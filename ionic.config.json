@@ -1,0 +1,7 @@
+{
+  "name": "pantry-manager",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

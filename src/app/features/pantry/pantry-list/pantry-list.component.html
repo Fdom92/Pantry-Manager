@@ -1,0 +1,13 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Despensa</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let item of items">
+      {{ item.name }} - {{ item.quantity }} {{ item.unit }}
+    </ion-item>
+  </ion-list>
+</ion-content>
