@@ -4,13 +4,82 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Shopping List</ion-card-title>
+      <ion-card-title>Shopping summary</ion-card-title>
+      @if (hasAlerts) {
+        <ion-card-subtitle>{{ summary.total }} items need attention.</ion-card-subtitle>
+      } @else {
+        <ion-card-subtitle>All stocked items meet their targets.</ion-card-subtitle>
+      }
     </ion-card-header>
     <ion-card-content>
-      <p>Welcome 👋 Here you'll see the generated shopping list.</p>
+      <div class="stat-grid">
+        <div class="stat">
+          <h3>{{ summary.total }}</h3>
+          <p>Total items to buy</p>
+        </div>
+        <div class="stat">
+          <h3>{{ summary.belowMin }}</h3>
+          <p>Below minimum</p>
+        </div>
+        <div class="stat">
+          <h3>{{ summary.basicLow }}</h3>
+          <p>Basic near minimum</p>
+        </div>
+        <div class="stat">
+          <h3>{{ summary.basicOut }}</h3>
+          <p>Basic out of stock</p>
+        </div>
+      </div>
+      <div class="summary-actions">
+        <ion-button size="small" fill="outline" (click)="refreshList()" [disabled]="loading">
+          Refresh list
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Suggested purchases</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      @if (loading) {
+        <div class="loading-state">
+          <ion-spinner name="lines"></ion-spinner>
+          <p>Generating shopping list…</p>
+        </div>
+      } @else if (shoppingItems.length) {
+        <ion-list lines="none">
+          @for (suggestion of shoppingItems; track suggestion.item._id) {
+            <ion-item lines="none" class="shopping-item">
+              <ion-label>
+                <h3>{{ suggestion.item.name }}</h3>
+                <p class="meta">
+                  Current: {{ suggestion.currentQuantity | number:'1.0-2' }} {{ getUnit(suggestion.item) }}
+                  @if (suggestion.minThreshold !== undefined) {
+                    · Min: {{ suggestion.minThreshold | number:'1.0-2' }} {{ getUnit(suggestion.item) }}
+                  }
+                </p>
+              </ion-label>
+              <div slot="end" class="suggestion-cta">
+                <ion-chip [color]="getBadgeColor(suggestion.reason)" [outline]="true">
+                  {{ reasonLabels[suggestion.reason] }}
+                </ion-chip>
+                <ion-note color="primary">
+                  Buy {{ suggestion.suggestedQuantity | number:'1.0-2' }} {{ getUnit(suggestion.item) }}
+                </ion-note>
+              </div>
+            </ion-item>
+          }
+        </ion-list>
+      } @else {
+        <ion-text color="medium">
+          Nothing to buy right now. Everything is within desired levels.
+        </ion-text>
+      }
     </ion-card-content>
   </ion-card>
 </ion-content>

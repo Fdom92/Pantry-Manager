@@ -25,7 +25,9 @@ export class SeedService {
         stock: {
           quantity: 2,
           unit: MeasurementUnit.KILOGRAM,
-          status: StockStatus.NORMAL,
+          status: StockStatus.LOW,
+          minThreshold: 3,
+          isBasic: true,
         },
         categoryId: '',
         locationId: '',
@@ -43,6 +45,8 @@ export class SeedService {
           quantity: 6,
           unit: MeasurementUnit.UNIT,
           status: StockStatus.LOW,
+          minThreshold: 8,
+          isBasic: true,
         },
         categoryId: '',
         locationId: '',
@@ -59,13 +63,15 @@ export class SeedService {
         stock: {
           quantity: 12,
           unit: MeasurementUnit.UNIT,
-          status: StockStatus.NORMAL,
+          status: StockStatus.LOW,
+          minThreshold: 18,
+          isBasic: true,
         },
         categoryId: '',
         locationId: '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 14).toISOString(), // 2 semanas
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 14).toISOString(), // 2 weeks
       });
 
       await this.storage.save({
@@ -77,12 +83,13 @@ export class SeedService {
           quantity: 1.5,
           unit: MeasurementUnit.KILOGRAM,
           status: StockStatus.NORMAL,
+          minThreshold: 2,
         },
         categoryId: '',
         locationId: '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 10).toISOString(), // 10 días
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 10).toISOString(), // 10 days
       });
 
       await this.storage.save({
@@ -94,12 +101,14 @@ export class SeedService {
           quantity: 1,
           unit: MeasurementUnit.UNIT,
           status: StockStatus.LOW,
+          minThreshold: 2,
+          isBasic: true,
         },
         categoryId: '',
         locationId: '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 días
+        expirationDate: new Date(now - 1000 * 60 * 60 * 24).toISOString(), // expired yesterday
       });
 
       await this.storage.save({
@@ -110,13 +119,15 @@ export class SeedService {
         stock: {
           quantity: 0.75,
           unit: MeasurementUnit.LITER,
-          status: StockStatus.NORMAL,
+          status: StockStatus.LOW,
+          minThreshold: 1,
+          isBasic: true,
         },
         categoryId: '',
         locationId: '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 365).toISOString(), // 1 año
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 365).toISOString(), // 1 year
       });
 
       await this.storage.save({
@@ -128,12 +139,50 @@ export class SeedService {
           quantity: 0.5,
           unit: MeasurementUnit.KILOGRAM,
           status: StockStatus.NORMAL,
+          minThreshold: 0.8,
         },
         categoryId: '',
         locationId: '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 7).toISOString(), // 1 semana
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 7).toISOString(), // 1 week
+      });
+
+      await this.storage.save({
+        _id: 'item:sample-butter',
+        type: 'item',
+        householdId: 'household:demo',
+        name: 'Butter',
+        stock: {
+          quantity: 0,
+          unit: MeasurementUnit.UNIT,
+          status: StockStatus.EMPTY,
+          minThreshold: 2,
+          isBasic: true,
+        },
+        categoryId: '',
+        locationId: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 30).toISOString(), // 30 days
+      });
+
+      await this.storage.save({
+        _id: 'item:sample-salad',
+        type: 'item',
+        householdId: 'household:demo',
+        name: 'Mixed greens',
+        stock: {
+          quantity: 0.2,
+          unit: MeasurementUnit.KILOGRAM,
+          status: StockStatus.LOW,
+          minThreshold: 0.8,
+        },
+        categoryId: '',
+        locationId: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        expirationDate: new Date(now - 1000 * 60 * 60 * 24 * 3).toISOString(), // expired 3 days ago
       });
 
     }

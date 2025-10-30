@@ -1,0 +1,66 @@
+ion-card + ion-card {
+  margin-top: 16px;
+}
+
+.stat-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.stat {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(var(--ion-color-warning-rgb, 255, 206, 0), 0.12);
+  text-align: center;
+}
+
+.stat h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--ion-color-warning);
+}
+
+.stat p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+}
+
+.summary-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  color: var(--ion-color-medium);
+}
+
+.shopping-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  align-items: flex-start;
+}
+
+.meta {
+  margin: 4px 0 0;
+  color: var(--ion-color-medium);
+}
+
+.suggestion-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.suggestion-cta ion-note {
+  font-weight: 600;
+}
