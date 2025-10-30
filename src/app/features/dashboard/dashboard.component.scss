@@ -1,0 +1,33 @@
+ion-card + ion-card {
+  margin-top: 16px;
+}
+
+.stat-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.stat {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08);
+  text-align: center;
+}
+
+.stat h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+}
+
+.stat p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+}
+
+ion-badge {
+  text-transform: capitalize;
+}
