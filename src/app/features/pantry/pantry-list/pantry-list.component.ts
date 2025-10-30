@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { Item } from '@core/models/item.model';
 import { SeedService } from '@core/services/seed.service';
-import { StorageService } from '@core/services/storage.service';
+import { StorageService } from '@core/services';
+import { PantryItem } from '@core/models';
 
 @Component({
   selector: 'app-pantry-list',
@@ -13,10 +13,10 @@ import { StorageService } from '@core/services/storage.service';
   styleUrls: ['./pantry-list.component.scss'],
 })
 export class PantryListComponent {
-  items: Item[] = [];
+  items: PantryItem[] = [];
 
   constructor(
-    private storage: StorageService<Item>,
+    private storage: StorageService<PantryItem>,
     private seedService: SeedService,
   ) {}
 

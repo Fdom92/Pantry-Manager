@@ -1,42 +1,162 @@
+// src/app/core/services/storage.service.ts
 import { Injectable } from '@angular/core';
-import { createLocalDB } from '@core/database/pouchdb.config';
-import { BaseDoc } from '@core/models/base-doc.model';
+import PouchDB from 'pouchdb-browser';
+import PouchFind from 'pouchdb-find';
+import { BaseDoc } from '@core/models';
+import { APP_DB_NAME } from '@core/constants/app.constants';
 
-@Injectable({ providedIn: 'root' })
+PouchDB.plugin(PouchFind);
+
+type PouchResponse = PouchDB.Core.Response;
+
+@Injectable({
+  providedIn: 'root',
+})
 export class StorageService<T extends BaseDoc> {
   private db: PouchDB.Database<T>;
 
   constructor() {
-    this.db = createLocalDB('pantry-db');
+    // auto_compaction reduces database size; tweak if needed
+    this.db = new PouchDB<T>(APP_DB_NAME, { auto_compaction: true });
   }
 
-  async save(doc: T) {
-    const existing = await this.db.get(doc._id).catch(() => null);
-    if (existing) {
-      doc._rev = existing._rev;
-      doc.createdAt = existing.createdAt ?? doc.createdAt ?? Date.now();
-    } else {
-      doc.createdAt = doc.createdAt ?? Date.now();
+  /**
+   * save - public alias for upsert (create/update).
+   * Updates when it exists; otherwise creates it.
+   * Returns the document with the updated _rev.
+   */
+  async save(doc: T): Promise<T> {
+    return this.upsert(doc);
+  }
+
+  /**
+   * upsert - internal create or update with timestamps
+   */
+  async upsert(doc: T): Promise<T> {
+    const now = new Date().toISOString();
+
+    try {
+      const existing = await this.db.get(doc._id).catch((err: any) => {
+        if (err?.status === 404) return undefined;
+        throw err;
+      });
+
+      const newDoc: T = {
+        ...doc,
+        createdAt: existing?.createdAt ?? now,
+        updatedAt: now,
+        _rev: existing?._rev,
+      } as T;
+
+      const res: PouchResponse = await this.db.put(newDoc as any);
+      return { ...newDoc, _rev: res.rev } as T;
+    } catch (err) {
+      console.error('[StorageService] upsert error', err);
+      throw err;
     }
-    doc.updatedAt = Date.now();
-    return this.db.put(doc);
   }
 
-  async get(id: string) {
-    return this.db.get(id);
+  /**
+   * get - fetch by id (null when it does not exist).
+   */
+  async get(id: string): Promise<T | null> {
+    try {
+      return await this.db.get(id);
+    } catch (err: any) {
+      if (err?.status === 404) return null;
+      throw err;
+    }
   }
 
-  async remove(id: string) {
-    const doc = await this.db.get(id);
-    return this.db.remove(doc);
+  /**
+   * remove - delete by id (app-level soft deletes can wrap this).
+   */
+  async remove(id: string): Promise<boolean> {
+    try {
+      const doc = await this.db.get(id);
+      await this.db.remove(doc);
+      return true;
+    } catch (err) {
+      console.error('[StorageService] remove error', err);
+      return false;
+    }
   }
 
-  async all(type?: string) {
+  /**
+   * all - returns every document or filters by type.
+   * If type is omitted, returns all docs (include_docs).
+   */
+  async all(type?: string): Promise<T[]> {
     if (!type) {
-      const result = await this.db.allDocs({ include_docs: true });
-      return result.rows.map(r => r.doc!);
+      const result = await this.db.allDocs<T>({ include_docs: true });
+      return result.rows.map(r => r.doc!).filter(Boolean);
     }
-    const result = await this.db.find({ selector: { type } });
-    return result.docs;
+
+    // Use find to search by type (ensure the index exists)
+    await this.ensureIndex([ 'type' ]);
+    const res = await this.db.find({ selector: { type } });
+    return res.docs;
+  }
+
+  /**
+   * listByType - helper for specific services.
+   */
+  protected async listByType(type: string): Promise<T[]> {
+    return this.all(type);
+  }
+
+  /**
+   * findByField - query by any indexed field.
+   */
+  async findByField<K extends keyof T>(field: K, value: T[K]): Promise<T[]> {
+    try {
+      await this.ensureIndex([ field as string ]);
+      const result = await this.db.find({
+        selector: { [field as string]: value },
+      });
+      return result.docs;
+    } catch (err) {
+      console.error('[StorageService] findByField error', err);
+      return [];
+    }
+  }
+
+  /**
+   * ensureIndex - creates the index if it does not exist.
+   */
+  async ensureIndex(fields: string[]): Promise<void> {
+    try {
+      await this.db.createIndex({ index: { fields } });
+    } catch (err) {
+      // Some errors appear when the index already exists; log and ignore them
+      console.warn('[StorageService] ensureIndex warning', err);
+    }
+  }
+
+  /**
+   * clearAll - wipe the database (handy during development).
+   */
+  async clearAll(): Promise<void> {
+    await this.db.destroy();
+    this.db = new PouchDB<T>(APP_DB_NAME, { auto_compaction: true });
+  }
+
+  /**
+   * watchChanges - subscribe to live DB changes.
+   */
+  watchChanges(onChange: (doc: T) => void): PouchDB.Core.Changes<T> {
+    const feed = this.db.changes<T>({
+      since: 'now',
+      live: true,
+      include_docs: true,
+    })
+    .on('change', change => {
+      if (change.doc) onChange(change.doc);
+    })
+    .on('error', err => {
+      console.error('[StorageService] changes feed error', err);
+    });
+
+    return feed;
   }
 }
