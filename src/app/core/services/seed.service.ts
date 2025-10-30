@@ -18,10 +18,10 @@ export class SeedService {
       const now = Date.now();
 
       await this.storage.save({
-        _id: 'item:sample-arroz',
+        _id: 'item:sample-rice',
         type: 'item',
         householdId: 'household:demo',
-        name: 'Arroz blanco',
+        name: 'White rice',
         stock: {
           quantity: 2,
           unit: MeasurementUnit.KILOGRAM,
@@ -35,10 +35,10 @@ export class SeedService {
       });
 
       await this.storage.save({
-        _id: 'item:sample-leche',
+        _id: 'item:sample-milk',
         type: 'item',
         householdId: 'household:demo',
-        name: 'Leche entera',
+        name: 'Whole milk',
         stock: {
           quantity: 6,
           unit: MeasurementUnit.UNIT,
@@ -52,10 +52,10 @@ export class SeedService {
       });
 
       await this.storage.save({
-        _id: 'item:sample-huevos',
+        _id: 'item:sample-eggs',
         type: 'item',
         householdId: 'household:demo',
-        name: 'Huevos',
+        name: 'Eggs',
         stock: {
           quantity: 12,
           unit: MeasurementUnit.UNIT,
@@ -69,10 +69,10 @@ export class SeedService {
       });
 
       await this.storage.save({
-        _id: 'item:sample-manzanas',
+        _id: 'item:sample-apples',
         type: 'item',
         householdId: 'household:demo',
-        name: 'Manzanas rojas',
+        name: 'Red apples',
         stock: {
           quantity: 1.5,
           unit: MeasurementUnit.KILOGRAM,
@@ -86,10 +86,10 @@ export class SeedService {
       });
 
       await this.storage.save({
-        _id: 'item:sample-pan',
+        _id: 'item:sample-bread',
         type: 'item',
         householdId: 'household:demo',
-        name: 'Pan integral',
+        name: 'Whole grain bread',
         stock: {
           quantity: 1,
           unit: MeasurementUnit.UNIT,
@@ -103,10 +103,10 @@ export class SeedService {
       });
 
       await this.storage.save({
-        _id: 'item:sample-aceite',
+        _id: 'item:sample-oil',
         type: 'item',
         householdId: 'household:demo',
-        name: 'Aceite de oliva',
+        name: 'Olive oil',
         stock: {
           quantity: 0.75,
           unit: MeasurementUnit.LITER,
@@ -120,10 +120,10 @@ export class SeedService {
       });
 
       await this.storage.save({
-        _id: 'item:sample-arandanos',
+        _id: 'item:sample-blueberries',
         type: 'item',
         householdId: 'household:demo',
-        name: 'Arándanos',
+        name: 'Blueberries',
         stock: {
           quantity: 0.5,
           unit: MeasurementUnit.KILOGRAM,

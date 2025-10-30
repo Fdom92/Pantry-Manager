@@ -1,15 +1,134 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Despensa</ion-title>
+    <ion-title>Pantry</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="openNewItemModal()">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <ion-list>
-    @for (item of items; track item._id) {
+    @if (items.length === 0) {
       <ion-item>
-        {{ item.name }} - {{ item.stock?.quantity }} {{ item.stock?.unit }}
+        <ion-label color="medium">No pantry items yet.</ion-label>
       </ion-item>
+    } @else {
+      @for (item of items; track item._id) {
+        <ion-item>
+          <ion-label>
+            <h2>{{ item.name }}</h2>
+            <p>
+              {{ item.stock?.quantity }} {{ item.stock?.unit }}
+              @if (item.expirationDate) {
+                · expires {{ item.expirationDate | date:'MM/dd/yyyy' }}
+              }
+            </p>
+          </ion-label>
+        </ion-item>
+      }
     }
   </ion-list>
+
+  <ion-modal [isOpen]="showCreateModal" (willDismiss)="closeNewItemModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>New Item</ion-title>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" color="medium" (click)="closeNewItemModal()">
+              Cancel
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <form [formGroup]="form" (ngSubmit)="submitNewItem()">
+          <ion-list lines="full">
+            <ion-item>
+              <ion-input
+                formControlName="name"
+                label="Name"
+                labelPlacement="stacked"
+                placeholder="Rice, milk..."
+                required>
+              </ion-input>
+            </ion-item>
+            @if (form.get('name')?.invalid && form.get('name')?.touched) {
+              <ion-note color="danger" class="ion-padding-start">
+                Name is required.
+              </ion-note>
+            }
+
+            <ion-item>
+              <ion-input
+                type="number"
+                min="0"
+                formControlName="quantity"
+                label="Quantity"
+                labelPlacement="stacked">
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-select
+                formControlName="unit"
+                interface="popover"
+                label="Unit"
+                labelPlacement="stacked">
+                @for (unit of unitOptions; track unit) {
+                  <ion-select-option [value]="unit">{{ unit }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+
+            <ion-item>
+              <ion-input
+                formControlName="categoryId"
+                label="Category"
+                labelPlacement="stacked"
+                placeholder="Cereals, dairy...">
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-input
+                formControlName="locationId"
+                label="Location"
+                labelPlacement="stacked"
+                placeholder="Pantry, kitchen...">
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-input
+                type="number"
+                min="0"
+                formControlName="minThreshold"
+                label="Minimum quantity (alerts)"
+                labelPlacement="stacked">
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-input
+                type="date"
+                formControlName="expirationDate"
+                label="Expiration date"
+                labelPlacement="stacked">
+              </ion-input>
+            </ion-item>
+          </ion-list>
+
+          <div class="ion-padding-top">
+            <ion-button type="submit" expand="block" [disabled]="form.invalid">
+              Save item
+            </ion-button>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
