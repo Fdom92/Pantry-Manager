@@ -9,28 +9,84 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
-    @if (items.length === 0) {
-      <ion-item>
-        <ion-label color="medium">No pantry items yet.</ion-label>
-      </ion-item>
-    } @else {
-      @for (item of items; track item._id) {
-        <ion-item>
-          <ion-label>
-            <h2>{{ item.name }}</h2>
-            <p>
-              {{ item.stock?.quantity }} {{ item.stock?.unit }}
-              @if (item.expirationDate) {
-                · expires {{ item.expirationDate | date:'MM/dd/yyyy' }}
+<ion-content class="ion-padding">
+  @if (items.length === 0) {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Pantry overview</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-text color="medium">No pantry items yet. Add your first product to get started.</ion-text>
+      </ion-card-content>
+    </ion-card>
+  } @else {
+    <div class="category-stack">
+      @for (group of groups; track group.key) {
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>{{ group.name }}</ion-card-title>
+            <ion-card-subtitle>
+              {{ group.items.length }} items
+              @if (group.lowStockCount) {
+                · {{ group.lowStockCount }} low stock
               }
-            </p>
-          </ion-label>
-        </ion-item>
+              @if (group.expiringCount) {
+                · {{ group.expiringCount }} expiring soon
+              }
+              @if (group.expiredCount) {
+                · {{ group.expiredCount }} expired
+              }
+            </ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="item-grid">
+              @for (item of group.items; track item._id) {
+                <ion-card class="item-card" [ngClass]="{
+                  'item-low': isLowStock(item),
+                  'item-expired': isExpired(item),
+                  'item-near-expiry': isNearExpiry(item)
+                }">
+                  <ion-card-header>
+                    <ion-card-title>{{ item.name }}</ion-card-title>
+                  </ion-card-header>
+                  <ion-card-content>
+                    <p class="item-quantity">
+                      {{ (item.stock?.quantity ?? 0) | number:'1.0-2' }} {{ getUnit(item) }}
+                      @if (item.stock?.minThreshold != null) {
+                        <span class="min">/ {{ (item.stock?.minThreshold ?? 0) | number:'1.0-2' }}</span>
+                      }
+                    </p>
+                    @if (item.expirationDate) {
+                      <p class="item-expiration">
+                        @if (isExpired(item)) {
+                          Expired {{ item.expirationDate | date:'MMM d, yyyy' }}
+                        } @else {
+                          Expires {{ item.expirationDate | date:'MMM d, yyyy' }}
+                        }
+                      </p>
+                    }
+                    <div class="tags">
+                      @if (isExpired(item)) {
+                        <ion-chip color="medium" size="small">Expired</ion-chip>
+                      } @else if (isNearExpiry(item)) {
+                        <ion-chip color="warning" size="small">Expiring soon</ion-chip>
+                      }
+                      @if (isLowStock(item)) {
+                        <ion-chip color="danger" size="small">Low stock</ion-chip>
+                      }
+                      @if (item.stock?.isBasic) {
+                        <ion-chip color="tertiary" size="small">Basic</ion-chip>
+                      }
+                    </div>
+                  </ion-card-content>
+                </ion-card>
+              }
+            </div>
+          </ion-card-content>
+        </ion-card>
       }
-    }
-  </ion-list>
+    </div>
+  }
 
   <ion-modal [isOpen]="showCreateModal" (willDismiss)="closeNewItemModal()">
     <ng-template>

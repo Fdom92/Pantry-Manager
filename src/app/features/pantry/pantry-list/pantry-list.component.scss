@@ -1,0 +1,62 @@
+.category-stack ion-card + ion-card {
+  margin-top: 16px;
+}
+
+.item-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.item-card {
+  margin: 0;
+  border-radius: 12px;
+  background: var(--ion-color-light);
+  box-shadow: none;
+}
+
+.item-card ion-card-header {
+  padding-bottom: 0;
+}
+
+.item-card ion-card-title {
+  font-size: 1.05rem;
+}
+
+.item-quantity {
+  font-weight: 600;
+  margin: 0;
+}
+
+.item-quantity .min {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+}
+
+.item-expiration {
+  margin: 6px 0 0;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.item-low {
+  border: 1px solid rgba(var(--ion-color-danger-rgb, 255, 68, 68), 0.3);
+}
+
+.item-expired {
+  border: 1px solid rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.4);
+  background: rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.1);
+}
+
+.item-near-expiry {
+  border: 1px solid rgba(var(--ion-color-warning-rgb, 255, 206, 0), 0.4);
+}
