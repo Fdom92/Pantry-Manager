@@ -20,30 +20,30 @@
     <div class="summary-chips">
       <ion-chip color="primary" size="small">
         <ion-icon name="layers-outline"></ion-icon>
-        <ion-label>Total: {{ summary.total }}</ion-label>
+        <ion-label>Total: {{ summary().total }}</ion-label>
       </ion-chip>
-      @if (summary.low) {
+      @if (summary().low) {
         <ion-chip color="danger" size="small">
           <ion-icon name="alert-circle-outline"></ion-icon>
-          <ion-label>Low: {{ summary.low }}</ion-label>
+          <ion-label>Low: {{ summary().low }}</ion-label>
         </ion-chip>
       }
-      @if (summary.expiring) {
+      @if (summary().expiring) {
         <ion-chip color="warning" size="small">
           <ion-icon name="hourglass-outline"></ion-icon>
-          <ion-label>Expiring: {{ summary.expiring }}</ion-label>
+          <ion-label>Expiring: {{ summary().expiring }}</ion-label>
         </ion-chip>
       }
-      @if (summary.expired) {
+      @if (summary().expired) {
         <ion-chip color="medium" size="small">
           <ion-icon name="time-outline"></ion-icon>
-          <ion-label>Expired: {{ summary.expired }}</ion-label>
+          <ion-label>Expired: {{ summary().expired }}</ion-label>
         </ion-chip>
       }
     </div>
   </div>
 
-  <ion-modal [isOpen]="showFilters" (willDismiss)="closeFilters()">
+  <ion-modal [isOpen]="showFilters()" (willDismiss)="closeFilters()">
     <ng-template>
       <ion-header>
         <ion-toolbar>
@@ -58,7 +58,7 @@
       <ion-content class="ion-padding filter-modal">
         <ion-searchbar
           placeholder="Search products"
-          [value]="searchTerm"
+          [value]="searchTerm()"
           debounce="300"
           (ionInput)="onSearchTermChange($event)"
           (ionClear)="onSearchTermChange($event)">
@@ -73,9 +73,9 @@
               interface="popover"
               label="Category"
               labelPlacement="stacked"
-              [value]="selectedCategory"
+              [value]="selectedCategory()"
               (ionChange)="onCategoryChange($event)">
-              @for (option of categoryOptions; track option.id) {
+              @for (option of categoryOptions(); track option.id) {
                 <ion-select-option [value]="option.id">
                   {{ option.label }}
                   ({{ option.count }})
@@ -92,9 +92,9 @@
               interface="popover"
               label="Location"
               labelPlacement="stacked"
-              [value]="selectedLocation"
+              [value]="selectedLocation()"
               (ionChange)="onLocationChange($event)">
-              @for (option of locationOptions; track option.id) {
+              @for (option of locationOptions(); track option.id) {
                 <ion-select-option [value]="option.id">
                   {{ option.label }}
                   ({{ option.count }})
@@ -108,7 +108,7 @@
               interface="popover"
               label="Sort by"
               labelPlacement="stacked"
-              [value]="sortOption"
+              [value]="sortOption()"
               (ionChange)="onSortChange($event)">
               <ion-select-option value="name">Name (A-Z)</ion-select-option>
               <ion-select-option value="quantity">Quantity (high → low)</ion-select-option>
@@ -121,7 +121,7 @@
           <ion-label>Status</ion-label>
           <ion-segment
             mode="md"
-            [value]="statusFilter"
+            [value]="statusFilter()"
             (ionChange)="onStatusFilterChange($event)">
             <ion-segment-button value="all">
               All
@@ -147,11 +147,11 @@
     </ng-template>
   </ion-modal>
 
-  @if (isLoading) {
+  @if (loading() && itemsState().length === 0) {
     <div class="state">
       <ion-spinner name="dots"></ion-spinner>
     </div>
-  } @else if (items.length === 0) {
+  } @else if (itemsState().length === 0) {
     <ion-card>
       <ion-card-header>
         <ion-card-title>Pantry overview</ion-card-title>
@@ -160,7 +160,7 @@
         <ion-text color="medium">No pantry items yet. Add your first product to get started.</ion-text>
       </ion-card-content>
     </ion-card>
-  } @else if (filteredItems.length === 0) {
+  } @else if (filteredItems().length === 0) {
     <ion-card>
       <ion-card-content>
         <ion-text color="medium">No items match the current filters.</ion-text>
@@ -168,7 +168,7 @@
     </ion-card>
   } @else {
     <div class="category-stack">
-      @for (group of groups; track group.key) {
+      @for (group of groups(); track group.key) {
         <ion-card [ngClass]="{ 'category-collapsed': !isCategoryExpanded(group.key) }">
           <ion-card-header (click)="toggleCategory(group.key, $event)">
             <div class="group-header">

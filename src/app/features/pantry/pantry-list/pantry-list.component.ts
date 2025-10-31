@@ -1,14 +1,14 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, signal, computed, effect } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { SeedService } from '@core/services/seed.service';
-import { PantryService } from '@core/services';
 import { PantryItem, MeasurementUnit, StockStatus, StockInfo } from '@core/models';
 import { createDocumentId } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { trigger, state, style, transition, animate } from '@angular/animations';
+import { PantryStoreService } from '@core/store/pantry-store.service';
 interface PantryGroup {
   key: string;
   name: string;
@@ -39,26 +39,30 @@ interface CategoryState {
   ],
 })
 export class PantryListComponent implements OnDestroy {
-  items: PantryItem[] = [];
-  filteredItems: PantryItem[] = [];
+  readonly searchTerm = signal('');
+  readonly selectedCategory = signal('all');
+  readonly selectedLocation = signal('all');
+  readonly sortOption = signal<'name' | 'quantity' | 'expiration'>('name');
+  readonly statusFilter = signal<'all' | 'expired' | 'near-expiry'>('all');
+  readonly showFilters = signal(false);
+  readonly itemsState = signal<PantryItem[]>([]);
+  readonly filteredItems = computed(() => this.computeFilteredItems());
+  readonly groups = computed(() => this.buildGroups(this.filteredItems()));
+  readonly summary = computed(() => this.buildSummary(this.filteredItems()));
+  readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
+  readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
+  readonly loading = this.pantryStore.loading;
+  readonly nearExpiryDays = 3;
+  readonly unitOptions = Object.values(MeasurementUnit);
   showCreateModal = false;
-  groups: PantryGroup[] = [];
-  categoryOptions: Array<{ id: string; label: string; count: number; lowCount: number }> = [];
-  locationOptions: Array<{ id: string; label: string; count: number }> = [];
-  selectedCategory = 'all';
-  selectedLocation = 'all';
-  searchTerm = '';
-  sortOption: 'name' | 'quantity' | 'expiration' = 'name';
-  statusFilter: 'all' | 'expired' | 'near-expiry' = 'all';
   editingItem: PantryItem | null = null;
-  isLoading = false;
   isSaving = false;
   private readonly expandedItems = new Set<string>();
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveDelay = 500;
   private readonly categoryState = new Map<string, CategoryState>();
-  readonly nearExpiryDays = 3;
-  readonly unitOptions = Object.values(MeasurementUnit);
+  private realtimeSubscribed = false;
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     quantity: this.fb.control(1, { validators: [Validators.required, Validators.min(0)], nonNullable: true }),
@@ -69,33 +73,48 @@ export class PantryListComponent implements OnDestroy {
     expirationDate: this.fb.control(''),
     notes: this.fb.control('')
   });
-  summary = {
-    total: 0,
-    low: 0,
-    expiring: 0,
-    expired: 0
-  };
-  showFilters = false;
-
   constructor(
-    private readonly pantryService: PantryService,
+    private readonly pantryStore: PantryStoreService,
     private seedService: SeedService,
     private readonly fb: FormBuilder,
     private readonly toastCtrl: ToastController,
-  ) {}
+  ) {
+    effect(() => {
+      this.itemsState.set(this.pantryStore.items());
+    });
+
+    effect(() => {
+      this.ensureCategoryState(this.groups());
+    });
+
+    effect(() => {
+      const categories = this.categoryOptions();
+      const selected = this.selectedCategory();
+      if (selected !== 'all' && !categories.some(option => option.id === selected)) {
+        this.selectedCategory.set('all');
+      }
+    });
+
+    effect(() => {
+      const locations = this.locationOptions();
+      const selected = this.selectedLocation();
+      if (selected !== 'all' && !locations.some(option => option.id === selected)) {
+        this.selectedLocation.set('all');
+      }
+    });
+  }
 
   async ionViewWillEnter() {
     await this.seedService.ensureSeedData();
     await this.loadItems();
+    if (!this.realtimeSubscribed) {
+      this.pantryStore.watchRealtime();
+      this.realtimeSubscribed = true;
+    }
   }
 
   async loadItems(): Promise<void> {
-    this.isLoading = true;
-    this.items = await this.pantryService.getAll();
-    this.buildCategoryOptions(this.items);
-    this.buildLocationOptions(this.items);
-    this.applyFilters();
-    this.isLoading = false;
+    await this.pantryStore.loadAll();
   }
 
   openNewItemModal(): void {
@@ -144,10 +163,13 @@ export class PantryListComponent implements OnDestroy {
     this.isSaving = true;
     try {
       const item = this.buildItemPayload(this.editingItem ?? undefined);
-      const saved = await this.pantryService.saveItem(item);
-      this.upsertItem(saved);
+      if (this.editingItem) {
+        await this.pantryStore.updateItem(item);
+      } else {
+        await this.pantryStore.addItem(item);
+      }
       this.closeFormModal();
-      await this.presentToast(`Saved "${saved.name}"`, 'success');
+      await this.presentToast(`Saved "${item.name}"`, 'success');
     } catch (err) {
       console.error('[PantryListComponent] submitItem error', err);
       this.isSaving = false;
@@ -168,11 +190,9 @@ export class PantryListComponent implements OnDestroy {
       }
     }
 
-    const success = await this.pantryService.deleteItem(item._id);
-    if (success) {
-      this.removeItem(item._id);
-      await this.presentToast(`Removed "${item.name}"`, 'medium');
-    }
+    await this.pantryStore.deleteItem(item._id);
+    this.expandedItems.delete(item._id);
+    await this.presentToast(`Removed "${item.name}"`, 'medium');
   }
 
   async adjustQuantity(item: PantryItem, delta: number, event?: Event): Promise<void> {
@@ -188,7 +208,9 @@ export class PantryListComponent implements OnDestroy {
 
     const updatedLocal = this.updateLocalQuantity(item._id, next);
     await this.provideQuantityFeedback(prevQuantity, next);
-    this.triggerStockSave(item._id, next);
+    if (updatedLocal) {
+      this.triggerStockSave(item._id, updatedLocal);
+    }
 
     if (updatedLocal && next === 0) {
       await this.presentToast(`"${updatedLocal.name}" added to shopping list suggestions`, 'success');
@@ -196,51 +218,46 @@ export class PantryListComponent implements OnDestroy {
   }
 
   onSearchTermChange(ev: CustomEvent): void {
-    this.searchTerm = (ev.detail?.value ?? '').trim();
-    this.applyFilters();
+    this.searchTerm.set((ev.detail?.value ?? '').trim());
   }
 
   onCategoryChange(ev: CustomEvent): void {
-    this.selectedCategory = ev.detail?.value ?? 'all';
-    this.applyFilters();
+    this.selectedCategory.set(ev.detail?.value ?? 'all');
   }
 
   onLocationChange(ev: CustomEvent): void {
-    this.selectedLocation = ev.detail?.value ?? 'all';
-    this.applyFilters();
+    this.selectedLocation.set(ev.detail?.value ?? 'all');
   }
 
   onStatusFilterChange(ev: CustomEvent): void {
-    this.statusFilter = ev.detail?.value ?? 'all';
-    this.applyFilters();
+    this.statusFilter.set(ev.detail?.value ?? 'all');
   }
 
   onSortChange(ev: CustomEvent): void {
-    this.sortOption = ev.detail?.value ?? 'name';
-    this.applyFilters();
+    this.sortOption.set(ev.detail?.value ?? 'name');
   }
 
   openFilters(event?: Event): void {
     event?.preventDefault();
-    this.showFilters = true;
+    this.showFilters.set(true);
   }
 
   closeFilters(): void {
-    this.showFilters = false;
+    this.showFilters.set(false);
   }
 
   clearFilters(): void {
-    this.searchTerm = '';
-    this.selectedCategory = 'all';
-    this.selectedLocation = 'all';
-    this.statusFilter = 'all';
-    this.sortOption = 'name';
-    this.applyFilters();
+    this.searchTerm.set('');
+    this.selectedCategory.set('all');
+    this.selectedLocation.set('all');
+    this.statusFilter.set('all');
+    this.sortOption.set('name');
+    this.showFilters.set(false);
   }
 
   async refreshItems(event?: Event): Promise<void> {
     event?.preventDefault();
-    await this.loadItems();
+    await this.pantryStore.refresh();
   }
 
   async discardExpiredItem(item: PantryItem, event?: Event): Promise<void> {
@@ -348,47 +365,46 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
-  private applyFilters(): void {
-    const activeSearch = this.searchTerm.trim().toLowerCase();
-    let filtered = [...this.items];
+  private computeFilteredItems(): PantryItem[] {
+    const items = this.itemsState();
+    const search = this.searchTerm().trim().toLowerCase();
+    const category = this.selectedCategory();
+    const location = this.selectedLocation();
+    const status = this.statusFilter();
 
-    if (activeSearch) {
-      filtered = filtered.filter(item => this.matchesSearch(item, activeSearch));
-    }
+    let filtered = items.filter(item => {
+      if (search && !this.matchesSearch(item, search)) {
+        return false;
+      }
+      if (category !== 'all' && (item.categoryId ?? '') !== category) {
+        return false;
+      }
+      if (location !== 'all' && (item.locationId ?? '') !== location) {
+        return false;
+      }
+      switch (status) {
+        case 'expired':
+          return this.isExpired(item);
+        case 'near-expiry':
+          return this.isNearExpiry(item) && !this.isExpired(item);
+        default:
+          return true;
+      }
+    });
 
-    if (this.selectedCategory !== 'all') {
-      filtered = filtered.filter(item => (item.categoryId ?? '') === this.selectedCategory);
-    }
-
-    if (this.selectedLocation !== 'all') {
-      filtered = filtered.filter(item => (item.locationId ?? '') === this.selectedLocation);
-    }
-
-    switch (this.statusFilter) {
-      case 'expired':
-        filtered = filtered.filter(item => this.isExpired(item));
-        break;
-      case 'near-expiry':
-        filtered = filtered.filter(item => this.isNearExpiry(item) && !this.isExpired(item));
-        break;
-    }
-
-    filtered = filtered.sort((a, b) => this.compareItems(a, b));
-
-    this.filteredItems = filtered;
-    this.summary = this.buildSummary(filtered);
-    this.groups = this.buildGroups(filtered);
-    this.ensureCategoryState();
+    filtered = [...filtered].sort((a, b) => this.compareItems(a, b));
     this.syncExpandedItems(filtered);
+    return filtered;
   }
 
   private compareItems(a: PantryItem, b: PantryItem): number {
+    const sortOption = this.sortOption();
     const expirationWeightDiff = this.getExpirationWeight(a) - this.getExpirationWeight(b);
     if (expirationWeightDiff !== 0) {
       return expirationWeightDiff;
     }
 
-    switch (this.sortOption) {
+    switch (sortOption) {
       case 'quantity': {
         const quantityDiff = (b.stock?.quantity ?? 0) - (a.stock?.quantity ?? 0);
         if (quantityDiff !== 0) {
@@ -451,7 +467,7 @@ export class PantryListComponent implements OnDestroy {
     };
   }
 
-  private buildLocationOptions(items: PantryItem[]): void {
+  private computeLocationOptions(items: PantryItem[]): Array<{ id: string; label: string; count: number }> {
     const counts = new Map<string, { label: string; count: number }>();
 
     for (const item of items) {
@@ -469,71 +485,66 @@ export class PantryListComponent implements OnDestroy {
       .map(([id, meta]) => ({ id, label: meta.label, count: meta.count }))
       .sort((a, b) => a.label.localeCompare(b.label));
 
-    this.locationOptions = [
+    return [
       { id: 'all', label: `All (${items.length})`, count: items.length },
       ...mapped
     ];
-
-    const hasSelected = mapped.some(option => option.id === this.selectedLocation);
-    if (!hasSelected) {
-      this.selectedLocation = 'all';
-    }
   }
 
   private updateLocalQuantity(itemId: string, quantity: number): PantryItem | null {
     let updatedItem: PantryItem | null = null;
-    this.items = this.items.map(item => {
-      if (item._id !== itemId) {
-        return item;
-      }
-      const minThreshold = item.stock?.minThreshold ?? null;
-      const unit = item.stock?.unit ?? MeasurementUnit.UNIT;
-      const baseStock: StockInfo = {
-        ...(item.stock ?? { quantity: 0, unit }),
-        quantity,
-        unit,
-        status: this.computeStockStatus(quantity, minThreshold),
-      };
+    this.itemsState.update(items =>
+      items.map(item => {
+        if (item._id !== itemId) {
+          return item;
+        }
+        const minThreshold = item.stock?.minThreshold ?? null;
+        const unit = item.stock?.unit ?? MeasurementUnit.UNIT;
+        const baseStock: StockInfo = {
+          ...(item.stock ?? { quantity: 0, unit }),
+          quantity,
+          unit,
+          status: this.computeStockStatus(quantity, minThreshold),
+        };
 
-      if (minThreshold != null) {
-        baseStock.minThreshold = minThreshold;
-      } else {
-        baseStock.minThreshold = undefined;
-      }
+        if (minThreshold != null) {
+          baseStock.minThreshold = minThreshold;
+        } else {
+          baseStock.minThreshold = undefined;
+        }
 
-      updatedItem = {
-        ...item,
-        stock: baseStock,
-        updatedAt: new Date().toISOString(),
-      };
-      return updatedItem;
-    });
+        updatedItem = {
+          ...item,
+          stock: baseStock,
+          updatedAt: new Date().toISOString(),
+        };
+        return updatedItem;
+      })
+    );
 
-    this.buildCategoryOptions(this.items);
-    this.applyFilters();
     return updatedItem;
   }
 
-  private triggerStockSave(itemId: string, quantity: number): void {
+  private triggerStockSave(itemId: string, updated: PantryItem): void {
+    this.pendingItems.set(itemId, updated);
     const existingTimer = this.stockSaveTimers.get(itemId);
     if (existingTimer) {
       clearTimeout(existingTimer);
     }
 
-    const timer = setTimeout(() => {
-      void (async () => {
+    const timer = setTimeout(async () => {
+      const pending = this.pendingItems.get(itemId);
+      if (pending) {
         try {
-          const updated = await this.pantryService.updateStock(itemId, quantity);
-          if (updated) {
-            this.upsertItem(updated);
-          }
+          await this.pantryStore.updateItem(pending);
         } catch (err) {
-          console.error('[PantryListComponent] updateStock error', err);
+          console.error('[PantryListComponent] updateItem error', err);
           await this.presentToast('Error updating quantity', 'danger');
         } finally {
-          this.stockSaveTimers.delete(itemId);
+          this.pendingItems.delete(itemId);
         }
-      })();
+      }
+      this.stockSaveTimers.delete(itemId);
     }, this.stockSaveDelay);
 
     this.stockSaveTimers.set(itemId, timer);
@@ -576,6 +587,7 @@ export class PantryListComponent implements OnDestroy {
       clearTimeout(timer);
     }
     this.stockSaveTimers.clear();
+    this.pendingItems.clear();
   }
 
   private buildItemPayload(existing?: PantryItem): PantryItem {
@@ -673,7 +685,7 @@ export class PantryListComponent implements OnDestroy {
     return StockStatus.NORMAL;
   }
 
-  private buildCategoryOptions(items: PantryItem[]): void {
+  private computeCategoryOptions(items: PantryItem[]): Array<{ id: string; label: string; count: number; lowCount: number }> {
     const counts = new Map<string, { label: string; count: number; lowCount: number }>();
     for (const item of items) {
       const id = (item.categoryId ?? '').trim();
@@ -698,15 +710,10 @@ export class PantryListComponent implements OnDestroy {
       .sort((a, b) => a.label.localeCompare(b.label));
 
     const lowTotal = mapped.reduce((acc, option) => acc + option.lowCount, 0);
-    this.categoryOptions = [
+    return [
       { id: 'all', label: `All (${items.length})`, count: items.length, lowCount: lowTotal },
       ...mapped
     ];
-
-    const hasSelected = mapped.some(option => option.id === this.selectedCategory);
-    if (!hasSelected) {
-      this.selectedCategory = 'all';
-    }
   }
 
   private buildGroups(items: PantryItem[]): PantryGroup[] {
@@ -756,14 +763,15 @@ export class PantryListComponent implements OnDestroy {
     this.categoryState.set(key, { expanded: !current });
   }
 
-  private ensureCategoryState(): void {
-    for (const group of this.groups) {
+  private ensureCategoryState(groups: PantryGroup[]): void {
+    const keys = new Set(groups.map(group => group.key));
+    for (const group of groups) {
       if (!this.categoryState.has(group.key)) {
         this.categoryState.set(group.key, { expanded: true });
       }
     }
     for (const key of Array.from(this.categoryState.keys())) {
-      if (!this.groups.some(group => group.key === key)) {
+      if (!keys.has(key)) {
         this.categoryState.delete(key);
       }
     }
@@ -794,7 +802,7 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
-  private syncExpandedItems(source: PantryItem[] = this.items): void {
+  private syncExpandedItems(source: PantryItem[] = this.itemsState()): void {
     const validIds = new Set(source.map(item => item._id));
     for (const id of Array.from(this.expandedItems)) {
       if (!validIds.has(id)) {
@@ -810,27 +818,4 @@ export class PantryListComponent implements OnDestroy {
     return name.includes(search) || category.includes(search) || location.includes(search);
   }
 
-  private upsertItem(updated: PantryItem): void {
-    const index = this.items.findIndex(i => i._id === updated._id);
-    if (index >= 0) {
-      this.items = [
-        ...this.items.slice(0, index),
-        { ...updated },
-        ...this.items.slice(index + 1)
-      ];
-    } else {
-      this.items = [...this.items, updated];
-    }
-    this.buildCategoryOptions(this.items);
-    this.buildLocationOptions(this.items);
-    this.applyFilters();
-  }
-
-  private removeItem(id: string): void {
-    this.items = this.items.filter(item => item._id !== id);
-    this.expandedItems.delete(id);
-    this.buildCategoryOptions(this.items);
-    this.buildLocationOptions(this.items);
-    this.applyFilters();
-  }
 }
