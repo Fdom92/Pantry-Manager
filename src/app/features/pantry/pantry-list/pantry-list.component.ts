@@ -163,13 +163,17 @@ export class PantryListComponent implements OnDestroy {
     this.isSaving = true;
     try {
       const item = this.buildItemPayload(this.editingItem ?? undefined);
-      if (this.editingItem) {
+      const previous = this.editingItem;
+      let successMessage: string;
+      if (previous) {
         await this.pantryStore.updateItem(item);
+        successMessage = this.buildUpdateSuccessMessage(previous, item);
       } else {
         await this.pantryStore.addItem(item);
+        successMessage = this.buildCreateSuccessMessage(item);
       }
       this.closeFormModal();
-      await this.presentToast(`Saved "${item.name}"`, 'success');
+      await this.presentToast(successMessage, 'success');
     } catch (err) {
       console.error('[PantryListComponent] submitItem error', err);
       this.isSaving = false;
@@ -192,7 +196,7 @@ export class PantryListComponent implements OnDestroy {
 
     await this.pantryStore.deleteItem(item._id);
     this.expandedItems.delete(item._id);
-    await this.presentToast(`Removed "${item.name}"`, 'medium');
+    await this.presentToast('🗑️ Producto eliminado.', 'medium');
   }
 
   async adjustQuantity(item: PantryItem, delta: number, event?: Event): Promise<void> {
@@ -537,6 +541,10 @@ export class PantryListComponent implements OnDestroy {
       if (pending) {
         try {
           await this.pantryStore.updateItem(pending);
+          const message = this.buildStockUpdateMessage(pending);
+          if (message) {
+            await this.presentToast(message, 'success');
+          }
         } catch (err) {
           console.error('[PantryListComponent] updateItem error', err);
           await this.presentToast('Error updating quantity', 'danger');
@@ -588,6 +596,82 @@ export class PantryListComponent implements OnDestroy {
     }
     this.stockSaveTimers.clear();
     this.pendingItems.clear();
+  }
+
+  private buildCreateSuccessMessage(item: PantryItem): string {
+    const name = item.name?.trim() || 'Producto';
+    const quantityText = this.formatQuantityForMessage(item.stock?.quantity, item.stock?.unit);
+    const locationPhrase = this.formatLocationPhrase(item.locationId, 'en', 'la despensa');
+    const quantitySegment = quantityText ? ` (${quantityText})` : '';
+    return `✅ ${name} añadido${quantitySegment} ${locationPhrase}.`;
+  }
+
+  private buildUpdateSuccessMessage(previous: PantryItem, updated: PantryItem): string {
+    const previousLocation = (previous.locationId ?? '').trim();
+    const nextLocation = (updated.locationId ?? '').trim();
+    if (previousLocation !== nextLocation) {
+      const locationPhrase = this.formatLocationPhrase(updated.locationId, 'a', 'la nueva ubicación');
+      return `📦 Producto movido ${locationPhrase}.`;
+    }
+
+    const previousQuantity = previous.stock?.quantity ?? null;
+    const nextQuantity = updated.stock?.quantity ?? null;
+    if (previousQuantity !== nextQuantity) {
+      const quantityText = this.formatQuantityForMessage(updated.stock?.quantity, updated.stock?.unit);
+      if (quantityText) {
+        return `💾 Stock actualizado: ${updated.name} (${quantityText}).`;
+      }
+      return '💾 Stock actualizado.';
+    }
+
+    return '💾 Cambios guardados.';
+  }
+
+  private buildStockUpdateMessage(item: PantryItem): string {
+    const quantityText = this.formatQuantityForMessage(item.stock?.quantity, item.stock?.unit);
+    if (quantityText) {
+      return `💾 Stock actualizado: ${item.name} (${quantityText}).`;
+    }
+    return '💾 Stock actualizado.';
+  }
+
+  private formatLocationPhrase(locationId: string | undefined, preposition: 'a' | 'en', fallbackLabel: string): string {
+    const label = this.getLocationMessageLabel(locationId) ?? fallbackLabel;
+    if (preposition === 'a') {
+      if (label.startsWith('el ')) {
+        return `al ${label.slice(3)}`;
+      }
+      return `a ${label}`;
+    }
+    return `${preposition} ${label}`;
+  }
+
+  private getLocationMessageLabel(locationId?: string | null): string | null {
+    const key = (locationId ?? '').trim().toLowerCase();
+    if (!key) {
+      return null;
+    }
+    switch (key) {
+      case 'pantry':
+        return 'la despensa';
+      case 'kitchen':
+        return 'la cocina';
+      case 'fridge':
+        return 'el frigorífico';
+      case 'freezer':
+        return 'el congelador';
+      default:
+        return this.formatFriendlyName(locationId ?? '', '').toLowerCase();
+    }
+  }
+
+  private formatQuantityForMessage(quantity?: number | null, unit?: MeasurementUnit | string | null): string | null {
+    if (quantity == null || Number.isNaN(Number(quantity))) {
+      return null;
+    }
+    const formatted = Number(quantity).toLocaleString('es-ES', { maximumFractionDigits: 2 });
+    const unitLabel = unit ?? MeasurementUnit.UNIT;
+    return `${formatted} ${unitLabel}`.trim();
   }
 
   private buildItemPayload(existing?: PantryItem): PantryItem {
