@@ -1,4 +1,3 @@
-// src/app/core/services/storage.service.ts
 import { Injectable } from '@angular/core';
 import PouchDB from 'pouchdb-browser';
 import PouchFind from 'pouchdb-find';
@@ -158,5 +157,36 @@ export class StorageService<T extends BaseDoc> {
     });
 
     return feed;
+  }
+
+  async bulkSave(docs: T[]): Promise<T[]> {
+    const now = new Date().toISOString();
+    const prepared = docs.map(doc => ({
+      ...doc,
+      createdAt: doc.createdAt ?? now,
+      updatedAt: now,
+    })) as T[];
+
+    const res = await this.db.bulkDocs(prepared as any);
+    return prepared.map((d, i) => ({ ...d, _rev: res[i].rev } as T));
+  }
+
+  async count(type?: string): Promise<number> {
+    const docs = await this.all(type);
+    return docs.length;
+  }
+
+  async search(text: string, fields: (keyof T)[]): Promise<T[]> {
+    if (!text.trim()) return [];
+    const docs = await this.all();
+    const lower = text.toLowerCase();
+    return docs.filter(doc =>
+      fields.some(f => String(doc[f] ?? '').toLowerCase().includes(lower))
+    );
+  }
+
+  async exists(id: string): Promise<boolean> {
+    const doc = await this.get(id);
+    return !!doc;
   }
 }

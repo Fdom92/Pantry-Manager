@@ -66,4 +66,61 @@ export class PantryService extends StorageService<PantryItem> {
     if (days <= 3) return ExpirationStatus.NEAR_EXPIRY;
     return ExpirationStatus.OK;
   }
+
+  async deleteItem(id: string): Promise<boolean> {
+    return this.remove(id);
+  }
+
+  async updateStock(itemId: string, quantity: number): Promise<PantryItem | null> {
+    const item = await this.get(itemId);
+    if (!item) return null;
+
+    const updated: PantryItem = {
+      ...item,
+      stock: {
+        ...item.stock!,
+        quantity,
+      },
+    };
+
+    return this.saveItem(updated);
+  }
+
+  async getExpired(): Promise<PantryItem[]> {
+    const items = await this.getAll();
+    const now = new Date();
+    return items.filter(i => i.expirationDate && new Date(i.expirationDate) < now);
+  }
+
+  async getSummary(): Promise<{
+    total: number;
+    expired: number;
+    nearExpiry: number;
+    lowStock: number;
+  }> {
+    const items = await this.getAll();
+    const now = new Date();
+    const limit = new Date();
+    limit.setDate(now.getDate() + 3);
+
+    let expired = 0, nearExpiry = 0, lowStock = 0;
+
+    for (const i of items) {
+      if (i.expirationDate) {
+        const exp = new Date(i.expirationDate);
+        if (exp < now) expired++;
+        else if (exp <= limit) nearExpiry++;
+      }
+      if (i.stock?.minThreshold && i.stock.quantity <= i.stock.minThreshold)
+        lowStock++;
+    }
+
+    return { total: items.length, expired, nearExpiry, lowStock };
+  }
+
+  watchPantryChanges(onChange: (item: PantryItem) => void) {
+    return this.watchChanges(doc => {
+      if (doc.type === this.TYPE) onChange(doc);
+    });
+  }
 }

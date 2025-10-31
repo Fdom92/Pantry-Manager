@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { StorageService } from './storage.service';
 import { MeasurementUnit, PantryItem, StockStatus } from '@core/models';
+import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 
 @Injectable({ providedIn: 'root' })
 export class SeedService {
@@ -9,18 +10,22 @@ export class SeedService {
   constructor(private storage: StorageService<PantryItem>) {}
 
   async ensureSeedData(): Promise<void> {
-    if (this.seeded) {
+    if (this.seeded) return;
+
+    const existing = await this.storage.all('item');
+    if (existing.length > 0) {
+      this.seeded = true;
       return;
     }
 
-    const existingItems = await this.storage.all('item');
-    if (existingItems.length === 0) {
-      const now = Date.now();
+    const now = Date.now();
+    const nowIso = new Date().toISOString();
 
-      await this.storage.save({
+    const items: PantryItem[] = [
+      {
         _id: 'item:sample-rice',
         type: 'item',
-        householdId: 'household:demo',
+        householdId: DEFAULT_HOUSEHOLD_ID,
         name: 'White rice',
         stock: {
           quantity: 2,
@@ -31,15 +36,14 @@ export class SeedService {
         },
         categoryId: 'category:grains',
         locationId: 'pantry',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 90).toISOString(),
-      });
-
-      await this.storage.save({
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 90).toISOString(), // 3 meses
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      },
+      {
         _id: 'item:sample-milk',
         type: 'item',
-        householdId: 'household:demo',
+        householdId: DEFAULT_HOUSEHOLD_ID,
         name: 'Whole milk',
         stock: {
           quantity: 6,
@@ -50,15 +54,14 @@ export class SeedService {
         },
         categoryId: 'category:dairy',
         locationId: 'fridge',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 90).toISOString(),
-      });
-
-      await this.storage.save({
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 10).toISOString(),
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      },
+      {
         _id: 'item:sample-eggs',
         type: 'item',
-        householdId: 'household:demo',
+        householdId: DEFAULT_HOUSEHOLD_ID,
         name: 'Eggs',
         stock: {
           quantity: 12,
@@ -69,15 +72,14 @@ export class SeedService {
         },
         categoryId: 'category:dairy',
         locationId: 'fridge',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 14).toISOString(), // 2 weeks
-      });
-
-      await this.storage.save({
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 14).toISOString(),
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      },
+      {
         _id: 'item:sample-apples',
         type: 'item',
-        householdId: 'household:demo',
+        householdId: DEFAULT_HOUSEHOLD_ID,
         name: 'Red apples',
         stock: {
           quantity: 1.5,
@@ -87,15 +89,14 @@ export class SeedService {
         },
         categoryId: 'category:produce',
         locationId: 'pantry',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 10).toISOString(), // 10 days
-      });
-
-      await this.storage.save({
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 10).toISOString(),
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      },
+      {
         _id: 'item:sample-bread',
         type: 'item',
-        householdId: 'household:demo',
+        householdId: DEFAULT_HOUSEHOLD_ID,
         name: 'Whole grain bread',
         stock: {
           quantity: 1,
@@ -106,15 +107,14 @@ export class SeedService {
         },
         categoryId: 'category:bakery',
         locationId: 'pantry',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now - 1000 * 60 * 60 * 24).toISOString(), // expired yesterday
-      });
-
-      await this.storage.save({
+        expirationDate: new Date(now - 1000 * 60 * 60 * 24).toISOString(), // vencido
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      },
+      {
         _id: 'item:sample-oil',
         type: 'item',
-        householdId: 'household:demo',
+        householdId: DEFAULT_HOUSEHOLD_ID,
         name: 'Olive oil',
         stock: {
           quantity: 0.75,
@@ -125,15 +125,14 @@ export class SeedService {
         },
         categoryId: 'category:pantry',
         locationId: 'pantry',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 365).toISOString(), // 1 year
-      });
-
-      await this.storage.save({
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 365).toISOString(),
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      },
+      {
         _id: 'item:sample-blueberries',
         type: 'item',
-        householdId: 'household:demo',
+        householdId: DEFAULT_HOUSEHOLD_ID,
         name: 'Blueberries',
         stock: {
           quantity: 0.5,
@@ -143,15 +142,14 @@ export class SeedService {
         },
         categoryId: 'category:produce',
         locationId: 'fridge',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 7).toISOString(), // 1 week
-      });
-
-      await this.storage.save({
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 7).toISOString(),
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      },
+      {
         _id: 'item:sample-butter',
         type: 'item',
-        householdId: 'household:demo',
+        householdId: DEFAULT_HOUSEHOLD_ID,
         name: 'Butter',
         stock: {
           quantity: 0,
@@ -162,15 +160,14 @@ export class SeedService {
         },
         categoryId: 'category:dairy',
         locationId: 'fridge',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 30).toISOString(), // 30 days
-      });
-
-      await this.storage.save({
+        expirationDate: new Date(now + 1000 * 60 * 60 * 24 * 30).toISOString(),
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      },
+      {
         _id: 'item:sample-salad',
         type: 'item',
-        householdId: 'household:demo',
+        householdId: DEFAULT_HOUSEHOLD_ID,
         name: 'Mixed greens',
         stock: {
           quantity: 0.2,
@@ -180,13 +177,13 @@ export class SeedService {
         },
         categoryId: 'category:produce',
         locationId: 'fridge',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        expirationDate: new Date(now - 1000 * 60 * 60 * 24 * 3).toISOString(), // expired 3 days ago
-      });
+        expirationDate: new Date(now - 1000 * 60 * 60 * 24 * 3).toISOString(),
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      },
+    ];
 
-    }
-
+    await this.storage.bulkSave(items);
     this.seeded = true;
   }
 }
