@@ -7,43 +7,59 @@
 <ion-content class="ion-padding">
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Pantry Snapshot</ion-card-title>
-      @if (lastUpdated) {
-        <ion-card-subtitle>Updated {{ lastUpdated | date:'short' }}</ion-card-subtitle>
+      <div class="snapshot-header">
+        <ion-card-title>Pantry Snapshot</ion-card-title>
+        <ion-button
+          fill="clear"
+          size="small"
+          (click)="toggleSnapshot()"
+          [attr.aria-expanded]="showSnapshot()"
+          aria-label="Toggle pantry snapshot"
+        >
+          <ion-icon
+            slot="icon-only"
+            [name]="showSnapshot() ? 'chevron-up-outline' : 'chevron-down-outline'"
+          ></ion-icon>
+        </ion-button>
+      </div>
+      @if (lastUpdated()) {
+        <ion-card-subtitle>Updated {{ lastUpdated() | date:'short' }}</ion-card-subtitle>
       }
     </ion-card-header>
-    <ion-card-content>
-      <div class="stat-grid">
-        <div class="stat">
-          <h3>{{ totalItems }}</h3>
-          <p>Total items</p>
+    @if (showSnapshot()) {
+      <ion-card-content>
+        <div class="stat-grid">
+          <div class="stat">
+            <h3>{{ totalItems() }}</h3>
+            <p>Total items</p>
+          </div>
+          <div class="stat">
+            <h3>{{ alertCount() }}</h3>
+            <p>Active alerts</p>
+          </div>
+          <div class="stat">
+            <h3>{{ lowStockItems().length }}</h3>
+            <p>Low stock</p>
+          </div>
+          <div class="stat">
+            <h3>{{ nearExpiryItems().length }}</h3>
+            <p>Expiring soon</p>
+          </div>
+          <div class="stat">
+            <h3>{{ expiredItems().length }}</h3>
+            <p>Expired</p>
+          </div>
+          <div class="stat">
+            <h3>{{ categoryCount() }}</h3>
+            <p>Categories tracked</p>
+          </div>
+          <div class="stat">
+            <h3>{{ locationCount() }}</h3>
+            <p>Locations used</p>
+          </div>
         </div>
-        <div class="stat">
-          <h3>{{ alertCount }}</h3>
-          <p>Active alerts</p>
-        </div>
-        <div class="stat">
-          <h3>{{ lowStockItems.length }}</h3>
-          <p>Low stock</p>
-        </div>
-        <div class="stat">
-          <h3>{{ nearExpiryItems.length }}</h3>
-          <p>Expiring soon</p>
-        </div>
-        <div class="stat">
-          <h3>{{ expiredItems.length }}</h3>
-          <p>Expired</p>
-        </div>
-        <div class="stat">
-          <h3>{{ categoryCount }}</h3>
-          <p>Categories tracked</p>
-        </div>
-        <div class="stat">
-          <h3>{{ locationCount }}</h3>
-          <p>Locations used</p>
-        </div>
-      </div>
-    </ion-card-content>
+      </ion-card-content>
+    }
   </ion-card>
 
   <ion-card>
@@ -52,9 +68,9 @@
       <ion-card-subtitle>Next {{ nearExpiryWindow }} days</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      @if (nearExpiryItems.length) {
+      @if (nearExpiryItems().length) {
         <ion-list lines="none">
-          @for (item of nearExpiryItems; track item._id) {
+          @for (item of nearExpiryItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
@@ -76,9 +92,9 @@
       <ion-card-subtitle>At or below minimum level</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      @if (lowStockItems.length) {
+      @if (lowStockItems().length) {
         <ion-list lines="none">
-          @for (item of lowStockItems; track item._id) {
+          @for (item of lowStockItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
@@ -102,9 +118,9 @@
       <ion-card-title>Expired items</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      @if (expiredItems.length) {
+      @if (expiredItems().length) {
         <ion-list lines="none">
-          @for (item of expiredItems; track item._id) {
+          @for (item of expiredItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
@@ -125,9 +141,9 @@
       <ion-card-title>Recently updated</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      @if (recentItems.length) {
+      @if (recentItems().length) {
         <ion-list lines="none">
-          @for (item of recentItems; track item._id) {
+          @for (item of recentItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>

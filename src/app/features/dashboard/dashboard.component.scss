@@ -2,6 +2,13 @@ ion-card + ion-card {
   margin-top: 16px;
 }
 
+.snapshot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .stat-grid {
   display: grid;
   gap: 16px;
