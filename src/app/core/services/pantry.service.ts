@@ -14,20 +14,20 @@ export class PantryService extends StorageService<PantryItem> {
     super();
   }
 
-  /** Persist an item while normalizing legacy data into the multi-location format. */
+  /** Persist an item ensuring aggregate fields (type, household, expirations) stay in sync. */
   async saveItem(item: PantryItem): Promise<PantryItem> {
-    const normalized = this.normalizeItem({
+    const prepared = this.applyDerivedFields({
       ...item,
       type: this.TYPE,
-      householdId: item.householdId ?? DEFAULT_HOUSEHOLD_ID
+      householdId: item.householdId ?? DEFAULT_HOUSEHOLD_ID,
     });
-    return await this.upsert(normalized);
+    return await this.upsert(prepared);
   }
 
-  /** Fetch every pantry item, always returning normalized documents. */
+  /** Fetch every pantry item, computing aggregate fields directly from stored data. */
   async getAll(): Promise<PantryItem[]> {
     const docs = await this.listByType(this.TYPE);
-    return docs.map(doc => this.normalizeItem(doc));
+    return docs.map(doc => this.applyDerivedFields(doc));
   }
 
   /** Return items that currently have stock in the requested location. */
@@ -81,30 +81,40 @@ export class PantryService extends StorageService<PantryItem> {
 
   /**
    * Update the quantity for a specific location entry, creating a placeholder if needed,
-   * and re-save the normalized document.
+   * and then persist the refreshed document.
    */
   async updateLocationQuantity(itemId: string, quantity: number, locationId?: string): Promise<PantryItem | null> {
-    const raw = await this.get(itemId);
-    if (!raw) {
+    const current = await this.get(itemId);
+    if (!current) {
       return null;
     }
 
-    const current = this.normalizeItem(raw);
-    const targetId = locationId ?? current.locations[0]?.locationId;
+    const locations = [...(current.locations ?? [])];
+    const targetId = locationId ?? locations[0]?.locationId;
     if (!targetId) {
       return null;
     }
 
-    const nextLocations = this.ensureLocationArray(current.locations);
-    const updatedLocations = nextLocations.map(loc =>
-      loc.locationId === targetId
-        ? { ...loc, quantity: Math.max(0, quantity) }
-        : loc
-    );
+    let handled = false;
+    const nextLocations = locations.map(loc => {
+      if (loc.locationId === targetId) {
+        handled = true;
+        return { ...loc, quantity: Math.max(0, quantity) };
+      }
+      return loc;
+    });
+
+    if (!handled) {
+      nextLocations.push({
+        locationId: targetId,
+        quantity: Math.max(0, quantity),
+        unit: locations[0]?.unit ?? MeasurementUnit.UNIT,
+      });
+    }
 
     const updated: PantryItem = {
       ...current,
-      locations: updatedLocations
+      locations: nextLocations,
     };
 
     return this.saveItem(updated);
@@ -146,11 +156,11 @@ export class PantryService extends StorageService<PantryItem> {
     };
   }
 
-  /** Subscribe to live-updates while ensuring consumers always see normalized payloads. */
+  /** Subscribe to live-updates while ensuring consumers always see consistent payloads. */
   watchPantryChanges(onChange: (item: PantryItem) => void) {
     return this.watchChanges(doc => {
       if (doc.type === this.TYPE) {
-        onChange(this.normalizeItem(doc));
+        onChange(this.applyDerivedFields(doc));
       }
     });
   }
@@ -189,81 +199,20 @@ export class PantryService extends StorageService<PantryItem> {
     return this.computeEarliestExpiry(item.locations);
   }
 
-  /** Normalize a raw storage document, handling legacy single-location fields. */
-  private normalizeItem(raw: any): PantryItem {
-    const {
-      locationId,
-      stock,
-      locations,
-      isBasic,
-      expirationDate,
-      expirationStatus,
-      ...rest
-    } = raw ?? {};
+  /** Compute aggregate fields without mutating the original payload. */
+  private applyDerivedFields(item: PantryItem): PantryItem {
+    const locations = (item.locations && item.locations.length)
+      ? item.locations
+      : [{ locationId: 'unassigned', quantity: 0, unit: MeasurementUnit.UNIT }];
 
-    const normalizedLocations = this.normalizeLocations(
-      Array.isArray(locations) ? locations : undefined,
-      locationId,
-      stock,
-      expirationDate
-    );
+    const earliestExpiry = this.computeEarliestExpiry(locations);
+    const expirationStatus = this.computeExpirationStatus(locations);
 
-    const earliestExpiry = this.computeEarliestExpiry(normalizedLocations);
-    const computedExpirationStatus = this.computeExpirationStatus(normalizedLocations);
-
-    const base: PantryItem = {
-      ...rest,
-      householdId: rest?.householdId ?? DEFAULT_HOUSEHOLD_ID,
-      type: rest?.type ?? this.TYPE,
-      locations: normalizedLocations,
-      isBasic: isBasic ?? stock?.isBasic ?? undefined,
-      expirationDate: earliestExpiry ?? expirationDate,
-      expirationStatus: computedExpirationStatus ?? expirationStatus ?? ExpirationStatus.OK,
-    };
-
-    return base;
-  }
-
-  /**
-   * Translate legacy stock and location fields into the new array-of-locations structure.
-   * Creates a default entry when the document predates the migration.
-   */
-  private normalizeLocations(
-    rawLocations: ItemLocationStock[] | undefined,
-    legacyLocationId?: string,
-    legacyStock?: { quantity?: number; unit?: MeasurementUnit; minThreshold?: number; expiryDate?: string; },
-    legacyExpirationDate?: string
-  ): ItemLocationStock[] {
-    if (rawLocations && rawLocations.length) {
-      return rawLocations.map(loc => this.normalizeLocationEntry(loc));
-    }
-
-    const locationId = legacyLocationId ?? 'unassigned';
-    const quantity = legacyStock?.quantity ?? 0;
-    const unit = legacyStock?.unit ?? MeasurementUnit.UNIT;
-    const minThreshold = legacyStock?.minThreshold;
-    const expiryDate = (legacyStock as any)?.expiryDate ?? legacyExpirationDate;
-
-    return [
-      this.normalizeLocationEntry({
-        locationId,
-        quantity,
-        unit,
-        minThreshold,
-        expiryDate,
-      })
-    ];
-  }
-
-  /** Ensure each location entry has consistent types and defaults. */
-  private normalizeLocationEntry(location: Partial<ItemLocationStock>): ItemLocationStock {
     return {
-      locationId: location.locationId ?? 'unassigned',
-      quantity: Number.isFinite(location.quantity as number) ? Number(location.quantity) : 0,
-      unit: location.unit ?? MeasurementUnit.UNIT,
-      minThreshold: location.minThreshold != null ? Number(location.minThreshold) : undefined,
-      expiryDate: location.expiryDate,
-      opened: typeof location.opened === 'boolean' ? location.opened : undefined,
+      ...item,
+      locations,
+      expirationDate: earliestExpiry,
+      expirationStatus,
     };
   }
 
@@ -357,11 +306,4 @@ export class PantryService extends StorageService<PantryItem> {
     return days >= 0 && days <= windowDays;
   }
 
-  /** Guarantee that we always have at least one normalized location. */
-  private ensureLocationArray(locations: ItemLocationStock[]): ItemLocationStock[] {
-    if (locations.length) {
-      return locations.map(loc => this.normalizeLocationEntry(loc));
-    }
-    return [this.normalizeLocationEntry({ locationId: 'unassigned', quantity: 0, unit: MeasurementUnit.UNIT })];
-  }
 }
