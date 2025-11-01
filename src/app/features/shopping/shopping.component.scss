@@ -2,6 +2,23 @@ ion-card + ion-card {
   margin-top: 16px;
 }
 
+.summary-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.summary-toggle {
+  margin: 0;
+}
+
 .stat-grid {
   display: grid;
   gap: 16px;
@@ -43,24 +60,74 @@ ion-card + ion-card {
   color: var(--ion-color-medium);
 }
 
-.shopping-item {
-  --padding-start: 0;
-  --inner-padding-end: 0;
-  align-items: flex-start;
-}
-
 .meta {
   margin: 4px 0 0;
   color: var(--ion-color-medium);
 }
 
-.suggestion-cta {
+.suggestion-list {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  gap: 16px;
 }
 
-.suggestion-cta ion-note {
+.suggestion-card {
+  margin: 0;
+  border-radius: 16px;
+  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08);
+  box-shadow: var(
+    --ion-card-box-shadow,
+    0px 4px 16px rgba(15, 27, 40, 0.1)
+  );
+}
+
+.suggestion-card ion-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.suggestion-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.suggestion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.suggestion-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
   font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+.suggestion-header ion-chip {
+  margin: 0;
+}
+
+.purchase-note {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.purchase-action {
+  --padding-start: 0;
+  --padding-end: 0;
+  --border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }

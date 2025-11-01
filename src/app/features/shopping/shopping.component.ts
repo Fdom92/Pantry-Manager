@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { PantryService, SeedService } from '@core/services';
+import { PantryStoreService } from '@core/store/pantry-store.service';
+import { SeedService } from '@core/services';
 import { PantryItem } from '@core/models';
 
 type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out';
@@ -14,6 +15,19 @@ interface ShoppingSuggestion {
   minThreshold?: number;
 }
 
+interface ShoppingSummary {
+  total: number;
+  belowMin: number;
+  basicLow: number;
+  basicOut: number;
+}
+
+interface ShoppingState {
+  suggestions: ShoppingSuggestion[];
+  summary: ShoppingSummary;
+  hasAlerts: boolean;
+}
+
 @Component({
   selector: 'app-shopping',
   standalone: true,
@@ -22,37 +36,66 @@ interface ShoppingSuggestion {
   styleUrls: ['./shopping.component.scss'],
 })
 export class ShoppingComponent {
-  shoppingItems: ShoppingSuggestion[] = [];
-  loading = false;
-  summary = {
-    total: 0,
-    belowMin: 0,
-    basicLow: 0,
-    basicOut: 0,
-  };
-
   readonly reasonLabels: Record<ShoppingReason, string> = {
     'below-min': 'Below minimum',
     'basic-low': 'Basic item below minimum',
     'basic-out': 'Basic item out of stock',
   };
 
+  readonly loading = this.pantryStore.loading;
+  readonly shoppingState = computed<ShoppingState>(() => {
+    const analysis = this.analyzeShopping(this.pantryStore.items());
+    return {
+      ...analysis,
+      hasAlerts: analysis.summary.total > 0,
+    };
+  });
+  readonly summaryExpanded = signal(true);
+  readonly processingIds = signal<Set<string>>(new Set());
+
   constructor(
-    private readonly pantryService: PantryService,
+    private readonly pantryStore: PantryStoreService,
     private readonly seedService: SeedService,
   ) {}
 
   async ionViewWillEnter(): Promise<void> {
     await this.seedService.ensureSeedData();
-    await this.loadShoppingList();
+    await this.pantryStore.loadAll();
   }
 
   async refreshList(): Promise<void> {
-    await this.loadShoppingList();
+    await this.pantryStore.refresh();
   }
 
-  get hasAlerts(): boolean {
-    return this.summary.total > 0;
+  toggleSummary(): void {
+    this.summaryExpanded.update(isOpen => !isOpen);
+  }
+
+  isProcessing(id: string | undefined): boolean {
+    return id ? this.processingIds().has(id) : false;
+  }
+
+  async markAsPurchased(suggestion: ShoppingSuggestion): Promise<void> {
+    const id = suggestion.item?._id;
+    if (!id || this.isProcessing(id) || suggestion.suggestedQuantity <= 0) {
+      return;
+    }
+
+    this.processingIds.update(ids => {
+      const next = new Set(ids);
+      next.add(id);
+      return next;
+    });
+
+    try {
+      await this.pantryStore.adjustQuantity(id, suggestion.suggestedQuantity);
+    } finally {
+      this.processingIds.update(ids => {
+        const next = new Set(ids);
+        next.delete(id);
+        return next;
+      });
+    }
   }
 
   getBadgeColor(reason: ShoppingReason): string {
@@ -70,20 +113,14 @@ export class ShoppingComponent {
     return item.stock?.unit ?? 'unit';
   }
 
-  private async loadShoppingList(): Promise<void> {
-    this.loading = true;
-    try {
-      const items = await this.pantryService.getAll();
-      const suggestions = this.buildShoppingList(items);
-      this.shoppingItems = suggestions;
-      this.updateSummary(suggestions);
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  private buildShoppingList(items: PantryItem[]): ShoppingSuggestion[] {
+  private analyzeShopping(items: PantryItem[]): Omit<ShoppingState, 'hasAlerts'> {
     const suggestions: ShoppingSuggestion[] = [];
+    const summary: ShoppingSummary = {
+      total: 0,
+      belowMin: 0,
+      basicLow: 0,
+      basicOut: 0,
+    };
 
     for (const item of items) {
       const stock = item.stock;
@@ -113,10 +150,23 @@ export class ShoppingComponent {
           currentQuantity: this.roundQuantity(quantity),
           minThreshold: minThreshold != null ? this.roundQuantity(minThreshold) : undefined,
         });
+
+        switch (reason) {
+          case 'below-min':
+            summary.belowMin += 1;
+            break;
+          case 'basic-low':
+            summary.basicLow += 1;
+            break;
+          case 'basic-out':
+            summary.basicOut += 1;
+            break;
+        }
       }
     }
 
-    return suggestions;
+    summary.total = suggestions.length;
+    return { suggestions, summary };
   }
 
   private ensurePositiveQuantity(value: number, fallback?: number): number {
@@ -138,30 +188,5 @@ export class ShoppingComponent {
       return 0;
     }
     return Math.round(num * 100) / 100;
-  }
-
-  private updateSummary(suggestions: ShoppingSuggestion[]): void {
-    const summary = {
-      total: suggestions.length,
-      belowMin: 0,
-      basicLow: 0,
-      basicOut: 0,
-    };
-
-    for (const suggestion of suggestions) {
-      switch (suggestion.reason) {
-        case 'below-min':
-          summary.belowMin += 1;
-          break;
-        case 'basic-low':
-          summary.basicLow += 1;
-          break;
-        case 'basic-out':
-          summary.basicOut += 1;
-          break;
-      }
-    }
-
-    this.summary = summary;
   }
 }
