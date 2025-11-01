@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { SeedService } from '@core/services';
 import { ItemLocationStock, PantryItem } from '@core/models';
 import { PantryStoreService } from '@core/store/pantry-store.service';
+import { getLocationDisplayName } from '@core/utils';
 
 @Component({
   selector: 'app-dashboard',
@@ -129,6 +130,13 @@ export class DashboardComponent {
         const quantity = Number(location.quantity ?? 0).toFixed(1).replace(/\.0$/, '');
         const unit = this.pantryStore.getUnitLabel(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
         const name = this.formatLocationName(location.locationId);
+        const batches = Array.isArray(location.batches) ? location.batches : [];
+        if (batches.length) {
+          const earliest = this.getLocationEarliestExpiry(location);
+          const batchLabel = batches.length === 1 ? '1 lote' : `${batches.length} lotes`;
+          const extra = earliest ? `${batchLabel}, cad ${this.formatShortDate(earliest)}` : batchLabel;
+          return `${quantity} ${unit} · ${name} (${extra})`;
+        }
         return `${quantity} ${unit} · ${name}`;
       })
       .join(', ');
@@ -136,25 +144,33 @@ export class DashboardComponent {
 
   /** Map raw location ids into friendly labels for dashboard display. */
   private formatLocationName(id?: string): string {
-    const value = (id ?? '').trim();
-    if (!value) {
-      return 'Unassigned';
+    return getLocationDisplayName(id, 'Sin ubicación');
+  }
+
+  private getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {
+    const batches = Array.isArray(location.batches) ? location.batches : [];
+    const dates = batches
+      .map(batch => batch.expirationDate)
+      .filter((date): date is string => Boolean(date));
+    if (!dates.length) {
+      return undefined;
     }
-    switch (value.toLowerCase()) {
-      case 'pantry':
-        return 'Pantry';
-      case 'fridge':
-        return 'Fridge';
-      case 'freezer':
-        return 'Freezer';
-      case 'kitchen':
-        return 'Kitchen';
-      default:
-        return value
-          .replace(/[-_]/g, ' ')
-          .split(' ')
-          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-          .join(' ');
+    return dates.reduce((earliest, current) => {
+      if (!earliest) {
+        return current;
+      }
+      return new Date(current) < new Date(earliest) ? current : earliest;
+    });
+  }
+
+  private formatShortDate(value: string): string {
+    try {
+      return new Intl.DateTimeFormat('es-ES', {
+        day: '2-digit',
+        month: 'short',
+      }).format(new Date(value));
+    } catch {
+      return value;
     }
   }
 }

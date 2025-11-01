@@ -3,8 +3,8 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
 import { SeedService } from '@core/services/seed.service';
-import { PantryItem, MeasurementUnit, ItemLocationStock } from '@core/models';
-import { createDocumentId } from '@core/utils';
+import { PantryItem, MeasurementUnit, ItemLocationStock, ItemBatch } from '@core/models';
+import { createDocumentId, getLocationDisplayName } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { trigger, state, style, transition, animate } from '@angular/animations';
@@ -79,6 +79,30 @@ export class PantryListComponent implements OnDestroy {
 
   get locationsArray(): FormArray<FormGroup> {
     return this.form.get('locations') as FormArray<FormGroup>;
+  }
+
+  getBatchesArray(locationIndex: number): FormArray<FormGroup> {
+    const control = this.locationsArray.at(locationIndex).get('batches');
+    if (control instanceof FormArray) {
+      return control as FormArray<FormGroup>;
+    }
+
+    const batches = this.fb.array<FormGroup>([]);
+    this.locationsArray.at(locationIndex).setControl('batches', batches);
+    return batches;
+  }
+
+  addBatchEntry(locationIndex: number): void {
+    const batches = this.getBatchesArray(locationIndex);
+    batches.push(this.createBatchGroup());
+  }
+
+  removeBatchEntry(locationIndex: number, batchIndex: number): void {
+    const batches = this.getBatchesArray(locationIndex);
+    if (batchIndex < 0 || batchIndex >= batches.length) {
+      return;
+    }
+    batches.removeAt(batchIndex);
   }
   constructor(
     private readonly pantryStore: PantryStoreService,
@@ -161,8 +185,7 @@ export class PantryListComponent implements OnDestroy {
           quantity: 0,
           unit: this.pantryStore.getItemPrimaryUnit(item),
           minThreshold: undefined,
-          expiryDate: undefined,
-          opened: false,
+          batches: [],
         }];
     this.resetLocationControls(locations);
     this.showCreateModal = true;
@@ -193,6 +216,7 @@ export class PantryListComponent implements OnDestroy {
 
   /** Create a form group for a single location with coercion and sane defaults. */
   private createLocationGroup(initial?: Partial<ItemLocationStock>): FormGroup {
+    const batches = Array.isArray(initial?.batches) ? initial.batches : [];
     return this.fb.group({
       locationId: this.fb.control((initial?.locationId ?? '').trim(), { nonNullable: true }),
       quantity: this.fb.control(initial?.quantity != null ? Number(initial.quantity) : 0, {
@@ -206,7 +230,21 @@ export class PantryListComponent implements OnDestroy {
       minThreshold: this.fb.control(
         initial?.minThreshold != null ? Number(initial.minThreshold) : null
       ),
-      expiryDate: this.fb.control(initial?.expiryDate ? this.toDateInputValue(initial.expiryDate) : ''),
+      batches: this.fb.array(
+        batches.map(batch => this.createBatchGroup(batch))
+      ),
+    });
+  }
+
+  private createBatchGroup(initial?: Partial<ItemBatch>): FormGroup {
+    return this.fb.group({
+      batchId: this.fb.control((initial?.batchId ?? '').trim()),
+      quantity: this.fb.control(initial?.quantity != null ? Number(initial.quantity) : 0, {
+        validators: [Validators.required, Validators.min(0)],
+        nonNullable: true,
+      }),
+      entryDate: this.fb.control(initial?.entryDate ? this.toDateInputValue(initial.entryDate) : ''),
+      expirationDate: this.fb.control(initial?.expirationDate ? this.toDateInputValue(initial.expirationDate) : ''),
       opened: this.fb.control(initial?.opened ?? false),
     });
   }
@@ -358,7 +396,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   getLocationLabel(locationId: string | undefined): string {
-    return this.formatFriendlyName(locationId ?? '', 'Unassigned');
+    return getLocationDisplayName(locationId, 'Sin ubicación');
   }
 
   /** Derive a human-readable status badge for the item card header. */
@@ -407,6 +445,10 @@ export class PantryListComponent implements OnDestroy {
 
   isNearExpiry(item: PantryItem): boolean {
     return this.pantryStore.isItemNearExpiry(item);
+  }
+
+  hasOpenBatch(item: PantryItem): boolean {
+    return this.pantryStore.hasItemOpenBatch(item);
   }
 
   trackByItemId(_: number, item: PantryItem): string {
@@ -548,7 +590,7 @@ export class PantryListComponent implements OnDestroy {
           continue;
         }
         seen.add(id);
-        const label = this.formatFriendlyName(id, 'Unassigned');
+        const label = getLocationDisplayName(id, 'Sin ubicación');
         const current = counts.get(id);
         if (current) {
           current.count += 1;
@@ -563,15 +605,41 @@ export class PantryListComponent implements OnDestroy {
       .sort((a, b) => a.label.localeCompare(b.label));
 
     return [
-      { id: 'all', label: `All (${items.length})`, count: items.length },
+      { id: 'all', label: `Todas (${items.length})`, count: items.length },
       ...mapped
     ];
   }
 
   /** Return the earliest expiry date present in the provided locations array. */
   private computeEarliestExpiry(locations: ItemLocationStock[]): string | undefined {
-    const dates = locations
-      .map(loc => loc.expiryDate)
+    const dates: string[] = [];
+    for (const location of locations) {
+      const batches = this.getLocationBatches(location);
+      for (const batch of batches) {
+        if (batch.expirationDate) {
+          dates.push(batch.expirationDate);
+        }
+      }
+    }
+    if (!dates.length) {
+      return undefined;
+    }
+    return dates.reduce((earliest, current) => {
+      if (!earliest) {
+        return current;
+      }
+      return new Date(current) < new Date(earliest) ? current : earliest;
+    });
+  }
+
+  getLocationBatches(location: ItemLocationStock): ItemBatch[] {
+    return Array.isArray(location.batches) ? location.batches : [];
+  }
+
+  private getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {
+    const batches = this.getLocationBatches(location);
+    const dates = batches
+      .map(batch => batch.expirationDate)
       .filter((date): date is string => Boolean(date));
     if (!dates.length) {
       return undefined;
@@ -582,6 +650,17 @@ export class PantryListComponent implements OnDestroy {
       }
       return new Date(current) < new Date(earliest) ? current : earliest;
     });
+  }
+
+  private formatShortDate(value: string): string {
+    try {
+      return new Intl.DateTimeFormat('es-ES', {
+        day: '2-digit',
+        month: 'short'
+      }).format(new Date(value));
+    } catch {
+      return value;
+    }
   }
 
   /**
@@ -612,6 +691,7 @@ export class PantryListComponent implements OnDestroy {
             locationId,
             quantity,
             unit: item.locations[0]?.unit ?? MeasurementUnit.UNIT,
+            batches: [],
           });
         }
 
@@ -746,8 +826,8 @@ export class PantryListComponent implements OnDestroy {
     return '💾 Stock actualizado.';
   }
 
-  /** Human readable breakdown describing how quantities are distributed. */
-  private formatLocationBreakdown(locations: ItemLocationStock[]): string {
+  /** Human readable breakdown describing cómo se reparte el stock. */
+  formatLocationBreakdown(locations: ItemLocationStock[]): string {
     if (!locations.length) {
       return '';
     }
@@ -755,8 +835,19 @@ export class PantryListComponent implements OnDestroy {
       .map(location => {
         const quantity = this.roundDisplayQuantity(Number(location.quantity ?? 0));
         const unitLabel = this.getUnitLabel(location.unit ?? MeasurementUnit.UNIT);
-        const label = this.formatFriendlyName(location.locationId ?? '', 'Unassigned');
-        return `${quantity} ${unitLabel} · ${label}`;
+        const label = getLocationDisplayName(location.locationId, 'Sin ubicación');
+        const batches = this.getLocationBatches(location);
+        const extras: string[] = [];
+        if (batches.length) {
+          const batchesLabel = batches.length === 1 ? '1 lote' : `${batches.length} lotes`;
+          extras.push(batchesLabel);
+          const earliest = this.getLocationEarliestExpiry(location);
+          if (earliest) {
+            extras.push(`cad ${this.formatShortDate(earliest)}`);
+          }
+        }
+        const meta = extras.length ? ` (${extras.join(' · ')})` : '';
+        return `${quantity} ${unitLabel} · ${label}${meta}`;
       })
       .join(', ');
   }
@@ -798,16 +889,44 @@ export class PantryListComponent implements OnDestroy {
       const minThreshold = value?.minThreshold != null && value.minThreshold !== ''
         ? Number(value.minThreshold)
         : undefined;
-      const expiryDate = value?.expiryDate ? new Date(value.expiryDate).toISOString() : undefined;
-      const opened = value?.opened ? true : undefined;
+
+      const batchesControl = control.get('batches');
+      const batches = batchesControl instanceof FormArray
+        ? (batchesControl.controls as FormGroup[]).map(group => {
+            const batchValue = group.value as any;
+            const entryDate = batchValue?.entryDate
+              ? new Date(batchValue.entryDate).toISOString()
+              : undefined;
+            const expirationDate = batchValue?.expirationDate
+              ? new Date(batchValue.expirationDate).toISOString()
+              : undefined;
+            const batchQuantity = batchValue?.quantity != null ? Number(batchValue.quantity) : 0;
+            const batchId = (batchValue?.batchId ?? '').trim() || undefined;
+            const opened = batchValue?.opened ? true : undefined;
+            return {
+              batchId,
+              quantity: Number.isFinite(batchQuantity) ? batchQuantity : 0,
+              entryDate,
+              expirationDate,
+              opened,
+              unit,
+            } as ItemBatch;
+          })
+        : [];
+
+      const normalizedBatches = batches.filter(batch =>
+        batch.quantity > 0 ||
+        Boolean(batch.expirationDate) ||
+        Boolean(batch.entryDate) ||
+        Boolean(batch.opened)
+      );
 
       return {
         locationId,
         quantity: Number.isFinite(quantity) ? quantity : 0,
         unit,
         minThreshold,
-        expiryDate,
-        opened,
+        batches: normalizedBatches,
       };
     });
 
@@ -861,7 +980,7 @@ export class PantryListComponent implements OnDestroy {
 
     const lowTotal = mapped.reduce((acc, option) => acc + option.lowCount, 0);
     return [
-      { id: 'all', label: `All (${items.length})`, count: items.length, lowCount: lowTotal },
+      { id: 'all', label: `Todas (${items.length})`, count: items.length, lowCount: lowTotal },
       ...mapped
     ];
   }
@@ -970,7 +1089,7 @@ export class PantryListComponent implements OnDestroy {
     }
     return item.locations.some(loc => {
       const id = loc.locationId?.toLowerCase() ?? '';
-      const label = this.formatFriendlyName(loc.locationId ?? '', '').toLowerCase();
+      const label = getLocationDisplayName(loc.locationId, '').toLowerCase();
       return id.includes(search) || label.includes(search);
     });
   }

@@ -158,6 +158,11 @@ export class PantryStoreService {
     return this.pantryService.getItemTotalMinThreshold(item);
   }
 
+  /** Earliest expiry date considering all batches and locations. */
+  getItemEarliestExpiry(item: PantryItem): string | undefined {
+    return this.pantryService.getItemEarliestExpiry(item);
+  }
+
   /** True when the item is in a low-stock situation. */
   isItemLowStock(item: PantryItem): boolean {
     return this.pantryService.isItemLowStock(item);
@@ -171,5 +176,20 @@ export class PantryStoreService {
   /** True when any location expires within the near-expiry window. */
   isItemNearExpiry(item: PantryItem): boolean {
     return this.pantryService.isItemNearExpiry(item);
+  }
+
+  /** Aggregate quantity for a specific location ID across the item. */
+  getItemQuantityByLocation(item: PantryItem, locationId: string): number {
+    return this.pantryService.getItemQuantityByLocation(item, locationId);
+  }
+
+  /** Flatten all batches associated with an item. */
+  getItemBatches(item: PantryItem) {
+    return this.pantryService.getItemBatches(item);
+  }
+
+  /** Determine whether any batch for the item is currently marked as opened. */
+  hasItemOpenBatch(item: PantryItem): boolean {
+    return this.pantryService.hasOpenBatch(item);
   }
 }

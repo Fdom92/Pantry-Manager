@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Dashboard</ion-title>
+    <ion-title>Panel</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -8,13 +8,13 @@
   <ion-card>
     <ion-card-header>
       <div class="snapshot-header">
-        <ion-card-title>Pantry Snapshot</ion-card-title>
+        <ion-card-title>Resumen de la despensa</ion-card-title>
         <ion-button
           fill="clear"
           size="small"
           (click)="toggleSnapshot()"
           [attr.aria-expanded]="showSnapshot()"
-          aria-label="Toggle pantry snapshot"
+          aria-label="Alternar resumen de la despensa"
         >
           <ion-icon
             slot="icon-only"
@@ -23,7 +23,7 @@
         </ion-button>
       </div>
       @if (lastUpdated()) {
-        <ion-card-subtitle>Updated {{ lastUpdated() | date:'short' }}</ion-card-subtitle>
+        <ion-card-subtitle>Actualizado {{ lastUpdated() | date:'short' }}</ion-card-subtitle>
       }
     </ion-card-header>
     @if (showSnapshot()) {
@@ -31,31 +31,31 @@
         <div class="stat-grid">
           <div class="stat">
             <h3>{{ totalItems() }}</h3>
-            <p>Total items</p>
+            <p>Artículos totales</p>
           </div>
           <div class="stat">
             <h3>{{ alertCount() }}</h3>
-            <p>Active alerts</p>
+            <p>Alertas activas</p>
           </div>
           <div class="stat">
             <h3>{{ lowStockItems().length }}</h3>
-            <p>Low stock</p>
+            <p>Poco stock</p>
           </div>
           <div class="stat">
             <h3>{{ nearExpiryItems().length }}</h3>
-            <p>Expiring soon</p>
+            <p>Próximo a caducar</p>
           </div>
           <div class="stat">
             <h3>{{ expiredItems().length }}</h3>
-            <p>Expired</p>
+            <p>Caducados</p>
           </div>
           <div class="stat">
             <h3>{{ categoryCount() }}</h3>
-            <p>Categories tracked</p>
+            <p>Categorías registradas</p>
           </div>
           <div class="stat">
             <h3>{{ locationCount() }}</h3>
-            <p>Locations used</p>
+            <p>Ubicaciones utilizadas</p>
           </div>
         </div>
       </ion-card-content>
@@ -64,8 +64,8 @@
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Expiring soon</ion-card-title>
-      <ion-card-subtitle>Next {{ nearExpiryWindow }} days</ion-card-subtitle>
+      <ion-card-title>Próximos a caducar</ion-card-title>
+      <ion-card-subtitle>Próximos {{ nearExpiryWindow }} días</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
       @if (nearExpiryItems().length) {
@@ -74,22 +74,22 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>Expires {{ item.expirationDate | date:'MMM d, yyyy' }}</p>
+                <p>Caduca {{ item.expirationDate | date:'MMM d, yyyy' }}</p>
               </ion-label>
               <ion-badge color="warning">{{ item.expirationDate | date:'MMM d' }}</ion-badge>
             </ion-item>
           }
         </ion-list>
       } @else {
-        <ion-text color="medium">No items close to expiring.</ion-text>
+        <ion-text color="medium">No hay artículos próximos a caducar.</ion-text>
       }
     </ion-card-content>
   </ion-card>
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Low stock alerts</ion-card-title>
-      <ion-card-subtitle>At or below minimum level</ion-card-subtitle>
+      <ion-card-title>Alertas de poco stock</ion-card-title>
+      <ion-card-subtitle>En o por debajo del nivel mínimo</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
       @if (lowStockItems().length) {
@@ -101,7 +101,7 @@
                 <p>
                   {{ getItemTotalQuantity(item) | number:'1.0-2' }} {{ getItemUnitLabel(item) }}
                   @if (getItemTotalMinThreshold(item) > 0) {
-                    (min {{ getItemTotalMinThreshold(item) | number:'1.0-2' }} {{ getItemUnitLabel(item) }})
+                    (mín {{ getItemTotalMinThreshold(item) | number:'1.0-2' }} {{ getItemUnitLabel(item) }})
                   }
                 </p>
                 <ion-note color="medium">
@@ -113,14 +113,14 @@
           }
         </ion-list>
       } @else {
-        <ion-text color="medium">All items are above their minimum level.</ion-text>
+        <ion-text color="medium">Todos los artículos están por encima de su nivel mínimo.</ion-text>
       }
     </ion-card-content>
   </ion-card>
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Expired items</ion-card-title>
+      <ion-card-title>Artículos caducados</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       @if (expiredItems().length) {
@@ -129,21 +129,21 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>Expired {{ item.expirationDate | date:'MMM d, yyyy' }}</p>
+                <p>Caducó {{ item.expirationDate | date:'MMM d, yyyy' }}</p>
               </ion-label>
-              <ion-badge color="medium">Expired</ion-badge>
+              <ion-badge color="medium">Caducado</ion-badge>
             </ion-item>
           }
         </ion-list>
       } @else {
-        <ion-text color="medium">No expired items right now.</ion-text>
+        <ion-text color="medium">No hay artículos caducados en este momento.</ion-text>
       }
     </ion-card-content>
   </ion-card>
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Recently updated</ion-card-title>
+      <ion-card-title>Actualizados recientemente</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       @if (recentItems().length) {
@@ -152,14 +152,14 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>Updated {{ item.updatedAt | date:'MMM d, yyyy' }}</p>
+                <p>Actualizado {{ item.updatedAt | date:'MMM d, yyyy' }}</p>
               </ion-label>
-              <ion-badge color="tertiary">New</ion-badge>
+              <ion-badge color="tertiary">Nuevo</ion-badge>
             </ion-item>
           }
         </ion-list>
       } @else {
-        <ion-text color="medium">No recent updates.</ion-text>
+        <ion-text color="medium">Sin actualizaciones recientes.</ion-text>
       }
     </ion-card-content>
   </ion-card>

@@ -287,6 +287,12 @@
   flex-wrap: wrap;
 }
 
+.location-summary-note {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
 .item-actions {
   display: flex;
   align-items: center;
@@ -364,6 +370,41 @@
   gap: 4px;
 }
 
+.location-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.location-quantity {
+  font-weight: 600;
+  color: var(--ion-color-primary);
+}
+
+.location-batches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.batch-chip {
+  --background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08);
+  --padding-start: 6px;
+  --padding-end: 8px;
+  font-size: 0.75rem;
+}
+
+.batch-chip ion-icon {
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+.batch-placeholder {
+  font-size: 0.8rem;
+}
+
 .location-actions {
   display: flex;
   gap: 8px;
@@ -397,6 +438,34 @@
 }
 
 .location-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.batch-form-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.batch-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.batch-form-card {
+  border: 1px dashed rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.4);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(var(--ion-color-light-rgb, 255, 255, 255), 0.4);
+}
+
+.batch-form-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;

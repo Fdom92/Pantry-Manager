@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { SeedService } from '@core/services';
 import { PantryItem, MeasurementUnit } from '@core/models';
+import { getLocationDisplayName } from '@core/utils';
 
 type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out';
 
@@ -117,24 +118,7 @@ export class ShoppingComponent {
   }
 
   getLocationLabel(locationId: string): string {
-    const key = (locationId ?? '').trim().toLowerCase();
-    if (!key) {
-      return 'Unassigned';
-    }
-    switch (key) {
-      case 'pantry':
-        return 'Pantry';
-      case 'kitchen':
-        return 'Kitchen';
-      case 'fridge':
-        return 'Fridge';
-      case 'freezer':
-        return 'Freezer';
-      case 'bathroom':
-        return 'Bathroom';
-      default:
-        return this.toTitleCase(locationId);
-    }
+    return getLocationDisplayName(locationId, 'Sin ubicación');
   }
 
   /**
@@ -224,15 +208,4 @@ export class ShoppingComponent {
     return Math.round(num * 100) / 100;
   }
 
-  /** Format custom location names into title case for display. */
-  private toTitleCase(value: string): string {
-    const clean = value.replace(/[-_]/g, ' ').trim();
-    if (!clean) {
-      return 'Unassigned';
-    }
-    return clean
-      .split(' ')
-      .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-      .join(' ');
-  }
 }

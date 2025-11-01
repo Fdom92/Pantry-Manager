@@ -4,6 +4,7 @@ export * from './enums.model';
 export * from './household.model';
 export * from './item.model';
 export * from './item-location-stock.model';
+export * from './item-batch.model';
 export * from './location.model';
 export * from './shopping-list.model';
 export * from './supermarket.model';

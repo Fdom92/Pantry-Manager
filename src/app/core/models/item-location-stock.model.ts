@@ -1,10 +1,10 @@
 import { MeasurementUnit } from './enums.model';
+import { ItemBatch } from './item-batch.model';
 
 export interface ItemLocationStock {
   locationId: string;
-  quantity: number;
   unit: MeasurementUnit;
+  quantity: number;
   minThreshold?: number;
-  expiryDate?: string;
-  opened?: boolean;
+  batches?: ItemBatch[];
 }

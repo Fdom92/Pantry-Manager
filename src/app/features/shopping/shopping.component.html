@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Shopping</ion-title>
+    <ion-title>Compras</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,22 +11,22 @@
     <ion-card-header class="summary-card-header">
       <div class="summary-header-content">
         <div class="summary-header-top">
-          <ion-card-title>Shopping summary</ion-card-title>
+          <ion-card-title>Resumen de compras</ion-card-title>
           <ion-button
             fill="clear"
             size="small"
             (click)="toggleSummary()"
             class="summary-toggle"
             [aria-expanded]="summaryExpanded()"
-            [attr.aria-label]="summaryExpanded() ? 'Collapse summary' : 'Expand summary'"
+            [attr.aria-label]="summaryExpanded() ? 'Contraer resumen' : 'Expandir resumen'"
           >
             <ion-icon [name]="summaryExpanded() ? 'chevron-up-outline' : 'chevron-down-outline'" slot="icon-only"></ion-icon>
           </ion-button>
         </div>
         @if (state.hasAlerts) {
-          <ion-card-subtitle>{{ state.summary.total }} items need attention.</ion-card-subtitle>
+          <ion-card-subtitle>{{ state.summary.total }} artículos necesitan atención.</ion-card-subtitle>
         } @else {
-          <ion-card-subtitle>All stocked items meet their targets.</ion-card-subtitle>
+          <ion-card-subtitle>Todos los artículos almacenados cumplen sus objetivos.</ion-card-subtitle>
         }
       </div>
     </ion-card-header>
@@ -35,19 +35,19 @@
         <div class="stat-grid">
           <div class="stat">
             <h3>{{ state.summary.total }}</h3>
-            <p>Total items to buy</p>
+            <p>Artículos totales por comprar</p>
           </div>
           <div class="stat">
             <h3>{{ state.summary.belowMin }}</h3>
-            <p>Below minimum</p>
+            <p>Por debajo del mínimo</p>
           </div>
           <div class="stat">
             <h3>{{ state.summary.basicLow }}</h3>
-            <p>Basic near minimum</p>
+            <p>Básicos cerca del mínimo</p>
           </div>
           <div class="stat">
             <h3>{{ state.summary.basicOut }}</h3>
-            <p>Basic out of stock</p>
+            <p>Básicos sin stock</p>
           </div>
         </div>
       }
@@ -56,13 +56,13 @@
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Suggested purchases</ion-card-title>
+      <ion-card-title>Compras sugeridas</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       @if (loading()) {
         <div class="loading-state">
           <ion-spinner name="lines"></ion-spinner>
-          <p>Generating shopping list…</p>
+          <p>Generando lista de compras…</p>
         </div>
       } @else if (state.suggestions.length) {
         <div class="suggestion-list">
@@ -76,15 +76,15 @@
                   </ion-chip>
                 </div>
                 <p class="meta">
-                  Location: {{ getLocationLabel(suggestion.locationId) }} ·
-                  Current: {{ suggestion.currentQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
+                  Ubicación: {{ getLocationLabel(suggestion.locationId) }} ·
+                  Actual: {{ suggestion.currentQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
                   @if (suggestion.minThreshold !== undefined) {
-                    · Min: {{ suggestion.minThreshold | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
+                    · Mín.: {{ suggestion.minThreshold | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
                   }
                 </p>
                 <div class="suggestion-footer">
                   <ion-note color="primary" class="purchase-note">
-                    Buy {{ suggestion.suggestedQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
+                    Comprar {{ suggestion.suggestedQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
                   </ion-note>
                   <ion-button
                     size="small"
@@ -107,7 +107,7 @@
         </div>
       } @else {
         <ion-text color="medium">
-          Nothing to buy right now. Everything is within desired levels.
+          Nada que comprar por ahora. Todo está dentro de los niveles deseados.
         </ion-text>
       }
     </ion-card-content>
