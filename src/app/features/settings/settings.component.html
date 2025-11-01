@@ -1,16 +1,96 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Settings</ion-title>
+    <ion-title>Ajustes</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Main Settings</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>Welcome 👋 Configure the app to your preference here.</p>
-    </ion-card-content>
-  </ion-card>
+  <div class="settings-content">
+    <ion-list lines="full">
+      <ion-list-header>
+        <ion-label>
+          <h2>Gestión de datos</h2>
+          <p>Controla el almacenamiento local de la app.</p>
+        </ion-label>
+      </ion-list-header>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>Limpiar datos / Reset app</h3>
+          <p>Elimina toda la información guardada en este dispositivo.</p>
+        </ion-label>
+        <ion-button
+          color="danger"
+          fill="outline"
+          slot="end"
+          (click)="onResetApp()"
+          [disabled]="resettingData()"
+        >
+          <ion-spinner
+            slot="start"
+            name="dots"
+            *ngIf="resettingData()"
+          ></ion-spinner>
+          Limpiar
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>Exportar datos</h3>
+          <p>Descarga un fichero JSON con tus datos actuales.</p>
+        </ion-label>
+        <ion-button
+          slot="end"
+          (click)="onExportData()"
+          [disabled]="exportingData()"
+        >
+          <ion-spinner
+            slot="start"
+            name="dots"
+            *ngIf="exportingData()"
+          ></ion-spinner>
+          Exportar
+        </ion-button>
+      </ion-item>
+    </ion-list>
+
+    <ion-list lines="full">
+      <ion-list-header>
+        <ion-label>
+          <h2>Información</h2>
+          <p>Detalles rápidos de la aplicación.</p>
+        </ion-label>
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label>
+          <h3>Versión</h3>
+          <p>{{ appVersion }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <h3>Última sincronización</h3>
+          <p>{{ lastSyncDisplay() }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>Enviar feedback</h3>
+          <p>Comparte sugerencias o reporta incidencias.</p>
+        </ion-label>
+        <ion-button
+          slot="end"
+          fill="outline"
+          color="primary"
+          href="mailto:feedback@pantry-manager.app?subject=Feedback%20Pantry%20Manager"
+        >
+          Enviar feedback
+        </ion-button>
+      </ion-item>
+    </ion-list>
+  </div>
 </ion-content>

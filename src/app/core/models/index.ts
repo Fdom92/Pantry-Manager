@@ -8,3 +8,4 @@ export * from './shopping-list.model';
 export * from './stock-info.model';
 export * from './supermarket.model';
 export * from './user.model';
+export * from './settings.model';
