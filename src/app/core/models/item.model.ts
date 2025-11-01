@@ -1,6 +1,6 @@
 import { BaseDoc } from './base-doc.model';
 import { ExpirationStatus } from './enums.model';
-import { StockInfo } from './stock-info.model';
+import { ItemLocationStock } from './item-location-stock.model';
 
 export interface PantryItem extends BaseDoc {
   type: 'item';
@@ -8,10 +8,10 @@ export interface PantryItem extends BaseDoc {
   name: string;
   brand?: string;
   categoryId: string;
-  locationId: string;
   supermarketId?: string;
   barcode?: string;
-  stock: StockInfo | null;
+  locations: ItemLocationStock[];
+  isBasic?: boolean;
   expirationDate?: string;
   expirationStatus?: ExpirationStatus;
 }

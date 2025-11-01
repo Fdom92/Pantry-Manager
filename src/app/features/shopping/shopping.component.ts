@@ -3,16 +3,18 @@ import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { SeedService } from '@core/services';
-import { PantryItem } from '@core/models';
+import { PantryItem, MeasurementUnit } from '@core/models';
 
 type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out';
 
 interface ShoppingSuggestion {
   item: PantryItem;
+  locationId: string;
   reason: ShoppingReason;
   suggestedQuantity: number;
   currentQuantity: number;
   minThreshold?: number;
+  unit: MeasurementUnit;
 }
 
 interface ShoppingSummary {
@@ -59,12 +61,8 @@ export class ShoppingComponent {
   ) {}
 
   async ionViewWillEnter(): Promise<void> {
-    await this.seedService.ensureSeedData();
+    // await this.seedService.ensureSeedData();
     await this.pantryStore.loadAll();
-  }
-
-  async refreshList(): Promise<void> {
-    await this.pantryStore.refresh();
   }
 
   toggleSummary(): void {
@@ -88,7 +86,7 @@ export class ShoppingComponent {
     });
 
     try {
-      await this.pantryStore.adjustQuantity(id, suggestion.suggestedQuantity);
+      await this.pantryStore.adjustQuantity(id, suggestion.locationId, suggestion.suggestedQuantity);
     } finally {
       this.processingIds.update(ids => {
         const next = new Set(ids);
@@ -109,8 +107,29 @@ export class ShoppingComponent {
     }
   }
 
-  getUnit(item: PantryItem): string {
-    return item.stock?.unit ?? 'unit';
+  getUnitLabel(unit: MeasurementUnit): string {
+    return this.pantryStore.getUnitLabel(unit);
+  }
+
+  getLocationLabel(locationId: string): string {
+    const key = (locationId ?? '').trim().toLowerCase();
+    if (!key) {
+      return 'Unassigned';
+    }
+    switch (key) {
+      case 'pantry':
+        return 'Pantry';
+      case 'kitchen':
+        return 'Kitchen';
+      case 'fridge':
+        return 'Fridge';
+      case 'freezer':
+        return 'Freezer';
+      case 'bathroom':
+        return 'Bathroom';
+      default:
+        return this.toTitleCase(locationId);
+    }
   }
 
   private analyzeShopping(items: PantryItem[]): Omit<ShoppingState, 'hasAlerts'> {
@@ -123,44 +142,48 @@ export class ShoppingComponent {
     };
 
     for (const item of items) {
-      const stock = item.stock;
-      const quantity = stock ? Number(stock.quantity ?? 0) : 0;
-      const minThreshold = stock?.minThreshold;
-      const isBasic = Boolean(stock?.isBasic);
+      const isBasic = Boolean(item.isBasic);
+      for (const location of item.locations) {
+        const quantity = Number(location.quantity ?? 0);
+        const minThreshold = location.minThreshold != null ? Number(location.minThreshold) : null;
+        const unit = location.unit ?? this.pantryStore.getItemPrimaryUnit(item);
 
-      let reason: ShoppingReason | null = null;
-      let suggestedQuantity = 0;
+        let reason: ShoppingReason | null = null;
+        let suggestedQuantity = 0;
 
-      if (isBasic && quantity <= 0) {
-        reason = 'basic-out';
-        suggestedQuantity = this.ensurePositiveQuantity(minThreshold ?? 1);
-      } else if (isBasic && minThreshold != null && quantity < minThreshold) {
-        reason = 'basic-low';
-        suggestedQuantity = this.ensurePositiveQuantity(minThreshold - quantity, minThreshold);
-      } else if (minThreshold != null && quantity < minThreshold) {
-        reason = 'below-min';
-        suggestedQuantity = this.ensurePositiveQuantity(minThreshold - quantity, minThreshold);
-      }
+        if (isBasic && quantity <= 0) {
+          reason = 'basic-out';
+          suggestedQuantity = this.ensurePositiveQuantity(minThreshold ?? 1);
+        } else if (isBasic && minThreshold != null && quantity < minThreshold) {
+          reason = 'basic-low';
+          suggestedQuantity = this.ensurePositiveQuantity(minThreshold - quantity, minThreshold);
+        } else if (minThreshold != null && quantity < minThreshold) {
+          reason = 'below-min';
+          suggestedQuantity = this.ensurePositiveQuantity(minThreshold - quantity, minThreshold);
+        }
 
-      if (reason) {
-        suggestions.push({
-          item,
-          reason,
-          suggestedQuantity,
-          currentQuantity: this.roundQuantity(quantity),
-          minThreshold: minThreshold != null ? this.roundQuantity(minThreshold) : undefined,
-        });
+        if (reason) {
+          suggestions.push({
+            item,
+            locationId: location.locationId,
+            reason,
+            suggestedQuantity,
+            currentQuantity: this.roundQuantity(quantity),
+            minThreshold: minThreshold != null ? this.roundQuantity(minThreshold) : undefined,
+            unit,
+          });
 
-        switch (reason) {
-          case 'below-min':
-            summary.belowMin += 1;
-            break;
-          case 'basic-low':
-            summary.basicLow += 1;
-            break;
-          case 'basic-out':
-            summary.basicOut += 1;
-            break;
+          switch (reason) {
+            case 'below-min':
+              summary.belowMin += 1;
+              break;
+            case 'basic-low':
+              summary.basicLow += 1;
+              break;
+            case 'basic-out':
+              summary.basicOut += 1;
+              break;
+          }
         }
       }
     }
@@ -188,5 +211,16 @@ export class ShoppingComponent {
       return 0;
     }
     return Math.round(num * 100) / 100;
+  }
+
+  private toTitleCase(value: string): string {
+    const clean = value.replace(/[-_]/g, ' ').trim();
+    if (!clean) {
+      return 'Unassigned';
+    }
+    return clean
+      .split(' ')
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+      .join(' ');
   }
 }

@@ -1,9 +1,9 @@
 import { Component, OnDestroy, signal, computed, effect } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
 import { SeedService } from '@core/services/seed.service';
-import { PantryItem, MeasurementUnit, StockStatus, StockInfo } from '@core/models';
+import { PantryItem, MeasurementUnit, ItemLocationStock } from '@core/models';
 import { createDocumentId } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -65,14 +65,21 @@ export class PantryListComponent implements OnDestroy {
   private realtimeSubscribed = false;
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
-    quantity: this.fb.control(1, { validators: [Validators.required, Validators.min(0)], nonNullable: true }),
-    unit: this.fb.control<MeasurementUnit>(MeasurementUnit.UNIT, { validators: [Validators.required], nonNullable: true }),
     categoryId: this.fb.control(''),
-    locationId: this.fb.control(''),
-    minThreshold: this.fb.control<number | null>(null),
-    expirationDate: this.fb.control(''),
-    notes: this.fb.control('')
+    isBasic: this.fb.control(false),
+    notes: this.fb.control(''),
+    locations: this.fb.array([
+      this.createLocationGroup({
+        locationId: '',
+        quantity: 1,
+        unit: MeasurementUnit.UNIT,
+      })
+    ])
   });
+
+  get locationsArray(): FormArray<FormGroup> {
+    return this.form.get('locations') as FormArray<FormGroup>;
+  }
   constructor(
     private readonly pantryStore: PantryStoreService,
     private seedService: SeedService,
@@ -105,7 +112,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   async ionViewWillEnter() {
-    await this.seedService.ensureSeedData();
+    // await this.seedService.ensureSeedData();
     await this.loadItems();
     if (!this.realtimeSubscribed) {
       this.pantryStore.watchRealtime();
@@ -121,14 +128,17 @@ export class PantryListComponent implements OnDestroy {
     this.editingItem = null;
     this.form.reset({
       name: '',
-      quantity: 1,
-      unit: MeasurementUnit.UNIT,
       categoryId: '',
-      locationId: '',
-      minThreshold: null,
-      expirationDate: '',
+      isBasic: false,
       notes: ''
     });
+    this.resetLocationControls([
+      {
+        locationId: '',
+        quantity: 1,
+        unit: MeasurementUnit.UNIT,
+      }
+    ]);
     this.showCreateModal = true;
   }
 
@@ -137,15 +147,61 @@ export class PantryListComponent implements OnDestroy {
     this.editingItem = item;
     this.form.reset({
       name: item.name ?? '',
-      quantity: item.stock?.quantity ?? 0,
-      unit: item.stock?.unit ?? MeasurementUnit.UNIT,
       categoryId: item.categoryId ?? '',
-      locationId: item.locationId ?? '',
-      minThreshold: item.stock?.minThreshold ?? null,
-      expirationDate: item.expirationDate ? this.toDateInputValue(item.expirationDate) : '',
+      isBasic: Boolean(item.isBasic),
       notes: ''
     });
+    const locations = item.locations.length
+      ? item.locations
+      : [{
+          locationId: '',
+          quantity: 0,
+          unit: this.pantryStore.getItemPrimaryUnit(item),
+          minThreshold: undefined,
+          expiryDate: undefined,
+          opened: false,
+        }];
+    this.resetLocationControls(locations);
     this.showCreateModal = true;
+  }
+
+  addLocationEntry(): void {
+    this.locationsArray.push(this.createLocationGroup());
+  }
+
+  removeLocationEntry(index: number): void {
+    if (this.locationsArray.length <= 1) {
+      return;
+    }
+    this.locationsArray.removeAt(index);
+  }
+
+  private resetLocationControls(locations: Array<Partial<ItemLocationStock>>): void {
+    while (this.locationsArray.length) {
+      this.locationsArray.removeAt(0);
+    }
+    for (const location of locations) {
+      this.locationsArray.push(this.createLocationGroup(location));
+    }
+  }
+
+  private createLocationGroup(initial?: Partial<ItemLocationStock>): FormGroup {
+    return this.fb.group({
+      locationId: this.fb.control((initial?.locationId ?? '').trim(), { nonNullable: true }),
+      quantity: this.fb.control(initial?.quantity != null ? Number(initial.quantity) : 0, {
+        validators: [Validators.required, Validators.min(0)],
+        nonNullable: true,
+      }),
+      unit: this.fb.control<MeasurementUnit>(initial?.unit ?? MeasurementUnit.UNIT, {
+        validators: [Validators.required],
+        nonNullable: true,
+      }),
+      minThreshold: this.fb.control(
+        initial?.minThreshold != null ? Number(initial.minThreshold) : null
+      ),
+      expiryDate: this.fb.control(initial?.expiryDate ? this.toDateInputValue(initial.expiryDate) : ''),
+      opened: this.fb.control(initial?.opened ?? false),
+    });
   }
 
   closeFormModal(): void {
@@ -199,18 +255,18 @@ export class PantryListComponent implements OnDestroy {
     await this.presentToast('🗑️ Producto eliminado.', 'medium');
   }
 
-  async adjustQuantity(item: PantryItem, delta: number, event?: Event): Promise<void> {
+  async adjustLocationQuantity(item: PantryItem, location: ItemLocationStock, delta: number, event?: Event): Promise<void> {
     event?.stopPropagation();
-    if (!item?._id) {
+    if (!item?._id || !location?.locationId) {
       return;
     }
-    const prevQuantity = this.getQuantity(item);
+    const prevQuantity = Number(location.quantity ?? 0);
     const next = Math.max(0, prevQuantity + delta);
     if (next === prevQuantity) {
       return;
     }
 
-    const updatedLocal = this.updateLocalQuantity(item._id, next);
+    const updatedLocal = this.updateLocalLocationQuantity(item._id, location.locationId, next);
     await this.provideQuantityFeedback(prevQuantity, next);
     if (updatedLocal) {
       this.triggerStockSave(item._id, updatedLocal);
@@ -259,11 +315,6 @@ export class PantryListComponent implements OnDestroy {
     this.showFilters.set(false);
   }
 
-  async refreshItems(event?: Event): Promise<void> {
-    event?.preventDefault();
-    await this.pantryStore.refresh();
-  }
-
   async discardExpiredItem(item: PantryItem, event?: Event): Promise<void> {
     if (!this.isExpired(item)) {
       return;
@@ -271,20 +322,32 @@ export class PantryListComponent implements OnDestroy {
     await this.deleteItem(item, event, true);
   }
 
-  getUnit(item: PantryItem): string {
-    return item.stock?.unit ?? MeasurementUnit.UNIT;
+  getTotalQuantity(item: PantryItem): number {
+    return this.pantryStore.getItemTotalQuantity(item);
   }
 
-  getLocationName(item: PantryItem): string {
-    return this.formatFriendlyName(item.locationId, 'Unassigned');
+  getTotalMinThreshold(item: PantryItem): number {
+    return this.pantryStore.getItemTotalMinThreshold(item);
   }
 
-  getQuantity(item: PantryItem): number {
-    return item.stock?.quantity ?? 0;
+  getPrimaryUnit(item: PantryItem): MeasurementUnit {
+    return this.pantryStore.getItemPrimaryUnit(item);
+  }
+
+  getUnitLabelForItem(item: PantryItem): string {
+    return this.pantryStore.getUnitLabel(this.getPrimaryUnit(item));
+  }
+
+  getUnitLabel(unit: MeasurementUnit): string {
+    return this.pantryStore.getUnitLabel(unit);
+  }
+
+  getLocationLabel(locationId: string | undefined): string {
+    return this.formatFriendlyName(locationId ?? '', 'Unassigned');
   }
 
   getStatus(item: PantryItem): { label: string; color: string } {
-    const quantity = item.stock?.quantity ?? 0;
+    const quantity = this.getTotalQuantity(item);
     if (this.isExpired(item)) {
       return { label: 'Expired', color: 'danger' };
     }
@@ -301,7 +364,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   getStatusIcon(item: PantryItem): string {
-    const quantity = this.getQuantity(item);
+    const quantity = this.getTotalQuantity(item);
     if (this.isExpired(item)) {
       return 'alert-circle-outline';
     }
@@ -314,42 +377,19 @@ export class PantryListComponent implements OnDestroy {
     if (this.isLowStock(item)) {
       return 'trending-down-outline';
     }
-    return 'checkmark-circle-outline';
+      return 'checkmark-circle-outline';
   }
 
   isLowStock(item: PantryItem): boolean {
-    const stock = item.stock;
-    if (!stock) {
-      return true;
-    }
-    if (stock.minThreshold == null) {
-      return false;
-    }
-    return stock.quantity <= stock.minThreshold;
+    return this.pantryStore.isItemLowStock(item);
   }
 
   isExpired(item: PantryItem): boolean {
-    if (!item.expirationDate) {
-      return false;
-    }
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const expiration = new Date(item.expirationDate);
-    expiration.setHours(0, 0, 0, 0);
-    return expiration < today;
+    return this.pantryStore.isItemExpired(item);
   }
 
   isNearExpiry(item: PantryItem): boolean {
-    if (!item.expirationDate) {
-      return false;
-    }
-    if (this.isExpired(item)) {
-      return false;
-    }
-    const today = new Date();
-    const target = new Date(item.expirationDate);
-    const diff = (target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-    return diff <= this.nearExpiryDays;
+    return this.pantryStore.isItemNearExpiry(item);
   }
 
   trackByItemId(_: number, item: PantryItem): string {
@@ -383,7 +423,10 @@ export class PantryListComponent implements OnDestroy {
       if (category !== 'all' && (item.categoryId ?? '') !== category) {
         return false;
       }
-      if (location !== 'all' && (item.locationId ?? '') !== location) {
+      if (
+        location !== 'all' &&
+        !item.locations.some(loc => (loc.locationId ?? '') === location)
+      ) {
         return false;
       }
       switch (status) {
@@ -410,7 +453,7 @@ export class PantryListComponent implements OnDestroy {
 
     switch (sortOption) {
       case 'quantity': {
-        const quantityDiff = (b.stock?.quantity ?? 0) - (a.stock?.quantity ?? 0);
+        const quantityDiff = this.getTotalQuantity(b) - this.getTotalQuantity(a);
         if (quantityDiff !== 0) {
           return quantityDiff;
         }
@@ -441,10 +484,11 @@ export class PantryListComponent implements OnDestroy {
   }
 
   private getExpirationTime(item: PantryItem): number {
-    if (!item.expirationDate) {
+    const expiry = this.computeEarliestExpiry(item.locations);
+    if (!expiry) {
       return Number.MAX_SAFE_INTEGER;
     }
-    return new Date(item.expirationDate).getTime();
+    return new Date(expiry).getTime();
   }
 
   private buildSummary(items: PantryItem[]) {
@@ -475,13 +519,20 @@ export class PantryListComponent implements OnDestroy {
     const counts = new Map<string, { label: string; count: number }>();
 
     for (const item of items) {
-      const id = (item.locationId ?? '').trim();
-      const label = this.formatFriendlyName(id, 'Unassigned');
-      const current = counts.get(id);
-      if (current) {
-        current.count += 1;
-      } else {
-        counts.set(id, { label, count: 1 });
+      const seen = new Set<string>();
+      for (const location of item.locations) {
+        const id = (location.locationId ?? '').trim();
+        if (seen.has(id)) {
+          continue;
+        }
+        seen.add(id);
+        const label = this.formatFriendlyName(id, 'Unassigned');
+        const current = counts.get(id);
+        if (current) {
+          current.count += 1;
+        } else {
+          counts.set(id, { label, count: 1 });
+        }
       }
     }
 
@@ -495,34 +546,57 @@ export class PantryListComponent implements OnDestroy {
     ];
   }
 
-  private updateLocalQuantity(itemId: string, quantity: number): PantryItem | null {
+  private computeEarliestExpiry(locations: ItemLocationStock[]): string | undefined {
+    const dates = locations
+      .map(loc => loc.expiryDate)
+      .filter((date): date is string => Boolean(date));
+    if (!dates.length) {
+      return undefined;
+    }
+    return dates.reduce((earliest, current) => {
+      if (!earliest) {
+        return current;
+      }
+      return new Date(current) < new Date(earliest) ? current : earliest;
+    });
+  }
+
+  private updateLocalLocationQuantity(itemId: string, locationId: string, quantity: number): PantryItem | null {
     let updatedItem: PantryItem | null = null;
     this.itemsState.update(items =>
       items.map(item => {
         if (item._id !== itemId) {
           return item;
         }
-        const minThreshold = item.stock?.minThreshold ?? null;
-        const unit = item.stock?.unit ?? MeasurementUnit.UNIT;
-        const baseStock: StockInfo = {
-          ...(item.stock ?? { quantity: 0, unit }),
-          quantity,
-          unit,
-          status: this.computeStockStatus(quantity, minThreshold),
-        };
+        let found = false;
+        const nextLocations = item.locations.map(loc => {
+          if (loc.locationId === locationId) {
+            found = true;
+            return {
+              ...loc,
+              quantity,
+            };
+          }
+          return loc;
+        });
 
-        if (minThreshold != null) {
-          baseStock.minThreshold = minThreshold;
-        } else {
-          baseStock.minThreshold = undefined;
+        if (!found) {
+          nextLocations.push({
+            locationId,
+            quantity,
+            unit: item.locations[0]?.unit ?? MeasurementUnit.UNIT,
+          });
         }
 
-        updatedItem = {
+        const updated: PantryItem = {
           ...item,
-          stock: baseStock,
+          locations: nextLocations,
+          expirationDate: this.computeEarliestExpiry(nextLocations),
           updatedAt: new Date().toISOString(),
         };
-        return updatedItem;
+
+        updatedItem = updated;
+        return updated;
       })
     );
 
@@ -600,24 +674,27 @@ export class PantryListComponent implements OnDestroy {
 
   private buildCreateSuccessMessage(item: PantryItem): string {
     const name = item.name?.trim() || 'Producto';
-    const quantityText = this.formatQuantityForMessage(item.stock?.quantity, item.stock?.unit);
-    const locationPhrase = this.formatLocationPhrase(item.locationId, 'en', 'la despensa');
+    const quantityText = this.formatQuantityForMessage(
+      this.getTotalQuantity(item),
+      this.getPrimaryUnit(item)
+    );
+    const breakdown = this.formatLocationBreakdown(item.locations);
     const quantitySegment = quantityText ? ` (${quantityText})` : '';
-    return `✅ ${name} añadido${quantitySegment} ${locationPhrase}.`;
+    const breakdownSegment = breakdown ? ` · ${breakdown}` : '';
+    return `✅ ${name} añadido${quantitySegment}${breakdownSegment}.`;
   }
 
   private buildUpdateSuccessMessage(previous: PantryItem, updated: PantryItem): string {
-    const previousLocation = (previous.locationId ?? '').trim();
-    const nextLocation = (updated.locationId ?? '').trim();
-    if (previousLocation !== nextLocation) {
-      const locationPhrase = this.formatLocationPhrase(updated.locationId, 'a', 'la nueva ubicación');
-      return `📦 Producto movido ${locationPhrase}.`;
+    const previousBreakdown = this.formatLocationBreakdown(previous.locations);
+    const nextBreakdown = this.formatLocationBreakdown(updated.locations);
+    if (previousBreakdown !== nextBreakdown) {
+      return `📦 Ubicaciones actualizadas: ${nextBreakdown || 'sin asignar'}.`;
     }
 
-    const previousQuantity = previous.stock?.quantity ?? null;
-    const nextQuantity = updated.stock?.quantity ?? null;
+    const previousQuantity = this.getTotalQuantity(previous);
+    const nextQuantity = this.getTotalQuantity(updated);
     if (previousQuantity !== nextQuantity) {
-      const quantityText = this.formatQuantityForMessage(updated.stock?.quantity, updated.stock?.unit);
+      const quantityText = this.formatQuantityForMessage(nextQuantity, this.getPrimaryUnit(updated));
       if (quantityText) {
         return `💾 Stock actualizado: ${updated.name} (${quantityText}).`;
       }
@@ -628,72 +705,82 @@ export class PantryListComponent implements OnDestroy {
   }
 
   private buildStockUpdateMessage(item: PantryItem): string {
-    const quantityText = this.formatQuantityForMessage(item.stock?.quantity, item.stock?.unit);
+    const quantityText = this.formatQuantityForMessage(
+      this.getTotalQuantity(item),
+      this.getPrimaryUnit(item)
+    );
     if (quantityText) {
       return `💾 Stock actualizado: ${item.name} (${quantityText}).`;
     }
     return '💾 Stock actualizado.';
   }
 
-  private formatLocationPhrase(locationId: string | undefined, preposition: 'a' | 'en', fallbackLabel: string): string {
-    const label = this.getLocationMessageLabel(locationId) ?? fallbackLabel;
-    if (preposition === 'a') {
-      if (label.startsWith('el ')) {
-        return `al ${label.slice(3)}`;
-      }
-      return `a ${label}`;
+  private formatLocationBreakdown(locations: ItemLocationStock[]): string {
+    if (!locations.length) {
+      return '';
     }
-    return `${preposition} ${label}`;
-  }
-
-  private getLocationMessageLabel(locationId?: string | null): string | null {
-    const key = (locationId ?? '').trim().toLowerCase();
-    if (!key) {
-      return null;
-    }
-    switch (key) {
-      case 'pantry':
-        return 'la despensa';
-      case 'kitchen':
-        return 'la cocina';
-      case 'fridge':
-        return 'el frigorífico';
-      case 'freezer':
-        return 'el congelador';
-      default:
-        return this.formatFriendlyName(locationId ?? '', '').toLowerCase();
-    }
+    return locations
+      .map(location => {
+        const quantity = this.roundDisplayQuantity(Number(location.quantity ?? 0));
+        const unitLabel = this.getUnitLabel(location.unit ?? MeasurementUnit.UNIT);
+        const label = this.formatFriendlyName(location.locationId ?? '', 'Unassigned');
+        return `${quantity} ${unitLabel} · ${label}`;
+      })
+      .join(', ');
   }
 
   private formatQuantityForMessage(quantity?: number | null, unit?: MeasurementUnit | string | null): string | null {
     if (quantity == null || Number.isNaN(Number(quantity))) {
       return null;
     }
-    const formatted = Number(quantity).toLocaleString('es-ES', { maximumFractionDigits: 2 });
-    const unitLabel = unit ?? MeasurementUnit.UNIT;
-    return `${formatted} ${unitLabel}`.trim();
+    const formattedNumber = this.roundDisplayQuantity(Number(quantity)).toLocaleString('es-ES', {
+      maximumFractionDigits: 2,
+    });
+    if (typeof unit === 'string' && !(unit in MeasurementUnit)) {
+      return `${formattedNumber} ${unit}`.trim();
+    }
+    const unitLabel = this.getUnitLabel((unit as MeasurementUnit) ?? MeasurementUnit.UNIT);
+    return `${formattedNumber} ${unitLabel}`.trim();
+  }
+
+  private roundDisplayQuantity(value: number): number {
+    const num = Number.isFinite(value) ? value : 0;
+    return Math.round(num * 100) / 100;
   }
 
   private buildItemPayload(existing?: PantryItem): PantryItem {
-    const {
-      name,
-      quantity,
-      unit,
-      categoryId,
-      locationId,
-      minThreshold,
-      expirationDate
-    } = this.form.value;
-
-    const {
-      now,
-      normalizedExpiration,
-      normalizedQuantity,
-      normalizedMinThreshold,
-      normalizedUnit
-    } = this.normalizeFormValues(quantity, minThreshold, unit, expirationDate);
-
+    const { name, categoryId, isBasic } = this.form.value;
     const identifier = existing?._id ?? createDocumentId('item');
+    const now = new Date().toISOString();
+
+    const locations: ItemLocationStock[] = this.locationsArray.controls.map(control => {
+      const value = control.value as any;
+      const rawLocationId = (value?.locationId ?? '').trim();
+      const locationId = rawLocationId || 'unassigned';
+      const quantity = value?.quantity != null ? Number(value.quantity) : 0;
+      const unit = value?.unit ?? MeasurementUnit.UNIT;
+      const minThreshold = value?.minThreshold != null && value.minThreshold !== ''
+        ? Number(value.minThreshold)
+        : undefined;
+      const expiryDate = value?.expiryDate ? new Date(value.expiryDate).toISOString() : undefined;
+      const opened = value?.opened ? true : undefined;
+
+      return {
+        locationId,
+        quantity: Number.isFinite(quantity) ? quantity : 0,
+        unit,
+        minThreshold,
+        expiryDate,
+        opened,
+      };
+    });
+
+    const normalizedLocations = locations.length
+      ? locations
+      : [{ locationId: 'unassigned', quantity: 0, unit: MeasurementUnit.UNIT }];
+
+    const earliestExpiry = this.computeEarliestExpiry(normalizedLocations);
+
     const base: PantryItem = {
       _id: identifier,
       _rev: existing?._rev,
@@ -701,72 +788,14 @@ export class PantryListComponent implements OnDestroy {
       householdId: existing?.householdId ?? DEFAULT_HOUSEHOLD_ID,
       name: (name ?? '').trim(),
       categoryId: (categoryId ?? '').trim(),
-      locationId: (locationId ?? '').trim(),
-      stock: {
-        quantity: normalizedQuantity,
-        unit: normalizedUnit,
-        minThreshold: normalizedMinThreshold ?? undefined,
-        status: this.computeStockStatus(normalizedQuantity, normalizedMinThreshold),
-        isBasic: existing?.stock?.isBasic
-      },
-      expirationDate: normalizedExpiration,
+      locations: normalizedLocations,
+      isBasic: isBasic ? true : undefined,
+      expirationDate: earliestExpiry,
       createdAt: existing?.createdAt ?? now,
-      updatedAt: now
+      updatedAt: now,
     };
-
-    if (base.stock) {
-      if (base.stock.minThreshold == null) {
-        base.stock.minThreshold = undefined;
-      }
-      if (!base.stock.isBasic) {
-        base.stock.isBasic = undefined;
-      }
-    }
-
-    if (existing && !normalizedExpiration) {
-      base.expirationDate = undefined;
-    }
 
     return base;
-  }
-
-  private normalizeFormValues(
-    quantity: number | null | undefined,
-    minThreshold: number | null | undefined,
-    unit: MeasurementUnit | null | undefined,
-    expirationDate: string | null | undefined
-  ): {
-    now: string;
-    normalizedQuantity: number;
-    normalizedMinThreshold: number | null;
-    normalizedUnit: MeasurementUnit;
-    normalizedExpiration?: string;
-  } {
-    const quantityValue = quantity == null ? 0 : Number(quantity);
-    const minThresholdValue = minThreshold == null
-      ? null
-      : Number(minThreshold);
-    const normalizedExpiration = expirationDate
-      ? new Date(expirationDate as string).toISOString()
-      : undefined;
-
-    return {
-      now: new Date().toISOString(),
-      normalizedExpiration,
-      normalizedQuantity: quantityValue,
-      normalizedMinThreshold: minThresholdValue,
-      normalizedUnit: (unit ?? MeasurementUnit.UNIT) as MeasurementUnit
-    };
-  }
-
-  private computeStockStatus(quantity: number, minThreshold: number | null): StockStatus {
-    if (quantity <= 0) {
-      return StockStatus.EMPTY;
-    }
-    if (minThreshold != null && quantity <= minThreshold) {
-      return StockStatus.LOW;
-    }
-    return StockStatus.NORMAL;
   }
 
   private computeCategoryOptions(items: PantryItem[]): Array<{ id: string; label: string; count: number; lowCount: number }> {
@@ -898,8 +927,14 @@ export class PantryListComponent implements OnDestroy {
   private matchesSearch(item: PantryItem, search: string): boolean {
     const name = item.name?.toLowerCase() ?? '';
     const category = item.categoryId?.toLowerCase() ?? '';
-    const location = item.locationId?.toLowerCase() ?? '';
-    return name.includes(search) || category.includes(search) || location.includes(search);
+    if (name.includes(search) || category.includes(search)) {
+      return true;
+    }
+    return item.locations.some(loc => {
+      const id = loc.locationId?.toLowerCase() ?? '';
+      const label = this.formatFriendlyName(loc.locationId ?? '', '').toLowerCase();
+      return id.includes(search) || label.includes(search);
+    });
   }
 
 }

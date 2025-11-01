@@ -99,11 +99,16 @@
               <ion-label>
                 <h3>{{ item.name }}</h3>
                 <p>
-                  {{ item.stock?.quantity }} {{ item.stock?.unit }}
-                  (min {{ item.stock?.minThreshold }})
+                  {{ getItemTotalQuantity(item) | number:'1.0-2' }} {{ getItemUnitLabel(item) }}
+                  @if (getItemTotalMinThreshold(item) > 0) {
+                    (min {{ getItemTotalMinThreshold(item) | number:'1.0-2' }} {{ getItemUnitLabel(item) }})
+                  }
                 </p>
+                <ion-note color="medium">
+                  {{ getItemLocationsSummary(item) }}
+                </ion-note>
               </ion-label>
-              <ion-badge color="danger">{{ item.stock?.quantity }}</ion-badge>
+              <ion-badge color="danger">{{ getItemTotalQuantity(item) | number:'1.0-2' }}</ion-badge>
             </ion-item>
           }
         </ion-list>

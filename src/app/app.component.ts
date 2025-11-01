@@ -11,6 +11,6 @@ export class AppComponent implements OnInit {
   constructor(private seedService: SeedService) {}
 
   ngOnInit(): void {
-    void this.seedService.ensureSeedData();
+    // void this.seedService.ensureSeedData();
   }
 }

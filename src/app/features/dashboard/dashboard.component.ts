@@ -2,7 +2,7 @@ import { Component, computed, effect, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { SeedService } from '@core/services';
-import { PantryItem } from '@core/models';
+import { ItemLocationStock, PantryItem } from '@core/models';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 
 @Component({
@@ -34,9 +34,17 @@ export class DashboardComponent {
   readonly categoryCount = computed(() =>
     this.countDistinct(this.items().map(item => item.categoryId))
   );
-  readonly locationCount = computed(() =>
-    this.countDistinct(this.items().map(item => item.locationId))
-  );
+  readonly locationCount = computed(() => {
+    const ids: string[] = [];
+    for (const item of this.items()) {
+      for (const location of item.locations) {
+        if (location.locationId) {
+          ids.push(location.locationId);
+        }
+      }
+    }
+    return this.countDistinct(ids);
+  });
   readonly recentItems = computed(() => this.computeRecentItems(this.items()));
 
   constructor(
@@ -63,7 +71,7 @@ export class DashboardComponent {
   }
 
   async ionViewWillEnter(): Promise<void> {
-    await this.seedService.ensureSeedData();
+    // await this.seedService.ensureSeedData();
     await this.pantryStore.loadAll();
     this.hasInitialized = true;
     this.lastUpdated.set(new Date().toISOString());
@@ -91,5 +99,52 @@ export class DashboardComponent {
 
   private countDistinct(values: (string | undefined)[]): number {
     return new Set(values.filter(Boolean)).size;
+  }
+
+  getItemTotalQuantity(item: PantryItem): number {
+    return this.pantryStore.getItemTotalQuantity(item);
+  }
+
+  getItemUnitLabel(item: PantryItem): string {
+    const unit = this.pantryStore.getItemPrimaryUnit(item);
+    return this.pantryStore.getUnitLabel(unit);
+  }
+
+  getItemTotalMinThreshold(item: PantryItem): number {
+    return this.pantryStore.getItemTotalMinThreshold(item);
+  }
+
+  getItemLocationsSummary(item: PantryItem): string {
+    return item.locations
+      .map(location => {
+        const quantity = Number(location.quantity ?? 0).toFixed(1).replace(/\.0$/, '');
+        const unit = this.pantryStore.getUnitLabel(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
+        const name = this.formatLocationName(location.locationId);
+        return `${quantity} ${unit} · ${name}`;
+      })
+      .join(', ');
+  }
+
+  private formatLocationName(id?: string): string {
+    const value = (id ?? '').trim();
+    if (!value) {
+      return 'Unassigned';
+    }
+    switch (value.toLowerCase()) {
+      case 'pantry':
+        return 'Pantry';
+      case 'fridge':
+        return 'Fridge';
+      case 'freezer':
+        return 'Freezer';
+      case 'kitchen':
+        return 'Kitchen';
+      default:
+        return value
+          .replace(/[-_]/g, ' ')
+          .split(' ')
+          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(' ');
+    }
   }
 }

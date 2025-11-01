@@ -51,11 +51,6 @@
           </div>
         </div>
       }
-      <div class="summary-actions">
-        <ion-button size="small" fill="outline" (click)="refreshList()" [disabled]="loading()">
-          Refresh list
-        </ion-button>
-      </div>
     </ion-card-content>
   </ion-card>
 
@@ -81,14 +76,15 @@
                   </ion-chip>
                 </div>
                 <p class="meta">
-                  Current: {{ suggestion.currentQuantity | number:'1.0-2' }} {{ getUnit(suggestion.item) }}
+                  Location: {{ getLocationLabel(suggestion.locationId) }} ·
+                  Current: {{ suggestion.currentQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
                   @if (suggestion.minThreshold !== undefined) {
-                    · Min: {{ suggestion.minThreshold | number:'1.0-2' }} {{ getUnit(suggestion.item) }}
+                    · Min: {{ suggestion.minThreshold | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
                   }
                 </p>
                 <div class="suggestion-footer">
                   <ion-note color="primary" class="purchase-note">
-                    Buy {{ suggestion.suggestedQuantity | number:'1.0-2' }} {{ getUnit(suggestion.item) }}
+                    Buy {{ suggestion.suggestedQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
                   </ion-note>
                   <ion-button
                     size="small"

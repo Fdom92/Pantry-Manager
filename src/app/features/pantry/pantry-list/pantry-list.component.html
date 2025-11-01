@@ -5,9 +5,6 @@
       <ion-button fill="clear" size="small" (click)="openFilters($event)">
         <ion-icon slot="icon-only" name="filter-outline"></ion-icon>
       </ion-button>
-      <ion-button fill="clear" size="small" (click)="refreshItems($event)">
-        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
-      </ion-button>
       <ion-button fill="solid" shape="round" size="small" (click)="openNewItemModal()">
         <ion-icon slot="icon-only" name="add"></ion-icon>
       </ion-button>
@@ -209,8 +206,8 @@
               @for (item of group.items; track item._id) {
                 @let status = getStatus(item);
                 <ion-card class="item-card" [ngClass]="{
-                  'item-empty': getQuantity(item) === 0,
-                  'item-low': isLowStock(item) && getQuantity(item) > 0,
+                  'item-empty': getTotalQuantity(item) === 0,
+                  'item-low': isLowStock(item) && getTotalQuantity(item) > 0,
                   'item-expired': isExpired(item),
                   'item-near-expiry': isNearExpiry(item) && !isExpired(item)
                 }">
@@ -218,12 +215,12 @@
                   <ion-card-header (click)="toggleItemExpansion(item, $event)">
                     <div class="item-card-header">
                       <div class="item-title-block">
-                        @if (item.stock?.isBasic) {
+                        @if (item.isBasic) {
                           <ion-icon class="basic-icon" name="star-outline"></ion-icon>
                         }
                         <ion-card-title>{{ item.name }}</ion-card-title>
                         <ion-badge class="unit-badge" color="light">
-                          {{ getQuantity(item) | number:'1.0-2' }} {{ getUnit(item) }}
+                          {{ getTotalQuantity(item) | number:'1.0-2' }} {{ getUnitLabelForItem(item) }}
                         </ion-badge>
                       </div>
                       <ion-button
@@ -257,7 +254,7 @@
                         <ion-icon [name]="getStatusIcon(item)"></ion-icon>
                         <ion-label>{{ status.label }}</ion-label>
                       </ion-chip>
-                      @if (getQuantity(item) === 0 && status.label !== 'Empty') {
+                      @if (getTotalQuantity(item) === 0 && status.label !== 'Empty') {
                         <ion-chip class="status-chip" color="danger" size="small">
                           <ion-icon name="alert-circle-outline"></ion-icon>
                           <ion-label>Empty</ion-label>
@@ -269,7 +266,7 @@
                           <ion-label>Near expiry</ion-label>
                         </ion-chip>
                       }
-                      @if (isLowStock(item) && getQuantity(item) > 0 && status.label !== 'Low stock') {
+                      @if (isLowStock(item) && getTotalQuantity(item) > 0 && status.label !== 'Low stock') {
                         <ion-chip class="status-chip" color="warning" size="small">
                           <ion-icon name="trending-down-outline"></ion-icon>
                           <ion-label>Low stock</ion-label>
@@ -283,63 +280,76 @@
                       }
                     </div>
 
-                    <div class="quick-actions">
-                      <div class="quantity-control">
-                        <ion-button
-                          fill="clear"
-                          shape="round"
-                          size="small"
-                          color="medium"
-                          (click)="adjustQuantity(item, -1, $event)"
-                          [disabled]="getQuantity(item) <= 0">
-                          <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
-                        </ion-button>
-                        <ion-button
-                          fill="solid"
-                          shape="round"
-                          size="small"
-                          color="primary"
-                          (click)="adjustQuantity(item, 1, $event)">
-                          <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-                        </ion-button>
-                      </div>
-                      <div class="item-actions">
-                        <ion-button fill="clear" size="small" (click)="openEditItemModal(item, $event)">
-                          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-                        </ion-button>
-                        <ion-button fill="clear" size="small" color="danger" (click)="deleteItem(item, $event)">
-                          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                        </ion-button>
-                      </div>
+                    <div class="item-actions">
+                      <ion-button fill="clear" size="small" (click)="openEditItemModal(item, $event)">
+                        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                      </ion-button>
+                      <ion-button fill="clear" size="small" color="danger" (click)="deleteItem(item, $event)">
+                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                      </ion-button>
                     </div>
 
                     <div class="item-details" [@expandCollapse]="isExpanded(item) ? 'expanded' : 'collapsed'">
                       @if (isExpanded(item)) {
                         <div class="detail-grid">
-                        <div class="detail-card">
-                          <ion-icon name="location-outline"></ion-icon>
-                          <div>
-                            <p class="detail-label">Location</p>
-                            <p class="detail-value">{{ getLocationName(item) }}</p>
-                          </div>
-                        </div>
-                        @if (item.categoryId) {
-                          <div class="detail-card">
-                            <ion-icon name="pricetag-outline"></ion-icon>
+                          <div class="detail-card location-card">
+                            <ion-icon name="location-outline"></ion-icon>
                             <div>
-                              <p class="detail-label">Category</p>
-                              <p class="detail-value">{{ formatCategoryName(item.categoryId) }}</p>
+                              <p class="detail-label">Locations</p>
+                              <div class="detail-value location-list">
+                                @for (location of item.locations; track $index) {
+                                  <div class="location-entry">
+                                    <div class="location-info">
+                                      <strong>{{ getLocationLabel(location.locationId) }}</strong>
+                                      <span>{{ location.quantity | number:'1.0-2' }} {{ getUnitLabel(location.unit) }}</span>
+                                      @if (location.minThreshold !== undefined && location.minThreshold !== null) {
+                                        <ion-badge color="medium">Min {{ location.minThreshold | number:'1.0-2' }} {{ getUnitLabel(location.unit) }}</ion-badge>
+                                      }
+                                      @if (location.expiryDate) {
+                                        <span class="expiry-tag">Expires {{ location.expiryDate | date:'mediumDate' }}</span>
+                                      }
+                                    </div>
+                                    <div class="location-actions">
+                                      <ion-button
+                                        fill="clear"
+                                        size="small"
+                                        color="medium"
+                                        shape="round"
+                                        (click)="adjustLocationQuantity(item, location, -1, $event)"
+                                        [disabled]="location.quantity <= 0">
+                                        <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+                                      </ion-button>
+                                      <ion-button
+                                        fill="solid"
+                                        size="small"
+                                        color="primary"
+                                        shape="round"
+                                        (click)="adjustLocationQuantity(item, location, 1, $event)">
+                                        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                                      </ion-button>
+                                    </div>
+                                  </div>
+                                }
+                              </div>
                             </div>
                           </div>
-                        }
-                        @if (item.stock?.minThreshold !== null && item.stock?.minThreshold !== undefined) {
-                          <div class="detail-card">
-                            <ion-icon name="speedometer-outline"></ion-icon>
-                            <div>
-                              <p class="detail-label">Min threshold</p>
+                          @if (item.categoryId) {
+                            <div class="detail-card">
+                              <ion-icon name="pricetag-outline"></ion-icon>
+                              <div>
+                                <p class="detail-label">Category</p>
+                                <p class="detail-value">{{ formatCategoryName(item.categoryId) }}</p>
+                              </div>
+                            </div>
+                          }
+                          @if (getTotalMinThreshold(item) > 0) {
+                            <div class="detail-card">
+                              <ion-icon name="speedometer-outline"></ion-icon>
+                              <div>
+                                <p class="detail-label">Min threshold (total)</p>
                                 <p class="detail-value">
                                   <ion-badge color="medium">
-                                    {{ item.stock?.minThreshold | number:'1.0-2' }} {{ getUnit(item) }}
+                                    {{ getTotalMinThreshold(item) | number:'1.0-2' }} {{ getUnitLabelForItem(item) }}
                                   </ion-badge>
                                 </p>
                               </div>
@@ -403,28 +413,6 @@
 
             <ion-item>
               <ion-input
-                type="number"
-                min="0"
-                formControlName="quantity"
-                label="Quantity"
-                labelPlacement="stacked">
-              </ion-input>
-            </ion-item>
-
-            <ion-item>
-              <ion-select
-                formControlName="unit"
-                interface="popover"
-                label="Unit"
-                labelPlacement="stacked">
-                @for (unit of unitOptions; track unit) {
-                  <ion-select-option [value]="unit">{{ unit }}</ion-select-option>
-                }
-              </ion-select>
-            </ion-item>
-
-            <ion-item>
-              <ion-input
                 formControlName="categoryId"
                 label="Category"
                 labelPlacement="stacked"
@@ -432,33 +420,79 @@
               </ion-input>
             </ion-item>
 
-            <ion-item>
-              <ion-input
-                formControlName="locationId"
-                label="Location"
-                labelPlacement="stacked"
-                placeholder="Pantry, kitchen...">
-              </ion-input>
+            <ion-item lines="full">
+              <ion-toggle formControlName="isBasic" justify="space-between">Basic pantry item</ion-toggle>
             </ion-item>
 
-            <ion-item>
-              <ion-input
-                type="number"
-                min="0"
-                formControlName="minThreshold"
-                label="Minimum quantity (alerts)"
-                labelPlacement="stacked">
-              </ion-input>
-            </ion-item>
-
-            <ion-item>
-              <ion-input
-                type="date"
-                formControlName="expirationDate"
-                label="Expiration date"
-                labelPlacement="stacked">
-              </ion-input>
-            </ion-item>
+            <div formArrayName="locations" class="location-form-list">
+              @for (locationCtrl of locationsArray.controls; track $index; let i = $index) {
+                <div class="location-form-card" [formGroupName]="i">
+                  <div class="location-form-header">
+                    <h4>Location {{ i + 1 }}</h4>
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      color="danger"
+                      (click)="removeLocationEntry(i)"
+                      [disabled]="locationsArray.length <= 1">
+                      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                    </ion-button>
+                  </div>
+                  <ion-item>
+                    <ion-input
+                      formControlName="locationId"
+                      label="Location"
+                      labelPlacement="stacked"
+                      placeholder="Pantry, kitchen...">
+                    </ion-input>
+                  </ion-item>
+                  <ion-item>
+                    <ion-input
+                      type="number"
+                      min="0"
+                      formControlName="quantity"
+                      label="Quantity"
+                      labelPlacement="stacked">
+                    </ion-input>
+                  </ion-item>
+                  <ion-item>
+                    <ion-select
+                      formControlName="unit"
+                      interface="popover"
+                      label="Unit"
+                      labelPlacement="stacked">
+                      @for (unit of unitOptions; track unit) {
+                        <ion-select-option [value]="unit">{{ unit }}</ion-select-option>
+                      }
+                    </ion-select>
+                  </ion-item>
+                  <ion-item>
+                    <ion-input
+                      type="number"
+                      min="0"
+                      formControlName="minThreshold"
+                      label="Minimum quantity (alerts)"
+                      labelPlacement="stacked">
+                    </ion-input>
+                  </ion-item>
+                  <ion-item>
+                    <ion-input
+                      type="date"
+                      formControlName="expiryDate"
+                      label="Expiration date"
+                      labelPlacement="stacked">
+                    </ion-input>
+                  </ion-item>
+                  <ion-item lines="none">
+                    <ion-toggle formControlName="opened" justify="space-between">Opened</ion-toggle>
+                  </ion-item>
+                </div>
+              }
+              <ion-button fill="clear" size="small" (click)="addLocationEntry()">
+                <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+                Add location
+              </ion-button>
+            </div>
           </ion-list>
 
           <div class="ion-padding-top">

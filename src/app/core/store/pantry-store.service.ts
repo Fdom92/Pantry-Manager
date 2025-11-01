@@ -13,31 +13,16 @@ export class PantryStoreService {
   readonly error = signal<string | null>(null);
 
   /** --- Derived computed signals --- */
-  readonly expiredItems = computed(() => {
-    const now = new Date();
-    return this.items().filter(i => {
-      if (!i.expirationDate) return false;
-      const exp = new Date(i.expirationDate);
-      exp.setHours(0, 0, 0, 0);
-      return exp < now;
-    });
-  });
+  readonly expiredItems = computed(() =>
+    this.items().filter(item => this.pantryService.isItemExpired(item))
+  );
 
-  readonly nearExpiryItems = computed(() => {
-    const now = new Date();
-    const limit = new Date();
-    limit.setDate(now.getDate() + 3);
-    return this.items().filter(i => {
-      if (!i.expirationDate) return false;
-      const exp = new Date(i.expirationDate);
-      return exp > now && exp <= limit;
-    });
-  });
+  readonly nearExpiryItems = computed(() =>
+    this.items().filter(item => this.pantryService.isItemNearExpiry(item))
+  );
 
   readonly lowStockItems = computed(() =>
-    this.items().filter(i =>
-      i.stock?.minThreshold != null && i.stock.quantity <= i.stock.minThreshold
-    )
+    this.items().filter(item => this.pantryService.isItemLowStock(item))
   );
 
   /** --- Quick summary for dashboard or analytics --- */
@@ -103,12 +88,16 @@ export class PantryStoreService {
   }
 
   /** --- Update only the stock quantity --- */
-  async adjustQuantity(id: string, delta: number): Promise<void> {
+  async adjustQuantity(id: string, locationId: string, delta: number): Promise<void> {
     try {
       const current = this.items().find(i => i._id === id);
-      if (!current || !current.stock) return;
-      const nextQty = Math.max(0, current.stock.quantity + delta);
-      const updated = await this.pantryService.updateStock(id, nextQty);
+      if (!current) return;
+
+      const location = current.locations.find(loc => loc.locationId === locationId) ?? current.locations[0];
+      if (!location) return;
+
+      const nextQty = Math.max(0, Number(location.quantity ?? 0) + delta);
+      const updated = await this.pantryService.updateLocationQuantity(id, nextQty, location.locationId);
       if (updated) {
         this.itemsSignal.update(items =>
           items.map(i => (i._id === updated._id ? updated : i))
@@ -134,12 +123,13 @@ export class PantryStoreService {
 
   /** --- Utility: Compute stock status for quick logic reuse --- */
   getStockStatus(item: PantryItem): StockStatus {
-    if (!item.stock) return StockStatus.EMPTY;
-    if (item.stock.quantity <= 0) return StockStatus.EMPTY;
-    if (
-      item.stock.minThreshold != null &&
-      item.stock.quantity <= item.stock.minThreshold
-    ) {
+    const totalQuantity = this.pantryService.getItemTotalQuantity(item);
+    if (totalQuantity <= 0) {
+      return StockStatus.EMPTY;
+    }
+
+    const minThreshold = this.pantryService.getItemTotalMinThreshold(item);
+    if (minThreshold > 0 && totalQuantity <= minThreshold) {
       return StockStatus.LOW;
     }
     return StockStatus.NORMAL;
@@ -148,5 +138,29 @@ export class PantryStoreService {
   /** --- Utility: Format units cleanly --- */
   getUnitLabel(unit: MeasurementUnit): string {
     return unit === MeasurementUnit.UNIT ? 'pcs' : unit.toLowerCase();
+  }
+
+  getItemPrimaryUnit(item: PantryItem): MeasurementUnit {
+    return item.locations[0]?.unit ?? MeasurementUnit.UNIT;
+  }
+
+  getItemTotalQuantity(item: PantryItem): number {
+    return this.pantryService.getItemTotalQuantity(item);
+  }
+
+  getItemTotalMinThreshold(item: PantryItem): number {
+    return this.pantryService.getItemTotalMinThreshold(item);
+  }
+
+  isItemLowStock(item: PantryItem): boolean {
+    return this.pantryService.isItemLowStock(item);
+  }
+
+  isItemExpired(item: PantryItem): boolean {
+    return this.pantryService.isItemExpired(item);
+  }
+
+  isItemNearExpiry(item: PantryItem): boolean {
+    return this.pantryService.isItemNearExpiry(item);
   }
 }
