@@ -188,7 +188,19 @@
                     · {{ group.expiredCount }} expired
                   }
                 </ion-text>
-                <ion-icon class="category-toggle" [class.expanded]="isCategoryExpanded(group.key)" [name]="isCategoryExpanded(group.key) ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  class="category-toggle"
+                  (click)="toggleCategory(group.key, $event)"
+                  [attr.aria-label]="isCategoryExpanded(group.key) ? 'Collapse category' : 'Expand category'"
+                  [attr.aria-expanded]="isCategoryExpanded(group.key)"
+                >
+                  <ion-icon
+                    slot="icon-only"
+                    [name]="isCategoryExpanded(group.key) ? 'chevron-up-outline' : 'chevron-down-outline'"
+                  ></ion-icon>
+                </ion-button>
               </div>
             </div>
           </ion-card-header>
@@ -214,7 +226,19 @@
                           {{ getQuantity(item) | number:'1.0-2' }} {{ getUnit(item) }}
                         </ion-badge>
                       </div>
-                      <ion-icon class="toggle-icon" [class.expanded]="isExpanded(item)" [name]="isExpanded(item) ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+                      <ion-button
+                        fill="clear"
+                        size="small"
+                        class="item-toggle"
+                        (click)="toggleItemExpansion(item, $event)"
+                        [attr.aria-label]="isExpanded(item) ? 'Collapse item details' : 'Expand item details'"
+                        [attr.aria-expanded]="isExpanded(item)"
+                      >
+                        <ion-icon
+                          slot="icon-only"
+                          [name]="isExpanded(item) ? 'chevron-up-outline' : 'chevron-down-outline'"
+                        ></ion-icon>
+                      </ion-button>
                     </div>
                   </ion-card-header>
                   <ion-card-content>

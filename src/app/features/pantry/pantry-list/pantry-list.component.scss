@@ -137,13 +137,20 @@
 }
 
 .category-toggle {
-  font-size: 18px;
-  color: var(--ion-color-medium);
-  transition: transform 180ms ease;
+  --background: transparent;
+  --background-activated: rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.16);
+  --background-focused: rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.12);
+  --color: var(--ion-color-medium);
+  --border-radius: 999px;
+  --padding-start: 6px;
+  --padding-end: 6px;
+  height: 32px;
+  min-height: 32px;
+  width: 32px;
 }
 
-.category-toggle.expanded {
-  transform: rotate(180deg);
+.category-toggle ion-icon {
+  font-size: 18px;
 }
 
 .item-grid {
@@ -225,19 +232,26 @@
   margin-right: 4px;
 }
 
-.toggle-icon {
-  font-size: 18px;
-  color: var(--ion-color-medium);
+.item-toggle {
+  --background: transparent;
+  --background-activated: rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.16);
+  --background-focused: rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.12);
+  --color: var(--ion-color-medium);
+  --border-radius: 999px;
+  --padding-start: 6px;
+  --padding-end: 6px;
+  height: 32px;
+  min-height: 32px;
+  width: 32px;
   transition: transform 160ms ease;
 }
 
-
-.item-card-header:hover .toggle-icon:not(.expanded) {
-  transform: translateY(-1px);
+.item-toggle ion-icon {
+  font-size: 18px;
 }
 
-.toggle-icon.expanded {
-  transform: rotate(180deg);
+.item-card-header:hover .item-toggle:not([aria-expanded='true']) {
+  transform: translateY(-1px);
 }
 
 .quantity-pill {
