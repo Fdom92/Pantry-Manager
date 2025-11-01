@@ -35,7 +35,7 @@ export class PantryStoreService {
 
   constructor(private readonly pantryService: PantryService) {}
 
-  /** --- Load all items from local DB or storage --- */
+  /** Load items from storage, updating loading/error signals accordingly. */
   async loadAll(): Promise<void> {
     this.loading.set(true);
     try {
@@ -50,7 +50,7 @@ export class PantryStoreService {
     }
   }
 
-  /** --- Add a new pantry item --- */
+  /** Push a freshly saved item into the local store state. */
   async addItem(item: PantryItem): Promise<void> {
     try {
       const saved = await this.pantryService.saveItem(item);
@@ -61,7 +61,7 @@ export class PantryStoreService {
     }
   }
 
-  /** --- Update an existing pantry item --- */
+  /** Replace an existing item in the signal cache with its latest version. */
   async updateItem(item: PantryItem): Promise<void> {
     try {
       const updated = await this.pantryService.saveItem(item);
@@ -74,7 +74,7 @@ export class PantryStoreService {
     }
   }
 
-  /** --- Delete an item by ID --- */
+  /** Remove an item from the local cache once deletion succeeds. */
   async deleteItem(id: string): Promise<void> {
     try {
       const ok = await this.pantryService.deleteItem(id);
@@ -87,7 +87,10 @@ export class PantryStoreService {
     }
   }
 
-  /** --- Update only the stock quantity --- */
+  /**
+   * Adjust the quantity stored for a specific location and persist the change.
+   * Falls back to the first location so legacy data still works.
+   */
   async adjustQuantity(id: string, locationId: string, delta: number): Promise<void> {
     try {
       const current = this.items().find(i => i._id === id);
@@ -109,19 +112,19 @@ export class PantryStoreService {
     }
   }
 
-  /** --- Refresh data manually (useful for pull-to-refresh or dashboard) --- */
+  /** Simple alias used by views to trigger a full reload. */
   async refresh(): Promise<void> {
     await this.loadAll();
   }
 
-  /** --- Real-time change listener (if storage supports it) --- */
+  /** Bridge live database change events into the signal-based store. */
   watchRealtime(): void {
     this.pantryService.watchPantryChanges(() => {
       this.loadAll();
     });
   }
 
-  /** --- Utility: Compute stock status for quick logic reuse --- */
+  /** Compute an aggregate stock status based on total quantity and thresholds. */
   getStockStatus(item: PantryItem): StockStatus {
     const totalQuantity = this.pantryService.getItemTotalQuantity(item);
     if (totalQuantity <= 0) {
@@ -135,31 +138,37 @@ export class PantryStoreService {
     return StockStatus.NORMAL;
   }
 
-  /** --- Utility: Format units cleanly --- */
+  /** Return a human friendly unit label; defaults to lowercase plural. */
   getUnitLabel(unit: MeasurementUnit): string {
     return unit === MeasurementUnit.UNIT ? 'pcs' : unit.toLowerCase();
   }
 
+  /** Helper used by UI layers to choose a representative unit. */
   getItemPrimaryUnit(item: PantryItem): MeasurementUnit {
     return item.locations[0]?.unit ?? MeasurementUnit.UNIT;
   }
 
+  /** Sum every location quantity to avoid duplicating reduce logic in components. */
   getItemTotalQuantity(item: PantryItem): number {
     return this.pantryService.getItemTotalQuantity(item);
   }
 
+  /** Sum the minimum thresholds configured for the item. */
   getItemTotalMinThreshold(item: PantryItem): number {
     return this.pantryService.getItemTotalMinThreshold(item);
   }
 
+  /** True when the item is in a low-stock situation. */
   isItemLowStock(item: PantryItem): boolean {
     return this.pantryService.isItemLowStock(item);
   }
 
+  /** True when at least one location has already expired. */
   isItemExpired(item: PantryItem): boolean {
     return this.pantryService.isItemExpired(item);
   }
 
+  /** True when any location expires within the near-expiry window. */
   isItemNearExpiry(item: PantryItem): boolean {
     return this.pantryService.isItemNearExpiry(item);
   }

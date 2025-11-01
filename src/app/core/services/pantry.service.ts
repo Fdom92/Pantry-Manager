@@ -14,7 +14,7 @@ export class PantryService extends StorageService<PantryItem> {
     super();
   }
 
-  // 🔹 Create or update an item
+  /** Persist an item while normalizing legacy data into the multi-location format. */
   async saveItem(item: PantryItem): Promise<PantryItem> {
     const normalized = this.normalizeItem({
       ...item,
@@ -24,13 +24,13 @@ export class PantryService extends StorageService<PantryItem> {
     return await this.upsert(normalized);
   }
 
-  // 🔹 Retrieve every item
+  /** Fetch every pantry item, always returning normalized documents. */
   async getAll(): Promise<PantryItem[]> {
     const docs = await this.listByType(this.TYPE);
     return docs.map(doc => this.normalizeItem(doc));
   }
 
-  // 🔹 Items by location (kitchen, pantry, fridge…)
+  /** Return items that currently have stock in the requested location. */
   async getByLocation(locationId: string): Promise<PantryItem[]> {
     const all = await this.getAll();
     return all.filter(item =>
@@ -38,19 +38,19 @@ export class PantryService extends StorageService<PantryItem> {
     );
   }
 
-  // 🔹 Items that need restocking
+  /** Retrieve items whose aggregated quantity is at or below the configured threshold. */
   async getLowStock(): Promise<PantryItem[]> {
     const items = await this.getAll();
-    return items.filter(item => this.isLowStock(item));
+  	return items.filter(item => this.isLowStock(item));
   }
 
-  // 🔹 Items close to expiring
+  /** Retrieve items that have at least one location expiring within the provided window. */
   async getNearExpiry(daysAhead: number = 3): Promise<PantryItem[]> {
     const items = await this.getAll();
     return items.filter(item => this.isNearExpiry(item, daysAhead));
   }
 
-  // 🔹 Calculate expiration status
+  /** Compute the overall expiration status based on the most urgent location expiry. */
   getExpirationStatus(item: PantryItem): ExpirationStatus {
     if (!item.locations.length) {
       return ExpirationStatus.OK;
@@ -74,10 +74,15 @@ export class PantryService extends StorageService<PantryItem> {
     return this.remove(id);
   }
 
+  /** Backwards-compatible stock updater retained for existing consumers. */
   async updateStock(itemId: string, quantity: number, locationId?: string): Promise<PantryItem | null> {
     return this.updateLocationQuantity(itemId, quantity, locationId);
   }
 
+  /**
+   * Update the quantity for a specific location entry, creating a placeholder if needed,
+   * and re-save the normalized document.
+   */
   async updateLocationQuantity(itemId: string, quantity: number, locationId?: string): Promise<PantryItem | null> {
     const raw = await this.get(itemId);
     if (!raw) {
@@ -105,11 +110,13 @@ export class PantryService extends StorageService<PantryItem> {
     return this.saveItem(updated);
   }
 
+  /** Retrieve items that already have an expired location. */
   async getExpired(): Promise<PantryItem[]> {
     const items = await this.getAll();
     return items.filter(item => this.isExpired(item));
   }
 
+  /** Build a quick aggregate for dashboards without forcing callers to re-implement loops. */
   async getSummary(): Promise<{
     total: number;
     expired: number;
@@ -139,6 +146,7 @@ export class PantryService extends StorageService<PantryItem> {
     };
   }
 
+  /** Subscribe to live-updates while ensuring consumers always see normalized payloads. */
   watchPantryChanges(onChange: (item: PantryItem) => void) {
     return this.watchChanges(doc => {
       if (doc.type === this.TYPE) {
@@ -148,22 +156,27 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   /** --- Public helpers for store/UI logic reuse --- */
+  /** Check whether the combined stock across locations is considered low. */
   isItemLowStock(item: PantryItem): boolean {
     return this.isLowStock(item);
   }
 
+  /** Determine if any location expires within the provided rolling window. */
   isItemNearExpiry(item: PantryItem, daysAhead: number = this.NEAR_EXPIRY_WINDOW_DAYS): boolean {
     return this.isNearExpiry(item, daysAhead);
   }
 
+  /** Determine if at least one location has already expired. */
   isItemExpired(item: PantryItem): boolean {
     return this.isExpired(item);
   }
 
+  /** Sum every location quantity into a single figure. */
   getItemTotalQuantity(item: PantryItem): number {
     return item.locations.reduce((sum, loc) => sum + (Number(loc.quantity) || 0), 0);
   }
 
+  /** Sum the minimum thresholds defined at each location. */
   getItemTotalMinThreshold(item: PantryItem): number {
     return item.locations.reduce(
       (sum, loc) => sum + (loc.minThreshold != null ? Number(loc.minThreshold) : 0),
@@ -171,10 +184,12 @@ export class PantryService extends StorageService<PantryItem> {
     );
   }
 
+  /** Return the earliest expiry date among the defined locations. */
   getItemEarliestExpiry(item: PantryItem): string | undefined {
     return this.computeEarliestExpiry(item.locations);
   }
 
+  /** Normalize a raw storage document, handling legacy single-location fields. */
   private normalizeItem(raw: any): PantryItem {
     const {
       locationId,
@@ -209,6 +224,10 @@ export class PantryService extends StorageService<PantryItem> {
     return base;
   }
 
+  /**
+   * Translate legacy stock and location fields into the new array-of-locations structure.
+   * Creates a default entry when the document predates the migration.
+   */
   private normalizeLocations(
     rawLocations: ItemLocationStock[] | undefined,
     legacyLocationId?: string,
@@ -236,6 +255,7 @@ export class PantryService extends StorageService<PantryItem> {
     ];
   }
 
+  /** Ensure each location entry has consistent types and defaults. */
   private normalizeLocationEntry(location: Partial<ItemLocationStock>): ItemLocationStock {
     return {
       locationId: location.locationId ?? 'unassigned',
@@ -247,6 +267,7 @@ export class PantryService extends StorageService<PantryItem> {
     };
   }
 
+  /** Identify the earliest expiry date across all location entries. */
   private computeEarliestExpiry(locations: ItemLocationStock[]): string | undefined {
     const validDates = locations
       .map(loc => loc.expiryDate)
@@ -261,6 +282,7 @@ export class PantryService extends StorageService<PantryItem> {
     return earliest;
   }
 
+  /** Project a high-level expiration status based on per-location dates. */
   private computeExpirationStatus(locations: ItemLocationStock[]): ExpirationStatus {
     const now = new Date();
     const windowDays = this.NEAR_EXPIRY_WINDOW_DAYS;
@@ -280,6 +302,7 @@ export class PantryService extends StorageService<PantryItem> {
     return nearest;
   }
 
+  /** Internal low-stock detector that considers the sum of all locations. */
   private isLowStock(item: PantryItem): boolean {
     if (!item.locations.length) {
       return true;
@@ -295,6 +318,7 @@ export class PantryService extends StorageService<PantryItem> {
     return totalQuantity <= totalMinThreshold;
   }
 
+  /** Internal near-expiry detector that checks every location. */
   private isNearExpiry(item: PantryItem, daysAhead: number = this.NEAR_EXPIRY_WINDOW_DAYS): boolean {
     const now = new Date();
     return item.locations.some(loc => {
@@ -304,6 +328,7 @@ export class PantryService extends StorageService<PantryItem> {
     });
   }
 
+  /** Internal expired detector that checks every location. */
   private isExpired(item: PantryItem): boolean {
     const now = new Date();
     return item.locations.some(loc => {
@@ -321,6 +346,7 @@ export class PantryService extends StorageService<PantryItem> {
     return exp < ref;
   }
 
+  /** Evaluate whether an expiry is within the provided window starting from today. */
   private isNearExpiryDate(expiration: Date, reference: Date, windowDays: number): boolean {
     const exp = new Date(expiration);
     exp.setHours(0, 0, 0, 0);
@@ -331,6 +357,7 @@ export class PantryService extends StorageService<PantryItem> {
     return days >= 0 && days <= windowDays;
   }
 
+  /** Guarantee that we always have at least one normalized location. */
   private ensureLocationArray(locations: ItemLocationStock[]): ItemLocationStock[] {
     if (locations.length) {
       return locations.map(loc => this.normalizeLocationEntry(loc));

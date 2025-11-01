@@ -60,6 +60,7 @@ export class ShoppingComponent {
     private readonly seedService: SeedService,
   ) {}
 
+  /** Lifecycle hook: make sure the store is populated before rendering suggestions. */
   async ionViewWillEnter(): Promise<void> {
     // await this.seedService.ensureSeedData();
     await this.pantryStore.loadAll();
@@ -73,6 +74,10 @@ export class ShoppingComponent {
     return id ? this.processingIds().has(id) : false;
   }
 
+  /**
+   * Apply the suggested purchase quantity to the relevant item/location,
+   * guarding against concurrent operations on the same item.
+   */
   async markAsPurchased(suggestion: ShoppingSuggestion): Promise<void> {
     const id = suggestion.item?._id;
     if (!id || this.isProcessing(id) || suggestion.suggestedQuantity <= 0) {
@@ -132,6 +137,10 @@ export class ShoppingComponent {
     }
   }
 
+  /**
+   * Evaluate every location for each item and produce actionable shopping suggestions.
+   * Returns both the detailed list and aggregate counters for the summary card.
+   */
   private analyzeShopping(items: PantryItem[]): Omit<ShoppingState, 'hasAlerts'> {
     const suggestions: ShoppingSuggestion[] = [];
     const summary: ShoppingSummary = {
@@ -192,6 +201,7 @@ export class ShoppingComponent {
     return { suggestions, summary };
   }
 
+  /** Keep the suggested quantity positive, defaulting to a fallback when needed. */
   private ensurePositiveQuantity(value: number, fallback?: number): number {
     const rounded = this.roundQuantity(value);
     if (rounded > 0) {
@@ -205,6 +215,7 @@ export class ShoppingComponent {
     return 1;
   }
 
+  /** Round quantities to two decimals to keep UI values tidy. */
   private roundQuantity(value: number): number {
     const num = Number(value ?? 0);
     if (!isFinite(num)) {
@@ -213,6 +224,7 @@ export class ShoppingComponent {
     return Math.round(num * 100) / 100;
   }
 
+  /** Format custom location names into title case for display. */
   private toTitleCase(value: string): string {
     const clean = value.replace(/[-_]/g, ' ').trim();
     if (!clean) {

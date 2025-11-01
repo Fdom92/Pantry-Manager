@@ -111,6 +111,7 @@ export class PantryListComponent implements OnDestroy {
     });
   }
 
+  /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
   async ionViewWillEnter() {
     // await this.seedService.ensureSeedData();
     await this.loadItems();
@@ -120,10 +121,12 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
+  /** Convenience wrapper used by multiple entry points to reload the list. */
   async loadItems(): Promise<void> {
     await this.pantryStore.loadAll();
   }
 
+  /** Open the creation modal with blank defaults and a single location row. */
   openNewItemModal(): void {
     this.editingItem = null;
     this.form.reset({
@@ -165,10 +168,12 @@ export class PantryListComponent implements OnDestroy {
     this.showCreateModal = true;
   }
 
+  /** Append a new empty location group so the user can split stock. */
   addLocationEntry(): void {
     this.locationsArray.push(this.createLocationGroup());
   }
 
+  /** Remove the requested location, keeping at least one so the form stays valid. */
   removeLocationEntry(index: number): void {
     if (this.locationsArray.length <= 1) {
       return;
@@ -176,6 +181,7 @@ export class PantryListComponent implements OnDestroy {
     this.locationsArray.removeAt(index);
   }
 
+  /** Replace the current form array with normalized groups based on the provided data. */
   private resetLocationControls(locations: Array<Partial<ItemLocationStock>>): void {
     while (this.locationsArray.length) {
       this.locationsArray.removeAt(0);
@@ -185,6 +191,7 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
+  /** Create a form group for a single location with coercion and sane defaults. */
   private createLocationGroup(initial?: Partial<ItemLocationStock>): FormGroup {
     return this.fb.group({
       locationId: this.fb.control((initial?.locationId ?? '').trim(), { nonNullable: true }),
@@ -210,6 +217,10 @@ export class PantryListComponent implements OnDestroy {
     this.editingItem = null;
   }
 
+  /**
+   * Persist the form payload, close the modal, and surface contextual feedback.
+   * Handles both creation and update flows through the store.
+   */
   async submitItem(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -255,6 +266,10 @@ export class PantryListComponent implements OnDestroy {
     await this.presentToast('🗑️ Producto eliminado.', 'medium');
   }
 
+  /**
+   * Apply a quantity delta to a specific location, optimistically update the UI,
+   * and debounce persistence to avoid spamming storage.
+   */
   async adjustLocationQuantity(item: PantryItem, location: ItemLocationStock, delta: number, event?: Event): Promise<void> {
     event?.stopPropagation();
     if (!item?._id || !location?.locationId) {
@@ -346,6 +361,7 @@ export class PantryListComponent implements OnDestroy {
     return this.formatFriendlyName(locationId ?? '', 'Unassigned');
   }
 
+  /** Derive a human-readable status badge for the item card header. */
   getStatus(item: PantryItem): { label: string; color: string } {
     const quantity = this.getTotalQuantity(item);
     if (this.isExpired(item)) {
@@ -363,6 +379,7 @@ export class PantryListComponent implements OnDestroy {
     return { label: 'Normal', color: 'success' };
   }
 
+  /** Pair the status with an icon that conveys urgency at a glance. */
   getStatusIcon(item: PantryItem): string {
     const quantity = this.getTotalQuantity(item);
     if (this.isExpired(item)) {
@@ -400,6 +417,7 @@ export class PantryListComponent implements OnDestroy {
     return this.expandedItems.has(item._id);
   }
 
+  /** Toggle the expansion panel for a given item without triggering parent handlers. */
   toggleItemExpansion(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     if (this.expandedItems.has(item._id)) {
@@ -409,6 +427,7 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
+  /** Apply search, filter, and sorting rules while keeping expansion state in sync. */
   private computeFilteredItems(): PantryItem[] {
     const items = this.itemsState();
     const search = this.searchTerm().trim().toLowerCase();
@@ -444,6 +463,7 @@ export class PantryListComponent implements OnDestroy {
     return filtered;
   }
 
+  /** Sort items by urgency (expiry/quantity) and finally by name for stable output. */
   private compareItems(a: PantryItem, b: PantryItem): number {
     const sortOption = this.sortOption();
     const expirationWeightDiff = this.getExpirationWeight(a) - this.getExpirationWeight(b);
@@ -491,6 +511,7 @@ export class PantryListComponent implements OnDestroy {
     return new Date(expiry).getTime();
   }
 
+  /** Aggregate counts for the summary bar shown above the list. */
   private buildSummary(items: PantryItem[]) {
     let low = 0;
     let expiring = 0;
@@ -515,6 +536,7 @@ export class PantryListComponent implements OnDestroy {
     };
   }
 
+  /** Build select options that indicate how many items belong to each location. */
   private computeLocationOptions(items: PantryItem[]): Array<{ id: string; label: string; count: number }> {
     const counts = new Map<string, { label: string; count: number }>();
 
@@ -546,6 +568,7 @@ export class PantryListComponent implements OnDestroy {
     ];
   }
 
+  /** Return the earliest expiry date present in the provided locations array. */
   private computeEarliestExpiry(locations: ItemLocationStock[]): string | undefined {
     const dates = locations
       .map(loc => loc.expiryDate)
@@ -561,6 +584,10 @@ export class PantryListComponent implements OnDestroy {
     });
   }
 
+  /**
+   * Mutate the local signal cache to reflect a quantity change before persistence.
+   * Ensures a location entry exists even if the delta introduces a new bucket.
+   */
   private updateLocalLocationQuantity(itemId: string, locationId: string, quantity: number): PantryItem | null {
     let updatedItem: PantryItem | null = null;
     this.itemsState.update(items =>
@@ -603,6 +630,7 @@ export class PantryListComponent implements OnDestroy {
     return updatedItem;
   }
 
+  /** Debounce stock writes so rapid tap interactions batch into fewer saves. */
   private triggerStockSave(itemId: string, updated: PantryItem): void {
     this.pendingItems.set(itemId, updated);
     const existingTimer = this.stockSaveTimers.get(itemId);
@@ -672,6 +700,7 @@ export class PantryListComponent implements OnDestroy {
     this.pendingItems.clear();
   }
 
+  /** Craft a toast message summarizing a newly created item. */
   private buildCreateSuccessMessage(item: PantryItem): string {
     const name = item.name?.trim() || 'Producto';
     const quantityText = this.formatQuantityForMessage(
@@ -684,6 +713,7 @@ export class PantryListComponent implements OnDestroy {
     return `✅ ${name} añadido${quantitySegment}${breakdownSegment}.`;
   }
 
+  /** Explain what changed during an update so users understand the persisted action. */
   private buildUpdateSuccessMessage(previous: PantryItem, updated: PantryItem): string {
     const previousBreakdown = this.formatLocationBreakdown(previous.locations);
     const nextBreakdown = this.formatLocationBreakdown(updated.locations);
@@ -704,6 +734,7 @@ export class PantryListComponent implements OnDestroy {
     return '💾 Cambios guardados.';
   }
 
+  /** Produce a brief toast summarizing the current stock state. */
   private buildStockUpdateMessage(item: PantryItem): string {
     const quantityText = this.formatQuantityForMessage(
       this.getTotalQuantity(item),
@@ -715,6 +746,7 @@ export class PantryListComponent implements OnDestroy {
     return '💾 Stock actualizado.';
   }
 
+  /** Human readable breakdown describing how quantities are distributed. */
   private formatLocationBreakdown(locations: ItemLocationStock[]): string {
     if (!locations.length) {
       return '';
@@ -748,6 +780,10 @@ export class PantryListComponent implements OnDestroy {
     return Math.round(num * 100) / 100;
   }
 
+  /**
+   * Transform the reactive form into a normalized PantryItem ready for persistence,
+   * handling type conversion, default location creation, and legacy compatibility.
+   */
   private buildItemPayload(existing?: PantryItem): PantryItem {
     const { name, categoryId, isBasic } = this.form.value;
     const identifier = existing?._id ?? createDocumentId('item');
@@ -798,6 +834,7 @@ export class PantryListComponent implements OnDestroy {
     return base;
   }
 
+  /** Build category filter metadata including how many items are low within each group. */
   private computeCategoryOptions(items: PantryItem[]): Array<{ id: string; label: string; count: number; lowCount: number }> {
     const counts = new Map<string, { label: string; count: number; lowCount: number }>();
     for (const item of items) {
@@ -924,6 +961,7 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
+  /** Determine whether the item matches the provided free-text search term. */
   private matchesSearch(item: PantryItem, search: string): boolean {
     const name = item.name?.toLowerCase() ?? '';
     const category = item.categoryId?.toLowerCase() ?? '';
