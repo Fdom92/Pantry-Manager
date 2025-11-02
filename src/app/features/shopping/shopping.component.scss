@@ -65,6 +65,32 @@ ion-card + ion-card {
   color: var(--ion-color-medium);
 }
 
+.suggestion-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.suggestion-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.supermarket-heading {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+.supermarket-heading ion-badge {
+  margin-left: 4px;
+}
+
 .suggestion-list {
   display: flex;
   flex-direction: column;

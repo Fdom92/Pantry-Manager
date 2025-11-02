@@ -51,6 +51,7 @@ export class PantryListComponent implements OnDestroy {
   readonly summary = computed(() => this.buildSummary(this.filteredItems()));
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
   readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
+  readonly supermarketOptions = computed(() => this.computeSupermarketOptions(this.itemsState()));
   readonly loading = this.pantryStore.loading;
   readonly nearExpiryDays = 3;
   readonly unitOptions = Object.values(MeasurementUnit);
@@ -66,13 +67,14 @@ export class PantryListComponent implements OnDestroy {
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     categoryId: this.fb.control(''),
+    supermarket: this.fb.control('', { validators: [Validators.maxLength(80)] }),
     isBasic: this.fb.control(false),
     notes: this.fb.control(''),
     locations: this.fb.array([
       this.createLocationGroup({
         locationId: '',
-        quantity: 1,
         unit: MeasurementUnit.UNIT,
+        batches: [],
       })
     ])
   });
@@ -156,14 +158,15 @@ export class PantryListComponent implements OnDestroy {
     this.form.reset({
       name: '',
       categoryId: '',
+      supermarket: '',
       isBasic: false,
       notes: ''
     });
     this.resetLocationControls([
       {
         locationId: '',
-        quantity: 1,
         unit: MeasurementUnit.UNIT,
+        batches: [],
       }
     ]);
     this.showCreateModal = true;
@@ -175,6 +178,7 @@ export class PantryListComponent implements OnDestroy {
     this.form.reset({
       name: item.name ?? '',
       categoryId: item.categoryId ?? '',
+      supermarket: item.supermarket ?? '',
       isBasic: Boolean(item.isBasic),
       notes: ''
     });
@@ -204,6 +208,17 @@ export class PantryListComponent implements OnDestroy {
     this.locationsArray.removeAt(index);
   }
 
+  selectSupermarketOption(option: string): void {
+    const control = this.form.get('supermarket');
+    if (!control) {
+      return;
+    }
+    const next = option.trim();
+    control.setValue(next);
+    control.markAsDirty();
+    control.markAsTouched();
+  }
+
   /** Replace the current form array with normalized groups based on the provided data. */
   private resetLocationControls(locations: Array<Partial<ItemLocationStock>>): void {
     while (this.locationsArray.length) {
@@ -219,10 +234,6 @@ export class PantryListComponent implements OnDestroy {
     const batches = Array.isArray(initial?.batches) ? initial.batches : [];
     return this.fb.group({
       locationId: this.fb.control((initial?.locationId ?? '').trim(), { nonNullable: true }),
-      quantity: this.fb.control(initial?.quantity != null ? Number(initial.quantity) : 0, {
-        validators: [Validators.required, Validators.min(0)],
-        nonNullable: true,
-      }),
       unit: this.fb.control<MeasurementUnit>(initial?.unit ?? MeasurementUnit.UNIT, {
         validators: [Validators.required],
         nonNullable: true,
@@ -312,7 +323,7 @@ export class PantryListComponent implements OnDestroy {
     if (!item?._id || !location?.locationId) {
       return;
     }
-    const prevQuantity = Number(location.quantity ?? 0);
+    const prevQuantity = this.getLocationTotal(location);
     const next = Math.max(0, prevQuantity + delta);
     if (next === prevQuantity) {
       return;
@@ -609,6 +620,22 @@ export class PantryListComponent implements OnDestroy {
     ];
   }
 
+  private computeSupermarketOptions(items: PantryItem[]): string[] {
+    const options = new Map<string, string>();
+    for (const item of items) {
+      const value = (item.supermarket ?? '').trim();
+      if (!value) {
+        continue;
+      }
+      const normalizedValue = value.replace(/\s+/g, ' ');
+      const key = normalizedValue.toLowerCase();
+      if (!options.has(key)) {
+        options.set(key, normalizedValue);
+      }
+    }
+    return Array.from(options.values()).sort((a, b) => a.localeCompare(b));
+  }
+
   /** Return the earliest expiry date present in the provided locations array. */
   private computeEarliestExpiry(locations: ItemLocationStock[]): string | undefined {
     const dates: string[] = [];
@@ -633,6 +660,25 @@ export class PantryListComponent implements OnDestroy {
 
   getLocationBatches(location: ItemLocationStock): ItemBatch[] {
     return Array.isArray(location.batches) ? location.batches : [];
+  }
+
+  getLocationTotal(location: ItemLocationStock): number {
+    return this.sumBatchQuantities(location.batches);
+  }
+
+  getLocationTotalForControl(index: number): number {
+    const batchesArray = this.getBatchesArray(index);
+    return batchesArray.controls.reduce((sum, control) => {
+      const raw = control.get('quantity')?.value;
+      const quantity = Number(raw ?? 0);
+      return sum + (Number.isFinite(quantity) ? quantity : 0);
+    }, 0);
+  }
+
+  getLocationUnitLabelForControl(index: number): string {
+    const control = this.locationsArray.at(index).get('unit');
+    const value = (control?.value as MeasurementUnit | undefined) ?? MeasurementUnit.UNIT;
+    return this.getUnitLabel(value);
   }
 
   private getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {
@@ -677,20 +723,22 @@ export class PantryListComponent implements OnDestroy {
         const nextLocations = item.locations.map(loc => {
           if (loc.locationId === locationId) {
             found = true;
+            const unit = loc.unit ?? this.getPrimaryUnit(item);
             return {
               ...loc,
-              quantity,
+              unit,
+              batches: this.adjustBatchesForTotal(loc.batches, unit, quantity),
             };
           }
           return loc;
         });
 
         if (!found) {
+          const unit = item.locations[0]?.unit ?? MeasurementUnit.UNIT;
           nextLocations.push({
             locationId,
-            quantity,
-            unit: item.locations[0]?.unit ?? MeasurementUnit.UNIT,
-            batches: [],
+            unit,
+            batches: this.adjustBatchesForTotal([], unit, quantity),
           });
         }
 
@@ -707,6 +755,88 @@ export class PantryListComponent implements OnDestroy {
     );
 
     return updatedItem;
+  }
+
+  private adjustBatchesForTotal(
+    batches: ItemBatch[] | undefined,
+    unit: MeasurementUnit,
+    nextTotal: number
+  ): ItemBatch[] {
+    const target = Math.max(0, Number(nextTotal) || 0);
+    if (target <= 0) {
+      return [];
+    }
+
+    const sanitized = this.sanitizeBatches(batches, unit);
+    const currentTotal = this.sumBatchQuantities(sanitized);
+
+    if (Math.abs(currentTotal - target) < 1e-9) {
+      return sanitized;
+    }
+
+    if (currentTotal === 0) {
+      return [
+        {
+          batchId: this.createTempBatchId(),
+          quantity: target,
+          unit,
+          opened: false,
+        },
+      ];
+    }
+
+    const adjusted = sanitized.map(batch => ({ ...batch }));
+    let delta = target - currentTotal;
+
+    if (delta > 0) {
+      adjusted[0].quantity = this.roundDisplayQuantity(this.toNumber(adjusted[0].quantity) + delta);
+      return adjusted;
+    }
+
+    delta = Math.abs(delta);
+    for (let i = adjusted.length - 1; i >= 0 && delta > 0; i--) {
+      const qty = this.toNumber(adjusted[i].quantity);
+      if (qty <= delta + 1e-9) {
+        delta -= qty;
+        adjusted.splice(i, 1);
+      } else {
+        adjusted[i].quantity = this.roundDisplayQuantity(qty - delta);
+        delta = 0;
+      }
+    }
+
+    if (delta > 0) {
+      return [];
+    }
+
+    return adjusted.filter(batch => this.toNumber(batch.quantity) > 0);
+  }
+
+  private sanitizeBatches(batches: ItemBatch[] | undefined, unit: MeasurementUnit): ItemBatch[] {
+    if (!Array.isArray(batches) || !batches.length) {
+      return [];
+    }
+    return batches.map(batch => ({
+      ...batch,
+      quantity: this.toNumber(batch.quantity),
+      unit: batch.unit ?? unit,
+    }));
+  }
+
+  private sumBatchQuantities(batches: ItemBatch[] | undefined): number {
+    if (!Array.isArray(batches) || !batches.length) {
+      return 0;
+    }
+    return batches.reduce((sum, batch) => sum + this.toNumber(batch.quantity), 0);
+  }
+
+  private toNumber(value: unknown): number {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : 0;
+  }
+
+  private createTempBatchId(): string {
+    return `batch:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   }
 
   /** Debounce stock writes so rapid tap interactions batch into fewer saves. */
@@ -832,7 +962,7 @@ export class PantryListComponent implements OnDestroy {
     }
     return locations
       .map(location => {
-        const quantity = this.roundDisplayQuantity(Number(location.quantity ?? 0));
+        const quantity = this.roundDisplayQuantity(this.getLocationTotal(location));
         const unitLabel = this.getUnitLabel(location.unit ?? MeasurementUnit.UNIT);
         const label = getLocationDisplayName(location.locationId, 'Sin ubicación');
         const batches = this.getLocationBatches(location);
@@ -875,7 +1005,12 @@ export class PantryListComponent implements OnDestroy {
    * handling type conversion, default location creation, and legacy compatibility.
    */
   private buildItemPayload(existing?: PantryItem): PantryItem {
-    const { name, categoryId, isBasic } = this.form.value;
+    const { name, categoryId, isBasic, supermarket } = this.form.value as {
+      name?: string;
+      categoryId?: string;
+      isBasic?: boolean;
+      supermarket?: string;
+    };
     const identifier = existing?._id ?? createDocumentId('item');
     const now = new Date().toISOString();
 
@@ -883,7 +1018,6 @@ export class PantryListComponent implements OnDestroy {
       const value = control.value as any;
       const rawLocationId = (value?.locationId ?? '').trim();
       const locationId = rawLocationId || 'unassigned';
-      const quantity = value?.quantity != null ? Number(value.quantity) : 0;
       const unit = value?.unit ?? MeasurementUnit.UNIT;
       const minThreshold = value?.minThreshold != null && value.minThreshold !== ''
         ? Number(value.minThreshold)
@@ -917,7 +1051,6 @@ export class PantryListComponent implements OnDestroy {
 
       return {
         locationId,
-        quantity: Number.isFinite(quantity) ? quantity : 0,
         unit,
         minThreshold,
         batches: normalizedBatches,
@@ -926,9 +1059,10 @@ export class PantryListComponent implements OnDestroy {
 
     const normalizedLocations = locations.length
       ? locations
-      : [{ locationId: 'unassigned', quantity: 0, unit: MeasurementUnit.UNIT }];
+      : [{ locationId: 'unassigned', unit: MeasurementUnit.UNIT, batches: [] }];
 
     const earliestExpiry = this.computeEarliestExpiry(normalizedLocations);
+    const normalizedSupermarket = this.normalizeSupermarketInput(supermarket);
 
     const base: PantryItem = {
       _id: identifier,
@@ -938,6 +1072,7 @@ export class PantryListComponent implements OnDestroy {
       name: (name ?? '').trim(),
       categoryId: (categoryId ?? '').trim(),
       locations: normalizedLocations,
+      supermarket: normalizedSupermarket,
       isBasic: isBasic ? true : undefined,
       expirationDate: earliestExpiry,
       createdAt: existing?.createdAt ?? now,
@@ -945,6 +1080,17 @@ export class PantryListComponent implements OnDestroy {
     };
 
     return base;
+  }
+
+  private normalizeSupermarketInput(value: string | undefined): string | undefined {
+    if (typeof value !== 'string') {
+      return undefined;
+    }
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return undefined;
+    }
+    return trimmed.replace(/\s+/g, ' ');
   }
 
   /** Build category filter metadata including how many items are low within each group. */

@@ -8,7 +8,7 @@ export interface PantryItem extends BaseDoc {
   name: string;
   brand?: string;
   categoryId: string;
-  supermarketId?: string;
+  supermarket?: string;
   barcode?: string;
   locations: ItemLocationStock[];
   isBasic?: boolean;

@@ -46,8 +46,7 @@ export class DashboardComponent {
           return;
         }
         this.lastUpdated.set(new Date().toISOString());
-      },
-      { allowSignalWrites: true }
+      }
     );
   }
 
@@ -107,7 +106,7 @@ export class DashboardComponent {
   getItemLocationsSummary(item: PantryItem): string {
     return item.locations
       .map(location => {
-        const quantity = Number(location.quantity ?? 0).toFixed(1).replace(/\.0$/, '');
+        const quantity = this.formatQuantityValue(this.getLocationQuantity(location));
         const unit = this.pantryStore.getUnitLabel(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
         const name = this.formatLocationName(location.locationId);
         const batches = Array.isArray(location.batches) ? location.batches : [];
@@ -125,6 +124,18 @@ export class DashboardComponent {
   /** Map raw location ids into friendly labels for dashboard display. */
   private formatLocationName(id?: string): string {
     return getLocationDisplayName(id, 'Sin ubicación');
+  }
+
+  private getLocationQuantity(location: ItemLocationStock): number {
+    if (!Array.isArray(location.batches) || !location.batches.length) {
+      return 0;
+    }
+    return location.batches.reduce((sum, batch) => sum + Number(batch.quantity ?? 0), 0);
+  }
+
+  private formatQuantityValue(value: number): string {
+    const rounded = Math.round((Number(value) || 0) * 10) / 10;
+    return rounded.toFixed(1).replace(/\.0$/, '');
   }
 
   private getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {

@@ -3,7 +3,7 @@ import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { SeedService } from '@core/services';
-import { PantryItem, MeasurementUnit } from '@core/models';
+import { ItemLocationStock, PantryItem, MeasurementUnit } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
 
 type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out';
@@ -16,6 +16,13 @@ interface ShoppingSuggestion {
   currentQuantity: number;
   minThreshold?: number;
   unit: MeasurementUnit;
+  supermarket?: string;
+}
+
+interface ShoppingSuggestionGroup {
+  key: string;
+  label: string;
+  suggestions: ShoppingSuggestion[];
 }
 
 interface ShoppingSummary {
@@ -23,10 +30,12 @@ interface ShoppingSummary {
   belowMin: number;
   basicLow: number;
   basicOut: number;
+  supermarketCount: number;
 }
 
 interface ShoppingState {
   suggestions: ShoppingSuggestion[];
+  groupedSuggestions: ShoppingSuggestionGroup[];
   summary: ShoppingSummary;
   hasAlerts: boolean;
 }
@@ -44,6 +53,8 @@ export class ShoppingComponent {
     'basic-low': 'Basic item below minimum',
     'basic-out': 'Basic item out of stock',
   };
+  readonly unassignedSupermarketLabel = 'Sin supermercado';
+  private readonly unassignedSupermarketKey = '__none__';
 
   readonly loading = this.pantryStore.loading;
   readonly shoppingState = computed<ShoppingState>(() => {
@@ -121,25 +132,34 @@ export class ShoppingComponent {
     return getLocationDisplayName(locationId, 'Sin ubicación');
   }
 
+  private getLocationQuantity(location: ItemLocationStock): number {
+    if (!Array.isArray(location.batches) || !location.batches.length) {
+      return 0;
+    }
+    return location.batches.reduce((sum, batch) => sum + Number(batch.quantity ?? 0), 0);
+  }
+
   /**
    * Evaluate every location for each item and produce actionable shopping suggestions.
    * Returns both the detailed list and aggregate counters for the summary card.
    */
   private analyzeShopping(items: PantryItem[]): Omit<ShoppingState, 'hasAlerts'> {
     const suggestions: ShoppingSuggestion[] = [];
+    const uniqueSupermarkets = new Set<string>();
     const summary: ShoppingSummary = {
       total: 0,
       belowMin: 0,
       basicLow: 0,
       basicOut: 0,
+      supermarketCount: 0,
     };
 
     for (const item of items) {
       const isBasic = Boolean(item.isBasic);
       for (const location of item.locations) {
-        const quantity = Number(location.quantity ?? 0);
         const minThreshold = location.minThreshold != null ? Number(location.minThreshold) : null;
         const unit = location.unit ?? this.pantryStore.getItemPrimaryUnit(item);
+        const quantity = this.getLocationQuantity(location);
 
         let reason: ShoppingReason | null = null;
         let suggestedQuantity = 0;
@@ -156,6 +176,11 @@ export class ShoppingComponent {
         }
 
         if (reason) {
+          const supermarket = this.normalizeSupermarketValue(item.supermarket);
+          if (supermarket) {
+            uniqueSupermarkets.add(supermarket.toLowerCase());
+          }
+
           suggestions.push({
             item,
             locationId: location.locationId,
@@ -164,6 +189,7 @@ export class ShoppingComponent {
             currentQuantity: this.roundQuantity(quantity),
             minThreshold: minThreshold != null ? this.roundQuantity(minThreshold) : undefined,
             unit,
+            supermarket,
           });
 
           switch (reason) {
@@ -182,7 +208,58 @@ export class ShoppingComponent {
     }
 
     summary.total = suggestions.length;
-    return { suggestions, summary };
+    summary.supermarketCount = uniqueSupermarkets.size;
+    const groupedSuggestions = this.groupSuggestionsBySupermarket(suggestions);
+    return { suggestions, groupedSuggestions, summary };
+  }
+
+  private normalizeSupermarketValue(value?: string | null): string | undefined {
+    const trimmed = (value ?? '').trim();
+    if (!trimmed) {
+      return undefined;
+    }
+    return trimmed.replace(/\s+/g, ' ');
+  }
+
+  private groupSuggestionsBySupermarket(suggestions: ShoppingSuggestion[]): ShoppingSuggestionGroup[] {
+    const map = new Map<string, ShoppingSuggestion[]>();
+    for (const suggestion of suggestions) {
+      const key = suggestion.supermarket?.toLowerCase() ?? this.unassignedSupermarketKey;
+      const list = map.get(key);
+      if (list) {
+        list.push(suggestion);
+      } else {
+        map.set(key, [suggestion]);
+      }
+    }
+
+    const groups = Array.from(map.entries()).map(([key, list]) => {
+      const label =
+        key === this.unassignedSupermarketKey
+          ? this.unassignedSupermarketLabel
+          : list[0]?.supermarket ?? this.unassignedSupermarketLabel;
+      return {
+        key,
+        label,
+        suggestions: list,
+      };
+    });
+
+    return groups.sort((a, b) => {
+      if (a.key === this.unassignedSupermarketKey) {
+        return 1;
+      }
+      if (b.key === this.unassignedSupermarketKey) {
+        return -1;
+      }
+      return a.label.localeCompare(b.label);
+    });
+  }
+
+  getSuggestionTrackId(suggestion: ShoppingSuggestion): string {
+    const itemId = suggestion.item?._id ?? suggestion.item?.name ?? 'item';
+    const locationId = suggestion.locationId ?? 'location';
+    return `${itemId}::${locationId}`;
   }
 
   /** Keep the suggested quantity positive, defaulting to a fallback when needed. */

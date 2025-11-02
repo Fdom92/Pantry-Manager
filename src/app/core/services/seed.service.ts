@@ -33,7 +33,6 @@ export class SeedService {
         locations: [
           {
             locationId: 'pantry',
-            quantity: 2,
             unit: MeasurementUnit.KILOGRAM,
             minThreshold: 3,
             batches: [
@@ -54,7 +53,6 @@ export class SeedService {
           },
           {
             locationId: 'kitchen',
-            quantity: 0.5,
             unit: MeasurementUnit.KILOGRAM,
             minThreshold: 1,
             batches: [
@@ -82,7 +80,6 @@ export class SeedService {
         locations: [
           {
             locationId: 'fridge',
-            quantity: 6,
             unit: MeasurementUnit.UNIT,
             minThreshold: 8,
             batches: [
@@ -116,7 +113,6 @@ export class SeedService {
         locations: [
           {
             locationId: 'fridge',
-            quantity: 12,
             unit: MeasurementUnit.UNIT,
             minThreshold: 18,
             batches: [
@@ -144,7 +140,6 @@ export class SeedService {
         locations: [
           {
             locationId: 'pantry',
-            quantity: 1,
             unit: MeasurementUnit.KILOGRAM,
             minThreshold: 2,
             batches: [
@@ -165,7 +160,6 @@ export class SeedService {
           },
           {
             locationId: 'fridge',
-            quantity: 0.8,
             unit: MeasurementUnit.KILOGRAM,
             minThreshold: 1,
             batches: [
@@ -191,7 +185,6 @@ export class SeedService {
         locations: [
           {
             locationId: 'pantry',
-            quantity: 1,
             unit: MeasurementUnit.UNIT,
             minThreshold: 2,
             batches: [
@@ -219,7 +212,6 @@ export class SeedService {
         locations: [
           {
             locationId: 'pantry',
-            quantity: 0.75,
             unit: MeasurementUnit.LITER,
             minThreshold: 1,
             batches: [
@@ -246,7 +238,6 @@ export class SeedService {
         locations: [
           {
             locationId: 'fridge',
-            quantity: 0.5,
             unit: MeasurementUnit.KILOGRAM,
             minThreshold: 0.8,
             batches: [
@@ -279,7 +270,6 @@ export class SeedService {
         locations: [
           {
             locationId: 'fridge',
-            quantity: 0.5,
             unit: MeasurementUnit.UNIT,
             minThreshold: 2,
             batches: [
@@ -307,7 +297,6 @@ export class SeedService {
         locations: [
           {
             locationId: 'fridge',
-            quantity: 0.2,
             unit: MeasurementUnit.KILOGRAM,
             minThreshold: 0.8,
             batches: [

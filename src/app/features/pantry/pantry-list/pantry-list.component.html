@@ -209,7 +209,7 @@
                                       <div class="location-heading">
                                         <strong>{{ getLocationLabel(location.locationId) }}</strong>
                                         <span class="location-quantity">
-                                          {{ location.quantity | number:'1.0-2' }} {{ getUnitLabel(location.unit) }}
+                                          {{ getLocationTotal(location) | number:'1.0-2' }} {{ getUnitLabel(location.unit) }}
                                         </span>
                                       </div>
                                       @if (location.minThreshold !== undefined && location.minThreshold !== null) {
@@ -247,7 +247,7 @@
                                         color="medium"
                                         shape="round"
                                         (click)="adjustLocationQuantity(item, location, -1, $event)"
-                                        [disabled]="location.quantity <= 0">
+                                        [disabled]="getLocationTotal(location) <= 0">
                                         <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
                                       </ion-button>
                                       <ion-button
@@ -441,6 +441,30 @@
               </ion-input>
             </ion-item>
 
+            <ion-item>
+              <ion-input
+                formControlName="supermarket"
+                label="Supermercado"
+                labelPlacement="stacked"
+                placeholder="Mercadona, Carrefour...">
+              </ion-input>
+            </ion-item>
+            @if (supermarketOptions().length) {
+              <div class="supermarket-suggestions">
+                <ion-text color="medium">Reutiliza un supermercado existente:</ion-text>
+                <div class="supermarket-chip-list">
+                  @for (option of supermarketOptions(); track option) {
+                    <ion-chip color="light" size="small" (click)="selectSupermarketOption(option)">
+                      <ion-label>{{ option }}</ion-label>
+                    </ion-chip>
+                  }
+                  <ion-chip color="medium" size="small" (click)="selectSupermarketOption('')">
+                    <ion-label>Sin supermercado</ion-label>
+                  </ion-chip>
+                </div>
+              </div>
+            }
+
             <ion-item lines="full">
               <ion-toggle formControlName="isBasic" justify="space-between">Producto básico de la despensa</ion-toggle>
             </ion-item>
@@ -450,7 +474,12 @@
               @for (locationCtrl of locationsArray.controls; track $index; let i = $index) {
                 <div class="location-form-card" [formGroupName]="i">
                   <div class="location-form-header">
-                    <h4>Ubicación {{ i + 1 }}</h4>
+                    <h4>
+                      Ubicación {{ i + 1 }}
+                      <span class="location-total">
+                        (Total: {{ getLocationTotalForControl(i) | number:'1.0-2' }} {{ getLocationUnitLabelForControl(i) }})
+                      </span>
+                    </h4>
                     <ion-button
                       fill="clear"
                       size="small"
@@ -467,15 +496,6 @@
                         label="Ubicación"
                         labelPlacement="stacked"
                         placeholder="Despensa, cocina...">
-                      </ion-input>
-                    </ion-item>
-                    <ion-item>
-                      <ion-input
-                        type="number"
-                        min="0"
-                        formControlName="quantity"
-                        label="Cantidad"
-                        labelPlacement="stacked">
                       </ion-input>
                     </ion-item>
                     <ion-item>

@@ -82,17 +82,26 @@ export class PantryService extends StorageService<PantryItem> {
     const nextLocations = locations.map(loc => {
       if (loc.locationId === targetId) {
         handled = true;
-        return { ...loc, quantity: Math.max(0, quantity) };
+        const unit = loc.unit ?? MeasurementUnit.UNIT;
+        const sanitizedBatches = this.normalizeBatches(loc.batches, unit);
+        const nextTotal = Math.max(0, quantity);
+        const adjustedBatches = this.applyQuantityDeltaToBatches(sanitizedBatches, nextTotal, unit);
+        return {
+          ...loc,
+          unit,
+          batches: adjustedBatches,
+        };
       }
       return loc;
     });
 
     if (!handled) {
+      const unit = locations[0]?.unit ?? MeasurementUnit.UNIT;
+      const nextTotal = Math.max(0, quantity);
       nextLocations.push({
         locationId: targetId,
-        quantity: Math.max(0, quantity),
-        unit: locations[0]?.unit ?? MeasurementUnit.UNIT,
-        batches: [],
+        unit,
+        batches: this.applyQuantityDeltaToBatches([], nextTotal, unit),
       });
     }
 
@@ -207,12 +216,28 @@ export class PantryService extends StorageService<PantryItem> {
   /** Compute aggregate fields without mutating the original payload. */
   private applyDerivedFields(item: PantryItem): PantryItem {
     const locations = this.normalizeLocations(item.locations);
-    return {
+    const supermarket = this.normalizeSupermarketName(
+      (item.supermarket ?? (item as any).supermarketId) as string | undefined
+    );
+    const prepared: PantryItem = {
       ...item,
+      supermarket,
       locations,
       expirationDate: this.computeEarliestExpiry(locations),
       expirationStatus: this.computeExpirationStatus(locations),
     };
+    delete (prepared as any).supermarketId;
+    return prepared;
+  }
+
+  private normalizeSupermarketName(raw?: string | null): string | undefined {
+    const trimmed = (raw ?? '').trim();
+    if (!trimmed) {
+      return undefined;
+    }
+    const normalizedWhitespace = trimmed.replace(/\s+/g, ' ');
+    const lower = normalizedWhitespace.toLowerCase();
+    return lower.replace(/\b\w/g, char => char.toUpperCase());
   }
 
   private normalizeLocations(locations?: ItemLocationStock[]): ItemLocationStock[] {
@@ -225,7 +250,6 @@ export class PantryService extends StorageService<PantryItem> {
       return [
         {
           locationId: 'unassigned',
-          quantity: 0,
           unit: MeasurementUnit.UNIT,
           minThreshold: undefined,
           batches: [],
@@ -239,15 +263,23 @@ export class PantryService extends StorageService<PantryItem> {
   private normalizeLocation(location: ItemLocationStock): ItemLocationStock {
     const unit = location.unit ?? MeasurementUnit.UNIT;
     const locationId = (location.locationId ?? 'unassigned').trim() || 'unassigned';
-    const quantity = this.toNumberOrZero(location.quantity);
     const minThreshold = this.toNumberOrUndefined(location.minThreshold);
     const batches = this.normalizeBatches(location.batches, unit);
+    const legacyQuantity = this.toNumberOrZero((location as any).quantity);
+    const totalBatchQuantity = this.sumBatchQuantities(batches);
+
+    if (legacyQuantity > 0 && totalBatchQuantity === 0) {
+      batches.push({
+        batchId: this.generateBatchId(),
+        quantity: legacyQuantity,
+        unit,
+        opened: false,
+      });
+    }
 
     return {
-      ...location,
       locationId,
       unit,
-      quantity,
       minThreshold,
       batches,
     };
@@ -372,8 +404,82 @@ export class PantryService extends StorageService<PantryItem> {
     return batches;
   }
 
+  private sumBatchQuantities(batches: ItemBatch[] | undefined): number {
+    if (!Array.isArray(batches) || !batches.length) {
+      return 0;
+    }
+    return batches.reduce((sum, batch) => sum + this.toNumberOrZero(batch.quantity), 0);
+  }
+
+  private applyQuantityDeltaToBatches(batches: ItemBatch[], nextTotal: number, fallbackUnit: MeasurementUnit): ItemBatch[] {
+    const sanitized: ItemBatch[] = batches.map(batch => ({
+      ...batch,
+      quantity: this.toNumberOrZero(batch.quantity),
+      unit: batch.unit ?? fallbackUnit,
+    }));
+    const currentTotal = this.sumBatchQuantities(sanitized);
+    const target = this.toNumberOrZero(nextTotal);
+
+    if (target <= 0) {
+      return [];
+    }
+
+    if (Math.abs(target - currentTotal) < 1e-9) {
+      return sanitized;
+    }
+
+    if (currentTotal === 0) {
+      return [
+        {
+          batchId: this.generateBatchId(),
+          quantity: target,
+          unit: fallbackUnit,
+          opened: false,
+        },
+      ];
+    }
+
+    let delta = target - currentTotal;
+    const adjusted = sanitized.map(batch => ({ ...batch }));
+
+    if (delta > 0) {
+      if (!adjusted.length) {
+        adjusted.push({
+          batchId: this.generateBatchId(),
+          quantity: target,
+          unit: fallbackUnit,
+          opened: false,
+        });
+      } else {
+        adjusted[0].quantity = this.toNumberOrZero(adjusted[0].quantity) + delta;
+      }
+      return adjusted;
+    }
+
+    delta = Math.abs(delta);
+    for (let i = adjusted.length - 1; i >= 0 && delta > 0; i--) {
+      const batchQty = this.toNumberOrZero(adjusted[i].quantity);
+      if (batchQty <= delta + 1e-9) {
+        delta -= batchQty;
+        adjusted.splice(i, 1);
+      } else {
+        adjusted[i].quantity = batchQty - delta;
+        delta = 0;
+      }
+    }
+
+    if (delta > 0) {
+      return [];
+    }
+
+    return adjusted;
+  }
+
   private getLocationQuantity(location: ItemLocationStock): number {
-    return this.toNumberOrZero(location.quantity);
+    if (!Array.isArray(location.batches) || location.batches.length === 0) {
+      return 0;
+    }
+    return location.batches.reduce((sum, batch) => sum + this.toNumberOrZero(batch.quantity), 0);
   }
 
   private toNumberOrZero(value: unknown): number {

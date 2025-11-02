@@ -87,6 +87,19 @@
   flex: 1;
 }
 
+.supermarket-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 16px 0;
+}
+
+.supermarket-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .state {
   display: flex;
   justify-content: center;
@@ -441,6 +454,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.location-total {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ion-color-medium);
+  margin-left: 8px;
 }
 
 .batch-form-list {

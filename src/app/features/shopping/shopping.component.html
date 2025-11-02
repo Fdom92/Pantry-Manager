@@ -24,7 +24,13 @@
           </ion-button>
         </div>
         @if (state.hasAlerts) {
-          <ion-card-subtitle>{{ state.summary.total }} artículos necesitan atención.</ion-card-subtitle>
+          <ion-card-subtitle>
+            {{ state.summary.total }}
+            {{ state.summary.total === 1 ? 'producto' : 'productos' }}
+            para comprar en
+            {{ state.summary.supermarketCount }}
+            {{ state.summary.supermarketCount === 1 ? 'supermercado' : 'supermercados' }}.
+          </ion-card-subtitle>
         } @else {
           <ion-card-subtitle>Todos los artículos almacenados cumplen sus objetivos.</ion-card-subtitle>
         }
@@ -64,45 +70,55 @@
           <ion-spinner name="lines"></ion-spinner>
           <p>Generando lista de compras…</p>
         </div>
-      } @else if (state.suggestions.length) {
-        <div class="suggestion-list">
-          @for (suggestion of state.suggestions; track suggestion.item._id) {
-            <ion-card class="suggestion-card">
-              <ion-card-content>
-                <div class="suggestion-header">
-                  <h3>{{ suggestion.item.name }}</h3>
-                  <ion-chip [color]="getBadgeColor(suggestion.reason)" [outline]="true">
-                    {{ reasonLabels[suggestion.reason] }}
-                  </ion-chip>
-                </div>
-                <p class="meta">
-                  Ubicación: {{ getLocationLabel(suggestion.locationId) }} ·
-                  Actual: {{ suggestion.currentQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
-                  @if (suggestion.minThreshold !== undefined) {
-                    · Mín.: {{ suggestion.minThreshold | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
-                  }
-                </p>
-                <div class="suggestion-footer">
-                  <ion-note color="primary" class="purchase-note">
-                    Comprar {{ suggestion.suggestedQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
-                  </ion-note>
-                  <ion-button
-                    size="small"
-                    color="success"
-                    fill="solid"
-                    (click)="markAsPurchased(suggestion)"
-                    [disabled]="isProcessing(suggestion.item._id)"
-                    class="purchase-action"
-                  >
-                    @if (isProcessing(suggestion.item._id)) {
-                      <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
-                    } @else {
-                      <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                    }
-                  </ion-button>
-                </div>
-              </ion-card-content>
-            </ion-card>
+      } @else if (state.summary.total) {
+        <div class="suggestion-groups">
+          @for (group of state.groupedSuggestions; track group.key) {
+            <div class="suggestion-group">
+              <h3 class="supermarket-heading">
+                {{ group.label }}
+                <ion-badge color="medium">{{ group.suggestions.length }}</ion-badge>
+              </h3>
+              <div class="suggestion-list">
+                @for (suggestion of group.suggestions; track getSuggestionTrackId(suggestion)) {
+                  <ion-card class="suggestion-card">
+                    <ion-card-content>
+                      <div class="suggestion-header">
+                        <h3>{{ suggestion.item.name }}</h3>
+                        <ion-chip [color]="getBadgeColor(suggestion.reason)" [outline]="true">
+                          {{ reasonLabels[suggestion.reason] }}
+                        </ion-chip>
+                      </div>
+                      <p class="meta">
+                        Ubicación: {{ getLocationLabel(suggestion.locationId) }} ·
+                        Actual: {{ suggestion.currentQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
+                        @if (suggestion.minThreshold !== undefined) {
+                          · Mín.: {{ suggestion.minThreshold | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
+                        }
+                      </p>
+                      <div class="suggestion-footer">
+                        <ion-note color="primary" class="purchase-note">
+                          Comprar {{ suggestion.suggestedQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
+                        </ion-note>
+                        <ion-button
+                          size="small"
+                          color="success"
+                          fill="solid"
+                          (click)="markAsPurchased(suggestion)"
+                          [disabled]="isProcessing(suggestion.item._id)"
+                          class="purchase-action"
+                        >
+                          @if (isProcessing(suggestion.item._id)) {
+                            <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
+                          } @else {
+                            <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+                          }
+                        </ion-button>
+                      </div>
+                    </ion-card-content>
+                  </ion-card>
+                }
+              </div>
+            </div>
           }
         </div>
       } @else {

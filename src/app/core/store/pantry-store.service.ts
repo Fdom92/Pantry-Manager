@@ -99,7 +99,8 @@ export class PantryStoreService {
       const location = current.locations.find(loc => loc.locationId === locationId) ?? current.locations[0];
       if (!location) return;
 
-      const nextQty = Math.max(0, Number(location.quantity ?? 0) + delta);
+      const currentQuantity = this.pantryService.getItemQuantityByLocation(current, location.locationId);
+      const nextQty = Math.max(0, currentQuantity + delta);
       const updated = await this.pantryService.updateLocationQuantity(id, nextQty, location.locationId);
       if (updated) {
         this.itemsSignal.update(items =>

@@ -10,6 +10,7 @@ import {
   settingsOutline,
   add as addIcon,
   addOutline,
+  addCircleOutline,
   close as closeIcon,
   removeOutline,
   trashOutline,
@@ -27,6 +28,7 @@ import {
   pricetagOutline,
   calendarOutline,
   speedometerOutline,
+  cubeOutline,
   chevronUpOutline,
   chevronDownOutline,
 } from 'ionicons/icons';
@@ -40,6 +42,7 @@ addIcons({
   'settings-outline': settingsOutline,
   add: addIcon,
   'add-outline': addOutline,
+  'add-circle-outline': addCircleOutline,
   close: closeIcon,
   'remove-outline': removeOutline,
   'trash-outline': trashOutline,
@@ -59,6 +62,7 @@ addIcons({
   'pricetag-outline': pricetagOutline,
   'calendar-outline': calendarOutline,
   'speedometer-outline': speedometerOutline,
+  'cube-outline': cubeOutline,
 });
 
 bootstrapApplication(AppComponent, {
