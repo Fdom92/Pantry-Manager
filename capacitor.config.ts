@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'pantry-manager',
+  appId: 'com.fdom.pantry',
+  appName: 'Mi Despensa',
   webDir: 'www'
 };
 
