@@ -26,26 +26,6 @@ export class DashboardComponent {
   readonly showSnapshot = signal(true);
 
   readonly totalItems = computed(() => this.summary().total);
-  readonly alertCount = computed(
-    () =>
-      this.lowStockItems().length +
-      this.nearExpiryItems().length +
-      this.expiredItems().length
-  );
-  readonly categoryCount = computed(() =>
-    this.countDistinct(this.items().map(item => item.categoryId))
-  );
-  readonly locationCount = computed(() => {
-    const ids: string[] = [];
-    for (const item of this.items()) {
-      for (const location of item.locations) {
-        if (location.locationId) {
-          ids.push(location.locationId);
-        }
-      }
-    }
-    return this.countDistinct(ids);
-  });
   readonly recentItems = computed(() => this.computeRecentItems(this.items()));
 
   constructor(

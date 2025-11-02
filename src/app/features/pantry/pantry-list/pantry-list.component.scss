@@ -564,3 +564,7 @@
   background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.25);
   color: var(--ion-color-light);
 }
+
+ion-modal ion-list {
+  border-radius: 8px;
+}

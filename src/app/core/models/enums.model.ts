@@ -1,11 +1,10 @@
 export enum MeasurementUnit {
-  UNIT = 'unit',
   GRAM = 'g',
   KILOGRAM = 'kg',
   LITER = 'l',
   MILLILITER = 'ml',
-  PACKAGE = 'package',
-  PIECE = 'piece'
+  PACKAGE = 'paquete',
+  UNIT = 'unidad',
 }
 
 export enum LocationType {

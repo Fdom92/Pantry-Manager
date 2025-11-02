@@ -40,110 +40,6 @@
     </div>
   </div>
 
-  <ion-modal [isOpen]="showFilters()" (willDismiss)="closeFilters()">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Filtros</ion-title>
-          <ion-buttons slot="end">
-            <ion-button fill="clear" color="medium" (click)="closeFilters()">
-              Cerrar
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content class="ion-padding filter-modal">
-        <ion-searchbar
-          placeholder="Buscar productos"
-          [value]="searchTerm()"
-          debounce="300"
-          (ionInput)="onSearchTermChange($event)"
-          (ionClear)="onSearchTermChange($event)">
-        </ion-searchbar>
-
-        <ion-list lines="full">
-          <ion-list-header lines="inset">
-            <ion-label>Refinar resultados</ion-label>
-          </ion-list-header>
-          <ion-item>
-            <ion-select
-              interface="popover"
-              label="Categoría"
-              labelPlacement="stacked"
-              [value]="selectedCategory()"
-              (ionChange)="onCategoryChange($event)">
-              @for (option of categoryOptions(); track option.id) {
-                <ion-select-option [value]="option.id">
-                  {{ option.label }}
-                  ({{ option.count }})
-                  @if (option.lowCount) {
-                    · Bajo stock {{ option.lowCount }}
-                  }
-                </ion-select-option>
-              }
-            </ion-select>
-          </ion-item>
-
-          <ion-item>
-            <ion-select
-              interface="popover"
-              label="Ubicación"
-              labelPlacement="stacked"
-              [value]="selectedLocation()"
-              (ionChange)="onLocationChange($event)">
-              @for (option of locationOptions(); track option.id) {
-                <ion-select-option [value]="option.id">
-                  {{ option.label }}
-                  ({{ option.count }})
-                </ion-select-option>
-              }
-            </ion-select>
-          </ion-item>
-
-          <ion-item>
-            <ion-select
-              interface="popover"
-              label="Ordenar por"
-              labelPlacement="stacked"
-              [value]="sortOption()"
-              (ionChange)="onSortChange($event)">
-              <ion-select-option value="name">Nombre (A-Z)</ion-select-option>
-              <ion-select-option value="quantity">Cantidad (mayor → menor)</ion-select-option>
-              <ion-select-option value="expiration">Caducidad (más próximas primero)</ion-select-option>
-            </ion-select>
-          </ion-item>
-        </ion-list>
-
-        <div class="filter-status">
-          <ion-label>Estado</ion-label>
-          <ion-segment
-            mode="md"
-            [value]="statusFilter()"
-            (ionChange)="onStatusFilterChange($event)">
-            <ion-segment-button value="all">
-              Todos
-            </ion-segment-button>
-            <ion-segment-button value="near-expiry">
-              Próximo a caducar
-            </ion-segment-button>
-            <ion-segment-button value="expired">
-              Caducado
-            </ion-segment-button>
-          </ion-segment>
-        </div>
-
-        <div class="filter-actions">
-          <ion-button fill="clear" color="medium" (click)="clearFilters()">
-            Limpiar
-          </ion-button>
-          <ion-button expand="block" (click)="closeFilters()">
-            Aplicar
-          </ion-button>
-        </div>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
-
   @if (loading() && itemsState().length === 0) {
     <div class="state">
       <ion-spinner name="dots"></ion-spinner>
@@ -414,6 +310,96 @@
     </div>
   }
 
+  <ion-modal [isOpen]="showFilters()" (willDismiss)="closeFilters()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Filtros</ion-title>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" color="medium" (click)="closeFilters()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding filter-modal">
+        <ion-searchbar
+          placeholder="Buscar productos"
+          [value]="searchTerm()"
+          debounce="300"
+          (ionInput)="onSearchTermChange($event)">
+        </ion-searchbar>
+
+        <ion-list lines="full">
+          <ion-item>
+            <ion-select
+              interface="popover"
+              label="Categoría"
+              labelPlacement="stacked"
+              [value]="selectedCategory()"
+              (ionChange)="onCategoryChange($event)">
+              @for (option of categoryOptions(); track option.id) {
+                <ion-select-option [value]="option.id">
+                  {{ option.label }}
+                </ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-select
+              interface="popover"
+              label="Ubicación"
+              labelPlacement="stacked"
+              [value]="selectedLocation()"
+              (ionChange)="onLocationChange($event)">
+              @for (option of locationOptions(); track option.id) {
+                <ion-select-option [value]="option.id">
+                  {{ option.label }}
+                </ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-select
+              interface="popover"
+              label="Ordenar por"
+              labelPlacement="stacked"
+              [value]="sortOption()"
+              (ionChange)="onSortChange($event)">
+              <ion-select-option value="name">Nombre (A-Z)</ion-select-option>
+              <ion-select-option value="quantity">Cantidad (mayor → menor)</ion-select-option>
+              <ion-select-option value="expiration">Caducidad (más próximas primero)</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label position="stacked">Estado</ion-label>
+            <ion-segment
+              mode="md"
+              [value]="statusFilter()"
+              (ionChange)="onStatusFilterChange($event)">
+              <ion-segment-button value="all">Todos</ion-segment-button>
+              <ion-segment-button value="near-expiry">Próximo a caducar</ion-segment-button>
+              <ion-segment-button value="expired">Caducado</ion-segment-button>
+            </ion-segment>
+          </ion-item>
+        </ion-list>
+
+        <div class="filter-actions">
+          <ion-button expand="block" fill="clear" color="medium" (click)="clearFilters()">
+            Limpiar filtros
+          </ion-button>
+          <ion-button expand="block" (click)="closeFilters()">
+            Aplicar
+          </ion-button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
   <ion-modal [isOpen]="showCreateModal" (willDismiss)="closeFormModal()">
     <ng-template>
       <ion-header>
@@ -458,8 +444,9 @@
             <ion-item lines="full">
               <ion-toggle formControlName="isBasic" justify="space-between">Producto básico de la despensa</ion-toggle>
             </ion-item>
+          </ion-list>
 
-            <div formArrayName="locations" class="location-form-list">
+          <div formArrayName="locations" class="location-form-list">
               @for (locationCtrl of locationsArray.controls; track $index; let i = $index) {
                 <div class="location-form-card" [formGroupName]="i">
                   <div class="location-form-header">
@@ -473,43 +460,45 @@
                       <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                     </ion-button>
                   </div>
-                  <ion-item>
-                    <ion-input
-                      formControlName="locationId"
-                      label="Ubicación"
-                      labelPlacement="stacked"
-                      placeholder="Despensa, cocina...">
-                    </ion-input>
-                  </ion-item>
-                  <ion-item>
-                    <ion-input
-                      type="number"
-                      min="0"
-                      formControlName="quantity"
-                      label="Cantidad"
-                      labelPlacement="stacked">
-                    </ion-input>
-                  </ion-item>
-                  <ion-item>
-                    <ion-select
-                      formControlName="unit"
-                      interface="popover"
-                      label="Unidad"
-                      labelPlacement="stacked">
-                      @for (unit of unitOptions; track unit) {
-                        <ion-select-option [value]="unit">{{ unit }}</ion-select-option>
-                      }
-                    </ion-select>
-                  </ion-item>
-                  <ion-item>
-                    <ion-input
-                      type="number"
-                      min="0"
-                      formControlName="minThreshold"
-                      label="Cantidad mínima (alertas)"
-                      labelPlacement="stacked">
-                    </ion-input>
-                  </ion-item>
+                  <ion-list lines="full">
+                    <ion-item>
+                      <ion-input
+                        formControlName="locationId"
+                        label="Ubicación"
+                        labelPlacement="stacked"
+                        placeholder="Despensa, cocina...">
+                      </ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        type="number"
+                        min="0"
+                        formControlName="quantity"
+                        label="Cantidad"
+                        labelPlacement="stacked">
+                      </ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-select
+                        formControlName="unit"
+                        interface="popover"
+                        label="Unidad"
+                        labelPlacement="stacked">
+                        @for (unit of unitOptions; track unit) {
+                          <ion-select-option [value]="unit">{{ unit }}</ion-select-option>
+                        }
+                      </ion-select>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        type="number"
+                        min="0"
+                        formControlName="minThreshold"
+                        label="Cantidad mínima (alertas)"
+                        labelPlacement="stacked">
+                      </ion-input>
+                    </ion-item>
+                  </ion-list>
                   <div formArrayName="batches" class="batch-form-list">
                     <div class="batch-form-header">
                       <h5>Lotes</h5>
@@ -520,11 +509,13 @@
                     </div>
                     @let batchesArray = getBatchesArray(i);
                     @if (batchesArray.length === 0) {
-                      <ion-item lines="none">
-                        <ion-text color="medium">
-                          Todavía no hay lotes. Añade uno para controlar las fechas de caducidad.
-                        </ion-text>
-                      </ion-item>
+                      <ion-list>
+                        <ion-item lines="none">
+                          <ion-text color="medium">
+                            Todavía no hay lotes. Añade uno para controlar las fechas de caducidad.
+                          </ion-text>
+                        </ion-item>
+                      </ion-list>
                     }
                     @for (batchCtrl of batchesArray.controls; track $index; let j = $index) {
                       <div class="batch-form-card" [formGroupName]="j">
@@ -538,34 +529,28 @@
                             <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                           </ion-button>
                         </div>
-                        <ion-item>
-                          <ion-input
-                            type="number"
-                            min="0"
-                            formControlName="quantity"
-                            label="Cantidad"
-                            labelPlacement="stacked">
-                          </ion-input>
-                        </ion-item>
-                        <ion-item>
-                          <ion-input
-                            type="date"
-                            formControlName="entryDate"
-                            label="Fecha de entrada"
-                            labelPlacement="stacked">
-                          </ion-input>
-                        </ion-item>
-                        <ion-item>
-                          <ion-input
-                            type="date"
-                            formControlName="expirationDate"
-                            label="Fecha de caducidad"
-                            labelPlacement="stacked">
-                          </ion-input>
-                        </ion-item>
-                        <ion-item lines="none">
-                          <ion-toggle formControlName="opened" justify="space-between">Abierto</ion-toggle>
-                        </ion-item>
+                        <ion-list lines="full">
+                          <ion-item>
+                            <ion-input
+                              type="number"
+                              min="0"
+                              formControlName="quantity"
+                              label="Cantidad"
+                              labelPlacement="stacked">
+                            </ion-input>
+                          </ion-item>
+                          <ion-item>
+                            <ion-input
+                              type="date"
+                              formControlName="expirationDate"
+                              label="Fecha de caducidad"
+                              labelPlacement="stacked">
+                            </ion-input>
+                          </ion-item>
+                          <ion-item lines="none">
+                            <ion-toggle formControlName="opened" justify="space-between">Abierto</ion-toggle>
+                          </ion-item>
+                        </ion-list>
                       </div>
                     }
                   </div>
@@ -576,7 +561,6 @@
                 Añadir ubicación
               </ion-button>
             </div>
-          </ion-list>
 
           <div class="ion-padding-top">
             <ion-button type="submit" expand="block" [disabled]="form.invalid || isSaving">

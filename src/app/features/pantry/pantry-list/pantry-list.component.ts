@@ -243,7 +243,6 @@ export class PantryListComponent implements OnDestroy {
         validators: [Validators.required, Validators.min(0)],
         nonNullable: true,
       }),
-      entryDate: this.fb.control(initial?.entryDate ? this.toDateInputValue(initial.entryDate) : ''),
       expirationDate: this.fb.control(initial?.expirationDate ? this.toDateInputValue(initial.expirationDate) : ''),
       opened: this.fb.control(initial?.opened ?? false),
     });
@@ -605,7 +604,7 @@ export class PantryListComponent implements OnDestroy {
       .sort((a, b) => a.label.localeCompare(b.label));
 
     return [
-      { id: 'all', label: `Todas (${items.length})`, count: items.length },
+      { id: 'all', label: `Todas`, count: items.length },
       ...mapped
     ];
   }
@@ -894,9 +893,6 @@ export class PantryListComponent implements OnDestroy {
       const batches = batchesControl instanceof FormArray
         ? (batchesControl.controls as FormGroup[]).map(group => {
             const batchValue = group.value as any;
-            const entryDate = batchValue?.entryDate
-              ? new Date(batchValue.entryDate).toISOString()
-              : undefined;
             const expirationDate = batchValue?.expirationDate
               ? new Date(batchValue.expirationDate).toISOString()
               : undefined;
@@ -906,7 +902,6 @@ export class PantryListComponent implements OnDestroy {
             return {
               batchId,
               quantity: Number.isFinite(batchQuantity) ? batchQuantity : 0,
-              entryDate,
               expirationDate,
               opened,
               unit,
@@ -917,7 +912,6 @@ export class PantryListComponent implements OnDestroy {
       const normalizedBatches = batches.filter(batch =>
         batch.quantity > 0 ||
         Boolean(batch.expirationDate) ||
-        Boolean(batch.entryDate) ||
         Boolean(batch.opened)
       );
 
@@ -980,7 +974,7 @@ export class PantryListComponent implements OnDestroy {
 
     const lowTotal = mapped.reduce((acc, option) => acc + option.lowCount, 0);
     return [
-      { id: 'all', label: `Todas (${items.length})`, count: items.length, lowCount: lowTotal },
+      { id: 'all', label: `Todas`, count: items.length, lowCount: lowTotal },
       ...mapped
     ];
   }
