@@ -270,13 +270,21 @@
 }
 
 .summary-meta.secondary {
-  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
 }
 
-.summary-meta ion-icon {
+.summary-meta.secondary ion-icon {
   font-size: 16px;
   color: inherit;
+}
+
+.summary-meta .batches-inline {
+  font-weight: 600;
+  color: var(--ion-color-primary);
 }
 
 .meta-primary {
@@ -361,6 +369,108 @@
 
 .card-actions ion-button {
   flex: 0 0 auto;
+}
+
+.batch-section {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.batch-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.batch-section-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.batch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.batch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(var(--ion-color-step-100, 235, 235, 235), 0.3);
+  border: 1px solid rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.18);
+}
+
+.batch-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.batch-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+.batch-date ion-icon {
+  font-size: 16px;
+  color: inherit;
+}
+
+.batch-meta {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.batch-status {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.batch-empty {
+  font-size: 0.9rem;
+}
+
+.batches-modal-content {
+  padding: 0 0 24px;
+}
+
+.batches-modal-header {
+  padding: 20px 20px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.batches-modal-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.modal-actions {
+  padding: 16px 20px 24px;
+}
+
+.modal-spinner {
+  display: block;
+  margin: 48px auto;
 }
 
 .location-form-list {
