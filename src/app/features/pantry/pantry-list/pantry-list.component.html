@@ -101,206 +101,160 @@
             <div class="item-grid">
               @for (item of group.items; track item._id) {
                 @let status = getStatus(item);
-                <ion-card class="item-card" [ngClass]="{
-                  'item-empty': getTotalQuantity(item) === 0,
-                  'item-low': isLowStock(item) && getTotalQuantity(item) > 0,
-                  'item-expired': isExpired(item),
-                  'item-near-expiry': isNearExpiry(item) && !isExpired(item)
-                }">
-                  <div class="item-card-accent"></div>
-                  <ion-card-header (click)="toggleItemExpansion(item, $event)">
-                    <div class="item-card-header">
-                      <div class="item-title-block">
-                        @if (item.isBasic) {
-                          <ion-icon class="basic-icon" name="star-outline"></ion-icon>
-                        }
-                        <ion-card-title>{{ item.name }}</ion-card-title>
-                        <ion-badge class="unit-badge" color="light">
+                <ion-card
+                  class="pantry-item-card"
+                  [ngClass]="['tone-' + status.tone, isExpanded(item) ? 'is-expanded' : '']">
+                  <div
+                    class="card-summary"
+                    role="button"
+                    tabindex="0"
+                    (click)="toggleItemExpansion(item)"
+                    (keydown)="onSummaryKeydown(item, $event)">
+                    <div class="summary-top">
+                      <div class="summary-title">
+                        <h3>
+                          @if (item.isBasic) {
+                            <ion-icon class="basic-icon" name="star-outline"></ion-icon>
+                          }
+                          <span class="summary-name">{{ item.name }}</span>
+                        </h3>
+                        <span class="summary-quantity">
                           {{ getTotalQuantity(item) | number:'1.0-2' }} {{ getUnitLabelForItem(item) }}
-                        </ion-badge>
+                        </span>
                       </div>
-                      <ion-button
-                        fill="clear"
-                        size="small"
-                        class="item-toggle"
-                        (click)="toggleItemExpansion(item, $event)"
-                        [attr.aria-label]="isExpanded(item) ? 'Contraer detalles del artículo' : 'Expandir detalles del artículo'"
-                        [attr.aria-expanded]="isExpanded(item)"
-                      >
-                        <ion-icon
-                          slot="icon-only"
-                          [name]="isExpanded(item) ? 'chevron-up-outline' : 'chevron-down-outline'"
-                        ></ion-icon>
-                      </ion-button>
+                      <ion-icon
+                        class="summary-toggle-icon"
+                        [name]="isExpanded(item) ? 'chevron-up-outline' : 'chevron-down-outline'">
+                      </ion-icon>
                     </div>
-                  </ion-card-header>
-                  <ion-card-content>
-                    @if (item.expirationDate) {
-                      <div class="expiration-chip" [ngClass]="{
-                        expired: isExpired(item),
-                        warning: isNearExpiry(item),
-                        ok: !isExpired(item) && !isNearExpiry(item)
-                      }">
+                    @let totalBatches = getTotalBatchCount(item);
+                    <div class="summary-meta">
+                      <div class="meta-primary">
                         <ion-icon name="calendar-outline"></ion-icon>
-                        <span>{{ item.expirationDate | date:'mediumDate' }}</span>
+                        <span>
+                          {{ item.expirationDate ? (item.expirationDate | date:'shortDate') : 'Sin fecha' }}
+                        </span>
                       </div>
-                    }
-                    <div class="status-tags">
                       <ion-chip class="status-chip" [color]="status.color" size="small">
                         <ion-icon [name]="getStatusIcon(item)"></ion-icon>
                         <ion-label>{{ status.label }}</ion-label>
                       </ion-chip>
-                      @if (getTotalQuantity(item) === 0 && status.label !== 'Empty') {
-                        <ion-chip class="status-chip" color="danger" size="small">
-                          <ion-icon name="alert-circle-outline"></ion-icon>
-                          <ion-label>Vacío</ion-label>
-                        </ion-chip>
-                      }
-                      @if (isNearExpiry(item) && status.label !== 'Expiring soon') {
-                        <ion-chip class="status-chip" color="warning" size="small">
-                          <ion-icon name="hourglass-outline"></ion-icon>
-                          <ion-label>Próximo a caducar</ion-label>
-                        </ion-chip>
-                      }
-                      @if (isLowStock(item) && getTotalQuantity(item) > 0 && status.label !== 'Low stock') {
-                        <ion-chip class="status-chip" color="warning" size="small">
-                          <ion-icon name="trending-down-outline"></ion-icon>
-                          <ion-label>Poco stock</ion-label>
-                        </ion-chip>
-                      }
-                      @if (hasOpenBatch(item)) {
-                        <ion-chip class="status-chip" color="secondary" size="small">
-                          <ion-icon name="cube-outline"></ion-icon>
-                          <ion-label>Lote abierto</ion-label>
-                        </ion-chip>
-                      }
-                      @if (isExpired(item) && status.label !== 'Expired') {
-                        <ion-chip class="status-chip" color="danger" size="small">
-                          <ion-icon name="alert-circle-outline"></ion-icon>
-                          <ion-label>Caducado</ion-label>
-                        </ion-chip>
-                      }
                     </div>
-                    <ion-note color="medium" class="location-summary-note">
-                      {{ formatLocationBreakdown(item.locations) }}
-                    </ion-note>
+                    @if (item.supermarket) {
+                      <div class="summary-meta secondary">
+                        <span>{{ totalBatches }} lotes</span>
+                        <span>{{ item.supermarket }}</span>
+                      </div>
+                    }
+                  </div>
 
-                    <div class="item-actions">
-                      <ion-button fill="clear" size="small" (click)="openEditItemModal(item, $event)">
-                        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-                      </ion-button>
-                      <ion-button fill="clear" size="small" color="danger" (click)="deleteItem(item, $event)">
-                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                      </ion-button>
-                    </div>
-
-                    <div class="item-details" [@expandCollapse]="isExpanded(item) ? 'expanded' : 'collapsed'">
-                      @if (isExpanded(item)) {
-                        <div class="detail-grid">
-                          <div class="detail-card location-card">
-                            <ion-icon name="location-outline"></ion-icon>
-                            <div>
-                              <p class="detail-label">Ubicaciones</p>
-                              <div class="detail-value location-list">
-                                @for (location of item.locations; track $index) {
-                                  @let batches = getLocationBatches(location);
-                                  <div class="location-entry">
-                                    <div class="location-info">
-                                      <div class="location-heading">
-                                        <strong>{{ getLocationLabel(location.locationId) }}</strong>
-                                        <span class="location-quantity">
-                                          {{ getLocationTotal(location) | number:'1.0-2' }} {{ getUnitLabel(location.unit) }}
-                                        </span>
-                                      </div>
-                                      @if (location.minThreshold !== undefined && location.minThreshold !== null) {
-                                        <ion-badge color="medium">
-                                          Mín {{ location.minThreshold | number:'1.0-2' }} {{ getUnitLabel(location.unit) }}
-                                        </ion-badge>
-                                      }
-                                      <div class="location-batches">
-                                        @if (batches.length) {
-                                          @for (batch of batches; track batch.batchId ?? batch.expirationDate ?? $index) {
-                                            <ion-chip size="small" color="light" class="batch-chip">
-                                              <ion-icon name="cube-outline"></ion-icon>
-                                              <ion-label>
-                                                {{ batch.quantity | number:'1.0-2' }} {{ getUnitLabel(location.unit) }}
-                                                @if (batch.opened) {
-                                                  · Abierto
-                                                }
-                                                @if (batch.expirationDate) {
-                                                  · {{ batch.expirationDate | date:'mediumDate' }}
-                                                }
-                                              </ion-label>
-                                            </ion-chip>
-                                          }
-                                        } @else {
-                                          <ion-text color="medium" class="batch-placeholder">
-                                            Sin lotes registrados
-                                          </ion-text>
-                                        }
-                                      </div>
-                                    </div>
-                                    <div class="location-actions">
-                                      <ion-button
-                                        fill="clear"
-                                        size="small"
-                                        color="medium"
-                                        shape="round"
-                                        (click)="adjustLocationQuantity(item, location, -1, $event)"
-                                        [disabled]="getLocationTotal(location) <= 0">
-                                        <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
-                                      </ion-button>
-                                      <ion-button
-                                        fill="solid"
-                                        size="small"
-                                        color="primary"
-                                        shape="round"
-                                        (click)="adjustLocationQuantity(item, location, 1, $event)">
-                                        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-                                      </ion-button>
-                                    </div>
-                                  </div>
-                                }
-                              </div>
+                  <div class="item-details" [@expandCollapse]="isExpanded(item) ? 'expanded' : 'collapsed'">
+                    @if (isExpanded(item)) {
+                      <div class="location-list expanded">
+                        @if (!item.locations.length) {
+                          <ion-text color="medium">
+                            Sin ubicaciones registradas.
+                          </ion-text>
+                        }
+                        @for (location of item.locations; track $index) {
+                          <div class="location-row">
+                            <div class="location-info">
+                              <span class="location-name">{{ getLocationLabel(location.locationId) }}</span>
+                              <span class="location-quantity">
+                                {{ getLocationTotal(location) | number:'1.0-2' }} {{ getUnitLabel(location.unit) }}
+                              </span>
                             </div>
-                          </div>
-                          @if (item.categoryId) {
-                            <div class="detail-card">
-                              <ion-icon name="pricetag-outline"></ion-icon>
-                              <div>
-                                <p class="detail-label">Categoría</p>
-                                <p class="detail-value">{{ formatCategoryName(item.categoryId) }}</p>
-                              </div>
+                            <div class="location-actions">
+                              <ion-button
+                                fill="clear"
+                                color="medium"
+                                size="small"
+                                (click)="adjustLocationQuantity(item, location, -1, $event)"
+                                [disabled]="getLocationTotal(location) <= 0">
+                                <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+                              </ion-button>
+                              <ion-button
+                                fill="solid"
+                                color="primary"
+                                size="small"
+                                (click)="adjustLocationQuantity(item, location, 1, $event)">
+                                <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                              </ion-button>
                             </div>
-                          }
-                          @if (getTotalMinThreshold(item) > 0) {
-                            <div class="detail-card">
-                              <ion-icon name="speedometer-outline"></ion-icon>
-                              <div>
-                                <p class="detail-label">Umbral mínimo (total)</p>
-                                <p class="detail-value">
-                                  <ion-badge color="medium">
-                                    {{ getTotalMinThreshold(item) | number:'1.0-2' }} {{ getUnitLabelForItem(item) }}
-                                  </ion-badge>
-                                </p>
-                              </div>
-                            </div>
-                          }
-                        </div>
-                        @if (isExpired(item)) {
-                          <div class="detail-actions">
-                            <ion-button
-                              size="small"
-                              color="medium"
-                              fill="outline"
-                              (click)="discardExpiredItem(item, $event)">
-                              Descartar
-                            </ion-button>
                           </div>
                         }
-                      }
-                    </div>
-                  </ion-card-content>
+                      </div>
+
+                      <div class="batch-section">
+                        <div class="batch-section-header">
+                          <h4>Lotes y caducidad</h4>
+                        </div>
+
+                        @if (totalBatches === 0) {
+                          <ion-text color="medium" class="batch-empty">
+                            No hay lotes registrados para este producto.
+                          </ion-text>
+                        } @else {
+                          <div class="batch-list">
+                            @for (entry of getTopBatches(item); track entry.batch.batchId ?? entry.batch.expirationDate ?? $index) {
+                              <div class="batch-row">
+                                <div class="batch-main">
+                                  <div class="batch-date">
+                                    <ion-icon name="calendar-outline"></ion-icon>
+                                    <span>{{ formatBatchDate(entry.batch) }}</span>
+                                  </div>
+                                  <div class="batch-meta">
+                                    <span class="batch-quantity">
+                                      {{ formatBatchQuantity(entry.batch, entry.locationUnit ?? MeasurementUnit.UNIT) }}
+                                    </span>
+                                    <span class="batch-location">
+                                      · {{ entry.locationLabel }}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div class="batch-status">
+                                  <ion-chip [color]="entry.status.color" size="small">
+                                    <ion-icon [name]="entry.status.icon"></ion-icon>
+                                    <ion-label>{{ entry.status.label }}</ion-label>
+                                  </ion-chip>
+                                  @if (entry.batch.opened) {
+                                    <ion-badge color="tertiary">Abierto</ion-badge>
+                                  }
+                                </div>
+                              </div>
+                            }
+                            @if (totalBatches > 3) {
+                              <ion-button
+                                size="small"
+                                fill="outline"
+                                color="primary"
+                                (click)="openBatchesModal(item, $event)">
+                                Ver todos los lotes
+                              </ion-button>
+                            }
+                          </div>
+                        }
+                      </div>
+
+                      <div class="card-actions">
+                        <ion-button
+                          fill="outline"
+                          size="small"
+                          (click)="openEditItemModal(item, $event)">
+                          <ion-icon slot="start" name="create-outline"></ion-icon>
+                          Editar
+                        </ion-button>
+                        <ion-button
+                          fill="outline"
+                          color="danger"
+                          size="small"
+                          (click)="deleteItem(item, $event)">
+                          <ion-icon slot="start" name="trash-outline"></ion-icon>
+                          Eliminar
+                        </ion-button>
+                      </div>
+                    }
+                  </div>
                 </ion-card>
               }
             </div>
@@ -309,6 +263,65 @@
       }
     </div>
   }
+
+  <ion-modal [isOpen]="showBatchesModal()" (willDismiss)="closeBatchesModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Lotes del producto</ion-title>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" color="medium" (click)="closeBatchesModal()">
+              Cerrar
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="batches-modal-content">
+        @let selectedItem = selectedBatchesItem();
+        @if (!selectedItem) {
+          <ion-spinner class="modal-spinner"></ion-spinner>
+        } @else {
+          <div class="batches-modal-header">
+            <h2>{{ selectedItem.name }}</h2>
+            <ion-text color="medium">
+              {{ getTotalBatchCount(selectedItem) }} lotes registrados
+            </ion-text>
+          </div>
+          <ion-list lines="full">
+            @for (entry of getSortedBatches(selectedItem); track entry.batch.batchId ?? entry.batch.expirationDate ?? $index) {
+              <ion-item>
+                <ion-label>
+                  <h3>
+                    <ion-icon name="calendar-outline"></ion-icon>
+                    {{ formatBatchDate(entry.batch) }}
+                  </h3>
+                  <p>
+                    {{ formatBatchQuantity(entry.batch, entry.locationUnit ?? MeasurementUnit.UNIT) }}
+                    · {{ entry.locationLabel }}
+                  </p>
+                  @if (entry.batch.opened) {
+                    <ion-badge color="tertiary" size="small">Abierto</ion-badge>
+                  }
+                </ion-label>
+                <ion-chip slot="end" [color]="entry.status.color" size="small">
+                  <ion-icon [name]="entry.status.icon"></ion-icon>
+                  <ion-label>{{ entry.status.label }}</ion-label>
+                </ion-chip>
+              </ion-item>
+            }
+          </ion-list>
+          <div class="modal-actions">
+            <ion-button
+              expand="block"
+              fill="outline"
+              (click)="openEditItemModal(selectedItem)">
+              Editar producto
+            </ion-button>
+          </div>
+        }
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 
   <ion-modal [isOpen]="showFilters()" (willDismiss)="closeFilters()">
     <ng-template>

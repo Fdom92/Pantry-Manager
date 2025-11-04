@@ -23,6 +23,24 @@ interface CategoryState {
   expanded: boolean;
 }
 
+interface BatchStatusMeta {
+  label: string;
+  color: 'danger' | 'warning' | 'success' | 'medium';
+  icon: string;
+}
+
+interface BatchEntryMeta {
+  batch: ItemBatch;
+  locationLabel: string;
+  locationUnit: MeasurementUnit | string | undefined;
+  status: BatchStatusMeta;
+}
+
+interface BatchSummaryMeta {
+  total: number;
+  sorted: BatchEntryMeta[];
+}
+
 @Component({
   selector: 'app-pantry-list',
   standalone: true,
@@ -55,9 +73,13 @@ export class PantryListComponent implements OnDestroy {
   readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.itemsState()));
   readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
   readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
+  readonly batchSummaries = computed(() => this.computeBatchSummaries(this.itemsState()));
+  readonly showBatchesModal = signal(false);
+  readonly selectedBatchesItem = signal<PantryItem | null>(null);
   readonly loading = this.pantryStore.loading;
   readonly nearExpiryDays = 3;
   readonly unitOptions = Object.values(MeasurementUnit);
+  readonly MeasurementUnit = MeasurementUnit;
   showCreateModal = false;
   editingItem: PantryItem | null = null;
   isSaving = false;
@@ -418,22 +440,22 @@ export class PantryListComponent implements OnDestroy {
     return getLocationDisplayName(locationId, 'Sin ubicación');
   }
 
-  /** Derive a human-readable status badge for the item card header. */
-  getStatus(item: PantryItem): { label: string; color: string } {
+  /** Derive a human-readable status badge plus tone for the item card header. */
+  getStatus(item: PantryItem): { label: string; color: string; tone: 'normal' | 'low' | 'warning' | 'danger' } {
     const quantity = this.getTotalQuantity(item);
     if (this.isExpired(item)) {
-      return { label: 'Expired', color: 'danger' };
+      return { label: 'Caducado', color: 'danger', tone: 'danger' };
     }
     if (this.isNearExpiry(item)) {
-      return { label: 'Expiring soon', color: 'warning' };
+      return { label: 'Próx. a caducar', color: 'warning', tone: 'warning' };
     }
     if (quantity === 0) {
-      return { label: 'Empty', color: 'danger' };
+      return { label: 'Sin stock', color: 'danger', tone: 'danger' };
     }
     if (this.isLowStock(item)) {
-      return { label: 'Low stock', color: 'warning' };
+      return { label: 'Bajo', color: 'warning', tone: 'low' };
     }
-    return { label: 'Normal', color: 'success' };
+    return { label: 'Normal', color: 'success', tone: 'normal' };
   }
 
   /** Pair the status with an icon that conveys urgency at a glance. */
@@ -451,7 +473,15 @@ export class PantryListComponent implements OnDestroy {
     if (this.isLowStock(item)) {
       return 'trending-down-outline';
     }
-      return 'checkmark-circle-outline';
+    return 'checkmark-circle-outline';
+  }
+
+  onSummaryKeydown(item: PantryItem, event: KeyboardEvent): void {
+    const key = event.key.toLowerCase();
+    if (key === 'enter' || key === ' ') {
+      event.preventDefault();
+      this.toggleItemExpansion(item);
+    }
   }
 
   isLowStock(item: PantryItem): boolean {
@@ -486,6 +516,17 @@ export class PantryListComponent implements OnDestroy {
     } else {
       this.expandedItems.add(item._id);
     }
+  }
+
+  openBatchesModal(item: PantryItem, event?: Event): void {
+    event?.stopPropagation();
+    this.selectedBatchesItem.set(item);
+    this.showBatchesModal.set(true);
+  }
+
+  closeBatchesModal(): void {
+    this.showBatchesModal.set(false);
+    this.selectedBatchesItem.set(null);
   }
 
   /** Apply search, filter, and sorting rules while keeping expansion state in sync. */
@@ -767,6 +808,126 @@ export class PantryListComponent implements OnDestroy {
 
   private normalizeKey(value: string): string {
     return value.trim().toLowerCase();
+  }
+
+  getTotalBatchCount(item: PantryItem): number {
+    return this.getBatchSummary(item).total;
+  }
+
+  hasMultipleBatches(item: PantryItem): boolean {
+    return this.getTotalBatchCount(item) > 1;
+  }
+
+  getTopBatches(item: PantryItem, limit: number = 3): BatchEntryMeta[] {
+    return this.getBatchSummary(item).sorted.slice(0, limit);
+  }
+
+  getSortedBatches(item: PantryItem): BatchEntryMeta[] {
+    return this.getBatchSummary(item).sorted;
+  }
+
+  formatBatchDate(batch: ItemBatch): string {
+    const value = batch.expirationDate;
+    if (!value) {
+      return 'Sin fecha';
+    }
+    try {
+      return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).format(
+        new Date(value)
+      );
+    } catch {
+      return value;
+    }
+  }
+
+  formatBatchQuantity(batch: ItemBatch, locationUnit: string | MeasurementUnit): string {
+    const formatted = this.roundDisplayQuantity(this.toNumber(batch.quantity)).toLocaleString('es-ES', {
+      maximumFractionDigits: 2,
+    });
+    return `${formatted} ${typeof locationUnit === 'string' ? locationUnit : this.getUnitLabel(locationUnit)}`;
+  }
+
+  private getBatchSummary(item: PantryItem): BatchSummaryMeta {
+    return this.batchSummaries().get(item._id) ?? { total: 0, sorted: [] };
+  }
+
+  private collectBatches(item: PantryItem): Array<{ batch: ItemBatch; locationLabel: string; locationUnit: MeasurementUnit | string | undefined }> {
+    const batches: Array<{ batch: ItemBatch; locationLabel: string; locationUnit: MeasurementUnit | string | undefined }> = [];
+    for (const location of item.locations) {
+      const locationLabel = this.getLocationLabel(location.locationId);
+      const locationUnit = location.unit ?? MeasurementUnit.UNIT;
+      const entries = this.getLocationBatches(location);
+      for (const batch of entries) {
+        batches.push({ batch, locationLabel, locationUnit });
+      }
+    }
+    return batches;
+  }
+
+  private computeBatchSummaries(items: PantryItem[]): Map<string, BatchSummaryMeta> {
+    const summaries = new Map<string, BatchSummaryMeta>();
+    for (const item of items) {
+      const collected = this.collectBatches(item);
+      if (!collected.length) {
+        summaries.set(item._id, { total: 0, sorted: [] });
+        continue;
+      }
+      const sorted = collected
+        .sort((a, b) => {
+          const aTime = this.getBatchTime(a.batch);
+          const bTime = this.getBatchTime(b.batch);
+          if (aTime === bTime) {
+            return 0;
+          }
+          if (aTime === null) {
+            return 1;
+          }
+          if (bTime === null) {
+            return -1;
+          }
+          return aTime - bTime;
+        })
+        .map(entry => ({
+          batch: entry.batch,
+          locationLabel: entry.locationLabel,
+          locationUnit: entry.locationUnit,
+          status: this.getBatchStatus(entry.batch),
+        }));
+
+      summaries.set(item._id, {
+        total: collected.length,
+        sorted,
+      });
+    }
+    return summaries;
+  }
+
+  private getBatchTime(batch: ItemBatch): number | null {
+    if (!batch.expirationDate) {
+      return null;
+    }
+    const time = new Date(batch.expirationDate).getTime();
+    return Number.isFinite(time) ? time : null;
+  }
+
+  private getBatchStatus(batch: ItemBatch): BatchStatusMeta {
+    const now = new Date();
+    const nearExpiryThreshold = new Date();
+    nearExpiryThreshold.setDate(now.getDate() + this.nearExpiryDays);
+    if (!batch.expirationDate) {
+      return { label: 'Sin fecha', color: 'medium', icon: 'remove-circle-outline' };
+    }
+    const expiryDate = new Date(batch.expirationDate);
+    if (!Number.isFinite(expiryDate.getTime())) {
+      return { label: 'Sin fecha', color: 'medium', icon: 'remove-circle-outline' };
+    }
+    if (expiryDate < now) {
+      return { label: 'Caducado', color: 'danger', icon: 'alert-circle-outline' };
+    }
+    if (expiryDate <= nearExpiryThreshold) {
+      return { label: 'Próx. caducar', color: 'warning', icon: 'hourglass-outline' };
+    }
+    return { label: 'Vigente', color: 'success', icon: 'checkmark-circle-outline' };
   }
 
   /** Return the earliest expiry date present in the provided locations array. */
