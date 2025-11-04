@@ -20,6 +20,8 @@ export interface AppPreferences {
   notifyOnExpired?: boolean;
   notifyOnLowStock?: boolean;
   lastSyncAt?: string | null;
+  locationOptions: string[];
+  supermarketOptions: string[];
 }
 
 export interface AppPreferencesDoc extends BaseDoc, AppPreferences {}

@@ -22,6 +22,11 @@ export const routes: Routes = [
           import('@features/shopping/shopping.component').then(m => m.ShoppingComponent),
       },
       {
+        path: 'settings/catalogos',
+        loadComponent: () =>
+          import('@features/settings/settings-catalogs/settings-catalogs.component').then(m => m.SettingsCatalogsComponent),
+      },
+      {
         path: 'settings',
         loadComponent: () =>
           import('@features/settings/settings.component').then(m => m.SettingsComponent),
