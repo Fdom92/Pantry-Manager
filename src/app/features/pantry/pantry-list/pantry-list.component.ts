@@ -3,6 +3,7 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
 import { SeedService } from '@core/services/seed.service';
+import { AppPreferencesService, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS } from '@core/services';
 import { PantryItem, MeasurementUnit, ItemLocationStock, ItemBatch } from '@core/models';
 import { createDocumentId, getLocationDisplayName } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
@@ -51,7 +52,9 @@ export class PantryListComponent implements OnDestroy {
   readonly summary = computed(() => this.buildSummary(this.filteredItems()));
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
   readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
-  readonly supermarketOptions = computed(() => this.computeSupermarketOptions(this.itemsState()));
+  readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.itemsState()));
+  readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
+  readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
   readonly loading = this.pantryStore.loading;
   readonly nearExpiryDays = 3;
   readonly unitOptions = Object.values(MeasurementUnit);
@@ -67,7 +70,10 @@ export class PantryListComponent implements OnDestroy {
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     categoryId: this.fb.control(''),
-    supermarket: this.fb.control('', { validators: [Validators.maxLength(80)] }),
+    supermarket: this.fb.control('', {
+      validators: [Validators.required, Validators.maxLength(80)],
+      nonNullable: true,
+    }),
     isBasic: this.fb.control(false),
     notes: this.fb.control(''),
     locations: this.fb.array([
@@ -111,6 +117,7 @@ export class PantryListComponent implements OnDestroy {
     private seedService: SeedService,
     private readonly fb: FormBuilder,
     private readonly toastCtrl: ToastController,
+    private readonly appPreferences: AppPreferencesService,
   ) {
     effect(() => {
       this.itemsState.set(this.pantryStore.items());
@@ -208,17 +215,6 @@ export class PantryListComponent implements OnDestroy {
     this.locationsArray.removeAt(index);
   }
 
-  selectSupermarketOption(option: string): void {
-    const control = this.form.get('supermarket');
-    if (!control) {
-      return;
-    }
-    const next = option.trim();
-    control.setValue(next);
-    control.markAsDirty();
-    control.markAsTouched();
-  }
-
   /** Replace the current form array with normalized groups based on the provided data. */
   private resetLocationControls(locations: Array<Partial<ItemLocationStock>>): void {
     while (this.locationsArray.length) {
@@ -232,8 +228,13 @@ export class PantryListComponent implements OnDestroy {
   /** Create a form group for a single location with coercion and sane defaults. */
   private createLocationGroup(initial?: Partial<ItemLocationStock>): FormGroup {
     const batches = Array.isArray(initial?.batches) ? initial.batches : [];
+    const rawLocation = (initial?.locationId ?? '').trim();
+    const locationId = rawLocation && rawLocation !== 'unassigned' ? rawLocation : '';
     return this.fb.group({
-      locationId: this.fb.control((initial?.locationId ?? '').trim(), { nonNullable: true }),
+      locationId: this.fb.control(locationId, {
+        validators: [Validators.required],
+        nonNullable: true,
+      }),
       unit: this.fb.control<MeasurementUnit>(initial?.unit ?? MeasurementUnit.UNIT, {
         validators: [Validators.required],
         nonNullable: true,
@@ -290,8 +291,16 @@ export class PantryListComponent implements OnDestroy {
       this.closeFormModal();
       await this.presentToast(successMessage, 'success');
     } catch (err) {
-      console.error('[PantryListComponent] submitItem error', err);
       this.isSaving = false;
+      if (err instanceof Error && err.message === 'LOCATION_REQUIRED') {
+        await this.presentToast('Selecciona una ubicación antes de guardar.', 'danger');
+        return;
+      }
+      if (err instanceof Error && err.message === 'SUPERMARKET_REQUIRED') {
+        await this.presentToast('Selecciona un supermercado antes de guardar.', 'danger');
+        return;
+      }
+      console.error('[PantryListComponent] submitItem error', err);
       await this.presentToast('Error saving item', 'danger');
     }
   }
@@ -634,6 +643,130 @@ export class PantryListComponent implements OnDestroy {
       }
     }
     return Array.from(options.values()).sort((a, b) => a.localeCompare(b));
+  }
+
+  getLocationOptionsForControl(index: number): Array<{ value: string; label: string }> {
+    const presetOptions = this.presetLocationOptions();
+    const seen = new Set<string>();
+    const options: Array<{ value: string; label: string }> = [];
+
+    const addOption = (value: string, label?: string): void => {
+      const normalized = this.normalizeKey(value);
+      if (!normalized || seen.has(normalized)) {
+        return;
+      }
+      seen.add(normalized);
+      const display = label ?? getLocationDisplayName(value, 'Sin ubicación');
+      options.push({ value, label: display });
+    };
+
+    for (const preset of presetOptions) {
+      addOption(preset);
+    }
+
+    const control = this.locationsArray.at(index);
+    const currentValue = (control?.get('locationId')?.value ?? '').trim();
+    if (currentValue && !seen.has(this.normalizeKey(currentValue))) {
+      addOption(currentValue);
+    }
+
+    return options;
+  }
+
+  getSupermarketSelectOptions(): Array<{ value: string; label: string }> {
+    const presetOptions = this.presetSupermarketOptions();
+    const suggestions = this.supermarketSuggestions();
+    const seen = new Set<string>();
+    const options: Array<{ value: string; label: string }> = [];
+
+    const addOption = (value: string, label?: string): void => {
+      const normalized = this.normalizeKey(value);
+      if (!normalized || seen.has(normalized)) {
+        return;
+      }
+      seen.add(normalized);
+      const trimmedValue = value.trim();
+      const display = label ?? trimmedValue;
+      options.push({ value: trimmedValue, label: display });
+    };
+
+    for (const preset of presetOptions) {
+      addOption(preset);
+    }
+
+    for (const suggestion of suggestions) {
+      addOption(suggestion);
+    }
+
+    const control = this.form.get('supermarket');
+    const currentValue = (control?.value ?? '').trim();
+    if (currentValue && !seen.has(this.normalizeKey(currentValue))) {
+      addOption(currentValue);
+    }
+
+    return options;
+  }
+
+  private computePresetLocationOptions(): string[] {
+    const prefs = this.appPreferences.preferences();
+    const source = Array.isArray(prefs.locationOptions) ? prefs.locationOptions : [];
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+
+    for (const option of source) {
+      if (typeof option !== 'string') {
+        continue;
+      }
+      const trimmed = option.trim();
+      if (!trimmed) {
+        continue;
+      }
+      const key = this.normalizeKey(trimmed);
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      normalized.push(trimmed);
+    }
+
+    if (!normalized.length) {
+      return [...DEFAULT_LOCATION_OPTIONS];
+    }
+
+    return normalized;
+  }
+
+  private computePresetSupermarketOptions(): string[] {
+    const prefs = this.appPreferences.preferences();
+    const source = Array.isArray(prefs.supermarketOptions) ? prefs.supermarketOptions : [];
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+
+    for (const option of source) {
+      if (typeof option !== 'string') {
+        continue;
+      }
+      const trimmed = option.trim();
+      if (!trimmed) {
+        continue;
+      }
+      const key = this.normalizeKey(trimmed);
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      normalized.push(trimmed);
+    }
+
+    if (!normalized.length) {
+      return [...DEFAULT_SUPERMARKET_OPTIONS];
+    }
+
+    return normalized;
+  }
+
+  private normalizeKey(value: string): string {
+    return value.trim().toLowerCase();
   }
 
   /** Return the earliest expiry date present in the provided locations array. */
@@ -1014,55 +1147,62 @@ export class PantryListComponent implements OnDestroy {
     const identifier = existing?._id ?? createDocumentId('item');
     const now = new Date().toISOString();
 
-    const locations: ItemLocationStock[] = this.locationsArray.controls.map(control => {
-      const value = control.value as any;
-      const rawLocationId = (value?.locationId ?? '').trim();
-      const locationId = rawLocationId || 'unassigned';
-      const unit = value?.unit ?? MeasurementUnit.UNIT;
-      const minThreshold = value?.minThreshold != null && value.minThreshold !== ''
-        ? Number(value.minThreshold)
-        : undefined;
+    const locations: ItemLocationStock[] = this.locationsArray.controls
+      .map(control => {
+        const value = control.value as any;
+        const rawLocationId = (value?.locationId ?? '').trim();
+        if (!rawLocationId) {
+          return null;
+        }
+        const unit = value?.unit ?? MeasurementUnit.UNIT;
+        const minThreshold = value?.minThreshold != null && value.minThreshold !== ''
+          ? Number(value.minThreshold)
+          : undefined;
 
-      const batchesControl = control.get('batches');
-      const batches = batchesControl instanceof FormArray
-        ? (batchesControl.controls as FormGroup[]).map(group => {
-            const batchValue = group.value as any;
-            const expirationDate = batchValue?.expirationDate
-              ? new Date(batchValue.expirationDate).toISOString()
-              : undefined;
-            const batchQuantity = batchValue?.quantity != null ? Number(batchValue.quantity) : 0;
-            const batchId = (batchValue?.batchId ?? '').trim() || undefined;
-            const opened = batchValue?.opened ? true : undefined;
-            return {
-              batchId,
-              quantity: Number.isFinite(batchQuantity) ? batchQuantity : 0,
-              expirationDate,
-              opened,
-              unit,
-            } as ItemBatch;
-          })
-        : [];
+        const batchesControl = control.get('batches');
+        const batches = batchesControl instanceof FormArray
+          ? (batchesControl.controls as FormGroup[]).map(group => {
+              const batchValue = group.value as any;
+              const expirationDate = batchValue?.expirationDate
+                ? new Date(batchValue.expirationDate).toISOString()
+                : undefined;
+              const batchQuantity = batchValue?.quantity != null ? Number(batchValue.quantity) : 0;
+              const batchId = (batchValue?.batchId ?? '').trim() || undefined;
+              const opened = batchValue?.opened ? true : undefined;
+              return {
+                batchId,
+                quantity: Number.isFinite(batchQuantity) ? batchQuantity : 0,
+                expirationDate,
+                opened,
+                unit,
+              } as ItemBatch;
+            })
+          : [];
 
-      const normalizedBatches = batches.filter(batch =>
-        batch.quantity > 0 ||
-        Boolean(batch.expirationDate) ||
-        Boolean(batch.opened)
-      );
+        const normalizedBatches = batches.filter(batch =>
+          batch.quantity > 0 ||
+          Boolean(batch.expirationDate) ||
+          Boolean(batch.opened)
+        );
 
-      return {
-        locationId,
-        unit,
-        minThreshold,
-        batches: normalizedBatches,
-      };
-    });
+        return {
+          locationId: rawLocationId,
+          unit,
+          minThreshold,
+          batches: normalizedBatches,
+        } as ItemLocationStock;
+      })
+      .filter((location): location is ItemLocationStock => location !== null);
 
-    const normalizedLocations = locations.length
-      ? locations
-      : [{ locationId: 'unassigned', unit: MeasurementUnit.UNIT, batches: [] }];
+    if (!locations.length) {
+      throw new Error('LOCATION_REQUIRED');
+    }
 
-    const earliestExpiry = this.computeEarliestExpiry(normalizedLocations);
+    const earliestExpiry = this.computeEarliestExpiry(locations);
     const normalizedSupermarket = this.normalizeSupermarketInput(supermarket);
+    if (!normalizedSupermarket) {
+      throw new Error('SUPERMARKET_REQUIRED');
+    }
 
     const base: PantryItem = {
       _id: identifier,
@@ -1071,7 +1211,7 @@ export class PantryListComponent implements OnDestroy {
       householdId: existing?.householdId ?? DEFAULT_HOUSEHOLD_ID,
       name: (name ?? '').trim(),
       categoryId: (categoryId ?? '').trim(),
-      locations: normalizedLocations,
+      locations,
       supermarket: normalizedSupermarket,
       isBasic: isBasic ? true : undefined,
       expirationDate: earliestExpiry,

@@ -441,29 +441,21 @@
               </ion-input>
             </ion-item>
 
-            <ion-item>
-              <ion-input
-                formControlName="supermarket"
-                label="Supermercado"
-                labelPlacement="stacked"
-                placeholder="Mercadona, Carrefour...">
-              </ion-input>
-            </ion-item>
-            @if (supermarketOptions().length) {
-              <div class="supermarket-suggestions">
-                <ion-text color="medium">Reutiliza un supermercado existente:</ion-text>
-                <div class="supermarket-chip-list">
-                  @for (option of supermarketOptions(); track option) {
-                    <ion-chip color="light" size="small" (click)="selectSupermarketOption(option)">
-                      <ion-label>{{ option }}</ion-label>
-                    </ion-chip>
+              <ion-item>
+                <ion-select
+                  formControlName="supermarket"
+                  interface="popover"
+                  label="Supermercado"
+                  labelPlacement="stacked"
+                  placeholder="Selecciona un supermercado"
+                  required>
+                  @for (option of getSupermarketSelectOptions(); track option.value) {
+                    <ion-select-option [value]="option.value">
+                      {{ option.label }}
+                    </ion-select-option>
                   }
-                  <ion-chip color="medium" size="small" (click)="selectSupermarketOption('')">
-                    <ion-label>Sin supermercado</ion-label>
-                  </ion-chip>
-                </div>
-              </div>
-            }
+              </ion-select>
+            </ion-item>
 
             <ion-item lines="full">
               <ion-toggle formControlName="isBasic" justify="space-between">Producto básico de la despensa</ion-toggle>
@@ -491,12 +483,19 @@
                   </div>
                   <ion-list lines="full">
                     <ion-item>
-                      <ion-input
+                      <ion-select
                         formControlName="locationId"
+                        interface="popover"
                         label="Ubicación"
                         labelPlacement="stacked"
-                        placeholder="Despensa, cocina...">
-                      </ion-input>
+                        placeholder="Selecciona una ubicación"
+                        required>
+                        @for (option of getLocationOptionsForControl(i); track option.value) {
+                          <ion-select-option [value]="option.value">
+                            {{ option.label }}
+                          </ion-select-option>
+                        }
+                      </ion-select>
                     </ion-item>
                     <ion-item>
                       <ion-select
