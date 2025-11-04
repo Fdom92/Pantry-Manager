@@ -418,22 +418,22 @@ export class PantryListComponent implements OnDestroy {
     return getLocationDisplayName(locationId, 'Sin ubicación');
   }
 
-  /** Derive a human-readable status badge for the item card header. */
-  getStatus(item: PantryItem): { label: string; color: string } {
+  /** Derive a human-readable status badge plus tone for the item card header. */
+  getStatus(item: PantryItem): { label: string; color: string; tone: 'normal' | 'low' | 'warning' | 'danger' } {
     const quantity = this.getTotalQuantity(item);
     if (this.isExpired(item)) {
-      return { label: 'Expired', color: 'danger' };
+      return { label: 'Caducado', color: 'danger', tone: 'danger' };
     }
     if (this.isNearExpiry(item)) {
-      return { label: 'Expiring soon', color: 'warning' };
+      return { label: 'Próx. a caducar', color: 'warning', tone: 'warning' };
     }
     if (quantity === 0) {
-      return { label: 'Empty', color: 'danger' };
+      return { label: 'Sin stock', color: 'danger', tone: 'danger' };
     }
     if (this.isLowStock(item)) {
-      return { label: 'Low stock', color: 'warning' };
+      return { label: 'Bajo', color: 'warning', tone: 'low' };
     }
-    return { label: 'Normal', color: 'success' };
+    return { label: 'Normal', color: 'success', tone: 'normal' };
   }
 
   /** Pair the status with an icon that conveys urgency at a glance. */
@@ -451,7 +451,15 @@ export class PantryListComponent implements OnDestroy {
     if (this.isLowStock(item)) {
       return 'trending-down-outline';
     }
-      return 'checkmark-circle-outline';
+    return 'checkmark-circle-outline';
+  }
+
+  onSummaryKeydown(item: PantryItem, event: KeyboardEvent): void {
+    const key = event.key.toLowerCase();
+    if (key === 'enter' || key === ' ') {
+      event.preventDefault();
+      this.toggleItemExpansion(item);
+    }
   }
 
   isLowStock(item: PantryItem): boolean {
