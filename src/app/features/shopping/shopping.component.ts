@@ -2,7 +2,6 @@ import { Component, computed, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { PantryStoreService } from '@core/store/pantry-store.service';
-import { SeedService } from '@core/services';
 import { ItemLocationStock, PantryItem, MeasurementUnit } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
 
@@ -69,12 +68,10 @@ export class ShoppingComponent {
 
   constructor(
     private readonly pantryStore: PantryStoreService,
-    private readonly seedService: SeedService,
   ) {}
 
   /** Lifecycle hook: make sure the store is populated before rendering suggestions. */
   async ionViewWillEnter(): Promise<void> {
-    // await this.seedService.ensureSeedData();
     await this.pantryStore.loadAll();
   }
 

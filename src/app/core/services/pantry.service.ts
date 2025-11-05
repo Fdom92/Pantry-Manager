@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
 import { StorageService } from './storage.service';
 import { PantryItem, ExpirationStatus, ItemLocationStock, MeasurementUnit, ItemBatch } from '@core/models';
-import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
+import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PantryService extends StorageService<PantryItem> {
   private readonly TYPE = 'item';
-  private readonly NEAR_EXPIRY_WINDOW_DAYS = 3;
 
   constructor() {
     super();
@@ -165,7 +164,7 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   /** Determine if any location expires within the provided rolling window. */
-  isItemNearExpiry(item: PantryItem, daysAhead: number = this.NEAR_EXPIRY_WINDOW_DAYS): boolean {
+  isItemNearExpiry(item: PantryItem, daysAhead: number = NEAR_EXPIRY_WINDOW_DAYS): boolean {
     return this.isNearExpiry(item, daysAhead);
   }
 
@@ -318,7 +317,7 @@ export class PantryService extends StorageService<PantryItem> {
   /** Project a high-level expiration status based on per-location dates. */
   private computeExpirationStatus(locations: ItemLocationStock[]): ExpirationStatus {
     const now = new Date();
-    const windowDays = this.NEAR_EXPIRY_WINDOW_DAYS;
+    const windowDays = NEAR_EXPIRY_WINDOW_DAYS;
     let nearest: ExpirationStatus = ExpirationStatus.OK;
 
     for (const batch of this.collectBatches(locations)) {
@@ -347,7 +346,7 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   /** Internal near-expiry detector that checks every location. */
-  private isNearExpiry(item: PantryItem, daysAhead: number = this.NEAR_EXPIRY_WINDOW_DAYS): boolean {
+  private isNearExpiry(item: PantryItem, daysAhead: number = NEAR_EXPIRY_WINDOW_DAYS): boolean {
     const now = new Date();
     return this.collectBatches(item.locations).some(batch => {
       if (!batch.expirationDate) return false;

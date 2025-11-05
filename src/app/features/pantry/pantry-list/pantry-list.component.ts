@@ -2,7 +2,6 @@ import { Component, OnDestroy, signal, computed, effect } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
-import { SeedService } from '@core/services/seed.service';
 import { AppPreferencesService, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS } from '@core/services';
 import { PantryItem, MeasurementUnit, ItemLocationStock, ItemBatch } from '@core/models';
 import { createDocumentId, getLocationDisplayName } from '@core/utils';
@@ -136,7 +135,6 @@ export class PantryListComponent implements OnDestroy {
   }
   constructor(
     private readonly pantryStore: PantryStoreService,
-    private seedService: SeedService,
     private readonly fb: FormBuilder,
     private readonly toastCtrl: ToastController,
     private readonly appPreferences: AppPreferencesService,
@@ -168,7 +166,6 @@ export class PantryListComponent implements OnDestroy {
 
   /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
   async ionViewWillEnter() {
-    // await this.seedService.ensureSeedData();
     await this.loadItems();
     if (!this.realtimeSubscribed) {
       this.pantryStore.watchRealtime();
@@ -271,12 +268,19 @@ export class PantryListComponent implements OnDestroy {
   }
 
   private createBatchGroup(initial?: Partial<ItemBatch>): FormGroup {
+    let normalizedQuantity: number | null = null;
+    if (initial?.quantity != null) {
+      const numericValue = Number(initial.quantity);
+      normalizedQuantity = Number.isFinite(numericValue) ? numericValue : null;
+    }
     return this.fb.group({
       batchId: this.fb.control((initial?.batchId ?? '').trim()),
-      quantity: this.fb.control(initial?.quantity != null ? Number(initial.quantity) : 0, {
-        validators: [Validators.required, Validators.min(0)],
-        nonNullable: true,
-      }),
+      quantity: this.fb.control<number | null>(
+        normalizedQuantity,
+        {
+          validators: [Validators.required, Validators.min(0)],
+        }
+      ),
       expirationDate: this.fb.control(initial?.expirationDate ? this.toDateInputValue(initial.expirationDate) : ''),
       opened: this.fb.control(initial?.opened ?? false),
     });
