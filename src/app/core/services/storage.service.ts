@@ -3,6 +3,7 @@ import PouchDB from 'pouchdb-browser';
 import PouchFind from 'pouchdb-find';
 import { BaseDoc } from '@core/models';
 import { APP_DB_NAME } from '@core/constants/app.constants';
+import { createDocumentId } from '@core/utils';
 
 PouchDB.plugin(PouchFind);
 
@@ -13,6 +14,7 @@ type PouchResponse = PouchDB.Core.Response;
 })
 export class StorageService<T extends BaseDoc> {
   private db: PouchDB.Database<T>;
+  private readonly MAX_LIST_LIMIT = 100;
 
   constructor() {
     // auto_compaction reduces database size; tweak if needed
@@ -32,16 +34,29 @@ export class StorageService<T extends BaseDoc> {
    * upsert - internal create or update with timestamps
    */
   async upsert(doc: T): Promise<T> {
+    const withId = this.ensureDocumentId(doc);
+    const docId = withId._id;
     const now = new Date().toISOString();
 
     try {
-      const existing = await this.db.get(doc._id).catch((err: any) => {
+      const existing = await this.db.get(docId).catch((err: any) => {
         if (err?.status === 404) return undefined;
         throw err;
       });
 
+      if (!existing && withId._rev) {
+        console.warn(`[StorageService] Dropping unexpected _rev for new doc`, { _id: docId, _rev: withId._rev });
+      }
+
+      if (existing && withId._rev && withId._rev !== existing._rev) {
+        console.warn(
+          `[StorageService] _rev mismatch detected before upsert`,
+          { _id: docId, incomingRev: withId._rev, storedRev: existing._rev }
+        );
+      }
+
       const newDoc: T = {
-        ...doc,
+        ...withId,
         createdAt: existing?.createdAt ?? now,
         updatedAt: now,
         _rev: existing?._rev,
@@ -50,6 +65,9 @@ export class StorageService<T extends BaseDoc> {
       const res: PouchResponse = await this.db.put(newDoc as any);
       return { ...newDoc, _rev: res.rev } as T;
     } catch (err) {
+      if ((err as any)?.status === 409) {
+        console.warn('[StorageService] Conflict while saving document', { _id: docId, error: err });
+      }
       console.error('[StorageService] upsert error', err);
       throw err;
     }
@@ -91,9 +109,16 @@ export class StorageService<T extends BaseDoc> {
       return result.rows.map(r => r.doc!).filter(Boolean);
     }
 
-    // Use find to search by type (ensure the index exists)
-    await this.ensureIndex([ 'type' ]);
-    const res = await this.db.find({ selector: { type } });
+    try {
+      await this.db.createIndex({ index: { fields: ['type'] } });
+    } catch (err) {
+      console.warn('[StorageService] createIndex warning for type', err);
+    }
+
+    const res = await this.db.find({
+      selector: { type },
+      limit: this.MAX_LIST_LIMIT,
+    });
     return res.docs;
   }
 
@@ -161,14 +186,30 @@ export class StorageService<T extends BaseDoc> {
 
   async bulkSave(docs: T[]): Promise<T[]> {
     const now = new Date().toISOString();
-    const prepared = docs.map(doc => ({
-      ...doc,
-      createdAt: doc.createdAt ?? now,
-      updatedAt: now,
-    })) as T[];
+    const prepared = docs.map(doc => {
+      const withId = this.ensureDocumentId(doc);
+      return {
+        ...withId,
+        createdAt: withId.createdAt ?? now,
+        updatedAt: now,
+        _rev: withId._rev,
+      } as T;
+    });
+
+    const duplicateIds = this.findDuplicateIds(prepared);
+    if (duplicateIds.length) {
+      console.warn('[StorageService] bulkSave detected duplicate IDs', duplicateIds);
+    }
 
     const res = await this.db.bulkDocs(prepared as any);
-    return prepared.map((d, i) => ({ ...d, _rev: res[i].rev } as T));
+    return prepared.map((doc, index) => {
+      const outcome = res[index] as PouchDB.Core.Response & { error?: string };
+      if (outcome?.error) {
+        console.error('[StorageService] bulkSave error for document', { _id: doc._id, error: outcome });
+        return doc;
+      }
+      return { ...doc, _rev: outcome.rev } as T;
+    });
   }
 
   async count(type?: string): Promise<number> {
@@ -188,5 +229,34 @@ export class StorageService<T extends BaseDoc> {
   async exists(id: string): Promise<boolean> {
     const doc = await this.get(id);
     return !!doc;
+  }
+
+  private ensureDocumentId(doc: T): T {
+    const rawId = (doc?._id ?? '').trim();
+    if (rawId) {
+      if (rawId !== doc._id) {
+        return { ...doc, _id: rawId } as T;
+      }
+      return doc;
+    }
+
+    const typePrefix = ((doc as any)?.type ?? 'doc').toString().split(':')[0] || 'doc';
+    const generatedId = createDocumentId(typePrefix);
+    console.warn('[StorageService] Generated missing _id for document', { generatedId, type: (doc as any)?.type });
+    return { ...doc, _id: generatedId } as T;
+  }
+
+  private findDuplicateIds(docs: T[]): string[] {
+    const seen = new Set<string>();
+    const duplicates = new Set<string>();
+    for (const doc of docs) {
+      const id = doc._id;
+      if (seen.has(id)) {
+        duplicates.add(id);
+      } else {
+        seen.add(id);
+      }
+    }
+    return Array.from(duplicates);
   }
 }
