@@ -2,7 +2,11 @@ import { Component, OnDestroy, signal, computed, effect } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
-import { AppPreferencesService, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS } from '@core/services';
+import {
+  AppPreferencesService,
+  DEFAULT_LOCATION_OPTIONS,
+  DEFAULT_SUPERMARKET_OPTIONS,
+} from '@core/services';
 import { PantryItem, MeasurementUnit, ItemLocationStock, ItemBatch } from '@core/models';
 import { createDocumentId, getLocationDisplayName } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
@@ -77,7 +81,6 @@ export class PantryListComponent implements OnDestroy {
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
   readonly loading = this.pantryStore.loading;
   readonly nearExpiryDays = 3;
-  readonly unitOptions = Object.values(MeasurementUnit);
   readonly MeasurementUnit = MeasurementUnit;
   showCreateModal = false;
   editingItem: PantryItem | null = null;
@@ -254,8 +257,7 @@ export class PantryListComponent implements OnDestroy {
         validators: [Validators.required],
         nonNullable: true,
       }),
-      unit: this.fb.control<MeasurementUnit>(initial?.unit ?? MeasurementUnit.UNIT, {
-        validators: [Validators.required],
+      unit: this.fb.control<string>(this.normalizeUnitValue(initial?.unit), {
         nonNullable: true,
       }),
       minThreshold: this.fb.control(
@@ -428,15 +430,15 @@ export class PantryListComponent implements OnDestroy {
     return this.pantryStore.getItemTotalMinThreshold(item);
   }
 
-  getPrimaryUnit(item: PantryItem): MeasurementUnit {
-    return this.pantryStore.getItemPrimaryUnit(item);
+  getPrimaryUnit(item: PantryItem): string {
+    return this.normalizeUnitValue(this.pantryStore.getItemPrimaryUnit(item));
   }
 
   getUnitLabelForItem(item: PantryItem): string {
     return this.pantryStore.getUnitLabel(this.getPrimaryUnit(item));
   }
 
-  getUnitLabel(unit: MeasurementUnit): string {
+  getUnitLabel(unit: MeasurementUnit | string | undefined): string {
     return this.pantryStore.getUnitLabel(unit);
   }
 
@@ -814,6 +816,17 @@ export class PantryListComponent implements OnDestroy {
     return value.trim().toLowerCase();
   }
 
+  private normalizeUnitValue(unit: MeasurementUnit | string | undefined): string {
+    if (typeof unit !== 'string') {
+      return MeasurementUnit.UNIT;
+    }
+    const trimmed = unit.trim();
+    if (!trimmed) {
+      return MeasurementUnit.UNIT;
+    }
+    return trimmed;
+  }
+
   getTotalBatchCount(item: PantryItem): number {
     return this.getBatchSummary(item).total;
   }
@@ -848,7 +861,8 @@ export class PantryListComponent implements OnDestroy {
     const formatted = this.roundDisplayQuantity(this.toNumber(batch.quantity)).toLocaleString('es-ES', {
       maximumFractionDigits: 2,
     });
-    return `${formatted} ${typeof locationUnit === 'string' ? locationUnit : this.getUnitLabel(locationUnit)}`;
+    const unitLabel = this.getUnitLabel(this.normalizeUnitValue(locationUnit));
+    return `${formatted} ${unitLabel}`;
   }
 
   private getBatchSummary(item: PantryItem): BatchSummaryMeta {
@@ -859,7 +873,7 @@ export class PantryListComponent implements OnDestroy {
     const batches: Array<{ batch: ItemBatch; locationLabel: string; locationUnit: MeasurementUnit | string | undefined }> = [];
     for (const location of item.locations) {
       const locationLabel = this.getLocationLabel(location.locationId);
-      const locationUnit = location.unit ?? MeasurementUnit.UNIT;
+      const locationUnit = this.normalizeUnitValue(location.unit);
       const entries = this.getLocationBatches(location);
       for (const batch of entries) {
         batches.push({ batch, locationLabel, locationUnit });
@@ -975,7 +989,7 @@ export class PantryListComponent implements OnDestroy {
 
   getLocationUnitLabelForControl(index: number): string {
     const control = this.locationsArray.at(index).get('unit');
-    const value = (control?.value as MeasurementUnit | undefined) ?? MeasurementUnit.UNIT;
+    const value = this.normalizeUnitValue(control?.value as MeasurementUnit | string | undefined);
     return this.getUnitLabel(value);
   }
 
@@ -1021,7 +1035,7 @@ export class PantryListComponent implements OnDestroy {
         const nextLocations = item.locations.map(loc => {
           if (loc.locationId === locationId) {
             found = true;
-            const unit = loc.unit ?? this.getPrimaryUnit(item);
+            const unit = this.normalizeUnitValue(loc.unit);
             return {
               ...loc,
               unit,
@@ -1032,7 +1046,7 @@ export class PantryListComponent implements OnDestroy {
         });
 
         if (!found) {
-          const unit = item.locations[0]?.unit ?? MeasurementUnit.UNIT;
+          const unit = this.normalizeUnitValue(item.locations[0]?.unit);
           nextLocations.push({
             locationId,
             unit,
@@ -1057,7 +1071,7 @@ export class PantryListComponent implements OnDestroy {
 
   private adjustBatchesForTotal(
     batches: ItemBatch[] | undefined,
-    unit: MeasurementUnit,
+    unit: MeasurementUnit | string,
     nextTotal: number
   ): ItemBatch[] {
     const target = Math.max(0, Number(nextTotal) || 0);
@@ -1073,11 +1087,12 @@ export class PantryListComponent implements OnDestroy {
     }
 
     if (currentTotal === 0) {
+      const normalizedUnit = this.normalizeUnitValue(unit);
       return [
         {
           batchId: this.createTempBatchId(),
           quantity: target,
-          unit,
+          unit: normalizedUnit,
           opened: false,
         },
       ];
@@ -1088,6 +1103,7 @@ export class PantryListComponent implements OnDestroy {
 
     if (delta > 0) {
       adjusted[0].quantity = this.roundDisplayQuantity(this.toNumber(adjusted[0].quantity) + delta);
+      adjusted[0].unit = this.normalizeUnitValue(adjusted[0].unit ?? unit);
       return adjusted;
     }
 
@@ -1110,14 +1126,16 @@ export class PantryListComponent implements OnDestroy {
     return adjusted.filter(batch => this.toNumber(batch.quantity) > 0);
   }
 
-  private sanitizeBatches(batches: ItemBatch[] | undefined, unit: MeasurementUnit): ItemBatch[] {
+  private sanitizeBatches(batches: ItemBatch[] | undefined, unit: MeasurementUnit | string): ItemBatch[] {
     if (!Array.isArray(batches) || !batches.length) {
       return [];
     }
+    const normalizedUnit = this.normalizeUnitValue(unit);
     return batches.map(batch => ({
       ...batch,
       quantity: this.toNumber(batch.quantity),
-      unit: batch.unit ?? unit,
+      unit: this.normalizeUnitValue(batch.unit ?? normalizedUnit),
+      opened: batch.opened ?? false,
     }));
   }
 
@@ -1261,7 +1279,7 @@ export class PantryListComponent implements OnDestroy {
     return locations
       .map(location => {
         const quantity = this.roundDisplayQuantity(this.getLocationTotal(location));
-        const unitLabel = this.getUnitLabel(location.unit ?? MeasurementUnit.UNIT);
+        const unitLabel = this.getUnitLabel(this.normalizeUnitValue(location.unit));
         const label = getLocationDisplayName(location.locationId, 'Sin ubicación');
         const batches = this.getLocationBatches(location);
         const extras: string[] = [];
@@ -1286,10 +1304,7 @@ export class PantryListComponent implements OnDestroy {
     const formattedNumber = this.roundDisplayQuantity(Number(quantity)).toLocaleString('es-ES', {
       maximumFractionDigits: 2,
     });
-    if (typeof unit === 'string' && !(unit in MeasurementUnit)) {
-      return `${formattedNumber} ${unit}`.trim();
-    }
-    const unitLabel = this.getUnitLabel((unit as MeasurementUnit) ?? MeasurementUnit.UNIT);
+    const unitLabel = this.getUnitLabel(this.normalizeUnitValue(unit ?? undefined));
     return `${formattedNumber} ${unitLabel}`.trim();
   }
 
@@ -1319,7 +1334,7 @@ export class PantryListComponent implements OnDestroy {
         if (!rawLocationId) {
           return null;
         }
-        const unit = value?.unit ?? MeasurementUnit.UNIT;
+        const unit = this.normalizeUnitValue(value?.unit as MeasurementUnit | string | undefined);
         const minThreshold = value?.minThreshold != null && value.minThreshold !== ''
           ? Number(value.minThreshold)
           : undefined;

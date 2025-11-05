@@ -5,7 +5,9 @@ import {
   AppPreferencesService,
   DEFAULT_LOCATION_OPTIONS,
   DEFAULT_SUPERMARKET_OPTIONS,
+  DEFAULT_UNIT_OPTIONS,
 } from '@core/services';
+import { MeasurementUnit } from '@core/models';
 
 const TOAST_DURATION = 1800;
 
@@ -20,6 +22,7 @@ export class SettingsCatalogsComponent {
   readonly loading = signal(false);
   readonly savingLocations = signal(false);
   readonly savingSupermarkets = signal(false);
+  readonly savingUnits = signal(false);
 
   readonly locationOptionsDraft = signal<string[]>([]);
   readonly originalLocationOptions = signal<string[]>([]);
@@ -37,6 +40,17 @@ export class SettingsCatalogsComponent {
   readonly hasSupermarketChanges = computed(() => {
     const draft = this.normalizeSupermarketOptions(this.supermarketOptionsDraft(), false);
     const original = this.originalSupermarketOptions();
+    if (draft.length !== original.length) {
+      return true;
+    }
+    return draft.some((value, index) => value !== original[index]);
+  });
+
+  readonly unitOptionsDraft = signal<string[]>([]);
+  readonly originalUnitOptions = signal<string[]>([]);
+  readonly hasUnitChanges = computed(() => {
+    const draft = this.normalizeUnitOptions(this.unitOptionsDraft(), false);
+    const original = this.originalUnitOptions();
     if (draft.length !== original.length) {
       return true;
     }
@@ -97,6 +111,51 @@ export class SettingsCatalogsComponent {
     }
   }
 
+  addUnitOption(): void {
+    this.unitOptionsDraft.update(options => [...options, '']);
+  }
+
+  removeUnitOption(index: number): void {
+    this.unitOptionsDraft.update(options => options.filter((_, i) => i !== index));
+  }
+
+  onUnitOptionInput(index: number, event: Event): void {
+    const value = (event as CustomEvent<{ value?: string | null }>).detail?.value ?? '';
+    this.unitOptionsDraft.update(options => {
+      const next = [...options];
+      next[index] = value ?? '';
+      return next;
+    });
+  }
+
+  restoreDefaultUnitOptions(): void {
+    this.unitOptionsDraft.set([...DEFAULT_UNIT_OPTIONS]);
+  }
+
+  async saveUnitOptions(): Promise<void> {
+    if (this.savingUnits()) {
+      return;
+    }
+    const normalizedDraft = this.normalizeUnitOptions(this.unitOptionsDraft(), false);
+    const payload = normalizedDraft.length ? normalizedDraft : [...DEFAULT_UNIT_OPTIONS];
+    this.savingUnits.set(true);
+    try {
+      const current = await this.appPreferencesService.getPreferences();
+      await this.appPreferencesService.savePreferences({
+        ...current,
+        unitOptions: payload,
+      });
+      this.originalUnitOptions.set(payload);
+      this.unitOptionsDraft.set([...payload]);
+      await this.presentToast('Unidades actualizadas.', 'success');
+    } catch (err) {
+      console.error('[SettingsCatalogsComponent] saveUnitOptions error', err);
+      await this.presentToast('No se pudieron guardar las unidades.', 'danger');
+    } finally {
+      this.savingUnits.set(false);
+    }
+  }
+
   addSupermarketOption(): void {
     this.supermarketOptionsDraft.update(options => [...options, '']);
   }
@@ -148,6 +207,7 @@ export class SettingsCatalogsComponent {
       await this.appPreferencesService.getPreferences();
       this.syncLocationOptionsFromPreferences();
       this.syncSupermarketOptionsFromPreferences();
+      this.syncUnitOptionsFromPreferences();
     } catch (err) {
       console.error('[SettingsCatalogsComponent] loadPreferences error', err);
       await this.presentToast('No se pudieron cargar los catálogos.', 'danger');
@@ -170,6 +230,13 @@ export class SettingsCatalogsComponent {
     this.supermarketOptionsDraft.set([...current]);
   }
 
+  private syncUnitOptionsFromPreferences(): void {
+    const prefs = this.appPreferencesService.preferences();
+    const current = this.normalizeUnitOptions(prefs.unitOptions);
+    this.originalUnitOptions.set(current);
+    this.unitOptionsDraft.set([...current]);
+  }
+
   private normalizeLocationOptions(
     values: readonly string[] | null | undefined,
     fallbackToDefault = true,
@@ -184,6 +251,17 @@ export class SettingsCatalogsComponent {
     const normalized = this.normalizeStringOptions(values, DEFAULT_SUPERMARKET_OPTIONS, fallbackToDefault);
     if (!normalized.some(option => option.toLowerCase() === 'otro')) {
       normalized.push('Otro');
+    }
+    return normalized;
+  }
+
+  private normalizeUnitOptions(
+    values: readonly string[] | null | undefined,
+    fallbackToDefault = true,
+  ): string[] {
+    const normalized = this.normalizeStringOptions(values, DEFAULT_UNIT_OPTIONS, fallbackToDefault);
+    if (!normalized.some(option => option.toLowerCase() === MeasurementUnit.UNIT.toLowerCase())) {
+      normalized.push(MeasurementUnit.UNIT);
     }
     return normalized;
   }

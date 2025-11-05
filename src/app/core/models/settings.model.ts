@@ -22,6 +22,7 @@ export interface AppPreferences {
   lastSyncAt?: string | null;
   locationOptions: string[];
   supermarketOptions: string[];
+  unitOptions: string[];
 }
 
 export interface AppPreferencesDoc extends BaseDoc, AppPreferences {}

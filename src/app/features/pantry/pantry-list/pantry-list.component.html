@@ -511,17 +511,6 @@
                       </ion-select>
                     </ion-item>
                     <ion-item>
-                      <ion-select
-                        formControlName="unit"
-                        interface="popover"
-                        label="Unidad"
-                        labelPlacement="stacked">
-                        @for (unit of unitOptions; track unit) {
-                          <ion-select-option [value]="unit">{{ unit }}</ion-select-option>
-                        }
-                      </ion-select>
-                    </ion-item>
-                    <ion-item>
                       <ion-input
                         type="number"
                         min="0"

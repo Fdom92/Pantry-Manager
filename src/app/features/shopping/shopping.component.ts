@@ -14,7 +14,7 @@ interface ShoppingSuggestion {
   suggestedQuantity: number;
   currentQuantity: number;
   minThreshold?: number;
-  unit: MeasurementUnit;
+  unit: string;
   supermarket?: string;
 }
 
@@ -121,8 +121,8 @@ export class ShoppingComponent {
     }
   }
 
-  getUnitLabel(unit: MeasurementUnit): string {
-    return this.pantryStore.getUnitLabel(unit);
+  getUnitLabel(unit: MeasurementUnit | string): string {
+    return this.pantryStore.getUnitLabel(this.normalizeUnit(unit));
   }
 
   getLocationLabel(locationId: string): string {
@@ -155,7 +155,7 @@ export class ShoppingComponent {
       const isBasic = Boolean(item.isBasic);
       for (const location of item.locations) {
         const minThreshold = location.minThreshold != null ? Number(location.minThreshold) : null;
-        const unit = location.unit ?? this.pantryStore.getItemPrimaryUnit(item);
+        const unit = this.normalizeUnit(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
         const quantity = this.getLocationQuantity(location);
 
         let reason: ShoppingReason | null = null;
@@ -280,6 +280,17 @@ export class ShoppingComponent {
       return 0;
     }
     return Math.round(num * 100) / 100;
+  }
+
+  private normalizeUnit(unit?: MeasurementUnit | string | null): string {
+    if (typeof unit !== 'string') {
+      return MeasurementUnit.UNIT;
+    }
+    const trimmed = unit.trim();
+    if (!trimmed) {
+      return MeasurementUnit.UNIT;
+    }
+    return trimmed;
   }
 
 }
