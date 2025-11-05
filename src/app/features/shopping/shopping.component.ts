@@ -5,7 +5,7 @@ import { PantryStoreService } from '@core/store/pantry-store.service';
 import { ItemLocationStock, PantryItem, MeasurementUnit } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
 
-type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out';
+type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';
 
 interface ShoppingSuggestion {
   item: PantryItem;
@@ -51,6 +51,7 @@ export class ShoppingComponent {
     'below-min': 'Below minimum',
     'basic-low': 'Basic item below minimum',
     'basic-out': 'Basic item out of stock',
+    'empty': 'Out of stock',
   };
   readonly unassignedSupermarketLabel = 'Sin supermercado';
   private readonly unassignedSupermarketKey = '__none__';
@@ -170,6 +171,9 @@ export class ShoppingComponent {
         } else if (minThreshold != null && quantity < minThreshold) {
           reason = 'below-min';
           suggestedQuantity = this.ensurePositiveQuantity(minThreshold - quantity, minThreshold);
+        } else if (minThreshold === null && quantity <= 0) {
+          reason = 'empty';
+          suggestedQuantity = this.ensurePositiveQuantity(1);
         }
 
         if (reason) {
