@@ -2,11 +2,10 @@ import { Component, computed, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { PantryStoreService } from '@core/store/pantry-store.service';
-import { SeedService } from '@core/services';
 import { ItemLocationStock, PantryItem, MeasurementUnit } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
 
-type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out';
+type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';
 
 interface ShoppingSuggestion {
   item: PantryItem;
@@ -15,7 +14,7 @@ interface ShoppingSuggestion {
   suggestedQuantity: number;
   currentQuantity: number;
   minThreshold?: number;
-  unit: MeasurementUnit;
+  unit: string;
   supermarket?: string;
 }
 
@@ -52,6 +51,7 @@ export class ShoppingComponent {
     'below-min': 'Below minimum',
     'basic-low': 'Basic item below minimum',
     'basic-out': 'Basic item out of stock',
+    'empty': 'Out of stock',
   };
   readonly unassignedSupermarketLabel = 'Sin supermercado';
   private readonly unassignedSupermarketKey = '__none__';
@@ -69,12 +69,10 @@ export class ShoppingComponent {
 
   constructor(
     private readonly pantryStore: PantryStoreService,
-    private readonly seedService: SeedService,
   ) {}
 
   /** Lifecycle hook: make sure the store is populated before rendering suggestions. */
   async ionViewWillEnter(): Promise<void> {
-    // await this.seedService.ensureSeedData();
     await this.pantryStore.loadAll();
   }
 
@@ -124,8 +122,8 @@ export class ShoppingComponent {
     }
   }
 
-  getUnitLabel(unit: MeasurementUnit): string {
-    return this.pantryStore.getUnitLabel(unit);
+  getUnitLabel(unit: MeasurementUnit | string): string {
+    return this.pantryStore.getUnitLabel(this.normalizeUnit(unit));
   }
 
   getLocationLabel(locationId: string): string {
@@ -158,7 +156,7 @@ export class ShoppingComponent {
       const isBasic = Boolean(item.isBasic);
       for (const location of item.locations) {
         const minThreshold = location.minThreshold != null ? Number(location.minThreshold) : null;
-        const unit = location.unit ?? this.pantryStore.getItemPrimaryUnit(item);
+        const unit = this.normalizeUnit(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
         const quantity = this.getLocationQuantity(location);
 
         let reason: ShoppingReason | null = null;
@@ -173,6 +171,9 @@ export class ShoppingComponent {
         } else if (minThreshold != null && quantity < minThreshold) {
           reason = 'below-min';
           suggestedQuantity = this.ensurePositiveQuantity(minThreshold - quantity, minThreshold);
+        } else if (minThreshold === null && quantity <= 0) {
+          reason = 'empty';
+          suggestedQuantity = this.ensurePositiveQuantity(1);
         }
 
         if (reason) {
@@ -283,6 +284,17 @@ export class ShoppingComponent {
       return 0;
     }
     return Math.round(num * 100) / 100;
+  }
+
+  private normalizeUnit(unit?: MeasurementUnit | string | null): string {
+    if (typeof unit !== 'string') {
+      return MeasurementUnit.UNIT;
+    }
+    const trimmed = unit.trim();
+    if (!trimmed) {
+      return MeasurementUnit.UNIT;
+    }
+    return trimmed;
   }
 
 }

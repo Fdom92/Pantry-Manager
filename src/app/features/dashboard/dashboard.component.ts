@@ -1,10 +1,10 @@
 import { Component, computed, effect, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { SeedService } from '@core/services';
 import { ItemLocationStock, PantryItem } from '@core/models';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { getLocationDisplayName } from '@core/utils';
+import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,7 +14,6 @@ import { getLocationDisplayName } from '@core/utils';
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
-  private readonly NEAR_EXPIRY_DAYS = 3;
   private hasInitialized = false;
 
   readonly lastUpdated = signal<string | null>(null);
@@ -29,7 +28,6 @@ export class DashboardComponent {
   readonly recentItems = computed(() => this.computeRecentItems(this.items()));
 
   constructor(
-    private readonly seedService: SeedService,
     private readonly pantryStore: PantryStoreService
   ) {
     effect(
@@ -52,14 +50,13 @@ export class DashboardComponent {
 
   /** Lifecycle hook: populate dashboard data and stamp the refresh time. */
   async ionViewWillEnter(): Promise<void> {
-    // await this.seedService.ensureSeedData();
     await this.pantryStore.loadAll();
     this.hasInitialized = true;
     this.lastUpdated.set(new Date().toISOString());
   }
 
   get nearExpiryWindow(): number {
-    return this.NEAR_EXPIRY_DAYS;
+    return NEAR_EXPIRY_WINDOW_DAYS;
   }
 
   /** Toggle the visibility of the snapshot card without altering other state. */

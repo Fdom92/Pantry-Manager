@@ -32,6 +32,9 @@ export class PantryStoreService {
     nearExpiry: this.nearExpiryItems().length,
     lowStock: this.lowStockItems().length,
   }));
+  private readonly knownMeasurementUnits = new Set(
+    Object.values(MeasurementUnit).map(option => option.toLowerCase())
+  );
 
   constructor(private readonly pantryService: PantryService) {}
 
@@ -140,13 +143,25 @@ export class PantryStoreService {
   }
 
   /** Return a human friendly unit label; defaults to lowercase plural. */
-  getUnitLabel(unit: MeasurementUnit): string {
-    return unit === MeasurementUnit.UNIT ? 'pcs' : unit.toLowerCase();
+  getUnitLabel(unit: MeasurementUnit | string | undefined): string {
+    const value = typeof unit === 'string' && unit.trim() ? unit.trim() : MeasurementUnit.UNIT;
+    const lower = value.toLowerCase();
+    if (lower === MeasurementUnit.UNIT.toLowerCase()) {
+      return 'pcs';
+    }
+    if (this.knownMeasurementUnits.has(lower)) {
+      return lower;
+    }
+    return value;
   }
 
   /** Helper used by UI layers to choose a representative unit. */
-  getItemPrimaryUnit(item: PantryItem): MeasurementUnit {
-    return item.locations[0]?.unit ?? MeasurementUnit.UNIT;
+  getItemPrimaryUnit(item: PantryItem): MeasurementUnit | string {
+    const unit = item.locations[0]?.unit;
+    if (typeof unit === 'string' && unit.trim()) {
+      return unit.trim();
+    }
+    return MeasurementUnit.UNIT;
   }
 
   /** Sum every location quantity to avoid duplicating reduce logic in components. */

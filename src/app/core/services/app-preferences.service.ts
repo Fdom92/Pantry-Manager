@@ -5,6 +5,7 @@ import {
   AppPreferencesDoc,
   AppThemePreference,
   DefaultUnitPreference,
+  MeasurementUnit,
 } from '@core/models';
 
 const STORAGE_KEY = 'app:preferences';
@@ -22,6 +23,15 @@ export const DEFAULT_SUPERMARKET_OPTIONS = [
   'Otro',
 ];
 
+export const DEFAULT_UNIT_OPTIONS = [
+  MeasurementUnit.GRAM,
+  MeasurementUnit.KILOGRAM,
+  MeasurementUnit.LITER,
+  MeasurementUnit.MILLILITER,
+  MeasurementUnit.PACKAGE,
+  MeasurementUnit.UNIT,
+];
+
 const DEFAULT_PREFERENCES: AppPreferences = {
   theme: 'system',
   defaultUnit: 'unit',
@@ -33,6 +43,7 @@ const DEFAULT_PREFERENCES: AppPreferences = {
   lastSyncAt: null,
   locationOptions: [...DEFAULT_LOCATION_OPTIONS],
   supermarketOptions: [...DEFAULT_SUPERMARKET_OPTIONS],
+  unitOptions: [...DEFAULT_UNIT_OPTIONS],
 };
 
 @Injectable({
@@ -113,6 +124,7 @@ export class AppPreferencesService {
       lastSyncAt: input?.lastSyncAt ?? null,
       locationOptions: this.ensureLocationOptions(input?.locationOptions),
       supermarketOptions: this.ensureSupermarketOptions(input?.supermarketOptions),
+      unitOptions: this.ensureUnitOptions(input?.unitOptions),
     };
   }
 
@@ -190,6 +202,36 @@ export class AppPreferencesService {
     }
     if (!normalized.some(option => option.toLowerCase() === 'otro')) {
       normalized.push('Otro');
+    }
+    return normalized;
+  }
+
+  private ensureUnitOptions(options?: unknown): string[] {
+    if (!Array.isArray(options)) {
+      return [...DEFAULT_UNIT_OPTIONS];
+    }
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+    for (const option of options) {
+      if (typeof option !== 'string') {
+        continue;
+      }
+      const trimmed = option.trim();
+      if (!trimmed) {
+        continue;
+      }
+      const key = trimmed.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      normalized.push(trimmed);
+    }
+    if (!normalized.length) {
+      return [...DEFAULT_UNIT_OPTIONS];
+    }
+    if (!normalized.some(option => option.toLowerCase() === MeasurementUnit.UNIT.toLowerCase())) {
+      normalized.push(MeasurementUnit.UNIT);
     }
     return normalized;
   }

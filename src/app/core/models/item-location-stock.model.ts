@@ -1,9 +1,8 @@
-import { MeasurementUnit } from './enums.model';
 import { ItemBatch } from './item-batch.model';
 
 export interface ItemLocationStock {
   locationId: string;
-  unit: MeasurementUnit;
+  unit: string;
   minThreshold?: number;
   batches?: ItemBatch[];
 }
