@@ -13,6 +13,7 @@ import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { PantryStoreService } from '@core/store/pantry-store.service';
+import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
 interface PantryGroup {
   key: string;
   name: string;
@@ -28,12 +29,14 @@ interface CategoryState {
 
 interface BatchStatusMeta {
   label: string;
-  color: 'danger' | 'warning' | 'success' | 'medium';
   icon: string;
+  state: BatchStatusState;
+  color: 'danger' | 'warning' | 'success' | 'medium';
 }
 
 interface BatchEntryMeta {
   batch: ItemBatch;
+  location: ItemLocationStock;
   locationLabel: string;
   locationUnit: MeasurementUnit | string | undefined;
   status: BatchStatusMeta;
@@ -44,20 +47,77 @@ interface BatchSummaryMeta {
   sorted: BatchEntryMeta[];
 }
 
+interface BatchCountsMeta {
+  total: number;
+  expired: number;
+  nearExpiry: number;
+  normal: number;
+  unknown: number;
+}
+
+type BatchStatusState = 'normal' | 'near-expiry' | 'expired' | 'unknown';
+type ProductStatusState = 'normal' | 'near-expiry' | 'expired';
+
+export interface PantryItemGlobalStatus {
+  state: ProductStatusState;
+  label: string;
+  accentColor: string;
+  chipColor: string;
+  chipTextColor: string;
+}
+
+export interface PantryItemBatchViewModel {
+  batch: ItemBatch;
+  location: ItemLocationStock;
+  locationLabel: string;
+  status: BatchStatusMeta;
+  formattedDate: string;
+  quantityLabel: string;
+  quantityValue: number;
+  unitLabel: string;
+  opened: boolean;
+}
+
+export interface PantryItemCardViewModel {
+  item: PantryItem;
+  globalStatus: PantryItemGlobalStatus;
+  totalQuantity: number;
+  totalQuantityLabel: string;
+  unitLabel: string;
+  totalBatches: number;
+  totalBatchesLabel: string;
+  earliestExpirationDate: string | null;
+  formattedEarliestExpirationShort: string;
+  formattedEarliestExpirationLong: string;
+  batchCountsLabel: string;
+  batchCounts: BatchCountsMeta;
+  batches: PantryItemBatchViewModel[];
+}
+
 @Component({
   selector: 'app-pantry-list',
   standalone: true,
-  imports: [IonicModule, CommonModule, ReactiveFormsModule],
+  imports: [IonicModule, CommonModule, ReactiveFormsModule, PantryDetailComponent],
   templateUrl: './pantry-list.component.html',
   styleUrls: ['./pantry-list.component.scss'],
   animations: [
     trigger('expandCollapse', [
-      state('collapsed', style({ height: '0px', opacity: 0, overflow: 'hidden', marginTop: '0px' })),
+      state('collapsed', style({ height: '0px', opacity: 0, marginTop: '0px' })),
       state('expanded', style({ height: '*', opacity: 1, marginTop: '16px' })),
       transition('collapsed <=> expanded', [
         animate('180ms ease-in-out')
       ]),
-    ])
+    ]),
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-2px)' }),
+        animate('140ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+      transition('* => *', [
+        style({ opacity: 0.4, transform: 'translateY(-1px)' }),
+        animate('140ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+    ]),
   ],
 })
 export class PantryListComponent implements OnDestroy {
@@ -80,7 +140,7 @@ export class PantryListComponent implements OnDestroy {
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
   readonly loading = this.pantryStore.loading;
-  readonly nearExpiryDays = 3;
+  readonly nearExpiryDays = 7;
   readonly MeasurementUnit = MeasurementUnit;
   showCreateModal = false;
   editingItem: PantryItem | null = null;
@@ -352,28 +412,59 @@ export class PantryListComponent implements OnDestroy {
   }
 
   /**
-   * Apply a quantity delta to a specific location, optimistically update the UI,
-   * and debounce persistence to avoid spamming storage.
+   * Apply a quantity delta directly to a single batch and refresh the derived totals/state.
+   * Keeps the item signal in sync without forcing a full reload.
    */
-  async adjustLocationQuantity(item: PantryItem, location: ItemLocationStock, delta: number, event?: Event): Promise<void> {
+  async adjustBatchQuantity(
+    item: PantryItem,
+    location: ItemLocationStock,
+    batch: ItemBatch,
+    delta: number,
+    event?: Event
+  ): Promise<void> {
     event?.stopPropagation();
-    if (!item?._id || !location?.locationId) {
-      return;
-    }
-    const prevQuantity = this.getLocationTotal(location);
-    const next = Math.max(0, prevQuantity + delta);
-    if (next === prevQuantity) {
+    if (!item?._id || !location?.locationId || !Number.isFinite(delta) || delta === 0) {
       return;
     }
 
-    const updatedLocal = this.updateLocalLocationQuantity(item._id, location.locationId, next);
-    await this.provideQuantityFeedback(prevQuantity, next);
-    if (updatedLocal) {
-      this.triggerStockSave(item._id, updatedLocal);
+    const unit = this.normalizeUnitValue(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
+    const originalBatches = Array.isArray(location.batches) ? location.batches : [];
+    const targetIndex = originalBatches.indexOf(batch);
+    const sanitizedBatches = this.sanitizeBatches(location.batches, unit);
+    const batchIndex = targetIndex >= 0 ? targetIndex : sanitizedBatches.findIndex(entry => entry.batchId === batch.batchId);
+
+    if (batchIndex < 0) {
+      return;
     }
 
-    if (updatedLocal && next === 0) {
-      await this.presentToast(`"${updatedLocal.name}" added to shopping list suggestions`, 'success');
+    const previousTotal = this.sumBatchQuantities(sanitizedBatches);
+    const currentBatchQuantity = this.toNumber(sanitizedBatches[batchIndex].quantity);
+    const nextBatchQuantity = this.roundDisplayQuantity(Math.max(0, currentBatchQuantity + delta));
+
+    if (nextBatchQuantity === currentBatchQuantity) {
+      return;
+    }
+
+    if (nextBatchQuantity <= 0) {
+      sanitizedBatches.splice(batchIndex, 1);
+    } else {
+      sanitizedBatches[batchIndex] = {
+        ...sanitizedBatches[batchIndex],
+        quantity: nextBatchQuantity,
+      };
+    }
+
+    const nextTotal = this.sumBatchQuantities(sanitizedBatches);
+    const updatedItem = this.applyLocationBatches(item._id, location.locationId, sanitizedBatches);
+    if (!updatedItem) {
+      return;
+    }
+
+    await this.provideQuantityFeedback(previousTotal, nextTotal);
+    this.triggerStockSave(item._id, updatedItem);
+
+    if (previousTotal > 0 && nextTotal === 0) {
+      await this.presentToast(`"${updatedItem.name}" added to shopping list suggestions`, 'success');
     }
   }
 
@@ -444,42 +535,6 @@ export class PantryListComponent implements OnDestroy {
 
   getLocationLabel(locationId: string | undefined): string {
     return getLocationDisplayName(locationId, 'Sin ubicación');
-  }
-
-  /** Derive a human-readable status badge plus tone for the item card header. */
-  getStatus(item: PantryItem): { label: string; color: string; tone: 'normal' | 'low' | 'warning' | 'danger' } {
-    const quantity = this.getTotalQuantity(item);
-    if (this.isExpired(item)) {
-      return { label: 'Caducado', color: 'danger', tone: 'danger' };
-    }
-    if (this.isNearExpiry(item)) {
-      return { label: 'Próx. a caducar', color: 'warning', tone: 'warning' };
-    }
-    if (quantity === 0) {
-      return { label: 'Sin stock', color: 'danger', tone: 'danger' };
-    }
-    if (this.isLowStock(item)) {
-      return { label: 'Bajo', color: 'warning', tone: 'low' };
-    }
-    return { label: 'Normal', color: 'success', tone: 'normal' };
-  }
-
-  /** Pair the status with an icon that conveys urgency at a glance. */
-  getStatusIcon(item: PantryItem): string {
-    const quantity = this.getTotalQuantity(item);
-    if (this.isExpired(item)) {
-      return 'alert-circle-outline';
-    }
-    if (this.isNearExpiry(item)) {
-      return 'hourglass-outline';
-    }
-    if (quantity === 0) {
-      return 'alert-circle-outline';
-    }
-    if (this.isLowStock(item)) {
-      return 'trending-down-outline';
-    }
-    return 'checkmark-circle-outline';
   }
 
   onSummaryKeydown(item: PantryItem, event: KeyboardEvent): void {
@@ -843,21 +898,66 @@ export class PantryListComponent implements OnDestroy {
     return this.getBatchSummary(item).sorted;
   }
 
+  buildItemCardViewModel(item: PantryItem): PantryItemCardViewModel {
+    const totalQuantity = this.getTotalQuantity(item);
+    const unitLabel = this.getUnitLabelForItem(item);
+    const totalBatches = this.getTotalBatchCount(item);
+    const formattedQuantityValue = this.roundDisplayQuantity(totalQuantity).toLocaleString('es-ES', {
+      maximumFractionDigits: 2,
+    });
+    const baseQuantityLabel = unitLabel ? `${formattedQuantityValue} ${unitLabel}` : formattedQuantityValue;
+    const totalQuantityLabel = `${baseQuantityLabel} total`;
+    const totalBatchesLabel = totalBatches === 1 ? '1 lote' : `${totalBatches} lotes`;
+
+    const summary = this.getBatchSummary(item);
+    const batches = summary.sorted.map(entry => ({
+      batch: entry.batch,
+      location: entry.location,
+      locationLabel: entry.locationLabel,
+      status: entry.status,
+      formattedDate: this.formatBatchDate(entry.batch),
+      quantityLabel: this.formatBatchQuantity(entry.batch, entry.locationUnit),
+      quantityValue: this.toNumber(entry.batch.quantity),
+      unitLabel: this.getUnitLabel(this.normalizeUnitValue(entry.locationUnit)),
+      opened: Boolean(entry.batch.opened),
+    }));
+
+    const aggregates = this.computeProductAggregates(batches);
+
+    return {
+      item,
+      totalQuantity,
+      totalQuantityLabel,
+      unitLabel,
+      totalBatches,
+      totalBatchesLabel,
+      globalStatus: aggregates.status,
+      earliestExpirationDate: aggregates.earliestDate,
+      formattedEarliestExpirationShort: aggregates.earliestDate
+        ? this.formatDateCompact(aggregates.earliestDate)
+        : 'Sin fecha',
+      formattedEarliestExpirationLong: aggregates.earliestDate
+        ? this.formatDateVerbose(aggregates.earliestDate)
+        : 'Sin fecha',
+      batchCountsLabel: aggregates.batchSummaryLabel,
+      batchCounts: aggregates.counts,
+      batches,
+    };
+  }
+
   formatBatchDate(batch: ItemBatch): string {
     const value = batch.expirationDate;
     if (!value) {
       return 'Sin fecha';
     }
     try {
-      return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).format(
-        new Date(value)
-      );
+      return this.formatDateVerbose(value);
     } catch {
       return value;
     }
   }
 
-  formatBatchQuantity(batch: ItemBatch, locationUnit: string | MeasurementUnit): string {
+  formatBatchQuantity(batch: ItemBatch, locationUnit: string | MeasurementUnit | undefined): string {
     const formatted = this.roundDisplayQuantity(this.toNumber(batch.quantity)).toLocaleString('es-ES', {
       maximumFractionDigits: 2,
     });
@@ -865,18 +965,156 @@ export class PantryListComponent implements OnDestroy {
     return `${formatted} ${unitLabel}`;
   }
 
+  private computeProductAggregates(batches: PantryItemBatchViewModel[]): {
+    status: PantryItemGlobalStatus;
+    earliestDate: string | null;
+    counts: BatchCountsMeta;
+    batchSummaryLabel: string;
+  } {
+    const counts: BatchCountsMeta = {
+      total: batches.length,
+      expired: 0,
+      nearExpiry: 0,
+      normal: 0,
+      unknown: 0,
+    };
+
+    let earliestDate: string | null = null;
+    let earliestTime: number | null = null;
+
+    for (const entry of batches) {
+      switch (entry.status.state) {
+        case 'expired':
+          counts.expired += 1;
+          break;
+        case 'near-expiry':
+          counts.nearExpiry += 1;
+          break;
+        case 'normal':
+          counts.normal += 1;
+          break;
+        default:
+          counts.unknown += 1;
+          break;
+      }
+
+      if (entry.batch.expirationDate) {
+        const time = this.getBatchTime(entry.batch);
+        if (time !== null && (earliestTime === null || time < earliestTime)) {
+          earliestTime = time;
+          earliestDate = entry.batch.expirationDate;
+        }
+      }
+    }
+
+    const statusState: ProductStatusState =
+      counts.expired > 0 ? 'expired' : counts.nearExpiry > 0 ? 'near-expiry' : 'normal';
+
+    const status = this.getProductStatusMeta(statusState);
+    const batchSummaryLabel = this.buildBatchSummaryLabel(counts);
+
+    return {
+      status,
+      earliestDate,
+      counts,
+      batchSummaryLabel,
+    };
+  }
+
+  private formatDateCompact(value: string): string {
+    try {
+      return new Intl.DateTimeFormat('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      }).format(new Date(value));
+    } catch {
+      return value;
+    }
+  }
+
+  private formatDateVerbose(value: string): string {
+    try {
+      return new Intl.DateTimeFormat('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).format(new Date(value));
+    } catch {
+      return value;
+    }
+  }
+
+  private getProductStatusMeta(state: ProductStatusState): PantryItemGlobalStatus {
+    switch (state) {
+      case 'expired':
+        return {
+          state,
+          label: 'Caducado',
+          accentColor: '#B91C1C',
+          chipColor: '#B91C1C',
+          chipTextColor: '#F8FAFC',
+        };
+      case 'near-expiry':
+        return {
+          state,
+          label: 'Próximo a vencer',
+          accentColor: '#EA580C',
+          chipColor: '#EA580C',
+          chipTextColor: '#F8FAFC',
+        };
+      default:
+        return {
+          state: 'normal',
+          label: 'Normal',
+          accentColor: '#15803D',
+          chipColor: '#15803D',
+          chipTextColor: '#F8FAFC',
+        };
+    }
+  }
+
+  private buildBatchSummaryLabel(counts: BatchCountsMeta): string {
+    if (!counts.total) {
+      return 'Sin lotes registrados';
+    }
+
+    const descriptors: string[] = [];
+    if (counts.expired) {
+      descriptors.push(`${counts.expired} caducado${counts.expired > 1 ? 's' : ''}`);
+    }
+    if (counts.nearExpiry) {
+      descriptors.push(`${counts.nearExpiry} próximo${counts.nearExpiry > 1 ? 's' : ''} a vencer`);
+    }
+    if (counts.normal) {
+      descriptors.push(`${counts.normal} vigente${counts.normal > 1 ? 's' : ''}`);
+    }
+    if (counts.unknown) {
+      descriptors.push(`${counts.unknown} sin fecha`);
+    }
+
+    const totalLabel = counts.total === 1 ? '1 lote' : `${counts.total} lotes`;
+    return descriptors.length ? `${totalLabel} (${descriptors.join(', ')})` : totalLabel;
+  }
+
   private getBatchSummary(item: PantryItem): BatchSummaryMeta {
     return this.batchSummaries().get(item._id) ?? { total: 0, sorted: [] };
   }
 
-  private collectBatches(item: PantryItem): Array<{ batch: ItemBatch; locationLabel: string; locationUnit: MeasurementUnit | string | undefined }> {
-    const batches: Array<{ batch: ItemBatch; locationLabel: string; locationUnit: MeasurementUnit | string | undefined }> = [];
+  private collectBatches(item: PantryItem): BatchEntryMeta[] {
+    const batches: BatchEntryMeta[] = [];
     for (const location of item.locations) {
       const locationLabel = this.getLocationLabel(location.locationId);
       const locationUnit = this.normalizeUnitValue(location.unit);
       const entries = this.getLocationBatches(location);
       for (const batch of entries) {
-        batches.push({ batch, locationLabel, locationUnit });
+        batches.push({
+          batch,
+          location,
+          locationLabel,
+          locationUnit,
+          status: this.getBatchStatus(batch),
+        });
       }
     }
     return batches;
@@ -907,9 +1145,10 @@ export class PantryListComponent implements OnDestroy {
         })
         .map(entry => ({
           batch: entry.batch,
+          location: entry.location,
           locationLabel: entry.locationLabel,
           locationUnit: entry.locationUnit,
-          status: this.getBatchStatus(entry.batch),
+          status: entry.status,
         }));
 
       summaries.set(item._id, {
@@ -928,24 +1167,24 @@ export class PantryListComponent implements OnDestroy {
     return Number.isFinite(time) ? time : null;
   }
 
-  private getBatchStatus(batch: ItemBatch): BatchStatusMeta {
+  getBatchStatus(batch: ItemBatch): BatchStatusMeta {
     const now = new Date();
     const nearExpiryThreshold = new Date();
     nearExpiryThreshold.setDate(now.getDate() + this.nearExpiryDays);
     if (!batch.expirationDate) {
-      return { label: 'Sin fecha', color: 'medium', icon: 'remove-circle-outline' };
+      return { label: 'Sin fecha', icon: 'remove-circle-outline', state: 'unknown', color: 'medium' };
     }
     const expiryDate = new Date(batch.expirationDate);
     if (!Number.isFinite(expiryDate.getTime())) {
-      return { label: 'Sin fecha', color: 'medium', icon: 'remove-circle-outline' };
+      return { label: 'Sin fecha', icon: 'remove-circle-outline', state: 'unknown', color: 'medium' };
     }
     if (expiryDate < now) {
-      return { label: 'Caducado', color: 'danger', icon: 'alert-circle-outline' };
+      return { label: 'Caducado', icon: 'alert-circle-outline', state: 'expired', color: 'danger' };
     }
     if (expiryDate <= nearExpiryThreshold) {
-      return { label: 'Próx. caducar', color: 'warning', icon: 'hourglass-outline' };
+      return { label: 'Próximo a vencer', icon: 'hourglass-outline', state: 'near-expiry', color: 'warning' };
     }
-    return { label: 'Vigente', color: 'success', icon: 'checkmark-circle-outline' };
+    return { label: 'Vigente', icon: 'checkmark-circle-outline', state: 'normal', color: 'success' };
   }
 
   /** Return the earliest expiry date present in the provided locations array. */
@@ -972,6 +1211,22 @@ export class PantryListComponent implements OnDestroy {
 
   getLocationBatches(location: ItemLocationStock): ItemBatch[] {
     return Array.isArray(location.batches) ? location.batches : [];
+  }
+
+  getLocationMeta(location: ItemLocationStock): string {
+    const batches = this.getLocationBatches(location);
+    if (!batches.length) {
+      return '';
+    }
+    const earliest = this.getLocationEarliestExpiry(location);
+    if (earliest) {
+      return `Caduca: ${this.formatShortDate(earliest)}`;
+    }
+    const openedCount = batches.filter(batch => batch.opened).length;
+    if (openedCount > 0) {
+      return openedCount === 1 ? '1 lote abierto' : `${openedCount} lotes abiertos`;
+    }
+    return 'Sin caducidad registrada';
   }
 
   getLocationTotal(location: ItemLocationStock): number {
@@ -1024,106 +1279,48 @@ export class PantryListComponent implements OnDestroy {
    * Mutate the local signal cache to reflect a quantity change before persistence.
    * Ensures a location entry exists even if the delta introduces a new bucket.
    */
-  private updateLocalLocationQuantity(itemId: string, locationId: string, quantity: number): PantryItem | null {
+  private applyLocationBatches(itemId: string, locationId: string, batches: ItemBatch[]): PantryItem | null {
     let updatedItem: PantryItem | null = null;
     this.itemsState.update(items =>
       items.map(item => {
         if (item._id !== itemId) {
           return item;
         }
+
+        const unitFallback = this.normalizeUnitValue(
+          item.locations.find(loc => loc.locationId === locationId)?.unit ?? this.getPrimaryUnit(item)
+        );
+
         let found = false;
         const nextLocations = item.locations.map(loc => {
           if (loc.locationId === locationId) {
             found = true;
-            const unit = this.normalizeUnitValue(loc.unit);
+            const normalizedUnit = this.normalizeUnitValue(loc.unit ?? unitFallback);
             return {
               ...loc,
-              unit,
-              batches: this.adjustBatchesForTotal(loc.batches, unit, quantity),
+              unit: normalizedUnit,
+              batches: this.sanitizeBatches(batches, normalizedUnit),
             };
           }
           return loc;
         });
 
         if (!found) {
-          const unit = this.normalizeUnitValue(item.locations[0]?.unit);
+          const normalizedUnit = this.normalizeUnitValue(unitFallback);
           nextLocations.push({
             locationId,
-            unit,
-            batches: this.adjustBatchesForTotal([], unit, quantity),
+            unit: normalizedUnit,
+            batches: this.sanitizeBatches(batches, normalizedUnit),
           });
         }
 
-        const updated: PantryItem = {
-          ...item,
-          locations: nextLocations,
-          expirationDate: this.computeEarliestExpiry(nextLocations),
-          updatedAt: new Date().toISOString(),
-        };
-
-        updatedItem = updated;
-        return updated;
+        const rebuilt = this.rebuildItemWithLocations(item, nextLocations);
+        updatedItem = rebuilt;
+        return rebuilt;
       })
     );
 
     return updatedItem;
-  }
-
-  private adjustBatchesForTotal(
-    batches: ItemBatch[] | undefined,
-    unit: MeasurementUnit | string,
-    nextTotal: number
-  ): ItemBatch[] {
-    const target = Math.max(0, Number(nextTotal) || 0);
-    if (target <= 0) {
-      return [];
-    }
-
-    const sanitized = this.sanitizeBatches(batches, unit);
-    const currentTotal = this.sumBatchQuantities(sanitized);
-
-    if (Math.abs(currentTotal - target) < 1e-9) {
-      return sanitized;
-    }
-
-    if (currentTotal === 0) {
-      const normalizedUnit = this.normalizeUnitValue(unit);
-      return [
-        {
-          batchId: this.createTempBatchId(),
-          quantity: target,
-          unit: normalizedUnit,
-          opened: false,
-        },
-      ];
-    }
-
-    const adjusted = sanitized.map(batch => ({ ...batch }));
-    let delta = target - currentTotal;
-
-    if (delta > 0) {
-      adjusted[0].quantity = this.roundDisplayQuantity(this.toNumber(adjusted[0].quantity) + delta);
-      adjusted[0].unit = this.normalizeUnitValue(adjusted[0].unit ?? unit);
-      return adjusted;
-    }
-
-    delta = Math.abs(delta);
-    for (let i = adjusted.length - 1; i >= 0 && delta > 0; i--) {
-      const qty = this.toNumber(adjusted[i].quantity);
-      if (qty <= delta + 1e-9) {
-        delta -= qty;
-        adjusted.splice(i, 1);
-      } else {
-        adjusted[i].quantity = this.roundDisplayQuantity(qty - delta);
-        delta = 0;
-      }
-    }
-
-    if (delta > 0) {
-      return [];
-    }
-
-    return adjusted.filter(batch => this.toNumber(batch.quantity) > 0);
   }
 
   private sanitizeBatches(batches: ItemBatch[] | undefined, unit: MeasurementUnit | string): ItemBatch[] {
@@ -1133,6 +1330,7 @@ export class PantryListComponent implements OnDestroy {
     const normalizedUnit = this.normalizeUnitValue(unit);
     return batches.map(batch => ({
       ...batch,
+      batchId: batch.batchId ?? this.createTempBatchId(),
       quantity: this.toNumber(batch.quantity),
       unit: this.normalizeUnitValue(batch.unit ?? normalizedUnit),
       opened: batch.opened ?? false,
@@ -1143,7 +1341,8 @@ export class PantryListComponent implements OnDestroy {
     if (!Array.isArray(batches) || !batches.length) {
       return 0;
     }
-    return batches.reduce((sum, batch) => sum + this.toNumber(batch.quantity), 0);
+    const total = batches.reduce((sum, batch) => sum + this.toNumber(batch.quantity), 0);
+    return this.roundDisplayQuantity(total);
   }
 
   private toNumber(value: unknown): number {
@@ -1153,6 +1352,27 @@ export class PantryListComponent implements OnDestroy {
 
   private createTempBatchId(): string {
     return `batch:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  private updateLocationTotals(locations: ItemLocationStock[]): ItemLocationStock[] {
+    return locations.map(location => {
+      const unit = this.normalizeUnitValue(location.unit);
+      return {
+        ...location,
+        unit,
+        batches: this.sanitizeBatches(location.batches, unit),
+      };
+    });
+  }
+
+  private rebuildItemWithLocations(item: PantryItem, locations: ItemLocationStock[]): PantryItem {
+    const normalizedLocations = this.updateLocationTotals(locations);
+    return {
+      ...item,
+      locations: normalizedLocations,
+      expirationDate: this.computeEarliestExpiry(normalizedLocations),
+      updatedAt: new Date().toISOString(),
+    };
   }
 
   /** Debounce stock writes so rapid tap interactions batch into fewer saves. */
