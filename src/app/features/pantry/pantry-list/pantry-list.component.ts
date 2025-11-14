@@ -159,6 +159,7 @@ export class PantryListComponent implements OnDestroy {
       nonNullable: true,
     }),
     isBasic: this.fb.control(false),
+    minThreshold: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
     notes: this.fb.control(''),
     locations: this.fb.array([
       this.createLocationGroup({
@@ -249,6 +250,7 @@ export class PantryListComponent implements OnDestroy {
       categoryId: '',
       supermarket: '',
       isBasic: false,
+      minThreshold: null,
       notes: ''
     });
     this.resetLocationControls([
@@ -269,6 +271,7 @@ export class PantryListComponent implements OnDestroy {
       categoryId: item.categoryId ?? '',
       supermarket: item.supermarket ?? '',
       isBasic: Boolean(item.isBasic),
+      minThreshold: item.minThreshold ?? null,
       notes: ''
     });
     const locations = item.locations.length
@@ -277,7 +280,6 @@ export class PantryListComponent implements OnDestroy {
           locationId: '',
           quantity: 0,
           unit: this.pantryStore.getItemPrimaryUnit(item),
-          minThreshold: undefined,
           batches: [],
         }];
     this.resetLocationControls(locations);
@@ -320,9 +322,6 @@ export class PantryListComponent implements OnDestroy {
       unit: this.fb.control<string>(this.normalizeUnitValue(initial?.unit), {
         nonNullable: true,
       }),
-      minThreshold: this.fb.control(
-        initial?.minThreshold != null ? Number(initial.minThreshold) : null
-      ),
       batches: this.fb.array(
         batches.map(batch => this.createBatchGroup(batch))
       ),
@@ -1538,14 +1537,20 @@ export class PantryListComponent implements OnDestroy {
    * handling type conversion, default location creation, and legacy compatibility.
    */
   private buildItemPayload(existing?: PantryItem): PantryItem {
-    const { name, categoryId, isBasic, supermarket } = this.form.value as {
+    const { name, categoryId, isBasic, supermarket, minThreshold } = this.form.value as {
       name?: string;
       categoryId?: string;
       isBasic?: boolean;
       supermarket?: string;
+      minThreshold?: number | string | null;
     };
     const identifier = existing?._id ?? createDocumentId('item');
     const now = new Date().toISOString();
+    let normalizedMinThreshold: number | undefined;
+    if (minThreshold !== null && minThreshold !== undefined && minThreshold !== '') {
+      const numericValue = Number(minThreshold);
+      normalizedMinThreshold = Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
+    }
 
     const locations: ItemLocationStock[] = this.locationsArray.controls
       .map(control => {
@@ -1555,10 +1560,6 @@ export class PantryListComponent implements OnDestroy {
           return null;
         }
         const unit = this.normalizeUnitValue(value?.unit as MeasurementUnit | string | undefined);
-        const minThreshold = value?.minThreshold != null && value.minThreshold !== ''
-          ? Number(value.minThreshold)
-          : undefined;
-
         const batchesControl = control.get('batches');
         const batches = batchesControl instanceof FormArray
           ? (batchesControl.controls as FormGroup[]).map(group => {
@@ -1588,7 +1589,6 @@ export class PantryListComponent implements OnDestroy {
         return {
           locationId: rawLocationId,
           unit,
-          minThreshold,
           batches: normalizedBatches,
         } as ItemLocationStock;
       })
@@ -1614,6 +1614,7 @@ export class PantryListComponent implements OnDestroy {
       locations,
       supermarket: normalizedSupermarket,
       isBasic: isBasic ? true : undefined,
+      minThreshold: normalizedMinThreshold,
       expirationDate: earliestExpiry,
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,

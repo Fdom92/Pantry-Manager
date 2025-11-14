@@ -12,6 +12,7 @@ export interface PantryItem extends BaseDoc {
   barcode?: string;
   locations: ItemLocationStock[];
   isBasic?: boolean;
+  minThreshold?: number;
   expirationDate?: string;
   expirationStatus?: ExpirationStatus;
 }
