@@ -34,7 +34,6 @@ export class SeedService {
           {
             locationId: 'pantry',
             unit: MeasurementUnit.KILOGRAM,
-            minThreshold: 3,
             batches: [
               {
                 batchId: 'batch:seed-rice-1',
@@ -54,7 +53,6 @@ export class SeedService {
           {
             locationId: 'kitchen',
             unit: MeasurementUnit.KILOGRAM,
-            minThreshold: 1,
             batches: [
               {
                 batchId: 'batch:seed-rice-3',
@@ -67,6 +65,7 @@ export class SeedService {
           },
         ],
         isBasic: true,
+        minThreshold: 4,
         categoryId: 'category:grains',
         expirationDate: plusDays(30),
         createdAt: nowIso,
@@ -81,7 +80,6 @@ export class SeedService {
           {
             locationId: 'fridge',
             unit: MeasurementUnit.UNIT,
-            minThreshold: 8,
             batches: [
               {
                 batchId: 'batch:seed-milk-1',
@@ -100,6 +98,7 @@ export class SeedService {
           },
         ],
         isBasic: true,
+        minThreshold: 8,
         categoryId: 'category:dairy',
         expirationDate: plusDays(7),
         createdAt: nowIso,
@@ -114,7 +113,6 @@ export class SeedService {
           {
             locationId: 'fridge',
             unit: MeasurementUnit.UNIT,
-            minThreshold: 18,
             batches: [
               {
                 batchId: 'batch:seed-eggs-1',
@@ -127,6 +125,7 @@ export class SeedService {
           },
         ],
         isBasic: true,
+        minThreshold: 18,
         categoryId: 'category:dairy',
         expirationDate: plusDays(14),
         createdAt: nowIso,
@@ -141,7 +140,6 @@ export class SeedService {
           {
             locationId: 'pantry',
             unit: MeasurementUnit.KILOGRAM,
-            minThreshold: 2,
             batches: [
               {
                 batchId: 'batch:seed-apples-1',
@@ -161,7 +159,6 @@ export class SeedService {
           {
             locationId: 'fridge',
             unit: MeasurementUnit.KILOGRAM,
-            minThreshold: 1,
             batches: [
               {
                 batchId: 'batch:seed-apples-3',
@@ -172,6 +169,7 @@ export class SeedService {
             ],
           },
         ],
+        minThreshold: 3,
         categoryId: 'category:produce',
         expirationDate: plusDays(5),
         createdAt: nowIso,
@@ -186,7 +184,6 @@ export class SeedService {
           {
             locationId: 'pantry',
             unit: MeasurementUnit.UNIT,
-            minThreshold: 2,
             batches: [
               {
                 batchId: 'batch:seed-bread-1',
@@ -199,6 +196,7 @@ export class SeedService {
           },
         ],
         isBasic: true,
+        minThreshold: 2,
         categoryId: 'category:bakery',
         expirationDate: minusDays(1),
         createdAt: nowIso,
@@ -213,7 +211,6 @@ export class SeedService {
           {
             locationId: 'pantry',
             unit: MeasurementUnit.LITER,
-            minThreshold: 1,
             batches: [
               {
                 batchId: 'batch:seed-oil-1',
@@ -225,6 +222,7 @@ export class SeedService {
           },
         ],
         isBasic: true,
+        minThreshold: 1,
         categoryId: 'category:pantry',
         expirationDate: plusDays(365),
         createdAt: nowIso,
@@ -239,7 +237,6 @@ export class SeedService {
           {
             locationId: 'fridge',
             unit: MeasurementUnit.KILOGRAM,
-            minThreshold: 0.8,
             batches: [
               {
                 batchId: 'batch:seed-blueberries-1',
@@ -257,6 +254,7 @@ export class SeedService {
             ],
           },
         ],
+        minThreshold: 0.8,
         categoryId: 'category:produce',
         expirationDate: plusDays(2),
         createdAt: nowIso,
@@ -271,7 +269,6 @@ export class SeedService {
           {
             locationId: 'fridge',
             unit: MeasurementUnit.UNIT,
-            minThreshold: 2,
             batches: [
               {
                 batchId: 'batch:seed-butter-1',
@@ -284,6 +281,7 @@ export class SeedService {
           },
         ],
         isBasic: true,
+        minThreshold: 2,
         categoryId: 'category:dairy',
         expirationDate: plusDays(30),
         createdAt: nowIso,
@@ -298,7 +296,6 @@ export class SeedService {
           {
             locationId: 'fridge',
             unit: MeasurementUnit.KILOGRAM,
-            minThreshold: 0.8,
             batches: [
               {
                 batchId: 'batch:seed-salad-1',
@@ -310,6 +307,7 @@ export class SeedService {
             ],
           },
         ],
+        minThreshold: 0.8,
         categoryId: 'category:produce',
         expirationDate: minusDays(3),
         createdAt: nowIso,

@@ -1,3 +1,115 @@
-<p>
-  El detalle de la despensa funciona.
-</p>
+<ion-card
+  class="pantry-item-card"
+  [attr.data-status]="viewModel.globalStatus.state"
+  [style.--card-accent]="viewModel.globalStatus.accentColor"
+  [ngClass]="expanded ? 'is-expanded' : ''">
+  <div
+    class="card-summary"
+    role="button"
+    tabindex="0"
+    (click)="handleToggle($event)"
+    (keydown)="handleSummaryKeydown($event)">
+    <div class="summary-header">
+      <div class="summary-title">
+        <div class="title-row">
+          @if (viewModel.item.isBasic) {
+            <ion-icon class="basic-icon" name="star"></ion-icon>
+          }
+          <span class="summary-name">{{ viewModel.item.name }}</span>
+        </div>
+      </div>
+      <ion-icon
+        class="summary-toggle-icon"
+        [name]="expanded ? 'chevron-up-outline' : 'chevron-down-outline'">
+      </ion-icon>
+    </div>
+    <div class="summary-info">
+      <div class="summary-row">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>Caduca primero: {{ viewModel.formattedEarliestExpirationLong }}</span>
+      </div>
+      <div class="summary-row meta">
+        <ion-icon name="layers-outline"></ion-icon>
+        <span>{{ viewModel.batchCountsLabel }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="item-details" [@expandCollapse]="expanded ? 'expanded' : 'collapsed'">
+    @if (expanded) {
+      <div class="expanded-content">
+        <section class="batch-section">
+          @if (!viewModel.batches.length) {
+            <ion-text color="medium" class="empty-state">
+              Sin lotes registrados.
+            </ion-text>
+          } @else {
+            <div class="batch-list">
+              @for (batch of viewModel.batches; track trackBatch($index, batch)) {
+                <article class="batch-row" [attr.data-status]="batch.status.state">
+                  <div class="batch-expiration">
+                    <span class="batch-date"><ion-icon name="calendar-outline"></ion-icon>{{ batch.formattedDate }}</span>
+                    <span class="status-chip" [attr.data-status]="batch.status.state">
+                      {{ batch.status.label }}
+                    </span>
+                  </div>
+                  <div class="batch-main">
+                    <ion-icon class="batch-icon" name="location-outline"></ion-icon>
+                    <div class="batch-info">
+                      <span class="batch-location">{{ batch.locationLabel }}</span>
+                    </div>
+                  </div>
+                  <div class="batch-meta">
+                    <span class="batch-quantity" [@fadeIn]="batch.quantityValue">
+                      {{ batch.quantityLabel }}
+                    </span>
+                    <!--  -->
+                    <div class="batch-actions">
+                      <ion-button
+                        fill="clear"
+                        size="small"
+                        color="primary"
+                        (click)="handleAdjustBatch(batch.location, batch.batch, -1, $event)"
+                        [disabled]="batch.quantityValue <= 0">
+                        <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+                      </ion-button>
+                      <ion-button
+                        fill="clear"
+                        size="small"
+                        color="primary"
+                        (click)="handleAdjustBatch(batch.location, batch.batch, 1, $event)">
+                        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                      </ion-button>
+                    </div>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </section>
+
+        <div class="card-actions">
+          <ion-button
+            fill="outline"
+            size="small"
+            (click)="handleOpenBatches($event)">
+            <ion-icon slot="icon-only" name="list-outline"></ion-icon>
+          </ion-button>
+          <ion-button
+            fill="outline"
+            size="small"
+            (click)="handleEdit($event)">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button
+            fill="outline"
+            color="danger"
+            size="small"
+            (click)="handleDelete($event)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    }
+  </div>
+</ion-card>

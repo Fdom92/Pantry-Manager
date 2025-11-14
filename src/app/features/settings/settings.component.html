@@ -55,7 +55,20 @@
       </ion-item>
     </ion-list>
 
-    <ion-list lines="full">
+    <ion-list>
+      <ion-item
+        lines="none"
+        button
+        detail="true"
+        routerLink="/settings/catalogos">
+        <ion-label>
+          <h3>Catálogos</h3>
+          <p>Gestiona las listas reutilizadas al organizar la despensa.</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list>
       <ion-list-header>
         <ion-label>
           <h2>Información</h2>
@@ -63,14 +76,14 @@
         </ion-label>
       </ion-list-header>
 
-      <ion-item>
+      <ion-item lines="none">
         <ion-label>
           <h3>Versión</h3>
           <p>{{ appVersion }}</p>
         </ion-label>
       </ion-item>
 
-      <ion-item>
+      <ion-item lines="none">
         <ion-label>
           <h3>Última sincronización</h3>
           <p>{{ lastSyncDisplay() }}</p>

@@ -5,10 +5,32 @@ import {
   AppPreferencesDoc,
   AppThemePreference,
   DefaultUnitPreference,
+  MeasurementUnit,
 } from '@core/models';
 
 const STORAGE_KEY = 'app:preferences';
 const DOC_TYPE = 'app-preferences';
+
+export const DEFAULT_LOCATION_OPTIONS = ['Despensa', 'Nevera', 'Cocina', 'Congelador'];
+export const DEFAULT_SUPERMARKET_OPTIONS = [
+  'Lidl',
+  'Mercadona',
+  'Carrefour',
+  'Aldi',
+  'Costco',
+  'Ahorramas',
+  'Merkocash',
+  'Otro',
+];
+
+export const DEFAULT_UNIT_OPTIONS = [
+  MeasurementUnit.GRAM,
+  MeasurementUnit.KILOGRAM,
+  MeasurementUnit.LITER,
+  MeasurementUnit.MILLILITER,
+  MeasurementUnit.PACKAGE,
+  MeasurementUnit.UNIT,
+];
 
 const DEFAULT_PREFERENCES: AppPreferences = {
   theme: 'system',
@@ -19,6 +41,9 @@ const DEFAULT_PREFERENCES: AppPreferences = {
   notifyOnExpired: false,
   notifyOnLowStock: false,
   lastSyncAt: null,
+  locationOptions: [...DEFAULT_LOCATION_OPTIONS],
+  supermarketOptions: [...DEFAULT_SUPERMARKET_OPTIONS],
+  unitOptions: [...DEFAULT_UNIT_OPTIONS],
 };
 
 @Injectable({
@@ -97,6 +122,9 @@ export class AppPreferencesService {
       notifyOnExpired: Boolean(input?.notifyOnExpired),
       notifyOnLowStock: Boolean(input?.notifyOnLowStock),
       lastSyncAt: input?.lastSyncAt ?? null,
+      locationOptions: this.ensureLocationOptions(input?.locationOptions),
+      supermarketOptions: this.ensureSupermarketOptions(input?.supermarketOptions),
+      unitOptions: this.ensureUnitOptions(input?.unitOptions),
     };
   }
 
@@ -119,5 +147,92 @@ export class AppPreferencesService {
       return DEFAULT_PREFERENCES.nearExpiryDays;
     }
     return Math.max(0, Math.round(value));
+  }
+
+  private ensureLocationOptions(options?: unknown): string[] {
+    if (!Array.isArray(options)) {
+      return [...DEFAULT_LOCATION_OPTIONS];
+    }
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+    for (const option of options) {
+      if (typeof option !== 'string') {
+        continue;
+      }
+      const trimmed = option.trim();
+      if (!trimmed) {
+        continue;
+      }
+      const key = trimmed.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      normalized.push(trimmed);
+    }
+    if (!normalized.length) {
+      return [...DEFAULT_LOCATION_OPTIONS];
+    }
+    return normalized;
+  }
+
+  private ensureSupermarketOptions(options?: unknown): string[] {
+    if (!Array.isArray(options)) {
+      return [...DEFAULT_SUPERMARKET_OPTIONS];
+    }
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+    for (const option of options) {
+      if (typeof option !== 'string') {
+        continue;
+      }
+      const trimmed = option.trim();
+      if (!trimmed) {
+        continue;
+      }
+      const key = trimmed.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      normalized.push(trimmed);
+    }
+    if (!normalized.length) {
+      return [...DEFAULT_SUPERMARKET_OPTIONS];
+    }
+    if (!normalized.some(option => option.toLowerCase() === 'otro')) {
+      normalized.push('Otro');
+    }
+    return normalized;
+  }
+
+  private ensureUnitOptions(options?: unknown): string[] {
+    if (!Array.isArray(options)) {
+      return [...DEFAULT_UNIT_OPTIONS];
+    }
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+    for (const option of options) {
+      if (typeof option !== 'string') {
+        continue;
+      }
+      const trimmed = option.trim();
+      if (!trimmed) {
+        continue;
+      }
+      const key = trimmed.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      normalized.push(trimmed);
+    }
+    if (!normalized.length) {
+      return [...DEFAULT_UNIT_OPTIONS];
+    }
+    if (!normalized.some(option => option.toLowerCase() === MeasurementUnit.UNIT.toLowerCase())) {
+      normalized.push(MeasurementUnit.UNIT);
+    }
+    return normalized;
   }
 }

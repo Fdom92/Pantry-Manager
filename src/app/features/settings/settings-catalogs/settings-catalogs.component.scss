@@ -1,0 +1,64 @@
+:host {
+  display: block;
+}
+
+.catalogs-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px;
+  padding-bottom: 32px;
+}
+
+ion-list-header {
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: var(--ion-color-medium);
+  }
+}
+
+ion-item h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+ion-item p {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+  margin: 0;
+}
+
+.options-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+
+  ion-button {
+    margin: 0;
+  }
+}
+
+.catalog-actions {
+  padding: 0 16px 8px;
+}
+
+@media (min-width: 768px) {
+  .catalogs-content {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .catalog-actions {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
