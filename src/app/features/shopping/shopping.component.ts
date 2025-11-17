@@ -2,7 +2,7 @@ import { Component, computed, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { PantryStoreService } from '@core/store/pantry-store.service';
-import { ItemLocationStock, PantryItem, MeasurementUnit } from '@core/models';
+import { PantryItem, MeasurementUnit } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
 
 type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';
@@ -90,7 +90,8 @@ export class ShoppingComponent {
    */
   async markAsPurchased(suggestion: ShoppingSuggestion): Promise<void> {
     const id = suggestion.item?._id;
-    if (!id || this.isProcessing(id) || suggestion.suggestedQuantity <= 0) {
+    const targetLocationId = suggestion.locationId || suggestion.item.locations[0]?.locationId;
+    if (!id || !targetLocationId || this.isProcessing(id) || suggestion.suggestedQuantity <= 0) {
       return;
     }
 
@@ -101,7 +102,7 @@ export class ShoppingComponent {
     });
 
     try {
-      await this.pantryStore.adjustQuantity(id, suggestion.locationId, suggestion.suggestedQuantity);
+      await this.pantryStore.adjustQuantity(id, targetLocationId, suggestion.suggestedQuantity);
     } finally {
       this.processingIds.update(ids => {
         const next = new Set(ids);
@@ -130,13 +131,6 @@ export class ShoppingComponent {
     return getLocationDisplayName(locationId, 'Sin ubicación');
   }
 
-  private getLocationQuantity(location: ItemLocationStock): number {
-    if (!Array.isArray(location.batches) || !location.batches.length) {
-      return 0;
-    }
-    return location.batches.reduce((sum, batch) => sum + Number(batch.quantity ?? 0), 0);
-  }
-
   /**
    * Evaluate every location for each item and produce actionable shopping suggestions.
    * Returns both the detailed list and aggregate counters for the summary card.
@@ -154,56 +148,56 @@ export class ShoppingComponent {
 
     for (const item of items) {
       const isBasic = Boolean(item.isBasic);
-      for (const location of item.locations) {
-        const minThreshold = location.minThreshold != null ? Number(location.minThreshold) : null;
-        const unit = this.normalizeUnit(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
-        const quantity = this.getLocationQuantity(location);
+      const minThreshold = item.minThreshold != null ? Number(item.minThreshold) : null;
+      const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
+      const primaryLocation = item.locations[0];
+      const locationId = primaryLocation?.locationId ?? 'unassigned';
+      const unit = this.normalizeUnit(primaryLocation?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
 
-        let reason: ShoppingReason | null = null;
-        let suggestedQuantity = 0;
+      let reason: ShoppingReason | null = null;
+      let suggestedQuantity = 0;
 
-        if (isBasic && quantity <= 0) {
-          reason = 'basic-out';
-          suggestedQuantity = this.ensurePositiveQuantity(minThreshold ?? 1);
-        } else if (isBasic && minThreshold != null && quantity < minThreshold) {
-          reason = 'basic-low';
-          suggestedQuantity = this.ensurePositiveQuantity(minThreshold - quantity, minThreshold);
-        } else if (minThreshold != null && quantity < minThreshold) {
-          reason = 'below-min';
-          suggestedQuantity = this.ensurePositiveQuantity(minThreshold - quantity, minThreshold);
-        } else if (minThreshold === null && quantity <= 0) {
-          reason = 'empty';
-          suggestedQuantity = this.ensurePositiveQuantity(1);
+      if (isBasic && totalQuantity <= 0) {
+        reason = 'basic-out';
+        suggestedQuantity = this.ensurePositiveQuantity(minThreshold ?? 1);
+      } else if (isBasic && minThreshold != null && totalQuantity < minThreshold) {
+        reason = 'basic-low';
+        suggestedQuantity = this.ensurePositiveQuantity(minThreshold - totalQuantity, minThreshold);
+      } else if (minThreshold != null && totalQuantity < minThreshold) {
+        reason = 'below-min';
+        suggestedQuantity = this.ensurePositiveQuantity(minThreshold - totalQuantity, minThreshold);
+      } else if (minThreshold === null && totalQuantity <= 0) {
+        reason = 'empty';
+        suggestedQuantity = this.ensurePositiveQuantity(1);
+      }
+
+      if (reason) {
+        const supermarket = this.normalizeSupermarketValue(item.supermarket);
+        if (supermarket) {
+          uniqueSupermarkets.add(supermarket.toLowerCase());
         }
 
-        if (reason) {
-          const supermarket = this.normalizeSupermarketValue(item.supermarket);
-          if (supermarket) {
-            uniqueSupermarkets.add(supermarket.toLowerCase());
-          }
+        suggestions.push({
+          item,
+          locationId,
+          reason,
+          suggestedQuantity,
+          currentQuantity: this.roundQuantity(totalQuantity),
+          minThreshold: minThreshold != null ? this.roundQuantity(minThreshold) : undefined,
+          unit,
+          supermarket,
+        });
 
-          suggestions.push({
-            item,
-            locationId: location.locationId,
-            reason,
-            suggestedQuantity,
-            currentQuantity: this.roundQuantity(quantity),
-            minThreshold: minThreshold != null ? this.roundQuantity(minThreshold) : undefined,
-            unit,
-            supermarket,
-          });
-
-          switch (reason) {
-            case 'below-min':
-              summary.belowMin += 1;
-              break;
-            case 'basic-low':
-              summary.basicLow += 1;
-              break;
-            case 'basic-out':
-              summary.basicOut += 1;
-              break;
-          }
+        switch (reason) {
+          case 'below-min':
+            summary.belowMin += 1;
+            break;
+          case 'basic-low':
+            summary.basicLow += 1;
+            break;
+          case 'basic-out':
+            summary.basicOut += 1;
+            break;
         }
       }
     }
@@ -258,9 +252,7 @@ export class ShoppingComponent {
   }
 
   getSuggestionTrackId(suggestion: ShoppingSuggestion): string {
-    const itemId = suggestion.item?._id ?? suggestion.item?.name ?? 'item';
-    const locationId = suggestion.locationId ?? 'location';
-    return `${itemId}::${locationId}`;
+    return suggestion.item?._id ?? suggestion.item?.name ?? 'item';
   }
 
   /** Keep the suggested quantity positive, defaulting to a fallback when needed. */

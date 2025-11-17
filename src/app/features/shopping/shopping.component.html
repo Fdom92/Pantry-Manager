@@ -89,8 +89,8 @@
                         </ion-chip>
                       </div>
                       <p class="meta">
-                        Ubicación: {{ getLocationLabel(suggestion.locationId) }} ·
-                        Actual: {{ suggestion.currentQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
+                        Destino sugerido: {{ getLocationLabel(suggestion.locationId) }} ·
+                        Stock total: {{ suggestion.currentQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
                         @if (suggestion.minThreshold !== undefined) {
                           · Mín.: {{ suggestion.minThreshold | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
                         }

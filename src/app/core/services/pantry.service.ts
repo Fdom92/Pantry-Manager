@@ -3,6 +3,8 @@ import { StorageService } from './storage.service';
 import { PantryItem, ExpirationStatus, ItemLocationStock, MeasurementUnit, ItemBatch } from '@core/models';
 import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
+type LegacyLocationStock = ItemLocationStock & { minThreshold?: number | null };
+
 @Injectable({
   providedIn: 'root'
 })
@@ -178,12 +180,9 @@ export class PantryService extends StorageService<PantryItem> {
     return item.locations.reduce((sum, loc) => sum + this.getLocationQuantity(loc), 0);
   }
 
-  /** Sum the minimum thresholds defined at each location. */
+  /** Return the minimum threshold configured for the product (legacy per-location sums are handled earlier). */
   getItemTotalMinThreshold(item: PantryItem): number {
-    return item.locations.reduce(
-      (sum, loc) => sum + (this.toNumberOrUndefined(loc.minThreshold) ?? 0),
-      0
-    );
+    return this.toNumberOrUndefined(item.minThreshold) ?? 0;
   }
 
   /** Return the earliest expiry date among the defined locations. */
@@ -214,14 +213,17 @@ export class PantryService extends StorageService<PantryItem> {
 
   /** Compute aggregate fields without mutating the original payload. */
   private applyDerivedFields(item: PantryItem): PantryItem {
-    const locations = this.normalizeLocations(item.locations);
+    const rawLocations = Array.isArray(item.locations) ? item.locations : [];
+    const locations = this.normalizeLocations(rawLocations);
     const supermarket = this.normalizeSupermarketName(
       (item.supermarket ?? (item as any).supermarketId) as string | undefined
     );
+    const minThreshold = this.normalizeItemMinThreshold(item.minThreshold, rawLocations as LegacyLocationStock[]);
     const prepared: PantryItem = {
       ...item,
       supermarket,
       locations,
+      minThreshold,
       expirationDate: this.computeEarliestExpiry(locations),
       expirationStatus: this.computeExpirationStatus(locations),
     };
@@ -250,7 +252,6 @@ export class PantryService extends StorageService<PantryItem> {
         {
           locationId: 'unassigned',
           unit: MeasurementUnit.UNIT,
-          minThreshold: undefined,
           batches: [],
         },
       ];
@@ -259,10 +260,26 @@ export class PantryService extends StorageService<PantryItem> {
     return normalized;
   }
 
+  private normalizeItemMinThreshold(
+    itemMinThreshold: number | undefined,
+    rawLocations: LegacyLocationStock[]
+  ): number | undefined {
+    const normalizedValue = this.toNumberOrUndefined(itemMinThreshold);
+    if (normalizedValue != null) {
+      return normalizedValue;
+    }
+
+    const legacyTotal = rawLocations.reduce((sum, location) => {
+      const legacyMin = this.toNumberOrUndefined(location?.minThreshold);
+      return sum + (legacyMin ?? 0);
+    }, 0);
+
+    return legacyTotal > 0 ? legacyTotal : undefined;
+  }
+
   private normalizeLocation(location: ItemLocationStock): ItemLocationStock {
     const unit = this.normalizeUnitValue(location.unit);
     const locationId = (location.locationId ?? 'unassigned').trim() || 'unassigned';
-    const minThreshold = this.toNumberOrUndefined(location.minThreshold);
     const batches = this.normalizeBatches(location.batches, unit);
     const legacyQuantity = this.toNumberOrZero((location as any).quantity);
     const totalBatchQuantity = this.sumBatchQuantities(batches);
@@ -279,7 +296,6 @@ export class PantryService extends StorageService<PantryItem> {
     return {
       locationId,
       unit,
-      minThreshold,
       batches,
     };
   }

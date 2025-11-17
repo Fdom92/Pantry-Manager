@@ -328,6 +328,15 @@
             <ion-item lines="full">
               <ion-toggle formControlName="isBasic" justify="space-between">Producto básico de la despensa</ion-toggle>
             </ion-item>
+            <ion-item>
+              <ion-input
+                type="number"
+                min="0"
+                formControlName="minThreshold"
+                label="Cantidad mínima (alertas)"
+                labelPlacement="stacked">
+              </ion-input>
+            </ion-item>
           </ion-list>
 
           <div formArrayName="locations" class="location-form-list">
@@ -364,15 +373,6 @@
                           </ion-select-option>
                         }
                       </ion-select>
-                    </ion-item>
-                    <ion-item>
-                      <ion-input
-                        type="number"
-                        min="0"
-                        formControlName="minThreshold"
-                        label="Cantidad mínima (alertas)"
-                        labelPlacement="stacked">
-                      </ion-input>
                     </ion-item>
                   </ion-list>
                   <div formArrayName="batches" class="batch-form-list">
