@@ -1,4 +1,5 @@
-import { Component, OnDestroy, signal, computed, effect } from '@angular/core';
+import { Component, OnDestroy, signal, computed, effect, ViewChild } from '@angular/core';
+import { CdkVirtualScrollViewport, ScrollingModule, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
@@ -7,99 +8,51 @@ import {
   DEFAULT_LOCATION_OPTIONS,
   DEFAULT_SUPERMARKET_OPTIONS,
 } from '@core/services';
-import { PantryItem, MeasurementUnit, ItemLocationStock, ItemBatch } from '@core/models';
+import {
+  PantryItem,
+  MeasurementUnit,
+  ItemLocationStock,
+  ItemBatch,
+  PantryGroup,
+  CategoryState,
+  BatchStatusMeta,
+  BatchEntryMeta,
+  BatchSummaryMeta,
+  BatchCountsMeta,
+  BatchStatusState,
+  ProductStatusState,
+  PantryItemGlobalStatus,
+  PantryItemBatchViewModel,
+  PantryItemCardViewModel,
+  PantryVirtualEntry,
+} from '@core/models';
 import { createDocumentId, getLocationDisplayName } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
-interface PantryGroup {
-  key: string;
-  name: string;
-  items: PantryItem[];
-  lowStockCount: number;
-  expiringCount: number;
-  expiredCount: number;
-}
+import { PantryVirtualItemHeightDirective, VirtualItemHeightChange } from '../virtual-item-height.directive';
+import { PantryAutosizeVirtualScrollStrategy } from '../pantry-autosize-virtual-scroll.strategy';
 
-interface CategoryState {
-  expanded: boolean;
-}
-
-interface BatchStatusMeta {
-  label: string;
-  icon: string;
-  state: BatchStatusState;
-  color: 'danger' | 'warning' | 'success' | 'medium';
-}
-
-interface BatchEntryMeta {
-  batch: ItemBatch;
-  location: ItemLocationStock;
-  locationLabel: string;
-  locationUnit: MeasurementUnit | string | undefined;
-  status: BatchStatusMeta;
-}
-
-interface BatchSummaryMeta {
-  total: number;
-  sorted: BatchEntryMeta[];
-}
-
-interface BatchCountsMeta {
-  total: number;
-  expired: number;
-  nearExpiry: number;
-  normal: number;
-  unknown: number;
-}
-
-type BatchStatusState = 'normal' | 'near-expiry' | 'expired' | 'unknown';
-type ProductStatusState = 'normal' | 'near-expiry' | 'expired';
-
-export interface PantryItemGlobalStatus {
-  state: ProductStatusState;
-  label: string;
-  accentColor: string;
-  chipColor: string;
-  chipTextColor: string;
-}
-
-export interface PantryItemBatchViewModel {
-  batch: ItemBatch;
-  location: ItemLocationStock;
-  locationLabel: string;
-  status: BatchStatusMeta;
-  formattedDate: string;
-  quantityLabel: string;
-  quantityValue: number;
-  unitLabel: string;
-  opened: boolean;
-}
-
-export interface PantryItemCardViewModel {
-  item: PantryItem;
-  globalStatus: PantryItemGlobalStatus;
-  totalQuantity: number;
-  totalQuantityLabel: string;
-  unitLabel: string;
-  totalBatches: number;
-  totalBatchesLabel: string;
-  earliestExpirationDate: string | null;
-  formattedEarliestExpirationShort: string;
-  formattedEarliestExpirationLong: string;
-  batchCountsLabel: string;
-  batchCounts: BatchCountsMeta;
-  batches: PantryItemBatchViewModel[];
-}
+const PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER = {
+  provide: PantryAutosizeVirtualScrollStrategy,
+  useFactory: () => new PantryAutosizeVirtualScrollStrategy(900, 1800),
+};
 
 @Component({
   selector: 'app-pantry-list',
   standalone: true,
-  imports: [IonicModule, CommonModule, ReactiveFormsModule, PantryDetailComponent],
+  imports: [IonicModule, CommonModule, ReactiveFormsModule, PantryDetailComponent, ScrollingModule, PantryVirtualItemHeightDirective],
   templateUrl: './pantry-list.component.html',
   styleUrls: ['./pantry-list.component.scss'],
+  providers: [
+    PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER,
+    {
+      provide: VIRTUAL_SCROLL_STRATEGY,
+      useExisting: PantryAutosizeVirtualScrollStrategy,
+    },
+  ],
   animations: [
     trigger('expandCollapse', [
       state('collapsed', style({ height: '0px', opacity: 0, marginTop: '0px' })),
@@ -121,6 +74,7 @@ export interface PantryItemCardViewModel {
   ],
 })
 export class PantryListComponent implements OnDestroy {
+  @ViewChild(CdkVirtualScrollViewport) private viewport?: CdkVirtualScrollViewport;
   readonly searchTerm = signal('');
   readonly selectedCategory = signal('all');
   readonly selectedLocation = signal('all');
@@ -130,6 +84,15 @@ export class PantryListComponent implements OnDestroy {
   readonly itemsState = signal<PantryItem[]>([]);
   readonly filteredItems = computed(() => this.computeFilteredItems());
   readonly groups = computed(() => this.buildGroups(this.filteredItems()));
+  private readonly categoryState = signal(new Map<string, CategoryState>());
+  readonly virtualEntries = computed(() => this.buildVirtualEntries(this.groups(), this.categoryState()));
+  readonly virtualEntryHeights = computed(() => {
+    const measured = this.measuredEntryHeights();
+    return this.virtualEntries().map(entry => {
+      const key = this.getVirtualEntryKey(entry);
+      return measured.get(key) ?? this.getDefaultEntryHeight(entry);
+    });
+  });
   readonly summary = computed(() => this.buildSummary(this.filteredItems()));
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
   readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
@@ -137,6 +100,7 @@ export class PantryListComponent implements OnDestroy {
   readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
   readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
   readonly batchSummaries = computed(() => this.computeBatchSummaries(this.itemsState()));
+  private readonly measuredEntryHeights = signal(new Map<string, number>());
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
   readonly loading = this.pantryStore.loading;
@@ -146,10 +110,13 @@ export class PantryListComponent implements OnDestroy {
   editingItem: PantryItem | null = null;
   isSaving = false;
   private readonly expandedItems = new Set<string>();
+  private readonly collapsedItemHeight = 210;
+  readonly categoryHeaderHeight = 90;
+  private readonly expandedBaseHeight = 200;
+  private readonly batchRowHeight = 64;
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveDelay = 500;
-  private readonly categoryState = new Map<string, CategoryState>();
   private realtimeSubscribed = false;
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -202,6 +169,7 @@ export class PantryListComponent implements OnDestroy {
     private readonly fb: FormBuilder,
     private readonly toastCtrl: ToastController,
     private readonly appPreferences: AppPreferencesService,
+    private readonly pantryVirtualScrollStrategy: PantryAutosizeVirtualScrollStrategy,
   ) {
     effect(() => {
       const storeItems = this.pantryStore.items();
@@ -210,6 +178,10 @@ export class PantryListComponent implements OnDestroy {
 
     effect(() => {
       this.ensureCategoryState(this.groups());
+    });
+
+    effect(() => {
+      this.pantryVirtualScrollStrategy.setItemHeights(this.virtualEntryHeights());
     });
 
     effect(() => {
@@ -569,6 +541,40 @@ export class PantryListComponent implements OnDestroy {
     return this.expandedItems.has(item._id);
   }
 
+  getVirtualItemKey(item: PantryItem): string {
+    return `item-${item._id}`;
+  }
+
+  getVirtualItemHeight(item: PantryItem): number {
+    return this.measuredEntryHeights().get(this.getVirtualItemKey(item)) ?? this.calculateDefaultItemHeight(item);
+  }
+
+  handleVirtualItemHeightChange(change: VirtualItemHeightChange): void {
+    if (!change?.key) {
+      return;
+    }
+    const roundedHeight = Math.max(1, Math.round(change.height));
+    this.measuredEntryHeights.update(current => {
+      const next = new Map(current);
+      if (next.get(change.key) === roundedHeight) {
+        return current;
+      }
+      next.set(change.key, roundedHeight);
+      return next;
+    });
+  }
+
+  private calculateDefaultItemHeight(item: PantryItem): number {
+    const baseHeight = this.collapsedItemHeight;
+    if (!this.isExpanded(item)) {
+      return baseHeight;
+    }
+
+    const batches = Math.max(1, this.getTotalBatchCount(item));
+    const batchesHeight = batches * this.batchRowHeight;
+    return baseHeight + this.expandedBaseHeight + batchesHeight;
+  }
+
   /** Toggle the expansion panel for a given item without triggering parent handlers. */
   toggleItemExpansion(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
@@ -577,6 +583,7 @@ export class PantryListComponent implements OnDestroy {
     } else {
       this.expandedItems.add(item._id);
     }
+    setTimeout(() => this.viewport?.checkViewportSize());
   }
 
   openBatchesModal(item: PantryItem, event?: Event): void {
@@ -1323,6 +1330,27 @@ export class PantryListComponent implements OnDestroy {
     return updatedItem;
   }
 
+  /**
+   * Merge pending optimistic updates over the latest store snapshot so the UI
+   * does not briefly revert to stale quantities while debounced saves run.
+   */
+  private mergePendingItems(source: PantryItem[]): PantryItem[] {
+    if (!this.pendingItems.size) {
+      return source;
+    }
+
+    const merged = source.map(item => this.pendingItems.get(item._id) ?? item);
+    const seen = new Set(merged.map(item => item._id));
+
+    for (const [pendingId, pendingItem] of this.pendingItems.entries()) {
+      if (!seen.has(pendingId)) {
+        merged.push(pendingItem);
+      }
+    }
+
+    return merged;
+  }
+
   private sanitizeBatches(batches: ItemBatch[] | undefined, unit: MeasurementUnit | string): ItemBatch[] {
     if (!Array.isArray(batches) || !batches.length) {
       return [];
@@ -1704,28 +1732,76 @@ export class PantryListComponent implements OnDestroy {
     return groups;
   }
 
+  private buildVirtualEntries(groups: PantryGroup[], state: ReadonlyMap<string, CategoryState>): PantryVirtualEntry[] {
+    const entries: PantryVirtualEntry[] = [];
+    for (const group of groups) {
+      entries.push({ kind: 'category', group });
+      const expanded = state.get(group.key)?.expanded ?? true;
+      if (!expanded) {
+        continue;
+      }
+      for (const item of group.items) {
+        entries.push({
+          kind: 'item',
+          groupKey: group.key,
+          item,
+        });
+      }
+    }
+    return entries;
+  }
+
   isCategoryExpanded(key: string): boolean {
-    return this.categoryState.get(key)?.expanded ?? true;
+    return this.categoryState().get(key)?.expanded ?? true;
   }
 
   toggleCategory(key: string, event?: Event): void {
     event?.stopPropagation();
-    const current = this.categoryState.get(key)?.expanded ?? true;
-    this.categoryState.set(key, { expanded: !current });
+    this.categoryState.update(current => {
+      const next = new Map(current);
+      const currentState = next.get(key)?.expanded ?? true;
+      next.set(key, { expanded: !currentState });
+      return next;
+    });
+  }
+
+  trackVirtualEntry(_: number, entry: PantryVirtualEntry): string {
+    if (entry.kind === 'category') {
+      return `category-${entry.group.key}`;
+    }
+    return `item-${entry.item._id}`;
+  }
+
+  private getVirtualEntryKey(entry: PantryVirtualEntry): string {
+    return entry.kind === 'category' ? `category-${entry.group.key}` : this.getVirtualItemKey(entry.item);
+  }
+
+  private getDefaultEntryHeight(entry: PantryVirtualEntry): number {
+    return entry.kind === 'category' ? this.categoryHeaderHeight : this.calculateDefaultItemHeight(entry.item);
   }
 
   private ensureCategoryState(groups: PantryGroup[]): void {
-    const keys = new Set(groups.map(group => group.key));
-    for (const group of groups) {
-      if (!this.categoryState.has(group.key)) {
-        this.categoryState.set(group.key, { expanded: true });
+    this.categoryState.update(current => {
+      const next = new Map(current);
+      const keys = new Set(groups.map(group => group.key));
+      let changed = false;
+
+      for (const group of groups) {
+        if (!next.has(group.key)) {
+          next.set(group.key, { expanded: true });
+          changed = true;
+        }
       }
-    }
-    for (const key of Array.from(this.categoryState.keys())) {
-      if (!keys.has(key)) {
-        this.categoryState.delete(key);
+
+      for (const key of Array.from(next.keys())) {
+        if (!keys.has(key)) {
+          next.delete(key);
+          changed = true;
+        }
       }
-    }
+
+      return changed ? next : current;
+    });
   }
 
   formatCategoryName(key: string): string {
@@ -1774,26 +1850,5 @@ export class PantryListComponent implements OnDestroy {
       const label = getLocationDisplayName(loc.locationId, '').toLowerCase();
       return id.includes(search) || label.includes(search);
     });
-  }
-
-  /**
-   * Merge pending optimistic updates over the latest store snapshot so the UI
-   * does not briefly revert to stale quantities while debounced saves run.
-   */
-  private mergePendingItems(source: PantryItem[]): PantryItem[] {
-    if (!this.pendingItems.size) {
-      return source;
-    }
-
-    const merged = source.map(item => this.pendingItems.get(item._id) ?? item);
-    const seen = new Set(merged.map(item => item._id));
-
-    for (const [pendingId, pendingItem] of this.pendingItems.entries()) {
-      if (!seen.has(pendingId)) {
-        merged.push(pendingItem);
-      }
-    }
-
-    return merged;
   }
 }

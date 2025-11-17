@@ -35,7 +35,10 @@
     </div>
   </div>
 
-  <div class="item-details" [@expandCollapse]="expanded ? 'expanded' : 'collapsed'">
+  <div
+    class="item-details"
+    [class.item-details--collapsed]="!expanded"
+    [@expandCollapse]="expanded ? 'expanded' : 'collapsed'">
     @if (expanded) {
       <div class="expanded-content">
         <section class="batch-section">

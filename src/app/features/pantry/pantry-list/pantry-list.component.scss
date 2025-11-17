@@ -4,7 +4,7 @@
   justify-content: space-between;
   gap: 12px;
   flex-wrap: nowrap;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .summary-chips {
@@ -97,8 +97,53 @@
   margin-top: 16px;
 }
 
+.category-stack ion-card {
+  background: none;
+  box-shadow: none;
+}
+
 .category-collapsed .item-grid {
   pointer-events: none;
+}
+
+.virtual-scroll {
+  display: block;
+  height: 100%;
+  contain: content;
+  padding-bottom: 8px;
+}
+
+.virtual-scroll .cdk-virtual-scroll-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.virtual-category-card {
+  width: 100%;
+  display: flex;
+  margin-bottom: 0;
+}
+
+.virtual-category-card ion-card {
+  flex: 1 1 auto;
+  height: 100%;
+  margin: 0;
+}
+
+.virtual-item-card {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  transition: height 0.25s ease;
+  overflow: hidden;
+  display: flex;
+}
+
+.virtual-item-card__detail {
+  display: block;
+  flex: 1 1 auto;
+  height: 100%;
 }
 
 .group-header {

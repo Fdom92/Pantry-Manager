@@ -8,6 +8,7 @@
   color: #f4f4f5;
   --card-accent: #2f2f33;
   transition: transform 180ms ease, box-shadow 220ms ease, border-color 180ms ease;
+  margin: 0;
 }
 
 .pantry-item-card::before {
@@ -28,7 +29,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 20px 22px 0 26px;
+  padding: 20px 22px 8px 26px;
   cursor: pointer;
   outline: none;
 }
@@ -149,6 +150,10 @@
 .item-details {
   padding: 0 22px 22px 26px;
   overflow: hidden;
+}
+
+.item-details--collapsed {
+  padding-bottom: 0;
 }
 
 .expanded-content {
