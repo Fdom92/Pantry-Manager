@@ -2,10 +2,7 @@ import { Component, ChangeDetectionStrategy, EventEmitter, Input, Output } from 
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import type {
-  PantryItemBatchViewModel,
-  PantryItemCardViewModel,
-} from '../pantry-list/pantry-list.component';
+import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models';
 import { ItemBatch, ItemLocationStock } from '@core/models';
 
 @Component({
