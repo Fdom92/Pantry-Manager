@@ -203,7 +203,8 @@ export class PantryListComponent implements OnDestroy {
     private readonly appPreferences: AppPreferencesService,
   ) {
     effect(() => {
-      this.itemsState.set(this.pantryStore.items());
+      const storeItems = this.pantryStore.items();
+      this.itemsState.set(this.mergePendingItems(storeItems));
     });
 
     effect(() => {
@@ -1774,4 +1775,24 @@ export class PantryListComponent implements OnDestroy {
     });
   }
 
+  /**
+   * Merge pending optimistic updates over the latest store snapshot so the UI
+   * does not briefly revert to stale quantities while debounced saves run.
+   */
+  private mergePendingItems(source: PantryItem[]): PantryItem[] {
+    if (!this.pendingItems.size) {
+      return source;
+    }
+
+    const merged = source.map(item => this.pendingItems.get(item._id) ?? item);
+    const seen = new Set(merged.map(item => item._id));
+
+    for (const [pendingId, pendingItem] of this.pendingItems.entries()) {
+      if (!seen.has(pendingId)) {
+        merged.push(pendingItem);
+      }
+    }
+
+    return merged;
+  }
 }
