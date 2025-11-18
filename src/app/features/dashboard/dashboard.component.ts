@@ -17,6 +17,7 @@ export class DashboardComponent {
   private hasInitialized = false;
 
   readonly lastUpdated = signal<string | null>(null);
+  readonly deletingExpired = signal(false);
   readonly items = this.pantryStore.items;
   readonly lowStockItems = this.pantryStore.lowStockItems;
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
@@ -62,6 +63,31 @@ export class DashboardComponent {
   /** Toggle the visibility of the snapshot card without altering other state. */
   toggleSnapshot(): void {
     this.showSnapshot.update(open => !open);
+  }
+
+  /** Remove expired items after a minimal confirmation. */
+  async onDeleteExpiredItems(): Promise<void> {
+    if (this.deletingExpired() || this.expiredItems().length === 0) {
+      return;
+    }
+
+    const confirmed =
+      typeof window === 'undefined'
+        ? true
+        : window.confirm('Esto eliminará todos los productos caducados. ¿Quieres continuar?');
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.deletingExpired.set(true);
+    try {
+      await this.pantryStore.deleteExpiredItems();
+    } catch (err) {
+      console.error('[DashboardComponent] onDeleteExpiredItems error', err);
+    } finally {
+      this.deletingExpired.set(false);
+    }
   }
 
   /** Return the latest five updated items so the dashboard highlights recent activity. */

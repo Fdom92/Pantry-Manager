@@ -56,6 +56,20 @@ export class PantryStoreService {
   /** Push a freshly saved item into the local store state. */
   async addItem(item: PantryItem): Promise<void> {
     try {
+      const mergeTarget = await this.findMergeCandidate(item);
+      if (mergeTarget) {
+        const merged = this.mergeItemWithExisting(mergeTarget, item);
+        const savedMerge = await this.pantryService.saveItem(merged);
+        this.itemsSignal.update(items => {
+          const index = items.findIndex(existing => existing._id === savedMerge._id);
+          if (index >= 0) {
+            return items.map(existing => (existing._id === savedMerge._id ? savedMerge : existing));
+          }
+          return [...items, savedMerge];
+        });
+        return;
+      }
+
       const saved = await this.pantryService.saveItem(item);
       this.itemsSignal.update(items => [...items, saved]);
     } catch (err: any) {
@@ -88,6 +102,15 @@ export class PantryStoreService {
       console.error('[PantryStoreService] deleteItem error', err);
       this.error.set('Failed to delete item');
     }
+  }
+
+  /** Remove every expired item currently cached in the store. */
+  async deleteExpiredItems(): Promise<void> {
+    const expiredIds = this.expiredItems().map(item => item._id);
+    if (!expiredIds.length) {
+      return;
+    }
+    await Promise.all(expiredIds.map(id => this.deleteItem(id)));
   }
 
   /**
@@ -207,5 +230,103 @@ export class PantryStoreService {
   /** Determine whether any batch for the item is currently marked as opened. */
   hasItemOpenBatch(item: PantryItem): boolean {
     return this.pantryService.hasOpenBatch(item);
+  }
+
+  private async findMergeCandidate(candidate: PantryItem): Promise<PantryItem | undefined> {
+    const barcode = this.normalizeBarcode(candidate.barcode);
+    const key = this.buildMergeKey(candidate);
+
+    const localItems = this.items();
+
+    if (barcode) {
+      const localBarcodeMatch = localItems.find(item => this.normalizeBarcode(item.barcode) === barcode);
+      if (localBarcodeMatch) {
+        return localBarcodeMatch;
+      }
+    }
+
+    if (key) {
+      const localKeyMatch = localItems.find(item => this.buildMergeKey(item) === key);
+      if (localKeyMatch) {
+        return localKeyMatch;
+      }
+    }
+
+    const persisted = await this.pantryService.getAll();
+
+    if (barcode) {
+      const remoteBarcode = persisted.find(item => this.normalizeBarcode(item.barcode) === barcode);
+      if (remoteBarcode) {
+        return remoteBarcode;
+      }
+    }
+
+    if (key) {
+      return persisted.find(item => this.buildMergeKey(item) === key);
+    }
+
+    return undefined;
+  }
+
+  private buildMergeKey(item: PantryItem): string | null {
+    const name = (item.name ?? '').trim().toLowerCase();
+    const category = (item.categoryId ?? '').trim();
+    const supermarket = (item.supermarket ?? '').trim().toLowerCase();
+    if (!name || !supermarket) {
+      return null;
+    }
+    return `${name}::${category || 'uncategorized'}::${supermarket}`;
+  }
+
+  private normalizeBarcode(value?: string): string | null {
+    const trimmed = (value ?? '').trim();
+    return trimmed || null;
+  }
+
+  private mergeItemWithExisting(existing: PantryItem, incoming: PantryItem): PantryItem {
+    const normalizedLocations = existing.locations.map(location => ({
+      ...location,
+      batches: Array.isArray(location.batches) ? [...location.batches] : [],
+    }));
+
+    for (const newLocation of incoming.locations ?? []) {
+      const locationId = this.normalizeLocationId(newLocation.locationId);
+      if (!locationId) {
+        continue;
+      }
+      const targetIndex = normalizedLocations.findIndex(
+        location => this.normalizeLocationId(location.locationId) === locationId
+      );
+      const newBatches = Array.isArray(newLocation.batches) ? [...newLocation.batches] : [];
+
+      if (targetIndex >= 0) {
+        const current = normalizedLocations[targetIndex];
+        const mergedBatches = Array.isArray(current.batches) ? current.batches : [];
+        normalizedLocations[targetIndex] = {
+          ...current,
+          unit: current.unit || newLocation.unit,
+          batches: [...mergedBatches, ...newBatches],
+        };
+      } else {
+        normalizedLocations.push({
+          locationId,
+          unit: newLocation.unit,
+          batches: newBatches,
+        });
+      }
+    }
+
+    return {
+      ...existing,
+      locations: normalizedLocations,
+      brand: existing.brand ?? incoming.brand,
+      barcode: existing.barcode ?? incoming.barcode,
+      minThreshold: existing.minThreshold ?? incoming.minThreshold,
+      isBasic: existing.isBasic ?? incoming.isBasic,
+    };
+  }
+
+  private normalizeLocationId(value?: string): string {
+    return (value ?? '').trim();
   }
 }

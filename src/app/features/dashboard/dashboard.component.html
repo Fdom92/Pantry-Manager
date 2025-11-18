@@ -7,7 +7,7 @@
 <ion-content class="ion-padding">
   <ion-card>
     <ion-card-header>
-      <div class="snapshot-header">
+      <div class="card-header-actions">
         <ion-card-title>Resumen de la despensa</ion-card-title>
         <ion-button
           fill="clear"
@@ -108,7 +108,25 @@
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Artículos caducados</ion-card-title>
+      <div class="card-header-actions">
+        <ion-card-title>Artículos caducados</ion-card-title>
+        @if (expiredItems().length) {
+          <ion-button
+            color="danger"
+            fill="clear"
+            size="small"
+            [disabled]="deletingExpired()"
+            (click)="onDeleteExpiredItems()"
+            aria-label="Eliminar caducados"
+          >
+            @if (deletingExpired()) {
+              <ion-spinner slot="icon-only" name="crescent"></ion-spinner>
+            } @else {
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            }
+          </ion-button>
+        }
+      </div>
     </ion-card-header>
     <ion-card-content>
       @if (expiredItems().length) {

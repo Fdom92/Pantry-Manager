@@ -1355,13 +1355,44 @@ export class PantryListComponent implements OnDestroy {
       return [];
     }
     const normalizedUnit = this.normalizeUnitValue(unit);
-    return batches.map(batch => ({
+    const normalized = batches.map(batch => ({
       ...batch,
       batchId: batch.batchId ?? this.createTempBatchId(),
       quantity: this.toNumber(batch.quantity),
       unit: this.normalizeUnitValue(batch.unit ?? normalizedUnit),
       opened: batch.opened ?? false,
     }));
+
+    return this.mergeBatchesByExpiry(normalized);
+  }
+
+  private mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
+    if (batches.length <= 1) {
+      return batches;
+    }
+
+    const seen = new Map<string, ItemBatch>();
+    const merged: ItemBatch[] = [];
+
+    for (const batch of batches) {
+      const key = (batch.expirationDate ?? '').trim();
+      if (!key) {
+        merged.push(batch);
+        continue;
+      }
+
+      const existing = seen.get(key);
+      if (!existing) {
+        seen.set(key, batch);
+        merged.push(batch);
+        continue;
+      }
+
+      existing.quantity = this.toNumber(existing.quantity) + this.toNumber(batch.quantity);
+      existing.opened = Boolean(existing.opened || batch.opened);
+    }
+
+    return merged;
   }
 
   private sumBatchQuantities(batches: ItemBatch[] | undefined): number {
