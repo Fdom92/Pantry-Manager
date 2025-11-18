@@ -87,6 +87,35 @@
   flex: 1;
 }
 
+.filter-card {
+  margin-bottom: 12px;
+  border-radius: 14px;
+  --background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.filter-card ion-card-header {
+  font-weight: 600;
+  font-size: 1rem;
+  padding-bottom: 0;
+}
+
+.filter-card ion-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.filter-actions ion-button[expand="block"] {
+  flex: 1;
+}
+
 .state {
   display: flex;
   justify-content: center;

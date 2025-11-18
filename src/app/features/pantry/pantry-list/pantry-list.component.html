@@ -203,78 +203,92 @@
         </ion-toolbar>
       </ion-header>
 
-      <ion-content class="ion-padding filter-modal">
-        <ion-searchbar
-          placeholder="Buscar productos"
-          [value]="searchTerm()"
-          debounce="300"
-          (ionInput)="onSearchTermChange($event)">
-        </ion-searchbar>
+      <ion-content class="ion-padding">
+        <!-- Búsqueda -->
+        <ion-card class="filter-card search-card">
+          <ion-searchbar
+            placeholder="Buscar productos"
+            [value]="searchTerm()"
+            debounce="300"
+            (ionInput)="onSearchTermChange($event)">
+          </ion-searchbar>
+        </ion-card>
 
-        <ion-list lines="full">
-          <ion-item>
-            <ion-select
-              interface="popover"
-              label="Categoría"
-              labelPlacement="stacked"
-              [value]="selectedCategory()"
-              (ionChange)="onCategoryChange($event)">
-              @for (option of categoryOptions(); track option.id) {
-                <ion-select-option [value]="option.id">
-                  {{ option.label }}
-                </ion-select-option>
-              }
-            </ion-select>
-          </ion-item>
+        <!-- Filtros principales -->
+        <ion-card class="filter-card">
+          <ion-card-content>
+            <ion-item>
+              <ion-select
+                interface="popover"
+                label="Categoría"
+                labelPlacement="stacked"
+                [value]="selectedCategory()"
+                (ionChange)="onCategoryChange($event)">
+                @for (option of categoryOptions(); track option.id) {
+                  <ion-select-option [value]="option.id">{{ option.label }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
 
-          <ion-item>
-            <ion-select
-              interface="popover"
-              label="Ubicación"
-              labelPlacement="stacked"
-              [value]="selectedLocation()"
-              (ionChange)="onLocationChange($event)">
-              @for (option of locationOptions(); track option.id) {
-                <ion-select-option [value]="option.id">
-                  {{ option.label }}
-                </ion-select-option>
-              }
-            </ion-select>
-          </ion-item>
+            <ion-item>
+              <ion-select
+                interface="popover"
+                label="Ubicación"
+                labelPlacement="stacked"
+                [value]="selectedLocation()"
+                (ionChange)="onLocationChange($event)">
+                @for (option of locationOptions(); track option.id) {
+                  <ion-select-option [value]="option.id">{{ option.label }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
 
-          <ion-item>
-            <ion-select
-              interface="popover"
-              label="Ordenar por"
-              labelPlacement="stacked"
-              [value]="sortOption()"
-              (ionChange)="onSortChange($event)">
-              <ion-select-option value="name">Nombre (A-Z)</ion-select-option>
-              <ion-select-option value="quantity">Cantidad (mayor → menor)</ion-select-option>
-              <ion-select-option value="expiration">Caducidad (más próximas primero)</ion-select-option>
-            </ion-select>
-          </ion-item>
+            <ion-item>
+              <ion-select
+                interface="popover"
+                label="Estado"
+                labelPlacement="stacked"
+                [value]="statusFilter()"
+                (ionChange)="onStatusFilterChange($event)">
+                <ion-select-option value="all">Todos</ion-select-option>
+                <ion-select-option value="near-expiry">Próx. caducidad</ion-select-option>
+                <ion-select-option value="expired">Caducados</ion-select-option>
+              </ion-select>
+            </ion-item>
 
-          <ion-item lines="none">
-            <ion-label position="stacked">Estado</ion-label>
-            <ion-segment
-              mode="md"
-              [value]="statusFilter()"
-              (ionChange)="onStatusFilterChange($event)">
-              <ion-segment-button value="all">Todos</ion-segment-button>
-              <ion-segment-button value="near-expiry">Próximo a caducar</ion-segment-button>
-              <ion-segment-button value="expired">Caducado</ion-segment-button>
-            </ion-segment>
-          </ion-item>
-        </ion-list>
+            <ion-item>
+              <ion-select
+                interface="popover"
+                label="Ordenar por"
+                labelPlacement="stacked"
+                [value]="sortOption()"
+                (ionChange)="onSortChange($event)">
+                <ion-select-option value="name">Nombre (A-Z)</ion-select-option>
+                <ion-select-option value="quantity">Cantidad (mayor → menor)</ion-select-option>
+                <ion-select-option value="expiration">Caducidad (próximas primero)</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
 
+        <!-- Opcionales: básicos y stock bajo -->
+        <ion-card class="filter-card">
+          <ion-card-content>
+            <ion-item lines="none">
+              <ion-label>Producto básico</ion-label>
+              <ion-toggle [checked]="basicOnly()" (ionChange)="toggleBasicOnly($event)"></ion-toggle>
+            </ion-item>
+            <ion-item lines="none">
+              <ion-label>Stock bajo</ion-label>
+              <ion-toggle [checked]="lowStockOnly()" (ionChange)="toggleLowStockOnly($event)"></ion-toggle>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Acciones -->
         <div class="filter-actions">
-          <ion-button expand="block" fill="clear" color="medium" (click)="clearFilters()">
-            Limpiar filtros
-          </ion-button>
-          <ion-button expand="block" (click)="closeFilters()">
-            Aplicar
-          </ion-button>
+          <ion-button expand="block" fill="clear" color="medium" (click)="clearFilters()">Limpiar</ion-button>
+          <ion-button expand="block" (click)="closeFilters()">Aplicar</ion-button>
         </div>
       </ion-content>
     </ng-template>

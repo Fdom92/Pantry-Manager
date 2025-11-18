@@ -59,6 +59,8 @@ export class PantryListComponent implements OnDestroy {
   readonly sortOption = signal<'name' | 'quantity' | 'expiration'>('name');
   readonly statusFilter = signal<'all' | 'expired' | 'near-expiry'>('all');
   readonly showFilters = signal(false);
+  readonly basicOnly = signal(false);
+  readonly lowStockOnly = signal(false);
   readonly itemsState = signal<PantryItem[]>([]);
   readonly filteredItems = computed(() => this.computeFilteredItems());
   readonly groups = computed(() => this.buildGroups(this.filteredItems()));
@@ -433,6 +435,14 @@ export class PantryListComponent implements OnDestroy {
     this.sortOption.set(ev.detail?.value ?? 'name');
   }
 
+  toggleBasicOnly(ev: CustomEvent<{ checked: boolean }>): void {
+    this.basicOnly.set(Boolean(ev.detail?.checked));
+  }
+
+  toggleLowStockOnly(ev: CustomEvent<{ checked: boolean }>): void {
+    this.lowStockOnly.set(Boolean(ev.detail?.checked));
+  }
+
   openFilters(event?: Event): void {
     event?.preventDefault();
     this.showFilters.set(true);
@@ -448,6 +458,8 @@ export class PantryListComponent implements OnDestroy {
     this.selectedLocation.set('all');
     this.statusFilter.set('all');
     this.sortOption.set('name');
+    this.basicOnly.set(false);
+    this.lowStockOnly.set(false);
     this.showFilters.set(false);
   }
 
@@ -583,6 +595,8 @@ export class PantryListComponent implements OnDestroy {
     const category = this.selectedCategory();
     const location = this.selectedLocation();
     const status = this.statusFilter();
+    const basicOnly = this.basicOnly();
+    const lowStockOnly = this.lowStockOnly();
 
     let filtered = items.filter(item => {
       if (search && !this.matchesSearch(item, search)) {
@@ -595,6 +609,12 @@ export class PantryListComponent implements OnDestroy {
         location !== 'all' &&
         !item.locations.some(loc => (loc.locationId ?? '') === location)
       ) {
+        return false;
+      }
+      if (basicOnly && !item.isBasic) {
+        return false;
+      }
+      if (lowStockOnly && !this.isLowStock(item)) {
         return false;
       }
       switch (status) {
