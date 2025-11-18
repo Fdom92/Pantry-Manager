@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { animate, state, style, transition, trigger } from '@angular/animations';
 import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models';
 import { ItemBatch, ItemLocationStock } from '@core/models';
 
@@ -12,25 +11,6 @@ import { ItemBatch, ItemLocationStock } from '@core/models';
   templateUrl: './pantry-detail.component.html',
   styleUrls: ['./pantry-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [
-    trigger('expandCollapse', [
-      state('collapsed', style({ height: '0px', opacity: 0, marginTop: '0px' })),
-      state('expanded', style({ height: '*', opacity: 1, marginTop: '16px' })),
-      transition('collapsed <=> expanded', [
-        animate('180ms ease-in-out')
-      ]),
-    ]),
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(-2px)' }),
-        animate('140ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
-      ]),
-      transition('* => *', [
-        style({ opacity: 0.4, transform: 'translateY(-1px)' }),
-        animate('140ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
-      ]),
-    ]),
-  ],
 })
 export class PantryDetailComponent {
   @Input({ required: true }) viewModel!: PantryItemCardViewModel;

@@ -84,8 +84,8 @@
 
   <ng-template #categoryEntryTemplate let-group="group">
     <div class="virtual-category-card" [style.height.px]="categoryHeaderHeight">
-      <ion-card [ngClass]="{ 'category-collapsed': !isCategoryExpanded(group.key) }">
-        <ion-card-header (click)="toggleCategory(group.key, $event)">
+      <ion-card>
+        <ion-card-header>
           <div class="group-header">
             <div class="group-title">
               <ion-card-title>{{ group.name }}</ion-card-title>
@@ -103,19 +103,6 @@
                   · {{ group.expiredCount }} caducados
                 }
               </ion-text>
-              <ion-button
-                fill="clear"
-                size="small"
-                class="category-toggle"
-                (click)="toggleCategory(group.key, $event)"
-                [attr.aria-label]="isCategoryExpanded(group.key) ? 'Contraer categoría' : 'Expandir categoría'"
-                [attr.aria-expanded]="isCategoryExpanded(group.key)"
-              >
-                <ion-icon
-                  slot="icon-only"
-                  [name]="isCategoryExpanded(group.key) ? 'chevron-up-outline' : 'chevron-down-outline'"
-                ></ion-icon>
-              </ion-button>
             </div>
           </div>
         </ion-card-header>

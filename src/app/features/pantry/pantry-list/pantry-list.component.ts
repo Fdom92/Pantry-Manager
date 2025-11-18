@@ -14,12 +14,10 @@ import {
   ItemLocationStock,
   ItemBatch,
   PantryGroup,
-  CategoryState,
   BatchStatusMeta,
   BatchEntryMeta,
   BatchSummaryMeta,
   BatchCountsMeta,
-  BatchStatusState,
   ProductStatusState,
   PantryItemGlobalStatus,
   PantryItemBatchViewModel,
@@ -29,7 +27,6 @@ import {
 import { createDocumentId, getLocationDisplayName } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { trigger, state, style, transition, animate } from '@angular/animations';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
 import { PantryVirtualItemHeightDirective, VirtualItemHeightChange } from '../virtual-item-height.directive';
@@ -52,26 +49,7 @@ const PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER = {
       provide: VIRTUAL_SCROLL_STRATEGY,
       useExisting: PantryAutosizeVirtualScrollStrategy,
     },
-  ],
-  animations: [
-    trigger('expandCollapse', [
-      state('collapsed', style({ height: '0px', opacity: 0, marginTop: '0px' })),
-      state('expanded', style({ height: '*', opacity: 1, marginTop: '16px' })),
-      transition('collapsed <=> expanded', [
-        animate('180ms ease-in-out')
-      ]),
-    ]),
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(-2px)' }),
-        animate('140ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
-      ]),
-      transition('* => *', [
-        style({ opacity: 0.4, transform: 'translateY(-1px)' }),
-        animate('140ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
-      ]),
-    ]),
-  ],
+  ]
 })
 export class PantryListComponent implements OnDestroy {
   @ViewChild(CdkVirtualScrollViewport) private viewport?: CdkVirtualScrollViewport;
@@ -84,8 +62,7 @@ export class PantryListComponent implements OnDestroy {
   readonly itemsState = signal<PantryItem[]>([]);
   readonly filteredItems = computed(() => this.computeFilteredItems());
   readonly groups = computed(() => this.buildGroups(this.filteredItems()));
-  private readonly categoryState = signal(new Map<string, CategoryState>());
-  readonly virtualEntries = computed(() => this.buildVirtualEntries(this.groups(), this.categoryState()));
+  readonly virtualEntries = computed(() => this.buildVirtualEntries(this.groups()));
   readonly virtualEntryHeights = computed(() => {
     const measured = this.measuredEntryHeights();
     return this.virtualEntries().map(entry => {
@@ -111,7 +88,7 @@ export class PantryListComponent implements OnDestroy {
   isSaving = false;
   private readonly expandedItems = new Set<string>();
   private readonly collapsedItemHeight = 210;
-  readonly categoryHeaderHeight = 90;
+  readonly categoryHeaderHeight = 30;
   private readonly expandedBaseHeight = 200;
   private readonly batchRowHeight = 64;
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -174,10 +151,6 @@ export class PantryListComponent implements OnDestroy {
     effect(() => {
       const storeItems = this.pantryStore.items();
       this.itemsState.set(this.mergePendingItems(storeItems));
-    });
-
-    effect(() => {
-      this.ensureCategoryState(this.groups());
     });
 
     effect(() => {
@@ -583,7 +556,13 @@ export class PantryListComponent implements OnDestroy {
     } else {
       this.expandedItems.add(item._id);
     }
-    setTimeout(() => this.viewport?.checkViewportSize());
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          this.viewport?.checkViewportSize();
+        }, 180);
+      });
+    });
   }
 
   openBatchesModal(item: PantryItem, event?: Event): void {
@@ -1732,14 +1711,10 @@ export class PantryListComponent implements OnDestroy {
     return groups;
   }
 
-  private buildVirtualEntries(groups: PantryGroup[], state: ReadonlyMap<string, CategoryState>): PantryVirtualEntry[] {
+  private buildVirtualEntries(groups: PantryGroup[]): PantryVirtualEntry[] {
     const entries: PantryVirtualEntry[] = [];
     for (const group of groups) {
       entries.push({ kind: 'category', group });
-      const expanded = state.get(group.key)?.expanded ?? true;
-      if (!expanded) {
-        continue;
-      }
       for (const item of group.items) {
         entries.push({
           kind: 'item',
@@ -1749,20 +1724,6 @@ export class PantryListComponent implements OnDestroy {
       }
     }
     return entries;
-  }
-
-  isCategoryExpanded(key: string): boolean {
-    return this.categoryState().get(key)?.expanded ?? true;
-  }
-
-  toggleCategory(key: string, event?: Event): void {
-    event?.stopPropagation();
-    this.categoryState.update(current => {
-      const next = new Map(current);
-      const currentState = next.get(key)?.expanded ?? true;
-      next.set(key, { expanded: !currentState });
-      return next;
-    });
   }
 
   trackVirtualEntry(_: number, entry: PantryVirtualEntry): string {
@@ -1778,30 +1739,6 @@ export class PantryListComponent implements OnDestroy {
 
   private getDefaultEntryHeight(entry: PantryVirtualEntry): number {
     return entry.kind === 'category' ? this.categoryHeaderHeight : this.calculateDefaultItemHeight(entry.item);
-  }
-
-  private ensureCategoryState(groups: PantryGroup[]): void {
-    this.categoryState.update(current => {
-      const next = new Map(current);
-      const keys = new Set(groups.map(group => group.key));
-      let changed = false;
-
-      for (const group of groups) {
-        if (!next.has(group.key)) {
-          next.set(group.key, { expanded: true });
-          changed = true;
-        }
-      }
-
-      for (const key of Array.from(next.keys())) {
-        if (!keys.has(key)) {
-          next.delete(key);
-          changed = true;
-        }
-      }
-
-      return changed ? next : current;
-    });
   }
 
   formatCategoryName(key: string): string {

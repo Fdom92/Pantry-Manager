@@ -37,8 +37,7 @@
 
   <div
     class="item-details"
-    [class.item-details--collapsed]="!expanded"
-    [@expandCollapse]="expanded ? 'expanded' : 'collapsed'">
+    [class.item-details--collapsed]="!expanded">
     @if (expanded) {
       <div class="expanded-content">
         <section class="batch-section">
@@ -63,7 +62,7 @@
                     </div>
                   </div>
                   <div class="batch-meta">
-                    <span class="batch-quantity" [@fadeIn]="batch.quantityValue">
+                    <span class="batch-quantity">
                       {{ batch.quantityLabel }}
                     </span>
                     <!--  -->
