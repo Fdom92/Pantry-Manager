@@ -89,9 +89,6 @@
           <div class="group-header">
             <div class="group-title">
               <ion-card-title>{{ group.name }}</ion-card-title>
-              @if (group.lowStockCount) {
-                <ion-badge color="danger">{{ group.lowStockCount }}</ion-badge>
-              }
             </div>
             <div class="group-meta">
               <ion-text color="medium">
@@ -113,6 +110,7 @@
   <ng-template #pantryItemTemplate let-item="item">
     <div
       class="virtual-item-card"
+      [class.virtual-item-card--expanded]="isExpanded(item)"
       [style.height.px]="getVirtualItemHeight(item)">
       @let card = buildItemCardViewModel(item);
       <app-pantry-detail

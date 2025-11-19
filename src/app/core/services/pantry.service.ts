@@ -305,13 +305,46 @@ export class PantryService extends StorageService<PantryItem> {
       return [];
     }
 
-    return batches.map(batch => ({
+    const normalized = batches.map(batch => ({
       ...batch,
       batchId: batch.batchId ?? this.generateBatchId(),
       quantity: this.toNumberOrZero(batch.quantity),
       unit: this.normalizeUnitValue(batch.unit ?? fallbackUnit),
       opened: batch.opened ?? false,
     }));
+
+    return this.mergeBatchesByExpiry(normalized);
+  }
+
+  /** Merge batches that share the same expiration date so duplicate entries collapse automatically. */
+  private mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
+    if (batches.length <= 1) {
+      return batches;
+    }
+
+    const seen = new Map<string, ItemBatch>();
+    const merged: ItemBatch[] = [];
+
+    for (const batch of batches) {
+      const key = (batch.expirationDate ?? '').trim();
+      if (!key) {
+        merged.push(batch);
+        continue;
+      }
+
+      const existing = seen.get(key);
+      if (!existing) {
+        const clone = { ...batch };
+        seen.set(key, clone);
+        merged.push(clone);
+        continue;
+      }
+
+      existing.quantity = this.toNumberOrZero(existing.quantity) + this.toNumberOrZero(batch.quantity);
+      existing.opened = Boolean(existing.opened || batch.opened);
+    }
+
+    return merged;
   }
 
   /** Identify the earliest expiry date across all location entries. */
@@ -358,7 +391,7 @@ export class PantryService extends StorageService<PantryItem> {
     if (totalMinThreshold <= 0) {
       return false;
     }
-    return this.getItemTotalQuantity(item) <= totalMinThreshold;
+    return this.getItemTotalQuantity(item) < totalMinThreshold;
   }
 
   /** Internal near-expiry detector that checks every location. */

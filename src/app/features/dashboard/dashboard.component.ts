@@ -1,7 +1,7 @@
 import { Component, computed, effect, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { ItemLocationStock, PantryItem } from '@core/models';
+import { ItemLocationStock, PantryItem, ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { getLocationDisplayName } from '@core/utils';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
@@ -17,6 +17,7 @@ export class DashboardComponent {
   private hasInitialized = false;
 
   readonly lastUpdated = signal<string | null>(null);
+  readonly deletingExpired = signal(false);
   readonly items = this.pantryStore.items;
   readonly lowStockItems = this.pantryStore.lowStockItems;
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
@@ -62,6 +63,31 @@ export class DashboardComponent {
   /** Toggle the visibility of the snapshot card without altering other state. */
   toggleSnapshot(): void {
     this.showSnapshot.update(open => !open);
+  }
+
+  /** Remove expired items after a minimal confirmation. */
+  async onDeleteExpiredItems(): Promise<void> {
+    if (this.deletingExpired() || this.expiredItems().length === 0) {
+      return;
+    }
+
+    const confirmed =
+      typeof window === 'undefined'
+        ? true
+        : window.confirm('Esto eliminará todos los productos caducados. ¿Quieres continuar?');
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.deletingExpired.set(true);
+    try {
+      await this.pantryStore.deleteExpiredItems();
+    } catch (err) {
+      console.error('[DashboardComponent] onDeleteExpiredItems error', err);
+    } finally {
+      this.deletingExpired.set(false);
+    }
   }
 
   /** Return the latest five updated items so the dashboard highlights recent activity. */
@@ -153,12 +179,56 @@ export class DashboardComponent {
 
   private formatShortDate(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
-        day: '2-digit',
-        month: 'short',
-      }).format(new Date(value));
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
+    }
+  }
+
+  formatLastUpdated(value: string | null): string {
+    if (!value) {
+      return '';
+    }
+    try {
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return '';
+      }
+      const datePart = parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
+      const timePart = parsed.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      return `${datePart} ${timePart}`;
+    } catch {
+      return '';
+    }
+  }
+
+  formatExpiryFull(value?: string | null): string {
+    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
+  }
+
+  formatExpiryBadge(value?: string | null): string {
+    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
+  }
+
+  private formatDateWithOptions(
+    value: string | Date | null | undefined,
+    options: Intl.DateTimeFormatOptions
+  ): string {
+    if (!value) {
+      return 'Sin fecha';
+    }
+    try {
+      const parsed = typeof value === 'string' ? new Date(value) : value;
+      if (Number.isNaN(parsed.getTime())) {
+        return 'Sin fecha';
+      }
+      return parsed.toLocaleDateString('es-ES', options);
+    } catch {
+      return 'Sin fecha';
     }
   }
 }

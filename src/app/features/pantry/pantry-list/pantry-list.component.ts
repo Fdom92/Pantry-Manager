@@ -23,6 +23,7 @@ import {
   PantryItemBatchViewModel,
   PantryItemCardViewModel,
   PantryVirtualEntry,
+  ES_DATE_FORMAT_OPTIONS,
 } from '@core/models';
 import { createDocumentId, getLocationDisplayName } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
@@ -928,7 +929,9 @@ export class PantryListComponent implements OnDestroy {
       opened: Boolean(entry.batch.opened),
     }));
 
-    const aggregates = this.computeProductAggregates(batches);
+    const lowStock = this.isLowStock(item);
+    const aggregates = this.computeProductAggregates(batches, lowStock);
+    const colorClass = this.getColorClass(aggregates.status.state);
 
     return {
       item,
@@ -938,6 +941,7 @@ export class PantryListComponent implements OnDestroy {
       totalBatches,
       totalBatchesLabel,
       globalStatus: aggregates.status,
+      colorClass,
       earliestExpirationDate: aggregates.earliestDate,
       formattedEarliestExpirationShort: aggregates.earliestDate
         ? this.formatDateCompact(aggregates.earliestDate)
@@ -971,7 +975,10 @@ export class PantryListComponent implements OnDestroy {
     return `${formatted} ${unitLabel}`;
   }
 
-  private computeProductAggregates(batches: PantryItemBatchViewModel[]): {
+  private computeProductAggregates(
+    batches: PantryItemBatchViewModel[],
+    isLowStock: boolean
+  ): {
     status: PantryItemGlobalStatus;
     earliestDate: string | null;
     counts: BatchCountsMeta;
@@ -987,6 +994,7 @@ export class PantryListComponent implements OnDestroy {
 
     let earliestDate: string | null = null;
     let earliestTime: number | null = null;
+    let earliestStatus: ProductStatusState | null = null;
 
     for (const entry of batches) {
       switch (entry.status.state) {
@@ -1009,12 +1017,24 @@ export class PantryListComponent implements OnDestroy {
         if (time !== null && (earliestTime === null || time < earliestTime)) {
           earliestTime = time;
           earliestDate = entry.batch.expirationDate;
+          earliestStatus =
+            entry.status.state === 'normal' || entry.status.state === 'unknown'
+              ? 'normal'
+              : (entry.status.state as Extract<ProductStatusState, 'expired' | 'near-expiry'>);
         }
       }
     }
 
-    const statusState: ProductStatusState =
-      counts.expired > 0 ? 'expired' : counts.nearExpiry > 0 ? 'near-expiry' : 'normal';
+    let statusState: ProductStatusState;
+    if (earliestStatus === 'expired') {
+      statusState = 'expired';
+    } else if (earliestStatus === 'near-expiry') {
+      statusState = 'near-expiry';
+    } else if (isLowStock) {
+      statusState = 'low-stock';
+    } else {
+      statusState = 'normal';
+    }
 
     const status = this.getProductStatusMeta(statusState);
     const batchSummaryLabel = this.buildBatchSummaryLabel(counts);
@@ -1029,11 +1049,11 @@ export class PantryListComponent implements OnDestroy {
 
   private formatDateCompact(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-      }).format(new Date(value));
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
     }
@@ -1041,13 +1061,26 @@ export class PantryListComponent implements OnDestroy {
 
   private formatDateVerbose(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }).format(new Date(value));
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
+    }
+  }
+
+  private getColorClass(state: ProductStatusState): string {
+    switch (state) {
+      case 'expired':
+        return 'state-expired';
+      case 'near-expiry':
+        return 'state-expiring';
+      case 'low-stock':
+        return 'state-low-stock';
+      default:
+        return 'state-ok';
     }
   }
 
@@ -1057,24 +1090,32 @@ export class PantryListComponent implements OnDestroy {
         return {
           state,
           label: 'Caducado',
-          accentColor: '#B91C1C',
-          chipColor: '#B91C1C',
+          accentColor: '#DC2626',
+          chipColor: '#DC2626',
           chipTextColor: '#F8FAFC',
         };
       case 'near-expiry':
         return {
           state,
-          label: 'Próximo a vencer',
-          accentColor: '#EA580C',
-          chipColor: '#EA580C',
+          label: 'Por caducar',
+          accentColor: '#FACC15',
+          chipColor: '#FACC15',
           chipTextColor: '#F8FAFC',
+        };
+      case 'low-stock':
+        return {
+          state,
+          label: 'Bajo stock',
+          accentColor: '#FB923C',
+          chipColor: '#FB923C',
+          chipTextColor: '#0F172A',
         };
       default:
         return {
           state: 'normal',
-          label: 'Normal',
-          accentColor: '#15803D',
-          chipColor: '#15803D',
+          label: 'Stock',
+          accentColor: '#16A34A',
+          chipColor: '#16A34A',
           chipTextColor: '#F8FAFC',
         };
     }
@@ -1090,10 +1131,10 @@ export class PantryListComponent implements OnDestroy {
       descriptors.push(`${counts.expired} caducado${counts.expired > 1 ? 's' : ''}`);
     }
     if (counts.nearExpiry) {
-      descriptors.push(`${counts.nearExpiry} próximo${counts.nearExpiry > 1 ? 's' : ''} a vencer`);
+      descriptors.push(`${counts.nearExpiry} por caducar`);
     }
     if (counts.normal) {
-      descriptors.push(`${counts.normal} vigente${counts.normal > 1 ? 's' : ''}`);
+      descriptors.push(`${counts.normal} con stock`);
     }
     if (counts.unknown) {
       descriptors.push(`${counts.unknown} sin fecha`);
@@ -1188,9 +1229,9 @@ export class PantryListComponent implements OnDestroy {
       return { label: 'Caducado', icon: 'alert-circle-outline', state: 'expired', color: 'danger' };
     }
     if (expiryDate <= nearExpiryThreshold) {
-      return { label: 'Próximo a vencer', icon: 'hourglass-outline', state: 'near-expiry', color: 'warning' };
+      return { label: 'Por caducar', icon: 'hourglass-outline', state: 'near-expiry', color: 'warning' };
     }
-    return { label: 'Vigente', icon: 'checkmark-circle-outline', state: 'normal', color: 'success' };
+    return { label: 'Stock', icon: 'checkmark-circle-outline', state: 'normal', color: 'success' };
   }
 
   /** Return the earliest expiry date present in the provided locations array. */
@@ -1272,10 +1313,11 @@ export class PantryListComponent implements OnDestroy {
 
   private formatShortDate(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
-        day: '2-digit',
-        month: 'short'
-      }).format(new Date(value));
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
     }
@@ -1355,13 +1397,44 @@ export class PantryListComponent implements OnDestroy {
       return [];
     }
     const normalizedUnit = this.normalizeUnitValue(unit);
-    return batches.map(batch => ({
+    const normalized = batches.map(batch => ({
       ...batch,
       batchId: batch.batchId ?? this.createTempBatchId(),
       quantity: this.toNumber(batch.quantity),
       unit: this.normalizeUnitValue(batch.unit ?? normalizedUnit),
       opened: batch.opened ?? false,
     }));
+
+    return this.mergeBatchesByExpiry(normalized);
+  }
+
+  private mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
+    if (batches.length <= 1) {
+      return batches;
+    }
+
+    const seen = new Map<string, ItemBatch>();
+    const merged: ItemBatch[] = [];
+
+    for (const batch of batches) {
+      const key = (batch.expirationDate ?? '').trim();
+      if (!key) {
+        merged.push(batch);
+        continue;
+      }
+
+      const existing = seen.get(key);
+      if (!existing) {
+        seen.set(key, batch);
+        merged.push(batch);
+        continue;
+      }
+
+      existing.quantity = this.toNumber(existing.quantity) + this.toNumber(batch.quantity);
+      existing.opened = Boolean(existing.opened || batch.opened);
+    }
+
+    return merged;
   }
 
   private sumBatchQuantities(batches: ItemBatch[] | undefined): number {

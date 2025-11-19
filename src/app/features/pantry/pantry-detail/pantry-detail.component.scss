@@ -20,9 +20,34 @@
   transition: background 180ms ease;
 }
 
+.pantry-item-card.state-expired {
+  --card-accent: #dc2626;
+  border-color: rgba(220, 38, 38, 0.45);
+  background: linear-gradient(120deg, rgba(220, 38, 38, 0.18), #1c1c1e 55%);
+}
+
+.pantry-item-card.state-expiring {
+  --card-accent: #facc15;
+  border-color: rgba(250, 204, 21, 0.35);
+  background: linear-gradient(120deg, rgba(250, 204, 21, 0.14), #1c1c1e 55%);
+}
+
+.pantry-item-card.state-low-stock {
+  --card-accent: #fb923c;
+  border-color: rgba(251, 146, 60, 0.4);
+  background: linear-gradient(120deg, rgba(251, 146, 60, 0.2), #1c1c1e 55%);
+}
+
+.pantry-item-card.state-ok {
+  --card-accent: #16a34a;
+  border-color: rgba(22, 163, 74, 0.4);
+  background: linear-gradient(120deg, rgba(22, 163, 74, 0.18), #1c1c1e 55%);
+}
+
 .pantry-item-card.is-expanded {
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
   transform: translateY(-1px);
+  z-index: 5;
 }
 
 .card-summary {

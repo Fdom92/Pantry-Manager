@@ -17,7 +17,7 @@ export interface CategoryState {
 }
 
 export type BatchStatusState = 'normal' | 'near-expiry' | 'expired' | 'unknown';
-export type ProductStatusState = 'normal' | 'near-expiry' | 'expired';
+export type ProductStatusState = 'normal' | 'near-expiry' | 'expired' | 'low-stock';
 
 export interface BatchStatusMeta {
   label: string;
@@ -70,6 +70,7 @@ export interface PantryItemBatchViewModel {
 export interface PantryItemCardViewModel {
   item: PantryItem;
   globalStatus: PantryItemGlobalStatus;
+  colorClass: string;
   totalQuantity: number;
   totalQuantityLabel: string;
   unitLabel: string;

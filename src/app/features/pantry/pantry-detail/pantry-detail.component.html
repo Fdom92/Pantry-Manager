@@ -2,7 +2,7 @@
   class="pantry-item-card"
   [attr.data-status]="viewModel.globalStatus.state"
   [style.--card-accent]="viewModel.globalStatus.accentColor"
-  [ngClass]="expanded ? 'is-expanded' : ''">
+  [ngClass]="[viewModel.colorClass, expanded ? 'is-expanded' : '']">
   <div
     class="card-summary"
     role="button"

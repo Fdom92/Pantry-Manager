@@ -2,7 +2,7 @@ import { Component, computed, signal } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { BaseDoc } from '@core/models';
+import { BaseDoc, ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { AppPreferencesService, StorageService } from '@core/services';
 import packageJson from '../../../../package.json';
 
@@ -90,7 +90,7 @@ export class SettingsComponent {
     if (Number.isNaN(date.getTime())) {
       return 'Sin sincronización registrada';
     }
-    return new Intl.DateTimeFormat('es-ES').format(date);
+    return date.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
   }
 
   private async ensurePreferencesLoaded(): Promise<void> {

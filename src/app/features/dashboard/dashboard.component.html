@@ -7,7 +7,7 @@
 <ion-content class="ion-padding">
   <ion-card>
     <ion-card-header>
-      <div class="snapshot-header">
+      <div class="card-header-actions">
         <ion-card-title>Resumen de la despensa</ion-card-title>
         <ion-button
           fill="clear"
@@ -23,7 +23,7 @@
         </ion-button>
       </div>
       @if (lastUpdated()) {
-        <ion-card-subtitle>Actualizado {{ lastUpdated() | date:'short' }}</ion-card-subtitle>
+        <ion-card-subtitle>Actualizado {{ formatLastUpdated(lastUpdated()) }}</ion-card-subtitle>
       }
     </ion-card-header>
     @if (showSnapshot()) {
@@ -35,11 +35,11 @@
           </div>
           <div class="stat">
             <h3>{{ lowStockItems().length }}</h3>
-            <p>Poco stock</p>
+            <p>Bajo stock</p>
           </div>
           <div class="stat">
             <h3>{{ nearExpiryItems().length }}</h3>
-            <p>Próximo a caducar</p>
+            <p>Por caducar</p>
           </div>
           <div class="stat">
             <h3>{{ expiredItems().length }}</h3>
@@ -52,8 +52,8 @@
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Próximos a caducar</ion-card-title>
-      <ion-card-subtitle>Próximos {{ nearExpiryWindow }} días</ion-card-subtitle>
+      <ion-card-title>Por caducar</ion-card-title>
+      <ion-card-subtitle>En los próximos {{ nearExpiryWindow }} días</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
       @if (nearExpiryItems().length) {
@@ -62,21 +62,21 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>Caduca {{ item.expirationDate | date:'MMM d, yyyy' }}</p>
+                <p>Caduca {{ formatExpiryFull(item.expirationDate) }}</p>
               </ion-label>
-              <ion-badge color="warning">{{ item.expirationDate | date:'MMM d' }}</ion-badge>
+              <ion-badge color="warning">{{ formatExpiryBadge(item.expirationDate) }}</ion-badge>
             </ion-item>
           }
         </ion-list>
       } @else {
-        <ion-text color="medium">No hay artículos próximos a caducar.</ion-text>
+        <ion-text color="medium">No hay artículos por caducar.</ion-text>
       }
     </ion-card-content>
   </ion-card>
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Alertas de poco stock</ion-card-title>
+      <ion-card-title>Alertas de bajo stock</ion-card-title>
       <ion-card-subtitle>En o por debajo del nivel mínimo</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
@@ -108,7 +108,25 @@
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Artículos caducados</ion-card-title>
+      <div class="card-header-actions">
+        <ion-card-title>Artículos caducados</ion-card-title>
+        @if (expiredItems().length) {
+          <ion-button
+            color="danger"
+            fill="clear"
+            size="small"
+            [disabled]="deletingExpired()"
+            (click)="onDeleteExpiredItems()"
+            aria-label="Eliminar caducados"
+          >
+            @if (deletingExpired()) {
+              <ion-spinner slot="icon-only" name="crescent"></ion-spinner>
+            } @else {
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            }
+          </ion-button>
+        }
+      </div>
     </ion-card-header>
     <ion-card-content>
       @if (expiredItems().length) {
@@ -117,7 +135,7 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>Caducó {{ item.expirationDate | date:'MMM d, yyyy' }}</p>
+                <p>Caducó {{ formatExpiryFull(item.expirationDate) }}</p>
               </ion-label>
               <ion-badge color="medium">Caducado</ion-badge>
             </ion-item>
@@ -140,7 +158,7 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>Actualizado {{ item.updatedAt | date:'MMM d, yyyy' }}</p>
+                <p>Actualizado {{ formatExpiryFull(item.updatedAt) }}</p>
               </ion-label>
               <ion-badge color="tertiary">Nuevo</ion-badge>
             </ion-item>
