@@ -6,6 +6,12 @@ import { PantryStoreService } from '@core/store/pantry-store.service';
 import { getLocationDisplayName } from '@core/utils';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
+const ES_NUMERIC_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+};
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -183,10 +189,7 @@ export class DashboardComponent {
       if (Number.isNaN(parsed.getTime())) {
         return value;
       }
-      return parsed.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'short',
-      });
+      return parsed.toLocaleDateString('es-ES', ES_NUMERIC_DATE_OPTIONS);
     } catch {
       return value;
     }
@@ -201,11 +204,7 @@ export class DashboardComponent {
       if (Number.isNaN(parsed.getTime())) {
         return '';
       }
-      const datePart = parsed.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      });
+      const datePart = parsed.toLocaleDateString('es-ES', ES_NUMERIC_DATE_OPTIONS);
       const timePart = parsed.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
       return `${datePart} ${timePart}`;
     } catch {
@@ -214,18 +213,11 @@ export class DashboardComponent {
   }
 
   formatExpiryFull(value?: string | null): string {
-    return this.formatDateWithOptions(value, {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    return this.formatDateWithOptions(value, ES_NUMERIC_DATE_OPTIONS);
   }
 
   formatExpiryBadge(value?: string | null): string {
-    return this.formatDateWithOptions(value, {
-      day: '2-digit',
-      month: 'short',
-    });
+    return this.formatDateWithOptions(value, ES_NUMERIC_DATE_OPTIONS);
   }
 
   private formatDateWithOptions(

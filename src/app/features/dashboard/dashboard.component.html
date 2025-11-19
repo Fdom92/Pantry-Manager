@@ -35,11 +35,11 @@
           </div>
           <div class="stat">
             <h3>{{ lowStockItems().length }}</h3>
-            <p>Poco stock</p>
+            <p>Bajo stock</p>
           </div>
           <div class="stat">
             <h3>{{ nearExpiryItems().length }}</h3>
-            <p>Próximo a caducar</p>
+            <p>Por caducar</p>
           </div>
           <div class="stat">
             <h3>{{ expiredItems().length }}</h3>
@@ -52,8 +52,8 @@
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Próximos a caducar</ion-card-title>
-      <ion-card-subtitle>Próximos {{ nearExpiryWindow }} días</ion-card-subtitle>
+      <ion-card-title>Por caducar</ion-card-title>
+      <ion-card-subtitle>En los próximos {{ nearExpiryWindow }} días</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
       @if (nearExpiryItems().length) {
@@ -69,14 +69,14 @@
           }
         </ion-list>
       } @else {
-        <ion-text color="medium">No hay artículos próximos a caducar.</ion-text>
+        <ion-text color="medium">No hay artículos por caducar.</ion-text>
       }
     </ion-card-content>
   </ion-card>
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Alertas de poco stock</ion-card-title>
+      <ion-card-title>Alertas de bajo stock</ion-card-title>
       <ion-card-subtitle>En o por debajo del nivel mínimo</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>

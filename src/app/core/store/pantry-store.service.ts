@@ -159,7 +159,7 @@ export class PantryStoreService {
     }
 
     const minThreshold = this.pantryService.getItemTotalMinThreshold(item);
-    if (minThreshold > 0 && totalQuantity <= minThreshold) {
+    if (minThreshold > 0 && totalQuantity < minThreshold) {
       return StockStatus.LOW;
     }
     return StockStatus.NORMAL;

@@ -37,6 +37,12 @@ const PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER = {
   useFactory: () => new PantryAutosizeVirtualScrollStrategy(900, 1800),
 };
 
+const ES_NUMERIC_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+};
+
 @Component({
   selector: 'app-pantry-list',
   standalone: true,
@@ -1052,11 +1058,7 @@ export class PantryListComponent implements OnDestroy {
       if (Number.isNaN(parsed.getTime())) {
         return value;
       }
-      return parsed.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-      });
+      return parsed.toLocaleDateString('es-ES', ES_NUMERIC_DATE_OPTIONS);
     } catch {
       return value;
     }
@@ -1068,11 +1070,7 @@ export class PantryListComponent implements OnDestroy {
       if (Number.isNaN(parsed.getTime())) {
         return value;
       }
-      return parsed.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      });
+      return parsed.toLocaleDateString('es-ES', ES_NUMERIC_DATE_OPTIONS);
     } catch {
       return value;
     }
@@ -1104,7 +1102,7 @@ export class PantryListComponent implements OnDestroy {
       case 'near-expiry':
         return {
           state,
-          label: 'Próximo a vencer',
+          label: 'Por caducar',
           accentColor: '#FACC15',
           chipColor: '#FACC15',
           chipTextColor: '#F8FAFC',
@@ -1120,7 +1118,7 @@ export class PantryListComponent implements OnDestroy {
       default:
         return {
           state: 'normal',
-          label: 'Stock OK',
+          label: 'Stock',
           accentColor: '#16A34A',
           chipColor: '#16A34A',
           chipTextColor: '#F8FAFC',
@@ -1138,10 +1136,10 @@ export class PantryListComponent implements OnDestroy {
       descriptors.push(`${counts.expired} caducado${counts.expired > 1 ? 's' : ''}`);
     }
     if (counts.nearExpiry) {
-      descriptors.push(`${counts.nearExpiry} próximo${counts.nearExpiry > 1 ? 's' : ''} a vencer`);
+      descriptors.push(`${counts.nearExpiry} por caducar`);
     }
     if (counts.normal) {
-      descriptors.push(`${counts.normal} vigente${counts.normal > 1 ? 's' : ''}`);
+      descriptors.push(`${counts.normal} con stock`);
     }
     if (counts.unknown) {
       descriptors.push(`${counts.unknown} sin fecha`);
@@ -1236,9 +1234,9 @@ export class PantryListComponent implements OnDestroy {
       return { label: 'Caducado', icon: 'alert-circle-outline', state: 'expired', color: 'danger' };
     }
     if (expiryDate <= nearExpiryThreshold) {
-      return { label: 'Próximo a vencer', icon: 'hourglass-outline', state: 'near-expiry', color: 'warning' };
+      return { label: 'Por caducar', icon: 'hourglass-outline', state: 'near-expiry', color: 'warning' };
     }
-    return { label: 'Vigente', icon: 'checkmark-circle-outline', state: 'normal', color: 'success' };
+    return { label: 'Stock', icon: 'checkmark-circle-outline', state: 'normal', color: 'success' };
   }
 
   /** Return the earliest expiry date present in the provided locations array. */
@@ -1324,10 +1322,7 @@ export class PantryListComponent implements OnDestroy {
       if (Number.isNaN(parsed.getTime())) {
         return value;
       }
-      return parsed.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'short'
-      });
+      return parsed.toLocaleDateString('es-ES', ES_NUMERIC_DATE_OPTIONS);
     } catch {
       return value;
     }

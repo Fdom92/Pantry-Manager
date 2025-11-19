@@ -391,7 +391,7 @@ export class PantryService extends StorageService<PantryItem> {
     if (totalMinThreshold <= 0) {
       return false;
     }
-    return this.getItemTotalQuantity(item) <= totalMinThreshold;
+    return this.getItemTotalQuantity(item) < totalMinThreshold;
   }
 
   /** Internal near-expiry detector that checks every location. */
