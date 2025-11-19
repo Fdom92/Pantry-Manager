@@ -1,8 +1,10 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
 import {
   homeOutline,
   basketOutline,
@@ -36,6 +38,8 @@ import {
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
+
+registerLocaleData(localeEs);
 
 addIcons({
   'home-outline': homeOutline,
@@ -72,7 +76,7 @@ addIcons({
 bootstrapApplication(AppComponent, {
   providers: [
     provideIonicAngular(),
-    provideAnimations(),
     provideRouter(routes),
+    { provide: LOCALE_ID, useValue: 'es' },
   ],
 }).catch(err => console.error(err));

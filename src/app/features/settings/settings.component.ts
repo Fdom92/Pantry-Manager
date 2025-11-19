@@ -90,7 +90,7 @@ export class SettingsComponent {
     if (Number.isNaN(date.getTime())) {
       return 'Sin sincronización registrada';
     }
-    return new Intl.DateTimeFormat('es-ES').format(date);
+    return date.toLocaleDateString('es-ES');
   }
 
   private async ensurePreferencesLoaded(): Promise<void> {

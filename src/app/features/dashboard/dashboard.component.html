@@ -23,7 +23,7 @@
         </ion-button>
       </div>
       @if (lastUpdated()) {
-        <ion-card-subtitle>Actualizado {{ lastUpdated() | date:'short' }}</ion-card-subtitle>
+        <ion-card-subtitle>Actualizado {{ formatLastUpdated(lastUpdated()) }}</ion-card-subtitle>
       }
     </ion-card-header>
     @if (showSnapshot()) {
@@ -62,9 +62,9 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>Caduca {{ item.expirationDate | date:'MMM d, yyyy' }}</p>
+                <p>Caduca {{ formatExpiryFull(item.expirationDate) }}</p>
               </ion-label>
-              <ion-badge color="warning">{{ item.expirationDate | date:'MMM d' }}</ion-badge>
+              <ion-badge color="warning">{{ formatExpiryBadge(item.expirationDate) }}</ion-badge>
             </ion-item>
           }
         </ion-list>
@@ -135,7 +135,7 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>Caducó {{ item.expirationDate | date:'MMM d, yyyy' }}</p>
+                <p>Caducó {{ formatExpiryFull(item.expirationDate) }}</p>
               </ion-label>
               <ion-badge color="medium">Caducado</ion-badge>
             </ion-item>
@@ -158,7 +158,7 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>Actualizado {{ item.updatedAt | date:'MMM d, yyyy' }}</p>
+                <p>Actualizado {{ formatExpiryFull(item.updatedAt) }}</p>
               </ion-label>
               <ion-badge color="tertiary">Nuevo</ion-badge>
             </ion-item>

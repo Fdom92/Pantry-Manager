@@ -179,12 +179,70 @@ export class DashboardComponent {
 
   private formatShortDate(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: 'short',
-      }).format(new Date(value));
+      });
     } catch {
       return value;
+    }
+  }
+
+  formatLastUpdated(value: string | null): string {
+    if (!value) {
+      return '';
+    }
+    try {
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return '';
+      }
+      const datePart = parsed.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+      const timePart = parsed.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      return `${datePart} ${timePart}`;
+    } catch {
+      return '';
+    }
+  }
+
+  formatExpiryFull(value?: string | null): string {
+    return this.formatDateWithOptions(value, {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
+
+  formatExpiryBadge(value?: string | null): string {
+    return this.formatDateWithOptions(value, {
+      day: '2-digit',
+      month: 'short',
+    });
+  }
+
+  private formatDateWithOptions(
+    value: string | Date | null | undefined,
+    options: Intl.DateTimeFormatOptions
+  ): string {
+    if (!value) {
+      return 'Sin fecha';
+    }
+    try {
+      const parsed = typeof value === 'string' ? new Date(value) : value;
+      if (Number.isNaN(parsed.getTime())) {
+        return 'Sin fecha';
+      }
+      return parsed.toLocaleDateString('es-ES', options);
+    } catch {
+      return 'Sin fecha';
     }
   }
 }

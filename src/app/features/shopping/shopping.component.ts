@@ -4,8 +4,9 @@ import { CommonModule } from '@angular/common';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { PantryItem, MeasurementUnit } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
+import { SHOPPING_REASON_LABELS } from '@core/constants';
 
-type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';
+type ShoppingReason = keyof typeof SHOPPING_REASON_LABELS;
 
 interface ShoppingSuggestion {
   item: PantryItem;
@@ -47,12 +48,7 @@ interface ShoppingState {
   styleUrls: ['./shopping.component.scss'],
 })
 export class ShoppingComponent {
-  readonly reasonLabels: Record<ShoppingReason, string> = {
-    'below-min': 'Below minimum',
-    'basic-low': 'Basic item below minimum',
-    'basic-out': 'Basic item out of stock',
-    'empty': 'Out of stock',
-  };
+  readonly reasonLabels = SHOPPING_REASON_LABELS;
   readonly unassignedSupermarketLabel = 'Sin supermercado';
   private readonly unassignedSupermarketKey = '__none__';
 

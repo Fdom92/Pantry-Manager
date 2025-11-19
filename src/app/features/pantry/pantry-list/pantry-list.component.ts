@@ -1029,11 +1029,15 @@ export class PantryListComponent implements OnDestroy {
 
   private formatDateCompact(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: '2-digit',
         year: '2-digit',
-      }).format(new Date(value));
+      });
     } catch {
       return value;
     }
@@ -1041,11 +1045,15 @@ export class PantryListComponent implements OnDestroy {
 
   private formatDateVerbose(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
-      }).format(new Date(value));
+      });
     } catch {
       return value;
     }
@@ -1272,10 +1280,14 @@ export class PantryListComponent implements OnDestroy {
 
   private formatShortDate(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', {
         day: '2-digit',
         month: 'short'
-      }).format(new Date(value));
+      });
     } catch {
       return value;
     }
