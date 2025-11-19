@@ -53,13 +53,14 @@
         <ion-text color="medium">Todavía no hay productos en la despensa. Añade tu primer producto para comenzar.</ion-text>
       </ion-card-content>
     </ion-card>
-  } @else if (filteredItems().length === 0) {
+  } @else if (itemsState().length === 0) {
     <ion-card>
       <ion-card-content>
         <ion-text color="medium">Ningún producto coincide con los filtros actuales.</ion-text>
       </ion-card-content>
     </ion-card>
   } @else {
+    <!-- Virtual scroll consumes the flattened entries so we can group categories without breaking pagination. -->
     <cdk-virtual-scroll-viewport
       class="category-stack virtual-scroll"
       autosize
@@ -80,6 +81,25 @@
         }
       </ng-container>
     </cdk-virtual-scroll-viewport>
+    <!-- Infinite scroll advances PouchDB pagination and shows live status while loading or after the end. -->
+    <ion-infinite-scroll
+      threshold="150px"
+      [disabled]="endReached()"
+      (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="dots"
+        loadingText="Cargando productos...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+    @if (itemsState().length > 0) {
+      <div class="infinite-status">
+        @if (loading()) {
+          <ion-spinner name="dots"></ion-spinner>
+        } @else if (endReached()) {
+          <ion-text color="medium">No hay más productos</ion-text>
+        }
+      </div>
+    }
   }
 
   <ng-template #categoryEntryTemplate let-group="group">

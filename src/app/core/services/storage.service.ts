@@ -14,7 +14,11 @@ type PouchResponse = PouchDB.Core.Response;
 })
 export class StorageService<T extends BaseDoc> {
   private db: PouchDB.Database<T>;
-  private readonly MAX_LIST_LIMIT = 100;
+  /**
+   * Internal chunk size used to stream complete lists without imposing a hard total limit.
+   * This keeps memory predictable while still returning every document.
+   */
+  private readonly LIST_CHUNK_SIZE = 250;
 
   constructor() {
     // auto_compaction reduces database size; tweak if needed
@@ -109,17 +113,25 @@ export class StorageService<T extends BaseDoc> {
       return result.rows.map(r => r.doc!).filter(Boolean);
     }
 
-    try {
-      await this.db.createIndex({ index: { fields: ['type'] } });
-    } catch (err) {
-      console.warn('[StorageService] createIndex warning for type', err);
+    await this.ensureIndex(['type']);
+    const docs: T[] = [];
+    let skip = 0;
+
+    // Stream the entire result set in deterministic batches so callers never hit an artificial cap.
+    while (true) {
+      const res = await this.db.find({
+        selector: { type },
+        skip,
+        limit: this.LIST_CHUNK_SIZE,
+      });
+      docs.push(...res.docs);
+      if (res.docs.length < this.LIST_CHUNK_SIZE) {
+        break;
+      }
+      skip += res.docs.length;
     }
 
-    const res = await this.db.find({
-      selector: { type },
-      limit: this.MAX_LIST_LIMIT,
-    });
-    return res.docs;
+    return docs;
   }
 
   /**
@@ -258,5 +270,9 @@ export class StorageService<T extends BaseDoc> {
       }
     }
     return Array.from(duplicates);
+  }
+
+  protected get database(): PouchDB.Database<T> {
+    return this.db;
   }
 }
