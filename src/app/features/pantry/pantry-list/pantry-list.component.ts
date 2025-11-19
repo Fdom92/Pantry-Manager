@@ -23,6 +23,7 @@ import {
   PantryItemBatchViewModel,
   PantryItemCardViewModel,
   PantryVirtualEntry,
+  ES_DATE_FORMAT_OPTIONS,
 } from '@core/models';
 import { createDocumentId, getLocationDisplayName } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
@@ -35,12 +36,6 @@ import { PantryAutosizeVirtualScrollStrategy } from '../pantry-autosize-virtual-
 const PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER = {
   provide: PantryAutosizeVirtualScrollStrategy,
   useFactory: () => new PantryAutosizeVirtualScrollStrategy(900, 1800),
-};
-
-const ES_NUMERIC_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
 };
 
 @Component({
@@ -1058,7 +1053,7 @@ export class PantryListComponent implements OnDestroy {
       if (Number.isNaN(parsed.getTime())) {
         return value;
       }
-      return parsed.toLocaleDateString('es-ES', ES_NUMERIC_DATE_OPTIONS);
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
     }
@@ -1070,7 +1065,7 @@ export class PantryListComponent implements OnDestroy {
       if (Number.isNaN(parsed.getTime())) {
         return value;
       }
-      return parsed.toLocaleDateString('es-ES', ES_NUMERIC_DATE_OPTIONS);
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
     }
@@ -1322,7 +1317,7 @@ export class PantryListComponent implements OnDestroy {
       if (Number.isNaN(parsed.getTime())) {
         return value;
       }
-      return parsed.toLocaleDateString('es-ES', ES_NUMERIC_DATE_OPTIONS);
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
     }

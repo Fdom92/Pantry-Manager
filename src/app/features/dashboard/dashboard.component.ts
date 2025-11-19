@@ -1,16 +1,10 @@
 import { Component, computed, effect, signal } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { ItemLocationStock, PantryItem } from '@core/models';
+import { ItemLocationStock, PantryItem, ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { getLocationDisplayName } from '@core/utils';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-
-const ES_NUMERIC_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-};
 
 @Component({
   selector: 'app-dashboard',
@@ -189,7 +183,7 @@ export class DashboardComponent {
       if (Number.isNaN(parsed.getTime())) {
         return value;
       }
-      return parsed.toLocaleDateString('es-ES', ES_NUMERIC_DATE_OPTIONS);
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
     }
@@ -204,7 +198,7 @@ export class DashboardComponent {
       if (Number.isNaN(parsed.getTime())) {
         return '';
       }
-      const datePart = parsed.toLocaleDateString('es-ES', ES_NUMERIC_DATE_OPTIONS);
+      const datePart = parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
       const timePart = parsed.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
       return `${datePart} ${timePart}`;
     } catch {
@@ -213,11 +207,11 @@ export class DashboardComponent {
   }
 
   formatExpiryFull(value?: string | null): string {
-    return this.formatDateWithOptions(value, ES_NUMERIC_DATE_OPTIONS);
+    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
   }
 
   formatExpiryBadge(value?: string | null): string {
-    return this.formatDateWithOptions(value, ES_NUMERIC_DATE_OPTIONS);
+    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
   }
 
   private formatDateWithOptions(
