@@ -161,14 +161,22 @@
   box-sizing: border-box;
   margin-bottom: 8px;
   transition: height 0.25s ease;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
+  position: relative;
+  z-index: 1;
 }
 
 .virtual-item-card__detail {
   display: block;
   flex: 1 1 auto;
   height: 100%;
+}
+
+.virtual-item-card--expanded {
+  margin-top: 10px;
+  margin-bottom: 14px;
+  z-index: 5;
 }
 
 .group-header {

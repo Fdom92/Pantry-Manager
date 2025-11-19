@@ -110,6 +110,7 @@
   <ng-template #pantryItemTemplate let-item="item">
     <div
       class="virtual-item-card"
+      [class.virtual-item-card--expanded]="isExpanded(item)"
       [style.height.px]="getVirtualItemHeight(item)">
       @let card = buildItemCardViewModel(item);
       <app-pantry-detail

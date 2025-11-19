@@ -928,7 +928,9 @@ export class PantryListComponent implements OnDestroy {
       opened: Boolean(entry.batch.opened),
     }));
 
-    const aggregates = this.computeProductAggregates(batches);
+    const lowStock = this.isLowStock(item);
+    const aggregates = this.computeProductAggregates(batches, lowStock);
+    const colorClass = this.getColorClass(aggregates.status.state);
 
     return {
       item,
@@ -938,6 +940,7 @@ export class PantryListComponent implements OnDestroy {
       totalBatches,
       totalBatchesLabel,
       globalStatus: aggregates.status,
+      colorClass,
       earliestExpirationDate: aggregates.earliestDate,
       formattedEarliestExpirationShort: aggregates.earliestDate
         ? this.formatDateCompact(aggregates.earliestDate)
@@ -971,7 +974,10 @@ export class PantryListComponent implements OnDestroy {
     return `${formatted} ${unitLabel}`;
   }
 
-  private computeProductAggregates(batches: PantryItemBatchViewModel[]): {
+  private computeProductAggregates(
+    batches: PantryItemBatchViewModel[],
+    isLowStock: boolean
+  ): {
     status: PantryItemGlobalStatus;
     earliestDate: string | null;
     counts: BatchCountsMeta;
@@ -987,6 +993,7 @@ export class PantryListComponent implements OnDestroy {
 
     let earliestDate: string | null = null;
     let earliestTime: number | null = null;
+    let earliestStatus: ProductStatusState | null = null;
 
     for (const entry of batches) {
       switch (entry.status.state) {
@@ -1009,12 +1016,24 @@ export class PantryListComponent implements OnDestroy {
         if (time !== null && (earliestTime === null || time < earliestTime)) {
           earliestTime = time;
           earliestDate = entry.batch.expirationDate;
+          earliestStatus =
+            entry.status.state === 'normal' || entry.status.state === 'unknown'
+              ? 'normal'
+              : (entry.status.state as Extract<ProductStatusState, 'expired' | 'near-expiry'>);
         }
       }
     }
 
-    const statusState: ProductStatusState =
-      counts.expired > 0 ? 'expired' : counts.nearExpiry > 0 ? 'near-expiry' : 'normal';
+    let statusState: ProductStatusState;
+    if (earliestStatus === 'expired') {
+      statusState = 'expired';
+    } else if (earliestStatus === 'near-expiry') {
+      statusState = 'near-expiry';
+    } else if (isLowStock) {
+      statusState = 'low-stock';
+    } else {
+      statusState = 'normal';
+    }
 
     const status = this.getProductStatusMeta(statusState);
     const batchSummaryLabel = this.buildBatchSummaryLabel(counts);
@@ -1059,30 +1078,51 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
+  private getColorClass(state: ProductStatusState): string {
+    switch (state) {
+      case 'expired':
+        return 'state-expired';
+      case 'near-expiry':
+        return 'state-expiring';
+      case 'low-stock':
+        return 'state-low-stock';
+      default:
+        return 'state-ok';
+    }
+  }
+
   private getProductStatusMeta(state: ProductStatusState): PantryItemGlobalStatus {
     switch (state) {
       case 'expired':
         return {
           state,
           label: 'Caducado',
-          accentColor: '#B91C1C',
-          chipColor: '#B91C1C',
+          accentColor: '#DC2626',
+          chipColor: '#DC2626',
           chipTextColor: '#F8FAFC',
         };
       case 'near-expiry':
         return {
           state,
           label: 'Próximo a vencer',
-          accentColor: '#EA580C',
-          chipColor: '#EA580C',
+          accentColor: '#FACC15',
+          chipColor: '#FACC15',
           chipTextColor: '#F8FAFC',
+        };
+      case 'low-stock':
+        return {
+          state,
+          label: 'Bajo stock',
+          accentColor: '#FB923C',
+          chipColor: '#FB923C',
+          chipTextColor: '#0F172A',
         };
       default:
         return {
           state: 'normal',
-          label: 'Normal',
-          accentColor: '#15803D',
-          chipColor: '#15803D',
+          label: 'Stock OK',
+          accentColor: '#16A34A',
+          chipColor: '#16A34A',
           chipTextColor: '#F8FAFC',
         };
     }
