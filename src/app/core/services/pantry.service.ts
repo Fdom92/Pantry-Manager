@@ -17,7 +17,7 @@ export class PantryService extends StorageService<PantryItem> {
   readonly activeFilters = signal<PantryFilterState>({ ...DEFAULT_PANTRY_FILTERS });
   readonly sortMode = signal<PantrySortMode>('name');
   readonly pageOffset = signal(0);
-  readonly pageSize = signal(50);
+  readonly pageSize = signal(300);
   readonly loading = signal(false);
   readonly endReached = signal(false);
   readonly totalCount = signal(0);
@@ -63,7 +63,7 @@ export class PantryService extends StorageService<PantryItem> {
   /** Reloads from the beginning by fetching the first full page from PouchDB. */
   async reloadFromStart(): Promise<void> {
     this.resetPagination();
-    await this.loadNextPage();
+    await this.loadAllPages();
   }
 
   /**
@@ -441,7 +441,7 @@ export class PantryService extends StorageService<PantryItem> {
     }
     this.pendingPipelineReset = false;
     this.resetPagination();
-    await this.loadNextPage();
+    await this.loadAllPages();
   }
 
   private hasActiveFilters(filters: PantryFilterState = this.activeFilters()): boolean {
@@ -899,9 +899,7 @@ export class PantryService extends StorageService<PantryItem> {
     this.productIndexReady = true;
   }
 
-  /**
-   * Adds or replaces freshly paginated documents while preserving the flat virtual-scroll order.
-   */
+  /** Adds or replaces freshly loaded documents while preserving the cached order. */
   private appendBatchToLoadedProducts(batch: PantryItem[]): void {
     if (!batch.length) {
       return;
@@ -966,5 +964,11 @@ export class PantryService extends StorageService<PantryItem> {
 
   private decrementTotalCount(delta: number = 1): void {
     this.totalCount.update(count => Math.max(0, count - delta));
+  }
+
+  private async loadAllPages(): Promise<void> {
+    while (!this.endReached()) {
+      await this.loadNextPage();
+    }
   }
 }

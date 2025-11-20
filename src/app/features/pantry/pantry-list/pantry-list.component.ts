@@ -1,6 +1,5 @@
-import { Component, OnDestroy, AfterViewInit, signal, computed, effect, ViewChild, Signal } from '@angular/core';
-import { CdkVirtualScrollViewport, ScrollingModule, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { Component, OnDestroy, ChangeDetectionStrategy, signal, computed, effect, ViewChild, Signal } from '@angular/core';
+import { IonicModule, IonContent, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
 import {
@@ -22,7 +21,6 @@ import {
   PantryItemGlobalStatus,
   PantryItemBatchViewModel,
   PantryItemCardViewModel,
-  PantryVirtualEntry,
   ES_DATE_FORMAT_OPTIONS,
 } from '@core/models';
 import { createDocumentId, getLocationDisplayName } from '@core/utils';
@@ -32,31 +30,17 @@ import { PantryStoreService } from '@core/store/pantry-store.service';
 import { PantryService } from '@core/services/pantry.service';
 import { PantryFilterState } from '@core/models/pantry-pipeline.model';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
-import { PantryVirtualItemHeightDirective, VirtualItemHeightChange } from '../virtual-item-height.directive';
-import { PantryAutosizeVirtualScrollStrategy } from '../pantry-autosize-virtual-scroll.strategy';
-import { Subscription } from 'rxjs';
-
-const PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER = {
-  provide: PantryAutosizeVirtualScrollStrategy,
-  useFactory: () => new PantryAutosizeVirtualScrollStrategy(900, 1800),
-};
 
 @Component({
   selector: 'app-pantry-list',
   standalone: true,
-  imports: [IonicModule, CommonModule, ReactiveFormsModule, PantryDetailComponent, ScrollingModule, PantryVirtualItemHeightDirective],
+  imports: [IonicModule, CommonModule, ReactiveFormsModule, PantryDetailComponent],
   templateUrl: './pantry-list.component.html',
   styleUrls: ['./pantry-list.component.scss'],
-  providers: [
-    PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER,
-    {
-      provide: VIRTUAL_SCROLL_STRATEGY,
-      useExisting: PantryAutosizeVirtualScrollStrategy,
-    },
-  ]
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PantryListComponent implements OnDestroy, AfterViewInit {
-  @ViewChild(CdkVirtualScrollViewport) private viewport?: CdkVirtualScrollViewport;
+export class PantryListComponent implements OnDestroy {
+  @ViewChild('content', { static: false }) private content?: IonContent;
   readonly searchTerm: Signal<string>;
   readonly activeFilters: Signal<PantryFilterState>;
   readonly selectedCategory: Signal<string>;
@@ -68,15 +52,6 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
   readonly lowStockOnly: Signal<boolean>;
   readonly itemsState = signal<PantryItem[]>([]);
   readonly groups = computed(() => this.buildGroups(this.itemsState()));
-  /** Flatten category headers + products so the CDK virtual scroll can render a single stream. */
-  readonly virtualEntries = computed(() => this.buildVirtualEntries(this.groups()));
-  readonly virtualEntryHeights = computed(() => {
-    const measured = this.measuredEntryHeights();
-    return this.virtualEntries().map(entry => {
-      const key = this.getVirtualEntryKey(entry);
-      return measured.get(key) ?? this.getDefaultEntryHeight(entry);
-    });
-  });
   readonly summary = computed(() => this.buildSummary(this.itemsState(), this.pantryService.totalCount()));
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
   readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
@@ -84,27 +59,20 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
   readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
   readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
   readonly batchSummaries = computed(() => this.computeBatchSummaries(this.itemsState()));
-  private readonly measuredEntryHeights = signal(new Map<string, number>());
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
   readonly loading = this.pantryService.loading;
-  readonly endReached = this.pantryService.endReached;
   readonly nearExpiryDays = 7;
   readonly MeasurementUnit = MeasurementUnit;
+  readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   showCreateModal = false;
   editingItem: PantryItem | null = null;
   isSaving = false;
   private readonly expandedItems = new Set<string>();
-  private readonly collapsedItemHeight = 210;
-  readonly categoryHeaderHeight = 30;
-  private readonly expandedBaseHeight = 200;
-  private readonly batchRowHeight = 64;
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveDelay = 500;
   private realtimeSubscribed = false;
-  private endOfListToastShown = false;
-  private viewportSubscription?: Subscription;
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     categoryId: this.fb.control(''),
@@ -157,7 +125,6 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
     private readonly fb: FormBuilder,
     private readonly toastCtrl: ToastController,
     private readonly appPreferences: AppPreferencesService,
-    private readonly pantryVirtualScrollStrategy: PantryAutosizeVirtualScrollStrategy,
   ) {
     this.searchTerm = this.pantryService.searchQuery;
     this.activeFilters = this.pantryService.activeFilters;
@@ -168,8 +135,7 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
     this.basicOnly = computed(() => this.activeFilters().basic);
     this.lowStockOnly = computed(() => this.activeFilters().lowStock);
 
-    // Keep the UI in sync with the paginated pipeline; the service performs pagination + filtering
-    // and we only merge optimistic edits before rendering the virtual scroll dataset.
+    // Keep the UI in sync with the filtered pipeline, merging optimistic edits before rendering the list.
     effect(() => {
       const paginatedItems = this.pantryService.filteredProducts();
       this.itemsState.set(this.mergePendingItems(paginatedItems));
@@ -178,19 +144,6 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
     // Expansion toggles depend on ids that might disappear when new batches arrive.
     effect(() => {
       this.syncExpandedItems(this.itemsState());
-    });
-
-    // Feed the autosize strategy with the latest heights so the viewport keeps buffering correctly.
-    effect(() => {
-      this.pantryVirtualScrollStrategy.setItemHeights(this.virtualEntryHeights());
-    });
-
-    effect(() => {
-      if (!this.endReached()) {
-        this.endOfListToastShown = false;
-      } else if (!this.loading()) {
-        void this.notifyEndOfList();
-      }
     });
 
     effect(() => {
@@ -219,22 +172,10 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
     }
   }
 
-  ngAfterViewInit(): void {
-    if (!this.viewport) {
-      return;
-    }
-    this.viewportSubscription = this.viewport.scrolledIndexChange.subscribe(() => {
-      void this.checkAndLoadNextPage();
-    });
-    void this.checkAndLoadNextPage();
-  }
-
   /** Convenience wrapper used by multiple entry points to reload the list. */
   async loadItems(): Promise<void> {
-    this.endOfListToastShown = false;
     if (this.pantryService.loadedProducts().length === 0) {
       await this.pantryService.reloadFromStart();
-      await this.checkAndLoadNextPage();
     }
     this.scrollViewportToTop();
   }
@@ -516,7 +457,6 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
     this.pantryService.setSortMode('name');
     this.showFilters.set(false);
     this.scrollViewportToTop();
-    this.endOfListToastShown = false;
   }
 
   async discardExpiredItem(item: PantryItem, event?: Event): Promise<void> {
@@ -582,40 +522,6 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
     return this.expandedItems.has(item._id);
   }
 
-  getVirtualItemKey(item: PantryItem): string {
-    return `item-${item._id}`;
-  }
-
-  getVirtualItemHeight(item: PantryItem): number {
-    return this.measuredEntryHeights().get(this.getVirtualItemKey(item)) ?? this.calculateDefaultItemHeight(item);
-  }
-
-  handleVirtualItemHeightChange(change: VirtualItemHeightChange): void {
-    if (!change?.key) {
-      return;
-    }
-    const roundedHeight = Math.max(1, Math.round(change.height));
-    this.measuredEntryHeights.update(current => {
-      const next = new Map(current);
-      if (next.get(change.key) === roundedHeight) {
-        return current;
-      }
-      next.set(change.key, roundedHeight);
-      return next;
-    });
-  }
-
-  private calculateDefaultItemHeight(item: PantryItem): number {
-    const baseHeight = this.collapsedItemHeight;
-    if (!this.isExpanded(item)) {
-      return baseHeight;
-    }
-
-    const batches = Math.max(1, this.getTotalBatchCount(item));
-    const batchesHeight = batches * this.batchRowHeight;
-    return baseHeight + this.expandedBaseHeight + batchesHeight;
-  }
-
   /** Toggle the expansion panel for a given item without triggering parent handlers. */
   toggleItemExpansion(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
@@ -624,23 +530,11 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
     } else {
       this.expandedItems.add(item._id);
     }
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          this.viewport?.checkViewportSize();
-        }, 180);
-      });
-    });
   }
 
-  /** Resetea la posición del virtual scroll tras reiniciar la paginación. */
+  /** Scroll to the top of the list after reloading or clearing filters. */
   private scrollViewportToTop(): void {
-    if (!this.viewport) {
-      return;
-    }
-    requestAnimationFrame(() => {
-      this.viewport?.scrollToOffset(0);
-    });
+    this.content?.scrollToTop(300);
   }
 
   openBatchesModal(item: PantryItem, event?: Event): void {
@@ -1554,27 +1448,7 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
     await toast.present();
   }
 
-  private async notifyEndOfList(): Promise<void> {
-    if (this.endOfListToastShown) {
-      return;
-    }
-    this.endOfListToastShown = true;
-    await this.presentToast('No hay más productos por cargar.', 'medium');
-  }
-
-  private async checkAndLoadNextPage(): Promise<void> {
-    if (!this.viewport || this.loading() || this.endReached()) {
-      return;
-    }
-    const renderedRange = this.viewport.getRenderedRange();
-    const total = this.virtualEntries().length;
-    if (renderedRange.end >= total - 5) {
-      await this.pantryService.loadNextPage();
-    }
-  }
-
   ngOnDestroy(): void {
-    this.viewportSubscription?.unsubscribe();
     this.clearStockSaveTimers();
   }
 
@@ -1853,40 +1727,6 @@ export class PantryListComponent implements OnDestroy, AfterViewInit {
       group.items = group.items.sort((a, b) => this.compareItems(a, b));
     }
     return groups;
-  }
-
-  /**
-   * Produce una vista plana para el virtual scroll insertando cabeceras cada vez que cambia la categoría.
-   * Así detectamos transiciones de categoría sin depender de que PouchDB devuelva el listado completo.
-   */
-  private buildVirtualEntries(groups: PantryGroup[]): PantryVirtualEntry[] {
-    const entries: PantryVirtualEntry[] = [];
-    for (const group of groups) {
-      entries.push({ kind: 'category', group });
-      for (const item of group.items) {
-        entries.push({
-          kind: 'item',
-          groupKey: group.key,
-          item,
-        });
-      }
-    }
-    return entries;
-  }
-
-  trackVirtualEntry(_: number, entry: PantryVirtualEntry): string {
-    if (entry.kind === 'category') {
-      return `category-${entry.group.key}`;
-    }
-    return `item-${entry.item._id}`;
-  }
-
-  private getVirtualEntryKey(entry: PantryVirtualEntry): string {
-    return entry.kind === 'category' ? `category-${entry.group.key}` : this.getVirtualItemKey(entry.item);
-  }
-
-  private getDefaultEntryHeight(entry: PantryVirtualEntry): number {
-    return entry.kind === 'category' ? this.categoryHeaderHeight : this.calculateDefaultItemHeight(entry.item);
   }
 
   formatCategoryName(key: string): string {
