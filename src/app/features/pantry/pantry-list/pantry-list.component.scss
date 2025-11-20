@@ -1,28 +1,91 @@
 .summary-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: nowrap;
+  position: sticky;
+  top: -16px;
+  z-index: 5;
   margin-bottom: 12px;
+  padding-bottom: 8px;
+  background: var(--ion-background-color);
 }
 
 .summary-chips {
   display: flex;
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
 }
 
-.summary-chips ion-chip {
-  --padding-start: 8px;
-  --padding-end: 12px;
+.summary-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.summary-chips .status-chip {
+  flex: 0 0 auto;
+  --padding-start: 10px;
+  --padding-end: 14px;
+  --ripple-color: rgba(255, 255, 255, 0.2);
   font-weight: 600;
+  scroll-snap-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 999px;
 }
 
-.summary-chips ion-icon {
-  font-size: 16px;
-  margin-right: 4px;
+.summary-chips .status-chip ion-icon {
+  font-size: 18px;
+  margin-right: 6px;
+}
+
+.summary-chips .status-chip .chip-body {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.1;
+}
+
+.summary-chips .status-chip .chip-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.summary-chips .status-chip .chip-count {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-chips .status-chip:not(.active) {
+  opacity: 0.75;
+}
+
+.summary-chips .status-chip.active {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transform: translateY(-2px);
+}
+
+.summary-chips .status-chip.chip--all {
+  --background: var(--ion-color-primary-tint);
+  --color: var(--ion-color-primary-contrast);
+}
+
+.summary-chips .status-chip.chip--normal {
+  --background: #16A34A;
+  --color: #F8FAFC;
+}
+
+.summary-chips .status-chip.chip--low {
+  --background: #FB923C;
+  --color: #0F172A;
+}
+
+.summary-chips .status-chip.chip--expiring {
+  --background: #FACC15;
+  --color: #0F172A;
+}
+
+.summary-chips .status-chip.chip--expired {
+  --background: #DC2626;
+  --color: #F8FAFC;
 }
 
 .header-actions {
@@ -42,12 +105,11 @@
 
 @media (max-width: 600px) {
   .summary-bar {
-    flex-wrap: wrap;
-    gap: 8px;
+    padding-bottom: 4px;
   }
 
   .summary-chips {
-    flex: 1 1 100%;
+    gap: 8px;
   }
 
   .summary-actions {

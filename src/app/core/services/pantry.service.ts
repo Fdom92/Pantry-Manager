@@ -380,6 +380,9 @@ export class PantryService extends StorageService<PantryItem> {
     if (filters.expiring && (!this.isNearExpiry(item) || this.isExpired(item))) {
       return false;
     }
+    if (filters.normalOnly && (this.isLowStock(item) || this.isExpired(item) || this.isNearExpiry(item))) {
+      return false;
+    }
     if (filters.categoryId && (item.categoryId ?? '') !== filters.categoryId) {
       return false;
     }
@@ -449,6 +452,7 @@ export class PantryService extends StorageService<PantryItem> {
       filters.lowStock ||
       filters.expired ||
       filters.expiring ||
+      filters.normalOnly ||
       filters.basic ||
       filters.categoryId ||
       filters.locationId
@@ -464,6 +468,7 @@ export class PantryService extends StorageService<PantryItem> {
       a.lowStock === b.lowStock &&
       a.expired === b.expired &&
       a.expiring === b.expiring &&
+      a.normalOnly === b.normalOnly &&
       a.basic === b.basic &&
       (a.categoryId ?? null) === (b.categoryId ?? null) &&
       (a.locationId ?? null) === (b.locationId ?? null)
