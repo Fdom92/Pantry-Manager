@@ -13,28 +13,23 @@
 </ion-header>
 
 <ion-content #content class="ion-padding">
-  <div class="summary-bar">
-    <div class="summary-chips">
-      <ion-chip color="primary" size="small">
-        <ion-icon name="layers-outline"></ion-icon>
-        <ion-label>Total: {{ summary().total }}</ion-label>
-      </ion-chip>
-      @if (summary().low) {
-        <ion-chip color="danger" size="small">
-          <ion-icon name="alert-circle-outline"></ion-icon>
-          <ion-label>Bajo stock: {{ summary().low }}</ion-label>
-        </ion-chip>
-      }
-      @if (summary().expiring) {
-        <ion-chip color="warning" size="small">
-          <ion-icon name="hourglass-outline"></ion-icon>
-          <ion-label>Por caducar: {{ summary().expiring }}</ion-label>
-        </ion-chip>
-      }
-      @if (summary().expired) {
-        <ion-chip color="medium" size="small">
-          <ion-icon name="time-outline"></ion-icon>
-          <ion-label>Caducados: {{ summary().expired }}</ion-label>
+  <div class="summary-bar" aria-label="Filtros rápidos por estado">
+    <div class="summary-chips" role="tablist">
+      @for (chip of statusChips(); track chip.value) {
+        <ion-chip
+          class="status-chip"
+          [class.active]="statusFilter() === chip.value"
+          [ngClass]="chip.colorClass"
+          button="true"
+          (click)="onStatusChipSelected(chip.value)"
+          [attr.aria-pressed]="statusFilter() === chip.value"
+          [attr.aria-label]="chip.description + ' (' + chip.count + ')'"
+          size="small">
+          <ion-icon [name]="chip.icon"></ion-icon>
+          <div class="chip-body">
+            <span class="chip-label">{{ chip.label }}</span>
+            <span class="chip-count">{{ chip.count }}</span>
+          </div>
         </ion-chip>
       }
     </div>
@@ -236,6 +231,8 @@
                 [value]="statusFilter()"
                 (ionChange)="onStatusFilterChange($event)">
                 <ion-select-option value="all">Todos</ion-select-option>
+                <ion-select-option value="normal">Con stock</ion-select-option>
+                <ion-select-option value="low-stock">Stock bajo</ion-select-option>
                 <ion-select-option value="near-expiry">Próx. caducidad</ion-select-option>
                 <ion-select-option value="expired">Caducados</ion-select-option>
               </ion-select>
