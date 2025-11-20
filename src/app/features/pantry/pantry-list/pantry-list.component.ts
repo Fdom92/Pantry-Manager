@@ -1,6 +1,5 @@
-import { Component, OnDestroy, signal, computed, effect, ViewChild } from '@angular/core';
-import { CdkVirtualScrollViewport, ScrollingModule, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { Component, OnDestroy, ChangeDetectionStrategy, signal, computed, effect, ViewChild, Signal } from '@angular/core';
+import { IonicModule, IonContent, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
 import {
@@ -22,78 +21,54 @@ import {
   PantryItemGlobalStatus,
   PantryItemBatchViewModel,
   PantryItemCardViewModel,
-  PantryVirtualEntry,
   ES_DATE_FORMAT_OPTIONS,
 } from '@core/models';
 import { createDocumentId, getLocationDisplayName } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { PantryStoreService } from '@core/store/pantry-store.service';
+import { PantryService } from '@core/services/pantry.service';
+import { PantryFilterState } from '@core/models/pantry-pipeline.model';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
-import { PantryVirtualItemHeightDirective, VirtualItemHeightChange } from '../virtual-item-height.directive';
-import { PantryAutosizeVirtualScrollStrategy } from '../pantry-autosize-virtual-scroll.strategy';
-
-const PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER = {
-  provide: PantryAutosizeVirtualScrollStrategy,
-  useFactory: () => new PantryAutosizeVirtualScrollStrategy(900, 1800),
-};
 
 @Component({
   selector: 'app-pantry-list',
   standalone: true,
-  imports: [IonicModule, CommonModule, ReactiveFormsModule, PantryDetailComponent, ScrollingModule, PantryVirtualItemHeightDirective],
+  imports: [IonicModule, CommonModule, ReactiveFormsModule, PantryDetailComponent],
   templateUrl: './pantry-list.component.html',
   styleUrls: ['./pantry-list.component.scss'],
-  providers: [
-    PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER,
-    {
-      provide: VIRTUAL_SCROLL_STRATEGY,
-      useExisting: PantryAutosizeVirtualScrollStrategy,
-    },
-  ]
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PantryListComponent implements OnDestroy {
-  @ViewChild(CdkVirtualScrollViewport) private viewport?: CdkVirtualScrollViewport;
-  readonly searchTerm = signal('');
-  readonly selectedCategory = signal('all');
-  readonly selectedLocation = signal('all');
-  readonly sortOption = signal<'name' | 'quantity' | 'expiration'>('name');
-  readonly statusFilter = signal<'all' | 'expired' | 'near-expiry'>('all');
+  @ViewChild('content', { static: false }) private content?: IonContent;
+  readonly searchTerm: Signal<string>;
+  readonly activeFilters: Signal<PantryFilterState>;
+  readonly selectedCategory: Signal<string>;
+  readonly selectedLocation: Signal<string>;
+  readonly sortOption: Signal<'name' | 'quantity' | 'expiration'>;
+  readonly statusFilter: Signal<'all' | 'expired' | 'near-expiry'>;
   readonly showFilters = signal(false);
-  readonly basicOnly = signal(false);
-  readonly lowStockOnly = signal(false);
+  readonly basicOnly: Signal<boolean>;
+  readonly lowStockOnly: Signal<boolean>;
   readonly itemsState = signal<PantryItem[]>([]);
-  readonly filteredItems = computed(() => this.computeFilteredItems());
-  readonly groups = computed(() => this.buildGroups(this.filteredItems()));
-  readonly virtualEntries = computed(() => this.buildVirtualEntries(this.groups()));
-  readonly virtualEntryHeights = computed(() => {
-    const measured = this.measuredEntryHeights();
-    return this.virtualEntries().map(entry => {
-      const key = this.getVirtualEntryKey(entry);
-      return measured.get(key) ?? this.getDefaultEntryHeight(entry);
-    });
-  });
-  readonly summary = computed(() => this.buildSummary(this.filteredItems()));
+  readonly groups = computed(() => this.buildGroups(this.itemsState()));
+  readonly summary = computed(() => this.buildSummary(this.itemsState(), this.pantryService.totalCount()));
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
   readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
   readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.itemsState()));
   readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
   readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
   readonly batchSummaries = computed(() => this.computeBatchSummaries(this.itemsState()));
-  private readonly measuredEntryHeights = signal(new Map<string, number>());
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
-  readonly loading = this.pantryStore.loading;
+  readonly loading = this.pantryService.loading;
   readonly nearExpiryDays = 7;
   readonly MeasurementUnit = MeasurementUnit;
+  readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   showCreateModal = false;
   editingItem: PantryItem | null = null;
   isSaving = false;
   private readonly expandedItems = new Set<string>();
-  private readonly collapsedItemHeight = 210;
-  readonly categoryHeaderHeight = 30;
-  private readonly expandedBaseHeight = 200;
-  private readonly batchRowHeight = 64;
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveDelay = 500;
@@ -146,33 +121,44 @@ export class PantryListComponent implements OnDestroy {
   }
   constructor(
     private readonly pantryStore: PantryStoreService,
+    private readonly pantryService: PantryService,
     private readonly fb: FormBuilder,
     private readonly toastCtrl: ToastController,
     private readonly appPreferences: AppPreferencesService,
-    private readonly pantryVirtualScrollStrategy: PantryAutosizeVirtualScrollStrategy,
   ) {
+    this.searchTerm = this.pantryService.searchQuery;
+    this.activeFilters = this.pantryService.activeFilters;
+    this.sortOption = this.pantryService.sortMode;
+    this.selectedCategory = computed(() => this.activeFilters().categoryId ?? 'all');
+    this.selectedLocation = computed(() => this.activeFilters().locationId ?? 'all');
+    this.statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
+    this.basicOnly = computed(() => this.activeFilters().basic);
+    this.lowStockOnly = computed(() => this.activeFilters().lowStock);
+
+    // Keep the UI in sync with the filtered pipeline, merging optimistic edits before rendering the list.
     effect(() => {
-      const storeItems = this.pantryStore.items();
-      this.itemsState.set(this.mergePendingItems(storeItems));
+      const paginatedItems = this.pantryService.filteredProducts();
+      this.itemsState.set(this.mergePendingItems(paginatedItems));
     });
 
+    // Expansion toggles depend on ids that might disappear when new batches arrive.
     effect(() => {
-      this.pantryVirtualScrollStrategy.setItemHeights(this.virtualEntryHeights());
+      this.syncExpandedItems(this.itemsState());
     });
 
     effect(() => {
       const categories = this.categoryOptions();
-      const selected = this.selectedCategory();
-      if (selected !== 'all' && !categories.some(option => option.id === selected)) {
-        this.selectedCategory.set('all');
+      const categoryFilter = this.activeFilters().categoryId;
+      if (categoryFilter && !categories.some(option => option.id === categoryFilter)) {
+        this.pantryService.setFilter('categoryId', null);
       }
     });
 
     effect(() => {
       const locations = this.locationOptions();
-      const selected = this.selectedLocation();
-      if (selected !== 'all' && !locations.some(option => option.id === selected)) {
-        this.selectedLocation.set('all');
+      const locationFilter = this.activeFilters().locationId;
+      if (locationFilter && !locations.some(option => option.id === locationFilter)) {
+        this.pantryService.setFilter('locationId', null);
       }
     });
   }
@@ -188,7 +174,10 @@ export class PantryListComponent implements OnDestroy {
 
   /** Convenience wrapper used by multiple entry points to reload the list. */
   async loadItems(): Promise<void> {
-    await this.pantryStore.loadAll();
+    if (this.pantryService.loadedProducts().length === 0) {
+      await this.pantryService.reloadFromStart();
+    }
+    this.scrollViewportToTop();
   }
 
   /** Open the creation modal with blank defaults and a single location row. */
@@ -417,31 +406,41 @@ export class PantryListComponent implements OnDestroy {
   }
 
   onSearchTermChange(ev: CustomEvent): void {
-    this.searchTerm.set((ev.detail?.value ?? '').trim());
+    this.pantryService.setSearchQuery(ev.detail?.value ?? '');
   }
 
   onCategoryChange(ev: CustomEvent): void {
-    this.selectedCategory.set(ev.detail?.value ?? 'all');
+    const raw = ev.detail?.value ?? 'all';
+    this.pantryService.setFilter('categoryId', raw === 'all' ? null : raw);
   }
 
   onLocationChange(ev: CustomEvent): void {
-    this.selectedLocation.set(ev.detail?.value ?? 'all');
+    const raw = ev.detail?.value ?? 'all';
+    this.pantryService.setFilter('locationId', raw === 'all' ? null : raw);
   }
 
   onStatusFilterChange(ev: CustomEvent): void {
-    this.statusFilter.set(ev.detail?.value ?? 'all');
+    const value = (ev.detail?.value ?? 'all') as 'all' | 'near-expiry' | 'expired';
+    if (value === 'expired') {
+      this.pantryService.setFilters({ expired: true, expiring: false });
+    } else if (value === 'near-expiry') {
+      this.pantryService.setFilters({ expired: false, expiring: true });
+    } else {
+      this.pantryService.setFilters({ expired: false, expiring: false });
+    }
   }
 
   onSortChange(ev: CustomEvent): void {
-    this.sortOption.set(ev.detail?.value ?? 'name');
+    const mode = (ev.detail?.value ?? 'name') as 'name' | 'quantity' | 'expiration';
+    this.pantryService.setSortMode(mode);
   }
 
   toggleBasicOnly(ev: CustomEvent<{ checked: boolean }>): void {
-    this.basicOnly.set(Boolean(ev.detail?.checked));
+    this.pantryService.setFilter('basic', Boolean(ev.detail?.checked));
   }
 
   toggleLowStockOnly(ev: CustomEvent<{ checked: boolean }>): void {
-    this.lowStockOnly.set(Boolean(ev.detail?.checked));
+    this.pantryService.setFilter('lowStock', Boolean(ev.detail?.checked));
   }
 
   openFilters(event?: Event): void {
@@ -454,14 +453,10 @@ export class PantryListComponent implements OnDestroy {
   }
 
   clearFilters(): void {
-    this.searchTerm.set('');
-    this.selectedCategory.set('all');
-    this.selectedLocation.set('all');
-    this.statusFilter.set('all');
-    this.sortOption.set('name');
-    this.basicOnly.set(false);
-    this.lowStockOnly.set(false);
+    this.pantryService.resetSearchAndFilters();
+    this.pantryService.setSortMode('name');
     this.showFilters.set(false);
+    this.scrollViewportToTop();
   }
 
   async discardExpiredItem(item: PantryItem, event?: Event): Promise<void> {
@@ -527,40 +522,6 @@ export class PantryListComponent implements OnDestroy {
     return this.expandedItems.has(item._id);
   }
 
-  getVirtualItemKey(item: PantryItem): string {
-    return `item-${item._id}`;
-  }
-
-  getVirtualItemHeight(item: PantryItem): number {
-    return this.measuredEntryHeights().get(this.getVirtualItemKey(item)) ?? this.calculateDefaultItemHeight(item);
-  }
-
-  handleVirtualItemHeightChange(change: VirtualItemHeightChange): void {
-    if (!change?.key) {
-      return;
-    }
-    const roundedHeight = Math.max(1, Math.round(change.height));
-    this.measuredEntryHeights.update(current => {
-      const next = new Map(current);
-      if (next.get(change.key) === roundedHeight) {
-        return current;
-      }
-      next.set(change.key, roundedHeight);
-      return next;
-    });
-  }
-
-  private calculateDefaultItemHeight(item: PantryItem): number {
-    const baseHeight = this.collapsedItemHeight;
-    if (!this.isExpanded(item)) {
-      return baseHeight;
-    }
-
-    const batches = Math.max(1, this.getTotalBatchCount(item));
-    const batchesHeight = batches * this.batchRowHeight;
-    return baseHeight + this.expandedBaseHeight + batchesHeight;
-  }
-
   /** Toggle the expansion panel for a given item without triggering parent handlers. */
   toggleItemExpansion(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
@@ -569,13 +530,11 @@ export class PantryListComponent implements OnDestroy {
     } else {
       this.expandedItems.add(item._id);
     }
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          this.viewport?.checkViewportSize();
-        }, 180);
-      });
-    });
+  }
+
+  /** Scroll to the top of the list after reloading or clearing filters. */
+  private scrollViewportToTop(): void {
+    this.content?.scrollToTop(300);
   }
 
   openBatchesModal(item: PantryItem, event?: Event): void {
@@ -587,50 +546,6 @@ export class PantryListComponent implements OnDestroy {
   closeBatchesModal(): void {
     this.showBatchesModal.set(false);
     this.selectedBatchesItem.set(null);
-  }
-
-  /** Apply search, filter, and sorting rules while keeping expansion state in sync. */
-  private computeFilteredItems(): PantryItem[] {
-    const items = this.itemsState();
-    const search = this.searchTerm().trim().toLowerCase();
-    const category = this.selectedCategory();
-    const location = this.selectedLocation();
-    const status = this.statusFilter();
-    const basicOnly = this.basicOnly();
-    const lowStockOnly = this.lowStockOnly();
-
-    let filtered = items.filter(item => {
-      if (search && !this.matchesSearch(item, search)) {
-        return false;
-      }
-      if (category !== 'all' && (item.categoryId ?? '') !== category) {
-        return false;
-      }
-      if (
-        location !== 'all' &&
-        !item.locations.some(loc => (loc.locationId ?? '') === location)
-      ) {
-        return false;
-      }
-      if (basicOnly && !item.isBasic) {
-        return false;
-      }
-      if (lowStockOnly && !this.isLowStock(item)) {
-        return false;
-      }
-      switch (status) {
-        case 'expired':
-          return this.isExpired(item);
-        case 'near-expiry':
-          return this.isNearExpiry(item) && !this.isExpired(item);
-        default:
-          return true;
-      }
-    });
-
-    filtered = [...filtered].sort((a, b) => this.compareItems(a, b));
-    this.syncExpandedItems(filtered);
-    return filtered;
   }
 
   /** Sort items by urgency (expiry/quantity) and finally by name for stable output. */
@@ -682,7 +597,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   /** Aggregate counts for the summary bar shown above the list. */
-  private buildSummary(items: PantryItem[]) {
+  private buildSummary(items: PantryItem[], totalCount: number) {
     let low = 0;
     let expiring = 0;
     let expired = 0;
@@ -699,7 +614,7 @@ export class PantryListComponent implements OnDestroy {
     }
 
     return {
-      total: items.length,
+      total: totalCount,
       low,
       expiring,
       expired
@@ -1735,6 +1650,16 @@ export class PantryListComponent implements OnDestroy {
     return trimmed.replace(/\s+/g, ' ');
   }
 
+  private getStatusFilterValue(filters: PantryFilterState): 'all' | 'near-expiry' | 'expired' {
+    if (filters.expired) {
+      return 'expired';
+    }
+    if (filters.expiring) {
+      return 'near-expiry';
+    }
+    return 'all';
+  }
+
   /** Build category filter metadata including how many items are low within each group. */
   private computeCategoryOptions(items: PantryItem[]): Array<{ id: string; label: string; count: number; lowCount: number }> {
     const counts = new Map<string, { label: string; count: number; lowCount: number }>();
@@ -1804,36 +1729,6 @@ export class PantryListComponent implements OnDestroy {
     return groups;
   }
 
-  private buildVirtualEntries(groups: PantryGroup[]): PantryVirtualEntry[] {
-    const entries: PantryVirtualEntry[] = [];
-    for (const group of groups) {
-      entries.push({ kind: 'category', group });
-      for (const item of group.items) {
-        entries.push({
-          kind: 'item',
-          groupKey: group.key,
-          item,
-        });
-      }
-    }
-    return entries;
-  }
-
-  trackVirtualEntry(_: number, entry: PantryVirtualEntry): string {
-    if (entry.kind === 'category') {
-      return `category-${entry.group.key}`;
-    }
-    return `item-${entry.item._id}`;
-  }
-
-  private getVirtualEntryKey(entry: PantryVirtualEntry): string {
-    return entry.kind === 'category' ? `category-${entry.group.key}` : this.getVirtualItemKey(entry.item);
-  }
-
-  private getDefaultEntryHeight(entry: PantryVirtualEntry): number {
-    return entry.kind === 'category' ? this.categoryHeaderHeight : this.calculateDefaultItemHeight(entry.item);
-  }
-
   formatCategoryName(key: string): string {
     return this.formatFriendlyName(key, 'Uncategorized');
   }
@@ -1868,17 +1763,4 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
-  /** Determine whether the item matches the provided free-text search term. */
-  private matchesSearch(item: PantryItem, search: string): boolean {
-    const name = item.name?.toLowerCase() ?? '';
-    const category = item.categoryId?.toLowerCase() ?? '';
-    if (name.includes(search) || category.includes(search)) {
-      return true;
-    }
-    return item.locations.some(loc => {
-      const id = loc.locationId?.toLowerCase() ?? '';
-      const label = getLocationDisplayName(loc.locationId, '').toLowerCase();
-      return id.includes(search) || label.includes(search);
-    });
-  }
 }

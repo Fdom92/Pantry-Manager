@@ -146,8 +146,22 @@ export class PantryStoreService {
 
   /** Bridge live database change events into the signal-based store. */
   watchRealtime(): void {
-    this.pantryService.watchPantryChanges(() => {
-      this.loadAll();
+    this.pantryService.watchPantryChanges((item, meta) => {
+      if (meta?.deleted) {
+        this.itemsSignal.update(items => items.filter(existing => existing._id !== meta.id));
+        return;
+      }
+      if (item) {
+        this.itemsSignal.update(items => {
+          const index = items.findIndex(existing => existing._id === item._id);
+          if (index < 0) {
+            return [...items, item];
+          }
+          const next = [...items];
+          next[index] = item;
+          return next;
+        });
+      }
     });
   }
 

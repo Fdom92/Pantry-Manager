@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, effect } from '@angular/core';
 import { StorageService } from './storage.service';
 import { PantryItem, ExpirationStatus, ItemLocationStock, MeasurementUnit, ItemBatch } from '@core/models';
 import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { PantryFilterState, PantrySortMode, DEFAULT_PANTRY_FILTERS } from '@core/models/pantry-pipeline.model';
 
 type LegacyLocationStock = ItemLocationStock & { minThreshold?: number | null };
 
@@ -10,9 +11,77 @@ type LegacyLocationStock = ItemLocationStock & { minThreshold?: number | null };
 })
 export class PantryService extends StorageService<PantryItem> {
   private readonly TYPE = 'item';
+  readonly loadedProducts = signal<PantryItem[]>([]);
+  readonly filteredProducts = signal<PantryItem[]>([]);
+  readonly searchQuery = signal('');
+  readonly activeFilters = signal<PantryFilterState>({ ...DEFAULT_PANTRY_FILTERS });
+  readonly sortMode = signal<PantrySortMode>('name');
+  readonly pageOffset = signal(0);
+  readonly pageSize = signal(300);
+  readonly loading = signal(false);
+  readonly endReached = signal(false);
+  readonly totalCount = signal(0);
+  private dbPreloaded = false;
+  private productIndexReady = false;
+  private pendingPipelineReset = false;
+  private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
 
   constructor() {
     super();
+    effect(() => {
+      this.recomputeFilteredProducts();
+    });
+  }
+
+  /**
+   * Warms up the database during bootstrap to eliminate the initial lag and
+   * ensures the index required by paginated queries is available.
+   */
+  async initialize(): Promise<void> {
+    if (this.dbPreloaded) {
+      return;
+    }
+    this.dbPreloaded = true;
+    try {
+      await this.database.info();
+      await this.ensureProductIndex();
+      await this.refreshTotalCount();
+    } catch (err) {
+      console.warn('[PantryService] Database warmup failed', err);
+      this.dbPreloaded = false;
+    }
+  }
+
+  /** Clears pagination state and wipes the cached product batches. */
+  resetPagination(): void {
+    this.pageOffset.set(0);
+    this.loadedProducts.set([]);
+    this.filteredProducts.set([]);
+    this.endReached.set(false);
+  }
+
+  /** Reloads from the beginning by fetching the first full page from PouchDB. */
+  async reloadFromStart(): Promise<void> {
+    this.resetPagination();
+    await this.loadAllPages();
+  }
+
+  /**
+   * Fetches a page of normalized products using skip/limit.
+   * @param offset Starting position (0 for the first page)
+   * @param limit Batch size to retrieve
+   */
+  async getPaginatedProducts(offset: number, limit: number): Promise<PantryItem[]> {
+    if (limit <= 0) {
+      return [];
+    }
+    await this.ensureProductIndex();
+    const response = await this.database.find({
+      selector: { type: this.TYPE },
+      skip: Math.max(0, offset),
+      limit,
+    });
+    return response.docs.map(doc => this.applyDerivedFields(doc));
   }
 
   /** Persist an item ensuring aggregate fields (type, household, expirations) stay in sync. */
@@ -22,7 +91,10 @@ export class PantryService extends StorageService<PantryItem> {
       type: this.TYPE,
       householdId: item.householdId ?? DEFAULT_HOUSEHOLD_ID,
     });
-    return await this.upsert(prepared);
+    const saved = await this.upsert(prepared);
+    const normalized = this.applyDerivedFields(saved);
+    this.replaceProductInCache(normalized);
+    return normalized;
   }
 
   /** Fetch every pantry item, computing aggregate fields directly from stored data. */
@@ -60,7 +132,11 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   async deleteItem(id: string): Promise<boolean> {
-    return this.remove(id);
+    const ok = await this.remove(id);
+    if (ok) {
+      this.removeProductFromCache(id);
+    }
+    return ok;
   }
 
   /**
@@ -151,12 +227,247 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   /** Subscribe to live-updates while ensuring consumers always see consistent payloads. */
-  watchPantryChanges(onChange: (item: PantryItem) => void) {
+  watchPantryChanges(onChange: (item: PantryItem | null, meta?: { deleted?: boolean; id: string }) => void) {
     return this.watchChanges(doc => {
-      if (doc.type === this.TYPE) {
-        onChange(this.applyDerivedFields(doc));
+      if (doc.type !== this.TYPE) {
+        return;
       }
+      const deleted = (doc as any)._deleted === true;
+      if (deleted) {
+        this.removeProductFromCache(doc._id);
+        onChange(null, { deleted: true, id: doc._id });
+        return;
+      }
+      const normalized = this.applyDerivedFields(doc);
+      this.replaceProductInCache(normalized);
+      onChange(normalized, { id: doc._id });
     });
+  }
+
+  /**
+   * Loads the next raw page from PouchDB using skip/limit.
+   * It never applies filters or sorting here; the reactive pipeline handles that in memory.
+   */
+  async loadNextPage(isBackground = false): Promise<void> {
+    if (this.loading() || this.endReached()) {
+      return;
+    }
+
+    const limit = this.pageSize();
+    if (limit <= 0) {
+      return;
+    }
+
+    this.loading.set(true);
+    try {
+      await this.initialize();
+      const offset = this.pageOffset();
+      const docs = await this.getPaginatedProducts(offset, limit);
+      if (docs.length) {
+        this.appendBatchToLoadedProducts(docs);
+        this.pageOffset.update(value => value + docs.length);
+      } else if (offset === 0) {
+        this.loadedProducts.set([]);
+        this.filteredProducts.set([]);
+      }
+      if (docs.length < limit) {
+        this.endReached.set(true);
+      }
+    } finally {
+      this.loading.set(false);
+    }
+
+    if (this.pendingPipelineReset) {
+      await this.performPendingPipelineReset();
+    }
+  }
+
+  /** Updates the global search term and restarts pagination so results reload from the beginning. */
+  setSearchQuery(raw: string): void {
+    const normalized = (raw ?? '').trim();
+    if (this.searchQuery() === normalized) {
+      return;
+    }
+    this.searchQuery.set(normalized);
+    this.requestPipelineReset();
+  }
+
+  /** Changes the local sort mode without touching the database. */
+  setSortMode(mode: PantrySortMode): void {
+    if (this.sortMode() === mode) {
+      return;
+    }
+    this.sortMode.set(mode);
+  }
+
+  /** Updates a single filter entry and restarts the paginated load. */
+  setFilter<K extends keyof PantryFilterState>(key: K, value: PantryFilterState[K]): void {
+    this.setFilters({ [key]: value } as Partial<PantryFilterState>);
+  }
+
+  /** Allows batching multiple filter updates in one call. */
+  setFilters(updates: Partial<PantryFilterState>): void {
+    const current = this.activeFilters();
+    const next = { ...current, ...updates };
+    if (this.areFiltersEqual(current, next)) {
+      return;
+    }
+    this.activeFilters.set(next);
+    this.requestPipelineReset();
+  }
+
+  /** Resets filters and search text, forcing a fresh load from the start. */
+  resetSearchAndFilters(): void {
+    const hasSearch = Boolean(this.searchQuery());
+    const currentFilters = this.activeFilters();
+    const filtersChanged = !this.areFiltersEqual(currentFilters, DEFAULT_PANTRY_FILTERS);
+    if (!hasSearch && !filtersChanged) {
+      return;
+    }
+    this.searchQuery.set('');
+    this.activeFilters.set({ ...DEFAULT_PANTRY_FILTERS });
+    this.requestPipelineReset();
+  }
+
+  private async refreshTotalCount(): Promise<void> {
+    try {
+      const total = await this.countByType(this.TYPE);
+      this.totalCount.set(total);
+    } catch (err) {
+      console.warn('[PantryService] Failed to refresh total count', err);
+    }
+  }
+
+  /**
+   * Recomputes the filtered list whenever the raw items, search term, filters,
+   * or sort mode change.
+   */
+  private recomputeFilteredProducts(): void {
+    const loaded = this.loadedProducts();
+    const query = this.searchQuery().toLowerCase();
+    const filters = this.activeFilters();
+    const mode = this.sortMode();
+
+    const filtered = loaded.filter(item => {
+      return this.matchesSearch(item, query) && this.matchesFilters(item, filters);
+    });
+    const sorted = this.sortItems(filtered, mode);
+    this.filteredProducts.set(sorted);
+  }
+
+  private matchesSearch(item: PantryItem, query: string): boolean {
+    if (!query) {
+      return true;
+    }
+    const name = (item.name ?? '').toLowerCase();
+    const category = (item.categoryId ?? '').toLowerCase();
+    if (name.includes(query) || category.includes(query)) {
+      return true;
+    }
+    return item.locations.some(loc => (loc.locationId ?? '').toLowerCase().includes(query));
+  }
+
+  private matchesFilters(item: PantryItem, filters: PantryFilterState): boolean {
+    if (filters.basic && !item.isBasic) {
+      return false;
+    }
+    if (filters.lowStock && !this.isLowStock(item)) {
+      return false;
+    }
+    if (filters.expired && !this.isExpired(item)) {
+      return false;
+    }
+    if (filters.expiring && (!this.isNearExpiry(item) || this.isExpired(item))) {
+      return false;
+    }
+    if (filters.categoryId && (item.categoryId ?? '') !== filters.categoryId) {
+      return false;
+    }
+    if (filters.locationId && !item.locations.some(loc => (loc.locationId ?? '') === filters.locationId)) {
+      return false;
+    }
+    return true;
+  }
+
+  private sortItems(items: PantryItem[], mode: PantrySortMode): PantryItem[] {
+    if (items.length <= 1) {
+      return items;
+    }
+    const sorted = [...items];
+    sorted.sort((a, b) => this.compareItemsForSort(a, b, mode));
+    return sorted;
+  }
+
+  private compareItemsForSort(a: PantryItem, b: PantryItem, mode: PantrySortMode): number {
+    const expirationDiff = this.getExpirationWeight(a) - this.getExpirationWeight(b);
+    if (expirationDiff !== 0) {
+      return expirationDiff;
+    }
+
+    switch (mode) {
+      case 'quantity': {
+        const quantityDiff = this.getItemTotalQuantity(b) - this.getItemTotalQuantity(a);
+        if (quantityDiff !== 0) {
+          return quantityDiff;
+        }
+        break;
+      }
+      case 'expiration': {
+        const timeDiff = this.getExpirationTime(a) - this.getExpirationTime(b);
+        if (timeDiff !== 0) {
+          return timeDiff;
+        }
+        break;
+      }
+      default:
+        break;
+    }
+
+    const labelA = (a.name ?? '').toLowerCase();
+    const labelB = (b.name ?? '').toLowerCase();
+    return labelA.localeCompare(labelB);
+  }
+
+  private requestPipelineReset(): void {
+    this.pendingPipelineReset = true;
+    if (!this.loading()) {
+      void this.performPendingPipelineReset();
+    }
+  }
+
+  private async performPendingPipelineReset(): Promise<void> {
+    if (!this.pendingPipelineReset) {
+      return;
+    }
+    this.pendingPipelineReset = false;
+    this.resetPagination();
+    await this.loadAllPages();
+  }
+
+  private hasActiveFilters(filters: PantryFilterState = this.activeFilters()): boolean {
+    return Boolean(
+      filters.lowStock ||
+      filters.expired ||
+      filters.expiring ||
+      filters.basic ||
+      filters.categoryId ||
+      filters.locationId
+    );
+  }
+
+  private hasSearchQuery(): boolean {
+    return Boolean(this.searchQuery());
+  }
+
+  private areFiltersEqual(a: PantryFilterState, b: PantryFilterState): boolean {
+    return (
+      a.lowStock === b.lowStock &&
+      a.expired === b.expired &&
+      a.expiring === b.expiring &&
+      a.basic === b.basic &&
+      (a.categoryId ?? null) === (b.categoryId ?? null) &&
+      (a.locationId ?? null) === (b.locationId ?? null)
+    );
   }
 
   /** --- Public helpers for store/UI logic reuse --- */
@@ -188,6 +499,24 @@ export class PantryService extends StorageService<PantryItem> {
   /** Return the earliest expiry date among the defined locations. */
   getItemEarliestExpiry(item: PantryItem): string | undefined {
     return this.computeEarliestExpiry(item.locations);
+  }
+
+  private getExpirationWeight(item: PantryItem): number {
+    if (this.isExpired(item)) {
+      return 0;
+    }
+    if (this.isNearExpiry(item)) {
+      return 1;
+    }
+    return 2;
+  }
+
+  private getExpirationTime(item: PantryItem): number {
+    const expiry = this.computeEarliestExpiry(item.locations);
+    if (!expiry) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+    return new Date(expiry).getTime();
   }
 
   /** Total quantity stored for a specific location id. */
@@ -560,5 +889,86 @@ export class PantryService extends StorageService<PantryItem> {
 
   private generateBatchId(): string {
     return `batch:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  private async ensureProductIndex(): Promise<void> {
+    if (this.productIndexReady) {
+      return;
+    }
+    await this.ensureIndex(this.PRODUCT_INDEX_FIELDS);
+    this.productIndexReady = true;
+  }
+
+  /** Adds or replaces freshly loaded documents while preserving the cached order. */
+  private appendBatchToLoadedProducts(batch: PantryItem[]): void {
+    if (!batch.length) {
+      return;
+    }
+    this.loadedProducts.update(items => {
+      if (!items.length) {
+        return [...batch];
+      }
+      const next = [...items];
+      const indexById = new Map<string, number>();
+      next.forEach((item, idx) => indexById.set(item._id, idx));
+      for (const doc of batch) {
+        const existingIndex = indexById.get(doc._id);
+        if (existingIndex != null) {
+          next[existingIndex] = doc;
+        } else {
+          indexById.set(doc._id, next.length);
+          next.push(doc);
+        }
+      }
+      return next;
+    });
+  }
+
+  /** Updates the reactive cache with a freshly modified document to avoid broad re-queries. */
+  private replaceProductInCache(item: PantryItem): void {
+    let added = false;
+    this.loadedProducts.update(items => {
+      const index = items.findIndex(existing => existing._id === item._id);
+      if (index < 0) {
+        added = true;
+        return [item, ...items];
+      }
+      const next = [...items];
+      next[index] = item;
+      return next;
+    });
+    if (added) {
+      this.incrementTotalCount();
+    }
+  }
+
+  /** Removes a product from the paginated cache when it gets deleted via UI or sync. */
+  private removeProductFromCache(id: string): void {
+    if (!id) {
+      return;
+    }
+    let removed = false;
+    this.loadedProducts.update(items => {
+      const next = items.filter(item => item._id !== id);
+      removed = next.length !== items.length;
+      return next;
+    });
+    if (removed) {
+      this.decrementTotalCount();
+    }
+  }
+
+  private incrementTotalCount(delta: number = 1): void {
+    this.totalCount.update(count => count + delta);
+  }
+
+  private decrementTotalCount(delta: number = 1): void {
+    this.totalCount.update(count => Math.max(0, count - delta));
+  }
+
+  private async loadAllPages(): Promise<void> {
+    while (!this.endReached()) {
+      await this.loadNextPage();
+    }
   }
 }
