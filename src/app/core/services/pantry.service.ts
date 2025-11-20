@@ -6,8 +6,6 @@ import { PantryFilterState, PantrySortMode, DEFAULT_PANTRY_FILTERS } from '@core
 
 type LegacyLocationStock = ItemLocationStock & { minThreshold?: number | null };
 
-const BACKGROUND_PREFETCH_DELAY_MS = 250;
-
 @Injectable({
   providedIn: 'root'
 })
@@ -22,10 +20,10 @@ export class PantryService extends StorageService<PantryItem> {
   readonly pageSize = signal(50);
   readonly loading = signal(false);
   readonly endReached = signal(false);
+  readonly totalCount = signal(0);
   private dbPreloaded = false;
   private productIndexReady = false;
   private pendingPipelineReset = false;
-  private backgroundPrefetchTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
 
   constructor() {
@@ -47,6 +45,7 @@ export class PantryService extends StorageService<PantryItem> {
     try {
       await this.database.info();
       await this.ensureProductIndex();
+      await this.refreshTotalCount();
     } catch (err) {
       console.warn('[PantryService] Database warmup failed', err);
       this.dbPreloaded = false;
@@ -59,7 +58,6 @@ export class PantryService extends StorageService<PantryItem> {
     this.loadedProducts.set([]);
     this.filteredProducts.set([]);
     this.endReached.set(false);
-    this.clearBackgroundPrefetchTimer();
   }
 
   /** Reloads from the beginning by fetching the first full page from PouchDB. */
@@ -281,11 +279,6 @@ export class PantryService extends StorageService<PantryItem> {
 
     if (this.pendingPipelineReset) {
       await this.performPendingPipelineReset();
-      return;
-    }
-
-    if (!isBackground) {
-      this.scheduleBackgroundPrefetch();
     }
   }
 
@@ -334,6 +327,15 @@ export class PantryService extends StorageService<PantryItem> {
     this.searchQuery.set('');
     this.activeFilters.set({ ...DEFAULT_PANTRY_FILTERS });
     this.requestPipelineReset();
+  }
+
+  private async refreshTotalCount(): Promise<void> {
+    try {
+      const total = await this.countByType(this.TYPE);
+      this.totalCount.set(total);
+    } catch (err) {
+      console.warn('[PantryService] Failed to refresh total count', err);
+    }
   }
 
   /**
@@ -440,26 +442,6 @@ export class PantryService extends StorageService<PantryItem> {
     this.pendingPipelineReset = false;
     this.resetPagination();
     await this.loadNextPage();
-  }
-
-  private scheduleBackgroundPrefetch(): void {
-    if (this.backgroundPrefetchTimer || this.loading()) {
-      return;
-    }
-    if (this.endReached() || this.hasActiveFilters() || this.hasSearchQuery()) {
-      return;
-    }
-    this.backgroundPrefetchTimer = setTimeout(() => {
-      this.backgroundPrefetchTimer = null;
-      void this.loadNextPage(true);
-    }, BACKGROUND_PREFETCH_DELAY_MS);
-  }
-
-  private clearBackgroundPrefetchTimer(): void {
-    if (this.backgroundPrefetchTimer) {
-      clearTimeout(this.backgroundPrefetchTimer);
-      this.backgroundPrefetchTimer = null;
-    }
   }
 
   private hasActiveFilters(filters: PantryFilterState = this.activeFilters()): boolean {
@@ -946,15 +928,20 @@ export class PantryService extends StorageService<PantryItem> {
 
   /** Updates the reactive cache with a freshly modified document to avoid broad re-queries. */
   private replaceProductInCache(item: PantryItem): void {
+    let added = false;
     this.loadedProducts.update(items => {
       const index = items.findIndex(existing => existing._id === item._id);
       if (index < 0) {
+        added = true;
         return [item, ...items];
       }
       const next = [...items];
       next[index] = item;
       return next;
     });
+    if (added) {
+      this.incrementTotalCount();
+    }
   }
 
   /** Removes a product from the paginated cache when it gets deleted via UI or sync. */
@@ -962,6 +949,22 @@ export class PantryService extends StorageService<PantryItem> {
     if (!id) {
       return;
     }
-    this.loadedProducts.update(items => items.filter(item => item._id !== id));
+    let removed = false;
+    this.loadedProducts.update(items => {
+      const next = items.filter(item => item._id !== id);
+      removed = next.length !== items.length;
+      return next;
+    });
+    if (removed) {
+      this.decrementTotalCount();
+    }
+  }
+
+  private incrementTotalCount(delta: number = 1): void {
+    this.totalCount.update(count => count + delta);
+  }
+
+  private decrementTotalCount(delta: number = 1): void {
+    this.totalCount.update(count => Math.max(0, count - delta));
   }
 }

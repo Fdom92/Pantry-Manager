@@ -1,4 +1,4 @@
-import { Component, OnDestroy, signal, computed, effect, ViewChild, Signal } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit, signal, computed, effect, ViewChild, Signal } from '@angular/core';
 import { CdkVirtualScrollViewport, ScrollingModule, VIRTUAL_SCROLL_STRATEGY } from '@angular/cdk/scrolling';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -34,6 +34,7 @@ import { PantryFilterState } from '@core/models/pantry-pipeline.model';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
 import { PantryVirtualItemHeightDirective, VirtualItemHeightChange } from '../virtual-item-height.directive';
 import { PantryAutosizeVirtualScrollStrategy } from '../pantry-autosize-virtual-scroll.strategy';
+import { Subscription } from 'rxjs';
 
 const PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER = {
   provide: PantryAutosizeVirtualScrollStrategy,
@@ -54,7 +55,7 @@ const PANTRY_VIRTUAL_SCROLL_STRATEGY_PROVIDER = {
     },
   ]
 })
-export class PantryListComponent implements OnDestroy {
+export class PantryListComponent implements OnDestroy, AfterViewInit {
   @ViewChild(CdkVirtualScrollViewport) private viewport?: CdkVirtualScrollViewport;
   readonly searchTerm: Signal<string>;
   readonly activeFilters: Signal<PantryFilterState>;
@@ -76,7 +77,7 @@ export class PantryListComponent implements OnDestroy {
       return measured.get(key) ?? this.getDefaultEntryHeight(entry);
     });
   });
-  readonly summary = computed(() => this.buildSummary(this.itemsState()));
+  readonly summary = computed(() => this.buildSummary(this.itemsState(), this.pantryService.totalCount()));
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
   readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
   readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.itemsState()));
@@ -102,6 +103,8 @@ export class PantryListComponent implements OnDestroy {
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveDelay = 500;
   private realtimeSubscribed = false;
+  private endOfListToastShown = false;
+  private viewportSubscription?: Subscription;
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     categoryId: this.fb.control(''),
@@ -183,6 +186,14 @@ export class PantryListComponent implements OnDestroy {
     });
 
     effect(() => {
+      if (!this.endReached()) {
+        this.endOfListToastShown = false;
+      } else if (!this.loading()) {
+        void this.notifyEndOfList();
+      }
+    });
+
+    effect(() => {
       const categories = this.categoryOptions();
       const categoryFilter = this.activeFilters().categoryId;
       if (categoryFilter && !categories.some(option => option.id === categoryFilter)) {
@@ -208,24 +219,24 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
-  /** Convenience wrapper used by multiple entry points to reload the list. */
-  async loadItems(): Promise<void> {
-    await this.pantryService.reloadFromStart();
-    this.scrollViewportToTop();
-  }
-
-  /** Infinite-scroll handler: advancing pagination while ensuring the PouchDB call finishes before completion. */
-  async loadMore(event: CustomEvent): Promise<void> {
-    const target = event?.target as HTMLIonInfiniteScrollElement | null;
-    if (this.loading() || this.endReached()) {
-      target?.complete();
+  ngAfterViewInit(): void {
+    if (!this.viewport) {
       return;
     }
-    try {
-      await this.pantryService.loadNextPage();
-    } finally {
-      target?.complete();
+    this.viewportSubscription = this.viewport.scrolledIndexChange.subscribe(() => {
+      void this.checkAndLoadNextPage();
+    });
+    void this.checkAndLoadNextPage();
+  }
+
+  /** Convenience wrapper used by multiple entry points to reload the list. */
+  async loadItems(): Promise<void> {
+    this.endOfListToastShown = false;
+    if (this.pantryService.loadedProducts().length === 0) {
+      await this.pantryService.reloadFromStart();
+      await this.checkAndLoadNextPage();
     }
+    this.scrollViewportToTop();
   }
 
   /** Open the creation modal with blank defaults and a single location row. */
@@ -505,6 +516,7 @@ export class PantryListComponent implements OnDestroy {
     this.pantryService.setSortMode('name');
     this.showFilters.set(false);
     this.scrollViewportToTop();
+    this.endOfListToastShown = false;
   }
 
   async discardExpiredItem(item: PantryItem, event?: Event): Promise<void> {
@@ -691,7 +703,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   /** Aggregate counts for the summary bar shown above the list. */
-  private buildSummary(items: PantryItem[]) {
+  private buildSummary(items: PantryItem[], totalCount: number) {
     let low = 0;
     let expiring = 0;
     let expired = 0;
@@ -708,7 +720,7 @@ export class PantryListComponent implements OnDestroy {
     }
 
     return {
-      total: items.length,
+      total: totalCount,
       low,
       expiring,
       expired
@@ -1542,7 +1554,27 @@ export class PantryListComponent implements OnDestroy {
     await toast.present();
   }
 
+  private async notifyEndOfList(): Promise<void> {
+    if (this.endOfListToastShown) {
+      return;
+    }
+    this.endOfListToastShown = true;
+    await this.presentToast('No hay más productos por cargar.', 'medium');
+  }
+
+  private async checkAndLoadNextPage(): Promise<void> {
+    if (!this.viewport || this.loading() || this.endReached()) {
+      return;
+    }
+    const renderedRange = this.viewport.getRenderedRange();
+    const total = this.virtualEntries().length;
+    if (renderedRange.end >= total - 5) {
+      await this.pantryService.loadNextPage();
+    }
+  }
+
   ngOnDestroy(): void {
+    this.viewportSubscription?.unsubscribe();
     this.clearStockSaveTimers();
   }
 

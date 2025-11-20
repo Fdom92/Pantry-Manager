@@ -319,6 +319,12 @@
   background: rgba(var(--ion-color-warning-rgb, 255, 206, 0), 0.06);
 }
 
+.pantry-load-indicator {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 32px;
+}
+
 .item-expired {
   background: rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.14);
 }

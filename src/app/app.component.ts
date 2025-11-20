@@ -9,6 +9,11 @@ import { PantryService } from '@core/services/pantry.service';
 })
 export class AppComponent {
   constructor(private readonly pantryService: PantryService) {
-    void this.pantryService.initialize();
+    void this.preloadPantryData();
+  }
+
+  private async preloadPantryData(): Promise<void> {
+    await this.pantryService.initialize();
+    await this.pantryService.reloadFromStart();
   }
 }

@@ -81,23 +81,9 @@
         }
       </ng-container>
     </cdk-virtual-scroll-viewport>
-    <!-- Infinite scroll advances PouchDB pagination and shows live status while loading or after the end. -->
-    <ion-infinite-scroll
-      threshold="150px"
-      [disabled]="endReached()"
-      (ionInfinite)="loadMore($event)">
-      <ion-infinite-scroll-content
-        loadingSpinner="dots"
-        loadingText="Cargando productos...">
-      </ion-infinite-scroll-content>
-    </ion-infinite-scroll>
-    @if (itemsState().length > 0) {
-      <div class="infinite-status">
-        @if (loading()) {
-          <ion-spinner name="dots"></ion-spinner>
-        } @else if (endReached()) {
-          <ion-text color="medium">No hay más productos</ion-text>
-        }
+    @if (loading() && !endReached()) {
+      <div class="pantry-load-indicator">
+        <ion-spinner name="dots"></ion-spinner>
       </div>
     }
   }

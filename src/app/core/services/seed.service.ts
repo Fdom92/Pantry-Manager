@@ -6,6 +6,17 @@ import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 @Injectable({ providedIn: 'root' })
 export class SeedService {
   private seeded = false;
+  private readonly TARGET_QUANTITY = 120;
+  private readonly categories = [
+    'category:grains',
+    'category:bakery',
+    'category:dairy',
+    'category:produce',
+    'category:snacks',
+    'category:pantry',
+    'category:frozen',
+  ];
+  private readonly locations = ['pantry', 'kitchen', 'fridge', 'freezer', 'garage'];
 
   constructor(private storage: StorageService<PantryItem>) {}
 
@@ -13,18 +24,25 @@ export class SeedService {
     if (this.seeded) return;
 
     const existing = await this.storage.all('item');
-    if (existing.length > 0) {
+    if (existing.length >= this.TARGET_QUANTITY) {
       this.seeded = true;
       return;
     }
 
+    const newItems = this.buildSeedItems(existing.length);
+    if (newItems.length) {
+      await this.storage.bulkSave(newItems);
+    }
+    this.seeded = true;
+  }
+
+  private buildSeedItems(offset: number): PantryItem[] {
     const now = Date.now();
-    const nowIso = new Date().toISOString();
     const DAY = 1000 * 60 * 60 * 24;
     const plusDays = (days: number) => new Date(now + DAY * days).toISOString();
     const minusDays = (days: number) => new Date(now - DAY * days).toISOString();
 
-    const items: PantryItem[] = [
+    const baseItems: PantryItem[] = [
       {
         _id: 'item:sample-rice',
         type: 'item',
@@ -68,8 +86,8 @@ export class SeedService {
         minThreshold: 4,
         categoryId: 'category:grains',
         expirationDate: plusDays(30),
-        createdAt: nowIso,
-        updatedAt: nowIso,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
       {
         _id: 'item:sample-milk',
@@ -101,8 +119,8 @@ export class SeedService {
         minThreshold: 8,
         categoryId: 'category:dairy',
         expirationDate: plusDays(7),
-        createdAt: nowIso,
-        updatedAt: nowIso,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
       {
         _id: 'item:sample-eggs',
@@ -128,8 +146,8 @@ export class SeedService {
         minThreshold: 18,
         categoryId: 'category:dairy',
         expirationDate: plusDays(14),
-        createdAt: nowIso,
-        updatedAt: nowIso,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
       {
         _id: 'item:sample-apples',
@@ -172,8 +190,8 @@ export class SeedService {
         minThreshold: 3,
         categoryId: 'category:produce',
         expirationDate: plusDays(5),
-        createdAt: nowIso,
-        updatedAt: nowIso,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
       {
         _id: 'item:sample-bread',
@@ -199,123 +217,55 @@ export class SeedService {
         minThreshold: 2,
         categoryId: 'category:bakery',
         expirationDate: minusDays(1),
-        createdAt: nowIso,
-        updatedAt: nowIso,
-      },
-      {
-        _id: 'item:sample-oil',
-        type: 'item',
-        householdId: DEFAULT_HOUSEHOLD_ID,
-        name: 'Olive oil',
-        locations: [
-          {
-            locationId: 'pantry',
-            unit: MeasurementUnit.LITER,
-            batches: [
-              {
-                batchId: 'batch:seed-oil-1',
-                quantity: 0.75,
-                unit: MeasurementUnit.LITER,
-                expirationDate: plusDays(365),
-              },
-            ],
-          },
-        ],
-        isBasic: true,
-        minThreshold: 1,
-        categoryId: 'category:pantry',
-        expirationDate: plusDays(365),
-        createdAt: nowIso,
-        updatedAt: nowIso,
-      },
-      {
-        _id: 'item:sample-blueberries',
-        type: 'item',
-        householdId: DEFAULT_HOUSEHOLD_ID,
-        name: 'Blueberries',
-        locations: [
-          {
-            locationId: 'fridge',
-            unit: MeasurementUnit.KILOGRAM,
-            batches: [
-              {
-                batchId: 'batch:seed-blueberries-1',
-                quantity: 0.3,
-                unit: MeasurementUnit.KILOGRAM,
-                expirationDate: plusDays(5),
-                opened: true,
-              },
-              {
-                batchId: 'batch:seed-blueberries-2',
-                quantity: 0.2,
-                unit: MeasurementUnit.KILOGRAM,
-                expirationDate: plusDays(2),
-              },
-            ],
-          },
-        ],
-        minThreshold: 0.8,
-        categoryId: 'category:produce',
-        expirationDate: plusDays(2),
-        createdAt: nowIso,
-        updatedAt: nowIso,
-      },
-      {
-        _id: 'item:sample-butter',
-        type: 'item',
-        householdId: DEFAULT_HOUSEHOLD_ID,
-        name: 'Butter',
-        locations: [
-          {
-            locationId: 'fridge',
-            unit: MeasurementUnit.UNIT,
-            batches: [
-              {
-                batchId: 'batch:seed-butter-1',
-                quantity: 0.5,
-                unit: MeasurementUnit.UNIT,
-                expirationDate: plusDays(30),
-                opened: true,
-              },
-            ],
-          },
-        ],
-        isBasic: true,
-        minThreshold: 2,
-        categoryId: 'category:dairy',
-        expirationDate: plusDays(30),
-        createdAt: nowIso,
-        updatedAt: nowIso,
-      },
-      {
-        _id: 'item:sample-salad',
-        type: 'item',
-        householdId: DEFAULT_HOUSEHOLD_ID,
-        name: 'Mixed greens',
-        locations: [
-          {
-            locationId: 'fridge',
-            unit: MeasurementUnit.KILOGRAM,
-            batches: [
-              {
-                batchId: 'batch:seed-salad-1',
-                quantity: 0.2,
-                unit: MeasurementUnit.KILOGRAM,
-                expirationDate: minusDays(3),
-                opened: true,
-              },
-            ],
-          },
-        ],
-        minThreshold: 0.8,
-        categoryId: 'category:produce',
-        expirationDate: minusDays(3),
-        createdAt: nowIso,
-        updatedAt: nowIso,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     ];
 
-    await this.storage.bulkSave(items);
-    this.seeded = true;
+    const generatedItems: PantryItem[] = [];
+    const remaining = Math.max(0, this.TARGET_QUANTITY - offset);
+    for (let i = 0; i < remaining; i++) {
+      const base = baseItems[i % baseItems.length];
+      const index = offset + i + 1;
+      generatedItems.push({
+        ...base,
+        _id: `${base._id}-${index}`,
+        name: `${base.name} ${index}`,
+        categoryId: this.categories[index % this.categories.length],
+        locations: this.buildLocations(index),
+        minThreshold: base.minThreshold ?? Math.floor(index % 5),
+        createdAt: plusDays(-index),
+        updatedAt: plusDays(-index + 1),
+      });
+    }
+    return generatedItems;
+  }
+
+  private buildLocations(seed: number) {
+    const locationCount = 1 + (seed % this.locations.length);
+    return Array.from({ length: locationCount }).map((_, idx) => {
+      const locationId = this.locations[(seed + idx) % this.locations.length];
+      const unit =
+        idx % 2 === 0 ? MeasurementUnit.UNIT : seed % 3 === 0 ? MeasurementUnit.KILOGRAM : MeasurementUnit.LITER;
+      return {
+        locationId,
+        unit,
+        batches: [
+          {
+            batchId: `batch:${seed}-${idx}-a`,
+            quantity: idx + 1,
+            unit,
+            expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * (seed + idx)).toISOString(),
+            opened: idx % 2 === 0,
+          },
+          {
+            batchId: `batch:${seed}-${idx}-b`,
+            quantity: idx + 2,
+            unit,
+            expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * (seed + idx + 5)).toISOString(),
+          },
+        ],
+      };
+    });
   }
 }

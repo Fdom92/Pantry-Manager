@@ -142,6 +142,32 @@ export class StorageService<T extends BaseDoc> {
   }
 
   /**
+   * countByType - returns the number of documents for the requested type without fetching full docs.
+   */
+  protected async countByType(type: string): Promise<number> {
+    await this.ensureIndex(['type']);
+    let total = 0;
+    let skip = 0;
+
+    while (true) {
+      const res = await this.db.find({
+        selector: { type },
+        fields: ['_id'],
+        skip,
+        limit: this.LIST_CHUNK_SIZE,
+      });
+      const batch = res.docs.length;
+      total += batch;
+      if (batch < this.LIST_CHUNK_SIZE) {
+        break;
+      }
+      skip += batch;
+    }
+
+    return total;
+  }
+
+  /**
    * findByField - query by any indexed field.
    */
   async findByField<K extends keyof T>(field: K, value: T[K]): Promise<T[]> {
