@@ -1,0 +1,73 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Agente</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()">
+        Limpiar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="chat">
+    @for (message of messages(); track trackById($index, message)) {
+      <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-tool]="message.role === 'tool'" [class.is-error]="message.status === 'error'">
+        <div class="message__bubble">
+          <div class="message__meta">
+            <span class="message__author">
+              {{ message.role === 'user' ? 'Tú' : (message.role === 'tool' ? 'Acción' : 'Agente') }}
+            </span>
+            <span class="message__time">{{ message.createdAt | date:'shortTime' }}</span>
+          </div>
+          <div class="message__content">
+            <p>{{ message.content }}</p>
+          </div>
+          @if (message.data?.summary || message.data?.details?.length) {
+            <div class="result-card">
+              @if (message.data?.summary) {
+                <div class="result-card__title">{{ message.data?.summary }}</div>
+              }
+              @if (message.data?.details?.length) {
+                <ul class="result-card__list">
+                  @for (detail of message.data?.details; track detail) {
+                    <li>{{ detail }}</li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (thinking()) {
+      <div class="message from-agent">
+        <div class="message__bubble thinking">
+          <ion-spinner name="dots"></ion-spinner>
+          <span>Pensando…</span>
+        </div>
+      </div>
+    }
+  </div>
+</ion-content>
+
+<ion-footer>
+  <div class="composer">
+    <ion-textarea
+      class="composer__input"
+      placeholder="Escribe instrucciones como “Mueve 2 yogures al frigo”"
+      autoGrow="true"
+      [formControl]="messageControl"
+      enterkeyhint="send">
+    </ion-textarea>
+    <div class="composer__actions">
+      <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()">
+        Limpiar
+      </ion-button>
+      <ion-button color="primary" (click)="send()" [disabled]="!messageControl.value.trim() || thinking()">
+        Enviar
+      </ion-button>
+    </div>
+  </div>
+</ion-footer>

@@ -1,6 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { provideIonicAngular } from '@ionic/angular/standalone';
+import { provideHttpClient } from '@angular/common/http';
 import { addIcons } from 'ionicons';
 import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
@@ -26,6 +27,7 @@ import {
   trendingDownOutline,
   checkmarkCircleOutline,
   listOutline,
+  chatbubblesOutline,
   star,
   starOutline,
   locationOutline,
@@ -64,6 +66,7 @@ addIcons({
   'trending-down-outline': trendingDownOutline,
   'checkmark-circle-outline': checkmarkCircleOutline,
   'list-outline': listOutline,
+  'chatbubbles-outline': chatbubblesOutline,
   'star': star,
   'star-outline': starOutline,
   'location-outline': locationOutline,
@@ -77,6 +80,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideIonicAngular(),
     provideRouter(routes),
+    provideHttpClient(),
     { provide: LOCALE_ID, useValue: 'es' },
   ],
 }).catch(err => console.error(err));
