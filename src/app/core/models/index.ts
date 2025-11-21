@@ -10,3 +10,5 @@ export * from './shopping-list.model';
 export * from './supermarket.model';
 export * from './user.model';
 export * from './settings.model';
+export * from './pantry-list.model';
+export * from './date-format-options.model';

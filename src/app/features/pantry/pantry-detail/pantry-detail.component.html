@@ -2,7 +2,7 @@
   class="pantry-item-card"
   [attr.data-status]="viewModel.globalStatus.state"
   [style.--card-accent]="viewModel.globalStatus.accentColor"
-  [ngClass]="expanded ? 'is-expanded' : ''">
+  [ngClass]="[viewModel.colorClass, expanded ? 'is-expanded' : '']">
   <div
     class="card-summary"
     role="button"
@@ -35,7 +35,9 @@
     </div>
   </div>
 
-  <div class="item-details" [@expandCollapse]="expanded ? 'expanded' : 'collapsed'">
+  <div
+    class="item-details"
+    [class.item-details--collapsed]="!expanded">
     @if (expanded) {
       <div class="expanded-content">
         <section class="batch-section">
@@ -60,7 +62,7 @@
                     </div>
                   </div>
                   <div class="batch-meta">
-                    <span class="batch-quantity" [@fadeIn]="batch.quantityValue">
+                    <span class="batch-quantity">
                       {{ batch.quantityLabel }}
                     </span>
                     <!--  -->

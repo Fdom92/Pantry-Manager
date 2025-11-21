@@ -1,5 +1,5 @@
-import { Component, OnDestroy, signal, computed, effect } from '@angular/core';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { Component, OnDestroy, ChangeDetectionStrategy, signal, computed, effect, ViewChild, Signal } from '@angular/core';
+import { IonicModule, IonContent, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
 import {
@@ -7,91 +7,50 @@ import {
   DEFAULT_LOCATION_OPTIONS,
   DEFAULT_SUPERMARKET_OPTIONS,
 } from '@core/services';
-import { PantryItem, MeasurementUnit, ItemLocationStock, ItemBatch } from '@core/models';
+import {
+  PantryItem,
+  MeasurementUnit,
+  ItemLocationStock,
+  ItemBatch,
+  PantryGroup,
+  BatchStatusMeta,
+  BatchEntryMeta,
+  BatchSummaryMeta,
+  BatchCountsMeta,
+  ProductStatusState,
+  PantryItemGlobalStatus,
+  PantryItemBatchViewModel,
+  PantryItemCardViewModel,
+  ES_DATE_FORMAT_OPTIONS,
+} from '@core/models';
 import { createDocumentId, getLocationDisplayName } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { trigger, state, style, transition, animate } from '@angular/animations';
 import { PantryStoreService } from '@core/store/pantry-store.service';
+import { PantryService } from '@core/services/pantry.service';
+import { PantryFilterState } from '@core/models/pantry-pipeline.model';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
-interface PantryGroup {
-  key: string;
-  name: string;
-  items: PantryItem[];
-  lowStockCount: number;
-  expiringCount: number;
-  expiredCount: number;
-}
 
-interface CategoryState {
-  expanded: boolean;
-}
+type PantryStatusFilterValue = 'all' | 'expired' | 'near-expiry' | 'low-stock' | 'normal';
 
-interface BatchStatusMeta {
+interface StatusChipViewModel {
+  value: PantryStatusFilterValue;
   label: string;
+  count: number;
   icon: string;
-  state: BatchStatusState;
-  color: 'danger' | 'warning' | 'success' | 'medium';
+  description: string;
+  colorClass: string;
 }
 
-interface BatchEntryMeta {
-  batch: ItemBatch;
-  location: ItemLocationStock;
-  locationLabel: string;
-  locationUnit: MeasurementUnit | string | undefined;
-  status: BatchStatusMeta;
-}
-
-interface BatchSummaryMeta {
+interface PantrySummaryMeta {
   total: number;
-  sorted: BatchEntryMeta[];
-}
-
-interface BatchCountsMeta {
-  total: number;
-  expired: number;
-  nearExpiry: number;
-  normal: number;
-  unknown: number;
-}
-
-type BatchStatusState = 'normal' | 'near-expiry' | 'expired' | 'unknown';
-type ProductStatusState = 'normal' | 'near-expiry' | 'expired';
-
-export interface PantryItemGlobalStatus {
-  state: ProductStatusState;
-  label: string;
-  accentColor: string;
-  chipColor: string;
-  chipTextColor: string;
-}
-
-export interface PantryItemBatchViewModel {
-  batch: ItemBatch;
-  location: ItemLocationStock;
-  locationLabel: string;
-  status: BatchStatusMeta;
-  formattedDate: string;
-  quantityLabel: string;
-  quantityValue: number;
-  unitLabel: string;
-  opened: boolean;
-}
-
-export interface PantryItemCardViewModel {
-  item: PantryItem;
-  globalStatus: PantryItemGlobalStatus;
-  totalQuantity: number;
-  totalQuantityLabel: string;
-  unitLabel: string;
-  totalBatches: number;
-  totalBatchesLabel: string;
-  earliestExpirationDate: string | null;
-  formattedEarliestExpirationShort: string;
-  formattedEarliestExpirationLong: string;
-  batchCountsLabel: string;
-  batchCounts: BatchCountsMeta;
-  batches: PantryItemBatchViewModel[];
+  visible: number;
+  statusCounts: {
+    expired: number;
+    expiring: number;
+    lowStock: number;
+    normal: number;
+  };
 }
 
 @Component({
@@ -100,37 +59,24 @@ export interface PantryItemCardViewModel {
   imports: [IonicModule, CommonModule, ReactiveFormsModule, PantryDetailComponent],
   templateUrl: './pantry-list.component.html',
   styleUrls: ['./pantry-list.component.scss'],
-  animations: [
-    trigger('expandCollapse', [
-      state('collapsed', style({ height: '0px', opacity: 0, marginTop: '0px' })),
-      state('expanded', style({ height: '*', opacity: 1, marginTop: '16px' })),
-      transition('collapsed <=> expanded', [
-        animate('180ms ease-in-out')
-      ]),
-    ]),
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(-2px)' }),
-        animate('140ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
-      ]),
-      transition('* => *', [
-        style({ opacity: 0.4, transform: 'translateY(-1px)' }),
-        animate('140ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
-      ]),
-    ]),
-  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PantryListComponent implements OnDestroy {
-  readonly searchTerm = signal('');
-  readonly selectedCategory = signal('all');
-  readonly selectedLocation = signal('all');
-  readonly sortOption = signal<'name' | 'quantity' | 'expiration'>('name');
-  readonly statusFilter = signal<'all' | 'expired' | 'near-expiry'>('all');
+  @ViewChild('content', { static: false }) private content?: IonContent;
+  readonly searchTerm: Signal<string>;
+  readonly activeFilters: Signal<PantryFilterState>;
+  readonly selectedCategory: Signal<string>;
+  readonly selectedLocation: Signal<string>;
+  readonly sortOption: Signal<'name' | 'quantity' | 'expiration'>;
+  readonly statusFilter: Signal<PantryStatusFilterValue>;
   readonly showFilters = signal(false);
+  readonly basicOnly: Signal<boolean>;
+  readonly lowStockOnly: Signal<boolean>;
   readonly itemsState = signal<PantryItem[]>([]);
-  readonly filteredItems = computed(() => this.computeFilteredItems());
-  readonly groups = computed(() => this.buildGroups(this.filteredItems()));
-  readonly summary = computed(() => this.buildSummary(this.filteredItems()));
+  readonly groups = computed(() => this.buildGroups(this.itemsState()));
+  private readonly summaryCache = signal<PantrySummaryMeta>(this.createEmptySummary());
+  readonly summary = computed<PantrySummaryMeta>(() => this.summaryCache());
+  readonly statusChips = computed(() => this.buildStatusChips(this.summary()));
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
   readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
   readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.itemsState()));
@@ -139,9 +85,10 @@ export class PantryListComponent implements OnDestroy {
   readonly batchSummaries = computed(() => this.computeBatchSummaries(this.itemsState()));
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
-  readonly loading = this.pantryStore.loading;
+  readonly loading = this.pantryService.loading;
   readonly nearExpiryDays = 7;
   readonly MeasurementUnit = MeasurementUnit;
+  readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   showCreateModal = false;
   editingItem: PantryItem | null = null;
   isSaving = false;
@@ -149,7 +96,6 @@ export class PantryListComponent implements OnDestroy {
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveDelay = 500;
-  private readonly categoryState = new Map<string, CategoryState>();
   private realtimeSubscribed = false;
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -199,32 +145,54 @@ export class PantryListComponent implements OnDestroy {
   }
   constructor(
     private readonly pantryStore: PantryStoreService,
+    private readonly pantryService: PantryService,
     private readonly fb: FormBuilder,
     private readonly toastCtrl: ToastController,
     private readonly appPreferences: AppPreferencesService,
   ) {
+    this.searchTerm = this.pantryService.searchQuery;
+    this.activeFilters = this.pantryService.activeFilters;
+    this.sortOption = this.pantryService.sortMode;
+    this.selectedCategory = computed(() => this.activeFilters().categoryId ?? 'all');
+    this.selectedLocation = computed(() => this.activeFilters().locationId ?? 'all');
+    this.statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
+    this.basicOnly = computed(() => this.activeFilters().basic);
+    this.lowStockOnly = computed(() => this.activeFilters().lowStock);
+
+    // Keep the UI in sync with the filtered pipeline, merging optimistic edits before rendering the list.
     effect(() => {
-      const storeItems = this.pantryStore.items();
-      this.itemsState.set(this.mergePendingItems(storeItems));
+      const paginatedItems = this.pantryService.filteredProducts();
+      this.itemsState.set(this.mergePendingItems(paginatedItems));
     });
 
+    // Expansion toggles depend on ids that might disappear when new batches arrive.
     effect(() => {
-      this.ensureCategoryState(this.groups());
+      this.syncExpandedItems(this.itemsState());
     });
 
     effect(() => {
       const categories = this.categoryOptions();
-      const selected = this.selectedCategory();
-      if (selected !== 'all' && !categories.some(option => option.id === selected)) {
-        this.selectedCategory.set('all');
+      const categoryFilter = this.activeFilters().categoryId;
+      if (categoryFilter && !categories.some(option => option.id === categoryFilter)) {
+        this.pantryService.setFilter('categoryId', null);
       }
     });
 
     effect(() => {
       const locations = this.locationOptions();
-      const selected = this.selectedLocation();
-      if (selected !== 'all' && !locations.some(option => option.id === selected)) {
-        this.selectedLocation.set('all');
+      const locationFilter = this.activeFilters().locationId;
+      if (locationFilter && !locations.some(option => option.id === locationFilter)) {
+        this.pantryService.setFilter('locationId', null);
+      }
+    });
+
+    effect(() => {
+      const totalCount = this.pantryService.totalCount();
+      const loadedItems = this.pantryService.loadedProducts();
+      const isLoading = this.pantryService.loading();
+      const shouldUseFreshSummary = !isLoading || loadedItems.length > 0 || totalCount === 0;
+      if (shouldUseFreshSummary) {
+        this.summaryCache.set(this.buildSummary(loadedItems, totalCount));
       }
     });
   }
@@ -240,7 +208,10 @@ export class PantryListComponent implements OnDestroy {
 
   /** Convenience wrapper used by multiple entry points to reload the list. */
   async loadItems(): Promise<void> {
-    await this.pantryStore.loadAll();
+    if (this.pantryService.loadedProducts().length === 0) {
+      await this.pantryService.reloadFromStart();
+    }
+    this.scrollViewportToTop();
   }
 
   /** Open the creation modal with blank defaults and a single location row. */
@@ -469,23 +440,44 @@ export class PantryListComponent implements OnDestroy {
   }
 
   onSearchTermChange(ev: CustomEvent): void {
-    this.searchTerm.set((ev.detail?.value ?? '').trim());
+    this.pantryService.setSearchQuery(ev.detail?.value ?? '');
   }
 
   onCategoryChange(ev: CustomEvent): void {
-    this.selectedCategory.set(ev.detail?.value ?? 'all');
+    const raw = ev.detail?.value ?? 'all';
+    this.pantryService.setFilter('categoryId', raw === 'all' ? null : raw);
   }
 
   onLocationChange(ev: CustomEvent): void {
-    this.selectedLocation.set(ev.detail?.value ?? 'all');
+    const raw = ev.detail?.value ?? 'all';
+    this.pantryService.setFilter('locationId', raw === 'all' ? null : raw);
   }
 
   onStatusFilterChange(ev: CustomEvent): void {
-    this.statusFilter.set(ev.detail?.value ?? 'all');
+    const value = (ev.detail?.value ?? 'all') as PantryStatusFilterValue;
+    this.applyStatusFilterPreset(value);
+  }
+
+  onStatusChipSelected(value: PantryStatusFilterValue): void {
+    this.applyStatusFilterPreset(value);
   }
 
   onSortChange(ev: CustomEvent): void {
-    this.sortOption.set(ev.detail?.value ?? 'name');
+    const mode = (ev.detail?.value ?? 'name') as 'name' | 'quantity' | 'expiration';
+    this.pantryService.setSortMode(mode);
+  }
+
+  toggleBasicOnly(ev: CustomEvent<{ checked: boolean }>): void {
+    this.pantryService.setFilter('basic', Boolean(ev.detail?.checked));
+  }
+
+  toggleLowStockOnly(ev: CustomEvent<{ checked: boolean }>): void {
+    const checked = Boolean(ev.detail?.checked);
+    if (checked) {
+      this.pantryService.setFilters({ lowStock: true, normalOnly: false });
+    } else {
+      this.pantryService.setFilter('lowStock', false);
+    }
   }
 
   openFilters(event?: Event): void {
@@ -498,12 +490,30 @@ export class PantryListComponent implements OnDestroy {
   }
 
   clearFilters(): void {
-    this.searchTerm.set('');
-    this.selectedCategory.set('all');
-    this.selectedLocation.set('all');
-    this.statusFilter.set('all');
-    this.sortOption.set('name');
+    this.pantryService.resetSearchAndFilters();
+    this.pantryService.setSortMode('name');
     this.showFilters.set(false);
+    this.scrollViewportToTop();
+  }
+
+  private applyStatusFilterPreset(preset: PantryStatusFilterValue): void {
+    switch (preset) {
+      case 'expired':
+        this.pantryService.setFilters({ expired: true, expiring: false, lowStock: false, normalOnly: false });
+        break;
+      case 'near-expiry':
+        this.pantryService.setFilters({ expired: false, expiring: true, lowStock: false, normalOnly: false });
+        break;
+      case 'low-stock':
+        this.pantryService.setFilters({ expired: false, expiring: false, lowStock: true, normalOnly: false });
+        break;
+      case 'normal':
+        this.pantryService.setFilters({ expired: false, expiring: false, lowStock: false, normalOnly: true });
+        break;
+      default:
+        this.pantryService.setFilters({ expired: false, expiring: false, lowStock: false, normalOnly: false });
+        break;
+    }
   }
 
   async discardExpiredItem(item: PantryItem, event?: Event): Promise<void> {
@@ -579,6 +589,11 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
+  /** Scroll to the top of the list after reloading or clearing filters. */
+  private scrollViewportToTop(): void {
+    this.content?.scrollToTop(300);
+  }
+
   openBatchesModal(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     this.selectedBatchesItem.set(item);
@@ -588,42 +603,6 @@ export class PantryListComponent implements OnDestroy {
   closeBatchesModal(): void {
     this.showBatchesModal.set(false);
     this.selectedBatchesItem.set(null);
-  }
-
-  /** Apply search, filter, and sorting rules while keeping expansion state in sync. */
-  private computeFilteredItems(): PantryItem[] {
-    const items = this.itemsState();
-    const search = this.searchTerm().trim().toLowerCase();
-    const category = this.selectedCategory();
-    const location = this.selectedLocation();
-    const status = this.statusFilter();
-
-    let filtered = items.filter(item => {
-      if (search && !this.matchesSearch(item, search)) {
-        return false;
-      }
-      if (category !== 'all' && (item.categoryId ?? '') !== category) {
-        return false;
-      }
-      if (
-        location !== 'all' &&
-        !item.locations.some(loc => (loc.locationId ?? '') === location)
-      ) {
-        return false;
-      }
-      switch (status) {
-        case 'expired':
-          return this.isExpired(item);
-        case 'near-expiry':
-          return this.isNearExpiry(item) && !this.isExpired(item);
-        default:
-          return true;
-      }
-    });
-
-    filtered = [...filtered].sort((a, b) => this.compareItems(a, b));
-    this.syncExpandedItems(filtered);
-    return filtered;
   }
 
   /** Sort items by urgency (expiry/quantity) and finally by name for stable output. */
@@ -675,28 +654,109 @@ export class PantryListComponent implements OnDestroy {
   }
 
   /** Aggregate counts for the summary bar shown above the list. */
-  private buildSummary(items: PantryItem[]) {
-    let low = 0;
-    let expiring = 0;
-    let expired = 0;
+  private buildSummary(items: PantryItem[], totalCount: number): PantrySummaryMeta {
+    const statusCounts = {
+      expired: 0,
+      expiring: 0,
+      lowStock: 0,
+      normal: 0,
+    };
 
     for (const item of items) {
-      if (this.isExpired(item)) {
-        expired += 1;
-      } else if (this.isNearExpiry(item)) {
-        expiring += 1;
-      }
-      if (this.isLowStock(item)) {
-        low += 1;
+      const state = this.getItemStatusState(item);
+      switch (state) {
+        case 'expired':
+          statusCounts.expired += 1;
+          break;
+        case 'near-expiry':
+          statusCounts.expiring += 1;
+          break;
+        case 'low-stock':
+          statusCounts.lowStock += 1;
+          break;
+        default:
+          statusCounts.normal += 1;
+          break;
       }
     }
 
     return {
-      total: items.length,
-      low,
-      expiring,
-      expired
+      total: totalCount,
+      visible: items.length,
+      statusCounts,
     };
+  }
+
+  private createEmptySummary(): PantrySummaryMeta {
+    return {
+      total: 0,
+      visible: 0,
+      statusCounts: {
+        expired: 0,
+        expiring: 0,
+        lowStock: 0,
+        normal: 0,
+      },
+    };
+  }
+
+  private getItemStatusState(item: PantryItem): ProductStatusState {
+    if (this.isExpired(item)) {
+      return 'expired';
+    }
+    if (this.isNearExpiry(item)) {
+      return 'near-expiry';
+    }
+    if (this.isLowStock(item)) {
+      return 'low-stock';
+    }
+    return 'normal';
+  }
+
+  private buildStatusChips(summary: PantrySummaryMeta): StatusChipViewModel[] {
+    const counts = summary.statusCounts;
+    return [
+      {
+        value: 'all',
+        label: 'Todos',
+        count: summary.total,
+        icon: 'layers-outline',
+        description: 'Ver todos los productos disponibles',
+        colorClass: 'chip--all',
+      },
+      {
+        value: 'normal',
+        label: 'Con stock',
+        count: counts.normal,
+        icon: 'checkmark-circle-outline',
+        description: 'Productos sin alertas activas',
+        colorClass: 'chip--normal',
+      },
+      {
+        value: 'low-stock',
+        label: 'Stock bajo',
+        count: counts.lowStock,
+        icon: 'alert-circle-outline',
+        description: 'Necesitan reposición pronto',
+        colorClass: 'chip--low',
+      },
+      {
+        value: 'near-expiry',
+        label: 'Próx. caducar',
+        count: counts.expiring,
+        icon: 'hourglass-outline',
+        description: 'Caducan en pocos días',
+        colorClass: 'chip--expiring',
+      },
+      {
+        value: 'expired',
+        label: 'Caducados',
+        count: counts.expired,
+        icon: 'time-outline',
+        description: 'Revisar y descartar',
+        colorClass: 'chip--expired',
+      },
+    ];
   }
 
   /** Build select options that indicate how many items belong to each location. */
@@ -922,7 +982,9 @@ export class PantryListComponent implements OnDestroy {
       opened: Boolean(entry.batch.opened),
     }));
 
-    const aggregates = this.computeProductAggregates(batches);
+    const lowStock = this.isLowStock(item);
+    const aggregates = this.computeProductAggregates(batches, lowStock);
+    const colorClass = this.getColorClass(aggregates.status.state);
 
     return {
       item,
@@ -932,6 +994,7 @@ export class PantryListComponent implements OnDestroy {
       totalBatches,
       totalBatchesLabel,
       globalStatus: aggregates.status,
+      colorClass,
       earliestExpirationDate: aggregates.earliestDate,
       formattedEarliestExpirationShort: aggregates.earliestDate
         ? this.formatDateCompact(aggregates.earliestDate)
@@ -965,7 +1028,10 @@ export class PantryListComponent implements OnDestroy {
     return `${formatted} ${unitLabel}`;
   }
 
-  private computeProductAggregates(batches: PantryItemBatchViewModel[]): {
+  private computeProductAggregates(
+    batches: PantryItemBatchViewModel[],
+    isLowStock: boolean
+  ): {
     status: PantryItemGlobalStatus;
     earliestDate: string | null;
     counts: BatchCountsMeta;
@@ -981,6 +1047,7 @@ export class PantryListComponent implements OnDestroy {
 
     let earliestDate: string | null = null;
     let earliestTime: number | null = null;
+    let earliestStatus: ProductStatusState | null = null;
 
     for (const entry of batches) {
       switch (entry.status.state) {
@@ -1003,12 +1070,24 @@ export class PantryListComponent implements OnDestroy {
         if (time !== null && (earliestTime === null || time < earliestTime)) {
           earliestTime = time;
           earliestDate = entry.batch.expirationDate;
+          earliestStatus =
+            entry.status.state === 'normal' || entry.status.state === 'unknown'
+              ? 'normal'
+              : (entry.status.state as Extract<ProductStatusState, 'expired' | 'near-expiry'>);
         }
       }
     }
 
-    const statusState: ProductStatusState =
-      counts.expired > 0 ? 'expired' : counts.nearExpiry > 0 ? 'near-expiry' : 'normal';
+    let statusState: ProductStatusState;
+    if (earliestStatus === 'expired') {
+      statusState = 'expired';
+    } else if (earliestStatus === 'near-expiry') {
+      statusState = 'near-expiry';
+    } else if (isLowStock) {
+      statusState = 'low-stock';
+    } else {
+      statusState = 'normal';
+    }
 
     const status = this.getProductStatusMeta(statusState);
     const batchSummaryLabel = this.buildBatchSummaryLabel(counts);
@@ -1023,11 +1102,11 @@ export class PantryListComponent implements OnDestroy {
 
   private formatDateCompact(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-      }).format(new Date(value));
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
     }
@@ -1035,13 +1114,26 @@ export class PantryListComponent implements OnDestroy {
 
   private formatDateVerbose(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }).format(new Date(value));
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
+    }
+  }
+
+  private getColorClass(state: ProductStatusState): string {
+    switch (state) {
+      case 'expired':
+        return 'state-expired';
+      case 'near-expiry':
+        return 'state-expiring';
+      case 'low-stock':
+        return 'state-low-stock';
+      default:
+        return 'state-ok';
     }
   }
 
@@ -1051,24 +1143,32 @@ export class PantryListComponent implements OnDestroy {
         return {
           state,
           label: 'Caducado',
-          accentColor: '#B91C1C',
-          chipColor: '#B91C1C',
+          accentColor: '#DC2626',
+          chipColor: '#DC2626',
           chipTextColor: '#F8FAFC',
         };
       case 'near-expiry':
         return {
           state,
-          label: 'Próximo a vencer',
-          accentColor: '#EA580C',
-          chipColor: '#EA580C',
+          label: 'Por caducar',
+          accentColor: '#FACC15',
+          chipColor: '#FACC15',
           chipTextColor: '#F8FAFC',
+        };
+      case 'low-stock':
+        return {
+          state,
+          label: 'Bajo stock',
+          accentColor: '#FB923C',
+          chipColor: '#FB923C',
+          chipTextColor: '#0F172A',
         };
       default:
         return {
           state: 'normal',
-          label: 'Normal',
-          accentColor: '#15803D',
-          chipColor: '#15803D',
+          label: 'Stock',
+          accentColor: '#16A34A',
+          chipColor: '#16A34A',
           chipTextColor: '#F8FAFC',
         };
     }
@@ -1084,10 +1184,10 @@ export class PantryListComponent implements OnDestroy {
       descriptors.push(`${counts.expired} caducado${counts.expired > 1 ? 's' : ''}`);
     }
     if (counts.nearExpiry) {
-      descriptors.push(`${counts.nearExpiry} próximo${counts.nearExpiry > 1 ? 's' : ''} a vencer`);
+      descriptors.push(`${counts.nearExpiry} por caducar`);
     }
     if (counts.normal) {
-      descriptors.push(`${counts.normal} vigente${counts.normal > 1 ? 's' : ''}`);
+      descriptors.push(`${counts.normal} con stock`);
     }
     if (counts.unknown) {
       descriptors.push(`${counts.unknown} sin fecha`);
@@ -1182,9 +1282,9 @@ export class PantryListComponent implements OnDestroy {
       return { label: 'Caducado', icon: 'alert-circle-outline', state: 'expired', color: 'danger' };
     }
     if (expiryDate <= nearExpiryThreshold) {
-      return { label: 'Próximo a vencer', icon: 'hourglass-outline', state: 'near-expiry', color: 'warning' };
+      return { label: 'Por caducar', icon: 'hourglass-outline', state: 'near-expiry', color: 'warning' };
     }
-    return { label: 'Vigente', icon: 'checkmark-circle-outline', state: 'normal', color: 'success' };
+    return { label: 'Stock', icon: 'checkmark-circle-outline', state: 'normal', color: 'success' };
   }
 
   /** Return the earliest expiry date present in the provided locations array. */
@@ -1266,10 +1366,11 @@ export class PantryListComponent implements OnDestroy {
 
   private formatShortDate(value: string): string {
     try {
-      return new Intl.DateTimeFormat('es-ES', {
-        day: '2-digit',
-        month: 'short'
-      }).format(new Date(value));
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
     }
@@ -1323,18 +1424,70 @@ export class PantryListComponent implements OnDestroy {
     return updatedItem;
   }
 
+  /**
+   * Merge pending optimistic updates over the latest store snapshot so the UI
+   * does not briefly revert to stale quantities while debounced saves run.
+   */
+  private mergePendingItems(source: PantryItem[]): PantryItem[] {
+    if (!this.pendingItems.size) {
+      return source;
+    }
+
+    const merged = source.map(item => this.pendingItems.get(item._id) ?? item);
+    const seen = new Set(merged.map(item => item._id));
+
+    for (const [pendingId, pendingItem] of this.pendingItems.entries()) {
+      if (!seen.has(pendingId)) {
+        merged.push(pendingItem);
+      }
+    }
+
+    return merged;
+  }
+
   private sanitizeBatches(batches: ItemBatch[] | undefined, unit: MeasurementUnit | string): ItemBatch[] {
     if (!Array.isArray(batches) || !batches.length) {
       return [];
     }
     const normalizedUnit = this.normalizeUnitValue(unit);
-    return batches.map(batch => ({
+    const normalized = batches.map(batch => ({
       ...batch,
       batchId: batch.batchId ?? this.createTempBatchId(),
       quantity: this.toNumber(batch.quantity),
       unit: this.normalizeUnitValue(batch.unit ?? normalizedUnit),
       opened: batch.opened ?? false,
     }));
+
+    return this.mergeBatchesByExpiry(normalized);
+  }
+
+  private mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
+    if (batches.length <= 1) {
+      return batches;
+    }
+
+    const seen = new Map<string, ItemBatch>();
+    const merged: ItemBatch[] = [];
+
+    for (const batch of batches) {
+      const key = (batch.expirationDate ?? '').trim();
+      if (!key) {
+        merged.push(batch);
+        continue;
+      }
+
+      const existing = seen.get(key);
+      if (!existing) {
+        seen.set(key, batch);
+        merged.push(batch);
+        continue;
+      }
+
+      existing.quantity = this.toNumber(existing.quantity) + this.toNumber(batch.quantity);
+      existing.opened = Boolean(existing.opened || batch.opened);
+    }
+
+    return merged;
   }
 
   private sumBatchQuantities(batches: ItemBatch[] | undefined): number {
@@ -1635,6 +1788,22 @@ export class PantryListComponent implements OnDestroy {
     return trimmed.replace(/\s+/g, ' ');
   }
 
+  private getStatusFilterValue(filters: PantryFilterState): PantryStatusFilterValue {
+    if (filters.expired) {
+      return 'expired';
+    }
+    if (filters.expiring) {
+      return 'near-expiry';
+    }
+    if (filters.lowStock) {
+      return 'low-stock';
+    }
+    if (filters.normalOnly) {
+      return 'normal';
+    }
+    return 'all';
+  }
+
   /** Build category filter metadata including how many items are low within each group. */
   private computeCategoryOptions(items: PantryItem[]): Array<{ id: string; label: string; count: number; lowCount: number }> {
     const counts = new Map<string, { label: string; count: number; lowCount: number }>();
@@ -1704,30 +1873,6 @@ export class PantryListComponent implements OnDestroy {
     return groups;
   }
 
-  isCategoryExpanded(key: string): boolean {
-    return this.categoryState.get(key)?.expanded ?? true;
-  }
-
-  toggleCategory(key: string, event?: Event): void {
-    event?.stopPropagation();
-    const current = this.categoryState.get(key)?.expanded ?? true;
-    this.categoryState.set(key, { expanded: !current });
-  }
-
-  private ensureCategoryState(groups: PantryGroup[]): void {
-    const keys = new Set(groups.map(group => group.key));
-    for (const group of groups) {
-      if (!this.categoryState.has(group.key)) {
-        this.categoryState.set(group.key, { expanded: true });
-      }
-    }
-    for (const key of Array.from(this.categoryState.keys())) {
-      if (!keys.has(key)) {
-        this.categoryState.delete(key);
-      }
-    }
-  }
-
   formatCategoryName(key: string): string {
     return this.formatFriendlyName(key, 'Uncategorized');
   }
@@ -1762,38 +1907,4 @@ export class PantryListComponent implements OnDestroy {
     }
   }
 
-  /** Determine whether the item matches the provided free-text search term. */
-  private matchesSearch(item: PantryItem, search: string): boolean {
-    const name = item.name?.toLowerCase() ?? '';
-    const category = item.categoryId?.toLowerCase() ?? '';
-    if (name.includes(search) || category.includes(search)) {
-      return true;
-    }
-    return item.locations.some(loc => {
-      const id = loc.locationId?.toLowerCase() ?? '';
-      const label = getLocationDisplayName(loc.locationId, '').toLowerCase();
-      return id.includes(search) || label.includes(search);
-    });
-  }
-
-  /**
-   * Merge pending optimistic updates over the latest store snapshot so the UI
-   * does not briefly revert to stale quantities while debounced saves run.
-   */
-  private mergePendingItems(source: PantryItem[]): PantryItem[] {
-    if (!this.pendingItems.size) {
-      return source;
-    }
-
-    const merged = source.map(item => this.pendingItems.get(item._id) ?? item);
-    const seen = new Set(merged.map(item => item._id));
-
-    for (const [pendingId, pendingItem] of this.pendingItems.entries()) {
-      if (!seen.has(pendingId)) {
-        merged.push(pendingItem);
-      }
-    }
-
-    return merged;
-  }
 }
