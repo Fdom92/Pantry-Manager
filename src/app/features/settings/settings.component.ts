@@ -1,8 +1,8 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { BaseDoc, ES_DATE_FORMAT_OPTIONS } from '@core/models';
+import { BaseDoc } from '@core/models';
 import { AppPreferencesService, StorageService } from '@core/services';
 import packageJson from '../../../../package.json';
 
@@ -20,9 +20,6 @@ export class SettingsComponent {
 
   readonly exportingData = signal(false);
   readonly resettingData = signal(false);
-  readonly lastSyncDisplay = computed(() =>
-    this.formatDate(this.appPreferencesService.preferences().lastSyncAt)
-  );
 
   constructor(
     private readonly toastCtrl: ToastController,
@@ -68,29 +65,22 @@ export class SettingsComponent {
     this.exportingData.set(true);
     try {
       const docs = (await this.storage.all()).filter(doc => !doc._id.startsWith('_design/'));
-      const blob = new Blob([JSON.stringify(docs, null, 2)], {
-        type: 'application/json',
-      });
+      const json = JSON.stringify(docs, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
       const filename = this.buildExportFileName();
-      this.triggerDownload(blob, filename);
-      await this.presentToast('📦 Datos exportados.', 'success');
+      const file = new File([blob], filename, { type: 'application/json' });
+
+      const shared = await this.tryShareFile(file);
+      if (!shared) {
+        this.triggerDownload(blob, filename);
+      }
+      await this.presentToast(shared ? '📤 Datos listos para compartir.' : '📦 Datos exportados.', 'success');
     } catch (err) {
       console.error('[SettingsComponent] onExportData error', err);
       await this.presentToast('No se pudieron exportar los datos.', 'danger');
     } finally {
       this.exportingData.set(false);
     }
-  }
-
-  formatDate(iso: string | null | undefined): string {
-    if (!iso) {
-      return 'Sin sincronización registrada';
-    }
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) {
-      return 'Sin sincronización registrada';
-    }
-    return date.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
   }
 
   private async ensurePreferencesLoaded(): Promise<void> {
@@ -117,6 +107,30 @@ export class SettingsComponent {
       .toISOString()
       .replace(/[:.]/g, '-');
     return `pantry-manager-backup-${timestamp}.json`;
+  }
+
+  private async tryShareFile(file: File): Promise<boolean> {
+    const canUseWebShare =
+      typeof navigator !== 'undefined' &&
+      typeof navigator.canShare === 'function' &&
+      typeof navigator.share === 'function' &&
+      navigator.canShare({ files: [file] });
+
+    if (!canUseWebShare) {
+      return false;
+    }
+
+    try {
+      await navigator.share({
+        title: 'Pantry Manager - Respaldo',
+        text: 'Exporta o comparte tu copia de seguridad.',
+        files: [file],
+      });
+      return true;
+    } catch (err) {
+      console.warn('[SettingsComponent] Web Share failed, falling back to download', err);
+      return false;
+    }
   }
 
   private async presentToast(

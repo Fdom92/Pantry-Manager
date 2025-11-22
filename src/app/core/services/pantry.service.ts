@@ -24,6 +24,7 @@ export class PantryService extends StorageService<PantryItem> {
   private dbPreloaded = false;
   private productIndexReady = false;
   private pendingPipelineReset = false;
+  private backgroundLoadPromise: Promise<void> | null = null;
   private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
 
   constructor() {
@@ -64,6 +65,37 @@ export class PantryService extends StorageService<PantryItem> {
   async reloadFromStart(): Promise<void> {
     this.resetPagination();
     await this.loadAllPages();
+  }
+
+  /** Ensure at least one page is available to render something immediately. */
+  async ensureFirstPageLoaded(): Promise<void> {
+    if (this.loadedProducts().length > 0 || this.loading()) {
+      return;
+    }
+    this.resetPagination();
+    await this.loadNextPage(true);
+  }
+
+  /** Continue loading remaining pages without blocking the UI. */
+  startBackgroundLoad(): void {
+    if (this.backgroundLoadPromise || this.endReached()) {
+      return;
+    }
+    this.backgroundLoadPromise = (async () => {
+      try {
+        if (this.loadedProducts().length === 0 && !this.loading()) {
+          this.resetPagination();
+          await this.loadNextPage(true);
+        }
+        while (!this.endReached()) {
+          await this.loadNextPage(true);
+        }
+      } catch (err) {
+        console.warn('[PantryService] background load failed', err);
+      } finally {
+        this.backgroundLoadPromise = null;
+      }
+    })();
   }
 
   /**
