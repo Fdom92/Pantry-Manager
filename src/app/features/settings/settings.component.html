@@ -1,23 +1,46 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Ajustes</ion-title>
+    <ion-title>{{ 'settings.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <div class="settings-content">
+    <ion-list>
+      <ion-list-header>
+        <ion-label>
+          <h2>{{ 'settings.preferences.title' | translate }}</h2>
+          <p>{{ 'settings.preferences.subtitle' | translate }}</p>
+        </ion-label>
+      </ion-list-header>
+      <ion-item>
+        <ion-select
+          interface="popover"
+          label="{{ 'settings.preferences.language.label' | translate }}"
+          labelPlacement="stacked"
+          [value]="language()"
+          (ionChange)="onLanguageChange($event)">
+          @for (option of languageOptions; track option.value) {
+            <ion-select-option [value]="option.value">
+              {{ option.label | translate }}
+            </ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+    </ion-list>
+
     <ion-list lines="full">
       <ion-list-header>
         <ion-label>
-          <h2>Gestión de datos</h2>
-          <p>Controla el almacenamiento local de la app.</p>
+          <h2>{{ 'settings.data.title' | translate }}</h2>
+          <p>{{ 'settings.data.subtitle' | translate }}</p>
         </ion-label>
       </ion-list-header>
 
       <ion-item lines="none">
         <ion-label>
-          <h3>Limpiar datos / Restablecer app</h3>
-          <p>Elimina toda la información guardada en este dispositivo.</p>
+          <h3>{{ 'settings.data.resetTitle' | translate }}</h3>
+          <p>{{ 'settings.data.resetDescription' | translate }}</p>
         </ion-label>
         <ion-button
           color="danger"
@@ -31,14 +54,14 @@
             name="dots"
             *ngIf="resettingData()"
           ></ion-spinner>
-          Limpiar
+          {{ 'settings.data.resetAction' | translate }}
         </ion-button>
       </ion-item>
 
       <ion-item lines="none">
         <ion-label>
-          <h3>Exportar datos</h3>
-          <p>Descarga un fichero JSON con tus datos actuales.</p>
+          <h3>{{ 'settings.data.exportTitle' | translate }}</h3>
+          <p>{{ 'settings.data.exportDescription' | translate }}</p>
         </ion-label>
         <ion-button
           slot="end"
@@ -50,7 +73,7 @@
             name="dots"
             *ngIf="exportingData()"
           ></ion-spinner>
-          Exportar
+          {{ 'settings.data.exportAction' | translate }}
         </ion-button>
       </ion-item>
     </ion-list>
@@ -62,8 +85,8 @@
         detail="true"
         routerLink="/settings/catalogos">
         <ion-label>
-          <h3>Catálogos</h3>
-          <p>Gestiona las listas reutilizadas al organizar la despensa.</p>
+          <h3>{{ 'settings.catalogs.title' | translate }}</h3>
+          <p>{{ 'settings.catalogs.subtitle' | translate }}</p>
         </ion-label>
       </ion-item>
     </ion-list>
@@ -71,22 +94,22 @@
     <ion-list>
       <ion-list-header>
         <ion-label>
-          <h2>Información</h2>
-          <p>Detalles rápidos de la aplicación.</p>
+          <h2>{{ 'settings.info.title' | translate }}</h2>
+          <p>{{ 'settings.info.subtitle' | translate }}</p>
         </ion-label>
       </ion-list-header>
 
       <ion-item lines="none">
         <ion-label>
-          <h3>Versión</h3>
+          <h3>{{ 'settings.info.version' | translate }}</h3>
           <p>{{ appVersion }}</p>
         </ion-label>
       </ion-item>
 
       <ion-item lines="none">
         <ion-label>
-          <h3>Enviar comentarios</h3>
-          <p>Comparte sugerencias o reporta incidencias.</p>
+          <h3>{{ 'settings.info.feedbackTitle' | translate }}</h3>
+          <p>{{ 'settings.info.feedbackSubtitle' | translate }}</p>
         </ion-label>
         <ion-button
           slot="end"
@@ -94,7 +117,7 @@
           color="primary"
           href="mailto:hola@pantry-manager.app?subject=Comentarios%20Pantry%20Manager"
         >
-          Enviar comentarios
+          {{ 'settings.info.feedbackAction' | translate }}
         </ion-button>
       </ion-item>
     </ion-list>

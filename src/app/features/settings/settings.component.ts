@@ -3,15 +3,16 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BaseDoc } from '@core/models';
-import { AppPreferencesService, StorageService } from '@core/services';
+import { AppPreferencesService, LanguageService, StorageService } from '@core/services';
 import packageJson from '../../../../package.json';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const TOAST_DURATION = 1800;
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [IonicModule, CommonModule, RouterLink],
+  imports: [IonicModule, CommonModule, RouterLink, TranslateModule],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
 })
@@ -20,11 +21,18 @@ export class SettingsComponent {
 
   readonly exportingData = signal(false);
   readonly resettingData = signal(false);
+  readonly language = this.languageService.language();
+  readonly languageOptions = [
+    { value: 'es', label: 'settings.languages.es' },
+    { value: 'en', label: 'settings.languages.en' },
+  ];
 
   constructor(
     private readonly toastCtrl: ToastController,
     private readonly appPreferencesService: AppPreferencesService,
     private readonly storage: StorageService<BaseDoc>,
+    private readonly translate: TranslateService,
+    private readonly languageService: LanguageService,
   ) {}
 
   async ionViewWillEnter(): Promise<void> {
@@ -36,7 +44,7 @@ export class SettingsComponent {
       typeof window === 'undefined'
         ? true
         : window.confirm(
-            'Esto eliminará TODOS los datos locales de la aplicación.\n¿Quieres continuar?'
+            this.translate.instant('settings.reset.confirm')
           );
 
     if (!confirmed) {
@@ -47,10 +55,10 @@ export class SettingsComponent {
     try {
       await this.storage.clearAll();
       await this.appPreferencesService.reload();
-      await this.presentToast('Datos locales eliminados.', 'success');
+      await this.presentToast(this.translate.instant('settings.reset.success'), 'success');
     } catch (err) {
       console.error('[SettingsComponent] onResetApp error', err);
-      await this.presentToast('No se pudo limpiar la aplicación.', 'danger');
+      await this.presentToast(this.translate.instant('settings.reset.error'), 'danger');
     } finally {
       this.resettingData.set(false);
     }
@@ -58,7 +66,7 @@ export class SettingsComponent {
 
   async onExportData(): Promise<void> {
     if (typeof document === 'undefined') {
-      await this.presentToast('La exportación no está disponible en este entorno.', 'warning');
+      await this.presentToast(this.translate.instant('settings.export.unavailable'), 'warning');
       return;
     }
 
@@ -74,10 +82,15 @@ export class SettingsComponent {
       if (!shared) {
         this.triggerDownload(blob, filename);
       }
-      await this.presentToast(shared ? '📤 Datos listos para compartir.' : '📦 Datos exportados.', 'success');
+      await this.presentToast(
+        shared
+          ? this.translate.instant('settings.export.readyToShare')
+          : this.translate.instant('settings.export.success'),
+        'success'
+      );
     } catch (err) {
       console.error('[SettingsComponent] onExportData error', err);
-      await this.presentToast('No se pudieron exportar los datos.', 'danger');
+      await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
     } finally {
       this.exportingData.set(false);
     }
@@ -88,7 +101,7 @@ export class SettingsComponent {
       await this.appPreferencesService.getPreferences();
     } catch (err) {
       console.error('[SettingsComponent] ensurePreferencesLoaded error', err);
-      await this.presentToast('Ocurrió un problema cargando los ajustes.', 'danger');
+      await this.presentToast(this.translate.instant('settings.loadError'), 'danger');
     }
   }
 
@@ -147,6 +160,11 @@ export class SettingsComponent {
       position: 'bottom',
     });
     await toast.present();
+  }
+
+  async onLanguageChange(event: Event): Promise<void> {
+    const value = (event as CustomEvent<{ value?: string }>).detail?.value ?? '';
+    await this.languageService.setLanguage(value);
   }
 
 }
