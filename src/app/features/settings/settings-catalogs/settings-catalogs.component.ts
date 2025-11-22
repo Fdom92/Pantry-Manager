@@ -20,9 +20,7 @@ const TOAST_DURATION = 1800;
 })
 export class SettingsCatalogsComponent {
   readonly loading = signal(false);
-  readonly savingLocations = signal(false);
-  readonly savingSupermarkets = signal(false);
-  readonly savingUnits = signal(false);
+  readonly savingCatalogs = signal(false);
 
   readonly locationOptionsDraft = signal<string[]>([]);
   readonly originalLocationOptions = signal<string[]>([]);
@@ -57,6 +55,13 @@ export class SettingsCatalogsComponent {
     return draft.some((value, index) => value !== original[index]);
   });
 
+  readonly hasAnyChanges = computed(
+    () =>
+      this.hasLocationChanges() ||
+      this.hasSupermarketChanges() ||
+      this.hasUnitChanges(),
+  );
+
   constructor(
     private readonly toastCtrl: ToastController,
     private readonly appPreferencesService: AppPreferencesService,
@@ -87,30 +92,6 @@ export class SettingsCatalogsComponent {
     this.locationOptionsDraft.set([...DEFAULT_LOCATION_OPTIONS]);
   }
 
-  async saveLocationOptions(): Promise<void> {
-    if (this.savingLocations()) {
-      return;
-    }
-    const normalizedDraft = this.normalizeLocationOptions(this.locationOptionsDraft(), false);
-    const payload = normalizedDraft.length ? normalizedDraft : [...DEFAULT_LOCATION_OPTIONS];
-    this.savingLocations.set(true);
-    try {
-      const current = await this.appPreferencesService.getPreferences();
-      await this.appPreferencesService.savePreferences({
-        ...current,
-        locationOptions: payload,
-      });
-      this.originalLocationOptions.set(payload);
-      this.locationOptionsDraft.set([...payload]);
-      await this.presentToast('Ubicaciones actualizadas.', 'success');
-    } catch (err) {
-      console.error('[SettingsCatalogsComponent] saveLocationOptions error', err);
-      await this.presentToast('No se pudieron guardar las ubicaciones.', 'danger');
-    } finally {
-      this.savingLocations.set(false);
-    }
-  }
-
   addUnitOption(): void {
     this.unitOptionsDraft.update(options => [...options, '']);
   }
@@ -130,30 +111,6 @@ export class SettingsCatalogsComponent {
 
   restoreDefaultUnitOptions(): void {
     this.unitOptionsDraft.set([...DEFAULT_UNIT_OPTIONS]);
-  }
-
-  async saveUnitOptions(): Promise<void> {
-    if (this.savingUnits()) {
-      return;
-    }
-    const normalizedDraft = this.normalizeUnitOptions(this.unitOptionsDraft(), false);
-    const payload = normalizedDraft.length ? normalizedDraft : [...DEFAULT_UNIT_OPTIONS];
-    this.savingUnits.set(true);
-    try {
-      const current = await this.appPreferencesService.getPreferences();
-      await this.appPreferencesService.savePreferences({
-        ...current,
-        unitOptions: payload,
-      });
-      this.originalUnitOptions.set(payload);
-      this.unitOptionsDraft.set([...payload]);
-      await this.presentToast('Unidades actualizadas.', 'success');
-    } catch (err) {
-      console.error('[SettingsCatalogsComponent] saveUnitOptions error', err);
-      await this.presentToast('No se pudieron guardar las unidades.', 'danger');
-    } finally {
-      this.savingUnits.set(false);
-    }
   }
 
   addSupermarketOption(): void {
@@ -177,27 +134,49 @@ export class SettingsCatalogsComponent {
     this.supermarketOptionsDraft.set([...DEFAULT_SUPERMARKET_OPTIONS]);
   }
 
-  async saveSupermarketOptions(): Promise<void> {
-    if (this.savingSupermarkets()) {
+  async saveCatalogs(): Promise<void> {
+    if (this.savingCatalogs() || !this.hasAnyChanges()) {
       return;
     }
-    const normalizedDraft = this.normalizeSupermarketOptions(this.supermarketOptionsDraft(), false);
-    const payload = normalizedDraft.length ? normalizedDraft : [...DEFAULT_SUPERMARKET_OPTIONS];
-    this.savingSupermarkets.set(true);
+
+    const normalizedLocations = this.normalizeLocationOptions(this.locationOptionsDraft(), false);
+    const normalizedSupermarkets = this.normalizeSupermarketOptions(
+      this.supermarketOptionsDraft(),
+      false,
+    );
+    const normalizedUnits = this.normalizeUnitOptions(this.unitOptionsDraft(), false);
+
+    const locationPayload = normalizedLocations.length
+      ? normalizedLocations
+      : [...DEFAULT_LOCATION_OPTIONS];
+    const supermarketPayload = normalizedSupermarkets.length
+      ? normalizedSupermarkets
+      : [...DEFAULT_SUPERMARKET_OPTIONS];
+    const unitPayload = normalizedUnits.length
+      ? normalizedUnits
+      : [...DEFAULT_UNIT_OPTIONS];
+
+    this.savingCatalogs.set(true);
     try {
       const current = await this.appPreferencesService.getPreferences();
       await this.appPreferencesService.savePreferences({
         ...current,
-        supermarketOptions: payload,
+        locationOptions: locationPayload,
+        supermarketOptions: supermarketPayload,
+        unitOptions: unitPayload,
       });
-      this.originalSupermarketOptions.set(payload);
-      this.supermarketOptionsDraft.set([...payload]);
-      await this.presentToast('Supermercados actualizados.', 'success');
+      this.originalLocationOptions.set(locationPayload);
+      this.originalSupermarketOptions.set(supermarketPayload);
+      this.originalUnitOptions.set(unitPayload);
+      this.locationOptionsDraft.set([...locationPayload]);
+      this.supermarketOptionsDraft.set([...supermarketPayload]);
+      this.unitOptionsDraft.set([...unitPayload]);
+      await this.presentToast('Catálogos actualizados.', 'success');
     } catch (err) {
-      console.error('[SettingsCatalogsComponent] saveSupermarketOptions error', err);
-      await this.presentToast('No se pudieron guardar los supermercados.', 'danger');
+      console.error('[SettingsCatalogsComponent] saveCatalogs error', err);
+      await this.presentToast('No se pudieron guardar los catálogos.', 'danger');
     } finally {
-      this.savingSupermarkets.set(false);
+      this.savingCatalogs.set(false);
     }
   }
 

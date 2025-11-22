@@ -7,7 +7,7 @@
   flex-direction: column;
   gap: 24px;
   padding: 16px;
-  padding-bottom: 32px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 56px);
 }
 
 ion-list-header {
@@ -55,6 +55,7 @@ ion-item p {
   .catalogs-content {
     padding-left: 32px;
     padding-right: 32px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
   }
 
   .catalog-actions {

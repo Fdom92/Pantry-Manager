@@ -15,14 +15,14 @@
 <ion-content #content class="ion-padding">
   <div class="summary-bar" aria-label="Filtros rápidos por estado">
     <div class="summary-chips" role="tablist">
-      @for (chip of statusChips(); track chip.value) {
+      @for (chip of filterChips(); track chip.key) {
         <ion-chip
           class="status-chip"
-          [class.active]="statusFilter() === chip.value"
+          [class.active]="chip.active"
           [ngClass]="chip.colorClass"
           button="true"
-          (click)="onStatusChipSelected(chip.value)"
-          [attr.aria-pressed]="statusFilter() === chip.value"
+          (click)="onFilterChipSelected(chip)"
+          [attr.aria-pressed]="chip.active"
           [attr.aria-label]="chip.description + ' (' + chip.count + ')'"
           size="small">
           <ion-icon [name]="chip.icon"></ion-icon>
@@ -226,21 +226,6 @@
             <ion-item>
               <ion-select
                 interface="popover"
-                label="Estado"
-                labelPlacement="stacked"
-                [value]="statusFilter()"
-                (ionChange)="onStatusFilterChange($event)">
-                <ion-select-option value="all">Todos</ion-select-option>
-                <ion-select-option value="normal">Con stock</ion-select-option>
-                <ion-select-option value="low-stock">Stock bajo</ion-select-option>
-                <ion-select-option value="near-expiry">Próx. caducidad</ion-select-option>
-                <ion-select-option value="expired">Caducados</ion-select-option>
-              </ion-select>
-            </ion-item>
-
-            <ion-item>
-              <ion-select
-                interface="popover"
                 label="Ordenar por"
                 labelPlacement="stacked"
                 [value]="sortOption()"
@@ -249,20 +234,6 @@
                 <ion-select-option value="quantity">Cantidad (mayor → menor)</ion-select-option>
                 <ion-select-option value="expiration">Caducidad (próximas primero)</ion-select-option>
               </ion-select>
-            </ion-item>
-          </ion-card-content>
-        </ion-card>
-
-        <!-- Opcionales: básicos y stock bajo -->
-        <ion-card class="filter-card">
-          <ion-card-content>
-            <ion-item lines="none">
-              <ion-label>Producto básico</ion-label>
-              <ion-toggle [checked]="basicOnly()" (ionChange)="toggleBasicOnly($event)"></ion-toggle>
-            </ion-item>
-            <ion-item lines="none">
-              <ion-label>Stock bajo</ion-label>
-              <ion-toggle [checked]="lowStockOnly()" (ionChange)="toggleLowStockOnly($event)"></ion-toggle>
             </ion-item>
           </ion-card-content>
         </ion-card>

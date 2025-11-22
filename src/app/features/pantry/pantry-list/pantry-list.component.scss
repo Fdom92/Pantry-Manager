@@ -88,6 +88,11 @@
   --color: #F8FAFC;
 }
 
+.summary-chips .status-chip.chip--basic {
+  --background: #FCD34D;
+  --color: #0F172A;
+}
+
 .header-actions {
   display: flex;
   gap: 4px;
