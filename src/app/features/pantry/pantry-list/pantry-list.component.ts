@@ -33,13 +33,18 @@ import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component'
 
 type PantryStatusFilterValue = 'all' | 'expired' | 'near-expiry' | 'low-stock' | 'normal';
 
-interface StatusChipViewModel {
-  value: PantryStatusFilterValue;
+type FilterChipKind = 'status' | 'basic';
+
+interface FilterChipViewModel {
+  key: string;
+  kind: FilterChipKind;
+  value?: PantryStatusFilterValue;
   label: string;
   count: number;
   icon: string;
   description: string;
   colorClass: string;
+  active: boolean;
 }
 
 interface PantrySummaryMeta {
@@ -76,8 +81,7 @@ export class PantryListComponent implements OnDestroy {
   readonly groups = computed(() => this.buildGroups(this.itemsState()));
   private readonly summaryCache = signal<PantrySummaryMeta>(this.createEmptySummary());
   readonly summary = computed<PantrySummaryMeta>(() => this.summaryCache());
-  readonly statusChips = computed(() => this.buildStatusChips(this.summary()));
-  readonly basicChip = computed(() => this.buildBasicChip(this.summary(), this.basicOnly()));
+  readonly filterChips = computed(() => this.buildFilterChips(this.summary(), this.statusFilter(), this.basicOnly()));
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
   readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
   readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.itemsState()));
@@ -454,13 +458,19 @@ export class PantryListComponent implements OnDestroy {
     this.pantryService.setFilter('locationId', raw === 'all' ? null : raw);
   }
 
-  onStatusChipSelected(value: PantryStatusFilterValue): void {
-    this.applyStatusFilterPreset(value);
-  }
-
   onSortChange(ev: CustomEvent): void {
     const mode = (ev.detail?.value ?? 'name') as 'name' | 'quantity' | 'expiration';
     this.pantryService.setSortMode(mode);
+  }
+
+  onFilterChipSelected(chip: FilterChipViewModel): void {
+    if (chip.kind === 'basic') {
+      this.toggleBasicFilter();
+      return;
+    }
+    if (chip.value) {
+      this.applyStatusFilterPreset(chip.value);
+    }
   }
 
   toggleBasicFilter(): void {
@@ -743,58 +753,89 @@ export class PantryListComponent implements OnDestroy {
     return 'normal';
   }
 
-  private buildStatusChips(summary: PantrySummaryMeta): StatusChipViewModel[] {
+  private buildFilterChips(
+    summary: PantrySummaryMeta,
+    activeStatus: PantryStatusFilterValue,
+    basicActive: boolean,
+  ): FilterChipViewModel[] {
+    const statusChips = this.buildStatusChips(summary, activeStatus);
+    const basicChip = this.buildBasicChip(summary, basicActive);
+    return [...statusChips, basicChip];
+  }
+
+  private buildStatusChips(
+    summary: PantrySummaryMeta,
+    activeStatus: PantryStatusFilterValue,
+  ): FilterChipViewModel[] {
     const counts = summary.statusCounts;
     return [
       {
+        key: 'status-all',
+        kind: 'status',
         value: 'all',
         label: 'Todos',
         count: summary.total,
         icon: 'layers-outline',
         description: 'Ver todos los productos disponibles',
         colorClass: 'chip--all',
+        active: activeStatus === 'all',
       },
       {
+        key: 'status-normal',
+        kind: 'status',
         value: 'normal',
         label: 'Con stock',
         count: counts.normal,
         icon: 'checkmark-circle-outline',
         description: 'Productos sin alertas activas',
         colorClass: 'chip--normal',
+        active: activeStatus === 'normal',
       },
       {
+        key: 'status-low',
+        kind: 'status',
         value: 'low-stock',
         label: 'Stock bajo',
         count: counts.lowStock,
         icon: 'alert-circle-outline',
         description: 'Necesitan reposición pronto',
         colorClass: 'chip--low',
+        active: activeStatus === 'low-stock',
       },
       {
+        key: 'status-expiring',
+        kind: 'status',
         value: 'near-expiry',
         label: 'Próx. caducar',
         count: counts.expiring,
         icon: 'hourglass-outline',
         description: 'Caducan en pocos días',
         colorClass: 'chip--expiring',
+        active: activeStatus === 'near-expiry',
       },
       {
+        key: 'status-expired',
+        kind: 'status',
         value: 'expired',
         label: 'Caducados',
         count: counts.expired,
         icon: 'time-outline',
         description: 'Revisar y descartar',
         colorClass: 'chip--expired',
+        active: activeStatus === 'expired',
       },
     ];
   }
 
-  private buildBasicChip(summary: PantrySummaryMeta, isActive: boolean) {
+  private buildBasicChip(summary: PantrySummaryMeta, isActive: boolean): FilterChipViewModel {
     return {
+      key: 'basic',
+      kind: 'basic',
       label: 'Básicos',
       description: 'Mostrar solo los productos marcados como básicos',
       count: summary.basicCount,
       icon: 'star',
+      colorClass: 'chip--basic',
       active: isActive,
     };
   }

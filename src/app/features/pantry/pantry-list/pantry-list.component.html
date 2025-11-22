@@ -15,14 +15,14 @@
 <ion-content #content class="ion-padding">
   <div class="summary-bar" aria-label="Filtros rápidos por estado">
     <div class="summary-chips" role="tablist">
-      @for (chip of statusChips(); track chip.value) {
+      @for (chip of filterChips(); track chip.key) {
         <ion-chip
           class="status-chip"
-          [class.active]="statusFilter() === chip.value"
+          [class.active]="chip.active"
           [ngClass]="chip.colorClass"
           button="true"
-          (click)="onStatusChipSelected(chip.value)"
-          [attr.aria-pressed]="statusFilter() === chip.value"
+          (click)="onFilterChipSelected(chip)"
+          [attr.aria-pressed]="chip.active"
           [attr.aria-label]="chip.description + ' (' + chip.count + ')'"
           size="small">
           <ion-icon [name]="chip.icon"></ion-icon>
@@ -32,21 +32,6 @@
           </div>
         </ion-chip>
       }
-      @let basic = basicChip();
-      <ion-chip
-        class="status-chip basic-chip"
-        [class.active]="basic.active"
-        button="true"
-        (click)="toggleBasicFilter()"
-        [attr.aria-pressed]="basic.active"
-        [attr.aria-label]="basic.description + ' (' + basic.count + ')'"
-        size="small">
-        <ion-icon name="star"></ion-icon>
-        <div class="chip-body">
-          <span class="chip-label">{{ basic.label }}</span>
-          <span class="chip-count">{{ basic.count }}</span>
-        </div>
-      </ion-chip>
     </div>
   </div>
 
