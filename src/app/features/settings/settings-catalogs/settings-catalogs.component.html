@@ -67,20 +67,6 @@
       </ion-item>
     </ion-list>
 
-    <div class="catalog-actions">
-      <ion-button
-        expand="block"
-        (click)="saveLocationOptions()"
-        [disabled]="!hasLocationChanges() || savingLocations()">
-        <ion-spinner
-          slot="start"
-          name="dots"
-          *ngIf="savingLocations()">
-        </ion-spinner>
-        Guardar ubicaciones
-      </ion-button>
-    </div>
-
     <ion-list lines="full">
       <ion-list-header>
         <ion-label>
@@ -135,20 +121,6 @@
         </ion-button>
       </ion-item>
     </ion-list>
-
-    <div class="catalog-actions">
-      <ion-button
-        expand="block"
-        (click)="saveSupermarketOptions()"
-        [disabled]="!hasSupermarketChanges() || savingSupermarkets()">
-        <ion-spinner
-          slot="start"
-          name="dots"
-          *ngIf="savingSupermarkets()">
-        </ion-spinner>
-        Guardar supermercados
-      </ion-button>
-    </div>
 
     <ion-list lines="full">
       <ion-list-header>
@@ -208,14 +180,14 @@
     <div class="catalog-actions">
       <ion-button
         expand="block"
-        (click)="saveUnitOptions()"
-        [disabled]="!hasUnitChanges() || savingUnits()">
+        (click)="saveCatalogs()"
+        [disabled]="!hasAnyChanges() || savingCatalogs()">
         <ion-spinner
           slot="start"
           name="dots"
-          *ngIf="savingUnits()">
+          *ngIf="savingCatalogs()">
         </ion-spinner>
-        Guardar unidades
+        Guardar cambios
       </ion-button>
     </div>
   </div>

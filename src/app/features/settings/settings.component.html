@@ -4,7 +4,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
   <div class="settings-content">
     <ion-list lines="full">
       <ion-list-header>
@@ -85,13 +85,6 @@
 
       <ion-item lines="none">
         <ion-label>
-          <h3>Última sincronización</h3>
-          <p>{{ lastSyncDisplay() }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item lines="none">
-        <ion-label>
           <h3>Enviar comentarios</h3>
           <p>Comparte sugerencias o reporta incidencias.</p>
         </ion-label>
@@ -99,7 +92,7 @@
           slot="end"
           fill="outline"
           color="primary"
-          href="mailto:feedback@pantry-manager.app?subject=Comentarios%20Pantry%20Manager"
+          href="mailto:hola@pantry-manager.app?subject=Comentarios%20Pantry%20Manager"
         >
           Enviar comentarios
         </ion-button>

@@ -1,8 +1,8 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { BaseDoc, ES_DATE_FORMAT_OPTIONS } from '@core/models';
+import { BaseDoc } from '@core/models';
 import { AppPreferencesService, StorageService } from '@core/services';
 import packageJson from '../../../../package.json';
 
@@ -20,9 +20,6 @@ export class SettingsComponent {
 
   readonly exportingData = signal(false);
   readonly resettingData = signal(false);
-  readonly lastSyncDisplay = computed(() =>
-    this.formatDate(this.appPreferencesService.preferences().lastSyncAt)
-  );
 
   constructor(
     private readonly toastCtrl: ToastController,
@@ -80,17 +77,6 @@ export class SettingsComponent {
     } finally {
       this.exportingData.set(false);
     }
-  }
-
-  formatDate(iso: string | null | undefined): string {
-    if (!iso) {
-      return 'Sin sincronización registrada';
-    }
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) {
-      return 'Sin sincronización registrada';
-    }
-    return date.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
   }
 
   private async ensurePreferencesLoaded(): Promise<void> {

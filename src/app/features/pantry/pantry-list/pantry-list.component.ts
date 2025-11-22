@@ -45,6 +45,7 @@ interface StatusChipViewModel {
 interface PantrySummaryMeta {
   total: number;
   visible: number;
+  basicCount: number;
   statusCounts: {
     expired: number;
     expiring: number;
@@ -71,12 +72,12 @@ export class PantryListComponent implements OnDestroy {
   readonly statusFilter: Signal<PantryStatusFilterValue>;
   readonly showFilters = signal(false);
   readonly basicOnly: Signal<boolean>;
-  readonly lowStockOnly: Signal<boolean>;
   readonly itemsState = signal<PantryItem[]>([]);
   readonly groups = computed(() => this.buildGroups(this.itemsState()));
   private readonly summaryCache = signal<PantrySummaryMeta>(this.createEmptySummary());
   readonly summary = computed<PantrySummaryMeta>(() => this.summaryCache());
   readonly statusChips = computed(() => this.buildStatusChips(this.summary()));
+  readonly basicChip = computed(() => this.buildBasicChip(this.summary(), this.basicOnly()));
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
   readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
   readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.itemsState()));
@@ -157,7 +158,6 @@ export class PantryListComponent implements OnDestroy {
     this.selectedLocation = computed(() => this.activeFilters().locationId ?? 'all');
     this.statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
     this.basicOnly = computed(() => this.activeFilters().basic);
-    this.lowStockOnly = computed(() => this.activeFilters().lowStock);
 
     // Keep the UI in sync with the filtered pipeline, merging optimistic edits before rendering the list.
     effect(() => {
@@ -209,7 +209,8 @@ export class PantryListComponent implements OnDestroy {
   /** Convenience wrapper used by multiple entry points to reload the list. */
   async loadItems(): Promise<void> {
     if (this.pantryService.loadedProducts().length === 0) {
-      await this.pantryService.reloadFromStart();
+      await this.pantryService.ensureFirstPageLoaded();
+      this.pantryService.startBackgroundLoad();
     }
     this.scrollViewportToTop();
   }
@@ -453,11 +454,6 @@ export class PantryListComponent implements OnDestroy {
     this.pantryService.setFilter('locationId', raw === 'all' ? null : raw);
   }
 
-  onStatusFilterChange(ev: CustomEvent): void {
-    const value = (ev.detail?.value ?? 'all') as PantryStatusFilterValue;
-    this.applyStatusFilterPreset(value);
-  }
-
   onStatusChipSelected(value: PantryStatusFilterValue): void {
     this.applyStatusFilterPreset(value);
   }
@@ -467,17 +463,15 @@ export class PantryListComponent implements OnDestroy {
     this.pantryService.setSortMode(mode);
   }
 
-  toggleBasicOnly(ev: CustomEvent<{ checked: boolean }>): void {
-    this.pantryService.setFilter('basic', Boolean(ev.detail?.checked));
-  }
-
-  toggleLowStockOnly(ev: CustomEvent<{ checked: boolean }>): void {
-    const checked = Boolean(ev.detail?.checked);
-    if (checked) {
-      this.pantryService.setFilters({ lowStock: true, normalOnly: false });
-    } else {
-      this.pantryService.setFilter('lowStock', false);
-    }
+  toggleBasicFilter(): void {
+    const next = !this.basicOnly();
+    this.pantryService.setFilters({
+      basic: next,
+      expired: false,
+      expiring: false,
+      lowStock: false,
+      normalOnly: false,
+    });
   }
 
   openFilters(event?: Event): void {
@@ -499,19 +493,49 @@ export class PantryListComponent implements OnDestroy {
   private applyStatusFilterPreset(preset: PantryStatusFilterValue): void {
     switch (preset) {
       case 'expired':
-        this.pantryService.setFilters({ expired: true, expiring: false, lowStock: false, normalOnly: false });
+        this.pantryService.setFilters({
+          expired: true,
+          expiring: false,
+          lowStock: false,
+          normalOnly: false,
+          basic: false,
+        });
         break;
       case 'near-expiry':
-        this.pantryService.setFilters({ expired: false, expiring: true, lowStock: false, normalOnly: false });
+        this.pantryService.setFilters({
+          expired: false,
+          expiring: true,
+          lowStock: false,
+          normalOnly: false,
+          basic: false,
+        });
         break;
       case 'low-stock':
-        this.pantryService.setFilters({ expired: false, expiring: false, lowStock: true, normalOnly: false });
+        this.pantryService.setFilters({
+          expired: false,
+          expiring: false,
+          lowStock: true,
+          normalOnly: false,
+          basic: false,
+        });
         break;
       case 'normal':
-        this.pantryService.setFilters({ expired: false, expiring: false, lowStock: false, normalOnly: true });
+        this.pantryService.setFilters({
+          expired: false,
+          expiring: false,
+          lowStock: false,
+          normalOnly: true,
+          basic: false,
+        });
         break;
       default:
-        this.pantryService.setFilters({ expired: false, expiring: false, lowStock: false, normalOnly: false });
+        this.pantryService.setFilters({
+          expired: false,
+          expiring: false,
+          lowStock: false,
+          normalOnly: false,
+          basic: false,
+        });
         break;
     }
   }
@@ -661,8 +685,12 @@ export class PantryListComponent implements OnDestroy {
       lowStock: 0,
       normal: 0,
     };
+    let basicCount = 0;
 
     for (const item of items) {
+      if (item.isBasic) {
+        basicCount += 1;
+      }
       const state = this.getItemStatusState(item);
       switch (state) {
         case 'expired':
@@ -683,6 +711,7 @@ export class PantryListComponent implements OnDestroy {
     return {
       total: totalCount,
       visible: items.length,
+      basicCount,
       statusCounts,
     };
   }
@@ -691,6 +720,7 @@ export class PantryListComponent implements OnDestroy {
     return {
       total: 0,
       visible: 0,
+      basicCount: 0,
       statusCounts: {
         expired: 0,
         expiring: 0,
@@ -757,6 +787,16 @@ export class PantryListComponent implements OnDestroy {
         colorClass: 'chip--expired',
       },
     ];
+  }
+
+  private buildBasicChip(summary: PantrySummaryMeta, isActive: boolean) {
+    return {
+      label: 'Básicos',
+      description: 'Mostrar solo los productos marcados como básicos',
+      count: summary.basicCount,
+      icon: 'star',
+      active: isActive,
+    };
   }
 
   /** Build select options that indicate how many items belong to each location. */
