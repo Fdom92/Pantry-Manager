@@ -218,7 +218,8 @@
       "title": "Preferencias",
       "subtitle": "Personaliza el comportamiento de la app.",
       "language": {
-        "label": "Idioma"
+        "label": "Idioma",
+        "device": "Se ajusta automáticamente al idioma del dispositivo."
       }
     },
     "languages": {
@@ -244,7 +245,9 @@
       "unavailable": "La exportación no está disponible en este entorno.",
       "readyToShare": "📤 Datos listos para compartir.",
       "success": "📦 Datos exportados.",
-      "error": "No se pudieron exportar los datos."
+      "error": "No se pudieron exportar los datos.",
+      "shareTitle": "Pantry Manager - Respaldo",
+      "shareText": "Exporta o comparte tu copia de seguridad."
     },
     "loadError": "Ocurrió un problema cargando los ajustes.",
     "catalogs": {

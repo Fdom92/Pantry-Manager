@@ -2,33 +2,32 @@ import { Injectable, Signal, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
-type SupportedLanguage = 'es' | 'en';
+type SupportedLanguage = 'en' | 'es';
 
-const SUPPORTED_LANGUAGES: SupportedLanguage[] = ['es', 'en'];
-const STORAGE_KEY = 'app:language';
+const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = ['en', 'es'];
+const DEFAULT_LANGUAGE: SupportedLanguage = 'en';
+const LOCALES: Record<SupportedLanguage, string> = {
+  en: 'en-US',
+  es: 'es-ES',
+};
 
 @Injectable({
   providedIn: 'root',
 })
 export class LanguageService {
-  private readonly currentLanguage = signal<SupportedLanguage>('es');
+  private readonly currentLanguage = signal<SupportedLanguage>(DEFAULT_LANGUAGE);
 
   constructor(private readonly translate: TranslateService) {}
 
   async init(): Promise<void> {
-    this.translate.addLangs(SUPPORTED_LANGUAGES);
-    this.translate.setDefaultLang('es');
+    this.translate.addLangs([...SUPPORTED_LANGUAGES]);
+    this.translate.setDefaultLang(DEFAULT_LANGUAGE);
 
-    const saved = this.normalize(this.readStoredLanguage());
-    const browserCulture = this.normalize(this.translate.getBrowserCultureLang());
-    const browser = this.normalize(this.translate.getBrowserLang());
-    const system = this.normalize(this.getNavigatorLanguage());
-    const fallback: SupportedLanguage = 'es';
-    const lang = saved ?? browserCulture ?? browser ?? system ?? fallback;
+    const deviceLocale = this.getNavigatorLocale();
+    const language = this.resolveSupportedLanguage(deviceLocale);
 
-    await firstValueFrom(this.translate.use(lang));
-    this.currentLanguage.set(lang);
-    this.persist(lang);
+    await firstValueFrom(this.translate.use(language));
+    this.currentLanguage.set(language);
   }
 
   language(): Signal<SupportedLanguage> {
@@ -36,65 +35,54 @@ export class LanguageService {
   }
 
   getCurrentLocale(): string {
-    return this.currentLanguage() === 'en' ? 'en-US' : 'es-ES';
+    const lang = this.currentLanguage();
+    return LOCALES[lang] ?? LOCALES[DEFAULT_LANGUAGE];
   }
 
-  async setLanguage(lang: string): Promise<void> {
-    const normalized = this.normalize(lang);
-    if (!normalized) {
-      return;
-    }
-    if (normalized === this.currentLanguage()) {
-      return;
-    }
-    await firstValueFrom(this.translate.use(normalized));
-    this.currentLanguage.set(normalized);
-    this.persist(normalized);
-  }
-
-  private normalize(lang?: string | null): SupportedLanguage | null {
-    const key = (lang ?? '').toLowerCase();
-    if (SUPPORTED_LANGUAGES.includes(key as SupportedLanguage)) {
-      return key as SupportedLanguage;
-    }
-    if (key.startsWith('es')) {
-      return 'es';
-    }
-    if (key.startsWith('en')) {
-      return 'en';
-    }
-    return null;
-  }
-
-  private getNavigatorLanguage(): string | null {
-    if (typeof navigator === 'undefined') {
+  /** Normalize a locale string (es-ES, en_GB) into its base language code. */
+  private normalizeLocale(locale?: string | null): string | null {
+    if (!locale) {
       return null;
     }
-    if (Array.isArray(navigator.languages) && navigator.languages.length) {
-      return navigator.languages[0];
-    }
-    return navigator.language ?? null;
+    const normalized = locale.toLowerCase().replace('_', '-');
+    const [base] = normalized.split('-');
+    return base || null;
   }
 
-  private readStoredLanguage(): string | null {
-    try {
-      if (typeof localStorage === 'undefined') {
-        return null;
+  private isSupportedLanguage(lang: string | null): lang is SupportedLanguage {
+    if (!lang) {
+      return false;
+    }
+    return SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage);
+  }
+
+  private resolveSupportedLanguage(locale: string | null): SupportedLanguage {
+    const base = this.normalizeLocale(locale);
+    if (this.isSupportedLanguage(base)) {
+      return base;
+    }
+
+    if (base) {
+      console.warn(`[LanguageService] Locale ${base} no soportado, usando fallback en.`);
+    }
+    return DEFAULT_LANGUAGE;
+  }
+
+  private getNavigatorLocale(): string | null {
+    if (typeof navigator !== 'undefined') {
+      if (Array.isArray(navigator.languages) && navigator.languages.length) {
+        return navigator.languages[0];
       }
-      return localStorage.getItem(STORAGE_KEY);
+      if (navigator.language) {
+        return navigator.language;
+      }
+    }
+
+    try {
+      const intlLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+      return intlLocale ?? null;
     } catch {
       return null;
-    }
-  }
-
-  private persist(lang: SupportedLanguage): void {
-    try {
-      if (typeof localStorage === 'undefined') {
-        return;
-      }
-      localStorage.setItem(STORAGE_KEY, lang);
-    } catch {
-      // ignore storage failures
     }
   }
 }

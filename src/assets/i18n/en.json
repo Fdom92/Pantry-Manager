@@ -218,7 +218,8 @@
       "title": "Preferences",
       "subtitle": "Customize how the app behaves.",
       "language": {
-        "label": "Language"
+        "label": "Language",
+        "device": "Matches your device language automatically."
       }
     },
     "languages": {
@@ -244,7 +245,9 @@
       "unavailable": "Export is not available in this environment.",
       "readyToShare": "Data ready to share.",
       "success": "Data exported.",
-      "error": "Could not export the data."
+      "error": "Could not export the data.",
+      "shareTitle": "Pantry Manager - Backup",
+      "shareText": "Export or share your pantry backup."
     },
     "loadError": "There was a problem loading settings.",
     "catalogs": {

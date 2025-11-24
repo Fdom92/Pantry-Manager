@@ -6,28 +6,6 @@
 
 <ion-content class="ion-padding">
   <div class="settings-content">
-    <ion-list>
-      <ion-list-header>
-        <ion-label>
-          <h2>{{ 'settings.preferences.title' | translate }}</h2>
-          <p>{{ 'settings.preferences.subtitle' | translate }}</p>
-        </ion-label>
-      </ion-list-header>
-      <ion-item>
-        <ion-select
-          interface="popover"
-          label="{{ 'settings.preferences.language.label' | translate }}"
-          labelPlacement="stacked"
-          [value]="language()"
-          (ionChange)="onLanguageChange($event)">
-          @for (option of languageOptions; track option.value) {
-            <ion-select-option [value]="option.value">
-              {{ option.label | translate }}
-            </ion-select-option>
-          }
-        </ion-select>
-      </ion-item>
-    </ion-list>
 
     <ion-list lines="full">
       <ion-list-header>

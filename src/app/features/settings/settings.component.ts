@@ -3,7 +3,7 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BaseDoc } from '@core/models';
-import { AppPreferencesService, LanguageService, StorageService } from '@core/services';
+import { AppPreferencesService, StorageService } from '@core/services';
 import packageJson from '../../../../package.json';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -21,18 +21,12 @@ export class SettingsComponent {
 
   readonly exportingData = signal(false);
   readonly resettingData = signal(false);
-  readonly language = this.languageService.language();
-  readonly languageOptions = [
-    { value: 'es', label: 'settings.languages.es' },
-    { value: 'en', label: 'settings.languages.en' },
-  ];
 
   constructor(
     private readonly toastCtrl: ToastController,
     private readonly appPreferencesService: AppPreferencesService,
     private readonly storage: StorageService<BaseDoc>,
     private readonly translate: TranslateService,
-    private readonly languageService: LanguageService,
   ) {}
 
   async ionViewWillEnter(): Promise<void> {
@@ -135,8 +129,8 @@ export class SettingsComponent {
 
     try {
       await navigator.share({
-        title: 'Pantry Manager - Respaldo',
-        text: 'Exporta o comparte tu copia de seguridad.',
+        title: this.translate.instant('settings.export.shareTitle'),
+        text: this.translate.instant('settings.export.shareText'),
         files: [file],
       });
       return true;
@@ -161,10 +155,4 @@ export class SettingsComponent {
     });
     await toast.present();
   }
-
-  async onLanguageChange(event: Event): Promise<void> {
-    const value = (event as CustomEvent<{ value?: string }>).detail?.value ?? '';
-    await this.languageService.setLanguage(value);
-  }
-
 }
