@@ -1,0 +1,293 @@
+{
+  "tabs": {
+    "dashboard": "Inicio",
+    "pantry": "Despensa",
+    "shopping": "Compras",
+    "settings": "Ajustes"
+  },
+  "common": {
+    "actions": {
+      "close": "Cerrar",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "apply": "Aplicar",
+      "clear": "Limpiar"
+    },
+    "dates": {
+      "none": "Sin fecha"
+    },
+    "locations": {
+      "none": "Sin ubicación"
+    }
+  },
+  "locations": {
+    "pantry": "Despensa",
+    "kitchen": "Cocina",
+    "fridge": "Nevera",
+    "freezer": "Congelador",
+    "bathroom": "Baño",
+    "freezerDrawer": "Congelador",
+    "cupboard": "Alacena",
+    "cellar": "Bodega",
+    "other": "Otros",
+    "unassigned": "Sin ubicación"
+  },
+  "dashboard": {
+    "title": "Inicio",
+    "confirmDeleteExpired": "Esto eliminará todos los productos caducados. ¿Quieres continuar?",
+    "summary": {
+      "title": "Resumen de la despensa",
+      "toggle": "Alternar resumen de la despensa",
+      "updated": "Actualizado {{ value }}",
+      "stats": {
+        "total": "Artículos totales",
+        "lowStock": "Bajo stock",
+        "nearExpiry": "Por caducar",
+        "expired": "Caducados"
+      }
+    },
+    "nearExpiry": {
+      "title": "Por caducar",
+      "subtitle": "En los próximos {{ days }} días",
+      "expires": "Caduca {{ date }}",
+      "empty": "No hay artículos por caducar."
+    },
+    "lowStock": {
+      "title": "Alertas de bajo stock",
+      "subtitle": "En o por debajo del nivel mínimo",
+      "minLabel": "mín {{ value }} {{ unit }}",
+      "empty": "Todos los artículos están por encima de su nivel mínimo."
+    },
+    "batches": {
+      "single": "1 lote",
+      "plural": "{{ count }} lotes",
+      "withExpiry": "{{ batchLabel }}, cad {{ date }}"
+    },
+    "expired": {
+      "title": "Artículos caducados",
+      "deleteAria": "Eliminar caducados",
+      "expires": "Caducó {{ date }}",
+      "badge": "Caducado",
+      "empty": "No hay artículos caducados en este momento."
+    },
+    "recent": {
+      "title": "Actualizados recientemente",
+      "updated": "Actualizado {{ date }}",
+      "badge": "Nuevo",
+      "empty": "Sin actualizaciones recientes."
+    }
+  },
+  "shopping": {
+    "title": "Compras",
+    "unassignedSupermarket": "Sin supermercado",
+    "summary": {
+      "title": "Resumen de compras",
+      "collapse": "Contraer resumen",
+      "expand": "Expandir resumen",
+      "productOne": "producto",
+      "productMany": "productos",
+      "toBuyIn": "para comprar en",
+      "storeOne": "supermercado",
+      "storeMany": "supermercados",
+      "ok": "Todos los artículos almacenados cumplen sus objetivos.",
+      "stats": {
+        "total": "Artículos totales por comprar",
+        "basicOut": "Básicos sin stock",
+        "basicLow": "Básicos con bajo stock",
+        "lowStock": "Productos con bajo stock"
+      }
+    },
+    "reasons": {
+      "below-min": "Bajo stock",
+      "basic-low": "Básico con bajo stock",
+      "basic-out": "Básico sin stock",
+      "empty": "Sin stock"
+    },
+    "suggestions": {
+      "title": "Compras sugeridas",
+      "loading": "Generando lista de compras…",
+      "destination": "Destino sugerido: {{ location }}",
+      "totalStock": "Stock total: {{ amount }} {{ unit }}",
+      "minStock": "Mín.: {{ amount }} {{ unit }}",
+      "buy": "Comprar {{ amount }} {{ unit }}",
+      "empty": "Nada que comprar por ahora. Todo está dentro de los niveles deseados."
+    }
+  },
+  "pantry": {
+    "title": "Despensa",
+    "filters": {
+      "quick": "Filtros rápidos por estado",
+      "all": "Todas",
+      "desc": {
+        "all": "Ver todos los productos disponibles",
+        "normal": "Productos sin alertas activas",
+        "low": "Necesitan reposición pronto",
+        "expiring": "Caducan en pocos días",
+        "expired": "Revisar y descartar",
+        "basic": "Mostrar solo los productos marcados como básicos"
+      },
+      "status": {
+        "normal": "Con stock",
+        "low": "Stock bajo",
+        "expiring": "Próx. caducar",
+        "expired": "Caducados"
+      },
+      "basic": "Básicos",
+      "title": "Filtros",
+      "search": "Buscar productos",
+      "category": "Categoría",
+      "location": "Ubicación",
+      "sort": {
+        "label": "Ordenar por",
+        "name": "Nombre (A-Z)",
+        "quantity": "Cantidad (mayor → menor)",
+        "expiration": "Caducidad (próximas primero)"
+      }
+    },
+    "empty": {
+      "title": "Resumen de la despensa",
+      "description": "Todavía no hay productos en la despensa. Añade tu primer producto para comenzar.",
+      "filters": "Ningún producto coincide con los filtros actuales."
+    },
+    "group": {
+      "count": "{{ count }} artículos",
+      "expiring": "{{ count }} por caducar",
+      "expired": "{{ count }} caducados"
+    },
+    "batches": {
+      "title": "Lotes del producto",
+      "count": "{{ count }} lotes registrados",
+      "open": "Abierto",
+      "edit": "Editar producto"
+    },
+    "form": {
+      "editTitle": "Editar artículo",
+      "newTitle": "Nuevo artículo",
+      "name": "Nombre",
+      "namePlaceholder": "Arroz, leche...",
+      "nameRequired": "El nombre es obligatorio.",
+      "category": "Categoría",
+      "categoryPlaceholder": "Cereales, lácteos...",
+      "uncategorized": "Sin categoría",
+      "supermarket": "Supermercado",
+      "supermarketPlaceholder": "Selecciona un supermercado",
+      "basic": "Producto básico de la despensa",
+      "minThreshold": "Cantidad mínima (alertas)",
+      "locationTitle": "Ubicación {{ index }}",
+      "locationTotal": "Total: {{ total }} {{ unit }}",
+      "location": "Ubicación",
+      "locationPlaceholder": "Selecciona una ubicación",
+      "batches": {
+        "title": "Lotes",
+        "add": "Añadir lote",
+        "empty": "Todavía no hay lotes. Añade uno para controlar las fechas de caducidad.",
+        "titleIndex": "Lote {{ index }}",
+        "quantity": "Cantidad",
+        "expiry": "Fecha de caducidad",
+        "opened": "Abierto"
+      },
+      "addLocation": "Añadir ubicación"
+    },
+    "detail": {
+      "earliest": "Caduca primero: {{ date }}",
+      "noBatches": "Sin lotes registrados.",
+      "totalQuantity": "{{ value }} total",
+      "batches": {
+        "single": "1 lote",
+        "plural": "{{ count }} lotes",
+        "withExpiry": "cad {{ date }}"
+      }
+    },
+    "toasts": {
+      "locationRequired": "Selecciona una ubicación antes de guardar.",
+      "supermarketRequired": "Selecciona un supermercado antes de guardar.",
+      "saveError": "No se pudo guardar el producto.",
+      "deleted": "🗑️ Producto eliminado.",
+      "addedToShopping": "\"{{ name }}\" añadido a sugerencias de compra.",
+      "createSuccess": "✅ {{ name }} añadido{{ quantity }}{{ breakdown }}.",
+      "locationsUpdated": "📦 Ubicaciones actualizadas: {{ breakdown }}.",
+      "stockUpdated": "💾 Stock actualizado: {{ name }} ({{ quantity }}).",
+      "stockUpdatedSimple": "💾 Stock actualizado.",
+      "saved": "💾 Cambios guardados."
+    },
+    "confirmDelete": "¿Eliminar \"{{ name }}\"?"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "preferences": {
+      "title": "Preferencias",
+      "subtitle": "Personaliza el comportamiento de la app.",
+      "language": {
+        "label": "Idioma",
+        "device": "Se ajusta automáticamente al idioma del dispositivo."
+      }
+    },
+    "languages": {
+      "es": "Español",
+      "en": "Inglés"
+    },
+    "data": {
+      "title": "Gestión de datos",
+      "subtitle": "Controla el almacenamiento local de la app.",
+      "resetTitle": "Limpiar datos / Restablecer app",
+      "resetDescription": "Elimina toda la información guardada en este dispositivo.",
+      "resetAction": "Limpiar",
+      "exportTitle": "Exportar datos",
+      "exportDescription": "Descarga un fichero JSON con tus datos actuales.",
+      "exportAction": "Exportar"
+    },
+    "reset": {
+      "confirm": "Esto eliminará TODOS los datos locales de la aplicación.\n¿Quieres continuar?",
+      "success": "Datos locales eliminados.",
+      "error": "No se pudo limpiar la aplicación."
+    },
+    "export": {
+      "unavailable": "La exportación no está disponible en este entorno.",
+      "readyToShare": "📤 Datos listos para compartir.",
+      "success": "📦 Datos exportados.",
+      "error": "No se pudieron exportar los datos.",
+      "shareTitle": "Pantry Manager - Respaldo",
+      "shareText": "Exporta o comparte tu copia de seguridad."
+    },
+    "loadError": "Ocurrió un problema cargando los ajustes.",
+    "catalogs": {
+      "title": "Catálogos",
+      "subtitle": "Gestiona las listas reutilizadas al organizar la despensa.",
+      "saveSuccess": "Catálogos actualizados.",
+      "saveError": "No se pudieron guardar los catálogos.",
+      "loadError": "No se pudieron cargar los catálogos.",
+      "restoreDefaults": "Restaurar valores clásicos",
+      "saveAction": "Guardar cambios",
+      "locations": {
+        "title": "Ubicaciones",
+        "subtitle": "Personaliza las ubicaciones disponibles al crear o editar productos.",
+        "empty": "Añade una ubicación para empezar.",
+        "field": "Ubicación {{ index }}",
+        "add": "Añadir ubicación"
+      },
+      "supermarkets": {
+        "title": "Supermercados",
+        "subtitle": "Define la lista disponible al asignar supermercados en los productos.",
+        "empty": "Añade un supermercado para empezar.",
+        "field": "Supermercado {{ index }}",
+        "add": "Añadir supermercado",
+        "other": "Otro"
+      },
+      "units": {
+        "title": "Unidades",
+        "subtitle": "Gestiona las unidades disponibles al registrar cantidades.",
+        "empty": "Añade una unidad para empezar.",
+        "field": "Unidad {{ index }}",
+        "add": "Añadir unidad"
+      }
+    },
+    "info": {
+      "title": "Información",
+      "subtitle": "Detalles rápidos de la aplicación.",
+      "version": "Versión",
+      "feedbackTitle": "Enviar comentarios",
+      "feedbackSubtitle": "Comparte sugerencias o reporta incidencias.",
+      "feedbackAction": "Enviar comentarios"
+    }
+  }
+}

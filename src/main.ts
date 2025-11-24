@@ -2,9 +2,13 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { LOCALE_ID } from '@angular/core';
+import { APP_INITIALIZER, LOCALE_ID, importProvidersFrom } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
+import localeEn from '@angular/common/locales/en';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import {
   homeOutline,
   basketOutline,
@@ -38,8 +42,22 @@ import {
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
+import { LanguageService } from '@core/services';
 
 registerLocaleData(localeEs);
+registerLocaleData(localeEn);
+
+function httpTranslateLoader(http: HttpClient): TranslateHttpLoader {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
+function initLanguage(language: LanguageService): () => Promise<void> {
+  return () => language.init();
+}
+
+function localeFactory(language: LanguageService): string {
+  return language.getCurrentLocale();
+}
 
 addIcons({
   'home-outline': homeOutline,
@@ -77,6 +95,19 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideIonicAngular(),
     provideRouter(routes),
-    { provide: LOCALE_ID, useValue: 'es' },
+    importProvidersFrom(
+      HttpClientModule,
+      TranslateModule.forRoot({
+        defaultLanguage: 'en',
+        useDefaultLang: true,
+        loader: {
+          provide: TranslateLoader,
+          useFactory: httpTranslateLoader,
+          deps: [HttpClient],
+        },
+      })
+    ),
+    { provide: APP_INITIALIZER, useFactory: initLanguage, deps: [LanguageService], multi: true },
+    { provide: LOCALE_ID, useFactory: localeFactory, deps: [LanguageService] },
   ],
 }).catch(err => console.error(err));

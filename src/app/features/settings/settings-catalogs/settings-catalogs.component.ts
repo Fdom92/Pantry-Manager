@@ -8,13 +8,14 @@ import {
   DEFAULT_UNIT_OPTIONS,
 } from '@core/services';
 import { MeasurementUnit } from '@core/models';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const TOAST_DURATION = 1800;
 
 @Component({
   selector: 'app-settings-catalogs',
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, TranslateModule],
   templateUrl: './settings-catalogs.component.html',
   styleUrls: ['./settings-catalogs.component.scss'],
 })
@@ -65,6 +66,7 @@ export class SettingsCatalogsComponent {
   constructor(
     private readonly toastCtrl: ToastController,
     private readonly appPreferencesService: AppPreferencesService,
+    private readonly translate: TranslateService,
   ) {}
 
   async ionViewWillEnter(): Promise<void> {
@@ -171,10 +173,10 @@ export class SettingsCatalogsComponent {
       this.locationOptionsDraft.set([...locationPayload]);
       this.supermarketOptionsDraft.set([...supermarketPayload]);
       this.unitOptionsDraft.set([...unitPayload]);
-      await this.presentToast('Catálogos actualizados.', 'success');
+      await this.presentToast(this.translate.instant('settings.catalogs.saveSuccess'), 'success');
     } catch (err) {
       console.error('[SettingsCatalogsComponent] saveCatalogs error', err);
-      await this.presentToast('No se pudieron guardar los catálogos.', 'danger');
+      await this.presentToast(this.translate.instant('settings.catalogs.saveError'), 'danger');
     } finally {
       this.savingCatalogs.set(false);
     }
@@ -189,7 +191,7 @@ export class SettingsCatalogsComponent {
       this.syncUnitOptionsFromPreferences();
     } catch (err) {
       console.error('[SettingsCatalogsComponent] loadPreferences error', err);
-      await this.presentToast('No se pudieron cargar los catálogos.', 'danger');
+      await this.presentToast(this.translate.instant('settings.catalogs.loadError'), 'danger');
     } finally {
       this.loading.set(false);
     }

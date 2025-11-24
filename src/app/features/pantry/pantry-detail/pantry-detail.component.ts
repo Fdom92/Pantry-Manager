@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models';
 import { ItemBatch, ItemLocationStock } from '@core/models';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-pantry-detail',
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, TranslateModule],
   templateUrl: './pantry-detail.component.html',
   styleUrls: ['./pantry-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

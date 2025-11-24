@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Despensa</ion-title>
+    <ion-title>{{ 'pantry.title' | translate }}</ion-title>
     <ion-buttons slot="end" class="header-actions">
       <ion-button fill="clear" size="small" (click)="openFilters($event)">
         <ion-icon slot="icon-only" name="filter-outline"></ion-icon>
@@ -13,7 +13,7 @@
 </ion-header>
 
 <ion-content #content class="ion-padding">
-  <div class="summary-bar" aria-label="Filtros rápidos por estado">
+  <div class="summary-bar" [attr.aria-label]="'pantry.filters.quick' | translate">
     <div class="summary-chips" role="tablist">
       @for (chip of filterChips(); track chip.key) {
         <ion-chip
@@ -23,11 +23,11 @@
           button="true"
           (click)="onFilterChipSelected(chip)"
           [attr.aria-pressed]="chip.active"
-          [attr.aria-label]="chip.description + ' (' + chip.count + ')'"
+          [attr.aria-label]="(chip.description | translate) + ' (' + chip.count + ')'"
           size="small">
           <ion-icon [name]="chip.icon"></ion-icon>
           <div class="chip-body">
-            <span class="chip-label">{{ chip.label }}</span>
+            <span class="chip-label">{{ chip.label | translate }}</span>
             <span class="chip-count">{{ chip.count }}</span>
           </div>
         </ion-chip>
@@ -52,16 +52,16 @@
   } @else if (summary().total === 0) {
     <ion-card>
       <ion-card-header>
-        <ion-card-title>Resumen de la despensa</ion-card-title>
+        <ion-card-title>{{ 'pantry.empty.title' | translate }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-text color="medium">Todavía no hay productos en la despensa. Añade tu primer producto para comenzar.</ion-text>
+        <ion-text color="medium">{{ 'pantry.empty.description' | translate }}</ion-text>
       </ion-card-content>
     </ion-card>
   } @else if (itemsState().length === 0) {
     <ion-card>
       <ion-card-content>
-        <ion-text color="medium">Ningún producto coincide con los filtros actuales.</ion-text>
+        <ion-text color="medium">{{ 'pantry.empty.filters' | translate }}</ion-text>
       </ion-card-content>
     </ion-card>
   } @else {
@@ -76,12 +76,12 @@
                 </div>
                 <div class="group-meta">
                   <ion-text color="medium">
-                    {{ group.items.length }} artículos
+                    {{ 'pantry.group.count' | translate:{ count: group.items.length } }}
                     @if (group.expiringCount) {
-                      · {{ group.expiringCount }} por caducar
+                      · {{ 'pantry.group.expiring' | translate:{ count: group.expiringCount } }}
                     }
                     @if (group.expiredCount) {
-                      · {{ group.expiredCount }} caducados
+                      · {{ 'pantry.group.expired' | translate:{ count: group.expiredCount } }}
                     }
                   </ion-text>
                 </div>
@@ -115,10 +115,10 @@
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title>Lotes del producto</ion-title>
+          <ion-title>{{ 'pantry.batches.title' | translate }}</ion-title>
           <ion-buttons slot="end">
             <ion-button fill="clear" color="medium" (click)="closeBatchesModal()">
-              Cerrar
+              {{ 'common.actions.close' | translate }}
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
@@ -131,7 +131,7 @@
           <div class="batches-modal-header">
             <h2>{{ selectedItem.name }}</h2>
             <ion-text color="medium">
-              {{ getTotalBatchCount(selectedItem) }} lotes registrados
+              {{ 'pantry.batches.count' | translate:{ count: getTotalBatchCount(selectedItem) } }}
             </ion-text>
           </div>
           <ion-list lines="full">
@@ -147,7 +147,7 @@
                     · {{ entry.locationLabel }}
                   </p>
                   @if (entry.batch.opened) {
-                    <ion-badge color="tertiary" size="small">Abierto</ion-badge>
+                    <ion-badge color="tertiary" size="small">{{ 'pantry.batches.open' | translate }}</ion-badge>
                   }
                 </ion-label>
                 <ion-chip slot="end" [color]="entry.status.color" size="small">
@@ -162,7 +162,7 @@
               expand="block"
               fill="outline"
               (click)="openEditItemModal(selectedItem)">
-              Editar producto
+              {{ 'pantry.batches.edit' | translate }}
             </ion-button>
           </div>
         }
@@ -174,7 +174,7 @@
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title>Filtros</ion-title>
+          <ion-title>{{ 'pantry.filters.title' | translate }}</ion-title>
           <ion-buttons slot="end">
             <ion-button fill="clear" color="medium" (click)="closeFilters()">
               <ion-icon name="close"></ion-icon>
@@ -187,7 +187,7 @@
         <!-- Búsqueda -->
         <ion-card class="filter-card search-card">
           <ion-searchbar
-            placeholder="Buscar productos"
+            [placeholder]="'pantry.filters.search' | translate"
             [value]="searchTerm()"
             debounce="300"
             (ionInput)="onSearchTermChange($event)">
@@ -200,7 +200,7 @@
             <ion-item>
               <ion-select
                 interface="popover"
-                label="Categoría"
+                label="{{ 'pantry.filters.category' | translate }}"
                 labelPlacement="stacked"
                 [value]="selectedCategory()"
                 (ionChange)="onCategoryChange($event)">
@@ -213,7 +213,7 @@
             <ion-item>
               <ion-select
                 interface="popover"
-                label="Ubicación"
+                label="{{ 'pantry.filters.location' | translate }}"
                 labelPlacement="stacked"
                 [value]="selectedLocation()"
                 (ionChange)="onLocationChange($event)">
@@ -226,13 +226,13 @@
             <ion-item>
               <ion-select
                 interface="popover"
-                label="Ordenar por"
+                label="{{ 'pantry.filters.sort.label' | translate }}"
                 labelPlacement="stacked"
                 [value]="sortOption()"
                 (ionChange)="onSortChange($event)">
-                <ion-select-option value="name">Nombre (A-Z)</ion-select-option>
-                <ion-select-option value="quantity">Cantidad (mayor → menor)</ion-select-option>
-                <ion-select-option value="expiration">Caducidad (próximas primero)</ion-select-option>
+                <ion-select-option value="name">{{ 'pantry.filters.sort.name' | translate }}</ion-select-option>
+                <ion-select-option value="quantity">{{ 'pantry.filters.sort.quantity' | translate }}</ion-select-option>
+                <ion-select-option value="expiration">{{ 'pantry.filters.sort.expiration' | translate }}</ion-select-option>
               </ion-select>
             </ion-item>
           </ion-card-content>
@@ -240,8 +240,8 @@
 
         <!-- Acciones -->
         <div class="filter-actions">
-          <ion-button expand="block" fill="clear" color="medium" (click)="clearFilters()">Limpiar</ion-button>
-          <ion-button expand="block" (click)="closeFilters()">Aplicar</ion-button>
+          <ion-button expand="block" fill="clear" color="medium" (click)="clearFilters()">{{ 'common.actions.clear' | translate }}</ion-button>
+          <ion-button expand="block" (click)="closeFilters()">{{ 'common.actions.apply' | translate }}</ion-button>
         </div>
       </ion-content>
     </ng-template>
@@ -252,11 +252,11 @@
       <ion-header>
         <ion-toolbar>
           <ion-title>
-            @if (editingItem) { Editar artículo } @else { Nuevo artículo }
+            @if (editingItem) { {{ 'pantry.form.editTitle' | translate }} } @else { {{ 'pantry.form.newTitle' | translate }} }
           </ion-title>
           <ion-buttons slot="end">
             <ion-button fill="clear" color="medium" (click)="closeFormModal()">
-              Cancelar
+              {{ 'common.actions.cancel' | translate }}
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
@@ -267,24 +267,24 @@
             <ion-item>
               <ion-input
                 formControlName="name"
-                label="Nombre"
+                label="{{ 'pantry.form.name' | translate }}"
                 labelPlacement="stacked"
-                placeholder="Arroz, leche..."
+                [placeholder]="'pantry.form.namePlaceholder' | translate"
                 required>
               </ion-input>
             </ion-item>
             @if (form.get('name')?.invalid && form.get('name')?.touched) {
               <ion-note color="danger" class="ion-padding-start">
-                El nombre es obligatorio.
+                {{ 'pantry.form.nameRequired' | translate }}
               </ion-note>
             }
 
             <ion-item>
               <ion-input
                 formControlName="categoryId"
-                label="Categoría"
+                label="{{ 'pantry.form.category' | translate }}"
                 labelPlacement="stacked"
-                placeholder="Cereales, lácteos...">
+                [placeholder]="'pantry.form.categoryPlaceholder' | translate">
               </ion-input>
             </ion-item>
 
@@ -292,9 +292,9 @@
                 <ion-select
                   formControlName="supermarket"
                   interface="popover"
-                  label="Supermercado"
+                  label="{{ 'pantry.form.supermarket' | translate }}"
                   labelPlacement="stacked"
-                  placeholder="Selecciona un supermercado"
+                  [placeholder]="'pantry.form.supermarketPlaceholder' | translate"
                   required>
                   @for (option of getSupermarketSelectOptions(); track option.value) {
                     <ion-select-option [value]="option.value">
@@ -305,14 +305,14 @@
             </ion-item>
 
             <ion-item lines="full">
-              <ion-toggle formControlName="isBasic" justify="space-between">Producto básico de la despensa</ion-toggle>
+              <ion-toggle formControlName="isBasic" justify="space-between">{{ 'pantry.form.basic' | translate }}</ion-toggle>
             </ion-item>
             <ion-item>
               <ion-input
                 type="number"
                 min="0"
                 formControlName="minThreshold"
-                label="Cantidad mínima (alertas)"
+                label="{{ 'pantry.form.minThreshold' | translate }}"
                 labelPlacement="stacked">
               </ion-input>
             </ion-item>
@@ -323,9 +323,9 @@
                 <div class="location-form-card" [formGroupName]="i">
                   <div class="location-form-header">
                     <h4>
-                      Ubicación {{ i + 1 }}
+                      {{ 'pantry.form.locationTitle' | translate:{ index: i + 1 } }}
                       <span class="location-total">
-                        (Total: {{ getLocationTotalForControl(i) | number:'1.0-2' }} {{ getLocationUnitLabelForControl(i) }})
+                        ({{ 'pantry.form.locationTotal' | translate:{ total: (getLocationTotalForControl(i) | number:'1.0-2'), unit: getLocationUnitLabelForControl(i) } }})
                       </span>
                     </h4>
                     <ion-button
@@ -342,9 +342,9 @@
                       <ion-select
                         formControlName="locationId"
                         interface="popover"
-                        label="Ubicación"
+                        label="{{ 'pantry.form.location' | translate }}"
                         labelPlacement="stacked"
-                        placeholder="Selecciona una ubicación"
+                        [placeholder]="'pantry.form.locationPlaceholder' | translate"
                         required>
                         @for (option of getLocationOptionsForControl(i); track option.value) {
                           <ion-select-option [value]="option.value">
@@ -356,10 +356,10 @@
                   </ion-list>
                   <div formArrayName="batches" class="batch-form-list">
                     <div class="batch-form-header">
-                      <h5>Lotes</h5>
+                      <h5>{{ 'pantry.form.batches.title' | translate }}</h5>
                       <ion-button fill="clear" size="small" (click)="addBatchEntry(i)">
                         <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-                        Añadir lote
+                        {{ 'pantry.form.batches.add' | translate }}
                       </ion-button>
                     </div>
                     @let batchesArray = getBatchesArray(i);
@@ -367,7 +367,7 @@
                       <ion-list>
                         <ion-item lines="none">
                           <ion-text color="medium">
-                            Todavía no hay lotes. Añade uno para controlar las fechas de caducidad.
+                            {{ 'pantry.form.batches.empty' | translate }}
                           </ion-text>
                         </ion-item>
                       </ion-list>
@@ -375,7 +375,7 @@
                     @for (batchCtrl of batchesArray.controls; track $index; let j = $index) {
                       <div class="batch-form-card" [formGroupName]="j">
                         <div class="batch-form-card-header">
-                          <h6>Lote {{ j + 1 }}</h6>
+                          <h6>{{ 'pantry.form.batches.titleIndex' | translate:{ index: j + 1 } }}</h6>
                           <ion-button
                             fill="clear"
                             size="small"
@@ -390,7 +390,7 @@
                               type="number"
                               min="0"
                               formControlName="quantity"
-                              label="Cantidad"
+                              label="{{ 'pantry.form.batches.quantity' | translate }}"
                               labelPlacement="stacked">
                             </ion-input>
                           </ion-item>
@@ -398,12 +398,12 @@
                             <ion-input
                               type="date"
                               formControlName="expirationDate"
-                              label="Fecha de caducidad"
+                              label="{{ 'pantry.form.batches.expiry' | translate }}"
                               labelPlacement="stacked">
                             </ion-input>
                           </ion-item>
                           <ion-item lines="none">
-                            <ion-toggle formControlName="opened" justify="space-between">Abierto</ion-toggle>
+                            <ion-toggle formControlName="opened" justify="space-between">{{ 'pantry.form.batches.opened' | translate }}</ion-toggle>
                           </ion-item>
                         </ion-list>
                       </div>
@@ -413,7 +413,7 @@
               }
               <ion-button fill="clear" size="small" (click)="addLocationEntry()">
                 <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-                Añadir ubicación
+                {{ 'pantry.form.addLocation' | translate }}
               </ion-button>
             </div>
 
@@ -422,7 +422,7 @@
               @if (isSaving) {
                 <ion-spinner name="dots"></ion-spinner>
               } @else {
-                Guardar artículo
+                {{ 'common.actions.save' | translate }}
               }
             </ion-button>
           </div>

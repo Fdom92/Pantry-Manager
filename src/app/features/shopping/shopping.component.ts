@@ -4,9 +4,10 @@ import { CommonModule } from '@angular/common';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { PantryItem, MeasurementUnit } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
-import { SHOPPING_REASON_LABELS } from '@core/constants';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LanguageService } from '@core/services';
 
-type ShoppingReason = keyof typeof SHOPPING_REASON_LABELS;
+type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';
 
 interface ShoppingSuggestion {
   item: PantryItem;
@@ -43,13 +44,11 @@ interface ShoppingState {
 @Component({
   selector: 'app-shopping',
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, TranslateModule],
   templateUrl: './shopping.component.html',
   styleUrls: ['./shopping.component.scss'],
 })
 export class ShoppingComponent {
-  readonly reasonLabels = SHOPPING_REASON_LABELS;
-  readonly unassignedSupermarketLabel = 'Sin supermercado';
   private readonly unassignedSupermarketKey = '__none__';
 
   readonly loading = this.pantryStore.loading;
@@ -65,6 +64,8 @@ export class ShoppingComponent {
 
   constructor(
     private readonly pantryStore: PantryStoreService,
+    private readonly translate: TranslateService,
+    private readonly languageService: LanguageService,
   ) {}
 
   /** Lifecycle hook: make sure the store is populated before rendering suggestions. */
@@ -124,7 +125,11 @@ export class ShoppingComponent {
   }
 
   getLocationLabel(locationId: string): string {
-    return getLocationDisplayName(locationId, 'Sin ubicación');
+    return getLocationDisplayName(
+      locationId,
+      this.translate.instant('common.locations.none'),
+      this.translate
+    );
   }
 
   /**
@@ -227,8 +232,8 @@ export class ShoppingComponent {
     const groups = Array.from(map.entries()).map(([key, list]) => {
       const label =
         key === this.unassignedSupermarketKey
-          ? this.unassignedSupermarketLabel
-          : list[0]?.supermarket ?? this.unassignedSupermarketLabel;
+          ? this.getUnassignedSupermarketLabel()
+          : list[0]?.supermarket ?? this.getUnassignedSupermarketLabel();
       return {
         key,
         label,
@@ -283,6 +288,10 @@ export class ShoppingComponent {
       return MeasurementUnit.UNIT;
     }
     return trimmed;
+  }
+
+  private getUnassignedSupermarketLabel(): string {
+    return this.translate.instant('shopping.unassignedSupermarket');
   }
 
 }
