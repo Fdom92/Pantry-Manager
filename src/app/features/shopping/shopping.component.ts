@@ -1,11 +1,13 @@
 import { Component, computed, signal } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { PantryItem, MeasurementUnit } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '@core/services';
+import { AddPurchaseModalComponent } from '../../components/add-purchase-modal/add-purchase-modal.component';
+import { PantryService } from '@core/services';
 
 type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';
 
@@ -66,6 +68,8 @@ export class ShoppingComponent {
     private readonly pantryStore: PantryStoreService,
     private readonly translate: TranslateService,
     private readonly languageService: LanguageService,
+    private readonly modalCtrl: ModalController,
+    private readonly pantryService: PantryService,
   ) {}
 
   /** Lifecycle hook: make sure the store is populated before rendering suggestions. */
@@ -82,31 +86,27 @@ export class ShoppingComponent {
   }
 
   /**
-   * Apply the suggested purchase quantity to the relevant item/location,
-   * guarding against concurrent operations on the same item.
+   * Open modal to confirm purchase details and apply them.
    */
-  async markAsPurchased(suggestion: ShoppingSuggestion): Promise<void> {
-    const id = suggestion.item?._id;
-    const targetLocationId = suggestion.locationId || suggestion.item.locations[0]?.locationId;
-    if (!id || !targetLocationId || this.isProcessing(id) || suggestion.suggestedQuantity <= 0) {
-      return;
-    }
-
-    this.processingIds.update(ids => {
-      const next = new Set(ids);
-      next.add(id);
-      return next;
+  async openPurchaseModal(suggestion: ShoppingSuggestion): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: AddPurchaseModalComponent,
+      componentProps: {
+        item: {
+          id: suggestion.item?._id,
+          productId: suggestion.item?._id,
+          suggestedQuantity: suggestion.suggestedQuantity,
+          locationId: suggestion.locationId,
+        },
+        product: suggestion.item,
+      },
     });
+    await modal.present();
 
-    try {
-      await this.pantryStore.adjustQuantity(id, targetLocationId, suggestion.suggestedQuantity);
-    } finally {
-      this.processingIds.update(ids => {
-        const next = new Set(ids);
-        next.delete(id);
-        return next;
-      });
-    }
+    const { data } = await modal.onWillDismiss();
+    if (!data) return;
+
+    await this.handlePurchase(suggestion, data);
   }
 
   getBadgeColor(reason: ShoppingReason): string {
@@ -117,6 +117,40 @@ export class ShoppingComponent {
         return 'tertiary';
       default:
         return 'warning';
+    }
+  }
+
+  /**
+   * Persist the purchased batch and refresh shopping state.
+   */
+  private async handlePurchase(
+    suggestion: ShoppingSuggestion,
+    data: { quantity: number; expiryDate?: string | null; location: string }
+  ): Promise<void> {
+    const id = suggestion.item?._id;
+    if (!id || this.isProcessing(id)) {
+      return;
+    }
+
+    this.processingIds.update(ids => {
+      const next = new Set(ids);
+      next.add(id);
+      return next;
+    });
+
+    try {
+      await this.pantryService.addNewLot(id, {
+        quantity: data.quantity,
+        expiryDate: data.expiryDate ?? undefined,
+        location: data.location,
+      });
+      await this.pantryStore.loadAll();
+    } finally {
+      this.processingIds.update(ids => {
+        const next = new Set(ids);
+        next.delete(id);
+        return next;
+      });
     }
   }
 

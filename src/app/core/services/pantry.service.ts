@@ -222,6 +222,65 @@ export class PantryService extends StorageService<PantryItem> {
     return this.saveItem(updated);
   }
 
+  /**
+   * Append a brand new batch to the requested product/location without altering other batches.
+   * If the location does not exist yet, it will be created.
+   */
+  async addNewLot(
+    productId: string,
+    lot: { quantity: number; expiryDate?: string | null; location: string; unit?: string }
+  ): Promise<PantryItem | null> {
+    const item = await this.get(productId);
+    if (!item) {
+      return null;
+    }
+
+    const current = this.applyDerivedFields(item);
+    const quantity = this.toNumberOrZero(lot?.quantity);
+    if (quantity <= 0) {
+      return current;
+    }
+
+    const locationId = (lot?.location ?? '').trim() || 'unassigned';
+    const unit = this.normalizeUnitValue(
+      lot?.unit ?? current.locations[0]?.unit ?? MeasurementUnit.UNIT
+    );
+    const expiryDate = lot?.expiryDate ?? undefined;
+
+    const nextLocations = [...(current.locations ?? [])];
+    const targetIndex = nextLocations.findIndex(loc => (loc.locationId ?? '').trim() === locationId);
+    const newBatch: ItemBatch = {
+      batchId: this.generateBatchId(),
+      quantity,
+      unit,
+      expirationDate: expiryDate || undefined,
+      opened: false,
+    };
+
+    if (targetIndex >= 0) {
+      const target = nextLocations[targetIndex];
+      const batches = this.normalizeBatches(target.batches, unit);
+      const merged = this.mergeBatchesByExpiry([...batches, newBatch]);
+      nextLocations[targetIndex] = {
+        ...target,
+        locationId,
+        unit,
+        batches: merged,
+      };
+    } else {
+      nextLocations.push({
+        locationId,
+        unit,
+        batches: this.mergeBatchesByExpiry([newBatch]),
+      });
+    }
+
+    return this.saveItem({
+      ...current,
+      locations: nextLocations,
+    });
+  }
+
   /** Retrieve items that already have an expired location. */
   async getExpired(): Promise<PantryItem[]> {
     const items = await this.getAll();
