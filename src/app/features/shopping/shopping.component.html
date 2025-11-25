@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Compras</ion-title>
+    <ion-title>{{ 'shopping.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,14 +11,14 @@
     <ion-card-header class="summary-card-header">
       <div class="summary-header-content">
         <div class="summary-header-top">
-          <ion-card-title>Resumen de compras</ion-card-title>
+          <ion-card-title>{{ 'shopping.summary.title' | translate }}</ion-card-title>
           <ion-button
             fill="clear"
             size="small"
             (click)="toggleSummary()"
             class="summary-toggle"
             [aria-expanded]="summaryExpanded()"
-            [attr.aria-label]="summaryExpanded() ? 'Contraer resumen' : 'Expandir resumen'"
+            [attr.aria-label]="summaryExpanded() ? ('shopping.summary.collapse' | translate) : ('shopping.summary.expand' | translate)"
           >
             <ion-icon [name]="summaryExpanded() ? 'chevron-up-outline' : 'chevron-down-outline'" slot="icon-only"></ion-icon>
           </ion-button>
@@ -26,13 +26,13 @@
         @if (state.hasAlerts) {
           <ion-card-subtitle>
             {{ state.summary.total }}
-            {{ state.summary.total === 1 ? 'producto' : 'productos' }}
-            para comprar en
+            {{ state.summary.total === 1 ? ('shopping.summary.productOne' | translate) : ('shopping.summary.productMany' | translate) }}
+            {{ 'shopping.summary.toBuyIn' | translate }}
             {{ state.summary.supermarketCount }}
-            {{ state.summary.supermarketCount === 1 ? 'supermercado' : 'supermercados' }}.
+            {{ state.summary.supermarketCount === 1 ? ('shopping.summary.storeOne' | translate) : ('shopping.summary.storeMany' | translate) }}.
           </ion-card-subtitle>
         } @else {
-          <ion-card-subtitle>Todos los artículos almacenados cumplen sus objetivos.</ion-card-subtitle>
+          <ion-card-subtitle>{{ 'shopping.summary.ok' | translate }}</ion-card-subtitle>
         }
       </div>
     </ion-card-header>
@@ -41,19 +41,19 @@
         <div class="stat-grid">
           <div class="stat">
             <h3>{{ state.summary.total }}</h3>
-            <p>Artículos totales por comprar</p>
+            <p>{{ 'shopping.summary.stats.total' | translate }}</p>
           </div>
           <div class="stat">
             <h3>{{ state.summary.basicOut }}</h3>
-            <p>Básicos sin stock</p>
+            <p>{{ 'shopping.summary.stats.basicOut' | translate }}</p>
           </div>
           <div class="stat">
             <h3>{{ state.summary.basicLow }}</h3>
-            <p>Básicos con bajo stock</p>
+            <p>{{ 'shopping.summary.stats.basicLow' | translate }}</p>
           </div>
           <div class="stat">
             <h3>{{ state.summary.belowMin }}</h3>
-            <p>Productos con bajo stock</p>
+            <p>{{ 'shopping.summary.stats.lowStock' | translate }}</p>
           </div>
         </div>
       }
@@ -62,13 +62,13 @@
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Compras sugeridas</ion-card-title>
+      <ion-card-title>{{ 'shopping.suggestions.title' | translate }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       @if (loading()) {
         <div class="loading-state">
           <ion-spinner name="lines"></ion-spinner>
-          <p>Generando lista de compras…</p>
+          <p>{{ 'shopping.suggestions.loading' | translate }}</p>
         </div>
       } @else if (state.summary.total) {
         <div class="suggestion-groups">
@@ -85,19 +85,19 @@
                       <div class="suggestion-header">
                         <h3>{{ suggestion.item.name }}</h3>
                         <ion-chip [color]="getBadgeColor(suggestion.reason)" [outline]="true">
-                          {{ reasonLabels[suggestion.reason] }}
+                          {{ ('shopping.reasons.' + suggestion.reason) | translate }}
                         </ion-chip>
                       </div>
                       <p class="meta">
-                        Destino sugerido: {{ getLocationLabel(suggestion.locationId) }} ·
-                        Stock total: {{ suggestion.currentQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
+                        {{ 'shopping.suggestions.destination' | translate:{ location: getLocationLabel(suggestion.locationId) } }} ·
+                        {{ 'shopping.suggestions.totalStock' | translate:{ amount: (suggestion.currentQuantity | number:'1.0-2'), unit: getUnitLabel(suggestion.unit) } }}
                         @if (suggestion.minThreshold !== undefined) {
-                          · Mín.: {{ suggestion.minThreshold | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
+                          · {{ 'shopping.suggestions.minStock' | translate:{ amount: (suggestion.minThreshold | number:'1.0-2'), unit: getUnitLabel(suggestion.unit) } }}
                         }
                       </p>
                       <div class="suggestion-footer">
                         <ion-note color="primary" class="purchase-note">
-                          Comprar {{ suggestion.suggestedQuantity | number:'1.0-2' }} {{ getUnitLabel(suggestion.unit) }}
+                          {{ 'shopping.suggestions.buy' | translate:{ amount: (suggestion.suggestedQuantity | number:'1.0-2'), unit: getUnitLabel(suggestion.unit) } }}
                         </ion-note>
                         <ion-button
                           size="small"
@@ -123,7 +123,7 @@
         </div>
       } @else {
         <ion-text color="medium">
-          Nada que comprar por ahora. Todo está dentro de los niveles deseados.
+          {{ 'shopping.suggestions.empty' | translate }}
         </ion-text>
       }
     </ion-card-content>

@@ -26,7 +26,7 @@
     <div class="summary-info">
       <div class="summary-row">
         <ion-icon name="calendar-outline"></ion-icon>
-        <span>Caduca primero: {{ viewModel.formattedEarliestExpirationLong }}</span>
+        <span>{{ 'pantry.detail.earliest' | translate:{ date: viewModel.formattedEarliestExpirationLong } }}</span>
       </div>
       <div class="summary-row meta">
         <ion-icon name="layers-outline"></ion-icon>
@@ -43,7 +43,7 @@
         <section class="batch-section">
           @if (!viewModel.batches.length) {
             <ion-text color="medium" class="empty-state">
-              Sin lotes registrados.
+              {{ 'pantry.detail.noBatches' | translate }}
             </ion-text>
           } @else {
             <div class="batch-list">
