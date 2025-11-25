@@ -103,7 +103,7 @@
                           size="small"
                           color="success"
                           fill="solid"
-                          (click)="markAsPurchased(suggestion)"
+                          (click)="openPurchaseModal(suggestion)"
                           [disabled]="isProcessing(suggestion.item._id)"
                           class="purchase-action"
                         >
