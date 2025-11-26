@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Purchases } from '@revenuecat/purchases-capacitor';
 
-const PUBLIC_API_KEY = 'REVENUECAT_PUBLIC_API_KEY';
+const PUBLIC_API_KEY = 'goog_QWDXnEcbnxIKMCjuMLHcOtwxmrR';
 const STORAGE_KEY = 'revenuecat:isPro';
 
 @Injectable({
