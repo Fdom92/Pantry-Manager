@@ -2,12 +2,14 @@ import { ChangeDetectionStrategy, Component, OnDestroy, ViewChild, effect, injec
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonContent, IonicModule } from '@ionic/angular';
+import { TranslateModule } from '@ngx-translate/core';
 import { AgentMessage, AgentService } from '@core/services/agent.service';
+import { RevenuecatService } from '@core/services/revenuecat.service';
 
 @Component({
   selector: 'app-agent',
   standalone: true,
-  imports: [CommonModule, IonicModule, ReactiveFormsModule],
+  imports: [CommonModule, IonicModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './agent.component.html',
   styleUrls: ['./agent.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -15,9 +17,11 @@ import { AgentMessage, AgentService } from '@core/services/agent.service';
 export class AgentComponent implements OnDestroy {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
   private readonly agentService = inject(AgentService);
+  private readonly revenuecat = inject(RevenuecatService);
 
   readonly messages = this.agentService.messages;
   readonly thinking = this.agentService.thinking;
+  readonly isPro$ = this.revenuecat.isPro$;
 
   readonly messageControl = new FormControl('', {
     nonNullable: true,

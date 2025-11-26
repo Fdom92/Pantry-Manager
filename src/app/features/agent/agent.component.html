@@ -1,9 +1,16 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Agente</ion-title>
+    <ion-title>
+      <div class="agent-title">
+        <span>{{ 'agent.title' | translate }}</span>
+        <ion-badge color="warning" *ngIf="isPro$ | async">
+          {{ 'settings.pro.badgePro' | translate }}
+        </ion-badge>
+      </div>
+    </ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()">
-        Limpiar
+        {{ 'common.actions.clear' | translate }}
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -16,7 +23,11 @@
         <div class="message__bubble">
           <div class="message__meta">
             <span class="message__author">
-              {{ message.role === 'user' ? 'Tú' : (message.role === 'tool' ? 'Acción' : 'Agente') }}
+              {{
+                message.role === 'user'
+                  ? ('agent.roles.user' | translate)
+                  : (message.role === 'tool' ? ('agent.roles.tool' | translate) : ('agent.roles.assistant' | translate))
+              }}
             </span>
             <span class="message__time">{{ message.createdAt | date:'shortTime' }}</span>
           </div>
@@ -45,7 +56,7 @@
       <div class="message from-agent">
         <div class="message__bubble thinking">
           <ion-spinner name="dots"></ion-spinner>
-          <span>Pensando…</span>
+          <span>{{ 'agent.thinking' | translate }}</span>
         </div>
       </div>
     }
@@ -56,17 +67,17 @@
   <div class="composer">
     <ion-textarea
       class="composer__input"
-      placeholder="Escribe instrucciones como “Mueve 2 yogures al frigo”"
+      placeholder="{{ 'agent.placeholder' | translate }}"
       autoGrow="true"
       [formControl]="messageControl"
       enterkeyhint="send">
     </ion-textarea>
     <div class="composer__actions">
       <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()">
-        Limpiar
+        {{ 'common.actions.clear' | translate }}
       </ion-button>
       <ion-button color="primary" (click)="send()" [disabled]="!messageControl.value.trim() || thinking()">
-        Enviar
+        {{ 'agent.actions.send' | translate }}
       </ion-button>
     </div>
   </div>

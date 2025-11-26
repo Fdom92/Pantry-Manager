@@ -1463,13 +1463,17 @@ export class PantryListComponent implements OnDestroy {
     }
     const earliest = this.getLocationEarliestExpiry(location);
     if (earliest) {
-      return `Caduca: ${this.formatShortDate(earliest)}`;
+      return this.translate.instant('pantry.detail.locationMeta.expires', {
+        date: this.formatShortDate(earliest),
+      });
     }
     const openedCount = batches.filter(batch => batch.opened).length;
     if (openedCount > 0) {
-      return openedCount === 1 ? '1 lote abierto' : `${openedCount} lotes abiertos`;
+      return openedCount === 1
+        ? this.translate.instant('pantry.detail.locationMeta.openedOne')
+        : this.translate.instant('pantry.detail.locationMeta.openedMany', { count: openedCount });
     }
-    return 'Sin caducidad registrada';
+    return this.translate.instant('pantry.detail.locationMeta.noExpiry');
   }
 
   getLocationTotal(location: ItemLocationStock): number {

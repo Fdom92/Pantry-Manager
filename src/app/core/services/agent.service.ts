@@ -1,8 +1,10 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 import { PantryService } from './pantry.service';
 import { AppPreferencesService, DEFAULT_LOCATION_OPTIONS } from './app-preferences.service';
+import { RevenuecatService } from './revenuecat.service';
 import { createDocumentId } from '@core/utils';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { ItemBatch, ItemLocationStock, MeasurementUnit, PantryItem } from '@core/models';
@@ -198,7 +200,13 @@ export class AgentService {
     private readonly http: HttpClient,
     private readonly pantryService: PantryService,
     private readonly appPreferences: AppPreferencesService,
+    private readonly translate: TranslateService,
+    private readonly revenuecat: RevenuecatService,
   ) {}
+
+  private t(key: string, params?: Record<string, any>): string {
+    return this.translate.instant(key, params);
+  }
 
   async sendMessage(userText: string): Promise<AgentMessage | null> {
     const trimmed = (userText ?? '').trim();
@@ -250,7 +258,7 @@ export class AgentService {
       // Loop will call the model again with the new tool results
     }
 
-    return latestAssistant ?? this.createMessage('assistant', 'No pude generar respuesta.', 'error');
+    return latestAssistant ?? this.createMessage('assistant', this.t('agent.messages.noResponse'), 'error');
   }
 
   private createMessage(role: AgentRole, content: string, status: AgentMessage['status'] = 'ok'): AgentMessage {
@@ -318,16 +326,18 @@ export class AgentService {
     if (!this.apiUrl) {
       console.warn('[AgentService] agentApiUrl is empty, skipping remote call');
       return {
-        content: 'No hay endpoint configurado para el agente.',
+        content: this.t('agent.messages.noEndpoint'),
       };
     }
     try {
-      return await firstValueFrom(this.http.post<AgentModelResponse>(this.apiUrl, payload));
+      return await firstValueFrom(this.http.post<AgentModelResponse>(this.apiUrl, payload, {
+        headers: this.buildProHeaders(),
+      }));
     } catch (err: any) {
       console.error('[AgentService] callModel failed', err);
       return {
-        error: 'No se pudo contactar con el modelo',
-        content: 'No se pudo contactar con el modelo',
+        error: this.t('agent.messages.callFailed'),
+        content: this.t('agent.messages.callFailed'),
       };
     }
   }
@@ -371,11 +381,23 @@ export class AgentService {
     return raw;
   }
 
+  private buildProHeaders(): Record<string, string> | undefined {
+    const userId = this.revenuecat.getUserId();
+    if (!userId) {
+      return undefined;
+    }
+    return {
+      'x-user-id': userId,
+    };
+  }
+
   private appendAssistantFromModel(response: AgentModelResponse): AgentMessage {
     const hasToolCalls = Array.isArray((response.message as any)?.tool_calls);
     let content = response.message?.content || response.content || '';
     if (!content) {
-      content = hasToolCalls ? 'Procesando acción…' : (response.error || 'No pude generar respuesta.');
+      content = hasToolCalls
+        ? this.t('agent.messages.processing')
+        : (response.error || this.t('agent.messages.noResponse'));
     }
     const assistantMessage = this.createMessage('assistant', content, response.error ? 'error' : 'ok');
     if (hasToolCalls) {
@@ -402,7 +424,7 @@ export class AgentService {
       default: {
         const message = this.createMessage(
           'assistant',
-          `La herramienta "${call.name}" no está disponible.`,
+          this.t('agent.messages.toolUnavailable', { name: call.name }),
           'error',
         );
         return { tool: call.name, success: false, message };
@@ -430,16 +452,18 @@ export class AgentService {
     const expirationDate = this.normalizeDate(args?.['expirationDate']);
 
     if (!name) {
-      return this.errorResult('Falta el nombre del producto.');
+      return this.errorResult(this.t('agent.errors.missingName'));
     }
     if (!Number.isFinite(quantity) || quantity <= 0) {
-      return this.errorResult('La cantidad debe ser mayor que 0.');
+      return this.errorResult(this.t('agent.errors.quantityPositive'));
     }
 
     const resolvedLocation = await this.resolveLocation(locationInput);
     if (!resolvedLocation) {
-      const details = [`Opciones válidas: ${Object.values(this.locationSynonyms).join(', ')}`];
-      return this.errorResult('No entiendo la ubicación. Prueba con despensa, nevera, cocina o congelador.', details);
+      const details = [
+        this.t('agent.details.options', { value: Object.values(this.locationSynonyms).join(', ') }),
+      ];
+      return this.errorResult(this.t('agent.errors.unknownLocation'), details);
     }
 
     const existing = await this.findItemByName(name);
@@ -459,16 +483,18 @@ export class AgentService {
     await this.pantryService.reloadFromStart();
 
     const summary = existing
-      ? `Añadido stock a ${saved.name} en ${resolvedLocation}`
-      : `Creado ${saved.name} en ${resolvedLocation}`;
+      ? this.t('agent.results.addExisting', { name: saved.name, location: resolvedLocation })
+      : this.t('agent.results.addNew', { name: saved.name, location: resolvedLocation });
 
     const message = this.createMessage('assistant', summary);
     message.data = {
       summary,
       details: [
-        `Cantidad: ${quantity}`,
-        `Ubicación: ${resolvedLocation}`,
-        expirationDate ? `Caduca: ${expirationDate}` : 'Sin caducidad',
+        this.t('agent.results.quantity', { value: quantity }),
+        this.t('agent.results.location', { value: resolvedLocation }),
+        expirationDate
+          ? this.t('agent.details.expiration', { value: expirationDate })
+          : this.t('agent.details.noExpiry'),
       ],
       item: saved,
     };
@@ -491,7 +517,7 @@ export class AgentService {
     const requestedQuantity = this.toOptionalNumber(args?.['quantity']);
 
     if (!name || !fromInput || !toInput) {
-      return this.errorResult('Faltan datos: necesito producto, origen y destino.');
+      return this.errorResult(this.t('agent.errors.missingMoveData'));
     }
 
     const [fromLocation, toLocation] = await Promise.all([
@@ -500,25 +526,25 @@ export class AgentService {
     ]);
     if (!fromLocation || !toLocation) {
       const options = await this.getLocationOptions();
-      const details = [`Orígenes/destino válidos: ${options.join(', ')}`];
-      return this.errorResult('No reconozco alguna de las ubicaciones indicadas.', details);
+      const details = [this.t('agent.details.origins', { value: options.join(', ') })];
+      return this.errorResult(this.t('agent.errors.invalidMoveLocation'), details);
     }
 
     const item = await this.findItemByName(name);
     if (!item) {
       const suggestions = await this.suggestProducts(name);
-      const details = suggestions.length ? [`Quizás querías decir: ${suggestions.join(', ')}`] : undefined;
-      return this.errorResult(`No encontré "${name}". ¿Seguro que existe?`, details);
+      const details = suggestions.length ? [this.t('agent.details.suggestions', { value: suggestions.join(', ') })] : undefined;
+      return this.errorResult(this.t('agent.errors.notFound', { name }), details);
     }
 
     const source = item.locations.find(loc => this.sameLocation(loc.locationId, fromLocation));
     if (!source) {
-      return this.errorResult(`"${name}" no está en ${fromLocation}.`);
+      return this.errorResult(this.t('agent.errors.notInSource', { name, location: fromLocation }));
     }
 
     const amountAvailable = this.sumBatches(source.batches);
     if (amountAvailable <= 0) {
-      return this.errorResult(`No hay unidades disponibles en ${fromLocation}.`);
+      return this.errorResult(this.t('agent.errors.noUnits', { location: fromLocation }));
     }
 
     const amountToMove = requestedQuantity && requestedQuantity > 0
@@ -551,15 +577,19 @@ export class AgentService {
     const saved = await this.pantryService.saveItem(updated);
     await this.pantryService.reloadFromStart();
 
-    const summary = `Movido ${amountToMove} de ${fromLocation} a ${toLocation}`;
+    const summary = this.t('agent.results.moveSummary', {
+      amount: amountToMove,
+      from: fromLocation,
+      to: toLocation,
+    });
     const message = this.createMessage('assistant', summary);
     message.data = {
       summary,
       details: [
-        `Producto: ${saved.name}`,
-        `Origen: ${fromLocation}`,
-        `Destino: ${toLocation}`,
-        `Cantidad: ${amountToMove}`,
+        this.t('agent.results.moveProduct', { value: saved.name }),
+        this.t('agent.results.moveFrom', { value: fromLocation }),
+        this.t('agent.results.moveTo', { value: toLocation }),
+        this.t('agent.results.moveQuantity', { value: amountToMove }),
       ],
       item: saved,
     };
@@ -581,44 +611,48 @@ export class AgentService {
     const delta = this.toNumber(args?.['quantityChange']);
 
     if (!name || !locationInput || !Number.isFinite(delta)) {
-      return this.errorResult('Faltan datos para ajustar stock (producto, ubicación y delta numérico).');
+      return this.errorResult(this.t('agent.errors.missingAdjustData'));
     }
 
     const location = await this.resolveLocation(locationInput);
     if (!location) {
       const options = await this.getLocationOptions();
-      const details = [`Ubicaciones disponibles: ${options.join(', ')}`];
-      return this.errorResult('No entiendo la ubicación indicada.', details);
+      const details = [this.t('agent.details.locations', { value: options.join(', ') })];
+      return this.errorResult(this.t('agent.errors.invalidLocation'), details);
     }
 
     const item = await this.findItemByName(name);
     if (!item) {
       const suggestions = await this.suggestProducts(name);
-      const details = suggestions.length ? [`Tal vez buscabas: ${suggestions.join(', ')}`] : undefined;
-      return this.errorResult(`No encontré "${name}".`, details);
+      const details = suggestions.length ? [this.t('agent.details.suggestions', { value: suggestions.join(', ') })] : undefined;
+      return this.errorResult(this.t('agent.errors.notFound', { name }), details);
     }
 
     const targetLocation = item.locations.find(loc => this.sameLocation(loc.locationId, location));
     if (!targetLocation) {
-      return this.errorResult(`"${name}" no tiene stock en ${location}.`);
+      return this.errorResult(this.t('agent.errors.noStock', { name, location }));
     }
 
     const currentQty = this.sumBatches(targetLocation.batches);
     const nextQty = Math.max(0, currentQty + delta);
     const updated = await this.pantryService.updateLocationQuantity(item._id, nextQty, targetLocation.locationId);
     if (!updated) {
-      return this.errorResult('No pude actualizar la cantidad.');
+      return this.errorResult(this.t('agent.errors.updateFailed'));
     }
     await this.pantryService.reloadFromStart();
 
-    const summary = `Ajustado ${name} en ${location} a ${nextQty}`;
+    const summary = this.t('agent.results.adjustSummary', {
+      name,
+      location,
+      quantity: nextQty,
+    });
     const message = this.createMessage('assistant', summary);
     message.data = {
       summary,
       details: [
-        `Cambio: ${delta >= 0 ? '+' : ''}${delta}`,
-        `Nueva cantidad: ${nextQty}`,
-        `Ubicación: ${location}`,
+        this.t('agent.results.adjustChange', { value: `${delta >= 0 ? '+' : ''}${delta}` }),
+        this.t('agent.results.adjustNewQuantity', { value: nextQty }),
+        this.t('agent.results.adjustLocation', { value: location }),
       ],
       item: updated,
     };
@@ -638,8 +672,8 @@ export class AgentService {
     const days = this.toNumber(args?.['days']) > 0 ? this.toNumber(args?.['days']) : 5;
     const items = await this.pantryService.getNearExpiry(days);
     const summary = items.length
-      ? `Encontrados ${items.length} productos que caducan en ${days} días`
-      : `Nada caduca en ${days} días`;
+      ? this.t('agent.results.expiringFound', { count: items.length, days })
+      : this.t('agent.results.expiringEmpty', { days });
     const message = this.createMessage('assistant', summary);
     message.data = {
       summary,
@@ -651,8 +685,8 @@ export class AgentService {
 
   private async handleGetProducts(): Promise<{ success: boolean; message: AgentMessage }> {
     const items = await this.pantryService.getAll();
-    const message = this.createMessage('assistant', `Hay ${items.length} productos en la despensa.`);
-    message.data = { summary: 'Listado completo recuperado', items };
+    const message = this.createMessage('assistant', this.t('agent.results.listSummary', { count: items.length }));
+    message.data = { summary: this.t('agent.results.listDetail'), items };
     message.modelContent = JSON.stringify({ action: 'getProducts', status: 'ok', count: items.length, items });
     return { success: true, message };
   }
@@ -674,11 +708,11 @@ export class AgentService {
     const ingredients = inputList.length ? inputList : autoIngredients;
 
     const recipePrompt = ingredients.length
-      ? `Utiliza estos ingredientes (prioriza los que caducan pronto): ${ingredients.join(', ')}. Devuelve 2-3 recetas concisas.`
-      : 'Genera 2 recetas sencillas usando productos básicos de despensa.';
+      ? this.t('agent.results.recipesPromptWith', { ingredients: ingredients.join(', ') })
+      : this.t('agent.results.recipesPromptAuto');
 
     const payload: AgentModelRequest = {
-      system: 'Eres un chef que propone recetas breves con pasos numerados.',
+      system: this.t('agent.results.recipesSystem'),
       messages: [
         { role: 'user', content: recipePrompt },
       ],
@@ -686,12 +720,14 @@ export class AgentService {
     };
 
     const recipeResponse = await this.callModel(payload);
-    const content = recipeResponse.content || recipeResponse.message?.content || 'Aquí tienes algunas ideas de recetas.';
+    const content = recipeResponse.content || recipeResponse.message?.content || this.t('agent.results.recipesFallback');
 
     const message = this.createMessage('assistant', content);
     message.data = {
-      summary: 'Recetas generadas',
-      details: ingredients.length ? [`Ingredientes usados: ${ingredients.join(', ')}`] : undefined,
+      summary: this.t('agent.results.recipesSummary'),
+      details: ingredients.length
+        ? [this.t('agent.results.recipesIngredients', { list: ingredients.join(', ') })]
+        : undefined,
     };
     message.modelContent = JSON.stringify({
       action: 'getRecipesWith',

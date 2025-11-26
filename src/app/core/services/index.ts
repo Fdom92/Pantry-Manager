@@ -5,3 +5,4 @@ export * from './user-settings.service';
 export * from './app-preferences.service';
 export * from './agent.service';
 export * from './language.service';
+export * from './revenuecat.service';

@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   agentApiUrl: 'http://localhost:4000/agent/process',
+  proApiUrl: 'http://localhost:4000/api/pro',
 };
 
 /*

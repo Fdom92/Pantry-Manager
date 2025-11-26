@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{ product?.name || 'Añadir compra' }}</ion-title>
+    <ion-title>{{ product?.name || ('shopping.purchaseModal.title' | translate) }}</ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="cancel()">
         <ion-icon slot="icon-only" name="close"></ion-icon>
@@ -12,7 +12,7 @@
 <ion-content class="ion-padding">
   <ion-list lines="full">
     <ion-item>
-      <ion-label position="stacked">Cantidad</ion-label>
+      <ion-label position="stacked">{{ 'shopping.purchaseModal.quantity' | translate }}</ion-label>
       <ion-input
         type="number"
         inputmode="decimal"
@@ -24,7 +24,7 @@
     </ion-item>
 
     <ion-item lines="full">
-      <ion-label>Sin caducidad</ion-label>
+      <ion-label>{{ 'shopping.purchaseModal.noExpiry' | translate }}</ion-label>
       <ion-toggle
         slot="end"
         justify="space-between"
@@ -37,7 +37,7 @@
       <ion-item>
         <ion-input
           type="date"
-          label="Fecha de caducidad"
+          label="{{ 'shopping.purchaseModal.expiration' | translate }}"
           labelPlacement="stacked"
           [(ngModel)]="expiryDate"
         ></ion-input>
@@ -46,7 +46,7 @@
 
     @if (locationOptions.length > 1) {
       <ion-item>
-        <ion-label position="stacked">Ubicación</ion-label>
+        <ion-label position="stacked">{{ 'shopping.purchaseModal.location' | translate }}</ion-label>
         <ion-select interface="popover" [(ngModel)]="location">
           @for (loc of locationOptions; track loc) {
             <ion-select-option [value]="loc">{{ getLocationLabel(loc) }}</ion-select-option>
@@ -60,10 +60,14 @@
 <ion-footer>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button fill="clear" color="medium" (click)="cancel()">Cancelar</ion-button>
+      <ion-button fill="clear" color="medium" (click)="cancel()">
+        {{ 'common.actions.cancel' | translate }}
+      </ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button color="success" [disabled]="!canConfirm" (click)="submit()">Añadir a la despensa</ion-button>
+      <ion-button color="success" [disabled]="!canConfirm" (click)="submit()">
+        {{ 'shopping.purchaseModal.submit' | translate }}
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-footer>

@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'upgrade.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="upgrade-hero">
+    <div class="pro-badge">
+      <ion-icon name="star"></ion-icon>
+      <span>PRO</span>
+    </div>
+    <h1>{{ 'upgrade.headline' | translate }}</h1>
+    <p>{{ 'upgrade.subtitle' | translate }}</p>
+  </div>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ 'upgrade.benefits.title' | translate }}</ion-card-title>
+      <ion-card-subtitle>{{ 'upgrade.benefits.subtitle' | translate }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list lines="none">
+        @for (key of benefitKeys; track key) {
+          <ion-item lines="none">
+            <ion-icon name="checkmark-circle-outline" color="success" slot="start"></ion-icon>
+            <ion-label>{{ key | translate }}</ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <div class="cta-block">
+    <ion-button expand="block" color="primary" size="large" (click)="onBuy()">
+      {{ 'upgrade.actions.subscribe' | translate }} <span *ngIf="offeringPrice">&nbsp;({{ offeringPrice }})</span>
+    </ion-button>
+    <ion-button expand="block" fill="clear" color="medium" (click)="maybeLater()">
+      {{ 'upgrade.actions.maybeLater' | translate }}
+    </ion-button>
+    <ion-button expand="block" fill="outline" color="secondary" (click)="onRestore()">
+      {{ 'upgrade.actions.restore' | translate }}
+    </ion-button>
+    <ion-note>
+      {{ 'upgrade.note' | translate }}
+    </ion-note>
+    <ion-badge color="success" *ngIf="isPro$ | async">{{ 'upgrade.alreadyPro' | translate }}</ion-badge>
+  </div>
+</ion-content>

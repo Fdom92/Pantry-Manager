@@ -7,6 +7,31 @@
 <ion-content class="ion-padding">
   <div class="settings-content">
 
+    @if (isPro$ | async) {
+      <ion-card color="light">
+        <ion-card-header>
+          <ion-card-title>{{ 'settings.pro.statusTitle' | translate }}</ion-card-title>
+          <ion-card-subtitle>{{ 'settings.pro.statusPro' | translate }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          {{ 'settings.pro.statusDescription' | translate }}
+        </ion-card-content>
+      </ion-card>
+    } @else {
+      <ion-card color="warning">
+        <ion-card-header>
+          <ion-card-title>{{ 'settings.pro.statusTitle' | translate }}</ion-card-title>
+          <ion-card-subtitle>{{ 'settings.pro.statusFree' | translate }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p>{{ 'settings.pro.upgradePrompt' | translate }}</p>
+          <ion-button expand="block" routerLink="/upgrade" color="dark">
+            {{ 'settings.pro.upgradeCta' | translate }}
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    }
+
     <ion-list lines="full">
       <ion-list-header>
         <ion-label>
@@ -52,6 +77,51 @@
             *ngIf="exportingData()"
           ></ion-spinner>
           {{ 'settings.data.exportAction' | translate }}
+        </ion-button>
+      </ion-item>
+    </ion-list>
+
+    <ion-list>
+      <ion-list-header>
+        <ion-label>
+          <h2>{{ 'settings.pro.title' | translate }}</h2>
+          <p>{{ 'settings.pro.subtitle' | translate }}</p>
+        </ion-label>
+        <ion-badge *ngIf="isPro$ | async; else freeBadge" color="success">
+          {{ 'settings.pro.badgePro' | translate }}
+        </ion-badge>
+        <ng-template #freeBadge>
+          <ion-badge color="medium">{{ 'settings.pro.badgeFree' | translate }}</ion-badge>
+        </ng-template>
+      </ion-list-header>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ 'settings.pro.cloudSync.title' | translate }}</h3>
+          <p>{{ 'settings.pro.cloudSync.subtitle' | translate }}</p>
+        </ion-label>
+        <ion-button slot="end" fill="clear" (click)="onCloudSync()">
+          {{ 'settings.pro.cloudSync.action' | translate }}
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ 'settings.pro.history.title' | translate }}</h3>
+          <p>{{ 'settings.pro.history.subtitle' | translate }}</p>
+        </ion-label>
+        <ion-button slot="end" fill="clear" (click)="onHistory()">
+          {{ 'settings.pro.history.action' | translate }}
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ 'settings.pro.recipes.title' | translate }}</h3>
+          <p>{{ 'settings.pro.recipes.subtitle' | translate }}</p>
+        </ion-label>
+        <ion-button slot="end" fill="clear" (click)="onAdvancedRecipes()">
+          {{ 'settings.pro.recipes.action' | translate }}
         </ion-button>
       </ion-item>
     </ion-list>

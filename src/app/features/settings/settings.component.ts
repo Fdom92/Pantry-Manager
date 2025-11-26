@@ -1,11 +1,12 @@
 import { Component, signal } from '@angular/core';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, NavController, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BaseDoc } from '@core/models';
 import { AppPreferencesService, StorageService } from '@core/services';
 import packageJson from '../../../../package.json';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { RevenuecatService } from '@core/services/revenuecat.service';
 
 const TOAST_DURATION = 1800;
 
@@ -21,12 +22,15 @@ export class SettingsComponent {
 
   readonly exportingData = signal(false);
   readonly resettingData = signal(false);
+  readonly isPro$ = this.revenuecat.isPro$;
 
   constructor(
     private readonly toastCtrl: ToastController,
     private readonly appPreferencesService: AppPreferencesService,
     private readonly storage: StorageService<BaseDoc>,
     private readonly translate: TranslateService,
+    private readonly revenuecat: RevenuecatService,
+    private readonly navCtrl: NavController,
   ) {}
 
   async ionViewWillEnter(): Promise<void> {
@@ -87,6 +91,24 @@ export class SettingsComponent {
       await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
     } finally {
       this.exportingData.set(false);
+    }
+  }
+
+  onCloudSync(): void {
+    if (this.ensureProAccess()) {
+      void this.presentToast(this.translate.instant('settings.pro.cloudSync.ready'), 'medium');
+    }
+  }
+
+  onHistory(): void {
+    if (this.ensureProAccess()) {
+      void this.presentToast(this.translate.instant('settings.pro.history.ready'), 'medium');
+    }
+  }
+
+  onAdvancedRecipes(): void {
+    if (this.ensureProAccess()) {
+      void this.presentToast(this.translate.instant('settings.pro.recipes.ready'), 'medium');
     }
   }
 
@@ -154,5 +176,13 @@ export class SettingsComponent {
       position: 'bottom',
     });
     await toast.present();
+  }
+
+  private ensureProAccess(): boolean {
+    if (this.revenuecat.isPro()) {
+      return true;
+    }
+    void this.navCtrl.navigateForward('/upgrade');
+    return false;
   }
 }

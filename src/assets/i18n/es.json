@@ -2,8 +2,12 @@
   "tabs": {
     "dashboard": "Inicio",
     "pantry": "Despensa",
+    "agent": "Agente",
     "shopping": "Compras",
     "settings": "Ajustes"
+  },
+  "pro": {
+    "locked": "PRO"
   },
   "common": {
     "actions": {
@@ -111,6 +115,81 @@
       "minStock": "Mín.: {{ amount }} {{ unit }}",
       "buy": "Comprar {{ amount }} {{ unit }}",
       "empty": "Nada que comprar por ahora. Todo está dentro de los niveles deseados."
+    },
+    "purchaseModal": {
+      "title": "Añadir compra",
+      "quantity": "Cantidad",
+      "noExpiry": "Sin caducidad",
+      "expiration": "Fecha de caducidad",
+      "location": "Ubicación",
+      "submit": "Añadir a la despensa"
+    }
+  },
+  "agent": {
+    "title": "Agente",
+    "thinking": "Pensando…",
+    "placeholder": "Escribe instrucciones como \"Mueve 2 yogures al frigo\"",
+    "actions": {
+      "send": "Enviar"
+    },
+    "roles": {
+      "user": "Tú",
+      "assistant": "Agente",
+      "tool": "Acción"
+    },
+    "messages": {
+      "processing": "Procesando acción…",
+      "noResponse": "No pude generar respuesta.",
+      "noEndpoint": "No hay endpoint configurado para el agente.",
+      "callFailed": "No se pudo contactar con el modelo.",
+      "toolUnavailable": "La herramienta \"{{ name }}\" no está disponible."
+    },
+    "errors": {
+      "missingName": "Falta el nombre del producto.",
+      "quantityPositive": "La cantidad debe ser mayor que 0.",
+      "unknownLocation": "No entiendo la ubicación. Prueba con despensa, nevera, cocina o congelador.",
+      "missingMoveData": "Faltan datos: necesito producto, origen y destino.",
+      "invalidMoveLocation": "No reconozco alguna de las ubicaciones indicadas.",
+      "notFound": "\"{{ name }}\" no fue encontrado. ¿Seguro que existe?",
+      "notInSource": "\"{{ name }}\" no está en {{ location }}.",
+      "noUnits": "No hay unidades disponibles en {{ location }}.",
+      "missingAdjustData": "Faltan datos para ajustar stock (producto, ubicación y delta numérico).",
+      "invalidLocation": "No entiendo la ubicación indicada.",
+      "noStock": "\"{{ name }}\" no tiene stock en {{ location }}.",
+      "updateFailed": "No pude actualizar la cantidad."
+    },
+    "details": {
+      "options": "Opciones válidas: {{ value }}",
+      "origins": "Orígenes/destino válidos: {{ value }}",
+      "locations": "Ubicaciones disponibles: {{ value }}",
+      "suggestions": "Quizás querías decir: {{ value }}",
+      "expiration": "Caduca: {{ value }}",
+      "noExpiry": "Sin caducidad"
+    },
+    "results": {
+      "addExisting": "Añadido stock a {{ name }} en {{ location }}",
+      "addNew": "Creado {{ name }} en {{ location }}",
+      "quantity": "Cantidad: {{ value }}",
+      "location": "Ubicación: {{ value }}",
+      "moveSummary": "Movido {{ amount }} de {{ from }} a {{ to }}",
+      "moveProduct": "Producto: {{ value }}",
+      "moveFrom": "Origen: {{ value }}",
+      "moveTo": "Destino: {{ value }}",
+      "moveQuantity": "Cantidad: {{ value }}",
+      "adjustSummary": "Ajustado {{ name }} en {{ location }} a {{ quantity }}",
+      "adjustChange": "Cambio: {{ value }}",
+      "adjustNewQuantity": "Nueva cantidad: {{ value }}",
+      "adjustLocation": "Ubicación: {{ value }}",
+      "expiringFound": "Encontrados {{ count }} productos que caducan en {{ days }} días",
+      "expiringEmpty": "Nada caduca en {{ days }} días",
+      "listSummary": "Hay {{ count }} productos en la despensa.",
+      "listDetail": "Listado completo recuperado",
+      "recipesPromptWith": "Utiliza estos ingredientes (prioriza los que caducan pronto): {{ ingredients }}. Devuelve 2-3 recetas concisas.",
+      "recipesPromptAuto": "Genera 2 recetas sencillas usando productos básicos de despensa.",
+      "recipesSystem": "Eres un chef que propone recetas breves con pasos numerados.",
+      "recipesFallback": "Aquí tienes algunas ideas de recetas.",
+      "recipesSummary": "Recetas generadas",
+      "recipesIngredients": "Ingredientes usados: {{ list }}"
     }
   },
   "pantry": {
@@ -192,6 +271,12 @@
       "earliest": "Caduca primero: {{ date }}",
       "noBatches": "Sin lotes registrados.",
       "totalQuantity": "{{ value }} total",
+      "locationMeta": {
+        "expires": "Caduca: {{ date }}",
+        "openedOne": "1 lote abierto",
+        "openedMany": "{{ count }} lotes abiertos",
+        "noExpiry": "Sin caducidad registrada"
+      },
       "batches": {
         "single": "1 lote",
         "plural": "{{ count }} lotes",
@@ -212,8 +297,58 @@
     },
     "confirmDelete": "¿Eliminar \"{{ name }}\"?"
   },
+  "upgrade": {
+    "title": "Hazte PRO",
+    "headline": "Desbloquea todo el poder de tu despensa",
+    "subtitle": "Automatización inteligente, copia en la nube y funciones prioritarias.",
+    "benefits": {
+      "title": "Todo lo que incluye PRO",
+      "subtitle": "Pensado para hogares con mucho movimiento.",
+      "agent": "Agente IA para gestionar la despensa sin manos.",
+      "cloudSync": "Sincronización y backup en la nube.",
+      "history": "Historial completo de cambios en tus productos.",
+      "predictions": "Recetas avanzadas y predicciones inteligentes."
+    },
+    "actions": {
+      "subscribe": "Ir a suscripción PRO en Google Play",
+      "maybeLater": "Ahora no",
+      "restore": "Restaurar compra"
+    },
+    "note": "Las suscripciones se gestionan desde tu cuenta de Google Play.",
+    "alreadyPro": "PRO activo ✅"
+  },
   "settings": {
     "title": "Ajustes",
+    "pro": {
+      "statusTitle": "Estado PRO",
+      "statusPro": "Usuario PRO",
+      "statusFree": "Versión gratuita",
+      "statusDescription": "Gracias por apoyar el proyecto. PRO está activo en este dispositivo.",
+      "upgradePrompt": "Hazte PRO para desbloquear funciones premium y la copia en la nube.",
+      "upgradeCta": "Hazte PRO",
+      "title": "Funciones PRO",
+      "subtitle": "Acciones protegidas solo para usuarios PRO.",
+      "badgePro": "PRO activo",
+      "badgeFree": "Gratis",
+      "cloudSync": {
+        "title": "Sync en la nube",
+        "subtitle": "Mantén tu despensa sincronizada en todos los dispositivos.",
+        "action": "Sincronizar",
+        "ready": "La sincronización está protegida para cuentas PRO. Próximamente."
+      },
+      "history": {
+        "title": "Historial",
+        "subtitle": "Consulta el registro completo de cambios.",
+        "action": "Abrir historial",
+        "ready": "El historial es solo para usuarios PRO."
+      },
+      "recipes": {
+        "title": "Recetas avanzadas y predicciones",
+        "subtitle": "Recomendaciones premium con IA.",
+        "action": "Desbloquear",
+        "ready": "Las recetas avanzadas son exclusivas PRO."
+      }
+    },
     "preferences": {
       "title": "Preferencias",
       "subtitle": "Personaliza el comportamiento de la app.",

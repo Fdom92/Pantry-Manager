@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ModalController } from '@ionic/angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PantryItem } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
 
@@ -18,13 +19,13 @@ export type PantryProduct = PantryItem;
 @Component({
   selector: 'app-add-purchase-modal',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
+  imports: [IonicModule, CommonModule, FormsModule, TranslateModule],
   templateUrl: './add-purchase-modal.component.html',
   styleUrls: ['./add-purchase-modal.component.scss'],
 })
 export class AddPurchaseModalComponent implements OnInit {
-  @Input() item!: ShoppingItem;
-  @Input() product!: PantryProduct;
+  @Input() item: ShoppingItem | null = null;
+  @Input() product: PantryProduct | null = null;
 
   @Output() confirm = new EventEmitter<{
     quantity: number;
@@ -37,7 +38,10 @@ export class AddPurchaseModalComponent implements OnInit {
   expiryDate: string | null = null;
   location = 'unassigned';
 
-  constructor(private readonly modalCtrl: ModalController) {}
+  constructor(
+    private readonly modalCtrl: ModalController,
+    private readonly translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
     this.initializeDefaults();
@@ -68,7 +72,7 @@ export class AddPurchaseModalComponent implements OnInit {
   }
 
   getLocationLabel(id: string): string {
-    return getLocationDisplayName(id, 'Despensa');
+    return getLocationDisplayName(id, this.translate.instant('locations.pantry'), this.translate);
   }
 
   onToggleNoExpiry(): void {
