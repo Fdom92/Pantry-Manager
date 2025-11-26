@@ -42,7 +42,7 @@ import {
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
-import { LanguageService } from '@core/services';
+import { AppPreferencesService, LanguageService } from '@core/services';
 
 registerLocaleData(localeEs);
 registerLocaleData(localeEn);
@@ -53,6 +53,10 @@ function httpTranslateLoader(http: HttpClient): TranslateHttpLoader {
 
 function initLanguage(language: LanguageService): () => Promise<void> {
   return () => language.init();
+}
+
+function initPreferences(appPreferences: AppPreferencesService): () => Promise<void> {
+  return () => appPreferences.getPreferences().then(() => void 0);
 }
 
 function localeFactory(language: LanguageService): string {
@@ -108,6 +112,7 @@ bootstrapApplication(AppComponent, {
       })
     ),
     { provide: APP_INITIALIZER, useFactory: initLanguage, deps: [LanguageService], multi: true },
+    { provide: APP_INITIALIZER, useFactory: initPreferences, deps: [AppPreferencesService], multi: true },
     { provide: LOCALE_ID, useFactory: localeFactory, deps: [LanguageService] },
   ],
 }).catch(err => console.error(err));

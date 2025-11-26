@@ -1,8 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { BaseDoc } from '@core/models';
+import { AppThemePreference, BaseDoc } from '@core/models';
 import { AppPreferencesService, StorageService } from '@core/services';
 import packageJson from '../../../../package.json';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -21,6 +21,8 @@ export class SettingsComponent {
 
   readonly exportingData = signal(false);
   readonly resettingData = signal(false);
+  readonly updatingTheme = signal(false);
+  readonly themePreference = computed<AppThemePreference>(() => this.appPreferencesService.preferences().theme);
 
   constructor(
     private readonly toastCtrl: ToastController,
@@ -87,6 +89,32 @@ export class SettingsComponent {
       await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
     } finally {
       this.exportingData.set(false);
+    }
+  }
+
+  async onThemeChanged(value: string | number | null | undefined): Promise<void> {
+    const normalized = typeof value === 'string' ? value : value != null ? String(value) : null;
+    const nextTheme: AppThemePreference =
+      normalized === 'light' || normalized === 'dark'
+        ? normalized
+        : 'system';
+
+    if (nextTheme === this.themePreference()) {
+      return;
+    }
+
+    this.updatingTheme.set(true);
+    try {
+      const current = this.appPreferencesService.preferences();
+      await this.appPreferencesService.savePreferences({
+        ...current,
+        theme: nextTheme,
+      });
+    } catch (err) {
+      console.error('[SettingsComponent] onThemeChanged error', err);
+      await this.presentToast(this.translate.instant('settings.appearance.error'), 'danger');
+    } finally {
+      this.updatingTheme.set(false);
     }
   }
 

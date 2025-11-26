@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{ product?.name || 'Añadir compra' }}</ion-title>
+    <ion-title>{{ product.name || 'Añadir compra' }}</ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="cancel()">
         <ion-icon slot="icon-only" name="close"></ion-icon>
@@ -23,26 +23,14 @@
       ></ion-input>
     </ion-item>
 
-    <ion-item lines="full">
-      <ion-label>Sin caducidad</ion-label>
-      <ion-toggle
-        slot="end"
-        justify="space-between"
-        [checked]="noExpiry"
-        (ionChange)="noExpiry = $event.detail.checked; onToggleNoExpiry()"
-      ></ion-toggle>
+    <ion-item>
+      <ion-input
+        type="date"
+        label="Fecha de caducidad (opcional)"
+        labelPlacement="stacked"
+        [(ngModel)]="expiryDate"
+      ></ion-input>
     </ion-item>
-
-    @if (!noExpiry) {
-      <ion-item>
-        <ion-input
-          type="date"
-          label="Fecha de caducidad"
-          labelPlacement="stacked"
-          [(ngModel)]="expiryDate"
-        ></ion-input>
-      </ion-item>
-    }
 
     @if (locationOptions.length > 1) {
       <ion-item>

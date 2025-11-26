@@ -33,7 +33,6 @@ export class AddPurchaseModalComponent implements OnInit {
   }>();
 
   quantity = 1;
-  noExpiry = false;
   expiryDate: string | null = null;
   location = 'unassigned';
 
@@ -64,17 +63,11 @@ export class AddPurchaseModalComponent implements OnInit {
   }
 
   get canConfirm(): boolean {
-    return this.quantity > 0 && Boolean(this.location) && (this.noExpiry || Boolean(this.expiryDate));
+    return this.quantity > 0 && Boolean(this.location);
   }
 
   getLocationLabel(id: string): string {
     return getLocationDisplayName(id, 'Despensa');
-  }
-
-  onToggleNoExpiry(): void {
-    if (this.noExpiry) {
-      this.expiryDate = null;
-    }
   }
 
   onQuantityInput(event: CustomEvent): void {
@@ -93,7 +86,7 @@ export class AddPurchaseModalComponent implements OnInit {
     }
     const payload = {
       quantity: this.quantity,
-      expiryDate: this.noExpiry ? null : this.expiryDate,
+      expiryDate: this.expiryDate || null,
       location: this.location,
     };
     this.confirm.emit(payload);

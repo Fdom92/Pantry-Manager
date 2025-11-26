@@ -433,10 +433,6 @@
   color: var(--ion-color-success);
 }
 
-:host-context(.dark) .summary-chips ion-chip {
-  --background: rgba(var(--ion-color-light-rgb, 255, 255, 255), 0.08);
-}
-
 :host-context(.dark) .item-card {
   background: rgba(var(--ion-color-step-100, 18, 18, 18), 0.95);
   border-color: rgba(var(--ion-color-step-250, 72, 72, 72), 0.45);
@@ -484,4 +480,18 @@ ion-modal ion-list {
 ion-card-header {
   padding-bottom: 0;
   padding-top: 0;
+}
+
+.create-item-modal-content {
+  --padding-bottom: 24px;
+}
+
+.create-footer {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+.create-footer ion-button {
+  width: 100%;
 }

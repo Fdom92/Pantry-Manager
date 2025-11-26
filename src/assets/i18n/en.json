@@ -222,6 +222,16 @@
         "device": "Matches your device language automatically."
       }
     },
+    "appearance": {
+      "title": "Appearance",
+      "subtitle": "Choose how the app looks.",
+      "theme": "Theme",
+      "description": "Switch between light, dark or follow the system.",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "error": "Could not update the theme."
+    },
     "languages": {
       "es": "Spanish",
       "en": "English"
