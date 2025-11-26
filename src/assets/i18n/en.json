@@ -103,6 +103,14 @@
       "basic-out": "Staple out of stock",
       "empty": "Out of stock"
     },
+    "purchaseModal": {
+      "title": "Add purchase",
+      "quantity": "Quantity",
+      "quantityPlaceholder": "0",
+      "expiry": "Expiry date (optional)",
+      "location": "Location",
+      "addToPantry": "Add to pantry"
+    },
     "suggestions": {
       "title": "Suggested purchases",
       "loading": "Building shopping list…",

@@ -6,7 +6,7 @@ import { PantryItem, MeasurementUnit } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '@core/services';
-import { AddPurchaseModalComponent } from '../../components/add-purchase-modal/add-purchase-modal.component';
+import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
 import { PantryService } from '@core/services';
 
 type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';

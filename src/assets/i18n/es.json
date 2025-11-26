@@ -103,6 +103,14 @@
       "basic-out": "Básico sin stock",
       "empty": "Sin stock"
     },
+    "purchaseModal": {
+      "title": "Añadir compra",
+      "quantity": "Cantidad",
+      "quantityPlaceholder": "0",
+      "expiry": "Fecha de caducidad (opcional)",
+      "location": "Ubicación",
+      "addToPantry": "Añadir a la despensa"
+    },
     "suggestions": {
       "title": "Compras sugeridas",
       "loading": "Generando lista de compras…",
