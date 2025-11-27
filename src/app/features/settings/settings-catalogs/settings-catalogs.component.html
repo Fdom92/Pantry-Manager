@@ -1,11 +1,11 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Catálogos</ion-title>
-  </ion-toolbar>
-</ion-header>
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/settings"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'settings.catalogs.title' | translate }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
 <ion-content>
   @if (loading()) {
@@ -15,15 +15,15 @@
     <ion-list lines="full">
       <ion-list-header>
         <ion-label>
-          <h2>Ubicaciones</h2>
-          <p>Personaliza las ubicaciones disponibles al crear o editar productos.</p>
+          <h2>{{ 'settings.catalogs.locations.title' | translate }}</h2>
+          <p>{{ 'settings.catalogs.locations.subtitle' | translate }}</p>
         </ion-label>
       </ion-list-header>
 
       @if (!locationOptionsDraft().length) {
         <ion-item lines="none">
           <ion-text color="medium">
-            Añade una ubicación para empezar.
+            {{ 'settings.catalogs.locations.empty' | translate }}
           </ion-text>
         </ion-item>
       }
@@ -31,7 +31,7 @@
       @for (location of locationOptionsDraft(); track $index; let i = $index) {
         <ion-item>
           <ion-input
-            label="Ubicación {{ i + 1 }}"
+            label="{{ 'settings.catalogs.locations.field' | translate:{ index: i + 1 } }}"
             labelPlacement="stacked"
             [value]="location"
             (ionInput)="onLocationOptionInput(i, $event)"
@@ -54,7 +54,7 @@
           size="small"
           (click)="addLocationOption()">
           <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-          Añadir ubicación
+          {{ 'settings.catalogs.locations.add' | translate }}
         </ion-button>
         <ion-button
           fill="clear"
@@ -62,37 +62,23 @@
           color="medium"
           (click)="restoreDefaultLocationOptions()">
           <ion-icon slot="start" name="refresh-outline"></ion-icon>
-          Restaurar valores clásicos
+          {{ 'settings.catalogs.restoreDefaults' | translate }}
         </ion-button>
       </ion-item>
     </ion-list>
 
-    <div class="catalog-actions">
-      <ion-button
-        expand="block"
-        (click)="saveLocationOptions()"
-        [disabled]="!hasLocationChanges() || savingLocations()">
-        <ion-spinner
-          slot="start"
-          name="dots"
-          *ngIf="savingLocations()">
-        </ion-spinner>
-        Guardar ubicaciones
-      </ion-button>
-    </div>
-
     <ion-list lines="full">
       <ion-list-header>
         <ion-label>
-          <h2>Supermercados</h2>
-          <p>Define la lista disponible al asignar supermercados en los productos.</p>
+          <h2>{{ 'settings.catalogs.supermarkets.title' | translate }}</h2>
+          <p>{{ 'settings.catalogs.supermarkets.subtitle' | translate }}</p>
         </ion-label>
       </ion-list-header>
 
       @if (!supermarketOptionsDraft().length) {
         <ion-item lines="none">
           <ion-text color="medium">
-            Añade un supermercado para empezar.
+            {{ 'settings.catalogs.supermarkets.empty' | translate }}
           </ion-text>
         </ion-item>
       }
@@ -100,7 +86,7 @@
       @for (supermarket of supermarketOptionsDraft(); track $index; let i = $index) {
         <ion-item>
           <ion-input
-            label="Supermercado {{ i + 1 }}"
+            label="{{ 'settings.catalogs.supermarkets.field' | translate:{ index: i + 1 } }}"
             labelPlacement="stacked"
             [value]="supermarket"
             (ionInput)="onSupermarketOptionInput(i, $event)"
@@ -123,7 +109,7 @@
           size="small"
           (click)="addSupermarketOption()">
           <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-          Añadir supermercado
+          {{ 'settings.catalogs.supermarkets.add' | translate }}
         </ion-button>
         <ion-button
           fill="clear"
@@ -131,37 +117,23 @@
           color="medium"
           (click)="restoreDefaultSupermarketOptions()">
           <ion-icon slot="start" name="refresh-outline"></ion-icon>
-          Restaurar valores clásicos
+          {{ 'settings.catalogs.restoreDefaults' | translate }}
         </ion-button>
       </ion-item>
     </ion-list>
 
-    <div class="catalog-actions">
-      <ion-button
-        expand="block"
-        (click)="saveSupermarketOptions()"
-        [disabled]="!hasSupermarketChanges() || savingSupermarkets()">
-        <ion-spinner
-          slot="start"
-          name="dots"
-          *ngIf="savingSupermarkets()">
-        </ion-spinner>
-        Guardar supermercados
-      </ion-button>
-    </div>
-
     <ion-list lines="full">
       <ion-list-header>
         <ion-label>
-          <h2>Unidades</h2>
-          <p>Gestiona las unidades disponibles al registrar cantidades.</p>
+          <h2>{{ 'settings.catalogs.units.title' | translate }}</h2>
+          <p>{{ 'settings.catalogs.units.subtitle' | translate }}</p>
         </ion-label>
       </ion-list-header>
 
       @if (!unitOptionsDraft().length) {
         <ion-item lines="none">
           <ion-text color="medium">
-            Añade una unidad para empezar.
+            {{ 'settings.catalogs.units.empty' | translate }}
           </ion-text>
         </ion-item>
       }
@@ -169,7 +141,7 @@
       @for (unit of unitOptionsDraft(); track $index; let i = $index) {
         <ion-item>
           <ion-input
-            label="Unidad {{ i + 1 }}"
+            label="{{ 'settings.catalogs.units.field' | translate:{ index: i + 1 } }}"
             labelPlacement="stacked"
             [value]="unit"
             (ionInput)="onUnitOptionInput(i, $event)"
@@ -192,7 +164,7 @@
           size="small"
           (click)="addUnitOption()">
           <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-          Añadir unidad
+          {{ 'settings.catalogs.units.add' | translate }}
         </ion-button>
         <ion-button
           fill="clear"
@@ -200,7 +172,7 @@
           color="medium"
           (click)="restoreDefaultUnitOptions()">
           <ion-icon slot="start" name="refresh-outline"></ion-icon>
-          Restaurar valores clásicos
+          {{ 'settings.catalogs.restoreDefaults' | translate }}
         </ion-button>
       </ion-item>
     </ion-list>
@@ -208,14 +180,14 @@
     <div class="catalog-actions">
       <ion-button
         expand="block"
-        (click)="saveUnitOptions()"
-        [disabled]="!hasUnitChanges() || savingUnits()">
+        (click)="saveCatalogs()"
+        [disabled]="!hasAnyChanges() || savingCatalogs()">
         <ion-spinner
           slot="start"
           name="dots"
-          *ngIf="savingUnits()">
+          *ngIf="savingCatalogs()">
         </ion-spinner>
-        Guardar unidades
+        {{ 'settings.catalogs.saveAction' | translate }}
       </ion-button>
     </div>
   </div>

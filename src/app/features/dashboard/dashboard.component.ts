@@ -5,11 +5,13 @@ import { ItemLocationStock, PantryItem, ES_DATE_FORMAT_OPTIONS } from '@core/mod
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { getLocationDisplayName } from '@core/utils';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LanguageService } from '@core/services';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, TranslateModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
@@ -29,7 +31,9 @@ export class DashboardComponent {
   readonly recentItems = computed(() => this.computeRecentItems(this.items()));
 
   constructor(
-    private readonly pantryStore: PantryStoreService
+    private readonly pantryStore: PantryStoreService,
+    private readonly translate: TranslateService,
+    private readonly languageService: LanguageService,
   ) {
     effect(
       () => {
@@ -74,7 +78,7 @@ export class DashboardComponent {
     const confirmed =
       typeof window === 'undefined'
         ? true
-        : window.confirm('Esto eliminará todos los productos caducados. ¿Quieres continuar?');
+        : window.confirm(this.translate.instant('dashboard.confirmDeleteExpired'));
 
     if (!confirmed) {
       return;
@@ -135,9 +139,18 @@ export class DashboardComponent {
         const batches = Array.isArray(location.batches) ? location.batches : [];
         if (batches.length) {
           const earliest = this.getLocationEarliestExpiry(location);
-          const batchLabel = batches.length === 1 ? '1 lote' : `${batches.length} lotes`;
-          const extra = earliest ? `${batchLabel}, cad ${this.formatShortDate(earliest)}` : batchLabel;
-          return `${quantity} ${unit} · ${name} (${extra})`;
+          const batchLabel = this.translate.instant(
+            batches.length === 1 ? 'dashboard.batches.single' : 'dashboard.batches.plural',
+            { count: batches.length }
+          );
+          const extra = earliest
+            ? this.translate.instant('dashboard.batches.withExpiry', {
+                batchLabel,
+                date: this.formatShortDate(earliest),
+              })
+            : batchLabel;
+          const extraSegment = extra ? ` (${extra})` : '';
+          return `${quantity} ${unit} · ${name}${extraSegment}`;
         }
         return `${quantity} ${unit} · ${name}`;
       })
@@ -146,7 +159,7 @@ export class DashboardComponent {
 
   /** Map raw location ids into friendly labels for dashboard display. */
   private formatLocationName(id?: string): string {
-    return getLocationDisplayName(id, 'Sin ubicación');
+    return getLocationDisplayName(id, this.translate.instant('common.locations.none'), this.translate);
   }
 
   private getLocationQuantity(location: ItemLocationStock): number {
@@ -178,12 +191,13 @@ export class DashboardComponent {
   }
 
   private formatShortDate(value: string): string {
+    const locale = this.languageService.getCurrentLocale();
     try {
       const parsed = new Date(value);
       if (Number.isNaN(parsed.getTime())) {
         return value;
       }
-      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
+      return parsed.toLocaleDateString(locale, ES_DATE_FORMAT_OPTIONS.numeric);
     } catch {
       return value;
     }
@@ -193,13 +207,14 @@ export class DashboardComponent {
     if (!value) {
       return '';
     }
+    const locale = this.languageService.getCurrentLocale();
     try {
       const parsed = new Date(value);
       if (Number.isNaN(parsed.getTime())) {
         return '';
       }
-      const datePart = parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
-      const timePart = parsed.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      const datePart = parsed.toLocaleDateString(locale, ES_DATE_FORMAT_OPTIONS.numeric);
+      const timePart = parsed.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
       return `${datePart} ${timePart}`;
     } catch {
       return '';
@@ -219,16 +234,17 @@ export class DashboardComponent {
     options: Intl.DateTimeFormatOptions
   ): string {
     if (!value) {
-      return 'Sin fecha';
+      return this.translate.instant('common.dates.none');
     }
+    const locale = this.languageService.getCurrentLocale();
     try {
       const parsed = typeof value === 'string' ? new Date(value) : value;
       if (Number.isNaN(parsed.getTime())) {
-        return 'Sin fecha';
+        return this.translate.instant('common.dates.none');
       }
-      return parsed.toLocaleDateString('es-ES', options);
+      return parsed.toLocaleDateString(locale, options);
     } catch {
-      return 'Sin fecha';
+      return this.translate.instant('common.dates.none');
     }
   }
 }

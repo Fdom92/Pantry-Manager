@@ -1,109 +1,137 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Ajustes</ion-title>
+    <ion-title>{{ 'settings.title' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
   <div class="settings-content">
-    <ion-list lines="full">
-      <ion-list-header>
-        <ion-label>
-          <h2>Gestión de datos</h2>
-          <p>Controla el almacenamiento local de la app.</p>
-        </ion-label>
-      </ion-list-header>
 
-      <ion-item lines="none">
-        <ion-label>
-          <h3>Limpiar datos / Restablecer app</h3>
-          <p>Elimina toda la información guardada en este dispositivo.</p>
-        </ion-label>
-        <ion-button
-          color="danger"
-          fill="outline"
-          slot="end"
-          (click)="onResetApp()"
-          [disabled]="resettingData()"
-        >
-          <ion-spinner
-            slot="start"
-            name="dots"
-            *ngIf="resettingData()"
-          ></ion-spinner>
-          Limpiar
-        </ion-button>
-      </ion-item>
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>{{ 'settings.appearance.title' | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ 'settings.appearance.subtitle' | translate }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item lines="none" class="theme-item">
+            <ion-label>
+              <h3>{{ 'settings.appearance.theme' | translate }}</h3>
+              <p>{{ 'settings.appearance.description' | translate }}</p>
+            </ion-label>
+            <ion-select
+              [value]="themePreference()"
+              (ionChange)="onThemeChanged($event.detail.value)"
+              [disabled]="updatingTheme()"
+              interface="popover"
+              class="theme-select"
+            >
+              <ion-select-option value="light">{{ 'settings.appearance.light' | translate }}</ion-select-option>
+              <ion-select-option value="dark">{{ 'settings.appearance.dark' | translate }}</ion-select-option>
+              <ion-select-option value="system">{{ 'settings.appearance.system' | translate }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
 
-      <ion-item lines="none">
-        <ion-label>
-          <h3>Exportar datos</h3>
-          <p>Descarga un fichero JSON con tus datos actuales.</p>
-        </ion-label>
-        <ion-button
-          slot="end"
-          (click)="onExportData()"
-          [disabled]="exportingData()"
-        >
-          <ion-spinner
-            slot="start"
-            name="dots"
-            *ngIf="exportingData()"
-          ></ion-spinner>
-          Exportar
-        </ion-button>
-      </ion-item>
-    </ion-list>
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>{{ 'settings.data.title' | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ 'settings.data.subtitle' | translate }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ 'settings.data.resetTitle' | translate }}</h3>
+              <p>{{ 'settings.data.resetDescription' | translate }}</p>
+            </ion-label>
+            <ion-button
+              color="danger"
+              fill="outline"
+              slot="end"
+              (click)="onResetApp()"
+              [disabled]="resettingData()"
+            >
+              <ion-spinner
+                slot="start"
+                name="dots"
+                *ngIf="resettingData()"
+              ></ion-spinner>
+              {{ 'settings.data.resetAction' | translate }}
+            </ion-button>
+          </ion-item>
 
-    <ion-list>
-      <ion-item
-        lines="none"
-        button
-        detail="true"
-        routerLink="/settings/catalogos">
-        <ion-label>
-          <h3>Catálogos</h3>
-          <p>Gestiona las listas reutilizadas al organizar la despensa.</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ 'settings.data.exportTitle' | translate }}</h3>
+              <p>{{ 'settings.data.exportDescription' | translate }}</p>
+            </ion-label>
+            <ion-button
+              slot="end"
+              (click)="onExportData()"
+              [disabled]="exportingData()"
+            >
+              <ion-spinner
+                slot="start"
+                name="dots"
+                *ngIf="exportingData()"
+              ></ion-spinner>
+              {{ 'settings.data.exportAction' | translate }}
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
 
-    <ion-list>
-      <ion-list-header>
-        <ion-label>
-          <h2>Información</h2>
-          <p>Detalles rápidos de la aplicación.</p>
-        </ion-label>
-      </ion-list-header>
+    <ion-card class="settings-card">
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item
+            lines="none"
+            button
+            detail="true"
+            routerLink="/settings/catalogos">
+            <ion-label>
+              <h3>{{ 'settings.catalogs.title' | translate }}</h3>
+              <p>{{ 'settings.catalogs.subtitle' | translate }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
 
-      <ion-item lines="none">
-        <ion-label>
-          <h3>Versión</h3>
-          <p>{{ appVersion }}</p>
-        </ion-label>
-      </ion-item>
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>{{ 'settings.info.title' | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ 'settings.info.subtitle' | translate }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ 'settings.info.version' | translate }}</h3>
+              <p>{{ appVersion }}</p>
+            </ion-label>
+          </ion-item>
 
-      <ion-item lines="none">
-        <ion-label>
-          <h3>Última sincronización</h3>
-          <p>{{ lastSyncDisplay() }}</p>
-        </ion-label>
-      </ion-item>
-
-      <ion-item lines="none">
-        <ion-label>
-          <h3>Enviar comentarios</h3>
-          <p>Comparte sugerencias o reporta incidencias.</p>
-        </ion-label>
-        <ion-button
-          slot="end"
-          fill="outline"
-          color="primary"
-          href="mailto:feedback@pantry-manager.app?subject=Comentarios%20Pantry%20Manager"
-        >
-          Enviar comentarios
-        </ion-button>
-      </ion-item>
-    </ion-list>
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ 'settings.info.feedbackTitle' | translate }}</h3>
+              <p>{{ 'settings.info.feedbackSubtitle' | translate }}</p>
+            </ion-label>
+            <ion-button
+              slot="end"
+              fill="outline"
+              color="primary"
+              href="mailto:hola@pantry-manager.app?subject=Comentarios%20Pantry%20Manager"
+            >
+              {{ 'settings.info.feedbackAction' | translate }}
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
   </div>
 </ion-content>

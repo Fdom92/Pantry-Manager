@@ -2,11 +2,14 @@
   position: relative;
   overflow: hidden;
   border-radius: 18px;
-  background: #1c1c1e;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(120deg, rgba(15, 23, 42, 0.05), #ffffff 60%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
   padding: 0;
-  color: #f4f4f5;
-  --card-accent: #2f2f33;
+  color: #0f172a;
+  --card-accent: #e2e8f0;
+  --card-title: #0f172a;
+  --card-muted: #475569;
+  --card-icon: #64748b;
   transition: transform 180ms ease, box-shadow 220ms ease, border-color 180ms ease;
   margin: 0;
 }
@@ -22,30 +25,30 @@
 
 .pantry-item-card.state-expired {
   --card-accent: #dc2626;
-  border-color: rgba(220, 38, 38, 0.45);
-  background: linear-gradient(120deg, rgba(220, 38, 38, 0.18), #1c1c1e 55%);
+  border-color: rgba(220, 38, 38, 0.28);
+  background: linear-gradient(120deg, rgba(220, 38, 38, 0.14), #ffffff 60%);
 }
 
 .pantry-item-card.state-expiring {
   --card-accent: #facc15;
-  border-color: rgba(250, 204, 21, 0.35);
-  background: linear-gradient(120deg, rgba(250, 204, 21, 0.14), #1c1c1e 55%);
+  border-color: rgba(250, 204, 21, 0.26);
+  background: linear-gradient(120deg, rgba(250, 204, 21, 0.12), #ffffff 60%);
 }
 
 .pantry-item-card.state-low-stock {
   --card-accent: #fb923c;
-  border-color: rgba(251, 146, 60, 0.4);
-  background: linear-gradient(120deg, rgba(251, 146, 60, 0.2), #1c1c1e 55%);
+  border-color: rgba(251, 146, 60, 0.28);
+  background: linear-gradient(120deg, rgba(251, 146, 60, 0.15), #ffffff 60%);
 }
 
 .pantry-item-card.state-ok {
   --card-accent: #16a34a;
-  border-color: rgba(22, 163, 74, 0.4);
-  background: linear-gradient(120deg, rgba(22, 163, 74, 0.18), #1c1c1e 55%);
+  border-color: rgba(22, 163, 74, 0.26);
+  background: linear-gradient(120deg, rgba(22, 163, 74, 0.12), #ffffff 60%);
 }
 
 .pantry-item-card.is-expanded {
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
   transform: translateY(-1px);
   z-index: 5;
 }
@@ -94,7 +97,7 @@
 .summary-name {
   font-size: 1.05rem;
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--card-title);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -102,7 +105,7 @@
 
 .summary-toggle-icon {
   font-size: 20px;
-  color: rgba(148, 163, 184, 0.88);
+  color: var(--card-icon);
   transition: transform 160ms ease;
 }
 
@@ -117,7 +120,7 @@
   gap: 6px;
   flex-wrap: wrap;
   font-size: 0.70rem;
-  color: rgba(203, 213, 225, 0.86);
+  color: var(--card-muted);
 }
 
 .summary-date {
@@ -129,12 +132,51 @@
 
 .summary-date ion-icon {
   font-size: 17px;
-  color: rgba(148, 163, 184, 0.78);
+  color: var(--card-icon);
 }
 
 .summary-supermarket {
   font-size: 0.8rem;
-  color: rgba(148, 163, 184, 0.82);
+  color: var(--card-muted);
+}
+
+.summary-date,
+.summary-supermarket {
+  color: #0f172a;
+}
+
+.summary-date ion-icon {
+  color: #1e293b;
+}
+
+:host-context(.dark) .pantry-item-card {
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f4f4f5;
+  --card-accent: #2f2f33;
+  --card-title: #f8fafc;
+  --card-muted: rgba(203, 213, 225, 0.86);
+  --card-icon: rgba(148, 163, 184, 0.88);
+}
+
+:host-context(.dark) .pantry-item-card.state-expired {
+  border-color: rgba(220, 38, 38, 0.45);
+  background: linear-gradient(120deg, rgba(220, 38, 38, 0.18), #1c1c1e 55%);
+}
+
+:host-context(.dark) .pantry-item-card.state-expiring {
+  border-color: rgba(250, 204, 21, 0.35);
+  background: linear-gradient(120deg, rgba(250, 204, 21, 0.14), #1c1c1e 55%);
+}
+
+:host-context(.dark) .pantry-item-card.state-low-stock {
+  border-color: rgba(251, 146, 60, 0.4);
+  background: linear-gradient(120deg, rgba(251, 146, 60, 0.2), #1c1c1e 55%);
+}
+
+:host-context(.dark) .pantry-item-card.state-ok {
+  border-color: rgba(22, 163, 74, 0.4);
+  background: linear-gradient(120deg, rgba(22, 163, 74, 0.18), #1c1c1e 55%);
 }
 
 .status-chip {
@@ -203,11 +245,7 @@
   align-items: center;
   gap: 10px;
   font-size: 0.70rem;
-  color: rgba(226, 232, 240, 0.92);
-}
-
-.summary-row.meta {
-  color: rgba(148, 163, 184, 0.9);
+  color: rgba(148, 163, 184, 0.9)
 }
 
 .summary-row ion-icon {

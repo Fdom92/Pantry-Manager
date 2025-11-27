@@ -14,6 +14,7 @@ export class AppComponent {
 
   private async preloadPantryData(): Promise<void> {
     await this.pantryService.initialize();
-    await this.pantryService.reloadFromStart();
+    await this.pantryService.ensureFirstPageLoaded();
+    this.pantryService.startBackgroundLoad();
   }
 }

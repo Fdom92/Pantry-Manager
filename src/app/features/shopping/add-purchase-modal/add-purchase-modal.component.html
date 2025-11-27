@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ product.name || ('shopping.purchaseModal.title' | translate) }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="cancel()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list lines="full">
+    <ion-item>
+      <ion-label position="stacked">{{ 'shopping.purchaseModal.quantity' | translate }}</ion-label>
+      <ion-input
+        type="number"
+        inputmode="decimal"
+        [value]="quantity"
+        (ionInput)="onQuantityInput($event)"
+        min="0"
+        [placeholder]="'shopping.purchaseModal.quantityPlaceholder' | translate"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        type="date"
+        label="{{ 'shopping.purchaseModal.expiry' | translate }}"
+        labelPlacement="stacked"
+        [(ngModel)]="expiryDate"
+      ></ion-input>
+    </ion-item>
+
+    @if (locationOptions.length > 1) {
+      <ion-item>
+        <ion-label position="stacked">{{ 'shopping.purchaseModal.location' | translate }}</ion-label>
+        <ion-select interface="popover" [(ngModel)]="location">
+          @for (loc of locationOptions; track loc) {
+            <ion-select-option [value]="loc">{{ getLocationLabel(loc) }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+    }
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" color="medium" (click)="cancel()">
+        {{ 'common.actions.cancel' | translate }}
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button color="success" [disabled]="!canConfirm" (click)="submit()">
+        {{ 'shopping.purchaseModal.addToPantry' | translate }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

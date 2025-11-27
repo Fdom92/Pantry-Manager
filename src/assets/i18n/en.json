@@ -1,0 +1,311 @@
+{
+  "tabs": {
+    "dashboard": "Home",
+    "pantry": "Pantry",
+    "shopping": "Shopping",
+    "settings": "Settings"
+  },
+  "common": {
+    "actions": {
+      "close": "Close",
+      "cancel": "Cancel",
+      "save": "Save",
+      "apply": "Apply",
+      "clear": "Clear"
+    },
+    "dates": {
+      "none": "No date"
+    },
+    "locations": {
+      "none": "No location"
+    }
+  },
+  "locations": {
+    "pantry": "Pantry",
+    "kitchen": "Kitchen",
+    "fridge": "Fridge",
+    "freezer": "Freezer",
+    "bathroom": "Bathroom",
+    "freezerDrawer": "Freezer drawer",
+    "cupboard": "Cupboard",
+    "cellar": "Cellar",
+    "other": "Other",
+    "unassigned": "No location"
+  },
+  "dashboard": {
+    "title": "Home",
+    "confirmDeleteExpired": "This will delete all expired products. Continue?",
+    "summary": {
+      "title": "Pantry overview",
+      "toggle": "Toggle pantry overview",
+      "updated": "Updated {{ value }}",
+      "stats": {
+        "total": "Total items",
+        "lowStock": "Low stock",
+        "nearExpiry": "Near expiry",
+        "expired": "Expired"
+      }
+    },
+    "nearExpiry": {
+      "title": "Near expiry",
+      "subtitle": "In the next {{ days }} days",
+      "expires": "Expires {{ date }}",
+      "empty": "No items close to expiring."
+    },
+    "lowStock": {
+      "title": "Low stock alerts",
+      "subtitle": "At or below the minimum level",
+      "minLabel": "min {{ value }} {{ unit }}",
+      "empty": "All items are above their minimum level."
+    },
+    "batches": {
+      "single": "1 batch",
+      "plural": "{{ count }} batches",
+      "withExpiry": "{{ batchLabel }}, exp {{ date }}"
+    },
+    "expired": {
+      "title": "Expired items",
+      "deleteAria": "Delete expired items",
+      "expires": "Expired {{ date }}",
+      "badge": "Expired",
+      "empty": "No expired items right now."
+    },
+    "recent": {
+      "title": "Recently updated",
+      "updated": "Updated {{ date }}",
+      "badge": "New",
+      "empty": "No recent updates."
+    }
+  },
+  "shopping": {
+    "title": "Shopping",
+    "unassignedSupermarket": "No supermarket",
+    "summary": {
+      "title": "Shopping summary",
+      "collapse": "Collapse summary",
+      "expand": "Expand summary",
+      "productOne": "product",
+      "productMany": "products",
+      "toBuyIn": "to buy in",
+      "storeOne": "store",
+      "storeMany": "stores",
+      "ok": "All stored items meet their targets.",
+      "stats": {
+        "total": "Items to buy",
+        "basicOut": "Staples out of stock",
+        "basicLow": "Staples running low",
+        "lowStock": "Products below target"
+      }
+    },
+    "reasons": {
+      "below-min": "Below minimum",
+      "basic-low": "Staple running low",
+      "basic-out": "Staple out of stock",
+      "empty": "Out of stock"
+    },
+    "purchaseModal": {
+      "title": "Add purchase",
+      "quantity": "Quantity",
+      "quantityPlaceholder": "0",
+      "expiry": "Expiry date (optional)",
+      "location": "Location",
+      "addToPantry": "Add to pantry"
+    },
+    "suggestions": {
+      "title": "Suggested purchases",
+      "loading": "Building shopping list…",
+      "destination": "Suggested location: {{ location }}",
+      "totalStock": "Total stock: {{ amount }} {{ unit }}",
+      "minStock": "Min: {{ amount }} {{ unit }}",
+      "buy": "Buy {{ amount }} {{ unit }}",
+      "empty": "Nothing to buy for now. Everything is within desired levels."
+    }
+  },
+  "pantry": {
+    "title": "Pantry",
+    "filters": {
+      "quick": "Quick status filters",
+      "all": "All",
+      "desc": {
+        "all": "See all available products",
+        "normal": "Products without active alerts",
+        "low": "Need replenishment soon",
+        "expiring": "Expiring in a few days",
+        "expired": "Review and discard",
+        "basic": "Show only items marked as staples"
+      },
+      "status": {
+        "normal": "In stock",
+        "low": "Low stock",
+        "expiring": "Near expiry",
+        "expired": "Expired"
+      },
+      "basic": "Staples",
+      "title": "Filters",
+      "search": "Search products",
+      "category": "Category",
+      "location": "Location",
+      "sort": {
+        "label": "Sort by",
+        "name": "Name (A-Z)",
+        "quantity": "Quantity (high → low)",
+        "expiration": "Expiry (soonest first)"
+      }
+    },
+    "empty": {
+      "title": "Pantry overview",
+      "description": "There are no products yet. Add your first product to get started.",
+      "filters": "No product matches the current filters."
+    },
+    "group": {
+      "count": "{{ count }} items",
+      "expiring": "{{ count }} expiring",
+      "expired": "{{ count }} expired"
+    },
+    "batches": {
+      "title": "Product batches",
+      "count": "{{ count }} batches recorded",
+      "open": "Opened",
+      "edit": "Edit product"
+    },
+    "form": {
+      "editTitle": "Edit item",
+      "newTitle": "New item",
+      "name": "Name",
+      "namePlaceholder": "Rice, milk...",
+      "nameRequired": "Name is required.",
+      "category": "Category",
+      "categoryPlaceholder": "Cereals, dairy...",
+      "uncategorized": "Uncategorized",
+      "supermarket": "Supermarket",
+      "supermarketPlaceholder": "Select a supermarket",
+      "basic": "Pantry staple item",
+      "minThreshold": "Minimum quantity (alerts)",
+      "locationTitle": "Location {{ index }}",
+      "locationTotal": "Total: {{ total }} {{ unit }}",
+      "location": "Location",
+      "locationPlaceholder": "Select a location",
+      "batches": {
+        "title": "Batches",
+        "add": "Add batch",
+        "empty": "No batches yet. Add one to track expiry dates.",
+        "titleIndex": "Batch {{ index }}",
+        "quantity": "Quantity",
+        "expiry": "Expiration date",
+        "opened": "Opened"
+      },
+      "addLocation": "Add location"
+    },
+    "detail": {
+      "earliest": "Expires first: {{ date }}",
+      "noBatches": "No batches recorded.",
+      "totalQuantity": "{{ value }} total",
+      "batches": {
+        "single": "1 batch",
+        "plural": "{{ count }} batches",
+        "withExpiry": "exp {{ date }}"
+      }
+    },
+    "toasts": {
+      "locationRequired": "Select a location before saving.",
+      "supermarketRequired": "Select a supermarket before saving.",
+      "saveError": "Could not save the item.",
+      "deleted": "🗑️ Item deleted.",
+      "addedToShopping": "\"{{ name }}\" added to shopping suggestions.",
+      "createSuccess": "✅ {{ name }} added{{ quantity }}{{ breakdown }}.",
+      "locationsUpdated": "📦 Locations updated: {{ breakdown }}.",
+      "stockUpdated": "💾 Stock updated: {{ name }} ({{ quantity }}).",
+      "stockUpdatedSimple": "💾 Stock updated.",
+      "saved": "💾 Changes saved."
+    },
+    "confirmDelete": "Delete \"{{ name }}\"?"
+  },
+  "settings": {
+    "title": "Settings",
+    "preferences": {
+      "title": "Preferences",
+      "subtitle": "Customize how the app behaves.",
+      "language": {
+        "label": "Language",
+        "device": "Matches your device language automatically."
+      }
+    },
+    "appearance": {
+      "title": "Appearance",
+      "subtitle": "Choose how the app looks.",
+      "theme": "Theme",
+      "description": "Switch between light, dark or follow the system.",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "error": "Could not update the theme."
+    },
+    "languages": {
+      "es": "Spanish",
+      "en": "English"
+    },
+    "data": {
+      "title": "Data management",
+      "subtitle": "Control what is stored on this device.",
+      "resetTitle": "Clear data / Reset app",
+      "resetDescription": "Remove all information saved on this device.",
+      "resetAction": "Clear",
+      "exportTitle": "Export data",
+      "exportDescription": "Download a JSON file with your current data.",
+      "exportAction": "Export"
+    },
+    "reset": {
+      "confirm": "This will delete ALL local app data.\nDo you want to continue?",
+      "success": "Local data removed.",
+      "error": "Could not clear the app."
+    },
+    "export": {
+      "unavailable": "Export is not available in this environment.",
+      "readyToShare": "Data ready to share.",
+      "success": "Data exported.",
+      "error": "Could not export the data.",
+      "shareTitle": "Pantry Manager - Backup",
+      "shareText": "Export or share your pantry backup."
+    },
+    "loadError": "There was a problem loading settings.",
+    "catalogs": {
+      "title": "Catalogs",
+      "subtitle": "Manage reusable lists for organizing your pantry.",
+      "saveSuccess": "Catalogs updated.",
+      "saveError": "Could not save catalogs.",
+      "loadError": "Could not load catalogs.",
+      "restoreDefaults": "Restore classic values",
+      "saveAction": "Save changes",
+      "locations": {
+        "title": "Locations",
+        "subtitle": "Customize locations available when creating or editing products.",
+        "empty": "Add a location to get started.",
+        "field": "Location {{ index }}",
+        "add": "Add location"
+      },
+      "supermarkets": {
+        "title": "Supermarkets",
+        "subtitle": "Define the list shown when assigning supermarkets to products.",
+        "empty": "Add a supermarket to get started.",
+        "field": "Supermarket {{ index }}",
+        "add": "Add supermarket",
+        "other": "Other"
+      },
+      "units": {
+        "title": "Units",
+        "subtitle": "Manage units available when recording quantities.",
+        "empty": "Add a unit to get started.",
+        "field": "Unit {{ index }}",
+        "add": "Add unit"
+      }
+    },
+    "info": {
+      "title": "Information",
+      "subtitle": "Quick app details.",
+      "version": "Version",
+      "feedbackTitle": "Send feedback",
+      "feedbackSubtitle": "Share suggestions or report issues.",
+      "feedbackAction": "Send feedback"
+    }
+  }
+}

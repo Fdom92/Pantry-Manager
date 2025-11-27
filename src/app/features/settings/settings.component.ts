@@ -2,16 +2,17 @@ import { Component, computed, signal } from '@angular/core';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { BaseDoc, ES_DATE_FORMAT_OPTIONS } from '@core/models';
+import { AppThemePreference, BaseDoc } from '@core/models';
 import { AppPreferencesService, StorageService } from '@core/services';
 import packageJson from '../../../../package.json';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const TOAST_DURATION = 1800;
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [IonicModule, CommonModule, RouterLink],
+  imports: [IonicModule, CommonModule, RouterLink, TranslateModule],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
 })
@@ -20,14 +21,14 @@ export class SettingsComponent {
 
   readonly exportingData = signal(false);
   readonly resettingData = signal(false);
-  readonly lastSyncDisplay = computed(() =>
-    this.formatDate(this.appPreferencesService.preferences().lastSyncAt)
-  );
+  readonly updatingTheme = signal(false);
+  readonly themePreference = computed<AppThemePreference>(() => this.appPreferencesService.preferences().theme);
 
   constructor(
     private readonly toastCtrl: ToastController,
     private readonly appPreferencesService: AppPreferencesService,
     private readonly storage: StorageService<BaseDoc>,
+    private readonly translate: TranslateService,
   ) {}
 
   async ionViewWillEnter(): Promise<void> {
@@ -39,7 +40,7 @@ export class SettingsComponent {
       typeof window === 'undefined'
         ? true
         : window.confirm(
-            'Esto eliminará TODOS los datos locales de la aplicación.\n¿Quieres continuar?'
+            this.translate.instant('settings.reset.confirm')
           );
 
     if (!confirmed) {
@@ -50,10 +51,10 @@ export class SettingsComponent {
     try {
       await this.storage.clearAll();
       await this.appPreferencesService.reload();
-      await this.presentToast('Datos locales eliminados.', 'success');
+      await this.presentToast(this.translate.instant('settings.reset.success'), 'success');
     } catch (err) {
       console.error('[SettingsComponent] onResetApp error', err);
-      await this.presentToast('No se pudo limpiar la aplicación.', 'danger');
+      await this.presentToast(this.translate.instant('settings.reset.error'), 'danger');
     } finally {
       this.resettingData.set(false);
     }
@@ -61,36 +62,60 @@ export class SettingsComponent {
 
   async onExportData(): Promise<void> {
     if (typeof document === 'undefined') {
-      await this.presentToast('La exportación no está disponible en este entorno.', 'warning');
+      await this.presentToast(this.translate.instant('settings.export.unavailable'), 'warning');
       return;
     }
 
     this.exportingData.set(true);
     try {
       const docs = (await this.storage.all()).filter(doc => !doc._id.startsWith('_design/'));
-      const blob = new Blob([JSON.stringify(docs, null, 2)], {
-        type: 'application/json',
-      });
+      const json = JSON.stringify(docs, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
       const filename = this.buildExportFileName();
-      this.triggerDownload(blob, filename);
-      await this.presentToast('📦 Datos exportados.', 'success');
+      const file = new File([blob], filename, { type: 'application/json' });
+
+      const shared = await this.tryShareFile(file);
+      if (!shared) {
+        this.triggerDownload(blob, filename);
+      }
+      await this.presentToast(
+        shared
+          ? this.translate.instant('settings.export.readyToShare')
+          : this.translate.instant('settings.export.success'),
+        'success'
+      );
     } catch (err) {
       console.error('[SettingsComponent] onExportData error', err);
-      await this.presentToast('No se pudieron exportar los datos.', 'danger');
+      await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
     } finally {
       this.exportingData.set(false);
     }
   }
 
-  formatDate(iso: string | null | undefined): string {
-    if (!iso) {
-      return 'Sin sincronización registrada';
+  async onThemeChanged(value: string | number | null | undefined): Promise<void> {
+    const normalized = typeof value === 'string' ? value : value != null ? String(value) : null;
+    const nextTheme: AppThemePreference =
+      normalized === 'light' || normalized === 'dark'
+        ? normalized
+        : 'system';
+
+    if (nextTheme === this.themePreference()) {
+      return;
     }
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) {
-      return 'Sin sincronización registrada';
+
+    this.updatingTheme.set(true);
+    try {
+      const current = this.appPreferencesService.preferences();
+      await this.appPreferencesService.savePreferences({
+        ...current,
+        theme: nextTheme,
+      });
+    } catch (err) {
+      console.error('[SettingsComponent] onThemeChanged error', err);
+      await this.presentToast(this.translate.instant('settings.appearance.error'), 'danger');
+    } finally {
+      this.updatingTheme.set(false);
     }
-    return date.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
   }
 
   private async ensurePreferencesLoaded(): Promise<void> {
@@ -98,7 +123,7 @@ export class SettingsComponent {
       await this.appPreferencesService.getPreferences();
     } catch (err) {
       console.error('[SettingsComponent] ensurePreferencesLoaded error', err);
-      await this.presentToast('Ocurrió un problema cargando los ajustes.', 'danger');
+      await this.presentToast(this.translate.instant('settings.loadError'), 'danger');
     }
   }
 
@@ -119,6 +144,30 @@ export class SettingsComponent {
     return `pantry-manager-backup-${timestamp}.json`;
   }
 
+  private async tryShareFile(file: File): Promise<boolean> {
+    const canUseWebShare =
+      typeof navigator !== 'undefined' &&
+      typeof navigator.canShare === 'function' &&
+      typeof navigator.share === 'function' &&
+      navigator.canShare({ files: [file] });
+
+    if (!canUseWebShare) {
+      return false;
+    }
+
+    try {
+      await navigator.share({
+        title: this.translate.instant('settings.export.shareTitle'),
+        text: this.translate.instant('settings.export.shareText'),
+        files: [file],
+      });
+      return true;
+    } catch (err) {
+      console.warn('[SettingsComponent] Web Share failed, falling back to download', err);
+      return false;
+    }
+  }
+
   private async presentToast(
     message: string,
     color: 'success' | 'danger' | 'warning' | 'medium'
@@ -134,5 +183,4 @@ export class SettingsComponent {
     });
     await toast.present();
   }
-
 }

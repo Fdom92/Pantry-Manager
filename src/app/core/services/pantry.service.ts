@@ -24,6 +24,7 @@ export class PantryService extends StorageService<PantryItem> {
   private dbPreloaded = false;
   private productIndexReady = false;
   private pendingPipelineReset = false;
+  private backgroundLoadPromise: Promise<void> | null = null;
   private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
 
   constructor() {
@@ -64,6 +65,37 @@ export class PantryService extends StorageService<PantryItem> {
   async reloadFromStart(): Promise<void> {
     this.resetPagination();
     await this.loadAllPages();
+  }
+
+  /** Ensure at least one page is available to render something immediately. */
+  async ensureFirstPageLoaded(): Promise<void> {
+    if (this.loadedProducts().length > 0 || this.loading()) {
+      return;
+    }
+    this.resetPagination();
+    await this.loadNextPage(true);
+  }
+
+  /** Continue loading remaining pages without blocking the UI. */
+  startBackgroundLoad(): void {
+    if (this.backgroundLoadPromise || this.endReached()) {
+      return;
+    }
+    this.backgroundLoadPromise = (async () => {
+      try {
+        if (this.loadedProducts().length === 0 && !this.loading()) {
+          this.resetPagination();
+          await this.loadNextPage(true);
+        }
+        while (!this.endReached()) {
+          await this.loadNextPage(true);
+        }
+      } catch (err) {
+        console.warn('[PantryService] background load failed', err);
+      } finally {
+        this.backgroundLoadPromise = null;
+      }
+    })();
   }
 
   /**
@@ -188,6 +220,65 @@ export class PantryService extends StorageService<PantryItem> {
     };
 
     return this.saveItem(updated);
+  }
+
+  /**
+   * Append a brand new batch to the requested product/location without altering other batches.
+   * If the location does not exist yet, it will be created.
+   */
+  async addNewLot(
+    productId: string,
+    lot: { quantity: number; expiryDate?: string | null; location: string; unit?: string }
+  ): Promise<PantryItem | null> {
+    const item = await this.get(productId);
+    if (!item) {
+      return null;
+    }
+
+    const current = this.applyDerivedFields(item);
+    const quantity = this.toNumberOrZero(lot?.quantity);
+    if (quantity <= 0) {
+      return current;
+    }
+
+    const locationId = (lot?.location ?? '').trim() || 'unassigned';
+    const unit = this.normalizeUnitValue(
+      lot?.unit ?? current.locations[0]?.unit ?? MeasurementUnit.UNIT
+    );
+    const expiryDate = lot?.expiryDate ?? undefined;
+
+    const nextLocations = [...(current.locations ?? [])];
+    const targetIndex = nextLocations.findIndex(loc => (loc.locationId ?? '').trim() === locationId);
+    const newBatch: ItemBatch = {
+      batchId: this.generateBatchId(),
+      quantity,
+      unit,
+      expirationDate: expiryDate || undefined,
+      opened: false,
+    };
+
+    if (targetIndex >= 0) {
+      const target = nextLocations[targetIndex];
+      const batches = this.normalizeBatches(target.batches, unit);
+      const merged = this.mergeBatchesByExpiry([...batches, newBatch]);
+      nextLocations[targetIndex] = {
+        ...target,
+        locationId,
+        unit,
+        batches: merged,
+      };
+    } else {
+      nextLocations.push({
+        locationId,
+        unit,
+        batches: this.mergeBatchesByExpiry([newBatch]),
+      });
+    }
+
+    return this.saveItem({
+      ...current,
+      locations: nextLocations,
+    });
   }
 
   /** Retrieve items that already have an expired location. */

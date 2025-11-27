@@ -1,12 +1,15 @@
 import { Component, computed, signal } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { PantryItem, MeasurementUnit } from '@core/models';
 import { getLocationDisplayName } from '@core/utils';
-import { SHOPPING_REASON_LABELS } from '@core/constants';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LanguageService } from '@core/services';
+import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
+import { PantryService } from '@core/services';
 
-type ShoppingReason = keyof typeof SHOPPING_REASON_LABELS;
+type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';
 
 interface ShoppingSuggestion {
   item: PantryItem;
@@ -43,13 +46,11 @@ interface ShoppingState {
 @Component({
   selector: 'app-shopping',
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, TranslateModule],
   templateUrl: './shopping.component.html',
   styleUrls: ['./shopping.component.scss'],
 })
 export class ShoppingComponent {
-  readonly reasonLabels = SHOPPING_REASON_LABELS;
-  readonly unassignedSupermarketLabel = 'Sin supermercado';
   private readonly unassignedSupermarketKey = '__none__';
 
   readonly loading = this.pantryStore.loading;
@@ -65,6 +66,10 @@ export class ShoppingComponent {
 
   constructor(
     private readonly pantryStore: PantryStoreService,
+    private readonly translate: TranslateService,
+    private readonly languageService: LanguageService,
+    private readonly modalCtrl: ModalController,
+    private readonly pantryService: PantryService,
   ) {}
 
   /** Lifecycle hook: make sure the store is populated before rendering suggestions. */
@@ -81,31 +86,27 @@ export class ShoppingComponent {
   }
 
   /**
-   * Apply the suggested purchase quantity to the relevant item/location,
-   * guarding against concurrent operations on the same item.
+   * Open modal to confirm purchase details and apply them.
    */
-  async markAsPurchased(suggestion: ShoppingSuggestion): Promise<void> {
-    const id = suggestion.item?._id;
-    const targetLocationId = suggestion.locationId || suggestion.item.locations[0]?.locationId;
-    if (!id || !targetLocationId || this.isProcessing(id) || suggestion.suggestedQuantity <= 0) {
-      return;
-    }
-
-    this.processingIds.update(ids => {
-      const next = new Set(ids);
-      next.add(id);
-      return next;
+  async openPurchaseModal(suggestion: ShoppingSuggestion): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: AddPurchaseModalComponent,
+      componentProps: {
+        item: {
+          id: suggestion.item?._id,
+          productId: suggestion.item?._id,
+          suggestedQuantity: suggestion.suggestedQuantity,
+          locationId: suggestion.locationId,
+        },
+        product: suggestion.item,
+      },
     });
+    await modal.present();
 
-    try {
-      await this.pantryStore.adjustQuantity(id, targetLocationId, suggestion.suggestedQuantity);
-    } finally {
-      this.processingIds.update(ids => {
-        const next = new Set(ids);
-        next.delete(id);
-        return next;
-      });
-    }
+    const { data } = await modal.onWillDismiss();
+    if (!data) return;
+
+    await this.handlePurchase(suggestion, data);
   }
 
   getBadgeColor(reason: ShoppingReason): string {
@@ -119,12 +120,50 @@ export class ShoppingComponent {
     }
   }
 
+  /**
+   * Persist the purchased batch and refresh shopping state.
+   */
+  private async handlePurchase(
+    suggestion: ShoppingSuggestion,
+    data: { quantity: number; expiryDate?: string | null; location: string }
+  ): Promise<void> {
+    const id = suggestion.item?._id;
+    if (!id || this.isProcessing(id)) {
+      return;
+    }
+
+    this.processingIds.update(ids => {
+      const next = new Set(ids);
+      next.add(id);
+      return next;
+    });
+
+    try {
+      await this.pantryService.addNewLot(id, {
+        quantity: data.quantity,
+        expiryDate: data.expiryDate ?? undefined,
+        location: data.location,
+      });
+      await this.pantryStore.loadAll();
+    } finally {
+      this.processingIds.update(ids => {
+        const next = new Set(ids);
+        next.delete(id);
+        return next;
+      });
+    }
+  }
+
   getUnitLabel(unit: MeasurementUnit | string): string {
     return this.pantryStore.getUnitLabel(this.normalizeUnit(unit));
   }
 
   getLocationLabel(locationId: string): string {
-    return getLocationDisplayName(locationId, 'Sin ubicación');
+    return getLocationDisplayName(
+      locationId,
+      this.translate.instant('common.locations.none'),
+      this.translate
+    );
   }
 
   /**
@@ -227,8 +266,8 @@ export class ShoppingComponent {
     const groups = Array.from(map.entries()).map(([key, list]) => {
       const label =
         key === this.unassignedSupermarketKey
-          ? this.unassignedSupermarketLabel
-          : list[0]?.supermarket ?? this.unassignedSupermarketLabel;
+          ? this.getUnassignedSupermarketLabel()
+          : list[0]?.supermarket ?? this.getUnassignedSupermarketLabel();
       return {
         key,
         label,
@@ -283,6 +322,10 @@ export class ShoppingComponent {
       return MeasurementUnit.UNIT;
     }
     return trimmed;
+  }
+
+  private getUnassignedSupermarketLabel(): string {
+    return this.translate.instant('shopping.unassignedSupermarket');
   }
 
 }
