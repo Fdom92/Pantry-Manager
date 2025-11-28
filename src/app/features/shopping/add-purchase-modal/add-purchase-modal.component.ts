@@ -24,8 +24,8 @@ export type PantryProduct = PantryItem;
   styleUrls: ['./add-purchase-modal.component.scss'],
 })
 export class AddPurchaseModalComponent implements OnInit {
-  @Input() item!: ShoppingItem;
-  @Input() product!: PantryProduct;
+  @Input() item: ShoppingItem | null = null;
+  @Input() product: PantryProduct | null = null;
 
   @Output() confirm = new EventEmitter<{
     quantity: number;

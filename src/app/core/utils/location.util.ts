@@ -27,12 +27,13 @@ const LOCATION_LABEL_KEYS: Record<string, string> = {
 
 export function getLocationDisplayName(
   id: string | null | undefined,
-  fallback: string = 'Sin ubicación',
+  fallback: string = '',
   translate?: TranslateService
 ): string {
+  const resolvedFallback = fallback || translate?.instant('common.locations.none') || 'No location';
   const key = (id ?? '').trim().toLowerCase();
   if (!key) {
-    return fallback;
+    return resolvedFallback;
   }
   const labelKey = LOCATION_LABEL_KEYS[key];
   if (labelKey) {
@@ -42,7 +43,7 @@ export function getLocationDisplayName(
         return translated;
       }
     }
-    return fallback;
+    return resolvedFallback;
   }
   return key
     .replace(/^(location:)/, '')
@@ -50,5 +51,5 @@ export function getLocationDisplayName(
     .split(' ')
     .filter(Boolean)
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ') || fallback;
+    .join(' ') || resolvedFallback;
 }

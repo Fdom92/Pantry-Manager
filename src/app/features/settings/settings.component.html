@@ -1,23 +1,58 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{ 'settings.title' | translate }}</ion-title>
+    <ion-title>{{ "settings.title" | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <div class="settings-content">
-
+    @if (isPro$ | async) {
+    <ion-card color="light">
+      <ion-card-header>
+        <ion-card-title>{{
+          "settings.pro.statusTitle" | translate
+        }}</ion-card-title>
+        <ion-card-subtitle>{{
+          "settings.pro.statusPro" | translate
+        }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        {{ "settings.pro.statusDescription" | translate }}
+      </ion-card-content>
+    </ion-card>
+    } @else {
+    <ion-card color="warning">
+      <ion-card-header>
+        <ion-card-title>{{
+          "settings.pro.statusTitle" | translate
+        }}</ion-card-title>
+        <ion-card-subtitle>{{
+          "settings.pro.statusFree" | translate
+        }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p>{{ "settings.pro.upgradePrompt" | translate }}</p>
+        <ion-button expand="block" routerLink="/upgrade" color="dark">
+          {{ "settings.pro.upgradeCta" | translate }}
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+    }
     <ion-card class="settings-card">
       <ion-card-header>
-        <ion-card-title>{{ 'settings.appearance.title' | translate }}</ion-card-title>
-        <ion-card-subtitle>{{ 'settings.appearance.subtitle' | translate }}</ion-card-subtitle>
+        <ion-card-title>{{
+          "settings.appearance.title" | translate
+        }}</ion-card-title>
+        <ion-card-subtitle>{{
+          "settings.appearance.subtitle" | translate
+        }}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
         <ion-list lines="none">
           <ion-item lines="none" class="theme-item">
             <ion-label>
-              <h3>{{ 'settings.appearance.theme' | translate }}</h3>
-              <p>{{ 'settings.appearance.description' | translate }}</p>
+              <h3>{{ "settings.appearance.theme" | translate }}</h3>
+              <p>{{ "settings.appearance.description" | translate }}</p>
             </ion-label>
             <ion-select
               [value]="themePreference()"
@@ -26,9 +61,15 @@
               interface="popover"
               class="theme-select"
             >
-              <ion-select-option value="light">{{ 'settings.appearance.light' | translate }}</ion-select-option>
-              <ion-select-option value="dark">{{ 'settings.appearance.dark' | translate }}</ion-select-option>
-              <ion-select-option value="system">{{ 'settings.appearance.system' | translate }}</ion-select-option>
+              <ion-select-option value="light">{{
+                "settings.appearance.light" | translate
+              }}</ion-select-option>
+              <ion-select-option value="dark">{{
+                "settings.appearance.dark" | translate
+              }}</ion-select-option>
+              <ion-select-option value="system">{{
+                "settings.appearance.system" | translate
+              }}</ion-select-option>
             </ion-select>
           </ion-item>
         </ion-list>
@@ -37,15 +78,17 @@
 
     <ion-card class="settings-card">
       <ion-card-header>
-        <ion-card-title>{{ 'settings.data.title' | translate }}</ion-card-title>
-        <ion-card-subtitle>{{ 'settings.data.subtitle' | translate }}</ion-card-subtitle>
+        <ion-card-title>{{ "settings.data.title" | translate }}</ion-card-title>
+        <ion-card-subtitle>{{
+          "settings.data.subtitle" | translate
+        }}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
         <ion-list lines="none">
           <ion-item lines="none">
             <ion-label>
-              <h3>{{ 'settings.data.resetTitle' | translate }}</h3>
-              <p>{{ 'settings.data.resetDescription' | translate }}</p>
+              <h3>{{ "settings.data.resetTitle" | translate }}</h3>
+              <p>{{ "settings.data.resetDescription" | translate }}</p>
             </ion-label>
             <ion-button
               color="danger"
@@ -54,31 +97,33 @@
               (click)="onResetApp()"
               [disabled]="resettingData()"
             >
-              <ion-spinner
-                slot="start"
-                name="dots"
-                *ngIf="resettingData()"
-              ></ion-spinner>
-              {{ 'settings.data.resetAction' | translate }}
+              @if (resettingData()) {
+                <ion-spinner
+                  slot="start"
+                  name="dots"
+                ></ion-spinner>
+              }
+              {{ "settings.data.resetAction" | translate }}
             </ion-button>
           </ion-item>
 
           <ion-item lines="none">
             <ion-label>
-              <h3>{{ 'settings.data.exportTitle' | translate }}</h3>
-              <p>{{ 'settings.data.exportDescription' | translate }}</p>
+              <h3>{{ "settings.data.exportTitle" | translate }}</h3>
+              <p>{{ "settings.data.exportDescription" | translate }}</p>
             </ion-label>
             <ion-button
               slot="end"
               (click)="onExportData()"
               [disabled]="exportingData()"
             >
-              <ion-spinner
-                slot="start"
-                name="dots"
-                *ngIf="exportingData()"
-              ></ion-spinner>
-              {{ 'settings.data.exportAction' | translate }}
+              @if (exportingData()) {
+                <ion-spinner
+                  slot="start"
+                  name="dots"
+                ></ion-spinner>
+              }
+              {{ "settings.data.exportAction" | translate }}
             </ion-button>
           </ion-item>
         </ion-list>
@@ -92,10 +137,11 @@
             lines="none"
             button
             detail="true"
-            routerLink="/settings/catalogos">
+            routerLink="/settings/catalogos"
+          >
             <ion-label>
-              <h3>{{ 'settings.catalogs.title' | translate }}</h3>
-              <p>{{ 'settings.catalogs.subtitle' | translate }}</p>
+              <h3>{{ "settings.catalogs.title" | translate }}</h3>
+              <p>{{ "settings.catalogs.subtitle" | translate }}</p>
             </ion-label>
           </ion-item>
         </ion-list>
@@ -104,22 +150,24 @@
 
     <ion-card class="settings-card">
       <ion-card-header>
-        <ion-card-title>{{ 'settings.info.title' | translate }}</ion-card-title>
-        <ion-card-subtitle>{{ 'settings.info.subtitle' | translate }}</ion-card-subtitle>
+        <ion-card-title>{{ "settings.info.title" | translate }}</ion-card-title>
+        <ion-card-subtitle>{{
+          "settings.info.subtitle" | translate
+        }}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
         <ion-list lines="none">
           <ion-item lines="none">
             <ion-label>
-              <h3>{{ 'settings.info.version' | translate }}</h3>
+              <h3>{{ "settings.info.version" | translate }}</h3>
               <p>{{ appVersion }}</p>
             </ion-label>
           </ion-item>
 
           <ion-item lines="none">
             <ion-label>
-              <h3>{{ 'settings.info.feedbackTitle' | translate }}</h3>
-              <p>{{ 'settings.info.feedbackSubtitle' | translate }}</p>
+              <h3>{{ "settings.info.feedbackTitle" | translate }}</h3>
+              <p>{{ "settings.info.feedbackSubtitle" | translate }}</p>
             </ion-label>
             <ion-button
               slot="end"
@@ -127,7 +175,7 @@
               color="primary"
               href="mailto:hola@pantry-manager.app?subject=Comentarios%20Pantry%20Manager"
             >
-              {{ 'settings.info.feedbackAction' | translate }}
+              {{ "settings.info.feedbackAction" | translate }}
             </ion-button>
           </ion-item>
         </ion-list>

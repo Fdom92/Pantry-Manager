@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { TabsComponent } from './tabs/tabs.component';
+import { proGuard } from '@core/pro';
 
 export const routes: Routes = [
   {
@@ -22,6 +23,12 @@ export const routes: Routes = [
           import('@features/shopping/shopping.component').then(m => m.ShoppingComponent),
       },
       {
+        path: 'agent',
+        canMatch: [proGuard],
+        loadComponent: () =>
+          import('@features/agent/agent.component').then(m => m.AgentComponent),
+      },
+      {
         path: 'settings/catalogos',
         loadComponent: () =>
           import('@features/settings/settings-catalogs/settings-catalogs.component').then(m => m.SettingsCatalogsComponent),
@@ -33,6 +40,11 @@ export const routes: Routes = [
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
+  },
+  {
+    path: 'upgrade',
+    loadComponent: () =>
+      import('@features/upgrade/upgrade.page').then(m => m.UpgradePage),
   },
   { path: '**', redirectTo: 'dashboard' },
 ];
