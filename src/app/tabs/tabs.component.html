@@ -10,6 +10,20 @@
       <ion-label>{{ 'tabs.pantry' | translate }}</ion-label>
     </ion-tab-button>
 
+    <ion-tab-button
+      tab="agent"
+      [routerLink]="['/agent']"
+      (click)="onAgentTabClick($event)"
+      [class.locked]="!isPro()">
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+      <ion-label>{{ 'tabs.agent' | translate }}</ion-label>
+      @if (!isPro()) {
+      <div class="lock-overlay">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+      </div>
+      }
+    </ion-tab-button>
+
     <ion-tab-button tab="shopping" [routerLink]="['/shopping']">
       <ion-icon name="cart-outline"></ion-icon>
       <ion-label>{{ 'tabs.shopping' | translate }}</ion-label>

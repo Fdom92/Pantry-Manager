@@ -1,6 +1,7 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { provideIonicAngular } from '@ionic/angular/standalone';
+import { provideHttpClient } from '@angular/common/http';
 import { addIcons } from 'ionicons';
 import { APP_INITIALIZER, LOCALE_ID, importProvidersFrom } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
@@ -30,6 +31,7 @@ import {
   trendingDownOutline,
   checkmarkCircleOutline,
   listOutline,
+  chatbubblesOutline,
   star,
   starOutline,
   locationOutline,
@@ -39,6 +41,7 @@ import {
   cubeOutline,
   chevronUpOutline,
   chevronDownOutline,
+  lockClosedOutline,
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -86,6 +89,7 @@ addIcons({
   'trending-down-outline': trendingDownOutline,
   'checkmark-circle-outline': checkmarkCircleOutline,
   'list-outline': listOutline,
+  'chatbubbles-outline': chatbubblesOutline,
   'star': star,
   'star-outline': starOutline,
   'location-outline': locationOutline,
@@ -93,12 +97,14 @@ addIcons({
   'calendar-outline': calendarOutline,
   'speedometer-outline': speedometerOutline,
   'cube-outline': cubeOutline,
+  'lock-closed-outline': lockClosedOutline,
 });
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideIonicAngular(),
     provideRouter(routes),
+    provideHttpClient(),
     importProvidersFrom(
       HttpClientModule,
       TranslateModule.forRoot({

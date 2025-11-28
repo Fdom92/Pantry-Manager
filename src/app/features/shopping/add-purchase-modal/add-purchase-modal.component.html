@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{ product.name || ('shopping.purchaseModal.title' | translate) }}</ion-title>
+    <ion-title>{{ product?.name || ('shopping.purchaseModal.title' | translate) }}</ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="cancel()">
         <ion-icon slot="icon-only" name="close"></ion-icon>

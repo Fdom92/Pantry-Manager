@@ -1,5 +1,6 @@
 export interface Environment {
   production: boolean;
-  apiBaseUrl: string;
+  agentApiUrl: string;
+  proApiUrl: string;
   revenueCatPublicKey: string;
 }
