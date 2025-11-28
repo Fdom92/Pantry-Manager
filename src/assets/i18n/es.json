@@ -107,6 +107,14 @@
       "basic-out": "Básico sin stock",
       "empty": "Sin stock"
     },
+    "purchaseModal": {
+      "title": "Añadir compra",
+      "quantity": "Cantidad",
+      "quantityPlaceholder": "0",
+      "expiry": "Fecha de caducidad (opcional)",
+      "location": "Ubicación",
+      "addToPantry": "Añadir a la despensa"
+    },
     "suggestions": {
       "title": "Compras sugeridas",
       "loading": "Generando lista de compras…",
@@ -356,6 +364,16 @@
         "label": "Idioma",
         "device": "Se ajusta automáticamente al idioma del dispositivo."
       }
+    },
+    "appearance": {
+      "title": "Apariencia",
+      "subtitle": "Elige cómo se ve la aplicación.",
+      "theme": "Tema",
+      "description": "Configura modo claro, oscuro o sigue al sistema.",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema",
+      "error": "No se pudo actualizar el tema."
     },
     "languages": {
       "es": "Español",

@@ -107,6 +107,14 @@
       "basic-out": "Staple out of stock",
       "empty": "Out of stock"
     },
+    "purchaseModal": {
+      "title": "Add purchase",
+      "quantity": "Quantity",
+      "quantityPlaceholder": "0",
+      "expiry": "Expiry date (optional)",
+      "location": "Location",
+      "addToPantry": "Add to pantry"
+    },
     "suggestions": {
       "title": "Suggested purchases",
       "loading": "Building shopping list…",
@@ -356,6 +364,16 @@
         "label": "Language",
         "device": "Matches your device language automatically."
       }
+    },
+    "appearance": {
+      "title": "Appearance",
+      "subtitle": "Choose how the app looks.",
+      "theme": "Theme",
+      "description": "Switch between light, dark or follow the system.",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "error": "Could not update the theme."
     },
     "languages": {
       "es": "Spanish",

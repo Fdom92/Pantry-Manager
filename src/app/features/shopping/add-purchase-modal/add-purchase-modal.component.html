@@ -19,30 +19,18 @@
         [value]="quantity"
         (ionInput)="onQuantityInput($event)"
         min="0"
-        placeholder="0"
+        [placeholder]="'shopping.purchaseModal.quantityPlaceholder' | translate"
       ></ion-input>
     </ion-item>
 
-    <ion-item lines="full">
-      <ion-label>{{ 'shopping.purchaseModal.noExpiry' | translate }}</ion-label>
-      <ion-toggle
-        slot="end"
-        justify="space-between"
-        [checked]="noExpiry"
-        (ionChange)="noExpiry = $event.detail.checked; onToggleNoExpiry()"
-      ></ion-toggle>
+    <ion-item>
+      <ion-input
+        type="date"
+        label="{{ 'shopping.purchaseModal.expiry' | translate }}"
+        labelPlacement="stacked"
+        [(ngModel)]="expiryDate"
+      ></ion-input>
     </ion-item>
-
-    @if (!noExpiry) {
-      <ion-item>
-        <ion-input
-          type="date"
-          label="{{ 'shopping.purchaseModal.expiration' | translate }}"
-          labelPlacement="stacked"
-          [(ngModel)]="expiryDate"
-        ></ion-input>
-      </ion-item>
-    }
 
     @if (locationOptions.length > 1) {
       <ion-item>
@@ -66,7 +54,7 @@
     </ion-buttons>
     <ion-buttons slot="end">
       <ion-button color="success" [disabled]="!canConfirm" (click)="submit()">
-        {{ 'shopping.purchaseModal.submit' | translate }}
+        {{ 'shopping.purchaseModal.addToPantry' | translate }}
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

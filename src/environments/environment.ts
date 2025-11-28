@@ -2,10 +2,13 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-export const environment = {
+import { Environment } from './environment.model';
+
+export const environment: Environment = {
   production: false,
-  agentApiUrl: 'https://pantry-manager.onrender.com/agent/process',
-  proApiUrl: 'https://pantry-manager.onrender.com/api/payments',
+  agentApiUrl: 'https://pantry-manager-develop.onrender.com/agent/process',
+  proApiUrl: 'https://pantry-manager-develop.onrender.com/api/payments',
+  revenueCatPublicKey: 'goog_vWMgZBWrWzVBcjMvfvSSbMFFIEa',
 };
 
 /*

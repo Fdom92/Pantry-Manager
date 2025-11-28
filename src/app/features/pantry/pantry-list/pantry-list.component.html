@@ -261,8 +261,8 @@
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
-      <ion-content class="ion-padding">
-        <form [formGroup]="form" (ngSubmit)="submitItem()">
+      <ion-content class="ion-padding create-item-modal-content">
+        <form [formGroup]="form">
           <ion-list lines="full">
             <ion-item>
               <ion-input
@@ -417,17 +417,22 @@
               </ion-button>
             </div>
 
-          <div class="ion-padding-top">
-            <ion-button type="submit" expand="block" [disabled]="form.invalid || isSaving">
-              @if (isSaving) {
-                <ion-spinner name="dots"></ion-spinner>
-              } @else {
-                {{ 'common.actions.save' | translate }}
-              }
-            </ion-button>
-          </div>
         </form>
       </ion-content>
+      <ion-footer>
+        <ion-toolbar class="create-footer">
+          <ion-button
+            expand="block"
+            [disabled]="form.invalid || isSaving"
+            (click)="submitItem()">
+            @if (isSaving) {
+              <ion-spinner name="dots"></ion-spinner>
+            } @else {
+              {{ 'common.actions.save' | translate }}
+            }
+          </ion-button>
+        </ion-toolbar>
+      </ion-footer>
     </ng-template>
   </ion-modal>
 </ion-content>

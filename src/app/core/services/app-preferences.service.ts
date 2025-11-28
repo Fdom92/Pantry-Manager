@@ -52,6 +52,10 @@ const DEFAULT_PREFERENCES: AppPreferences = {
 export class AppPreferencesService {
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
+  private readonly prefersDarkQuery =
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-color-scheme: dark)')
+      : null;
 
   private readonly preferencesSignal = signal<AppPreferences>({ ...DEFAULT_PREFERENCES });
   readonly preferences = computed(() => this.preferencesSignal());
@@ -60,6 +64,7 @@ export class AppPreferencesService {
     private readonly storage: StorageService<AppPreferencesDoc>,
   ) {
     this.ready = this.loadFromStorage();
+    this.setupSystemThemeListener();
   }
 
   async getPreferences(): Promise<AppPreferences> {
@@ -91,7 +96,9 @@ export class AppPreferencesService {
 
     const saved = await this.storage.save(doc);
     this.cachedDoc = saved;
-    this.preferencesSignal.set(this.normalizePreferences(saved));
+    const normalizedPrefs = this.normalizePreferences(saved);
+    this.preferencesSignal.set(normalizedPrefs);
+    this.applyTheme(normalizedPrefs.theme);
   }
 
   private async loadFromStorage(): Promise<void> {
@@ -101,14 +108,19 @@ export class AppPreferencesService {
         this.cachedDoc = doc;
         const normalized = this.normalizePreferences(doc);
         this.preferencesSignal.set(normalized);
+        this.applyTheme(normalized.theme);
       } else {
-        this.preferencesSignal.set({ ...DEFAULT_PREFERENCES });
+        const defaults = { ...DEFAULT_PREFERENCES };
+        this.preferencesSignal.set(defaults);
         this.cachedDoc = null;
+        this.applyTheme(defaults.theme);
       }
     } catch (err) {
       console.error('[AppPreferencesService] loadFromStorage error', err);
-      this.preferencesSignal.set({ ...DEFAULT_PREFERENCES });
+      const defaults = { ...DEFAULT_PREFERENCES };
+      this.preferencesSignal.set(defaults);
       this.cachedDoc = null;
+      this.applyTheme(defaults.theme);
     }
   }
 
@@ -133,6 +145,36 @@ export class AppPreferencesService {
       return theme;
     }
     return DEFAULT_PREFERENCES.theme;
+  }
+
+  private applyTheme(theme: AppThemePreference, systemPrefersDark?: boolean): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+    const prefersDark = systemPrefersDark ?? this.prefersDarkQuery?.matches ?? false;
+    const useDark = theme === 'dark' || (theme === 'system' && prefersDark);
+    const root = document.documentElement;
+    root.classList.toggle('ion-palette-dark', useDark);
+    root.classList.toggle('dark', useDark);
+    root.setAttribute('data-theme', useDark ? 'dark' : 'light');
+    root.style.setProperty('color-scheme', useDark ? 'dark' : 'light');
+  }
+
+  private setupSystemThemeListener(): void {
+    if (!this.prefersDarkQuery) {
+      return;
+    }
+    const listener = (event: MediaQueryListEvent) => {
+      if (this.preferencesSignal().theme === 'system') {
+        this.applyTheme('system', event.matches);
+      }
+    };
+
+    if (typeof this.prefersDarkQuery.addEventListener === 'function') {
+      this.prefersDarkQuery.addEventListener('change', listener);
+    } else if (typeof this.prefersDarkQuery.addListener === 'function') {
+      this.prefersDarkQuery.addListener(listener);
+    }
   }
 
   private ensureUnit(unit?: string): DefaultUnitPreference {

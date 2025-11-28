@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.fdom.pantry"
+    namespace "com.fdom.pantrymind"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.fdom.pantry"
+        applicationId "com.fdom.pantrymind"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -20,6 +20,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
         }
     }
 }
