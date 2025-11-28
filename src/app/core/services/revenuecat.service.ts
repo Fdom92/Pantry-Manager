@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Purchases } from '@revenuecat/purchases-capacitor';
+import { environment } from 'src/environments/environment';
 
-const PUBLIC_API_KEY = 'goog_QWDXnEcbnxIKMCjuMLHcOtwxmrR';
 const STORAGE_KEY = 'revenuecat:isPro';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RevenuecatService {
+  private readonly publicApiKey = environment.revenueCatPublicKey;
   private initialized = false;
   private userId: string | null = null;
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());
@@ -16,8 +17,12 @@ export class RevenuecatService {
 
   async init(userId: string): Promise<void> {
     this.userId = userId;
+    if (!this.publicApiKey) {
+      console.error('[RevenuecatService] missing public API key in environment');
+      return;
+    }
     try {
-      await Purchases.configure({ apiKey: PUBLIC_API_KEY, appUserID: userId });
+      await Purchases.configure({ apiKey: this.publicApiKey, appUserID: userId });
       Purchases.addCustomerInfoUpdateListener((info: any) => {
         this.updateProState(this.extractIsPro(info));
       });
