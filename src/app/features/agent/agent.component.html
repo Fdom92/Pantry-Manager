@@ -3,9 +3,11 @@
     <ion-title>
       <div class="agent-title">
         <span>{{ 'agent.title' | translate }}</span>
-        <ion-badge color="warning" *ngIf="isPro$ | async">
-          {{ 'settings.pro.badgePro' | translate }}
-        </ion-badge>
+        @if (isPro$ | async) {
+          <ion-badge color="warning">
+            {{ 'settings.pro.badgePro' | translate }}
+          </ion-badge>
+        }
       </div>
     </ion-title>
     <ion-buttons slot="end">

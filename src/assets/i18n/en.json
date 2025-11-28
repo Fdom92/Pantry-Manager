@@ -112,6 +112,7 @@
       "quantity": "Quantity",
       "quantityPlaceholder": "0",
       "expiry": "Expiry date (optional)",
+      "noExpiry": "No expiry",
       "location": "Location",
       "addToPantry": "Add to pantry"
     },
@@ -123,14 +124,6 @@
       "minStock": "Min: {{ amount }} {{ unit }}",
       "buy": "Buy {{ amount }} {{ unit }}",
       "empty": "Nothing to buy for now. Everything is within desired levels."
-    },
-    "purchaseModal": {
-      "title": "Add purchase",
-      "quantity": "Quantity",
-      "noExpiry": "No expiry",
-      "expiration": "Expiration date",
-      "location": "Location",
-      "submit": "Add to pantry"
     }
   },
   "agent": {

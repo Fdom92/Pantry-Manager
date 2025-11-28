@@ -96,24 +96,6 @@ export class SettingsComponent {
     }
   }
 
-    onCloudSync(): void {
-    if (this.ensureProAccess()) {
-      void this.presentToast(this.translate.instant('settings.pro.cloudSync.ready'), 'medium');
-    }
-  }
-
-  onHistory(): void {
-    if (this.ensureProAccess()) {
-      void this.presentToast(this.translate.instant('settings.pro.history.ready'), 'medium');
-    }
-  }
-
-  onAdvancedRecipes(): void {
-    if (this.ensureProAccess()) {
-      void this.presentToast(this.translate.instant('settings.pro.recipes.ready'), 'medium');
-    }
-  }
-
   async onThemeChanged(value: string | number | null | undefined): Promise<void> {
     const normalized = typeof value === 'string' ? value : value != null ? String(value) : null;
     const nextTheme: AppThemePreference =

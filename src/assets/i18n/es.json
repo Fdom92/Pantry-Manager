@@ -112,6 +112,7 @@
       "quantity": "Cantidad",
       "quantityPlaceholder": "0",
       "expiry": "Fecha de caducidad (opcional)",
+      "noExpiry": "Sin caducidad",
       "location": "Ubicación",
       "addToPantry": "Añadir a la despensa"
     },
@@ -123,14 +124,6 @@
       "minStock": "Mín.: {{ amount }} {{ unit }}",
       "buy": "Comprar {{ amount }} {{ unit }}",
       "empty": "Nada que comprar por ahora. Todo está dentro de los niveles deseados."
-    },
-    "purchaseModal": {
-      "title": "Añadir compra",
-      "quantity": "Cantidad",
-      "noExpiry": "Sin caducidad",
-      "expiration": "Fecha de caducidad",
-      "location": "Ubicación",
-      "submit": "Añadir a la despensa"
     }
   },
   "agent": {

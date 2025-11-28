@@ -16,9 +16,6 @@ export class UpgradePage {
   readonly isPro$ = this.revenuecat.isPro$;
   readonly benefitKeys = [
     'upgrade.benefits.agent',
-    'upgrade.benefits.cloudSync',
-    'upgrade.benefits.history',
-    'upgrade.benefits.predictions',
   ];
 
   constructor(

@@ -182,11 +182,12 @@
         expand="block"
         (click)="saveCatalogs()"
         [disabled]="!hasAnyChanges() || savingCatalogs()">
-        <ion-spinner
-          slot="start"
-          name="dots"
-          *ngIf="savingCatalogs()">
-        </ion-spinner>
+        @if (savingCatalogs()) {
+          <ion-spinner
+            slot="start"
+            name="dots">
+          </ion-spinner>
+        }
         {{ 'settings.catalogs.saveAction' | translate }}
       </ion-button>
     </div>

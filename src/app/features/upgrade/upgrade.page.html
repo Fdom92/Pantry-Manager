@@ -36,7 +36,10 @@
 
   <div class="cta-block">
     <ion-button expand="block" color="primary" size="large" (click)="onBuy()">
-      {{ 'upgrade.actions.subscribe' | translate }} <span *ngIf="offeringPrice">&nbsp;({{ offeringPrice }})</span>
+      {{ 'upgrade.actions.subscribe' | translate }}
+      @if (offeringPrice) {
+        <span>&nbsp;({{ offeringPrice }})</span>
+      }
     </ion-button>
     <ion-button expand="block" fill="clear" color="medium" (click)="maybeLater()">
       {{ 'upgrade.actions.maybeLater' | translate }}
@@ -47,6 +50,8 @@
     <ion-note>
       {{ 'upgrade.note' | translate }}
     </ion-note>
-    <ion-badge color="success" *ngIf="isPro$ | async">{{ 'upgrade.alreadyPro' | translate }}</ion-badge>
+    @if (isPro$ | async) {
+      <ion-badge color="success">{{ 'upgrade.alreadyPro' | translate }}</ion-badge>
+    }
   </div>
 </ion-content>
