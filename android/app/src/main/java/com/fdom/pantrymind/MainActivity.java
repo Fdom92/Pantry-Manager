@@ -1,4 +1,4 @@
-package com.fdom.pantry;
+package com.fdom.pantrymind;
 
 import com.getcapacitor.BridgeActivity;
 
