@@ -394,6 +394,7 @@
       "unavailable": "Export is not available in this environment.",
       "readyToShare": "Data ready to share.",
       "success": "Data exported.",
+      "saved": "Data exported to your device.",
       "error": "Could not export the data.",
       "shareTitle": "Pantry Manager - Backup",
       "shareText": "Export or share your pantry backup."

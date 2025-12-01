@@ -394,6 +394,7 @@
       "unavailable": "La exportación no está disponible en este entorno.",
       "readyToShare": "📤 Datos listos para compartir.",
       "success": "📦 Datos exportados.",
+      "saved": "📦 Datos exportados en el dispositivo.",
       "error": "No se pudieron exportar los datos.",
       "shareTitle": "Pantry Manager - Respaldo",
       "shareText": "Exporta o comparte tu copia de seguridad."
