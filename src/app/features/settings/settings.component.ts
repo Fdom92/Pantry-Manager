@@ -70,8 +70,77 @@ export class SettingsComponent {
     if (!fileInput || this.importingData()) {
       return;
     }
-    fileInput.value = '';
-    fileInput.click();
+    this.tryNativeAutoImport(fileInput);
+  }
+
+  private async tryNativeAutoImport(fileInput: HTMLInputElement): Promise<void> {
+    if (!Capacitor.isNativePlatform()) {
+      fileInput.value = '';
+      fileInput.click();
+      return;
+    }
+
+    try {
+      const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
+      const folder = 'PantryManager';
+      const listing = await Filesystem.readdir({ path: folder, directory: Directory.Documents });
+      const candidates = listing.files?.filter(file => file.name?.toLowerCase().endsWith('.json')) ?? [];
+      if (!candidates.length) {
+        fileInput.value = '';
+        fileInput.click();
+        return;
+      }
+
+      const filesWithStats = await Promise.all(
+        candidates.map(async file => {
+          try {
+            const path = `${folder}/${file.name}`;
+            const stat = await Filesystem.stat({ path, directory: Directory.Documents });
+            return { path, mtime: stat.mtime ?? 0 };
+          } catch {
+            return null;
+          }
+        })
+      );
+      const usable = filesWithStats.filter((f): f is { path: string; mtime: number } => !!f);
+      if (!usable.length) {
+        fileInput.value = '';
+        fileInput.click();
+        return;
+      }
+
+      const latest = usable.sort((a, b) => (b.mtime || 0) - (a.mtime || 0))[0];
+      const confirmed = await this.confirmImport();
+      if (!confirmed) {
+        return;
+      }
+
+      this.importingData.set(true);
+      try {
+        const file = await Filesystem.readFile({
+          path: latest.path,
+          directory: Directory.Documents,
+          encoding: Encoding.UTF8,
+        });
+        const payload =
+          typeof file.data === 'string'
+            ? file.data
+            : file.data instanceof Blob
+              ? await file.data.text()
+              : '';
+        const docs = this.parseBackup(payload ?? '');
+        await this.applyImport(docs);
+      } catch (err) {
+        console.error('[SettingsComponent] tryNativeAutoImport error', err);
+        await this.presentToast(this.translate.instant('settings.import.error'), 'danger');
+      } finally {
+        this.importingData.set(false);
+      }
+    } catch (err) {
+      console.warn('[SettingsComponent] Native auto-import unavailable, falling back to picker', err);
+      fileInput.value = '';
+      fileInput.click();
+    }
   }
 
   async onExportData(): Promise<void> {
@@ -172,13 +241,7 @@ export class SettingsComponent {
     try {
       const fileContents = await file.text();
       const docs = this.parseBackup(fileContents);
-      await this.storage.clearAll();
-      await this.storage.bulkSave(docs);
-      await this.appPreferencesService.reload();
-      await this.presentToast(this.translate.instant('settings.import.success'), 'success');
-      if (typeof window !== 'undefined') {
-        setTimeout(() => window.location.reload(), 300);
-      }
+      await this.applyImport(docs);
     } catch (err: any) {
       console.error('[SettingsComponent] onImportData error', err);
       const messageKey =
@@ -190,6 +253,16 @@ export class SettingsComponent {
       await this.presentToast(this.translate.instant(messageKey), 'danger');
     } finally {
       this.importingData.set(false);
+    }
+  }
+
+  private async applyImport(docs: BaseDoc[]): Promise<void> {
+    await this.storage.clearAll();
+    await this.storage.bulkSave(docs);
+    await this.appPreferencesService.reload();
+    await this.presentToast(this.translate.instant('settings.import.success'), 'success');
+    if (typeof window !== 'undefined') {
+      setTimeout(() => window.location.reload(), 300);
     }
   }
 

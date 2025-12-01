@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Mi Despensa</string>
     <string name="title_activity_main">Mi Despensa</string>
-    <string name="package_name">com.fdom.pantry</string>
-    <string name="custom_url_scheme">com.fdom.pantry</string>
+    <string name="package_name">com.fdom.pantrymind</string>
+    <string name="custom_url_scheme">com.fdom.pantrymind</string>
 </resources>
