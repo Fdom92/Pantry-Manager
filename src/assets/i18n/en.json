@@ -380,7 +380,10 @@
       "resetAction": "Clear",
       "exportTitle": "Export data",
       "exportDescription": "Download a JSON file with your current data.",
-      "exportAction": "Export"
+      "exportAction": "Export",
+      "importTitle": "Import data",
+      "importDescription": "Restore a JSON backup you exported earlier.",
+      "importAction": "Import"
     },
     "reset": {
       "confirm": "This will delete ALL local app data.\nDo you want to continue?",
@@ -394,6 +397,13 @@
       "error": "Could not export the data.",
       "shareTitle": "Pantry Manager - Backup",
       "shareText": "Export or share your pantry backup."
+    },
+    "import": {
+      "confirm": "This will replace your current data with the selected file. Continue?",
+      "success": "Data imported. Restarting app...",
+      "error": "Could not import the data. Please check the file.",
+      "invalid": "The selected file is not a valid backup.",
+      "empty": "The file has no data to import."
     },
     "loadError": "There was a problem loading settings.",
     "catalogs": {

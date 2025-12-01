@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.fdom.pantry',
+  appId: 'com.fdom.pantrymind',
   appName: 'Mi Despensa',
   webDir: 'www'
 };
