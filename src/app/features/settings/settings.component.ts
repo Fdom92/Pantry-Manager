@@ -21,6 +21,7 @@ export class SettingsComponent {
   readonly appVersion = packageJson.version ?? '0.0.0';
 
   readonly exportingData = signal(false);
+  readonly importingData = signal(false);
   readonly resettingData = signal(false);
   readonly isPro$ = this.revenuecat.isPro$;
   readonly updatingTheme = signal(false);
@@ -64,6 +65,14 @@ export class SettingsComponent {
     }
   }
 
+  triggerImport(fileInput: HTMLInputElement | null): void {
+    if (!fileInput || this.importingData()) {
+      return;
+    }
+    fileInput.value = '';
+    fileInput.click();
+  }
+
   async onExportData(): Promise<void> {
     if (typeof document === 'undefined') {
       await this.presentToast(this.translate.instant('settings.export.unavailable'), 'warning');
@@ -93,6 +102,46 @@ export class SettingsComponent {
       await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
     } finally {
       this.exportingData.set(false);
+    }
+  }
+
+  async onImportFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (input) {
+      input.value = '';
+    }
+    if (!file) {
+      return;
+    }
+
+    const confirmed = await this.confirmImport();
+    if (!confirmed) {
+      return;
+    }
+
+    this.importingData.set(true);
+    try {
+      const fileContents = await file.text();
+      const docs = this.parseBackup(fileContents);
+      await this.storage.clearAll();
+      await this.storage.bulkSave(docs);
+      await this.appPreferencesService.reload();
+      await this.presentToast(this.translate.instant('settings.import.success'), 'success');
+      if (typeof window !== 'undefined') {
+        setTimeout(() => window.location.reload(), 300);
+      }
+    } catch (err: any) {
+      console.error('[SettingsComponent] onImportData error', err);
+      const messageKey =
+        err?.message === 'IMPORT_EMPTY'
+          ? 'settings.import.empty'
+          : err?.message === 'IMPORT_INVALID'
+            ? 'settings.import.invalid'
+            : 'settings.import.error';
+      await this.presentToast(this.translate.instant(messageKey), 'danger');
+    } finally {
+      this.importingData.set(false);
     }
   }
 
@@ -129,6 +178,54 @@ export class SettingsComponent {
       console.error('[SettingsComponent] ensurePreferencesLoaded error', err);
       await this.presentToast(this.translate.instant('settings.loadError'), 'danger');
     }
+  }
+
+  private parseBackup(raw: string): BaseDoc[] {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      throw new Error('IMPORT_INVALID');
+    }
+
+    if (!Array.isArray(parsed)) {
+      throw new Error('IMPORT_INVALID');
+    }
+
+    const now = new Date().toISOString();
+    const docs = parsed
+      .filter(entry => !!entry && typeof entry === 'object')
+      .map(entry => entry as any)
+      .filter(doc => typeof doc._id === 'string' && doc._id.trim().length > 0)
+      .filter(doc => typeof doc.type === 'string' && doc.type.trim().length > 0)
+      .filter(doc => !String(doc._id).startsWith('_design/'))
+      .filter(doc => doc._deleted !== true)
+      .map(doc => {
+        const sanitizedId = doc._id.trim();
+        const sanitizedType = doc.type.trim();
+        const createdAt = typeof doc.createdAt === 'string' && doc.createdAt ? doc.createdAt : now;
+        const updatedAt = typeof doc.updatedAt === 'string' && doc.updatedAt ? doc.updatedAt : createdAt;
+        const { _rev, _revisions, _conflicts, _deleted, ...rest } = doc;
+        return {
+          ...rest,
+          _id: sanitizedId,
+          type: sanitizedType,
+          createdAt,
+          updatedAt,
+        } as BaseDoc;
+      });
+
+    if (!docs.length) {
+      throw new Error('IMPORT_EMPTY');
+    }
+    return docs;
+  }
+
+  private async confirmImport(): Promise<boolean> {
+    if (typeof window === 'undefined') {
+      return true;
+    }
+    return window.confirm(this.translate.instant('settings.import.confirm'));
   }
 
   private triggerDownload(blob: Blob, filename: string): void {

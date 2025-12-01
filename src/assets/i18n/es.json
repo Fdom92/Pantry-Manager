@@ -380,7 +380,10 @@
       "resetAction": "Limpiar",
       "exportTitle": "Exportar datos",
       "exportDescription": "Descarga un fichero JSON con tus datos actuales.",
-      "exportAction": "Exportar"
+      "exportAction": "Exportar",
+      "importTitle": "Importar datos",
+      "importDescription": "Restaura una copia de seguridad JSON previamente exportada.",
+      "importAction": "Importar"
     },
     "reset": {
       "confirm": "Esto eliminará TODOS los datos locales de la aplicación.\n¿Quieres continuar?",
@@ -394,6 +397,13 @@
       "error": "No se pudieron exportar los datos.",
       "shareTitle": "Pantry Manager - Respaldo",
       "shareText": "Exporta o comparte tu copia de seguridad."
+    },
+    "import": {
+      "confirm": "Esto reemplazará tus datos actuales con el archivo seleccionado. ¿Quieres continuar?",
+      "success": "✅ Datos importados. Reiniciando app...",
+      "error": "No se pudieron importar los datos. Comprueba el fichero.",
+      "invalid": "El fichero seleccionado no es una copia válida.",
+      "empty": "El fichero no contiene datos para importar."
     },
     "loadError": "Ocurrió un problema cargando los ajustes.",
     "catalogs": {
