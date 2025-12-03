@@ -1,13 +1,13 @@
-import { IonicModule, NavController, ToastController } from '@ionic/angular';
-import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
 import { AppThemePreference, BaseDoc } from '@core/models';
 import { AppPreferencesService, StorageService } from '@core/services';
-import packageJson from '../../../../package.json';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { Capacitor } from '@capacitor/core';
+import { IonicModule, NavController, ToastController } from '@ionic/angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import packageJson from '../../../../package.json';
 
 const TOAST_DURATION = 1800;
 

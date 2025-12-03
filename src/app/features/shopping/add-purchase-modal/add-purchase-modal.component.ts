@@ -1,20 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { PantryItem, ShoppingItem } from '@core/models';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { PantryItem } from '@core/models';
-import { getLocationDisplayName } from '@core/utils';
-
-export interface ShoppingItem {
-  id?: string;
-  productId?: string;
-  quantity?: number;
-  suggestedQuantity?: number;
-  locationId?: string;
-}
-
-export type PantryProduct = PantryItem;
 
 @Component({
   selector: 'app-add-purchase-modal',
@@ -25,7 +14,7 @@ export type PantryProduct = PantryItem;
 })
 export class AddPurchaseModalComponent implements OnInit {
   @Input() item: ShoppingItem | null = null;
-  @Input() product: PantryProduct | null = null;
+  @Input() product: PantryItem | null = null;
 
   @Output() confirm = new EventEmitter<{
     quantity: number;
@@ -71,7 +60,8 @@ export class AddPurchaseModalComponent implements OnInit {
   }
 
   getLocationLabel(id: string): string {
-    return getLocationDisplayName(id, this.translate.instant('locations.pantry'), this.translate);
+    const trimmed = (id ?? '').trim();
+    return trimmed || this.translate.instant('locations.pantry');
   }
 
   onQuantityInput(event: CustomEvent): void {

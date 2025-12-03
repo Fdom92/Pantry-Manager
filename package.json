@@ -1,8 +1,8 @@
 {
-  "name": "pantry-manager",
-  "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "name": "pantrymind",
+  "version": "1.0.0",
+  "author": "Fernando del olmo",
+  "homepage": "https://ferolmo.com/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -73,5 +73,5 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.0"
   },
-  "description": "An Ionic project"
+  "description": "A project that helps manage the pantry"
 }

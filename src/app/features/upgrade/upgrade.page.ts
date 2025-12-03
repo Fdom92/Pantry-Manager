@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RevenuecatService } from '@core/services/revenuecat.service';
 import { IonicModule, NavController } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
-import { RevenuecatService } from '@core/services/revenuecat.service';
 
 @Component({
   selector: 'app-upgrade',

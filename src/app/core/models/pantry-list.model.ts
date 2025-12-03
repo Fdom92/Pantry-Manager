@@ -1,7 +1,35 @@
-import { PantryItem } from './item.model';
 import { MeasurementUnit } from './enums.model';
-import { ItemLocationStock } from './item-location-stock.model';
 import { ItemBatch } from './item-batch.model';
+import { ItemLocationStock } from './item-location-stock.model';
+import { PantryItem } from './item.model';
+
+export type PantryStatusFilterValue = 'all' | 'expired' | 'near-expiry' | 'low-stock' | 'normal';
+
+export type FilterChipKind = 'status' | 'basic';
+
+export interface FilterChipViewModel {
+  key: string;
+  kind: FilterChipKind;
+  value?: PantryStatusFilterValue;
+  label: string;
+  count: number;
+  icon: string;
+  description: string;
+  colorClass: string;
+  active: boolean;
+}
+
+export interface PantrySummaryMeta {
+  total: number;
+  visible: number;
+  basicCount: number;
+  statusCounts: {
+    expired: number;
+    expiring: number;
+    lowStock: number;
+    normal: number;
+  };
+}
 
 export interface PantryGroup {
   key: string;
@@ -10,10 +38,6 @@ export interface PantryGroup {
   lowStockCount: number;
   expiringCount: number;
   expiredCount: number;
-}
-
-export interface CategoryState {
-  expanded: boolean;
 }
 
 export type BatchStatusState = 'normal' | 'near-expiry' | 'expired' | 'unknown';
@@ -83,14 +107,3 @@ export interface PantryItemCardViewModel {
   batchCounts: BatchCountsMeta;
   batches: PantryItemBatchViewModel[];
 }
-
-export type PantryVirtualEntry =
-  | {
-      kind: 'category';
-      group: PantryGroup;
-    }
-  | {
-      kind: 'item';
-      groupKey: string;
-      item: PantryItem;
-    };

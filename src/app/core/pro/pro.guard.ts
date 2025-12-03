@@ -1,5 +1,5 @@
-import { CanActivateFn, CanMatchFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
+import { CanActivateFn, CanMatchFn, Router } from '@angular/router';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 
 const ensurePro = (): boolean | ReturnType<Router['createUrlTree']> => {

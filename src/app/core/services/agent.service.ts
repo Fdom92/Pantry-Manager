@@ -1,14 +1,14 @@
-import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
-import { PantryService } from './pantry.service';
-import { AppPreferencesService, DEFAULT_LOCATION_OPTIONS } from './app-preferences.service';
-import { RevenuecatService } from './revenuecat.service';
-import { createDocumentId } from '@core/utils';
+import { Injectable, computed, signal } from '@angular/core';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { ItemBatch, ItemLocationStock, MeasurementUnit, PantryItem } from '@core/models';
+import { createDocumentId } from '@core/utils';
+import { TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { AppPreferencesService, DEFAULT_LOCATION_OPTIONS } from './app-preferences.service';
+import { PantryService } from './pantry.service';
+import { RevenuecatService } from './revenuecat.service';
 
 type AgentRole = 'user' | 'assistant' | 'tool';
 
