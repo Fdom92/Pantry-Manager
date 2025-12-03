@@ -8,7 +8,7 @@ export const environment: Environment = {
   production: false,
   agentApiUrl: 'https://pantry-manager-develop.onrender.com/agent/process',
   proApiUrl: 'https://pantry-manager-develop.onrender.com/api/payments',
-  revenueCatPublicKey: 'goog_vWMgZBWrWzVBcjMvfvSSbMFFIEa',
+  revenueCatPublicKey: 'goog_XAdxxyRVPtpNaFLROJWzPwjdJNx',
 };
 
 /*
