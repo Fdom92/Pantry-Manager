@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
 import {
   AppPreferencesService,
+  DEFAULT_CATEGORY_OPTIONS,
   DEFAULT_LOCATION_OPTIONS,
   DEFAULT_SUPERMARKET_OPTIONS,
 } from '@core/services';
@@ -61,6 +62,30 @@ interface PantrySummaryMeta {
   };
 }
 
+const BUILTIN_CATEGORY_TRANSLATIONS: Record<string, string> = {
+  lacteos: 'pantry.categories.dairy',
+  dairy: 'pantry.categories.dairy',
+  cereales: 'pantry.categories.grains',
+  grains: 'pantry.categories.grains',
+  pastas: 'pantry.categories.pasta',
+  pasta: 'pantry.categories.pasta',
+  frescos: 'pantry.categories.fresh',
+  fresh: 'pantry.categories.fresh',
+  conservas: 'pantry.categories.canned',
+  canned: 'pantry.categories.canned',
+  embutidos: 'pantry.categories.coldcuts',
+  coldcuts: 'pantry.categories.coldcuts',
+  dulces: 'pantry.categories.sweets',
+  sweets: 'pantry.categories.sweets',
+  snacks: 'pantry.categories.snacks',
+  bebidas: 'pantry.categories.drinks',
+  drinks: 'pantry.categories.drinks',
+  salsas: 'pantry.categories.sauces',
+  sauces: 'pantry.categories.sauces',
+  spices: 'pantry.categories.spices',
+  especias: 'pantry.categories.spices',
+};
+
 @Component({
   selector: 'app-pantry-list',
   standalone: true,
@@ -87,6 +112,7 @@ export class PantryListComponent implements OnDestroy {
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
   readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
   readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.itemsState()));
+  readonly presetCategoryOptions = computed(() => this.computePresetCategoryOptions());
   readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
   readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
   readonly batchSummaries = computed(() => this.computeBatchSummaries(this.itemsState()));
@@ -106,7 +132,7 @@ export class PantryListComponent implements OnDestroy {
   private realtimeSubscribed = false;
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
-    categoryId: this.fb.control(''),
+    categoryId: this.fb.control<string | null>(null, { validators: [Validators.required] }),
     supermarket: this.fb.control('', {
       validators: [Validators.required, Validators.maxLength(80)],
       nonNullable: true,
@@ -228,7 +254,7 @@ export class PantryListComponent implements OnDestroy {
     this.editingItem = null;
     this.form.reset({
       name: '',
-      categoryId: '',
+      categoryId: null,
       supermarket: '',
       isBasic: false,
       minThreshold: null,
@@ -249,7 +275,7 @@ export class PantryListComponent implements OnDestroy {
     this.editingItem = item;
     this.form.reset({
       name: item.name ?? '',
-      categoryId: item.categoryId ?? '',
+      categoryId: item.categoryId ?? null,
       supermarket: item.supermarket ?? '',
       isBasic: Boolean(item.isBasic),
       minThreshold: item.minThreshold ?? null,
@@ -903,6 +929,71 @@ export class PantryListComponent implements OnDestroy {
       }
     }
     return Array.from(options.values()).sort((a, b) => a.localeCompare(b));
+  }
+
+  getCategorySelectOptions(): Array<{ value: string; label: string }> {
+    const presetOptions = this.presetCategoryOptions();
+    const seen = new Set<string>();
+    const options: Array<{ value: string; label: string }> = [];
+
+    const addOption = (value: string, label?: string): void => {
+      const normalized = this.normalizeKey(value);
+      if (!normalized || seen.has(normalized)) {
+        return;
+      }
+      seen.add(normalized);
+      const trimmed = value.trim();
+      const display = label ?? this.formatCategoryName(trimmed);
+      options.push({ value: trimmed, label: display });
+    };
+
+    for (const preset of presetOptions) {
+      addOption(preset);
+    }
+
+    for (const item of this.itemsState()) {
+      const id = (item.categoryId ?? '').trim();
+      if (id) {
+        addOption(id);
+      }
+    }
+
+    const control = this.form.get('categoryId');
+    const currentValue = typeof control?.value === 'string' ? control.value.trim() : '';
+    if (currentValue && !seen.has(this.normalizeKey(currentValue))) {
+      addOption(currentValue);
+    }
+
+    return options;
+  }
+
+  private computePresetCategoryOptions(): string[] {
+    const prefs = this.appPreferences.preferences();
+    const source = Array.isArray(prefs.categoryOptions) ? prefs.categoryOptions : [];
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+
+    for (const option of source) {
+      if (typeof option !== 'string') {
+        continue;
+      }
+      const trimmed = option.trim();
+      if (!trimmed) {
+        continue;
+      }
+      const key = this.normalizeKey(trimmed);
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      normalized.push(trimmed);
+    }
+
+    if (!normalized.length) {
+      return [...DEFAULT_CATEGORY_OPTIONS];
+    }
+
+    return normalized;
   }
 
   getLocationOptionsForControl(index: number): Array<{ value: string; label: string }> {
@@ -1979,6 +2070,23 @@ export class PantryListComponent implements OnDestroy {
   /** Build category filter metadata including how many items are low within each group. */
   private computeCategoryOptions(items: PantryItem[]): Array<{ id: string; label: string; count: number; lowCount: number }> {
     const counts = new Map<string, { label: string; count: number; lowCount: number }>();
+    const presets = this.presetCategoryOptions();
+
+    for (const preset of presets) {
+      const id = preset.trim();
+      if (!counts.has(id)) {
+        counts.set(id, { label: this.formatCategoryName(id), count: 0, lowCount: 0 });
+      }
+    }
+
+    if (!counts.has('')) {
+      counts.set('', {
+        label: this.translate.instant('pantry.form.uncategorized'),
+        count: 0,
+        lowCount: 0,
+      });
+    }
+
     for (const item of items) {
       const id = (item.categoryId ?? '').trim();
       const label = this.formatCategoryName(id);
@@ -2003,7 +2111,7 @@ export class PantryListComponent implements OnDestroy {
 
     const lowTotal = mapped.reduce((acc, option) => acc + option.lowCount, 0);
     return [
-      { id: 'all', label: `Todas`, count: items.length, lowCount: lowTotal },
+      { id: 'all', label: this.translate.instant('pantry.filters.all'), count: items.length, lowCount: lowTotal },
       ...mapped
     ];
   }
@@ -2046,6 +2154,14 @@ export class PantryListComponent implements OnDestroy {
   }
 
   formatCategoryName(key: string): string {
+    const normalized = this.normalizeCategoryKey(key);
+    const translationKey = normalized ? BUILTIN_CATEGORY_TRANSLATIONS[normalized] : null;
+    if (translationKey) {
+      const translated = this.translate.instant(translationKey);
+      if (translated) {
+        return translated;
+      }
+    }
     return this.formatFriendlyName(key, this.translate.instant('pantry.form.uncategorized'));
   }
 
@@ -2060,6 +2176,17 @@ export class PantryListComponent implements OnDestroy {
       .filter(Boolean)
       .map(part => part.charAt(0).toUpperCase() + part.slice(1))
       .join(' ');
+  }
+
+  private normalizeCategoryKey(value: string): string {
+    if (!value) {
+      return '';
+    }
+    const trimmed = value.trim().toLowerCase();
+    return trimmed
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ');
   }
 
   private toDateInputValue(dateIso: string): string {
