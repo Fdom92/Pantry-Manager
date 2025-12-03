@@ -1,8 +1,8 @@
-import { Injectable, signal, effect } from '@angular/core';
-import { StorageService } from './storage.service';
-import { PantryItem, ExpirationStatus, ItemLocationStock, MeasurementUnit, ItemBatch } from '@core/models';
+import { effect, Injectable, signal } from '@angular/core';
 import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { PantryFilterState, PantrySortMode, DEFAULT_PANTRY_FILTERS } from '@core/models/pantry-pipeline.model';
+import { ExpirationStatus, ItemBatch, ItemLocationStock, MeasurementUnit, PantryItem } from '@core/models';
+import { DEFAULT_PANTRY_FILTERS, PantryFilterState, PantrySortMode } from '@core/models/pantry-pipeline.model';
+import { StorageService } from './storage.service';
 
 type LegacyLocationStock = ItemLocationStock & { minThreshold?: number | null };
 

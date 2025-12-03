@@ -1,5 +1,4 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { StorageService } from './storage.service';
 import {
   AppPreferences,
   AppPreferencesDoc,
@@ -7,6 +6,7 @@ import {
   DefaultUnitPreference,
   MeasurementUnit,
 } from '@core/models';
+import { StorageService } from './storage.service';
 
 const STORAGE_KEY = 'app:preferences';
 const DOC_TYPE = 'app-preferences';

@@ -1,6 +1,6 @@
-import { Component, signal, computed } from '@angular/core';
-import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { Component, computed, signal } from '@angular/core';
+import { MeasurementUnit } from '@core/models';
 import {
   AppPreferencesService,
   DEFAULT_CATEGORY_OPTIONS,
@@ -8,7 +8,7 @@ import {
   DEFAULT_SUPERMARKET_OPTIONS,
   DEFAULT_UNIT_OPTIONS,
 } from '@core/services';
-import { MeasurementUnit } from '@core/models';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const TOAST_DURATION = 1800;

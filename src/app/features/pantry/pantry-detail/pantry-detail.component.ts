@@ -1,8 +1,8 @@
-import { Component, ChangeDetectionStrategy, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models';
 import { ItemBatch, ItemLocationStock } from '@core/models';
+import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({

@@ -1,90 +1,41 @@
-import { Component, OnDestroy, ChangeDetectionStrategy, signal, computed, effect, ViewChild, Signal } from '@angular/core';
-import { IonicModule, IonContent, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, FormArray, FormGroup } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, OnDestroy, signal, Signal, ViewChild } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
+import {
+  BatchCountsMeta,
+  BatchEntryMeta,
+  BatchStatusMeta,
+  BatchSummaryMeta,
+  ES_DATE_FORMAT_OPTIONS,
+  FilterChipViewModel,
+  ItemBatch,
+  ItemLocationStock,
+  MeasurementUnit,
+  PantryGroup,
+  PantryItem,
+  PantryItemBatchViewModel,
+  PantryItemCardViewModel,
+  PantryItemGlobalStatus,
+  PantryStatusFilterValue,
+  PantrySummaryMeta,
+  ProductStatusState
+} from '@core/models';
+import { PantryFilterState } from '@core/models/pantry-pipeline.model';
 import {
   AppPreferencesService,
   DEFAULT_CATEGORY_OPTIONS,
   DEFAULT_LOCATION_OPTIONS,
   DEFAULT_SUPERMARKET_OPTIONS,
+  LanguageService,
 } from '@core/services';
-import {
-  PantryItem,
-  MeasurementUnit,
-  ItemLocationStock,
-  ItemBatch,
-  PantryGroup,
-  BatchStatusMeta,
-  BatchEntryMeta,
-  BatchSummaryMeta,
-  BatchCountsMeta,
-  ProductStatusState,
-  PantryItemGlobalStatus,
-  PantryItemBatchViewModel,
-  PantryItemCardViewModel,
-  ES_DATE_FORMAT_OPTIONS,
-} from '@core/models';
-import { createDocumentId, getLocationDisplayName } from '@core/utils';
-import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { PantryStoreService } from '@core/store/pantry-store.service';
 import { PantryService } from '@core/services/pantry.service';
-import { PantryFilterState } from '@core/models/pantry-pipeline.model';
-import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
+import { PantryStoreService } from '@core/store/pantry-store.service';
+import { createDocumentId } from '@core/utils';
+import { IonContent, IonicModule, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { LanguageService } from '@core/services';
-
-type PantryStatusFilterValue = 'all' | 'expired' | 'near-expiry' | 'low-stock' | 'normal';
-
-type FilterChipKind = 'status' | 'basic';
-
-interface FilterChipViewModel {
-  key: string;
-  kind: FilterChipKind;
-  value?: PantryStatusFilterValue;
-  label: string;
-  count: number;
-  icon: string;
-  description: string;
-  colorClass: string;
-  active: boolean;
-}
-
-interface PantrySummaryMeta {
-  total: number;
-  visible: number;
-  basicCount: number;
-  statusCounts: {
-    expired: number;
-    expiring: number;
-    lowStock: number;
-    normal: number;
-  };
-}
-
-const BUILTIN_CATEGORY_TRANSLATIONS: Record<string, string> = {
-  lacteos: 'pantry.categories.dairy',
-  dairy: 'pantry.categories.dairy',
-  cereales: 'pantry.categories.grains',
-  grains: 'pantry.categories.grains',
-  pastas: 'pantry.categories.pasta',
-  pasta: 'pantry.categories.pasta',
-  frescos: 'pantry.categories.fresh',
-  fresh: 'pantry.categories.fresh',
-  conservas: 'pantry.categories.canned',
-  canned: 'pantry.categories.canned',
-  embutidos: 'pantry.categories.coldcuts',
-  coldcuts: 'pantry.categories.coldcuts',
-  dulces: 'pantry.categories.sweets',
-  sweets: 'pantry.categories.sweets',
-  snacks: 'pantry.categories.snacks',
-  bebidas: 'pantry.categories.drinks',
-  drinks: 'pantry.categories.drinks',
-  salsas: 'pantry.categories.sauces',
-  sauces: 'pantry.categories.sauces',
-  spices: 'pantry.categories.spices',
-  especias: 'pantry.categories.spices',
-};
+import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
 
 @Component({
   selector: 'app-pantry-list',
@@ -613,11 +564,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   getLocationLabel(locationId: string | undefined): string {
-    return getLocationDisplayName(
-      locationId,
-      this.translate.instant('common.locations.none'),
-      this.translate
-    );
+    return this.getLocationLabelText(locationId, this.translate.instant('common.locations.none'));
   }
 
   onSummaryKeydown(item: PantryItem, event: KeyboardEvent): void {
@@ -891,11 +838,7 @@ export class PantryListComponent implements OnDestroy {
           continue;
         }
         seen.add(id);
-        const label = getLocationDisplayName(
-          id,
-          this.translate.instant('common.locations.none'),
-          this.translate
-        );
+        const label = this.getLocationLabelText(id, this.translate.instant('common.locations.none'));
         const current = counts.get(id);
         if (current) {
           current.count += 1;
@@ -1007,11 +950,7 @@ export class PantryListComponent implements OnDestroy {
         return;
       }
       seen.add(normalized);
-      const display = label ?? getLocationDisplayName(
-        value,
-        this.translate.instant('common.locations.none'),
-        this.translate
-      );
+      const display = label ?? this.getLocationLabelText(value, this.translate.instant('common.locations.none'));
       options.push({ value, label: display });
     };
 
@@ -1903,10 +1842,9 @@ export class PantryListComponent implements OnDestroy {
       .map(location => {
         const quantity = this.roundDisplayQuantity(this.getLocationTotal(location));
         const unitLabel = this.getUnitLabel(this.normalizeUnitValue(location.unit));
-        const label = getLocationDisplayName(
+        const label = this.getLocationLabelText(
           location.locationId,
-          this.translate.instant('common.locations.none'),
-          this.translate
+          this.translate.instant('common.locations.none')
         );
         const batches = this.getLocationBatches(location);
         const extras: string[] = [];
@@ -2154,14 +2092,6 @@ export class PantryListComponent implements OnDestroy {
   }
 
   formatCategoryName(key: string): string {
-    const normalized = this.normalizeCategoryKey(key);
-    const translationKey = normalized ? BUILTIN_CATEGORY_TRANSLATIONS[normalized] : null;
-    if (translationKey) {
-      const translated = this.translate.instant(translationKey);
-      if (translated) {
-        return translated;
-      }
-    }
     return this.formatFriendlyName(key, this.translate.instant('pantry.form.uncategorized'));
   }
 
@@ -2178,15 +2108,9 @@ export class PantryListComponent implements OnDestroy {
       .join(' ');
   }
 
-  private normalizeCategoryKey(value: string): string {
-    if (!value) {
-      return '';
-    }
-    const trimmed = value.trim().toLowerCase();
-    return trimmed
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/\s+/g, ' ');
+  private getLocationLabelText(id: string | null | undefined, fallback: string = ''): string {
+    const value = (id ?? '').trim();
+    return value || fallback || 'No location';
   }
 
   private toDateInputValue(dateIso: string): string {

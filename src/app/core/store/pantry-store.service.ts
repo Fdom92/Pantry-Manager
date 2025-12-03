@@ -1,5 +1,5 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { PantryItem, MeasurementUnit, StockStatus } from '@core/models';
+import { computed, Injectable, signal } from '@angular/core';
+import { MeasurementUnit, PantryItem, StockStatus } from '@core/models';
 import { PantryService } from '@core/services/pantry.service';
 
 @Injectable({ providedIn: 'root' })
