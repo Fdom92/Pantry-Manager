@@ -234,6 +234,20 @@
       "expiring": "{{ count }} expiring",
       "expired": "{{ count }} expired"
     },
+    "categories": {
+      "dairy": "Dairy",
+      "grains": "Grains",
+      "pasta": "Pasta",
+      "fresh": "Fresh",
+      "canned": "Canned",
+      "coldcuts": "Cold cuts",
+      "sweets": "Sweets",
+      "snacks": "Snacks",
+      "drinks": "Drinks",
+      "sauces": "Sauces",
+      "spices": "Spices",
+      "legumes": "Legumes"
+    },
     "batches": {
       "title": "Product batches",
       "count": "{{ count }} batches recorded",
@@ -245,7 +259,6 @@
       "newTitle": "New item",
       "name": "Name",
       "namePlaceholder": "Rice, milk...",
-      "nameRequired": "Name is required.",
       "category": "Category",
       "categoryPlaceholder": "Cereals, dairy...",
       "uncategorized": "Uncategorized",
@@ -421,6 +434,13 @@
         "empty": "Add a location to get started.",
         "field": "Location {{ index }}",
         "add": "Add location"
+      },
+      "categories": {
+        "title": "Categories",
+        "subtitle": "Define the categories available when adding products.",
+        "empty": "Add a category to get started.",
+        "field": "Category {{ index }}",
+        "add": "Add category"
       },
       "supermarkets": {
         "title": "Supermarkets",
