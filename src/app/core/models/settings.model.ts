@@ -21,6 +21,7 @@ export interface AppPreferences {
   notifyOnLowStock?: boolean;
   lastSyncAt?: string | null;
   locationOptions: string[];
+  categoryOptions: string[];
   supermarketOptions: string[];
   unitOptions: string[];
 }

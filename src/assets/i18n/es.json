@@ -234,6 +234,20 @@
       "expiring": "{{ count }} por caducar",
       "expired": "{{ count }} caducados"
     },
+    "categories": {
+      "dairy": "Lácteos",
+      "grains": "Cereales",
+      "pasta": "Pastas",
+      "fresh": "Frescos",
+      "canned": "Conservas",
+      "coldcuts": "Embutidos",
+      "sweets": "Dulces",
+      "snacks": "Snacks",
+      "drinks": "Bebidas",
+      "sauces": "Salsas",
+      "spices": "Especias",
+      "legumes": "Legumbres"
+    },
     "batches": {
       "title": "Lotes del producto",
       "count": "{{ count }} lotes registrados",
@@ -245,7 +259,6 @@
       "newTitle": "Nuevo artículo",
       "name": "Nombre",
       "namePlaceholder": "Arroz, leche...",
-      "nameRequired": "El nombre es obligatorio.",
       "category": "Categoría",
       "categoryPlaceholder": "Cereales, lácteos...",
       "uncategorized": "Sin categoría",
@@ -421,6 +434,13 @@
         "empty": "Añade una ubicación para empezar.",
         "field": "Ubicación {{ index }}",
         "add": "Añadir ubicación"
+      },
+      "categories": {
+        "title": "Categorías",
+        "subtitle": "Define las categorías disponibles al registrar productos.",
+        "empty": "Añade una categoría para empezar.",
+        "field": "Categoría {{ index }}",
+        "add": "Añadir categoría"
       },
       "supermarkets": {
         "title": "Supermercados",

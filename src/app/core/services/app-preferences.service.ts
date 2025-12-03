@@ -12,6 +12,19 @@ const STORAGE_KEY = 'app:preferences';
 const DOC_TYPE = 'app-preferences';
 
 export const DEFAULT_LOCATION_OPTIONS = ['Despensa', 'Nevera', 'Cocina', 'Congelador'];
+export const DEFAULT_CATEGORY_OPTIONS = [
+  'Lácteos',
+  'Cereales',
+  'Pastas',
+  'Frescos',
+  'Conservas',
+  'Embutidos',
+  'Dulces',
+  'Snacks',
+  'Bebidas',
+  'Salsas',
+  'Especias',
+];
 export const DEFAULT_SUPERMARKET_OPTIONS = [
   'Lidl',
   'Mercadona',
@@ -42,6 +55,7 @@ const DEFAULT_PREFERENCES: AppPreferences = {
   notifyOnLowStock: false,
   lastSyncAt: null,
   locationOptions: [...DEFAULT_LOCATION_OPTIONS],
+  categoryOptions: [...DEFAULT_CATEGORY_OPTIONS],
   supermarketOptions: [...DEFAULT_SUPERMARKET_OPTIONS],
   unitOptions: [...DEFAULT_UNIT_OPTIONS],
 };
@@ -135,6 +149,7 @@ export class AppPreferencesService {
       notifyOnLowStock: Boolean(input?.notifyOnLowStock),
       lastSyncAt: input?.lastSyncAt ?? null,
       locationOptions: this.ensureLocationOptions(input?.locationOptions),
+      categoryOptions: this.ensureCategoryOptions(input?.categoryOptions),
       supermarketOptions: this.ensureSupermarketOptions(input?.supermarketOptions),
       unitOptions: this.ensureUnitOptions(input?.unitOptions),
     };
@@ -214,6 +229,33 @@ export class AppPreferencesService {
     }
     if (!normalized.length) {
       return [...DEFAULT_LOCATION_OPTIONS];
+    }
+    return normalized;
+  }
+
+  private ensureCategoryOptions(options?: unknown): string[] {
+    if (!Array.isArray(options)) {
+      return [...DEFAULT_CATEGORY_OPTIONS];
+    }
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+    for (const option of options) {
+      if (typeof option !== 'string') {
+        continue;
+      }
+      const trimmed = option.trim();
+      if (!trimmed) {
+        continue;
+      }
+      const key = trimmed.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      normalized.push(trimmed);
+    }
+    if (!normalized.length) {
+      return [...DEFAULT_CATEGORY_OPTIONS];
     }
     return normalized;
   }

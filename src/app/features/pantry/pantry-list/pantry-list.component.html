@@ -273,19 +273,19 @@
                 required>
               </ion-input>
             </ion-item>
-            @if (form.get('name')?.invalid && form.get('name')?.touched) {
-              <ion-note color="danger" class="ion-padding-start">
-                {{ 'pantry.form.nameRequired' | translate }}
-              </ion-note>
-            }
-
             <ion-item>
-              <ion-input
+              <ion-select
                 formControlName="categoryId"
+                interface="popover"
                 label="{{ 'pantry.form.category' | translate }}"
                 labelPlacement="stacked"
                 [placeholder]="'pantry.form.categoryPlaceholder' | translate">
-              </ion-input>
+                @for (option of getCategorySelectOptions(); track option.value) {
+                  <ion-select-option [value]="option.value">
+                    {{ option.label }}
+                  </ion-select-option>
+                }
+              </ion-select>
             </ion-item>
 
               <ion-item>
