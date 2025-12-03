@@ -1,14 +1,12 @@
-import { Component, signal, computed } from '@angular/core';
-import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { Component, computed, signal } from '@angular/core';
 import {
   AppPreferencesService,
   DEFAULT_CATEGORY_OPTIONS,
   DEFAULT_LOCATION_OPTIONS,
   DEFAULT_SUPERMARKET_OPTIONS,
-  DEFAULT_UNIT_OPTIONS,
 } from '@core/services';
-import { MeasurementUnit } from '@core/models';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const TOAST_DURATION = 1800;
@@ -57,23 +55,11 @@ export class SettingsCatalogsComponent {
     return draft.some((value, index) => value !== original[index]);
   });
 
-  readonly unitOptionsDraft = signal<string[]>([]);
-  readonly originalUnitOptions = signal<string[]>([]);
-  readonly hasUnitChanges = computed(() => {
-    const draft = this.normalizeUnitOptions(this.unitOptionsDraft(), false);
-    const original = this.originalUnitOptions();
-    if (draft.length !== original.length) {
-      return true;
-    }
-    return draft.some((value, index) => value !== original[index]);
-  });
-
   readonly hasAnyChanges = computed(
     () =>
       this.hasLocationChanges() ||
       this.hasCategoryChanges() ||
-      this.hasSupermarketChanges() ||
-      this.hasUnitChanges(),
+      this.hasSupermarketChanges(),
   );
 
   constructor(
@@ -128,27 +114,6 @@ export class SettingsCatalogsComponent {
     this.categoryOptionsDraft.set([...DEFAULT_CATEGORY_OPTIONS]);
   }
 
-  addUnitOption(): void {
-    this.unitOptionsDraft.update(options => [...options, '']);
-  }
-
-  removeUnitOption(index: number): void {
-    this.unitOptionsDraft.update(options => options.filter((_, i) => i !== index));
-  }
-
-  onUnitOptionInput(index: number, event: Event): void {
-    const value = (event as CustomEvent<{ value?: string | null }>).detail?.value ?? '';
-    this.unitOptionsDraft.update(options => {
-      const next = [...options];
-      next[index] = value ?? '';
-      return next;
-    });
-  }
-
-  restoreDefaultUnitOptions(): void {
-    this.unitOptionsDraft.set([...DEFAULT_UNIT_OPTIONS]);
-  }
-
   addSupermarketOption(): void {
     this.supermarketOptionsDraft.update(options => [...options, '']);
   }
@@ -181,7 +146,6 @@ export class SettingsCatalogsComponent {
       this.supermarketOptionsDraft(),
       false,
     );
-    const normalizedUnits = this.normalizeUnitOptions(this.unitOptionsDraft(), false);
 
     const locationPayload = normalizedLocations.length
       ? normalizedLocations
@@ -192,9 +156,6 @@ export class SettingsCatalogsComponent {
     const supermarketPayload = normalizedSupermarkets.length
       ? normalizedSupermarkets
       : [...DEFAULT_SUPERMARKET_OPTIONS];
-    const unitPayload = normalizedUnits.length
-      ? normalizedUnits
-      : [...DEFAULT_UNIT_OPTIONS];
 
     this.savingCatalogs.set(true);
     try {
@@ -204,16 +165,13 @@ export class SettingsCatalogsComponent {
         locationOptions: locationPayload,
         categoryOptions: categoryPayload,
         supermarketOptions: supermarketPayload,
-        unitOptions: unitPayload,
       });
       this.originalLocationOptions.set(locationPayload);
       this.originalCategoryOptions.set(categoryPayload);
       this.originalSupermarketOptions.set(supermarketPayload);
-      this.originalUnitOptions.set(unitPayload);
       this.locationOptionsDraft.set([...locationPayload]);
       this.categoryOptionsDraft.set([...categoryPayload]);
       this.supermarketOptionsDraft.set([...supermarketPayload]);
-      this.unitOptionsDraft.set([...unitPayload]);
       await this.presentToast(this.translate.instant('settings.catalogs.saveSuccess'), 'success');
     } catch (err) {
       console.error('[SettingsCatalogsComponent] saveCatalogs error', err);
@@ -230,7 +188,6 @@ export class SettingsCatalogsComponent {
       this.syncLocationOptionsFromPreferences();
       this.syncCategoryOptionsFromPreferences();
       this.syncSupermarketOptionsFromPreferences();
-      this.syncUnitOptionsFromPreferences();
     } catch (err) {
       console.error('[SettingsCatalogsComponent] loadPreferences error', err);
       await this.presentToast(this.translate.instant('settings.catalogs.loadError'), 'danger');
@@ -260,13 +217,6 @@ export class SettingsCatalogsComponent {
     this.supermarketOptionsDraft.set([...current]);
   }
 
-  private syncUnitOptionsFromPreferences(): void {
-    const prefs = this.appPreferencesService.preferences();
-    const current = this.normalizeUnitOptions(prefs.unitOptions);
-    this.originalUnitOptions.set(current);
-    this.unitOptionsDraft.set([...current]);
-  }
-
   private normalizeLocationOptions(
     values: readonly string[] | null | undefined,
     fallbackToDefault = true,
@@ -288,17 +238,6 @@ export class SettingsCatalogsComponent {
     const normalized = this.normalizeStringOptions(values, DEFAULT_SUPERMARKET_OPTIONS, fallbackToDefault);
     if (!normalized.some(option => option.toLowerCase() === 'otro')) {
       normalized.push('Otro');
-    }
-    return normalized;
-  }
-
-  private normalizeUnitOptions(
-    values: readonly string[] | null | undefined,
-    fallbackToDefault = true,
-  ): string[] {
-    const normalized = this.normalizeStringOptions(values, DEFAULT_UNIT_OPTIONS, fallbackToDefault);
-    if (!normalized.some(option => option.toLowerCase() === MeasurementUnit.UNIT.toLowerCase())) {
-      normalized.push(MeasurementUnit.UNIT);
     }
     return normalized;
   }

@@ -48,6 +48,10 @@ ion-item p {
   margin: 0;
 }
 
+ion-item {
+  --background: transparent;
+}
+
 .theme-item ion-label {
   width: 100%;
 }

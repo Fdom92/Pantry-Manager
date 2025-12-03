@@ -1,12 +1,11 @@
-import { Component, computed, effect, signal } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { ItemLocationStock, PantryItem, ES_DATE_FORMAT_OPTIONS } from '@core/models';
-import { PantryStoreService } from '@core/store/pantry-store.service';
-import { getLocationDisplayName } from '@core/utils';
+import { Component, computed, effect, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ES_DATE_FORMAT_OPTIONS, ItemLocationStock, PantryItem } from '@core/models';
 import { LanguageService } from '@core/services';
+import { PantryStoreService } from '@core/store/pantry-store.service';
+import { IonicModule } from '@ionic/angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -159,7 +158,8 @@ export class DashboardComponent {
 
   /** Map raw location ids into friendly labels for dashboard display. */
   private formatLocationName(id?: string): string {
-    return getLocationDisplayName(id, this.translate.instant('common.locations.none'), this.translate);
+    const trimmed = (id ?? '').trim();
+    return trimmed || this.translate.instant('common.locations.none');
   }
 
   private getLocationQuantity(location: ItemLocationStock): number {

@@ -1,10 +1,10 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { IonicModule, NavController } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
 import { RevenuecatService } from '@core/services/revenuecat.service';
+import { IonicModule, NavController } from '@ionic/angular';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-tabs',

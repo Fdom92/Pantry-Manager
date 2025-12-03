@@ -1,47 +1,23 @@
-import { Component, computed, signal } from '@angular/core';
-import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
+import { Component, computed, signal } from '@angular/core';
+import {
+  MeasurementUnit,
+  PantryItem,
+  ShoppingReason,
+  ShoppingState,
+  ShoppingSuggestion,
+  ShoppingSuggestionGroup,
+  ShoppingSummary,
+} from '@core/models';
+import { LanguageService, PantryService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
-import { PantryItem, MeasurementUnit } from '@core/models';
-import { getLocationDisplayName } from '@core/utils';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { LanguageService } from '@core/services';
 import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
-import { PantryService } from '@core/services';
 
-type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';
-
-interface ShoppingSuggestion {
-  item: PantryItem;
-  locationId: string;
-  reason: ShoppingReason;
-  suggestedQuantity: number;
-  currentQuantity: number;
-  minThreshold?: number;
-  unit: string;
-  supermarket?: string;
-}
-
-interface ShoppingSuggestionGroup {
-  key: string;
-  label: string;
-  suggestions: ShoppingSuggestion[];
-}
-
-interface ShoppingSummary {
-  total: number;
-  belowMin: number;
-  basicLow: number;
-  basicOut: number;
-  supermarketCount: number;
-}
-
-interface ShoppingState {
-  suggestions: ShoppingSuggestion[];
-  groupedSuggestions: ShoppingSuggestionGroup[];
-  summary: ShoppingSummary;
-  hasAlerts: boolean;
-}
+type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;
+type ShoppingSuggestionGroupWithItem = ShoppingSuggestionGroup<PantryItem>;
+type ShoppingStateWithItem = ShoppingState<PantryItem>;
 
 @Component({
   selector: 'app-shopping',
@@ -54,7 +30,7 @@ export class ShoppingComponent {
   private readonly unassignedSupermarketKey = '__none__';
 
   readonly loading = this.pantryStore.loading;
-  readonly shoppingState = computed<ShoppingState>(() => {
+  readonly shoppingState = computed<ShoppingStateWithItem>(() => {
     const analysis = this.analyzeShopping(this.pantryStore.items());
     return {
       ...analysis,
@@ -88,7 +64,7 @@ export class ShoppingComponent {
   /**
    * Open modal to confirm purchase details and apply them.
    */
-  async openPurchaseModal(suggestion: ShoppingSuggestion): Promise<void> {
+  async openPurchaseModal(suggestion: ShoppingSuggestionWithItem): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: AddPurchaseModalComponent,
       componentProps: {
@@ -124,7 +100,7 @@ export class ShoppingComponent {
    * Persist the purchased batch and refresh shopping state.
    */
   private async handlePurchase(
-    suggestion: ShoppingSuggestion,
+    suggestion: ShoppingSuggestionWithItem,
     data: { quantity: number; expiryDate?: string | null; location: string }
   ): Promise<void> {
     const id = suggestion.item?._id;
@@ -159,19 +135,15 @@ export class ShoppingComponent {
   }
 
   getLocationLabel(locationId: string): string {
-    return getLocationDisplayName(
-      locationId,
-      this.translate.instant('common.locations.none'),
-      this.translate
-    );
+    return this.formatLocationLabel(locationId, this.translate.instant('common.locations.none'));
   }
 
   /**
    * Evaluate every location for each item and produce actionable shopping suggestions.
    * Returns both the detailed list and aggregate counters for the summary card.
    */
-  private analyzeShopping(items: PantryItem[]): Omit<ShoppingState, 'hasAlerts'> {
-    const suggestions: ShoppingSuggestion[] = [];
+  private analyzeShopping(items: PantryItem[]): Omit<ShoppingStateWithItem, 'hasAlerts'> {
+    const suggestions: ShoppingSuggestionWithItem[] = [];
     const uniqueSupermarkets = new Set<string>();
     const summary: ShoppingSummary = {
       total: 0,
@@ -251,8 +223,10 @@ export class ShoppingComponent {
     return trimmed.replace(/\s+/g, ' ');
   }
 
-  private groupSuggestionsBySupermarket(suggestions: ShoppingSuggestion[]): ShoppingSuggestionGroup[] {
-    const map = new Map<string, ShoppingSuggestion[]>();
+  private groupSuggestionsBySupermarket(
+    suggestions: ShoppingSuggestionWithItem[]
+  ): ShoppingSuggestionGroupWithItem[] {
+    const map = new Map<string, ShoppingSuggestionWithItem[]>();
     for (const suggestion of suggestions) {
       const key = suggestion.supermarket?.toLowerCase() ?? this.unassignedSupermarketKey;
       const list = map.get(key);
@@ -286,7 +260,7 @@ export class ShoppingComponent {
     });
   }
 
-  getSuggestionTrackId(suggestion: ShoppingSuggestion): string {
+  getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
     return suggestion.item?._id ?? suggestion.item?.name ?? 'item';
   }
 
@@ -328,4 +302,8 @@ export class ShoppingComponent {
     return this.translate.instant('shopping.unassignedSupermarket');
   }
 
+  private formatLocationLabel(value: string | null | undefined, fallback: string = ''): string {
+    const trimmed = (value ?? '').trim();
+    return trimmed || fallback || 'No location';
+  }
 }

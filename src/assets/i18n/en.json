@@ -449,13 +449,6 @@
         "field": "Supermarket {{ index }}",
         "add": "Add supermarket",
         "other": "Other"
-      },
-      "units": {
-        "title": "Units",
-        "subtitle": "Manage units available when recording quantities.",
-        "empty": "Add a unit to get started.",
-        "field": "Unit {{ index }}",
-        "add": "Add unit"
       }
     },
     "info": {
