@@ -11,8 +11,8 @@
       </div>
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()">
-        {{ 'common.actions.clear' | translate }}
+      <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()" aria-label="{{ 'common.actions.clear' | translate }}">
+        <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -23,18 +23,11 @@
     @for (message of messages(); track trackById($index, message)) {
       <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-tool]="message.role === 'tool'" [class.is-error]="message.status === 'error'">
         <div class="message__bubble">
-          <div class="message__meta">
-            <span class="message__author">
-              {{
-                message.role === 'user'
-                  ? ('agent.roles.user' | translate)
-                  : (message.role === 'tool' ? ('agent.roles.tool' | translate) : ('agent.roles.assistant' | translate))
-              }}
-            </span>
-            <span class="message__time">{{ message.createdAt | date:'shortTime' }}</span>
-          </div>
           <div class="message__content">
             <p>{{ message.content }}</p>
+          </div>
+          <div class="message__meta">
+            <span class="message__time">{{ message.createdAt | date:'shortTime' }}</span>
           </div>
           @if (message.data?.summary || message.data?.details?.length) {
             <div class="result-card">
@@ -75,9 +68,6 @@
       enterkeyhint="send">
     </ion-textarea>
     <div class="composer__actions">
-      <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()">
-        {{ 'common.actions.clear' | translate }}
-      </ion-button>
       <ion-button color="primary" (click)="send()" [disabled]="!messageControl.value.trim() || thinking()">
         {{ 'agent.actions.send' | translate }}
       </ion-button>

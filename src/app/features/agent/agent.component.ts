@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnDestroy, ViewChild, effect, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AgentMessage, AgentService } from '@core/services/agent.service';
+import { AgentMessage } from '@core/models';
+import { AgentService } from '@core/services/agent.service';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { IonContent, IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';

@@ -329,7 +329,19 @@
       "restore": "Restore purchase"
     },
     "note": "Subscriptions are managed in the Google Play account screen.",
-    "alreadyPro": "Already PRO ✅"
+    "alreadyPro": "Already PRO ✅",
+    "errors": {
+      "purchaseFailed": "No subscription available right now. Try again or check your Play account.",
+      "selectPlan": "Choose a plan to continue."
+    },
+    "plans": {
+      "title": "Choose your PRO plan",
+      "subtitle": "Pick the cadence that fits you best.",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "other": "Other plan",
+      "unavailable": "No plans available right now. Check your connection or try again in a moment."
+    }
   },
   "settings": {
     "title": "Settings",

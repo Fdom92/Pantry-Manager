@@ -37,3 +37,7 @@
     color: var(--ion-color-medium);
   }
 }
+
+:host ion-content {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+}
