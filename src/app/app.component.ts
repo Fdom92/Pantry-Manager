@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular';
+import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { PantryService } from '@core/services/pantry.service';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { App as CapacitorApp } from '@capacitor/app';
@@ -13,7 +16,10 @@ export class AppComponent {
   constructor(
     private readonly pantryService: PantryService,
     private readonly revenuecat: RevenuecatService,
+    private readonly router: Router,
+    private readonly navCtrl: NavController,
   ) {
+    this.redirectToOnboardingIfFirstRun();
     void this.initializeApp();
   }
 
@@ -44,6 +50,18 @@ export class AppComponent {
       return generated;
     } catch {
       return 'local-user';
+    }
+  }
+
+  private redirectToOnboardingIfFirstRun(): void {
+    try {
+      const hasSeen = localStorage.getItem(ONBOARDING_STORAGE_KEY);
+      const alreadyOnboarding = this.router.url?.startsWith('/onboarding');
+      if (!hasSeen && !alreadyOnboarding) {
+        void this.navCtrl.navigateRoot('/onboarding');
+      }
+    } catch (err) {
+      console.warn('[AppComponent] onboarding check failed', err);
     }
   }
 }

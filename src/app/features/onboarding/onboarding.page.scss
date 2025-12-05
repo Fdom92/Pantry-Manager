@@ -1,0 +1,232 @@
+:host {
+  display: block;
+}
+
+.onboarding {
+  --background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.18), transparent 28%),
+    radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.15), transparent 24%),
+    linear-gradient(160deg, #0b1021 0%, #0f172a 50%, #0b1226 100%);
+  position: relative;
+  color: #f6f7fb;
+}
+
+.background-blur {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  filter: blur(64px);
+  opacity: 0.8;
+}
+
+.blur-a {
+  background: radial-gradient(circle at 10% 70%, rgba(16, 185, 129, 0.18), transparent 30%);
+}
+
+.blur-b {
+  background: radial-gradient(circle at 90% 60%, rgba(99, 102, 241, 0.22), transparent 28%);
+}
+
+.top-bar {
+  position: relative;
+  z-index: 2;
+  padding: 16px 20px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.eyebrow {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: #dce4ff;
+
+  ion-icon {
+    font-size: 18px;
+    color: var(--ion-color-primary);
+  }
+}
+
+.onboarding-swiper {
+  position: relative;
+  z-index: 2;
+  height: calc(100% - 140px);
+  padding: 14px 12px 72px;
+}
+
+.slide-card {
+  max-width: 520px;
+  margin: 28px auto 0;
+  padding: 32px 28px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(14px);
+  text-align: left;
+  animation: floatIn 420ms ease;
+
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 10px 0 12px;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin: 0;
+    color: rgba(237, 242, 255, 0.9);
+    line-height: 1.5;
+    font-size: 16px;
+  }
+}
+
+.slide-card.is-pro {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 18px 50px rgba(99, 102, 241, 0.28);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.14);
+  color: #c7d2ff;
+  font-size: 13px;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+}
+
+.icon-burst {
+  position: relative;
+  width: 74px;
+  height: 74px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(16, 185, 129, 0.8));
+  box-shadow:
+    0 12px 30px rgba(99, 102, 241, 0.45),
+    0 16px 50px rgba(15, 23, 42, 0.6);
+  overflow: hidden;
+}
+
+.icon-burst ion-icon {
+  font-size: 32px;
+  color: #fff;
+  position: relative;
+  z-index: 2;
+  animation: floatPulse 4.6s ease-in-out infinite;
+}
+
+.icon-burst .glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent 58%);
+  filter: blur(18px);
+  opacity: 0.8;
+  animation: glowWave 6s ease-in-out infinite;
+}
+
+.actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  padding: 0 18px;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  ion-button {
+    --padding-start: 18px;
+    --padding-end: 18px;
+    --border-radius: 16px;
+    font-weight: 700;
+    text-transform: none;
+  }
+}
+
+.swiper-pagination {
+  bottom: 30px !important;
+}
+
+.swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  opacity: 1;
+  transition: width 180ms ease, background 180ms ease;
+}
+
+.swiper-pagination-bullet-active {
+  width: 28px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--ion-color-primary), #34d399);
+}
+
+@media (max-width: 600px) {
+  .onboarding-swiper {
+    padding: 10px 6px 90px;
+  }
+
+  .slide-card {
+    margin-top: 8px;
+    padding: 28px 22px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 15px;
+    }
+  }
+
+  .actions {
+    bottom: 6px;
+  }
+}
+
+@keyframes floatIn {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes floatPulse {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes glowWave {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.6;
+  }
+}

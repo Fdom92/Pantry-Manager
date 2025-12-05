@@ -17,6 +17,36 @@
       "shopping": "Compra inteligente con IA."
     }
   },
+  "onboarding": {
+    "tagline": "Empieza en 1 minuto",
+    "actions": {
+      "skip": "Saltar",
+      "next": "Siguiente",
+      "start": "Empezar"
+    },
+    "slides": {
+      "organize": {
+        "title": "Organiza tu despensa sin esfuerzo",
+        "description": "Registra productos en segundos, con categorías y ubicaciones hechas a tu medida."
+      },
+      "batches": {
+        "title": "Control por lotes y caducidades",
+        "description": "Gestiona lotes, fechas de caducidad y recibe alertas antes de que algo se eche a perder."
+      },
+      "suggestions": {
+        "title": "Sugerencias de compra inteligentes",
+        "description": "Te dice qué reponer según consumo, stock mínimo y lo que caducará pronto."
+      },
+      "agent": {
+        "title": "Desbloquea el Agente IA (PRO)",
+        "description": "Chatea con tu despensa, pide recetas y genera listas en segundos.",
+        "badge": "Exclusivo PRO",
+        "titlePro": "Agente IA listo para ti",
+        "descriptionPro": "Ya tienes acceso PRO: usa el Agente para recetas, ideas y compras.",
+        "badgePro": "PRO activo"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Cerrar",
@@ -515,6 +545,10 @@
         "add": "Añadir supermercado",
         "other": "Otro"
       }
+    },
+    "tutorial": {
+      "title": "Ver tutorial",
+      "subtitle": "Revisa el onboarding inicial cuando quieras."
     },
     "info": {
       "title": "Información",
