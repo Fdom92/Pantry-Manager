@@ -1,3 +1,4 @@
+export * from './agent.models';
 export * from './base-doc.model';
 export * from './category.model';
 export * from './date-format-options.model';
