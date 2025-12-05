@@ -7,7 +7,15 @@
     "settings": "Settings"
   },
   "pro": {
-    "locked": "PRO"
+    "locked": "PRO",
+    "banner": {
+      "title": "Exclusive for PRO",
+      "cta": "Go PRO",
+      "default": "Unlock AI-powered features and premium tools.",
+      "suggestions": "Generate AI-powered recipes tailored to your pantry.",
+      "pantry": "Optimize your pantry with AI recommendations.",
+      "shopping": "Smarter grocery planning with AI."
+    }
   },
   "common": {
     "actions": {
@@ -158,6 +166,15 @@
     "placeholder": "Write instructions like \"Move 2 yogurts to the fridge\"",
     "actions": {
       "send": "Send"
+    },
+    "preview": {
+      "badge": "Preview",
+      "title": "Preview the PRO agent",
+      "headline": "Unlock AI to manage your pantry for you.",
+      "subtitle": "See expired items, generate recipes and reorganize stock with one prompt.",
+      "cta": "Unlock PRO agent",
+      "note": "Start your free trial and cancel anytime.",
+      "lockedPlaceholder": "Available with PRO"
     },
     "roles": {
       "user": "You",
@@ -340,11 +357,12 @@
   "upgrade": {
     "title": "Upgrade to PRO",
     "headline": "Unlock the full pantry superpowers",
-    "subtitle": "Smarter automation, cloud protection and priority features.",
+    "subtitle": "Smarter automation and priority features.",
     "benefits": {
       "title": "Everything you get with PRO",
       "subtitle": "Designed for power users and busy households.",
       "agent": "AI agent to manage your pantry hands-free.",
+      "future": "Early access to upcoming PRO features.",
       "cloudSync": "Cloud sync and backup for peace of mind.",
       "history": "Full history of changes to your items.",
       "predictions": "Advanced recipes and smart predictions."
@@ -352,7 +370,9 @@
     "actions": {
       "subscribe": "Go PRO on Google Play",
       "maybeLater": "Maybe later",
-      "restore": "Restore purchase"
+      "restore": "Restore purchase",
+      "startTrial": "Start free trial",
+      "select": "Select plan"
     },
     "note": "Subscriptions are managed in the Google Play account screen.",
     "alreadyPro": "Already PRO ✅",
@@ -366,7 +386,14 @@
       "monthly": "Monthly",
       "annual": "Annual",
       "other": "Other plan",
-      "unavailable": "No plans available right now. Check your connection or try again in a moment."
+      "unavailable": "No plans available right now. Check your connection or try again in a moment.",
+      "perMonth": "/month",
+      "perYear": "/year",
+      "badgeBestValue": "Best value",
+      "trialFree": "Free trial available",
+      "trialDiscount": "{{ cycles }} intro periods at {{ price }}",
+      "savings": "Save {{ value }}%",
+      "proLabel": "PRO plan"
     }
   },
   "settings": {
@@ -376,7 +403,7 @@
       "statusPro": "PRO user",
       "statusFree": "Free version",
       "statusDescription": "Thank you for supporting the project. PRO is active on this device.",
-      "upgradePrompt": "Upgrade to PRO to unlock premium features and cloud extras.",
+      "upgradePrompt": "Upgrade to PRO to unlock premium features.",
       "upgradeCta": "Upgrade to PRO",
       "title": "PRO features",
       "subtitle": "Protected actions only available to PRO users.",

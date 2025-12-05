@@ -1,0 +1,14 @@
+<div class="pro-banner" [class.pro-banner--subtle]="subtle">
+  <div class="pro-banner__icon">
+    <ion-icon [name]="icon"></ion-icon>
+  </div>
+  <div class="pro-banner__content">
+    <p class="pro-banner__eyebrow">{{ 'pro.banner.title' | translate }}</p>
+    <p class="pro-banner__message">{{ message || ('pro.banner.default' | translate) }}</p>
+  </div>
+  @if (showAction) {
+    <ion-button size="small" color="warning" fill="solid" (click)="onClick()">
+      {{ ctaLabel || ('pro.banner.cta' | translate) }}
+    </ion-button>
+  }
+</div>

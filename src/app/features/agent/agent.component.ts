@@ -4,7 +4,7 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AgentMessage } from '@core/models';
 import { AgentService } from '@core/services/agent.service';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { IonContent, IonicModule } from '@ionic/angular';
+import { IonContent, IonicModule, NavController } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -19,10 +19,26 @@ export class AgentComponent implements OnDestroy {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
   private readonly agentService = inject(AgentService);
   private readonly revenuecat = inject(RevenuecatService);
+  private readonly navCtrl = inject(NavController);
 
   readonly messages = this.agentService.messages;
   readonly thinking = this.agentService.thinking;
   readonly isPro$ = this.revenuecat.isPro$;
+  readonly previewMessages: AgentMessage[] = [
+    {
+      id: 'preview-user',
+      role: 'user',
+      content: 'Quiero ver los caducados',
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'preview-agent',
+      role: 'assistant',
+      content: 'Respuesta bloqueada · Disponible en PRO',
+      createdAt: new Date().toISOString(),
+      status: 'error',
+    },
+  ];
 
   readonly messageControl = new FormControl('', {
     nonNullable: true,
@@ -44,6 +60,10 @@ export class AgentComponent implements OnDestroy {
   }
 
   async send(): Promise<void> {
+    if (!this.revenuecat.isPro()) {
+      await this.goToUpgrade();
+      return;
+    }
     const text = this.messageControl.value.trim();
     if (!text) {
       return;
@@ -71,5 +91,9 @@ export class AgentComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.agentService.resetConversation();
+  }
+
+  async goToUpgrade(): Promise<void> {
+    await this.navCtrl.navigateForward('/upgrade');
   }
 }

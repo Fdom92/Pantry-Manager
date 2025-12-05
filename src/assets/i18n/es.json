@@ -7,7 +7,15 @@
     "settings": "Ajustes"
   },
   "pro": {
-    "locked": "PRO"
+    "locked": "PRO",
+    "banner": {
+      "title": "Solo para PRO",
+      "cta": "Hazte PRO",
+      "default": "Desbloquea funciones avanzadas con IA y herramientas premium.",
+      "suggestions": "Generar receta IA con tus ingredientes.",
+      "pantry": "Optimiza la despensa con IA.",
+      "shopping": "Compra inteligente con IA."
+    }
   },
   "common": {
     "actions": {
@@ -158,6 +166,15 @@
     "placeholder": "Escribe instrucciones como \"Mueve 2 yogures al frigo\"",
     "actions": {
       "send": "Enviar"
+    },
+    "preview": {
+      "badge": "Vista previa",
+      "title": "Así se ve el agente PRO",
+      "headline": "Respuestas premium con IA",
+      "subtitle": "Consulta caducados, genera recetas y reorganiza stock en un solo mensaje.",
+      "cta": "Desbloquear agente PRO",
+      "note": "Prueba gratis incluida con el plan PRO.",
+      "lockedPlaceholder": "Disponible solo con PRO"
     },
     "roles": {
       "user": "Tú",
@@ -340,11 +357,12 @@
   "upgrade": {
     "title": "Hazte PRO",
     "headline": "Desbloquea todo el poder de tu despensa",
-    "subtitle": "Automatización inteligente, copia en la nube y funciones prioritarias.",
+    "subtitle": "Automatización inteligente y funciones prioritarias.",
     "benefits": {
       "title": "Todo lo que incluye PRO",
       "subtitle": "Pensado para hogares con mucho movimiento.",
       "agent": "Agente IA para gestionar la despensa sin manos.",
+      "future": "Acceso anticipado a futuras funciones PRO.",
       "cloudSync": "Sincronización y backup en la nube.",
       "history": "Historial completo de cambios en tus productos.",
       "predictions": "Recetas avanzadas y predicciones inteligentes."
@@ -352,7 +370,9 @@
     "actions": {
       "subscribe": "Ir a suscripción PRO en Google Play",
       "maybeLater": "Ahora no",
-      "restore": "Restaurar compra"
+      "restore": "Restaurar compra",
+      "startTrial": "Empezar prueba gratis",
+      "select": "Elegir plan"
     },
     "note": "Las suscripciones se gestionan desde tu cuenta de Google Play.",
     "alreadyPro": "PRO activo ✅",
@@ -366,7 +386,14 @@
       "monthly": "Mensual",
       "annual": "Anual",
       "other": "Otro plan",
-      "unavailable": "No hay planes disponibles ahora mismo. Revisa tu conexión o inténtalo en unos momentos."
+      "unavailable": "No hay planes disponibles ahora mismo. Revisa tu conexión o inténtalo en unos momentos.",
+      "perMonth": "/mes",
+      "perYear": "/año",
+      "badgeBestValue": "Mejor oferta",
+      "trialFree": "Prueba gratuita disponible",
+      "trialDiscount": "{{ cycles }} periodos iniciales por {{ price }}",
+      "savings": "Ahorra {{ value }}%",
+      "proLabel": "Plan PRO"
     }
   },
   "settings": {
@@ -376,7 +403,7 @@
       "statusPro": "Usuario PRO",
       "statusFree": "Versión gratuita",
       "statusDescription": "Gracias por apoyar el proyecto. PRO está activo en este dispositivo.",
-      "upgradePrompt": "Hazte PRO para desbloquear funciones premium y la copia en la nube.",
+      "upgradePrompt": "Hazte PRO para desbloquear funciones premium.",
       "upgradeCta": "Hazte PRO",
       "title": "Funciones PRO",
       "subtitle": "Acciones protegidas solo para usuarios PRO.",

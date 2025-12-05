@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { TabsComponent } from './tabs/tabs.component';
-import { proGuard } from '@core/pro';
 
 export const routes: Routes = [
   {
@@ -24,7 +23,6 @@ export const routes: Routes = [
       },
       {
         path: 'agent',
-        canMatch: [proGuard],
         loadComponent: () =>
           import('@features/agent/agent.component').then(m => m.AgentComponent),
       },

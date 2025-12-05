@@ -1,74 +1,117 @@
+@let isPro = (isPro$ | async);
+
 <ion-header>
   <ion-toolbar>
     <ion-title>
       <div class="agent-title">
         <span>{{ 'agent.title' | translate }}</span>
-        @if (isPro$ | async) {
+        @if (isPro) {
           <ion-badge color="warning">
             {{ 'settings.pro.badgePro' | translate }}
+          </ion-badge>
+        } @else {
+          <ion-badge color="medium">
+            {{ 'agent.preview.badge' | translate }}
           </ion-badge>
         }
       </div>
     </ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()" aria-label="{{ 'common.actions.clear' | translate }}">
-        <ion-icon name="trash-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    @if (isPro) {
+      <ion-buttons slot="end">
+        <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()" aria-label="{{ 'common.actions.clear' | translate }}">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    }
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div class="chat">
-    @for (message of messages(); track trackById($index, message)) {
-      <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-tool]="message.role === 'tool'" [class.is-error]="message.status === 'error'">
-        <div class="message__bubble">
-          <div class="message__content">
-            <p>{{ message.content }}</p>
+  @if (isPro) {
+    <div class="chat">
+      @for (message of messages(); track trackById($index, message)) {
+        <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-tool]="message.role === 'tool'" [class.is-error]="message.status === 'error'">
+          <div class="message__bubble">
+            <div class="message__content">
+              <p>{{ message.content }}</p>
+            </div>
+            <div class="message__meta">
+              <span class="message__time">{{ message.createdAt | date:'shortTime' }}</span>
+            </div>
+            @if (message.data?.summary || message.data?.details?.length) {
+              <div class="result-card">
+                @if (message.data?.summary) {
+                  <div class="result-card__title">{{ message.data?.summary }}</div>
+                }
+                @if (message.data?.details?.length) {
+                  <ul class="result-card__list">
+                    @for (detail of message.data?.details; track detail) {
+                      <li>{{ detail }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
           </div>
-          <div class="message__meta">
-            <span class="message__time">{{ message.createdAt | date:'shortTime' }}</span>
+        </div>
+      }
+
+      @if (thinking()) {
+        <div class="message from-agent">
+          <div class="message__bubble thinking">
+            <ion-spinner name="dots"></ion-spinner>
+            <span>{{ 'agent.thinking' | translate }}</span>
           </div>
-          @if (message.data?.summary || message.data?.details?.length) {
-            <div class="result-card">
-              @if (message.data?.summary) {
-                <div class="result-card__title">{{ message.data?.summary }}</div>
-              }
-              @if (message.data?.details?.length) {
-                <ul class="result-card__list">
-                  @for (detail of message.data?.details; track detail) {
-                    <li>{{ detail }}</li>
-                  }
-                </ul>
-              }
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="pro-preview">
+      <div class="preview-card">
+        <div class="preview-card__header">
+          <div class="preview-icon">
+            <ion-icon name="star-outline"></ion-icon>
+          </div>
+          <div>
+            <p class="eyebrow">{{ 'agent.preview.title' | translate }}</p>
+            <h2>{{ 'agent.preview.headline' | translate }}</h2>
+            <p class="muted">{{ 'agent.preview.subtitle' | translate }}</p>
+          </div>
+        </div>
+        <div class="chat chat--preview">
+          @for (message of previewMessages; track trackById($index, message)) {
+            <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-error]="message.status === 'error'">
+              <div class="message__bubble">
+                <div class="message__content">
+                  <p>{{ message.content }}</p>
+                </div>
+              </div>
             </div>
           }
         </div>
-      </div>
-    }
-
-    @if (thinking()) {
-      <div class="message from-agent">
-        <div class="message__bubble thinking">
-          <ion-spinner name="dots"></ion-spinner>
-          <span>{{ 'agent.thinking' | translate }}</span>
+        <div class="preview-card__cta">
+          <ion-button expand="block" color="warning" size="large" (click)="goToUpgrade()">
+            {{ 'agent.preview.cta' | translate }}
+          </ion-button>
         </div>
       </div>
-    }
-  </div>
+    </div>
+  }
 </ion-content>
 
 <ion-footer>
-  <div class="composer">
+  <div class="composer" [class.composer--locked]="!isPro">
     <ion-textarea
       class="composer__input"
-      placeholder="{{ 'agent.placeholder' | translate }}"
+      [placeholder]="isPro ? ('agent.placeholder' | translate) : ('agent.preview.lockedPlaceholder' | translate)"
       autoGrow="true"
       [formControl]="messageControl"
+      [value]="isPro ? messageControl.value : ''"
+      [disabled]="!isPro"
       enterkeyhint="send">
     </ion-textarea>
     <div class="composer__actions">
-      <ion-button color="primary" (click)="send()" [disabled]="!messageControl.value.trim() || thinking()">
+      <ion-button color="primary" (click)="isPro ? send() : null" [disabled]="!isPro || !messageControl.value.trim() || thinking()">
         {{ 'agent.actions.send' | translate }}
       </ion-button>
     </div>
