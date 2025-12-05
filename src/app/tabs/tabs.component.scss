@@ -3,13 +3,24 @@ ion-tab-button.locked {
   overflow: hidden;
 }
 
+.tab-pro-pill {
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #fce7c6, #f8d57b);
+  color: #7a5400;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
 .lock-overlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.35);
-  color: #fff;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.22));
+  color: #111;
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;

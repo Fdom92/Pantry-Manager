@@ -7,36 +7,19 @@
 <ion-content class="ion-padding">
   <div class="settings-content">
     @if (isPro$ | async) {
-    <ion-card color="light">
-      <ion-card-header>
-        <ion-card-title>{{
-          "settings.pro.statusTitle" | translate
-        }}</ion-card-title>
-        <ion-card-subtitle>{{
-          "settings.pro.statusPro" | translate
-        }}</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        {{ "settings.pro.statusDescription" | translate }}
-      </ion-card-content>
-    </ion-card>
+      <app-pro-banner
+        class="pro-inline-banner"
+        [message]="'settings.pro.statusDescription' | translate"
+        [showAction]="false"
+        [subtle]="true">
+      </app-pro-banner>
     } @else {
-    <ion-card color="warning">
-      <ion-card-header>
-        <ion-card-title>{{
-          "settings.pro.statusTitle" | translate
-        }}</ion-card-title>
-        <ion-card-subtitle>{{
-          "settings.pro.statusFree" | translate
-        }}</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <p>{{ "settings.pro.upgradePrompt" | translate }}</p>
-        <ion-button expand="block" routerLink="/upgrade" color="dark">
-          {{ "settings.pro.upgradeCta" | translate }}
-        </ion-button>
-      </ion-card-content>
-    </ion-card>
+      <app-pro-banner
+        class="pro-inline-banner"
+        [message]="'settings.pro.upgradePrompt' | translate"
+        [ctaLabel]="'settings.pro.upgradeCta' | translate"
+        (action)="goToUpgrade()">
+      </app-pro-banner>
     }
     <ion-card class="settings-card">
       <ion-card-header>
