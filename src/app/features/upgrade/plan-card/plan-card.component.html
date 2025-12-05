@@ -1,0 +1,33 @@
+<div class="plan-card" [class.plan-card--highlight]="highlight" [class.plan-card--selected]="selected">
+  @if (badge) {
+    <div class="plan-card__badge">{{ badge }}</div>
+  }
+  <div class="plan-card__header">
+    <p class="plan-card__eyebrow">{{ 'upgrade.plans.proLabel' | translate }}</p>
+    <h3>{{ title }}</h3>
+    <p class="plan-card__subtitle">{{ subtitle }}</p>
+  </div>
+  <div class="plan-card__price">
+    <span class="plan-card__amount">{{ price }}</span>
+    <span class="plan-card__period">{{ period }}</span>
+  </div>
+  <div class="plan-card__meta">
+    @if (savings) {
+      <span class="pill">{{ savings }}</span>
+    }
+    @if (trialLabel) {
+      <span class="pill pill--trial">{{ trialLabel }}</span>
+    }
+  </div>
+  <ul class="plan-card__list">
+    @for (benefit of benefits; track benefit) {
+      <li>
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <span>{{ benefit }}</span>
+      </li>
+    }
+  </ul>
+  <ion-button expand="block" color="warning" size="large" [disabled]="disabled" (click)="onSelect()">
+    {{ ctaLabel || ('upgrade.actions.select' | translate) }}
+  </ion-button>
+</div>

@@ -1,0 +1,113 @@
+.plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #0f172a, #111827);
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.3);
+}
+
+.plan-card--selected {
+  border-color: rgba(251, 191, 36, 0.65);
+  box-shadow: 0 20px 48px rgba(251, 191, 36, 0.25);
+}
+
+.plan-card--highlight {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #0f172a;
+  box-shadow: 0 20px 50px rgba(251, 191, 36, 0.35);
+}
+
+.plan-card__badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  color: inherit;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.plan-card__header h3 {
+  margin: 4px 0 2px;
+  font-size: 20px;
+}
+
+.plan-card__eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.plan-card__subtitle {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.8);
+}
+
+.plan-card__price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.plan-card__amount {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.plan-card__period {
+  font-size: 14px;
+  opacity: 0.78;
+}
+
+.plan-card__meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.14);
+  color: inherit;
+  font-weight: 600;
+}
+
+.pill--trial {
+  background: rgba(16, 185, 129, 0.16);
+  color: #065f46;
+}
+
+.plan-card--highlight .pill--trial {
+  background: rgba(15, 23, 42, 0.14);
+  color: #0f172a;
+}
+
+.plan-card__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: inherit;
+}
+
+.plan-card__list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plan-card ion-button {
+  --box-shadow: none;
+}

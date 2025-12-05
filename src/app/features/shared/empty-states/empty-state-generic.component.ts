@@ -11,7 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrls: ['./empty-state.component.scss'],
 })
 export class EmptyStateGenericComponent {
-  @Input() icon = 'sparkles-outline';
+  @Input() icon = 'star-outline';
   @Input() title?: string;
   @Input() subtitle?: string;
   @Input() titleKey = 'emptyStates.generic.title';
