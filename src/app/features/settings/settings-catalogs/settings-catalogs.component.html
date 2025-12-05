@@ -22,9 +22,13 @@
 
       @if (!locationOptionsDraft().length) {
         <ion-item lines="none">
-          <ion-text color="medium">
-            {{ 'settings.catalogs.locations.empty' | translate }}
-          </ion-text>
+          <app-empty-state-generic
+            class="list-empty-state"
+            icon="navigate-outline"
+            [title]="'settings.catalogs.locations.title' | translate"
+            [subtitle]="'settings.catalogs.locations.empty' | translate"
+            [compact]="true">
+          </app-empty-state-generic>
         </ion-item>
       }
 
@@ -77,9 +81,13 @@
 
       @if (!categoryOptionsDraft().length) {
         <ion-item lines="none">
-          <ion-text color="medium">
-            {{ 'settings.catalogs.categories.empty' | translate }}
-          </ion-text>
+          <app-empty-state-generic
+            class="list-empty-state"
+            icon="pricetag-outline"
+            [title]="'settings.catalogs.categories.title' | translate"
+            [subtitle]="'settings.catalogs.categories.empty' | translate"
+            [compact]="true">
+          </app-empty-state-generic>
         </ion-item>
       }
 
@@ -132,9 +140,13 @@
 
       @if (!supermarketOptionsDraft().length) {
         <ion-item lines="none">
-          <ion-text color="medium">
-            {{ 'settings.catalogs.supermarkets.empty' | translate }}
-          </ion-text>
+          <app-empty-state-generic
+            class="list-empty-state"
+            icon="storefront-outline"
+            [title]="'settings.catalogs.supermarkets.title' | translate"
+            [subtitle]="'settings.catalogs.supermarkets.empty' | translate"
+            [compact]="true">
+          </app-empty-state-generic>
         </ion-item>
       }
 

@@ -24,6 +24,27 @@
       "none": "No location"
     }
   },
+  "emptyStates": {
+    "actions": {
+      "addProduct": "Add product"
+    },
+    "generic": {
+      "title": "Nothing to show",
+      "subtitle": "Adjust filters or add a product to get started."
+    },
+    "pantry": {
+      "title": "Pantry is empty",
+      "subtitle": "Add your first product to track stock and expirations."
+    },
+    "shopping": {
+      "title": "Shopping list is clear",
+      "subtitle": "Nothing pending right now. I'll notify you when something needs restocking."
+    },
+    "expired": {
+      "title": "Nothing expired",
+      "subtitle": "No expired products right now."
+    }
+  },
   "locations": {
     "pantry": "Pantry",
     "kitchen": "Kitchen",
@@ -54,7 +75,7 @@
       "title": "Near expiry",
       "subtitle": "In the next {{ days }} days",
       "expires": "Expires {{ date }}",
-      "empty": "No items close to expiring."
+      "empty": "No products expiring soon."
     },
     "lowStock": {
       "title": "Low stock alerts",
@@ -111,9 +132,14 @@
       "title": "Add purchase",
       "quantity": "Quantity",
       "quantityPlaceholder": "0",
+      "quantityHelp": "Use the stepper to adjust the purchased amount.",
+      "quantityError": "Enter an amount greater than 0.",
       "expiry": "Expiry date (optional)",
       "noExpiry": "No expiry",
       "location": "Location",
+      "locationHint": "Choose where this lot will be stored.",
+      "locationRequired": "Pick a location before saving.",
+      "expiryHint": "Optional: record the expiration date if needed.",
       "addToPantry": "Add to pantry"
     },
     "suggestions": {
@@ -123,7 +149,7 @@
       "totalStock": "Total stock: {{ amount }} {{ unit }}",
       "minStock": "Min: {{ amount }} {{ unit }}",
       "buy": "Buy {{ amount }} {{ unit }}",
-      "empty": "Nothing to buy for now. Everything is within desired levels."
+      "empty": "Nothing pending right now. I'll let you know when something needs restocking."
     }
   },
   "agent": {

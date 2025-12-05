@@ -36,6 +36,15 @@ ion-item p {
   margin: 0;
 }
 
+.list-empty-state {
+  width: 100%;
+}
+
+.list-empty-state .empty-state {
+  width: 100%;
+  box-shadow: none;
+}
+
 .options-footer {
   display: flex;
   flex-wrap: wrap;

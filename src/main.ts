@@ -42,6 +42,7 @@ import {
   chevronUpOutline,
   chevronDownOutline,
   lockClosedOutline,
+  fastFoodOutline,
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -98,6 +99,7 @@ addIcons({
   'speedometer-outline': speedometerOutline,
   'cube-outline': cubeOutline,
   'lock-closed-outline': lockClosedOutline,
+  'fast-food-outline': fastFoodOutline,
 });
 
 bootstrapApplication(AppComponent, {

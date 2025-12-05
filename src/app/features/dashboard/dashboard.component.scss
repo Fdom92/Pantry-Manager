@@ -2,6 +2,15 @@ ion-card + ion-card {
   margin-top: 16px;
 }
 
+ion-card-title {
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+
+ion-card-subtitle {
+  font-size: 0.95rem;
+}
+
 .card-header-actions {
   display: flex;
   align-items: center;
@@ -41,4 +50,24 @@ ion-badge {
 
 ion-list {
   border-radius: 8px;
+}
+
+.fade-in-list {
+  animation: fadeInList 220ms ease;
+}
+
+.list-empty-state {
+  display: block;
+  margin: 10px 0 4px;
+}
+
+@keyframes fadeInList {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

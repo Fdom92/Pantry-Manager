@@ -1,0 +1,19 @@
+<div class="empty-state" [class.empty-state--compact]="compact">
+  <div class="empty-icon">
+    <ion-icon [name]="icon"></ion-icon>
+  </div>
+  <div class="empty-copy">
+    <h3>{{ title || (titleKey | translate) }}</h3>
+    <p>{{ subtitle || (subtitleKey | translate) }}</p>
+  </div>
+  @if (showAction) {
+    <ion-button
+      color="primary"
+      class="empty-action"
+      shape="round"
+      (click)="handleAction()">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      {{ actionLabel || ('emptyStates.actions.addProduct' | translate) }}
+    </ion-button>
+  }
+</div>
