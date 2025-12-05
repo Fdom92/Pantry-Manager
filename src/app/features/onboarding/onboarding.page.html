@@ -1,0 +1,67 @@
+<ion-content [fullscreen]="true" class="onboarding">
+  <div class="background-blur blur-a"></div>
+  <div class="background-blur blur-b"></div>
+
+  <div class="top-bar">
+    <div class="eyebrow">
+      <ion-icon name="aperture-outline"></ion-icon>
+      <span>{{ 'onboarding.tagline' | translate }}</span>
+    </div>
+    <ion-button
+      fill="clear"
+      color="light"
+      size="small"
+      (click)="onSkip()">
+      {{ 'onboarding.actions.skip' | translate }}
+    </ion-button>
+  </div>
+
+  <swiper-container
+    #swiperRef
+    class="onboarding-swiper"
+    (slidechange)="onSlideChanged()">
+    <swiper-slide *ngFor="let slide of slidesToShow(); index as idx">
+      <div class="slide-card" [class.is-pro]="slide.pro">
+        @if (slide.badgeKey) {
+        <div class="pill">
+          {{ slide.badgeKey | translate }}
+        </div>
+        }
+        <div class="icon-burst">
+          <div class="glow"></div>
+          <ion-icon [name]="slide.icon"></ion-icon>
+        </div>
+        <h1>
+          {{ slide.titleKey | translate }}
+        </h1>
+        <p>
+          {{ slide.descriptionKey | translate }}
+        </p>
+      </div>
+    </swiper-slide>
+  </swiper-container>
+
+  <div class="actions">
+    <ion-button
+      fill="clear"
+      color="light"
+      (click)="onSkip()">
+      {{ 'onboarding.actions.skip' | translate }}
+    </ion-button>
+    @if (!isLastSlide()) {
+    <ion-button
+      color="primary"
+      shape="round"
+      (click)="onNext()">
+      {{ 'onboarding.actions.next' | translate }}
+    </ion-button>
+    } @else {
+    <ion-button
+      color="primary"
+      shape="round"
+      (click)="onStart()">
+      {{ 'onboarding.actions.start' | translate }}
+    </ion-button>
+    }
+  </div>
+</ion-content>
