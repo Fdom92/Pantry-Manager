@@ -217,10 +217,25 @@
 .item-details {
   padding: 0 22px 22px 26px;
   overflow: hidden;
+  max-height: 1800px;
+  transition:
+    max-height 260ms ease,
+    opacity 220ms ease,
+    transform 220ms ease,
+    padding-bottom 200ms ease;
+  opacity: 1;
 }
 
 .item-details--collapsed {
   padding-bottom: 0;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+.item-details--collapsed .expanded-content {
+  visibility: hidden;
 }
 
 .expanded-content {
@@ -408,6 +423,15 @@
 
 .batch-actions ion-button[disabled] {
   opacity: 0.4;
+}
+
+.pressable {
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.pressable:active,
+.pressable.ion-activated {
+  transform: scale(0.94);
 }
 
 .card-actions {

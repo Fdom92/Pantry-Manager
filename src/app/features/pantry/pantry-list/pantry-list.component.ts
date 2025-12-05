@@ -36,11 +36,19 @@ import { createDocumentId } from '@core/utils';
 import { IonContent, IonicModule, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
+import { EmptyStateGenericComponent } from '../../shared/empty-states/empty-state-generic.component';
 
 @Component({
   selector: 'app-pantry-list',
   standalone: true,
-  imports: [IonicModule, CommonModule, ReactiveFormsModule, PantryDetailComponent, TranslateModule],
+  imports: [
+    IonicModule,
+    CommonModule,
+    ReactiveFormsModule,
+    PantryDetailComponent,
+    TranslateModule,
+    EmptyStateGenericComponent,
+  ],
   templateUrl: './pantry-list.component.html',
   styleUrls: ['./pantry-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,6 +81,7 @@ export class PantryListComponent implements OnDestroy {
   readonly nearExpiryDays = 7;
   readonly MeasurementUnit = MeasurementUnit;
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
+  readonly hasLoadedOnce = signal(false);
   showCreateModal = false;
   editingItem: PantryItem | null = null;
   isSaving = false;
@@ -197,6 +206,7 @@ export class PantryListComponent implements OnDestroy {
       await this.pantryService.ensureFirstPageLoaded();
       this.pantryService.startBackgroundLoad();
     }
+    this.hasLoadedOnce.set(true);
     this.scrollViewportToTop();
   }
 

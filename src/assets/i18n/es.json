@@ -24,6 +24,27 @@
       "none": "Sin ubicación"
     }
   },
+  "emptyStates": {
+    "actions": {
+      "addProduct": "Añadir producto"
+    },
+    "generic": {
+      "title": "Nada que mostrar",
+      "subtitle": "Ajusta los filtros o añade un producto para empezar."
+    },
+    "pantry": {
+      "title": "La despensa está vacía",
+      "subtitle": "Añade tu primer producto y controla el stock y las caducidades."
+    },
+    "shopping": {
+      "title": "Lista de compras limpia",
+      "subtitle": "Nada pendiente por ahora. Te avisaré cuando algo necesite reponerse."
+    },
+    "expired": {
+      "title": "Nada caducado",
+      "subtitle": "No hay productos vencidos por ahora."
+    }
+  },
   "locations": {
     "pantry": "Despensa",
     "kitchen": "Cocina",
@@ -54,7 +75,7 @@
       "title": "Por caducar",
       "subtitle": "En los próximos {{ days }} días",
       "expires": "Caduca {{ date }}",
-      "empty": "No hay artículos por caducar."
+      "empty": "No hay productos que expiren pronto."
     },
     "lowStock": {
       "title": "Alertas de bajo stock",
@@ -111,9 +132,14 @@
       "title": "Añadir compra",
       "quantity": "Cantidad",
       "quantityPlaceholder": "0",
+      "quantityHelp": "Usa el sumador para ajustar la cantidad comprada.",
+      "quantityError": "Introduce una cantidad mayor que 0.",
       "expiry": "Fecha de caducidad (opcional)",
       "noExpiry": "Sin caducidad",
       "location": "Ubicación",
+      "locationHint": "Elige dónde guardarás el lote.",
+      "locationRequired": "Selecciona una ubicación antes de guardar.",
+      "expiryHint": "Opcional: registra la caducidad si aplica.",
       "addToPantry": "Añadir a la despensa"
     },
     "suggestions": {
@@ -123,7 +149,7 @@
       "totalStock": "Stock total: {{ amount }} {{ unit }}",
       "minStock": "Mín.: {{ amount }} {{ unit }}",
       "buy": "Comprar {{ amount }} {{ unit }}",
-      "empty": "Nada que comprar por ahora. Todo está dentro de los niveles deseados."
+      "empty": "Nada pendiente por ahora. Te avisaré cuando algo necesite reponerse."
     }
   },
   "agent": {

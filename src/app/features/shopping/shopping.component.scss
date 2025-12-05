@@ -157,3 +157,32 @@ ion-card + ion-card {
   justify-content: center;
   align-items: center;
 }
+
+.pressable {
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.pressable:active,
+.pressable.ion-activated {
+  transform: scale(0.94);
+}
+
+.fade-in-list {
+  animation: fadeInList 240ms ease;
+}
+
+.list-empty-state {
+  display: block;
+  margin: 12px 0 4px;
+}
+
+@keyframes fadeInList {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
