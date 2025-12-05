@@ -14,6 +14,7 @@ import { PantryStoreService } from '@core/store/pantry-store.service';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
+import { EmptyStateGenericComponent } from '../shared/empty-states/empty-state-generic.component';
 
 type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;
 type ShoppingSuggestionGroupWithItem = ShoppingSuggestionGroup<PantryItem>;
@@ -22,7 +23,7 @@ type ShoppingStateWithItem = ShoppingState<PantryItem>;
 @Component({
   selector: 'app-shopping',
   standalone: true,
-  imports: [IonicModule, CommonModule, TranslateModule],
+  imports: [IonicModule, CommonModule, TranslateModule, EmptyStateGenericComponent],
   templateUrl: './shopping.component.html',
   styleUrls: ['./shopping.component.scss'],
 })

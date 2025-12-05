@@ -5,9 +5,6 @@
       <ion-button fill="clear" size="small" (click)="openFilters($event)">
         <ion-icon slot="icon-only" name="filter-outline"></ion-icon>
       </ion-button>
-      <ion-button fill="solid" shape="round" size="small" (click)="openNewItemModal()">
-        <ion-icon slot="icon-only" name="add"></ion-icon>
-      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -35,7 +32,7 @@
     </div>
   </div>
 
-  @if (loading() && itemsState().length === 0) {
+  @if (loading() && itemsState().length === 0 && !hasLoadedOnce()) {
     <div class="skeleton-list">
       @for (placeholder of skeletonPlaceholders; track placeholder) {
         <ion-card class="skeleton-card">
@@ -50,22 +47,24 @@
       }
     </div>
   } @else if (summary().total === 0) {
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>{{ 'pantry.empty.title' | translate }}</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-text color="medium">{{ 'pantry.empty.description' | translate }}</ion-text>
-      </ion-card-content>
-    </ion-card>
+    <app-empty-state-generic
+      class="list-empty-state"
+      icon="fast-food-outline"
+      [titleKey]="'emptyStates.pantry.title'"
+      [subtitleKey]="'emptyStates.pantry.subtitle'"
+      [showAction]="true"
+      (action)="openNewItemModal()">
+    </app-empty-state-generic>
   } @else if (itemsState().length === 0) {
-    <ion-card>
-      <ion-card-content>
-        <ion-text color="medium">{{ 'pantry.empty.filters' | translate }}</ion-text>
-      </ion-card-content>
-    </ion-card>
+    <app-empty-state-generic
+      class="list-empty-state"
+      icon="filter-outline"
+      [subtitle]="'pantry.empty.filters' | translate"
+      [showAction]="true"
+      (action)="openFilters()">
+    </app-empty-state-generic>
   } @else {
-    <div class="category-stack">
+    <div class="category-stack fade-in-list">
       @for (group of groups(); track group.key) {
         <div class="virtual-category-card">
           <ion-card>
@@ -366,9 +365,13 @@
                     @if (batchesArray.length === 0) {
                       <ion-list>
                         <ion-item lines="none">
-                          <ion-text color="medium">
-                            {{ 'pantry.form.batches.empty' | translate }}
-                          </ion-text>
+                          <app-empty-state-generic
+                            class="list-empty-state"
+                            icon="cube-outline"
+                            [title]="'pantry.form.batches.title' | translate"
+                            [subtitle]="'pantry.form.batches.empty' | translate"
+                            [compact]="true">
+                          </app-empty-state-generic>
                         </ion-item>
                       </ion-list>
                     }
@@ -435,4 +438,12 @@
       </ion-footer>
     </ng-template>
   </ion-modal>
+
+  @if (summary().total > 0) {
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="add-fab">
+      <ion-fab-button color="primary" (click)="openNewItemModal()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  }
 </ion-content>

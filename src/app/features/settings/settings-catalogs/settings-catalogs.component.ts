@@ -8,13 +8,14 @@ import {
 } from '@core/services';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { EmptyStateGenericComponent } from '../../shared/empty-states/empty-state-generic.component';
 
 const TOAST_DURATION = 1800;
 
 @Component({
   selector: 'app-settings-catalogs',
   standalone: true,
-  imports: [IonicModule, CommonModule, TranslateModule],
+  imports: [IonicModule, CommonModule, TranslateModule, EmptyStateGenericComponent],
   templateUrl: './settings-catalogs.component.html',
   styleUrls: ['./settings-catalogs.component.scss'],
 })

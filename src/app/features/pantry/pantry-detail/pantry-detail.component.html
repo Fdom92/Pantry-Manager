@@ -37,81 +37,82 @@
 
   <div
     class="item-details"
-    [class.item-details--collapsed]="!expanded">
-    @if (expanded) {
-      <div class="expanded-content">
-        <section class="batch-section">
-          @if (!viewModel.batches.length) {
-            <ion-text color="medium" class="empty-state">
-              {{ 'pantry.detail.noBatches' | translate }}
-            </ion-text>
-          } @else {
-            <div class="batch-list">
-              @for (batch of viewModel.batches; track trackBatch($index, batch)) {
-                <article class="batch-row" [attr.data-status]="batch.status.state">
-                  <div class="batch-expiration">
-                    <span class="batch-date"><ion-icon name="calendar-outline"></ion-icon>{{ batch.formattedDate }}</span>
-                    <span class="status-chip" [attr.data-status]="batch.status.state">
-                      {{ batch.status.label }}
-                    </span>
+    [class.item-details--collapsed]="!expanded"
+    [attr.aria-hidden]="!expanded">
+    <div class="expanded-content">
+      <section class="batch-section">
+        @if (!viewModel.batches.length) {
+          <ion-text color="medium" class="empty-state">
+            {{ 'pantry.detail.noBatches' | translate }}
+          </ion-text>
+        } @else {
+          <div class="batch-list">
+            @for (batch of viewModel.batches; track trackBatch($index, batch)) {
+              <article class="batch-row" [attr.data-status]="batch.status.state">
+                <div class="batch-expiration">
+                  <span class="batch-date"><ion-icon name="calendar-outline"></ion-icon>{{ batch.formattedDate }}</span>
+                  <span class="status-chip" [attr.data-status]="batch.status.state">
+                    {{ batch.status.label }}
+                  </span>
+                </div>
+                <div class="batch-main">
+                  <ion-icon class="batch-icon" name="location-outline"></ion-icon>
+                  <div class="batch-info">
+                    <span class="batch-location">{{ batch.locationLabel }}</span>
                   </div>
-                  <div class="batch-main">
-                    <ion-icon class="batch-icon" name="location-outline"></ion-icon>
-                    <div class="batch-info">
-                      <span class="batch-location">{{ batch.locationLabel }}</span>
-                    </div>
+                </div>
+                <div class="batch-meta">
+                  <span class="batch-quantity">
+                    {{ batch.quantityLabel }}
+                  </span>
+                  <!--  -->
+                  <div class="batch-actions">
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      color="primary"
+                      class="pressable"
+                      (click)="handleAdjustBatch(batch.location, batch.batch, -1, $event)"
+                      [disabled]="batch.quantityValue <= 0">
+                      <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+                    </ion-button>
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      color="primary"
+                      class="pressable"
+                      (click)="handleAdjustBatch(batch.location, batch.batch, 1, $event)">
+                      <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                    </ion-button>
                   </div>
-                  <div class="batch-meta">
-                    <span class="batch-quantity">
-                      {{ batch.quantityLabel }}
-                    </span>
-                    <!--  -->
-                    <div class="batch-actions">
-                      <ion-button
-                        fill="clear"
-                        size="small"
-                        color="primary"
-                        (click)="handleAdjustBatch(batch.location, batch.batch, -1, $event)"
-                        [disabled]="batch.quantityValue <= 0">
-                        <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
-                      </ion-button>
-                      <ion-button
-                        fill="clear"
-                        size="small"
-                        color="primary"
-                        (click)="handleAdjustBatch(batch.location, batch.batch, 1, $event)">
-                        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-                      </ion-button>
-                    </div>
-                  </div>
-                </article>
-              }
-            </div>
-          }
-        </section>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </section>
 
-        <div class="card-actions">
-          <ion-button
-            fill="outline"
-            size="small"
-            (click)="handleOpenBatches($event)">
-            <ion-icon slot="icon-only" name="list-outline"></ion-icon>
-          </ion-button>
-          <ion-button
-            fill="outline"
-            size="small"
-            (click)="handleEdit($event)">
-            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-          </ion-button>
-          <ion-button
-            fill="outline"
-            color="danger"
-            size="small"
-            (click)="handleDelete($event)">
-            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-          </ion-button>
-        </div>
+      <div class="card-actions">
+        <ion-button
+          fill="outline"
+          size="small"
+          (click)="handleOpenBatches($event)">
+          <ion-icon slot="icon-only" name="list-outline"></ion-icon>
+        </ion-button>
+        <ion-button
+          fill="outline"
+          size="small"
+          (click)="handleEdit($event)">
+          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+        </ion-button>
+        <ion-button
+          fill="outline"
+          color="danger"
+          size="small"
+          (click)="handleDelete($event)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
       </div>
-    }
+    </div>
   </div>
 </ion-card>

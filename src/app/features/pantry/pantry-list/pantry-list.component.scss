@@ -183,6 +183,25 @@
   flex: 1;
 }
 
+.fade-in-list {
+  animation: fadeInList 240ms ease;
+}
+
+.list-empty-state {
+  display: block;
+  margin: 14px 0 6px;
+}
+
+.add-fab {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  right: 16px;
+}
+
+.list-empty-state .empty-state--compact {
+  margin: 0;
+  box-shadow: none;
+}
+
 .skeleton-list {
   display: flex;
   flex-direction: column;
@@ -192,6 +211,17 @@
 .skeleton-card {
   border-radius: 16px;
   padding: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 0%, rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08) 40%, rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.16) 60%, transparent 100%);
+  transform: translateX(-100%);
+  animation: shimmer 1.4s ease-in-out infinite;
 }
 
 .state {
@@ -243,6 +273,7 @@
   display: flex;
   position: relative;
   z-index: 1;
+  animation: fadeInList 260ms ease;
 }
 
 .virtual-item-card__detail {
@@ -494,4 +525,24 @@ ion-card-header {
 
 .create-footer ion-button {
   width: 100%;
+}
+
+@keyframes fadeInList {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }

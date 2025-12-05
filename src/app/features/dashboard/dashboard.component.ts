@@ -6,11 +6,12 @@ import { LanguageService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { IonicModule } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { EmptyStateGenericComponent } from '../shared/empty-states/empty-state-generic.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [IonicModule, CommonModule, TranslateModule],
+  imports: [IonicModule, CommonModule, TranslateModule, EmptyStateGenericComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })

@@ -71,7 +71,7 @@
           <p>{{ 'shopping.suggestions.loading' | translate }}</p>
         </div>
       } @else if (state.summary.total) {
-        <div class="suggestion-groups">
+        <div class="suggestion-groups fade-in-list">
           @for (group of state.groupedSuggestions; track group.key) {
             <div class="suggestion-group">
               <h3 class="supermarket-heading">
@@ -105,7 +105,7 @@
                           fill="solid"
                           (click)="openPurchaseModal(suggestion)"
                           [disabled]="isProcessing(suggestion.item._id)"
-                          class="purchase-action"
+                          class="purchase-action pressable"
                         >
                           @if (isProcessing(suggestion.item._id)) {
                             <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
@@ -122,9 +122,12 @@
           }
         </div>
       } @else {
-        <ion-text color="medium">
-          {{ 'shopping.suggestions.empty' | translate }}
-        </ion-text>
+        <app-empty-state-generic
+          class="list-empty-state"
+          icon="cart-outline"
+          [titleKey]="'emptyStates.shopping.title'"
+          [subtitle]="'shopping.suggestions.empty' | translate">
+        </app-empty-state-generic>
       }
     </ion-card-content>
   </ion-card>

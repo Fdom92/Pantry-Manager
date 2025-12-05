@@ -61,7 +61,7 @@
     </ion-card-header>
     <ion-card-content>
       @if (nearExpiryItems().length) {
-        <ion-list lines="none">
+        <ion-list lines="none" class="fade-in-list">
           @for (item of nearExpiryItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
@@ -73,7 +73,12 @@
           }
         </ion-list>
       } @else {
-        <ion-text color="medium">{{ 'dashboard.nearExpiry.empty' | translate }}</ion-text>
+        <app-empty-state-generic
+          class="list-empty-state"
+          icon="hourglass-outline"
+          [title]="'dashboard.nearExpiry.title' | translate"
+          [subtitle]="'dashboard.nearExpiry.empty' | translate">
+        </app-empty-state-generic>
       }
     </ion-card-content>
   </ion-card>
@@ -85,7 +90,7 @@
     </ion-card-header>
     <ion-card-content>
       @if (lowStockItems().length) {
-        <ion-list lines="none">
+        <ion-list lines="none" class="fade-in-list">
           @for (item of lowStockItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
@@ -105,7 +110,12 @@
           }
         </ion-list>
       } @else {
-        <ion-text color="medium">{{ 'dashboard.lowStock.empty' | translate }}</ion-text>
+        <app-empty-state-generic
+          class="list-empty-state"
+          icon="trending-down-outline"
+          [title]="'dashboard.lowStock.title' | translate"
+          [subtitle]="'dashboard.lowStock.empty' | translate">
+        </app-empty-state-generic>
       }
     </ion-card-content>
   </ion-card>
@@ -134,7 +144,7 @@
     </ion-card-header>
     <ion-card-content>
       @if (expiredItems().length) {
-        <ion-list lines="none">
+        <ion-list lines="none" class="fade-in-list">
           @for (item of expiredItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
@@ -146,7 +156,12 @@
           }
         </ion-list>
       } @else {
-        <ion-text color="medium">{{ 'dashboard.expired.empty' | translate }}</ion-text>
+        <app-empty-state-generic
+          class="list-empty-state"
+          icon="alert-circle-outline"
+          [title]="'dashboard.expired.title' | translate"
+          [subtitle]="'dashboard.expired.empty' | translate">
+        </app-empty-state-generic>
       }
     </ion-card-content>
   </ion-card>
@@ -157,7 +172,7 @@
     </ion-card-header>
     <ion-card-content>
       @if (recentItems().length) {
-        <ion-list lines="none">
+        <ion-list lines="none" class="fade-in-list">
           @for (item of recentItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
@@ -169,7 +184,12 @@
           }
         </ion-list>
       } @else {
-        <ion-text color="medium">{{ 'dashboard.recent.empty' | translate }}</ion-text>
+        <app-empty-state-generic
+          class="list-empty-state"
+          icon="time-outline"
+          [title]="'dashboard.recent.title' | translate"
+          [subtitle]="'dashboard.recent.empty' | translate">
+        </app-empty-state-generic>
       }
     </ion-card-content>
   </ion-card>
