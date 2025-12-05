@@ -34,13 +34,29 @@
     </ion-card-content>
   </ion-card>
 
-  <div class="cta-block">
-    <ion-button expand="block" color="primary" size="large" (click)="onBuy()">
-      {{ 'upgrade.actions.subscribe' | translate }}
-      @if (offeringPrice) {
-        <span>&nbsp;({{ offeringPrice }})</span>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ 'upgrade.plans.title' | translate }}</ion-card-title>
+      <ion-card-subtitle>{{ 'upgrade.plans.subtitle' | translate }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      @if (packages.length) {
+        @for (pkg of packages; track pkg.identifier) {
+          <ion-item button detail="true" lines="full" (click)="purchase(pkg)">
+            <ion-label>
+              <h3>{{ getPackageLabel(pkg) }}</h3>
+              <p>{{ getProductTitle(pkg) }}</p>
+            </ion-label>
+            <ion-note slot="end" color="primary">{{ getProductPrice(pkg) }}</ion-note>
+          </ion-item>
+        }
+      } @else {
+        <ion-note>{{ 'upgrade.plans.unavailable' | translate }}</ion-note>
       }
-    </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <div class="cta-block">
     <ion-button expand="block" fill="clear" color="medium" (click)="maybeLater()">
       {{ 'upgrade.actions.maybeLater' | translate }}
     </ion-button>

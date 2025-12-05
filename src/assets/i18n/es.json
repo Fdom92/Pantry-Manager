@@ -329,7 +329,19 @@
       "restore": "Restaurar compra"
     },
     "note": "Las suscripciones se gestionan desde tu cuenta de Google Play.",
-    "alreadyPro": "PRO activo ✅"
+    "alreadyPro": "PRO activo ✅",
+    "errors": {
+      "purchaseFailed": "No hay suscripciones disponibles ahora mismo. Intenta de nuevo o revisa tu cuenta de Play.",
+      "selectPlan": "Elige un plan para continuar."
+    },
+    "plans": {
+      "title": "Elige tu plan PRO",
+      "subtitle": "Escoge la periodicidad que mejor encaja contigo.",
+      "monthly": "Mensual",
+      "annual": "Anual",
+      "other": "Otro plan",
+      "unavailable": "No hay planes disponibles ahora mismo. Revisa tu conexión o inténtalo en unos momentos."
+    }
   },
   "settings": {
     "title": "Ajustes",

@@ -1,106 +1,30 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
-import { ItemBatch, ItemLocationStock, MeasurementUnit, PantryItem } from '@core/models';
+import {
+  AgentMessage, AgentModelMessage, AgentModelRequest,
+  AgentModelResponse,
+  AgentRole,
+  AgentToolCall,
+  AgentToolDefinition, ItemBatch, ItemLocationStock, MeasurementUnit, MoveBatchesResult, PantryItem, RawToolCall,
+  ToolExecution
+} from '@core/models';
 import { createDocumentId } from '@core/utils';
 import { TranslateService } from '@ngx-translate/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout as rxTimeout } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AppPreferencesService, DEFAULT_LOCATION_OPTIONS } from './app-preferences.service';
 import { PantryService } from './pantry.service';
 import { RevenuecatService } from './revenuecat.service';
 
-type AgentRole = 'user' | 'assistant' | 'tool';
-
-export interface AgentMessage {
-  id: string;
-  role: AgentRole;
-  content: string;
-  createdAt: string;
-  modelContent?: string;
-  toolName?: string;
-  toolCallId?: string;
-  toolCalls?: any[];
-  status?: 'ok' | 'error';
-  data?: {
-    summary?: string;
-    details?: string[];
-    items?: PantryItem[];
-    item?: PantryItem;
-  };
-}
-
-interface AgentToolCall {
-  id?: string;
-  name: string;
-  arguments: Record<string, any>;
-}
-
-type RawToolCall = AgentToolCall | {
-  id?: string;
-  function?: { name: string; arguments?: string | Record<string, any> };
-  name?: string;
-  arguments?: string | Record<string, any>;
-};
-
-interface AgentToolDefinition {
-  name: string;
-  description: string;
-  parameters: {
-    type: 'object';
-    properties: Record<string, any>;
-    required?: string[];
-  };
-}
-
-interface AgentModelMessage {
-  role: 'system' | 'user' | 'assistant' | 'tool';
-  content: string;
-  name?: string;
-  tool_call_id?: string;
-  tool_calls?: any[];
-}
-
-interface AgentModelRequest {
-  system: string;
-  messages: AgentModelMessage[];
-  tools: AgentToolDefinition[];
-  context?: Record<string, any>;
-}
-
-interface AgentModelResponse {
-  content?: string;
-  message?: {
-    content?: string;
-    tool_call_id?: string;
-    toolCalls?: AgentToolCall[];
-    tool_calls?: Array<{
-      id?: string;
-      function?: { name: string; arguments?: string | Record<string, any> };
-    }>;
-  };
-  tool?: string;
-  tool_call_id?: string;
-  arguments?: any;
-  error?: string;
-}
-
-interface ToolExecution {
-  tool: string;
-  success: boolean;
-  message: AgentMessage;
-}
-
-interface MoveBatchesResult {
-  moved: ItemBatch[];
-  remaining: ItemBatch[];
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class AgentService {
+  // Backend endpoint for the LLM agent (OpenAI proxy).
   private readonly apiUrl = environment.agentApiUrl ?? '';
+  // Max time to wait for the agent HTTP call before timing out.
+  private readonly requestTimeoutMs = 30000;
   private readonly messagesSignal = signal<AgentMessage[]>([]);
   readonly messages = computed(() => this.messagesSignal());
   readonly thinking = signal(false);
@@ -110,14 +34,25 @@ export class AgentService {
     pantry: 'Despensa',
     armario: 'Despensa',
     alacena: 'Despensa',
+    cupboard: 'Despensa',
+    cabinet: 'Despensa',
+    larder: 'Despensa',
+    storage: 'Despensa',
     nevera: 'Nevera',
     frigo: 'Nevera',
     refrigerador: 'Nevera',
+    refrigerator: 'Nevera',
+    fridge: 'Nevera',
     cocina: 'Cocina',
     encimera: 'Cocina',
     counter: 'Cocina',
+    countertop: 'Cocina',
+    kitchen: 'Cocina',
+    mesa: 'Cocina',
+    table: 'Cocina',
     congelador: 'Congelador',
     freezer: 'Congelador',
+    'deep freezer': 'Congelador',
   };
 
   private readonly toolsCatalog: AgentToolDefinition[] = [
@@ -125,12 +60,13 @@ export class AgentService {
       name: 'addProduct',
       // ensure the model receives a proper function tool definition
       // (backend normalizes to include type:function as well)
-      description: 'Añade un producto y un lote con cantidad y caducidad opcional',
+      description: 'Añade un producto con lote y ubicación',
       parameters: {
         type: 'object',
         properties: {
-          name: { type: 'string', description: 'Nombre del producto' },
-          quantity: { type: 'number', description: 'Cantidad a registrar' },
+          name: { type: 'string', description: 'Nombre del producto (ej. leche entera)' },
+          categoryId: { type: 'string', description: 'Categoría interna si se conoce (opcional)' },
+          quantity: { type: 'number', description: 'Cantidad a registrar (>0)' },
           location: { type: 'string', description: 'Ubicación destino' },
           expirationDate: { type: 'string', description: 'Fecha de caducidad en ISO o texto interpretable', enum: [] },
         },
@@ -194,6 +130,58 @@ export class AgentService {
         properties: {},
       },
     },
+    {
+      name: 'consumeProduct',
+      description: 'Resta cantidad de un producto (uso/consumo rápido)',
+      parameters: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', description: 'Nombre del producto' },
+          quantity: { type: 'number', description: 'Cantidad a descontar (>0)' },
+          location: { type: 'string', description: 'Ubicación (opcional, se usa la primera si no se indica)' },
+        },
+        required: ['name', 'quantity'],
+      },
+    },
+    {
+      name: 'markOpened',
+      description: 'Marca un lote como abierto en una ubicación',
+      parameters: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', description: 'Producto' },
+          location: { type: 'string', description: 'Ubicación (opcional)' },
+        },
+        required: ['name'],
+      },
+    },
+    {
+      name: 'listLowStock',
+      description: 'Devuelve productos bajo mínimo para reponer',
+      parameters: { type: 'object', properties: {} },
+    },
+    {
+      name: 'listByLocation',
+      description: 'Lista los productos de una ubicación concreta',
+      parameters: {
+        type: 'object',
+        properties: {
+          location: { type: 'string', description: 'Ubicación a listar' },
+        },
+        required: ['location'],
+      },
+    },
+    {
+      name: 'depleteProduct',
+      description: 'Marca un producto como agotado en todas las ubicaciones',
+      parameters: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', description: 'Producto a marcar como agotado' },
+        },
+        required: ['name'],
+      },
+    },
   ];
 
   constructor(
@@ -242,13 +230,16 @@ export class AgentService {
 
     while (safetyCounter < 4) {
       safetyCounter += 1;
+      // Build payload with history + tool definitions
       const response = await this.callModel(await this.buildModelRequest());
+      // Append assistant placeholder/response
       latestAssistant = this.appendAssistantFromModel(response);
       const toolCalls = this.extractToolCalls(response);
       if (!toolCalls.length) {
         return latestAssistant;
       }
 
+      // Execute each tool call sequentially and append tool messages
       for (const call of toolCalls) {
         const result = await this.executeToolCall(call);
         // Keep the tool result message with the call id to satisfy OpenAI API requirements
@@ -261,6 +252,7 @@ export class AgentService {
     return latestAssistant ?? this.createMessage('assistant', this.t('agent.messages.noResponse'), 'error');
   }
 
+  // Create a chat message with metadata (used for user/assistant/tool entries).
   private createMessage(role: AgentRole, content: string, status: AgentMessage['status'] = 'ok'): AgentMessage {
     return {
       id: createDocumentId('msg'),
@@ -296,6 +288,7 @@ export class AgentService {
     };
   }
 
+  // Convert UI messages into the format expected by the model/tool API.
   private toModelMessage(message: AgentMessage): AgentModelMessage | null {
     const content = message.modelContent ?? message.content;
     if (!content.trim()) {
@@ -330,9 +323,13 @@ export class AgentService {
       };
     }
     try {
-      return await firstValueFrom(this.http.post<AgentModelResponse>(this.apiUrl, payload, {
-        headers: this.buildProHeaders(),
-      }));
+      return await firstValueFrom(
+        this.http
+          .post<AgentModelResponse>(this.apiUrl, payload, {
+            headers: this.buildProHeaders(),
+          })
+          .pipe(rxTimeout(this.requestTimeoutMs))
+      );
     } catch (err: any) {
       console.error('[AgentService] callModel failed', err);
       return {
@@ -369,6 +366,7 @@ export class AgentService {
     return toolCalls;
   }
 
+  // Safely parse tool arguments (stringified JSON or object).
   private parseArguments(raw: any): Record<string, any> {
     if (!raw) return {};
     if (typeof raw === 'string') {
@@ -381,6 +379,7 @@ export class AgentService {
     return raw;
   }
 
+  // Attach PRO/user id headers so the backend can apply auth/context.
   private buildProHeaders(): Record<string, string> | undefined {
     const userId = this.revenuecat.getUserId();
     if (!userId) {
@@ -394,17 +393,41 @@ export class AgentService {
   private appendAssistantFromModel(response: AgentModelResponse): AgentMessage {
     const hasToolCalls = Array.isArray((response.message as any)?.tool_calls);
     let content = response.message?.content || response.content || '';
-    if (!content) {
-      content = hasToolCalls
-        ? this.t('agent.messages.processing')
-        : (response.error || this.t('agent.messages.noResponse'));
+    const processingMessage =
+      hasToolCalls && !content
+        ? this.createMessage('assistant', this.t('agent.messages.processing'), response.error ? 'error' : 'ok')
+        : null;
+
+    if (processingMessage) {
+      this.messagesSignal.update(history => [...history, processingMessage]);
     }
-    const assistantMessage = this.createMessage('assistant', content, response.error ? 'error' : 'ok');
-    if (hasToolCalls) {
-      assistantMessage.toolCalls = (response.message as any).tool_calls;
+
+    // If we have actual content (final answer), append it and drop the processing placeholder.
+    if (content) {
+      const assistantMessage = this.createMessage('assistant', content, response.error ? 'error' : 'ok');
+      if (hasToolCalls) {
+        assistantMessage.toolCalls = (response.message as any).tool_calls;
+      }
+      this.messagesSignal.update(history =>
+        [
+          ...history.filter(msg =>
+            msg !== processingMessage &&
+            !(msg.role === 'assistant' && msg.content === this.t('agent.messages.processing'))
+          ),
+          assistantMessage,
+        ]
+      );
+      return assistantMessage;
     }
-    this.messagesSignal.update(history => [...history, assistantMessage]);
-    return assistantMessage;
+
+    // No content and no tool calls: fallback message
+    const fallback = this.createMessage(
+      'assistant',
+      response.error || this.t('agent.messages.noResponse'),
+      response.error ? 'error' : 'ok'
+    );
+    this.messagesSignal.update(history => [...history, fallback]);
+    return fallback;
   }
 
   private async executeToolCall(call: AgentToolCall): Promise<ToolExecution> {
@@ -421,6 +444,16 @@ export class AgentService {
         return this.wrapToolResult(call.name, await this.handleGetRecipes(call.arguments));
       case 'getProducts':
         return this.wrapToolResult(call.name, await this.handleGetProducts());
+      case 'consumeProduct':
+        return this.wrapToolResult(call.name, await this.handleConsumeProduct(call.arguments));
+      case 'markOpened':
+        return this.wrapToolResult(call.name, await this.handleMarkOpened(call.arguments));
+      case 'listLowStock':
+        return this.wrapToolResult(call.name, await this.handleListLowStock());
+      case 'listByLocation':
+        return this.wrapToolResult(call.name, await this.handleListByLocation(call.arguments));
+      case 'depleteProduct':
+        return this.wrapToolResult(call.name, await this.handleDepleteProduct(call.arguments));
       default: {
         const message = this.createMessage(
           'assistant',
@@ -432,6 +465,7 @@ export class AgentService {
     }
   }
 
+  // Normalize tool handler outputs into a ToolExecution with tool metadata.
   private wrapToolResult(tool: string, result: { message: AgentMessage; success: boolean } & { id?: string }): ToolExecution {
     return {
       tool,
@@ -445,8 +479,10 @@ export class AgentService {
     };
   }
 
+  // Add stock to an item (create it if missing), respecting category/location/batches.
   private async handleAddProduct(args: Record<string, any>): Promise<{ success: boolean; message: AgentMessage }> {
     const name = this.normalizeText(args?.['name']);
+    const categoryId = this.normalizeText(args?.['categoryId']);
     const quantity = this.toNumber(args?.['quantity']);
     const locationInput = args?.['location'] as string;
     const expirationDate = this.normalizeDate(args?.['expirationDate']);
@@ -468,6 +504,7 @@ export class AgentService {
 
     const existing = await this.findItemByName(name);
     const unit = existing?.locations[0]?.unit ?? MeasurementUnit.UNIT;
+    const effectiveCategoryId = categoryId || existing?.categoryId || '';
     const batch: ItemBatch = {
       batchId: createDocumentId('batch'),
       quantity,
@@ -476,8 +513,8 @@ export class AgentService {
     };
 
     const updatedItem = existing
-      ? this.addBatchToExistingItem(existing, resolvedLocation, batch)
-      : this.buildNewItem(name, resolvedLocation, batch);
+      ? this.addBatchToExistingItem(existing, resolvedLocation, batch, effectiveCategoryId)
+      : this.buildNewItem(name, resolvedLocation, batch, effectiveCategoryId);
 
     const saved = await this.pantryService.saveItem(updatedItem);
     await this.pantryService.reloadFromStart();
@@ -510,6 +547,7 @@ export class AgentService {
     return { success: true, message };
   }
 
+  // Move stock between locations, merging batches by expiry at destination.
   private async handleMoveProduct(args: Record<string, any>): Promise<{ success: boolean; message: AgentMessage }> {
     const name = this.normalizeText(args?.['name']);
     const fromInput = args?.['fromLocation'] as string;
@@ -605,6 +643,7 @@ export class AgentService {
     return { success: true, message };
   }
 
+  // Adjust quantity delta (+/-) for a given location.
   private async handleAdjustQuantity(args: Record<string, any>): Promise<{ success: boolean; message: AgentMessage }> {
     const name = this.normalizeText(args?.['name']);
     const locationInput = args?.['location'] as string;
@@ -668,6 +707,7 @@ export class AgentService {
     return { success: true, message };
   }
 
+  // List items expiring within a rolling window of days.
   private async handleGetExpiringSoon(args: Record<string, any>): Promise<{ success: boolean; message: AgentMessage }> {
     const days = this.toNumber(args?.['days']) > 0 ? this.toNumber(args?.['days']) : 5;
     const items = await this.pantryService.getNearExpiry(days);
@@ -683,6 +723,7 @@ export class AgentService {
     return { success: true, message };
   }
 
+  // Return full pantry inventory.
   private async handleGetProducts(): Promise<{ success: boolean; message: AgentMessage }> {
     const items = await this.pantryService.getAll();
     const message = this.createMessage('assistant', this.t('agent.results.listSummary', { count: items.length }));
@@ -691,6 +732,7 @@ export class AgentService {
     return { success: true, message };
   }
 
+  // Generate recipes using provided or near-expiry ingredients.
   private async handleGetRecipes(args: Record<string, any>): Promise<{ success: boolean; message: AgentMessage }> {
     const inputList: string[] = Array.isArray(args?.['ingredientList'])
       ? args['ingredientList'].filter((i: any) => typeof i === 'string').map((i: string) => i.trim()).filter(Boolean)
@@ -738,7 +780,169 @@ export class AgentService {
     return { success: true, message };
   }
 
-  private addBatchToExistingItem(item: PantryItem, locationId: string, batch: ItemBatch): PantryItem {
+  // Subtract quantity (consumption) from a location.
+  private async handleConsumeProduct(args: Record<string, any>): Promise<{ success: boolean; message: AgentMessage }> {
+    const name = this.normalizeText(args?.['name']);
+    const requested = this.toNumber(args?.['quantity']);
+    const locationInput = args?.['location'] as string | undefined;
+    if (!name || !Number.isFinite(requested) || requested <= 0) {
+      return this.errorResult(this.t('agent.errors.missingAdjustData'));
+    }
+
+    const item = await this.findItemByName(name);
+    if (!item) {
+      const suggestions = await this.suggestProducts(name);
+      const details = suggestions.length ? [this.t('agent.details.suggestions', { value: suggestions.join(', ') })] : undefined;
+      return this.errorResult(this.t('agent.errors.notFound', { name }), details);
+    }
+
+    let locationId = (locationInput ? await this.resolveLocation(locationInput) : item.locations[0]?.locationId) ?? '';
+    if (!locationId) {
+      return this.errorResult(this.t('agent.errors.invalidLocation'));
+    }
+    const locEntry = item.locations.find(loc => this.sameLocation(loc.locationId, locationId));
+    if (!locEntry) {
+      locationId = item.locations[0]?.locationId ?? locationId;
+    }
+    if (!locationId) {
+      return this.errorResult(this.t('agent.errors.invalidLocation'));
+    }
+    const resolvedLocationId = locationId;
+    const target = item.locations.find(loc => this.sameLocation(loc.locationId, resolvedLocationId));
+    if (!target) {
+      return this.errorResult(this.t('agent.errors.noStock', { name, location: resolvedLocationId }));
+    }
+    const current = this.sumBatches(target.batches);
+    const next = Math.max(0, current - requested);
+    const updated = await this.pantryService.updateLocationQuantity(item._id, next, target.locationId);
+    if (!updated) {
+      return this.errorResult(this.t('agent.errors.updateFailed'));
+    }
+    await this.pantryService.reloadFromStart();
+    const summary = this.t('agent.results.adjustSummary', { name, location: target.locationId, quantity: next });
+    const message = this.createMessage('assistant', summary);
+    message.data = {
+      summary,
+      details: [
+        this.t('agent.results.adjustChange', { value: `-${requested}` }),
+        this.t('agent.results.adjustNewQuantity', { value: next }),
+        this.t('agent.results.adjustLocation', { value: target.locationId }),
+      ],
+      item: updated,
+    };
+    message.modelContent = JSON.stringify({
+      action: 'consumeProduct',
+      status: 'ok',
+      name,
+      location: target.locationId,
+      consumed: requested,
+      newQuantity: next,
+    });
+    return { success: true, message };
+  }
+
+  // Mark the first available batch as opened in a location.
+  private async handleMarkOpened(args: Record<string, any>): Promise<{ success: boolean; message: AgentMessage }> {
+    const name = this.normalizeText(args?.['name']);
+    const locationInput = args?.['location'] as string | undefined;
+    if (!name) {
+      return this.errorResult(this.t('agent.errors.missingName'));
+    }
+    const item = await this.findItemByName(name);
+    if (!item) {
+      const suggestions = await this.suggestProducts(name);
+      const details = suggestions.length ? [this.t('agent.details.suggestions', { value: suggestions.join(', ') })] : undefined;
+      return this.errorResult(this.t('agent.errors.notFound', { name }), details);
+    }
+    const locationId = locationInput ? await this.resolveLocation(locationInput) : item.locations[0]?.locationId;
+    if (!locationId) {
+      return this.errorResult(this.t('agent.errors.invalidLocation'));
+    }
+    const target = item.locations.find(loc => this.sameLocation(loc.locationId, locationId));
+    if (!target || !target.batches?.length) {
+      return this.errorResult(this.t('agent.errors.noStock', { name, location: locationId }));
+    }
+    const batches = [...target.batches];
+    const idx = batches.findIndex(b => !b.opened);
+    const targetIndex = idx >= 0 ? idx : 0;
+    batches[targetIndex] = { ...batches[targetIndex], opened: true };
+
+    const updated: PantryItem = {
+      ...item,
+      locations: item.locations.map(loc =>
+        this.sameLocation(loc.locationId, locationId) ? { ...loc, batches } : loc
+      ),
+    };
+    const saved = await this.pantryService.saveItem(updated);
+    await this.pantryService.reloadFromStart();
+    const summary = this.t('agent.results.markOpened', { name: saved.name, location: locationId });
+    const message = this.createMessage('assistant', summary);
+    message.data = { summary, item: saved };
+    message.modelContent = JSON.stringify({ action: 'markOpened', status: 'ok', name, location: locationId });
+    return { success: true, message };
+  }
+
+  // List items below their minimum threshold.
+  private async handleListLowStock(): Promise<{ success: boolean; message: AgentMessage }> {
+    const items = await this.pantryService.getLowStock();
+    const summary = items.length
+      ? this.t('agent.results.lowStockFound', { count: items.length })
+      : this.t('agent.results.lowStockEmpty');
+    const message = this.createMessage('assistant', summary);
+    message.data = { summary, items };
+    message.modelContent = JSON.stringify({ action: 'listLowStock', status: 'ok', count: items.length, items });
+    return { success: true, message };
+  }
+
+  // List items stored in a specific location.
+  private async handleListByLocation(args: Record<string, any>): Promise<{ success: boolean; message: AgentMessage }> {
+    const locationInput = args?.['location'] as string;
+    if (!locationInput) {
+      return this.errorResult(this.t('agent.errors.invalidLocation'));
+    }
+    const locationId = await this.resolveLocation(locationInput);
+    if (!locationId) {
+      const options = await this.getLocationOptions();
+      const details = [this.t('agent.details.locations', { value: options.join(', ') })];
+      return this.errorResult(this.t('agent.errors.invalidLocation'), details);
+    }
+    const items = await this.pantryService.getByLocation(locationId);
+    const summary = this.t('agent.results.listByLocation', { count: items.length, location: locationId });
+    const message = this.createMessage('assistant', summary);
+    message.data = { summary, items };
+    message.modelContent = JSON.stringify({ action: 'listByLocation', status: 'ok', location: locationId, count: items.length, items });
+    return { success: true, message };
+  }
+
+  // Zero out all batches for an item (mark as out of stock everywhere).
+  private async handleDepleteProduct(args: Record<string, any>): Promise<{ success: boolean; message: AgentMessage }> {
+    const name = this.normalizeText(args?.['name']);
+    if (!name) {
+      return this.errorResult(this.t('agent.errors.missingName'));
+    }
+    const item = await this.findItemByName(name);
+    if (!item) {
+      const suggestions = await this.suggestProducts(name);
+      const details = suggestions.length ? [this.t('agent.details.suggestions', { value: suggestions.join(', ') })] : undefined;
+      return this.errorResult(this.t('agent.errors.notFound', { name }), details);
+    }
+    const zeroed = {
+      ...item,
+      locations: (item.locations ?? []).map(loc => ({
+        ...loc,
+        batches: (loc.batches ?? []).map(batch => ({ ...batch, quantity: 0 })),
+      })),
+    };
+    const saved = await this.pantryService.saveItem(zeroed);
+    await this.pantryService.reloadFromStart();
+    const summary = this.t('agent.results.depleted', { name: saved.name });
+    const message = this.createMessage('assistant', summary);
+    message.data = { summary, item: saved };
+    message.modelContent = JSON.stringify({ action: 'depleteProduct', status: 'ok', name });
+    return { success: true, message };
+  }
+
+  private addBatchToExistingItem(item: PantryItem, locationId: string, batch: ItemBatch, categoryId?: string): PantryItem {
     const locations = [...item.locations];
     const existingLocationIndex = locations.findIndex(loc => this.sameLocation(loc.locationId, locationId));
     if (existingLocationIndex >= 0) {
@@ -753,17 +957,17 @@ export class AgentService {
       });
     }
 
-    return { ...item, locations };
+    return { ...item, locations, categoryId: categoryId ?? item.categoryId ?? '' };
   }
 
-  private buildNewItem(name: string, locationId: string, batch: ItemBatch): PantryItem {
+  private buildNewItem(name: string, locationId: string, batch: ItemBatch, categoryId: string): PantryItem {
     const now = new Date().toISOString();
     return {
       _id: createDocumentId('item'),
       type: 'item',
       householdId: DEFAULT_HOUSEHOLD_ID,
       name,
-      categoryId: '',
+      categoryId: categoryId || '',
       supermarket: '',
       isBasic: false,
       createdAt: now,
@@ -919,6 +1123,7 @@ export class AgentService {
     return batches.reduce((sum, batch) => sum + this.toNumber(batch.quantity), 0);
   }
 
+  // Helper to return a standardized error tool result.
   private errorResult(message: string, details?: string[]): { success: boolean; message: AgentMessage } {
     const msg = this.createMessage('assistant', message, 'error');
     msg.data = details?.length ? { summary: message, details } : { summary: message };
