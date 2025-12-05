@@ -17,6 +17,36 @@
       "shopping": "Smarter grocery planning with AI."
     }
   },
+  "onboarding": {
+    "tagline": "Get set up in a minute",
+    "actions": {
+      "skip": "Skip",
+      "next": "Next",
+      "start": "Get started"
+    },
+    "slides": {
+      "organize": {
+        "title": "Organize your pantry effortlessly",
+        "description": "Add items in seconds with categories and locations that fit you."
+      },
+      "batches": {
+        "title": "Batch and expiry control",
+        "description": "Track batches, expiration dates, and get alerts before anything goes bad."
+      },
+      "suggestions": {
+        "title": "Smart purchase suggestions",
+        "description": "Know what to restock based on usage, minimum stock, and upcoming expiries."
+      },
+      "agent": {
+        "title": "Unlock the AI Agent (PRO)",
+        "description": "Chat with your pantry, request recipes, and auto-generate shopping lists.",
+        "badge": "PRO exclusive",
+        "titlePro": "AI Agent ready for you",
+        "descriptionPro": "PRO unlocked: use the Agent for recipes, ideas, and faster lists.",
+        "badgePro": "PRO active"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Close",
@@ -515,6 +545,10 @@
         "add": "Add supermarket",
         "other": "Other"
       }
+    },
+    "tutorial": {
+      "title": "View tutorial",
+      "subtitle": "Replay the onboarding whenever you need it."
     },
     "info": {
       "title": "Information",

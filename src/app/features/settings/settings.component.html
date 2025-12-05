@@ -168,6 +168,18 @@
       </ion-card-header>
       <ion-card-content>
         <ion-list lines="none">
+          <ion-item
+            lines="none"
+            button
+            detail="true"
+            routerLink="/onboarding"
+          >
+            <ion-label>
+              <h3>{{ "settings.tutorial.title" | translate }}</h3>
+              <p>{{ "settings.tutorial.subtitle" | translate }}</p>
+            </ion-label>
+          </ion-item>
+
           <ion-item lines="none">
             <ion-label>
               <h3>{{ "settings.info.version" | translate }}</h3>
