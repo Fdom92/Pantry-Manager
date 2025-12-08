@@ -284,9 +284,6 @@ export class AppPreferencesService {
     if (!normalized.length) {
       return [...DEFAULT_SUPERMARKET_OPTIONS];
     }
-    if (!normalized.some(option => option.toLowerCase() === 'otro')) {
-      normalized.push('Otro');
-    }
     return normalized;
   }
 

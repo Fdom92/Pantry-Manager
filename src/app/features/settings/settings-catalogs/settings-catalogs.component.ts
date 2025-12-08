@@ -236,11 +236,7 @@ export class SettingsCatalogsComponent {
     values: readonly string[] | null | undefined,
     fallbackToDefault = true,
   ): string[] {
-    const normalized = this.normalizeStringOptions(values, DEFAULT_SUPERMARKET_OPTIONS, fallbackToDefault);
-    if (!normalized.some(option => option.toLowerCase() === 'otro')) {
-      normalized.push('Otro');
-    }
-    return normalized;
+    return this.normalizeStringOptions(values, DEFAULT_SUPERMARKET_OPTIONS, fallbackToDefault);
   }
 
   private normalizeStringOptions(
