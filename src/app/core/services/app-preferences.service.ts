@@ -33,7 +33,7 @@ export const DEFAULT_SUPERMARKET_OPTIONS = [
   'Costco',
   'Ahorramas',
   'Merkocash',
-  'Otro',
+  'Cualquiera',
 ];
 
 export const DEFAULT_UNIT_OPTIONS = [

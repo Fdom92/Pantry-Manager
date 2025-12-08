@@ -47,6 +47,8 @@ import {
   enterOutline,
   exitOutline,
   paperPlaneOutline,
+  navigateOutline,
+  storefrontOutline
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -108,6 +110,8 @@ addIcons({
   'enter-outline': enterOutline,
   'exit-outline': exitOutline,
   'paper-plane-outline': paperPlaneOutline,
+  navigateOutline,
+  storefrontOutline
 });
 
 bootstrapApplication(AppComponent, {

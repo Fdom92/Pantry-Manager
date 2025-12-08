@@ -54,3 +54,14 @@
   font-weight: 700;
   color: inherit;
 }
+
+:host-context(.dark) .pro-banner--subtle {
+  background: linear-gradient(120deg, rgba(226, 232, 240, 0.08), rgba(226, 232, 240, 0.06));
+  color: #e2e8f0;
+  border-color: rgba(226, 232, 240, 0.16);
+}
+
+:host-context(.dark) .pro-banner--subtle .pro-banner__icon {
+  background: rgba(248, 196, 80, 0.26);
+  color: #fcd34d;
+}
