@@ -86,6 +86,7 @@ export class UpgradePage {
       return;
     }
     this.purchasingId = pkg.identifier;
+    this.cdr.markForCheck();
     try {
       const success = await this.revenuecat.purchasePackage(pkg);
       if (success) {
@@ -101,6 +102,7 @@ export class UpgradePage {
       await this.presentToast('upgrade.errors.purchaseFailed');
     } finally {
       this.purchasingId = null;
+      this.cdr.markForCheck();
     }
   }
 
@@ -206,13 +208,5 @@ export class UpgradePage {
       position: 'bottom',
     });
     await toast.present();
-  }
-
-  getPrimaryPlan(): PlanViewModel | null {
-    if (!this.plans.length) {
-      return null;
-    }
-    const highlighted = this.plans.find(plan => plan.highlight);
-    return highlighted ?? this.plans[0];
   }
 }
