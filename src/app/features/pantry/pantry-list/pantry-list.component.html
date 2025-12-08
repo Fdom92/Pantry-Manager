@@ -254,8 +254,8 @@
             @if (editingItem) { {{ 'pantry.form.editTitle' | translate }} } @else { {{ 'pantry.form.newTitle' | translate }} }
           </ion-title>
           <ion-buttons slot="end">
-            <ion-button fill="clear" color="medium" (click)="closeFormModal()">
-              {{ 'common.actions.cancel' | translate }}
+            <ion-button fill="clear" (click)="closeFormModal()">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
@@ -272,152 +272,189 @@
                 required>
               </ion-input>
             </ion-item>
-            <ion-item>
-              <ion-select
-                formControlName="categoryId"
-                interface="popover"
-                label="{{ 'pantry.form.category' | translate }}"
-                labelPlacement="stacked"
-                [placeholder]="'pantry.form.categoryPlaceholder' | translate">
-                @for (option of getCategorySelectOptions(); track option.value) {
-                  <ion-select-option [value]="option.value">
-                    {{ option.label }}
-                  </ion-select-option>
-                }
-              </ion-select>
-            </ion-item>
+            @if (!showAdvanced()) {
+              <ion-item>
+                <ion-input
+                  type="number"
+                  min="0"
+                  formControlName="quickQuantity"
+                  label="{{ 'pantry.form.quickQuantity' | translate }}"
+                  labelPlacement="stacked"
+                  [placeholder]="'pantry.form.quickQuantity' | translate">
+                </ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-input
+                  type="date"
+                  formControlName="quickExpiry"
+                  label="{{ 'pantry.form.quickExpiry' | translate }}"
+                  labelPlacement="stacked">
+                </ion-input>
+              </ion-item>
+            }
+
+            @if (!editingItem) {
+              <div class="advanced-toggle">
+                <ion-button fill="clear" size="small" (click)="toggleAdvanced()">
+                  <ion-icon slot="start" [name]="showAdvanced() ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+                  {{ showAdvanced() ? ('pantry.form.hideAdvanced' | translate) : ('pantry.form.showAdvanced' | translate) }}
+                </ion-button>
+              </div>
+            }
+
+            @if (showAdvanced()) {
+              <ion-item>
+                <ion-select
+                  formControlName="categoryId"
+                  interface="popover"
+                  label="{{ 'pantry.form.category' | translate }}"
+                  labelPlacement="stacked"
+                  [placeholder]="'pantry.form.categoryPlaceholder' | translate">
+                  @for (option of getCategorySelectOptions(); track option.value) {
+                    <ion-select-option [value]="option.value">
+                      {{ option.label }}
+                    </ion-select-option>
+                  }
+                </ion-select>
+              </ion-item>
 
               <ion-item>
                 <ion-select
-                formControlName="supermarket"
-                interface="popover"
-                label="{{ 'pantry.form.supermarket' | translate }}"
-                labelPlacement="stacked"
-                [placeholder]="'pantry.form.supermarketPlaceholder' | translate">
+                  formControlName="supermarket"
+                  interface="popover"
+                  label="{{ 'pantry.form.supermarket' | translate }}"
+                  labelPlacement="stacked"
+                  [placeholder]="'pantry.form.supermarketPlaceholder' | translate">
                   @for (option of getSupermarketSelectOptions(); track option.value) {
                     <ion-select-option [value]="option.value">
                       {{ option.label }}
                     </ion-select-option>
                   }
-              </ion-select>
-            </ion-item>
+                </ion-select>
+              </ion-item>
 
-            <ion-item lines="full">
-              <ion-toggle formControlName="isBasic" justify="space-between">{{ 'pantry.form.basic' | translate }}</ion-toggle>
-            </ion-item>
-            <ion-item>
-              <ion-input
-                type="number"
-                min="0"
-                formControlName="minThreshold"
-                label="{{ 'pantry.form.minThreshold' | translate }}"
-                labelPlacement="stacked">
-              </ion-input>
-            </ion-item>
+              <ion-item>
+                <ion-input
+                  type="number"
+                  min="0"
+                  formControlName="minThreshold"
+                  label="{{ 'pantry.form.minThreshold' | translate }}"
+                  labelPlacement="stacked">
+                </ion-input>
+              </ion-item>
+
+              <ion-item lines="full">
+                <ion-checkbox formControlName="isBasic" justify="space-between">
+                  {{ 'pantry.form.basic' | translate }}
+                </ion-checkbox>
+              </ion-item>
+            }
           </ion-list>
 
-          <div formArrayName="locations" class="location-form-list">
-              @for (locationCtrl of locationsArray.controls; track $index; let i = $index) {
-                <div class="location-form-card" [formGroupName]="i">
-                  <div class="location-form-header">
-                    <h4>
-                      {{ 'pantry.form.locationTitle' | translate:{ index: i + 1 } }}
-                      <span class="location-total">
-                        ({{ 'pantry.form.locationTotal' | translate:{ total: (getLocationTotalForControl(i) | number:'1.0-2'), unit: getLocationUnitLabelForControl(i) } }})
-                      </span>
-                    </h4>
-                    <ion-button
-                      fill="clear"
-                      size="small"
-                      color="danger"
-                      (click)="removeLocationEntry(i)"
-                      [disabled]="locationsArray.length <= 1">
-                      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                    </ion-button>
-                  </div>
-                  <ion-list lines="full">
-                    <ion-item>
-                      <ion-select
-                        formControlName="locationId"
-                        interface="popover"
-                        label="{{ 'pantry.form.location' | translate }}"
-                        labelPlacement="stacked"
-                        [placeholder]="'pantry.form.locationPlaceholder' | translate"
-                        required>
-                        @for (option of getLocationOptionsForControl(i); track option.value) {
-                          <ion-select-option [value]="option.value">
-                            {{ option.label }}
-                          </ion-select-option>
-                        }
-                      </ion-select>
-                    </ion-item>
-                  </ion-list>
-                  <div formArrayName="batches" class="batch-form-list">
-                    <div class="batch-form-header">
-                      <h5>{{ 'pantry.form.batches.title' | translate }}</h5>
-                      <ion-button fill="clear" size="small" (click)="addBatchEntry(i)">
-                        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-                        {{ 'pantry.form.batches.add' | translate }}
+            @if (showAdvanced()) {
+              <div formArrayName="locations" class="location-form-list">
+                @for (locationCtrl of locationsArray.controls; track $index; let i = $index) {
+                  <div class="location-form-card" [formGroupName]="i">
+                    <div class="location-form-header">
+                      <h4>
+                        {{ 'pantry.form.locationTitle' | translate:{ index: i + 1 } }}
+                        <span class="location-total">
+                          ({{ 'pantry.form.locationTotal' | translate:{ total: (getLocationTotalForControl(i) | number:'1.0-2'), unit: getLocationUnitLabelForControl(i) } }})
+                        </span>
+                      </h4>
+                      <ion-button
+                        fill="clear"
+                        size="small"
+                        color="danger"
+                        (click)="removeLocationEntry(i)"
+                        [disabled]="locationsArray.length <= 1">
+                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                       </ion-button>
                     </div>
-                    @let batchesArray = getBatchesArray(i);
-                    @if (batchesArray.length === 0) {
-                      <ion-list>
-                        <ion-item lines="none">
-                          <app-empty-state-generic
-                            class="list-empty-state"
-                            icon="cube-outline"
-                            [title]="'pantry.form.batches.title' | translate"
-                            [subtitle]="'pantry.form.batches.empty' | translate"
-                            [compact]="true">
-                          </app-empty-state-generic>
-                        </ion-item>
-                      </ion-list>
-                    }
-                    @for (batchCtrl of batchesArray.controls; track $index; let j = $index) {
-                      <div class="batch-form-card" [formGroupName]="j">
-                        <div class="batch-form-card-header">
-                          <h6>{{ 'pantry.form.batches.titleIndex' | translate:{ index: j + 1 } }}</h6>
-                          <ion-button
-                            fill="clear"
-                            size="small"
-                            color="danger"
-                            (click)="removeBatchEntry(i, j)">
-                            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                          </ion-button>
-                        </div>
-                        <ion-list lines="full">
-                          <ion-item>
-                            <ion-input
-                              type="number"
-                              min="0"
-                              formControlName="quantity"
-                              label="{{ 'pantry.form.batches.quantity' | translate }}"
-                              labelPlacement="stacked">
-                            </ion-input>
-                          </ion-item>
-                          <ion-item>
-                            <ion-input
-                              type="date"
-                              formControlName="expirationDate"
-                              label="{{ 'pantry.form.batches.expiry' | translate }}"
-                              labelPlacement="stacked">
-                            </ion-input>
-                          </ion-item>
+                    <ion-list lines="full">
+                      <ion-item>
+                        <ion-select
+                          formControlName="locationId"
+                          interface="popover"
+                          label="{{ 'pantry.form.location' | translate }}"
+                          labelPlacement="stacked"
+                          [placeholder]="'pantry.form.locationPlaceholder' | translate"
+                          required>
+                          @for (option of getLocationOptionsForControl(i); track option.value) {
+                            <ion-select-option [value]="option.value">
+                              {{ option.label }}
+                            </ion-select-option>
+                          }
+                        </ion-select>
+                      </ion-item>
+                    </ion-list>
+                    <div formArrayName="batches" class="batch-form-list">
+                      <div class="batch-form-header">
+                        <h5>{{ 'pantry.form.batches.title' | translate }}</h5>
+                        <ion-button fill="clear" size="small" (click)="addBatchEntry(i)">
+                          <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+                          {{ 'pantry.form.batches.add' | translate }}
+                        </ion-button>
+                      </div>
+                      @let batchesArray = getBatchesArray(i);
+                      @if (batchesArray.length === 0) {
+                        <ion-list>
                           <ion-item lines="none">
-                            <ion-toggle formControlName="opened" justify="space-between">{{ 'pantry.form.batches.opened' | translate }}</ion-toggle>
+                            <app-empty-state-generic
+                              class="list-empty-state"
+                              icon="cube-outline"
+                              [title]="'pantry.form.batches.title' | translate"
+                              [subtitle]="'pantry.form.batches.empty' | translate"
+                              [compact]="true">
+                            </app-empty-state-generic>
                           </ion-item>
                         </ion-list>
-                      </div>
-                    }
+                      }
+                      @for (batchCtrl of batchesArray.controls; track $index; let j = $index) {
+                        <div class="batch-form-card" [formGroupName]="j">
+                          <div class="batch-form-card-header">
+                            <h6>{{ 'pantry.form.batches.titleIndex' | translate:{ index: j + 1 } }}</h6>
+                            <ion-button
+                              fill="clear"
+                              size="small"
+                              color="danger"
+                              (click)="removeBatchEntry(i, j)">
+                              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                            </ion-button>
+                          </div>
+                          <ion-list lines="full">
+                            <ion-item>
+                              <ion-input
+                                type="number"
+                                min="0"
+                                formControlName="quantity"
+                                label="{{ 'pantry.form.batches.quantity' | translate }}"
+                                labelPlacement="stacked">
+                              </ion-input>
+                            </ion-item>
+                            <ion-item>
+                              <ion-input
+                                type="date"
+                                formControlName="expirationDate"
+                                label="{{ 'pantry.form.batches.expiry' | translate }}"
+                                labelPlacement="stacked">
+                              </ion-input>
+                            </ion-item>
+                            <ion-item lines="none">
+                              <ion-toggle formControlName="opened" justify="space-between">{{ 'pantry.form.batches.opened' | translate }}</ion-toggle>
+                            </ion-item>
+                          </ion-list>
+                        </div>
+                      }
+                    </div>
                   </div>
-                </div>
-              }
-              <ion-button fill="clear" size="small" (click)="addLocationEntry()">
-                <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-                {{ 'pantry.form.addLocation' | translate }}
-              </ion-button>
-            </div>
+                }
+                <ion-button fill="clear" size="small" (click)="addLocationEntry()">
+                  <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+                  {{ 'pantry.form.addLocation' | translate }}
+                </ion-button>
+              </div>
+            }
 
         </form>
       </ion-content>
@@ -425,7 +462,7 @@
         <ion-toolbar class="create-footer">
           <ion-button
             expand="block"
-            [disabled]="form.invalid || isSaving"
+            [disabled]="isSaving || (showAdvanced() ? form.invalid : quickFormInvalid())"
             (click)="submitItem()">
             @if (isSaving) {
               <ion-spinner name="dots"></ion-spinner>
