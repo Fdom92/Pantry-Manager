@@ -43,6 +43,10 @@ import {
   chevronDownOutline,
   lockClosedOutline,
   fastFoodOutline,
+  sendOutline,
+  enterOutline,
+  exitOutline,
+  paperPlaneOutline,
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -100,6 +104,10 @@ addIcons({
   'cube-outline': cubeOutline,
   'lock-closed-outline': lockClosedOutline,
   'fast-food-outline': fastFoodOutline,
+  'send-outline': sendOutline,
+  'enter-outline': enterOutline,
+  'exit-outline': exitOutline,
+  'paper-plane-outline': paperPlaneOutline,
 });
 
 bootstrapApplication(AppComponent, {

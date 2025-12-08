@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Mi Despensa</string>
-    <string name="title_activity_main">Mi Despensa</string>
+    <string name="app_name">PantryMind</string>
+    <string name="title_activity_main">PantryMind</string>
     <string name="package_name">com.fdom.pantrymind</string>
     <string name="custom_url_scheme">com.fdom.pantrymind</string>
 </resources>

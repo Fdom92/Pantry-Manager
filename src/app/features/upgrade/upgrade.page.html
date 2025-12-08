@@ -1,5 +1,3 @@
-@let primary = getPrimaryPlan();
-
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -15,33 +13,11 @@
     <h1>{{ 'upgrade.headline' | translate }}</h1>
     <p>{{ 'upgrade.subtitle' | translate }}</p>
     <div class="hero-actions">
-      @if (primary) {
-        <ion-button color="warning" size="large" (click)="onSelectPlan(primary)">
-          {{ primary.ctaLabel }}
-        </ion-button>
-      }
       <ion-button fill="clear" color="light" (click)="maybeLater()">
         {{ 'upgrade.actions.maybeLater' | translate }}
       </ion-button>
     </div>
   </div>
-
-  <ion-card class="benefits-card">
-    <ion-card-header>
-      <ion-card-subtitle>{{ 'upgrade.benefits.subtitle' | translate }}</ion-card-subtitle>
-      <ion-card-title>{{ 'upgrade.benefits.title' | translate }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ul class="benefits-list">
-        @for (key of benefitKeys; track key) {
-          <li>
-            <ion-icon name="star-outline"></ion-icon>
-            <span>{{ key | translate }}</span>
-          </li>
-        }
-      </ul>
-    </ion-card-content>
-  </ion-card>
 
   <div class="plans-section">
     <div class="plans-grid">

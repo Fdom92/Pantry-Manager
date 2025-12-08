@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, effect, Injectable, signal } from '@angular/core';
 import { MeasurementUnit, PantryItem, StockStatus } from '@core/models';
 import { PantryService } from '@core/services/pantry.service';
 
@@ -36,14 +36,19 @@ export class PantryStoreService {
     Object.values(MeasurementUnit).map(option => option.toLowerCase())
   );
 
-  constructor(private readonly pantryService: PantryService) {}
+  constructor(private readonly pantryService: PantryService) {
+    // Mirror the shared pantry service cache so dashboard consumers avoid duplicating DB reads.
+    effect(() => {
+      this.itemsSignal.set(this.pantryService.loadedProducts());
+    });
+  }
 
   /** Load items from storage, updating loading/error signals accordingly. */
   async loadAll(): Promise<void> {
     this.loading.set(true);
     try {
-      const all = await this.pantryService.getAll();
-      this.itemsSignal.set(all);
+      await this.pantryService.ensureFirstPageLoaded();
+      this.pantryService.startBackgroundLoad();
       this.error.set(null);
     } catch (err: any) {
       console.error('[PantryStoreService] loadAll error', err);
