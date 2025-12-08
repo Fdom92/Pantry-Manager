@@ -82,10 +82,11 @@
             </ion-label>
             <ion-button
               color="danger"
-              fill="outline"
+              fill="clear"
               slot="end"
               (click)="onResetApp()"
               [disabled]="resettingData()"
+              [attr.aria-label]="'settings.data.resetAction' | translate"
             >
               @if (resettingData()) {
                 <ion-spinner
@@ -93,7 +94,7 @@
                   name="dots"
                 ></ion-spinner>
               }
-              {{ "settings.data.resetAction" | translate }}
+              <ion-icon name="trash-outline"></ion-icon>
             </ion-button>
           </ion-item>
 
@@ -104,8 +105,10 @@
             </ion-label>
             <ion-button
               slot="end"
+              fill="clear"
               (click)="onExportData()"
               [disabled]="exportingData()"
+              [attr.aria-label]="'settings.data.exportAction' | translate"
             >
               @if (exportingData()) {
                 <ion-spinner
@@ -113,7 +116,7 @@
                   name="dots"
                 ></ion-spinner>
               }
-              {{ "settings.data.exportAction" | translate }}
+              <ion-icon name="exit-outline"></ion-icon>
             </ion-button>
           </ion-item>
 
@@ -125,8 +128,10 @@
             <ion-button
               slot="end"
               color="secondary"
+              fill="clear"
               (click)="triggerImport(importInput)"
               [disabled]="importingData()"
+              [attr.aria-label]="'settings.data.importAction' | translate"
             >
               @if (importingData()) {
                 <ion-spinner
@@ -134,7 +139,7 @@
                   name="dots"
                 ></ion-spinner>
               }
-              {{ "settings.data.importAction" | translate }}
+              <ion-icon name="enter-outline"></ion-icon>
             </ion-button>
           </ion-item>
         </ion-list>
@@ -194,11 +199,12 @@
             </ion-label>
             <ion-button
               slot="end"
-              fill="outline"
+              fill="clear"
               color="primary"
+              [attr.aria-label]="'settings.info.feedbackAction' | translate"
               href="mailto:fer.olmo92@gmail.com?subject=Feedback%20PantryMind"
             >
-              {{ "settings.info.feedbackAction" | translate }}
+              <ion-icon name="paper-plane-outline"></ion-icon>
             </ion-button>
           </ion-item>
         </ion-list>
