@@ -21,6 +21,7 @@ export class PantryService extends StorageService<PantryItem> {
   readonly loading = signal(false);
   readonly endReached = signal(false);
   readonly totalCount = signal(0);
+  private currentLoadPromise: Promise<void> | null = null;
   private dbPreloaded = false;
   private productIndexReady = false;
   private pendingPipelineReset = false;
@@ -69,9 +70,17 @@ export class PantryService extends StorageService<PantryItem> {
 
   /** Ensure at least one page is available to render something immediately. */
   async ensureFirstPageLoaded(): Promise<void> {
-    if (this.loadedProducts().length > 0 || this.loading()) {
+    if (this.loadedProducts().length > 0) {
       return;
     }
+
+    if (this.currentLoadPromise) {
+      await this.currentLoadPromise;
+      if (this.loadedProducts().length > 0) {
+        return;
+      }
+    }
+
     this.resetPagination();
     await this.loadNextPage(true);
   }
@@ -83,10 +92,7 @@ export class PantryService extends StorageService<PantryItem> {
     }
     this.backgroundLoadPromise = (async () => {
       try {
-        if (this.loadedProducts().length === 0 && !this.loading()) {
-          this.resetPagination();
-          await this.loadNextPage(true);
-        }
+        await this.ensureFirstPageLoaded();
         while (!this.endReached()) {
           await this.loadNextPage(true);
         }
@@ -340,7 +346,11 @@ export class PantryService extends StorageService<PantryItem> {
    * It never applies filters or sorting here; the reactive pipeline handles that in memory.
    */
   async loadNextPage(isBackground = false): Promise<void> {
-    if (this.loading() || this.endReached()) {
+    if (this.loading()) {
+      return this.currentLoadPromise ?? Promise.resolve();
+    }
+
+    if (this.endReached()) {
       return;
     }
 
@@ -349,27 +359,39 @@ export class PantryService extends StorageService<PantryItem> {
       return;
     }
 
-    this.loading.set(true);
-    try {
-      await this.initialize();
-      const offset = this.pageOffset();
-      const docs = await this.getPaginatedProducts(offset, limit);
-      if (docs.length) {
-        this.appendBatchToLoadedProducts(docs);
-        this.pageOffset.update(value => value + docs.length);
-      } else if (offset === 0) {
-        this.loadedProducts.set([]);
-        this.filteredProducts.set([]);
+    const loadPromise = (async () => {
+      this.loading.set(true);
+      try {
+        await this.initialize();
+        const offset = this.pageOffset();
+        const docs = await this.getPaginatedProducts(offset, limit);
+        if (docs.length) {
+          this.appendBatchToLoadedProducts(docs);
+          this.pageOffset.update(value => value + docs.length);
+        } else if (offset === 0) {
+          this.loadedProducts.set([]);
+          this.filteredProducts.set([]);
+        }
+        if (docs.length < limit) {
+          this.endReached.set(true);
+        }
+      } finally {
+        this.loading.set(false);
       }
-      if (docs.length < limit) {
-        this.endReached.set(true);
-      }
-    } finally {
-      this.loading.set(false);
-    }
 
-    if (this.pendingPipelineReset) {
-      await this.performPendingPipelineReset();
+      if (this.pendingPipelineReset) {
+        await this.performPendingPipelineReset();
+      }
+    })();
+
+    this.currentLoadPromise = loadPromise;
+
+    try {
+      await loadPromise;
+    } finally {
+      if (this.currentLoadPromise === loadPromise) {
+        this.currentLoadPromise = null;
+      }
     }
   }
 
