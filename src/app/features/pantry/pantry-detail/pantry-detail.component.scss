@@ -311,25 +311,26 @@
   gap: 16px;
   padding: 14px 16px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--ion-color-light-rgb, 255, 255, 255), 0.9);
   border: 1px solid transparent;
+  color: var(--ion-text-color, #0f172a);
   transition: border-color 160ms ease, background 160ms ease;
 }
 
 .batch-row[data-status='normal'] {
-  border-color: rgba(21, 128, 61, 0.32);
+  border-color: rgba(var(--ion-color-success-rgb, 34, 197, 94), 0.28);
 }
 
 .batch-row[data-status='near-expiry'] {
-  border-color: rgba(234, 88, 12, 0.42);
+  border-color: rgba(var(--ion-color-warning-rgb, 234, 179, 8), 0.36);
 }
 
 .batch-row[data-status='expired'] {
-  border-color: rgba(185, 28, 28, 0.5);
+  border-color: rgba(var(--ion-color-danger-rgb, 239, 68, 68), 0.4);
 }
 
 .batch-row[data-status='unknown'] {
-  border-color: rgba(148, 163, 184, 0.32);
+  border-color: rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.32);
 }
 .batch-expiration {
   display: flex;
@@ -348,7 +349,7 @@
 
 .batch-icon {
   font-size: 22px;
-  color: rgba(148, 163, 184, 0.9);
+  color: rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.9);
 }
 
 .batch-info {
@@ -360,7 +361,7 @@
 
 .batch-date {
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--ion-text-color, #0f172a);
   font-size: 0.70rem;
   display: flex;
   align-items: center;
@@ -373,7 +374,7 @@
 
 .batch-location {
   font-size: 0.8rem;
-  color: rgba(203, 213, 225, 0.86);
+  color: rgba(var(--ion-color-medium-rgb, 152, 154, 162), 0.9);
 }
 
 .batch-pill {
@@ -381,8 +382,8 @@
   align-items: center;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(94, 234, 212, 0.18);
-  color: #67e8f9;
+  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.12);
+  color: var(--ion-color-primary, #3b82f6);
   font-size: 0.7rem;
   font-weight: 600;
   width: fit-content;
@@ -399,7 +400,7 @@
 .batch-quantity {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--ion-text-color, #0f172a);
 }
 
 .batch-actions {
@@ -410,15 +411,15 @@
 .batch-actions ion-button {
   --padding-start: 6px;
   --padding-end: 6px;
-  --background: rgba(255, 255, 255, 0.05);
+  --background: rgba(var(--ion-color-light-rgb, 255, 255, 255), 0.9);
   --border-radius: 12px;
-  --color: rgba(226, 232, 240, 0.88);
+  --color: var(--ion-color-primary, #3b82f6);
   --box-shadow: none;
 }
 
 .batch-actions ion-button[color='primary'] {
-  --background: rgba(56, 189, 248, 0.16);
-  --color: #bae6fd;
+  --background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.16);
+  --color: var(--ion-color-primary, #3b82f6);
 }
 
 .batch-actions ion-button[disabled] {

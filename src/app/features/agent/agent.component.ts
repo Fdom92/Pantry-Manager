@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, ViewChild, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, ViewChild, effect, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AgentMessage } from '@core/models';
 import { AgentService } from '@core/services/agent.service';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { IonContent, IonicModule, NavController } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-agent',
@@ -20,6 +21,7 @@ export class AgentComponent implements OnDestroy {
   private readonly agentService = inject(AgentService);
   private readonly revenuecat = inject(RevenuecatService);
   private readonly navCtrl = inject(NavController);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly messages = this.agentService.messages;
   readonly thinking = this.agentService.thinking;
@@ -46,6 +48,18 @@ export class AgentComponent implements OnDestroy {
   });
 
   constructor() {
+    // Keep the composer enabled only for PRO users to avoid template disabled binding warnings.
+    this.isPro$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(isPro => {
+        if (isPro) {
+          this.messageControl.enable({ emitEvent: false });
+        } else {
+          this.messageControl.disable({ emitEvent: false });
+          this.messageControl.setValue('', { emitEvent: false });
+        }
+      });
+
     effect(() => {
       // react to message updates and thinking indicator
       this.messages();

@@ -142,7 +142,7 @@
   },
   "shopping": {
     "title": "Shopping",
-    "unassignedSupermarket": "No supermarket",
+    "unassignedSupermarket": "Any supermarket",
     "summary": {
       "title": "Shopping summary",
       "collapse": "Collapse summary",
@@ -168,6 +168,8 @@
     },
     "purchaseModal": {
       "title": "Add purchase",
+      "titleProduct": "Purchase product",
+      "productName": "Name",
       "quantity": "Quantity",
       "quantityPlaceholder": "0",
       "quantityHelp": "Use the stepper to adjust the purchased amount.",
@@ -178,7 +180,7 @@
       "locationHint": "Choose where this lot will be stored.",
       "locationRequired": "Pick a location before saving.",
       "expiryHint": "Optional: record the expiration date if needed.",
-      "addToPantry": "Add to pantry"
+      "addToPantry": "Add"
     },
     "suggestions": {
       "title": "Suggested purchases",
@@ -332,13 +334,17 @@
       "newTitle": "New item",
       "name": "Name",
       "namePlaceholder": "Rice, milk...",
+      "quickQuantity": "Quantity",
+      "quickExpiry": "Date",
+      "showAdvanced": "Show advanced version",
+      "hideAdvanced": "Hide advanced version",
       "category": "Category",
       "categoryPlaceholder": "Cereals, dairy...",
       "uncategorized": "Uncategorized",
       "supermarket": "Supermarket",
       "supermarketPlaceholder": "Select a supermarket",
       "basic": "Pantry staple item",
-      "minThreshold": "Minimum quantity (alerts)",
+      "minThreshold": "Minimum quantity",
       "locationTitle": "Location {{ index }}",
       "locationTotal": "Total: {{ total }} {{ unit }}",
       "location": "Location",

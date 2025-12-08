@@ -82,6 +82,7 @@ export class PantryListComponent implements OnDestroy {
   readonly MeasurementUnit = MeasurementUnit;
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   readonly hasLoadedOnce = signal(false);
+  readonly showAdvanced = signal(false);
   showCreateModal = false;
   editingItem: PantryItem | null = null;
   isSaving = false;
@@ -92,9 +93,11 @@ export class PantryListComponent implements OnDestroy {
   private realtimeSubscribed = false;
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
-    categoryId: this.fb.control<string | null>(null, { validators: [Validators.required] }),
+    quickQuantity: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
+    quickExpiry: this.fb.control<string | null>(null),
+    categoryId: this.fb.control<string | null>(null),
     supermarket: this.fb.control('', {
-      validators: [Validators.required, Validators.maxLength(80)],
+      validators: [Validators.maxLength(80)],
       nonNullable: true,
     }),
     isBasic: this.fb.control(false),
@@ -213,8 +216,11 @@ export class PantryListComponent implements OnDestroy {
   /** Open the creation modal with blank defaults and a single location row. */
   openNewItemModal(): void {
     this.editingItem = null;
+    this.showAdvanced.set(false);
     this.form.reset({
       name: '',
+      quickQuantity: null,
+      quickExpiry: null,
       categoryId: null,
       supermarket: '',
       isBasic: false,
@@ -234,8 +240,11 @@ export class PantryListComponent implements OnDestroy {
   openEditItemModal(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     this.editingItem = item;
+    this.showAdvanced.set(true);
     this.form.reset({
       name: item.name ?? '',
+      quickQuantity: null,
+      quickExpiry: null,
       categoryId: item.categoryId ?? null,
       supermarket: item.supermarket ?? '',
       isBasic: Boolean(item.isBasic),
@@ -265,6 +274,22 @@ export class PantryListComponent implements OnDestroy {
       return;
     }
     this.locationsArray.removeAt(index);
+  }
+
+  toggleAdvanced(): void {
+    if (this.editingItem) {
+      return;
+    }
+    this.showAdvanced.update(value => {
+      const next = !value;
+      if (next) {
+        this.form.patchValue({
+          quickQuantity: null,
+          quickExpiry: null,
+        });
+      }
+      return next;
+    });
   }
 
   /** Replace the current form array with normalized groups based on the provided data. */
@@ -326,14 +351,25 @@ export class PantryListComponent implements OnDestroy {
    * Handles both creation and update flows through the store.
    */
   async submitItem(): Promise<void> {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
+    const advancedMode = this.showAdvanced();
+    if (advancedMode) {
+      if (this.form.invalid) {
+        this.form.markAllAsTouched();
+        return;
+      }
+    } else {
+      this.form.get('name')?.markAsTouched();
+      this.form.get('quickQuantity')?.markAsTouched();
+      if (this.quickFormInvalid()) {
+        return;
+      }
     }
 
     this.isSaving = true;
     try {
-      const item = this.buildItemPayload(this.editingItem ?? undefined);
+      const item = advancedMode
+        ? this.buildItemPayload(this.editingItem ?? undefined)
+        : this.buildQuickItemPayload(this.editingItem ?? undefined);
       const previous = this.editingItem;
       let successMessage: string;
       if (previous) {
@@ -349,10 +385,6 @@ export class PantryListComponent implements OnDestroy {
       this.isSaving = false;
       if (err instanceof Error && err.message === 'LOCATION_REQUIRED') {
         await this.presentToast(this.translate.instant('pantry.toasts.locationRequired'), 'danger');
-        return;
-      }
-      if (err instanceof Error && err.message === 'SUPERMARKET_REQUIRED') {
-        await this.presentToast(this.translate.instant('pantry.toasts.supermarketRequired'), 'danger');
         return;
       }
       console.error('[PantryListComponent] submitItem error', err);
@@ -905,14 +937,14 @@ export class PantryListComponent implements OnDestroy {
     }
 
     for (const item of this.itemsState()) {
-      const id = (item.categoryId ?? '').trim();
+      const id = this.normalizeCategoryId(item.categoryId);
       if (id) {
         addOption(id);
       }
     }
 
     const control = this.form.get('categoryId');
-    const currentValue = typeof control?.value === 'string' ? control.value.trim() : '';
+    const currentValue = typeof control?.value === 'string' ? this.normalizeCategoryId(control.value) : '';
     if (currentValue && !seen.has(this.normalizeKey(currentValue))) {
       addOption(currentValue);
     }
@@ -1496,6 +1528,21 @@ export class PantryListComponent implements OnDestroy {
     return Array.isArray(location.batches) ? location.batches : [];
   }
 
+  getQuickQuantity(): number {
+    const value = (this.form.get('quickQuantity')?.value ?? null) as number | null;
+    if (value === null || value === undefined) {
+      return 0;
+    }
+    const num = Number(value);
+    return Number.isFinite(num) ? num : 0;
+  }
+
+  quickFormInvalid(): boolean {
+    const nameValid = Boolean((this.form.get('name')?.value ?? '').trim());
+    const quantity = this.getQuickQuantity();
+    return !nameValid || quantity <= 0;
+  }
+
   getLocationMeta(location: ItemLocationStock): string {
     const batches = this.getLocationBatches(location);
     if (!batches.length) {
@@ -1965,9 +2012,7 @@ export class PantryListComponent implements OnDestroy {
 
     const earliestExpiry = this.computeEarliestExpiry(locations);
     const normalizedSupermarket = this.normalizeSupermarketInput(supermarket);
-    if (!normalizedSupermarket) {
-      throw new Error('SUPERMARKET_REQUIRED');
-    }
+    const normalizedCategory = this.normalizeCategoryId(categoryId);
 
     const base: PantryItem = {
       _id: identifier,
@@ -1975,7 +2020,7 @@ export class PantryListComponent implements OnDestroy {
       type: 'item',
       householdId: existing?.householdId ?? DEFAULT_HOUSEHOLD_ID,
       name: (name ?? '').trim(),
-      categoryId: (categoryId ?? '').trim(),
+      categoryId: normalizedCategory,
       locations,
       supermarket: normalizedSupermarket,
       isBasic: isBasic ? true : undefined,
@@ -1986,6 +2031,58 @@ export class PantryListComponent implements OnDestroy {
     };
 
     return base;
+  }
+
+  /** Build a minimal item payload using quick entry fields. */
+  private buildQuickItemPayload(existing?: PantryItem): PantryItem {
+    const { name, categoryId, isBasic, supermarket, quickExpiry } = this.form.value as {
+      name?: string;
+      categoryId?: string;
+      isBasic?: boolean;
+      supermarket?: string;
+      quickExpiry?: string | null;
+    };
+    const quantity = this.getQuickQuantity();
+    const identifier = existing?._id ?? createDocumentId('item');
+    const now = new Date().toISOString();
+    const normalizedSupermarket = this.normalizeSupermarketInput(supermarket);
+    const normalizedCategory = this.normalizeCategoryId(categoryId);
+    const defaultLocation = this.getDefaultLocationId();
+    const batch: ItemBatch = {
+      quantity,
+      unit: MeasurementUnit.UNIT,
+    };
+    if (quickExpiry) {
+      const parsedDate = new Date(quickExpiry);
+      if (!isNaN(parsedDate.getTime())) {
+        batch.expirationDate = parsedDate.toISOString();
+      }
+    }
+    const locations: ItemLocationStock[] = [
+      {
+        locationId: defaultLocation,
+        unit: MeasurementUnit.UNIT,
+        batches: quantity > 0 ? [batch] : [],
+      },
+    ];
+
+    const earliestExpiry = this.computeEarliestExpiry(locations);
+
+    return {
+      _id: identifier,
+      _rev: existing?._rev,
+      type: 'item',
+      householdId: existing?.householdId ?? DEFAULT_HOUSEHOLD_ID,
+      name: (name ?? '').trim(),
+      categoryId: normalizedCategory,
+      locations,
+      supermarket: normalizedSupermarket,
+      isBasic: isBasic ? true : undefined,
+      minThreshold: undefined,
+      expirationDate: earliestExpiry,
+      createdAt: existing?.createdAt ?? now,
+      updatedAt: now,
+    };
   }
 
   private normalizeSupermarketInput(value: string | undefined): string | undefined {
@@ -2036,7 +2133,7 @@ export class PantryListComponent implements OnDestroy {
     }
 
     for (const item of items) {
-      const id = (item.categoryId ?? '').trim();
+      const id = this.normalizeCategoryId(item.categoryId);
       const label = this.formatCategoryName(id);
       const current = counts.get(id);
       if (current) {
@@ -2068,7 +2165,7 @@ export class PantryListComponent implements OnDestroy {
     const map = new Map<string, PantryGroup>();
 
     for (const item of items) {
-      const key = item.categoryId?.trim() || 'uncategorized';
+      const key = this.normalizeCategoryId(item.categoryId);
       const name = this.formatCategoryName(key);
       let group = map.get(key);
       if (!group) {
@@ -2105,6 +2202,18 @@ export class PantryListComponent implements OnDestroy {
     return this.formatFriendlyName(key, this.translate.instant('pantry.form.uncategorized'));
   }
 
+  /** Normalize category ids for display, collapsing legacy placeholders. */
+  private normalizeCategoryId(value: string | null | undefined): string {
+    const trimmed = (value ?? '').trim();
+    if (!trimmed) {
+      return '';
+    }
+    if (trimmed.toLowerCase() === 'uncategorized') {
+      return '';
+    }
+    return trimmed;
+  }
+
   private formatFriendlyName(value: string, fallback: string): string {
     const key = value?.trim();
     if (!key) {
@@ -2129,6 +2238,16 @@ export class PantryListComponent implements OnDestroy {
     } catch {
       return '';
     }
+  }
+
+  private getDefaultLocationId(): string {
+    const presets = this.presetLocationOptions();
+    const first = presets[0]?.trim();
+    if (first) {
+      return first;
+    }
+    const fallback = DEFAULT_LOCATION_OPTIONS[0];
+    return fallback ? fallback.trim() : 'unassigned';
   }
 
   private syncExpandedItems(source: PantryItem[] = this.itemsState()): void {

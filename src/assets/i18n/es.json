@@ -142,7 +142,7 @@
   },
   "shopping": {
     "title": "Compras",
-    "unassignedSupermarket": "Sin supermercado",
+    "unassignedSupermarket": "Cualquier supermercado",
     "summary": {
       "title": "Resumen de compras",
       "collapse": "Contraer resumen",
@@ -168,6 +168,8 @@
     },
     "purchaseModal": {
       "title": "Añadir compra",
+      "titleProduct": "Comprar producto",
+      "productName": "Nombre",
       "quantity": "Cantidad",
       "quantityPlaceholder": "0",
       "quantityHelp": "Usa el sumador para ajustar la cantidad comprada.",
@@ -178,7 +180,7 @@
       "locationHint": "Elige dónde guardarás el lote.",
       "locationRequired": "Selecciona una ubicación antes de guardar.",
       "expiryHint": "Opcional: registra la caducidad si aplica.",
-      "addToPantry": "Añadir a la despensa"
+      "addToPantry": "Añadir"
     },
     "suggestions": {
       "title": "Compras sugeridas",
@@ -332,13 +334,17 @@
       "newTitle": "Nuevo artículo",
       "name": "Nombre",
       "namePlaceholder": "Arroz, leche...",
+      "quickQuantity": "Cantidad",
+      "quickExpiry": "Fecha",
+      "showAdvanced": "Mostrar versión avanzada",
+      "hideAdvanced": "Ocultar versión avanzada",
       "category": "Categoría",
       "categoryPlaceholder": "Cereales, lácteos...",
       "uncategorized": "Sin categoría",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Selecciona un supermercado",
       "basic": "Producto básico de la despensa",
-      "minThreshold": "Cantidad mínima (alertas)",
+      "minThreshold": "Cantidad mínima",
       "locationTitle": "Ubicación {{ index }}",
       "locationTotal": "Total: {{ total }} {{ unit }}",
       "location": "Ubicación",

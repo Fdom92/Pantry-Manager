@@ -96,9 +96,6 @@
                         }
                       </p>
                       <div class="suggestion-footer">
-                        <ion-note color="primary" class="purchase-note">
-                          {{ 'shopping.suggestions.buy' | translate:{ amount: (suggestion.suggestedQuantity | number:'1.0-2'), unit: getUnitLabel(suggestion.unit) } }}
-                        </ion-note>
                         <ion-button
                           size="small"
                           color="success"
@@ -125,6 +122,7 @@
         <app-empty-state-generic
           class="list-empty-state"
           icon="cart-outline"
+          [iconColor]="'warning'"
           [titleKey]="'emptyStates.shopping.title'"
           [subtitle]="'shopping.suggestions.empty' | translate">
         </app-empty-state-generic>

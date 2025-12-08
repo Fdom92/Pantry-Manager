@@ -1,3 +1,16 @@
-ion-footer ion-button {
-  font-weight: 600;
+.add-footer {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+.add-footer ion-button {
+  width: 100%;
+}
+
+.add-footer__cta {
+  --background: var(--ion-color-primary);
+  --background-focused: var(--ion-color-primary-shade);
+  --background-hover: var(--ion-color-primary-tint);
+  --color: var(--ion-color-primary-contrast);
 }

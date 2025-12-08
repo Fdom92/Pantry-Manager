@@ -19,6 +19,7 @@ export class EmptyStateGenericComponent {
   @Input() showAction = false;
   @Input() actionLabel?: string;
   @Input() compact = false;
+  @Input() iconColor?: 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'medium';
   @Output() action = new EventEmitter<void>();
 
   handleAction(): void {

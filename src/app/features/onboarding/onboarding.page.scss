@@ -30,7 +30,7 @@
 .top-bar {
   position: relative;
   z-index: 2;
-  padding: 16px 20px 6px;
+  padding: calc(16px + var(--ion-safe-area-top)) 20px 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -58,8 +58,8 @@
 .onboarding-swiper {
   position: relative;
   z-index: 2;
-  height: calc(100% - 140px);
-  padding: 14px 12px 72px;
+  height: calc(100% - 140px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
+  padding: calc(14px + var(--ion-safe-area-top)) 12px calc(72px + var(--ion-safe-area-bottom));
 }
 
 .slide-card {
@@ -103,6 +103,7 @@
   color: #c7d2ff;
   font-size: 13px;
   border: 1px solid rgba(99, 102, 241, 0.4);
+  margin-bottom: 4px;
 }
 
 .icon-burst {
@@ -140,7 +141,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 14px;
+  bottom: calc(14px + var(--ion-safe-area-bottom));
   padding: 0 18px;
   z-index: 3;
   display: flex;

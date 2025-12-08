@@ -106,8 +106,6 @@
       [placeholder]="isPro ? ('agent.placeholder' | translate) : ('agent.preview.lockedPlaceholder' | translate)"
       autoGrow="true"
       [formControl]="messageControl"
-      [value]="isPro ? messageControl.value : ''"
-      [disabled]="!isPro"
       enterkeyhint="send">
     </ion-textarea>
     <div class="composer__actions">
