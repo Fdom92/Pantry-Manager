@@ -142,7 +142,7 @@
   },
   "shopping": {
     "title": "Compras",
-    "unassignedSupermarket": "Sin supermercado",
+    "unassignedSupermarket": "Cualquier supermercado",
     "summary": {
       "title": "Resumen de compras",
       "collapse": "Contraer resumen",

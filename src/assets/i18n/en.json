@@ -142,7 +142,7 @@
   },
   "shopping": {
     "title": "Shopping",
-    "unassignedSupermarket": "No supermarket",
+    "unassignedSupermarket": "Any supermarket",
     "summary": {
       "title": "Shopping summary",
       "collapse": "Collapse summary",

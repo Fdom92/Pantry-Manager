@@ -289,12 +289,11 @@
 
               <ion-item>
                 <ion-select
-                  formControlName="supermarket"
-                  interface="popover"
-                  label="{{ 'pantry.form.supermarket' | translate }}"
-                  labelPlacement="stacked"
-                  [placeholder]="'pantry.form.supermarketPlaceholder' | translate"
-                  required>
+                formControlName="supermarket"
+                interface="popover"
+                label="{{ 'pantry.form.supermarket' | translate }}"
+                labelPlacement="stacked"
+                [placeholder]="'pantry.form.supermarketPlaceholder' | translate">
                   @for (option of getSupermarketSelectOptions(); track option.value) {
                     <ion-select-option [value]="option.value">
                       {{ option.label }}
