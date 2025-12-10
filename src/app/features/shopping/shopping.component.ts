@@ -11,23 +11,7 @@ import {
 } from '@core/models';
 import { LanguageService, PantryService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
-import {
-  IonBadge,
-  IonButton,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonContent,
-  IonChip,
-  IonHeader,
-  IonIcon,
-  IonSpinner,
-  IonTitle,
-  IonToolbar,
-} from '@ionic/angular/standalone';
-import { ModalController } from '@ionic/angular';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
 import { EmptyStateGenericComponent } from '../shared/empty-states/empty-state-generic.component';
@@ -40,20 +24,7 @@ type ShoppingStateWithItem = ShoppingState<PantryItem>;
   selector: 'app-shopping',
   standalone: true,
   imports: [
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
-    IonCardContent,
-    IonButton,
-    IonIcon,
-    IonBadge,
-    IonChip,
-    IonSpinner,
+    IonicModule,
     CommonModule,
     TranslateModule,
     EmptyStateGenericComponent,

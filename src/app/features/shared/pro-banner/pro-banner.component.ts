@@ -13,7 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
 export class ProBannerComponent {
   @Input() message = '';
   @Input() ctaLabel = '';
-  @Input() icon: string = 'star';
+  @Input() icon: string = 'star-outline';
   @Input() subtle = false;
   @Input() showAction = true;
   @Output() action = new EventEmitter<void>();

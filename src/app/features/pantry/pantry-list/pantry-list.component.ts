@@ -557,7 +557,9 @@ export class PantryListComponent implements OnDestroy {
     }
     if (chip.value) {
       this.applyStatusFilterPreset(chip.value);
-    }
+       return;
+     }
+    this.applyStatusFilterPreset('all');
   }
 
   toggleBasicFilter(): void {
@@ -921,7 +923,7 @@ export class PantryListComponent implements OnDestroy {
       label: 'pantry.filters.basic',
       description: 'pantry.filters.desc.basic',
       count: summary.basicCount,
-      icon: 'star',
+      icon: 'star-outline',
       colorClass: 'chip--basic',
       active: isActive,
     };
@@ -1992,8 +1994,9 @@ export class PantryListComponent implements OnDestroy {
     const formattedNumber = this.roundDisplayQuantity(Number(quantity)).toLocaleString(
       this.languageService.getCurrentLocale(),
       {
-      maximumFractionDigits: 2,
-    });
+        maximumFractionDigits: 2,
+      }
+    );
     const unitLabel = this.getUnitLabel(this.normalizeUnitValue(unit ?? undefined));
     return `${formattedNumber} ${unitLabel}`.trim();
   }

@@ -19,7 +19,6 @@ import {
   basketOutline,
   cartOutline,
   settingsOutline,
-  add as addIcon,
   addOutline,
   addCircleOutline,
   close as closeIcon,
@@ -36,7 +35,6 @@ import {
   checkmarkCircleOutline,
   listOutline,
   chatbubblesOutline,
-  star,
   starOutline,
   locationOutline,
   pricetagOutline,
@@ -86,7 +84,6 @@ addIcons({
   'basket-outline': basketOutline,
   'cart-outline': cartOutline,
   'settings-outline': settingsOutline,
-  add: addIcon,
   'add-outline': addOutline,
   'add-circle-outline': addCircleOutline,
   close: closeIcon,
@@ -105,7 +102,6 @@ addIcons({
   'checkmark-circle-outline': checkmarkCircleOutline,
   'list-outline': listOutline,
   'chatbubbles-outline': chatbubblesOutline,
-  'star': star,
   'star-outline': starOutline,
   'location-outline': locationOutline,
   'pricetag-outline': pricetagOutline,
@@ -118,8 +114,8 @@ addIcons({
   'enter-outline': enterOutline,
   'exit-outline': exitOutline,
   'paper-plane-outline': paperPlaneOutline,
-  navigateOutline,
-  storefrontOutline
+  'navigate-outline': navigateOutline,
+  'storefront-outline': storefrontOutline
 });
 
 bootstrapApplication(AppComponent, {
