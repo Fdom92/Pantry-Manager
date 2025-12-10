@@ -1,7 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { IonicModule, NavController } from '@ionic/angular';
+import {
+  IonBackButton,
+  IonBadge,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonNote,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular';
 import { ToastController } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
@@ -25,7 +36,20 @@ interface PlanViewModel {
 @Component({
   selector: 'app-upgrade',
   standalone: true,
-  imports: [IonicModule, CommonModule, TranslateModule, PlanCardComponent],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonBackButton,
+    IonTitle,
+    IonContent,
+    IonButton,
+    IonNote,
+    IonBadge,
+    CommonModule,
+    TranslateModule,
+    PlanCardComponent,
+  ],
   templateUrl: './upgrade.page.html',
   styleUrls: ['./upgrade.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

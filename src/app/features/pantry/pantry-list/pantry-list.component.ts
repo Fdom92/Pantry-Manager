@@ -33,7 +33,38 @@ import {
 import { PantryService } from '@core/services/pantry.service';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { createDocumentId } from '@core/utils';
-import { IonContent, IonicModule, ToastController } from '@ionic/angular';
+import {
+  IonBadge,
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonCheckbox,
+  IonChip,
+  IonContent,
+  IonFab,
+  IonFabButton,
+  IonFooter,
+  IonHeader,
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonModal,
+  IonSearchbar,
+  IonSelect,
+  IonSelectOption,
+  IonSkeletonText,
+  IonSpinner,
+  IonText,
+  IonTitle,
+  IonToggle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
 import { EmptyStateGenericComponent } from '../../shared/empty-states/empty-state-generic.component';
@@ -42,7 +73,35 @@ import { EmptyStateGenericComponent } from '../../shared/empty-states/empty-stat
   selector: 'app-pantry-list',
   standalone: true,
   imports: [
-    IonicModule,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonSearchbar,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonBadge,
+    IonSelect,
+    IonSelectOption,
+    IonToggle,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonCheckbox,
+    IonInput,
+    IonModal,
+    IonFab,
+    IonFabButton,
+    IonSpinner,
+    IonChip,
+    IonSkeletonText,
+    IonText,
+    IonFooter,
     CommonModule,
     ReactiveFormsModule,
     PantryDetailComponent,
@@ -498,7 +557,9 @@ export class PantryListComponent implements OnDestroy {
     }
     if (chip.value) {
       this.applyStatusFilterPreset(chip.value);
-    }
+       return;
+     }
+    this.applyStatusFilterPreset('all');
   }
 
   toggleBasicFilter(): void {
@@ -862,7 +923,7 @@ export class PantryListComponent implements OnDestroy {
       label: 'pantry.filters.basic',
       description: 'pantry.filters.desc.basic',
       count: summary.basicCount,
-      icon: 'star',
+      icon: 'star-outline',
       colorClass: 'chip--basic',
       active: isActive,
     };
@@ -1933,8 +1994,9 @@ export class PantryListComponent implements OnDestroy {
     const formattedNumber = this.roundDisplayQuantity(Number(quantity)).toLocaleString(
       this.languageService.getCurrentLocale(),
       {
-      maximumFractionDigits: 2,
-    });
+        maximumFractionDigits: 2,
+      }
+    );
     const unitLabel = this.getUnitLabel(this.normalizeUnitValue(unit ?? undefined));
     return `${formattedNumber} ${unitLabel}`.trim();
   }

@@ -57,7 +57,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 20px 22px 8px 26px;
+  padding: 16px 16px 8px 16px;
   cursor: pointer;
   outline: none;
 }
@@ -95,12 +95,12 @@
 }
 
 .summary-name {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--card-title);
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .summary-toggle-icon {
@@ -116,10 +116,10 @@
 .summary-info {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
+  justify-content: flex-start;
+  gap: 10px;
   flex-wrap: wrap;
-  font-size: 0.70rem;
+  font-size: 0.9rem;
   color: var(--card-muted);
 }
 
@@ -211,11 +211,16 @@
 
 .status-chip[data-status='unknown'] {
   background: rgba(148, 163, 184, 0.28);
+  color: #0f172a;
+}
+
+:host-context(.dark) .status-chip[data-status='unknown'] {
+  background: rgba(148, 163, 184, 0.4);
   color: #f8fafc;
 }
 
 .item-details {
-  padding: 0 22px 22px 26px;
+  padding: 0 16px 16px 16px;
   overflow: hidden;
   max-height: 1800px;
   transition:

@@ -8,7 +8,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-add-purchase-modal',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, TranslateModule],
+  imports: [
+    IonicModule,
+    CommonModule,
+    FormsModule,
+    TranslateModule,
+  ],
   templateUrl: './add-purchase-modal.component.html',
   styleUrls: ['./add-purchase-modal.component.scss'],
 })
