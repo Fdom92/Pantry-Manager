@@ -2,13 +2,47 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PantryItem, ShoppingItem } from '@core/models';
-import { IonicModule, ModalController } from '@ionic/angular';
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonSelect,
+  IonSelectOption,
+  IonFooter,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-purchase-modal',
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, TranslateModule],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonSelect,
+    IonSelectOption,
+    IonFooter,
+    CommonModule,
+    FormsModule,
+    TranslateModule,
+  ],
   templateUrl: './add-purchase-modal.component.html',
   styleUrls: ['./add-purchase-modal.component.scss'],
 })

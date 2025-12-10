@@ -5,7 +5,27 @@ import { Capacitor } from '@capacitor/core';
 import { AppThemePreference, BaseDoc } from '@core/models';
 import { AppPreferencesService, StorageService } from '@core/services';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { IonicModule, NavController, ToastController } from '@ionic/angular';
+import {
+  IonBadge,
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonSelect,
+  IonSelectOption,
+  IonSpinner,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
+import { NavController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ProBannerComponent } from '@features/shared/pro-banner/pro-banner.component';
 import packageJson from '../../../../package.json';
@@ -15,7 +35,29 @@ const TOAST_DURATION = 1800;
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [IonicModule, CommonModule, RouterLink, TranslateModule, ProBannerComponent],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonCardContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonSelect,
+    IonSelectOption,
+    IonButton,
+    IonIcon,
+    IonSpinner,
+    CommonModule,
+    RouterLink,
+    TranslateModule,
+    ProBannerComponent,
+  ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
 })

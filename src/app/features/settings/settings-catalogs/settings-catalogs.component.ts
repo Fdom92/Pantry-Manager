@@ -6,7 +6,24 @@ import {
   DEFAULT_LOCATION_OPTIONS,
   DEFAULT_SUPERMARKET_OPTIONS,
 } from '@core/services';
-import { IonicModule, ToastController } from '@ionic/angular';
+import {
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonListHeader,
+  IonProgressBar,
+  IonSpinner,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '../../shared/empty-states/empty-state-generic.component';
 
@@ -15,7 +32,26 @@ const TOAST_DURATION = 1800;
 @Component({
   selector: 'app-settings-catalogs',
   standalone: true,
-  imports: [IonicModule, CommonModule, TranslateModule, EmptyStateGenericComponent],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonBackButton,
+    IonTitle,
+    IonContent,
+    IonProgressBar,
+    IonList,
+    IonListHeader,
+    IonLabel,
+    IonItem,
+    IonInput,
+    IonButton,
+    IonIcon,
+    IonSpinner,
+    CommonModule,
+    TranslateModule,
+    EmptyStateGenericComponent,
+  ],
   templateUrl: './settings-catalogs.component.html',
   styleUrls: ['./settings-catalogs.component.scss'],
 })
