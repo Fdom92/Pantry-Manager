@@ -2,13 +2,17 @@ import { Injectable, Signal, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
-type SupportedLanguage = 'en' | 'es';
+type SupportedLanguage = 'en' | 'es' | 'fr' | 'de' | 'pt' | 'it';
 
-const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = ['en', 'es'];
+const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = ['en', 'es', 'fr', 'de', 'pt', 'it'];
 const DEFAULT_LANGUAGE: SupportedLanguage = 'en';
 const LOCALES: Record<SupportedLanguage, string> = {
   en: 'en-US',
   es: 'es-ES',
+  fr: 'fr-FR',
+  de: 'de-DE',
+  pt: 'pt-PT',
+  it: 'it-IT',
 };
 
 @Injectable({

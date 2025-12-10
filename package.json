@@ -1,6 +1,6 @@
 {
   "name": "pantrymind",
-  "version": "1.0.0",
+  "version": "1.1",
   "author": "Fernando del olmo",
   "homepage": "https://ferolmo.com/",
   "scripts": {
@@ -11,7 +11,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "prepare:build": "npm run build && npx cap copy && npx cap sync",
-    "prepare:prod-build": "npm run build --prod && npx cap copy && npx cap sync"
+    "prepare:prod-build": "npm run build -- --configuration production && npx cap copy && npx cap sync"
   },
   "private": true,
   "dependencies": {

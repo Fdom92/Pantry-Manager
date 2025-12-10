@@ -4,14 +4,42 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AgentMessage } from '@core/models';
 import { AgentService } from '@core/services/agent.service';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { IonContent, IonicModule, NavController } from '@ionic/angular';
+import {
+  IonBadge,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonFooter,
+  IonHeader,
+  IonIcon,
+  IonSpinner,
+  IonTextarea,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-agent',
   standalone: true,
-  imports: [CommonModule, IonicModule, ReactiveFormsModule, TranslateModule],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonButton,
+    IonBadge,
+    IonIcon,
+    IonContent,
+    IonSpinner,
+    IonFooter,
+    IonTextarea,
+    CommonModule,
+    ReactiveFormsModule,
+    TranslateModule,
+  ],
   templateUrl: './agent.component.html',
   styleUrls: ['./agent.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

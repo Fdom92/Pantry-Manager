@@ -3,7 +3,8 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHE
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { IonicModule, NavController } from '@ionic/angular';
+import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { register } from 'swiper/element/bundle';
 import type { SwiperOptions } from 'swiper/types';
@@ -28,7 +29,7 @@ interface OnboardingSlide {
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [IonicModule, CommonModule, TranslateModule],
+  imports: [IonContent, IonButton, IonIcon, CommonModule, TranslateModule],
   templateUrl: './onboarding.page.html',
   styleUrls: ['./onboarding.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

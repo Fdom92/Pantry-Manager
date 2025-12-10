@@ -1,19 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-pro-banner',
   standalone: true,
-  imports: [CommonModule, IonicModule, TranslateModule],
+  imports: [CommonModule, IonButton, IonIcon, TranslateModule],
   templateUrl: './pro-banner.component.html',
   styleUrls: ['./pro-banner.component.scss'],
 })
 export class ProBannerComponent {
   @Input() message = '';
   @Input() ctaLabel = '';
-  @Input() icon: string = 'star';
+  @Input() icon: string = 'star-outline';
   @Input() subtle = false;
   @Input() showAction = true;
   @Output() action = new EventEmitter<void>();

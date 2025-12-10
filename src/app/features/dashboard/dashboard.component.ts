@@ -4,14 +4,53 @@ import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { ES_DATE_FORMAT_OPTIONS, ItemLocationStock, PantryItem } from '@core/models';
 import { LanguageService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
-import { IonicModule } from '@ionic/angular';
+import {
+  IonBadge,
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonNote,
+  IonSpinner,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '../shared/empty-states/empty-state-generic.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [IonicModule, CommonModule, TranslateModule, EmptyStateGenericComponent],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonCardContent,
+    IonButton,
+    IonIcon,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonBadge,
+    IonNote,
+    IonSpinner,
+    CommonModule,
+    TranslateModule,
+    EmptyStateGenericComponent,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })

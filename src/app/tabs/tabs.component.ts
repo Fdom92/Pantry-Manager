@@ -3,13 +3,13 @@ import { Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { IonicModule } from '@ionic/angular';
+import { IonTabBar, IonTabButton, IonTabs, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-tabs',
   standalone: true,
-  imports: [IonicModule, RouterModule, CommonModule, TranslateModule],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, RouterModule, CommonModule, TranslateModule],
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss'],
 })

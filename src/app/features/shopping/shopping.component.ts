@@ -23,7 +23,12 @@ type ShoppingStateWithItem = ShoppingState<PantryItem>;
 @Component({
   selector: 'app-shopping',
   standalone: true,
-  imports: [IonicModule, CommonModule, TranslateModule, EmptyStateGenericComponent],
+  imports: [
+    IonicModule,
+    CommonModule,
+    TranslateModule,
+    EmptyStateGenericComponent,
+  ],
   templateUrl: './shopping.component.html',
   styleUrls: ['./shopping.component.scss'],
 })

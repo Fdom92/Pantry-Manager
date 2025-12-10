@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-empty-state-generic',
   standalone: true,
-  imports: [IonicModule, CommonModule, TranslateModule],
+  imports: [IonButton, IonIcon, CommonModule, TranslateModule],
   templateUrl: './empty-state-generic.component.html',
   styleUrls: ['./empty-state.component.scss'],
 })
