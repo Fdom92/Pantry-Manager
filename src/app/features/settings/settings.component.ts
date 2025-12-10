@@ -6,7 +6,6 @@ import { AppThemePreference, BaseDoc } from '@core/models';
 import { AppPreferencesService, StorageService } from '@core/services';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import {
-  IonBadge,
   IonButton,
   IonCard,
   IonCardContent,
