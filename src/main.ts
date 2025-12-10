@@ -7,6 +7,10 @@ import { APP_INITIALIZER, LOCALE_ID, importProvidersFrom } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import localeEn from '@angular/common/locales/en';
+import localeFr from '@angular/common/locales/fr';
+import localeDe from '@angular/common/locales/de';
+import localePt from '@angular/common/locales/pt';
+import localeIt from '@angular/common/locales/it';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -56,6 +60,10 @@ import { AppPreferencesService, LanguageService } from '@core/services';
 
 registerLocaleData(localeEs);
 registerLocaleData(localeEn);
+registerLocaleData(localeFr);
+registerLocaleData(localeDe);
+registerLocaleData(localePt);
+registerLocaleData(localeIt);
 
 function httpTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
