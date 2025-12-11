@@ -10,6 +10,15 @@
 </ion-header>
 
 <ion-content #content class="ion-padding">
+  <div class="pantry-search">
+    <ion-searchbar
+      [placeholder]="'pantry.filters.search' | translate"
+      [value]="searchTerm()"
+      debounce="300"
+      (ionInput)="onSearchTermChange($event)">
+    </ion-searchbar>
+  </div>
+
   <div class="summary-bar" [attr.aria-label]="'pantry.filters.quick' | translate">
     <div class="summary-chips" role="tablist">
       @for (chip of filterChips(); track chip.key) {
@@ -197,16 +206,6 @@
       </ion-header>
 
       <ion-content class="ion-padding">
-        <!-- Búsqueda -->
-        <ion-card class="filter-card search-card">
-          <ion-searchbar
-            [placeholder]="'pantry.filters.search' | translate"
-            [value]="searchTerm()"
-            debounce="300"
-            (ionInput)="onSearchTermChange($event)">
-          </ion-searchbar>
-        </ion-card>
-
         <!-- Filtros principales -->
         <ion-card class="filter-card">
           <ion-card-content>

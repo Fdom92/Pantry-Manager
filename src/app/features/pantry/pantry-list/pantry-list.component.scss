@@ -1,15 +1,23 @@
+.pantry-search {
+  margin-bottom: 6px;
+}
+
+.pantry-search ion-searchbar {
+  --border-radius: 12px;
+  --background: var(--ion-card-background, var(--ion-item-background, var(--ion-background-color, #fff)));
+  padding: 0;
+}
+
 .summary-bar {
   position: sticky;
   top: -16px;
   z-index: 5;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
+  margin-bottom: 6px;
   background: var(--ion-background-color);
 }
 
 .summary-chips {
   display: flex;
-  gap: 10px;
   overflow-x: auto;
   padding: 4px 2px;
   scroll-snap-type: x proximity;
@@ -110,14 +118,6 @@
 }
 
 @media (max-width: 600px) {
-  .summary-bar {
-    padding-bottom: 4px;
-  }
-
-  .summary-chips {
-    gap: 8px;
-  }
-
   .summary-actions {
     flex: 0 0 auto;
   }
