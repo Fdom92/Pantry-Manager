@@ -142,6 +142,7 @@ export class PantryListComponent implements OnDestroy {
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   readonly hasLoadedOnce = signal(false);
   readonly showAdvanced = signal(false);
+  readonly collapsedGroups = signal<Set<string>>(new Set());
   showCreateModal = false;
   editingItem: PantryItem | null = null;
   isSaving = false;
@@ -250,6 +251,10 @@ export class PantryListComponent implements OnDestroy {
       if (shouldUseFreshSummary) {
         this.summaryCache.set(this.buildSummary(loadedItems, totalCount));
       }
+    });
+
+    effect(() => {
+      this.syncCollapsedGroups(this.groups());
     });
   }
 
@@ -709,6 +714,31 @@ export class PantryListComponent implements OnDestroy {
       this.expandedItems.delete(item._id);
     } else {
       this.expandedItems.add(item._id);
+    }
+  }
+
+  isGroupCollapsed(key: string): boolean {
+    return this.collapsedGroups().has(key);
+  }
+
+  toggleGroupCollapse(key: string, event?: Event): void {
+    event?.stopPropagation();
+    this.collapsedGroups.update(current => {
+      const next = new Set(current);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }
+
+  onGroupHeaderKeydown(key: string, event: KeyboardEvent): void {
+    const keyName = event.key.toLowerCase();
+    if (keyName === 'enter' || keyName === ' ') {
+      event.preventDefault();
+      this.toggleGroupCollapse(key);
     }
   }
 
@@ -2319,6 +2349,19 @@ export class PantryListComponent implements OnDestroy {
         this.expandedItems.delete(id);
       }
     }
+  }
+
+  private syncCollapsedGroups(groups: PantryGroup[]): void {
+    const validKeys = new Set(groups.map(group => group.key));
+    this.collapsedGroups.update(current => {
+      const next = new Set(current);
+      for (const key of Array.from(next)) {
+        if (!validKeys.has(key)) {
+          next.delete(key);
+        }
+      }
+      return next;
+    });
   }
 
 }
