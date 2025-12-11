@@ -248,7 +248,10 @@
       "missingAdjustData": "Missing data to adjust stock (product, location and numeric delta).",
       "invalidLocation": "I can't understand the provided location.",
       "noStock": "\"{{ name }}\" has no stock in {{ location }}.",
-      "updateFailed": "Could not update the quantity."
+      "updateFailed": "Could not update the quantity.",
+      "missingUpdates": "Aucun changement à appliquer.",
+      "deleteFailed": "Impossible de supprimer {{ name }}.",
+      "batchNotFound": "Aucun lot trouvé avec cette date."
     },
     "details": {
       "options": "Valid options: {{ value }}",
@@ -257,6 +260,10 @@
       "suggestions": "Maybe you meant: {{ value }}",
       "expiration": "Expires: {{ value }}",
       "noExpiry": "No expiry"
+    },
+    "values": {
+      "yes": "Oui",
+      "no": "Non"
     },
     "results": {
       "addExisting": "Added stock to {{ name }} in {{ location }}",
@@ -268,10 +275,12 @@
       "moveFrom": "From: {{ value }}",
       "moveTo": "To: {{ value }}",
       "moveQuantity": "Quantity: {{ value }}",
+      "moveBatch": "Batch: {{ value }}",
       "adjustSummary": "Adjusted {{ name }} in {{ location }} to {{ quantity }}",
       "adjustChange": "Change: {{ value }}",
       "adjustNewQuantity": "New quantity: {{ value }}",
       "adjustLocation": "Location: {{ value }}",
+      "adjustBatch": "Batch: {{ value }}",
       "expiringFound": "Found {{ count }} products expiring in {{ days }} days",
       "expiringEmpty": "Nothing expires in {{ days }} days",
       "listSummary": "{{ count }} products in the pantry.",
@@ -281,7 +290,25 @@
       "recipesSystem": "You are a chef that shares short recipes with numbered steps.",
       "recipesFallback": "Here are some recipe ideas.",
       "recipesSummary": "Recipes generated",
-      "recipesIngredients": "Ingredients used: {{ list }}"
+      "recipesIngredients": "Ingredients used: {{ list }}",
+      "updateSummary": "{{ name }} mis à jour",
+      "updatedFields": "Champs modifiés : {{ value }}",
+      "deleteSummary": "{{ name }} supprimé",
+      "categoriesSummary": "{{ count }} catégories disponibles",
+      "categoriesList": "Catégories : {{ value }}",
+      "locationsSummary": "{{ count }} emplacements disponibles",
+      "locationsList": "Emplacements : {{ value }}",
+      "historySummary": "Historique de {{ name }}",
+      "historyCreated": "Créé : {{ value }}",
+      "historyUpdated": "Mis à jour : {{ value }}",
+      "historyTotalStock": "Stock total : {{ value }}",
+      "historyLocations": "Emplacements : {{ value }}",
+      "suggestionsSummary": "{{ count }} suggestions actives (périmés : {{ expired }}, bientôt périmés : {{ nearExpiry }}, stock bas : {{ low }})",
+      "suggestionsEmpty": "Tout est sous contrôle, aucune alerte pour l'instant.",
+      "suggestionsExpiredList": "Périmés : {{ value }}",
+      "suggestionsNearExpiryList": "Bientôt périmés : {{ value }}",
+      "suggestionsLowList": "Stock bas : {{ value }}",
+      "suggestionsBasicsList": "Produits essentiels : {{ value }}"
     }
   },
   "pantry": {

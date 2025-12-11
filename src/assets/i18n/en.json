@@ -248,7 +248,10 @@
       "missingAdjustData": "Missing data to adjust stock (product, location and numeric delta).",
       "invalidLocation": "I can't understand the provided location.",
       "noStock": "\"{{ name }}\" has no stock in {{ location }}.",
-      "updateFailed": "Could not update the quantity."
+      "updateFailed": "Could not update the quantity.",
+      "missingUpdates": "No changes to apply.",
+      "deleteFailed": "Couldn't delete {{ name }}.",
+      "batchNotFound": "I couldn't find a lot with that date."
     },
     "details": {
       "options": "Valid options: {{ value }}",
@@ -257,6 +260,10 @@
       "suggestions": "Maybe you meant: {{ value }}",
       "expiration": "Expires: {{ value }}",
       "noExpiry": "No expiry"
+    },
+    "values": {
+      "yes": "Yes",
+      "no": "No"
     },
     "results": {
       "addExisting": "Added stock to {{ name }} in {{ location }}",
@@ -268,10 +275,12 @@
       "moveFrom": "From: {{ value }}",
       "moveTo": "To: {{ value }}",
       "moveQuantity": "Quantity: {{ value }}",
+      "moveBatch": "Batch: {{ value }}",
       "adjustSummary": "Adjusted {{ name }} in {{ location }} to {{ quantity }}",
       "adjustChange": "Change: {{ value }}",
       "adjustNewQuantity": "New quantity: {{ value }}",
       "adjustLocation": "Location: {{ value }}",
+      "adjustBatch": "Batch: {{ value }}",
       "expiringFound": "Found {{ count }} products expiring in {{ days }} days",
       "expiringEmpty": "Nothing expires in {{ days }} days",
       "listSummary": "{{ count }} products in the pantry.",
@@ -281,7 +290,25 @@
       "recipesSystem": "You are a chef that shares short recipes with numbered steps.",
       "recipesFallback": "Here are some recipe ideas.",
       "recipesSummary": "Recipes generated",
-      "recipesIngredients": "Ingredients used: {{ list }}"
+      "recipesIngredients": "Ingredients used: {{ list }}",
+      "updateSummary": "Updated {{ name }}",
+      "updatedFields": "Changed: {{ value }}",
+      "deleteSummary": "Deleted {{ name }}",
+      "categoriesSummary": "{{ count }} categories available",
+      "categoriesList": "Categories: {{ value }}",
+      "locationsSummary": "{{ count }} locations available",
+      "locationsList": "Locations: {{ value }}",
+      "historySummary": "{{ name }} history",
+      "historyCreated": "Created: {{ value }}",
+      "historyUpdated": "Updated: {{ value }}",
+      "historyTotalStock": "Total stock: {{ value }}",
+      "historyLocations": "Locations: {{ value }}",
+      "suggestionsSummary": "{{ count }} suggestions active (expired: {{ expired }}, expiring: {{ nearExpiry }}, low stock: {{ low }})",
+      "suggestionsEmpty": "Everything looks good, no alerts right now.",
+      "suggestionsExpiredList": "Expired: {{ value }}",
+      "suggestionsNearExpiryList": "Expiring soon: {{ value }}",
+      "suggestionsLowList": "Low stock: {{ value }}",
+      "suggestionsBasicsList": "Essential items: {{ value }}"
     }
   },
   "pantry": {
