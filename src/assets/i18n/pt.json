@@ -190,6 +190,22 @@
       "minStock": "Min: {{ amount }} {{ unit }}",
       "buy": "Buy {{ amount }} {{ unit }}",
       "empty": "Nothing pending right now. I'll let you know when something needs restocking."
+    },
+    "share": {
+      "button": "Compartilhar lista",
+      "empty": "Sua lista de compras está vazia.",
+      "ready": "Lista de compras pronta para compartilhar.",
+      "saved": "Lista salva como PDF.",
+      "error": "Não foi possível compartilhar a lista de compras.",
+      "pdfTitle": "Lista de compras",
+      "generatedOn": "Gerada em {{ date }}",
+      "headers": {
+        "product": "Produto",
+        "quantity": "Qtd. necessária",
+        "supermarket": "Supermercado"
+      },
+      "dialogTitle": "Lista de compras",
+      "dialogText": "Compartilhe sua lista em PDF."
     }
   },
   "agent": {

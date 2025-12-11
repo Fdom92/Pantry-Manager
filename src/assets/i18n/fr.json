@@ -190,6 +190,22 @@
       "minStock": "Min: {{ amount }} {{ unit }}",
       "buy": "Buy {{ amount }} {{ unit }}",
       "empty": "Nothing pending right now. I'll let you know when something needs restocking."
+    },
+    "share": {
+      "button": "Partager la liste",
+      "empty": "Votre liste de courses est vide.",
+      "ready": "Liste de courses prête à être partagée.",
+      "saved": "Liste enregistrée en PDF.",
+      "error": "Impossible de partager la liste de courses.",
+      "pdfTitle": "Liste de courses",
+      "generatedOn": "Générée le {{ date }}",
+      "headers": {
+        "product": "Produit",
+        "quantity": "Quantité nécessaire",
+        "supermarket": "Supermarché"
+      },
+      "dialogTitle": "Liste de courses",
+      "dialogText": "Partagez votre liste de courses en PDF."
     }
   },
   "agent": {

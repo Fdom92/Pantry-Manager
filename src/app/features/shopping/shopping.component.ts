@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import {
   MeasurementUnit,
   PantryItem,
@@ -11,10 +12,11 @@ import {
 } from '@core/models';
 import { LanguageService, PantryService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
+import jsPDF from 'jspdf';
 import { EmptyStateGenericComponent } from '../shared/empty-states/empty-state-generic.component';
+import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
 
 type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;
 type ShoppingSuggestionGroupWithItem = ShoppingSuggestionGroup<PantryItem>;
@@ -45,6 +47,7 @@ export class ShoppingComponent {
   });
   readonly summaryExpanded = signal(true);
   readonly processingIds = signal<Set<string>>(new Set());
+  readonly sharingList = signal(false);
 
   constructor(
     private readonly pantryStore: PantryStoreService,
@@ -52,6 +55,7 @@ export class ShoppingComponent {
     private readonly languageService: LanguageService,
     private readonly modalCtrl: ModalController,
     private readonly pantryService: PantryService,
+    private readonly toastCtrl: ToastController,
   ) {}
 
   /** Lifecycle hook: make sure the store is populated before rendering suggestions. */
@@ -142,6 +146,38 @@ export class ShoppingComponent {
 
   getLocationLabel(locationId: string): string {
     return this.formatLocationLabel(locationId, this.translate.instant('common.locations.none'));
+  }
+
+  async shareShoppingList(): Promise<void> {
+    if (this.sharingList()) {
+      return;
+    }
+
+    const state = this.shoppingState();
+    if (!state.summary.total) {
+      await this.presentToast(this.translate.instant('shopping.share.empty'), 'medium');
+      return;
+    }
+
+    this.sharingList.set(true);
+    try {
+      const pdfBlob = this.buildShoppingPdf(state.groupedSuggestions);
+      const filename = this.buildShareFileName();
+      const shared =
+        (await this.tryNativeShare(pdfBlob, filename)) || (await this.tryWebShare(pdfBlob, filename));
+
+      if (shared) {
+        await this.presentToast(this.translate.instant('shopping.share.ready'), 'success');
+      } else {
+        this.triggerDownload(pdfBlob, filename);
+        await this.presentToast(this.translate.instant('shopping.share.saved'), 'success');
+      }
+    } catch (err) {
+      console.error('[ShoppingComponent] shareShoppingList error', err);
+      await this.presentToast(this.translate.instant('shopping.share.error'), 'danger');
+    } finally {
+      this.sharingList.set(false);
+    }
   }
 
   /**
@@ -311,5 +347,218 @@ export class ShoppingComponent {
   private formatLocationLabel(value: string | null | undefined, fallback: string = ''): string {
     const trimmed = (value ?? '').trim();
     return trimmed || fallback || 'No location';
+  }
+
+  private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {
+    const doc = new jsPDF();
+    const now = new Date();
+    const marginX = 14;
+    const lineHeight = 6;
+    const columnX = {
+      product: marginX,
+      quantity: 110,
+      supermarket: 150,
+    };
+    const columnWidth = {
+      product: 90,
+      quantity: 30,
+      supermarket: 45,
+    };
+    const title = this.translate.instant('shopping.share.pdfTitle');
+    const generatedOn = this.translate.instant('shopping.share.generatedOn', {
+      date: this.formatExportDate(now),
+    });
+    const headers = {
+      product: this.translate.instant('shopping.share.headers.product'),
+      quantity: this.translate.instant('shopping.share.headers.quantity'),
+      supermarket: this.translate.instant('shopping.share.headers.supermarket'),
+    };
+
+    doc.setFontSize(16);
+    doc.text(title, marginX, 20);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(generatedOn, marginX, 26);
+    doc.setTextColor(0);
+
+    let y = 34;
+    doc.setFontSize(12);
+    y += lineHeight;
+
+    for (const group of groups) {
+      if (!group.suggestions.length) {
+        continue;
+      }
+
+      y = this.ensurePageSpace(doc, y, lineHeight);
+      doc.setFont('helvetica', 'bold');
+      doc.text(group.label, marginX, y);
+      doc.setFont('helvetica', 'normal');
+      y += lineHeight;
+
+      for (const suggestion of group.suggestions) {
+        const row = {
+          product: suggestion.item?.name ?? '',
+          quantity: this.formatQuantityLabel(suggestion.suggestedQuantity, suggestion.unit),
+          supermarket: suggestion.supermarket ?? this.getUnassignedSupermarketLabel(),
+        };
+        const productLines = doc.splitTextToSize(row.product, columnWidth.product);
+        const quantityLines = doc.splitTextToSize(row.quantity, columnWidth.quantity);
+        const maxLines = Math.max(productLines.length, quantityLines.length);
+        const neededSpace = maxLines * lineHeight + 2;
+
+        y = this.ensurePageSpace(doc, y, neededSpace);
+        for (let i = 0; i < maxLines; i += 1) {
+          const offsetY = y + i * lineHeight;
+          if (productLines[i]) {
+            doc.text(productLines[i], columnX.product, offsetY);
+          }
+          if (quantityLines[i]) {
+            doc.text(quantityLines[i], columnX.quantity, offsetY);
+          }
+        }
+        y += neededSpace;
+      }
+    }
+
+    return doc.output('blob') as Blob;
+  }
+
+  private formatExportDate(date: Date): string {
+    return new Intl.DateTimeFormat(this.languageService.getCurrentLocale(), {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  }
+
+  private ensurePageSpace(doc: jsPDF, currentY: number, neededSpace: number): number {
+    const bottomMargin = 20;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    if (currentY + neededSpace > pageHeight - bottomMargin) {
+      doc.addPage();
+      return 20;
+    }
+    return currentY;
+  }
+
+  private formatQuantityLabel(value: number, unit: MeasurementUnit | string): string {
+    const locale = this.languageService.getCurrentLocale();
+    const formatted = new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(this.roundQuantity(value));
+    const unitLabel = this.getUnitLabel(unit);
+    return unitLabel ? `${formatted} ${unitLabel}` : formatted;
+  }
+
+  private buildShareFileName(): string {
+    return `shopping-list-${new Date().toISOString().replace(/[:.]/g, '-')}.pdf`;
+  }
+
+  private triggerDownload(blob: Blob, filename: string): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.rel = 'noopener';
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
+  private async tryWebShare(blob: Blob, filename: string): Promise<boolean> {
+    if (typeof navigator === 'undefined' || typeof window === 'undefined') {
+      return false;
+    }
+
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    const canShareFiles =
+      typeof navigator.canShare === 'function' &&
+      navigator.canShare({ files: [file] }) &&
+      typeof navigator.share === 'function';
+
+    if (!canShareFiles) {
+      return false;
+    }
+
+    try {
+      await navigator.share({
+        title: this.translate.instant('shopping.share.dialogTitle'),
+        text: this.translate.instant('shopping.share.dialogText'),
+        files: [file],
+      });
+      return true;
+    } catch (err) {
+      console.warn('[ShoppingComponent] Web share failed or was cancelled', err);
+      return false;
+    }
+  }
+
+  private async tryNativeShare(blob: Blob, filename: string): Promise<boolean> {
+    if (!Capacitor.isNativePlatform()) {
+      return false;
+    }
+
+    try {
+      const [{ Filesystem, Directory }, { Share }] = await Promise.all([
+        import('@capacitor/filesystem'),
+        import('@capacitor/share'),
+      ]);
+      const base64Data = await this.blobToBase64(blob);
+      const path = `PantryManager/${filename}`;
+      await Filesystem.writeFile({
+        path,
+        data: base64Data,
+        directory: Directory.Documents,
+        recursive: true,
+      });
+      const { uri } = await Filesystem.getUri({ path, directory: Directory.Documents });
+      await Share.share({
+        title: this.translate.instant('shopping.share.dialogTitle'),
+        text: this.translate.instant('shopping.share.dialogText'),
+        url: uri,
+      });
+      return true;
+    } catch (err) {
+      console.warn('[ShoppingComponent] Native share unavailable', err);
+      return false;
+    }
+  }
+
+  private async blobToBase64(blob: Blob): Promise<string> {
+    const buffer = await blob.arrayBuffer();
+    return this.arrayBufferToBase64(buffer);
+  }
+
+  private arrayBufferToBase64(buffer: ArrayBuffer): string {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, i + chunkSize);
+      binary += String.fromCharCode(...chunk);
+    }
+    return btoa(binary);
+  }
+
+  private async presentToast(
+    message: string,
+    color: 'success' | 'danger' | 'warning' | 'medium'
+  ): Promise<void> {
+    if (!message) {
+      return;
+    }
+    const toast = await this.toastCtrl.create({
+      message,
+      color,
+      duration: 1800,
+      position: 'bottom',
+    });
+    await toast.present();
   }
 }
