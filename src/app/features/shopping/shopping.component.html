@@ -61,8 +61,24 @@
   </ion-card>
 
   <ion-card>
-    <ion-card-header>
-      <ion-card-title>{{ 'shopping.suggestions.title' | translate }}</ion-card-title>
+    <ion-card-header class="suggestions-header">
+      <ion-card-title>
+        {{ 'shopping.suggestions.title' | translate }}
+            <ion-button
+        fill="clear"
+        color="primary"
+        class="share-icon-button"
+        (click)="shareShoppingList()"
+        [disabled]="loading() || sharingList() || !state.summary.total"
+        [attr.aria-label]="'shopping.share.button' | translate"
+      >
+        @if (sharingList()) {
+          <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
+        } @else {
+          <ion-icon slot="icon-only" name="share-outline"></ion-icon>
+        }
+      </ion-button>
+      </ion-card-title>
     </ion-card-header>
     <ion-card-content>
       @if (loading()) {
