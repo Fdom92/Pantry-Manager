@@ -156,7 +156,7 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   /** Retrieve items that have at least one location expiring within the provided window. */
-  async getNearExpiry(daysAhead: number = 3): Promise<PantryItem[]> {
+  async getNearExpiry(daysAhead: number = 7): Promise<PantryItem[]> {
     const items = await this.getAll();
     return items.filter(item => this.isNearExpiry(item, daysAhead));
   }
