@@ -469,15 +469,12 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   private matchesSearch(item: PantryItem, query: string): boolean {
-    if (!query) {
+    const normalized = query.trim();
+    if (!normalized) {
       return true;
     }
     const name = (item.name ?? '').toLowerCase();
-    const category = (item.categoryId ?? '').toLowerCase();
-    if (name.includes(query) || category.includes(query)) {
-      return true;
-    }
-    return item.locations.some(loc => (loc.locationId ?? '').toLowerCase().includes(query));
+    return name.includes(normalized);
   }
 
   private matchesFilters(item: PantryItem, filters: PantryFilterState): boolean {
