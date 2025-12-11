@@ -376,6 +376,14 @@
         "single": "1 lote",
         "plural": "{{ count }} lotes",
         "withExpiry": "cad {{ date }}"
+      },
+      "actions": {
+        "viewBatches": "Ver lotes",
+        "editItem": "Editar producto",
+        "deleteItem": "Eliminar producto",
+        "menuLabel": "Abrir menú de acciones",
+        "expand": "Expandir detalles del producto",
+        "collapse": "Contraer detalles del producto"
       }
     },
     "toasts": {

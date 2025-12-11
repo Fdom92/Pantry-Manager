@@ -50,7 +50,8 @@ import {
   exitOutline,
   paperPlaneOutline,
   navigateOutline,
-  storefrontOutline
+  storefrontOutline,
+  ellipsisVerticalOutline
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -115,7 +116,8 @@ addIcons({
   'exit-outline': exitOutline,
   'paper-plane-outline': paperPlaneOutline,
   'navigate-outline': navigateOutline,
-  'storefront-outline': storefrontOutline
+  'storefront-outline': storefrontOutline,
+  'ellipsis-vertical-outline': ellipsisVerticalOutline
 });
 
 bootstrapApplication(AppComponent, {

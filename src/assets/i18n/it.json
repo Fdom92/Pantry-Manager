@@ -376,6 +376,14 @@
         "single": "1 batch",
         "plural": "{{ count }} batches",
         "withExpiry": "exp {{ date }}"
+      },
+      "actions": {
+        "viewBatches": "Vedi lotti",
+        "editItem": "Modifica articolo",
+        "deleteItem": "Elimina articolo",
+        "menuLabel": "Apri menu azioni",
+        "expand": "Mostra dettagli articolo",
+        "collapse": "Nascondi dettagli articolo"
       }
     },
     "toasts": {

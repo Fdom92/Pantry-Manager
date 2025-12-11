@@ -2,13 +2,24 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models';
 import { ItemBatch, ItemLocationStock } from '@core/models';
-import { IonButton, IonCard, IonIcon, IonText } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonIcon, IonItem, IonLabel, IonList, IonPopover, IonText } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-pantry-detail',
   standalone: true,
-  imports: [CommonModule, IonCard, IonButton, IonIcon, IonText, TranslateModule],
+  imports: [
+    CommonModule,
+    IonCard,
+    IonButton,
+    IonIcon,
+    IonText,
+    IonPopover,
+    IonList,
+    IonItem,
+    IonLabel,
+    TranslateModule,
+  ],
   templateUrl: './pantry-detail.component.html',
   styleUrls: ['./pantry-detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

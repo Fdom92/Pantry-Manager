@@ -3,35 +3,78 @@
   [attr.data-status]="viewModel.globalStatus.state"
   [style.--card-accent]="viewModel.globalStatus.accentColor"
   [ngClass]="[viewModel.colorClass, expanded ? 'is-expanded' : '']">
-  <div
-    class="card-summary"
-    role="button"
-    tabindex="0"
-    (click)="handleToggle($event)"
-    (keydown)="handleSummaryKeydown($event)">
-    <div class="summary-header">
-      <div class="summary-title">
-        <div class="title-row">
-          @if (viewModel.item.isBasic) {
-            <ion-icon class="basic-icon" name="star-outline"></ion-icon>
-          }
-          <span class="summary-name">{{ viewModel.item.name }}</span>
+  <div class="card-summary">
+    <div
+      class="summary-trigger"
+      role="button"
+      tabindex="0"
+      (click)="handleToggle($event)"
+      (keydown)="handleSummaryKeydown($event)">
+      <div class="summary-header">
+        <div class="summary-title">
+          <div class="title-row">
+            @if (viewModel.item.isBasic) {
+              <ion-icon class="basic-icon" name="star-outline"></ion-icon>
+            }
+            <span class="summary-name">{{ viewModel.item.name }}</span>
+          </div>
         </div>
       </div>
-      <ion-icon
-        class="summary-toggle-icon"
-        [name]="expanded ? 'chevron-up-outline' : 'chevron-down-outline'">
-      </ion-icon>
+      <div class="summary-info">
+        <div class="summary-row">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <span>{{ 'pantry.detail.earliest' | translate:{ date: viewModel.formattedEarliestExpirationLong } }}</span>
+        </div>
+        <div class="summary-row meta">
+          <ion-icon name="layers-outline"></ion-icon>
+          <span>{{ viewModel.batchCountsLabel }}</span>
+        </div>
+      </div>
     </div>
-    <div class="summary-info">
-      <div class="summary-row">
-        <ion-icon name="calendar-outline"></ion-icon>
-        <span>{{ 'pantry.detail.earliest' | translate:{ date: viewModel.formattedEarliestExpirationLong } }}</span>
-      </div>
-      <div class="summary-row meta">
-        <ion-icon name="layers-outline"></ion-icon>
-        <span>{{ viewModel.batchCountsLabel }}</span>
-      </div>
+    <div class="summary-controls">
+      <ion-button
+        fill="clear"
+        size="small"
+        class="summary-action-button"
+        (click)="handleToggle($event); $event.stopPropagation()"
+        [attr.aria-label]="expanded ? ('pantry.detail.actions.collapse' | translate) : ('pantry.detail.actions.expand' | translate)">
+        <ion-icon
+          slot="icon-only"
+          class="summary-toggle-icon"
+          [name]="expanded ? 'chevron-up-outline' : 'chevron-down-outline'">
+        </ion-icon>
+      </ion-button>
+      <ion-button
+        fill="clear"
+        size="small"
+        class="summary-action-button"
+        [attr.id]="'pantry-card-actions-' + viewModel.item._id"
+        (click)="$event.stopPropagation()"
+        [attr.aria-label]="'pantry.detail.actions.menuLabel' | translate">
+        <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
+      </ion-button>
+      <ion-popover
+        [trigger]="'pantry-card-actions-' + viewModel.item._id"
+        triggerAction="click"
+        dismissOnSelect="true"
+        reference="trigger">
+        <ng-template>
+          <ion-list lines="none" class="pantry-card-popover">
+            <ion-item button detail="false" (click)="$event.stopPropagation(); handleOpenBatches($event)">
+              <ion-icon slot="start" name="list-outline"></ion-icon>
+              <ion-label>{{ 'pantry.detail.actions.viewBatches' | translate }}</ion-label>
+            </ion-item>
+            <ion-item button detail="false" (click)="$event.stopPropagation(); handleEdit($event)">
+              <ion-icon slot="start" name="create-outline"></ion-icon>
+              <ion-label>{{ 'pantry.detail.actions.editItem' | translate }}</ion-label>
+            </ion-item>
+            <ion-item button detail="false" (click)="$event.stopPropagation(); handleDelete($event)">
+              <ion-icon slot="start" name="trash-outline"></ion-icon>
+              <ion-label>{{ 'pantry.detail.actions.deleteItem' | translate }}</ion-label>
+            </ion-item>
+          </ion-list>
+        </ng-template>
+      </ion-popover>
     </div>
   </div>
 
@@ -92,27 +135,6 @@
         }
       </section>
 
-      <div class="card-actions">
-        <ion-button
-          fill="outline"
-          size="small"
-          (click)="handleOpenBatches($event)">
-          <ion-icon slot="icon-only" name="list-outline"></ion-icon>
-        </ion-button>
-        <ion-button
-          fill="outline"
-          size="small"
-          (click)="handleEdit($event)">
-          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-        </ion-button>
-        <ion-button
-          fill="outline"
-          color="danger"
-          size="small"
-          (click)="handleDelete($event)">
-          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-        </ion-button>
-      </div>
     </div>
   </div>
 </ion-card>
