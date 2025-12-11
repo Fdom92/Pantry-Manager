@@ -140,7 +140,7 @@
           <ion-title>{{ 'pantry.batches.title' | translate }}</ion-title>
           <ion-buttons slot="end">
             <ion-button fill="clear" color="medium" (click)="closeBatchesModal()">
-              {{ 'common.actions.close' | translate }}
+             <ion-icon name="close"></ion-icon>
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
@@ -179,14 +179,6 @@
               </ion-item>
             }
           </ion-list>
-          <div class="modal-actions">
-            <ion-button
-              expand="block"
-              fill="outline"
-              (click)="openEditItemModal(selectedItem)">
-              {{ 'pantry.batches.edit' | translate }}
-            </ion-button>
-          </div>
         }
       </ion-content>
     </ng-template>
