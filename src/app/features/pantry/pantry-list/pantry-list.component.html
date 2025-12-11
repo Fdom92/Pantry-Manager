@@ -68,8 +68,16 @@
       @for (group of groups(); track group.key) {
         <div class="virtual-category-card">
           <ion-card>
-            <ion-card-header>
-              <div class="group-header">
+            <ion-card-header
+              class="group-header"
+              role="button"
+              tabindex="0"
+              [attr.aria-expanded]="!isGroupCollapsed(group.key)"
+              [attr.aria-label]="isGroupCollapsed(group.key) ? ('pantry.group.expand' | translate:{ name: group.name }) : ('pantry.group.collapse' | translate:{ name: group.name })"
+              (click)="toggleGroupCollapse(group.key, $event)"
+              (keydown)="onGroupHeaderKeydown(group.key, $event)"
+              [class.group-header--collapsed]="isGroupCollapsed(group.key)">
+              <section class="group-details">
                 <div class="group-title">
                   <ion-card-title>{{ group.name }}</ion-card-title>
                 </div>
@@ -83,28 +91,34 @@
                       · {{ 'pantry.group.expired' | translate:{ count: group.expiredCount } }}
                     }
                   </ion-text>
+                  <ion-icon
+                    class="group-toggle-icon"
+                    [name]="isGroupCollapsed(group.key) ? 'chevron-down-outline' : 'chevron-up-outline'">
+                  </ion-icon>
                 </div>
-              </div>
+              </section>
             </ion-card-header>
           </ion-card>
         </div>
-        @for (item of group.items; track trackByItemId($index, item)) {
-          <div
-            class="virtual-item-card"
-            [class.virtual-item-card--expanded]="isExpanded(item)">
-            @let card = buildItemCardViewModel(item);
-            <app-pantry-detail
-              class="virtual-item-card__detail"
-              [viewModel]="card"
-              [expanded]="isExpanded(item)"
-              (toggleRequested)="toggleItemExpansion(item, $event)"
-              (summaryKeydown)="onSummaryKeydown(item, $event)"
-              (openBatches)="openBatchesModal(item, $event)"
-              (editRequested)="openEditItemModal(item, $event)"
-              (deleteRequested)="deleteItem(item, $event)"
-              (adjustBatchRequested)="adjustBatchQuantity(item, $event.location, $event.batch, $event.delta, $event.event)"
-            ></app-pantry-detail>
-          </div>
+        @if (!isGroupCollapsed(group.key)) {
+          @for (item of group.items; track trackByItemId($index, item)) {
+            <div
+              class="virtual-item-card"
+              [class.virtual-item-card--expanded]="isExpanded(item)">
+              @let card = buildItemCardViewModel(item);
+              <app-pantry-detail
+                class="virtual-item-card__detail"
+                [viewModel]="card"
+                [expanded]="isExpanded(item)"
+                (toggleRequested)="toggleItemExpansion(item, $event)"
+                (summaryKeydown)="onSummaryKeydown(item, $event)"
+                (openBatches)="openBatchesModal(item, $event)"
+                (editRequested)="openEditItemModal(item, $event)"
+                (deleteRequested)="deleteItem(item, $event)"
+                (adjustBatchRequested)="adjustBatchQuantity(item, $event.location, $event.batch, $event.delta, $event.event)"
+              ></app-pantry-detail>
+            </div>
+          }
         }
       }
     </div>

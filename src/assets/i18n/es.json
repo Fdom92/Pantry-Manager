@@ -307,7 +307,9 @@
     "group": {
       "count": "{{ count }} artículos",
       "expiring": "{{ count }} por caducar",
-      "expired": "{{ count }} caducados"
+      "expired": "{{ count }} caducados",
+      "collapse": "Contraer {{ name }}",
+      "expand": "Expandir {{ name }}"
     },
     "categories": {
       "dairy": "Lácteos",

@@ -106,11 +106,7 @@
 .summary-toggle-icon {
   font-size: 20px;
   color: var(--card-icon);
-  transition: transform 160ms ease;
-}
-
-.pantry-item-card.is-expanded .summary-toggle-icon {
-  transform: rotate(180deg);
+  transition: color 160ms ease;
 }
 
 .summary-info {

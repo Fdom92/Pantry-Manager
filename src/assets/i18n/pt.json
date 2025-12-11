@@ -307,7 +307,9 @@
     "group": {
       "count": "{{ count }} items",
       "expiring": "{{ count }} expiring",
-      "expired": "{{ count }} expired"
+      "expired": "{{ count }} expired",
+      "collapse": "Recolher {{ name }}",
+      "expand": "Expandir {{ name }}"
     },
     "categories": {
       "dairy": "Dairy",

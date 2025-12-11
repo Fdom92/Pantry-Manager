@@ -294,17 +294,36 @@
   align-items: center;
   gap: 8px;
   justify-content: space-between;
+  cursor: pointer;
+  padding: 10px 6px;
+  border-radius: 12px;
+  transition: background 0.15s ease, outline 0.15s ease;
+}
+
+section.group-details {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .group-title {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .group-title ion-card-title {
   margin: 0;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .group-title ion-badge {
@@ -318,6 +337,22 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+.group-toggle-icon {
+  font-size: 20px;
+  transition: color 0.18s ease;
+}
+
+.group-header:hover {
+  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08);
+}
+
+.group-header:focus-visible {
+  outline: 2px solid var(--ion-color-primary, #3880ff);
+  outline-offset: 4px;
 }
 
 .group-meta ion-text {
