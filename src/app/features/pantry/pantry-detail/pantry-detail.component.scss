@@ -55,16 +55,42 @@
 
 .card-summary {
   display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 16px 8px 16px;
+}
+
+.summary-trigger {
+  flex: 1;
+  display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 16px 16px 8px 16px;
   cursor: pointer;
   outline: none;
 }
 
-.card-summary:focus-visible {
+.summary-trigger:focus-visible {
   box-shadow: inset 0 0 0 2px rgba(94, 234, 212, 0.45);
   border-radius: 14px;
+}
+
+.summary-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+  flex: 0 0 auto;
+}
+
+.summary-action-button {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --border-radius: 12px;
+  --color: var(--card-icon);
+  --background: transparent;
+  --box-shadow: none;
+  height: 32px;
+  width: 32px;
 }
 
 .summary-header {
@@ -106,11 +132,7 @@
 .summary-toggle-icon {
   font-size: 20px;
   color: var(--card-icon);
-  transition: transform 160ms ease;
-}
-
-.pantry-item-card.is-expanded .summary-toggle-icon {
-  transform: rotate(180deg);
+  transition: color 160ms ease;
 }
 
 .summary-info {
@@ -224,10 +246,10 @@
   overflow: hidden;
   max-height: 1800px;
   transition:
-    max-height 260ms ease,
-    opacity 220ms ease,
-    transform 220ms ease,
-    padding-bottom 200ms ease;
+    max-height 320ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 240ms ease,
+    transform 240ms ease,
+    padding-bottom 220ms ease;
   opacity: 1;
 }
 
@@ -235,7 +257,7 @@
   padding-bottom: 0;
   max-height: 0;
   opacity: 0;
-  transform: translateY(-6px);
+  transform: translateY(-8px);
   pointer-events: none;
 }
 
@@ -440,24 +462,20 @@
   transform: scale(0.94);
 }
 
-.card-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+.pantry-card-popover {
+  padding: 8px 0;
+  min-width: 190px;
 }
 
-.card-actions ion-button[fill='outline'] {
-  --background: transparent;
-  --border-color: rgba(148, 163, 184, 0.4);
-  --color: #e2e8f0;
-  --border-style: solid;
-  --border-width: 1px;
-  --border-radius: 12px;
+.pantry-card-popover ion-item {
+  --min-height: 42px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  font-weight: 500;
 }
 
-.card-actions ion-button[fill='outline'][color='danger'] {
-  --border-color: rgba(239, 68, 68, 0.55);
-  --color: #f87171;
+.pantry-card-popover ion-icon {
+  color: var(--card-icon);
 }
 
 @media (max-width: 640px) {

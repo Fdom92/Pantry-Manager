@@ -190,6 +190,22 @@
       "minStock": "Min: {{ amount }} {{ unit }}",
       "buy": "Buy {{ amount }} {{ unit }}",
       "empty": "Nothing pending right now. I'll let you know when something needs restocking."
+    },
+    "share": {
+      "button": "Condividi lista",
+      "empty": "La tua lista della spesa è vuota.",
+      "ready": "Lista della spesa pronta da condividere.",
+      "saved": "Lista salvata in PDF.",
+      "error": "Impossibile condividere la lista della spesa.",
+      "pdfTitle": "Lista della spesa",
+      "generatedOn": "Generata il {{ date }}",
+      "headers": {
+        "product": "Prodotto",
+        "quantity": "Quantità necessaria",
+        "supermarket": "Supermercato"
+      },
+      "dialogTitle": "Lista della spesa",
+      "dialogText": "Condividi la tua lista in PDF."
     }
   },
   "agent": {
@@ -217,7 +233,8 @@
       "processing": "Processing action…",
       "noResponse": "Couldn't generate a response.",
       "noEndpoint": "Agent endpoint is not configured.",
-      "callFailed": "Couldn't reach the model.",
+      "callFailed": "Sembra che la connessione con l'assistente abbia avuto un problema temporaneo. Riprova tra qualche secondo.",
+      "incompleteToolCall": "L'assistente non è riuscito a ottenere tutti i dati necessari per eseguire l'azione. Riformula o riprova.",
       "toolUnavailable": "Tool \"{{ name }}\" is not available."
     },
     "errors": {
@@ -232,7 +249,11 @@
       "missingAdjustData": "Missing data to adjust stock (product, location and numeric delta).",
       "invalidLocation": "I can't understand the provided location.",
       "noStock": "\"{{ name }}\" has no stock in {{ location }}.",
-      "updateFailed": "Could not update the quantity."
+      "updateFailed": "Could not update the quantity.",
+      "missingUpdates": "Nessuna modifica da applicare.",
+      "deleteFailed": "Impossibile eliminare {{ name }}.",
+      "batchNotFound": "Nessun lotto trovato con questa data.",
+      "invalidArguments": "Servono dati validi per eseguire questa azione. Controlla i campi."
     },
     "details": {
       "options": "Valid options: {{ value }}",
@@ -241,6 +262,10 @@
       "suggestions": "Maybe you meant: {{ value }}",
       "expiration": "Expires: {{ value }}",
       "noExpiry": "No expiry"
+    },
+    "values": {
+      "yes": "Sì",
+      "no": "No"
     },
     "results": {
       "addExisting": "Added stock to {{ name }} in {{ location }}",
@@ -252,10 +277,12 @@
       "moveFrom": "From: {{ value }}",
       "moveTo": "To: {{ value }}",
       "moveQuantity": "Quantity: {{ value }}",
+      "moveBatch": "Lotto: {{ value }}",
       "adjustSummary": "Adjusted {{ name }} in {{ location }} to {{ quantity }}",
       "adjustChange": "Change: {{ value }}",
       "adjustNewQuantity": "New quantity: {{ value }}",
       "adjustLocation": "Location: {{ value }}",
+      "adjustBatch": "Lotto: {{ value }}",
       "expiringFound": "Found {{ count }} products expiring in {{ days }} days",
       "expiringEmpty": "Nothing expires in {{ days }} days",
       "listSummary": "{{ count }} products in the pantry.",
@@ -265,7 +292,25 @@
       "recipesSystem": "You are a chef that shares short recipes with numbered steps.",
       "recipesFallback": "Here are some recipe ideas.",
       "recipesSummary": "Recipes generated",
-      "recipesIngredients": "Ingredients used: {{ list }}"
+      "recipesIngredients": "Ingredients used: {{ list }}",
+      "updateSummary": "Aggiornato {{ name }}",
+      "updatedFields": "Campi modificati: {{ value }}",
+      "deleteSummary": "Eliminato {{ name }}",
+      "categoriesSummary": "{{ count }} categorie disponibili",
+      "categoriesList": "Categorie: {{ value }}",
+      "locationsSummary": "{{ count }} posizioni disponibili",
+      "locationsList": "Posizioni: {{ value }}",
+      "historySummary": "Cronologia di {{ name }}",
+      "historyCreated": "Creato: {{ value }}",
+      "historyUpdated": "Ultimo aggiornamento: {{ value }}",
+      "historyTotalStock": "Scorta totale: {{ value }}",
+      "historyLocations": "Posizioni: {{ value }}",
+      "suggestionsSummary": "{{ count }} suggerimenti attivi (scaduti: {{ expired }}, in scadenza: {{ nearExpiry }}, scorta bassa: {{ low }})",
+      "suggestionsEmpty": "Tutto sotto controllo, nessun avviso al momento.",
+      "suggestionsExpiredList": "Scaduti: {{ value }}",
+      "suggestionsNearExpiryList": "In scadenza: {{ value }}",
+      "suggestionsLowList": "Scorta bassa: {{ value }}",
+      "suggestionsBasicsList": "Beni essenziali: {{ value }}"
     }
   },
   "pantry": {
@@ -307,7 +352,9 @@
     "group": {
       "count": "{{ count }} items",
       "expiring": "{{ count }} expiring",
-      "expired": "{{ count }} expired"
+      "expired": "{{ count }} expired",
+      "collapse": "Comprimi {{ name }}",
+      "expand": "Espandi {{ name }}"
     },
     "categories": {
       "dairy": "Dairy",
@@ -374,6 +421,38 @@
         "single": "1 batch",
         "plural": "{{ count }} batches",
         "withExpiry": "exp {{ date }}"
+      },
+      "actions": {
+        "viewBatches": "Vedi lotti",
+        "editItem": "Modifica articolo",
+        "moveItem": "Sposta articolo",
+        "deleteItem": "Elimina articolo",
+        "menuLabel": "Apri menu azioni",
+        "expand": "Mostra dettagli articolo",
+        "collapse": "Nascondi dettagli articolo"
+      }
+    },
+    "move": {
+      "from": "Da",
+      "to": "A",
+      "toPlaceholder": "Nuova posizione (es. Freezer)",
+      "quantity": "Quantità da spostare",
+      "suggestions": "Suggerimenti",
+      "availability": {
+        "label": "Disponibile: {{ value }}",
+        "empty": "Nessuna scorta disponibile in questa posizione"
+      },
+      "errors": {
+        "missingLocations": "Seleziona origine e destinazione.",
+        "sameLocation": "Origine e destinazione devono essere diverse.",
+        "invalidQuantity": "Inserisci una quantità maggiore di zero.",
+        "noAvailableStock": "Non c'è stock da spostare da questa posizione.",
+        "generic": "Impossibile spostare l'articolo. Riprova."
+      },
+      "submit": "Sposta",
+      "cancel": "Annulla",
+      "toasts": {
+        "success": "{{ quantity }} spostati da {{ from }} a {{ to }}."
       }
     },
     "toasts": {

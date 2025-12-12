@@ -156,7 +156,7 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   /** Retrieve items that have at least one location expiring within the provided window. */
-  async getNearExpiry(daysAhead: number = 3): Promise<PantryItem[]> {
+  async getNearExpiry(daysAhead: number = 7): Promise<PantryItem[]> {
     const items = await this.getAll();
     return items.filter(item => this.isNearExpiry(item, daysAhead));
   }
@@ -469,15 +469,12 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   private matchesSearch(item: PantryItem, query: string): boolean {
-    if (!query) {
+    const normalized = query.trim();
+    if (!normalized) {
       return true;
     }
     const name = (item.name ?? '').toLowerCase();
-    const category = (item.categoryId ?? '').toLowerCase();
-    if (name.includes(query) || category.includes(query)) {
-      return true;
-    }
-    return item.locations.some(loc => (loc.locationId ?? '').toLowerCase().includes(query));
+    return name.includes(normalized);
   }
 
   private matchesFilters(item: PantryItem, filters: PantryFilterState): boolean {

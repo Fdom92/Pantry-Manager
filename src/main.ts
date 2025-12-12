@@ -1,60 +1,62 @@
+import { registerLocaleData } from '@angular/common';
+import { HttpClient, HttpClientModule, provideHttpClient } from '@angular/common/http';
+import localeDe from '@angular/common/locales/de';
+import localeEn from '@angular/common/locales/en';
+import localeEs from '@angular/common/locales/es';
+import localeFr from '@angular/common/locales/fr';
+import localeIt from '@angular/common/locales/it';
+import localePt from '@angular/common/locales/pt';
+import { APP_INITIALIZER, LOCALE_ID, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import { AppPreferencesService, LanguageService } from '@core/services';
 import { provideIonicAngular } from '@ionic/angular/standalone';
-import { provideHttpClient } from '@angular/common/http';
-import { addIcons } from 'ionicons';
-import { APP_INITIALIZER, LOCALE_ID, importProvidersFrom } from '@angular/core';
-import { registerLocaleData } from '@angular/common';
-import localeEs from '@angular/common/locales/es';
-import localeEn from '@angular/common/locales/en';
-import localeFr from '@angular/common/locales/fr';
-import localeDe from '@angular/common/locales/de';
-import localePt from '@angular/common/locales/pt';
-import localeIt from '@angular/common/locales/it';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { addIcons } from 'ionicons';
 import {
-  homeOutline,
-  basketOutline,
-  cartOutline,
-  settingsOutline,
-  addOutline,
   addCircleOutline,
-  close as closeIcon,
-  removeOutline,
-  trashOutline,
-  createOutline,
-  refreshOutline,
-  filterOutline,
-  layersOutline,
+  addOutline,
   alertCircleOutline,
-  hourglassOutline,
-  timeOutline,
-  trendingDownOutline,
-  checkmarkCircleOutline,
-  listOutline,
-  chatbubblesOutline,
-  starOutline,
-  locationOutline,
-  pricetagOutline,
+  basketOutline,
   calendarOutline,
-  speedometerOutline,
-  cubeOutline,
-  chevronUpOutline,
+  cartOutline,
+  chatbubblesOutline,
+  checkmarkCircleOutline,
   chevronDownOutline,
-  lockClosedOutline,
-  fastFoodOutline,
-  sendOutline,
+  chevronUpOutline,
+  close as closeIcon,
+  createOutline,
+  cubeOutline,
+  ellipsisVerticalOutline,
   enterOutline,
   exitOutline,
-  paperPlaneOutline,
+  fastFoodOutline,
+  filterOutline,
+  homeOutline,
+  hourglassOutline,
+  layersOutline,
+  listOutline,
+  locationOutline,
+  lockClosedOutline,
   navigateOutline,
-  storefrontOutline
+  paperPlaneOutline,
+  pricetagOutline,
+  refreshOutline,
+  removeOutline,
+  sendOutline,
+  settingsOutline,
+  shareOutline,
+  speedometerOutline,
+  starOutline,
+  storefrontOutline,
+  swapHorizontalOutline,
+  timeOutline,
+  trashOutline,
+  trendingDownOutline
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
-import { AppPreferencesService, LanguageService } from '@core/services';
 
 registerLocaleData(localeEs);
 registerLocaleData(localeEn);
@@ -80,13 +82,13 @@ function localeFactory(language: LanguageService): string {
 }
 
 addIcons({
+  close: closeIcon,
   'home-outline': homeOutline,
   'basket-outline': basketOutline,
   'cart-outline': cartOutline,
   'settings-outline': settingsOutline,
   'add-outline': addOutline,
   'add-circle-outline': addCircleOutline,
-  close: closeIcon,
   'remove-outline': removeOutline,
   'trash-outline': trashOutline,
   'create-outline': createOutline,
@@ -115,7 +117,10 @@ addIcons({
   'exit-outline': exitOutline,
   'paper-plane-outline': paperPlaneOutline,
   'navigate-outline': navigateOutline,
-  'storefront-outline': storefrontOutline
+  'storefront-outline': storefrontOutline,
+  'ellipsis-vertical-outline': ellipsisVerticalOutline,
+  'share-outline': shareOutline,
+  'swap-horizontal-outline': swapHorizontalOutline
 });
 
 bootstrapApplication(AppComponent, {

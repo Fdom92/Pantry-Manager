@@ -12,6 +12,7 @@ import {
   FilterChipViewModel,
   ItemBatch,
   ItemLocationStock,
+  MoveBatchesResult,
   MeasurementUnit,
   PantryGroup,
   PantryItem,
@@ -54,6 +55,7 @@ import {
   IonLabel,
   IonList,
   IonModal,
+  IonNote,
   IonSearchbar,
   IonSelect,
   IonSelectOption,
@@ -95,6 +97,7 @@ import { EmptyStateGenericComponent } from '../../shared/empty-states/empty-stat
     IonCheckbox,
     IonInput,
     IonModal,
+    IonNote,
     IonFab,
     IonFabButton,
     IonSpinner,
@@ -136,19 +139,26 @@ export class PantryListComponent implements OnDestroy {
   readonly batchSummaries = computed(() => this.computeBatchSummaries(this.itemsState()));
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
+  readonly showMoveModal = signal(false);
+  readonly moveItemTarget = signal<PantryItem | null>(null);
+  moveSubmitting = false;
+  moveError: string | null = null;
   readonly loading = this.pantryService.loading;
   readonly nearExpiryDays = 7;
   readonly MeasurementUnit = MeasurementUnit;
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   readonly hasLoadedOnce = signal(false);
   readonly showAdvanced = signal(false);
+  readonly collapsedGroups = signal<Set<string>>(new Set());
   showCreateModal = false;
   editingItem: PantryItem | null = null;
   isSaving = false;
   private readonly expandedItems = new Set<string>();
+  private readonly deletingItems = signal<Set<string>>(new Set());
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveDelay = 500;
+  private readonly deleteAnimationDuration = 220;
   private realtimeSubscribed = false;
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -169,6 +179,20 @@ export class PantryListComponent implements OnDestroy {
         batches: [],
       })
     ])
+  });
+
+  readonly moveForm = this.fb.group({
+    fromLocation: this.fb.control('', {
+      validators: [Validators.required],
+      nonNullable: true,
+    }),
+    toLocation: this.fb.control('', {
+      validators: [Validators.required],
+      nonNullable: true,
+    }),
+    quantity: this.fb.control<number | null>(null, {
+      validators: [Validators.required, Validators.min(0.01)],
+    }),
   });
 
   get locationsArray(): FormArray<FormGroup> {
@@ -250,6 +274,10 @@ export class PantryListComponent implements OnDestroy {
       if (shouldUseFreshSummary) {
         this.summaryCache.set(this.buildSummary(loadedItems, totalCount));
       }
+    });
+
+    effect(() => {
+      this.syncCollapsedGroups(this.groups());
     });
   }
 
@@ -466,9 +494,18 @@ export class PantryListComponent implements OnDestroy {
       }
     }
 
-    await this.pantryStore.deleteItem(item._id);
-    this.expandedItems.delete(item._id);
-    await this.presentToast(this.translate.instant('pantry.toasts.deleted'), 'medium');
+    this.markItemDeleting(item._id);
+    try {
+      await this.delay(this.deleteAnimationDuration);
+      await this.pantryStore.deleteItem(item._id);
+      this.expandedItems.delete(item._id);
+      await this.presentToast(this.translate.instant('pantry.toasts.deleted'), 'medium');
+    } catch (err) {
+      console.error('[PantryListComponent] deleteItem error', err);
+      await this.presentToast(this.translate.instant('pantry.toasts.saveError'), 'danger');
+    } finally {
+      this.unmarkItemDeleting(item._id);
+    }
   }
 
   /**
@@ -702,6 +739,10 @@ export class PantryListComponent implements OnDestroy {
     return this.expandedItems.has(item._id);
   }
 
+  isDeleting(item: PantryItem): boolean {
+    return this.deletingItems().has(item._id);
+  }
+
   /** Toggle the expansion panel for a given item without triggering parent handlers. */
   toggleItemExpansion(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
@@ -709,6 +750,31 @@ export class PantryListComponent implements OnDestroy {
       this.expandedItems.delete(item._id);
     } else {
       this.expandedItems.add(item._id);
+    }
+  }
+
+  isGroupCollapsed(key: string): boolean {
+    return this.collapsedGroups().has(key);
+  }
+
+  toggleGroupCollapse(key: string, event?: Event): void {
+    event?.stopPropagation();
+    this.collapsedGroups.update(current => {
+      const next = new Set(current);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }
+
+  onGroupHeaderKeydown(key: string, event: KeyboardEvent): void {
+    const keyName = event.key.toLowerCase();
+    if (keyName === 'enter' || keyName === ' ') {
+      event.preventDefault();
+      this.toggleGroupCollapse(key);
     }
   }
 
@@ -726,6 +792,176 @@ export class PantryListComponent implements OnDestroy {
   closeBatchesModal(): void {
     this.showBatchesModal.set(false);
     this.selectedBatchesItem.set(null);
+  }
+
+  openMoveItemModal(item: PantryItem, event?: Event): void {
+    event?.stopPropagation();
+    const candidates = this.getMoveSourceOptions(item);
+    if (!candidates.length) {
+      this.presentToast(this.translate.instant('pantry.move.errors.noAvailableStock'), 'medium');
+      return;
+    }
+    const defaultFrom = candidates[0]?.value ?? '';
+    const suggestedDestination = this.getSuggestedDestination(item, defaultFrom);
+    const defaultQuantity = this.getAvailableQuantityFor(item, defaultFrom);
+    this.moveForm.reset({
+      fromLocation: defaultFrom,
+      toLocation: suggestedDestination,
+      quantity: defaultQuantity,
+    });
+    this.moveError = null;
+    this.moveItemTarget.set(item);
+    this.showMoveModal.set(true);
+  }
+
+  closeMoveItemModal(): void {
+    this.showMoveModal.set(false);
+    this.moveItemTarget.set(null);
+    this.moveForm.reset({
+      fromLocation: '',
+      toLocation: '',
+      quantity: null,
+    });
+    this.moveSubmitting = false;
+    this.moveError = null;
+  }
+
+  onMoveSourceChange(): void {
+    const item = this.moveItemTarget();
+    if (!item) {
+      return;
+    }
+    const fromId = this.moveForm.controls.fromLocation.value;
+    const available = this.getAvailableQuantityFor(item, fromId);
+    this.moveForm.patchValue({ quantity: available }, { emitEvent: false });
+  }
+
+  getMoveSourceOptions(item: PantryItem | null): Array<{ value: string; label: string; quantityLabel: string }> {
+    if (!item) {
+      return [];
+    }
+    return item.locations
+      .map(location => {
+        const total = this.getLocationTotal(location);
+        if (total <= 0) {
+          return null;
+        }
+        const quantityLabel =
+          this.formatQuantityForMessage(total, location.unit ?? this.getPrimaryUnit(item)) ??
+          this.roundDisplayQuantity(total).toString();
+        return {
+          value: location.locationId,
+          label: this.getLocationLabel(location.locationId),
+          quantityLabel,
+        };
+      })
+      .filter((option): option is { value: string; label: string; quantityLabel: string } => Boolean(option?.value));
+  }
+
+  getMoveDestinationSuggestions(item: PantryItem | null): string[] {
+    if (!item) {
+      return [];
+    }
+    const exclude = this.normalizeKey(this.moveForm.controls.fromLocation.value ?? '');
+    const seen = new Set<string>();
+    const suggestions: string[] = [];
+    const addSuggestion = (value: string | undefined | null): void => {
+      const trimmed = (value ?? '').trim();
+      if (!trimmed) {
+        return;
+      }
+      const key = this.normalizeKey(trimmed);
+      if (!key || key === exclude || seen.has(key)) {
+        return;
+      }
+      seen.add(key);
+      suggestions.push(trimmed);
+    };
+
+    for (const location of item.locations) {
+      addSuggestion(location.locationId);
+    }
+    for (const preset of this.presetLocationOptions()) {
+      addSuggestion(preset);
+    }
+    return suggestions.slice(0, 6);
+  }
+
+  applyMoveDestination(value: string): void {
+    this.moveForm.patchValue({ toLocation: value });
+  }
+
+  getMoveAvailabilityLabel(item: PantryItem | null): string {
+    if (!item) {
+      return '';
+    }
+    const fromId = this.moveForm.controls.fromLocation.value;
+    const available = this.getAvailableQuantityFor(item, fromId);
+    if (available <= 0) {
+      return this.translate.instant('pantry.move.availability.empty');
+    }
+    const quantityLabel = this.formatQuantityForMessage(available, this.getLocationUnitForItem(item, fromId));
+    if (!quantityLabel) {
+      return '';
+    }
+    return this.translate.instant('pantry.move.availability.label', { value: quantityLabel });
+  }
+
+  async submitMoveItem(): Promise<void> {
+    const targetItem = this.moveItemTarget();
+    if (!targetItem) {
+      return;
+    }
+    if (this.moveForm.invalid) {
+      this.moveForm.markAllAsTouched();
+      return;
+    }
+    const fromLocation = (this.moveForm.controls.fromLocation.value ?? '').trim();
+    const toLocation = (this.moveForm.controls.toLocation.value ?? '').trim();
+    const quantityInput = this.moveForm.controls.quantity.value;
+    const requestedQuantity = this.toNumber(quantityInput);
+
+    if (!fromLocation || !toLocation) {
+      this.moveError = this.translate.instant('pantry.move.errors.missingLocations');
+      return;
+    }
+    if (this.normalizeKey(fromLocation) === this.normalizeKey(toLocation)) {
+      this.moveError = this.translate.instant('pantry.move.errors.sameLocation');
+      return;
+    }
+    if (requestedQuantity <= 0) {
+      this.moveError = this.translate.instant('pantry.move.errors.invalidQuantity');
+      return;
+    }
+
+    this.moveSubmitting = true;
+    this.moveError = null;
+    try {
+      const result = this.buildMoveResult(targetItem, fromLocation, toLocation, requestedQuantity);
+      if (!result) {
+        this.moveError = this.translate.instant('pantry.move.errors.noAvailableStock');
+        this.moveSubmitting = false;
+        return;
+      }
+
+      this.itemsState.update(items =>
+        items.map(existing => (existing._id === result.updatedItem._id ? result.updatedItem : existing))
+      );
+      this.triggerStockSave(result.updatedItem._id, result.updatedItem);
+
+      const message = this.translate.instant('pantry.move.toasts.success', {
+        quantity: result.quantityLabel,
+        from: result.fromLabel,
+        to: result.toLabel,
+      });
+      await this.presentToast(message, 'success');
+      this.closeMoveItemModal();
+    } catch (err) {
+      console.error('[PantryListComponent] submitMoveItem error', err);
+      this.moveError = this.translate.instant('pantry.move.errors.generic');
+    } finally {
+      this.moveSubmitting = false;
+    }
   }
 
   /** Sort items by urgency (expiry/quantity) and finally by name for stable output. */
@@ -1719,6 +1955,155 @@ export class PantryListComponent implements OnDestroy {
     return updatedItem;
   }
 
+  private buildMoveResult(
+    item: PantryItem,
+    fromLocationId: string,
+    toLocationId: string,
+    requestedQuantity: number
+  ): { updatedItem: PantryItem; quantityLabel: string; fromLabel: string; toLabel: string } | null {
+    const normalizedFrom = this.normalizeKey(fromLocationId);
+    const normalizedTo = this.normalizeKey(toLocationId);
+    if (!normalizedFrom || !normalizedTo || normalizedFrom === normalizedTo) {
+      return null;
+    }
+
+    const source = item.locations.find(loc => this.normalizeKey(loc.locationId) === normalizedFrom);
+    if (!source) {
+      return null;
+    }
+
+    const unit = this.normalizeUnitValue(source.unit ?? this.getPrimaryUnit(item));
+    const sanitizedSource = this.sanitizeBatches(source.batches, unit);
+    const available = this.sumBatchQuantities(sanitizedSource);
+    if (available <= 0) {
+      return null;
+    }
+
+    const amountToMove = this.roundDisplayQuantity(Math.min(Math.max(requestedQuantity, 0), available));
+    if (amountToMove <= 0) {
+      return null;
+    }
+
+    const { moved, remaining } = this.extractBatchesForMove(sanitizedSource, amountToMove);
+    if (!moved.length) {
+      return null;
+    }
+
+    const destination = item.locations.find(loc => this.normalizeKey(loc.locationId) === normalizedTo);
+    const destinationUnit = this.normalizeUnitValue(destination?.unit ?? unit);
+    const sanitizedDestination = this.sanitizeBatches(destination?.batches, destinationUnit);
+    const mergedDestination = this.mergeBatchesByExpiry([...sanitizedDestination, ...moved]);
+
+    const nextLocations = item.locations.filter(
+      loc => this.normalizeKey(loc.locationId) !== normalizedFrom && this.normalizeKey(loc.locationId) !== normalizedTo
+    );
+
+    if (this.sumBatchQuantities(remaining) > 0) {
+      nextLocations.push({
+        ...source,
+        batches: remaining,
+        unit,
+      });
+    }
+
+    if (this.sumBatchQuantities(mergedDestination) > 0) {
+      nextLocations.push({
+        ...(destination ?? { locationId: toLocationId, unit: destinationUnit, batches: [] }),
+        locationId: destination?.locationId ?? toLocationId,
+        batches: mergedDestination,
+        unit: destinationUnit,
+      });
+    }
+
+    const updatedItem = this.rebuildItemWithLocations(item, nextLocations);
+    const quantityLabel =
+      this.formatQuantityForMessage(amountToMove, unit) ??
+      `${this.roundDisplayQuantity(amountToMove)} ${this.getUnitLabel(unit)}`;
+
+    return {
+      updatedItem,
+      quantityLabel,
+      fromLabel: this.getLocationLabelText(
+        source.locationId,
+        this.translate.instant('common.locations.none')
+      ),
+      toLabel: this.getLocationLabelText(
+        toLocationId,
+        this.translate.instant('common.locations.none')
+      ),
+    };
+  }
+
+  private extractBatchesForMove(batches: ItemBatch[], amount: number): MoveBatchesResult {
+    let remaining = this.roundDisplayQuantity(Math.max(0, amount));
+    const ordered = [...batches].sort((a, b) => {
+      const aTime = this.getBatchTime(a) ?? Number.MAX_SAFE_INTEGER;
+      const bTime = this.getBatchTime(b) ?? Number.MAX_SAFE_INTEGER;
+      return aTime - bTime;
+    });
+
+    const moved: ItemBatch[] = [];
+    const leftover: ItemBatch[] = [];
+
+    for (const batch of ordered) {
+      const quantity = this.roundDisplayQuantity(this.toNumber(batch.quantity));
+      if (quantity <= 0) {
+        continue;
+      }
+      if (remaining <= 0) {
+        leftover.push(batch);
+        continue;
+      }
+      if (quantity <= remaining) {
+        moved.push({ ...batch, quantity });
+        remaining = this.roundDisplayQuantity(remaining - quantity);
+      } else {
+        moved.push({ ...batch, quantity: remaining });
+        const remainder = this.roundDisplayQuantity(quantity - remaining);
+        leftover.push({ ...batch, quantity: remainder });
+        remaining = 0;
+      }
+    }
+
+    if (remaining > 0) {
+      return { moved: [], remaining: batches };
+    }
+
+    return {
+      moved,
+      remaining: [...leftover],
+    };
+  }
+
+  private getSuggestedDestination(item: PantryItem, fromId: string): string {
+    const normalizedFrom = this.normalizeKey(fromId);
+    const alternative = item.locations.find(loc => this.normalizeKey(loc.locationId) !== normalizedFrom)?.locationId;
+    if (alternative) {
+      return alternative;
+    }
+    const presets = this.presetLocationOptions();
+    const presetOption = presets.find(option => this.normalizeKey(option) !== normalizedFrom);
+    if (presetOption) {
+      return presetOption;
+    }
+    return this.getDefaultLocationId();
+  }
+
+  private getAvailableQuantityFor(item: PantryItem, locationId: string): number {
+    return this.getLocationTotal(
+      item.locations.find(loc => this.normalizeKey(loc.locationId) === this.normalizeKey(locationId)) ?? {
+        locationId: '',
+        unit: this.getPrimaryUnit(item),
+        batches: [],
+      }
+    );
+  }
+
+  private getLocationUnitForItem(item: PantryItem, locationId: string): string {
+    const location = item.locations.find(loc => this.normalizeKey(loc.locationId) === this.normalizeKey(locationId));
+    return this.normalizeUnitValue(location?.unit ?? this.getPrimaryUnit(item));
+  }
+
   /**
    * Merge pending optimistic updates over the latest store snapshot so the UI
    * does not briefly revert to stale quantities while debounced saves run.
@@ -1908,6 +2293,32 @@ export class PantryListComponent implements OnDestroy {
       quantity: quantitySegment,
       breakdown: breakdownSegment,
     });
+  }
+
+  private markItemDeleting(id: string): void {
+    this.deletingItems.update(current => {
+      if (current.has(id)) {
+        return current;
+      }
+      const next = new Set(current);
+      next.add(id);
+      return next;
+    });
+  }
+
+  private unmarkItemDeleting(id: string): void {
+    this.deletingItems.update(current => {
+      if (!current.has(id)) {
+        return current;
+      }
+      const next = new Set(current);
+      next.delete(id);
+      return next;
+    });
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /** Explain what changed during an update so users understand the persisted action. */
@@ -2319,6 +2730,19 @@ export class PantryListComponent implements OnDestroy {
         this.expandedItems.delete(id);
       }
     }
+  }
+
+  private syncCollapsedGroups(groups: PantryGroup[]): void {
+    const validKeys = new Set(groups.map(group => group.key));
+    this.collapsedGroups.update(current => {
+      const next = new Set(current);
+      for (const key of Array.from(next)) {
+        if (!validKeys.has(key)) {
+          next.delete(key);
+        }
+      }
+      return next;
+    });
   }
 
 }

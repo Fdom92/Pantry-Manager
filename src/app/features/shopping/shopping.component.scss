@@ -2,6 +2,12 @@ ion-card + ion-card {
   margin-top: 16px;
 }
 
+ion-card-title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
 .summary-header-content {
   display: flex;
   flex-direction: column;
@@ -49,6 +55,17 @@ ion-card + ion-card {
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+}
+
+.suggestions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.share-icon-button {
+  margin: 0;
 }
 
 .loading-state {
