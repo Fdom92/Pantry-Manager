@@ -190,6 +190,22 @@
       "minStock": "Mín.: {{ amount }} {{ unit }}",
       "buy": "Comprar {{ amount }} {{ unit }}",
       "empty": "Nada pendiente por ahora. Te avisaré cuando algo necesite reponerse."
+    },
+    "share": {
+      "button": "Compartir lista",
+      "empty": "Tu lista de la compra está vacía.",
+      "ready": "Lista de la compra lista para compartir.",
+      "saved": "Lista guardada como PDF.",
+      "error": "No se pudo compartir la lista de la compra.",
+      "pdfTitle": "Lista de la compra",
+      "generatedOn": "Generada el {{ date }}",
+      "headers": {
+        "product": "Producto",
+        "quantity": "Cantidad necesaria",
+        "supermarket": "Supermercado"
+      },
+      "dialogTitle": "Lista de la compra",
+      "dialogText": "Comparte tu lista en PDF."
     }
   },
   "agent": {
@@ -217,7 +233,8 @@
       "processing": "Procesando acción…",
       "noResponse": "No pude generar respuesta.",
       "noEndpoint": "No hay endpoint configurado para el agente.",
-      "callFailed": "No se pudo contactar con el modelo.",
+      "callFailed": "Parece que la conexión con el asistente tuvo un problema temporal. Inténtalo de nuevo en unos segundos.",
+      "incompleteToolCall": "No pude completar la acción porque faltan datos. Reformula la instrucción o inténtalo otra vez.",
       "toolUnavailable": "La herramienta \"{{ name }}\" no está disponible."
     },
     "errors": {
@@ -232,7 +249,11 @@
       "missingAdjustData": "Faltan datos para ajustar stock (producto, ubicación y delta numérico).",
       "invalidLocation": "No entiendo la ubicación indicada.",
       "noStock": "\"{{ name }}\" no tiene stock en {{ location }}.",
-      "updateFailed": "No pude actualizar la cantidad."
+      "updateFailed": "No pude actualizar la cantidad.",
+      "missingUpdates": "No hay cambios para aplicar.",
+      "deleteFailed": "No pude eliminar {{ name }}.",
+      "batchNotFound": "No encontré un lote con esa fecha.",
+      "invalidArguments": "Necesitamos datos válidos para ejecutar esta acción. Revisa los campos."
     },
     "details": {
       "options": "Opciones válidas: {{ value }}",
@@ -241,6 +262,10 @@
       "suggestions": "Quizás querías decir: {{ value }}",
       "expiration": "Caduca: {{ value }}",
       "noExpiry": "Sin caducidad"
+    },
+    "values": {
+      "yes": "Sí",
+      "no": "No"
     },
     "results": {
       "addExisting": "Añadido stock a {{ name }} en {{ location }}",
@@ -252,10 +277,12 @@
       "moveFrom": "Origen: {{ value }}",
       "moveTo": "Destino: {{ value }}",
       "moveQuantity": "Cantidad: {{ value }}",
+      "moveBatch": "Lote: {{ value }}",
       "adjustSummary": "Ajustado {{ name }} en {{ location }} a {{ quantity }}",
       "adjustChange": "Cambio: {{ value }}",
       "adjustNewQuantity": "Nueva cantidad: {{ value }}",
       "adjustLocation": "Ubicación: {{ value }}",
+      "adjustBatch": "Lote: {{ value }}",
       "expiringFound": "Encontrados {{ count }} productos que caducan en {{ days }} días",
       "expiringEmpty": "Nada caduca en {{ days }} días",
       "listSummary": "Hay {{ count }} productos en la despensa.",
@@ -265,7 +292,25 @@
       "recipesSystem": "Eres un chef que propone recetas breves con pasos numerados.",
       "recipesFallback": "Aquí tienes algunas ideas de recetas.",
       "recipesSummary": "Recetas generadas",
-      "recipesIngredients": "Ingredientes usados: {{ list }}"
+      "recipesIngredients": "Ingredientes usados: {{ list }}",
+      "updateSummary": "Actualizado {{ name }}",
+      "updatedFields": "Campos modificados: {{ value }}",
+      "deleteSummary": "Eliminado {{ name }}",
+      "categoriesSummary": "{{ count }} categorías disponibles",
+      "categoriesList": "Categorías: {{ value }}",
+      "locationsSummary": "{{ count }} ubicaciones disponibles",
+      "locationsList": "Ubicaciones: {{ value }}",
+      "historySummary": "Historial de {{ name }}",
+      "historyCreated": "Creado: {{ value }}",
+      "historyUpdated": "Última actualización: {{ value }}",
+      "historyTotalStock": "Stock total: {{ value }}",
+      "historyLocations": "Ubicaciones: {{ value }}",
+      "suggestionsSummary": "{{ count }} sugerencias activas (caducados: {{ expired }}, por caducar: {{ nearExpiry }}, bajo stock: {{ low }})",
+      "suggestionsEmpty": "Todo está bajo control, no hay alertas ahora mismo.",
+      "suggestionsExpiredList": "Caducados: {{ value }}",
+      "suggestionsNearExpiryList": "Por caducar: {{ value }}",
+      "suggestionsLowList": "Bajo stock: {{ value }}",
+      "suggestionsBasicsList": "Básicos a revisar: {{ value }}"
     }
   },
   "pantry": {
@@ -307,7 +352,9 @@
     "group": {
       "count": "{{ count }} artículos",
       "expiring": "{{ count }} por caducar",
-      "expired": "{{ count }} caducados"
+      "expired": "{{ count }} caducados",
+      "collapse": "Contraer {{ name }}",
+      "expand": "Expandir {{ name }}"
     },
     "categories": {
       "dairy": "Lácteos",
@@ -374,6 +421,38 @@
         "single": "1 lote",
         "plural": "{{ count }} lotes",
         "withExpiry": "cad {{ date }}"
+      },
+      "actions": {
+        "viewBatches": "Ver lotes",
+        "editItem": "Editar producto",
+        "moveItem": "Mover producto",
+        "deleteItem": "Eliminar producto",
+        "menuLabel": "Abrir menú de acciones",
+        "expand": "Expandir detalles del producto",
+        "collapse": "Contraer detalles del producto"
+      }
+    },
+    "move": {
+      "from": "Desde",
+      "to": "Hacia",
+      "toPlaceholder": "Nueva ubicación (ej. Congelador)",
+      "quantity": "Cantidad a mover",
+      "suggestions": "Sugerencias",
+      "availability": {
+        "label": "Disponible: {{ value }}",
+        "empty": "Sin stock disponible en esta ubicación"
+      },
+      "errors": {
+        "missingLocations": "Selecciona origen y destino.",
+        "sameLocation": "El origen y el destino deben ser diferentes.",
+        "invalidQuantity": "Introduce una cantidad mayor que cero.",
+        "noAvailableStock": "No hay stock para mover desde esa ubicación.",
+        "generic": "No se pudo mover el producto, inténtalo de nuevo."
+      },
+      "submit": "Mover",
+      "cancel": "Cancelar",
+      "toasts": {
+        "success": "Moviste {{ quantity }} de {{ from }} a {{ to }}."
       }
     },
     "toasts": {

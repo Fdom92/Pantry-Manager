@@ -190,6 +190,22 @@
       "minStock": "Min: {{ amount }} {{ unit }}",
       "buy": "Buy {{ amount }} {{ unit }}",
       "empty": "Nothing pending right now. I'll let you know when something needs restocking."
+    },
+    "share": {
+      "button": "Partager la liste",
+      "empty": "Votre liste de courses est vide.",
+      "ready": "Liste de courses prête à être partagée.",
+      "saved": "Liste enregistrée en PDF.",
+      "error": "Impossible de partager la liste de courses.",
+      "pdfTitle": "Liste de courses",
+      "generatedOn": "Générée le {{ date }}",
+      "headers": {
+        "product": "Produit",
+        "quantity": "Quantité nécessaire",
+        "supermarket": "Supermarché"
+      },
+      "dialogTitle": "Liste de courses",
+      "dialogText": "Partagez votre liste de courses en PDF."
     }
   },
   "agent": {
@@ -217,7 +233,8 @@
       "processing": "Processing action…",
       "noResponse": "Couldn't generate a response.",
       "noEndpoint": "Agent endpoint is not configured.",
-      "callFailed": "Couldn't reach the model.",
+      "callFailed": "Il semble que la connexion avec l'assistant ait rencontré un problème temporaire. Réessayez dans quelques secondes.",
+      "incompleteToolCall": "L'assistant n'a pas pu obtenir toutes les données nécessaires pour exécuter cette action. Reformulez ou réessayez.",
       "toolUnavailable": "Tool \"{{ name }}\" is not available."
     },
     "errors": {
@@ -232,7 +249,11 @@
       "missingAdjustData": "Missing data to adjust stock (product, location and numeric delta).",
       "invalidLocation": "I can't understand the provided location.",
       "noStock": "\"{{ name }}\" has no stock in {{ location }}.",
-      "updateFailed": "Could not update the quantity."
+      "updateFailed": "Could not update the quantity.",
+      "missingUpdates": "Aucun changement à appliquer.",
+      "deleteFailed": "Impossible de supprimer {{ name }}.",
+      "batchNotFound": "Aucun lot trouvé avec cette date.",
+      "invalidArguments": "Nous avons besoin de données valides pour exécuter cette action. Vérifiez les champs."
     },
     "details": {
       "options": "Valid options: {{ value }}",
@@ -241,6 +262,10 @@
       "suggestions": "Maybe you meant: {{ value }}",
       "expiration": "Expires: {{ value }}",
       "noExpiry": "No expiry"
+    },
+    "values": {
+      "yes": "Oui",
+      "no": "Non"
     },
     "results": {
       "addExisting": "Added stock to {{ name }} in {{ location }}",
@@ -252,10 +277,12 @@
       "moveFrom": "From: {{ value }}",
       "moveTo": "To: {{ value }}",
       "moveQuantity": "Quantity: {{ value }}",
+      "moveBatch": "Batch: {{ value }}",
       "adjustSummary": "Adjusted {{ name }} in {{ location }} to {{ quantity }}",
       "adjustChange": "Change: {{ value }}",
       "adjustNewQuantity": "New quantity: {{ value }}",
       "adjustLocation": "Location: {{ value }}",
+      "adjustBatch": "Batch: {{ value }}",
       "expiringFound": "Found {{ count }} products expiring in {{ days }} days",
       "expiringEmpty": "Nothing expires in {{ days }} days",
       "listSummary": "{{ count }} products in the pantry.",
@@ -265,7 +292,25 @@
       "recipesSystem": "You are a chef that shares short recipes with numbered steps.",
       "recipesFallback": "Here are some recipe ideas.",
       "recipesSummary": "Recipes generated",
-      "recipesIngredients": "Ingredients used: {{ list }}"
+      "recipesIngredients": "Ingredients used: {{ list }}",
+      "updateSummary": "{{ name }} mis à jour",
+      "updatedFields": "Champs modifiés : {{ value }}",
+      "deleteSummary": "{{ name }} supprimé",
+      "categoriesSummary": "{{ count }} catégories disponibles",
+      "categoriesList": "Catégories : {{ value }}",
+      "locationsSummary": "{{ count }} emplacements disponibles",
+      "locationsList": "Emplacements : {{ value }}",
+      "historySummary": "Historique de {{ name }}",
+      "historyCreated": "Créé : {{ value }}",
+      "historyUpdated": "Mis à jour : {{ value }}",
+      "historyTotalStock": "Stock total : {{ value }}",
+      "historyLocations": "Emplacements : {{ value }}",
+      "suggestionsSummary": "{{ count }} suggestions actives (périmés : {{ expired }}, bientôt périmés : {{ nearExpiry }}, stock bas : {{ low }})",
+      "suggestionsEmpty": "Tout est sous contrôle, aucune alerte pour l'instant.",
+      "suggestionsExpiredList": "Périmés : {{ value }}",
+      "suggestionsNearExpiryList": "Bientôt périmés : {{ value }}",
+      "suggestionsLowList": "Stock bas : {{ value }}",
+      "suggestionsBasicsList": "Produits essentiels : {{ value }}"
     }
   },
   "pantry": {
@@ -307,7 +352,9 @@
     "group": {
       "count": "{{ count }} items",
       "expiring": "{{ count }} expiring",
-      "expired": "{{ count }} expired"
+      "expired": "{{ count }} expired",
+      "collapse": "Replier {{ name }}",
+      "expand": "Développer {{ name }}"
     },
     "categories": {
       "dairy": "Dairy",
@@ -374,6 +421,38 @@
         "single": "1 batch",
         "plural": "{{ count }} batches",
         "withExpiry": "exp {{ date }}"
+      },
+      "actions": {
+        "viewBatches": "Voir les lots",
+        "editItem": "Modifier l'article",
+        "moveItem": "Déplacer l'article",
+        "deleteItem": "Supprimer l'article",
+        "menuLabel": "Ouvrir le menu d'actions",
+        "expand": "Afficher les détails de l'article",
+        "collapse": "Masquer les détails de l'article"
+      }
+    },
+    "move": {
+      "from": "Depuis",
+      "to": "Vers",
+      "toPlaceholder": "Nouvel emplacement (ex. Congélateur)",
+      "quantity": "Quantité à déplacer",
+      "suggestions": "Suggestions",
+      "availability": {
+        "label": "Disponible : {{ value }}",
+        "empty": "Aucun stock disponible dans cet emplacement"
+      },
+      "errors": {
+        "missingLocations": "Sélectionnez l'origine et la destination.",
+        "sameLocation": "L'origine et la destination doivent être différentes.",
+        "invalidQuantity": "Saisissez une quantité supérieure à zéro.",
+        "noAvailableStock": "Il n'y a pas de stock à déplacer depuis cet emplacement.",
+        "generic": "Impossible de déplacer l'article. Réessayez."
+      },
+      "submit": "Déplacer",
+      "cancel": "Annuler",
+      "toasts": {
+        "success": "{{ quantity }} déplacé de {{ from }} vers {{ to }}."
       }
     },
     "toasts": {
