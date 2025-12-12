@@ -423,10 +423,34 @@
       "actions": {
         "viewBatches": "Chargen anzeigen",
         "editItem": "Artikel bearbeiten",
+        "moveItem": "Artikel verschieben",
         "deleteItem": "Artikel löschen",
         "menuLabel": "Aktionsmenü öffnen",
         "expand": "Artikeldetails anzeigen",
         "collapse": "Artikeldetails ausblenden"
+      }
+    },
+    "move": {
+      "from": "Von",
+      "to": "Nach",
+      "toPlaceholder": "Neuer Ort (z. B. Gefrierschrank)",
+      "quantity": "Menge verschieben",
+      "suggestions": "Vorschläge",
+      "availability": {
+        "label": "Verfügbar: {{ value }}",
+        "empty": "Kein Bestand an diesem Ort"
+      },
+      "errors": {
+        "missingLocations": "Wähle Herkunft und Ziel.",
+        "sameLocation": "Herkunft und Ziel müssen unterschiedlich sein.",
+        "invalidQuantity": "Gib eine Menge größer als null ein.",
+        "noAvailableStock": "Kein Bestand zum Verschieben an diesem Ort.",
+        "generic": "Produkt konnte nicht verschoben werden. Versuche es erneut."
+      },
+      "submit": "Verschieben",
+      "cancel": "Abbrechen",
+      "toasts": {
+        "success": "{{ quantity }} von {{ from }} nach {{ to }} verschoben."
       }
     },
     "toasts": {

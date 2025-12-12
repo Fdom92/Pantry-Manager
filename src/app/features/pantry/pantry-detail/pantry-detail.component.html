@@ -54,21 +54,26 @@
         <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
       </ion-button>
       <ion-popover
+        #actionsPopover
         [trigger]="'pantry-card-actions-' + viewModel.item._id"
         triggerAction="click"
         dismissOnSelect="true"
         reference="trigger">
         <ng-template>
           <ion-list lines="none" class="pantry-card-popover">
-            <ion-item button detail="false" (click)="$event.stopPropagation(); handleOpenBatches($event)">
+            <ion-item button detail="false" (click)="$event.stopPropagation(); actionsPopover.dismiss(); handleOpenBatches($event)">
               <ion-icon slot="start" name="list-outline"></ion-icon>
               <ion-label>{{ 'pantry.detail.actions.viewBatches' | translate }}</ion-label>
             </ion-item>
-            <ion-item button detail="false" (click)="$event.stopPropagation(); handleEdit($event)">
+            <ion-item button detail="false" (click)="$event.stopPropagation(); actionsPopover.dismiss(); handleEdit($event)">
               <ion-icon slot="start" name="create-outline"></ion-icon>
               <ion-label>{{ 'pantry.detail.actions.editItem' | translate }}</ion-label>
             </ion-item>
-            <ion-item button detail="false" (click)="$event.stopPropagation(); handleDelete($event)">
+            <ion-item button detail="false" (click)="$event.stopPropagation(); actionsPopover.dismiss(); handleMove($event)">
+              <ion-icon slot="start" name="swap-horizontal-outline"></ion-icon>
+              <ion-label>{{ 'pantry.detail.actions.moveItem' | translate }}</ion-label>
+            </ion-item>
+            <ion-item button detail="false" (click)="$event.stopPropagation(); actionsPopover.dismiss(); handleDelete($event)">
               <ion-icon slot="start" name="trash-outline"></ion-icon>
               <ion-label>{{ 'pantry.detail.actions.deleteItem' | translate }}</ion-label>
             </ion-item>

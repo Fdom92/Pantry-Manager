@@ -423,10 +423,34 @@
       "actions": {
         "viewBatches": "Ver lotes",
         "editItem": "Editar producto",
+        "moveItem": "Mover producto",
         "deleteItem": "Eliminar producto",
         "menuLabel": "Abrir menú de acciones",
         "expand": "Expandir detalles del producto",
         "collapse": "Contraer detalles del producto"
+      }
+    },
+    "move": {
+      "from": "Desde",
+      "to": "Hacia",
+      "toPlaceholder": "Nueva ubicación (ej. Congelador)",
+      "quantity": "Cantidad a mover",
+      "suggestions": "Sugerencias",
+      "availability": {
+        "label": "Disponible: {{ value }}",
+        "empty": "Sin stock disponible en esta ubicación"
+      },
+      "errors": {
+        "missingLocations": "Selecciona origen y destino.",
+        "sameLocation": "El origen y el destino deben ser diferentes.",
+        "invalidQuantity": "Introduce una cantidad mayor que cero.",
+        "noAvailableStock": "No hay stock para mover desde esa ubicación.",
+        "generic": "No se pudo mover el producto, inténtalo de nuevo."
+      },
+      "submit": "Mover",
+      "cancel": "Cancelar",
+      "toasts": {
+        "success": "Moviste {{ quantity }} de {{ from }} a {{ to }}."
       }
     },
     "toasts": {

@@ -50,6 +50,7 @@ import {
   speedometerOutline,
   starOutline,
   storefrontOutline,
+  swapHorizontalOutline,
   timeOutline,
   trashOutline,
   trendingDownOutline
@@ -118,7 +119,8 @@ addIcons({
   'navigate-outline': navigateOutline,
   'storefront-outline': storefrontOutline,
   'ellipsis-vertical-outline': ellipsisVerticalOutline,
-  'share-outline': shareOutline
+  'share-outline': shareOutline,
+  'swap-horizontal-outline': swapHorizontalOutline
 });
 
 bootstrapApplication(AppComponent, {
