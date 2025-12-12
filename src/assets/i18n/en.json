@@ -423,10 +423,34 @@
       "actions": {
         "viewBatches": "View batches",
         "editItem": "Edit item",
+        "moveItem": "Move item",
         "deleteItem": "Delete item",
         "menuLabel": "Open actions menu",
         "expand": "Expand item details",
         "collapse": "Collapse item details"
+      }
+    },
+    "move": {
+      "from": "From",
+      "to": "To",
+      "toPlaceholder": "New location (e.g. Freezer)",
+      "quantity": "Quantity to move",
+      "suggestions": "Suggestions",
+      "availability": {
+        "label": "Available: {{ value }}",
+        "empty": "No stock available in this location"
+      },
+      "errors": {
+        "missingLocations": "Select both origin and destination.",
+        "sameLocation": "Origin and destination must be different.",
+        "invalidQuantity": "Enter a quantity greater than zero.",
+        "noAvailableStock": "There is no stock to move from that location.",
+        "generic": "We couldn't move the item. Try again."
+      },
+      "submit": "Move",
+      "cancel": "Cancel",
+      "toasts": {
+        "success": "Moved {{ quantity }} from {{ from }} to {{ to }}."
       }
     },
     "toasts": {

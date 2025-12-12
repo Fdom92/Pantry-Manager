@@ -32,6 +32,7 @@ export class PantryDetailComponent {
   @Output() summaryKeydown = new EventEmitter<KeyboardEvent>();
   @Output() openBatches = new EventEmitter<Event | undefined>();
   @Output() editRequested = new EventEmitter<Event | undefined>();
+  @Output() moveRequested = new EventEmitter<Event | undefined>();
   @Output() deleteRequested = new EventEmitter<Event | undefined>();
   @Output() adjustBatchRequested = new EventEmitter<{
     location: ItemLocationStock;
@@ -54,6 +55,10 @@ export class PantryDetailComponent {
 
   handleEdit(event?: Event): void {
     this.editRequested.emit(event);
+  }
+
+  handleMove(event?: Event): void {
+    this.moveRequested.emit(event);
   }
 
   handleDelete(event?: Event): void {
