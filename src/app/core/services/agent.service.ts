@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
-import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
+import { DEFAULT_HOUSEHOLD_ID, LOCATION_SYNONYMS, AGENT_TOOLS_CATALOG } from '@core/constants';
 import {
   AgentMessage, AgentModelMessage, AgentModelRequest,
   AgentModelResponse,
@@ -29,232 +29,11 @@ export class AgentService {
   readonly messages = computed(() => this.messagesSignal());
   readonly thinking = signal(false);
 
-  private readonly locationSynonyms: Record<string, string> = {
-    despensa: 'Despensa',
-    pantry: 'Despensa',
-    armario: 'Despensa',
-    alacena: 'Despensa',
-    cupboard: 'Despensa',
-    cabinet: 'Despensa',
-    larder: 'Despensa',
-    storage: 'Despensa',
-    nevera: 'Nevera',
-    frigo: 'Nevera',
-    refrigerador: 'Nevera',
-    refrigerator: 'Nevera',
-    fridge: 'Nevera',
-    cocina: 'Cocina',
-    encimera: 'Cocina',
-    counter: 'Cocina',
-    countertop: 'Cocina',
-    kitchen: 'Cocina',
-    mesa: 'Cocina',
-    table: 'Cocina',
-    congelador: 'Congelador',
-    freezer: 'Congelador',
-    'deep freezer': 'Congelador',
-  };
-
-  private readonly toolsCatalog: AgentToolDefinition[] = [
-    {
-      name: 'addProduct',
-      description:
-        'Añade un producto por nombre indicando cantidad, ubicación y datos opcionales como categoría o caducidad.',
-      parameters: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Nombre del producto.' },
-          quantity: { type: 'number', description: 'Cantidad inicial (>0).' },
-          location: { type: 'string', description: 'Ubicación donde se guarda.' },
-          categoryId: { type: 'string', description: 'Categoría opcional.' },
-          expirationDate: { type: 'string', description: 'Fecha de caducidad ISO (opcional).' },
-        },
-        required: ['name', 'quantity', 'location'],
-      },
-    },
-    {
-      name: 'updateProductInfo',
-      description:
-        'Actualiza campos de un producto existente: nombre, categoría, supermercado, básico o umbral mínimo.',
-      parameters: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Producto a actualizar.' },
-          updates: {
-            type: 'object',
-            description: 'Campos que se van a modificar.',
-            properties: {
-              newName: { type: 'string' },
-              categoryId: { type: 'string' },
-              supermarket: { type: 'string' },
-              isBasic: { type: 'boolean' },
-              minThreshold: { type: 'number' },
-            },
-          },
-        },
-        required: ['name', 'updates'],
-      },
-    },
-    {
-      name: 'adjustQuantity',
-      description:
-        'Modifica la cantidad de un producto (incremento o decremento) en una ubicación concreta, pudiendo indicar el lote.',
-      parameters: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Producto a ajustar.' },
-          location: { type: 'string', description: 'Ubicación donde se aplica el cambio.' },
-          quantityChange: {
-            type: 'number',
-            description: 'Delta a aplicar (p.ej. +2, -1).',
-          },
-          expirationDate: {
-            type: 'string',
-            description: 'Fecha del lote específico que se debe ajustar (opcional).',
-          },
-        },
-        required: ['name', 'location', 'quantityChange'],
-      },
-    },
-    {
-      name: 'deleteProduct',
-      description:
-        'Elimina completamente un producto de la despensa.',
-      parameters: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Nombre exacto del producto.' },
-        },
-        required: ['name'],
-      },
-    },
-    {
-      name: 'moveProduct',
-      description:
-        'Cambia un producto de una ubicación a otra (ej: de Despensa a Nevera) y permite limitarlo a un lote.',
-      parameters: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Producto a mover.' },
-          fromLocation: { type: 'string', description: 'Ubicación origen.' },
-          toLocation: { type: 'string', description: 'Ubicación destino.' },
-          quantity: {
-            type: 'number',
-            description: 'Cantidad a mover (opcional, por defecto todo el stock).',
-          },
-          expirationDate: {
-            type: 'string',
-            description: 'Fecha del lote concreto a mover (opcional).',
-          },
-        },
-        required: ['name', 'fromLocation', 'toLocation'],
-      },
-    },
-    {
-      name: 'getProducts',
-      description:
-        'Devuelve el listado completo de productos con su cantidad, ubicación y caducidad.',
-      parameters: {
-        type: 'object',
-        properties: {},
-      },
-    },
-    {
-      name: 'getRecipesWith',
-      description:
-        'Genera recetas usando los ingredientes proporcionados o los que caducan pronto.',
-      parameters: {
-        type: 'object',
-        properties: {
-          ingredients: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'Lista opcional de ingredientes prioritarios.',
-          },
-        },
-      },
-    },
-    {
-      name: 'getExpiringSoon',
-      description:
-        'Devuelve productos cuya caducidad es cercana.',
-      parameters: {
-        type: 'object',
-        properties: {
-          days: { type: 'number', description: 'Ventana en días a revisar (opcional).' },
-        },
-      },
-    },
-    {
-      name: 'listByLocation',
-      description: 'Lista productos filtrados por ubicación específica.',
-      parameters: {
-        type: 'object',
-        properties: {
-          location: { type: 'string' },
-        },
-        required: ['location'],
-      },
-    },
-    {
-      name: 'markOpened',
-      description:
-        'Marca un producto como abierto e incluye la fecha de apertura.',
-      parameters: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Producto a marcar.' },
-          location: { type: 'string', description: 'Ubicación (opcional).' },
-          openedDate: {
-            type: 'string',
-            description: 'Fecha en ISO (opcional).',
-          },
-        },
-        required: ['name'],
-      },
-    },
-    {
-      name: 'getCategories',
-      description:
-        'Devuelve la lista de categorías disponibles para clasificar productos.',
-      parameters: {
-        type: 'object',
-        properties: {},
-      },
-    },
-    {
-      name: 'getLocations',
-      description:
-        'Devuelve las ubicaciones disponibles (Despensa, Nevera, Congelador, etc).',
-      parameters: {
-        type: 'object',
-        properties: {},
-      },
-    },
-    {
-      name: 'getHistory',
-      description:
-        'Obtiene el historial resumido del producto: creación, última actualización y ubicaciones.',
-      parameters: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Producto cuyo historial se solicita.' },
-        },
-        required: ['name'],
-      },
-    },
-    {
-      name: 'getSuggestions',
-      description:
-        'Devuelve sugerencias de compra basadas en stock bajo, básicos o caducidades.',
-      parameters: {
-        type: 'object',
-        properties: {
-          includeBasics: { type: 'boolean', description: 'Forzar que los básicos aparezcan si están bajos.' },
-        },
-      },
-    }
-  ];
+  private readonly toolDefinitionsMap = new Map<string, AgentToolDefinition>(
+    AGENT_TOOLS_CATALOG.map(tool => [tool.name, tool])
+  );
+  private readonly inventoryCacheTtlMs = 60000;
+  private inventoryCache: { expiresAt: number; items: PantryItem[] } | null = null;
 
   constructor(
     private readonly http: HttpClient,
@@ -299,6 +78,7 @@ export class AgentService {
   private async processWithModel(): Promise<AgentMessage> {
     let latestAssistant: AgentMessage | null = null;
     let safetyCounter = 0;
+    let retriedAfterIncomplete = false;
 
     while (safetyCounter < 4) {
       safetyCounter += 1;
@@ -306,10 +86,22 @@ export class AgentService {
       const response = await this.callModel(await this.buildModelRequest());
       // Append assistant placeholder/response
       latestAssistant = this.appendAssistantFromModel(response);
-      const toolCalls = this.extractToolCalls(response);
+      const { calls: toolCalls, hadToolIntent } = this.extractToolCalls(response);
       if (!toolCalls.length) {
+        if (hadToolIntent) {
+          this.logAgentIssue('incomplete-tool-call', { response });
+          if (!retriedAfterIncomplete) {
+            retriedAfterIncomplete = true;
+            await this.delay(400);
+            continue;
+          }
+          const warning = this.createMessage('assistant', this.t('agent.messages.incompleteToolCall'), 'error');
+          this.messagesSignal.update(history => [...history, warning]);
+          return warning;
+        }
         return latestAssistant;
       }
+      retriedAfterIncomplete = false;
 
       // Execute each tool call sequentially and append tool messages
       for (const call of toolCalls) {
@@ -394,8 +186,8 @@ export class AgentService {
     return {
       system,
       messages: modelMessages,
-      tools: this.toolsCatalog,
-      context: { locations: locationOptions, synonyms: this.locationSynonyms },
+      tools: AGENT_TOOLS_CATALOG,
+      context: { locations: locationOptions, synonyms: LOCATION_SYNONYMS },
     };
   }
 
@@ -443,6 +235,7 @@ export class AgentService {
       );
     } catch (err: any) {
       console.error('[AgentService] callModel failed', err);
+      this.logAgentIssue('model-call-failed', { error: err?.message ?? err });
       return {
         error: this.t('agent.messages.callFailed'),
         content: this.t('agent.messages.callFailed'),
@@ -450,31 +243,37 @@ export class AgentService {
     }
   }
 
-  private extractToolCalls(response: AgentModelResponse): AgentToolCall[] {
-    if (response.tool && response.arguments) {
-      return [
-        {
-          id: response.tool_call_id,
-          name: response.tool,
-          arguments: this.parseArguments(response.arguments),
-        },
-      ];
-    }
-
+  private extractToolCalls(response: AgentModelResponse): { calls: AgentToolCall[]; hadToolIntent: boolean } {
+    let hadToolIntent = false;
     const toolCalls: AgentToolCall[] = [];
-    const fromMessage = (response.message?.tool_calls ?? response.message?.toolCalls) as RawToolCall[] | undefined;
-    if (Array.isArray(fromMessage)) {
-      for (const call of fromMessage) {
-        const name = (call as any).function?.name ?? (call as any).name;
-        if (!name) continue;
-        toolCalls.push({
-          id: call.id,
-          name,
-          arguments: this.parseArguments((call as any).function?.arguments ?? (call as any).arguments),
-        });
+
+    if (response.tool && response.arguments) {
+      hadToolIntent = true;
+      toolCalls.push({
+        id: response.tool_call_id,
+        name: response.tool,
+        arguments: this.parseArguments(response.arguments),
+      });
+    } else {
+      const fromMessage = (response.message?.tool_calls ?? response.message?.toolCalls) as RawToolCall[] | undefined;
+      if (Array.isArray(fromMessage)) {
+        for (const call of fromMessage) {
+          const name = (call as any).function?.name ?? (call as any).name;
+          if (!name) {
+            hadToolIntent = true;
+            continue;
+          }
+          hadToolIntent = true;
+          toolCalls.push({
+            id: call.id,
+            name,
+            arguments: this.parseArguments((call as any).function?.arguments ?? (call as any).arguments),
+          });
+        }
       }
     }
-    return toolCalls;
+
+    return { calls: toolCalls, hadToolIntent };
   }
 
   // Safely parse tool arguments (stringified JSON or object).
@@ -542,6 +341,15 @@ export class AgentService {
   }
 
   private async executeToolCall(call: AgentToolCall): Promise<ToolExecution> {
+    const validation = this.sanitizeToolCall(call);
+    if (!validation.success && validation.message) {
+      return {
+        tool: call.name,
+        success: false,
+        message: validation.message,
+      };
+    }
+
     switch (call.name) {
       case 'addProduct':
         return this.wrapToolResult(call.name, await this.handleAddProduct(call.arguments));
@@ -596,10 +404,47 @@ export class AgentService {
     };
   }
 
+  private sanitizeToolCall(call: AgentToolCall): { success: boolean; message?: AgentMessage } {
+    const definition = this.toolDefinitionsMap.get(call.name);
+    const rawArgs = typeof call.arguments === 'object' && call.arguments !== null ? call.arguments : {};
+    const normalizedArgs: Record<string, any> = {};
+    const properties = definition?.parameters?.properties ?? {};
+
+    for (const key of Object.keys(rawArgs)) {
+      const schema = properties[key];
+      let normalizedValue = this.normalizeArgumentValue(rawArgs[key], schema?.type);
+      if (typeof normalizedValue === 'string') {
+        if (this.isLocationArgument(key)) {
+          normalizedValue = this.normalizeLocationInput(normalizedValue);
+        } else if (this.isCategoryArgument(key)) {
+          normalizedValue = this.normalizeCategoryInput(normalizedValue);
+        }
+      }
+      normalizedArgs[key] = normalizedValue;
+    }
+
+    call.arguments = normalizedArgs;
+
+    if (!definition) {
+      return { success: true };
+    }
+
+    const required = definition.parameters?.required ?? [];
+    for (const key of required) {
+      if (!this.isValidArgument(call.arguments[key], (properties[key] as any)?.type)) {
+        this.logAgentIssue('invalid-tool-arguments', { tool: call.name, key, value: call.arguments[key] });
+        const error = this.errorResult(this.t('agent.errors.invalidArguments'));
+        return { success: false, message: error.message };
+      }
+    }
+
+    return { success: true };
+  }
+
   // Add stock to an item (create it if missing), respecting category/location/batches.
   private async handleAddProduct(args: Record<string, any>): Promise<{ success: boolean; message: AgentMessage }> {
     const name = this.normalizeText(args?.['name']);
-    const categoryId = this.normalizeText(args?.['categoryId']);
+    const categoryId = this.normalizeCategoryInput(args?.['categoryId']);
     const quantity = this.toNumber(args?.['quantity']);
     const locationInput = args?.['location'] as string;
     const expirationDate = this.normalizeDate(args?.['expirationDate']);
@@ -614,7 +459,7 @@ export class AgentService {
     const resolvedLocation = await this.resolveLocation(locationInput);
     if (!resolvedLocation) {
       const details = [
-        this.t('agent.details.options', { value: Object.values(this.locationSynonyms).join(', ') }),
+        this.t('agent.details.options', { value: Object.values(LOCATION_SYNONYMS).join(', ') }),
       ];
       return this.errorResult(this.t('agent.errors.unknownLocation'), details);
     }
@@ -634,6 +479,7 @@ export class AgentService {
       : this.buildNewItem(name, resolvedLocation, batch, effectiveCategoryId);
 
     const saved = await this.pantryService.saveItem(updatedItem);
+    this.invalidateInventoryCache();
     await this.pantryService.reloadFromStart();
 
     const summary = existing
@@ -693,9 +539,9 @@ export class AgentService {
     }
 
     if (typeof updates['categoryId'] === 'string') {
-      const trimmed = updates['categoryId'].trim();
-      if (trimmed !== item.categoryId) {
-        next.categoryId = trimmed;
+      const normalizedCategory = this.normalizeCategoryInput(updates['categoryId']);
+      if (normalizedCategory !== item.categoryId) {
+        next.categoryId = normalizedCategory;
         changedFields.push('categoryId');
       }
     }
@@ -732,6 +578,7 @@ export class AgentService {
     }
 
     const saved = await this.pantryService.saveItem(next);
+    this.invalidateInventoryCache();
     await this.pantryService.reloadFromStart();
 
     const summary = this.t('agent.results.updateSummary', { name: saved.name });
@@ -830,6 +677,7 @@ export class AgentService {
     };
 
     const saved = await this.pantryService.saveItem(updated);
+    this.invalidateInventoryCache();
     await this.pantryService.reloadFromStart();
 
     const summary = this.t('agent.results.moveSummary', {
@@ -920,6 +768,7 @@ export class AgentService {
       };
 
       const saved = await this.pantryService.saveItem(updatedItem);
+      this.invalidateInventoryCache();
       await this.pantryService.reloadFromStart();
 
       const locationTotal = this.sumBatches(sanitizedBatches);
@@ -953,6 +802,7 @@ export class AgentService {
     if (!updated) {
       return this.errorResult(this.t('agent.errors.updateFailed'));
     }
+    this.invalidateInventoryCache();
     await this.pantryService.reloadFromStart();
 
     const summary = this.t('agent.results.adjustSummary', { name, location, quantity: nextQty });
@@ -995,6 +845,7 @@ export class AgentService {
     if (!deleted) {
       return this.errorResult(this.t('agent.errors.deleteFailed', { name: item.name }));
     }
+    this.invalidateInventoryCache();
     await this.pantryService.reloadFromStart();
 
     const summary = this.t('agent.results.deleteSummary', { name: item.name });
@@ -1026,7 +877,7 @@ export class AgentService {
 
   // Return full pantry inventory.
   private async handleGetProducts(): Promise<{ success: boolean; message: AgentMessage }> {
-    const items = await this.pantryService.getAll();
+    const items = await this.getInventorySnapshot();
     const message = this.createMessage('assistant', this.t('agent.results.listSummary', { count: items.length }));
     message.data = { summary: this.t('agent.results.listDetail'), items };
     message.modelContent = JSON.stringify({ action: 'getProducts', status: 'ok', count: items.length, items });
@@ -1478,7 +1329,7 @@ export class AgentService {
     const raw = (input ?? '').trim();
     if (!raw) return null;
     const lower = raw.toLowerCase();
-    const mapped = this.locationSynonyms[lower] ?? raw;
+    const mapped = LOCATION_SYNONYMS[lower] ?? raw;
     const catalog = await this.getLocationOptions();
     const exact = catalog.find(loc => loc.toLowerCase() === mapped.toLowerCase());
     if (exact) return exact;
@@ -1518,25 +1369,217 @@ export class AgentService {
   }
 
   private async findItemByName(name: string): Promise<PantryItem | null> {
+    const searchKey = this.buildSearchKey(name);
+    if (!searchKey) {
+      return null;
+    }
     const all = await this.pantryService.getAll();
-    const lower = name.toLowerCase();
-    return all.find(item => (item.name ?? '').toLowerCase() === lower) ?? null;
+    return all.find(item => this.buildSearchKey(item.name) === searchKey) ?? null;
   }
 
   private async suggestProducts(query: string): Promise<string[]> {
     const all = await this.pantryService.getAll();
-    const lower = query.toLowerCase();
-    const matches = all
-      .filter(item => (item.name ?? '').toLowerCase().includes(lower))
-      .map(item => item.name);
+    const normalized = this.buildSearchKey(query);
+    const matches = normalized
+      ? all
+          .filter(item => this.buildSearchKey(item.name).includes(normalized))
+          .map(item => item.name)
+      : [];
     if (matches.length) {
       return matches.slice(0, 3);
     }
     return all.slice(0, 3).map(item => item.name);
   }
 
+  private getCachedInventory(): PantryItem[] | null {
+    if (this.inventoryCache && this.inventoryCache.expiresAt > Date.now()) {
+      return this.inventoryCache.items;
+    }
+    return null;
+  }
+
+  private async getInventorySnapshot(): Promise<PantryItem[]> {
+    const cached = this.getCachedInventory();
+    if (cached) {
+      return cached;
+    }
+    const items = await this.pantryService.getAll();
+    this.inventoryCache = {
+      expiresAt: Date.now() + this.inventoryCacheTtlMs,
+      items,
+    };
+    return items;
+  }
+
+  private invalidateInventoryCache(): void {
+    this.inventoryCache = null;
+  }
+
   private normalizeText(value: any): string {
     return typeof value === 'string' ? value.trim() : '';
+  }
+
+  private normalizeArgumentValue(value: any, expectedType?: string): any {
+    switch (expectedType) {
+      case 'string': {
+        if (typeof value === 'string') {
+          return value.trim();
+        }
+        if (value === null || value === undefined) {
+          return '';
+        }
+        return String(value).trim();
+      }
+      case 'number': {
+        if (value === null || value === undefined || value === '') {
+          return NaN;
+        }
+        const normalized = typeof value === 'string' ? value.replace(',', '.') : value;
+        const num = Number(normalized);
+        return Number.isFinite(num) ? num : NaN;
+      }
+      case 'boolean': {
+        if (typeof value === 'boolean') {
+          return value;
+        }
+        if (typeof value === 'string') {
+          const lowered = value.trim().toLowerCase();
+          if (lowered === 'true') return true;
+          if (lowered === 'false') return false;
+        }
+        return Boolean(value);
+      }
+      case 'array': {
+        if (!Array.isArray(value)) {
+          return [];
+        }
+        return value
+          .map(entry => (typeof entry === 'string' ? entry.trim() : entry))
+          .filter(entry => entry !== '' && entry !== null && entry !== undefined);
+      }
+      default:
+        if (typeof value === 'string') {
+          return value.trim();
+        }
+        return value;
+    }
+  }
+
+  private isValidArgument(value: any, expectedType?: string): boolean {
+    switch (expectedType) {
+      case 'string':
+        return typeof value === 'string' && value.length > 0;
+      case 'number':
+        return Number.isFinite(value);
+      case 'boolean':
+        return typeof value === 'boolean';
+      case 'array':
+        return Array.isArray(value) && value.length > 0;
+      default:
+        return value !== undefined && value !== null && value !== '';
+    }
+  }
+
+  private isLocationArgument(key: string): boolean {
+    const normalized = key.toLowerCase();
+    return normalized.includes('location') || normalized === 'from' || normalized === 'to';
+  }
+
+  private isCategoryArgument(key: string): boolean {
+    const normalized = key.toLowerCase();
+    return normalized === 'categoryid' || normalized === 'category';
+  }
+
+  private normalizeCategoryInput(value: any): string {
+    const trimmed = this.normalizeText(value);
+    if (!trimmed) {
+      return '';
+    }
+    const catalog = this.getKnownCategories();
+    const match = catalog.find(option => option.toLowerCase() === trimmed.toLowerCase());
+    return match ?? trimmed;
+  }
+
+  private normalizeLocationInput(value: any): string {
+    const trimmed = this.normalizeText(value);
+    if (!trimmed) {
+      return '';
+    }
+    const lower = trimmed.toLowerCase();
+    if (LOCATION_SYNONYMS[lower]) {
+      return LOCATION_SYNONYMS[lower];
+    }
+    const catalog = this.getKnownLocations();
+    const match = catalog.find(option => option.toLowerCase() === lower);
+    if (match) {
+      return match;
+    }
+    return this.capitalizeFirst(trimmed);
+  }
+
+  private getKnownCategories(): string[] {
+    const prefs = this.appPreferences.preferences();
+    const custom = Array.isArray(prefs.categoryOptions) ? prefs.categoryOptions : [];
+    return [...DEFAULT_CATEGORY_OPTIONS, ...custom].map(option => option.trim()).filter(Boolean);
+  }
+
+  private getKnownLocations(): string[] {
+    const prefs = this.appPreferences.preferences();
+    const custom = Array.isArray(prefs.locationOptions) ? prefs.locationOptions : [];
+    return [...DEFAULT_LOCATION_OPTIONS, ...custom].map(option => option.trim()).filter(Boolean);
+  }
+
+  private buildSearchKey(value?: string | null): string {
+    let normalized = (value ?? '').trim().toLowerCase();
+    if (!normalized) {
+      return '';
+    }
+    normalized = this.stripLeadingArticle(normalized);
+    normalized = normalized.replace(/\s+/g, ' ').trim();
+    const words = normalized.split(' ').map(word => this.singularizeWord(word));
+    return words.join(' ').trim();
+  }
+
+  private stripLeadingArticle(value: string): string {
+    return value.replace(/^(el|la|los|las|the)\s+/i, '');
+  }
+
+  private capitalizeFirst(value: string): string {
+    if (!value) {
+      return value;
+    }
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  private singularizeWord(word: string): string {
+    if (word.length <= 3) {
+      return word;
+    }
+    if (word.endsWith('ches')) {
+      return `${word.slice(0, -1)}`;
+    }
+    if (word.endsWith('es') && !word.endsWith('ses')) {
+      return word.slice(0, -2);
+    }
+    if (word.endsWith('s') && !word.endsWith('ss') && word.length > 4) {
+      return word.slice(0, -1);
+    }
+    return word;
+  }
+
+  private logAgentIssue(event: string, payload?: Record<string, any>): void {
+    if (!this.apiUrl) {
+      console.warn(`[AgentService] ${event}`, payload);
+      return;
+    }
+    const endpoint = `${this.apiUrl.replace(/\/$/, '')}/telemetry`;
+    this.http
+      .post(endpoint, { event, payload, timestamp: new Date().toISOString() })
+      .subscribe({ error: () => undefined });
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   private normalizeDate(value: any): string | null {

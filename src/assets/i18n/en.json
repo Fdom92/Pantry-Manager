@@ -233,7 +233,8 @@
       "processing": "Processing action…",
       "noResponse": "Couldn't generate a response.",
       "noEndpoint": "Agent endpoint is not configured.",
-      "callFailed": "Couldn't reach the model.",
+      "callFailed": "It looks like the assistant connection had a temporary issue. Please try again in a few seconds.",
+      "incompleteToolCall": "The assistant couldn't gather all the data needed to run that action. Please rephrase or try again.",
       "toolUnavailable": "Tool \"{{ name }}\" is not available."
     },
     "errors": {
@@ -251,7 +252,8 @@
       "updateFailed": "Could not update the quantity.",
       "missingUpdates": "No changes to apply.",
       "deleteFailed": "Couldn't delete {{ name }}.",
-      "batchNotFound": "I couldn't find a lot with that date."
+      "batchNotFound": "I couldn't find a lot with that date.",
+      "invalidArguments": "We need valid information to run that action. Please review the fields."
     },
     "details": {
       "options": "Valid options: {{ value }}",

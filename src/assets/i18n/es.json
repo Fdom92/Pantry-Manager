@@ -233,7 +233,8 @@
       "processing": "Procesando acción…",
       "noResponse": "No pude generar respuesta.",
       "noEndpoint": "No hay endpoint configurado para el agente.",
-      "callFailed": "No se pudo contactar con el modelo.",
+      "callFailed": "Parece que la conexión con el asistente tuvo un problema temporal. Inténtalo de nuevo en unos segundos.",
+      "incompleteToolCall": "No pude completar la acción porque faltan datos. Reformula la instrucción o inténtalo otra vez.",
       "toolUnavailable": "La herramienta \"{{ name }}\" no está disponible."
     },
     "errors": {
@@ -251,7 +252,8 @@
       "updateFailed": "No pude actualizar la cantidad.",
       "missingUpdates": "No hay cambios para aplicar.",
       "deleteFailed": "No pude eliminar {{ name }}.",
-      "batchNotFound": "No encontré un lote con esa fecha."
+      "batchNotFound": "No encontré un lote con esa fecha.",
+      "invalidArguments": "Necesitamos datos válidos para ejecutar esta acción. Revisa los campos."
     },
     "details": {
       "options": "Opciones válidas: {{ value }}",

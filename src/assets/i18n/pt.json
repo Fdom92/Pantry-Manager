@@ -233,7 +233,8 @@
       "processing": "Processing action…",
       "noResponse": "Couldn't generate a response.",
       "noEndpoint": "Agent endpoint is not configured.",
-      "callFailed": "Couldn't reach the model.",
+      "callFailed": "Parece que a conexão com o assistente teve um problema temporário. Tente novamente em alguns segundos.",
+      "incompleteToolCall": "O assistente não conseguiu reunir todos os dados necessários para executar essa ação. Reformule ou tente novamente.",
       "toolUnavailable": "Tool \"{{ name }}\" is not available."
     },
     "errors": {
@@ -251,7 +252,8 @@
       "updateFailed": "Could not update the quantity.",
       "missingUpdates": "Não há alterações para aplicar.",
       "deleteFailed": "Não consegui eliminar {{ name }}.",
-      "batchNotFound": "Não encontrei um lote com essa data."
+      "batchNotFound": "Não encontrei um lote com essa data.",
+      "invalidArguments": "Precisamos de dados válidos para executar essa ação. Revise os campos."
     },
     "details": {
       "options": "Valid options: {{ value }}",
