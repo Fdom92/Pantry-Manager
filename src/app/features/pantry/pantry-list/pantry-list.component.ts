@@ -154,9 +154,11 @@ export class PantryListComponent implements OnDestroy {
   editingItem: PantryItem | null = null;
   isSaving = false;
   private readonly expandedItems = new Set<string>();
+  private readonly deletingItems = signal<Set<string>>(new Set());
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveDelay = 500;
+  private readonly deleteAnimationDuration = 220;
   private realtimeSubscribed = false;
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -492,9 +494,18 @@ export class PantryListComponent implements OnDestroy {
       }
     }
 
-    await this.pantryStore.deleteItem(item._id);
-    this.expandedItems.delete(item._id);
-    await this.presentToast(this.translate.instant('pantry.toasts.deleted'), 'medium');
+    this.markItemDeleting(item._id);
+    try {
+      await this.delay(this.deleteAnimationDuration);
+      await this.pantryStore.deleteItem(item._id);
+      this.expandedItems.delete(item._id);
+      await this.presentToast(this.translate.instant('pantry.toasts.deleted'), 'medium');
+    } catch (err) {
+      console.error('[PantryListComponent] deleteItem error', err);
+      await this.presentToast(this.translate.instant('pantry.toasts.saveError'), 'danger');
+    } finally {
+      this.unmarkItemDeleting(item._id);
+    }
   }
 
   /**
@@ -726,6 +737,10 @@ export class PantryListComponent implements OnDestroy {
 
   isExpanded(item: PantryItem): boolean {
     return this.expandedItems.has(item._id);
+  }
+
+  isDeleting(item: PantryItem): boolean {
+    return this.deletingItems().has(item._id);
   }
 
   /** Toggle the expansion panel for a given item without triggering parent handlers. */
@@ -2278,6 +2293,32 @@ export class PantryListComponent implements OnDestroy {
       quantity: quantitySegment,
       breakdown: breakdownSegment,
     });
+  }
+
+  private markItemDeleting(id: string): void {
+    this.deletingItems.update(current => {
+      if (current.has(id)) {
+        return current;
+      }
+      const next = new Set(current);
+      next.add(id);
+      return next;
+    });
+  }
+
+  private unmarkItemDeleting(id: string): void {
+    this.deletingItems.update(current => {
+      if (!current.has(id)) {
+        return current;
+      }
+      const next = new Set(current);
+      next.delete(id);
+      return next;
+    });
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /** Explain what changed during an update so users understand the persisted action. */
