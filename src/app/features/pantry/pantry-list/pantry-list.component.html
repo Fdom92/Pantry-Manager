@@ -111,7 +111,8 @@
           @for (item of group.items; track trackByItemId($index, item)) {
             <div
               class="virtual-item-card"
-              [class.virtual-item-card--expanded]="isExpanded(item)">
+              [class.virtual-item-card--expanded]="isExpanded(item)"
+              [class.virtual-item-card--deleting]="isDeleting(item)">
               @let card = buildItemCardViewModel(item);
               <app-pantry-detail
                 class="virtual-item-card__detail"

@@ -269,12 +269,21 @@
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 8px;
-  transition: height 0.25s ease;
+  transition:
+    height 0.25s ease,
+    opacity 220ms ease,
+    transform 220ms ease;
   overflow: visible;
   display: flex;
   position: relative;
   z-index: 1;
   animation: fadeInList 260ms ease;
+}
+
+.virtual-item-card--deleting {
+  opacity: 0;
+  transform: translateX(-14px);
+  pointer-events: none;
 }
 
 .virtual-item-card__detail {
