@@ -30,7 +30,7 @@
   @if (isPro) {
     <div class="chat">
       @for (message of messages(); track trackById($index, message)) {
-        <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-tool]="message.role === 'tool'" [class.is-error]="message.status === 'error'">
+        <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-error]="message.status === 'error'">
           <div class="message__bubble">
             <div class="message__content">
               <p>{{ message.content }}</p>
@@ -52,15 +52,22 @@
                 }
               </div>
             }
+            @if (message.status === 'error' && canRetry()) {
+              <div class="message__actions">
+                <ion-button fill="clear" color="primary" size="small" (click)="retry()" [disabled]="thinking()">
+                  {{ 'agent.actions.retry' | translate }}
+                </ion-button>
+              </div>
+            }
           </div>
         </div>
       }
 
-      @if (thinking()) {
+      @if (agentPhase() !== 'idle') {
         <div class="message from-agent">
           <div class="message__bubble thinking">
             <ion-spinner name="dots"></ion-spinner>
-            <span>{{ 'agent.thinking' | translate }}</span>
+            <span>{{ ('agent.states.' + agentPhase()) | translate }}</span>
           </div>
         </div>
       }

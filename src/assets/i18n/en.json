@@ -211,9 +211,15 @@
   "agent": {
     "title": "Agent",
     "thinking": "Thinking…",
+    "states": {
+      "thinking": "Thinking…",
+      "fetching": "Checking your pantry…",
+      "responding": "Crafting the response…"
+    },
     "placeholder": "Write instructions like \"Move 2 yogurts to the fridge\"",
     "actions": {
-      "send": "Send"
+      "send": "Send",
+      "retry": "Retry"
     },
     "preview": {
       "badge": "Preview",
@@ -235,7 +241,8 @@
       "noEndpoint": "Agent endpoint is not configured.",
       "callFailed": "It looks like the assistant connection had a temporary issue. Please try again in a few seconds.",
       "incompleteToolCall": "The assistant couldn't gather all the data needed to run that action. Please rephrase or try again.",
-      "toolUnavailable": "Tool \"{{ name }}\" is not available."
+      "toolUnavailable": "Tool \"{{ name }}\" is not available.",
+      "unifiedError": "The assistant couldn’t reply right now. Please try again in a few seconds."
     },
     "errors": {
       "missingName": "Product name is required.",
@@ -311,6 +318,15 @@
       "suggestionsNearExpiryList": "Expiring soon: {{ value }}",
       "suggestionsLowList": "Low stock: {{ value }}",
       "suggestionsBasicsList": "Essential items: {{ value }}"
+    },
+    "toasts": {
+      "addProduct": "Product added to the pantry.",
+      "adjustQuantity": "Stock updated.",
+      "deleteProduct": "Product deleted.",
+      "moveProduct": "Movement registered.",
+      "markOpened": "Product marked as opened.",
+      "updateProductInfo": "Product info updated.",
+      "generic": "Action completed."
     }
   },
   "pantry": {

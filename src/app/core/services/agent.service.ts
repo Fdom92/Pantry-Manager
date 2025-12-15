@@ -1,9 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { DEFAULT_HOUSEHOLD_ID, LOCATION_SYNONYMS, AGENT_TOOLS_CATALOG } from '@core/constants';
 import {
-  AgentMessage, AgentModelMessage, AgentModelRequest,
+  AgentMessage, AgentModelCallError, AgentModelMessage, AgentModelRequest,
   AgentModelResponse,
+  AgentPhase,
   AgentRole,
   AgentToolCall,
   AgentToolDefinition, ItemBatch, ItemLocationStock, MeasurementUnit, MoveBatchesResult, PantryItem, RawToolCall,
@@ -16,6 +17,7 @@ import { environment } from 'src/environments/environment';
 import { AppPreferencesService, DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS } from './app-preferences.service';
 import { PantryService } from './pantry.service';
 import { RevenuecatService } from './revenuecat.service';
+import { ToastController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root',
@@ -26,14 +28,29 @@ export class AgentService {
   // Max time to wait for the agent HTTP call before timing out.
   private readonly requestTimeoutMs = 30000;
   private readonly messagesSignal = signal<AgentMessage[]>([]);
-  readonly messages = computed(() => this.messagesSignal());
+  readonly messages = computed(() => this.messagesSignal().filter(message => this.isVisibleMessage(message)));
+  private readonly agentPhaseSignal = signal<AgentPhase>('idle');
+  readonly agentPhase = computed(() => this.agentPhaseSignal());
   readonly thinking = signal(false);
+  private readonly retryAvailable = signal(false);
+  readonly canRetry = computed(() => this.retryAvailable());
+  private readonly transientStatusCodes = new Set([502, 503, 504]);
+  private readonly maxTransientRetries = 2;
+  private readonly transientRetryDelayMs = 600;
 
   private readonly toolDefinitionsMap = new Map<string, AgentToolDefinition>(
     AGENT_TOOLS_CATALOG.map(tool => [tool.name, tool])
   );
   private readonly inventoryCacheTtlMs = 60000;
   private inventoryCache: { expiresAt: number; items: PantryItem[] } | null = null;
+  private readonly actionToastMap = new Map<string, string>([
+    ['addProduct', 'agent.toasts.addProduct'],
+    ['adjustQuantity', 'agent.toasts.adjustQuantity'],
+    ['deleteProduct', 'agent.toasts.deleteProduct'],
+    ['moveProduct', 'agent.toasts.moveProduct'],
+    ['markOpened', 'agent.toasts.markOpened'],
+    ['updateProductInfo', 'agent.toasts.updateProductInfo'],
+  ]);
 
   constructor(
     private readonly http: HttpClient,
@@ -41,6 +58,7 @@ export class AgentService {
     private readonly appPreferences: AppPreferencesService,
     private readonly translate: TranslateService,
     private readonly revenuecat: RevenuecatService,
+    private readonly toastController: ToastController,
   ) {}
 
   private t(key: string, params?: Record<string, any>): string {
@@ -55,24 +73,64 @@ export class AgentService {
 
     const userMessage = this.createMessage('user', trimmed);
     this.messagesSignal.update(history => [...history, userMessage]);
-    this.thinking.set(true);
+    this.setRetryAvailable(false);
 
     try {
       const response = await this.processWithModel();
+      if (response.status !== 'error') {
+        this.emitAgentTelemetry('agent_success', { source: 'user', messageId: response.id });
+      }
+      this.setRetryAvailable(false);
       return response;
     } catch (err: any) {
-      console.error('[AgentService] sendMessage error', err);
-      const errorMessage = this.createMessage('assistant', 'Algo fue mal hablando con el agente. ¿Puedes intentar de nuevo?', 'error');
-      this.messagesSignal.update(history => [...history, errorMessage]);
-      return errorMessage;
+      return this.handleAgentFailure(err, 'user');
     } finally {
-      this.thinking.set(false);
+      this.setAgentPhase('idle');
+    }
+  }
+
+  async retryLastUserMessage(): Promise<AgentMessage | null> {
+    if (!this.retryAvailable()) {
+      return null;
+    }
+    const history = this.messagesSignal();
+    const lastUserIndex = this.findLastUserMessageIndex(history);
+    if (lastUserIndex === -1) {
+      return null;
+    }
+    const trimmedHistory = history.slice(0, lastUserIndex + 1);
+    this.messagesSignal.set(trimmedHistory);
+    this.setRetryAvailable(false);
+
+    try {
+      const response = await this.processWithModel();
+      if (response.status !== 'error') {
+        this.emitAgentTelemetry('agent_success', { source: 'retry', messageId: response.id });
+      }
+      return response;
+    } catch (err) {
+      return this.handleAgentFailure(err, 'retry');
+    } finally {
+      this.setAgentPhase('idle');
     }
   }
 
   resetConversation(): void {
     this.messagesSignal.set([]);
-    this.thinking.set(false);
+    this.setAgentPhase('idle');
+    this.setRetryAvailable(false);
+  }
+
+  private handleAgentFailure(err: any, source: 'user' | 'retry'): AgentMessage {
+    console.error('[AgentService] workflow error', err);
+    this.emitAgentTelemetry('agent_error', {
+      source,
+      error: err?.message ?? err,
+    });
+    this.setRetryAvailable(true);
+    const errorMessage = this.createUnifiedErrorMessage();
+    this.messagesSignal.update(history => this.appendWithoutDuplicate(history, errorMessage));
+    return errorMessage;
   }
 
   private async processWithModel(): Promise<AgentMessage> {
@@ -82,11 +140,19 @@ export class AgentService {
 
     while (safetyCounter < 4) {
       safetyCounter += 1;
+      this.setAgentPhase('thinking');
       // Build payload with history + tool definitions
       const response = await this.callModel(await this.buildModelRequest());
-      // Append assistant placeholder/response
-      latestAssistant = this.appendAssistantFromModel(response);
-      const { calls: toolCalls, hadToolIntent } = this.extractToolCalls(response);
+      const extraction = this.extractToolCalls(response);
+      // Append assistant placeholder/response (must happen before executing tools)
+      const assistantMessage = this.appendAssistantFromModel(response, extraction.rawToolCalls);
+      if (
+        assistantMessage.role === 'assistant' &&
+        assistantMessage.content !== this.t('agent.messages.processing')
+      ) {
+        latestAssistant = assistantMessage;
+      }
+      const { calls: toolCalls, hadToolIntent } = extraction;
       if (!toolCalls.length) {
         if (hadToolIntent) {
           this.logAgentIssue('incomplete-tool-call', { response });
@@ -95,25 +161,32 @@ export class AgentService {
             await this.delay(400);
             continue;
           }
-          const warning = this.createMessage('assistant', this.t('agent.messages.incompleteToolCall'), 'error');
-          this.messagesSignal.update(history => [...history, warning]);
-          return warning;
+          throw this.buildUserFacingError('agent.messages.unifiedError');
         }
-        return latestAssistant;
+        this.setAgentPhase('responding');
+        if (latestAssistant) {
+          return latestAssistant;
+        }
+        throw this.buildUserFacingError('agent.messages.unifiedError');
       }
       retriedAfterIncomplete = false;
+      this.setAgentPhase('fetching');
 
       // Execute each tool call sequentially and append tool messages
       for (const call of toolCalls) {
+        if (this.hasToolResult(call.id)) {
+          continue;
+        }
         const result = await this.executeToolCall(call);
         // Keep the tool result message with the call id to satisfy OpenAI API requirements
         result.message.toolCallId = call.id ?? result.message.toolCallId;
-        this.messagesSignal.update(history => [...history, result.message]);
+        this.messagesSignal.update(history => this.appendWithoutDuplicate(history, result.message));
       }
+      this.setAgentPhase('thinking');
       // Loop will call the model again with the new tool results
     }
 
-    return latestAssistant ?? this.createMessage('assistant', this.t('agent.messages.noResponse'), 'error');
+    throw this.buildUserFacingError('agent.messages.unifiedError');
   }
 
   // Create a chat message with metadata (used for user/assistant/tool entries).
@@ -179,7 +252,7 @@ export class AgentService {
       `
     ].join('\n');
 
-    const modelMessages: AgentModelMessage[] = this.messages()
+    const modelMessages: AgentModelMessage[] = this.messagesSignal()
       .map(msg => this.toModelMessage(msg))
       .filter(Boolean) as AgentModelMessage[];
 
@@ -220,60 +293,118 @@ export class AgentService {
 
   private async callModel(payload: AgentModelRequest): Promise<AgentModelResponse> {
     if (!this.apiUrl) {
-      console.warn('[AgentService] agentApiUrl is empty, skipping remote call');
-      return {
-        content: this.t('agent.messages.noEndpoint'),
-      };
+      console.warn('[AgentService] agentApiUrl is empty, cannot call remote agent');
+      throw this.buildUserFacingError('agent.messages.noEndpoint');
     }
-    try {
-      return await firstValueFrom(
-        this.http
-          .post<AgentModelResponse>(this.apiUrl, payload, {
-            headers: this.buildProHeaders(),
-          })
-          .pipe(rxTimeout(this.requestTimeoutMs))
-      );
-    } catch (err: any) {
-      console.error('[AgentService] callModel failed', err);
-      this.logAgentIssue('model-call-failed', { error: err?.message ?? err });
-      return {
-        error: this.t('agent.messages.callFailed'),
-        content: this.t('agent.messages.callFailed'),
-      };
-    }
-  }
 
-  private extractToolCalls(response: AgentModelResponse): { calls: AgentToolCall[]; hadToolIntent: boolean } {
-    let hadToolIntent = false;
-    const toolCalls: AgentToolCall[] = [];
+    let attempt = 0;
+    let lastError: AgentModelCallError | null = null;
 
-    if (response.tool && response.arguments) {
-      hadToolIntent = true;
-      toolCalls.push({
-        id: response.tool_call_id,
-        name: response.tool,
-        arguments: this.parseArguments(response.arguments),
-      });
-    } else {
-      const fromMessage = (response.message?.tool_calls ?? response.message?.toolCalls) as RawToolCall[] | undefined;
-      if (Array.isArray(fromMessage)) {
-        for (const call of fromMessage) {
-          const name = (call as any).function?.name ?? (call as any).name;
-          if (!name) {
-            hadToolIntent = true;
-            continue;
-          }
-          hadToolIntent = true;
-          toolCalls.push({
-            id: call.id,
-            name,
-            arguments: this.parseArguments((call as any).function?.arguments ?? (call as any).arguments),
-          });
+    while (attempt <= this.maxTransientRetries) {
+      try {
+        return await firstValueFrom(
+          this.http
+            .post<AgentModelResponse>(this.apiUrl, payload, {
+              headers: this.buildProHeaders(),
+            })
+            .pipe(rxTimeout(this.requestTimeoutMs))
+        );
+      } catch (err: any) {
+        const normalized = this.normalizeHttpError(err);
+        lastError = normalized;
+        const shouldRetry = this.shouldRetryModel(normalized, attempt);
+        if (shouldRetry) {
+          attempt += 1;
+          console.warn('[AgentService] callModel retrying', { attempt, status: normalized.status });
+          await this.delay(this.transientRetryDelayMs * attempt);
+          continue;
         }
+        this.logAgentIssue('model-call-failed', { error: normalized.message, status: normalized.status });
+        throw normalized;
       }
     }
 
-    return { calls: toolCalls, hadToolIntent };
+    throw lastError ?? this.buildUserFacingError('agent.messages.callFailed');
+  }
+
+  private extractToolCalls(response: AgentModelResponse): {
+    calls: AgentToolCall[];
+    rawToolCalls?: RawToolCall[];
+    hadToolIntent: boolean;
+  } {
+    let hadToolIntent = false;
+    const parsedCalls: AgentToolCall[] = [];
+    const rawToolCalls: RawToolCall[] = [];
+    const usedIds = new Set<string>();
+
+    const ensureToolCallId = (candidate?: string): string => {
+      const trimmed = (candidate ?? '').trim();
+      if (trimmed && !usedIds.has(trimmed)) {
+        usedIds.add(trimmed);
+        return trimmed;
+      }
+      let generated = '';
+      do {
+        generated = createDocumentId('toolcall');
+      } while (usedIds.has(generated));
+      usedIds.add(generated);
+      return generated;
+    };
+
+    const pushCall = (name?: string, argsSource?: any, idCandidate?: string, rawSource?: RawToolCall): void => {
+      if (!name) {
+        hadToolIntent = hadToolIntent || Boolean(rawSource);
+        return;
+      }
+      hadToolIntent = true;
+      const id = ensureToolCallId(idCandidate);
+      const parsed = this.parseArguments(argsSource);
+      parsedCalls.push({ id, name, arguments: parsed });
+      const normalizedRaw: RawToolCall = rawSource
+        ? ({
+            ...rawSource,
+            id,
+            type: rawSource.type ?? 'function',
+            function: rawSource.function
+              ? {
+                  ...rawSource.function,
+                  name,
+                  arguments: this.stringifyToolArguments(rawSource.function.arguments),
+                }
+              : {
+                  name,
+                  arguments: this.stringifyToolArguments((rawSource as any)?.arguments ?? argsSource),
+                },
+          } as RawToolCall)
+        : ({
+            id,
+            type: 'function',
+            function: {
+              name,
+              arguments: this.stringifyToolArguments(argsSource),
+            },
+          } as RawToolCall);
+      rawToolCalls.push(normalizedRaw);
+    };
+
+    if (response.tool) {
+      pushCall(response.tool, response.arguments, response.tool_call_id);
+    }
+
+    const fromMessage = (response.message?.tool_calls ?? response.message?.toolCalls) as RawToolCall[] | undefined;
+    if (Array.isArray(fromMessage)) {
+      for (const rawCall of fromMessage) {
+        const name = (rawCall as any)?.function?.name ?? (rawCall as any)?.name;
+        const argsSource = (rawCall as any)?.function?.arguments ?? (rawCall as any)?.arguments;
+        pushCall(name, argsSource, rawCall.id, rawCall);
+      }
+    }
+
+    return {
+      calls: parsedCalls,
+      rawToolCalls: rawToolCalls.length ? rawToolCalls : undefined,
+      hadToolIntent,
+    };
   }
 
   // Safely parse tool arguments (stringified JSON or object).
@@ -289,6 +420,20 @@ export class AgentService {
     return raw;
   }
 
+  private stringifyToolArguments(raw: any): string {
+    if (raw == null) {
+      return '{}';
+    }
+    if (typeof raw === 'string') {
+      return raw;
+    }
+    try {
+      return JSON.stringify(raw);
+    } catch {
+      return String(raw);
+    }
+  }
+
   // Attach PRO/user id headers so the backend can apply auth/context.
   private buildProHeaders(): Record<string, string> | undefined {
     const userId = this.revenuecat.getUserId();
@@ -300,49 +445,103 @@ export class AgentService {
     };
   }
 
-  private appendAssistantFromModel(response: AgentModelResponse): AgentMessage {
-    const hasToolCalls = Array.isArray((response.message as any)?.tool_calls);
-    let content = response.message?.content || response.content || '';
-    const processingMessage =
-      hasToolCalls && !content
-        ? this.createMessage('assistant', this.t('agent.messages.processing'), response.error ? 'error' : 'ok')
-        : null;
+  private shouldRetryModel(error: AgentModelCallError, attempt: number): boolean {
+    if (attempt >= this.maxTransientRetries) {
+      return false;
+    }
+    if (error.timeout) {
+      return true;
+    }
+    if (typeof error.status === 'number' && this.transientStatusCodes.has(error.status)) {
+      return true;
+    }
+    return false;
+  }
 
-    if (processingMessage) {
-      this.messagesSignal.update(history => [...history, processingMessage]);
+  private normalizeHttpError(err: any): AgentModelCallError {
+    const defaultMessage = this.t('agent.messages.callFailed');
+    let normalized: AgentModelCallError;
+    if (err instanceof Error) {
+      normalized = err as AgentModelCallError;
+    } else {
+      normalized = new Error(typeof err === 'string' ? err : defaultMessage) as AgentModelCallError;
     }
 
-    // If we have actual content (final answer), append it and drop the processing placeholder.
+    const status =
+      (err as HttpErrorResponse)?.status ??
+      err?.status ??
+      err?.statusCode ??
+      err?.response?.status ??
+      null;
+    if (typeof status === 'number') {
+      normalized.status = status;
+    }
+    if ((err as any)?.name === 'TimeoutError') {
+      normalized.timeout = true;
+    }
+    if (!normalized.userMessage) {
+      normalized.userMessage = defaultMessage;
+    }
+    return normalized;
+  }
+
+  private buildUserFacingError(key: string): AgentModelCallError {
+    const message = this.t(key);
+    const error = new Error(message) as AgentModelCallError;
+    error.userMessage = message;
+    return error;
+  }
+
+  private createUnifiedErrorMessage(): AgentMessage {
+    return this.createMessage('assistant', this.t('agent.messages.unifiedError'), 'error');
+  }
+
+  private appendAssistantFromModel(response: AgentModelResponse, rawToolCalls?: RawToolCall[]): AgentMessage {
+    const toolCalls =
+      rawToolCalls ??
+      (Array.isArray((response.message as any)?.tool_calls)
+        ? (response.message as any).tool_calls
+        : undefined);
+    const hasToolCalls = Boolean(toolCalls?.length);
+    const content = response.message?.content || response.content || '';
+    const processingLabel = this.t('agent.messages.processing');
+
+    if (hasToolCalls && !content) {
+      // Preserve assistant placeholder with tool_calls to satisfy OpenAI's requirement:
+      // the matching tool result must reference these ids, so we never drop this message.
+      const processingMessage = this.createMessage(
+        'assistant',
+        processingLabel,
+        response.error ? 'error' : 'ok'
+      );
+      processingMessage.toolCalls = toolCalls;
+      processingMessage.uiHidden = true;
+      this.messagesSignal.update(history => this.appendWithoutDuplicate(history, processingMessage));
+      return processingMessage;
+    }
+
     if (content) {
       const assistantMessage = this.createMessage('assistant', content, response.error ? 'error' : 'ok');
-      if (hasToolCalls) {
-        assistantMessage.toolCalls = (response.message as any).tool_calls;
+      if (hasToolCalls && toolCalls) {
+        assistantMessage.toolCalls = toolCalls;
       }
-      this.messagesSignal.update(history =>
-        [
-          ...history.filter(msg =>
-            msg !== processingMessage &&
-            !(msg.role === 'assistant' && msg.content === this.t('agent.messages.processing'))
-          ),
-          assistantMessage,
-        ]
-      );
+      this.messagesSignal.update(history => this.appendWithoutDuplicate(history, assistantMessage));
       return assistantMessage;
     }
 
-    // No content and no tool calls: fallback message
     const fallback = this.createMessage(
       'assistant',
       response.error || this.t('agent.messages.noResponse'),
       response.error ? 'error' : 'ok'
     );
-    this.messagesSignal.update(history => [...history, fallback]);
+    this.messagesSignal.update(history => this.appendWithoutDuplicate(history, fallback));
     return fallback;
   }
 
   private async executeToolCall(call: AgentToolCall): Promise<ToolExecution> {
     const validation = this.sanitizeToolCall(call);
     if (!validation.success && validation.message) {
+      this.emitAgentTelemetry('tool_call_failed', { tool: call.name, reason: 'validation' });
       return {
         tool: call.name,
         success: false,
@@ -350,44 +549,69 @@ export class AgentService {
       };
     }
 
+    let execution: ToolExecution;
+
     switch (call.name) {
       case 'addProduct':
-        return this.wrapToolResult(call.name, await this.handleAddProduct(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleAddProduct(call.arguments));
+        break;
       case 'adjustQuantity':
-        return this.wrapToolResult(call.name, await this.handleAdjustQuantity(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleAdjustQuantity(call.arguments));
+        break;
       case 'deleteProduct':
-        return this.wrapToolResult(call.name, await this.handleDeleteProduct(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleDeleteProduct(call.arguments));
+        break;
       case 'moveProduct':
-        return this.wrapToolResult(call.name, await this.handleMoveProduct(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleMoveProduct(call.arguments));
+        break;
       case 'getExpiringSoon':
-        return this.wrapToolResult(call.name, await this.handleGetExpiringSoon(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleGetExpiringSoon(call.arguments));
+        break;
       case 'getRecipesWith':
-        return this.wrapToolResult(call.name, await this.handleGetRecipes(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleGetRecipes(call.arguments));
+        break;
       case 'getProducts':
-        return this.wrapToolResult(call.name, await this.handleGetProducts());
+        execution = this.wrapToolResult(call.name, await this.handleGetProducts());
+        break;
       case 'listByLocation':
-        return this.wrapToolResult(call.name, await this.handleListByLocation(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleListByLocation(call.arguments));
+        break;
       case 'markOpened':
-        return this.wrapToolResult(call.name, await this.handleMarkOpened(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleMarkOpened(call.arguments));
+        break;
       case 'getCategories':
-        return this.wrapToolResult(call.name, await this.handleGetCategories());
+        execution = this.wrapToolResult(call.name, await this.handleGetCategories());
+        break;
       case 'getLocations':
-        return this.wrapToolResult(call.name, await this.handleGetLocations());
+        execution = this.wrapToolResult(call.name, await this.handleGetLocations());
+        break;
       case 'getHistory':
-        return this.wrapToolResult(call.name, await this.handleGetHistory(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleGetHistory(call.arguments));
+        break;
       case 'getSuggestions':
-        return this.wrapToolResult(call.name, await this.handleGetSuggestions(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleGetSuggestions(call.arguments));
+        break;
       case 'updateProductInfo':
-        return this.wrapToolResult(call.name, await this.handleUpdateProductInfo(call.arguments));
+        execution = this.wrapToolResult(call.name, await this.handleUpdateProductInfo(call.arguments));
+        break;
       default: {
         const message = this.createMessage(
           'assistant',
           this.t('agent.messages.toolUnavailable', { name: call.name }),
           'error',
         );
-        return { tool: call.name, success: false, message };
+        execution = { tool: call.name, success: false, message };
+        break;
       }
     }
+
+    if (execution.success) {
+      this.queueSilentConfirmation(call.name);
+    } else {
+      this.emitAgentTelemetry('tool_call_failed', { tool: call.name });
+    }
+
+    return execution;
   }
 
   // Normalize tool handler outputs into a ToolExecution with tool metadata.
@@ -402,6 +626,15 @@ export class AgentService {
         toolCallId: result.message.toolCallId ?? result.id,
       },
     };
+  }
+
+  private hasToolResult(toolCallId?: string): boolean {
+    if (!toolCallId) {
+      return false;
+    }
+    return this.messagesSignal().some(
+      msg => msg.role === 'tool' && msg.toolCallId === toolCallId
+    );
   }
 
   private sanitizeToolCall(call: AgentToolCall): { success: boolean; message?: AgentMessage } {
@@ -1576,6 +1809,77 @@ export class AgentService {
     this.http
       .post(endpoint, { event, payload, timestamp: new Date().toISOString() })
       .subscribe({ error: () => undefined });
+  }
+
+  private emitAgentTelemetry(event: 'agent_success' | 'agent_error' | 'tool_call_failed', payload?: Record<string, any>): void {
+    this.logAgentIssue(event, payload);
+  }
+
+  private setAgentPhase(phase: AgentPhase): void {
+    this.agentPhaseSignal.set(phase);
+    this.thinking.set(phase !== 'idle');
+  }
+
+  private setRetryAvailable(value: boolean): void {
+    this.retryAvailable.set(value);
+  }
+
+  private findLastUserMessageIndex(history: AgentMessage[]): number {
+    for (let i = history.length - 1; i >= 0; i -= 1) {
+      if (history[i]?.role === 'user') {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private isVisibleMessage(message: AgentMessage): boolean {
+    if (message.uiHidden) {
+      return false;
+    }
+    if (message.role === 'tool') {
+      return false;
+    }
+    return true;
+  }
+
+  private queueSilentConfirmation(toolName: string): void {
+    const translationKey = this.actionToastMap.get(toolName);
+    if (!translationKey) {
+      return;
+    }
+    void this.presentConfirmationToast(translationKey);
+  }
+
+  private async presentConfirmationToast(translationKey: string): Promise<void> {
+    try {
+      const toast = await this.toastController.create({
+        message: this.t(translationKey),
+        duration: 2200,
+        position: 'bottom',
+        color: 'success',
+        animated: true,
+      });
+      await toast.present();
+    } catch {
+      // Ignore toast failures; they are purely cosmetic.
+    }
+  }
+
+  private appendWithoutDuplicate(history: AgentMessage[], message: AgentMessage): AgentMessage[] {
+    if (!history.length) {
+      return [...history, message];
+    }
+    const last = history[history.length - 1];
+    if (
+      last.role === message.role &&
+      last.content === message.content &&
+      !last.toolCalls?.length &&
+      !message.toolCalls?.length
+    ) {
+      return [...history.slice(0, -1), message];
+    }
+    return [...history, message];
   }
 
   private delay(ms: number): Promise<void> {
