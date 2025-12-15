@@ -211,9 +211,15 @@
   "agent": {
     "title": "Agente",
     "thinking": "Pensando…",
+    "states": {
+      "thinking": "Pensando…",
+      "fetching": "Consultando tu despensa…",
+      "responding": "Generando respuesta…"
+    },
     "placeholder": "Escribe instrucciones como \"Mueve 2 yogures al frigo\"",
     "actions": {
-      "send": "Enviar"
+      "send": "Enviar",
+      "retry": "Reintentar"
     },
     "preview": {
       "badge": "Vista previa",
@@ -235,7 +241,8 @@
       "noEndpoint": "No hay endpoint configurado para el agente.",
       "callFailed": "Parece que la conexión con el asistente tuvo un problema temporal. Inténtalo de nuevo en unos segundos.",
       "incompleteToolCall": "No pude completar la acción porque faltan datos. Reformula la instrucción o inténtalo otra vez.",
-      "toolUnavailable": "La herramienta \"{{ name }}\" no está disponible."
+      "toolUnavailable": "La herramienta \"{{ name }}\" no está disponible.",
+      "unifiedError": "El asistente no pudo responder en este momento. Inténtalo de nuevo en unos segundos."
     },
     "errors": {
       "missingName": "Falta el nombre del producto.",
@@ -311,6 +318,15 @@
       "suggestionsNearExpiryList": "Por caducar: {{ value }}",
       "suggestionsLowList": "Bajo stock: {{ value }}",
       "suggestionsBasicsList": "Básicos a revisar: {{ value }}"
+    },
+    "toasts": {
+      "addProduct": "Producto añadido a la despensa.",
+      "adjustQuantity": "Stock actualizado.",
+      "deleteProduct": "Producto eliminado.",
+      "moveProduct": "Movimiento registrado.",
+      "markOpened": "Producto marcado como abierto.",
+      "updateProductInfo": "Información del producto actualizada.",
+      "generic": "Acción aplicada."
     }
   },
   "pantry": {
