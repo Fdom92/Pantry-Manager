@@ -1,6 +1,13 @@
 import type { PantryItem, ItemBatch } from '@core/models';
 
 export type AgentRole = 'user' | 'assistant' | 'tool';
+export type AgentPhase = 'idle' | 'thinking' | 'fetching' | 'responding';
+
+export type AgentModelCallError = Error & {
+  status?: number;
+  userMessage?: string;
+  timeout?: boolean;
+};
 
 export interface AgentMessage {
   id: string;
@@ -10,8 +17,9 @@ export interface AgentMessage {
   modelContent?: string;
   toolName?: string;
   toolCallId?: string;
-  toolCalls?: any[];
+  toolCalls?: RawToolCall[];
   status?: 'ok' | 'error';
+  uiHidden?: boolean;
   data?: {
     summary?: string;
     details?: string[];
@@ -26,14 +34,16 @@ export interface AgentToolCall {
   arguments: Record<string, any>;
 }
 
-export type RawToolCall =
-  | AgentToolCall
-  | {
-      id?: string;
-      function?: { name: string; arguments?: string | Record<string, any> };
-      name?: string;
-      arguments?: string | Record<string, any>;
-    };
+export interface RawToolCall {
+  id?: string;
+  type?: 'function';
+  name?: string;
+  arguments?: string | Record<string, any>;
+  function?: {
+    name?: string;
+    arguments?: string | Record<string, any>;
+  };
+}
 
 export interface AgentToolDefinition {
   name: string;
@@ -50,7 +60,7 @@ export interface AgentModelMessage {
   content: string;
   name?: string;
   tool_call_id?: string;
-  tool_calls?: any[];
+  tool_calls?: RawToolCall[];
 }
 
 export interface AgentModelRequest {
@@ -65,11 +75,8 @@ export interface AgentModelResponse {
   message?: {
     content?: string;
     tool_call_id?: string;
-    toolCalls?: AgentToolCall[];
-    tool_calls?: Array<{
-      id?: string;
-      function?: { name: string; arguments?: string | Record<string, any> };
-    }>;
+    toolCalls?: RawToolCall[];
+    tool_calls?: RawToolCall[];
   };
   tool?: string;
   tool_call_id?: string;

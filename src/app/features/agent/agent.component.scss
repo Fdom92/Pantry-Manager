@@ -128,6 +128,12 @@
   }
 }
 
+.message__actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .thinking {
   display: flex;
   align-items: center;
