@@ -179,7 +179,12 @@ export class AgentService {
         }
         const result = await this.executeToolCall(call);
         // Keep the tool result message with the call id to satisfy OpenAI API requirements
-        result.message.toolCallId = call.id ?? result.message.toolCallId;
+        const normalizedToolCallId = this.normalizeToolCallId(call.id ?? result.message.toolCallId);
+        result.message.toolCallId = normalizedToolCallId;
+        if (!result.message.toolCallId) {
+          console.warn('[AgentService] Tool result without toolCallId skipped', result);
+          continue;
+        }
         this.messagesSignal.update(history => this.appendWithoutDuplicate(history, result.message));
       }
       this.setAgentPhase('thinking');
@@ -339,16 +344,25 @@ export class AgentService {
 
     const ensureToolCallId = (candidate?: string): string => {
       const trimmed = (candidate ?? '').trim();
-      if (trimmed && !usedIds.has(trimmed)) {
-        usedIds.add(trimmed);
-        return trimmed;
+      if (trimmed) {
+        const normalized = this.normalizeToolCallId(trimmed);
+        if (candidate && candidate.length > 40 && candidate !== normalized) {
+          console.warn('[AgentService] Tool call id truncated', {
+            original: candidate,
+            normalized,
+          });
+        }
+        if (!usedIds.has(normalized)) {
+          usedIds.add(normalized);
+          return normalized;
+        }
       }
-      let generated = '';
+      let regenerated: string;
       do {
-        generated = createDocumentId('toolcall');
-      } while (usedIds.has(generated));
-      usedIds.add(generated);
-      return generated;
+        regenerated = this.normalizeToolCallId(createDocumentId('toolcall'));
+      } while (usedIds.has(regenerated));
+      usedIds.add(regenerated);
+      return regenerated;
     };
 
     const pushCall = (name?: string, argsSource?: any, idCandidate?: string, rawSource?: RawToolCall): void => {
@@ -432,6 +446,20 @@ export class AgentService {
     } catch {
       return String(raw);
     }
+  }
+
+  private normalizeToolCallId(rawId?: string): string {
+    if (!rawId) {
+      return `tool_${Date.now().toString(36)}`;
+    }
+    if (rawId.length <= 40) {
+      return rawId;
+    }
+    const hash = rawId
+      .split('')
+      .reduce((acc, c) => ((acc << 5) - acc + c.charCodeAt(0)) | 0, 0)
+      .toString(36);
+    return `tool_${hash}`.slice(0, 40);
   }
 
   // Attach PRO/user id headers so the backend can apply auth/context.
