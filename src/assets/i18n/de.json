@@ -211,9 +211,15 @@
   "agent": {
     "title": "Agent",
     "thinking": "Thinking…",
+    "states": {
+      "thinking": "Denkt nach…",
+      "fetching": "Prüft deine Vorratskammer…",
+      "responding": "Generiert die Antwort…"
+    },
     "placeholder": "Write instructions like \"Move 2 yogurts to the fridge\"",
     "actions": {
-      "send": "Send"
+      "send": "Send",
+      "retry": "Erneut versuchen"
     },
     "preview": {
       "badge": "Preview",
@@ -235,7 +241,8 @@
       "noEndpoint": "Agent endpoint is not configured.",
       "callFailed": "Die Verbindung zum Assistenten hatte offenbar ein temporäres Problem. Bitte versuch es in wenigen Sekunden erneut.",
       "incompleteToolCall": "Der Assistent konnte nicht alle benötigten Daten sammeln, um die Aktion auszuführen. Formuliere die Anweisung neu oder versuche es erneut.",
-      "toolUnavailable": "Tool \"{{ name }}\" is not available."
+      "toolUnavailable": "Tool \"{{ name }}\" is not available.",
+      "unifiedError": "Der Assistent konnte gerade nicht antworten. Versuche es in ein paar Sekunden erneut."
     },
     "errors": {
       "missingName": "Product name is required.",
@@ -311,6 +318,15 @@
       "suggestionsNearExpiryList": "Läuft bald ab: {{ value }}",
       "suggestionsLowList": "Niedriger Bestand: {{ value }}",
       "suggestionsBasicsList": "Grundbedarf: {{ value }}"
+    },
+    "toasts": {
+      "addProduct": "Produkt zur Vorratskammer hinzugefügt.",
+      "adjustQuantity": "Bestand aktualisiert.",
+      "deleteProduct": "Produkt gelöscht.",
+      "moveProduct": "Bewegung erfasst.",
+      "markOpened": "Produkt als geöffnet markiert.",
+      "updateProductInfo": "Produktinfo aktualisiert.",
+      "generic": "Aktion ausgeführt."
     }
   },
   "pantry": {

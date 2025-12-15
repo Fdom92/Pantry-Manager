@@ -53,6 +53,8 @@ export class AgentComponent implements OnDestroy {
 
   readonly messages = this.agentService.messages;
   readonly thinking = this.agentService.thinking;
+  readonly agentPhase = this.agentService.agentPhase;
+  readonly canRetry = this.agentService.canRetry;
   readonly isPro$ = this.revenuecat.isPro$;
   readonly previewMessages: AgentMessage[] = [
     {
@@ -137,5 +139,13 @@ export class AgentComponent implements OnDestroy {
 
   async goToUpgrade(): Promise<void> {
     await this.navCtrl.navigateForward('/upgrade');
+  }
+
+  async retry(): Promise<void> {
+    if (!this.canRetry()) {
+      return;
+    }
+    await this.agentService.retryLastUserMessage();
+    await this.scrollToBottom();
   }
 }
