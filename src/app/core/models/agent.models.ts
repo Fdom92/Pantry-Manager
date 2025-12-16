@@ -52,6 +52,7 @@ export interface AgentToolDefinition {
     type: 'object';
     properties: Record<string, any>;
     required?: string[];
+    additionalProperties: boolean;
   };
 }
 
