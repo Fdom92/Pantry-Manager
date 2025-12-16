@@ -137,10 +137,36 @@ export class AgentService {
     let latestAssistant: AgentMessage | null = null;
     let safetyCounter = 0;
     let retriedAfterIncomplete = false;
+    let pendingAssistantWithTools: AgentMessage | null = null;
 
     while (safetyCounter < 4) {
       safetyCounter += 1;
       this.setAgentPhase('thinking');
+      const history = this.messagesSignal();
+      // If a previous assistant turn asked for tool work, wait until every tool response is present.
+      if (
+        pendingAssistantWithTools?.toolCalls?.length &&
+        !this.hasAllToolResults(pendingAssistantWithTools, history)
+      ) {
+        console.warn('[AgentService] Missing tool results, forcing execution');
+        await this.delay(50);
+        continue;
+      }
+      const lastAssistantWithTools = this.findLastAssistantWithToolCalls(history);
+      /**
+       * OPENAI CONTRACT RULE:
+       * Every assistant message with tool_calls MUST be followed
+       * by one tool message per tool_call_id BEFORE calling the model again.
+       * This message MUST stay in the history.
+       */
+      if (
+        lastAssistantWithTools &&
+        !this.hasAllToolResults(lastAssistantWithTools, history)
+      ) {
+        throw new Error(
+          'Spec violation: assistant with tool_calls without matching tool results'
+        );
+      }
       // Build payload with history + tool definitions
       const response = await this.callModel(await this.buildModelRequest());
       const extraction = this.extractToolCalls(response);
@@ -169,6 +195,7 @@ export class AgentService {
         }
         throw this.buildUserFacingError('agent.messages.unifiedError');
       }
+      pendingAssistantWithTools = assistantMessage.toolCalls?.length ? assistantMessage : null;
       retriedAfterIncomplete = false;
       this.setAgentPhase('fetching');
 
@@ -186,6 +213,12 @@ export class AgentService {
           continue;
         }
         this.messagesSignal.update(history => this.appendWithoutDuplicate(history, result.message));
+      }
+      if (assistantMessage.toolCalls?.length) {
+        const complete = this.hasAllToolResults(assistantMessage, this.messagesSignal());
+        if (complete) {
+          pendingAssistantWithTools = null;
+        }
       }
       this.setAgentPhase('thinking');
       // Loop will call the model again with the new tool results
@@ -271,25 +304,31 @@ export class AgentService {
 
   // Convert UI messages into the format expected by the model/tool API.
   private toModelMessage(message: AgentMessage): AgentModelMessage | null {
-    const content = message.modelContent ?? message.content;
-    if (!content.trim()) {
-      return null;
-    }
+    // TOOL messages
     if (message.role === 'tool') {
       return {
         role: 'tool',
-        name: message.toolName,
-        tool_call_id: message.toolCallId,
-        content,
+        name: message.toolName!,
+        tool_call_id: message.toolCallId!,
+        content: message.modelContent ?? message.content ?? '',
       };
     }
-    if (message.role === 'assistant' && Array.isArray(message.toolCalls) && message.toolCalls.length) {
+
+    // ASSISTANT with tool_calls (MUST ALWAYS PASS)
+    if (message.role === 'assistant' && Array.isArray(message.toolCalls)) {
       return {
         role: 'assistant',
-        content,
+        content: message.modelContent ?? message.content ?? '',
         tool_calls: message.toolCalls,
-      } as any;
+      };
     }
+
+    // NORMAL messages
+    const content = message.modelContent ?? message.content;
+    if (!content || !content.trim()) {
+      return null;
+    }
+
     return {
       role: message.role,
       content,
@@ -531,21 +570,20 @@ export class AgentService {
         ? (response.message as any).tool_calls
         : undefined);
     const hasToolCalls = Boolean(toolCalls?.length);
-    const content = response.message?.content || response.content || '';
-    const processingLabel = this.t('agent.messages.processing');
+    const content = response.message?.content ?? response.content ?? '';
 
-    if (hasToolCalls && !content) {
-      // Preserve assistant placeholder with tool_calls to satisfy OpenAI's requirement:
-      // the matching tool result must reference these ids, so we never drop this message.
-      const processingMessage = this.createMessage(
+    if (hasToolCalls) {
+      // Even when the model omits natural language content, keep this assistant entry (UI hides it)
+      // so that subsequent tool messages have a stable tool_call_id anchor.
+      const assistant = this.createMessage(
         'assistant',
-        processingLabel,
+        content ?? '',
         response.error ? 'error' : 'ok'
       );
-      processingMessage.toolCalls = toolCalls;
-      processingMessage.uiHidden = true;
-      this.messagesSignal.update(history => this.appendWithoutDuplicate(history, processingMessage));
-      return processingMessage;
+      assistant.toolCalls = toolCalls;
+      assistant.uiHidden = true; // solo UI
+      this.messagesSignal.update(history => this.appendWithoutDuplicate(history, assistant));
+      return assistant;
     }
 
     if (content) {
@@ -579,58 +617,63 @@ export class AgentService {
 
     let execution: ToolExecution;
 
-    switch (call.name) {
-      case 'addProduct':
-        execution = this.wrapToolResult(call.name, await this.handleAddProduct(call.arguments));
-        break;
-      case 'adjustQuantity':
-        execution = this.wrapToolResult(call.name, await this.handleAdjustQuantity(call.arguments));
-        break;
-      case 'deleteProduct':
-        execution = this.wrapToolResult(call.name, await this.handleDeleteProduct(call.arguments));
-        break;
-      case 'moveProduct':
-        execution = this.wrapToolResult(call.name, await this.handleMoveProduct(call.arguments));
-        break;
-      case 'getExpiringSoon':
-        execution = this.wrapToolResult(call.name, await this.handleGetExpiringSoon(call.arguments));
-        break;
-      case 'getRecipesWith':
-        execution = this.wrapToolResult(call.name, await this.handleGetRecipes(call.arguments));
-        break;
-      case 'getProducts':
-        execution = this.wrapToolResult(call.name, await this.handleGetProducts());
-        break;
-      case 'listByLocation':
-        execution = this.wrapToolResult(call.name, await this.handleListByLocation(call.arguments));
-        break;
-      case 'markOpened':
-        execution = this.wrapToolResult(call.name, await this.handleMarkOpened(call.arguments));
-        break;
-      case 'getCategories':
-        execution = this.wrapToolResult(call.name, await this.handleGetCategories());
-        break;
-      case 'getLocations':
-        execution = this.wrapToolResult(call.name, await this.handleGetLocations());
-        break;
-      case 'getHistory':
-        execution = this.wrapToolResult(call.name, await this.handleGetHistory(call.arguments));
-        break;
-      case 'getSuggestions':
-        execution = this.wrapToolResult(call.name, await this.handleGetSuggestions(call.arguments));
-        break;
-      case 'updateProductInfo':
-        execution = this.wrapToolResult(call.name, await this.handleUpdateProductInfo(call.arguments));
-        break;
-      default: {
-        const message = this.createMessage(
-          'assistant',
-          this.t('agent.messages.toolUnavailable', { name: call.name }),
-          'error',
-        );
-        execution = { tool: call.name, success: false, message };
-        break;
+    try {
+      switch (call.name) {
+        case 'addProduct':
+          execution = this.wrapToolResult(call.name, await this.handleAddProduct(call.arguments));
+          break;
+        case 'adjustQuantity':
+          execution = this.wrapToolResult(call.name, await this.handleAdjustQuantity(call.arguments));
+          break;
+        case 'deleteProduct':
+          execution = this.wrapToolResult(call.name, await this.handleDeleteProduct(call.arguments));
+          break;
+        case 'moveProduct':
+          execution = this.wrapToolResult(call.name, await this.handleMoveProduct(call.arguments));
+          break;
+        case 'getExpiringSoon':
+          execution = this.wrapToolResult(call.name, await this.handleGetExpiringSoon(call.arguments));
+          break;
+        case 'getRecipesWith':
+          execution = this.wrapToolResult(call.name, await this.handleGetRecipes(call.arguments));
+          break;
+        case 'getProducts':
+          execution = this.wrapToolResult(call.name, await this.handleGetProducts());
+          break;
+        case 'listByLocation':
+          execution = this.wrapToolResult(call.name, await this.handleListByLocation(call.arguments));
+          break;
+        case 'markOpened':
+          execution = this.wrapToolResult(call.name, await this.handleMarkOpened(call.arguments));
+          break;
+        case 'getCategories':
+          execution = this.wrapToolResult(call.name, await this.handleGetCategories());
+          break;
+        case 'getLocations':
+          execution = this.wrapToolResult(call.name, await this.handleGetLocations());
+          break;
+        case 'getHistory':
+          execution = this.wrapToolResult(call.name, await this.handleGetHistory(call.arguments));
+          break;
+        case 'getSuggestions':
+          execution = this.wrapToolResult(call.name, await this.handleGetSuggestions(call.arguments));
+          break;
+        case 'updateProductInfo':
+          execution = this.wrapToolResult(call.name, await this.handleUpdateProductInfo(call.arguments));
+          break;
+        default: {
+          const message = this.createMessage(
+            'assistant',
+            this.t('agent.messages.toolUnavailable', { name: call.name }),
+            'error',
+          );
+          execution = { tool: call.name, success: false, message };
+          break;
+        }
       }
+    } catch (err: any) {
+      console.error('[AgentService] Tool execution failed', err);
+      return this.buildToolFailureResult(call, err);
     }
 
     if (execution.success) {
@@ -656,6 +699,24 @@ export class AgentService {
     };
   }
 
+  private buildToolFailureResult(call: AgentToolCall, err: any): ToolExecution {
+    const message = this.createMessage(
+      'tool',
+      JSON.stringify({
+        error: 'Tool execution failed',
+        reason: err instanceof Error ? err.message : String(err ?? 'Unknown error'),
+      }),
+      'error',
+    );
+    message.toolName = call.name;
+    message.toolCallId = call.id;
+    return {
+      tool: call.name,
+      success: false,
+      message,
+    };
+  }
+
   private hasToolResult(toolCallId?: string): boolean {
     if (!toolCallId) {
       return false;
@@ -663,6 +724,27 @@ export class AgentService {
     return this.messagesSignal().some(
       msg => msg.role === 'tool' && msg.toolCallId === toolCallId
     );
+  }
+
+  // Ensures every tool_call issued by an assistant turn has a corresponding tool message in history.
+  private hasAllToolResults(assistantMessage: AgentMessage, history: AgentMessage[]): boolean {
+    const calls = assistantMessage.toolCalls ?? [];
+    if (!calls.length) {
+      return true;
+    }
+    const results = history.filter(message => message.role === 'tool' && Boolean(message.toolCallId));
+    return calls.every(call => results.some(result => result.toolCallId === call.id));
+  }
+
+  // Walk history backwards to find the most recent assistant turn that issued tool_calls.
+  private findLastAssistantWithToolCalls(history: AgentMessage[]): AgentMessage | null {
+    for (let i = history.length - 1; i >= 0; i -= 1) {
+      const message = history[i];
+      if (message.role === 'assistant' && Array.isArray(message.toolCalls) && message.toolCalls.length) {
+        return message;
+      }
+    }
+    return null;
   }
 
   private sanitizeToolCall(call: AgentToolCall): { success: boolean; message?: AgentMessage } {
