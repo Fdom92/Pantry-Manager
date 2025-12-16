@@ -22,4 +22,19 @@ export const agentController = {
       return res.status(500).json({ error: 'Agent error' });
     }
   },
+
+  async telemetry(req: Request, res: Response) {
+    try {
+      const payload = req.body ?? {};
+      const { event, timestamp } = payload as { event?: string; timestamp?: string };
+      console.info('[agentController] telemetry', {
+        event: event ?? 'unknown',
+        timestamp,
+      });
+      return res.status(204).send();
+    } catch (err) {
+      console.error('[agentController] telemetry error', err);
+      return res.status(500).json({ error: 'Telemetry error' });
+    }
+  },
 };

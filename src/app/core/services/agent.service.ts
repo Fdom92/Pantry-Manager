@@ -1915,7 +1915,9 @@ export class AgentService {
       console.warn(`[AgentService] ${event}`, payload);
       return;
     }
-    const endpoint = `${this.apiUrl.replace(/\/$/, '')}/telemetry`;
+    const trimmedBase = this.apiUrl.replace(/\/$/, '');
+    const telemetryBase = trimmedBase.replace(/\/process$/, '');
+    const endpoint = `${telemetryBase}/telemetry`;
     this.http
       .post(endpoint, { event, payload, timestamp: new Date().toISOString() })
       .subscribe({ error: () => undefined });
