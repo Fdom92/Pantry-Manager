@@ -3,61 +3,57 @@ import { AgentToolDefinition } from '@core/models';
 export const AGENT_TOOLS_CATALOG: AgentToolDefinition[] = [
   {
     name: 'addProduct',
-    description:
-      'Añade un producto por nombre indicando cantidad, ubicación y datos opcionales como categoría o caducidad.',
+    description: 'Añade un producto indicando nombre, cantidad y ubicación.',
     parameters: {
       type: 'object',
       properties: {
         name: { type: 'string', description: 'Nombre del producto.' },
-        quantity: { type: 'number', description: 'Cantidad inicial (>0).' },
-        location: { type: 'string', description: 'Ubicación donde se guarda.' },
-        categoryId: { type: 'string', description: 'Categoría opcional.' },
-        expirationDate: { type: 'string', description: 'Fecha de caducidad ISO (opcional).' },
+        quantity: { type: 'number', description: 'Cantidad a añadir.' },
+        location: { type: 'string', description: 'Ubicación destino.' },
+        categoryId: { type: 'string', description: 'Identificador de categoría opcional.' },
+        expirationDate: { type: 'string', description: 'Fecha de caducidad en formato ISO 8601.' },
       },
       required: ['name', 'quantity', 'location'],
+      additionalProperties: false,
     },
   },
   {
     name: 'updateProductInfo',
-    description: 'Actualiza campos de un producto existente: nombre, categoría, supermercado, básico o umbral mínimo.',
+    description: 'Actualiza los metadatos de un producto existente.',
     parameters: {
       type: 'object',
       properties: {
-        name: { type: 'string', description: 'Producto a actualizar.' },
+        name: { type: 'string', description: 'Producto que se desea modificar.' },
         updates: {
           type: 'object',
-          description: 'Campos que se van a modificar.',
+          description: 'Campos que se actualizarán.',
           properties: {
-            newName: { type: 'string' },
-            categoryId: { type: 'string' },
-            supermarket: { type: 'string' },
-            isBasic: { type: 'boolean' },
-            minThreshold: { type: 'number' },
+            newName: { type: 'string', description: 'Nuevo nombre.' },
+            categoryId: { type: 'string', description: 'Categoría objetivo.' },
+            supermarket: { type: 'string', description: 'Supermercado asociado.' },
+            isBasic: { type: 'boolean', description: 'Marca si es un producto básico.' },
+            minThreshold: { type: 'number', description: 'Cantidad mínima deseada.' },
           },
+          additionalProperties: false,
         },
       },
       required: ['name', 'updates'],
+      additionalProperties: false,
     },
   },
   {
     name: 'adjustQuantity',
-    description:
-      'Modifica la cantidad de un producto (incremento o decremento) en una ubicación concreta, pudiendo indicar el lote.',
+    description: 'Ajusta la cantidad de un producto en una ubicación.',
     parameters: {
       type: 'object',
       properties: {
         name: { type: 'string', description: 'Producto a ajustar.' },
         location: { type: 'string', description: 'Ubicación donde se aplica el cambio.' },
-        quantityChange: {
-          type: 'number',
-          description: 'Delta a aplicar (p.ej. +2, -1).',
-        },
-        expirationDate: {
-          type: 'string',
-          description: 'Fecha del lote específico que se debe ajustar (opcional).',
-        },
+        quantityChange: { type: 'number', description: 'Cantidad a sumar o restar.' },
+        expirationDate: { type: 'string', description: 'Fecha de caducidad asociada al ajuste.' },
       },
-      required: ['name', 'location', 'quantityChange'],
+      required: ['name', 'quantityChange'],
+      additionalProperties: false,
     },
   },
   {
@@ -66,30 +62,26 @@ export const AGENT_TOOLS_CATALOG: AgentToolDefinition[] = [
     parameters: {
       type: 'object',
       properties: {
-        name: { type: 'string', description: 'Nombre exacto del producto.' },
+        name: { type: 'string', description: 'Nombre del producto a eliminar.' },
       },
       required: ['name'],
+      additionalProperties: false,
     },
   },
   {
     name: 'moveProduct',
-    description: 'Cambia un producto de una ubicación a otra (ej: de Despensa a Nevera) y permite limitarlo a un lote.',
+    description: 'Mueve un producto de una ubicación a otra.',
     parameters: {
       type: 'object',
       properties: {
         name: { type: 'string', description: 'Producto a mover.' },
         fromLocation: { type: 'string', description: 'Ubicación origen.' },
         toLocation: { type: 'string', description: 'Ubicación destino.' },
-        quantity: {
-          type: 'number',
-          description: 'Cantidad a mover (opcional, por defecto todo el stock).',
-        },
-        expirationDate: {
-          type: 'string',
-          description: 'Fecha del lote concreto a mover (opcional).',
-        },
+        quantity: { type: 'number', description: 'Cantidad a mover.' },
+        expirationDate: { type: 'string', description: 'Fecha de caducidad asociada.' },
       },
       required: ['name', 'fromLocation', 'toLocation'],
+      additionalProperties: false,
     },
   },
   {
@@ -98,30 +90,34 @@ export const AGENT_TOOLS_CATALOG: AgentToolDefinition[] = [
     parameters: {
       type: 'object',
       properties: {},
+      additionalProperties: false,
     },
   },
   {
     name: 'getRecipesWith',
-    description: 'Genera recetas usando los ingredientes proporcionados o los que caducan pronto.',
+    description:
+      'Genera recetas usando una lista explícita de ingredientes. Si la lista está vacía, se usarán productos próximos a caducar.',
     parameters: {
       type: 'object',
       properties: {
         ingredients: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Lista opcional de ingredientes prioritarios.',
+          description: 'Ingredientes a priorizar.',
         },
       },
+      additionalProperties: false,
     },
   },
   {
     name: 'getExpiringSoon',
-    description: 'Devuelve productos cuya caducidad es cercana.',
+    description: 'Devuelve productos próximos a caducar.',
     parameters: {
       type: 'object',
       properties: {
-        days: { type: 'number', description: 'Ventana en días a revisar (opcional).' },
+        days: { type: 'number', description: 'Ventana en días para considerar la caducidad.' },
       },
+      additionalProperties: false,
     },
   },
   {
@@ -130,9 +126,13 @@ export const AGENT_TOOLS_CATALOG: AgentToolDefinition[] = [
     parameters: {
       type: 'object',
       properties: {
-        location: { type: 'string' },
+        location: {
+          type: 'string',
+          description: 'Ubicación a consultar.',
+        },
       },
       required: ['location'],
+      additionalProperties: false,
     },
   },
   {
@@ -142,13 +142,11 @@ export const AGENT_TOOLS_CATALOG: AgentToolDefinition[] = [
       type: 'object',
       properties: {
         name: { type: 'string', description: 'Producto a marcar.' },
-        location: { type: 'string', description: 'Ubicación (opcional).' },
-        openedDate: {
-          type: 'string',
-          description: 'Fecha en ISO (opcional).',
-        },
+        location: { type: 'string', description: 'Ubicación del producto.' },
+        openedDate: { type: 'string', description: 'Fecha en la que se abrió el producto.' },
       },
       required: ['name'],
+      additionalProperties: false,
     },
   },
   {
@@ -157,6 +155,7 @@ export const AGENT_TOOLS_CATALOG: AgentToolDefinition[] = [
     parameters: {
       type: 'object',
       properties: {},
+      additionalProperties: false,
     },
   },
   {
@@ -165,6 +164,7 @@ export const AGENT_TOOLS_CATALOG: AgentToolDefinition[] = [
     parameters: {
       type: 'object',
       properties: {},
+      additionalProperties: false,
     },
   },
   {
@@ -176,6 +176,7 @@ export const AGENT_TOOLS_CATALOG: AgentToolDefinition[] = [
         name: { type: 'string', description: 'Producto cuyo historial se solicita.' },
       },
       required: ['name'],
+      additionalProperties: false,
     },
   },
   {
@@ -184,8 +185,9 @@ export const AGENT_TOOLS_CATALOG: AgentToolDefinition[] = [
     parameters: {
       type: 'object',
       properties: {
-        includeBasics: { type: 'boolean', description: 'Forzar que los básicos aparezcan si están bajos.' },
+        includeBasics: { type: 'boolean', description: 'Incluye productos básicos en las sugerencias.' },
       },
+      additionalProperties: false,
     },
   },
 ];
