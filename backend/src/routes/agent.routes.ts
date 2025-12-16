@@ -5,5 +5,6 @@ import { verifyPro } from '../middleware/verifyPro.js';
 const router = Router();
 
 router.post('/process', verifyPro, agentController.process);
+router.post('/telemetry', verifyPro, agentController.telemetry);
 
 export default router;

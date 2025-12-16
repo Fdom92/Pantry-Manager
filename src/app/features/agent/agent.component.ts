@@ -55,7 +55,7 @@ export class AgentComponent implements OnDestroy {
   readonly thinking = this.agentService.thinking;
   readonly agentPhase = this.agentService.agentPhase;
   readonly canRetry = this.agentService.canRetry;
-  readonly isPro$ = this.revenuecat.isPro$;
+  readonly canUseAgent$ = this.revenuecat.canUseAgent$;
   readonly previewMessages: AgentMessage[] = [
     {
       id: 'preview-user',
@@ -78,11 +78,11 @@ export class AgentComponent implements OnDestroy {
   });
 
   constructor() {
-    // Keep the composer enabled only for PRO users to avoid template disabled binding warnings.
-    this.isPro$
+    // Keep the composer enabled only for allowed users (PRO or override) to avoid template disabled binding warnings.
+    this.canUseAgent$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(isPro => {
-        if (isPro) {
+      .subscribe(isUnlocked => {
+        if (isUnlocked) {
           this.messageControl.enable({ emitEvent: false });
         } else {
           this.messageControl.disable({ emitEvent: false });
@@ -104,7 +104,7 @@ export class AgentComponent implements OnDestroy {
   }
 
   async send(): Promise<void> {
-    if (!this.revenuecat.isPro()) {
+    if (!this.revenuecat.canUseAgent()) {
       await this.goToUpgrade();
       return;
     }
