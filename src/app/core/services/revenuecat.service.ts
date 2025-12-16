@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-capacitor';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 const STORAGE_KEY = 'revenuecat:isPro';
@@ -14,6 +14,7 @@ export class RevenuecatService {
   private userId: string | null = null;
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());
   readonly isPro$: Observable<boolean> = this.proSubject.asObservable();
+  readonly canUseAgent$: Observable<boolean> = this.isPro$.pipe(map(isPro => isPro || !environment.production));
 
   async init(userId: string): Promise<void> {
     this.userId = userId;
@@ -173,6 +174,10 @@ export class RevenuecatService {
 
   isPro(): boolean {
     return this.proSubject.value;
+  }
+
+  canUseAgent(): boolean {
+    return !environment.production || this.isPro();
   }
 
   private extractIsPro(info: any): boolean | null {

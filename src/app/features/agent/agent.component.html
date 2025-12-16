@@ -1,11 +1,11 @@
-@let isPro = (isPro$ | async);
+@let canUseAgent = (canUseAgent$ | async);
 
 <ion-header>
   <ion-toolbar>
     <ion-title>
       <div class="agent-title">
         <span>{{ 'agent.title' | translate }}</span>
-        @if (isPro) {
+        @if (canUseAgent) {
           <ion-badge color="warning">
             {{ 'settings.pro.badgePro' | translate }}
           </ion-badge>
@@ -16,7 +16,7 @@
         }
       </div>
     </ion-title>
-    @if (isPro) {
+    @if (canUseAgent) {
       <ion-buttons slot="end">
         <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()" aria-label="{{ 'common.actions.clear' | translate }}">
           <ion-icon name="trash-outline"></ion-icon>
@@ -27,7 +27,7 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (isPro) {
+  @if (canUseAgent) {
     <div class="chat">
       @for (message of messages(); track trackById($index, message)) {
         <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-error]="message.status === 'error'">
@@ -107,16 +107,16 @@
 </ion-content>
 
 <ion-footer>
-  <div class="composer" [class.composer--locked]="!isPro">
+  <div class="composer" [class.composer--locked]="!canUseAgent">
     <ion-textarea
       class="composer__input"
-      [placeholder]="isPro ? ('agent.placeholder' | translate) : ('agent.preview.lockedPlaceholder' | translate)"
+      [placeholder]="canUseAgent ? ('agent.placeholder' | translate) : ('agent.preview.lockedPlaceholder' | translate)"
       autoGrow="true"
       [formControl]="messageControl"
       enterkeyhint="send">
     </ion-textarea>
     <div class="composer__actions">
-      <ion-button color="primary" (click)="isPro ? send() : null" [disabled]="!isPro || !messageControl.value.trim() || thinking()">
+      <ion-button color="primary" (click)="canUseAgent ? send() : null" [disabled]="!canUseAgent || !messageControl.value.trim() || thinking()">
         {{ 'agent.actions.send' | translate }}
       </ion-button>
     </div>
