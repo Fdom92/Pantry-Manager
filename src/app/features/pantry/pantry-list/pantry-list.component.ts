@@ -69,7 +69,7 @@ import {
 import { ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
-import { EmptyStateGenericComponent } from '../../shared/empty-states/empty-state-generic.component';
+import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 
 @Component({
   selector: 'app-pantry-list',

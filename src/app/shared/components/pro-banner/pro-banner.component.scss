@@ -1,0 +1,81 @@
+.pro-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(99, 102, 241, 0.22), transparent 32%),
+    radial-gradient(circle at 78% 12%, rgba(16, 185, 129, 0.18), transparent 28%),
+    linear-gradient(150deg, #0b1021 0%, #0f172a 60%, #0b1226 100%);
+  color: #f6f7fb;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.35);
+}
+
+.pro-banner__info {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.pro-banner--subtle {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(99, 102, 241, 0.12), transparent 32%),
+    radial-gradient(circle at 78% 12%, rgba(16, 185, 129, 0.11), transparent 28%),
+    linear-gradient(150deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.04));
+  color: #0f172a;
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow: none;
+}
+
+.pro-banner__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(251, 191, 36, 0.22);
+  display: grid;
+  place-items: center;
+  color: #fcd34d;
+  font-size: 24px;
+}
+
+.pro-banner--subtle .pro-banner__icon {
+  background: rgba(251, 191, 36, 0.28);
+  color: #b45309;
+}
+
+.pro-banner__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pro-banner__eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.pro-banner__message {
+  margin: 0;
+  font-weight: 700;
+  color: rgba(226, 232, 240, 0.92);
+}
+
+:host-context(.dark) .pro-banner--subtle {
+  color: #f6f7fb;
+  border-color: rgba(226, 232, 240, 0.2);
+  background:
+    radial-gradient(circle at 20% 24%, rgba(99, 102, 241, 0.22), transparent 40%),
+    radial-gradient(circle at 74% 14%, rgba(16, 185, 129, 0.16), transparent 32%),
+    linear-gradient(150deg, rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.45));
+}
+
+:host-context(.dark) .pro-banner--subtle .pro-banner__icon {
+  background: rgba(251, 191, 36, 0.35);
+  color: #fcd34d;
+}

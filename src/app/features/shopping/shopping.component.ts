@@ -15,7 +15,7 @@ import { PantryStoreService } from '@core/store/pantry-store.service';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
-import { EmptyStateGenericComponent } from '../shared/empty-states/empty-state-generic.component';
+import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
 
 type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;
