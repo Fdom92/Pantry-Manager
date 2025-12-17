@@ -2,6 +2,13 @@ ion-card + ion-card {
   margin-top: 16px;
 }
 
+.insights-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
 ion-card-title {
   font-size: 1.1rem;
   line-height: 1.2;

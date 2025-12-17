@@ -19,6 +19,7 @@ import {
   addOutline,
   alertCircleOutline,
   basketOutline,
+  bulbOutline,
   calendarOutline,
   cartOutline,
   chatbubblesOutline,
@@ -120,7 +121,8 @@ addIcons({
   'storefront-outline': storefrontOutline,
   'ellipsis-vertical-outline': ellipsisVerticalOutline,
   'share-outline': shareOutline,
-  'swap-horizontal-outline': swapHorizontalOutline
+  'swap-horizontal-outline': swapHorizontalOutline,
+  'bulb-outline': bulbOutline
 });
 
 bootstrapApplication(AppComponent, {

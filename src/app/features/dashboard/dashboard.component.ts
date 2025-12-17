@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { InsightService } from '@core/insights/insight.service';
+import { InsightTriggerService } from '@core/insights/insight-trigger.service';
+import { InsightCTA, InsightTrigger } from '@core/insights/insight.types';
 import { ES_DATE_FORMAT_OPTIONS, ItemLocationStock, PantryItem } from '@core/models';
 import { LanguageService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
@@ -24,7 +27,8 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EmptyStateGenericComponent } from '../shared/empty-states/empty-state-generic.component';
+import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
+import { EmptyStateGenericComponent } from '../../shared/components/empty-states/empty-state-generic.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -50,6 +54,7 @@ import { EmptyStateGenericComponent } from '../shared/empty-states/empty-state-g
     CommonModule,
     TranslateModule,
     EmptyStateGenericComponent,
+    InsightCardComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
@@ -65,6 +70,9 @@ export class DashboardComponent {
   readonly expiredItems = this.pantryStore.expiredItems;
   readonly summary = this.pantryStore.summary;
   readonly showSnapshot = signal(true);
+  readonly dashboardInsights = computed(() =>
+    this.insightService.getInsights(InsightTrigger.DASHBOARD)
+  );
 
   readonly totalItems = computed(() => this.summary().total);
   readonly recentItems = computed(() => this.computeRecentItems(this.items()));
@@ -73,6 +81,8 @@ export class DashboardComponent {
     private readonly pantryStore: PantryStoreService,
     private readonly translate: TranslateService,
     private readonly languageService: LanguageService,
+    private readonly insightService: InsightService,
+    private readonly insightTriggerService: InsightTriggerService,
   ) {
     effect(
       () => {
@@ -97,6 +107,8 @@ export class DashboardComponent {
     await this.pantryStore.loadAll();
     this.hasInitialized = true;
     this.lastUpdated.set(new Date().toISOString());
+    this.insightService.clearTrigger(InsightTrigger.DASHBOARD);
+    this.insightTriggerService.trigger(InsightTrigger.DASHBOARD);
   }
 
   get nearExpiryWindow(): number {
@@ -267,6 +279,15 @@ export class DashboardComponent {
 
   formatExpiryBadge(value?: string | null): string {
     return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
+  }
+
+  handleInsightAction(cta: InsightCTA): void {
+    if (cta.action === 'dismiss' && cta.payload?.insightId) {
+      this.insightService.dismissInsight(cta.payload.insightId);
+      return;
+    }
+    // Future actions (agent, navigation, etc.) will be orchestrated upstream.
+    console.debug('[DashboardComponent] Insight CTA selected', cta);
   }
 
   private formatDateWithOptions(
