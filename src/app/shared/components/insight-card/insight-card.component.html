@@ -1,0 +1,24 @@
+<div class="insight-card" [class.pro]="insight.proOnly">
+  <div class="insight-card__body">
+    <div class="insight-card__icon">
+      <ion-icon name="bulb-outline" aria-hidden="true"></ion-icon>
+    </div>
+    <div class="insight-card__content">
+      <p class="insight-card__eyebrow">Insight</p>
+      <h4>{{ insight.title }}</h4>
+      <p class="insight-card__message">{{ insight.message }}</p>
+    </div>
+  </div>
+
+  @if (insight.cta) {
+  <div class="insight-card__actions">
+    <ion-button
+      size="small"
+      fill="solid"
+      color="warning"
+      (click)="emitAction(insight.cta)">
+      {{ insight.cta.label }}
+    </ion-button>
+  </div>
+  }
+</div>

@@ -1,0 +1,76 @@
+.insight-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(99, 102, 241, 0.22), transparent 35%),
+    radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.2), transparent 32%),
+    linear-gradient(150deg, #0b1021 0%, #0f172a 60%, #0b1226 100%);
+  color: #f6f7fb;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.35);
+
+  &.pro {
+    border-color: rgba(251, 191, 36, 0.6);
+    background:
+      radial-gradient(circle at 20% 25%, rgba(251, 191, 36, 0.28), transparent 38%),
+      radial-gradient(circle at 78% 8%, rgba(16, 185, 129, 0.22), transparent 30%),
+      linear-gradient(150deg, #1c1405 0%, #0f172a 65%, #090d1c 100%);
+  }
+
+  &__body {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(251, 191, 36, 0.18);
+    display: grid;
+    place-items: center;
+    color: #fcd34d;
+    font-size: 24px;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.6rem;
+    font-weight: 700;
+    opacity: 0.85;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  &__message {
+    margin: 0;
+    font-size: 0.8rem;
+    color: rgba(226, 232, 240, 0.92);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  ion-button {
+    font-size: 0.8rem;
+  }
+}
