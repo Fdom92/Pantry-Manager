@@ -1,4 +1,4 @@
-import { BaseDoc } from './base-doc.model';
+import { BaseDoc } from "../shared";
 
 export type AppThemePreference = 'light' | 'dark' | 'system';
 export type DefaultUnitPreference = 'kg' | 'g' | 'l' | 'unit';

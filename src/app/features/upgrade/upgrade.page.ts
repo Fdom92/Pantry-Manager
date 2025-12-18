@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
+import { PlanViewModel } from '@core/models/upgrade';
 import { RevenuecatService } from '@core/services/revenuecat.service';
+import { NavController } from '@ionic/angular';
 import {
   IonBackButton,
   IonBadge,
@@ -11,27 +13,11 @@ import {
   IonNote,
   IonTitle,
   IonToolbar,
+  ToastController,
 } from '@ionic/angular/standalone';
-import { NavController } from '@ionic/angular';
-import { ToastController } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { PlanCardComponent } from './plan-card/plan-card.component';
-
-interface PlanViewModel {
-  id: string;
-  type: PACKAGE_TYPE;
-  title: string;
-  subtitle: string;
-  price: string;
-  period: string;
-  badge?: string | null;
-  savings?: string | null;
-  trialLabel?: string | null;
-  ctaLabel: string;
-  benefits: string[];
-  highlight: boolean;
-}
 
 @Component({
   selector: 'app-upgrade',
@@ -55,22 +41,21 @@ interface PlanViewModel {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpgradePage {
-  readonly isPro$ = this.revenuecat.isPro$;
-  readonly benefitKeys = ['upgrade.benefits.agent', 'upgrade.benefits.future'];
-
-  constructor(
-    private readonly navCtrl: NavController,
-    private readonly revenuecat: RevenuecatService,
-    private readonly toastCtrl: ToastController,
-    private readonly translate: TranslateService,
-    private readonly cdr: ChangeDetectorRef,
-  ) {}
-
+  // DI
+  private readonly navCtrl = inject(NavController);
+  private readonly revenuecat = inject(RevenuecatService);
+  private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  // Data
   plans: PlanViewModel[] = [];
   loadingPackages = false;
   purchasingId: string | null = null;
   private monthlyPrice: number | null = null;
   private annualPrice: number | null = null;
+  readonly isPro$ = this.revenuecat.isPro$;
+  readonly benefitKeys = ['upgrade.benefits.agent', 'upgrade.benefits.future'];
+  private readonly planPackages: PurchasesPackage[] = [];
 
   goBack(): void {
     this.navCtrl.back();
@@ -95,14 +80,6 @@ export class UpgradePage {
       return;
     }
     await this.presentToast('upgrade.errors.purchaseFailed');
-  }
-
-  private async loadPackages(): Promise<void> {
-    this.loadingPackages = true;
-    const packages = await this.revenuecat.getAvailablePackages();
-    this.buildPlans(packages);
-    this.loadingPackages = false;
-    this.cdr.markForCheck();
   }
 
   async purchase(pkg: PurchasesPackage | null): Promise<void> {
@@ -135,12 +112,18 @@ export class UpgradePage {
     void this.purchase(pkg);
   }
 
+  private async loadPackages(): Promise<void> {
+    this.loadingPackages = true;
+    const packages = await this.revenuecat.getAvailablePackages();
+    this.buildPlans(packages);
+    this.loadingPackages = false;
+    this.cdr.markForCheck();
+  }
+
   private findPackage(identifier: string): PurchasesPackage | null {
     const match = this.planPackages.find(p => p.identifier === identifier);
     return match ?? null;
   }
-
-  private readonly planPackages: PurchasesPackage[] = [];
 
   private buildPlans(packages: PurchasesPackage[]): void {
     this.planPackages.splice(0, this.planPackages.length, ...packages);

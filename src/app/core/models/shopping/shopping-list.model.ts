@@ -1,4 +1,5 @@
-import { BaseDoc } from './base-doc.model';
+import { PantryItem } from "../inventory";
+import { BaseDoc } from "../shared";
 
 export interface ShoppingList extends BaseDoc {
   type: 'shopping-list';
@@ -57,3 +58,7 @@ export interface ShoppingItem {
   suggestedQuantity?: number;
   locationId?: string;
 }
+
+export type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;
+export type ShoppingSuggestionGroupWithItem = ShoppingSuggestionGroup<PantryItem>;
+export type ShoppingStateWithItem = ShoppingState<PantryItem>;

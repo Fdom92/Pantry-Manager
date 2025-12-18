@@ -1,5 +1,4 @@
-import { BaseDoc } from './base-doc.model';
-import { LocationType } from './enums.model';
+import { BaseDoc, LocationType } from "../shared";
 
 export interface Location extends BaseDoc {
   type: 'location';

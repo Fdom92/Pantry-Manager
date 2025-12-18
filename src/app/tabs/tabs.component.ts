@@ -3,7 +3,7 @@ import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { IonTabBar, IonTabButton, IonTabs, IonIcon, IonLabel } from '@ionic/angular/standalone';
+import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
 
@@ -15,7 +15,10 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./tabs.component.scss'],
 })
 export class TabsComponent {
-  private readonly revenuecat = inject(RevenuecatService);
+  // DI
+  readonly revenuecat = inject(RevenuecatService);
+  // Signals
   readonly isPro = toSignal(this.revenuecat.isPro$, { initialValue: false });
+  // Computed Signals
   readonly canUseAgent = computed(() => !environment.production || this.isPro());
 }

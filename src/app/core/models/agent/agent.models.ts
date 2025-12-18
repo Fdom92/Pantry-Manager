@@ -1,4 +1,4 @@
-import type { PantryItem, ItemBatch } from '@core/models';
+import type { PantryItem } from '@core/models/inventory';
 
 export type AgentRole = 'user' | 'assistant' | 'tool';
 export type AgentPhase = 'idle' | 'thinking' | 'fetching' | 'responding';
@@ -89,9 +89,4 @@ export interface ToolExecution {
   tool: string;
   success: boolean;
   message: AgentMessage;
-}
-
-export interface MoveBatchesResult {
-  moved: ItemBatch[];
-  remaining: ItemBatch[];
 }

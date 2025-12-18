@@ -1,4 +1,4 @@
-import { AgentToolDefinition } from '@core/models';
+import { AgentToolDefinition } from '@core/models/agent';
 
 export const AGENT_TOOLS_CATALOG: AgentToolDefinition[] = [
   {

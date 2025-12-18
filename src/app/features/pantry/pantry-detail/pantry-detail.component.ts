@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models';
-import { ItemBatch, ItemLocationStock } from '@core/models';
+import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models/inventory';
+import { ItemBatch, ItemLocationStock } from '@core/models/inventory';
 import { IonButton, IonCard, IonIcon, IonItem, IonLabel, IonList, IonPopover, IonText } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -27,7 +27,6 @@ import { TranslateModule } from '@ngx-translate/core';
 export class PantryDetailComponent {
   @Input({ required: true }) viewModel!: PantryItemCardViewModel;
   @Input() expanded = false;
-
   @Output() toggleRequested = new EventEmitter<Event | undefined>();
   @Output() summaryKeydown = new EventEmitter<KeyboardEvent>();
   @Output() openBatches = new EventEmitter<Event | undefined>();

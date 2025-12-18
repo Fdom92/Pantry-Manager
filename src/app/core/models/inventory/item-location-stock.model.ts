@@ -5,3 +5,5 @@ export interface ItemLocationStock {
   unit: string;
   batches?: ItemBatch[];
 }
+
+export type LegacyLocationStock = ItemLocationStock & { minThreshold?: number | null };
