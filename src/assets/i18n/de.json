@@ -1,200 +1,200 @@
 {
   "tabs": {
-    "dashboard": "Home",
-    "pantry": "Pantry",
+    "dashboard": "Start",
+    "pantry": "Vorratskammer",
     "agent": "Agent",
-    "shopping": "Shopping",
-    "settings": "Settings"
+    "shopping": "Einkäufe",
+    "settings": "Einstellungen"
   },
   "pro": {
     "locked": "PRO",
     "banner": {
-      "title": "Exclusive for PRO",
-      "cta": "Go PRO",
-      "default": "Unlock AI-powered features and premium tools.",
-      "suggestions": "Generate AI-powered recipes tailored to your pantry.",
-      "pantry": "Optimize your pantry with AI recommendations.",
-      "shopping": "Smarter grocery planning with AI."
+      "title": "Nur für PRO",
+      "cta": "PRO werden",
+      "default": "Schalte erweiterte KI-Funktionen und Premium-Tools frei.",
+      "suggestions": "KI-Rezept mit deinen Zutaten erstellen.",
+      "pantry": "Vorratskammer mit KI optimieren.",
+      "shopping": "Intelligent einkaufen mit KI."
     }
   },
   "onboarding": {
-    "tagline": "Get set up in a minute",
+    "tagline": "In 1 Minute starten",
     "actions": {
-      "skip": "Skip",
-      "next": "Next",
-      "start": "Get started"
+      "skip": "Überspringen",
+      "next": "Weiter",
+      "start": "Starten"
     },
     "slides": {
       "organize": {
-        "title": "Organize your pantry effortlessly",
-        "description": "Add items in seconds with categories and locations that fit you."
+        "title": "Organisiere deine Vorratskammer mühelos",
+        "description": "Produkte in Sekunden erfassen, mit individuell angepassten Kategorien und Standorten."
       },
       "batches": {
-        "title": "Batch and expiry control",
-        "description": "Track batches, expiration dates, and get alerts before anything goes bad."
+        "title": "Chargen- und Haltbarkeitskontrolle",
+        "description": "Verwalte Chargen, Haltbarkeitsdaten und erhalte Warnungen, bevor etwas verdirbt."
       },
       "suggestions": {
-        "title": "Smart purchase suggestions",
-        "description": "Know what to restock based on usage, minimum stock, and upcoming expiries."
+        "title": "Intelligente Einkaufsvorschläge",
+        "description": "Zeigt dir, was nachgekauft werden sollte – basierend auf Verbrauch, Mindestbestand und nahendem Ablauf."
       },
       "agent": {
-        "title": "Unlock the AI Agent (PRO)",
-        "description": "Chat with your pantry, request recipes, and auto-generate shopping lists.",
-        "badge": "PRO exclusive",
-        "titlePro": "AI Agent ready for you",
-        "descriptionPro": "PRO unlocked: use the Agent for recipes, ideas, and faster lists.",
-        "badgePro": "PRO active"
+        "title": "KI-Agent freischalten (PRO)",
+        "description": "Chatte mit deiner Vorratskammer, fordere Rezepte an und erstelle Listen in Sekunden.",
+        "badge": "Exklusiv für PRO",
+        "titlePro": "KI-Agent bereit für dich",
+        "descriptionPro": "Du hast PRO-Zugriff: Nutze den Agenten für Rezepte, Ideen und Einkäufe.",
+        "badgePro": "PRO aktiv"
       }
     }
   },
   "common": {
     "actions": {
-      "close": "Close",
-      "cancel": "Cancel",
-      "save": "Save",
-      "apply": "Apply",
-      "clear": "Clear"
+      "close": "Schließen",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "apply": "Anwenden",
+      "clear": "Leeren"
     },
     "dates": {
-      "none": "No date"
+      "none": "Kein Datum"
     },
     "locations": {
-      "none": "No location"
+      "none": "Kein Standort"
     }
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Add product"
+      "addProduct": "Produkt hinzufügen"
     },
     "generic": {
-      "title": "Nothing to show",
-      "subtitle": "Adjust filters or add a product to get started."
+      "title": "Nichts anzuzeigen",
+      "subtitle": "Passe die Filter an oder füge ein Produkt hinzu, um zu beginnen."
     },
     "pantry": {
-      "title": "Pantry is empty",
-      "subtitle": "Add your first product to track stock and expirations."
+      "title": "Die Vorratskammer ist leer",
+      "subtitle": "Füge dein erstes Produkt hinzu und behalte Bestand und Haltbarkeit im Blick."
     },
     "shopping": {
-      "title": "Shopping list is clear",
-      "subtitle": "Nothing pending right now. I'll notify you when something needs restocking."
+      "title": "Einkaufsliste leer",
+      "subtitle": "Derzeit nichts zu erledigen. Ich informiere dich, wenn etwas nachgekauft werden muss."
     },
     "expired": {
-      "title": "Nothing expired",
-      "subtitle": "No expired products right now."
+      "title": "Nichts abgelaufen",
+      "subtitle": "Momentan gibt es keine abgelaufenen Produkte."
     }
   },
   "locations": {
-    "pantry": "Pantry",
-    "kitchen": "Kitchen",
-    "fridge": "Fridge",
-    "freezer": "Freezer",
-    "bathroom": "Bathroom",
-    "freezerDrawer": "Freezer drawer",
-    "cupboard": "Cupboard",
-    "cellar": "Cellar",
-    "other": "Other",
-    "unassigned": "No location"
+    "pantry": "Vorratskammer",
+    "kitchen": "Küche",
+    "fridge": "Kühlschrank",
+    "freezer": "Gefrierschrank",
+    "bathroom": "Badezimmer",
+    "freezerDrawer": "Gefrierfach",
+    "cupboard": "Schrank",
+    "cellar": "Keller",
+    "other": "Andere",
+    "unassigned": "Kein Standort"
   },
   "dashboard": {
-    "title": "Home",
-    "confirmDeleteExpired": "This will delete all expired products. Continue?",
+    "title": "Start",
+    "confirmDeleteExpired": "Dadurch werden alle abgelaufenen Produkte gelöscht. Möchtest du fortfahren?",
     "summary": {
-      "title": "Pantry overview",
-      "toggle": "Toggle pantry overview",
-      "updated": "Updated {{ value }}",
+      "title": "Vorratsübersicht",
+      "toggle": "Vorratsübersicht ein-/ausblenden",
+      "updated": "Aktualisiert {{ value }}",
       "stats": {
-        "total": "Total items",
-        "lowStock": "Low stock",
-        "nearExpiry": "Near expiry",
-        "expired": "Expired"
+        "total": "Gesamtanzahl Artikel",
+        "lowStock": "Niedriger Bestand",
+        "nearExpiry": "Kurz vor Ablauf",
+        "expired": "Abgelaufen"
       }
     },
     "nearExpiry": {
-      "title": "Near expiry",
-      "subtitle": "In the next {{ days }} days",
-      "expires": "Expires {{ date }}",
-      "empty": "No products expiring soon."
+      "title": "Kurz vor Ablauf",
+      "subtitle": "In den nächsten {{ days }} Tagen",
+      "expires": "Läuft ab am {{ date }}",
+      "empty": "Keine Produkte laufen bald ab."
     },
     "lowStock": {
-      "title": "Low stock alerts",
-      "subtitle": "At or below the minimum level",
-      "minLabel": "min {{ value }} {{ unit }}",
-      "empty": "All items are above their minimum level."
+      "title": "Warnungen bei niedrigem Bestand",
+      "subtitle": "Auf oder unter dem Mindestbestand",
+      "minLabel": "Min. {{ value }} {{ unit }}",
+      "empty": "Alle Artikel liegen über ihrem Mindestbestand."
     },
     "batches": {
-      "single": "1 batch",
-      "plural": "{{ count }} batches",
-      "withExpiry": "{{ batchLabel }}, exp {{ date }}"
+      "single": "1 Charge",
+      "plural": "{{ count }} Chargen",
+      "withExpiry": "{{ batchLabel }}, Ablauf {{ date }}"
     },
     "expired": {
-      "title": "Expired items",
-      "deleteAria": "Delete expired items",
-      "expires": "Expired {{ date }}",
-      "badge": "Expired",
-      "empty": "No expired items right now."
+      "title": "Abgelaufene Artikel",
+      "deleteAria": "Abgelaufene löschen",
+      "expires": "Abgelaufen am {{ date }}",
+      "badge": "Abgelaufen",
+      "empty": "Zurzeit gibt es keine abgelaufenen Artikel."
     },
     "recent": {
-      "title": "Recently updated",
-      "updated": "Updated {{ date }}",
-      "badge": "New",
-      "empty": "No recent updates."
+      "title": "Kürzlich aktualisiert",
+      "updated": "Aktualisiert {{ date }}",
+      "badge": "Neu",
+      "empty": "Keine aktuellen Änderungen."
     }
   },
   "shopping": {
-    "title": "Shopping",
-    "unassignedSupermarket": "Any supermarket",
+    "title": "Einkäufe",
+    "unassignedSupermarket": "Beliebiger Supermarkt",
     "summary": {
-      "title": "Shopping summary",
-      "collapse": "Collapse summary",
-      "expand": "Expand summary",
-      "productOne": "product",
-      "productMany": "products",
-      "toBuyIn": "to buy in",
-      "storeOne": "store",
-      "storeMany": "stores",
-      "ok": "All stored items meet their targets.",
+      "title": "Einkaufsübersicht",
+      "collapse": "Übersicht einklappen",
+      "expand": "Übersicht ausklappen",
+      "productOne": "Produkt",
+      "productMany": "Produkte",
+      "toBuyIn": "zu kaufen in",
+      "storeOne": "Supermarkt",
+      "storeMany": "Supermärkte",
+      "ok": "Alle gelagerten Artikel erfüllen ihre Zielwerte.",
       "stats": {
-        "total": "Items to buy",
-        "basicOut": "Staples out of stock",
-        "basicLow": "Staples running low",
-        "lowStock": "Products below target"
+        "total": "Gesamtanzahl zu kaufender Artikel",
+        "basicOut": "Grundprodukte ohne Bestand",
+        "basicLow": "Grundprodukte mit niedrigem Bestand",
+        "lowStock": "Produkte mit niedrigem Bestand"
       }
     },
     "reasons": {
-      "below-min": "Below minimum",
-      "basic-low": "Staple running low",
-      "basic-out": "Staple out of stock",
-      "empty": "Out of stock"
+      "below-min": "Niedriger Bestand",
+      "basic-low": "Grundprodukt mit niedrigem Bestand",
+      "basic-out": "Grundprodukt ohne Bestand",
+      "empty": "Kein Bestand"
     },
     "purchaseModal": {
-      "title": "Add purchase",
-      "titleProduct": "Purchase product",
+      "title": "Einkauf hinzufügen",
+      "titleProduct": "Produkt kaufen",
       "productName": "Name",
-      "quantity": "Quantity",
+      "quantity": "Menge",
       "quantityPlaceholder": "0",
-      "quantityHelp": "Use the stepper to adjust the purchased amount.",
-      "quantityError": "Enter an amount greater than 0.",
-      "expiry": "Expiry date (optional)",
-      "noExpiry": "No expiry",
-      "location": "Location",
-      "locationHint": "Choose where this lot will be stored.",
-      "locationRequired": "Pick a location before saving.",
-      "expiryHint": "Optional: record the expiration date if needed.",
-      "addToPantry": "Add"
+      "quantityHelp": "Verwende die Steuerelemente, um die gekaufte Menge anzupassen.",
+      "quantityError": "Bitte gib eine Menge größer als 0 ein.",
+      "expiry": "Haltbarkeitsdatum (optional)",
+      "noExpiry": "Kein Ablaufdatum",
+      "location": "Standort",
+      "locationHint": "Wähle aus, wo die Charge gelagert wird.",
+      "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
+      "expiryHint": "Optional: Haltbarkeitsdatum erfassen, falls zutreffend.",
+      "addToPantry": "Hinzufügen"
     },
     "suggestions": {
-      "title": "Suggested purchases",
-      "loading": "Building shopping list…",
-      "destination": "Suggested location: {{ location }}",
-      "totalStock": "Total stock: {{ amount }} {{ unit }}",
-      "minStock": "Min: {{ amount }} {{ unit }}",
-      "buy": "Buy {{ amount }} {{ unit }}",
-      "empty": "Nothing pending right now. I'll let you know when something needs restocking."
+      "title": "Vorgeschlagene Einkäufe",
+      "loading": "Einkaufsliste wird erstellt…",
+      "destination": "Empfohlenes Ziel: {{ location }}",
+      "totalStock": "Gesamtbestand: {{ amount }} {{ unit }}",
+      "minStock": "Min.: {{ amount }} {{ unit }}",
+      "buy": "{{ amount }} {{ unit }} kaufen",
+      "empty": "Derzeit nichts zu erledigen. Ich informiere dich, wenn Nachschub nötig ist."
     },
     "share": {
       "button": "Liste teilen",
       "empty": "Deine Einkaufsliste ist leer.",
-      "ready": "Einkaufsliste bereit zum Teilen.",
+      "ready": "Einkaufsliste ist bereit zum Teilen.",
       "saved": "Liste als PDF gespeichert.",
       "error": "Die Einkaufsliste konnte nicht geteilt werden.",
       "pdfTitle": "Einkaufsliste",
@@ -210,454 +210,454 @@
   },
   "agent": {
     "title": "Agent",
-    "thinking": "Thinking…",
+    "thinking": "Denkt nach…",
     "states": {
       "thinking": "Denkt nach…",
-      "fetching": "Prüft deine Vorratskammer…",
-      "responding": "Generiert die Antwort…"
+      "fetching": "Vorratskammer wird abgefragt…",
+      "responding": "Antwort wird erstellt…"
     },
-    "placeholder": "Write instructions like \"Move 2 yogurts to the fridge\"",
+    "placeholder": "Schreibe Anweisungen wie „Verschiebe 2 Joghurts in den Kühlschrank“",
     "actions": {
-      "send": "Send",
+      "send": "Senden",
       "retry": "Erneut versuchen"
     },
     "preview": {
-      "badge": "Preview",
-      "title": "Preview the PRO agent",
-      "headline": "Unlock AI to manage your pantry for you.",
-      "subtitle": "See expired items, generate recipes and reorganize stock with one prompt.",
-      "cta": "Unlock PRO agent",
-      "note": "Start your free trial and cancel anytime.",
-      "lockedPlaceholder": "Available with PRO"
+      "badge": "Vorschau",
+      "title": "So sieht der Agent aus",
+      "headline": "Premium-KI-Antworten",
+      "subtitle": "Abgelaufene prüfen, Rezepte erstellen und Bestand neu organisieren – mit einer Nachricht.",
+      "cta": "Agent freischalten",
+      "note": "Kostenlose Testversion im PRO-Plan enthalten.",
+      "lockedPlaceholder": "Nur mit PRO verfügbar"
     },
     "roles": {
-      "user": "You",
+      "user": "Du",
       "assistant": "Agent",
-      "tool": "Action"
+      "tool": "Aktion"
     },
     "messages": {
-      "processing": "Processing action…",
-      "noResponse": "Couldn't generate a response.",
-      "noEndpoint": "Agent endpoint is not configured.",
-      "callFailed": "Die Verbindung zum Assistenten hatte offenbar ein temporäres Problem. Bitte versuch es in wenigen Sekunden erneut.",
-      "incompleteToolCall": "Der Assistent konnte nicht alle benötigten Daten sammeln, um die Aktion auszuführen. Formuliere die Anweisung neu oder versuche es erneut.",
-      "toolUnavailable": "Tool \"{{ name }}\" is not available.",
-      "unifiedError": "Der Assistent konnte gerade nicht antworten. Versuche es in ein paar Sekunden erneut."
+      "processing": "Aktion wird verarbeitet…",
+      "noResponse": "Ich konnte keine Antwort erzeugen.",
+      "noEndpoint": "Für den Agenten ist kein Endpoint konfiguriert.",
+      "callFailed": "Die Verbindung zum Assistenten hatte ein temporäres Problem. Bitte versuche es in ein paar Sekunden erneut.",
+      "incompleteToolCall": "Die Aktion konnte nicht abgeschlossen werden, da Daten fehlen. Bitte formuliere die Anweisung neu.",
+      "toolUnavailable": "Das Tool „{{ name }}“ ist nicht verfügbar.",
+      "unifiedError": "Der Assistent konnte im Moment nicht antworten. Bitte versuche es später erneut."
     },
     "errors": {
-      "missingName": "Product name is required.",
-      "quantityPositive": "Quantity must be greater than 0.",
-      "unknownLocation": "I can't understand the location. Try pantry, fridge, kitchen or freezer.",
-      "missingMoveData": "Product, origin and destination are required.",
-      "invalidMoveLocation": "Some of the provided locations are not recognized.",
-      "notFound": "\"{{ name }}\" was not found. Are you sure it exists?",
-      "notInSource": "\"{{ name }}\" is not in {{ location }}.",
-      "noUnits": "No units available in {{ location }}.",
-      "missingAdjustData": "Missing data to adjust stock (product, location and numeric delta).",
-      "invalidLocation": "I can't understand the provided location.",
-      "noStock": "\"{{ name }}\" has no stock in {{ location }}.",
-      "updateFailed": "Could not update the quantity.",
-      "missingUpdates": "Keine Änderungen anzuwenden.",
+      "missingName": "Der Produktname fehlt.",
+      "quantityPositive": "Die Menge muss größer als 0 sein.",
+      "unknownLocation": "Ich verstehe den Standort nicht. Versuche es mit Vorratskammer, Kühlschrank, Küche oder Gefrierschrank.",
+      "missingMoveData": "Es fehlen Daten: Produkt, Herkunft und Ziel werden benötigt.",
+      "invalidMoveLocation": "Ein angegebener Standort wird nicht erkannt.",
+      "notFound": "„{{ name }}“ wurde nicht gefunden. Bist du sicher, dass es existiert?",
+      "notInSource": "„{{ name }}“ befindet sich nicht in {{ location }}.",
+      "noUnits": "In {{ location }} sind keine Einheiten verfügbar.",
+      "missingAdjustData": "Es fehlen Daten zur Bestandsanpassung (Produkt, Standort und numerische Änderung).",
+      "invalidLocation": "Der angegebene Standort wird nicht verstanden.",
+      "noStock": "„{{ name }}“ hat keinen Bestand in {{ location }}.",
+      "updateFailed": "Die Menge konnte nicht aktualisiert werden.",
+      "missingUpdates": "Es gibt keine Änderungen zum Anwenden.",
       "deleteFailed": "{{ name }} konnte nicht gelöscht werden.",
-      "batchNotFound": "Kein Los mit diesem Datum gefunden.",
-      "invalidArguments": "Für diese Aktion benötigen wir gültige Angaben. Bitte überprüfe die Felder."
+      "batchNotFound": "Es wurde keine Charge mit diesem Datum gefunden.",
+      "invalidArguments": "Für diese Aktion werden gültige Daten benötigt. Bitte überprüfe die Felder."
     },
     "details": {
-      "options": "Valid options: {{ value }}",
-      "origins": "Valid origins/destinations: {{ value }}",
-      "locations": "Available locations: {{ value }}",
-      "suggestions": "Maybe you meant: {{ value }}",
-      "expiration": "Expires: {{ value }}",
-      "noExpiry": "No expiry"
+      "options": "Gültige Optionen: {{ value }}",
+      "origins": "Gültige Herkunft/Ziele: {{ value }}",
+      "locations": "Verfügbare Standorte: {{ value }}",
+      "suggestions": "Meintest du vielleicht: {{ value }}",
+      "expiration": "Läuft ab: {{ value }}",
+      "noExpiry": "Kein Ablaufdatum"
     },
     "values": {
       "yes": "Ja",
       "no": "Nein"
     },
     "results": {
-      "addExisting": "Added stock to {{ name }} in {{ location }}",
-      "addNew": "Created {{ name }} in {{ location }}",
-      "quantity": "Quantity: {{ value }}",
-      "location": "Location: {{ value }}",
-      "moveSummary": "Moved {{ amount }} from {{ from }} to {{ to }}",
-      "moveProduct": "Product: {{ value }}",
-      "moveFrom": "From: {{ value }}",
-      "moveTo": "To: {{ value }}",
-      "moveQuantity": "Quantity: {{ value }}",
-      "moveBatch": "Los: {{ value }}",
-      "adjustSummary": "Adjusted {{ name }} in {{ location }} to {{ quantity }}",
-      "adjustChange": "Change: {{ value }}",
-      "adjustNewQuantity": "New quantity: {{ value }}",
-      "adjustLocation": "Location: {{ value }}",
-      "adjustBatch": "Los: {{ value }}",
-      "expiringFound": "Found {{ count }} products expiring in {{ days }} days",
-      "expiringEmpty": "Nothing expires in {{ days }} days",
-      "listSummary": "{{ count }} products in the pantry.",
-      "listDetail": "Full list retrieved",
-      "recipesPromptWith": "Use these ingredients (prioritize the soon-to-expire ones): {{ ingredients }}. Return 2-3 concise recipes.",
-      "recipesPromptAuto": "Generate 2 simple recipes using pantry staples.",
-      "recipesSystem": "You are a chef that shares short recipes with numbered steps.",
-      "recipesFallback": "Here are some recipe ideas.",
-      "recipesSummary": "Recipes generated",
-      "recipesIngredients": "Ingredients used: {{ list }}",
+      "addExisting": "Bestand zu {{ name }} in {{ location }} hinzugefügt",
+      "addNew": "{{ name }} in {{ location }} erstellt",
+      "quantity": "Menge: {{ value }}",
+      "location": "Standort: {{ value }}",
+      "moveSummary": "{{ amount }} von {{ from }} nach {{ to }} verschoben",
+      "moveProduct": "Produkt: {{ value }}",
+      "moveFrom": "Herkunft: {{ value }}",
+      "moveTo": "Ziel: {{ value }}",
+      "moveQuantity": "Menge: {{ value }}",
+      "moveBatch": "Charge: {{ value }}",
+      "adjustSummary": "{{ name }} in {{ location }} auf {{ quantity }} angepasst",
+      "adjustChange": "Änderung: {{ value }}",
+      "adjustNewQuantity": "Neue Menge: {{ value }}",
+      "adjustLocation": "Standort: {{ value }}",
+      "adjustBatch": "Charge: {{ value }}",
+      "expiringFound": "{{ count }} Produkte gefunden, die in {{ days }} Tagen ablaufen",
+      "expiringEmpty": "In {{ days }} Tagen läuft nichts ab",
+      "listSummary": "Es gibt {{ count }} Produkte in der Vorratskammer.",
+      "listDetail": "Vollständige Liste abgerufen",
+      "recipesPromptWith": "Verwende diese Zutaten (priorisiere bald ablaufende): {{ ingredients }}. Gib 2–3 kurze Rezepte zurück.",
+      "recipesPromptAuto": "Erstelle 2 einfache Rezepte mit grundlegenden Vorratsprodukten.",
+      "recipesSystem": "Du bist ein Koch, der kurze Rezepte mit nummerierten Schritten vorschlägt.",
+      "recipesFallback": "Hier sind einige Rezeptideen.",
+      "recipesSummary": "Rezepte generiert",
+      "recipesIngredients": "Verwendete Zutaten: {{ list }}",
       "updateSummary": "{{ name }} aktualisiert",
       "updatedFields": "Geänderte Felder: {{ value }}",
       "deleteSummary": "{{ name }} gelöscht",
-      "categoriesSummary": "{{ count }} Kategorien verfügbar",
+      "categoriesSummary": "{{ count }} verfügbare Kategorien",
       "categoriesList": "Kategorien: {{ value }}",
-      "locationsSummary": "{{ count }} Lagerorte verfügbar",
-      "locationsList": "Lagerorte: {{ value }}",
+      "locationsSummary": "{{ count }} verfügbare Standorte",
+      "locationsList": "Standorte: {{ value }}",
       "historySummary": "Verlauf von {{ name }}",
       "historyCreated": "Erstellt: {{ value }}",
-      "historyUpdated": "Aktualisiert: {{ value }}",
+      "historyUpdated": "Letzte Aktualisierung: {{ value }}",
       "historyTotalStock": "Gesamtbestand: {{ value }}",
-      "historyLocations": "Lagerorte: {{ value }}",
-      "suggestionsSummary": "{{ count }} aktive Vorschläge (abgelaufen: {{ expired }}, läuft bald ab: {{ nearExpiry }}, niedriger Bestand: {{ low }})",
-      "suggestionsEmpty": "Alles unter Kontrolle, derzeit keine Warnungen.",
+      "historyLocations": "Standorte: {{ value }}",
+      "suggestionsSummary": "{{ count }} aktive Vorschläge (abgelaufen: {{ expired }}, kurz vor Ablauf: {{ nearExpiry }}, niedriger Bestand: {{ low }})",
+      "suggestionsEmpty": "Alles ist unter Kontrolle, aktuell gibt es keine Warnungen.",
       "suggestionsExpiredList": "Abgelaufen: {{ value }}",
-      "suggestionsNearExpiryList": "Läuft bald ab: {{ value }}",
+      "suggestionsNearExpiryList": "Kurz vor Ablauf: {{ value }}",
       "suggestionsLowList": "Niedriger Bestand: {{ value }}",
-      "suggestionsBasicsList": "Grundbedarf: {{ value }}"
+      "suggestionsBasicsList": "Zu prüfende Grundprodukte: {{ value }}"
     },
     "toasts": {
       "addProduct": "Produkt zur Vorratskammer hinzugefügt.",
       "adjustQuantity": "Bestand aktualisiert.",
       "deleteProduct": "Produkt gelöscht.",
-      "moveProduct": "Bewegung erfasst.",
+      "moveProduct": "Verschiebung gespeichert.",
       "markOpened": "Produkt als geöffnet markiert.",
-      "updateProductInfo": "Produktinfo aktualisiert.",
+      "updateProductInfo": "Produktinformationen aktualisiert.",
       "generic": "Aktion ausgeführt."
     }
   },
   "pantry": {
-    "title": "Pantry",
+    "title": "Vorratskammer",
     "filters": {
-      "quick": "Quick status filters",
-      "all": "All",
+      "quick": "Schnellfilter nach Status",
+      "all": "Alle",
       "desc": {
-        "all": "See all available products",
-        "normal": "Products without active alerts",
-        "low": "Need replenishment soon",
-        "expiring": "Expiring in a few days",
-        "expired": "Review and discard",
-        "basic": "Show only items marked as staples"
+        "all": "Alle verfügbaren Produkte anzeigen",
+        "normal": "Produkte ohne aktive Warnungen",
+        "low": "Müssen bald nachgefüllt werden",
+        "expiring": "Laufen in wenigen Tagen ab",
+        "expired": "Überprüfen und entsorgen",
+        "basic": "Nur als Grundprodukte markierte Produkte anzeigen"
       },
       "status": {
-        "normal": "In stock",
-        "low": "Low stock",
-        "expiring": "Near expiry",
-        "expired": "Expired"
+        "normal": "Auf Lager",
+        "low": "Niedriger Bestand",
+        "expiring": "Bald ablaufend",
+        "expired": "Abgelaufen"
       },
-      "basic": "Staples",
-      "title": "Filters",
-      "search": "Search products",
-      "category": "Category",
-      "location": "Location",
+      "basic": "Grundprodukte",
+      "title": "Filter",
+      "search": "Produkte suchen",
+      "category": "Kategorie",
+      "location": "Standort",
       "sort": {
-        "label": "Sort by",
-        "name": "Name (A-Z)",
-        "quantity": "Quantity (high → low)",
-        "expiration": "Expiry (soonest first)"
+        "label": "Sortieren nach",
+        "name": "Name (A–Z)",
+        "quantity": "Menge (hoch → niedrig)",
+        "expiration": "Haltbarkeit (bald zuerst)"
       }
     },
     "empty": {
-      "title": "Pantry overview",
-      "description": "There are no products yet. Add your first product to get started.",
-      "filters": "No product matches the current filters."
+      "title": "Vorratsübersicht",
+      "description": "Es befinden sich noch keine Produkte in der Vorratskammer. Füge dein erstes Produkt hinzu, um zu beginnen.",
+      "filters": "Kein Produkt entspricht den aktuellen Filtern."
     },
     "group": {
-      "count": "{{ count }} items",
-      "expiring": "{{ count }} expiring",
-      "expired": "{{ count }} expired",
-      "collapse": "Kategorie {{ name }} einklappen",
-      "expand": "Kategorie {{ name }} ausklappen"
+      "count": "{{ count }} Artikel",
+      "expiring": "{{ count }} kurz vor Ablauf",
+      "expired": "{{ count }} abgelaufen",
+      "collapse": "{{ name }} einklappen",
+      "expand": "{{ name }} ausklappen"
     },
     "categories": {
-      "dairy": "Dairy",
-      "grains": "Grains",
+      "dairy": "Milchprodukte",
+      "grains": "Getreide",
       "pasta": "Pasta",
-      "fresh": "Fresh",
-      "canned": "Canned",
-      "coldcuts": "Cold cuts",
-      "sweets": "Sweets",
+      "fresh": "Frischwaren",
+      "canned": "Konserven",
+      "coldcuts": "Aufschnitt",
+      "sweets": "Süßigkeiten",
       "snacks": "Snacks",
-      "drinks": "Drinks",
-      "sauces": "Sauces",
-      "spices": "Spices",
-      "legumes": "Legumes"
+      "drinks": "Getränke",
+      "sauces": "Soßen",
+      "spices": "Gewürze",
+      "legumes": "Hülsenfrüchte"
     },
     "batches": {
-      "title": "Product batches",
-      "count": "{{ count }} batches recorded",
-      "open": "Opened",
-      "edit": "Edit product"
+      "title": "Produktchargen",
+      "count": "{{ count }} registrierte Chargen",
+      "open": "Geöffnet",
+      "edit": "Produkt bearbeiten"
     },
     "form": {
-      "editTitle": "Edit item",
-      "newTitle": "New item",
+      "editTitle": "Artikel bearbeiten",
+      "newTitle": "Neuer Artikel",
       "name": "Name",
-      "namePlaceholder": "Rice, milk...",
-      "quickQuantity": "Quantity",
-      "quickExpiry": "Date",
-      "showAdvanced": "Show advanced version",
-      "hideAdvanced": "Hide advanced version",
-      "category": "Category",
-      "categoryPlaceholder": "Cereals, dairy...",
-      "uncategorized": "Uncategorized",
-      "supermarket": "Supermarket",
-      "supermarketPlaceholder": "Select a supermarket",
-      "basic": "Pantry staple item",
-      "minThreshold": "Minimum quantity",
-      "locationTitle": "Location {{ index }}",
-      "locationTotal": "Total: {{ total }} {{ unit }}",
-      "location": "Location",
-      "locationPlaceholder": "Select a location",
+      "namePlaceholder": "Reis, Milch…",
+      "quickQuantity": "Menge",
+      "quickExpiry": "Datum",
+      "showAdvanced": "Erweiterte Ansicht anzeigen",
+      "hideAdvanced": "Erweiterte Ansicht ausblenden",
+      "category": "Kategorie",
+      "categoryPlaceholder": "Getreide, Milchprodukte…",
+      "uncategorized": "Ohne Kategorie",
+      "supermarket": "Supermarkt",
+      "supermarketPlaceholder": "Supermarkt auswählen",
+      "basic": "Grundprodukt der Vorratskammer",
+      "minThreshold": "Mindestmenge",
+      "locationTitle": "Standort {{ index }}",
+      "locationTotal": "Gesamt: {{ total }} {{ unit }}",
+      "location": "Standort",
+      "locationPlaceholder": "Standort auswählen",
       "batches": {
-        "title": "Batches",
-        "add": "Add batch",
-        "empty": "No batches yet. Add one to track expiry dates.",
-        "titleIndex": "Batch {{ index }}",
-        "quantity": "Quantity",
-        "expiry": "Expiration date",
-        "opened": "Opened"
+        "title": "Chargen",
+        "add": "Charge hinzufügen",
+        "empty": "Noch keine Chargen vorhanden. Füge eine hinzu, um Haltbarkeitsdaten zu verfolgen.",
+        "titleIndex": "Charge {{ index }}",
+        "quantity": "Menge",
+        "expiry": "Haltbarkeitsdatum",
+        "opened": "Geöffnet"
       },
-      "addLocation": "Add location"
+      "addLocation": "Standort hinzufügen"
     },
     "detail": {
-      "earliest": "Expires first: {{ date }}",
-      "noBatches": "No batches recorded.",
-      "totalQuantity": "{{ value }} total",
+      "earliest": "Läuft zuerst ab: {{ date }}",
+      "noBatches": "Keine Chargen erfasst.",
+      "totalQuantity": "{{ value }} gesamt",
       "locationMeta": {
-        "expires": "Expires: {{ date }}",
-        "openedOne": "1 opened batch",
-        "openedMany": "{{ count }} opened batches",
-        "noExpiry": "No expiry recorded"
+        "expires": "Läuft ab: {{ date }}",
+        "openedOne": "1 geöffnete Charge",
+        "openedMany": "{{ count }} geöffnete Chargen",
+        "noExpiry": "Kein Haltbarkeitsdatum erfasst"
       },
       "batches": {
-        "single": "1 batch",
-        "plural": "{{ count }} batches",
-        "withExpiry": "exp {{ date }}"
+        "single": "1 Charge",
+        "plural": "{{ count }} Chargen",
+        "withExpiry": "Ablauf {{ date }}"
       },
       "actions": {
         "viewBatches": "Chargen anzeigen",
-        "editItem": "Artikel bearbeiten",
-        "moveItem": "Artikel verschieben",
-        "deleteItem": "Artikel löschen",
+        "editItem": "Produkt bearbeiten",
+        "moveItem": "Produkt verschieben",
+        "deleteItem": "Produkt löschen",
         "menuLabel": "Aktionsmenü öffnen",
-        "expand": "Artikeldetails anzeigen",
-        "collapse": "Artikeldetails ausblenden"
+        "expand": "Produktdetails erweitern",
+        "collapse": "Produktdetails reduzieren"
       }
     },
     "move": {
       "from": "Von",
       "to": "Nach",
-      "toPlaceholder": "Neuer Ort (z. B. Gefrierschrank)",
-      "quantity": "Menge verschieben",
+      "toPlaceholder": "Neuer Standort (z. B. Gefrierschrank)",
+      "quantity": "Zu verschiebende Menge",
       "suggestions": "Vorschläge",
       "availability": {
         "label": "Verfügbar: {{ value }}",
-        "empty": "Kein Bestand an diesem Ort"
+        "empty": "An diesem Standort ist kein Bestand verfügbar"
       },
       "errors": {
-        "missingLocations": "Wähle Herkunft und Ziel.",
+        "missingLocations": "Bitte Herkunft und Ziel auswählen.",
         "sameLocation": "Herkunft und Ziel müssen unterschiedlich sein.",
-        "invalidQuantity": "Gib eine Menge größer als null ein.",
-        "noAvailableStock": "Kein Bestand zum Verschieben an diesem Ort.",
-        "generic": "Produkt konnte nicht verschoben werden. Versuche es erneut."
+        "invalidQuantity": "Bitte eine Menge größer als null eingeben.",
+        "noAvailableStock": "Von diesem Standort ist kein Bestand verfügbar.",
+        "generic": "Das Produkt konnte nicht verschoben werden. Bitte versuche es erneut."
       },
       "submit": "Verschieben",
       "cancel": "Abbrechen",
       "toasts": {
-        "success": "{{ quantity }} von {{ from }} nach {{ to }} verschoben."
+        "success": "Du hast {{ quantity }} von {{ from }} nach {{ to }} verschoben."
       }
     },
     "toasts": {
-      "locationRequired": "Select a location before saving.",
-      "supermarketRequired": "Select a supermarket before saving.",
-      "saveError": "Could not save the item.",
-      "deleted": "🗑️ Item deleted.",
-      "addedToShopping": "\"{{ name }}\" added to shopping suggestions.",
-      "createSuccess": "✅ {{ name }} added{{ quantity }}{{ breakdown }}.",
-      "locationsUpdated": "📦 Locations updated: {{ breakdown }}.",
-      "stockUpdated": "💾 Stock updated: {{ name }} ({{ quantity }}).",
-      "stockUpdatedSimple": "💾 Stock updated.",
-      "saved": "💾 Changes saved."
+      "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
+      "supermarketRequired": "Bitte wähle vor dem Speichern einen Supermarkt aus.",
+      "saveError": "Das Produkt konnte nicht gespeichert werden.",
+      "deleted": "🗑️ Produkt gelöscht.",
+      "addedToShopping": "„{{ name }}“ zu Einkaufsvorschlägen hinzugefügt.",
+      "createSuccess": "✅ {{ name }} hinzugefügt{{ quantity }}{{ breakdown }}.",
+      "locationsUpdated": "📦 Standorte aktualisiert: {{ breakdown }}.",
+      "stockUpdated": "💾 Bestand aktualisiert: {{ name }} ({{ quantity }}).",
+      "stockUpdatedSimple": "💾 Bestand aktualisiert.",
+      "saved": "💾 Änderungen gespeichert."
     },
-    "confirmDelete": "Delete \"{{ name }}\"?"
+    "confirmDelete": "„{{ name }}“ löschen?"
   },
   "upgrade": {
-    "title": "Upgrade to PRO",
-    "headline": "Unlock the full pantry superpowers",
-    "subtitle": "Smarter automation and priority features.",
+    "title": "PRO werden",
+    "headline": "Entfalte das volle Potenzial deiner Vorratskammer",
+    "subtitle": "Intelligente Automatisierung und priorisierte Funktionen.",
     "benefits": {
-      "title": "Everything you get with PRO",
-      "subtitle": "Designed for power users and busy households.",
-      "agent": "AI agent to manage your pantry hands-free.",
-      "future": "Early access to upcoming PRO features.",
-      "cloudSync": "Cloud sync and backup for peace of mind.",
-      "history": "Full history of changes to your items.",
-      "predictions": "Advanced recipes and smart predictions."
+      "title": "Alles, was PRO beinhaltet",
+      "subtitle": "Entwickelt für Haushalte mit viel Bewegung.",
+      "agent": "KI-Agent zur freihändigen Verwaltung der Vorratskammer.",
+      "future": "Frühzeitiger Zugriff auf zukünftige PRO-Funktionen.",
+      "cloudSync": "Cloud-Synchronisierung und Backup.",
+      "history": "Vollständiger Änderungsverlauf deiner Produkte.",
+      "predictions": "Erweiterte Rezepte und intelligente Vorhersagen."
     },
     "actions": {
-      "subscribe": "Go PRO on Google Play",
-      "maybeLater": "Maybe later",
-      "restore": "Restore purchase",
-      "startTrial": "Start free trial",
-      "select": "Select plan"
+      "subscribe": "Zur PRO-Mitgliedschaft bei Google Play",
+      "maybeLater": "Vielleicht später",
+      "restore": "Kauf wiederherstellen",
+      "startTrial": "Kostenlose Testphase starten",
+      "select": "Plan auswählen"
     },
-    "note": "Subscriptions are managed in the Google Play account screen.",
-    "alreadyPro": "Already PRO ✅",
+    "note": "Abonnements werden über dein Google-Play-Konto verwaltet.",
+    "alreadyPro": "PRO aktiv ✅",
     "errors": {
-      "purchaseFailed": "No subscription available right now. Try again or check your Play account.",
-      "selectPlan": "Choose a plan to continue."
+      "purchaseFailed": "Derzeit sind keine Abonnements verfügbar. Bitte versuche es erneut oder überprüfe dein Play-Konto.",
+      "selectPlan": "Bitte wähle einen Plan aus, um fortzufahren."
     },
     "plans": {
-      "title": "Choose your PRO plan",
-      "subtitle": "Pick the cadence that fits you best.",
-      "monthly": "Monthly",
-      "annual": "Annual",
-      "other": "Other plan",
-      "unavailable": "No plans available right now. Check your connection or try again in a moment.",
-      "perMonth": "/month",
-      "perYear": "/year",
-      "badgeBestValue": "Best value",
-      "trialFree": "Free trial available",
-      "trialDiscount": "{{ cycles }} intro periods at {{ price }}",
-      "savings": "Save {{ value }}%",
-      "proLabel": "PRO plan"
+      "title": "Wähle deinen PRO-Plan",
+      "subtitle": "Wähle die Laufzeit, die am besten zu dir passt.",
+      "monthly": "Monatlich",
+      "annual": "Jährlich",
+      "other": "Anderer Plan",
+      "unavailable": "Derzeit sind keine Pläne verfügbar. Bitte überprüfe deine Verbindung oder versuche es später erneut.",
+      "perMonth": "/Monat",
+      "perYear": "/Jahr",
+      "badgeBestValue": "Bestes Angebot",
+      "trialFree": "Kostenlose Testversion verfügbar",
+      "trialDiscount": "{{ cycles }} Anfangszeiträume für {{ price }}",
+      "savings": "Spare {{ value }}%",
+      "proLabel": "PRO-Plan"
     }
   },
   "settings": {
-    "title": "Settings",
+    "title": "Einstellungen",
     "pro": {
-      "statusTitle": "PRO status",
-      "statusPro": "PRO user",
-      "statusFree": "Free version",
-      "statusDescription": "Thank you for supporting the project. PRO is active on this device.",
-      "upgradePrompt": "Upgrade to PRO to unlock premium features.",
-      "upgradeCta": "Upgrade to PRO",
-      "title": "PRO features",
-      "subtitle": "Protected actions only available to PRO users.",
-      "badgePro": "PRO active",
-      "badgeFree": "Free tier",
+      "statusTitle": "PRO-Status",
+      "statusPro": "PRO-Nutzer",
+      "statusFree": "Kostenlose Version",
+      "statusDescription": "Danke für deine Unterstützung. PRO ist auf diesem Gerät aktiv.",
+      "upgradePrompt": "Werde PRO, um Premium-Funktionen freizuschalten.",
+      "upgradeCta": "PRO werden",
+      "title": "PRO-Funktionen",
+      "subtitle": "Geschützte Aktionen nur für PRO-Nutzer.",
+      "badgePro": "PRO aktiv",
+      "badgeFree": "Kostenlos",
       "cloudSync": {
-        "title": "Cloud sync",
-        "subtitle": "Keep your pantry in sync across devices.",
-        "action": "Sync",
-        "ready": "Cloud sync is protected by PRO. Coming soon."
+        "title": "Cloud-Synchronisierung",
+        "subtitle": "Halte deine Vorratskammer auf allen Geräten synchron.",
+        "action": "Synchronisieren",
+        "ready": "Die Synchronisierung ist für PRO-Konten reserviert. Demnächst verfügbar."
       },
       "history": {
-        "title": "History",
-        "subtitle": "Access the full change log of your items.",
-        "action": "Open history",
-        "ready": "History is a PRO-only area."
+        "title": "Verlauf",
+        "subtitle": "Sieh dir das vollständige Änderungsprotokoll an.",
+        "action": "Verlauf öffnen",
+        "ready": "Der Verlauf ist nur für PRO-Nutzer verfügbar."
       },
       "recipes": {
-        "title": "Advanced recipes & predictions",
-        "subtitle": "Premium recommendations powered by AI.",
-        "action": "Unlock",
-        "ready": "Advanced recipes are reserved for PRO users."
+        "title": "Erweiterte Rezepte und Vorhersagen",
+        "subtitle": "Premium-Empfehlungen mit KI.",
+        "action": "Freischalten",
+        "ready": "Erweiterte Rezepte sind exklusiv für PRO."
       }
     },
     "preferences": {
-      "title": "Preferences",
-      "subtitle": "Customize how the app behaves.",
+      "title": "Einstellungen",
+      "subtitle": "Passe das Verhalten der App an.",
       "language": {
-        "label": "Language",
-        "device": "Matches your device language automatically."
+        "label": "Sprache",
+        "device": "Wird automatisch an die Gerätesprache angepasst."
       }
     },
     "appearance": {
-      "title": "Appearance",
-      "subtitle": "Choose how the app looks.",
-      "theme": "Theme",
-      "description": "Switch between light, dark or follow the system.",
-      "light": "Light",
-      "dark": "Dark",
+      "title": "Erscheinungsbild",
+      "subtitle": "Lege fest, wie die App aussieht.",
+      "theme": "Design",
+      "description": "Hellen Modus, dunklen Modus oder Systemeinstellung verwenden.",
+      "light": "Hell",
+      "dark": "Dunkel",
       "system": "System",
-      "error": "Could not update the theme."
+      "error": "Das Design konnte nicht aktualisiert werden."
     },
     "languages": {
-      "es": "Spanish",
-      "en": "English"
+      "es": "Spanisch",
+      "en": "Englisch"
     },
     "data": {
-      "title": "Data management",
-      "subtitle": "Control what is stored on this device.",
-      "resetTitle": "Clear data / Reset app",
-      "resetDescription": "Remove all information saved on this device.",
-      "resetAction": "Clear",
-      "exportTitle": "Export data",
-      "exportDescription": "Download a JSON file with your current data.",
-      "exportAction": "Export",
-      "importTitle": "Import data",
-      "importDescription": "Restore a JSON backup you exported earlier.",
-      "importAction": "Import"
+      "title": "Datenverwaltung",
+      "subtitle": "Verwalte den lokalen Speicher der App.",
+      "resetTitle": "Daten löschen / App zurücksetzen",
+      "resetDescription": "Löscht alle auf diesem Gerät gespeicherten Informationen.",
+      "resetAction": "Löschen",
+      "exportTitle": "Daten exportieren",
+      "exportDescription": "Lade eine JSON-Datei mit deinen aktuellen Daten herunter.",
+      "exportAction": "Exportieren",
+      "importTitle": "Daten importieren",
+      "importDescription": "Stelle eine zuvor exportierte JSON-Sicherung wieder her.",
+      "importAction": "Importieren"
     },
     "reset": {
-      "confirm": "This will delete ALL local app data.\nDo you want to continue?",
-      "success": "Local data removed.",
-      "error": "Could not clear the app."
+      "confirm": "Dadurch werden ALLE lokalen App-Daten gelöscht.\nMöchtest du fortfahren?",
+      "success": "Lokale Daten gelöscht.",
+      "error": "Die App konnte nicht bereinigt werden."
     },
     "export": {
-      "unavailable": "Export is not available in this environment.",
-      "readyToShare": "Data ready to share.",
-      "success": "Data exported.",
-      "saved": "Data exported to your device.",
-      "error": "Could not export the data.",
-      "shareTitle": "Pantry Manager - Backup",
-      "shareText": "Export or share your pantry backup."
+      "unavailable": "Der Export ist in dieser Umgebung nicht verfügbar.",
+      "readyToShare": "📤 Daten bereit zum Teilen.",
+      "success": "📦 Daten exportiert.",
+      "saved": "📦 Daten auf dem Gerät gespeichert.",
+      "error": "Die Daten konnten nicht exportiert werden.",
+      "shareTitle": "Pantry Manager – Sicherung",
+      "shareText": "Exportiere oder teile dein Backup."
     },
     "import": {
-      "confirm": "This will replace your current data with the selected file. Continue?",
-      "success": "Data imported. Restarting app...",
-      "error": "Could not import the data. Please check the file.",
-      "invalid": "The selected file is not a valid backup.",
-      "empty": "The file has no data to import."
+      "confirm": "Dies ersetzt deine aktuellen Daten durch die ausgewählte Datei. Möchtest du fortfahren?",
+      "success": "✅ Daten importiert. App wird neu gestartet…",
+      "error": "Die Daten konnten nicht importiert werden. Bitte überprüfe die Datei.",
+      "invalid": "Die ausgewählte Datei ist kein gültiges Backup.",
+      "empty": "Die Datei enthält keine importierbaren Daten."
     },
-    "loadError": "There was a problem loading settings.",
+    "loadError": "Beim Laden der Einstellungen ist ein Problem aufgetreten.",
     "catalogs": {
-      "title": "Catalogs",
-      "subtitle": "Manage reusable lists for organizing your pantry.",
-      "saveSuccess": "Catalogs updated.",
-      "saveError": "Could not save catalogs.",
-      "loadError": "Could not load catalogs.",
-      "restoreDefaults": "Restore classic values",
-      "saveAction": "Save changes",
+      "title": "Kataloge",
+      "subtitle": "Verwalte wiederverwendbare Listen zur Organisation der Vorratskammer.",
+      "saveSuccess": "Kataloge aktualisiert.",
+      "saveError": "Kataloge konnten nicht gespeichert werden.",
+      "loadError": "Kataloge konnten nicht geladen werden.",
+      "restoreDefaults": "Klassische Werte wiederherstellen",
+      "saveAction": "Änderungen speichern",
       "locations": {
-        "title": "Locations",
-        "subtitle": "Customize locations available when creating or editing products.",
-        "empty": "Add a location to get started.",
-        "field": "Location {{ index }}",
-        "add": "Add location"
+        "title": "Standorte",
+        "subtitle": "Passe die verfügbaren Standorte beim Erstellen oder Bearbeiten von Produkten an.",
+        "empty": "Füge einen Standort hinzu, um zu beginnen.",
+        "field": "Standort {{ index }}",
+        "add": "Standort hinzufügen"
       },
       "categories": {
-        "title": "Categories",
-        "subtitle": "Define the categories available when adding products.",
-        "empty": "Add a category to get started.",
-        "field": "Category {{ index }}",
-        "add": "Add category"
+        "title": "Kategorien",
+        "subtitle": "Definiere die verfügbaren Kategorien beim Erfassen von Produkten.",
+        "empty": "Füge eine Kategorie hinzu, um zu beginnen.",
+        "field": "Kategorie {{ index }}",
+        "add": "Kategorie hinzufügen"
       },
       "supermarkets": {
-        "title": "Supermarkets",
-        "subtitle": "Define the list shown when assigning supermarkets to products.",
-        "empty": "Add a supermarket to get started.",
-        "field": "Supermarket {{ index }}",
-        "add": "Add supermarket",
-        "other": "Other"
+        "title": "Supermärkte",
+        "subtitle": "Lege die verfügbare Liste beim Zuweisen von Supermärkten fest.",
+        "empty": "Füge einen Supermarkt hinzu, um zu beginnen.",
+        "field": "Supermarkt {{ index }}",
+        "add": "Supermarkt hinzufügen",
+        "other": "Andere"
       }
     },
     "tutorial": {
-      "title": "View tutorial",
-      "subtitle": "Replay the onboarding whenever you need it."
+      "title": "Tutorial ansehen",
+      "subtitle": "Sieh dir das Onboarding jederzeit erneut an."
     },
     "info": {
-      "title": "Information",
-      "subtitle": "Quick app details.",
+      "title": "Informationen",
+      "subtitle": "Kurze Details zur Anwendung.",
       "version": "Version",
-      "feedbackTitle": "Send feedback",
-      "feedbackSubtitle": "Share suggestions or report issues.",
-      "feedbackAction": "Send feedback"
+      "feedbackTitle": "Feedback senden",
+      "feedbackSubtitle": "Teile Vorschläge oder melde Probleme.",
+      "feedbackAction": "Feedback senden"
     }
   }
 }
