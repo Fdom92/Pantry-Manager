@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_PREFERENCES, DEFAULT_SUPERMARKET_OPTIONS, DEFAULT_UNIT_OPTIONS, DOC_TYPE_PREFERENCES, STORAGE_KEY_PREFERENCES } from '@core/constants';
 import {
   AppPreferences,
   AppPreferencesDoc,
@@ -8,70 +9,20 @@ import {
 } from '@core/models';
 import { StorageService } from './storage.service';
 
-const STORAGE_KEY = 'app:preferences';
-const DOC_TYPE = 'app-preferences';
-
-export const DEFAULT_LOCATION_OPTIONS = ['Despensa', 'Nevera', 'Cocina', 'Congelador'];
-export const DEFAULT_CATEGORY_OPTIONS = [
-  'Lácteos',
-  'Cereales',
-  'Pastas',
-  'Frescos',
-  'Conservas',
-  'Embutidos',
-  'Dulces',
-  'Snacks',
-  'Bebidas',
-  'Salsas',
-  'Especias',
-];
-export const DEFAULT_SUPERMARKET_OPTIONS = [
-  'Lidl',
-  'Mercadona',
-  'Carrefour',
-  'Aldi',
-  'Costco',
-  'Ahorramas',
-  'Merkocash',
-  'Cualquiera',
-];
-
-export const DEFAULT_UNIT_OPTIONS = [
-  MeasurementUnit.GRAM,
-  MeasurementUnit.KILOGRAM,
-  MeasurementUnit.LITER,
-  MeasurementUnit.MILLILITER,
-  MeasurementUnit.PACKAGE,
-  MeasurementUnit.UNIT,
-];
-
-const DEFAULT_PREFERENCES: AppPreferences = {
-  theme: 'system',
-  defaultUnit: 'unit',
-  nearExpiryDays: 3,
-  compactView: false,
-  notificationsEnabled: false,
-  notifyOnExpired: false,
-  notifyOnLowStock: false,
-  lastSyncAt: null,
-  locationOptions: [...DEFAULT_LOCATION_OPTIONS],
-  categoryOptions: [...DEFAULT_CATEGORY_OPTIONS],
-  supermarketOptions: [...DEFAULT_SUPERMARKET_OPTIONS],
-  unitOptions: [...DEFAULT_UNIT_OPTIONS],
-};
-
 @Injectable({
   providedIn: 'root',
 })
 export class AppPreferencesService {
+  // Data
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
   private readonly prefersDarkQuery =
     typeof window !== 'undefined' && typeof window.matchMedia === 'function'
       ? window.matchMedia('(prefers-color-scheme: dark)')
       : null;
-
+  // Signals
   private readonly preferencesSignal = signal<AppPreferences>({ ...DEFAULT_PREFERENCES });
+  // Computed Signals
   readonly preferences = computed(() => this.preferencesSignal());
 
   constructor(
@@ -99,8 +50,8 @@ export class AppPreferencesService {
     const now = new Date().toISOString();
 
     const doc: AppPreferencesDoc = {
-      _id: STORAGE_KEY,
-      type: DOC_TYPE,
+      _id: STORAGE_KEY_PREFERENCES,
+      type: DOC_TYPE_PREFERENCES,
       createdAt: this.cachedDoc?.createdAt ?? now,
       updatedAt: now,
       _rev: this.cachedDoc?._rev,
@@ -117,7 +68,7 @@ export class AppPreferencesService {
 
   private async loadFromStorage(): Promise<void> {
     try {
-      const doc = await this.storage.get(STORAGE_KEY);
+      const doc = await this.storage.get(STORAGE_KEY_PREFERENCES);
       if (doc) {
         this.cachedDoc = doc;
         const normalized = this.normalizePreferences(doc);

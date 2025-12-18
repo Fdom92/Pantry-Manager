@@ -27,7 +27,6 @@ import { TranslateModule } from '@ngx-translate/core';
 export class PantryDetailComponent {
   @Input({ required: true }) viewModel!: PantryItemCardViewModel;
   @Input() expanded = false;
-
   @Output() toggleRequested = new EventEmitter<Event | undefined>();
   @Output() summaryKeydown = new EventEmitter<KeyboardEvent>();
   @Output() openBatches = new EventEmitter<Event | undefined>();

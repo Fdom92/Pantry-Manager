@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
-import { NavController } from '@ionic/angular';
+import { App as CapacitorApp } from '@capacitor/app';
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { PantryService } from '@core/services/pantry.service';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { App as CapacitorApp } from '@capacitor/app';
+import { NavController } from '@ionic/angular';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-root',

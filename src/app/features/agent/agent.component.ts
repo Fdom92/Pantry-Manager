@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, ViewChild, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, ViewChild, effect } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AgentMessage } from '@core/models';
 import { AgentService } from '@core/services/agent.service';
 import { RevenuecatService } from '@core/services/revenuecat.service';
+import { NavController } from '@ionic/angular';
 import {
   IonBadge,
   IonButton,
@@ -17,9 +19,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { NavController } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-agent',
@@ -46,11 +46,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class AgentComponent implements OnDestroy {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
-  private readonly agentService = inject(AgentService);
-  private readonly revenuecat = inject(RevenuecatService);
-  private readonly navCtrl = inject(NavController);
-  private readonly destroyRef = inject(DestroyRef);
-
+  // Data
   readonly messages = this.agentService.messages;
   readonly thinking = this.agentService.thinking;
   readonly agentPhase = this.agentService.agentPhase;
@@ -71,13 +67,18 @@ export class AgentComponent implements OnDestroy {
       status: 'error',
     },
   ];
-
+  // Form
   readonly messageControl = new FormControl('', {
     nonNullable: true,
     validators: [Validators.maxLength(500)],
   });
 
-  constructor() {
+  constructor(
+    private readonly agentService: AgentService,
+    private readonly revenuecat: RevenuecatService,
+    private readonly navCtrl: NavController,
+    private readonly destroyRef: DestroyRef,
+  ) {
     // Keep the composer enabled only for allowed users (PRO or override) to avoid template disabled binding warnings.
     this.canUseAgent$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -99,8 +100,17 @@ export class AgentComponent implements OnDestroy {
     });
   }
 
+  ngOnDestroy(): void {
+    this.agentService.resetConversation();
+  }
+
   trackById(_: number, message: AgentMessage): string {
     return message.id;
+  }
+
+  clearChat(): void {
+    this.agentService.resetConversation();
+    this.messageControl.setValue('');
   }
 
   async send(): Promise<void> {
@@ -117,11 +127,6 @@ export class AgentComponent implements OnDestroy {
     await this.scrollToBottom();
   }
 
-  clearChat(): void {
-    this.agentService.resetConversation();
-    this.messageControl.setValue('');
-  }
-
   async scrollToBottom(): Promise<void> {
     if (!this.content) {
       return;
@@ -131,10 +136,6 @@ export class AgentComponent implements OnDestroy {
     } catch {
       // best-effort; ignore
     }
-  }
-
-  ngOnDestroy(): void {
-    this.agentService.resetConversation();
   }
 
   async goToUpgrade(): Promise<void> {

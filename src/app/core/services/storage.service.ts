@@ -13,12 +13,13 @@ type PouchResponse = PouchDB.Core.Response;
   providedIn: 'root',
 })
 export class StorageService<T extends BaseDoc> {
+  // Data
   private db: PouchDB.Database<T>;
-  /**
-   * Internal chunk size used to stream complete lists without imposing a hard total limit.
-   * This keeps memory predictable while still returning every document.
-   */
   private readonly LIST_CHUNK_SIZE = 250;
+  // Getter
+  protected get database(): PouchDB.Database<T> {
+    return this.db;
+  }
 
   constructor() {
     // auto_compaction reduces database size; tweak if needed
@@ -296,9 +297,5 @@ export class StorageService<T extends BaseDoc> {
       }
     }
     return Array.from(duplicates);
-  }
-
-  protected get database(): PouchDB.Database<T> {
-    return this.db;
   }
 }

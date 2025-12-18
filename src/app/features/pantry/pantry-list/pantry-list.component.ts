@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, OnDestroy, signal, Signal, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
+import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_HOUSEHOLD_ID, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS } from '@core/constants';
 import {
   BatchCountsMeta,
   BatchEntryMeta,
@@ -12,8 +12,8 @@ import {
   FilterChipViewModel,
   ItemBatch,
   ItemLocationStock,
-  MoveBatchesResult,
   MeasurementUnit,
+  MoveBatchesResult,
   PantryGroup,
   PantryItem,
   PantryItemBatchViewModel,
@@ -26,14 +26,12 @@ import {
 import { PantryFilterState } from '@core/models/pantry-pipeline.model';
 import {
   AppPreferencesService,
-  DEFAULT_CATEGORY_OPTIONS,
-  DEFAULT_LOCATION_OPTIONS,
-  DEFAULT_SUPERMARKET_OPTIONS,
   LanguageService,
 } from '@core/services';
 import { PantryService } from '@core/services/pantry.service';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { createDocumentId } from '@core/utils';
+import { ToastController } from '@ionic/angular';
 import {
   IonBadge,
   IonButton,
@@ -66,10 +64,9 @@ import {
   IonToggle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
+import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
 
 @Component({
   selector: 'app-pantry-list',
@@ -117,6 +114,23 @@ import { EmptyStateGenericComponent } from '@shared/components/empty-states/empt
 })
 export class PantryListComponent implements OnDestroy {
   @ViewChild('content', { static: false }) private content?: IonContent;
+  // Data
+  moveSubmitting = false;
+  moveError: string | null = null;
+  showCreateModal = false;
+  editingItem: PantryItem | null = null;
+  isSaving = false;
+  private realtimeSubscribed = false;
+  readonly loading = this.pantryService.loading;
+  readonly nearExpiryDays = 7;
+  readonly MeasurementUnit = MeasurementUnit;
+  readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
+  private readonly expandedItems = new Set<string>();
+  private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly pendingItems = new Map<string, PantryItem>();
+  private readonly stockSaveDelay = 500;
+  private readonly deleteAnimationDuration = 220;
+  // Signals
   readonly searchTerm: Signal<string>;
   readonly activeFilters: Signal<PantryFilterState>;
   readonly selectedCategory: Signal<string>;
@@ -126,8 +140,17 @@ export class PantryListComponent implements OnDestroy {
   readonly showFilters = signal(false);
   readonly basicOnly: Signal<boolean>;
   readonly itemsState = signal<PantryItem[]>([]);
+  readonly showBatchesModal = signal(false);
+  readonly selectedBatchesItem = signal<PantryItem | null>(null);
+  readonly showMoveModal = signal(false);
+  readonly moveItemTarget = signal<PantryItem | null>(null);
+  readonly summaryCache = signal<PantrySummaryMeta>(this.createEmptySummary());
+  readonly hasLoadedOnce = signal(false);
+  readonly showAdvanced = signal(false);
+  readonly collapsedGroups = signal<Set<string>>(new Set());
+  readonly deletingItems = signal<Set<string>>(new Set());
+  // Computed Signals
   readonly groups = computed(() => this.buildGroups(this.itemsState()));
-  private readonly summaryCache = signal<PantrySummaryMeta>(this.createEmptySummary());
   readonly summary = computed<PantrySummaryMeta>(() => this.summaryCache());
   readonly filterChips = computed(() => this.buildFilterChips(this.summary(), this.statusFilter(), this.basicOnly()));
   readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
@@ -137,29 +160,7 @@ export class PantryListComponent implements OnDestroy {
   readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
   readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
   readonly batchSummaries = computed(() => this.computeBatchSummaries(this.itemsState()));
-  readonly showBatchesModal = signal(false);
-  readonly selectedBatchesItem = signal<PantryItem | null>(null);
-  readonly showMoveModal = signal(false);
-  readonly moveItemTarget = signal<PantryItem | null>(null);
-  moveSubmitting = false;
-  moveError: string | null = null;
-  readonly loading = this.pantryService.loading;
-  readonly nearExpiryDays = 7;
-  readonly MeasurementUnit = MeasurementUnit;
-  readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
-  readonly hasLoadedOnce = signal(false);
-  readonly showAdvanced = signal(false);
-  readonly collapsedGroups = signal<Set<string>>(new Set());
-  showCreateModal = false;
-  editingItem: PantryItem | null = null;
-  isSaving = false;
-  private readonly expandedItems = new Set<string>();
-  private readonly deletingItems = signal<Set<string>>(new Set());
-  private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
-  private readonly pendingItems = new Map<string, PantryItem>();
-  private readonly stockSaveDelay = 500;
-  private readonly deleteAnimationDuration = 220;
-  private realtimeSubscribed = false;
+  // Forms
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     quickQuantity: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
@@ -180,7 +181,6 @@ export class PantryListComponent implements OnDestroy {
       })
     ])
   });
-
   readonly moveForm = this.fb.group({
     fromLocation: this.fb.control('', {
       validators: [Validators.required],
@@ -194,34 +194,11 @@ export class PantryListComponent implements OnDestroy {
       validators: [Validators.required, Validators.min(0.01)],
     }),
   });
-
+  // Getter
   get locationsArray(): FormArray<FormGroup> {
     return this.form.get('locations') as FormArray<FormGroup>;
   }
 
-  getBatchesArray(locationIndex: number): FormArray<FormGroup> {
-    const control = this.locationsArray.at(locationIndex).get('batches');
-    if (control instanceof FormArray) {
-      return control as FormArray<FormGroup>;
-    }
-
-    const batches = this.fb.array<FormGroup>([]);
-    this.locationsArray.at(locationIndex).setControl('batches', batches);
-    return batches;
-  }
-
-  addBatchEntry(locationIndex: number): void {
-    const batches = this.getBatchesArray(locationIndex);
-    batches.push(this.createBatchGroup());
-  }
-
-  removeBatchEntry(locationIndex: number, batchIndex: number): void {
-    const batches = this.getBatchesArray(locationIndex);
-    if (batchIndex < 0 || batchIndex >= batches.length) {
-      return;
-    }
-    batches.removeAt(batchIndex);
-  }
   constructor(
     private readonly pantryStore: PantryStoreService,
     private readonly pantryService: PantryService,
@@ -298,6 +275,30 @@ export class PantryListComponent implements OnDestroy {
     }
     this.hasLoadedOnce.set(true);
     this.scrollViewportToTop();
+  }
+
+  getBatchesArray(locationIndex: number): FormArray<FormGroup> {
+    const control = this.locationsArray.at(locationIndex).get('batches');
+    if (control instanceof FormArray) {
+      return control as FormArray<FormGroup>;
+    }
+
+    const batches = this.fb.array<FormGroup>([]);
+    this.locationsArray.at(locationIndex).setControl('batches', batches);
+    return batches;
+  }
+
+  addBatchEntry(locationIndex: number): void {
+    const batches = this.getBatchesArray(locationIndex);
+    batches.push(this.createBatchGroup());
+  }
+
+  removeBatchEntry(locationIndex: number, batchIndex: number): void {
+    const batches = this.getBatchesArray(locationIndex);
+    if (batchIndex < 0 || batchIndex >= batches.length) {
+      return;
+    }
+    batches.removeAt(batchIndex);
   }
 
   /** Open the creation modal with blank defaults and a single location row. */

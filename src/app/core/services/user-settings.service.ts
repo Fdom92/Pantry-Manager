@@ -1,27 +1,21 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { DEFAULT_SETTINGS, DOC_TYPE_SETTINGS, STORAGE_KEY_SETTINGS } from '@core/constants';
 import {
   UserSettings,
   UserSettingsDoc,
 } from '@core/models';
 import { StorageService } from './storage.service';
 
-const STORAGE_KEY = 'user:settings';
-const DOC_TYPE = 'user-settings';
-
-const DEFAULT_SETTINGS: UserSettings = {
-  username: '',
-  householdName: '',
-  favoriteSupermarket: '',
-};
-
 @Injectable({
   providedIn: 'root',
 })
 export class UserSettingsService {
+  // Data
   private readonly ready: Promise<void>;
   private cachedDoc: UserSettingsDoc | null = null;
-
+  // Signals
   private readonly settingsSignal = signal<UserSettings>({ ...DEFAULT_SETTINGS });
+  // Computed Signals
   readonly settings = computed(() => this.settingsSignal());
 
   constructor(
@@ -45,8 +39,8 @@ export class UserSettingsService {
     const now = new Date().toISOString();
 
     const doc: UserSettingsDoc = {
-      _id: STORAGE_KEY,
-      type: DOC_TYPE,
+      _id: STORAGE_KEY_SETTINGS,
+      type: DOC_TYPE_SETTINGS,
       createdAt: this.cachedDoc?.createdAt ?? now,
       updatedAt: now,
       _rev: this.cachedDoc?._rev,
@@ -63,7 +57,7 @@ export class UserSettingsService {
 
   private async loadFromStorage(): Promise<void> {
     try {
-      const doc = await this.storage.get(STORAGE_KEY);
+      const doc = await this.storage.get(STORAGE_KEY_SETTINGS);
       if (doc) {
         this.cachedDoc = doc;
         this.settingsSignal.set(this.normalizeSettings(doc));

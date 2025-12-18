@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
+import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS, TOAST_DURATION } from '@core/constants';
 import {
   AppPreferencesService,
-  DEFAULT_CATEGORY_OPTIONS,
-  DEFAULT_LOCATION_OPTIONS,
-  DEFAULT_SUPERMARKET_OPTIONS,
 } from '@core/services';
+import { ToastController } from '@ionic/angular';
 import {
   IonBackButton,
   IonButton,
@@ -23,11 +22,8 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
-
-const TOAST_DURATION = 1800;
 
 @Component({
   selector: 'app-settings-catalogs',
@@ -56,11 +52,16 @@ const TOAST_DURATION = 1800;
   styleUrls: ['./settings-catalogs.component.scss'],
 })
 export class SettingsCatalogsComponent {
+  // Signals
   readonly loading = signal(false);
   readonly savingCatalogs = signal(false);
-
   readonly locationOptionsDraft = signal<string[]>([]);
   readonly originalLocationOptions = signal<string[]>([]);
+  readonly categoryOptionsDraft = signal<string[]>([]);
+  readonly originalCategoryOptions = signal<string[]>([]);
+  readonly supermarketOptionsDraft = signal<string[]>([]);
+  readonly originalSupermarketOptions = signal<string[]>([]);
+  // Computed Signals
   readonly hasLocationChanges = computed(() => {
     const draft = this.normalizeLocationOptions(this.locationOptionsDraft(), false);
     const original = this.originalLocationOptions();
@@ -69,9 +70,6 @@ export class SettingsCatalogsComponent {
     }
     return draft.some((value, index) => value !== original[index]);
   });
-
-  readonly categoryOptionsDraft = signal<string[]>([]);
-  readonly originalCategoryOptions = signal<string[]>([]);
   readonly hasCategoryChanges = computed(() => {
     const draft = this.normalizeCategoryOptions(this.categoryOptionsDraft(), false);
     const original = this.originalCategoryOptions();
@@ -80,9 +78,6 @@ export class SettingsCatalogsComponent {
     }
     return draft.some((value, index) => value !== original[index]);
   });
-
-  readonly supermarketOptionsDraft = signal<string[]>([]);
-  readonly originalSupermarketOptions = signal<string[]>([]);
   readonly hasSupermarketChanges = computed(() => {
     const draft = this.normalizeSupermarketOptions(this.supermarketOptionsDraft(), false);
     const original = this.originalSupermarketOptions();
@@ -91,7 +86,6 @@ export class SettingsCatalogsComponent {
     }
     return draft.some((value, index) => value !== original[index]);
   });
-
   readonly hasAnyChanges = computed(
     () =>
       this.hasLocationChanges() ||

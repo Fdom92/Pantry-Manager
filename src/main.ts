@@ -18,14 +18,16 @@ import {
   addCircleOutline,
   addOutline,
   alertCircleOutline,
+  apertureOutline,
   basketOutline,
+  bulbOutline,
   calendarOutline,
   cartOutline,
   chatbubblesOutline,
   checkmarkCircleOutline,
   chevronDownOutline,
   chevronUpOutline,
-  close as closeIcon,
+  close,
   createOutline,
   cubeOutline,
   ellipsisVerticalOutline,
@@ -47,6 +49,7 @@ import {
   sendOutline,
   settingsOutline,
   shareOutline,
+  sparklesOutline,
   speedometerOutline,
   starOutline,
   storefrontOutline,
@@ -82,7 +85,7 @@ function localeFactory(language: LanguageService): string {
 }
 
 addIcons({
-  close: closeIcon,
+  close: close,
   'home-outline': homeOutline,
   'basket-outline': basketOutline,
   'cart-outline': cartOutline,
@@ -120,7 +123,10 @@ addIcons({
   'storefront-outline': storefrontOutline,
   'ellipsis-vertical-outline': ellipsisVerticalOutline,
   'share-outline': shareOutline,
-  'swap-horizontal-outline': swapHorizontalOutline
+  'swap-horizontal-outline': swapHorizontalOutline,
+  'aperture-outline': apertureOutline,
+  'bulb-outline': bulbOutline,
+  'sparkles-outline': sparklesOutline
 });
 
 bootstrapApplication(AppComponent, {

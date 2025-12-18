@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
-import { DEFAULT_HOUSEHOLD_ID, LOCATION_SYNONYMS, AGENT_TOOLS_CATALOG } from '@core/constants';
+import { AGENT_TOOLS_CATALOG, DEFAULT_CATEGORY_OPTIONS, DEFAULT_HOUSEHOLD_ID, DEFAULT_LOCATION_OPTIONS, LOCATION_SYNONYMS } from '@core/constants';
 import {
   AgentMessage, AgentModelCallError, AgentModelMessage, AgentModelRequest,
   AgentModelResponse,
@@ -11,33 +11,24 @@ import {
   ToolExecution
 } from '@core/models';
 import { createDocumentId } from '@core/utils';
+import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, timeout as rxTimeout } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { AppPreferencesService, DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS } from './app-preferences.service';
+import { AppPreferencesService } from './app-preferences.service';
 import { PantryService } from './pantry.service';
 import { RevenuecatService } from './revenuecat.service';
-import { ToastController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AgentService {
-  // Backend endpoint for the LLM agent (OpenAI proxy).
+  // Data
   private readonly apiUrl = environment.agentApiUrl ?? '';
-  // Max time to wait for the agent HTTP call before timing out.
   private readonly requestTimeoutMs = 30000;
-  private readonly messagesSignal = signal<AgentMessage[]>([]);
-  readonly messages = computed(() => this.messagesSignal().filter(message => this.isVisibleMessage(message)));
-  private readonly agentPhaseSignal = signal<AgentPhase>('idle');
-  readonly agentPhase = computed(() => this.agentPhaseSignal());
-  readonly thinking = signal(false);
-  private readonly retryAvailable = signal(false);
-  readonly canRetry = computed(() => this.retryAvailable());
   private readonly transientStatusCodes = new Set([502, 503, 504]);
   private readonly maxTransientRetries = 2;
   private readonly transientRetryDelayMs = 600;
-
   private readonly toolDefinitionsMap = new Map<string, AgentToolDefinition>(
     AGENT_TOOLS_CATALOG.map(tool => [tool.name, tool])
   );
@@ -51,6 +42,15 @@ export class AgentService {
     ['markOpened', 'agent.toasts.markOpened'],
     ['updateProductInfo', 'agent.toasts.updateProductInfo'],
   ]);
+  // Signals
+  private readonly messagesSignal = signal<AgentMessage[]>([]);
+  readonly thinking = signal(false);
+  private readonly retryAvailable = signal(false);
+  private readonly agentPhaseSignal = signal<AgentPhase>('idle');
+  // Computed Signals
+  readonly messages = computed(() => this.messagesSignal().filter(message => this.isVisibleMessage(message)));
+  readonly agentPhase = computed(() => this.agentPhaseSignal());
+  readonly canRetry = computed(() => this.retryAvailable());
 
   constructor(
     private readonly http: HttpClient,
@@ -60,10 +60,6 @@ export class AgentService {
     private readonly revenuecat: RevenuecatService,
     private readonly toastController: ToastController,
   ) {}
-
-  private t(key: string, params?: Record<string, any>): string {
-    return this.translate.instant(key, params);
-  }
 
   async sendMessage(userText: string): Promise<AgentMessage | null> {
     const trimmed = (userText ?? '').trim();
@@ -2074,5 +2070,9 @@ export class AgentService {
     msg.data = details?.length ? { summary: message, details } : { summary: message };
     msg.modelContent = JSON.stringify({ status: 'error', message, details: details ?? [] });
     return { success: false, message: msg };
+  }
+
+  private t(key: string, params?: Record<string, any>): string {
+    return this.translate.instant(key, params);
   }
 }

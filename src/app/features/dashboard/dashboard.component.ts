@@ -55,19 +55,24 @@ import { EmptyStateGenericComponent } from '@shared/components/empty-states/empt
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
+  // Data
   private hasInitialized = false;
-
-  readonly lastUpdated = signal<string | null>(null);
-  readonly deletingExpired = signal(false);
   readonly items = this.pantryStore.items;
   readonly lowStockItems = this.pantryStore.lowStockItems;
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
   readonly expiredItems = this.pantryStore.expiredItems;
   readonly summary = this.pantryStore.summary;
+  // Signals
   readonly showSnapshot = signal(true);
-
+  readonly lastUpdated = signal<string | null>(null);
+  readonly deletingExpired = signal(false);
+  // Computed Signals
   readonly totalItems = computed(() => this.summary().total);
   readonly recentItems = computed(() => this.computeRecentItems(this.items()));
+  // Getter
+  get nearExpiryWindow(): number {
+    return NEAR_EXPIRY_WINDOW_DAYS;
+  }
 
   constructor(
     private readonly pantryStore: PantryStoreService,
@@ -97,10 +102,6 @@ export class DashboardComponent {
     await this.pantryStore.loadAll();
     this.hasInitialized = true;
     this.lastUpdated.set(new Date().toISOString());
-  }
-
-  get nearExpiryWindow(): number {
-    return NEAR_EXPIRY_WINDOW_DAYS;
   }
 
   /** Toggle the visibility of the snapshot card without altering other state. */
@@ -147,11 +148,6 @@ export class DashboardComponent {
     return aTime - bTime;
   }
 
-  /** Count distinct non-empty values; used by summary badges. */
-  private countDistinct(values: (string | undefined)[]): number {
-    return new Set(values.filter(Boolean)).size;
-  }
-
   /** Total quantity across all locations for dashboard chips. */
   getItemTotalQuantity(item: PantryItem): number {
     return this.pantryStore.getItemTotalQuantity(item);
@@ -194,6 +190,28 @@ export class DashboardComponent {
         return `${quantity} ${unit} · ${name}`;
       })
       .join(', ');
+  }
+
+  formatLastUpdated(value: string | null): string {
+    if (!value) {
+      return '';
+    }
+    const locale = this.languageService.getCurrentLocale();
+    try {
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) {
+        return '';
+      }
+      const datePart = parsed.toLocaleDateString(locale, ES_DATE_FORMAT_OPTIONS.numeric);
+      const timePart = parsed.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+      return `${datePart} ${timePart}`;
+    } catch {
+      return '';
+    }
+  }
+
+  formatDate(value?: string | null): string {
+    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
   }
 
   /** Map raw location ids into friendly labels for dashboard display. */
@@ -241,32 +259,6 @@ export class DashboardComponent {
     } catch {
       return value;
     }
-  }
-
-  formatLastUpdated(value: string | null): string {
-    if (!value) {
-      return '';
-    }
-    const locale = this.languageService.getCurrentLocale();
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return '';
-      }
-      const datePart = parsed.toLocaleDateString(locale, ES_DATE_FORMAT_OPTIONS.numeric);
-      const timePart = parsed.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-      return `${datePart} ${timePart}`;
-    } catch {
-      return '';
-    }
-  }
-
-  formatExpiryFull(value?: string | null): string {
-    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
-  }
-
-  formatExpiryBadge(value?: string | null): string {
-    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
   }
 
   private formatDateWithOptions(

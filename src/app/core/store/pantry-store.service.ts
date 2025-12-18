@@ -4,37 +4,31 @@ import { PantryService } from '@core/services/pantry.service';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
-  /** --- Main state signal --- */
-  private readonly itemsSignal = signal<PantryItem[]>([]);
-  readonly items = computed(() => this.itemsSignal());
-
-  /** --- Loading & error state --- */
+  // Data
+  private readonly knownMeasurementUnits = new Set(
+    Object.values(MeasurementUnit).map(option => option.toLowerCase())
+  );
+  // Signals
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
-
-  /** --- Derived computed signals --- */
+  private readonly itemsSignal = signal<PantryItem[]>([]);
+  // Computed Signals
+  readonly items = computed(() => this.itemsSignal());
   readonly expiredItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemExpired(item))
   );
-
   readonly nearExpiryItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemNearExpiry(item))
   );
-
   readonly lowStockItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemLowStock(item))
   );
-
-  /** --- Quick summary for dashboard or analytics --- */
   readonly summary = computed(() => ({
     total: this.items().length,
     expired: this.expiredItems().length,
     nearExpiry: this.nearExpiryItems().length,
     lowStock: this.lowStockItems().length,
   }));
-  private readonly knownMeasurementUnits = new Set(
-    Object.values(MeasurementUnit).map(option => option.toLowerCase())
-  );
 
   constructor(private readonly pantryService: PantryService) {
     // Mirror the shared pantry service cache so dashboard consumers avoid duplicating DB reads.

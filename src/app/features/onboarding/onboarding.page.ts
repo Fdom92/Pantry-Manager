@@ -1,30 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, computed, signal } from '@angular/core';
-import { ONBOARDING_STORAGE_KEY } from '@core/constants';
-import { RevenuecatService } from '@core/services/revenuecat.service';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, signal, ViewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { ONBOARDING_STORAGE_KEY } from '@core/constants';
+import { OnboardingSlide } from '@core/models';
+import { RevenuecatService } from '@core/services/revenuecat.service';
 import { NavController } from '@ionic/angular';
+import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { register } from 'swiper/element/bundle';
 import type { SwiperOptions } from 'swiper/types';
-import { addIcons } from 'ionicons';
-import {
-  apertureOutline,
-  bulbOutline,
-  chatbubblesOutline,
-  layersOutline,
-  sparklesOutline,
-} from 'ionicons/icons';
-
-interface OnboardingSlide {
-  key: string;
-  titleKey: string;
-  descriptionKey: string;
-  icon: string;
-  badgeKey?: string | null;
-  pro?: boolean;
-}
 
 @Component({
   selector: 'app-onboarding',
@@ -37,7 +21,7 @@ interface OnboardingSlide {
 })
 export class OnboardingPage implements AfterViewInit {
   @ViewChild('swiperRef') swiper?: ElementRef<any>;
-
+  // Data
   readonly slideOptions: SwiperOptions = {
     speed: 550,
     spaceBetween: 24,
@@ -49,7 +33,6 @@ export class OnboardingPage implements AfterViewInit {
       next: { translate: ['16%', 0, 0], scale: 0.95, opacity: 1 },
     },
   };
-
   private readonly baseSlides: OnboardingSlide[] = [
     {
       key: 'organize',
@@ -70,7 +53,6 @@ export class OnboardingPage implements AfterViewInit {
       icon: 'bulb-outline',
     },
   ];
-
   private readonly agentSlideLocked: OnboardingSlide = {
     key: 'agent',
     titleKey: 'onboarding.slides.agent.title',
@@ -79,7 +61,6 @@ export class OnboardingPage implements AfterViewInit {
     badgeKey: 'onboarding.slides.agent.badge',
     pro: true,
   };
-
   private readonly agentSlideUnlocked: OnboardingSlide = {
     key: 'agent',
     titleKey: 'onboarding.slides.agent.titlePro',
@@ -88,26 +69,20 @@ export class OnboardingPage implements AfterViewInit {
     badgeKey: 'onboarding.slides.agent.badgePro',
     pro: true,
   };
-
+  // Signals
+  readonly activeIndex = signal(0);
   readonly isPro = toSignal(this.revenuecat.isPro$, { initialValue: false });
+  // Computed Signals
   readonly slidesToShow = computed<OnboardingSlide[]>(() => {
     const agentSlide = this.isPro() ? this.agentSlideUnlocked : this.agentSlideLocked;
     return [...this.baseSlides, agentSlide];
   });
 
-  readonly activeIndex = signal(0);
-
   constructor(
     private readonly navCtrl: NavController,
     private readonly revenuecat: RevenuecatService,
   ) {
-    addIcons({
-      apertureOutline,
-      sparklesOutline,
-      layersOutline,
-      bulbOutline,
-      chatbubblesOutline,
-    });
+    // Register the Swiper to make it works
     register();
   }
 

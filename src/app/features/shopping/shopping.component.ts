@@ -5,22 +5,18 @@ import {
   MeasurementUnit,
   PantryItem,
   ShoppingReason,
-  ShoppingState,
-  ShoppingSuggestion,
-  ShoppingSuggestionGroup,
-  ShoppingSummary,
+  ShoppingStateWithItem,
+  ShoppingSuggestionGroupWithItem,
+  ShoppingSuggestionWithItem,
+  ShoppingSummary
 } from '@core/models';
 import { LanguageService, PantryService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import jsPDF from 'jspdf';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
+import jsPDF from 'jspdf';
 import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
-
-type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;
-type ShoppingSuggestionGroupWithItem = ShoppingSuggestionGroup<PantryItem>;
-type ShoppingStateWithItem = ShoppingState<PantryItem>;
 
 @Component({
   selector: 'app-shopping',
@@ -35,9 +31,14 @@ type ShoppingStateWithItem = ShoppingState<PantryItem>;
   styleUrls: ['./shopping.component.scss'],
 })
 export class ShoppingComponent {
-  private readonly unassignedSupermarketKey = '__none__';
-
+  // Data
   readonly loading = this.pantryStore.loading;
+  private readonly unassignedSupermarketKey = '__none__';
+  // Signals
+  readonly summaryExpanded = signal(true);
+  readonly processingIds = signal<Set<string>>(new Set());
+  readonly sharingList = signal(false);
+  // Computed Signals
   readonly shoppingState = computed<ShoppingStateWithItem>(() => {
     const analysis = this.analyzeShopping(this.pantryStore.items());
     return {
@@ -45,9 +46,6 @@ export class ShoppingComponent {
       hasAlerts: analysis.summary.total > 0,
     };
   });
-  readonly summaryExpanded = signal(true);
-  readonly processingIds = signal<Set<string>>(new Set());
-  readonly sharingList = signal(false);
 
   constructor(
     private readonly pantryStore: PantryStoreService,
@@ -108,40 +106,6 @@ export class ShoppingComponent {
     }
   }
 
-  /**
-   * Persist the purchased batch and refresh shopping state.
-   */
-  private async handlePurchase(
-    suggestion: ShoppingSuggestionWithItem,
-    data: { quantity: number; expiryDate?: string | null; location: string }
-  ): Promise<void> {
-    const id = suggestion.item?._id;
-    if (!id || this.isProcessing(id)) {
-      return;
-    }
-
-    this.processingIds.update(ids => {
-      const next = new Set(ids);
-      next.add(id);
-      return next;
-    });
-
-    try {
-      await this.pantryService.addNewLot(id, {
-        quantity: data.quantity,
-        expiryDate: data.expiryDate ?? undefined,
-        location: data.location,
-      });
-      await this.pantryStore.loadAll();
-    } finally {
-      this.processingIds.update(ids => {
-        const next = new Set(ids);
-        next.delete(id);
-        return next;
-      });
-    }
-  }
-
   getUnitLabel(unit: MeasurementUnit | string): string {
     return this.pantryStore.getUnitLabel(this.normalizeUnit(unit));
   }
@@ -180,6 +144,10 @@ export class ShoppingComponent {
     } finally {
       this.sharingList.set(false);
     }
+  }
+
+  getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
+    return suggestion.item?._id ?? suggestion.item?.name ?? 'item';
   }
 
   /**
@@ -304,8 +272,38 @@ export class ShoppingComponent {
     });
   }
 
-  getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
-    return suggestion.item?._id ?? suggestion.item?.name ?? 'item';
+  /**
+   * Persist the purchased batch and refresh shopping state.
+   */
+  private async handlePurchase(
+    suggestion: ShoppingSuggestionWithItem,
+    data: { quantity: number; expiryDate?: string | null; location: string }
+  ): Promise<void> {
+    const id = suggestion.item?._id;
+    if (!id || this.isProcessing(id)) {
+      return;
+    }
+
+    this.processingIds.update(ids => {
+      const next = new Set(ids);
+      next.add(id);
+      return next;
+    });
+
+    try {
+      await this.pantryService.addNewLot(id, {
+        quantity: data.quantity,
+        expiryDate: data.expiryDate ?? undefined,
+        location: data.location,
+      });
+      await this.pantryStore.loadAll();
+    } finally {
+      this.processingIds.update(ids => {
+        const next = new Set(ids);
+        next.delete(id);
+        return next;
+      });
+    }
   }
 
   /** Keep the suggested quantity positive, defaulting to a fallback when needed. */

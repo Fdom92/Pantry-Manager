@@ -20,26 +20,16 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 export class AddPurchaseModalComponent implements OnInit {
   @Input() item: ShoppingItem | null = null;
   @Input() product: PantryItem | null = null;
-
   @Output() confirm = new EventEmitter<{
     quantity: number;
     expiryDate?: string | null;
     location: string;
   }>();
-
+  // Data
   quantity = 1;
   expiryDate: string | null = null;
   location = 'unassigned';
-
-  constructor(
-    private readonly modalCtrl: ModalController,
-    private readonly translate: TranslateService,
-  ) {}
-
-  ngOnInit(): void {
-    this.initializeDefaults();
-  }
-
+  // Getters
   get locationOptions(): string[] {
     const options = new Set<string>();
     const fromItem = (this.item?.locationId ?? '').trim();
@@ -59,9 +49,17 @@ export class AddPurchaseModalComponent implements OnInit {
     }
     return Array.from(options);
   }
-
   get canConfirm(): boolean {
     return this.quantity > 0 && Boolean(this.location);
+  }
+
+  constructor(
+    private readonly modalCtrl: ModalController,
+    private readonly translate: TranslateService,
+  ) {}
+
+  ngOnInit(): void {
+    this.initializeDefaults();
   }
 
   getLocationLabel(id: string): string {
