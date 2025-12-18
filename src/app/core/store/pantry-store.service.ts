@@ -1,10 +1,12 @@
-import { computed, effect, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { MeasurementUnit, PantryItem, StockStatus } from '@core/models';
 import { PantryService } from '@core/services/pantry.service';
 import { normalizeLocationId } from '@core/utils/normalization.util';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
+  // DI
+  private readonly pantryService = inject(PantryService);
   // Data
   private readonly knownMeasurementUnits = new Set(
     Object.values(MeasurementUnit).map(option => option.toLowerCase())
@@ -31,7 +33,7 @@ export class PantryStoreService {
     lowStock: this.lowStockItems().length,
   }));
 
-  constructor(private readonly pantryService: PantryService) {
+  constructor() {
     // Mirror the shared pantry service cache so dashboard consumers avoid duplicating DB reads.
     effect(() => {
       this.itemsSignal.set(this.pantryService.loadedProducts());

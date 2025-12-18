@@ -1,4 +1,4 @@
-import { Injectable, Signal, signal } from '@angular/core';
+import { Injectable, inject, Signal, signal } from '@angular/core';
 import { DEFAULT_LANGUAGE, LOCALES, SUPPORTED_LANGUAGES, SupportedLanguage } from '@core/constants';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
@@ -7,10 +7,10 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root',
 })
 export class LanguageService {
+  // DI
+  private readonly translate = inject(TranslateService);
   // Signals
   private readonly currentLanguage = signal<SupportedLanguage>(DEFAULT_LANGUAGE);
-
-  constructor(private readonly translate: TranslateService) {}
 
   async init(): Promise<void> {
     this.translate.addLangs([...SUPPORTED_LANGUAGES]);

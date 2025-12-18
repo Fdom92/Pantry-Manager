@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { PlanViewModel } from '@core/models';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { NavController } from '@ionic/angular';
@@ -41,6 +41,12 @@ import { PlanCardComponent } from './plan-card/plan-card.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpgradePage {
+  // DI
+  private readonly navCtrl = inject(NavController);
+  private readonly revenuecat = inject(RevenuecatService);
+  private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
+  private readonly cdr = inject(ChangeDetectorRef);
   // Data
   plans: PlanViewModel[] = [];
   loadingPackages = false;
@@ -50,14 +56,6 @@ export class UpgradePage {
   readonly isPro$ = this.revenuecat.isPro$;
   readonly benefitKeys = ['upgrade.benefits.agent', 'upgrade.benefits.future'];
   private readonly planPackages: PurchasesPackage[] = [];
-
-  constructor(
-    private readonly navCtrl: NavController,
-    private readonly revenuecat: RevenuecatService,
-    private readonly toastCtrl: ToastController,
-    private readonly translate: TranslateService,
-    private readonly cdr: ChangeDetectorRef,
-  ) {}
 
   goBack(): void {
     this.navCtrl.back();

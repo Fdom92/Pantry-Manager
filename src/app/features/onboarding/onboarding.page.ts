@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { OnboardingSlide } from '@core/models';
@@ -21,6 +21,9 @@ import type { SwiperOptions } from 'swiper/types';
 })
 export class OnboardingPage implements AfterViewInit {
   @ViewChild('swiperRef') swiper?: ElementRef<any>;
+  // DI
+  private readonly navCtrl = inject(NavController);
+  private readonly revenuecat = inject(RevenuecatService);
   // Data
   readonly slideOptions: SwiperOptions = {
     speed: 550,
@@ -78,10 +81,7 @@ export class OnboardingPage implements AfterViewInit {
     return [...this.baseSlides, agentSlide];
   });
 
-  constructor(
-    private readonly navCtrl: NavController,
-    private readonly revenuecat: RevenuecatService,
-  ) {
+  constructor() {
     // Register the Swiper to make it works
     register();
   }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PantryItem, ShoppingItem } from '@core/models';
 import { normalizeLocationId } from '@core/utils/normalization.util';
@@ -26,6 +26,9 @@ export class AddPurchaseModalComponent implements OnInit {
     expiryDate?: string | null;
     location: string;
   }>();
+  // DI
+  private readonly modalCtrl = inject(ModalController);
+  private readonly translate = inject(TranslateService);
   // Data
   quantity = 1;
   expiryDate: string | null = null;
@@ -53,11 +56,6 @@ export class AddPurchaseModalComponent implements OnInit {
   get canConfirm(): boolean {
     return this.quantity > 0 && Boolean(this.location);
   }
-
-  constructor(
-    private readonly modalCtrl: ModalController,
-    private readonly translate: TranslateService,
-  ) {}
 
   ngOnInit(): void {
     this.initializeDefaults();

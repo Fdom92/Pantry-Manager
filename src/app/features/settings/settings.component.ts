@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { AppThemePreference, BaseDoc } from '@core/models';
@@ -60,6 +60,13 @@ import { TOAST_DURATION } from '@core/constants';
   styleUrls: ['./settings.component.scss'],
 })
 export class SettingsComponent {
+  // DI
+  private readonly toastCtrl = inject(ToastController);
+  private readonly appPreferencesService = inject(AppPreferencesService);
+  private readonly storage = inject<StorageService<BaseDoc>>(StorageService);
+  private readonly translate = inject(TranslateService);
+  private readonly revenuecat = inject(RevenuecatService);
+  private readonly navCtrl = inject(NavController);
   // Data
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isPro$ = this.revenuecat.isPro$;
@@ -70,15 +77,6 @@ export class SettingsComponent {
   readonly updatingTheme = signal(false);
   // Computed Signals
   readonly themePreference = computed<AppThemePreference>(() => this.appPreferencesService.preferences().theme);
-
-  constructor(
-    private readonly toastCtrl: ToastController,
-    private readonly appPreferencesService: AppPreferencesService,
-    private readonly storage: StorageService<BaseDoc>,
-    private readonly translate: TranslateService,
-    private readonly revenuecat: RevenuecatService,
-    private readonly navCtrl: NavController,
-  ) {}
 
   async ionViewWillEnter(): Promise<void> {
     await this.ensurePreferencesLoaded();

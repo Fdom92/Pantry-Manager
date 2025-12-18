@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import {
   MeasurementUnit,
@@ -32,6 +32,13 @@ import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-mod
   styleUrls: ['./shopping.component.scss'],
 })
 export class ShoppingComponent {
+  // DI
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
+  private readonly modalCtrl = inject(ModalController);
+  private readonly pantryService = inject(PantryService);
+  private readonly toastCtrl = inject(ToastController);
   // Data
   readonly loading = this.pantryStore.loading;
   private readonly unassignedSupermarketKey = '__none__';
@@ -47,15 +54,6 @@ export class ShoppingComponent {
       hasAlerts: analysis.summary.total > 0,
     };
   });
-
-  constructor(
-    private readonly pantryStore: PantryStoreService,
-    private readonly translate: TranslateService,
-    private readonly languageService: LanguageService,
-    private readonly modalCtrl: ModalController,
-    private readonly pantryService: PantryService,
-    private readonly toastCtrl: ToastController,
-  ) {}
 
   /** Lifecycle hook: make sure the store is populated before rendering suggestions. */
   async ionViewWillEnter(): Promise<void> {

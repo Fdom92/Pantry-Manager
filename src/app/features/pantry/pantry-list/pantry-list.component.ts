@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, OnDestroy, signal, Signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, signal, Signal, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_HOUSEHOLD_ID, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS } from '@core/constants';
@@ -122,6 +122,13 @@ import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component'
 })
 export class PantryListComponent implements OnDestroy {
   @ViewChild('content', { static: false }) private content?: IonContent;
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly pantryService = inject(PantryService);
+  private readonly fb = inject(FormBuilder);
+  private readonly toastCtrl = inject(ToastController);
+  private readonly appPreferences = inject(AppPreferencesService);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
   // Data
   moveSubmitting = false;
   moveError: string | null = null;
@@ -207,15 +214,7 @@ export class PantryListComponent implements OnDestroy {
     return this.form.get('locations') as FormArray<FormGroup>;
   }
 
-  constructor(
-    private readonly pantryStore: PantryStoreService,
-    private readonly pantryService: PantryService,
-    private readonly fb: FormBuilder,
-    private readonly toastCtrl: ToastController,
-    private readonly appPreferences: AppPreferencesService,
-    private readonly translate: TranslateService,
-    private readonly languageService: LanguageService,
-  ) {
+  constructor() {
     this.searchTerm = this.pantryService.searchQuery;
     this.activeFilters = this.pantryService.activeFilters;
     this.sortOption = this.pantryService.sortMode;

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, ViewChild, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, ViewChild, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AgentMessage } from '@core/models';
@@ -46,6 +46,11 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class AgentComponent implements OnDestroy {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
+  // DI
+  private readonly agentService = inject(AgentService);
+  private readonly revenuecat = inject(RevenuecatService);
+  private readonly navCtrl = inject(NavController);
+  private readonly destroyRef = inject(DestroyRef);
   // Data
   readonly messages = this.agentService.messages;
   readonly thinking = this.agentService.thinking;
@@ -73,12 +78,7 @@ export class AgentComponent implements OnDestroy {
     validators: [Validators.maxLength(500)],
   });
 
-  constructor(
-    private readonly agentService: AgentService,
-    private readonly revenuecat: RevenuecatService,
-    private readonly navCtrl: NavController,
-    private readonly destroyRef: DestroyRef,
-  ) {
+  constructor() {
     // Keep the composer enabled only for allowed users (PRO or override) to avoid template disabled binding warnings.
     this.canUseAgent$
       .pipe(takeUntilDestroyed(this.destroyRef))

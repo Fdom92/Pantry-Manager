@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { DEFAULT_SETTINGS, DOC_TYPE_SETTINGS, STORAGE_KEY_SETTINGS } from '@core/constants';
 import {
   UserSettings,
@@ -10,6 +10,8 @@ import { StorageService } from './storage.service';
   providedIn: 'root',
 })
 export class UserSettingsService {
+  // DI
+  private readonly storage = inject<StorageService<UserSettingsDoc>>(StorageService);
   // Data
   private readonly ready: Promise<void>;
   private cachedDoc: UserSettingsDoc | null = null;
@@ -18,9 +20,7 @@ export class UserSettingsService {
   // Computed Signals
   readonly settings = computed(() => this.settingsSignal());
 
-  constructor(
-    private readonly storage: StorageService<UserSettingsDoc>,
-  ) {
+  constructor() {
     this.ready = this.loadFromStorage();
   }
 

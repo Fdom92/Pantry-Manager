@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS, TOAST_DURATION } from '@core/constants';
 import { AppPreferencesService } from '@core/services';
 import { normalizeStringList } from '@core/utils/normalization.util';
@@ -51,6 +51,10 @@ import { EmptyStateGenericComponent } from '@shared/components/empty-states/empt
   styleUrls: ['./settings-catalogs.component.scss'],
 })
 export class SettingsCatalogsComponent {
+  // DI
+  private readonly toastCtrl = inject(ToastController);
+  private readonly appPreferencesService = inject(AppPreferencesService);
+  private readonly translate = inject(TranslateService);
   // Signals
   readonly loading = signal(false);
   readonly savingCatalogs = signal(false);
@@ -91,12 +95,6 @@ export class SettingsCatalogsComponent {
       this.hasCategoryChanges() ||
       this.hasSupermarketChanges(),
   );
-
-  constructor(
-    private readonly toastCtrl: ToastController,
-    private readonly appPreferencesService: AppPreferencesService,
-    private readonly translate: TranslateService,
-  ) {}
 
   async ionViewWillEnter(): Promise<void> {
     await this.loadPreferences();

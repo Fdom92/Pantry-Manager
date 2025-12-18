@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { RevenuecatService } from '@core/services/revenuecat.service';
@@ -15,10 +15,10 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./tabs.component.scss'],
 })
 export class TabsComponent {
+  // DI
+  readonly revenuecat = inject(RevenuecatService);
   // Signals
   readonly isPro = toSignal(this.revenuecat.isPro$, { initialValue: false });
   // Computed Signals
   readonly canUseAgent = computed(() => !environment.production || this.isPro());
-
-  constructor(readonly revenuecat: RevenuecatService) {}
 }

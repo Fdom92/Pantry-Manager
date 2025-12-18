@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_PREFERENCES, DEFAULT_SUPERMARKET_OPTIONS, DEFAULT_UNIT_OPTIONS, DOC_TYPE_PREFERENCES, STORAGE_KEY_PREFERENCES } from '@core/constants';
 import {
   AppPreferences,
@@ -14,6 +14,8 @@ import { StorageService } from './storage.service';
   providedIn: 'root',
 })
 export class AppPreferencesService {
+  // DI
+  private readonly storage = inject<StorageService<AppPreferencesDoc>>(StorageService);
   // Data
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
@@ -26,9 +28,7 @@ export class AppPreferencesService {
   // Computed Signals
   readonly preferences = computed(() => this.preferencesSignal());
 
-  constructor(
-    private readonly storage: StorageService<AppPreferencesDoc>,
-  ) {
+  constructor() {
     this.ready = this.loadFromStorage();
     this.setupSystemThemeListener();
   }

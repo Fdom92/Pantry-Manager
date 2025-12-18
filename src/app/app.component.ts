@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { App as CapacitorApp } from '@capacitor/app';
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
@@ -13,12 +13,13 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
-  constructor(
-    private readonly pantryService: PantryService,
-    private readonly revenuecat: RevenuecatService,
-    private readonly router: Router,
-    private readonly navCtrl: NavController,
-  ) {
+  // DI
+  private readonly pantryService = inject(PantryService);
+  private readonly revenuecat = inject(RevenuecatService);
+  private readonly router = inject(Router);
+  private readonly navCtrl = inject(NavController);
+
+  constructor() {
     this.redirectToOnboardingIfFirstRun();
     void this.initializeApp();
   }

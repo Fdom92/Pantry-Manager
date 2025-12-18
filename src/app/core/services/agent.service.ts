@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { AGENT_TOOLS_CATALOG, DEFAULT_CATEGORY_OPTIONS, DEFAULT_HOUSEHOLD_ID, DEFAULT_LOCATION_OPTIONS, LOCATION_SYNONYMS } from '@core/constants';
 import {
   AgentMessage, AgentModelCallError, AgentModelMessage, AgentModelRequest,
@@ -23,6 +23,13 @@ import { RevenuecatService } from './revenuecat.service';
   providedIn: 'root',
 })
 export class AgentService {
+  // DI
+  private readonly http = inject(HttpClient);
+  private readonly pantryService = inject(PantryService);
+  private readonly appPreferences = inject(AppPreferencesService);
+  private readonly translate = inject(TranslateService);
+  private readonly revenuecat = inject(RevenuecatService);
+  private readonly toastController = inject(ToastController);
   // Data
   private readonly apiUrl = environment.agentApiUrl ?? '';
   private readonly requestTimeoutMs = 30000;
@@ -51,15 +58,6 @@ export class AgentService {
   readonly messages = computed(() => this.messagesSignal().filter(message => this.isVisibleMessage(message)));
   readonly agentPhase = computed(() => this.agentPhaseSignal());
   readonly canRetry = computed(() => this.retryAvailable());
-
-  constructor(
-    private readonly http: HttpClient,
-    private readonly pantryService: PantryService,
-    private readonly appPreferences: AppPreferencesService,
-    private readonly translate: TranslateService,
-    private readonly revenuecat: RevenuecatService,
-    private readonly toastController: ToastController,
-  ) {}
 
   async sendMessage(userText: string): Promise<AgentMessage | null> {
     const trimmed = (userText ?? '').trim();

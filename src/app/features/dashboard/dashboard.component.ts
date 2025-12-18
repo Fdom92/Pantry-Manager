@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { ES_DATE_FORMAT_OPTIONS, ItemLocationStock, PantryItem } from '@core/models';
 import { LanguageService } from '@core/services';
@@ -55,6 +55,10 @@ import { EmptyStateGenericComponent } from '@shared/components/empty-states/empt
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
+  // DI
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
   // Data
   private hasInitialized = false;
   readonly items = this.pantryStore.items;
@@ -74,11 +78,7 @@ export class DashboardComponent {
     return NEAR_EXPIRY_WINDOW_DAYS;
   }
 
-  constructor(
-    private readonly pantryStore: PantryStoreService,
-    private readonly translate: TranslateService,
-    private readonly languageService: LanguageService,
-  ) {
+  constructor() {
     effect(
       () => {
         // track list changes and mark the dashboard as refreshed
