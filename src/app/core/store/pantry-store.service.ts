@@ -1,6 +1,7 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
 import { MeasurementUnit, PantryItem, StockStatus } from '@core/models';
 import { PantryService } from '@core/services/pantry.service';
+import { normalizeLocationId } from '@core/utils/normalization.util';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
@@ -303,12 +304,12 @@ export class PantryStoreService {
     }));
 
     for (const newLocation of incoming.locations ?? []) {
-      const locationId = this.normalizeLocationId(newLocation.locationId);
+      const locationId = normalizeLocationId(newLocation.locationId);
       if (!locationId) {
         continue;
       }
       const targetIndex = normalizedLocations.findIndex(
-        location => this.normalizeLocationId(location.locationId) === locationId
+        location => normalizeLocationId(location.locationId) === locationId
       );
       const newBatches = Array.isArray(newLocation.batches) ? [...newLocation.batches] : [];
 
@@ -339,7 +340,4 @@ export class PantryStoreService {
     };
   }
 
-  private normalizeLocationId(value?: string): string {
-    return (value ?? '').trim();
-  }
 }

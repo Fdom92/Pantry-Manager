@@ -11,8 +11,8 @@ import {
   ShoppingSummary
 } from '@core/models';
 import { LanguageService, PantryService } from '@core/services';
-import { normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
 import { PantryStoreService } from '@core/store/pantry-store.service';
+import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
@@ -112,7 +112,7 @@ export class ShoppingComponent {
   }
 
   getLocationLabel(locationId: string): string {
-    return this.formatLocationLabel(locationId, this.translate.instant('common.locations.none'));
+    return normalizeLocationId(locationId, this.translate.instant('common.locations.none'));
   }
 
   async shareShoppingList(): Promise<void> {
@@ -324,11 +324,6 @@ export class ShoppingComponent {
 
   private getUnassignedSupermarketLabel(): string {
     return this.translate.instant('shopping.unassignedSupermarket');
-  }
-
-  private formatLocationLabel(value: string | null | undefined, fallback: string = ''): string {
-    const trimmed = (value ?? '').trim();
-    return trimmed || fallback || 'No location';
   }
 
   private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {

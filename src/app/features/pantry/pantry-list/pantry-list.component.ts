@@ -34,6 +34,7 @@ import { createDocumentId } from '@core/utils';
 import {
   normalizeCategoryId,
   normalizeKey,
+  normalizeLocationId,
   normalizeStringList,
   normalizeSupermarketValue,
   normalizeUnitValue,
@@ -400,7 +401,7 @@ export class PantryListComponent implements OnDestroy {
   /** Create a form group for a single location with coercion and sane defaults. */
   private createLocationGroup(initial?: Partial<ItemLocationStock>): FormGroup {
     const batches = Array.isArray(initial?.batches) ? initial.batches : [];
-    const rawLocation = (initial?.locationId ?? '').trim();
+    const rawLocation = normalizeLocationId(initial?.locationId);
     const locationId = rawLocation && rawLocation !== 'unassigned' ? rawLocation : '';
     return this.fb.group({
       locationId: this.fb.control(locationId, {
@@ -712,7 +713,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   getLocationLabel(locationId: string | undefined): string {
-    return this.getLocationLabelText(locationId, this.translate.instant('common.locations.none'));
+    return normalizeLocationId(locationId, this.translate.instant('common.locations.none'));
   }
 
   onSummaryKeydown(item: PantryItem, event: KeyboardEvent): void {
@@ -1180,12 +1181,12 @@ export class PantryListComponent implements OnDestroy {
     for (const item of items) {
       const seen = new Set<string>();
       for (const location of item.locations) {
-        const id = (location.locationId ?? '').trim();
+        const id = normalizeLocationId(location.locationId);
         if (seen.has(id)) {
           continue;
         }
         seen.add(id);
-        const label = this.getLocationLabelText(id, this.translate.instant('common.locations.none'));
+        const label = normalizeLocationId(id, this.translate.instant('common.locations.none'));
         const current = counts.get(id);
         if (current) {
           current.count += 1;
@@ -1274,7 +1275,7 @@ export class PantryListComponent implements OnDestroy {
         return;
       }
       seen.add(normalized);
-      const display = label ?? this.getLocationLabelText(value, this.translate.instant('common.locations.none'));
+      const display = label ?? normalizeLocationId(value, this.translate.instant('common.locations.none'));
       options.push({ value, label: display });
     };
 
@@ -1283,7 +1284,7 @@ export class PantryListComponent implements OnDestroy {
     }
 
     const control = this.locationsArray.at(index);
-    const currentValue = (control?.get('locationId')?.value ?? '').trim();
+    const currentValue = normalizeLocationId(control?.get('locationId')?.value);
     if (currentValue && !seen.has(normalizeKey(currentValue))) {
       addOption(currentValue);
     }
@@ -1949,11 +1950,11 @@ export class PantryListComponent implements OnDestroy {
     return {
       updatedItem,
       quantityLabel,
-      fromLabel: this.getLocationLabelText(
+      fromLabel: normalizeLocationId(
         source.locationId,
         this.translate.instant('common.locations.none')
       ),
-      toLabel: this.getLocationLabelText(
+      toLabel: normalizeLocationId(
         toLocationId,
         this.translate.instant('common.locations.none')
       ),
@@ -2297,7 +2298,7 @@ export class PantryListComponent implements OnDestroy {
       .map(location => {
         const quantity = this.roundDisplayQuantity(this.getLocationTotal(location));
         const unitLabel = this.getUnitLabel(normalizeUnitValue(location.unit));
-        const label = this.getLocationLabelText(
+        const label = normalizeLocationId(
           location.locationId,
           this.translate.instant('common.locations.none')
         );
@@ -2366,7 +2367,7 @@ export class PantryListComponent implements OnDestroy {
     const locations: ItemLocationStock[] = this.locationsArray.controls
       .map(control => {
         const value = control.value as any;
-        const rawLocationId = (value?.locationId ?? '').trim();
+        const rawLocationId = normalizeLocationId(value?.locationId);
         if (!rawLocationId) {
           return null;
         }
@@ -2601,11 +2602,6 @@ export class PantryListComponent implements OnDestroy {
       .filter(Boolean)
       .map(part => part.charAt(0).toUpperCase() + part.slice(1))
       .join(' ');
-  }
-
-  private getLocationLabelText(id: string | null | undefined, fallback: string = ''): string {
-    const value = (id ?? '').trim();
-    return value || fallback || 'No location';
   }
 
   private toDateInputValue(dateIso: string): string {

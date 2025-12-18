@@ -14,6 +14,11 @@ export function normalizeWhitespace(value: string | null | undefined): string {
   return (value ?? '').replace(/\s+/g, ' ').trim();
 }
 
+export function normalizeLocationId(value?: string | null, fallback: string = ''): string {
+  const trimmed = (value ?? '').trim();
+  return trimmed || fallback;
+}
+
 export function normalizeCategoryId(value: string | null | undefined): string {
   const trimmed = normalizeWhitespace(value);
   if (!trimmed || trimmed.toLowerCase() === 'uncategorized') {

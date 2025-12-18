@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PantryItem, ShoppingItem } from '@core/models';
+import { normalizeLocationId } from '@core/utils/normalization.util';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -32,13 +33,13 @@ export class AddPurchaseModalComponent implements OnInit {
   // Getters
   get locationOptions(): string[] {
     const options = new Set<string>();
-    const fromItem = (this.item?.locationId ?? '').trim();
+    const fromItem = normalizeLocationId(this.item?.locationId);
     if (fromItem) {
       options.add(fromItem);
     }
     if (Array.isArray(this.product?.locations)) {
       this.product.locations.forEach(loc => {
-        const id = (loc.locationId ?? '').trim();
+        const id = normalizeLocationId(loc.locationId);
         if (id) {
           options.add(id);
         }
@@ -63,8 +64,7 @@ export class AddPurchaseModalComponent implements OnInit {
   }
 
   getLocationLabel(id: string): string {
-    const trimmed = (id ?? '').trim();
-    return trimmed || this.translate.instant('locations.pantry');
+    return normalizeLocationId(id, this.translate.instant('locations.pantry'));
   }
 
   onQuantityInput(event: CustomEvent): void {
@@ -96,8 +96,8 @@ export class AddPurchaseModalComponent implements OnInit {
     this.quantity = suggestedQuantity > 0 ? suggestedQuantity : 1;
 
     const defaultLocation =
-      (this.item?.locationId ?? '').trim() ||
-      (Array.isArray(this.product?.locations) ? this.product.locations[0]?.locationId : '') ||
+      normalizeLocationId(this.item?.locationId) ||
+      (Array.isArray(this.product?.locations) ? normalizeLocationId(this.product.locations[0]?.locationId) : '') ||
       'pantry';
     this.location = defaultLocation || 'pantry';
   }
