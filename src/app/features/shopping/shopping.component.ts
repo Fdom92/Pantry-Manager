@@ -11,6 +11,7 @@ import {
   ShoppingSummary
 } from '@core/models';
 import { LanguageService, PantryService } from '@core/services';
+import { normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -107,7 +108,7 @@ export class ShoppingComponent {
   }
 
   getUnitLabel(unit: MeasurementUnit | string): string {
-    return this.pantryStore.getUnitLabel(this.normalizeUnit(unit));
+    return this.pantryStore.getUnitLabel(normalizeUnitValue(unit));
   }
 
   getLocationLabel(locationId: string): string {
@@ -171,7 +172,7 @@ export class ShoppingComponent {
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       const primaryLocation = item.locations[0];
       const locationId = primaryLocation?.locationId ?? 'unassigned';
-      const unit = this.normalizeUnit(primaryLocation?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
+      const unit = normalizeUnitValue(primaryLocation?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
 
       let reason: ShoppingReason | null = null;
       let suggestedQuantity = 0;
@@ -191,7 +192,7 @@ export class ShoppingComponent {
       }
 
       if (reason) {
-        const supermarket = this.normalizeSupermarketValue(item.supermarket);
+        const supermarket = normalizeSupermarketValue(item.supermarket);
         if (supermarket) {
           uniqueSupermarkets.add(supermarket.toLowerCase());
         }
@@ -225,14 +226,6 @@ export class ShoppingComponent {
     summary.supermarketCount = uniqueSupermarkets.size;
     const groupedSuggestions = this.groupSuggestionsBySupermarket(suggestions);
     return { suggestions, groupedSuggestions, summary };
-  }
-
-  private normalizeSupermarketValue(value?: string | null): string | undefined {
-    const trimmed = (value ?? '').trim();
-    if (!trimmed) {
-      return undefined;
-    }
-    return trimmed.replace(/\s+/g, ' ');
   }
 
   private groupSuggestionsBySupermarket(
@@ -327,17 +320,6 @@ export class ShoppingComponent {
       return 0;
     }
     return Math.round(num * 100) / 100;
-  }
-
-  private normalizeUnit(unit?: MeasurementUnit | string | null): string {
-    if (typeof unit !== 'string') {
-      return MeasurementUnit.UNIT;
-    }
-    const trimmed = unit.trim();
-    if (!trimmed) {
-      return MeasurementUnit.UNIT;
-    }
-    return trimmed;
   }
 
   private getUnassignedSupermarketLabel(): string {

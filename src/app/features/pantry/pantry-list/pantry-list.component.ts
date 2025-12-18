@@ -31,6 +31,13 @@ import {
 import { PantryService } from '@core/services/pantry.service';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { createDocumentId } from '@core/utils';
+import {
+  normalizeCategoryId,
+  normalizeKey,
+  normalizeStringList,
+  normalizeSupermarketValue,
+  normalizeUnitValue,
+} from '@core/utils/normalization.util';
 import { ToastController } from '@ionic/angular';
 import {
   IonBadge,
@@ -400,7 +407,7 @@ export class PantryListComponent implements OnDestroy {
         validators: [Validators.required],
         nonNullable: true,
       }),
-      unit: this.fb.control<string>(this.normalizeUnitValue(initial?.unit), {
+      unit: this.fb.control<string>(normalizeUnitValue(initial?.unit), {
         nonNullable: true,
       }),
       batches: this.fb.array(
@@ -525,7 +532,7 @@ export class PantryListComponent implements OnDestroy {
       return;
     }
 
-    const unit = this.normalizeUnitValue(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
+    const unit = normalizeUnitValue(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
     const originalBatches = Array.isArray(location.batches) ? location.batches : [];
     const targetIndex = originalBatches.indexOf(batch);
     const sanitizedBatches = this.sanitizeBatches(location.batches, unit);
@@ -693,7 +700,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   getPrimaryUnit(item: PantryItem): string {
-    return this.normalizeUnitValue(this.pantryStore.getItemPrimaryUnit(item));
+    return normalizeUnitValue(this.pantryStore.getItemPrimaryUnit(item));
   }
 
   getUnitLabelForItem(item: PantryItem): string {
@@ -863,7 +870,7 @@ export class PantryListComponent implements OnDestroy {
     if (!item) {
       return [];
     }
-    const exclude = this.normalizeKey(this.moveForm.controls.fromLocation.value ?? '');
+    const exclude = normalizeKey(this.moveForm.controls.fromLocation.value ?? '');
     const seen = new Set<string>();
     const suggestions: string[] = [];
     const addSuggestion = (value: string | undefined | null): void => {
@@ -871,7 +878,7 @@ export class PantryListComponent implements OnDestroy {
       if (!trimmed) {
         return;
       }
-      const key = this.normalizeKey(trimmed);
+      const key = normalizeKey(trimmed);
       if (!key || key === exclude || seen.has(key)) {
         return;
       }
@@ -926,7 +933,7 @@ export class PantryListComponent implements OnDestroy {
       this.moveError = this.translate.instant('pantry.move.errors.missingLocations');
       return;
     }
-    if (this.normalizeKey(fromLocation) === this.normalizeKey(toLocation)) {
+    if (normalizeKey(fromLocation) === normalizeKey(toLocation)) {
       this.moveError = this.translate.instant('pantry.move.errors.sameLocation');
       return;
     }
@@ -1201,11 +1208,10 @@ export class PantryListComponent implements OnDestroy {
   private computeSupermarketOptions(items: PantryItem[]): string[] {
     const options = new Map<string, string>();
     for (const item of items) {
-      const value = (item.supermarket ?? '').trim();
-      if (!value) {
+      const normalizedValue = normalizeSupermarketValue(item.supermarket);
+      if (!normalizedValue) {
         continue;
       }
-      const normalizedValue = value.replace(/\s+/g, ' ');
       const key = normalizedValue.toLowerCase();
       if (!options.has(key)) {
         options.set(key, normalizedValue);
@@ -1220,7 +1226,7 @@ export class PantryListComponent implements OnDestroy {
     const options: Array<{ value: string; label: string }> = [];
 
     const addOption = (value: string, label?: string): void => {
-      const normalized = this.normalizeKey(value);
+      const normalized = normalizeKey(value);
       if (!normalized || seen.has(normalized)) {
         return;
       }
@@ -1235,15 +1241,15 @@ export class PantryListComponent implements OnDestroy {
     }
 
     for (const item of this.itemsState()) {
-      const id = this.normalizeCategoryId(item.categoryId);
+      const id = normalizeCategoryId(item.categoryId);
       if (id) {
         addOption(id);
       }
     }
 
     const control = this.form.get('categoryId');
-    const currentValue = typeof control?.value === 'string' ? this.normalizeCategoryId(control.value) : '';
-    if (currentValue && !seen.has(this.normalizeKey(currentValue))) {
+    const currentValue = typeof control?.value === 'string' ? normalizeCategoryId(control.value) : '';
+    if (currentValue && !seen.has(normalizeKey(currentValue))) {
       addOption(currentValue);
     }
 
@@ -1252,31 +1258,9 @@ export class PantryListComponent implements OnDestroy {
 
   private computePresetCategoryOptions(): string[] {
     const prefs = this.appPreferences.preferences();
-    const source = Array.isArray(prefs.categoryOptions) ? prefs.categoryOptions : [];
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-
-    for (const option of source) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = this.normalizeKey(trimmed);
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-
-    if (!normalized.length) {
-      return [...DEFAULT_CATEGORY_OPTIONS];
-    }
-
-    return normalized;
+    return normalizeStringList(prefs.categoryOptions, {
+      fallback: DEFAULT_CATEGORY_OPTIONS,
+    });
   }
 
   getLocationOptionsForControl(index: number): Array<{ value: string; label: string }> {
@@ -1285,7 +1269,7 @@ export class PantryListComponent implements OnDestroy {
     const options: Array<{ value: string; label: string }> = [];
 
     const addOption = (value: string, label?: string): void => {
-      const normalized = this.normalizeKey(value);
+      const normalized = normalizeKey(value);
       if (!normalized || seen.has(normalized)) {
         return;
       }
@@ -1300,7 +1284,7 @@ export class PantryListComponent implements OnDestroy {
 
     const control = this.locationsArray.at(index);
     const currentValue = (control?.get('locationId')?.value ?? '').trim();
-    if (currentValue && !seen.has(this.normalizeKey(currentValue))) {
+    if (currentValue && !seen.has(normalizeKey(currentValue))) {
       addOption(currentValue);
     }
 
@@ -1314,7 +1298,7 @@ export class PantryListComponent implements OnDestroy {
     const options: Array<{ value: string; label: string }> = [];
 
     const addOption = (value: string, label?: string): void => {
-      const normalized = this.normalizeKey(value);
+      const normalized = normalizeKey(value);
       if (!normalized || seen.has(normalized)) {
         return;
       }
@@ -1334,7 +1318,7 @@ export class PantryListComponent implements OnDestroy {
 
     const control = this.form.get('supermarket');
     const currentValue = (control?.value ?? '').trim();
-    if (currentValue && !seen.has(this.normalizeKey(currentValue))) {
+    if (currentValue && !seen.has(normalizeKey(currentValue))) {
       addOption(currentValue);
     }
 
@@ -1343,60 +1327,16 @@ export class PantryListComponent implements OnDestroy {
 
   private computePresetLocationOptions(): string[] {
     const prefs = this.appPreferences.preferences();
-    const source = Array.isArray(prefs.locationOptions) ? prefs.locationOptions : [];
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-
-    for (const option of source) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = this.normalizeKey(trimmed);
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-
-    if (!normalized.length) {
-      return [...DEFAULT_LOCATION_OPTIONS];
-    }
-
-    return normalized;
+    return normalizeStringList(prefs.locationOptions, {
+      fallback: DEFAULT_LOCATION_OPTIONS,
+    });
   }
 
   private computePresetSupermarketOptions(): string[] {
     const prefs = this.appPreferences.preferences();
-    const source = Array.isArray(prefs.supermarketOptions) ? prefs.supermarketOptions : [];
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-
-    for (const option of source) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = this.normalizeKey(trimmed);
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-
-    if (!normalized.length) {
-      return [...DEFAULT_SUPERMARKET_OPTIONS];
-    }
-
-    return normalized;
+    return normalizeStringList(prefs.supermarketOptions, {
+      fallback: DEFAULT_SUPERMARKET_OPTIONS,
+    });
   }
 
   private formatSupermarketLabel(value: string): string {
@@ -1405,21 +1345,6 @@ export class PantryListComponent implements OnDestroy {
       return this.translate.instant('settings.catalogs.supermarkets.other');
     }
     return value.trim();
-  }
-
-  private normalizeKey(value: string): string {
-    return value.trim().toLowerCase();
-  }
-
-  private normalizeUnitValue(unit: MeasurementUnit | string | undefined): string {
-    if (typeof unit !== 'string') {
-      return MeasurementUnit.UNIT;
-    }
-    const trimmed = unit.trim();
-    if (!trimmed) {
-      return MeasurementUnit.UNIT;
-    }
-    return trimmed;
   }
 
   getTotalBatchCount(item: PantryItem): number {
@@ -1464,7 +1389,7 @@ export class PantryListComponent implements OnDestroy {
       formattedDate: this.formatBatchDate(entry.batch),
       quantityLabel: this.formatBatchQuantity(entry.batch, entry.locationUnit),
       quantityValue: this.toNumber(entry.batch.quantity),
-      unitLabel: this.getUnitLabel(this.normalizeUnitValue(entry.locationUnit)),
+      unitLabel: this.getUnitLabel(normalizeUnitValue(entry.locationUnit)),
       opened: Boolean(entry.batch.opened),
     }));
 
@@ -1512,7 +1437,7 @@ export class PantryListComponent implements OnDestroy {
       {
       maximumFractionDigits: 2,
     });
-    const unitLabel = this.getUnitLabel(this.normalizeUnitValue(locationUnit));
+    const unitLabel = this.getUnitLabel(normalizeUnitValue(locationUnit));
     return `${formatted} ${unitLabel}`;
   }
 
@@ -1693,7 +1618,7 @@ export class PantryListComponent implements OnDestroy {
     const batches: BatchEntryMeta[] = [];
     for (const location of item.locations) {
       const locationLabel = this.getLocationLabel(location.locationId);
-      const locationUnit = this.normalizeUnitValue(location.unit);
+      const locationUnit = normalizeUnitValue(location.unit);
       const entries = this.getLocationBatches(location);
       for (const batch of entries) {
         batches.push({
@@ -1876,7 +1801,7 @@ export class PantryListComponent implements OnDestroy {
 
   getLocationUnitLabelForControl(index: number): string {
     const control = this.locationsArray.at(index).get('unit');
-    const value = this.normalizeUnitValue(control?.value as MeasurementUnit | string | undefined);
+    const value = normalizeUnitValue(control?.value as MeasurementUnit | string | undefined);
     return this.getUnitLabel(value);
   }
 
@@ -1920,7 +1845,7 @@ export class PantryListComponent implements OnDestroy {
           return item;
         }
 
-        const unitFallback = this.normalizeUnitValue(
+        const unitFallback = normalizeUnitValue(
           item.locations.find(loc => loc.locationId === locationId)?.unit ?? this.getPrimaryUnit(item)
         );
 
@@ -1928,7 +1853,7 @@ export class PantryListComponent implements OnDestroy {
         const nextLocations = item.locations.map(loc => {
           if (loc.locationId === locationId) {
             found = true;
-            const normalizedUnit = this.normalizeUnitValue(loc.unit ?? unitFallback);
+            const normalizedUnit = normalizeUnitValue(loc.unit ?? unitFallback);
             return {
               ...loc,
               unit: normalizedUnit,
@@ -1939,7 +1864,7 @@ export class PantryListComponent implements OnDestroy {
         });
 
         if (!found) {
-          const normalizedUnit = this.normalizeUnitValue(unitFallback);
+          const normalizedUnit = normalizeUnitValue(unitFallback);
           nextLocations.push({
             locationId,
             unit: normalizedUnit,
@@ -1962,18 +1887,18 @@ export class PantryListComponent implements OnDestroy {
     toLocationId: string,
     requestedQuantity: number
   ): { updatedItem: PantryItem; quantityLabel: string; fromLabel: string; toLabel: string } | null {
-    const normalizedFrom = this.normalizeKey(fromLocationId);
-    const normalizedTo = this.normalizeKey(toLocationId);
+    const normalizedFrom = normalizeKey(fromLocationId);
+    const normalizedTo = normalizeKey(toLocationId);
     if (!normalizedFrom || !normalizedTo || normalizedFrom === normalizedTo) {
       return null;
     }
 
-    const source = item.locations.find(loc => this.normalizeKey(loc.locationId) === normalizedFrom);
+    const source = item.locations.find(loc => normalizeKey(loc.locationId) === normalizedFrom);
     if (!source) {
       return null;
     }
 
-    const unit = this.normalizeUnitValue(source.unit ?? this.getPrimaryUnit(item));
+    const unit = normalizeUnitValue(source.unit ?? this.getPrimaryUnit(item));
     const sanitizedSource = this.sanitizeBatches(source.batches, unit);
     const available = this.sumBatchQuantities(sanitizedSource);
     if (available <= 0) {
@@ -1990,13 +1915,13 @@ export class PantryListComponent implements OnDestroy {
       return null;
     }
 
-    const destination = item.locations.find(loc => this.normalizeKey(loc.locationId) === normalizedTo);
-    const destinationUnit = this.normalizeUnitValue(destination?.unit ?? unit);
+    const destination = item.locations.find(loc => normalizeKey(loc.locationId) === normalizedTo);
+    const destinationUnit = normalizeUnitValue(destination?.unit ?? unit);
     const sanitizedDestination = this.sanitizeBatches(destination?.batches, destinationUnit);
     const mergedDestination = this.mergeBatchesByExpiry([...sanitizedDestination, ...moved]);
 
     const nextLocations = item.locations.filter(
-      loc => this.normalizeKey(loc.locationId) !== normalizedFrom && this.normalizeKey(loc.locationId) !== normalizedTo
+      loc => normalizeKey(loc.locationId) !== normalizedFrom && normalizeKey(loc.locationId) !== normalizedTo
     );
 
     if (this.sumBatchQuantities(remaining) > 0) {
@@ -2077,13 +2002,13 @@ export class PantryListComponent implements OnDestroy {
   }
 
   private getSuggestedDestination(item: PantryItem, fromId: string): string {
-    const normalizedFrom = this.normalizeKey(fromId);
-    const alternative = item.locations.find(loc => this.normalizeKey(loc.locationId) !== normalizedFrom)?.locationId;
+    const normalizedFrom = normalizeKey(fromId);
+    const alternative = item.locations.find(loc => normalizeKey(loc.locationId) !== normalizedFrom)?.locationId;
     if (alternative) {
       return alternative;
     }
     const presets = this.presetLocationOptions();
-    const presetOption = presets.find(option => this.normalizeKey(option) !== normalizedFrom);
+    const presetOption = presets.find(option => normalizeKey(option) !== normalizedFrom);
     if (presetOption) {
       return presetOption;
     }
@@ -2092,7 +2017,7 @@ export class PantryListComponent implements OnDestroy {
 
   private getAvailableQuantityFor(item: PantryItem, locationId: string): number {
     return this.getLocationTotal(
-      item.locations.find(loc => this.normalizeKey(loc.locationId) === this.normalizeKey(locationId)) ?? {
+      item.locations.find(loc => normalizeKey(loc.locationId) === normalizeKey(locationId)) ?? {
         locationId: '',
         unit: this.getPrimaryUnit(item),
         batches: [],
@@ -2101,8 +2026,8 @@ export class PantryListComponent implements OnDestroy {
   }
 
   private getLocationUnitForItem(item: PantryItem, locationId: string): string {
-    const location = item.locations.find(loc => this.normalizeKey(loc.locationId) === this.normalizeKey(locationId));
-    return this.normalizeUnitValue(location?.unit ?? this.getPrimaryUnit(item));
+    const location = item.locations.find(loc => normalizeKey(loc.locationId) === normalizeKey(locationId));
+    return normalizeUnitValue(location?.unit ?? this.getPrimaryUnit(item));
   }
 
   /**
@@ -2130,12 +2055,12 @@ export class PantryListComponent implements OnDestroy {
     if (!Array.isArray(batches) || !batches.length) {
       return [];
     }
-    const normalizedUnit = this.normalizeUnitValue(unit);
+    const normalizedUnit = normalizeUnitValue(unit);
     const normalized = batches.map(batch => ({
       ...batch,
       batchId: batch.batchId ?? this.createTempBatchId(),
       quantity: this.toNumber(batch.quantity),
-      unit: this.normalizeUnitValue(batch.unit ?? normalizedUnit),
+      unit: normalizeUnitValue(batch.unit ?? normalizedUnit),
       opened: batch.opened ?? false,
     }));
 
@@ -2190,7 +2115,7 @@ export class PantryListComponent implements OnDestroy {
 
   private updateLocationTotals(locations: ItemLocationStock[]): ItemLocationStock[] {
     return locations.map(location => {
-      const unit = this.normalizeUnitValue(location.unit);
+      const unit = normalizeUnitValue(location.unit);
       return {
         ...location,
         unit,
@@ -2371,7 +2296,7 @@ export class PantryListComponent implements OnDestroy {
     return locations
       .map(location => {
         const quantity = this.roundDisplayQuantity(this.getLocationTotal(location));
-        const unitLabel = this.getUnitLabel(this.normalizeUnitValue(location.unit));
+        const unitLabel = this.getUnitLabel(normalizeUnitValue(location.unit));
         const label = this.getLocationLabelText(
           location.locationId,
           this.translate.instant('common.locations.none')
@@ -2409,7 +2334,7 @@ export class PantryListComponent implements OnDestroy {
         maximumFractionDigits: 2,
       }
     );
-    const unitLabel = this.getUnitLabel(this.normalizeUnitValue(unit ?? undefined));
+    const unitLabel = this.getUnitLabel(normalizeUnitValue(unit ?? undefined));
     return `${formattedNumber} ${unitLabel}`.trim();
   }
 
@@ -2445,7 +2370,7 @@ export class PantryListComponent implements OnDestroy {
         if (!rawLocationId) {
           return null;
         }
-        const unit = this.normalizeUnitValue(value?.unit as MeasurementUnit | string | undefined);
+        const unit = normalizeUnitValue(value?.unit as MeasurementUnit | string | undefined);
         const batchesControl = control.get('batches');
         const batches = batchesControl instanceof FormArray
           ? (batchesControl.controls as FormGroup[]).map(group => {
@@ -2485,8 +2410,8 @@ export class PantryListComponent implements OnDestroy {
     }
 
     const earliestExpiry = this.computeEarliestExpiry(locations);
-    const normalizedSupermarket = this.normalizeSupermarketInput(supermarket);
-    const normalizedCategory = this.normalizeCategoryId(categoryId);
+    const normalizedSupermarket = normalizeSupermarketValue(supermarket);
+    const normalizedCategory = normalizeCategoryId(categoryId);
 
     const base: PantryItem = {
       _id: identifier,
@@ -2519,8 +2444,8 @@ export class PantryListComponent implements OnDestroy {
     const quantity = this.getQuickQuantity();
     const identifier = existing?._id ?? createDocumentId('item');
     const now = new Date().toISOString();
-    const normalizedSupermarket = this.normalizeSupermarketInput(supermarket);
-    const normalizedCategory = this.normalizeCategoryId(categoryId);
+    const normalizedSupermarket = normalizeSupermarketValue(supermarket);
+    const normalizedCategory = normalizeCategoryId(categoryId);
     const defaultLocation = this.getDefaultLocationId();
     const batch: ItemBatch = {
       quantity,
@@ -2557,17 +2482,6 @@ export class PantryListComponent implements OnDestroy {
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     };
-  }
-
-  private normalizeSupermarketInput(value: string | undefined): string | undefined {
-    if (typeof value !== 'string') {
-      return undefined;
-    }
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return undefined;
-    }
-    return trimmed.replace(/\s+/g, ' ');
   }
 
   private getStatusFilterValue(filters: PantryFilterState): PantryStatusFilterValue {
@@ -2607,7 +2521,7 @@ export class PantryListComponent implements OnDestroy {
     }
 
     for (const item of items) {
-      const id = this.normalizeCategoryId(item.categoryId);
+      const id = normalizeCategoryId(item.categoryId);
       const label = this.formatCategoryName(id);
       const current = counts.get(id);
       if (current) {
@@ -2639,7 +2553,7 @@ export class PantryListComponent implements OnDestroy {
     const map = new Map<string, PantryGroup>();
 
     for (const item of items) {
-      const key = this.normalizeCategoryId(item.categoryId);
+      const key = normalizeCategoryId(item.categoryId);
       const name = this.formatCategoryName(key);
       let group = map.get(key);
       if (!group) {
@@ -2674,18 +2588,6 @@ export class PantryListComponent implements OnDestroy {
 
   formatCategoryName(key: string): string {
     return this.formatFriendlyName(key, this.translate.instant('pantry.form.uncategorized'));
-  }
-
-  /** Normalize category ids for display, collapsing legacy placeholders. */
-  private normalizeCategoryId(value: string | null | undefined): string {
-    const trimmed = (value ?? '').trim();
-    if (!trimmed) {
-      return '';
-    }
-    if (trimmed.toLowerCase() === 'uncategorized') {
-      return '';
-    }
-    return trimmed;
   }
 
   private formatFriendlyName(value: string, fallback: string): string {

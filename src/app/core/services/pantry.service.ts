@@ -1,6 +1,7 @@
 import { effect, Injectable, signal } from '@angular/core';
 import { DEFAULT_HOUSEHOLD_ID, LegacyLocationStock, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { ExpirationStatus, ItemBatch, ItemLocationStock, MeasurementUnit, PantryItem } from '@core/models';
+import { normalizeUnitValue } from '@core/utils/normalization.util';
 import { DEFAULT_PANTRY_FILTERS, PantryFilterState, PantrySortMode } from '@core/models/pantry-pipeline.model';
 import { StorageService } from './storage.service';
 
@@ -197,7 +198,7 @@ export class PantryService extends StorageService<PantryItem> {
     const nextLocations = locations.map(loc => {
       if (loc.locationId === targetId) {
         handled = true;
-        const unit = this.normalizeUnitValue(loc.unit);
+        const unit = normalizeUnitValue(loc.unit);
         const sanitizedBatches = this.normalizeBatches(loc.batches, unit);
         const nextTotal = Math.max(0, quantity);
         const adjustedBatches = this.applyQuantityDeltaToBatches(sanitizedBatches, nextTotal, unit);
@@ -211,7 +212,7 @@ export class PantryService extends StorageService<PantryItem> {
     });
 
     if (!handled) {
-      const unit = this.normalizeUnitValue(locations[0]?.unit);
+      const unit = normalizeUnitValue(locations[0]?.unit);
       const nextTotal = Math.max(0, quantity);
       nextLocations.push({
         locationId: targetId,
@@ -248,7 +249,7 @@ export class PantryService extends StorageService<PantryItem> {
     }
 
     const locationId = (lot?.location ?? '').trim() || 'unassigned';
-    const unit = this.normalizeUnitValue(
+    const unit = normalizeUnitValue(
       lot?.unit ?? current.locations[0]?.unit ?? MeasurementUnit.UNIT
     );
     const expiryDate = lot?.expiryDate ?? undefined;
@@ -710,7 +711,7 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   private normalizeLocation(location: ItemLocationStock): ItemLocationStock {
-    const unit = this.normalizeUnitValue(location.unit);
+    const unit = normalizeUnitValue(location.unit);
     const locationId = (location.locationId ?? 'unassigned').trim() || 'unassigned';
     const batches = this.normalizeBatches(location.batches, unit);
     const legacyQuantity = this.toNumberOrZero((location as any).quantity);
@@ -741,7 +742,7 @@ export class PantryService extends StorageService<PantryItem> {
       ...batch,
       batchId: batch.batchId ?? this.generateBatchId(),
       quantity: this.toNumberOrZero(batch.quantity),
-      unit: this.normalizeUnitValue(batch.unit ?? fallbackUnit),
+      unit: normalizeUnitValue(batch.unit ?? fallbackUnit),
       opened: batch.opened ?? false,
     }));
 
@@ -875,24 +876,13 @@ export class PantryService extends StorageService<PantryItem> {
         batches.push({
           ...batch,
           quantity: this.toNumberOrZero(batch.quantity),
-          unit: this.normalizeUnitValue(batch.unit ?? location.unit),
+          unit: normalizeUnitValue(batch.unit ?? location.unit),
           batchId: batch.batchId ?? this.generateBatchId(),
           opened: batch.opened ?? false,
         });
       }
     }
     return batches;
-  }
-
-  private normalizeUnitValue(unit: MeasurementUnit | string | undefined): string {
-    if (typeof unit !== 'string') {
-      return MeasurementUnit.UNIT;
-    }
-    const trimmed = unit.trim();
-    if (!trimmed) {
-      return MeasurementUnit.UNIT;
-    }
-    return trimmed;
   }
 
   private sumBatchQuantities(batches: ItemBatch[] | undefined): number {
@@ -910,7 +900,7 @@ export class PantryService extends StorageService<PantryItem> {
     const sanitized: ItemBatch[] = batches.map(batch => ({
       ...batch,
       quantity: this.toNumberOrZero(batch.quantity),
-      unit: this.normalizeUnitValue(batch.unit ?? fallbackUnit),
+      unit: normalizeUnitValue(batch.unit ?? fallbackUnit),
     }));
     const currentTotal = this.sumBatchQuantities(sanitized);
     const target = this.toNumberOrZero(nextTotal);
@@ -928,7 +918,7 @@ export class PantryService extends StorageService<PantryItem> {
         {
           batchId: this.generateBatchId(),
           quantity: target,
-          unit: this.normalizeUnitValue(fallbackUnit),
+          unit: normalizeUnitValue(fallbackUnit),
           opened: false,
         },
       ];
@@ -942,7 +932,7 @@ export class PantryService extends StorageService<PantryItem> {
         adjusted.push({
           batchId: this.generateBatchId(),
           quantity: target,
-          unit: this.normalizeUnitValue(fallbackUnit),
+          unit: normalizeUnitValue(fallbackUnit),
           opened: false,
         });
       } else {

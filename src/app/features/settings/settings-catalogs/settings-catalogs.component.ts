@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS, TOAST_DURATION } from '@core/constants';
-import {
-  AppPreferencesService,
-} from '@core/services';
+import { AppPreferencesService } from '@core/services';
+import { normalizeStringList } from '@core/utils/normalization.util';
 import { ToastController } from '@ionic/angular';
 import {
   IonBackButton,
@@ -252,52 +251,27 @@ export class SettingsCatalogsComponent {
     values: readonly string[] | null | undefined,
     fallbackToDefault = true,
   ): string[] {
-    return this.normalizeStringOptions(values, DEFAULT_LOCATION_OPTIONS, fallbackToDefault);
+    return normalizeStringList(values, {
+      fallback: fallbackToDefault ? DEFAULT_LOCATION_OPTIONS : [],
+    });
   }
 
   private normalizeCategoryOptions(
     values: readonly string[] | null | undefined,
     fallbackToDefault = true,
   ): string[] {
-    return this.normalizeStringOptions(values, DEFAULT_CATEGORY_OPTIONS, fallbackToDefault);
+    return normalizeStringList(values, {
+      fallback: fallbackToDefault ? DEFAULT_CATEGORY_OPTIONS : [],
+    });
   }
 
   private normalizeSupermarketOptions(
     values: readonly string[] | null | undefined,
     fallbackToDefault = true,
   ): string[] {
-    return this.normalizeStringOptions(values, DEFAULT_SUPERMARKET_OPTIONS, fallbackToDefault);
-  }
-
-  private normalizeStringOptions(
-    values: readonly string[] | null | undefined,
-    defaults: readonly string[],
-    fallbackToDefault: boolean,
-  ): string[] {
-    if (!Array.isArray(values)) {
-      return fallbackToDefault ? [...defaults] : [];
-    }
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-    for (const option of values) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = trimmed.toLowerCase();
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-    if (!normalized.length) {
-      return fallbackToDefault ? [...defaults] : [];
-    }
-    return normalized;
+    return normalizeStringList(values, {
+      fallback: fallbackToDefault ? DEFAULT_SUPERMARKET_OPTIONS : [],
+    });
   }
 
   private async presentToast(

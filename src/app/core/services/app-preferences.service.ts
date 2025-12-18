@@ -7,6 +7,7 @@ import {
   DefaultUnitPreference,
   MeasurementUnit,
 } from '@core/models';
+import { normalizeStringList } from '@core/utils/normalization.util';
 import { StorageService } from './storage.service';
 
 @Injectable({
@@ -158,113 +159,27 @@ export class AppPreferencesService {
   }
 
   private ensureLocationOptions(options?: unknown): string[] {
-    if (!Array.isArray(options)) {
-      return [...DEFAULT_LOCATION_OPTIONS];
-    }
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-    for (const option of options) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = trimmed.toLowerCase();
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-    if (!normalized.length) {
-      return [...DEFAULT_LOCATION_OPTIONS];
-    }
-    return normalized;
+    return normalizeStringList(options, {
+      fallback: DEFAULT_LOCATION_OPTIONS,
+    });
   }
 
   private ensureCategoryOptions(options?: unknown): string[] {
-    if (!Array.isArray(options)) {
-      return [...DEFAULT_CATEGORY_OPTIONS];
-    }
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-    for (const option of options) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = trimmed.toLowerCase();
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-    if (!normalized.length) {
-      return [...DEFAULT_CATEGORY_OPTIONS];
-    }
-    return normalized;
+    return normalizeStringList(options, {
+      fallback: DEFAULT_CATEGORY_OPTIONS,
+    });
   }
 
   private ensureSupermarketOptions(options?: unknown): string[] {
-    if (!Array.isArray(options)) {
-      return [...DEFAULT_SUPERMARKET_OPTIONS];
-    }
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-    for (const option of options) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = trimmed.toLowerCase();
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-    if (!normalized.length) {
-      return [...DEFAULT_SUPERMARKET_OPTIONS];
-    }
-    return normalized;
+    return normalizeStringList(options, {
+      fallback: DEFAULT_SUPERMARKET_OPTIONS,
+    });
   }
 
   private ensureUnitOptions(options?: unknown): string[] {
-    if (!Array.isArray(options)) {
-      return [...DEFAULT_UNIT_OPTIONS];
-    }
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-    for (const option of options) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = trimmed.toLowerCase();
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-    if (!normalized.length) {
-      return [...DEFAULT_UNIT_OPTIONS];
-    }
-    if (!normalized.some(option => option.toLowerCase() === MeasurementUnit.UNIT.toLowerCase())) {
-      normalized.push(MeasurementUnit.UNIT);
-    }
-    return normalized;
+    return normalizeStringList(options, {
+      fallback: DEFAULT_UNIT_OPTIONS,
+      ensure: [MeasurementUnit.UNIT],
+    });
   }
 }
