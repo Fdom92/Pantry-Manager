@@ -22,6 +22,7 @@ import {
 } from '@core/models/inventory';
 import { MeasurementUnit } from '@core/models/shared';
 import { createDocumentId } from '@core/utils';
+import { formatDateTimeValue, formatQuantity } from '@core/utils/formatting.util';
 import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, timeout as rxTimeout } from 'rxjs';
@@ -29,6 +30,7 @@ import { environment } from 'src/environments/environment';
 import { AppPreferencesService } from './app-preferences.service';
 import { PantryService } from './pantry.service';
 import { RevenuecatService } from './revenuecat.service';
+import { LanguageService } from './language.service';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +41,7 @@ export class AgentService {
   private readonly pantryService = inject(PantryService);
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
   private readonly revenuecat = inject(RevenuecatService);
   private readonly toastController = inject(ToastController);
   // Data
@@ -1613,11 +1616,9 @@ export class AgentService {
     if (!value) {
       return this.t('common.dates.none');
     }
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-    return date.toLocaleString();
+    return formatDateTimeValue(value, this.languageService.getCurrentLocale(), {
+      fallback: value,
+    });
   }
 
   private buildLocationSummary(item: PantryItem): string {
@@ -1627,9 +1628,12 @@ export class AgentService {
     return item.locations
       .map(loc => {
         const quantity = this.sumBatches(loc.batches);
+        const quantityLabel = formatQuantity(quantity, this.languageService.getCurrentLocale(), {
+          maximumFractionDigits: 2,
+        });
         const locName = loc.locationId || this.t('common.locations.none');
         const unit = loc.unit ? ` ${loc.unit}` : '';
-        return `${locName} (${quantity}${unit})`;
+        return `${locName} (${quantityLabel}${unit})`;
       })
       .join(', ');
   }

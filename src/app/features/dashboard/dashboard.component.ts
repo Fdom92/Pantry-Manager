@@ -6,6 +6,12 @@ import { ItemLocationStock, PantryItem } from '@core/models/inventory';
 import { LanguageService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import {
+  formatDateTimeValue,
+  formatDateValue,
+  formatQuantity,
+  formatShortDate,
+} from '@core/utils/formatting.util';
+import {
   IonBadge,
   IonButton,
   IonCard,
@@ -182,7 +188,7 @@ export class DashboardComponent {
           const extra = earliest
             ? this.translate.instant('dashboard.batches.withExpiry', {
                 batchLabel,
-                date: this.formatShortDate(earliest),
+                date: formatShortDate(earliest, this.languageService.getCurrentLocale(), { fallback: earliest }),
               })
             : batchLabel;
           const extraSegment = extra ? ` (${extra})` : '';
@@ -194,25 +200,13 @@ export class DashboardComponent {
   }
 
   formatLastUpdated(value: string | null): string {
-    if (!value) {
-      return '';
-    }
-    const locale = this.languageService.getCurrentLocale();
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return '';
-      }
-      const datePart = parsed.toLocaleDateString(locale, ES_DATE_FORMAT_OPTIONS.numeric);
-      const timePart = parsed.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-      return `${datePart} ${timePart}`;
-    } catch {
-      return '';
-    }
+    return formatDateTimeValue(value, this.languageService.getCurrentLocale(), { fallback: '' });
   }
 
   formatDate(value?: string | null): string {
-    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
+    return formatDateValue(value ?? null, this.languageService.getCurrentLocale(), ES_DATE_FORMAT_OPTIONS.numeric, {
+      fallback: this.translate.instant('common.dates.none'),
+    });
   }
 
   /** Map raw location ids into friendly labels for dashboard display. */
@@ -229,8 +223,9 @@ export class DashboardComponent {
   }
 
   private formatQuantityValue(value: number): string {
-    const rounded = Math.round((Number(value) || 0) * 10) / 10;
-    return rounded.toFixed(1).replace(/\.0$/, '');
+    return formatQuantity(value, this.languageService.getCurrentLocale(), {
+      maximumFractionDigits: 1,
+    });
   }
 
   private getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {
@@ -249,35 +244,4 @@ export class DashboardComponent {
     });
   }
 
-  private formatShortDate(value: string): string {
-    const locale = this.languageService.getCurrentLocale();
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return value;
-      }
-      return parsed.toLocaleDateString(locale, ES_DATE_FORMAT_OPTIONS.numeric);
-    } catch {
-      return value;
-    }
-  }
-
-  private formatDateWithOptions(
-    value: string | Date | null | undefined,
-    options: Intl.DateTimeFormatOptions
-  ): string {
-    if (!value) {
-      return this.translate.instant('common.dates.none');
-    }
-    const locale = this.languageService.getCurrentLocale();
-    try {
-      const parsed = typeof value === 'string' ? new Date(value) : value;
-      if (Number.isNaN(parsed.getTime())) {
-        return this.translate.instant('common.dates.none');
-      }
-      return parsed.toLocaleDateString(locale, options);
-    } catch {
-      return this.translate.instant('common.dates.none');
-    }
-  }
 }

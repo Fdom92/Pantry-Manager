@@ -38,6 +38,7 @@ import {
   normalizeSupermarketValue,
   normalizeUnitValue,
 } from '@core/utils/normalization.util';
+import { formatDateValue, formatQuantity, formatShortDate, roundQuantity } from '@core/utils/formatting.util';
 import { ToastController } from '@ionic/angular';
 import {
   IonBadge,
@@ -543,7 +544,7 @@ export class PantryListComponent implements OnDestroy {
 
     const previousTotal = this.sumBatchQuantities(sanitizedBatches);
     const currentBatchQuantity = this.toNumber(sanitizedBatches[batchIndex].quantity);
-    const nextBatchQuantity = this.roundDisplayQuantity(Math.max(0, currentBatchQuantity + delta));
+    const nextBatchQuantity = roundQuantity(Math.max(0, currentBatchQuantity + delta));
 
     if (nextBatchQuantity === currentBatchQuantity) {
       return;
@@ -855,7 +856,7 @@ export class PantryListComponent implements OnDestroy {
         }
         const quantityLabel =
           this.formatQuantityForMessage(total, location.unit ?? this.getPrimaryUnit(item)) ??
-          this.roundDisplayQuantity(total).toString();
+          formatQuantity(total, this.languageService.getCurrentLocale(), { maximumFractionDigits: 2 });
         return {
           value: location.locationId,
           label: this.getLocationLabel(location.locationId),
@@ -1367,7 +1368,7 @@ export class PantryListComponent implements OnDestroy {
     const unitLabel = this.getUnitLabelForItem(item);
     const totalBatches = this.getTotalBatchCount(item);
     const locale = this.languageService.getCurrentLocale();
-    const formattedQuantityValue = this.roundDisplayQuantity(totalQuantity).toLocaleString(locale, {
+    const formattedQuantityValue = formatQuantity(totalQuantity, locale, {
       maximumFractionDigits: 2,
     });
     const baseQuantityLabel = unitLabel ? `${formattedQuantityValue} ${unitLabel}` : formattedQuantityValue;
@@ -1395,6 +1396,15 @@ export class PantryListComponent implements OnDestroy {
     const lowStock = this.isLowStock(item);
     const aggregates = this.computeProductAggregates(batches, lowStock);
     const colorClass = this.getColorClass(aggregates.status.state);
+    const fallbackLabel = this.translate.instant('common.dates.none');
+    const formattedEarliestExpirationShort = aggregates.earliestDate
+      ? formatShortDate(aggregates.earliestDate, locale, { fallback: aggregates.earliestDate })
+      : fallbackLabel;
+    const formattedEarliestExpirationLong = aggregates.earliestDate
+      ? formatDateValue(aggregates.earliestDate, locale, ES_DATE_FORMAT_OPTIONS.numeric, {
+          fallback: aggregates.earliestDate,
+        })
+      : fallbackLabel;
 
     return {
       item,
@@ -1406,12 +1416,8 @@ export class PantryListComponent implements OnDestroy {
       globalStatus: aggregates.status,
       colorClass,
       earliestExpirationDate: aggregates.earliestDate,
-      formattedEarliestExpirationShort: aggregates.earliestDate
-        ? this.formatDateCompact(aggregates.earliestDate)
-        : this.translate.instant('common.dates.none'),
-      formattedEarliestExpirationLong: aggregates.earliestDate
-        ? this.formatDateVerbose(aggregates.earliestDate)
-        : this.translate.instant('common.dates.none'),
+      formattedEarliestExpirationShort,
+      formattedEarliestExpirationLong,
       batchCountsLabel: aggregates.batchSummaryLabel,
       batchCounts: aggregates.counts,
       batches,
@@ -1423,17 +1429,13 @@ export class PantryListComponent implements OnDestroy {
     if (!value) {
       return this.translate.instant('common.dates.none');
     }
-    try {
-      return this.formatDateVerbose(value);
-    } catch {
-      return value;
-    }
+    return formatDateValue(value, this.languageService.getCurrentLocale(), ES_DATE_FORMAT_OPTIONS.numeric, {
+      fallback: value,
+    });
   }
 
   formatBatchQuantity(batch: ItemBatch, locationUnit: string | MeasurementUnit | undefined): string {
-    const formatted = this.roundDisplayQuantity(this.toNumber(batch.quantity)).toLocaleString(
-      this.languageService.getCurrentLocale(),
-      {
+    const formatted = formatQuantity(this.toNumber(batch.quantity), this.languageService.getCurrentLocale(), {
       maximumFractionDigits: 2,
     });
     const unitLabel = this.getUnitLabel(normalizeUnitValue(locationUnit));
@@ -1510,30 +1512,6 @@ export class PantryListComponent implements OnDestroy {
       counts,
       batchSummaryLabel,
     };
-  }
-
-  private formatDateCompact(value: string): string {
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return value;
-      }
-      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
-    } catch {
-      return value;
-    }
-  }
-
-  private formatDateVerbose(value: string): string {
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return value;
-      }
-      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
-    } catch {
-      return value;
-    }
   }
 
   private getColorClass(state: ProductStatusState): string {
@@ -1773,7 +1751,7 @@ export class PantryListComponent implements OnDestroy {
     const earliest = this.getLocationEarliestExpiry(location);
     if (earliest) {
       return this.translate.instant('pantry.detail.locationMeta.expires', {
-        date: this.formatShortDate(earliest),
+        date: formatShortDate(earliest, this.languageService.getCurrentLocale(), { fallback: earliest }),
       });
     }
     const openedCount = batches.filter(batch => batch.opened).length;
@@ -1818,18 +1796,6 @@ export class PantryListComponent implements OnDestroy {
       }
       return new Date(current) < new Date(earliest) ? current : earliest;
     });
-  }
-
-  private formatShortDate(value: string): string {
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return value;
-      }
-      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
-    } catch {
-      return value;
-    }
   }
 
   /**
@@ -1904,7 +1870,7 @@ export class PantryListComponent implements OnDestroy {
       return null;
     }
 
-    const amountToMove = this.roundDisplayQuantity(Math.min(Math.max(requestedQuantity, 0), available));
+    const amountToMove = roundQuantity(Math.min(Math.max(requestedQuantity, 0), available));
     if (amountToMove <= 0) {
       return null;
     }
@@ -1943,7 +1909,7 @@ export class PantryListComponent implements OnDestroy {
     const updatedItem = this.rebuildItemWithLocations(item, nextLocations);
     const quantityLabel =
       this.formatQuantityForMessage(amountToMove, unit) ??
-      `${this.roundDisplayQuantity(amountToMove)} ${this.getUnitLabel(unit)}`;
+      `${roundQuantity(amountToMove)} ${this.getUnitLabel(unit)}`;
 
     return {
       updatedItem,
@@ -1960,7 +1926,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   private extractBatchesForMove(batches: ItemBatch[], amount: number): MoveBatchesResult {
-    let remaining = this.roundDisplayQuantity(Math.max(0, amount));
+    let remaining = roundQuantity(Math.max(0, amount));
     const ordered = [...batches].sort((a, b) => {
       const aTime = this.getBatchTime(a) ?? Number.MAX_SAFE_INTEGER;
       const bTime = this.getBatchTime(b) ?? Number.MAX_SAFE_INTEGER;
@@ -1971,7 +1937,7 @@ export class PantryListComponent implements OnDestroy {
     const leftover: ItemBatch[] = [];
 
     for (const batch of ordered) {
-      const quantity = this.roundDisplayQuantity(this.toNumber(batch.quantity));
+      const quantity = roundQuantity(this.toNumber(batch.quantity));
       if (quantity <= 0) {
         continue;
       }
@@ -1981,10 +1947,10 @@ export class PantryListComponent implements OnDestroy {
       }
       if (quantity <= remaining) {
         moved.push({ ...batch, quantity });
-        remaining = this.roundDisplayQuantity(remaining - quantity);
+        remaining = roundQuantity(remaining - quantity);
       } else {
         moved.push({ ...batch, quantity: remaining });
-        const remainder = this.roundDisplayQuantity(quantity - remaining);
+        const remainder = roundQuantity(quantity - remaining);
         leftover.push({ ...batch, quantity: remainder });
         remaining = 0;
       }
@@ -2100,7 +2066,7 @@ export class PantryListComponent implements OnDestroy {
       return 0;
     }
     const total = batches.reduce((sum, batch) => sum + this.toNumber(batch.quantity), 0);
-    return this.roundDisplayQuantity(total);
+    return roundQuantity(total);
   }
 
   private toNumber(value: unknown): number {
@@ -2294,7 +2260,9 @@ export class PantryListComponent implements OnDestroy {
     }
     return locations
       .map(location => {
-        const quantity = this.roundDisplayQuantity(this.getLocationTotal(location));
+        const quantityLabel = formatQuantity(this.getLocationTotal(location), this.languageService.getCurrentLocale(), {
+          maximumFractionDigits: 2,
+        });
         const unitLabel = this.getUnitLabel(normalizeUnitValue(location.unit));
         const label = normalizeLocationId(
           location.locationId,
@@ -2312,13 +2280,13 @@ export class PantryListComponent implements OnDestroy {
           if (earliest) {
             extras.push(
               this.translate.instant('pantry.detail.batches.withExpiry', {
-                date: this.formatShortDate(earliest),
+                date: formatShortDate(earliest, this.languageService.getCurrentLocale(), { fallback: earliest }),
               })
             );
           }
         }
         const meta = extras.length ? ` (${extras.join(' · ')})` : '';
-        return `${quantity} ${unitLabel} · ${label}${meta}`;
+        return `${quantityLabel} ${unitLabel} · ${label}${meta}`;
       })
       .join(', ');
   }
@@ -2327,19 +2295,11 @@ export class PantryListComponent implements OnDestroy {
     if (quantity == null || Number.isNaN(Number(quantity))) {
       return null;
     }
-    const formattedNumber = this.roundDisplayQuantity(Number(quantity)).toLocaleString(
-      this.languageService.getCurrentLocale(),
-      {
-        maximumFractionDigits: 2,
-      }
-    );
+    const formattedNumber = formatQuantity(quantity, this.languageService.getCurrentLocale(), {
+      maximumFractionDigits: 2,
+    });
     const unitLabel = this.getUnitLabel(normalizeUnitValue(unit ?? undefined));
     return `${formattedNumber} ${unitLabel}`.trim();
-  }
-
-  private roundDisplayQuantity(value: number): number {
-    const num = Number.isFinite(value) ? value : 0;
-    return Math.round(num * 100) / 100;
   }
 
   /**

@@ -13,6 +13,7 @@ import {
 import { LanguageService, PantryService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
+import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
@@ -200,8 +201,8 @@ export class ShoppingComponent {
           locationId,
           reason,
           suggestedQuantity,
-          currentQuantity: this.roundQuantity(totalQuantity),
-          minThreshold: minThreshold != null ? this.roundQuantity(minThreshold) : undefined,
+          currentQuantity: roundQuantity(totalQuantity),
+          minThreshold: minThreshold != null ? roundQuantity(minThreshold) : undefined,
           unit,
           supermarket,
         });
@@ -299,25 +300,16 @@ export class ShoppingComponent {
 
   /** Keep the suggested quantity positive, defaulting to a fallback when needed. */
   private ensurePositiveQuantity(value: number, fallback?: number): number {
-    const rounded = this.roundQuantity(value);
+    const rounded = roundQuantity(value);
     if (rounded > 0) {
       return rounded;
     }
 
     if (fallback != null && fallback > 0) {
-      return this.roundQuantity(fallback);
+      return roundQuantity(fallback);
     }
 
     return 1;
-  }
-
-  /** Round quantities to two decimals to keep UI values tidy. */
-  private roundQuantity(value: number): number {
-    const num = Number(value ?? 0);
-    if (!isFinite(num)) {
-      return 0;
-    }
-    return Math.round(num * 100) / 100;
   }
 
   private getUnassignedSupermarketLabel(): string {
@@ -400,13 +392,11 @@ export class ShoppingComponent {
   }
 
   private formatExportDate(date: Date): string {
-    return new Intl.DateTimeFormat(this.languageService.getCurrentLocale(), {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
+    return formatDateTimeValue(date, this.languageService.getCurrentLocale(), {
+      dateOptions: { year: 'numeric', month: 'long', day: 'numeric' },
+      timeOptions: { hour: '2-digit', minute: '2-digit' },
+      fallback: '',
+    });
   }
 
   private ensurePageSpace(doc: jsPDF, currentY: number, neededSpace: number): number {
@@ -421,10 +411,10 @@ export class ShoppingComponent {
 
   private formatQuantityLabel(value: number, unit: MeasurementUnit | string): string {
     const locale = this.languageService.getCurrentLocale();
-    const formatted = new Intl.NumberFormat(locale, {
+    const formatted = formatQuantity(value, locale, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
-    }).format(this.roundQuantity(value));
+    });
     const unitLabel = this.getUnitLabel(unit);
     return unitLabel ? `${formatted} ${unitLabel}` : formatted;
   }
