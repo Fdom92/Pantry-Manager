@@ -98,11 +98,13 @@ export class ShoppingComponent {
   getBadgeColor(reason: ShoppingReason): string {
     switch (reason) {
       case 'basic-out':
+      case 'empty':
         return 'danger';
       case 'basic-low':
-        return 'tertiary';
-      default:
+      case 'below-min':
         return 'warning';
+      default:
+        return 'primary';
     }
   }
 

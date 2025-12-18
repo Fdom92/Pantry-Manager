@@ -1,13 +1,19 @@
-:host {
-  display: block;
-}
-
 .onboarding {
-  --background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.18), transparent 28%),
-    radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.15), transparent 24%),
-    linear-gradient(160deg, #0b1021 0%, #0f172a 50%, #0b1226 100%);
+  --onboarding-radial-a: color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
+  --onboarding-radial-b: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+  --onboarding-glass: color-mix(in srgb, #ffffff 12%, transparent);
+  --onboarding-glass-border: color-mix(in srgb, #ffffff 20%, transparent);
+  --onboarding-pill-text: var(--ion-text-color);
+  --background: radial-gradient(circle at 20% 20%, var(--onboarding-radial-a), transparent 28%),
+    radial-gradient(circle at 80% 10%, var(--onboarding-radial-b), transparent 24%),
+    linear-gradient(
+      160deg,
+      var(--ion-color-light) 0%,
+      var(--ion-card-background) 50%,
+      var(--ion-background-color) 100%
+    );
   position: relative;
-  color: #f6f7fb;
+  color: var(--ion-text-color);
 }
 
 .background-blur {
@@ -20,11 +26,11 @@
 }
 
 .blur-a {
-  background: radial-gradient(circle at 10% 70%, rgba(16, 185, 129, 0.18), transparent 30%);
+  background: radial-gradient(circle at 10% 70%, var(--onboarding-radial-a), transparent 30%);
 }
 
 .blur-b {
-  background: radial-gradient(circle at 90% 60%, rgba(99, 102, 241, 0.22), transparent 28%);
+  background: radial-gradient(circle at 90% 60%, var(--onboarding-radial-b), transparent 28%);
 }
 
 .top-bar {
@@ -42,12 +48,12 @@
   align-items: center;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--onboarding-glass);
+  border: 1px solid var(--onboarding-glass-border);
   backdrop-filter: blur(12px);
   font-size: 14px;
   letter-spacing: 0.02em;
-  color: #dce4ff;
+  color: var(--onboarding-pill-text);
 
   ion-icon {
     font-size: 18px;
@@ -66,10 +72,10 @@
   max-width: 520px;
   margin: 28px auto 0;
   padding: 24px 16px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--onboarding-glass);
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--onboarding-glass-border);
+  box-shadow: 0 20px 60px rgba(15, 20, 19, 0.35);
   backdrop-filter: blur(14px);
   text-align: center;
   animation: floatIn 420ms ease;
@@ -83,15 +89,15 @@
 
   p {
     margin: 0;
-    color: rgba(237, 242, 255, 0.9);
+    color: color-mix(in srgb, var(--ion-color-dark-contrast) 90%, transparent);
     line-height: 1.5;
     font-size: 1rem;
   }
 }
 
 .slide-card.is-pro {
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 18px 50px rgba(99, 102, 241, 0.28);
+  border-color: color-mix(in srgb, var(--ion-color-secondary) 45%, transparent);
+  box-shadow: 0 18px 50px color-mix(in srgb, var(--ion-color-secondary) 35%, transparent);
 }
 
 .pill {
@@ -99,10 +105,10 @@
   align-items: center;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(99, 102, 241, 0.14);
-  color: #c7d2ff;
+  background: color-mix(in srgb, var(--ion-color-secondary) 25%, transparent);
+  color: var(--onboarding-pill-text);
   font-size: 13px;
-  border: 1px solid rgba(99, 102, 241, 0.4);
+  border: 1px solid color-mix(in srgb, var(--ion-color-secondary) 42%, transparent);
   margin-bottom: 4px;
 }
 
@@ -113,16 +119,20 @@
   display: grid;
   place-items: center;
   border-radius: 20px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(16, 185, 129, 0.8));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ion-color-primary) 80%, var(--ion-text-color) 20%),
+    color-mix(in srgb, var(--ion-color-secondary) 85%, var(--ion-color-dark-contrast) 15%)
+  );
   box-shadow:
-    0 12px 30px rgba(99, 102, 241, 0.45),
-    0 16px 50px rgba(15, 23, 42, 0.6);
+    0 12px 30px color-mix(in srgb, var(--ion-color-primary) 45%, transparent),
+    0 16px 50px color-mix(in srgb, var(--ion-text-color) 60%, transparent);
   overflow: hidden;
 }
 
 .icon-burst ion-icon {
   font-size: 32px;
-  color: #fff;
+  color: var(--ion-color-dark-contrast);
   position: relative;
   z-index: 2;
   animation: floatPulse 4.6s ease-in-out infinite;
@@ -173,7 +183,7 @@
 .swiper-pagination-bullet-active {
   width: 28px;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--ion-color-primary), #34d399);
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
 }
 
 @media (max-width: 600px) {

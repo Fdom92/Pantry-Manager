@@ -5,15 +5,9 @@
     <ion-title>
       <div class="agent-title">
         <span>{{ 'agent.title' | translate }}</span>
-        @if (canUseAgent) {
-          <ion-badge color="warning">
-            {{ 'settings.pro.badgePro' | translate }}
-          </ion-badge>
-        } @else {
-          <ion-badge color="medium">
-            {{ 'agent.preview.badge' | translate }}
-          </ion-badge>
-        }
+        <ion-badge [color]="canUseAgent ? 'secondary' : 'medium'">
+          {{ canUseAgent ? ('settings.pro.badgePro' | translate) : ('agent.preview.badge' | translate) }}
+        </ion-badge>
       </div>
     </ion-title>
     @if (canUseAgent) {
@@ -97,7 +91,7 @@
           }
         </div>
         <div class="preview-card__cta">
-          <ion-button expand="block" color="warning" size="large" (click)="goToUpgrade()">
+          <ion-button expand="block" color="primary" size="large" (click)="goToUpgrade()">
             {{ 'agent.preview.cta' | translate }}
           </ion-button>
         </div>

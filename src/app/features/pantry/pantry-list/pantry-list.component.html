@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>{{ 'pantry.title' | translate }}</ion-title>
     <ion-buttons slot="end" class="header-actions">
-      <ion-button fill="clear" size="small" (click)="openFilters($event)">
+      <ion-button fill="clear" color="medium" size="small" (click)="openFilters($event)">
         <ion-icon slot="icon-only" name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -265,6 +265,7 @@
             <ion-button
               expand="block"
               type="submit"
+              color="primary"
               [disabled]="moveForm.invalid || moveSubmitting">
               @if (moveSubmitting) {
                 <ion-spinner slot="start" name="lines-small"></ion-spinner>
@@ -352,7 +353,7 @@
             @if (editingItem) { {{ 'pantry.form.editTitle' | translate }} } @else { {{ 'pantry.form.newTitle' | translate }} }
           </ion-title>
           <ion-buttons slot="end">
-            <ion-button fill="clear" (click)="closeFormModal()">
+            <ion-button fill="clear" color="medium" (click)="closeFormModal()">
               <ion-icon slot="icon-only" name="close"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -560,6 +561,7 @@
         <ion-toolbar class="create-footer">
           <ion-button
             expand="block"
+            color="primary"
             [disabled]="isSaving || (showAdvanced() ? form.invalid : quickFormInvalid())"
             (click)="submitItem()">
             @if (isSaving) {
