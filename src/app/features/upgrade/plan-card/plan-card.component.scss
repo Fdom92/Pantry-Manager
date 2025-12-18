@@ -5,21 +5,25 @@
   gap: 12px;
   padding: 18px;
   border-radius: 18px;
-  background: linear-gradient(145deg, #0f172a, #111827);
-  color: #e2e8f0;
-  border: 1px solid rgba(148, 163, 184, 0.32);
-  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.3);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--ion-text-color) 80%, var(--ion-background-color) 20%),
+    color-mix(in srgb, var(--ion-text-color) 90%, var(--ion-background-color) 10%)
+  );
+  color: var(--ion-color-dark-contrast);
+  border: 1px solid color-mix(in srgb, var(--ion-color-dark-contrast) 18%, transparent);
+  box-shadow: 0 18px 42px rgba(15, 20, 19, 0.35);
 }
 
 .plan-card--selected {
-  border-color: rgba(251, 191, 36, 0.65);
-  box-shadow: 0 20px 48px rgba(251, 191, 36, 0.25);
+  border-color: color-mix(in srgb, var(--ion-color-secondary) 65%, transparent);
+  box-shadow: 0 20px 48px color-mix(in srgb, var(--ion-color-secondary) 35%, transparent);
 }
 
 .plan-card--highlight {
-  background: linear-gradient(135deg, #f59e0b, #fbbf24);
-  color: #0f172a;
-  box-shadow: 0 20px 50px rgba(251, 191, 36, 0.35);
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+  color: var(--ion-text-color);
+  box-shadow: 0 20px 50px color-mix(in srgb, var(--ion-color-secondary) 45%, transparent);
 }
 
 .plan-card__badge {
@@ -28,7 +32,7 @@
   right: 12px;
   padding: 6px 10px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.14);
+  background: color-mix(in srgb, var(--ion-color-dark-contrast) 14%, transparent);
   color: inherit;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -49,7 +53,7 @@
 
 .plan-card__subtitle {
   margin: 0;
-  color: rgba(226, 232, 240, 0.8);
+  color: var(--ion-color-medium);
 }
 
 .plan-card__price {
@@ -77,19 +81,19 @@
 .pill {
   padding: 6px 10px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.14);
+  background: color-mix(in srgb, var(--ion-color-dark-contrast) 14%, transparent);
   color: inherit;
   font-weight: 600;
 }
 
 .pill--trial {
-  background: rgba(16, 185, 129, 0.16);
-  color: #065f46;
+  background: color-mix(in srgb, var(--ion-color-primary) 16%, transparent);
+  color: color-mix(in srgb, var(--ion-color-primary) 70%, var(--ion-text-color) 30%);
 }
 
 .plan-card--highlight .pill--trial {
-  background: rgba(15, 23, 42, 0.14);
-  color: #0f172a;
+  background: color-mix(in srgb, var(--ion-text-color) 14%, transparent);
+  color: var(--ion-text-color);
 }
 
 .plan-card__list {
