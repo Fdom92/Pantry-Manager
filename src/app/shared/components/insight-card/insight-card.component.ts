@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Insight, InsightCTA } from '@core/models';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
-import { Insight, InsightCTA } from '@core/insights/insight.types';
 
 @Component({
   selector: 'app-insight-card',

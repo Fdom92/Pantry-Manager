@@ -1,11 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { InsightTriggerService } from '@core/insights/insight-trigger.service';
-import { InsightService } from '@core/insights/insight.service';
-import { InsightCTA, InsightTrigger } from '@core/insights/insight.types';
-import { ES_DATE_FORMAT_OPTIONS, ItemLocationStock, PantryItem } from '@core/models';
-import { LanguageService } from '@core/services';
+import { ES_DATE_FORMAT_OPTIONS, InsightCTA, InsightTrigger, ItemLocationStock, PantryItem } from '@core/models';
+import { InsightService, InsightTriggerService, LanguageService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import {
   formatDateTimeValue,

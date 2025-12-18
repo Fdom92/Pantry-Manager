@@ -30,3 +30,10 @@ export interface Insight {
   createdAt: number;
 }
 
+export interface DashboardInsightContext {
+  hasProAccess: boolean;
+}
+
+export interface ProductAddedInsightContext {
+  product?: { name?: string } | null;
+}

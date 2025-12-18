@@ -1,15 +1,12 @@
-import { Injectable } from '@angular/core';
-import { ProService } from '@core/pro';
+import { inject, Injectable } from '@angular/core';
+import { ProService } from '@core/services';
+import { Insight, InsightTrigger } from '@core/models';
 import { InsightService } from './insight.service';
-import { buildDashboardInsights, buildProductAddedInsights } from './insight-library';
-import { Insight, InsightTrigger } from './insight.types';
 
 @Injectable({ providedIn: 'root' })
 export class InsightTriggerService {
-  constructor(
-    private readonly insightService: InsightService,
-    private readonly proService: ProService,
-  ) {}
+  private readonly insightService = inject(InsightService);
+  private readonly proService = inject(ProService);
 
   trigger(trigger: InsightTrigger, context?: any): void {
     const insights = this.generateInsights(trigger, context);
@@ -19,9 +16,9 @@ export class InsightTriggerService {
   private generateInsights(trigger: InsightTrigger, context?: any): Insight[] {
     switch (trigger) {
       case InsightTrigger.DASHBOARD:
-        return buildDashboardInsights({ hasProAccess: this.proService.canUseProFeatures() });
+        return this.insightService.buildDashboardInsights({ hasProAccess: this.proService.canUseProFeatures() });
       case InsightTrigger.PRODUCT_ADDED:
-        return buildProductAddedInsights({ product: context });
+        return this.insightService.buildProductAddedInsights({ product: context });
       default:
         return [];
     }

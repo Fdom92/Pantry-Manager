@@ -1,14 +1,31 @@
-import { Insight, InsightTrigger, InsightType } from './insight.types';
+import { Injectable, signal } from '@angular/core';
+import { DashboardInsightContext, Insight, InsightTrigger, InsightType, ProductAddedInsightContext } from '@core/models';
 
-export interface DashboardInsightContext {
-  hasProAccess: boolean;
-}
+@Injectable({ providedIn: 'root' })
+export class InsightService {
+  private readonly insights = signal<Insight[]>([]);
 
-export interface ProductAddedInsightContext {
-  product?: { name?: string } | null;
-}
+  getInsights(trigger: InsightTrigger): Insight[] {
+    return this.insights().filter(insight => insight.trigger === trigger);
+  }
 
-export function buildDashboardInsights(context: DashboardInsightContext): Insight[] {
+  addInsight(insight: Insight): void {
+    this.insights.update(list => [...list, insight]);
+  }
+
+  dismissInsight(insightId: string): void {
+    this.insights.update(list => list.filter(insight => insight.id !== insightId));
+  }
+
+  clearTrigger(trigger: InsightTrigger): void {
+    this.insights.update(list => list.filter(insight => insight.trigger !== trigger));
+  }
+
+  clearAll(): void {
+    this.insights.set([]);
+  }
+
+  buildDashboardInsights(context: DashboardInsightContext): Insight[] {
   const { hasProAccess } = context;
   const insightId = crypto.randomUUID();
 
@@ -32,7 +49,7 @@ export function buildDashboardInsights(context: DashboardInsightContext): Insigh
   ];
 }
 
-export function buildProductAddedInsights(context: ProductAddedInsightContext): Insight[] {
+buildProductAddedInsights(context: ProductAddedInsightContext): Insight[] {
   const productName = context.product?.name;
   if (!productName) {
     return [];
@@ -55,4 +72,6 @@ export function buildProductAddedInsights(context: ProductAddedInsightContext): 
       createdAt: Date.now(),
     },
   ];
+}
+
 }

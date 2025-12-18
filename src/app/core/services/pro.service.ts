@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { RevenuecatService } from '@core/services';
 import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ProService {
-  constructor(private readonly revenuecat: RevenuecatService) {}
+  private readonly revenuecat = inject(RevenuecatService);
 
   isPro(): boolean {
     return this.revenuecat.isPro();
