@@ -1,5 +1,5 @@
-ion-card + ion-card {
-  margin-top: 16px;
+ion-card {
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
 }
 
 .insights-stack {
@@ -18,6 +18,10 @@ ion-card-subtitle {
   font-size: 0.95rem;
 }
 
+ion-title {
+  color: var(--ion-text-color, var(--ion-text-color));
+}
+
 .card-header-actions {
   display: flex;
   align-items: center;
@@ -34,7 +38,7 @@ ion-card-subtitle {
 .stat {
   padding: 16px;
   border-radius: 12px;
-  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08);
+  background: color-mix(in srgb, var(--ion-color-primary, var(--ion-color-primary)) 8%, transparent);
   text-align: center;
 }
 

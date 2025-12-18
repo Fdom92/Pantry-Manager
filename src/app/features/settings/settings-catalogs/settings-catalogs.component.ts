@@ -25,7 +25,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EmptyStateGenericComponent } from '../../shared/empty-states/empty-state-generic.component';
+import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 
 const TOAST_DURATION = 1800;
 

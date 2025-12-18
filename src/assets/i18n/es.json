@@ -223,10 +223,10 @@
     },
     "preview": {
       "badge": "Vista previa",
-      "title": "Así se ve el agente PRO",
+      "title": "Así se ve el agente",
       "headline": "Respuestas premium con IA",
       "subtitle": "Consulta caducados, genera recetas y reorganiza stock en un solo mensaje.",
-      "cta": "Desbloquear agente PRO",
+      "cta": "Desbloquear agente",
       "note": "Prueba gratis incluida con el plan PRO.",
       "lockedPlaceholder": "Disponible solo con PRO"
     },

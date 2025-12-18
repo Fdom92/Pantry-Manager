@@ -28,7 +28,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
-import { EmptyStateGenericComponent } from '../../shared/components/empty-states/empty-state-generic.component';
+import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 
 @Component({
   selector: 'app-dashboard',

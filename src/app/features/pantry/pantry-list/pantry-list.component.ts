@@ -69,7 +69,7 @@ import {
 import { ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
-import { EmptyStateGenericComponent } from '../../../shared/components/empty-states/empty-state-generic.component';
+import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 
 @Component({
   selector: 'app-pantry-list',
@@ -1630,33 +1630,33 @@ export class PantryListComponent implements OnDestroy {
         return {
           state,
           label: 'Caducado',
-          accentColor: '#DC2626',
-          chipColor: '#DC2626',
-          chipTextColor: '#F8FAFC',
+          accentColor: 'var(--ion-color-danger)',
+          chipColor: 'var(--ion-color-danger)',
+          chipTextColor: 'var(--ion-color-dark-contrast)',
         };
       case 'near-expiry':
         return {
           state,
           label: 'Por caducar',
-          accentColor: '#FACC15',
-          chipColor: '#FACC15',
-          chipTextColor: '#F8FAFC',
+          accentColor: 'var(--ion-color-warning)',
+          chipColor: 'var(--ion-color-warning)',
+          chipTextColor: 'var(--ion-text-color)',
         };
       case 'low-stock':
         return {
           state,
           label: 'Bajo stock',
-          accentColor: '#FB923C',
-          chipColor: '#FB923C',
-          chipTextColor: '#0F172A',
+          accentColor: 'var(--ion-color-warning)',
+          chipColor: 'var(--ion-color-warning)',
+          chipTextColor: 'var(--ion-color-dark)',
         };
       default:
         return {
           state: 'normal',
           label: 'Stock',
-          accentColor: '#16A34A',
-          chipColor: '#16A34A',
-          chipTextColor: '#F8FAFC',
+          accentColor: 'var(--ion-color-primary)',
+          chipColor: 'var(--ion-color-primary)',
+          chipTextColor: 'var(--ion-color-primary-contrast)',
         };
     }
   }

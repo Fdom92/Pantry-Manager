@@ -223,10 +223,10 @@
     },
     "preview": {
       "badge": "Preview",
-      "title": "Preview the PRO agent",
+      "title": "Preview the agent",
       "headline": "Unlock AI to manage your pantry for you.",
       "subtitle": "See expired items, generate recipes and reorganize stock with one prompt.",
-      "cta": "Unlock PRO agent",
+      "cta": "Unlock agent",
       "note": "Start your free trial and cancel anytime.",
       "lockedPlaceholder": "Available with PRO"
     },

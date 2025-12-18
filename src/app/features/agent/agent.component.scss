@@ -3,18 +3,22 @@
   align-items: center;
   gap: 8px;
   font-weight: 700;
-  color: var(--ion-text-color, #0f172a);
+  color: var(--ion-text-color, var(--ion-text-color));
 }
 
 :host {
-  --chat-surface: #f3f4f6;
-  --chat-text: #0b1223;
-  --chat-muted: rgba(11, 18, 35, 0.72);
-  --agent-bg: #e8edff;
-  --agent-border: #3b82f6;
-  --user-bg-start: var(--ion-color-primary, #2d6bff);
-  --user-bg-end: #1d4ed8;
-  --preview-surface: linear-gradient(135deg, #0f172a, #1e293b);
+  --chat-surface: var(--ion-card-background);
+  --chat-text: var(--ion-text-color);
+  --chat-muted: var(--ion-color-medium);
+  --agent-bg: var(--ion-color-light);
+  --agent-border: var(--ion-color-tertiary);
+  --user-bg-start: var(--ion-color-primary, var(--ion-color-primary));
+  --user-bg-end: color-mix(in srgb, var(--ion-color-secondary) 80%, var(--ion-color-primary) 20%);
+  --preview-surface: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ion-text-color) 75%, var(--ion-background-color) 25%),
+    color-mix(in srgb, var(--ion-text-color) 90%, var(--ion-background-color) 10%)
+  );
 }
 
 .chat {
@@ -25,27 +29,35 @@
 }
 
 .chat--preview {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.08));
-  border: 1px dashed rgba(255, 255, 255, 0.15);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--ion-card-background) 85%, var(--ion-color-primary) 15%),
+    color-mix(in srgb, var(--ion-card-background) 95%, var(--ion-color-primary) 5%)
+  );
+  border: 1px dashed color-mix(in srgb, var(--ion-color-primary) 25%, transparent);
   padding: 16px;
   border-radius: 16px;
-  color: #e2e8f0;
+  color: var(--ion-text-color);
 }
 
 .chat--preview .message__bubble {
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--ion-card-background) 90%, transparent);
   color: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
 }
 
 .chat--preview .message.from-user .message__bubble {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ion-color-primary-shade) 60%, var(--ion-color-primary) 40%),
+    var(--ion-color-primary)
+  );
 }
 
 .chat--preview .message.is-error .message__bubble {
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid color-mix(in srgb, var(--ion-color-danger) 40%, transparent);
+  background: color-mix(in srgb, var(--ion-card-background) 80%, var(--ion-color-danger) 20%);
+  color: var(--ion-text-color);
 }
 
 .message {
@@ -65,30 +77,30 @@
     background: var(--chat-surface);
     border-radius: 14px;
     padding: 14px 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 12px color-mix(in srgb, var(--ion-text-color) 18%, transparent);
     color: var(--chat-text);
-    border: 1px solid rgba(16, 24, 40, 0.12);
+    border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
   }
 
   &.from-agent .message__bubble {
     background: var(--agent-bg);
-    border-color: rgba(59, 130, 246, 0.25);
+    border-color: color-mix(in srgb, var(--agent-border) 25%, transparent);
   }
 
   &.from-user .message__bubble {
     background: linear-gradient(135deg, var(--user-bg-start), var(--user-bg-end));
-    color: #fff;
+    color: var(--ion-color-dark-contrast);
     border: none;
   }
 
   &.is-tool .message__bubble {
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    background: #e1e8ff;
+    border: 1px solid color-mix(in srgb, var(--ion-color-tertiary) 30%, transparent);
+    background: color-mix(in srgb, var(--ion-color-tertiary) 12%, var(--ion-card-background));
   }
 
   &.is-error .message__bubble {
-    border: 1px solid var(--ion-color-danger, #eb445a);
-    background: #fff1f2;
+    border: 1px solid var(--ion-color-danger);
+    background: color-mix(in srgb, var(--ion-color-danger) 18%, var(--ion-card-background));
   }
 }
 
@@ -111,8 +123,8 @@
   margin-top: 8px;
   padding: 10px 12px;
   border-radius: 12px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: color-mix(in srgb, var(--ion-color-tertiary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ion-color-tertiary) 30%, transparent);
   color: var(--chat-text);
 
   &__title {
@@ -124,7 +136,7 @@
   &__list {
     margin: 0;
     padding-left: 16px;
-    color: #111827;
+    color: var(--ion-text-color);
   }
 }
 
@@ -145,7 +157,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border-top: 1px solid var(--ion-color-light-shade, #e5e5e5);
+  border-top: 1px solid var(--ion-color-light-shade, var(--ion-color-light-shade));
 
   &__input {
     --padding-start: 12px;
@@ -153,12 +165,12 @@
     --padding-top: 10px;
     --padding-bottom: 10px;
     --border-radius: 12px;
-    border: 1px solid rgba(16, 24, 40, 0.12);
-    background: var(--ion-item-background, var(--ion-card-background, #121212));
-    color: var(--ion-text-color, #f8fafc);
+    border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+    background: var(--ion-item-background, var(--ion-card-background, var(--ion-card-background)));
+    color: var(--ion-text-color, var(--ion-text-color));
     --background: transparent;
-    --placeholder-color: rgba(248, 250, 252, 0.6);
-    caret-color: var(--ion-color-primary, #4c8dff);
+    --placeholder-color: color-mix(in srgb, var(--ion-text-color) 60%, var(--ion-background-color) 40%);
+    caret-color: var(--ion-color-primary, var(--ion-color-primary));
   }
 
   &__actions {
@@ -169,8 +181,12 @@
 }
 
 .composer--locked {
-  background: linear-gradient(120deg, rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.06));
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--ion-text-color) 4%, transparent),
+    color-mix(in srgb, var(--ion-text-color) 6%, transparent)
+  );
+  border-top: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
 
   .composer__input {
     opacity: 0.7;
@@ -191,11 +207,15 @@
 .preview-card {
   width: 100%;
   max-width: 720px;
-  background: var(--preview-surface);
-  color: #e2e8f0;
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--ion-card-background) 80%, var(--ion-color-primary) 20%),
+    color-mix(in srgb, var(--ion-card-background) 95%, var(--ion-color-primary) 5%)
+  );
+  color: var(--ion-text-color);
   padding: 20px;
   border-radius: 18px;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 18px 50px rgba(15, 20, 19, 0.35);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -209,7 +229,7 @@
 
   h2 {
     margin: 2px 0 4px;
-    color: #f8fafc;
+    color: var(--ion-text-color);
   }
 
   .eyebrow {
@@ -217,12 +237,11 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-size: 12px;
-    color: #cbd5e1;
   }
 
   .muted {
     margin: 0;
-    color: rgba(226, 232, 240, 0.78);
+    color: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
   }
 }
 
@@ -230,10 +249,9 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(244, 196, 94, 0.18);
   display: grid;
   place-items: center;
-  color: #fbbf24;
+  color: var(--ion-color-primary);
   font-size: 22px;
 }
 
@@ -245,7 +263,7 @@
 
   .small {
     margin: 0;
-    color: rgba(226, 232, 240, 0.78);
+    color: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
     font-size: 13px;
   }
 }

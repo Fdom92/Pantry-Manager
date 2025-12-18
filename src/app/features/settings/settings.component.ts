@@ -26,7 +26,7 @@ import {
 } from '@ionic/angular/standalone';
 import { NavController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ProBannerComponent } from '@features/shared/pro-banner/pro-banner.component';
+import { ProBannerComponent } from '@shared/components/pro-banner/pro-banner.component';
 import packageJson from '../../../../package.json';
 
 const TOAST_DURATION = 1800;

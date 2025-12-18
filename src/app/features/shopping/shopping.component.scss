@@ -1,5 +1,5 @@
-ion-card + ion-card {
-  margin-top: 16px;
+ion-card {
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
 }
 
 ion-card-title {
@@ -8,6 +8,11 @@ ion-card-title {
   width: 100%;
   justify-content: space-between;
 }
+
+ion-title {
+  color: var(--ion-text-color, var(--ion-text-color));
+}
+
 .summary-header-content {
   display: flex;
   flex-direction: column;
@@ -34,7 +39,7 @@ ion-card-title {
 .stat {
   padding: 16px;
   border-radius: 12px;
-  background: rgba(var(--ion-color-warning-rgb, 255, 206, 0), 0.12);
+  background: color-mix(in srgb, var(--ion-color-primary, var(--ion-color-primary)) 8%, transparent);
   text-align: center;
 }
 
@@ -42,7 +47,7 @@ ion-card-title {
   margin: 0;
   font-size: 1.6rem;
   font-weight: 600;
-  color: var(--ion-color-warning);
+  color: var(--ion-color-primary);
 }
 
 .stat p {
@@ -101,7 +106,6 @@ ion-card-title {
   gap: 8px;
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--ion-color-dark);
 }
 
 .supermarket-heading ion-badge {
@@ -117,11 +121,8 @@ ion-card-title {
 .suggestion-card {
   margin: 0;
   border-radius: 16px;
-  background: rgba(var(--ion-color-primary-rgb, 56, 128, 255), 0.08);
-  box-shadow: var(
-    --ion-card-box-shadow,
-    0px 4px 16px rgba(15, 27, 40, 0.1)
-  );
+  background: color-mix(in srgb, var(--ion-color-primary, var(--ion-color-primary)) 8%, transparent);
+  box-shadow: none;
 }
 
 .suggestion-card ion-card-content {
@@ -150,7 +151,6 @@ ion-card-title {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--ion-color-dark);
 }
 
 .suggestion-header ion-chip {
