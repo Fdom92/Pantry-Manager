@@ -1,12 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { InsightService } from '@core/insights/insight.service';
 import { InsightTriggerService } from '@core/insights/insight-trigger.service';
-import { InsightCTA, InsightTrigger } from '@core/insights/insight.types';
+import { InsightService } from '@core/insights/insight.service';
+import { InsightTrigger } from '@core/insights/insight.types';
 import { ES_DATE_FORMAT_OPTIONS, ItemLocationStock, PantryItem } from '@core/models';
 import { LanguageService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
+import {
+  formatDateTimeValue,
+  formatDateValue,
+  formatQuantity,
+  formatShortDate,
+} from '@core/utils/formatting.util';
 import {
   IonBadge,
   IonButton,
@@ -27,8 +33,8 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
+import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -60,30 +66,36 @@ import { EmptyStateGenericComponent } from '@shared/components/empty-states/empt
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
+  // DI
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
+  private readonly insightService = inject(InsightService);
+  private readonly insightTriggerService = inject(InsightTriggerService);
+  // Data
   private hasInitialized = false;
-
-  readonly lastUpdated = signal<string | null>(null);
-  readonly deletingExpired = signal(false);
   readonly items = this.pantryStore.items;
   readonly lowStockItems = this.pantryStore.lowStockItems;
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
   readonly expiredItems = this.pantryStore.expiredItems;
   readonly summary = this.pantryStore.summary;
+  // Signals
   readonly showSnapshot = signal(true);
   readonly dashboardInsights = computed(() =>
     this.insightService.getInsights(InsightTrigger.DASHBOARD)
   );
 
+  readonly lastUpdated = signal<string | null>(null);
+  readonly deletingExpired = signal(false);
+  // Computed Signals
   readonly totalItems = computed(() => this.summary().total);
   readonly recentItems = computed(() => this.computeRecentItems(this.items()));
+  // Getter
+  get nearExpiryWindow(): number {
+    return NEAR_EXPIRY_WINDOW_DAYS;
+  }
 
-  constructor(
-    private readonly pantryStore: PantryStoreService,
-    private readonly translate: TranslateService,
-    private readonly languageService: LanguageService,
-    private readonly insightService: InsightService,
-    private readonly insightTriggerService: InsightTriggerService,
-  ) {
+  constructor() {
     effect(
       () => {
         // track list changes and mark the dashboard as refreshed
@@ -109,10 +121,6 @@ export class DashboardComponent {
     this.lastUpdated.set(new Date().toISOString());
     this.insightService.clearTrigger(InsightTrigger.DASHBOARD);
     this.insightTriggerService.trigger(InsightTrigger.DASHBOARD);
-  }
-
-  get nearExpiryWindow(): number {
-    return NEAR_EXPIRY_WINDOW_DAYS;
   }
 
   /** Toggle the visibility of the snapshot card without altering other state. */
@@ -159,11 +167,6 @@ export class DashboardComponent {
     return aTime - bTime;
   }
 
-  /** Count distinct non-empty values; used by summary badges. */
-  private countDistinct(values: (string | undefined)[]): number {
-    return new Set(values.filter(Boolean)).size;
-  }
-
   /** Total quantity across all locations for dashboard chips. */
   getItemTotalQuantity(item: PantryItem): number {
     return this.pantryStore.getItemTotalQuantity(item);
@@ -197,7 +200,7 @@ export class DashboardComponent {
           const extra = earliest
             ? this.translate.instant('dashboard.batches.withExpiry', {
                 batchLabel,
-                date: this.formatShortDate(earliest),
+                date: formatShortDate(earliest, this.languageService.getCurrentLocale(), { fallback: earliest }),
               })
             : batchLabel;
           const extraSegment = extra ? ` (${extra})` : '';
@@ -206,6 +209,16 @@ export class DashboardComponent {
         return `${quantity} ${unit} · ${name}`;
       })
       .join(', ');
+  }
+
+  formatLastUpdated(value: string | null): string {
+    return formatDateTimeValue(value, this.languageService.getCurrentLocale(), { fallback: '' });
+  }
+
+  formatDate(value?: string | null): string {
+    return formatDateValue(value ?? null, this.languageService.getCurrentLocale(), ES_DATE_FORMAT_OPTIONS.numeric, {
+      fallback: this.translate.instant('common.dates.none'),
+    });
   }
 
   /** Map raw location ids into friendly labels for dashboard display. */
@@ -222,8 +235,9 @@ export class DashboardComponent {
   }
 
   private formatQuantityValue(value: number): string {
-    const rounded = Math.round((Number(value) || 0) * 10) / 10;
-    return rounded.toFixed(1).replace(/\.0$/, '');
+    return formatQuantity(value, this.languageService.getCurrentLocale(), {
+      maximumFractionDigits: 1,
+    });
   }
 
   private getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {
@@ -240,72 +254,5 @@ export class DashboardComponent {
       }
       return new Date(current) < new Date(earliest) ? current : earliest;
     });
-  }
-
-  private formatShortDate(value: string): string {
-    const locale = this.languageService.getCurrentLocale();
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return value;
-      }
-      return parsed.toLocaleDateString(locale, ES_DATE_FORMAT_OPTIONS.numeric);
-    } catch {
-      return value;
-    }
-  }
-
-  formatLastUpdated(value: string | null): string {
-    if (!value) {
-      return '';
-    }
-    const locale = this.languageService.getCurrentLocale();
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return '';
-      }
-      const datePart = parsed.toLocaleDateString(locale, ES_DATE_FORMAT_OPTIONS.numeric);
-      const timePart = parsed.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-      return `${datePart} ${timePart}`;
-    } catch {
-      return '';
-    }
-  }
-
-  formatExpiryFull(value?: string | null): string {
-    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
-  }
-
-  formatExpiryBadge(value?: string | null): string {
-    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
-  }
-
-  handleInsightAction(cta: InsightCTA): void {
-    if (cta.action === 'dismiss' && cta.payload?.insightId) {
-      this.insightService.dismissInsight(cta.payload.insightId);
-      return;
-    }
-    // Future actions (agent, navigation, etc.) will be orchestrated upstream.
-    console.debug('[DashboardComponent] Insight CTA selected', cta);
-  }
-
-  private formatDateWithOptions(
-    value: string | Date | null | undefined,
-    options: Intl.DateTimeFormatOptions
-  ): string {
-    if (!value) {
-      return this.translate.instant('common.dates.none');
-    }
-    const locale = this.languageService.getCurrentLocale();
-    try {
-      const parsed = typeof value === 'string' ? new Date(value) : value;
-      if (Number.isNaN(parsed.getTime())) {
-        return this.translate.instant('common.dates.none');
-      }
-      return parsed.toLocaleDateString(locale, options);
-    } catch {
-      return this.translate.instant('common.dates.none');
-    }
   }
 }

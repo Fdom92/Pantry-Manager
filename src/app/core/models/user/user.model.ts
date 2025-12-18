@@ -1,4 +1,4 @@
-import { BaseDoc } from './base-doc.model';
+import { BaseDoc } from "../shared";
 
 export interface User extends BaseDoc {
   type: 'user';

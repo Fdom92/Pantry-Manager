@@ -1,26 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
+import { PantryItem } from '@core/models/inventory';
+import { MeasurementUnit } from '@core/models/shared';
 import {
-  MeasurementUnit,
-  PantryItem,
   ShoppingReason,
-  ShoppingState,
-  ShoppingSuggestion,
-  ShoppingSuggestionGroup,
-  ShoppingSummary,
-} from '@core/models';
+  ShoppingStateWithItem,
+  ShoppingSuggestionGroupWithItem,
+  ShoppingSuggestionWithItem,
+  ShoppingSummary
+} from '@core/models/shopping';
 import { LanguageService, PantryService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
+import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
+import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import jsPDF from 'jspdf';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
+import jsPDF from 'jspdf';
 import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
-
-type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;
-type ShoppingSuggestionGroupWithItem = ShoppingSuggestionGroup<PantryItem>;
-type ShoppingStateWithItem = ShoppingState<PantryItem>;
 
 @Component({
   selector: 'app-shopping',
@@ -35,9 +33,21 @@ type ShoppingStateWithItem = ShoppingState<PantryItem>;
   styleUrls: ['./shopping.component.scss'],
 })
 export class ShoppingComponent {
-  private readonly unassignedSupermarketKey = '__none__';
-
+  // DI
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
+  private readonly modalCtrl = inject(ModalController);
+  private readonly pantryService = inject(PantryService);
+  private readonly toastCtrl = inject(ToastController);
+  // Data
   readonly loading = this.pantryStore.loading;
+  private readonly unassignedSupermarketKey = '__none__';
+  // Signals
+  readonly summaryExpanded = signal(true);
+  readonly processingIds = signal<Set<string>>(new Set());
+  readonly sharingList = signal(false);
+  // Computed Signals
   readonly shoppingState = computed<ShoppingStateWithItem>(() => {
     const analysis = this.analyzeShopping(this.pantryStore.items());
     return {
@@ -45,18 +55,6 @@ export class ShoppingComponent {
       hasAlerts: analysis.summary.total > 0,
     };
   });
-  readonly summaryExpanded = signal(true);
-  readonly processingIds = signal<Set<string>>(new Set());
-  readonly sharingList = signal(false);
-
-  constructor(
-    private readonly pantryStore: PantryStoreService,
-    private readonly translate: TranslateService,
-    private readonly languageService: LanguageService,
-    private readonly modalCtrl: ModalController,
-    private readonly pantryService: PantryService,
-    private readonly toastCtrl: ToastController,
-  ) {}
 
   /** Lifecycle hook: make sure the store is populated before rendering suggestions. */
   async ionViewWillEnter(): Promise<void> {
@@ -108,46 +106,12 @@ export class ShoppingComponent {
     }
   }
 
-  /**
-   * Persist the purchased batch and refresh shopping state.
-   */
-  private async handlePurchase(
-    suggestion: ShoppingSuggestionWithItem,
-    data: { quantity: number; expiryDate?: string | null; location: string }
-  ): Promise<void> {
-    const id = suggestion.item?._id;
-    if (!id || this.isProcessing(id)) {
-      return;
-    }
-
-    this.processingIds.update(ids => {
-      const next = new Set(ids);
-      next.add(id);
-      return next;
-    });
-
-    try {
-      await this.pantryService.addNewLot(id, {
-        quantity: data.quantity,
-        expiryDate: data.expiryDate ?? undefined,
-        location: data.location,
-      });
-      await this.pantryStore.loadAll();
-    } finally {
-      this.processingIds.update(ids => {
-        const next = new Set(ids);
-        next.delete(id);
-        return next;
-      });
-    }
-  }
-
   getUnitLabel(unit: MeasurementUnit | string): string {
-    return this.pantryStore.getUnitLabel(this.normalizeUnit(unit));
+    return this.pantryStore.getUnitLabel(normalizeUnitValue(unit));
   }
 
   getLocationLabel(locationId: string): string {
-    return this.formatLocationLabel(locationId, this.translate.instant('common.locations.none'));
+    return normalizeLocationId(locationId, this.translate.instant('common.locations.none'));
   }
 
   async shareShoppingList(): Promise<void> {
@@ -182,6 +146,10 @@ export class ShoppingComponent {
     }
   }
 
+  getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
+    return suggestion.item?._id ?? suggestion.item?.name ?? 'item';
+  }
+
   /**
    * Evaluate every location for each item and produce actionable shopping suggestions.
    * Returns both the detailed list and aggregate counters for the summary card.
@@ -203,7 +171,7 @@ export class ShoppingComponent {
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       const primaryLocation = item.locations[0];
       const locationId = primaryLocation?.locationId ?? 'unassigned';
-      const unit = this.normalizeUnit(primaryLocation?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
+      const unit = normalizeUnitValue(primaryLocation?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
 
       let reason: ShoppingReason | null = null;
       let suggestedQuantity = 0;
@@ -223,7 +191,7 @@ export class ShoppingComponent {
       }
 
       if (reason) {
-        const supermarket = this.normalizeSupermarketValue(item.supermarket);
+        const supermarket = normalizeSupermarketValue(item.supermarket);
         if (supermarket) {
           uniqueSupermarkets.add(supermarket.toLowerCase());
         }
@@ -233,8 +201,8 @@ export class ShoppingComponent {
           locationId,
           reason,
           suggestedQuantity,
-          currentQuantity: this.roundQuantity(totalQuantity),
-          minThreshold: minThreshold != null ? this.roundQuantity(minThreshold) : undefined,
+          currentQuantity: roundQuantity(totalQuantity),
+          minThreshold: minThreshold != null ? roundQuantity(minThreshold) : undefined,
           unit,
           supermarket,
         });
@@ -257,14 +225,6 @@ export class ShoppingComponent {
     summary.supermarketCount = uniqueSupermarkets.size;
     const groupedSuggestions = this.groupSuggestionsBySupermarket(suggestions);
     return { suggestions, groupedSuggestions, summary };
-  }
-
-  private normalizeSupermarketValue(value?: string | null): string | undefined {
-    const trimmed = (value ?? '').trim();
-    if (!trimmed) {
-      return undefined;
-    }
-    return trimmed.replace(/\s+/g, ' ');
   }
 
   private groupSuggestionsBySupermarket(
@@ -304,51 +264,56 @@ export class ShoppingComponent {
     });
   }
 
-  getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
-    return suggestion.item?._id ?? suggestion.item?.name ?? 'item';
+  /**
+   * Persist the purchased batch and refresh shopping state.
+   */
+  private async handlePurchase(
+    suggestion: ShoppingSuggestionWithItem,
+    data: { quantity: number; expiryDate?: string | null; location: string }
+  ): Promise<void> {
+    const id = suggestion.item?._id;
+    if (!id || this.isProcessing(id)) {
+      return;
+    }
+
+    this.processingIds.update(ids => {
+      const next = new Set(ids);
+      next.add(id);
+      return next;
+    });
+
+    try {
+      await this.pantryService.addNewLot(id, {
+        quantity: data.quantity,
+        expiryDate: data.expiryDate ?? undefined,
+        location: data.location,
+      });
+      await this.pantryStore.loadAll();
+    } finally {
+      this.processingIds.update(ids => {
+        const next = new Set(ids);
+        next.delete(id);
+        return next;
+      });
+    }
   }
 
   /** Keep the suggested quantity positive, defaulting to a fallback when needed. */
   private ensurePositiveQuantity(value: number, fallback?: number): number {
-    const rounded = this.roundQuantity(value);
+    const rounded = roundQuantity(value);
     if (rounded > 0) {
       return rounded;
     }
 
     if (fallback != null && fallback > 0) {
-      return this.roundQuantity(fallback);
+      return roundQuantity(fallback);
     }
 
     return 1;
   }
 
-  /** Round quantities to two decimals to keep UI values tidy. */
-  private roundQuantity(value: number): number {
-    const num = Number(value ?? 0);
-    if (!isFinite(num)) {
-      return 0;
-    }
-    return Math.round(num * 100) / 100;
-  }
-
-  private normalizeUnit(unit?: MeasurementUnit | string | null): string {
-    if (typeof unit !== 'string') {
-      return MeasurementUnit.UNIT;
-    }
-    const trimmed = unit.trim();
-    if (!trimmed) {
-      return MeasurementUnit.UNIT;
-    }
-    return trimmed;
-  }
-
   private getUnassignedSupermarketLabel(): string {
     return this.translate.instant('shopping.unassignedSupermarket');
-  }
-
-  private formatLocationLabel(value: string | null | undefined, fallback: string = ''): string {
-    const trimmed = (value ?? '').trim();
-    return trimmed || fallback || 'No location';
   }
 
   private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {
@@ -427,13 +392,11 @@ export class ShoppingComponent {
   }
 
   private formatExportDate(date: Date): string {
-    return new Intl.DateTimeFormat(this.languageService.getCurrentLocale(), {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
+    return formatDateTimeValue(date, this.languageService.getCurrentLocale(), {
+      dateOptions: { year: 'numeric', month: 'long', day: 'numeric' },
+      timeOptions: { hour: '2-digit', minute: '2-digit' },
+      fallback: '',
+    });
   }
 
   private ensurePageSpace(doc: jsPDF, currentY: number, neededSpace: number): number {
@@ -448,10 +411,10 @@ export class ShoppingComponent {
 
   private formatQuantityLabel(value: number, unit: MeasurementUnit | string): string {
     const locale = this.languageService.getCurrentLocale();
-    const formatted = new Intl.NumberFormat(locale, {
+    const formatted = formatQuantity(value, locale, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
-    }).format(this.roundQuantity(value));
+    });
     const unitLabel = this.getUnitLabel(unit);
     return unitLabel ? `${formatted} ${unitLabel}` : formatted;
   }

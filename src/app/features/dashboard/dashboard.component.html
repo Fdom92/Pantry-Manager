@@ -77,9 +77,9 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>{{ 'dashboard.nearExpiry.expires' | translate:{ date: formatExpiryFull(item.expirationDate) } }}</p>
+                <p>{{ 'dashboard.nearExpiry.expires' | translate:{ date: formatDate(item.expirationDate) } }}</p>
               </ion-label>
-              <ion-badge color="warning">{{ formatExpiryBadge(item.expirationDate) }}</ion-badge>
+              <ion-badge color="warning">{{ formatDate(item.expirationDate) }}</ion-badge>
             </ion-item>
           }
         </ion-list>
@@ -160,7 +160,7 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>{{ 'dashboard.expired.expires' | translate:{ date: formatExpiryFull(item.expirationDate) } }}</p>
+                <p>{{ 'dashboard.expired.expires' | translate:{ date: formatDate(item.expirationDate) } }}</p>
               </ion-label>
               <ion-badge color="medium">{{ 'dashboard.expired.badge' | translate }}</ion-badge>
             </ion-item>
@@ -188,7 +188,7 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>{{ 'dashboard.recent.updated' | translate:{ date: formatExpiryFull(item.updatedAt) } }}</p>
+                <p>{{ 'dashboard.recent.updated' | translate:{ date: formatDate(item.updatedAt) } }}</p>
               </ion-label>
               <ion-badge color="tertiary">{{ 'dashboard.recent.badge' | translate }}</ion-badge>
             </ion-item>

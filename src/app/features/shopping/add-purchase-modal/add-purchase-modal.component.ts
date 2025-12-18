@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PantryItem, ShoppingItem } from '@core/models';
+import { PantryItem } from '@core/models/inventory';
+import { ShoppingItem } from '@core/models/shopping';
+import { normalizeLocationId } from '@core/utils/normalization.util';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -20,35 +22,28 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 export class AddPurchaseModalComponent implements OnInit {
   @Input() item: ShoppingItem | null = null;
   @Input() product: PantryItem | null = null;
-
   @Output() confirm = new EventEmitter<{
     quantity: number;
     expiryDate?: string | null;
     location: string;
   }>();
-
+  // DI
+  private readonly modalCtrl = inject(ModalController);
+  private readonly translate = inject(TranslateService);
+  // Data
   quantity = 1;
   expiryDate: string | null = null;
   location = 'unassigned';
-
-  constructor(
-    private readonly modalCtrl: ModalController,
-    private readonly translate: TranslateService,
-  ) {}
-
-  ngOnInit(): void {
-    this.initializeDefaults();
-  }
-
+  // Getters
   get locationOptions(): string[] {
     const options = new Set<string>();
-    const fromItem = (this.item?.locationId ?? '').trim();
+    const fromItem = normalizeLocationId(this.item?.locationId);
     if (fromItem) {
       options.add(fromItem);
     }
     if (Array.isArray(this.product?.locations)) {
       this.product.locations.forEach(loc => {
-        const id = (loc.locationId ?? '').trim();
+        const id = normalizeLocationId(loc.locationId);
         if (id) {
           options.add(id);
         }
@@ -59,14 +54,16 @@ export class AddPurchaseModalComponent implements OnInit {
     }
     return Array.from(options);
   }
-
   get canConfirm(): boolean {
     return this.quantity > 0 && Boolean(this.location);
   }
 
+  ngOnInit(): void {
+    this.initializeDefaults();
+  }
+
   getLocationLabel(id: string): string {
-    const trimmed = (id ?? '').trim();
-    return trimmed || this.translate.instant('locations.pantry');
+    return normalizeLocationId(id, this.translate.instant('locations.pantry'));
   }
 
   onQuantityInput(event: CustomEvent): void {
@@ -98,8 +95,8 @@ export class AddPurchaseModalComponent implements OnInit {
     this.quantity = suggestedQuantity > 0 ? suggestedQuantity : 1;
 
     const defaultLocation =
-      (this.item?.locationId ?? '').trim() ||
-      (Array.isArray(this.product?.locations) ? this.product.locations[0]?.locationId : '') ||
+      normalizeLocationId(this.item?.locationId) ||
+      (Array.isArray(this.product?.locations) ? normalizeLocationId(this.product.locations[0]?.locationId) : '') ||
       'pantry';
     this.location = defaultLocation || 'pantry';
   }

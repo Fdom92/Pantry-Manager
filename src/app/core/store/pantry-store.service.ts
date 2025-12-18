@@ -1,42 +1,40 @@
-import { computed, effect, Injectable, signal } from '@angular/core';
-import { MeasurementUnit, PantryItem, StockStatus } from '@core/models';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { PantryItem } from '@core/models/inventory';
+import { MeasurementUnit, StockStatus } from '@core/models/shared';
 import { PantryService } from '@core/services/pantry.service';
+import { normalizeLocationId } from '@core/utils/normalization.util';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
-  /** --- Main state signal --- */
-  private readonly itemsSignal = signal<PantryItem[]>([]);
-  readonly items = computed(() => this.itemsSignal());
-
-  /** --- Loading & error state --- */
+  // DI
+  private readonly pantryService = inject(PantryService);
+  // Data
+  private readonly knownMeasurementUnits = new Set(
+    Object.values(MeasurementUnit).map(option => option.toLowerCase())
+  );
+  // Signals
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
-
-  /** --- Derived computed signals --- */
+  private readonly itemsSignal = signal<PantryItem[]>([]);
+  // Computed Signals
+  readonly items = computed(() => this.itemsSignal());
   readonly expiredItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemExpired(item))
   );
-
   readonly nearExpiryItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemNearExpiry(item))
   );
-
   readonly lowStockItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemLowStock(item))
   );
-
-  /** --- Quick summary for dashboard or analytics --- */
   readonly summary = computed(() => ({
     total: this.items().length,
     expired: this.expiredItems().length,
     nearExpiry: this.nearExpiryItems().length,
     lowStock: this.lowStockItems().length,
   }));
-  private readonly knownMeasurementUnits = new Set(
-    Object.values(MeasurementUnit).map(option => option.toLowerCase())
-  );
 
-  constructor(private readonly pantryService: PantryService) {
+  constructor() {
     // Mirror the shared pantry service cache so dashboard consumers avoid duplicating DB reads.
     effect(() => {
       this.itemsSignal.set(this.pantryService.loadedProducts());
@@ -309,12 +307,12 @@ export class PantryStoreService {
     }));
 
     for (const newLocation of incoming.locations ?? []) {
-      const locationId = this.normalizeLocationId(newLocation.locationId);
+      const locationId = normalizeLocationId(newLocation.locationId);
       if (!locationId) {
         continue;
       }
       const targetIndex = normalizedLocations.findIndex(
-        location => this.normalizeLocationId(location.locationId) === locationId
+        location => normalizeLocationId(location.locationId) === locationId
       );
       const newBatches = Array.isArray(newLocation.batches) ? [...newLocation.batches] : [];
 
@@ -345,7 +343,4 @@ export class PantryStoreService {
     };
   }
 
-  private normalizeLocationId(value?: string): string {
-    return (value ?? '').trim();
-  }
 }

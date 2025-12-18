@@ -1,4 +1,4 @@
-import { MeasurementUnit } from './enums.model';
+import { MeasurementUnit } from '../shared';
 import { ItemBatch } from './item-batch.model';
 import { ItemLocationStock } from './item-location-stock.model';
 import { PantryItem } from './item.model';
@@ -106,4 +106,9 @@ export interface PantryItemCardViewModel {
   batchCountsLabel: string;
   batchCounts: BatchCountsMeta;
   batches: PantryItemBatchViewModel[];
+}
+
+export interface MoveBatchesResult {
+  moved: ItemBatch[];
+  remaining: ItemBatch[];
 }
