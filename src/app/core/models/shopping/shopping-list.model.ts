@@ -1,5 +1,5 @@
-import { BaseDoc } from './base-doc.model';
-import { PantryItem } from './item.model';
+import { PantryItem } from "../inventory";
+import { BaseDoc } from "../shared";
 
 export interface ShoppingList extends BaseDoc {
   type: 'shopping-list';

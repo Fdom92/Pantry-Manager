@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
-import { PlanViewModel } from '@core/models';
+import { PlanViewModel } from '@core/models/upgrade';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { NavController } from '@ionic/angular';
 import {

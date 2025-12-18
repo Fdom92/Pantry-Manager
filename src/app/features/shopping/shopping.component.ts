@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
+import { PantryItem } from '@core/models/inventory';
+import { MeasurementUnit } from '@core/models/shared';
 import {
-  MeasurementUnit,
-  PantryItem,
   ShoppingReason,
   ShoppingStateWithItem,
   ShoppingSuggestionGroupWithItem,
   ShoppingSuggestionWithItem,
   ShoppingSummary
-} from '@core/models';
+} from '@core/models/shopping';
 import { LanguageService, PantryService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';

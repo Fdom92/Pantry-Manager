@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, ViewChild, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AgentMessage } from '@core/models';
+import { AgentMessage } from '@core/models/agent';
 import { AgentService } from '@core/services/agent.service';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { NavController } from '@ionic/angular';

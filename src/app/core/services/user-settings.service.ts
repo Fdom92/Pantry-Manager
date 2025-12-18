@@ -1,9 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { DEFAULT_SETTINGS, DOC_TYPE_SETTINGS, STORAGE_KEY_SETTINGS } from '@core/constants';
-import {
-  UserSettings,
-  UserSettingsDoc,
-} from '@core/models';
+import { UserSettings, UserSettingsDoc } from '@core/models/user';
 import { StorageService } from './storage.service';
 
 @Injectable({

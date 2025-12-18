@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { APP_DB_NAME } from '@core/constants/app.constants';
-import { BaseDoc } from '@core/models';
+import { APP_DB_NAME } from '@core/constants';
+import { BaseDoc } from '@core/models/shared';
 import { createDocumentId } from '@core/utils';
 import PouchDB from 'pouchdb-browser';
 import PouchFind from 'pouchdb-find';

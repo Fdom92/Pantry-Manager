@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
-import { OnboardingSlide } from '@core/models';
+import { OnboardingSlide } from '@core/models/onboarding';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { NavController } from '@ionic/angular';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';

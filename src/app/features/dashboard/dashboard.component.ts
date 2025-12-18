@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { ES_DATE_FORMAT_OPTIONS, ItemLocationStock, PantryItem } from '@core/models';
+import { ES_DATE_FORMAT_OPTIONS } from '@core/models/shared';
+import { ItemLocationStock, PantryItem } from '@core/models/inventory';
 import { LanguageService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import {

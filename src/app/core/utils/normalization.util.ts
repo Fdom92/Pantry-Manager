@@ -1,4 +1,4 @@
-import { MeasurementUnit } from '@core/models';
+import { MeasurementUnit } from '@core/models/shared';
 
 export interface NormalizeStringListOptions {
   fallback?: readonly string[];

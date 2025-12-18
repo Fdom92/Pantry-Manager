@@ -2,14 +2,25 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { AGENT_TOOLS_CATALOG, DEFAULT_CATEGORY_OPTIONS, DEFAULT_HOUSEHOLD_ID, DEFAULT_LOCATION_OPTIONS, LOCATION_SYNONYMS } from '@core/constants';
 import {
-  AgentMessage, AgentModelCallError, AgentModelMessage, AgentModelRequest,
+  AgentMessage,
+  AgentModelCallError,
+  AgentModelMessage,
+  AgentModelRequest,
   AgentModelResponse,
   AgentPhase,
   AgentRole,
   AgentToolCall,
-  AgentToolDefinition, ItemBatch, ItemLocationStock, MeasurementUnit, MoveBatchesResult, PantryItem, RawToolCall,
-  ToolExecution
-} from '@core/models';
+  AgentToolDefinition,
+  RawToolCall,
+  ToolExecution,
+} from '@core/models/agent';
+import {
+  ItemBatch,
+  ItemLocationStock,
+  MoveBatchesResult,
+  PantryItem,
+} from '@core/models/inventory';
+import { MeasurementUnit } from '@core/models/shared';
 import { createDocumentId } from '@core/utils';
 import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';

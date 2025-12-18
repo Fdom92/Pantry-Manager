@@ -1,5 +1,4 @@
-import { BaseDoc } from './base-doc.model';
-import { ExpirationStatus } from './enums.model';
+import { BaseDoc, ExpirationStatus } from '../shared';
 import { ItemLocationStock } from './item-location-stock.model';
 
 export interface PantryItem extends BaseDoc {

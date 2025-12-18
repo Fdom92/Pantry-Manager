@@ -8,12 +8,11 @@ import {
   BatchEntryMeta,
   BatchStatusMeta,
   BatchSummaryMeta,
-  ES_DATE_FORMAT_OPTIONS,
   FilterChipViewModel,
   ItemBatch,
   ItemLocationStock,
-  MeasurementUnit,
   MoveBatchesResult,
+  PantryFilterState,
   PantryGroup,
   PantryItem,
   PantryItemBatchViewModel,
@@ -22,8 +21,8 @@ import {
   PantryStatusFilterValue,
   PantrySummaryMeta,
   ProductStatusState
-} from '@core/models';
-import { PantryFilterState } from '@core/models/pantry-pipeline.model';
+} from '@core/models/inventory';
+import { ES_DATE_FORMAT_OPTIONS, MeasurementUnit } from '@core/models/shared';
 import {
   AppPreferencesService,
   LanguageService,

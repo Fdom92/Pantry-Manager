@@ -1,8 +1,8 @@
 import { effect, Injectable, signal } from '@angular/core';
-import { DEFAULT_HOUSEHOLD_ID, LegacyLocationStock, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { ExpirationStatus, ItemBatch, ItemLocationStock, MeasurementUnit, PantryItem } from '@core/models';
+import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { DEFAULT_PANTRY_FILTERS, ItemBatch, ItemLocationStock, LegacyLocationStock, PantryFilterState, PantryItem, PantrySortMode } from '@core/models/inventory';
+import { ExpirationStatus, MeasurementUnit } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
-import { DEFAULT_PANTRY_FILTERS, PantryFilterState, PantrySortMode } from '@core/models/pantry-pipeline.model';
 import { StorageService } from './storage.service';
 
 @Injectable({
