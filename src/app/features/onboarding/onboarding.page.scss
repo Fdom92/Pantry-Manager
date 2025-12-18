@@ -4,14 +4,19 @@
   --onboarding-glass: color-mix(in srgb, #ffffff 12%, transparent);
   --onboarding-glass-border: color-mix(in srgb, #ffffff 20%, transparent);
   --onboarding-pill-text: var(--ion-text-color);
-  --background: radial-gradient(circle at 20% 20%, var(--onboarding-radial-a), transparent 28%),
-    radial-gradient(circle at 80% 10%, var(--onboarding-radial-b), transparent 24%),
+  --background: radial-gradient(
+      circle at 18% 22%,
+      color-mix(in srgb, var(--ion-color-primary) 25%, transparent),
+      transparent 32%),
+    radial-gradient(
+      circle at 78% 12%,
+      color-mix(in srgb, var(--ion-color-secondary) 22%, transparent),
+      transparent 28%),
     linear-gradient(
-      160deg,
-      var(--ion-color-light) 0%,
-      var(--ion-card-background) 50%,
-      var(--ion-background-color) 100%
-    );
+      150deg,
+      color-mix(in srgb, var(--ion-card-background) 70%, var(--ion-color-primary) 30%) 0%,
+      color-mix(in srgb, var(--ion-card-background) 85%, var(--ion-color-primary) 15%) 60%,
+      var(--ion-card-background) 100%)
   position: relative;
   color: var(--ion-text-color);
 }
@@ -89,7 +94,6 @@
 
   p {
     margin: 0;
-    color: color-mix(in srgb, var(--ion-color-dark-contrast) 90%, transparent);
     line-height: 1.5;
     font-size: 1rem;
   }
