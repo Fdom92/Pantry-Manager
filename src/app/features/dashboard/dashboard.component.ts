@@ -3,7 +3,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { InsightTriggerService } from '@core/insights/insight-trigger.service';
 import { InsightService } from '@core/insights/insight.service';
-import { InsightTrigger } from '@core/insights/insight.types';
+import { InsightCTA, InsightTrigger } from '@core/insights/insight.types';
 import { ES_DATE_FORMAT_OPTIONS, ItemLocationStock, PantryItem } from '@core/models';
 import { LanguageService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
@@ -121,6 +121,15 @@ export class DashboardComponent {
     this.lastUpdated.set(new Date().toISOString());
     this.insightService.clearTrigger(InsightTrigger.DASHBOARD);
     this.insightTriggerService.trigger(InsightTrigger.DASHBOARD);
+  }
+
+  handleInsightAction(cta: InsightCTA): void {
+    if (cta.action === 'dismiss' && cta.payload?.insightId) {
+      this.insightService.dismissInsight(cta.payload.insightId);
+      return;
+    }
+    // Future actions (agent, navigation, etc.) will be orchestrated upstream.
+    console.debug('[DashboardComponent] Insight CTA selected', cta);
   }
 
   /** Toggle the visibility of the snapshot card without altering other state. */
