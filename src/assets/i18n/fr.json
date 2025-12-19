@@ -226,7 +226,7 @@
     },
     "duplicatedProducts": {
       "title": "Produits dupliqués dans le garde-manger",
-      "description": "Certains produits sont répartis sur plusieurs lots ou emplacements.",
+      "description": "Des articles portent le même nom dans plusieurs fiches. Vérifiez-les et fusionnez-les.",
       "cta": "Revoir les produits"
     }
   },

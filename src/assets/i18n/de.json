@@ -226,7 +226,7 @@
     },
     "duplicatedProducts": {
       "title": "Doppelte Produkte in der Speisekammer",
-      "description": "Einige Produkte sind auf mehrere Chargen oder Standorte verteilt.",
+      "description": "Einige Artikel haben denselben Namen in mehreren Einträgen. Prüfe und führe sie zusammen.",
       "cta": "Produkte prüfen"
     }
   },

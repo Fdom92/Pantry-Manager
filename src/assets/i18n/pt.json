@@ -226,7 +226,7 @@
     },
     "duplicatedProducts": {
       "title": "Produtos duplicados na despensa",
-      "description": "Há produtos distribuídos em vários lotes ou locais.",
+      "description": "Existem itens com o mesmo nome registrados mais de uma vez. Revise e consolide.",
       "cta": "Revisar produtos"
     }
   },

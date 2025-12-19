@@ -226,7 +226,7 @@
     },
     "duplicatedProducts": {
       "title": "Prodotti duplicati in dispensa",
-      "description": "Alcuni prodotti sono distribuiti in più lotti o posizioni.",
+      "description": "Ci sono articoli con lo stesso nome registrati più volte. Controlla e uniscili.",
       "cta": "Rivedi prodotti"
     }
   },
