@@ -1,202 +1,101 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
+  DashboardInsightContext,
   Insight,
-  InsightCTAAction,
-  InsightEvaluationContext,
-  InsightType,
-  PantryItem,
+  InsightId,
 } from '@core/models';
-
-const RECIPE_SESSION_TTL_MS = 1000 * 60 * 30; // 30 minutes since the last generation.
-const NON_RECIPE_CATEGORY_HINTS = ['clean', 'limp', 'hogar', 'bath', 'aseo', 'pet', 'mascota'];
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({ providedIn: 'root' })
 export class InsightService {
-  evaluateInsights(context: InsightEvaluationContext): Insight | null {
-    // Generate every possible insight using the current context.
-    const candidates = [
-      this.buildExpiringSoonInsight(context),
-      this.buildCookNowInsight(context),
-      this.buildOutOfStockInsight(context),
-      this.buildLowStockInsight(context),
-      this.buildShoppingReminderInsight(context),
-    ].filter((insight): insight is Insight => Boolean(insight));
+  private readonly translate = inject(TranslateService);
 
-    if (!candidates.length) {
-      return null;
+  getDashboardInsights(context: DashboardInsightContext): Insight[] {
+    const insights: Insight[] = [];
+
+    const expiringLowStock = context.expiringSoonItems.filter(item => item.isLowStock);
+    if (expiringLowStock.length >= 1) {
+      insights.push({
+        id: InsightId.EXPIRING_LOW_STOCK,
+        title: this.translateKey('insights.expiringLowStock.title'),
+        description: this.translateKey('insights.expiringLowStock.description'),
+        ctaLabel: this.translateKey('insights.expiringLowStock.cta'),
+        action: {
+          type: 'navigate',
+          target: 'dashboard_section',
+          payload: 'expiring',
+        },
+        priority: 2,
+      });
     }
 
-    // Lower priority value means higher importance.
-    candidates.sort((a, b) => a.priority - b.priority);
-    return candidates[0];
+    const expiredWithStock = context.expiredItems.filter(item => item.quantity > 0);
+    if (expiredWithStock.length >= 1) {
+      insights.push({
+        id: InsightId.EXPIRED_WITH_STOCK,
+        title: this.translateKey('insights.expiredWithStock.title'),
+        description: this.translateKey('insights.expiredWithStock.description'),
+        ctaLabel: this.translateKey('insights.expiredWithStock.cta'),
+        action: {
+          type: 'navigate',
+          target: 'dashboard_section',
+          payload: 'expired',
+        },
+        priority: 1,
+      });
+    }
+
+    if (context.expiringSoonCount === 0 && context.lowStockCount >= 3) {
+      insights.push({
+        id: InsightId.LOW_STOCK_NO_EXPIRY,
+        title: this.translateKey('insights.lowStockNoExpiry.title'),
+        description: this.translateKey('insights.lowStockNoExpiry.description'),
+        ctaLabel: this.translateKey('insights.lowStockNoExpiry.cta'),
+        action: {
+          type: 'navigate',
+          target: 'dashboard_section',
+          payload: 'lowStock',
+        },
+        priority: 3,
+      });
+    }
+
+    if (this.hasDuplicateProductNames(context.products)) {
+      insights.push({
+        id: InsightId.DUPLICATED_PRODUCTS,
+        title: this.translateKey('insights.duplicatedProducts.title'),
+        description: this.translateKey('insights.duplicatedProducts.description'),
+        ctaLabel: this.translateKey('insights.duplicatedProducts.cta'),
+        action: {
+          type: 'navigate',
+          target: 'dashboard_section',
+          payload: 'products',
+        },
+        priority: 4,
+      });
+    }
+
+    return insights.sort((a, b) => a.priority - b.priority).slice(0, 2);
   }
 
-  private buildExpiringSoonInsight(context: InsightEvaluationContext): Insight | null {
-    if (!this.isDashboardView(context) || !context.expiringSoon.length) {
-      return null;
-    }
-
-    const summary = this.describeProducts(context.expiringSoon);
-
-    return this.createInsight({
-      type: InsightType.EXPIRING_SOON,
-      title: 'Productos a punto de caducar',
-      description: `${summary} caduca pronto. Revísalos antes de que sea tarde.`,
-      ctaLabel: 'Ver productos',
-      ctaAction: InsightCTAAction.VIEW_EXPIRING_PRODUCTS,
-      priority: 1,
-      blocking: true,
-      context: { count: context.expiringSoon.length },
-    });
+  private translateKey(key: string): string {
+    return this.translate.instant(key);
   }
 
-  private buildCookNowInsight(context: InsightEvaluationContext): Insight | null {
-    // Requires at least two critical products and no recent recipe generation.
-    if (context.expiringSoon.length < 2) {
-      return null;
+  private hasDuplicateProductNames(products: DashboardInsightContext['products']): boolean {
+    const nameCounts = new Map<string, number>();
+    for (const product of products) {
+      const key = (product.name ?? '').trim().toLowerCase();
+      if (!key) {
+        continue;
+      }
+      nameCounts.set(key, (nameCounts.get(key) ?? 0) + 1);
     }
-    if (this.hasRecentRecipeGeneration(context.lastRecipeGeneratedAt)) {
-      return null;
+    for (const count of nameCounts.values()) {
+      if (count > 1) {
+        return true;
+      }
     }
-
-    const recipeCandidates = context.expiringSoon.filter(item => this.isRecipeCompatible(item));
-    if (recipeCandidates.length < 2) {
-      return null;
-    }
-
-    const summary = this.describeProducts(recipeCandidates);
-    return this.createInsight({
-      type: InsightType.COOK_NOW,
-      title: 'Aprovecha los ingredientes',
-      description: `${summary} están listos para usarse en una receta hoy.`,
-      ctaLabel: 'Ver recetas',
-      ctaAction: InsightCTAAction.VIEW_RECIPES,
-      priority: 2,
-      blocking: true,
-      context: { items: recipeCandidates.slice(0, 5).map(item => item._id) },
-    });
-  }
-
-  private buildOutOfStockInsight(context: InsightEvaluationContext): Insight | null {
-    // Only applies on Dashboard and while the user is outside the shopping view.
-    if (!this.isDashboardView(context) || !context.outOfStock.length || this.isShoppingView(context)) {
-      return null;
-    }
-
-    const summary = this.describeProducts(context.outOfStock);
-    return this.createInsight({
-      type: InsightType.OUT_OF_STOCK,
-      title: 'Productos agotados',
-      description: `${summary} se quedó sin stock. Actualiza la lista de compra para reponerlos.`,
-      ctaLabel: 'Revisar compra',
-      ctaAction: InsightCTAAction.REVIEW_SHOPPING,
-      priority: 3,
-      blocking: false,
-      context: { count: context.outOfStock.length },
-    });
-  }
-
-  private buildLowStockInsight(context: InsightEvaluationContext): Insight | null {
-    // Avoids competing with OUT_OF_STOCK and skips products already in the shopping list.
-    if (!context.lowStock.length || context.outOfStock.length) {
-      return null;
-    }
-
-    const pendingLowStock = context.lowStock.filter(item => !this.isItemInShoppingList(item, context.shoppingList));
-    if (!pendingLowStock.length) {
-      return null;
-    }
-
-    const summary = this.describeProducts(pendingLowStock);
-    return this.createInsight({
-      type: InsightType.LOW_STOCK,
-      title: 'Reponer antes de que falte',
-      description: `${summary} tiene stock limitado. Añádelos a tu lista de compra.`,
-      ctaLabel: 'Añadir a compra',
-      ctaAction: InsightCTAAction.ADD_TO_SHOPPING,
-      priority: 4,
-      blocking: false,
-      context: { count: pendingLowStock.length },
-    });
-  }
-
-  private buildShoppingReminderInsight(context: InsightEvaluationContext): Insight | null {
-    // Light reminder when there is a pending shopping list and the user is on Dashboard.
-    if (
-      !this.isDashboardView(context) ||
-      !context.shoppingList.length ||
-      this.isShoppingView(context)
-    ) {
-      return null;
-    }
-
-    const summary = this.describeProducts(context.shoppingList);
-    return this.createInsight({
-      type: InsightType.SHOPPING_REMINDER,
-      title: 'Compra pendiente',
-      description: `${summary} espera en la lista de compra. Revísala antes de salir.`,
-      ctaLabel: 'Ver lista',
-      ctaAction: InsightCTAAction.VIEW_SHOPPING_LIST,
-      priority: 5,
-      blocking: false,
-      context: { count: context.shoppingList.length },
-    });
-  }
-
-  private hasRecentRecipeGeneration(lastRecipeGeneratedAt?: string | number | Date): boolean {
-    if (!lastRecipeGeneratedAt) {
-      return false;
-    }
-    const last = new Date(lastRecipeGeneratedAt).getTime();
-    if (Number.isNaN(last)) {
-      return false;
-    }
-    return Date.now() - last < RECIPE_SESSION_TTL_MS;
-  }
-
-  private isDashboardView(context: InsightEvaluationContext): boolean {
-    return (context.currentView ?? '').toLowerCase() === 'dashboard'.toLowerCase();
-  }
-
-  private isShoppingView(context: InsightEvaluationContext): boolean {
-    return (context.currentView ?? '').toLowerCase() === 'compra'.toLowerCase();
-  }
-
-  private isItemInShoppingList(target: PantryItem, shoppingList: PantryItem[]): boolean {
-    if (!target?._id) {
-      return false;
-    }
-    return shoppingList.some(item => item?._id === target._id);
-  }
-
-  private describeProducts(items: PantryItem[]): string {
-    if (!items.length) {
-      return 'Los productos';
-    }
-    const [first, second] = items;
-    if (items.length === 1) {
-      return first?.name ?? 'Este producto';
-    }
-    if (items.length === 2) {
-      return `${first?.name ?? 'Un producto'} y ${second?.name ?? 'otro producto'}`;
-    }
-    const remaining = items.length - 1;
-    return `${first?.name ?? 'Un producto'} y ${remaining} ${remaining === 1 ? 'producto más' : 'productos más'}`;
-  }
-
-  private isRecipeCompatible(item: PantryItem): boolean {
-    const category = (item.categoryId ?? '').toLowerCase();
-    if (!category) {
-      return true;
-    }
-    return !NON_RECIPE_CATEGORY_HINTS.some(disallowed => category.includes(disallowed));
-  }
-
-  private createInsight(partial: Omit<Insight, 'id' | 'createdAt'>): Insight {
-    return {
-      ...partial,
-      id: crypto.randomUUID(),
-      createdAt: Date.now(),
-    };
+    return false;
   }
 }

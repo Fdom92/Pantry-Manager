@@ -19,7 +19,7 @@ export class InsightCardComponent {
       return;
     }
     this.action.emit({
-      action: this.insight.ctaAction,
+      action: this.insight.action,
       insight: this.insight,
     });
   }

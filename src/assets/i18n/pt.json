@@ -208,6 +208,28 @@
       "dialogText": "Partilha a tua lista em PDF."
     }
   },
+  "insights": {
+    "expiringLowStock": {
+      "title": "Produtos prestes a vencer e com pouco estoque",
+      "description": "Alguns produtos combinam vencimento próximo e estoque baixo.",
+      "cta": "Ver produtos"
+    },
+    "expiredWithStock": {
+      "title": "Produtos vencidos ainda disponíveis",
+      "description": "Existem produtos vencidos que ainda têm estoque.",
+      "cta": "Revisar vencidos"
+    },
+    "lowStockNoExpiry": {
+      "title": "Estoque baixo mesmo sem vencimentos urgentes",
+      "description": "Há vários itens com estoque baixo mesmo sem produtos prestes a vencer.",
+      "cta": "Ver estoque baixo"
+    },
+    "duplicatedProducts": {
+      "title": "Produtos duplicados na despensa",
+      "description": "Há produtos distribuídos em vários lotes ou locais.",
+      "cta": "Revisar produtos"
+    }
+  },
   "agent": {
     "title": "Agente",
     "thinking": "A pensar…",

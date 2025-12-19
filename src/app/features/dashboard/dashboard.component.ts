@@ -5,8 +5,7 @@ import {
   ES_DATE_FORMAT_OPTIONS,
   Insight,
   InsightActionEvent,
-  InsightCTAAction,
-  InsightEvaluationContext,
+  DashboardInsightContext,
   ItemLocationStock,
   PantryItem,
 } from '@core/models';
@@ -90,7 +89,7 @@ export class DashboardComponent {
   readonly totalItems = computed(() => this.inventorySummary().total);
   readonly recentlyUpdatedItems = computed(() => this.getRecentItemsByUpdatedAt(this.pantryItems()));
   readonly hasExpiredItems = computed(() => this.expiredItems().length > 0);
-  readonly dashboardInsight = computed<Insight | null>(() => this.evaluateDashboardInsight());
+  readonly dashboardInsights = computed<Insight[]>(() => this.evaluateDashboardInsights());
   // Getter
   get nearExpiryWindow(): number {
     return NEAR_EXPIRY_WINDOW_DAYS;
@@ -123,63 +122,40 @@ export class DashboardComponent {
   }
 
   handleInsightAction(event: InsightActionEvent): void {
-    const { action } = event;
-    if (typeof action === 'function') {
-      action();
+    const { action, insight } = event;
+    if (action?.type === 'navigate' && action.target === 'dashboard_section') {
+      console.debug('[DashboardComponent] Navigating to dashboard section', action.payload, insight);
       return;
     }
-
-    switch (action) {
-      case InsightCTAAction.VIEW_EXPIRING_PRODUCTS:
-        console.debug('[DashboardComponent] Ver productos a punto de caducar', event);
-        break;
-      case InsightCTAAction.VIEW_RECIPES:
-        console.debug('[DashboardComponent] Ver recetas sugeridas', event);
-        break;
-      case InsightCTAAction.REVIEW_SHOPPING:
-        console.debug('[DashboardComponent] Revisar compra', event);
-        break;
-      case InsightCTAAction.ADD_TO_SHOPPING:
-        console.debug('[DashboardComponent] Añadir a compra', event);
-        break;
-      case InsightCTAAction.VIEW_SHOPPING_LIST:
-        console.debug('[DashboardComponent] Ver lista de compra', event);
-        break;
-      default:
-        console.debug('[DashboardComponent] Insight CTA seleccionado', event);
-    }
+    console.debug('[DashboardComponent] Insight action received', event);
   }
 
-  private evaluateDashboardInsight(): Insight | null {
+  private evaluateDashboardInsights(): Insight[] {
     const items = this.pantryItems();
     if (!items?.length) {
-      return null;
+      return [];
     }
-    const context: InsightEvaluationContext = {
-      products: items,
-      expiringSoon: this.nearExpiryItems(),
-      outOfStock: items.filter(item => this.pantryStore.getItemTotalQuantity(item) <= 0),
-      lowStock: this.lowStockItems(),
-      shoppingList: items.filter(item => this.shouldAddToShoppingList(item)),
-      lastRecipeGeneratedAt: undefined,
-      currentView: 'Dashboard',
-    };
-    return this.insightService.evaluateInsights(context);
-  }
 
-  private shouldAddToShoppingList(item: PantryItem): boolean {
-    const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
-    const minThreshold = this.pantryStore.getItemTotalMinThreshold(item);
-    if (item.isBasic && totalQuantity <= 0) {
-      return true;
-    }
-    if (item.isBasic && minThreshold > 0 && totalQuantity < minThreshold) {
-      return true;
-    }
-    if (minThreshold > 0 && totalQuantity < minThreshold) {
-      return true;
-    }
-    return minThreshold <= 0 && totalQuantity <= 0;
+    const expiringSoon = this.nearExpiryItems();
+    const context: DashboardInsightContext = {
+      expiringSoonItems: expiringSoon.map(item => ({
+        id: item._id,
+        isLowStock: this.pantryStore.isItemLowStock(item),
+      })),
+      expiredItems: this.expiredItems().map(item => ({
+        id: item._id,
+        quantity: this.pantryStore.getItemTotalQuantity(item),
+      })),
+      expiringSoonCount: expiringSoon.length,
+      lowStockCount: this.lowStockItems().length,
+      products: items.map(item => ({
+        id: item._id,
+        name: item.name,
+        categoryId: item.categoryId,
+      })),
+    };
+
+    return this.insightService.getDashboardInsights(context);
   }
 
   /** Toggle the visibility of the snapshot card without altering other state. */

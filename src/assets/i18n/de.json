@@ -208,6 +208,28 @@
       "dialogText": "Teile deine Einkaufsliste als PDF."
     }
   },
+  "insights": {
+    "expiringLowStock": {
+      "title": "Produkte kurz vor Ablauf mit geringem Bestand",
+      "description": "Einige Produkte haben sowohl ein nahes Ablaufdatum als auch niedrigen Bestand.",
+      "cta": "Produkte anzeigen"
+    },
+    "expiredWithStock": {
+      "title": "Abgelaufene Produkte noch verfügbar",
+      "description": "Einige abgelaufene Produkte sind noch auf Lager.",
+      "cta": "Abgelaufene prüfen"
+    },
+    "lowStockNoExpiry": {
+      "title": "Niedriger Bestand ohne dringende Ablaufdaten",
+      "description": "Es gibt mehrere Artikel mit niedrigem Bestand, obwohl nichts bald abläuft.",
+      "cta": "Niedrigen Bestand ansehen"
+    },
+    "duplicatedProducts": {
+      "title": "Doppelte Produkte in der Speisekammer",
+      "description": "Einige Produkte sind auf mehrere Chargen oder Standorte verteilt.",
+      "cta": "Produkte prüfen"
+    }
+  },
   "agent": {
     "title": "Agent",
     "thinking": "Denkt nach…",

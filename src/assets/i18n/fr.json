@@ -208,6 +208,28 @@
       "dialogText": "Partagez votre liste en PDF."
     }
   },
+  "insights": {
+    "expiringLowStock": {
+      "title": "Produits proches de la date de péremption et à faible stock",
+      "description": "Certains produits cumulent date de péremption proche et faible stock.",
+      "cta": "Voir les produits"
+    },
+    "expiredWithStock": {
+      "title": "Produits périmés encore disponibles",
+      "description": "Certains produits périmés possèdent encore du stock.",
+      "cta": "Vérifier les périmés"
+    },
+    "lowStockNoExpiry": {
+      "title": "Stock faible malgré l’absence d’expirations urgentes",
+      "description": "Plusieurs articles sont en stock faible, même si rien n’expire bientôt.",
+      "cta": "Voir le stock faible"
+    },
+    "duplicatedProducts": {
+      "title": "Produits dupliqués dans le garde-manger",
+      "description": "Certains produits sont répartis sur plusieurs lots ou emplacements.",
+      "cta": "Revoir les produits"
+    }
+  },
   "agent": {
     "title": "Agent",
     "thinking": "Réflexion…",

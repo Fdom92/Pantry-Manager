@@ -1,52 +1,52 @@
-import { PantryItem } from '../inventory';
-
-export enum InsightType {
-  EXPIRING_SOON = 'expiring-soon',
-  OUT_OF_STOCK = 'out-of-stock',
-  LOW_STOCK = 'low-stock',
-  COOK_NOW = 'cook-now',
-  SHOPPING_REMINDER = 'shopping-reminder',
-  NO_INSIGHT = 'no-insight',
+export enum InsightId {
+  EXPIRING_LOW_STOCK = 'expiring_low_stock',
+  EXPIRED_WITH_STOCK = 'expired_with_stock',
+  LOW_STOCK_NO_EXPIRY = 'low_stock_no_expiry',
+  DUPLICATED_PRODUCTS = 'duplicated_products',
 }
 
-export type InsightCTACallback = () => void;
+export type DashboardSectionTarget = 'expired' | 'expiring' | 'lowStock' | 'products';
 
-export type InsightCTAHandler = InsightCTAAction | InsightCTACallback;
+export interface InsightAction {
+  type: 'navigate';
+  target: 'dashboard_section';
+  payload: DashboardSectionTarget;
+}
 
 export interface Insight {
-  id: string;
-  type: InsightType;
+  id: InsightId;
   title: string;
   description: string;
   ctaLabel: string;
-  ctaAction: InsightCTAHandler;
+  action: InsightAction;
   priority: number;
-  blocking: boolean;
-  createdAt: number;
-  context?: Record<string, any>;
-}
-
-export enum InsightCTAAction {
-  VIEW_EXPIRING_PRODUCTS = 'view-expiring-products',
-  VIEW_RECIPES = 'view-recipes',
-  REVIEW_SHOPPING = 'review-shopping',
-  ADD_TO_SHOPPING = 'add-to-shopping',
-  VIEW_SHOPPING_LIST = 'view-shopping-list',
 }
 
 export interface InsightActionEvent {
-  action: InsightCTAHandler;
+  action: InsightAction;
   insight: Insight;
 }
 
-export type InsightView = 'Dashboard' | 'Compra' | 'Despensa' | string;
+export interface DashboardExpiringItem {
+  id?: string;
+  isLowStock: boolean;
+}
 
-export interface InsightEvaluationContext {
-  products: PantryItem[];
-  expiringSoon: PantryItem[];
-  outOfStock: PantryItem[];
-  lowStock: PantryItem[];
-  shoppingList: PantryItem[];
-  lastRecipeGeneratedAt?: string | number | Date;
-  currentView: InsightView;
+export interface DashboardExpiredItem {
+  id?: string;
+  quantity: number;
+}
+
+export interface DashboardProductSummary {
+  id?: string;
+  name: string;
+  categoryId?: string | null;
+}
+
+export interface DashboardInsightContext {
+  expiringSoonItems: DashboardExpiringItem[];
+  expiredItems: DashboardExpiredItem[];
+  expiringSoonCount: number;
+  lowStockCount: number;
+  products: DashboardProductSummary[];
 }
