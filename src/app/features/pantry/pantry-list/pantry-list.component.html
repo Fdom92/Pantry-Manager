@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>{{ 'pantry.title' | translate }}</ion-title>
     <ion-buttons slot="end" class="header-actions">
-      <ion-button fill="clear" size="small" (click)="openFilters($event)">
+      <ion-button fill="clear" color="medium" size="small" (click)="openFilters($event)">
         <ion-icon slot="icon-only" name="filter-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  @if (loading() && itemsState().length === 0 && !hasLoadedOnce()) {
+  @if (loading() && pantryItemsState().length === 0 && !hasCompletedInitialLoad()) {
     <div class="skeleton-list">
       @for (placeholder of skeletonPlaceholders; track placeholder) {
         <ion-card class="skeleton-card">
@@ -64,7 +64,7 @@
       [showAction]="true"
       (action)="openNewItemModal()">
     </app-empty-state-generic>
-  } @else if (itemsState().length === 0) {
+  } @else if (pantryItemsState().length === 0) {
     <app-empty-state-generic
       class="list-empty-state"
       icon="filter-outline"
@@ -265,6 +265,7 @@
             <ion-button
               expand="block"
               type="submit"
+              color="primary"
               [disabled]="moveForm.invalid || moveSubmitting">
               @if (moveSubmitting) {
                 <ion-spinner slot="start" name="lines-small"></ion-spinner>
@@ -352,7 +353,7 @@
             @if (editingItem) { {{ 'pantry.form.editTitle' | translate }} } @else { {{ 'pantry.form.newTitle' | translate }} }
           </ion-title>
           <ion-buttons slot="end">
-            <ion-button fill="clear" (click)="closeFormModal()">
+            <ion-button fill="clear" color="medium" (click)="closeFormModal()">
               <ion-icon slot="icon-only" name="close"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -370,7 +371,7 @@
                 required>
               </ion-input>
             </ion-item>
-            @if (!showAdvanced()) {
+            @if (!showAdvancedFilters()) {
               <ion-item>
                 <ion-input
                   type="number"
@@ -394,13 +395,13 @@
             @if (!editingItem) {
               <div class="advanced-toggle">
                 <ion-button fill="clear" size="small" (click)="toggleAdvanced()">
-                  <ion-icon slot="start" [name]="showAdvanced() ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
-                  {{ showAdvanced() ? ('pantry.form.hideAdvanced' | translate) : ('pantry.form.showAdvanced' | translate) }}
+                  <ion-icon slot="start" [name]="showAdvancedFilters() ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+                  {{ showAdvancedFilters() ? ('pantry.form.hideAdvanced' | translate) : ('pantry.form.showAdvanced' | translate) }}
                 </ion-button>
               </div>
             }
 
-            @if (showAdvanced()) {
+            @if (showAdvancedFilters()) {
               <ion-item>
                 <ion-select
                   formControlName="categoryId"
@@ -449,7 +450,7 @@
             }
           </ion-list>
 
-            @if (showAdvanced()) {
+            @if (showAdvancedFilters()) {
               <div formArrayName="locations" class="location-form-list">
                 @for (locationCtrl of locationsArray.controls; track $index; let i = $index) {
                   <div class="location-form-card" [formGroupName]="i">
@@ -560,7 +561,8 @@
         <ion-toolbar class="create-footer">
           <ion-button
             expand="block"
-            [disabled]="isSaving || (showAdvanced() ? form.invalid : quickFormInvalid())"
+            color="primary"
+            [disabled]="isSaving || (showAdvancedFilters() ? form.invalid : quickFormInvalid())"
             (click)="submitItem()">
             @if (isSaving) {
               <ion-spinner name="dots"></ion-spinner>

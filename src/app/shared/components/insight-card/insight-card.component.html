@@ -1,0 +1,17 @@
+<ion-card [class]="'insight-card insight-card--' + insight.severity">
+  <ion-card-header>
+    <ion-card-title>{{ insight.title }}</ion-card-title>
+  </ion-card-header>
+
+  <ion-card-content>
+    <p class="insight-card__message">{{ insight.description }}</p>
+
+    <ion-button
+      size="small"
+      fill="clear"
+      color="primary"
+      (click)="emitDismiss()">
+      {{ ('insights.ctaDefault' | translate) }}
+    </ion-button>
+  </ion-card-content>
+</ion-card>

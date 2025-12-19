@@ -1,5 +1,5 @@
-:host {
-  display: block;
+ion-title {
+  color: var(--ion-text-color, var(--ion-text-color));
 }
 
 .catalogs-content {
@@ -22,6 +22,10 @@ ion-list-header {
     font-size: 0.85rem;
     color: var(--ion-color-medium);
   }
+}
+
+ion-list {
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
 }
 
 ion-item h3 {

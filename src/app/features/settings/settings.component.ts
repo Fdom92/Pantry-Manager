@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
-import { AppThemePreference, BaseDoc } from '@core/models';
+import { TOAST_DURATION } from '@core/constants';
+import { BaseDoc } from '@core/models/shared';
+import { AppThemePreference } from '@core/models/user';
 import { AppPreferencesService, StorageService } from '@core/services';
 import { RevenuecatService } from '@core/services/revenuecat.service';
+import { NavController, ToastController } from '@ionic/angular';
 import {
   IonButton,
   IonCard,
@@ -24,12 +27,9 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { NavController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ProBannerComponent } from '@features/shared/pro-banner/pro-banner.component';
+import { ProBannerComponent } from '@shared/components/pro-banner/pro-banner.component';
 import packageJson from '../../../../package.json';
-
-const TOAST_DURATION = 1800;
 
 @Component({
   selector: 'app-settings',
@@ -61,29 +61,29 @@ const TOAST_DURATION = 1800;
   styleUrls: ['./settings.component.scss'],
 })
 export class SettingsComponent {
+  // DI
+  private readonly toastCtrl = inject(ToastController);
+  private readonly appPreferencesService = inject(AppPreferencesService);
+  private readonly storage = inject<StorageService<BaseDoc>>(StorageService);
+  private readonly translate = inject(TranslateService);
+  private readonly revenuecat = inject(RevenuecatService);
+  private readonly navCtrl = inject(NavController);
+  // Data
   readonly appVersion = packageJson.version ?? '0.0.0';
-
-  readonly exportingData = signal(false);
-  readonly importingData = signal(false);
-  readonly resettingData = signal(false);
   readonly isPro$ = this.revenuecat.isPro$;
-  readonly updatingTheme = signal(false);
+  // Signals
+  readonly isExportingData = signal(false);
+  readonly isImportingData = signal(false);
+  readonly isResettingData = signal(false);
+  readonly isUpdatingTheme = signal(false);
+  // Computed Signals
   readonly themePreference = computed<AppThemePreference>(() => this.appPreferencesService.preferences().theme);
-
-  constructor(
-    private readonly toastCtrl: ToastController,
-    private readonly appPreferencesService: AppPreferencesService,
-    private readonly storage: StorageService<BaseDoc>,
-    private readonly translate: TranslateService,
-    private readonly revenuecat: RevenuecatService,
-    private readonly navCtrl: NavController,
-  ) {}
 
   async ionViewWillEnter(): Promise<void> {
     await this.ensurePreferencesLoaded();
   }
 
-  async onResetApp(): Promise<void> {
+  async resetApplicationData(): Promise<void> {
     const confirmed =
       typeof window === 'undefined'
         ? true
@@ -95,7 +95,7 @@ export class SettingsComponent {
       return;
     }
 
-    this.resettingData.set(true);
+    this.isResettingData.set(true);
     try {
       await this.storage.clearAll();
       await this.appPreferencesService.reload();
@@ -104,94 +104,24 @@ export class SettingsComponent {
       console.error('[SettingsComponent] onResetApp error', err);
       await this.presentToast(this.translate.instant('settings.reset.error'), 'danger');
     } finally {
-      this.resettingData.set(false);
+      this.isResettingData.set(false);
     }
   }
 
-  triggerImport(fileInput: HTMLInputElement | null): void {
-    if (!fileInput || this.importingData()) {
+  triggerImportPicker(fileInput: HTMLInputElement | null): void {
+    if (!fileInput || this.isImportingData()) {
       return;
     }
     this.tryNativeAutoImport(fileInput);
   }
 
-  private async tryNativeAutoImport(fileInput: HTMLInputElement): Promise<void> {
-    if (!Capacitor.isNativePlatform()) {
-      fileInput.value = '';
-      fileInput.click();
-      return;
-    }
-
-    try {
-      const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
-      const folder = 'PantryManager';
-      const listing = await Filesystem.readdir({ path: folder, directory: Directory.Documents });
-      const candidates = listing.files?.filter(file => file.name?.toLowerCase().endsWith('.json')) ?? [];
-      if (!candidates.length) {
-        fileInput.value = '';
-        fileInput.click();
-        return;
-      }
-
-      const filesWithStats = await Promise.all(
-        candidates.map(async file => {
-          try {
-            const path = `${folder}/${file.name}`;
-            const stat = await Filesystem.stat({ path, directory: Directory.Documents });
-            return { path, mtime: stat.mtime ?? 0 };
-          } catch {
-            return null;
-          }
-        })
-      );
-      const usable = filesWithStats.filter((f): f is { path: string; mtime: number } => !!f);
-      if (!usable.length) {
-        fileInput.value = '';
-        fileInput.click();
-        return;
-      }
-
-      const latest = usable.sort((a, b) => (b.mtime || 0) - (a.mtime || 0))[0];
-      const confirmed = await this.confirmImport();
-      if (!confirmed) {
-        return;
-      }
-
-      this.importingData.set(true);
-      try {
-        const file = await Filesystem.readFile({
-          path: latest.path,
-          directory: Directory.Documents,
-          encoding: Encoding.UTF8,
-        });
-        const payload =
-          typeof file.data === 'string'
-            ? file.data
-            : file.data instanceof Blob
-              ? await file.data.text()
-              : '';
-        const docs = this.parseBackup(payload ?? '');
-        await this.applyImport(docs);
-      } catch (err) {
-        console.error('[SettingsComponent] tryNativeAutoImport error', err);
-        await this.presentToast(this.translate.instant('settings.import.error'), 'danger');
-      } finally {
-        this.importingData.set(false);
-      }
-    } catch (err) {
-      console.warn('[SettingsComponent] Native auto-import unavailable, falling back to picker', err);
-      fileInput.value = '';
-      fileInput.click();
-    }
-  }
-
-  async onExportData(): Promise<void> {
+  async exportDataBackup(): Promise<void> {
     if (typeof document === 'undefined') {
       await this.presentToast(this.translate.instant('settings.export.unavailable'), 'warning');
       return;
     }
 
-    this.exportingData.set(true);
+    this.isExportingData.set(true);
     try {
       const docs = (await this.storage.all()).filter(doc => !doc._id.startsWith('_design/'));
       const json = JSON.stringify(docs, null, 2);
@@ -221,50 +151,11 @@ export class SettingsComponent {
       console.error('[SettingsComponent] onExportData error', err);
       await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
     } finally {
-      this.exportingData.set(false);
+      this.isExportingData.set(false);
     }
   }
 
-  private async tryNativeExport(
-    json: string,
-    filename: string
-  ): Promise<{ success: true; shared: boolean; path?: string } | null> {
-    if (!Capacitor.isNativePlatform()) {
-      return null;
-    }
-    try {
-      const [{ Filesystem, Directory, Encoding }, { Share }] = await Promise.all([
-        import('@capacitor/filesystem'),
-        import('@capacitor/share'),
-      ]);
-      const path = `PantryManager/${filename}`;
-      await Filesystem.writeFile({
-        path,
-        data: json,
-        directory: Directory.Documents,
-        encoding: Encoding.UTF8,
-        recursive: true,
-      });
-      const uri = await Filesystem.getUri({ path, directory: Directory.Documents });
-      let shared = false;
-      try {
-        await Share.share({
-          title: this.translate.instant('settings.export.shareTitle'),
-          text: this.translate.instant('settings.export.shareText'),
-          url: uri.uri,
-        });
-        shared = true;
-      } catch (shareErr) {
-        console.warn('[SettingsComponent] Native share failed, keeping file on device', shareErr);
-      }
-      return { success: true, shared, path: uri.uri };
-    } catch (err) {
-      console.warn('[SettingsComponent] Native export unavailable', err);
-      return null;
-    }
-  }
-
-  async onImportFileSelected(event: Event): Promise<void> {
+  async handleImportFileSelection(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement | null;
     const file = input?.files?.[0];
     if (input) {
@@ -279,7 +170,7 @@ export class SettingsComponent {
       return;
     }
 
-    this.importingData.set(true);
+    this.isImportingData.set(true);
     try {
       const fileContents = await file.text();
       const docs = this.parseBackup(fileContents);
@@ -294,21 +185,11 @@ export class SettingsComponent {
             : 'settings.import.error';
       await this.presentToast(this.translate.instant(messageKey), 'danger');
     } finally {
-      this.importingData.set(false);
+      this.isImportingData.set(false);
     }
   }
 
-  private async applyImport(docs: BaseDoc[]): Promise<void> {
-    await this.storage.clearAll();
-    await this.storage.bulkSave(docs);
-    await this.appPreferencesService.reload();
-    await this.presentToast(this.translate.instant('settings.import.success'), 'success');
-    if (typeof window !== 'undefined') {
-      setTimeout(() => window.location.reload(), 300);
-    }
-  }
-
-  async onThemeChanged(value: string | number | null | undefined): Promise<void> {
+  async updateThemePreference(value: string | number | null | undefined): Promise<void> {
     const normalized = typeof value === 'string' ? value : value != null ? String(value) : null;
     const nextTheme: AppThemePreference =
       normalized === 'light' || normalized === 'dark'
@@ -319,7 +200,7 @@ export class SettingsComponent {
       return;
     }
 
-    this.updatingTheme.set(true);
+    this.isUpdatingTheme.set(true);
     try {
       const current = this.appPreferencesService.preferences();
       await this.appPreferencesService.savePreferences({
@@ -330,8 +211,12 @@ export class SettingsComponent {
       console.error('[SettingsComponent] onThemeChanged error', err);
       await this.presentToast(this.translate.instant('settings.appearance.error'), 'danger');
     } finally {
-      this.updatingTheme.set(false);
+      this.isUpdatingTheme.set(false);
     }
+  }
+
+  navigateToUpgrade(): void {
+    void this.navCtrl.navigateForward('/upgrade');
   }
 
   private async ensurePreferencesLoaded(): Promise<void> {
@@ -448,15 +333,122 @@ export class SettingsComponent {
     await toast.present();
   }
 
-  goToUpgrade(): void {
-    void this.navCtrl.navigateForward('/upgrade');
+  private async tryNativeAutoImport(fileInput: HTMLInputElement): Promise<void> {
+    if (!Capacitor.isNativePlatform()) {
+      fileInput.value = '';
+      fileInput.click();
+      return;
+    }
+
+    try {
+      const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
+      const folder = 'PantryManager';
+      const listing = await Filesystem.readdir({ path: folder, directory: Directory.Documents });
+      const candidates = listing.files?.filter(file => file.name?.toLowerCase().endsWith('.json')) ?? [];
+      if (!candidates.length) {
+        fileInput.value = '';
+        fileInput.click();
+        return;
+      }
+
+      const filesWithStats = await Promise.all(
+        candidates.map(async file => {
+          try {
+            const path = `${folder}/${file.name}`;
+            const stat = await Filesystem.stat({ path, directory: Directory.Documents });
+            return { path, mtime: stat.mtime ?? 0 };
+          } catch {
+            return null;
+          }
+        })
+      );
+      const usable = filesWithStats.filter((f): f is { path: string; mtime: number } => !!f);
+      if (!usable.length) {
+        fileInput.value = '';
+        fileInput.click();
+        return;
+      }
+
+      const latest = usable.sort((a, b) => (b.mtime || 0) - (a.mtime || 0))[0];
+      const confirmed = await this.confirmImport();
+      if (!confirmed) {
+        return;
+      }
+
+      this.isImportingData.set(true);
+      try {
+        const file = await Filesystem.readFile({
+          path: latest.path,
+          directory: Directory.Documents,
+          encoding: Encoding.UTF8,
+        });
+        const payload =
+          typeof file.data === 'string'
+            ? file.data
+            : file.data instanceof Blob
+              ? await file.data.text()
+              : '';
+        const docs = this.parseBackup(payload ?? '');
+        await this.applyImport(docs);
+      } catch (err) {
+        console.error('[SettingsComponent] tryNativeAutoImport error', err);
+        await this.presentToast(this.translate.instant('settings.import.error'), 'danger');
+      } finally {
+        this.isImportingData.set(false);
+      }
+    } catch (err) {
+      console.warn('[SettingsComponent] Native auto-import unavailable, falling back to picker', err);
+      fileInput.value = '';
+      fileInput.click();
+    }
   }
 
-  private ensureProAccess(): boolean {
-    if (this.revenuecat.isPro()) {
-      return true;
+  private async tryNativeExport(
+    json: string,
+    filename: string
+  ): Promise<{ success: true; shared: boolean; path?: string } | null> {
+    if (!Capacitor.isNativePlatform()) {
+      return null;
     }
-    void this.navCtrl.navigateForward('/upgrade');
-    return false;
+    try {
+      const [{ Filesystem, Directory, Encoding }, { Share }] = await Promise.all([
+        import('@capacitor/filesystem'),
+        import('@capacitor/share'),
+      ]);
+      const path = `PantryManager/${filename}`;
+      await Filesystem.writeFile({
+        path,
+        data: json,
+        directory: Directory.Documents,
+        encoding: Encoding.UTF8,
+        recursive: true,
+      });
+      const uri = await Filesystem.getUri({ path, directory: Directory.Documents });
+      let shared = false;
+      try {
+        await Share.share({
+          title: this.translate.instant('settings.export.shareTitle'),
+          text: this.translate.instant('settings.export.shareText'),
+          url: uri.uri,
+        });
+        shared = true;
+      } catch (shareErr) {
+        console.warn('[SettingsComponent] Native share failed, keeping file on device', shareErr);
+      }
+      return { success: true, shared, path: uri.uri };
+    } catch (err) {
+      console.warn('[SettingsComponent] Native export unavailable', err);
+      return null;
+    }
+  }
+
+  private async applyImport(docs: BaseDoc[]): Promise<void> {
+    await this.storage.clearAll();
+    await this.storage.bulkSave(docs);
+    await this.appPreferencesService.reload();
+    await this.presentToast(this.translate.instant('settings.import.success'), 'success');
+    if (typeof window !== 'undefined') {
+      setTimeout(() => window.location.reload(), 300);
+    }
   }
 }
