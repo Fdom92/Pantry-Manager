@@ -12,7 +12,7 @@
     </ion-title>
     @if (canUseAgent) {
       <ion-buttons slot="end">
-        <ion-button fill="clear" color="medium" (click)="clearChat()" [disabled]="thinking()" aria-label="{{ 'common.actions.clear' | translate }}">
+        <ion-button fill="clear" color="medium" (click)="resetConversation()" [disabled]="isAgentProcessing()" aria-label="{{ 'common.actions.clear' | translate }}">
           <ion-icon name="trash-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
@@ -23,7 +23,7 @@
 <ion-content class="ion-padding">
   @if (canUseAgent) {
     <div class="chat">
-      @for (message of messages(); track trackById($index, message)) {
+      @for (message of conversationMessages(); track trackById($index, message)) {
         <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-error]="message.status === 'error'">
           <div class="message__bubble">
             <div class="message__content">
@@ -46,9 +46,9 @@
                 }
               </div>
             }
-            @if (message.status === 'error' && canRetry()) {
+            @if (message.status === 'error' && canRetryLastMessage()) {
               <div class="message__actions">
-                <ion-button fill="clear" color="primary" size="small" (click)="retry()" [disabled]="thinking()">
+                <ion-button fill="clear" color="primary" size="small" (click)="retryLastAttempt()" [disabled]="isAgentProcessing()">
                   {{ 'agent.actions.retry' | translate }}
                 </ion-button>
               </div>
@@ -57,11 +57,11 @@
         </div>
       }
 
-      @if (agentPhase() !== 'idle') {
+      @if (agentExecutionPhase() !== 'idle') {
         <div class="message from-agent">
           <div class="message__bubble thinking">
             <ion-spinner name="dots"></ion-spinner>
-            <span>{{ ('agent.states.' + agentPhase()) | translate }}</span>
+            <span>{{ ('agent.states.' + agentExecutionPhase()) | translate }}</span>
           </div>
         </div>
       }
@@ -91,7 +91,7 @@
           }
         </div>
         <div class="preview-card__cta">
-          <ion-button expand="block" color="primary" size="large" (click)="goToUpgrade()">
+          <ion-button expand="block" color="primary" size="large" (click)="navigateToUpgrade()">
             {{ 'agent.preview.cta' | translate }}
           </ion-button>
         </div>
@@ -106,11 +106,11 @@
       class="composer__input"
       [placeholder]="canUseAgent ? ('agent.placeholder' | translate) : ('agent.preview.lockedPlaceholder' | translate)"
       autoGrow="true"
-      [formControl]="messageControl"
+      [formControl]="composerControl"
       enterkeyhint="send">
     </ion-textarea>
     <div class="composer__actions">
-      <ion-button color="primary" (click)="canUseAgent ? send() : null" [disabled]="!canUseAgent || !messageControl.value.trim() || thinking()">
+      <ion-button color="primary" (click)="canUseAgent ? sendMessage() : null" [disabled]="!canUseAgent || !composerControl.value.trim() || isAgentProcessing()">
         {{ 'agent.actions.send' | translate }}
       </ion-button>
     </div>

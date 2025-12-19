@@ -1,5 +1,5 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { PantryItem } from '@core/models/inventory';
+import { PantryItem, PantrySummary } from '@core/models/inventory';
 import { MeasurementUnit, StockStatus } from '@core/models/shared';
 import { PantryService } from '@core/services/pantry.service';
 import { normalizeLocationId } from '@core/utils/normalization.util';
@@ -15,9 +15,9 @@ export class PantryStoreService {
   // Signals
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
-  private readonly itemsSignal = signal<PantryItem[]>([]);
+  private readonly pantryItemsSignal = signal<PantryItem[]>([]);
   // Computed Signals
-  readonly items = computed(() => this.itemsSignal());
+  readonly items = computed(() => this.pantryItemsSignal());
   readonly expiredItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemExpired(item))
   );
@@ -27,7 +27,7 @@ export class PantryStoreService {
   readonly lowStockItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemLowStock(item))
   );
-  readonly summary = computed(() => ({
+  readonly summary = computed<PantrySummary>(() => ({
     total: this.items().length,
     expired: this.expiredItems().length,
     nearExpiry: this.nearExpiryItems().length,
@@ -37,7 +37,7 @@ export class PantryStoreService {
   constructor() {
     // Mirror the shared pantry service cache so dashboard consumers avoid duplicating DB reads.
     effect(() => {
-      this.itemsSignal.set(this.pantryService.loadedProducts());
+      this.pantryItemsSignal.set(this.pantryService.loadedProducts());
     });
   }
 
@@ -63,7 +63,7 @@ export class PantryStoreService {
       if (mergeTarget) {
         const merged = this.mergeItemWithExisting(mergeTarget, item);
         const savedMerge = await this.pantryService.saveItem(merged);
-        this.itemsSignal.update(items => {
+        this.pantryItemsSignal.update(items => {
           const index = items.findIndex(existing => existing._id === savedMerge._id);
           if (index >= 0) {
             return items.map(existing => (existing._id === savedMerge._id ? savedMerge : existing));
@@ -74,7 +74,7 @@ export class PantryStoreService {
       }
 
       const saved = await this.pantryService.saveItem(item);
-      this.itemsSignal.update(items => [...items, saved]);
+      this.pantryItemsSignal.update(items => [...items, saved]);
     } catch (err: any) {
       console.error('[PantryStoreService] addItem error', err);
       this.error.set('Failed to add item');
@@ -85,7 +85,7 @@ export class PantryStoreService {
   async updateItem(item: PantryItem): Promise<void> {
     try {
       const updated = await this.pantryService.saveItem(item);
-      this.itemsSignal.update(items =>
+      this.pantryItemsSignal.update(items =>
         items.map(i => (i._id === updated._id ? updated : i))
       );
     } catch (err: any) {
@@ -99,7 +99,7 @@ export class PantryStoreService {
     try {
       const ok = await this.pantryService.deleteItem(id);
       if (ok) {
-        this.itemsSignal.update(items => items.filter(i => i._id !== id));
+        this.pantryItemsSignal.update(items => items.filter(i => i._id !== id));
       }
     } catch (err: any) {
       console.error('[PantryStoreService] deleteItem error', err);
@@ -132,7 +132,7 @@ export class PantryStoreService {
       const nextQty = Math.max(0, currentQuantity + delta);
       const updated = await this.pantryService.updateLocationQuantity(id, nextQty, location.locationId);
       if (updated) {
-        this.itemsSignal.update(items =>
+        this.pantryItemsSignal.update(items =>
           items.map(i => (i._id === updated._id ? updated : i))
         );
       }
@@ -151,11 +151,11 @@ export class PantryStoreService {
   watchRealtime(): void {
     this.pantryService.watchPantryChanges((item, meta) => {
       if (meta?.deleted) {
-        this.itemsSignal.update(items => items.filter(existing => existing._id !== meta.id));
+        this.pantryItemsSignal.update(items => items.filter(existing => existing._id !== meta.id));
         return;
       }
       if (item) {
-        this.itemsSignal.update(items => {
+        this.pantryItemsSignal.update(items => {
           const index = items.findIndex(existing => existing._id === item._id);
           if (index < 0) {
             return [...items, item];

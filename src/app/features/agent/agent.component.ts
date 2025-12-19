@@ -52,10 +52,10 @@ export class AgentComponent implements OnDestroy {
   private readonly navCtrl = inject(NavController);
   private readonly destroyRef = inject(DestroyRef);
   // Data
-  readonly messages = this.agentService.messages;
-  readonly thinking = this.agentService.thinking;
-  readonly agentPhase = this.agentService.agentPhase;
-  readonly canRetry = this.agentService.canRetry;
+  readonly conversationMessages = this.agentService.messages;
+  readonly isAgentProcessing = this.agentService.thinking;
+  readonly agentExecutionPhase = this.agentService.agentPhase;
+  readonly canRetryLastMessage = this.agentService.canRetry;
   readonly canUseAgent$ = this.revenuecat.canUseAgent$;
   readonly previewMessages: AgentMessage[] = [
     {
@@ -73,7 +73,7 @@ export class AgentComponent implements OnDestroy {
     },
   ];
   // Form
-  readonly messageControl = new FormControl('', {
+  readonly composerControl = new FormControl('', {
     nonNullable: true,
     validators: [Validators.maxLength(500)],
   });
@@ -82,21 +82,14 @@ export class AgentComponent implements OnDestroy {
     // Keep the composer enabled only for allowed users (PRO or override) to avoid template disabled binding warnings.
     this.canUseAgent$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(isUnlocked => {
-        if (isUnlocked) {
-          this.messageControl.enable({ emitEvent: false });
-        } else {
-          this.messageControl.disable({ emitEvent: false });
-          this.messageControl.setValue('', { emitEvent: false });
-        }
-      });
+      .subscribe(isUnlocked => this.updateComposerAccess(isUnlocked));
 
     effect(() => {
       // react to message updates and thinking indicator
-      this.messages();
-      this.thinking();
+      this.conversationMessages();
+      this.isAgentProcessing();
       // keep the chat pinned to the bottom when new messages arrive
-      void this.scrollToBottom();
+      void this.scrollToChatBottom();
     });
   }
 
@@ -108,26 +101,26 @@ export class AgentComponent implements OnDestroy {
     return message.id;
   }
 
-  clearChat(): void {
+  resetConversation(): void {
     this.agentService.resetConversation();
-    this.messageControl.setValue('');
+    this.composerControl.setValue('');
   }
 
-  async send(): Promise<void> {
+  async sendMessage(): Promise<void> {
     if (!this.revenuecat.canUseAgent()) {
-      await this.goToUpgrade();
+      await this.navigateToUpgrade();
       return;
     }
-    const text = this.messageControl.value.trim();
-    if (!text) {
+    const message = this.getTrimmedComposerValue();
+    if (!message) {
       return;
     }
-    this.messageControl.setValue('');
-    await this.agentService.sendMessage(text);
-    await this.scrollToBottom();
+    this.composerControl.setValue('');
+    await this.agentService.sendMessage(message);
+    await this.scrollToChatBottom();
   }
 
-  async scrollToBottom(): Promise<void> {
+  async scrollToChatBottom(): Promise<void> {
     if (!this.content) {
       return;
     }
@@ -138,15 +131,29 @@ export class AgentComponent implements OnDestroy {
     }
   }
 
-  async goToUpgrade(): Promise<void> {
+  async navigateToUpgrade(): Promise<void> {
     await this.navCtrl.navigateForward('/upgrade');
   }
 
-  async retry(): Promise<void> {
-    if (!this.canRetry()) {
+  async retryLastAttempt(): Promise<void> {
+    if (!this.canRetryLastMessage()) {
       return;
     }
     await this.agentService.retryLastUserMessage();
-    await this.scrollToBottom();
+    await this.scrollToChatBottom();
+  }
+
+  private updateComposerAccess(isUnlocked: boolean): void {
+    if (isUnlocked) {
+      this.composerControl.enable({ emitEvent: false });
+      return;
+    }
+    this.composerControl.disable({ emitEvent: false });
+    this.composerControl.setValue('', { emitEvent: false });
+  }
+
+  private getTrimmedComposerValue(): string | null {
+    const value = this.composerControl.value.trim();
+    return value || null;
   }
 }

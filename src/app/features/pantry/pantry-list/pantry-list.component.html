@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  @if (loading() && itemsState().length === 0 && !hasLoadedOnce()) {
+  @if (loading() && pantryItemsState().length === 0 && !hasCompletedInitialLoad()) {
     <div class="skeleton-list">
       @for (placeholder of skeletonPlaceholders; track placeholder) {
         <ion-card class="skeleton-card">
@@ -64,7 +64,7 @@
       [showAction]="true"
       (action)="openNewItemModal()">
     </app-empty-state-generic>
-  } @else if (itemsState().length === 0) {
+  } @else if (pantryItemsState().length === 0) {
     <app-empty-state-generic
       class="list-empty-state"
       icon="filter-outline"
@@ -371,7 +371,7 @@
                 required>
               </ion-input>
             </ion-item>
-            @if (!showAdvanced()) {
+            @if (!showAdvancedFilters()) {
               <ion-item>
                 <ion-input
                   type="number"
@@ -395,13 +395,13 @@
             @if (!editingItem) {
               <div class="advanced-toggle">
                 <ion-button fill="clear" size="small" (click)="toggleAdvanced()">
-                  <ion-icon slot="start" [name]="showAdvanced() ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
-                  {{ showAdvanced() ? ('pantry.form.hideAdvanced' | translate) : ('pantry.form.showAdvanced' | translate) }}
+                  <ion-icon slot="start" [name]="showAdvancedFilters() ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+                  {{ showAdvancedFilters() ? ('pantry.form.hideAdvanced' | translate) : ('pantry.form.showAdvanced' | translate) }}
                 </ion-button>
               </div>
             }
 
-            @if (showAdvanced()) {
+            @if (showAdvancedFilters()) {
               <ion-item>
                 <ion-select
                   formControlName="categoryId"
@@ -450,7 +450,7 @@
             }
           </ion-list>
 
-            @if (showAdvanced()) {
+            @if (showAdvancedFilters()) {
               <div formArrayName="locations" class="location-form-list">
                 @for (locationCtrl of locationsArray.controls; track $index; let i = $index) {
                   <div class="location-form-card" [formGroupName]="i">
@@ -562,7 +562,7 @@
           <ion-button
             expand="block"
             color="primary"
-            [disabled]="isSaving || (showAdvanced() ? form.invalid : quickFormInvalid())"
+            [disabled]="isSaving || (showAdvancedFilters() ? form.invalid : quickFormInvalid())"
             (click)="submitItem()">
             @if (isSaving) {
               <ion-spinner name="dots"></ion-spinner>

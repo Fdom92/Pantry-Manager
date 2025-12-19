@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { EmptyStateColor } from '@core/models/shared/empty.state.models';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -19,10 +20,13 @@ export class EmptyStateGenericComponent {
   @Input() showAction = false;
   @Input() actionLabel?: string;
   @Input() compact = false;
-  @Input() iconColor?: 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'medium';
+  @Input() iconColor?: EmptyStateColor;
   @Output() action = new EventEmitter<void>();
 
-  handleAction(): void {
+  triggerAction(): void {
+    if (!this.showAction) {
+      return;
+    }
     this.action.emit();
   }
 }
