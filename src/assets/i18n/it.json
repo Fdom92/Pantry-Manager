@@ -208,6 +208,29 @@
       "dialogText": "Condividi la tua lista in PDF."
     }
   },
+  "insights": {
+    "expiringLowStock": {
+      "title": "Prodotti in scadenza con poco stock",
+      "description": "Alcuni prodotti stanno per scadere e hanno scorte limitate.",
+      "cta": "Vedi prodotti"
+    },
+    "expiredWithStock": {
+      "title": "Prodotti scaduti ma ancora disponibili",
+      "description": "Ci sono prodotti scaduti che hanno ancora scorte.",
+      "cta": "Controlla gli scaduti"
+    },
+    "lowStockNoExpiry": {
+      "title": "Stock basso senza scadenze urgenti",
+      "description": "Ci sono vari articoli con scorte basse anche senza scadenze vicine.",
+      "cta": "Vedi scorte basse"
+    },
+    "duplicatedProducts": {
+      "title": "Prodotti duplicati in dispensa",
+      "description": "Ci sono articoli con lo stesso nome registrati più volte. Controlla e uniscili.",
+      "cta": "Rivedi prodotti"
+    },
+    "ctaDefault": "Capito"
+  },
   "agent": {
     "title": "Agente",
     "thinking": "Sto pensando…",
@@ -485,7 +508,7 @@
     },
     "confirmDelete": "Eliminare \"{{ name }}\"?"
   },
-    "upgrade": {
+  "upgrade": {
     "title": "Passa a PRO",
     "headline": "Sblocca tutte le superpotenzialità della dispensa",
     "subtitle": "Automazioni intelligenti e funzionalità prioritarie.",

@@ -2,6 +2,13 @@ ion-card {
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
 }
 
+.insights-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
 ion-card-title {
   display: flex;
   align-items: center;

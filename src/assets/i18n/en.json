@@ -208,6 +208,29 @@
       "dialogText": "Share your grocery list as a PDF."
     }
   },
+  "insights": {
+    "expiringLowStock": {
+      "title": "Products close to expiring with low stock",
+      "description": "Some products combine an upcoming expiry and low stock.",
+      "cta": "View products"
+    },
+    "expiredWithStock": {
+      "title": "Expired products still available",
+      "description": "Some expired products still have stock that needs review.",
+      "cta": "Review expired items"
+    },
+    "lowStockNoExpiry": {
+      "title": "Low stock even without urgent expiries",
+      "description": "There are several low-stock items even though nothing is expiring soon.",
+      "cta": "View low stock"
+    },
+    "duplicatedProducts": {
+      "title": "Duplicated products in the pantry",
+      "description": "Some items share the same name in different entries. Review and consolidate them.",
+      "cta": "Review products"
+    },
+    "ctaDefault": "Got it"
+  },
   "agent": {
     "title": "Agent",
     "thinking": "Thinking…",

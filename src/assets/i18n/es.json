@@ -208,6 +208,29 @@
       "dialogText": "Comparte tu lista en PDF."
     }
   },
+  "insights": {
+    "expiringLowStock": {
+      "title": "Productos a punto de caducar y con poco stock",
+      "description": "Algunos productos combinan caducidad cercana y bajo stock.",
+      "cta": "Ver productos"
+    },
+    "expiredWithStock": {
+      "title": "Productos caducados aún disponibles",
+      "description": "Hay productos caducados que siguen teniendo stock.",
+      "cta": "Revisar caducados"
+    },
+    "lowStockNoExpiry": {
+      "title": "Stock bajo sin caducidades urgentes",
+      "description": "Aunque no hay caducidades cercanas, varios productos están bajos.",
+      "cta": "Ver bajo stock"
+    },
+    "duplicatedProducts": {
+      "title": "Productos duplicados en la despensa",
+      "description": "Hay artículos con el mismo nombre registrados varias veces. Revisa y consolida.",
+      "cta": "Revisar productos"
+    },
+    "ctaDefault": "Entendido"
+  },
   "agent": {
     "title": "Agente",
     "thinking": "Pensando…",

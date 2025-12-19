@@ -1,9 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { ItemLocationStock, PantryItem } from '@core/models/inventory';
-import { ES_DATE_FORMAT_OPTIONS } from '@core/models/shared';
-import { LanguageService, PantryStoreService } from '@core/services';
+import {
+  ES_DATE_FORMAT_OPTIONS,
+  Insight,
+  DashboardInsightContext,
+  ItemLocationStock,
+  PantryItem,
+} from '@core/models';
+import { InsightService, LanguageService, PantryStoreService } from '@core/services';
 import {
   formatDateTimeValue,
   formatDateValue,
@@ -31,6 +36,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
+import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -56,6 +62,7 @@ import { EmptyStateGenericComponent } from '@shared/components/empty-states/empt
     CommonModule,
     TranslateModule,
     EmptyStateGenericComponent,
+    InsightCardComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
@@ -65,6 +72,7 @@ export class DashboardComponent {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
+  private readonly insightService = inject(InsightService);
   // Data
   private hasCompletedInitialLoad = false;
   readonly pantryItems = this.pantryStore.items;
@@ -76,6 +84,7 @@ export class DashboardComponent {
   readonly isSnapshotCardExpanded = signal(true);
   readonly lastRefreshTimestamp = signal<string | null>(null);
   readonly isDeletingExpiredItems = signal(false);
+  readonly visibleInsights = signal<Insight[]>([]);
   // Computed Signals
   readonly totalItems = computed(() => this.inventorySummary().total);
   readonly recentlyUpdatedItems = computed(() => this.getRecentItemsByUpdatedAt(this.pantryItems()));
@@ -102,6 +111,17 @@ export class DashboardComponent {
         this.lastRefreshTimestamp.set(new Date().toISOString());
       }
     );
+
+    effect(() => {
+      const items = this.pantryItems();
+      const expiringSoon = this.nearExpiryItems();
+      const expired = this.expiredItems();
+      const lowStock = this.lowStockItems();
+      if (!this.hasCompletedInitialLoad) {
+        return;
+      }
+      this.refreshDashboardInsights(items, expiringSoon, expired, lowStock);
+    });
   }
 
   /** Lifecycle hook: populate dashboard data and stamp the refresh time. */
@@ -109,6 +129,44 @@ export class DashboardComponent {
     await this.pantryStore.loadAll();
     this.hasCompletedInitialLoad = true;
     this.lastRefreshTimestamp.set(new Date().toISOString());
+  }
+
+  dismissInsight(insight: Insight): void {
+    this.insightService.dismiss(insight.id);
+    this.visibleInsights.update(current => current.filter(item => item.id !== insight.id));
+  }
+
+  private refreshDashboardInsights(
+    items: PantryItem[],
+    expiringSoon: PantryItem[],
+    expiredItems: PantryItem[],
+    lowStockItems: PantryItem[],
+  ): void {
+    if (!items?.length) {
+      this.visibleInsights.set([]);
+      return;
+    }
+
+    const context: DashboardInsightContext = {
+      expiringSoonItems: expiringSoon.map(item => ({
+        id: item._id,
+        isLowStock: this.pantryStore.isItemLowStock(item),
+      })),
+      expiredItems: expiredItems.map(item => ({
+        id: item._id,
+        quantity: this.pantryStore.getItemTotalQuantity(item),
+      })),
+      expiringSoonCount: expiringSoon.length,
+      lowStockCount: lowStockItems.length,
+      products: items.map(item => ({
+        id: item._id,
+        name: item.name,
+        categoryId: item.categoryId,
+      })),
+    };
+
+    const generated = this.insightService.buildDashboardInsights(context);
+    this.visibleInsights.set(this.insightService.getVisibleInsights(generated));
   }
 
   /** Toggle the visibility of the snapshot card without altering other state. */

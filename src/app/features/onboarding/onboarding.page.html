@@ -35,10 +35,9 @@
   </swiper-container>
 
   <div class="actions">
-      <ion-button
-        fill="clear"
-        color="light"
-        (click)="skipOnboarding()">
+    <ion-button
+      fill="clear"
+      (click)="skipOnboarding()">
       {{ 'onboarding.actions.skip' | translate }}
     </ion-button>
     @if (!isLastSlide()) {
