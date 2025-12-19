@@ -7,26 +7,29 @@
 <ion-content class="ion-padding">
   <ion-card>
     <ion-card-header>
-      <div class="card-header-actions">
-        <ion-card-title>{{ 'dashboard.summary.title' | translate }}</ion-card-title>
-        <ion-button
-          fill="clear"
-          size="small"
-          (click)="toggleSnapshotCard()"
-          [attr.aria-expanded]="isSnapshotCardExpanded()"
-          [attr.aria-label]="'dashboard.summary.toggle' | translate"
-        >
-          <ion-icon
-            slot="icon-only"
-            [name]="isSnapshotCardExpanded() ? 'chevron-up-outline' : 'chevron-down-outline'"
-          ></ion-icon>
-        </ion-button>
+      <div class="card-header-content">
+        <div class="card-header-actions">
+          <ion-card-title>{{ 'dashboard.summary.title' | translate }}</ion-card-title>
+          <ion-button
+            class="card-header-toggle"
+            fill="clear"
+            size="small"
+            (click)="toggleSnapshotCard()"
+            [attr.aria-expanded]="isSnapshotCardExpanded()"
+            [attr.aria-label]="'dashboard.summary.toggle' | translate"
+          >
+            <ion-icon
+              slot="icon-only"
+              [name]="isSnapshotCardExpanded() ? 'chevron-up-outline' : 'chevron-down-outline'"
+            ></ion-icon>
+          </ion-button>
+        </div>
+        @if (lastRefreshTimestamp()) {
+          <ion-card-subtitle>
+            {{ 'dashboard.summary.updated' | translate:{ value: formatLastUpdated(lastRefreshTimestamp()) } }}
+          </ion-card-subtitle>
+        }
       </div>
-      @if (lastRefreshTimestamp()) {
-        <ion-card-subtitle>
-          {{ 'dashboard.summary.updated' | translate:{ value: formatLastUpdated(lastRefreshTimestamp()) } }}
-        </ion-card-subtitle>
-      }
     </ion-card-header>
     @if (isSnapshotCardExpanded()) {
       <ion-card-content>
