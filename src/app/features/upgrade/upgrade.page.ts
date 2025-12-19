@@ -48,20 +48,16 @@ export class UpgradePage {
   private readonly translate = inject(TranslateService);
   private readonly cdr = inject(ChangeDetectorRef);
   // Data
-  plans: PlanViewModel[] = [];
-  loadingPackages = false;
-  purchasingId: string | null = null;
-  private monthlyPrice: number | null = null;
-  private annualPrice: number | null = null;
+  planOptions: PlanViewModel[] = [];
+  isLoadingPlans = false;
+  activePurchaseId: string | null = null;
+  private monthlyPriceValue: number | null = null;
+  private annualPriceValue: number | null = null;
   readonly isPro$ = this.revenuecat.isPro$;
   readonly benefitKeys = ['upgrade.benefits.agent', 'upgrade.benefits.future'];
-  private readonly planPackages: PurchasesPackage[] = [];
+  private readonly availablePackages: PurchasesPackage[] = [];
 
-  goBack(): void {
-    this.navCtrl.back();
-  }
-
-  async maybeLater(): Promise<void> {
+  async skipUpgradeFlow(): Promise<void> {
     await this.navCtrl.navigateRoot('/dashboard');
   }
 
@@ -70,23 +66,23 @@ export class UpgradePage {
       await this.navCtrl.navigateRoot('/dashboard');
       return;
     }
-    await this.loadPackages();
+    await this.loadAvailablePackages();
   }
 
-  async onRestore(): Promise<void> {
+  async restorePurchases(): Promise<void> {
     const restored = await this.revenuecat.restore();
     if (restored || this.revenuecat.isPro()) {
       await this.navCtrl.navigateRoot('/dashboard');
       return;
     }
-    await this.presentToast('upgrade.errors.purchaseFailed');
+    await this.presentUpgradeToast('upgrade.errors.purchaseFailed');
   }
 
-  async purchase(pkg: PurchasesPackage | null): Promise<void> {
-    if (!pkg || this.purchasingId) {
+  async purchasePlan(pkg: PurchasesPackage | null): Promise<void> {
+    if (!pkg || this.activePurchaseId) {
       return;
     }
-    this.purchasingId = pkg.identifier;
+    this.activePurchaseId = pkg.identifier;
     this.cdr.markForCheck();
     try {
       const success = await this.revenuecat.purchasePackage(pkg);
@@ -100,54 +96,54 @@ export class UpgradePage {
         await this.navCtrl.navigateRoot('/dashboard');
         return;
       }
-      await this.presentToast('upgrade.errors.purchaseFailed');
+      await this.presentUpgradeToast('upgrade.errors.purchaseFailed');
     } finally {
-      this.purchasingId = null;
+      this.activePurchaseId = null;
       this.cdr.markForCheck();
     }
   }
 
-  onSelectPlan(plan: PlanViewModel): void {
-    const pkg = this.findPackage(plan.id);
-    void this.purchase(pkg);
+  handleSelectPlan(plan: PlanViewModel): void {
+    const pkg = this.findPackageById(plan.id);
+    void this.purchasePlan(pkg);
   }
 
-  private async loadPackages(): Promise<void> {
-    this.loadingPackages = true;
+  private async loadAvailablePackages(): Promise<void> {
+    this.isLoadingPlans = true;
     const packages = await this.revenuecat.getAvailablePackages();
-    this.buildPlans(packages);
-    this.loadingPackages = false;
+    this.buildPlanOptions(packages);
+    this.isLoadingPlans = false;
     this.cdr.markForCheck();
   }
 
-  private findPackage(identifier: string): PurchasesPackage | null {
-    const match = this.planPackages.find(p => p.identifier === identifier);
+  private findPackageById(identifier: string): PurchasesPackage | null {
+    const match = this.availablePackages.find(p => p.identifier === identifier);
     return match ?? null;
   }
 
-  private buildPlans(packages: PurchasesPackage[]): void {
-    this.planPackages.splice(0, this.planPackages.length, ...packages);
-    this.monthlyPrice = null;
-    this.annualPrice = null;
-    this.plans = packages.map(pkg => {
+  private buildPlanOptions(packages: PurchasesPackage[]): void {
+    this.availablePackages.splice(0, this.availablePackages.length, ...packages);
+    this.monthlyPriceValue = null;
+    this.annualPriceValue = null;
+    this.planOptions = packages.map(pkg => {
       if (pkg.packageType === PACKAGE_TYPE.MONTHLY && pkg.product?.price) {
-        this.monthlyPrice = pkg.product.price;
+        this.monthlyPriceValue = pkg.product.price;
       }
       if (pkg.packageType === PACKAGE_TYPE.ANNUAL && pkg.product?.price) {
-        this.annualPrice = pkg.product.price;
+        this.annualPriceValue = pkg.product.price;
       }
-      return this.toViewModel(pkg);
+      return this.toPlanViewModel(pkg);
     });
   }
 
-  private toViewModel(pkg: PurchasesPackage): PlanViewModel {
-    const typeKey = this.getPackageTypeKey(pkg.packageType);
+  private toPlanViewModel(pkg: PurchasesPackage): PlanViewModel {
+    const typeKey = this.resolvePackageTypeKey(pkg.packageType);
     const isAnnual = pkg.packageType === PACKAGE_TYPE.ANNUAL;
     const price = pkg.product?.priceString ?? '-';
     const period = this.translate.instant(isAnnual ? 'upgrade.plans.perYear' : 'upgrade.plans.perMonth');
     const badge = isAnnual ? this.translate.instant('upgrade.plans.badgeBestValue') : null;
-    const savings = isAnnual ? this.getAnnualSavingsLabel() : null;
-    const trialLabel = this.getTrialLabel(pkg);
+    const savings = isAnnual ? this.buildAnnualSavingsLabel() : null;
+    const trialLabel = this.buildTrialLabel(pkg);
     const ctaLabel = trialLabel
       ? this.translate.instant('upgrade.actions.startTrial')
       : this.translate.instant('upgrade.actions.select');
@@ -167,7 +163,7 @@ export class UpgradePage {
     };
   }
 
-  private getPackageTypeKey(type: PACKAGE_TYPE): string {
+  private resolvePackageTypeKey(type: PACKAGE_TYPE): string {
     switch (type) {
       case PACKAGE_TYPE.MONTHLY:
         return 'upgrade.plans.monthly';
@@ -178,7 +174,7 @@ export class UpgradePage {
     }
   }
 
-  private getTrialLabel(pkg: PurchasesPackage): string | null {
+  private buildTrialLabel(pkg: PurchasesPackage): string | null {
     const introPrice = pkg.product?.introPrice;
     if (!introPrice) {
       return null;
@@ -192,22 +188,22 @@ export class UpgradePage {
     });
   }
 
-  private getAnnualSavingsLabel(): string | null {
-    if (!this.monthlyPrice || !this.annualPrice) {
+  private buildAnnualSavingsLabel(): string | null {
+    if (!this.monthlyPriceValue || !this.annualPriceValue) {
       return null;
     }
-    const monthlyYearCost = this.monthlyPrice * 12;
+    const monthlyYearCost = this.monthlyPriceValue * 12;
     if (!monthlyYearCost) {
       return null;
     }
-    const savingsPercent = Math.max(0, Math.round((1 - this.annualPrice / monthlyYearCost) * 100));
+    const savingsPercent = Math.max(0, Math.round((1 - this.annualPriceValue / monthlyYearCost) * 100));
     if (!savingsPercent) {
       return null;
     }
     return this.translate.instant('upgrade.plans.savings', { value: savingsPercent });
   }
 
-  private async presentToast(key: string): Promise<void> {
+  private async presentUpgradeToast(key: string): Promise<void> {
     const message = this.translate.instant(key);
     const toast = await this.toastCtrl.create({
       message,

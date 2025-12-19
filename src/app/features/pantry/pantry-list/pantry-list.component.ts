@@ -26,10 +26,11 @@ import { ES_DATE_FORMAT_OPTIONS, MeasurementUnit } from '@core/models/shared';
 import {
   AppPreferencesService,
   LanguageService,
+  PantryStoreService,
 } from '@core/services';
 import { PantryService } from '@core/services/pantry.service';
-import { PantryStoreService } from '@core/store/pantry-store.service';
 import { createDocumentId } from '@core/utils';
+import { formatDateValue, formatQuantity, formatShortDate, roundQuantity } from '@core/utils/formatting.util';
 import {
   normalizeCategoryId,
   normalizeKey,
@@ -38,7 +39,6 @@ import {
   normalizeSupermarketValue,
   normalizeUnitValue,
 } from '@core/utils/normalization.util';
-import { formatDateValue, formatQuantity, formatShortDate, roundQuantity } from '@core/utils/formatting.util';
 import { ToastController } from '@ionic/angular';
 import {
   IonBadge,
@@ -122,6 +122,7 @@ import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component'
 })
 export class PantryListComponent implements OnDestroy {
   @ViewChild('content', { static: false }) private content?: IonContent;
+  // DI
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
   private readonly fb = inject(FormBuilder);
@@ -154,27 +155,27 @@ export class PantryListComponent implements OnDestroy {
   readonly statusFilter: Signal<PantryStatusFilterValue>;
   readonly showFilters = signal(false);
   readonly basicOnly: Signal<boolean>;
-  readonly itemsState = signal<PantryItem[]>([]);
+  readonly pantryItemsState = signal<PantryItem[]>([]);
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
   readonly showMoveModal = signal(false);
   readonly moveItemTarget = signal<PantryItem | null>(null);
-  readonly summaryCache = signal<PantrySummaryMeta>(this.createEmptySummary());
-  readonly hasLoadedOnce = signal(false);
-  readonly showAdvanced = signal(false);
+  readonly summarySnapshot = signal<PantrySummaryMeta>(this.createEmptySummary());
+  readonly hasCompletedInitialLoad = signal(false);
+  readonly showAdvancedFilters = signal(false);
   readonly collapsedGroups = signal<Set<string>>(new Set());
   readonly deletingItems = signal<Set<string>>(new Set());
   // Computed Signals
-  readonly groups = computed(() => this.buildGroups(this.itemsState()));
-  readonly summary = computed<PantrySummaryMeta>(() => this.summaryCache());
+  readonly groups = computed(() => this.buildGroups(this.pantryItemsState()));
+  readonly summary = computed<PantrySummaryMeta>(() => this.summarySnapshot());
   readonly filterChips = computed(() => this.buildFilterChips(this.summary(), this.statusFilter(), this.basicOnly()));
-  readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
-  readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
-  readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.itemsState()));
+  readonly categoryOptions = computed(() => this.computeCategoryOptions(this.pantryItemsState()));
+  readonly locationOptions = computed(() => this.computeLocationOptions(this.pantryItemsState()));
+  readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.pantryItemsState()));
   readonly presetCategoryOptions = computed(() => this.computePresetCategoryOptions());
   readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
   readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
-  readonly batchSummaries = computed(() => this.computeBatchSummaries(this.itemsState()));
+  readonly batchSummaries = computed(() => this.computeBatchSummaries(this.pantryItemsState()));
   // Forms
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -226,12 +227,12 @@ export class PantryListComponent implements OnDestroy {
     // Keep the UI in sync with the filtered pipeline, merging optimistic edits before rendering the list.
     effect(() => {
       const paginatedItems = this.pantryService.filteredProducts();
-      this.itemsState.set(this.mergePendingItems(paginatedItems));
+      this.pantryItemsState.set(this.mergePendingItems(paginatedItems));
     });
 
     // Expansion toggles depend on ids that might disappear when new batches arrive.
     effect(() => {
-      this.syncExpandedItems(this.itemsState());
+      this.syncExpandedItems(this.pantryItemsState());
     });
 
     effect(() => {
@@ -256,7 +257,7 @@ export class PantryListComponent implements OnDestroy {
       const isLoading = this.pantryService.loading();
       const shouldUseFreshSummary = !isLoading || loadedItems.length > 0 || totalCount === 0;
       if (shouldUseFreshSummary) {
-        this.summaryCache.set(this.buildSummary(loadedItems, totalCount));
+        this.summarySnapshot.set(this.buildSummary(loadedItems, totalCount));
       }
     });
 
@@ -280,7 +281,7 @@ export class PantryListComponent implements OnDestroy {
       await this.pantryService.ensureFirstPageLoaded();
       this.pantryService.startBackgroundLoad();
     }
-    this.hasLoadedOnce.set(true);
+    this.hasCompletedInitialLoad.set(true);
     this.scrollViewportToTop();
   }
 
@@ -311,7 +312,7 @@ export class PantryListComponent implements OnDestroy {
   /** Open the creation modal with blank defaults and a single location row. */
   openNewItemModal(): void {
     this.editingItem = null;
-    this.showAdvanced.set(false);
+    this.showAdvancedFilters.set(false);
     this.form.reset({
       name: '',
       quickQuantity: null,
@@ -335,7 +336,7 @@ export class PantryListComponent implements OnDestroy {
   openEditItemModal(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     this.editingItem = item;
-    this.showAdvanced.set(true);
+    this.showAdvancedFilters.set(true);
     this.form.reset({
       name: item.name ?? '',
       quickQuantity: null,
@@ -375,7 +376,7 @@ export class PantryListComponent implements OnDestroy {
     if (this.editingItem) {
       return;
     }
-    this.showAdvanced.update(value => {
+    this.showAdvancedFilters.update(value => {
       const next = !value;
       if (next) {
         this.form.patchValue({
@@ -446,7 +447,7 @@ export class PantryListComponent implements OnDestroy {
    * Handles both creation and update flows through the store.
    */
   async submitItem(): Promise<void> {
-    const advancedMode = this.showAdvanced();
+    const advancedMode = this.showAdvancedFilters();
     if (advancedMode) {
       if (this.form.invalid) {
         this.form.markAllAsTouched();
@@ -952,7 +953,7 @@ export class PantryListComponent implements OnDestroy {
         return;
       }
 
-      this.itemsState.update(items =>
+      this.pantryItemsState.update(items =>
         items.map(existing => (existing._id === result.updatedItem._id ? result.updatedItem : existing))
       );
       this.triggerStockSave(result.updatedItem._id, result.updatedItem);
@@ -1240,7 +1241,7 @@ export class PantryListComponent implements OnDestroy {
       addOption(preset);
     }
 
-    for (const item of this.itemsState()) {
+    for (const item of this.pantryItemsState()) {
       const id = normalizeCategoryId(item.categoryId);
       if (id) {
         addOption(id);
@@ -1804,7 +1805,7 @@ export class PantryListComponent implements OnDestroy {
    */
   private applyLocationBatches(itemId: string, locationId: string, batches: ItemBatch[]): PantryItem | null {
     let updatedItem: PantryItem | null = null;
-    this.itemsState.update(items =>
+    this.pantryItemsState.update(items =>
       items.map(item => {
         if (item._id !== itemId) {
           return item;
@@ -2580,7 +2581,7 @@ export class PantryListComponent implements OnDestroy {
     return fallback ? fallback.trim() : 'unassigned';
   }
 
-  private syncExpandedItems(source: PantryItem[] = this.itemsState()): void {
+  private syncExpandedItems(source: PantryItem[] = this.pantryItemsState()): void {
     const validIds = new Set(source.map(item => item._id));
     for (const id of Array.from(this.expandedItems)) {
       if (!validIds.has(id)) {

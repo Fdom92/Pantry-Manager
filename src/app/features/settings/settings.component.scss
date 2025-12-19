@@ -39,7 +39,6 @@ ion-item {
   flex-direction: column;
   gap: 10px;
   margin: 10px;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 48px);
 }
 
 .pro-inline-banner {
@@ -78,11 +77,5 @@ ion-item {
 
   .theme-select {
     max-width: 240px;
-  }
-}
-
-@media (min-width: 768px) {
-  .settings-content {
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 56px);
   }
 }
