@@ -249,6 +249,14 @@ export class PantryStoreService {
     return this.pantryService.hasOpenBatch(item);
   }
 
+  /** Single source of truth for deciding whether an item should be auto-added to shopping list. */
+  shouldAutoAddToShoppingList(
+    item: PantryItem,
+    context?: { totalQuantity?: number; minThreshold?: number | null }
+  ): boolean {
+    return this.pantryService.shouldAutoAddToShoppingList(item, context);
+  }
+
   private async findMergeCandidate(candidate: PantryItem): Promise<PantryItem | undefined> {
     const barcode = this.normalizeBarcode(candidate.barcode);
     const key = this.buildMergeKey(candidate);
