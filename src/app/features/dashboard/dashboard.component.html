@@ -5,12 +5,12 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (dashboardInsights().length) {
+  @if (visibleInsights().length) {
     <div class="insights-stack">
-      @for (insight of dashboardInsights(); track insight.id) {
+      @for (insight of visibleInsights(); track insight.id) {
         <app-insight-card
           [insight]="insight"
-          (action)="handleInsightAction($event)">
+          (dismiss)="dismissInsight(insight)">
         </app-insight-card>
       }
     </div>

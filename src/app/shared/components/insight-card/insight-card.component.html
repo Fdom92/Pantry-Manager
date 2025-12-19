@@ -1,22 +1,17 @@
-<div class="insight-card">
-  <div class="insight-card__body">
-    <div class="insight-card__icon">
-      <ion-icon name="bulb-outline" aria-hidden="true"></ion-icon>
-    </div>
-    <div class="insight-card__content">
-      <p class="insight-card__eyebrow">Insight</p>
-      <h4>{{ insight.title }}</h4>
-      <p class="insight-card__message">{{ insight.description }}</p>
-    </div>
-  </div>
+<ion-card [class]="'insight-card insight-card--' + insight.severity">
+  <ion-card-header>
+    <ion-card-title>{{ insight.title }}</ion-card-title>
+  </ion-card-header>
 
-  <div class="insight-card__actions">
+  <ion-card-content>
+    <p class="insight-card__message">{{ insight.description }}</p>
+
     <ion-button
       size="small"
-      fill="solid"
+      fill="clear"
       color="primary"
-      (click)="emitAction()">
-      {{ insight.ctaLabel }}
+      (click)="emitDismiss()">
+      {{ ('insights.ctaDefault' | translate) }}
     </ion-button>
-  </div>
-</div>
+  </ion-card-content>
+</ion-card>

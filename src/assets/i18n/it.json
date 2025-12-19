@@ -228,7 +228,8 @@
       "title": "Prodotti duplicati in dispensa",
       "description": "Ci sono articoli con lo stesso nome registrati più volte. Controlla e uniscili.",
       "cta": "Rivedi prodotti"
-    }
+    },
+    "ctaDefault": "Capito"
   },
   "agent": {
     "title": "Agente",

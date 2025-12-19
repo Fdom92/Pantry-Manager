@@ -4,7 +4,6 @@ import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import {
   ES_DATE_FORMAT_OPTIONS,
   Insight,
-  InsightActionEvent,
   DashboardInsightContext,
   ItemLocationStock,
   PantryItem,
@@ -85,11 +84,11 @@ export class DashboardComponent {
   readonly isSnapshotCardExpanded = signal(true);
   readonly lastRefreshTimestamp = signal<string | null>(null);
   readonly isDeletingExpiredItems = signal(false);
+  readonly visibleInsights = signal<Insight[]>([]);
   // Computed Signals
   readonly totalItems = computed(() => this.inventorySummary().total);
   readonly recentlyUpdatedItems = computed(() => this.getRecentItemsByUpdatedAt(this.pantryItems()));
   readonly hasExpiredItems = computed(() => this.expiredItems().length > 0);
-  readonly dashboardInsights = computed<Insight[]>(() => this.evaluateDashboardInsights());
   // Getter
   get nearExpiryWindow(): number {
     return NEAR_EXPIRY_WINDOW_DAYS;
@@ -112,6 +111,17 @@ export class DashboardComponent {
         this.lastRefreshTimestamp.set(new Date().toISOString());
       }
     );
+
+    effect(() => {
+      const items = this.pantryItems();
+      const expiringSoon = this.nearExpiryItems();
+      const expired = this.expiredItems();
+      const lowStock = this.lowStockItems();
+      if (!this.hasCompletedInitialLoad) {
+        return;
+      }
+      this.refreshDashboardInsights(items, expiringSoon, expired, lowStock);
+    });
   }
 
   /** Lifecycle hook: populate dashboard data and stamp the refresh time. */
@@ -121,33 +131,33 @@ export class DashboardComponent {
     this.lastRefreshTimestamp.set(new Date().toISOString());
   }
 
-  handleInsightAction(event: InsightActionEvent): void {
-    const { action, insight } = event;
-    if (action?.type === 'navigate' && action.target === 'dashboard_section') {
-      console.debug('[DashboardComponent] Navigating to dashboard section', action.payload, insight);
-      return;
-    }
-    console.debug('[DashboardComponent] Insight action received', event);
+  dismissInsight(insight: Insight): void {
+    this.insightService.dismiss(insight.id);
+    this.visibleInsights.update(current => current.filter(item => item.id !== insight.id));
   }
 
-  private evaluateDashboardInsights(): Insight[] {
-    const items = this.pantryItems();
+  private refreshDashboardInsights(
+    items: PantryItem[],
+    expiringSoon: PantryItem[],
+    expiredItems: PantryItem[],
+    lowStockItems: PantryItem[],
+  ): void {
     if (!items?.length) {
-      return [];
+      this.visibleInsights.set([]);
+      return;
     }
 
-    const expiringSoon = this.nearExpiryItems();
     const context: DashboardInsightContext = {
       expiringSoonItems: expiringSoon.map(item => ({
         id: item._id,
         isLowStock: this.pantryStore.isItemLowStock(item),
       })),
-      expiredItems: this.expiredItems().map(item => ({
+      expiredItems: expiredItems.map(item => ({
         id: item._id,
         quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       expiringSoonCount: expiringSoon.length,
-      lowStockCount: this.lowStockItems().length,
+      lowStockCount: lowStockItems.length,
       products: items.map(item => ({
         id: item._id,
         name: item.name,
@@ -155,7 +165,8 @@ export class DashboardComponent {
       })),
     };
 
-    return this.insightService.getDashboardInsights(context);
+    const generated = this.insightService.buildDashboardInsights(context);
+    this.visibleInsights.set(this.insightService.getVisibleInsights(generated));
   }
 
   /** Toggle the visibility of the snapshot card without altering other state. */

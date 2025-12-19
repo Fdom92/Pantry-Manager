@@ -3,14 +3,16 @@ import {
   DashboardInsightContext,
   Insight,
   InsightId,
+  InsightSeverity,
 } from '@core/models';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({ providedIn: 'root' })
 export class InsightService {
   private readonly translate = inject(TranslateService);
+  private readonly dismissedInsightIds = new Set<string>();
 
-  getDashboardInsights(context: DashboardInsightContext): Insight[] {
+  buildDashboardInsights(context: DashboardInsightContext): Insight[] {
     const insights: Insight[] = [];
 
     const expiringLowStock = context.expiringSoonItems.filter(item => item.isLowStock);
@@ -20,11 +22,7 @@ export class InsightService {
         title: this.translateKey('insights.expiringLowStock.title'),
         description: this.translateKey('insights.expiringLowStock.description'),
         ctaLabel: this.translateKey('insights.expiringLowStock.cta'),
-        action: {
-          type: 'navigate',
-          target: 'dashboard_section',
-          payload: 'expiring',
-        },
+        severity: this.severity('warning'),
         priority: 2,
       });
     }
@@ -36,11 +34,7 @@ export class InsightService {
         title: this.translateKey('insights.expiredWithStock.title'),
         description: this.translateKey('insights.expiredWithStock.description'),
         ctaLabel: this.translateKey('insights.expiredWithStock.cta'),
-        action: {
-          type: 'navigate',
-          target: 'dashboard_section',
-          payload: 'expired',
-        },
+        severity: this.severity('danger'),
         priority: 1,
       });
     }
@@ -51,11 +45,7 @@ export class InsightService {
         title: this.translateKey('insights.lowStockNoExpiry.title'),
         description: this.translateKey('insights.lowStockNoExpiry.description'),
         ctaLabel: this.translateKey('insights.lowStockNoExpiry.cta'),
-        action: {
-          type: 'navigate',
-          target: 'dashboard_section',
-          payload: 'lowStock',
-        },
+        severity: this.severity('info'),
         priority: 3,
       });
     }
@@ -66,16 +56,24 @@ export class InsightService {
         title: this.translateKey('insights.duplicatedProducts.title'),
         description: this.translateKey('insights.duplicatedProducts.description'),
         ctaLabel: this.translateKey('insights.duplicatedProducts.cta'),
-        action: {
-          type: 'navigate',
-          target: 'dashboard_section',
-          payload: 'products',
-        },
+        severity: this.severity('info'),
         priority: 4,
       });
     }
 
     return insights.sort((a, b) => a.priority - b.priority).slice(0, 2);
+  }
+
+  getVisibleInsights(insights: Insight[]): Insight[] {
+    return insights.filter(insight => !this.dismissedInsightIds.has(insight.id));
+  }
+
+  dismiss(id: string): void {
+    this.dismissedInsightIds.add(id);
+  }
+
+  resetSession(): void {
+    this.dismissedInsightIds.clear();
   }
 
   private translateKey(key: string): string {
@@ -97,5 +95,9 @@ export class InsightService {
       }
     }
     return false;
+  }
+
+  private severity(level: InsightSeverity): InsightSeverity {
+    return level;
   }
 }

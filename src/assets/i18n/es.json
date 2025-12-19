@@ -228,7 +228,8 @@
       "title": "Productos duplicados en la despensa",
       "description": "Hay artículos con el mismo nombre registrados varias veces. Revisa y consolida.",
       "cta": "Revisar productos"
-    }
+    },
+    "ctaDefault": "Entendido"
   },
   "agent": {
     "title": "Agente",

@@ -1,8 +1,7 @@
 .insight-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px 18px;
+  gap: 2px;
   border-radius: 16px;
   background:
     radial-gradient(circle at 20% 25%, rgba(99, 102, 241, 0.22), transparent 35%),
@@ -71,5 +70,14 @@
 
   ion-button {
     font-size: 0.8rem;
+  }
+
+  ion-card-header {
+    padding-bottom: 0;
+  }
+
+  ion-card-title {
+    font-size: 1rem;
+    color: var(--ion-color-light);
   }
 }

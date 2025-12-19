@@ -1,26 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Insight, InsightActionEvent } from '@core/models';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { Insight } from '@core/models';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle } from '@ionic/angular/standalone';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-insight-card',
   standalone: true,
-  imports: [CommonModule, IonButton, IonIcon],
+  imports: [CommonModule, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, TranslateModule],
   templateUrl: './insight-card.component.html',
   styleUrls: ['./insight-card.component.scss'],
 })
 export class InsightCardComponent {
   @Input() insight!: Insight;
-  @Output() action = new EventEmitter<InsightActionEvent>();
+  @Output() dismiss = new EventEmitter<void>();
 
-  emitAction(): void {
-    if (!this.insight) {
-      return;
-    }
-    this.action.emit({
-      action: this.insight.action,
-      insight: this.insight,
-    });
+  emitDismiss(): void {
+    this.dismiss.emit();
   }
 }

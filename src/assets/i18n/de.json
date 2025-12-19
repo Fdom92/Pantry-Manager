@@ -228,7 +228,8 @@
       "title": "Doppelte Produkte in der Speisekammer",
       "description": "Einige Artikel haben denselben Namen in mehreren Einträgen. Prüfe und führe sie zusammen.",
       "cta": "Produkte prüfen"
-    }
+    },
+    "ctaDefault": "Verstanden"
   },
   "agent": {
     "title": "Agent",

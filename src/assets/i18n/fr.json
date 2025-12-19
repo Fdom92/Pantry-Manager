@@ -228,7 +228,8 @@
       "title": "Produits dupliqués dans le garde-manger",
       "description": "Des articles portent le même nom dans plusieurs fiches. Vérifiez-les et fusionnez-les.",
       "cta": "Revoir les produits"
-    }
+    },
+    "ctaDefault": "Compris"
   },
   "agent": {
     "title": "Agent",

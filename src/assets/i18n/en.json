@@ -228,7 +228,8 @@
       "title": "Duplicated products in the pantry",
       "description": "Some items share the same name in different entries. Review and consolidate them.",
       "cta": "Review products"
-    }
+    },
+    "ctaDefault": "Got it"
   },
   "agent": {
     "title": "Agent",

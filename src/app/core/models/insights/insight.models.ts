@@ -13,18 +13,15 @@ export interface InsightAction {
   payload: DashboardSectionTarget;
 }
 
+export type InsightSeverity = 'info' | 'warning' | 'danger';
+
 export interface Insight {
   id: InsightId;
   title: string;
   description: string;
-  ctaLabel: string;
-  action: InsightAction;
+  severity: InsightSeverity;
+  ctaLabel?: string;
   priority: number;
-}
-
-export interface InsightActionEvent {
-  action: InsightAction;
-  insight: Insight;
 }
 
 export interface DashboardExpiringItem {
