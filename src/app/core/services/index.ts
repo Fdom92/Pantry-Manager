@@ -1,6 +1,5 @@
 export * from './agent.service';
 export * from './app-preferences.service';
-export * from './insight-trigger.service';
 export * from './insight.service';
 export * from './language.service';
 export * from './pantry.service';

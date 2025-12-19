@@ -1,8 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { ES_DATE_FORMAT_OPTIONS, InsightCTA, InsightTrigger, ItemLocationStock, PantryItem } from '@core/models';
-import { InsightService, InsightTriggerService, LanguageService } from '@core/services';
+import {
+  ES_DATE_FORMAT_OPTIONS,
+  Insight,
+  InsightActionEvent,
+  InsightCTAAction,
+  InsightEvaluationContext,
+  ItemLocationStock,
+  PantryItem,
+} from '@core/models';
+import { InsightService, LanguageService } from '@core/services';
 import { PantryStoreService } from '@core/store/pantry-store.service';
 import {
   formatDateTimeValue,
@@ -68,7 +76,6 @@ export class DashboardComponent {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly insightService = inject(InsightService);
-  private readonly insightTriggerService = inject(InsightTriggerService);
   // Data
   private hasInitialized = false;
   readonly items = this.pantryStore.items;
@@ -78,15 +85,12 @@ export class DashboardComponent {
   readonly summary = this.pantryStore.summary;
   // Signals
   readonly showSnapshot = signal(true);
-  readonly dashboardInsights = computed(() =>
-    this.insightService.getInsights(InsightTrigger.DASHBOARD)
-  );
-
   readonly lastUpdated = signal<string | null>(null);
   readonly deletingExpired = signal(false);
   // Computed Signals
   readonly totalItems = computed(() => this.summary().total);
   readonly recentItems = computed(() => this.computeRecentItems(this.items()));
+  readonly dashboardInsight = computed<Insight | null>(() => this.evaluateDashboardInsight());
   // Getter
   get nearExpiryWindow(): number {
     return NEAR_EXPIRY_WINDOW_DAYS;
@@ -116,17 +120,66 @@ export class DashboardComponent {
     await this.pantryStore.loadAll();
     this.hasInitialized = true;
     this.lastUpdated.set(new Date().toISOString());
-    this.insightService.clearTrigger(InsightTrigger.DASHBOARD);
-    this.insightTriggerService.trigger(InsightTrigger.DASHBOARD);
   }
 
-  handleInsightAction(cta: InsightCTA): void {
-    if (cta.action === 'dismiss' && cta.payload?.insightId) {
-      this.insightService.dismissInsight(cta.payload.insightId);
+  handleInsightAction(event: InsightActionEvent): void {
+    const { action } = event;
+    if (typeof action === 'function') {
+      action();
       return;
     }
-    // Future actions (agent, navigation, etc.) will be orchestrated upstream.
-    console.debug('[DashboardComponent] Insight CTA selected', cta);
+
+    switch (action) {
+      case InsightCTAAction.VIEW_EXPIRING_PRODUCTS:
+        console.debug('[DashboardComponent] Ver productos a punto de caducar', event);
+        break;
+      case InsightCTAAction.VIEW_RECIPES:
+        console.debug('[DashboardComponent] Ver recetas sugeridas', event);
+        break;
+      case InsightCTAAction.REVIEW_SHOPPING:
+        console.debug('[DashboardComponent] Revisar compra', event);
+        break;
+      case InsightCTAAction.ADD_TO_SHOPPING:
+        console.debug('[DashboardComponent] Añadir a compra', event);
+        break;
+      case InsightCTAAction.VIEW_SHOPPING_LIST:
+        console.debug('[DashboardComponent] Ver lista de compra', event);
+        break;
+      default:
+        console.debug('[DashboardComponent] Insight CTA seleccionado', event);
+    }
+  }
+
+  private evaluateDashboardInsight(): Insight | null {
+    const items = this.items();
+    if (!items?.length) {
+      return null;
+    }
+    const context: InsightEvaluationContext = {
+      products: items,
+      expiringSoon: this.nearExpiryItems(),
+      outOfStock: items.filter(item => this.pantryStore.getItemTotalQuantity(item) <= 0),
+      lowStock: this.lowStockItems(),
+      shoppingList: items.filter(item => this.shouldAddToShoppingList(item)),
+      lastRecipeGeneratedAt: undefined,
+      currentView: 'Dashboard',
+    };
+    return this.insightService.evaluateInsights(context);
+  }
+
+  private shouldAddToShoppingList(item: PantryItem): boolean {
+    const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
+    const minThreshold = this.pantryStore.getItemTotalMinThreshold(item);
+    if (item.isBasic && totalQuantity <= 0) {
+      return true;
+    }
+    if (item.isBasic && minThreshold > 0 && totalQuantity < minThreshold) {
+      return true;
+    }
+    if (minThreshold > 0 && totalQuantity < minThreshold) {
+      return true;
+    }
+    return minThreshold <= 0 && totalQuantity <= 0;
   }
 
   /** Toggle the visibility of the snapshot card without altering other state. */

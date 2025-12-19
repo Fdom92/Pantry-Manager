@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Insight, InsightCTA } from '@core/models';
+import { Insight, InsightActionEvent } from '@core/models';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 
 @Component({
@@ -12,9 +12,15 @@ import { IonButton, IonIcon } from '@ionic/angular/standalone';
 })
 export class InsightCardComponent {
   @Input() insight!: Insight;
-  @Output() action = new EventEmitter<InsightCTA>();
+  @Output() action = new EventEmitter<InsightActionEvent>();
 
-  emitAction(cta: InsightCTA): void {
-    this.action.emit(cta);
+  emitAction(): void {
+    if (!this.insight) {
+      return;
+    }
+    this.action.emit({
+      action: this.insight.ctaAction,
+      insight: this.insight,
+    });
   }
 }
