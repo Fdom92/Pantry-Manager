@@ -165,15 +165,22 @@ export class ShoppingComponent {
     };
 
     for (const item of items) {
-      const isBasic = Boolean(item.isBasic);
       const minThreshold = item.minThreshold != null ? Number(item.minThreshold) : null;
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       const primaryLocation = item.locations[0];
       const locationId = primaryLocation?.locationId ?? 'unassigned';
       const unit = normalizeUnitValue(primaryLocation?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
 
+      const shouldAutoAdd = this.pantryService.shouldAutoAddToShoppingList(item, {
+        totalQuantity,
+        minThreshold,
+      });
+
+      if (!shouldAutoAdd) {
+        continue;
+      }
+
       const { reason, suggestedQuantity } = this.determineSuggestionNeed(
-        isBasic,
         totalQuantity,
         minThreshold
       );
@@ -278,32 +285,19 @@ export class ShoppingComponent {
 
   /** Keep the suggested quantity positive, defaulting to a fallback when needed. */
   private determineSuggestionNeed(
-    isBasicItem: boolean,
     totalQuantity: number,
     minThreshold: number | null
   ): { reason: ShoppingReason | null; suggestedQuantity: number } {
-    if (isBasicItem && totalQuantity <= 0) {
+    if (totalQuantity <= 0) {
       return {
         reason: 'basic-out',
         suggestedQuantity: this.ensureMinimumSuggestedQuantity(minThreshold ?? 1),
       };
     }
-    if (isBasicItem && minThreshold != null && totalQuantity < minThreshold) {
+    if (minThreshold != null && totalQuantity < minThreshold) {
       return {
         reason: 'basic-low',
         suggestedQuantity: this.ensureMinimumSuggestedQuantity(minThreshold - totalQuantity, minThreshold),
-      };
-    }
-    if (minThreshold != null && totalQuantity < minThreshold) {
-      return {
-        reason: 'below-min',
-        suggestedQuantity: this.ensureMinimumSuggestedQuantity(minThreshold - totalQuantity, minThreshold),
-      };
-    }
-    if (minThreshold === null && totalQuantity <= 0) {
-      return {
-        reason: 'empty',
-        suggestedQuantity: this.ensureMinimumSuggestedQuantity(1),
       };
     }
     return { reason: null, suggestedQuantity: 0 };

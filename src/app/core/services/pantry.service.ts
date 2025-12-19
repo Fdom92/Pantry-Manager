@@ -495,6 +495,38 @@ export class PantryService extends StorageService<PantryItem> {
     return this.collectBatches(item.locations).some(batch => Boolean(batch.opened));
   }
 
+  /** Decide if the item should appear automatically in the shopping list. */
+  shouldAutoAddToShoppingList(
+    item: PantryItem,
+    context?: { totalQuantity?: number; minThreshold?: number | null }
+  ): boolean {
+    if (!item || !item.isBasic) {
+      return false;
+    }
+
+    const totalQuantity =
+      context && typeof context.totalQuantity === 'number'
+        ? context.totalQuantity
+        : this.getItemTotalQuantity(item);
+
+    const hasMinThresholdOverride = Boolean(context && 'minThreshold' in context);
+    const minThreshold = hasMinThresholdOverride
+      ? context?.minThreshold ?? null
+      : item.minThreshold != null
+        ? Number(item.minThreshold)
+        : null;
+
+    if (totalQuantity <= 0) {
+      return true;
+    }
+
+    if (minThreshold != null && totalQuantity < minThreshold) {
+      return true;
+    }
+
+    return false;
+  }
+
   private async refreshTotalCount(): Promise<void> {
     try {
       const total = await this.countByType(this.TYPE);
