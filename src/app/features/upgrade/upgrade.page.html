@@ -13,7 +13,7 @@
     <h1>{{ 'upgrade.headline' | translate }}</h1>
     <p>{{ 'upgrade.subtitle' | translate }}</p>
     <div class="hero-actions">
-      <ion-button fill="clear" color="light" (click)="maybeLater()">
+      <ion-button fill="clear" color="light" (click)="skipUpgradeFlow()">
         {{ 'upgrade.actions.maybeLater' | translate }}
       </ion-button>
     </div>
@@ -21,8 +21,8 @@
 
   <div class="plans-section">
     <div class="plans-grid">
-      @if (plans.length) {
-        @for (plan of plans; track plan.id) {
+      @if (planOptions.length) {
+        @for (plan of planOptions; track plan.id) {
           <app-plan-card
             [title]="plan.title"
             [subtitle]="plan.subtitle"
@@ -34,8 +34,8 @@
             [ctaLabel]="plan.ctaLabel"
             [badge]="plan.badge"
             [highlight]="plan.highlight"
-            [disabled]="!!purchasingId || loadingPackages"
-            (selectPlan)="onSelectPlan(plan)">
+            [disabled]="!!activePurchaseId || isLoadingPlans"
+            (selectPlan)="handleSelectPlan(plan)">
           </app-plan-card>
         }
       } @else {
@@ -45,7 +45,7 @@
   </div>
 
   <div class="cta-block">
-    <ion-button expand="block" fill="outline" color="secondary" (click)="onRestore()">
+    <ion-button expand="block" fill="outline" color="secondary" (click)="restorePurchases()">
       {{ 'upgrade.actions.restore' | translate }}
     </ion-button>
     <ion-note>

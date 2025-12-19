@@ -1,30 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild, computed, signal } from '@angular/core';
-import { ONBOARDING_STORAGE_KEY } from '@core/constants';
-import { RevenuecatService } from '@core/services/revenuecat.service';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  CUSTOM_ELEMENTS_SCHEMA,
+  ElementRef,
+  inject,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { ONBOARDING_STORAGE_KEY } from '@core/constants';
+import { OnboardingSlide } from '@core/models/onboarding';
+import { RevenuecatService } from '@core/services/revenuecat.service';
 import { NavController } from '@ionic/angular';
+import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { register } from 'swiper/element/bundle';
 import type { SwiperOptions } from 'swiper/types';
-import { addIcons } from 'ionicons';
-import {
-  apertureOutline,
-  bulbOutline,
-  chatbubblesOutline,
-  layersOutline,
-  sparklesOutline,
-} from 'ionicons/icons';
-
-interface OnboardingSlide {
-  key: string;
-  titleKey: string;
-  descriptionKey: string;
-  icon: string;
-  badgeKey?: string | null;
-  pro?: boolean;
-}
 
 @Component({
   selector: 'app-onboarding',
@@ -36,8 +30,11 @@ interface OnboardingSlide {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class OnboardingPage implements AfterViewInit {
-  @ViewChild('swiperRef') swiper?: ElementRef<any>;
-
+  @ViewChild('swiperRef') swiperElement?: ElementRef<any>;
+  // DI
+  private readonly navCtrl = inject(NavController);
+  private readonly revenuecat = inject(RevenuecatService);
+  // Data
   readonly slideOptions: SwiperOptions = {
     speed: 550,
     spaceBetween: 24,
@@ -49,8 +46,7 @@ export class OnboardingPage implements AfterViewInit {
       next: { translate: ['16%', 0, 0], scale: 0.95, opacity: 1 },
     },
   };
-
-  private readonly baseSlides: OnboardingSlide[] = [
+  private readonly onboardingCoreSlides: OnboardingSlide[] = [
     {
       key: 'organize',
       titleKey: 'onboarding.slides.organize.title',
@@ -70,7 +66,6 @@ export class OnboardingPage implements AfterViewInit {
       icon: 'bulb-outline',
     },
   ];
-
   private readonly agentSlideLocked: OnboardingSlide = {
     key: 'agent',
     titleKey: 'onboarding.slides.agent.title',
@@ -79,7 +74,6 @@ export class OnboardingPage implements AfterViewInit {
     badgeKey: 'onboarding.slides.agent.badge',
     pro: true,
   };
-
   private readonly agentSlideUnlocked: OnboardingSlide = {
     key: 'agent',
     titleKey: 'onboarding.slides.agent.titlePro',
@@ -88,31 +82,22 @@ export class OnboardingPage implements AfterViewInit {
     badgeKey: 'onboarding.slides.agent.badgePro',
     pro: true,
   };
-
-  readonly isPro = toSignal(this.revenuecat.isPro$, { initialValue: false });
-  readonly slidesToShow = computed<OnboardingSlide[]>(() => {
-    const agentSlide = this.isPro() ? this.agentSlideUnlocked : this.agentSlideLocked;
-    return [...this.baseSlides, agentSlide];
+  // Signals
+  readonly currentSlideIndex = signal(0);
+  readonly isProUser = toSignal(this.revenuecat.isPro$, { initialValue: false });
+  // Computed Signals
+  readonly availableSlides = computed<OnboardingSlide[]>(() => {
+    const agentSlide = this.isProUser() ? this.agentSlideUnlocked : this.agentSlideLocked;
+    return [...this.onboardingCoreSlides, agentSlide];
   });
 
-  readonly activeIndex = signal(0);
-
-  constructor(
-    private readonly navCtrl: NavController,
-    private readonly revenuecat: RevenuecatService,
-  ) {
-    addIcons({
-      apertureOutline,
-      sparklesOutline,
-      layersOutline,
-      bulbOutline,
-      chatbubblesOutline,
-    });
+  constructor() {
+    // Register the Swiper to make it works
     register();
   }
 
   ngAfterViewInit(): void {
-    const swiperEl = this.swiper?.nativeElement;
+    const swiperEl = this.swiperElement?.nativeElement;
     if (!swiperEl) {
       return;
     }
@@ -120,32 +105,32 @@ export class OnboardingPage implements AfterViewInit {
     swiperEl.initialize?.();
   }
 
-  onSlideChanged(): void {
-    const swiper = this.swiper?.nativeElement?.swiper;
+  handleSlideChanged(): void {
+    const swiper = this.getSwiperInstance();
     if (!swiper) {
       return;
     }
-    this.activeIndex.set(swiper.realIndex ?? swiper.activeIndex ?? 0);
+    this.currentSlideIndex.set(swiper.realIndex ?? swiper.activeIndex ?? 0);
   }
 
   isLastSlide(): boolean {
-    return this.activeIndex() >= this.slidesToShow().length - 1;
+    return this.currentSlideIndex() >= this.availableSlides().length - 1;
   }
 
-  async onNext(): Promise<void> {
-    const swiper = this.swiper?.nativeElement?.swiper;
+  async goToNextSlide(): Promise<void> {
+    const swiper = this.getSwiperInstance();
     if (!swiper || swiper.isEnd) {
-      await this.onStart();
+      await this.completeOnboarding();
       return;
     }
     swiper.slideNext(500);
   }
 
-  async onSkip(): Promise<void> {
-    await this.onStart();
+  async skipOnboarding(): Promise<void> {
+    await this.completeOnboarding();
   }
 
-  async onStart(): Promise<void> {
+  async completeOnboarding(): Promise<void> {
     this.persistOnboardingFlag();
     await this.navCtrl.navigateRoot('/dashboard');
   }
@@ -156,5 +141,8 @@ export class OnboardingPage implements AfterViewInit {
     } catch (err) {
       console.warn('[Onboarding] failed to persist onboarding flag', err);
     }
+  }
+  private getSwiperInstance(): any {
+    return this.swiperElement?.nativeElement?.swiper;
   }
 }

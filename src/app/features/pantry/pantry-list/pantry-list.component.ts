@@ -1,19 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, OnDestroy, signal, Signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnDestroy, signal, Signal, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
+import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_HOUSEHOLD_ID, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS } from '@core/constants';
 import {
   BatchCountsMeta,
   BatchEntryMeta,
   BatchStatusMeta,
   BatchSummaryMeta,
-  ES_DATE_FORMAT_OPTIONS,
   FilterChipViewModel,
   ItemBatch,
   ItemLocationStock,
   MoveBatchesResult,
-  MeasurementUnit,
+  PantryFilterState,
   PantryGroup,
   PantryItem,
   PantryItemBatchViewModel,
@@ -22,18 +21,25 @@ import {
   PantryStatusFilterValue,
   PantrySummaryMeta,
   ProductStatusState
-} from '@core/models';
-import { PantryFilterState } from '@core/models/pantry-pipeline.model';
+} from '@core/models/inventory';
+import { ES_DATE_FORMAT_OPTIONS, MeasurementUnit } from '@core/models/shared';
 import {
   AppPreferencesService,
-  DEFAULT_CATEGORY_OPTIONS,
-  DEFAULT_LOCATION_OPTIONS,
-  DEFAULT_SUPERMARKET_OPTIONS,
   LanguageService,
+  PantryStoreService,
 } from '@core/services';
 import { PantryService } from '@core/services/pantry.service';
-import { PantryStoreService } from '@core/store/pantry-store.service';
 import { createDocumentId } from '@core/utils';
+import { formatDateValue, formatQuantity, formatShortDate, roundQuantity } from '@core/utils/formatting.util';
+import {
+  normalizeCategoryId,
+  normalizeKey,
+  normalizeLocationId,
+  normalizeStringList,
+  normalizeSupermarketValue,
+  normalizeUnitValue,
+} from '@core/utils/normalization.util';
+import { ToastController } from '@ionic/angular';
 import {
   IonBadge,
   IonButton,
@@ -66,10 +72,9 @@ import {
   IonToggle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
-import { EmptyStateGenericComponent } from '../../shared/empty-states/empty-state-generic.component';
 
 @Component({
   selector: 'app-pantry-list',
@@ -117,6 +122,31 @@ import { EmptyStateGenericComponent } from '../../shared/empty-states/empty-stat
 })
 export class PantryListComponent implements OnDestroy {
   @ViewChild('content', { static: false }) private content?: IonContent;
+  // DI
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly pantryService = inject(PantryService);
+  private readonly fb = inject(FormBuilder);
+  private readonly toastCtrl = inject(ToastController);
+  private readonly appPreferences = inject(AppPreferencesService);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
+  // Data
+  moveSubmitting = false;
+  moveError: string | null = null;
+  showCreateModal = false;
+  editingItem: PantryItem | null = null;
+  isSaving = false;
+  private realtimeSubscribed = false;
+  readonly loading = this.pantryService.loading;
+  readonly nearExpiryDays = 7;
+  readonly MeasurementUnit = MeasurementUnit;
+  readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
+  private readonly expandedItems = new Set<string>();
+  private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly pendingItems = new Map<string, PantryItem>();
+  private readonly stockSaveDelay = 500;
+  private readonly deleteAnimationDuration = 220;
+  // Signals
   readonly searchTerm: Signal<string>;
   readonly activeFilters: Signal<PantryFilterState>;
   readonly selectedCategory: Signal<string>;
@@ -125,41 +155,28 @@ export class PantryListComponent implements OnDestroy {
   readonly statusFilter: Signal<PantryStatusFilterValue>;
   readonly showFilters = signal(false);
   readonly basicOnly: Signal<boolean>;
-  readonly itemsState = signal<PantryItem[]>([]);
-  readonly groups = computed(() => this.buildGroups(this.itemsState()));
-  private readonly summaryCache = signal<PantrySummaryMeta>(this.createEmptySummary());
-  readonly summary = computed<PantrySummaryMeta>(() => this.summaryCache());
-  readonly filterChips = computed(() => this.buildFilterChips(this.summary(), this.statusFilter(), this.basicOnly()));
-  readonly categoryOptions = computed(() => this.computeCategoryOptions(this.itemsState()));
-  readonly locationOptions = computed(() => this.computeLocationOptions(this.itemsState()));
-  readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.itemsState()));
-  readonly presetCategoryOptions = computed(() => this.computePresetCategoryOptions());
-  readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
-  readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
-  readonly batchSummaries = computed(() => this.computeBatchSummaries(this.itemsState()));
+  readonly pantryItemsState = signal<PantryItem[]>([]);
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
   readonly showMoveModal = signal(false);
   readonly moveItemTarget = signal<PantryItem | null>(null);
-  moveSubmitting = false;
-  moveError: string | null = null;
-  readonly loading = this.pantryService.loading;
-  readonly nearExpiryDays = 7;
-  readonly MeasurementUnit = MeasurementUnit;
-  readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
-  readonly hasLoadedOnce = signal(false);
-  readonly showAdvanced = signal(false);
+  readonly summarySnapshot = signal<PantrySummaryMeta>(this.createEmptySummary());
+  readonly hasCompletedInitialLoad = signal(false);
+  readonly showAdvancedFilters = signal(false);
   readonly collapsedGroups = signal<Set<string>>(new Set());
-  showCreateModal = false;
-  editingItem: PantryItem | null = null;
-  isSaving = false;
-  private readonly expandedItems = new Set<string>();
-  private readonly deletingItems = signal<Set<string>>(new Set());
-  private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
-  private readonly pendingItems = new Map<string, PantryItem>();
-  private readonly stockSaveDelay = 500;
-  private readonly deleteAnimationDuration = 220;
-  private realtimeSubscribed = false;
+  readonly deletingItems = signal<Set<string>>(new Set());
+  // Computed Signals
+  readonly groups = computed(() => this.buildGroups(this.pantryItemsState()));
+  readonly summary = computed<PantrySummaryMeta>(() => this.summarySnapshot());
+  readonly filterChips = computed(() => this.buildFilterChips(this.summary(), this.statusFilter(), this.basicOnly()));
+  readonly categoryOptions = computed(() => this.computeCategoryOptions(this.pantryItemsState()));
+  readonly locationOptions = computed(() => this.computeLocationOptions(this.pantryItemsState()));
+  readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.pantryItemsState()));
+  readonly presetCategoryOptions = computed(() => this.computePresetCategoryOptions());
+  readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
+  readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
+  readonly batchSummaries = computed(() => this.computeBatchSummaries(this.pantryItemsState()));
+  // Forms
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     quickQuantity: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
@@ -180,7 +197,6 @@ export class PantryListComponent implements OnDestroy {
       })
     ])
   });
-
   readonly moveForm = this.fb.group({
     fromLocation: this.fb.control('', {
       validators: [Validators.required],
@@ -194,9 +210,79 @@ export class PantryListComponent implements OnDestroy {
       validators: [Validators.required, Validators.min(0.01)],
     }),
   });
-
+  // Getter
   get locationsArray(): FormArray<FormGroup> {
     return this.form.get('locations') as FormArray<FormGroup>;
+  }
+
+  constructor() {
+    this.searchTerm = this.pantryService.searchQuery;
+    this.activeFilters = this.pantryService.activeFilters;
+    this.sortOption = this.pantryService.sortMode;
+    this.selectedCategory = computed(() => this.activeFilters().categoryId ?? 'all');
+    this.selectedLocation = computed(() => this.activeFilters().locationId ?? 'all');
+    this.statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
+    this.basicOnly = computed(() => this.activeFilters().basic);
+
+    // Keep the UI in sync with the filtered pipeline, merging optimistic edits before rendering the list.
+    effect(() => {
+      const paginatedItems = this.pantryService.filteredProducts();
+      this.pantryItemsState.set(this.mergePendingItems(paginatedItems));
+    });
+
+    // Expansion toggles depend on ids that might disappear when new batches arrive.
+    effect(() => {
+      this.syncExpandedItems(this.pantryItemsState());
+    });
+
+    effect(() => {
+      const categories = this.categoryOptions();
+      const categoryFilter = this.activeFilters().categoryId;
+      if (categoryFilter && !categories.some(option => option.id === categoryFilter)) {
+        this.pantryService.setFilter('categoryId', null);
+      }
+    });
+
+    effect(() => {
+      const locations = this.locationOptions();
+      const locationFilter = this.activeFilters().locationId;
+      if (locationFilter && !locations.some(option => option.id === locationFilter)) {
+        this.pantryService.setFilter('locationId', null);
+      }
+    });
+
+    effect(() => {
+      const totalCount = this.pantryService.totalCount();
+      const loadedItems = this.pantryService.loadedProducts();
+      const isLoading = this.pantryService.loading();
+      const shouldUseFreshSummary = !isLoading || loadedItems.length > 0 || totalCount === 0;
+      if (shouldUseFreshSummary) {
+        this.summarySnapshot.set(this.buildSummary(loadedItems, totalCount));
+      }
+    });
+
+    effect(() => {
+      this.syncCollapsedGroups(this.groups());
+    });
+  }
+
+  /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
+  async ionViewWillEnter() {
+    await this.loadItems();
+    if (!this.realtimeSubscribed) {
+      this.pantryStore.watchRealtime();
+      this.realtimeSubscribed = true;
+    }
+  }
+
+  /** Convenience wrapper used by multiple entry points to reload the list. */
+  async loadItems(): Promise<void> {
+    if (this.pantryService.loadedProducts().length === 0) {
+      await this.pantryService.ensureFirstPageLoaded();
+      this.pantryService.startBackgroundLoad();
+    }
+    this.hasCompletedInitialLoad.set(true);
+    this.scrollViewportToTop();
   }
 
   getBatchesArray(locationIndex: number): FormArray<FormGroup> {
@@ -222,88 +308,11 @@ export class PantryListComponent implements OnDestroy {
     }
     batches.removeAt(batchIndex);
   }
-  constructor(
-    private readonly pantryStore: PantryStoreService,
-    private readonly pantryService: PantryService,
-    private readonly fb: FormBuilder,
-    private readonly toastCtrl: ToastController,
-    private readonly appPreferences: AppPreferencesService,
-    private readonly translate: TranslateService,
-    private readonly languageService: LanguageService,
-  ) {
-    this.searchTerm = this.pantryService.searchQuery;
-    this.activeFilters = this.pantryService.activeFilters;
-    this.sortOption = this.pantryService.sortMode;
-    this.selectedCategory = computed(() => this.activeFilters().categoryId ?? 'all');
-    this.selectedLocation = computed(() => this.activeFilters().locationId ?? 'all');
-    this.statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
-    this.basicOnly = computed(() => this.activeFilters().basic);
-
-    // Keep the UI in sync with the filtered pipeline, merging optimistic edits before rendering the list.
-    effect(() => {
-      const paginatedItems = this.pantryService.filteredProducts();
-      this.itemsState.set(this.mergePendingItems(paginatedItems));
-    });
-
-    // Expansion toggles depend on ids that might disappear when new batches arrive.
-    effect(() => {
-      this.syncExpandedItems(this.itemsState());
-    });
-
-    effect(() => {
-      const categories = this.categoryOptions();
-      const categoryFilter = this.activeFilters().categoryId;
-      if (categoryFilter && !categories.some(option => option.id === categoryFilter)) {
-        this.pantryService.setFilter('categoryId', null);
-      }
-    });
-
-    effect(() => {
-      const locations = this.locationOptions();
-      const locationFilter = this.activeFilters().locationId;
-      if (locationFilter && !locations.some(option => option.id === locationFilter)) {
-        this.pantryService.setFilter('locationId', null);
-      }
-    });
-
-    effect(() => {
-      const totalCount = this.pantryService.totalCount();
-      const loadedItems = this.pantryService.loadedProducts();
-      const isLoading = this.pantryService.loading();
-      const shouldUseFreshSummary = !isLoading || loadedItems.length > 0 || totalCount === 0;
-      if (shouldUseFreshSummary) {
-        this.summaryCache.set(this.buildSummary(loadedItems, totalCount));
-      }
-    });
-
-    effect(() => {
-      this.syncCollapsedGroups(this.groups());
-    });
-  }
-
-  /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
-  async ionViewWillEnter() {
-    await this.loadItems();
-    if (!this.realtimeSubscribed) {
-      this.pantryStore.watchRealtime();
-      this.realtimeSubscribed = true;
-    }
-  }
-
-  /** Convenience wrapper used by multiple entry points to reload the list. */
-  async loadItems(): Promise<void> {
-    if (this.pantryService.loadedProducts().length === 0) {
-      await this.pantryService.ensureFirstPageLoaded();
-      this.pantryService.startBackgroundLoad();
-    }
-    this.hasLoadedOnce.set(true);
-    this.scrollViewportToTop();
-  }
 
   /** Open the creation modal with blank defaults and a single location row. */
   openNewItemModal(): void {
     this.editingItem = null;
-    this.showAdvanced.set(false);
+    this.showAdvancedFilters.set(false);
     this.form.reset({
       name: '',
       quickQuantity: null,
@@ -327,7 +336,7 @@ export class PantryListComponent implements OnDestroy {
   openEditItemModal(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     this.editingItem = item;
-    this.showAdvanced.set(true);
+    this.showAdvancedFilters.set(true);
     this.form.reset({
       name: item.name ?? '',
       quickQuantity: null,
@@ -367,7 +376,7 @@ export class PantryListComponent implements OnDestroy {
     if (this.editingItem) {
       return;
     }
-    this.showAdvanced.update(value => {
+    this.showAdvancedFilters.update(value => {
       const next = !value;
       if (next) {
         this.form.patchValue({
@@ -392,14 +401,14 @@ export class PantryListComponent implements OnDestroy {
   /** Create a form group for a single location with coercion and sane defaults. */
   private createLocationGroup(initial?: Partial<ItemLocationStock>): FormGroup {
     const batches = Array.isArray(initial?.batches) ? initial.batches : [];
-    const rawLocation = (initial?.locationId ?? '').trim();
+    const rawLocation = normalizeLocationId(initial?.locationId);
     const locationId = rawLocation && rawLocation !== 'unassigned' ? rawLocation : '';
     return this.fb.group({
       locationId: this.fb.control(locationId, {
         validators: [Validators.required],
         nonNullable: true,
       }),
-      unit: this.fb.control<string>(this.normalizeUnitValue(initial?.unit), {
+      unit: this.fb.control<string>(normalizeUnitValue(initial?.unit), {
         nonNullable: true,
       }),
       batches: this.fb.array(
@@ -438,7 +447,7 @@ export class PantryListComponent implements OnDestroy {
    * Handles both creation and update flows through the store.
    */
   async submitItem(): Promise<void> {
-    const advancedMode = this.showAdvanced();
+    const advancedMode = this.showAdvancedFilters();
     if (advancedMode) {
       if (this.form.invalid) {
         this.form.markAllAsTouched();
@@ -524,7 +533,7 @@ export class PantryListComponent implements OnDestroy {
       return;
     }
 
-    const unit = this.normalizeUnitValue(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
+    const unit = normalizeUnitValue(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
     const originalBatches = Array.isArray(location.batches) ? location.batches : [];
     const targetIndex = originalBatches.indexOf(batch);
     const sanitizedBatches = this.sanitizeBatches(location.batches, unit);
@@ -536,7 +545,7 @@ export class PantryListComponent implements OnDestroy {
 
     const previousTotal = this.sumBatchQuantities(sanitizedBatches);
     const currentBatchQuantity = this.toNumber(sanitizedBatches[batchIndex].quantity);
-    const nextBatchQuantity = this.roundDisplayQuantity(Math.max(0, currentBatchQuantity + delta));
+    const nextBatchQuantity = roundQuantity(Math.max(0, currentBatchQuantity + delta));
 
     if (nextBatchQuantity === currentBatchQuantity) {
       return;
@@ -692,7 +701,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   getPrimaryUnit(item: PantryItem): string {
-    return this.normalizeUnitValue(this.pantryStore.getItemPrimaryUnit(item));
+    return normalizeUnitValue(this.pantryStore.getItemPrimaryUnit(item));
   }
 
   getUnitLabelForItem(item: PantryItem): string {
@@ -704,7 +713,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   getLocationLabel(locationId: string | undefined): string {
-    return this.getLocationLabelText(locationId, this.translate.instant('common.locations.none'));
+    return normalizeLocationId(locationId, this.translate.instant('common.locations.none'));
   }
 
   onSummaryKeydown(item: PantryItem, event: KeyboardEvent): void {
@@ -848,7 +857,7 @@ export class PantryListComponent implements OnDestroy {
         }
         const quantityLabel =
           this.formatQuantityForMessage(total, location.unit ?? this.getPrimaryUnit(item)) ??
-          this.roundDisplayQuantity(total).toString();
+          formatQuantity(total, this.languageService.getCurrentLocale(), { maximumFractionDigits: 2 });
         return {
           value: location.locationId,
           label: this.getLocationLabel(location.locationId),
@@ -862,7 +871,7 @@ export class PantryListComponent implements OnDestroy {
     if (!item) {
       return [];
     }
-    const exclude = this.normalizeKey(this.moveForm.controls.fromLocation.value ?? '');
+    const exclude = normalizeKey(this.moveForm.controls.fromLocation.value ?? '');
     const seen = new Set<string>();
     const suggestions: string[] = [];
     const addSuggestion = (value: string | undefined | null): void => {
@@ -870,7 +879,7 @@ export class PantryListComponent implements OnDestroy {
       if (!trimmed) {
         return;
       }
-      const key = this.normalizeKey(trimmed);
+      const key = normalizeKey(trimmed);
       if (!key || key === exclude || seen.has(key)) {
         return;
       }
@@ -925,7 +934,7 @@ export class PantryListComponent implements OnDestroy {
       this.moveError = this.translate.instant('pantry.move.errors.missingLocations');
       return;
     }
-    if (this.normalizeKey(fromLocation) === this.normalizeKey(toLocation)) {
+    if (normalizeKey(fromLocation) === normalizeKey(toLocation)) {
       this.moveError = this.translate.instant('pantry.move.errors.sameLocation');
       return;
     }
@@ -944,7 +953,7 @@ export class PantryListComponent implements OnDestroy {
         return;
       }
 
-      this.itemsState.update(items =>
+      this.pantryItemsState.update(items =>
         items.map(existing => (existing._id === result.updatedItem._id ? result.updatedItem : existing))
       );
       this.triggerStockSave(result.updatedItem._id, result.updatedItem);
@@ -1172,12 +1181,12 @@ export class PantryListComponent implements OnDestroy {
     for (const item of items) {
       const seen = new Set<string>();
       for (const location of item.locations) {
-        const id = (location.locationId ?? '').trim();
+        const id = normalizeLocationId(location.locationId);
         if (seen.has(id)) {
           continue;
         }
         seen.add(id);
-        const label = this.getLocationLabelText(id, this.translate.instant('common.locations.none'));
+        const label = normalizeLocationId(id, this.translate.instant('common.locations.none'));
         const current = counts.get(id);
         if (current) {
           current.count += 1;
@@ -1200,11 +1209,10 @@ export class PantryListComponent implements OnDestroy {
   private computeSupermarketOptions(items: PantryItem[]): string[] {
     const options = new Map<string, string>();
     for (const item of items) {
-      const value = (item.supermarket ?? '').trim();
-      if (!value) {
+      const normalizedValue = normalizeSupermarketValue(item.supermarket);
+      if (!normalizedValue) {
         continue;
       }
-      const normalizedValue = value.replace(/\s+/g, ' ');
       const key = normalizedValue.toLowerCase();
       if (!options.has(key)) {
         options.set(key, normalizedValue);
@@ -1219,7 +1227,7 @@ export class PantryListComponent implements OnDestroy {
     const options: Array<{ value: string; label: string }> = [];
 
     const addOption = (value: string, label?: string): void => {
-      const normalized = this.normalizeKey(value);
+      const normalized = normalizeKey(value);
       if (!normalized || seen.has(normalized)) {
         return;
       }
@@ -1233,16 +1241,16 @@ export class PantryListComponent implements OnDestroy {
       addOption(preset);
     }
 
-    for (const item of this.itemsState()) {
-      const id = this.normalizeCategoryId(item.categoryId);
+    for (const item of this.pantryItemsState()) {
+      const id = normalizeCategoryId(item.categoryId);
       if (id) {
         addOption(id);
       }
     }
 
     const control = this.form.get('categoryId');
-    const currentValue = typeof control?.value === 'string' ? this.normalizeCategoryId(control.value) : '';
-    if (currentValue && !seen.has(this.normalizeKey(currentValue))) {
+    const currentValue = typeof control?.value === 'string' ? normalizeCategoryId(control.value) : '';
+    if (currentValue && !seen.has(normalizeKey(currentValue))) {
       addOption(currentValue);
     }
 
@@ -1251,31 +1259,9 @@ export class PantryListComponent implements OnDestroy {
 
   private computePresetCategoryOptions(): string[] {
     const prefs = this.appPreferences.preferences();
-    const source = Array.isArray(prefs.categoryOptions) ? prefs.categoryOptions : [];
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-
-    for (const option of source) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = this.normalizeKey(trimmed);
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-
-    if (!normalized.length) {
-      return [...DEFAULT_CATEGORY_OPTIONS];
-    }
-
-    return normalized;
+    return normalizeStringList(prefs.categoryOptions, {
+      fallback: DEFAULT_CATEGORY_OPTIONS,
+    });
   }
 
   getLocationOptionsForControl(index: number): Array<{ value: string; label: string }> {
@@ -1284,12 +1270,12 @@ export class PantryListComponent implements OnDestroy {
     const options: Array<{ value: string; label: string }> = [];
 
     const addOption = (value: string, label?: string): void => {
-      const normalized = this.normalizeKey(value);
+      const normalized = normalizeKey(value);
       if (!normalized || seen.has(normalized)) {
         return;
       }
       seen.add(normalized);
-      const display = label ?? this.getLocationLabelText(value, this.translate.instant('common.locations.none'));
+      const display = label ?? normalizeLocationId(value, this.translate.instant('common.locations.none'));
       options.push({ value, label: display });
     };
 
@@ -1298,8 +1284,8 @@ export class PantryListComponent implements OnDestroy {
     }
 
     const control = this.locationsArray.at(index);
-    const currentValue = (control?.get('locationId')?.value ?? '').trim();
-    if (currentValue && !seen.has(this.normalizeKey(currentValue))) {
+    const currentValue = normalizeLocationId(control?.get('locationId')?.value);
+    if (currentValue && !seen.has(normalizeKey(currentValue))) {
       addOption(currentValue);
     }
 
@@ -1313,7 +1299,7 @@ export class PantryListComponent implements OnDestroy {
     const options: Array<{ value: string; label: string }> = [];
 
     const addOption = (value: string, label?: string): void => {
-      const normalized = this.normalizeKey(value);
+      const normalized = normalizeKey(value);
       if (!normalized || seen.has(normalized)) {
         return;
       }
@@ -1333,7 +1319,7 @@ export class PantryListComponent implements OnDestroy {
 
     const control = this.form.get('supermarket');
     const currentValue = (control?.value ?? '').trim();
-    if (currentValue && !seen.has(this.normalizeKey(currentValue))) {
+    if (currentValue && !seen.has(normalizeKey(currentValue))) {
       addOption(currentValue);
     }
 
@@ -1342,60 +1328,16 @@ export class PantryListComponent implements OnDestroy {
 
   private computePresetLocationOptions(): string[] {
     const prefs = this.appPreferences.preferences();
-    const source = Array.isArray(prefs.locationOptions) ? prefs.locationOptions : [];
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-
-    for (const option of source) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = this.normalizeKey(trimmed);
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-
-    if (!normalized.length) {
-      return [...DEFAULT_LOCATION_OPTIONS];
-    }
-
-    return normalized;
+    return normalizeStringList(prefs.locationOptions, {
+      fallback: DEFAULT_LOCATION_OPTIONS,
+    });
   }
 
   private computePresetSupermarketOptions(): string[] {
     const prefs = this.appPreferences.preferences();
-    const source = Array.isArray(prefs.supermarketOptions) ? prefs.supermarketOptions : [];
-    const seen = new Set<string>();
-    const normalized: string[] = [];
-
-    for (const option of source) {
-      if (typeof option !== 'string') {
-        continue;
-      }
-      const trimmed = option.trim();
-      if (!trimmed) {
-        continue;
-      }
-      const key = this.normalizeKey(trimmed);
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
-      normalized.push(trimmed);
-    }
-
-    if (!normalized.length) {
-      return [...DEFAULT_SUPERMARKET_OPTIONS];
-    }
-
-    return normalized;
+    return normalizeStringList(prefs.supermarketOptions, {
+      fallback: DEFAULT_SUPERMARKET_OPTIONS,
+    });
   }
 
   private formatSupermarketLabel(value: string): string {
@@ -1404,21 +1346,6 @@ export class PantryListComponent implements OnDestroy {
       return this.translate.instant('settings.catalogs.supermarkets.other');
     }
     return value.trim();
-  }
-
-  private normalizeKey(value: string): string {
-    return value.trim().toLowerCase();
-  }
-
-  private normalizeUnitValue(unit: MeasurementUnit | string | undefined): string {
-    if (typeof unit !== 'string') {
-      return MeasurementUnit.UNIT;
-    }
-    const trimmed = unit.trim();
-    if (!trimmed) {
-      return MeasurementUnit.UNIT;
-    }
-    return trimmed;
   }
 
   getTotalBatchCount(item: PantryItem): number {
@@ -1442,7 +1369,7 @@ export class PantryListComponent implements OnDestroy {
     const unitLabel = this.getUnitLabelForItem(item);
     const totalBatches = this.getTotalBatchCount(item);
     const locale = this.languageService.getCurrentLocale();
-    const formattedQuantityValue = this.roundDisplayQuantity(totalQuantity).toLocaleString(locale, {
+    const formattedQuantityValue = formatQuantity(totalQuantity, locale, {
       maximumFractionDigits: 2,
     });
     const baseQuantityLabel = unitLabel ? `${formattedQuantityValue} ${unitLabel}` : formattedQuantityValue;
@@ -1463,13 +1390,22 @@ export class PantryListComponent implements OnDestroy {
       formattedDate: this.formatBatchDate(entry.batch),
       quantityLabel: this.formatBatchQuantity(entry.batch, entry.locationUnit),
       quantityValue: this.toNumber(entry.batch.quantity),
-      unitLabel: this.getUnitLabel(this.normalizeUnitValue(entry.locationUnit)),
+      unitLabel: this.getUnitLabel(normalizeUnitValue(entry.locationUnit)),
       opened: Boolean(entry.batch.opened),
     }));
 
     const lowStock = this.isLowStock(item);
     const aggregates = this.computeProductAggregates(batches, lowStock);
     const colorClass = this.getColorClass(aggregates.status.state);
+    const fallbackLabel = this.translate.instant('common.dates.none');
+    const formattedEarliestExpirationShort = aggregates.earliestDate
+      ? formatShortDate(aggregates.earliestDate, locale, { fallback: aggregates.earliestDate })
+      : fallbackLabel;
+    const formattedEarliestExpirationLong = aggregates.earliestDate
+      ? formatDateValue(aggregates.earliestDate, locale, ES_DATE_FORMAT_OPTIONS.numeric, {
+          fallback: aggregates.earliestDate,
+        })
+      : fallbackLabel;
 
     return {
       item,
@@ -1481,12 +1417,8 @@ export class PantryListComponent implements OnDestroy {
       globalStatus: aggregates.status,
       colorClass,
       earliestExpirationDate: aggregates.earliestDate,
-      formattedEarliestExpirationShort: aggregates.earliestDate
-        ? this.formatDateCompact(aggregates.earliestDate)
-        : this.translate.instant('common.dates.none'),
-      formattedEarliestExpirationLong: aggregates.earliestDate
-        ? this.formatDateVerbose(aggregates.earliestDate)
-        : this.translate.instant('common.dates.none'),
+      formattedEarliestExpirationShort,
+      formattedEarliestExpirationLong,
       batchCountsLabel: aggregates.batchSummaryLabel,
       batchCounts: aggregates.counts,
       batches,
@@ -1498,20 +1430,16 @@ export class PantryListComponent implements OnDestroy {
     if (!value) {
       return this.translate.instant('common.dates.none');
     }
-    try {
-      return this.formatDateVerbose(value);
-    } catch {
-      return value;
-    }
+    return formatDateValue(value, this.languageService.getCurrentLocale(), ES_DATE_FORMAT_OPTIONS.numeric, {
+      fallback: value,
+    });
   }
 
   formatBatchQuantity(batch: ItemBatch, locationUnit: string | MeasurementUnit | undefined): string {
-    const formatted = this.roundDisplayQuantity(this.toNumber(batch.quantity)).toLocaleString(
-      this.languageService.getCurrentLocale(),
-      {
+    const formatted = formatQuantity(this.toNumber(batch.quantity), this.languageService.getCurrentLocale(), {
       maximumFractionDigits: 2,
     });
-    const unitLabel = this.getUnitLabel(this.normalizeUnitValue(locationUnit));
+    const unitLabel = this.getUnitLabel(normalizeUnitValue(locationUnit));
     return `${formatted} ${unitLabel}`;
   }
 
@@ -1587,30 +1515,6 @@ export class PantryListComponent implements OnDestroy {
     };
   }
 
-  private formatDateCompact(value: string): string {
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return value;
-      }
-      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
-    } catch {
-      return value;
-    }
-  }
-
-  private formatDateVerbose(value: string): string {
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return value;
-      }
-      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
-    } catch {
-      return value;
-    }
-  }
-
   private getColorClass(state: ProductStatusState): string {
     switch (state) {
       case 'expired':
@@ -1630,33 +1534,33 @@ export class PantryListComponent implements OnDestroy {
         return {
           state,
           label: 'Caducado',
-          accentColor: '#DC2626',
-          chipColor: '#DC2626',
-          chipTextColor: '#F8FAFC',
+          accentColor: 'var(--ion-color-danger)',
+          chipColor: 'var(--ion-color-danger)',
+          chipTextColor: 'var(--ion-color-dark-contrast)',
         };
       case 'near-expiry':
         return {
           state,
           label: 'Por caducar',
-          accentColor: '#FACC15',
-          chipColor: '#FACC15',
-          chipTextColor: '#F8FAFC',
+          accentColor: 'var(--ion-color-warning)',
+          chipColor: 'var(--ion-color-warning)',
+          chipTextColor: 'var(--ion-text-color)',
         };
       case 'low-stock':
         return {
           state,
           label: 'Bajo stock',
-          accentColor: '#FB923C',
-          chipColor: '#FB923C',
-          chipTextColor: '#0F172A',
+          accentColor: 'var(--ion-color-warning)',
+          chipColor: 'var(--ion-color-warning)',
+          chipTextColor: 'var(--ion-color-dark)',
         };
       default:
         return {
           state: 'normal',
           label: 'Stock',
-          accentColor: '#16A34A',
-          chipColor: '#16A34A',
-          chipTextColor: '#F8FAFC',
+          accentColor: 'var(--ion-color-primary)',
+          chipColor: 'var(--ion-color-primary)',
+          chipTextColor: 'var(--ion-color-primary-contrast)',
         };
     }
   }
@@ -1692,7 +1596,7 @@ export class PantryListComponent implements OnDestroy {
     const batches: BatchEntryMeta[] = [];
     for (const location of item.locations) {
       const locationLabel = this.getLocationLabel(location.locationId);
-      const locationUnit = this.normalizeUnitValue(location.unit);
+      const locationUnit = normalizeUnitValue(location.unit);
       const entries = this.getLocationBatches(location);
       for (const batch of entries) {
         batches.push({
@@ -1848,7 +1752,7 @@ export class PantryListComponent implements OnDestroy {
     const earliest = this.getLocationEarliestExpiry(location);
     if (earliest) {
       return this.translate.instant('pantry.detail.locationMeta.expires', {
-        date: this.formatShortDate(earliest),
+        date: formatShortDate(earliest, this.languageService.getCurrentLocale(), { fallback: earliest }),
       });
     }
     const openedCount = batches.filter(batch => batch.opened).length;
@@ -1875,7 +1779,7 @@ export class PantryListComponent implements OnDestroy {
 
   getLocationUnitLabelForControl(index: number): string {
     const control = this.locationsArray.at(index).get('unit');
-    const value = this.normalizeUnitValue(control?.value as MeasurementUnit | string | undefined);
+    const value = normalizeUnitValue(control?.value as MeasurementUnit | string | undefined);
     return this.getUnitLabel(value);
   }
 
@@ -1895,31 +1799,19 @@ export class PantryListComponent implements OnDestroy {
     });
   }
 
-  private formatShortDate(value: string): string {
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return value;
-      }
-      return parsed.toLocaleDateString('es-ES', ES_DATE_FORMAT_OPTIONS.numeric);
-    } catch {
-      return value;
-    }
-  }
-
   /**
    * Mutate the local signal cache to reflect a quantity change before persistence.
    * Ensures a location entry exists even if the delta introduces a new bucket.
    */
   private applyLocationBatches(itemId: string, locationId: string, batches: ItemBatch[]): PantryItem | null {
     let updatedItem: PantryItem | null = null;
-    this.itemsState.update(items =>
+    this.pantryItemsState.update(items =>
       items.map(item => {
         if (item._id !== itemId) {
           return item;
         }
 
-        const unitFallback = this.normalizeUnitValue(
+        const unitFallback = normalizeUnitValue(
           item.locations.find(loc => loc.locationId === locationId)?.unit ?? this.getPrimaryUnit(item)
         );
 
@@ -1927,7 +1819,7 @@ export class PantryListComponent implements OnDestroy {
         const nextLocations = item.locations.map(loc => {
           if (loc.locationId === locationId) {
             found = true;
-            const normalizedUnit = this.normalizeUnitValue(loc.unit ?? unitFallback);
+            const normalizedUnit = normalizeUnitValue(loc.unit ?? unitFallback);
             return {
               ...loc,
               unit: normalizedUnit,
@@ -1938,7 +1830,7 @@ export class PantryListComponent implements OnDestroy {
         });
 
         if (!found) {
-          const normalizedUnit = this.normalizeUnitValue(unitFallback);
+          const normalizedUnit = normalizeUnitValue(unitFallback);
           nextLocations.push({
             locationId,
             unit: normalizedUnit,
@@ -1961,25 +1853,25 @@ export class PantryListComponent implements OnDestroy {
     toLocationId: string,
     requestedQuantity: number
   ): { updatedItem: PantryItem; quantityLabel: string; fromLabel: string; toLabel: string } | null {
-    const normalizedFrom = this.normalizeKey(fromLocationId);
-    const normalizedTo = this.normalizeKey(toLocationId);
+    const normalizedFrom = normalizeKey(fromLocationId);
+    const normalizedTo = normalizeKey(toLocationId);
     if (!normalizedFrom || !normalizedTo || normalizedFrom === normalizedTo) {
       return null;
     }
 
-    const source = item.locations.find(loc => this.normalizeKey(loc.locationId) === normalizedFrom);
+    const source = item.locations.find(loc => normalizeKey(loc.locationId) === normalizedFrom);
     if (!source) {
       return null;
     }
 
-    const unit = this.normalizeUnitValue(source.unit ?? this.getPrimaryUnit(item));
+    const unit = normalizeUnitValue(source.unit ?? this.getPrimaryUnit(item));
     const sanitizedSource = this.sanitizeBatches(source.batches, unit);
     const available = this.sumBatchQuantities(sanitizedSource);
     if (available <= 0) {
       return null;
     }
 
-    const amountToMove = this.roundDisplayQuantity(Math.min(Math.max(requestedQuantity, 0), available));
+    const amountToMove = roundQuantity(Math.min(Math.max(requestedQuantity, 0), available));
     if (amountToMove <= 0) {
       return null;
     }
@@ -1989,13 +1881,13 @@ export class PantryListComponent implements OnDestroy {
       return null;
     }
 
-    const destination = item.locations.find(loc => this.normalizeKey(loc.locationId) === normalizedTo);
-    const destinationUnit = this.normalizeUnitValue(destination?.unit ?? unit);
+    const destination = item.locations.find(loc => normalizeKey(loc.locationId) === normalizedTo);
+    const destinationUnit = normalizeUnitValue(destination?.unit ?? unit);
     const sanitizedDestination = this.sanitizeBatches(destination?.batches, destinationUnit);
     const mergedDestination = this.mergeBatchesByExpiry([...sanitizedDestination, ...moved]);
 
     const nextLocations = item.locations.filter(
-      loc => this.normalizeKey(loc.locationId) !== normalizedFrom && this.normalizeKey(loc.locationId) !== normalizedTo
+      loc => normalizeKey(loc.locationId) !== normalizedFrom && normalizeKey(loc.locationId) !== normalizedTo
     );
 
     if (this.sumBatchQuantities(remaining) > 0) {
@@ -2018,16 +1910,16 @@ export class PantryListComponent implements OnDestroy {
     const updatedItem = this.rebuildItemWithLocations(item, nextLocations);
     const quantityLabel =
       this.formatQuantityForMessage(amountToMove, unit) ??
-      `${this.roundDisplayQuantity(amountToMove)} ${this.getUnitLabel(unit)}`;
+      `${roundQuantity(amountToMove)} ${this.getUnitLabel(unit)}`;
 
     return {
       updatedItem,
       quantityLabel,
-      fromLabel: this.getLocationLabelText(
+      fromLabel: normalizeLocationId(
         source.locationId,
         this.translate.instant('common.locations.none')
       ),
-      toLabel: this.getLocationLabelText(
+      toLabel: normalizeLocationId(
         toLocationId,
         this.translate.instant('common.locations.none')
       ),
@@ -2035,7 +1927,7 @@ export class PantryListComponent implements OnDestroy {
   }
 
   private extractBatchesForMove(batches: ItemBatch[], amount: number): MoveBatchesResult {
-    let remaining = this.roundDisplayQuantity(Math.max(0, amount));
+    let remaining = roundQuantity(Math.max(0, amount));
     const ordered = [...batches].sort((a, b) => {
       const aTime = this.getBatchTime(a) ?? Number.MAX_SAFE_INTEGER;
       const bTime = this.getBatchTime(b) ?? Number.MAX_SAFE_INTEGER;
@@ -2046,7 +1938,7 @@ export class PantryListComponent implements OnDestroy {
     const leftover: ItemBatch[] = [];
 
     for (const batch of ordered) {
-      const quantity = this.roundDisplayQuantity(this.toNumber(batch.quantity));
+      const quantity = roundQuantity(this.toNumber(batch.quantity));
       if (quantity <= 0) {
         continue;
       }
@@ -2056,10 +1948,10 @@ export class PantryListComponent implements OnDestroy {
       }
       if (quantity <= remaining) {
         moved.push({ ...batch, quantity });
-        remaining = this.roundDisplayQuantity(remaining - quantity);
+        remaining = roundQuantity(remaining - quantity);
       } else {
         moved.push({ ...batch, quantity: remaining });
-        const remainder = this.roundDisplayQuantity(quantity - remaining);
+        const remainder = roundQuantity(quantity - remaining);
         leftover.push({ ...batch, quantity: remainder });
         remaining = 0;
       }
@@ -2076,13 +1968,13 @@ export class PantryListComponent implements OnDestroy {
   }
 
   private getSuggestedDestination(item: PantryItem, fromId: string): string {
-    const normalizedFrom = this.normalizeKey(fromId);
-    const alternative = item.locations.find(loc => this.normalizeKey(loc.locationId) !== normalizedFrom)?.locationId;
+    const normalizedFrom = normalizeKey(fromId);
+    const alternative = item.locations.find(loc => normalizeKey(loc.locationId) !== normalizedFrom)?.locationId;
     if (alternative) {
       return alternative;
     }
     const presets = this.presetLocationOptions();
-    const presetOption = presets.find(option => this.normalizeKey(option) !== normalizedFrom);
+    const presetOption = presets.find(option => normalizeKey(option) !== normalizedFrom);
     if (presetOption) {
       return presetOption;
     }
@@ -2091,7 +1983,7 @@ export class PantryListComponent implements OnDestroy {
 
   private getAvailableQuantityFor(item: PantryItem, locationId: string): number {
     return this.getLocationTotal(
-      item.locations.find(loc => this.normalizeKey(loc.locationId) === this.normalizeKey(locationId)) ?? {
+      item.locations.find(loc => normalizeKey(loc.locationId) === normalizeKey(locationId)) ?? {
         locationId: '',
         unit: this.getPrimaryUnit(item),
         batches: [],
@@ -2100,8 +1992,8 @@ export class PantryListComponent implements OnDestroy {
   }
 
   private getLocationUnitForItem(item: PantryItem, locationId: string): string {
-    const location = item.locations.find(loc => this.normalizeKey(loc.locationId) === this.normalizeKey(locationId));
-    return this.normalizeUnitValue(location?.unit ?? this.getPrimaryUnit(item));
+    const location = item.locations.find(loc => normalizeKey(loc.locationId) === normalizeKey(locationId));
+    return normalizeUnitValue(location?.unit ?? this.getPrimaryUnit(item));
   }
 
   /**
@@ -2129,12 +2021,12 @@ export class PantryListComponent implements OnDestroy {
     if (!Array.isArray(batches) || !batches.length) {
       return [];
     }
-    const normalizedUnit = this.normalizeUnitValue(unit);
+    const normalizedUnit = normalizeUnitValue(unit);
     const normalized = batches.map(batch => ({
       ...batch,
       batchId: batch.batchId ?? this.createTempBatchId(),
       quantity: this.toNumber(batch.quantity),
-      unit: this.normalizeUnitValue(batch.unit ?? normalizedUnit),
+      unit: normalizeUnitValue(batch.unit ?? normalizedUnit),
       opened: batch.opened ?? false,
     }));
 
@@ -2175,7 +2067,7 @@ export class PantryListComponent implements OnDestroy {
       return 0;
     }
     const total = batches.reduce((sum, batch) => sum + this.toNumber(batch.quantity), 0);
-    return this.roundDisplayQuantity(total);
+    return roundQuantity(total);
   }
 
   private toNumber(value: unknown): number {
@@ -2189,7 +2081,7 @@ export class PantryListComponent implements OnDestroy {
 
   private updateLocationTotals(locations: ItemLocationStock[]): ItemLocationStock[] {
     return locations.map(location => {
-      const unit = this.normalizeUnitValue(location.unit);
+      const unit = normalizeUnitValue(location.unit);
       return {
         ...location,
         unit,
@@ -2369,9 +2261,11 @@ export class PantryListComponent implements OnDestroy {
     }
     return locations
       .map(location => {
-        const quantity = this.roundDisplayQuantity(this.getLocationTotal(location));
-        const unitLabel = this.getUnitLabel(this.normalizeUnitValue(location.unit));
-        const label = this.getLocationLabelText(
+        const quantityLabel = formatQuantity(this.getLocationTotal(location), this.languageService.getCurrentLocale(), {
+          maximumFractionDigits: 2,
+        });
+        const unitLabel = this.getUnitLabel(normalizeUnitValue(location.unit));
+        const label = normalizeLocationId(
           location.locationId,
           this.translate.instant('common.locations.none')
         );
@@ -2387,13 +2281,13 @@ export class PantryListComponent implements OnDestroy {
           if (earliest) {
             extras.push(
               this.translate.instant('pantry.detail.batches.withExpiry', {
-                date: this.formatShortDate(earliest),
+                date: formatShortDate(earliest, this.languageService.getCurrentLocale(), { fallback: earliest }),
               })
             );
           }
         }
         const meta = extras.length ? ` (${extras.join(' · ')})` : '';
-        return `${quantity} ${unitLabel} · ${label}${meta}`;
+        return `${quantityLabel} ${unitLabel} · ${label}${meta}`;
       })
       .join(', ');
   }
@@ -2402,19 +2296,11 @@ export class PantryListComponent implements OnDestroy {
     if (quantity == null || Number.isNaN(Number(quantity))) {
       return null;
     }
-    const formattedNumber = this.roundDisplayQuantity(Number(quantity)).toLocaleString(
-      this.languageService.getCurrentLocale(),
-      {
-        maximumFractionDigits: 2,
-      }
-    );
-    const unitLabel = this.getUnitLabel(this.normalizeUnitValue(unit ?? undefined));
+    const formattedNumber = formatQuantity(quantity, this.languageService.getCurrentLocale(), {
+      maximumFractionDigits: 2,
+    });
+    const unitLabel = this.getUnitLabel(normalizeUnitValue(unit ?? undefined));
     return `${formattedNumber} ${unitLabel}`.trim();
-  }
-
-  private roundDisplayQuantity(value: number): number {
-    const num = Number.isFinite(value) ? value : 0;
-    return Math.round(num * 100) / 100;
   }
 
   /**
@@ -2440,11 +2326,11 @@ export class PantryListComponent implements OnDestroy {
     const locations: ItemLocationStock[] = this.locationsArray.controls
       .map(control => {
         const value = control.value as any;
-        const rawLocationId = (value?.locationId ?? '').trim();
+        const rawLocationId = normalizeLocationId(value?.locationId);
         if (!rawLocationId) {
           return null;
         }
-        const unit = this.normalizeUnitValue(value?.unit as MeasurementUnit | string | undefined);
+        const unit = normalizeUnitValue(value?.unit as MeasurementUnit | string | undefined);
         const batchesControl = control.get('batches');
         const batches = batchesControl instanceof FormArray
           ? (batchesControl.controls as FormGroup[]).map(group => {
@@ -2484,8 +2370,8 @@ export class PantryListComponent implements OnDestroy {
     }
 
     const earliestExpiry = this.computeEarliestExpiry(locations);
-    const normalizedSupermarket = this.normalizeSupermarketInput(supermarket);
-    const normalizedCategory = this.normalizeCategoryId(categoryId);
+    const normalizedSupermarket = normalizeSupermarketValue(supermarket);
+    const normalizedCategory = normalizeCategoryId(categoryId);
 
     const base: PantryItem = {
       _id: identifier,
@@ -2518,8 +2404,8 @@ export class PantryListComponent implements OnDestroy {
     const quantity = this.getQuickQuantity();
     const identifier = existing?._id ?? createDocumentId('item');
     const now = new Date().toISOString();
-    const normalizedSupermarket = this.normalizeSupermarketInput(supermarket);
-    const normalizedCategory = this.normalizeCategoryId(categoryId);
+    const normalizedSupermarket = normalizeSupermarketValue(supermarket);
+    const normalizedCategory = normalizeCategoryId(categoryId);
     const defaultLocation = this.getDefaultLocationId();
     const batch: ItemBatch = {
       quantity,
@@ -2556,17 +2442,6 @@ export class PantryListComponent implements OnDestroy {
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     };
-  }
-
-  private normalizeSupermarketInput(value: string | undefined): string | undefined {
-    if (typeof value !== 'string') {
-      return undefined;
-    }
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return undefined;
-    }
-    return trimmed.replace(/\s+/g, ' ');
   }
 
   private getStatusFilterValue(filters: PantryFilterState): PantryStatusFilterValue {
@@ -2606,7 +2481,7 @@ export class PantryListComponent implements OnDestroy {
     }
 
     for (const item of items) {
-      const id = this.normalizeCategoryId(item.categoryId);
+      const id = normalizeCategoryId(item.categoryId);
       const label = this.formatCategoryName(id);
       const current = counts.get(id);
       if (current) {
@@ -2638,7 +2513,7 @@ export class PantryListComponent implements OnDestroy {
     const map = new Map<string, PantryGroup>();
 
     for (const item of items) {
-      const key = this.normalizeCategoryId(item.categoryId);
+      const key = normalizeCategoryId(item.categoryId);
       const name = this.formatCategoryName(key);
       let group = map.get(key);
       if (!group) {
@@ -2675,18 +2550,6 @@ export class PantryListComponent implements OnDestroy {
     return this.formatFriendlyName(key, this.translate.instant('pantry.form.uncategorized'));
   }
 
-  /** Normalize category ids for display, collapsing legacy placeholders. */
-  private normalizeCategoryId(value: string | null | undefined): string {
-    const trimmed = (value ?? '').trim();
-    if (!trimmed) {
-      return '';
-    }
-    if (trimmed.toLowerCase() === 'uncategorized') {
-      return '';
-    }
-    return trimmed;
-  }
-
   private formatFriendlyName(value: string, fallback: string): string {
     const key = value?.trim();
     if (!key) {
@@ -2698,11 +2561,6 @@ export class PantryListComponent implements OnDestroy {
       .filter(Boolean)
       .map(part => part.charAt(0).toUpperCase() + part.slice(1))
       .join(' ');
-  }
-
-  private getLocationLabelText(id: string | null | undefined, fallback: string = ''): string {
-    const value = (id ?? '').trim();
-    return value || fallback || 'No location';
   }
 
   private toDateInputValue(dateIso: string): string {
@@ -2723,7 +2581,7 @@ export class PantryListComponent implements OnDestroy {
     return fallback ? fallback.trim() : 'unassigned';
   }
 
-  private syncExpandedItems(source: PantryItem[] = this.itemsState()): void {
+  private syncExpandedItems(source: PantryItem[] = this.pantryItemsState()): void {
     const validIds = new Set(source.map(item => item._id));
     for (const id of Array.from(this.expandedItems)) {
       if (!validIds.has(id)) {

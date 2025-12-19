@@ -5,30 +5,44 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  @if (visibleInsights().length) {
+    <div class="insights-stack">
+      @for (insight of visibleInsights(); track insight.id) {
+        <app-insight-card
+          [insight]="insight"
+          (dismiss)="dismissInsight(insight)">
+        </app-insight-card>
+      }
+    </div>
+  }
+
   <ion-card>
     <ion-card-header>
-      <div class="card-header-actions">
-        <ion-card-title>{{ 'dashboard.summary.title' | translate }}</ion-card-title>
-        <ion-button
-          fill="clear"
-          size="small"
-          (click)="toggleSnapshot()"
-          [attr.aria-expanded]="showSnapshot()"
-          [attr.aria-label]="'dashboard.summary.toggle' | translate"
-        >
-          <ion-icon
-            slot="icon-only"
-            [name]="showSnapshot() ? 'chevron-up-outline' : 'chevron-down-outline'"
-          ></ion-icon>
-        </ion-button>
+      <div class="card-header-content">
+        <div class="card-header-actions">
+          <ion-card-title>{{ 'dashboard.summary.title' | translate }}</ion-card-title>
+          <ion-button
+            class="card-header-toggle"
+            fill="clear"
+            size="small"
+            (click)="toggleSnapshotCard()"
+            [attr.aria-expanded]="isSnapshotCardExpanded()"
+            [attr.aria-label]="'dashboard.summary.toggle' | translate"
+          >
+            <ion-icon
+              slot="icon-only"
+              [name]="isSnapshotCardExpanded() ? 'chevron-up-outline' : 'chevron-down-outline'"
+            ></ion-icon>
+          </ion-button>
+        </div>
+        @if (lastRefreshTimestamp()) {
+          <ion-card-subtitle>
+            {{ 'dashboard.summary.updated' | translate:{ value: formatLastUpdated(lastRefreshTimestamp()) } }}
+          </ion-card-subtitle>
+        }
       </div>
-      @if (lastUpdated()) {
-        <ion-card-subtitle>
-          {{ 'dashboard.summary.updated' | translate:{ value: formatLastUpdated(lastUpdated()) } }}
-        </ion-card-subtitle>
-      }
     </ion-card-header>
-    @if (showSnapshot()) {
+    @if (isSnapshotCardExpanded()) {
       <ion-card-content>
         <div class="stat-grid">
           <div class="stat">
@@ -66,9 +80,9 @@
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>{{ 'dashboard.nearExpiry.expires' | translate:{ date: formatExpiryFull(item.expirationDate) } }}</p>
+                <p>{{ 'dashboard.nearExpiry.expires' | translate:{ date: formatDate(item.expirationDate) } }}</p>
               </ion-label>
-              <ion-badge color="warning">{{ formatExpiryBadge(item.expirationDate) }}</ion-badge>
+              <ion-badge color="warning">{{ formatDate(item.expirationDate) }}</ion-badge>
             </ion-item>
           }
         </ion-list>
@@ -124,16 +138,16 @@
     <ion-card-header>
       <div class="card-header-actions">
         <ion-card-title>{{ 'dashboard.expired.title' | translate }}</ion-card-title>
-        @if (expiredItems().length) {
+        @if (hasExpiredItems()) {
           <ion-button
             color="danger"
             fill="clear"
             size="small"
-            [disabled]="deletingExpired()"
+            [disabled]="isDeletingExpiredItems()"
             (click)="onDeleteExpiredItems()"
             [attr.aria-label]="'dashboard.expired.deleteAria' | translate"
           >
-            @if (deletingExpired()) {
+            @if (isDeletingExpiredItems()) {
               <ion-spinner slot="icon-only" name="crescent"></ion-spinner>
             } @else {
               <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
@@ -143,13 +157,13 @@
       </div>
     </ion-card-header>
     <ion-card-content>
-      @if (expiredItems().length) {
+      @if (hasExpiredItems()) {
         <ion-list lines="none" class="fade-in-list">
           @for (item of expiredItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>{{ 'dashboard.expired.expires' | translate:{ date: formatExpiryFull(item.expirationDate) } }}</p>
+                <p>{{ 'dashboard.expired.expires' | translate:{ date: formatDate(item.expirationDate) } }}</p>
               </ion-label>
               <ion-badge color="medium">{{ 'dashboard.expired.badge' | translate }}</ion-badge>
             </ion-item>
@@ -171,13 +185,13 @@
       <ion-card-title>{{ 'dashboard.recent.title' | translate }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      @if (recentItems().length) {
+      @if (recentlyUpdatedItems().length) {
         <ion-list lines="none" class="fade-in-list">
-          @for (item of recentItems(); track item._id) {
+          @for (item of recentlyUpdatedItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>{{ 'dashboard.recent.updated' | translate:{ date: formatExpiryFull(item.updatedAt) } }}</p>
+                <p>{{ 'dashboard.recent.updated' | translate:{ date: formatDate(item.updatedAt) } }}</p>
               </ion-label>
               <ion-badge color="tertiary">{{ 'dashboard.recent.badge' | translate }}</ion-badge>
             </ion-item>

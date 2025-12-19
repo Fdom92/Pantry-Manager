@@ -1,9 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { ES_DATE_FORMAT_OPTIONS, ItemLocationStock, PantryItem } from '@core/models';
-import { LanguageService } from '@core/services';
-import { PantryStoreService } from '@core/store/pantry-store.service';
+import {
+  ES_DATE_FORMAT_OPTIONS,
+  Insight,
+  DashboardInsightContext,
+  ItemLocationStock,
+  PantryItem,
+} from '@core/models';
+import { InsightService, LanguageService, PantryStoreService } from '@core/services';
+import {
+  formatDateTimeValue,
+  formatDateValue,
+  formatQuantity,
+  formatShortDate,
+} from '@core/utils/formatting.util';
 import {
   IonBadge,
   IonButton,
@@ -24,7 +35,8 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EmptyStateGenericComponent } from '../shared/empty-states/empty-state-generic.component';
+import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
+import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -50,91 +62,140 @@ import { EmptyStateGenericComponent } from '../shared/empty-states/empty-state-g
     CommonModule,
     TranslateModule,
     EmptyStateGenericComponent,
+    InsightCardComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
-  private hasInitialized = false;
-
-  readonly lastUpdated = signal<string | null>(null);
-  readonly deletingExpired = signal(false);
-  readonly items = this.pantryStore.items;
+  // DI
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
+  private readonly insightService = inject(InsightService);
+  // Data
+  private hasCompletedInitialLoad = false;
+  readonly pantryItems = this.pantryStore.items;
   readonly lowStockItems = this.pantryStore.lowStockItems;
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
   readonly expiredItems = this.pantryStore.expiredItems;
-  readonly summary = this.pantryStore.summary;
-  readonly showSnapshot = signal(true);
+  readonly inventorySummary = this.pantryStore.summary;
+  // Signals
+  readonly isSnapshotCardExpanded = signal(true);
+  readonly lastRefreshTimestamp = signal<string | null>(null);
+  readonly isDeletingExpiredItems = signal(false);
+  readonly visibleInsights = signal<Insight[]>([]);
+  // Computed Signals
+  readonly totalItems = computed(() => this.inventorySummary().total);
+  readonly recentlyUpdatedItems = computed(() => this.getRecentItemsByUpdatedAt(this.pantryItems()));
+  readonly hasExpiredItems = computed(() => this.expiredItems().length > 0);
+  // Getter
+  get nearExpiryWindow(): number {
+    return NEAR_EXPIRY_WINDOW_DAYS;
+  }
 
-  readonly totalItems = computed(() => this.summary().total);
-  readonly recentItems = computed(() => this.computeRecentItems(this.items()));
-
-  constructor(
-    private readonly pantryStore: PantryStoreService,
-    private readonly translate: TranslateService,
-    private readonly languageService: LanguageService,
-  ) {
+  constructor() {
     effect(
       () => {
         // track list changes and mark the dashboard as refreshed
-        const items = this.items();
+        const items = this.pantryItems();
         if (this.pantryStore.loading()) {
           return;
         }
-        if (!this.hasInitialized) {
+        if (!this.hasCompletedInitialLoad) {
           return;
         }
         if (!items) {
           return;
         }
-        this.lastUpdated.set(new Date().toISOString());
+        this.lastRefreshTimestamp.set(new Date().toISOString());
       }
     );
+
+    effect(() => {
+      const items = this.pantryItems();
+      const expiringSoon = this.nearExpiryItems();
+      const expired = this.expiredItems();
+      const lowStock = this.lowStockItems();
+      if (!this.hasCompletedInitialLoad) {
+        return;
+      }
+      this.refreshDashboardInsights(items, expiringSoon, expired, lowStock);
+    });
   }
 
   /** Lifecycle hook: populate dashboard data and stamp the refresh time. */
   async ionViewWillEnter(): Promise<void> {
     await this.pantryStore.loadAll();
-    this.hasInitialized = true;
-    this.lastUpdated.set(new Date().toISOString());
+    this.hasCompletedInitialLoad = true;
+    this.lastRefreshTimestamp.set(new Date().toISOString());
   }
 
-  get nearExpiryWindow(): number {
-    return NEAR_EXPIRY_WINDOW_DAYS;
+  dismissInsight(insight: Insight): void {
+    this.insightService.dismiss(insight.id);
+    this.visibleInsights.update(current => current.filter(item => item.id !== insight.id));
+  }
+
+  private refreshDashboardInsights(
+    items: PantryItem[],
+    expiringSoon: PantryItem[],
+    expiredItems: PantryItem[],
+    lowStockItems: PantryItem[],
+  ): void {
+    if (!items?.length) {
+      this.visibleInsights.set([]);
+      return;
+    }
+
+    const context: DashboardInsightContext = {
+      expiringSoonItems: expiringSoon.map(item => ({
+        id: item._id,
+        isLowStock: this.pantryStore.isItemLowStock(item),
+      })),
+      expiredItems: expiredItems.map(item => ({
+        id: item._id,
+        quantity: this.pantryStore.getItemTotalQuantity(item),
+      })),
+      expiringSoonCount: expiringSoon.length,
+      lowStockCount: lowStockItems.length,
+      products: items.map(item => ({
+        id: item._id,
+        name: item.name,
+        categoryId: item.categoryId,
+      })),
+    };
+
+    const generated = this.insightService.buildDashboardInsights(context);
+    this.visibleInsights.set(this.insightService.getVisibleInsights(generated));
   }
 
   /** Toggle the visibility of the snapshot card without altering other state. */
-  toggleSnapshot(): void {
-    this.showSnapshot.update(open => !open);
+  toggleSnapshotCard(): void {
+    this.isSnapshotCardExpanded.update(open => !open);
   }
 
   /** Remove expired items after a minimal confirmation. */
   async onDeleteExpiredItems(): Promise<void> {
-    if (this.deletingExpired() || this.expiredItems().length === 0) {
+    if (!this.canDeleteExpiredItems()) {
       return;
     }
 
-    const confirmed =
-      typeof window === 'undefined'
-        ? true
-        : window.confirm(this.translate.instant('dashboard.confirmDeleteExpired'));
-
-    if (!confirmed) {
+    if (!this.hasConfirmedExpiredDeletion()) {
       return;
     }
 
-    this.deletingExpired.set(true);
+    this.isDeletingExpiredItems.set(true);
     try {
       await this.pantryStore.deleteExpiredItems();
     } catch (err) {
       console.error('[DashboardComponent] onDeleteExpiredItems error', err);
     } finally {
-      this.deletingExpired.set(false);
+      this.isDeletingExpiredItems.set(false);
     }
   }
 
   /** Return the latest five updated items so the dashboard highlights recent activity. */
-  private computeRecentItems(items: PantryItem[]): PantryItem[] {
+  private getRecentItemsByUpdatedAt(items: PantryItem[]): PantryItem[] {
     return [...items]
       .sort((a, b) => this.compareDates(b.updatedAt, a.updatedAt))
       .slice(0, 5);
@@ -145,11 +206,6 @@ export class DashboardComponent {
     const aTime = a ? new Date(a).getTime() : Number.POSITIVE_INFINITY;
     const bTime = b ? new Date(b).getTime() : Number.POSITIVE_INFINITY;
     return aTime - bTime;
-  }
-
-  /** Count distinct non-empty values; used by summary badges. */
-  private countDistinct(values: (string | undefined)[]): number {
-    return new Set(values.filter(Boolean)).size;
   }
 
   /** Total quantity across all locations for dashboard chips. */
@@ -185,7 +241,7 @@ export class DashboardComponent {
           const extra = earliest
             ? this.translate.instant('dashboard.batches.withExpiry', {
                 batchLabel,
-                date: this.formatShortDate(earliest),
+                date: formatShortDate(earliest, this.languageService.getCurrentLocale(), { fallback: earliest }),
               })
             : batchLabel;
           const extraSegment = extra ? ` (${extra})` : '';
@@ -196,9 +252,19 @@ export class DashboardComponent {
       .join(', ');
   }
 
+  formatLastUpdated(value: string | null): string {
+    return formatDateTimeValue(value, this.languageService.getCurrentLocale(), { fallback: '' });
+  }
+
+  formatDate(value?: string | null): string {
+    return formatDateValue(value ?? null, this.languageService.getCurrentLocale(), ES_DATE_FORMAT_OPTIONS.numeric, {
+      fallback: this.translate.instant('common.dates.none'),
+    });
+  }
+
   /** Map raw location ids into friendly labels for dashboard display. */
-  private formatLocationName(id?: string): string {
-    const trimmed = (id ?? '').trim();
+  private formatLocationName(locationId?: string): string {
+    const trimmed = (locationId ?? '').trim();
     return trimmed || this.translate.instant('common.locations.none');
   }
 
@@ -210,8 +276,9 @@ export class DashboardComponent {
   }
 
   private formatQuantityValue(value: number): string {
-    const rounded = Math.round((Number(value) || 0) * 10) / 10;
-    return rounded.toFixed(1).replace(/\.0$/, '');
+    return formatQuantity(value, this.languageService.getCurrentLocale(), {
+      maximumFractionDigits: 1,
+    });
   }
 
   private getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {
@@ -230,61 +297,15 @@ export class DashboardComponent {
     });
   }
 
-  private formatShortDate(value: string): string {
-    const locale = this.languageService.getCurrentLocale();
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return value;
-      }
-      return parsed.toLocaleDateString(locale, ES_DATE_FORMAT_OPTIONS.numeric);
-    } catch {
-      return value;
-    }
+  private canDeleteExpiredItems(): boolean {
+    return !this.isDeletingExpiredItems() && this.hasExpiredItems();
   }
 
-  formatLastUpdated(value: string | null): string {
-    if (!value) {
-      return '';
+  private hasConfirmedExpiredDeletion(): boolean {
+    if (typeof window === 'undefined') {
+      return true;
     }
-    const locale = this.languageService.getCurrentLocale();
-    try {
-      const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) {
-        return '';
-      }
-      const datePart = parsed.toLocaleDateString(locale, ES_DATE_FORMAT_OPTIONS.numeric);
-      const timePart = parsed.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-      return `${datePart} ${timePart}`;
-    } catch {
-      return '';
-    }
+    return window.confirm(this.translate.instant('dashboard.confirmDeleteExpired'));
   }
 
-  formatExpiryFull(value?: string | null): string {
-    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
-  }
-
-  formatExpiryBadge(value?: string | null): string {
-    return this.formatDateWithOptions(value, ES_DATE_FORMAT_OPTIONS.numeric);
-  }
-
-  private formatDateWithOptions(
-    value: string | Date | null | undefined,
-    options: Intl.DateTimeFormatOptions
-  ): string {
-    if (!value) {
-      return this.translate.instant('common.dates.none');
-    }
-    const locale = this.languageService.getCurrentLocale();
-    try {
-      const parsed = typeof value === 'string' ? new Date(value) : value;
-      if (Number.isNaN(parsed.getTime())) {
-        return this.translate.instant('common.dates.none');
-      }
-      return parsed.toLocaleDateString(locale, options);
-    } catch {
-      return this.translate.instant('common.dates.none');
-    }
-  }
 }

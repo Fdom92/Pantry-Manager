@@ -7,8 +7,12 @@ ion-tab-button.locked {
   margin-top: 4px;
   padding: 2px 8px;
   border-radius: 999px;
-  background: linear-gradient(120deg, #fce7c6, #f8d57b);
-  color: #7a5400;
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--ion-color-primary) 25%, var(--ion-card-background)),
+    color-mix(in srgb, var(--ion-color-primary) 10%, var(--ion-card-background))
+  );
+  color: var(--ion-text-color);
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.08em;
@@ -19,8 +23,12 @@ ion-tab-button.locked {
   inset: 0;
   display: flex;
   align-items: center;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.22));
-  color: #111;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ion-text-color) 8%, transparent),
+    color-mix(in srgb, var(--ion-text-color) 22%, transparent)
+  );
+  color: var(--ion-text-color);
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;

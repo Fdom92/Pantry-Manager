@@ -23,7 +23,6 @@ export class PlanCardComponent {
   @Input() highlight = false;
   @Input() ctaLabel = '';
   @Input() disabled = false;
-
   @Output() selectPlan = new EventEmitter<void>();
 
   onSelect(): void {

@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
+import { STORAGE_KEY_PRO } from '@core/constants';
 import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
-
-const STORAGE_KEY = 'revenuecat:isPro';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RevenuecatService {
-  private readonly publicApiKey = environment.revenueCatPublicKey;
+  // Data
   private initialized = false;
   private userId: string | null = null;
+  private readonly publicApiKey = environment.revenueCatPublicKey;
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());
   readonly isPro$: Observable<boolean> = this.proSubject.asObservable();
   readonly canUseAgent$: Observable<boolean> = this.isPro$.pipe(map(isPro => isPro || !environment.production));
@@ -214,7 +214,7 @@ export class RevenuecatService {
   private updateProState(isPro: boolean): void {
     this.proSubject.next(isPro);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(isPro));
+      localStorage.setItem(STORAGE_KEY_PRO, JSON.stringify(isPro));
     } catch (err) {
       console.warn('[RevenuecatService] failed to persist state', err);
     }
@@ -222,7 +222,7 @@ export class RevenuecatService {
 
   private loadStoredState(): boolean {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(STORAGE_KEY_PRO);
       return raw ? JSON.parse(raw) : false;
     } catch {
       return false;
