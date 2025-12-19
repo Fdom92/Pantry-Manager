@@ -10,8 +10,10 @@ ion-card {
 }
 
 ion-card-title {
-  font-size: 1.1rem;
-  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
 }
 
 ion-card-subtitle {
@@ -26,6 +28,16 @@ ion-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 2px;
+}
+
+.card-header-toggle {
+  margin: 0;
+}
+
+.card-header-content {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 

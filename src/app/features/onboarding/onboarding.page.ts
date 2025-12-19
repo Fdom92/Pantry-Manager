@@ -1,5 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  CUSTOM_ELEMENTS_SCHEMA,
+  ElementRef,
+  inject,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { OnboardingSlide } from '@core/models/onboarding';
@@ -20,7 +30,7 @@ import type { SwiperOptions } from 'swiper/types';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class OnboardingPage implements AfterViewInit {
-  @ViewChild('swiperRef') swiper?: ElementRef<any>;
+  @ViewChild('swiperRef') swiperElement?: ElementRef<any>;
   // DI
   private readonly navCtrl = inject(NavController);
   private readonly revenuecat = inject(RevenuecatService);
@@ -36,7 +46,7 @@ export class OnboardingPage implements AfterViewInit {
       next: { translate: ['16%', 0, 0], scale: 0.95, opacity: 1 },
     },
   };
-  private readonly baseSlides: OnboardingSlide[] = [
+  private readonly onboardingCoreSlides: OnboardingSlide[] = [
     {
       key: 'organize',
       titleKey: 'onboarding.slides.organize.title',
@@ -73,12 +83,12 @@ export class OnboardingPage implements AfterViewInit {
     pro: true,
   };
   // Signals
-  readonly activeIndex = signal(0);
-  readonly isPro = toSignal(this.revenuecat.isPro$, { initialValue: false });
+  readonly currentSlideIndex = signal(0);
+  readonly isProUser = toSignal(this.revenuecat.isPro$, { initialValue: false });
   // Computed Signals
-  readonly slidesToShow = computed<OnboardingSlide[]>(() => {
-    const agentSlide = this.isPro() ? this.agentSlideUnlocked : this.agentSlideLocked;
-    return [...this.baseSlides, agentSlide];
+  readonly availableSlides = computed<OnboardingSlide[]>(() => {
+    const agentSlide = this.isProUser() ? this.agentSlideUnlocked : this.agentSlideLocked;
+    return [...this.onboardingCoreSlides, agentSlide];
   });
 
   constructor() {
@@ -87,7 +97,7 @@ export class OnboardingPage implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    const swiperEl = this.swiper?.nativeElement;
+    const swiperEl = this.swiperElement?.nativeElement;
     if (!swiperEl) {
       return;
     }
@@ -95,32 +105,32 @@ export class OnboardingPage implements AfterViewInit {
     swiperEl.initialize?.();
   }
 
-  onSlideChanged(): void {
-    const swiper = this.swiper?.nativeElement?.swiper;
+  handleSlideChanged(): void {
+    const swiper = this.getSwiperInstance();
     if (!swiper) {
       return;
     }
-    this.activeIndex.set(swiper.realIndex ?? swiper.activeIndex ?? 0);
+    this.currentSlideIndex.set(swiper.realIndex ?? swiper.activeIndex ?? 0);
   }
 
   isLastSlide(): boolean {
-    return this.activeIndex() >= this.slidesToShow().length - 1;
+    return this.currentSlideIndex() >= this.availableSlides().length - 1;
   }
 
-  async onNext(): Promise<void> {
-    const swiper = this.swiper?.nativeElement?.swiper;
+  async goToNextSlide(): Promise<void> {
+    const swiper = this.getSwiperInstance();
     if (!swiper || swiper.isEnd) {
-      await this.onStart();
+      await this.completeOnboarding();
       return;
     }
     swiper.slideNext(500);
   }
 
-  async onSkip(): Promise<void> {
-    await this.onStart();
+  async skipOnboarding(): Promise<void> {
+    await this.completeOnboarding();
   }
 
-  async onStart(): Promise<void> {
+  async completeOnboarding(): Promise<void> {
     this.persistOnboardingFlag();
     await this.navCtrl.navigateRoot('/dashboard');
   }
@@ -131,5 +141,8 @@ export class OnboardingPage implements AfterViewInit {
     } catch (err) {
       console.warn('[Onboarding] failed to persist onboarding flag', err);
     }
+  }
+  private getSwiperInstance(): any {
+    return this.swiperElement?.nativeElement?.swiper;
   }
 }

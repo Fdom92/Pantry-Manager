@@ -10,8 +10,7 @@ import {
   ItemLocationStock,
   PantryItem,
 } from '@core/models';
-import { InsightService, LanguageService } from '@core/services';
-import { PantryStoreService } from '@core/store/pantry-store.service';
+import { InsightService, LanguageService, PantryStoreService } from '@core/services';
 import {
   formatDateTimeValue,
   formatDateValue,
@@ -77,19 +76,20 @@ export class DashboardComponent {
   private readonly languageService = inject(LanguageService);
   private readonly insightService = inject(InsightService);
   // Data
-  private hasInitialized = false;
-  readonly items = this.pantryStore.items;
+  private hasCompletedInitialLoad = false;
+  readonly pantryItems = this.pantryStore.items;
   readonly lowStockItems = this.pantryStore.lowStockItems;
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
   readonly expiredItems = this.pantryStore.expiredItems;
-  readonly summary = this.pantryStore.summary;
+  readonly inventorySummary = this.pantryStore.summary;
   // Signals
-  readonly showSnapshot = signal(true);
-  readonly lastUpdated = signal<string | null>(null);
-  readonly deletingExpired = signal(false);
+  readonly isSnapshotCardExpanded = signal(true);
+  readonly lastRefreshTimestamp = signal<string | null>(null);
+  readonly isDeletingExpiredItems = signal(false);
   // Computed Signals
-  readonly totalItems = computed(() => this.summary().total);
-  readonly recentItems = computed(() => this.computeRecentItems(this.items()));
+  readonly totalItems = computed(() => this.inventorySummary().total);
+  readonly recentlyUpdatedItems = computed(() => this.getRecentItemsByUpdatedAt(this.pantryItems()));
+  readonly hasExpiredItems = computed(() => this.expiredItems().length > 0);
   readonly dashboardInsight = computed<Insight | null>(() => this.evaluateDashboardInsight());
   // Getter
   get nearExpiryWindow(): number {
@@ -100,17 +100,17 @@ export class DashboardComponent {
     effect(
       () => {
         // track list changes and mark the dashboard as refreshed
-        const items = this.items();
+        const items = this.pantryItems();
         if (this.pantryStore.loading()) {
           return;
         }
-        if (!this.hasInitialized) {
+        if (!this.hasCompletedInitialLoad) {
           return;
         }
         if (!items) {
           return;
         }
-        this.lastUpdated.set(new Date().toISOString());
+        this.lastRefreshTimestamp.set(new Date().toISOString());
       }
     );
   }
@@ -118,8 +118,8 @@ export class DashboardComponent {
   /** Lifecycle hook: populate dashboard data and stamp the refresh time. */
   async ionViewWillEnter(): Promise<void> {
     await this.pantryStore.loadAll();
-    this.hasInitialized = true;
-    this.lastUpdated.set(new Date().toISOString());
+    this.hasCompletedInitialLoad = true;
+    this.lastRefreshTimestamp.set(new Date().toISOString());
   }
 
   handleInsightAction(event: InsightActionEvent): void {
@@ -151,7 +151,7 @@ export class DashboardComponent {
   }
 
   private evaluateDashboardInsight(): Insight | null {
-    const items = this.items();
+    const items = this.pantryItems();
     if (!items?.length) {
       return null;
     }
@@ -183,37 +183,32 @@ export class DashboardComponent {
   }
 
   /** Toggle the visibility of the snapshot card without altering other state. */
-  toggleSnapshot(): void {
-    this.showSnapshot.update(open => !open);
+  toggleSnapshotCard(): void {
+    this.isSnapshotCardExpanded.update(open => !open);
   }
 
   /** Remove expired items after a minimal confirmation. */
   async onDeleteExpiredItems(): Promise<void> {
-    if (this.deletingExpired() || this.expiredItems().length === 0) {
+    if (!this.canDeleteExpiredItems()) {
       return;
     }
 
-    const confirmed =
-      typeof window === 'undefined'
-        ? true
-        : window.confirm(this.translate.instant('dashboard.confirmDeleteExpired'));
-
-    if (!confirmed) {
+    if (!this.hasConfirmedExpiredDeletion()) {
       return;
     }
 
-    this.deletingExpired.set(true);
+    this.isDeletingExpiredItems.set(true);
     try {
       await this.pantryStore.deleteExpiredItems();
     } catch (err) {
       console.error('[DashboardComponent] onDeleteExpiredItems error', err);
     } finally {
-      this.deletingExpired.set(false);
+      this.isDeletingExpiredItems.set(false);
     }
   }
 
   /** Return the latest five updated items so the dashboard highlights recent activity. */
-  private computeRecentItems(items: PantryItem[]): PantryItem[] {
+  private getRecentItemsByUpdatedAt(items: PantryItem[]): PantryItem[] {
     return [...items]
       .sort((a, b) => this.compareDates(b.updatedAt, a.updatedAt))
       .slice(0, 5);
@@ -281,8 +276,8 @@ export class DashboardComponent {
   }
 
   /** Map raw location ids into friendly labels for dashboard display. */
-  private formatLocationName(id?: string): string {
-    const trimmed = (id ?? '').trim();
+  private formatLocationName(locationId?: string): string {
+    const trimmed = (locationId ?? '').trim();
     return trimmed || this.translate.instant('common.locations.none');
   }
 
@@ -314,4 +309,16 @@ export class DashboardComponent {
       return new Date(current) < new Date(earliest) ? current : earliest;
     });
   }
+
+  private canDeleteExpiredItems(): boolean {
+    return !this.isDeletingExpiredItems() && this.hasExpiredItems();
+  }
+
+  private hasConfirmedExpiredDeletion(): boolean {
+    if (typeof window === 'undefined') {
+      return true;
+    }
+    return window.confirm(this.translate.instant('dashboard.confirmDeleteExpired'));
+  }
+
 }

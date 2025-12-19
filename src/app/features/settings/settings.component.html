@@ -17,7 +17,7 @@
       class="pro-inline-banner"
       [message]="'settings.pro.upgradePrompt' | translate"
       [ctaLabel]="'settings.pro.upgradeCta' | translate"
-      (action)="goToUpgrade()">
+      (action)="navigateToUpgrade()">
     </app-pro-banner>
   }
   <div class="settings-content">
@@ -39,8 +39,8 @@
             </ion-label>
             <ion-select
               [value]="themePreference()"
-              (ionChange)="onThemeChanged($event.detail.value)"
-              [disabled]="updatingTheme()"
+              (ionChange)="updateThemePreference($event.detail.value)"
+              [disabled]="isUpdatingTheme()"
               interface="popover"
               class="theme-select"
             >
@@ -65,7 +65,7 @@
         accept="application/json,.json,*/*"
         hidden
         #importInput
-        (change)="onImportFileSelected($event)"
+        (change)="handleImportFileSelection($event)"
       />
       <ion-card-header>
         <ion-card-title>{{ "settings.data.title" | translate }}</ion-card-title>
@@ -84,11 +84,11 @@
               color="danger"
               fill="clear"
               slot="end"
-              (click)="onResetApp()"
-              [disabled]="resettingData()"
+              (click)="resetApplicationData()"
+              [disabled]="isResettingData()"
               [attr.aria-label]="'settings.data.resetAction' | translate"
             >
-              @if (resettingData()) {
+              @if (isResettingData()) {
                 <ion-spinner
                   slot="start"
                   name="dots"
@@ -106,11 +106,11 @@
             <ion-button
               slot="end"
               fill="clear"
-              (click)="onExportData()"
-              [disabled]="exportingData()"
+              (click)="exportDataBackup()"
+              [disabled]="isExportingData()"
               [attr.aria-label]="'settings.data.exportAction' | translate"
             >
-              @if (exportingData()) {
+              @if (isExportingData()) {
                 <ion-spinner
                   slot="start"
                   name="dots"
@@ -129,11 +129,11 @@
               slot="end"
               color="secondary"
               fill="clear"
-              (click)="triggerImport(importInput)"
-              [disabled]="importingData()"
+              (click)="triggerImportPicker(importInput)"
+              [disabled]="isImportingData()"
               [attr.aria-label]="'settings.data.importAction' | translate"
             >
-              @if (importingData()) {
+              @if (isImportingData()) {
                 <ion-spinner
                   slot="start"
                   name="dots"

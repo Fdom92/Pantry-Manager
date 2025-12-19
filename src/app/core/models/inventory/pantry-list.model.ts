@@ -112,3 +112,10 @@ export interface MoveBatchesResult {
   moved: ItemBatch[];
   remaining: ItemBatch[];
 }
+
+export type PantrySummary = Readonly<{
+  total: number;
+  expired: number;
+  nearExpiry: number;
+  lowStock: number;
+}>;
