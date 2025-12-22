@@ -2,7 +2,7 @@
   "tabs": {
     "dashboard": "Início",
     "pantry": "Despensa",
-    "agent": "Agente",
+    "agent": "Planeamento",
     "shopping": "Compras",
     "settings": "Definições"
   },
@@ -212,12 +212,16 @@
     "expiringLowStock": {
       "title": "Produtos prestes a vencer e com pouco estoque",
       "description": "Alguns produtos combinam vencimento próximo e estoque baixo.",
-      "cta": "Ver produtos"
+      "cta": "Ver produtos",
+      "planPrompt": "Ajuda-me a planear receitas com os produtos que vão vencer e já têm pouco estoque.",
+      "ideasPrompt": "Dá-me ideias rápidas para usar esses ingredientes antes que estraguem."
     },
     "expiredWithStock": {
       "title": "Produtos vencidos ainda disponíveis",
       "description": "Existem produtos vencidos que ainda têm estoque.",
-      "cta": "Revisar vencidos"
+      "cta": "Revisar vencidos",
+      "planPrompt": "Cria um plano para consumir os produtos que já passaram da validade mas continuam em estoque.",
+      "ideasPrompt": "Sugere receitas ou formas de aproveitar esses produtos vencidos."
     },
     "lowStockNoExpiry": {
       "title": "Estoque baixo mesmo sem vencimentos urgentes",
@@ -229,29 +233,80 @@
       "description": "Existem itens com o mesmo nome registrados mais de uma vez. Revise e consolide.",
       "cta": "Revisar produtos"
     },
+    "ctaLabels": {
+      "plan": "Planear",
+      "ideas": "Dá-me ideias"
+    },
     "ctaDefault": "Entendi"
   },
   "agent": {
-    "title": "Agente",
+    "title": "Planeamento",
     "thinking": "A pensar…",
     "states": {
       "thinking": "A pensar…",
       "fetching": "A consultar a tua despensa…",
       "responding": "A gerar resposta…"
     },
-    "placeholder": "Escreve instruções como \"Mover 2 iogurtes para o frigorífico\"",
+    "placeholder": "Pede receitas, planos de refeições ou ideias com o que tens.",
     "actions": {
       "send": "Enviar",
       "retry": "Tentar novamente"
     },
     "preview": {
       "badge": "Pré-visualização",
-      "title": "Experimenta o agente PRO",
-      "headline": "Desbloqueia a IA para gerir a tua despensa por ti.",
-      "subtitle": "Vê itens expirados, gera receitas e reorganiza o stock com um só pedido.",
+      "title": "Camada de planeamento inteligente",
+      "headline": "Ideias e planos com IA",
+      "subtitle": "Recebe receitas, menus e insights feitos para a tua despensa.",
       "cta": "Desbloquear agente PRO",
-      "note": "Inicia o teste gratuito e cancela quando quiseres.",
-      "lockedPlaceholder": "Disponível com PRO"
+      "note": "Teste PRO gratuito incluído.",
+      "lockedPlaceholder": "Disponível com PRO",
+      "demo": {
+        "chipsTitle": "Começa com uma intenção",
+        "sessionTitle": "Conversa exemplo",
+        "userMessage": "“Planeia jantares com o que vence esta semana.”",
+        "agentMessage": "Perfeito. Tens espinafre e feta que vencem em 2 dias. Sugestão: hoje pesto de espinafre com massa e amanhã omelete grega."
+      },
+      "sampleWeek": {
+        "title": "Visão semanal",
+        "items": {
+          "one": {
+            "title": "Seg · Tacos veggie",
+            "desc": "Usa pimentos e feijão que vencem amanhã."
+          },
+          "two": {
+            "title": "Qua · Lote de sopa",
+            "desc": "Assa abóbora e congela duas porções."
+          },
+          "three": {
+            "title": "Fim de semana · Brunch",
+            "desc": "Overnight oats com a fruta madura."
+          }
+        }
+      },
+      "sampleIdeas": {
+        "title": "Fila de ideias",
+        "cards": {
+          "one": {
+            "title": "Jantar zero desperdício",
+            "desc": "Transforma o espinafre prestes a vencer em pesto para massa."
+          },
+          "two": {
+            "title": "Prep de almoço",
+            "desc": "Grelha frango e junta com legumes assados."
+          }
+        }
+      }
+    },
+    "quickStart": {
+      "title": "Entrada contextual",
+      "headline": "Começa a planear sem um chat vazio",
+      "subtitle": "Escolhe uma intenção e o agente responde de imediato.",
+      "ctaTitle": "Começa com um toque",
+      "ctaSubtitle": "Seleciona o foco para hoje.",
+      "today": "O que posso cozinhar hoje?",
+      "quickIdeas": "Ideias rápidas com o que tenho",
+      "weeklyPlan": "Planear as refeições da semana",
+      "useExpiring": "Aproveitar o que vai expirar"
     },
     "roles": {
       "user": "Tu",

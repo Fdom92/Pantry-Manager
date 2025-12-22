@@ -4,11 +4,12 @@ import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import {
   ES_DATE_FORMAT_OPTIONS,
   Insight,
+  InsightCta,
   DashboardInsightContext,
   ItemLocationStock,
   PantryItem,
 } from '@core/models';
-import { InsightService, LanguageService, PantryStoreService } from '@core/services';
+import { AgentService, InsightService, LanguageService, PantryStoreService } from '@core/services';
 import {
   formatDateTimeValue,
   formatDateValue,
@@ -34,6 +35,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
@@ -73,6 +75,8 @@ export class DashboardComponent {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly insightService = inject(InsightService);
+  private readonly agentService = inject(AgentService);
+  private readonly navCtrl = inject(NavController);
   // Data
   private hasCompletedInitialLoad = false;
   readonly pantryItems = this.pantryStore.items;
@@ -134,6 +138,17 @@ export class DashboardComponent {
   dismissInsight(insight: Insight): void {
     this.insightService.dismiss(insight.id);
     this.visibleInsights.update(current => current.filter(item => item.id !== insight.id));
+  }
+
+  async onInsightAction(_: Insight, cta: InsightCta): Promise<void> {
+    if (!cta?.prompt) {
+      return;
+    }
+    this.agentService.prepareConversation({
+      entryContext: cta.entryContext,
+      initialPrompt: cta.prompt,
+    });
+    await this.navCtrl.navigateForward('/agent');
   }
 
   private refreshDashboardInsights(

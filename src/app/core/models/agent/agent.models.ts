@@ -1,5 +1,17 @@
 import type { PantryItem } from '@core/models/inventory';
 
+export enum AgentEntryContext {
+  PLANNING = 'planning',
+  RECIPES = 'recipes',
+  DASHBOARD_INSIGHT = 'dashboard-insight',
+  RECIPE_INSIGHT = 'recipe-insight',
+}
+
+export interface AgentConversationInit {
+  entryContext: AgentEntryContext;
+  initialPrompt?: string;
+}
+
 export type AgentRole = 'user' | 'assistant' | 'tool';
 export type AgentPhase = 'idle' | 'thinking' | 'fetching' | 'responding';
 

@@ -2,7 +2,7 @@
   "tabs": {
     "dashboard": "Home",
     "pantry": "Pantry",
-    "agent": "Agent",
+    "agent": "Planning",
     "shopping": "Shopping",
     "settings": "Settings"
   },
@@ -212,12 +212,16 @@
     "expiringLowStock": {
       "title": "Products close to expiring with low stock",
       "description": "Some products combine an upcoming expiry and low stock.",
-      "cta": "View products"
+      "cta": "View products",
+      "planPrompt": "Help me plan recipes that use the low-stock items expiring soon.",
+      "ideasPrompt": "Give me quick ideas to use those ingredients before they spoil."
     },
     "expiredWithStock": {
       "title": "Expired products still available",
       "description": "Some expired products still have stock that needs review.",
-      "cta": "Review expired items"
+      "cta": "Review expired items",
+      "planPrompt": "Create a plan to consume the items that already expired but are still in my pantry.",
+      "ideasPrompt": "Suggest recipes or uses to salvage those expired products."
     },
     "lowStockNoExpiry": {
       "title": "Low stock even without urgent expiries",
@@ -229,29 +233,80 @@
       "description": "Some items share the same name in different entries. Review and consolidate them.",
       "cta": "Review products"
     },
+    "ctaLabels": {
+      "plan": "Plan",
+      "ideas": "Give me ideas"
+    },
     "ctaDefault": "Got it"
   },
   "agent": {
-    "title": "Agent",
+    "title": "Planning",
     "thinking": "Thinking…",
     "states": {
       "thinking": "Thinking…",
       "fetching": "Checking your pantry…",
       "responding": "Crafting the response…"
     },
-    "placeholder": "Write instructions like \"Move 2 yogurts to the fridge\"",
+    "placeholder": "Ask for recipes, meal plans, or ways to use what you have.",
     "actions": {
       "send": "Send",
       "retry": "Retry"
     },
     "preview": {
       "badge": "Preview",
-      "title": "Preview the agent",
-      "headline": "Unlock AI to manage your pantry for you.",
-      "subtitle": "See expired items, generate recipes and reorganize stock with one prompt.",
+      "title": "See the planning layer",
+      "headline": "Ideas and plans powered by AI",
+      "subtitle": "Get recipes, menus, and insights tailored to your pantry.",
       "cta": "Unlock agent",
       "note": "Start your free trial and cancel anytime.",
-      "lockedPlaceholder": "Available with PRO"
+      "lockedPlaceholder": "Available with PRO",
+      "demo": {
+        "chipsTitle": "Start with a quick prompt",
+        "sessionTitle": "Sample conversation",
+        "userMessage": "“Use what expires this week to plan dinners.”",
+        "agentMessage": "Great idea. You have spinach and feta that expire in 2 days. How about a spinach pesto pasta tonight and a Greek-style omelette tomorrow?"
+      },
+      "sampleWeek": {
+        "title": "Weekly snapshot",
+        "items": {
+          "one": {
+            "title": "Mon · Veggie tacos",
+            "desc": "Use peppers and beans that expire tomorrow."
+          },
+          "two": {
+            "title": "Wed · Soup batch",
+            "desc": "Roast pumpkin and freeze two portions."
+          },
+          "three": {
+            "title": "Weekend brunch",
+            "desc": "Overnight oats with the ripe fruit."
+          }
+        }
+      },
+      "sampleIdeas": {
+        "title": "Idea queue",
+        "cards": {
+          "one": {
+            "title": "Zero-waste dinner",
+            "desc": "Turn expiring spinach into pesto pasta."
+          },
+          "two": {
+            "title": "Lunch prep",
+            "desc": "Grill chicken and pair it with roasted veggies."
+          }
+        }
+      }
+    },
+    "quickStart": {
+      "title": "Contextual entry",
+      "headline": "Start planning without an empty chat",
+      "subtitle": "Pick an intention and the agent reacts instantly.",
+      "ctaTitle": "Start with one tap",
+      "ctaSubtitle": "Choose how you want to plan today.",
+      "today": "What can I cook today?",
+      "quickIdeas": "Quick ideas with what I have",
+      "weeklyPlan": "Plan meals for the week",
+      "useExpiring": "Use what expires soon"
     },
     "roles": {
       "user": "You",

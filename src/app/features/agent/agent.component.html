@@ -1,4 +1,5 @@
 @let canUseAgent = (canUseAgent$ | async);
+@let showQuickStart = shouldShowQuickStart();
 
 <ion-header>
   <ion-toolbar>
@@ -22,6 +23,13 @@
 
 <ion-content class="ion-padding">
   @if (canUseAgent) {
+    @if (showQuickStart) {
+      <div class="planning-empty">
+        <p class="eyebrow">{{ 'agent.quickStart.title' | translate }}</p>
+        <h2>{{ 'agent.quickStart.headline' | translate }}</h2>
+        <p class="muted">{{ 'agent.quickStart.subtitle' | translate }}</p>
+      </div>
+    }
     <div class="chat">
       @for (message of conversationMessages(); track trackById($index, message)) {
         <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-error]="message.status === 'error'">
@@ -79,21 +87,34 @@
             <p class="muted">{{ 'agent.preview.subtitle' | translate }}</p>
           </div>
         </div>
-        <div class="chat chat--preview">
-          @for (message of previewMessages; track trackById($index, message)) {
-            <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-error]="message.status === 'error'">
+        <div class="planning-preview">
+          <div class="planning-preview__chips">
+            <p class="eyebrow">{{ 'agent.preview.demo.chipsTitle' | translate }}</p>
+            <div class="planning-preview__chip-row">
+              @for (prompt of quickPrompts; track prompt.id) {
+                @if ($index < 3) {
+                  <ion-chip disabled>{{ prompt.labelKey | translate }}</ion-chip>
+                }
+              }
+            </div>
+          </div>
+          <div class="planning-preview__messages">
+            <p class="eyebrow">{{ 'agent.preview.demo.sessionTitle' | translate }}</p>
+            <div class="message from-user preview">
               <div class="message__bubble">
                 <div class="message__content">
-                  <p>{{ message.content }}</p>
+                  <p>{{ 'agent.preview.demo.userMessage' | translate }}</p>
                 </div>
               </div>
             </div>
-          }
-        </div>
-        <div class="preview-card__cta">
-          <ion-button expand="block" color="primary" size="large" (click)="navigateToUpgrade()">
-            {{ 'agent.preview.cta' | translate }}
-          </ion-button>
+            <div class="message from-agent preview">
+              <div class="message__bubble">
+                <div class="message__content">
+                  <p>{{ 'agent.preview.demo.agentMessage' | translate }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -101,18 +122,40 @@
 </ion-content>
 
 <ion-footer>
-  <div class="composer" [class.composer--locked]="!canUseAgent">
-    <ion-textarea
-      class="composer__input"
-      [placeholder]="canUseAgent ? ('agent.placeholder' | translate) : ('agent.preview.lockedPlaceholder' | translate)"
-      autoGrow="true"
-      [formControl]="composerControl"
-      enterkeyhint="send">
-    </ion-textarea>
-    <div class="composer__actions">
-      <ion-button color="primary" (click)="canUseAgent ? sendMessage() : null" [disabled]="!canUseAgent || !composerControl.value.trim() || isAgentProcessing()">
-        {{ 'agent.actions.send' | translate }}
+  @if (canUseAgent && showQuickStart) {
+    <div class="quick-start">
+      <div>
+        <p class="eyebrow">{{ 'agent.quickStart.ctaTitle' | translate }}</p>
+        <p class="muted">{{ 'agent.quickStart.ctaSubtitle' | translate }}</p>
+      </div>
+      <div class="quick-start__chips">
+        @for (prompt of quickPrompts; track prompt.id) {
+          <ion-chip (click)="triggerQuickPrompt(prompt)" [disabled]="isAgentProcessing()">
+            {{ prompt.labelKey | translate }}
+          </ion-chip>
+        }
+      </div>
+    </div>
+  } @else if (canUseAgent) {
+    <div class="composer">
+      <ion-textarea
+        class="composer__input"
+        [placeholder]="'agent.placeholder' | translate"
+        autoGrow="true"
+        [formControl]="composerControl"
+        enterkeyhint="send">
+      </ion-textarea>
+      <div class="composer__actions">
+        <ion-button color="primary" (click)="sendMessage()" [disabled]="!composerControl.value.trim() || isAgentProcessing()">
+          {{ 'agent.actions.send' | translate }}
+        </ion-button>
+      </div>
+    </div>
+  } @else {
+    <div class="composer composer--preview-cta">
+      <ion-button expand="block" color="primary" size="large" (click)="navigateToUpgrade()">
+        {{ 'agent.preview.cta' | translate }}
       </ion-button>
     </div>
-  </div>
+  }
 </ion-footer>

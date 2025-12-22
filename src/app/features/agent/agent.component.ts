@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, ViewChild, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AgentMessage } from '@core/models/agent';
+import { AgentEntryContext, AgentMessage } from '@core/models/agent';
 import { AgentService } from '@core/services/agent.service';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { NavController } from '@ionic/angular';
+import { NavController, ViewWillEnter } from '@ionic/angular';
 import {
   IonBadge,
   IonButton,
   IonButtons,
+  IonChip,
   IonContent,
   IonFooter,
   IonHeader,
@@ -19,7 +20,14 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
+interface QuickPrompt {
+  id: string;
+  labelKey: string;
+  context: AgentEntryContext;
+  promptKey?: string;
+}
 
 @Component({
   selector: 'app-agent',
@@ -35,6 +43,7 @@ import { TranslateModule } from '@ngx-translate/core';
     IonContent,
     IonSpinner,
     IonFooter,
+    IonChip,
     IonTextarea,
     CommonModule,
     ReactiveFormsModule,
@@ -44,32 +53,43 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrls: ['./agent.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AgentComponent implements OnDestroy {
+export class AgentComponent implements ViewWillEnter {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
   // DI
   private readonly agentService = inject(AgentService);
   private readonly revenuecat = inject(RevenuecatService);
   private readonly navCtrl = inject(NavController);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
+  private readonly canUseAgentState = signal(false);
+  private readonly hasConversationStarted = signal(false);
+  readonly shouldShowQuickStart = computed(() => this.canUseAgentState() && !this.hasConversationStarted());
   // Data
   readonly conversationMessages = this.agentService.messages;
   readonly isAgentProcessing = this.agentService.thinking;
   readonly agentExecutionPhase = this.agentService.agentPhase;
   readonly canRetryLastMessage = this.agentService.canRetry;
   readonly canUseAgent$ = this.revenuecat.canUseAgent$;
-  readonly previewMessages: AgentMessage[] = [
+  readonly quickPrompts: QuickPrompt[] = [
     {
-      id: 'preview-user',
-      role: 'user',
-      content: 'Quiero ver los caducados',
-      createdAt: new Date().toISOString(),
+      id: 'cook-today',
+      labelKey: 'agent.quickStart.today',
+      context: AgentEntryContext.PLANNING,
     },
     {
-      id: 'preview-agent',
-      role: 'assistant',
-      content: 'Respuesta bloqueada · Disponible en PRO',
-      createdAt: new Date().toISOString(),
-      status: 'error',
+      id: 'quick-ideas',
+      labelKey: 'agent.quickStart.quickIdeas',
+      context: AgentEntryContext.RECIPES,
+    },
+    {
+      id: 'weekly-plan',
+      labelKey: 'agent.quickStart.weeklyPlan',
+      context: AgentEntryContext.PLANNING,
+    },
+    {
+      id: 'use-expiring',
+      labelKey: 'agent.quickStart.useExpiring',
+      context: AgentEntryContext.DASHBOARD_INSIGHT,
     },
   ];
   // Form
@@ -82,7 +102,10 @@ export class AgentComponent implements OnDestroy {
     // Keep the composer enabled only for allowed users (PRO or override) to avoid template disabled binding warnings.
     this.canUseAgent$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(isUnlocked => this.updateComposerAccess(isUnlocked));
+      .subscribe(isUnlocked => {
+        this.updateComposerAccess(isUnlocked);
+        this.canUseAgentState.set(isUnlocked);
+      });
 
     effect(() => {
       // react to message updates and thinking indicator
@@ -91,10 +114,33 @@ export class AgentComponent implements OnDestroy {
       // keep the chat pinned to the bottom when new messages arrive
       void this.scrollToChatBottom();
     });
+
+    effect(() => {
+      if (this.conversationMessages().length) {
+        this.hasConversationStarted.set(true);
+      }
+    });
   }
 
-  ngOnDestroy(): void {
-    this.agentService.resetConversation();
+  async ionViewWillEnter(): Promise<void> {
+    const pendingInit = this.agentService.consumeConversationInit();
+    if (!pendingInit) {
+      if (!this.hasConversationStarted()) {
+        this.agentService.setEntryContext(AgentEntryContext.PLANNING);
+      }
+      return;
+    }
+    if (!this.revenuecat.canUseAgent()) {
+      await this.navigateToUpgrade();
+      return;
+    }
+    this.agentService.setEntryContext(pendingInit.entryContext);
+    if (!pendingInit.initialPrompt) {
+      return;
+    }
+    this.markConversationStarted();
+    await this.agentService.sendMessage(pendingInit.initialPrompt);
+    await this.scrollToChatBottom();
   }
 
   trackById(_: number, message: AgentMessage): string {
@@ -104,6 +150,8 @@ export class AgentComponent implements OnDestroy {
   resetConversation(): void {
     this.agentService.resetConversation();
     this.composerControl.setValue('');
+    this.hasConversationStarted.set(false);
+    this.agentService.setEntryContext(AgentEntryContext.PLANNING);
   }
 
   async sendMessage(): Promise<void> {
@@ -116,6 +164,7 @@ export class AgentComponent implements OnDestroy {
       return;
     }
     this.composerControl.setValue('');
+    this.markConversationStarted();
     await this.agentService.sendMessage(message);
     await this.scrollToChatBottom();
   }
@@ -155,5 +204,26 @@ export class AgentComponent implements OnDestroy {
   private getTrimmedComposerValue(): string | null {
     const value = this.composerControl.value.trim();
     return value || null;
+  }
+
+  async triggerQuickPrompt(prompt: QuickPrompt): Promise<void> {
+    if (!this.revenuecat.canUseAgent()) {
+      await this.navigateToUpgrade();
+      return;
+    }
+    this.agentService.setEntryContext(prompt.context);
+    const message = this.translate.instant(prompt.promptKey ?? prompt.labelKey);
+    if (!message) {
+      return;
+    }
+    this.markConversationStarted();
+    await this.agentService.sendMessage(message);
+    await this.scrollToChatBottom();
+  }
+
+  private markConversationStarted(): void {
+    if (!this.hasConversationStarted()) {
+      this.hasConversationStarted.set(true);
+    }
   }
 }

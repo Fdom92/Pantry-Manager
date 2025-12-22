@@ -2,7 +2,7 @@
   "tabs": {
     "dashboard": "Home",
     "pantry": "Dispensa",
-    "agent": "Agente",
+    "agent": "Pianificazione",
     "shopping": "Spesa",
     "settings": "Impostazioni"
   },
@@ -212,12 +212,16 @@
     "expiringLowStock": {
       "title": "Prodotti in scadenza con poco stock",
       "description": "Alcuni prodotti stanno per scadere e hanno scorte limitate.",
-      "cta": "Vedi prodotti"
+      "cta": "Vedi prodotti",
+      "planPrompt": "Aiutami a pianificare ricette con i prodotti che stanno per scadere e hanno poco stock.",
+      "ideasPrompt": "Dammi idee rapide per usare quei prodotti prima che vadano persi."
     },
     "expiredWithStock": {
       "title": "Prodotti scaduti ma ancora disponibili",
       "description": "Ci sono prodotti scaduti che hanno ancora scorte.",
-      "cta": "Controlla gli scaduti"
+      "cta": "Controlla gli scaduti",
+      "planPrompt": "Crea un piano per consumare i prodotti già scaduti ma ancora presenti in dispensa.",
+      "ideasPrompt": "Suggerisci ricette o usi per recuperare quei prodotti scaduti."
     },
     "lowStockNoExpiry": {
       "title": "Stock basso senza scadenze urgenti",
@@ -229,29 +233,80 @@
       "description": "Ci sono articoli con lo stesso nome registrati più volte. Controlla e uniscili.",
       "cta": "Rivedi prodotti"
     },
+    "ctaLabels": {
+      "plan": "Pianificare",
+      "ideas": "Dammi idee"
+    },
     "ctaDefault": "Capito"
   },
   "agent": {
-    "title": "Agente",
+    "title": "Pianificazione",
     "thinking": "Sto pensando…",
     "states": {
       "thinking": "Pensando…",
       "fetching": "Consultando la tua dispensa…",
       "responding": "Generando la risposta…"
     },
-    "placeholder": "Scrivi istruzioni come \"Sposta 2 yogurt nel frigorifero\"",
+    "placeholder": "Chiedi ricette, piani pasto o idee con quello che hai.",
     "actions": {
       "send": "Invia",
       "retry": "Riprova"
     },
     "preview": {
       "badge": "Anteprima",
-      "title": "Anteprima dell'agente PRO",
-      "headline": "Sblocca l'AI per gestire la tua dispensa per te.",
-      "subtitle": "Vedi gli articoli scaduti, genera ricette e riorganizza lo stock con un solo comando.",
+      "title": "La nuova area di pianificazione",
+      "headline": "Idee e piani guidati dall'AI",
+      "subtitle": "Ricevi ricette, menù e insight su misura per la tua dispensa.",
       "cta": "Sblocca l'agente PRO",
-      "note": "Inizia la prova gratuita e annulla in qualsiasi momento.",
-      "lockedPlaceholder": "Disponibile con PRO"
+      "note": "Prova gratuita inclusa nel piano PRO.",
+      "lockedPlaceholder": "Disponibile con PRO",
+      "demo": {
+        "chipsTitle": "Parti da un'intenzione",
+        "sessionTitle": "Conversazione di esempio",
+        "userMessage": "“Pianifica le cene usando ciò che scade questa settimana.”",
+        "agentMessage": "Ottimo. Hai spinaci e feta che scadono tra 2 giorni. Propongo pasta al pesto di spinaci stasera e frittata greca domani."
+      },
+      "sampleWeek": {
+        "title": "Panoramica settimanale",
+        "items": {
+          "one": {
+            "title": "Lun · Tacos veggie",
+            "desc": "Usa peperoni e fagioli che scadono domani."
+          },
+          "two": {
+            "title": "Mer · Zuppa in batch",
+            "desc": "Arrostisci la zucca e congela due porzioni."
+          },
+          "three": {
+            "title": "Weekend · Brunch",
+            "desc": "Overnight oats con la frutta matura."
+          }
+        }
+      },
+      "sampleIdeas": {
+        "title": "Coda di idee",
+        "cards": {
+          "one": {
+            "title": "Cena zero sprechi",
+            "desc": "Trasforma gli spinaci in scadenza in pesto per la pasta."
+          },
+          "two": {
+            "title": "Lunch prep",
+            "desc": "Griglia il pollo e abbinalo a verdure al forno."
+          }
+        }
+      }
+    },
+    "quickStart": {
+      "title": "Ingresso contestuale",
+      "headline": "Inizia a pianificare senza una chat vuota",
+      "subtitle": "Scegli un'intenzione e l'agente risponde subito.",
+      "ctaTitle": "Parti con un tocco",
+      "ctaSubtitle": "Decidi su cosa concentrarti oggi.",
+      "today": "Cosa posso cucinare oggi?",
+      "quickIdeas": "Idee rapide con quello che ho",
+      "weeklyPlan": "Pianificare i pasti della settimana",
+      "useExpiring": "Usare ciò che sta per scadere"
     },
     "roles": {
       "user": "Tu",
