@@ -306,7 +306,8 @@
       "today": "Que puis-je cuisiner aujourd’hui ?",
       "quickIdeas": "Idées rapides avec ce que j’ai",
       "weeklyPlan": "Planifier les repas de la semaine",
-      "useExpiring": "Utiliser ce qui va périmer"
+      "useExpiring": "Utiliser ce qui va périmer",
+      "decideForMe": "Décide pour moi"
     },
     "roles": {
       "user": "Vous",

@@ -306,7 +306,8 @@
       "today": "Was kann ich heute kochen?",
       "quickIdeas": "Schnelle Ideen mit meinen Vorräten",
       "weeklyPlan": "Mahlzeiten für die Woche planen",
-      "useExpiring": "Nutze, was bald abläuft"
+      "useExpiring": "Nutze, was bald abläuft",
+      "decideForMe": "Entscheide für mich"
     },
     "roles": {
       "user": "Du",

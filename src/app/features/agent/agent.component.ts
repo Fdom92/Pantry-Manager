@@ -91,6 +91,11 @@ export class AgentComponent implements ViewWillEnter {
       labelKey: 'agent.quickStart.useExpiring',
       context: AgentEntryContext.DASHBOARD_INSIGHT,
     },
+    {
+      id: 'decide-for-me',
+      labelKey: 'agent.quickStart.decideForMe',
+      context: AgentEntryContext.PLANNING,
+    },
   ];
   // Form
   readonly composerControl = new FormControl('', {

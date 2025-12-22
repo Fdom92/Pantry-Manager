@@ -306,7 +306,8 @@
       "today": "What can I cook today?",
       "quickIdeas": "Quick ideas with what I have",
       "weeklyPlan": "Plan meals for the week",
-      "useExpiring": "Use what expires soon"
+      "useExpiring": "Use what expires soon",
+      "decideForMe": "Decide for me"
     },
     "roles": {
       "user": "You",
