@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { AGENT_TOOLS_CATALOG, DEFAULT_CATEGORY_OPTIONS, DEFAULT_HOUSEHOLD_ID, DEFAULT_LOCATION_OPTIONS, LOCATION_SYNONYMS } from '@core/constants';
 import {
   AgentConversationInit,
@@ -33,6 +33,7 @@ import { AppPreferencesService } from './app-preferences.service';
 import { PantryService } from './pantry.service';
 import { RevenuecatService } from './revenuecat.service';
 import { LanguageService } from './language.service';
+import { AgentConversationStore } from '@core/store';
 
 @Injectable({
   providedIn: 'root',
@@ -65,18 +66,13 @@ export class AgentService {
     ['markOpened', 'agent.toasts.markOpened'],
     ['updateProductInfo', 'agent.toasts.updateProductInfo'],
   ]);
-  // Signals
-  private readonly messagesSignal = signal<AgentMessage[]>([]);
-  readonly thinking = signal(false);
-  private readonly retryAvailable = signal(false);
-  private readonly agentPhaseSignal = signal<AgentPhase>('idle');
-  private readonly pendingConversationInit = signal<AgentConversationInit | null>(null);
-  private readonly entryContextSignal = signal<AgentEntryContext>(AgentEntryContext.PLANNING);
-  // Computed Signals
-  readonly messages = computed(() => this.messagesSignal().filter(message => this.isVisibleMessage(message)));
-  readonly agentPhase = computed(() => this.agentPhaseSignal());
-  readonly canRetry = computed(() => this.retryAvailable());
-  readonly entryContext = computed(() => this.entryContextSignal());
+  // Conversation state
+  private readonly conversationStore = inject(AgentConversationStore);
+  readonly messages = this.conversationStore.messages;
+  readonly thinking = this.conversationStore.thinking;
+  readonly agentPhase = this.conversationStore.agentPhase;
+  readonly canRetry = this.conversationStore.canRetry;
+  readonly entryContext = this.conversationStore.entryContext;
 
   async sendMessage(userText: string): Promise<AgentMessage | null> {
     const trimmed = (userText ?? '').trim();
@@ -85,7 +81,7 @@ export class AgentService {
     }
 
     const userMessage = this.createMessage('user', trimmed);
-    this.messagesSignal.update(history => [...history, userMessage]);
+    this.conversationStore.appendMessage(userMessage);
     this.setRetryAvailable(false);
 
     try {
@@ -103,16 +99,16 @@ export class AgentService {
   }
 
   async retryLastUserMessage(): Promise<AgentMessage | null> {
-    if (!this.retryAvailable()) {
+    if (!this.conversationStore.isRetryAvailable()) {
       return null;
     }
-    const history = this.messagesSignal();
+    const history = this.conversationStore.getHistorySnapshot();
     const lastUserIndex = this.findLastUserMessageIndex(history);
     if (lastUserIndex === -1) {
       return null;
     }
     const trimmedHistory = history.slice(0, lastUserIndex + 1);
-    this.messagesSignal.set(trimmedHistory);
+    this.conversationStore.setHistory(trimmedHistory);
     this.setRetryAvailable(false);
 
     try {
@@ -129,34 +125,25 @@ export class AgentService {
   }
 
   resetConversation(): void {
-    this.messagesSignal.set([]);
-    this.setAgentPhase('idle');
-    this.setRetryAvailable(false);
-    this.pendingConversationInit.set(null);
+    this.conversationStore.resetConversation();
   }
 
   prepareConversation(init: AgentConversationInit): void {
     this.resetConversation();
-    this.entryContextSignal.set(init.entryContext);
-    this.pendingConversationInit.set(init);
+    this.conversationStore.setEntryContext(init.entryContext);
+    this.conversationStore.setPendingConversationInit(init);
   }
 
   consumeConversationInit(): AgentConversationInit | null {
-    const init = this.pendingConversationInit();
-    if (!init) {
-      return null;
-    }
-    this.pendingConversationInit.set(null);
-    this.entryContextSignal.set(init.entryContext);
-    return init;
+    return this.conversationStore.consumeConversationInit();
   }
 
   setEntryContext(context: AgentEntryContext): void {
-    this.entryContextSignal.set(context);
+    this.conversationStore.setEntryContext(context);
   }
 
   getEntryContext(): AgentEntryContext {
-    return this.entryContextSignal();
+    return this.conversationStore.getEntryContext();
   }
 
   private handleAgentFailure(err: any, source: 'user' | 'retry'): AgentMessage {
@@ -167,7 +154,7 @@ export class AgentService {
     });
     this.setRetryAvailable(true);
     const errorMessage = this.createUnifiedErrorMessage();
-    this.messagesSignal.update(history => this.appendWithoutDuplicate(history, errorMessage));
+    this.conversationStore.appendMessage(errorMessage);
     return errorMessage;
   }
 
@@ -180,7 +167,7 @@ export class AgentService {
     while (safetyCounter < 4) {
       safetyCounter += 1;
       this.setAgentPhase('thinking');
-      const history = this.messagesSignal();
+      const history = this.conversationStore.getHistorySnapshot();
       // If a previous assistant turn asked for tool work, wait until every tool response is present.
       if (
         pendingAssistantWithTools?.toolCalls?.length &&
@@ -254,10 +241,10 @@ export class AgentService {
           console.warn('[AgentService] Tool result without toolCallId skipped', result);
           continue;
         }
-        this.messagesSignal.update(history => this.appendWithoutDuplicate(history, result.message));
+        this.conversationStore.appendMessage(result.message);
       }
       if (assistantMessage.toolCalls?.length) {
-        const complete = this.hasAllToolResults(assistantMessage, this.messagesSignal());
+        const complete = this.hasAllToolResults(assistantMessage, this.conversationStore.getHistorySnapshot());
         if (complete) {
           pendingAssistantWithTools = null;
         }
@@ -271,17 +258,11 @@ export class AgentService {
 
   // Create a chat message with metadata (used for user/assistant/tool entries).
   private createMessage(role: AgentRole, content: string, status: AgentMessage['status'] = 'ok'): AgentMessage {
-    return {
-      id: createDocumentId('msg'),
-      role,
-      content,
-      status,
-      createdAt: new Date().toISOString(),
-    };
+    return this.conversationStore.createMessage(role, content, status);
   }
 
   private async buildModelRequest(): Promise<AgentModelRequest> {
-    const history = this.messagesSignal();
+    const history = this.conversationStore.getHistorySnapshot();
     const locationOptions = await this.getLocationOptions();
     const entryContext = this.entryContext();
     const system = this.buildSystemPrompt(entryContext);
@@ -588,7 +569,7 @@ export class AgentService {
       );
       assistant.toolCalls = toolCalls;
       assistant.uiHidden = true; // solo UI
-      this.messagesSignal.update(history => this.appendWithoutDuplicate(history, assistant));
+      this.conversationStore.appendMessage(assistant);
       return assistant;
     }
 
@@ -597,7 +578,7 @@ export class AgentService {
       if (hasToolCalls && toolCalls) {
         assistantMessage.toolCalls = toolCalls;
       }
-      this.messagesSignal.update(history => this.appendWithoutDuplicate(history, assistantMessage));
+      this.conversationStore.appendMessage(assistantMessage);
       return assistantMessage;
     }
 
@@ -606,7 +587,7 @@ export class AgentService {
       response.error || this.t('agent.messages.noResponse'),
       response.error ? 'error' : 'ok'
     );
-    this.messagesSignal.update(history => this.appendWithoutDuplicate(history, fallback));
+    this.conversationStore.appendMessage(fallback);
     return fallback;
   }
 
@@ -621,7 +602,7 @@ export class AgentService {
         'Ahora mismo solo puedo ayudarte con ideas y recetas.',
         'error'
       );
-      this.messagesSignal.update(history => [...history, warning]);
+      this.conversationStore.appendMessage(warning, { dedupe: false });
       return warning;
     }
     return null;
@@ -741,7 +722,7 @@ export class AgentService {
     if (!toolCallId) {
       return false;
     }
-    return this.messagesSignal().some(
+    return this.conversationStore.getHistorySnapshot().some(
       msg => msg.role === 'tool' && msg.toolCallId === toolCallId
     );
   }
@@ -1949,12 +1930,11 @@ export class AgentService {
   }
 
   private setAgentPhase(phase: AgentPhase): void {
-    this.agentPhaseSignal.set(phase);
-    this.thinking.set(phase !== 'idle');
+    this.conversationStore.setAgentPhase(phase);
   }
 
   private setRetryAvailable(value: boolean): void {
-    this.retryAvailable.set(value);
+    this.conversationStore.setRetryAvailable(value);
   }
 
   private findLastUserMessageIndex(history: AgentMessage[]): number {
@@ -1964,16 +1944,6 @@ export class AgentService {
       }
     }
     return -1;
-  }
-
-  private isVisibleMessage(message: AgentMessage): boolean {
-    if (message.uiHidden) {
-      return false;
-    }
-    if (message.role === 'tool') {
-      return false;
-    }
-    return true;
   }
 
   private queueSilentConfirmation(toolName: string): void {
@@ -1997,25 +1967,6 @@ export class AgentService {
     } catch {
       // Ignore toast failures; they are purely cosmetic.
     }
-  }
-
-  private appendWithoutDuplicate(history: AgentMessage[], message: AgentMessage): AgentMessage[] {
-    if (message.role !== 'user') {
-      return [...history, message];
-    }
-    if (!history.length) {
-      return [...history, message];
-    }
-    const last = history[history.length - 1];
-    if (
-      last.role === message.role &&
-      last.content === message.content &&
-      !last.toolCalls?.length &&
-      !message.toolCalls?.length
-    ) {
-      return [...history.slice(0, -1), message];
-    }
-    return [...history, message];
   }
 
   private delay(ms: number): Promise<void> {

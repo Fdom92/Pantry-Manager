@@ -3,8 +3,9 @@ import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, ef
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AgentEntryContext, AgentMessage } from '@core/models/agent';
-import { AgentService } from '@core/services/agent.service';
+import { MealPlannerAgentService, MealPlannerMode } from '@core/services';
 import { RevenuecatService } from '@core/services/revenuecat.service';
+import { AgentConversationStore } from '@core/store';
 import { NavController, ViewWillEnter } from '@ionic/angular';
 import {
   IonBadge,
@@ -56,7 +57,8 @@ interface QuickPrompt {
 export class AgentComponent implements ViewWillEnter {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
   // DI
-  private readonly agentService = inject(AgentService);
+  private readonly conversationStore = inject(AgentConversationStore);
+  private readonly MealPlannerAgentService = inject(MealPlannerAgentService);
   private readonly revenuecat = inject(RevenuecatService);
   private readonly navCtrl = inject(NavController);
   private readonly destroyRef = inject(DestroyRef);
@@ -65,10 +67,10 @@ export class AgentComponent implements ViewWillEnter {
   private readonly hasConversationStarted = signal(false);
   readonly shouldShowQuickStart = computed(() => this.canUseAgentState() && !this.hasConversationStarted());
   // Data
-  readonly conversationMessages = this.agentService.messages;
-  readonly isAgentProcessing = this.agentService.thinking;
-  readonly agentExecutionPhase = this.agentService.agentPhase;
-  readonly canRetryLastMessage = this.agentService.canRetry;
+  readonly conversationMessages = this.conversationStore.messages;
+  readonly isAgentProcessing = this.conversationStore.thinking;
+  readonly agentExecutionPhase = this.conversationStore.agentPhase;
+  readonly canRetryLastMessage = this.conversationStore.canRetry;
   readonly canUseAgent$ = this.revenuecat.canUseAgent$;
   readonly quickPrompts: QuickPrompt[] = [
     {
@@ -128,10 +130,10 @@ export class AgentComponent implements ViewWillEnter {
   }
 
   async ionViewWillEnter(): Promise<void> {
-    const pendingInit = this.agentService.consumeConversationInit();
+    const pendingInit = this.conversationStore.consumeConversationInit();
     if (!pendingInit) {
       if (!this.hasConversationStarted()) {
-        this.agentService.setEntryContext(AgentEntryContext.PLANNING);
+        this.conversationStore.setEntryContext(AgentEntryContext.PLANNING);
       }
       return;
     }
@@ -139,13 +141,12 @@ export class AgentComponent implements ViewWillEnter {
       await this.navigateToUpgrade();
       return;
     }
-    this.agentService.setEntryContext(pendingInit.entryContext);
+    this.conversationStore.setEntryContext(pendingInit.entryContext);
     if (!pendingInit.initialPrompt) {
       return;
     }
     this.markConversationStarted();
-    await this.agentService.sendMessage(pendingInit.initialPrompt);
-    await this.scrollToChatBottom();
+    await this.handlePlannerRequest(pendingInit.initialPrompt);
   }
 
   trackById(_: number, message: AgentMessage): string {
@@ -153,10 +154,10 @@ export class AgentComponent implements ViewWillEnter {
   }
 
   resetConversation(): void {
-    this.agentService.resetConversation();
+    this.conversationStore.resetConversation();
     this.composerControl.setValue('');
     this.hasConversationStarted.set(false);
-    this.agentService.setEntryContext(AgentEntryContext.PLANNING);
+    this.conversationStore.setEntryContext(AgentEntryContext.PLANNING);
   }
 
   async sendMessage(): Promise<void> {
@@ -170,8 +171,7 @@ export class AgentComponent implements ViewWillEnter {
     }
     this.composerControl.setValue('');
     this.markConversationStarted();
-    await this.agentService.sendMessage(message);
-    await this.scrollToChatBottom();
+    await this.handlePlannerRequest(message);
   }
 
   async scrollToChatBottom(): Promise<void> {
@@ -193,8 +193,13 @@ export class AgentComponent implements ViewWillEnter {
     if (!this.canRetryLastMessage()) {
       return;
     }
-    await this.agentService.retryLastUserMessage();
-    await this.scrollToChatBottom();
+    const history = this.conversationStore.getHistorySnapshot();
+    const lastUserIndex = this.findLastUserMessageIndex(history);
+    if (lastUserIndex === -1) {
+      return;
+    }
+    this.conversationStore.setHistory(history.slice(0, lastUserIndex + 1));
+    await this.handlePlannerRequest(history[lastUserIndex].content, { appendUserMessage: false });
   }
 
   private updateComposerAccess(isUnlocked: boolean): void {
@@ -216,19 +221,102 @@ export class AgentComponent implements ViewWillEnter {
       await this.navigateToUpgrade();
       return;
     }
-    this.agentService.setEntryContext(prompt.context);
+    this.conversationStore.setEntryContext(prompt.context);
     const message = this.translate.instant(prompt.promptKey ?? prompt.labelKey);
     if (!message) {
       return;
     }
     this.markConversationStarted();
-    await this.agentService.sendMessage(message);
-    await this.scrollToChatBottom();
+    const overrides = this.getPromptOverrides(prompt);
+    await this.handlePlannerRequest(message, overrides);
   }
 
   private markConversationStarted(): void {
     if (!this.hasConversationStarted()) {
       this.hasConversationStarted.set(true);
     }
+  }
+
+  private async handlePlannerRequest(
+    userText: string,
+    options?: { appendUserMessage?: boolean; modeOverride?: MealPlannerMode; daysOverride?: number }
+  ): Promise<void> {
+    const trimmed = userText?.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    if (options?.appendUserMessage !== false) {
+      const userMessage = this.conversationStore.createMessage('user', trimmed);
+      this.conversationStore.appendMessage(userMessage);
+      this.markConversationStarted();
+    }
+
+    this.conversationStore.setRetryAvailable(false);
+    this.conversationStore.setAgentPhase('thinking');
+    try {
+      const mode = options?.modeOverride ?? this.resolvePlannerMode();
+      const days = options?.daysOverride ?? this.defaultDaysForMode(mode);
+      const response = await this.MealPlannerAgentService.run({ mode, days });
+      this.conversationStore.setAgentPhase('responding');
+      const assistantMessage = this.conversationStore.createMessage('assistant', response || this.translate.instant('agent.messages.noResponse'));
+      this.conversationStore.appendMessage(assistantMessage);
+    } catch (err) {
+      console.error('[AgentComponent] Meal planner run failed', err);
+      const errorMessage = this.conversationStore.createMessage(
+        'assistant',
+        this.translate.instant('agent.messages.unifiedError'),
+        'error'
+      );
+      this.conversationStore.appendMessage(errorMessage);
+      this.conversationStore.setRetryAvailable(true);
+    } finally {
+      this.conversationStore.setAgentPhase('idle');
+      await this.scrollToChatBottom();
+    }
+  }
+
+  private resolvePlannerMode(): MealPlannerMode {
+    const context = this.conversationStore.getEntryContext();
+    if (context === AgentEntryContext.RECIPES || context === AgentEntryContext.RECIPE_INSIGHT) {
+      return 'recipes';
+    }
+    if (context === AgentEntryContext.DASHBOARD_INSIGHT) {
+      return 'plan';
+    }
+    return 'plan';
+  }
+
+  private defaultDaysForMode(mode: MealPlannerMode): number | undefined {
+    switch (mode) {
+      case 'plan':
+        return 3;
+      case 'menu':
+        return 7;
+      default:
+        return undefined;
+    }
+  }
+
+  private getPromptOverrides(prompt: QuickPrompt): { modeOverride?: MealPlannerMode; daysOverride?: number } {
+    switch (prompt.id) {
+      case 'quick-ideas':
+        return { modeOverride: 'recipes' };
+      case 'weekly-plan':
+        return { modeOverride: 'menu', daysOverride: 7 };
+      case 'decide-for-me':
+        return { modeOverride: 'plan', daysOverride: 5 };
+      default:
+        return {};
+    }
+  }
+
+  private findLastUserMessageIndex(history: AgentMessage[]): number {
+    for (let i = history.length - 1; i >= 0; i -= 1) {
+      if (history[i]?.role === 'user') {
+        return i;
+      }
+    }
+    return -1;
   }
 }

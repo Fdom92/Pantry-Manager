@@ -10,7 +10,7 @@ import {
   ShoppingSuggestionWithItem,
   ShoppingSummary
 } from '@core/models/shopping';
-import { LanguageService, PantryService, PantryStoreService } from '@core/services';
+import { LanguageService, PantryService } from '@core/services';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
@@ -18,6 +18,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 import jsPDF from 'jspdf';
 import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
+import { PantryStoreService } from '@core/store';
 
 @Component({
   selector: 'app-shopping',

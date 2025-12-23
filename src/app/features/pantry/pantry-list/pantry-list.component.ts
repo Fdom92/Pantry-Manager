@@ -26,7 +26,6 @@ import { ES_DATE_FORMAT_OPTIONS, MeasurementUnit } from '@core/models/shared';
 import {
   AppPreferencesService,
   LanguageService,
-  PantryStoreService,
 } from '@core/services';
 import { PantryService } from '@core/services/pantry.service';
 import { createDocumentId } from '@core/utils';
@@ -75,6 +74,7 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
+import { PantryStoreService } from '@core/store';
 
 @Component({
   selector: 'app-pantry-list',

@@ -9,7 +9,7 @@ import {
   ItemLocationStock,
   PantryItem,
 } from '@core/models';
-import { AgentService, InsightService, LanguageService, PantryStoreService } from '@core/services';
+import { AgentService, InsightService, LanguageService } from '@core/services';
 import {
   formatDateTimeValue,
   formatDateValue,
@@ -39,6 +39,7 @@ import { NavController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
+import { PantryStoreService } from '@core/store';
 
 @Component({
   selector: 'app-dashboard',
