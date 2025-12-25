@@ -1,10 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { AgentEntryContext } from '@core/models/agent';
 import { PantryItem } from '@core/models/inventory';
-import { LanguageService } from './language.service';
-import { LlmService } from './llm.service';
-import { PantryService } from './pantry.service';
-import { AgentConversationStore } from '@core/store';
+import { AgentConversationStore } from './agent-conversation.store';
+import { LlmClientService } from './llm-client.service';
+import { PantryService } from '../pantry.service';
+import { LanguageService } from '../language.service';
 
 export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
 
@@ -12,12 +12,10 @@ export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
   providedIn: 'root',
 })
 export class MealPlannerAgentService {
-  constructor(
-    private readonly pantryService: PantryService,
-    private readonly llm: LlmService,
-    private readonly languageService: LanguageService,
-    private readonly conversationStore: AgentConversationStore,
-  ) {}
+  private readonly pantryService = inject(PantryService);
+  private readonly llm = inject(LlmClientService);
+  private readonly languageService = inject(LanguageService);
+  private readonly conversationStore = inject(AgentConversationStore);
 
   async run(params: { mode: MealPlannerMode; days?: number }): Promise<string> {
     const pantry = await this.pantryService.getAll();

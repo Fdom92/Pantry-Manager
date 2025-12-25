@@ -18,7 +18,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 import jsPDF from 'jspdf';
 import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
-import { PantryStoreService } from '@core/store';
+import { PantryStoreService } from '@core/services';
 
 @Component({
   selector: 'app-shopping',

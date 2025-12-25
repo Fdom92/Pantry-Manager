@@ -29,16 +29,17 @@ import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, timeout as rxTimeout } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { AppPreferencesService } from './app-preferences.service';
-import { PantryService } from './pantry.service';
-import { RevenuecatService } from './revenuecat.service';
-import { LanguageService } from './language.service';
-import { AgentConversationStore } from '@core/store';
+import { AppPreferencesService } from '../app-preferences.service';
+import { PantryService } from '../pantry.service';
+import { RevenuecatService } from '../revenuecat.service';
+import { LanguageService } from '../language.service';
+import { AgentConversationStore } from './agent-conversation.store';
+import { findLastUserMessageIndex } from './conversation.utils';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AgentService {
+export class PantryAgentService {
   // DI
   private readonly http = inject(HttpClient);
   private readonly pantryService = inject(PantryService);
@@ -103,7 +104,7 @@ export class AgentService {
       return null;
     }
     const history = this.conversationStore.getHistorySnapshot();
-    const lastUserIndex = this.findLastUserMessageIndex(history);
+    const lastUserIndex = findLastUserMessageIndex(history);
     if (lastUserIndex === -1) {
       return null;
     }
@@ -147,7 +148,7 @@ export class AgentService {
   }
 
   private handleAgentFailure(err: any, source: 'user' | 'retry'): AgentMessage {
-    console.error('[AgentService] workflow error', err);
+    console.error('[PantryAgentService] workflow error', err);
     this.emitAgentTelemetry('agent_error', {
       source,
       error: err?.message ?? err,
@@ -173,7 +174,7 @@ export class AgentService {
         pendingAssistantWithTools?.toolCalls?.length &&
         !this.hasAllToolResults(pendingAssistantWithTools, history)
       ) {
-        console.warn('[AgentService] Missing tool results, forcing execution');
+        console.warn('[PantryAgentService] Missing tool results, forcing execution');
         await this.delay(50);
         continue;
       }
@@ -238,7 +239,7 @@ export class AgentService {
         const normalizedToolCallId = this.normalizeToolCallId(call.id ?? result.message.toolCallId);
         result.message.toolCallId = normalizedToolCallId;
         if (!result.message.toolCallId) {
-          console.warn('[AgentService] Tool result without toolCallId skipped', result);
+          console.warn('[PantryAgentService] Tool result without toolCallId skipped', result);
           continue;
         }
         this.conversationStore.appendMessage(result.message);
@@ -324,7 +325,7 @@ export class AgentService {
 
   private async callModel(payload: AgentModelRequest): Promise<AgentModelResponse> {
     if (!this.apiUrl) {
-      console.warn('[AgentService] agentApiUrl is empty, cannot call remote agent');
+      console.warn('[PantryAgentService] agentApiUrl is empty, cannot call remote agent');
       throw this.buildUserFacingError('agent.messages.noEndpoint');
     }
 
@@ -346,7 +347,7 @@ export class AgentService {
         const shouldRetry = this.shouldRetryModel(normalized, attempt);
         if (shouldRetry) {
           attempt += 1;
-          console.warn('[AgentService] callModel retrying', { attempt, status: normalized.status });
+          console.warn('[PantryAgentService] callModel retrying', { attempt, status: normalized.status });
           await this.delay(this.transientRetryDelayMs * attempt);
           continue;
         }
@@ -373,7 +374,7 @@ export class AgentService {
       if (trimmed) {
         const normalized = this.normalizeToolCallId(trimmed);
         if (candidate && candidate.length > 40 && candidate !== normalized) {
-          console.warn('[AgentService] Tool call id truncated', {
+          console.warn('[PantryAgentService] Tool call id truncated', {
             original: candidate,
             normalized,
           });
@@ -594,7 +595,7 @@ export class AgentService {
   private blockToolCallsFromResponse(response: AgentModelResponse): AgentMessage | null {
     const toolCalls = response?.message?.tool_calls ?? (response as any)?.tool_calls ?? null;
     if (Array.isArray(toolCalls) && toolCalls.length > 0) {
-      console.error('[AgentService] Tool calls received but tools are disabled', toolCalls);
+      console.error('[PantryAgentService] Tool calls received but tools are disabled', toolCalls);
       this.setAgentPhase('idle');
       this.setRetryAvailable(false);
       const warning = this.createMessage(
@@ -673,7 +674,7 @@ export class AgentService {
         }
       }
     } catch (err: any) {
-      console.error('[AgentService] Tool execution failed', err);
+      console.error('[PantryAgentService] Tool execution failed', err);
       return this.buildToolFailureResult(call, err);
     }
 
@@ -1690,7 +1691,7 @@ export class AgentService {
         return prefs.locationOptions;
       }
     } catch (err) {
-      console.warn('[AgentService] getLocationOptions fallback to default', err);
+      console.warn('[PantryAgentService] getLocationOptions fallback to default', err);
     }
     return [...DEFAULT_LOCATION_OPTIONS];
   }
@@ -1914,7 +1915,7 @@ export class AgentService {
 
   private logAgentIssue(event: string, payload?: Record<string, any>): void {
     if (!this.apiUrl) {
-      console.warn(`[AgentService] ${event}`, payload);
+      console.warn(`[PantryAgentService] ${event}`, payload);
       return;
     }
     const trimmedBase = this.apiUrl.replace(/\/$/, '');
@@ -1935,15 +1936,6 @@ export class AgentService {
 
   private setRetryAvailable(value: boolean): void {
     this.conversationStore.setRetryAvailable(value);
-  }
-
-  private findLastUserMessageIndex(history: AgentMessage[]): number {
-    for (let i = history.length - 1; i >= 0; i -= 1) {
-      if (history[i]?.role === 'user') {
-        return i;
-      }
-    }
-    return -1;
   }
 
   private queueSilentConfirmation(toolName: string): void {

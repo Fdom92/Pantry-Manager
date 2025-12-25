@@ -1,6 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { AgentConversationInit, AgentEntryContext, AgentMessage, AgentPhase, AgentRole } from '@core/models/agent';
 import { createDocumentId } from '@core/utils';
+import { appendWithUserDedupe, isVisibleAgentMessage } from './conversation.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,7 @@ export class AgentConversationStore {
   private readonly entryContextSignal = signal<AgentEntryContext>(AgentEntryContext.PLANNING);
   private readonly pendingConversationInitSignal = signal<AgentConversationInit | null>(null);
 
-  readonly messages = computed(() => this.historySignal().filter(message => this.isVisibleMessage(message)));
+  readonly messages = computed(() => this.historySignal().filter(message => isVisibleAgentMessage(message)));
   readonly thinking = this.thinkingSignal.asReadonly();
   readonly agentPhase = computed(() => this.agentPhaseSignal());
   readonly canRetry = computed(() => this.retryAvailableSignal());
@@ -34,7 +35,7 @@ export class AgentConversationStore {
   appendMessage(message: AgentMessage, options?: { dedupe?: boolean }): void {
     const dedupe = options?.dedupe ?? true;
     this.historySignal.update(history =>
-      dedupe ? this.appendWithoutDuplicate(history, message) : [...history, message]
+      dedupe ? appendWithUserDedupe(history, message) : [...history, message]
     );
   }
 
@@ -90,32 +91,4 @@ export class AgentConversationStore {
     };
   }
 
-  private isVisibleMessage(message: AgentMessage): boolean {
-    if (message.uiHidden) {
-      return false;
-    }
-    if (message.role === 'tool') {
-      return false;
-    }
-    return true;
-  }
-
-  private appendWithoutDuplicate(history: AgentMessage[], message: AgentMessage): AgentMessage[] {
-    if (message.role !== 'user') {
-      return [...history, message];
-    }
-    if (!history.length) {
-      return [...history, message];
-    }
-    const last = history[history.length - 1];
-    if (
-      last.role === message.role &&
-      last.content === message.content &&
-      !last.toolCalls?.length &&
-      !message.toolCalls?.length
-    ) {
-      return [...history.slice(0, -1), message];
-    }
-    return [...history, message];
-  }
 }

@@ -74,7 +74,7 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
-import { PantryStoreService } from '@core/store';
+import { PantryStoreService } from '@core/services';
 
 @Component({
   selector: 'app-pantry-list',

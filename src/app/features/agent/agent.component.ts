@@ -3,9 +3,8 @@ import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, ef
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AgentEntryContext, AgentMessage } from '@core/models/agent';
-import { MealPlannerAgentService, MealPlannerMode } from '@core/services';
+import { AgentConversationStore, MealPlannerAgentService, MealPlannerMode, findLastUserMessageIndex } from '@core/services';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { AgentConversationStore } from '@core/store';
 import { NavController, ViewWillEnter } from '@ionic/angular';
 import {
   IonBadge,
@@ -58,7 +57,7 @@ export class AgentComponent implements ViewWillEnter {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
   // DI
   private readonly conversationStore = inject(AgentConversationStore);
-  private readonly MealPlannerAgentService = inject(MealPlannerAgentService);
+  private readonly mealPlannerAgent = inject(MealPlannerAgentService);
   private readonly revenuecat = inject(RevenuecatService);
   private readonly navCtrl = inject(NavController);
   private readonly destroyRef = inject(DestroyRef);
@@ -194,7 +193,7 @@ export class AgentComponent implements ViewWillEnter {
       return;
     }
     const history = this.conversationStore.getHistorySnapshot();
-    const lastUserIndex = this.findLastUserMessageIndex(history);
+    const lastUserIndex = findLastUserMessageIndex(history);
     if (lastUserIndex === -1) {
       return;
     }
@@ -257,7 +256,7 @@ export class AgentComponent implements ViewWillEnter {
     try {
       const mode = options?.modeOverride ?? this.resolvePlannerMode();
       const days = options?.daysOverride ?? this.defaultDaysForMode(mode);
-      const response = await this.MealPlannerAgentService.run({ mode, days });
+      const response = await this.mealPlannerAgent.run({ mode, days });
       this.conversationStore.setAgentPhase('responding');
       const assistantMessage = this.conversationStore.createMessage('assistant', response || this.translate.instant('agent.messages.noResponse'));
       this.conversationStore.appendMessage(assistantMessage);
@@ -309,14 +308,5 @@ export class AgentComponent implements ViewWillEnter {
       default:
         return {};
     }
-  }
-
-  private findLastUserMessageIndex(history: AgentMessage[]): number {
-    for (let i = history.length - 1; i >= 0; i -= 1) {
-      if (history[i]?.role === 'user') {
-        return i;
-      }
-    }
-    return -1;
   }
 }

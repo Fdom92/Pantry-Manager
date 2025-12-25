@@ -4,16 +4,19 @@ import { LlmCompletionRequest, LlmCompletionResponse } from '@core/models';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
+/**
+ * Thin gateway around the backend LLM endpoint so agents don't need to know about HTTP.
+ */
 @Injectable({
   providedIn: 'root',
 })
-export class LlmService {
+export class LlmClientService {
   private readonly http = inject(HttpClient);
   private readonly endpoint = environment.agentApiUrl ?? '';
 
   async complete(payload: LlmCompletionRequest): Promise<LlmCompletionResponse> {
     if (!this.endpoint) {
-      throw new Error('[LlmService] agentApiUrl is empty');
+      throw new Error('[LlmClientService] agentApiUrl is empty');
     }
 
     const response = await firstValueFrom(
