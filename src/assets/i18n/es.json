@@ -2,7 +2,7 @@
   "tabs": {
     "dashboard": "Inicio",
     "pantry": "Despensa",
-    "agent": "Agente",
+    "agent": "Planificación",
     "shopping": "Compras",
     "settings": "Ajustes"
   },
@@ -212,12 +212,16 @@
     "expiringLowStock": {
       "title": "Productos a punto de caducar y con poco stock",
       "description": "Algunos productos combinan caducidad cercana y bajo stock.",
-      "cta": "Ver productos"
+      "cta": "Ver productos",
+      "planPrompt": "Ayúdame a planificar recetas usando los productos con poco stock que caducan pronto.",
+      "ideasPrompt": "Dame ideas rápidas para aprovechar lo que está a punto de caducar."
     },
     "expiredWithStock": {
       "title": "Productos caducados aún disponibles",
       "description": "Hay productos caducados que siguen teniendo stock.",
-      "cta": "Revisar caducados"
+      "cta": "Revisar caducados",
+      "planPrompt": "Propón un plan para consumir los productos que ya caducaron pero siguen en stock.",
+      "ideasPrompt": "Dame recetas o usos para rescatar esos productos caducados."
     },
     "lowStockNoExpiry": {
       "title": "Stock bajo sin caducidades urgentes",
@@ -229,29 +233,81 @@
       "description": "Hay artículos con el mismo nombre registrados varias veces. Revisa y consolida.",
       "cta": "Revisar productos"
     },
+    "ctaLabels": {
+      "plan": "Planificar",
+      "ideas": "Dame ideas"
+    },
     "ctaDefault": "Entendido"
   },
   "agent": {
-    "title": "Agente",
+    "title": "Planificación",
     "thinking": "Pensando…",
     "states": {
       "thinking": "Pensando…",
       "fetching": "Consultando tu despensa…",
       "responding": "Generando respuesta…"
     },
-    "placeholder": "Escribe instrucciones como \"Mueve 2 yogures al frigo\"",
+    "placeholder": "Pide recetas, planes o ideas con lo que tienes.",
     "actions": {
       "send": "Enviar",
       "retry": "Reintentar"
     },
     "preview": {
       "badge": "Vista previa",
-      "title": "Así se ve el agente",
-      "headline": "Respuestas premium con IA",
-      "subtitle": "Consulta caducados, genera recetas y reorganiza stock en un solo mensaje.",
+      "title": "Así empieza la planificación inteligente",
+      "headline": "Ideas y planes con IA",
+      "subtitle": "Recibe recetas, menús e insights basados en tu despensa sin salir de la app.",
       "cta": "Desbloquear agente",
       "note": "Prueba gratis incluida con el plan PRO.",
-      "lockedPlaceholder": "Disponible solo con PRO"
+      "lockedPlaceholder": "Disponible solo con PRO",
+      "demo": {
+        "chipsTitle": "Empieza con una intención",
+        "sessionTitle": "Conversación de ejemplo",
+        "userMessage": "“Planifica cenas usando lo que caduca esta semana.”",
+        "agentMessage": "Perfecto. Tienes espinaca y feta que caducan en 2 días. Te propongo pasta con pesto de espinaca para hoy y una tortilla griega mañana."
+      },
+      "sampleWeek": {
+        "title": "Visión semanal",
+        "items": {
+          "one": {
+            "title": "Lunes · Tacos veggie",
+            "desc": "Usa pimientos y frijoles que caducan mañana."
+          },
+          "two": {
+            "title": "Miércoles · Lote de sopa",
+            "desc": "Asa calabaza y congela 2 raciones."
+          },
+          "three": {
+            "title": "Fin de semana · Brunch",
+            "desc": "Avena nocturna con fruta madura."
+          }
+        }
+      },
+      "sampleIdeas": {
+        "title": "Ideas en cola",
+        "cards": {
+          "one": {
+            "title": "Cena sin desperdicio",
+            "desc": "Convierte la espinaca por caducar en pesto para pasta."
+          },
+          "two": {
+            "title": "Meal prep de mediodía",
+            "desc": "Asa pollo y combínalo con verduras al horno."
+          }
+        }
+      }
+    },
+    "quickStart": {
+      "title": "Entrada contextual",
+      "headline": "Planifica sin chatear desde cero",
+      "subtitle": "Elige un enfoque y la IA arrancará con ideas útiles.",
+      "ctaTitle": "Empieza con un toque",
+      "ctaSubtitle": "Selecciona una intención para lanzar la conversación.",
+      "today": "¿Qué puedo cocinar hoy?",
+      "quickIdeas": "Ideas rápidas con lo que tengo",
+      "weeklyPlan": "Planificar comidas de la semana",
+      "useExpiring": "Aprovechar lo que caduca",
+      "decideForMe": "Decide por mí"
     },
     "roles": {
       "user": "Tú",

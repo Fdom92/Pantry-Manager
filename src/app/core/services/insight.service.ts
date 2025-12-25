@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import {
+  AgentEntryContext,
   DashboardInsightContext,
   Insight,
+  InsightCta,
   InsightId,
   InsightSeverity,
 } from '@core/models';
@@ -22,6 +24,7 @@ export class InsightService {
         title: this.translateKey('insights.expiringLowStock.title'),
         description: this.translateKey('insights.expiringLowStock.description'),
         ctaLabel: this.translateKey('insights.expiringLowStock.cta'),
+        ctas: this.buildRecipeCtas('expiringLowStock'),
         severity: this.severity('warning'),
         priority: 2,
       });
@@ -34,6 +37,7 @@ export class InsightService {
         title: this.translateKey('insights.expiredWithStock.title'),
         description: this.translateKey('insights.expiredWithStock.description'),
         ctaLabel: this.translateKey('insights.expiredWithStock.cta'),
+        ctas: this.buildRecipeCtas('expiredWithStock'),
         severity: this.severity('danger'),
         priority: 1,
       });
@@ -99,5 +103,27 @@ export class InsightService {
 
   private severity(level: InsightSeverity): InsightSeverity {
     return level;
+  }
+
+  private buildRecipeCtas(type: 'expiringLowStock' | 'expiredWithStock'): InsightCta[] {
+    const planPrompt = this.translateKey(`insights.${type}.planPrompt`);
+    const ideasPrompt = this.translateKey(`insights.${type}.ideasPrompt`);
+    const planCta: InsightCta | null = planPrompt
+      ? {
+          id: `${type}-plan`,
+          label: this.translateKey('insights.ctaLabels.plan'),
+          entryContext: AgentEntryContext.DASHBOARD_INSIGHT,
+          prompt: planPrompt,
+        }
+      : null;
+    const ideasCta: InsightCta | null = ideasPrompt
+      ? {
+          id: `${type}-ideas`,
+          label: this.translateKey('insights.ctaLabels.ideas'),
+          entryContext: AgentEntryContext.RECIPE_INSIGHT,
+          prompt: ideasPrompt,
+        }
+      : null;
+    return [planCta, ideasCta].filter((cta): cta is InsightCta => Boolean(cta?.prompt));
   }
 }

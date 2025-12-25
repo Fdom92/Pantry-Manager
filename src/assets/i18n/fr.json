@@ -2,7 +2,7 @@
   "tabs": {
     "dashboard": "Accueil",
     "pantry": "Garde-manger",
-    "agent": "Agent",
+    "agent": "Planification",
     "shopping": "Achats",
     "settings": "Paramètres"
   },
@@ -212,12 +212,16 @@
     "expiringLowStock": {
       "title": "Produits proches de la date de péremption et à faible stock",
       "description": "Certains produits cumulent date de péremption proche et faible stock.",
-      "cta": "Voir les produits"
+      "cta": "Voir les produits",
+      "planPrompt": "Aide-moi à planifier des recettes avec les produits qui périment bientôt et dont il reste peu.",
+      "ideasPrompt": "Propose des idées rapides pour utiliser ces produits avant qu’ils ne se perdent."
     },
     "expiredWithStock": {
       "title": "Produits périmés encore disponibles",
       "description": "Certains produits périmés possèdent encore du stock.",
-      "cta": "Vérifier les périmés"
+      "cta": "Vérifier les périmés",
+      "planPrompt": "Prépare un plan pour consommer les produits déjà périmés mais encore en stock.",
+      "ideasPrompt": "Suggère des recettes ou astuces pour valoriser ces produits périmés."
     },
     "lowStockNoExpiry": {
       "title": "Stock faible malgré l’absence d’expirations urgentes",
@@ -229,29 +233,81 @@
       "description": "Des articles portent le même nom dans plusieurs fiches. Vérifiez-les et fusionnez-les.",
       "cta": "Revoir les produits"
     },
+    "ctaLabels": {
+      "plan": "Planifier",
+      "ideas": "Donne-moi des idées"
+    },
     "ctaDefault": "Compris"
   },
   "agent": {
-    "title": "Agent",
+    "title": "Planification",
     "thinking": "Réflexion…",
     "states": {
       "thinking": "Réflexion…",
       "fetching": "Consultation de votre garde-manger…",
       "responding": "Génération de la réponse…"
     },
-    "placeholder": "Écrivez des instructions comme \"Déplace 2 yaourts au frigo\"",
+    "placeholder": "Demandez des recettes, des menus ou des idées avec ce que vous avez.",
     "actions": {
       "send": "Envoyer",
       "retry": "Réessayer"
     },
     "preview": {
       "badge": "Aperçu",
-      "title": "Voici à quoi ressemble l’agent",
-      "headline": "Réponses IA premium",
-      "subtitle": "Consultez les périmés, générez des recettes et réorganisez le stock en un seul message.",
+      "title": "Voici la couche de planification",
+      "headline": "Idées et plans alimentés par l’IA",
+      "subtitle": "Recevez recettes, menus et insights adaptés à votre garde-manger.",
       "cta": "Débloquer l’agent",
-      "note": "Essai gratuit inclus avec le plan PRO.",
-      "lockedPlaceholder": "Disponible uniquement avec PRO"
+      "note": "Essai PRO gratuit inclus.",
+      "lockedPlaceholder": "Disponible uniquement avec PRO",
+      "demo": {
+        "chipsTitle": "Lancez-vous avec une intention",
+        "sessionTitle": "Conversation exemple",
+        "userMessage": "« Planifie des dîners avec ce qui expire cette semaine. »",
+        "agentMessage": "Bonne idée. Tu as des épinards et de la feta qui expirent dans 2 jours. Je propose un pesto d’épinards pour ce soir et une omelette grecque demain."
+      },
+      "sampleWeek": {
+        "title": "Aperçu de la semaine",
+        "items": {
+          "one": {
+            "title": "Lun · Tacos veggie",
+            "desc": "Utilise les poivrons et haricots qui expirent demain."
+          },
+          "two": {
+            "title": "Mer · Soupe en lot",
+            "desc": "Rôtis la courge et congèle deux portions."
+          },
+          "three": {
+            "title": "Week-end · Brunch",
+            "desc": "Overnight oats avec les fruits mûrs."
+          }
+        }
+      },
+      "sampleIdeas": {
+        "title": "File d’idées",
+        "cards": {
+          "one": {
+            "title": "Dîner anti-gaspi",
+            "desc": "Transforme les épinards sur le point de périmer en pesto pour pâtes."
+          },
+          "two": {
+            "title": "Prépa déjeuner",
+            "desc": "Grille du poulet et associe-le à des légumes rôtis."
+          }
+        }
+      }
+    },
+    "quickStart": {
+      "title": "Entrée contextuelle",
+      "headline": "Planifiez sans passer par un chat vide",
+      "subtitle": "Choisissez une intention et l’agent réagit immédiatement.",
+      "ctaTitle": "Démarrer en un geste",
+      "ctaSubtitle": "Choisissez votre objectif du moment.",
+      "today": "Que puis-je cuisiner aujourd’hui ?",
+      "quickIdeas": "Idées rapides avec ce que j’ai",
+      "weeklyPlan": "Planifier les repas de la semaine",
+      "useExpiring": "Utiliser ce qui va périmer",
+      "decideForMe": "Décide pour moi"
     },
     "roles": {
       "user": "Vous",

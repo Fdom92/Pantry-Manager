@@ -10,10 +10,15 @@
   --chat-surface: var(--ion-card-background);
   --chat-text: var(--ion-text-color);
   --chat-muted: var(--ion-color-medium);
-  --agent-bg: var(--ion-color-light);
-  --agent-border: var(--ion-color-tertiary);
-  --user-bg-start: var(--ion-color-primary, var(--ion-color-primary));
-  --user-bg-end: color-mix(in srgb, var(--ion-color-secondary) 80%, var(--ion-color-primary) 20%);
+  --chat-green-base: var(--ion-color-success, #2dd36f);
+  --chat-green-soft: color-mix(in srgb, var(--ion-card-background) 78%, var(--chat-green-base) 22%);
+  --chat-green-softer: color-mix(in srgb, var(--ion-card-background) 90%, var(--chat-green-base) 10%);
+  --chat-green-strong: color-mix(in srgb, var(--chat-green-base) 85%, #0b1f0c);
+  --chat-green-border: color-mix(in srgb, var(--chat-green-base) 35%, transparent);
+  --agent-bg: var(--chat-green-soft);
+  --agent-border: var(--chat-green-border);
+  --user-bg-start: var(--chat-green-strong);
+  --user-bg-end: color-mix(in srgb, var(--chat-green-base) 65%, var(--ion-color-success-contrast, #ffffff) 35%);
   --preview-surface: linear-gradient(
     135deg,
     color-mix(in srgb, var(--ion-text-color) 75%, var(--ion-background-color) 25%),
@@ -83,13 +88,14 @@
   }
 
   &.from-agent .message__bubble {
-    background: var(--agent-bg);
-    border-color: color-mix(in srgb, var(--agent-border) 25%, transparent);
+    background: linear-gradient(135deg, var(--chat-green-softer), var(--agent-bg));
+    border-color: var(--agent-border);
+    color: var(--chat-text);
   }
 
   &.from-user .message__bubble {
     background: linear-gradient(135deg, var(--user-bg-start), var(--user-bg-end));
-    color: var(--ion-color-dark-contrast);
+    color: var(--ion-color-success-contrast, #0f160e);
     border: none;
   }
 
@@ -157,7 +163,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border-top: 1px solid var(--ion-color-light-shade, var(--ion-color-light-shade));
+  border-top: 1px solid var(--ion-tab-bar-border-color, var(--ion-border-color, var(--ion-color-step-150, var(--ion-background-color-step-150, rgba(0, 0, 0, 0.07)))));
 
   &__input {
     --padding-start: 12px;
@@ -195,6 +201,12 @@
   .composer__actions {
     justify-content: stretch;
   }
+}
+
+.composer--preview-cta {
+  align-items: stretch;
+  text-align: center;
+  gap: 6px;
 }
 
 .pro-preview {
@@ -265,5 +277,113 @@
     margin: 0;
     color: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
     font-size: 13px;
+  }
+}
+
+.planning-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.planning-preview__chips,
+.planning-preview__messages {
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--chat-green-softer);
+  border: 1px dashed color-mix(in srgb, var(--chat-green-base) 25%, transparent);
+
+  .eyebrow {
+    margin: 0 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    color: color-mix(in srgb, var(--chat-text) 80%, transparent);
+  }
+}
+
+.planning-preview__chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  ion-chip {
+    --background: color-mix(in srgb, var(--chat-green-base) 18%, transparent);
+    --color: var(--chat-text);
+    font-weight: 600;
+  }
+}
+
+.planning-preview__messages .message.preview {
+  max-width: 100%;
+
+  .message__bubble {
+    box-shadow: none;
+  }
+}
+
+.planning-empty {
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    var(--chat-green-softer),
+    color-mix(in srgb, var(--chat-green-base) 35%, var(--ion-card-background) 65%)
+  );
+  border: 1px solid color-mix(in srgb, var(--chat-green-base) 30%, transparent);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--chat-green-base) 22%, transparent);
+
+  h2 {
+    margin: 6px 0;
+    font-size: 1.4rem;
+    color: var(--chat-text);
+  }
+
+  .eyebrow {
+    margin: 0;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
+  }
+
+  .muted {
+    margin: 0;
+    color: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
+  }
+}
+
+.quick-start {
+  padding: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--ion-text-color) 10%, transparent);
+  background: color-mix(in srgb, var(--ion-card-background) 94%, var(--ion-color-primary) 6%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .eyebrow {
+    margin: 0 0 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    color: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
+  }
+
+  .muted {
+    margin: 0;
+    color: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
+  }
+}
+
+.quick-start__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  ion-chip {
+    --background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+    --color: var(--ion-text-color);
+    font-weight: 600;
   }
 }

@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, ViewChild, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AgentMessage } from '@core/models/agent';
-import { AgentService } from '@core/services/agent.service';
+import { AgentEntryContext, AgentMessage } from '@core/models/agent';
+import { AgentConversationStore, MealPlannerAgentService, MealPlannerMode, findLastUserMessageIndex } from '@core/services';
 import { RevenuecatService } from '@core/services/revenuecat.service';
-import { NavController } from '@ionic/angular';
+import { NavController, ViewWillEnter } from '@ionic/angular';
 import {
   IonBadge,
   IonButton,
   IonButtons,
+  IonChip,
   IonContent,
   IonFooter,
   IonHeader,
@@ -19,7 +20,14 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
+interface QuickPrompt {
+  id: string;
+  labelKey: string;
+  context: AgentEntryContext;
+  promptKey?: string;
+}
 
 @Component({
   selector: 'app-agent',
@@ -35,6 +43,7 @@ import { TranslateModule } from '@ngx-translate/core';
     IonContent,
     IonSpinner,
     IonFooter,
+    IonChip,
     IonTextarea,
     CommonModule,
     ReactiveFormsModule,
@@ -44,32 +53,49 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrls: ['./agent.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AgentComponent implements OnDestroy {
+export class AgentComponent implements ViewWillEnter {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
   // DI
-  private readonly agentService = inject(AgentService);
+  private readonly conversationStore = inject(AgentConversationStore);
+  private readonly mealPlannerAgent = inject(MealPlannerAgentService);
   private readonly revenuecat = inject(RevenuecatService);
   private readonly navCtrl = inject(NavController);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
+  private readonly canUseAgentState = signal(false);
+  private readonly hasConversationStarted = signal(false);
+  readonly shouldShowQuickStart = computed(() => this.canUseAgentState() && !this.hasConversationStarted());
   // Data
-  readonly conversationMessages = this.agentService.messages;
-  readonly isAgentProcessing = this.agentService.thinking;
-  readonly agentExecutionPhase = this.agentService.agentPhase;
-  readonly canRetryLastMessage = this.agentService.canRetry;
+  readonly conversationMessages = this.conversationStore.messages;
+  readonly isAgentProcessing = this.conversationStore.thinking;
+  readonly agentExecutionPhase = this.conversationStore.agentPhase;
+  readonly canRetryLastMessage = this.conversationStore.canRetry;
   readonly canUseAgent$ = this.revenuecat.canUseAgent$;
-  readonly previewMessages: AgentMessage[] = [
+  readonly quickPrompts: QuickPrompt[] = [
     {
-      id: 'preview-user',
-      role: 'user',
-      content: 'Quiero ver los caducados',
-      createdAt: new Date().toISOString(),
+      id: 'cook-today',
+      labelKey: 'agent.quickStart.today',
+      context: AgentEntryContext.PLANNING,
     },
     {
-      id: 'preview-agent',
-      role: 'assistant',
-      content: 'Respuesta bloqueada · Disponible en PRO',
-      createdAt: new Date().toISOString(),
-      status: 'error',
+      id: 'quick-ideas',
+      labelKey: 'agent.quickStart.quickIdeas',
+      context: AgentEntryContext.RECIPES,
+    },
+    {
+      id: 'weekly-plan',
+      labelKey: 'agent.quickStart.weeklyPlan',
+      context: AgentEntryContext.PLANNING,
+    },
+    {
+      id: 'use-expiring',
+      labelKey: 'agent.quickStart.useExpiring',
+      context: AgentEntryContext.DASHBOARD_INSIGHT,
+    },
+    {
+      id: 'decide-for-me',
+      labelKey: 'agent.quickStart.decideForMe',
+      context: AgentEntryContext.PLANNING,
     },
   ];
   // Form
@@ -82,7 +108,10 @@ export class AgentComponent implements OnDestroy {
     // Keep the composer enabled only for allowed users (PRO or override) to avoid template disabled binding warnings.
     this.canUseAgent$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(isUnlocked => this.updateComposerAccess(isUnlocked));
+      .subscribe(isUnlocked => {
+        this.updateComposerAccess(isUnlocked);
+        this.canUseAgentState.set(isUnlocked);
+      });
 
     effect(() => {
       // react to message updates and thinking indicator
@@ -91,10 +120,32 @@ export class AgentComponent implements OnDestroy {
       // keep the chat pinned to the bottom when new messages arrive
       void this.scrollToChatBottom();
     });
+
+    effect(() => {
+      if (this.conversationMessages().length) {
+        this.hasConversationStarted.set(true);
+      }
+    });
   }
 
-  ngOnDestroy(): void {
-    this.agentService.resetConversation();
+  async ionViewWillEnter(): Promise<void> {
+    const pendingInit = this.conversationStore.consumeConversationInit();
+    if (!pendingInit) {
+      if (!this.hasConversationStarted()) {
+        this.conversationStore.setEntryContext(AgentEntryContext.PLANNING);
+      }
+      return;
+    }
+    if (!this.revenuecat.canUseAgent()) {
+      await this.navigateToUpgrade();
+      return;
+    }
+    this.conversationStore.setEntryContext(pendingInit.entryContext);
+    if (!pendingInit.initialPrompt) {
+      return;
+    }
+    this.markConversationStarted();
+    await this.handlePlannerRequest(pendingInit.initialPrompt);
   }
 
   trackById(_: number, message: AgentMessage): string {
@@ -102,8 +153,10 @@ export class AgentComponent implements OnDestroy {
   }
 
   resetConversation(): void {
-    this.agentService.resetConversation();
+    this.conversationStore.resetConversation();
     this.composerControl.setValue('');
+    this.hasConversationStarted.set(false);
+    this.conversationStore.setEntryContext(AgentEntryContext.PLANNING);
   }
 
   async sendMessage(): Promise<void> {
@@ -116,8 +169,8 @@ export class AgentComponent implements OnDestroy {
       return;
     }
     this.composerControl.setValue('');
-    await this.agentService.sendMessage(message);
-    await this.scrollToChatBottom();
+    this.markConversationStarted();
+    await this.handlePlannerRequest(message);
   }
 
   async scrollToChatBottom(): Promise<void> {
@@ -139,8 +192,13 @@ export class AgentComponent implements OnDestroy {
     if (!this.canRetryLastMessage()) {
       return;
     }
-    await this.agentService.retryLastUserMessage();
-    await this.scrollToChatBottom();
+    const history = this.conversationStore.getHistorySnapshot();
+    const lastUserIndex = findLastUserMessageIndex(history);
+    if (lastUserIndex === -1) {
+      return;
+    }
+    this.conversationStore.setHistory(history.slice(0, lastUserIndex + 1));
+    await this.handlePlannerRequest(history[lastUserIndex].content, { appendUserMessage: false });
   }
 
   private updateComposerAccess(isUnlocked: boolean): void {
@@ -155,5 +213,100 @@ export class AgentComponent implements OnDestroy {
   private getTrimmedComposerValue(): string | null {
     const value = this.composerControl.value.trim();
     return value || null;
+  }
+
+  async triggerQuickPrompt(prompt: QuickPrompt): Promise<void> {
+    if (!this.revenuecat.canUseAgent()) {
+      await this.navigateToUpgrade();
+      return;
+    }
+    this.conversationStore.setEntryContext(prompt.context);
+    const message = this.translate.instant(prompt.promptKey ?? prompt.labelKey);
+    if (!message) {
+      return;
+    }
+    this.markConversationStarted();
+    const overrides = this.getPromptOverrides(prompt);
+    await this.handlePlannerRequest(message, overrides);
+  }
+
+  private markConversationStarted(): void {
+    if (!this.hasConversationStarted()) {
+      this.hasConversationStarted.set(true);
+    }
+  }
+
+  private async handlePlannerRequest(
+    userText: string,
+    options?: { appendUserMessage?: boolean; modeOverride?: MealPlannerMode; daysOverride?: number }
+  ): Promise<void> {
+    const trimmed = userText?.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    if (options?.appendUserMessage !== false) {
+      const userMessage = this.conversationStore.createMessage('user', trimmed);
+      this.conversationStore.appendMessage(userMessage);
+      this.markConversationStarted();
+    }
+
+    this.conversationStore.setRetryAvailable(false);
+    this.conversationStore.setAgentPhase('thinking');
+    try {
+      const mode = options?.modeOverride ?? this.resolvePlannerMode();
+      const days = options?.daysOverride ?? this.defaultDaysForMode(mode);
+      const response = await this.mealPlannerAgent.run({ mode, days });
+      this.conversationStore.setAgentPhase('responding');
+      const assistantMessage = this.conversationStore.createMessage('assistant', response || this.translate.instant('agent.messages.noResponse'));
+      this.conversationStore.appendMessage(assistantMessage);
+    } catch (err) {
+      console.error('[AgentComponent] Meal planner run failed', err);
+      const errorMessage = this.conversationStore.createMessage(
+        'assistant',
+        this.translate.instant('agent.messages.unifiedError'),
+        'error'
+      );
+      this.conversationStore.appendMessage(errorMessage);
+      this.conversationStore.setRetryAvailable(true);
+    } finally {
+      this.conversationStore.setAgentPhase('idle');
+      await this.scrollToChatBottom();
+    }
+  }
+
+  private resolvePlannerMode(): MealPlannerMode {
+    const context = this.conversationStore.getEntryContext();
+    if (context === AgentEntryContext.RECIPES || context === AgentEntryContext.RECIPE_INSIGHT) {
+      return 'recipes';
+    }
+    if (context === AgentEntryContext.DASHBOARD_INSIGHT) {
+      return 'plan';
+    }
+    return 'plan';
+  }
+
+  private defaultDaysForMode(mode: MealPlannerMode): number | undefined {
+    switch (mode) {
+      case 'plan':
+        return 3;
+      case 'menu':
+        return 7;
+      default:
+        return undefined;
+    }
+  }
+
+  private getPromptOverrides(prompt: QuickPrompt): { modeOverride?: MealPlannerMode; daysOverride?: number } {
+    switch (prompt.id) {
+      case 'quick-ideas':
+        return { modeOverride: 'recipes' };
+      case 'weekly-plan':
+        return { modeOverride: 'menu', daysOverride: 7 };
+      case 'decide-for-me':
+        return { modeOverride: 'plan', daysOverride: 5 };
+      default:
+        return {};
+    }
   }
 }

@@ -1,3 +1,5 @@
+import { AgentEntryContext } from '@core/models/agent';
+
 export enum InsightId {
   EXPIRING_LOW_STOCK = 'expiring_low_stock',
   EXPIRED_WITH_STOCK = 'expired_with_stock',
@@ -15,12 +17,20 @@ export interface InsightAction {
 
 export type InsightSeverity = 'info' | 'warning' | 'danger';
 
+export interface InsightCta {
+  id: string;
+  label: string;
+  entryContext: AgentEntryContext;
+  prompt: string;
+}
+
 export interface Insight {
   id: InsightId;
   title: string;
   description: string;
   severity: InsightSeverity;
   ctaLabel?: string;
+  ctas?: InsightCta[];
   priority: number;
 }
 

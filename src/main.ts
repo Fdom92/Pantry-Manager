@@ -46,6 +46,7 @@ import {
   pricetagOutline,
   refreshOutline,
   removeOutline,
+  restaurantOutline,
   sendOutline,
   settingsOutline,
   shareOutline,
@@ -126,7 +127,8 @@ addIcons({
   'swap-horizontal-outline': swapHorizontalOutline,
   'aperture-outline': apertureOutline,
   'bulb-outline': bulbOutline,
-  'sparkles-outline': sparklesOutline
+  'sparkles-outline': sparklesOutline,
+  'restaurant-outline': restaurantOutline
 });
 
 bootstrapApplication(AppComponent, {
