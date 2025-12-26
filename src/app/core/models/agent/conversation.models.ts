@@ -1,5 +1,4 @@
 import type { PantryItem } from '@core/models/inventory';
-import type { RawToolCall } from './tooling.models';
 
 export enum AgentEntryContext {
   PLANNING = 'planning',
@@ -13,7 +12,7 @@ export interface AgentConversationInit {
   initialPrompt?: string;
 }
 
-export type AgentRole = 'user' | 'assistant' | 'tool';
+export type AgentRole = 'user' | 'assistant';
 export type AgentPhase = 'idle' | 'thinking' | 'fetching' | 'responding';
 
 export interface AgentMessage {
@@ -21,10 +20,6 @@ export interface AgentMessage {
   role: AgentRole;
   content: string;
   createdAt: string;
-  modelContent?: string;
-  toolName?: string;
-  toolCallId?: string;
-  toolCalls?: RawToolCall[];
   status?: 'ok' | 'error';
   uiHidden?: boolean;
   data?: {
