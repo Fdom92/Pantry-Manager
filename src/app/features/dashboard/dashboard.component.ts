@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { ES_DATE_FORMAT_OPTIONS, Insight, InsightCta, InsightContext, ItemLocationStock, PantryItem } from '@core/models';
-import { InsightService, LanguageService, PantryAgentService } from '@core/services';
+import { AgentConversationStore, InsightService, LanguageService } from '@core/services';
 import {
   formatDateTimeValue,
   formatDateValue,
@@ -69,7 +69,7 @@ export class DashboardComponent {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly insightService = inject(InsightService);
-  private readonly agentService = inject(PantryAgentService);
+  private readonly conversationStore = inject(AgentConversationStore);
   private readonly navCtrl = inject(NavController);
   // Data
   private hasCompletedInitialLoad = false;
@@ -144,7 +144,7 @@ export class DashboardComponent {
       }
       return;
     }
-    this.agentService.prepareConversation({
+    this.conversationStore.prepareConversation({
       entryContext: cta.entryContext,
       initialPrompt: cta.prompt,
     });

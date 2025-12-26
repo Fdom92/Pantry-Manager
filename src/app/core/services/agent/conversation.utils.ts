@@ -4,9 +4,6 @@ export function isVisibleAgentMessage(message: AgentMessage): boolean {
   if (message.uiHidden) {
     return false;
   }
-  if (message.role === 'tool') {
-    return false;
-  }
   return true;
 }
 
@@ -18,12 +15,7 @@ export function appendWithUserDedupe(history: AgentMessage[], message: AgentMess
     return [...history, message];
   }
   const last = history[history.length - 1];
-  if (
-    last.role === message.role &&
-    last.content === message.content &&
-    !last.toolCalls?.length &&
-    !message.toolCalls?.length
-  ) {
+  if (last.role === message.role && last.content === message.content) {
     return [...history.slice(0, -1), message];
   }
   return [...history, message];

@@ -46,6 +46,12 @@ export class AgentConversationStore {
     this.pendingConversationInitSignal.set(null);
   }
 
+  prepareConversation(init: AgentConversationInit): void {
+    this.resetConversation();
+    this.setEntryContext(init.entryContext);
+    this.setPendingConversationInit(init);
+  }
+
   setAgentPhase(phase: AgentPhase): void {
     this.agentPhaseSignal.set(phase);
     this.thinkingSignal.set(phase !== 'idle');
