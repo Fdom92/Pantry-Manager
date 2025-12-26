@@ -38,11 +38,11 @@
         "description": "Saprai cosa riassortire in base all'uso, allo stock minimo e alle scadenze imminenti."
       },
       "agent": {
-        "title": "Sblocca l'Agente AI (PRO)",
-        "description": "Chatta con la tua dispensa, richiedi ricette e genera automaticamente liste della spesa.",
+        "title": "Sblocca il pianificatore intelligente (PRO)",
+        "description": "Pianifica menù, chiedi ricette e genera liste automaticamente.",
         "badge": "Esclusivo PRO",
-        "titlePro": "Agente AI pronto per te",
-        "descriptionPro": "PRO sbloccato: usa l'Agente per ricette, idee e liste più veloci.",
+        "titlePro": "Pianificatore intelligente pronto per te",
+        "descriptionPro": "PRO attivo: usa il pianificatore per ricette, idee e liste più rapide.",
         "badgePro": "PRO attivo"
       }
     }
@@ -294,7 +294,7 @@
       "title": "La nuova area di pianificazione",
       "headline": "Idee e piani guidati dall'AI",
       "subtitle": "Ricevi ricette, menù e insight su misura per la tua dispensa.",
-      "cta": "Sblocca l'agente PRO",
+      "cta": "Sblocca il pianificatore PRO",
       "note": "Prova gratuita inclusa nel piano PRO.",
       "lockedPlaceholder": "Disponibile con PRO",
       "demo": {
@@ -337,7 +337,7 @@
     "quickStart": {
       "title": "Ingresso contestuale",
       "headline": "Inizia a pianificare senza una chat vuota",
-      "subtitle": "Scegli un'intenzione e l'agente risponde subito.",
+      "subtitle": "Scegli un'intenzione e il pianificatore risponde subito.",
       "ctaTitle": "Parti con un tocco",
       "ctaSubtitle": "Decidi su cosa concentrarti oggi.",
       "today": "Cosa posso cucinare oggi?",
@@ -348,17 +348,17 @@
     },
     "roles": {
       "user": "Tu",
-      "assistant": "Agente",
+      "assistant": "Pianificatore",
       "tool": "Azione"
     },
     "messages": {
       "processing": "Elaborazione azione…",
       "noResponse": "Impossibile generare una risposta.",
-      "noEndpoint": "Endpoint dell'agente non configurato.",
-      "callFailed": "Sembra che ci sia stato un problema temporaneo di connessione con l'agente. Riprova tra qualche secondo.",
-      "incompleteToolCall": "L'agente non è riuscito a raccogliere tutti i dati necessari per eseguire l'azione. Riformula o riprova.",
+      "noEndpoint": "Endpoint del pianificatore non configurato.",
+      "callFailed": "Sembra che ci sia stato un problema temporaneo di connessione con il pianificatore. Riprova tra qualche secondo.",
+      "incompleteToolCall": "Il pianificatore non è riuscito a raccogliere tutti i dati necessari per eseguire l'azione. Riformula o riprova.",
       "toolUnavailable": "Lo strumento \"{{ name }}\" non è disponibile.",
-      "unifiedError": "L'agente non può rispondere in questo momento. Riprova tra qualche secondo."
+      "unifiedError": "Il pianificatore non può rispondere in questo momento. Riprova tra qualche secondo."
     },
     "errors": {
       "missingName": "Il nome del prodotto è richiesto.",
@@ -608,7 +608,7 @@
     "benefits": {
       "title": "Tutto ciò che ottieni con PRO",
       "subtitle": "Progettato per utenti esperti e famiglie impegnate.",
-      "agent": "Agente AI per gestire la tua dispensa senza mani.",
+      "agent": "Pianificatore AI che propone menù e ricette su misura per te.",
       "future": "Accesso anticipato alle nuove funzionalità PRO.",
       "cloudSync": "Sincronizzazione cloud e backup per la tranquillità.",
       "history": "Storico completo delle modifiche ai tuoi articoli.",

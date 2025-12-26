@@ -38,11 +38,11 @@
         "description": "Zeigt dir, was nachgekauft werden sollte – basierend auf Verbrauch, Mindestbestand und nahendem Ablauf."
       },
       "agent": {
-        "title": "KI-Agent freischalten (PRO)",
-        "description": "Chatte mit deiner Vorratskammer, fordere Rezepte an und erstelle Listen in Sekunden.",
+        "title": "Intelligenten Menüplaner freischalten (PRO)",
+        "description": "Plane Menüs, fordere Rezepte an und erstelle Einkaufslisten automatisch.",
         "badge": "Exklusiv für PRO",
-        "titlePro": "KI-Agent bereit für dich",
-        "descriptionPro": "Du hast PRO-Zugriff: Nutze den Agenten für Rezepte, Ideen und Einkäufe.",
+        "titlePro": "Menüplaner bereit für dich",
+        "descriptionPro": "PRO aktiv: Nutze den Menüplaner für Rezepte, Ideen und schnellere Listen.",
         "badgePro": "PRO aktiv"
       }
     }
@@ -294,7 +294,7 @@
       "title": "Das Planungserlebnis",
       "headline": "Ideen und Pläne mit KI",
       "subtitle": "Erhalte Rezepte, Menüs und Insights passend zu deinem Vorrat.",
-      "cta": "Agent freischalten",
+      "cta": "Menüplaner freischalten",
       "note": "Kostenlose Testversion im PRO-Plan enthalten.",
       "lockedPlaceholder": "Nur mit PRO verfügbar",
       "demo": {
@@ -337,7 +337,7 @@
     "quickStart": {
       "title": "Kontextueller Einstieg",
       "headline": "Starte die Planung ohne leeren Chat",
-      "subtitle": "Wähle eine Intention und der Agent reagiert sofort.",
+      "subtitle": "Wähle eine Intention und der Menüplaner reagiert sofort.",
       "ctaTitle": "Mit einem Tipp starten",
       "ctaSubtitle": "Bestimme, worauf du heute fokussierst.",
       "today": "Was kann ich heute kochen?",
@@ -348,17 +348,17 @@
     },
     "roles": {
       "user": "Du",
-      "assistant": "Agent",
+      "assistant": "Planer",
       "tool": "Aktion"
     },
     "messages": {
       "processing": "Aktion wird verarbeitet…",
       "noResponse": "Ich konnte keine Antwort erzeugen.",
-      "noEndpoint": "Für den Agenten ist kein Endpoint konfiguriert.",
-      "callFailed": "Die Verbindung zum Assistenten hatte ein temporäres Problem. Bitte versuche es in ein paar Sekunden erneut.",
-      "incompleteToolCall": "Die Aktion konnte nicht abgeschlossen werden, da Daten fehlen. Bitte formuliere die Anweisung neu.",
+      "noEndpoint": "Für den Menüplaner ist kein Endpoint konfiguriert.",
+      "callFailed": "Die Verbindung zum Menüplaner hatte ein temporäres Problem. Bitte versuche es in ein paar Sekunden erneut.",
+      "incompleteToolCall": "Der Menüplaner konnte nicht alle nötigen Daten sammeln. Bitte formuliere die Anweisung neu.",
       "toolUnavailable": "Das Tool „{{ name }}“ ist nicht verfügbar.",
-      "unifiedError": "Der Assistent konnte im Moment nicht antworten. Bitte versuche es später erneut."
+      "unifiedError": "Der Menüplaner konnte im Moment nicht antworten. Bitte versuche es später erneut."
     },
     "errors": {
       "missingName": "Der Produktname fehlt.",
@@ -608,7 +608,7 @@
     "benefits": {
       "title": "Alles, was PRO beinhaltet",
       "subtitle": "Entwickelt für Haushalte mit viel Bewegung.",
-      "agent": "KI-Agent zur freihändigen Verwaltung der Vorratskammer.",
+      "agent": "KI-Menüplaner, der dir passende Menüs und Rezepte vorschlägt.",
       "future": "Frühzeitiger Zugriff auf zukünftige PRO-Funktionen.",
       "cloudSync": "Cloud-Synchronisierung und Backup.",
       "history": "Vollständiger Änderungsverlauf deiner Produkte.",

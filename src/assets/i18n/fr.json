@@ -38,11 +38,11 @@
         "description": "Suggère quoi réapprovisionner selon la consommation, le stock minimum et les produits proches de la péremption."
       },
       "agent": {
-        "title": "Débloquez l’Agent IA (PRO)",
-        "description": "Discutez avec votre garde-manger, demandez des recettes et générez des listes en quelques secondes.",
+        "title": "Débloquez le planificateur intelligent (PRO)",
+        "description": "Planifiez vos menus, demandez des recettes et créez des listes automatiquement.",
         "badge": "Exclusif PRO",
-        "titlePro": "Agent IA prêt pour vous",
-        "descriptionPro": "Vous avez déjà accès PRO : utilisez l’Agent pour les recettes, idées et achats.",
+        "titlePro": "Planificateur intelligent prêt pour vous",
+        "descriptionPro": "Vous avez déjà accès PRO : utilisez le planificateur pour recettes, idées et achats rapides.",
         "badgePro": "PRO actif"
       }
     }
@@ -294,7 +294,7 @@
       "title": "Voici la couche de planification",
       "headline": "Idées et plans alimentés par l’IA",
       "subtitle": "Recevez recettes, menus et insights adaptés à votre garde-manger.",
-      "cta": "Débloquer l’agent",
+      "cta": "Débloquer le planificateur",
       "note": "Essai PRO gratuit inclus.",
       "lockedPlaceholder": "Disponible uniquement avec PRO",
       "demo": {
@@ -337,7 +337,7 @@
     "quickStart": {
       "title": "Entrée contextuelle",
       "headline": "Planifiez sans passer par un chat vide",
-      "subtitle": "Choisissez une intention et l’agent réagit immédiatement.",
+      "subtitle": "Choisissez une intention et le planificateur réagit immédiatement.",
       "ctaTitle": "Démarrer en un geste",
       "ctaSubtitle": "Choisissez votre objectif du moment.",
       "today": "Que puis-je cuisiner aujourd’hui ?",
@@ -348,17 +348,17 @@
     },
     "roles": {
       "user": "Vous",
-      "assistant": "Agent",
+      "assistant": "Planificateur",
       "tool": "Action"
     },
     "messages": {
       "processing": "Traitement de l’action…",
       "noResponse": "Impossible de générer une réponse.",
-      "noEndpoint": "Aucun endpoint configuré pour l’agent.",
-      "callFailed": "La connexion avec l’assistant a rencontré un problème temporaire. Réessayez dans quelques secondes.",
-      "incompleteToolCall": "Impossible de terminer l’action car des données sont manquantes. Reformulez l’instruction ou réessayez.",
+      "noEndpoint": "Aucun endpoint configuré pour le planificateur.",
+      "callFailed": "La connexion avec le planificateur a rencontré un problème temporaire. Réessayez dans quelques secondes.",
+      "incompleteToolCall": "Le planificateur n’a pas pu rassembler toutes les données nécessaires. Reformulez l’instruction ou réessayez.",
       "toolUnavailable": "L’outil \"{{ name }}\" n’est pas disponible.",
-      "unifiedError": "L’assistant ne peut pas répondre pour le moment. Réessayez dans quelques secondes."
+      "unifiedError": "Le planificateur ne peut pas répondre pour le moment. Réessayez dans quelques secondes."
     },
     "errors": {
       "missingName": "Le nom du produit est manquant.",
@@ -608,7 +608,7 @@
     "benefits": {
       "title": "Tout ce que PRO inclut",
       "subtitle": "Conçu pour les foyers très actifs.",
-      "agent": "Agent IA pour gérer le garde-manger sans les mains.",
+      "agent": "Planificateur IA qui vous propose des menus et des recettes sur mesure.",
       "future": "Accès anticipé aux futures fonctionnalités PRO.",
       "cloudSync": "Synchronisation et sauvegarde dans le cloud.",
       "history": "Historique complet des modifications de vos produits.",

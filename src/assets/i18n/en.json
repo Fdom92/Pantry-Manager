@@ -38,11 +38,11 @@
         "description": "Know what to restock based on usage, minimum stock, and upcoming expiries."
       },
       "agent": {
-        "title": "Unlock the AI Agent (PRO)",
-        "description": "Chat with your pantry, request recipes, and auto-generate shopping lists.",
+        "title": "Unlock the AI Meal Planner (PRO)",
+        "description": "Plan menus, request recipes, and auto-build shopping lists tailored to you.",
         "badge": "PRO exclusive",
-        "titlePro": "AI Agent ready for you",
-        "descriptionPro": "PRO unlocked: use the Agent for recipes, ideas, and faster lists.",
+        "titlePro": "AI Meal Planner ready for you",
+        "descriptionPro": "PRO unlocked: use the meal planner for recipes, ideas, and faster lists.",
         "badgePro": "PRO active"
       }
     }
@@ -294,7 +294,7 @@
       "title": "See the planning layer",
       "headline": "Ideas and plans powered by AI",
       "subtitle": "Get recipes, menus, and insights tailored to your pantry.",
-      "cta": "Unlock agent",
+      "cta": "Unlock meal planner",
       "note": "Start your free trial and cancel anytime.",
       "lockedPlaceholder": "Available with PRO",
       "demo": {
@@ -337,7 +337,7 @@
     "quickStart": {
       "title": "Contextual entry",
       "headline": "Start planning without an empty chat",
-      "subtitle": "Pick an intention and the agent reacts instantly.",
+      "subtitle": "Pick an intention and the planner reacts instantly.",
       "ctaTitle": "Start with one tap",
       "ctaSubtitle": "Choose how you want to plan today.",
       "today": "What can I cook today?",
@@ -348,17 +348,17 @@
     },
     "roles": {
       "user": "You",
-      "assistant": "Agent",
+      "assistant": "Planner",
       "tool": "Action"
     },
     "messages": {
       "processing": "Processing action…",
       "noResponse": "Couldn't generate a response.",
-      "noEndpoint": "Agent endpoint is not configured.",
-      "callFailed": "It looks like the assistant connection had a temporary issue. Please try again in a few seconds.",
-      "incompleteToolCall": "The assistant couldn't gather all the data needed to run that action. Please rephrase or try again.",
+      "noEndpoint": "Meal planner endpoint is not configured.",
+      "callFailed": "It looks like the meal planner connection had a temporary issue. Please try again in a few seconds.",
+      "incompleteToolCall": "The meal planner couldn't gather all the data needed to run that action. Please rephrase or try again.",
       "toolUnavailable": "Tool \"{{ name }}\" is not available.",
-      "unifiedError": "The assistant couldn’t reply right now. Please try again in a few seconds."
+      "unifiedError": "The meal planner couldn’t reply right now. Please try again in a few seconds."
     },
     "errors": {
       "missingName": "Product name is required.",
@@ -608,7 +608,7 @@
     "benefits": {
       "title": "Everything you get with PRO",
       "subtitle": "Designed for power users and busy households.",
-      "agent": "AI agent to manage your pantry hands-free.",
+      "agent": "AI meal planner that proposes menus and recipes tailored to you.",
       "future": "Early access to upcoming PRO features.",
       "cloudSync": "Cloud sync and backup for peace of mind.",
       "history": "Full history of changes to your items.",

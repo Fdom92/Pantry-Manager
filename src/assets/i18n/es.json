@@ -38,11 +38,11 @@
         "description": "Te dice qué reponer según consumo, stock mínimo y lo que caducará pronto."
       },
       "agent": {
-        "title": "Desbloquea el Agente IA (PRO)",
-        "description": "Chatea con tu despensa, pide recetas y genera listas en segundos.",
+        "title": "Desbloquea el planificador inteligente (PRO)",
+        "description": "Planifica menús, pide recetas y genera listas automáticamente.",
         "badge": "Exclusivo PRO",
-        "titlePro": "Agente IA listo para ti",
-        "descriptionPro": "Ya tienes acceso PRO: usa el Agente para recetas, ideas y compras.",
+        "titlePro": "Planificador inteligente listo para ti",
+        "descriptionPro": "Ya tienes acceso PRO: usa el planificador para recetas, ideas y compras rápidas.",
         "badgePro": "PRO activo"
       }
     }
@@ -294,7 +294,7 @@
       "title": "Así empieza la planificación inteligente",
       "headline": "Ideas y planes con IA",
       "subtitle": "Recibe recetas, menús e insights basados en tu despensa sin salir de la app.",
-      "cta": "Desbloquear agente",
+      "cta": "Desbloquear planificador",
       "note": "Prueba gratis incluida con el plan PRO.",
       "lockedPlaceholder": "Disponible solo con PRO",
       "demo": {
@@ -348,17 +348,17 @@
     },
     "roles": {
       "user": "Tú",
-      "assistant": "Agente",
+      "assistant": "Planificador",
       "tool": "Acción"
     },
     "messages": {
       "processing": "Procesando acción…",
       "noResponse": "No pude generar respuesta.",
-      "noEndpoint": "No hay endpoint configurado para el agente.",
-      "callFailed": "Parece que la conexión con el asistente tuvo un problema temporal. Inténtalo de nuevo en unos segundos.",
+      "noEndpoint": "No hay endpoint configurado para el planificador.",
+      "callFailed": "Parece que la conexión con el planificador tuvo un problema temporal. Inténtalo de nuevo en unos segundos.",
       "incompleteToolCall": "No pude completar la acción porque faltan datos. Reformula la instrucción o inténtalo otra vez.",
       "toolUnavailable": "La herramienta \"{{ name }}\" no está disponible.",
-      "unifiedError": "El asistente no pudo responder en este momento. Inténtalo de nuevo en unos segundos."
+      "unifiedError": "El planificador no pudo responder en este momento. Inténtalo de nuevo en unos segundos."
     },
     "errors": {
       "missingName": "Falta el nombre del producto.",
@@ -608,7 +608,7 @@
     "benefits": {
       "title": "Todo lo que incluye PRO",
       "subtitle": "Pensado para hogares con mucho movimiento.",
-      "agent": "Agente IA para gestionar la despensa sin manos.",
+      "agent": "Planificador con IA para proponerte menús y recetas a tu medida.",
       "future": "Acceso anticipado a futuras funciones PRO.",
       "cloudSync": "Sincronización y backup en la nube.",
       "history": "Historial completo de cambios en tus productos.",
