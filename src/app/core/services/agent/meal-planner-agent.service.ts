@@ -73,9 +73,9 @@ export class MealPlannerAgentService {
     switch (context) {
       case AgentEntryContext.RECIPES:
         return 'Prioriza recetas rápidas y creativas.';
-      case AgentEntryContext.DASHBOARD_INSIGHT:
-        return 'Usa primero los productos que caducan pronto o están en riesgo.';
-      case AgentEntryContext.RECIPE_INSIGHT:
+      case AgentEntryContext.INSIGHTS:
+        return 'Usa primero los productos que caducan pronto o estan en riesgo.';
+      case AgentEntryContext.INSIGHTS_RECIPES:
         return 'Ofrece sugerencias muy concretas basadas en un hallazgo reciente.';
       case AgentEntryContext.PLANNING:
       default:

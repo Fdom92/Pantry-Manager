@@ -1,14 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import {
-  ES_DATE_FORMAT_OPTIONS,
-  Insight,
-  InsightCta,
-  DashboardInsightContext,
-  ItemLocationStock,
-  PantryItem,
-} from '@core/models';
+import { ES_DATE_FORMAT_OPTIONS, Insight, InsightCta, InsightContext, ItemLocationStock, PantryItem } from '@core/models';
 import { InsightService, LanguageService, PantryAgentService } from '@core/services';
 import {
   formatDateTimeValue,
@@ -142,7 +135,13 @@ export class DashboardComponent {
   }
 
   async onInsightAction(_: Insight, cta: InsightCta): Promise<void> {
-    if (!cta?.prompt) {
+    if (!cta) {
+      return;
+    }
+    if (cta.type === 'navigate') {
+      if (cta.route) {
+        await this.navCtrl.navigateForward(cta.route);
+      }
       return;
     }
     this.agentService.prepareConversation({
@@ -163,10 +162,11 @@ export class DashboardComponent {
       return;
     }
 
-    const context: DashboardInsightContext = {
+    const context: InsightContext = {
       expiringSoonItems: expiringSoon.map(item => ({
         id: item._id,
         isLowStock: this.pantryStore.isItemLowStock(item),
+        quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       expiredItems: expiredItems.map(item => ({
         id: item._id,

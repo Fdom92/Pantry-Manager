@@ -237,7 +237,44 @@
       "plan": "Planificar",
       "ideas": "Dame ideas"
     },
-    "ctaDefault": "Entendido"
+    "ctaDefault": "Entendido",
+    "library": {
+      "weeklyMealPlanning": {
+        "title": "Planificar las comidas de la semana",
+        "description": "Planifica tus comidas de esta semana con lo que ya tienes.",
+        "cta": "Planificar ahora",
+        "prompt": "Planifica mis comidas de esta semana usando solo lo que tengo en la despensa."
+      },
+      "cookBeforeExpiry": {
+        "title": "Cocina antes de que caduquen",
+        "description": "Aprovecha los productos que están a punto de caducar y aún tienen stock.",
+        "cta": "Usar productos críticos",
+        "prompt": "Sugiere recetas priorizando los productos que caducan pronto en mi despensa."
+      },
+      "lunchIdeas": {
+        "title": "¿Qué puedo preparar para comer?",
+        "description": "Ideas rápidas para la comida usando tu despensa.",
+        "cta": "Ver ideas",
+        "prompt": "Dame opciones de comida para hoy usando lo que tengo disponible."
+      },
+      "dinnerIdeas": {
+        "title": "¿Qué puedo preparar para cenar?",
+        "description": "Sugerencias para la cena con lo que ya tienes.",
+        "cta": "Ver cenas",
+        "prompt": "Planifica una cena sencilla con los ingredientes de mi despensa."
+      },
+      "whatToCookNow": {
+        "title": "¿Qué cocino ahora?",
+        "description": "No sabes qué comer. Te doy ideas con tu despensa.",
+        "cta": "Dame ideas",
+        "prompt": "Dame ideas rápidas de qué cocinar usando los ingredientes que ya tengo."
+      },
+      "planAndSaveTime": {
+        "title": "Planifica tus comidas y ahorra tiempo cada semana",
+        "description": "Desbloquea el planificador PRO y organiza tu menú fácilmente.",
+        "cta": "Hazte PRO"
+      }
+    }
   },
   "agent": {
     "title": "Planificación",

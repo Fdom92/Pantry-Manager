@@ -90,7 +90,7 @@ export class AgentComponent implements ViewWillEnter {
     {
       id: 'use-expiring',
       labelKey: 'agent.quickStart.useExpiring',
-      context: AgentEntryContext.DASHBOARD_INSIGHT,
+      context: AgentEntryContext.INSIGHTS,
     },
     {
       id: 'decide-for-me',
@@ -277,10 +277,10 @@ export class AgentComponent implements ViewWillEnter {
 
   private resolvePlannerMode(): MealPlannerMode {
     const context = this.conversationStore.getEntryContext();
-    if (context === AgentEntryContext.RECIPES || context === AgentEntryContext.RECIPE_INSIGHT) {
+    if (context === AgentEntryContext.RECIPES || context === AgentEntryContext.INSIGHTS_RECIPES) {
       return 'recipes';
     }
-    if (context === AgentEntryContext.DASHBOARD_INSIGHT) {
+    if (context === AgentEntryContext.INSIGHTS) {
       return 'plan';
     }
     return 'plan';

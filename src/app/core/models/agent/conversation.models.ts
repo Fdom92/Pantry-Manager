@@ -4,8 +4,8 @@ import type { RawToolCall } from './tooling.models';
 export enum AgentEntryContext {
   PLANNING = 'planning',
   RECIPES = 'recipes',
-  DASHBOARD_INSIGHT = 'dashboard-insight',
-  RECIPE_INSIGHT = 'recipe-insight',
+  INSIGHTS = 'insights',
+  INSIGHTS_RECIPES = 'insights-recipes',
 }
 
 export interface AgentConversationInit {
