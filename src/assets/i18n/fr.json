@@ -237,7 +237,44 @@
       "plan": "Planifier",
       "ideas": "Donne-moi des idées"
     },
-    "ctaDefault": "Compris"
+    "ctaDefault": "Compris",
+    "library": {
+      "weeklyMealPlanning": {
+        "title": "Planifiez les repas de la semaine",
+        "description": "Planifiez les repas de cette semaine avec ce que vous avez déjà.",
+        "cta": "Planifier maintenant",
+        "prompt": "Planifie mes repas de cette semaine en utilisant uniquement ce qui se trouve déjà dans mon garde-manger."
+      },
+      "cookBeforeExpiry": {
+        "title": "Cuisinez avant qu'ils expirent",
+        "description": "Profitez des produits qui vont bientôt périmer et qui ont encore du stock.",
+        "cta": "Utiliser les produits urgents",
+        "prompt": "Suggère des recettes qui privilégient les produits bientôt périmés de mon garde-manger."
+      },
+      "lunchIdeas": {
+        "title": "Que puis-je préparer pour le déjeuner ?",
+        "description": "Idées rapides de déjeuner avec votre garde-manger.",
+        "cta": "Voir des idées",
+        "prompt": "Donne-moi des options de déjeuner pour aujourd'hui avec ce que j'ai déjà."
+      },
+      "dinnerIdeas": {
+        "title": "Que puis-je préparer pour le dîner ?",
+        "description": "Suggestions de dîner avec ce que vous possédez déjà.",
+        "cta": "Planifier le dîner",
+        "prompt": "Planifie un dîner simple avec les ingrédients de mon garde-manger."
+      },
+      "whatToCookNow": {
+        "title": "Que cuisiner maintenant ?",
+        "description": "Vous ne savez pas quoi manger ? Je vous propose des idées avec votre garde-manger.",
+        "cta": "Donne-moi des idées",
+        "prompt": "Propose des idées rapides à cuisiner en utilisant uniquement les ingrédients que je possède déjà."
+      },
+      "planAndSaveTime": {
+        "title": "Planifiez vos repas et gagnez du temps chaque semaine",
+        "description": "Débloquez le planificateur PRO et organisez facilement votre menu.",
+        "cta": "Devenir PRO"
+      }
+    }
   },
   "agent": {
     "title": "Planification",

@@ -237,7 +237,44 @@
       "plan": "Pianificare",
       "ideas": "Dammi idee"
     },
-    "ctaDefault": "Capito"
+    "ctaDefault": "Capito",
+    "library": {
+      "weeklyMealPlanning": {
+        "title": "Pianifica i pasti della settimana",
+        "description": "Organizza i pasti di questa settimana con ciò che hai già.",
+        "cta": "Pianifica ora",
+        "prompt": "Pianifica i pasti di questa settimana usando solo ciò che ho già in dispensa."
+      },
+      "cookBeforeExpiry": {
+        "title": "Cucina prima che scadano",
+        "description": "Sfrutta i prodotti che stanno per scadere e hanno ancora scorte.",
+        "cta": "Usa prodotti critici",
+        "prompt": "Suggerisci ricette che diano priorità ai prodotti in scadenza nella mia dispensa."
+      },
+      "lunchIdeas": {
+        "title": "Cosa posso preparare per pranzo?",
+        "description": "Idee veloci per il pranzo usando la tua dispensa.",
+        "cta": "Vedi idee",
+        "prompt": "Dammi opzioni per il pranzo di oggi usando ciò che ho disponibile."
+      },
+      "dinnerIdeas": {
+        "title": "Cosa posso preparare per cena?",
+        "description": "Suggerimenti per la cena con ciò che hai già.",
+        "cta": "Pianifica la cena",
+        "prompt": "Organizza una cena semplice con gli ingredienti della mia dispensa."
+      },
+      "whatToCookNow": {
+        "title": "Cosa cucino adesso?",
+        "description": "Non sai cosa mangiare? Ti do idee con la tua dispensa.",
+        "cta": "Dammi idee",
+        "prompt": "Dammi idee rapide su cosa cucinare usando solo gli ingredienti che possiedo."
+      },
+      "planAndSaveTime": {
+        "title": "Pianifica i pasti e risparmia tempo ogni settimana",
+        "description": "Sblocca il pianificatore PRO e organizza il tuo menù facilmente.",
+        "cta": "Diventa PRO"
+      }
+    }
   },
   "agent": {
     "title": "Pianificazione",

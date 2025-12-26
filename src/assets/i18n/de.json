@@ -237,7 +237,44 @@
       "plan": "Planen",
       "ideas": "Mir Ideen geben"
     },
-    "ctaDefault": "Verstanden"
+    "ctaDefault": "Verstanden",
+    "library": {
+      "weeklyMealPlanning": {
+        "title": "Plane deine Mahlzeiten für die Woche",
+        "description": "Plane die Mahlzeiten dieser Woche mit dem, was du bereits hast.",
+        "cta": "Jetzt planen",
+        "prompt": "Plane meine Mahlzeiten für diese Woche nur mit den Vorräten, die ich bereits habe."
+      },
+      "cookBeforeExpiry": {
+        "title": "Koche bevor sie ablaufen",
+        "description": "Nutze Produkte, die bald ablaufen und noch Bestand haben.",
+        "cta": "Bald ablaufende nutzen",
+        "prompt": "Schlage Rezepte vor, die die bald ablaufenden Produkte in meiner Speisekammer priorisieren."
+      },
+      "lunchIdeas": {
+        "title": "Was kann ich zum Mittagessen zubereiten?",
+        "description": "Schnelle Mittagsideen mit deinen Vorräten.",
+        "cta": "Ideen anzeigen",
+        "prompt": "Gib mir Mittagsoptionen für heute mit dem, was ich bereits habe."
+      },
+      "dinnerIdeas": {
+        "title": "Was kann ich zum Abendessen zubereiten?",
+        "description": "Abendessen-Vorschläge mit dem, was schon da ist.",
+        "cta": "Abendessen planen",
+        "prompt": "Plane ein einfaches Abendessen mit den Zutaten in meiner Speisekammer."
+      },
+      "whatToCookNow": {
+        "title": "Was koche ich jetzt?",
+        "description": "Du weißt nicht, was du essen sollst? Ich gebe dir Ideen mit deinen Vorräten.",
+        "cta": "Gib mir Ideen",
+        "prompt": "Teile schnelle Kochideen mit nur den Zutaten, die ich bereits besitze."
+      },
+      "planAndSaveTime": {
+        "title": "Plane deine Mahlzeiten und spare jede Woche Zeit",
+        "description": "Schalte den PRO-Planer frei und organisiere dein Menü ganz leicht.",
+        "cta": "PRO werden"
+      }
+    }
   },
   "agent": {
     "title": "Planung",

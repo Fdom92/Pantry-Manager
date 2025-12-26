@@ -237,7 +237,44 @@
       "plan": "Plan",
       "ideas": "Give me ideas"
     },
-    "ctaDefault": "Got it"
+    "ctaDefault": "Got it",
+    "library": {
+      "weeklyMealPlanning": {
+        "title": "Plan your meals for the week",
+        "description": "Plan this week's meals with what you already have.",
+        "cta": "Plan now",
+        "prompt": "Plan my meals for this week using only what I already have in the pantry."
+      },
+      "cookBeforeExpiry": {
+        "title": "Cook before they expire",
+        "description": "Use up the products that are about to expire and still have stock.",
+        "cta": "Use expiring items",
+        "prompt": "Suggest recipes that prioritize the products expiring soon in my pantry."
+      },
+      "lunchIdeas": {
+        "title": "What can I make for lunch?",
+        "description": "Quick lunch ideas using your pantry.",
+        "cta": "See ideas",
+        "prompt": "Give me lunch options for today using what I already have."
+      },
+      "dinnerIdeas": {
+        "title": "What can I make for dinner?",
+        "description": "Dinner suggestions with what you already have.",
+        "cta": "Plan dinner",
+        "prompt": "Plan a simple dinner using the ingredients in my pantry."
+      },
+      "whatToCookNow": {
+        "title": "What should I cook now?",
+        "description": "Not sure what to eat? I'll suggest ideas with your pantry.",
+        "cta": "Give me ideas",
+        "prompt": "Share quick meal ideas using only the ingredients I already own."
+      },
+      "planAndSaveTime": {
+        "title": "Plan meals and save time every week",
+        "description": "Unlock the PRO planner and organize your menu easily.",
+        "cta": "Go PRO"
+      }
+    }
   },
   "agent": {
     "title": "Planning",

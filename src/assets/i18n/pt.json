@@ -237,7 +237,44 @@
       "plan": "Planear",
       "ideas": "Dá-me ideias"
     },
-    "ctaDefault": "Entendi"
+    "ctaDefault": "Entendi",
+    "library": {
+      "weeklyMealPlanning": {
+        "title": "Planeje as refeições da semana",
+        "description": "Planeje as refeições desta semana com o que você já tem.",
+        "cta": "Planejar agora",
+        "prompt": "Planeje minhas refeições desta semana usando apenas o que já tenho na despensa."
+      },
+      "cookBeforeExpiry": {
+        "title": "Cozinhe antes de vencerem",
+        "description": "Aproveite os produtos que estão prestes a vencer e ainda têm estoque.",
+        "cta": "Usar itens críticos",
+        "prompt": "Sugira receitas priorizando os produtos que vencem em breve na minha despensa."
+      },
+      "lunchIdeas": {
+        "title": "O que posso preparar para o almoço?",
+        "description": "Ideias rápidas de almoço usando sua despensa.",
+        "cta": "Ver ideias",
+        "prompt": "Dê opções de almoço para hoje usando o que já tenho."
+      },
+      "dinnerIdeas": {
+        "title": "O que posso preparar para o jantar?",
+        "description": "Sugestões de jantar com o que você já tem.",
+        "cta": "Planejar jantar",
+        "prompt": "Planeje um jantar simples com os ingredientes da minha despensa."
+      },
+      "whatToCookNow": {
+        "title": "O que preparo agora?",
+        "description": "Não sabe o que comer? Eu te dou ideias com a sua despensa.",
+        "cta": "Me dê ideias",
+        "prompt": "Traga ideias rápidas do que cozinhar usando apenas os ingredientes que já possuo."
+      },
+      "planAndSaveTime": {
+        "title": "Planeje suas refeições e economize tempo toda semana",
+        "description": "Desbloqueie o planejador PRO e organize seu menu com facilidade.",
+        "cta": "Torne-se PRO"
+      }
+    }
   },
   "agent": {
     "title": "Planeamento",

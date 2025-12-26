@@ -1,71 +1,22 @@
 import { Injectable, inject } from '@angular/core';
-import {
-  AgentEntryContext,
-  DashboardInsightContext,
-  Insight,
-  InsightCta,
-  InsightId,
-  InsightSeverity,
-} from '@core/models';
+import { INSIGHTS_LIBRARY } from '@core/constants';
+import { Insight, InsightContext, InsightCta, InsightCtaDefinition, InsightDefinition, InsightPredicateHelpers } from '@core/models';
 import { TranslateService } from '@ngx-translate/core';
+import { ProService } from './pro.service';
 
 @Injectable({ providedIn: 'root' })
 export class InsightService {
   private readonly translate = inject(TranslateService);
+  private readonly proService = inject(ProService);
   private readonly dismissedInsightIds = new Set<string>();
 
-  buildDashboardInsights(context: DashboardInsightContext): Insight[] {
-    const insights: Insight[] = [];
-
-    const expiringLowStock = context.expiringSoonItems.filter(item => item.isLowStock);
-    if (expiringLowStock.length >= 1) {
-      insights.push({
-        id: InsightId.EXPIRING_LOW_STOCK,
-        title: this.translateKey('insights.expiringLowStock.title'),
-        description: this.translateKey('insights.expiringLowStock.description'),
-        ctaLabel: this.translateKey('insights.expiringLowStock.cta'),
-        ctas: this.buildRecipeCtas('expiringLowStock'),
-        severity: this.severity('warning'),
-        priority: 2,
-      });
-    }
-
-    const expiredWithStock = context.expiredItems.filter(item => item.quantity > 0);
-    if (expiredWithStock.length >= 1) {
-      insights.push({
-        id: InsightId.EXPIRED_WITH_STOCK,
-        title: this.translateKey('insights.expiredWithStock.title'),
-        description: this.translateKey('insights.expiredWithStock.description'),
-        ctaLabel: this.translateKey('insights.expiredWithStock.cta'),
-        ctas: this.buildRecipeCtas('expiredWithStock'),
-        severity: this.severity('danger'),
-        priority: 1,
-      });
-    }
-
-    if (context.expiringSoonCount === 0 && context.lowStockCount >= 3) {
-      insights.push({
-        id: InsightId.LOW_STOCK_NO_EXPIRY,
-        title: this.translateKey('insights.lowStockNoExpiry.title'),
-        description: this.translateKey('insights.lowStockNoExpiry.description'),
-        ctaLabel: this.translateKey('insights.lowStockNoExpiry.cta'),
-        severity: this.severity('info'),
-        priority: 3,
-      });
-    }
-
-    if (this.hasDuplicateProductNames(context.products)) {
-      insights.push({
-        id: InsightId.DUPLICATED_PRODUCTS,
-        title: this.translateKey('insights.duplicatedProducts.title'),
-        description: this.translateKey('insights.duplicatedProducts.description'),
-        ctaLabel: this.translateKey('insights.duplicatedProducts.cta'),
-        severity: this.severity('info'),
-        priority: 4,
-      });
-    }
-
-    return insights.sort((a, b) => a.priority - b.priority).slice(0, 2);
+  buildDashboardInsights(context: InsightContext): Insight[] {
+    const isPro = this.proService.isPro();
+    const helpers: InsightPredicateHelpers = { now: new Date() };
+    return INSIGHTS_LIBRARY.filter(def => this.isAvailable(def, isPro))
+      .filter(def => !def.predicate || def.predicate(context, helpers))
+      .sort((a, b) => a.priority - b.priority)
+      .map(def => this.toInsight(def));
   }
 
   getVisibleInsights(insights: Insight[]): Insight[] {
@@ -80,50 +31,50 @@ export class InsightService {
     this.dismissedInsightIds.clear();
   }
 
+  private isAvailable(definition: InsightDefinition, isPro: boolean): boolean {
+    if (definition.audience === 'pro') {
+      return isPro;
+    }
+    if (definition.audience === 'non-pro') {
+      return !isPro;
+    }
+    return true;
+  }
+
+  private toInsight(definition: InsightDefinition): Insight {
+    return {
+      id: definition.id,
+      title: this.translateKey(definition.titleKey),
+      description: this.translateKey(definition.descriptionKey),
+      severity: definition.severity,
+      priority: definition.priority,
+      ctas: definition.ctas?.map(cta => this.toCta(cta)).filter((cta): cta is InsightCta => Boolean(cta)),
+    };
+  }
+
+  private toCta(definition: InsightCtaDefinition): InsightCta | null {
+    if (definition.type === 'agent') {
+      const prompt = this.translateKey(definition.promptKey);
+      if (!prompt) {
+        return null;
+      }
+      return {
+        id: definition.id,
+        label: this.translateKey(definition.labelKey),
+        type: 'agent',
+        entryContext: definition.entryContext,
+        prompt,
+      };
+    }
+    return {
+      id: definition.id,
+      label: this.translateKey(definition.labelKey),
+      type: 'navigate',
+      route: definition.route,
+    };
+  }
+
   private translateKey(key: string): string {
     return this.translate.instant(key);
-  }
-
-  private hasDuplicateProductNames(products: DashboardInsightContext['products']): boolean {
-    const nameCounts = new Map<string, number>();
-    for (const product of products) {
-      const key = (product.name ?? '').trim().toLowerCase();
-      if (!key) {
-        continue;
-      }
-      nameCounts.set(key, (nameCounts.get(key) ?? 0) + 1);
-    }
-    for (const count of nameCounts.values()) {
-      if (count > 1) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private severity(level: InsightSeverity): InsightSeverity {
-    return level;
-  }
-
-  private buildRecipeCtas(type: 'expiringLowStock' | 'expiredWithStock'): InsightCta[] {
-    const planPrompt = this.translateKey(`insights.${type}.planPrompt`);
-    const ideasPrompt = this.translateKey(`insights.${type}.ideasPrompt`);
-    const planCta: InsightCta | null = planPrompt
-      ? {
-          id: `${type}-plan`,
-          label: this.translateKey('insights.ctaLabels.plan'),
-          entryContext: AgentEntryContext.DASHBOARD_INSIGHT,
-          prompt: planPrompt,
-        }
-      : null;
-    const ideasCta: InsightCta | null = ideasPrompt
-      ? {
-          id: `${type}-ideas`,
-          label: this.translateKey('insights.ctaLabels.ideas'),
-          entryContext: AgentEntryContext.RECIPE_INSIGHT,
-          prompt: ideasPrompt,
-        }
-      : null;
-    return [planCta, ideasCta].filter((cta): cta is InsightCta => Boolean(cta?.prompt));
   }
 }
