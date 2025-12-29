@@ -13,3 +13,8 @@ export interface LlmCompletionRequest {
 export interface LlmCompletionResponse {
   content: string;
 }
+
+export interface LlmClientError extends Error {
+  status?: number;
+  timeout?: boolean;
+}
