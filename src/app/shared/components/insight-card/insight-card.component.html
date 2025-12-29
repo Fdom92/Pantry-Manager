@@ -6,12 +6,33 @@
   <ion-card-content>
     <p class="insight-card__message">{{ insight.description }}</p>
 
-    <ion-button
-      size="small"
-      fill="clear"
-      color="primary"
-      (click)="emitDismiss()">
-      {{ ('insights.ctaDefault' | translate) }}
-    </ion-button>
+    @if (insight.ctas?.length) {
+      <div class="insight-card__actions">
+        @for (cta of insight.ctas; track cta.id) {
+          <ion-button
+            size="small"
+            fill="solid"
+            color="primary"
+            (click)="emitCta(cta)">
+            {{ cta.label }}
+          </ion-button>
+        }
+        <ion-button
+          size="small"
+          fill="clear"
+          color="secondary"
+          (click)="emitDismiss()">
+          {{ ('insights.ctaDefault' | translate) }}
+        </ion-button>
+      </div>
+    } @else {
+      <ion-button
+        size="small"
+        fill="clear"
+        color="secondary"
+        (click)="emitDismiss()">
+        {{ ('insights.ctaDefault' | translate) }}
+      </ion-button>
+    }
   </ion-card-content>
 </ion-card>

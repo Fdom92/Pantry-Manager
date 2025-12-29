@@ -10,7 +10,8 @@
       @for (insight of visibleInsights(); track insight.id) {
         <app-insight-card
           [insight]="insight"
-          (dismiss)="dismissInsight(insight)">
+          (dismiss)="dismissInsight(insight)"
+          (ctaSelect)="onInsightAction(insight, $event)">
         </app-insight-card>
       }
     </div>
