@@ -16,7 +16,8 @@ export class InsightService {
     return INSIGHTS_LIBRARY.filter(def => this.isAvailable(def, isPro))
       .filter(def => !def.predicate || def.predicate(context, helpers))
       .sort((a, b) => a.priority - b.priority)
-      .map(def => this.toInsight(def));
+      .map(def => this.toInsight(def))
+      .slice(0, 2);
   }
 
   getVisibleInsights(insights: Insight[]): Insight[] {
