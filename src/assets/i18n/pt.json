@@ -2,7 +2,7 @@
   "tabs": {
     "dashboard": "Início",
     "pantry": "Despensa",
-    "agent": "Agente",
+    "agent": "Planeamento",
     "shopping": "Compras",
     "settings": "Definições"
   },
@@ -38,11 +38,11 @@
         "description": "Sabe o que reabastecer com base no consumo, stock mínimo e prazos de validade."
       },
       "agent": {
-        "title": "Desbloqueia o Agente IA (PRO)",
-        "description": "Conversa com a tua despensa, pede receitas e gera listas de compras automaticamente.",
+        "title": "Desbloqueia o planeador inteligente (PRO)",
+        "description": "Planeia menus, pede receitas e cria listas automaticamente.",
         "badge": "Exclusivo PRO",
-        "titlePro": "Agente IA pronto para ti",
-        "descriptionPro": "PRO ativo: usa o Agente para receitas, ideias e listas mais rápidas.",
+        "titlePro": "Planeador inteligente pronto para ti",
+        "descriptionPro": "PRO ativo: usa o planeador para receitas, ideias e listas mais rápidas.",
         "badgePro": "PRO ativo"
       }
     }
@@ -212,12 +212,16 @@
     "expiringLowStock": {
       "title": "Produtos prestes a vencer e com pouco estoque",
       "description": "Alguns produtos combinam vencimento próximo e estoque baixo.",
-      "cta": "Ver produtos"
+      "cta": "Ver produtos",
+      "planPrompt": "Ajuda-me a planear receitas com os produtos que vão vencer e já têm pouco estoque.",
+      "ideasPrompt": "Dá-me ideias rápidas para usar esses ingredientes antes que estraguem."
     },
     "expiredWithStock": {
       "title": "Produtos vencidos ainda disponíveis",
       "description": "Existem produtos vencidos que ainda têm estoque.",
-      "cta": "Revisar vencidos"
+      "cta": "Revisar vencidos",
+      "planPrompt": "Cria um plano para consumir os produtos que já passaram da validade mas continuam em estoque.",
+      "ideasPrompt": "Sugere receitas ou formas de aproveitar esses produtos vencidos."
     },
     "lowStockNoExpiry": {
       "title": "Estoque baixo mesmo sem vencimentos urgentes",
@@ -229,43 +233,132 @@
       "description": "Existem itens com o mesmo nome registrados mais de uma vez. Revise e consolide.",
       "cta": "Revisar produtos"
     },
-    "ctaDefault": "Entendi"
+    "ctaLabels": {
+      "plan": "Planear",
+      "ideas": "Dá-me ideias"
+    },
+    "ctaDefault": "Entendi",
+    "library": {
+      "weeklyMealPlanning": {
+        "title": "Planeje as refeições da semana",
+        "description": "Planeje as refeições desta semana com o que você já tem.",
+        "cta": "Planejar agora",
+        "prompt": "Planeje minhas refeições desta semana usando apenas o que já tenho na despensa."
+      },
+      "cookBeforeExpiry": {
+        "title": "Cozinhe antes de vencerem",
+        "description": "Aproveite os produtos que estão prestes a vencer e ainda têm estoque.",
+        "cta": "Usar itens críticos",
+        "prompt": "Sugira receitas priorizando os produtos que vencem em breve na minha despensa."
+      },
+      "lunchIdeas": {
+        "title": "O que posso preparar para o almoço?",
+        "description": "Ideias rápidas de almoço usando sua despensa.",
+        "cta": "Ver ideias",
+        "prompt": "Dê opções de almoço para hoje usando o que já tenho."
+      },
+      "dinnerIdeas": {
+        "title": "O que posso preparar para o jantar?",
+        "description": "Sugestões de jantar com o que você já tem.",
+        "cta": "Planejar jantar",
+        "prompt": "Planeje um jantar simples com os ingredientes da minha despensa."
+      },
+      "whatToCookNow": {
+        "title": "O que preparo agora?",
+        "description": "Não sabe o que comer? Eu te dou ideias com a sua despensa.",
+        "cta": "Me dê ideias",
+        "prompt": "Traga ideias rápidas do que cozinhar usando apenas os ingredientes que já possuo."
+      },
+      "planAndSaveTime": {
+        "title": "Planeje suas refeições e economize tempo toda semana",
+        "description": "Desbloqueie o planejador PRO e organize seu menu com facilidade.",
+        "cta": "Torne-se PRO"
+      }
+    }
   },
   "agent": {
-    "title": "Agente",
+    "title": "Planeamento",
     "thinking": "A pensar…",
     "states": {
       "thinking": "A pensar…",
       "fetching": "A consultar a tua despensa…",
       "responding": "A gerar resposta…"
     },
-    "placeholder": "Escreve instruções como \"Mover 2 iogurtes para o frigorífico\"",
+    "placeholder": "Pede receitas, planos de refeições ou ideias com o que tens.",
     "actions": {
       "send": "Enviar",
       "retry": "Tentar novamente"
     },
     "preview": {
       "badge": "Pré-visualização",
-      "title": "Experimenta o agente PRO",
-      "headline": "Desbloqueia a IA para gerir a tua despensa por ti.",
-      "subtitle": "Vê itens expirados, gera receitas e reorganiza o stock com um só pedido.",
-      "cta": "Desbloquear agente PRO",
-      "note": "Inicia o teste gratuito e cancela quando quiseres.",
-      "lockedPlaceholder": "Disponível com PRO"
+      "title": "Camada de planeamento inteligente",
+      "headline": "Ideias e planos com IA",
+      "subtitle": "Recebe receitas, menus e insights feitos para a tua despensa.",
+      "cta": "Desbloquear planeador PRO",
+      "note": "Teste PRO gratuito incluído.",
+      "lockedPlaceholder": "Disponível com PRO",
+      "demo": {
+        "chipsTitle": "Começa com uma intenção",
+        "sessionTitle": "Conversa exemplo",
+        "userMessage": "“Planeia jantares com o que vence esta semana.”",
+        "agentMessage": "Perfeito. Tens espinafre e feta que vencem em 2 dias. Sugestão: hoje pesto de espinafre com massa e amanhã omelete grega."
+      },
+      "sampleWeek": {
+        "title": "Visão semanal",
+        "items": {
+          "one": {
+            "title": "Seg · Tacos veggie",
+            "desc": "Usa pimentos e feijão que vencem amanhã."
+          },
+          "two": {
+            "title": "Qua · Lote de sopa",
+            "desc": "Assa abóbora e congela duas porções."
+          },
+          "three": {
+            "title": "Fim de semana · Brunch",
+            "desc": "Overnight oats com a fruta madura."
+          }
+        }
+      },
+      "sampleIdeas": {
+        "title": "Fila de ideias",
+        "cards": {
+          "one": {
+            "title": "Jantar zero desperdício",
+            "desc": "Transforma o espinafre prestes a vencer em pesto para massa."
+          },
+          "two": {
+            "title": "Prep de almoço",
+            "desc": "Grelha frango e junta com legumes assados."
+          }
+        }
+      }
+    },
+    "quickStart": {
+      "title": "Entrada contextual",
+      "headline": "Começa a planear sem um chat vazio",
+      "subtitle": "Escolhe uma intenção e o planeador responde de imediato.",
+      "ctaTitle": "Começa com um toque",
+      "ctaSubtitle": "Seleciona o foco para hoje.",
+      "today": "O que posso cozinhar hoje?",
+      "quickIdeas": "Ideias rápidas com o que tenho",
+      "weeklyPlan": "Planear as refeições da semana",
+      "useExpiring": "Aproveitar o que vai expirar",
+      "decideForMe": "Decide por mim"
     },
     "roles": {
       "user": "Tu",
-      "assistant": "Agente",
+      "assistant": "Planeador",
       "tool": "Ação"
     },
     "messages": {
       "processing": "A processar ação…",
       "noResponse": "Não foi possível gerar uma resposta.",
-      "noEndpoint": "O endpoint do agente não está configurado.",
-      "callFailed": "Parece que a ligação ao assistente teve um problema temporário. Tenta novamente dentro de alguns segundos.",
-      "incompleteToolCall": "O assistente não conseguiu reunir todos os dados necessários para executar esta ação. Reformula ou tenta novamente.",
+      "noEndpoint": "O endpoint do planeador não está configurado.",
+      "callFailed": "Parece que a ligação ao planeador teve um problema temporário. Tenta novamente dentro de alguns segundos.",
+      "incompleteToolCall": "O planeador não conseguiu reunir todos os dados necessários para executar esta ação. Reformula ou tenta novamente.",
       "toolUnavailable": "A ferramenta \"{{ name }}\" não está disponível.",
-      "unifiedError": "O assistente não conseguiu responder agora. Tenta novamente dentro de alguns segundos."
+      "unifiedError": "O planeador não conseguiu responder agora. Tenta novamente dentro de alguns segundos."
     },
     "errors": {
       "missingName": "O nome do produto é obrigatório.",
@@ -515,7 +608,7 @@
     "benefits": {
       "title": "Tudo o que obténs com PRO",
       "subtitle": "Desenhado para utilizadores avançados e famílias ocupadas.",
-      "agent": "Agente IA para gerir a despensa automaticamente.",
+      "agent": "Planeador IA que te propõe menus e receitas à tua medida.",
       "future": "Acesso antecipado a futuras funcionalidades PRO.",
       "cloudSync": "Sincronização e backup na cloud para mais segurança.",
       "history": "Histórico completo das alterações aos itens.",

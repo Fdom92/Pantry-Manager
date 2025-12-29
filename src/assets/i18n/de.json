@@ -2,7 +2,7 @@
   "tabs": {
     "dashboard": "Start",
     "pantry": "Vorratskammer",
-    "agent": "Agent",
+    "agent": "Planung",
     "shopping": "Einkäufe",
     "settings": "Einstellungen"
   },
@@ -38,11 +38,11 @@
         "description": "Zeigt dir, was nachgekauft werden sollte – basierend auf Verbrauch, Mindestbestand und nahendem Ablauf."
       },
       "agent": {
-        "title": "KI-Agent freischalten (PRO)",
-        "description": "Chatte mit deiner Vorratskammer, fordere Rezepte an und erstelle Listen in Sekunden.",
+        "title": "Intelligenten Menüplaner freischalten (PRO)",
+        "description": "Plane Menüs, fordere Rezepte an und erstelle Einkaufslisten automatisch.",
         "badge": "Exklusiv für PRO",
-        "titlePro": "KI-Agent bereit für dich",
-        "descriptionPro": "Du hast PRO-Zugriff: Nutze den Agenten für Rezepte, Ideen und Einkäufe.",
+        "titlePro": "Menüplaner bereit für dich",
+        "descriptionPro": "PRO aktiv: Nutze den Menüplaner für Rezepte, Ideen und schnellere Listen.",
         "badgePro": "PRO aktiv"
       }
     }
@@ -212,12 +212,16 @@
     "expiringLowStock": {
       "title": "Produkte kurz vor Ablauf mit geringem Bestand",
       "description": "Einige Produkte haben sowohl ein nahes Ablaufdatum als auch niedrigen Bestand.",
-      "cta": "Produkte anzeigen"
+      "cta": "Produkte anzeigen",
+      "planPrompt": "Hilf mir, Rezepte zu planen, die die wenigen Produkte nutzen, die bald ablaufen.",
+      "ideasPrompt": "Gib mir schnelle Ideen, um diese Produkte vor dem Ablauf zu verbrauchen."
     },
     "expiredWithStock": {
       "title": "Abgelaufene Produkte noch verfügbar",
       "description": "Einige abgelaufene Produkte sind noch auf Lager.",
-      "cta": "Abgelaufene prüfen"
+      "cta": "Abgelaufene prüfen",
+      "planPrompt": "Erstelle einen Plan, um die bereits abgelaufenen Produkte mit Bestand aufzubrauchen.",
+      "ideasPrompt": "Schlage Rezepte oder Verwendungsideen vor, um diese abgelaufenen Produkte zu verwerten."
     },
     "lowStockNoExpiry": {
       "title": "Niedriger Bestand ohne dringende Ablaufdaten",
@@ -229,43 +233,132 @@
       "description": "Einige Artikel haben denselben Namen in mehreren Einträgen. Prüfe und führe sie zusammen.",
       "cta": "Produkte prüfen"
     },
-    "ctaDefault": "Verstanden"
+    "ctaLabels": {
+      "plan": "Planen",
+      "ideas": "Mir Ideen geben"
+    },
+    "ctaDefault": "Verstanden",
+    "library": {
+      "weeklyMealPlanning": {
+        "title": "Plane deine Mahlzeiten für die Woche",
+        "description": "Plane die Mahlzeiten dieser Woche mit dem, was du bereits hast.",
+        "cta": "Jetzt planen",
+        "prompt": "Plane meine Mahlzeiten für diese Woche nur mit den Vorräten, die ich bereits habe."
+      },
+      "cookBeforeExpiry": {
+        "title": "Koche bevor sie ablaufen",
+        "description": "Nutze Produkte, die bald ablaufen und noch Bestand haben.",
+        "cta": "Bald ablaufende nutzen",
+        "prompt": "Schlage Rezepte vor, die die bald ablaufenden Produkte in meiner Speisekammer priorisieren."
+      },
+      "lunchIdeas": {
+        "title": "Was kann ich zum Mittagessen zubereiten?",
+        "description": "Schnelle Mittagsideen mit deinen Vorräten.",
+        "cta": "Ideen anzeigen",
+        "prompt": "Gib mir Mittagsoptionen für heute mit dem, was ich bereits habe."
+      },
+      "dinnerIdeas": {
+        "title": "Was kann ich zum Abendessen zubereiten?",
+        "description": "Abendessen-Vorschläge mit dem, was schon da ist.",
+        "cta": "Abendessen planen",
+        "prompt": "Plane ein einfaches Abendessen mit den Zutaten in meiner Speisekammer."
+      },
+      "whatToCookNow": {
+        "title": "Was koche ich jetzt?",
+        "description": "Du weißt nicht, was du essen sollst? Ich gebe dir Ideen mit deinen Vorräten.",
+        "cta": "Gib mir Ideen",
+        "prompt": "Teile schnelle Kochideen mit nur den Zutaten, die ich bereits besitze."
+      },
+      "planAndSaveTime": {
+        "title": "Plane deine Mahlzeiten und spare jede Woche Zeit",
+        "description": "Schalte den PRO-Planer frei und organisiere dein Menü ganz leicht.",
+        "cta": "PRO werden"
+      }
+    }
   },
   "agent": {
-    "title": "Agent",
+    "title": "Planung",
     "thinking": "Denkt nach…",
     "states": {
       "thinking": "Denkt nach…",
       "fetching": "Vorratskammer wird abgefragt…",
       "responding": "Antwort wird erstellt…"
     },
-    "placeholder": "Schreibe Anweisungen wie „Verschiebe 2 Joghurts in den Kühlschrank“",
+    "placeholder": "Frag nach Rezepten, Essensplänen oder Ideen mit deinen Vorräten.",
     "actions": {
       "send": "Senden",
       "retry": "Erneut versuchen"
     },
     "preview": {
       "badge": "Vorschau",
-      "title": "So sieht der Agent aus",
-      "headline": "Premium-KI-Antworten",
-      "subtitle": "Abgelaufene prüfen, Rezepte erstellen und Bestand neu organisieren – mit einer Nachricht.",
-      "cta": "Agent freischalten",
+      "title": "Das Planungserlebnis",
+      "headline": "Ideen und Pläne mit KI",
+      "subtitle": "Erhalte Rezepte, Menüs und Insights passend zu deinem Vorrat.",
+      "cta": "Menüplaner freischalten",
       "note": "Kostenlose Testversion im PRO-Plan enthalten.",
-      "lockedPlaceholder": "Nur mit PRO verfügbar"
+      "lockedPlaceholder": "Nur mit PRO verfügbar",
+      "demo": {
+        "chipsTitle": "Starte mit einer Absicht",
+        "sessionTitle": "Beispielkonversation",
+        "userMessage": "„Plane Abendessen mit allem, was diese Woche abläuft.“",
+        "agentMessage": "Klingt gut. Spinat und Feta laufen in 2 Tagen ab. Vorschlag: Heute Spinat-Pesto-Pasta und morgen ein griechisches Omelett."
+      },
+      "sampleWeek": {
+        "title": "Wochenüberblick",
+        "items": {
+          "one": {
+            "title": "Mo · Veggie-Tacos",
+            "desc": "Paprika und Bohnen nutzen, die morgen ablaufen."
+          },
+          "two": {
+            "title": "Mi · Suppenvorrat",
+            "desc": "Kürbis rösten und zwei Portionen einfrieren."
+          },
+          "three": {
+            "title": "Wochenende · Brunch",
+            "desc": "Overnight Oats mit reifem Obst."
+          }
+        }
+      },
+      "sampleIdeas": {
+        "title": "Ideenliste",
+        "cards": {
+          "one": {
+            "title": "Zero-Waste-Dinner",
+            "desc": "Spinat kurz vor Ablauf zu Pesto-Pasta verarbeiten."
+          },
+          "two": {
+            "title": "Lunch-Prep",
+            "desc": "Hähnchen grillen und mit Ofengemüse kombinieren."
+          }
+        }
+      }
+    },
+    "quickStart": {
+      "title": "Kontextueller Einstieg",
+      "headline": "Starte die Planung ohne leeren Chat",
+      "subtitle": "Wähle eine Intention und der Menüplaner reagiert sofort.",
+      "ctaTitle": "Mit einem Tipp starten",
+      "ctaSubtitle": "Bestimme, worauf du heute fokussierst.",
+      "today": "Was kann ich heute kochen?",
+      "quickIdeas": "Schnelle Ideen mit meinen Vorräten",
+      "weeklyPlan": "Mahlzeiten für die Woche planen",
+      "useExpiring": "Nutze, was bald abläuft",
+      "decideForMe": "Entscheide für mich"
     },
     "roles": {
       "user": "Du",
-      "assistant": "Agent",
+      "assistant": "Planer",
       "tool": "Aktion"
     },
     "messages": {
       "processing": "Aktion wird verarbeitet…",
       "noResponse": "Ich konnte keine Antwort erzeugen.",
-      "noEndpoint": "Für den Agenten ist kein Endpoint konfiguriert.",
-      "callFailed": "Die Verbindung zum Assistenten hatte ein temporäres Problem. Bitte versuche es in ein paar Sekunden erneut.",
-      "incompleteToolCall": "Die Aktion konnte nicht abgeschlossen werden, da Daten fehlen. Bitte formuliere die Anweisung neu.",
+      "noEndpoint": "Für den Menüplaner ist kein Endpoint konfiguriert.",
+      "callFailed": "Die Verbindung zum Menüplaner hatte ein temporäres Problem. Bitte versuche es in ein paar Sekunden erneut.",
+      "incompleteToolCall": "Der Menüplaner konnte nicht alle nötigen Daten sammeln. Bitte formuliere die Anweisung neu.",
       "toolUnavailable": "Das Tool „{{ name }}“ ist nicht verfügbar.",
-      "unifiedError": "Der Assistent konnte im Moment nicht antworten. Bitte versuche es später erneut."
+      "unifiedError": "Der Menüplaner konnte im Moment nicht antworten. Bitte versuche es später erneut."
     },
     "errors": {
       "missingName": "Der Produktname fehlt.",
@@ -515,7 +608,7 @@
     "benefits": {
       "title": "Alles, was PRO beinhaltet",
       "subtitle": "Entwickelt für Haushalte mit viel Bewegung.",
-      "agent": "KI-Agent zur freihändigen Verwaltung der Vorratskammer.",
+      "agent": "KI-Menüplaner, der dir passende Menüs und Rezepte vorschlägt.",
       "future": "Frühzeitiger Zugriff auf zukünftige PRO-Funktionen.",
       "cloudSync": "Cloud-Synchronisierung und Backup.",
       "history": "Vollständiger Änderungsverlauf deiner Produkte.",

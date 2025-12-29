@@ -1,4 +1,4 @@
-export * from './agent.service';
+export * from './agent/index';
 export * from './app-preferences.service';
 export * from './insight.service';
 export * from './language.service';

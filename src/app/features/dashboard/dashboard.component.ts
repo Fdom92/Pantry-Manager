@@ -1,14 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import {
-  ES_DATE_FORMAT_OPTIONS,
-  Insight,
-  DashboardInsightContext,
-  ItemLocationStock,
-  PantryItem,
-} from '@core/models';
-import { InsightService, LanguageService, PantryStoreService } from '@core/services';
+import { ES_DATE_FORMAT_OPTIONS, Insight, InsightCta, InsightContext, ItemLocationStock, PantryItem } from '@core/models';
+import { AgentConversationStore, InsightService, LanguageService } from '@core/services';
 import {
   formatDateTimeValue,
   formatDateValue,
@@ -34,9 +28,11 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
+import { PantryStoreService } from '@core/services';
 
 @Component({
   selector: 'app-dashboard',
@@ -73,6 +69,8 @@ export class DashboardComponent {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly insightService = inject(InsightService);
+  private readonly conversationStore = inject(AgentConversationStore);
+  private readonly navCtrl = inject(NavController);
   // Data
   private hasCompletedInitialLoad = false;
   readonly pantryItems = this.pantryStore.items;
@@ -136,6 +134,23 @@ export class DashboardComponent {
     this.visibleInsights.update(current => current.filter(item => item.id !== insight.id));
   }
 
+  async onInsightAction(_: Insight, cta: InsightCta): Promise<void> {
+    if (!cta) {
+      return;
+    }
+    if (cta.type === 'navigate') {
+      if (cta.route) {
+        await this.navCtrl.navigateForward(cta.route);
+      }
+      return;
+    }
+    this.conversationStore.prepareConversation({
+      entryContext: cta.entryContext,
+      initialPrompt: cta.prompt,
+    });
+    await this.navCtrl.navigateForward('/agent');
+  }
+
   private refreshDashboardInsights(
     items: PantryItem[],
     expiringSoon: PantryItem[],
@@ -147,10 +162,11 @@ export class DashboardComponent {
       return;
     }
 
-    const context: DashboardInsightContext = {
+    const context: InsightContext = {
       expiringSoonItems: expiringSoon.map(item => ({
         id: item._id,
         isLowStock: this.pantryStore.isItemLowStock(item),
+        quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       expiredItems: expiredItems.map(item => ({
         id: item._id,

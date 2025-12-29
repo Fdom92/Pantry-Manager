@@ -2,7 +2,7 @@
   "tabs": {
     "dashboard": "Accueil",
     "pantry": "Garde-manger",
-    "agent": "Agent",
+    "agent": "Planification",
     "shopping": "Achats",
     "settings": "Paramètres"
   },
@@ -38,11 +38,11 @@
         "description": "Suggère quoi réapprovisionner selon la consommation, le stock minimum et les produits proches de la péremption."
       },
       "agent": {
-        "title": "Débloquez l’Agent IA (PRO)",
-        "description": "Discutez avec votre garde-manger, demandez des recettes et générez des listes en quelques secondes.",
+        "title": "Débloquez le planificateur intelligent (PRO)",
+        "description": "Planifiez vos menus, demandez des recettes et créez des listes automatiquement.",
         "badge": "Exclusif PRO",
-        "titlePro": "Agent IA prêt pour vous",
-        "descriptionPro": "Vous avez déjà accès PRO : utilisez l’Agent pour les recettes, idées et achats.",
+        "titlePro": "Planificateur intelligent prêt pour vous",
+        "descriptionPro": "Vous avez déjà accès PRO : utilisez le planificateur pour recettes, idées et achats rapides.",
         "badgePro": "PRO actif"
       }
     }
@@ -212,12 +212,16 @@
     "expiringLowStock": {
       "title": "Produits proches de la date de péremption et à faible stock",
       "description": "Certains produits cumulent date de péremption proche et faible stock.",
-      "cta": "Voir les produits"
+      "cta": "Voir les produits",
+      "planPrompt": "Aide-moi à planifier des recettes avec les produits qui périment bientôt et dont il reste peu.",
+      "ideasPrompt": "Propose des idées rapides pour utiliser ces produits avant qu’ils ne se perdent."
     },
     "expiredWithStock": {
       "title": "Produits périmés encore disponibles",
       "description": "Certains produits périmés possèdent encore du stock.",
-      "cta": "Vérifier les périmés"
+      "cta": "Vérifier les périmés",
+      "planPrompt": "Prépare un plan pour consommer les produits déjà périmés mais encore en stock.",
+      "ideasPrompt": "Suggère des recettes ou astuces pour valoriser ces produits périmés."
     },
     "lowStockNoExpiry": {
       "title": "Stock faible malgré l’absence d’expirations urgentes",
@@ -229,43 +233,132 @@
       "description": "Des articles portent le même nom dans plusieurs fiches. Vérifiez-les et fusionnez-les.",
       "cta": "Revoir les produits"
     },
-    "ctaDefault": "Compris"
+    "ctaLabels": {
+      "plan": "Planifier",
+      "ideas": "Donne-moi des idées"
+    },
+    "ctaDefault": "Compris",
+    "library": {
+      "weeklyMealPlanning": {
+        "title": "Planifiez les repas de la semaine",
+        "description": "Planifiez les repas de cette semaine avec ce que vous avez déjà.",
+        "cta": "Planifier maintenant",
+        "prompt": "Planifie mes repas de cette semaine en utilisant uniquement ce qui se trouve déjà dans mon garde-manger."
+      },
+      "cookBeforeExpiry": {
+        "title": "Cuisinez avant qu'ils expirent",
+        "description": "Profitez des produits qui vont bientôt périmer et qui ont encore du stock.",
+        "cta": "Utiliser les produits urgents",
+        "prompt": "Suggère des recettes qui privilégient les produits bientôt périmés de mon garde-manger."
+      },
+      "lunchIdeas": {
+        "title": "Que puis-je préparer pour le déjeuner ?",
+        "description": "Idées rapides de déjeuner avec votre garde-manger.",
+        "cta": "Voir des idées",
+        "prompt": "Donne-moi des options de déjeuner pour aujourd'hui avec ce que j'ai déjà."
+      },
+      "dinnerIdeas": {
+        "title": "Que puis-je préparer pour le dîner ?",
+        "description": "Suggestions de dîner avec ce que vous possédez déjà.",
+        "cta": "Planifier le dîner",
+        "prompt": "Planifie un dîner simple avec les ingrédients de mon garde-manger."
+      },
+      "whatToCookNow": {
+        "title": "Que cuisiner maintenant ?",
+        "description": "Vous ne savez pas quoi manger ? Je vous propose des idées avec votre garde-manger.",
+        "cta": "Donne-moi des idées",
+        "prompt": "Propose des idées rapides à cuisiner en utilisant uniquement les ingrédients que je possède déjà."
+      },
+      "planAndSaveTime": {
+        "title": "Planifiez vos repas et gagnez du temps chaque semaine",
+        "description": "Débloquez le planificateur PRO et organisez facilement votre menu.",
+        "cta": "Devenir PRO"
+      }
+    }
   },
   "agent": {
-    "title": "Agent",
+    "title": "Planification",
     "thinking": "Réflexion…",
     "states": {
       "thinking": "Réflexion…",
       "fetching": "Consultation de votre garde-manger…",
       "responding": "Génération de la réponse…"
     },
-    "placeholder": "Écrivez des instructions comme \"Déplace 2 yaourts au frigo\"",
+    "placeholder": "Demandez des recettes, des menus ou des idées avec ce que vous avez.",
     "actions": {
       "send": "Envoyer",
       "retry": "Réessayer"
     },
     "preview": {
       "badge": "Aperçu",
-      "title": "Voici à quoi ressemble l’agent",
-      "headline": "Réponses IA premium",
-      "subtitle": "Consultez les périmés, générez des recettes et réorganisez le stock en un seul message.",
-      "cta": "Débloquer l’agent",
-      "note": "Essai gratuit inclus avec le plan PRO.",
-      "lockedPlaceholder": "Disponible uniquement avec PRO"
+      "title": "Voici la couche de planification",
+      "headline": "Idées et plans alimentés par l’IA",
+      "subtitle": "Recevez recettes, menus et insights adaptés à votre garde-manger.",
+      "cta": "Débloquer le planificateur",
+      "note": "Essai PRO gratuit inclus.",
+      "lockedPlaceholder": "Disponible uniquement avec PRO",
+      "demo": {
+        "chipsTitle": "Lancez-vous avec une intention",
+        "sessionTitle": "Conversation exemple",
+        "userMessage": "« Planifie des dîners avec ce qui expire cette semaine. »",
+        "agentMessage": "Bonne idée. Tu as des épinards et de la feta qui expirent dans 2 jours. Je propose un pesto d’épinards pour ce soir et une omelette grecque demain."
+      },
+      "sampleWeek": {
+        "title": "Aperçu de la semaine",
+        "items": {
+          "one": {
+            "title": "Lun · Tacos veggie",
+            "desc": "Utilise les poivrons et haricots qui expirent demain."
+          },
+          "two": {
+            "title": "Mer · Soupe en lot",
+            "desc": "Rôtis la courge et congèle deux portions."
+          },
+          "three": {
+            "title": "Week-end · Brunch",
+            "desc": "Overnight oats avec les fruits mûrs."
+          }
+        }
+      },
+      "sampleIdeas": {
+        "title": "File d’idées",
+        "cards": {
+          "one": {
+            "title": "Dîner anti-gaspi",
+            "desc": "Transforme les épinards sur le point de périmer en pesto pour pâtes."
+          },
+          "two": {
+            "title": "Prépa déjeuner",
+            "desc": "Grille du poulet et associe-le à des légumes rôtis."
+          }
+        }
+      }
+    },
+    "quickStart": {
+      "title": "Entrée contextuelle",
+      "headline": "Planifiez sans passer par un chat vide",
+      "subtitle": "Choisissez une intention et le planificateur réagit immédiatement.",
+      "ctaTitle": "Démarrer en un geste",
+      "ctaSubtitle": "Choisissez votre objectif du moment.",
+      "today": "Que puis-je cuisiner aujourd’hui ?",
+      "quickIdeas": "Idées rapides avec ce que j’ai",
+      "weeklyPlan": "Planifier les repas de la semaine",
+      "useExpiring": "Utiliser ce qui va périmer",
+      "decideForMe": "Décide pour moi"
     },
     "roles": {
       "user": "Vous",
-      "assistant": "Agent",
+      "assistant": "Planificateur",
       "tool": "Action"
     },
     "messages": {
       "processing": "Traitement de l’action…",
       "noResponse": "Impossible de générer une réponse.",
-      "noEndpoint": "Aucun endpoint configuré pour l’agent.",
-      "callFailed": "La connexion avec l’assistant a rencontré un problème temporaire. Réessayez dans quelques secondes.",
-      "incompleteToolCall": "Impossible de terminer l’action car des données sont manquantes. Reformulez l’instruction ou réessayez.",
+      "noEndpoint": "Aucun endpoint configuré pour le planificateur.",
+      "callFailed": "La connexion avec le planificateur a rencontré un problème temporaire. Réessayez dans quelques secondes.",
+      "incompleteToolCall": "Le planificateur n’a pas pu rassembler toutes les données nécessaires. Reformulez l’instruction ou réessayez.",
       "toolUnavailable": "L’outil \"{{ name }}\" n’est pas disponible.",
-      "unifiedError": "L’assistant ne peut pas répondre pour le moment. Réessayez dans quelques secondes."
+      "unifiedError": "Le planificateur ne peut pas répondre pour le moment. Réessayez dans quelques secondes."
     },
     "errors": {
       "missingName": "Le nom du produit est manquant.",
@@ -515,7 +608,7 @@
     "benefits": {
       "title": "Tout ce que PRO inclut",
       "subtitle": "Conçu pour les foyers très actifs.",
-      "agent": "Agent IA pour gérer le garde-manger sans les mains.",
+      "agent": "Planificateur IA qui vous propose des menus et des recettes sur mesure.",
       "future": "Accès anticipé aux futures fonctionnalités PRO.",
       "cloudSync": "Synchronisation et sauvegarde dans le cloud.",
       "history": "Historique complet des modifications de vos produits.",

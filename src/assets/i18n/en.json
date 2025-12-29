@@ -2,7 +2,7 @@
   "tabs": {
     "dashboard": "Home",
     "pantry": "Pantry",
-    "agent": "Agent",
+    "agent": "Planning",
     "shopping": "Shopping",
     "settings": "Settings"
   },
@@ -38,11 +38,11 @@
         "description": "Know what to restock based on usage, minimum stock, and upcoming expiries."
       },
       "agent": {
-        "title": "Unlock the AI Agent (PRO)",
-        "description": "Chat with your pantry, request recipes, and auto-generate shopping lists.",
+        "title": "Unlock the AI Meal Planner (PRO)",
+        "description": "Plan menus, request recipes, and auto-build shopping lists tailored to you.",
         "badge": "PRO exclusive",
-        "titlePro": "AI Agent ready for you",
-        "descriptionPro": "PRO unlocked: use the Agent for recipes, ideas, and faster lists.",
+        "titlePro": "AI Meal Planner ready for you",
+        "descriptionPro": "PRO unlocked: use the meal planner for recipes, ideas, and faster lists.",
         "badgePro": "PRO active"
       }
     }
@@ -212,12 +212,16 @@
     "expiringLowStock": {
       "title": "Products close to expiring with low stock",
       "description": "Some products combine an upcoming expiry and low stock.",
-      "cta": "View products"
+      "cta": "View products",
+      "planPrompt": "Help me plan recipes that use the low-stock items expiring soon.",
+      "ideasPrompt": "Give me quick ideas to use those ingredients before they spoil."
     },
     "expiredWithStock": {
       "title": "Expired products still available",
       "description": "Some expired products still have stock that needs review.",
-      "cta": "Review expired items"
+      "cta": "Review expired items",
+      "planPrompt": "Create a plan to consume the items that already expired but are still in my pantry.",
+      "ideasPrompt": "Suggest recipes or uses to salvage those expired products."
     },
     "lowStockNoExpiry": {
       "title": "Low stock even without urgent expiries",
@@ -229,43 +233,132 @@
       "description": "Some items share the same name in different entries. Review and consolidate them.",
       "cta": "Review products"
     },
-    "ctaDefault": "Got it"
+    "ctaLabels": {
+      "plan": "Plan",
+      "ideas": "Give me ideas"
+    },
+    "ctaDefault": "Got it",
+    "library": {
+      "weeklyMealPlanning": {
+        "title": "Plan your meals for the week",
+        "description": "Plan this week's meals with what you already have.",
+        "cta": "Plan now",
+        "prompt": "Plan my meals for this week using only what I already have in the pantry."
+      },
+      "cookBeforeExpiry": {
+        "title": "Cook before they expire",
+        "description": "Use up the products that are about to expire and still have stock.",
+        "cta": "Use expiring items",
+        "prompt": "Suggest recipes that prioritize the products expiring soon in my pantry."
+      },
+      "lunchIdeas": {
+        "title": "What can I make for lunch?",
+        "description": "Quick lunch ideas using your pantry.",
+        "cta": "See ideas",
+        "prompt": "Give me lunch options for today using what I already have."
+      },
+      "dinnerIdeas": {
+        "title": "What can I make for dinner?",
+        "description": "Dinner suggestions with what you already have.",
+        "cta": "Plan dinner",
+        "prompt": "Plan a simple dinner using the ingredients in my pantry."
+      },
+      "whatToCookNow": {
+        "title": "What should I cook now?",
+        "description": "Not sure what to eat? I'll suggest ideas with your pantry.",
+        "cta": "Give me ideas",
+        "prompt": "Share quick meal ideas using only the ingredients I already own."
+      },
+      "planAndSaveTime": {
+        "title": "Plan meals and save time every week",
+        "description": "Unlock the PRO planner and organize your menu easily.",
+        "cta": "Go PRO"
+      }
+    }
   },
   "agent": {
-    "title": "Agent",
+    "title": "Planning",
     "thinking": "Thinking…",
     "states": {
       "thinking": "Thinking…",
       "fetching": "Checking your pantry…",
       "responding": "Crafting the response…"
     },
-    "placeholder": "Write instructions like \"Move 2 yogurts to the fridge\"",
+    "placeholder": "Ask for recipes, meal plans, or ways to use what you have.",
     "actions": {
       "send": "Send",
       "retry": "Retry"
     },
     "preview": {
       "badge": "Preview",
-      "title": "Preview the agent",
-      "headline": "Unlock AI to manage your pantry for you.",
-      "subtitle": "See expired items, generate recipes and reorganize stock with one prompt.",
-      "cta": "Unlock agent",
+      "title": "See the planning layer",
+      "headline": "Ideas and plans powered by AI",
+      "subtitle": "Get recipes, menus, and insights tailored to your pantry.",
+      "cta": "Unlock meal planner",
       "note": "Start your free trial and cancel anytime.",
-      "lockedPlaceholder": "Available with PRO"
+      "lockedPlaceholder": "Available with PRO",
+      "demo": {
+        "chipsTitle": "Start with a quick prompt",
+        "sessionTitle": "Sample conversation",
+        "userMessage": "“Use what expires this week to plan dinners.”",
+        "agentMessage": "Great idea. You have spinach and feta that expire in 2 days. How about a spinach pesto pasta tonight and a Greek-style omelette tomorrow?"
+      },
+      "sampleWeek": {
+        "title": "Weekly snapshot",
+        "items": {
+          "one": {
+            "title": "Mon · Veggie tacos",
+            "desc": "Use peppers and beans that expire tomorrow."
+          },
+          "two": {
+            "title": "Wed · Soup batch",
+            "desc": "Roast pumpkin and freeze two portions."
+          },
+          "three": {
+            "title": "Weekend brunch",
+            "desc": "Overnight oats with the ripe fruit."
+          }
+        }
+      },
+      "sampleIdeas": {
+        "title": "Idea queue",
+        "cards": {
+          "one": {
+            "title": "Zero-waste dinner",
+            "desc": "Turn expiring spinach into pesto pasta."
+          },
+          "two": {
+            "title": "Lunch prep",
+            "desc": "Grill chicken and pair it with roasted veggies."
+          }
+        }
+      }
+    },
+    "quickStart": {
+      "title": "Contextual entry",
+      "headline": "Start planning without an empty chat",
+      "subtitle": "Pick an intention and the planner reacts instantly.",
+      "ctaTitle": "Start with one tap",
+      "ctaSubtitle": "Choose how you want to plan today.",
+      "today": "What can I cook today?",
+      "quickIdeas": "Quick ideas with what I have",
+      "weeklyPlan": "Plan meals for the week",
+      "useExpiring": "Use what expires soon",
+      "decideForMe": "Decide for me"
     },
     "roles": {
       "user": "You",
-      "assistant": "Agent",
+      "assistant": "Planner",
       "tool": "Action"
     },
     "messages": {
       "processing": "Processing action…",
       "noResponse": "Couldn't generate a response.",
-      "noEndpoint": "Agent endpoint is not configured.",
-      "callFailed": "It looks like the assistant connection had a temporary issue. Please try again in a few seconds.",
-      "incompleteToolCall": "The assistant couldn't gather all the data needed to run that action. Please rephrase or try again.",
+      "noEndpoint": "Meal planner endpoint is not configured.",
+      "callFailed": "It looks like the meal planner connection had a temporary issue. Please try again in a few seconds.",
+      "incompleteToolCall": "The meal planner couldn't gather all the data needed to run that action. Please rephrase or try again.",
       "toolUnavailable": "Tool \"{{ name }}\" is not available.",
-      "unifiedError": "The assistant couldn’t reply right now. Please try again in a few seconds."
+      "unifiedError": "The meal planner couldn’t reply right now. Please try again in a few seconds."
     },
     "errors": {
       "missingName": "Product name is required.",
@@ -515,7 +608,7 @@
     "benefits": {
       "title": "Everything you get with PRO",
       "subtitle": "Designed for power users and busy households.",
-      "agent": "AI agent to manage your pantry hands-free.",
+      "agent": "AI meal planner that proposes menus and recipes tailored to you.",
       "future": "Early access to upcoming PRO features.",
       "cloudSync": "Cloud sync and backup for peace of mind.",
       "history": "Full history of changes to your items.",
