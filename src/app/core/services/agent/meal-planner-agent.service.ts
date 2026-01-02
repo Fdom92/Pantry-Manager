@@ -1,10 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { AgentEntryContext } from '@core/models/agent';
 import { PantryItem } from '@core/models/inventory';
-import { AgentConversationStore } from './agent-conversation.store';
 import { LlmClientService } from './llm-client.service';
 import { PantryService } from '../pantry.service';
-import { LanguageService } from '../language.service';
 
 export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
 
@@ -14,73 +11,133 @@ export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
 export class MealPlannerAgentService {
   private readonly pantryService = inject(PantryService);
   private readonly llm = inject(LlmClientService);
-  private readonly languageService = inject(LanguageService);
-  private readonly conversationStore = inject(AgentConversationStore);
 
-  async run(params: { mode: MealPlannerMode; days?: number }): Promise<string> {
+  async run(userText: string): Promise<string> {
     const pantry = await this.pantryService.getAll();
     const pantryContext = this.buildPantryContext(pantry);
-    const locale = this.languageService.getCurrentLocale();
-    const entryContext = this.conversationStore.getEntryContext();
 
-    const system = [
-      'Eres un asistente experto en planificación de comidas y recetas.',
-      '',
-      'Contexto del usuario:',
-      pantryContext,
-      '',
-      'Reglas:',
-      '- Usa PRIORITARIAMENTE los ingredientes disponibles',
-      '- Evita proponer ingredientes externos',
-      '- Si falta algo, indícalo claramente',
-      '- Prioriza ingredientes que caduquen antes',
-      '- No expliques reglas internas',
-      '- Responde de forma clara y práctica',
-      `- Idioma: ${locale}`,
-    ].join('\n');
+    const system =
+      `
+      You are a Meal Planning and Recipe Assistant.
+      Your ONLY responsibility is to:
+      - Suggest recipes
+      - Create meal plans (daily, weekly, or monthly)
 
-    const userPrompt = this.buildUserPrompt(params, entryContext);
+      You must ALWAYS adapt your response to the user's explicit request.
+      Ignore how the conversation was started (chips, insights, shortcuts).
+      Only the user's message defines what you should do.
+
+      ━━━━━━━━━━━━━━━━━━
+      LANGUAGE
+      ━━━━━━━━━━━━━━━━━━
+
+      - Always respond in the same language used by the user.
+      - Do not switch languages unless the user does.
+
+      ━━━━━━━━━━━━━━━━━━
+      STRICT BEHAVIOR RULES
+      ━━━━━━━━━━━━━━━━━━
+
+      1. RECIPE MODE
+      You are in RECIPE MODE if the user asks for:
+      - Recipe ideas
+      - What can I cook
+      - What should I eat today
+      - Breakfast / lunch / dinner ideas
+      - Quick ideas
+      - Cooking with specific ingredients
+
+      In RECIPE MODE:
+      - Respond ONLY with recipes
+      - Do NOT create meal plans
+      - Do NOT include multiple days
+      - If a meal is specified (breakfast, lunch, dinner), return ONLY that meal
+      - If no meal is specified, return general recipes
+
+      ━━━━━━━━━━━━━━━━━━
+
+      2. PLANNING MODE
+      You are in PLANNING MODE ONLY if the user explicitly asks for:
+      - A meal plan
+      - A weekly plan
+      - A monthly plan
+      - Planning meals
+
+      In PLANNING MODE:
+      - Create a structured plan
+      - Include breakfast, lunch, and dinner
+      - Cover ONLY the requested time range
+      - Do NOT add extra days or meals
+
+      ━━━━━━━━━━━━━━━━━━
+
+      3. INGREDIENT RULES (VERY IMPORTANT)
+      - Base all recipes strictly on the ingredients available in the pantry context
+      - Do NOT invent or propose external ingredients
+      - If a recipe is missing a minor ingredient:
+        - Explicitly mention what is missing
+        - Do NOT assume the user has it
+      - If a recipe requires too many missing ingredients:
+        - Do NOT propose that recipe
+
+      ━━━━━━━━━━━━━━━━━━
+
+      4. EXPIRING INGREDIENTS
+      - If the user explicitly asks to use expiring or near-expiry items:
+        - Prioritize those ingredients in the recipes
+        - Do not mention items that are not near expiry
+      - If the user does NOT ask for this:
+        - Do not prioritize expiry implicitly
+
+      ━━━━━━━━━━━━━━━━━━
+
+      5. NEVER EXPAND THE SCOPE
+      - Do NOT add planning when recipes are requested
+      - Do NOT add recipes when a plan is requested
+      - Do NOT add extra meals, days, or explanations
+      - Do NOT assume user intent
+
+      ━━━━━━━━━━━━━━━━━━
+
+      6. FORMATTING RULES
+      - Use plain text
+      - No markdown symbols (*, #, -, bullets)
+      - Clear spacing and simple sections
+      - Easy to read on mobile
+
+      ━━━━━━━━━━━━━━━━━━
+
+      7. CLARIFICATION
+      If and ONLY if the request is ambiguous:
+      - Ask ONE short clarifying question
+      - Do not provide partial answers
+
+      ━━━━━━━━━━━━━━━━━━
+
+      8. OUT OF SCOPE
+      - Do not manage inventory
+      - Do not suggest shopping lists
+      - Do not explain how the app works
+      - Do not mention subscriptions, pricing, or PRO features
+      - Do not reference chips, insights, or UI elements
+
+      ━━━━━━━━━━━━━━━━━━
+
+      9. CURRENT PANTRY DATA
+      ${pantryContext}
+
+      ━━━━━━━━━━━━━━━━━━
+
+      You only plan meals or suggest recipes.
+      Nothing else.
+      `;
 
     const response = await this.llm.complete({
       system,
-      messages: [{ role: 'user', content: userPrompt }],
+      messages: [{ role: 'user', content: userText }],
     });
 
     return response.content;
-  }
-
-  private buildUserPrompt(params: { mode: MealPlannerMode; days?: number }, context: AgentEntryContext): string {
-    let base: string;
-    switch (params.mode) {
-      case 'recipes':
-        base = 'Propón 2-3 recetas usando solo la despensa disponible.';
-        break;
-      case 'plan':
-        base = `Planifica comidas para ${params.days ?? 3} días.`;
-        break;
-      case 'menu':
-        base = `Crea un menú ${params.days && params.days > 7 ? 'mensual' : 'semanal'} equilibrado.`;
-        break;
-      default:
-        base = 'Propón ideas de comidas con la despensa disponible.';
-        break;
-    }
-    const contextHint = this.describeEntryContext(context);
-    return contextHint ? `${base} ${contextHint}` : base;
-  }
-
-  private describeEntryContext(context: AgentEntryContext): string {
-    switch (context) {
-      case AgentEntryContext.RECIPES:
-        return 'Prioriza recetas rápidas y creativas.';
-      case AgentEntryContext.INSIGHTS:
-        return 'Usa primero los productos que caducan pronto o estan en riesgo.';
-      case AgentEntryContext.INSIGHTS_RECIPES:
-        return 'Ofrece sugerencias muy concretas basadas en un hallazgo reciente.';
-      case AgentEntryContext.PLANNING:
-      default:
-        return '';
-    }
   }
 
   private buildPantryContext(items: PantryItem[]): string {

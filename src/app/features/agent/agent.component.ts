@@ -256,7 +256,7 @@ export class AgentComponent implements ViewWillEnter {
     try {
       const mode = options?.modeOverride ?? this.resolvePlannerMode();
       const days = options?.daysOverride ?? this.defaultDaysForMode(mode);
-      const response = await this.mealPlannerAgent.run({ mode, days });
+      const response = await this.mealPlannerAgent.run(userText);
       this.conversationStore.setAgentPhase('responding');
       const assistantMessage = this.conversationStore.createMessage('assistant', response || this.translate.instant('agent.messages.noResponse'));
       this.conversationStore.appendMessage(assistantMessage);
