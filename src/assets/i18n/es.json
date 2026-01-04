@@ -693,6 +693,16 @@
       "system": "Sistema",
       "error": "No se pudo actualizar el tema."
     },
+    "ai": {
+      "title": "IA",
+      "subtitle": "Comparte contexto para el planificador.",
+      "contextTitle": "Contexto / Memoria",
+      "contextDescription": "Cuenta al planificador sobre tu hogar, dietas, alergias o preferencias que deba recordar siempre.",
+      "contextPlaceholder": "Ejemplo: Somos dos adultos y una niña. Evita picante y frutos secos. Prioriza recetas mediterráneas.",
+      "saveAction": "Guardar contexto IA",
+      "saveSuccess": "Contexto guardado.",
+      "saveError": "No se pudo guardar el contexto."
+    },
     "languages": {
       "es": "Español",
       "en": "Inglés"
@@ -735,6 +745,8 @@
     "catalogs": {
       "title": "Catálogos",
       "subtitle": "Gestiona las listas reutilizadas al organizar la despensa.",
+      "manageTitle": "Abrir gestor de catálogos",
+      "manageSubtitle": "Edita ubicaciones, categorías y supermercados con más detalle.",
       "saveSuccess": "Catálogos actualizados.",
       "saveError": "No se pudieron guardar los catálogos.",
       "loadError": "No se pudieron cargar los catálogos.",

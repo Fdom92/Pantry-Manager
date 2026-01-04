@@ -693,6 +693,16 @@
       "system": "System",
       "error": "Could not update the theme."
     },
+    "ai": {
+      "title": "AI",
+      "subtitle": "Share context for the planner.",
+      "contextTitle": "Context / Memory",
+      "contextDescription": "Tell the planner about your household, diets, dislikes or any preference it should always remember.",
+      "contextPlaceholder": "Example: We are two adults and a toddler. Avoid spicy food and peanuts. Focus on Mediterranean recipes.",
+      "saveAction": "Save AI context",
+      "saveSuccess": "Planner context saved.",
+      "saveError": "Could not save the planner context."
+    },
     "languages": {
       "es": "Spanish",
       "en": "English"
@@ -735,6 +745,8 @@
     "catalogs": {
       "title": "Catalogs",
       "subtitle": "Manage reusable lists for organizing your pantry.",
+      "manageTitle": "Open catalog manager",
+      "manageSubtitle": "Edit locations, categories and supermarkets in detail.",
       "saveSuccess": "Catalogs updated.",
       "saveError": "Could not save catalogs.",
       "loadError": "Could not load catalogs.",

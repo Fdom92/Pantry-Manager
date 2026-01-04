@@ -24,6 +24,7 @@ export interface AppPreferences {
   categoryOptions: string[];
   supermarketOptions: string[];
   unitOptions: string[];
+  plannerMemory?: string;
 }
 
 export interface AppPreferencesDoc extends BaseDoc, AppPreferences {}
