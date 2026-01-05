@@ -27,23 +27,19 @@
       ></ion-textarea>
     </ion-card-content>
   </ion-card>
-</ion-content>
 
-<ion-footer class="ai-footer">
-  <ion-toolbar>
-    <ion-button
-      expand="block"
-      color="primary"
-      (click)="savePlannerMemory()"
-      [disabled]="!hasChanges() || isSaving() || isLoading()"
-    >
-      @if (isSaving()) {
-        <ion-spinner
-          slot="start"
-          name="dots"
-        ></ion-spinner>
-      }
-      {{ "settings.ai.saveAction" | translate }}
-    </ion-button>
-  </ion-toolbar>
-</ion-footer>
+  <ion-button
+    expand="block"
+    color="primary"
+    (click)="savePlannerMemory()"
+    [disabled]="!hasChanges() || isSaving() || isLoading()"
+  >
+    @if (isSaving()) {
+      <ion-spinner
+        slot="start"
+        name="dots"
+      ></ion-spinner>
+    }
+    {{ "settings.ai.saveAction" | translate }}
+  </ion-button>
+</ion-content>
