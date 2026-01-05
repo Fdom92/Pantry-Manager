@@ -693,6 +693,16 @@
       "system": "Système",
       "error": "Impossible de mettre à jour le thème."
     },
+    "ai": {
+      "title": "IA",
+      "subtitle": "Partagez du contexte avec le planificateur.",
+      "contextTitle": "Contexte / Mémoire",
+      "contextDescription": "Expliquez au planificateur votre foyer, vos régimes, allergies ou préférences à mémoriser.",
+      "contextPlaceholder": "Exemple : Nous sommes deux adultes et un enfant. Éviter la nourriture épicée et les arachides. Priorité aux recettes méditerranéennes.",
+      "saveAction": "Enregistrer le contexte IA",
+      "saveSuccess": "Contexte enregistré.",
+      "saveError": "Impossible d’enregistrer le contexte."
+    },
     "languages": {
       "es": "Espagnol",
       "en": "Anglais"
@@ -735,6 +745,8 @@
     "catalogs": {
       "title": "Catalogues",
       "subtitle": "Gérez les listes réutilisables pour organiser le garde-manger.",
+      "manageTitle": "Ouvrir le gestionnaire de catalogues",
+      "manageSubtitle": "Modifiez en détail les emplacements, catégories et supermarchés.",
       "saveSuccess": "Catalogues mis à jour.",
       "saveError": "Impossible d’enregistrer les catalogues.",
       "loadError": "Impossible de charger les catalogues.",

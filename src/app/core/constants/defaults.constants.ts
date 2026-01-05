@@ -63,4 +63,5 @@ export const DEFAULT_PREFERENCES: AppPreferences = {
   categoryOptions: [...DEFAULT_CATEGORY_OPTIONS],
   supermarketOptions: [...DEFAULT_SUPERMARKET_OPTIONS],
   unitOptions: [...DEFAULT_UNIT_OPTIONS],
+  plannerMemory: '',
 };

@@ -192,6 +192,7 @@
     <div class="catalog-actions">
       <ion-button
         expand="block"
+        color="primary"
         (click)="saveCatalogs()"
         [disabled]="!hasAnyChanges() || savingCatalogs()">
         @if (savingCatalogs()) {

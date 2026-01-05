@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { PantryItem } from '@core/models/inventory';
 import { LlmClientService } from './llm-client.service';
 import { PantryService } from '../pantry.service';
+import { AppPreferencesService } from '../app-preferences.service';
 
 export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
 
@@ -11,10 +12,15 @@ export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
 export class MealPlannerAgentService {
   private readonly pantryService = inject(PantryService);
   private readonly llm = inject(LlmClientService);
+  private readonly appPreferences = inject(AppPreferencesService);
 
   async run(userText: string): Promise<string> {
-    const pantry = await this.pantryService.getAll();
+    const [pantry, preferences] = await Promise.all([
+      this.pantryService.getAll(),
+      this.appPreferences.getPreferences(),
+    ]);
     const pantryContext = this.buildPantryContext(pantry);
+    const userPreferencesSection = this.buildUserPreferencesSection(preferences.plannerMemory);
 
     const system =
       `
@@ -128,6 +134,10 @@ export class MealPlannerAgentService {
 
       ━━━━━━━━━━━━━━━━━━
 
+      ${userPreferencesSection}
+
+      ━━━━━━━━━━━━━━━━━━
+
       You only plan meals or suggest recipes.
       Nothing else.
       `;
@@ -157,5 +167,14 @@ export class MealPlannerAgentService {
         return `- ${item.name}: ${total}`;
       })
       .join('\n');
+  }
+
+  private buildUserPreferencesSection(memory?: string | null): string {
+    const trimmed = memory?.trim();
+    if (!trimmed) {
+      return 'USER PREFERENCES\n      The user has not provided additional preferences.';
+    }
+    const formatted = trimmed.replace(/\r?\n/g, '\n      ');
+    return `USER PREFERENCES\n      ${formatted}`;
   }
 }
