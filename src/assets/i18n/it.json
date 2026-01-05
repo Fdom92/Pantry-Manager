@@ -340,11 +340,12 @@
       "subtitle": "Scegli un'intenzione e il pianificatore risponde subito.",
       "ctaTitle": "Parti con un tocco",
       "ctaSubtitle": "Decidi su cosa concentrarti oggi.",
-      "today": "Cosa posso cucinare oggi?",
-      "quickIdeas": "Idee rapide con quello che ho",
+      "today": "Cosa posso cucinare con quello che ho?",
+      "quickIdeas": "Dammi idee di ricette veloci",
       "weeklyPlan": "Pianificare i pasti della settimana",
-      "useExpiring": "Usare ciò che sta per scadere",
-      "decideForMe": "Decidi tu per me"
+      "useExpiring": "Usare ingredienti in scadenza",
+      "decideForMe": "Decidi tu per me",
+      "customPrompt": "Chiedere qualcos'altro"
     },
     "roles": {
       "user": "Tu",
@@ -693,6 +694,16 @@
       "system": "Sistema",
       "error": "Impossibile aggiornare il tema."
     },
+    "ai": {
+      "title": "IA",
+      "subtitle": "Condividi il contesto con il planner.",
+      "contextTitle": "Contesto / Memoria",
+      "contextDescription": "Racconta al planner la tua famiglia, le diete, le allergie o qualsiasi preferenza da ricordare sempre.",
+      "contextPlaceholder": "Esempio: Siamo due adulti e una bambina. Evita cibi piccanti e arachidi. Preferisci ricette mediterranee.",
+      "saveAction": "Salva contesto IA",
+      "saveSuccess": "Contesto salvato.",
+      "saveError": "Impossibile salvare il contesto."
+    },
     "languages": {
       "es": "Spagnolo",
       "en": "Inglese"
@@ -735,6 +746,8 @@
     "catalogs": {
       "title": "Cataloghi",
       "subtitle": "Gestisci liste riutilizzabili per organizzare la tua dispensa.",
+      "manageTitle": "Apri gestione cataloghi",
+      "manageSubtitle": "Modifica nel dettaglio posizioni, categorie e supermercati.",
       "saveSuccess": "Cataloghi aggiornati.",
       "saveError": "Impossibile salvare i cataloghi.",
       "loadError": "Impossibile caricare i cataloghi.",

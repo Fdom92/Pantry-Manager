@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ "settings.ai.contextTitle" | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card class="ai-card">
+    <ion-card-header>
+      <ion-card-title>{{ "settings.ai.title" | translate }}</ion-card-title>
+      <ion-card-subtitle>{{ "settings.ai.subtitle" | translate }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p class="ai-description">{{ "settings.ai.contextDescription" | translate }}</p>
+      <ion-textarea
+        autoGrow="true"
+        [value]="plannerMemory()"
+        [maxlength]="plannerMemoryLimit"
+        [counter]="true"
+        [rows]="8"
+        [disabled]="isSaving() || isLoading()"
+        (ionInput)="onPlannerMemoryInput($event.detail.value ?? '')"
+        [placeholder]="'settings.ai.contextPlaceholder' | translate"
+      ></ion-textarea>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button
+    expand="block"
+    color="primary"
+    (click)="savePlannerMemory()"
+    [disabled]="!hasChanges() || isSaving() || isLoading()"
+  >
+    @if (isSaving()) {
+      <ion-spinner
+        slot="start"
+        name="dots"
+      ></ion-spinner>
+    }
+    {{ "settings.ai.saveAction" | translate }}
+  </ion-button>
+</ion-content>
