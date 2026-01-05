@@ -344,7 +344,8 @@
       "quickIdeas": "Give me quick recipe ideas",
       "weeklyPlan": "Plan my meals for this week",
       "useExpiring": "Use ingredients that are about to expire",
-      "decideForMe": "Decide for me"
+      "decideForMe": "Decide for me",
+      "customPrompt": "Ask something else"
     },
     "roles": {
       "user": "You",

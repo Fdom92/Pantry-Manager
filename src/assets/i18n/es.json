@@ -344,7 +344,8 @@
       "quickIdeas": "Dame ideas rápidas para cocinar",
       "weeklyPlan": "Planificar mis comidas de la semana",
       "useExpiring": "Usar lo que está a punto de caducar",
-      "decideForMe": "Decide por mí"
+      "decideForMe": "Decide por mí",
+      "customPrompt": "Preguntar otra cosa"
     },
     "roles": {
       "user": "Tú",

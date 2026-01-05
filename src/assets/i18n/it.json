@@ -344,7 +344,8 @@
       "quickIdeas": "Dammi idee di ricette veloci",
       "weeklyPlan": "Pianificare i pasti della settimana",
       "useExpiring": "Usare ingredienti in scadenza",
-      "decideForMe": "Decidi tu per me"
+      "decideForMe": "Decidi tu per me",
+      "customPrompt": "Chiedere qualcos'altro"
     },
     "roles": {
       "user": "Tu",
