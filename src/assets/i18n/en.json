@@ -340,10 +340,10 @@
       "subtitle": "Pick an intention and the planner reacts instantly.",
       "ctaTitle": "Start with one tap",
       "ctaSubtitle": "Choose how you want to plan today.",
-      "today": "What can I cook today?",
-      "quickIdeas": "Quick ideas with what I have",
-      "weeklyPlan": "Plan meals for the week",
-      "useExpiring": "Use what expires soon",
+      "today": "What can I cook with what I have?",
+      "quickIdeas": "Give me quick recipe ideas",
+      "weeklyPlan": "Plan my meals for this week",
+      "useExpiring": "Use ingredients that are about to expire",
       "decideForMe": "Decide for me"
     },
     "roles": {

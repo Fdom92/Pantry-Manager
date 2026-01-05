@@ -340,10 +340,10 @@
       "subtitle": "Escolhe uma intenção e o planeador responde de imediato.",
       "ctaTitle": "Começa com um toque",
       "ctaSubtitle": "Seleciona o foco para hoje.",
-      "today": "O que posso cozinhar hoje?",
-      "quickIdeas": "Ideias rápidas com o que tenho",
+      "today": "O que posso cozinhar com o que tenho?",
+      "quickIdeas": "Dá-me ideias rápidas de receitas",
       "weeklyPlan": "Planear as refeições da semana",
-      "useExpiring": "Aproveitar o que vai expirar",
+      "useExpiring": "Usar ingredientes que estão prestes a vencer",
       "decideForMe": "Decide por mim"
     },
     "roles": {

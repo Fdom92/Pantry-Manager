@@ -340,10 +340,10 @@
       "subtitle": "Wähle eine Intention und der Menüplaner reagiert sofort.",
       "ctaTitle": "Mit einem Tipp starten",
       "ctaSubtitle": "Bestimme, worauf du heute fokussierst.",
-      "today": "Was kann ich heute kochen?",
-      "quickIdeas": "Schnelle Ideen mit meinen Vorräten",
-      "weeklyPlan": "Mahlzeiten für die Woche planen",
-      "useExpiring": "Nutze, was bald abläuft",
+      "today": "Was kann ich mit dem kochen, was ich habe?",
+      "quickIdeas": "Gib mir schnelle Rezeptideen",
+      "weeklyPlan": "Meine Mahlzeiten für diese Woche planen",
+      "useExpiring": "Zutaten verwenden, die bald ablaufen",
       "decideForMe": "Entscheide für mich"
     },
     "roles": {

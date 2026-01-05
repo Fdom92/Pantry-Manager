@@ -340,10 +340,10 @@
       "subtitle": "Scegli un'intenzione e il pianificatore risponde subito.",
       "ctaTitle": "Parti con un tocco",
       "ctaSubtitle": "Decidi su cosa concentrarti oggi.",
-      "today": "Cosa posso cucinare oggi?",
-      "quickIdeas": "Idee rapide con quello che ho",
+      "today": "Cosa posso cucinare con quello che ho?",
+      "quickIdeas": "Dammi idee di ricette veloci",
       "weeklyPlan": "Pianificare i pasti della settimana",
-      "useExpiring": "Usare ciò che sta per scadere",
+      "useExpiring": "Usare ingredienti in scadenza",
       "decideForMe": "Decidi tu per me"
     },
     "roles": {

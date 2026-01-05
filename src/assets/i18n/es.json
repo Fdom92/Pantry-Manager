@@ -340,10 +340,10 @@
       "subtitle": "Elige un enfoque y la IA arrancará con ideas útiles.",
       "ctaTitle": "Empieza con un toque",
       "ctaSubtitle": "Selecciona una intención para lanzar la conversación.",
-      "today": "¿Qué puedo cocinar hoy?",
-      "quickIdeas": "Ideas rápidas con lo que tengo",
-      "weeklyPlan": "Planificar comidas de la semana",
-      "useExpiring": "Aprovechar lo que caduca",
+      "today": "¿Qué puedo cocinar con lo que tengo?",
+      "quickIdeas": "Dame ideas rápidas para cocinar",
+      "weeklyPlan": "Planificar mis comidas de la semana",
+      "useExpiring": "Usar lo que está a punto de caducar",
       "decideForMe": "Decide por mí"
     },
     "roles": {
