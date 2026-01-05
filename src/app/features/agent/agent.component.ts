@@ -22,11 +22,14 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
+type QuickPromptBehavior = 'prompt' | 'composer';
+
 interface QuickPrompt {
   id: string;
   labelKey: string;
-  context: AgentEntryContext;
+  context?: AgentEntryContext;
   promptKey?: string;
+  behavior?: QuickPromptBehavior;
 }
 
 @Component({
@@ -55,6 +58,7 @@ interface QuickPrompt {
 })
 export class AgentComponent implements ViewWillEnter {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
+  @ViewChild(IonTextarea, { static: false }) private composerInput?: IonTextarea;
   // DI
   private readonly conversationStore = inject(AgentConversationStore);
   private readonly mealPlannerAgent = inject(MealPlannerAgentService);
@@ -96,6 +100,11 @@ export class AgentComponent implements ViewWillEnter {
       id: 'decide-for-me',
       labelKey: 'agent.quickStart.decideForMe',
       context: AgentEntryContext.PLANNING,
+    },
+    {
+      id: 'custom-question',
+      labelKey: 'agent.quickStart.customPrompt',
+      behavior: 'composer',
     },
   ];
   // Form
@@ -220,7 +229,11 @@ export class AgentComponent implements ViewWillEnter {
       await this.navigateToUpgrade();
       return;
     }
-    this.conversationStore.setEntryContext(prompt.context);
+    if (prompt.behavior === 'composer') {
+      this.prepareCustomPrompt();
+      return;
+    }
+    this.conversationStore.setEntryContext(prompt.context ?? AgentEntryContext.PLANNING);
     const message = this.translate.instant(prompt.promptKey ?? prompt.labelKey);
     if (!message) {
       return;
@@ -256,7 +269,7 @@ export class AgentComponent implements ViewWillEnter {
     try {
       const mode = options?.modeOverride ?? this.resolvePlannerMode();
       const days = options?.daysOverride ?? this.defaultDaysForMode(mode);
-      const response = await this.mealPlannerAgent.run({ mode, days });
+      const response = await this.mealPlannerAgent.run(userText);
       this.conversationStore.setAgentPhase('responding');
       const assistantMessage = this.conversationStore.createMessage('assistant', response || this.translate.instant('agent.messages.noResponse'));
       this.conversationStore.appendMessage(assistantMessage);
@@ -308,5 +321,17 @@ export class AgentComponent implements ViewWillEnter {
       default:
         return {};
     }
+  }
+
+  private prepareCustomPrompt(): void {
+    this.conversationStore.setEntryContext(AgentEntryContext.PLANNING);
+    this.markConversationStarted();
+    this.focusComposerInput();
+  }
+
+  private focusComposerInput(): void {
+    setTimeout(() => {
+      void this.composerInput?.setFocus();
+    });
   }
 }

@@ -340,11 +340,12 @@
       "subtitle": "Wähle eine Intention und der Menüplaner reagiert sofort.",
       "ctaTitle": "Mit einem Tipp starten",
       "ctaSubtitle": "Bestimme, worauf du heute fokussierst.",
-      "today": "Was kann ich heute kochen?",
-      "quickIdeas": "Schnelle Ideen mit meinen Vorräten",
-      "weeklyPlan": "Mahlzeiten für die Woche planen",
-      "useExpiring": "Nutze, was bald abläuft",
-      "decideForMe": "Entscheide für mich"
+      "today": "Was kann ich mit dem kochen, was ich habe?",
+      "quickIdeas": "Gib mir schnelle Rezeptideen",
+      "weeklyPlan": "Meine Mahlzeiten für diese Woche planen",
+      "useExpiring": "Zutaten verwenden, die bald ablaufen",
+      "decideForMe": "Entscheide für mich",
+      "customPrompt": "Etwas anderes fragen"
     },
     "roles": {
       "user": "Du",
@@ -693,6 +694,16 @@
       "system": "System",
       "error": "Das Design konnte nicht aktualisiert werden."
     },
+    "ai": {
+      "title": "KI",
+      "subtitle": "Gib dem Planer zusätzlichen Kontext.",
+      "contextTitle": "Kontext / Gedächtnis",
+      "contextDescription": "Beschreibe Haushalt, Ernährungsweisen, Abneigungen oder alles, was der Planer sich merken soll.",
+      "contextPlaceholder": "Beispiel: Wir sind zwei Erwachsene und ein Kleinkind. Kein scharfes Essen und keine Erdnüsse. Fokus auf mediterrane Rezepte.",
+      "saveAction": "KI-Kontext speichern",
+      "saveSuccess": "Kontext gespeichert.",
+      "saveError": "Planer-Kontext konnte nicht gespeichert werden."
+    },
     "languages": {
       "es": "Spanisch",
       "en": "Englisch"
@@ -735,6 +746,8 @@
     "catalogs": {
       "title": "Kataloge",
       "subtitle": "Verwalte wiederverwendbare Listen zur Organisation der Vorratskammer.",
+      "manageTitle": "Katalogverwaltung öffnen",
+      "manageSubtitle": "Bearbeite Standorte, Kategorien und Supermärkte im Detail.",
       "saveSuccess": "Kataloge aktualisiert.",
       "saveError": "Kataloge konnten nicht gespeichert werden.",
       "loadError": "Kataloge konnten nicht geladen werden.",

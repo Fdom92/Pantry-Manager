@@ -27,6 +27,11 @@ export const routes: Routes = [
           import('@features/agent/agent.component').then(m => m.AgentComponent),
       },
       {
+        path: 'settings/ai',
+        loadComponent: () =>
+          import('@features/settings/settings-ai/settings-ai.component').then(m => m.SettingsAiComponent),
+      },
+      {
         path: 'settings/catalogos',
         loadComponent: () =>
           import('@features/settings/settings-catalogs/settings-catalogs.component').then(m => m.SettingsCatalogsComponent),

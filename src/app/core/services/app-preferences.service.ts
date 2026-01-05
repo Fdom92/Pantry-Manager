@@ -19,6 +19,7 @@ export class AppPreferencesService {
   // Data
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
+  private readonly plannerMemoryLimit = 2000;
   private readonly prefersDarkQuery =
     typeof window !== 'undefined' && typeof window.matchMedia === 'function'
       ? window.matchMedia('(prefers-color-scheme: dark)')
@@ -104,6 +105,7 @@ export class AppPreferencesService {
       categoryOptions: this.ensureCategoryOptions(input?.categoryOptions),
       supermarketOptions: this.ensureSupermarketOptions(input?.supermarketOptions),
       unitOptions: this.ensureUnitOptions(input?.unitOptions),
+      plannerMemory: this.ensurePlannerMemory(input?.plannerMemory),
     };
   }
 
@@ -181,5 +183,16 @@ export class AppPreferencesService {
       fallback: DEFAULT_UNIT_OPTIONS,
       ensure: [MeasurementUnit.UNIT],
     });
+  }
+
+  private ensurePlannerMemory(value?: unknown): string {
+    if (typeof value !== 'string') {
+      return '';
+    }
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return '';
+    }
+    return trimmed.length > this.plannerMemoryLimit ? trimmed.slice(0, this.plannerMemoryLimit) : trimmed;
   }
 }
