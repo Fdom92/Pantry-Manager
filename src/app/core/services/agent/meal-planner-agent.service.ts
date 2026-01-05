@@ -138,6 +138,22 @@ export class MealPlannerAgentService {
 
       ━━━━━━━━━━━━━━━━━━
 
+      STAPLE INGREDIENTS (LIMITED)
+
+      The following basic staples may be assumed to be available in the user's kitchen:
+      - Water
+      - Salt
+      - Pepper
+      - Olive oil or neutral cooking oil
+
+      Rules:
+      - These staples may be used in recipes without listing them as missing
+      - Do NOT assume any other ingredients
+      - Do NOT add dairy, eggs, flour, sugar, spices, herbs, sauces, or condiments
+      - If a recipe requires anything beyond this list, it must be explicitly available in the pantry or marked as missing
+
+      ━━━━━━━━━━━━━━━━━━
+
       You only plan meals or suggest recipes.
       Nothing else.
       `;
