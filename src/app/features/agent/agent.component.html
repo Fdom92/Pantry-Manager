@@ -13,7 +13,7 @@
     </ion-title>
     @if (canUseAgent) {
       <ion-buttons slot="end">
-        <ion-button fill="clear" color="medium" (click)="resetConversation()" [disabled]="isAgentProcessing()" aria-label="{{ 'common.actions.clear' | translate }}">
+        <ion-button fill="clear" color="text-color" (click)="resetConversation()" [disabled]="isAgentProcessing()" aria-label="{{ 'common.actions.clear' | translate }}">
           <ion-icon name="trash-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
