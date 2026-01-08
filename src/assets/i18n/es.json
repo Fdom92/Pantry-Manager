@@ -477,6 +477,18 @@
         "expiration": "Caducidad (próximas primero)"
       }
     },
+    "fastAdd": {
+      "cta": "Añadir rápido",
+      "advancedAction": "Añadir avanzado",
+      "groupLabel": "Añadir productos rápidamente",
+      "title": "Añade productos rápido",
+      "subtitle": "Un producto por línea. La cantidad es opcional. Usa \"Añadir avanzado\" para opciones detalladas.",
+      "placeholder": "2 leche\npechugas de pollo\n3 manzanas",
+      "submit": "Añadir productos",
+      "singleSuccess": "1 producto añadido",
+      "success": "{{ count }} productos añadidos",
+      "error": "No se pudieron añadir los productos."
+    },
     "empty": {
       "title": "Resumen de la despensa",
       "description": "Todavía no hay productos en la despensa. Añade tu primer producto para comenzar.",

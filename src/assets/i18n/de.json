@@ -477,6 +477,18 @@
         "expiration": "Haltbarkeit (bald zuerst)"
       }
     },
+    "fastAdd": {
+      "cta": "Schnell hinzufügen",
+      "advancedAction": "Erweitertes Hinzufügen",
+      "groupLabel": "Produkte schnell hinzufügen",
+      "title": "Produkte schnell hinzufügen",
+      "subtitle": "Ein Produkt pro Zeile. Die Menge ist optional. Verwende \"Erweitertes Hinzufügen\" für weitere Optionen.",
+      "placeholder": "2 Milch\nHähnchenbrust\n3 Äpfel",
+      "submit": "Produkte hinzufügen",
+      "singleSuccess": "1 Produkt hinzugefügt",
+      "success": "{{ count }} Produkte hinzugefügt",
+      "error": "Produkte konnten nicht hinzugefügt werden."
+    },
     "empty": {
       "title": "Vorratsübersicht",
       "description": "Es befinden sich noch keine Produkte in der Vorratskammer. Füge dein erstes Produkt hinzu, um zu beginnen.",

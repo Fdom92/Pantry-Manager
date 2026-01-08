@@ -477,6 +477,18 @@
         "expiration": "Scadenza (prima le più vicine)"
       }
     },
+    "fastAdd": {
+      "cta": "Aggiungi veloce",
+      "advancedAction": "Aggiungi avanzato",
+      "groupLabel": "Aggiungi prodotti velocemente",
+      "title": "Aggiungi prodotti velocemente",
+      "subtitle": "Un prodotto per riga. La quantità è opzionale. Usa \"Aggiungi avanzato\" per opzioni dettagliate.",
+      "placeholder": "2 latte\npetto di pollo\n3 mele",
+      "submit": "Aggiungi prodotti",
+      "singleSuccess": "1 prodotto aggiunto",
+      "success": "{{ count }} prodotti aggiunti",
+      "error": "Impossibile aggiungere i prodotti."
+    },
     "empty": {
       "title": "Panoramica della dispensa",
       "description": "Non ci sono ancora prodotti. Aggiungi il primo prodotto per iniziare.",
