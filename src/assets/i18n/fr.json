@@ -477,6 +477,18 @@
         "expiration": "Date de péremption (les plus proches d’abord)"
       }
     },
+    "fastAdd": {
+      "cta": "Ajouter rapidement",
+      "advancedAction": "Ajout avancé",
+      "groupLabel": "Ajouter des produits rapidement",
+      "title": "Ajouter des produits rapidement",
+      "subtitle": "Un produit par ligne. La quantité est optionnelle. Utilisez « Ajout avancé » pour plus d’options.",
+      "placeholder": "2 lait\npoitrines de poulet\n3 pommes",
+      "submit": "Ajouter les produits",
+      "singleSuccess": "1 produit ajouté",
+      "success": "{{ count }} produits ajoutés",
+      "error": "Impossible d’ajouter les produits."
+    },
     "empty": {
       "title": "Résumé du garde-manger",
       "description": "Il n’y a pas encore de produits dans le garde-manger. Ajoutez votre premier produit pour commencer.",

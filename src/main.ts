@@ -28,6 +28,7 @@ import {
   chevronDownOutline,
   chevronUpOutline,
   close,
+  constructOutline,
   createOutline,
   cubeOutline,
   ellipsisVerticalOutline,
@@ -35,6 +36,7 @@ import {
   exitOutline,
   fastFoodOutline,
   filterOutline,
+  flashOutline,
   homeOutline,
   hourglassOutline,
   layersOutline,
@@ -128,7 +130,9 @@ addIcons({
   'aperture-outline': apertureOutline,
   'bulb-outline': bulbOutline,
   'sparkles-outline': sparklesOutline,
-  'restaurant-outline': restaurantOutline
+  'restaurant-outline': restaurantOutline,
+  'flash-outline': flashOutline,
+  'construct-outline': constructOutline
 });
 
 bootstrapApplication(AppComponent, {

@@ -477,6 +477,18 @@
         "expiration": "Expiry (soonest first)"
       }
     },
+    "fastAdd": {
+      "cta": "Add quickly",
+      "advancedAction": "Advanced add",
+      "groupLabel": "Add products quickly",
+      "title": "Add products quickly",
+      "subtitle": "One product per line. Quantity is optional. Use \"Advanced add\" for detailed options.",
+      "placeholder": "2 milk\nchicken breasts\n3 apples",
+      "submit": "Add products",
+      "singleSuccess": "1 product added",
+      "success": "{{ count }} products added",
+      "error": "Couldn't add the products."
+    },
     "empty": {
       "title": "Pantry overview",
       "description": "There are no products yet. Add your first product to get started.",
