@@ -83,7 +83,7 @@ export class PantryService extends StorageService<PantryItem> {
     }
 
     this.resetPagination();
-    await this.loadNextPage(true);
+    await this.loadNextPage();
   }
 
   /** Continue loading remaining pages without blocking the UI. */
@@ -95,7 +95,7 @@ export class PantryService extends StorageService<PantryItem> {
       try {
         await this.ensureFirstPageLoaded();
         while (!this.endReached()) {
-          await this.loadNextPage(true);
+          await this.loadNextPage();
         }
       } catch (err) {
         console.warn('[PantryService] background load failed', err);
@@ -346,7 +346,7 @@ export class PantryService extends StorageService<PantryItem> {
    * Loads the next raw page from PouchDB using skip/limit.
    * It never applies filters or sorting here; the reactive pipeline handles that in memory.
    */
-  async loadNextPage(isBackground = false): Promise<void> {
+  async loadNextPage(): Promise<void> {
     if (this.loading()) {
       return this.currentLoadPromise ?? Promise.resolve();
     }

@@ -39,7 +39,7 @@
 
     @if (locationOptions.length > 1) {
       <ion-item>
-        <ion-label position="stacked">{{ 'shopping.purchaseModal.location' | translate }}</ion-label>
+        <ion-label position="stacked">{{ 'pantry.form.location' | translate }}</ion-label>
         <ion-select interface="popover" [(ngModel)]="location">
           @for (loc of locationOptions; track loc) {
             <ion-select-option [value]="loc">{{ getLocationLabel(loc) }}</ion-select-option>
