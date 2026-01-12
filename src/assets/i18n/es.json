@@ -239,6 +239,12 @@
     },
     "ctaDefault": "Entendido",
     "library": {
+      "pendingProductUpdates": {
+        "title": "Productos pendientes de revisar",
+        "description": "Tienes {{ count }} productos sin actualizar. Pongamos al día la despensa en unos minutos.",
+        "cta": "Hacerlo",
+        "dismiss": "No ahora"
+      },
       "weeklyMealPlanning": {
         "title": "Planificar las comidas de la semana",
         "description": "Planifica tus comidas de esta semana con lo que ya tienes.",

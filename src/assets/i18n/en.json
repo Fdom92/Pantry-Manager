@@ -239,6 +239,12 @@
     },
     "ctaDefault": "Got it",
     "library": {
+      "pendingProductUpdates": {
+        "title": "Pantry updates pending",
+        "description": "You have {{ count }} products to refresh. Let's get your pantry up to date in just a few minutes.",
+        "cta": "Let's do it",
+        "dismiss": "Not now"
+      },
       "weeklyMealPlanning": {
         "title": "Plan your meals for the week",
         "description": "Plan this week's meals with what you already have.",

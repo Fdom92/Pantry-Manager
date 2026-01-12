@@ -239,6 +239,12 @@
     },
     "ctaDefault": "Compris",
     "library": {
+      "pendingProductUpdates": {
+        "title": "Produits en attente de mise à jour",
+        "description": "Tu as {{ count }} produits à remettre à jour. Mettons ta réserve à jour en quelques minutes.",
+        "cta": "Allons-y",
+        "dismiss": "Pas maintenant"
+      },
       "weeklyMealPlanning": {
         "title": "Planifiez les repas de la semaine",
         "description": "Planifiez les repas de cette semaine avec ce que vous avez déjà.",

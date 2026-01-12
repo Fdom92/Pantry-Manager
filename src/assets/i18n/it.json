@@ -239,6 +239,12 @@
     },
     "ctaDefault": "Capito",
     "library": {
+      "pendingProductUpdates": {
+        "title": "Prodotti da aggiornare",
+        "description": "Hai {{ count }} prodotti da aggiornare. Rimettiamo in ordine la dispensa in pochi minuti.",
+        "cta": "Facciamolo",
+        "dismiss": "Non ora"
+      },
       "weeklyMealPlanning": {
         "title": "Pianifica i pasti della settimana",
         "description": "Organizza i pasti di questa settimana con ciò che hai già.",

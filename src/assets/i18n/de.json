@@ -239,6 +239,12 @@
     },
     "ctaDefault": "Verstanden",
     "library": {
+      "pendingProductUpdates": {
+        "title": "Produkte zum Aktualisieren",
+        "description": "Du hast {{ count }} Produkte ohne Update. Bringen wir deine Vorratskammer in wenigen Minuten wieder auf Stand.",
+        "cta": "Los geht's",
+        "dismiss": "Nicht jetzt"
+      },
       "weeklyMealPlanning": {
         "title": "Plane deine Mahlzeiten für die Woche",
         "description": "Plane die Mahlzeiten dieser Woche mit dem, was du bereits hast.",

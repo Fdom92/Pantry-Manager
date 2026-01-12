@@ -3,6 +3,27 @@ import { InsightDefinition, InsightId } from '@core/models/insights';
 
 export const INSIGHTS_LIBRARY: InsightDefinition[] = [
   {
+    id: InsightId.PENDING_PRODUCT_UPDATES,
+    titleKey: 'insights.library.pendingProductUpdates.title',
+    descriptionKey: 'insights.library.pendingProductUpdates.description',
+    descriptionParams: context => ({
+      count: context.pendingReviewProducts.length,
+    }),
+    severity: 'warning',
+    priority: 0,
+    audience: 'all',
+    predicate: context => context.pendingReviewProducts.length > 0,
+    dismissLabelKey: 'insights.library.pendingProductUpdates.dismiss',
+    ctas: [
+      {
+        id: 'review-pantry-items',
+        labelKey: 'insights.library.pendingProductUpdates.cta',
+        type: 'navigate',
+        route: '/pantry',
+      },
+    ],
+  },
+  {
     id: InsightId.WEEKLY_MEAL_PLANNING,
     titleKey: 'insights.library.weeklyMealPlanning.title',
     descriptionKey: 'insights.library.weeklyMealPlanning.description',

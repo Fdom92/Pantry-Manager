@@ -1,6 +1,7 @@
 import { AgentEntryContext } from '@core/models/agent';
 
 export enum InsightId {
+  PENDING_PRODUCT_UPDATES = 'pending_product_updates',
   WEEKLY_MEAL_PLANNING = 'weekly_meal_planning',
   COOK_BEFORE_EXPIRY = 'cook_before_expiry',
   WHAT_TO_COOK_NOW = 'what_to_cook_now',
@@ -12,6 +13,12 @@ export enum InsightId {
 export type InsightSeverity = 'info' | 'warning' | 'danger';
 
 export type InsightAudience = 'all' | 'pro' | 'non-pro';
+
+export type InsightTranslationParamsBuilder = (context: InsightContext, helpers: InsightPredicateHelpers) => Record<string, unknown>;
+
+export type InsightPredicate = (context: InsightContext, helpers: InsightPredicateHelpers) => boolean;
+
+export type InsightPendingReviewReason = 'stale-update' | 'missing-info';
 
 export type InsightCta =
   | {
@@ -28,15 +35,6 @@ export type InsightCta =
       route: string;
     };
 
-export interface Insight {
-  id: InsightId;
-  title: string;
-  description: string;
-  severity: InsightSeverity;
-  ctas?: InsightCta[];
-  priority: number;
-}
-
 export type InsightCtaDefinition =
   | {
       id: string;
@@ -52,6 +50,16 @@ export type InsightCtaDefinition =
       route: string;
     };
 
+export interface Insight {
+  id: InsightId;
+  title: string;
+  description: string;
+  severity: InsightSeverity;
+  ctas?: InsightCta[];
+  priority: number;
+  dismissLabel?: string;
+}
+
 export interface InsightDefinition {
   id: InsightId;
   titleKey: string;
@@ -60,6 +68,8 @@ export interface InsightDefinition {
   ctas?: InsightCtaDefinition[];
   priority: number;
   audience: InsightAudience;
+  dismissLabelKey?: string;
+  descriptionParams?: InsightTranslationParamsBuilder;
   predicate?: InsightPredicate;
 }
 
@@ -86,10 +96,13 @@ export interface InsightContext {
   expiringSoonCount: number;
   lowStockCount: number;
   products: InsightProductSummary[];
+  pendingReviewProducts: InsightPendingReviewProduct[];
 }
-
-export type InsightPredicate = (context: InsightContext, helpers: InsightPredicateHelpers) => boolean;
 
 export interface InsightPredicateHelpers {
   now: Date;
+}
+
+export interface InsightPendingReviewProduct extends InsightProductSummary {
+  reasons: InsightPendingReviewReason[];
 }
