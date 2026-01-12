@@ -1,20 +1,9 @@
 {
-  "tabs": {
-    "dashboard": "Inicio",
-    "pantry": "Despensa",
-    "agent": "Planificación",
-    "shopping": "Compras",
-    "settings": "Ajustes"
-  },
   "pro": {
-    "locked": "PRO",
     "banner": {
       "title": "Solo para PRO",
       "cta": "Hazte PRO",
-      "default": "Desbloquea funciones avanzadas con IA y herramientas premium.",
-      "suggestions": "Generar receta IA con tus ingredientes.",
-      "pantry": "Optimiza la despensa con IA.",
-      "shopping": "Compra inteligente con IA."
+      "default": "Desbloquea funciones avanzadas con IA y herramientas premium."
     }
   },
   "onboarding": {
@@ -50,7 +39,6 @@
   "common": {
     "actions": {
       "close": "Cerrar",
-      "cancel": "Cancelar",
       "save": "Guardar",
       "apply": "Aplicar",
       "clear": "Limpiar"
@@ -76,25 +64,11 @@
       "subtitle": "Añade tu primer producto y controla el stock y las caducidades."
     },
     "shopping": {
-      "title": "Lista de compras limpia",
-      "subtitle": "Nada pendiente por ahora. Te avisaré cuando algo necesite reponerse."
-    },
-    "expired": {
-      "title": "Nada caducado",
-      "subtitle": "No hay productos vencidos por ahora."
+      "title": "Lista de compras limpia"
     }
   },
   "locations": {
-    "pantry": "Despensa",
-    "kitchen": "Cocina",
-    "fridge": "Nevera",
-    "freezer": "Congelador",
-    "bathroom": "Baño",
-    "freezerDrawer": "Congelador",
-    "cupboard": "Alacena",
-    "cellar": "Bodega",
-    "other": "Otros",
-    "unassigned": "Sin ubicación"
+    "pantry": "Despensa"
   },
   "dashboard": {
     "title": "Inicio",
@@ -168,19 +142,11 @@
       "empty": "Sin stock"
     },
     "purchaseModal": {
-      "title": "Añadir compra",
       "titleProduct": "Comprar producto",
       "productName": "Nombre",
       "quantity": "Cantidad",
       "quantityPlaceholder": "0",
-      "quantityHelp": "Usa el sumador para ajustar la cantidad comprada.",
-      "quantityError": "Introduce una cantidad mayor que 0.",
       "expiry": "Fecha de caducidad (opcional)",
-      "noExpiry": "Sin caducidad",
-      "location": "Ubicación",
-      "locationHint": "Elige dónde guardarás el lote.",
-      "locationRequired": "Selecciona una ubicación antes de guardar.",
-      "expiryHint": "Opcional: registra la caducidad si aplica.",
       "addToPantry": "Añadir"
     },
     "suggestions": {
@@ -189,7 +155,6 @@
       "destination": "Destino sugerido: {{ location }}",
       "totalStock": "Stock total: {{ amount }} {{ unit }}",
       "minStock": "Mín.: {{ amount }} {{ unit }}",
-      "buy": "Comprar {{ amount }} {{ unit }}",
       "empty": "Nada pendiente por ahora. Te avisaré cuando algo necesite reponerse."
     },
     "share": {
@@ -200,44 +165,11 @@
       "error": "No se pudo compartir la lista de la compra.",
       "pdfTitle": "Lista de la compra",
       "generatedOn": "Generada el {{ date }}",
-      "headers": {
-        "product": "Producto",
-        "quantity": "Cantidad necesaria",
-        "supermarket": "Supermercado"
-      },
       "dialogTitle": "Lista de la compra",
       "dialogText": "Comparte tu lista en PDF."
     }
   },
   "insights": {
-    "expiringLowStock": {
-      "title": "Productos a punto de caducar y con poco stock",
-      "description": "Algunos productos combinan caducidad cercana y bajo stock.",
-      "cta": "Ver productos",
-      "planPrompt": "Ayúdame a planificar recetas usando los productos con poco stock que caducan pronto.",
-      "ideasPrompt": "Dame ideas rápidas para aprovechar lo que está a punto de caducar."
-    },
-    "expiredWithStock": {
-      "title": "Productos caducados aún disponibles",
-      "description": "Hay productos caducados que siguen teniendo stock.",
-      "cta": "Revisar caducados",
-      "planPrompt": "Propón un plan para consumir los productos que ya caducaron pero siguen en stock.",
-      "ideasPrompt": "Dame recetas o usos para rescatar esos productos caducados."
-    },
-    "lowStockNoExpiry": {
-      "title": "Stock bajo sin caducidades urgentes",
-      "description": "Aunque no hay caducidades cercanas, varios productos están bajos.",
-      "cta": "Ver bajo stock"
-    },
-    "duplicatedProducts": {
-      "title": "Productos duplicados en la despensa",
-      "description": "Hay artículos con el mismo nombre registrados varias veces. Revisa y consolida.",
-      "cta": "Revisar productos"
-    },
-    "ctaLabels": {
-      "plan": "Planificar",
-      "ideas": "Dame ideas"
-    },
     "ctaDefault": "Entendido",
     "library": {
       "pendingProductUpdates": {
@@ -288,15 +220,11 @@
     "progress": "Productos pendientes {{ pending }} de {{ total }}",
     "lastUpdated": "Última actualización: {{ date }}",
     "fields": {
-      "category": "Categoría",
-      "location": "Ubicación",
       "expiry": "Caducidad",
       "stock": "Stock"
     },
     "edit": {
       "title": "Actualizar producto",
-      "save": "Guardar",
-      "cancel": "Cancelar",
       "expiryToggle": "Añadir fecha de caducidad"
     },
     "reasons": {
@@ -316,7 +244,6 @@
   },
   "agent": {
     "title": "Planificación",
-    "thinking": "Pensando…",
     "states": {
       "thinking": "Pensando…",
       "fetching": "Consultando tu despensa…",
@@ -333,43 +260,11 @@
       "headline": "Ideas y planes con IA",
       "subtitle": "Recibe recetas, menús e insights basados en tu despensa sin salir de la app.",
       "cta": "Desbloquear planificador",
-      "note": "Prueba gratis incluida con el plan PRO.",
-      "lockedPlaceholder": "Disponible solo con PRO",
       "demo": {
         "chipsTitle": "Empieza con una intención",
         "sessionTitle": "Conversación de ejemplo",
         "userMessage": "“Planifica cenas usando lo que caduca esta semana.”",
         "agentMessage": "Perfecto. Tienes espinaca y feta que caducan en 2 días. Te propongo pasta con pesto de espinaca para hoy y una tortilla griega mañana."
-      },
-      "sampleWeek": {
-        "title": "Visión semanal",
-        "items": {
-          "one": {
-            "title": "Lunes · Tacos veggie",
-            "desc": "Usa pimientos y frijoles que caducan mañana."
-          },
-          "two": {
-            "title": "Miércoles · Lote de sopa",
-            "desc": "Asa calabaza y congela 2 raciones."
-          },
-          "three": {
-            "title": "Fin de semana · Brunch",
-            "desc": "Avena nocturna con fruta madura."
-          }
-        }
-      },
-      "sampleIdeas": {
-        "title": "Ideas en cola",
-        "cards": {
-          "one": {
-            "title": "Cena sin desperdicio",
-            "desc": "Convierte la espinaca por caducar en pesto para pasta."
-          },
-          "two": {
-            "title": "Meal prep de mediodía",
-            "desc": "Asa pollo y combínalo con verduras al horno."
-          }
-        }
       }
     },
     "quickStart": {
@@ -385,103 +280,9 @@
       "decideForMe": "Decide por mí",
       "customPrompt": "Preguntar otra cosa"
     },
-    "roles": {
-      "user": "Tú",
-      "assistant": "Planificador",
-      "tool": "Acción"
-    },
     "messages": {
-      "processing": "Procesando acción…",
       "noResponse": "No pude generar respuesta.",
-      "noEndpoint": "No hay endpoint configurado para el planificador.",
-      "callFailed": "Parece que la conexión con el planificador tuvo un problema temporal. Inténtalo de nuevo en unos segundos.",
-      "incompleteToolCall": "No pude completar la acción porque faltan datos. Reformula la instrucción o inténtalo otra vez.",
-      "toolUnavailable": "La herramienta \"{{ name }}\" no está disponible.",
       "unifiedError": "El planificador no pudo responder en este momento. Inténtalo de nuevo en unos segundos."
-    },
-    "errors": {
-      "missingName": "Falta el nombre del producto.",
-      "quantityPositive": "La cantidad debe ser mayor que 0.",
-      "unknownLocation": "No entiendo la ubicación. Prueba con despensa, nevera, cocina o congelador.",
-      "missingMoveData": "Faltan datos: necesito producto, origen y destino.",
-      "invalidMoveLocation": "No reconozco alguna de las ubicaciones indicadas.",
-      "notFound": "\"{{ name }}\" no fue encontrado. ¿Seguro que existe?",
-      "notInSource": "\"{{ name }}\" no está en {{ location }}.",
-      "noUnits": "No hay unidades disponibles en {{ location }}.",
-      "missingAdjustData": "Faltan datos para ajustar stock (producto, ubicación y delta numérico).",
-      "invalidLocation": "No entiendo la ubicación indicada.",
-      "noStock": "\"{{ name }}\" no tiene stock en {{ location }}.",
-      "updateFailed": "No pude actualizar la cantidad.",
-      "missingUpdates": "No hay cambios para aplicar.",
-      "deleteFailed": "No pude eliminar {{ name }}.",
-      "batchNotFound": "No encontré un lote con esa fecha.",
-      "invalidArguments": "Necesitamos datos válidos para ejecutar esta acción. Revisa los campos."
-    },
-    "details": {
-      "options": "Opciones válidas: {{ value }}",
-      "origins": "Orígenes/destino válidos: {{ value }}",
-      "locations": "Ubicaciones disponibles: {{ value }}",
-      "suggestions": "Quizás querías decir: {{ value }}",
-      "expiration": "Caduca: {{ value }}",
-      "noExpiry": "Sin caducidad"
-    },
-    "values": {
-      "yes": "Sí",
-      "no": "No"
-    },
-    "results": {
-      "addExisting": "Añadido stock a {{ name }} en {{ location }}",
-      "addNew": "Creado {{ name }} en {{ location }}",
-      "quantity": "Cantidad: {{ value }}",
-      "location": "Ubicación: {{ value }}",
-      "moveSummary": "Movido {{ amount }} de {{ from }} a {{ to }}",
-      "moveProduct": "Producto: {{ value }}",
-      "moveFrom": "Origen: {{ value }}",
-      "moveTo": "Destino: {{ value }}",
-      "moveQuantity": "Cantidad: {{ value }}",
-      "moveBatch": "Lote: {{ value }}",
-      "adjustSummary": "Ajustado {{ name }} en {{ location }} a {{ quantity }}",
-      "adjustChange": "Cambio: {{ value }}",
-      "adjustNewQuantity": "Nueva cantidad: {{ value }}",
-      "adjustLocation": "Ubicación: {{ value }}",
-      "adjustBatch": "Lote: {{ value }}",
-      "expiringFound": "Encontrados {{ count }} productos que caducan en {{ days }} días",
-      "expiringEmpty": "Nada caduca en {{ days }} días",
-      "listSummary": "Hay {{ count }} productos en la despensa.",
-      "listDetail": "Listado completo recuperado",
-      "recipesPromptWith": "Utiliza estos ingredientes (prioriza los que caducan pronto): {{ ingredients }}. Devuelve 2-3 recetas concisas.",
-      "recipesPromptAuto": "Genera 2 recetas sencillas usando productos básicos de despensa.",
-      "recipesSystem": "Eres un chef que propone recetas breves con pasos numerados.",
-      "recipesFallback": "Aquí tienes algunas ideas de recetas.",
-      "recipesSummary": "Recetas generadas",
-      "recipesIngredients": "Ingredientes usados: {{ list }}",
-      "updateSummary": "Actualizado {{ name }}",
-      "updatedFields": "Campos modificados: {{ value }}",
-      "deleteSummary": "Eliminado {{ name }}",
-      "categoriesSummary": "{{ count }} categorías disponibles",
-      "categoriesList": "Categorías: {{ value }}",
-      "locationsSummary": "{{ count }} ubicaciones disponibles",
-      "locationsList": "Ubicaciones: {{ value }}",
-      "historySummary": "Historial de {{ name }}",
-      "historyCreated": "Creado: {{ value }}",
-      "historyUpdated": "Última actualización: {{ value }}",
-      "historyTotalStock": "Stock total: {{ value }}",
-      "historyLocations": "Ubicaciones: {{ value }}",
-      "suggestionsSummary": "{{ count }} sugerencias activas (caducados: {{ expired }}, por caducar: {{ nearExpiry }}, bajo stock: {{ low }})",
-      "suggestionsEmpty": "Todo está bajo control, no hay alertas ahora mismo.",
-      "suggestionsExpiredList": "Caducados: {{ value }}",
-      "suggestionsNearExpiryList": "Por caducar: {{ value }}",
-      "suggestionsLowList": "Bajo stock: {{ value }}",
-      "suggestionsBasicsList": "Básicos a revisar: {{ value }}"
-    },
-    "toasts": {
-      "addProduct": "Producto añadido a la despensa.",
-      "adjustQuantity": "Stock actualizado.",
-      "deleteProduct": "Producto eliminado.",
-      "moveProduct": "Movimiento registrado.",
-      "markOpened": "Producto marcado como abierto.",
-      "updateProductInfo": "Información del producto actualizada.",
-      "generic": "Acción aplicada."
     }
   },
   "pantry": {
@@ -528,8 +329,6 @@
       "error": "No se pudieron añadir los productos."
     },
     "empty": {
-      "title": "Resumen de la despensa",
-      "description": "Todavía no hay productos en la despensa. Añade tu primer producto para comenzar.",
       "filters": "Ningún producto coincide con los filtros actuales."
     },
     "group": {
@@ -539,35 +338,16 @@
       "collapse": "Contraer {{ name }}",
       "expand": "Expandir {{ name }}"
     },
-    "categories": {
-      "dairy": "Lácteos",
-      "grains": "Cereales",
-      "pasta": "Pastas",
-      "fresh": "Frescos",
-      "canned": "Conservas",
-      "coldcuts": "Embutidos",
-      "sweets": "Dulces",
-      "snacks": "Snacks",
-      "drinks": "Bebidas",
-      "sauces": "Salsas",
-      "spices": "Especias",
-      "legumes": "Legumbres"
-    },
     "batches": {
       "title": "Lotes del producto",
       "count": "{{ count }} lotes registrados",
-      "open": "Abierto",
-      "edit": "Editar producto"
+      "open": "Abierto"
     },
     "form": {
       "editTitle": "Editar artículo",
       "newTitle": "Nuevo artículo",
       "name": "Nombre",
       "namePlaceholder": "Arroz, leche...",
-      "quickQuantity": "Cantidad",
-      "quickExpiry": "Fecha",
-      "showAdvanced": "Mostrar versión avanzada",
-      "hideAdvanced": "Ocultar versión avanzada",
       "category": "Categoría",
       "categoryPlaceholder": "Cereales, lácteos...",
       "uncategorized": "Sin categoría",
@@ -633,14 +413,12 @@
         "generic": "No se pudo mover el producto, inténtalo de nuevo."
       },
       "submit": "Mover",
-      "cancel": "Cancelar",
       "toasts": {
         "success": "Moviste {{ quantity }} de {{ from }} a {{ to }}."
       }
     },
     "toasts": {
       "locationRequired": "Selecciona una ubicación antes de guardar.",
-      "supermarketRequired": "Selecciona un supermercado antes de guardar.",
       "saveError": "No se pudo guardar el producto.",
       "deleted": "🗑️ Producto eliminado.",
       "addedToShopping": "\"{{ name }}\" añadido a sugerencias de compra.",
@@ -657,16 +435,10 @@
     "headline": "Desbloquea todo el poder de tu despensa",
     "subtitle": "Automatización inteligente y funciones prioritarias.",
     "benefits": {
-      "title": "Todo lo que incluye PRO",
-      "subtitle": "Pensado para hogares con mucho movimiento.",
       "agent": "Planificador con IA para proponerte menús y recetas a tu medida.",
-      "future": "Acceso anticipado a futuras funciones PRO.",
-      "cloudSync": "Sincronización y backup en la nube.",
-      "history": "Historial completo de cambios en tus productos.",
-      "predictions": "Recetas avanzadas y predicciones inteligentes."
+      "future": "Acceso anticipado a futuras funciones PRO."
     },
     "actions": {
-      "subscribe": "Ir a suscripción PRO en Google Play",
       "maybeLater": "Ahora no",
       "restore": "Restaurar compra",
       "startTrial": "Empezar prueba gratis",
@@ -675,12 +447,9 @@
     "note": "Las suscripciones se gestionan desde tu cuenta de Google Play.",
     "alreadyPro": "PRO activo ✅",
     "errors": {
-      "purchaseFailed": "No hay suscripciones disponibles ahora mismo. Intenta de nuevo o revisa tu cuenta de Play.",
-      "selectPlan": "Elige un plan para continuar."
+      "purchaseFailed": "No hay suscripciones disponibles ahora mismo. Intenta de nuevo o revisa tu cuenta de Play."
     },
     "plans": {
-      "title": "Elige tu plan PRO",
-      "subtitle": "Escoge la periodicidad que mejor encaja contigo.",
       "monthly": "Mensual",
       "annual": "Anual",
       "other": "Otro plan",
@@ -697,42 +466,10 @@
   "settings": {
     "title": "Ajustes",
     "pro": {
-      "statusTitle": "Estado PRO",
-      "statusPro": "Usuario PRO",
-      "statusFree": "Versión gratuita",
       "statusDescription": "Gracias por apoyar el proyecto. PRO está activo en este dispositivo.",
       "upgradePrompt": "Hazte PRO para desbloquear funciones premium.",
       "upgradeCta": "Hazte PRO",
-      "title": "Funciones PRO",
-      "subtitle": "Acciones protegidas solo para usuarios PRO.",
-      "badgePro": "PRO activo",
-      "badgeFree": "Gratis",
-      "cloudSync": {
-        "title": "Sync en la nube",
-        "subtitle": "Mantén tu despensa sincronizada en todos los dispositivos.",
-        "action": "Sincronizar",
-        "ready": "La sincronización está protegida para cuentas PRO. Próximamente."
-      },
-      "history": {
-        "title": "Historial",
-        "subtitle": "Consulta el registro completo de cambios.",
-        "action": "Abrir historial",
-        "ready": "El historial es solo para usuarios PRO."
-      },
-      "recipes": {
-        "title": "Recetas avanzadas y predicciones",
-        "subtitle": "Recomendaciones premium con IA.",
-        "action": "Desbloquear",
-        "ready": "Las recetas avanzadas son exclusivas PRO."
-      }
-    },
-    "preferences": {
-      "title": "Preferencias",
-      "subtitle": "Personaliza el comportamiento de la app.",
-      "language": {
-        "label": "Idioma",
-        "device": "Se ajusta automáticamente al idioma del dispositivo."
-      }
+      "badgePro": "PRO activo"
     },
     "appearance": {
       "title": "Apariencia",
@@ -753,10 +490,6 @@
       "saveAction": "Guardar contexto IA",
       "saveSuccess": "Contexto guardado.",
       "saveError": "No se pudo guardar el contexto."
-    },
-    "languages": {
-      "es": "Español",
-      "en": "Inglés"
     },
     "data": {
       "title": "Gestión de datos",
@@ -780,7 +513,6 @@
       "unavailable": "La exportación no está disponible en este entorno.",
       "readyToShare": "📤 Datos listos para compartir.",
       "success": "📦 Datos exportados.",
-      "saved": "📦 Datos exportados en el dispositivo.",
       "error": "No se pudieron exportar los datos.",
       "shareTitle": "Pantry Manager - Respaldo",
       "shareText": "Exporta o comparte tu copia de seguridad."

@@ -44,7 +44,7 @@
             }
             @if (item) {
               <ion-text color="medium">
-                {{ 'upToDate.fields.category' | translate }}: {{ formatCategory(item) }}
+                {{ 'pantry.form.category' | translate }}: {{ formatCategory(item) }}
               </ion-text>
               <ion-text color="medium">
                 {{ 'upToDate.fields.stock' | translate }}: {{ formatQuantityLabel(item) }}
@@ -126,7 +126,7 @@
               <ion-list lines="none">
                 @if (editNeedsCategory()) {
                   <ion-item>
-                    <ion-label>{{ 'upToDate.fields.category' | translate }}</ion-label>
+                    <ion-label>{{ 'pantry.form.category' | translate }}</ion-label>
                     <ion-select
                       interface="popover"
                       [value]="editCategory()"
@@ -140,7 +140,7 @@
 
                 @if (editNeedsLocation()) {
                   <ion-item>
-                    <ion-label>{{ 'upToDate.fields.location' | translate }}</ion-label>
+                    <ion-label>{{ 'pantry.form.location' | translate }}</ion-label>
                     <ion-select
                       interface="popover"
                       [value]="editLocation()"
@@ -178,7 +178,7 @@
                 @if (isSavingEdit()) {
                   <ion-spinner name="dots"></ion-spinner>
                 } @else {
-                  {{ 'upToDate.edit.save' | translate }}
+                  {{ 'common.actions.save' | translate }}
                 }
               </ion-button>
             </div>

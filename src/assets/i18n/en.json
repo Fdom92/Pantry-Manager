@@ -1,20 +1,9 @@
 {
-  "tabs": {
-    "dashboard": "Home",
-    "pantry": "Pantry",
-    "agent": "Planning",
-    "shopping": "Shopping",
-    "settings": "Settings"
-  },
   "pro": {
-    "locked": "PRO",
     "banner": {
       "title": "Exclusive for PRO",
       "cta": "Go PRO",
-      "default": "Unlock AI-powered features and premium tools.",
-      "suggestions": "Generate AI-powered recipes tailored to your pantry.",
-      "pantry": "Optimize your pantry with AI recommendations.",
-      "shopping": "Smarter grocery planning with AI."
+      "default": "Unlock AI-powered features and premium tools."
     }
   },
   "onboarding": {
@@ -50,7 +39,6 @@
   "common": {
     "actions": {
       "close": "Close",
-      "cancel": "Cancel",
       "save": "Save",
       "apply": "Apply",
       "clear": "Clear"
@@ -76,25 +64,11 @@
       "subtitle": "Add your first product to track stock and expirations."
     },
     "shopping": {
-      "title": "Shopping list is clear",
-      "subtitle": "Nothing pending right now. I'll notify you when something needs restocking."
-    },
-    "expired": {
-      "title": "Nothing expired",
-      "subtitle": "No expired products right now."
+      "title": "Shopping list is clear"
     }
   },
   "locations": {
-    "pantry": "Pantry",
-    "kitchen": "Kitchen",
-    "fridge": "Fridge",
-    "freezer": "Freezer",
-    "bathroom": "Bathroom",
-    "freezerDrawer": "Freezer drawer",
-    "cupboard": "Cupboard",
-    "cellar": "Cellar",
-    "other": "Other",
-    "unassigned": "No location"
+    "pantry": "Pantry"
   },
   "dashboard": {
     "title": "Home",
@@ -168,19 +142,11 @@
       "empty": "Out of stock"
     },
     "purchaseModal": {
-      "title": "Add purchase",
       "titleProduct": "Purchase product",
       "productName": "Name",
       "quantity": "Quantity",
       "quantityPlaceholder": "0",
-      "quantityHelp": "Use the stepper to adjust the purchased amount.",
-      "quantityError": "Enter an amount greater than 0.",
       "expiry": "Expiry date (optional)",
-      "noExpiry": "No expiry",
-      "location": "Location",
-      "locationHint": "Choose where this lot will be stored.",
-      "locationRequired": "Pick a location before saving.",
-      "expiryHint": "Optional: record the expiration date if needed.",
       "addToPantry": "Add"
     },
     "suggestions": {
@@ -189,7 +155,6 @@
       "destination": "Suggested location: {{ location }}",
       "totalStock": "Total stock: {{ amount }} {{ unit }}",
       "minStock": "Min: {{ amount }} {{ unit }}",
-      "buy": "Buy {{ amount }} {{ unit }}",
       "empty": "Nothing pending right now. I'll let you know when something needs restocking."
     },
     "share": {
@@ -200,44 +165,11 @@
       "error": "We couldn't share the shopping list.",
       "pdfTitle": "Shopping list",
       "generatedOn": "Generated on {{ date }}",
-      "headers": {
-        "product": "Product",
-        "quantity": "Needed qty",
-        "supermarket": "Store"
-      },
       "dialogTitle": "Shopping list",
       "dialogText": "Share your grocery list as a PDF."
     }
   },
   "insights": {
-    "expiringLowStock": {
-      "title": "Products close to expiring with low stock",
-      "description": "Some products combine an upcoming expiry and low stock.",
-      "cta": "View products",
-      "planPrompt": "Help me plan recipes that use the low-stock items expiring soon.",
-      "ideasPrompt": "Give me quick ideas to use those ingredients before they spoil."
-    },
-    "expiredWithStock": {
-      "title": "Expired products still available",
-      "description": "Some expired products still have stock that needs review.",
-      "cta": "Review expired items",
-      "planPrompt": "Create a plan to consume the items that already expired but are still in my pantry.",
-      "ideasPrompt": "Suggest recipes or uses to salvage those expired products."
-    },
-    "lowStockNoExpiry": {
-      "title": "Low stock even without urgent expiries",
-      "description": "There are several low-stock items even though nothing is expiring soon.",
-      "cta": "View low stock"
-    },
-    "duplicatedProducts": {
-      "title": "Duplicated products in the pantry",
-      "description": "Some items share the same name in different entries. Review and consolidate them.",
-      "cta": "Review products"
-    },
-    "ctaLabels": {
-      "plan": "Plan",
-      "ideas": "Give me ideas"
-    },
     "ctaDefault": "Got it",
     "library": {
       "pendingProductUpdates": {
@@ -288,15 +220,11 @@
     "progress": "Products pending {{ pending }} of {{ total }}",
     "lastUpdated": "Last updated: {{ date }}",
     "fields": {
-      "category": "Category",
-      "location": "Location",
       "expiry": "Expiry date",
       "stock": "Stock"
     },
     "edit": {
       "title": "Update product",
-      "save": "Save",
-      "cancel": "Cancel",
       "expiryToggle": "Add expiry date"
     },
     "reasons": {
@@ -316,7 +244,6 @@
   },
   "agent": {
     "title": "Planning",
-    "thinking": "Thinking…",
     "states": {
       "thinking": "Thinking…",
       "fetching": "Checking your pantry…",
@@ -333,43 +260,11 @@
       "headline": "Ideas and plans powered by AI",
       "subtitle": "Get recipes, menus, and insights tailored to your pantry.",
       "cta": "Unlock meal planner",
-      "note": "Start your free trial and cancel anytime.",
-      "lockedPlaceholder": "Available with PRO",
       "demo": {
         "chipsTitle": "Start with a quick prompt",
         "sessionTitle": "Sample conversation",
         "userMessage": "“Use what expires this week to plan dinners.”",
         "agentMessage": "Great idea. You have spinach and feta that expire in 2 days. How about a spinach pesto pasta tonight and a Greek-style omelette tomorrow?"
-      },
-      "sampleWeek": {
-        "title": "Weekly snapshot",
-        "items": {
-          "one": {
-            "title": "Mon · Veggie tacos",
-            "desc": "Use peppers and beans that expire tomorrow."
-          },
-          "two": {
-            "title": "Wed · Soup batch",
-            "desc": "Roast pumpkin and freeze two portions."
-          },
-          "three": {
-            "title": "Weekend brunch",
-            "desc": "Overnight oats with the ripe fruit."
-          }
-        }
-      },
-      "sampleIdeas": {
-        "title": "Idea queue",
-        "cards": {
-          "one": {
-            "title": "Zero-waste dinner",
-            "desc": "Turn expiring spinach into pesto pasta."
-          },
-          "two": {
-            "title": "Lunch prep",
-            "desc": "Grill chicken and pair it with roasted veggies."
-          }
-        }
       }
     },
     "quickStart": {
@@ -385,103 +280,9 @@
       "decideForMe": "Decide for me",
       "customPrompt": "Ask something else"
     },
-    "roles": {
-      "user": "You",
-      "assistant": "Planner",
-      "tool": "Action"
-    },
     "messages": {
-      "processing": "Processing action…",
       "noResponse": "Couldn't generate a response.",
-      "noEndpoint": "Meal planner endpoint is not configured.",
-      "callFailed": "It looks like the meal planner connection had a temporary issue. Please try again in a few seconds.",
-      "incompleteToolCall": "The meal planner couldn't gather all the data needed to run that action. Please rephrase or try again.",
-      "toolUnavailable": "Tool \"{{ name }}\" is not available.",
       "unifiedError": "The meal planner couldn’t reply right now. Please try again in a few seconds."
-    },
-    "errors": {
-      "missingName": "Product name is required.",
-      "quantityPositive": "Quantity must be greater than 0.",
-      "unknownLocation": "I can't understand the location. Try pantry, fridge, kitchen or freezer.",
-      "missingMoveData": "Product, origin and destination are required.",
-      "invalidMoveLocation": "Some of the provided locations are not recognized.",
-      "notFound": "\"{{ name }}\" was not found. Are you sure it exists?",
-      "notInSource": "\"{{ name }}\" is not in {{ location }}.",
-      "noUnits": "No units available in {{ location }}.",
-      "missingAdjustData": "Missing data to adjust stock (product, location and numeric delta).",
-      "invalidLocation": "I can't understand the provided location.",
-      "noStock": "\"{{ name }}\" has no stock in {{ location }}.",
-      "updateFailed": "Could not update the quantity.",
-      "missingUpdates": "No changes to apply.",
-      "deleteFailed": "Couldn't delete {{ name }}.",
-      "batchNotFound": "I couldn't find a lot with that date.",
-      "invalidArguments": "We need valid information to run that action. Please review the fields."
-    },
-    "details": {
-      "options": "Valid options: {{ value }}",
-      "origins": "Valid origins/destinations: {{ value }}",
-      "locations": "Available locations: {{ value }}",
-      "suggestions": "Maybe you meant: {{ value }}",
-      "expiration": "Expires: {{ value }}",
-      "noExpiry": "No expiry"
-    },
-    "values": {
-      "yes": "Yes",
-      "no": "No"
-    },
-    "results": {
-      "addExisting": "Added stock to {{ name }} in {{ location }}",
-      "addNew": "Created {{ name }} in {{ location }}",
-      "quantity": "Quantity: {{ value }}",
-      "location": "Location: {{ value }}",
-      "moveSummary": "Moved {{ amount }} from {{ from }} to {{ to }}",
-      "moveProduct": "Product: {{ value }}",
-      "moveFrom": "From: {{ value }}",
-      "moveTo": "To: {{ value }}",
-      "moveQuantity": "Quantity: {{ value }}",
-      "moveBatch": "Batch: {{ value }}",
-      "adjustSummary": "Adjusted {{ name }} in {{ location }} to {{ quantity }}",
-      "adjustChange": "Change: {{ value }}",
-      "adjustNewQuantity": "New quantity: {{ value }}",
-      "adjustLocation": "Location: {{ value }}",
-      "adjustBatch": "Batch: {{ value }}",
-      "expiringFound": "Found {{ count }} products expiring in {{ days }} days",
-      "expiringEmpty": "Nothing expires in {{ days }} days",
-      "listSummary": "{{ count }} products in the pantry.",
-      "listDetail": "Full list retrieved",
-      "recipesPromptWith": "Use these ingredients (prioritize the soon-to-expire ones): {{ ingredients }}. Return 2-3 concise recipes.",
-      "recipesPromptAuto": "Generate 2 simple recipes using pantry staples.",
-      "recipesSystem": "You are a chef that shares short recipes with numbered steps.",
-      "recipesFallback": "Here are some recipe ideas.",
-      "recipesSummary": "Recipes generated",
-      "recipesIngredients": "Ingredients used: {{ list }}",
-      "updateSummary": "Updated {{ name }}",
-      "updatedFields": "Changed: {{ value }}",
-      "deleteSummary": "Deleted {{ name }}",
-      "categoriesSummary": "{{ count }} categories available",
-      "categoriesList": "Categories: {{ value }}",
-      "locationsSummary": "{{ count }} locations available",
-      "locationsList": "Locations: {{ value }}",
-      "historySummary": "{{ name }} history",
-      "historyCreated": "Created: {{ value }}",
-      "historyUpdated": "Updated: {{ value }}",
-      "historyTotalStock": "Total stock: {{ value }}",
-      "historyLocations": "Locations: {{ value }}",
-      "suggestionsSummary": "{{ count }} suggestions active (expired: {{ expired }}, expiring: {{ nearExpiry }}, low stock: {{ low }})",
-      "suggestionsEmpty": "Everything looks good, no alerts right now.",
-      "suggestionsExpiredList": "Expired: {{ value }}",
-      "suggestionsNearExpiryList": "Expiring soon: {{ value }}",
-      "suggestionsLowList": "Low stock: {{ value }}",
-      "suggestionsBasicsList": "Essential items: {{ value }}"
-    },
-    "toasts": {
-      "addProduct": "Product added to the pantry.",
-      "adjustQuantity": "Stock updated.",
-      "deleteProduct": "Product deleted.",
-      "moveProduct": "Movement registered.",
-      "markOpened": "Product marked as opened.",
-      "updateProductInfo": "Product info updated.",
-      "generic": "Action completed."
     }
   },
   "pantry": {
@@ -528,8 +329,6 @@
       "error": "Couldn't add the products."
     },
     "empty": {
-      "title": "Pantry overview",
-      "description": "There are no products yet. Add your first product to get started.",
       "filters": "No product matches the current filters."
     },
     "group": {
@@ -539,35 +338,16 @@
       "collapse": "Collapse {{ name }}",
       "expand": "Expand {{ name }}"
     },
-    "categories": {
-      "dairy": "Dairy",
-      "grains": "Grains",
-      "pasta": "Pasta",
-      "fresh": "Fresh",
-      "canned": "Canned",
-      "coldcuts": "Cold cuts",
-      "sweets": "Sweets",
-      "snacks": "Snacks",
-      "drinks": "Drinks",
-      "sauces": "Sauces",
-      "spices": "Spices",
-      "legumes": "Legumes"
-    },
     "batches": {
       "title": "Product batches",
       "count": "{{ count }} batches recorded",
-      "open": "Opened",
-      "edit": "Edit product"
+      "open": "Opened"
     },
     "form": {
       "editTitle": "Edit item",
       "newTitle": "New item",
       "name": "Name",
       "namePlaceholder": "Rice, milk...",
-      "quickQuantity": "Quantity",
-      "quickExpiry": "Date",
-      "showAdvanced": "Show advanced version",
-      "hideAdvanced": "Hide advanced version",
       "category": "Category",
       "categoryPlaceholder": "Cereals, dairy...",
       "uncategorized": "Uncategorized",
@@ -633,14 +413,12 @@
         "generic": "We couldn't move the item. Try again."
       },
       "submit": "Move",
-      "cancel": "Cancel",
       "toasts": {
         "success": "Moved {{ quantity }} from {{ from }} to {{ to }}."
       }
     },
     "toasts": {
       "locationRequired": "Select a location before saving.",
-      "supermarketRequired": "Select a supermarket before saving.",
       "saveError": "Could not save the item.",
       "deleted": "🗑️ Item deleted.",
       "addedToShopping": "\"{{ name }}\" added to shopping suggestions.",
@@ -657,16 +435,10 @@
     "headline": "Unlock the full pantry superpowers",
     "subtitle": "Smarter automation and priority features.",
     "benefits": {
-      "title": "Everything you get with PRO",
-      "subtitle": "Designed for power users and busy households.",
       "agent": "AI meal planner that proposes menus and recipes tailored to you.",
-      "future": "Early access to upcoming PRO features.",
-      "cloudSync": "Cloud sync and backup for peace of mind.",
-      "history": "Full history of changes to your items.",
-      "predictions": "Advanced recipes and smart predictions."
+      "future": "Early access to upcoming PRO features."
     },
     "actions": {
-      "subscribe": "Go PRO on Google Play",
       "maybeLater": "Maybe later",
       "restore": "Restore purchase",
       "startTrial": "Start free trial",
@@ -675,12 +447,9 @@
     "note": "Subscriptions are managed in the Google Play account screen.",
     "alreadyPro": "Already PRO ✅",
     "errors": {
-      "purchaseFailed": "No subscription available right now. Try again or check your Play account.",
-      "selectPlan": "Choose a plan to continue."
+      "purchaseFailed": "No subscription available right now. Try again or check your Play account."
     },
     "plans": {
-      "title": "Choose your PRO plan",
-      "subtitle": "Pick the cadence that fits you best.",
       "monthly": "Monthly",
       "annual": "Annual",
       "other": "Other plan",
@@ -697,42 +466,10 @@
   "settings": {
     "title": "Settings",
     "pro": {
-      "statusTitle": "PRO status",
-      "statusPro": "PRO user",
-      "statusFree": "Free version",
       "statusDescription": "Thank you for supporting the project. PRO is active on this device.",
       "upgradePrompt": "Upgrade to PRO to unlock premium features.",
       "upgradeCta": "Upgrade to PRO",
-      "title": "PRO features",
-      "subtitle": "Protected actions only available to PRO users.",
-      "badgePro": "PRO active",
-      "badgeFree": "Free tier",
-      "cloudSync": {
-        "title": "Cloud sync",
-        "subtitle": "Keep your pantry in sync across devices.",
-        "action": "Sync",
-        "ready": "Cloud sync is protected by PRO. Coming soon."
-      },
-      "history": {
-        "title": "History",
-        "subtitle": "Access the full change log of your items.",
-        "action": "Open history",
-        "ready": "History is a PRO-only area."
-      },
-      "recipes": {
-        "title": "Advanced recipes & predictions",
-        "subtitle": "Premium recommendations powered by AI.",
-        "action": "Unlock",
-        "ready": "Advanced recipes are reserved for PRO users."
-      }
-    },
-    "preferences": {
-      "title": "Preferences",
-      "subtitle": "Customize how the app behaves.",
-      "language": {
-        "label": "Language",
-        "device": "Matches your device language automatically."
-      }
+      "badgePro": "PRO active"
     },
     "appearance": {
       "title": "Appearance",
@@ -753,10 +490,6 @@
       "saveAction": "Save AI context",
       "saveSuccess": "Planner context saved.",
       "saveError": "Could not save the planner context."
-    },
-    "languages": {
-      "es": "Spanish",
-      "en": "English"
     },
     "data": {
       "title": "Data management",
@@ -780,7 +513,6 @@
       "unavailable": "Export is not available in this environment.",
       "readyToShare": "Data ready to share.",
       "success": "Data exported.",
-      "saved": "Data exported to your device.",
       "error": "Could not export the data.",
       "shareTitle": "Pantry Manager - Backup",
       "shareText": "Export or share your pantry backup."

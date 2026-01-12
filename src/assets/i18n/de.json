@@ -1,20 +1,9 @@
 {
-  "tabs": {
-    "dashboard": "Start",
-    "pantry": "Vorratskammer",
-    "agent": "Planung",
-    "shopping": "Einkäufe",
-    "settings": "Einstellungen"
-  },
   "pro": {
-    "locked": "PRO",
     "banner": {
       "title": "Nur für PRO",
       "cta": "PRO werden",
-      "default": "Schalte erweiterte KI-Funktionen und Premium-Tools frei.",
-      "suggestions": "KI-Rezept mit deinen Zutaten erstellen.",
-      "pantry": "Vorratskammer mit KI optimieren.",
-      "shopping": "Intelligent einkaufen mit KI."
+      "default": "Schalte erweiterte KI-Funktionen und Premium-Tools frei."
     }
   },
   "onboarding": {
@@ -50,7 +39,6 @@
   "common": {
     "actions": {
       "close": "Schließen",
-      "cancel": "Abbrechen",
       "save": "Speichern",
       "apply": "Anwenden",
       "clear": "Leeren"
@@ -76,25 +64,11 @@
       "subtitle": "Füge dein erstes Produkt hinzu und behalte Bestand und Haltbarkeit im Blick."
     },
     "shopping": {
-      "title": "Einkaufsliste leer",
-      "subtitle": "Derzeit nichts zu erledigen. Ich informiere dich, wenn etwas nachgekauft werden muss."
-    },
-    "expired": {
-      "title": "Nichts abgelaufen",
-      "subtitle": "Momentan gibt es keine abgelaufenen Produkte."
+      "title": "Einkaufsliste leer"
     }
   },
   "locations": {
-    "pantry": "Vorratskammer",
-    "kitchen": "Küche",
-    "fridge": "Kühlschrank",
-    "freezer": "Gefrierschrank",
-    "bathroom": "Badezimmer",
-    "freezerDrawer": "Gefrierfach",
-    "cupboard": "Schrank",
-    "cellar": "Keller",
-    "other": "Andere",
-    "unassigned": "Kein Standort"
+    "pantry": "Vorratskammer"
   },
   "dashboard": {
     "title": "Start",
@@ -168,19 +142,11 @@
       "empty": "Kein Bestand"
     },
     "purchaseModal": {
-      "title": "Einkauf hinzufügen",
       "titleProduct": "Produkt kaufen",
       "productName": "Name",
       "quantity": "Menge",
       "quantityPlaceholder": "0",
-      "quantityHelp": "Verwende die Steuerelemente, um die gekaufte Menge anzupassen.",
-      "quantityError": "Bitte gib eine Menge größer als 0 ein.",
       "expiry": "Haltbarkeitsdatum (optional)",
-      "noExpiry": "Kein Ablaufdatum",
-      "location": "Standort",
-      "locationHint": "Wähle aus, wo die Charge gelagert wird.",
-      "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
-      "expiryHint": "Optional: Haltbarkeitsdatum erfassen, falls zutreffend.",
       "addToPantry": "Hinzufügen"
     },
     "suggestions": {
@@ -189,7 +155,6 @@
       "destination": "Empfohlenes Ziel: {{ location }}",
       "totalStock": "Gesamtbestand: {{ amount }} {{ unit }}",
       "minStock": "Min.: {{ amount }} {{ unit }}",
-      "buy": "{{ amount }} {{ unit }} kaufen",
       "empty": "Derzeit nichts zu erledigen. Ich informiere dich, wenn Nachschub nötig ist."
     },
     "share": {
@@ -200,44 +165,11 @@
       "error": "Die Einkaufsliste konnte nicht geteilt werden.",
       "pdfTitle": "Einkaufsliste",
       "generatedOn": "Erstellt am {{ date }}",
-      "headers": {
-        "product": "Produkt",
-        "quantity": "Benötigte Menge",
-        "supermarket": "Supermarkt"
-      },
       "dialogTitle": "Einkaufsliste",
       "dialogText": "Teile deine Einkaufsliste als PDF."
     }
   },
   "insights": {
-    "expiringLowStock": {
-      "title": "Produkte kurz vor Ablauf mit geringem Bestand",
-      "description": "Einige Produkte haben sowohl ein nahes Ablaufdatum als auch niedrigen Bestand.",
-      "cta": "Produkte anzeigen",
-      "planPrompt": "Hilf mir, Rezepte zu planen, die die wenigen Produkte nutzen, die bald ablaufen.",
-      "ideasPrompt": "Gib mir schnelle Ideen, um diese Produkte vor dem Ablauf zu verbrauchen."
-    },
-    "expiredWithStock": {
-      "title": "Abgelaufene Produkte noch verfügbar",
-      "description": "Einige abgelaufene Produkte sind noch auf Lager.",
-      "cta": "Abgelaufene prüfen",
-      "planPrompt": "Erstelle einen Plan, um die bereits abgelaufenen Produkte mit Bestand aufzubrauchen.",
-      "ideasPrompt": "Schlage Rezepte oder Verwendungsideen vor, um diese abgelaufenen Produkte zu verwerten."
-    },
-    "lowStockNoExpiry": {
-      "title": "Niedriger Bestand ohne dringende Ablaufdaten",
-      "description": "Es gibt mehrere Artikel mit niedrigem Bestand, obwohl nichts bald abläuft.",
-      "cta": "Niedrigen Bestand ansehen"
-    },
-    "duplicatedProducts": {
-      "title": "Doppelte Produkte in der Speisekammer",
-      "description": "Einige Artikel haben denselben Namen in mehreren Einträgen. Prüfe und führe sie zusammen.",
-      "cta": "Produkte prüfen"
-    },
-    "ctaLabels": {
-      "plan": "Planen",
-      "ideas": "Mir Ideen geben"
-    },
     "ctaDefault": "Verstanden",
     "library": {
       "pendingProductUpdates": {
@@ -288,15 +220,11 @@
     "progress": "Ausstehende Produkte {{ pending }} von {{ total }}",
     "lastUpdated": "Zuletzt aktualisiert: {{ date }}",
     "fields": {
-      "category": "Kategorie",
-      "location": "Standort",
       "expiry": "Ablaufdatum",
       "stock": "Bestand"
     },
     "edit": {
       "title": "Produkt aktualisieren",
-      "save": "Speichern",
-      "cancel": "Abbrechen",
       "expiryToggle": "Ablaufdatum hinzufügen"
     },
     "reasons": {
@@ -316,7 +244,6 @@
   },
   "agent": {
     "title": "Planung",
-    "thinking": "Denkt nach…",
     "states": {
       "thinking": "Denkt nach…",
       "fetching": "Vorratskammer wird abgefragt…",
@@ -333,43 +260,11 @@
       "headline": "Ideen und Pläne mit KI",
       "subtitle": "Erhalte Rezepte, Menüs und Insights passend zu deinem Vorrat.",
       "cta": "Menüplaner freischalten",
-      "note": "Kostenlose Testversion im PRO-Plan enthalten.",
-      "lockedPlaceholder": "Nur mit PRO verfügbar",
       "demo": {
         "chipsTitle": "Starte mit einer Absicht",
         "sessionTitle": "Beispielkonversation",
         "userMessage": "„Plane Abendessen mit allem, was diese Woche abläuft.“",
         "agentMessage": "Klingt gut. Spinat und Feta laufen in 2 Tagen ab. Vorschlag: Heute Spinat-Pesto-Pasta und morgen ein griechisches Omelett."
-      },
-      "sampleWeek": {
-        "title": "Wochenüberblick",
-        "items": {
-          "one": {
-            "title": "Mo · Veggie-Tacos",
-            "desc": "Paprika und Bohnen nutzen, die morgen ablaufen."
-          },
-          "two": {
-            "title": "Mi · Suppenvorrat",
-            "desc": "Kürbis rösten und zwei Portionen einfrieren."
-          },
-          "three": {
-            "title": "Wochenende · Brunch",
-            "desc": "Overnight Oats mit reifem Obst."
-          }
-        }
-      },
-      "sampleIdeas": {
-        "title": "Ideenliste",
-        "cards": {
-          "one": {
-            "title": "Zero-Waste-Dinner",
-            "desc": "Spinat kurz vor Ablauf zu Pesto-Pasta verarbeiten."
-          },
-          "two": {
-            "title": "Lunch-Prep",
-            "desc": "Hähnchen grillen und mit Ofengemüse kombinieren."
-          }
-        }
       }
     },
     "quickStart": {
@@ -385,103 +280,9 @@
       "decideForMe": "Entscheide für mich",
       "customPrompt": "Etwas anderes fragen"
     },
-    "roles": {
-      "user": "Du",
-      "assistant": "Planer",
-      "tool": "Aktion"
-    },
     "messages": {
-      "processing": "Aktion wird verarbeitet…",
       "noResponse": "Ich konnte keine Antwort erzeugen.",
-      "noEndpoint": "Für den Menüplaner ist kein Endpoint konfiguriert.",
-      "callFailed": "Die Verbindung zum Menüplaner hatte ein temporäres Problem. Bitte versuche es in ein paar Sekunden erneut.",
-      "incompleteToolCall": "Der Menüplaner konnte nicht alle nötigen Daten sammeln. Bitte formuliere die Anweisung neu.",
-      "toolUnavailable": "Das Tool „{{ name }}“ ist nicht verfügbar.",
       "unifiedError": "Der Menüplaner konnte im Moment nicht antworten. Bitte versuche es später erneut."
-    },
-    "errors": {
-      "missingName": "Der Produktname fehlt.",
-      "quantityPositive": "Die Menge muss größer als 0 sein.",
-      "unknownLocation": "Ich verstehe den Standort nicht. Versuche es mit Vorratskammer, Kühlschrank, Küche oder Gefrierschrank.",
-      "missingMoveData": "Es fehlen Daten: Produkt, Herkunft und Ziel werden benötigt.",
-      "invalidMoveLocation": "Ein angegebener Standort wird nicht erkannt.",
-      "notFound": "„{{ name }}“ wurde nicht gefunden. Bist du sicher, dass es existiert?",
-      "notInSource": "„{{ name }}“ befindet sich nicht in {{ location }}.",
-      "noUnits": "In {{ location }} sind keine Einheiten verfügbar.",
-      "missingAdjustData": "Es fehlen Daten zur Bestandsanpassung (Produkt, Standort und numerische Änderung).",
-      "invalidLocation": "Der angegebene Standort wird nicht verstanden.",
-      "noStock": "„{{ name }}“ hat keinen Bestand in {{ location }}.",
-      "updateFailed": "Die Menge konnte nicht aktualisiert werden.",
-      "missingUpdates": "Es gibt keine Änderungen zum Anwenden.",
-      "deleteFailed": "{{ name }} konnte nicht gelöscht werden.",
-      "batchNotFound": "Es wurde keine Charge mit diesem Datum gefunden.",
-      "invalidArguments": "Für diese Aktion werden gültige Daten benötigt. Bitte überprüfe die Felder."
-    },
-    "details": {
-      "options": "Gültige Optionen: {{ value }}",
-      "origins": "Gültige Herkunft/Ziele: {{ value }}",
-      "locations": "Verfügbare Standorte: {{ value }}",
-      "suggestions": "Meintest du vielleicht: {{ value }}",
-      "expiration": "Läuft ab: {{ value }}",
-      "noExpiry": "Kein Ablaufdatum"
-    },
-    "values": {
-      "yes": "Ja",
-      "no": "Nein"
-    },
-    "results": {
-      "addExisting": "Bestand zu {{ name }} in {{ location }} hinzugefügt",
-      "addNew": "{{ name }} in {{ location }} erstellt",
-      "quantity": "Menge: {{ value }}",
-      "location": "Standort: {{ value }}",
-      "moveSummary": "{{ amount }} von {{ from }} nach {{ to }} verschoben",
-      "moveProduct": "Produkt: {{ value }}",
-      "moveFrom": "Herkunft: {{ value }}",
-      "moveTo": "Ziel: {{ value }}",
-      "moveQuantity": "Menge: {{ value }}",
-      "moveBatch": "Charge: {{ value }}",
-      "adjustSummary": "{{ name }} in {{ location }} auf {{ quantity }} angepasst",
-      "adjustChange": "Änderung: {{ value }}",
-      "adjustNewQuantity": "Neue Menge: {{ value }}",
-      "adjustLocation": "Standort: {{ value }}",
-      "adjustBatch": "Charge: {{ value }}",
-      "expiringFound": "{{ count }} Produkte gefunden, die in {{ days }} Tagen ablaufen",
-      "expiringEmpty": "In {{ days }} Tagen läuft nichts ab",
-      "listSummary": "Es gibt {{ count }} Produkte in der Vorratskammer.",
-      "listDetail": "Vollständige Liste abgerufen",
-      "recipesPromptWith": "Verwende diese Zutaten (priorisiere bald ablaufende): {{ ingredients }}. Gib 2–3 kurze Rezepte zurück.",
-      "recipesPromptAuto": "Erstelle 2 einfache Rezepte mit grundlegenden Vorratsprodukten.",
-      "recipesSystem": "Du bist ein Koch, der kurze Rezepte mit nummerierten Schritten vorschlägt.",
-      "recipesFallback": "Hier sind einige Rezeptideen.",
-      "recipesSummary": "Rezepte generiert",
-      "recipesIngredients": "Verwendete Zutaten: {{ list }}",
-      "updateSummary": "{{ name }} aktualisiert",
-      "updatedFields": "Geänderte Felder: {{ value }}",
-      "deleteSummary": "{{ name }} gelöscht",
-      "categoriesSummary": "{{ count }} verfügbare Kategorien",
-      "categoriesList": "Kategorien: {{ value }}",
-      "locationsSummary": "{{ count }} verfügbare Standorte",
-      "locationsList": "Standorte: {{ value }}",
-      "historySummary": "Verlauf von {{ name }}",
-      "historyCreated": "Erstellt: {{ value }}",
-      "historyUpdated": "Letzte Aktualisierung: {{ value }}",
-      "historyTotalStock": "Gesamtbestand: {{ value }}",
-      "historyLocations": "Standorte: {{ value }}",
-      "suggestionsSummary": "{{ count }} aktive Vorschläge (abgelaufen: {{ expired }}, kurz vor Ablauf: {{ nearExpiry }}, niedriger Bestand: {{ low }})",
-      "suggestionsEmpty": "Alles ist unter Kontrolle, aktuell gibt es keine Warnungen.",
-      "suggestionsExpiredList": "Abgelaufen: {{ value }}",
-      "suggestionsNearExpiryList": "Kurz vor Ablauf: {{ value }}",
-      "suggestionsLowList": "Niedriger Bestand: {{ value }}",
-      "suggestionsBasicsList": "Zu prüfende Grundprodukte: {{ value }}"
-    },
-    "toasts": {
-      "addProduct": "Produkt zur Vorratskammer hinzugefügt.",
-      "adjustQuantity": "Bestand aktualisiert.",
-      "deleteProduct": "Produkt gelöscht.",
-      "moveProduct": "Verschiebung gespeichert.",
-      "markOpened": "Produkt als geöffnet markiert.",
-      "updateProductInfo": "Produktinformationen aktualisiert.",
-      "generic": "Aktion ausgeführt."
     }
   },
   "pantry": {
@@ -528,8 +329,6 @@
       "error": "Produkte konnten nicht hinzugefügt werden."
     },
     "empty": {
-      "title": "Vorratsübersicht",
-      "description": "Es befinden sich noch keine Produkte in der Vorratskammer. Füge dein erstes Produkt hinzu, um zu beginnen.",
       "filters": "Kein Produkt entspricht den aktuellen Filtern."
     },
     "group": {
@@ -539,35 +338,16 @@
       "collapse": "{{ name }} einklappen",
       "expand": "{{ name }} ausklappen"
     },
-    "categories": {
-      "dairy": "Milchprodukte",
-      "grains": "Getreide",
-      "pasta": "Pasta",
-      "fresh": "Frischwaren",
-      "canned": "Konserven",
-      "coldcuts": "Aufschnitt",
-      "sweets": "Süßigkeiten",
-      "snacks": "Snacks",
-      "drinks": "Getränke",
-      "sauces": "Soßen",
-      "spices": "Gewürze",
-      "legumes": "Hülsenfrüchte"
-    },
     "batches": {
       "title": "Produktchargen",
       "count": "{{ count }} registrierte Chargen",
-      "open": "Geöffnet",
-      "edit": "Produkt bearbeiten"
+      "open": "Geöffnet"
     },
     "form": {
       "editTitle": "Artikel bearbeiten",
       "newTitle": "Neuer Artikel",
       "name": "Name",
       "namePlaceholder": "Reis, Milch…",
-      "quickQuantity": "Menge",
-      "quickExpiry": "Datum",
-      "showAdvanced": "Erweiterte Ansicht anzeigen",
-      "hideAdvanced": "Erweiterte Ansicht ausblenden",
       "category": "Kategorie",
       "categoryPlaceholder": "Getreide, Milchprodukte…",
       "uncategorized": "Ohne Kategorie",
@@ -633,14 +413,12 @@
         "generic": "Das Produkt konnte nicht verschoben werden. Bitte versuche es erneut."
       },
       "submit": "Verschieben",
-      "cancel": "Abbrechen",
       "toasts": {
         "success": "Du hast {{ quantity }} von {{ from }} nach {{ to }} verschoben."
       }
     },
     "toasts": {
       "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
-      "supermarketRequired": "Bitte wähle vor dem Speichern einen Supermarkt aus.",
       "saveError": "Das Produkt konnte nicht gespeichert werden.",
       "deleted": "🗑️ Produkt gelöscht.",
       "addedToShopping": "„{{ name }}“ zu Einkaufsvorschlägen hinzugefügt.",
@@ -657,16 +435,10 @@
     "headline": "Entfalte das volle Potenzial deiner Vorratskammer",
     "subtitle": "Intelligente Automatisierung und priorisierte Funktionen.",
     "benefits": {
-      "title": "Alles, was PRO beinhaltet",
-      "subtitle": "Entwickelt für Haushalte mit viel Bewegung.",
       "agent": "KI-Menüplaner, der dir passende Menüs und Rezepte vorschlägt.",
-      "future": "Frühzeitiger Zugriff auf zukünftige PRO-Funktionen.",
-      "cloudSync": "Cloud-Synchronisierung und Backup.",
-      "history": "Vollständiger Änderungsverlauf deiner Produkte.",
-      "predictions": "Erweiterte Rezepte und intelligente Vorhersagen."
+      "future": "Frühzeitiger Zugriff auf zukünftige PRO-Funktionen."
     },
     "actions": {
-      "subscribe": "Zur PRO-Mitgliedschaft bei Google Play",
       "maybeLater": "Vielleicht später",
       "restore": "Kauf wiederherstellen",
       "startTrial": "Kostenlose Testphase starten",
@@ -675,12 +447,9 @@
     "note": "Abonnements werden über dein Google-Play-Konto verwaltet.",
     "alreadyPro": "PRO aktiv ✅",
     "errors": {
-      "purchaseFailed": "Derzeit sind keine Abonnements verfügbar. Bitte versuche es erneut oder überprüfe dein Play-Konto.",
-      "selectPlan": "Bitte wähle einen Plan aus, um fortzufahren."
+      "purchaseFailed": "Derzeit sind keine Abonnements verfügbar. Bitte versuche es erneut oder überprüfe dein Play-Konto."
     },
     "plans": {
-      "title": "Wähle deinen PRO-Plan",
-      "subtitle": "Wähle die Laufzeit, die am besten zu dir passt.",
       "monthly": "Monatlich",
       "annual": "Jährlich",
       "other": "Anderer Plan",
@@ -697,42 +466,10 @@
   "settings": {
     "title": "Einstellungen",
     "pro": {
-      "statusTitle": "PRO-Status",
-      "statusPro": "PRO-Nutzer",
-      "statusFree": "Kostenlose Version",
       "statusDescription": "Danke für deine Unterstützung. PRO ist auf diesem Gerät aktiv.",
       "upgradePrompt": "Werde PRO, um Premium-Funktionen freizuschalten.",
       "upgradeCta": "PRO werden",
-      "title": "PRO-Funktionen",
-      "subtitle": "Geschützte Aktionen nur für PRO-Nutzer.",
-      "badgePro": "PRO aktiv",
-      "badgeFree": "Kostenlos",
-      "cloudSync": {
-        "title": "Cloud-Synchronisierung",
-        "subtitle": "Halte deine Vorratskammer auf allen Geräten synchron.",
-        "action": "Synchronisieren",
-        "ready": "Die Synchronisierung ist für PRO-Konten reserviert. Demnächst verfügbar."
-      },
-      "history": {
-        "title": "Verlauf",
-        "subtitle": "Sieh dir das vollständige Änderungsprotokoll an.",
-        "action": "Verlauf öffnen",
-        "ready": "Der Verlauf ist nur für PRO-Nutzer verfügbar."
-      },
-      "recipes": {
-        "title": "Erweiterte Rezepte und Vorhersagen",
-        "subtitle": "Premium-Empfehlungen mit KI.",
-        "action": "Freischalten",
-        "ready": "Erweiterte Rezepte sind exklusiv für PRO."
-      }
-    },
-    "preferences": {
-      "title": "Einstellungen",
-      "subtitle": "Passe das Verhalten der App an.",
-      "language": {
-        "label": "Sprache",
-        "device": "Wird automatisch an die Gerätesprache angepasst."
-      }
+      "badgePro": "PRO aktiv"
     },
     "appearance": {
       "title": "Erscheinungsbild",
@@ -753,10 +490,6 @@
       "saveAction": "KI-Kontext speichern",
       "saveSuccess": "Kontext gespeichert.",
       "saveError": "Planer-Kontext konnte nicht gespeichert werden."
-    },
-    "languages": {
-      "es": "Spanisch",
-      "en": "Englisch"
     },
     "data": {
       "title": "Datenverwaltung",
@@ -780,7 +513,6 @@
       "unavailable": "Der Export ist in dieser Umgebung nicht verfügbar.",
       "readyToShare": "📤 Daten bereit zum Teilen.",
       "success": "📦 Daten exportiert.",
-      "saved": "📦 Daten auf dem Gerät gespeichert.",
       "error": "Die Daten konnten nicht exportiert werden.",
       "shareTitle": "Pantry Manager – Sicherung",
       "shareText": "Exportiere oder teile dein Backup."
