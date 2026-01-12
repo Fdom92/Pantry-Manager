@@ -17,6 +17,7 @@
     <app-empty-state-generic
       class="done-state"
       icon="checkmark-circle-outline"
+      iconColor="success"
       [title]="'upToDate.done.title' | translate"
       [subtitle]="'upToDate.done.subtitle' | translate">
     </app-empty-state-generic>
@@ -57,7 +58,7 @@
           </div>
 
           <div class="pending-card__actions">
-            @if (hasReason(entry, 'stale-update')) {
+            @if (hasReason(entry, 'stale-update') && !hasReason(entry, 'missing-info')) {
               <ion-button
                 size="small"
                 fill="solid"
@@ -68,9 +69,11 @@
                   <ion-spinner name="dots"></ion-spinner>
                 } @else {
                   {{ 'upToDate.actions.keep' | translate }}
-                  }
-                </ion-button>
+                }
+              </ion-button>
+            }
 
+            @if (hasReason(entry, 'stale-update')) {
               <ion-button
                 size="small"
                 fill="outline"
@@ -90,12 +93,104 @@
               fill="clear"
               color="secondary"
               [disabled]="isBusy(entry.id)"
-              (click)="edit(entry)">
-              {{ 'upToDate.actions.edit' | translate }}
+              (click)="skip(entry)">
+              {{ 'upToDate.actions.skip' | translate }}
             </ion-button>
+
+            @if (hasReason(entry, 'missing-info')) {
+              <ion-button
+                size="small"
+                fill="solid"
+                color="primary"
+                [disabled]="isBusy(entry.id)"
+                (click)="edit(entry)">
+                {{ 'upToDate.actions.edit' | translate }}
+              </ion-button>
+            }
           </div>
         </ion-card-content>
       </ion-card>
     }
   }
+
+  <ion-modal [isOpen]="isEditModalOpen()" (willDismiss)="closeEditModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ 'upToDate.edit.title' | translate }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button
+              fill="clear"
+              color="medium"
+              (click)="closeEditModal()"
+              [disabled]="isSavingEdit()"
+              [attr.aria-label]="'common.actions.close' | translate">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <ion-list lines="none">
+          @if (editNeedsCategory()) {
+            <ion-item>
+              <ion-label>{{ 'upToDate.fields.category' | translate }}</ion-label>
+              <ion-select
+                interface="popover"
+                [value]="editCategory()"
+                (ionChange)="onEditCategoryChange($event)">
+                @for (option of categoryOptions(); track option) {
+                  <ion-select-option [value]="option">{{ option }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+          }
+
+          @if (editNeedsLocation()) {
+            <ion-item>
+              <ion-label>{{ 'upToDate.fields.location' | translate }}</ion-label>
+              <ion-select
+                interface="popover"
+                [value]="editLocation()"
+                (ionChange)="onEditLocationChange($event)">
+                @for (option of locationOptions(); track option) {
+                  <ion-select-option [value]="option">{{ option }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+          }
+
+          @if (editNeedsExpiry()) {
+            <ion-item>
+              <ion-label>{{ 'upToDate.edit.expiryToggle' | translate }}</ion-label>
+              <ion-toggle
+                justify="end"
+                [checked]="editHasExpiry()"
+                (ionChange)="onEditHasExpiryToggle($event)">
+              </ion-toggle>
+            </ion-item>
+            @if (editHasExpiry()) {
+              <ion-item>
+                <ion-label>{{ 'upToDate.fields.expiry' | translate }}</ion-label>
+                <ion-input
+                  type="date"
+                  [value]="editExpiryDate()"
+                  (ionInput)="onEditExpiryChange($event)">
+                </ion-input>
+              </ion-item>
+            }
+          }
+        </ion-list>
+
+        <ion-button expand="block" color="primary" (click)="saveEditModal()" [disabled]="!canSaveEdit()">
+          @if (isSavingEdit()) {
+            <ion-spinner name="dots"></ion-spinner>
+          } @else {
+            {{ 'upToDate.edit.save' | translate }}
+          }
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { INSIGHTS_LIBRARY } from '@core/constants';
+import { INSIGHTS_LIBRARY, PENDING_REVIEW_STALE_WINDOW_DAYS } from '@core/constants';
 import {
   Insight,
   InsightContext,
@@ -19,7 +19,7 @@ export class InsightService {
   private readonly translate = inject(TranslateService);
   private readonly proService = inject(ProService);
   private readonly dismissedInsightIds = new Set<string>();
-  private readonly pendingReviewStaleWindowDays = 7;
+  private readonly pendingReviewStaleWindowDays = PENDING_REVIEW_STALE_WINDOW_DAYS;
 
   buildDashboardInsights(context: InsightContext): Insight[] {
     const isPro = this.proService.isPro();
@@ -40,7 +40,7 @@ export class InsightService {
     }
     const now = options?.now ?? new Date();
     const staleWindowDays = options?.staleWindowDays ?? this.pendingReviewStaleWindowDays;
-    return items
+    const products = items
       .map(item => {
         const reasons: InsightPendingReviewReason[] = [];
         if (this.hasStaleUpdate(item, now, staleWindowDays)) {
@@ -60,6 +60,18 @@ export class InsightService {
         } as InsightPendingReviewProduct;
       })
       .filter((product): product is InsightPendingReviewProduct => Boolean(product));
+
+    return products.sort((a, b) => {
+      const scoreDiff = this.getPendingReviewPriority(b) - this.getPendingReviewPriority(a);
+      if (scoreDiff !== 0) {
+        return scoreDiff;
+      }
+      const nameDiff = (a.name ?? '').localeCompare(b.name ?? '');
+      if (nameDiff !== 0) {
+        return nameDiff;
+      }
+      return (a.id ?? '').localeCompare(b.id ?? '');
+    });
   }
 
   getVisibleInsights(insights: Insight[]): Insight[] {
@@ -146,13 +158,18 @@ export class InsightService {
         const id = (location.locationId ?? '').trim().toLowerCase();
         return Boolean(id) && id !== 'unassigned';
       }) ?? false;
-    const hasBatchDetails =
+    const hasExpiryDate =
       item.locations?.some(location =>
-        (location.batches ?? []).some(batch => {
-          const quantity = Number(batch.quantity ?? 0);
-          return quantity > 0 || Boolean(batch.expirationDate);
-        })
+        (location.batches ?? []).some(batch => Boolean(batch.expirationDate))
       ) ?? false;
-    return !hasCategory || !hasDetailedLocation || !hasBatchDetails;
+    const hasNoExpiryMarker = item.noExpiry === true;
+    return !hasCategory || !hasDetailedLocation || !(hasExpiryDate || hasNoExpiryMarker);
+  }
+
+  private getPendingReviewPriority(product: InsightPendingReviewProduct): number {
+    const reasons = product?.reasons ?? [];
+    const hasMissing = reasons.includes('missing-info');
+    const hasStale = reasons.includes('stale-update');
+    return (hasMissing ? 2 : 0) + (hasStale ? 1 : 0);
   }
 }

@@ -1,0 +1,2 @@
+export const PENDING_REVIEW_STALE_WINDOW_DAYS = 7;
+

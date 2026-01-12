@@ -289,19 +289,28 @@
     "lastUpdated": "Dernière mise à jour : {{ date }}",
     "fields": {
       "category": "Catégorie",
+      "location": "Emplacement",
+      "expiry": "Date de péremption",
       "stock": "Stock"
+    },
+    "edit": {
+      "title": "Mettre à jour le produit",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "expiryToggle": "Ajouter une date de péremption"
     },
     "reasons": {
       "stale-update": "Pas mis à jour depuis un moment",
       "missing-info": "Informations manquantes"
     },
     "actions": {
-      "keep": "Garder",
+      "keep": "Garder ici",
       "delete": "Supprimer",
-      "edit": "Modifier"
+      "edit": "Modifier",
+      "skip": "Passer pour l'instant"
     },
     "done": {
-      "title": "Tout est en ordre",
+      "title": "Réserve à jour, bravo",
       "subtitle": "Retour au tableau de bord…"
     }
   },

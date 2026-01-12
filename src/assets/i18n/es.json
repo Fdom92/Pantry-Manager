@@ -289,19 +289,28 @@
     "lastUpdated": "Última actualización: {{ date }}",
     "fields": {
       "category": "Categoría",
+      "location": "Ubicación",
+      "expiry": "Caducidad",
       "stock": "Stock"
+    },
+    "edit": {
+      "title": "Actualizar producto",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "expiryToggle": "Añadir fecha de caducidad"
     },
     "reasons": {
       "stale-update": "Sin actualizar desde hace tiempo",
       "missing-info": "Falta información"
     },
     "actions": {
-      "keep": "Mantener",
+      "keep": "Sigue aquí",
       "delete": "Eliminar",
-      "edit": "Editar"
+      "edit": "Editar",
+      "skip": "Saltar por ahora"
     },
     "done": {
-      "title": "Todo en orden",
+      "title": "Despensa al día, buen trabajo",
       "subtitle": "Volviendo al dashboard…"
     }
   },

@@ -289,19 +289,28 @@
     "lastUpdated": "Última atualização: {{ date }}",
     "fields": {
       "category": "Categoria",
+      "location": "Localização",
+      "expiry": "Validade",
       "stock": "Stock"
+    },
+    "edit": {
+      "title": "Atualizar produto",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "expiryToggle": "Adicionar data de validade"
     },
     "reasons": {
       "stale-update": "Sem atualização há algum tempo",
       "missing-info": "Falta informação"
     },
     "actions": {
-      "keep": "Manter",
+      "keep": "Fica aqui",
       "delete": "Eliminar",
-      "edit": "Editar"
+      "edit": "Editar",
+      "skip": "Saltar por agora"
     },
     "done": {
-      "title": "Tudo em ordem",
+      "title": "Despensa em dia, bom trabalho",
       "subtitle": "A voltar ao dashboard…"
     }
   },

@@ -289,19 +289,28 @@
     "lastUpdated": "Last updated: {{ date }}",
     "fields": {
       "category": "Category",
+      "location": "Location",
+      "expiry": "Expiry date",
       "stock": "Stock"
+    },
+    "edit": {
+      "title": "Update product",
+      "save": "Save",
+      "cancel": "Cancel",
+      "expiryToggle": "Add expiry date"
     },
     "reasons": {
       "stale-update": "Not updated in a while",
       "missing-info": "Missing information"
     },
     "actions": {
-      "keep": "Keep",
+      "keep": "Keep it",
       "delete": "Delete",
-      "edit": "Edit"
+      "edit": "Edit",
+      "skip": "Skip for now"
     },
     "done": {
-      "title": "All set",
+      "title": "Pantry up to date, nice work",
       "subtitle": "Returning to your dashboard…"
     }
   },
