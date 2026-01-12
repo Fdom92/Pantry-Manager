@@ -10,8 +10,6 @@ export enum InsightId {
   WHAT_TO_COOK_FOR_DINNER = 'what_to_cook_for_dinner',
 }
 
-export type InsightSeverity = 'info' | 'warning' | 'danger';
-
 export type InsightAudience = 'all' | 'pro' | 'non-pro';
 
 export type InsightTranslationParamsBuilder = (context: InsightContext, helpers: InsightPredicateHelpers) => Record<string, unknown>;
@@ -54,7 +52,6 @@ export interface Insight {
   id: InsightId;
   title: string;
   description: string;
-  severity: InsightSeverity;
   ctas?: InsightCta[];
   priority: number;
   dismissLabel?: string;
@@ -64,12 +61,10 @@ export interface InsightDefinition {
   id: InsightId;
   titleKey: string;
   descriptionKey: string;
-  severity: InsightSeverity;
   ctas?: InsightCtaDefinition[];
   priority: number;
   audience: InsightAudience;
   dismissLabelKey?: string;
-  descriptionParams?: InsightTranslationParamsBuilder;
   predicate?: InsightPredicate;
 }
 

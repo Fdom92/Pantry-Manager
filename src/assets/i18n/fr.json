@@ -242,7 +242,7 @@
     "library": {
       "pendingProductUpdates": {
         "title": "Produits en attente de mise à jour",
-        "description": "Tu as {{ count }} produits à remettre à jour. Mettons ta réserve à jour en quelques minutes.",
+        "description": "Il y a quelques produits que tu pourrais mettre à jour. Ça te prendra moins d'une minute.",
         "cta": "Allons-y",
         "dismiss": "Pas maintenant"
       },

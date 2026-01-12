@@ -242,7 +242,7 @@
     "library": {
       "pendingProductUpdates": {
         "title": "Pantry updates pending",
-        "description": "You have {{ count }} products to refresh. Let's get your pantry up to date in just a few minutes.",
+        "description": "There are a few products you could refresh. It’ll take less than a minute.",
         "cta": "Let's do it",
         "dismiss": "Not now"
       },

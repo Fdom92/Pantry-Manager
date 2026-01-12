@@ -242,7 +242,7 @@
     "library": {
       "pendingProductUpdates": {
         "title": "Produkte zum Aktualisieren",
-        "description": "Du hast {{ count }} Produkte ohne Update. Bringen wir deine Vorratskammer in wenigen Minuten wieder auf Stand.",
+        "description": "Es gibt ein paar Produkte, die du aktualisieren könntest. Das dauert weniger als eine Minute.",
         "cta": "Los geht's",
         "dismiss": "Nicht jetzt"
       },

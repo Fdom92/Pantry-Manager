@@ -4,4 +4,3 @@ export * from './i18n.constants';
 export * from './ui.constants';
 export * from './synonyms.constants';
 export * from './insight-library.constants';
-export * from './insights.constants';

@@ -242,7 +242,7 @@
     "library": {
       "pendingProductUpdates": {
         "title": "Productos pendientes de revisar",
-        "description": "Tienes {{ count }} productos sin actualizar. Pongamos al día la despensa en unos minutos.",
+        "description": "Hay algunos productos que podrías poner al día. Te llevará menos de un minuto.",
         "cta": "Hacerlo",
         "dismiss": "No ahora"
       },

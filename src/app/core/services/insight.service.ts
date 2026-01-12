@@ -27,7 +27,7 @@ export class InsightService {
     return INSIGHTS_LIBRARY.filter(def => this.isAvailable(def, isPro))
       .filter(def => !def.predicate || def.predicate(context, helpers))
       .sort((a, b) => a.priority - b.priority)
-      .map(def => this.toInsight(def, context, helpers))
+      .map(def => this.toInsight(def))
       .slice(0, 2);
   }
 
@@ -96,12 +96,11 @@ export class InsightService {
     return true;
   }
 
-  private toInsight(definition: InsightDefinition, context: InsightContext, helpers: InsightPredicateHelpers): Insight {
+  private toInsight(definition: InsightDefinition): Insight {
     return {
       id: definition.id,
       title: this.translateKey(definition.titleKey),
-      description: this.translateKey(definition.descriptionKey, definition.descriptionParams?.(context, helpers)),
-      severity: definition.severity,
+      description: this.translateKey(definition.descriptionKey),
       priority: definition.priority,
       dismissLabel: definition.dismissLabelKey ? this.translateKey(definition.dismissLabelKey) : undefined,
       ctas: definition.ctas?.map(cta => this.toCta(cta)).filter((cta): cta is InsightCta => Boolean(cta)),

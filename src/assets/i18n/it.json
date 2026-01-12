@@ -242,7 +242,7 @@
     "library": {
       "pendingProductUpdates": {
         "title": "Prodotti da aggiornare",
-        "description": "Hai {{ count }} prodotti da aggiornare. Rimettiamo in ordine la dispensa in pochi minuti.",
+        "description": "Ci sono alcuni prodotti che potresti aggiornare. Ci vorrà meno di un minuto.",
         "cta": "Facciamolo",
         "dismiss": "Non ora"
       },

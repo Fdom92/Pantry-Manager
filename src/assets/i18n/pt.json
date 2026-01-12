@@ -242,7 +242,7 @@
     "library": {
       "pendingProductUpdates": {
         "title": "Produtos por atualizar",
-        "description": "Tens {{ count }} produtos sem atualizar. Vamos pôr a despensa em dia em poucos minutos.",
+        "description": "Há alguns produtos que podes pôr em dia. Leva menos de um minuto.",
         "cta": "Vamos lá",
         "dismiss": "Agora não"
       },
