@@ -55,6 +55,7 @@
       "apply": "Anwenden",
       "clear": "Leeren"
     },
+    "loading": "Lädt…",
     "dates": {
       "none": "Kein Datum"
     },
@@ -280,6 +281,28 @@
         "description": "Schalte den PRO-Planer frei und organisiere dein Menü ganz leicht.",
         "cta": "PRO werden"
       }
+    }
+  },
+  "upToDate": {
+    "title": "Aktualisieren",
+    "progress": "Ausstehende Produkte {{ pending }} von {{ total }}",
+    "lastUpdated": "Zuletzt aktualisiert: {{ date }}",
+    "fields": {
+      "category": "Kategorie",
+      "stock": "Bestand"
+    },
+    "reasons": {
+      "stale-update": "Lange nicht aktualisiert",
+      "missing-info": "Fehlende Informationen"
+    },
+    "actions": {
+      "keep": "Behalten",
+      "delete": "Löschen",
+      "edit": "Bearbeiten"
+    },
+    "done": {
+      "title": "Alles erledigt",
+      "subtitle": "Zurück zum Dashboard…"
     }
   },
   "agent": {

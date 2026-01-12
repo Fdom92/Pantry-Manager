@@ -55,6 +55,7 @@
       "apply": "Apply",
       "clear": "Clear"
     },
+    "loading": "Loading…",
     "dates": {
       "none": "No date"
     },
@@ -280,6 +281,28 @@
         "description": "Unlock the PRO planner and organize your menu easily.",
         "cta": "Go PRO"
       }
+    }
+  },
+  "upToDate": {
+    "title": "Get up to date",
+    "progress": "Products pending {{ pending }} of {{ total }}",
+    "lastUpdated": "Last updated: {{ date }}",
+    "fields": {
+      "category": "Category",
+      "stock": "Stock"
+    },
+    "reasons": {
+      "stale-update": "Not updated in a while",
+      "missing-info": "Missing information"
+    },
+    "actions": {
+      "keep": "Keep",
+      "delete": "Delete",
+      "edit": "Edit"
+    },
+    "done": {
+      "title": "All set",
+      "subtitle": "Returning to your dashboard…"
     }
   },
   "agent": {

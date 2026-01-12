@@ -1,0 +1,101 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'upToDate.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (!hasLoaded() && isLoading()) {
+    <div class="loading-state">
+      <ion-spinner name="dots"></ion-spinner>
+      <ion-text color="medium">{{ 'common.loading' | translate }}</ion-text>
+    </div>
+  } @else if (isDone()) {
+    <app-empty-state-generic
+      class="done-state"
+      icon="checkmark-circle-outline"
+      [title]="'upToDate.done.title' | translate"
+      [subtitle]="'upToDate.done.subtitle' | translate">
+    </app-empty-state-generic>
+  } @else {
+    <div class="up-to-date-header">
+      <p class="up-to-date-header__subtitle">
+        {{ 'upToDate.progress' | translate:{ pending: currentStep(), total: totalSteps() } }}
+      </p>
+    </div>
+
+    @let entry = currentEntry();
+    @let item = currentItem();
+    @if (entry) {
+      <ion-card class="pending-card">
+        <ion-card-header>
+          <ion-card-title class="pending-card__title">{{ entry.name }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="pending-card__meta">
+            @for (reason of entry.reasons; track reason) {
+              <ion-text color="medium">
+                {{ ('upToDate.reasons.' + reason) | translate }}
+              </ion-text>
+            }
+            @if (item) {
+              <ion-text color="medium">
+                {{ 'upToDate.fields.category' | translate }}: {{ formatCategory(item) }}
+              </ion-text>
+              <ion-text color="medium">
+                {{ 'upToDate.fields.stock' | translate }}: {{ formatQuantityLabel(item) }}
+              </ion-text>
+            }
+            <ion-text color="medium">
+              @if (item) {
+                {{ 'upToDate.lastUpdated' | translate:{ date: formatItemDate(item.updatedAt || item.createdAt) } }}
+              }
+            </ion-text>
+          </div>
+
+          <div class="pending-card__actions">
+            @if (hasReason(entry, 'stale-update')) {
+              <ion-button
+                size="small"
+                fill="solid"
+                color="primary"
+                [disabled]="isBusy(entry.id)"
+                (click)="keep(entry)">
+                @if (isBusy(entry.id)) {
+                  <ion-spinner name="dots"></ion-spinner>
+                } @else {
+                  {{ 'upToDate.actions.keep' | translate }}
+                  }
+                </ion-button>
+
+              <ion-button
+                size="small"
+                fill="outline"
+                color="danger"
+                [disabled]="isBusy(entry.id)"
+                (click)="remove(entry)">
+                @if (isBusy(entry.id)) {
+                  <ion-spinner name="dots"></ion-spinner>
+                } @else {
+                  {{ 'upToDate.actions.delete' | translate }}
+                }
+              </ion-button>
+            }
+
+            <ion-button
+              size="small"
+              fill="clear"
+              color="secondary"
+              [disabled]="isBusy(entry.id)"
+              (click)="edit(entry)">
+              {{ 'upToDate.actions.edit' | translate }}
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    }
+  }
+</ion-content>

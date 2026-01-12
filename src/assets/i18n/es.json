@@ -55,6 +55,7 @@
       "apply": "Aplicar",
       "clear": "Limpiar"
     },
+    "loading": "Cargando…",
     "dates": {
       "none": "Sin fecha"
     },
@@ -280,6 +281,28 @@
         "description": "Desbloquea el planificador PRO y organiza tu menú fácilmente.",
         "cta": "Hazte PRO"
       }
+    }
+  },
+  "upToDate": {
+    "title": "Poner al día",
+    "progress": "Productos pendientes {{ pending }} de {{ total }}",
+    "lastUpdated": "Última actualización: {{ date }}",
+    "fields": {
+      "category": "Categoría",
+      "stock": "Stock"
+    },
+    "reasons": {
+      "stale-update": "Sin actualizar desde hace tiempo",
+      "missing-info": "Falta información"
+    },
+    "actions": {
+      "keep": "Mantener",
+      "delete": "Eliminar",
+      "edit": "Editar"
+    },
+    "done": {
+      "title": "Todo en orden",
+      "subtitle": "Volviendo al dashboard…"
     }
   },
   "agent": {

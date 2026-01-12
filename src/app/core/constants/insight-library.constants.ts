@@ -19,7 +19,7 @@ export const INSIGHTS_LIBRARY: InsightDefinition[] = [
         id: 'review-pantry-items',
         labelKey: 'insights.library.pendingProductUpdates.cta',
         type: 'navigate',
-        route: '/pantry',
+        route: '/up-to-date',
       },
     ],
   },
