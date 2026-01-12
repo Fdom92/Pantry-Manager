@@ -55,3 +55,17 @@ ion-title, ion-back-button {
 .pending-card__actions ion-button {
   --border-radius: 999px;
 }
+
+.inline-edit {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--ion-color-medium) 18%, transparent);
+}
+
+.inline-edit__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}

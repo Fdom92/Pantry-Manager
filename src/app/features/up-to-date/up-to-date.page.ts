@@ -19,7 +19,6 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonModal,
   IonSelect,
   IonSelectOption,
   IonSpinner,
@@ -63,7 +62,6 @@ type QuickEditPatch = {
     IonCardContent,
     IonButton,
     IonIcon,
-    IonModal,
     IonList,
     IonItem,
     IonLabel,
@@ -148,6 +146,14 @@ export class UpToDatePage {
     return entries[0] ?? null;
   });
   readonly currentItem = computed(() => this.getPantryItem(this.currentEntry()?.id ?? null));
+  readonly isEditingCurrent = computed(() => {
+    if (!this.isEditModalOpen()) {
+      return false;
+    }
+    const currentId = this.normalizeId(this.currentEntry()?.id);
+    const editId = this.normalizeId(this.editTargetId());
+    return Boolean(currentId) && currentId === editId;
+  });
   readonly editTargetEntry = computed(() => {
     const targetId = this.normalizeId(this.editTargetId());
     if (!targetId) {
@@ -475,6 +481,7 @@ export class UpToDatePage {
   private completeAndAdvance(currentId: string | null, snapshot: InsightPendingReviewProduct[]): void {
     const key = this.normalizeId(currentId);
     const nextId = this.getNextPendingId(key, snapshot);
+    this.closeEditModalInternal(true);
     if (key) {
       this.processedIds.update(current => {
         const next = new Set(current);
