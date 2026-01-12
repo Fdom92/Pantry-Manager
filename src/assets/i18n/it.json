@@ -55,6 +55,7 @@
       "apply": "Applica",
       "clear": "Pulisci"
     },
+    "loading": "Caricamento…",
     "dates": {
       "none": "Nessuna data"
     },
@@ -239,6 +240,12 @@
     },
     "ctaDefault": "Capito",
     "library": {
+      "pendingProductUpdates": {
+        "title": "Prodotti da aggiornare",
+        "description": "Ci sono alcuni prodotti che potresti aggiornare. Ci vorrà meno di un minuto.",
+        "cta": "Facciamolo",
+        "dismiss": "Non ora"
+      },
       "weeklyMealPlanning": {
         "title": "Pianifica i pasti della settimana",
         "description": "Organizza i pasti di questa settimana con ciò che hai già.",
@@ -274,6 +281,37 @@
         "description": "Sblocca il pianificatore PRO e organizza il tuo menù facilmente.",
         "cta": "Diventa PRO"
       }
+    }
+  },
+  "upToDate": {
+    "title": "Aggiorna",
+    "progress": "Prodotti in attesa {{ pending }} di {{ total }}",
+    "lastUpdated": "Ultimo aggiornamento: {{ date }}",
+    "fields": {
+      "category": "Categoria",
+      "location": "Posizione",
+      "expiry": "Scadenza",
+      "stock": "Stock"
+    },
+    "edit": {
+      "title": "Aggiorna prodotto",
+      "save": "Salva",
+      "cancel": "Annulla",
+      "expiryToggle": "Aggiungi data di scadenza"
+    },
+    "reasons": {
+      "stale-update": "Non aggiornato da un po'",
+      "missing-info": "Informazioni mancanti"
+    },
+    "actions": {
+      "keep": "Tieni qui",
+      "delete": "Elimina",
+      "edit": "Modifica",
+      "skip": "Salta per ora"
+    },
+    "done": {
+      "title": "Dispensa aggiornata, ottimo lavoro",
+      "subtitle": "Ritorno alla dashboard…"
     }
   },
   "agent": {

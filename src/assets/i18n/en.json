@@ -55,6 +55,7 @@
       "apply": "Apply",
       "clear": "Clear"
     },
+    "loading": "Loading…",
     "dates": {
       "none": "No date"
     },
@@ -239,6 +240,12 @@
     },
     "ctaDefault": "Got it",
     "library": {
+      "pendingProductUpdates": {
+        "title": "Pantry updates pending",
+        "description": "There are a few products you could refresh. It’ll take less than a minute.",
+        "cta": "Let's do it",
+        "dismiss": "Not now"
+      },
       "weeklyMealPlanning": {
         "title": "Plan your meals for the week",
         "description": "Plan this week's meals with what you already have.",
@@ -274,6 +281,37 @@
         "description": "Unlock the PRO planner and organize your menu easily.",
         "cta": "Go PRO"
       }
+    }
+  },
+  "upToDate": {
+    "title": "Get up to date",
+    "progress": "Products pending {{ pending }} of {{ total }}",
+    "lastUpdated": "Last updated: {{ date }}",
+    "fields": {
+      "category": "Category",
+      "location": "Location",
+      "expiry": "Expiry date",
+      "stock": "Stock"
+    },
+    "edit": {
+      "title": "Update product",
+      "save": "Save",
+      "cancel": "Cancel",
+      "expiryToggle": "Add expiry date"
+    },
+    "reasons": {
+      "stale-update": "Not updated in a while",
+      "missing-info": "Missing information"
+    },
+    "actions": {
+      "keep": "Keep it",
+      "delete": "Delete",
+      "edit": "Edit",
+      "skip": "Skip for now"
+    },
+    "done": {
+      "title": "Pantry up to date, nice work",
+      "subtitle": "Returning to your dashboard…"
     }
   },
   "agent": {

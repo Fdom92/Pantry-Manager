@@ -55,6 +55,7 @@
       "apply": "Aplicar",
       "clear": "Limpar"
     },
+    "loading": "A carregar…",
     "dates": {
       "none": "Sem data"
     },
@@ -239,6 +240,12 @@
     },
     "ctaDefault": "Entendi",
     "library": {
+      "pendingProductUpdates": {
+        "title": "Produtos por atualizar",
+        "description": "Há alguns produtos que podes pôr em dia. Leva menos de um minuto.",
+        "cta": "Vamos lá",
+        "dismiss": "Agora não"
+      },
       "weeklyMealPlanning": {
         "title": "Planeje as refeições da semana",
         "description": "Planeje as refeições desta semana com o que você já tem.",
@@ -274,6 +281,37 @@
         "description": "Desbloqueie o planejador PRO e organize seu menu com facilidade.",
         "cta": "Torne-se PRO"
       }
+    }
+  },
+  "upToDate": {
+    "title": "Pôr em dia",
+    "progress": "Produtos pendentes {{ pending }} de {{ total }}",
+    "lastUpdated": "Última atualização: {{ date }}",
+    "fields": {
+      "category": "Categoria",
+      "location": "Localização",
+      "expiry": "Validade",
+      "stock": "Stock"
+    },
+    "edit": {
+      "title": "Atualizar produto",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "expiryToggle": "Adicionar data de validade"
+    },
+    "reasons": {
+      "stale-update": "Sem atualização há algum tempo",
+      "missing-info": "Falta informação"
+    },
+    "actions": {
+      "keep": "Fica aqui",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "skip": "Saltar por agora"
+    },
+    "done": {
+      "title": "Despensa em dia, bom trabalho",
+      "subtitle": "A voltar ao dashboard…"
     }
   },
   "agent": {

@@ -55,6 +55,7 @@
       "apply": "Appliquer",
       "clear": "Effacer"
     },
+    "loading": "Chargement…",
     "dates": {
       "none": "Sans date"
     },
@@ -239,6 +240,12 @@
     },
     "ctaDefault": "Compris",
     "library": {
+      "pendingProductUpdates": {
+        "title": "Produits en attente de mise à jour",
+        "description": "Il y a quelques produits que tu pourrais mettre à jour. Ça te prendra moins d'une minute.",
+        "cta": "Allons-y",
+        "dismiss": "Pas maintenant"
+      },
       "weeklyMealPlanning": {
         "title": "Planifiez les repas de la semaine",
         "description": "Planifiez les repas de cette semaine avec ce que vous avez déjà.",
@@ -274,6 +281,37 @@
         "description": "Débloquez le planificateur PRO et organisez facilement votre menu.",
         "cta": "Devenir PRO"
       }
+    }
+  },
+  "upToDate": {
+    "title": "Mettre à jour",
+    "progress": "Produits en attente {{ pending }} sur {{ total }}",
+    "lastUpdated": "Dernière mise à jour : {{ date }}",
+    "fields": {
+      "category": "Catégorie",
+      "location": "Emplacement",
+      "expiry": "Date de péremption",
+      "stock": "Stock"
+    },
+    "edit": {
+      "title": "Mettre à jour le produit",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "expiryToggle": "Ajouter une date de péremption"
+    },
+    "reasons": {
+      "stale-update": "Pas mis à jour depuis un moment",
+      "missing-info": "Informations manquantes"
+    },
+    "actions": {
+      "keep": "Garder ici",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "skip": "Passer pour l'instant"
+    },
+    "done": {
+      "title": "Réserve à jour, bravo",
+      "subtitle": "Retour au tableau de bord…"
     }
   },
   "agent": {
