@@ -118,36 +118,6 @@ ion-title, ion-buttons > ion-button {
   border-radius: 12px;
 }
 
-.summary-actions {
-  display: none;
-}
-
-@media (max-width: 600px) {
-  .summary-actions {
-    flex: 0 0 auto;
-  }
-}
-
-.filter-modal ion-searchbar {
-  margin-bottom: 16px;
-  --border-radius: 12px;
-}
-
-.filter-modal ion-item {
-  --inner-padding-end: 0;
-}
-
-.filter-modal ion-list-header {
-  padding-inline-start: 0;
-  margin-bottom: 4px;
-}
-
-.filter-status {
-  margin-top: 20px;
-  display: grid;
-  gap: 12px;
-}
-
 .filter-actions {
   display: flex;
   justify-content: space-between;
@@ -201,11 +171,6 @@ ion-title, ion-buttons > ion-button {
 .add-fab {
   bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
   right: 16px;
-}
-
-.list-empty-state .empty-state--compact {
-  margin: 0;
-  box-shadow: none;
 }
 
 .skeleton-list {
@@ -360,13 +325,6 @@ section.group-details {
   font-size: 0.9rem;
 }
 
-.item-grid {
-  display: grid;
-  gap: 6px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  overflow: hidden;
-}
-
 .batches-modal-content {
   padding: 0 0 24px;
 }
@@ -382,10 +340,6 @@ section.group-details {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-}
-
-.modal-actions {
-  padding: 16px 20px 24px;
 }
 
 .modal-spinner {
@@ -521,55 +475,6 @@ section.group-details {
   justify-content: space-between;
 }
 
-.detail-actions {
-  margin-top: 12px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.item-low {
-  background: color-mix(in srgb, var(--ion-color-warning) 20%, transparent);
-}
-
-.item-near-expiry {
-  background: color-mix(in srgb, var(--ion-color-warning) 12%, transparent);
-}
-
-.item-expired {
-  background: color-mix(in srgb, var(--ion-color-danger) 14%, transparent);
-}
-
-.item-empty {
-  background: var(--ion-color-danger-tint);
-}
-
-.item-low .item-card-accent {
-  background: var(--ion-color-warning);
-}
-
-.item-near-expiry .item-card-accent {
-  background: var(--ion-color-warning);
-}
-
-.item-expired .item-card-accent {
-  background: var(--ion-color-danger);
-}
-
-.item-empty .item-card-accent {
-  background: var(--ion-color-danger);
-}
-
-.detail-value.expired {
-  color: var(--ion-color-danger);
-}
-
-.detail-value.warning {
-  color: var(--ion-color-warning);
-}
-
-.detail-value.ok {
-  color: var(--ion-color-primary);
-}
 
 
 ion-modal ion-list {
@@ -630,12 +535,6 @@ ion-card-header {
 
 .modal-footer ion-button {
   width: 100%;
-}
-
-.modal-title-label {
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
 }
 
 .modal-title-value {

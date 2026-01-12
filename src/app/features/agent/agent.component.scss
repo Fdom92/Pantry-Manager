@@ -37,38 +37,6 @@ ion-title, ion-buttons > ion-button {
   padding: 4px 0 16px;
 }
 
-.chat--preview {
-  background: linear-gradient(
-    160deg,
-    color-mix(in srgb, var(--ion-card-background) 85%, var(--ion-color-primary) 15%),
-    color-mix(in srgb, var(--ion-card-background) 95%, var(--ion-color-primary) 5%)
-  );
-  border: 1px dashed color-mix(in srgb, var(--ion-color-primary) 25%, transparent);
-  padding: 16px;
-  border-radius: 16px;
-  color: var(--ion-text-color);
-}
-
-.chat--preview .message__bubble {
-  background: color-mix(in srgb, var(--ion-card-background) 90%, transparent);
-  color: inherit;
-  border: 1px solid color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
-}
-
-.chat--preview .message.from-user .message__bubble {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--ion-color-primary-shade) 60%, var(--ion-color-primary) 40%),
-    var(--ion-color-primary)
-  );
-}
-
-.chat--preview .message.is-error .message__bubble {
-  border: 1px solid color-mix(in srgb, var(--ion-color-danger) 40%, transparent);
-  background: color-mix(in srgb, var(--ion-card-background) 80%, var(--ion-color-danger) 20%);
-  color: var(--ion-text-color);
-}
-
 .message {
   display: flex;
   width: 100%;
@@ -101,11 +69,6 @@ ion-title, ion-buttons > ion-button {
     background: linear-gradient(135deg, var(--user-bg-start), var(--user-bg-end));
     color: var(--ion-color-success-contrast, #0f160e);
     border: none;
-  }
-
-  &.is-tool .message__bubble {
-    border: 1px solid color-mix(in srgb, var(--ion-color-tertiary) 30%, transparent);
-    background: color-mix(in srgb, var(--ion-color-tertiary) 12%, var(--ion-card-background));
   }
 
   &.is-error .message__bubble {
@@ -190,23 +153,6 @@ ion-title, ion-buttons > ion-button {
   }
 }
 
-.composer--locked {
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--ion-text-color) 4%, transparent),
-    color-mix(in srgb, var(--ion-text-color) 6%, transparent)
-  );
-  border-top: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
-
-  .composer__input {
-    opacity: 0.7;
-  }
-
-  .composer__actions {
-    justify-content: stretch;
-  }
-}
-
 .composer--preview-cta {
   align-items: stretch;
   text-align: center;
@@ -269,19 +215,6 @@ ion-title, ion-buttons > ion-button {
   place-items: center;
   color: var(--ion-color-primary);
   font-size: 22px;
-}
-
-.preview-card__cta {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: center;
-
-  .small {
-    margin: 0;
-    color: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
-    font-size: 13px;
-  }
 }
 
 .planning-preview {
