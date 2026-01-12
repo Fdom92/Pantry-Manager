@@ -3,14 +3,6 @@ import { BaseDoc } from "../shared";
 export type AppThemePreference = 'light' | 'dark' | 'system';
 export type DefaultUnitPreference = 'kg' | 'g' | 'l' | 'unit';
 
-export interface UserSettings {
-  username: string;
-  householdName: string;
-  favoriteSupermarket?: string;
-}
-
-export interface UserSettingsDoc extends BaseDoc, UserSettings {}
-
 export interface AppPreferences {
   theme: AppThemePreference;
   defaultUnit: DefaultUnitPreference;
