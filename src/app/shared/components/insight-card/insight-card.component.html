@@ -1,4 +1,4 @@
-<ion-card [class]="'insight-card insight-card--' + insight.severity">
+<ion-card class="insight-card">
   <ion-card-header>
     <ion-card-title>{{ insight.title }}</ion-card-title>
   </ion-card-header>
@@ -22,7 +22,7 @@
           fill="clear"
           color="secondary"
           (click)="emitDismiss()">
-          {{ ('insights.ctaDefault' | translate) }}
+          {{ insight.dismissLabel ?? ('insights.ctaDefault' | translate) }}
         </ion-button>
       </div>
     } @else {
@@ -31,7 +31,7 @@
         fill="clear"
         color="secondary"
         (click)="emitDismiss()">
-        {{ ('insights.ctaDefault' | translate) }}
+        {{ insight.dismissLabel ?? ('insights.ctaDefault' | translate) }}
       </ion-button>
     }
   </ion-card-content>

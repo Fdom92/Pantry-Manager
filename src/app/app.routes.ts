@@ -54,5 +54,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('@features/upgrade/upgrade.page').then(m => m.UpgradePage),
   },
+  {
+    path: 'up-to-date',
+    loadComponent: () =>
+      import('@features/up-to-date/up-to-date.page').then(m => m.UpToDatePage),
+  },
   { path: '**', redirectTo: 'dashboard' },
 ];

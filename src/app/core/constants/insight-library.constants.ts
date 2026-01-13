@@ -1,12 +1,38 @@
 import { AgentEntryContext } from '@core/models/agent';
 import { InsightDefinition, InsightId } from '@core/models/insights';
 
+export const PENDING_REVIEW_STALE_WINDOW_DAYS = 7;
+
 export const INSIGHTS_LIBRARY: InsightDefinition[] = [
+  {
+    id: InsightId.PENDING_PRODUCT_UPDATES,
+    titleKey: 'insights.library.pendingProductUpdates.title',
+    descriptionKey: 'insights.library.pendingProductUpdates.description',
+    priority: 0,
+    audience: 'all',
+    predicate: context => {
+      const missingOnlyCount = context.pendingReviewProducts.filter(
+        product => product.reasons.includes('missing-info') && !product.reasons.includes('stale-update')
+      ).length;
+      const staleAndMissingCount = context.pendingReviewProducts.filter(
+        product => product.reasons.includes('missing-info') && product.reasons.includes('stale-update')
+      ).length;
+      return missingOnlyCount >= 2 || staleAndMissingCount >= 3;
+    },
+    dismissLabelKey: 'insights.library.pendingProductUpdates.dismiss',
+    ctas: [
+      {
+        id: 'review-pantry-items',
+        labelKey: 'insights.library.pendingProductUpdates.cta',
+        type: 'navigate',
+        route: '/up-to-date',
+      },
+    ],
+  },
   {
     id: InsightId.WEEKLY_MEAL_PLANNING,
     titleKey: 'insights.library.weeklyMealPlanning.title',
     descriptionKey: 'insights.library.weeklyMealPlanning.description',
-    severity: 'info',
     priority: 1,
     audience: 'pro',
     predicate: (_ctx, helpers) => isSundayAfternoon(helpers.now),
@@ -24,7 +50,6 @@ export const INSIGHTS_LIBRARY: InsightDefinition[] = [
     id: InsightId.COOK_BEFORE_EXPIRY,
     titleKey: 'insights.library.cookBeforeExpiry.title',
     descriptionKey: 'insights.library.cookBeforeExpiry.description',
-    severity: 'warning',
     priority: 2,
     audience: 'pro',
     predicate: context => context.expiringSoonItems.some(item => (item.quantity ?? 0) > 0),
@@ -42,7 +67,6 @@ export const INSIGHTS_LIBRARY: InsightDefinition[] = [
     id: InsightId.WHAT_TO_COOK_FOR_LUNCH,
     titleKey: 'insights.library.lunchIdeas.title',
     descriptionKey: 'insights.library.lunchIdeas.description',
-    severity: 'info',
     priority: 3,
     audience: 'pro',
     predicate: (_ctx, helpers) => isWithinHours(helpers.now, 11, 15),
@@ -60,7 +84,6 @@ export const INSIGHTS_LIBRARY: InsightDefinition[] = [
     id: InsightId.WHAT_TO_COOK_FOR_DINNER,
     titleKey: 'insights.library.dinnerIdeas.title',
     descriptionKey: 'insights.library.dinnerIdeas.description',
-    severity: 'info',
     priority: 4,
     audience: 'pro',
     predicate: (_ctx, helpers) => isWithinHours(helpers.now, 18, 22),
@@ -78,7 +101,6 @@ export const INSIGHTS_LIBRARY: InsightDefinition[] = [
     id: InsightId.WHAT_TO_COOK_NOW,
     titleKey: 'insights.library.whatToCookNow.title',
     descriptionKey: 'insights.library.whatToCookNow.description',
-    severity: 'info',
     priority: 5,
     audience: 'pro',
     ctas: [
@@ -95,7 +117,6 @@ export const INSIGHTS_LIBRARY: InsightDefinition[] = [
     id: InsightId.PLAN_AND_SAVE_TIME,
     titleKey: 'insights.library.planAndSaveTime.title',
     descriptionKey: 'insights.library.planAndSaveTime.description',
-    severity: 'info',
     priority: 6,
     audience: 'non-pro',
     ctas: [

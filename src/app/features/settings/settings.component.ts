@@ -112,7 +112,8 @@ export class SettingsComponent {
     if (!fileInput || this.isImportingData()) {
       return;
     }
-    this.tryNativeAutoImport(fileInput);
+    fileInput.value = '';
+    fileInput.click();
   }
 
   async exportDataBackup(): Promise<void> {
@@ -126,27 +127,23 @@ export class SettingsComponent {
       const docs = (await this.storage.all()).filter(doc => !doc._id.startsWith('_design/'));
       const json = JSON.stringify(docs, null, 2);
       const filename = this.buildExportFileName();
+      const blob = new Blob([json], { type: 'application/json' });
+      const file = new File([blob], filename, { type: 'application/json' });
 
-      const nativeResult = await this.tryNativeExport(json, filename);
-      if (!nativeResult?.success) {
-        const blob = new Blob([json], { type: 'application/json' });
-        const file = new File([blob], filename, { type: 'application/json' });
-        const shared = await this.tryShareFile(file);
-        if (!shared) {
-          this.triggerDownload(blob, filename);
-        }
-        await this.presentToast(
-          shared
-            ? this.translate.instant('settings.export.readyToShare')
-            : this.translate.instant('settings.export.success'),
-          'success'
-        );
-      } else {
-        const message = nativeResult.shared
-          ? this.translate.instant('settings.export.readyToShare')
-          : this.translate.instant('settings.export.saved', { path: nativeResult.path ?? '' });
-        await this.presentToast(message, 'success');
+      const sharedViaWeb = await this.tryShareFile(file);
+      if (sharedViaWeb) {
+        await this.presentToast(this.translate.instant('settings.export.readyToShare'), 'success');
+        return;
       }
+
+      const sharedViaNative = await this.shareNativeExport(json, filename);
+      if (sharedViaNative) {
+        await this.presentToast(this.translate.instant('settings.export.readyToShare'), 'success');
+        return;
+      }
+
+      this.triggerDownload(blob, filename);
+      await this.presentToast(this.translate.instant('settings.export.success'), 'success');
     } catch (err) {
       console.error('[SettingsComponent] onExportData error', err);
       await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
@@ -333,112 +330,44 @@ export class SettingsComponent {
     await toast.present();
   }
 
-  private async tryNativeAutoImport(fileInput: HTMLInputElement): Promise<void> {
+  private async shareNativeExport(json: string, filename: string): Promise<boolean> {
     if (!Capacitor.isNativePlatform()) {
-      fileInput.value = '';
-      fileInput.click();
-      return;
-    }
-
-    try {
-      const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
-      const folder = 'PantryManager';
-      const listing = await Filesystem.readdir({ path: folder, directory: Directory.Documents });
-      const candidates = listing.files?.filter(file => file.name?.toLowerCase().endsWith('.json')) ?? [];
-      if (!candidates.length) {
-        fileInput.value = '';
-        fileInput.click();
-        return;
-      }
-
-      const filesWithStats = await Promise.all(
-        candidates.map(async file => {
-          try {
-            const path = `${folder}/${file.name}`;
-            const stat = await Filesystem.stat({ path, directory: Directory.Documents });
-            return { path, mtime: stat.mtime ?? 0 };
-          } catch {
-            return null;
-          }
-        })
-      );
-      const usable = filesWithStats.filter((f): f is { path: string; mtime: number } => !!f);
-      if (!usable.length) {
-        fileInput.value = '';
-        fileInput.click();
-        return;
-      }
-
-      const latest = usable.sort((a, b) => (b.mtime || 0) - (a.mtime || 0))[0];
-      const confirmed = await this.confirmImport();
-      if (!confirmed) {
-        return;
-      }
-
-      this.isImportingData.set(true);
-      try {
-        const file = await Filesystem.readFile({
-          path: latest.path,
-          directory: Directory.Documents,
-          encoding: Encoding.UTF8,
-        });
-        const payload =
-          typeof file.data === 'string'
-            ? file.data
-            : file.data instanceof Blob
-              ? await file.data.text()
-              : '';
-        const docs = this.parseBackup(payload ?? '');
-        await this.applyImport(docs);
-      } catch (err) {
-        console.error('[SettingsComponent] tryNativeAutoImport error', err);
-        await this.presentToast(this.translate.instant('settings.import.error'), 'danger');
-      } finally {
-        this.isImportingData.set(false);
-      }
-    } catch (err) {
-      console.warn('[SettingsComponent] Native auto-import unavailable, falling back to picker', err);
-      fileInput.value = '';
-      fileInput.click();
-    }
-  }
-
-  private async tryNativeExport(
-    json: string,
-    filename: string
-  ): Promise<{ success: true; shared: boolean; path?: string } | null> {
-    if (!Capacitor.isNativePlatform()) {
-      return null;
+      return false;
     }
     try {
       const [{ Filesystem, Directory, Encoding }, { Share }] = await Promise.all([
         import('@capacitor/filesystem'),
         import('@capacitor/share'),
       ]);
-      const path = `PantryManager/${filename}`;
+      const path = `PantryManagerExport/${filename}`;
       await Filesystem.writeFile({
         path,
         data: json,
-        directory: Directory.Documents,
+        directory: Directory.Cache,
         encoding: Encoding.UTF8,
         recursive: true,
       });
-      const uri = await Filesystem.getUri({ path, directory: Directory.Documents });
-      let shared = false;
       try {
+        const uri = await Filesystem.getUri({ path, directory: Directory.Cache });
         await Share.share({
           title: this.translate.instant('settings.export.shareTitle'),
           text: this.translate.instant('settings.export.shareText'),
           url: uri.uri,
         });
-        shared = true;
+        return true;
       } catch (shareErr) {
-        console.warn('[SettingsComponent] Native share failed, keeping file on device', shareErr);
+        console.warn('[SettingsComponent] Native share failed', shareErr);
+        return false;
+      } finally {
+        try {
+          await Filesystem.deleteFile({ path, directory: Directory.Cache });
+        } catch (deleteErr) {
+          console.warn('[SettingsComponent] Failed to delete temp export file', deleteErr);
+        }
       }
-      return { success: true, shared, path: uri.uri };
     } catch (err) {
       console.warn('[SettingsComponent] Native export unavailable', err);
-      return null;
+      return false;
     }
   }
 

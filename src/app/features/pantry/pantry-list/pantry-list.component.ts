@@ -52,6 +52,7 @@ import {
   IonContent,
   IonFab,
   IonFabButton,
+  IonFabList,
   IonFooter,
   IonHeader,
   IonIcon,
@@ -66,6 +67,7 @@ import {
   IonSelectOption,
   IonSkeletonText,
   IonSpinner,
+  IonTextarea,
   IonText,
   IonTitle,
   IonToggle,
@@ -103,8 +105,10 @@ import { PantryStoreService } from '@core/services';
     IonInput,
     IonModal,
     IonNote,
+    IonTextarea,
     IonFab,
     IonFabButton,
+    IonFabList,
     IonSpinner,
     IonChip,
     IonSkeletonText,
@@ -134,8 +138,10 @@ export class PantryListComponent implements OnDestroy {
   moveSubmitting = false;
   moveError: string | null = null;
   showCreateModal = false;
+  fastAddModalOpen = false;
   editingItem: PantryItem | null = null;
   isSaving = false;
+  isFastAdding = false;
   private realtimeSubscribed = false;
   readonly loading = this.pantryService.loading;
   readonly nearExpiryDays = 7;
@@ -162,7 +168,6 @@ export class PantryListComponent implements OnDestroy {
   readonly moveItemTarget = signal<PantryItem | null>(null);
   readonly summarySnapshot = signal<PantrySummaryMeta>(this.createEmptySummary());
   readonly hasCompletedInitialLoad = signal(false);
-  readonly showAdvancedFilters = signal(false);
   readonly collapsedGroups = signal<Set<string>>(new Set());
   readonly deletingItems = signal<Set<string>>(new Set());
   // Computed Signals
@@ -179,8 +184,6 @@ export class PantryListComponent implements OnDestroy {
   // Forms
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
-    quickQuantity: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
-    quickExpiry: this.fb.control<string | null>(null),
     categoryId: this.fb.control<string | null>(null),
     supermarket: this.fb.control('', {
       validators: [Validators.maxLength(80)],
@@ -196,6 +199,9 @@ export class PantryListComponent implements OnDestroy {
         batches: [],
       })
     ])
+  });
+  readonly fastAddForm = this.fb.group({
+    entries: this.fb.control('', { nonNullable: true }),
   });
   readonly moveForm = this.fb.group({
     fromLocation: this.fb.control('', {
@@ -310,13 +316,10 @@ export class PantryListComponent implements OnDestroy {
   }
 
   /** Open the creation modal with blank defaults and a single location row. */
-  openNewItemModal(): void {
+  openAdvancedAddModal(): void {
     this.editingItem = null;
-    this.showAdvancedFilters.set(false);
     this.form.reset({
       name: '',
-      quickQuantity: null,
-      quickExpiry: null,
       categoryId: null,
       supermarket: '',
       isBasic: false,
@@ -333,14 +336,27 @@ export class PantryListComponent implements OnDestroy {
     this.showCreateModal = true;
   }
 
+  openFastAddModal(): void {
+    this.fastAddForm.reset({ entries: '' });
+    this.fastAddModalOpen = true;
+  }
+
+  closeFastAddModal(): void {
+    this.fastAddModalOpen = false;
+    this.isFastAdding = false;
+    this.fastAddForm.reset({ entries: '' });
+  }
+
+  hasFastAddEntries(): boolean {
+    const value = this.fastAddForm.get('entries')?.value ?? '';
+    return value.trim().length > 0;
+  }
+
   openEditItemModal(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     this.editingItem = item;
-    this.showAdvancedFilters.set(true);
     this.form.reset({
       name: item.name ?? '',
-      quickQuantity: null,
-      quickExpiry: null,
       categoryId: item.categoryId ?? null,
       supermarket: item.supermarket ?? '',
       isBasic: Boolean(item.isBasic),
@@ -370,22 +386,6 @@ export class PantryListComponent implements OnDestroy {
       return;
     }
     this.locationsArray.removeAt(index);
-  }
-
-  toggleAdvanced(): void {
-    if (this.editingItem) {
-      return;
-    }
-    this.showAdvancedFilters.update(value => {
-      const next = !value;
-      if (next) {
-        this.form.patchValue({
-          quickQuantity: null,
-          quickExpiry: null,
-        });
-      }
-      return next;
-    });
   }
 
   /** Replace the current form array with normalized groups based on the provided data. */
@@ -447,25 +447,14 @@ export class PantryListComponent implements OnDestroy {
    * Handles both creation and update flows through the store.
    */
   async submitItem(): Promise<void> {
-    const advancedMode = this.showAdvancedFilters();
-    if (advancedMode) {
-      if (this.form.invalid) {
-        this.form.markAllAsTouched();
-        return;
-      }
-    } else {
-      this.form.get('name')?.markAsTouched();
-      this.form.get('quickQuantity')?.markAsTouched();
-      if (this.quickFormInvalid()) {
-        return;
-      }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
     }
 
     this.isSaving = true;
     try {
-      const item = advancedMode
-        ? this.buildItemPayload(this.editingItem ?? undefined)
-        : this.buildQuickItemPayload(this.editingItem ?? undefined);
+      const item = this.buildItemPayload(this.editingItem ?? undefined);
       const previous = this.editingItem;
       let successMessage: string;
       if (previous) {
@@ -485,6 +474,34 @@ export class PantryListComponent implements OnDestroy {
       }
       console.error('[PantryListComponent] submitItem error', err);
       await this.presentToast(this.translate.instant('pantry.toasts.saveError'), 'danger');
+    }
+  }
+
+  async submitFastAdd(): Promise<void> {
+    if (this.isFastAdding) {
+      return;
+    }
+    const rawEntries = this.fastAddForm.get('entries')?.value ?? '';
+    const entries = this.parseFastAddEntries(rawEntries);
+    if (!entries.length) {
+      return;
+    }
+
+    this.isFastAdding = true;
+    try {
+      let created = 0;
+      for (const entry of entries) {
+        const item = this.buildFastAddItemPayload(entry.name, entry.quantity);
+        await this.pantryStore.addItem(item);
+        created += 1;
+      }
+      const messageKey = created === 1 ? 'pantry.fastAdd.singleSuccess' : 'pantry.fastAdd.success';
+      this.closeFastAddModal();
+      await this.presentToast(this.translate.instant(messageKey, { count: created }), 'success');
+    } catch (err) {
+      console.error('[PantryListComponent] submitFastAdd error', err);
+      this.isFastAdding = false;
+      await this.presentToast(this.translate.instant('pantry.fastAdd.error'), 'danger');
     }
   }
 
@@ -1729,21 +1746,6 @@ export class PantryListComponent implements OnDestroy {
     return Array.isArray(location.batches) ? location.batches : [];
   }
 
-  getQuickQuantity(): number {
-    const value = (this.form.get('quickQuantity')?.value ?? null) as number | null;
-    if (value === null || value === undefined) {
-      return 0;
-    }
-    const num = Number(value);
-    return Number.isFinite(num) ? num : 0;
-  }
-
-  quickFormInvalid(): boolean {
-    const nameValid = Boolean((this.form.get('name')?.value ?? '').trim());
-    const quantity = this.getQuickQuantity();
-    return !nameValid || quantity <= 0;
-  }
-
   getLocationMeta(location: ItemLocationStock): string {
     const batches = this.getLocationBatches(location);
     if (!batches.length) {
@@ -2392,56 +2394,95 @@ export class PantryListComponent implements OnDestroy {
     return base;
   }
 
-  /** Build a minimal item payload using quick entry fields. */
-  private buildQuickItemPayload(existing?: PantryItem): PantryItem {
-    const { name, categoryId, isBasic, supermarket, quickExpiry } = this.form.value as {
-      name?: string;
-      categoryId?: string;
-      isBasic?: boolean;
-      supermarket?: string;
-      quickExpiry?: string | null;
-    };
-    const quantity = this.getQuickQuantity();
-    const identifier = existing?._id ?? createDocumentId('item');
+  /** Build the simplified payload used by the Fast Add flow. */
+  private buildFastAddItemPayload(name: string, quantity: number): PantryItem {
     const now = new Date().toISOString();
-    const normalizedSupermarket = normalizeSupermarketValue(supermarket);
-    const normalizedCategory = normalizeCategoryId(categoryId);
+    const normalizedName = name.trim() || 'Product';
+    const sanitizedQuantity = this.normalizeFastAddQuantity(quantity);
+    const roundedQuantity = roundQuantity(Math.max(1, sanitizedQuantity));
     const defaultLocation = this.getDefaultLocationId();
     const batch: ItemBatch = {
-      quantity,
+      quantity: roundedQuantity,
       unit: MeasurementUnit.UNIT,
     };
-    if (quickExpiry) {
-      const parsedDate = new Date(quickExpiry);
-      if (!isNaN(parsedDate.getTime())) {
-        batch.expirationDate = parsedDate.toISOString();
-      }
-    }
     const locations: ItemLocationStock[] = [
       {
         locationId: defaultLocation,
         unit: MeasurementUnit.UNIT,
-        batches: quantity > 0 ? [batch] : [],
-      },
+        batches: [batch],
+      }
     ];
 
-    const earliestExpiry = this.computeEarliestExpiry(locations);
-
     return {
-      _id: identifier,
-      _rev: existing?._rev,
+      _id: createDocumentId('item'),
       type: 'item',
-      householdId: existing?.householdId ?? DEFAULT_HOUSEHOLD_ID,
-      name: (name ?? '').trim(),
-      categoryId: normalizedCategory,
+      householdId: DEFAULT_HOUSEHOLD_ID,
+      name: normalizedName,
+      categoryId: '',
       locations,
-      supermarket: normalizedSupermarket,
-      isBasic: isBasic ? true : undefined,
+      supermarket: '',
+      isBasic: undefined,
       minThreshold: undefined,
-      expirationDate: earliestExpiry,
-      createdAt: existing?.createdAt ?? now,
+      expirationDate: this.computeEarliestExpiry(locations),
+      createdAt: now,
       updatedAt: now,
     };
+  }
+
+  private parseFastAddEntries(raw: string): Array<{ name: string; quantity: number }> {
+    return raw
+      .split(/\r?\n/)
+      .map(line => this.parseFastAddLine(line))
+      .filter((entry): entry is { name: string; quantity: number } => entry !== null);
+  }
+
+  private parseFastAddLine(line: string): { name: string; quantity: number } | null {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const leadingMatch = trimmed.match(/^(\d+(?:[.,]\d+)?)(?:\s*[x×])?\s+(.+)$/i);
+    if (leadingMatch) {
+      return {
+        name: leadingMatch[2].trim() || trimmed,
+        quantity: this.normalizeFastAddQuantity(leadingMatch[1]),
+      };
+    }
+
+    const trailingMultiplierMatch = trimmed.match(/^(.+?)\s*(?:x|×)\s*(\d+(?:[.,]\d+)?)$/i);
+    if (trailingMultiplierMatch) {
+      return {
+        name: trailingMultiplierMatch[1].trim() || trimmed,
+        quantity: this.normalizeFastAddQuantity(trailingMultiplierMatch[2]),
+      };
+    }
+
+    const trailingNumberMatch = trimmed.match(/^(.+?)\s+(\d+(?:[.,]\d+)?)$/);
+    if (trailingNumberMatch) {
+      return {
+        name: trailingNumberMatch[1].trim() || trimmed,
+        quantity: this.normalizeFastAddQuantity(trailingNumberMatch[2]),
+      };
+    }
+
+    return {
+      name: trimmed,
+      quantity: 1,
+    };
+  }
+
+  private normalizeFastAddQuantity(value: string | number | undefined): number {
+    if (typeof value === 'number') {
+      const numericValue = Number(value);
+      return Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 1;
+    }
+    if (typeof value === 'string') {
+      const normalized = value.replace(',', '.').trim();
+      const numericValue = Number(normalized);
+      return Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 1;
+    }
+    return 1;
   }
 
   private getStatusFilterValue(filters: PantryFilterState): PantryStatusFilterValue {

@@ -55,50 +55,11 @@ ion-title, ion-back-button {
   }
 }
 
-.benefits-card {
-  margin-top: 12px;
-}
-
-.benefits-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 10px;
-
-  li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-  }
-}
-
 .plans-section {
   margin-top: 16px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-.plans-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-
-  h2 {
-    margin: 2px 0;
-  }
-}
-
-.eyebrow {
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ion-color-medium);
-  font-size: 12px;
 }
 
 .plans-grid {

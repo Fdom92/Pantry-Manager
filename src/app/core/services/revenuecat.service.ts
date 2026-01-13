@@ -9,7 +9,6 @@ import { environment } from 'src/environments/environment';
 })
 export class RevenuecatService {
   // Data
-  private initialized = false;
   private userId: string | null = null;
   private readonly publicApiKey = environment.revenueCatPublicKey;
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());
@@ -39,7 +38,6 @@ export class RevenuecatService {
       } else {
         console.warn('[RevenuecatService] init: no entitlement data, keeping stored state');
       }
-      this.initialized = true;
     } catch (err) {
       console.error('[RevenuecatService] init error', err);
     }
