@@ -1,7 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { ES_DATE_FORMAT_OPTIONS, Insight, InsightCta, InsightContext, ItemLocationStock, PantryItem } from '@core/models';
+import {
+  ES_DATE_FORMAT_OPTIONS,
+  Insight,
+  InsightCta,
+  InsightContext,
+  ItemLocationStock,
+  PantryItem,
+} from '@core/models';
 import { AgentConversationStore, InsightService, LanguageService } from '@core/services';
 import {
   formatDateTimeValue,
@@ -162,6 +169,8 @@ export class DashboardComponent {
       return;
     }
 
+    const pendingReviewProducts = this.insightService.getPendingReviewProducts(items);
+
     const context: InsightContext = {
       expiringSoonItems: expiringSoon.map(item => ({
         id: item._id,
@@ -179,6 +188,7 @@ export class DashboardComponent {
         name: item.name,
         categoryId: item.categoryId,
       })),
+      pendingReviewProducts,
     };
 
     const generated = this.insightService.buildDashboardInsights(context);

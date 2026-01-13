@@ -166,32 +166,6 @@
   color: var(--card-muted);
 }
 
-.summary-date {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: inherit;
-}
-
-.summary-date ion-icon {
-  font-size: 17px;
-  color: var(--card-icon);
-}
-
-.summary-supermarket {
-  font-size: 0.8rem;
-  color: var(--card-muted);
-}
-
-.summary-date,
-.summary-supermarket {
-  color: var(--ion-text-color);
-}
-
-.summary-date ion-icon {
-  color: var(--ion-color-primary);
-}
-
 .status-chip {
   display: inline-flex;
   align-items: center;
@@ -258,16 +232,6 @@
   padding-top: 6px;
 }
 
-.expanded-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--ion-color-dark-contrast) 4%, transparent);
-  border: 1px solid color-mix(in srgb, var(--ion-color-dark-contrast) 6%, transparent);
-}
-
 .summary-row {
   display: flex;
   align-items: center;
@@ -290,20 +254,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.section-header {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: color-mix(in srgb, var(--ion-color-dark-contrast) 85%, transparent);
-}
-
-.section-header ion-icon {
-  font-size: 20px;
-  color: color-mix(in srgb, var(--ion-text-color) 45%, var(--ion-background-color) 55%);
 }
 
 .empty-state {
@@ -390,17 +340,6 @@
   color: color-mix(in srgb, var(--ion-text-color) 35%, var(--ion-background-color) 65%);
 }
 
-.batch-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ion-color-tertiary) 12%, transparent);
-  color: var(--ion-color-tertiary);
-  font-size: 0.7rem;
-  font-weight: 600;
-  width: fit-content;
-}
 
 .batch-meta {
   display: flex;

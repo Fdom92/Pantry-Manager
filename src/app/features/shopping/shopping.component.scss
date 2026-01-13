@@ -56,12 +56,6 @@ ion-title {
   color: var(--ion-color-medium);
 }
 
-.summary-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
-}
-
 .suggestions-header {
   display: flex;
   align-items: center;
@@ -155,13 +149,6 @@ ion-title {
 
 .suggestion-header ion-chip {
   margin: 0;
-}
-
-.purchase-note {
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .purchase-action {

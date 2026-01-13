@@ -356,11 +356,6 @@ export class ShoppingComponent {
     const generatedOn = this.translate.instant('shopping.share.generatedOn', {
       date: this.formatExportDate(now),
     });
-    const headers = {
-      product: this.translate.instant('shopping.share.headers.product'),
-      quantity: this.translate.instant('shopping.share.headers.quantity'),
-      supermarket: this.translate.instant('shopping.share.headers.supermarket'),
-    };
 
     doc.setFontSize(16);
     doc.text(title, marginX, 20);

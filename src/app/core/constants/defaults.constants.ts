@@ -1,4 +1,4 @@
-import { AppPreferences, UserSettings } from '@core/models/user';
+import { AppPreferences } from '@core/models/user';
 import { MeasurementUnit } from '@core/models/shared';
 
 export const DEFAULT_LOCATION_OPTIONS = ['Despensa', 'Nevera', 'Cocina', 'Congelador'];
@@ -43,12 +43,6 @@ export const DEFAULT_OPTION_SETS = {
   SUPERMARKETS: DEFAULT_SUPERMARKET_OPTIONS,
   UNITS: DEFAULT_UNIT_OPTIONS,
 } as const;
-
-export const DEFAULT_SETTINGS: UserSettings = {
-  username: '',
-  householdName: '',
-  favoriteSupermarket: '',
-};
 
 export const DEFAULT_PREFERENCES: AppPreferences = {
   theme: 'system',

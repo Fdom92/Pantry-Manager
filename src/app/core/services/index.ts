@@ -7,4 +7,3 @@ export * from './pantry.service';
 export * from './pro.service';
 export * from './revenuecat.service';
 export * from './storage.service';
-export * from './user-settings.service';

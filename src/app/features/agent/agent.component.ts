@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, ef
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AgentEntryContext, AgentMessage } from '@core/models/agent';
-import { AgentConversationStore, MealPlannerAgentService, MealPlannerMode, findLastUserMessageIndex } from '@core/services';
+import { AgentConversationStore, MealPlannerAgentService, findLastUserMessageIndex } from '@core/services';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { NavController, ViewWillEnter } from '@ionic/angular';
 import {
@@ -239,8 +239,7 @@ export class AgentComponent implements ViewWillEnter {
       return;
     }
     this.markConversationStarted();
-    const overrides = this.getPromptOverrides(prompt);
-    await this.handlePlannerRequest(message, overrides);
+    await this.handlePlannerRequest(message);
   }
 
   private markConversationStarted(): void {
@@ -251,7 +250,7 @@ export class AgentComponent implements ViewWillEnter {
 
   private async handlePlannerRequest(
     userText: string,
-    options?: { appendUserMessage?: boolean; modeOverride?: MealPlannerMode; daysOverride?: number }
+    options?: { appendUserMessage?: boolean }
   ): Promise<void> {
     const trimmed = userText?.trim();
     if (!trimmed) {
@@ -267,8 +266,6 @@ export class AgentComponent implements ViewWillEnter {
     this.conversationStore.setRetryAvailable(false);
     this.conversationStore.setAgentPhase('thinking');
     try {
-      const mode = options?.modeOverride ?? this.resolvePlannerMode();
-      const days = options?.daysOverride ?? this.defaultDaysForMode(mode);
       const response = await this.mealPlannerAgent.run(userText);
       this.conversationStore.setAgentPhase('responding');
       const assistantMessage = this.conversationStore.createMessage('assistant', response || this.translate.instant('agent.messages.noResponse'));
@@ -285,41 +282,6 @@ export class AgentComponent implements ViewWillEnter {
     } finally {
       this.conversationStore.setAgentPhase('idle');
       await this.scrollToChatBottom();
-    }
-  }
-
-  private resolvePlannerMode(): MealPlannerMode {
-    const context = this.conversationStore.getEntryContext();
-    if (context === AgentEntryContext.RECIPES || context === AgentEntryContext.INSIGHTS_RECIPES) {
-      return 'recipes';
-    }
-    if (context === AgentEntryContext.INSIGHTS) {
-      return 'plan';
-    }
-    return 'plan';
-  }
-
-  private defaultDaysForMode(mode: MealPlannerMode): number | undefined {
-    switch (mode) {
-      case 'plan':
-        return 3;
-      case 'menu':
-        return 7;
-      default:
-        return undefined;
-    }
-  }
-
-  private getPromptOverrides(prompt: QuickPrompt): { modeOverride?: MealPlannerMode; daysOverride?: number } {
-    switch (prompt.id) {
-      case 'quick-ideas':
-        return { modeOverride: 'recipes' };
-      case 'weekly-plan':
-        return { modeOverride: 'menu', daysOverride: 7 };
-      case 'decide-for-me':
-        return { modeOverride: 'plan', daysOverride: 5 };
-      default:
-        return {};
     }
   }
 

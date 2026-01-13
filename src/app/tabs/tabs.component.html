@@ -2,12 +2,12 @@
   <ion-tab-bar slot="bottom">
     <ion-tab-button tab="dashboard" [routerLink]="['/dashboard']">
       <ion-icon name="home-outline"></ion-icon>
-      <ion-label>{{ 'tabs.dashboard' | translate }}</ion-label>
+      <ion-label>{{ 'dashboard.title' | translate }}</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="pantry" [routerLink]="['/pantry']">
       <ion-icon name="basket-outline"></ion-icon>
-      <ion-label>{{ 'tabs.pantry' | translate }}</ion-label>
+      <ion-label>{{ 'pantry.title' | translate }}</ion-label>
     </ion-tab-button>
 
     <ion-tab-button
@@ -18,18 +18,18 @@
       @if (!canUseAgent()) {
         <div class="tab-pro-pill">PRO</div>
       } @else {
-        <ion-label>{{ 'tabs.agent' | translate }}</ion-label>
+        <ion-label>{{ 'agent.title' | translate }}</ion-label>
       }
     </ion-tab-button>
 
     <ion-tab-button tab="shopping" [routerLink]="['/shopping']">
       <ion-icon name="cart-outline"></ion-icon>
-      <ion-label>{{ 'tabs.shopping' | translate }}</ion-label>
+      <ion-label>{{ 'shopping.title' | translate }}</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="settings" [routerLink]="['/settings']">
       <ion-icon name="settings-outline"></ion-icon>
-      <ion-label>{{ 'tabs.settings' | translate }}</ion-label>
+      <ion-label>{{ 'settings.title' | translate }}</ion-label>
     </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>
