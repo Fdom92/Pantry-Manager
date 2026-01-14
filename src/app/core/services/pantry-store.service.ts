@@ -1,4 +1,4 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { Signal, computed, inject, Injectable, signal } from '@angular/core';
 import { PantryItem, PantrySummary } from '@core/models/inventory';
 import { MeasurementUnit, StockStatus } from '@core/models/shared';
 import { PantryService } from '@core/services/pantry.service';
@@ -13,11 +13,10 @@ export class PantryStoreService {
     Object.values(MeasurementUnit).map(option => option.toLowerCase())
   );
   // Signals
-  readonly loading = signal(false);
+  readonly loading: Signal<boolean> = this.pantryService.loading;
   readonly error = signal<string | null>(null);
-  private readonly pantryItemsSignal = signal<PantryItem[]>([]);
   // Computed Signals
-  readonly items = computed(() => this.pantryItemsSignal());
+  readonly items = computed(() => this.pantryService.loadedProducts());
   readonly expiredItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemExpired(item))
   );
@@ -34,16 +33,8 @@ export class PantryStoreService {
     lowStock: this.lowStockItems().length,
   }));
 
-  constructor() {
-    // Mirror the shared pantry service cache so dashboard consumers avoid duplicating DB reads.
-    effect(() => {
-      this.pantryItemsSignal.set(this.pantryService.loadedProducts());
-    });
-  }
-
   /** Load items from storage, updating loading/error signals accordingly. */
   async loadAll(): Promise<void> {
-    this.loading.set(true);
     try {
       await this.pantryService.ensureFirstPageLoaded();
       this.pantryService.startBackgroundLoad();
@@ -51,8 +42,6 @@ export class PantryStoreService {
     } catch (err: any) {
       console.error('[PantryStoreService] loadAll error', err);
       this.error.set(err.message || 'Error loading pantry items');
-    } finally {
-      this.loading.set(false);
     }
   }
 
@@ -62,19 +51,11 @@ export class PantryStoreService {
       const mergeTarget = await this.findMergeCandidate(item);
       if (mergeTarget) {
         const merged = this.mergeItemWithExisting(mergeTarget, item);
-        const savedMerge = await this.pantryService.saveItem(merged);
-        this.pantryItemsSignal.update(items => {
-          const index = items.findIndex(existing => existing._id === savedMerge._id);
-          if (index >= 0) {
-            return items.map(existing => (existing._id === savedMerge._id ? savedMerge : existing));
-          }
-          return [...items, savedMerge];
-        });
+        await this.pantryService.saveItem(merged);
         return;
       }
 
-      const saved = await this.pantryService.saveItem(item);
-      this.pantryItemsSignal.update(items => [...items, saved]);
+      await this.pantryService.saveItem(item);
     } catch (err: any) {
       console.error('[PantryStoreService] addItem error', err);
       this.error.set('Failed to add item');
@@ -84,10 +65,7 @@ export class PantryStoreService {
   /** Replace an existing item in the signal cache with its latest version. */
   async updateItem(item: PantryItem): Promise<void> {
     try {
-      const updated = await this.pantryService.saveItem(item);
-      this.pantryItemsSignal.update(items =>
-        items.map(i => (i._id === updated._id ? updated : i))
-      );
+      await this.pantryService.saveItem(item);
     } catch (err: any) {
       console.error('[PantryStoreService] updateItem error', err);
       this.error.set('Failed to update item');
@@ -97,10 +75,7 @@ export class PantryStoreService {
   /** Remove an item from the local cache once deletion succeeds. */
   async deleteItem(id: string): Promise<void> {
     try {
-      const ok = await this.pantryService.deleteItem(id);
-      if (ok) {
-        this.pantryItemsSignal.update(items => items.filter(i => i._id !== id));
-      }
+      await this.pantryService.deleteItem(id);
     } catch (err: any) {
       console.error('[PantryStoreService] deleteItem error', err);
       this.error.set('Failed to delete item');
@@ -130,12 +105,7 @@ export class PantryStoreService {
 
       const currentQuantity = this.pantryService.getItemQuantityByLocation(current, location.locationId);
       const nextQty = Math.max(0, currentQuantity + delta);
-      const updated = await this.pantryService.updateLocationQuantity(id, nextQty, location.locationId);
-      if (updated) {
-        this.pantryItemsSignal.update(items =>
-          items.map(i => (i._id === updated._id ? updated : i))
-        );
-      }
+      await this.pantryService.updateLocationQuantity(id, nextQty, location.locationId);
     } catch (err: any) {
       console.error('[PantryStoreService] adjustQuantity error', err);
       this.error.set('Failed to adjust quantity');
@@ -149,23 +119,8 @@ export class PantryStoreService {
 
   /** Bridge live database change events into the signal-based store. */
   watchRealtime(): void {
-    this.pantryService.watchPantryChanges((item, meta) => {
-      if (meta?.deleted) {
-        this.pantryItemsSignal.update(items => items.filter(existing => existing._id !== meta.id));
-        return;
-      }
-      if (item) {
-        this.pantryItemsSignal.update(items => {
-          const index = items.findIndex(existing => existing._id === item._id);
-          if (index < 0) {
-            return [...items, item];
-          }
-          const next = [...items];
-          next[index] = item;
-          return next;
-        });
-      }
-    });
+    // PantryService already updates its internal cache; this store simply exposes it.
+    this.pantryService.watchPantryChanges(() => {});
   }
 
   /** Compute an aggregate stock status based on total quantity and thresholds. */

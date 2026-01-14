@@ -17,7 +17,7 @@ import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
 import jsPDF from 'jspdf';
-import { AddPurchaseModalComponent } from './add-purchase-modal/add-purchase-modal.component';
+import { AddPurchaseModalComponent } from './components/add-purchase-modal/add-purchase-modal.component';
 import { PantryStoreService } from '@core/services';
 
 @Component({

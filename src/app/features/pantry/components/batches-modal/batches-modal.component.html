@@ -1,0 +1,51 @@
+<ion-modal [isOpen]="state.showBatchesModal()" (willDismiss)="state.closeBatchesModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ 'pantry.batches.title' | translate }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" color="medium" (click)="state.closeBatchesModal()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding batches-modal-content">
+      @let selectedItem = state.selectedBatchesItem();
+      @if (!selectedItem) {
+        <ion-spinner class="modal-spinner"></ion-spinner>
+      } @else {
+        <h2 class="modal-title-value">{{ selectedItem.name }}</h2>
+        <div class="batches-modal-header">
+          <ion-text color="medium">
+            {{ 'pantry.batches.count' | translate:{ count: state.getTotalBatchCount(selectedItem) } }}
+          </ion-text>
+        </div>
+        <ion-list lines="none">
+          @for (entry of state.getSortedBatches(selectedItem); track entry.batch.batchId ?? entry.batch.expirationDate ?? $index) {
+            <ion-item>
+              <ion-label>
+                <h3>
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  {{ state.formatBatchDate(entry.batch) }}
+                </h3>
+                <p>
+                  {{ state.formatBatchQuantity(entry.batch, entry.locationUnit) }}
+                  · {{ entry.locationLabel }}
+                </p>
+                @if (entry.batch.opened) {
+                  <ion-badge color="tertiary" size="small">{{ 'pantry.batches.open' | translate }}</ion-badge>
+                }
+              </ion-label>
+              <ion-chip slot="end" [color]="entry.status.color" size="small">
+                <ion-icon [name]="entry.status.icon"></ion-icon>
+                <ion-label>{{ entry.status.label }}</ion-label>
+              </ion-chip>
+            </ion-item>
+          }
+        </ion-list>
+      }
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
