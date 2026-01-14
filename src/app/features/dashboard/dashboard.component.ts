@@ -37,7 +37,7 @@ import {
 } from '@ionic/angular/standalone';
 import { NavController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
 import { PantryStoreService } from '@core/services';
 
@@ -64,7 +64,7 @@ import { PantryStoreService } from '@core/services';
     IonSpinner,
     CommonModule,
     TranslateModule,
-    EmptyStateGenericComponent,
+    EmptyStateComponent,
     InsightCardComponent,
   ],
   templateUrl: './dashboard.component.html',

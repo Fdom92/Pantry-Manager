@@ -28,7 +28,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 type UpToDateReason = 'stale-update' | 'missing-info';
 
@@ -48,7 +48,7 @@ type QuickEditPatch = {
   imports: [
     CommonModule,
     TranslateModule,
-    EmptyStateGenericComponent,
+    EmptyStateComponent,
     IonHeader,
     IonToolbar,
     IonButtons,

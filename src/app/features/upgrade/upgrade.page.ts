@@ -17,7 +17,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
-import { PlanCardComponent } from './plan-card/plan-card.component';
+import { PlanCardComponent } from './components/plan-card/plan-card.component';
 
 @Component({
   selector: 'app-upgrade',

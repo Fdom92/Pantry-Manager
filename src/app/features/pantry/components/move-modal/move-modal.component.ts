@@ -23,7 +23,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { PantryListStateService } from '../pantry-list.state.service';
+import { PantryStateService } from '../../pantry.state.service';
 
 @Component({
   selector: 'app-pantry-move-modal',
@@ -57,6 +57,6 @@ import { PantryListStateService } from '../pantry-list.state.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PantryMoveModalComponent {
-  readonly state = inject(PantryListStateService);
+  readonly state = inject(PantryStateService);
 }
 

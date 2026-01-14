@@ -51,7 +51,7 @@ import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
-export class PantryListStateService {
+export class PantryStateService {
   // DI
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);

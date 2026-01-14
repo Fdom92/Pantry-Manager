@@ -16,7 +16,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { PantryListStateService } from '../pantry-list.state.service';
+import { PantryStateService } from '../../pantry.state.service';
 
 @Component({
   selector: 'app-pantry-filters-modal',
@@ -43,6 +43,6 @@ import { PantryListStateService } from '../pantry-list.state.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PantryFiltersModalComponent {
-  readonly state = inject(PantryListStateService);
+  readonly state = inject(PantryStateService);
 }
 

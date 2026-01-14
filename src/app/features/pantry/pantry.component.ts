@@ -54,16 +54,16 @@ import {
   IonToolbar
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
-import { PantryBatchesModalComponent } from '../components/batches-modal/batches-modal.component';
-import { PantryEditItemModalComponent } from '../components/edit-item-modal/edit-item-modal.component';
-import { PantryFiltersModalComponent } from '../components/filters-modal/filters-modal.component';
-import { PantryMoveModalComponent } from '../components/move-modal/move-modal.component';
-import { PantryDetailComponent } from '../pantry-detail/pantry-detail.component';
-import { PantryListStateService } from './pantry-list.state.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
+import { PantryBatchesModalComponent } from './components/batches-modal/batches-modal.component';
+import { PantryEditItemModalComponent } from './components/edit-item-modal/edit-item-modal.component';
+import { PantryFiltersModalComponent } from './components/filters-modal/filters-modal.component';
+import { PantryMoveModalComponent } from './components/move-modal/move-modal.component';
+import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.component';
+import { PantryStateService } from './pantry.state.service';
 
 @Component({
-  selector: 'app-pantry-list',
+  selector: 'app-pantry',
   standalone: true,
   imports: [
     IonHeader,
@@ -92,22 +92,22 @@ import { PantryListStateService } from './pantry-list.state.service';
     ReactiveFormsModule,
     PantryDetailComponent,
     TranslateModule,
-    EmptyStateGenericComponent,
+    EmptyStateComponent,
     PantryBatchesModalComponent,
     PantryMoveModalComponent,
     PantryFiltersModalComponent,
     PantryEditItemModalComponent,
   ],
-  templateUrl: './pantry-list.component.html',
-  styleUrls: ['./pantry-list.component.scss'],
+  templateUrl: './pantry.component.html',
+  styleUrls: ['./pantry.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [PantryListStateService],
+  providers: [PantryStateService],
 })
-export class PantryListComponent implements OnDestroy {
+export class PantryComponent implements OnDestroy {
   @ViewChild('content', { static: false }) private content?: IonContent;
   @ViewChild(PantryEditItemModalComponent, { static: false }) private editItemModal?: PantryEditItemModalComponent;
   // DI
-  private readonly state = inject(PantryListStateService);
+  private readonly state = inject(PantryStateService);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
   private readonly fb = inject(FormBuilder);

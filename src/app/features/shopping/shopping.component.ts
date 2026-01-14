@@ -15,7 +15,7 @@ import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/
 import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import jsPDF from 'jspdf';
 import { AddPurchaseModalComponent } from './components/add-purchase-modal/add-purchase-modal.component';
 import { PantryStoreService } from '@core/services';
@@ -27,7 +27,7 @@ import { PantryStoreService } from '@core/services';
     IonicModule,
     CommonModule,
     TranslateModule,
-    EmptyStateGenericComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './shopping.component.html',
   styleUrls: ['./shopping.component.scss'],

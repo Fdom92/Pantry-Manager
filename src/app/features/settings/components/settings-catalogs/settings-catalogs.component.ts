@@ -22,7 +22,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-settings-catalogs',
@@ -45,7 +45,7 @@ import { EmptyStateGenericComponent } from '@shared/components/empty-states/empt
     IonSpinner,
     CommonModule,
     TranslateModule,
-    EmptyStateGenericComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './settings-catalogs.component.html',
   styleUrls: ['./settings-catalogs.component.scss'],

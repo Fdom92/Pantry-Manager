@@ -14,13 +14,13 @@
       <ion-text color="medium">{{ 'common.loading' | translate }}</ion-text>
     </div>
   } @else if (isDone()) {
-    <app-empty-state-generic
+    <app-empty-state
       class="done-state"
       icon="checkmark-circle-outline"
       iconColor="success"
       [title]="'upToDate.done.title' | translate"
       [subtitle]="'upToDate.done.subtitle' | translate">
-    </app-empty-state-generic>
+    </app-empty-state>
   } @else {
     <div class="up-to-date-header">
       <p class="up-to-date-header__subtitle">

@@ -44,8 +44,8 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EmptyStateGenericComponent } from '@shared/components/empty-states/empty-state-generic.component';
-import { PantryListStateService } from '../pantry-list.state.service';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
+import { PantryStateService } from '../../pantry.state.service';
 
 @Component({
   selector: 'app-pantry-edit-item-modal',
@@ -54,7 +54,7 @@ import { PantryListStateService } from '../pantry-list.state.service';
     CommonModule,
     ReactiveFormsModule,
     TranslateModule,
-    EmptyStateGenericComponent,
+    EmptyStateComponent,
     IonModal,
     IonHeader,
     IonToolbar,
@@ -86,7 +86,7 @@ export class PantryEditItemModalComponent {
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
-  private readonly listState = inject(PantryListStateService);
+  private readonly listState = inject(PantryStateService);
 
   readonly isOpen = signal(false);
   editingItem: PantryItem | null = null;

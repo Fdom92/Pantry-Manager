@@ -56,7 +56,7 @@
       }
     </div>
   } @else if (summary().total === 0) {
-    <app-empty-state-generic
+    <app-empty-state
       class="list-empty-state"
       icon="fast-food-outline"
       [titleKey]="'emptyStates.pantry.title'"
@@ -64,13 +64,13 @@
       [showAction]="true"
       [actionLabel]="'pantry.fastAdd.advancedAction' | translate"
       (action)="openAdvancedAddModal()">
-    </app-empty-state-generic>
+    </app-empty-state>
   } @else if (pantryItemsState().length === 0) {
-    <app-empty-state-generic
+    <app-empty-state
       class="list-empty-state"
       icon="filter-outline"
       [subtitle]="'pantry.empty.filters' | translate">
-    </app-empty-state-generic>
+    </app-empty-state>
   } @else {
     <div class="category-stack fade-in-list">
       @for (group of groups(); track group.key) {
