@@ -1,12 +1,12 @@
-import { PantryItem } from "../pantry";
-import { BaseDoc } from "../shared";
+import type { PantryItem } from '../pantry';
+import type { BaseDoc } from '../shared/base-doc.model';
 
 // ENUMS
 export enum ShoppingReasonEnum {
   EMPTY = 'empty',
   BASIC_OUT = 'basic-out',
   BASIC_LOW = 'basic-low',
-  BELOW_MIN = 'below-min'
+  BELOW_MIN = 'below-min',
 }
 // TYPES
 export type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';

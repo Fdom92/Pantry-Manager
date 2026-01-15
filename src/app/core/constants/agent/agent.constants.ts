@@ -1,5 +1,4 @@
-
-import { AgentEntryContext, QuickPrompt } from "@core/models/agent";
+import { AgentEntryContext, type QuickPrompt } from '@core/models/agent';
 
 export const QUICK_PROMPTS: QuickPrompt[] = [
   {
@@ -32,6 +31,6 @@ export const QUICK_PROMPTS: QuickPrompt[] = [
     labelKey: 'agent.quickStart.customPrompt',
     behavior: 'composer',
   },
-]
+];
 
 export const USER_PROMPT_MAXLENGTH = 500;

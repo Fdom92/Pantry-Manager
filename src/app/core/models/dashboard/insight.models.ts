@@ -1,4 +1,4 @@
-import { AgentEntryContext } from '@core/models/agent';
+import type { AgentEntryContext } from '@core/models/agent';
 
 // ENUMS
 export enum InsightId {

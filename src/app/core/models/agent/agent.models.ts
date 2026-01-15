@@ -1,4 +1,4 @@
-import { PantryItem } from '../pantry';
+import type { PantryItem } from '../pantry';
 
 // TYPES
 export type AgentRole = 'user' | 'assistant';

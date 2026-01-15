@@ -1,4 +1,4 @@
-import { BaseDoc } from "../shared";
+import type { BaseDoc } from '../shared/base-doc.model';
 
 // TYPES
 export type AppThemePreference = 'light' | 'dark' | 'system';

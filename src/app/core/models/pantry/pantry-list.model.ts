@@ -1,4 +1,4 @@
-import { MeasurementUnit } from '../shared';
+import type { MeasurementUnit } from '../shared/enums.model';
 import { ItemBatch } from './item-batch.model';
 import { ItemLocationStock } from './item-location-stock.model';
 import { PantryItem } from './item.model';

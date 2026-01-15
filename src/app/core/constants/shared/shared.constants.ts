@@ -1,4 +1,5 @@
-import { AppPreferences, MeasurementUnit } from "@core/models";
+import { MeasurementUnit } from '@core/models/shared';
+import type { AppPreferences } from '@core/models/settings';
 
 export const TOAST_DURATION = 1800;
 export const UNASSIGNED_LOCATION_KEY = 'unassigned';

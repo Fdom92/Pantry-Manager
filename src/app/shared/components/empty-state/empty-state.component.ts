@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { EmptyStateColor } from '@core/models/shared/empty.state.models';
+import type { EmptyStateColor } from '@core/models/shared';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
