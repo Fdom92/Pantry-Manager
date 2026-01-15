@@ -14,7 +14,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { AGENT_SLIDE_LOCKED, AGENT_SLIDE_UNLOCKED, CORE_SLIDES } from '@core/constants/onboarding';
 import { OnboardingSlide } from '@core/models/onboarding';
-import { RevenuecatService } from '@core/services/revenuecat.service';
+import { RevenuecatService } from '@core/services/upgrade';
 import { NavController } from '@ionic/angular';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';

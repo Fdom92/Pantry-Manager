@@ -6,7 +6,7 @@ import { BACKUP_FILENAME, EXPORT_PATH, IMPORT_EMPTY_ERROR, IMPORT_EMPTY_INVALID,
 import { AppThemePreference } from '@core/models';
 import { BaseDoc } from '@core/models/shared';
 import { AppPreferencesService, StorageService } from '@core/services';
-import { RevenuecatService } from '@core/services/revenuecat.service';
+import { RevenuecatService } from '@core/services/upgrade';
 import { NavController, ToastController } from '@ionic/angular';
 import {
   IonButton,

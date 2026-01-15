@@ -8,7 +8,7 @@ import {
 } from '@core/models';
 import { MeasurementUnit } from '@core/models/shared';
 import { normalizeStringList } from '@core/utils/normalization.util';
-import { StorageService } from './storage.service';
+import { StorageService } from '../shared/storage.service';
 
 @Injectable({
   providedIn: 'root',

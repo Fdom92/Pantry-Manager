@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
-import { RevenuecatService } from '@core/services/revenuecat.service';
+import { RevenuecatService } from '@core/services/upgrade';
 import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';

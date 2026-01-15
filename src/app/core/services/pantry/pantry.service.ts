@@ -23,7 +23,7 @@ import {
 import { DEFAULT_PANTRY_FILTERS, ItemBatch, ItemLocationStock, LegacyLocationStock, PantryFilterState, PantryItem, PantrySortMode } from '@core/models/pantry';
 import { ExpirationStatus, MeasurementUnit } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
-import { StorageService } from './storage.service';
+import { StorageService } from '../shared/storage.service';
 
 @Injectable({
   providedIn: 'root'

@@ -5,7 +5,7 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { QUICK_PROMPTS, USER_PROMPT_MAXLENGTH } from '@core/constants';
 import { AgentEntryContext, AgentMessage, QuickPrompt } from '@core/models/agent';
 import { AgentConversationStore, MealPlannerAgentService, findLastUserMessageIndex } from '@core/services';
-import { RevenuecatService } from '@core/services/revenuecat.service';
+import { RevenuecatService } from '@core/services/upgrade';
 import { NavController, ViewWillEnter } from '@ionic/angular';
 import {
   IonBadge,

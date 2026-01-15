@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { getItemTotalQuantity } from '@core/domain/pantry-item';
 import { PantryItem } from '@core/models/pantry';
 import { LlmClientService } from './llm-client.service';
-import { PantryService } from '../pantry.service';
-import { AppPreferencesService } from '../app-preferences.service';
+import { PantryService } from '../pantry/pantry.service';
+import { AppPreferencesService } from '../settings/app-preferences.service';
 
 export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
 

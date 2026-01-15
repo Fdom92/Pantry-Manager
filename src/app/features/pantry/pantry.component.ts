@@ -21,7 +21,7 @@ import {
   LanguageService,
   PantryStoreService,
 } from '@core/services';
-import { PantryService } from '@core/services/pantry.service';
+import { PantryService } from '@core/services/pantry';
 import { createDocumentId } from '@core/utils';
 import { formatShortDate, roundQuantity } from '@core/utils/formatting.util';
 import {

@@ -12,7 +12,7 @@ import {
   PantryItem,
 } from '@core/models';
 import { TranslateService } from '@ngx-translate/core';
-import { ProService } from './pro.service';
+import { ProService } from '../upgrade/pro.service';
 
 @Injectable({ providedIn: 'root' })
 export class InsightService {

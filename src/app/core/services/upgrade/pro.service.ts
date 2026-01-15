@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { RevenuecatService } from '@core/services';
+import { RevenuecatService } from './revenuecat.service';
 import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })

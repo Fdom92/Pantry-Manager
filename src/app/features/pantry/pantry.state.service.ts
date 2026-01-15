@@ -38,7 +38,7 @@ import {
 } from '@core/models/pantry';
 import { ES_DATE_FORMAT_OPTIONS, MeasurementUnit } from '@core/models/shared';
 import { AppPreferencesService, LanguageService, PantryStoreService } from '@core/services';
-import { PantryService } from '@core/services/pantry.service';
+import { PantryService } from '@core/services/pantry';
 import { formatDateValue, formatQuantity, formatShortDate, roundQuantity } from '@core/utils/formatting.util';
 import {
   normalizeCategoryId,
