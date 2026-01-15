@@ -1,9 +1,8 @@
-import { classifyExpiry, computeEarliestExpiry, toNumberOrZero } from '@core/domain/pantry-stock';
+import { classifyExpiry, computeEarliestExpiry, toNumberOrZero } from '@core/domain/pantry/pantry-stock';
 import { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { ExpirationStatus } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
-
-export type BatchIdGenerator = () => string;
+import { BatchIdGenerator } from '../pantry.domain';
 
 export function collectBatches(
   locations: ItemLocationStock[],

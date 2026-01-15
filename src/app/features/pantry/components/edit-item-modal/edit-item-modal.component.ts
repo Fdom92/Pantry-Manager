@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ViewEncapsulation, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewEncapsulation, effect, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DEFAULT_HOUSEHOLD_ID, TOAST_DURATION, UNASSIGNED_LOCATION_KEY, UNASSIGNED_PRODUCT_NAME } from '@core/constants';
 import {
@@ -9,7 +9,7 @@ import {
   getPresetCategoryOptions,
   getPresetLocationOptions,
   getPresetSupermarketOptions
-} from '@core/domain/pantry-catalog';
+} from '@core/domain/pantry/pantry-catalog';
 import { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { AppPreferencesService, LanguageService, PantryStoreService } from '@core/services';
@@ -44,7 +44,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-import { PantryStateService } from '../../pantry.state.service';
+import { PantryFacade } from '../../facade/pantry.facade';
 
 @Component({
   selector: 'app-pantry-edit-item-modal',
@@ -85,7 +85,7 @@ export class PantryEditItemModalComponent {
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
-  private readonly listState = inject(PantryStateService);
+  private readonly listState = inject(PantryFacade);
   // DATA
   isSaving = false;
   editingItem: PantryItem | null = null;
@@ -113,6 +113,21 @@ export class PantryEditItemModalComponent {
   // GETTERSS
   get locationsArray(): FormArray<FormGroup> {
     return this.form.get('locations') as FormArray<FormGroup>;
+  }
+
+  constructor() {
+    effect(() => {
+      const request = this.listState.editItemModalRequest();
+      if (!request) {
+        return;
+      }
+      if (request.mode === 'create') {
+        this.openCreate();
+      } else {
+        this.openEdit(request.item);
+      }
+      this.listState.clearEditItemModalRequest();
+    });
   }
 
   openCreate(): void {

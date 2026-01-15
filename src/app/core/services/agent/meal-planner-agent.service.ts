@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { getItemTotalQuantity } from '@core/domain/pantry-item';
+import { getItemTotalQuantity } from '@core/domain/pantry/pantry-item';
 import { PantryItem } from '@core/models/pantry';
 import { LlmClientService } from './llm-client.service';
 import { PantryService } from '../pantry/pantry.service';

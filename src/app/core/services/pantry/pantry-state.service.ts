@@ -3,21 +3,21 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { DEFAULT_LOCATION_OPTIONS, NEAR_EXPIRY_WINDOW_DAYS, TOAST_DURATION } from '@core/constants';
 import {
+  buildFastAddItemPayload,
+  classifyExpiry,
+  computeEarliestExpiry,
   computeSupermarketSuggestions,
   formatCategoryName as formatCategoryNameCatalog,
   formatFriendlyName as formatFriendlyNameCatalog,
   getPresetCategoryOptions,
   getPresetLocationOptions,
   getPresetSupermarketOptions,
-} from '@core/domain/pantry-catalog';
-import {
-  classifyExpiry,
-  computeEarliestExpiry,
   moveBatches,
   normalizeBatches,
+  parseFastAddEntries,
   sumQuantities,
-  toNumberOrZero
-} from '@core/domain/pantry-stock';
+  toNumberOrZero,
+} from '@core/domain/pantry';
 import {
   BatchCountsMeta,
   BatchEntryMeta,
@@ -37,8 +37,11 @@ import {
   ProductStatusState,
 } from '@core/models/pantry';
 import { ES_DATE_FORMAT_OPTIONS, MeasurementUnit } from '@core/models/shared';
-import { AppPreferencesService, LanguageService, PantryStoreService } from '@core/services';
-import { PantryService } from '@core/services/pantry';
+import { AppPreferencesService } from '../settings/app-preferences.service';
+import { LanguageService } from '../shared/language.service';
+import { PantryService } from './pantry.service';
+import { PantryStoreService } from './pantry-store.service';
+import { createDocumentId } from '@core/utils';
 import { formatDateValue, formatQuantity, formatShortDate, roundQuantity } from '@core/utils/formatting.util';
 import {
   normalizeCategoryId,
@@ -66,11 +69,34 @@ export class PantryStateService {
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly stockSaveDelay = 500;
+  private readonly expandedItems = new Set<string>();
+  private realtimeSubscribed = false;
+  private readonly deleteAnimationDuration = 220;
 
   // SIGNALS / view state
   readonly loading = this.pantryService.loading;
   readonly hasCompletedInitialLoad = signal(false);
   readonly showFilters = signal(false);
+  readonly collapsedGroups = signal<Set<string>>(new Set());
+  readonly deletingItems = signal<Set<string>>(new Set());
+
+  // Edit modal requests (handled by the modal component)
+  readonly editItemModalRequest = signal<
+    | { mode: 'create' }
+    | { mode: 'edit'; item: PantryItem }
+    | null
+  >(null);
+
+  // Fast add modal
+  readonly fastAddModalOpen = signal(false);
+  readonly isFastAdding = signal(false);
+  readonly fastAddForm = this.fb.group({
+    entries: this.fb.control('', { nonNullable: true }),
+  });
+  readonly hasFastAddEntries = computed(() => {
+    const raw = this.fastAddForm.get('entries')?.value ?? '';
+    return raw.trim().length > 0;
+  });
 
   // Move modal
   readonly showMoveModal = signal(false);
@@ -158,6 +184,24 @@ export class PantryStateService {
         this.pantryService.setFilter('locationId', null);
       }
     });
+
+    // Expansion/collapse depend on ids that can disappear when new pages arrive.
+    effect(() => {
+      this.syncExpandedItems(this.pantryItemsState());
+    });
+
+    effect(() => {
+      this.syncCollapsedGroups(this.groups());
+    });
+  }
+
+  /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
+  async ionViewWillEnter(): Promise<void> {
+    await this.loadItems();
+    if (!this.realtimeSubscribed) {
+      this.pantryStore.watchRealtime();
+      this.realtimeSubscribed = true;
+    }
   }
 
   async loadItems(): Promise<void> {
@@ -224,6 +268,155 @@ export class PantryStateService {
     this.pantryService.resetSearchAndFilters();
     this.pantryService.setSortMode('name');
     this.showFilters.set(false);
+  }
+
+  // -------- Edit item modal (request-based) --------
+  openAdvancedAddModal(event?: Event): void {
+    event?.stopPropagation();
+    this.editItemModalRequest.set({ mode: 'create' });
+  }
+
+  openEditItemModal(item: PantryItem, event?: Event): void {
+    event?.stopPropagation();
+    this.editItemModalRequest.set({ mode: 'edit', item });
+  }
+
+  clearEditItemModalRequest(): void {
+    this.editItemModalRequest.set(null);
+  }
+
+  // -------- Fast add --------
+  openFastAddModal(): void {
+    this.fastAddForm.reset({ entries: '' });
+    this.fastAddModalOpen.set(true);
+    this.isFastAdding.set(false);
+  }
+
+  closeFastAddModal(): void {
+    this.fastAddModalOpen.set(false);
+    this.isFastAdding.set(false);
+    this.fastAddForm.reset({ entries: '' });
+  }
+
+  async submitFastAdd(): Promise<void> {
+    if (this.isFastAdding()) {
+      return;
+    }
+    const rawEntries = this.fastAddForm.get('entries')?.value ?? '';
+    const entries = parseFastAddEntries(rawEntries);
+    if (!entries.length) {
+      return;
+    }
+
+    this.isFastAdding.set(true);
+    try {
+      const nowIso = new Date().toISOString();
+      const defaultLocationId = this.getDefaultLocationId();
+      let created = 0;
+      for (const entry of entries) {
+        const item = buildFastAddItemPayload({
+          id: createDocumentId('item'),
+          nowIso,
+          name: entry.name,
+          quantity: entry.quantity,
+          defaultLocationId,
+        });
+        await this.pantryStore.addItem(item);
+        created += 1;
+      }
+
+      const messageKey = created === 1 ? 'pantry.fastAdd.singleSuccess' : 'pantry.fastAdd.success';
+      this.closeFastAddModal();
+      await this.presentToast(this.translate.instant(messageKey, { count: created }), 'success');
+    } catch (err) {
+      console.error('[PantryStateService] submitFastAdd error', err);
+      this.isFastAdding.set(false);
+      await this.presentToast(this.translate.instant('pantry.fastAdd.error'), 'danger');
+    }
+  }
+
+  // -------- Expand/collapse + list UI state --------
+  trackByItemId(_: number, item: PantryItem): string {
+    return item._id;
+  }
+
+  onSummaryKeydown(item: PantryItem, event: KeyboardEvent): void {
+    const key = event.key.toLowerCase();
+    if (key === 'enter' || key === ' ') {
+      event.preventDefault();
+      this.toggleItemExpansion(item);
+    }
+  }
+
+  isExpanded(item: PantryItem): boolean {
+    return this.expandedItems.has(item._id);
+  }
+
+  toggleItemExpansion(item: PantryItem, event?: Event): void {
+    event?.stopPropagation();
+    if (this.expandedItems.has(item._id)) {
+      this.expandedItems.delete(item._id);
+    } else {
+      this.expandedItems.add(item._id);
+    }
+  }
+
+  isGroupCollapsed(key: string): boolean {
+    return this.collapsedGroups().has(key);
+  }
+
+  toggleGroupCollapse(key: string, event?: Event): void {
+    event?.stopPropagation();
+    this.collapsedGroups.update(current => {
+      const next = new Set(current);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }
+
+  onGroupHeaderKeydown(key: string, event: KeyboardEvent): void {
+    const keyName = event.key.toLowerCase();
+    if (keyName === 'enter' || keyName === ' ') {
+      event.preventDefault();
+      this.toggleGroupCollapse(key);
+    }
+  }
+
+  isDeleting(item: PantryItem): boolean {
+    return this.deletingItems().has(item._id);
+  }
+
+  async deleteItem(item: PantryItem, event?: Event, skipConfirm = false): Promise<void> {
+    event?.stopPropagation();
+    if (!item?._id) {
+      return;
+    }
+
+    const shouldConfirm = !skipConfirm && typeof window !== 'undefined';
+    if (shouldConfirm) {
+      const confirmed = window.confirm(this.translate.instant('pantry.confirmDelete', { name: item.name ?? '' }));
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    this.cancelPendingStockSave(item._id);
+    this.markItemDeleting(item._id);
+    try {
+      await this.delay(this.deleteAnimationDuration);
+      await this.pantryStore.deleteItem(item._id);
+      this.expandedItems.delete(item._id);
+      await this.presentToast(this.translate.instant('pantry.toasts.deleted'), 'medium');
+    } catch (err) {
+      console.error('[PantryStateService] deleteItem error', err);
+      await this.presentToast(this.translate.instant('pantry.toasts.saveError'), 'danger');
+    } finally {
+      this.unmarkItemDeleting(item._id);
+    }
   }
 
   private applyStatusFilterPreset(preset: PantryStatusFilterValue): void {
@@ -684,6 +877,54 @@ export class PantryStateService {
   }
 
   // -------- Internal impls (ported from component) --------
+  private markItemDeleting(id: string): void {
+    this.deletingItems.update(current => {
+      if (current.has(id)) {
+        return current;
+      }
+      const next = new Set(current);
+      next.add(id);
+      return next;
+    });
+  }
+
+  private unmarkItemDeleting(id: string): void {
+    this.deletingItems.update(current => {
+      if (!current.has(id)) {
+        return current;
+      }
+      const next = new Set(current);
+      next.delete(id);
+      return next;
+    });
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private syncExpandedItems(source: PantryItem[] = this.pantryItemsState()): void {
+    const validIds = new Set(source.map(item => item._id));
+    for (const id of Array.from(this.expandedItems)) {
+      if (!validIds.has(id)) {
+        this.expandedItems.delete(id);
+      }
+    }
+  }
+
+  private syncCollapsedGroups(groups: PantryGroup[]): void {
+    const validKeys = new Set(groups.map(group => group.key));
+    this.collapsedGroups.update(current => {
+      const next = new Set(current);
+      for (const key of Array.from(next)) {
+        if (!validKeys.has(key)) {
+          next.delete(key);
+        }
+      }
+      return next;
+    });
+  }
+
   private mergePendingItems(source: PantryItem[]): PantryItem[] {
     if (!this.pendingItems.size) {
       return source;

@@ -12,14 +12,14 @@ import {
   isItemLowStock as isItemLowStockItem,
   isItemNearExpiry as isItemNearExpiryItem,
   shouldAutoAddToShoppingList as shouldAutoAddToShoppingListItem,
-} from '@core/domain/pantry-item';
+} from '@core/domain/pantry/pantry-item';
 import {
   computeEarliestExpiry as computeEarliestExpiryStock,
   mergeBatchesByExpiry as mergeBatchesByExpiryStock,
   normalizeBatches as normalizeBatchesStock,
   sumQuantities as sumQuantitiesStock,
   toNumberOrZero as toNumberOrZeroStock,
-} from '@core/domain/pantry-stock';
+} from '@core/domain/pantry/pantry-stock';
 import { DEFAULT_PANTRY_FILTERS, ItemBatch, ItemLocationStock, LegacyLocationStock, PantryFilterState, PantryItem, PantrySortMode } from '@core/models/pantry';
 import { ExpirationStatus, MeasurementUnit } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';

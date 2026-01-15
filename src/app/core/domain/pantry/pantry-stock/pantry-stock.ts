@@ -1,8 +1,7 @@
 import { ItemBatch, ItemLocationStock } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
-
-export type BatchIdGenerator = () => string;
+import { BatchIdGenerator } from '../pantry.domain';
 
 export type ExpiryClassification = 'expired' | 'near-expiry' | 'normal' | 'unknown';
 
