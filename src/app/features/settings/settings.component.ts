@@ -68,15 +68,15 @@ export class SettingsComponent {
   private readonly translate = inject(TranslateService);
   private readonly revenuecat = inject(RevenuecatService);
   private readonly navCtrl = inject(NavController);
-  // Data
+  // DATA
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isPro$ = this.revenuecat.isPro$;
-  // Signals
+  // SIGNALS
   readonly isExportingData = signal(false);
   readonly isImportingData = signal(false);
   readonly isResettingData = signal(false);
   readonly isUpdatingTheme = signal(false);
-  // Computed Signals
+  // COMPUTED
   readonly themePreference = computed<AppThemePreference>(() => this.appPreferencesService.preferences().theme);
 
   async ionViewWillEnter(): Promise<void> {

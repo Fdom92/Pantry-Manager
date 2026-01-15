@@ -35,7 +35,7 @@ export class OnboardingPage implements AfterViewInit {
   // DI
   private readonly navCtrl = inject(NavController);
   private readonly revenuecat = inject(RevenuecatService);
-  // Data
+  // DATA
   readonly slideOptions: SwiperOptions = {
     speed: 550,
     spaceBetween: 24,
@@ -47,10 +47,10 @@ export class OnboardingPage implements AfterViewInit {
       next: { translate: ['16%', 0, 0], scale: 0.95, opacity: 1 },
     },
   };
-  // Signals
+  // SIGNALS
   readonly currentSlideIndex = signal(0);
   readonly isProUser = toSignal(this.revenuecat.isPro$, { initialValue: false });
-  // Computed Signals
+  // COMPUTED
   readonly availableSlides = computed<OnboardingSlide[]>(() => {
     const agentSlide = this.isProUser() ? AGENT_SLIDE_UNLOCKED : AGENT_SLIDE_LOCKED;
     return [...CORE_SLIDES, agentSlide];
@@ -107,6 +107,7 @@ export class OnboardingPage implements AfterViewInit {
       console.warn('[Onboarding] failed to persist onboarding flag', err);
     }
   }
+
   private getSwiperInstance(): any {
     return this.swiperElement?.nativeElement?.swiper;
   }

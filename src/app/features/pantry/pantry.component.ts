@@ -114,7 +114,7 @@ export class PantryComponent implements OnDestroy {
   private readonly toastCtrl = inject(ToastController);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
-  // Data
+  // DATA
   fastAddModalOpen = false;
   isFastAdding = false;
   private realtimeSubscribed = false;
@@ -124,7 +124,7 @@ export class PantryComponent implements OnDestroy {
   readonly skeletonPlaceholders = this.state.skeletonPlaceholders;
   private readonly expandedItems = new Set<string>();
   private readonly deleteAnimationDuration = 220;
-  // Signals
+  // SIGNALS
   readonly searchTerm = this.state.searchTerm;
   readonly activeFilters = this.state.activeFilters;
   readonly selectedCategory = this.state.selectedCategory;
@@ -142,7 +142,7 @@ export class PantryComponent implements OnDestroy {
   readonly hasCompletedInitialLoad = this.state.hasCompletedInitialLoad;
   readonly collapsedGroups = signal<Set<string>>(new Set());
   readonly deletingItems = signal<Set<string>>(new Set());
-  // Computed Signals
+  // COMPUTED
   readonly groups = this.state.groups;
   readonly summary = this.state.summary;
   readonly filterChips = this.state.filterChips;
@@ -153,7 +153,7 @@ export class PantryComponent implements OnDestroy {
   readonly presetLocationOptions = this.state.presetLocationOptions;
   readonly presetSupermarketOptions = this.state.presetSupermarketOptions;
   readonly batchSummaries = this.state.batchSummaries;
-  // Forms
+  // FORMS
   readonly fastAddForm = this.fb.group({
     entries: this.fb.control('', { nonNullable: true }),
   });
@@ -167,6 +167,10 @@ export class PantryComponent implements OnDestroy {
     effect(() => {
       this.syncCollapsedGroups(this.groups());
     });
+  }
+
+  ngOnDestroy(): void {
+    this.state.onDestroy();
   }
 
   /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
@@ -419,11 +423,6 @@ export class PantryComponent implements OnDestroy {
     }
   }
 
-  /** Scroll to the top of the list after reloading or clearing filters. */
-  private scrollViewportToTop(): void {
-    this.content?.scrollToTop(300);
-  }
-
   openBatchesModal(item: PantryItem, event?: Event): void {
     this.state.openBatchesModal(item, event);
   }
@@ -496,11 +495,6 @@ export class PantryComponent implements OnDestroy {
     return this.state.getBatchStatus(batch);
   }
 
-  /** Return the earliest expiry date present in the provided locations array. */
-  private computeEarliestExpiry(locations: ItemLocationStock[]): string | undefined {
-    return computeEarliestExpiryStock(locations);
-  }
-
   getLocationBatches(location: ItemLocationStock): ItemBatch[] {
     return Array.isArray(location.batches) ? location.batches : [];
   }
@@ -529,6 +523,10 @@ export class PantryComponent implements OnDestroy {
     return sumQuantitiesStock(location.batches, { round: roundQuantity });
   }
 
+  formatCategoryName(key: string): string {
+    return this.formatFriendlyName(key, this.translate.instant('pantry.form.uncategorized'));
+  }
+
   private getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {
     const batches = this.getLocationBatches(location);
     const dates = batches
@@ -545,8 +543,14 @@ export class PantryComponent implements OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    this.state.onDestroy();
+  /** Return the earliest expiry date present in the provided locations array. */
+  private computeEarliestExpiry(locations: ItemLocationStock[]): string | undefined {
+    return computeEarliestExpiryStock(locations);
+  }
+
+    /** Scroll to the top of the list after reloading or clearing filters. */
+  private scrollViewportToTop(): void {
+    this.content?.scrollToTop(300);
   }
 
   private async presentToast(message: string, color: string = 'medium'): Promise<void> {
@@ -679,10 +683,6 @@ export class PantryComponent implements OnDestroy {
     return 1;
   }
 
-  formatCategoryName(key: string): string {
-    return this.formatFriendlyName(key, this.translate.instant('pantry.form.uncategorized'));
-  }
-
   private formatFriendlyName(value: string, fallback: string): string {
     const key = value?.trim();
     if (!key) {
@@ -727,5 +727,4 @@ export class PantryComponent implements OnDestroy {
       return next;
     });
   }
-
 }

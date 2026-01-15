@@ -30,11 +30,11 @@ export class AddPurchaseModalComponent implements OnInit {
   // DI
   private readonly modalCtrl = inject(ModalController);
   private readonly translate = inject(TranslateService);
-  // Data
+  // DATA
   quantity = 1;
   expiryDate: string | null = null;
   location = 'unassigned';
-  // Getters
+  // GETTERS
   get locationOptions(): string[] {
     const options = new Set<string>();
     const fromItem = normalizeLocationId(this.item?.locationId);

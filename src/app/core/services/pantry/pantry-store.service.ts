@@ -8,14 +8,14 @@ import { normalizeLocationId } from '@core/utils/normalization.util';
 export class PantryStoreService {
   // DI
   private readonly pantryService = inject(PantryService);
-  // Data
+  // DATA
   private readonly knownMeasurementUnits = new Set(
     Object.values(MeasurementUnit).map(option => option.toLowerCase())
   );
-  // Signals
+  // SIGNALS
   readonly loading: Signal<boolean> = this.pantryService.loading;
   readonly error = signal<string | null>(null);
-  // Computed Signals
+  // COMPUTED
   readonly items = computed(() => this.pantryService.loadedProducts());
   readonly expiredItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemExpired(item))

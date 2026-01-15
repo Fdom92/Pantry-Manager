@@ -43,6 +43,7 @@ import { PantryStateService } from '../../pantry.state.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PantryFiltersModalComponent {
+  // DI
   readonly state = inject(PantryStateService);
 }
 

@@ -23,7 +23,6 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-
 @Component({
   selector: 'app-agent',
   standalone: true,
@@ -58,17 +57,19 @@ export class AgentComponent implements ViewWillEnter {
   private readonly navCtrl = inject(NavController);
   private readonly destroyRef = inject(DestroyRef);
   private readonly translate = inject(TranslateService);
-  private readonly canUseAgentState = signal(false);
-  private readonly hasConversationStarted = signal(false);
-  readonly shouldShowQuickStart = computed(() => this.canUseAgentState() && !this.hasConversationStarted());
-  // Data
+  // DATA
   readonly conversationMessages = this.conversationStore.messages;
   readonly isAgentProcessing = this.conversationStore.thinking;
   readonly agentExecutionPhase = this.conversationStore.agentPhase;
   readonly canRetryLastMessage = this.conversationStore.canRetry;
   readonly canUseAgent$ = this.revenuecat.canUseAgent$;
   readonly quickPrompts = QUICK_PROMPTS;
-  // Form
+  // SIGNALS
+  private readonly canUseAgentState = signal(false);
+  private readonly hasConversationStarted = signal(false);
+  // COMPUTED
+  readonly shouldShowQuickStart = computed(() => this.canUseAgentState() && !this.hasConversationStarted());
+  // FORM
   readonly composerControl = new FormControl('', {
     nonNullable: true,
     validators: [Validators.maxLength(USER_PROMPT_MAXLENGTH)],
@@ -171,20 +172,6 @@ export class AgentComponent implements ViewWillEnter {
     await this.handlePlannerRequest(history[lastUserIndex].content, { appendUserMessage: false });
   }
 
-  private updateComposerAccess(isUnlocked: boolean): void {
-    if (isUnlocked) {
-      this.composerControl.enable({ emitEvent: false });
-      return;
-    }
-    this.composerControl.disable({ emitEvent: false });
-    this.composerControl.setValue('', { emitEvent: false });
-  }
-
-  private getTrimmedComposerValue(): string | null {
-    const value = this.composerControl.value.trim();
-    return value || null;
-  }
-
   async triggerQuickPrompt(prompt: QuickPrompt): Promise<void> {
     if (!this.revenuecat.canUseAgent()) {
       await this.navigateToUpgrade();
@@ -256,5 +243,19 @@ export class AgentComponent implements ViewWillEnter {
     setTimeout(() => {
       void this.composerInput?.setFocus();
     });
+  }
+
+  private updateComposerAccess(isUnlocked: boolean): void {
+    if (isUnlocked) {
+      this.composerControl.enable({ emitEvent: false });
+      return;
+    }
+    this.composerControl.disable({ emitEvent: false });
+    this.composerControl.setValue('', { emitEvent: false });
+  }
+
+  private getTrimmedComposerValue(): string | null {
+    const value = this.composerControl.value.trim();
+    return value || null;
   }
 }

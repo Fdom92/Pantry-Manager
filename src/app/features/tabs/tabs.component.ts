@@ -17,8 +17,8 @@ import { environment } from 'src/environments/environment';
 export class TabsComponent {
   // DI
   readonly revenuecat = inject(RevenuecatService);
-  // Signals
+  // SIGNALS
   readonly isPro = toSignal(this.revenuecat.isPro$, { initialValue: false });
-  // Computed Signals
+  // COMPUTED
   readonly canUseAgent = computed(() => !environment.production || this.isPro());
 }

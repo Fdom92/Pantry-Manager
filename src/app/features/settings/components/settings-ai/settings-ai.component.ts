@@ -46,15 +46,17 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   styleUrls: ['./settings-ai.component.scss'],
 })
 export class SettingsAiComponent implements ViewWillEnter {
+  // DI
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly toastCtrl = inject(ToastController);
   private readonly translate = inject(TranslateService);
-
+  // SIGNALS
   readonly plannerMemory = signal('');
   readonly originalPlannerMemory = signal('');
   readonly isSaving = signal(false);
   readonly isLoading = signal(false);
   readonly plannerMemoryLimit = 2000;
+  // COMPUTED
   readonly hasChanges = computed(() => this.plannerMemory() !== this.originalPlannerMemory());
 
   async ionViewWillEnter(): Promise<void> {

@@ -13,10 +13,10 @@ type PouchResponse = PouchDB.Core.Response;
   providedIn: 'root',
 })
 export class StorageService<T extends BaseDoc> {
-  // Data
+  // DATA
   private db: PouchDB.Database<T>;
   private readonly LIST_CHUNK_SIZE = 250;
-  // Getter
+  // GETTERS
   protected get database(): PouchDB.Database<T> {
     return this.db;
   }

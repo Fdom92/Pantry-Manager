@@ -42,13 +42,13 @@ export class ShoppingComponent {
   private readonly modalCtrl = inject(ModalController);
   private readonly pantryService = inject(PantryService);
   private readonly toastCtrl = inject(ToastController);
-  // Data
+  // DATA
   readonly loading = this.pantryStore.loading;
-  // Signals
+  // SIGNALS
   readonly isSummaryExpanded = signal(true);
   readonly processingSuggestionIds = signal<Set<string>>(new Set());
   readonly isSharingListInProgress = signal(false);
-  // Computed Signals
+  // COMPUTED
   readonly shoppingAnalysis = computed<ShoppingStateWithItem>(() => {
     const analysis = this.buildShoppingAnalysis(this.pantryStore.items());
     return {

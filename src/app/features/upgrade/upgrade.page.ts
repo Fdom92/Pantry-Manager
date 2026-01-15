@@ -48,19 +48,15 @@ export class UpgradePage {
   private readonly toastCtrl = inject(ToastController);
   private readonly translate = inject(TranslateService);
   private readonly cdr = inject(ChangeDetectorRef);
-  // Data
+  // DATA
+  isLoadingPlans: boolean = false;
   planOptions: PlanViewModel[] = [];
-  isLoadingPlans = false;
   activePurchaseId: string | null = null;
+  readonly isPro$ = this.revenuecat.isPro$;
   private monthlyPriceValue: number | null = null;
   private annualPriceValue: number | null = null;
-  readonly isPro$ = this.revenuecat.isPro$;
-  readonly benefitKeys = ['upgrade.benefits.agent', 'upgrade.benefits.future'];
+  private readonly benefitKeys = ['upgrade.benefits.agent', 'upgrade.benefits.future'];
   private readonly availablePackages: PurchasesPackage[] = [];
-
-  async skipUpgradeFlow(): Promise<void> {
-    await this.navCtrl.navigateRoot('/dashboard');
-  }
 
   async ionViewWillEnter(): Promise<void> {
     if (this.revenuecat.isPro()) {
@@ -68,6 +64,10 @@ export class UpgradePage {
       return;
     }
     await this.loadAvailablePackages();
+  }
+
+  async skipUpgradeFlow(): Promise<void> {
+    await this.navCtrl.navigateRoot('/dashboard');
   }
 
   async restorePurchases(): Promise<void> {

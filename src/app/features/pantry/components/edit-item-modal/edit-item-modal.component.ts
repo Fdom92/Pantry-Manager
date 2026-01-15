@@ -5,11 +5,10 @@ import { DEFAULT_HOUSEHOLD_ID, TOAST_DURATION, UNASSIGNED_LOCATION_KEY, UNASSIGN
 import {
   buildUniqueSelectOptions,
   formatCategoryName as formatCategoryNameCatalog,
-  formatFriendlyName as formatFriendlyNameCatalog,
   formatSupermarketLabel,
   getPresetCategoryOptions,
   getPresetLocationOptions,
-  getPresetSupermarketOptions,
+  getPresetSupermarketOptions
 } from '@core/domain/pantry-catalog';
 import { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
@@ -87,11 +86,12 @@ export class PantryEditItemModalComponent {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly listState = inject(PantryStateService);
-
-  readonly isOpen = signal(false);
-  editingItem: PantryItem | null = null;
+  // DATA
   isSaving = false;
-
+  editingItem: PantryItem | null = null;
+  // SIGNALS
+  readonly isOpen = signal(false);
+  // FORM
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     categoryId: this.fb.control<string | null>(null),
@@ -110,7 +110,7 @@ export class PantryEditItemModalComponent {
       })
     ])
   });
-
+  // GETTERSS
   get locationsArray(): FormArray<FormGroup> {
     return this.form.get('locations') as FormArray<FormGroup>;
   }
@@ -316,7 +316,6 @@ export class PantryEditItemModalComponent {
     }
   }
 
-  // ---- internals ----
   private resetLocationControls(locations: Array<Partial<ItemLocationStock>>): void {
     while (this.locationsArray.length) {
       this.locationsArray.removeAt(0);

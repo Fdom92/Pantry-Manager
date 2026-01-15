@@ -9,7 +9,7 @@ import { firstValueFrom } from 'rxjs';
 export class LanguageService {
   // DI
   private readonly translate = inject(TranslateService);
-  // Signals
+  // SIGNALS
   private readonly currentLanguage = signal<SupportedLanguage>(DEFAULT_LANGUAGE);
 
   async init(): Promise<void> {

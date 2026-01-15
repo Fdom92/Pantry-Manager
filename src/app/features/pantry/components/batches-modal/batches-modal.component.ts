@@ -47,6 +47,7 @@ import { PantryStateService } from '../../pantry.state.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PantryBatchesModalComponent {
+  // DI
   readonly state = inject(PantryStateService);
 }
 

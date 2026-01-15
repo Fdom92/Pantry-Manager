@@ -73,8 +73,7 @@ export class UpToDatePage {
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
   private readonly appPreferencesService = inject(AppPreferencesService);
-
-  // Signals
+  // SIGNALS
   readonly isLoading = signal(false);
   readonly hasLoaded = signal(false);
   readonly busyIds = signal<Set<string>>(new Set());
@@ -87,12 +86,19 @@ export class UpToDatePage {
   readonly editLocation = signal('');
   readonly editHasExpiry = signal(false);
   readonly editExpiryDate = signal('');
-
-  // Data
+  // DATA
   readonly pantryItems = this.pantryStore.items;
-
-  // Computed
+  private doneRedirectTimeout: ReturnType<typeof setTimeout> | null = null;
+  // COMPUTED
   readonly pending = computed(() => this.insightService.getPendingReviewProducts(this.pantryItems()));
+  readonly pendingCount = computed(() => this.queue().length);
+  readonly processedCount = computed(() => this.processedIds().size);
+  readonly totalSteps = computed(() => this.processedCount() + this.pendingCount());
+  readonly isDone = computed(() => this.hasLoaded() && this.pendingCount() === 0);
+  readonly locationOptions = computed(() => this.appPreferencesService.preferences().locationOptions ?? []);
+  readonly categoryOptions = computed(() => this.appPreferencesService.preferences().categoryOptions ?? []);
+  readonly currentItem = computed(() => this.getPantryItem(this.currentEntry()?.id ?? null));
+  readonly editTargetItem = computed(() => this.getPantryItem(this.editTargetId()));
   readonly queue = computed(() => {
     const processed = this.processedIds();
     return this.pending().filter(entry => {
@@ -100,16 +106,12 @@ export class UpToDatePage {
       return id && !processed.has(id);
     });
   });
-  readonly pendingCount = computed(() => this.queue().length);
-  readonly processedCount = computed(() => this.processedIds().size);
-  readonly totalSteps = computed(() => this.processedCount() + this.pendingCount());
   readonly currentStep = computed(() => {
     if (this.pendingCount() <= 0) {
       return this.totalSteps();
     }
     return Math.min(this.processedCount() + 1, this.totalSteps());
   });
-  readonly isDone = computed(() => this.hasLoaded() && this.pendingCount() === 0);
   readonly pantryItemsById = computed(() => {
     const map = new Map<string, PantryItem>();
     for (const item of this.pantryItems()) {
@@ -119,8 +121,6 @@ export class UpToDatePage {
     }
     return map;
   });
-  readonly locationOptions = computed(() => this.appPreferencesService.preferences().locationOptions ?? []);
-  readonly categoryOptions = computed(() => this.appPreferencesService.preferences().categoryOptions ?? []);
   readonly currentEntry = computed(() => {
     const entries = this.queue();
     const current = this.normalizeId(this.currentId());
@@ -135,7 +135,6 @@ export class UpToDatePage {
     }
     return entries[0] ?? null;
   });
-  readonly currentItem = computed(() => this.getPantryItem(this.currentEntry()?.id ?? null));
   readonly isEditingCurrent = computed(() => {
     if (!this.isEditModalOpen()) {
       return false;
@@ -151,7 +150,6 @@ export class UpToDatePage {
     }
     return this.queue().find(entry => this.normalizeId(entry.id) === targetId) ?? null;
   });
-  readonly editTargetItem = computed(() => this.getPantryItem(this.editTargetId()));
   readonly editNeedsCategory = computed(() => {
     const item = this.editTargetItem();
     return Boolean(item) && !Boolean((item?.categoryId ?? '').trim());
@@ -194,8 +192,6 @@ export class UpToDatePage {
     }
     return true;
   });
-
-  private doneRedirectTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     effect(() => {
@@ -382,22 +378,6 @@ export class UpToDatePage {
     this.closeEditModalInternal(false);
   }
 
-  private closeEditModalInternal(force: boolean): void {
-    if (!force && this.isSavingEdit()) {
-      return;
-    }
-    this.isEditModalOpen.set(false);
-    this.resetEditState();
-  }
-
-  private resetEditState(): void {
-    this.editTargetId.set(null);
-    this.editCategory.set('');
-    this.editLocation.set('');
-    this.editHasExpiry.set(false);
-    this.editExpiryDate.set('');
-  }
-
   async saveEditModal(): Promise<void> {
     const entry = this.editTargetEntry();
     const item = this.editTargetItem();
@@ -432,6 +412,22 @@ export class UpToDatePage {
     } finally {
       this.isSavingEdit.set(false);
     }
+  }
+
+  private closeEditModalInternal(force: boolean): void {
+    if (!force && this.isSavingEdit()) {
+      return;
+    }
+    this.isEditModalOpen.set(false);
+    this.resetEditState();
+  }
+
+  private resetEditState(): void {
+    this.editTargetId.set(null);
+    this.editCategory.set('');
+    this.editLocation.set('');
+    this.editHasExpiry.set(false);
+    this.editExpiryDate.set('');
   }
 
   private markBusy(id: string, busy: boolean): void {

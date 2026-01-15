@@ -29,7 +29,7 @@ import { StorageService } from '../shared/storage.service';
   providedIn: 'root'
 })
 export class PantryService extends StorageService<PantryItem> {
-  // Data
+  // DATA
   private readonly TYPE = 'item';
   private currentLoadPromise: Promise<void> | null = null;
   private dbPreloaded = false;
@@ -37,7 +37,7 @@ export class PantryService extends StorageService<PantryItem> {
   private pendingPipelineReset = false;
   private backgroundLoadPromise: Promise<void> | null = null;
   private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
-  // Signals
+  // SIGNALS
   readonly loadedProducts = signal<PantryItem[]>([]);
   readonly filteredProducts = signal<PantryItem[]>([]);
   readonly searchQuery = signal('');

@@ -77,23 +77,23 @@ export class DashboardComponent {
   private readonly insightService = inject(InsightService);
   private readonly conversationStore = inject(AgentConversationStore);
   private readonly navCtrl = inject(NavController);
-  // Data
+  // DATA
   private hasCompletedInitialLoad = false;
   readonly pantryItems = this.pantryStore.items;
   readonly lowStockItems = this.pantryStore.lowStockItems;
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
   readonly expiredItems = this.pantryStore.expiredItems;
   readonly inventorySummary = this.pantryStore.summary;
-  // Signals
+  // SIGNALS
   readonly isSnapshotCardExpanded = signal(true);
   readonly lastRefreshTimestamp = signal<string | null>(null);
   readonly isDeletingExpiredItems = signal(false);
   readonly visibleInsights = signal<Insight[]>([]);
-  // Computed Signals
+  // COMPUTED
   readonly totalItems = computed(() => this.inventorySummary().total);
   readonly recentlyUpdatedItems = computed(() => this.getRecentItemsByUpdatedAt(this.pantryItems()));
   readonly hasExpiredItems = computed(() => this.expiredItems().length > 0);
-  // Getter
+  // GETTERS
   get nearExpiryWindow(): number {
     return NEAR_EXPIRY_WINDOW_DAYS;
   }
@@ -157,43 +157,6 @@ export class DashboardComponent {
     await this.navCtrl.navigateForward('/agent');
   }
 
-  private refreshDashboardInsights(
-    items: PantryItem[],
-    expiringSoon: PantryItem[],
-    expiredItems: PantryItem[],
-    lowStockItems: PantryItem[],
-  ): void {
-    if (!items?.length) {
-      this.visibleInsights.set([]);
-      return;
-    }
-
-    const pendingReviewProducts = this.insightService.getPendingReviewProducts(items);
-
-    const context: InsightContext = {
-      expiringSoonItems: expiringSoon.map(item => ({
-        id: item._id,
-        isLowStock: this.pantryStore.isItemLowStock(item),
-        quantity: this.pantryStore.getItemTotalQuantity(item),
-      })),
-      expiredItems: expiredItems.map(item => ({
-        id: item._id,
-        quantity: this.pantryStore.getItemTotalQuantity(item),
-      })),
-      expiringSoonCount: expiringSoon.length,
-      lowStockCount: lowStockItems.length,
-      products: items.map(item => ({
-        id: item._id,
-        name: item.name,
-        categoryId: item.categoryId,
-      })),
-      pendingReviewProducts,
-    };
-
-    const generated = this.insightService.buildDashboardInsights(context);
-    this.visibleInsights.set(this.insightService.getVisibleInsights(generated));
-  }
-
   /** Toggle the visibility of the snapshot card without altering other state. */
   toggleSnapshotCard(): void {
     this.isSnapshotCardExpanded.update(open => !open);
@@ -217,20 +180,6 @@ export class DashboardComponent {
     } finally {
       this.isDeletingExpiredItems.set(false);
     }
-  }
-
-  /** Return the latest five updated items so the dashboard highlights recent activity. */
-  private getRecentItemsByUpdatedAt(items: PantryItem[]): PantryItem[] {
-    return [...items]
-      .sort((a, b) => this.compareDates(b.updatedAt, a.updatedAt))
-      .slice(0, 5);
-  }
-
-  /** Compare ISO dates and gracefully fallback when timestamps are missing. */
-  private compareDates(a?: string, b?: string): number {
-    const aTime = a ? new Date(a).getTime() : Number.POSITIVE_INFINITY;
-    const bTime = b ? new Date(b).getTime() : Number.POSITIVE_INFINITY;
-    return aTime - bTime;
   }
 
   /** Total quantity across all locations for dashboard chips. */
@@ -333,4 +282,54 @@ export class DashboardComponent {
     return window.confirm(this.translate.instant('dashboard.confirmDeleteExpired'));
   }
 
+  /** Return the latest five updated items so the dashboard highlights recent activity. */
+  private getRecentItemsByUpdatedAt(items: PantryItem[]): PantryItem[] {
+    return [...items]
+      .sort((a, b) => this.compareDates(b.updatedAt, a.updatedAt))
+      .slice(0, 5);
+  }
+
+  /** Compare ISO dates and gracefully fallback when timestamps are missing. */
+  private compareDates(a?: string, b?: string): number {
+    const aTime = a ? new Date(a).getTime() : Number.POSITIVE_INFINITY;
+    const bTime = b ? new Date(b).getTime() : Number.POSITIVE_INFINITY;
+    return aTime - bTime;
+  }
+
+    private refreshDashboardInsights(
+    items: PantryItem[],
+    expiringSoon: PantryItem[],
+    expiredItems: PantryItem[],
+    lowStockItems: PantryItem[],
+  ): void {
+    if (!items?.length) {
+      this.visibleInsights.set([]);
+      return;
+    }
+
+    const pendingReviewProducts = this.insightService.getPendingReviewProducts(items);
+
+    const context: InsightContext = {
+      expiringSoonItems: expiringSoon.map(item => ({
+        id: item._id,
+        isLowStock: this.pantryStore.isItemLowStock(item),
+        quantity: this.pantryStore.getItemTotalQuantity(item),
+      })),
+      expiredItems: expiredItems.map(item => ({
+        id: item._id,
+        quantity: this.pantryStore.getItemTotalQuantity(item),
+      })),
+      expiringSoonCount: expiringSoon.length,
+      lowStockCount: lowStockItems.length,
+      products: items.map(item => ({
+        id: item._id,
+        name: item.name,
+        categoryId: item.categoryId,
+      })),
+      pendingReviewProducts,
+    };
+
+    const generated = this.insightService.buildDashboardInsights(context);
+    this.visibleInsights.set(this.insightService.getVisibleInsights(generated));
+  }
 }

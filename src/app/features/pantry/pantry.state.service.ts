@@ -60,14 +60,14 @@ export class PantryStateService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
 
-  // Data
+  // DATA
   readonly MeasurementUnit = MeasurementUnit;
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly stockSaveDelay = 500;
 
-  // Signals / view state
+  // SIGNALS / view state
   readonly loading = this.pantryService.loading;
   readonly hasCompletedInitialLoad = signal(false);
   readonly showFilters = signal(false);

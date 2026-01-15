@@ -55,7 +55,7 @@ export class SettingsCatalogsComponent {
   private readonly toastCtrl = inject(ToastController);
   private readonly appPreferencesService = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
-  // Signals
+  // SIGNALS
   readonly loading = signal(false);
   readonly savingCatalogs = signal(false);
   readonly locationOptionsDraft = signal<string[]>([]);
@@ -64,7 +64,7 @@ export class SettingsCatalogsComponent {
   readonly originalCategoryOptions = signal<string[]>([]);
   readonly supermarketOptionsDraft = signal<string[]>([]);
   readonly originalSupermarketOptions = signal<string[]>([]);
-  // Computed Signals
+  // COMPUTED
   readonly hasLocationChanges = computed(() => {
     const draft = this.normalizeLocationOptions(this.locationOptionsDraft(), false);
     const original = this.originalLocationOptions();
