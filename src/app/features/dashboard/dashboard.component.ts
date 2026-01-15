@@ -23,7 +23,7 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
-import { DashboardFacade } from './dashboard.facade';
+import { DashboardFacade } from './facade/dashboard.facade';
 
 @Component({
   selector: 'app-dashboard',

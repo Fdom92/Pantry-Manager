@@ -11,7 +11,7 @@ import {
 import { OnboardingStateService } from '@core/services/onboarding';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { OnboardingFacade } from './onboarding.facade';
+import { OnboardingFacade } from './facade/onboarding.facade';
 
 @Component({
   selector: 'app-onboarding',

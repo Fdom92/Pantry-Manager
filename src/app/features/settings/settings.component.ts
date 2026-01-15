@@ -23,7 +23,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { ProBannerComponent } from '@shared/components/pro-banner/pro-banner.component';
-import { SettingsFacade } from './settings.facade';
+import { SettingsFacade } from './facade/settings.facade';
 
 @Component({
   selector: 'app-settings',

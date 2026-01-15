@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SettingsStateService } from '@core/services/settings';
-import packageJson from '../../../../package.json';
+import packageJson from '../../../../../package.json';
 
 @Injectable()
 export class SettingsFacade {

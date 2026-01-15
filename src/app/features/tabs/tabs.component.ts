@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { TabsStateService } from '@core/services/tabs';
 import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { TabsFacade } from './tabs.facade';
+import { TabsFacade } from './facade/tabs.facade';
 
 @Component({
   selector: 'app-tabs',

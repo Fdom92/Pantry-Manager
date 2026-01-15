@@ -26,7 +26,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-import { UpToDateFacade } from './up-to-date.facade';
+import { UpToDateFacade } from './facade/up-to-date.facade';
 
 @Component({
   selector: 'app-up-to-date',

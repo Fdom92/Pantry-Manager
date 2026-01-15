@@ -5,7 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { AddPurchaseModalComponent } from './components/add-purchase-modal/add-purchase-modal.component';
-import { ShoppingFacade } from './shopping.facade';
+import { ShoppingFacade } from './facade/shopping.facade';
 
 @Component({
   selector: 'app-shopping',

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { normalizeLocationId } from '@core/utils/normalization.util';
 import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
-import { ShoppingFacade } from '../../shopping.facade';
+import { ShoppingFacade } from '../../facade/shopping.facade';
 
 @Component({
   selector: 'app-add-purchase-modal',
