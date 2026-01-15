@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PantryItem } from '@core/models/pantry';
-import { ShoppingItem } from '@core/models/shopping';
 import { normalizeLocationId } from '@core/utils/normalization.util';
-import { IonicModule, ModalController } from '@ionic/angular';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { IonicModule } from '@ionic/angular';
+import { TranslateModule } from '@ngx-translate/core';
+import { ShoppingFacade } from '../../shopping.facade';
 
 @Component({
   selector: 'app-add-purchase-modal',
@@ -19,51 +18,66 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   templateUrl: './add-purchase-modal.component.html',
   styleUrls: ['./add-purchase-modal.component.scss'],
 })
-export class AddPurchaseModalComponent implements OnInit {
-  @Input() item: ShoppingItem | null = null;
-  @Input() product: PantryItem | null = null;
-  @Output() confirm = new EventEmitter<{
-    quantity: number;
-    expiryDate?: string | null;
-    location: string;
-  }>();
-  // DI
-  private readonly modalCtrl = inject(ModalController);
-  private readonly translate = inject(TranslateService);
-  // DATA
+export class AddPurchaseModalComponent {
+  // DI (feature-scoped)
+  readonly state = inject(ShoppingFacade);
+  // DATA (local form state)
   quantity = 1;
   expiryDate: string | null = null;
   location = 'unassigned';
+  private locationOptionCache: string[] = [];
   // GETTERS
   get locationOptions(): string[] {
-    const options = new Set<string>();
-    const fromItem = normalizeLocationId(this.item?.locationId);
-    if (fromItem) {
-      options.add(fromItem);
-    }
-    if (Array.isArray(this.product?.locations)) {
-      this.product.locations.forEach(loc => {
-        const id = normalizeLocationId(loc.locationId);
-        if (id) {
-          options.add(id);
-        }
-      });
-    }
-    if (!options.size) {
-      options.add('pantry');
-    }
-    return Array.from(options);
+    return this.locationOptionCache;
   }
   get canConfirm(): boolean {
     return this.quantity > 0 && Boolean(this.location);
   }
 
-  ngOnInit(): void {
-    this.initializeDefaults();
+  constructor() {
+    effect(() => {
+      const suggestion = this.state.purchaseTarget();
+      if (!suggestion) {
+        this.locationOptionCache = [];
+        this.quantity = 1;
+        this.expiryDate = null;
+        this.location = 'unassigned';
+        return;
+      }
+
+      const product = suggestion.item;
+      const options = new Set<string>();
+      const fromSuggestion = normalizeLocationId(suggestion.locationId);
+      if (fromSuggestion) {
+        options.add(fromSuggestion);
+      }
+      if (Array.isArray(product?.locations)) {
+        product.locations.forEach(loc => {
+          const id = normalizeLocationId(loc.locationId);
+          if (id) {
+            options.add(id);
+          }
+        });
+      }
+      if (!options.size) {
+        options.add('pantry');
+      }
+      this.locationOptionCache = Array.from(options);
+
+      const suggestedQuantity = Number(suggestion.suggestedQuantity ?? 0) || Number(product?.minThreshold ?? 0);
+      this.quantity = suggestedQuantity > 0 ? suggestedQuantity : 1;
+
+      const defaultLocation =
+        normalizeLocationId(suggestion.locationId) ||
+        (Array.isArray(product?.locations) ? normalizeLocationId(product.locations[0]?.locationId) : '') ||
+        'pantry';
+      this.location = defaultLocation || 'pantry';
+      this.expiryDate = null;
+    });
   }
 
   getLocationLabel(id: string): string {
-    return normalizeLocationId(id, this.translate.instant('locations.pantry'));
+    return this.state.getLocationLabel(id);
   }
 
   onQuantityInput(event: CustomEvent): void {
@@ -73,10 +87,10 @@ export class AddPurchaseModalComponent implements OnInit {
   }
 
   cancel(): void {
-    this.modalCtrl.dismiss();
+    this.state.closePurchaseModal();
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (!this.canConfirm) {
       return;
     }
@@ -85,19 +99,6 @@ export class AddPurchaseModalComponent implements OnInit {
       expiryDate: this.expiryDate || null,
       location: this.location,
     };
-    this.confirm.emit(payload);
-    this.modalCtrl.dismiss(payload);
-  }
-
-  private initializeDefaults(): void {
-    const suggestedQuantity =
-      Number(this.item?.suggestedQuantity ?? this.item?.quantity) || Number(this.product?.minThreshold ?? 0);
-    this.quantity = suggestedQuantity > 0 ? suggestedQuantity : 1;
-
-    const defaultLocation =
-      normalizeLocationId(this.item?.locationId) ||
-      (Array.isArray(this.product?.locations) ? normalizeLocationId(this.product.locations[0]?.locationId) : '') ||
-      'pantry';
-    this.location = defaultLocation || 'pantry';
+    await this.state.confirmPurchaseForTarget(payload);
   }
 }

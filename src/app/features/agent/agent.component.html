@@ -1,5 +1,5 @@
-@let canUseAgent = (canUseAgent$ | async);
-@let showQuickStart = shouldShowQuickStart();
+@let canUseAgent = (facade.canUseAgent$ | async);
+@let showQuickStart = facade.shouldShowQuickStart();
 
 <ion-header>
   <ion-toolbar>
@@ -13,7 +13,7 @@
     </ion-title>
     @if (canUseAgent) {
       <ion-buttons slot="end">
-        <ion-button fill="clear" color="text-color" (click)="resetConversation()" [disabled]="isAgentProcessing()" aria-label="{{ 'common.actions.clear' | translate }}">
+        <ion-button fill="clear" color="text-color" (click)="facade.resetConversation()" [disabled]="facade.isAgentProcessing()" aria-label="{{ 'common.actions.clear' | translate }}">
           <ion-icon name="trash-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
@@ -31,7 +31,7 @@
       </div>
     }
     <div class="chat">
-      @for (message of conversationMessages(); track trackById($index, message)) {
+      @for (message of facade.conversationMessages(); track facade.trackById($index, message)) {
         <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-error]="message.status === 'error'">
           <div class="message__bubble">
             <div class="message__content">
@@ -54,9 +54,9 @@
                 }
               </div>
             }
-            @if (message.status === 'error' && canRetryLastMessage()) {
+            @if (message.status === 'error' && facade.canRetryLastMessage()) {
               <div class="message__actions">
-                <ion-button fill="clear" color="primary" size="small" (click)="retryLastAttempt()" [disabled]="isAgentProcessing()">
+                <ion-button fill="clear" color="primary" size="small" (click)="facade.retryLastAttempt()" [disabled]="facade.isAgentProcessing()">
                   {{ 'agent.actions.retry' | translate }}
                 </ion-button>
               </div>
@@ -65,11 +65,11 @@
         </div>
       }
 
-      @if (agentExecutionPhase() !== 'idle') {
+      @if (facade.agentExecutionPhase() !== 'idle') {
         <div class="message from-agent">
           <div class="message__bubble thinking">
             <ion-spinner name="dots"></ion-spinner>
-            <span>{{ ('agent.states.' + agentExecutionPhase()) | translate }}</span>
+            <span>{{ ('agent.states.' + facade.agentExecutionPhase()) | translate }}</span>
           </div>
         </div>
       }
@@ -91,7 +91,7 @@
           <div class="planning-preview__chips">
             <p class="eyebrow">{{ 'agent.preview.demo.chipsTitle' | translate }}</p>
             <div class="planning-preview__chip-row">
-              @for (prompt of quickPrompts; track prompt.id) {
+              @for (prompt of facade.quickPrompts; track prompt.id) {
                 @if ($index < 3) {
                   <ion-chip disabled>{{ prompt.labelKey | translate }}</ion-chip>
                 }
@@ -129,8 +129,8 @@
         <p class="muted">{{ 'agent.quickStart.ctaSubtitle' | translate }}</p>
       </div>
       <div class="quick-start__chips">
-        @for (prompt of quickPrompts; track prompt.id) {
-          <ion-chip (click)="triggerQuickPrompt(prompt)" [disabled]="isAgentProcessing()">
+        @for (prompt of facade.quickPrompts; track prompt.id) {
+          <ion-chip (click)="facade.triggerQuickPrompt(prompt)" [disabled]="facade.isAgentProcessing()">
             {{ prompt.labelKey | translate }}
           </ion-chip>
         }
@@ -143,18 +143,18 @@
         class="composer__input"
         [placeholder]="'agent.placeholder' | translate"
         autoGrow="true"
-        [formControl]="composerControl"
+        [formControl]="facade.composerControl"
         enterkeyhint="send">
       </ion-textarea>
       <div class="composer__actions">
-        <ion-button color="primary" (click)="sendMessage()" [disabled]="!composerControl.value.trim() || isAgentProcessing()">
+        <ion-button color="primary" (click)="facade.sendMessage()" [disabled]="!facade.composerControl.value.trim() || facade.isAgentProcessing()">
           {{ 'agent.actions.send' | translate }}
         </ion-button>
       </div>
     </div>
   } @else {
     <div class="composer composer--preview-cta">
-      <ion-button expand="block" color="primary" size="large" (click)="navigateToUpgrade()">
+      <ion-button expand="block" color="primary" size="large" (click)="facade.navigateToUpgrade()">
         {{ 'agent.preview.cta' | translate }}
       </ion-button>
     </div>

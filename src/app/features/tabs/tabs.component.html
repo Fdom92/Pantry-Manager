@@ -13,9 +13,9 @@
     <ion-tab-button
       tab="agent"
       [routerLink]="['/agent']"
-      [class.locked]="!canUseAgent()">
+      [class.locked]="!facade.canUseAgent()">
       <ion-icon name="restaurant-outline"></ion-icon>
-      @if (!canUseAgent()) {
+      @if (!facade.canUseAgent()) {
         <div class="tab-pro-pill">PRO</div>
       } @else {
         <ion-label>{{ 'agent.title' | translate }}</ion-label>

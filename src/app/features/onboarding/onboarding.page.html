@@ -13,7 +13,7 @@
     #swiperRef
     class="onboarding-swiper"
     (slidechange)="handleSlideChanged()">
-    <swiper-slide *ngFor="let slide of availableSlides(); index as idx">
+    <swiper-slide *ngFor="let slide of facade.availableSlides(); index as idx">
       <div class="slide-card" [class.is-pro]="slide.pro">
         @if (slide.badgeKey) {
         <div class="pill">
@@ -40,7 +40,7 @@
       (click)="skipOnboarding()">
       {{ 'onboarding.actions.skip' | translate }}
     </ion-button>
-    @if (!isLastSlide()) {
+    @if (!facade.isLastSlide()) {
       <ion-button
         color="primary"
         shape="round"

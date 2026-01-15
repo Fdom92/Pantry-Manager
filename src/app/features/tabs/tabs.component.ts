@@ -1,24 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { RevenuecatService } from '@core/services/upgrade';
+import { TabsStateService } from '@core/services/tabs';
 import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { environment } from 'src/environments/environment';
+import { TabsFacade } from './tabs.facade';
 
 @Component({
   selector: 'app-tabs',
   standalone: true,
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, RouterModule, CommonModule, TranslateModule],
+  providers: [TabsStateService, TabsFacade],
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss'],
 })
 export class TabsComponent {
-  // DI
-  readonly revenuecat = inject(RevenuecatService);
-  // SIGNALS
-  readonly isPro = toSignal(this.revenuecat.isPro$, { initialValue: false });
-  // COMPUTED
-  readonly canUseAgent = computed(() => !environment.production || this.isPro());
+  readonly facade = inject(TabsFacade);
 }

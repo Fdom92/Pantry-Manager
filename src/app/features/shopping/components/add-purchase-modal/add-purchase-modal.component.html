@@ -1,67 +1,78 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>{{ 'shopping.purchaseModal.titleProduct' | translate }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" color="medium" (click)="cancel()">
-        <ion-icon slot="icon-only" name="close"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-modal [isOpen]="state.isPurchaseModalOpen()" (willDismiss)="cancel()">
+  <ng-template>
+    @let target = state.purchaseTarget();
+    @if (!target) {
+      <ion-content class="ion-padding">
+        <ion-spinner></ion-spinner>
+      </ion-content>
+    } @else {
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ 'shopping.purchaseModal.titleProduct' | translate }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" color="medium" (click)="cancel()">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-list lines="full">
-    <ion-item>
-      <ion-label position="stacked">{{ 'shopping.purchaseModal.productName' | translate }}</ion-label>
-      <ion-input [value]="product?.name" disabled="true"></ion-input>
-    </ion-item>
+      <ion-content class="ion-padding">
+        <ion-list lines="full">
+          <ion-item>
+            <ion-label position="stacked">{{ 'shopping.purchaseModal.productName' | translate }}</ion-label>
+            <ion-input [value]="target.item.name" disabled="true"></ion-input>
+          </ion-item>
 
-    <ion-item>
-      <ion-label position="stacked">{{ 'shopping.purchaseModal.quantity' | translate }}</ion-label>
-      <ion-input
-        type="number"
-        inputmode="decimal"
-        [value]="quantity"
-        (ionInput)="onQuantityInput($event)"
-        min="0"
-        [placeholder]="'shopping.purchaseModal.quantityPlaceholder' | translate"
-      ></ion-input>
-    </ion-item>
+          <ion-item>
+            <ion-label position="stacked">{{ 'shopping.purchaseModal.quantity' | translate }}</ion-label>
+            <ion-input
+              type="number"
+              inputmode="decimal"
+              [value]="quantity"
+              (ionInput)="onQuantityInput($event)"
+              min="0"
+              [placeholder]="'shopping.purchaseModal.quantityPlaceholder' | translate"
+            ></ion-input>
+          </ion-item>
 
-    <ion-item>
-      <ion-input
-        type="date"
-        label="{{ 'shopping.purchaseModal.expiry' | translate }}"
-        labelPlacement="stacked"
-        [(ngModel)]="expiryDate"
-      ></ion-input>
-    </ion-item>
+          <ion-item>
+            <ion-input
+              type="date"
+              label="{{ 'shopping.purchaseModal.expiry' | translate }}"
+              labelPlacement="stacked"
+              [(ngModel)]="expiryDate"
+            ></ion-input>
+          </ion-item>
 
-    @if (locationOptions.length > 1) {
-      <ion-item>
-        <ion-label position="stacked">{{ 'pantry.form.location' | translate }}</ion-label>
-        <ion-select interface="popover" [(ngModel)]="location">
-          @for (loc of locationOptions; track loc) {
-            <ion-select-option [value]="loc">{{ getLocationLabel(loc) }}</ion-select-option>
+          @if (locationOptions.length > 1) {
+            <ion-item>
+              <ion-label position="stacked">{{ 'pantry.form.location' | translate }}</ion-label>
+              <ion-select interface="popover" [(ngModel)]="location">
+                @for (loc of locationOptions; track loc) {
+                  <ion-select-option [value]="loc">{{ getLocationLabel(loc) }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
           }
-        </ion-select>
-      </ion-item>
-    }
-  </ion-list>
-</ion-content>
+        </ion-list>
+      </ion-content>
 
-<ion-footer>
-  <ion-toolbar class="add-footer">
-    <ion-buttons>
-      <ion-button
-        class="add-footer__cta"
-        color="primary"
-        fill="solid"
-        expand="block"
-        [disabled]="!canConfirm"
-        (click)="submit()">
-        {{ 'shopping.purchaseModal.addToPantry' | translate }}
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-footer>
+      <ion-footer>
+        <ion-toolbar class="add-footer">
+          <ion-buttons>
+            <ion-button
+              class="add-footer__cta"
+              color="primary"
+              fill="solid"
+              expand="block"
+              [disabled]="!canConfirm || state.isSuggestionProcessing(target.item._id)"
+              (click)="submit()">
+              {{ 'shopping.purchaseModal.addToPantry' | translate }}
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-footer>
+    }
+  </ng-template>
+</ion-modal>
