@@ -1,6 +1,6 @@
 import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS } from '@core/constants';
-import { PantryItem } from '@core/models/inventory';
-import { AppPreferences } from '@core/models/user';
+import { AppPreferences } from '@core/models';
+import { PantryItem } from '@core/models/pantry';
 import { normalizeKey, normalizeStringList, normalizeSupermarketValue } from '@core/utils/normalization.util';
 
 export function getPresetCategoryOptions(preferences: Pick<AppPreferences, 'categoryOptions'>): string[] {

@@ -5,7 +5,7 @@ import {
   AppPreferencesDoc,
   AppThemePreference,
   DefaultUnitPreference,
-} from '@core/models/user';
+} from '@core/models';
 import { MeasurementUnit } from '@core/models/shared';
 import { normalizeStringList } from '@core/utils/normalization.util';
 import { StorageService } from './storage.service';

@@ -1,5 +1,6 @@
 import { PACKAGE_TYPE } from "@revenuecat/purchases-capacitor";
 
+// INTERFACES
 export interface PlanViewModel {
   id: string;
   type: PACKAGE_TYPE;

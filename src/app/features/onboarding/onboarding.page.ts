@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
+import { AGENT_SLIDE_LOCKED, AGENT_SLIDE_UNLOCKED, CORE_SLIDES } from '@core/constants/onboarding';
 import { OnboardingSlide } from '@core/models/onboarding';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { NavController } from '@ionic/angular';
@@ -46,49 +47,13 @@ export class OnboardingPage implements AfterViewInit {
       next: { translate: ['16%', 0, 0], scale: 0.95, opacity: 1 },
     },
   };
-  private readonly onboardingCoreSlides: OnboardingSlide[] = [
-    {
-      key: 'organize',
-      titleKey: 'onboarding.slides.organize.title',
-      descriptionKey: 'onboarding.slides.organize.description',
-      icon: 'sparkles-outline',
-    },
-    {
-      key: 'batches',
-      titleKey: 'onboarding.slides.batches.title',
-      descriptionKey: 'onboarding.slides.batches.description',
-      icon: 'layers-outline',
-    },
-    {
-      key: 'suggestions',
-      titleKey: 'onboarding.slides.suggestions.title',
-      descriptionKey: 'onboarding.slides.suggestions.description',
-      icon: 'bulb-outline',
-    },
-  ];
-  private readonly agentSlideLocked: OnboardingSlide = {
-    key: 'agent',
-    titleKey: 'onboarding.slides.agent.title',
-    descriptionKey: 'onboarding.slides.agent.description',
-    icon: 'chatbubbles-outline',
-    badgeKey: 'onboarding.slides.agent.badge',
-    pro: true,
-  };
-  private readonly agentSlideUnlocked: OnboardingSlide = {
-    key: 'agent',
-    titleKey: 'onboarding.slides.agent.titlePro',
-    descriptionKey: 'onboarding.slides.agent.descriptionPro',
-    icon: 'chatbubbles-outline',
-    badgeKey: 'onboarding.slides.agent.badgePro',
-    pro: true,
-  };
   // Signals
   readonly currentSlideIndex = signal(0);
   readonly isProUser = toSignal(this.revenuecat.isPro$, { initialValue: false });
   // Computed Signals
   readonly availableSlides = computed<OnboardingSlide[]>(() => {
-    const agentSlide = this.isProUser() ? this.agentSlideUnlocked : this.agentSlideLocked;
-    return [...this.onboardingCoreSlides, agentSlide];
+    const agentSlide = this.isProUser() ? AGENT_SLIDE_UNLOCKED : AGENT_SLIDE_LOCKED;
+    return [...CORE_SLIDES, agentSlide];
   });
 
   constructor() {

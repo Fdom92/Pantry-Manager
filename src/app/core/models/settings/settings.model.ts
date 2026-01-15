@@ -1,8 +1,9 @@
 import { BaseDoc } from "../shared";
 
+// TYPES
 export type AppThemePreference = 'light' | 'dark' | 'system';
 export type DefaultUnitPreference = 'kg' | 'g' | 'l' | 'unit';
-
+// INTERFACES
 export interface AppPreferences {
   theme: AppThemePreference;
   defaultUnit: DefaultUnitPreference;
@@ -18,5 +19,4 @@ export interface AppPreferences {
   unitOptions: string[];
   plannerMemory?: string;
 }
-
 export interface AppPreferencesDoc extends BaseDoc, AppPreferences {}

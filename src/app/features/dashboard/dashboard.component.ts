@@ -4,18 +4,19 @@ import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import {
   ES_DATE_FORMAT_OPTIONS,
   Insight,
-  InsightCta,
   InsightContext,
+  InsightCta,
   ItemLocationStock,
   PantryItem,
 } from '@core/models';
-import { AgentConversationStore, InsightService, LanguageService } from '@core/services';
+import { AgentConversationStore, InsightService, LanguageService, PantryStoreService } from '@core/services';
 import {
   formatDateTimeValue,
   formatDateValue,
   formatQuantity,
   formatShortDate,
 } from '@core/utils/formatting.util';
+import { NavController } from '@ionic/angular';
 import {
   IonBadge,
   IonButton,
@@ -35,11 +36,9 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { NavController } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
-import { PantryStoreService } from '@core/services';
 
 @Component({
   selector: 'app-dashboard',

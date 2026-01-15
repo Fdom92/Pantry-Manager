@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { TOAST_DURATION } from '@core/constants';
 import { AppPreferencesService } from '@core/services';
+import { ToastController, ViewWillEnter } from '@ionic/angular';
 import {
   IonBackButton,
   IonButton,
@@ -18,7 +19,6 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { ToastController, ViewWillEnter } from '@ionic/angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({

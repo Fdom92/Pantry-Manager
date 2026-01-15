@@ -1,13 +1,6 @@
 import { effect, Injectable, signal } from '@angular/core';
 import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import {
-  computeEarliestExpiry as computeEarliestExpiryStock,
-  mergeBatchesByExpiry as mergeBatchesByExpiryStock,
-  normalizeBatches as normalizeBatchesStock,
-  sumQuantities as sumQuantitiesStock,
-  toNumberOrZero as toNumberOrZeroStock,
-} from '@core/domain/pantry-stock';
-import {
   collectBatches as collectBatchesItem,
   computeExpirationStatus as computeExpirationStatusItem,
   getItemEarliestExpiry as getItemEarliestExpiryItem,
@@ -20,7 +13,14 @@ import {
   isItemNearExpiry as isItemNearExpiryItem,
   shouldAutoAddToShoppingList as shouldAutoAddToShoppingListItem,
 } from '@core/domain/pantry-item';
-import { DEFAULT_PANTRY_FILTERS, ItemBatch, ItemLocationStock, LegacyLocationStock, PantryFilterState, PantryItem, PantrySortMode } from '@core/models/inventory';
+import {
+  computeEarliestExpiry as computeEarliestExpiryStock,
+  mergeBatchesByExpiry as mergeBatchesByExpiryStock,
+  normalizeBatches as normalizeBatchesStock,
+  sumQuantities as sumQuantitiesStock,
+  toNumberOrZero as toNumberOrZeroStock,
+} from '@core/domain/pantry-stock';
+import { DEFAULT_PANTRY_FILTERS, ItemBatch, ItemLocationStock, LegacyLocationStock, PantryFilterState, PantryItem, PantrySortMode } from '@core/models/pantry';
 import { ExpirationStatus, MeasurementUnit } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
 import { StorageService } from './storage.service';

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models/inventory';
-import { ItemBatch, ItemLocationStock } from '@core/models/inventory';
+import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models/pantry';
+import { ItemBatch, ItemLocationStock } from '@core/models/pantry';
 import { IonButton, IonCard, IonIcon, IonItem, IonLabel, IonList, IonPopover, IonText } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 

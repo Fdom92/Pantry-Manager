@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, OnDestroy, signal, ViewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { DEFAULT_HOUSEHOLD_ID, DEFAULT_LOCATION_OPTIONS } from '@core/constants';
+import { DEFAULT_HOUSEHOLD_ID, DEFAULT_LOCATION_OPTIONS, TOAST_DURATION, UNASSIGNED_LOCATION_KEY, UNASSIGNED_PRODUCT_NAME } from '@core/constants';
 import {
   computeEarliestExpiry as computeEarliestExpiryStock,
   sumQuantities as sumQuantitiesStock
@@ -15,7 +15,7 @@ import {
   PantryGroup,
   PantryItem,
   PantryItemCardViewModel
-} from '@core/models/inventory';
+} from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import {
   LanguageService,
@@ -115,12 +115,11 @@ export class PantryComponent implements OnDestroy {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   // Data
-  readonly moveError = this.state.moveError;
   fastAddModalOpen = false;
   isFastAdding = false;
   private realtimeSubscribed = false;
+  readonly moveError = this.state.moveError;
   readonly loading = this.state.loading;
-  readonly nearExpiryDays = this.state.nearExpiryDays;
   readonly MeasurementUnit = this.state.MeasurementUnit;
   readonly skeletonPlaceholders = this.state.skeletonPlaceholders;
   private readonly expandedItems = new Set<string>();
@@ -557,7 +556,7 @@ export class PantryComponent implements OnDestroy {
     const toast = await this.toastCtrl.create({
       message,
       color,
-      duration: 1600,
+      duration: TOAST_DURATION,
       position: 'bottom',
     });
     await toast.present();
@@ -592,7 +591,7 @@ export class PantryComponent implements OnDestroy {
   /** Build the simplified payload used by the Fast Add flow. */
   private buildFastAddItemPayload(name: string, quantity: number): PantryItem {
     const now = new Date().toISOString();
-    const normalizedName = name.trim() || 'Product';
+    const normalizedName = name.trim() || UNASSIGNED_PRODUCT_NAME;
     const sanitizedQuantity = this.normalizeFastAddQuantity(quantity);
     const roundedQuantity = roundQuantity(Math.max(1, sanitizedQuantity));
     const defaultLocation = this.getDefaultLocationId();
@@ -704,7 +703,7 @@ export class PantryComponent implements OnDestroy {
       return first;
     }
     const fallback = DEFAULT_LOCATION_OPTIONS[0];
-    return fallback ? fallback.trim() : 'unassigned';
+    return fallback ? fallback.trim() : UNASSIGNED_LOCATION_KEY;
   }
 
   private syncExpandedItems(source: PantryItem[] = this.pantryItemsState()): void {

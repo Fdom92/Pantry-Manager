@@ -1,4 +1,4 @@
-import { ItemBatch, ItemLocationStock } from '@core/models/inventory';
+import { ItemBatch, ItemLocationStock } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
 

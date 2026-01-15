@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { InsightPendingReviewProduct, PantryItem } from '@core/models';
+import { QuickEditPatch, UpToDateReason } from '@core/models/up-to-date';
 import { AppPreferencesService, InsightService, LanguageService, PantryStoreService } from '@core/services';
 import { formatDateValue, formatQuantity } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
@@ -29,18 +31,6 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-
-type UpToDateReason = 'stale-update' | 'missing-info';
-
-type QuickEditPatch = {
-  categoryId: string;
-  locationId: string;
-  expiryDateInput: string;
-  hasExpiry: boolean;
-  needsCategory: boolean;
-  needsLocation: boolean;
-  needsExpiry: boolean;
-};
 
 @Component({
   selector: 'app-up-to-date',
@@ -498,7 +488,7 @@ export class UpToDatePage {
 
   private isUnassignedLocationId(value?: string | null): boolean {
     const id = this.normalizeId(value).toLowerCase();
-    return !id || id === 'unassigned';
+    return !id || id === UNASSIGNED_LOCATION_KEY;
   }
 
   private hasRealLocation(item: PantryItem): boolean {
@@ -601,7 +591,7 @@ export class UpToDatePage {
       if (iso) {
         if (!nextLocations.length) {
           nextLocations.push({
-            locationId: 'unassigned',
+            locationId: UNASSIGNED_LOCATION_KEY,
             unit: String(this.pantryStore.getItemPrimaryUnit(item)),
             batches: [],
           });

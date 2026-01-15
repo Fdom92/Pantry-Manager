@@ -1,4 +1,4 @@
-import { BaseDoc } from '@core/models/base-doc.model';
+import { BaseDoc } from '@core/models';
 import PouchDB from 'pouchdb-browser';
 import PouchDBFind from 'pouchdb-find';
 

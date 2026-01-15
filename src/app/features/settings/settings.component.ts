@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
-import { TOAST_DURATION } from '@core/constants';
+import { BACKUP_FILENAME, EXPORT_PATH, IMPORT_EMPTY_ERROR, IMPORT_EMPTY_INVALID, TOAST_DURATION } from '@core/constants';
+import { AppThemePreference } from '@core/models';
 import { BaseDoc } from '@core/models/shared';
-import { AppThemePreference } from '@core/models/user';
 import { AppPreferencesService, StorageService } from '@core/services';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { NavController, ToastController } from '@ionic/angular';
@@ -175,9 +175,9 @@ export class SettingsComponent {
     } catch (err: any) {
       console.error('[SettingsComponent] onImportData error', err);
       const messageKey =
-        err?.message === 'IMPORT_EMPTY'
+        err?.message === IMPORT_EMPTY_ERROR
           ? 'settings.import.empty'
-          : err?.message === 'IMPORT_INVALID'
+          : err?.message === IMPORT_EMPTY_INVALID
             ? 'settings.import.invalid'
             : 'settings.import.error';
       await this.presentToast(this.translate.instant(messageKey), 'danger');
@@ -230,11 +230,11 @@ export class SettingsComponent {
     try {
       parsed = JSON.parse(raw);
     } catch {
-      throw new Error('IMPORT_INVALID');
+      throw new Error(IMPORT_EMPTY_INVALID);
     }
 
     if (!Array.isArray(parsed)) {
-      throw new Error('IMPORT_INVALID');
+      throw new Error(IMPORT_EMPTY_INVALID);
     }
 
     const now = new Date().toISOString();
@@ -261,7 +261,7 @@ export class SettingsComponent {
       });
 
     if (!docs.length) {
-      throw new Error('IMPORT_EMPTY');
+      throw new Error(IMPORT_EMPTY_ERROR);
     }
     return docs;
   }
@@ -287,7 +287,7 @@ export class SettingsComponent {
     const timestamp = new Date()
       .toISOString()
       .replace(/[:.]/g, '-');
-    return `pantry-manager-backup-${timestamp}.json`;
+    return `${BACKUP_FILENAME}-${timestamp}.json`;
   }
 
   private async tryShareFile(file: File): Promise<boolean> {
@@ -339,7 +339,7 @@ export class SettingsComponent {
         import('@capacitor/filesystem'),
         import('@capacitor/share'),
       ]);
-      const path = `PantryManagerExport/${filename}`;
+      const path = `${EXPORT_PATH}/${filename}`;
       await Filesystem.writeFile({
         path,
         data: json,

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ViewEncapsulation, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
+import { DEFAULT_HOUSEHOLD_ID, TOAST_DURATION, UNASSIGNED_LOCATION_KEY, UNASSIGNED_PRODUCT_NAME } from '@core/constants';
 import {
   buildUniqueSelectOptions,
   formatCategoryName as formatCategoryNameCatalog,
@@ -11,7 +11,7 @@ import {
   getPresetLocationOptions,
   getPresetSupermarketOptions,
 } from '@core/domain/pantry-catalog';
-import { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/inventory';
+import { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { AppPreferencesService, LanguageService, PantryStoreService } from '@core/services';
 import { createDocumentId } from '@core/utils';
@@ -329,7 +329,7 @@ export class PantryEditItemModalComponent {
   private createLocationGroup(initial?: Partial<ItemLocationStock>): FormGroup {
     const batches = Array.isArray(initial?.batches) ? initial.batches : [];
     const rawLocation = normalizeLocationId(initial?.locationId);
-    const locationId = rawLocation && rawLocation !== 'unassigned' ? rawLocation : '';
+    const locationId = rawLocation && rawLocation !== UNASSIGNED_LOCATION_KEY ? rawLocation : '';
     return this.fb.group({
       locationId: this.fb.control(locationId, {
         validators: [Validators.required],
@@ -447,7 +447,7 @@ export class PantryEditItemModalComponent {
   }
 
   private buildCreateSuccessMessage(item: PantryItem): string {
-    const name = item.name?.trim() || 'Producto';
+    const name = item.name?.trim() || UNASSIGNED_PRODUCT_NAME;
     const quantityText = this.formatQuantityForMessage(
       this.getTotalQuantity(item),
       this.getPrimaryUnit(item)
@@ -587,10 +587,6 @@ export class PantryEditItemModalComponent {
     return formatCategoryNameCatalog(key, this.translate.instant('pantry.form.uncategorized'));
   }
 
-  private formatFriendlyName(value: string, fallback: string): string {
-    return formatFriendlyNameCatalog(value, fallback);
-  }
-
   private toDateInputValue(dateIso: string): string {
     try {
       return new Date(dateIso).toISOString().slice(0, 10);
@@ -606,7 +602,7 @@ export class PantryEditItemModalComponent {
     const toast = await this.toastCtrl.create({
       message,
       color,
-      duration: 1600,
+      duration: TOAST_DURATION,
       position: 'bottom',
     });
     await toast.present();

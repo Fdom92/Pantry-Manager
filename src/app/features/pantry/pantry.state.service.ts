@@ -1,7 +1,7 @@
 import { Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { DEFAULT_LOCATION_OPTIONS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { DEFAULT_LOCATION_OPTIONS, NEAR_EXPIRY_WINDOW_DAYS, TOAST_DURATION } from '@core/constants';
 import {
   computeSupermarketSuggestions,
   formatCategoryName as formatCategoryNameCatalog,
@@ -13,11 +13,10 @@ import {
 import {
   classifyExpiry,
   computeEarliestExpiry,
-  mergeBatchesByExpiry,
   moveBatches,
   normalizeBatches,
   sumQuantities,
-  toNumberOrZero,
+  toNumberOrZero
 } from '@core/domain/pantry-stock';
 import {
   BatchCountsMeta,
@@ -36,7 +35,7 @@ import {
   PantryStatusFilterValue,
   PantrySummaryMeta,
   ProductStatusState,
-} from '@core/models/inventory';
+} from '@core/models/pantry';
 import { ES_DATE_FORMAT_OPTIONS, MeasurementUnit } from '@core/models/shared';
 import { AppPreferencesService, LanguageService, PantryStoreService } from '@core/services';
 import { PantryService } from '@core/services/pantry.service';
@@ -62,7 +61,6 @@ export class PantryStateService {
   private readonly languageService = inject(LanguageService);
 
   // Data
-  readonly nearExpiryDays = NEAR_EXPIRY_WINDOW_DAYS;
   readonly MeasurementUnit = MeasurementUnit;
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   private readonly pendingItems = new Map<string, PantryItem>();
@@ -415,7 +413,7 @@ export class PantryStateService {
   }
 
   getBatchStatus(batch: ItemBatch): BatchStatusMeta {
-    const state = classifyExpiry(batch.expirationDate, new Date(), this.nearExpiryDays);
+    const state = classifyExpiry(batch.expirationDate, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
     switch (state) {
       case 'expired':
         return {
@@ -854,7 +852,7 @@ export class PantryStateService {
     const toast = await this.toastCtrl.create({
       message,
       color,
-      duration: 1600,
+      duration: TOAST_DURATION,
       position: 'bottom',
     });
     await toast.present();

@@ -1,5 +1,5 @@
 import { Signal, computed, inject, Injectable, signal } from '@angular/core';
-import { PantryItem, PantrySummary } from '@core/models/inventory';
+import { PantryItem, PantrySummary } from '@core/models/pantry';
 import { MeasurementUnit, StockStatus } from '@core/models/shared';
 import { PantryService } from '@core/services/pantry.service';
 import { normalizeLocationId } from '@core/utils/normalization.util';

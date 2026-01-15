@@ -1,6 +1,8 @@
-import { AppPreferences } from '@core/models/user';
-import { MeasurementUnit } from '@core/models/shared';
+import { AppPreferences, MeasurementUnit } from "@core/models";
 
+export const TOAST_DURATION = 1800;
+export const UNASSIGNED_LOCATION_KEY = 'unassigned';
+export const UNASSIGNED_PRODUCT_NAME = 'Product';
 export const DEFAULT_LOCATION_OPTIONS = ['Despensa', 'Nevera', 'Cocina', 'Congelador'];
 
 export const DEFAULT_CATEGORY_OPTIONS = [

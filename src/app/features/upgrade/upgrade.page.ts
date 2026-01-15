@@ -18,6 +18,7 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { PlanCardComponent } from './components/plan-card/plan-card.component';
+import { TOAST_DURATION } from '@core/constants';
 
 @Component({
   selector: 'app-upgrade',
@@ -207,7 +208,7 @@ export class UpgradePage {
     const message = this.translate.instant(key);
     const toast = await this.toastCtrl.create({
       message,
-      duration: 2000,
+      duration: TOAST_DURATION,
       position: 'bottom',
     });
     await toast.present();

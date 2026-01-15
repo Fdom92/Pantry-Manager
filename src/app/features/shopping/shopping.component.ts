@@ -1,16 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { PantryItem } from '@core/models/inventory';
+import { EXPORT_PATH, TOAST_DURATION } from '@core/constants';
+import { SHOPPING_LIST_NAME, UNASSIGNED_LOCATION_KEY, UNASSIGNED_SUPERMARKET_KEY } from '@core/constants';
+import { PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import {
   ShoppingReason,
+  ShoppingReasonEnum,
   ShoppingStateWithItem,
   ShoppingSuggestionGroupWithItem,
   ShoppingSuggestionWithItem,
   ShoppingSummary
 } from '@core/models/shopping';
-import { LanguageService, PantryService } from '@core/services';
+import { LanguageService, PantryService, PantryStoreService } from '@core/services';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
@@ -18,7 +21,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import jsPDF from 'jspdf';
 import { AddPurchaseModalComponent } from './components/add-purchase-modal/add-purchase-modal.component';
-import { PantryStoreService } from '@core/services';
 
 @Component({
   selector: 'app-shopping',
@@ -42,7 +44,6 @@ export class ShoppingComponent {
   private readonly toastCtrl = inject(ToastController);
   // Data
   readonly loading = this.pantryStore.loading;
-  private readonly unassignedSupermarketKey = '__none__';
   // Signals
   readonly isSummaryExpanded = signal(true);
   readonly processingSuggestionIds = signal<Set<string>>(new Set());
@@ -95,11 +96,11 @@ export class ShoppingComponent {
 
   getBadgeColorByReason(reason: ShoppingReason): string {
     switch (reason) {
-      case 'basic-out':
-      case 'empty':
+      case ShoppingReasonEnum.BASIC_OUT:
+      case ShoppingReasonEnum.EMPTY:
         return 'danger';
-      case 'basic-low':
-      case 'below-min':
+      case ShoppingReasonEnum.BASIC_LOW:
+      case ShoppingReasonEnum.BELOW_MIN:
         return 'warning';
       default:
         return 'primary';
@@ -169,7 +170,7 @@ export class ShoppingComponent {
       const minThreshold = item.minThreshold != null ? Number(item.minThreshold) : null;
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       const primaryLocation = item.locations[0];
-      const locationId = primaryLocation?.locationId ?? 'unassigned';
+      const locationId = primaryLocation?.locationId ?? UNASSIGNED_LOCATION_KEY;
       const unit = normalizeUnitValue(primaryLocation?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
 
       const shouldAutoAdd = this.pantryService.shouldAutoAddToShoppingList(item, {
@@ -218,7 +219,7 @@ export class ShoppingComponent {
   ): ShoppingSuggestionGroupWithItem[] {
     const map = new Map<string, ShoppingSuggestionWithItem[]>();
     for (const suggestion of suggestions) {
-      const key = suggestion.supermarket?.toLowerCase() ?? this.unassignedSupermarketKey;
+      const key = suggestion.supermarket?.toLowerCase() ?? UNASSIGNED_SUPERMARKET_KEY;
       const list = map.get(key);
       if (list) {
         list.push(suggestion);
@@ -229,7 +230,7 @@ export class ShoppingComponent {
 
     const groups = Array.from(map.entries()).map(([key, list]) => {
       const label =
-        key === this.unassignedSupermarketKey
+        key === UNASSIGNED_SUPERMARKET_KEY
           ? this.getUnassignedSupermarketLabel()
           : list[0]?.supermarket ?? this.getUnassignedSupermarketLabel();
       return {
@@ -240,10 +241,10 @@ export class ShoppingComponent {
     });
 
     return groups.sort((a, b) => {
-      if (a.key === this.unassignedSupermarketKey) {
+      if (a.key === UNASSIGNED_SUPERMARKET_KEY) {
         return 1;
       }
-      if (b.key === this.unassignedSupermarketKey) {
+      if (b.key === UNASSIGNED_SUPERMARKET_KEY) {
         return -1;
       }
       return a.label.localeCompare(b.label);
@@ -291,13 +292,13 @@ export class ShoppingComponent {
   ): { reason: ShoppingReason | null; suggestedQuantity: number } {
     if (totalQuantity <= 0) {
       return {
-        reason: 'basic-out',
+        reason: ShoppingReasonEnum.BASIC_OUT,
         suggestedQuantity: this.ensureMinimumSuggestedQuantity(minThreshold ?? 1),
       };
     }
     if (minThreshold != null && totalQuantity < minThreshold) {
       return {
-        reason: 'basic-low',
+        reason: ShoppingReasonEnum.BASIC_LOW,
         suggestedQuantity: this.ensureMinimumSuggestedQuantity(minThreshold - totalQuantity, minThreshold),
       };
     }
@@ -306,13 +307,13 @@ export class ShoppingComponent {
 
   private incrementSummary(summary: ShoppingSummary, reason: ShoppingReason): void {
     switch (reason) {
-      case 'below-min':
+      case ShoppingReasonEnum.BELOW_MIN:
         summary.belowMin += 1;
         break;
-      case 'basic-low':
+      case ShoppingReasonEnum.BASIC_LOW:
         summary.basicLow += 1;
         break;
-      case 'basic-out':
+      case ShoppingReasonEnum.BASIC_OUT:
         summary.basicOut += 1;
         break;
       default:
@@ -436,7 +437,7 @@ export class ShoppingComponent {
   }
 
   private buildShareFileName(): string {
-    return `shopping-list-${new Date().toISOString().replace(/[:.]/g, '-')}.pdf`;
+    return `${SHOPPING_LIST_NAME}-${new Date().toISOString().replace(/[:.]/g, '-')}.pdf`;
   }
 
   private triggerDownload(blob: Blob, filename: string): void {
@@ -491,7 +492,7 @@ export class ShoppingComponent {
         import('@capacitor/share'),
       ]);
       const base64Data = await this.blobToBase64(blob);
-      const path = `PantryManager/${filename}`;
+      const path = `${EXPORT_PATH}/${filename}`;
       await Filesystem.writeFile({
         path,
         data: base64Data,
@@ -537,7 +538,7 @@ export class ShoppingComponent {
     const toast = await this.toastCtrl.create({
       message,
       color,
-      duration: 1800,
+      duration: TOAST_DURATION,
       position: 'bottom',
     });
     await toast.present();

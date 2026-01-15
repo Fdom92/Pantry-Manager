@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PantryItem } from '@core/models/inventory';
+import { PantryItem } from '@core/models/pantry';
 import { ShoppingItem } from '@core/models/shopping';
 import { normalizeLocationId } from '@core/utils/normalization.util';
 import { IonicModule, ModalController } from '@ionic/angular';

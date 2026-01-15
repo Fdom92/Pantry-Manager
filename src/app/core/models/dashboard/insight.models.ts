@@ -1,5 +1,6 @@
 import { AgentEntryContext } from '@core/models/agent';
 
+// ENUMS
 export enum InsightId {
   PENDING_PRODUCT_UPDATES = 'pending_product_updates',
   WEEKLY_MEAL_PLANNING = 'weekly_meal_planning',
@@ -9,15 +10,11 @@ export enum InsightId {
   WHAT_TO_COOK_FOR_LUNCH = 'what_to_cook_for_lunch',
   WHAT_TO_COOK_FOR_DINNER = 'what_to_cook_for_dinner',
 }
-
+// TYPES
 export type InsightAudience = 'all' | 'pro' | 'non-pro';
-
 export type InsightTranslationParamsBuilder = (context: InsightContext, helpers: InsightPredicateHelpers) => Record<string, unknown>;
-
 export type InsightPredicate = (context: InsightContext, helpers: InsightPredicateHelpers) => boolean;
-
 export type InsightPendingReviewReason = 'stale-update' | 'missing-info';
-
 export type InsightCta =
   | {
       id: string;
@@ -32,7 +29,6 @@ export type InsightCta =
       type: 'navigate';
       route: string;
     };
-
 export type InsightCtaDefinition =
   | {
       id: string;
@@ -47,7 +43,7 @@ export type InsightCtaDefinition =
       type: 'navigate';
       route: string;
     };
-
+// INTERFACES
 export interface Insight {
   id: InsightId;
   title: string;
@@ -56,7 +52,6 @@ export interface Insight {
   priority: number;
   dismissLabel?: string;
 }
-
 export interface InsightDefinition {
   id: InsightId;
   titleKey: string;
@@ -67,24 +62,20 @@ export interface InsightDefinition {
   dismissLabelKey?: string;
   predicate?: InsightPredicate;
 }
-
 export interface InsightExpiringItem {
   id?: string;
   isLowStock: boolean;
   quantity: number;
 }
-
 export interface InsightExpiredItem {
   id?: string;
   quantity: number;
 }
-
 export interface InsightProductSummary {
   id?: string;
   name: string;
   categoryId?: string | null;
 }
-
 export interface InsightContext {
   expiringSoonItems: InsightExpiringItem[];
   expiredItems: InsightExpiredItem[];
@@ -93,11 +84,9 @@ export interface InsightContext {
   products: InsightProductSummary[];
   pendingReviewProducts: InsightPendingReviewProduct[];
 }
-
 export interface InsightPredicateHelpers {
   now: Date;
 }
-
 export interface InsightPendingReviewProduct extends InsightProductSummary {
   reasons: InsightPendingReviewReason[];
 }

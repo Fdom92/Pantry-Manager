@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AgentEntryContext, AgentMessage } from '@core/models/agent';
+import { QUICK_PROMPTS, USER_PROMPT_MAXLENGTH } from '@core/constants';
+import { AgentEntryContext, AgentMessage, QuickPrompt } from '@core/models/agent';
 import { AgentConversationStore, MealPlannerAgentService, findLastUserMessageIndex } from '@core/services';
 import { RevenuecatService } from '@core/services/revenuecat.service';
 import { NavController, ViewWillEnter } from '@ionic/angular';
@@ -22,15 +23,6 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-type QuickPromptBehavior = 'prompt' | 'composer';
-
-interface QuickPrompt {
-  id: string;
-  labelKey: string;
-  context?: AgentEntryContext;
-  promptKey?: string;
-  behavior?: QuickPromptBehavior;
-}
 
 @Component({
   selector: 'app-agent',
@@ -75,42 +67,11 @@ export class AgentComponent implements ViewWillEnter {
   readonly agentExecutionPhase = this.conversationStore.agentPhase;
   readonly canRetryLastMessage = this.conversationStore.canRetry;
   readonly canUseAgent$ = this.revenuecat.canUseAgent$;
-  readonly quickPrompts: QuickPrompt[] = [
-    {
-      id: 'cook-today',
-      labelKey: 'agent.quickStart.today',
-      context: AgentEntryContext.PLANNING,
-    },
-    {
-      id: 'quick-ideas',
-      labelKey: 'agent.quickStart.quickIdeas',
-      context: AgentEntryContext.RECIPES,
-    },
-    {
-      id: 'weekly-plan',
-      labelKey: 'agent.quickStart.weeklyPlan',
-      context: AgentEntryContext.PLANNING,
-    },
-    {
-      id: 'use-expiring',
-      labelKey: 'agent.quickStart.useExpiring',
-      context: AgentEntryContext.INSIGHTS,
-    },
-    {
-      id: 'decide-for-me',
-      labelKey: 'agent.quickStart.decideForMe',
-      context: AgentEntryContext.PLANNING,
-    },
-    {
-      id: 'custom-question',
-      labelKey: 'agent.quickStart.customPrompt',
-      behavior: 'composer',
-    },
-  ];
+  readonly quickPrompts = QUICK_PROMPTS;
   // Form
   readonly composerControl = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.maxLength(500)],
+    validators: [Validators.maxLength(USER_PROMPT_MAXLENGTH)],
   });
 
   constructor() {

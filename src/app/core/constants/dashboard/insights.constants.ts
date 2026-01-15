@@ -1,5 +1,5 @@
 import { AgentEntryContext } from '@core/models/agent';
-import { InsightDefinition, InsightId } from '@core/models/insights';
+import { InsightDefinition, InsightId } from '@core/models/dashboard';
 
 export const PENDING_REVIEW_STALE_WINDOW_DAYS = 7;
 

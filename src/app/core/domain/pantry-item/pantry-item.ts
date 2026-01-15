@@ -1,5 +1,5 @@
 import { classifyExpiry, computeEarliestExpiry, toNumberOrZero } from '@core/domain/pantry-stock';
-import { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/inventory';
+import { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { ExpirationStatus } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
 
