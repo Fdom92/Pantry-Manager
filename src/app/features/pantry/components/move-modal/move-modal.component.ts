@@ -23,7 +23,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { PantryStateService } from '@core/services/pantry';
+import { PantryStateService } from '@core/services/pantry/pantry-state.service';
 
 @Component({
   selector: 'app-pantry-move-modal',

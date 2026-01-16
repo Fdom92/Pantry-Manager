@@ -22,7 +22,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-import { PantryEditItemModalStateService } from '@core/services/pantry';
+import { PantryEditItemModalStateService } from '@core/services/pantry/pantry-edit-item-modal-state.service';
 
 @Component({
   selector: 'app-pantry-edit-item-modal',

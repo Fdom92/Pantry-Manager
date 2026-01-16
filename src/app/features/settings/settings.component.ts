@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { SettingsStateService } from '@core/services/settings';
+import { SettingsStateService } from '@core/services/settings/settings-state.service';
 import {
   IonButton,
   IonCard,

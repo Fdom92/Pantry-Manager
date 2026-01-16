@@ -8,7 +8,7 @@ import {
   inject,
   ViewChild,
 } from '@angular/core';
-import { OnboardingStateService } from '@core/services/onboarding';
+import { OnboardingStateService } from '@core/services/onboarding/onboarding-state.service';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 

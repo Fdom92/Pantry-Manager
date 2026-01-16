@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AgentStateService } from '@core/services/agent';
+import { AgentStateService } from '@core/services/agent/agent-state.service';
 import { IonBadge, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonSpinner, IonTextarea, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { ViewWillEnter } from '@ionic/angular';

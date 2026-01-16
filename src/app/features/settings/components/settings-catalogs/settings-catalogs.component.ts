@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { SettingsCatalogsStateService } from '@core/services/settings';
+import { SettingsCatalogsStateService } from '@core/services/settings/settings-catalogs-state.service';
 import {
   IonBackButton,
   IonButton,

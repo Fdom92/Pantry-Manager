@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { DashboardStateService } from '@core/services/dashboard';
+import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import {
   IonBadge,
   IonButton,

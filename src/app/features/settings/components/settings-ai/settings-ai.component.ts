@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { SettingsAiStateService } from '@core/services/settings';
+import { SettingsAiStateService } from '@core/services/settings/settings-ai-state.service';
 import { ViewWillEnter } from '@ionic/angular';
 import {
   IonBackButton,

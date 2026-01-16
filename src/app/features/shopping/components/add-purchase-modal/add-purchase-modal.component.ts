@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ShoppingAddPurchaseModalStateService, ShoppingStateService } from '@core/services/shopping';
+import { ShoppingAddPurchaseModalStateService } from '@core/services/shopping/shopping-add-purchase-modal-state.service';
+import { ShoppingStateService } from '@core/services/shopping/shopping-state.service';
 import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 

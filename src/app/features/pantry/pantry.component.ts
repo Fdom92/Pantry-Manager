@@ -32,7 +32,7 @@ import { PantryEditItemModalComponent } from './components/edit-item-modal/edit-
 import { PantryFiltersModalComponent } from './components/filters-modal/filters-modal.component';
 import { PantryMoveModalComponent } from './components/move-modal/move-modal.component';
 import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.component';
-import { PantryStateService } from '@core/services/pantry';
+import { PantryStateService } from '@core/services/pantry/pantry-state.service';
 
 @Component({
   selector: 'app-pantry',

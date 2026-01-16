@@ -13,7 +13,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { PlanCardComponent } from './components/plan-card/plan-card.component';
-import { UpgradeStateService } from '@core/services/upgrade';
+import { UpgradeStateService } from '@core/services/upgrade/upgrade-state.service';
 
 @Component({
   selector: 'app-upgrade',

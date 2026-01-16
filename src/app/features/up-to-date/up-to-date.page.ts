@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { UpToDateStateService } from '@core/services/up-to-date';
+import { UpToDateStateService } from '@core/services/up-to-date/up-to-date-state.service';
 import {
   IonBackButton,
   IonButton,
