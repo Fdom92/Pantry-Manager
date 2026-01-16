@@ -1,6 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { getLocationEarliestExpiry, getLocationQuantity, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { getLocationEarliestExpiry, getLocationQuantity } from '@core/domain/pantry';
 import type { Insight, InsightContext, InsightCta, ItemLocationStock, PantryItem } from '@core/models';
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { AgentConversationStore } from '../agent/agent-conversation.store';
@@ -231,4 +232,3 @@ export class DashboardStateService {
     this.visibleInsights.set(this.store.getVisibleInsights(generated));
   }
 }
-

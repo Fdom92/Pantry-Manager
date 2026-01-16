@@ -1,7 +1,7 @@
 import { ItemBatch, ItemLocationStock } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
-import { BatchIdGenerator } from '../pantry.domain';
+import type { BatchIdGenerator } from '../pantry.domain';
 
 export type ExpiryClassification = 'expired' | 'near-expiry' | 'normal' | 'unknown';
 
@@ -97,6 +97,10 @@ export function computeEarliestExpiry(locations: ItemLocationStock[]): string | 
     }
     return new Date(current) < new Date(earliest) ? current : earliest;
   });
+}
+
+export function getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {
+  return computeEarliestExpiry([location]);
 }
 
 export function classifyExpiry(expirationDate: string | undefined | null, now: Date, windowDays: number): ExpiryClassification {

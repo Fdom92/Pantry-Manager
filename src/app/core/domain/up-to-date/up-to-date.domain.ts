@@ -1,4 +1,5 @@
 import { UNASSIGNED_LOCATION_KEY } from '@core/constants';
+import { collectBatches } from '@core/domain/pantry';
 import type { ItemLocationStock, PantryItem } from '@core/models/pantry';
 import type { QuickEditPatch } from '@core/models/up-to-date';
 
@@ -24,7 +25,7 @@ export function getFirstRealLocationId(item: PantryItem | null): string {
 }
 
 export function hasAnyExpiryDate(item: PantryItem): boolean {
-  return item.locations?.some(location => (location.batches ?? []).some(batch => Boolean(batch.expirationDate))) ?? false;
+  return collectBatches(item.locations ?? []).some(batch => Boolean(batch.expirationDate));
 }
 
 export function toDateInputValue(dateIso: string): string {
@@ -39,12 +40,10 @@ export function getFirstExpiryDateInput(item: PantryItem | null): string {
   if (!item) {
     return '';
   }
-  for (const location of item.locations ?? []) {
-    for (const batch of location.batches ?? []) {
-      const iso = normalizeId(batch.expirationDate);
-      if (iso) {
-        return toDateInputValue(iso);
-      }
+  for (const batch of collectBatches(item.locations ?? [])) {
+    const iso = normalizeId(batch.expirationDate);
+    if (iso) {
+      return toDateInputValue(iso);
     }
   }
   return '';
@@ -131,4 +130,3 @@ export function applyQuickEdit(params: {
     updatedAt: new Date().toISOString(),
   };
 }
-

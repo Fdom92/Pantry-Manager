@@ -1,8 +1,8 @@
-import { classifyExpiry, computeEarliestExpiry, toNumberOrZero } from '@core/domain/pantry/pantry-stock';
+import { classifyExpiry, computeEarliestExpiry, sumQuantities, toNumberOrZero } from '@core/domain/pantry/pantry-stock';
 import { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { ExpirationStatus } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
-import { BatchIdGenerator } from '../pantry.domain';
+import type { BatchIdGenerator } from '../pantry.domain';
 
 export function collectBatches(
   locations: ItemLocationStock[],
@@ -29,10 +29,7 @@ export function collectBatches(
 }
 
 export function getLocationQuantity(location: ItemLocationStock): number {
-  if (!Array.isArray(location.batches) || location.batches.length === 0) {
-    return 0;
-  }
-  return location.batches.reduce((sum, batch) => sum + toNumberOrZero(batch.quantity), 0);
+  return sumQuantities(location?.batches);
 }
 
 export function getItemTotalQuantity(item: PantryItem): number {
@@ -126,4 +123,3 @@ export function shouldAutoAddToShoppingList(
 
   return false;
 }
-

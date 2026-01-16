@@ -1,8 +1,12 @@
 import { BACKUP_FILENAME, IMPORT_EMPTY_ERROR, IMPORT_EMPTY_INVALID } from '@core/constants';
 import type { BaseDoc } from '@core/models/shared';
 
+export function formatIsoTimestampForFilename(now: Date = new Date()): string {
+  return now.toISOString().replace(/[:.]/g, '-');
+}
+
 export function buildExportFileName(now: Date = new Date()): string {
-  const timestamp = now.toISOString().replace(/[:.]/g, '-');
+  const timestamp = formatIsoTimestampForFilename(now);
   return `${BACKUP_FILENAME}-${timestamp}.json`;
 }
 
@@ -46,4 +50,3 @@ export function parseBackup(raw: string, nowIso: string = new Date().toISOString
 
   return docs;
 }
-

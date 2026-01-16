@@ -867,13 +867,6 @@ export class PantryService extends StorageService<PantryItem> {
     return adjusted;
   }
 
-  private getLocationQuantity(location: ItemLocationStock): number {
-    if (!Array.isArray(location.batches) || location.batches.length === 0) {
-      return 0;
-    }
-    return location.batches.reduce((sum, batch) => sum + this.toNumberOrZero(batch.quantity), 0);
-  }
-
   private toNumberOrZero(value: unknown): number {
     return toNumberOrZeroStock(value);
   }

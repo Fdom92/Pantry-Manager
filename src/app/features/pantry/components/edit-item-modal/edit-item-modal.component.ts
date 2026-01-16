@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ViewEncapsulation, effect, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DEFAULT_HOUSEHOLD_ID, TOAST_DURATION, UNASSIGNED_LOCATION_KEY, UNASSIGNED_PRODUCT_NAME } from '@core/constants';
+import { getLocationEarliestExpiry } from '@core/domain/pantry';
 import {
   buildUniqueSelectOptions,
   formatCategoryName as formatCategoryNameCatalog,
@@ -10,6 +11,7 @@ import {
   getPresetLocationOptions,
   getPresetSupermarketOptions
 } from '@core/domain/pantry/pantry-catalog';
+import { toDateInputValue, toIsoDate } from '@core/domain/up-to-date';
 import { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { AppPreferencesService, LanguageService, PantryStoreService } from '@core/services';
@@ -372,7 +374,7 @@ export class PantryEditItemModalComponent {
           validators: [Validators.required, Validators.min(0)],
         }
       ),
-      expirationDate: this.fb.control(initial?.expirationDate ? this.toDateInputValue(initial.expirationDate) : ''),
+      expirationDate: this.fb.control(initial?.expirationDate ? toDateInputValue(initial.expirationDate) : ''),
       opened: this.fb.control(initial?.opened ?? false),
     });
   }
@@ -405,9 +407,10 @@ export class PantryEditItemModalComponent {
         const batches = batchesControl instanceof FormArray
           ? (batchesControl.controls as FormGroup[]).map(group => {
               const batchValue = group.value as any;
-              const expirationDate = batchValue?.expirationDate
-                ? new Date(batchValue.expirationDate).toISOString()
-                : undefined;
+              const expirationDate =
+                typeof batchValue?.expirationDate === 'string'
+                  ? toIsoDate(batchValue.expirationDate) ?? undefined
+                  : undefined;
               const batchQuantity = batchValue?.quantity != null ? Number(batchValue.quantity) : 0;
               const batchId = (batchValue?.batchId ?? '').trim() || undefined;
               const opened = batchValue?.opened ? true : undefined;
@@ -546,7 +549,7 @@ export class PantryEditItemModalComponent {
             { count: batches.length }
           );
           extras.push(batchesLabel);
-          const earliest = this.getLocationEarliestExpiry(location);
+          const earliest = getLocationEarliestExpiry(location);
           if (earliest) {
             extras.push(
               this.translate.instant('pantry.detail.batches.withExpiry', {
@@ -569,22 +572,6 @@ export class PantryEditItemModalComponent {
     return roundQuantity(total);
   }
 
-  private getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {
-    const batches = Array.isArray(location.batches) ? location.batches : [];
-    const dates = batches
-      .map(batch => batch.expirationDate)
-      .filter((date): date is string => Boolean(date));
-    if (!dates.length) {
-      return undefined;
-    }
-    return dates.reduce((earliest, current) => {
-      if (!earliest) {
-        return current;
-      }
-      return new Date(current) < new Date(earliest) ? current : earliest;
-    });
-  }
-
   private presetCategoryOptions(): string[] {
     return getPresetCategoryOptions(this.appPreferences.preferences());
   }
@@ -599,14 +586,6 @@ export class PantryEditItemModalComponent {
 
   private formatCategoryName(key: string): string {
     return formatCategoryNameCatalog(key, this.translate.instant('pantry.form.uncategorized'));
-  }
-
-  private toDateInputValue(dateIso: string): string {
-    try {
-      return new Date(dateIso).toISOString().slice(0, 10);
-    } catch {
-      return '';
-    }
   }
 
   private async presentToast(message: string, color: string = 'medium'): Promise<void> {

@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { EXPORT_PATH, TOAST_DURATION, UNASSIGNED_LOCATION_KEY, SHOPPING_LIST_NAME } from '@core/constants';
 import { determineSuggestionNeed, groupSuggestionsBySupermarket, incrementSummary } from '@core/domain/shopping';
+import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
 import type { MeasurementUnit } from '@core/models/shared';
 import type {
@@ -312,7 +313,7 @@ export class ShoppingStateService {
   }
 
   private buildShareFileName(): string {
-    return `${SHOPPING_LIST_NAME}-${new Date().toISOString().replace(/[:.]/g, '-')}.pdf`;
+    return `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename()}.pdf`;
   }
 
   private triggerDownload(blob: Blob, filename: string): void {
