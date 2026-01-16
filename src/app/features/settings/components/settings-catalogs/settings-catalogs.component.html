@@ -8,7 +8,7 @@
   </ion-header>
 
 <ion-content>
-  @if (loading()) {
+  @if (state.loading()) {
     <ion-progress-bar type="indeterminate"></ion-progress-bar>
   }
   <div class="catalogs-content">
@@ -20,7 +20,7 @@
         </ion-label>
       </ion-list-header>
 
-      @if (!locationOptionsDraft().length) {
+      @if (!state.locationOptionsDraft().length) {
         <ion-item lines="none">
           <app-empty-state
             class="list-empty-state"
@@ -32,13 +32,13 @@
         </ion-item>
       }
 
-      @for (location of locationOptionsDraft(); track $index; let i = $index) {
+      @for (location of state.locationOptionsDraft(); track $index; let i = $index) {
         <ion-item>
           <ion-input
             label="{{ 'settings.catalogs.locations.field' | translate:{ index: i + 1 } }}"
             labelPlacement="stacked"
             [value]="location"
-            (ionInput)="onLocationOptionInput(i, $event)"
+            (ionInput)="state.onLocationOptionInput(i, $event)"
             autocomplete="off"
             autocorrect="off">
           </ion-input>
@@ -46,7 +46,7 @@
             slot="end"
             fill="clear"
             color="danger"
-            (click)="removeLocationOption(i)">
+            (click)="state.removeLocationOption(i)">
             <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
           </ion-button>
         </ion-item>
@@ -56,7 +56,7 @@
         <ion-button
           fill="clear"
           size="small"
-          (click)="addLocationOption()">
+          (click)="state.addLocationOption()">
           <ion-icon slot="start" name="add-circle-outline"></ion-icon>
           {{ 'settings.catalogs.locations.add' | translate }}
         </ion-button>
@@ -64,7 +64,7 @@
           fill="clear"
           size="small"
           color="medium"
-          (click)="restoreDefaultLocationOptions()">
+          (click)="state.restoreDefaultLocationOptions()">
           <ion-icon slot="start" name="refresh-outline"></ion-icon>
           {{ 'settings.catalogs.restoreDefaults' | translate }}
         </ion-button>
@@ -79,7 +79,7 @@
         </ion-label>
       </ion-list-header>
 
-      @if (!categoryOptionsDraft().length) {
+      @if (!state.categoryOptionsDraft().length) {
         <ion-item lines="none">
           <app-empty-state
             class="list-empty-state"
@@ -91,13 +91,13 @@
         </ion-item>
       }
 
-      @for (category of categoryOptionsDraft(); track $index; let i = $index) {
+      @for (category of state.categoryOptionsDraft(); track $index; let i = $index) {
         <ion-item>
           <ion-input
             label="{{ 'settings.catalogs.categories.field' | translate:{ index: i + 1 } }}"
             labelPlacement="stacked"
             [value]="category"
-            (ionInput)="onCategoryOptionInput(i, $event)"
+            (ionInput)="state.onCategoryOptionInput(i, $event)"
             autocomplete="off"
             autocorrect="off">
           </ion-input>
@@ -105,7 +105,7 @@
             slot="end"
             fill="clear"
             color="danger"
-            (click)="removeCategoryOption(i)">
+            (click)="state.removeCategoryOption(i)">
             <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
           </ion-button>
         </ion-item>
@@ -115,7 +115,7 @@
         <ion-button
           fill="clear"
           size="small"
-          (click)="addCategoryOption()">
+          (click)="state.addCategoryOption()">
           <ion-icon slot="start" name="add-circle-outline"></ion-icon>
           {{ 'settings.catalogs.categories.add' | translate }}
         </ion-button>
@@ -123,7 +123,7 @@
           fill="clear"
           size="small"
           color="medium"
-          (click)="restoreDefaultCategoryOptions()">
+          (click)="state.restoreDefaultCategoryOptions()">
           <ion-icon slot="start" name="refresh-outline"></ion-icon>
           {{ 'settings.catalogs.restoreDefaults' | translate }}
         </ion-button>
@@ -138,7 +138,7 @@
         </ion-label>
       </ion-list-header>
 
-      @if (!supermarketOptionsDraft().length) {
+      @if (!state.supermarketOptionsDraft().length) {
         <ion-item lines="none">
           <app-empty-state
             class="list-empty-state"
@@ -150,13 +150,13 @@
         </ion-item>
       }
 
-      @for (supermarket of supermarketOptionsDraft(); track $index; let i = $index) {
+      @for (supermarket of state.supermarketOptionsDraft(); track $index; let i = $index) {
         <ion-item>
           <ion-input
             label="{{ 'settings.catalogs.supermarkets.field' | translate:{ index: i + 1 } }}"
             labelPlacement="stacked"
             [value]="supermarket"
-            (ionInput)="onSupermarketOptionInput(i, $event)"
+            (ionInput)="state.onSupermarketOptionInput(i, $event)"
             autocomplete="off"
             autocorrect="off">
           </ion-input>
@@ -164,7 +164,7 @@
             slot="end"
             fill="clear"
             color="danger"
-            (click)="removeSupermarketOption(i)">
+            (click)="state.removeSupermarketOption(i)">
             <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
           </ion-button>
         </ion-item>
@@ -174,7 +174,7 @@
         <ion-button
           fill="clear"
           size="small"
-          (click)="addSupermarketOption()">
+          (click)="state.addSupermarketOption()">
           <ion-icon slot="start" name="add-circle-outline"></ion-icon>
           {{ 'settings.catalogs.supermarkets.add' | translate }}
         </ion-button>
@@ -182,7 +182,7 @@
           fill="clear"
           size="small"
           color="medium"
-          (click)="restoreDefaultSupermarketOptions()">
+          (click)="state.restoreDefaultSupermarketOptions()">
           <ion-icon slot="start" name="refresh-outline"></ion-icon>
           {{ 'settings.catalogs.restoreDefaults' | translate }}
         </ion-button>
@@ -193,9 +193,9 @@
       <ion-button
         expand="block"
         color="primary"
-        (click)="saveCatalogs()"
-        [disabled]="!hasAnyChanges() || savingCatalogs()">
-        @if (savingCatalogs()) {
+        (click)="state.saveCatalogs()"
+        [disabled]="!state.hasAnyChanges() || state.savingCatalogs()">
+        @if (state.savingCatalogs()) {
           <ion-spinner
             slot="start"
             name="dots">

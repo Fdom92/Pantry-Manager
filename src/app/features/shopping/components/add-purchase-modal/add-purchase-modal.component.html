@@ -1,4 +1,4 @@
-<ion-modal [isOpen]="state.isPurchaseModalOpen()" (willDismiss)="cancel()">
+<ion-modal [isOpen]="state.isPurchaseModalOpen()" (willDismiss)="modal.cancel()">
   <ng-template>
     @let target = state.purchaseTarget();
     @if (!target) {
@@ -10,7 +10,7 @@
         <ion-toolbar>
           <ion-title>{{ 'shopping.purchaseModal.titleProduct' | translate }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button fill="clear" color="medium" (click)="cancel()">
+            <ion-button fill="clear" color="medium" (click)="modal.cancel()">
               <ion-icon slot="icon-only" name="close"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -29,8 +29,8 @@
             <ion-input
               type="number"
               inputmode="decimal"
-              [value]="quantity"
-              (ionInput)="onQuantityInput($event)"
+              [value]="modal.quantity"
+              (ionInput)="modal.onQuantityInput($event)"
               min="0"
               [placeholder]="'shopping.purchaseModal.quantityPlaceholder' | translate"
             ></ion-input>
@@ -41,16 +41,16 @@
               type="date"
               label="{{ 'shopping.purchaseModal.expiry' | translate }}"
               labelPlacement="stacked"
-              [(ngModel)]="expiryDate"
+              [(ngModel)]="modal.expiryDate"
             ></ion-input>
           </ion-item>
 
-          @if (locationOptions.length > 1) {
+          @if (modal.locationOptions.length > 1) {
             <ion-item>
               <ion-label position="stacked">{{ 'pantry.form.location' | translate }}</ion-label>
-              <ion-select interface="popover" [(ngModel)]="location">
-                @for (loc of locationOptions; track loc) {
-                  <ion-select-option [value]="loc">{{ getLocationLabel(loc) }}</ion-select-option>
+              <ion-select interface="popover" [(ngModel)]="modal.location">
+                @for (loc of modal.locationOptions; track loc) {
+                  <ion-select-option [value]="loc">{{ modal.getLocationLabel(loc) }}</ion-select-option>
                 }
               </ion-select>
             </ion-item>
@@ -66,8 +66,8 @@
               color="primary"
               fill="solid"
               expand="block"
-              [disabled]="!canConfirm || state.isSuggestionProcessing(target.item._id)"
-              (click)="submit()">
+              [disabled]="!modal.canConfirm || state.isSuggestionProcessing(target.item._id)"
+              (click)="modal.submit()">
               {{ 'shopping.purchaseModal.addToPantry' | translate }}
             </ion-button>
           </ion-buttons>

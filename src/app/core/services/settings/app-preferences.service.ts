@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_PREFERENCES, DEFAULT_SUPERMARKET_OPTIONS, DEFAULT_UNIT_OPTIONS, DOC_TYPE_PREFERENCES, STORAGE_KEY_PREFERENCES } from '@core/constants';
+import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_PREFERENCES, DEFAULT_SUPERMARKET_OPTIONS, DEFAULT_UNIT_OPTIONS, DOC_TYPE_PREFERENCES, PLANNER_MEMORY_LIMIT, STORAGE_KEY_PREFERENCES } from '@core/constants';
 import {
   AppPreferences,
   AppPreferencesDoc,
@@ -19,7 +19,7 @@ export class AppPreferencesService {
   // DATA
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
-  private readonly plannerMemoryLimit = 2000;
+  private readonly plannerMemoryLimit = PLANNER_MEMORY_LIMIT;
   private readonly prefersDarkQuery =
     typeof window !== 'undefined' && typeof window.matchMedia === 'function'
       ? window.matchMedia('(prefers-color-scheme: dark)')

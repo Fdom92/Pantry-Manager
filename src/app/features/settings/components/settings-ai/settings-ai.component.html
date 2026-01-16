@@ -17,12 +17,12 @@
       <p class="ai-description">{{ "settings.ai.contextDescription" | translate }}</p>
       <ion-textarea
         autoGrow="true"
-        [value]="plannerMemory()"
-        [maxlength]="plannerMemoryLimit"
+        [value]="state.plannerMemory()"
+        [maxlength]="state.plannerMemoryLimit"
         [counter]="true"
         [rows]="8"
-        [disabled]="isSaving() || isLoading()"
-        (ionInput)="onPlannerMemoryInput($event.detail.value ?? '')"
+        [disabled]="state.isSaving() || state.isLoading()"
+        (ionInput)="state.onPlannerMemoryInput($event.detail.value ?? '')"
         [placeholder]="'settings.ai.contextPlaceholder' | translate"
       ></ion-textarea>
     </ion-card-content>
@@ -31,10 +31,10 @@
   <ion-button
     expand="block"
     color="primary"
-    (click)="savePlannerMemory()"
-    [disabled]="!hasChanges() || isSaving() || isLoading()"
+    (click)="state.savePlannerMemory()"
+    [disabled]="!state.hasChanges() || state.isSaving() || state.isLoading()"
   >
-    @if (isSaving()) {
+    @if (state.isSaving()) {
       <ion-spinner
         slot="start"
         name="dots"

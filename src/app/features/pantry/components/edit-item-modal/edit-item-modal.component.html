@@ -1,19 +1,19 @@
-<ion-modal [isOpen]="isOpen()" (willDismiss)="close()">
+<ion-modal [isOpen]="state.isOpen()" (willDismiss)="state.close()">
   <ng-template>
     <ion-header>
       <ion-toolbar>
         <ion-title>
-          @if (editingItem) { {{ 'pantry.form.editTitle' | translate }} } @else { {{ 'pantry.form.newTitle' | translate }} }
+          @if (state.editingItem()) { {{ 'pantry.form.editTitle' | translate }} } @else { {{ 'pantry.form.newTitle' | translate }} }
         </ion-title>
         <ion-buttons slot="end">
-          <ion-button fill="clear" color="medium" (click)="close()">
+          <ion-button fill="clear" color="medium" (click)="state.close()">
             <ion-icon slot="icon-only" name="close"></ion-icon>
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding create-item-modal-content">
-      <form [formGroup]="form">
+      <form [formGroup]="state.form">
         <ion-list lines="full">
           <ion-item>
             <ion-input
@@ -31,7 +31,7 @@
               label="{{ 'pantry.form.category' | translate }}"
               labelPlacement="stacked"
               [placeholder]="'pantry.form.categoryPlaceholder' | translate">
-              @for (option of getCategorySelectOptions(); track option.value) {
+              @for (option of state.getCategorySelectOptions(); track option.value) {
                 <ion-select-option [value]="option.value">
                   {{ option.label }}
                 </ion-select-option>
@@ -46,7 +46,7 @@
               label="{{ 'pantry.form.supermarket' | translate }}"
               labelPlacement="stacked"
               [placeholder]="'pantry.form.supermarketPlaceholder' | translate">
-              @for (option of getSupermarketSelectOptions(); track option.value) {
+              @for (option of state.getSupermarketSelectOptions(); track option.value) {
                 <ion-select-option [value]="option.value">
                   {{ option.label }}
                 </ion-select-option>
@@ -72,21 +72,21 @@
         </ion-list>
 
         <div formArrayName="locations" class="location-form-list">
-          @for (locationCtrl of locationsArray.controls; track $index; let i = $index) {
+          @for (locationCtrl of state.locationsArray.controls; track $index; let i = $index) {
             <div class="location-form-card" [formGroupName]="i">
               <div class="location-form-header">
                 <h4>
                   {{ 'pantry.form.locationTitle' | translate:{ index: i + 1 } }}
                   <span class="location-total">
-                    ({{ 'pantry.form.locationTotal' | translate:{ total: (getLocationTotalForControl(i) | number:'1.0-2'), unit: getLocationUnitLabelForControl(i) } }})
+                    ({{ 'pantry.form.locationTotal' | translate:{ total: (state.getLocationTotalForControl(i) | number:'1.0-2'), unit: state.getLocationUnitLabelForControl(i) } }})
                   </span>
                 </h4>
                 <ion-button
                   fill="clear"
                   size="small"
                   color="danger"
-                  (click)="removeLocationEntry(i)"
-                  [disabled]="locationsArray.length <= 1">
+                  (click)="state.removeLocationEntry(i)"
+                  [disabled]="state.locationsArray.length <= 1">
                   <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                 </ion-button>
               </div>
@@ -99,7 +99,7 @@
                     labelPlacement="stacked"
                     [placeholder]="'pantry.form.locationPlaceholder' | translate"
                     required>
-                    @for (option of getLocationOptionsForControl(i); track option.value) {
+                    @for (option of state.getLocationOptionsForControl(i); track option.value) {
                       <ion-select-option [value]="option.value">
                         {{ option.label }}
                       </ion-select-option>
@@ -110,12 +110,12 @@
               <div formArrayName="batches" class="batch-form-list">
                 <div class="batch-form-header">
                   <h5>{{ 'pantry.form.batches.title' | translate }}</h5>
-                  <ion-button fill="clear" size="small" (click)="addBatchEntry(i)">
+                  <ion-button fill="clear" size="small" (click)="state.addBatchEntry(i)">
                     <ion-icon slot="start" name="add-circle-outline"></ion-icon>
                     {{ 'pantry.form.batches.add' | translate }}
                   </ion-button>
                 </div>
-                @let batchesArray = getBatchesArray(i);
+                @let batchesArray = state.getBatchesArray(i);
                 @if (batchesArray.length === 0) {
                   <ion-list>
                     <ion-item lines="none">
@@ -137,7 +137,7 @@
                         fill="clear"
                         size="small"
                         color="danger"
-                        (click)="removeBatchEntry(i, j)">
+                        (click)="state.removeBatchEntry(i, j)">
                         <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                       </ion-button>
                     </div>
@@ -168,7 +168,7 @@
               </div>
             </div>
           }
-          <ion-button fill="clear" size="small" (click)="addLocationEntry()">
+          <ion-button fill="clear" size="small" (click)="state.addLocationEntry()">
             <ion-icon slot="start" name="add-circle-outline"></ion-icon>
             {{ 'pantry.form.addLocation' | translate }}
           </ion-button>
@@ -181,9 +181,9 @@
         <ion-button
           expand="block"
           color="primary"
-          [disabled]="isSaving || form.invalid"
-          (click)="submitItem()">
-          @if (isSaving) {
+          [disabled]="state.isSaving() || state.form.invalid"
+          (click)="state.submitItem()">
+          @if (state.isSaving()) {
             <ion-spinner name="dots"></ion-spinner>
           } @else {
             {{ 'common.actions.save' | translate }}
@@ -193,4 +193,3 @@
     </ion-footer>
   </ng-template>
 </ion-modal>
-
