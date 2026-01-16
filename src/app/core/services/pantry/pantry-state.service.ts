@@ -1,7 +1,7 @@
 import { Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { DEFAULT_LOCATION_OPTIONS, NEAR_EXPIRY_WINDOW_DAYS, TOAST_DURATION } from '@core/constants';
+import { DEFAULT_LOCATION_OPTIONS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import {
   buildFastAddItemPayload,
   classifyExpiry,
@@ -49,8 +49,8 @@ import {
   normalizeLocationId,
   normalizeUnitValue,
 } from '@core/utils/normalization.util';
-import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { ConfirmService, ToastService, withSignalFlag } from '../shared';
 
 @Injectable()
 export class PantryStateService {
@@ -58,10 +58,11 @@ export class PantryStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
   private readonly fb = inject(FormBuilder);
-  private readonly toastCtrl = inject(ToastController);
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
+  private readonly toast = inject(ToastService);
+  private readonly confirm = inject(ConfirmService);
 
   // DATA
   readonly MeasurementUnit = MeasurementUnit;
@@ -308,8 +309,7 @@ export class PantryStateService {
       return;
     }
 
-    this.isFastAdding.set(true);
-    try {
+    await withSignalFlag(this.isFastAdding, async () => {
       const nowIso = new Date().toISOString();
       const defaultLocationId = this.getDefaultLocationId();
       let created = 0;
@@ -328,11 +328,10 @@ export class PantryStateService {
       const messageKey = created === 1 ? 'pantry.fastAdd.singleSuccess' : 'pantry.fastAdd.success';
       this.closeFastAddModal();
       await this.presentToast(this.translate.instant(messageKey, { count: created }), 'success');
-    } catch (err) {
+    }).catch(async err => {
       console.error('[PantryStateService] submitFastAdd error', err);
-      this.isFastAdding.set(false);
       await this.presentToast(this.translate.instant('pantry.fastAdd.error'), 'danger');
-    }
+    });
   }
 
   // -------- Expand/collapse + list UI state --------
@@ -398,7 +397,7 @@ export class PantryStateService {
 
     const shouldConfirm = !skipConfirm && typeof window !== 'undefined';
     if (shouldConfirm) {
-      const confirmed = window.confirm(this.translate.instant('pantry.confirmDelete', { name: item.name ?? '' }));
+      const confirmed = this.confirm.confirm(this.translate.instant('pantry.confirmDelete', { name: item.name ?? '' }));
       if (!confirmed) {
         return;
       }
@@ -781,13 +780,11 @@ export class PantryStateService {
       return;
     }
 
-    this.moveSubmitting.set(true);
     this.moveError.set(null);
-    try {
+    await withSignalFlag(this.moveSubmitting, async () => {
       const result = this.buildMoveResult(targetItem, fromLocation, toLocation, requestedQuantity);
       if (!result) {
         this.moveError.set(this.translate.instant('pantry.move.errors.noAvailableStock'));
-        this.moveSubmitting.set(false);
         return;
       }
 
@@ -803,12 +800,10 @@ export class PantryStateService {
       });
       this.closeMoveItemModal();
       void this.presentToast(message, 'success');
-    } catch (err) {
+    }).catch(err => {
       console.error('[PantryListStateService] submitMoveItem error', err);
       this.moveError.set(this.translate.instant('pantry.move.errors.generic'));
-    } finally {
-      this.moveSubmitting.set(false);
-    }
+    });
   }
 
   // -------- Stock pending + debounce --------
@@ -1087,16 +1082,7 @@ export class PantryStateService {
   }
 
   private async presentToast(message: string, color: string = 'medium'): Promise<void> {
-    if (!message) {
-      return;
-    }
-    const toast = await this.toastCtrl.create({
-      message,
-      color,
-      duration: TOAST_DURATION,
-      position: 'bottom',
-    });
-    await toast.present();
+    await this.toast.present(message, { color });
   }
 
   private buildStockUpdateMessage(item: PantryItem): string {

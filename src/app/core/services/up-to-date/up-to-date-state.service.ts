@@ -6,12 +6,17 @@ import { applyQuickEdit, getFirstExpiryDateInput, getFirstRealLocationId, hasAny
 import { formatDateValue, formatQuantity } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { InsightService } from '../dashboard/insight.service';
+import { PantryStoreService } from '../pantry/pantry-store.service';
+import { AppPreferencesService } from '../settings/app-preferences.service';
 import { LanguageService } from '../shared/language.service';
-import { UpToDateStoreService } from './up-to-date-store.service';
+import { withSignalFlag } from '../shared';
 
 @Injectable()
 export class UpToDateStateService {
-  private readonly store = inject(UpToDateStoreService);
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly insightService = inject(InsightService);
+  private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
@@ -30,10 +35,10 @@ export class UpToDateStateService {
   readonly editHasExpiry = signal(false);
   readonly editExpiryDate = signal('');
 
-  readonly pantryItems = this.store.pantryItems;
+  readonly pantryItems = this.pantryStore.items;
   private doneRedirectTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  readonly pending = computed(() => this.store.getPendingReviewProducts(this.pantryItems()));
+  readonly pending = computed(() => this.insightService.getPendingReviewProducts(this.pantryItems()));
   readonly queue = computed(() => {
     const processed = this.processedIds();
     return this.pending().filter(entry => {
@@ -45,8 +50,8 @@ export class UpToDateStateService {
   readonly processedCount = computed(() => this.processedIds().size);
   readonly totalSteps = computed(() => this.processedCount() + this.pendingCount());
   readonly isDone = computed(() => this.hasLoaded() && this.pendingCount() === 0);
-  readonly locationOptions = computed(() => this.store.getLocationOptions());
-  readonly categoryOptions = computed(() => this.store.getCategoryOptions());
+  readonly locationOptions = computed(() => this.appPreferences.preferences().locationOptions ?? []);
+  readonly categoryOptions = computed(() => this.appPreferences.preferences().categoryOptions ?? []);
   readonly pantryItemsById = computed(() => {
     const map = new Map<string, PantryItem>();
     for (const item of this.pantryItems()) {
@@ -170,13 +175,10 @@ export class UpToDateStateService {
   }
 
   async ionViewWillEnter(): Promise<void> {
-    this.isLoading.set(true);
-    try {
-      await this.store.loadAll();
-    } finally {
-      this.isLoading.set(false);
+    await withSignalFlag(this.isLoading, async () => {
+      await this.pantryStore.loadAll();
       this.hasLoaded.set(true);
-    }
+    });
   }
 
   ionViewWillLeave(): void {
@@ -219,7 +221,7 @@ export class UpToDateStateService {
     const snapshot = this.queue();
     try {
       const now = new Date().toISOString();
-      await this.store.updateItem({ ...item, updatedAt: now });
+      await this.pantryStore.updateItem({ ...item, updatedAt: now });
       this.completeAndAdvance(id, snapshot);
     } finally {
       this.markBusy(item._id, false);
@@ -237,7 +239,7 @@ export class UpToDateStateService {
     this.markBusy(id, true);
     const snapshot = this.queue();
     try {
-      await this.store.deleteItem(id);
+      await this.pantryStore.deleteItem(id);
       this.completeAndAdvance(id, snapshot);
     } finally {
       this.markBusy(id, false);
@@ -280,9 +282,9 @@ export class UpToDateStateService {
     if (!item) {
       return '';
     }
-    const total = this.store.getItemTotalQuantity(item);
+    const total = this.pantryStore.getItemTotalQuantity(item);
     const formatted = formatQuantity(total, this.languageService.getCurrentLocale(), { maximumFractionDigits: 1 });
-    const unitLabel = this.store.getUnitLabel(this.store.getItemPrimaryUnit(item));
+    const unitLabel = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
     return `${formatted} ${unitLabel}`.trim();
   }
 
@@ -339,9 +341,8 @@ export class UpToDateStateService {
       return;
     }
 
-    this.isSavingEdit.set(true);
     const snapshot = this.queue();
-    try {
+    await withSignalFlag(this.isSavingEdit, async () => {
       const patch: QuickEditPatch = {
         categoryId: this.editCategory().trim(),
         locationId: this.editLocation().trim(),
@@ -355,14 +356,12 @@ export class UpToDateStateService {
       const updated = applyQuickEdit({
         item,
         patch,
-        primaryUnit: this.store.getItemPrimaryUnit(item),
+        primaryUnit: String(this.pantryStore.getItemPrimaryUnit(item)),
       });
-      await this.store.updateItem(updated);
+      await this.pantryStore.updateItem(updated);
       this.closeEditModalInternal(true);
       this.completeAndAdvance(id, snapshot);
-    } finally {
-      this.isSavingEdit.set(false);
-    }
+    });
   }
 
   private closeEditModalInternal(force: boolean): void {
@@ -430,4 +429,3 @@ export class UpToDateStateService {
     return typeof value === 'string' ? value : String(value);
   }
 }
-

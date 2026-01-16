@@ -1,22 +1,29 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
-import { EXPORT_PATH, IMPORT_EMPTY_ERROR, IMPORT_EMPTY_INVALID, TOAST_DURATION } from '@core/constants';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { IMPORT_EMPTY_ERROR, IMPORT_EMPTY_INVALID } from '@core/constants';
 import { buildExportFileName, parseBackup } from '@core/domain/settings';
 import type { AppThemePreference } from '@core/models';
 import type { BaseDoc } from '@core/models/shared';
-import { NavController, ToastController } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { SettingsStoreService } from './settings-store.service';
+import { ConfirmService, DownloadService, ShareService, ToastService, withSignalFlag } from '../shared';
+import { StorageService } from '../shared/storage.service';
+import { RevenuecatService } from '../upgrade/revenuecat.service';
+import { AppPreferencesService } from './app-preferences.service';
 
 @Injectable()
 export class SettingsStateService {
-  private readonly toastCtrl = inject(ToastController);
   private readonly translate = inject(TranslateService);
-  private readonly store = inject(SettingsStoreService);
+  private readonly storage = inject<StorageService<BaseDoc>>(StorageService);
+  private readonly appPreferences = inject(AppPreferencesService);
+  private readonly revenuecat = inject(RevenuecatService);
   private readonly navCtrl = inject(NavController);
+  private readonly toast = inject(ToastService);
+  private readonly download = inject(DownloadService);
+  private readonly confirm = inject(ConfirmService);
+  private readonly share = inject(ShareService);
 
-  readonly isPro$ = this.store.isPro$;
-  readonly themePreference = this.store.themePreference;
+  readonly isPro$ = this.revenuecat.isPro$;
+  readonly themePreference = computed(() => this.appPreferences.preferences().theme);
 
   readonly isExportingData = signal(false);
   readonly isImportingData = signal(false);
@@ -28,26 +35,20 @@ export class SettingsStateService {
   }
 
   async resetApplicationData(): Promise<void> {
-    const confirmed =
-      typeof window === 'undefined'
-        ? true
-        : window.confirm(this.translate.instant('settings.reset.confirm'));
+    const confirmed = this.confirm.confirm(this.translate.instant('settings.reset.confirm'));
 
     if (!confirmed) {
       return;
     }
 
-    this.isResettingData.set(true);
-    try {
-      await this.store.clearAll();
-      await this.store.reloadPreferences();
+    await withSignalFlag(this.isResettingData, async () => {
+      await this.storage.clearAll();
+      await this.appPreferences.reload();
       await this.presentToast(this.translate.instant('settings.reset.success'), 'success');
-    } catch (err) {
+    }).catch(async err => {
       console.error('[SettingsStateService] resetApplicationData error', err);
       await this.presentToast(this.translate.instant('settings.reset.error'), 'danger');
-    } finally {
-      this.isResettingData.set(false);
-    }
+    });
   }
 
   triggerImportPicker(fileInput: HTMLInputElement | null): void {
@@ -63,35 +64,39 @@ export class SettingsStateService {
       await this.presentToast(this.translate.instant('settings.export.unavailable'), 'warning');
       return;
     }
+    if (this.isExportingData()) {
+      return;
+    }
 
-    this.isExportingData.set(true);
-    try {
-      const docs = (await this.store.allDocs()).filter(doc => !doc._id.startsWith('_design/'));
+    await withSignalFlag(this.isExportingData, async () => {
+      const docs = (await this.storage.all()).filter(doc => !doc._id.startsWith('_design/'));
       const json = JSON.stringify(docs, null, 2);
       const filename = buildExportFileName(new Date());
       const blob = new Blob([json], { type: 'application/json' });
-      const file = new File([blob], filename, { type: 'application/json' });
 
-      const sharedViaWeb = await this.tryShareFile(file);
-      if (sharedViaWeb) {
+      const { outcome } = await this.share.tryShareBlob({
+        blob,
+        filename,
+        mimeType: 'application/json',
+        title: this.translate.instant('settings.export.shareTitle'),
+        text: this.translate.instant('settings.export.shareText'),
+      });
+
+      if (outcome === 'shared') {
         await this.presentToast(this.translate.instant('settings.export.readyToShare'), 'success');
         return;
       }
 
-      const sharedViaNative = await this.shareNativeExport(json, filename);
-      if (sharedViaNative) {
-        await this.presentToast(this.translate.instant('settings.export.readyToShare'), 'success');
+      if (outcome === 'cancelled') {
         return;
       }
 
-      this.triggerDownload(blob, filename);
+      this.download.downloadBlob(blob, filename);
       await this.presentToast(this.translate.instant('settings.export.success'), 'success');
-    } catch (err) {
+    }).catch(async err => {
       console.error('[SettingsStateService] exportDataBackup error', err);
       await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
-    } finally {
-      this.isExportingData.set(false);
-    }
+    });
   }
 
   async handleImportFileSelection(event: Event): Promise<void> {
@@ -109,12 +114,11 @@ export class SettingsStateService {
       return;
     }
 
-    this.isImportingData.set(true);
-    try {
+    await withSignalFlag(this.isImportingData, async () => {
       const fileContents = await file.text();
       const docs = parseBackup(fileContents, new Date().toISOString());
       await this.applyImport(docs);
-    } catch (err: any) {
+    }).catch(async (err: any) => {
       console.error('[SettingsStateService] handleImportFileSelection error', err);
       const messageKey =
         err?.message === IMPORT_EMPTY_ERROR
@@ -123,9 +127,7 @@ export class SettingsStateService {
             ? 'settings.import.invalid'
             : 'settings.import.error';
       await this.presentToast(this.translate.instant(messageKey), 'danger');
-    } finally {
-      this.isImportingData.set(false);
-    }
+    });
   }
 
   async updateThemePreference(value: string | number | null | undefined): Promise<void> {
@@ -136,19 +138,16 @@ export class SettingsStateService {
       return;
     }
 
-    this.isUpdatingTheme.set(true);
-    try {
-      const current = this.store.getPreferencesSnapshot();
-      await this.store.savePreferences({
+    await withSignalFlag(this.isUpdatingTheme, async () => {
+      const current = this.appPreferences.preferences();
+      await this.appPreferences.savePreferences({
         ...current,
         theme: nextTheme,
       });
-    } catch (err) {
+    }).catch(async err => {
       console.error('[SettingsStateService] updateThemePreference error', err);
       await this.presentToast(this.translate.instant('settings.appearance.error'), 'danger');
-    } finally {
-      this.isUpdatingTheme.set(false);
-    }
+    });
   }
 
   navigateToUpgrade(): void {
@@ -157,7 +156,7 @@ export class SettingsStateService {
 
   private async ensurePreferencesLoaded(): Promise<void> {
     try {
-      await this.store.getPreferences();
+      await this.appPreferences.getPreferences();
     } catch (err) {
       console.error('[SettingsStateService] ensurePreferencesLoaded error', err);
       await this.presentToast(this.translate.instant('settings.loadError'), 'danger');
@@ -165,104 +164,17 @@ export class SettingsStateService {
   }
 
   private async confirmImport(): Promise<boolean> {
-    if (typeof window === 'undefined') {
-      return true;
-    }
-    return window.confirm(this.translate.instant('settings.import.confirm'));
-  }
-
-  private triggerDownload(blob: Blob, filename: string): void {
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = filename;
-    anchor.rel = 'noopener';
-    anchor.click();
-    URL.revokeObjectURL(url);
-  }
-
-  private async tryShareFile(file: File): Promise<boolean> {
-    const canUseWebShare =
-      typeof navigator !== 'undefined' &&
-      typeof navigator.canShare === 'function' &&
-      typeof navigator.share === 'function' &&
-      navigator.canShare({ files: [file] });
-
-    if (!canUseWebShare) {
-      return false;
-    }
-
-    try {
-      await navigator.share({
-        title: this.translate.instant('settings.export.shareTitle'),
-        text: this.translate.instant('settings.export.shareText'),
-        files: [file],
-      });
-      return true;
-    } catch (err) {
-      console.warn('[SettingsStateService] Web Share failed, falling back to download', err);
-      return false;
-    }
+    return this.confirm.confirm(this.translate.instant('settings.import.confirm'));
   }
 
   private async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium'): Promise<void> {
-    if (!message) {
-      return;
-    }
-    const toast = await this.toastCtrl.create({
-      message,
-      color,
-      duration: TOAST_DURATION,
-      position: 'bottom',
-    });
-    await toast.present();
-  }
-
-  private async shareNativeExport(json: string, filename: string): Promise<boolean> {
-    if (!Capacitor.isNativePlatform()) {
-      return false;
-    }
-    try {
-      const [{ Filesystem, Directory, Encoding }, { Share }] = await Promise.all([
-        import('@capacitor/filesystem'),
-        import('@capacitor/share'),
-      ]);
-      const path = `${EXPORT_PATH}/${filename}`;
-      await Filesystem.writeFile({
-        path,
-        data: json,
-        directory: Directory.Cache,
-        encoding: Encoding.UTF8,
-        recursive: true,
-      });
-      try {
-        const uri = await Filesystem.getUri({ path, directory: Directory.Cache });
-        await Share.share({
-          title: this.translate.instant('settings.export.shareTitle'),
-          text: this.translate.instant('settings.export.shareText'),
-          url: uri.uri,
-        });
-        return true;
-      } catch (shareErr) {
-        console.warn('[SettingsStateService] Native share failed', shareErr);
-        return false;
-      } finally {
-        try {
-          await Filesystem.deleteFile({ path, directory: Directory.Cache });
-        } catch (deleteErr) {
-          console.warn('[SettingsStateService] Failed to delete temp export file', deleteErr);
-        }
-      }
-    } catch (err) {
-      console.warn('[SettingsStateService] Native export unavailable', err);
-      return false;
-    }
+    await this.toast.present(message, { color });
   }
 
   private async applyImport(docs: BaseDoc[]): Promise<void> {
-    await this.store.clearAll();
-    await this.store.bulkSave(docs);
-    await this.store.reloadPreferences();
+    await this.storage.clearAll();
+    await this.storage.bulkSave(docs);
+    await this.appPreferences.reload();
     await this.presentToast(this.translate.instant('settings.import.success'), 'success');
     if (typeof window !== 'undefined') {
       setTimeout(() => window.location.reload(), 300);

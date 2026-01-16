@@ -6,7 +6,9 @@ import type { Insight, InsightContext, InsightCta, ItemLocationStock, PantryItem
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { AgentConversationStore } from '../agent/agent-conversation.store';
 import { LanguageService } from '../shared/language.service';
-import { DashboardStoreService } from './dashboard-store.service';
+import { ConfirmService, withSignalFlag } from '../shared';
+import { PantryStoreService } from '../pantry/pantry-store.service';
+import { InsightService } from './insight.service';
 import {
   formatDateTimeValue,
   formatDateValue,
@@ -18,19 +20,21 @@ import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class DashboardStateService {
-  private readonly store = inject(DashboardStoreService);
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly insightService = inject(InsightService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly conversationStore = inject(AgentConversationStore);
   private readonly navCtrl = inject(NavController);
+  private readonly confirm = inject(ConfirmService);
 
   private hasCompletedInitialLoad = false;
 
-  readonly pantryItems = this.store.pantryItems;
-  readonly lowStockItems = this.store.lowStockItems;
-  readonly nearExpiryItems = this.store.nearExpiryItems;
-  readonly expiredItems = this.store.expiredItems;
-  readonly inventorySummary = this.store.inventorySummary;
+  readonly pantryItems = this.pantryStore.items;
+  readonly lowStockItems = this.pantryStore.lowStockItems;
+  readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
+  readonly expiredItems = this.pantryStore.expiredItems;
+  readonly inventorySummary = this.pantryStore.summary;
 
   readonly isSnapshotCardExpanded = signal(true);
   readonly lastRefreshTimestamp = signal<string | null>(null);
@@ -48,7 +52,7 @@ export class DashboardStateService {
   constructor() {
     effect(() => {
       const items = this.pantryItems();
-      if (this.store.loading()) {
+      if (this.pantryStore.loading()) {
         return;
       }
       if (!this.hasCompletedInitialLoad) {
@@ -73,13 +77,13 @@ export class DashboardStateService {
   }
 
   async ionViewWillEnter(): Promise<void> {
-    await this.store.loadAll();
+    await this.pantryStore.loadAll();
     this.hasCompletedInitialLoad = true;
     this.lastRefreshTimestamp.set(new Date().toISOString());
   }
 
   dismissInsight(insight: Insight): void {
-    this.store.dismissInsight(insight.id);
+    this.insightService.dismiss(insight.id);
     this.visibleInsights.update(current => current.filter(item => item.id !== insight.id));
   }
 
@@ -113,34 +117,31 @@ export class DashboardStateService {
       return;
     }
 
-    this.isDeletingExpiredItems.set(true);
-    try {
-      await this.store.deleteExpiredItems();
-    } catch (err) {
+    await withSignalFlag(this.isDeletingExpiredItems, async () => {
+      await this.pantryStore.deleteExpiredItems();
+    }).catch(err => {
       console.error('[DashboardStateService] onDeleteExpiredItems error', err);
-    } finally {
-      this.isDeletingExpiredItems.set(false);
-    }
+    });
   }
 
   getItemTotalQuantity(item: PantryItem): number {
-    return this.store.getItemTotalQuantity(item);
+    return this.pantryStore.getItemTotalQuantity(item);
   }
 
   getItemUnitLabel(item: PantryItem): string {
-    const unit = this.store.getItemPrimaryUnit(item);
-    return this.store.getUnitLabel(unit);
+    const unit = this.pantryStore.getItemPrimaryUnit(item);
+    return this.pantryStore.getUnitLabel(unit);
   }
 
   getItemTotalMinThreshold(item: PantryItem): number {
-    return this.store.getItemTotalMinThreshold(item);
+    return this.pantryStore.getItemTotalMinThreshold(item);
   }
 
   getItemLocationsSummary(item: PantryItem): string {
     return item.locations
       .map(location => {
         const quantity = this.formatQuantityValue(getLocationQuantity(location));
-        const unit = this.store.getUnitLabel(location.unit ?? this.store.getItemPrimaryUnit(item));
+        const unit = this.pantryStore.getUnitLabel(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
         const name = this.formatLocationName(location.locationId);
         const batches = Array.isArray(location.batches) ? location.batches : [];
         if (batches.length) {
@@ -189,10 +190,7 @@ export class DashboardStateService {
   }
 
   private hasConfirmedExpiredDeletion(): boolean {
-    if (typeof window === 'undefined') {
-      return true;
-    }
-    return window.confirm(this.translate.instant('dashboard.confirmDeleteExpired'));
+    return this.confirm.confirm(this.translate.instant('dashboard.confirmDeleteExpired'));
   }
 
   private refreshDashboardInsights(
@@ -206,17 +204,17 @@ export class DashboardStateService {
       return;
     }
 
-    const pendingReviewProducts = this.store.getPendingReviewProducts(items);
+    const pendingReviewProducts = this.insightService.getPendingReviewProducts(items);
 
     const context: InsightContext = {
       expiringSoonItems: expiringSoon.map(item => ({
         id: item._id,
-        isLowStock: this.store.isItemLowStock(item),
-        quantity: this.store.getItemTotalQuantity(item),
+        isLowStock: this.pantryStore.isItemLowStock(item),
+        quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       expiredItems: expiredItems.map(item => ({
         id: item._id,
-        quantity: this.store.getItemTotalQuantity(item),
+        quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       expiringSoonCount: expiringSoon.length,
       lowStockCount: lowStockItems.length,
@@ -228,7 +226,7 @@ export class DashboardStateService {
       pendingReviewProducts,
     };
 
-    const generated = this.store.buildDashboardInsights(context);
-    this.visibleInsights.set(this.store.getVisibleInsights(generated));
+    const generated = this.insightService.buildDashboardInsights(context);
+    this.visibleInsights.set(this.insightService.getVisibleInsights(generated));
   }
 }

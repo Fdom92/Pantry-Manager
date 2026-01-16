@@ -1,23 +1,23 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { TOAST_DURATION } from '@core/constants';
 import { getPackageTypeTranslationKey, computeAnnualSavingsPercent } from '@core/domain/upgrade';
 import type { PlanViewModel } from '@core/models/upgrade';
-import { NavController, ToastController } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
-import { UpgradeStoreService } from './upgrade-store.service';
+import { ToastService, withSignalFlag } from '../shared';
+import { RevenuecatService } from './revenuecat.service';
 
 @Injectable()
 export class UpgradeStateService {
   private readonly navCtrl = inject(NavController);
-  private readonly toastCtrl = inject(ToastController);
   private readonly translate = inject(TranslateService);
-  private readonly store = inject(UpgradeStoreService);
+  private readonly revenuecat = inject(RevenuecatService);
+  private readonly toast = inject(ToastService);
 
   readonly isLoadingPlans = signal(false);
   readonly planOptions = signal<PlanViewModel[]>([]);
   readonly activePurchaseId = signal<string | null>(null);
-  readonly isPro$ = this.store.isPro$;
+  readonly isPro$ = this.revenuecat.isPro$;
 
   private monthlyPriceValue: number | null = null;
   private annualPriceValue: number | null = null;
@@ -25,7 +25,7 @@ export class UpgradeStateService {
   private readonly availablePackages: PurchasesPackage[] = [];
 
   async ionViewWillEnter(): Promise<void> {
-    if (this.store.isPro()) {
+    if (this.revenuecat.isPro()) {
       await this.navCtrl.navigateRoot('/dashboard');
       return;
     }
@@ -37,8 +37,8 @@ export class UpgradeStateService {
   }
 
   async restorePurchases(): Promise<void> {
-    const restored = await this.store.restore();
-    if (restored || this.store.isPro()) {
+    const restored = await this.revenuecat.restore();
+    if (restored || this.revenuecat.isPro()) {
       await this.navCtrl.navigateRoot('/dashboard');
       return;
     }
@@ -56,13 +56,13 @@ export class UpgradeStateService {
     }
     this.activePurchaseId.set(pkg.identifier);
     try {
-      const success = await this.store.purchasePackage(pkg);
+      const success = await this.revenuecat.purchasePackage(pkg);
       if (success) {
         await this.navCtrl.navigateRoot('/dashboard');
         return;
       }
 
-      const restored = await this.store.restore();
+      const restored = await this.revenuecat.restore();
       if (restored) {
         await this.navCtrl.navigateRoot('/dashboard');
         return;
@@ -74,13 +74,10 @@ export class UpgradeStateService {
   }
 
   private async loadAvailablePackages(): Promise<void> {
-    this.isLoadingPlans.set(true);
-    try {
-      const packages = await this.store.getAvailablePackages();
+    await withSignalFlag(this.isLoadingPlans, async () => {
+      const packages = await this.revenuecat.getAvailablePackages();
       this.buildPlanOptions(packages);
-    } finally {
-      this.isLoadingPlans.set(false);
-    }
+    });
   }
 
   private findPackageById(identifier: string): PurchasesPackage | null {
@@ -160,11 +157,6 @@ export class UpgradeStateService {
 
   private async presentUpgradeToast(key: string): Promise<void> {
     const message = this.translate.instant(key);
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: TOAST_DURATION,
-      position: 'bottom',
-    });
-    await toast.present();
+    await this.toast.present(message);
   }
 }

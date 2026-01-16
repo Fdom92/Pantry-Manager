@@ -1,6 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
-import { EXPORT_PATH, TOAST_DURATION, UNASSIGNED_LOCATION_KEY, SHOPPING_LIST_NAME } from '@core/constants';
+import { UNASSIGNED_LOCATION_KEY, SHOPPING_LIST_NAME } from '@core/constants';
 import { determineSuggestionNeed, groupSuggestionsBySupermarket, incrementSummary } from '@core/domain/shopping';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
@@ -14,22 +13,26 @@ import type {
 } from '@core/models/shopping';
 import { ShoppingReasonEnum } from '@core/models/shopping';
 import { LanguageService } from '../shared/language.service';
+import { DownloadService, ShareService, ToastService, withSignalFlag } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
-import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
-import { ShoppingStoreService } from './shopping-store.service';
+import { PantryService } from '../pantry/pantry.service';
+import { PantryStoreService } from '../pantry/pantry-store.service';
 
 @Injectable()
 export class ShoppingStateService {
-  private readonly store = inject(ShoppingStoreService);
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly pantryService = inject(PantryService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toast = inject(ToastService);
+  private readonly download = inject(DownloadService);
+  private readonly share = inject(ShareService);
 
-  readonly loading = this.store.loading;
-  readonly items = this.store.items;
+  readonly loading = this.pantryStore.loading;
+  readonly items = this.pantryStore.items;
 
   readonly isSummaryExpanded = signal(true);
   readonly processingSuggestionIds = signal<Set<string>>(new Set());
@@ -48,7 +51,7 @@ export class ShoppingStateService {
   });
 
   async ionViewWillEnter(): Promise<void> {
-    await this.store.loadAll();
+    await this.pantryStore.loadAll();
   }
 
   toggleSummaryCard(): void {
@@ -78,12 +81,12 @@ export class ShoppingStateService {
 
     this.processingSuggestionIds.update(ids => new Set(ids).add(id));
     try {
-      await this.store.addNewLot(id, {
+      await this.pantryService.addNewLot(id, {
         quantity: data.quantity,
         expiryDate: data.expiryDate ?? undefined,
         location: data.location,
       });
-      await this.store.loadAll();
+      await this.pantryStore.loadAll();
       this.closePurchaseModal();
     } finally {
       this.processingSuggestionIds.update(ids => {
@@ -108,7 +111,7 @@ export class ShoppingStateService {
   }
 
   getUnitLabel(unit: MeasurementUnit | string): string {
-    return this.store.getUnitLabel(normalizeUnitValue(unit));
+    return this.pantryStore.getUnitLabel(normalizeUnitValue(unit));
   }
 
   getLocationLabel(locationId: string): string {
@@ -130,25 +133,32 @@ export class ShoppingStateService {
       return;
     }
 
-    this.isSharingListInProgress.set(true);
-    try {
+    await withSignalFlag(this.isSharingListInProgress, async () => {
       const pdfBlob = this.buildShoppingPdf(state.groupedSuggestions);
       const filename = this.buildShareFileName();
-      const shared =
-        (await this.tryNativeShare(pdfBlob, filename)) || (await this.tryWebShare(pdfBlob, filename));
+      const { outcome } = await this.share.tryShareBlob({
+        blob: pdfBlob,
+        filename,
+        mimeType: 'application/pdf',
+        title: this.translate.instant('shopping.share.dialogTitle'),
+        text: this.translate.instant('shopping.share.dialogText'),
+      });
 
-      if (shared) {
+      if (outcome === 'shared') {
         await this.presentToast(this.translate.instant('shopping.share.ready'), 'success');
-      } else {
-        this.triggerDownload(pdfBlob, filename);
-        await this.presentToast(this.translate.instant('shopping.share.saved'), 'success');
+        return;
       }
-    } catch (err) {
+
+      if (outcome === 'cancelled') {
+        return;
+      }
+
+      this.download.downloadBlob(pdfBlob, filename);
+      await this.presentToast(this.translate.instant('shopping.share.saved'), 'success');
+    }).catch(async err => {
       console.error('[ShoppingStateService] shareShoppingList error', err);
       await this.presentToast(this.translate.instant('shopping.share.error'), 'danger');
-    } finally {
-      this.isSharingListInProgress.set(false);
-    }
+    });
   }
 
   private buildShoppingAnalysis(items: PantryItem[]): Omit<ShoppingStateWithItem, 'hasAlerts'> {
@@ -164,12 +174,12 @@ export class ShoppingStateService {
 
     for (const item of items) {
       const minThreshold = item.minThreshold != null ? Number(item.minThreshold) : null;
-      const totalQuantity = this.store.getItemTotalQuantity(item);
+      const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       const primaryLocation = item.locations[0];
       const locationId = primaryLocation?.locationId ?? UNASSIGNED_LOCATION_KEY;
-      const unit = normalizeUnitValue(primaryLocation?.unit ?? this.store.getItemPrimaryUnit(item));
+      const unit = normalizeUnitValue(primaryLocation?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
 
-      const shouldAutoAdd = this.store.shouldAutoAddToShoppingList(item, {
+      const shouldAutoAdd = this.pantryStore.shouldAutoAddToShoppingList(item, {
         totalQuantity,
         minThreshold,
       });
@@ -316,104 +326,7 @@ export class ShoppingStateService {
     return `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename()}.pdf`;
   }
 
-  private triggerDownload(blob: Blob, filename: string): void {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = filename;
-    anchor.rel = 'noopener';
-    anchor.click();
-    URL.revokeObjectURL(url);
-  }
-
-  private async tryWebShare(blob: Blob, filename: string): Promise<boolean> {
-    if (typeof navigator === 'undefined' || typeof window === 'undefined') {
-      return false;
-    }
-
-    const file = new File([blob], filename, { type: 'application/pdf' });
-    const canShareFiles =
-      typeof navigator.canShare === 'function' &&
-      navigator.canShare({ files: [file] }) &&
-      typeof navigator.share === 'function';
-
-    if (!canShareFiles) {
-      return false;
-    }
-
-    try {
-      await navigator.share({
-        title: this.translate.instant('shopping.share.dialogTitle'),
-        text: this.translate.instant('shopping.share.dialogText'),
-        files: [file],
-      });
-      return true;
-    } catch (err) {
-      console.warn('[ShoppingStateService] Web share failed or was cancelled', err);
-      return false;
-    }
-  }
-
-  private async tryNativeShare(blob: Blob, filename: string): Promise<boolean> {
-    if (!Capacitor.isNativePlatform()) {
-      return false;
-    }
-
-    try {
-      const [{ Filesystem, Directory }, { Share }] = await Promise.all([
-        import('@capacitor/filesystem'),
-        import('@capacitor/share'),
-      ]);
-      const base64Data = await this.blobToBase64(blob);
-      const path = `${EXPORT_PATH}/${filename}`;
-      await Filesystem.writeFile({
-        path,
-        data: base64Data,
-        directory: Directory.Documents,
-        recursive: true,
-      });
-      const { uri } = await Filesystem.getUri({ path, directory: Directory.Documents });
-      await Share.share({
-        title: this.translate.instant('shopping.share.dialogTitle'),
-        text: this.translate.instant('shopping.share.dialogText'),
-        url: uri,
-      });
-      return true;
-    } catch (err) {
-      console.warn('[ShoppingStateService] Native share unavailable', err);
-      return false;
-    }
-  }
-
-  private async blobToBase64(blob: Blob): Promise<string> {
-    const buffer = await blob.arrayBuffer();
-    return this.arrayBufferToBase64(buffer);
-  }
-
-  private arrayBufferToBase64(buffer: ArrayBuffer): string {
-    let binary = '';
-    const bytes = new Uint8Array(buffer);
-    const chunkSize = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, i + chunkSize);
-      binary += String.fromCharCode(...chunk);
-    }
-    return btoa(binary);
-  }
-
   private async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium'): Promise<void> {
-    if (!message) {
-      return;
-    }
-    const toast = await this.toastCtrl.create({
-      message,
-      color,
-      duration: TOAST_DURATION,
-      position: 'bottom',
-    });
-    await toast.present();
+    await this.toast.present(message, { color });
   }
 }

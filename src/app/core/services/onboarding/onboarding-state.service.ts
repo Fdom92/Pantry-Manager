@@ -1,19 +1,20 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AGENT_SLIDE_LOCKED, AGENT_SLIDE_UNLOCKED, CORE_SLIDES } from '@core/constants/onboarding';
+import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { isLastIndex } from '@core/domain/onboarding';
 import type { OnboardingSlide } from '@core/models/onboarding';
 import { NavController } from '@ionic/angular';
 import { register } from 'swiper/element/bundle';
 import type { SwiperOptions } from 'swiper/types';
-import { OnboardingStoreService } from './onboarding-store.service';
+import { RevenuecatService } from '../upgrade/revenuecat.service';
 
 let swiperRegistered = false;
 
 @Injectable()
 export class OnboardingStateService {
   private readonly navCtrl = inject(NavController);
-  private readonly store = inject(OnboardingStoreService);
+  private readonly revenuecat = inject(RevenuecatService);
 
   readonly slideOptions: SwiperOptions = {
     speed: 550,
@@ -28,7 +29,7 @@ export class OnboardingStateService {
   };
 
   readonly currentSlideIndex = signal(0);
-  readonly isProUser = toSignal(this.store.isPro$, { initialValue: false });
+  readonly isProUser = toSignal(this.revenuecat.isPro$, { initialValue: false });
 
   readonly availableSlides = computed<OnboardingSlide[]>(() => {
     const agentSlide = this.isProUser() ? AGENT_SLIDE_UNLOCKED : AGENT_SLIDE_LOCKED;
@@ -76,7 +77,15 @@ export class OnboardingStateService {
   }
 
   async completeOnboarding(): Promise<void> {
-    this.store.persistOnboardingFlag();
+    this.persistOnboardingFlag();
     await this.navCtrl.navigateRoot('/dashboard');
+  }
+
+  private persistOnboardingFlag(): void {
+    try {
+      localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
+    } catch (err) {
+      console.warn('[Onboarding] failed to persist onboarding flag', err);
+    }
   }
 }
