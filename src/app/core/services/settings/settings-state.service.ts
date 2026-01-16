@@ -1,17 +1,19 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { IMPORT_EMPTY_ERROR, IMPORT_EMPTY_INVALID } from '@core/constants';
 import { buildExportFileName, parseBackup } from '@core/domain/settings';
 import type { AppThemePreference } from '@core/models';
 import type { BaseDoc } from '@core/models/shared';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfirmService, DownloadService, ShareService, ToastService, withSignalFlag } from '../shared';
+import { ConfirmService, DownloadService, ShareService, ToastService, createLatestOnlyRunner, withSignalFlag } from '../shared';
 import { StorageService } from '../shared/storage.service';
 import { RevenuecatService } from '../upgrade/revenuecat.service';
 import { AppPreferencesService } from './app-preferences.service';
 
 @Injectable()
 export class SettingsStateService {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly lifecycle = createLatestOnlyRunner(this.destroyRef);
   private readonly translate = inject(TranslateService);
   private readonly storage = inject<StorageService<BaseDoc>>(StorageService);
   private readonly appPreferences = inject(AppPreferencesService);
@@ -44,14 +46,19 @@ export class SettingsStateService {
     await withSignalFlag(this.isResettingData, async () => {
       await this.storage.clearAll();
       await this.appPreferences.reload();
+      if (this.lifecycle.isDestroyed()) {
+        return;
+      }
       await this.presentToast(this.translate.instant('settings.reset.success'), 'success');
     }).catch(async err => {
       console.error('[SettingsStateService] resetApplicationData error', err);
-      await this.presentToast(this.translate.instant('settings.reset.error'), 'danger');
+      if (!this.lifecycle.isDestroyed()) {
+        await this.presentToast(this.translate.instant('settings.reset.error'), 'danger');
+      }
     });
   }
 
-  triggerImportPicker(fileInput: HTMLInputElement | null): void {
+  openImportPicker(fileInput: HTMLInputElement | null): void {
     if (!fileInput || this.isImportingData()) {
       return;
     }
@@ -82,6 +89,10 @@ export class SettingsStateService {
         text: this.translate.instant('settings.export.shareText'),
       });
 
+      if (this.lifecycle.isDestroyed()) {
+        return;
+      }
+
       if (outcome === 'shared') {
         await this.presentToast(this.translate.instant('settings.export.readyToShare'), 'success');
         return;
@@ -95,11 +106,13 @@ export class SettingsStateService {
       await this.presentToast(this.translate.instant('settings.export.success'), 'success');
     }).catch(async err => {
       console.error('[SettingsStateService] exportDataBackup error', err);
-      await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
+      if (!this.lifecycle.isDestroyed()) {
+        await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
+      }
     });
   }
 
-  async handleImportFileSelection(event: Event): Promise<void> {
+  async submitImportFileSelection(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement | null;
     const file = input?.files?.[0];
     if (input) {
@@ -119,7 +132,10 @@ export class SettingsStateService {
       const docs = parseBackup(fileContents, new Date().toISOString());
       await this.applyImport(docs);
     }).catch(async (err: any) => {
-      console.error('[SettingsStateService] handleImportFileSelection error', err);
+      console.error('[SettingsStateService] submitImportFileSelection error', err);
+      if (this.lifecycle.isDestroyed()) {
+        return;
+      }
       const messageKey =
         err?.message === IMPORT_EMPTY_ERROR
           ? 'settings.import.empty'
@@ -146,7 +162,9 @@ export class SettingsStateService {
       });
     }).catch(async err => {
       console.error('[SettingsStateService] updateThemePreference error', err);
-      await this.presentToast(this.translate.instant('settings.appearance.error'), 'danger');
+      if (!this.lifecycle.isDestroyed()) {
+        await this.presentToast(this.translate.instant('settings.appearance.error'), 'danger');
+      }
     });
   }
 
@@ -175,6 +193,9 @@ export class SettingsStateService {
     await this.storage.clearAll();
     await this.storage.bulkSave(docs);
     await this.appPreferences.reload();
+    if (this.lifecycle.isDestroyed()) {
+      return;
+    }
     await this.presentToast(this.translate.instant('settings.import.success'), 'success');
     if (typeof window !== 'undefined') {
       setTimeout(() => window.location.reload(), 300);

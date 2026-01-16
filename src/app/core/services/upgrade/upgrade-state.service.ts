@@ -1,14 +1,16 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { getPackageTypeTranslationKey, computeAnnualSavingsPercent } from '@core/domain/upgrade';
 import type { PlanViewModel } from '@core/models/upgrade';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
-import { ToastService, withSignalFlag } from '../shared';
+import { ToastService, createLatestOnlyRunner, withSignalFlag } from '../shared';
 import { RevenuecatService } from './revenuecat.service';
 
 @Injectable()
 export class UpgradeStateService {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly lifecycle = createLatestOnlyRunner(this.destroyRef);
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
   private readonly revenuecat = inject(RevenuecatService);
@@ -26,6 +28,9 @@ export class UpgradeStateService {
 
   async ionViewWillEnter(): Promise<void> {
     if (this.revenuecat.isPro()) {
+      if (this.lifecycle.isDestroyed()) {
+        return;
+      }
       await this.navCtrl.navigateRoot('/dashboard');
       return;
     }
@@ -33,19 +38,27 @@ export class UpgradeStateService {
   }
 
   async skipUpgradeFlow(): Promise<void> {
+    if (this.lifecycle.isDestroyed()) {
+      return;
+    }
     await this.navCtrl.navigateRoot('/dashboard');
   }
 
   async restorePurchases(): Promise<void> {
     const restored = await this.revenuecat.restore();
     if (restored || this.revenuecat.isPro()) {
+      if (this.lifecycle.isDestroyed()) {
+        return;
+      }
       await this.navCtrl.navigateRoot('/dashboard');
       return;
     }
-    await this.presentUpgradeToast('upgrade.errors.purchaseFailed');
+    if (!this.lifecycle.isDestroyed()) {
+      await this.presentUpgradeToast('upgrade.errors.purchaseFailed');
+    }
   }
 
-  handleSelectPlan(plan: PlanViewModel): void {
+  selectPlan(plan: PlanViewModel): void {
     const pkg = this.findPackageById(plan.id);
     void this.purchasePlan(pkg);
   }
@@ -58,16 +71,24 @@ export class UpgradeStateService {
     try {
       const success = await this.revenuecat.purchasePackage(pkg);
       if (success) {
+        if (this.lifecycle.isDestroyed()) {
+          return;
+        }
         await this.navCtrl.navigateRoot('/dashboard');
         return;
       }
 
       const restored = await this.revenuecat.restore();
       if (restored) {
+        if (this.lifecycle.isDestroyed()) {
+          return;
+        }
         await this.navCtrl.navigateRoot('/dashboard');
         return;
       }
-      await this.presentUpgradeToast('upgrade.errors.purchaseFailed');
+      if (!this.lifecycle.isDestroyed()) {
+        await this.presentUpgradeToast('upgrade.errors.purchaseFailed');
+      }
     } finally {
       this.activePurchaseId.set(null);
     }
@@ -76,6 +97,9 @@ export class UpgradeStateService {
   private async loadAvailablePackages(): Promise<void> {
     await withSignalFlag(this.isLoadingPlans, async () => {
       const packages = await this.revenuecat.getAvailablePackages();
+      if (this.lifecycle.isDestroyed()) {
+        return;
+      }
       this.buildPlanOptions(packages);
     });
   }

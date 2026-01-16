@@ -1,2 +1,2 @@
 export * from './shopping-state.service';
-export * from './shopping-add-purchase-modal-state.service';
+export * from './modals/shopping-add-purchase-modal-state.service';

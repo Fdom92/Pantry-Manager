@@ -31,7 +31,7 @@
   <ion-button
     expand="block"
     color="primary"
-    (click)="state.savePlannerMemory()"
+    (click)="state.submitPlannerMemory()"
     [disabled]="!state.hasChanges() || state.isSaving() || state.isLoading()"
   >
     @if (state.isSaving()) {

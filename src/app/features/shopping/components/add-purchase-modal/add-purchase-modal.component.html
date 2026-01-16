@@ -1,4 +1,4 @@
-<ion-modal [isOpen]="state.isPurchaseModalOpen()" (willDismiss)="modal.cancel()">
+<ion-modal [isOpen]="state.isPurchaseModalOpen()" (willDismiss)="modal.close()">
   <ng-template>
     @let target = state.purchaseTarget();
     @if (!target) {
@@ -10,7 +10,7 @@
         <ion-toolbar>
           <ion-title>{{ 'shopping.purchaseModal.titleProduct' | translate }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button fill="clear" color="medium" (click)="modal.cancel()">
+            <ion-button fill="clear" color="medium" (click)="modal.close()">
               <ion-icon slot="icon-only" name="close"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -67,7 +67,7 @@
               fill="solid"
               expand="block"
               [disabled]="!modal.canConfirm || state.isSuggestionProcessing(target.item._id)"
-              (click)="modal.submit()">
+              (click)="modal.submitPurchase()">
               {{ 'shopping.purchaseModal.addToPantry' | translate }}
             </ion-button>
           </ion-buttons>

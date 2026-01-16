@@ -6,8 +6,8 @@ import {
 } from '@core/constants';
 import { normalizeStringList } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { ToastService, withSignalFlag } from '../shared';
-import { AppPreferencesService } from './app-preferences.service';
+import { ToastService, withSignalFlag } from '../../shared';
+import { AppPreferencesService } from '../app-preferences.service';
 
 @Injectable()
 export class SettingsCatalogsStateService {
@@ -15,8 +15,8 @@ export class SettingsCatalogsStateService {
   private readonly translate = inject(TranslateService);
   private readonly toast = inject(ToastService);
 
-  readonly loading = signal(false);
-  readonly savingCatalogs = signal(false);
+  readonly isLoading = signal(false);
+  readonly isSaving = signal(false);
   readonly locationOptionsDraft = signal<string[]>([]);
   readonly originalLocationOptions = signal<string[]>([]);
   readonly categoryOptionsDraft = signal<string[]>([]);
@@ -122,8 +122,8 @@ export class SettingsCatalogsStateService {
     this.supermarketOptionsDraft.set([...DEFAULT_SUPERMARKET_OPTIONS]);
   }
 
-  async saveCatalogs(): Promise<void> {
-    if (this.savingCatalogs() || !this.hasAnyChanges()) {
+  async submitCatalogs(): Promise<void> {
+    if (this.isSaving() || !this.hasAnyChanges()) {
       return;
     }
 
@@ -135,7 +135,7 @@ export class SettingsCatalogsStateService {
     const categoryPayload = normalizedCategories.length ? normalizedCategories : [...DEFAULT_CATEGORY_OPTIONS];
     const supermarketPayload = normalizedSupermarkets.length ? normalizedSupermarkets : [...DEFAULT_SUPERMARKET_OPTIONS];
 
-    await withSignalFlag(this.savingCatalogs, async () => {
+    await withSignalFlag(this.isSaving, async () => {
       const current = await this.appPreferencesService.getPreferences();
       await this.appPreferencesService.savePreferences({
         ...current,
@@ -151,13 +151,13 @@ export class SettingsCatalogsStateService {
       this.supermarketOptionsDraft.set([...supermarketPayload]);
       await this.toast.present(this.translate.instant('settings.catalogs.saveSuccess'), { color: 'success' });
     }).catch(async err => {
-      console.error('[SettingsCatalogsStateService] saveCatalogs error', err);
+      console.error('[SettingsCatalogsStateService] submitCatalogs error', err);
       await this.toast.present(this.translate.instant('settings.catalogs.saveError'), { color: 'danger' });
     });
   }
 
   private async loadPreferences(): Promise<void> {
-    await withSignalFlag(this.loading, async () => {
+    await withSignalFlag(this.isLoading, async () => {
       await this.appPreferencesService.getPreferences();
       this.syncLocationOptionsFromPreferences();
       this.syncCategoryOptionsFromPreferences();

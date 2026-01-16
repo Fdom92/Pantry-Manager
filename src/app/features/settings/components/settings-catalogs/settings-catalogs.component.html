@@ -8,7 +8,7 @@
   </ion-header>
 
 <ion-content>
-  @if (state.loading()) {
+  @if (state.isLoading()) {
     <ion-progress-bar type="indeterminate"></ion-progress-bar>
   }
   <div class="catalogs-content">
@@ -193,9 +193,9 @@
       <ion-button
         expand="block"
         color="primary"
-        (click)="state.saveCatalogs()"
-        [disabled]="!state.hasAnyChanges() || state.savingCatalogs()">
-        @if (state.savingCatalogs()) {
+        (click)="state.submitCatalogs()"
+        [disabled]="!state.hasAnyChanges() || state.isSaving()">
+        @if (state.isSaving()) {
           <ion-spinner
             slot="start"
             name="dots">

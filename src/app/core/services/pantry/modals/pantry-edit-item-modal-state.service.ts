@@ -23,11 +23,11 @@ import {
   normalizeUnitValue,
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { AppPreferencesService } from '../settings/app-preferences.service';
-import { LanguageService } from '../shared/language.service';
-import { ToastService } from '../shared/toast.service';
-import { PantryStoreService } from './pantry-store.service';
-import { PantryStateService } from './pantry-state.service';
+import { AppPreferencesService } from '../../settings/app-preferences.service';
+import { LanguageService } from '../../shared/language.service';
+import { ToastService } from '../../shared/toast.service';
+import { PantryStoreService } from '../pantry-store.service';
+import { PantryStateService } from '../pantry-state.service';
 
 @Injectable()
 export class PantryEditItemModalStateService {
@@ -532,4 +532,3 @@ export class PantryEditItemModalStateService {
     await this.toast.present(message, { color });
   }
 }
-

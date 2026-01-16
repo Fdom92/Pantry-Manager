@@ -108,7 +108,7 @@ export class DashboardStateService {
     this.isSnapshotCardExpanded.update(open => !open);
   }
 
-  async onDeleteExpiredItems(): Promise<void> {
+  async deleteExpiredItems(): Promise<void> {
     if (!this.canDeleteExpiredItems()) {
       return;
     }
@@ -120,7 +120,7 @@ export class DashboardStateService {
     await withSignalFlag(this.isDeletingExpiredItems, async () => {
       await this.pantryStore.deleteExpiredItems();
     }).catch(err => {
-      console.error('[DashboardStateService] onDeleteExpiredItems error', err);
+      console.error('[DashboardStateService] deleteExpiredItems error', err);
     });
   }
 

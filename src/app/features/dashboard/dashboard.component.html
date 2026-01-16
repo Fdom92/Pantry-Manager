@@ -145,7 +145,7 @@
             fill="clear"
             size="small"
             [disabled]="facade.isDeletingExpiredItems()"
-            (click)="facade.onDeleteExpiredItems()"
+            (click)="facade.deleteExpiredItems()"
             [attr.aria-label]="'dashboard.expired.deleteAria' | translate"
           >
             @if (facade.isDeletingExpiredItems()) {

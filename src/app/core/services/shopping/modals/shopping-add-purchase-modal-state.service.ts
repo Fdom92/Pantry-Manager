@@ -1,6 +1,6 @@
 import { Injectable, effect, inject } from '@angular/core';
 import { normalizeLocationId } from '@core/utils/normalization.util';
-import { ShoppingStateService } from './shopping-state.service';
+import { ShoppingStateService } from '../shopping-state.service';
 
 @Injectable()
 export class ShoppingAddPurchaseModalStateService {
@@ -71,11 +71,11 @@ export class ShoppingAddPurchaseModalStateService {
     this.quantity = Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
   }
 
-  cancel(): void {
+  close(): void {
     this.shopping.closePurchaseModal();
   }
 
-  async submit(): Promise<void> {
+  async submitPurchase(): Promise<void> {
     if (!this.canConfirm) {
       return;
     }
@@ -87,4 +87,3 @@ export class ShoppingAddPurchaseModalStateService {
     await this.shopping.confirmPurchaseForTarget(payload);
   }
 }
-

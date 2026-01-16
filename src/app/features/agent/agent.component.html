@@ -130,7 +130,7 @@
       </div>
       <div class="quick-start__chips">
         @for (prompt of facade.quickPrompts; track prompt.id) {
-          <ion-chip (click)="facade.triggerQuickPrompt(prompt)" [disabled]="facade.isAgentProcessing()">
+          <ion-chip (click)="facade.selectQuickPrompt(prompt)" [disabled]="facade.isAgentProcessing()">
             {{ prompt.labelKey | translate }}
           </ion-chip>
         }

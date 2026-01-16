@@ -87,7 +87,7 @@
         accept="application/json,.json,*/*"
         hidden
         #importInput
-        (change)="facade.handleImportFileSelection($event)"
+        (change)="facade.submitImportFileSelection($event)"
       />
       <ion-card-header>
         <ion-card-title>{{ "settings.data.title" | translate }}</ion-card-title>
@@ -151,7 +151,7 @@
               slot="end"
               color="secondary"
               fill="clear"
-              (click)="facade.triggerImportPicker(importInput)"
+              (click)="facade.openImportPicker(importInput)"
               [disabled]="facade.isImportingData()"
               [attr.aria-label]="'settings.data.importAction' | translate"
             >

@@ -30,8 +30,8 @@ export class OnboardingPage implements AfterViewInit {
     this.facade.initializeSwiper(this.swiperElement?.nativeElement);
   }
 
-  handleSlideChanged(): void {
-    this.facade.handleSlideChanged(this.swiperElement?.nativeElement);
+  onSlideChanged(): void {
+    this.facade.onSlideChanged(this.swiperElement?.nativeElement);
   }
 
   isLastSlide(): boolean {

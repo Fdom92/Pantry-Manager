@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { PLANNER_MEMORY_LIMIT } from '@core/constants';
-import { ToastService, withSignalFlag } from '../shared';
-import { AppPreferencesService } from './app-preferences.service';
+import { ToastService, withSignalFlag } from '../../shared';
+import { AppPreferencesService } from '../app-preferences.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class SettingsAiStateService {
     this.plannerMemory.set(normalized);
   }
 
-  async savePlannerMemory(): Promise<void> {
+  async submitPlannerMemory(): Promise<void> {
     if (this.isSaving() || this.isLoading() || !this.hasChanges()) {
       return;
     }
@@ -43,7 +43,7 @@ export class SettingsAiStateService {
       this.plannerMemory.set(next);
       await this.toast.present(this.translate.instant('settings.ai.saveSuccess'), { color: 'success' });
     }).catch(async err => {
-      console.error('[SettingsAiStateService] savePlannerMemory error', err);
+      console.error('[SettingsAiStateService] submitPlannerMemory error', err);
       await this.toast.present(this.translate.instant('settings.ai.saveError'), { color: 'danger' });
     });
   }

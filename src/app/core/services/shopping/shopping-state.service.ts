@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { UNASSIGNED_LOCATION_KEY, SHOPPING_LIST_NAME } from '@core/constants';
 import { determineSuggestionNeed, groupSuggestionsBySupermarket, incrementSummary } from '@core/domain/shopping';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
@@ -13,7 +13,7 @@ import type {
 } from '@core/models/shopping';
 import { ShoppingReasonEnum } from '@core/models/shopping';
 import { LanguageService } from '../shared/language.service';
-import { DownloadService, ShareService, ToastService, withSignalFlag } from '../shared';
+import { DownloadService, ShareService, ToastService, createLatestOnlyRunner, withSignalFlag } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
@@ -23,6 +23,8 @@ import { PantryStoreService } from '../pantry/pantry-store.service';
 
 @Injectable()
 export class ShoppingStateService {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly shareTask = createLatestOnlyRunner(this.destroyRef);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
   private readonly translate = inject(TranslateService);
@@ -123,41 +125,52 @@ export class ShoppingStateService {
   }
 
   async shareShoppingListReport(): Promise<void> {
-    if (this.isSharingListInProgress()) {
-      return;
-    }
+    await this.shareTask.run(async isActive => {
+      if (this.isSharingListInProgress()) {
+        return;
+      }
 
-    const state = this.shoppingAnalysis();
-    if (!state.summary.total) {
-      await this.presentToast(this.translate.instant('shopping.share.empty'), 'medium');
-      return;
-    }
+      const state = this.shoppingAnalysis();
+      if (!state.summary.total) {
+        if (isActive()) {
+          await this.presentToast(this.translate.instant('shopping.share.empty'), 'medium');
+        }
+        return;
+      }
 
-    await withSignalFlag(this.isSharingListInProgress, async () => {
-      const pdfBlob = this.buildShoppingPdf(state.groupedSuggestions);
-      const filename = this.buildShareFileName();
-      const { outcome } = await this.share.tryShareBlob({
-        blob: pdfBlob,
-        filename,
-        mimeType: 'application/pdf',
-        title: this.translate.instant('shopping.share.dialogTitle'),
-        text: this.translate.instant('shopping.share.dialogText'),
+      await withSignalFlag(this.isSharingListInProgress, async () => {
+        const pdfBlob = this.buildShoppingPdf(state.groupedSuggestions);
+        const filename = this.buildShareFileName();
+        const { outcome } = await this.share.tryShareBlob({
+          blob: pdfBlob,
+          filename,
+          mimeType: 'application/pdf',
+          title: this.translate.instant('shopping.share.dialogTitle'),
+          text: this.translate.instant('shopping.share.dialogText'),
+        });
+
+        if (!isActive()) {
+          return;
+        }
+
+        if (outcome === 'shared') {
+          await this.presentToast(this.translate.instant('shopping.share.ready'), 'success');
+          return;
+        }
+
+        if (outcome === 'cancelled') {
+          return;
+        }
+
+        this.download.downloadBlob(pdfBlob, filename);
+        await this.presentToast(this.translate.instant('shopping.share.saved'), 'success');
+      }).catch(async err => {
+        if (!isActive()) {
+          return;
+        }
+        console.error('[ShoppingStateService] shareShoppingList error', err);
+        await this.presentToast(this.translate.instant('shopping.share.error'), 'danger');
       });
-
-      if (outcome === 'shared') {
-        await this.presentToast(this.translate.instant('shopping.share.ready'), 'success');
-        return;
-      }
-
-      if (outcome === 'cancelled') {
-        return;
-      }
-
-      this.download.downloadBlob(pdfBlob, filename);
-      await this.presentToast(this.translate.instant('shopping.share.saved'), 'success');
-    }).catch(async err => {
-      console.error('[ShoppingStateService] shareShoppingList error', err);
-      await this.presentToast(this.translate.instant('shopping.share.error'), 'danger');
     });
   }
 

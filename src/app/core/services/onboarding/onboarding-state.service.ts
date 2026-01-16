@@ -51,7 +51,7 @@ export class OnboardingStateService {
     swiperEl.initialize?.();
   }
 
-  handleSlideChanged(swiperEl: any): void {
+  onSlideChanged(swiperEl: any): void {
     const swiper = swiperEl?.swiper;
     if (!swiper) {
       return;

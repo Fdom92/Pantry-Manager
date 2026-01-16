@@ -12,6 +12,7 @@ import { RevenuecatService } from '../upgrade/revenuecat.service';
 import { AgentConversationStore } from './agent-conversation.store';
 import { MealPlannerAgentService } from './meal-planner-agent.service';
 import { findLastUserMessageIndex } from './conversation.utils';
+import { createLatestOnlyRunner } from '../shared';
 
 @Injectable()
 export class AgentStateService {
@@ -20,6 +21,7 @@ export class AgentStateService {
   private readonly revenuecat = inject(RevenuecatService);
   private readonly navCtrl = inject(NavController);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly requestTask = createLatestOnlyRunner(this.destroyRef);
   private readonly translate = inject(TranslateService);
 
   private content?: IonContent;
@@ -43,6 +45,12 @@ export class AgentStateService {
   });
 
   constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.requestTask.cancel();
+      this.conversationStore.setAgentPhase('idle');
+      this.conversationStore.setRetryAvailable(false);
+    });
+
     this.canUseAgent$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(isUnlocked => {
@@ -141,7 +149,7 @@ export class AgentStateService {
     await this.handlePlannerRequest(history[lastUserIndex].content, { appendUserMessage: false });
   }
 
-  async triggerQuickPrompt(prompt: QuickPrompt): Promise<void> {
+  async selectQuickPrompt(prompt: QuickPrompt): Promise<void> {
     if (!this.revenuecat.canUseAgent()) {
       await this.navigateToUpgrade();
       return;
@@ -174,35 +182,46 @@ export class AgentStateService {
       return;
     }
 
-    if (options?.appendUserMessage !== false) {
-      const userMessage = this.conversationStore.createMessage('user', trimmed);
-      this.conversationStore.appendMessage(userMessage);
-      this.markConversationStarted();
-    }
+    await this.requestTask.run(async isActive => {
+      if (options?.appendUserMessage !== false) {
+        const userMessage = this.conversationStore.createMessage('user', trimmed);
+        this.conversationStore.appendMessage(userMessage);
+        this.markConversationStarted();
+      }
 
-    this.conversationStore.setRetryAvailable(false);
-    this.conversationStore.setAgentPhase('thinking');
-    try {
-      const response = await this.mealPlannerAgent.run(userText);
-      this.conversationStore.setAgentPhase('responding');
-      const assistantMessage = this.conversationStore.createMessage(
-        'assistant',
-        response || this.translate.instant('agent.messages.noResponse')
-      );
-      this.conversationStore.appendMessage(assistantMessage);
-    } catch (err) {
-      console.error('[AgentStateService] Meal planner run failed', err);
-      const errorMessage = this.conversationStore.createMessage(
-        'assistant',
-        this.translate.instant('agent.messages.unifiedError'),
-        'error'
-      );
-      this.conversationStore.appendMessage(errorMessage);
-      this.conversationStore.setRetryAvailable(true);
-    } finally {
-      this.conversationStore.setAgentPhase('idle');
-      await this.scrollToChatBottom();
-    }
+      this.conversationStore.setRetryAvailable(false);
+      this.conversationStore.setAgentPhase('thinking');
+
+      try {
+        const response = await this.mealPlannerAgent.run(userText);
+        if (!isActive()) {
+          return;
+        }
+        this.conversationStore.setAgentPhase('responding');
+        const assistantMessage = this.conversationStore.createMessage(
+          'assistant',
+          response || this.translate.instant('agent.messages.noResponse')
+        );
+        this.conversationStore.appendMessage(assistantMessage);
+      } catch (err) {
+        if (!isActive()) {
+          return;
+        }
+        console.error('[AgentStateService] Meal planner run failed', err);
+        const errorMessage = this.conversationStore.createMessage(
+          'assistant',
+          this.translate.instant('agent.messages.unifiedError'),
+          'error'
+        );
+        this.conversationStore.appendMessage(errorMessage);
+        this.conversationStore.setRetryAvailable(true);
+      } finally {
+        if (isActive()) {
+          this.conversationStore.setAgentPhase('idle');
+          await this.scrollToChatBottom();
+        }
+      }
+    });
   }
 
   private prepareCustomPrompt(): void {
