@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ShoppingStateService } from '@core/services/shopping';
 import { normalizeLocationId } from '@core/utils/normalization.util';
 import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
-import { ShoppingFacade } from '../../facade/shopping.facade';
 
 @Component({
   selector: 'app-add-purchase-modal',
@@ -20,7 +20,7 @@ import { ShoppingFacade } from '../../facade/shopping.facade';
 })
 export class AddPurchaseModalComponent {
   // DI (feature-scoped)
-  readonly state = inject(ShoppingFacade);
+  readonly state = inject(ShoppingStateService);
   // DATA (local form state)
   quantity = 1;
   expiryDate: string | null = null;

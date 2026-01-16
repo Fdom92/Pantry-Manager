@@ -23,7 +23,6 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
-import { DashboardFacade } from './facade/dashboard.facade';
 
 @Component({
   selector: 'app-dashboard',
@@ -53,10 +52,10 @@ import { DashboardFacade } from './facade/dashboard.facade';
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  providers: [DashboardStateService, DashboardFacade],
+  providers: [DashboardStateService],
 })
 export class DashboardComponent {
-  readonly facade = inject(DashboardFacade);
+  readonly facade = inject(DashboardStateService);
 
   /** Lifecycle hook: populate dashboard data and stamp the refresh time. */
   async ionViewWillEnter(): Promise<void> {

@@ -23,7 +23,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { PantryFacade } from '../../facade/pantry.facade';
+import { PantryStateService } from '@core/services/pantry';
 
 @Component({
   selector: 'app-pantry-move-modal',
@@ -58,5 +58,5 @@ import { PantryFacade } from '../../facade/pantry.facade';
 })
 export class PantryMoveModalComponent {
   // DI
-  readonly state = inject(PantryFacade);
+  readonly state = inject(PantryStateService);
 }

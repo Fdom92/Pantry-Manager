@@ -5,7 +5,6 @@ import { AgentStateService } from '@core/services/agent';
 import { IonBadge, IonButton, IonButtons, IonChip, IonContent, IonFooter, IonHeader, IonIcon, IonSpinner, IonTextarea, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { ViewWillEnter } from '@ionic/angular';
-import { AgentFacade } from './facade/agent.facade';
 
 @Component({
   selector: 'app-agent',
@@ -30,13 +29,13 @@ import { AgentFacade } from './facade/agent.facade';
   templateUrl: './agent.component.html',
   styleUrls: ['./agent.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [AgentStateService, AgentFacade],
+  providers: [AgentStateService],
 })
 export class AgentComponent implements ViewWillEnter, AfterViewInit {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
   @ViewChild(IonTextarea, { static: false }) private composerInput?: IonTextarea;
 
-  readonly facade = inject(AgentFacade);
+  readonly facade = inject(AgentStateService);
 
   ngAfterViewInit(): void {
     this.facade.attachView(this.content, this.composerInput);
@@ -47,4 +46,3 @@ export class AgentComponent implements ViewWillEnter, AfterViewInit {
     await this.facade.ionViewWillEnter();
   }
 }
-

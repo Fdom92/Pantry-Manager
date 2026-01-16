@@ -11,7 +11,6 @@ import {
 import { OnboardingStateService } from '@core/services/onboarding';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { OnboardingFacade } from './facade/onboarding.facade';
 
 @Component({
   selector: 'app-onboarding',
@@ -21,11 +20,11 @@ import { OnboardingFacade } from './facade/onboarding.facade';
   styleUrls: ['./onboarding.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [OnboardingStateService, OnboardingFacade],
+  providers: [OnboardingStateService],
 })
 export class OnboardingPage implements AfterViewInit {
   @ViewChild('swiperRef') swiperElement?: ElementRef<any>;
-  readonly facade = inject(OnboardingFacade);
+  readonly facade = inject(OnboardingStateService);
 
   ngAfterViewInit(): void {
     this.facade.initializeSwiper(this.swiperElement?.nativeElement);
@@ -51,4 +50,3 @@ export class OnboardingPage implements AfterViewInit {
     await this.facade.completeOnboarding();
   }
 }
-

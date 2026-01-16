@@ -4,16 +4,15 @@ import { RouterModule } from '@angular/router';
 import { TabsStateService } from '@core/services/tabs';
 import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { TabsFacade } from './facade/tabs.facade';
 
 @Component({
   selector: 'app-tabs',
   standalone: true,
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, RouterModule, CommonModule, TranslateModule],
-  providers: [TabsStateService, TabsFacade],
+  providers: [TabsStateService],
   templateUrl: './tabs.component.html',
   styleUrls: ['./tabs.component.scss'],
 })
 export class TabsComponent {
-  readonly facade = inject(TabsFacade);
+  readonly facade = inject(TabsStateService);
 }

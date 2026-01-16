@@ -23,7 +23,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { ProBannerComponent } from '@shared/components/pro-banner/pro-banner.component';
-import { SettingsFacade } from './facade/settings.facade';
+import packageJson from '../../../../package.json';
 
 @Component({
   selector: 'app-settings',
@@ -53,10 +53,11 @@ import { SettingsFacade } from './facade/settings.facade';
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
-  providers: [SettingsStateService, SettingsFacade],
+  providers: [SettingsStateService],
 })
 export class SettingsComponent {
-  readonly facade = inject(SettingsFacade);
+  readonly facade = inject(SettingsStateService);
+  readonly appVersion = packageJson.version ?? '0.0.0';
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();

@@ -46,7 +46,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-import { PantryFacade } from '../../facade/pantry.facade';
+import { PantryStateService } from '@core/services/pantry';
 
 @Component({
   selector: 'app-pantry-edit-item-modal',
@@ -87,7 +87,7 @@ export class PantryEditItemModalComponent {
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
-  private readonly listState = inject(PantryFacade);
+  private readonly listState = inject(PantryStateService);
   // DATA
   isSaving = false;
   editingItem: PantryItem | null = null;

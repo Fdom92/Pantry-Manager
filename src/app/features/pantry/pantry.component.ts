@@ -32,7 +32,6 @@ import { PantryEditItemModalComponent } from './components/edit-item-modal/edit-
 import { PantryFiltersModalComponent } from './components/filters-modal/filters-modal.component';
 import { PantryMoveModalComponent } from './components/move-modal/move-modal.component';
 import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.component';
-import { PantryFacade } from './facade/pantry.facade';
 import { PantryStateService } from '@core/services/pantry';
 
 @Component({
@@ -74,10 +73,10 @@ import { PantryStateService } from '@core/services/pantry';
   templateUrl: './pantry.component.html',
   styleUrls: ['./pantry.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [PantryStateService, PantryFacade],
+  providers: [PantryStateService],
 })
 export class PantryComponent implements OnDestroy {
-  readonly facade = inject(PantryFacade);
+  readonly facade = inject(PantryStateService);
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();

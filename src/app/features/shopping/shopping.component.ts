@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { AddPurchaseModalComponent } from './components/add-purchase-modal/add-purchase-modal.component';
-import { ShoppingFacade } from './facade/shopping.facade';
 
 @Component({
   selector: 'app-shopping',
@@ -19,13 +18,12 @@ import { ShoppingFacade } from './facade/shopping.facade';
   ],
   templateUrl: './shopping.component.html',
   styleUrls: ['./shopping.component.scss'],
-  providers: [ShoppingStateService, ShoppingFacade],
+  providers: [ShoppingStateService],
 })
 export class ShoppingComponent {
-  readonly facade = inject(ShoppingFacade);
+  readonly facade = inject(ShoppingStateService);
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
   }
 }
-

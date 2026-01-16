@@ -26,7 +26,6 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-import { UpToDateFacade } from './facade/up-to-date.facade';
 
 @Component({
   selector: 'app-up-to-date',
@@ -60,10 +59,10 @@ import { UpToDateFacade } from './facade/up-to-date.facade';
   templateUrl: './up-to-date.page.html',
   styleUrls: ['./up-to-date.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [UpToDateStateService, UpToDateFacade],
+  providers: [UpToDateStateService],
 })
 export class UpToDatePage {
-  readonly facade = inject(UpToDateFacade);
+  readonly facade = inject(UpToDateStateService);
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
@@ -73,4 +72,3 @@ export class UpToDatePage {
     this.facade.ionViewWillLeave();
   }
 }
-

@@ -13,7 +13,6 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { PlanCardComponent } from './components/plan-card/plan-card.component';
-import { UpgradeFacade } from './facade/upgrade.facade';
 import { UpgradeStateService } from '@core/services/upgrade';
 
 @Component({
@@ -36,10 +35,10 @@ import { UpgradeStateService } from '@core/services/upgrade';
   templateUrl: './upgrade.page.html',
   styleUrls: ['./upgrade.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [UpgradeStateService, UpgradeFacade],
+  providers: [UpgradeStateService],
 })
 export class UpgradePage {
-  readonly facade = inject(UpgradeFacade);
+  readonly facade = inject(UpgradeStateService);
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();

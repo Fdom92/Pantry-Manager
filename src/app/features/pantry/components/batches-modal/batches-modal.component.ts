@@ -18,7 +18,7 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { PantryFacade } from '../../facade/pantry.facade';
+import { PantryStateService } from '@core/services/pantry';
 
 @Component({
   selector: 'app-pantry-batches-modal',
@@ -48,5 +48,5 @@ import { PantryFacade } from '../../facade/pantry.facade';
 })
 export class PantryBatchesModalComponent {
   // DI
-  readonly state = inject(PantryFacade);
+  readonly state = inject(PantryStateService);
 }
