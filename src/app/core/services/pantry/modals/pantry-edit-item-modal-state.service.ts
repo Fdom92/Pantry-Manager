@@ -129,9 +129,16 @@ export class PantryEditItemModalStateService {
   }
 
   close(): void {
+    if (this.isOpen()) {
+      return;
+    }
     this.isOpen.set(false);
     this.isSaving.set(false);
     this.editingItem.set(null);
+  }
+
+  dismiss(): void {
+    this.isOpen.set(false);
   }
 
   addLocationEntry(): void {
@@ -276,7 +283,7 @@ export class PantryEditItemModalStateService {
         successMessage = this.buildCreateSuccessMessage(item);
       }
 
-      this.close();
+      this.dismiss();
       await this.presentToast(successMessage, 'success');
     } catch (err) {
       this.isSaving.set(false);

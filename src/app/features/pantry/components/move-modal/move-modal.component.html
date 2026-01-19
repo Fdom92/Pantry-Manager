@@ -1,4 +1,7 @@
-<ion-modal [isOpen]="state.showMoveModal()" (didDismiss)="state.closeMoveItemModal()">
+<ion-modal
+  [isOpen]="state.showMoveModal()"
+  (willDismiss)="state.dismissMoveItemModal()"
+  (didDismiss)="state.closeMoveItemModal()">
   <ng-template>
     <form class="move-modal-form" [formGroup]="state.moveForm" (ngSubmit)="state.submitMoveItem()">
       <ion-header>
@@ -13,9 +16,7 @@
       </ion-header>
       <ion-content class="ion-padding move-modal-content">
         @let movingItem = state.moveItemTarget();
-        @if (!movingItem) {
-          <ion-spinner class="modal-spinner"></ion-spinner>
-        } @else {
+        @if (movingItem) {
           <h2 class="modal-title-value">{{ movingItem.name }}</h2>
           <div class="move-modal-header">
             <ion-text color="medium">

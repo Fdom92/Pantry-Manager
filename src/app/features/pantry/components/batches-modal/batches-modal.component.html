@@ -1,10 +1,13 @@
-<ion-modal [isOpen]="state.showBatchesModal()" (willDismiss)="state.closeBatchesModal()">
+<ion-modal
+  [isOpen]="state.showBatchesModal()"
+  (willDismiss)="state.dismissBatchesModal()"
+  (didDismiss)="state.closeBatchesModal()">
   <ng-template>
     <ion-header>
       <ion-toolbar>
         <ion-title>{{ 'pantry.batches.title' | translate }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button fill="clear" color="medium" (click)="state.closeBatchesModal()">
+          <ion-button fill="clear" color="medium" (click)="state.dismissBatchesModal()">
             <ion-icon name="close"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -12,9 +15,7 @@
     </ion-header>
     <ion-content class="ion-padding batches-modal-content">
       @let selectedItem = state.selectedBatchesItem();
-      @if (!selectedItem) {
-        <ion-spinner class="modal-spinner"></ion-spinner>
-      } @else {
+      @if (selectedItem) {
         <h2 class="modal-title-value">{{ selectedItem.name }}</h2>
         <div class="batches-modal-header">
           <ion-text color="medium">
@@ -48,4 +49,3 @@
     </ion-content>
   </ng-template>
 </ion-modal>
-

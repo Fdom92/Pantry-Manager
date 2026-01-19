@@ -1,11 +1,10 @@
-<ion-modal [isOpen]="state.isPurchaseModalOpen()" (willDismiss)="modal.close()">
+<ion-modal
+  [isOpen]="state.isPurchaseModalOpen()"
+  (willDismiss)="modal.close()"
+  (didDismiss)="state.closePurchaseModal()">
   <ng-template>
     @let target = state.purchaseTarget();
-    @if (!target) {
-      <ion-content class="ion-padding">
-        <ion-spinner></ion-spinner>
-      </ion-content>
-    } @else {
+    @if (target) {
       <ion-header>
         <ion-toolbar>
           <ion-title>{{ 'shopping.purchaseModal.titleProduct' | translate }}</ion-title>

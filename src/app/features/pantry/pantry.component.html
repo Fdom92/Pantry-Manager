@@ -134,14 +134,18 @@
     </div>
   }
 
-  <ion-modal [isOpen]="facade.fastAddModalOpen()" (willDismiss)="facade.closeFastAddModal()" class="fast-add-modal">
+  <ion-modal
+    [isOpen]="facade.fastAddModalOpen()"
+    (willDismiss)="facade.dismissFastAddModal()"
+    (didDismiss)="facade.closeFastAddModal()"
+    class="fast-add-modal">
     <ng-template>
       <form class="fast-add-form" [formGroup]="facade.fastAddForm" (ngSubmit)="facade.submitFastAdd()">
         <ion-header>
           <ion-toolbar>
             <ion-title>{{ 'pantry.fastAdd.title' | translate }}</ion-title>
             <ion-buttons slot="end">
-              <ion-button fill="clear" color="medium" type="button" (click)="facade.closeFastAddModal()">
+              <ion-button fill="clear" color="medium" type="button" (click)="facade.dismissFastAddModal()">
                 <ion-icon name="close"></ion-icon>
               </ion-button>
             </ion-buttons>

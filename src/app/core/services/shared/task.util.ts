@@ -34,4 +34,3 @@ export function createLatestOnlyRunner(destroyRef: DestroyRef): LatestOnlyRunner
     },
   };
 }
-
