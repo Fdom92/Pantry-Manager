@@ -1,4 +1,7 @@
-<ion-modal [isOpen]="state.isOpen()" (willDismiss)="state.close()">
+<ion-modal
+  [isOpen]="state.isOpen()"
+  (willDismiss)="state.dismiss()"
+  (didDismiss)="state.close()">
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -6,7 +9,7 @@
           @if (state.editingItem()) { {{ 'pantry.form.editTitle' | translate }} } @else { {{ 'pantry.form.newTitle' | translate }} }
         </ion-title>
         <ion-buttons slot="end">
-          <ion-button fill="clear" color="medium" (click)="state.close()">
+          <ion-button fill="clear" color="medium" (click)="state.dismiss()">
             <ion-icon slot="icon-only" name="close"></ion-icon>
           </ion-button>
         </ion-buttons>

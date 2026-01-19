@@ -72,7 +72,7 @@ export class ShoppingAddPurchaseModalStateService {
   }
 
   close(): void {
-    this.shopping.closePurchaseModal();
+    this.shopping.dismissPurchaseModal();
   }
 
   async submitPurchase(): Promise<void> {

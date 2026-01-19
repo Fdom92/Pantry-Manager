@@ -294,9 +294,16 @@ export class PantryStateService {
   }
 
   closeFastAddModal(): void {
+    if (this.fastAddModalOpen()) {
+      return;
+    }
     this.fastAddModalOpen.set(false);
     this.isFastAdding.set(false);
     this.fastAddForm.reset({ entries: '' });
+  }
+
+  dismissFastAddModal(): void {
+    this.fastAddModalOpen.set(false);
   }
 
   async submitFastAdd(): Promise<void> {
@@ -326,7 +333,7 @@ export class PantryStateService {
       }
 
       const messageKey = created === 1 ? 'pantry.fastAdd.singleSuccess' : 'pantry.fastAdd.success';
-      this.closeFastAddModal();
+      this.dismissFastAddModal();
       await this.presentToast(this.translate.instant(messageKey, { count: created }), 'success');
     }).catch(async err => {
       console.error('[PantryStateService] submitFastAdd error', err);
@@ -513,8 +520,15 @@ export class PantryStateService {
   }
 
   closeBatchesModal(): void {
+    if (this.showBatchesModal()) {
+      return;
+    }
     this.showBatchesModal.set(false);
     this.selectedBatchesItem.set(null);
+  }
+
+  dismissBatchesModal(): void {
+    this.showBatchesModal.set(false);
   }
 
   getTotalBatchCount(item: PantryItem): number {
@@ -660,6 +674,9 @@ export class PantryStateService {
   }
 
   closeMoveItemModal(): void {
+    if (this.showMoveModal()) {
+      return;
+    }
     this.showMoveModal.set(false);
     this.moveItemTarget.set(null);
     this.moveForm.reset({
@@ -669,6 +686,10 @@ export class PantryStateService {
     });
     this.moveSubmitting.set(false);
     this.moveError.set(null);
+  }
+
+  dismissMoveItemModal(): void {
+    this.showMoveModal.set(false);
   }
 
   onMoveSourceChange(): void {
@@ -798,7 +819,7 @@ export class PantryStateService {
         from: result.fromLabel,
         to: result.toLabel,
       });
-      this.closeMoveItemModal();
+      this.dismissMoveItemModal();
       void this.presentToast(message, 'success');
     }).catch(err => {
       console.error('[PantryListStateService] submitMoveItem error', err);

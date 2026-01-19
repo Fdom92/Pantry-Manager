@@ -112,11 +112,12 @@
             >
               @if (facade.isResettingData()) {
                 <ion-spinner
-                  slot="start"
+                  slot="icon-only"
                   name="dots"
                 ></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
               }
-              <ion-icon name="trash-outline"></ion-icon>
             </ion-button>
           </ion-item>
 
@@ -134,11 +135,12 @@
             >
               @if (facade.isExportingData()) {
                 <ion-spinner
-                  slot="start"
+                  slot="icon-only"
                   name="dots"
                 ></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
               }
-              <ion-icon name="exit-outline"></ion-icon>
             </ion-button>
           </ion-item>
 
@@ -157,11 +159,12 @@
             >
               @if (facade.isImportingData()) {
                 <ion-spinner
-                  slot="start"
+                  slot="icon-only"
                   name="dots"
                 ></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="enter-outline"></ion-icon>
               }
-              <ion-icon name="enter-outline"></ion-icon>
             </ion-button>
           </ion-item>
         </ion-list>

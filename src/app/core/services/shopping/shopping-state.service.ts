@@ -70,8 +70,15 @@ export class ShoppingStateService {
   }
 
   closePurchaseModal(): void {
+    if (this.isPurchaseModalOpen()) {
+      return;
+    }
     this.isPurchaseModalOpen.set(false);
     this.purchaseTarget.set(null);
+  }
+
+  dismissPurchaseModal(): void {
+    this.isPurchaseModalOpen.set(false);
   }
 
   async confirmPurchaseForTarget(data: { quantity: number; expiryDate?: string | null; location: string }): Promise<void> {
@@ -89,7 +96,7 @@ export class ShoppingStateService {
         location: data.location,
       });
       await this.pantryStore.loadAll();
-      this.closePurchaseModal();
+      this.dismissPurchaseModal();
     } finally {
       this.processingSuggestionIds.update(ids => {
         const next = new Set(ids);

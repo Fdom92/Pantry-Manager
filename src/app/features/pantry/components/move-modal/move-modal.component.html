@@ -1,11 +1,14 @@
-<ion-modal [isOpen]="state.showMoveModal()" (willDismiss)="state.closeMoveItemModal()">
+<ion-modal
+  [isOpen]="state.showMoveModal()"
+  (willDismiss)="state.dismissMoveItemModal()"
+  (didDismiss)="state.closeMoveItemModal()">
   <ng-template>
     <form class="move-modal-form" [formGroup]="state.moveForm" (ngSubmit)="state.submitMoveItem()">
       <ion-header>
         <ion-toolbar>
           <ion-title>{{ 'pantry.detail.actions.moveItem' | translate }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button fill="clear" color="medium" type="button" (click)="state.closeMoveItemModal()">
+            <ion-button fill="clear" color="medium" type="button" (click)="state.dismissMoveItemModal()">
               <ion-icon name="close"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -13,9 +16,7 @@
       </ion-header>
       <ion-content class="ion-padding move-modal-content">
         @let movingItem = state.moveItemTarget();
-        @if (!movingItem) {
-          <ion-spinner class="modal-spinner"></ion-spinner>
-        } @else {
+        @if (movingItem) {
           <h2 class="modal-title-value">{{ movingItem.name }}</h2>
           <div class="move-modal-header">
             <ion-text color="medium">
@@ -91,4 +92,3 @@
     </form>
   </ng-template>
 </ion-modal>
-

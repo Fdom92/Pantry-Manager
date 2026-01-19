@@ -14,6 +14,8 @@ export interface ShareBlobParams {
 
 @Injectable({ providedIn: 'root' })
 export class ShareService {
+  private readonly shareTimeoutMs = 120_000;
+
   async tryShareBlob(params: ShareBlobParams): Promise<{ outcome: ShareOutcome }> {
     if (Capacitor.isNativePlatform()) {
       const nativeResult = await this.tryNativeShareBlob(params);
@@ -44,11 +46,14 @@ export class ShareService {
     }
 
     try {
-      await navigator.share({
-        title: params.title,
-        text: params.text,
-        files: [file],
-      });
+      await this.withTimeout(
+        navigator.share({
+          title: params.title,
+          text: params.text,
+          files: [file],
+        }),
+        this.shareTimeoutMs
+      );
       return { outcome: 'shared' };
     } catch (err) {
       if (this.isUserCancellation(err)) {
@@ -68,6 +73,7 @@ export class ShareService {
 
       const base64Data = await this.blobToBase64(params.blob);
       const path = this.joinPath(EXPORT_PATH, params.filename);
+      let didTimeout = false;
 
       await Filesystem.writeFile({
         path,
@@ -78,23 +84,32 @@ export class ShareService {
 
       try {
         const uri = await Filesystem.getUri({ path, directory: Directory.Cache });
-        await Share.share({
-          title: params.title,
-          text: params.text,
-          url: uri.uri,
-        });
+        await this.withTimeout(
+          Share.share({
+            title: params.title,
+            text: params.text,
+            url: uri.uri,
+          }),
+          this.shareTimeoutMs
+        );
         return { outcome: 'shared' };
       } catch (err) {
         if (this.isUserCancellation(err)) {
           return { outcome: 'cancelled' };
         }
+        if (this.isTimeoutError(err)) {
+          didTimeout = true;
+          return { outcome: 'failed' };
+        }
         console.warn('[ShareService] Native share failed', err);
         return { outcome: 'failed' };
       } finally {
-        try {
-          await Filesystem.deleteFile({ path, directory: Directory.Cache });
-        } catch (deleteErr) {
-          console.warn('[ShareService] Failed to delete temp shared file', deleteErr);
+        if (!didTimeout) {
+          try {
+            await Filesystem.deleteFile({ path, directory: Directory.Cache });
+          } catch (deleteErr) {
+            console.warn('[ShareService] Failed to delete temp shared file', deleteErr);
+          }
         }
       }
     } catch (err) {
@@ -106,6 +121,27 @@ export class ShareService {
   private async blobToBase64(blob: Blob): Promise<string> {
     const buffer = await blob.arrayBuffer();
     return this.arrayBufferToBase64(buffer);
+  }
+
+  private async withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    try {
+      return await Promise.race([
+        promise,
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => reject(new Error('SHARE_TIMEOUT')), ms);
+        }),
+      ]);
+    } finally {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    }
+  }
+
+  private isTimeoutError(err: unknown): boolean {
+    const message = this.getErrorMessage(err);
+    return message === 'SHARE_TIMEOUT';
   }
 
   private arrayBufferToBase64(buffer: ArrayBuffer): string {
@@ -145,4 +181,3 @@ export class ShareService {
     return `${normalizedPrefix}${(filename ?? '').replace(/^\/+/, '')}`;
   }
 }
-
