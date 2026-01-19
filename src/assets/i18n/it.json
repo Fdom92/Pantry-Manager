@@ -239,6 +239,7 @@
   },
   "upToDate": {
     "title": "Aggiorna",
+    "subtitle": "Rivedi alcuni prodotti per mantenere la tua dispensa precisa e aggiornata.",
     "progress": "Prodotti in attesa {{ pending }} di {{ total }}",
     "lastUpdated": "Ultimo aggiornamento: {{ date }}",
     "fields": {
@@ -343,7 +344,7 @@
       "advancedAction": "Aggiungi avanzato",
       "groupLabel": "Aggiungi prodotti velocemente",
       "title": "Aggiungi prodotti velocemente",
-      "subtitle": "Un prodotto per riga. La quantità è opzionale. Usa \"Aggiungi avanzato\" per opzioni dettagliate.",
+      "subtitle": "Aggiungi più prodotti rapidamente. Un prodotto per riga. La quantità è facoltativa.",
       "placeholder": "2 latte\npetto di pollo\n3 mele",
       "submit": "Aggiungi prodotti",
       "singleSuccess": "1 prodotto aggiunto",

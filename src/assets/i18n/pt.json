@@ -239,6 +239,7 @@
   },
   "upToDate": {
     "title": "Pôr em dia",
+    "subtitle": "Revê alguns produtos para manter a tua despensa correta e atualizada.",
     "progress": "Produtos pendentes {{ pending }} de {{ total }}",
     "lastUpdated": "Última atualização: {{ date }}",
     "fields": {
@@ -343,7 +344,7 @@
       "advancedAction": "Adicionar avançado",
       "groupLabel": "Adicionar produtos rapidamente",
       "title": "Adicionar produtos rapidamente",
-      "subtitle": "Um produto por linha. A quantidade é opcional. Usa \"Adicionar avançado\" para opções detalhadas.",
+      "subtitle": "Adiciona vários produtos rapidamente. Um produto por linha. A quantidade é opcional.",
       "placeholder": "2 leite\npeitos de frango\n3 maçãs",
       "submit": "Adicionar produtos",
       "singleSuccess": "1 produto adicionado",

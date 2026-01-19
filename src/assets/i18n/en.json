@@ -239,6 +239,7 @@
   },
   "upToDate": {
     "title": "Get up to date",
+    "subtitle": "Review a few products to keep your pantry accurate and up to date",
     "progress": "Products pending {{ pending }} of {{ total }}",
     "lastUpdated": "Last updated: {{ date }}",
     "fields": {
@@ -343,7 +344,7 @@
       "advancedAction": "Advanced add",
       "groupLabel": "Add products quickly",
       "title": "Add products quickly",
-      "subtitle": "One product per line. Quantity is optional. Use \"Advanced add\" for detailed options.",
+      "subtitle": "Add multiple products quickly. One product per line. Quantity is optional.",
       "placeholder": "2 milk\nchicken breasts\n3 apples",
       "submit": "Add products",
       "singleSuccess": "1 product added",

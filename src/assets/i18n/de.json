@@ -239,6 +239,7 @@
   },
   "upToDate": {
     "title": "Aktualisieren",
+    "subtitle": "Überprüfe ein paar Produkte, um deine Vorratskammer korrekt und aktuell zu halten.",
     "progress": "Ausstehende Produkte {{ pending }} von {{ total }}",
     "lastUpdated": "Zuletzt aktualisiert: {{ date }}",
     "fields": {
@@ -343,7 +344,7 @@
       "advancedAction": "Erweitertes Hinzufügen",
       "groupLabel": "Produkte schnell hinzufügen",
       "title": "Produkte schnell hinzufügen",
-      "subtitle": "Ein Produkt pro Zeile. Die Menge ist optional. Verwende \"Erweitertes Hinzufügen\" für weitere Optionen.",
+      "subtitle": "Füge mehrere Produkte schnell hinzu. Ein Produkt pro Zeile. Menge ist optional.",
       "placeholder": "2 Milch\nHähnchenbrust\n3 Äpfel",
       "submit": "Produkte hinzufügen",
       "singleSuccess": "1 Produkt hinzugefügt",
