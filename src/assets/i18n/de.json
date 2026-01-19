@@ -86,6 +86,10 @@
     },
     "overview": {
       "aria": "Vorratsübersicht",
+      "sections": {
+        "alerts": { "title": "Warnungen" },
+        "activity": { "title": "Aktivität" }
+      },
       "cards": {
         "expired": "Abgelaufen",
         "nearExpiry": "Kurz vor Ablauf",

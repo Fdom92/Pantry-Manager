@@ -86,6 +86,10 @@
     },
     "overview": {
       "aria": "Résumé du garde-manger",
+      "sections": {
+        "alerts": { "title": "Alertes" },
+        "activity": { "title": "Activité" }
+      },
       "cards": {
         "expired": "Périmés",
         "nearExpiry": "Bientôt périmés",

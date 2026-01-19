@@ -17,105 +17,119 @@
     </div>
   }
 
-  <div class="summary-grid" [attr.aria-label]="'dashboard.overview.aria' | translate">
-    <ion-card
-      class="summary-card summary-card--expired"
-      role="button"
-      tabindex="0"
-      (click)="onSummaryCardClick('expired')"
-      (keydown.enter)="onSummaryCardClick('expired')"
-      (keydown.space)="onSummaryCardClick('expired'); $event.preventDefault()"
-      [attr.aria-label]="'dashboard.overview.cards.expired' | translate"
-    >
-      <ion-card-content>
-        <div class="summary-card-inner">
-          <ion-icon class="summary-icon" name="alert-circle-outline"></ion-icon>
-          <div class="summary-metric">
-            <div class="summary-value">{{ facade.expiredItems().length }}</div>
-            <div class="summary-label">{{ 'dashboard.overview.cards.expired' | translate }}</div>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
+  <div class="overview" [attr.aria-label]="'dashboard.overview.aria' | translate">
+    <section class="overview-section">
+      <header class="overview-section-header">
+        <h2 class="overview-section-title">{{ 'dashboard.overview.sections.alerts.title' | translate }}</h2>
+      </header>
+      <div class="summary-grid" [attr.aria-label]="'dashboard.overview.sections.alerts.title' | translate">
+        <ion-card
+          class="summary-card summary-card--expired"
+          role="button"
+          tabindex="0"
+          (click)="onSummaryCardClick('expired')"
+          (keydown.enter)="onSummaryCardClick('expired')"
+          (keydown.space)="onSummaryCardClick('expired'); $event.preventDefault()"
+          [attr.aria-label]="'dashboard.overview.cards.expired' | translate"
+        >
+          <ion-card-content>
+            <div class="summary-card-inner">
+              <ion-icon class="summary-icon" name="alert-circle-outline"></ion-icon>
+              <div class="summary-metric">
+                <div class="summary-value">{{ facade.expiredItems().length }}</div>
+                <div class="summary-label">{{ 'dashboard.overview.cards.expired' | translate }}</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
 
-    <ion-card
-      class="summary-card summary-card--near-expiry"
-      role="button"
-      tabindex="0"
-      (click)="onSummaryCardClick('near-expiry')"
-      (keydown.enter)="onSummaryCardClick('near-expiry')"
-      (keydown.space)="onSummaryCardClick('near-expiry'); $event.preventDefault()"
-      [attr.aria-label]="'dashboard.overview.cards.nearExpiry' | translate"
-    >
-      <ion-card-content>
-        <div class="summary-card-inner">
-          <ion-icon class="summary-icon" name="hourglass-outline"></ion-icon>
-          <div class="summary-metric">
-            <div class="summary-value">{{ facade.nearExpiryItems().length }}</div>
-            <div class="summary-label">{{ 'dashboard.overview.cards.nearExpiry' | translate }}</div>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
+        <ion-card
+          class="summary-card summary-card--near-expiry"
+          role="button"
+          tabindex="0"
+          (click)="onSummaryCardClick('near-expiry')"
+          (keydown.enter)="onSummaryCardClick('near-expiry')"
+          (keydown.space)="onSummaryCardClick('near-expiry'); $event.preventDefault()"
+          [attr.aria-label]="'dashboard.overview.cards.nearExpiry' | translate"
+        >
+          <ion-card-content>
+            <div class="summary-card-inner">
+              <ion-icon class="summary-icon" name="hourglass-outline"></ion-icon>
+              <div class="summary-metric">
+                <div class="summary-value">{{ facade.nearExpiryItems().length }}</div>
+                <div class="summary-label">{{ 'dashboard.overview.cards.nearExpiry' | translate }}</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
 
-    <ion-card
-      class="summary-card summary-card--pending"
-      role="button"
-      tabindex="0"
-      (click)="onSummaryCardClick('pending-review')"
-      (keydown.enter)="onSummaryCardClick('pending-review')"
-      (keydown.space)="onSummaryCardClick('pending-review'); $event.preventDefault()"
-      [attr.aria-label]="'dashboard.overview.cards.pendingReview' | translate"
-    >
-      <ion-card-content>
-        <div class="summary-card-inner">
-          <ion-icon class="summary-icon" name="clipboard-outline"></ion-icon>
-          <div class="summary-metric">
-            <div class="summary-value">{{ facade.pendingReviewProducts().length }}</div>
-            <div class="summary-label">{{ 'dashboard.overview.cards.pendingReview' | translate }}</div>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
+        <ion-card
+          class="summary-card summary-card--stock summary-card--span-2"
+          role="button"
+          tabindex="0"
+          (click)="onSummaryCardClick('low-or-empty')"
+          (keydown.enter)="onSummaryCardClick('low-or-empty')"
+          (keydown.space)="onSummaryCardClick('low-or-empty'); $event.preventDefault()"
+          [attr.aria-label]="'dashboard.overview.cards.lowOrEmpty' | translate"
+        >
+          <ion-card-content>
+            <div class="summary-card-inner">
+              <ion-icon class="summary-icon" name="trending-down-outline"></ion-icon>
+              <div class="summary-metric">
+                <div class="summary-value">{{ facade.lowStockItems().length }}</div>
+                <div class="summary-label">{{ 'dashboard.overview.cards.lowOrEmpty' | translate }}</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </section>
 
-    <ion-card
-      class="summary-card summary-card--stock"
-      role="button"
-      tabindex="0"
-      (click)="onSummaryCardClick('low-or-empty')"
-      (keydown.enter)="onSummaryCardClick('low-or-empty')"
-      (keydown.space)="onSummaryCardClick('low-or-empty'); $event.preventDefault()"
-      [attr.aria-label]="'dashboard.overview.cards.lowOrEmpty' | translate"
-    >
-      <ion-card-content>
-        <div class="summary-card-inner">
-          <ion-icon class="summary-icon" name="trending-down-outline"></ion-icon>
-          <div class="summary-metric">
-            <div class="summary-value">{{ facade.lowStockItems().length }}</div>
-            <div class="summary-label">{{ 'dashboard.overview.cards.lowOrEmpty' | translate }}</div>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
+    <section class="overview-section">
+      <header class="overview-section-header">
+        <h2 class="overview-section-title">{{ 'dashboard.overview.sections.activity.title' | translate }}</h2>
+      </header>
+      <div class="summary-grid" [attr.aria-label]="'dashboard.overview.sections.activity.title' | translate">
+        <ion-card
+          class="summary-card summary-card--pending"
+          role="button"
+          tabindex="0"
+          (click)="onSummaryCardClick('pending-review')"
+          (keydown.enter)="onSummaryCardClick('pending-review')"
+          (keydown.space)="onSummaryCardClick('pending-review'); $event.preventDefault()"
+          [attr.aria-label]="'dashboard.overview.cards.pendingReview' | translate"
+        >
+          <ion-card-content>
+            <div class="summary-card-inner">
+              <ion-icon class="summary-icon" name="clipboard-outline"></ion-icon>
+              <div class="summary-metric">
+                <div class="summary-value">{{ facade.pendingReviewProducts().length }}</div>
+                <div class="summary-label">{{ 'dashboard.overview.cards.pendingReview' | translate }}</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
 
-    <ion-card
-      class="summary-card summary-card--recent"
-      role="button"
-      tabindex="0"
-      (click)="onSummaryCardClick('recently-added')"
-      (keydown.enter)="onSummaryCardClick('recently-added')"
-      (keydown.space)="onSummaryCardClick('recently-added'); $event.preventDefault()"
-      [attr.aria-label]="'dashboard.overview.cards.recentlyAdded' | translate"
-    >
-      <ion-card-content>
-        <div class="summary-card-inner">
-          <ion-icon class="summary-icon" name="sparkles-outline"></ion-icon>
-          <div class="summary-metric">
-            <div class="summary-value">{{ facade.recentlyAddedCount() }}</div>
-            <div class="summary-label">{{ 'dashboard.overview.cards.recentlyAdded' | translate }}</div>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
+        <ion-card
+          class="summary-card summary-card--recent"
+          role="button"
+          tabindex="0"
+          (click)="onSummaryCardClick('recently-added')"
+          (keydown.enter)="onSummaryCardClick('recently-added')"
+          (keydown.space)="onSummaryCardClick('recently-added'); $event.preventDefault()"
+          [attr.aria-label]="'dashboard.overview.cards.recentlyAdded' | translate"
+        >
+          <ion-card-content>
+            <div class="summary-card-inner">
+              <ion-icon class="summary-icon" name="sparkles-outline"></ion-icon>
+              <div class="summary-metric">
+                <div class="summary-value">{{ facade.recentlyAddedCount() }}</div>
+                <div class="summary-label">{{ 'dashboard.overview.cards.recentlyAdded' | translate }}</div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </section>
   </div>
 </ion-content>

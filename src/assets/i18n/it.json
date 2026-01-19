@@ -86,6 +86,10 @@
     },
     "overview": {
       "aria": "Panoramica della dispensa",
+      "sections": {
+        "alerts": { "title": "Avvisi" },
+        "activity": { "title": "Attività" }
+      },
       "cards": {
         "expired": "Scaduti",
         "nearExpiry": "In scadenza",

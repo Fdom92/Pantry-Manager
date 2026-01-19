@@ -86,6 +86,10 @@
     },
     "overview": {
       "aria": "Resumen de la despensa",
+      "sections": {
+        "alerts": { "title": "Alertas" },
+        "activity": { "title": "Actividad" }
+      },
       "cards": {
         "expired": "Caducados",
         "nearExpiry": "A punto de caducar",

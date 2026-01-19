@@ -86,6 +86,10 @@
     },
     "overview": {
       "aria": "Visão geral da despensa",
+      "sections": {
+        "alerts": { "title": "Alertas" },
+        "activity": { "title": "Atividade" }
+      },
       "cards": {
         "expired": "Expirados",
         "nearExpiry": "A expirar em breve",

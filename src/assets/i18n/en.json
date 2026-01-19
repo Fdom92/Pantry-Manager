@@ -86,6 +86,10 @@
     },
     "overview": {
       "aria": "Pantry overview",
+      "sections": {
+        "alerts": { "title": "Alerts" },
+        "activity": { "title": "Activity" }
+      },
       "cards": {
         "expired": "Expired",
         "nearExpiry": "Expiring soon",
