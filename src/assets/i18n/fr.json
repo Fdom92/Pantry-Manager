@@ -14,25 +14,25 @@
       "start": "Commencer"
     },
     "slides": {
-      "organize": {
-        "title": "Organisez votre garde-manger sans effort",
-        "description": "Enregistrez des produits en quelques secondes, avec des catégories et des emplacements personnalisés."
+      "dashboard": {
+        "title": "Accueil",
+        "description": "Alertes et aperçu rapide de votre garde-manger."
       },
-      "batches": {
-        "title": "Gestion des lots et des dates de péremption",
-        "description": "Gérez les lots, les dates de péremption et recevez des alertes avant qu’un produit ne se périme."
+      "pantry": {
+        "title": "Garde-manger",
+        "description": "Ajoutez des produits, suivez le stock et les dates de péremption."
       },
-      "suggestions": {
-        "title": "Suggestions d’achat intelligentes",
-        "description": "Suggère quoi réapprovisionner selon la consommation, le stock minimum et les produits proches de la péremption."
+      "planner": {
+        "title": "Planificateur",
+        "description": "Idées et plans de repas avec ce que vous avez déjà."
       },
-      "agent": {
-        "title": "Débloquez le planificateur intelligent (PRO)",
-        "description": "Planifiez vos menus, demandez des recettes et créez des listes automatiquement.",
-        "badge": "Exclusif PRO",
-        "titlePro": "Planificateur intelligent prêt pour vous",
-        "descriptionPro": "Vous avez déjà accès PRO : utilisez le planificateur pour recettes, idées et achats rapides.",
-        "badgePro": "PRO actif"
+      "shopping": {
+        "title": "Achats",
+        "description": "Créez une liste et cochez au fur et à mesure."
+      },
+      "settings": {
+        "title": "Réglages",
+        "description": "Personnalisez les catalogues, alertes et préférences."
       }
     }
   },

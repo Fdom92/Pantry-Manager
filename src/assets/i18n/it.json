@@ -14,25 +14,25 @@
       "start": "Inizia"
     },
     "slides": {
-      "organize": {
-        "title": "Organizza la tua dispensa facilmente",
-        "description": "Aggiungi articoli in pochi secondi con categorie e posizioni che ti si addicono."
+      "dashboard": {
+        "title": "Home",
+        "description": "Avvisi e panoramica rapida della dispensa."
       },
-      "batches": {
-        "title": "Gestione lotti e scadenze",
-        "description": "Traccia lotti, date di scadenza e ricevi avvisi prima che qualcosa scada."
+      "pantry": {
+        "title": "Dispensa",
+        "description": "Aggiungi prodotti e traccia stock e scadenze."
       },
-      "suggestions": {
-        "title": "Suggerimenti intelligenti per gli acquisti",
-        "description": "Saprai cosa riassortire in base all'uso, allo stock minimo e alle scadenze imminenti."
+      "planner": {
+        "title": "Pianificatore",
+        "description": "Idee e piani pasti basati su ciò che hai."
       },
-      "agent": {
-        "title": "Sblocca il pianificatore intelligente (PRO)",
-        "description": "Pianifica menù, chiedi ricette e genera liste automaticamente.",
-        "badge": "Esclusivo PRO",
-        "titlePro": "Pianificatore intelligente pronto per te",
-        "descriptionPro": "PRO attivo: usa il pianificatore per ricette, idee e liste più rapide.",
-        "badgePro": "PRO attivo"
+      "shopping": {
+        "title": "Spesa",
+        "description": "Crea la lista e spunta mentre fai la spesa."
+      },
+      "settings": {
+        "title": "Impostazioni",
+        "description": "Personalizza cataloghi, avvisi e preferenze dell’app."
       }
     }
   },

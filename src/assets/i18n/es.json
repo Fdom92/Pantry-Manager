@@ -14,25 +14,25 @@
       "start": "Empezar"
     },
     "slides": {
-      "organize": {
-        "title": "Organiza tu despensa sin esfuerzo",
-        "description": "Registra productos en segundos, con categorías y ubicaciones hechas a tu medida."
+      "dashboard": {
+        "title": "Inicio",
+        "description": "Alertas y resumen de tu despensa de un vistazo."
       },
-      "batches": {
-        "title": "Control por lotes y caducidades",
-        "description": "Gestiona lotes, fechas de caducidad y recibe alertas antes de que algo se eche a perder."
+      "pantry": {
+        "title": "Despensa",
+        "description": "Añade productos, controla el stock y las caducidades."
       },
-      "suggestions": {
-        "title": "Sugerencias de compra inteligentes",
-        "description": "Te dice qué reponer según consumo, stock mínimo y lo que caducará pronto."
+      "planner": {
+        "title": "Planificador",
+        "description": "Ideas y planes de comidas con lo que ya tienes."
       },
-      "agent": {
-        "title": "Desbloquea el planificador inteligente (PRO)",
-        "description": "Planifica menús, pide recetas y genera listas automáticamente.",
-        "badge": "Exclusivo PRO",
-        "titlePro": "Planificador inteligente listo para ti",
-        "descriptionPro": "Ya tienes acceso PRO: usa el planificador para recetas, ideas y compras rápidas.",
-        "badgePro": "PRO activo"
+      "shopping": {
+        "title": "Compras",
+        "description": "Crea tu lista y marca lo comprado al momento."
+      },
+      "settings": {
+        "title": "Ajustes",
+        "description": "Personaliza catálogos, alertas y preferencias de la app."
       }
     }
   },
