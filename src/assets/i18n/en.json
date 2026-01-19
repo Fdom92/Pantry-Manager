@@ -14,25 +14,25 @@
       "start": "Get started"
     },
     "slides": {
-      "organize": {
-        "title": "Organize your pantry effortlessly",
-        "description": "Add items in seconds with categories and locations that fit you."
+      "dashboard": {
+        "title": "Home",
+        "description": "Alerts and a quick pantry snapshot."
       },
-      "batches": {
-        "title": "Batch and expiry control",
-        "description": "Track batches, expiration dates, and get alerts before anything goes bad."
+      "pantry": {
+        "title": "Pantry",
+        "description": "Add items, track stock and expirations."
       },
-      "suggestions": {
-        "title": "Smart purchase suggestions",
-        "description": "Know what to restock based on usage, minimum stock, and upcoming expiries."
+      "planner": {
+        "title": "Planner",
+        "description": "Meal ideas and plans based on what you have."
       },
-      "agent": {
-        "title": "Unlock the AI Meal Planner (PRO)",
-        "description": "Plan menus, request recipes, and auto-build shopping lists tailored to you.",
-        "badge": "PRO exclusive",
-        "titlePro": "AI Meal Planner ready for you",
-        "descriptionPro": "PRO unlocked: use the meal planner for recipes, ideas, and faster lists.",
-        "badgePro": "PRO active"
+      "shopping": {
+        "title": "Shopping",
+        "description": "Build a list and tick items as you shop."
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Tune catalogs, alerts, and app preferences."
       }
     }
   },
@@ -239,6 +239,7 @@
   },
   "upToDate": {
     "title": "Get up to date",
+    "subtitle": "Review a few products to keep your pantry accurate and up to date",
     "progress": "Products pending {{ pending }} of {{ total }}",
     "lastUpdated": "Last updated: {{ date }}",
     "fields": {
@@ -343,7 +344,7 @@
       "advancedAction": "Advanced add",
       "groupLabel": "Add products quickly",
       "title": "Add products quickly",
-      "subtitle": "One product per line. Quantity is optional. Use \"Advanced add\" for detailed options.",
+      "subtitle": "Add multiple products quickly. One product per line. Quantity is optional.",
       "placeholder": "2 milk\nchicken breasts\n3 apples",
       "submit": "Add products",
       "singleSuccess": "1 product added",

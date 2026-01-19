@@ -8,6 +8,12 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <ion-text color="medium">
+    <p class="up-to-date-intro">
+      {{ 'upToDate.subtitle' | translate }}
+    </p>
+  </ion-text>
+
   @if (!facade.hasLoaded() && facade.isLoading()) {
     <div class="loading-state">
       <ion-spinner name="dots"></ion-spinner>

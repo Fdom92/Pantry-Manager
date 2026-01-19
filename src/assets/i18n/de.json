@@ -14,25 +14,25 @@
       "start": "Starten"
     },
     "slides": {
-      "organize": {
-        "title": "Organisiere deine Vorratskammer mühelos",
-        "description": "Produkte in Sekunden erfassen, mit individuell angepassten Kategorien und Standorten."
+      "dashboard": {
+        "title": "Start",
+        "description": "Warnungen und Überblick über deinen Vorrat auf einen Blick."
       },
-      "batches": {
-        "title": "Chargen- und Haltbarkeitskontrolle",
-        "description": "Verwalte Chargen, Haltbarkeitsdaten und erhalte Warnungen, bevor etwas verdirbt."
+      "pantry": {
+        "title": "Vorratskammer",
+        "description": "Produkte hinzufügen, Bestand und Haltbarkeit im Blick behalten."
       },
-      "suggestions": {
-        "title": "Intelligente Einkaufsvorschläge",
-        "description": "Zeigt dir, was nachgekauft werden sollte – basierend auf Verbrauch, Mindestbestand und nahendem Ablauf."
+      "planner": {
+        "title": "Planer",
+        "description": "Essensideen und Pläne basierend auf dem, was du hast."
       },
-      "agent": {
-        "title": "Intelligenten Menüplaner freischalten (PRO)",
-        "description": "Plane Menüs, fordere Rezepte an und erstelle Einkaufslisten automatisch.",
-        "badge": "Exklusiv für PRO",
-        "titlePro": "Menüplaner bereit für dich",
-        "descriptionPro": "PRO aktiv: Nutze den Menüplaner für Rezepte, Ideen und schnellere Listen.",
-        "badgePro": "PRO aktiv"
+      "shopping": {
+        "title": "Einkauf",
+        "description": "Liste erstellen und beim Einkaufen abhaken."
+      },
+      "settings": {
+        "title": "Einstellungen",
+        "description": "Kataloge, Warnungen und App-Optionen anpassen."
       }
     }
   },
@@ -239,6 +239,7 @@
   },
   "upToDate": {
     "title": "Aktualisieren",
+    "subtitle": "Überprüfe ein paar Produkte, um deine Vorratskammer korrekt und aktuell zu halten.",
     "progress": "Ausstehende Produkte {{ pending }} von {{ total }}",
     "lastUpdated": "Zuletzt aktualisiert: {{ date }}",
     "fields": {
@@ -343,7 +344,7 @@
       "advancedAction": "Erweitertes Hinzufügen",
       "groupLabel": "Produkte schnell hinzufügen",
       "title": "Produkte schnell hinzufügen",
-      "subtitle": "Ein Produkt pro Zeile. Die Menge ist optional. Verwende \"Erweitertes Hinzufügen\" für weitere Optionen.",
+      "subtitle": "Füge mehrere Produkte schnell hinzu. Ein Produkt pro Zeile. Menge ist optional.",
       "placeholder": "2 Milch\nHähnchenbrust\n3 Äpfel",
       "submit": "Produkte hinzufügen",
       "singleSuccess": "1 Produkt hinzugefügt",

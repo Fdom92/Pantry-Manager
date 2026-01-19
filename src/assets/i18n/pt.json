@@ -14,25 +14,25 @@
       "start": "Começar"
     },
     "slides": {
-      "organize": {
-        "title": "Organiza a tua despensa sem esforço",
-        "description": "Adiciona produtos em segundos com categorias e localizações à tua medida."
+      "dashboard": {
+        "title": "Início",
+        "description": "Alertas e visão rápida do estado da despensa."
       },
-      "batches": {
-        "title": "Controlo de lotes e validade",
-        "description": "Acompanha lotes, datas de validade e recebe alertas antes de estragar."
+      "pantry": {
+        "title": "Despensa",
+        "description": "Adiciona produtos e acompanha stock e validade."
       },
-      "suggestions": {
-        "title": "Sugestões inteligentes de compra",
-        "description": "Sabe o que reabastecer com base no consumo, stock mínimo e prazos de validade."
+      "planner": {
+        "title": "Planeador",
+        "description": "Ideias e planos de refeições com o que tens."
       },
-      "agent": {
-        "title": "Desbloqueia o planeador inteligente (PRO)",
-        "description": "Planeia menus, pede receitas e cria listas automaticamente.",
-        "badge": "Exclusivo PRO",
-        "titlePro": "Planeador inteligente pronto para ti",
-        "descriptionPro": "PRO ativo: usa o planeador para receitas, ideias e listas mais rápidas.",
-        "badgePro": "PRO ativo"
+      "shopping": {
+        "title": "Compras",
+        "description": "Cria a lista e marca itens à medida que compras."
+      },
+      "settings": {
+        "title": "Definições",
+        "description": "Personaliza catálogos, alertas e preferências da app."
       }
     }
   },
@@ -239,6 +239,7 @@
   },
   "upToDate": {
     "title": "Pôr em dia",
+    "subtitle": "Revê alguns produtos para manter a tua despensa correta e atualizada.",
     "progress": "Produtos pendentes {{ pending }} de {{ total }}",
     "lastUpdated": "Última atualização: {{ date }}",
     "fields": {
@@ -343,7 +344,7 @@
       "advancedAction": "Adicionar avançado",
       "groupLabel": "Adicionar produtos rapidamente",
       "title": "Adicionar produtos rapidamente",
-      "subtitle": "Um produto por linha. A quantidade é opcional. Usa \"Adicionar avançado\" para opções detalhadas.",
+      "subtitle": "Adiciona vários produtos rapidamente. Um produto por linha. A quantidade é opcional.",
       "placeholder": "2 leite\npeitos de frango\n3 maçãs",
       "submit": "Adicionar produtos",
       "singleSuccess": "1 produto adicionado",
