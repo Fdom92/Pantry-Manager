@@ -17,7 +17,7 @@ export const INSIGHTS_LIBRARY: InsightDefinition[] = [
       const staleAndMissingCount = context.pendingReviewProducts.filter(
         product => product.reasons.includes('missing-info') && product.reasons.includes('stale-update')
       ).length;
-      return missingOnlyCount >= 2 || staleAndMissingCount >= 3;
+      return missingOnlyCount >= 5 || staleAndMissingCount >= 10;
     },
     dismissLabelKey: 'insights.library.pendingProductUpdates.dismiss',
     ctas: [

@@ -1,3 +1,7 @@
+ion-title, ion-back-button {
+  color: var(--ion-text-color, var(--ion-text-color));
+}
+
 .move-modal-form {
   height: 100%;
   display: flex;

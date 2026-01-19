@@ -22,7 +22,6 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { ProBannerComponent } from '@shared/components/pro-banner/pro-banner.component';
 import packageJson from '../../../../package.json';
 
 @Component({
@@ -49,7 +48,6 @@ import packageJson from '../../../../package.json';
     CommonModule,
     RouterLink,
     TranslateModule,
-    ProBannerComponent,
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],

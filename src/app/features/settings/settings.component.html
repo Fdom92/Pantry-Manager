@@ -5,21 +5,6 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (facade.isPro$ | async) {
-    <app-pro-banner
-      class="pro-inline-banner"
-      [message]="'settings.pro.statusDescription' | translate"
-      [showAction]="false"
-      [subtle]="true">
-    </app-pro-banner>
-  } @else {
-    <app-pro-banner
-      class="pro-inline-banner"
-      [message]="'settings.pro.upgradePrompt' | translate"
-      [ctaLabel]="'settings.pro.upgradeCta' | translate"
-      (action)="facade.navigateToUpgrade()">
-    </app-pro-banner>
-  }
   <div class="settings-content">
     <ion-card class="settings-card">
       <ion-card-header>
