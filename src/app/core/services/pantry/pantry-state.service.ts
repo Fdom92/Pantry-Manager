@@ -1,4 +1,5 @@
-import { Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { DEFAULT_LOCATION_OPTIONS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
@@ -63,6 +64,7 @@ export class PantryStateService {
   private readonly languageService = inject(LanguageService);
   private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmService);
+  private readonly destroyRef = inject(DestroyRef);
 
   // DATA
   readonly MeasurementUnit = MeasurementUnit;
@@ -94,9 +96,9 @@ export class PantryStateService {
   readonly fastAddForm = this.fb.group({
     entries: this.fb.control('', { nonNullable: true }),
   });
+  private readonly fastAddEntries = signal<string>(this.fastAddForm.controls.entries.value);
   readonly hasFastAddEntries = computed(() => {
-    const raw = this.fastAddForm.get('entries')?.value ?? '';
-    return raw.trim().length > 0;
+    return this.fastAddEntries().trim().length > 0;
   });
 
   // Move modal
@@ -155,6 +157,12 @@ export class PantryStateService {
   });
 
   constructor() {
+    this.fastAddForm.controls.entries.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(value => {
+        this.fastAddEntries.set(value);
+      });
+
     // Keep the UI in sync with the filtered pipeline, merging optimistic edits before rendering the list.
     effect(() => {
       const paginatedItems = this.pantryService.filteredProducts();

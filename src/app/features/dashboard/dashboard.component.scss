@@ -50,6 +50,7 @@ ion-title {
   user-select: none;
   transition:
     box-shadow 140ms ease;
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
   background: linear-gradient(
       180deg,
       color-mix(in srgb, var(--summary-accent, var(--ion-color-primary)) 12%, transparent),
@@ -68,7 +69,7 @@ ion-title {
 }
 
 .summary-card ion-card-content {
-  padding: 18px;
+  padding: 14px;
 }
 
 .summary-card-inner {

@@ -69,6 +69,7 @@
 .onboarding-swiper {
   position: relative;
   z-index: 2;
+  margin: 10px;
   height: calc(100% - 140px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
   padding: calc(16px + var(--ion-safe-area-top)) 16px calc(72px + var(--ion-safe-area-bottom));
 }
