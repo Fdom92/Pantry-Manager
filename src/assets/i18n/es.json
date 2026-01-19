@@ -84,6 +84,24 @@
         "expired": "Caducados"
       }
     },
+    "overview": {
+      "aria": "Resumen de la despensa",
+      "cards": {
+        "expired": "Caducados",
+        "nearExpiry": "A punto de caducar",
+        "pendingReview": "Pendientes de completar",
+        "lowOrEmpty": "Stock bajo",
+        "recentlyAdded": "Añadidos recientemente"
+      },
+      "toasts": {
+        "expiredEmpty": "Todo bien, no tienes nada caducado.",
+        "nearExpiryEmpty": "Todo bien, no tienes nada a punto de caducar.",
+        "pendingReviewEmpty": "Todo bien, no tienes nada pendiente de completar.",
+        "lowOrEmptyEmpty": "Todo bien, no tienes productos con stock bajo.",
+        "recentlyAddedEmpty": "Todo bien, no has añadido productos recientemente.",
+        "genericEmpty": "Todo bien, no hay elementos para esa condición."
+      }
+    },
     "nearExpiry": {
       "title": "Por caducar",
       "subtitle": "En los próximos {{ days }} días",
@@ -150,7 +168,7 @@
       "addToPantry": "Añadir"
     },
     "suggestions": {
-      "title": "Compras sugeridas",
+      "title": "Lista de la compra",
       "loading": "Generando lista de compras…",
       "destination": "Destino sugerido: {{ location }}",
       "totalStock": "Stock total: {{ amount }} {{ unit }}",

@@ -84,6 +84,24 @@
         "expired": "Scaduti"
       }
     },
+    "overview": {
+      "aria": "Panoramica della dispensa",
+      "cards": {
+        "expired": "Scaduti",
+        "nearExpiry": "In scadenza",
+        "pendingReview": "Da completare",
+        "lowOrEmpty": "Stock bajo",
+        "recentlyAdded": "Aggiunti di recente"
+      },
+      "toasts": {
+        "expiredEmpty": "Tutto ok — nessun articolo scaduto.",
+        "nearExpiryEmpty": "Tutto ok — nessun articolo in scadenza a breve.",
+        "pendingReviewEmpty": "Tutto ok — nulla da completare.",
+        "lowOrEmptyEmpty": "Tutto ok — nessun articolo con stock basso.",
+        "recentlyAddedEmpty": "Tutto ok — nessun articolo aggiunto di recente.",
+        "genericEmpty": "Tutto ok — non ci sono elementi per questa condizione."
+      }
+    },
     "nearExpiry": {
       "title": "In scadenza",
       "subtitle": "Nei prossimi {{ days }} giorni",
@@ -150,7 +168,7 @@
       "addToPantry": "Aggiungi"
     },
     "suggestions": {
-      "title": "Acquisti suggeriti",
+      "title": "Lista della spesa",
       "loading": "Sto creando la lista della spesa…",
       "destination": "Posizione suggerita: {{ location }}",
       "totalStock": "Stock totale: {{ amount }} {{ unit }}",

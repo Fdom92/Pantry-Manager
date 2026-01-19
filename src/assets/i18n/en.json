@@ -84,6 +84,24 @@
         "expired": "Expired"
       }
     },
+    "overview": {
+      "aria": "Pantry overview",
+      "cards": {
+        "expired": "Expired",
+        "nearExpiry": "Expiring soon",
+        "pendingReview": "Pending completion",
+        "lowOrEmpty": "Stock bajo",
+        "recentlyAdded": "Recently added"
+      },
+      "toasts": {
+        "expiredEmpty": "All good — nothing expired.",
+        "nearExpiryEmpty": "All good — nothing expiring soon.",
+        "pendingReviewEmpty": "All good — nothing pending to complete.",
+        "lowOrEmptyEmpty": "All good — no low-stock items.",
+        "recentlyAddedEmpty": "All good — nothing recently added.",
+        "genericEmpty": "All good — there are no items for that condition."
+      }
+    },
     "nearExpiry": {
       "title": "Near expiry",
       "subtitle": "In the next {{ days }} days",
@@ -150,7 +168,7 @@
       "addToPantry": "Add"
     },
     "suggestions": {
-      "title": "Suggested purchases",
+      "title": "Shopping list",
       "loading": "Building shopping list…",
       "destination": "Suggested location: {{ location }}",
       "totalStock": "Total stock: {{ amount }} {{ unit }}",

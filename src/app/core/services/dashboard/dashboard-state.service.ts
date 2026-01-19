@@ -1,13 +1,15 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
 import { getLocationEarliestExpiry, getLocationQuantity } from '@core/domain/pantry';
 import type { Insight, InsightContext, InsightCta, ItemLocationStock, PantryItem } from '@core/models';
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { AgentConversationStore } from '../agent/agent-conversation.store';
 import { LanguageService } from '../shared/language.service';
+import { ToastService } from '../shared/toast.service';
 import { ConfirmService, withSignalFlag } from '../shared';
 import { PantryStoreService } from '../pantry/pantry-store.service';
+import { PantryService } from '../pantry/pantry.service';
 import { InsightService } from './insight.service';
 import {
   formatDateTimeValue,
@@ -18,15 +20,19 @@ import {
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 
+export type DashboardOverviewCardId = 'expired' | 'near-expiry' | 'pending-review' | 'low-or-empty' | 'recently-added';
+
 @Injectable()
 export class DashboardStateService {
   private readonly pantryStore = inject(PantryStoreService);
+  private readonly pantryService = inject(PantryService);
   private readonly insightService = inject(InsightService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly conversationStore = inject(AgentConversationStore);
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
+  private readonly toast = inject(ToastService);
 
   private hasCompletedInitialLoad = false;
 
@@ -44,6 +50,20 @@ export class DashboardStateService {
   readonly totalItems = computed(() => this.inventorySummary().total);
   readonly recentlyUpdatedItems = computed(() => getRecentItemsByUpdatedAt(this.pantryItems()));
   readonly hasExpiredItems = computed(() => this.expiredItems().length > 0);
+  readonly pendingReviewProducts = computed(() =>
+    this.insightService.getPendingReviewProducts(this.pantryItems(), { now: this.getReferenceNow() })
+  );
+  readonly recentlyAddedCount = computed(() => {
+    const now = this.getReferenceNow();
+    const windowMs = RECENTLY_ADDED_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+    return this.pantryItems().filter(item => {
+      const createdAt = new Date(item.createdAt);
+      if (Number.isNaN(createdAt.getTime())) {
+        return false;
+      }
+      return now.getTime() - createdAt.getTime() <= windowMs;
+    }).length;
+  });
 
   get nearExpiryWindow(): number {
     return NEAR_EXPIRY_WINDOW_DAYS;
@@ -102,6 +122,38 @@ export class DashboardStateService {
       initialPrompt: cta.prompt,
     });
     await this.navCtrl.navigateForward('/agent');
+  }
+
+  async onOverviewCardSelected(card: DashboardOverviewCardId): Promise<void> {
+    const count = this.getOverviewCardCount(card);
+    if (count <= 0) {
+      await this.toast.present(this.translate.instant(this.getOverviewCardEmptyToastKey(card)), { color: 'medium' });
+      return;
+    }
+
+    switch (card) {
+      case 'pending-review':
+        await this.navCtrl.navigateForward('/up-to-date');
+        return;
+      case 'expired':
+        this.pantryService.setPendingNavigationPreset({ expired: true });
+        await this.navCtrl.navigateRoot('/pantry');
+        return;
+      case 'near-expiry':
+        this.pantryService.setPendingNavigationPreset({ expiring: true });
+        await this.navCtrl.navigateRoot('/pantry');
+        return;
+      case 'low-or-empty':
+        this.pantryService.setPendingNavigationPreset({ lowStock: true });
+        await this.navCtrl.navigateRoot('/pantry');
+        return;
+      case 'recently-added':
+        this.pantryService.setPendingNavigationPreset({ recentlyAdded: true });
+        await this.navCtrl.navigateRoot('/pantry');
+        return;
+      default:
+        return;
+    }
   }
 
   toggleSnapshotCard(): void {
@@ -174,6 +226,17 @@ export class DashboardStateService {
     });
   }
 
+  private getReferenceNow(): Date {
+    const timestamp = this.lastRefreshTimestamp();
+    if (timestamp) {
+      const parsed = new Date(timestamp);
+      if (!Number.isNaN(parsed.getTime())) {
+        return parsed;
+      }
+    }
+    return new Date();
+  }
+
   private formatLocationName(locationId?: string): string {
     const trimmed = (locationId ?? '').trim();
     return trimmed || this.translate.instant('common.locations.none');
@@ -229,4 +292,39 @@ export class DashboardStateService {
     const generated = this.insightService.buildDashboardInsights(context);
     this.visibleInsights.set(this.insightService.getVisibleInsights(generated));
   }
+
+  private getOverviewCardCount(card: DashboardOverviewCardId): number {
+    switch (card) {
+      case 'expired':
+        return this.expiredItems().length;
+      case 'near-expiry':
+        return this.nearExpiryItems().length;
+      case 'pending-review':
+        return this.pendingReviewProducts().length;
+      case 'low-or-empty':
+        return this.lowStockItems().length;
+      case 'recently-added':
+        return this.recentlyAddedCount();
+      default:
+        return 0;
+    }
+  }
+
+  private getOverviewCardEmptyToastKey(card: DashboardOverviewCardId): string {
+    switch (card) {
+      case 'expired':
+        return 'dashboard.overview.toasts.expiredEmpty';
+      case 'near-expiry':
+        return 'dashboard.overview.toasts.nearExpiryEmpty';
+      case 'pending-review':
+        return 'dashboard.overview.toasts.pendingReviewEmpty';
+      case 'low-or-empty':
+        return 'dashboard.overview.toasts.lowOrEmptyEmpty';
+      case 'recently-added':
+        return 'dashboard.overview.toasts.recentlyAddedEmpty';
+      default:
+        return 'dashboard.overview.toasts.genericEmpty';
+    }
+  }
+
 }
