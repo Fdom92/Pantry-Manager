@@ -660,6 +660,9 @@ export class PantryStateService {
   }
 
   closeMoveItemModal(): void {
+    if (this.showMoveModal()) {
+      return;
+    }
     this.showMoveModal.set(false);
     this.moveItemTarget.set(null);
     this.moveForm.reset({
@@ -669,6 +672,10 @@ export class PantryStateService {
     });
     this.moveSubmitting.set(false);
     this.moveError.set(null);
+  }
+
+  dismissMoveItemModal(): void {
+    this.showMoveModal.set(false);
   }
 
   onMoveSourceChange(): void {
@@ -798,7 +805,7 @@ export class PantryStateService {
         from: result.fromLabel,
         to: result.toLabel,
       });
-      this.closeMoveItemModal();
+      this.dismissMoveItemModal();
       void this.presentToast(message, 'success');
     }).catch(err => {
       console.error('[PantryListStateService] submitMoveItem error', err);
