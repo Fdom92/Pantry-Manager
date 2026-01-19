@@ -38,6 +38,66 @@
       }
     },
     {
+      "files": ["src/app/features/**/*.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^@core/services$",
+                "message": "No importes desde @core/services (barrel). Importa el *StateService concreto."
+              },
+              {
+                "regex": "^@core/services/(?!.*-state\\.service$).*",
+                "message": "Features solo pueden importar StateServices (rutas que terminen en -state.service)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/app/core/domain/**/*.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^@core/services(?:/|$)",
+                "message": "Domain no puede depender de services. Mueve esa lógica a core/services."
+              },
+              {
+                "regex": "^\\.{1,2}/.*services(?:/|$)",
+                "message": "Domain no puede depender de services (imports relativos)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/app/core/services/**/*.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^@features(?:/|$)",
+                "message": "Services no pueden depender de features."
+              },
+              {
+                "regex": "^\\.{1,2}/.*features(?:/|$)",
+                "message": "Services no pueden depender de features (imports relativos)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": ["*.html"],
       "extends": ["plugin:@angular-eslint/template/recommended"],
       "rules": {}

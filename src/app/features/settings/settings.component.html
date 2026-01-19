@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (isPro$ | async) {
+  @if (facade.isPro$ | async) {
     <app-pro-banner
       class="pro-inline-banner"
       [message]="'settings.pro.statusDescription' | translate"
@@ -17,7 +17,7 @@
       class="pro-inline-banner"
       [message]="'settings.pro.upgradePrompt' | translate"
       [ctaLabel]="'settings.pro.upgradeCta' | translate"
-      (action)="navigateToUpgrade()">
+      (action)="facade.navigateToUpgrade()">
     </app-pro-banner>
   }
   <div class="settings-content">
@@ -38,9 +38,9 @@
               <p>{{ "settings.appearance.description" | translate }}</p>
             </ion-label>
             <ion-select
-              [value]="themePreference()"
-              (ionChange)="updateThemePreference($event.detail.value)"
-              [disabled]="isUpdatingTheme()"
+              [value]="facade.themePreference()"
+              (ionChange)="facade.updateThemePreference($event.detail.value)"
+              [disabled]="facade.isUpdatingTheme()"
               interface="popover"
               class="theme-select"
             >
@@ -87,7 +87,7 @@
         accept="application/json,.json,*/*"
         hidden
         #importInput
-        (change)="handleImportFileSelection($event)"
+        (change)="facade.submitImportFileSelection($event)"
       />
       <ion-card-header>
         <ion-card-title>{{ "settings.data.title" | translate }}</ion-card-title>
@@ -106,11 +106,11 @@
               color="danger"
               fill="clear"
               slot="end"
-              (click)="resetApplicationData()"
-              [disabled]="isResettingData()"
+              (click)="facade.resetApplicationData()"
+              [disabled]="facade.isResettingData()"
               [attr.aria-label]="'settings.data.resetAction' | translate"
             >
-              @if (isResettingData()) {
+              @if (facade.isResettingData()) {
                 <ion-spinner
                   slot="start"
                   name="dots"
@@ -128,11 +128,11 @@
             <ion-button
               slot="end"
               fill="clear"
-              (click)="exportDataBackup()"
-              [disabled]="isExportingData()"
+              (click)="facade.exportDataBackup()"
+              [disabled]="facade.isExportingData()"
               [attr.aria-label]="'settings.data.exportAction' | translate"
             >
-              @if (isExportingData()) {
+              @if (facade.isExportingData()) {
                 <ion-spinner
                   slot="start"
                   name="dots"
@@ -151,11 +151,11 @@
               slot="end"
               color="secondary"
               fill="clear"
-              (click)="triggerImportPicker(importInput)"
-              [disabled]="isImportingData()"
+              (click)="facade.openImportPicker(importInput)"
+              [disabled]="facade.isImportingData()"
               [attr.aria-label]="'settings.data.importAction' | translate"
             >
-              @if (isImportingData()) {
+              @if (facade.isImportingData()) {
                 <ion-spinner
                   slot="start"
                   name="dots"

@@ -5,13 +5,13 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (visibleInsights().length) {
+  @if (facade.visibleInsights().length) {
     <div class="insights-stack">
-      @for (insight of visibleInsights(); track insight.id) {
+      @for (insight of facade.visibleInsights(); track insight.id) {
         <app-insight-card
           [insight]="insight"
-          (dismiss)="dismissInsight(insight)"
-          (ctaSelect)="onInsightAction(insight, $event)">
+          (dismiss)="facade.dismissInsight(insight)"
+          (ctaSelect)="facade.onInsightAction(insight, $event)">
         </app-insight-card>
       }
     </div>
@@ -26,40 +26,40 @@
             class="card-header-toggle"
             fill="clear"
             size="small"
-            (click)="toggleSnapshotCard()"
-            [attr.aria-expanded]="isSnapshotCardExpanded()"
+            (click)="facade.toggleSnapshotCard()"
+            [attr.aria-expanded]="facade.isSnapshotCardExpanded()"
             [attr.aria-label]="'dashboard.summary.toggle' | translate"
           >
             <ion-icon
               slot="icon-only"
-              [name]="isSnapshotCardExpanded() ? 'chevron-up-outline' : 'chevron-down-outline'"
+              [name]="facade.isSnapshotCardExpanded() ? 'chevron-up-outline' : 'chevron-down-outline'"
             ></ion-icon>
           </ion-button>
         </div>
-        @if (lastRefreshTimestamp()) {
+        @if (facade.lastRefreshTimestamp()) {
           <ion-card-subtitle>
-            {{ 'dashboard.summary.updated' | translate:{ value: formatLastUpdated(lastRefreshTimestamp()) } }}
+            {{ 'dashboard.summary.updated' | translate:{ value: facade.formatLastUpdated(facade.lastRefreshTimestamp()) } }}
           </ion-card-subtitle>
         }
       </div>
     </ion-card-header>
-    @if (isSnapshotCardExpanded()) {
+    @if (facade.isSnapshotCardExpanded()) {
       <ion-card-content>
         <div class="stat-grid">
           <div class="stat">
-            <h3>{{ totalItems() }}</h3>
+            <h3>{{ facade.totalItems() }}</h3>
             <p>{{ 'dashboard.summary.stats.total' | translate }}</p>
           </div>
           <div class="stat">
-            <h3>{{ lowStockItems().length }}</h3>
+            <h3>{{ facade.lowStockItems().length }}</h3>
             <p>{{ 'dashboard.summary.stats.lowStock' | translate }}</p>
           </div>
           <div class="stat">
-            <h3>{{ nearExpiryItems().length }}</h3>
+            <h3>{{ facade.nearExpiryItems().length }}</h3>
             <p>{{ 'dashboard.summary.stats.nearExpiry' | translate }}</p>
           </div>
           <div class="stat">
-            <h3>{{ expiredItems().length }}</h3>
+            <h3>{{ facade.expiredItems().length }}</h3>
             <p>{{ 'dashboard.summary.stats.expired' | translate }}</p>
           </div>
         </div>
@@ -71,29 +71,29 @@
     <ion-card-header>
       <ion-card-title>{{ 'dashboard.nearExpiry.title' | translate }}</ion-card-title>
       <ion-card-subtitle>
-        {{ 'dashboard.nearExpiry.subtitle' | translate:{ days: nearExpiryWindow } }}
+        {{ 'dashboard.nearExpiry.subtitle' | translate:{ days: facade.nearExpiryWindow } }}
       </ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      @if (nearExpiryItems().length) {
+      @if (facade.nearExpiryItems().length) {
         <ion-list lines="none" class="fade-in-list">
-          @for (item of nearExpiryItems(); track item._id) {
+          @for (item of facade.nearExpiryItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>{{ 'dashboard.nearExpiry.expires' | translate:{ date: formatDate(item.expirationDate) } }}</p>
+                <p>{{ 'dashboard.nearExpiry.expires' | translate:{ date: facade.formatDate(item.expirationDate) } }}</p>
               </ion-label>
-              <ion-badge color="warning">{{ formatDate(item.expirationDate) }}</ion-badge>
+              <ion-badge color="warning">{{ facade.formatDate(item.expirationDate) }}</ion-badge>
             </ion-item>
           }
         </ion-list>
       } @else {
-        <app-empty-state-generic
+        <app-empty-state
           class="list-empty-state"
           icon="hourglass-outline"
           [title]="'dashboard.nearExpiry.title' | translate"
           [subtitle]="'dashboard.nearExpiry.empty' | translate">
-        </app-empty-state-generic>
+        </app-empty-state>
       }
     </ion-card-content>
   </ion-card>
@@ -104,33 +104,33 @@
       <ion-card-subtitle>{{ 'dashboard.lowStock.subtitle' | translate }}</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
-      @if (lowStockItems().length) {
+      @if (facade.lowStockItems().length) {
         <ion-list lines="none" class="fade-in-list">
-          @for (item of lowStockItems(); track item._id) {
+          @for (item of facade.lowStockItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
                 <p>
-                  {{ getItemTotalQuantity(item) | number:'1.0-2' }} {{ getItemUnitLabel(item) }}
-                  @if (getItemTotalMinThreshold(item) > 0) {
-                    ({{ 'dashboard.lowStock.minLabel' | translate:{ value: (getItemTotalMinThreshold(item) | number:'1.0-2'), unit: getItemUnitLabel(item) } }})
+                  {{ facade.getItemTotalQuantity(item) | number:'1.0-2' }} {{ facade.getItemUnitLabel(item) }}
+                  @if (facade.getItemTotalMinThreshold(item) > 0) {
+                    ({{ 'dashboard.lowStock.minLabel' | translate:{ value: (facade.getItemTotalMinThreshold(item) | number:'1.0-2'), unit: facade.getItemUnitLabel(item) } }})
                   }
                 </p>
                 <ion-note color="medium">
-                  {{ getItemLocationsSummary(item) }}
+                  {{ facade.getItemLocationsSummary(item) }}
                 </ion-note>
               </ion-label>
-              <ion-badge color="danger">{{ getItemTotalQuantity(item) | number:'1.0-2' }}</ion-badge>
+              <ion-badge color="danger">{{ facade.getItemTotalQuantity(item) | number:'1.0-2' }}</ion-badge>
             </ion-item>
           }
         </ion-list>
       } @else {
-        <app-empty-state-generic
+        <app-empty-state
           class="list-empty-state"
           icon="trending-down-outline"
           [title]="'dashboard.lowStock.title' | translate"
           [subtitle]="'dashboard.lowStock.empty' | translate">
-        </app-empty-state-generic>
+        </app-empty-state>
       }
     </ion-card-content>
   </ion-card>
@@ -139,16 +139,16 @@
     <ion-card-header>
       <div class="card-header-actions">
         <ion-card-title>{{ 'dashboard.expired.title' | translate }}</ion-card-title>
-        @if (hasExpiredItems()) {
+        @if (facade.hasExpiredItems()) {
           <ion-button
             color="danger"
             fill="clear"
             size="small"
-            [disabled]="isDeletingExpiredItems()"
-            (click)="onDeleteExpiredItems()"
+            [disabled]="facade.isDeletingExpiredItems()"
+            (click)="facade.deleteExpiredItems()"
             [attr.aria-label]="'dashboard.expired.deleteAria' | translate"
           >
-            @if (isDeletingExpiredItems()) {
+            @if (facade.isDeletingExpiredItems()) {
               <ion-spinner slot="icon-only" name="crescent"></ion-spinner>
             } @else {
               <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
@@ -158,25 +158,25 @@
       </div>
     </ion-card-header>
     <ion-card-content>
-      @if (hasExpiredItems()) {
+      @if (facade.hasExpiredItems()) {
         <ion-list lines="none" class="fade-in-list">
-          @for (item of expiredItems(); track item._id) {
+          @for (item of facade.expiredItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>{{ 'dashboard.expired.expires' | translate:{ date: formatDate(item.expirationDate) } }}</p>
+                <p>{{ 'dashboard.expired.expires' | translate:{ date: facade.formatDate(item.expirationDate) } }}</p>
               </ion-label>
               <ion-badge color="medium">{{ 'dashboard.expired.badge' | translate }}</ion-badge>
             </ion-item>
           }
         </ion-list>
       } @else {
-        <app-empty-state-generic
+        <app-empty-state
           class="list-empty-state"
           icon="alert-circle-outline"
           [title]="'dashboard.expired.title' | translate"
           [subtitle]="'dashboard.expired.empty' | translate">
-        </app-empty-state-generic>
+        </app-empty-state>
       }
     </ion-card-content>
   </ion-card>
@@ -186,25 +186,25 @@
       <ion-card-title>{{ 'dashboard.recent.title' | translate }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      @if (recentlyUpdatedItems().length) {
+      @if (facade.recentlyUpdatedItems().length) {
         <ion-list lines="none" class="fade-in-list">
-          @for (item of recentlyUpdatedItems(); track item._id) {
+          @for (item of facade.recentlyUpdatedItems(); track item._id) {
             <ion-item lines="none">
               <ion-label>
                 <h3>{{ item.name }}</h3>
-                <p>{{ 'dashboard.recent.updated' | translate:{ date: formatDate(item.updatedAt) } }}</p>
+                <p>{{ 'dashboard.recent.updated' | translate:{ date: facade.formatDate(item.updatedAt) } }}</p>
               </ion-label>
               <ion-badge color="tertiary">{{ 'dashboard.recent.badge' | translate }}</ion-badge>
             </ion-item>
           }
         </ion-list>
       } @else {
-        <app-empty-state-generic
+        <app-empty-state
           class="list-empty-state"
           icon="time-outline"
           [title]="'dashboard.recent.title' | translate"
           [subtitle]="'dashboard.recent.empty' | translate">
-        </app-empty-state-generic>
+        </app-empty-state>
       }
     </ion-card-content>
   </ion-card>
