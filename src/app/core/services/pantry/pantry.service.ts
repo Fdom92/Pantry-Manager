@@ -1,5 +1,5 @@
 import { effect, Injectable, signal } from '@angular/core';
-import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import {
   collectBatches as collectBatchesItem,
   computeExpirationStatus as computeExpirationStatusItem,
@@ -46,8 +46,10 @@ export class PantryService extends StorageService<PantryItem> {
   readonly pageOffset = signal(0);
   readonly pageSize = signal(300);
   readonly loading = signal(false);
+  readonly pipelineResetting = signal(false);
   readonly endReached = signal(false);
   readonly totalCount = signal(0);
+  private readonly pendingNavigationPreset = signal<Partial<PantryFilterState> | null>(null);
 
   constructor() {
     super();
@@ -463,6 +465,72 @@ export class PantryService extends StorageService<PantryItem> {
     this.requestPipelineReset();
   }
 
+  /**
+   * Stores a one-shot preset to be applied by the pantry page on entry.
+   * This avoids mutating the shared pantry cache (and other views) before navigation completes.
+   */
+  setPendingNavigationPreset(preset: Partial<PantryFilterState>): void {
+    this.pendingNavigationPreset.set(preset);
+  }
+
+  /**
+   * Clears search/filters on pantry entry unless a dashboard preset is pending.
+   * This is a UX helper to ensure the pantry tab opens in a consistent state.
+   */
+  clearEntryFilters(): void {
+    if (this.pendingNavigationPreset()) {
+      return;
+    }
+
+    const defaultFilters: PantryFilterState = { ...DEFAULT_PANTRY_FILTERS };
+    const searchChanged = Boolean(this.searchQuery());
+    const filtersChanged = !this.areFiltersEqual(this.activeFilters(), defaultFilters);
+    const sortChanged = this.sortMode() !== 'name';
+
+    if (!searchChanged && !filtersChanged && !sortChanged) {
+      return;
+    }
+
+    if (searchChanged) {
+      this.searchQuery.set('');
+    }
+    if (filtersChanged) {
+      this.activeFilters.set(defaultFilters);
+    }
+    if (sortChanged) {
+      this.sortMode.set('name');
+    }
+  }
+
+  /** Applies and clears any pending navigation preset. */
+  applyPendingNavigationPreset(): void {
+    const preset = this.pendingNavigationPreset();
+    if (!preset) {
+      return;
+    }
+    this.pendingNavigationPreset.set(null);
+    this.applyNavigationPreset(preset);
+  }
+
+  private applyNavigationPreset(preset: Partial<PantryFilterState>): void {
+    const nextFilters: PantryFilterState = { ...DEFAULT_PANTRY_FILTERS, ...preset };
+    const searchChanged = Boolean(this.searchQuery());
+    const filtersChanged = !this.areFiltersEqual(this.activeFilters(), nextFilters);
+
+    if (!searchChanged && !filtersChanged) {
+      return;
+    }
+
+    if (searchChanged) {
+      this.searchQuery.set('');
+    }
+    if (filtersChanged) {
+      this.activeFilters.set(nextFilters);
+    }
+    this.sortMode.set('name');
+    this.requestPipelineReset();
+  }
+
   /** --- Public helpers for store/UI logic reuse --- */
   /** Check whether the combined stock across locations is considered low. */
   isItemLowStock(item: PantryItem): boolean {
@@ -565,6 +633,9 @@ export class PantryService extends StorageService<PantryItem> {
     if (filters.expiring && (!this.isNearExpiry(item) || this.isExpired(item))) {
       return false;
     }
+    if (filters.recentlyAdded && !this.isRecentlyAdded(item)) {
+      return false;
+    }
     if (filters.normalOnly && (this.isLowStock(item) || this.isExpired(item) || this.isNearExpiry(item))) {
       return false;
     }
@@ -621,6 +692,7 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   private requestPipelineReset(): void {
+    this.pipelineResetting.set(true);
     this.pendingPipelineReset = true;
     if (!this.loading()) {
       void this.performPendingPipelineReset();
@@ -632,8 +704,12 @@ export class PantryService extends StorageService<PantryItem> {
       return;
     }
     this.pendingPipelineReset = false;
-    this.resetPagination();
-    await this.loadAllPages();
+    try {
+      this.resetPagination();
+      await this.loadAllPages();
+    } finally {
+      this.pipelineResetting.set(false);
+    }
   }
 
   private areFiltersEqual(a: PantryFilterState, b: PantryFilterState): boolean {
@@ -641,11 +717,21 @@ export class PantryService extends StorageService<PantryItem> {
       a.lowStock === b.lowStock &&
       a.expired === b.expired &&
       a.expiring === b.expiring &&
+      a.recentlyAdded === b.recentlyAdded &&
       a.normalOnly === b.normalOnly &&
       a.basic === b.basic &&
       (a.categoryId ?? null) === (b.categoryId ?? null) &&
       (a.locationId ?? null) === (b.locationId ?? null)
     );
+  }
+
+  private isRecentlyAdded(item: PantryItem): boolean {
+    const createdAt = new Date(item?.createdAt ?? '');
+    if (Number.isNaN(createdAt.getTime())) {
+      return false;
+    }
+    const windowMs = RECENTLY_ADDED_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+    return Date.now() - createdAt.getTime() <= windowMs;
   }
 
   private getExpirationWeight(item: PantryItem): number {

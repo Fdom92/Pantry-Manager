@@ -84,6 +84,28 @@
         "expired": "Périmés"
       }
     },
+    "overview": {
+      "aria": "Résumé du garde-manger",
+      "sections": {
+        "alerts": { "title": "Alertes" },
+        "activity": { "title": "Activité" }
+      },
+      "cards": {
+        "expired": "Périmés",
+        "nearExpiry": "Bientôt périmés",
+        "pendingReview": "À compléter",
+        "lowOrEmpty": "Stock bajo",
+        "recentlyAdded": "Ajoutés récemment"
+      },
+      "toasts": {
+        "expiredEmpty": "Tout va bien — aucun article périmé.",
+        "nearExpiryEmpty": "Tout va bien — aucun article bientôt périmé.",
+        "pendingReviewEmpty": "Tout va bien — rien à compléter.",
+        "lowOrEmptyEmpty": "Tout va bien — aucun article avec stock bas.",
+        "recentlyAddedEmpty": "Tout va bien — aucun article ajouté récemment.",
+        "genericEmpty": "Tout est OK — aucun élément ne correspond à cette condition."
+      }
+    },
     "nearExpiry": {
       "title": "Bientôt périmés",
       "subtitle": "Dans les {{ days }} prochains jours",
@@ -150,7 +172,7 @@
       "addToPantry": "Ajouter"
     },
     "suggestions": {
-      "title": "Achats suggérés",
+      "title": "Liste de courses",
       "loading": "Génération de la liste d’achats…",
       "destination": "Destination suggérée : {{ location }}",
       "totalStock": "Stock total : {{ amount }} {{ unit }}",

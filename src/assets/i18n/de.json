@@ -84,6 +84,28 @@
         "expired": "Abgelaufen"
       }
     },
+    "overview": {
+      "aria": "Vorratsübersicht",
+      "sections": {
+        "alerts": { "title": "Warnungen" },
+        "activity": { "title": "Aktivität" }
+      },
+      "cards": {
+        "expired": "Abgelaufen",
+        "nearExpiry": "Kurz vor Ablauf",
+        "pendingReview": "Ausstehend zu vervollständigen",
+        "lowOrEmpty": "Stock bajo",
+        "recentlyAdded": "Kürzlich hinzugefügt"
+      },
+      "toasts": {
+        "expiredEmpty": "Alles gut — keine abgelaufenen Artikel.",
+        "nearExpiryEmpty": "Alles gut — keine Artikel, die bald ablaufen.",
+        "pendingReviewEmpty": "Alles gut — nichts ausstehend zu vervollständigen.",
+        "lowOrEmptyEmpty": "Alles gut — keine Artikel mit niedrigem Bestand.",
+        "recentlyAddedEmpty": "Alles gut — keine kürzlich hinzugefügten Artikel.",
+        "genericEmpty": "Alles gut — es gibt keine Elemente für diese Bedingung."
+      }
+    },
     "nearExpiry": {
       "title": "Kurz vor Ablauf",
       "subtitle": "In den nächsten {{ days }} Tagen",
@@ -150,7 +172,7 @@
       "addToPantry": "Hinzufügen"
     },
     "suggestions": {
-      "title": "Vorgeschlagene Einkäufe",
+      "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
       "destination": "Empfohlenes Ziel: {{ location }}",
       "totalStock": "Gesamtbestand: {{ amount }} {{ unit }}",

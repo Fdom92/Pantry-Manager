@@ -84,6 +84,28 @@
         "expired": "Expirados"
       }
     },
+    "overview": {
+      "aria": "Visão geral da despensa",
+      "sections": {
+        "alerts": { "title": "Alertas" },
+        "activity": { "title": "Atividade" }
+      },
+      "cards": {
+        "expired": "Expirados",
+        "nearExpiry": "A expirar em breve",
+        "pendingReview": "Por completar",
+        "lowOrEmpty": "Stock bajo",
+        "recentlyAdded": "Adicionados recentemente"
+      },
+      "toasts": {
+        "expiredEmpty": "Está tudo bem — não há itens expirados.",
+        "nearExpiryEmpty": "Está tudo bem — não há itens a expirar em breve.",
+        "pendingReviewEmpty": "Está tudo bem — não há nada por completar.",
+        "lowOrEmptyEmpty": "Está tudo bem — não há itens com stock baixo.",
+        "recentlyAddedEmpty": "Está tudo bem — não há itens adicionados recentemente.",
+        "genericEmpty": "Está tudo certo — não há itens para essa condição."
+      }
+    },
     "nearExpiry": {
       "title": "Perto da validade",
       "subtitle": "Nos próximos {{ days }} dias",
@@ -150,7 +172,7 @@
       "addToPantry": "Adicionar"
     },
     "suggestions": {
-      "title": "Compras sugeridas",
+      "title": "Lista de compras",
       "loading": "A criar lista de compras…",
       "destination": "Localização sugerida: {{ location }}",
       "totalStock": "Stock total: {{ amount }} {{ unit }}",

@@ -1,27 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
+import { DashboardStateService, type DashboardOverviewCardId } from '@core/services/dashboard/dashboard-state.service';
 import {
-  IonBadge,
-  IonButton,
   IonCard,
   IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
   IonContent,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonNote,
-  IonSpinner,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
 
 @Component({
@@ -33,21 +22,10 @@ import { InsightCardComponent } from '@shared/components/insight-card/insight-ca
     IonTitle,
     IonContent,
     IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
     IonCardContent,
-    IonButton,
     IonIcon,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonBadge,
-    IonNote,
-    IonSpinner,
     CommonModule,
     TranslateModule,
-    EmptyStateComponent,
     InsightCardComponent,
   ],
   templateUrl: './dashboard.component.html',
@@ -60,5 +38,9 @@ export class DashboardComponent {
   /** Lifecycle hook: populate dashboard data and stamp the refresh time. */
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
+  }
+
+  onSummaryCardClick(card: DashboardOverviewCardId): void {
+    void this.facade.onOverviewCardSelected(card);
   }
 }

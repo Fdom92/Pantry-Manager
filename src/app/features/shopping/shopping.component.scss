@@ -13,49 +13,6 @@ ion-title {
   color: var(--ion-text-color, var(--ion-text-color));
 }
 
-.summary-header-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.summary-header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2px;
-}
-
-.summary-toggle {
-  margin: 0;
-}
-
-.stat-grid {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-}
-
-.stat {
-  padding: 16px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--ion-color-primary, var(--ion-color-primary)) 8%, transparent);
-  text-align: center;
-}
-
-.stat h3 {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: var(--ion-color-primary);
-}
-
-.stat p {
-  margin: 4px 0 0;
-  font-size: 0.9rem;
-  color: var(--ion-color-medium);
-}
-
 .suggestions-header {
   display: flex;
   align-items: center;

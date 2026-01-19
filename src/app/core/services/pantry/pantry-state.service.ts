@@ -117,6 +117,7 @@ export class PantryStateService {
   readonly searchTerm: Signal<string> = this.pantryService.searchQuery;
   readonly activeFilters: Signal<PantryFilterState> = this.pantryService.activeFilters;
   readonly sortOption: Signal<'name' | 'quantity' | 'expiration'> = this.pantryService.sortMode;
+  readonly pipelineResetting: Signal<boolean> = this.pantryService.pipelineResetting;
   readonly selectedCategory = computed(() => this.activeFilters().categoryId ?? 'all');
   readonly selectedLocation = computed(() => this.activeFilters().locationId ?? 'all');
   readonly statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
@@ -198,6 +199,8 @@ export class PantryStateService {
 
   /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
   async ionViewWillEnter(): Promise<void> {
+    this.pantryService.clearEntryFilters();
+    this.pantryService.applyPendingNavigationPreset();
     await this.loadItems();
     if (!this.realtimeSubscribed) {
       this.pantryStore.watchRealtime();
@@ -208,6 +211,8 @@ export class PantryStateService {
   async loadItems(): Promise<void> {
     if (this.pantryService.loadedProducts().length === 0) {
       await this.pantryService.ensureFirstPageLoaded();
+    }
+    if (!this.pantryService.pipelineResetting()) {
       this.pantryService.startBackgroundLoad();
     }
     this.hasCompletedInitialLoad.set(true);
@@ -252,6 +257,7 @@ export class PantryStateService {
       expired: false,
       expiring: false,
       lowStock: false,
+      recentlyAdded: false,
       normalOnly: false,
     });
   }
@@ -432,6 +438,7 @@ export class PantryStateService {
           expired: true,
           expiring: false,
           lowStock: false,
+          recentlyAdded: false,
           normalOnly: false,
           basic: false,
         });
@@ -441,6 +448,7 @@ export class PantryStateService {
           expired: false,
           expiring: true,
           lowStock: false,
+          recentlyAdded: false,
           normalOnly: false,
           basic: false,
         });
@@ -450,6 +458,7 @@ export class PantryStateService {
           expired: false,
           expiring: false,
           lowStock: true,
+          recentlyAdded: false,
           normalOnly: false,
           basic: false,
         });
@@ -459,6 +468,7 @@ export class PantryStateService {
           expired: false,
           expiring: false,
           lowStock: false,
+          recentlyAdded: false,
           normalOnly: true,
           basic: false,
         });
@@ -468,6 +478,7 @@ export class PantryStateService {
           expired: false,
           expiring: false,
           lowStock: false,
+          recentlyAdded: false,
           normalOnly: false,
           basic: false,
         });

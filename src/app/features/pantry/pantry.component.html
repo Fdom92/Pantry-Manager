@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  @if (facade.loading() && facade.pantryItemsState().length === 0 && !facade.hasCompletedInitialLoad()) {
+  @if ((facade.loading() || facade.pipelineResetting()) && facade.pantryItemsState().length === 0) {
     <div class="skeleton-list">
       @for (placeholder of facade.skeletonPlaceholders; track placeholder) {
         <ion-card class="skeleton-card">
