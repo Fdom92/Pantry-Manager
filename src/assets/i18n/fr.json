@@ -87,15 +87,47 @@
     "overview": {
       "aria": "Résumé du garde-manger",
       "sections": {
-        "alerts": { "title": "Alertes" },
-        "activity": { "title": "Activité" }
+        "alerts": {
+          "title": "Alertes"
+        },
+        "maintenance": {
+          "title": "Maintenance"
+        },
+        "activity": {
+          "title": "Activité"
+        }
       },
       "cards": {
-        "expired": "Périmés",
-        "nearExpiry": "Bientôt périmés",
-        "pendingReview": "À compléter",
-        "lowOrEmpty": "Stock bajo",
-        "recentlyAdded": "Ajoutés récemment"
+        "nearExpiry": {
+          "title": "Bientôt périmés",
+          "body": "{{ count }} produits cette semaine",
+          "action": "Voir"
+        },
+        "expired": {
+          "title": "Périmés",
+          "body": "{{ count }} produits périmés",
+          "action": "Voir"
+        },
+        "pendingReview": {
+          "title": "Garde-manger à compléter",
+          "body": "{{ count }} produits à mettre à jour",
+          "action": "Revoir"
+        },
+        "lowOrEmpty": {
+          "title": "Stock faible",
+          "body": "{{ count }} produits en stock faible",
+          "action": "Revoir"
+        },
+        "shopping": {
+          "title": "Liste des achats",
+          "body": "{{ count }} articles à acheter",
+          "action": "Voir"
+        },
+        "recentlyAdded": {
+          "title": "Ajoutés récemment",
+          "body": "{{ count }} nouveaux produits",
+          "action": "Voir"
+        }
       },
       "toasts": {
         "expiredEmpty": "Tout va bien — aucun article périmé.",
@@ -103,6 +135,7 @@
         "pendingReviewEmpty": "Tout va bien — rien à compléter.",
         "lowOrEmptyEmpty": "Tout va bien — aucun article avec stock bas.",
         "recentlyAddedEmpty": "Tout va bien — aucun article ajouté récemment.",
+        "shoppingEmpty": "Tout va bien — votre liste d’achats est vide.",
         "genericEmpty": "Tout est OK — aucun élément ne correspond à cette condition."
       }
     },
@@ -140,28 +173,9 @@
   "shopping": {
     "title": "Achats",
     "unassignedSupermarket": "N’importe quel supermarché",
-    "summary": {
-      "title": "Résumé des achats",
-      "collapse": "Réduire le résumé",
-      "expand": "Développer le résumé",
-      "productOne": "produit",
-      "productMany": "produits",
-      "toBuyIn": "à acheter dans",
-      "storeOne": "supermarché",
-      "storeMany": "supermarchés",
-      "ok": "Tous les articles stockés atteignent leurs objectifs.",
-      "stats": {
-        "total": "Articles totaux à acheter",
-        "basicOut": "Produits de base en rupture",
-        "basicLow": "Produits de base en stock faible",
-        "lowStock": "Produits en stock faible"
-      }
-    },
     "reasons": {
       "below-min": "Stock faible",
-      "basic-low": "Produit de base en stock faible",
-      "basic-out": "Produit de base en rupture",
-      "empty": "Sans stock"
+      "empty": "Rupture de stock"
     },
     "purchaseModal": {
       "titleProduct": "Acheter un produit",

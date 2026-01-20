@@ -1,18 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import {
-  IonBadge,
   IonButton,
   IonButtons,
-  IonChip,
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
   IonModal,
-  IonText,
+  IonSpinner,
+  IonTextarea,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
@@ -20,10 +18,11 @@ import { TranslateModule } from '@ngx-translate/core';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
 
 @Component({
-  selector: 'app-pantry-batches-modal',
+  selector: 'app-pantry-fast-add-modal',
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     TranslateModule,
     IonModal,
     IonHeader,
@@ -33,18 +32,15 @@ import { PantryStateService } from '@core/services/pantry/pantry-state.service';
     IonButton,
     IonIcon,
     IonContent,
-    IonText,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonBadge,
-    IonChip,
+    IonTextarea,
+    IonFooter,
+    IonSpinner,
   ],
-  templateUrl: './batches-modal.component.html',
-  styleUrls: ['./batches-modal.component.scss'],
+  templateUrl: './fast-add-modal.component.html',
+  styleUrls: ['./fast-add-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PantryBatchesModalComponent {
-  // DI
+export class PantryFastAddModalComponent {
   readonly state = inject(PantryStateService);
 }
+

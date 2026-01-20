@@ -1,3 +1,7 @@
+ion-title, ion-back-button {
+  color: var(--ion-text-color, var(--ion-text-color));
+}
+
 .create-item-modal-content {
   --padding-bottom: 24px;
 }

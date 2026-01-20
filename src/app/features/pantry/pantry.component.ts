@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
 import {
   IonButton,
   IonButtons,
@@ -13,15 +12,11 @@ import {
   IonFab,
   IonFabButton,
   IonFabList,
-  IonFooter,
   IonHeader,
   IonIcon,
-  IonModal,
   IonSearchbar,
   IonSkeletonText,
-  IonSpinner,
   IonText,
-  IonTextarea,
   IonTitle,
   IonToolbar
 } from '@ionic/angular/standalone';
@@ -29,6 +24,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { PantryBatchesModalComponent } from './components/batches-modal/batches-modal.component';
 import { PantryEditItemModalComponent } from './components/edit-item-modal/edit-item-modal.component';
+import { PantryFastAddModalComponent } from './components/fast-add-modal/fast-add-modal.component';
 import { PantryFiltersModalComponent } from './components/filters-modal/filters-modal.component';
 import { PantryMoveModalComponent } from './components/move-modal/move-modal.component';
 import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.component';
@@ -50,21 +46,17 @@ import { PantryStateService } from '@core/services/pantry/pantry-state.service';
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonModal,
-    IonTextarea,
     IonFab,
     IonFabButton,
     IonFabList,
-    IonSpinner,
     IonChip,
     IonSkeletonText,
     IonText,
-    IonFooter,
     CommonModule,
-    ReactiveFormsModule,
     PantryDetailComponent,
     TranslateModule,
     EmptyStateComponent,
+    PantryFastAddModalComponent,
     PantryBatchesModalComponent,
     PantryMoveModalComponent,
     PantryFiltersModalComponent,

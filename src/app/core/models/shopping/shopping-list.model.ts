@@ -4,12 +4,10 @@ import type { BaseDoc } from '../shared/base-doc.model';
 // ENUMS
 export enum ShoppingReasonEnum {
   EMPTY = 'empty',
-  BASIC_OUT = 'basic-out',
-  BASIC_LOW = 'basic-low',
   BELOW_MIN = 'below-min',
 }
 // TYPES
-export type ShoppingReason = 'below-min' | 'basic-low' | 'basic-out' | 'empty';
+export type ShoppingReason = 'below-min' | 'empty';
 export type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;
 export type ShoppingSuggestionGroupWithItem = ShoppingSuggestionGroup<PantryItem>;
 export type ShoppingStateWithItem = ShoppingState<PantryItem>;
@@ -46,8 +44,7 @@ export interface ShoppingSuggestionGroup<TItem = string> {
 export interface ShoppingSummary {
   total: number;
   belowMin: number;
-  basicLow: number;
-  basicOut: number;
+  empty: number;
   supermarketCount: number;
 }
 export interface ShoppingState<TItem = string> {

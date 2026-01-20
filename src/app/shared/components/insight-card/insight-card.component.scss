@@ -3,18 +3,15 @@
   flex-direction: column;
   gap: 2px;
   border-radius: 16px;
-  background:
-    radial-gradient(circle at 20% 25%, rgba(99, 102, 241, 0.22), transparent 35%),
-    radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.2), transparent 32%),
-    linear-gradient(150deg, #0b1021 0%, #0f172a 60%, #0b1226 100%);
-  color: #f6f7fb;
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: var(--app-surface-bg);
+  color: var(--app-surface-text);
+  border: 1px solid var(--app-surface-border);
   box-shadow: 0 14px 32px rgba(15, 23, 42, 0.35);
 
   &__message {
     margin: 0;
     font-size: 0.8rem;
-    color: rgba(226, 232, 240, 0.92);
+    color: var(--app-surface-muted);
   }
 
   &__actions {
@@ -33,6 +30,6 @@
 
   ion-card-title {
     font-size: 1rem;
-    color: var(--ion-color-light);
+    color: var(--app-surface-title);
   }
 }

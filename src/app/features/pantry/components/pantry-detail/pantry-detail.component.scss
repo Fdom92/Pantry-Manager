@@ -1,19 +1,27 @@
+ion-title, ion-back-button {
+  color: var(--ion-text-color, var(--ion-text-color));
+}
+
 .pantry-item-card {
   position: relative;
   overflow: hidden;
   border-radius: 18px;
   --card-accent: color-mix(in srgb, var(--ion-color-primary) 65%, var(--ion-color-light-shade));
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--card-accent) 32%, transparent),
-    color-mix(in srgb, var(--card-accent) 18%, var(--ion-card-background)) 65%
-  );
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+  background: radial-gradient(
+      circle at 20% 25%,
+      color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 22%, transparent),
+      transparent 38%),
+    radial-gradient(
+      circle at 80% 10%,
+      color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 18%, transparent),
+      transparent 36%),
+    var(--app-surface-bg);
+  border: 1px solid var(--app-surface-border);
   padding: 0;
-  color: var(--ion-text-color);
-  --card-title: var(--ion-text-color);
-  --card-muted: var(--ion-color-medium);
-  --card-icon: color-mix(in srgb, var(--ion-text-color) 60%, var(--ion-background-color) 40%);
+  color: var(--app-surface-text);
+  --card-title: var(--app-surface-title);
+  --card-muted: var(--app-surface-muted);
+  --card-icon: color-mix(in srgb, var(--app-surface-text) 60%, transparent);
   transition: transform 180ms ease, box-shadow 220ms ease, border-color 180ms ease;
   margin: 0;
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
@@ -31,41 +39,21 @@
 .pantry-item-card.state-expired {
   --card-accent: var(--ion-color-danger);
   border-color: color-mix(in srgb, var(--ion-color-danger) 28%, transparent);
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--ion-color-danger) 36%, transparent),
-    color-mix(in srgb, var(--ion-color-danger) 18%, var(--ion-card-background)) 65%
-  );
 }
 
 .pantry-item-card.state-expiring {
   --card-accent: var(--ion-color-warning);
   border-color: color-mix(in srgb, var(--ion-color-warning) 26%, transparent);
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--ion-color-warning) 32%, transparent),
-    color-mix(in srgb, var(--ion-color-warning) 16%, var(--ion-card-background)) 65%
-  );
 }
 
 .pantry-item-card.state-low-stock {
   --card-accent: var(--ion-color-warning);
   border-color: color-mix(in srgb, var(--ion-color-warning) 28%, transparent);
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--ion-color-warning) 34%, transparent),
-    color-mix(in srgb, var(--ion-color-warning) 18%, var(--ion-card-background)) 65%
-  );
 }
 
 .pantry-item-card.state-ok {
   --card-accent: var(--ion-color-primary);
   border-color: color-mix(in srgb, var(--ion-color-primary) 26%, transparent);
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--ion-color-primary) 32%, transparent),
-    color-mix(in srgb, var(--ion-color-primary) 16%, var(--ion-card-background)) 65%
-  );
 }
 
 .pantry-item-card.is-expanded {

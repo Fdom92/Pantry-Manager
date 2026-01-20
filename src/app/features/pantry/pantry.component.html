@@ -60,10 +60,7 @@
       class="list-empty-state"
       icon="fast-food-outline"
       [titleKey]="'emptyStates.pantry.title'"
-      [subtitleKey]="'emptyStates.pantry.subtitle'"
-      [showAction]="true"
-      [actionLabel]="'pantry.fastAdd.advancedAction' | translate"
-      (action)="facade.openAdvancedAddModal()">
+      [subtitleKey]="'emptyStates.pantry.subtitle'">
     </app-empty-state>
   } @else if (facade.pantryItemsState().length === 0) {
     <app-empty-state
@@ -92,12 +89,6 @@
                 <div class="group-meta">
                   <ion-text color="medium">
                     {{ 'pantry.group.count' | translate:{ count: group.items.length } }}
-                    @if (group.expiringCount) {
-                      · {{ 'pantry.group.expiring' | translate:{ count: group.expiringCount } }}
-                    }
-                    @if (group.expiredCount) {
-                      · {{ 'pantry.group.expired' | translate:{ count: group.expiredCount } }}
-                    }
                   </ion-text>
                   <ion-icon
                     class="group-toggle-icon"
@@ -134,54 +125,7 @@
     </div>
   }
 
-  <ion-modal
-    [isOpen]="facade.fastAddModalOpen()"
-    (willDismiss)="facade.dismissFastAddModal()"
-    (didDismiss)="facade.closeFastAddModal()"
-    class="fast-add-modal">
-    <ng-template>
-      <form class="fast-add-form" [formGroup]="facade.fastAddForm" (ngSubmit)="facade.submitFastAdd()">
-        <ion-header>
-          <ion-toolbar>
-            <ion-title>{{ 'pantry.fastAdd.title' | translate }}</ion-title>
-            <ion-buttons slot="end">
-              <ion-button fill="clear" color="medium" type="button" (click)="facade.dismissFastAddModal()">
-                <ion-icon name="close"></ion-icon>
-              </ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content class="ion-padding fast-add-content" [fullscreen]="true">
-          <div class="fast-add-body">
-            <p class="fast-add-subtitle">
-              {{ 'pantry.fastAdd.subtitle' | translate }}
-            </p>
-            <ion-textarea
-              formControlName="entries"
-              autoGrow="true"
-              rows="6"
-              class="fast-add-textarea"
-              [placeholder]="'pantry.fastAdd.placeholder' | translate">
-            </ion-textarea>
-          </div>
-        </ion-content>
-        <ion-footer class="modal-footer">
-          <ion-toolbar>
-            <div class="fast-add-actions">
-              <ion-button expand="block" color="primary" type="submit" [disabled]="facade.isFastAdding() || !facade.hasFastAddEntries()">
-                @if (facade.isFastAdding()) {
-                  <ion-spinner name="dots"></ion-spinner>
-                } @else {
-                  {{ 'pantry.fastAdd.submit' | translate }}
-                }
-              </ion-button>
-            </div>
-          </ion-toolbar>
-        </ion-footer>
-      </form>
-    </ng-template>
-  </ion-modal>
-
+  <app-pantry-fast-add-modal></app-pantry-fast-add-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
   <app-pantry-move-modal></app-pantry-move-modal>
   <app-pantry-filters-modal></app-pantry-filters-modal>

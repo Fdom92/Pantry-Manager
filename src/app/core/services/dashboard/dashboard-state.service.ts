@@ -20,7 +20,13 @@ import {
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 
-export type DashboardOverviewCardId = 'expired' | 'near-expiry' | 'pending-review' | 'low-or-empty' | 'recently-added';
+export type DashboardOverviewCardId =
+  | 'expired'
+  | 'near-expiry'
+  | 'pending-review'
+  | 'low-or-empty'
+  | 'recently-added'
+  | 'shopping';
 
 @Injectable()
 export class DashboardStateService {
@@ -53,6 +59,17 @@ export class DashboardStateService {
   readonly pendingReviewProducts = computed(() =>
     this.insightService.getPendingReviewProducts(this.pantryItems(), { now: this.getReferenceNow() })
   );
+  readonly shoppingListCount = computed(() => {
+    const items = this.pantryItems();
+    if (!items?.length) {
+      return 0;
+    }
+    return items.reduce((total, item) => {
+      const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
+      const minThreshold = this.pantryStore.getItemTotalMinThreshold(item);
+      return this.pantryStore.shouldAutoAddToShoppingList(item, { totalQuantity, minThreshold }) ? total + 1 : total;
+    }, 0);
+  });
   readonly recentlyAddedCount = computed(() => {
     const now = this.getReferenceNow();
     const windowMs = RECENTLY_ADDED_WINDOW_DAYS * 24 * 60 * 60 * 1000;
@@ -150,6 +167,9 @@ export class DashboardStateService {
       case 'recently-added':
         this.pantryService.setPendingNavigationPreset({ recentlyAdded: true });
         await this.navCtrl.navigateRoot('/pantry');
+        return;
+      case 'shopping':
+        await this.navCtrl.navigateRoot('/shopping');
         return;
       default:
         return;
@@ -305,6 +325,8 @@ export class DashboardStateService {
         return this.lowStockItems().length;
       case 'recently-added':
         return this.recentlyAddedCount();
+      case 'shopping':
+        return this.shoppingListCount();
       default:
         return 0;
     }
@@ -322,6 +344,8 @@ export class DashboardStateService {
         return 'dashboard.overview.toasts.lowOrEmptyEmpty';
       case 'recently-added':
         return 'dashboard.overview.toasts.recentlyAddedEmpty';
+      case 'shopping':
+        return 'dashboard.overview.toasts.shoppingEmpty';
       default:
         return 'dashboard.overview.toasts.genericEmpty';
     }

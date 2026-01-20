@@ -87,15 +87,47 @@
     "overview": {
       "aria": "Visão geral da despensa",
       "sections": {
-        "alerts": { "title": "Alertas" },
-        "activity": { "title": "Atividade" }
+        "alerts": {
+          "title": "Alertas"
+        },
+        "maintenance": {
+          "title": "Manutenção"
+        },
+        "activity": {
+          "title": "Atividade"
+        }
       },
       "cards": {
-        "expired": "Expirados",
-        "nearExpiry": "A expirar em breve",
-        "pendingReview": "Por completar",
-        "lowOrEmpty": "Stock bajo",
-        "recentlyAdded": "Adicionados recentemente"
+        "nearExpiry": {
+          "title": "A expirar em breve",
+          "body": "{{ count }} produtos esta semana",
+          "action": "Ver"
+        },
+        "expired": {
+          "title": "Expirados",
+          "body": "{{ count }} produtos expirados",
+          "action": "Ver"
+        },
+        "pendingReview": {
+          "title": "Despensa por completar",
+          "body": "{{ count }} produtos por rever",
+          "action": "Rever"
+        },
+        "lowOrEmpty": {
+          "title": "Stock baixo",
+          "body": "{{ count }} produtos com stock baixo",
+          "action": "Rever"
+        },
+        "shopping": {
+          "title": "Lista de compras",
+          "body": "{{ count }} produtos pendentes",
+          "action": "Ver"
+        },
+        "recentlyAdded": {
+          "title": "Adicionados recentemente",
+          "body": "{{ count }} novos produtos",
+          "action": "Ver"
+        }
       },
       "toasts": {
         "expiredEmpty": "Está tudo bem — não há itens expirados.",
@@ -103,6 +135,7 @@
         "pendingReviewEmpty": "Está tudo bem — não há nada por completar.",
         "lowOrEmptyEmpty": "Está tudo bem — não há itens com stock baixo.",
         "recentlyAddedEmpty": "Está tudo bem — não há itens adicionados recentemente.",
+        "shoppingEmpty": "Está tudo bem — a tua lista de compras está vazia.",
         "genericEmpty": "Está tudo certo — não há itens para essa condição."
       }
     },
@@ -140,27 +173,8 @@
   "shopping": {
     "title": "Compras",
     "unassignedSupermarket": "Qualquer supermercado",
-    "summary": {
-      "title": "Resumo de compras",
-      "collapse": "Recolher resumo",
-      "expand": "Expandir resumo",
-      "productOne": "produto",
-      "productMany": "produtos",
-      "toBuyIn": "para comprar em",
-      "storeOne": "loja",
-      "storeMany": "lojas",
-      "ok": "Todos os itens armazenados cumprem os seus objetivos.",
-      "stats": {
-        "total": "Itens a comprar",
-        "basicOut": "Essenciais sem stock",
-        "basicLow": "Essenciais com stock baixo",
-        "lowStock": "Produtos abaixo do objetivo"
-      }
-    },
     "reasons": {
-      "below-min": "Abaixo do mínimo",
-      "basic-low": "Essencial com stock baixo",
-      "basic-out": "Essencial sem stock",
+      "below-min": "Stock baixo",
       "empty": "Sem stock"
     },
     "purchaseModal": {

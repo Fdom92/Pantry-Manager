@@ -261,20 +261,15 @@ ion-title, ion-buttons > ion-button {
 
 .planning-empty {
   margin-bottom: 20px;
-  padding: 20px;
-  border-radius: 18px;
-  background: linear-gradient(
-    135deg,
-    var(--chat-green-softer),
-    color-mix(in srgb, var(--chat-green-base) 35%, var(--ion-card-background) 65%)
-  );
-  border: 1px solid color-mix(in srgb, var(--chat-green-base) 30%, transparent);
-  box-shadow: 0 10px 30px color-mix(in srgb, var(--chat-green-base) 22%, transparent);
+
+  ion-card-content {
+    padding: 20px;
+  }
 
   h2 {
     margin: 6px 0;
     font-size: 1.4rem;
-    color: var(--chat-text);
+    color: var(--app-surface-title);
   }
 
   .eyebrow {
@@ -282,12 +277,12 @@ ion-title, ion-buttons > ion-button {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
+    color: var(--app-surface-muted);
   }
 
   .muted {
     margin: 0;
-    color: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
+    color: var(--app-surface-muted);
   }
 }
 
