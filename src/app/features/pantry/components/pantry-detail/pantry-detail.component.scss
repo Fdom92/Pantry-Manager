@@ -15,17 +15,13 @@ ion-title, ion-back-button {
       circle at 80% 10%,
       color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 18%, transparent),
       transparent 36%),
-    linear-gradient(
-      150deg,
-      #0b1021 0%,
-      #0f172a 60%,
-      #0b1226 100%);
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+    var(--app-surface-bg);
+  border: 1px solid var(--app-surface-border);
   padding: 0;
-  color: var(--ion-text-color);
-  --card-title: var(--ion-text-color);
-  --card-muted: var(--ion-color-medium);
-  --card-icon: color-mix(in srgb, var(--ion-text-color) 60%, var(--ion-background-color) 40%);
+  color: var(--app-surface-text);
+  --card-title: var(--app-surface-title);
+  --card-muted: var(--app-surface-muted);
+  --card-icon: color-mix(in srgb, var(--app-surface-text) 60%, transparent);
   transition: transform 180ms ease, box-shadow 220ms ease, border-color 180ms ease;
   margin: 0;
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
