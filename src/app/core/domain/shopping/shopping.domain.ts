@@ -16,13 +16,13 @@ export function determineSuggestionNeed(params: {
   const minThreshold = params.minThreshold;
   if (totalQuantity <= 0) {
     return {
-      reason: ShoppingReasonEnum.BASIC_OUT,
+      reason: ShoppingReasonEnum.EMPTY,
       suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold ?? 1),
     };
   }
   if (minThreshold != null && totalQuantity < minThreshold) {
     return {
-      reason: ShoppingReasonEnum.BASIC_LOW,
+      reason: ShoppingReasonEnum.BELOW_MIN,
       suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold - totalQuantity, minThreshold),
     };
   }
@@ -34,11 +34,8 @@ export function incrementSummary(summary: ShoppingSummary, reason: ShoppingReaso
     case ShoppingReasonEnum.BELOW_MIN:
       summary.belowMin += 1;
       break;
-    case ShoppingReasonEnum.BASIC_LOW:
-      summary.basicLow += 1;
-      break;
-    case ShoppingReasonEnum.BASIC_OUT:
-      summary.basicOut += 1;
+    case ShoppingReasonEnum.EMPTY:
+      summary.empty += 1;
       break;
     default:
       break;

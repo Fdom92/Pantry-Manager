@@ -87,9 +87,15 @@
     "overview": {
       "aria": "Résumé du garde-manger",
       "sections": {
-        "alerts": { "title": "Alertes" },
-        "maintenance": { "title": "Maintenance" },
-        "activity": { "title": "Activité" }
+        "alerts": {
+          "title": "Alertes"
+        },
+        "maintenance": {
+          "title": "Maintenance"
+        },
+        "activity": {
+          "title": "Activité"
+        }
       },
       "cards": {
         "nearExpiry": {
@@ -167,28 +173,9 @@
   "shopping": {
     "title": "Achats",
     "unassignedSupermarket": "N’importe quel supermarché",
-    "summary": {
-      "title": "Résumé des achats",
-      "collapse": "Réduire le résumé",
-      "expand": "Développer le résumé",
-      "productOne": "produit",
-      "productMany": "produits",
-      "toBuyIn": "à acheter dans",
-      "storeOne": "supermarché",
-      "storeMany": "supermarchés",
-      "ok": "Tous les articles stockés atteignent leurs objectifs.",
-      "stats": {
-        "total": "Articles totaux à acheter",
-        "basicOut": "Produits de base en rupture",
-        "basicLow": "Produits de base en stock faible",
-        "lowStock": "Produits en stock faible"
-      }
-    },
     "reasons": {
       "below-min": "Stock faible",
-      "basic-low": "Produit de base en stock faible",
-      "basic-out": "Produit de base en rupture",
-      "empty": "Sans stock"
+      "empty": "Rupture de stock"
     },
     "purchaseModal": {
       "titleProduct": "Acheter un produit",

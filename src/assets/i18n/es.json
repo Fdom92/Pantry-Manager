@@ -167,27 +167,8 @@
   "shopping": {
     "title": "Compras",
     "unassignedSupermarket": "Cualquier supermercado",
-    "summary": {
-      "title": "Resumen de compras",
-      "collapse": "Contraer resumen",
-      "expand": "Expandir resumen",
-      "productOne": "producto",
-      "productMany": "productos",
-      "toBuyIn": "para comprar en",
-      "storeOne": "supermercado",
-      "storeMany": "supermercados",
-      "ok": "Todos los artículos almacenados cumplen sus objetivos.",
-      "stats": {
-        "total": "Artículos totales por comprar",
-        "basicOut": "Básicos sin stock",
-        "basicLow": "Básicos con bajo stock",
-        "lowStock": "Productos con bajo stock"
-      }
-    },
     "reasons": {
       "below-min": "Bajo stock",
-      "basic-low": "Básico con bajo stock",
-      "basic-out": "Básico sin stock",
       "empty": "Sin stock"
     },
     "purchaseModal": {

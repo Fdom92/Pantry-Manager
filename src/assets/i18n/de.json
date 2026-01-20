@@ -87,9 +87,15 @@
     "overview": {
       "aria": "Vorratsübersicht",
       "sections": {
-        "alerts": { "title": "Warnungen" },
-        "maintenance": { "title": "Wartung" },
-        "activity": { "title": "Aktivität" }
+        "alerts": {
+          "title": "Warnungen"
+        },
+        "maintenance": {
+          "title": "Wartung"
+        },
+        "activity": {
+          "title": "Aktivität"
+        }
       },
       "cards": {
         "nearExpiry": {
@@ -167,27 +173,8 @@
   "shopping": {
     "title": "Einkäufe",
     "unassignedSupermarket": "Beliebiger Supermarkt",
-    "summary": {
-      "title": "Einkaufsübersicht",
-      "collapse": "Übersicht einklappen",
-      "expand": "Übersicht ausklappen",
-      "productOne": "Produkt",
-      "productMany": "Produkte",
-      "toBuyIn": "zu kaufen in",
-      "storeOne": "Supermarkt",
-      "storeMany": "Supermärkte",
-      "ok": "Alle gelagerten Artikel erfüllen ihre Zielwerte.",
-      "stats": {
-        "total": "Gesamtanzahl zu kaufender Artikel",
-        "basicOut": "Grundprodukte ohne Bestand",
-        "basicLow": "Grundprodukte mit niedrigem Bestand",
-        "lowStock": "Produkte mit niedrigem Bestand"
-      }
-    },
     "reasons": {
       "below-min": "Niedriger Bestand",
-      "basic-low": "Grundprodukt mit niedrigem Bestand",
-      "basic-out": "Grundprodukt ohne Bestand",
       "empty": "Kein Bestand"
     },
     "purchaseModal": {

@@ -87,9 +87,15 @@
     "overview": {
       "aria": "Pantry overview",
       "sections": {
-        "alerts": { "title": "Alerts" },
-        "maintenance": { "title": "Maintenance" },
-        "activity": { "title": "Activity" }
+        "alerts": {
+          "title": "Alerts"
+        },
+        "maintenance": {
+          "title": "Maintenance"
+        },
+        "activity": {
+          "title": "Activity"
+        }
       },
       "cards": {
         "nearExpiry": {
@@ -167,27 +173,8 @@
   "shopping": {
     "title": "Shopping",
     "unassignedSupermarket": "Any supermarket",
-    "summary": {
-      "title": "Shopping summary",
-      "collapse": "Collapse summary",
-      "expand": "Expand summary",
-      "productOne": "product",
-      "productMany": "products",
-      "toBuyIn": "to buy in",
-      "storeOne": "store",
-      "storeMany": "stores",
-      "ok": "All stored items meet their targets.",
-      "stats": {
-        "total": "Items to buy",
-        "basicOut": "Staples out of stock",
-        "basicLow": "Staples running low",
-        "lowStock": "Products below target"
-      }
-    },
     "reasons": {
-      "below-min": "Below minimum",
-      "basic-low": "Staple running low",
-      "basic-out": "Staple out of stock",
+      "below-min": "Low stock",
       "empty": "Out of stock"
     },
     "purchaseModal": {

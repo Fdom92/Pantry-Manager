@@ -108,10 +108,8 @@ export class ShoppingStateService {
 
   getBadgeColorByReason(reason: ShoppingReason): string {
     switch (reason) {
-      case ShoppingReasonEnum.BASIC_OUT:
       case ShoppingReasonEnum.EMPTY:
         return 'danger';
-      case ShoppingReasonEnum.BASIC_LOW:
       case ShoppingReasonEnum.BELOW_MIN:
         return 'warning';
       default:
@@ -187,8 +185,7 @@ export class ShoppingStateService {
     const summary: ShoppingSummary = {
       total: 0,
       belowMin: 0,
-      basicLow: 0,
-      basicOut: 0,
+      empty: 0,
       supermarketCount: 0,
     };
 

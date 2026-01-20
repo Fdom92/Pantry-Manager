@@ -87,9 +87,15 @@
     "overview": {
       "aria": "Panoramica della dispensa",
       "sections": {
-        "alerts": { "title": "Avvisi" },
-        "maintenance": { "title": "Manutenzione" },
-        "activity": { "title": "Attività" }
+        "alerts": {
+          "title": "Avvisi"
+        },
+        "maintenance": {
+          "title": "Manutenzione"
+        },
+        "activity": {
+          "title": "Attività"
+        }
       },
       "cards": {
         "nearExpiry": {
@@ -167,27 +173,8 @@
   "shopping": {
     "title": "Spesa",
     "unassignedSupermarket": "Qualsiasi supermercato",
-    "summary": {
-      "title": "Riepilogo della spesa",
-      "collapse": "Comprimi riepilogo",
-      "expand": "Espandi riepilogo",
-      "productOne": "prodotto",
-      "productMany": "prodotti",
-      "toBuyIn": "da acquistare in",
-      "storeOne": "negozio",
-      "storeMany": "negozi",
-      "ok": "Tutti gli articoli memorizzati soddisfano i requisiti.",
-      "stats": {
-        "total": "Articoli da acquistare",
-        "basicOut": "Basi esaurite",
-        "basicLow": "Basi quasi esaurite",
-        "lowStock": "Prodotti sotto il target"
-      }
-    },
     "reasons": {
-      "below-min": "Sotto minimo",
-      "basic-low": "Basi quasi esaurite",
-      "basic-out": "Basi esaurite",
+      "below-min": "Stock basso",
       "empty": "Esaurito"
     },
     "purchaseModal": {

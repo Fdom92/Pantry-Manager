@@ -87,9 +87,15 @@
     "overview": {
       "aria": "Visão geral da despensa",
       "sections": {
-        "alerts": { "title": "Alertas" },
-        "maintenance": { "title": "Manutenção" },
-        "activity": { "title": "Atividade" }
+        "alerts": {
+          "title": "Alertas"
+        },
+        "maintenance": {
+          "title": "Manutenção"
+        },
+        "activity": {
+          "title": "Atividade"
+        }
       },
       "cards": {
         "nearExpiry": {
@@ -167,27 +173,8 @@
   "shopping": {
     "title": "Compras",
     "unassignedSupermarket": "Qualquer supermercado",
-    "summary": {
-      "title": "Resumo de compras",
-      "collapse": "Recolher resumo",
-      "expand": "Expandir resumo",
-      "productOne": "produto",
-      "productMany": "produtos",
-      "toBuyIn": "para comprar em",
-      "storeOne": "loja",
-      "storeMany": "lojas",
-      "ok": "Todos os itens armazenados cumprem os seus objetivos.",
-      "stats": {
-        "total": "Itens a comprar",
-        "basicOut": "Essenciais sem stock",
-        "basicLow": "Essenciais com stock baixo",
-        "lowStock": "Produtos abaixo do objetivo"
-      }
-    },
     "reasons": {
-      "below-min": "Abaixo do mínimo",
-      "basic-low": "Essencial com stock baixo",
-      "basic-out": "Essencial sem stock",
+      "below-min": "Stock baixo",
       "empty": "Sem stock"
     },
     "purchaseModal": {
