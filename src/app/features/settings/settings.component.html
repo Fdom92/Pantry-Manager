@@ -5,21 +5,6 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (isPro$ | async) {
-    <app-pro-banner
-      class="pro-inline-banner"
-      [message]="'settings.pro.statusDescription' | translate"
-      [showAction]="false"
-      [subtle]="true">
-    </app-pro-banner>
-  } @else {
-    <app-pro-banner
-      class="pro-inline-banner"
-      [message]="'settings.pro.upgradePrompt' | translate"
-      [ctaLabel]="'settings.pro.upgradeCta' | translate"
-      (action)="navigateToUpgrade()">
-    </app-pro-banner>
-  }
   <div class="settings-content">
     <ion-card class="settings-card">
       <ion-card-header>
@@ -38,9 +23,9 @@
               <p>{{ "settings.appearance.description" | translate }}</p>
             </ion-label>
             <ion-select
-              [value]="themePreference()"
-              (ionChange)="updateThemePreference($event.detail.value)"
-              [disabled]="isUpdatingTheme()"
+              [value]="facade.themePreference()"
+              (ionChange)="facade.updateThemePreference($event.detail.value)"
+              [disabled]="facade.isUpdatingTheme()"
               interface="popover"
               class="theme-select"
             >
@@ -87,7 +72,7 @@
         accept="application/json,.json,*/*"
         hidden
         #importInput
-        (change)="handleImportFileSelection($event)"
+        (change)="facade.submitImportFileSelection($event)"
       />
       <ion-card-header>
         <ion-card-title>{{ "settings.data.title" | translate }}</ion-card-title>
@@ -106,17 +91,18 @@
               color="danger"
               fill="clear"
               slot="end"
-              (click)="resetApplicationData()"
-              [disabled]="isResettingData()"
+              (click)="facade.resetApplicationData()"
+              [disabled]="facade.isResettingData()"
               [attr.aria-label]="'settings.data.resetAction' | translate"
             >
-              @if (isResettingData()) {
+              @if (facade.isResettingData()) {
                 <ion-spinner
-                  slot="start"
+                  slot="icon-only"
                   name="dots"
                 ></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
               }
-              <ion-icon name="trash-outline"></ion-icon>
             </ion-button>
           </ion-item>
 
@@ -128,17 +114,18 @@
             <ion-button
               slot="end"
               fill="clear"
-              (click)="exportDataBackup()"
-              [disabled]="isExportingData()"
+              (click)="facade.exportDataBackup()"
+              [disabled]="facade.isExportingData()"
               [attr.aria-label]="'settings.data.exportAction' | translate"
             >
-              @if (isExportingData()) {
+              @if (facade.isExportingData()) {
                 <ion-spinner
-                  slot="start"
+                  slot="icon-only"
                   name="dots"
                 ></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
               }
-              <ion-icon name="exit-outline"></ion-icon>
             </ion-button>
           </ion-item>
 
@@ -151,17 +138,18 @@
               slot="end"
               color="secondary"
               fill="clear"
-              (click)="triggerImportPicker(importInput)"
-              [disabled]="isImportingData()"
+              (click)="facade.openImportPicker(importInput)"
+              [disabled]="facade.isImportingData()"
               [attr.aria-label]="'settings.data.importAction' | translate"
             >
-              @if (isImportingData()) {
+              @if (facade.isImportingData()) {
                 <ion-spinner
-                  slot="start"
+                  slot="icon-only"
                   name="dots"
                 ></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="enter-outline"></ion-icon>
               }
-              <ion-icon name="enter-outline"></ion-icon>
             </ion-button>
           </ion-item>
         </ion-list>

@@ -1,0 +1,94 @@
+<ion-modal
+  [isOpen]="state.showMoveModal()"
+  (willDismiss)="state.dismissMoveItemModal()"
+  (didDismiss)="state.closeMoveItemModal()">
+  <ng-template>
+    <form class="move-modal-form" [formGroup]="state.moveForm" (ngSubmit)="state.submitMoveItem()">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ 'pantry.detail.actions.moveItem' | translate }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" color="medium" type="button" (click)="state.dismissMoveItemModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding move-modal-content">
+        @let movingItem = state.moveItemTarget();
+        @if (movingItem) {
+          <h2 class="modal-title-value">{{ movingItem.name }}</h2>
+          <div class="move-modal-header">
+            <ion-text color="medium">
+              {{ state.getTotalQuantity(movingItem) | number:'1.0-2' }} {{ state.getUnitLabelForItem(movingItem) }}
+            </ion-text>
+          </div>
+          <ion-list lines="full">
+            <ion-item>
+              <ion-select
+                interface="popover"
+                label="{{ 'pantry.move.from' | translate }}"
+                labelPlacement="stacked"
+                formControlName="fromLocation"
+                (ionChange)="state.onMoveSourceChange()">
+                @for (option of state.getMoveSourceOptions(movingItem); track option.value) {
+                  <ion-select-option [value]="option.value">
+                    {{ option.label }} · {{ option.quantityLabel }}
+                  </ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+            <ion-item lines="full">
+              <ion-input
+                type="number"
+                inputmode="decimal"
+                formControlName="quantity"
+                label="{{ 'pantry.move.quantity' | translate }}"
+                labelPlacement="stacked"
+              ></ion-input>
+              <ion-note slot="helper" color="medium">
+                {{ state.getMoveAvailabilityLabel(movingItem) }}
+              </ion-note>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">{{ 'pantry.move.to' | translate }}</ion-label>
+              <ion-input
+                formControlName="toLocation"
+                [placeholder]="'pantry.move.toPlaceholder' | translate"
+              ></ion-input>
+            </ion-item>
+          </ion-list>
+          @if (state.getMoveDestinationSuggestions(movingItem).length) {
+            <div class="move-destination-suggestions">
+              <ion-text color="medium">{{ 'pantry.move.suggestions' | translate }}</ion-text>
+              <div class="move-destination-chips">
+                @for (suggestion of state.getMoveDestinationSuggestions(movingItem); track suggestion) {
+                  <ion-chip size="small" (click)="state.applyMoveDestination(suggestion)">
+                    {{ suggestion }}
+                  </ion-chip>
+                }
+              </div>
+            </div>
+          }
+          @if (state.moveError()) {
+            <ion-text color="danger" class="move-error">{{ state.moveError() }}</ion-text>
+          }
+        }
+      </ion-content>
+      <ion-footer class="modal-footer">
+        <ion-toolbar>
+          <ion-button
+            expand="block"
+            type="submit"
+            color="primary"
+            [disabled]="state.moveForm.invalid || state.moveSubmitting()">
+            @if (state.moveSubmitting()) {
+              <ion-spinner slot="start" name="lines-small"></ion-spinner>
+            }
+            {{ 'pantry.move.submit' | translate }}
+          </ion-button>
+        </ion-toolbar>
+      </ion-footer>
+    </form>
+  </ng-template>
+</ion-modal>

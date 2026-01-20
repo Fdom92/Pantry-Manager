@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { PantryItem } from '@core/models/inventory';
+import { getItemTotalQuantity } from '@core/domain/pantry/pantry-item';
+import { PantryItem } from '@core/models/pantry';
 import { LlmClientService } from './llm-client.service';
-import { PantryService } from '../pantry.service';
-import { AppPreferencesService } from '../app-preferences.service';
+import { PantryService } from '../pantry/pantry.service';
+import { AppPreferencesService } from '../settings/app-preferences.service';
 
 export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
 
@@ -173,13 +174,7 @@ export class MealPlannerAgentService {
 
     return items
       .map(item => {
-        const total = (item.locations ?? []).reduce((sum, loc) => {
-          const batches = loc.batches ?? [];
-          return (
-            sum +
-            batches.reduce((batchSum, batch) => batchSum + Number(batch.quantity ?? 0), 0)
-          );
-        }, 0);
+        const total = getItemTotalQuantity(item);
         return `- ${item.name}: ${total}`;
       })
       .join('\n');

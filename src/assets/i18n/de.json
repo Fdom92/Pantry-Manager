@@ -14,25 +14,25 @@
       "start": "Starten"
     },
     "slides": {
-      "organize": {
-        "title": "Organisiere deine Vorratskammer mühelos",
-        "description": "Produkte in Sekunden erfassen, mit individuell angepassten Kategorien und Standorten."
+      "dashboard": {
+        "title": "Start",
+        "description": "Warnungen und Überblick über deinen Vorrat auf einen Blick."
       },
-      "batches": {
-        "title": "Chargen- und Haltbarkeitskontrolle",
-        "description": "Verwalte Chargen, Haltbarkeitsdaten und erhalte Warnungen, bevor etwas verdirbt."
+      "pantry": {
+        "title": "Vorratskammer",
+        "description": "Produkte hinzufügen, Bestand und Haltbarkeit im Blick behalten."
       },
-      "suggestions": {
-        "title": "Intelligente Einkaufsvorschläge",
-        "description": "Zeigt dir, was nachgekauft werden sollte – basierend auf Verbrauch, Mindestbestand und nahendem Ablauf."
+      "planner": {
+        "title": "Planer",
+        "description": "Essensideen und Pläne basierend auf dem, was du hast."
       },
-      "agent": {
-        "title": "Intelligenten Menüplaner freischalten (PRO)",
-        "description": "Plane Menüs, fordere Rezepte an und erstelle Einkaufslisten automatisch.",
-        "badge": "Exklusiv für PRO",
-        "titlePro": "Menüplaner bereit für dich",
-        "descriptionPro": "PRO aktiv: Nutze den Menüplaner für Rezepte, Ideen und schnellere Listen.",
-        "badgePro": "PRO aktiv"
+      "shopping": {
+        "title": "Einkauf",
+        "description": "Liste erstellen und beim Einkaufen abhaken."
+      },
+      "settings": {
+        "title": "Einstellungen",
+        "description": "Kataloge, Warnungen und App-Optionen anpassen."
       }
     }
   },
@@ -84,6 +84,61 @@
         "expired": "Abgelaufen"
       }
     },
+    "overview": {
+      "aria": "Vorratsübersicht",
+      "sections": {
+        "alerts": {
+          "title": "Warnungen"
+        },
+        "maintenance": {
+          "title": "Wartung"
+        },
+        "activity": {
+          "title": "Aktivität"
+        }
+      },
+      "cards": {
+        "nearExpiry": {
+          "title": "Bald ablaufend",
+          "body": "{{ count }} Produkte diese Woche",
+          "action": "Ansehen"
+        },
+        "expired": {
+          "title": "Abgelaufen",
+          "body": "{{ count }} abgelaufene Produkte",
+          "action": "Ansehen"
+        },
+        "pendingReview": {
+          "title": "Vorrat vervollständigen",
+          "body": "{{ count }} Produkte zu prüfen",
+          "action": "Prüfen"
+        },
+        "lowOrEmpty": {
+          "title": "Niedriger Bestand",
+          "body": "{{ count }} Produkte mit niedrigem Bestand",
+          "action": "Prüfen"
+        },
+        "shopping": {
+          "title": "Einkaufsliste",
+          "body": "{{ count }} Artikel ausstehend",
+          "action": "Ansehen"
+        },
+        "recentlyAdded": {
+          "title": "Kürzlich hinzugefügt",
+          "body": "{{ count }} neue Produkte",
+          "action": "Ansehen"
+        }
+      },
+      "toasts": {
+        "expiredEmpty": "Alles gut — keine abgelaufenen Artikel.",
+        "nearExpiryEmpty": "Alles gut — keine Artikel, die bald ablaufen.",
+        "pendingReviewEmpty": "Alles gut — nichts ausstehend zu vervollständigen.",
+        "lowOrEmptyEmpty": "Alles gut — keine Artikel mit niedrigem Bestand.",
+        "recentlyAddedEmpty": "Alles gut — keine kürzlich hinzugefügten Artikel.",
+        "shoppingEmpty": "Alles gut — deine Einkaufsliste ist leer.",
+        "genericEmpty": "Alles gut — es gibt keine Elemente für diese Bedingung."
+      }
+    },
     "nearExpiry": {
       "title": "Kurz vor Ablauf",
       "subtitle": "In den nächsten {{ days }} Tagen",
@@ -118,27 +173,8 @@
   "shopping": {
     "title": "Einkäufe",
     "unassignedSupermarket": "Beliebiger Supermarkt",
-    "summary": {
-      "title": "Einkaufsübersicht",
-      "collapse": "Übersicht einklappen",
-      "expand": "Übersicht ausklappen",
-      "productOne": "Produkt",
-      "productMany": "Produkte",
-      "toBuyIn": "zu kaufen in",
-      "storeOne": "Supermarkt",
-      "storeMany": "Supermärkte",
-      "ok": "Alle gelagerten Artikel erfüllen ihre Zielwerte.",
-      "stats": {
-        "total": "Gesamtanzahl zu kaufender Artikel",
-        "basicOut": "Grundprodukte ohne Bestand",
-        "basicLow": "Grundprodukte mit niedrigem Bestand",
-        "lowStock": "Produkte mit niedrigem Bestand"
-      }
-    },
     "reasons": {
       "below-min": "Niedriger Bestand",
-      "basic-low": "Grundprodukt mit niedrigem Bestand",
-      "basic-out": "Grundprodukt ohne Bestand",
       "empty": "Kein Bestand"
     },
     "purchaseModal": {
@@ -150,7 +186,7 @@
       "addToPantry": "Hinzufügen"
     },
     "suggestions": {
-      "title": "Vorgeschlagene Einkäufe",
+      "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
       "destination": "Empfohlenes Ziel: {{ location }}",
       "totalStock": "Gesamtbestand: {{ amount }} {{ unit }}",
@@ -217,6 +253,7 @@
   },
   "upToDate": {
     "title": "Aktualisieren",
+    "subtitle": "Überprüfe ein paar Produkte, um deine Vorratskammer korrekt und aktuell zu halten.",
     "progress": "Ausstehende Produkte {{ pending }} von {{ total }}",
     "lastUpdated": "Zuletzt aktualisiert: {{ date }}",
     "fields": {
@@ -321,7 +358,7 @@
       "advancedAction": "Erweitertes Hinzufügen",
       "groupLabel": "Produkte schnell hinzufügen",
       "title": "Produkte schnell hinzufügen",
-      "subtitle": "Ein Produkt pro Zeile. Die Menge ist optional. Verwende \"Erweitertes Hinzufügen\" für weitere Optionen.",
+      "subtitle": "Füge mehrere Produkte schnell hinzu. Ein Produkt pro Zeile. Menge ist optional.",
       "placeholder": "2 Milch\nHähnchenbrust\n3 Äpfel",
       "submit": "Produkte hinzufügen",
       "singleSuccess": "1 Produkt hinzugefügt",

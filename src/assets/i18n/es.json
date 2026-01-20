@@ -14,25 +14,25 @@
       "start": "Empezar"
     },
     "slides": {
-      "organize": {
-        "title": "Organiza tu despensa sin esfuerzo",
-        "description": "Registra productos en segundos, con categorías y ubicaciones hechas a tu medida."
+      "dashboard": {
+        "title": "Inicio",
+        "description": "Alertas y resumen de tu despensa de un vistazo."
       },
-      "batches": {
-        "title": "Control por lotes y caducidades",
-        "description": "Gestiona lotes, fechas de caducidad y recibe alertas antes de que algo se eche a perder."
+      "pantry": {
+        "title": "Despensa",
+        "description": "Añade productos, controla el stock y las caducidades."
       },
-      "suggestions": {
-        "title": "Sugerencias de compra inteligentes",
-        "description": "Te dice qué reponer según consumo, stock mínimo y lo que caducará pronto."
+      "planner": {
+        "title": "Planificador",
+        "description": "Ideas y planes de comidas con lo que ya tienes."
       },
-      "agent": {
-        "title": "Desbloquea el planificador inteligente (PRO)",
-        "description": "Planifica menús, pide recetas y genera listas automáticamente.",
-        "badge": "Exclusivo PRO",
-        "titlePro": "Planificador inteligente listo para ti",
-        "descriptionPro": "Ya tienes acceso PRO: usa el planificador para recetas, ideas y compras rápidas.",
-        "badgePro": "PRO activo"
+      "shopping": {
+        "title": "Compras",
+        "description": "Crea tu lista y marca lo comprado al momento."
+      },
+      "settings": {
+        "title": "Ajustes",
+        "description": "Personaliza catálogos, alertas y preferencias de la app."
       }
     }
   },
@@ -84,6 +84,55 @@
         "expired": "Caducados"
       }
     },
+    "overview": {
+      "aria": "Resumen de la despensa",
+      "sections": {
+        "alerts": { "title": "Alertas" },
+        "maintenance": { "title": "Mantenimiento" },
+        "activity": { "title": "Actividad" }
+      },
+      "cards": {
+        "nearExpiry": {
+          "title": "Caducan pronto",
+          "body": "{{ count }} productos esta semana",
+          "action": "Ver"
+        },
+        "expired": {
+          "title": "Caducados",
+          "body": "{{ count }} productos vencidos",
+          "action": "Ver"
+        },
+        "pendingReview": {
+          "title": "Despensa por completar",
+          "body": "{{ count }} productos pendientes",
+          "action": "Revisar"
+        },
+        "lowOrEmpty": {
+          "title": "Bajo stock",
+          "body": "{{ count }} productos con stock bajo",
+          "action": "Revisar"
+        },
+        "shopping": {
+          "title": "Lista de la compra",
+          "body": "{{ count }} productos pendientes",
+          "action": "Ver"
+        },
+        "recentlyAdded": {
+          "title": "Añadidos recientemente",
+          "body": "{{ count }} productos nuevos",
+          "action": "Ver"
+        }
+      },
+      "toasts": {
+        "expiredEmpty": "Todo bien, no tienes nada caducado.",
+        "nearExpiryEmpty": "Todo bien, no tienes nada a punto de caducar.",
+        "pendingReviewEmpty": "Todo bien, no tienes nada pendiente de completar.",
+        "lowOrEmptyEmpty": "Todo bien, no tienes productos con stock bajo.",
+        "recentlyAddedEmpty": "Todo bien, no has añadido productos recientemente.",
+        "shoppingEmpty": "Todo bien, no tienes productos pendientes de compra.",
+        "genericEmpty": "Todo bien, no hay elementos para esa condición."
+      }
+    },
     "nearExpiry": {
       "title": "Por caducar",
       "subtitle": "En los próximos {{ days }} días",
@@ -118,27 +167,8 @@
   "shopping": {
     "title": "Compras",
     "unassignedSupermarket": "Cualquier supermercado",
-    "summary": {
-      "title": "Resumen de compras",
-      "collapse": "Contraer resumen",
-      "expand": "Expandir resumen",
-      "productOne": "producto",
-      "productMany": "productos",
-      "toBuyIn": "para comprar en",
-      "storeOne": "supermercado",
-      "storeMany": "supermercados",
-      "ok": "Todos los artículos almacenados cumplen sus objetivos.",
-      "stats": {
-        "total": "Artículos totales por comprar",
-        "basicOut": "Básicos sin stock",
-        "basicLow": "Básicos con bajo stock",
-        "lowStock": "Productos con bajo stock"
-      }
-    },
     "reasons": {
       "below-min": "Bajo stock",
-      "basic-low": "Básico con bajo stock",
-      "basic-out": "Básico sin stock",
       "empty": "Sin stock"
     },
     "purchaseModal": {
@@ -150,7 +180,7 @@
       "addToPantry": "Añadir"
     },
     "suggestions": {
-      "title": "Compras sugeridas",
+      "title": "Lista de la compra",
       "loading": "Generando lista de compras…",
       "destination": "Destino sugerido: {{ location }}",
       "totalStock": "Stock total: {{ amount }} {{ unit }}",
@@ -217,6 +247,7 @@
   },
   "upToDate": {
     "title": "Poner al día",
+    "subtitle": "Revisa algunos productos para mantener tu despensa precisa y al día.",
     "progress": "Productos pendientes {{ pending }} de {{ total }}",
     "lastUpdated": "Última actualización: {{ date }}",
     "fields": {
@@ -321,7 +352,7 @@
       "advancedAction": "Añadir avanzado",
       "groupLabel": "Añadir productos rápidamente",
       "title": "Añade productos rápido",
-      "subtitle": "Un producto por línea. La cantidad es opcional. Usa \"Añadir avanzado\" para opciones detalladas.",
+      "subtitle": "Añade varios productos rápidamente. Un producto por línea. La cantidad es opcional.",
       "placeholder": "2 leche\npechugas de pollo\n3 manzanas",
       "submit": "Añadir productos",
       "singleSuccess": "1 producto añadido",

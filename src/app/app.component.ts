@@ -2,8 +2,8 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { App as CapacitorApp } from '@capacitor/app';
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
-import { PantryService } from '@core/services/pantry.service';
-import { RevenuecatService } from '@core/services/revenuecat.service';
+import { PantryService } from '@core/services/pantry';
+import { RevenuecatService } from '@core/services/upgrade';
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 

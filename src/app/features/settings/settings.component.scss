@@ -47,9 +47,11 @@ ion-item {
 
 .settings-card {
   margin: 0;
-  background: var(--ion-card-background, var(--ion-card-background));
+  background: var(--ion-card-background, var(--ion-card-background)) !important;
+  --background: var(--ion-card-background, var(--ion-card-background));
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
   border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  color: var(--ion-text-color);
 }
 
 .settings-card ion-list {

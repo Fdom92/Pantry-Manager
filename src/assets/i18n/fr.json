@@ -14,25 +14,25 @@
       "start": "Commencer"
     },
     "slides": {
-      "organize": {
-        "title": "Organisez votre garde-manger sans effort",
-        "description": "Enregistrez des produits en quelques secondes, avec des catégories et des emplacements personnalisés."
+      "dashboard": {
+        "title": "Accueil",
+        "description": "Alertes et aperçu rapide de votre garde-manger."
       },
-      "batches": {
-        "title": "Gestion des lots et des dates de péremption",
-        "description": "Gérez les lots, les dates de péremption et recevez des alertes avant qu’un produit ne se périme."
+      "pantry": {
+        "title": "Garde-manger",
+        "description": "Ajoutez des produits, suivez le stock et les dates de péremption."
       },
-      "suggestions": {
-        "title": "Suggestions d’achat intelligentes",
-        "description": "Suggère quoi réapprovisionner selon la consommation, le stock minimum et les produits proches de la péremption."
+      "planner": {
+        "title": "Planificateur",
+        "description": "Idées et plans de repas avec ce que vous avez déjà."
       },
-      "agent": {
-        "title": "Débloquez le planificateur intelligent (PRO)",
-        "description": "Planifiez vos menus, demandez des recettes et créez des listes automatiquement.",
-        "badge": "Exclusif PRO",
-        "titlePro": "Planificateur intelligent prêt pour vous",
-        "descriptionPro": "Vous avez déjà accès PRO : utilisez le planificateur pour recettes, idées et achats rapides.",
-        "badgePro": "PRO actif"
+      "shopping": {
+        "title": "Achats",
+        "description": "Créez une liste et cochez au fur et à mesure."
+      },
+      "settings": {
+        "title": "Réglages",
+        "description": "Personnalisez les catalogues, alertes et préférences."
       }
     }
   },
@@ -84,6 +84,61 @@
         "expired": "Périmés"
       }
     },
+    "overview": {
+      "aria": "Résumé du garde-manger",
+      "sections": {
+        "alerts": {
+          "title": "Alertes"
+        },
+        "maintenance": {
+          "title": "Maintenance"
+        },
+        "activity": {
+          "title": "Activité"
+        }
+      },
+      "cards": {
+        "nearExpiry": {
+          "title": "Bientôt périmés",
+          "body": "{{ count }} produits cette semaine",
+          "action": "Voir"
+        },
+        "expired": {
+          "title": "Périmés",
+          "body": "{{ count }} produits périmés",
+          "action": "Voir"
+        },
+        "pendingReview": {
+          "title": "Garde-manger à compléter",
+          "body": "{{ count }} produits à mettre à jour",
+          "action": "Revoir"
+        },
+        "lowOrEmpty": {
+          "title": "Stock faible",
+          "body": "{{ count }} produits en stock faible",
+          "action": "Revoir"
+        },
+        "shopping": {
+          "title": "Liste des achats",
+          "body": "{{ count }} articles à acheter",
+          "action": "Voir"
+        },
+        "recentlyAdded": {
+          "title": "Ajoutés récemment",
+          "body": "{{ count }} nouveaux produits",
+          "action": "Voir"
+        }
+      },
+      "toasts": {
+        "expiredEmpty": "Tout va bien — aucun article périmé.",
+        "nearExpiryEmpty": "Tout va bien — aucun article bientôt périmé.",
+        "pendingReviewEmpty": "Tout va bien — rien à compléter.",
+        "lowOrEmptyEmpty": "Tout va bien — aucun article avec stock bas.",
+        "recentlyAddedEmpty": "Tout va bien — aucun article ajouté récemment.",
+        "shoppingEmpty": "Tout va bien — votre liste d’achats est vide.",
+        "genericEmpty": "Tout est OK — aucun élément ne correspond à cette condition."
+      }
+    },
     "nearExpiry": {
       "title": "Bientôt périmés",
       "subtitle": "Dans les {{ days }} prochains jours",
@@ -118,28 +173,9 @@
   "shopping": {
     "title": "Achats",
     "unassignedSupermarket": "N’importe quel supermarché",
-    "summary": {
-      "title": "Résumé des achats",
-      "collapse": "Réduire le résumé",
-      "expand": "Développer le résumé",
-      "productOne": "produit",
-      "productMany": "produits",
-      "toBuyIn": "à acheter dans",
-      "storeOne": "supermarché",
-      "storeMany": "supermarchés",
-      "ok": "Tous les articles stockés atteignent leurs objectifs.",
-      "stats": {
-        "total": "Articles totaux à acheter",
-        "basicOut": "Produits de base en rupture",
-        "basicLow": "Produits de base en stock faible",
-        "lowStock": "Produits en stock faible"
-      }
-    },
     "reasons": {
       "below-min": "Stock faible",
-      "basic-low": "Produit de base en stock faible",
-      "basic-out": "Produit de base en rupture",
-      "empty": "Sans stock"
+      "empty": "Rupture de stock"
     },
     "purchaseModal": {
       "titleProduct": "Acheter un produit",
@@ -150,7 +186,7 @@
       "addToPantry": "Ajouter"
     },
     "suggestions": {
-      "title": "Achats suggérés",
+      "title": "Liste de courses",
       "loading": "Génération de la liste d’achats…",
       "destination": "Destination suggérée : {{ location }}",
       "totalStock": "Stock total : {{ amount }} {{ unit }}",
@@ -217,6 +253,7 @@
   },
   "upToDate": {
     "title": "Mettre à jour",
+    "subtitle": "Passez en revue quelques produits pour garder votre garde-manger précis et à jour.",
     "progress": "Produits en attente {{ pending }} sur {{ total }}",
     "lastUpdated": "Dernière mise à jour : {{ date }}",
     "fields": {
@@ -321,7 +358,7 @@
       "advancedAction": "Ajout avancé",
       "groupLabel": "Ajouter des produits rapidement",
       "title": "Ajouter des produits rapidement",
-      "subtitle": "Un produit par ligne. La quantité est optionnelle. Utilisez « Ajout avancé » pour plus d’options.",
+      "subtitle": "Ajoutez plusieurs produits rapidement. Un produit par ligne. La quantité est facultative.",
       "placeholder": "2 lait\npoitrines de poulet\n3 pommes",
       "submit": "Ajouter les produits",
       "singleSuccess": "1 produit ajouté",

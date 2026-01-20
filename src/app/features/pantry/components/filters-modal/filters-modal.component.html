@@ -1,0 +1,67 @@
+<ion-modal [isOpen]="state.showFilters()" (willDismiss)="state.closeFilters()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ 'pantry.filters.title' | translate }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" color="medium" (click)="state.closeFilters()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <ion-card class="filter-card">
+        <ion-card-content>
+          <ion-item>
+            <ion-select
+              interface="popover"
+              label="{{ 'pantry.filters.category' | translate }}"
+              labelPlacement="stacked"
+              [value]="state.selectedCategory()"
+              (ionChange)="state.onCategoryChange($event)">
+              @for (option of state.categoryOptions(); track option.id) {
+                <ion-select-option [value]="option.id">{{ option.label }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-select
+              interface="popover"
+              label="{{ 'pantry.filters.location' | translate }}"
+              labelPlacement="stacked"
+              [value]="state.selectedLocation()"
+              (ionChange)="state.onLocationChange($event)">
+              @for (option of state.locationOptions(); track option.id) {
+                <ion-select-option [value]="option.id">{{ option.label }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-select
+              interface="popover"
+              label="{{ 'pantry.filters.sort.label' | translate }}"
+              labelPlacement="stacked"
+              [value]="state.sortOption()"
+              (ionChange)="state.onSortChange($event)">
+              <ion-select-option value="name">{{ 'pantry.filters.sort.name' | translate }}</ion-select-option>
+              <ion-select-option value="quantity">{{ 'pantry.filters.sort.quantity' | translate }}</ion-select-option>
+              <ion-select-option value="expiration">{{ 'pantry.filters.sort.expiration' | translate }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <div class="filter-actions">
+        <ion-button expand="block" fill="clear" color="medium" (click)="state.clearFilters()">
+          {{ 'common.actions.clear' | translate }}
+        </ion-button>
+        <ion-button expand="block" (click)="state.closeFilters()">{{ 'common.actions.apply' | translate }}</ion-button>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+

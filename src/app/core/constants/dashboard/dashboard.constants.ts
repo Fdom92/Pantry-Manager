@@ -1,0 +1,2 @@
+export const NEAR_EXPIRY_WINDOW_DAYS = 15;
+export const RECENTLY_ADDED_WINDOW_DAYS = 7;

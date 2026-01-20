@@ -1,0 +1,82 @@
+ion-title, ion-back-button {
+  color: var(--ion-text-color, var(--ion-text-color));
+}
+
+.create-item-modal-content {
+  --padding-bottom: 24px;
+}
+
+.modal-spinner {
+  display: block;
+  margin: 48px auto;
+}
+
+.location-form-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.location-form-card {
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  border-radius: 12px;
+  padding: 12px;
+  background: color-mix(in srgb, var(--ion-color-dark-contrast) 6%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.location-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.location-total {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ion-color-medium);
+  margin-left: 8px;
+}
+
+.batch-form-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.batch-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.batch-form-card {
+  border: 1px dashed color-mix(in srgb, var(--ion-text-color) 20%, transparent);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: color-mix(in srgb, var(--ion-color-dark-contrast) 4%, transparent);
+}
+
+.batch-form-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-footer ion-toolbar {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+.modal-footer ion-button {
+  width: 100%;
+}
+

@@ -14,25 +14,25 @@
       "start": "Começar"
     },
     "slides": {
-      "organize": {
-        "title": "Organiza a tua despensa sem esforço",
-        "description": "Adiciona produtos em segundos com categorias e localizações à tua medida."
+      "dashboard": {
+        "title": "Início",
+        "description": "Alertas e visão rápida do estado da despensa."
       },
-      "batches": {
-        "title": "Controlo de lotes e validade",
-        "description": "Acompanha lotes, datas de validade e recebe alertas antes de estragar."
+      "pantry": {
+        "title": "Despensa",
+        "description": "Adiciona produtos e acompanha stock e validade."
       },
-      "suggestions": {
-        "title": "Sugestões inteligentes de compra",
-        "description": "Sabe o que reabastecer com base no consumo, stock mínimo e prazos de validade."
+      "planner": {
+        "title": "Planeador",
+        "description": "Ideias e planos de refeições com o que tens."
       },
-      "agent": {
-        "title": "Desbloqueia o planeador inteligente (PRO)",
-        "description": "Planeia menus, pede receitas e cria listas automaticamente.",
-        "badge": "Exclusivo PRO",
-        "titlePro": "Planeador inteligente pronto para ti",
-        "descriptionPro": "PRO ativo: usa o planeador para receitas, ideias e listas mais rápidas.",
-        "badgePro": "PRO ativo"
+      "shopping": {
+        "title": "Compras",
+        "description": "Cria a lista e marca itens à medida que compras."
+      },
+      "settings": {
+        "title": "Definições",
+        "description": "Personaliza catálogos, alertas e preferências da app."
       }
     }
   },
@@ -84,6 +84,61 @@
         "expired": "Expirados"
       }
     },
+    "overview": {
+      "aria": "Visão geral da despensa",
+      "sections": {
+        "alerts": {
+          "title": "Alertas"
+        },
+        "maintenance": {
+          "title": "Manutenção"
+        },
+        "activity": {
+          "title": "Atividade"
+        }
+      },
+      "cards": {
+        "nearExpiry": {
+          "title": "A expirar em breve",
+          "body": "{{ count }} produtos esta semana",
+          "action": "Ver"
+        },
+        "expired": {
+          "title": "Expirados",
+          "body": "{{ count }} produtos expirados",
+          "action": "Ver"
+        },
+        "pendingReview": {
+          "title": "Despensa por completar",
+          "body": "{{ count }} produtos por rever",
+          "action": "Rever"
+        },
+        "lowOrEmpty": {
+          "title": "Stock baixo",
+          "body": "{{ count }} produtos com stock baixo",
+          "action": "Rever"
+        },
+        "shopping": {
+          "title": "Lista de compras",
+          "body": "{{ count }} produtos pendentes",
+          "action": "Ver"
+        },
+        "recentlyAdded": {
+          "title": "Adicionados recentemente",
+          "body": "{{ count }} novos produtos",
+          "action": "Ver"
+        }
+      },
+      "toasts": {
+        "expiredEmpty": "Está tudo bem — não há itens expirados.",
+        "nearExpiryEmpty": "Está tudo bem — não há itens a expirar em breve.",
+        "pendingReviewEmpty": "Está tudo bem — não há nada por completar.",
+        "lowOrEmptyEmpty": "Está tudo bem — não há itens com stock baixo.",
+        "recentlyAddedEmpty": "Está tudo bem — não há itens adicionados recentemente.",
+        "shoppingEmpty": "Está tudo bem — a tua lista de compras está vazia.",
+        "genericEmpty": "Está tudo certo — não há itens para essa condição."
+      }
+    },
     "nearExpiry": {
       "title": "Perto da validade",
       "subtitle": "Nos próximos {{ days }} dias",
@@ -118,27 +173,8 @@
   "shopping": {
     "title": "Compras",
     "unassignedSupermarket": "Qualquer supermercado",
-    "summary": {
-      "title": "Resumo de compras",
-      "collapse": "Recolher resumo",
-      "expand": "Expandir resumo",
-      "productOne": "produto",
-      "productMany": "produtos",
-      "toBuyIn": "para comprar em",
-      "storeOne": "loja",
-      "storeMany": "lojas",
-      "ok": "Todos os itens armazenados cumprem os seus objetivos.",
-      "stats": {
-        "total": "Itens a comprar",
-        "basicOut": "Essenciais sem stock",
-        "basicLow": "Essenciais com stock baixo",
-        "lowStock": "Produtos abaixo do objetivo"
-      }
-    },
     "reasons": {
-      "below-min": "Abaixo do mínimo",
-      "basic-low": "Essencial com stock baixo",
-      "basic-out": "Essencial sem stock",
+      "below-min": "Stock baixo",
       "empty": "Sem stock"
     },
     "purchaseModal": {
@@ -150,7 +186,7 @@
       "addToPantry": "Adicionar"
     },
     "suggestions": {
-      "title": "Compras sugeridas",
+      "title": "Lista de compras",
       "loading": "A criar lista de compras…",
       "destination": "Localização sugerida: {{ location }}",
       "totalStock": "Stock total: {{ amount }} {{ unit }}",
@@ -217,6 +253,7 @@
   },
   "upToDate": {
     "title": "Pôr em dia",
+    "subtitle": "Revê alguns produtos para manter a tua despensa correta e atualizada.",
     "progress": "Produtos pendentes {{ pending }} de {{ total }}",
     "lastUpdated": "Última atualização: {{ date }}",
     "fields": {
@@ -321,7 +358,7 @@
       "advancedAction": "Adicionar avançado",
       "groupLabel": "Adicionar produtos rapidamente",
       "title": "Adicionar produtos rapidamente",
-      "subtitle": "Um produto por linha. A quantidade é opcional. Usa \"Adicionar avançado\" para opções detalhadas.",
+      "subtitle": "Adiciona vários produtos rapidamente. Um produto por linha. A quantidade é opcional.",
       "placeholder": "2 leite\npeitos de frango\n3 maçãs",
       "submit": "Adicionar produtos",
       "singleSuccess": "1 produto adicionado",
