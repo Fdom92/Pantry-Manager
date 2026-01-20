@@ -27,6 +27,7 @@ import {
   checkmarkCircleOutline,
   chevronDownOutline,
   chevronUpOutline,
+  clipboardOutline,
   close,
   constructOutline,
   createOutline,
@@ -132,7 +133,8 @@ addIcons({
   'sparkles-outline': sparklesOutline,
   'restaurant-outline': restaurantOutline,
   'flash-outline': flashOutline,
-  'construct-outline': constructOutline
+  'construct-outline': constructOutline,
+  'clipboard-outline': clipboardOutline
 });
 
 bootstrapApplication(AppComponent, {

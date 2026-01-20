@@ -14,25 +14,25 @@
       "start": "Get started"
     },
     "slides": {
-      "organize": {
-        "title": "Organize your pantry effortlessly",
-        "description": "Add items in seconds with categories and locations that fit you."
+      "dashboard": {
+        "title": "Home",
+        "description": "Alerts and a quick pantry snapshot."
       },
-      "batches": {
-        "title": "Batch and expiry control",
-        "description": "Track batches, expiration dates, and get alerts before anything goes bad."
+      "pantry": {
+        "title": "Pantry",
+        "description": "Add items, track stock and expirations."
       },
-      "suggestions": {
-        "title": "Smart purchase suggestions",
-        "description": "Know what to restock based on usage, minimum stock, and upcoming expiries."
+      "planner": {
+        "title": "Planner",
+        "description": "Meal ideas and plans based on what you have."
       },
-      "agent": {
-        "title": "Unlock the AI Meal Planner (PRO)",
-        "description": "Plan menus, request recipes, and auto-build shopping lists tailored to you.",
-        "badge": "PRO exclusive",
-        "titlePro": "AI Meal Planner ready for you",
-        "descriptionPro": "PRO unlocked: use the meal planner for recipes, ideas, and faster lists.",
-        "badgePro": "PRO active"
+      "shopping": {
+        "title": "Shopping",
+        "description": "Build a list and tick items as you shop."
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Tune catalogs, alerts, and app preferences."
       }
     }
   },
@@ -84,6 +84,61 @@
         "expired": "Expired"
       }
     },
+    "overview": {
+      "aria": "Pantry overview",
+      "sections": {
+        "alerts": {
+          "title": "Alerts"
+        },
+        "maintenance": {
+          "title": "Maintenance"
+        },
+        "activity": {
+          "title": "Activity"
+        }
+      },
+      "cards": {
+        "nearExpiry": {
+          "title": "Expiring soon",
+          "body": "{{ count }} products this week",
+          "action": "View"
+        },
+        "expired": {
+          "title": "Expired",
+          "body": "{{ count }} expired products",
+          "action": "View"
+        },
+        "pendingReview": {
+          "title": "Pantry to complete",
+          "body": "{{ count }} products to review",
+          "action": "Review"
+        },
+        "lowOrEmpty": {
+          "title": "Low stock",
+          "body": "{{ count }} products low on stock",
+          "action": "Review"
+        },
+        "shopping": {
+          "title": "Shopping list",
+          "body": "{{ count }} items pending",
+          "action": "View"
+        },
+        "recentlyAdded": {
+          "title": "Recently added",
+          "body": "{{ count }} new products",
+          "action": "View"
+        }
+      },
+      "toasts": {
+        "expiredEmpty": "All good — nothing expired.",
+        "nearExpiryEmpty": "All good — nothing expiring soon.",
+        "pendingReviewEmpty": "All good — nothing pending to complete.",
+        "lowOrEmptyEmpty": "All good — no low-stock items.",
+        "recentlyAddedEmpty": "All good — nothing recently added.",
+        "shoppingEmpty": "All good — your shopping list is empty.",
+        "genericEmpty": "All good — there are no items for that condition."
+      }
+    },
     "nearExpiry": {
       "title": "Near expiry",
       "subtitle": "In the next {{ days }} days",
@@ -118,27 +173,8 @@
   "shopping": {
     "title": "Shopping",
     "unassignedSupermarket": "Any supermarket",
-    "summary": {
-      "title": "Shopping summary",
-      "collapse": "Collapse summary",
-      "expand": "Expand summary",
-      "productOne": "product",
-      "productMany": "products",
-      "toBuyIn": "to buy in",
-      "storeOne": "store",
-      "storeMany": "stores",
-      "ok": "All stored items meet their targets.",
-      "stats": {
-        "total": "Items to buy",
-        "basicOut": "Staples out of stock",
-        "basicLow": "Staples running low",
-        "lowStock": "Products below target"
-      }
-    },
     "reasons": {
-      "below-min": "Below minimum",
-      "basic-low": "Staple running low",
-      "basic-out": "Staple out of stock",
+      "below-min": "Low stock",
       "empty": "Out of stock"
     },
     "purchaseModal": {
@@ -150,7 +186,7 @@
       "addToPantry": "Add"
     },
     "suggestions": {
-      "title": "Suggested purchases",
+      "title": "Shopping list",
       "loading": "Building shopping list…",
       "destination": "Suggested location: {{ location }}",
       "totalStock": "Total stock: {{ amount }} {{ unit }}",
@@ -217,6 +253,7 @@
   },
   "upToDate": {
     "title": "Get up to date",
+    "subtitle": "Review a few products to keep your pantry accurate and up to date",
     "progress": "Products pending {{ pending }} of {{ total }}",
     "lastUpdated": "Last updated: {{ date }}",
     "fields": {
@@ -321,7 +358,7 @@
       "advancedAction": "Advanced add",
       "groupLabel": "Add products quickly",
       "title": "Add products quickly",
-      "subtitle": "One product per line. Quantity is optional. Use \"Advanced add\" for detailed options.",
+      "subtitle": "Add multiple products quickly. One product per line. Quantity is optional.",
       "placeholder": "2 milk\nchicken breasts\n3 apples",
       "submit": "Add products",
       "singleSuccess": "1 product added",

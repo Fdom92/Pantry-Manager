@@ -68,4 +68,26 @@
   --ion-card-background: #ffffff;
   --ion-toolbar-background: #ffffff;
   --ion-toolbar-color: var(--ion-color-dark);
+
+  --app-surface-bg:
+    radial-gradient(circle at 20% 25%, rgba(58, 152, 130, 0.18), transparent 35%),
+    radial-gradient(circle at 80% 10%, rgba(136, 200, 175, 0.22), transparent 32%),
+    linear-gradient(150deg, #f8fbfa 0%, #eef6f2 60%, #e9f2ef 100%);
+  --app-surface-border: rgba(15, 23, 42, 0.08);
+  --app-surface-text: var(--ion-color-dark);
+  --app-surface-title: var(--ion-color-dark);
+  --app-surface-muted: rgba(15, 20, 19, 0.62);
+}
+
+.ion-palette-dark,
+.dark,
+[data-theme='dark'] {
+  --app-surface-bg:
+    radial-gradient(circle at 20% 25%, rgba(99, 102, 241, 0.22), transparent 35%),
+    radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.2), transparent 32%),
+    linear-gradient(150deg, #0b1021 0%, #0f172a 60%, #0b1226 100%);
+  --app-surface-border: rgba(148, 163, 184, 0.35);
+  --app-surface-text: #f6f7fb;
+  --app-surface-title: var(--ion-color-light);
+  --app-surface-muted: rgba(226, 232, 240, 0.9);
 }

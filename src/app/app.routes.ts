@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { TabsComponent } from './tabs/tabs.component';
+import { TabsComponent } from './features/tabs/tabs.component';
 
 export const routes: Routes = [
   {
@@ -14,7 +14,7 @@ export const routes: Routes = [
       {
         path: 'pantry',
         loadComponent: () =>
-          import('@features/pantry/pantry-list/pantry-list.component').then(m => m.PantryListComponent),
+          import('@features/pantry/pantry.component').then(m => m.PantryComponent),
       },
       {
         path: 'shopping',
@@ -29,12 +29,12 @@ export const routes: Routes = [
       {
         path: 'settings/ai',
         loadComponent: () =>
-          import('@features/settings/settings-ai/settings-ai.component').then(m => m.SettingsAiComponent),
+          import('@features/settings/components/settings-ai/settings-ai.component').then(m => m.SettingsAiComponent),
       },
       {
         path: 'settings/catalogos',
         loadComponent: () =>
-          import('@features/settings/settings-catalogs/settings-catalogs.component').then(m => m.SettingsCatalogsComponent),
+          import('@features/settings/components/settings-catalogs/settings-catalogs.component').then(m => m.SettingsCatalogsComponent),
       },
       {
         path: 'settings',

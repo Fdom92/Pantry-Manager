@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { LlmClientError, LlmCompletionRequest, LlmCompletionResponse } from '@core/models';
 import { firstValueFrom, timeout as rxTimeout } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { RevenuecatService } from '../revenuecat.service';
+import { RevenuecatService } from '../upgrade/revenuecat.service';
 
 /**
  * Thin gateway around the backend LLM endpoint so agents don't need to know about HTTP.

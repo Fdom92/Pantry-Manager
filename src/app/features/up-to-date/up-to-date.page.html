@@ -8,28 +8,34 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  @if (!hasLoaded() && isLoading()) {
+  <ion-text color="medium">
+    <p class="up-to-date-intro">
+      {{ 'upToDate.subtitle' | translate }}
+    </p>
+  </ion-text>
+
+  @if (!facade.hasLoaded() && facade.isLoading()) {
     <div class="loading-state">
       <ion-spinner name="dots"></ion-spinner>
       <ion-text color="medium">{{ 'common.loading' | translate }}</ion-text>
     </div>
-  } @else if (isDone()) {
-    <app-empty-state-generic
+  } @else if (facade.isDone()) {
+    <app-empty-state
       class="done-state"
       icon="checkmark-circle-outline"
       iconColor="success"
       [title]="'upToDate.done.title' | translate"
       [subtitle]="'upToDate.done.subtitle' | translate">
-    </app-empty-state-generic>
+    </app-empty-state>
   } @else {
     <div class="up-to-date-header">
       <p class="up-to-date-header__subtitle">
-        {{ 'upToDate.progress' | translate:{ pending: currentStep(), total: totalSteps() } }}
+        {{ 'upToDate.progress' | translate:{ pending: facade.currentStep(), total: facade.totalSteps() } }}
       </p>
     </div>
 
-    @let entry = currentEntry();
-    @let item = currentItem();
+    @let entry = facade.currentEntry();
+    @let item = facade.currentItem();
     @if (entry) {
       <ion-card class="pending-card">
         <ion-card-header>
@@ -44,29 +50,29 @@
             }
             @if (item) {
               <ion-text color="medium">
-                {{ 'pantry.form.category' | translate }}: {{ formatCategory(item) }}
+                {{ 'pantry.form.category' | translate }}: {{ facade.formatCategory(item) }}
               </ion-text>
               <ion-text color="medium">
-                {{ 'upToDate.fields.stock' | translate }}: {{ formatQuantityLabel(item) }}
+                {{ 'upToDate.fields.stock' | translate }}: {{ facade.formatQuantityLabel(item) }}
               </ion-text>
             }
             <ion-text color="medium">
               @if (item) {
-                {{ 'upToDate.lastUpdated' | translate:{ date: formatItemDate(item.updatedAt || item.createdAt) } }}
+                {{ 'upToDate.lastUpdated' | translate:{ date: facade.formatItemDate(item.updatedAt || item.createdAt) } }}
               }
             </ion-text>
           </div>
 
-          @if (!isEditingCurrent()) {
+          @if (!facade.isEditingCurrent()) {
             <div class="pending-card__actions">
-              @if (hasReason(entry, 'stale-update') && !hasReason(entry, 'missing-info')) {
+              @if (facade.hasReason(entry, 'stale-update') && !facade.hasReason(entry, 'missing-info')) {
                 <ion-button
                   size="small"
                   fill="solid"
                   color="primary"
-                  [disabled]="isBusy(entry.id)"
-                  (click)="keep(entry)">
-                  @if (isBusy(entry.id)) {
+                  [disabled]="facade.isBusy(entry.id)"
+                  (click)="facade.keep(entry)">
+                  @if (facade.isBusy(entry.id)) {
                     <ion-spinner name="dots"></ion-spinner>
                   } @else {
                     {{ 'upToDate.actions.keep' | translate }}
@@ -74,14 +80,14 @@
                 </ion-button>
               }
 
-              @if (hasReason(entry, 'stale-update')) {
+              @if (facade.hasReason(entry, 'stale-update')) {
                 <ion-button
                   size="small"
                   fill="outline"
                   color="danger"
-                  [disabled]="isBusy(entry.id)"
-                  (click)="remove(entry)">
-                  @if (isBusy(entry.id)) {
+                  [disabled]="facade.isBusy(entry.id)"
+                  (click)="facade.remove(entry)">
+                  @if (facade.isBusy(entry.id)) {
                     <ion-spinner name="dots"></ion-spinner>
                   } @else {
                     {{ 'upToDate.actions.delete' | translate }}
@@ -93,18 +99,18 @@
                 size="small"
                 fill="clear"
                 color="secondary"
-                [disabled]="isBusy(entry.id)"
-                (click)="skip(entry)">
+                [disabled]="facade.isBusy(entry.id)"
+                (click)="facade.skip(entry)">
                 {{ 'upToDate.actions.skip' | translate }}
               </ion-button>
 
-              @if (hasReason(entry, 'missing-info')) {
+              @if (facade.hasReason(entry, 'missing-info')) {
                 <ion-button
                   size="small"
                   fill="solid"
                   color="primary"
-                  [disabled]="isBusy(entry.id)"
-                  (click)="edit(entry)">
+                  [disabled]="facade.isBusy(entry.id)"
+                  (click)="facade.edit(entry)">
                   {{ 'upToDate.actions.edit' | translate }}
                 </ion-button>
               }
@@ -116,66 +122,66 @@
                 <ion-button
                   fill="clear"
                   color="medium"
-                  (click)="closeEditModal()"
-                  [disabled]="isSavingEdit()"
+                  (click)="facade.closeEditModal()"
+                  [disabled]="facade.isSavingEdit()"
                   [attr.aria-label]="'common.actions.close' | translate">
                   <ion-icon name="close"></ion-icon>
                 </ion-button>
               </div>
 
               <ion-list lines="none">
-                @if (editNeedsCategory()) {
+                @if (facade.editNeedsCategory()) {
                   <ion-item>
                     <ion-label>{{ 'pantry.form.category' | translate }}</ion-label>
                     <ion-select
                       interface="popover"
-                      [value]="editCategory()"
-                      (ionChange)="onEditCategoryChange($event)">
-                      @for (option of categoryOptions(); track option) {
+                      [value]="facade.editCategory()"
+                      (ionChange)="facade.onEditCategoryChange($event)">
+                      @for (option of facade.categoryOptions(); track option) {
                         <ion-select-option [value]="option">{{ option }}</ion-select-option>
                       }
                     </ion-select>
                   </ion-item>
                 }
 
-                @if (editNeedsLocation()) {
+                @if (facade.editNeedsLocation()) {
                   <ion-item>
                     <ion-label>{{ 'pantry.form.location' | translate }}</ion-label>
                     <ion-select
                       interface="popover"
-                      [value]="editLocation()"
-                      (ionChange)="onEditLocationChange($event)">
-                      @for (option of locationOptions(); track option) {
+                      [value]="facade.editLocation()"
+                      (ionChange)="facade.onEditLocationChange($event)">
+                      @for (option of facade.locationOptions(); track option) {
                         <ion-select-option [value]="option">{{ option }}</ion-select-option>
                       }
                     </ion-select>
                   </ion-item>
                 }
 
-                @if (editNeedsExpiry()) {
+                @if (facade.editNeedsExpiry()) {
                   <ion-item>
                     <ion-label>{{ 'upToDate.edit.expiryToggle' | translate }}</ion-label>
                     <ion-toggle
                       justify="end"
-                      [checked]="editHasExpiry()"
-                      (ionChange)="onEditHasExpiryToggle($event)">
+                      [checked]="facade.editHasExpiry()"
+                      (ionChange)="facade.onEditHasExpiryToggle($event)">
                     </ion-toggle>
                   </ion-item>
-                  @if (editHasExpiry()) {
+                  @if (facade.editHasExpiry()) {
                     <ion-item>
                       <ion-label>{{ 'upToDate.fields.expiry' | translate }}</ion-label>
                       <ion-input
                         type="date"
-                        [value]="editExpiryDate()"
-                        (ionInput)="onEditExpiryChange($event)">
+                        [value]="facade.editExpiryDate()"
+                        (ionInput)="facade.onEditExpiryChange($event)">
                       </ion-input>
                     </ion-item>
                   }
                 }
               </ion-list>
 
-              <ion-button expand="block" color="primary" (click)="saveEditModal()" [disabled]="!canSaveEdit()">
-                @if (isSavingEdit()) {
+              <ion-button expand="block" color="primary" (click)="facade.saveEditModal()" [disabled]="!facade.canSaveEdit()">
+                @if (facade.isSavingEdit()) {
                   <ion-spinner name="dots"></ion-spinner>
                 } @else {
                   {{ 'common.actions.save' | translate }}

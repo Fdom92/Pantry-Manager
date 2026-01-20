@@ -14,25 +14,25 @@
       "start": "Inizia"
     },
     "slides": {
-      "organize": {
-        "title": "Organizza la tua dispensa facilmente",
-        "description": "Aggiungi articoli in pochi secondi con categorie e posizioni che ti si addicono."
+      "dashboard": {
+        "title": "Home",
+        "description": "Avvisi e panoramica rapida della dispensa."
       },
-      "batches": {
-        "title": "Gestione lotti e scadenze",
-        "description": "Traccia lotti, date di scadenza e ricevi avvisi prima che qualcosa scada."
+      "pantry": {
+        "title": "Dispensa",
+        "description": "Aggiungi prodotti e traccia stock e scadenze."
       },
-      "suggestions": {
-        "title": "Suggerimenti intelligenti per gli acquisti",
-        "description": "Saprai cosa riassortire in base all'uso, allo stock minimo e alle scadenze imminenti."
+      "planner": {
+        "title": "Pianificatore",
+        "description": "Idee e piani pasti basati su ciò che hai."
       },
-      "agent": {
-        "title": "Sblocca il pianificatore intelligente (PRO)",
-        "description": "Pianifica menù, chiedi ricette e genera liste automaticamente.",
-        "badge": "Esclusivo PRO",
-        "titlePro": "Pianificatore intelligente pronto per te",
-        "descriptionPro": "PRO attivo: usa il pianificatore per ricette, idee e liste più rapide.",
-        "badgePro": "PRO attivo"
+      "shopping": {
+        "title": "Spesa",
+        "description": "Crea la lista e spunta mentre fai la spesa."
+      },
+      "settings": {
+        "title": "Impostazioni",
+        "description": "Personalizza cataloghi, avvisi e preferenze dell’app."
       }
     }
   },
@@ -84,6 +84,61 @@
         "expired": "Scaduti"
       }
     },
+    "overview": {
+      "aria": "Panoramica della dispensa",
+      "sections": {
+        "alerts": {
+          "title": "Avvisi"
+        },
+        "maintenance": {
+          "title": "Manutenzione"
+        },
+        "activity": {
+          "title": "Attività"
+        }
+      },
+      "cards": {
+        "nearExpiry": {
+          "title": "In scadenza a breve",
+          "body": "{{ count }} prodotti questa settimana",
+          "action": "Vedi"
+        },
+        "expired": {
+          "title": "Scaduti",
+          "body": "{{ count }} prodotti scaduti",
+          "action": "Vedi"
+        },
+        "pendingReview": {
+          "title": "Dispensa da completare",
+          "body": "{{ count }} prodotti da rivedere",
+          "action": "Rivedi"
+        },
+        "lowOrEmpty": {
+          "title": "Stock basso",
+          "body": "{{ count }} prodotti con stock basso",
+          "action": "Rivedi"
+        },
+        "shopping": {
+          "title": "Lista della spesa",
+          "body": "{{ count }} prodotti in sospeso",
+          "action": "Vedi"
+        },
+        "recentlyAdded": {
+          "title": "Aggiunti di recente",
+          "body": "{{ count }} nuovi prodotti",
+          "action": "Vedi"
+        }
+      },
+      "toasts": {
+        "expiredEmpty": "Tutto ok — nessun articolo scaduto.",
+        "nearExpiryEmpty": "Tutto ok — nessun articolo in scadenza a breve.",
+        "pendingReviewEmpty": "Tutto ok — nulla da completare.",
+        "lowOrEmptyEmpty": "Tutto ok — nessun articolo con stock basso.",
+        "recentlyAddedEmpty": "Tutto ok — nessun articolo aggiunto di recente.",
+        "shoppingEmpty": "Tutto ok — la tua lista della spesa è vuota.",
+        "genericEmpty": "Tutto ok — non ci sono elementi per questa condizione."
+      }
+    },
     "nearExpiry": {
       "title": "In scadenza",
       "subtitle": "Nei prossimi {{ days }} giorni",
@@ -118,27 +173,8 @@
   "shopping": {
     "title": "Spesa",
     "unassignedSupermarket": "Qualsiasi supermercato",
-    "summary": {
-      "title": "Riepilogo della spesa",
-      "collapse": "Comprimi riepilogo",
-      "expand": "Espandi riepilogo",
-      "productOne": "prodotto",
-      "productMany": "prodotti",
-      "toBuyIn": "da acquistare in",
-      "storeOne": "negozio",
-      "storeMany": "negozi",
-      "ok": "Tutti gli articoli memorizzati soddisfano i requisiti.",
-      "stats": {
-        "total": "Articoli da acquistare",
-        "basicOut": "Basi esaurite",
-        "basicLow": "Basi quasi esaurite",
-        "lowStock": "Prodotti sotto il target"
-      }
-    },
     "reasons": {
-      "below-min": "Sotto minimo",
-      "basic-low": "Basi quasi esaurite",
-      "basic-out": "Basi esaurite",
+      "below-min": "Stock basso",
       "empty": "Esaurito"
     },
     "purchaseModal": {
@@ -150,7 +186,7 @@
       "addToPantry": "Aggiungi"
     },
     "suggestions": {
-      "title": "Acquisti suggeriti",
+      "title": "Lista della spesa",
       "loading": "Sto creando la lista della spesa…",
       "destination": "Posizione suggerita: {{ location }}",
       "totalStock": "Stock totale: {{ amount }} {{ unit }}",
@@ -217,6 +253,7 @@
   },
   "upToDate": {
     "title": "Aggiorna",
+    "subtitle": "Rivedi alcuni prodotti per mantenere la tua dispensa precisa e aggiornata.",
     "progress": "Prodotti in attesa {{ pending }} di {{ total }}",
     "lastUpdated": "Ultimo aggiornamento: {{ date }}",
     "fields": {
@@ -321,7 +358,7 @@
       "advancedAction": "Aggiungi avanzato",
       "groupLabel": "Aggiungi prodotti velocemente",
       "title": "Aggiungi prodotti velocemente",
-      "subtitle": "Un prodotto per riga. La quantità è opzionale. Usa \"Aggiungi avanzato\" per opzioni dettagliate.",
+      "subtitle": "Aggiungi più prodotti rapidamente. Un prodotto per riga. La quantità è facoltativa.",
       "placeholder": "2 latte\npetto di pollo\n3 mele",
       "submit": "Aggiungi prodotti",
       "singleSuccess": "1 prodotto aggiunto",

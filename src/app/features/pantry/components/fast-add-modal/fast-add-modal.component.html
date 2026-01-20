@@ -1,0 +1,54 @@
+<ion-modal
+  [isOpen]="state.fastAddModalOpen()"
+  (willDismiss)="state.dismissFastAddModal()"
+  (didDismiss)="state.closeFastAddModal()"
+  class="fast-add-modal">
+  <ng-template>
+    <form class="fast-add-form" [formGroup]="state.fastAddForm" (ngSubmit)="state.submitFastAdd()">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ 'pantry.fastAdd.title' | translate }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" color="medium" type="button" (click)="state.dismissFastAddModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding fast-add-content" [fullscreen]="true">
+        <div class="fast-add-body">
+          <p class="fast-add-subtitle">
+            {{ 'pantry.fastAdd.subtitle' | translate }}
+          </p>
+          <ion-textarea
+            formControlName="entries"
+            autoGrow="true"
+            rows="6"
+            class="fast-add-textarea"
+            [placeholder]="'pantry.fastAdd.placeholder' | translate">
+          </ion-textarea>
+        </div>
+      </ion-content>
+
+      <ion-footer class="modal-footer">
+        <ion-toolbar>
+          <div class="fast-add-actions">
+            <ion-button
+              expand="block"
+              color="primary"
+              type="submit"
+              [disabled]="state.isFastAdding() || !state.hasFastAddEntries()">
+              @if (state.isFastAdding()) {
+                <ion-spinner name="dots"></ion-spinner>
+              } @else {
+                {{ 'pantry.fastAdd.submit' | translate }}
+              }
+            </ion-button>
+          </div>
+        </ion-toolbar>
+      </ion-footer>
+    </form>
+  </ng-template>
+</ion-modal>
+
