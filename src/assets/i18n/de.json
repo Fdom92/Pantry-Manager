@@ -88,14 +88,40 @@
       "aria": "Vorratsübersicht",
       "sections": {
         "alerts": { "title": "Warnungen" },
+        "maintenance": { "title": "Wartung" },
         "activity": { "title": "Aktivität" }
       },
       "cards": {
-        "expired": "Abgelaufen",
-        "nearExpiry": "Kurz vor Ablauf",
-        "pendingReview": "Ausstehend zu vervollständigen",
-        "lowOrEmpty": "Stock bajo",
-        "recentlyAdded": "Kürzlich hinzugefügt"
+        "nearExpiry": {
+          "title": "Bald ablaufend",
+          "body": "{{ count }} Produkte diese Woche",
+          "action": "Ansehen"
+        },
+        "expired": {
+          "title": "Abgelaufen",
+          "body": "{{ count }} abgelaufene Produkte",
+          "action": "Ansehen"
+        },
+        "pendingReview": {
+          "title": "Vorrat vervollständigen",
+          "body": "{{ count }} Produkte zu prüfen",
+          "action": "Prüfen"
+        },
+        "lowOrEmpty": {
+          "title": "Niedriger Bestand",
+          "body": "{{ count }} Produkte mit niedrigem Bestand",
+          "action": "Prüfen"
+        },
+        "shopping": {
+          "title": "Einkaufsliste",
+          "body": "{{ count }} Artikel ausstehend",
+          "action": "Ansehen"
+        },
+        "recentlyAdded": {
+          "title": "Kürzlich hinzugefügt",
+          "body": "{{ count }} neue Produkte",
+          "action": "Ansehen"
+        }
       },
       "toasts": {
         "expiredEmpty": "Alles gut — keine abgelaufenen Artikel.",
@@ -103,6 +129,7 @@
         "pendingReviewEmpty": "Alles gut — nichts ausstehend zu vervollständigen.",
         "lowOrEmptyEmpty": "Alles gut — keine Artikel mit niedrigem Bestand.",
         "recentlyAddedEmpty": "Alles gut — keine kürzlich hinzugefügten Artikel.",
+        "shoppingEmpty": "Alles gut — deine Einkaufsliste ist leer.",
         "genericEmpty": "Alles gut — es gibt keine Elemente für diese Bedingung."
       }
     },

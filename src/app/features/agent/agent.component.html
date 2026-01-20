@@ -24,11 +24,13 @@
 <ion-content class="ion-padding">
   @if (canUseAgent) {
     @if (showQuickStart) {
-      <div class="planning-empty">
-        <p class="eyebrow">{{ 'agent.quickStart.title' | translate }}</p>
-        <h2>{{ 'agent.quickStart.headline' | translate }}</h2>
-        <p class="muted">{{ 'agent.quickStart.subtitle' | translate }}</p>
-      </div>
+      <ion-card class="planning-empty">
+        <ion-card-content>
+          <p class="eyebrow">{{ 'agent.quickStart.title' | translate }}</p>
+          <h2>{{ 'agent.quickStart.headline' | translate }}</h2>
+          <p class="muted">{{ 'agent.quickStart.subtitle' | translate }}</p>
+        </ion-card-content>
+      </ion-card>
     }
     <div class="chat">
       @for (message of facade.conversationMessages(); track facade.trackById($index, message)) {

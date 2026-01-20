@@ -60,10 +60,7 @@
       class="list-empty-state"
       icon="fast-food-outline"
       [titleKey]="'emptyStates.pantry.title'"
-      [subtitleKey]="'emptyStates.pantry.subtitle'"
-      [showAction]="true"
-      [actionLabel]="'pantry.fastAdd.advancedAction' | translate"
-      (action)="facade.openAdvancedAddModal()">
+      [subtitleKey]="'emptyStates.pantry.subtitle'">
     </app-empty-state>
   } @else if (facade.pantryItemsState().length === 0) {
     <app-empty-state

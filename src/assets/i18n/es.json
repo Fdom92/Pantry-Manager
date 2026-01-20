@@ -88,14 +88,40 @@
       "aria": "Resumen de la despensa",
       "sections": {
         "alerts": { "title": "Alertas" },
+        "maintenance": { "title": "Mantenimiento" },
         "activity": { "title": "Actividad" }
       },
       "cards": {
-        "expired": "Caducados",
-        "nearExpiry": "A punto de caducar",
-        "pendingReview": "Pendientes de completar",
-        "lowOrEmpty": "Stock bajo",
-        "recentlyAdded": "Añadidos recientemente"
+        "nearExpiry": {
+          "title": "Caducan pronto",
+          "body": "{{ count }} productos esta semana",
+          "action": "Ver"
+        },
+        "expired": {
+          "title": "Caducados",
+          "body": "{{ count }} productos vencidos",
+          "action": "Ver"
+        },
+        "pendingReview": {
+          "title": "Despensa por completar",
+          "body": "{{ count }} productos pendientes",
+          "action": "Revisar"
+        },
+        "lowOrEmpty": {
+          "title": "Bajo stock",
+          "body": "{{ count }} productos con stock bajo",
+          "action": "Revisar"
+        },
+        "shopping": {
+          "title": "Lista de la compra",
+          "body": "{{ count }} productos pendientes",
+          "action": "Ver"
+        },
+        "recentlyAdded": {
+          "title": "Añadidos recientemente",
+          "body": "{{ count }} productos nuevos",
+          "action": "Ver"
+        }
       },
       "toasts": {
         "expiredEmpty": "Todo bien, no tienes nada caducado.",
@@ -103,6 +129,7 @@
         "pendingReviewEmpty": "Todo bien, no tienes nada pendiente de completar.",
         "lowOrEmptyEmpty": "Todo bien, no tienes productos con stock bajo.",
         "recentlyAddedEmpty": "Todo bien, no has añadido productos recientemente.",
+        "shoppingEmpty": "Todo bien, no tienes productos pendientes de compra.",
         "genericEmpty": "Todo bien, no hay elementos para esa condición."
       }
     },

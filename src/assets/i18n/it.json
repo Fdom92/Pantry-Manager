@@ -88,14 +88,40 @@
       "aria": "Panoramica della dispensa",
       "sections": {
         "alerts": { "title": "Avvisi" },
+        "maintenance": { "title": "Manutenzione" },
         "activity": { "title": "Attività" }
       },
       "cards": {
-        "expired": "Scaduti",
-        "nearExpiry": "In scadenza",
-        "pendingReview": "Da completare",
-        "lowOrEmpty": "Stock bajo",
-        "recentlyAdded": "Aggiunti di recente"
+        "nearExpiry": {
+          "title": "In scadenza a breve",
+          "body": "{{ count }} prodotti questa settimana",
+          "action": "Vedi"
+        },
+        "expired": {
+          "title": "Scaduti",
+          "body": "{{ count }} prodotti scaduti",
+          "action": "Vedi"
+        },
+        "pendingReview": {
+          "title": "Dispensa da completare",
+          "body": "{{ count }} prodotti da rivedere",
+          "action": "Rivedi"
+        },
+        "lowOrEmpty": {
+          "title": "Stock basso",
+          "body": "{{ count }} prodotti con stock basso",
+          "action": "Rivedi"
+        },
+        "shopping": {
+          "title": "Lista della spesa",
+          "body": "{{ count }} prodotti in sospeso",
+          "action": "Vedi"
+        },
+        "recentlyAdded": {
+          "title": "Aggiunti di recente",
+          "body": "{{ count }} nuovi prodotti",
+          "action": "Vedi"
+        }
       },
       "toasts": {
         "expiredEmpty": "Tutto ok — nessun articolo scaduto.",
@@ -103,6 +129,7 @@
         "pendingReviewEmpty": "Tutto ok — nulla da completare.",
         "lowOrEmptyEmpty": "Tutto ok — nessun articolo con stock basso.",
         "recentlyAddedEmpty": "Tutto ok — nessun articolo aggiunto di recente.",
+        "shoppingEmpty": "Tutto ok — la tua lista della spesa è vuota.",
         "genericEmpty": "Tutto ok — non ci sono elementi per questa condizione."
       }
     },

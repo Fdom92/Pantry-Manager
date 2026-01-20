@@ -6,14 +6,13 @@ ion-card {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 16px;
 }
 
 ion-title {
   color: var(--ion-text-color, var(--ion-text-color));
 }
 
-.summary-grid {
+.overview-grid {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -29,7 +28,7 @@ ion-title {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin: 2px 2px 10px;
+  margin: 6px 10px;
 }
 
 .overview-section-title {
@@ -40,101 +39,103 @@ ion-title {
   letter-spacing: 0.02em;
 }
 
-.summary-card--span-2 {
-  grid-column: 1 / -1;
-}
-
-.summary-card {
-  margin: 0;
+.overview-card {
+  margin-inline: 10px;
+  margin-top: 0;
+  margin-bottom: 0;
   cursor: pointer;
   user-select: none;
   transition:
     box-shadow 140ms ease;
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
-  background: linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--summary-accent, var(--ion-color-primary)) 12%, transparent),
-      transparent 55%
-    ),
-    var(--ion-card-background, var(--ion-background-color, #fff));
+  border-radius: 16px;
+  border: 1px solid var(--app-surface-border);
+  background:
+    radial-gradient(
+        circle at 20% 25%,
+        color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 22%, transparent),
+        transparent 38%
+      ),
+    radial-gradient(
+        circle at 80% 10%,
+        color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 18%, transparent),
+        transparent 36%
+      ),
+    var(--app-surface-bg);
+  color: var(--app-surface-text);
 }
 
-.summary-card:hover {
-  box-shadow: 0 14px 34px rgba(15, 20, 19, 0.22);
+.overview-card ion-card-header {
+  padding-bottom: 6px;
 }
 
-.summary-card:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--ion-color-primary) 70%, transparent);
-  outline-offset: 2px;
+.overview-card ion-card-title {
+  font-size: 1rem;
+  color: var(--app-surface-title);
 }
 
-.summary-card ion-card-content {
-  padding: 14px;
+.overview-card ion-card-content {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
 }
 
-.summary-card-inner {
+.overview-card__header {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
 }
 
-.summary-icon {
+.overview-card__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
-  font-size: 42px;
-  color: var(--summary-accent, var(--ion-color-primary));
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 22px;
+  padding: 6px;
+  color: var(--app-surface-title);
+  background: color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 35%, transparent);
 }
 
-.summary-metric {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  align-items: center;
-}
-
-.summary-value {
-  font-size: 2.25rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--ion-text-color);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-}
-
-.summary-label {
+.overview-card__body {
+  margin: 0;
   font-size: 0.85rem;
-  color: var(--ion-color-medium);
+  color: var(--app-surface-muted);
 }
 
-.summary-card--expired {
-  --summary-accent: var(--ion-color-danger);
+.overview-card ion-button {
+  align-self: flex-start;
+  --border-color: color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 65%, transparent);
+  --color: var(--app-surface-title);
 }
 
-.summary-card--near-expiry {
-  --summary-accent: var(--ion-color-warning);
+.overview-card--expired {
+  --card-accent: var(--ion-color-danger);
 }
 
-.summary-card--pending {
-  --summary-accent: var(--ion-color-tertiary);
+.overview-card--near-expiry {
+  --card-accent: var(--ion-color-warning);
 }
 
-.summary-card--stock {
-  --summary-accent: var(--ion-color-primary);
+.overview-card--pending {
+  --card-accent: var(--ion-color-tertiary);
 }
 
-.summary-card--recent {
-  --summary-accent: var(--ion-color-success);
+.overview-card--stock {
+  --card-accent: var(--ion-color-primary);
+}
+
+.overview-card--recent {
+  --card-accent: var(--ion-color-success);
+}
+
+.overview-card--shopping {
+  --card-accent: var(--ion-color-secondary);
 }
 
 @media (max-width: 360px) {
-  .summary-card-inner {
-    align-items: center;
+  .overview-grid {
+    grid-template-columns: 1fr;
   }
 }

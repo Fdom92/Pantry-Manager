@@ -88,14 +88,40 @@
       "aria": "Visão geral da despensa",
       "sections": {
         "alerts": { "title": "Alertas" },
+        "maintenance": { "title": "Manutenção" },
         "activity": { "title": "Atividade" }
       },
       "cards": {
-        "expired": "Expirados",
-        "nearExpiry": "A expirar em breve",
-        "pendingReview": "Por completar",
-        "lowOrEmpty": "Stock bajo",
-        "recentlyAdded": "Adicionados recentemente"
+        "nearExpiry": {
+          "title": "A expirar em breve",
+          "body": "{{ count }} produtos esta semana",
+          "action": "Ver"
+        },
+        "expired": {
+          "title": "Expirados",
+          "body": "{{ count }} produtos expirados",
+          "action": "Ver"
+        },
+        "pendingReview": {
+          "title": "Despensa por completar",
+          "body": "{{ count }} produtos por rever",
+          "action": "Rever"
+        },
+        "lowOrEmpty": {
+          "title": "Stock baixo",
+          "body": "{{ count }} produtos com stock baixo",
+          "action": "Rever"
+        },
+        "shopping": {
+          "title": "Lista de compras",
+          "body": "{{ count }} produtos pendentes",
+          "action": "Ver"
+        },
+        "recentlyAdded": {
+          "title": "Adicionados recentemente",
+          "body": "{{ count }} novos produtos",
+          "action": "Ver"
+        }
       },
       "toasts": {
         "expiredEmpty": "Está tudo bem — não há itens expirados.",
@@ -103,6 +129,7 @@
         "pendingReviewEmpty": "Está tudo bem — não há nada por completar.",
         "lowOrEmptyEmpty": "Está tudo bem — não há itens com stock baixo.",
         "recentlyAddedEmpty": "Está tudo bem — não há itens adicionados recentemente.",
+        "shoppingEmpty": "Está tudo bem — a tua lista de compras está vazia.",
         "genericEmpty": "Está tudo certo — não há itens para essa condição."
       }
     },

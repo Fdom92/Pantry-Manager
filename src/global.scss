@@ -34,3 +34,22 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 @import "@ionic/angular/css/palettes/dark.class.css";
+
+ion-card {
+  --background: var(--app-surface-bg);
+  color: var(--app-surface-text);
+  border: 1px solid var(--app-surface-border);
+  background: var(--app-surface-bg) !important;
+}
+
+ion-card-title {
+  color: var(--app-surface-title);
+}
+
+ion-card-subtitle {
+  color: var(--app-surface-muted);
+}
+
+ion-card-content {
+  color: var(--app-surface-text);
+}

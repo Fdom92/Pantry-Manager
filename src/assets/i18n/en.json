@@ -88,14 +88,40 @@
       "aria": "Pantry overview",
       "sections": {
         "alerts": { "title": "Alerts" },
+        "maintenance": { "title": "Maintenance" },
         "activity": { "title": "Activity" }
       },
       "cards": {
-        "expired": "Expired",
-        "nearExpiry": "Expiring soon",
-        "pendingReview": "Pending completion",
-        "lowOrEmpty": "Stock bajo",
-        "recentlyAdded": "Recently added"
+        "nearExpiry": {
+          "title": "Expiring soon",
+          "body": "{{ count }} products this week",
+          "action": "View"
+        },
+        "expired": {
+          "title": "Expired",
+          "body": "{{ count }} expired products",
+          "action": "View"
+        },
+        "pendingReview": {
+          "title": "Pantry to complete",
+          "body": "{{ count }} products to review",
+          "action": "Review"
+        },
+        "lowOrEmpty": {
+          "title": "Low stock",
+          "body": "{{ count }} products low on stock",
+          "action": "Review"
+        },
+        "shopping": {
+          "title": "Shopping list",
+          "body": "{{ count }} items pending",
+          "action": "View"
+        },
+        "recentlyAdded": {
+          "title": "Recently added",
+          "body": "{{ count }} new products",
+          "action": "View"
+        }
       },
       "toasts": {
         "expiredEmpty": "All good — nothing expired.",
@@ -103,6 +129,7 @@
         "pendingReviewEmpty": "All good — nothing pending to complete.",
         "lowOrEmptyEmpty": "All good — no low-stock items.",
         "recentlyAddedEmpty": "All good — nothing recently added.",
+        "shoppingEmpty": "All good — your shopping list is empty.",
         "genericEmpty": "All good — there are no items for that condition."
       }
     },

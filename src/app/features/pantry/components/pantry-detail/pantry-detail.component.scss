@@ -7,11 +7,19 @@ ion-title, ion-back-button {
   overflow: hidden;
   border-radius: 18px;
   --card-accent: color-mix(in srgb, var(--ion-color-primary) 65%, var(--ion-color-light-shade));
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--card-accent) 32%, transparent),
-    color-mix(in srgb, var(--card-accent) 18%, var(--ion-card-background)) 65%
-  );
+  background: radial-gradient(
+      circle at 20% 25%,
+      color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 22%, transparent),
+      transparent 38%),
+    radial-gradient(
+      circle at 80% 10%,
+      color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 18%, transparent),
+      transparent 36%),
+    linear-gradient(
+      150deg,
+      #0b1021 0%,
+      #0f172a 60%,
+      #0b1226 100%);
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
   padding: 0;
   color: var(--ion-text-color);
@@ -35,41 +43,21 @@ ion-title, ion-back-button {
 .pantry-item-card.state-expired {
   --card-accent: var(--ion-color-danger);
   border-color: color-mix(in srgb, var(--ion-color-danger) 28%, transparent);
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--ion-color-danger) 36%, transparent),
-    color-mix(in srgb, var(--ion-color-danger) 18%, var(--ion-card-background)) 65%
-  );
 }
 
 .pantry-item-card.state-expiring {
   --card-accent: var(--ion-color-warning);
   border-color: color-mix(in srgb, var(--ion-color-warning) 26%, transparent);
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--ion-color-warning) 32%, transparent),
-    color-mix(in srgb, var(--ion-color-warning) 16%, var(--ion-card-background)) 65%
-  );
 }
 
 .pantry-item-card.state-low-stock {
   --card-accent: var(--ion-color-warning);
   border-color: color-mix(in srgb, var(--ion-color-warning) 28%, transparent);
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--ion-color-warning) 34%, transparent),
-    color-mix(in srgb, var(--ion-color-warning) 18%, var(--ion-card-background)) 65%
-  );
 }
 
 .pantry-item-card.state-ok {
   --card-accent: var(--ion-color-primary);
   border-color: color-mix(in srgb, var(--ion-color-primary) 26%, transparent);
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--ion-color-primary) 32%, transparent),
-    color-mix(in srgb, var(--ion-color-primary) 16%, var(--ion-card-background)) 65%
-  );
 }
 
 .pantry-item-card.is-expanded {

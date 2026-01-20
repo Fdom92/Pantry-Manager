@@ -2,8 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { DashboardStateService, type DashboardOverviewCardId } from '@core/services/dashboard/dashboard-state.service';
 import {
+  IonButton,
   IonCard,
   IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
   IonContent,
   IonHeader,
   IonIcon,
@@ -21,8 +24,11 @@ import { InsightCardComponent } from '@shared/components/insight-card/insight-ca
     IonToolbar,
     IonTitle,
     IonContent,
+    IonButton,
     IonCard,
     IonCardContent,
+    IonCardHeader,
+    IonCardTitle,
     IonIcon,
     CommonModule,
     TranslateModule,
