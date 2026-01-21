@@ -410,6 +410,30 @@
     "detail": {
       "earliest": "Expire en premier : {{ date }}",
       "noBatches": "Aucun lot enregistré.",
+      "batchSummary": {
+        "none": "Aucun lot enregistré",
+        "total": {
+          "single": "1 lot",
+          "plural": "{{ count }} lots"
+        },
+        "expired": {
+          "single": "{{ count }} périmé",
+          "plural": "{{ count }} périmés"
+        },
+        "nearExpiry": {
+          "single": "{{ count }} bientôt périmé",
+          "plural": "{{ count }} bientôt périmés"
+        },
+        "normal": {
+          "single": "{{ count }} en stock",
+          "plural": "{{ count }} en stock"
+        },
+        "unknown": {
+          "single": "{{ count }} sans date",
+          "plural": "{{ count }} sans date"
+        },
+        "withDescriptors": "{{ total }} ({{ descriptors }})"
+      },
       "totalQuantity": "{{ value }} au total",
       "locationMeta": {
         "expires": "Expire : {{ date }}",

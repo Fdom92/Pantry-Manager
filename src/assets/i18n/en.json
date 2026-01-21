@@ -410,6 +410,30 @@
     "detail": {
       "earliest": "Expires first: {{ date }}",
       "noBatches": "No batches recorded.",
+      "batchSummary": {
+        "none": "No batches recorded",
+        "total": {
+          "single": "1 batch",
+          "plural": "{{ count }} batches"
+        },
+        "expired": {
+          "single": "{{ count }} expired",
+          "plural": "{{ count }} expired"
+        },
+        "nearExpiry": {
+          "single": "{{ count }} near expiry",
+          "plural": "{{ count }} near expiry"
+        },
+        "normal": {
+          "single": "{{ count }} in stock",
+          "plural": "{{ count }} in stock"
+        },
+        "unknown": {
+          "single": "{{ count }} without date",
+          "plural": "{{ count }} without date"
+        },
+        "withDescriptors": "{{ total }} ({{ descriptors }})"
+      },
       "totalQuantity": "{{ value }} total",
       "locationMeta": {
         "expires": "Expires: {{ date }}",

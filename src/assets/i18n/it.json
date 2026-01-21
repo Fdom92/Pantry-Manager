@@ -410,6 +410,30 @@
     "detail": {
       "earliest": "Scade per primo: {{ date }}",
       "noBatches": "Nessun lotto registrato.",
+      "batchSummary": {
+        "none": "Nessun lotto registrato",
+        "total": {
+          "single": "1 lotto",
+          "plural": "{{ count }} lotti"
+        },
+        "expired": {
+          "single": "{{ count }} scaduto",
+          "plural": "{{ count }} scaduti"
+        },
+        "nearExpiry": {
+          "single": "{{ count }} in scadenza",
+          "plural": "{{ count }} in scadenza"
+        },
+        "normal": {
+          "single": "{{ count }} disponibile",
+          "plural": "{{ count }} disponibili"
+        },
+        "unknown": {
+          "single": "{{ count }} senza data",
+          "plural": "{{ count }} senza data"
+        },
+        "withDescriptors": "{{ total }} ({{ descriptors }})"
+      },
       "totalQuantity": "{{ value }} totali",
       "locationMeta": {
         "expires": "Scade: {{ date }}",

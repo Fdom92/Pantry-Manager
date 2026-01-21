@@ -410,6 +410,30 @@
     "detail": {
       "earliest": "Läuft zuerst ab: {{ date }}",
       "noBatches": "Keine Chargen erfasst.",
+      "batchSummary": {
+        "none": "Keine Chargen erfasst",
+        "total": {
+          "single": "1 Charge",
+          "plural": "{{ count }} Chargen"
+        },
+        "expired": {
+          "single": "{{ count }} abgelaufen",
+          "plural": "{{ count }} abgelaufen"
+        },
+        "nearExpiry": {
+          "single": "{{ count }} kurz vor Ablauf",
+          "plural": "{{ count }} kurz vor Ablauf"
+        },
+        "normal": {
+          "single": "{{ count }} auf Lager",
+          "plural": "{{ count }} auf Lager"
+        },
+        "unknown": {
+          "single": "{{ count }} ohne Datum",
+          "plural": "{{ count }} ohne Datum"
+        },
+        "withDescriptors": "{{ total }} ({{ descriptors }})"
+      },
       "totalQuantity": "{{ value }} gesamt",
       "locationMeta": {
         "expires": "Läuft ab: {{ date }}",

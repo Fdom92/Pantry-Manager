@@ -404,6 +404,30 @@
     "detail": {
       "earliest": "Caduca primero: {{ date }}",
       "noBatches": "Sin lotes registrados.",
+      "batchSummary": {
+        "none": "Sin lotes registrados",
+        "total": {
+          "single": "1 lote",
+          "plural": "{{ count }} lotes"
+        },
+        "expired": {
+          "single": "{{ count }} caducado",
+          "plural": "{{ count }} caducados"
+        },
+        "nearExpiry": {
+          "single": "{{ count }} por caducar",
+          "plural": "{{ count }} por caducar"
+        },
+        "normal": {
+          "single": "{{ count }} con stock",
+          "plural": "{{ count }} con stock"
+        },
+        "unknown": {
+          "single": "{{ count }} sin fecha",
+          "plural": "{{ count }} sin fecha"
+        },
+        "withDescriptors": "{{ total }} ({{ descriptors }})"
+      },
       "totalQuantity": "{{ value }} total",
       "locationMeta": {
         "expires": "Caduca: {{ date }}",
