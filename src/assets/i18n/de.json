@@ -689,6 +689,12 @@
       "title": "Tutorial ansehen",
       "subtitle": "Sieh dir das Onboarding jederzeit erneut an."
     },
+    "dev": {
+      "title": "Entwicklung",
+      "subtitle": "Tools zum Testen von Onboarding und Setup.",
+      "setupTitle": "Setup ansehen",
+      "setupSubtitle": "Öffne den Setup-Flow zur Katalogkonfiguration."
+    },
     "info": {
       "title": "Informationen",
       "subtitle": "Kurze Details zur Anwendung.",
