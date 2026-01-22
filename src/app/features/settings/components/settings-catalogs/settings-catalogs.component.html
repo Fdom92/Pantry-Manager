@@ -181,4 +181,12 @@
       </ion-button>
     </div>
   </div>
+
+  <ion-alert
+    [isOpen]="state.isSupermarketRemovePromptOpen()"
+    [header]="'settings.catalogs.supermarkets.removeInUseTitle' | translate"
+    [message]="state.getSupermarketRemovePromptMessage()"
+    [buttons]="state.getSupermarketRemovePromptButtons()"
+    (didDismiss)="state.onSupermarketRemovePromptDismiss()">
+  </ion-alert>
 </ion-content>

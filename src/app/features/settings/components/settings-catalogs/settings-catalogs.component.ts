@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { SettingsCatalogsStateService } from '@core/services/settings/pages/settings-catalogs-state.service';
 import {
   IonBackButton,
+  IonAlert,
   IonButton,
   IonButtons,
   IonContent,
@@ -34,6 +35,7 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
     IonProgressBar,
     IonList,
     IonListHeader,
+    IonAlert,
     IonLabel,
     IonItem,
     IonInput,

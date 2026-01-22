@@ -665,7 +665,10 @@
         "empty": "Füge einen Supermarkt hinzu, um zu beginnen.",
         "field": "Supermarkt {{ index }}",
         "add": "Supermarkt hinzufügen",
-        "other": "Andere"
+        "other": "Andere",
+        "removeInUseTitle": "Supermarkt in Verwendung",
+        "removeInUseMessage": "Dieser Supermarkt wird von {{ count }} Produkten verwendet. Diese Produkte verlieren diese Information.",
+        "removeAction": "Entfernen"
       }
     },
     "tutorial": {

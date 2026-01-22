@@ -665,7 +665,10 @@
         "empty": "Add a supermarket to get started.",
         "field": "Supermarket {{ index }}",
         "add": "Add supermarket",
-        "other": "Other"
+        "other": "Other",
+        "removeInUseTitle": "Supermarket in use",
+        "removeInUseMessage": "This supermarket is used by {{ count }} products. Those products will lose this information.",
+        "removeAction": "Remove"
       }
     },
     "tutorial": {

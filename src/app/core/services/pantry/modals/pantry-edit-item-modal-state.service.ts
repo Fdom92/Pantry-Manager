@@ -342,8 +342,12 @@ export class PantryEditItemModalStateService {
     const current = await this.appPreferences.getPreferences();
     const existing = current.supermarketOptions ?? [];
     const normalizedKey = normalizeKey(normalized);
-    const alreadyExists = existing.some(option => normalizeKey(option) === normalizedKey);
-    const next = alreadyExists ? existing : [...existing, normalized];
+    const existingMatch = existing.find(option => normalizeKey(option) === normalizedKey);
+    if (existingMatch) {
+      this.form.get('supermarket')?.setValue(existingMatch);
+      return;
+    }
+    const next = [...existing, normalized];
     await this.appPreferences.savePreferences({ ...current, supermarketOptions: next });
     this.form.get('supermarket')?.setValue(normalized);
   }

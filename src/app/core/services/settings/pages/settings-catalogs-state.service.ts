@@ -1,5 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { normalizeStringList } from '@core/utils/normalization.util';
+import type { PantryItem } from '@core/models/pantry';
+import { PantryService } from '@core/services/pantry/pantry.service';
+import { normalizeKey, normalizeStringList, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastService, withSignalFlag } from '../../shared';
 import { AppPreferencesService } from '../app-preferences.service';
@@ -9,6 +11,7 @@ export class SettingsCatalogsStateService {
   private readonly appPreferencesService = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly toast = inject(ToastService);
+  private readonly pantryService = inject(PantryService);
 
   readonly isLoading = signal(false);
   readonly isSaving = signal(false);
@@ -18,6 +21,13 @@ export class SettingsCatalogsStateService {
   readonly originalCategoryOptions = signal<string[]>([]);
   readonly supermarketOptionsDraft = signal<string[]>([]);
   readonly originalSupermarketOptions = signal<string[]>([]);
+  readonly isSupermarketRemovePromptOpen = signal(false);
+  private readonly supermarketRemoveTarget = signal<{
+    index: number;
+    value: string;
+    count: number;
+    items: PantryItem[];
+  } | null>(null);
 
   readonly hasLocationChanges = computed(() => {
     const draft = this.normalizeLocationOptions(this.locationOptionsDraft());
@@ -93,7 +103,7 @@ export class SettingsCatalogsStateService {
   }
 
   removeSupermarketOption(index: number): void {
-    this.supermarketOptionsDraft.update(options => options.filter((_, i) => i !== index));
+    void this.requestSupermarketRemoval(index);
   }
 
   onSupermarketOptionInput(index: number, event: Event): void {
@@ -103,6 +113,36 @@ export class SettingsCatalogsStateService {
       next[index] = value ?? '';
       return next;
     });
+  }
+
+  onSupermarketRemovePromptDismiss(): void {
+    this.isSupermarketRemovePromptOpen.set(false);
+    this.supermarketRemoveTarget.set(null);
+  }
+
+  getSupermarketRemovePromptMessage(): string {
+    const target = this.supermarketRemoveTarget();
+    const count = target?.count ?? 0;
+    return this.translate.instant('settings.catalogs.supermarkets.removeInUseMessage', { count });
+  }
+
+  getSupermarketRemovePromptButtons(): Array<{
+    text: string;
+    role?: string;
+    handler?: () => boolean | void | Promise<boolean | void>;
+  }> {
+    return [
+      {
+        text: this.translate.instant('common.actions.cancel'),
+        role: 'cancel',
+      },
+      {
+        text: this.translate.instant('settings.catalogs.supermarkets.removeAction'),
+        handler: async () => {
+          await this.confirmSupermarketRemoval();
+        },
+      },
+    ];
   }
 
   async submitCatalogs(): Promise<void> {
@@ -188,5 +228,69 @@ export class SettingsCatalogsStateService {
     return normalizeStringList(values, {
       fallback: [],
     });
+  }
+
+  private async requestSupermarketRemoval(index: number): Promise<void> {
+    const value = (this.supermarketOptionsDraft()[index] ?? '').trim();
+    if (!value) {
+      this.removeSupermarketFromDraft(index);
+      return;
+    }
+
+    const { count, items } = await this.getSupermarketUsage(value);
+    if (!count) {
+      this.removeSupermarketFromDraft(index);
+      return;
+    }
+
+    this.supermarketRemoveTarget.set({ index, value, count, items });
+    this.isSupermarketRemovePromptOpen.set(true);
+  }
+
+  private async confirmSupermarketRemoval(): Promise<void> {
+    const target = this.supermarketRemoveTarget();
+    if (!target) {
+      return;
+    }
+    await this.clearSupermarketFromItems(target.items);
+    this.removeSupermarketFromDraft(target.index);
+    this.onSupermarketRemovePromptDismiss();
+  }
+
+  private removeSupermarketFromDraft(index: number): void {
+    this.supermarketOptionsDraft.update(options => options.filter((_, i) => i !== index));
+  }
+
+  private async getSupermarketUsage(value: string): Promise<{
+    count: number;
+    items: PantryItem[];
+  }> {
+    const normalizedKey = normalizeKey(value);
+    if (!normalizedKey) {
+      return { count: 0, items: [] };
+    }
+    const items = await this.pantryService.getAll();
+    const matches = items.filter(item => {
+      const itemKey = normalizeKey(normalizeSupermarketValue(item.supermarket) ?? '');
+      return itemKey === normalizedKey;
+    });
+    return {
+      count: matches.length,
+      items: matches,
+    };
+  }
+
+  private async clearSupermarketFromItems(items: PantryItem[]): Promise<void> {
+    if (!items.length) {
+      return;
+    }
+    await Promise.all(
+      items.map(async item => {
+        await this.pantryService.saveItem({
+          ...item,
+          supermarket: undefined,
+        });
+      }),
+    );
   }
 }
