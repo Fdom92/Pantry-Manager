@@ -1,9 +1,9 @@
-.onboarding {
-  --onboarding-radial-a: color-mix(in srgb, var(--ion-color-secondary) 18%, transparent);
-  --onboarding-radial-b: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
-  --onboarding-glass: color-mix(in srgb, #ffffff 12%, transparent);
-  --onboarding-glass-border: color-mix(in srgb, #ffffff 20%, transparent);
-  --onboarding-pill-text: var(--ion-text-color);
+.setup {
+  --setup-radial-a: color-mix(in srgb, var(--ion-color-secondary) 18%, transparent);
+  --setup-radial-b: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+  --setup-glass: color-mix(in srgb, #ffffff 12%, transparent);
+  --setup-glass-border: color-mix(in srgb, #ffffff 20%, transparent);
+  --setup-pill-text: var(--ion-text-color);
   --background: radial-gradient(
       circle at 15% 20%,
       color-mix(in srgb, var(--ion-color-secondary) 22%, transparent),
@@ -31,11 +31,11 @@
 }
 
 .blur-a {
-  background: radial-gradient(circle at 10% 70%, var(--onboarding-radial-a), transparent 30%);
+  background: radial-gradient(circle at 10% 70%, var(--setup-radial-a), transparent 30%);
 }
 
 .blur-b {
-  background: radial-gradient(circle at 90% 60%, var(--onboarding-radial-b), transparent 28%);
+  background: radial-gradient(circle at 90% 60%, var(--setup-radial-b), transparent 28%);
 }
 
 .top-bar {
@@ -45,6 +45,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
 .eyebrow {
@@ -53,12 +54,12 @@
   align-items: center;
   padding: 8px 12px;
   border-radius: 999px;
-  background: var(--onboarding-glass);
-  border: 1px solid var(--onboarding-glass-border);
+  background: var(--setup-glass);
+  border: 1px solid var(--setup-glass-border);
   backdrop-filter: blur(12px);
   font-size: 14px;
   letter-spacing: 0.02em;
-  color: var(--onboarding-pill-text);
+  color: var(--setup-pill-text);
 
   ion-icon {
     font-size: 18px;
@@ -66,18 +67,18 @@
   }
 }
 
-.onboarding-swiper {
-  position: relative;
-  z-index: 2;
-  margin: 10px;
-  height: calc(100% - 140px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
-  padding: calc(16px + var(--ion-safe-area-top)) 16px calc(72px + var(--ion-safe-area-bottom));
+.step-indicator {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ion-color-medium);
 }
 
-.slide-card {
-  max-width: 520px;
-  margin: 28px auto 0;
-  padding: 24px 16px;
+.setup-card {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  margin: 24px auto 0;
+  padding: 24px 18px 28px;
   background: var(--app-surface-bg);
   border-radius: 24px;
   border: 1px solid var(--app-surface-border);
@@ -87,45 +88,30 @@
   animation: floatIn 420ms ease;
 
   h1 {
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     font-weight: 700;
-    margin: 10px 0 12px;
+    margin: 12px 0 10px;
     letter-spacing: -0.01em;
     color: var(--app-surface-title);
   }
 
   p {
-    margin: 0;
+    margin: 0 auto;
+    max-width: 520px;
     line-height: 1.5;
     font-size: 1rem;
     color: var(--app-surface-muted);
   }
 }
 
-.slide-card.is-pro {
-  border-color: color-mix(in srgb, var(--ion-color-secondary) 55%, transparent);
-  box-shadow: 0 18px 50px color-mix(in srgb, var(--ion-color-secondary) 40%, transparent);
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ion-color-secondary) 35%, transparent);
-  color: var(--ion-color-light);
-  font-size: 13px;
-  border: 1px solid color-mix(in srgb, var(--ion-color-secondary) 55%, transparent);
-  margin-bottom: 4px;
-}
-
 .icon-burst {
   position: relative;
-  width: 74px;
-  height: 74px;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto;
   display: grid;
   place-items: center;
-  border-radius: 20px;
+  border-radius: 18px;
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--ion-color-primary) 80%, var(--ion-text-color) 20%),
@@ -138,7 +124,7 @@
 }
 
 .icon-burst ion-icon {
-  font-size: 32px;
+  font-size: 30px;
   color: var(--ion-color-dark-contrast);
   position: relative;
   z-index: 2;
@@ -152,6 +138,50 @@
   filter: blur(18px);
   opacity: 0.8;
   animation: glowWave 6s ease-in-out infinite;
+}
+
+.chip-grid {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+
+  ion-chip {
+    --background: color-mix(in srgb, var(--ion-color-step-100) 65%, transparent);
+    --color: var(--ion-text-color);
+    border: 1px solid color-mix(in srgb, var(--ion-color-step-300) 65%, transparent);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--ion-color-step-200) 55%, transparent);
+    transition: transform 140ms ease, border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+  }
+
+  ion-chip.is-selected {
+    --background: color-mix(in srgb, var(--ion-color-primary) 28%, transparent);
+    --color: var(--ion-color-primary);
+    border-color: color-mix(in srgb, var(--ion-color-primary) 65%, transparent);
+    box-shadow:
+      0 1px 0 color-mix(in srgb, var(--ion-color-primary) 40%, transparent),
+      0 8px 18px color-mix(in srgb, var(--ion-color-primary) 22%, transparent);
+    transform: translateY(-1px) scale(1.01);
+  }
+}
+
+.selection-hint {
+  margin: 12px auto 0;
+  max-width: 520px;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+}
+
+:host-context(.dark) .chip-grid ion-chip {
+  --background: color-mix(in srgb, var(--ion-color-step-200) 35%, transparent);
+  border-color: color-mix(in srgb, var(--ion-color-step-300) 55%, transparent);
+}
+
+:host-context(.dark) .chip-grid ion-chip.is-selected {
+  --background: color-mix(in srgb, var(--ion-color-primary) 35%, transparent);
+  --color: var(--ion-color-primary);
+  border-color: color-mix(in srgb, var(--ion-color-primary) 75%, transparent);
 }
 
 .actions {
@@ -175,35 +205,13 @@
   }
 }
 
-.swiper-pagination {
-  bottom: 30px !important;
-}
-
-.swiper-pagination-bullet {
-  width: 12px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.4);
-  opacity: 1;
-  transition: width 180ms ease, background 180ms ease;
-}
-
-.swiper-pagination-bullet-active {
-  width: 28px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
-}
-
 @media (max-width: 600px) {
-  .onboarding-swiper {
-    padding: 10px 6px 90px;
-  }
-
-  .slide-card {
-    margin-top: 8px;
-    padding: 28px 22px;
+  .setup-card {
+    margin: 12px 12px 0;
+    padding: 24px 18px 26px;
 
     h1 {
-      font-size: 24px;
+      font-size: 1.2rem;
     }
 
     p {

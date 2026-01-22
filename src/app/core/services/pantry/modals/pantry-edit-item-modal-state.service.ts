@@ -1,4 +1,5 @@
-import { Injectable, effect, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_LOCATION_KEY, UNASSIGNED_PRODUCT_NAME } from '@core/constants';
 import { getLocationEarliestExpiry } from '@core/domain/pantry';
@@ -31,6 +32,8 @@ import { PantryStateService } from '../pantry-state.service';
 
 @Injectable()
 export class PantryEditItemModalStateService {
+  private static readonly ADD_SUPERMARKET_VALUE = '__add_supermarket__';
+  private static readonly ADD_CATEGORY_VALUE = '__add_category__';
   private readonly pantryStore = inject(PantryStoreService);
   private readonly fb = inject(FormBuilder);
   private readonly toast = inject(ToastService);
@@ -38,10 +41,15 @@ export class PantryEditItemModalStateService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly listState = inject(PantryStateService);
+  private readonly destroyRef = inject(DestroyRef);
+  private lastSupermarketValue = '';
+  private lastCategoryValue = '';
 
   readonly isOpen = signal(false);
   readonly isSaving = signal(false);
   readonly editingItem = signal<PantryItem | null>(null);
+  readonly isSupermarketPromptOpen = signal(false);
+  readonly isCategoryPromptOpen = signal(false);
 
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -79,6 +87,28 @@ export class PantryEditItemModalStateService {
       }
       this.listState.clearEditItemModalRequest();
     });
+
+    const supermarketControl = this.form.get('supermarket');
+    supermarketControl?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(value => {
+        const nextValue = (value ?? '').toString();
+        if (nextValue === PantryEditItemModalStateService.ADD_SUPERMARKET_VALUE) {
+          return;
+        }
+        this.lastSupermarketValue = nextValue;
+      });
+
+    const categoryControl = this.form.get('categoryId');
+    categoryControl?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(value => {
+        const nextValue = (value ?? '').toString();
+        if (nextValue === PantryEditItemModalStateService.ADD_CATEGORY_VALUE) {
+          return;
+        }
+        this.lastCategoryValue = nextValue;
+      });
   }
 
   openCreate(): void {
@@ -217,6 +247,10 @@ export class PantryEditItemModalStateService {
       addOption(currentValue);
     }
 
+    options.push({
+      value: PantryEditItemModalStateService.ADD_CATEGORY_VALUE,
+      label: this.translate.instant('pantry.form.categoryAdd.option'),
+    });
     return options;
   }
 
@@ -252,10 +286,161 @@ export class PantryEditItemModalStateService {
     const presetOptions = this.presetSupermarketOptions();
     const control = this.form.get('supermarket');
     const currentValue = (control?.value ?? '').trim();
-    return buildUniqueSelectOptions([...presetOptions, currentValue], {
+    const options = buildUniqueSelectOptions([...presetOptions, currentValue], {
       labelFor: value =>
         formatSupermarketLabel(value, this.translate.instant('settings.catalogs.supermarkets.other')),
     });
+    options.push({
+      value: PantryEditItemModalStateService.ADD_SUPERMARKET_VALUE,
+      label: this.translate.instant('pantry.form.supermarketAdd.option'),
+    });
+    return options;
+  }
+
+  onCategoryChange(event: CustomEvent): void {
+    const value = (event.detail as { value?: string })?.value ?? '';
+    if (value !== PantryEditItemModalStateService.ADD_CATEGORY_VALUE) {
+      return;
+    }
+    const control = this.form.get('categoryId');
+    control?.setValue(this.lastCategoryValue || null);
+    this.isCategoryPromptOpen.set(true);
+  }
+
+  onSupermarketChange(event: CustomEvent): void {
+    const value = (event.detail as { value?: string })?.value ?? '';
+    if (value !== PantryEditItemModalStateService.ADD_SUPERMARKET_VALUE) {
+      return;
+    }
+    const control = this.form.get('supermarket');
+    control?.setValue(this.lastSupermarketValue);
+    this.isSupermarketPromptOpen.set(true);
+  }
+
+  onCategoryPromptDismiss(): void {
+    this.isCategoryPromptOpen.set(false);
+  }
+
+  onSupermarketPromptDismiss(): void {
+    this.isSupermarketPromptOpen.set(false);
+  }
+
+  getCategoryPromptInputs(): Array<{
+    name: string;
+    type: string;
+    placeholder: string;
+    attributes?: { [key: string]: string | number };
+  }> {
+    return [
+      {
+        name: 'name',
+        type: 'text',
+        placeholder: this.translate.instant('pantry.form.categoryAdd.placeholder'),
+        attributes: { maxlength: 80 },
+      },
+    ];
+  }
+
+  getCategoryPromptButtons(): Array<{
+    text: string;
+    role?: string;
+    handler?: (data: { [key: string]: string }) => boolean | void | Promise<boolean | void>;
+  }> {
+    return [
+      {
+        text: this.translate.instant('common.actions.cancel'),
+        role: 'cancel',
+      },
+      {
+        text: this.translate.instant('common.actions.add'),
+        handler: async data => {
+          const rawValue = (data?.['name'] ?? '').trim();
+          if (!rawValue) {
+            return false;
+          }
+          await this.addCategoryOption(rawValue);
+          this.isCategoryPromptOpen.set(false);
+          return true;
+        },
+      },
+    ];
+  }
+
+  getSupermarketPromptInputs(): Array<{
+    name: string;
+    type: string;
+    placeholder: string;
+    attributes?: { [key: string]: string | number };
+  }> {
+    return [
+      {
+        name: 'name',
+        type: 'text',
+        placeholder: this.translate.instant('pantry.form.supermarketAdd.placeholder'),
+        attributes: { maxlength: 80 },
+      },
+    ];
+  }
+
+  getSupermarketPromptButtons(): Array<{
+    text: string;
+    role?: string;
+    handler?: (data: { [key: string]: string }) => boolean | void | Promise<boolean | void>;
+  }> {
+    return [
+      {
+        text: this.translate.instant('common.actions.cancel'),
+        role: 'cancel',
+      },
+      {
+        text: this.translate.instant('common.actions.add'),
+        handler: async data => {
+          const rawValue = (data?.['name'] ?? '').trim();
+          if (!rawValue) {
+            return false;
+          }
+          await this.addSupermarketOption(rawValue);
+          this.isSupermarketPromptOpen.set(false);
+          return true;
+        },
+      },
+    ];
+  }
+
+  private async addSupermarketOption(value: string): Promise<void> {
+    const normalized = normalizeSupermarketValue(value);
+    if (!normalized) {
+      return;
+    }
+    const current = await this.appPreferences.getPreferences();
+    const existing = current.supermarketOptions ?? [];
+    const normalizedKey = normalizeKey(normalized);
+    const existingMatch = existing.find(option => normalizeKey(option) === normalizedKey);
+    if (existingMatch) {
+      this.form.get('supermarket')?.setValue(existingMatch);
+      return;
+    }
+    const next = [...existing, normalized];
+    await this.appPreferences.savePreferences({ ...current, supermarketOptions: next });
+    this.form.get('supermarket')?.setValue(normalized);
+  }
+
+  private async addCategoryOption(value: string): Promise<void> {
+    const normalized = normalizeCategoryId(value);
+    if (!normalized) {
+      return;
+    }
+    const current = await this.appPreferences.getPreferences();
+    const existing = current.categoryOptions ?? [];
+    const normalizedKey = normalizeKey(normalized);
+    const existingMatch = existing.find(option => normalizeKey(normalizeCategoryId(option)) === normalizedKey);
+    if (existingMatch) {
+      this.form.get('categoryId')?.setValue(existingMatch);
+      return;
+    }
+    const next = [...existing, normalized];
+    await this.appPreferences.savePreferences({ ...current, categoryOptions: next });
+    this.form.get('categoryId')?.setValue(normalized);
   }
 
   async submitItem(): Promise<void> {

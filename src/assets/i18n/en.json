@@ -36,9 +36,51 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Personalize your pantry",
+    "stepIndicator": "Step {{ current }} of {{ total }}",
+    "actions": {
+      "skip": "Skip",
+      "continue": "Continue",
+      "finish": "Start"
+    },
+    "validation": {
+      "minimumSelection": "Select at least one option to continue.",
+      "categoriesOptional": "You can add categories later."
+    },
+    "locations": {
+      "title": "Where do you store things?",
+      "description": "Pick the locations you use most so we can suggest them later.",
+      "options": {
+        "pantry": "Pantry",
+        "fridge": "Fridge",
+        "kitchen": "Kitchen",
+        "freezer": "Freezer"
+      }
+    },
+    "categories": {
+      "title": "What do you stock?",
+      "description": "Select the categories you usually buy. You can change them later.",
+      "options": {
+        "dairy": "Dairy",
+        "cereals": "Cereals",
+        "pasta": "Pasta",
+        "fresh": "Fresh",
+        "canned": "Canned",
+        "coldCuts": "Cold cuts",
+        "sweets": "Sweets",
+        "snacks": "Snacks",
+        "drinks": "Drinks",
+        "sauces": "Sauces",
+        "spices": "Spices"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Close",
+      "cancel": "Cancel",
+      "add": "Add",
       "save": "Save",
       "apply": "Apply",
       "clear": "Clear"
@@ -49,6 +91,9 @@
     },
     "locations": {
       "none": "No location"
+    },
+    "selects": {
+      "noOptions": "No options configured. Add them in Settings."
     }
   },
   "emptyStates": {
@@ -387,9 +432,19 @@
       "namePlaceholder": "Rice, milk...",
       "category": "Category",
       "categoryPlaceholder": "Cereals, dairy...",
+      "categoryAdd": {
+        "option": "+ Add category",
+        "title": "Add category",
+        "placeholder": "Category name"
+      },
       "uncategorized": "Uncategorized",
       "supermarket": "Supermarket",
       "supermarketPlaceholder": "Select a supermarket",
+      "supermarketAdd": {
+        "option": "+ Add supermarket",
+        "title": "Add supermarket",
+        "placeholder": "Supermarket name"
+      },
       "basic": "Pantry staple item",
       "minThreshold": "Minimum quantity",
       "locationTitle": "Location {{ index }}",
@@ -410,6 +465,30 @@
     "detail": {
       "earliest": "Expires first: {{ date }}",
       "noBatches": "No batches recorded.",
+      "batchSummary": {
+        "none": "No batches recorded",
+        "total": {
+          "single": "1 batch",
+          "plural": "{{ count }} batches"
+        },
+        "expired": {
+          "single": "{{ count }} expired",
+          "plural": "{{ count }} expired"
+        },
+        "nearExpiry": {
+          "single": "{{ count }} near expiry",
+          "plural": "{{ count }} near expiry"
+        },
+        "normal": {
+          "single": "{{ count }} in stock",
+          "plural": "{{ count }} in stock"
+        },
+        "unknown": {
+          "single": "{{ count }} without date",
+          "plural": "{{ count }} without date"
+        },
+        "withDescriptors": "{{ total }} ({{ descriptors }})"
+      },
       "totalQuantity": "{{ value }} total",
       "locationMeta": {
         "expires": "Expires: {{ date }}",
@@ -572,19 +651,27 @@
       "loadError": "Could not load catalogs.",
       "restoreDefaults": "Restore classic values",
       "saveAction": "Save changes",
+      "duplicate": "This option already exists.",
       "locations": {
         "title": "Locations",
         "subtitle": "Customize locations available when creating or editing products.",
         "empty": "Add a location to get started.",
         "field": "Location {{ index }}",
-        "add": "Add location"
+        "add": "Add location",
+        "replaceTitle": "Replace location",
+        "replaceMessage": "This location is used by {{ count }} products. Choose a replacement.",
+        "replaceAction": "Replace",
+        "removeNoReplacement": "Add another location before removing this one."
       },
       "categories": {
         "title": "Categories",
         "subtitle": "Define the categories available when adding products.",
         "empty": "Add a category to get started.",
         "field": "Category {{ index }}",
-        "add": "Add category"
+        "add": "Add category",
+        "removeInUseTitle": "Category in use",
+        "removeInUseMessage": "This category is used by {{ count }} products. Those products will lose this information.",
+        "removeAction": "Remove"
       },
       "supermarkets": {
         "title": "Supermarkets",
@@ -592,7 +679,10 @@
         "empty": "Add a supermarket to get started.",
         "field": "Supermarket {{ index }}",
         "add": "Add supermarket",
-        "other": "Other"
+        "other": "Other",
+        "removeInUseTitle": "Supermarket in use",
+        "removeInUseMessage": "This supermarket is used by {{ count }} products. Those products will lose this information.",
+        "removeAction": "Remove"
       }
     },
     "tutorial": {

@@ -2,7 +2,7 @@ import { DestroyRef, Injectable, Signal, computed, effect, inject, signal } from
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { DEFAULT_LOCATION_OPTIONS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import {
   buildFastAddItemPayload,
   classifyExpiry,
@@ -1631,8 +1631,7 @@ export class PantryStateService {
     if (first) {
       return first;
     }
-    const fallback = DEFAULT_LOCATION_OPTIONS[0];
-    return fallback ? fallback.trim() : 'unassigned';
+    return 'unassigned';
   }
 
   // -------- Batch summaries internal --------
@@ -1830,24 +1829,48 @@ export class PantryStateService {
 
   private buildBatchSummaryLabel(counts: BatchCountsMeta): string {
     if (!counts.total) {
-      return 'Sin lotes registrados';
+      return this.translate.instant('pantry.detail.batchSummary.none');
     }
 
     const descriptors: string[] = [];
     if (counts.expired) {
-      descriptors.push(`${counts.expired} caducado${counts.expired > 1 ? 's' : ''}`);
+      const key =
+        counts.expired === 1
+          ? 'pantry.detail.batchSummary.expired.single'
+          : 'pantry.detail.batchSummary.expired.plural';
+      descriptors.push(this.translate.instant(key, { count: counts.expired }));
     }
     if (counts.nearExpiry) {
-      descriptors.push(`${counts.nearExpiry} por caducar`);
+      const key =
+        counts.nearExpiry === 1
+          ? 'pantry.detail.batchSummary.nearExpiry.single'
+          : 'pantry.detail.batchSummary.nearExpiry.plural';
+      descriptors.push(this.translate.instant(key, { count: counts.nearExpiry }));
     }
     if (counts.normal) {
-      descriptors.push(`${counts.normal} con stock`);
+      const key =
+        counts.normal === 1 ? 'pantry.detail.batchSummary.normal.single' : 'pantry.detail.batchSummary.normal.plural';
+      descriptors.push(this.translate.instant(key, { count: counts.normal }));
     }
     if (counts.unknown) {
-      descriptors.push(`${counts.unknown} sin fecha`);
+      const key =
+        counts.unknown === 1
+          ? 'pantry.detail.batchSummary.unknown.single'
+          : 'pantry.detail.batchSummary.unknown.plural';
+      descriptors.push(this.translate.instant(key, { count: counts.unknown }));
     }
 
-    const totalLabel = counts.total === 1 ? '1 lote' : `${counts.total} lotes`;
-    return descriptors.length ? `${totalLabel} (${descriptors.join(', ')})` : totalLabel;
+    const totalLabel = this.translate.instant(
+      counts.total === 1 ? 'pantry.detail.batchSummary.total.single' : 'pantry.detail.batchSummary.total.plural',
+      { count: counts.total }
+    );
+    if (!descriptors.length) {
+      return totalLabel;
+    }
+
+    return this.translate.instant('pantry.detail.batchSummary.withDescriptors', {
+      total: totalLabel,
+      descriptors: descriptors.join(', '),
+    });
   }
 }

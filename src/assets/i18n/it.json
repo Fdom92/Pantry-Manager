@@ -36,9 +36,51 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Personalizza la tua dispensa",
+    "stepIndicator": "Passo {{ current }} di {{ total }}",
+    "actions": {
+      "skip": "Salta",
+      "continue": "Continua",
+      "finish": "Inizia"
+    },
+    "validation": {
+      "minimumSelection": "Seleziona almeno un'opzione per continuare.",
+      "categoriesOptional": "Potrai aggiungere categorie in seguito."
+    },
+    "locations": {
+      "title": "Dove conservi i prodotti?",
+      "description": "Scegli le posizioni che usi di piu per suggerirle in seguito.",
+      "options": {
+        "pantry": "Dispensa",
+        "fridge": "Frigorifero",
+        "kitchen": "Cucina",
+        "freezer": "Congelatore"
+      }
+    },
+    "categories": {
+      "title": "Cosa compri di solito?",
+      "description": "Seleziona le categorie che acquisti piu spesso. Potrai cambiarle piu tardi.",
+      "options": {
+        "dairy": "Latticini",
+        "cereals": "Cereali",
+        "pasta": "Pasta",
+        "fresh": "Freschi",
+        "canned": "Conserve",
+        "coldCuts": "Salumi",
+        "sweets": "Dolci",
+        "snacks": "Snack",
+        "drinks": "Bevande",
+        "sauces": "Salse",
+        "spices": "Spezie"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Chiudi",
+      "cancel": "Annulla",
+      "add": "Aggiungi",
       "save": "Salva",
       "apply": "Applica",
       "clear": "Pulisci"
@@ -49,6 +91,9 @@
     },
     "locations": {
       "none": "Nessuna posizione"
+    },
+    "selects": {
+      "noOptions": "Nessuna opzione configurata. Aggiungile nelle impostazioni."
     }
   },
   "emptyStates": {
@@ -387,9 +432,19 @@
       "namePlaceholder": "Riso, latte...",
       "category": "Categoria",
       "categoryPlaceholder": "Cereali, latticini...",
+      "categoryAdd": {
+        "option": "+ Aggiungi categoria",
+        "title": "Aggiungi categoria",
+        "placeholder": "Nome della categoria"
+      },
       "uncategorized": "Senza categoria",
       "supermarket": "Supermercato",
       "supermarketPlaceholder": "Seleziona un supermercato",
+      "supermarketAdd": {
+        "option": "+ Aggiungi supermercato",
+        "title": "Aggiungi supermercato",
+        "placeholder": "Nome del supermercato"
+      },
       "basic": "Articolo essenziale della dispensa",
       "minThreshold": "Quantità minima",
       "locationTitle": "Posizione {{ index }}",
@@ -410,6 +465,30 @@
     "detail": {
       "earliest": "Scade per primo: {{ date }}",
       "noBatches": "Nessun lotto registrato.",
+      "batchSummary": {
+        "none": "Nessun lotto registrato",
+        "total": {
+          "single": "1 lotto",
+          "plural": "{{ count }} lotti"
+        },
+        "expired": {
+          "single": "{{ count }} scaduto",
+          "plural": "{{ count }} scaduti"
+        },
+        "nearExpiry": {
+          "single": "{{ count }} in scadenza",
+          "plural": "{{ count }} in scadenza"
+        },
+        "normal": {
+          "single": "{{ count }} disponibile",
+          "plural": "{{ count }} disponibili"
+        },
+        "unknown": {
+          "single": "{{ count }} senza data",
+          "plural": "{{ count }} senza data"
+        },
+        "withDescriptors": "{{ total }} ({{ descriptors }})"
+      },
       "totalQuantity": "{{ value }} totali",
       "locationMeta": {
         "expires": "Scade: {{ date }}",
@@ -572,19 +651,27 @@
       "loadError": "Impossibile caricare i cataloghi.",
       "restoreDefaults": "Ripristina valori classici",
       "saveAction": "Salva modifiche",
+      "duplicate": "Questa opzione esiste già.",
       "locations": {
         "title": "Posizioni",
         "subtitle": "Personalizza le posizioni disponibili durante la creazione o modifica dei prodotti.",
         "empty": "Aggiungi una posizione per iniziare.",
         "field": "Posizione {{ index }}",
-        "add": "Aggiungi posizione"
+        "add": "Aggiungi posizione",
+        "replaceTitle": "Sostituisci posizione",
+        "replaceMessage": "Questa posizione è usata da {{ count }} prodotti. Scegli una sostituzione.",
+        "replaceAction": "Sostituisci",
+        "removeNoReplacement": "Aggiungi un'altra posizione prima di rimuovere questa."
       },
       "categories": {
         "title": "Categorie",
         "subtitle": "Definisci le categorie disponibili quando aggiungi prodotti.",
         "empty": "Aggiungi una categoria per iniziare.",
         "field": "Categoria {{ index }}",
-        "add": "Aggiungi categoria"
+        "add": "Aggiungi categoria",
+        "removeInUseTitle": "Categoria in uso",
+        "removeInUseMessage": "Questa categoria è usata da {{ count }} prodotti. Questi prodotti perderanno questa informazione.",
+        "removeAction": "Rimuovi"
       },
       "supermarkets": {
         "title": "Supermercati",
@@ -592,7 +679,10 @@
         "empty": "Aggiungi un supermercato per iniziare.",
         "field": "Supermercato {{ index }}",
         "add": "Aggiungi supermercato",
-        "other": "Altro"
+        "other": "Altro",
+        "removeInUseTitle": "Supermercato in uso",
+        "removeInUseMessage": "Questo supermercato è usato da {{ count }} prodotti. Questi prodotti perderanno questa informazione.",
+        "removeAction": "Rimuovi"
       }
     },
     "tutorial": {
