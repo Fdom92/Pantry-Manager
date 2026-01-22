@@ -35,18 +35,13 @@
               label="{{ 'pantry.form.category' | translate }}"
               labelPlacement="stacked"
               [placeholder]="'pantry.form.categoryPlaceholder' | translate"
-              [disabled]="!categoryOptions.length">
+              (ionChange)="state.onCategoryChange($event)">
               @for (option of categoryOptions; track option.value) {
                 <ion-select-option [value]="option.value">
                   {{ option.label }}
                 </ion-select-option>
               }
             </ion-select>
-            @if (!categoryOptions.length) {
-              <ion-note slot="helper" color="medium">
-                {{ 'common.selects.noOptions' | translate }}
-              </ion-note>
-            }
           </ion-item>
 
           <ion-item>
@@ -216,6 +211,13 @@
       [inputs]="state.getSupermarketPromptInputs()"
       [buttons]="state.getSupermarketPromptButtons()"
       (didDismiss)="state.onSupermarketPromptDismiss()">
+    </ion-alert>
+    <ion-alert
+      [isOpen]="state.isCategoryPromptOpen()"
+      [header]="'pantry.form.categoryAdd.title' | translate"
+      [inputs]="state.getCategoryPromptInputs()"
+      [buttons]="state.getCategoryPromptButtons()"
+      (didDismiss)="state.onCategoryPromptDismiss()">
     </ion-alert>
   </ng-template>
 </ion-modal>

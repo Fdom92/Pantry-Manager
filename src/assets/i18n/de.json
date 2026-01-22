@@ -45,7 +45,8 @@
       "finish": "Starten"
     },
     "validation": {
-      "minimumSelection": "Wähle mindestens eine Option, um fortzufahren."
+      "minimumSelection": "Wähle mindestens eine Option, um fortzufahren.",
+      "categoriesOptional": "Kategorien kannst du später hinzufügen."
     },
     "locations": {
       "title": "Wo lagerst du Dinge?",
@@ -431,6 +432,11 @@
       "namePlaceholder": "Reis, Milch…",
       "category": "Kategorie",
       "categoryPlaceholder": "Getreide, Milchprodukte…",
+      "categoryAdd": {
+        "option": "+ Kategorie hinzufügen",
+        "title": "Kategorie hinzufügen",
+        "placeholder": "Kategoriename"
+      },
       "uncategorized": "Ohne Kategorie",
       "supermarket": "Supermarkt",
       "supermarketPlaceholder": "Supermarkt auswählen",
@@ -645,12 +651,17 @@
       "loadError": "Kataloge konnten nicht geladen werden.",
       "restoreDefaults": "Klassische Werte wiederherstellen",
       "saveAction": "Änderungen speichern",
+      "duplicate": "Diese Option existiert bereits.",
       "locations": {
         "title": "Standorte",
         "subtitle": "Passe die verfügbaren Standorte beim Erstellen oder Bearbeiten von Produkten an.",
         "empty": "Füge einen Standort hinzu, um zu beginnen.",
         "field": "Standort {{ index }}",
-        "add": "Standort hinzufügen"
+        "add": "Standort hinzufügen",
+        "replaceTitle": "Standort ersetzen",
+        "replaceMessage": "Dieser Standort wird von {{ count }} Produkten verwendet. Wähle einen Ersatz.",
+        "replaceAction": "Ersetzen",
+        "removeNoReplacement": "Füge einen weiteren Standort hinzu, bevor du diesen entfernst."
       },
       "categories": {
         "title": "Kategorien",

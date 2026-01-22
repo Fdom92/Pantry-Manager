@@ -37,8 +37,10 @@ export class SetupStateService {
   );
   readonly canContinue = computed(() => {
     const step = this.currentStep();
-    const selections = step.key === 'locations' ? this.selectedLocations() : this.selectedCategories();
-    return selections.size > 0;
+    if (step.key === 'categories') {
+      return true;
+    }
+    return this.selectedLocations().size > 0;
   });
   readonly primaryActionLabelKey = computed(() =>
     this.isLastStep() ? 'setup.actions.finish' : 'setup.actions.continue',

@@ -45,7 +45,8 @@
       "finish": "Inizia"
     },
     "validation": {
-      "minimumSelection": "Seleziona almeno un'opzione per continuare."
+      "minimumSelection": "Seleziona almeno un'opzione per continuare.",
+      "categoriesOptional": "Potrai aggiungere categorie in seguito."
     },
     "locations": {
       "title": "Dove conservi i prodotti?",
@@ -431,6 +432,11 @@
       "namePlaceholder": "Riso, latte...",
       "category": "Categoria",
       "categoryPlaceholder": "Cereali, latticini...",
+      "categoryAdd": {
+        "option": "+ Aggiungi categoria",
+        "title": "Aggiungi categoria",
+        "placeholder": "Nome della categoria"
+      },
       "uncategorized": "Senza categoria",
       "supermarket": "Supermercato",
       "supermarketPlaceholder": "Seleziona un supermercato",
@@ -645,12 +651,17 @@
       "loadError": "Impossibile caricare i cataloghi.",
       "restoreDefaults": "Ripristina valori classici",
       "saveAction": "Salva modifiche",
+      "duplicate": "Questa opzione esiste già.",
       "locations": {
         "title": "Posizioni",
         "subtitle": "Personalizza le posizioni disponibili durante la creazione o modifica dei prodotti.",
         "empty": "Aggiungi una posizione per iniziare.",
         "field": "Posizione {{ index }}",
-        "add": "Aggiungi posizione"
+        "add": "Aggiungi posizione",
+        "replaceTitle": "Sostituisci posizione",
+        "replaceMessage": "Questa posizione è usata da {{ count }} prodotti. Scegli una sostituzione.",
+        "replaceAction": "Sostituisci",
+        "removeNoReplacement": "Aggiungi un'altra posizione prima di rimuovere questa."
       },
       "categories": {
         "title": "Categorie",

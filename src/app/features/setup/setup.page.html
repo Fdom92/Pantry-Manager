@@ -35,6 +35,8 @@
     </div>
     @if (!facade.canContinue()) {
       <p class="selection-hint">{{ 'setup.validation.minimumSelection' | translate }}</p>
+    } @else if (facade.currentStep().key === 'categories') {
+      <p class="selection-hint">{{ 'setup.validation.categoriesOptional' | translate }}</p>
     }
   </div>
 

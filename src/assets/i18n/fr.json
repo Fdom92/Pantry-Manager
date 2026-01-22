@@ -45,7 +45,8 @@
       "finish": "Commencer"
     },
     "validation": {
-      "minimumSelection": "Sélectionnez au moins une option pour continuer."
+      "minimumSelection": "Sélectionnez au moins une option pour continuer.",
+      "categoriesOptional": "Vous pourrez ajouter des catégories plus tard."
     },
     "locations": {
       "title": "Où rangez-vous les produits ?",
@@ -431,6 +432,11 @@
       "namePlaceholder": "Riz, lait…",
       "category": "Catégorie",
       "categoryPlaceholder": "Céréales, produits laitiers…",
+      "categoryAdd": {
+        "option": "+ Ajouter une catégorie",
+        "title": "Ajouter une catégorie",
+        "placeholder": "Nom de la catégorie"
+      },
       "uncategorized": "Sans catégorie",
       "supermarket": "Supermarché",
       "supermarketPlaceholder": "Sélectionnez un supermarché",
@@ -645,12 +651,17 @@
       "loadError": "Impossible de charger les catalogues.",
       "restoreDefaults": "Restaurer les valeurs par défaut",
       "saveAction": "Enregistrer les modifications",
+      "duplicate": "Cette option existe déjà.",
       "locations": {
         "title": "Emplacements",
         "subtitle": "Personnalisez les emplacements disponibles lors de la création ou de la modification des produits.",
         "empty": "Ajoutez un emplacement pour commencer.",
         "field": "Emplacement {{ index }}",
-        "add": "Ajouter un emplacement"
+        "add": "Ajouter un emplacement",
+        "replaceTitle": "Remplacer l’emplacement",
+        "replaceMessage": "Cet emplacement est utilisé par {{ count }} produits. Choisissez un remplacement.",
+        "replaceAction": "Remplacer",
+        "removeNoReplacement": "Ajoutez un autre emplacement avant de supprimer celui-ci."
       },
       "categories": {
         "title": "Catégories",

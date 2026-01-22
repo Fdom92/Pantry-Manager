@@ -170,7 +170,7 @@
         expand="block"
         color="primary"
         (click)="state.submitCatalogs()"
-        [disabled]="!state.hasAnyChanges() || state.isSaving()">
+        [disabled]="!state.hasAnyChanges() || state.isSaving() || state.hasDuplicateOptions()">
         @if (state.isSaving()) {
           <ion-spinner
             slot="start"
@@ -183,10 +183,19 @@
   </div>
 
   <ion-alert
-    [isOpen]="state.isRemovePromptOpen()"
-    [header]="state.getRemovePromptHeaderKey() | translate"
-    [message]="state.getRemovePromptMessage()"
-    [buttons]="state.getRemovePromptButtons()"
-    (didDismiss)="state.onRemovePromptDismiss()">
+    [isOpen]="state.isRemovalPromptOpen()"
+    [header]="state.getRemovalPromptHeaderKey() | translate"
+    [message]="state.getRemovalPromptMessage()"
+    [buttons]="state.getRemovalPromptButtons()"
+    (didDismiss)="state.onRemovalPromptDismiss()">
+  </ion-alert>
+
+  <ion-alert
+    [isOpen]="state.isReplacementPromptOpen()"
+    [header]="'settings.catalogs.locations.replaceTitle' | translate"
+    [message]="state.getReplacementPromptMessage()"
+    [inputs]="state.getReplacementPromptInputs()"
+    [buttons]="state.getReplacementPromptButtons()"
+    (didDismiss)="state.onReplacementPromptDismiss()">
   </ion-alert>
 </ion-content>

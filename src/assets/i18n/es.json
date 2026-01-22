@@ -45,7 +45,8 @@
       "finish": "Entrar"
     },
     "validation": {
-      "minimumSelection": "Selecciona al menos una opción para continuar."
+      "minimumSelection": "Selecciona al menos una opción para continuar.",
+      "categoriesOptional": "Podrás añadir categorías más adelante."
     },
     "locations": {
       "title": "¿Dónde guardas las cosas?",
@@ -425,6 +426,11 @@
       "namePlaceholder": "Arroz, leche...",
       "category": "Categoría",
       "categoryPlaceholder": "Cereales, lácteos...",
+      "categoryAdd": {
+        "option": "+ Añadir categoría",
+        "title": "Añadir categoría",
+        "placeholder": "Nombre de la categoría"
+      },
       "uncategorized": "Sin categoría",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Selecciona un supermercado",
@@ -639,12 +645,17 @@
       "loadError": "No se pudieron cargar los catálogos.",
       "restoreDefaults": "Restaurar valores clásicos",
       "saveAction": "Guardar cambios",
+      "duplicate": "Esta opción ya existe.",
       "locations": {
         "title": "Ubicaciones",
         "subtitle": "Personaliza las ubicaciones disponibles al crear o editar productos.",
         "empty": "Añade una ubicación para empezar.",
         "field": "Ubicación {{ index }}",
-        "add": "Añadir ubicación"
+        "add": "Añadir ubicación",
+        "replaceTitle": "Reemplazar ubicación",
+        "replaceMessage": "Esta ubicación está en uso en {{ count }} productos. Elige una ubicación de reemplazo.",
+        "replaceAction": "Reemplazar",
+        "removeNoReplacement": "Añade otra ubicación antes de eliminar esta."
       },
       "categories": {
         "title": "Categorías",
