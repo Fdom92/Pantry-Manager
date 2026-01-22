@@ -689,6 +689,12 @@
       "title": "Visualizza tutorial",
       "subtitle": "Rivedi l'onboarding quando vuoi."
     },
+    "dev": {
+      "title": "Sviluppo",
+      "subtitle": "Strumenti per testare onboarding e setup.",
+      "setupTitle": "Visualizza setup",
+      "setupSubtitle": "Apri il flusso di setup per configurare i cataloghi."
+    },
     "info": {
       "title": "Informazioni",
       "subtitle": "Dettagli rapidi sull'app.",

@@ -689,6 +689,12 @@
       "title": "View tutorial",
       "subtitle": "Replay the onboarding whenever you need it."
     },
+    "dev": {
+      "title": "Developer",
+      "subtitle": "Tools for testing onboarding and setup flows.",
+      "setupTitle": "View setup",
+      "setupSubtitle": "Open the setup flow to configure catalogs."
+    },
     "info": {
       "title": "Information",
       "subtitle": "Quick app details.",

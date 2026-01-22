@@ -689,6 +689,12 @@
       "title": "Voir le tutoriel",
       "subtitle": "Revoir l’onboarding initial à tout moment."
     },
+    "dev": {
+      "title": "Développement",
+      "subtitle": "Outils pour tester l’onboarding et le setup.",
+      "setupTitle": "Voir le setup",
+      "setupSubtitle": "Ouvrez le flux de setup pour configurer les catalogues."
+    },
     "info": {
       "title": "Informations",
       "subtitle": "Détails rapides de l’application.",
