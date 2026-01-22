@@ -36,9 +36,50 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Personalize your pantry",
+    "stepIndicator": "Step {{ current }} of {{ total }}",
+    "actions": {
+      "skip": "Skip",
+      "continue": "Continue",
+      "finish": "Start"
+    },
+    "validation": {
+      "minimumSelection": "Select at least one option to continue."
+    },
+    "locations": {
+      "title": "Where do you store things?",
+      "description": "Pick the locations you use most so we can suggest them later.",
+      "options": {
+        "pantry": "Pantry",
+        "fridge": "Fridge",
+        "kitchen": "Kitchen",
+        "freezer": "Freezer"
+      }
+    },
+    "categories": {
+      "title": "What do you stock?",
+      "description": "Select the categories you usually buy. You can change them later.",
+      "options": {
+        "dairy": "Dairy",
+        "cereals": "Cereals",
+        "pasta": "Pasta",
+        "fresh": "Fresh",
+        "canned": "Canned",
+        "coldCuts": "Cold cuts",
+        "sweets": "Sweets",
+        "snacks": "Snacks",
+        "drinks": "Drinks",
+        "sauces": "Sauces",
+        "spices": "Spices"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Close",
+      "cancel": "Cancel",
+      "add": "Add",
       "save": "Save",
       "apply": "Apply",
       "clear": "Clear"
@@ -49,6 +90,9 @@
     },
     "locations": {
       "none": "No location"
+    },
+    "selects": {
+      "noOptions": "No options configured. Add them in Settings."
     }
   },
   "emptyStates": {
@@ -390,6 +434,11 @@
       "uncategorized": "Uncategorized",
       "supermarket": "Supermarket",
       "supermarketPlaceholder": "Select a supermarket",
+      "supermarketAdd": {
+        "option": "+ Add supermarket",
+        "title": "Add supermarket",
+        "placeholder": "Supermarket name"
+      },
       "basic": "Pantry staple item",
       "minThreshold": "Minimum quantity",
       "locationTitle": "Location {{ index }}",

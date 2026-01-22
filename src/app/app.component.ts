@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { App as CapacitorApp } from '@capacitor/app';
-import { ONBOARDING_STORAGE_KEY } from '@core/constants';
+import { ONBOARDING_STORAGE_KEY, SETUP_STORAGE_KEY } from '@core/constants';
 import { PantryService } from '@core/services/pantry';
 import { RevenuecatService } from '@core/services/upgrade';
 import { NavController } from '@ionic/angular';
@@ -21,7 +21,7 @@ export class AppComponent {
   private readonly navCtrl = inject(NavController);
 
   constructor() {
-    this.redirectToOnboardingIfFirstRun();
+    this.redirectToFirstRunFlows();
     void this.initializeApp();
   }
 
@@ -55,15 +55,22 @@ export class AppComponent {
     }
   }
 
-  private redirectToOnboardingIfFirstRun(): void {
+  private redirectToFirstRunFlows(): void {
     try {
-      const hasSeen = localStorage.getItem(ONBOARDING_STORAGE_KEY);
-      const alreadyOnboarding = this.router.url?.startsWith('/onboarding');
-      if (!hasSeen && !alreadyOnboarding) {
+      const hasSeenOnboarding = localStorage.getItem(ONBOARDING_STORAGE_KEY);
+      const hasSeenSetup = localStorage.getItem(SETUP_STORAGE_KEY);
+      const currentUrl = this.router.url ?? '';
+      const alreadyOnboarding = currentUrl.startsWith('/onboarding');
+      const alreadySetup = currentUrl.startsWith('/setup');
+      if (!hasSeenOnboarding && !alreadyOnboarding) {
         void this.navCtrl.navigateRoot('/onboarding');
+        return;
+      }
+      if (hasSeenOnboarding && !hasSeenSetup && !alreadySetup) {
+        void this.navCtrl.navigateRoot('/setup');
       }
     } catch (err) {
-      console.warn('[AppComponent] onboarding check failed', err);
+      console.warn('[AppComponent] first-run check failed', err);
     }
   }
 }

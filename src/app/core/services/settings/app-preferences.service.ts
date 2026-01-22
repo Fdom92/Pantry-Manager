@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_PREFERENCES, DEFAULT_SUPERMARKET_OPTIONS, DEFAULT_UNIT_OPTIONS, DOC_TYPE_PREFERENCES, PLANNER_MEMORY_LIMIT, STORAGE_KEY_PREFERENCES } from '@core/constants';
+import { DEFAULT_PREFERENCES, DEFAULT_UNIT_OPTIONS, DOC_TYPE_PREFERENCES, PLANNER_MEMORY_LIMIT, STORAGE_KEY_PREFERENCES } from '@core/constants';
 import {
   AppPreferences,
   AppPreferencesDoc,
@@ -162,19 +162,19 @@ export class AppPreferencesService {
 
   private ensureLocationOptions(options?: unknown): string[] {
     return normalizeStringList(options, {
-      fallback: DEFAULT_LOCATION_OPTIONS,
+      fallback: [],
     });
   }
 
   private ensureCategoryOptions(options?: unknown): string[] {
     return normalizeStringList(options, {
-      fallback: DEFAULT_CATEGORY_OPTIONS,
+      fallback: [],
     });
   }
 
   private ensureSupermarketOptions(options?: unknown): string[] {
     return normalizeStringList(options, {
-      fallback: DEFAULT_SUPERMARKET_OPTIONS,
+      fallback: [],
     });
   }
 

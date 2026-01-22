@@ -36,9 +36,50 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Personalizza la tua dispensa",
+    "stepIndicator": "Passo {{ current }} di {{ total }}",
+    "actions": {
+      "skip": "Salta",
+      "continue": "Continua",
+      "finish": "Inizia"
+    },
+    "validation": {
+      "minimumSelection": "Seleziona almeno un'opzione per continuare."
+    },
+    "locations": {
+      "title": "Dove conservi i prodotti?",
+      "description": "Scegli le posizioni che usi di piu per suggerirle in seguito.",
+      "options": {
+        "pantry": "Dispensa",
+        "fridge": "Frigorifero",
+        "kitchen": "Cucina",
+        "freezer": "Congelatore"
+      }
+    },
+    "categories": {
+      "title": "Cosa compri di solito?",
+      "description": "Seleziona le categorie che acquisti piu spesso. Potrai cambiarle piu tardi.",
+      "options": {
+        "dairy": "Latticini",
+        "cereals": "Cereali",
+        "pasta": "Pasta",
+        "fresh": "Freschi",
+        "canned": "Conserve",
+        "coldCuts": "Salumi",
+        "sweets": "Dolci",
+        "snacks": "Snack",
+        "drinks": "Bevande",
+        "sauces": "Salse",
+        "spices": "Spezie"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Chiudi",
+      "cancel": "Annulla",
+      "add": "Aggiungi",
       "save": "Salva",
       "apply": "Applica",
       "clear": "Pulisci"
@@ -49,6 +90,9 @@
     },
     "locations": {
       "none": "Nessuna posizione"
+    },
+    "selects": {
+      "noOptions": "Nessuna opzione configurata. Aggiungile nelle impostazioni."
     }
   },
   "emptyStates": {
@@ -390,6 +434,11 @@
       "uncategorized": "Senza categoria",
       "supermarket": "Supermercato",
       "supermarketPlaceholder": "Seleziona un supermercato",
+      "supermarketAdd": {
+        "option": "+ Aggiungi supermercato",
+        "title": "Aggiungi supermercato",
+        "placeholder": "Nome del supermercato"
+      },
       "basic": "Articolo essenziale della dispensa",
       "minThreshold": "Quantità minima",
       "locationTitle": "Posizione {{ index }}",

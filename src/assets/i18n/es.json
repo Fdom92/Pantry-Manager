@@ -36,9 +36,50 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Personaliza tu despensa",
+    "stepIndicator": "Paso {{ current }} de {{ total }}",
+    "actions": {
+      "skip": "Saltar",
+      "continue": "Continuar",
+      "finish": "Entrar"
+    },
+    "validation": {
+      "minimumSelection": "Selecciona al menos una opción para continuar."
+    },
+    "locations": {
+      "title": "¿Dónde guardas las cosas?",
+      "description": "Elige las ubicaciones que usas más para sugerirlas después.",
+      "options": {
+        "pantry": "Despensa",
+        "fridge": "Nevera",
+        "kitchen": "Cocina",
+        "freezer": "Congelador"
+      }
+    },
+    "categories": {
+      "title": "¿Qué sueles comprar?",
+      "description": "Selecciona las categorías habituales. Podrás cambiarlas más tarde.",
+      "options": {
+        "dairy": "Lácteos",
+        "cereals": "Cereales",
+        "pasta": "Pastas",
+        "fresh": "Frescos",
+        "canned": "Conservas",
+        "coldCuts": "Embutidos",
+        "sweets": "Dulces",
+        "snacks": "Snacks",
+        "drinks": "Bebidas",
+        "sauces": "Salsas",
+        "spices": "Especias"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Cerrar",
+      "cancel": "Cancelar",
+      "add": "Añadir",
       "save": "Guardar",
       "apply": "Aplicar",
       "clear": "Limpiar"
@@ -49,6 +90,9 @@
     },
     "locations": {
       "none": "Sin ubicación"
+    },
+    "selects": {
+      "noOptions": "No hay opciones configuradas. Añádelas en ajustes."
     }
   },
   "emptyStates": {
@@ -384,6 +428,11 @@
       "uncategorized": "Sin categoría",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Selecciona un supermercado",
+      "supermarketAdd": {
+        "option": "+ Añadir supermercado",
+        "title": "Añadir supermercado",
+        "placeholder": "Nombre del supermercado"
+      },
       "basic": "Producto básico de la despensa",
       "minThreshold": "Cantidad mínima",
       "locationTitle": "Ubicación {{ index }}",

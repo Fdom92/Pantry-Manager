@@ -36,9 +36,50 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Personnalisez votre garde-manger",
+    "stepIndicator": "Étape {{ current }} sur {{ total }}",
+    "actions": {
+      "skip": "Passer",
+      "continue": "Continuer",
+      "finish": "Commencer"
+    },
+    "validation": {
+      "minimumSelection": "Sélectionnez au moins une option pour continuer."
+    },
+    "locations": {
+      "title": "Où rangez-vous les produits ?",
+      "description": "Choisissez les emplacements que vous utilisez le plus pour les proposer ensuite.",
+      "options": {
+        "pantry": "Garde-manger",
+        "fridge": "Réfrigérateur",
+        "kitchen": "Cuisine",
+        "freezer": "Congélateur"
+      }
+    },
+    "categories": {
+      "title": "Que stockez-vous ?",
+      "description": "Sélectionnez les catégories que vous achetez le plus souvent. Vous pourrez les modifier plus tard.",
+      "options": {
+        "dairy": "Produits laitiers",
+        "cereals": "Céréales",
+        "pasta": "Pâtes",
+        "fresh": "Produits frais",
+        "canned": "Conserves",
+        "coldCuts": "Charcuterie",
+        "sweets": "Douceurs",
+        "snacks": "Snacks",
+        "drinks": "Boissons",
+        "sauces": "Sauces",
+        "spices": "Épices"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Fermer",
+      "cancel": "Annuler",
+      "add": "Ajouter",
       "save": "Enregistrer",
       "apply": "Appliquer",
       "clear": "Effacer"
@@ -49,6 +90,9 @@
     },
     "locations": {
       "none": "Sans emplacement"
+    },
+    "selects": {
+      "noOptions": "Aucune option configurée. Ajoutez-les dans les réglages."
     }
   },
   "emptyStates": {
@@ -390,6 +434,11 @@
       "uncategorized": "Sans catégorie",
       "supermarket": "Supermarché",
       "supermarketPlaceholder": "Sélectionnez un supermarché",
+      "supermarketAdd": {
+        "option": "+ Ajouter un supermarché",
+        "title": "Ajouter un supermarché",
+        "placeholder": "Nom du supermarché"
+      },
       "basic": "Produit essentiel du garde-manger",
       "minThreshold": "Quantité minimale",
       "locationTitle": "Emplacement {{ index }}",

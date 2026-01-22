@@ -1,9 +1,4 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import {
-  DEFAULT_CATEGORY_OPTIONS,
-  DEFAULT_LOCATION_OPTIONS,
-  DEFAULT_SUPERMARKET_OPTIONS,
-} from '@core/constants';
 import { normalizeStringList } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastService, withSignalFlag } from '../../shared';
@@ -25,7 +20,7 @@ export class SettingsCatalogsStateService {
   readonly originalSupermarketOptions = signal<string[]>([]);
 
   readonly hasLocationChanges = computed(() => {
-    const draft = this.normalizeLocationOptions(this.locationOptionsDraft(), false);
+    const draft = this.normalizeLocationOptions(this.locationOptionsDraft());
     const original = this.originalLocationOptions();
     if (draft.length !== original.length) {
       return true;
@@ -34,7 +29,7 @@ export class SettingsCatalogsStateService {
   });
 
   readonly hasCategoryChanges = computed(() => {
-    const draft = this.normalizeCategoryOptions(this.categoryOptionsDraft(), false);
+    const draft = this.normalizeCategoryOptions(this.categoryOptionsDraft());
     const original = this.originalCategoryOptions();
     if (draft.length !== original.length) {
       return true;
@@ -43,7 +38,7 @@ export class SettingsCatalogsStateService {
   });
 
   readonly hasSupermarketChanges = computed(() => {
-    const draft = this.normalizeSupermarketOptions(this.supermarketOptionsDraft(), false);
+    const draft = this.normalizeSupermarketOptions(this.supermarketOptionsDraft());
     const original = this.originalSupermarketOptions();
     if (draft.length !== original.length) {
       return true;
@@ -76,10 +71,6 @@ export class SettingsCatalogsStateService {
     });
   }
 
-  restoreDefaultLocationOptions(): void {
-    this.locationOptionsDraft.set([...DEFAULT_LOCATION_OPTIONS]);
-  }
-
   addCategoryOption(): void {
     this.categoryOptionsDraft.update(options => [...options, '']);
   }
@@ -95,10 +86,6 @@ export class SettingsCatalogsStateService {
       next[index] = value ?? '';
       return next;
     });
-  }
-
-  restoreDefaultCategoryOptions(): void {
-    this.categoryOptionsDraft.set([...DEFAULT_CATEGORY_OPTIONS]);
   }
 
   addSupermarketOption(): void {
@@ -118,22 +105,18 @@ export class SettingsCatalogsStateService {
     });
   }
 
-  restoreDefaultSupermarketOptions(): void {
-    this.supermarketOptionsDraft.set([...DEFAULT_SUPERMARKET_OPTIONS]);
-  }
-
   async submitCatalogs(): Promise<void> {
     if (this.isSaving() || !this.hasAnyChanges()) {
       return;
     }
 
-    const normalizedLocations = this.normalizeLocationOptions(this.locationOptionsDraft(), false);
-    const normalizedCategories = this.normalizeCategoryOptions(this.categoryOptionsDraft(), false);
-    const normalizedSupermarkets = this.normalizeSupermarketOptions(this.supermarketOptionsDraft(), false);
+    const normalizedLocations = this.normalizeLocationOptions(this.locationOptionsDraft());
+    const normalizedCategories = this.normalizeCategoryOptions(this.categoryOptionsDraft());
+    const normalizedSupermarkets = this.normalizeSupermarketOptions(this.supermarketOptionsDraft());
 
-    const locationPayload = normalizedLocations.length ? normalizedLocations : [...DEFAULT_LOCATION_OPTIONS];
-    const categoryPayload = normalizedCategories.length ? normalizedCategories : [...DEFAULT_CATEGORY_OPTIONS];
-    const supermarketPayload = normalizedSupermarkets.length ? normalizedSupermarkets : [...DEFAULT_SUPERMARKET_OPTIONS];
+    const locationPayload = normalizedLocations;
+    const categoryPayload = normalizedCategories;
+    const supermarketPayload = normalizedSupermarkets;
 
     await withSignalFlag(this.isSaving, async () => {
       const current = await this.appPreferencesService.getPreferences();
@@ -189,21 +172,21 @@ export class SettingsCatalogsStateService {
     this.supermarketOptionsDraft.set([...current]);
   }
 
-  private normalizeLocationOptions(values: readonly string[] | null | undefined, fallbackToDefault = true): string[] {
+  private normalizeLocationOptions(values: readonly string[] | null | undefined): string[] {
     return normalizeStringList(values, {
-      fallback: fallbackToDefault ? DEFAULT_LOCATION_OPTIONS : [],
+      fallback: [],
     });
   }
 
-  private normalizeCategoryOptions(values: readonly string[] | null | undefined, fallbackToDefault = true): string[] {
+  private normalizeCategoryOptions(values: readonly string[] | null | undefined): string[] {
     return normalizeStringList(values, {
-      fallback: fallbackToDefault ? DEFAULT_CATEGORY_OPTIONS : [],
+      fallback: [],
     });
   }
 
-  private normalizeSupermarketOptions(values: readonly string[] | null | undefined, fallbackToDefault = true): string[] {
+  private normalizeSupermarketOptions(values: readonly string[] | null | undefined): string[] {
     return normalizeStringList(values, {
-      fallback: fallbackToDefault ? DEFAULT_SUPERMARKET_OPTIONS : [],
+      fallback: [],
     });
   }
 }

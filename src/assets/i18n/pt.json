@@ -36,9 +36,50 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Personaliza a tua despensa",
+    "stepIndicator": "Passo {{ current }} de {{ total }}",
+    "actions": {
+      "skip": "Ignorar",
+      "continue": "Continuar",
+      "finish": "Entrar"
+    },
+    "validation": {
+      "minimumSelection": "Seleciona pelo menos uma opção para continuar."
+    },
+    "locations": {
+      "title": "Onde guardas as coisas?",
+      "description": "Escolhe as localizações que usas mais para as sugerirmos depois.",
+      "options": {
+        "pantry": "Despensa",
+        "fridge": "Frigorífico",
+        "kitchen": "Cozinha",
+        "freezer": "Congelador"
+      }
+    },
+    "categories": {
+      "title": "O que costumas comprar?",
+      "description": "Seleciona as categorias que costumas comprar. Podes alterá-las mais tarde.",
+      "options": {
+        "dairy": "Laticínios",
+        "cereals": "Cereais",
+        "pasta": "Massas",
+        "fresh": "Frescos",
+        "canned": "Conservas",
+        "coldCuts": "Charcutaria",
+        "sweets": "Doces",
+        "snacks": "Snacks",
+        "drinks": "Bebidas",
+        "sauces": "Molhos",
+        "spices": "Especiarias"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Fechar",
+      "cancel": "Cancelar",
+      "add": "Adicionar",
       "save": "Guardar",
       "apply": "Aplicar",
       "clear": "Limpar"
@@ -49,6 +90,9 @@
     },
     "locations": {
       "none": "Sem localização"
+    },
+    "selects": {
+      "noOptions": "Sem opções configuradas. Adiciona-as nas definições."
     }
   },
   "emptyStates": {
@@ -390,6 +434,11 @@
       "uncategorized": "Sem categoria",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Seleciona um supermercado",
+      "supermarketAdd": {
+        "option": "+ Adicionar supermercado",
+        "title": "Adicionar supermercado",
+        "placeholder": "Nome do supermercado"
+      },
       "basic": "Item essencial da despensa",
       "minThreshold": "Quantidade mínima",
       "locationTitle": "Localização {{ index }}",

@@ -2,7 +2,7 @@ import { DestroyRef, Injectable, Signal, computed, effect, inject, signal } from
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { DEFAULT_LOCATION_OPTIONS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import {
   buildFastAddItemPayload,
   classifyExpiry,
@@ -1631,8 +1631,7 @@ export class PantryStateService {
     if (first) {
       return first;
     }
-    const fallback = DEFAULT_LOCATION_OPTIONS[0];
-    return fallback ? fallback.trim() : 'unassigned';
+    return 'unassigned';
   }
 
   // -------- Batch summaries internal --------

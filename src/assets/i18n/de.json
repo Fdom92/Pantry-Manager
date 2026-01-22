@@ -36,9 +36,50 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Richte deine Vorratskammer ein",
+    "stepIndicator": "Schritt {{ current }} von {{ total }}",
+    "actions": {
+      "skip": "Überspringen",
+      "continue": "Weiter",
+      "finish": "Starten"
+    },
+    "validation": {
+      "minimumSelection": "Wähle mindestens eine Option, um fortzufahren."
+    },
+    "locations": {
+      "title": "Wo lagerst du Dinge?",
+      "description": "Wähle die Standorte, die du am häufigsten nutzt, damit wir sie später vorschlagen können.",
+      "options": {
+        "pantry": "Vorratskammer",
+        "fridge": "Kühlschrank",
+        "kitchen": "Küche",
+        "freezer": "Gefrierschrank"
+      }
+    },
+    "categories": {
+      "title": "Was kaufst du häufig?",
+      "description": "Wähle die Kategorien, die du normalerweise kaufst. Du kannst sie später ändern.",
+      "options": {
+        "dairy": "Milchprodukte",
+        "cereals": "Cerealien",
+        "pasta": "Pasta",
+        "fresh": "Frische",
+        "canned": "Konserven",
+        "coldCuts": "Wurstwaren",
+        "sweets": "Süßes",
+        "snacks": "Snacks",
+        "drinks": "Getränke",
+        "sauces": "Saucen",
+        "spices": "Gewürze"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Schließen",
+      "cancel": "Abbrechen",
+      "add": "Hinzufügen",
       "save": "Speichern",
       "apply": "Anwenden",
       "clear": "Leeren"
@@ -49,6 +90,9 @@
     },
     "locations": {
       "none": "Kein Standort"
+    },
+    "selects": {
+      "noOptions": "Keine Optionen konfiguriert. Bitte in den Einstellungen hinzufügen."
     }
   },
   "emptyStates": {
@@ -390,6 +434,11 @@
       "uncategorized": "Ohne Kategorie",
       "supermarket": "Supermarkt",
       "supermarketPlaceholder": "Supermarkt auswählen",
+      "supermarketAdd": {
+        "option": "+ Supermarkt hinzufügen",
+        "title": "Supermarkt hinzufügen",
+        "placeholder": "Supermarktname"
+      },
       "basic": "Grundprodukt der Vorratskammer",
       "minThreshold": "Mindestmenge",
       "locationTitle": "Standort {{ index }}",
