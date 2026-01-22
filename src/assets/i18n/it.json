@@ -657,7 +657,10 @@
         "subtitle": "Definisci le categorie disponibili quando aggiungi prodotti.",
         "empty": "Aggiungi una categoria per iniziare.",
         "field": "Categoria {{ index }}",
-        "add": "Aggiungi categoria"
+        "add": "Aggiungi categoria",
+        "removeInUseTitle": "Categoria in uso",
+        "removeInUseMessage": "Questa categoria è usata da {{ count }} prodotti. Questi prodotti perderanno questa informazione.",
+        "removeAction": "Rimuovi"
       },
       "supermarkets": {
         "title": "Supermercati",

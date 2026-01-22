@@ -651,7 +651,10 @@
         "subtitle": "Define las categorías disponibles al registrar productos.",
         "empty": "Añade una categoría para empezar.",
         "field": "Categoría {{ index }}",
-        "add": "Añadir categoría"
+        "add": "Añadir categoría",
+        "removeInUseTitle": "Categoría en uso",
+        "removeInUseMessage": "Esta categoría está en uso en {{ count }} productos. Esos productos perderán esa información.",
+        "removeAction": "Eliminar"
       },
       "supermarkets": {
         "title": "Supermercados",

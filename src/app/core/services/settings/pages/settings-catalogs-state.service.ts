@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
 import { PantryService } from '@core/services/pantry/pantry.service';
-import { normalizeKey, normalizeStringList, normalizeSupermarketValue } from '@core/utils/normalization.util';
+import { normalizeCategoryId, normalizeKey, normalizeStringList, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastService, withSignalFlag } from '../../shared';
 import { AppPreferencesService } from '../app-preferences.service';
@@ -21,8 +21,9 @@ export class SettingsCatalogsStateService {
   readonly originalCategoryOptions = signal<string[]>([]);
   readonly supermarketOptionsDraft = signal<string[]>([]);
   readonly originalSupermarketOptions = signal<string[]>([]);
-  readonly isSupermarketRemovePromptOpen = signal(false);
-  private readonly supermarketRemoveTarget = signal<{
+  readonly isRemovePromptOpen = signal(false);
+  private readonly removePromptTarget = signal<{
+    kind: 'category' | 'supermarket';
     index: number;
     value: string;
     count: number;
@@ -86,7 +87,7 @@ export class SettingsCatalogsStateService {
   }
 
   removeCategoryOption(index: number): void {
-    this.categoryOptionsDraft.update(options => options.filter((_, i) => i !== index));
+    void this.requestRemoval('category', index);
   }
 
   onCategoryOptionInput(index: number, event: Event): void {
@@ -103,7 +104,7 @@ export class SettingsCatalogsStateService {
   }
 
   removeSupermarketOption(index: number): void {
-    void this.requestSupermarketRemoval(index);
+    void this.requestRemoval('supermarket', index);
   }
 
   onSupermarketOptionInput(index: number, event: Event): void {
@@ -115,18 +116,29 @@ export class SettingsCatalogsStateService {
     });
   }
 
-  onSupermarketRemovePromptDismiss(): void {
-    this.isSupermarketRemovePromptOpen.set(false);
-    this.supermarketRemoveTarget.set(null);
+  onRemovePromptDismiss(): void {
+    this.isRemovePromptOpen.set(false);
+    this.removePromptTarget.set(null);
   }
 
-  getSupermarketRemovePromptMessage(): string {
-    const target = this.supermarketRemoveTarget();
+  getRemovePromptHeaderKey(): string {
+    const target = this.removePromptTarget();
+    return target?.kind === 'category'
+      ? 'settings.catalogs.categories.removeInUseTitle'
+      : 'settings.catalogs.supermarkets.removeInUseTitle';
+  }
+
+  getRemovePromptMessage(): string {
+    const target = this.removePromptTarget();
     const count = target?.count ?? 0;
-    return this.translate.instant('settings.catalogs.supermarkets.removeInUseMessage', { count });
+    const messageKey =
+      target?.kind === 'category'
+        ? 'settings.catalogs.categories.removeInUseMessage'
+        : 'settings.catalogs.supermarkets.removeInUseMessage';
+    return this.translate.instant(messageKey, { count });
   }
 
-  getSupermarketRemovePromptButtons(): Array<{
+  getRemovePromptButtons(): Array<{
     text: string;
     role?: string;
     handler?: () => boolean | void | Promise<boolean | void>;
@@ -137,12 +149,17 @@ export class SettingsCatalogsStateService {
         role: 'cancel',
       },
       {
-        text: this.translate.instant('settings.catalogs.supermarkets.removeAction'),
+        text: this.translate.instant(this.getRemovePromptActionKey()),
         handler: async () => {
-          await this.confirmSupermarketRemoval();
+          await this.confirmRemoval();
         },
       },
     ];
+  }
+
+  private getRemovePromptActionKey(): string {
+    const target = this.removePromptTarget();
+    return this.getRemoveConfig(target?.kind).removeActionKey;
   }
 
   async submitCatalogs(): Promise<void> {
@@ -230,35 +247,34 @@ export class SettingsCatalogsStateService {
     });
   }
 
-  private async requestSupermarketRemoval(index: number): Promise<void> {
-    const value = (this.supermarketOptionsDraft()[index] ?? '').trim();
+  private async requestRemoval(kind: 'category' | 'supermarket', index: number): Promise<void> {
+    const config = this.getRemoveConfig(kind);
+    const draft = config.getDraft();
+    const value = (draft[index] ?? '').trim();
     if (!value) {
-      this.removeSupermarketFromDraft(index);
+      config.removeFromDraft(index);
       return;
     }
 
-    const { count, items } = await this.getSupermarketUsage(value);
-    if (!count) {
-      this.removeSupermarketFromDraft(index);
+    const usage = await config.getUsage(value);
+    if (!usage.count) {
+      config.removeFromDraft(index);
       return;
     }
 
-    this.supermarketRemoveTarget.set({ index, value, count, items });
-    this.isSupermarketRemovePromptOpen.set(true);
+    this.removePromptTarget.set({ kind, index, value, count: usage.count, items: usage.items });
+    this.isRemovePromptOpen.set(true);
   }
 
-  private async confirmSupermarketRemoval(): Promise<void> {
-    const target = this.supermarketRemoveTarget();
+  private async confirmRemoval(): Promise<void> {
+    const target = this.removePromptTarget();
     if (!target) {
       return;
     }
-    await this.clearSupermarketFromItems(target.items);
-    this.removeSupermarketFromDraft(target.index);
-    this.onSupermarketRemovePromptDismiss();
-  }
-
-  private removeSupermarketFromDraft(index: number): void {
-    this.supermarketOptionsDraft.update(options => options.filter((_, i) => i !== index));
+    const config = this.getRemoveConfig(target.kind);
+    await config.clearFromItems(target.items);
+    config.removeFromDraft(target.index);
+    this.onRemovePromptDismiss();
   }
 
   private async getSupermarketUsage(value: string): Promise<{
@@ -280,6 +296,26 @@ export class SettingsCatalogsStateService {
     };
   }
 
+  private async getCategoryUsage(value: string): Promise<{
+    count: number;
+    items: PantryItem[];
+  }> {
+    const normalizedValue = normalizeCategoryId(value);
+    if (!normalizedValue) {
+      return { count: 0, items: [] };
+    }
+    const normalizedKey = normalizeKey(normalizedValue);
+    if (!normalizedKey) {
+      return { count: 0, items: [] };
+    }
+    const items = await this.pantryService.getAll();
+    const matches = items.filter(item => normalizeKey(normalizeCategoryId(item.categoryId)) === normalizedKey);
+    return {
+      count: matches.length,
+      items: matches,
+    };
+  }
+
   private async clearSupermarketFromItems(items: PantryItem[]): Promise<void> {
     if (!items.length) {
       return;
@@ -292,5 +328,46 @@ export class SettingsCatalogsStateService {
         });
       }),
     );
+  }
+
+  private async clearCategoryFromItems(items: PantryItem[]): Promise<void> {
+    if (!items.length) {
+      return;
+    }
+    await Promise.all(
+      items.map(async item => {
+        await this.pantryService.saveItem({
+          ...item,
+          categoryId: '',
+        });
+      }),
+    );
+  }
+
+  private getRemoveConfig(kind?: 'category' | 'supermarket'): {
+    removeActionKey: string;
+    getDraft: () => string[];
+    removeFromDraft: (index: number) => void;
+    getUsage: (value: string) => Promise<{ count: number; items: PantryItem[] }>;
+    clearFromItems: (items: PantryItem[]) => Promise<void>;
+  } {
+    if (kind === 'category') {
+      return {
+        removeActionKey: 'settings.catalogs.categories.removeAction',
+        getDraft: () => this.categoryOptionsDraft(),
+        removeFromDraft: index =>
+          this.categoryOptionsDraft.update(options => options.filter((_, i) => i !== index)),
+        getUsage: value => this.getCategoryUsage(value),
+        clearFromItems: items => this.clearCategoryFromItems(items),
+      };
+    }
+    return {
+      removeActionKey: 'settings.catalogs.supermarkets.removeAction',
+      getDraft: () => this.supermarketOptionsDraft(),
+      removeFromDraft: index =>
+        this.supermarketOptionsDraft.update(options => options.filter((_, i) => i !== index)),
+      getUsage: value => this.getSupermarketUsage(value),
+      clearFromItems: items => this.clearSupermarketFromItems(items),
+    };
   }
 }
