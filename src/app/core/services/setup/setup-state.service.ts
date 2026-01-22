@@ -107,10 +107,12 @@ export class SetupStateService {
 
   private async persistSelections(): Promise<void> {
     const current = await this.preferences.getPreferences();
+    const hasLocations = (current.locationOptions ?? []).length > 0;
+    const hasCategories = (current.categoryOptions ?? []).length > 0;
     await this.preferences.savePreferences({
       ...current,
-      locationOptions: this.getSelectedLabels('locations'),
-      categoryOptions: this.getSelectedLabels('categories'),
+      locationOptions: hasLocations ? current.locationOptions : this.getSelectedLabels('locations'),
+      categoryOptions: hasCategories ? current.categoryOptions : this.getSelectedLabels('categories'),
     });
   }
 
