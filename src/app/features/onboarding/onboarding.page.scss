@@ -158,7 +158,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(14px + var(--ion-safe-area-bottom));
+  bottom: calc(90px + var(--ion-safe-area-bottom));
   padding: 0 16px;
   z-index: 3;
   display: flex;
@@ -209,10 +209,6 @@
     p {
       font-size: 15px;
     }
-  }
-
-  .actions {
-    bottom: 6px;
   }
 }
 
