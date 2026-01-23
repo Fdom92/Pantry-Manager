@@ -398,6 +398,7 @@ export class SettingsCatalogsStateService {
     const config = this.getCatalogConfig(target.kind);
     await config.clearFromItems(target.items);
     config.removeFromDraft(target.index);
+    await this.submitCatalogs();
     this.onRemovalPromptDismiss();
   }
 
@@ -409,6 +410,7 @@ export class SettingsCatalogsStateService {
     const config = this.getCatalogConfig(target.kind);
     await config.replaceInItems?.(target.items, target.value, replacement);
     config.removeFromDraft(target.index);
+    await this.submitCatalogs();
     this.onReplacementPromptDismiss();
   }
 
