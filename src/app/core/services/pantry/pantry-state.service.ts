@@ -210,10 +210,7 @@ export class PantryStateService {
     this.pantryService.clearEntryFilters();
     this.pantryService.applyPendingNavigationPreset();
     await this.loadItems();
-    if (!this.realtimeSubscribed) {
-      this.pantryStore.watchRealtime();
-      this.realtimeSubscribed = true;
-    }
+    this.pantryStore.watchRealtime();
   }
 
   async loadItems(): Promise<void> {
