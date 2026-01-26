@@ -47,6 +47,7 @@ export class SettingsStateService {
       if (this.lifecycle.isDestroyed()) {
         return;
       }
+      this.reloadApp();
     }).catch(async err => {
       console.error('[SettingsStateService] resetApplicationData error', err);
     });
@@ -132,7 +133,7 @@ export class SettingsStateService {
     });
 
     if (shouldReload && typeof window !== 'undefined') {
-      setTimeout(() => window.location.reload(), 600);
+      this.reloadApp();
     }
   }
 
@@ -178,5 +179,12 @@ export class SettingsStateService {
     if (this.lifecycle.isDestroyed()) {
       return;
     }
+  }
+
+  private reloadApp(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    setTimeout(() => window.location.reload(), 600);
   }
 }
