@@ -1,18 +1,17 @@
-import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_SUPERMARKET_OPTIONS } from '@core/constants';
 import { AppPreferences } from '@core/models';
 import { PantryItem } from '@core/models/pantry';
 import { normalizeKey, normalizeStringList, normalizeSupermarketValue } from '@core/utils/normalization.util';
 
 export function getPresetCategoryOptions(preferences: Pick<AppPreferences, 'categoryOptions'>): string[] {
-  return normalizeStringList(preferences.categoryOptions, { fallback: DEFAULT_CATEGORY_OPTIONS });
+  return normalizeStringList(preferences.categoryOptions, { fallback: [] });
 }
 
 export function getPresetLocationOptions(preferences: Pick<AppPreferences, 'locationOptions'>): string[] {
-  return normalizeStringList(preferences.locationOptions, { fallback: DEFAULT_LOCATION_OPTIONS });
+  return normalizeStringList(preferences.locationOptions, { fallback: [] });
 }
 
 export function getPresetSupermarketOptions(preferences: Pick<AppPreferences, 'supermarketOptions'>): string[] {
-  return normalizeStringList(preferences.supermarketOptions, { fallback: DEFAULT_SUPERMARKET_OPTIONS });
+  return normalizeStringList(preferences.supermarketOptions, { fallback: [] });
 }
 
 export function computeSupermarketSuggestions(items: PantryItem[]): string[] {

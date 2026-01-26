@@ -36,9 +36,51 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Personaliza a tua despensa",
+    "stepIndicator": "Passo {{ current }} de {{ total }}",
+    "actions": {
+      "skip": "Ignorar",
+      "continue": "Continuar",
+      "finish": "Entrar"
+    },
+    "validation": {
+      "minimumSelection": "Seleciona pelo menos uma opção para continuar.",
+      "categoriesOptional": "Podes adicionar categorias mais tarde."
+    },
+    "locations": {
+      "title": "Onde guardas as coisas?",
+      "description": "Escolhe as localizações que usas mais para as sugerirmos depois.",
+      "options": {
+        "pantry": "Despensa",
+        "fridge": "Frigorífico",
+        "kitchen": "Cozinha",
+        "freezer": "Congelador"
+      }
+    },
+    "categories": {
+      "title": "O que costumas comprar?",
+      "description": "Seleciona as categorias que costumas comprar. Podes alterá-las mais tarde.",
+      "options": {
+        "proteins": "Proteínas",
+        "dairy": "Laticínios",
+        "fruits": "Frutas",
+        "drinks": "Bebidas",
+        "cereals": "Cereais",
+        "condiments": "Condimentos",
+        "canned": "Conservas",
+        "sweets": "Doces",
+        "snacks": "Snacks",
+        "vegetables": "Legumes",
+        "household": "Casa"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Fechar",
+      "cancel": "Cancelar",
+      "add": "Adicionar",
       "save": "Guardar",
       "apply": "Aplicar",
       "clear": "Limpar"
@@ -49,6 +91,9 @@
     },
     "locations": {
       "none": "Sem localização"
+    },
+    "selects": {
+      "noOptions": "Sem opções configuradas. Adiciona-as nas definições."
     }
   },
   "emptyStates": {
@@ -387,9 +432,19 @@
       "namePlaceholder": "Arroz, leite...",
       "category": "Categoria",
       "categoryPlaceholder": "Cereais, laticínios...",
+      "categoryAdd": {
+        "option": "+ Adicionar categoria",
+        "title": "Adicionar categoria",
+        "placeholder": "Nome da categoria"
+      },
       "uncategorized": "Sem categoria",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Seleciona um supermercado",
+      "supermarketAdd": {
+        "option": "+ Adicionar supermercado",
+        "title": "Adicionar supermercado",
+        "placeholder": "Nome do supermercado"
+      },
       "basic": "Item essencial da despensa",
       "minThreshold": "Quantidade mínima",
       "locationTitle": "Localização {{ index }}",
@@ -410,6 +465,30 @@
     "detail": {
       "earliest": "Expira primeiro: {{ date }}",
       "noBatches": "Nenhum lote registado.",
+      "batchSummary": {
+        "none": "Nenhum lote registado",
+        "total": {
+          "single": "1 lote",
+          "plural": "{{ count }} lotes"
+        },
+        "expired": {
+          "single": "{{ count }} expirado",
+          "plural": "{{ count }} expirados"
+        },
+        "nearExpiry": {
+          "single": "{{ count }} a expirar",
+          "plural": "{{ count }} a expirar"
+        },
+        "normal": {
+          "single": "{{ count }} com stock",
+          "plural": "{{ count }} com stock"
+        },
+        "unknown": {
+          "single": "{{ count }} sem data",
+          "plural": "{{ count }} sem data"
+        },
+        "withDescriptors": "{{ total }} ({{ descriptors }})"
+      },
       "totalQuantity": "{{ value }} total",
       "locationMeta": {
         "expires": "Expira: {{ date }}",
@@ -572,19 +651,27 @@
       "loadError": "Não foi possível carregar os catálogos.",
       "restoreDefaults": "Restaurar valores clássicos",
       "saveAction": "Guardar alterações",
+      "duplicate": "Esta opção já existe.",
       "locations": {
         "title": "Localizações",
         "subtitle": "Personaliza as localizações disponíveis ao criar ou editar produtos.",
         "empty": "Adiciona uma localização para começar.",
         "field": "Localização {{ index }}",
-        "add": "Adicionar localização"
+        "add": "Adicionar localização",
+        "replaceTitle": "Substituir localização",
+        "replaceMessage": "Esta localização está a ser usada por {{ count }} produtos. Escolhe uma substituição.",
+        "replaceAction": "Substituir",
+        "removeNoReplacement": "Adiciona outra localização antes de remover esta."
       },
       "categories": {
         "title": "Categorias",
         "subtitle": "Define as categorias disponíveis ao adicionar produtos.",
         "empty": "Adiciona uma categoria para começar.",
         "field": "Categoria {{ index }}",
-        "add": "Adicionar categoria"
+        "add": "Adicionar categoria",
+        "removeInUseTitle": "Categoria em uso",
+        "removeInUseMessage": "Esta categoria está a ser usada por {{ count }} produtos. Esses produtos vão perder esta informação.",
+        "removeAction": "Remover"
       },
       "supermarkets": {
         "title": "Supermercados",
@@ -592,12 +679,21 @@
         "empty": "Adiciona um supermercado para começar.",
         "field": "Supermercado {{ index }}",
         "add": "Adicionar supermercado",
-        "other": "Outro"
+        "other": "Outro",
+        "removeInUseTitle": "Supermercado em uso",
+        "removeInUseMessage": "Este supermercado está a ser usado por {{ count }} produtos. Esses produtos vão perder esta informação.",
+        "removeAction": "Remover"
       }
     },
     "tutorial": {
       "title": "Ver tutorial",
       "subtitle": "Reproduz o onboarding sempre que precisares."
+    },
+    "dev": {
+      "title": "Desenvolvimento",
+      "subtitle": "Ferramentas para testar onboarding e setup.",
+      "setupTitle": "Ver setup",
+      "setupSubtitle": "Abre o fluxo de setup para configurar catálogos."
     },
     "info": {
       "title": "Informações",

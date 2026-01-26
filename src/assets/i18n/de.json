@@ -36,9 +36,51 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Richte deine Vorratskammer ein",
+    "stepIndicator": "Schritt {{ current }} von {{ total }}",
+    "actions": {
+      "skip": "Überspringen",
+      "continue": "Weiter",
+      "finish": "Starten"
+    },
+    "validation": {
+      "minimumSelection": "Wähle mindestens eine Option, um fortzufahren.",
+      "categoriesOptional": "Kategorien kannst du später hinzufügen."
+    },
+    "locations": {
+      "title": "Wo lagerst du Dinge?",
+      "description": "Wähle die Standorte, die du am häufigsten nutzt, damit wir sie später vorschlagen können.",
+      "options": {
+        "pantry": "Vorratskammer",
+        "fridge": "Kühlschrank",
+        "kitchen": "Küche",
+        "freezer": "Gefrierschrank"
+      }
+    },
+    "categories": {
+      "title": "Was kaufst du häufig?",
+      "description": "Wähle die Kategorien, die du normalerweise kaufst. Du kannst sie später ändern.",
+      "options": {
+        "proteins": "Proteine",
+        "dairy": "Milchprodukte",
+        "fruits": "Obst",
+        "drinks": "Getränke",
+        "cereals": "Cerealien",
+        "condiments": "Gewürze & Würzmittel",
+        "canned": "Konserven",
+        "sweets": "Süßes",
+        "snacks": "Snacks",
+        "vegetables": "Gemüse",
+        "household": "Haushalt"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Schließen",
+      "cancel": "Abbrechen",
+      "add": "Hinzufügen",
       "save": "Speichern",
       "apply": "Anwenden",
       "clear": "Leeren"
@@ -49,6 +91,9 @@
     },
     "locations": {
       "none": "Kein Standort"
+    },
+    "selects": {
+      "noOptions": "Keine Optionen konfiguriert. Bitte in den Einstellungen hinzufügen."
     }
   },
   "emptyStates": {
@@ -387,9 +432,19 @@
       "namePlaceholder": "Reis, Milch…",
       "category": "Kategorie",
       "categoryPlaceholder": "Getreide, Milchprodukte…",
+      "categoryAdd": {
+        "option": "+ Kategorie hinzufügen",
+        "title": "Kategorie hinzufügen",
+        "placeholder": "Kategoriename"
+      },
       "uncategorized": "Ohne Kategorie",
       "supermarket": "Supermarkt",
       "supermarketPlaceholder": "Supermarkt auswählen",
+      "supermarketAdd": {
+        "option": "+ Supermarkt hinzufügen",
+        "title": "Supermarkt hinzufügen",
+        "placeholder": "Supermarktname"
+      },
       "basic": "Grundprodukt der Vorratskammer",
       "minThreshold": "Mindestmenge",
       "locationTitle": "Standort {{ index }}",
@@ -410,6 +465,30 @@
     "detail": {
       "earliest": "Läuft zuerst ab: {{ date }}",
       "noBatches": "Keine Chargen erfasst.",
+      "batchSummary": {
+        "none": "Keine Chargen erfasst",
+        "total": {
+          "single": "1 Charge",
+          "plural": "{{ count }} Chargen"
+        },
+        "expired": {
+          "single": "{{ count }} abgelaufen",
+          "plural": "{{ count }} abgelaufen"
+        },
+        "nearExpiry": {
+          "single": "{{ count }} kurz vor Ablauf",
+          "plural": "{{ count }} kurz vor Ablauf"
+        },
+        "normal": {
+          "single": "{{ count }} auf Lager",
+          "plural": "{{ count }} auf Lager"
+        },
+        "unknown": {
+          "single": "{{ count }} ohne Datum",
+          "plural": "{{ count }} ohne Datum"
+        },
+        "withDescriptors": "{{ total }} ({{ descriptors }})"
+      },
       "totalQuantity": "{{ value }} gesamt",
       "locationMeta": {
         "expires": "Läuft ab: {{ date }}",
@@ -572,19 +651,27 @@
       "loadError": "Kataloge konnten nicht geladen werden.",
       "restoreDefaults": "Klassische Werte wiederherstellen",
       "saveAction": "Änderungen speichern",
+      "duplicate": "Diese Option existiert bereits.",
       "locations": {
         "title": "Standorte",
         "subtitle": "Passe die verfügbaren Standorte beim Erstellen oder Bearbeiten von Produkten an.",
         "empty": "Füge einen Standort hinzu, um zu beginnen.",
         "field": "Standort {{ index }}",
-        "add": "Standort hinzufügen"
+        "add": "Standort hinzufügen",
+        "replaceTitle": "Standort ersetzen",
+        "replaceMessage": "Dieser Standort wird von {{ count }} Produkten verwendet. Wähle einen Ersatz.",
+        "replaceAction": "Ersetzen",
+        "removeNoReplacement": "Füge einen weiteren Standort hinzu, bevor du diesen entfernst."
       },
       "categories": {
         "title": "Kategorien",
         "subtitle": "Definiere die verfügbaren Kategorien beim Erfassen von Produkten.",
         "empty": "Füge eine Kategorie hinzu, um zu beginnen.",
         "field": "Kategorie {{ index }}",
-        "add": "Kategorie hinzufügen"
+        "add": "Kategorie hinzufügen",
+        "removeInUseTitle": "Kategorie in Verwendung",
+        "removeInUseMessage": "Diese Kategorie wird von {{ count }} Produkten verwendet. Diese Produkte verlieren diese Information.",
+        "removeAction": "Entfernen"
       },
       "supermarkets": {
         "title": "Supermärkte",
@@ -592,12 +679,21 @@
         "empty": "Füge einen Supermarkt hinzu, um zu beginnen.",
         "field": "Supermarkt {{ index }}",
         "add": "Supermarkt hinzufügen",
-        "other": "Andere"
+        "other": "Andere",
+        "removeInUseTitle": "Supermarkt in Verwendung",
+        "removeInUseMessage": "Dieser Supermarkt wird von {{ count }} Produkten verwendet. Diese Produkte verlieren diese Information.",
+        "removeAction": "Entfernen"
       }
     },
     "tutorial": {
       "title": "Tutorial ansehen",
       "subtitle": "Sieh dir das Onboarding jederzeit erneut an."
+    },
+    "dev": {
+      "title": "Entwicklung",
+      "subtitle": "Tools zum Testen von Onboarding und Setup.",
+      "setupTitle": "Setup ansehen",
+      "setupSubtitle": "Öffne den Setup-Flow zur Katalogkonfiguration."
     },
     "info": {
       "title": "Informationen",

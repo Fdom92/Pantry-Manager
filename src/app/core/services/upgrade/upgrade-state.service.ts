@@ -4,7 +4,7 @@ import type { PlanViewModel } from '@core/models/upgrade';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
-import { ToastService, createLatestOnlyRunner, withSignalFlag } from '../shared';
+import { createLatestOnlyRunner, withSignalFlag } from '../shared';
 import { RevenuecatService } from './revenuecat.service';
 
 @Injectable()
@@ -14,7 +14,6 @@ export class UpgradeStateService {
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
   private readonly revenuecat = inject(RevenuecatService);
-  private readonly toast = inject(ToastService);
 
   readonly isLoadingPlans = signal(false);
   readonly planOptions = signal<PlanViewModel[]>([]);
@@ -54,7 +53,6 @@ export class UpgradeStateService {
       return;
     }
     if (!this.lifecycle.isDestroyed()) {
-      await this.presentUpgradeToast('upgrade.errors.purchaseFailed');
     }
   }
 
@@ -87,7 +85,6 @@ export class UpgradeStateService {
         return;
       }
       if (!this.lifecycle.isDestroyed()) {
-        await this.presentUpgradeToast('upgrade.errors.purchaseFailed');
       }
     } finally {
       this.activePurchaseId.set(null);
@@ -179,8 +176,4 @@ export class UpgradeStateService {
     return this.translate.instant('upgrade.plans.savings', { value: savingsPercent });
   }
 
-  private async presentUpgradeToast(key: string): Promise<void> {
-    const message = this.translate.instant(key);
-    await this.toast.present(message);
-  }
 }

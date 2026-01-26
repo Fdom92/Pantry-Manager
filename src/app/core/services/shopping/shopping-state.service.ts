@@ -13,7 +13,7 @@ import type {
 } from '@core/models/shopping';
 import { ShoppingReasonEnum } from '@core/models/shopping';
 import { LanguageService } from '../shared/language.service';
-import { DownloadService, ShareService, ToastService, createLatestOnlyRunner, withSignalFlag } from '../shared';
+import { DownloadService, ShareService, createLatestOnlyRunner, withSignalFlag } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
@@ -29,7 +29,6 @@ export class ShoppingStateService {
   private readonly pantryService = inject(PantryService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
-  private readonly toast = inject(ToastService);
   private readonly download = inject(DownloadService);
   private readonly share = inject(ShareService);
 
@@ -137,9 +136,6 @@ export class ShoppingStateService {
 
       const state = this.shoppingAnalysis();
       if (!state.summary.total) {
-        if (isActive()) {
-          await this.presentToast(this.translate.instant('shopping.share.empty'), 'medium');
-        }
         return;
       }
 
@@ -159,7 +155,6 @@ export class ShoppingStateService {
         }
 
         if (outcome === 'shared') {
-          await this.presentToast(this.translate.instant('shopping.share.ready'), 'success');
           return;
         }
 
@@ -168,13 +163,11 @@ export class ShoppingStateService {
         }
 
         this.download.downloadBlob(pdfBlob, filename);
-        await this.presentToast(this.translate.instant('shopping.share.saved'), 'success');
       }).catch(async err => {
         if (!isActive()) {
           return;
         }
         console.error('[ShoppingStateService] shareShoppingList error', err);
-        await this.presentToast(this.translate.instant('shopping.share.error'), 'danger');
       });
     });
   }
@@ -343,7 +336,4 @@ export class ShoppingStateService {
     return `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename()}.pdf`;
   }
 
-  private async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium'): Promise<void> {
-    await this.toast.present(message, { color });
-  }
 }

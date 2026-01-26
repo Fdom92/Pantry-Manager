@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { DEFAULT_CATEGORY_OPTIONS, DEFAULT_LOCATION_OPTIONS, DEFAULT_PREFERENCES, DEFAULT_SUPERMARKET_OPTIONS, DEFAULT_UNIT_OPTIONS, DOC_TYPE_PREFERENCES, PLANNER_MEMORY_LIMIT, STORAGE_KEY_PREFERENCES } from '@core/constants';
+import { DEFAULT_PREFERENCES, DEFAULT_UNIT_OPTIONS, DOC_TYPE_PREFERENCES, ONBOARDING_STORAGE_KEY, PLANNER_MEMORY_LIMIT, SETUP_STORAGE_KEY, STORAGE_KEY_PREFERENCES } from '@core/constants';
 import {
   AppPreferences,
   AppPreferencesDoc,
@@ -74,6 +74,10 @@ export class AppPreferencesService {
       if (doc) {
         this.cachedDoc = doc;
         const normalized = this.normalizePreferences(doc);
+        if (this.shouldSeedLocations(normalized.locationOptions)) {
+          await this.savePreferences({ ...normalized, locationOptions: ['Pantry'] });
+          return;
+        }
         this.preferencesSignal.set(normalized);
         this.applyTheme(normalized.theme);
       } else {
@@ -88,6 +92,22 @@ export class AppPreferencesService {
       this.preferencesSignal.set(defaults);
       this.cachedDoc = null;
       this.applyTheme(defaults.theme);
+    }
+  }
+
+  private shouldSeedLocations(locationOptions: string[]): boolean {
+    return (
+      this.hasSeenFlag(ONBOARDING_STORAGE_KEY) &&
+      !this.hasSeenFlag(SETUP_STORAGE_KEY) &&
+      (!locationOptions || !locationOptions.length)
+    );
+  }
+
+  private hasSeenFlag(key: string): boolean {
+    try {
+      return Boolean(localStorage.getItem(key));
+    } catch {
+      return false;
     }
   }
 
@@ -162,19 +182,19 @@ export class AppPreferencesService {
 
   private ensureLocationOptions(options?: unknown): string[] {
     return normalizeStringList(options, {
-      fallback: DEFAULT_LOCATION_OPTIONS,
+      fallback: [],
     });
   }
 
   private ensureCategoryOptions(options?: unknown): string[] {
     return normalizeStringList(options, {
-      fallback: DEFAULT_CATEGORY_OPTIONS,
+      fallback: [],
     });
   }
 
   private ensureSupermarketOptions(options?: unknown): string[] {
     return normalizeStringList(options, {
-      fallback: DEFAULT_SUPERMARKET_OPTIONS,
+      fallback: [],
     });
   }
 
