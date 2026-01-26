@@ -6,7 +6,6 @@ import type { Insight, InsightContext, InsightCta, ItemLocationStock, PantryItem
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { AgentConversationStore } from '../agent/agent-conversation.store';
 import { LanguageService } from '../shared/language.service';
-import { ToastService } from '../shared/toast.service';
 import { ConfirmService, withSignalFlag } from '../shared';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { PantryService } from '../pantry/pantry.service';
@@ -38,7 +37,6 @@ export class DashboardStateService {
   private readonly conversationStore = inject(AgentConversationStore);
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
-  private readonly toast = inject(ToastService);
 
   private hasCompletedInitialLoad = false;
 
@@ -144,7 +142,6 @@ export class DashboardStateService {
   async onOverviewCardSelected(card: DashboardOverviewCardId): Promise<void> {
     const count = this.getOverviewCardCount(card);
     if (count <= 0) {
-      await this.toast.present(this.translate.instant(this.getOverviewCardEmptyToastKey(card)), { color: 'medium' });
       return;
     }
 

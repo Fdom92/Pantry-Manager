@@ -62,17 +62,17 @@
       "title": "What do you stock?",
       "description": "Select the categories you usually buy. You can change them later.",
       "options": {
+        "proteins": "Proteins",
         "dairy": "Dairy",
+        "fruits": "Fruit",
+        "drinks": "Drinks",
         "cereals": "Cereals",
-        "pasta": "Pasta",
-        "fresh": "Fresh",
-        "canned": "Canned",
-        "coldCuts": "Cold cuts",
+        "condiments": "Condiments",
+        "canned": "Canned goods",
         "sweets": "Sweets",
         "snacks": "Snacks",
-        "drinks": "Drinks",
-        "sauces": "Sauces",
-        "spices": "Spices"
+        "vegetables": "Vegetables",
+        "household": "Household"
       }
     }
   },

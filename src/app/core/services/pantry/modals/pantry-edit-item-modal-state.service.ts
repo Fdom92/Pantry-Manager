@@ -1,8 +1,7 @@
 import { DestroyRef, Injectable, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_LOCATION_KEY, UNASSIGNED_PRODUCT_NAME } from '@core/constants';
-import { getLocationEarliestExpiry } from '@core/domain/pantry';
+import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import {
   buildUniqueSelectOptions,
   formatCategoryName as formatCategoryNameCatalog,
@@ -15,7 +14,7 @@ import { toDateInputValue, toIsoDate } from '@core/domain/up-to-date';
 import type { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { createDocumentId } from '@core/utils';
-import { formatQuantity, formatShortDate, roundQuantity } from '@core/utils/formatting.util';
+import { roundQuantity } from '@core/utils/formatting.util';
 import {
   normalizeCategoryId,
   normalizeKey,
@@ -25,8 +24,6 @@ import {
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { AppPreferencesService } from '../../settings/app-preferences.service';
-import { LanguageService } from '../../shared/language.service';
-import { ToastService } from '../../shared/toast.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { PantryStateService } from '../pantry-state.service';
 
@@ -36,10 +33,8 @@ export class PantryEditItemModalStateService {
   private static readonly ADD_CATEGORY_VALUE = '__add_category__';
   private readonly pantryStore = inject(PantryStoreService);
   private readonly fb = inject(FormBuilder);
-  private readonly toast = inject(ToastService);
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
-  private readonly languageService = inject(LanguageService);
   private readonly listState = inject(PantryStateService);
   private readonly destroyRef = inject(DestroyRef);
   private lastSupermarketValue = '';
@@ -457,27 +452,20 @@ export class PantryEditItemModalStateService {
     try {
       const existing = this.editingItem();
       const item = this.buildItemPayload(existing ?? undefined);
-      let successMessage: string;
-
       if (existing) {
         this.listState.cancelPendingStockSave(item._id);
         await this.pantryStore.updateItem(item);
-        successMessage = this.buildUpdateSuccessMessage(existing, item);
       } else {
         await this.pantryStore.addItem(item);
-        successMessage = this.buildCreateSuccessMessage(item);
       }
 
       this.dismiss();
-      await this.presentToast(successMessage, 'success');
     } catch (err) {
       this.isSaving.set(false);
       if (err instanceof Error && err.message === 'LOCATION_REQUIRED') {
-        await this.presentToast(this.translate.instant('pantry.toasts.locationRequired'), 'danger');
         return;
       }
       console.error('[PantryEditItemModalStateService] submitItem error', err);
-      await this.presentToast(this.translate.instant('pantry.toasts.saveError'), 'danger');
     }
   }
 
@@ -601,107 +589,8 @@ export class PantryEditItemModalStateService {
     };
   }
 
-  private buildCreateSuccessMessage(item: PantryItem): string {
-    const name = item.name?.trim() || UNASSIGNED_PRODUCT_NAME;
-    const quantityText = this.formatQuantityForMessage(this.getTotalQuantity(item), this.getPrimaryUnit(item));
-    const breakdown = this.formatLocationBreakdown(item.locations);
-    const quantitySegment = quantityText ? ` (${quantityText})` : '';
-    const breakdownSegment = breakdown ? ` · ${breakdown}` : '';
-    return this.translate.instant('pantry.toasts.createSuccess', {
-      name,
-      quantity: quantitySegment,
-      breakdown: breakdownSegment,
-    });
-  }
-
-  private buildUpdateSuccessMessage(previous: PantryItem, updated: PantryItem): string {
-    const previousBreakdown = this.formatLocationBreakdown(previous.locations);
-    const nextBreakdown = this.formatLocationBreakdown(updated.locations);
-    if (previousBreakdown !== nextBreakdown) {
-      return this.translate.instant('pantry.toasts.locationsUpdated', {
-        breakdown: nextBreakdown || this.translate.instant('common.locations.none'),
-      });
-    }
-
-    const previousQuantity = this.getTotalQuantity(previous);
-    const nextQuantity = this.getTotalQuantity(updated);
-    if (previousQuantity !== nextQuantity) {
-      const quantityText = this.formatQuantityForMessage(nextQuantity, this.getPrimaryUnit(updated));
-      if (quantityText) {
-        return this.translate.instant('pantry.toasts.stockUpdated', {
-          name: updated.name,
-          quantity: quantityText,
-        });
-      }
-      return this.translate.instant('pantry.toasts.stockUpdatedSimple');
-    }
-
-    return this.translate.instant('pantry.toasts.saved');
-  }
-
-  private getPrimaryUnit(item: PantryItem): string {
-    return normalizeUnitValue(this.pantryStore.getItemPrimaryUnit(item));
-  }
-
-  private getTotalQuantity(item: PantryItem): number {
-    return this.pantryStore.getItemTotalQuantity(item);
-  }
-
   private getUnitLabel(unit: MeasurementUnit | string | undefined): string {
     return this.pantryStore.getUnitLabel(unit);
-  }
-
-  private formatQuantityForMessage(quantity?: number | null, unit?: MeasurementUnit | string | null): string | null {
-    if (quantity == null || Number.isNaN(Number(quantity))) {
-      return null;
-    }
-    const formattedNumber = formatQuantity(quantity, this.languageService.getCurrentLocale(), {
-      maximumFractionDigits: 2,
-    });
-    const unitLabel = this.getUnitLabel(normalizeUnitValue(unit ?? undefined));
-    return `${formattedNumber} ${unitLabel}`.trim();
-  }
-
-  private formatLocationBreakdown(locations: ItemLocationStock[]): string {
-    if (!locations.length) {
-      return '';
-    }
-    return locations
-      .map(location => {
-        const quantityLabel = formatQuantity(this.getLocationTotal(location), this.languageService.getCurrentLocale(), {
-          maximumFractionDigits: 2,
-        });
-        const unitLabel = this.getUnitLabel(normalizeUnitValue(location.unit));
-        const label = normalizeLocationId(location.locationId, this.translate.instant('common.locations.none'));
-        const batches = Array.isArray(location.batches) ? location.batches : [];
-        const extras: string[] = [];
-        if (batches.length) {
-          const batchesLabel = this.translate.instant(
-            batches.length === 1 ? 'pantry.detail.batches.single' : 'pantry.detail.batches.plural',
-            { count: batches.length },
-          );
-          extras.push(batchesLabel);
-          const earliest = getLocationEarliestExpiry(location);
-          if (earliest) {
-            extras.push(
-              this.translate.instant('pantry.detail.batches.withExpiry', {
-                date: formatShortDate(earliest, this.languageService.getCurrentLocale(), { fallback: earliest }),
-              }),
-            );
-          }
-        }
-        const meta = extras.length ? ` (${extras.join(' · ')})` : '';
-        return `${quantityLabel} ${unitLabel} · ${label}${meta}`;
-      })
-      .join(', ');
-  }
-
-  private getLocationTotal(location: ItemLocationStock): number {
-    if (!Array.isArray(location.batches) || !location.batches.length) {
-      return 0;
-    }
-    const total = location.batches.reduce((sum, batch) => sum + roundQuantity(Number(batch.quantity ?? 0)), 0);
-    return roundQuantity(total);
   }
 
   private presetCategoryOptions(): string[] {
@@ -720,7 +609,4 @@ export class PantryEditItemModalStateService {
     return formatCategoryNameCatalog(key, this.translate.instant('pantry.form.uncategorized'));
   }
 
-  private async presentToast(message: string, color: string = 'medium'): Promise<void> {
-    await this.toast.present(message, { color });
-  }
 }

@@ -51,7 +51,7 @@ import {
   normalizeUnitValue,
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfirmService, ToastService, withSignalFlag } from '../shared';
+import { ConfirmService, withSignalFlag } from '../shared';
 
 @Injectable()
 export class PantryStateService {
@@ -62,7 +62,6 @@ export class PantryStateService {
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
-  private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -210,10 +209,7 @@ export class PantryStateService {
     this.pantryService.clearEntryFilters();
     this.pantryService.applyPendingNavigationPreset();
     await this.loadItems();
-    if (!this.realtimeSubscribed) {
-      this.pantryStore.watchRealtime();
-      this.realtimeSubscribed = true;
-    }
+    this.pantryStore.watchRealtime();
   }
 
   async loadItems(): Promise<void> {
@@ -333,7 +329,6 @@ export class PantryStateService {
     await withSignalFlag(this.isFastAdding, async () => {
       const nowIso = new Date().toISOString();
       const defaultLocationId = this.getDefaultLocationId();
-      let created = 0;
       for (const entry of entries) {
         const item = buildFastAddItemPayload({
           id: createDocumentId('item'),
@@ -343,15 +338,10 @@ export class PantryStateService {
           defaultLocationId,
         });
         await this.pantryStore.addItem(item);
-        created += 1;
       }
-
-      const messageKey = created === 1 ? 'pantry.fastAdd.singleSuccess' : 'pantry.fastAdd.success';
       this.dismissFastAddModal();
-      await this.presentToast(this.translate.instant(messageKey, { count: created }), 'success');
     }).catch(async err => {
       console.error('[PantryStateService] submitFastAdd error', err);
-      await this.presentToast(this.translate.instant('pantry.fastAdd.error'), 'danger');
     });
   }
 
@@ -430,10 +420,8 @@ export class PantryStateService {
       await this.delay(this.deleteAnimationDuration);
       await this.pantryStore.deleteItem(item._id);
       this.expandedItems.delete(item._id);
-      await this.presentToast(this.translate.instant('pantry.toasts.deleted'), 'medium');
     } catch (err) {
       console.error('[PantryStateService] deleteItem error', err);
-      await this.presentToast(this.translate.instant('pantry.toasts.saveError'), 'danger');
     } finally {
       this.unmarkItemDeleting(item._id);
     }
@@ -676,7 +664,6 @@ export class PantryStateService {
     event?.stopPropagation();
     const candidates = this.getMoveSourceOptions(item);
     if (!candidates.length) {
-      void this.presentToast(this.translate.instant('pantry.move.errors.noAvailableStock'), 'medium');
       return;
     }
     const defaultFrom = candidates[0]?.value ?? '';
@@ -833,13 +820,7 @@ export class PantryStateService {
       );
       this.triggerStockSave(result.updatedItem._id, result.updatedItem);
 
-      const message = this.translate.instant('pantry.move.toasts.success', {
-        quantity: result.quantityLabel,
-        from: result.fromLabel,
-        to: result.toLabel,
-      });
       this.dismissMoveItemModal();
-      void this.presentToast(message, 'success');
     }).catch(err => {
       console.error('[PantryListStateService] submitMoveItem error', err);
       this.moveError.set(this.translate.instant('pantry.move.errors.generic'));
@@ -895,12 +876,6 @@ export class PantryStateService {
     await this.provideQuantityFeedback(previousTotal, nextTotal);
     this.triggerStockSave(item._id, updatedItem);
 
-    if (previousTotal > 0 && nextTotal === 0) {
-      await this.presentToast(
-        this.translate.instant('pantry.toasts.addedToShopping', { name: updatedItem.name }),
-        'success'
-      );
-    }
   }
 
   onDestroy(): void {
@@ -1072,13 +1047,8 @@ export class PantryStateService {
             : pending;
 
           await this.pantryStore.updateItem(nextPayload);
-          const message = this.buildStockUpdateMessage(nextPayload);
-          if (message) {
-            await this.presentToast(message, 'success');
-          }
         } catch (err) {
           console.error('[PantryListStateService] updateItem error', err);
-          await this.presentToast('Error updating quantity', 'danger');
         } finally {
           this.pendingItems.delete(itemId);
         }
@@ -1119,24 +1089,6 @@ export class PantryStateService {
         navigator.vibrate(20);
       }
     }
-  }
-
-  private async presentToast(message: string, color: string = 'medium'): Promise<void> {
-    await this.toast.present(message, { color });
-  }
-
-  private buildStockUpdateMessage(item: PantryItem): string {
-    const quantityText = this.formatQuantityForMessage(
-      this.getTotalQuantity(item),
-      this.getPrimaryUnit(item)
-    );
-    if (quantityText) {
-      return this.translate.instant('pantry.toasts.stockUpdated', {
-        name: item.name,
-        quantity: quantityText,
-      });
-    }
-    return this.translate.instant('pantry.toasts.stockUpdatedSimple');
   }
 
   private formatQuantityForMessage(quantity?: number | null, unit?: MeasurementUnit | string | null): string | null {

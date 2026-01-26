@@ -15,6 +15,7 @@ export class PantryStoreService {
   // SIGNALS
   readonly loading: Signal<boolean> = this.pantryService.loading;
   readonly error = signal<string | null>(null);
+  private realtimeSubscribed = false;
   // COMPUTED
   readonly items = computed(() => this.pantryService.loadedProducts());
   readonly expiredItems = computed(() =>
@@ -38,6 +39,7 @@ export class PantryStoreService {
     try {
       await this.pantryService.ensureFirstPageLoaded();
       this.pantryService.startBackgroundLoad();
+      this.watchRealtime();
       this.error.set(null);
     } catch (err: any) {
       console.error('[PantryStoreService] loadAll error', err);
@@ -120,6 +122,10 @@ export class PantryStoreService {
   /** Bridge live database change events into the signal-based store. */
   watchRealtime(): void {
     // PantryService already updates its internal cache; this store simply exposes it.
+    if (this.realtimeSubscribed) {
+      return;
+    }
+    this.realtimeSubscribed = true;
     this.pantryService.watchPantryChanges(() => {});
   }
 
