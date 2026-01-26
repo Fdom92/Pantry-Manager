@@ -3,17 +3,15 @@ import type { ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { PantryService } from '@core/services/pantry/pantry.service';
 import { normalizeCategoryId, normalizeKey, normalizeLocationId, normalizeStringList, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { ToastService, withSignalFlag } from '../../shared';
+import { withSignalFlag } from '../../shared';
 import { AppPreferencesService } from '../app-preferences.service';
 
 type CatalogKind = 'category' | 'supermarket' | 'location';
 
 @Injectable()
 export class SettingsCatalogsStateService {
-  private static readonly NO_REPLACEMENT_TOAST_KEY = 'settings.catalogs.locations.removeNoReplacement';
   private readonly appPreferencesService = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
-  private readonly toast = inject(ToastService);
   private readonly pantryService = inject(PantryService);
 
   readonly isLoading = signal(false);
@@ -240,10 +238,8 @@ export class SettingsCatalogsStateService {
       return;
     }
     if (this.hasDuplicateOptions()) {
-      await this.toast.present(this.translate.instant('settings.catalogs.duplicate'), { color: 'medium' });
       return;
     }
-
     const normalizedLocations = this.normalizeLocationOptions(this.locationOptionsDraft());
     const normalizedCategories = this.normalizeCategoryOptions(this.categoryOptionsDraft());
     const normalizedSupermarkets = this.normalizeSupermarketOptions(this.supermarketOptionsDraft());
@@ -266,10 +262,8 @@ export class SettingsCatalogsStateService {
       this.locationOptionsDraft.set([...locationPayload]);
       this.categoryOptionsDraft.set([...categoryPayload]);
       this.supermarketOptionsDraft.set([...supermarketPayload]);
-      await this.toast.present(this.translate.instant('settings.catalogs.saveSuccess'), { color: 'success' });
     }).catch(async err => {
       console.error('[SettingsCatalogsStateService] submitCatalogs error', err);
-      await this.toast.present(this.translate.instant('settings.catalogs.saveError'), { color: 'danger' });
     });
   }
 
@@ -281,7 +275,6 @@ export class SettingsCatalogsStateService {
       this.syncSupermarketOptionsFromPreferences();
     }).catch(async err => {
       console.error('[SettingsCatalogsStateService] loadPreferences error', err);
-      await this.toast.present(this.translate.instant('settings.catalogs.loadError'), { color: 'danger' });
     });
   }
 
@@ -352,9 +345,6 @@ export class SettingsCatalogsStateService {
     const config = this.getCatalogConfig(kind);
     const draft = config.getDraft();
     if (kind === 'location' && draft.length <= 1) {
-      await this.toast.present(this.translate.instant(SettingsCatalogsStateService.NO_REPLACEMENT_TOAST_KEY), {
-        color: 'medium',
-      });
       return;
     }
     const value = (draft[index] ?? '').trim();
@@ -375,9 +365,6 @@ export class SettingsCatalogsStateService {
         .filter(option => option && normalizeKey(option) !== normalizeKey(value));
 
       if (!replacements.length) {
-        await this.toast.present(this.translate.instant(SettingsCatalogsStateService.NO_REPLACEMENT_TOAST_KEY), {
-          color: 'medium',
-        });
         return;
       }
 
