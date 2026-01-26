@@ -4,6 +4,7 @@ export * from './onboarding';
 export * from './pantry';
 export * from './settings';
 export * from './shopping';
+export * from './setup';
 export * from './shared';
 export * from './tabs';
 export * from './up-to-date';

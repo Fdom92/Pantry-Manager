@@ -1,11 +1,10 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
-import { IMPORT_EMPTY_ERROR, IMPORT_EMPTY_INVALID } from '@core/constants';
 import { buildExportFileName, parseBackup } from '@core/domain/settings';
 import type { AppThemePreference } from '@core/models';
 import type { BaseDoc } from '@core/models/shared';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfirmService, DownloadService, ShareService, ToastService, createLatestOnlyRunner, withSignalFlag } from '../shared';
+import { ConfirmService, DownloadService, ShareService, createLatestOnlyRunner, withSignalFlag } from '../shared';
 import { StorageService } from '../shared/storage.service';
 import { RevenuecatService } from '../upgrade/revenuecat.service';
 import { AppPreferencesService } from './app-preferences.service';
@@ -19,7 +18,6 @@ export class SettingsStateService {
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly revenuecat = inject(RevenuecatService);
   private readonly navCtrl = inject(NavController);
-  private readonly toast = inject(ToastService);
   private readonly download = inject(DownloadService);
   private readonly confirm = inject(ConfirmService);
   private readonly share = inject(ShareService);
@@ -49,12 +47,9 @@ export class SettingsStateService {
       if (this.lifecycle.isDestroyed()) {
         return;
       }
-      await this.presentToast(this.translate.instant('settings.reset.success'), 'success');
+      this.reloadApp();
     }).catch(async err => {
       console.error('[SettingsStateService] resetApplicationData error', err);
-      if (!this.lifecycle.isDestroyed()) {
-        await this.presentToast(this.translate.instant('settings.reset.error'), 'danger');
-      }
     });
   }
 
@@ -68,7 +63,6 @@ export class SettingsStateService {
 
   async exportDataBackup(): Promise<void> {
     if (typeof document === 'undefined') {
-      await this.presentToast(this.translate.instant('settings.export.unavailable'), 'warning');
       return;
     }
     if (this.isExportingData()) {
@@ -94,7 +88,6 @@ export class SettingsStateService {
       }
 
       if (outcome === 'shared') {
-        await this.presentToast(this.translate.instant('settings.export.readyToShare'), 'success');
         return;
       }
 
@@ -103,12 +96,8 @@ export class SettingsStateService {
       }
 
       this.download.downloadBlob(blob, filename);
-      await this.presentToast(this.translate.instant('settings.export.success'), 'success');
     }).catch(async err => {
       console.error('[SettingsStateService] exportDataBackup error', err);
-      if (!this.lifecycle.isDestroyed()) {
-        await this.presentToast(this.translate.instant('settings.export.error'), 'danger');
-      }
     });
   }
 
@@ -127,23 +116,25 @@ export class SettingsStateService {
       return;
     }
 
+    let shouldReload = false;
+
     await withSignalFlag(this.isImportingData, async () => {
       const fileContents = await file.text();
       const docs = parseBackup(fileContents, new Date().toISOString());
       await this.applyImport(docs);
+      if (!this.lifecycle.isDestroyed()) {
+        shouldReload = true;
+      }
     }).catch(async (err: any) => {
       console.error('[SettingsStateService] submitImportFileSelection error', err);
       if (this.lifecycle.isDestroyed()) {
         return;
       }
-      const messageKey =
-        err?.message === IMPORT_EMPTY_ERROR
-          ? 'settings.import.empty'
-          : err?.message === IMPORT_EMPTY_INVALID
-            ? 'settings.import.invalid'
-            : 'settings.import.error';
-      await this.presentToast(this.translate.instant(messageKey), 'danger');
     });
+
+    if (shouldReload && typeof window !== 'undefined') {
+      this.reloadApp();
+    }
   }
 
   async updateThemePreference(value: string | number | null | undefined): Promise<void> {
@@ -162,9 +153,6 @@ export class SettingsStateService {
       });
     }).catch(async err => {
       console.error('[SettingsStateService] updateThemePreference error', err);
-      if (!this.lifecycle.isDestroyed()) {
-        await this.presentToast(this.translate.instant('settings.appearance.error'), 'danger');
-      }
     });
   }
 
@@ -177,16 +165,11 @@ export class SettingsStateService {
       await this.appPreferences.getPreferences();
     } catch (err) {
       console.error('[SettingsStateService] ensurePreferencesLoaded error', err);
-      await this.presentToast(this.translate.instant('settings.loadError'), 'danger');
     }
   }
 
   private async confirmImport(): Promise<boolean> {
     return this.confirm.confirm(this.translate.instant('settings.import.confirm'));
-  }
-
-  private async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium'): Promise<void> {
-    await this.toast.present(message, { color });
   }
 
   private async applyImport(docs: BaseDoc[]): Promise<void> {
@@ -196,9 +179,12 @@ export class SettingsStateService {
     if (this.lifecycle.isDestroyed()) {
       return;
     }
-    await this.presentToast(this.translate.instant('settings.import.success'), 'success');
-    if (typeof window !== 'undefined') {
-      setTimeout(() => window.location.reload(), 300);
+  }
+
+  private reloadApp(): void {
+    if (typeof window === 'undefined') {
+      return;
     }
+    setTimeout(() => window.location.reload(), 600);
   }
 }

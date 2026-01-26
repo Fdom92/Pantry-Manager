@@ -23,6 +23,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import packageJson from '../../../../package.json';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-settings',
@@ -56,6 +57,7 @@ import packageJson from '../../../../package.json';
 export class SettingsComponent {
   readonly facade = inject(SettingsStateService);
   readonly appVersion = packageJson.version ?? '0.0.0';
+  readonly isDev = !environment.production;
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();

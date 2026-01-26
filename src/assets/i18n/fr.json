@@ -36,9 +36,51 @@
       }
     }
   },
+  "setup": {
+    "tagline": "Personnalisez votre garde-manger",
+    "stepIndicator": "Étape {{ current }} sur {{ total }}",
+    "actions": {
+      "skip": "Passer",
+      "continue": "Continuer",
+      "finish": "Commencer"
+    },
+    "validation": {
+      "minimumSelection": "Sélectionnez au moins une option pour continuer.",
+      "categoriesOptional": "Vous pourrez ajouter des catégories plus tard."
+    },
+    "locations": {
+      "title": "Où rangez-vous les produits ?",
+      "description": "Choisissez les emplacements que vous utilisez le plus pour les proposer ensuite.",
+      "options": {
+        "pantry": "Garde-manger",
+        "fridge": "Réfrigérateur",
+        "kitchen": "Cuisine",
+        "freezer": "Congélateur"
+      }
+    },
+    "categories": {
+      "title": "Que stockez-vous ?",
+      "description": "Sélectionnez les catégories que vous achetez le plus souvent. Vous pourrez les modifier plus tard.",
+      "options": {
+        "proteins": "Protéines",
+        "dairy": "Produits laitiers",
+        "fruits": "Fruits",
+        "drinks": "Boissons",
+        "cereals": "Céréales",
+        "condiments": "Condiments",
+        "canned": "Conserves",
+        "sweets": "Douceurs",
+        "snacks": "Snacks",
+        "vegetables": "Légumes",
+        "household": "Maison"
+      }
+    }
+  },
   "common": {
     "actions": {
       "close": "Fermer",
+      "cancel": "Annuler",
+      "add": "Ajouter",
       "save": "Enregistrer",
       "apply": "Appliquer",
       "clear": "Effacer"
@@ -49,6 +91,9 @@
     },
     "locations": {
       "none": "Sans emplacement"
+    },
+    "selects": {
+      "noOptions": "Aucune option configurée. Ajoutez-les dans les réglages."
     }
   },
   "emptyStates": {
@@ -387,9 +432,19 @@
       "namePlaceholder": "Riz, lait…",
       "category": "Catégorie",
       "categoryPlaceholder": "Céréales, produits laitiers…",
+      "categoryAdd": {
+        "option": "+ Ajouter une catégorie",
+        "title": "Ajouter une catégorie",
+        "placeholder": "Nom de la catégorie"
+      },
       "uncategorized": "Sans catégorie",
       "supermarket": "Supermarché",
       "supermarketPlaceholder": "Sélectionnez un supermarché",
+      "supermarketAdd": {
+        "option": "+ Ajouter un supermarché",
+        "title": "Ajouter un supermarché",
+        "placeholder": "Nom du supermarché"
+      },
       "basic": "Produit essentiel du garde-manger",
       "minThreshold": "Quantité minimale",
       "locationTitle": "Emplacement {{ index }}",
@@ -410,6 +465,30 @@
     "detail": {
       "earliest": "Expire en premier : {{ date }}",
       "noBatches": "Aucun lot enregistré.",
+      "batchSummary": {
+        "none": "Aucun lot enregistré",
+        "total": {
+          "single": "1 lot",
+          "plural": "{{ count }} lots"
+        },
+        "expired": {
+          "single": "{{ count }} périmé",
+          "plural": "{{ count }} périmés"
+        },
+        "nearExpiry": {
+          "single": "{{ count }} bientôt périmé",
+          "plural": "{{ count }} bientôt périmés"
+        },
+        "normal": {
+          "single": "{{ count }} en stock",
+          "plural": "{{ count }} en stock"
+        },
+        "unknown": {
+          "single": "{{ count }} sans date",
+          "plural": "{{ count }} sans date"
+        },
+        "withDescriptors": "{{ total }} ({{ descriptors }})"
+      },
       "totalQuantity": "{{ value }} au total",
       "locationMeta": {
         "expires": "Expire : {{ date }}",
@@ -572,19 +651,27 @@
       "loadError": "Impossible de charger les catalogues.",
       "restoreDefaults": "Restaurer les valeurs par défaut",
       "saveAction": "Enregistrer les modifications",
+      "duplicate": "Cette option existe déjà.",
       "locations": {
         "title": "Emplacements",
         "subtitle": "Personnalisez les emplacements disponibles lors de la création ou de la modification des produits.",
         "empty": "Ajoutez un emplacement pour commencer.",
         "field": "Emplacement {{ index }}",
-        "add": "Ajouter un emplacement"
+        "add": "Ajouter un emplacement",
+        "replaceTitle": "Remplacer l’emplacement",
+        "replaceMessage": "Cet emplacement est utilisé par {{ count }} produits. Choisissez un remplacement.",
+        "replaceAction": "Remplacer",
+        "removeNoReplacement": "Ajoutez un autre emplacement avant de supprimer celui-ci."
       },
       "categories": {
         "title": "Catégories",
         "subtitle": "Définissez les catégories disponibles lors de l’enregistrement des produits.",
         "empty": "Ajoutez une catégorie pour commencer.",
         "field": "Catégorie {{ index }}",
-        "add": "Ajouter une catégorie"
+        "add": "Ajouter une catégorie",
+        "removeInUseTitle": "Catégorie utilisée",
+        "removeInUseMessage": "Cette catégorie est utilisée par {{ count }} produits. Ces produits perdront cette information.",
+        "removeAction": "Supprimer"
       },
       "supermarkets": {
         "title": "Supermarchés",
@@ -592,12 +679,21 @@
         "empty": "Ajoutez un supermarché pour commencer.",
         "field": "Supermarché {{ index }}",
         "add": "Ajouter un supermarché",
-        "other": "Autre"
+        "other": "Autre",
+        "removeInUseTitle": "Supermarché utilisé",
+        "removeInUseMessage": "Ce supermarché est utilisé par {{ count }} produits. Ces produits perdront cette information.",
+        "removeAction": "Supprimer"
       }
     },
     "tutorial": {
       "title": "Voir le tutoriel",
       "subtitle": "Revoir l’onboarding initial à tout moment."
+    },
+    "dev": {
+      "title": "Développement",
+      "subtitle": "Outils pour tester l’onboarding et le setup.",
+      "setupTitle": "Voir le setup",
+      "setupSubtitle": "Ouvrez le flux de setup pour configurer les catalogues."
     },
     "info": {
       "title": "Informations",

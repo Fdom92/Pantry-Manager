@@ -21,7 +21,7 @@ export class AppComponent {
   private readonly navCtrl = inject(NavController);
 
   constructor() {
-    this.redirectToOnboardingIfFirstRun();
+    this.redirectToFirstRunFlows();
     void this.initializeApp();
   }
 
@@ -55,15 +55,16 @@ export class AppComponent {
     }
   }
 
-  private redirectToOnboardingIfFirstRun(): void {
+  private redirectToFirstRunFlows(): void {
     try {
-      const hasSeen = localStorage.getItem(ONBOARDING_STORAGE_KEY);
-      const alreadyOnboarding = this.router.url?.startsWith('/onboarding');
-      if (!hasSeen && !alreadyOnboarding) {
+      const hasSeenOnboarding = localStorage.getItem(ONBOARDING_STORAGE_KEY);
+      const currentUrl = this.router.url ?? '';
+      const alreadyOnboarding = currentUrl.startsWith('/onboarding');
+      if (!hasSeenOnboarding && !alreadyOnboarding) {
         void this.navCtrl.navigateRoot('/onboarding');
       }
     } catch (err) {
-      console.warn('[AppComponent] onboarding check failed', err);
+      console.warn('[AppComponent] first-run check failed', err);
     }
   }
 }

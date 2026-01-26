@@ -28,13 +28,15 @@
             </ion-input>
           </ion-item>
           <ion-item>
+            @let categoryOptions = state.getCategorySelectOptions();
             <ion-select
               formControlName="categoryId"
               interface="popover"
               label="{{ 'pantry.form.category' | translate }}"
               labelPlacement="stacked"
-              [placeholder]="'pantry.form.categoryPlaceholder' | translate">
-              @for (option of state.getCategorySelectOptions(); track option.value) {
+              [placeholder]="'pantry.form.categoryPlaceholder' | translate"
+              (ionChange)="state.onCategoryChange($event)">
+              @for (option of categoryOptions; track option.value) {
                 <ion-select-option [value]="option.value">
                   {{ option.label }}
                 </ion-select-option>
@@ -43,13 +45,15 @@
           </ion-item>
 
           <ion-item>
+            @let supermarketOptions = state.getSupermarketSelectOptions();
             <ion-select
               formControlName="supermarket"
               interface="popover"
               label="{{ 'pantry.form.supermarket' | translate }}"
               labelPlacement="stacked"
-              [placeholder]="'pantry.form.supermarketPlaceholder' | translate">
-              @for (option of state.getSupermarketSelectOptions(); track option.value) {
+              [placeholder]="'pantry.form.supermarketPlaceholder' | translate"
+              (ionChange)="state.onSupermarketChange($event)">
+              @for (option of supermarketOptions; track option.value) {
                 <ion-select-option [value]="option.value">
                   {{ option.label }}
                 </ion-select-option>
@@ -95,19 +99,26 @@
               </div>
               <ion-list lines="full">
                 <ion-item>
+                  @let locationOptions = state.getLocationOptionsForControl(i);
                   <ion-select
                     formControlName="locationId"
                     interface="popover"
                     label="{{ 'pantry.form.location' | translate }}"
                     labelPlacement="stacked"
                     [placeholder]="'pantry.form.locationPlaceholder' | translate"
+                    [disabled]="!locationOptions.length"
                     required>
-                    @for (option of state.getLocationOptionsForControl(i); track option.value) {
+                    @for (option of locationOptions; track option.value) {
                       <ion-select-option [value]="option.value">
                         {{ option.label }}
                       </ion-select-option>
                     }
                   </ion-select>
+                  @if (!locationOptions.length) {
+                    <ion-note slot="helper" color="medium">
+                      {{ 'common.selects.noOptions' | translate }}
+                    </ion-note>
+                  }
                 </ion-item>
               </ion-list>
               <div formArrayName="batches" class="batch-form-list">
@@ -194,5 +205,19 @@
         </ion-button>
       </ion-toolbar>
     </ion-footer>
+    <ion-alert
+      [isOpen]="state.isSupermarketPromptOpen()"
+      [header]="'pantry.form.supermarketAdd.title' | translate"
+      [inputs]="state.getSupermarketPromptInputs()"
+      [buttons]="state.getSupermarketPromptButtons()"
+      (didDismiss)="state.onSupermarketPromptDismiss()">
+    </ion-alert>
+    <ion-alert
+      [isOpen]="state.isCategoryPromptOpen()"
+      [header]="'pantry.form.categoryAdd.title' | translate"
+      [inputs]="state.getCategoryPromptInputs()"
+      [buttons]="state.getCategoryPromptButtons()"
+      (didDismiss)="state.onCategoryPromptDismiss()">
+    </ion-alert>
   </ng-template>
 </ion-modal>
