@@ -62,17 +62,17 @@
       "title": "Que stockez-vous ?",
       "description": "Sélectionnez les catégories que vous achetez le plus souvent. Vous pourrez les modifier plus tard.",
       "options": {
+        "proteins": "Protéines",
         "dairy": "Produits laitiers",
+        "fruits": "Fruits",
+        "drinks": "Boissons",
         "cereals": "Céréales",
-        "pasta": "Pâtes",
-        "fresh": "Produits frais",
+        "condiments": "Condiments",
         "canned": "Conserves",
-        "coldCuts": "Charcuterie",
         "sweets": "Douceurs",
         "snacks": "Snacks",
-        "drinks": "Boissons",
-        "sauces": "Sauces",
-        "spices": "Épices"
+        "vegetables": "Légumes",
+        "household": "Maison"
       }
     }
   },

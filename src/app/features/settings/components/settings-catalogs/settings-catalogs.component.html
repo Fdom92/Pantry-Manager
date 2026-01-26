@@ -46,6 +46,7 @@
             slot="end"
             fill="clear"
             color="danger"
+            [disabled]="state.locationOptionsDraft().length <= 1"
             (click)="state.removeLocationOption(i)">
             <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
           </ion-button>

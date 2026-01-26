@@ -62,17 +62,17 @@
       "title": "Was kaufst du häufig?",
       "description": "Wähle die Kategorien, die du normalerweise kaufst. Du kannst sie später ändern.",
       "options": {
+        "proteins": "Proteine",
         "dairy": "Milchprodukte",
+        "fruits": "Obst",
+        "drinks": "Getränke",
         "cereals": "Cerealien",
-        "pasta": "Pasta",
-        "fresh": "Frische",
+        "condiments": "Gewürze & Würzmittel",
         "canned": "Konserven",
-        "coldCuts": "Wurstwaren",
         "sweets": "Süßes",
         "snacks": "Snacks",
-        "drinks": "Getränke",
-        "sauces": "Saucen",
-        "spices": "Gewürze"
+        "vegetables": "Gemüse",
+        "household": "Haushalt"
       }
     }
   },

@@ -62,17 +62,17 @@
       "title": "Cosa compri di solito?",
       "description": "Seleziona le categorie che acquisti piu spesso. Potrai cambiarle piu tardi.",
       "options": {
+        "proteins": "Proteine",
         "dairy": "Latticini",
+        "fruits": "Frutta",
+        "drinks": "Bevande",
         "cereals": "Cereali",
-        "pasta": "Pasta",
-        "fresh": "Freschi",
+        "condiments": "Condimenti",
         "canned": "Conserve",
-        "coldCuts": "Salumi",
         "sweets": "Dolci",
         "snacks": "Snack",
-        "drinks": "Bevande",
-        "sauces": "Salse",
-        "spices": "Spezie"
+        "vegetables": "Verdure",
+        "household": "Casa"
       }
     }
   },

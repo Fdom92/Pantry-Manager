@@ -62,17 +62,17 @@
       "title": "¿Qué sueles comprar?",
       "description": "Selecciona las categorías habituales. Podrás cambiarlas más tarde.",
       "options": {
+        "proteins": "Proteínas",
         "dairy": "Lácteos",
+        "fruits": "Frutas",
+        "drinks": "Bebidas",
         "cereals": "Cereales",
-        "pasta": "Pastas",
-        "fresh": "Frescos",
+        "condiments": "Condimentos",
         "canned": "Conservas",
-        "coldCuts": "Embutidos",
         "sweets": "Dulces",
         "snacks": "Snacks",
-        "drinks": "Bebidas",
-        "sauces": "Salsas",
-        "spices": "Especias"
+        "vegetables": "Verduras",
+        "household": "Hogar"
       }
     }
   },
