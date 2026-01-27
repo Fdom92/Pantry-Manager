@@ -10,6 +10,7 @@ import { InsightService } from '../dashboard/insight.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { AppPreferencesService } from '../settings/app-preferences.service';
 import { LanguageService } from '../shared/language.service';
+import { ReviewPromptService } from '../shared/review-prompt.service';
 import { withSignalFlag } from '../shared';
 
 @Injectable()
@@ -20,6 +21,7 @@ export class UpToDateStateService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
+  private readonly reviewPrompt = inject(ReviewPromptService);
 
   // SIGNALS
   readonly isLoading = signal(false);
@@ -168,6 +170,7 @@ export class UpToDateStateService {
       if (this.doneRedirectTimeout) {
         return;
       }
+      this.reviewPrompt.markEngagement();
       this.doneRedirectTimeout = setTimeout(() => {
         void this.navCtrl.navigateRoot('/dashboard');
       }, 1200);

@@ -20,6 +20,7 @@ import { TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
 import { PantryService } from '../pantry/pantry.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
+import { ReviewPromptService } from '../shared/review-prompt.service';
 
 @Injectable()
 export class ShoppingStateService {
@@ -27,6 +28,7 @@ export class ShoppingStateService {
   private readonly shareTask = createLatestOnlyRunner(this.destroyRef);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
+  private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly download = inject(DownloadService);
@@ -95,6 +97,9 @@ export class ShoppingStateService {
         location: data.location,
       });
       await this.pantryStore.loadAll();
+      if (this.shoppingAnalysis().summary.total === 0) {
+        this.reviewPrompt.markEngagement();
+      }
       this.dismissPurchaseModal();
     } finally {
       this.processingSuggestionIds.update(ids => {

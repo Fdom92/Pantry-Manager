@@ -3,11 +3,13 @@ import { PantryItem, PantrySummary } from '@core/models/pantry';
 import { MeasurementUnit, StockStatus } from '@core/models/shared';
 import { PantryService } from './pantry.service';
 import { normalizeLocationId } from '@core/utils/normalization.util';
+import { ReviewPromptService } from '../shared/review-prompt.service';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
   // DI
   private readonly pantryService = inject(PantryService);
+  private readonly reviewPrompt = inject(ReviewPromptService);
   // DATA
   private readonly knownMeasurementUnits = new Set(
     Object.values(MeasurementUnit).map(option => option.toLowerCase())
@@ -58,6 +60,7 @@ export class PantryStoreService {
       }
 
       await this.pantryService.saveItem(item);
+      this.reviewPrompt.handleProductAdded();
     } catch (err: any) {
       console.error('[PantryStoreService] addItem error', err);
       this.error.set('Failed to add item');
