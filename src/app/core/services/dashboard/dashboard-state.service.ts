@@ -7,6 +7,7 @@ import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { AgentConversationStore } from '../agent/agent-conversation.store';
 import { LanguageService } from '../shared/language.service';
 import { ConfirmService, withSignalFlag } from '../shared';
+import { ReviewPromptService } from '../shared/review-prompt.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { PantryService } from '../pantry/pantry.service';
 import { InsightService } from './insight.service';
@@ -37,6 +38,7 @@ export class DashboardStateService {
   private readonly conversationStore = inject(AgentConversationStore);
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
+  private readonly reviewPrompt = inject(ReviewPromptService);
 
   private hasCompletedInitialLoad = false;
 
@@ -115,6 +117,7 @@ export class DashboardStateService {
     await this.pantryStore.loadAll();
     this.hasCompletedInitialLoad = true;
     this.lastRefreshTimestamp.set(new Date().toISOString());
+    void this.reviewPrompt.handleDashboardEnter();
   }
 
   dismissInsight(insight: Insight): void {

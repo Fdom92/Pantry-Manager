@@ -16,51 +16,107 @@ export class ReviewPromptService {
   private readonly minDaysSinceFirstUse = 7;
   private readonly minLaunches = 7;
   private readonly cooldownDays = 30;
+  private readonly minProductAddsForPrompt = 3;
   private readonly promptDelayMs = 1500;
-  private lastForegroundAt = 0;
+  private lastTriggerAt = 0;
 
-  async handleAppForeground(): Promise<void> {
+  async handleDashboardEnter(): Promise<void> {
     if (!this.canUseStorage()) {
       return;
     }
     const now = Date.now();
-    if (now - this.lastForegroundAt < 1500) {
+    if (now - this.lastTriggerAt < 1500) {
       return;
     }
-    this.lastForegroundAt = now;
+    this.lastTriggerAt = now;
 
-    this.recordLaunch();
-    if (!this.shouldPrompt()) {
+    this.noteLaunch();
+    if (!this.hasPendingPrompt()) {
       return;
+    }
+    const didPrompt = await this.promptIfEligible();
+    if (didPrompt) {
+      this.clearPendingPrompt();
+    }
+  }
+
+  markEngagement(): void {
+    if (!this.canUseStorage()) {
+      return;
+    }
+    this.noteFirstUse();
+    this.setPendingPrompt();
+  }
+
+  handleProductAdded(): void {
+    if (!this.canUseStorage()) {
+      return;
+    }
+    this.noteFirstUse();
+    const current = this.getStoredNumber(REVIEW_STORAGE_KEYS.PRODUCT_ADD_COUNT) ?? 0;
+    const next = current + 1;
+    this.setItem(REVIEW_STORAGE_KEYS.PRODUCT_ADD_COUNT, String(next));
+    if (next >= this.minProductAddsForPrompt) {
+      this.setPendingPrompt();
+    }
+  }
+
+  private noteLaunch(): void {
+    this.noteFirstUse();
+    const launchCount = this.getStoredNumber(REVIEW_STORAGE_KEYS.LAUNCH_COUNT) ?? 0;
+    this.setItem(REVIEW_STORAGE_KEYS.LAUNCH_COUNT, String(launchCount + 1));
+  }
+
+  private noteFirstUse(): void {
+    const now = new Date().toISOString();
+    const firstUse = this.getStoredDate(REVIEW_STORAGE_KEYS.FIRST_USE_AT);
+    if (!firstUse) {
+      this.setItem(REVIEW_STORAGE_KEYS.FIRST_USE_AT, now);
+    }
+  }
+
+  private async promptIfEligible(): Promise<boolean> {
+    if (!this.shouldPrompt()) {
+      return false;
     }
 
     await this.delay(this.promptDelayMs);
     if (!this.shouldPrompt()) {
-      return;
+      return false;
     }
 
     const accepted = this.confirm.confirm(this.translate.instant('reviews.prompt'));
     const promptTimestamp = new Date().toISOString();
     this.setItem(REVIEW_STORAGE_KEYS.LAST_PROMPT_AT, promptTimestamp);
     if (!accepted) {
-      return;
+      return true;
     }
 
     const didRequest = await this.requestNativeReview();
     if (didRequest) {
       this.setItem(REVIEW_STORAGE_KEYS.COMPLETED_AT, promptTimestamp);
     }
+    return true;
   }
 
-  private recordLaunch(): void {
-    const now = new Date().toISOString();
-    const firstUse = this.getStoredDate(REVIEW_STORAGE_KEYS.FIRST_USE_AT);
-    if (!firstUse) {
-      this.setItem(REVIEW_STORAGE_KEYS.FIRST_USE_AT, now);
-    }
+  private setPendingPrompt(): void {
+    this.setItem(REVIEW_STORAGE_KEYS.PENDING, 'true');
+  }
 
-    const launchCount = this.getStoredNumber(REVIEW_STORAGE_KEYS.LAUNCH_COUNT) ?? 0;
-    this.setItem(REVIEW_STORAGE_KEYS.LAUNCH_COUNT, String(launchCount + 1));
+  private hasPendingPrompt(): boolean {
+    try {
+      return localStorage.getItem(REVIEW_STORAGE_KEYS.PENDING) === 'true';
+    } catch {
+      return false;
+    }
+  }
+
+  private clearPendingPrompt(): void {
+    try {
+      localStorage.removeItem(REVIEW_STORAGE_KEYS.PENDING);
+    } catch {
+      // Ignore storage failures.
+    }
   }
 
   private shouldPrompt(): boolean {

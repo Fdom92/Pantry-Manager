@@ -5,6 +5,7 @@ import type { BaseDoc } from '@core/models/shared';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmService, DownloadService, ShareService, createLatestOnlyRunner, withSignalFlag } from '../shared';
+import { ReviewPromptService } from '../shared/review-prompt.service';
 import { StorageService } from '../shared/storage.service';
 import { RevenuecatService } from '../upgrade/revenuecat.service';
 import { AppPreferencesService } from './app-preferences.service';
@@ -21,6 +22,7 @@ export class SettingsStateService {
   private readonly download = inject(DownloadService);
   private readonly confirm = inject(ConfirmService);
   private readonly share = inject(ShareService);
+  private readonly reviewPrompt = inject(ReviewPromptService);
 
   readonly isPro$ = this.revenuecat.isPro$;
   readonly themePreference = computed(() => this.appPreferences.preferences().theme);
@@ -122,6 +124,7 @@ export class SettingsStateService {
       const fileContents = await file.text();
       const docs = parseBackup(fileContents, new Date().toISOString());
       await this.applyImport(docs);
+      this.reviewPrompt.markEngagement();
       if (!this.lifecycle.isDestroyed()) {
         shouldReload = true;
       }
