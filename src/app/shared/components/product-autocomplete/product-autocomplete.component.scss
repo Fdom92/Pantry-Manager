@@ -1,0 +1,57 @@
+:host {
+  display: block;
+}
+
+.autocomplete-shell {
+  position: relative;
+}
+
+.autocomplete-options {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 10;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 240px;
+  overflow-y: auto;
+  border-radius: 12px;
+  border: 1px solid var(--app-surface-border, var(--ion-color-step-150));
+  background: var(--app-surface-bg, var(--ion-background-color, #fff));
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+.autocomplete-option {
+  --background: transparent;
+  --background-hover: color-mix(in srgb, var(--ion-color-primary) 8%, transparent);
+  cursor: pointer;
+}
+
+.autocomplete-option ion-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.autocomplete-option h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.autocomplete-option p {
+  margin: 0;
+  color: var(--app-surface-muted, var(--ion-color-medium));
+  font-size: 0.82rem;
+}
+
+.autocomplete-option .meta-info {
+  color: var(--ion-color-medium);
+  font-size: 0.76rem;
+}
+
+.autocomplete-empty {
+  --background: transparent;
+  color: var(--ion-color-medium);
+}
