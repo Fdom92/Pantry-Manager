@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { App as CapacitorApp } from '@capacitor/app';
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { PantryService } from '@core/services/pantry';
+import { ReviewPromptService } from '@core/services/shared/review-prompt.service';
 import { RevenuecatService } from '@core/services/upgrade';
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
@@ -16,6 +17,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 export class AppComponent {
   // DI
   private readonly pantryService = inject(PantryService);
+  private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly revenuecat = inject(RevenuecatService);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
@@ -30,6 +32,7 @@ export class AppComponent {
     await this.pantryService.initialize();
     await this.pantryService.ensureFirstPageLoaded();
     this.pantryService.startBackgroundLoad();
+    void this.reviewPrompt.handleAppForeground();
   }
 
   private async initializeRevenueCat(): Promise<void> {
@@ -38,6 +41,7 @@ export class AppComponent {
     CapacitorApp.addListener('appStateChange', async state => {
       if (state.isActive) {
         await this.revenuecat.restore();
+        await this.reviewPrompt.handleAppForeground();
       }
     });
   }

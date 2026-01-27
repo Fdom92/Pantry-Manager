@@ -703,5 +703,8 @@
       "feedbackSubtitle": "Teile Vorschläge oder melde Probleme.",
       "feedbackAction": "Feedback senden"
     }
+  },
+  "reviews": {
+    "prompt": "Gefällt dir PantryMind? Würdest du eine kurze Bewertung hinterlassen?"
   }
 }
