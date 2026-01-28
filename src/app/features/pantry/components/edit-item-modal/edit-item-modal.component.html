@@ -17,7 +17,7 @@
     </ion-header>
     <ion-content class="ion-padding create-item-modal-content">
       <form [formGroup]="state.form">
-        <ion-list lines="full">
+        <div class="form-section">
           <ion-item>
             <ion-input
               formControlName="name"
@@ -76,7 +76,7 @@
               {{ 'pantry.form.basic' | translate }}
             </ion-checkbox>
           </ion-item>
-        </ion-list>
+        </div>
 
         <div formArrayName="locations" class="location-form-list">
           @for (locationCtrl of state.locationsArray.controls; track $index; let i = $index) {
