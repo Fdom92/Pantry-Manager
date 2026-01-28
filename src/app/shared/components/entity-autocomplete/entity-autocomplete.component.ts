@@ -11,13 +11,13 @@ export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
 }
 
 @Component({
-  selector: 'app-product-autocomplete',
+  selector: 'app-entity-autocomplete',
   standalone: true,
   imports: [CommonModule, IonInput, IonItem, IonLabel, IonList],
-  templateUrl: './product-autocomplete.component.html',
-  styleUrls: ['./product-autocomplete.component.scss'],
+  templateUrl: './entity-autocomplete.component.html',
+  styleUrls: ['./entity-autocomplete.component.scss'],
 })
-export class ProductAutocompleteComponent<TRaw = unknown, TMeta = unknown> implements OnChanges {
+export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implements OnChanges {
   // DI
   private readonly host = inject(ElementRef<HTMLElement>);
   // INPUTS
@@ -34,13 +34,17 @@ export class ProductAutocompleteComponent<TRaw = unknown, TMeta = unknown> imple
   @Input() showSecondaryInfo = false;
   @Input() showMeta = false;
   @Input() emptyLabel = 'No results';
+  @Input() showEmptyAction = false;
+  @Input() emptyActionLabel = '';
   @Input() autofocus = false;
+  @Input() clearOnSelect = true;
   // OUTPUTS
   @Output() valueChange = new EventEmitter<string>();
   @Output() onSelect = new EventEmitter<AutocompleteItem<TRaw, TMeta>>();
   @Output() onClear = new EventEmitter<void>();
   @Output() onFocus = new EventEmitter<void>();
   @Output() onBlur = new EventEmitter<void>();
+  @Output() emptyAction = new EventEmitter<string>();
   // DATA
   inputValue = '';
   isFocused = false;
@@ -108,9 +112,26 @@ export class ProductAutocompleteComponent<TRaw = unknown, TMeta = unknown> imple
   }
 
   selectOption(option: AutocompleteItem<TRaw, TMeta>): void {
-    this.setValue('');
+    if (this.clearOnSelect) {
+      this.setValue('');
+    } else {
+      this.setValue(option.title ?? '');
+    }
     this.isFocused = false;
     this.onSelect.emit(option);
+  }
+
+  triggerEmptyAction(): void {
+    if (!this.showEmptyAction || !this.emptyActionLabel) {
+      return;
+    }
+    const currentValue = this.inputValue.trim();
+    if (currentValue) {
+      this.onClear.emit();
+    }
+    this.emptyAction.emit(currentValue);
+    this.setValue('');
+    this.isFocused = false;
   }
 
   shouldShowOptions(): boolean {

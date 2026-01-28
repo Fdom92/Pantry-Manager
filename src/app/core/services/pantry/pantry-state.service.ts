@@ -1,5 +1,4 @@
-import { DestroyRef, Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
@@ -15,7 +14,6 @@ import {
   getPresetSupermarketOptions,
   moveBatches,
   normalizeBatches,
-  parseFastAddEntries,
   sumQuantities,
   toNumberOrZero,
 } from '@core/domain/pantry';
@@ -30,6 +28,7 @@ import {
   PantryFilterState,
   PantryGroup,
   PantryItem,
+  FastAddEntry,
   PantryItemBatchViewModel,
   PantryItemCardViewModel,
   PantryItemGlobalStatus,
@@ -52,6 +51,8 @@ import {
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmService, withSignalFlag } from '../shared';
+import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 
 @Injectable()
 export class PantryStateService {
@@ -63,7 +64,6 @@ export class PantryStateService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly confirm = inject(ConfirmService);
-  private readonly destroyRef = inject(DestroyRef);
 
   // DATA
   readonly MeasurementUnit = MeasurementUnit;
@@ -92,13 +92,22 @@ export class PantryStateService {
   // Fast add modal
   readonly fastAddModalOpen = signal(false);
   readonly isFastAdding = signal(false);
-  readonly fastAddForm = this.fb.group({
-    entries: this.fb.control('', { nonNullable: true }),
-  });
-  private readonly fastAddEntries = signal<string>(this.fastAddForm.controls.entries.value);
-  readonly hasFastAddEntries = computed(() => {
-    return this.fastAddEntries().trim().length > 0;
-  });
+  readonly fastAddQuery = signal('');
+  readonly fastAddEntries = signal<FastAddEntry[]>([]);
+  readonly fastAddEntryViewModels = computed<EntitySelectorEntry[]>(() =>
+    this.fastAddEntries().map(entry => ({
+      id: entry.id,
+      title: entry.name,
+      quantity: entry.quantity,
+      unitLabel: entry.unitLabel,
+    }))
+  );
+  readonly hasFastAddEntries = computed(() => this.fastAddEntries().length > 0);
+  readonly fastAddOptions = computed(() =>
+    this.buildFastAddOptions(this.pantryItemsState(), this.fastAddEntries())
+  );
+  readonly showFastAddEmptyAction = computed(() => this.fastAddQuery().trim().length >= 1);
+  readonly fastAddEmptyActionLabel = computed(() => this.buildFastAddEmptyActionLabel());
 
   // Move modal
   readonly showMoveModal = signal(false);
@@ -156,12 +165,6 @@ export class PantryStateService {
   });
 
   constructor() {
-    this.fastAddForm.controls.entries.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(value => {
-        this.fastAddEntries.set(value);
-      });
-
     // Keep the UI in sync with the filtered pipeline, merging optimistic edits before rendering the list.
     effect(() => {
       const paginatedItems = this.pantryService.filteredProducts();
@@ -298,7 +301,8 @@ export class PantryStateService {
 
   // -------- Fast add --------
   openFastAddModal(): void {
-    this.fastAddForm.reset({ entries: '' });
+    this.fastAddEntries.set([]);
+    this.fastAddQuery.set('');
     this.fastAddModalOpen.set(true);
     this.isFastAdding.set(false);
   }
@@ -309,7 +313,8 @@ export class PantryStateService {
     }
     this.fastAddModalOpen.set(false);
     this.isFastAdding.set(false);
-    this.fastAddForm.reset({ entries: '' });
+    this.fastAddEntries.set([]);
+    this.fastAddQuery.set('');
   }
 
   dismissFastAddModal(): void {
@@ -320,8 +325,7 @@ export class PantryStateService {
     if (this.isFastAdding()) {
       return;
     }
-    const rawEntries = this.fastAddForm.get('entries')?.value ?? '';
-    const entries = parseFastAddEntries(rawEntries);
+    const entries = this.fastAddEntries().filter(entry => entry.quantity > 0);
     if (!entries.length) {
       return;
     }
@@ -330,19 +334,138 @@ export class PantryStateService {
       const nowIso = new Date().toISOString();
       const defaultLocationId = this.getDefaultLocationId();
       for (const entry of entries) {
-        const item = buildFastAddItemPayload({
-          id: createDocumentId('item'),
-          nowIso,
-          name: entry.name,
+        if (entry.isNew || !entry.item) {
+          const item = buildFastAddItemPayload({
+            id: createDocumentId('item'),
+            nowIso,
+            name: entry.name,
+            quantity: entry.quantity,
+            defaultLocationId,
+          });
+          await this.pantryStore.addItem(item);
+          continue;
+        }
+
+        const unit = this.pantryStore.getItemPrimaryUnit(entry.item);
+        const updated = await this.pantryService.addNewLot(entry.item._id, {
           quantity: entry.quantity,
-          defaultLocationId,
+          location: defaultLocationId,
+          unit,
         });
-        await this.pantryStore.addItem(item);
+        if (updated) {
+          await this.pantryStore.updateItem(updated);
+        }
       }
       this.dismissFastAddModal();
     }).catch(async err => {
       console.error('[PantryStateService] submitFastAdd error', err);
     });
+  }
+
+  onFastAddQueryChange(value: string): void {
+    this.fastAddQuery.set(value ?? '');
+  }
+
+  addFastAddEntry(option: AutocompleteItem<PantryItem>): void {
+    const item = option?.raw;
+    if (!item) {
+      return;
+    }
+    const unitLabel = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
+    this.fastAddEntries.update(current => {
+      const existingIndex = current.findIndex(entry => entry.item?._id === item._id);
+      if (existingIndex >= 0) {
+        const next = [...current];
+        const updated = { ...next[existingIndex] };
+        updated.quantity = Math.max(0, updated.quantity + 1);
+        next[existingIndex] = updated;
+        return next;
+      }
+      return [
+        ...current,
+        {
+          id: `fast-add:${item._id}`,
+          name: option.title,
+          quantity: 1,
+          unitLabel,
+          item,
+          isNew: false,
+        },
+      ];
+    });
+    this.fastAddQuery.set('');
+  }
+
+  addFastAddEntryFromQuery(name?: string): void {
+    const nextName = (name ?? this.fastAddQuery()).trim();
+    if (!nextName) {
+      return;
+    }
+    const normalized = normalizeKey(nextName);
+    const matchingItem = this.pantryItemsState()
+      .find(item => normalizeKey(item.name) === normalized);
+    if (matchingItem) {
+      const option: AutocompleteItem<PantryItem> = {
+        id: matchingItem._id,
+        title: matchingItem.name,
+        raw: matchingItem,
+      };
+      this.addFastAddEntry(option);
+      return;
+    }
+    const formattedName = formatFriendlyNameCatalog(nextName, nextName);
+    const unitLabel = this.pantryStore.getUnitLabel(MeasurementUnit.UNIT);
+    this.fastAddEntries.update(current => {
+      const existingIndex = current.findIndex(entry => normalizeKey(entry.name) === normalized);
+      if (existingIndex >= 0) {
+        const next = [...current];
+        const updated = { ...next[existingIndex] };
+        updated.quantity = Math.max(0, updated.quantity + 1);
+        next[existingIndex] = updated;
+        return next;
+      }
+      return [
+        ...current,
+        {
+          id: `fast-add:new:${normalized}`,
+          name: formattedName,
+          quantity: 1,
+          unitLabel,
+          isNew: true,
+        },
+      ];
+    });
+    this.fastAddQuery.set('');
+  }
+
+  adjustFastAddEntry(entry: FastAddEntry, delta: number): void {
+    const nextDelta = Number.isFinite(delta) ? delta : 0;
+    if (!nextDelta) {
+      return;
+    }
+    this.fastAddEntries.update(current => {
+      const index = current.findIndex(row => row.id === entry.id);
+      if (index < 0) {
+        return current;
+      }
+      const next = [...current];
+      const updated = { ...next[index] };
+      updated.quantity = Math.max(0, updated.quantity + nextDelta);
+      if (updated.quantity <= 0) {
+        next.splice(index, 1);
+        return next;
+      }
+      next[index] = updated;
+      return next;
+    });
+  }
+
+  adjustFastAddEntryById(entryId: string, delta: number): void {
+    const entry = this.fastAddEntries().find(current => current.id === entryId);
+    if (!entry) {
+      return;
+    }
+    this.adjustFastAddEntry(entry, delta);
   }
 
   // -------- Expand/collapse + list UI state --------
@@ -1573,8 +1696,31 @@ export class PantryStateService {
     return formatCategoryNameCatalog(key, this.translate.instant('pantry.form.uncategorized'));
   }
 
-  private formatFriendlyName(value: string, fallback: string): string {
-    return formatFriendlyNameCatalog(value, fallback);
+  private buildFastAddOptions(items: PantryItem[], entries: FastAddEntry[]): AutocompleteItem<PantryItem>[] {
+    const locale = this.languageService.getCurrentLocale();
+    const excluded = new Set(entries.map(entry => entry.item?._id).filter(Boolean) as string[]);
+    return (items ?? [])
+      .filter(item => !excluded.has(item._id))
+      .map(item => {
+        const total = this.pantryStore.getItemTotalQuantity(item);
+        const unit = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
+        const formattedQty = formatQuantity(total, locale, { maximumFractionDigits: 1 });
+        return {
+          id: item._id,
+          title: item.name,
+          subtitle: `${formattedQty} ${unit}`.trim(),
+          raw: item,
+        };
+      });
+  }
+
+  private buildFastAddEmptyActionLabel(): string {
+    const name = this.fastAddQuery().trim();
+    if (!name) {
+      return '';
+    }
+    const formatted = formatFriendlyNameCatalog(name, name);
+    return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   }
 
   private getDefaultLocationId(): string {

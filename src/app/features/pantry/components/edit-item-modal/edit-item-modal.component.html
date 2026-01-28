@@ -27,39 +27,39 @@
               required>
             </ion-input>
           </ion-item>
-          <ion-item>
-            @let categoryOptions = state.getCategorySelectOptions();
-            <ion-select
-              formControlName="categoryId"
-              interface="popover"
-              label="{{ 'pantry.form.category' | translate }}"
+          <div class="form-autocomplete">
+            <app-entity-autocomplete
+              [items]="state.getCategoryAutocompleteOptions()"
+              [label]="'pantry.form.category' | translate"
               labelPlacement="stacked"
               [placeholder]="'pantry.form.categoryPlaceholder' | translate"
-              (ionChange)="state.onCategoryChange($event)">
-              @for (option of categoryOptions; track option.value) {
-                <ion-select-option [value]="option.value">
-                  {{ option.label }}
-                </ion-select-option>
-              }
-            </ion-select>
-          </ion-item>
+              [showAllOnFocus]="true"
+              [showEmptyAction]="true"
+              [emptyActionLabel]="'pantry.form.categoryAdd.option' | translate"
+              [emptyLabel]="'common.selects.noOptions' | translate"
+              [value]="state.form.get('categoryId')?.value ?? ''"
+              [clearOnSelect]="false"
+              (onSelect)="state.onCategoryAutocompleteSelect($event)"
+              (emptyAction)="state.addCategoryOptionFromText($event)">
+            </app-entity-autocomplete>
+          </div>
 
-          <ion-item>
-            @let supermarketOptions = state.getSupermarketSelectOptions();
-            <ion-select
-              formControlName="supermarket"
-              interface="popover"
-              label="{{ 'pantry.form.supermarket' | translate }}"
+          <div class="form-autocomplete">
+            <app-entity-autocomplete
+              [items]="state.getSupermarketAutocompleteOptions()"
+              [label]="'pantry.form.supermarket' | translate"
               labelPlacement="stacked"
               [placeholder]="'pantry.form.supermarketPlaceholder' | translate"
-              (ionChange)="state.onSupermarketChange($event)">
-              @for (option of supermarketOptions; track option.value) {
-                <ion-select-option [value]="option.value">
-                  {{ option.label }}
-                </ion-select-option>
-              }
-            </ion-select>
-          </ion-item>
+              [showAllOnFocus]="true"
+              [showEmptyAction]="true"
+              [emptyActionLabel]="'pantry.form.supermarketAdd.option' | translate"
+              [emptyLabel]="'common.selects.noOptions' | translate"
+              [value]="state.form.get('supermarket')?.value ?? ''"
+              [clearOnSelect]="false"
+              (onSelect)="state.onSupermarketAutocompleteSelect($event)"
+              (emptyAction)="state.addSupermarketOptionFromText($event)">
+            </app-entity-autocomplete>
+          </div>
 
           <ion-item>
             <ion-input
@@ -205,19 +205,5 @@
         </ion-button>
       </ion-toolbar>
     </ion-footer>
-    <ion-alert
-      [isOpen]="state.isSupermarketPromptOpen()"
-      [header]="'pantry.form.supermarketAdd.title' | translate"
-      [inputs]="state.getSupermarketPromptInputs()"
-      [buttons]="state.getSupermarketPromptButtons()"
-      (didDismiss)="state.onSupermarketPromptDismiss()">
-    </ion-alert>
-    <ion-alert
-      [isOpen]="state.isCategoryPromptOpen()"
-      [header]="'pantry.form.categoryAdd.title' | translate"
-      [inputs]="state.getCategoryPromptInputs()"
-      [buttons]="state.getCategoryPromptButtons()"
-      (didDismiss)="state.onCategoryPromptDismiss()">
-    </ion-alert>
   </ng-template>
 </ion-modal>

@@ -125,7 +125,33 @@
     </div>
   }
 
-  <app-pantry-fast-add-modal></app-pantry-fast-add-modal>
+  <app-entity-selector-modal
+    [isOpen]="facade.fastAddModalOpen()"
+    [title]="'pantry.fastAdd.title' | translate"
+    [cardTitle]="'pantry.fastAdd.cardTitle' | translate"
+    [subtitle]="'pantry.fastAdd.subtitle' | translate"
+    [placeholder]="'pantry.fastAdd.placeholder' | translate"
+    [emptyLabel]="'pantry.fastAdd.noResults' | translate"
+    [entriesEmptyLabel]="'pantry.fastAdd.empty' | translate"
+    [saveLabel]="'pantry.fastAdd.submit' | translate"
+    [saving]="facade.isFastAdding()"
+    [disableSave]="!facade.hasFastAddEntries()"
+    [items]="facade.fastAddOptions()"
+    [entries]="facade.fastAddEntryViewModels()"
+    [showSecondaryInfo]="true"
+    [showMeta]="false"
+    [showAllOnFocus]="true"
+    [autofocus]="true"
+    [showEmptyAction]="facade.showFastAddEmptyAction()"
+    [emptyActionLabel]="facade.fastAddEmptyActionLabel()"
+    (willDismiss)="facade.dismissFastAddModal()"
+    (didDismiss)="facade.closeFastAddModal()"
+    (selectItem)="facade.addFastAddEntry($event)"
+    (queryChange)="facade.onFastAddQueryChange($event)"
+    (emptyAction)="facade.addFastAddEntryFromQuery($event)"
+    (adjustEntry)="facade.adjustFastAddEntryById($event.entry.id, $event.delta)"
+    (save)="facade.submitFastAdd()">
+  </app-entity-selector-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
   <app-pantry-move-modal></app-pantry-move-modal>
   <app-pantry-filters-modal></app-pantry-filters-modal>

@@ -11,6 +11,10 @@ ion-title, ion-back-button {
   margin: 48px auto;
 }
 
+.form-autocomplete {
+  padding: 6px 0;
+}
+
 .location-form-list {
   display: flex;
   flex-direction: column;
@@ -79,4 +83,3 @@ ion-title, ion-back-button {
 .modal-footer ion-button {
   width: 100%;
 }
-

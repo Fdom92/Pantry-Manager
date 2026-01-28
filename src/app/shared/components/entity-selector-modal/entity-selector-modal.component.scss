@@ -6,14 +6,14 @@ ion-title, ion-back-button {
   color: var(--ion-text-color, var(--ion-text-color));
 }
 
-.consume-today-content {
+.entity-selector-content {
   display: flex;
   flex-direction: column;
   gap: 16px;
   overflow: visible;
 }
 
-.consume-today-card {
+.entity-selector-card {
   margin: 0;
   padding: 12px 14px;
   border-radius: 16px;
@@ -33,8 +33,62 @@ ion-modal::part(content) {
   overflow: visible;
 }
 
-ion-modal::part(backdrop) {
+.entity-selector-card ion-item {
+  --background: transparent;
+}
+
+.entity-selector-card__header {
+  margin-bottom: 10px;
+}
+
+.entity-selector-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.entity-selector-card__subtitle {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+}
+
+.entity-selector-card__content {
   overflow: visible;
+}
+
+.entity-selector-list {
+  margin-top: 4px;
+}
+
+.entity-selector-item h3 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.entity-selector-item p {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: 0.85rem;
+}
+
+.entity-selector-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.entity-selector-qty {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.entity-selector-empty {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
 }
 
 .modal-footer ion-toolbar {
@@ -46,63 +100,4 @@ ion-modal::part(backdrop) {
 
 .modal-footer ion-button {
   width: 100%;
-}
-
-.consume-today-card ion-item {
-  --background: transparent;
-}
-
-.consume-today-card__header {
-  margin-bottom: 10px;
-}
-
-.consume-today-card__title {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-
-.consume-today-card__subtitle {
-  margin: 4px 0 0;
-  font-size: 0.85rem;
-  color: var(--ion-color-medium);
-}
-
-.consume-today-card__content {
-  overflow: visible;
-}
-
-
-.consume-today-list {
-  margin-top: 4px;
-}
-
-.consume-today-item h3 {
-  margin: 0;
-  font-size: 0.98rem;
-  font-weight: 600;
-}
-
-.consume-today-item p {
-  margin: 0;
-  color: var(--ion-color-medium);
-  font-size: 0.85rem;
-}
-
-.consume-today-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.consume-today-qty {
-  min-width: 28px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.consume-today-empty {
-  display: block;
-  text-align: center;
-  margin-top: 12px;
 }
