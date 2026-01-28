@@ -24,7 +24,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { PantryBatchesModalComponent } from './components/batches-modal/batches-modal.component';
 import { PantryEditItemModalComponent } from './components/edit-item-modal/edit-item-modal.component';
-import { PantryFastAddModalComponent } from './components/fast-add-modal/fast-add-modal.component';
+import { EntitySelectorModalComponent } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { PantryFiltersModalComponent } from './components/filters-modal/filters-modal.component';
 import { PantryMoveModalComponent } from './components/move-modal/move-modal.component';
 import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.component';
@@ -56,7 +56,7 @@ import { PantryStateService } from '@core/services/pantry/pantry-state.service';
     PantryDetailComponent,
     TranslateModule,
     EmptyStateComponent,
-    PantryFastAddModalComponent,
+    EntitySelectorModalComponent,
     PantryBatchesModalComponent,
     PantryMoveModalComponent,
     PantryFiltersModalComponent,

@@ -261,5 +261,27 @@
     }
   </div>
 
-  <app-consume-today-modal></app-consume-today-modal>
+  <app-entity-selector-modal
+    [isOpen]="facade.isConsumeTodayOpen()"
+    [title]="'dashboard.consumeToday.title' | translate"
+    [cardTitle]="'dashboard.consumeToday.cardTitle' | translate"
+    [subtitle]="'dashboard.consumeToday.selectHint' | translate"
+    [placeholder]="'dashboard.consumeToday.placeholder' | translate"
+    [emptyLabel]="'dashboard.consumeToday.noResults' | translate"
+    [entriesEmptyLabel]="'dashboard.consumeToday.empty' | translate"
+    [saveLabel]="'dashboard.consumeToday.save' | translate"
+    [saving]="facade.consumeSaving()"
+    [disableSave]="!facade.canSaveConsumeToday()"
+    [items]="facade.consumeTodayOptions()"
+    [entries]="facade.consumeEntryViewModels()"
+    [showSecondaryInfo]="true"
+    [showMeta]="true"
+    [showAllOnFocus]="true"
+    [autofocus]="true"
+    (willDismiss)="facade.dismissConsumeTodayModal()"
+    (didDismiss)="facade.closeConsumeTodayModal()"
+    (selectItem)="facade.addConsumeEntry($event)"
+    (adjustEntry)="facade.adjustConsumeEntryById($event.entry.id, $event.delta)"
+    (save)="facade.saveConsumeToday()">
+  </app-entity-selector-modal>
 </ion-content>

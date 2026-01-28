@@ -34,6 +34,10 @@
             </ion-label>
           </ion-item>
         }
+      } @else if (showEmptyAction && emptyActionLabel) {
+        <ion-item button="true" class="autocomplete-option autocomplete-option--empty" (click)="triggerEmptyAction()">
+          <ion-label>{{ emptyActionLabel }}</ion-label>
+        </ion-item>
       } @else {
         <ion-item class="autocomplete-empty">
           <ion-label>{{ emptyLabel }}</ion-label>

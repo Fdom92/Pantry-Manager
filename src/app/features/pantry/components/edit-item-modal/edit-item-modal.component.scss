@@ -11,6 +11,25 @@ ion-title, ion-back-button {
   margin: 48px auto;
 }
 
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 16px;
+  background: var(--ion-card-background, var(--ion-card-background));
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  overflow: visible;
+}
+
+.form-section ion-item {
+  --background: transparent;
+}
+
+.form-autocomplete {
+  padding: 6px 0;
+}
+
 .location-form-list {
   display: flex;
   flex-direction: column;
@@ -79,4 +98,3 @@ ion-title, ion-back-button {
 .modal-footer ion-button {
   width: 100%;
 }
-

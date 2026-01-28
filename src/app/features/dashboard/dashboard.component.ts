@@ -16,7 +16,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
-import { ConsumeTodayModalComponent } from './components/consume-today-modal/consume-today-modal.component';
+import { EntitySelectorModalComponent } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -35,7 +35,7 @@ import { ConsumeTodayModalComponent } from './components/consume-today-modal/con
     CommonModule,
     TranslateModule,
     InsightCardComponent,
-    ConsumeTodayModalComponent,
+    EntitySelectorModalComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],

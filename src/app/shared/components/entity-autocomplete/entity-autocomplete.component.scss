@@ -28,6 +28,11 @@
   cursor: pointer;
 }
 
+.autocomplete-option--empty ion-label {
+  font-weight: 600;
+  color: var(--ion-color-primary);
+}
+
 .autocomplete-option ion-label {
   display: flex;
   flex-direction: column;

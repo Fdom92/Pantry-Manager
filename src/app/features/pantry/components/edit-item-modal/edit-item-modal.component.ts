@@ -10,7 +10,6 @@ import {
   IonHeader,
   IonIcon,
   IonInput,
-  IonAlert,
   IonItem,
   IonList,
   IonModal,
@@ -25,6 +24,7 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pantry-edit-item-modal-state.service';
+import { EntityAutocompleteComponent } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 
 @Component({
   selector: 'app-pantry-edit-item-modal',
@@ -44,7 +44,6 @@ import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pa
     IonContent,
     IonList,
     IonItem,
-    IonAlert,
     IonInput,
     IonNote,
     IonSelect,
@@ -53,6 +52,7 @@ import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pa
     IonToggle,
     IonFooter,
     IonSpinner,
+    EntityAutocompleteComponent,
   ],
   templateUrl: './edit-item-modal.component.html',
   styleUrls: ['./edit-item-modal.component.scss'],

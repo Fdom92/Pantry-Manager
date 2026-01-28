@@ -26,7 +26,8 @@ import {
 } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import type { AutocompleteItem } from '@shared/components/product-autocomplete/product-autocomplete.component';
+import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 
 
 @Injectable()
@@ -55,6 +56,15 @@ export class DashboardStateService {
   readonly visibleInsights = signal<Insight[]>([]);
   readonly isConsumeTodayOpen = signal(false);
   readonly consumeEntries = signal<ConsumeTodayEntry[]>([]);
+  readonly consumeEntryViewModels = computed<EntitySelectorEntry[]>(() =>
+    this.consumeEntries().map(entry => ({
+      id: entry.itemId,
+      title: entry.title,
+      quantity: entry.quantity,
+      unitLabel: entry.unitLabel,
+      maxQuantity: entry.maxQuantity,
+    }))
+  );
   readonly consumeSaving = signal(false);
 
   readonly totalItems = computed(() => this.inventorySummary().total);
@@ -258,6 +268,14 @@ export class DashboardStateService {
       next[index] = updated;
       return next;
     });
+  }
+
+  adjustConsumeEntryById(entryId: string, delta: number): void {
+    const entry = this.consumeEntries().find(current => current.itemId === entryId);
+    if (!entry) {
+      return;
+    }
+    this.adjustConsumeEntry(entry, delta);
   }
 
   async saveConsumeToday(): Promise<void> {
