@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { IonInput, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 
 export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
@@ -18,6 +18,9 @@ export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
   styleUrls: ['./product-autocomplete.component.scss'],
 })
 export class ProductAutocompleteComponent<TRaw = unknown, TMeta = unknown> implements OnChanges {
+  // DI
+  private readonly host = inject(ElementRef<HTMLElement>);
+  // INPUTS
   @Input() items: readonly AutocompleteItem<TRaw, TMeta>[] = [];
   @Input() placeholder?: string;
   @Input() label?: string;
@@ -32,13 +35,13 @@ export class ProductAutocompleteComponent<TRaw = unknown, TMeta = unknown> imple
   @Input() showMeta = false;
   @Input() emptyLabel = 'No results';
   @Input() autofocus = false;
-
+  // OUTPUTS
   @Output() valueChange = new EventEmitter<string>();
   @Output() onSelect = new EventEmitter<AutocompleteItem<TRaw, TMeta>>();
   @Output() onClear = new EventEmitter<void>();
   @Output() onFocus = new EventEmitter<void>();
   @Output() onBlur = new EventEmitter<void>();
-
+  // DATA
   inputValue = '';
   isFocused = false;
   private blurTimeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -50,6 +53,21 @@ export class ProductAutocompleteComponent<TRaw = unknown, TMeta = unknown> imple
         this.inputValue = next;
       }
     }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.isFocused) {
+      return;
+    }
+    const target = event.target as Node | null;
+    if (!target) {
+      return;
+    }
+    if (this.host.nativeElement.contains(target)) {
+      return;
+    }
+    this.isFocused = false;
   }
 
   onInput(event: CustomEvent): void {
@@ -141,16 +159,16 @@ export class ProductAutocompleteComponent<TRaw = unknown, TMeta = unknown> imple
     return JSON.stringify(option.meta);
   }
 
+  trackOption(index: number, option: AutocompleteItem<TRaw, TMeta>): string | number {
+    return option?.id ?? option?.title ?? index;
+  }
+
   private setValue(next: string): void {
     if (next === this.inputValue) {
       return;
     }
     this.inputValue = next;
     this.valueChange.emit(next);
-  }
-
-  trackOption(index: number, option: AutocompleteItem<TRaw, TMeta>): string | number {
-    return option?.id ?? option?.title ?? index;
   }
 
   private getOptionName(option: AutocompleteItem<TRaw, TMeta>): string {

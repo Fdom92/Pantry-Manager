@@ -135,8 +135,14 @@
         "alerts": {
           "title": "Alertas"
         },
-        "maintenance": {
-          "title": "Manutenção"
+        "dailyActions": {
+          "title": "Daily actions"
+        },
+        "control": {
+          "title": "Control"
+        },
+        "insights": {
+          "title": "Insights"
         },
         "activity": {
           "title": "Atividade"
@@ -167,6 +173,11 @@
           "title": "Lista de compras",
           "body": "{{ count }} produtos pendentes",
           "action": "Ver"
+        },
+        "consumeToday": {
+          "title": "Consumed today",
+          "body": "Log what you used today",
+          "action": "Add"
         },
         "recentlyAdded": {
           "title": "Adicionados recentemente",
@@ -213,6 +224,16 @@
       "updated": "Atualizado em {{ date }}",
       "badge": "Novo",
       "empty": "Sem atualizações recentes."
+    },
+    "consumeToday": {
+      "title": "Consumed today",
+      "cardTitle": "Add products",
+      "selectHint": "Pick what you used today, then set quantities.",
+      "listTitle": "Your list",
+      "placeholder": "Search products",
+      "noResults": "No results",
+      "empty": "No items added yet.",
+      "save": "Save"
     }
   },
   "shopping": {
