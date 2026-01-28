@@ -133,7 +133,9 @@
       "aria": "Resumen de la despensa",
       "sections": {
         "alerts": { "title": "Alertas" },
-        "maintenance": { "title": "Mantenimiento" },
+        "dailyActions": { "title": "Acciones diarias" },
+        "control": { "title": "Control" },
+        "insights": { "title": "Insights" },
         "activity": { "title": "Actividad" }
       },
       "cards": {
@@ -161,6 +163,11 @@
           "title": "Lista de la compra",
           "body": "{{ count }} productos pendientes",
           "action": "Ver"
+        },
+        "consumeToday": {
+          "title": "Consumido hoy",
+          "body": "Registra lo que has usado hoy",
+          "action": "Añadir"
         },
         "recentlyAdded": {
           "title": "Añadidos recientemente",
@@ -207,6 +214,16 @@
       "updated": "Actualizado {{ date }}",
       "badge": "Nuevo",
       "empty": "Sin actualizaciones recientes."
+    },
+    "consumeToday": {
+      "title": "Consumido hoy",
+      "cardTitle": "Añade productos",
+      "selectHint": "Elige lo que has consumido y ajusta cantidades.",
+      "listTitle": "Tu lista",
+      "placeholder": "Buscar productos",
+      "noResults": "Sin resultados",
+      "empty": "Todavía no has añadido productos.",
+      "save": "Guardar"
     }
   },
   "shopping": {

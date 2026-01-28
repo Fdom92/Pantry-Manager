@@ -1,8 +1,15 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
-import { getLocationEarliestExpiry, getLocationQuantity } from '@core/domain/pantry';
-import type { Insight, InsightContext, InsightCta, ItemLocationStock, PantryItem } from '@core/models';
+import { getLocationEarliestExpiry, getLocationQuantity, toNumberOrZero } from '@core/domain/pantry';
+import type {
+  Insight,
+  InsightContext,
+  InsightCta,
+  ItemLocationStock,
+  PantryItem,
+} from '@core/models';
+import type { ConsumeTodayEntry, DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { AgentConversationStore } from '../agent/agent-conversation.store';
 import { LanguageService } from '../shared/language.service';
@@ -19,14 +26,8 @@ import {
 } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import type { AutocompleteItem } from '@shared/components/product-autocomplete/product-autocomplete.component';
 
-export type DashboardOverviewCardId =
-  | 'expired'
-  | 'near-expiry'
-  | 'pending-review'
-  | 'low-or-empty'
-  | 'recently-added'
-  | 'shopping';
 
 @Injectable()
 export class DashboardStateService {
@@ -52,6 +53,9 @@ export class DashboardStateService {
   readonly lastRefreshTimestamp = signal<string | null>(null);
   readonly isDeletingExpiredItems = signal(false);
   readonly visibleInsights = signal<Insight[]>([]);
+  readonly isConsumeTodayOpen = signal(false);
+  readonly consumeEntries = signal<ConsumeTodayEntry[]>([]);
+  readonly consumeSaving = signal(false);
 
   readonly totalItems = computed(() => this.inventorySummary().total);
   readonly recentlyUpdatedItems = computed(() => getRecentItemsByUpdatedAt(this.pantryItems()));
@@ -80,6 +84,16 @@ export class DashboardStateService {
       }
       return now.getTime() - createdAt.getTime() <= windowMs;
     }).length;
+  });
+  readonly consumeTodayOptions = computed(() => {
+    const excluded = new Set(this.consumeEntries().map(entry => entry.itemId));
+    return this.buildConsumeTodayOptions(this.pantryItems(), excluded);
+  });
+  readonly canSaveConsumeToday = computed(() => {
+    if (this.consumeSaving()) {
+      return false;
+    }
+    return this.consumeEntries().some(entry => entry.quantity > 0);
   });
 
   get nearExpiryWindow(): number {
@@ -176,6 +190,96 @@ export class DashboardStateService {
     }
   }
 
+  openConsumeTodayModal(): void {
+    this.isConsumeTodayOpen.set(true);
+  }
+
+  dismissConsumeTodayModal(): void {
+    this.isConsumeTodayOpen.set(false);
+  }
+
+  closeConsumeTodayModal(): void {
+    this.consumeEntries.set([]);
+    this.consumeSaving.set(false);
+  }
+
+  addConsumeEntry(option: AutocompleteItem<PantryItem>): void {
+    const item = option?.raw;
+    if (!item) {
+      return;
+    }
+    const maxQuantity = Math.max(0, this.pantryStore.getItemTotalQuantity(item));
+    if (maxQuantity <= 0) {
+      return;
+    }
+    const unitLabel = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
+    this.consumeEntries.update(current => {
+      const existingIndex = current.findIndex(entry => entry.itemId === item._id);
+      if (existingIndex >= 0) {
+        const next = [...current];
+        const updated = { ...next[existingIndex] };
+        updated.maxQuantity = maxQuantity;
+        updated.quantity = Math.min(maxQuantity, updated.quantity + 1);
+        next[existingIndex] = updated;
+        return next;
+      }
+      return [
+        ...current,
+        {
+          itemId: item._id,
+          title: option.title,
+          unitLabel,
+          quantity: Math.min(1, maxQuantity),
+          maxQuantity,
+          item,
+        },
+      ];
+    });
+  }
+
+  adjustConsumeEntry(entry: ConsumeTodayEntry, delta: number): void {
+    const nextDelta = Number.isFinite(delta) ? delta : 0;
+    if (!nextDelta) {
+      return;
+    }
+    this.consumeEntries.update(current => {
+      const index = current.findIndex(row => row.itemId === entry.itemId);
+      if (index < 0) {
+        return current;
+      }
+      const next = [...current];
+      const updated = { ...next[index] };
+      const maxQuantity = Math.max(0, updated.maxQuantity);
+      updated.quantity = Math.min(maxQuantity, Math.max(0, updated.quantity + nextDelta));
+      if (updated.quantity <= 0) {
+        next.splice(index, 1);
+        return next;
+      }
+      next[index] = updated;
+      return next;
+    });
+  }
+
+  async saveConsumeToday(): Promise<void> {
+    if (!this.canSaveConsumeToday()) {
+      return;
+    }
+    const entries = this.consumeEntries().filter(entry => entry.quantity > 0);
+    if (!entries.length) {
+      return;
+    }
+    await withSignalFlag(this.consumeSaving, async () => {
+      const updates = entries
+        .map(entry => this.applyConsumeToday(entry.item, entry.quantity))
+        .filter((item): item is PantryItem => Boolean(item));
+      await Promise.all(updates.map(item => this.pantryStore.updateItem(item)));
+    }).catch(err => {
+      console.error('[DashboardStateService] consume today error', err);
+    });
+    this.dismissConsumeTodayModal();
+    this.closeConsumeTodayModal();
+  }
+
   toggleSnapshotCard(): void {
     this.isSnapshotCardExpanded.update(open => !open);
   }
@@ -236,6 +340,29 @@ export class DashboardStateService {
       .join(', ');
   }
 
+  buildConsumeTodayOptions(
+    items: PantryItem[],
+    excludedIds: Set<string> = new Set()
+  ): AutocompleteItem<PantryItem, string>[] {
+    const locale = this.languageService.getCurrentLocale();
+    return (items ?? [])
+      .filter(item => !excludedIds.has(item._id))
+      .filter(item => this.pantryStore.getItemTotalQuantity(item) > 0)
+      .map(item => {
+      const total = this.pantryStore.getItemTotalQuantity(item);
+      const unit = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
+      const formattedQty = formatQuantity(total, locale, { maximumFractionDigits: 1 });
+      const subtitle = `${formattedQty} ${unit}`.trim();
+      return {
+        id: item._id,
+        title: item.name,
+        subtitle,
+        meta: this.getConsumeMetaLabel(item, locale),
+        raw: item,
+      };
+    });
+  }
+
   formatLastUpdated(value: string | null): string {
     return formatDateTimeValue(value, this.languageService.getCurrentLocale(), { fallback: '' });
   }
@@ -266,6 +393,111 @@ export class DashboardStateService {
     return formatQuantity(value, this.languageService.getCurrentLocale(), {
       maximumFractionDigits: 1,
     });
+  }
+
+  private getConsumeMetaLabel(item: PantryItem, locale: string): string {
+    const batches = item.locations?.reduce((sum, loc) => sum + (loc.batches?.length ?? 0), 0) ?? 0;
+    const batchLabel = this.translate.instant(
+      batches === 1 ? 'dashboard.batches.single' : 'dashboard.batches.plural',
+      { count: batches }
+    );
+    const earliest = this.pantryStore.getItemEarliestExpiry(item);
+    if (!earliest) {
+      return batchLabel;
+    }
+    const formatted = formatShortDate(earliest, locale, { fallback: earliest });
+    return this.translate.instant('dashboard.batches.withExpiry', {
+      batchLabel,
+      date: formatted,
+    });
+  }
+
+  private applyConsumeToday(item: PantryItem, amount: number): PantryItem | null {
+    const delta = toNumberOrZero(amount);
+    if (delta <= 0) {
+      return null;
+    }
+    const nextLocations = (item.locations ?? []).map(location => ({
+      ...location,
+      batches: Array.isArray(location.batches) ? location.batches.map(batch => ({ ...batch })) : [],
+    }));
+    const batchRefs: Array<{
+      locationIndex: number;
+      batchIndex: number;
+      expiration?: string;
+      order: number;
+    }> = [];
+    let order = 0;
+    for (let i = 0; i < nextLocations.length; i++) {
+      const batches = nextLocations[i].batches ?? [];
+      for (let j = 0; j < batches.length; j++) {
+        const quantity = toNumberOrZero(batches[j]?.quantity);
+        if (quantity <= 0) {
+          continue;
+        }
+        batchRefs.push({
+          locationIndex: i,
+          batchIndex: j,
+          expiration: batches[j]?.expirationDate ?? undefined,
+          order: order++,
+        });
+      }
+    }
+
+    if (!batchRefs.length) {
+      return null;
+    }
+
+    batchRefs.sort((a, b) => {
+      const left = this.getExpiryValue(a.expiration);
+      const right = this.getExpiryValue(b.expiration);
+      if (left === right) {
+        return a.order - b.order;
+      }
+      return left - right;
+    });
+
+    let remaining = delta;
+    for (const ref of batchRefs) {
+      if (remaining <= 0) {
+        break;
+      }
+      const location = nextLocations[ref.locationIndex];
+      const batch = location.batches?.[ref.batchIndex];
+      if (!batch) {
+        continue;
+      }
+      const quantity = toNumberOrZero(batch.quantity);
+      if (quantity <= 0) {
+        continue;
+      }
+      if (quantity <= remaining + 1e-9) {
+        remaining -= quantity;
+        batch.quantity = 0;
+      } else {
+        batch.quantity = quantity - remaining;
+        remaining = 0;
+      }
+    }
+
+    for (const location of nextLocations) {
+      if (Array.isArray(location.batches)) {
+        location.batches = location.batches.filter(batch => toNumberOrZero(batch.quantity) > 0);
+      }
+    }
+
+    return {
+      ...item,
+      locations: nextLocations,
+    };
+  }
+
+  private getExpiryValue(value?: string): number {
+    if (!value) {
+      return Number.POSITIVE_INFINITY;
+    }
+    const time = Date.parse(value);
+    return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time;
   }
 
   private canDeleteExpiredItems(): boolean {

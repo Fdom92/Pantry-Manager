@@ -134,7 +134,11 @@ ion-title {
   --card-accent: var(--ion-color-secondary);
 }
 
-@media (max-width: 360px) {
+.overview-card--consume {
+  --card-accent: var(--ion-color-success);
+}
+
+@media (max-width: 470px) {
   .overview-grid {
     grid-template-columns: 1fr;
   }
