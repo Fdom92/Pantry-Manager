@@ -85,3 +85,37 @@ export function normalizeSupermarketValue(value?: string | null): string | undef
   const normalized = normalizeWhitespace(value);
   return normalized || undefined;
 }
+
+export function formatFriendlyName(value: string, fallback: string): string {
+  const key = value?.trim();
+  if (!key) {
+    return fallback;
+  }
+  const plain = key.replace(/^(category:|location:)/i, '');
+  return plain
+    .split(/[-_:]/)
+    .filter(Boolean)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+export function normalizeEntityName(value: string, fallback: string): string {
+  return formatFriendlyName(value, fallback);
+}
+
+export function dedupeByNormalizedKey<T>(
+  items: T[],
+  keyFn: (item: T) => string,
+): T[] {
+  const seen = new Set<string>();
+  const result: T[] = [];
+  for (const item of items) {
+    const key = normalizeKey(keyFn(item));
+    if (!key || seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    result.push(item);
+  }
+  return result;
+}

@@ -28,6 +28,7 @@ import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
+import { findEntryByKey, toEntitySelectorEntries } from '@core/utils/entity-selector.util';
 
 
 @Injectable()
@@ -57,7 +58,7 @@ export class DashboardStateService {
   readonly isConsumeTodayOpen = signal(false);
   readonly consumeEntries = signal<ConsumeTodayEntry[]>([]);
   readonly consumeEntryViewModels = computed<EntitySelectorEntry[]>(() =>
-    this.consumeEntries().map(entry => ({
+    toEntitySelectorEntries(this.consumeEntries(), entry => ({
       id: entry.itemId,
       title: entry.title,
       quantity: entry.quantity,
@@ -271,7 +272,7 @@ export class DashboardStateService {
   }
 
   adjustConsumeEntryById(entryId: string, delta: number): void {
-    const entry = this.consumeEntries().find(current => current.itemId === entryId);
+    const entry = findEntryByKey(this.consumeEntries(), entryId, current => current.itemId);
     if (!entry) {
       return;
     }

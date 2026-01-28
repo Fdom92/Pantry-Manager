@@ -8,7 +8,6 @@ import {
   computeEarliestExpiry,
   computeSupermarketSuggestions,
   formatCategoryName as formatCategoryNameCatalog,
-  formatFriendlyName as formatFriendlyNameCatalog,
   getPresetCategoryOptions,
   getPresetLocationOptions,
   getPresetSupermarketOptions,
@@ -53,6 +52,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { ConfirmService, withSignalFlag } from '../shared';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
+import { dedupeByNormalizedKey, normalizeEntityName } from '@core/utils/normalization.util';
+import { findEntryByKey, toEntitySelectorEntries } from '@core/utils/entity-selector.util';
 
 @Injectable()
 export class PantryStateService {
@@ -95,7 +96,7 @@ export class PantryStateService {
   readonly fastAddQuery = signal('');
   readonly fastAddEntries = signal<FastAddEntry[]>([]);
   readonly fastAddEntryViewModels = computed<EntitySelectorEntry[]>(() =>
-    this.fastAddEntries().map(entry => ({
+    toEntitySelectorEntries(this.fastAddEntries(), entry => ({
       id: entry.id,
       title: entry.name,
       quantity: entry.quantity,
@@ -413,7 +414,7 @@ export class PantryStateService {
       this.addFastAddEntry(option);
       return;
     }
-    const formattedName = formatFriendlyNameCatalog(nextName, nextName);
+    const formattedName = normalizeEntityName(nextName, nextName);
     const unitLabel = this.pantryStore.getUnitLabel(MeasurementUnit.UNIT);
     this.fastAddEntries.update(current => {
       const existingIndex = current.findIndex(entry => normalizeKey(entry.name) === normalized);
@@ -461,7 +462,7 @@ export class PantryStateService {
   }
 
   adjustFastAddEntryById(entryId: string, delta: number): void {
-    const entry = this.fastAddEntries().find(current => current.id === entryId);
+    const entry = findEntryByKey(this.fastAddEntries(), entryId, current => current.id);
     if (!entry) {
       return;
     }
@@ -1698,7 +1699,8 @@ export class PantryStateService {
 
   private buildFastAddOptions(items: PantryItem[], entries: FastAddEntry[]): AutocompleteItem<PantryItem>[] {
     const locale = this.languageService.getCurrentLocale();
-    const excluded = new Set(entries.map(entry => entry.item?._id).filter(Boolean) as string[]);
+    const uniqueEntries = dedupeByNormalizedKey(entries, entry => entry.name);
+    const excluded = new Set(uniqueEntries.map(entry => entry.item?._id).filter(Boolean) as string[]);
     return (items ?? [])
       .filter(item => !excluded.has(item._id))
       .map(item => {
@@ -1719,7 +1721,7 @@ export class PantryStateService {
     if (!name) {
       return '';
     }
-    const formatted = formatFriendlyNameCatalog(name, name);
+    const formatted = normalizeEntityName(name, name);
     return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   }
 
