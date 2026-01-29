@@ -38,7 +38,7 @@
             label="{{ 'settings.catalogs.locations.field' | translate:{ index: i + 1 } }}"
             labelPlacement="stacked"
             [value]="location"
-            (ionInput)="state.onLocationOptionInput(i, $event)"
+            readonly="true"
             autocomplete="off"
             autocorrect="off">
           </ion-input>
@@ -90,7 +90,7 @@
             label="{{ 'settings.catalogs.categories.field' | translate:{ index: i + 1 } }}"
             labelPlacement="stacked"
             [value]="category"
-            (ionInput)="state.onCategoryOptionInput(i, $event)"
+            readonly="true"
             autocomplete="off"
             autocorrect="off">
           </ion-input>
@@ -141,7 +141,7 @@
             label="{{ 'settings.catalogs.supermarkets.field' | translate:{ index: i + 1 } }}"
             labelPlacement="stacked"
             [value]="supermarket"
-            (ionInput)="state.onSupermarketOptionInput(i, $event)"
+            readonly="true"
             autocomplete="off"
             autocorrect="off">
           </ion-input>
