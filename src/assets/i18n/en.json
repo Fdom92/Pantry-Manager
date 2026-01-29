@@ -135,8 +135,14 @@
         "alerts": {
           "title": "Alerts"
         },
-        "maintenance": {
-          "title": "Maintenance"
+        "dailyActions": {
+          "title": "Daily actions"
+        },
+        "control": {
+          "title": "Control"
+        },
+        "insights": {
+          "title": "Insights"
         },
         "activity": {
           "title": "Activity"
@@ -167,6 +173,11 @@
           "title": "Shopping list",
           "body": "{{ count }} items pending",
           "action": "View"
+        },
+        "consumeToday": {
+          "title": "Consumed today",
+          "body": "Log what you used today",
+          "action": "Add"
         },
         "recentlyAdded": {
           "title": "Recently added",
@@ -213,6 +224,16 @@
       "updated": "Updated {{ date }}",
       "badge": "New",
       "empty": "No recent updates."
+    },
+    "consumeToday": {
+      "title": "Consumed today",
+      "cardTitle": "Add products",
+      "selectHint": "Pick what you used today, then set quantities.",
+      "listTitle": "Your list",
+      "placeholder": "Search products",
+      "noResults": "No results",
+      "empty": "No items added yet.",
+      "save": "Save"
     }
   },
   "shopping": {
@@ -402,10 +423,14 @@
       "cta": "Add quickly",
       "advancedAction": "Advanced add",
       "groupLabel": "Add products quickly",
-      "title": "Add products quickly",
-      "subtitle": "Add multiple products quickly. One product per line. Quantity is optional.",
-      "placeholder": "2 milk\nchicken breasts\n3 apples",
-      "submit": "Add products",
+      "title": "Quick add",
+      "cardTitle": "Select products",
+      "subtitle": "Pick items and set quantities.",
+      "placeholder": "Search products",
+      "noResults": "No results",
+      "addNew": "Add new product: {{ name }}",
+      "empty": "No items added yet.",
+      "submit": "Add to pantry",
       "singleSuccess": "1 product added",
       "success": "{{ count }} products added",
       "error": "Couldn't add the products."
@@ -703,5 +728,8 @@
       "feedbackSubtitle": "Share suggestions or report issues.",
       "feedbackAction": "Send feedback"
     }
+  },
+  "reviews": {
+    "prompt": "If PantryMind is helping you, a review really helps us. Would you leave one?"
   }
 }

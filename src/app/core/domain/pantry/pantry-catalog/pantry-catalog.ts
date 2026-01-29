@@ -1,6 +1,11 @@
 import { AppPreferences } from '@core/models';
 import { PantryItem } from '@core/models/pantry';
-import { normalizeKey, normalizeStringList, normalizeSupermarketValue } from '@core/utils/normalization.util';
+import {
+  formatFriendlyName,
+  normalizeKey,
+  normalizeStringList,
+  normalizeSupermarketValue,
+} from '@core/utils/normalization.util';
 
 export function getPresetCategoryOptions(preferences: Pick<AppPreferences, 'categoryOptions'>): string[] {
   return normalizeStringList(preferences.categoryOptions, { fallback: [] });
@@ -27,19 +32,6 @@ export function computeSupermarketSuggestions(items: PantryItem[]): string[] {
     }
   }
   return Array.from(options.values()).sort((a, b) => a.localeCompare(b));
-}
-
-export function formatFriendlyName(value: string, fallback: string): string {
-  const key = value?.trim();
-  if (!key) {
-    return fallback;
-  }
-  const plain = key.replace(/^(category:|location:)/i, '');
-  return plain
-    .split(/[-_:]/)
-    .filter(Boolean)
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
 }
 
 export function formatCategoryName(value: string, uncategorizedLabel: string): string {
