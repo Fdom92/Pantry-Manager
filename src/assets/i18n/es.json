@@ -133,7 +133,9 @@
       "aria": "Resumen de la despensa",
       "sections": {
         "alerts": { "title": "Alertas" },
-        "maintenance": { "title": "Mantenimiento" },
+        "dailyActions": { "title": "Acciones diarias" },
+        "control": { "title": "Control" },
+        "insights": { "title": "Insights" },
         "activity": { "title": "Actividad" }
       },
       "cards": {
@@ -161,6 +163,11 @@
           "title": "Lista de la compra",
           "body": "{{ count }} productos pendientes",
           "action": "Ver"
+        },
+        "consumeToday": {
+          "title": "Consumido hoy",
+          "body": "Registra lo que has usado hoy",
+          "action": "Añadir"
         },
         "recentlyAdded": {
           "title": "Añadidos recientemente",
@@ -207,6 +214,16 @@
       "updated": "Actualizado {{ date }}",
       "badge": "Nuevo",
       "empty": "Sin actualizaciones recientes."
+    },
+    "consumeToday": {
+      "title": "Consumido hoy",
+      "cardTitle": "Añade productos",
+      "selectHint": "Elige lo que has consumido y ajusta cantidades.",
+      "listTitle": "Tu lista",
+      "placeholder": "Buscar productos",
+      "noResults": "Sin resultados",
+      "empty": "Todavía no has añadido productos.",
+      "save": "Guardar"
     }
   },
   "shopping": {
@@ -396,10 +413,14 @@
       "cta": "Añadir rápido",
       "advancedAction": "Añadir avanzado",
       "groupLabel": "Añadir productos rápidamente",
-      "title": "Añade productos rápido",
-      "subtitle": "Añade varios productos rápidamente. Un producto por línea. La cantidad es opcional.",
-      "placeholder": "2 leche\npechugas de pollo\n3 manzanas",
-      "submit": "Añadir productos",
+      "title": "Añadir rápido",
+      "cardTitle": "Selecciona productos",
+      "subtitle": "Elige productos y ajusta cantidades.",
+      "placeholder": "Buscar productos",
+      "noResults": "Sin resultados",
+      "addNew": "Añadir producto nuevo: {{ name }}",
+      "empty": "Todavía no has añadido productos.",
+      "submit": "Añadir a la despensa",
       "singleSuccess": "1 producto añadido",
       "success": "{{ count }} productos añadidos",
       "error": "No se pudieron añadir los productos."
@@ -697,5 +718,8 @@
       "feedbackSubtitle": "Comparte sugerencias o reporta incidencias.",
       "feedbackAction": "Enviar comentarios"
     }
+  },
+  "reviews": {
+    "prompt": "Si PantryMind te está ayudando, una reseña nos ayuda mucho. ¿Te animas a dejar una?"
   }
 }

@@ -1,0 +1,92 @@
+<ion-modal
+  [isOpen]="isOpen"
+  (willDismiss)="willDismiss.emit()"
+  (didDismiss)="didDismiss.emit()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ title }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" color="medium" (click)="willDismiss.emit()">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding entity-selector-content">
+      <div class="entity-selector-card">
+        <div class="entity-selector-card__header">
+          <h3 class="entity-selector-card__title">{{ cardTitle }}</h3>
+          @if (subtitle) {
+            <p class="entity-selector-card__subtitle">{{ subtitle }}</p>
+          }
+        </div>
+        <div class="entity-selector-card__content">
+          <app-entity-autocomplete
+            [items]="items"
+            [placeholder]="placeholder"
+            [minChars]="1"
+            mode="select"
+            [showSecondaryInfo]="showSecondaryInfo"
+            [showMeta]="showMeta"
+            [showAllOnFocus]="showAllOnFocus"
+            [autofocus]="autofocus"
+            [emptyLabel]="emptyLabel"
+            [showEmptyAction]="showEmptyAction"
+            [emptyActionLabel]="emptyActionLabel"
+            (emptyAction)="emptyAction.emit()"
+            (valueChange)="queryChange.emit($event)"
+            (onSelect)="selectItem.emit($event)">
+          </app-entity-autocomplete>
+
+          @if (entries.length) {
+            <ion-list class="entity-selector-list">
+              @for (entry of entries; track entry.id) {
+                <ion-item class="entity-selector-item">
+                  <ion-label>
+                    <h3>{{ entry.title }}</h3>
+                  </ion-label>
+                  <div class="entity-selector-controls" slot="end">
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      [disabled]="entry.quantity <= 0"
+                      (click)="adjustEntry.emit({ entry, delta: -1 })">
+                      <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+                    </ion-button>
+                    <ion-text class="entity-selector-qty">{{ entry.quantity }}</ion-text>
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      [disabled]="!canIncrease(entry)"
+                      (click)="adjustEntry.emit({ entry, delta: 1 })">
+                      <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                    </ion-button>
+                  </div>
+                </ion-item>
+              }
+            </ion-list>
+          } @else if (entriesEmptyLabel) {
+            <ion-text color="medium" class="entity-selector-empty">
+              {{ entriesEmptyLabel }}
+            </ion-text>
+          }
+        </div>
+      </div>
+    </ion-content>
+    <ion-footer class="modal-footer">
+      <ion-toolbar>
+        <ion-button
+          expand="block"
+          color="primary"
+          [disabled]="disableSave || saving"
+          (click)="save.emit()">
+          @if (saving) {
+            <ion-spinner slot="start" name="lines-small"></ion-spinner>
+          }
+          {{ saveLabel }}
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
+  </ng-template>
+</ion-modal>
