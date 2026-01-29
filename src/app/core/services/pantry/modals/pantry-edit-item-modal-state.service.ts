@@ -4,12 +4,12 @@ import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import {
   buildUniqueSelectOptions,
   formatCategoryName as formatCategoryNameCatalog,
-  formatFriendlyName as formatFriendlyNameCatalog,
   formatSupermarketLabel,
   getPresetCategoryOptions,
   getPresetLocationOptions,
   getPresetSupermarketOptions,
 } from '@core/domain/pantry/pantry-catalog';
+import { normalizeEntityName } from '@core/utils/normalization.util';
 import { toDateInputValue, toIsoDate } from '@core/domain/up-to-date';
 import type { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
@@ -296,7 +296,7 @@ export class PantryEditItemModalStateService {
     if (!nextValue) {
       return;
     }
-    const formatted = formatFriendlyNameCatalog(nextValue, nextValue);
+    const formatted = normalizeEntityName(nextValue, nextValue);
     void this.addCategoryOption(formatted);
   }
 
@@ -305,7 +305,7 @@ export class PantryEditItemModalStateService {
     if (!nextValue) {
       return;
     }
-    const formatted = formatFriendlyNameCatalog(nextValue, nextValue);
+    const formatted = normalizeEntityName(nextValue, nextValue);
     void this.addSupermarketOption(formatted);
   }
 

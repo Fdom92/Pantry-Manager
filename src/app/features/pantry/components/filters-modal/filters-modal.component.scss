@@ -5,8 +5,11 @@ ion-title, ion-back-button {
 .filter-card {
   margin-bottom: 12px;
   border-radius: 14px;
-  --background: color-mix(in srgb, var(--ion-color-dark-contrast) 4%, transparent);
-  box-shadow: 0 4px 12px rgba(15, 20, 19, 0.18);
+  background: var(--ion-card-background, var(--ion-card-background)) !important;
+  --background: var(--ion-card-background, var(--ion-card-background));
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  color: var(--ion-text-color);
 }
 
 .filter-card ion-card-content {
@@ -24,4 +27,3 @@ ion-title, ion-back-button {
 .filter-actions ion-button[expand='block'] {
   flex: 1;
 }
-

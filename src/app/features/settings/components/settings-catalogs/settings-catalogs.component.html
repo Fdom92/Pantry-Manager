@@ -34,14 +34,10 @@
 
       @for (location of state.locationOptionsDraft(); track $index; let i = $index) {
         <ion-item>
-          <ion-input
-            label="{{ 'settings.catalogs.locations.field' | translate:{ index: i + 1 } }}"
-            labelPlacement="stacked"
-            [value]="location"
-            (ionInput)="state.onLocationOptionInput(i, $event)"
-            autocomplete="off"
-            autocorrect="off">
-          </ion-input>
+          <ion-label>
+            <h3>{{ 'settings.catalogs.locations.field' | translate:{ index: i + 1 } }}</h3>
+            <p>{{ location }}</p>
+          </ion-label>
           <ion-button
             slot="end"
             fill="clear"
@@ -86,14 +82,10 @@
 
       @for (category of state.categoryOptionsDraft(); track $index; let i = $index) {
         <ion-item>
-          <ion-input
-            label="{{ 'settings.catalogs.categories.field' | translate:{ index: i + 1 } }}"
-            labelPlacement="stacked"
-            [value]="category"
-            (ionInput)="state.onCategoryOptionInput(i, $event)"
-            autocomplete="off"
-            autocorrect="off">
-          </ion-input>
+          <ion-label>
+            <h3>{{ 'settings.catalogs.categories.field' | translate:{ index: i + 1 } }}</h3>
+            <p>{{ category }}</p>
+          </ion-label>
           <ion-button
             slot="end"
             fill="clear"
@@ -137,14 +129,10 @@
 
       @for (supermarket of state.supermarketOptionsDraft(); track $index; let i = $index) {
         <ion-item>
-          <ion-input
-            label="{{ 'settings.catalogs.supermarkets.field' | translate:{ index: i + 1 } }}"
-            labelPlacement="stacked"
-            [value]="supermarket"
-            (ionInput)="state.onSupermarketOptionInput(i, $event)"
-            autocomplete="off"
-            autocorrect="off">
-          </ion-input>
+          <ion-label>
+            <h3>{{ 'settings.catalogs.supermarkets.field' | translate:{ index: i + 1 } }}</h3>
+            <p>{{ supermarket }}</p>
+          </ion-label>
           <ion-button
             slot="end"
             fill="clear"
