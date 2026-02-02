@@ -110,7 +110,7 @@ export class SettingsCatalogsStateService {
       return '';
     }
     const count = target?.count ?? 0;
-    const messageKey = this.getCatalogConfig(target?.kind).replacementMessageKey;
+    const messageKey = this.getCatalogConfig(target.kind).replacementMessageKey;
     return this.translate.instant(messageKey, { count });
   }
 
@@ -409,7 +409,7 @@ export class SettingsCatalogsStateService {
     if (!normalizedKey) {
       return { count: 0, items: [] };
     }
-    const items = await this.pantryService.getAll();
+    const items = await this.pantryService.getAllActive();
     const matches = items.filter(item => {
       const itemKey = normalizeKey(normalizeSupermarketValue(item.supermarket) ?? '');
       return itemKey === normalizedKey;
@@ -432,7 +432,7 @@ export class SettingsCatalogsStateService {
     if (!normalizedKey) {
       return { count: 0, items: [] };
     }
-    const items = await this.pantryService.getAll();
+    const items = await this.pantryService.getAllActive();
     const matches = items.filter(item => normalizeKey(normalizeCategoryId(item.categoryId)) === normalizedKey);
     return {
       count: matches.length,
@@ -449,7 +449,7 @@ export class SettingsCatalogsStateService {
     if (!normalizedKey) {
       return { count: 0, items: [] };
     }
-    const items = await this.pantryService.getAll();
+    const items = await this.pantryService.getAllActive();
     const matches = items.filter(item =>
       (item.locations ?? []).some(location => normalizeKey(normalizeLocationId(location.locationId)) === normalizedKey),
     );
@@ -542,49 +542,61 @@ export class SettingsCatalogsStateService {
     clearFromItems: (items: PantryItem[]) => Promise<void>;
     replaceInItems?: (items: PantryItem[], fromValue: string, toValue: string) => Promise<void>;
   } {
-    if (kind === 'category') {
-      return {
+    const resolved = kind ?? 'supermarket';
+    const drafts = {
+      category: this.categoryOptionsDraft,
+      location: this.locationOptionsDraft,
+      supermarket: this.supermarketOptionsDraft,
+    };
+    const usage = {
+      category: this.getCategoryUsage.bind(this),
+      location: this.getLocationUsage.bind(this),
+      supermarket: this.getSupermarketUsage.bind(this),
+    };
+    const clear = {
+      category: this.clearCategoryFromItems.bind(this),
+      location: async () => undefined,
+      supermarket: this.clearSupermarketFromItems.bind(this),
+    };
+    const strings = {
+      category: {
         removalTitleKey: 'settings.catalogs.categories.removeInUseTitle',
         removalMessageKey: 'settings.catalogs.categories.removeInUseMessage',
         removalActionKey: 'settings.catalogs.categories.removeAction',
         replacementMessageKey: '',
         replacementActionKey: '',
         requiresReplacement: false,
-        getDraft: () => this.categoryOptionsDraft(),
-        removeFromDraft: index =>
-          this.categoryOptionsDraft.update(options => options.filter((_, i) => i !== index)),
-        getUsage: value => this.getCategoryUsage(value),
-        clearFromItems: items => this.clearCategoryFromItems(items),
-      };
-    }
-    if (kind === 'location') {
-      return {
+      },
+      location: {
         removalTitleKey: 'settings.catalogs.locations.replaceTitle',
         removalMessageKey: 'settings.catalogs.locations.replaceMessage',
         removalActionKey: 'settings.catalogs.locations.replaceAction',
         replacementMessageKey: 'settings.catalogs.locations.replaceMessage',
         replacementActionKey: 'settings.catalogs.locations.replaceAction',
         requiresReplacement: true,
-        getDraft: () => this.locationOptionsDraft(),
-        removeFromDraft: index =>
-          this.locationOptionsDraft.update(options => options.filter((_, i) => i !== index)),
-        getUsage: value => this.getLocationUsage(value),
-        clearFromItems: async () => undefined,
-        replaceInItems: (items, fromValue, toValue) => this.replaceLocationInItems(items, fromValue, toValue),
-      };
-    }
+      },
+      supermarket: {
+        removalTitleKey: 'settings.catalogs.supermarkets.removeInUseTitle',
+        removalMessageKey: 'settings.catalogs.supermarkets.removeInUseMessage',
+        removalActionKey: 'settings.catalogs.supermarkets.removeAction',
+        replacementMessageKey: '',
+        replacementActionKey: '',
+        requiresReplacement: false,
+      },
+    };
+    const removeFromDraft = (index: number) =>
+      drafts[resolved].update(options => options.filter((_, i) => i !== index));
+
     return {
-      removalTitleKey: 'settings.catalogs.supermarkets.removeInUseTitle',
-      removalMessageKey: 'settings.catalogs.supermarkets.removeInUseMessage',
-      removalActionKey: 'settings.catalogs.supermarkets.removeAction',
-      replacementMessageKey: '',
-      replacementActionKey: '',
-      requiresReplacement: false,
-      getDraft: () => this.supermarketOptionsDraft(),
-      removeFromDraft: index =>
-        this.supermarketOptionsDraft.update(options => options.filter((_, i) => i !== index)),
-      getUsage: value => this.getSupermarketUsage(value),
-      clearFromItems: items => this.clearSupermarketFromItems(items),
+      ...strings[resolved],
+      getDraft: () => drafts[resolved](),
+      removeFromDraft,
+      getUsage: usage[resolved],
+      clearFromItems: clear[resolved],
+      replaceInItems:
+        resolved === 'location'
+          ? (items, fromValue, toValue) => this.replaceLocationInItems(items, fromValue, toValue)
+          : undefined,
     };
   }
 }

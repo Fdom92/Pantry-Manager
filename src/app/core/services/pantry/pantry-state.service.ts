@@ -105,7 +105,7 @@ export class PantryStateService {
   );
   readonly hasFastAddEntries = computed(() => this.fastAddEntries().length > 0);
   readonly fastAddOptions = computed(() =>
-    this.buildFastAddOptions(this.pantryItemsState(), this.fastAddEntries())
+    this.buildFastAddOptions(this.pantryService.loadedProducts(), this.fastAddEntries())
   );
   readonly showFastAddEmptyAction = computed(() => this.fastAddQuery().trim().length >= 1);
   readonly fastAddEmptyActionLabel = computed(() => this.buildFastAddEmptyActionLabel());
@@ -174,11 +174,11 @@ export class PantryStateService {
 
     effect(() => {
       const totalCount = this.pantryService.totalCount();
-      const loadedItems = this.pantryService.loadedProducts();
+      const loadedItems = this.pantryService.activeProducts();
       const isLoading = this.pantryService.loading();
       const shouldUseFreshSummary = !isLoading || loadedItems.length > 0 || totalCount === 0;
       if (shouldUseFreshSummary) {
-        this.summarySnapshot.set(this.buildSummary(loadedItems, totalCount));
+        this.summarySnapshot.set(this.buildSummary(loadedItems, loadedItems.length));
       }
     });
 
@@ -403,7 +403,7 @@ export class PantryStateService {
       return;
     }
     const normalized = normalizeKey(nextName);
-    const matchingItem = this.pantryItemsState()
+    const matchingItem = this.pantryService.loadedProducts()
       .find(item => normalizeKey(item.name) === normalized);
     if (matchingItem) {
       const option: AutocompleteItem<PantryItem> = {

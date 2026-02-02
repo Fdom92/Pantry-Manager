@@ -1,4 +1,4 @@
-import { effect, Injectable, signal } from '@angular/core';
+import { computed, effect, Injectable, signal } from '@angular/core';
 import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import {
   collectBatches as collectBatchesItem,
@@ -39,6 +39,7 @@ export class PantryService extends StorageService<PantryItem> {
   private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
   // SIGNALS
   readonly loadedProducts = signal<PantryItem[]>([]);
+  readonly activeProducts = computed(() => this.loadedProducts().filter(item => this.hasStock(item)));
   readonly filteredProducts = signal<PantryItem[]>([]);
   readonly searchQuery = signal('');
   readonly activeFilters = signal<PantryFilterState>({ ...DEFAULT_PANTRY_FILTERS });
@@ -164,9 +165,15 @@ export class PantryService extends StorageService<PantryItem> {
     return docs.map(doc => this.applyDerivedFields(doc));
   }
 
+  /** Fetch every pantry item that currently has stock. */
+  async getAllActive(): Promise<PantryItem[]> {
+    const items = await this.getAll();
+    return items.filter(item => this.hasStock(item));
+  }
+
   /** Return items that currently have stock in the requested location. */
   async getByLocation(locationId: string): Promise<PantryItem[]> {
-    const all = await this.getAll();
+    const all = await this.getAllActive();
     return all.filter(item =>
       item.locations.some(loc => loc.locationId === locationId)
     );
@@ -174,13 +181,13 @@ export class PantryService extends StorageService<PantryItem> {
 
   /** Retrieve items whose aggregated quantity is at or below the configured threshold. */
   async getLowStock(): Promise<PantryItem[]> {
-    const items = await this.getAll();
+    const items = await this.getAllActive();
   	return items.filter(item => this.isLowStock(item));
   }
 
   /** Retrieve items that have at least one location expiring within the provided window. */
   async getNearExpiry(daysAhead: number = 7): Promise<PantryItem[]> {
-    const items = await this.getAll();
+    const items = await this.getAllActive();
     return items.filter(item => this.isNearExpiry(item, daysAhead));
   }
 
@@ -312,7 +319,7 @@ export class PantryService extends StorageService<PantryItem> {
 
   /** Retrieve items that already have an expired location. */
   async getExpired(): Promise<PantryItem[]> {
-    const items = await this.getAll();
+    const items = await this.getAllActive();
     return items.filter(item => this.isExpired(item));
   }
 
@@ -323,7 +330,7 @@ export class PantryService extends StorageService<PantryItem> {
     nearExpiry: number;
     lowStock: number;
   }> {
-    const items = await this.getAll();
+    const items = await this.getAllActive();
 
     let expired = 0, nearExpiry = 0, lowStock = 0;
 
@@ -599,13 +606,13 @@ export class PantryService extends StorageService<PantryItem> {
    * or sort mode change.
    */
   private recomputeFilteredProducts(): void {
-    const loaded = this.loadedProducts();
+    const loaded = this.activeProducts();
     const query = this.searchQuery().toLowerCase();
     const filters = this.activeFilters();
     const mode = this.sortMode();
 
     const filtered = loaded.filter(item => {
-      return this.matchesSearch(item, query) && this.matchesFilters(item, filters);
+      return this.hasStock(item) && this.matchesSearch(item, query) && this.matchesFilters(item, filters);
     });
     const sorted = this.sortItems(filtered, mode);
     this.filteredProducts.set(sorted);
@@ -650,6 +657,10 @@ export class PantryService extends StorageService<PantryItem> {
       return false;
     }
     return true;
+  }
+
+  private hasStock(item: PantryItem): boolean {
+    return this.getItemTotalQuantity(item) > 0;
   }
 
   private sortItems(items: PantryItem[], mode: PantrySortMode): PantryItem[] {

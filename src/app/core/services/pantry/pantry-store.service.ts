@@ -19,7 +19,7 @@ export class PantryStoreService {
   readonly error = signal<string | null>(null);
   private realtimeSubscribed = false;
   // COMPUTED
-  readonly items = computed(() => this.pantryService.loadedProducts());
+  readonly items = computed(() => this.pantryService.activeProducts());
   readonly expiredItems = computed(() =>
     this.items().filter(item => this.pantryService.isItemExpired(item))
   );
