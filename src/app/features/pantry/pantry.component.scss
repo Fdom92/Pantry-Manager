@@ -362,6 +362,26 @@ section.group-details {
   --box-shadow: none;
 }
 
+.add-mode-sheet::part(content) {
+  border-radius: 18px 18px 0 0;
+}
+
+.add-mode-content {
+  --padding-top: 16px;
+}
+
+.add-mode-title {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.add-mode-list ion-item {
+  --background: var(--ion-card-background, var(--ion-card-background));
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
 .location-form-card {
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
   border-radius: 12px;

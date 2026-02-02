@@ -109,6 +109,7 @@ export class PantryStateService {
   );
   readonly showFastAddEmptyAction = computed(() => this.fastAddQuery().trim().length >= 1);
   readonly fastAddEmptyActionLabel = computed(() => this.buildFastAddEmptyActionLabel());
+  readonly addModeSheetOpen = signal(false);
 
   // Move modal
   readonly showMoveModal = signal(false);
@@ -289,6 +290,32 @@ export class PantryStateService {
   openAdvancedAddModal(event?: Event): void {
     event?.stopPropagation();
     this.editItemModalRequest.set({ mode: 'create' });
+  }
+
+  openAddModeSheet(event?: Event): void {
+    event?.stopPropagation();
+    this.addModeSheetOpen.set(true);
+  }
+
+  closeAddModeSheet(): void {
+    if (this.addModeSheetOpen()) {
+      return;
+    }
+    this.addModeSheetOpen.set(false);
+  }
+
+  dismissAddModeSheet(): void {
+    this.addModeSheetOpen.set(false);
+  }
+
+  selectAddModeSimple(): void {
+    this.dismissAddModeSheet();
+    this.openFastAddModal();
+  }
+
+  selectAddModeAdvanced(): void {
+    this.dismissAddModeSheet();
+    this.openAdvancedAddModal();
   }
 
   openEditItemModal(item: PantryItem, event?: Event): void {

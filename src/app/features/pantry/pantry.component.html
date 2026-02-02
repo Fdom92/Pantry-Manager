@@ -158,22 +158,39 @@
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="add-fab">
-    <ion-fab-button color="primary" [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate">
+    <ion-fab-button
+      color="primary"
+      [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
+      (click)="facade.openAddModeSheet($event)">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
-    <ion-fab-list side="top" class="fab-options">
-      <ion-fab-button
-        color="primary"
-        (click)="facade.openFastAddModal()"
-        [attr.aria-label]="'pantry.fastAdd.cta' | translate">
-        <ion-icon name="flash-outline"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-button
-        color="medium"
-        (click)="facade.openAdvancedAddModal()"
-        [attr.aria-label]="'pantry.fastAdd.advancedAction' | translate">
-        <ion-icon name="construct-outline"></ion-icon>
-      </ion-fab-button>
-    </ion-fab-list>
   </ion-fab>
+
+  <ion-modal
+    class="add-mode-sheet"
+    [isOpen]="facade.addModeSheetOpen()"
+    [initialBreakpoint]="0.28"
+    [breakpoints]="[0, 0.28]"
+    (willDismiss)="facade.dismissAddModeSheet()"
+    (didDismiss)="facade.closeAddModeSheet()">
+    <ng-template>
+      <ion-content class="ion-padding add-mode-content">
+        <h3 class="add-mode-title">{{ 'pantry.addMode.title' | translate }}</h3>
+        <ion-list class="add-mode-list">
+          <ion-item button="true" detail="false" (click)="facade.selectAddModeSimple()">
+            <ion-label>
+              <h3>{{ 'pantry.addMode.simple' | translate }}</h3>
+              <p>{{ 'pantry.fastAdd.subtitle' | translate }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item button="true" detail="false" (click)="facade.selectAddModeAdvanced()">
+            <ion-label>
+              <h3>{{ 'pantry.addMode.advanced' | translate }}</h3>
+              <p>{{ 'pantry.form.newTitle' | translate }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

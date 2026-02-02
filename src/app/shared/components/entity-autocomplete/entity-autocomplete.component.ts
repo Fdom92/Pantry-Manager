@@ -27,6 +27,7 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   @Input() labelPlacement: 'fixed' | 'floating' | 'stacked' = 'stacked';
   @Input() value = '';
   @Input() disabled = false;
+  @Input() readonly = false;
   @Input() minChars = 1;
   @Input() maxOptions = 6;
   @Input() mode: 'consume' | 'add' | 'select' = 'select';
