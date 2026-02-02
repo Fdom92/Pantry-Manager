@@ -435,6 +435,11 @@
       "success": "{{ count }} products added",
       "error": "Couldn't add the products."
     },
+    "addMode": {
+      "title": "Select mode",
+      "simple": "Simple",
+      "advanced": "Advanced"
+    },
     "empty": {
       "filters": "No product matches the current filters."
     },

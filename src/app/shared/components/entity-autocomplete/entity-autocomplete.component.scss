@@ -6,6 +6,16 @@
   position: relative;
 }
 
+.autocomplete-input {
+  --inner-padding-end: 6px;
+}
+
+.autocomplete-clear {
+  --padding-start: 4px;
+  --padding-end: 4px;
+  height: 28px;
+}
+
 .autocomplete-options {
   position: absolute;
   left: 0;

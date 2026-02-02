@@ -425,6 +425,11 @@
       "success": "{{ count }} productos añadidos",
       "error": "No se pudieron añadir los productos."
     },
+    "addMode": {
+      "title": "Selecciona el modo",
+      "simple": "Simple",
+      "advanced": "Avanzado"
+    },
     "empty": {
       "filters": "Ningún producto coincide con los filtros actuales."
     },

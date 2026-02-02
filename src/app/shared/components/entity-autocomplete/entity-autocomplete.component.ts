@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
-import { IonInput, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 
 export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
   id?: string;
@@ -13,7 +13,7 @@ export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
 @Component({
   selector: 'app-entity-autocomplete',
   standalone: true,
-  imports: [CommonModule, IonInput, IonItem, IonLabel, IonList],
+  imports: [CommonModule, IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList],
   templateUrl: './entity-autocomplete.component.html',
   styleUrls: ['./entity-autocomplete.component.scss'],
 })
@@ -27,6 +27,7 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   @Input() labelPlacement: 'fixed' | 'floating' | 'stacked' = 'stacked';
   @Input() value = '';
   @Input() disabled = false;
+  @Input() readonly = false;
   @Input() minChars = 1;
   @Input() maxOptions = 6;
   @Input() mode: 'consume' | 'add' | 'select' = 'select';
@@ -38,6 +39,7 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   @Input() emptyActionLabel = '';
   @Input() autofocus = false;
   @Input() clearOnSelect = true;
+  @Input() showClearButton = false;
   // OUTPUTS
   @Output() valueChange = new EventEmitter<string>();
   @Output() onSelect = new EventEmitter<AutocompleteItem<TRaw, TMeta>>();
@@ -75,6 +77,9 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   }
 
   onInput(event: CustomEvent): void {
+    if (this.disabled || this.readonly) {
+      return;
+    }
     const value = this.getEventStringValue(event);
     if (value === '' && this.inputValue !== '') {
       this.onClear.emit();
@@ -83,6 +88,9 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   }
 
   handleFocus(): void {
+    if (this.disabled || this.readonly) {
+      return;
+    }
     this.isFocused = true;
     this.onFocus.emit();
     if (this.blurTimeoutId) {
@@ -100,6 +108,9 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   }
 
   onKeyDown(event: KeyboardEvent): void {
+    if (this.disabled || this.readonly) {
+      return;
+    }
     if (event.key !== 'Enter') {
       return;
     }
@@ -121,20 +132,28 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
     this.onSelect.emit(option);
   }
 
+  handleClearClick(): void {
+    if (!this.inputValue) {
+      return;
+    }
+    this.setValue('');
+    this.onClear.emit();
+  }
+
   triggerEmptyAction(): void {
     if (!this.showEmptyAction || !this.emptyActionLabel) {
       return;
     }
     const currentValue = this.inputValue.trim();
-    if (currentValue) {
-      this.onClear.emit();
-    }
     this.emptyAction.emit(currentValue);
     this.setValue('');
     this.isFocused = false;
   }
 
   shouldShowOptions(): boolean {
+    if (this.disabled || this.readonly) {
+      return false;
+    }
     if (!this.isFocused) {
       return false;
     }
