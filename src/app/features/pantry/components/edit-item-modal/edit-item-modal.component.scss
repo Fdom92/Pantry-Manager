@@ -11,6 +11,36 @@ ion-title, ion-back-button {
   margin: 48px auto;
 }
 
+.entity-selector-card {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--ion-card-background, var(--ion-card-background));
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  overflow: visible;
+}
+
+.entity-selector-card__header {
+  margin-bottom: 10px;
+}
+
+.entity-selector-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.entity-selector-card__subtitle {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+}
+
+.entity-selector-card__content {
+  overflow: visible;
+}
+
 .form-section {
   display: flex;
   flex-direction: column;

@@ -14,7 +14,7 @@ import { toDateInputValue, toIsoDate } from '@core/domain/up-to-date';
 import type { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { createDocumentId } from '@core/utils';
-import { roundQuantity } from '@core/utils/formatting.util';
+import { formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import {
   normalizeCategoryId,
   normalizeKey,
@@ -26,11 +26,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppPreferencesService } from '../../settings/app-preferences.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { PantryStateService } from '../pantry-state.service';
+import { PantryService } from '../pantry.service';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 
 @Injectable()
 export class PantryEditItemModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
+  private readonly pantryService = inject(PantryService);
   private readonly fb = inject(FormBuilder);
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
@@ -38,6 +40,11 @@ export class PantryEditItemModalStateService {
   readonly isOpen = signal(false);
   readonly isSaving = signal(false);
   readonly editingItem = signal<PantryItem | null>(null);
+  readonly selectingItem = signal(false);
+  readonly selectorQuery = signal('');
+  readonly selectorOptions = signal<AutocompleteItem<PantryItem>[]>([]);
+  readonly showSelectorEmptyAction = signal(false);
+  readonly selectorEmptyActionLabel = signal('');
 
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -76,32 +83,31 @@ export class PantryEditItemModalStateService {
       this.listState.clearEditItemModalRequest();
     });
 
-    // No prompt-based selection in this modal; inputs handle text directly.
+    effect(() => {
+      const items = this.pantryService.loadedProducts();
+      this.selectorOptions.set(this.buildSelectorOptions(items));
+    });
+
+    effect(() => {
+      const query = this.selectorQuery().trim();
+      this.showSelectorEmptyAction.set(query.length >= 1);
+      this.selectorEmptyActionLabel.set(this.buildSelectorEmptyActionLabel(query));
+    });
   }
 
   openCreate(): void {
     this.editingItem.set(null);
-    this.form.reset({
-      name: '',
-      categoryId: null,
-      supermarket: '',
-      isBasic: false,
-      minThreshold: null,
-      notes: '',
-    });
-    this.resetLocationControls([
-      {
-        locationId: '',
-        unit: MeasurementUnit.UNIT,
-        batches: [],
-      },
-    ]);
+    this.resetFormForCreate();
+    this.selectingItem.set(true);
+    this.selectorQuery.set('');
     this.isSaving.set(false);
     this.isOpen.set(true);
   }
 
   openEdit(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
+    this.selectingItem.set(false);
+    this.selectorQuery.set('');
     this.editingItem.set(item);
     this.form.reset({
       name: item.name ?? '',
@@ -133,10 +139,14 @@ export class PantryEditItemModalStateService {
     this.isOpen.set(false);
     this.isSaving.set(false);
     this.editingItem.set(null);
+    this.selectingItem.set(false);
+    this.selectorQuery.set('');
   }
 
   dismiss(): void {
     this.isOpen.set(false);
+    this.selectingItem.set(false);
+    this.selectorQuery.set('');
   }
 
   addLocationEntry(): void {
@@ -309,6 +319,24 @@ export class PantryEditItemModalStateService {
     void this.addSupermarketOption(formatted);
   }
 
+  onSelectorQueryChange(value: string): void {
+    this.selectorQuery.set(value ?? '');
+  }
+
+  onSelectorSelect(option: AutocompleteItem<PantryItem>): void {
+    const item = option?.raw;
+    if (!item) {
+      return;
+    }
+    this.openEdit(item);
+  }
+
+  onSelectorCreateNew(): void {
+    this.selectingItem.set(false);
+    this.selectorQuery.set('');
+    this.resetFormForCreate();
+  }
+
   private async addSupermarketOption(value: string): Promise<void> {
     const normalized = normalizeSupermarketValue(value);
     if (!normalized) {
@@ -383,6 +411,24 @@ export class PantryEditItemModalStateService {
     for (const location of locations) {
       this.locationsArray.push(this.createLocationGroup(location));
     }
+  }
+
+  private resetFormForCreate(): void {
+    this.form.reset({
+      name: '',
+      categoryId: null,
+      supermarket: '',
+      isBasic: false,
+      minThreshold: null,
+      notes: '',
+    });
+    this.resetLocationControls([
+      {
+        locationId: '',
+        unit: MeasurementUnit.UNIT,
+        batches: [],
+      },
+    ]);
   }
 
   private createLocationGroup(initial?: Partial<ItemLocationStock>): FormGroup {
@@ -514,6 +560,29 @@ export class PantryEditItemModalStateService {
 
   private formatCategoryName(key: string): string {
     return formatCategoryNameCatalog(key, this.translate.instant('pantry.form.uncategorized'));
+  }
+
+  private buildSelectorOptions(items: PantryItem[]): AutocompleteItem<PantryItem>[] {
+    const locale = this.translate.currentLang ?? 'es';
+    return (items ?? []).map(item => {
+      const total = this.pantryStore.getItemTotalQuantity(item);
+      const unit = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
+      const formattedQty = formatQuantity(total, locale, { maximumFractionDigits: 1 });
+      return {
+        id: item._id,
+        title: item.name,
+        subtitle: `${formattedQty} ${unit}`.trim(),
+        raw: item,
+      };
+    });
+  }
+
+  private buildSelectorEmptyActionLabel(query: string): string {
+    if (!query) {
+      return '';
+    }
+    const formatted = normalizeEntityName(query, query);
+    return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   }
 
 }

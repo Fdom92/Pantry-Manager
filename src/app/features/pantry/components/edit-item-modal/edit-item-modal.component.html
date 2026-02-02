@@ -16,194 +16,222 @@
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding create-item-modal-content">
-      <form [formGroup]="state.form">
-        <div class="form-section">
-          <ion-item>
-            <ion-input
-              formControlName="name"
-              label="{{ 'pantry.form.name' | translate }}"
-              labelPlacement="stacked"
-              [placeholder]="'pantry.form.namePlaceholder' | translate"
-              required>
-            </ion-input>
-          </ion-item>
-          <div class="form-autocomplete">
+      @if (state.selectingItem()) {
+        <div class="entity-selector-card">
+          <div class="entity-selector-card__header">
+            <h3 class="entity-selector-card__title">{{ 'pantry.fastAdd.cardTitle' | translate }}</h3>
+            <p class="entity-selector-card__subtitle">{{ 'pantry.fastAdd.subtitle' | translate }}</p>
+          </div>
+          <div class="entity-selector-card__content">
             <app-entity-autocomplete
-              [items]="state.getCategoryAutocompleteOptions()"
-              [label]="'pantry.form.category' | translate"
-              labelPlacement="stacked"
-              [placeholder]="'pantry.form.categoryPlaceholder' | translate"
+              [items]="state.selectorOptions()"
+              [placeholder]="'pantry.fastAdd.placeholder' | translate"
+              [minChars]="1"
+              mode="select"
+              [showSecondaryInfo]="true"
               [showAllOnFocus]="true"
-              [showEmptyAction]="true"
-              [emptyActionLabel]="'pantry.form.categoryAdd.option' | translate"
-              [emptyLabel]="'common.selects.noOptions' | translate"
-              [value]="state.form.get('categoryId')?.value ?? ''"
-              [clearOnSelect]="false"
-              (onSelect)="state.onCategoryAutocompleteSelect($event)"
-              (emptyAction)="state.addCategoryOptionFromText($event)">
+              [autofocus]="true"
+              [emptyLabel]="'pantry.fastAdd.noResults' | translate"
+              [showEmptyAction]="state.showSelectorEmptyAction()"
+              [emptyActionLabel]="state.selectorEmptyActionLabel()"
+              (emptyAction)="state.onSelectorCreateNew()"
+              (valueChange)="state.onSelectorQueryChange($event)"
+              (onSelect)="state.onSelectorSelect($event)">
             </app-entity-autocomplete>
           </div>
-
-          <div class="form-autocomplete">
-            <app-entity-autocomplete
-              [items]="state.getSupermarketAutocompleteOptions()"
-              [label]="'pantry.form.supermarket' | translate"
-              labelPlacement="stacked"
-              [placeholder]="'pantry.form.supermarketPlaceholder' | translate"
-              [showAllOnFocus]="true"
-              [showEmptyAction]="true"
-              [emptyActionLabel]="'pantry.form.supermarketAdd.option' | translate"
-              [emptyLabel]="'common.selects.noOptions' | translate"
-              [value]="state.form.get('supermarket')?.value ?? ''"
-              [clearOnSelect]="false"
-              (onSelect)="state.onSupermarketAutocompleteSelect($event)"
-              (emptyAction)="state.addSupermarketOptionFromText($event)">
-            </app-entity-autocomplete>
-          </div>
-
-          <ion-item>
-            <ion-input
-              type="number"
-              min="0"
-              formControlName="minThreshold"
-              label="{{ 'pantry.form.minThreshold' | translate }}"
-              labelPlacement="stacked">
-            </ion-input>
-          </ion-item>
-
-          <ion-item lines="full">
-            <ion-checkbox formControlName="isBasic" justify="space-between">
-              {{ 'pantry.form.basic' | translate }}
-            </ion-checkbox>
-          </ion-item>
         </div>
+      } @else {
+        <form [formGroup]="state.form">
+          <div class="form-section">
+            <ion-item>
+              <ion-input
+                formControlName="name"
+                label="{{ 'pantry.form.name' | translate }}"
+                labelPlacement="stacked"
+                [placeholder]="'pantry.form.namePlaceholder' | translate"
+                required>
+              </ion-input>
+            </ion-item>
+            <div class="form-autocomplete">
+              <app-entity-autocomplete
+                [items]="state.getCategoryAutocompleteOptions()"
+                [label]="'pantry.form.category' | translate"
+                labelPlacement="stacked"
+                [placeholder]="'pantry.form.categoryPlaceholder' | translate"
+                [showAllOnFocus]="true"
+                [showEmptyAction]="true"
+                [emptyActionLabel]="'pantry.form.categoryAdd.option' | translate"
+                [emptyLabel]="'common.selects.noOptions' | translate"
+                [value]="state.form.get('categoryId')?.value ?? ''"
+                [clearOnSelect]="false"
+                (onSelect)="state.onCategoryAutocompleteSelect($event)"
+                (emptyAction)="state.addCategoryOptionFromText($event)">
+              </app-entity-autocomplete>
+            </div>
 
-        <div formArrayName="locations" class="location-form-list">
-          @for (locationCtrl of state.locationsArray.controls; track $index; let i = $index) {
-            <div class="location-form-card" [formGroupName]="i">
-              <div class="location-form-header">
-                <h4>
-                  {{ 'pantry.form.locationTitle' | translate:{ index: i + 1 } }}
-                  <span class="location-total">
-                    ({{ 'pantry.form.locationTotal' | translate:{ total: (state.getLocationTotalForControl(i) | number:'1.0-2'), unit: state.getLocationUnitLabelForControl(i) } }})
-                  </span>
-                </h4>
-                <ion-button
-                  fill="clear"
-                  size="small"
-                  color="danger"
-                  (click)="state.removeLocationEntry(i)"
-                  [disabled]="state.locationsArray.length <= 1">
-                  <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                </ion-button>
-              </div>
-              <ion-list lines="full">
-                <ion-item>
-                  @let locationOptions = state.getLocationOptionsForControl(i);
-                  <ion-select
-                    formControlName="locationId"
-                    interface="popover"
-                    label="{{ 'pantry.form.location' | translate }}"
-                    labelPlacement="stacked"
-                    [placeholder]="'pantry.form.locationPlaceholder' | translate"
-                    [disabled]="!locationOptions.length"
-                    required>
-                    @for (option of locationOptions; track option.value) {
-                      <ion-select-option [value]="option.value">
-                        {{ option.label }}
-                      </ion-select-option>
-                    }
-                  </ion-select>
-                  @if (!locationOptions.length) {
-                    <ion-note slot="helper" color="medium">
-                      {{ 'common.selects.noOptions' | translate }}
-                    </ion-note>
-                  }
-                </ion-item>
-              </ion-list>
-              <div formArrayName="batches" class="batch-form-list">
-                <div class="batch-form-header">
-                  <h5>{{ 'pantry.form.batches.title' | translate }}</h5>
-                  <ion-button fill="clear" size="small" (click)="state.addBatchEntry(i)">
-                    <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-                    {{ 'pantry.form.batches.add' | translate }}
+            <div class="form-autocomplete">
+              <app-entity-autocomplete
+                [items]="state.getSupermarketAutocompleteOptions()"
+                [label]="'pantry.form.supermarket' | translate"
+                labelPlacement="stacked"
+                [placeholder]="'pantry.form.supermarketPlaceholder' | translate"
+                [showAllOnFocus]="true"
+                [showEmptyAction]="true"
+                [emptyActionLabel]="'pantry.form.supermarketAdd.option' | translate"
+                [emptyLabel]="'common.selects.noOptions' | translate"
+                [value]="state.form.get('supermarket')?.value ?? ''"
+                [clearOnSelect]="false"
+                (onSelect)="state.onSupermarketAutocompleteSelect($event)"
+                (emptyAction)="state.addSupermarketOptionFromText($event)">
+              </app-entity-autocomplete>
+            </div>
+
+            <ion-item>
+              <ion-input
+                type="number"
+                min="0"
+                formControlName="minThreshold"
+                label="{{ 'pantry.form.minThreshold' | translate }}"
+                labelPlacement="stacked">
+              </ion-input>
+            </ion-item>
+
+            <ion-item lines="full">
+              <ion-checkbox formControlName="isBasic" justify="space-between">
+                {{ 'pantry.form.basic' | translate }}
+              </ion-checkbox>
+            </ion-item>
+          </div>
+
+          <div formArrayName="locations" class="location-form-list">
+            @for (locationCtrl of state.locationsArray.controls; track $index; let i = $index) {
+              <div class="location-form-card" [formGroupName]="i">
+                <div class="location-form-header">
+                  <h4>
+                    {{ 'pantry.form.locationTitle' | translate:{ index: i + 1 } }}
+                    <span class="location-total">
+                      ({{ 'pantry.form.locationTotal' | translate:{ total: (state.getLocationTotalForControl(i) | number:'1.0-2'), unit: state.getLocationUnitLabelForControl(i) } }})
+                    </span>
+                  </h4>
+                  <ion-button
+                    fill="clear"
+                    size="small"
+                    color="danger"
+                    (click)="state.removeLocationEntry(i)"
+                    [disabled]="state.locationsArray.length <= 1">
+                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                   </ion-button>
                 </div>
-                @let batchesArray = state.getBatchesArray(i);
-                @if (batchesArray.length === 0) {
-                  <ion-list>
-                    <ion-item lines="none">
-                      <app-empty-state
-                        class="list-empty-state"
-                        icon="cube-outline"
-                        [title]="'pantry.form.batches.title' | translate"
-                        [subtitle]="'pantry.form.batches.empty' | translate"
-                        [compact]="true">
-                      </app-empty-state>
-                    </ion-item>
-                  </ion-list>
-                }
-                @for (batchCtrl of batchesArray.controls; track $index; let j = $index) {
-                  <div class="batch-form-card" [formGroupName]="j">
-                    <div class="batch-form-card-header">
-                      <h6>{{ 'pantry.form.batches.titleIndex' | translate:{ index: j + 1 } }}</h6>
-                      <ion-button
-                        fill="clear"
-                        size="small"
-                        color="danger"
-                        (click)="state.removeBatchEntry(i, j)">
-                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                      </ion-button>
-                    </div>
-                    <ion-list lines="full">
-                      <ion-item>
-                        <ion-input
-                          type="number"
-                          min="0"
-                          formControlName="quantity"
-                          label="{{ 'pantry.form.batches.quantity' | translate }}"
-                          labelPlacement="stacked">
-                        </ion-input>
-                      </ion-item>
-                      <ion-item>
-                        <ion-input
-                          type="date"
-                          formControlName="expirationDate"
-                          label="{{ 'pantry.form.batches.expiry' | translate }}"
-                          labelPlacement="stacked">
-                        </ion-input>
-                      </ion-item>
+                <ion-list lines="full">
+                  <ion-item>
+                    @let locationOptions = state.getLocationOptionsForControl(i);
+                    <ion-select
+                      formControlName="locationId"
+                      interface="popover"
+                      label="{{ 'pantry.form.location' | translate }}"
+                      labelPlacement="stacked"
+                      [placeholder]="'pantry.form.locationPlaceholder' | translate"
+                      [disabled]="!locationOptions.length"
+                      required>
+                      @for (option of locationOptions; track option.value) {
+                        <ion-select-option [value]="option.value">
+                          {{ option.label }}
+                        </ion-select-option>
+                      }
+                    </ion-select>
+                    @if (!locationOptions.length) {
+                      <ion-note slot="helper" color="medium">
+                        {{ 'common.selects.noOptions' | translate }}
+                      </ion-note>
+                    }
+                  </ion-item>
+                </ion-list>
+                <div formArrayName="batches" class="batch-form-list">
+                  <div class="batch-form-header">
+                    <h5>{{ 'pantry.form.batches.title' | translate }}</h5>
+                    <ion-button fill="clear" size="small" (click)="state.addBatchEntry(i)">
+                      <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+                      {{ 'pantry.form.batches.add' | translate }}
+                    </ion-button>
+                  </div>
+                  @let batchesArray = state.getBatchesArray(i);
+                  @if (batchesArray.length === 0) {
+                    <ion-list>
                       <ion-item lines="none">
-                        <ion-toggle formControlName="opened" justify="space-between">{{ 'pantry.form.batches.opened' | translate }}</ion-toggle>
+                        <app-empty-state
+                          class="list-empty-state"
+                          icon="cube-outline"
+                          [title]="'pantry.form.batches.title' | translate"
+                          [subtitle]="'pantry.form.batches.empty' | translate"
+                          [compact]="true">
+                        </app-empty-state>
                       </ion-item>
                     </ion-list>
-                  </div>
-                }
+                  }
+                  @for (batchCtrl of batchesArray.controls; track $index; let j = $index) {
+                    <div class="batch-form-card" [formGroupName]="j">
+                      <div class="batch-form-card-header">
+                        <h6>{{ 'pantry.form.batches.titleIndex' | translate:{ index: j + 1 } }}</h6>
+                        <ion-button
+                          fill="clear"
+                          size="small"
+                          color="danger"
+                          (click)="state.removeBatchEntry(i, j)">
+                          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                        </ion-button>
+                      </div>
+                      <ion-list lines="full">
+                        <ion-item>
+                          <ion-input
+                            type="number"
+                            min="0"
+                            formControlName="quantity"
+                            label="{{ 'pantry.form.batches.quantity' | translate }}"
+                            labelPlacement="stacked">
+                          </ion-input>
+                        </ion-item>
+                        <ion-item>
+                          <ion-input
+                            type="date"
+                            formControlName="expirationDate"
+                            label="{{ 'pantry.form.batches.expiry' | translate }}"
+                            labelPlacement="stacked">
+                          </ion-input>
+                        </ion-item>
+                        <ion-item lines="none">
+                          <ion-toggle formControlName="opened" justify="space-between">{{ 'pantry.form.batches.opened' | translate }}</ion-toggle>
+                        </ion-item>
+                      </ion-list>
+                    </div>
+                  }
+                </div>
               </div>
-            </div>
-          }
-          <ion-button fill="clear" size="small" (click)="state.addLocationEntry()">
-            <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-            {{ 'pantry.form.addLocation' | translate }}
-          </ion-button>
-        </div>
+            }
+            <ion-button fill="clear" size="small" (click)="state.addLocationEntry()">
+              <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+              {{ 'pantry.form.addLocation' | translate }}
+            </ion-button>
+          </div>
 
-      </form>
+        </form>
+      }
     </ion-content>
-    <ion-footer class="modal-footer">
-      <ion-toolbar>
-        <ion-button
-          expand="block"
-          color="primary"
-          [disabled]="state.isSaving() || state.form.invalid"
-          (click)="state.submitItem()">
-          @if (state.isSaving()) {
-            <ion-spinner name="dots"></ion-spinner>
-          } @else {
-            {{ 'common.actions.save' | translate }}
-          }
-        </ion-button>
-      </ion-toolbar>
-    </ion-footer>
+    @if (!state.selectingItem()) {
+      <ion-footer class="modal-footer">
+        <ion-toolbar>
+          <ion-button
+            expand="block"
+            color="primary"
+            [disabled]="state.isSaving() || state.form.invalid"
+            (click)="state.submitItem()">
+            @if (state.isSaving()) {
+              <ion-spinner name="dots"></ion-spinner>
+            } @else {
+              {{ 'common.actions.save' | translate }}
+            }
+          </ion-button>
+        </ion-toolbar>
+      </ion-footer>
+    }
   </ng-template>
 </ion-modal>
