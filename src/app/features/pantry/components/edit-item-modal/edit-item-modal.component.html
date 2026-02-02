@@ -16,7 +16,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding create-item-modal-content">
-      @if (state.selectingItem()) {
+      @if (state.selectorEnabled()) {
         <div class="entity-selector-card">
           <div class="entity-selector-card__header">
             <h3 class="entity-selector-card__title">{{ 'pantry.fastAdd.cardTitle' | translate }}</h3>
@@ -34,24 +34,32 @@
               [emptyLabel]="'pantry.fastAdd.noResults' | translate"
               [showEmptyAction]="state.showSelectorEmptyAction()"
               [emptyActionLabel]="state.selectorEmptyActionLabel()"
-              (emptyAction)="state.onSelectorCreateNew()"
+              [value]="state.selectorInputValue()"
+              [readonly]="state.selectorLocked()"
+              [disabled]="state.selectorLocked()"
+              [showClearButton]="state.selectorLocked()"
+              (emptyAction)="state.onSelectorCreateNew($event)"
               (valueChange)="state.onSelectorQueryChange($event)"
-              (onSelect)="state.onSelectorSelect($event)">
+              (onSelect)="state.onSelectorSelect($event)"
+              (onClear)="state.onSelectorClear()">
             </app-entity-autocomplete>
           </div>
         </div>
-      } @else {
+      }
+      @if (!state.selectingItem()) {
         <form [formGroup]="state.form">
           <div class="form-section">
-            <ion-item>
-              <ion-input
-                formControlName="name"
-                label="{{ 'pantry.form.name' | translate }}"
-                labelPlacement="stacked"
-                [placeholder]="'pantry.form.namePlaceholder' | translate"
-                required>
-              </ion-input>
-            </ion-item>
+            @if (!state.selectorEnabled()) {
+              <ion-item>
+                <ion-input
+                  formControlName="name"
+                  label="{{ 'pantry.form.name' | translate }}"
+                  labelPlacement="stacked"
+                  [placeholder]="'pantry.form.namePlaceholder' | translate"
+                  required>
+                </ion-input>
+              </ion-item>
+            }
             <div class="form-autocomplete">
               <app-entity-autocomplete
                 [items]="state.getCategoryAutocompleteOptions()"
@@ -131,7 +139,6 @@
                       label="{{ 'pantry.form.location' | translate }}"
                       labelPlacement="stacked"
                       [placeholder]="'pantry.form.locationPlaceholder' | translate"
-                      [disabled]="!locationOptions.length"
                       required>
                       @for (option of locationOptions; track option.value) {
                         <ion-select-option [value]="option.value">

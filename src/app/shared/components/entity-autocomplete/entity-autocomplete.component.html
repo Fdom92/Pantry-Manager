@@ -7,7 +7,7 @@
       [placeholder]="placeholder"
       [disabled]="disabled"
       [readonly]="readonly"
-      [clearInput]="true"
+      [clearInput]="!showClearButton && !readonly"
       [autofocus]="autofocus"
       autocomplete="off"
       (ionInput)="onInput($event)"
@@ -16,6 +16,17 @@
       (ionBlur)="handleBlur()"
       (keydown)="onKeyDown($event)">
     </ion-input>
+    @if (showClearButton && inputValue) {
+      <ion-button
+        class="autocomplete-clear"
+        fill="clear"
+        size="small"
+        slot="end"
+        (click)="handleClearClick()"
+        aria-label="Clear">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    }
   </ion-item>
 
   @if (shouldShowOptions()) {

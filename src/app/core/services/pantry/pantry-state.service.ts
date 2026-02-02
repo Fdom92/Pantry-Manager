@@ -298,23 +298,19 @@ export class PantryStateService {
   }
 
   closeAddModeSheet(): void {
-    if (this.addModeSheetOpen()) {
+    if (!this.addModeSheetOpen()) {
       return;
     }
     this.addModeSheetOpen.set(false);
   }
 
-  dismissAddModeSheet(): void {
-    this.addModeSheetOpen.set(false);
-  }
-
   selectAddModeSimple(): void {
-    this.dismissAddModeSheet();
+    this.closeAddModeSheet();
     this.openFastAddModal();
   }
 
   selectAddModeAdvanced(): void {
-    this.dismissAddModeSheet();
+    this.closeAddModeSheet();
     this.openAdvancedAddModal();
   }
 

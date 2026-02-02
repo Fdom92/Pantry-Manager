@@ -1,4 +1,4 @@
-import { Injectable, effect, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import {
@@ -41,10 +41,20 @@ export class PantryEditItemModalStateService {
   readonly isSaving = signal(false);
   readonly editingItem = signal<PantryItem | null>(null);
   readonly selectingItem = signal(false);
+  readonly selectorEnabled = signal(false);
   readonly selectorQuery = signal('');
-  readonly selectorOptions = signal<AutocompleteItem<PantryItem>[]>([]);
-  readonly showSelectorEmptyAction = signal(false);
-  readonly selectorEmptyActionLabel = signal('');
+  readonly selectedName = signal('');
+  readonly selectorOptions = computed(() =>
+    this.buildSelectorOptions(this.pantryService.loadedProducts())
+  );
+  readonly selectorLocked = computed(() => this.selectorEnabled() && !!this.selectedName().trim());
+  readonly selectorInputValue = computed(() =>
+    this.selectorLocked() ? this.selectedName() : this.selectorQuery()
+  );
+  readonly showSelectorEmptyAction = computed(() => this.selectorQuery().trim().length >= 1);
+  readonly selectorEmptyActionLabel = computed(() =>
+    this.buildSelectorEmptyActionLabel(this.selectorQuery().trim())
+  );
 
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -83,20 +93,12 @@ export class PantryEditItemModalStateService {
       this.listState.clearEditItemModalRequest();
     });
 
-    effect(() => {
-      const items = this.pantryService.loadedProducts();
-      this.selectorOptions.set(this.buildSelectorOptions(items));
-    });
-
-    effect(() => {
-      const query = this.selectorQuery().trim();
-      this.showSelectorEmptyAction.set(query.length >= 1);
-      this.selectorEmptyActionLabel.set(this.buildSelectorEmptyActionLabel(query));
-    });
   }
 
   openCreate(): void {
     this.editingItem.set(null);
+    this.selectorEnabled.set(true);
+    this.selectedName.set('');
     this.resetFormForCreate();
     this.selectingItem.set(true);
     this.selectorQuery.set('');
@@ -106,47 +108,31 @@ export class PantryEditItemModalStateService {
 
   openEdit(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
+    this.selectorEnabled.set(false);
     this.selectingItem.set(false);
     this.selectorQuery.set('');
-    this.editingItem.set(item);
-    this.form.reset({
-      name: item.name ?? '',
-      categoryId: item.categoryId ?? null,
-      supermarket: item.supermarket ?? '',
-      isBasic: Boolean(item.isBasic),
-      minThreshold: item.minThreshold ?? null,
-      notes: '',
-    });
-    const locations = item.locations.length
-      ? item.locations
-      : [
-          {
-            locationId: '',
-            quantity: 0,
-            unit: this.pantryStore.getItemPrimaryUnit(item),
-            batches: [],
-          },
-        ];
-    this.resetLocationControls(locations);
+    this.selectedName.set('');
+    this.applyItemToForm(item);
     this.isSaving.set(false);
     this.isOpen.set(true);
+  }
+
+  private openEditFromSelector(item: PantryItem): void {
+    this.selectingItem.set(false);
+    this.selectorQuery.set('');
+    this.selectedName.set(item.name ?? '');
+    this.applyItemToForm(item);
   }
 
   close(): void {
     if (this.isOpen()) {
       return;
     }
-    this.isOpen.set(false);
-    this.isSaving.set(false);
-    this.editingItem.set(null);
-    this.selectingItem.set(false);
-    this.selectorQuery.set('');
+    this.resetModalState();
   }
 
   dismiss(): void {
     this.isOpen.set(false);
-    this.selectingItem.set(false);
-    this.selectorQuery.set('');
   }
 
   addLocationEntry(): void {
@@ -247,8 +233,8 @@ export class PantryEditItemModalStateService {
       addOption(preset);
     }
 
-    const control = this.locationsArray.at(index);
-    const currentValue = normalizeLocationId(control?.get('locationId')?.value);
+    const locationGroup = this.locationsArray.at(index);
+    const currentValue = normalizeLocationId(locationGroup?.get('locationId')?.value);
     if (currentValue && !seen.has(normalizeKey(currentValue))) {
       addOption(currentValue);
     }
@@ -328,13 +314,27 @@ export class PantryEditItemModalStateService {
     if (!item) {
       return;
     }
-    this.openEdit(item);
+    this.openEditFromSelector(item);
   }
 
-  onSelectorCreateNew(): void {
+  onSelectorCreateNew(value?: string): void {
+    const raw = (value ?? this.selectorQuery()).trim();
+    const nextName = raw ? normalizeEntityName(raw, raw) : '';
     this.selectingItem.set(false);
     this.selectorQuery.set('');
+    this.selectedName.set(nextName);
     this.resetFormForCreate();
+    if (nextName) {
+      this.form.get('name')?.setValue(nextName);
+    }
+  }
+
+  onSelectorClear(): void {
+    if (this.selectorLocked()) {
+      this.openCreate();
+      return;
+    }
+    this.selectorQuery.set('');
   }
 
   private async addSupermarketOption(value: string): Promise<void> {
@@ -429,6 +429,38 @@ export class PantryEditItemModalStateService {
         batches: [],
       },
     ]);
+  }
+
+  private resetModalState(): void {
+    this.isSaving.set(false);
+    this.editingItem.set(null);
+    this.selectingItem.set(false);
+    this.selectorQuery.set('');
+    this.selectorEnabled.set(false);
+    this.selectedName.set('');
+  }
+
+  private applyItemToForm(item: PantryItem): void {
+    this.editingItem.set(item);
+    this.form.reset({
+      name: item.name ?? '',
+      categoryId: item.categoryId ?? null,
+      supermarket: item.supermarket ?? '',
+      isBasic: Boolean(item.isBasic),
+      minThreshold: item.minThreshold ?? null,
+      notes: '',
+    });
+    const locations = item.locations.length
+      ? item.locations
+      : [
+          {
+            locationId: '',
+            quantity: 0,
+            unit: this.pantryStore.getItemPrimaryUnit(item),
+            batches: [],
+          },
+        ];
+    this.resetLocationControls(locations);
   }
 
   private createLocationGroup(initial?: Partial<ItemLocationStock>): FormGroup {

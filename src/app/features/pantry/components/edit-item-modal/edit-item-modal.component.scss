@@ -19,6 +19,7 @@ ion-title, ion-back-button {
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
   overflow: visible;
+  margin-bottom: 12px;
 }
 
 .entity-selector-card__header {
