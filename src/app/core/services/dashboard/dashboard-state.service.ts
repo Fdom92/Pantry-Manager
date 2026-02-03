@@ -1,12 +1,11 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
+import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
-import { computeEarliestExpiry, toNumberOrZero } from '@core/domain/pantry';
+import { toNumberOrZero } from '@core/domain/pantry';
 import type {
   Insight,
   InsightContext,
   InsightCta,
-  ItemBatch,
   PantryItem,
 } from '@core/models';
 import type { ConsumeTodayEntry, DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
@@ -29,7 +28,6 @@ import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { findEntryByKey, toEntitySelectorEntries } from '@core/utils/entity-selector.util';
-import { normalizeLocationId } from '@core/utils/normalization.util';
 
 
 @Injectable()
@@ -377,17 +375,6 @@ export class DashboardStateService {
     return new Date();
   }
 
-  private formatLocationName(locationId?: string): string {
-    const trimmed = (locationId ?? '').trim();
-    return trimmed || this.translate.instant('common.locations.none');
-  }
-
-  private formatQuantityValue(value: number): string {
-    return formatQuantity(value, this.languageService.getCurrentLocale(), {
-      maximumFractionDigits: 1,
-    });
-  }
-
   private getConsumeMetaLabel(item: PantryItem, locale: string): string {
     const batches = item.batches?.length ?? 0;
     const batchLabel = this.translate.instant(
@@ -520,25 +507,6 @@ export class DashboardStateService {
         return this.shoppingListCount();
       default:
         return 0;
-    }
-  }
-
-  private getOverviewCardEmptyToastKey(card: DashboardOverviewCardId): string {
-    switch (card) {
-      case 'expired':
-        return 'dashboard.overview.toasts.expiredEmpty';
-      case 'near-expiry':
-        return 'dashboard.overview.toasts.nearExpiryEmpty';
-      case 'pending-review':
-        return 'dashboard.overview.toasts.pendingReviewEmpty';
-      case 'low-or-empty':
-        return 'dashboard.overview.toasts.lowOrEmptyEmpty';
-      case 'recently-added':
-        return 'dashboard.overview.toasts.recentlyAddedEmpty';
-      case 'shopping':
-        return 'dashboard.overview.toasts.shoppingEmpty';
-      default:
-        return 'dashboard.overview.toasts.genericEmpty';
     }
   }
 

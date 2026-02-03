@@ -960,42 +960,6 @@ export class PantryStateService {
     }
   }
 
-  private formatQuantityForMessage(quantity?: number | null, unit?: MeasurementUnit | string | null): string | null {
-    if (quantity == null || Number.isNaN(Number(quantity))) {
-      return null;
-    }
-    const formattedNumber = formatQuantity(quantity, this.languageService.getCurrentLocale(), {
-      maximumFractionDigits: 2,
-    });
-    const unitLabel = this.getUnitLabel(normalizeUnitValue(unit ?? undefined));
-    return `${formattedNumber} ${unitLabel}`.trim();
-  }
-
-  private getLocationGroups(item: PantryItem): Array<{ locationId: string; batches: ItemBatch[]; unit: string }> {
-    const groups = new Map<string, { locationId: string; batches: ItemBatch[]; unit: string }>();
-    const fallbackUnit = this.getPrimaryUnit(item);
-
-    for (const batch of item.batches ?? []) {
-      const locationId = normalizeLocationId(batch.locationId, UNASSIGNED_LOCATION_KEY);
-      const unit = normalizeUnitValue(batch.unit ?? fallbackUnit);
-      const current = groups.get(locationId);
-      if (current) {
-        current.batches.push({ ...batch, locationId });
-        if (!current.unit) {
-          current.unit = unit;
-        }
-      } else {
-        groups.set(locationId, {
-          locationId,
-          batches: [{ ...batch, locationId }],
-          unit,
-        });
-      }
-    }
-
-    return Array.from(groups.values());
-  }
-
   private getLocationTotal(item: PantryItem, locationId: string): number {
     const normalized = normalizeKey(locationId);
     const batches = (item.batches ?? []).filter(
@@ -1006,14 +970,6 @@ export class PantryStateService {
 
   private getAvailableQuantityFor(item: PantryItem, locationId: string): number {
     return this.getLocationTotal(item, locationId);
-  }
-
-  private getLocationUnitForItem(item: PantryItem, locationId: string): string {
-    const normalized = normalizeKey(locationId);
-    const batch = (item.batches ?? []).find(
-      entry => normalizeKey(entry.locationId ?? UNASSIGNED_LOCATION_KEY) === normalized
-    );
-    return normalizeUnitValue(batch?.unit ?? this.getPrimaryUnit(item));
   }
 
   // -------- Summary / grouping / options --------
@@ -1247,14 +1203,6 @@ export class PantryStateService {
       return 1;
     }
     return 2;
-  }
-
-  private getExpirationTime(item: PantryItem): number {
-    const expiry = computeEarliestExpiry(item.batches ?? []);
-    if (!expiry) {
-      return Number.MAX_SAFE_INTEGER;
-    }
-    return new Date(expiry).getTime();
   }
 
   private formatCategoryName(key: string): string {
