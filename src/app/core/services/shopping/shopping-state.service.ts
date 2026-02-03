@@ -1,5 +1,5 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
-import { UNASSIGNED_LOCATION_KEY, SHOPPING_LIST_NAME } from '@core/constants';
+import { SHOPPING_LIST_NAME } from '@core/constants';
 import { determineSuggestionNeed, groupSuggestionsBySupermarket, incrementSummary } from '@core/domain/shopping';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
@@ -15,7 +15,7 @@ import { ShoppingReasonEnum } from '@core/models/shopping';
 import { LanguageService } from '../shared/language.service';
 import { DownloadService, ShareService, createLatestOnlyRunner, withSignalFlag } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
-import { normalizeLocationId, normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
+import { normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
 import { PantryService } from '../pantry/pantry.service';
@@ -82,7 +82,7 @@ export class ShoppingStateService {
     this.isPurchaseModalOpen.set(false);
   }
 
-  async confirmPurchaseForTarget(data: { quantity: number; expiryDate?: string | null; location: string }): Promise<void> {
+  async confirmPurchaseForTarget(data: { quantity: number; expiryDate?: string | null }): Promise<void> {
     const suggestion = this.purchaseTarget();
     const id = suggestion?.item?._id;
     if (!suggestion || !id || this.isSuggestionProcessing(id)) {
@@ -94,7 +94,6 @@ export class ShoppingStateService {
       await this.pantryService.addNewLot(id, {
         quantity: data.quantity,
         expiryDate: data.expiryDate ?? undefined,
-        location: data.location,
       });
       await this.pantryStore.loadAll();
       if (this.shoppingAnalysis().summary.total === 0) {
@@ -123,10 +122,6 @@ export class ShoppingStateService {
 
   getUnitLabel(unit: MeasurementUnit | string): string {
     return this.pantryStore.getUnitLabel(normalizeUnitValue(unit));
-  }
-
-  getLocationLabel(locationId: string): string {
-    return normalizeLocationId(locationId, this.translate.instant('common.locations.none'));
   }
 
   getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
@@ -190,9 +185,8 @@ export class ShoppingStateService {
     for (const item of items) {
       const minThreshold = item.minThreshold != null ? Number(item.minThreshold) : null;
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
-      const primaryLocation = item.locations[0];
-      const locationId = primaryLocation?.locationId ?? UNASSIGNED_LOCATION_KEY;
-      const unit = normalizeUnitValue(primaryLocation?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
+      const primaryBatch = item.batches?.[0];
+      const unit = normalizeUnitValue(primaryBatch?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
 
       const shouldAutoAdd = this.pantryStore.shouldAutoAddToShoppingList(item, {
         totalQuantity,
@@ -213,7 +207,6 @@ export class ShoppingStateService {
 
         suggestions.push({
           item,
-          locationId,
           reason,
           suggestedQuantity,
           currentQuantity: roundQuantity(totalQuantity),

@@ -1,6 +1,6 @@
 import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_PRODUCT_NAME } from '@core/constants';
 import { computeEarliestExpiry } from '@core/domain/pantry/pantry-stock';
-import type { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
+import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { roundQuantity } from '@core/utils/formatting.util';
 
@@ -78,14 +78,9 @@ export function buildFastAddItemPayload(params: {
   const batch: ItemBatch = {
     quantity: roundedQuantity,
     unit: MeasurementUnit.UNIT,
+    locationId: (params.defaultLocationId ?? '').trim() || undefined,
   };
-  const locations: ItemLocationStock[] = [
-    {
-      locationId: params.defaultLocationId,
-      unit: MeasurementUnit.UNIT,
-      batches: [batch],
-    },
-  ];
+  const batches: ItemBatch[] = [batch];
 
   return {
     _id: params.id,
@@ -93,11 +88,11 @@ export function buildFastAddItemPayload(params: {
     householdId: params.householdId ?? DEFAULT_HOUSEHOLD_ID,
     name: normalizedName,
     categoryId: '',
-    locations,
+    batches,
     supermarket: '',
     isBasic: undefined,
     minThreshold: undefined,
-    expirationDate: computeEarliestExpiry(locations),
+    expirationDate: computeEarliestExpiry(batches),
     createdAt: params.nowIso,
     updatedAt: params.nowIso,
   };

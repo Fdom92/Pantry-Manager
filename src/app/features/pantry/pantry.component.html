@@ -1,11 +1,6 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>{{ 'pantry.title' | translate }}</ion-title>
-    <ion-buttons slot="end" class="header-actions">
-      <ion-button fill="clear" color="text-color" size="small" (click)="facade.openFilters($event)">
-        <ion-icon slot="icon-only" name="filter-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -114,9 +109,8 @@
                 (summaryKeydown)="facade.onSummaryKeydown(item, $event)"
                 (openBatches)="facade.openBatchesModal(item, $event)"
                 (editRequested)="facade.openEditItemModal(item, $event)"
-                (moveRequested)="facade.openMoveItemModal(item, $event)"
                 (deleteRequested)="facade.deleteItem(item, $event)"
-                (adjustBatchRequested)="facade.adjustBatchQuantity(item, $event.location, $event.batch, $event.delta, $event.event)"
+                (adjustBatchRequested)="facade.adjustBatchQuantity(item, $event.locationId, $event.batch, $event.delta, $event.event)"
               ></app-pantry-detail>
             </div>
           }
@@ -153,8 +147,6 @@
     (save)="facade.submitFastAdd()">
   </app-entity-selector-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
-  <app-pantry-move-modal></app-pantry-move-modal>
-  <app-pantry-filters-modal></app-pantry-filters-modal>
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="add-fab">

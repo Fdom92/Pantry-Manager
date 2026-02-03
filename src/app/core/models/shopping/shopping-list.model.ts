@@ -28,7 +28,6 @@ export interface ShoppingListItem {
 }
 export interface ShoppingSuggestion<TItem = string> {
   item: TItem;
-  locationId: string;
   reason: ShoppingReason;
   suggestedQuantity: number;
   currentQuantity: number;

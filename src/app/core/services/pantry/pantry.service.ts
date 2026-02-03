@@ -1,10 +1,9 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
-import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
+import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import {
   collectBatches as collectBatchesItem,
   computeExpirationStatus as computeExpirationStatusItem,
   getItemEarliestExpiry as getItemEarliestExpiryItem,
-  getItemQuantityByLocation as getItemQuantityByLocationItem,
   getItemTotalMinThreshold as getItemTotalMinThresholdItem,
   getItemTotalQuantity as getItemTotalQuantityItem,
   hasOpenBatch as hasOpenBatchItem,
@@ -17,13 +16,13 @@ import {
   computeEarliestExpiry as computeEarliestExpiryStock,
   mergeBatchesByExpiry as mergeBatchesByExpiryStock,
   normalizeBatches as normalizeBatchesStock,
-  sumQuantities as sumQuantitiesStock,
   toNumberOrZero as toNumberOrZeroStock,
 } from '@core/domain/pantry/pantry-stock';
-import { DEFAULT_PANTRY_FILTERS, ItemBatch, ItemLocationStock, LegacyLocationStock, PantryFilterState, PantryItem, PantrySortMode } from '@core/models/pantry';
+import { DEFAULT_PANTRY_FILTERS, ItemBatch, PantryFilterState, PantryItem } from '@core/models/pantry';
 import { ExpirationStatus, MeasurementUnit } from '@core/models/shared';
-import { normalizeUnitValue } from '@core/utils/normalization.util';
+import { normalizeLocationId, normalizeUnitValue } from '@core/utils/normalization.util';
 import { StorageService } from '../shared/storage.service';
+import type PouchDB from 'pouchdb-browser';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +42,6 @@ export class PantryService extends StorageService<PantryItem> {
   readonly filteredProducts = signal<PantryItem[]>([]);
   readonly searchQuery = signal('');
   readonly activeFilters = signal<PantryFilterState>({ ...DEFAULT_PANTRY_FILTERS });
-  readonly sortMode = signal<PantrySortMode>('name');
   readonly pageOffset = signal(0);
   readonly pageSize = signal(300);
   readonly loading = signal(false);
@@ -171,34 +169,6 @@ export class PantryService extends StorageService<PantryItem> {
     return items.filter(item => this.hasStock(item));
   }
 
-  /** Return items that currently have stock in the requested location. */
-  async getByLocation(locationId: string): Promise<PantryItem[]> {
-    const all = await this.getAllActive();
-    return all.filter(item =>
-      item.locations.some(loc => loc.locationId === locationId)
-    );
-  }
-
-  /** Retrieve items whose aggregated quantity is at or below the configured threshold. */
-  async getLowStock(): Promise<PantryItem[]> {
-    const items = await this.getAllActive();
-  	return items.filter(item => this.isLowStock(item));
-  }
-
-  /** Retrieve items that have at least one location expiring within the provided window. */
-  async getNearExpiry(daysAhead: number = 7): Promise<PantryItem[]> {
-    const items = await this.getAllActive();
-    return items.filter(item => this.isNearExpiry(item, daysAhead));
-  }
-
-  /** Compute the overall expiration status based on the most urgent location expiry. */
-  getExpirationStatus(item: PantryItem): ExpirationStatus {
-    if (!item.locations.length) {
-      return ExpirationStatus.OK;
-    }
-    return this.computeExpirationStatus(item.locations);
-  }
-
   async deleteItem(id: string): Promise<boolean> {
     const ok = await this.remove(id);
     if (ok) {
@@ -208,63 +178,12 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   /**
-   * Update the quantity for a specific location entry, creating a placeholder if needed,
-   * and then persist the refreshed document.
-   */
-  async updateLocationQuantity(itemId: string, quantity: number, locationId?: string): Promise<PantryItem | null> {
-    const current = await this.get(itemId);
-    if (!current) {
-      return null;
-    }
-
-    const locations = [...(current.locations ?? [])];
-    const targetId = locationId ?? locations[0]?.locationId;
-    if (!targetId) {
-      return null;
-    }
-
-    let handled = false;
-    const nextLocations = locations.map(loc => {
-      if (loc.locationId === targetId) {
-        handled = true;
-        const unit = normalizeUnitValue(loc.unit);
-        const sanitizedBatches = this.normalizeBatches(loc.batches, unit);
-        const nextTotal = Math.max(0, quantity);
-        const adjustedBatches = this.applyQuantityDeltaToBatches(sanitizedBatches, nextTotal, unit);
-        return {
-          ...loc,
-          unit,
-          batches: adjustedBatches,
-        };
-      }
-      return loc;
-    });
-
-    if (!handled) {
-      const unit = normalizeUnitValue(locations[0]?.unit);
-      const nextTotal = Math.max(0, quantity);
-      nextLocations.push({
-        locationId: targetId,
-        unit,
-        batches: this.applyQuantityDeltaToBatches([], nextTotal, unit),
-      });
-    }
-
-    const updated: PantryItem = {
-      ...current,
-      locations: nextLocations,
-    };
-
-    return this.saveItem(updated);
-  }
-
-  /**
-   * Append a brand new batch to the requested product/location without altering other batches.
-   * If the location does not exist yet, it will be created.
+   * Append a brand new batch to the requested product without altering other batches.
+   * If a location is provided, it will be normalized and stored on the batch.
    */
   async addNewLot(
     productId: string,
-    lot: { quantity: number; expiryDate?: string | null; location: string; unit?: string }
+    lot: { quantity: number; expiryDate?: string | null; location?: string; unit?: string }
   ): Promise<PantryItem | null> {
     const item = await this.get(productId);
     if (!item) {
@@ -277,50 +196,24 @@ export class PantryService extends StorageService<PantryItem> {
       return current;
     }
 
-    const locationId = (lot?.location ?? '').trim() || 'unassigned';
-    const unit = normalizeUnitValue(
-      lot?.unit ?? current.locations[0]?.unit ?? MeasurementUnit.UNIT
-    );
+    const rawLocation = (lot?.location ?? '').trim();
+    const locationId = rawLocation ? normalizeLocationId(rawLocation, UNASSIGNED_LOCATION_KEY) : undefined;
+    const unit = normalizeUnitValue(lot?.unit ?? current.batches[0]?.unit ?? MeasurementUnit.UNIT);
     const expiryDate = lot?.expiryDate ?? undefined;
 
-    const nextLocations = [...(current.locations ?? [])];
-    const targetIndex = nextLocations.findIndex(loc => (loc.locationId ?? '').trim() === locationId);
     const newBatch: ItemBatch = {
       batchId: this.generateBatchId(),
       quantity,
       unit,
       expirationDate: expiryDate || undefined,
       opened: false,
+      locationId,
     };
-
-    if (targetIndex >= 0) {
-      const target = nextLocations[targetIndex];
-      const batches = this.normalizeBatches(target.batches, unit);
-      const merged = this.mergeBatchesByExpiry([...batches, newBatch]);
-      nextLocations[targetIndex] = {
-        ...target,
-        locationId,
-        unit,
-        batches: merged,
-      };
-    } else {
-      nextLocations.push({
-        locationId,
-        unit,
-        batches: this.mergeBatchesByExpiry([newBatch]),
-      });
-    }
 
     return this.saveItem({
       ...current,
-      locations: nextLocations,
+      batches: this.mergeBatchesByExpiry([...(current.batches ?? []), newBatch]),
     });
-  }
-
-  /** Retrieve items that already have an expired location. */
-  async getExpired(): Promise<PantryItem[]> {
-    const items = await this.getAllActive();
-    return items.filter(item => this.isExpired(item));
   }
 
   /** Build a quick aggregate for dashboards without forcing callers to re-implement loops. */
@@ -435,14 +328,6 @@ export class PantryService extends StorageService<PantryItem> {
     this.requestPipelineReset();
   }
 
-  /** Changes the local sort mode without touching the database. */
-  setSortMode(mode: PantrySortMode): void {
-    if (this.sortMode() === mode) {
-      return;
-    }
-    this.sortMode.set(mode);
-  }
-
   /** Updates a single filter entry and restarts the paginated load. */
   setFilter<K extends keyof PantryFilterState>(key: K, value: PantryFilterState[K]): void {
     this.setFilters({ [key]: value } as Partial<PantryFilterState>);
@@ -492,9 +377,8 @@ export class PantryService extends StorageService<PantryItem> {
     const defaultFilters: PantryFilterState = { ...DEFAULT_PANTRY_FILTERS };
     const searchChanged = Boolean(this.searchQuery());
     const filtersChanged = !this.areFiltersEqual(this.activeFilters(), defaultFilters);
-    const sortChanged = this.sortMode() !== 'name';
 
-    if (!searchChanged && !filtersChanged && !sortChanged) {
+    if (!searchChanged && !filtersChanged) {
       return;
     }
 
@@ -503,9 +387,6 @@ export class PantryService extends StorageService<PantryItem> {
     }
     if (filtersChanged) {
       this.activeFilters.set(defaultFilters);
-    }
-    if (sortChanged) {
-      this.sortMode.set('name');
     }
   }
 
@@ -534,49 +415,43 @@ export class PantryService extends StorageService<PantryItem> {
     if (filtersChanged) {
       this.activeFilters.set(nextFilters);
     }
-    this.sortMode.set('name');
     this.requestPipelineReset();
   }
 
   /** --- Public helpers for store/UI logic reuse --- */
-  /** Check whether the combined stock across locations is considered low. */
+  /** Check whether the combined stock across batches is considered low. */
   isItemLowStock(item: PantryItem): boolean {
     return isItemLowStockItem(item);
   }
 
-  /** Determine if any location expires within the provided rolling window. */
+  /** Determine if any batch expires within the provided rolling window. */
   isItemNearExpiry(item: PantryItem, daysAhead: number = NEAR_EXPIRY_WINDOW_DAYS): boolean {
     return isItemNearExpiryItem(item, new Date(), daysAhead);
   }
 
-  /** Determine if at least one location has already expired. */
+  /** Determine if at least one batch has already expired. */
   isItemExpired(item: PantryItem): boolean {
     return isItemExpiredItem(item, new Date());
   }
 
-  /** Sum every location quantity into a single figure. */
+  /** Sum every batch quantity into a single figure. */
   getItemTotalQuantity(item: PantryItem): number {
     return getItemTotalQuantityItem(item);
   }
 
-  /** Return the minimum threshold configured for the product (legacy per-location sums are handled earlier). */
+  /** Return the minimum threshold configured for the product (legacy handling happens during migration). */
   getItemTotalMinThreshold(item: PantryItem): number {
     return getItemTotalMinThresholdItem(item);
   }
 
-  /** Return the earliest expiry date among the defined locations. */
+  /** Return the earliest expiry date among the defined batches. */
   getItemEarliestExpiry(item: PantryItem): string | undefined {
     return getItemEarliestExpiryItem(item);
   }
 
-    /** Total quantity stored for a specific location id. */
-  getItemQuantityByLocation(item: PantryItem, locationId: string): number {
-    return getItemQuantityByLocationItem(item, locationId);
-  }
-
   /** Return all batches currently tracked for the provided item. */
   getItemBatches(item: PantryItem): ItemBatch[] {
-    return collectBatchesItem(item.locations, { generateBatchId: this.generateBatchId.bind(this) });
+    return collectBatchesItem(item.batches ?? [], { generateBatchId: this.generateBatchId.bind(this) });
   }
 
   /** Determine whether any batch in the item is marked as opened. */
@@ -603,18 +478,17 @@ export class PantryService extends StorageService<PantryItem> {
 
   /**
    * Recomputes the filtered list whenever the raw items, search term, filters,
-   * or sort mode change.
+   * or sorting rules change.
    */
   private recomputeFilteredProducts(): void {
     const loaded = this.activeProducts();
     const query = this.searchQuery().toLowerCase();
     const filters = this.activeFilters();
-    const mode = this.sortMode();
 
     const filtered = loaded.filter(item => {
       return this.hasStock(item) && this.matchesSearch(item, query) && this.matchesFilters(item, filters);
     });
-    const sorted = this.sortItems(filtered, mode);
+    const sorted = this.sortItems(filtered);
     this.filteredProducts.set(sorted);
   }
 
@@ -646,16 +520,6 @@ export class PantryService extends StorageService<PantryItem> {
     if (filters.normalOnly && (this.isLowStock(item) || this.isExpired(item) || this.isNearExpiry(item))) {
       return false;
     }
-    if (filters.categoryId !== null && filters.categoryId !== undefined && (item.categoryId ?? '') !== filters.categoryId) {
-      return false;
-    }
-    if (
-      filters.locationId !== null &&
-      filters.locationId !== undefined &&
-      !item.locations.some(loc => (loc.locationId ?? '') === filters.locationId)
-    ) {
-      return false;
-    }
     return true;
   }
 
@@ -663,38 +527,19 @@ export class PantryService extends StorageService<PantryItem> {
     return this.getItemTotalQuantity(item) > 0;
   }
 
-  private sortItems(items: PantryItem[], mode: PantrySortMode): PantryItem[] {
+  private sortItems(items: PantryItem[]): PantryItem[] {
     if (items.length <= 1) {
       return items;
     }
     const sorted = [...items];
-    sorted.sort((a, b) => this.compareItemsForSort(a, b, mode));
+    sorted.sort((a, b) => this.compareItemsForSort(a, b));
     return sorted;
   }
 
-  private compareItemsForSort(a: PantryItem, b: PantryItem, mode: PantrySortMode): number {
+  private compareItemsForSort(a: PantryItem, b: PantryItem): number {
     const expirationDiff = this.getExpirationWeight(a) - this.getExpirationWeight(b);
     if (expirationDiff !== 0) {
       return expirationDiff;
-    }
-
-    switch (mode) {
-      case 'quantity': {
-        const quantityDiff = this.getItemTotalQuantity(b) - this.getItemTotalQuantity(a);
-        if (quantityDiff !== 0) {
-          return quantityDiff;
-        }
-        break;
-      }
-      case 'expiration': {
-        const timeDiff = this.getExpirationTime(a) - this.getExpirationTime(b);
-        if (timeDiff !== 0) {
-          return timeDiff;
-        }
-        break;
-      }
-      default:
-        break;
     }
 
     const labelA = (a.name ?? '').toLowerCase();
@@ -730,9 +575,7 @@ export class PantryService extends StorageService<PantryItem> {
       a.expiring === b.expiring &&
       a.recentlyAdded === b.recentlyAdded &&
       a.normalOnly === b.normalOnly &&
-      a.basic === b.basic &&
-      (a.categoryId ?? null) === (b.categoryId ?? null) &&
-      (a.locationId ?? null) === (b.locationId ?? null)
+      a.basic === b.basic
     );
   }
 
@@ -755,31 +598,27 @@ export class PantryService extends StorageService<PantryItem> {
     return 2;
   }
 
-  private getExpirationTime(item: PantryItem): number {
-    const expiry = this.computeEarliestExpiry(item.locations);
-    if (!expiry) {
-      return Number.MAX_SAFE_INTEGER;
-    }
-    return new Date(expiry).getTime();
-  }
-
   /** Compute aggregate fields without mutating the original payload. */
   private applyDerivedFields(item: PantryItem): PantryItem {
-    const rawLocations = Array.isArray(item.locations) ? item.locations : [];
-    const locations = this.normalizeLocations(rawLocations);
+    const rawBatches = Array.isArray(item.batches) ? item.batches : [];
+    const fallbackUnit = normalizeUnitValue(
+      rawBatches.find(batch => Boolean(batch?.unit))?.unit ?? MeasurementUnit.UNIT
+    );
+    const batches = this.normalizeBatches(rawBatches, fallbackUnit);
     const supermarket = this.normalizeSupermarketName(
       (item.supermarket ?? (item as any).supermarketId) as string | undefined
     );
-    const minThreshold = this.normalizeItemMinThreshold(item.minThreshold, rawLocations as LegacyLocationStock[]);
+    const minThreshold = this.toNumberOrUndefined(item.minThreshold);
     const prepared: PantryItem = {
       ...item,
       supermarket,
-      locations,
+      batches,
       minThreshold,
-      expirationDate: this.computeEarliestExpiry(locations),
-      expirationStatus: this.computeExpirationStatus(locations),
+      expirationDate: this.computeEarliestExpiry(batches),
+      expirationStatus: this.computeExpirationStatus(batches),
     };
     delete (prepared as any).supermarketId;
+    delete (prepared as any).locations;
     return prepared;
   }
 
@@ -793,63 +632,8 @@ export class PantryService extends StorageService<PantryItem> {
     return lower.replace(/\b\w/g, char => char.toUpperCase());
   }
 
-  private normalizeLocations(locations?: ItemLocationStock[]): ItemLocationStock[] {
-    const raw = Array.isArray(locations) ? locations.filter(Boolean) : [];
-    const normalized = raw
-      .map(location => this.normalizeLocation(location))
-      .filter((loc): loc is ItemLocationStock => Boolean((loc.locationId ?? '').trim()));
-
-    if (!normalized.length) {
-      return [
-        {
-          locationId: 'unassigned',
-          unit: MeasurementUnit.UNIT,
-          batches: [],
-        },
-      ];
-    }
-
-    return normalized;
-  }
-
-  private normalizeItemMinThreshold(
-    itemMinThreshold: number | undefined,
-    rawLocations: LegacyLocationStock[]
-  ): number | undefined {
-    const normalizedValue = this.toNumberOrUndefined(itemMinThreshold);
-    if (normalizedValue != null) {
-      return normalizedValue;
-    }
-
-    const legacyTotal = rawLocations.reduce((sum, location) => {
-      const legacyMin = this.toNumberOrUndefined(location?.minThreshold);
-      return sum + (legacyMin ?? 0);
-    }, 0);
-
-    return legacyTotal > 0 ? legacyTotal : undefined;
-  }
-
-  private normalizeLocation(location: ItemLocationStock): ItemLocationStock {
-    const unit = normalizeUnitValue(location.unit);
-    const locationId = (location.locationId ?? 'unassigned').trim() || 'unassigned';
-    const batches = this.normalizeBatches(location.batches, unit);
-    const legacyQuantity = this.toNumberOrZero((location as any).quantity);
-    const totalBatchQuantity = this.sumBatchQuantities(batches);
-
-    if (legacyQuantity > 0 && totalBatchQuantity === 0) {
-      batches.push({
-        batchId: this.generateBatchId(),
-        quantity: legacyQuantity,
-        unit,
-        opened: false,
-      });
-    }
-
-    return {
-      locationId,
-      unit,
-      batches,
-    };
+  getMigrationDatabase(): PouchDB.Database<PantryItem> {
+    return this.database;
   }
 
   private normalizeBatches(batches: ItemBatch[] | undefined, fallbackUnit: MeasurementUnit | string): ItemBatch[] {
@@ -863,105 +647,29 @@ export class PantryService extends StorageService<PantryItem> {
     return mergeBatchesByExpiryStock(batches);
   }
 
-  /** Identify the earliest expiry date across all location entries. */
-  private computeEarliestExpiry(locations: ItemLocationStock[]): string | undefined {
-    return computeEarliestExpiryStock(locations);
+  /** Identify the earliest expiry date across all batches. */
+  private computeEarliestExpiry(batches: ItemBatch[]): string | undefined {
+    return computeEarliestExpiryStock(batches);
   }
 
-  /** Project a high-level expiration status based on per-location dates. */
-  private computeExpirationStatus(locations: ItemLocationStock[]): ExpirationStatus {
-    return computeExpirationStatusItem(locations, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
+  /** Project a high-level expiration status based on batch dates. */
+  private computeExpirationStatus(batches: ItemBatch[]): ExpirationStatus {
+    return computeExpirationStatusItem(batches, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
   }
 
-  /** Internal low-stock detector that considers the sum of all locations. */
+  /** Internal low-stock detector that considers the sum of all batches. */
   private isLowStock(item: PantryItem): boolean {
     return isItemLowStockItem(item);
   }
 
-  /** Internal near-expiry detector that checks every location. */
+  /** Internal near-expiry detector that checks every batch. */
   private isNearExpiry(item: PantryItem, daysAhead: number = NEAR_EXPIRY_WINDOW_DAYS): boolean {
     return isItemNearExpiryItem(item, new Date(), daysAhead);
   }
 
-  /** Internal expired detector that checks every location. */
+  /** Internal expired detector that checks every batch. */
   private isExpired(item: PantryItem): boolean {
     return isItemExpiredItem(item, new Date());
-  }
-
-  private collectBatches(locations: ItemLocationStock[]): ItemBatch[] {
-    return collectBatchesItem(locations, { generateBatchId: this.generateBatchId.bind(this) });
-  }
-
-  private sumBatchQuantities(batches: ItemBatch[] | undefined): number {
-    return sumQuantitiesStock(batches);
-  }
-
-  private applyQuantityDeltaToBatches(
-    batches: ItemBatch[],
-    nextTotal: number,
-    fallbackUnit: MeasurementUnit | string
-  ): ItemBatch[] {
-    const sanitized: ItemBatch[] = batches.map(batch => ({
-      ...batch,
-      quantity: this.toNumberOrZero(batch.quantity),
-      unit: normalizeUnitValue(batch.unit ?? fallbackUnit),
-    }));
-    const currentTotal = this.sumBatchQuantities(sanitized);
-    const target = this.toNumberOrZero(nextTotal);
-
-    if (target <= 0) {
-      return [];
-    }
-
-    if (Math.abs(target - currentTotal) < 1e-9) {
-      return sanitized;
-    }
-
-    if (currentTotal === 0) {
-      return [
-        {
-          batchId: this.generateBatchId(),
-          quantity: target,
-          unit: normalizeUnitValue(fallbackUnit),
-          opened: false,
-        },
-      ];
-    }
-
-    let delta = target - currentTotal;
-    const adjusted = sanitized.map(batch => ({ ...batch }));
-
-    if (delta > 0) {
-      if (!adjusted.length) {
-        adjusted.push({
-          batchId: this.generateBatchId(),
-          quantity: target,
-          unit: normalizeUnitValue(fallbackUnit),
-          opened: false,
-        });
-      } else {
-        adjusted[0].quantity = this.toNumberOrZero(adjusted[0].quantity) + delta;
-      }
-      return adjusted;
-    }
-
-    delta = Math.abs(delta);
-    for (let i = adjusted.length - 1; i >= 0 && delta > 0; i--) {
-      const batchQty = this.toNumberOrZero(adjusted[i].quantity);
-      if (batchQty <= delta + 1e-9) {
-        delta -= batchQty;
-        adjusted.splice(i, 1);
-      } else {
-        adjusted[i].quantity = batchQty - delta;
-        delta = 0;
-      }
-    }
-
-    if (delta > 0) {
-      return [];
-    }
-
-    return adjusted;
   }
 
   private toNumberOrZero(value: unknown): number {

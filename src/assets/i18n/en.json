@@ -45,7 +45,7 @@
       "finish": "Start"
     },
     "validation": {
-      "minimumSelection": "Select at least one option to continue.",
+      "locationsOptional": "You can skip this step if you don’t want to add locations now.",
       "categoriesOptional": "You can add categories later."
     },
     "locations": {
@@ -254,7 +254,6 @@
     "suggestions": {
       "title": "Shopping list",
       "loading": "Building shopping list…",
-      "destination": "Suggested location: {{ location }}",
       "totalStock": "Total stock: {{ amount }} {{ unit }}",
       "minStock": "Min: {{ amount }} {{ unit }}",
       "empty": "Nothing pending right now. I'll let you know when something needs restocking."
@@ -408,16 +407,7 @@
         "expired": "Expired"
       },
       "basic": "Staples",
-      "title": "Filters",
-      "search": "Search products",
-      "category": "Category",
-      "location": "Location",
-      "sort": {
-        "label": "Sort by",
-        "name": "Name (A-Z)",
-        "quantity": "Quantity (high → low)",
-        "expiration": "Expiry (soonest first)"
-      }
+      "search": "Search products"
     },
     "fastAdd": {
       "cta": "Add quickly",
@@ -458,6 +448,7 @@
     "form": {
       "editTitle": "Edit item",
       "newTitle": "New item",
+      "details": "Details",
       "name": "Name",
       "namePlaceholder": "Rice, milk...",
       "category": "Category",
@@ -477,10 +468,11 @@
       },
       "basic": "Pantry staple item",
       "minThreshold": "Minimum quantity",
-      "locationTitle": "Location {{ index }}",
-      "locationTotal": "Total: {{ total }} {{ unit }}",
       "location": "Location",
       "locationPlaceholder": "Select a location",
+      "locationAdd": {
+        "option": "+ Add location"
+      },
       "batches": {
         "title": "Batches",
         "add": "Add batch",
@@ -489,8 +481,7 @@
         "quantity": "Quantity",
         "expiry": "Expiration date",
         "opened": "Opened"
-      },
-      "addLocation": "Add location"
+      }
     },
     "detail": {
       "earliest": "Expires first: {{ date }}",
@@ -534,33 +525,10 @@
       "actions": {
         "viewBatches": "View batches",
         "editItem": "Edit item",
-        "moveItem": "Move item",
         "deleteItem": "Delete item",
         "menuLabel": "Open actions menu",
         "expand": "Expand item details",
         "collapse": "Collapse item details"
-      }
-    },
-    "move": {
-      "from": "From",
-      "to": "To",
-      "toPlaceholder": "New location (e.g. Freezer)",
-      "quantity": "Quantity to move",
-      "suggestions": "Suggestions",
-      "availability": {
-        "label": "Available: {{ value }}",
-        "empty": "No stock available in this location"
-      },
-      "errors": {
-        "missingLocations": "Select both origin and destination.",
-        "sameLocation": "Origin and destination must be different.",
-        "invalidQuantity": "Enter a quantity greater than zero.",
-        "noAvailableStock": "There is no stock to move from that location.",
-        "generic": "We couldn't move the item. Try again."
-      },
-      "submit": "Move",
-      "toasts": {
-        "success": "Moved {{ quantity }} from {{ from }} to {{ to }}."
       }
     },
     "toasts": {
@@ -688,10 +656,11 @@
         "empty": "Add a location to get started.",
         "field": "Location {{ index }}",
         "add": "Add location",
-        "replaceTitle": "Replace location",
-        "replaceMessage": "This location is used by {{ count }} products. Choose a replacement.",
-        "replaceAction": "Replace",
-        "removeNoReplacement": "Add another location before removing this one."
+        "addPromptTitle": "Add location",
+        "addPromptPlaceholder": "Location name",
+        "removeInUseTitle": "Location in use",
+        "removeInUseMessage": "This location is used by {{ count }} products. Those products will lose this information.",
+        "removeAction": "Remove"
       },
       "categories": {
         "title": "Categories",
@@ -699,6 +668,8 @@
         "empty": "Add a category to get started.",
         "field": "Category {{ index }}",
         "add": "Add category",
+        "addPromptTitle": "Add category",
+        "addPromptPlaceholder": "Category name",
         "removeInUseTitle": "Category in use",
         "removeInUseMessage": "This category is used by {{ count }} products. Those products will lose this information.",
         "removeAction": "Remove"
@@ -709,6 +680,8 @@
         "empty": "Add a supermarket to get started.",
         "field": "Supermarket {{ index }}",
         "add": "Add supermarket",
+        "addPromptTitle": "Add supermarket",
+        "addPromptPlaceholder": "Supermarket name",
         "other": "Other",
         "removeInUseTitle": "Supermarket in use",
         "removeInUseMessage": "This supermarket is used by {{ count }} products. Those products will lose this information.",

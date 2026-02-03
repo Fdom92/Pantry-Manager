@@ -61,7 +61,6 @@
                           </ion-chip>
                         </div>
                         <p class="meta">
-                          {{ 'shopping.suggestions.destination' | translate:{ location: facade.getLocationLabel(suggestion.locationId) } }} ·
                           {{ 'shopping.suggestions.totalStock' | translate:{ amount: (suggestion.currentQuantity | number:'1.0-2'), unit: facade.getUnitLabel(suggestion.unit) } }}
                           @if (suggestion.minThreshold !== undefined) {
                             · {{ 'shopping.suggestions.minStock' | translate:{ amount: (suggestion.minThreshold | number:'1.0-2'), unit: facade.getUnitLabel(suggestion.unit) } }}

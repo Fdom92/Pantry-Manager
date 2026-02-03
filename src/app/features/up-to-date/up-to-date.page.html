@@ -151,27 +151,6 @@
                   </ion-item>
                 }
 
-                @if (facade.editNeedsLocation()) {
-                  <ion-item>
-                    <ion-label>{{ 'pantry.form.location' | translate }}</ion-label>
-                    @let locationOptions = facade.locationOptions();
-                    <ion-select
-                      interface="popover"
-                      [value]="facade.editLocation()"
-                      [disabled]="!locationOptions.length"
-                      (ionChange)="facade.onEditLocationChange($event)">
-                      @for (option of locationOptions; track option) {
-                        <ion-select-option [value]="option">{{ option }}</ion-select-option>
-                      }
-                    </ion-select>
-                    @if (!locationOptions.length) {
-                      <ion-note slot="helper" color="medium">
-                        {{ 'common.selects.noOptions' | translate }}
-                      </ion-note>
-                    }
-                  </ion-item>
-                }
-
                 @if (facade.editNeedsExpiry()) {
                   <ion-item>
                     <ion-label>{{ 'upToDate.edit.expiryToggle' | translate }}</ion-label>

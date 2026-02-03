@@ -1,12 +1,12 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
+import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
-import { getLocationEarliestExpiry, getLocationQuantity, toNumberOrZero } from '@core/domain/pantry';
+import { computeEarliestExpiry, toNumberOrZero } from '@core/domain/pantry';
 import type {
   Insight,
   InsightContext,
   InsightCta,
-  ItemLocationStock,
+  ItemBatch,
   PantryItem,
 } from '@core/models';
 import type { ConsumeTodayEntry, DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
@@ -29,6 +29,7 @@ import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { findEntryByKey, toEntitySelectorEntries } from '@core/utils/entity-selector.util';
+import { normalizeLocationId } from '@core/utils/normalization.util';
 
 
 @Injectable()
@@ -332,33 +333,6 @@ export class DashboardStateService {
     return this.pantryStore.getItemTotalMinThreshold(item);
   }
 
-  getItemLocationsSummary(item: PantryItem): string {
-    return item.locations
-      .map(location => {
-        const quantity = this.formatQuantityValue(getLocationQuantity(location));
-        const unit = this.pantryStore.getUnitLabel(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
-        const name = this.formatLocationName(location.locationId);
-        const batches = Array.isArray(location.batches) ? location.batches : [];
-        if (batches.length) {
-          const earliest = getLocationEarliestExpiry(location);
-          const batchLabel = this.translate.instant(
-            batches.length === 1 ? 'dashboard.batches.single' : 'dashboard.batches.plural',
-            { count: batches.length }
-          );
-          const extra = earliest
-            ? this.translate.instant('dashboard.batches.withExpiry', {
-                batchLabel,
-                date: formatShortDate(earliest, this.languageService.getCurrentLocale(), { fallback: earliest }),
-              })
-            : batchLabel;
-          const extraSegment = extra ? ` (${extra})` : '';
-          return `${quantity} ${unit} · ${name}${extraSegment}`;
-        }
-        return `${quantity} ${unit} · ${name}`;
-      })
-      .join(', ');
-  }
-
   buildConsumeTodayOptions(
     items: PantryItem[],
     excludedIds: Set<string> = new Set()
@@ -415,7 +389,7 @@ export class DashboardStateService {
   }
 
   private getConsumeMetaLabel(item: PantryItem, locale: string): string {
-    const batches = item.locations?.reduce((sum, loc) => sum + (loc.batches?.length ?? 0), 0) ?? 0;
+    const batches = item.batches?.length ?? 0;
     const batchLabel = this.translate.instant(
       batches === 1 ? 'dashboard.batches.single' : 'dashboard.batches.plural',
       { count: batches }
@@ -436,78 +410,44 @@ export class DashboardStateService {
     if (delta <= 0) {
       return null;
     }
-    const nextLocations = (item.locations ?? []).map(location => ({
-      ...location,
-      batches: Array.isArray(location.batches) ? location.batches.map(batch => ({ ...batch })) : [],
-    }));
-    const batchRefs: Array<{
-      locationIndex: number;
-      batchIndex: number;
-      expiration?: string;
-      order: number;
-    }> = [];
-    let order = 0;
-    for (let i = 0; i < nextLocations.length; i++) {
-      const batches = nextLocations[i].batches ?? [];
-      for (let j = 0; j < batches.length; j++) {
-        const quantity = toNumberOrZero(batches[j]?.quantity);
-        if (quantity <= 0) {
-          continue;
+    const nextBatches = (item.batches ?? []).map(batch => ({ ...batch }));
+    const ordered = nextBatches
+      .map((batch, index) => ({ batch, index }))
+      .filter(entry => toNumberOrZero(entry.batch.quantity) > 0)
+      .sort((a, b) => {
+        const left = this.getExpiryValue(a.batch.expirationDate);
+        const right = this.getExpiryValue(b.batch.expirationDate);
+        if (left === right) {
+          return a.index - b.index;
         }
-        batchRefs.push({
-          locationIndex: i,
-          batchIndex: j,
-          expiration: batches[j]?.expirationDate ?? undefined,
-          order: order++,
-        });
-      }
-    }
+        return left - right;
+      });
 
-    if (!batchRefs.length) {
+    if (!ordered.length) {
       return null;
     }
 
-    batchRefs.sort((a, b) => {
-      const left = this.getExpiryValue(a.expiration);
-      const right = this.getExpiryValue(b.expiration);
-      if (left === right) {
-        return a.order - b.order;
-      }
-      return left - right;
-    });
-
     let remaining = delta;
-    for (const ref of batchRefs) {
+    for (const entry of ordered) {
       if (remaining <= 0) {
         break;
       }
-      const location = nextLocations[ref.locationIndex];
-      const batch = location.batches?.[ref.batchIndex];
-      if (!batch) {
-        continue;
-      }
-      const quantity = toNumberOrZero(batch.quantity);
+      const quantity = toNumberOrZero(entry.batch.quantity);
       if (quantity <= 0) {
         continue;
       }
       if (quantity <= remaining + 1e-9) {
         remaining -= quantity;
-        batch.quantity = 0;
+        entry.batch.quantity = 0;
       } else {
-        batch.quantity = quantity - remaining;
+        entry.batch.quantity = quantity - remaining;
         remaining = 0;
-      }
-    }
-
-    for (const location of nextLocations) {
-      if (Array.isArray(location.batches)) {
-        location.batches = location.batches.filter(batch => toNumberOrZero(batch.quantity) > 0);
       }
     }
 
     return {
       ...item,
-      locations: nextLocations,
+      batches: nextBatches.filter(batch => toNumberOrZero(batch.quantity) > 0),
     };
   }
 
