@@ -6,3 +6,4 @@ export * from './onboarding';
 export * from './shared';
 export * from './shopping';
 export * from './upgrade';
+export * from './events';

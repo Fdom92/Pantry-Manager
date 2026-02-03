@@ -45,6 +45,7 @@ import {
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmService, withSignalFlag } from '../shared';
+import { EventLogService } from '../events';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { dedupeByNormalizedKey, normalizeEntityName } from '@core/utils/normalization.util';
@@ -59,12 +60,14 @@ export class PantryStateService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly confirm = inject(ConfirmService);
+  private readonly eventLog = inject(EventLogService);
 
   // DATA
   readonly MeasurementUnit = MeasurementUnit;
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly pendingEventMeta = new Map<string, { batchId?: string; locationId?: string }>();
   private readonly stockSaveDelay = 500;
   private readonly expandedItems = new Set<string>();
   private realtimeSubscribed = false;
@@ -274,21 +277,33 @@ export class PantryStateService {
     }
 
     await withSignalFlag(this.isFastAdding, async () => {
-      const nowIso = new Date().toISOString();
       const defaultLocationId = this.getDefaultLocationId();
       for (const entry of entries) {
+        const timestamp = new Date().toISOString();
         if (entry.isNew || !entry.item) {
           const item = buildFastAddItemPayload({
             id: createDocumentId('item'),
-            nowIso,
+            nowIso: timestamp,
             name: entry.name,
             quantity: entry.quantity,
             defaultLocationId,
           });
           await this.pantryStore.addItem(item);
+          const nextQuantity = this.pantryStore.getItemTotalQuantity(item);
+          await this.eventLog.logAddEvent({
+            productId: item._id,
+            quantity: entry.quantity,
+            deltaQuantity: entry.quantity,
+            previousQuantity: 0,
+            nextQuantity,
+            unit: item.batches[0]?.unit,
+            timestamp,
+            source: 'fast-add',
+          });
           continue;
         }
 
+        const previousQuantity = this.pantryStore.getItemTotalQuantity(entry.item);
         const unit = this.pantryStore.getItemPrimaryUnit(entry.item);
         const updated = await this.pantryService.addNewLot(entry.item._id, {
           quantity: entry.quantity,
@@ -297,6 +312,17 @@ export class PantryStateService {
         });
         if (updated) {
           await this.pantryStore.updateItem(updated);
+          const nextQuantity = this.pantryStore.getItemTotalQuantity(updated);
+          await this.eventLog.logAddEvent({
+            productId: updated._id,
+            quantity: entry.quantity,
+            deltaQuantity: entry.quantity,
+            previousQuantity,
+            nextQuantity,
+            unit: String(unit),
+            timestamp,
+            source: 'fast-add',
+          });
         }
       }
       this.dismissFastAddModal();
@@ -780,7 +806,10 @@ export class PantryStateService {
     const updatedItem = this.rebuildItemWithBatches(item, sanitizedBatches);
     const nextTotal = this.getAvailableQuantityFor(updatedItem, normalizedLocation);
     await this.provideQuantityFeedback(originalTotal, nextTotal);
-    this.triggerStockSave(item._id, updatedItem);
+    this.triggerStockSave(item._id, updatedItem, {
+      batchId: sanitizedBatches[batchIndex]?.batchId,
+      locationId: normalizedLocation,
+    });
 
   }
 
@@ -894,8 +923,15 @@ export class PantryStateService {
     return rebuilt;
   }
 
-  private triggerStockSave(itemId: string, updated: PantryItem): void {
+  private triggerStockSave(
+    itemId: string,
+    updated: PantryItem,
+    meta?: { batchId?: string; locationId?: string }
+  ): void {
     this.pendingItems.set(itemId, updated);
+    if (meta) {
+      this.pendingEventMeta.set(itemId, meta);
+    }
     const existingTimer = this.stockSaveTimers.get(itemId);
     if (existingTimer) {
       clearTimeout(existingTimer);
@@ -916,10 +952,28 @@ export class PantryStateService {
             : pending;
 
           await this.pantryStore.updateItem(nextPayload);
+          const previousQuantity = latest
+            ? this.pantryStore.getItemTotalQuantity(latest)
+            : undefined;
+          const nextQuantity = this.pantryStore.getItemTotalQuantity(nextPayload);
+          const eventMeta = this.pendingEventMeta.get(itemId);
+          await this.eventLog.logEditEvent({
+            productId: nextPayload._id,
+            quantity: nextQuantity,
+            deltaQuantity:
+              previousQuantity != null ? nextQuantity - previousQuantity : undefined,
+            previousQuantity,
+            nextQuantity,
+            unit: String(this.pantryStore.getItemPrimaryUnit(nextPayload)),
+            batchId: eventMeta?.batchId,
+            locationId: eventMeta?.locationId,
+            source: 'stock-adjust',
+          });
         } catch (err) {
           console.error('[PantryListStateService] updateItem error', err);
         } finally {
           this.pendingItems.delete(itemId);
+          this.pendingEventMeta.delete(itemId);
         }
       }
       this.stockSaveTimers.delete(itemId);
@@ -935,6 +989,7 @@ export class PantryStateService {
       this.stockSaveTimers.delete(itemId);
     }
     this.pendingItems.delete(itemId);
+    this.pendingEventMeta.delete(itemId);
   }
 
   private clearStockSaveTimers(): void {
@@ -943,6 +998,7 @@ export class PantryStateService {
     }
     this.stockSaveTimers.clear();
     this.pendingItems.clear();
+    this.pendingEventMeta.clear();
   }
 
   private async provideQuantityFeedback(prev: number, next: number): Promise<void> {

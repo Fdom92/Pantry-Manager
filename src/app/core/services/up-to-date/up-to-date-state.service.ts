@@ -11,6 +11,7 @@ import { AppPreferencesService } from '../settings/app-preferences.service';
 import { LanguageService } from '../shared/language.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { withSignalFlag } from '../shared';
+import { EventLogService } from '../events';
 
 @Injectable()
 export class UpToDateStateService {
@@ -21,6 +22,7 @@ export class UpToDateStateService {
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly eventLog = inject(EventLogService);
 
   // SIGNALS
   readonly isLoading = signal(false);
@@ -341,7 +343,18 @@ export class UpToDateStateService {
         patch,
         primaryUnit: String(this.pantryStore.getItemPrimaryUnit(item)),
       });
+      const previousQuantity = this.pantryStore.getItemTotalQuantity(item);
+      const nextQuantity = this.pantryStore.getItemTotalQuantity(updated);
       await this.pantryStore.updateItem(updated);
+      await this.eventLog.logEditEvent({
+        productId: updated._id,
+        quantity: nextQuantity,
+        deltaQuantity: nextQuantity - previousQuantity,
+        previousQuantity,
+        nextQuantity,
+        unit: String(this.pantryStore.getItemPrimaryUnit(updated)),
+        source: 'quick-edit',
+      });
       this.closeEditModalInternal(true);
       this.completeAndAdvance(id, snapshot);
     });
