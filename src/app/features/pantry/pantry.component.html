@@ -137,6 +137,7 @@
     [showAllOnFocus]="true"
     [autofocus]="true"
     [showEmptyAction]="facade.showFastAddEmptyAction()"
+    [showEmptyActionWhenNoExactMatch]="true"
     [emptyActionLabel]="facade.fastAddEmptyActionLabel()"
     (willDismiss)="facade.dismissFastAddModal()"
     (didDismiss)="facade.closeFastAddModal()"
@@ -161,8 +162,8 @@
   <ion-modal
     class="add-mode-sheet"
     [isOpen]="facade.addModeSheetOpen()"
-    [initialBreakpoint]="0.28"
-    [breakpoints]="[0, 0.28]"
+    [initialBreakpoint]="0.4"
+    [breakpoints]="[0, 0.4]"
     (didDismiss)="facade.closeAddModeSheet()">
     <ng-template>
       <ion-content class="ion-padding add-mode-content">

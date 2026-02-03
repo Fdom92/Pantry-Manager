@@ -309,6 +309,7 @@ section.group-details {
 
 .add-mode-content {
   --padding-top: 16px;
+  --padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
 }
 
 .add-mode-title {

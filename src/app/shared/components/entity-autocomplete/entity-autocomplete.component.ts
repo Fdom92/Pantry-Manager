@@ -36,6 +36,7 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   @Input() showMeta = false;
   @Input() emptyLabel = 'No results';
   @Input() showEmptyAction = false;
+  @Input() showEmptyActionWhenNoExactMatch = false;
   @Input() emptyActionLabel = '';
   @Input() autofocus = false;
   @Input() clearOnSelect = true;
@@ -179,6 +180,23 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
     return matches;
   }
 
+  shouldShowEmptyActionItem(): boolean {
+    if (!this.showEmptyAction || !this.emptyActionLabel) {
+      return false;
+    }
+    const query = this.inputValue.trim();
+    if (query.length < this.minChars) {
+      return false;
+    }
+    if (!this.items || this.items.length === 0) {
+      return true;
+    }
+    if (!this.showEmptyActionWhenNoExactMatch) {
+      return false;
+    }
+    return !this.hasExactMatch(query);
+  }
+
   getSecondaryInfo(option: AutocompleteItem<TRaw, TMeta>): string {
     if (!this.showSecondaryInfo) {
       return '';
@@ -213,6 +231,21 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
 
   private getOptionName(option: AutocompleteItem<TRaw, TMeta>): string {
     return (option?.title ?? '').toString();
+  }
+
+  private hasExactMatch(query: string): boolean {
+    const normalizedQuery = this.normalizeMatchValue(query);
+    if (!normalizedQuery) {
+      return false;
+    }
+    return (this.items ?? []).some(item => {
+      const name = this.normalizeMatchValue(this.getOptionName(item));
+      return name === normalizedQuery;
+    });
+  }
+
+  private normalizeMatchValue(value: string): string {
+    return (value ?? '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
   }
 
   private getEventStringValue(event: CustomEvent): string {

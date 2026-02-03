@@ -15,6 +15,7 @@ export class PantryStoreService {
   );
   // SIGNALS
   readonly loading: Signal<boolean> = this.pantryService.loading;
+  readonly endReached: Signal<boolean> = this.pantryService.endReached;
   readonly error = signal<string | null>(null);
   private realtimeSubscribed = false;
   // COMPUTED
