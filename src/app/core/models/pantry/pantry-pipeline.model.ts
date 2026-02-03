@@ -1,5 +1,3 @@
-export type PantrySortMode = 'name' | 'quantity' | 'expiration';
-
 export interface PantryFilterState {
   lowStock: boolean;
   expired: boolean;
@@ -7,8 +5,6 @@ export interface PantryFilterState {
   recentlyAdded: boolean;
   normalOnly: boolean;
   basic: boolean;
-  categoryId: string | null;
-  locationId: string | null;
 }
 
 export const DEFAULT_PANTRY_FILTERS: PantryFilterState = {
@@ -18,6 +14,4 @@ export const DEFAULT_PANTRY_FILTERS: PantryFilterState = {
   recentlyAdded: false,
   normalOnly: false,
   basic: false,
-  categoryId: null,
-  locationId: null,
 };

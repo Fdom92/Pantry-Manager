@@ -11,7 +11,7 @@ import {
 } from '@core/domain/pantry/pantry-catalog';
 import { normalizeEntityName } from '@core/utils/normalization.util';
 import { toDateInputValue, toIsoDate } from '@core/domain/up-to-date';
-import type { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
+import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { createDocumentId } from '@core/utils';
 import { formatQuantity, roundQuantity } from '@core/utils/formatting.util';
@@ -66,17 +66,11 @@ export class PantryEditItemModalStateService {
     isBasic: this.fb.control(false),
     minThreshold: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
     notes: this.fb.control(''),
-    locations: this.fb.array([
-      this.createLocationGroup({
-        locationId: '',
-        unit: MeasurementUnit.UNIT,
-        batches: [],
-      }),
-    ]),
+    batches: this.fb.array([this.createBatchGroup()]),
   });
 
-  get locationsArray(): FormArray<FormGroup> {
-    return this.form.get('locations') as FormArray<FormGroup>;
+  get batchesArray(): FormArray<FormGroup> {
+    return this.form.get('batches') as FormArray<FormGroup>;
   }
 
   constructor() {
@@ -135,54 +129,15 @@ export class PantryEditItemModalStateService {
     this.isOpen.set(false);
   }
 
-  addLocationEntry(): void {
-    this.locationsArray.push(this.createLocationGroup());
+  addBatchEntry(): void {
+    this.batchesArray.push(this.createBatchGroup());
   }
 
-  removeLocationEntry(index: number): void {
-    if (this.locationsArray.length <= 1) {
+  removeBatchEntry(index: number): void {
+    if (this.batchesArray.length <= 1) {
       return;
     }
-    this.locationsArray.removeAt(index);
-  }
-
-  getBatchesArray(locationIndex: number): FormArray<FormGroup> {
-    const control = this.locationsArray.at(locationIndex).get('batches');
-    if (control instanceof FormArray) {
-      return control as FormArray<FormGroup>;
-    }
-
-    const batches = this.fb.array<FormGroup>([]);
-    this.locationsArray.at(locationIndex).setControl('batches', batches);
-    return batches;
-  }
-
-  addBatchEntry(locationIndex: number): void {
-    const batches = this.getBatchesArray(locationIndex);
-    batches.push(this.createBatchGroup());
-  }
-
-  removeBatchEntry(locationIndex: number, batchIndex: number): void {
-    const batches = this.getBatchesArray(locationIndex);
-    if (batchIndex < 0 || batchIndex >= batches.length) {
-      return;
-    }
-    batches.removeAt(batchIndex);
-  }
-
-  getLocationTotalForControl(index: number): number {
-    const batchesArray = this.getBatchesArray(index);
-    return batchesArray.controls.reduce((sum, control) => {
-      const raw = control.get('quantity')?.value;
-      const quantity = Number(raw ?? 0);
-      return sum + (Number.isFinite(quantity) ? quantity : 0);
-    }, 0);
-  }
-
-  getLocationUnitLabelForControl(index: number): string {
-    const control = this.locationsArray.at(index).get('unit');
-    const value = normalizeUnitValue(control?.value as MeasurementUnit | string | undefined);
-    return this.getUnitLabel(value);
+    this.batchesArray.removeAt(index);
   }
 
   getCategorySelectOptions(): Array<{ value: string; label: string }> {
@@ -214,7 +169,7 @@ export class PantryEditItemModalStateService {
     return options;
   }
 
-  getLocationOptionsForControl(index: number): Array<{ value: string; label: string }> {
+  getLocationOptionsForBatch(index: number): Array<{ value: string; label: string }> {
     const presetOptions = this.presetLocationOptions();
     const seen = new Set<string>();
     const options: Array<{ value: string; label: string }> = [];
@@ -233,13 +188,22 @@ export class PantryEditItemModalStateService {
       addOption(preset);
     }
 
-    const locationGroup = this.locationsArray.at(index);
-    const currentValue = normalizeLocationId(locationGroup?.get('locationId')?.value);
+    const batchGroup = this.batchesArray.at(index);
+    const currentValue = normalizeLocationId(batchGroup?.get('locationId')?.value);
     if (currentValue && !seen.has(normalizeKey(currentValue))) {
       addOption(currentValue);
     }
 
     return options;
+  }
+
+  getLocationAutocompleteOptionsForBatch(index: number): AutocompleteItem<string>[] {
+    return this.getLocationOptionsForBatch(index)
+      .map(option => ({
+        id: option.value,
+        title: option.label,
+        raw: option.value,
+      }));
   }
 
   getSupermarketSelectOptions(): Array<{ value: string; label: string }> {
@@ -287,6 +251,15 @@ export class PantryEditItemModalStateService {
     this.form.get('supermarket')?.setValue(value);
   }
 
+  onLocationAutocompleteSelect(index: number, option: AutocompleteItem<string>): void {
+    const value = (option?.raw ?? '').toString().trim();
+    if (!value) {
+      return;
+    }
+    const control = this.batchesArray.at(index);
+    control?.get('locationId')?.setValue(value);
+  }
+
   addCategoryOptionFromText(value: string): void {
     const nextValue = (value ?? '').trim();
     if (!nextValue) {
@@ -303,6 +276,15 @@ export class PantryEditItemModalStateService {
     }
     const formatted = normalizeEntityName(nextValue, nextValue);
     void this.addSupermarketOption(formatted);
+  }
+
+  addLocationOptionFromText(index: number, value: string): void {
+    const nextValue = (value ?? '').trim();
+    if (!nextValue) {
+      return;
+    }
+    const formatted = normalizeEntityName(nextValue, nextValue);
+    void this.addLocationOption(index, formatted);
   }
 
   onSelectorQueryChange(value: string): void {
@@ -373,6 +355,23 @@ export class PantryEditItemModalStateService {
     this.form.get('categoryId')?.setValue(normalized);
   }
 
+  private async addLocationOption(index: number, value: string): Promise<void> {
+    const normalized = normalizeLocationId(value);
+    if (!normalized) {
+      return;
+    }
+    const current = await this.appPreferences.getPreferences();
+    const existing = current.locationOptions ?? [];
+    const normalizedKey = normalizeKey(normalized);
+    const existingMatch = existing.find(option => normalizeKey(normalizeLocationId(option)) === normalizedKey);
+    const nextValue = existingMatch ?? normalized;
+    if (!existingMatch) {
+      const next = [...existing, normalized];
+      await this.appPreferences.savePreferences({ ...current, locationOptions: next });
+    }
+    const control = this.batchesArray.at(index);
+    control?.get('locationId')?.setValue(nextValue);
+  }
   async submitItem(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -397,19 +396,16 @@ export class PantryEditItemModalStateService {
       this.dismiss();
     } catch (err) {
       this.isSaving.set(false);
-      if (err instanceof Error && err.message === 'LOCATION_REQUIRED') {
-        return;
-      }
       console.error('[PantryEditItemModalStateService] submitItem error', err);
     }
   }
 
-  private resetLocationControls(locations: Array<Partial<ItemLocationStock>>): void {
-    while (this.locationsArray.length) {
-      this.locationsArray.removeAt(0);
+  private resetBatchControls(batches: Array<Partial<ItemBatch>>): void {
+    while (this.batchesArray.length) {
+      this.batchesArray.removeAt(0);
     }
-    for (const location of locations) {
-      this.locationsArray.push(this.createLocationGroup(location));
+    for (const batch of batches) {
+      this.batchesArray.push(this.createBatchGroup(batch));
     }
   }
 
@@ -422,13 +418,7 @@ export class PantryEditItemModalStateService {
       minThreshold: null,
       notes: '',
     });
-    this.resetLocationControls([
-      {
-        locationId: '',
-        unit: MeasurementUnit.UNIT,
-        batches: [],
-      },
-    ]);
+    this.resetBatchControls([{}]);
   }
 
   private resetModalState(): void {
@@ -450,33 +440,16 @@ export class PantryEditItemModalStateService {
       minThreshold: item.minThreshold ?? null,
       notes: '',
     });
-    const locations = item.locations.length
-      ? item.locations
-      : [
-          {
-            locationId: '',
-            quantity: 0,
-            unit: this.pantryStore.getItemPrimaryUnit(item),
-            batches: [],
-          },
-        ];
-    this.resetLocationControls(locations);
+    const batches = this.buildBatchEntries(item);
+    this.resetBatchControls(batches);
   }
 
-  private createLocationGroup(initial?: Partial<ItemLocationStock>): FormGroup {
-    const batches = Array.isArray(initial?.batches) ? initial.batches : [];
-    const rawLocation = normalizeLocationId(initial?.locationId);
-    const locationId = rawLocation && rawLocation !== UNASSIGNED_LOCATION_KEY ? rawLocation : '';
-    return this.fb.group({
-      locationId: this.fb.control(locationId, {
-        validators: [Validators.required],
-        nonNullable: true,
-      }),
-      unit: this.fb.control<string>(normalizeUnitValue(initial?.unit), {
-        nonNullable: true,
-      }),
-      batches: this.fb.array(batches.map(batch => this.createBatchGroup(batch))),
-    });
+  private buildBatchEntries(item: PantryItem): Array<Partial<ItemBatch>> {
+    if (Array.isArray(item.batches) && item.batches.length) {
+      return item.batches;
+    }
+
+    return [{}];
   }
 
   private createBatchGroup(initial?: Partial<ItemBatch>): FormGroup {
@@ -485,13 +458,21 @@ export class PantryEditItemModalStateService {
       const numericValue = Number(initial.quantity);
       normalizedQuantity = Number.isFinite(numericValue) ? numericValue : null;
     }
+    const rawLocation = normalizeLocationId(initial?.locationId);
+    const locationId = rawLocation && rawLocation !== UNASSIGNED_LOCATION_KEY ? rawLocation : '';
     return this.fb.group({
       batchId: this.fb.control((initial?.batchId ?? '').trim()),
+      locationId: this.fb.control(locationId, {
+        nonNullable: true,
+      }),
       quantity: this.fb.control<number | null>(normalizedQuantity, {
         validators: [Validators.required, Validators.min(0)],
       }),
       expirationDate: this.fb.control(initial?.expirationDate ? toDateInputValue(initial.expirationDate) : ''),
       opened: this.fb.control(initial?.opened ?? false),
+      unit: this.fb.control(normalizeUnitValue(initial?.unit ?? MeasurementUnit.UNIT), {
+        nonNullable: true,
+      }),
     });
   }
 
@@ -511,49 +492,28 @@ export class PantryEditItemModalStateService {
       normalizedMinThreshold = Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
     }
 
-    const locations: ItemLocationStock[] = this.locationsArray.controls
-      .map(control => {
-        const value = control.value as any;
-        const rawLocationId = normalizeLocationId(value?.locationId);
-        if (!rawLocationId) {
-          return null;
-        }
-        const unit = normalizeUnitValue(value?.unit as MeasurementUnit | string | undefined);
-        const batchesControl = control.get('batches');
-        const batches =
-          batchesControl instanceof FormArray
-            ? (batchesControl.controls as FormGroup[]).map(group => {
-                const batchValue = group.value as any;
-                const expirationDate =
-                  typeof batchValue?.expirationDate === 'string'
-                    ? toIsoDate(batchValue.expirationDate) ?? undefined
-                    : undefined;
-                const batchQuantity = batchValue?.quantity != null ? Number(batchValue.quantity) : 0;
-                const batchId = (batchValue?.batchId ?? '').trim() || undefined;
-                const opened = batchValue?.opened ? true : undefined;
-                return {
-                  batchId,
-                  quantity: Number.isFinite(batchQuantity) ? batchQuantity : 0,
-                  expirationDate,
-                  opened,
-                  unit,
-                } as ItemBatch;
-              })
-            : [];
-
-        const normalizedBatches = batches.filter(batch => batch.quantity > 0 || Boolean(batch.expirationDate) || Boolean(batch.opened));
-
+    const batches: ItemBatch[] = this.batchesArray.controls
+      .map(group => {
+        const batchValue = group.value as any;
+        const expirationDate =
+          typeof batchValue?.expirationDate === 'string'
+            ? toIsoDate(batchValue.expirationDate) ?? undefined
+            : undefined;
+        const batchQuantity = batchValue?.quantity != null ? Number(batchValue.quantity) : 0;
+        const batchId = (batchValue?.batchId ?? '').trim() || undefined;
+        const opened = batchValue?.opened ? true : undefined;
+        const locationId = normalizeLocationId(batchValue?.locationId) || undefined;
+        const unit = normalizeUnitValue(batchValue?.unit as MeasurementUnit | string | undefined);
         return {
-          locationId: rawLocationId,
+          batchId,
+          quantity: Number.isFinite(batchQuantity) ? batchQuantity : 0,
+          expirationDate,
+          opened,
           unit,
-          batches: normalizedBatches,
-        } as ItemLocationStock;
+          locationId,
+        } as ItemBatch;
       })
-      .filter((location): location is ItemLocationStock => location !== null);
-
-    if (!locations.length) {
-      throw new Error('LOCATION_REQUIRED');
-    }
+      .filter(batch => batch.quantity > 0 || Boolean(batch.expirationDate) || Boolean(batch.opened));
 
     const normalizedSupermarket = normalizeSupermarketValue(supermarket);
     const normalizedCategory = normalizeCategoryId(categoryId);
@@ -565,7 +525,7 @@ export class PantryEditItemModalStateService {
       householdId: existing?.householdId ?? DEFAULT_HOUSEHOLD_ID,
       name: (name ?? '').trim(),
       categoryId: normalizedCategory,
-      locations,
+      batches,
       supermarket: normalizedSupermarket,
       isBasic: isBasic ? true : undefined,
       minThreshold: normalizedMinThreshold,

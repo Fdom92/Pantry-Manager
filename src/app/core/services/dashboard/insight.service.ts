@@ -152,17 +152,10 @@ export class InsightService {
       return true;
     }
     const hasCategory = Boolean((item.categoryId ?? '').trim());
-    const hasDetailedLocation =
-      item.locations?.some(location => {
-        const id = (location.locationId ?? '').trim().toLowerCase();
-        return Boolean(id) && id !== 'unassigned';
-      }) ?? false;
     const hasExpiryDate =
-      item.locations?.some(location =>
-        (location.batches ?? []).some(batch => Boolean(batch.expirationDate))
-      ) ?? false;
+      item.batches?.some(batch => Boolean(batch.expirationDate)) ?? false;
     const hasNoExpiryMarker = item.noExpiry === true;
-    return !hasCategory || !hasDetailedLocation || !(hasExpiryDate || hasNoExpiryMarker);
+    return !hasCategory || !(hasExpiryDate || hasNoExpiryMarker);
   }
 
   private getPendingReviewPriority(product: InsightPendingReviewProduct): number {

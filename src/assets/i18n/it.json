@@ -45,7 +45,7 @@
       "finish": "Inizia"
     },
     "validation": {
-      "minimumSelection": "Seleziona almeno un'opzione per continuare.",
+      "locationsOptional": "Puoi saltare questo passaggio se non vuoi aggiungere posizioni ora.",
       "categoriesOptional": "Potrai aggiungere categorie in seguito."
     },
     "locations": {
@@ -254,7 +254,6 @@
     "suggestions": {
       "title": "Lista della spesa",
       "loading": "Sto creando la lista della spesa…",
-      "destination": "Posizione suggerita: {{ location }}",
       "totalStock": "Stock totale: {{ amount }} {{ unit }}",
       "minStock": "Min: {{ amount }} {{ unit }}",
       "empty": "Al momento non ci sono acquisti in sospeso. Ti avviserò quando sarà necessario riassortire."
@@ -408,16 +407,7 @@
         "expired": "Scaduto"
       },
       "basic": "Essenziali",
-      "title": "Filtri",
-      "search": "Cerca prodotti",
-      "category": "Categoria",
-      "location": "Posizione",
-      "sort": {
-        "label": "Ordina per",
-        "name": "Nome (A-Z)",
-        "quantity": "Quantità (alta → bassa)",
-        "expiration": "Scadenza (prima le più vicine)"
-      }
+      "search": "Cerca prodotti"
     },
     "fastAdd": {
       "cta": "Aggiungi veloce",
@@ -458,6 +448,7 @@
     "form": {
       "editTitle": "Modifica articolo",
       "newTitle": "Nuovo articolo",
+      "details": "Dettagli",
       "name": "Nome",
       "namePlaceholder": "Riso, latte...",
       "category": "Categoria",
@@ -477,10 +468,11 @@
       },
       "basic": "Articolo essenziale della dispensa",
       "minThreshold": "Quantità minima",
-      "locationTitle": "Posizione {{ index }}",
-      "locationTotal": "Totale: {{ total }} {{ unit }}",
       "location": "Posizione",
       "locationPlaceholder": "Seleziona una posizione",
+      "locationAdd": {
+        "option": "+ Aggiungi posizione"
+      },
       "batches": {
         "title": "Lotti",
         "add": "Aggiungi lotto",
@@ -489,8 +481,7 @@
         "quantity": "Quantità",
         "expiry": "Data di scadenza",
         "opened": "Aperto"
-      },
-      "addLocation": "Aggiungi posizione"
+      }
     },
     "detail": {
       "earliest": "Scade per primo: {{ date }}",
@@ -534,33 +525,10 @@
       "actions": {
         "viewBatches": "Visualizza lotti",
         "editItem": "Modifica articolo",
-        "moveItem": "Sposta articolo",
         "deleteItem": "Elimina articolo",
         "menuLabel": "Apri menu azioni",
         "expand": "Mostra dettagli articolo",
         "collapse": "Nascondi dettagli articolo"
-      }
-    },
-    "move": {
-      "from": "Da",
-      "to": "A",
-      "toPlaceholder": "Nuova posizione (es. Congelatore)",
-      "quantity": "Quantità da spostare",
-      "suggestions": "Suggerimenti",
-      "availability": {
-        "label": "Disponibile: {{ value }}",
-        "empty": "Nessuno stock disponibile in questa posizione"
-      },
-      "errors": {
-        "missingLocations": "Seleziona origine e destinazione.",
-        "sameLocation": "Origine e destinazione devono essere diverse.",
-        "invalidQuantity": "Inserisci una quantità maggiore di zero.",
-        "noAvailableStock": "Non ci sono stock disponibili da questa posizione.",
-        "generic": "Impossibile spostare l'articolo. Riprova."
-      },
-      "submit": "Sposta",
-      "toasts": {
-        "success": "{{ quantity }} spostati da {{ from }} a {{ to }}."
       }
     },
     "toasts": {
@@ -688,10 +656,11 @@
         "empty": "Aggiungi una posizione per iniziare.",
         "field": "Posizione {{ index }}",
         "add": "Aggiungi posizione",
-        "replaceTitle": "Sostituisci posizione",
-        "replaceMessage": "Questa posizione è usata da {{ count }} prodotti. Scegli una sostituzione.",
-        "replaceAction": "Sostituisci",
-        "removeNoReplacement": "Aggiungi un'altra posizione prima di rimuovere questa."
+        "addPromptTitle": "Aggiungi posizione",
+        "addPromptPlaceholder": "Nome della posizione",
+        "removeInUseTitle": "Posizione in uso",
+        "removeInUseMessage": "Questa posizione è usata da {{ count }} prodotti. Questi prodotti perderanno questa informazione.",
+        "removeAction": "Rimuovi"
       },
       "categories": {
         "title": "Categorie",
@@ -699,6 +668,8 @@
         "empty": "Aggiungi una categoria per iniziare.",
         "field": "Categoria {{ index }}",
         "add": "Aggiungi categoria",
+        "addPromptTitle": "Aggiungi categoria",
+        "addPromptPlaceholder": "Nome della categoria",
         "removeInUseTitle": "Categoria in uso",
         "removeInUseMessage": "Questa categoria è usata da {{ count }} prodotti. Questi prodotti perderanno questa informazione.",
         "removeAction": "Rimuovi"
@@ -709,6 +680,8 @@
         "empty": "Aggiungi un supermercato per iniziare.",
         "field": "Supermercato {{ index }}",
         "add": "Aggiungi supermercato",
+        "addPromptTitle": "Aggiungi supermercato",
+        "addPromptPlaceholder": "Nome del supermercato",
         "other": "Altro",
         "removeInUseTitle": "Supermercato in uso",
         "removeInUseMessage": "Questo supermercato è usato da {{ count }} prodotti. Questi prodotti perderanno questa informazione.",

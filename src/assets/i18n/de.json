@@ -45,7 +45,7 @@
       "finish": "Starten"
     },
     "validation": {
-      "minimumSelection": "Wähle mindestens eine Option, um fortzufahren.",
+      "locationsOptional": "Du kannst diesen Schritt überspringen, wenn du jetzt keine Standorte hinzufügen möchtest.",
       "categoriesOptional": "Kategorien kannst du später hinzufügen."
     },
     "locations": {
@@ -254,7 +254,6 @@
     "suggestions": {
       "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
-      "destination": "Empfohlenes Ziel: {{ location }}",
       "totalStock": "Gesamtbestand: {{ amount }} {{ unit }}",
       "minStock": "Min.: {{ amount }} {{ unit }}",
       "empty": "Derzeit nichts zu erledigen. Ich informiere dich, wenn Nachschub nötig ist."
@@ -408,16 +407,7 @@
         "expired": "Abgelaufen"
       },
       "basic": "Grundprodukte",
-      "title": "Filter",
-      "search": "Produkte suchen",
-      "category": "Kategorie",
-      "location": "Standort",
-      "sort": {
-        "label": "Sortieren nach",
-        "name": "Name (A–Z)",
-        "quantity": "Menge (hoch → niedrig)",
-        "expiration": "Haltbarkeit (bald zuerst)"
-      }
+      "search": "Produkte suchen"
     },
     "fastAdd": {
       "cta": "Schnell hinzufügen",
@@ -458,6 +448,7 @@
     "form": {
       "editTitle": "Artikel bearbeiten",
       "newTitle": "Neuer Artikel",
+      "details": "Details",
       "name": "Name",
       "namePlaceholder": "Reis, Milch…",
       "category": "Kategorie",
@@ -477,10 +468,11 @@
       },
       "basic": "Grundprodukt der Vorratskammer",
       "minThreshold": "Mindestmenge",
-      "locationTitle": "Standort {{ index }}",
-      "locationTotal": "Gesamt: {{ total }} {{ unit }}",
       "location": "Standort",
       "locationPlaceholder": "Standort auswählen",
+      "locationAdd": {
+        "option": "+ Standort hinzufügen"
+      },
       "batches": {
         "title": "Chargen",
         "add": "Charge hinzufügen",
@@ -489,8 +481,7 @@
         "quantity": "Menge",
         "expiry": "Haltbarkeitsdatum",
         "opened": "Geöffnet"
-      },
-      "addLocation": "Standort hinzufügen"
+      }
     },
     "detail": {
       "earliest": "Läuft zuerst ab: {{ date }}",
@@ -534,33 +525,10 @@
       "actions": {
         "viewBatches": "Chargen anzeigen",
         "editItem": "Produkt bearbeiten",
-        "moveItem": "Produkt verschieben",
         "deleteItem": "Produkt löschen",
         "menuLabel": "Aktionsmenü öffnen",
         "expand": "Produktdetails erweitern",
         "collapse": "Produktdetails reduzieren"
-      }
-    },
-    "move": {
-      "from": "Von",
-      "to": "Nach",
-      "toPlaceholder": "Neuer Standort (z. B. Gefrierschrank)",
-      "quantity": "Zu verschiebende Menge",
-      "suggestions": "Vorschläge",
-      "availability": {
-        "label": "Verfügbar: {{ value }}",
-        "empty": "An diesem Standort ist kein Bestand verfügbar"
-      },
-      "errors": {
-        "missingLocations": "Bitte Herkunft und Ziel auswählen.",
-        "sameLocation": "Herkunft und Ziel müssen unterschiedlich sein.",
-        "invalidQuantity": "Bitte eine Menge größer als null eingeben.",
-        "noAvailableStock": "Von diesem Standort ist kein Bestand verfügbar.",
-        "generic": "Das Produkt konnte nicht verschoben werden. Bitte versuche es erneut."
-      },
-      "submit": "Verschieben",
-      "toasts": {
-        "success": "Du hast {{ quantity }} von {{ from }} nach {{ to }} verschoben."
       }
     },
     "toasts": {
@@ -688,10 +656,11 @@
         "empty": "Füge einen Standort hinzu, um zu beginnen.",
         "field": "Standort {{ index }}",
         "add": "Standort hinzufügen",
-        "replaceTitle": "Standort ersetzen",
-        "replaceMessage": "Dieser Standort wird von {{ count }} Produkten verwendet. Wähle einen Ersatz.",
-        "replaceAction": "Ersetzen",
-        "removeNoReplacement": "Füge einen weiteren Standort hinzu, bevor du diesen entfernst."
+        "addPromptTitle": "Standort hinzufügen",
+        "addPromptPlaceholder": "Standortname",
+        "removeInUseTitle": "Standort in Verwendung",
+        "removeInUseMessage": "Dieser Standort wird von {{ count }} Produkten verwendet. Diese Produkte verlieren diese Information.",
+        "removeAction": "Entfernen"
       },
       "categories": {
         "title": "Kategorien",
@@ -699,6 +668,8 @@
         "empty": "Füge eine Kategorie hinzu, um zu beginnen.",
         "field": "Kategorie {{ index }}",
         "add": "Kategorie hinzufügen",
+        "addPromptTitle": "Kategorie hinzufügen",
+        "addPromptPlaceholder": "Kategoriename",
         "removeInUseTitle": "Kategorie in Verwendung",
         "removeInUseMessage": "Diese Kategorie wird von {{ count }} Produkten verwendet. Diese Produkte verlieren diese Information.",
         "removeAction": "Entfernen"
@@ -709,6 +680,8 @@
         "empty": "Füge einen Supermarkt hinzu, um zu beginnen.",
         "field": "Supermarkt {{ index }}",
         "add": "Supermarkt hinzufügen",
+        "addPromptTitle": "Supermarkt hinzufügen",
+        "addPromptPlaceholder": "Supermarktname",
         "other": "Andere",
         "removeInUseTitle": "Supermarkt in Verwendung",
         "removeInUseMessage": "Dieser Supermarkt wird von {{ count }} Produkten verwendet. Diese Produkte verlieren diese Information.",

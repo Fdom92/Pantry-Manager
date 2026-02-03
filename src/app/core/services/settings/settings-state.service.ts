@@ -9,6 +9,7 @@ import { ReviewPromptService } from '../shared/review-prompt.service';
 import { StorageService } from '../shared/storage.service';
 import { RevenuecatService } from '../upgrade/revenuecat.service';
 import { AppPreferencesService } from './app-preferences.service';
+import { PantryMigrationService } from '../migration/pantry-migration.service';
 
 @Injectable()
 export class SettingsStateService {
@@ -17,6 +18,7 @@ export class SettingsStateService {
   private readonly translate = inject(TranslateService);
   private readonly storage = inject<StorageService<BaseDoc>>(StorageService);
   private readonly appPreferences = inject(AppPreferencesService);
+  private readonly migrationService = inject(PantryMigrationService);
   private readonly revenuecat = inject(RevenuecatService);
   private readonly navCtrl = inject(NavController);
   private readonly download = inject(DownloadService);
@@ -179,6 +181,7 @@ export class SettingsStateService {
     await this.storage.clearAll();
     await this.storage.bulkSave(docs);
     await this.appPreferences.reload();
+    this.migrationService.markMigrationCheckNeeded();
     if (this.lifecycle.isDestroyed()) {
       return;
     }

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models/pantry';
-import { ItemBatch, ItemLocationStock } from '@core/models/pantry';
+import { ItemBatch } from '@core/models/pantry';
 import { IonButton, IonCard, IonIcon, IonItem, IonLabel, IonList, IonPopover, IonText } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -31,10 +31,9 @@ export class PantryDetailComponent {
   @Output() summaryKeydown = new EventEmitter<KeyboardEvent>();
   @Output() openBatches = new EventEmitter<Event | undefined>();
   @Output() editRequested = new EventEmitter<Event | undefined>();
-  @Output() moveRequested = new EventEmitter<Event | undefined>();
   @Output() deleteRequested = new EventEmitter<Event | undefined>();
   @Output() adjustBatchRequested = new EventEmitter<{
-    location: ItemLocationStock;
+    locationId: string;
     batch: ItemBatch;
     delta: number;
     event?: Event;
@@ -56,21 +55,17 @@ export class PantryDetailComponent {
     this.editRequested.emit(event);
   }
 
-  handleMove(event?: Event): void {
-    this.moveRequested.emit(event);
-  }
-
   handleDelete(event?: Event): void {
     this.deleteRequested.emit(event);
   }
 
   handleAdjustBatch(
-    location: ItemLocationStock,
+    locationId: string,
     batch: ItemBatch,
     delta: number,
     event?: Event
   ): void {
-    this.adjustBatchRequested.emit({ location, batch, delta, event });
+    this.adjustBatchRequested.emit({ locationId, batch, delta, event });
   }
 
   trackBatch(index: number, batch: PantryItemBatchViewModel): string {

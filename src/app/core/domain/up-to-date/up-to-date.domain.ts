@@ -1,31 +1,13 @@
-import { UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { collectBatches } from '@core/domain/pantry';
-import type { ItemLocationStock, PantryItem } from '@core/models/pantry';
+import type { PantryItem } from '@core/models/pantry';
 import type { QuickEditPatch } from '@core/models/up-to-date';
 
 export function normalizeId(value?: string | null): string {
   return (value ?? '').trim();
 }
 
-export function isUnassignedLocationId(value?: string | null): boolean {
-  const id = normalizeId(value).toLowerCase();
-  return !id || id === UNASSIGNED_LOCATION_KEY;
-}
-
-export function hasRealLocation(item: PantryItem): boolean {
-  return item.locations?.some(location => !isUnassignedLocationId(location.locationId)) ?? false;
-}
-
-export function getFirstRealLocationId(item: PantryItem | null): string {
-  if (!item) {
-    return '';
-  }
-  const location = item.locations?.find(l => !isUnassignedLocationId(l.locationId));
-  return normalizeId(location?.locationId);
-}
-
 export function hasAnyExpiryDate(item: PantryItem): boolean {
-  return collectBatches(item.locations ?? []).some(batch => Boolean(batch.expirationDate));
+  return collectBatches(item.batches ?? []).some(batch => Boolean(batch.expirationDate));
 }
 
 export function toDateInputValue(dateIso: string): string {
@@ -40,7 +22,7 @@ export function getFirstExpiryDateInput(item: PantryItem | null): string {
   if (!item) {
     return '';
   }
-  for (const batch of collectBatches(item.locations ?? [])) {
+  for (const batch of collectBatches(item.batches ?? [])) {
     const iso = normalizeId(batch.expirationDate);
     if (iso) {
       return toDateInputValue(iso);
@@ -68,30 +50,14 @@ export function applyQuickEdit(params: {
 }): PantryItem {
   const { item, patch } = params;
   const nextCategory = patch.needsCategory ? patch.categoryId.trim() : (item.categoryId ?? '').trim();
-  const nextLocations: ItemLocationStock[] = Array.isArray(item.locations) ? item.locations.map(location => ({ ...location })) : [];
-
-  if (patch.needsLocation) {
-    const normalizedLocation = patch.locationId.trim();
-    const index = nextLocations.findIndex(location => isUnassignedLocationId(location.locationId));
-    if (index >= 0) {
-      nextLocations[index].locationId = normalizedLocation;
-    } else if (nextLocations.length > 0) {
-      nextLocations[0].locationId = normalizedLocation;
-    } else {
-      nextLocations.push({
-        locationId: normalizedLocation,
-        unit: params.primaryUnit,
-        batches: [],
-      });
-    }
-  }
+  const nextBatches = Array.isArray(item.batches) ? item.batches.map(batch => ({ ...batch })) : [];
 
   if (patch.needsExpiry) {
     if (!patch.hasExpiry) {
       return {
         ...item,
         categoryId: nextCategory,
-        locations: nextLocations,
+        batches: nextBatches,
         noExpiry: true,
         updatedAt: new Date().toISOString(),
       };
@@ -99,33 +65,23 @@ export function applyQuickEdit(params: {
 
     const iso = toIsoDate(patch.expiryDateInput);
     if (iso) {
-      if (!nextLocations.length) {
-        nextLocations.push({
-          locationId: UNASSIGNED_LOCATION_KEY,
-          unit: params.primaryUnit,
-          batches: [],
-        });
-      }
-      const target = nextLocations[0];
-      const batches = Array.isArray(target.batches) ? [...target.batches] : [];
-      const batchIndex = batches.findIndex(batch => !batch.expirationDate);
+      const batchIndex = nextBatches.findIndex(batch => !batch.expirationDate);
       if (batchIndex >= 0) {
-        batches[batchIndex] = { ...batches[batchIndex], expirationDate: iso };
+        nextBatches[batchIndex] = { ...nextBatches[batchIndex], expirationDate: iso };
       } else {
-        batches.push({
+        nextBatches.push({
           quantity: 0,
-          unit: target.unit,
+          unit: params.primaryUnit,
           expirationDate: iso,
         });
       }
-      nextLocations[0] = { ...target, batches };
     }
   }
 
   return {
     ...item,
     categoryId: nextCategory,
-    locations: nextLocations,
+    batches: nextBatches,
     noExpiry: patch.needsExpiry ? false : item.noExpiry,
     updatedAt: new Date().toISOString(),
   };

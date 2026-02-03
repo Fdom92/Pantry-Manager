@@ -2,7 +2,6 @@ import { Signal, computed, inject, Injectable, signal } from '@angular/core';
 import { PantryItem, PantrySummary } from '@core/models/pantry';
 import { MeasurementUnit, StockStatus } from '@core/models/shared';
 import { PantryService } from './pantry.service';
-import { normalizeLocationId } from '@core/utils/normalization.util';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 
 @Injectable({ providedIn: 'root' })
@@ -96,27 +95,6 @@ export class PantryStoreService {
     await Promise.all(expiredIds.map(id => this.deleteItem(id)));
   }
 
-  /**
-   * Adjust the quantity stored for a specific location and persist the change.
-   * Falls back to the first location so legacy data still works.
-   */
-  async adjustQuantity(id: string, locationId: string, delta: number): Promise<void> {
-    try {
-      const current = this.items().find(i => i._id === id);
-      if (!current) return;
-
-      const location = current.locations.find(loc => loc.locationId === locationId) ?? current.locations[0];
-      if (!location) return;
-
-      const currentQuantity = this.pantryService.getItemQuantityByLocation(current, location.locationId);
-      const nextQty = Math.max(0, currentQuantity + delta);
-      await this.pantryService.updateLocationQuantity(id, nextQty, location.locationId);
-    } catch (err: any) {
-      console.error('[PantryStoreService] adjustQuantity error', err);
-      this.error.set('Failed to adjust quantity');
-    }
-  }
-
   /** Simple alias used by views to trigger a full reload. */
   async refresh(): Promise<void> {
     await this.loadAll();
@@ -161,14 +139,14 @@ export class PantryStoreService {
 
   /** Helper used by UI layers to choose a representative unit. */
   getItemPrimaryUnit(item: PantryItem): MeasurementUnit | string {
-    const unit = item.locations[0]?.unit;
+    const unit = item.batches[0]?.unit;
     if (typeof unit === 'string' && unit.trim()) {
       return unit.trim();
     }
     return MeasurementUnit.UNIT;
   }
 
-  /** Sum every location quantity to avoid duplicating reduce logic in components. */
+  /** Sum every batch quantity to avoid duplicating reduce logic in components. */
   getItemTotalQuantity(item: PantryItem): number {
     return this.pantryService.getItemTotalQuantity(item);
   }
@@ -178,7 +156,7 @@ export class PantryStoreService {
     return this.pantryService.getItemTotalMinThreshold(item);
   }
 
-  /** Earliest expiry date considering all batches and locations. */
+  /** Earliest expiry date considering all batches. */
   getItemEarliestExpiry(item: PantryItem): string | undefined {
     return this.pantryService.getItemEarliestExpiry(item);
   }
@@ -188,19 +166,14 @@ export class PantryStoreService {
     return this.pantryService.isItemLowStock(item);
   }
 
-  /** True when at least one location has already expired. */
+  /** True when at least one batch has already expired. */
   isItemExpired(item: PantryItem): boolean {
     return this.pantryService.isItemExpired(item);
   }
 
-  /** True when any location expires within the near-expiry window. */
+  /** True when any batch expires within the near-expiry window. */
   isItemNearExpiry(item: PantryItem): boolean {
     return this.pantryService.isItemNearExpiry(item);
-  }
-
-  /** Aggregate quantity for a specific location ID across the item. */
-  getItemQuantityByLocation(item: PantryItem, locationId: string): number {
-    return this.pantryService.getItemQuantityByLocation(item, locationId);
   }
 
   /** Flatten all batches associated with an item. */
@@ -273,41 +246,9 @@ export class PantryStoreService {
   }
 
   private mergeItemWithExisting(existing: PantryItem, incoming: PantryItem): PantryItem {
-    const normalizedLocations = existing.locations.map(location => ({
-      ...location,
-      batches: Array.isArray(location.batches) ? [...location.batches] : [],
-    }));
-
-    for (const newLocation of incoming.locations ?? []) {
-      const locationId = normalizeLocationId(newLocation.locationId);
-      if (!locationId) {
-        continue;
-      }
-      const targetIndex = normalizedLocations.findIndex(
-        location => normalizeLocationId(location.locationId) === locationId
-      );
-      const newBatches = Array.isArray(newLocation.batches) ? [...newLocation.batches] : [];
-
-      if (targetIndex >= 0) {
-        const current = normalizedLocations[targetIndex];
-        const mergedBatches = Array.isArray(current.batches) ? current.batches : [];
-        normalizedLocations[targetIndex] = {
-          ...current,
-          unit: current.unit || newLocation.unit,
-          batches: [...mergedBatches, ...newBatches],
-        };
-      } else {
-        normalizedLocations.push({
-          locationId,
-          unit: newLocation.unit,
-          batches: newBatches,
-        });
-      }
-    }
-
     return {
       ...existing,
-      locations: normalizedLocations,
+      batches: [...(existing.batches ?? []), ...(incoming.batches ?? [])],
       brand: existing.brand ?? incoming.brand,
       barcode: existing.barcode ?? incoming.barcode,
       minThreshold: existing.minThreshold ?? incoming.minThreshold,

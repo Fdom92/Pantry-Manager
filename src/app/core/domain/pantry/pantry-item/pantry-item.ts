@@ -1,70 +1,54 @@
 import { classifyExpiry, computeEarliestExpiry, sumQuantities, toNumberOrZero } from '@core/domain/pantry/pantry-stock';
-import { ItemBatch, ItemLocationStock, PantryItem } from '@core/models/pantry';
+import { ItemBatch, PantryItem } from '@core/models/pantry';
 import { ExpirationStatus } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
 import type { BatchIdGenerator } from '../pantry.domain';
 
 export function collectBatches(
-  locations: ItemLocationStock[],
+  batches: ItemBatch[],
   options?: { generateBatchId?: BatchIdGenerator; fallbackUnit?: string }
 ): ItemBatch[] {
-  const batches: ItemBatch[] = [];
+  const normalized: ItemBatch[] = [];
   const fallbackUnit = normalizeUnitValue(options?.fallbackUnit);
-  for (const location of locations) {
-    if (!Array.isArray(location.batches)) {
+  for (const batch of batches ?? []) {
+    if (!batch) {
       continue;
     }
-    const locationUnit = normalizeUnitValue(location.unit ?? fallbackUnit);
-    for (const batch of location.batches) {
-      batches.push({
-        ...batch,
-        quantity: toNumberOrZero(batch.quantity),
-        unit: normalizeUnitValue(batch.unit ?? locationUnit),
-        batchId: batch.batchId ?? options?.generateBatchId?.(),
-        opened: batch.opened ?? false,
-      });
-    }
+    normalized.push({
+      ...batch,
+      quantity: toNumberOrZero(batch.quantity),
+      unit: normalizeUnitValue(batch.unit ?? fallbackUnit),
+      batchId: batch.batchId ?? options?.generateBatchId?.(),
+      opened: batch.opened ?? false,
+      locationId: (batch.locationId ?? '').trim() || undefined,
+    });
   }
-  return batches;
-}
-
-export function getLocationQuantity(location: ItemLocationStock): number {
-  return sumQuantities(location?.batches);
+  return normalized;
 }
 
 export function getItemTotalQuantity(item: PantryItem): number {
-  return (item.locations ?? []).reduce((sum, loc) => sum + getLocationQuantity(loc), 0);
+  return sumQuantities(item.batches ?? []);
 }
 
 export function getItemTotalMinThreshold(item: PantryItem): number {
   return toNumberOrZero(item.minThreshold);
 }
 
-export function getItemQuantityByLocation(item: PantryItem, locationId: string): number {
-  const target = (locationId ?? '').trim();
-  if (!target) {
-    return 0;
-  }
-  return (item.locations ?? [])
-    .filter(loc => (loc.locationId ?? '').trim() === target)
-    .reduce((sum, loc) => sum + getLocationQuantity(loc), 0);
-}
-
 export function getItemEarliestExpiry(item: PantryItem): string | undefined {
-  return computeEarliestExpiry(item.locations ?? []);
+  return computeEarliestExpiry(item.batches ?? []);
 }
 
 export function hasOpenBatch(item: PantryItem): boolean {
-  return collectBatches(item.locations ?? []).some(batch => Boolean(batch.opened));
+  return collectBatches(item.batches ?? []).some(batch => Boolean(batch.opened));
 }
 
 export function computeExpirationStatus(
-  locations: ItemLocationStock[],
+  batches: ItemBatch[],
   now: Date,
   windowDays: number
 ): ExpirationStatus {
   let status = ExpirationStatus.OK;
-  for (const batch of collectBatches(locations)) {
+  for (const batch of collectBatches(batches)) {
     const classification = classifyExpiry(batch.expirationDate, now, windowDays);
     if (classification === 'expired') {
       return ExpirationStatus.EXPIRED;
@@ -77,11 +61,11 @@ export function computeExpirationStatus(
 }
 
 export function isItemExpired(item: PantryItem, now: Date): boolean {
-  return collectBatches(item.locations ?? []).some(batch => classifyExpiry(batch.expirationDate, now, 0) === 'expired');
+  return collectBatches(item.batches ?? []).some(batch => classifyExpiry(batch.expirationDate, now, 0) === 'expired');
 }
 
 export function isItemNearExpiry(item: PantryItem, now: Date, windowDays: number): boolean {
-  return collectBatches(item.locations ?? []).some(batch => classifyExpiry(batch.expirationDate, now, windowDays) === 'near-expiry');
+  return collectBatches(item.batches ?? []).some(batch => classifyExpiry(batch.expirationDate, now, windowDays) === 'near-expiry');
 }
 
 export function isItemLowStock(item: PantryItem, context?: { totalQuantity?: number; minThreshold?: number | null }): boolean {

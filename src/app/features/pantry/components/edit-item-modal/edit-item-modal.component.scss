@@ -45,6 +45,7 @@ ion-title, ion-back-button {
 .form-section {
   display: flex;
   flex-direction: column;
+  padding: 10px;
   gap: 0;
   border-radius: 16px;
   background: var(--ion-card-background, var(--ion-card-background));
@@ -53,11 +54,29 @@ ion-title, ion-back-button {
   overflow: visible;
 }
 
+.form-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 2px 6px;
+  margin-top: 12px;
+}
+
+.form-section-header h5 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
 .form-section ion-item {
   --background: transparent;
 }
 
 .form-autocomplete {
+  padding: 6px 0;
+}
+
+.form-section--details .form-row {
   padding: 6px 0;
 }
 
@@ -101,16 +120,15 @@ ion-title, ion-back-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 12px;
 }
 
 .batch-form-card {
-  border: 1px dashed color-mix(in srgb, var(--ion-text-color) 20%, transparent);
   border-radius: 10px;
-  padding: 10px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: color-mix(in srgb, var(--ion-color-dark-contrast) 4%, transparent);
 }
 
 .batch-form-card-header {

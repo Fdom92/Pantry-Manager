@@ -1,8 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import type { InsightPendingReviewProduct, PantryItem } from '@core/models';
 import type { QuickEditPatch, UpToDateReason } from '@core/models/up-to-date';
-import { applyQuickEdit, getFirstExpiryDateInput, getFirstRealLocationId, hasAnyExpiryDate, hasRealLocation, normalizeId } from '@core/domain/up-to-date';
+import { applyQuickEdit, getFirstExpiryDateInput, hasAnyExpiryDate, normalizeId } from '@core/domain/up-to-date';
 import { formatDateValue, formatQuantity } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -33,7 +32,6 @@ export class UpToDateStateService {
   readonly isSavingEdit = signal(false);
   readonly editTargetId = signal<string | null>(null);
   readonly editCategory = signal('');
-  readonly editLocation = signal('');
   readonly editHasExpiry = signal(false);
   readonly editExpiryDate = signal('');
 
@@ -52,7 +50,6 @@ export class UpToDateStateService {
   readonly processedCount = computed(() => this.processedIds().size);
   readonly totalSteps = computed(() => this.processedCount() + this.pendingCount());
   readonly isDone = computed(() => this.hasLoaded() && this.pendingCount() === 0);
-  readonly locationOptions = computed(() => this.appPreferences.preferences().locationOptions ?? []);
   readonly categoryOptions = computed(() => this.appPreferences.preferences().categoryOptions ?? []);
   readonly pantryItemsById = computed(() => {
     const map = new Map<string, PantryItem>();
@@ -105,13 +102,6 @@ export class UpToDateStateService {
     const item = this.editTargetItem();
     return Boolean(item) && !Boolean((item?.categoryId ?? '').trim());
   });
-  readonly editNeedsLocation = computed(() => {
-    const item = this.editTargetItem();
-    if (!item) {
-      return false;
-    }
-    return !hasRealLocation(item);
-  });
   readonly editNeedsExpiry = computed(() => {
     const item = this.editTargetItem();
     if (!item) {
@@ -133,9 +123,6 @@ export class UpToDateStateService {
       return false;
     }
     if (this.editNeedsCategory() && !this.editCategory().trim()) {
-      return false;
-    }
-    if (this.editNeedsLocation() && !this.editLocation().trim()) {
       return false;
     }
     if (this.editNeedsExpiry() && this.editHasExpiry() && !this.editExpiryDate().trim()) {
@@ -295,10 +282,6 @@ export class UpToDateStateService {
     this.editCategory.set(this.getEventStringValue(event));
   }
 
-  onEditLocationChange(event: CustomEvent): void {
-    this.editLocation.set(this.getEventStringValue(event));
-  }
-
   onEditExpiryChange(event: CustomEvent): void {
     this.editExpiryDate.set(this.getEventStringValue(event));
   }
@@ -319,7 +302,6 @@ export class UpToDateStateService {
     const item = this.getPantryItem(id);
     this.editTargetId.set(id);
     this.editCategory.set((item?.categoryId ?? '').trim());
-    this.editLocation.set(getFirstRealLocationId(item));
     this.editExpiryDate.set(getFirstExpiryDateInput(item));
     this.editHasExpiry.set(false);
     this.isEditModalOpen.set(true);
@@ -348,11 +330,9 @@ export class UpToDateStateService {
     await withSignalFlag(this.isSavingEdit, async () => {
       const patch: QuickEditPatch = {
         categoryId: this.editCategory().trim(),
-        locationId: this.editLocation().trim(),
         expiryDateInput: this.editExpiryDate().trim(),
         hasExpiry: this.editHasExpiry(),
         needsCategory: this.editNeedsCategory(),
-        needsLocation: this.editNeedsLocation(),
         needsExpiry: this.editNeedsExpiry(),
       };
 
@@ -378,7 +358,6 @@ export class UpToDateStateService {
   private resetEditState(): void {
     this.editTargetId.set(null);
     this.editCategory.set('');
-    this.editLocation.set('');
     this.editHasExpiry.set(false);
     this.editExpiryDate.set('');
   }

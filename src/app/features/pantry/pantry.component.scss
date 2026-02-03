@@ -107,61 +107,6 @@ ion-title, ion-buttons > ion-button {
   --color: var(--ion-color-tertiary-contrast);
 }
 
-.header-actions {
-  display: flex;
-  gap: 4px;
-}
-
-.header-actions ion-button {
-  --padding-start: 8px;
-  --padding-end: 8px;
-  border-radius: 12px;
-}
-
-.filter-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.filter-actions ion-button[expand='block'] {
-  flex: 1;
-}
-
-.filter-card {
-  margin-bottom: 12px;
-  border-radius: 14px;
-  background: var(--ion-card-background, var(--ion-card-background)) !important;
-  --background: var(--ion-card-background, var(--ion-card-background));
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  color: var(--ion-text-color);
-}
-
-.filter-card ion-card-header {
-  font-weight: 600;
-  font-size: 1rem;
-  padding-bottom: 0;
-}
-
-.filter-card ion-card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.filter-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.filter-actions ion-button[expand="block"] {
-  flex: 1;
-}
-
 .fade-in-list {
   animation: fadeInList 240ms ease;
 }
@@ -442,42 +387,6 @@ ion-card-header {
 
 .create-item-modal-content {
   --padding-bottom: 24px;
-}
-
-.move-modal-form {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.move-modal-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  flex: 1;
-}
-
-.move-modal-header {
-  padding: 8px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.move-destination-suggestions {
-  margin: 8px 0 4px;
-}
-
-.move-destination-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.move-error {
-  display: block;
-  margin-top: 8px;
 }
 
 .modal-title-value {

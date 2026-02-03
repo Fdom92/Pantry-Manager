@@ -1,17 +1,13 @@
 import { Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import {
   buildFastAddItemPayload,
   classifyExpiry,
   computeEarliestExpiry,
   computeSupermarketSuggestions,
   formatCategoryName as formatCategoryNameCatalog,
-  getPresetCategoryOptions,
   getPresetLocationOptions,
-  getPresetSupermarketOptions,
-  moveBatches,
   normalizeBatches,
   sumQuantities,
   toNumberOrZero,
@@ -23,7 +19,6 @@ import {
   BatchSummaryMeta,
   FilterChipViewModel,
   ItemBatch,
-  ItemLocationStock,
   PantryFilterState,
   PantryGroup,
   PantryItem,
@@ -60,7 +55,6 @@ export class PantryStateService {
   // DI
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
-  private readonly fb = inject(FormBuilder);
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
@@ -79,7 +73,6 @@ export class PantryStateService {
   // SIGNALS / view state
   readonly loading = this.pantryService.loading;
   readonly hasCompletedInitialLoad = signal(false);
-  readonly showFilters = signal(false);
   readonly collapsedGroups = signal<Set<string>>(new Set());
   readonly deletingItems = signal<Set<string>>(new Set());
 
@@ -111,12 +104,6 @@ export class PantryStateService {
   readonly fastAddEmptyActionLabel = computed(() => this.buildFastAddEmptyActionLabel());
   readonly addModeSheetOpen = signal(false);
 
-  // Move modal
-  readonly showMoveModal = signal(false);
-  readonly moveItemTarget = signal<PantryItem | null>(null);
-  readonly moveSubmitting = signal(false);
-  readonly moveError = signal<string | null>(null);
-
   // Batches modal
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
@@ -128,10 +115,7 @@ export class PantryStateService {
   // Filters state (mirrors PantryService)
   readonly searchTerm: Signal<string> = this.pantryService.searchQuery;
   readonly activeFilters: Signal<PantryFilterState> = this.pantryService.activeFilters;
-  readonly sortOption: Signal<'name' | 'quantity' | 'expiration'> = this.pantryService.sortMode;
   readonly pipelineResetting: Signal<boolean> = this.pantryService.pipelineResetting;
-  readonly selectedCategory = computed(() => this.activeFilters().categoryId ?? 'all');
-  readonly selectedLocation = computed(() => this.activeFilters().locationId ?? 'all');
   readonly statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
   readonly basicOnly = computed(() => this.activeFilters().basic);
 
@@ -141,30 +125,11 @@ export class PantryStateService {
   readonly filterChips = computed(() => this.buildFilterChips(this.summary(), this.statusFilter(), this.basicOnly()));
 
   // Options
-  readonly categoryOptions = computed(() => this.computeCategoryOptions(this.pantryItemsState()));
-  readonly locationOptions = computed(() => this.computeLocationOptions(this.pantryItemsState()));
   readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.pantryItemsState()));
-  readonly presetCategoryOptions = computed(() => this.computePresetCategoryOptions());
   readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
-  readonly presetSupermarketOptions = computed(() => this.computePresetSupermarketOptions());
 
   // Batches
   readonly batchSummaries = computed(() => this.computeBatchSummaries(this.pantryItemsState()));
-
-  // Forms (only those needed for moved flows)
-  readonly moveForm = this.fb.group({
-    fromLocation: this.fb.control('', {
-      validators: [Validators.required],
-      nonNullable: true,
-    }),
-    toLocation: this.fb.control('', {
-      validators: [Validators.required],
-      nonNullable: true,
-    }),
-    quantity: this.fb.control<number | null>(null, {
-      validators: [Validators.required, Validators.min(0.01)],
-    }),
-  });
 
   constructor() {
     // Keep the UI in sync with the filtered pipeline, merging optimistic edits before rendering the list.
@@ -180,22 +145,6 @@ export class PantryStateService {
       const shouldUseFreshSummary = !isLoading || loadedItems.length > 0 || totalCount === 0;
       if (shouldUseFreshSummary) {
         this.summarySnapshot.set(this.buildSummary(loadedItems, loadedItems.length));
-      }
-    });
-
-    effect(() => {
-      const categories = this.categoryOptions();
-      const categoryFilter = this.activeFilters().categoryId;
-      if (categoryFilter && !categories.some(option => option.id === categoryFilter)) {
-        this.pantryService.setFilter('categoryId', null);
-      }
-    });
-
-    effect(() => {
-      const locations = this.locationOptions();
-      const locationFilter = this.activeFilters().locationId;
-      if (locationFilter && !locations.some(option => option.id === locationFilter)) {
-        this.pantryService.setFilter('locationId', null);
       }
     });
 
@@ -232,21 +181,6 @@ export class PantryStateService {
     this.pantryService.setSearchQuery(ev.detail?.value ?? '');
   }
 
-  onCategoryChange(ev: CustomEvent): void {
-    const raw = ev.detail?.value ?? 'all';
-    this.pantryService.setFilter('categoryId', raw === 'all' ? null : raw);
-  }
-
-  onLocationChange(ev: CustomEvent): void {
-    const raw = ev.detail?.value ?? 'all';
-    this.pantryService.setFilter('locationId', raw === 'all' ? null : raw);
-  }
-
-  onSortChange(ev: CustomEvent): void {
-    const mode = (ev.detail?.value ?? 'name') as 'name' | 'quantity' | 'expiration';
-    this.pantryService.setSortMode(mode);
-  }
-
   onFilterChipSelected(chip: FilterChipViewModel): void {
     if (chip.kind === 'basic') {
       this.toggleBasicFilter();
@@ -269,21 +203,6 @@ export class PantryStateService {
       recentlyAdded: false,
       normalOnly: false,
     });
-  }
-
-  openFilters(event?: Event): void {
-    event?.preventDefault();
-    this.showFilters.set(true);
-  }
-
-  closeFilters(): void {
-    this.showFilters.set(false);
-  }
-
-  clearFilters(): void {
-    this.pantryService.resetSearchAndFilters();
-    this.pantryService.setSortMode('name');
-    this.showFilters.set(false);
   }
 
   // -------- Edit item modal (request-based) --------
@@ -713,8 +632,9 @@ export class PantryStateService {
     const summary = this.getBatchSummary(item);
     const batches = summary.sorted.map(entry => ({
       batch: entry.batch,
-      location: entry.location,
+      locationId: entry.locationId,
       locationLabel: entry.locationLabel,
+      hasLocation: normalizeKey(entry.locationId) !== normalizeKey(UNASSIGNED_LOCATION_KEY),
       status: entry.status,
       formattedDate: this.formatBatchDate(entry.batch),
       quantityLabel: this.formatBatchQuantity(entry.batch, entry.locationUnit),
@@ -806,198 +726,40 @@ export class PantryStateService {
     }
   }
 
-  // -------- Move modal + logic --------
-  openMoveItemModal(item: PantryItem, event?: Event): void {
-    event?.stopPropagation();
-    const candidates = this.getMoveSourceOptions(item);
-    if (!candidates.length) {
-      return;
-    }
-    const defaultFrom = candidates[0]?.value ?? '';
-    const suggestedDestination = this.getSuggestedDestination(item, defaultFrom);
-    const defaultQuantity = this.getAvailableQuantityFor(item, defaultFrom);
-    this.moveForm.reset({
-      fromLocation: defaultFrom,
-      toLocation: suggestedDestination,
-      quantity: defaultQuantity,
-    });
-    this.moveError.set(null);
-    this.moveItemTarget.set(item);
-    this.showMoveModal.set(true);
-  }
-
-  closeMoveItemModal(): void {
-    if (this.showMoveModal()) {
-      return;
-    }
-    this.showMoveModal.set(false);
-    this.moveItemTarget.set(null);
-    this.moveForm.reset({
-      fromLocation: '',
-      toLocation: '',
-      quantity: null,
-    });
-    this.moveSubmitting.set(false);
-    this.moveError.set(null);
-  }
-
-  dismissMoveItemModal(): void {
-    this.showMoveModal.set(false);
-  }
-
-  onMoveSourceChange(): void {
-    const item = this.moveItemTarget();
-    if (!item) {
-      return;
-    }
-    const fromId = this.moveForm.controls.fromLocation.value;
-    const available = this.getAvailableQuantityFor(item, fromId);
-    this.moveForm.patchValue({ quantity: available }, { emitEvent: false });
-  }
-
-  getMoveSourceOptions(item: PantryItem | null): Array<{ value: string; label: string; quantityLabel: string }> {
-    if (!item) {
-      return [];
-    }
-    return item.locations
-      .map(location => {
-        const total = this.getLocationTotal(location);
-        if (total <= 0) {
-          return null;
-        }
-        const quantityLabel =
-          this.formatQuantityForMessage(total, location.unit ?? this.getPrimaryUnit(item)) ??
-          formatQuantity(total, this.languageService.getCurrentLocale(), { maximumFractionDigits: 2 });
-        return {
-          value: location.locationId,
-          label: this.getLocationLabel(location.locationId),
-          quantityLabel,
-        };
-      })
-      .filter((option): option is { value: string; label: string; quantityLabel: string } => Boolean(option?.value));
-  }
-
-  getMoveDestinationSuggestions(item: PantryItem | null): string[] {
-    if (!item) {
-      return [];
-    }
-    const exclude = normalizeKey(this.moveForm.controls.fromLocation.value ?? '');
-    const seen = new Set<string>();
-    const suggestions: string[] = [];
-    const addSuggestion = (value: string | undefined | null): void => {
-      const trimmed = (value ?? '').trim();
-      if (!trimmed) {
-        return;
-      }
-      const key = normalizeKey(trimmed);
-      if (!key || key === exclude || seen.has(key)) {
-        return;
-      }
-      seen.add(key);
-      suggestions.push(trimmed);
-    };
-
-    for (const location of item.locations) {
-      addSuggestion(location.locationId);
-    }
-    for (const preset of this.presetLocationOptions()) {
-      addSuggestion(preset);
-    }
-    return suggestions.slice(0, 6);
-  }
-
-  applyMoveDestination(value: string): void {
-    this.moveForm.patchValue({ toLocation: value });
-  }
-
-  getMoveAvailabilityLabel(item: PantryItem | null): string {
-    if (!item) {
-      return '';
-    }
-    const fromId = this.moveForm.controls.fromLocation.value;
-    const available = this.getAvailableQuantityFor(item, fromId);
-    if (available <= 0) {
-      return this.translate.instant('pantry.move.availability.empty');
-    }
-    const quantityLabel = this.formatQuantityForMessage(available, this.getLocationUnitForItem(item, fromId));
-    if (!quantityLabel) {
-      return '';
-    }
-    return this.translate.instant('pantry.move.availability.label', { value: quantityLabel });
-  }
-
-  async submitMoveItem(): Promise<void> {
-    const targetItem = this.moveItemTarget();
-    if (!targetItem) {
-      return;
-    }
-    if (this.moveForm.invalid) {
-      this.moveForm.markAllAsTouched();
-      return;
-    }
-
-    const fromLocation = (this.moveForm.controls.fromLocation.value ?? '').trim();
-    const toLocation = (this.moveForm.controls.toLocation.value ?? '').trim();
-    const quantityInput = this.moveForm.controls.quantity.value;
-    const requestedQuantity = toNumberOrZero(quantityInput);
-
-    if (!fromLocation || !toLocation) {
-      this.moveError.set(this.translate.instant('pantry.move.errors.missingLocations'));
-      return;
-    }
-    if (normalizeKey(fromLocation) === normalizeKey(toLocation)) {
-      this.moveError.set(this.translate.instant('pantry.move.errors.sameLocation'));
-      return;
-    }
-    if (requestedQuantity <= 0) {
-      this.moveError.set(this.translate.instant('pantry.move.errors.invalidQuantity'));
-      return;
-    }
-
-    this.moveError.set(null);
-    await withSignalFlag(this.moveSubmitting, async () => {
-      const result = this.buildMoveResult(targetItem, fromLocation, toLocation, requestedQuantity);
-      if (!result) {
-        this.moveError.set(this.translate.instant('pantry.move.errors.noAvailableStock'));
-        return;
-      }
-
-      this.pantryItemsState.update(items =>
-        items.map(existing => (existing._id === result.updatedItem._id ? result.updatedItem : existing))
-      );
-      this.triggerStockSave(result.updatedItem._id, result.updatedItem);
-
-      this.dismissMoveItemModal();
-    }).catch(err => {
-      console.error('[PantryListStateService] submitMoveItem error', err);
-      this.moveError.set(this.translate.instant('pantry.move.errors.generic'));
-    });
-  }
-
   // -------- Stock pending + debounce --------
   async adjustBatchQuantity(
     item: PantryItem,
-    location: ItemLocationStock,
+    locationId: string,
     batch: ItemBatch,
     delta: number,
     event?: Event
   ): Promise<void> {
     event?.stopPropagation();
-    if (!item?._id || !location?.locationId || !Number.isFinite(delta) || delta === 0) {
+    if (!item?._id || !Number.isFinite(delta) || delta === 0) {
       return;
     }
 
-    const unit = normalizeUnitValue(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
-    const originalBatches = Array.isArray(location.batches) ? location.batches : [];
-    const targetIndex = originalBatches.indexOf(batch);
-    const sanitizedBatches = this.sanitizeBatches(location.batches, unit);
-    const batchIndex = targetIndex >= 0 ? targetIndex : sanitizedBatches.findIndex(entry => entry.batchId === batch.batchId);
+    const normalizedLocation = normalizeLocationId(locationId, UNASSIGNED_LOCATION_KEY);
+    const unit = normalizeUnitValue(batch.unit ?? this.pantryStore.getItemPrimaryUnit(item));
+    const originalTotal = this.getAvailableQuantityFor(item, normalizedLocation);
+    const sanitizedBatches = this.sanitizeBatches(item.batches ?? [], unit).map(entry => ({
+      ...entry,
+      locationId: normalizeLocationId(entry.locationId, UNASSIGNED_LOCATION_KEY),
+    }));
+    const batchIndex = sanitizedBatches.findIndex(entry => {
+      if (batch.batchId && entry.batchId) {
+        return entry.batchId === batch.batchId;
+      }
+      const entryLocation = normalizeLocationId(entry.locationId, UNASSIGNED_LOCATION_KEY);
+      const entryExpiry = entry.expirationDate ?? '';
+      const targetExpiry = batch.expirationDate ?? '';
+      return entryLocation === normalizedLocation && entryExpiry === targetExpiry;
+    });
 
     if (batchIndex < 0) {
       return;
     }
 
-    const previousTotal = this.sumBatchQuantities(sanitizedBatches);
     const currentBatchQuantity = toNumberOrZero(sanitizedBatches[batchIndex].quantity);
     const nextBatchQuantity = roundQuantity(Math.max(0, currentBatchQuantity + delta));
 
@@ -1011,16 +773,13 @@ export class PantryStateService {
       sanitizedBatches[batchIndex] = {
         ...sanitizedBatches[batchIndex],
         quantity: nextBatchQuantity,
+        locationId: normalizedLocation,
       };
     }
 
-    const nextTotal = this.sumBatchQuantities(sanitizedBatches);
-    const updatedItem = this.applyLocationBatches(item, location.locationId, sanitizedBatches);
-    if (!updatedItem) {
-      return;
-    }
-
-    await this.provideQuantityFeedback(previousTotal, nextTotal);
+    const updatedItem = this.rebuildItemWithBatches(item, sanitizedBatches);
+    const nextTotal = this.getAvailableQuantityFor(updatedItem, normalizedLocation);
+    await this.provideQuantityFeedback(originalTotal, nextTotal);
     this.triggerStockSave(item._id, updatedItem);
 
   }
@@ -1095,7 +854,7 @@ export class PantryStateService {
 
       return {
         ...item,
-        locations: pending.locations,
+        batches: pending.batches,
         expirationDate: pending.expirationDate ?? item.expirationDate,
         updatedAt: pending.updatedAt ?? item.updatedAt,
       };
@@ -1116,56 +875,19 @@ export class PantryStateService {
     return `batch:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   }
 
-  private updateLocationTotals(locations: ItemLocationStock[]): ItemLocationStock[] {
-    return locations.map(location => {
-      const unit = normalizeUnitValue(location.unit);
-      return {
-        ...location,
-        unit,
-        batches: this.sanitizeBatches(location.batches, unit),
-      };
-    });
-  }
+  private rebuildItemWithBatches(item: PantryItem, batches: ItemBatch[]): PantryItem {
+    const fallbackUnit = this.getPrimaryUnit(item);
+    const normalized = this.sanitizeBatches(batches, fallbackUnit).map(batch => ({
+      ...batch,
+      locationId: normalizeLocationId(batch.locationId, UNASSIGNED_LOCATION_KEY),
+    }));
 
-  private rebuildItemWithLocations(item: PantryItem, locations: ItemLocationStock[]): PantryItem {
-    const normalizedLocations = this.updateLocationTotals(locations);
-    return {
+    const rebuilt = {
       ...item,
-      locations: normalizedLocations,
-      expirationDate: computeEarliestExpiry(normalizedLocations),
+      batches: normalized,
+      expirationDate: computeEarliestExpiry(normalized),
       updatedAt: new Date().toISOString(),
     };
-  }
-
-  private applyLocationBatches(item: PantryItem, locationId: string, batches: ItemBatch[]): PantryItem | null {
-    const unitFallback = normalizeUnitValue(
-      item.locations.find(loc => loc.locationId === locationId)?.unit ?? this.getPrimaryUnit(item)
-    );
-
-    let found = false;
-    const nextLocations = item.locations.map(loc => {
-      if (loc.locationId === locationId) {
-        found = true;
-        const normalizedUnit = normalizeUnitValue(loc.unit ?? unitFallback);
-        return {
-          ...loc,
-          unit: normalizedUnit,
-          batches: this.sanitizeBatches(batches, normalizedUnit),
-        };
-      }
-      return loc;
-    });
-
-    if (!found) {
-      const normalizedUnit = normalizeUnitValue(unitFallback);
-      nextLocations.push({
-        locationId,
-        unit: normalizedUnit,
-        batches: this.sanitizeBatches(batches, normalizedUnit),
-      });
-    }
-
-    const rebuilt = this.rebuildItemWithLocations(item, nextLocations);
     this.pantryItemsState.update(items =>
       items.map(existing => (existing._id === rebuilt._id ? rebuilt : existing))
     );
@@ -1187,7 +909,7 @@ export class PantryStateService {
           const nextPayload = latest
             ? {
                 ...latest,
-                locations: pending.locations,
+                batches: pending.batches,
                 expirationDate: pending.expirationDate ?? latest.expirationDate,
                 updatedAt: pending.updatedAt ?? new Date().toISOString(),
               }
@@ -1249,123 +971,49 @@ export class PantryStateService {
     return `${formattedNumber} ${unitLabel}`.trim();
   }
 
-  private getLocationTotal(location: ItemLocationStock): number {
-    return this.sumBatchQuantities(location.batches);
+  private getLocationGroups(item: PantryItem): Array<{ locationId: string; batches: ItemBatch[]; unit: string }> {
+    const groups = new Map<string, { locationId: string; batches: ItemBatch[]; unit: string }>();
+    const fallbackUnit = this.getPrimaryUnit(item);
+
+    for (const batch of item.batches ?? []) {
+      const locationId = normalizeLocationId(batch.locationId, UNASSIGNED_LOCATION_KEY);
+      const unit = normalizeUnitValue(batch.unit ?? fallbackUnit);
+      const current = groups.get(locationId);
+      if (current) {
+        current.batches.push({ ...batch, locationId });
+        if (!current.unit) {
+          current.unit = unit;
+        }
+      } else {
+        groups.set(locationId, {
+          locationId,
+          batches: [{ ...batch, locationId }],
+          unit,
+        });
+      }
+    }
+
+    return Array.from(groups.values());
+  }
+
+  private getLocationTotal(item: PantryItem, locationId: string): number {
+    const normalized = normalizeKey(locationId);
+    const batches = (item.batches ?? []).filter(
+      batch => normalizeKey(batch.locationId ?? UNASSIGNED_LOCATION_KEY) === normalized
+    );
+    return this.sumBatchQuantities(batches);
   }
 
   private getAvailableQuantityFor(item: PantryItem, locationId: string): number {
-    return this.getLocationTotal(
-      item.locations.find(loc => normalizeKey(loc.locationId) === normalizeKey(locationId)) ?? {
-        locationId: '',
-        unit: this.getPrimaryUnit(item),
-        batches: [],
-      }
-    );
+    return this.getLocationTotal(item, locationId);
   }
 
   private getLocationUnitForItem(item: PantryItem, locationId: string): string {
-    const location = item.locations.find(loc => normalizeKey(loc.locationId) === normalizeKey(locationId));
-    return normalizeUnitValue(location?.unit ?? this.getPrimaryUnit(item));
-  }
-
-  private getSuggestedDestination(item: PantryItem, fromId: string): string {
-    const normalizedFrom = normalizeKey(fromId);
-    const alternative = item.locations.find(loc => normalizeKey(loc.locationId) !== normalizedFrom)?.locationId;
-    if (alternative) {
-      return alternative;
-    }
-    const presets = this.presetLocationOptions();
-    const presetOption = presets.find(option => normalizeKey(option) !== normalizedFrom);
-    if (presetOption) {
-      return presetOption;
-    }
-    return this.getDefaultLocationId();
-  }
-
-  private buildMoveResult(
-    item: PantryItem,
-    fromLocationId: string,
-    toLocationId: string,
-    requestedQuantity: number
-  ): { updatedItem: PantryItem; quantityLabel: string; fromLabel: string; toLabel: string } | null {
-    const normalizedFrom = normalizeKey(fromLocationId);
-    const normalizedTo = normalizeKey(toLocationId);
-    if (!normalizedFrom || !normalizedTo || normalizedFrom === normalizedTo) {
-      return null;
-    }
-
-    const source = item.locations.find(loc => normalizeKey(loc.locationId) === normalizedFrom);
-    if (!source) {
-      return null;
-    }
-
-    const unit = normalizeUnitValue(source.unit ?? this.getPrimaryUnit(item));
-    const sanitizedSource = this.sanitizeBatches(source.batches, unit);
-    const available = this.sumBatchQuantities(sanitizedSource);
-    if (available <= 0) {
-      return null;
-    }
-
-    const amountToMove = roundQuantity(Math.min(Math.max(requestedQuantity, 0), available));
-    if (amountToMove <= 0) {
-      return null;
-    }
-
-    const destination = item.locations.find(loc => normalizeKey(loc.locationId) === normalizedTo);
-    const destinationUnit = normalizeUnitValue(destination?.unit ?? unit);
-    const sanitizedDestination = this.sanitizeBatches(destination?.batches, destinationUnit);
-    const { moved, remainingSource, nextDestination } = moveBatches({
-      source: sanitizedSource,
-      destination: sanitizedDestination,
-      amount: amountToMove,
-      round: roundQuantity,
-    });
-
-    if (moved.length === 0) {
-      return null;
-    }
-
-    const remaining = remainingSource;
-    const mergedDestination = nextDestination;
-
-    const nextLocations = item.locations.filter(
-      loc => normalizeKey(loc.locationId) !== normalizedFrom && normalizeKey(loc.locationId) !== normalizedTo
+    const normalized = normalizeKey(locationId);
+    const batch = (item.batches ?? []).find(
+      entry => normalizeKey(entry.locationId ?? UNASSIGNED_LOCATION_KEY) === normalized
     );
-
-    if (this.sumBatchQuantities(remaining) > 0) {
-      nextLocations.push({
-        ...source,
-        batches: remaining,
-        unit,
-      });
-    }
-
-    if (this.sumBatchQuantities(mergedDestination) > 0) {
-      nextLocations.push({
-        ...(destination ?? { locationId: toLocationId, unit: destinationUnit, batches: [] }),
-        locationId: destination?.locationId ?? toLocationId,
-        batches: mergedDestination,
-        unit: destinationUnit,
-      });
-    }
-
-    const updatedItem = this.rebuildItemWithLocations(item, nextLocations);
-    const quantityLabel =
-      this.formatQuantityForMessage(amountToMove, unit) ??
-      `${roundQuantity(amountToMove)} ${this.getUnitLabel(unit)}`;
-
-    return {
-      updatedItem,
-      quantityLabel,
-      fromLabel: normalizeLocationId(
-        source.locationId,
-        this.translate.instant('common.locations.none')
-      ),
-      toLabel: normalizeLocationId(
-        toLocationId,
-        this.translate.instant('common.locations.none')
-      ),
-    };
+    return normalizeUnitValue(batch?.unit ?? this.getPrimaryUnit(item));
   }
 
   // -------- Summary / grouping / options --------
@@ -1537,99 +1185,12 @@ export class PantryStateService {
     return 'all';
   }
 
-  private computeLocationOptions(items: PantryItem[]): Array<{ id: string; label: string; count: number }> {
-    const counts = new Map<string, { label: string; count: number }>();
-
-    for (const item of items) {
-      const seen = new Set<string>();
-      for (const location of item.locations) {
-        const id = normalizeLocationId(location.locationId);
-        if (seen.has(id)) {
-          continue;
-        }
-        seen.add(id);
-        const label = normalizeLocationId(id, this.translate.instant('common.locations.none'));
-        const current = counts.get(id);
-        if (current) {
-          current.count += 1;
-        } else {
-          counts.set(id, { label, count: 1 });
-        }
-      }
-    }
-
-    const mapped = Array.from(counts.entries())
-      .map(([id, meta]) => ({ id, label: meta.label, count: meta.count }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-
-    return [
-      { id: 'all', label: this.translate.instant('pantry.filters.all'), count: items.length },
-      ...mapped,
-    ];
-  }
-
   private computeSupermarketOptions(items: PantryItem[]): string[] {
     return computeSupermarketSuggestions(items);
   }
 
-  private computePresetCategoryOptions(): string[] {
-    return getPresetCategoryOptions(this.appPreferences.preferences());
-  }
-
   private computePresetLocationOptions(): string[] {
     return getPresetLocationOptions(this.appPreferences.preferences());
-  }
-
-  private computePresetSupermarketOptions(): string[] {
-    return getPresetSupermarketOptions(this.appPreferences.preferences());
-  }
-
-  private computeCategoryOptions(items: PantryItem[]): Array<{ id: string; label: string; count: number; lowCount: number }> {
-    const counts = new Map<string, { label: string; count: number; lowCount: number }>();
-    const presets = this.presetCategoryOptions();
-
-    for (const preset of presets) {
-      const id = preset.trim();
-      if (!counts.has(id)) {
-        counts.set(id, { label: this.formatCategoryName(id), count: 0, lowCount: 0 });
-      }
-    }
-
-    if (!counts.has('')) {
-      counts.set('', {
-        label: this.translate.instant('pantry.form.uncategorized'),
-        count: 0,
-        lowCount: 0,
-      });
-    }
-
-    for (const item of items) {
-      const id = normalizeCategoryId(item.categoryId);
-      const label = this.formatCategoryName(id);
-      const current = counts.get(id);
-      if (current) {
-        current.count += 1;
-        if (this.isLowStock(item)) {
-          current.lowCount += 1;
-        }
-      } else {
-        counts.set(id, {
-          label,
-          count: 1,
-          lowCount: this.isLowStock(item) ? 1 : 0,
-        });
-      }
-    }
-
-    const mapped = Array.from(counts.entries())
-      .map(([id, meta]) => ({ id, label: meta.label, count: meta.count, lowCount: meta.lowCount }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-
-    const lowTotal = mapped.reduce((acc, option) => acc + option.lowCount, 0);
-    return [
-      { id: 'all', label: this.translate.instant('pantry.filters.all'), count: items.length, lowCount: lowTotal },
-      ...mapped
-    ];
   }
 
   private buildGroups(items: PantryItem[]): PantryGroup[] {
@@ -1670,29 +1231,9 @@ export class PantryStateService {
   }
 
   private compareItems(a: PantryItem, b: PantryItem): number {
-    const sortOption = this.sortOption();
     const expirationWeightDiff = this.getExpirationWeight(a) - this.getExpirationWeight(b);
     if (expirationWeightDiff !== 0) {
       return expirationWeightDiff;
-    }
-
-    switch (sortOption) {
-      case 'quantity': {
-        const quantityDiff = this.getTotalQuantity(b) - this.getTotalQuantity(a);
-        if (quantityDiff !== 0) {
-          return quantityDiff;
-        }
-        break;
-      }
-      case 'expiration': {
-        const timeDiff = this.getExpirationTime(a) - this.getExpirationTime(b);
-        if (timeDiff !== 0) {
-          return timeDiff;
-        }
-        break;
-      }
-      default:
-        break;
     }
 
     return (a.name ?? '').localeCompare(b.name ?? '');
@@ -1709,7 +1250,7 @@ export class PantryStateService {
   }
 
   private getExpirationTime(item: PantryItem): number {
-    const expiry = computeEarliestExpiry(item.locations);
+    const expiry = computeEarliestExpiry(item.batches ?? []);
     if (!expiry) {
       return Number.MAX_SAFE_INTEGER;
     }
@@ -1754,7 +1295,7 @@ export class PantryStateService {
     if (first) {
       return first;
     }
-    return 'unassigned';
+    return '';
   }
 
   // -------- Batch summaries internal --------
@@ -1764,19 +1305,18 @@ export class PantryStateService {
 
   private collectBatches(item: PantryItem): BatchEntryMeta[] {
     const batches: BatchEntryMeta[] = [];
-    for (const location of item.locations) {
-      const locationLabel = this.getLocationLabel(location.locationId);
-      const locationUnit = normalizeUnitValue(location.unit);
-      const entries = Array.isArray(location.batches) ? location.batches : [];
-      for (const batch of entries) {
-        batches.push({
-          batch,
-          location,
-          locationLabel,
-          locationUnit,
-          status: this.getBatchStatus(batch),
-        });
-      }
+    const fallbackUnit = this.getPrimaryUnit(item);
+    for (const batch of this.sanitizeBatches(item.batches ?? [], fallbackUnit)) {
+      const locationId = normalizeLocationId(batch.locationId, UNASSIGNED_LOCATION_KEY);
+      const locationLabel = this.getLocationLabel(locationId);
+      const locationUnit = normalizeUnitValue(batch.unit ?? fallbackUnit);
+      batches.push({
+        batch: { ...batch, locationId },
+        locationId,
+        locationLabel,
+        locationUnit,
+        status: this.getBatchStatus(batch),
+      });
     }
     return batches;
   }
@@ -1806,7 +1346,7 @@ export class PantryStateService {
         })
         .map(entry => ({
           batch: entry.batch,
-          location: entry.location,
+          locationId: entry.locationId,
           locationLabel: entry.locationLabel,
           locationUnit: entry.locationUnit,
           status: entry.status,
