@@ -24,6 +24,7 @@ import {
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { AppPreferencesService } from '../../settings/app-preferences.service';
+import { EventLogService } from '../../events';
 import { PantryStoreService } from '../pantry-store.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryService } from '../pantry.service';
@@ -37,6 +38,7 @@ export class PantryEditItemModalStateService {
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly listState = inject(PantryStateService);
+  private readonly eventLog = inject(EventLogService);
   readonly isOpen = signal(false);
   readonly isSaving = signal(false);
   readonly editingItem = signal<PantryItem | null>(null);
@@ -386,11 +388,31 @@ export class PantryEditItemModalStateService {
     try {
       const existing = this.editingItem();
       const item = this.buildItemPayload(existing ?? undefined);
+      const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       if (existing) {
+        const previousQuantity = this.pantryStore.getItemTotalQuantity(existing);
         this.listState.cancelPendingStockSave(item._id);
         await this.pantryStore.updateItem(item);
+        await this.eventLog.logEditEvent({
+          productId: item._id,
+          quantity: totalQuantity,
+          deltaQuantity: totalQuantity - previousQuantity,
+          previousQuantity,
+          nextQuantity: totalQuantity,
+          unit: String(this.pantryStore.getItemPrimaryUnit(item)),
+          source: 'advanced',
+        });
       } else {
         await this.pantryStore.addItem(item);
+        await this.eventLog.logAddEvent({
+          productId: item._id,
+          quantity: totalQuantity,
+          deltaQuantity: totalQuantity,
+          previousQuantity: 0,
+          nextQuantity: totalQuantity,
+          unit: String(this.pantryStore.getItemPrimaryUnit(item)),
+          source: 'advanced',
+        });
       }
 
       this.dismiss();
