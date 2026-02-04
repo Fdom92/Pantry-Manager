@@ -6,6 +6,47 @@
 
 <ion-content class="ion-padding">
   <div class="overview" [attr.aria-label]="'dashboard.overview.aria' | translate">
+    @if (facade.isInitialInventoryLoading()) {
+      <section class="overview-section">
+        <header class="overview-section-header">
+          <h2 class="overview-section-title">{{ 'dashboard.overview.sections.alerts.title' | translate }}</h2>
+        </header>
+        <div class="overview-grid" [attr.aria-label]="'dashboard.overview.sections.alerts.title' | translate">
+          <ion-card class="overview-card overview-card--skeleton">
+            <ion-card-header>
+              <div class="overview-card__header">
+                <div class="overview-card__icon">
+                  <ion-skeleton-text animated style="width: 18px; height: 18px; border-radius: 6px;"></ion-skeleton-text>
+                </div>
+                <ion-card-title>
+                  <ion-skeleton-text animated style="width: 120px; height: 14px;"></ion-skeleton-text>
+                </ion-card-title>
+              </div>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+          <ion-card class="overview-card overview-card--skeleton">
+            <ion-card-header>
+              <div class="overview-card__header">
+                <div class="overview-card__icon">
+                  <ion-skeleton-text animated style="width: 18px; height: 18px; border-radius: 6px;"></ion-skeleton-text>
+                </div>
+                <ion-card-title>
+                  <ion-skeleton-text animated style="width: 120px; height: 14px;"></ion-skeleton-text>
+                </ion-card-title>
+              </div>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </section>
+    } @else {
     @if (facade.visibleInsights().length) {
       <section class="overview-section">
         <header class="overview-section-header">
@@ -41,14 +82,21 @@
             >
               <ion-card-header>
                 <div class="overview-card__header">
-                  <ion-icon class="overview-card__icon" name="alert-circle-outline"></ion-icon>
+                  <div class="overview-card__icon">
+                    <ion-icon name="alert-circle-outline"></ion-icon>
+                  </div>
                   <ion-card-title>{{ 'dashboard.overview.cards.expired.title' | translate }}</ion-card-title>
                 </div>
               </ion-card-header>
               <ion-card-content>
-                <p class="overview-card__body">
-                  {{ 'dashboard.overview.cards.expired.body' | translate:{ count: facade.expiredItems().length } }}
-                </p>
+                @if (facade.isInventoryLoading()) {
+                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+                } @else {
+                  <p class="overview-card__body">
+                    {{ 'dashboard.overview.cards.expired.body' | translate:{ count: facade.expiredItems().length } }}
+                  </p>
+                }
             <ion-button
               size="small"
               fill="clear"
@@ -70,14 +118,21 @@
             >
               <ion-card-header>
                 <div class="overview-card__header">
-                  <ion-icon class="overview-card__icon" name="hourglass-outline"></ion-icon>
+                  <div class="overview-card__icon">
+                    <ion-icon name="hourglass-outline"></ion-icon>
+                  </div>
                   <ion-card-title>{{ 'dashboard.overview.cards.nearExpiry.title' | translate }}</ion-card-title>
                 </div>
               </ion-card-header>
               <ion-card-content>
-                <p class="overview-card__body">
-                  {{ 'dashboard.overview.cards.nearExpiry.body' | translate:{ count: facade.nearExpiryItems().length } }}
-                </p>
+                @if (facade.isInventoryLoading()) {
+                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+                } @else {
+                  <p class="overview-card__body">
+                    {{ 'dashboard.overview.cards.nearExpiry.body' | translate:{ count: facade.nearExpiryItems().length } }}
+                  </p>
+                }
             <ion-button
               size="small"
               fill="clear"
@@ -107,7 +162,9 @@
         >
           <ion-card-header>
             <div class="overview-card__header">
-              <ion-icon class="overview-card__icon" name="restaurant-outline"></ion-icon>
+              <div class="overview-card__icon">
+                <ion-icon name="restaurant-outline"></ion-icon>
+              </div>
               <ion-card-title>{{ 'dashboard.overview.cards.consumeToday.title' | translate }}</ion-card-title>
             </div>
           </ion-card-header>
@@ -135,14 +192,21 @@
         >
           <ion-card-header>
             <div class="overview-card__header">
-              <ion-icon class="overview-card__icon" name="clipboard-outline"></ion-icon>
+              <div class="overview-card__icon">
+                <ion-icon name="clipboard-outline"></ion-icon>
+              </div>
               <ion-card-title>{{ 'dashboard.overview.cards.pendingReview.title' | translate }}</ion-card-title>
             </div>
           </ion-card-header>
           <ion-card-content>
-            <p class="overview-card__body">
-              {{ 'dashboard.overview.cards.pendingReview.body' | translate:{ count: facade.pendingReviewProducts().length } }}
-            </p>
+            @if (facade.isInventoryLoading()) {
+              <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+            } @else {
+              <p class="overview-card__body">
+                {{ 'dashboard.overview.cards.pendingReview.body' | translate:{ count: facade.pendingReviewProducts().length } }}
+              </p>
+            }
             <ion-button
               size="small"
               fill="clear"
@@ -154,13 +218,42 @@
       </div>
     </section>
 
-    @if (facade.lowStockItems().length || facade.shoppingListCount()) {
+    @if (facade.isInventoryLoading() || facade.lowStockItems().length || facade.shoppingListCount()) {
       <section class="overview-section">
         <header class="overview-section-header">
           <h2 class="overview-section-title">{{ 'dashboard.overview.sections.control.title' | translate }}</h2>
         </header>
         <div class="overview-grid" [attr.aria-label]="'dashboard.overview.sections.control.title' | translate">
-          @if (facade.lowStockItems().length) {
+          @if (facade.isInventoryLoading()) {
+            <ion-card class="overview-card overview-card--stock">
+              <ion-card-header>
+                <div class="overview-card__header">
+                  <div class="overview-card__icon">
+                    <ion-icon name="trending-down-outline"></ion-icon>
+                  </div>
+                  <ion-card-title>{{ 'dashboard.overview.cards.lowOrEmpty.title' | translate }}</ion-card-title>
+                </div>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+              </ion-card-content>
+            </ion-card>
+            <ion-card class="overview-card overview-card--shopping">
+              <ion-card-header>
+                <div class="overview-card__header">
+                  <div class="overview-card__icon">
+                    <ion-icon name="cart-outline"></ion-icon>
+                  </div>
+                  <ion-card-title>{{ 'dashboard.overview.cards.shopping.title' | translate }}</ion-card-title>
+                </div>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+              </ion-card-content>
+            </ion-card>
+          } @else if (facade.lowStockItems().length) {
             <ion-card
               class="overview-card overview-card--stock"
               role="button"
@@ -172,17 +265,24 @@
             >
               <ion-card-header>
                 <div class="overview-card__header">
-                  <ion-icon class="overview-card__icon" name="trending-down-outline"></ion-icon>
+                  <div class="overview-card__icon">
+                    <ion-icon name="trending-down-outline"></ion-icon>
+                  </div>
                   <ion-card-title>{{ 'dashboard.overview.cards.lowOrEmpty.title' | translate }}</ion-card-title>
                 </div>
               </ion-card-header>
               <ion-card-content>
-                <p class="overview-card__body">
-                  {{ 'dashboard.overview.cards.lowOrEmpty.body' | translate:{ count: facade.lowStockItems().length } }}
-                </p>
-                <ion-button
-                  size="small"
-                  fill="clear"
+                @if (facade.isInventoryLoading()) {
+                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+                } @else {
+                  <p class="overview-card__body">
+                    {{ 'dashboard.overview.cards.lowOrEmpty.body' | translate:{ count: facade.lowStockItems().length } }}
+                  </p>
+                }
+            <ion-button
+              size="small"
+              fill="clear"
                   (click)="onSummaryCardClick('low-or-empty'); $event.stopPropagation()">
                   {{ 'dashboard.overview.cards.lowOrEmpty.action' | translate }}
                 </ion-button>
@@ -190,7 +290,7 @@
             </ion-card>
           }
 
-          @if (facade.shoppingListCount()) {
+          @if (!facade.isInventoryLoading() && facade.shoppingListCount()) {
             <ion-card
               class="overview-card overview-card--shopping"
               role="button"
@@ -202,17 +302,24 @@
             >
               <ion-card-header>
                 <div class="overview-card__header">
-                  <ion-icon class="overview-card__icon" name="cart-outline"></ion-icon>
+                  <div class="overview-card__icon">
+                    <ion-icon name="cart-outline"></ion-icon>
+                  </div>
                   <ion-card-title>{{ 'dashboard.overview.cards.shopping.title' | translate }}</ion-card-title>
                 </div>
               </ion-card-header>
               <ion-card-content>
-                <p class="overview-card__body">
-                  {{ 'dashboard.overview.cards.shopping.body' | translate:{ count: facade.shoppingListCount() } }}
-                </p>
-                <ion-button
-                  size="small"
-                  fill="clear"
+                @if (facade.isInventoryLoading()) {
+                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+                } @else {
+                  <p class="overview-card__body">
+                    {{ 'dashboard.overview.cards.shopping.body' | translate:{ count: facade.shoppingListCount() } }}
+                  </p>
+                }
+            <ion-button
+              size="small"
+              fill="clear"
                   (click)="onSummaryCardClick('shopping'); $event.stopPropagation()">
                   {{ 'dashboard.overview.cards.shopping.action' | translate }}
                 </ion-button>
@@ -221,6 +328,7 @@
           }
         </div>
       </section>
+    }
     }
 
     @if (facade.recentlyAddedCount() > 0) {
@@ -240,14 +348,21 @@
           >
             <ion-card-header>
               <div class="overview-card__header">
-                <ion-icon class="overview-card__icon" name="sparkles-outline"></ion-icon>
+                <div class="overview-card__icon">
+                  <ion-icon name="sparkles-outline"></ion-icon>
+                </div>
                 <ion-card-title>{{ 'dashboard.overview.cards.recentlyAdded.title' | translate }}</ion-card-title>
               </div>
-            </ion-card-header>
-            <ion-card-content>
-              <p class="overview-card__body">
-                {{ 'dashboard.overview.cards.recentlyAdded.body' | translate:{ count: facade.recentlyAddedCount() } }}
-              </p>
+              </ion-card-header>
+              <ion-card-content>
+                @if (facade.isInventoryLoading()) {
+                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+                } @else {
+                  <p class="overview-card__body">
+                  {{ 'dashboard.overview.cards.recentlyAdded.body' | translate:{ count: facade.recentlyAddedCount() } }}
+                </p>
+                }
               <ion-button
                 size="small"
                 fill="clear"

@@ -44,16 +44,6 @@
             ></ion-input>
           </ion-item>
 
-          @if (modal.locationOptions.length > 1) {
-            <ion-item>
-              <ion-label position="stacked">{{ 'pantry.form.location' | translate }}</ion-label>
-              <ion-select interface="popover" [(ngModel)]="modal.location">
-                @for (loc of modal.locationOptions; track loc) {
-                  <ion-select-option [value]="loc">{{ modal.getLocationLabel(loc) }}</ion-select-option>
-                }
-              </ion-select>
-            </ion-item>
-          }
         </ion-list>
       </ion-content>
 

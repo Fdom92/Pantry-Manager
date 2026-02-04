@@ -32,7 +32,9 @@
                 </h3>
                 <p>
                   {{ state.formatBatchQuantity(entry.batch, entry.locationUnit) }}
-                  · {{ entry.locationLabel }}
+                  @if (entry.locationLabel && entry.locationId !== 'unassigned') {
+                    · {{ entry.locationLabel }}
+                  }
                 </p>
                 @if (entry.batch.opened) {
                   <ion-badge color="tertiary" size="small">{{ 'pantry.batches.open' | translate }}</ion-badge>

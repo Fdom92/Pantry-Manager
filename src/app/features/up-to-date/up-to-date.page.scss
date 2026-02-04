@@ -35,11 +35,21 @@ ion-title, ion-back-button {
   border-radius: 16px;
   border: 1px solid color-mix(in srgb, var(--ion-color-medium) 20%, transparent);
   background: var(--ion-card-background);
+  overflow: visible;
+}
+
+.pending-card__header {
+  padding: 14px 16px 0;
+}
+
+.pending-card__content {
+  padding: 6px 16px 16px;
 }
 
 .pending-card__title {
   font-weight: 800;
   letter-spacing: -0.01em;
+  margin: 0;
 }
 
 .pending-card__meta {
@@ -64,6 +74,7 @@ ion-title, ion-back-button {
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px solid color-mix(in srgb, var(--ion-color-medium) 18%, transparent);
+  overflow: visible;
 }
 
 .inline-edit__header {
@@ -72,4 +83,36 @@ ion-title, ion-back-button {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 10px;
+}
+
+.inline-edit__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+}
+
+.up-to-date-category-autocomplete {
+  --padding-start: 0;
+}
+
+.up-to-date-category-autocomplete::ng-deep .autocomplete-input {
+  --padding-start: 0;
+}
+
+.up-to-date-date-input {
+  --placeholder-color: var(--ion-color-medium);
+  --placeholder-opacity: 1;
+  color: var(--ion-text-color);
 }

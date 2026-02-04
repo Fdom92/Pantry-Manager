@@ -36,11 +36,7 @@ export class SetupStateService {
     }),
   );
   readonly canContinue = computed(() => {
-    const step = this.currentStep();
-    if (step.key === 'categories') {
-      return true;
-    }
-    return this.selectedLocations().size > 0;
+    return true;
   });
   readonly primaryActionLabelKey = computed(() =>
     this.isLastStep() ? 'setup.actions.finish' : 'setup.actions.continue',

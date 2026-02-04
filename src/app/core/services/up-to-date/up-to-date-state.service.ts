@@ -1,8 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import type { InsightPendingReviewProduct, PantryItem } from '@core/models';
 import type { QuickEditPatch, UpToDateReason } from '@core/models/up-to-date';
-import { applyQuickEdit, getFirstExpiryDateInput, getFirstRealLocationId, hasAnyExpiryDate, hasRealLocation, normalizeId } from '@core/domain/up-to-date';
+import { applyQuickEdit, getFirstExpiryDateInput, hasAnyExpiryDate, normalizeId } from '@core/domain/up-to-date';
 import { formatDateValue, formatQuantity } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -12,6 +11,9 @@ import { AppPreferencesService } from '../settings/app-preferences.service';
 import { LanguageService } from '../shared/language.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { withSignalFlag } from '../shared';
+import { EventLogService } from '../events';
+import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { normalizeCategoryId, normalizeEntityName, normalizeKey } from '@core/utils/normalization.util';
 
 @Injectable()
 export class UpToDateStateService {
@@ -22,6 +24,7 @@ export class UpToDateStateService {
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly eventLog = inject(EventLogService);
 
   // SIGNALS
   readonly isLoading = signal(false);
@@ -33,8 +36,6 @@ export class UpToDateStateService {
   readonly isSavingEdit = signal(false);
   readonly editTargetId = signal<string | null>(null);
   readonly editCategory = signal('');
-  readonly editLocation = signal('');
-  readonly editHasExpiry = signal(false);
   readonly editExpiryDate = signal('');
 
   readonly pantryItems = this.pantryStore.items;
@@ -52,7 +53,6 @@ export class UpToDateStateService {
   readonly processedCount = computed(() => this.processedIds().size);
   readonly totalSteps = computed(() => this.processedCount() + this.pendingCount());
   readonly isDone = computed(() => this.hasLoaded() && this.pendingCount() === 0);
-  readonly locationOptions = computed(() => this.appPreferences.preferences().locationOptions ?? []);
   readonly categoryOptions = computed(() => this.appPreferences.preferences().categoryOptions ?? []);
   readonly pantryItemsById = computed(() => {
     const map = new Map<string, PantryItem>();
@@ -105,13 +105,6 @@ export class UpToDateStateService {
     const item = this.editTargetItem();
     return Boolean(item) && !Boolean((item?.categoryId ?? '').trim());
   });
-  readonly editNeedsLocation = computed(() => {
-    const item = this.editTargetItem();
-    if (!item) {
-      return false;
-    }
-    return !hasRealLocation(item);
-  });
   readonly editNeedsExpiry = computed(() => {
     const item = this.editTargetItem();
     if (!item) {
@@ -133,12 +126,6 @@ export class UpToDateStateService {
       return false;
     }
     if (this.editNeedsCategory() && !this.editCategory().trim()) {
-      return false;
-    }
-    if (this.editNeedsLocation() && !this.editLocation().trim()) {
-      return false;
-    }
-    if (this.editNeedsExpiry() && this.editHasExpiry() && !this.editExpiryDate().trim()) {
       return false;
     }
     return true;
@@ -291,24 +278,37 @@ export class UpToDateStateService {
     return `${formatted} ${unitLabel}`.trim();
   }
 
-  onEditCategoryChange(event: CustomEvent): void {
-    this.editCategory.set(this.getEventStringValue(event));
+  getCategoryAutocompleteOptions(): AutocompleteItem<string>[] {
+    return this.categoryOptions().map(option => ({
+      id: option,
+      title: option,
+      raw: option,
+    }));
   }
 
-  onEditLocationChange(event: CustomEvent): void {
-    this.editLocation.set(this.getEventStringValue(event));
+  onEditCategoryValueChange(value: string): void {
+    this.editCategory.set((value ?? '').toString());
+  }
+
+  onEditCategorySelect(option: AutocompleteItem<string>): void {
+    const value = (option?.raw ?? '').toString().trim();
+    if (!value) {
+      return;
+    }
+    this.editCategory.set(value);
+  }
+
+  addCategoryOptionFromText(value: string): void {
+    const nextValue = (value ?? '').trim();
+    if (!nextValue) {
+      return;
+    }
+    const formatted = normalizeEntityName(nextValue, nextValue);
+    void this.addCategoryOption(formatted);
   }
 
   onEditExpiryChange(event: CustomEvent): void {
     this.editExpiryDate.set(this.getEventStringValue(event));
-  }
-
-  onEditHasExpiryToggle(event: CustomEvent): void {
-    const checked = Boolean((event.detail as any)?.checked);
-    this.editHasExpiry.set(checked);
-    if (!checked) {
-      this.editExpiryDate.set('');
-    }
   }
 
   openEditModal(pending: InsightPendingReviewProduct): void {
@@ -319,9 +319,7 @@ export class UpToDateStateService {
     const item = this.getPantryItem(id);
     this.editTargetId.set(id);
     this.editCategory.set((item?.categoryId ?? '').trim());
-    this.editLocation.set(getFirstRealLocationId(item));
     this.editExpiryDate.set(getFirstExpiryDateInput(item));
-    this.editHasExpiry.set(false);
     this.isEditModalOpen.set(true);
   }
 
@@ -348,11 +346,9 @@ export class UpToDateStateService {
     await withSignalFlag(this.isSavingEdit, async () => {
       const patch: QuickEditPatch = {
         categoryId: this.editCategory().trim(),
-        locationId: this.editLocation().trim(),
         expiryDateInput: this.editExpiryDate().trim(),
-        hasExpiry: this.editHasExpiry(),
+        hasExpiry: Boolean(this.editExpiryDate().trim()),
         needsCategory: this.editNeedsCategory(),
-        needsLocation: this.editNeedsLocation(),
         needsExpiry: this.editNeedsExpiry(),
       };
 
@@ -361,7 +357,18 @@ export class UpToDateStateService {
         patch,
         primaryUnit: String(this.pantryStore.getItemPrimaryUnit(item)),
       });
+      const previousQuantity = this.pantryStore.getItemTotalQuantity(item);
+      const nextQuantity = this.pantryStore.getItemTotalQuantity(updated);
       await this.pantryStore.updateItem(updated);
+      await this.eventLog.logEditEvent({
+        productId: updated._id,
+        quantity: nextQuantity,
+        deltaQuantity: nextQuantity - previousQuantity,
+        previousQuantity,
+        nextQuantity,
+        unit: String(this.pantryStore.getItemPrimaryUnit(updated)),
+        source: 'quick-edit',
+      });
       this.closeEditModalInternal(true);
       this.completeAndAdvance(id, snapshot);
     });
@@ -378,8 +385,6 @@ export class UpToDateStateService {
   private resetEditState(): void {
     this.editTargetId.set(null);
     this.editCategory.set('');
-    this.editLocation.set('');
-    this.editHasExpiry.set(false);
     this.editExpiryDate.set('');
   }
 
@@ -397,6 +402,24 @@ export class UpToDateStateService {
       }
       return next;
     });
+  }
+
+  private async addCategoryOption(value: string): Promise<void> {
+    const normalized = normalizeCategoryId(value);
+    if (!normalized) {
+      return;
+    }
+    const current = await this.appPreferences.getPreferences();
+    const existing = current.categoryOptions ?? [];
+    const normalizedKey = normalizeKey(normalized);
+    const existingMatch = existing.find(option => normalizeKey(normalizeCategoryId(option)) === normalizedKey);
+    if (existingMatch) {
+      this.editCategory.set(existingMatch);
+      return;
+    }
+    const next = [...existing, normalized];
+    await this.appPreferences.savePreferences({ ...current, categoryOptions: next });
+    this.editCategory.set(normalized);
   }
 
   private getNextPendingId(currentId: string | null, snapshot: InsightPendingReviewProduct[]): string | null {

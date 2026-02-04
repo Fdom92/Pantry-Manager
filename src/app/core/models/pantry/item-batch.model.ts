@@ -4,4 +4,5 @@ export interface ItemBatch {
   unit?: string;
   expirationDate?: string;
   opened?: boolean;
+  locationId?: string;
 }

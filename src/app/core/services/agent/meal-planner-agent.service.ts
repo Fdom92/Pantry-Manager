@@ -17,7 +17,7 @@ export class MealPlannerAgentService {
 
   async run(userText: string): Promise<string> {
     const [pantry, preferences] = await Promise.all([
-      this.pantryService.getAll(),
+      this.pantryService.getAllActive(),
       this.appPreferences.getPreferences(),
     ]);
     const pantryContext = this.buildPantryContext(pantry);

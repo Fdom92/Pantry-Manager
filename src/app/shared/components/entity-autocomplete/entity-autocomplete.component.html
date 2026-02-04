@@ -6,7 +6,8 @@
       [labelPlacement]="labelPlacement"
       [placeholder]="placeholder"
       [disabled]="disabled"
-      [clearInput]="true"
+      [readonly]="readonly"
+      [clearInput]="!showClearButton && !readonly"
       [autofocus]="autofocus"
       autocomplete="off"
       (ionInput)="onInput($event)"
@@ -15,11 +16,28 @@
       (ionBlur)="handleBlur()"
       (keydown)="onKeyDown($event)">
     </ion-input>
+    @if (showClearButton && inputValue) {
+      <ion-button
+        class="autocomplete-clear"
+        fill="clear"
+        size="small"
+        slot="end"
+        (click)="handleClearClick()"
+        aria-label="Clear">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    }
   </ion-item>
 
   @if (shouldShowOptions()) {
     <ion-list class="autocomplete-options">
       @let options = getFilteredOptions();
+      @let showCreateOption = shouldShowEmptyActionItem();
+      @if (showCreateOption) {
+        <ion-item button="true" class="autocomplete-option autocomplete-option--empty" (click)="triggerEmptyAction()">
+          <ion-label>{{ emptyActionLabel }}</ion-label>
+        </ion-item>
+      }
       @if (options.length) {
         @for (option of options; track trackOption($index, option)) {
           <ion-item button="true" class="autocomplete-option" (click)="selectOption(option)">
@@ -34,11 +52,7 @@
             </ion-label>
           </ion-item>
         }
-      } @else if (showEmptyAction && emptyActionLabel) {
-        <ion-item button="true" class="autocomplete-option autocomplete-option--empty" (click)="triggerEmptyAction()">
-          <ion-label>{{ emptyActionLabel }}</ion-label>
-        </ion-item>
-      } @else {
+      } @else if (!showCreateOption) {
         <ion-item class="autocomplete-empty">
           <ion-label>{{ emptyLabel }}</ion-label>
         </ion-item>

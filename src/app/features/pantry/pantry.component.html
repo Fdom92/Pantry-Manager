@@ -1,11 +1,6 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>{{ 'pantry.title' | translate }}</ion-title>
-    <ion-buttons slot="end" class="header-actions">
-      <ion-button fill="clear" color="text-color" size="small" (click)="facade.openFilters($event)">
-        <ion-icon slot="icon-only" name="filter-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -114,9 +109,8 @@
                 (summaryKeydown)="facade.onSummaryKeydown(item, $event)"
                 (openBatches)="facade.openBatchesModal(item, $event)"
                 (editRequested)="facade.openEditItemModal(item, $event)"
-                (moveRequested)="facade.openMoveItemModal(item, $event)"
                 (deleteRequested)="facade.deleteItem(item, $event)"
-                (adjustBatchRequested)="facade.adjustBatchQuantity(item, $event.location, $event.batch, $event.delta, $event.event)"
+                (adjustBatchRequested)="facade.adjustBatchQuantity(item, $event.locationId, $event.batch, $event.delta, $event.event)"
               ></app-pantry-detail>
             </div>
           }
@@ -143,6 +137,7 @@
     [showAllOnFocus]="true"
     [autofocus]="true"
     [showEmptyAction]="facade.showFastAddEmptyAction()"
+    [showEmptyActionWhenNoExactMatch]="true"
     [emptyActionLabel]="facade.fastAddEmptyActionLabel()"
     (willDismiss)="facade.dismissFastAddModal()"
     (didDismiss)="facade.closeFastAddModal()"
@@ -153,27 +148,41 @@
     (save)="facade.submitFastAdd()">
   </app-entity-selector-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
-  <app-pantry-move-modal></app-pantry-move-modal>
-  <app-pantry-filters-modal></app-pantry-filters-modal>
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="add-fab">
-    <ion-fab-button color="primary" [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate">
+    <ion-fab-button
+      color="primary"
+      [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
+      (click)="facade.openAddModeSheet($event)">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
-    <ion-fab-list side="top" class="fab-options">
-      <ion-fab-button
-        color="primary"
-        (click)="facade.openFastAddModal()"
-        [attr.aria-label]="'pantry.fastAdd.cta' | translate">
-        <ion-icon name="flash-outline"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-button
-        color="medium"
-        (click)="facade.openAdvancedAddModal()"
-        [attr.aria-label]="'pantry.fastAdd.advancedAction' | translate">
-        <ion-icon name="construct-outline"></ion-icon>
-      </ion-fab-button>
-    </ion-fab-list>
   </ion-fab>
+
+  <ion-modal
+    class="add-mode-sheet"
+    [isOpen]="facade.addModeSheetOpen()"
+    [initialBreakpoint]="0.4"
+    [breakpoints]="[0, 0.4]"
+    (didDismiss)="facade.closeAddModeSheet()">
+    <ng-template>
+      <ion-content class="ion-padding add-mode-content">
+        <h3 class="add-mode-title">{{ 'pantry.addMode.title' | translate }}</h3>
+        <ion-list class="add-mode-list">
+          <ion-item button="true" detail="false" (click)="facade.selectAddModeSimple()">
+            <ion-label>
+              <h3>{{ 'pantry.addMode.simple' | translate }}</h3>
+              <p>{{ 'pantry.addMode.simpleDescription' | translate }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item button="true" detail="false" (click)="facade.selectAddModeAdvanced()">
+            <ion-label>
+              <h3>{{ 'pantry.addMode.advanced' | translate }}</h3>
+              <p>{{ 'pantry.addMode.advancedDescription' | translate }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
