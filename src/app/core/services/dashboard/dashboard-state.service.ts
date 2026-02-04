@@ -54,6 +54,9 @@ export class DashboardStateService {
   readonly isInventoryLoading = computed(() =>
     this.pantryStore.loading() || !this.pantryStore.endReached()
   );
+  readonly isInitialInventoryLoading = computed(() =>
+    !this.hasCompletedInitialLoad && (this.pantryStore.loading() || !this.pantryStore.endReached())
+  );
 
   readonly isSnapshotCardExpanded = signal(true);
   readonly lastRefreshTimestamp = signal<string | null>(null);

@@ -123,6 +123,10 @@ ion-title {
   --card-accent: var(--ion-color-warning);
 }
 
+.overview-card--skeleton {
+  --card-accent: var(--ion-color-step-300, #d0d3d8);
+}
+
 .overview-card--pending {
   --card-accent: var(--ion-color-tertiary);
 }

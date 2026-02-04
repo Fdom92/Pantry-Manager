@@ -6,6 +6,47 @@
 
 <ion-content class="ion-padding">
   <div class="overview" [attr.aria-label]="'dashboard.overview.aria' | translate">
+    @if (facade.isInitialInventoryLoading()) {
+      <section class="overview-section">
+        <header class="overview-section-header">
+          <h2 class="overview-section-title">{{ 'dashboard.overview.sections.alerts.title' | translate }}</h2>
+        </header>
+        <div class="overview-grid" [attr.aria-label]="'dashboard.overview.sections.alerts.title' | translate">
+          <ion-card class="overview-card overview-card--skeleton">
+            <ion-card-header>
+              <div class="overview-card__header">
+                <div class="overview-card__icon">
+                  <ion-skeleton-text animated style="width: 18px; height: 18px; border-radius: 6px;"></ion-skeleton-text>
+                </div>
+                <ion-card-title>
+                  <ion-skeleton-text animated style="width: 120px; height: 14px;"></ion-skeleton-text>
+                </ion-card-title>
+              </div>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+          <ion-card class="overview-card overview-card--skeleton">
+            <ion-card-header>
+              <div class="overview-card__header">
+                <div class="overview-card__icon">
+                  <ion-skeleton-text animated style="width: 18px; height: 18px; border-radius: 6px;"></ion-skeleton-text>
+                </div>
+                <ion-card-title>
+                  <ion-skeleton-text animated style="width: 120px; height: 14px;"></ion-skeleton-text>
+                </ion-card-title>
+              </div>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </section>
+    } @else {
     @if (facade.visibleInsights().length) {
       <section class="overview-section">
         <header class="overview-section-header">
@@ -23,42 +64,13 @@
       </section>
     }
 
-    @if (facade.isInventoryLoading() || facade.expiredItems().length || facade.nearExpiryItems().length) {
+    @if (facade.expiredItems().length || facade.nearExpiryItems().length) {
       <section class="overview-section">
         <header class="overview-section-header">
           <h2 class="overview-section-title">{{ 'dashboard.overview.sections.alerts.title' | translate }}</h2>
         </header>
         <div class="overview-grid" [attr.aria-label]="'dashboard.overview.sections.alerts.title' | translate">
-          @if (facade.isInventoryLoading()) {
-            <ion-card class="overview-card overview-card--expired">
-              <ion-card-header>
-                <div class="overview-card__header">
-                  <div class="overview-card__icon">
-                    <ion-icon name="alert-circle-outline"></ion-icon>
-                  </div>
-                  <ion-card-title>{{ 'dashboard.overview.cards.expired.title' | translate }}</ion-card-title>
-                </div>
-              </ion-card-header>
-              <ion-card-content>
-                <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-              </ion-card-content>
-            </ion-card>
-            <ion-card class="overview-card overview-card--near-expiry">
-              <ion-card-header>
-                <div class="overview-card__header">
-                  <div class="overview-card__icon">
-                    <ion-icon name="hourglass-outline"></ion-icon>
-                  </div>
-                  <ion-card-title>{{ 'dashboard.overview.cards.nearExpiry.title' | translate }}</ion-card-title>
-                </div>
-              </ion-card-header>
-              <ion-card-content>
-                <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-              </ion-card-content>
-            </ion-card>
-          } @else if (facade.expiredItems().length) {
+          @if (facade.expiredItems().length) {
             <ion-card
               class="overview-card overview-card--expired"
               role="button"
@@ -89,7 +101,7 @@
               </ion-card-content>
             </ion-card>
           }
-          @if (!facade.isInventoryLoading() && facade.nearExpiryItems().length) {
+          @if (facade.nearExpiryItems().length) {
             <ion-card
               class="overview-card overview-card--near-expiry"
               role="button"
@@ -291,6 +303,7 @@
           }
         </div>
       </section>
+    }
     }
 
     @if (facade.recentlyAddedCount() > 0) {
