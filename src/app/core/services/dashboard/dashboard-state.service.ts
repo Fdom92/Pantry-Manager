@@ -1,6 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { getItemStatusState } from '@core/domain/pantry';
 import { toNumberOrZero } from '@core/domain/pantry';
 import type {
   Insight,
@@ -496,11 +497,12 @@ export class DashboardStateService {
     }
 
     const pendingReviewProducts = this.insightService.getPendingReviewProducts(items);
+    const now = new Date();
 
     const context: InsightContext = {
       expiringSoonItems: expiringSoon.map(item => ({
         id: item._id,
-        isLowStock: this.pantryStore.isItemLowStock(item),
+        isLowStock: getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock',
         quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       expiredItems: expiredItems.map(item => ({

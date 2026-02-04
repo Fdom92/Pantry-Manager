@@ -3,13 +3,11 @@ import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DA
 import {
   collectBatches as collectBatchesItem,
   computeExpirationStatus as computeExpirationStatusItem,
+  getItemStatusState,
   getItemEarliestExpiry as getItemEarliestExpiryItem,
   getItemTotalMinThreshold as getItemTotalMinThresholdItem,
   getItemTotalQuantity as getItemTotalQuantityItem,
   hasOpenBatch as hasOpenBatchItem,
-  isItemExpired as isItemExpiredItem,
-  isItemLowStock as isItemLowStockItem,
-  isItemNearExpiry as isItemNearExpiryItem,
   shouldAutoAddToShoppingList as shouldAutoAddToShoppingListItem,
 } from '@core/domain/pantry/pantry-item';
 import {
@@ -228,17 +226,24 @@ export class PantryService extends StorageService<PantryItem> {
     lowStock: number;
   }> {
     const items = await this.getAllActive();
+    const now = new Date();
 
     let expired = 0, nearExpiry = 0, lowStock = 0;
 
     for (const item of items) {
-      if (this.isExpired(item)) {
-        expired += 1;
-      } else if (this.isNearExpiry(item)) {
-        nearExpiry += 1;
-      }
-      if (this.isLowStock(item)) {
-        lowStock += 1;
+      const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
+      switch (state) {
+        case 'expired':
+          expired += 1;
+          break;
+        case 'near-expiry':
+          nearExpiry += 1;
+          break;
+        case 'low-stock':
+          lowStock += 1;
+          break;
+        default:
+          break;
       }
     }
 
@@ -423,21 +428,6 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   /** --- Public helpers for store/UI logic reuse --- */
-  /** Check whether the combined stock across batches is considered low. */
-  isItemLowStock(item: PantryItem): boolean {
-    return isItemLowStockItem(item);
-  }
-
-  /** Determine if any batch expires within the provided rolling window. */
-  isItemNearExpiry(item: PantryItem, daysAhead: number = NEAR_EXPIRY_WINDOW_DAYS): boolean {
-    return isItemNearExpiryItem(item, new Date(), daysAhead);
-  }
-
-  /** Determine if at least one batch has already expired. */
-  isItemExpired(item: PantryItem): boolean {
-    return isItemExpiredItem(item, new Date());
-  }
-
   /** Sum every batch quantity into a single figure. */
   getItemTotalQuantity(item: PantryItem): number {
     return getItemTotalQuantityItem(item);
@@ -509,19 +499,20 @@ export class PantryService extends StorageService<PantryItem> {
     if (filters.basic && !item.isBasic) {
       return false;
     }
-    if (filters.lowStock && !this.isLowStock(item)) {
+    const state = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
+    if (filters.expired && state !== 'expired') {
       return false;
     }
-    if (filters.expired && !this.isExpired(item)) {
+    if (filters.expiring && state !== 'near-expiry') {
       return false;
     }
-    if (filters.expiring && (!this.isNearExpiry(item) || this.isExpired(item))) {
+    if (filters.lowStock && state !== 'low-stock') {
       return false;
     }
     if (filters.recentlyAdded && !this.isRecentlyAdded(item)) {
       return false;
     }
-    if (filters.normalOnly && (this.isLowStock(item) || this.isExpired(item) || this.isNearExpiry(item))) {
+    if (filters.normalOnly && state !== 'normal') {
       return false;
     }
     return true;
@@ -593,13 +584,16 @@ export class PantryService extends StorageService<PantryItem> {
   }
 
   private getExpirationWeight(item: PantryItem): number {
-    if (this.isExpired(item)) {
-      return 0;
+    switch (getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS)) {
+      case 'expired':
+        return 0;
+      case 'near-expiry':
+        return 1;
+      case 'low-stock':
+        return 2;
+      default:
+        return 3;
     }
-    if (this.isNearExpiry(item)) {
-      return 1;
-    }
-    return 2;
   }
 
   /** Compute aggregate fields without mutating the original payload. */
@@ -659,21 +653,6 @@ export class PantryService extends StorageService<PantryItem> {
   /** Project a high-level expiration status based on batch dates. */
   private computeExpirationStatus(batches: ItemBatch[]): ExpirationStatus {
     return computeExpirationStatusItem(batches, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
-  }
-
-  /** Internal low-stock detector that considers the sum of all batches. */
-  private isLowStock(item: PantryItem): boolean {
-    return isItemLowStockItem(item);
-  }
-
-  /** Internal near-expiry detector that checks every batch. */
-  private isNearExpiry(item: PantryItem, daysAhead: number = NEAR_EXPIRY_WINDOW_DAYS): boolean {
-    return isItemNearExpiryItem(item, new Date(), daysAhead);
-  }
-
-  /** Internal expired detector that checks every batch. */
-  private isExpired(item: PantryItem): boolean {
-    return isItemExpiredItem(item, new Date());
   }
 
   private toNumberOrZero(value: unknown): number {

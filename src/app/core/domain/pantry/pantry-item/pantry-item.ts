@@ -1,5 +1,5 @@
 import { classifyExpiry, computeEarliestExpiry, sumQuantities, toNumberOrZero } from '@core/domain/pantry/pantry-stock';
-import { ItemBatch, PantryItem } from '@core/models/pantry';
+import { ItemBatch, PantryItem, ProductStatusState } from '@core/models/pantry';
 import { ExpirationStatus } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
 import type { BatchIdGenerator } from '../pantry.domain';
@@ -77,6 +77,24 @@ export function isItemLowStock(item: PantryItem, context?: { totalQuantity?: num
       : getItemTotalMinThreshold(item);
 
   return minThreshold > 0 && totalQuantity < minThreshold;
+}
+
+export function getItemStatusState(
+  item: PantryItem,
+  now: Date,
+  windowDays: number,
+  context?: { totalQuantity?: number; minThreshold?: number | null }
+): ProductStatusState {
+  if (isItemExpired(item, now)) {
+    return 'expired';
+  }
+  if (isItemNearExpiry(item, now, windowDays)) {
+    return 'near-expiry';
+  }
+  if (isItemLowStock(item, context)) {
+    return 'low-stock';
+  }
+  return 'normal';
 }
 
 export function shouldAutoAddToShoppingList(

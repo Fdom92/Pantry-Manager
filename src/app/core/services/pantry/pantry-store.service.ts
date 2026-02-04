@@ -1,4 +1,6 @@
 import { Signal, computed, inject, Injectable, signal } from '@angular/core';
+import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { getItemStatusState } from '@core/domain/pantry';
 import { PantryItem, PantrySummary } from '@core/models/pantry';
 import { MeasurementUnit, StockStatus } from '@core/models/shared';
 import { PantryService } from './pantry.service';
@@ -20,15 +22,18 @@ export class PantryStoreService {
   private realtimeSubscribed = false;
   // COMPUTED
   readonly items = computed(() => this.pantryService.activeProducts());
-  readonly expiredItems = computed(() =>
-    this.items().filter(item => this.pantryService.isItemExpired(item))
-  );
-  readonly nearExpiryItems = computed(() =>
-    this.items().filter(item => this.pantryService.isItemNearExpiry(item))
-  );
-  readonly lowStockItems = computed(() =>
-    this.items().filter(item => this.pantryService.isItemLowStock(item))
-  );
+  readonly expiredItems = computed(() => {
+    const now = new Date();
+    return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'expired');
+  });
+  readonly nearExpiryItems = computed(() => {
+    const now = new Date();
+    return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'near-expiry');
+  });
+  readonly lowStockItems = computed(() => {
+    const now = new Date();
+    return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock');
+  });
   readonly summary = computed<PantrySummary>(() => ({
     total: this.items().length,
     expired: this.expiredItems().length,
@@ -160,21 +165,6 @@ export class PantryStoreService {
   /** Earliest expiry date considering all batches. */
   getItemEarliestExpiry(item: PantryItem): string | undefined {
     return this.pantryService.getItemEarliestExpiry(item);
-  }
-
-  /** True when the item is in a low-stock situation. */
-  isItemLowStock(item: PantryItem): boolean {
-    return this.pantryService.isItemLowStock(item);
-  }
-
-  /** True when at least one batch has already expired. */
-  isItemExpired(item: PantryItem): boolean {
-    return this.pantryService.isItemExpired(item);
-  }
-
-  /** True when any batch expires within the near-expiry window. */
-  isItemNearExpiry(item: PantryItem): boolean {
-    return this.pantryService.isItemNearExpiry(item);
   }
 
   /** Flatten all batches associated with an item. */
