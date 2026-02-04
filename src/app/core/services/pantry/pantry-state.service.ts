@@ -7,6 +7,7 @@ import {
   computeEarliestExpiry,
   computeSupermarketSuggestions,
   formatCategoryName as formatCategoryNameCatalog,
+  getItemStatusState,
   getPresetLocationOptions,
   normalizeBatches,
   sumQuantities,
@@ -591,18 +592,6 @@ export class PantryStateService {
     return this.pantryStore.getUnitLabel(this.getPrimaryUnit(item));
   }
 
-  isLowStock(item: PantryItem): boolean {
-    return this.pantryStore.isItemLowStock(item);
-  }
-
-  isExpired(item: PantryItem): boolean {
-    return this.pantryStore.isItemExpired(item);
-  }
-
-  isNearExpiry(item: PantryItem): boolean {
-    return this.pantryStore.isItemNearExpiry(item);
-  }
-
   hasOpenBatch(item: PantryItem): boolean {
     return this.pantryStore.hasItemOpenBatch(item);
   }
@@ -669,7 +658,7 @@ export class PantryStateService {
       opened: Boolean(entry.batch.opened),
     }));
 
-    const lowStock = this.isLowStock(item);
+    const lowStock = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock';
     const aggregates = this.computeProductAggregates(batches, lowStock);
     const colorClass = this.getColorClass(aggregates.status.state);
     const fallbackLabel = this.translate.instant('common.dates.none');
@@ -1030,6 +1019,7 @@ export class PantryStateService {
 
   // -------- Summary / grouping / options --------
   private buildSummary(items: PantryItem[], totalCount: number): PantrySummaryMeta {
+    const now = new Date();
     const statusCounts = {
       expired: 0,
       expiring: 0,
@@ -1042,7 +1032,7 @@ export class PantryStateService {
       if (item.isBasic) {
         basicCount += 1;
       }
-      const state = this.getItemStatusState(item);
+      const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
       switch (state) {
         case 'expired':
           statusCounts.expired += 1;
@@ -1079,19 +1069,6 @@ export class PantryStateService {
         normal: 0,
       },
     };
-  }
-
-  private getItemStatusState(item: PantryItem): ProductStatusState {
-    if (this.isExpired(item)) {
-      return 'expired';
-    }
-    if (this.isNearExpiry(item)) {
-      return 'near-expiry';
-    }
-    if (this.isLowStock(item)) {
-      return 'low-stock';
-    }
-    return 'normal';
   }
 
   private buildFilterChips(
@@ -1207,6 +1184,7 @@ export class PantryStateService {
 
   private buildGroups(items: PantryItem[]): PantryGroup[] {
     const map = new Map<string, PantryGroup>();
+    const now = new Date();
 
     for (const item of items) {
       const key = normalizeCategoryId(item.categoryId);
@@ -1225,12 +1203,12 @@ export class PantryStateService {
       }
 
       group.items.push(item);
-      if (this.isLowStock(item)) {
+      const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
+      if (state === 'low-stock') {
         group.lowStockCount += 1;
-      }
-      if (this.isExpired(item)) {
+      } else if (state === 'expired') {
         group.expiredCount += 1;
-      } else if (this.isNearExpiry(item)) {
+      } else if (state === 'near-expiry') {
         group.expiringCount += 1;
       }
     }
@@ -1252,13 +1230,16 @@ export class PantryStateService {
   }
 
   private getExpirationWeight(item: PantryItem): number {
-    if (this.isExpired(item)) {
-      return 0;
+    switch (getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS)) {
+      case 'expired':
+        return 0;
+      case 'near-expiry':
+        return 1;
+      case 'low-stock':
+        return 2;
+      default:
+        return 3;
     }
-    if (this.isNearExpiry(item)) {
-      return 1;
-    }
-    return 2;
   }
 
   private formatCategoryName(key: string): string {

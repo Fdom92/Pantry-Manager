@@ -1,5 +1,14 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { DEFAULT_PREFERENCES, DEFAULT_UNIT_OPTIONS, DOC_TYPE_PREFERENCES, ONBOARDING_STORAGE_KEY, PLANNER_MEMORY_LIMIT, SETUP_STORAGE_KEY, STORAGE_KEY_PREFERENCES } from '@core/constants';
+import {
+  DEFAULT_PREFERENCES,
+  DEFAULT_UNIT_OPTIONS,
+  DOC_TYPE_PREFERENCES,
+  NEAR_EXPIRY_WINDOW_DAYS,
+  ONBOARDING_STORAGE_KEY,
+  PLANNER_MEMORY_LIMIT,
+  SETUP_STORAGE_KEY,
+  STORAGE_KEY_PREFERENCES,
+} from '@core/constants';
 import {
   AppPreferences,
   AppPreferencesDoc,
@@ -115,7 +124,7 @@ export class AppPreferencesService {
     return {
       theme: this.ensureTheme(input?.theme),
       defaultUnit: this.ensureUnit(input?.defaultUnit),
-      nearExpiryDays: this.ensureNearExpiryDays(input?.nearExpiryDays),
+      nearExpiryDays: NEAR_EXPIRY_WINDOW_DAYS,
       compactView: Boolean(input?.compactView),
       notificationsEnabled: Boolean(input?.notificationsEnabled),
       notifyOnExpired: Boolean(input?.notifyOnExpired),
@@ -171,13 +180,6 @@ export class AppPreferencesService {
       return unit;
     }
     return DEFAULT_PREFERENCES.defaultUnit;
-  }
-
-  private ensureNearExpiryDays(value?: number): number {
-    if (typeof value !== 'number' || Number.isNaN(value)) {
-      return DEFAULT_PREFERENCES.nearExpiryDays;
-    }
-    return Math.max(0, Math.round(value));
   }
 
   private ensureLocationOptions(options?: unknown): string[] {
