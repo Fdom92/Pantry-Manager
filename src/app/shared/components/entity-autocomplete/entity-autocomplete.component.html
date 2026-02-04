@@ -32,6 +32,12 @@
   @if (shouldShowOptions()) {
     <ion-list class="autocomplete-options">
       @let options = getFilteredOptions();
+      @let showCreateOption = shouldShowEmptyActionItem();
+      @if (showCreateOption) {
+        <ion-item button="true" class="autocomplete-option autocomplete-option--empty" (click)="triggerEmptyAction()">
+          <ion-label>{{ emptyActionLabel }}</ion-label>
+        </ion-item>
+      }
       @if (options.length) {
         @for (option of options; track trackOption($index, option)) {
           <ion-item button="true" class="autocomplete-option" (click)="selectOption(option)">
@@ -46,11 +52,7 @@
             </ion-label>
           </ion-item>
         }
-      } @else if (showEmptyAction && emptyActionLabel) {
-        <ion-item button="true" class="autocomplete-option autocomplete-option--empty" (click)="triggerEmptyAction()">
-          <ion-label>{{ emptyActionLabel }}</ion-label>
-        </ion-item>
-      } @else {
+      } @else if (!showCreateOption) {
         <ion-item class="autocomplete-empty">
           <ion-label>{{ emptyLabel }}</ion-label>
         </ion-item>

@@ -38,9 +38,21 @@
       </ion-card-header>
       <ion-card-content>
         @if (facade.loading()) {
-          <div class="loading-state">
-            <ion-spinner name="lines"></ion-spinner>
-            <p>{{ 'shopping.suggestions.loading' | translate }}</p>
+          <div class="suggestion-list shopping-skeleton-list">
+            @for (placeholder of [0, 1, 2]; track placeholder) {
+              <ion-card class="suggestion-card suggestion-card--skeleton">
+                <ion-card-content>
+                  <div class="suggestion-header">
+                    <ion-skeleton-text animated style="width: 45%; height: 16px;"></ion-skeleton-text>
+                    <ion-skeleton-text animated style="width: 72px; height: 22px;"></ion-skeleton-text>
+                  </div>
+                  <ion-skeleton-text animated style="width: 75%; height: 14px;"></ion-skeleton-text>
+                  <div class="suggestion-footer">
+                    <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 50%;"></ion-skeleton-text>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            }
           </div>
         } @else {
           <div class="suggestion-groups fade-in-list">

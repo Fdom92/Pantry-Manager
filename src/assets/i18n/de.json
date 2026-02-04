@@ -93,7 +93,7 @@
       "none": "Kein Standort"
     },
     "selects": {
-      "noOptions": "Keine Optionen konfiguriert. Bitte in den Einstellungen hinzufügen."
+      "noOptions": "Keine Optionen konfiguriert. Tippe, um eine zu erstellen, oder füge sie in den Einstellungen hinzu."
     }
   },
   "emptyStates": {
@@ -428,7 +428,9 @@
     "addMode": {
       "title": "Modus auswählen",
       "simple": "Einfach",
-      "advanced": "Erweitert"
+      "simpleDescription": "Füge nur das Nötigste hinzu.",
+      "advanced": "Erweitert",
+      "advancedDescription": "Füge mehr Details hinzu."
     },
     "empty": {
       "filters": "Kein Produkt entspricht den aktuellen Filtern."

@@ -12,6 +12,8 @@ import { LanguageService } from '../shared/language.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { withSignalFlag } from '../shared';
 import { EventLogService } from '../events';
+import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { normalizeCategoryId, normalizeEntityName, normalizeKey } from '@core/utils/normalization.util';
 
 @Injectable()
 export class UpToDateStateService {
@@ -34,7 +36,6 @@ export class UpToDateStateService {
   readonly isSavingEdit = signal(false);
   readonly editTargetId = signal<string | null>(null);
   readonly editCategory = signal('');
-  readonly editHasExpiry = signal(false);
   readonly editExpiryDate = signal('');
 
   readonly pantryItems = this.pantryStore.items;
@@ -125,9 +126,6 @@ export class UpToDateStateService {
       return false;
     }
     if (this.editNeedsCategory() && !this.editCategory().trim()) {
-      return false;
-    }
-    if (this.editNeedsExpiry() && this.editHasExpiry() && !this.editExpiryDate().trim()) {
       return false;
     }
     return true;
@@ -280,20 +278,37 @@ export class UpToDateStateService {
     return `${formatted} ${unitLabel}`.trim();
   }
 
-  onEditCategoryChange(event: CustomEvent): void {
-    this.editCategory.set(this.getEventStringValue(event));
+  getCategoryAutocompleteOptions(): AutocompleteItem<string>[] {
+    return this.categoryOptions().map(option => ({
+      id: option,
+      title: option,
+      raw: option,
+    }));
+  }
+
+  onEditCategoryValueChange(value: string): void {
+    this.editCategory.set((value ?? '').toString());
+  }
+
+  onEditCategorySelect(option: AutocompleteItem<string>): void {
+    const value = (option?.raw ?? '').toString().trim();
+    if (!value) {
+      return;
+    }
+    this.editCategory.set(value);
+  }
+
+  addCategoryOptionFromText(value: string): void {
+    const nextValue = (value ?? '').trim();
+    if (!nextValue) {
+      return;
+    }
+    const formatted = normalizeEntityName(nextValue, nextValue);
+    void this.addCategoryOption(formatted);
   }
 
   onEditExpiryChange(event: CustomEvent): void {
     this.editExpiryDate.set(this.getEventStringValue(event));
-  }
-
-  onEditHasExpiryToggle(event: CustomEvent): void {
-    const checked = Boolean((event.detail as any)?.checked);
-    this.editHasExpiry.set(checked);
-    if (!checked) {
-      this.editExpiryDate.set('');
-    }
   }
 
   openEditModal(pending: InsightPendingReviewProduct): void {
@@ -305,7 +320,6 @@ export class UpToDateStateService {
     this.editTargetId.set(id);
     this.editCategory.set((item?.categoryId ?? '').trim());
     this.editExpiryDate.set(getFirstExpiryDateInput(item));
-    this.editHasExpiry.set(false);
     this.isEditModalOpen.set(true);
   }
 
@@ -333,7 +347,7 @@ export class UpToDateStateService {
       const patch: QuickEditPatch = {
         categoryId: this.editCategory().trim(),
         expiryDateInput: this.editExpiryDate().trim(),
-        hasExpiry: this.editHasExpiry(),
+        hasExpiry: Boolean(this.editExpiryDate().trim()),
         needsCategory: this.editNeedsCategory(),
         needsExpiry: this.editNeedsExpiry(),
       };
@@ -371,7 +385,6 @@ export class UpToDateStateService {
   private resetEditState(): void {
     this.editTargetId.set(null);
     this.editCategory.set('');
-    this.editHasExpiry.set(false);
     this.editExpiryDate.set('');
   }
 
@@ -389,6 +402,24 @@ export class UpToDateStateService {
       }
       return next;
     });
+  }
+
+  private async addCategoryOption(value: string): Promise<void> {
+    const normalized = normalizeCategoryId(value);
+    if (!normalized) {
+      return;
+    }
+    const current = await this.appPreferences.getPreferences();
+    const existing = current.categoryOptions ?? [];
+    const normalizedKey = normalizeKey(normalized);
+    const existingMatch = existing.find(option => normalizeKey(normalizeCategoryId(option)) === normalizedKey);
+    if (existingMatch) {
+      this.editCategory.set(existingMatch);
+      return;
+    }
+    const next = [...existing, normalized];
+    await this.appPreferences.savePreferences({ ...current, categoryOptions: next });
+    this.editCategory.set(normalized);
   }
 
   private getNextPendingId(currentId: string | null, snapshot: InsightPendingReviewProduct[]): string | null {

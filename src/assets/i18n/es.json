@@ -93,7 +93,7 @@
       "none": "Sin ubicación"
     },
     "selects": {
-      "noOptions": "No hay opciones configuradas. Añádelas en ajustes."
+      "noOptions": "No hay opciones configuradas. Escríbela para crearla o añádela en ajustes."
     }
   },
   "emptyStates": {
@@ -418,7 +418,9 @@
     "addMode": {
       "title": "Selecciona el modo",
       "simple": "Simple",
-      "advanced": "Avanzado"
+      "simpleDescription": "Añade solo lo necesario.",
+      "advanced": "Avanzado",
+      "advancedDescription": "Añade con más detalles."
     },
     "empty": {
       "filters": "Ningún producto coincide con los filtros actuales."

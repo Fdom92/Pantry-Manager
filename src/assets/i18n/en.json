@@ -93,7 +93,7 @@
       "none": "No location"
     },
     "selects": {
-      "noOptions": "No options configured. Add them in Settings."
+      "noOptions": "No options configured. Type to create one or add it in Settings."
     }
   },
   "emptyStates": {
@@ -428,7 +428,9 @@
     "addMode": {
       "title": "Select mode",
       "simple": "Simple",
-      "advanced": "Advanced"
+      "simpleDescription": "Add only what you need.",
+      "advanced": "Advanced",
+      "advancedDescription": "Add with more details."
     },
     "empty": {
       "filters": "No product matches the current filters."

@@ -11,6 +11,7 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonSkeletonText,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
@@ -32,6 +33,7 @@ import { EntitySelectorModalComponent } from '@shared/components/entity-selector
     IonCardHeader,
     IonCardTitle,
     IonIcon,
+    IonSkeletonText,
     CommonModule,
     TranslateModule,
     InsightCardComponent,
