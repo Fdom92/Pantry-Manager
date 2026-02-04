@@ -93,7 +93,7 @@
       "none": "Nessuna posizione"
     },
     "selects": {
-      "noOptions": "Nessuna opzione configurata. Aggiungile nelle impostazioni."
+      "noOptions": "Nessuna opzione configurata. Digita per crearne una o aggiungila nelle impostazioni."
     }
   },
   "emptyStates": {

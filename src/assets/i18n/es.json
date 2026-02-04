@@ -93,7 +93,7 @@
       "none": "Sin ubicación"
     },
     "selects": {
-      "noOptions": "No hay opciones configuradas. Añádelas en ajustes."
+      "noOptions": "No hay opciones configuradas. Escríbela para crearla o añádela en ajustes."
     }
   },
   "emptyStates": {

@@ -93,7 +93,7 @@
       "none": "Sans emplacement"
     },
     "selects": {
-      "noOptions": "Aucune option configurée. Ajoutez-les dans les réglages."
+      "noOptions": "Aucune option configurée. Saisissez pour en créer une ou ajoutez-la dans les réglages."
     }
   },
   "emptyStates": {

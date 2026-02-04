@@ -93,7 +93,7 @@
       "none": "Sem localização"
     },
     "selects": {
-      "noOptions": "Sem opções configuradas. Adiciona-as nas definições."
+      "noOptions": "Sem opções configuradas. Escreve para criar uma ou adiciona-a nas definições."
     }
   },
   "emptyStates": {

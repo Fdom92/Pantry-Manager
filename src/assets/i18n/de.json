@@ -93,7 +93,7 @@
       "none": "Kein Standort"
     },
     "selects": {
-      "noOptions": "Keine Optionen konfiguriert. Bitte in den Einstellungen hinzufügen."
+      "noOptions": "Keine Optionen konfiguriert. Tippe, um eine zu erstellen, oder füge sie in den Einstellungen hinzu."
     }
   },
   "emptyStates": {
