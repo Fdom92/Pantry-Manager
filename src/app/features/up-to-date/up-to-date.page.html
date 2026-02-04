@@ -37,11 +37,11 @@
     @let entry = facade.currentEntry();
     @let item = facade.currentItem();
     @if (entry) {
-      <ion-card class="pending-card">
-        <ion-card-header>
-          <ion-card-title class="pending-card__title">{{ entry.name }}</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
+      <section class="pending-card">
+        <header class="pending-card__header">
+          <h2 class="pending-card__title">{{ entry.name }}</h2>
+        </header>
+        <div class="pending-card__content">
           <div class="pending-card__meta">
             @for (reason of entry.reasons; track reason) {
               <ion-text color="medium">
@@ -129,70 +129,41 @@
                 </ion-button>
               </div>
 
-              <ion-list lines="none">
+              <div class="inline-edit__list">
                 @if (facade.editNeedsCategory()) {
-                  <ion-item>
-                    <ion-label>{{ 'pantry.form.category' | translate }}</ion-label>
-                    @let categoryOptions = facade.categoryOptions();
-                    <ion-select
-                      interface="popover"
+                  <div class="form-row">
+                    <app-entity-autocomplete
+                      class="up-to-date-category-autocomplete"
+                      [items]="facade.getCategoryAutocompleteOptions()"
+                      [label]="'pantry.form.category' | translate"
+                      labelPlacement="stacked"
+                      [placeholder]="'pantry.form.categoryPlaceholder' | translate"
+                      [showAllOnFocus]="true"
+                      [showEmptyAction]="true"
+                      [showEmptyActionWhenNoExactMatch]="true"
+                      [emptyActionLabel]="'pantry.form.categoryAdd.option' | translate"
+                      [emptyLabel]="'common.selects.noOptions' | translate"
                       [value]="facade.editCategory()"
-                      [disabled]="!categoryOptions.length"
-                      (ionChange)="facade.onEditCategoryChange($event)">
-                      @for (option of categoryOptions; track option) {
-                        <ion-select-option [value]="option">{{ option }}</ion-select-option>
-                      }
-                    </ion-select>
-                    @if (!categoryOptions.length) {
-                      <ion-note slot="helper" color="medium">
-                        {{ 'common.selects.noOptions' | translate }}
-                      </ion-note>
-                    }
-                  </ion-item>
-                }
-
-                @if (facade.editNeedsLocation()) {
-                  <ion-item>
-                    <ion-label>{{ 'pantry.form.location' | translate }}</ion-label>
-                    @let locationOptions = facade.locationOptions();
-                    <ion-select
-                      interface="popover"
-                      [value]="facade.editLocation()"
-                      [disabled]="!locationOptions.length"
-                      (ionChange)="facade.onEditLocationChange($event)">
-                      @for (option of locationOptions; track option) {
-                        <ion-select-option [value]="option">{{ option }}</ion-select-option>
-                      }
-                    </ion-select>
-                    @if (!locationOptions.length) {
-                      <ion-note slot="helper" color="medium">
-                        {{ 'common.selects.noOptions' | translate }}
-                      </ion-note>
-                    }
-                  </ion-item>
+                      [clearOnSelect]="false"
+                      (valueChange)="facade.onEditCategoryValueChange($event)"
+                      (onSelect)="facade.onEditCategorySelect($event)"
+                      (emptyAction)="facade.addCategoryOptionFromText($event)">
+                    </app-entity-autocomplete>
+                  </div>
                 }
 
                 @if (facade.editNeedsExpiry()) {
-                  <ion-item>
-                    <ion-label>{{ 'upToDate.edit.expiryToggle' | translate }}</ion-label>
-                    <ion-toggle
-                      justify="end"
-                      [checked]="facade.editHasExpiry()"
-                      (ionChange)="facade.onEditHasExpiryToggle($event)">
-                    </ion-toggle>
-                  </ion-item>
-                  @if (facade.editHasExpiry()) {
-                    <ion-item>
-                      <ion-label>{{ 'upToDate.fields.expiry' | translate }}</ion-label>
-                      <ion-input
-                        type="date"
-                        [value]="facade.editExpiryDate()"
-                        (ionInput)="facade.onEditExpiryChange($event)">
-                      </ion-input>
-                    </ion-item>
-                  }
+                  <div class="form-row">
+                    <label class="form-label">{{ 'upToDate.fields.expiry' | translate }}</label>
+                    <ion-input
+                      class="up-to-date-date-input"
+                      type="date"
+                      [value]="facade.editExpiryDate()"
+                      (ionInput)="facade.onEditExpiryChange($event)">
+                    </ion-input>
+                  </div>
                 }
-              </ion-list>
+              </div>
 
               <ion-button expand="block" color="primary" (click)="facade.saveEditModal()" [disabled]="!facade.canSaveEdit()">
                 @if (facade.isSavingEdit()) {
@@ -203,8 +174,8 @@
               </ion-button>
             </div>
           }
-        </ion-card-content>
-      </ion-card>
+        </div>
+      </section>
     }
   }
 </ion-content>

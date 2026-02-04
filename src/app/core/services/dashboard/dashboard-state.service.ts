@@ -1,12 +1,11 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
-import { getLocationEarliestExpiry, getLocationQuantity, toNumberOrZero } from '@core/domain/pantry';
+import { toNumberOrZero } from '@core/domain/pantry';
 import type {
   Insight,
   InsightContext,
   InsightCta,
-  ItemLocationStock,
   PantryItem,
 } from '@core/models';
 import type { ConsumeTodayEntry, DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
@@ -15,6 +14,7 @@ import { AgentConversationStore } from '../agent/agent-conversation.store';
 import { LanguageService } from '../shared/language.service';
 import { ConfirmService, withSignalFlag } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
+import { EventLogService } from '../events';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { PantryService } from '../pantry/pantry.service';
 import { InsightService } from './insight.service';
@@ -42,6 +42,7 @@ export class DashboardStateService {
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly eventLog = inject(EventLogService);
 
   private hasCompletedInitialLoad = false;
 
@@ -50,6 +51,12 @@ export class DashboardStateService {
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
   readonly expiredItems = this.pantryStore.expiredItems;
   readonly inventorySummary = this.pantryStore.summary;
+  readonly isInventoryLoading = computed(() =>
+    this.pantryStore.loading() || !this.pantryStore.endReached()
+  );
+  readonly isInitialInventoryLoading = computed(() =>
+    !this.hasCompletedInitialLoad && (this.pantryStore.loading() || !this.pantryStore.endReached())
+  );
 
   readonly isSnapshotCardExpanded = signal(true);
   readonly lastRefreshTimestamp = signal<string | null>(null);
@@ -288,10 +295,32 @@ export class DashboardStateService {
       return;
     }
     await withSignalFlag(this.consumeSaving, async () => {
-      const updates = entries
-        .map(entry => this.applyConsumeToday(entry.item, entry.quantity))
-        .filter((item): item is PantryItem => Boolean(item));
-      await Promise.all(updates.map(item => this.pantryStore.updateItem(item)));
+      const updates: PantryItem[] = [];
+      const eventPromises: Promise<unknown>[] = [];
+      for (const entry of entries) {
+        const updated = this.applyConsumeToday(entry.item, entry.quantity);
+        if (!updated) {
+          continue;
+        }
+        const previousQuantity = this.pantryStore.getItemTotalQuantity(entry.item);
+        const nextQuantity = this.pantryStore.getItemTotalQuantity(updated);
+        updates.push(updated);
+        eventPromises.push(
+          this.eventLog.logConsumeEvent({
+            productId: entry.item._id,
+            quantity: entry.quantity,
+            deltaQuantity: -entry.quantity,
+            previousQuantity,
+            nextQuantity,
+            unit: String(this.pantryStore.getItemPrimaryUnit(entry.item)),
+            source: 'consume',
+          })
+        );
+      }
+      await Promise.all([
+        ...updates.map(item => this.pantryStore.updateItem(item)),
+        ...eventPromises,
+      ]);
     }).catch(err => {
       console.error('[DashboardStateService] consume today error', err);
     });
@@ -330,33 +359,6 @@ export class DashboardStateService {
 
   getItemTotalMinThreshold(item: PantryItem): number {
     return this.pantryStore.getItemTotalMinThreshold(item);
-  }
-
-  getItemLocationsSummary(item: PantryItem): string {
-    return item.locations
-      .map(location => {
-        const quantity = this.formatQuantityValue(getLocationQuantity(location));
-        const unit = this.pantryStore.getUnitLabel(location.unit ?? this.pantryStore.getItemPrimaryUnit(item));
-        const name = this.formatLocationName(location.locationId);
-        const batches = Array.isArray(location.batches) ? location.batches : [];
-        if (batches.length) {
-          const earliest = getLocationEarliestExpiry(location);
-          const batchLabel = this.translate.instant(
-            batches.length === 1 ? 'dashboard.batches.single' : 'dashboard.batches.plural',
-            { count: batches.length }
-          );
-          const extra = earliest
-            ? this.translate.instant('dashboard.batches.withExpiry', {
-                batchLabel,
-                date: formatShortDate(earliest, this.languageService.getCurrentLocale(), { fallback: earliest }),
-              })
-            : batchLabel;
-          const extraSegment = extra ? ` (${extra})` : '';
-          return `${quantity} ${unit} · ${name}${extraSegment}`;
-        }
-        return `${quantity} ${unit} · ${name}`;
-      })
-      .join(', ');
   }
 
   buildConsumeTodayOptions(
@@ -403,19 +405,8 @@ export class DashboardStateService {
     return new Date();
   }
 
-  private formatLocationName(locationId?: string): string {
-    const trimmed = (locationId ?? '').trim();
-    return trimmed || this.translate.instant('common.locations.none');
-  }
-
-  private formatQuantityValue(value: number): string {
-    return formatQuantity(value, this.languageService.getCurrentLocale(), {
-      maximumFractionDigits: 1,
-    });
-  }
-
   private getConsumeMetaLabel(item: PantryItem, locale: string): string {
-    const batches = item.locations?.reduce((sum, loc) => sum + (loc.batches?.length ?? 0), 0) ?? 0;
+    const batches = item.batches?.length ?? 0;
     const batchLabel = this.translate.instant(
       batches === 1 ? 'dashboard.batches.single' : 'dashboard.batches.plural',
       { count: batches }
@@ -436,78 +427,44 @@ export class DashboardStateService {
     if (delta <= 0) {
       return null;
     }
-    const nextLocations = (item.locations ?? []).map(location => ({
-      ...location,
-      batches: Array.isArray(location.batches) ? location.batches.map(batch => ({ ...batch })) : [],
-    }));
-    const batchRefs: Array<{
-      locationIndex: number;
-      batchIndex: number;
-      expiration?: string;
-      order: number;
-    }> = [];
-    let order = 0;
-    for (let i = 0; i < nextLocations.length; i++) {
-      const batches = nextLocations[i].batches ?? [];
-      for (let j = 0; j < batches.length; j++) {
-        const quantity = toNumberOrZero(batches[j]?.quantity);
-        if (quantity <= 0) {
-          continue;
+    const nextBatches = (item.batches ?? []).map(batch => ({ ...batch }));
+    const ordered = nextBatches
+      .map((batch, index) => ({ batch, index }))
+      .filter(entry => toNumberOrZero(entry.batch.quantity) > 0)
+      .sort((a, b) => {
+        const left = this.getExpiryValue(a.batch.expirationDate);
+        const right = this.getExpiryValue(b.batch.expirationDate);
+        if (left === right) {
+          return a.index - b.index;
         }
-        batchRefs.push({
-          locationIndex: i,
-          batchIndex: j,
-          expiration: batches[j]?.expirationDate ?? undefined,
-          order: order++,
-        });
-      }
-    }
+        return left - right;
+      });
 
-    if (!batchRefs.length) {
+    if (!ordered.length) {
       return null;
     }
 
-    batchRefs.sort((a, b) => {
-      const left = this.getExpiryValue(a.expiration);
-      const right = this.getExpiryValue(b.expiration);
-      if (left === right) {
-        return a.order - b.order;
-      }
-      return left - right;
-    });
-
     let remaining = delta;
-    for (const ref of batchRefs) {
+    for (const entry of ordered) {
       if (remaining <= 0) {
         break;
       }
-      const location = nextLocations[ref.locationIndex];
-      const batch = location.batches?.[ref.batchIndex];
-      if (!batch) {
-        continue;
-      }
-      const quantity = toNumberOrZero(batch.quantity);
+      const quantity = toNumberOrZero(entry.batch.quantity);
       if (quantity <= 0) {
         continue;
       }
       if (quantity <= remaining + 1e-9) {
         remaining -= quantity;
-        batch.quantity = 0;
+        entry.batch.quantity = 0;
       } else {
-        batch.quantity = quantity - remaining;
+        entry.batch.quantity = quantity - remaining;
         remaining = 0;
-      }
-    }
-
-    for (const location of nextLocations) {
-      if (Array.isArray(location.batches)) {
-        location.batches = location.batches.filter(batch => toNumberOrZero(batch.quantity) > 0);
       }
     }
 
     return {
       ...item,
-      locations: nextLocations,
+      batches: nextBatches.filter(batch => toNumberOrZero(batch.quantity) > 0),
     };
   }
 
@@ -580,25 +537,6 @@ export class DashboardStateService {
         return this.shoppingListCount();
       default:
         return 0;
-    }
-  }
-
-  private getOverviewCardEmptyToastKey(card: DashboardOverviewCardId): string {
-    switch (card) {
-      case 'expired':
-        return 'dashboard.overview.toasts.expiredEmpty';
-      case 'near-expiry':
-        return 'dashboard.overview.toasts.nearExpiryEmpty';
-      case 'pending-review':
-        return 'dashboard.overview.toasts.pendingReviewEmpty';
-      case 'low-or-empty':
-        return 'dashboard.overview.toasts.lowOrEmptyEmpty';
-      case 'recently-added':
-        return 'dashboard.overview.toasts.recentlyAddedEmpty';
-      case 'shopping':
-        return 'dashboard.overview.toasts.shoppingEmpty';
-      default:
-        return 'dashboard.overview.toasts.genericEmpty';
     }
   }
 

@@ -62,6 +62,7 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Input() emptyLabel = '';
   @Input() emptyActionLabel = '';
   @Input() showEmptyAction = false;
+  @Input() showEmptyActionWhenNoExactMatch = false;
   @Input() entriesEmptyLabel = '';
   @Input() saveLabel = '';
   @Input() saving = false;

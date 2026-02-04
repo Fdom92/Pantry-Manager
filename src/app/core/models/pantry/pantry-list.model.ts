@@ -1,6 +1,5 @@
 import type { MeasurementUnit } from '../shared/enums.model';
 import { ItemBatch } from './item-batch.model';
-import { ItemLocationStock } from './item-location-stock.model';
 import { PantryItem } from './item.model';
 
 export type PantryStatusFilterValue = 'all' | 'expired' | 'near-expiry' | 'low-stock' | 'normal';
@@ -52,7 +51,7 @@ export interface BatchStatusMeta {
 
 export interface BatchEntryMeta {
   batch: ItemBatch;
-  location: ItemLocationStock;
+  locationId: string;
   locationLabel: string;
   locationUnit: MeasurementUnit | string | undefined;
   status: BatchStatusMeta;
@@ -81,8 +80,9 @@ export interface PantryItemGlobalStatus {
 
 export interface PantryItemBatchViewModel {
   batch: ItemBatch;
-  location: ItemLocationStock;
+  locationId: string;
   locationLabel: string;
+  hasLocation: boolean;
   status: BatchStatusMeta;
   formattedDate: string;
   quantityLabel: string;

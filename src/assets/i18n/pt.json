@@ -45,7 +45,7 @@
       "finish": "Entrar"
     },
     "validation": {
-      "minimumSelection": "Seleciona pelo menos uma opção para continuar.",
+      "locationsOptional": "Podes ignorar este passo se não quiseres adicionar localizações agora.",
       "categoriesOptional": "Podes adicionar categorias mais tarde."
     },
     "locations": {
@@ -93,7 +93,7 @@
       "none": "Sem localização"
     },
     "selects": {
-      "noOptions": "Sem opções configuradas. Adiciona-as nas definições."
+      "noOptions": "Sem opções configuradas. Escreve para criar uma ou adiciona-a nas definições."
     }
   },
   "emptyStates": {
@@ -254,7 +254,6 @@
     "suggestions": {
       "title": "Lista de compras",
       "loading": "A criar lista de compras…",
-      "destination": "Localização sugerida: {{ location }}",
       "totalStock": "Stock total: {{ amount }} {{ unit }}",
       "minStock": "Mín: {{ amount }} {{ unit }}",
       "empty": "Nada pendente neste momento. Aviso-te quando for necessário reabastecer."
@@ -408,16 +407,7 @@
         "expired": "Expirado"
       },
       "basic": "Essenciais",
-      "title": "Filtros",
-      "search": "Pesquisar produtos",
-      "category": "Categoria",
-      "location": "Localização",
-      "sort": {
-        "label": "Ordenar por",
-        "name": "Nome (A-Z)",
-        "quantity": "Quantidade (alta → baixa)",
-        "expiration": "Validade (mais próxima primeiro)"
-      }
+      "search": "Pesquisar produtos"
     },
     "fastAdd": {
       "cta": "Adicionar rápido",
@@ -434,6 +424,13 @@
       "singleSuccess": "1 produto adicionado",
       "success": "{{ count }} produtos adicionados",
       "error": "Não foi possível adicionar os produtos."
+    },
+    "addMode": {
+      "title": "Selecionar modo",
+      "simple": "Simples",
+      "simpleDescription": "Adiciona só o necessário.",
+      "advanced": "Avançado",
+      "advancedDescription": "Adiciona mais detalhes."
     },
     "empty": {
       "filters": "Nenhum produto corresponde aos filtros atuais."
@@ -453,6 +450,7 @@
     "form": {
       "editTitle": "Editar item",
       "newTitle": "Novo item",
+      "details": "Detalhes",
       "name": "Nome",
       "namePlaceholder": "Arroz, leite...",
       "category": "Categoria",
@@ -472,10 +470,11 @@
       },
       "basic": "Item essencial da despensa",
       "minThreshold": "Quantidade mínima",
-      "locationTitle": "Localização {{ index }}",
-      "locationTotal": "Total: {{ total }} {{ unit }}",
       "location": "Localização",
       "locationPlaceholder": "Seleciona uma localização",
+      "locationAdd": {
+        "option": "+ Adicionar localização"
+      },
       "batches": {
         "title": "Lotes",
         "add": "Adicionar lote",
@@ -484,8 +483,7 @@
         "quantity": "Quantidade",
         "expiry": "Data de validade",
         "opened": "Aberto"
-      },
-      "addLocation": "Adicionar localização"
+      }
     },
     "detail": {
       "earliest": "Expira primeiro: {{ date }}",
@@ -529,33 +527,10 @@
       "actions": {
         "viewBatches": "Ver lotes",
         "editItem": "Editar item",
-        "moveItem": "Mover item",
         "deleteItem": "Eliminar item",
         "menuLabel": "Abrir menu de ações",
         "expand": "Mostrar detalhes do item",
         "collapse": "Esconder detalhes do item"
-      }
-    },
-    "move": {
-      "from": "De",
-      "to": "Para",
-      "toPlaceholder": "Novo local (ex: Congelador)",
-      "quantity": "Quantidade a mover",
-      "suggestions": "Sugestões",
-      "availability": {
-        "label": "Disponível: {{ value }}",
-        "empty": "Sem stock disponível neste local"
-      },
-      "errors": {
-        "missingLocations": "Seleciona origem e destino.",
-        "sameLocation": "Origem e destino têm de ser diferentes.",
-        "invalidQuantity": "Indica uma quantidade superior a zero.",
-        "noAvailableStock": "Não há stock para mover deste local.",
-        "generic": "Não foi possível mover o item. Tenta novamente."
-      },
-      "submit": "Mover",
-      "toasts": {
-        "success": "{{ quantity }} movidos de {{ from }} para {{ to }}."
       }
     },
     "toasts": {
@@ -683,10 +658,11 @@
         "empty": "Adiciona uma localização para começar.",
         "field": "Localização {{ index }}",
         "add": "Adicionar localização",
-        "replaceTitle": "Substituir localização",
-        "replaceMessage": "Esta localização está a ser usada por {{ count }} produtos. Escolhe uma substituição.",
-        "replaceAction": "Substituir",
-        "removeNoReplacement": "Adiciona outra localização antes de remover esta."
+        "addPromptTitle": "Adicionar localização",
+        "addPromptPlaceholder": "Nome da localização",
+        "removeInUseTitle": "Localização em uso",
+        "removeInUseMessage": "Esta localização está a ser usada por {{ count }} produtos. Esses produtos vão perder esta informação.",
+        "removeAction": "Remover"
       },
       "categories": {
         "title": "Categorias",
@@ -694,6 +670,8 @@
         "empty": "Adiciona uma categoria para começar.",
         "field": "Categoria {{ index }}",
         "add": "Adicionar categoria",
+        "addPromptTitle": "Adicionar categoria",
+        "addPromptPlaceholder": "Nome da categoria",
         "removeInUseTitle": "Categoria em uso",
         "removeInUseMessage": "Esta categoria está a ser usada por {{ count }} produtos. Esses produtos vão perder esta informação.",
         "removeAction": "Remover"
@@ -704,6 +682,8 @@
         "empty": "Adiciona um supermercado para começar.",
         "field": "Supermercado {{ index }}",
         "add": "Adicionar supermercado",
+        "addPromptTitle": "Adicionar supermercado",
+        "addPromptPlaceholder": "Nome do supermercado",
         "other": "Outro",
         "removeInUseTitle": "Supermercado em uso",
         "removeInUseMessage": "Este supermercado está a ser usado por {{ count }} produtos. Esses produtos vão perder esta informação.",

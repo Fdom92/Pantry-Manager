@@ -42,7 +42,7 @@
             slot="end"
             fill="clear"
             color="danger"
-            [disabled]="state.locationOptionsDraft().length <= 1"
+            [disabled]="state.locationOptionsDraft().length <= 0"
             (click)="state.removeLocationOption(i)">
             <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
           </ion-button>
@@ -172,19 +172,18 @@
   </div>
 
   <ion-alert
+    [isOpen]="state.isAddPromptOpen()"
+    [header]="state.getAddPromptHeaderKey() | translate"
+    [inputs]="state.getAddPromptInputs()"
+    [buttons]="state.getAddPromptButtons()"
+    (didDismiss)="state.onAddPromptDismiss()">
+  </ion-alert>
+
+  <ion-alert
     [isOpen]="state.isRemovalPromptOpen()"
     [header]="state.getRemovalPromptHeaderKey() | translate"
     [message]="state.getRemovalPromptMessage()"
     [buttons]="state.getRemovalPromptButtons()"
     (didDismiss)="state.onRemovalPromptDismiss()">
-  </ion-alert>
-
-  <ion-alert
-    [isOpen]="state.isReplacementPromptOpen()"
-    [header]="'settings.catalogs.locations.replaceTitle' | translate"
-    [message]="state.getReplacementPromptMessage()"
-    [inputs]="state.getReplacementPromptInputs()"
-    [buttons]="state.getReplacementPromptButtons()"
-    (didDismiss)="state.onReplacementPromptDismiss()">
   </ion-alert>
 </ion-content>

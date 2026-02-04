@@ -1,6 +1,6 @@
 import type { BaseDoc } from '../shared/base-doc.model';
 import type { ExpirationStatus } from '../shared/enums.model';
-import { ItemLocationStock } from './item-location-stock.model';
+import { ItemBatch } from './item-batch.model';
 
 export interface PantryItem extends BaseDoc {
   type: 'item';
@@ -10,7 +10,7 @@ export interface PantryItem extends BaseDoc {
   categoryId: string;
   supermarket?: string;
   barcode?: string;
-  locations: ItemLocationStock[];
+  batches: ItemBatch[];
   isBasic?: boolean;
   minThreshold?: number;
   noExpiry?: boolean;

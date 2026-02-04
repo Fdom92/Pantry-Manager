@@ -106,38 +106,33 @@
 
 .icon-burst {
   position: relative;
-  width: 70px;
-  height: 70px;
+  --app-icon-badge-size: 72px;
+  --app-icon-size: 36px;
+  --app-icon-badge-radius: 20px;
+  width: var(--app-icon-badge-size);
+  height: var(--app-icon-badge-size);
   margin: 0 auto;
   display: grid;
   place-items: center;
-  border-radius: 18px;
+  border-radius: var(--app-icon-badge-radius);
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--ion-color-primary) 80%, var(--ion-text-color) 20%),
     color-mix(in srgb, var(--ion-color-secondary) 85%, var(--ion-color-dark-contrast) 15%)
   );
-  box-shadow:
-    0 12px 30px color-mix(in srgb, var(--ion-color-primary) 45%, transparent),
-    0 16px 50px color-mix(in srgb, var(--ion-text-color) 60%, transparent);
   overflow: hidden;
 }
 
 .icon-burst ion-icon {
-  font-size: 30px;
+  font-size: var(--app-icon-size);
   color: var(--ion-color-dark-contrast);
   position: relative;
   z-index: 2;
-  animation: floatPulse 4.6s ease-in-out infinite;
+  animation: none;
 }
 
 .icon-burst .glow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent 58%);
-  filter: blur(18px);
-  opacity: 0.8;
-  animation: glowWave 6s ease-in-out infinite;
+  display: none;
 }
 
 .chip-grid {
@@ -228,27 +223,5 @@
   to {
     transform: translateY(0);
     opacity: 1;
-  }
-}
-
-@keyframes floatPulse {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes glowWave {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.85;
-  }
-  50% {
-    transform: scale(1.15);
-    opacity: 0.6;
   }
 }

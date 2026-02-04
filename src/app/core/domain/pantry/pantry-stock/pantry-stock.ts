@@ -1,4 +1,4 @@
-import { ItemBatch, ItemLocationStock } from '@core/models/pantry';
+import { ItemBatch } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
 import { normalizeUnitValue } from '@core/utils/normalization.util';
 import type { BatchIdGenerator } from '../pantry.domain';
@@ -34,7 +34,9 @@ export function mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
   const merged: ItemBatch[] = [];
 
   for (const batch of batches) {
-    const key = (batch.expirationDate ?? '').trim();
+    const expiryKey = (batch.expirationDate ?? '').trim();
+    const locationKey = (batch.locationId ?? '').trim();
+    const key = expiryKey ? `${locationKey}::${expiryKey}` : '';
     if (!key) {
       merged.push({ ...batch });
       continue;
@@ -76,14 +78,11 @@ export function normalizeBatches(
   return mergeBatchesByExpiry(normalized);
 }
 
-export function computeEarliestExpiry(locations: ItemLocationStock[]): string | undefined {
+export function computeEarliestExpiry(batches: ItemBatch[]): string | undefined {
   const dates: string[] = [];
-  for (const location of locations) {
-    const batches = Array.isArray(location.batches) ? location.batches : [];
-    for (const batch of batches) {
-      if (batch.expirationDate) {
-        dates.push(batch.expirationDate);
-      }
+  for (const batch of batches ?? []) {
+    if (batch?.expirationDate) {
+      dates.push(batch.expirationDate);
     }
   }
 
@@ -99,8 +98,8 @@ export function computeEarliestExpiry(locations: ItemLocationStock[]): string | 
   });
 }
 
-export function getLocationEarliestExpiry(location: ItemLocationStock): string | undefined {
-  return computeEarliestExpiry([location]);
+export function getBatchesEarliestExpiry(batches: ItemBatch[]): string | undefined {
+  return computeEarliestExpiry(batches);
 }
 
 export function classifyExpiry(expirationDate: string | undefined | null, now: Date, windowDays: number): ExpiryClassification {

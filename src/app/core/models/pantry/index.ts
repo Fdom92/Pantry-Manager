@@ -1,5 +1,4 @@
 export * from './item.model';
-export * from './item-location-stock.model';
 export * from './item-batch.model';
 export * from './fast-add.model';
 export * from './pantry-list.model';
