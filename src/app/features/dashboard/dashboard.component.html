@@ -89,9 +89,14 @@
                 </div>
               </ion-card-header>
               <ion-card-content>
-                <p class="overview-card__body">
-                  {{ 'dashboard.overview.cards.expired.body' | translate:{ count: facade.expiredItems().length } }}
-                </p>
+                @if (facade.isInventoryLoading()) {
+                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+                } @else {
+                  <p class="overview-card__body">
+                    {{ 'dashboard.overview.cards.expired.body' | translate:{ count: facade.expiredItems().length } }}
+                  </p>
+                }
             <ion-button
               size="small"
               fill="clear"
@@ -120,9 +125,14 @@
                 </div>
               </ion-card-header>
               <ion-card-content>
-                <p class="overview-card__body">
-                  {{ 'dashboard.overview.cards.nearExpiry.body' | translate:{ count: facade.nearExpiryItems().length } }}
-                </p>
+                @if (facade.isInventoryLoading()) {
+                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+                } @else {
+                  <p class="overview-card__body">
+                    {{ 'dashboard.overview.cards.nearExpiry.body' | translate:{ count: facade.nearExpiryItems().length } }}
+                  </p>
+                }
             <ion-button
               size="small"
               fill="clear"
@@ -189,9 +199,14 @@
             </div>
           </ion-card-header>
           <ion-card-content>
-            <p class="overview-card__body">
-              {{ 'dashboard.overview.cards.pendingReview.body' | translate:{ count: facade.pendingReviewProducts().length } }}
-            </p>
+            @if (facade.isInventoryLoading()) {
+              <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+            } @else {
+              <p class="overview-card__body">
+                {{ 'dashboard.overview.cards.pendingReview.body' | translate:{ count: facade.pendingReviewProducts().length } }}
+              </p>
+            }
             <ion-button
               size="small"
               fill="clear"
@@ -257,12 +272,17 @@
                 </div>
               </ion-card-header>
               <ion-card-content>
-                <p class="overview-card__body">
-                  {{ 'dashboard.overview.cards.lowOrEmpty.body' | translate:{ count: facade.lowStockItems().length } }}
-                </p>
-                <ion-button
-                  size="small"
-                  fill="clear"
+                @if (facade.isInventoryLoading()) {
+                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+                } @else {
+                  <p class="overview-card__body">
+                    {{ 'dashboard.overview.cards.lowOrEmpty.body' | translate:{ count: facade.lowStockItems().length } }}
+                  </p>
+                }
+            <ion-button
+              size="small"
+              fill="clear"
                   (click)="onSummaryCardClick('low-or-empty'); $event.stopPropagation()">
                   {{ 'dashboard.overview.cards.lowOrEmpty.action' | translate }}
                 </ion-button>
@@ -289,12 +309,17 @@
                 </div>
               </ion-card-header>
               <ion-card-content>
-                <p class="overview-card__body">
-                  {{ 'dashboard.overview.cards.shopping.body' | translate:{ count: facade.shoppingListCount() } }}
-                </p>
-                <ion-button
-                  size="small"
-                  fill="clear"
+                @if (facade.isInventoryLoading()) {
+                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+                } @else {
+                  <p class="overview-card__body">
+                    {{ 'dashboard.overview.cards.shopping.body' | translate:{ count: facade.shoppingListCount() } }}
+                  </p>
+                }
+            <ion-button
+              size="small"
+              fill="clear"
                   (click)="onSummaryCardClick('shopping'); $event.stopPropagation()">
                   {{ 'dashboard.overview.cards.shopping.action' | translate }}
                 </ion-button>
@@ -328,11 +353,16 @@
                 </div>
                 <ion-card-title>{{ 'dashboard.overview.cards.recentlyAdded.title' | translate }}</ion-card-title>
               </div>
-            </ion-card-header>
-            <ion-card-content>
-              <p class="overview-card__body">
-                {{ 'dashboard.overview.cards.recentlyAdded.body' | translate:{ count: facade.recentlyAddedCount() } }}
-              </p>
+              </ion-card-header>
+              <ion-card-content>
+                @if (facade.isInventoryLoading()) {
+                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+                } @else {
+                  <p class="overview-card__body">
+                  {{ 'dashboard.overview.cards.recentlyAdded.body' | translate:{ count: facade.recentlyAddedCount() } }}
+                </p>
+                }
               <ion-button
                 size="small"
                 fill="clear"
