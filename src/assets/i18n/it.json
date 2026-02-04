@@ -428,7 +428,9 @@
     "addMode": {
       "title": "Seleziona modalità",
       "simple": "Semplice",
-      "advanced": "Avanzata"
+      "simpleDescription": "Aggiungi solo il necessario.",
+      "advanced": "Avanzata",
+      "advancedDescription": "Aggiungi più dettagli."
     },
     "empty": {
       "filters": "Nessun prodotto corrisponde ai filtri attuali."

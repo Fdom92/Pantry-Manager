@@ -96,6 +96,10 @@ export class PantryService extends StorageService<PantryItem> {
       return;
     }
 
+    if (this.endReached() && !this.pipelineResetting()) {
+      return;
+    }
+
     if (this.currentLoadPromise) {
       await this.currentLoadPromise;
       if (this.loadedProducts().length > 0) {

@@ -20,21 +20,20 @@
 }
 
 .empty-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+  width: var(--app-icon-badge-size);
+  height: var(--app-icon-badge-size);
+  border-radius: var(--app-icon-badge-radius);
   display: grid;
   place-items: center;
   background: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
   color: var(--ion-color-primary);
-  font-size: 32px;
+  font-size: var(--app-icon-size);
 }
 
 .empty-state--compact .empty-icon {
-  width: 52px;
-  height: 52px;
-  font-size: 26px;
-  border-radius: 14px;
+  --app-icon-badge-size: 52px;
+  --app-icon-size: 26px;
+  --app-icon-badge-radius: 14px;
 }
 
 .empty-icon.color-warning {

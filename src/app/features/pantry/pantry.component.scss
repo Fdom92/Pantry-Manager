@@ -69,12 +69,14 @@ ion-title, ion-buttons > ion-button {
 }
 
 .summary-chips .status-chip:not(.active) {
-  opacity: 0.75;
+  opacity: 0.5;
 }
 
 .summary-chips .status-chip.active {
-  box-shadow: 0 6px 18px rgba(15, 20, 19, 0.18);
-  transform: translateY(-2px);
+  opacity: 1;
+  box-shadow: 0 4px 14px rgba(15, 20, 19, 0.18);
+  outline: 2px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  outline-offset: 2px;
 }
 
 .summary-chips .status-chip.chip--all {
@@ -305,6 +307,9 @@ section.group-details {
 
 .add-mode-sheet::part(content) {
   border-radius: 18px 18px 0 0;
+  background: var(--ion-card-background, var(--ion-background-color));
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 10%, transparent);
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
 }
 
 .add-mode-content {
