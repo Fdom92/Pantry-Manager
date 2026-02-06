@@ -390,41 +390,23 @@ export class PantryEditItemModalStateService {
       const item = this.buildItemPayload(existing ?? undefined);
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       if (existing) {
+        if (!this.hasMeaningfulChanges(existing, item)) {
+          this.dismiss();
+          return;
+        }
         const previousQuantity = this.pantryStore.getItemTotalQuantity(existing);
         const deltaQuantity = totalQuantity - previousQuantity;
         this.listState.cancelPendingStockSave(item._id);
         await this.pantryStore.updateItem(item);
-        if (totalQuantity > 0 && deltaQuantity > 0) {
-          await this.eventLog.logAddEvent({
-            productId: item._id,
-            quantity: deltaQuantity,
-            deltaQuantity,
-            previousQuantity,
-            nextQuantity: totalQuantity,
-            unit: String(this.pantryStore.getItemPrimaryUnit(item)),
-            source: 'advanced',
-          });
-        } else if (deltaQuantity < 0) {
-          await this.eventLog.logConsumeEvent({
-            productId: item._id,
-            quantity: Math.abs(deltaQuantity),
-            deltaQuantity,
-            previousQuantity,
-            nextQuantity: totalQuantity,
-            unit: String(this.pantryStore.getItemPrimaryUnit(item)),
-            source: 'advanced',
-          });
-        } else {
-          await this.eventLog.logEditEvent({
-            productId: item._id,
-            quantity: totalQuantity,
-            deltaQuantity,
-            previousQuantity,
-            nextQuantity: totalQuantity,
-            unit: String(this.pantryStore.getItemPrimaryUnit(item)),
-            source: 'advanced',
-          });
-        }
+        await this.eventLog.logEditEvent({
+          productId: item._id,
+          quantity: totalQuantity,
+          deltaQuantity,
+          previousQuantity,
+          nextQuantity: totalQuantity,
+          unit: String(this.pantryStore.getItemPrimaryUnit(item)),
+          source: 'advanced',
+        });
       } else {
         await this.pantryStore.addItem(item);
         if (totalQuantity > 0) {
@@ -445,6 +427,14 @@ export class PantryEditItemModalStateService {
       this.isSaving.set(false);
       console.error('[PantryEditItemModalStateService] submitItem error', err);
     }
+  }
+
+  private hasMeaningfulChanges(existing: PantryItem, next: PantryItem): boolean {
+    const stripMeta = (item: PantryItem) => {
+      const { _id, _rev, createdAt, updatedAt, ...rest } = item as any;
+      return rest;
+    };
+    return JSON.stringify(stripMeta(existing)) !== JSON.stringify(stripMeta(next));
   }
 
   private resetBatchControls(batches: Array<Partial<ItemBatch>>): void {
