@@ -1,14 +1,16 @@
 import type { BaseDoc } from '../shared/base-doc.model';
 
-export type PantryEventType = 'ADD' | 'CONSUME' | 'EDIT';
+export type PantryEventType = 'ADD' | 'CONSUME' | 'EDIT' | 'EXPIRE' | 'DELETE';
 
 export type PantryEventSource =
   | 'fast-add'
   | 'advanced'
   | 'consume'
   | 'import'
+  | 'shopping'
   | 'quick-edit'
   | 'stock-adjust'
+  | 'system'
   | 'edit'
   | 'unknown';
 

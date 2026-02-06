@@ -391,28 +391,53 @@ export class PantryEditItemModalStateService {
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       if (existing) {
         const previousQuantity = this.pantryStore.getItemTotalQuantity(existing);
+        const deltaQuantity = totalQuantity - previousQuantity;
         this.listState.cancelPendingStockSave(item._id);
         await this.pantryStore.updateItem(item);
-        await this.eventLog.logEditEvent({
-          productId: item._id,
-          quantity: totalQuantity,
-          deltaQuantity: totalQuantity - previousQuantity,
-          previousQuantity,
-          nextQuantity: totalQuantity,
-          unit: String(this.pantryStore.getItemPrimaryUnit(item)),
-          source: 'advanced',
-        });
+        if (totalQuantity > 0 && deltaQuantity > 0) {
+          await this.eventLog.logAddEvent({
+            productId: item._id,
+            quantity: deltaQuantity,
+            deltaQuantity,
+            previousQuantity,
+            nextQuantity: totalQuantity,
+            unit: String(this.pantryStore.getItemPrimaryUnit(item)),
+            source: 'advanced',
+          });
+        } else if (deltaQuantity < 0) {
+          await this.eventLog.logConsumeEvent({
+            productId: item._id,
+            quantity: Math.abs(deltaQuantity),
+            deltaQuantity,
+            previousQuantity,
+            nextQuantity: totalQuantity,
+            unit: String(this.pantryStore.getItemPrimaryUnit(item)),
+            source: 'advanced',
+          });
+        } else {
+          await this.eventLog.logEditEvent({
+            productId: item._id,
+            quantity: totalQuantity,
+            deltaQuantity,
+            previousQuantity,
+            nextQuantity: totalQuantity,
+            unit: String(this.pantryStore.getItemPrimaryUnit(item)),
+            source: 'advanced',
+          });
+        }
       } else {
         await this.pantryStore.addItem(item);
-        await this.eventLog.logAddEvent({
-          productId: item._id,
-          quantity: totalQuantity,
-          deltaQuantity: totalQuantity,
-          previousQuantity: 0,
-          nextQuantity: totalQuantity,
-          unit: String(this.pantryStore.getItemPrimaryUnit(item)),
-          source: 'advanced',
-        });
+        if (totalQuantity > 0) {
+          await this.eventLog.logAddEvent({
+            productId: item._id,
+            quantity: totalQuantity,
+            deltaQuantity: totalQuantity,
+            previousQuantity: 0,
+            nextQuantity: totalQuantity,
+            unit: String(this.pantryStore.getItemPrimaryUnit(item)),
+            source: 'advanced',
+          });
+        }
       }
 
       this.dismiss();

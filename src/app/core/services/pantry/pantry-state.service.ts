@@ -68,7 +68,12 @@ export class PantryStateService {
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
-  private readonly pendingEventMeta = new Map<string, { batchId?: string; locationId?: string }>();
+  private readonly pendingEventMeta = new Map<string, {
+    batchId?: string;
+    locationId?: string;
+    adjustmentType?: 'add' | 'consume' | 'edit';
+    deltaQuantity?: number;
+  }>();
   private readonly stockSaveDelay = 500;
   private readonly expandedItems = new Set<string>();
   private realtimeSubscribed = false;
@@ -512,6 +517,16 @@ export class PantryStateService {
     try {
       await this.delay(this.deleteAnimationDuration);
       await this.pantryStore.deleteItem(item._id);
+      await this.eventLog.logDeleteEvent({
+        productId: item._id,
+        quantity: this.pantryStore.getItemTotalQuantity(item),
+        deltaQuantity: -this.pantryStore.getItemTotalQuantity(item),
+        previousQuantity: this.pantryStore.getItemTotalQuantity(item),
+        nextQuantity: 0,
+        unit: String(this.pantryStore.getItemPrimaryUnit(item)),
+        source: 'edit',
+        reason: 'manual-delete',
+      });
       this.expandedItems.delete(item._id);
     } catch (err) {
       console.error('[PantryStateService] deleteItem error', err);
@@ -798,6 +813,8 @@ export class PantryStateService {
     this.triggerStockSave(item._id, updatedItem, {
       batchId: sanitizedBatches[batchIndex]?.batchId,
       locationId: normalizedLocation,
+      adjustmentType: delta > 0 ? 'add' : 'consume',
+      deltaQuantity: delta,
     });
 
   }
@@ -915,11 +932,28 @@ export class PantryStateService {
   private triggerStockSave(
     itemId: string,
     updated: PantryItem,
-    meta?: { batchId?: string; locationId?: string }
+    meta?: {
+      batchId?: string;
+      locationId?: string;
+      adjustmentType?: 'add' | 'consume' | 'edit';
+      deltaQuantity?: number;
+    }
   ): void {
     this.pendingItems.set(itemId, updated);
     if (meta) {
-      this.pendingEventMeta.set(itemId, meta);
+      const existing = this.pendingEventMeta.get(itemId);
+      if (!existing) {
+        this.pendingEventMeta.set(itemId, meta);
+      } else {
+        const nextDelta = (existing.deltaQuantity ?? 0) + (meta.deltaQuantity ?? 0);
+        const nextType = this.resolveAdjustmentType(existing.adjustmentType, meta.adjustmentType, nextDelta);
+        this.pendingEventMeta.set(itemId, {
+          batchId: meta.batchId ?? existing.batchId,
+          locationId: meta.locationId ?? existing.locationId,
+          adjustmentType: nextType,
+          deltaQuantity: Number.isFinite(nextDelta) ? nextDelta : undefined,
+        });
+      }
     }
     const existingTimer = this.stockSaveTimers.get(itemId);
     if (existingTimer) {
@@ -946,18 +980,46 @@ export class PantryStateService {
             : undefined;
           const nextQuantity = this.pantryStore.getItemTotalQuantity(nextPayload);
           const eventMeta = this.pendingEventMeta.get(itemId);
-          await this.eventLog.logEditEvent({
-            productId: nextPayload._id,
-            quantity: nextQuantity,
-            deltaQuantity:
-              previousQuantity != null ? nextQuantity - previousQuantity : undefined,
-            previousQuantity,
-            nextQuantity,
-            unit: String(this.pantryStore.getItemPrimaryUnit(nextPayload)),
-            batchId: eventMeta?.batchId,
-            locationId: eventMeta?.locationId,
-            source: 'stock-adjust',
-          });
+          const deltaQuantity = eventMeta?.deltaQuantity;
+          const primaryUnit = String(this.pantryStore.getItemPrimaryUnit(nextPayload));
+          if (eventMeta?.adjustmentType === 'add') {
+            await this.eventLog.logAddEvent({
+              productId: nextPayload._id,
+              quantity: Math.abs(deltaQuantity ?? 0),
+              deltaQuantity: deltaQuantity ?? undefined,
+              previousQuantity,
+              nextQuantity,
+              unit: primaryUnit,
+              batchId: eventMeta?.batchId,
+              locationId: eventMeta?.locationId,
+              source: 'stock-adjust',
+            });
+          } else if (eventMeta?.adjustmentType === 'consume') {
+            await this.eventLog.logConsumeEvent({
+              productId: nextPayload._id,
+              quantity: Math.abs(deltaQuantity ?? 0),
+              deltaQuantity: deltaQuantity ?? undefined,
+              previousQuantity,
+              nextQuantity,
+              unit: primaryUnit,
+              batchId: eventMeta?.batchId,
+              locationId: eventMeta?.locationId,
+              source: 'stock-adjust',
+            });
+          } else {
+            await this.eventLog.logEditEvent({
+              productId: nextPayload._id,
+              quantity: nextQuantity,
+              deltaQuantity:
+                previousQuantity != null ? nextQuantity - previousQuantity : undefined,
+              previousQuantity,
+              nextQuantity,
+              unit: primaryUnit,
+              batchId: eventMeta?.batchId,
+              locationId: eventMeta?.locationId,
+              source: 'stock-adjust',
+            });
+          }
         } catch (err) {
           console.error('[PantryListStateService] updateItem error', err);
         } finally {
@@ -969,6 +1031,23 @@ export class PantryStateService {
     }, this.stockSaveDelay);
 
     this.stockSaveTimers.set(itemId, timer);
+  }
+
+  private resolveAdjustmentType(
+    current: 'add' | 'consume' | 'edit' | undefined,
+    next: 'add' | 'consume' | 'edit' | undefined,
+    delta: number
+  ): 'add' | 'consume' | 'edit' {
+    if (current === 'edit' || next === 'edit') {
+      return 'edit';
+    }
+    if (current && next && current !== next) {
+      return 'edit';
+    }
+    if (delta === 0) {
+      return 'edit';
+    }
+    return next ?? current ?? 'edit';
   }
 
   private cancelPendingStockSaveInternal(itemId: string): void {

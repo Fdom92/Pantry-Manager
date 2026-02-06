@@ -112,6 +112,37 @@
       "title": "Einkaufsliste leer"
     }
   },
+  "history": {
+    "title": "Verlauf",
+    "pro": {
+      "cta": "Mehr Ereignisse mit PRO"
+    },
+    "filters": {
+      "title": "Verlaufsfilter",
+      "all": "Alle",
+      "added": "Hinzugefügt",
+      "consumed": "Verbraucht",
+      "expired": "Abgelaufen"
+    },
+    "eventTypes": {
+      "added": "Hinzugefügt",
+      "consumed": "Verbraucht",
+      "expired": "Abgelaufen",
+      "edited": "Bearbeitet",
+      "deleted": "Gelöscht"
+    },
+    "event": {
+      "unknownProduct": "Unbekannter Artikel"
+    },
+    "empty": {
+      "title": "Noch kein Verlauf",
+      "subtitle": "Füge Produkte hinzu und verbrauche sie, um Aktivitäten zu sehen.",
+      "filtered": {
+        "title": "Keine passenden Ereignisse",
+        "subtitle": "Probiere einen anderen Filter."
+      }
+    }
+  },
   "locations": {
     "pantry": "Vorratskammer"
   },

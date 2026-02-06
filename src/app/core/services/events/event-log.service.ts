@@ -8,6 +8,16 @@ import { StorageService } from '../shared/storage.service';
 export class EventLogService extends StorageService<PantryEvent> {
   private readonly TYPE = 'event';
 
+  async listEvents(): Promise<PantryEvent[]> {
+    const events = await this.listByType(this.TYPE);
+    return [...events].sort((a, b) => this.toTimestamp(b.timestamp) - this.toTimestamp(a.timestamp));
+  }
+
+  async listEventsByType(eventType: PantryEvent['eventType']): Promise<PantryEvent[]> {
+    const events = await this.findByField('eventType', eventType);
+    return [...events].sort((a, b) => this.toTimestamp(b.timestamp) - this.toTimestamp(a.timestamp));
+  }
+
   async logAddEvent(params: BaseEventParams): Promise<PantryEvent | null> {
     return this.logEvent({
       eventType: 'ADD',
@@ -29,6 +39,20 @@ export class EventLogService extends StorageService<PantryEvent> {
   async logEditEvent(params: BaseEventParams): Promise<PantryEvent | null> {
     return this.logEvent({
       eventType: 'EDIT',
+      ...params,
+    });
+  }
+
+  async logExpireEvent(params: BaseEventParams): Promise<PantryEvent | null> {
+    return this.logEvent({
+      eventType: 'EXPIRE',
+      ...params,
+    });
+  }
+
+  async logDeleteEvent(params: BaseEventParams): Promise<PantryEvent | null> {
+    return this.logEvent({
+      eventType: 'DELETE',
       ...params,
     });
   }
@@ -63,5 +87,10 @@ export class EventLogService extends StorageService<PantryEvent> {
       console.error('[EventLogService] logEvent error', err);
       return null;
     }
+  }
+
+  private toTimestamp(value: string): number {
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) ? date.getTime() : 0;
   }
 }

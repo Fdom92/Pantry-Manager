@@ -343,7 +343,28 @@ export class DashboardStateService {
     }
 
     await withSignalFlag(this.isDeletingExpiredItems, async () => {
-      await this.pantryStore.deleteExpiredItems();
+      const expiredItems = this.expiredItems();
+      if (!expiredItems.length) {
+        return;
+      }
+
+      const deletePromises = expiredItems.map(item => this.pantryStore.deleteItem(item._id));
+      const eventPromises = expiredItems.map(item => {
+        const quantity = this.pantryStore.getItemTotalQuantity(item);
+        const unit = String(this.pantryStore.getItemPrimaryUnit(item));
+        return this.eventLog.logExpireEvent({
+          productId: item._id,
+          quantity,
+          unit,
+          source: 'system',
+          reason: 'expired',
+        });
+      });
+
+      await Promise.all([
+        ...deletePromises,
+        ...eventPromises,
+      ]);
     }).catch(err => {
       console.error('[DashboardStateService] deleteExpiredItems error', err);
     });

@@ -10,16 +10,9 @@
       <ion-label>{{ 'pantry.title' | translate }}</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button
-      tab="agent"
-      [routerLink]="['/agent']"
-      [class.locked]="!facade.canUseAgent()">
-      <ion-icon name="restaurant-outline"></ion-icon>
-      @if (!facade.canUseAgent()) {
-        <div class="tab-pro-pill">PRO</div>
-      } @else {
-        <ion-label>{{ 'agent.title' | translate }}</ion-label>
-      }
+    <ion-tab-button tab="history" [routerLink]="['/history']">
+      <ion-icon name="time-outline"></ion-icon>
+      <ion-label>{{ 'history.title' | translate }}</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="shopping" [routerLink]="['/shopping']">

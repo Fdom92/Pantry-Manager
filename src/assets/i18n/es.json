@@ -112,6 +112,37 @@
       "title": "Lista de compras limpia"
     }
   },
+  "history": {
+    "title": "Historial",
+    "pro": {
+      "cta": "Ver más eventos con PRO"
+    },
+    "filters": {
+      "title": "Filtros del historial",
+      "all": "Todo",
+      "added": "Añadidos",
+      "consumed": "Consumidos",
+      "expired": "Caducados"
+    },
+    "eventTypes": {
+      "added": "Añadido",
+      "consumed": "Consumido",
+      "expired": "Caducado",
+      "edited": "Ajustado",
+      "deleted": "Eliminado"
+    },
+    "event": {
+      "unknownProduct": "Producto desconocido"
+    },
+    "empty": {
+      "title": "Sin historial todavía",
+      "subtitle": "Empieza añadiendo y consumiendo productos para ver la actividad.",
+      "filtered": {
+        "title": "Sin eventos",
+        "subtitle": "Prueba otro filtro para ver más actividad."
+      }
+    }
+  },
   "locations": {
     "pantry": "Despensa"
   },
