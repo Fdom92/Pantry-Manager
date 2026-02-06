@@ -10,6 +10,10 @@ import { StorageService } from '../shared/storage.service';
 import { RevenuecatService } from '../upgrade/revenuecat.service';
 import { AppPreferencesService } from './app-preferences.service';
 import { PantryMigrationService } from '../migration/pantry-migration.service';
+import { EventLogService } from '../events';
+import type { PantryItem } from '@core/models/pantry';
+import { sumQuantities } from '@core/domain/pantry/pantry-stock/pantry-stock';
+import { MeasurementUnit } from '@core/models/shared';
 
 @Injectable()
 export class SettingsStateService {
@@ -20,6 +24,7 @@ export class SettingsStateService {
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly migrationService = inject(PantryMigrationService);
   private readonly revenuecat = inject(RevenuecatService);
+  private readonly eventLog = inject(EventLogService);
   private readonly navCtrl = inject(NavController);
   private readonly download = inject(DownloadService);
   private readonly confirm = inject(ConfirmService);
@@ -180,10 +185,44 @@ export class SettingsStateService {
   private async applyImport(docs: BaseDoc[]): Promise<void> {
     await this.storage.clearAll();
     await this.storage.bulkSave(docs);
+    await this.logImportEventsIfNeeded(docs);
     await this.appPreferences.reload();
     this.migrationService.markMigrationCheckNeeded();
     if (this.lifecycle.isDestroyed()) {
       return;
+    }
+  }
+
+  private async logImportEventsIfNeeded(docs: BaseDoc[]): Promise<void> {
+    const hasEvents = docs.some(doc => doc.type === 'event');
+    if (hasEvents) {
+      return;
+    }
+    const items = docs.filter(doc => doc.type === 'item') as PantryItem[];
+    if (!items.length) {
+      return;
+    }
+    const tasks = items
+      .map(item => {
+        const totalQuantity = sumQuantities(item.batches);
+        if (!Number.isFinite(totalQuantity) || totalQuantity <= 0) {
+          return null;
+        }
+        const unit = item.batches?.[0]?.unit ?? MeasurementUnit.UNIT;
+        return this.eventLog.logAddEvent({
+          productId: item._id,
+          quantity: totalQuantity,
+          deltaQuantity: totalQuantity,
+          previousQuantity: 0,
+          nextQuantity: totalQuantity,
+          unit,
+          source: 'import',
+          timestamp: item.updatedAt ?? item.createdAt,
+        });
+      })
+      .filter(Boolean);
+    if (tasks.length) {
+      await Promise.all(tasks as Array<Promise<unknown>>);
     }
   }
 

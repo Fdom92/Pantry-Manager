@@ -112,6 +112,39 @@
       "title": "Lista della spesa vuota"
     }
   },
+  "history": {
+    "title": "Cronologia",
+    "pro": {
+      "cta": "Vedi più eventi con PRO"
+    },
+    "filters": {
+      "title": "Filtri cronologia",
+      "all": "Tutti",
+      "added": "Aggiunti",
+      "consumed": "Consumati",
+      "edited": "Modificati",
+      "expired": "Scaduti",
+      "deleted": "Eliminati"
+    },
+    "eventTypes": {
+      "added": "Aggiunto",
+      "consumed": "Consumato",
+      "expired": "Scaduto",
+      "edited": "Modificato",
+      "deleted": "Eliminato"
+    },
+    "event": {
+      "unknownProduct": "Prodotto sconosciuto"
+    },
+    "empty": {
+      "title": "Nessuna cronologia",
+      "subtitle": "Aggiungi e consuma prodotti per vedere l’attività.",
+      "filtered": {
+        "title": "Nessun evento corrispondente",
+        "subtitle": "Prova un altro filtro."
+      }
+    }
+  },
   "locations": {
     "pantry": "Dispensa"
   },

@@ -343,7 +343,12 @@ export class DashboardStateService {
     }
 
     await withSignalFlag(this.isDeletingExpiredItems, async () => {
-      await this.pantryStore.deleteExpiredItems();
+      const expiredItems = this.expiredItems();
+      if (!expiredItems.length) {
+        return;
+      }
+
+      await Promise.all(expiredItems.map(item => this.pantryStore.deleteItem(item._id)));
     }).catch(err => {
       console.error('[DashboardStateService] deleteExpiredItems error', err);
     });
