@@ -91,6 +91,11 @@ ion-title {
 }
 
 .summary-chips .status-chip.chip--consumed {
+  --background: var(--ion-color-tertiary);
+  --color: var(--ion-color-tertiary-contrast);
+}
+
+.summary-chips .status-chip.chip--edited {
   --background: var(--ion-color-warning);
   --color: var(--ion-color-dark);
 }
@@ -98,6 +103,11 @@ ion-title {
 .summary-chips .status-chip.chip--expired {
   --background: var(--ion-color-danger);
   --color: var(--ion-color-danger-contrast);
+}
+
+.summary-chips .status-chip.chip--deleted {
+  --background: var(--ion-color-medium);
+  --color: var(--ion-color-light);
 }
 
 .list-empty-state {

@@ -122,7 +122,9 @@
       "all": "All",
       "added": "Added",
       "consumed": "Consumed",
-      "expired": "Expired"
+      "edited": "Edited",
+      "expired": "Expired",
+      "deleted": "Deleted"
     },
     "eventTypes": {
       "added": "Added",

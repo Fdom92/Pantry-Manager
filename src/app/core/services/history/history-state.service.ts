@@ -9,7 +9,7 @@ import { withSignalFlag } from '../shared';
 import { TranslateService } from '@ngx-translate/core';
 import { RevenuecatService } from '../upgrade/revenuecat.service';
 
-export type HistoryFilterKey = 'all' | 'added' | 'consumed' | 'expired';
+export type HistoryFilterKey = 'all' | 'added' | 'consumed' | 'edited' | 'expired' | 'deleted';
 
 type HistoryFilterChip = {
   key: HistoryFilterKey;
@@ -41,7 +41,9 @@ const FILTER_DEFINITIONS: Array<Omit<HistoryFilterChip, 'count' | 'active'>> = [
   { key: 'all', labelKey: 'history.filters.all', icon: 'layers-outline', colorClass: 'chip--all' },
   { key: 'added', labelKey: 'history.filters.added', icon: 'add-circle-outline', colorClass: 'chip--added' },
   { key: 'consumed', labelKey: 'history.filters.consumed', icon: 'remove-circle-outline', colorClass: 'chip--consumed' },
+  { key: 'edited', labelKey: 'history.filters.edited', icon: 'create-outline', colorClass: 'chip--edited' },
   { key: 'expired', labelKey: 'history.filters.expired', icon: 'alert-circle-outline', colorClass: 'chip--expired' },
+  { key: 'deleted', labelKey: 'history.filters.deleted', icon: 'trash-outline', colorClass: 'chip--deleted' },
 ];
 
 @Injectable()
@@ -83,7 +85,9 @@ export class HistoryStateService {
       all: events.length,
       added: events.filter(event => event.eventType === 'ADD').length,
       consumed: events.filter(event => event.eventType === 'CONSUME').length,
+      edited: events.filter(event => event.eventType === 'EDIT').length,
       expired: events.filter(event => this.isExpiredEvent(event)).length,
+      deleted: events.filter(event => event.eventType === 'DELETE').length,
     };
 
     const active = this.activeFilter();
@@ -106,7 +110,13 @@ export class HistoryStateService {
     if (filter === 'consumed') {
       return events.filter(event => event.eventType === 'CONSUME');
     }
-    return events.filter(event => this.isExpiredEvent(event));
+    if (filter === 'edited') {
+      return events.filter(event => event.eventType === 'EDIT');
+    }
+    if (filter === 'expired') {
+      return events.filter(event => this.isExpiredEvent(event));
+    }
+    return events.filter(event => event.eventType === 'DELETE');
   });
 
   readonly eventCards = computed<HistoryEventCard[]>(() =>
