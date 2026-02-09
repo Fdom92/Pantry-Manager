@@ -29,6 +29,7 @@ import {
   chevronUpOutline,
   clipboardOutline,
   close,
+  cloudUploadOutline,
   constructOutline,
   createOutline,
   cubeOutline,
@@ -48,6 +49,7 @@ import {
   paperPlaneOutline,
   pricetagOutline,
   refreshOutline,
+  removeCircleOutline,
   removeOutline,
   restaurantOutline,
   sendOutline,
@@ -134,7 +136,9 @@ addIcons({
   'restaurant-outline': restaurantOutline,
   'flash-outline': flashOutline,
   'construct-outline': constructOutline,
-  'clipboard-outline': clipboardOutline
+  'clipboard-outline': clipboardOutline,
+  'remove-circle-outline': removeCircleOutline,
+  'cloud-upload-outline': cloudUploadOutline
 });
 
 bootstrapApplication(AppComponent, {

@@ -15,7 +15,7 @@ import { AgentConversationStore } from '../agent/agent-conversation.store';
 import { LanguageService } from '../shared/language.service';
 import { ConfirmService, withSignalFlag } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { EventLogService } from '../events';
+import { EventManagerService } from '../events';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { PantryService } from '../pantry/pantry.service';
 import { InsightService } from './insight.service';
@@ -43,7 +43,7 @@ export class DashboardStateService {
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventLog = inject(EventLogService);
+  private readonly eventManager = inject(EventManagerService);
 
   private hasCompletedInitialLoad = false;
 
@@ -296,32 +296,14 @@ export class DashboardStateService {
       return;
     }
     await withSignalFlag(this.consumeSaving, async () => {
-      const updates: PantryItem[] = [];
-      const eventPromises: Promise<unknown>[] = [];
       for (const entry of entries) {
         const updated = this.applyConsumeToday(entry.item, entry.quantity);
         if (!updated) {
           continue;
         }
-        const previousQuantity = this.pantryStore.getItemTotalQuantity(entry.item);
-        const nextQuantity = this.pantryStore.getItemTotalQuantity(updated);
-        updates.push(updated);
-        eventPromises.push(
-          this.eventLog.logConsumeEvent({
-            productId: entry.item._id,
-            quantity: entry.quantity,
-            deltaQuantity: -entry.quantity,
-            previousQuantity,
-            nextQuantity,
-            unit: String(this.pantryStore.getItemPrimaryUnit(entry.item)),
-            source: 'consume',
-          })
-        );
+        await this.pantryStore.updateItem(updated);
+        await this.eventManager.logConsumeDashboard(entry.item, updated, entry.quantity);
       }
-      await Promise.all([
-        ...updates.map(item => this.pantryStore.updateItem(item)),
-        ...eventPromises,
-      ]);
     }).catch(err => {
       console.error('[DashboardStateService] consume today error', err);
     });

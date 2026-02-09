@@ -1,6 +1,12 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import type { PantryEvent } from '@core/models/events';
+import {
+  HISTORY_FILTER_DEFINITIONS,
+  type HistoryFilterKey,
+  getHistoryEventMeta,
+  type HistoryEventKind,
+} from './history-event.mapper';
 import { formatDateValue, formatQuantity, formatTimeValue } from '@core/utils/formatting.util';
 import { EventLogService } from '../events';
 import { PantryStoreService } from '../pantry/pantry-store.service';
@@ -8,8 +14,6 @@ import { LanguageService } from '../shared/language.service';
 import { withSignalFlag } from '../shared';
 import { TranslateService } from '@ngx-translate/core';
 import { RevenuecatService } from '../upgrade/revenuecat.service';
-
-export type HistoryFilterKey = 'all' | 'added' | 'consumed' | 'edited' | 'expired' | 'deleted';
 
 type HistoryFilterChip = {
   key: HistoryFilterKey;
@@ -28,7 +32,7 @@ type HistoryEventCard = {
   timeLabel: string;
   timestamp: string;
   icon: string;
-  kind: 'added' | 'consumed' | 'expired' | 'edited' | 'deleted';
+  kind: HistoryEventKind;
 };
 
 type HistoryDayGroup = {
@@ -36,15 +40,6 @@ type HistoryDayGroup = {
   label: string;
   events: HistoryEventCard[];
 };
-
-const FILTER_DEFINITIONS: Array<Omit<HistoryFilterChip, 'count' | 'active'>> = [
-  { key: 'all', labelKey: 'history.filters.all', icon: 'layers-outline', colorClass: 'chip--all' },
-  { key: 'added', labelKey: 'history.filters.added', icon: 'add-circle-outline', colorClass: 'chip--added' },
-  { key: 'consumed', labelKey: 'history.filters.consumed', icon: 'remove-circle-outline', colorClass: 'chip--consumed' },
-  { key: 'edited', labelKey: 'history.filters.edited', icon: 'create-outline', colorClass: 'chip--edited' },
-  { key: 'expired', labelKey: 'history.filters.expired', icon: 'alert-circle-outline', colorClass: 'chip--expired' },
-  { key: 'deleted', labelKey: 'history.filters.deleted', icon: 'trash-outline', colorClass: 'chip--deleted' },
-];
 
 @Injectable()
 export class HistoryStateService {
@@ -81,17 +76,28 @@ export class HistoryStateService {
 
   readonly filterChips = computed<HistoryFilterChip[]>(() => {
     const events = this.visibleEvents();
-    const counts = {
-      all: events.length,
-      added: events.filter(event => event.eventType === 'ADD').length,
-      consumed: events.filter(event => event.eventType === 'CONSUME').length,
-      edited: events.filter(event => event.eventType === 'EDIT').length,
-      expired: events.filter(event => this.isExpiredEvent(event)).length,
-      deleted: events.filter(event => event.eventType === 'DELETE').length,
-    };
+    const counts = HISTORY_FILTER_DEFINITIONS.reduce(
+      (acc, definition) => {
+        if (definition.key === 'all') {
+          acc.all = events.length;
+        } else {
+          acc[definition.key] = events.filter(event => event.eventType === definition.eventType).length;
+        }
+        return acc;
+      },
+      {
+        all: 0,
+        added: 0,
+        consumed: 0,
+        edited: 0,
+        expired: 0,
+        deleted: 0,
+        imported: 0,
+      } as Record<HistoryFilterKey, number>
+    );
 
     const active = this.activeFilter();
-    return FILTER_DEFINITIONS.map(definition => ({
+    return HISTORY_FILTER_DEFINITIONS.map(definition => ({
       ...definition,
       count: counts[definition.key],
       active: active === definition.key,
@@ -104,19 +110,11 @@ export class HistoryStateService {
     if (filter === 'all') {
       return events;
     }
-    if (filter === 'added') {
-      return events.filter(event => event.eventType === 'ADD');
+    const definition = HISTORY_FILTER_DEFINITIONS.find(entry => entry.key === filter);
+    if (!definition?.eventType) {
+      return events;
     }
-    if (filter === 'consumed') {
-      return events.filter(event => event.eventType === 'CONSUME');
-    }
-    if (filter === 'edited') {
-      return events.filter(event => event.eventType === 'EDIT');
-    }
-    if (filter === 'expired') {
-      return events.filter(event => this.isExpiredEvent(event));
-    }
-    return events.filter(event => event.eventType === 'DELETE');
+    return events.filter(event => event.eventType === definition.eventType);
   });
 
   readonly eventCards = computed<HistoryEventCard[]>(() =>
@@ -170,11 +168,14 @@ export class HistoryStateService {
 
   private buildEventCard(event: PantryEvent): HistoryEventCard {
     const locale = this.languageService.getCurrentLocale();
-    const productName = this.productMap().get(event.productId)
-      ?? this.translate.instant('history.event.unknownProduct');
-    const kind = this.getEventKind(event);
-    const subtitle = this.translate.instant(`history.eventTypes.${kind}`);
-    const quantityLabel = this.buildQuantityLabel(event, locale);
+    const productName = event.entityType === 'import' || event.eventType === 'IMPORT'
+      ? this.translate.instant('history.event.importTitle')
+      : ((event.productName ?? '').trim()
+        || this.productMap().get(event.productId)
+        || this.translate.instant('history.event.unknownProduct'));
+    const meta = getHistoryEventMeta(event);
+    const subtitle = this.translate.instant(meta.subtitleKey);
+    const quantityLabel = meta.showQuantity ? this.buildQuantityLabel(event, locale, meta.signedQuantity) : '';
     const timeLabel = formatTimeValue(event.timestamp, locale, { fallback: '' });
 
     return {
@@ -184,53 +185,18 @@ export class HistoryStateService {
       quantityLabel,
       timeLabel,
       timestamp: event.timestamp,
-      icon: this.getEventIcon(kind),
-      kind,
+      icon: meta.icon,
+      kind: meta.kind,
     };
   }
 
-  private getEventKind(event: PantryEvent): HistoryEventCard['kind'] {
-    if (this.isExpiredEvent(event)) {
-      return 'expired';
-    }
-    if (event.eventType === 'ADD') {
-      return 'added';
-    }
-    if (event.eventType === 'CONSUME') {
-      return 'consumed';
-    }
-    if (event.eventType === 'DELETE') {
-      return 'deleted';
-    }
-    return 'edited';
-  }
-
-  private getEventIcon(kind: HistoryEventCard['kind']): string {
-    switch (kind) {
-      case 'added':
-        return 'add-circle-outline';
-      case 'consumed':
-        return 'remove-circle-outline';
-      case 'expired':
-        return 'alert-circle-outline';
-      case 'deleted':
-        return 'trash-outline';
-      default:
-        return 'create-outline';
-    }
-  }
-
-  private buildQuantityLabel(event: PantryEvent, locale: string): string {
+  private buildQuantityLabel(event: PantryEvent, locale: string, signed: boolean): string {
     const value = Number.isFinite(event.deltaQuantity) ? event.deltaQuantity : event.quantity;
     const safeValue = typeof value === 'number' && Number.isFinite(value) ? value : 0;
     const unit = event.unit ? this.pantryStore.getUnitLabel(event.unit) : '';
     const formatted = formatQuantity(Math.abs(safeValue), locale, { maximumFractionDigits: 2 });
-    const sign = safeValue < 0 ? '-' : safeValue > 0 ? '+' : '';
+    const sign = signed ? (safeValue < 0 ? '-' : safeValue > 0 ? '+' : '') : '';
     return `${sign}${formatted}${unit ? ` ${unit}` : ''}`;
-  }
-
-  private isExpiredEvent(event: PantryEvent): boolean {
-    return event.eventType === 'EXPIRE' || event.reason === 'expired';
   }
 
   private getDayKey(value: string, fallback: string): string {

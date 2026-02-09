@@ -124,17 +124,21 @@
       "consumed": "Consumed",
       "edited": "Edited",
       "expired": "Expired",
-      "deleted": "Deleted"
+      "deleted": "Deleted",
+      "imported": "Imported"
     },
     "eventTypes": {
       "added": "Added",
       "consumed": "Consumed",
       "expired": "Expired",
       "edited": "Edited",
-      "deleted": "Deleted"
+      "deleted": "Deleted",
+      "imported": "Imported"
     },
     "event": {
-      "unknownProduct": "Unknown item"
+      "unknownProduct": "Unknown item",
+      "importTitle": "Import",
+      "editedTitle": "Edited"
     },
     "empty": {
       "title": "No history yet",

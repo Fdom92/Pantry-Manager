@@ -57,6 +57,13 @@ export class EventLogService extends StorageService<PantryEvent> {
     });
   }
 
+  async logImportEvent(params: BaseEventParams): Promise<PantryEvent | null> {
+    return this.logEvent({
+      eventType: 'IMPORT',
+      ...params,
+    });
+  }
+
   async logEvent(params: EventParams): Promise<PantryEvent | null> {
     const now = params.timestamp ?? new Date().toISOString();
     const quantities = buildEventQuantities(params);
@@ -65,18 +72,16 @@ export class EventLogService extends StorageService<PantryEvent> {
       type: this.TYPE,
       eventType: params.eventType,
       productId: params.productId,
+      productName: params.productName,
+      entityType: params.entityType,
       quantity: quantities.quantity,
       deltaQuantity: quantities.deltaQuantity,
       previousQuantity: quantities.previousQuantity,
       nextQuantity: quantities.nextQuantity,
       unit: params.unit,
       batchId: params.batchId,
-      locationId: params.locationId,
-      actorId: params.actorId,
-      reason: params.reason,
       sourceMetadata: params.sourceMetadata,
       timestamp: now,
-      source: params.source,
       createdAt: now,
       updatedAt: now,
     };
@@ -93,4 +98,5 @@ export class EventLogService extends StorageService<PantryEvent> {
     const date = new Date(value);
     return Number.isFinite(date.getTime()) ? date.getTime() : 0;
   }
+
 }
