@@ -124,17 +124,21 @@
       "consumed": "Verbraucht",
       "edited": "Bearbeitet",
       "expired": "Abgelaufen",
-      "deleted": "Gelöscht"
+      "deleted": "Gelöscht",
+      "imported": "Importiert"
     },
     "eventTypes": {
       "added": "Hinzugefügt",
       "consumed": "Verbraucht",
       "expired": "Abgelaufen",
       "edited": "Bearbeitet",
-      "deleted": "Gelöscht"
+      "deleted": "Gelöscht",
+      "imported": "Importiert"
     },
     "event": {
-      "unknownProduct": "Unbekannter Artikel"
+      "unknownProduct": "Unbekannter Artikel",
+      "importTitle": "Import",
+      "editedTitle": "Bearbeitet"
     },
     "empty": {
       "title": "Noch kein Verlauf",

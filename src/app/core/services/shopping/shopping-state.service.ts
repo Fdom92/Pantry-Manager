@@ -21,7 +21,7 @@ import jsPDF from 'jspdf';
 import { PantryService } from '../pantry/pantry.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { EventLogService } from '../events';
+import { EventManagerService } from '../events';
 
 @Injectable()
 export class ShoppingStateService {
@@ -30,7 +30,7 @@ export class ShoppingStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventLog = inject(EventLogService);
+  private readonly eventManager = inject(EventManagerService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly download = inject(DownloadService);
@@ -87,29 +87,20 @@ export class ShoppingStateService {
   async confirmPurchaseForTarget(data: { quantity: number; expiryDate?: string | null }): Promise<void> {
     const suggestion = this.purchaseTarget();
     const id = suggestion?.item?._id;
-    if (!suggestion || !id || this.isSuggestionProcessing(id)) {
+    const quantity = Number(data.quantity ?? 0);
+    if (!suggestion || !id || this.isSuggestionProcessing(id) || !Number.isFinite(quantity) || quantity <= 0) {
       return;
     }
 
     this.processingSuggestionIds.update(ids => new Set(ids).add(id));
     try {
-      const previousQuantity = this.pantryStore.getItemTotalQuantity(suggestion.item);
       const updated = await this.pantryService.addNewLot(id, {
-        quantity: data.quantity,
+        quantity,
         expiryDate: data.expiryDate ?? undefined,
       });
       if (updated) {
         await this.pantryStore.updateItem(updated);
-        const nextQuantity = this.pantryStore.getItemTotalQuantity(updated);
-        await this.eventLog.logAddEvent({
-          productId: updated._id,
-          quantity: data.quantity,
-          deltaQuantity: data.quantity,
-          previousQuantity,
-          nextQuantity,
-          unit: String(this.pantryStore.getItemPrimaryUnit(updated)),
-          source: 'shopping',
-        });
+        await this.eventManager.logShoppingAdd(suggestion.item, updated, quantity);
       }
       await this.pantryStore.loadAll();
       if (this.shoppingAnalysis().summary.total === 0) {

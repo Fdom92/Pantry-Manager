@@ -46,7 +46,7 @@ import {
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmService, withSignalFlag } from '../shared';
-import { EventLogService } from '../events';
+import { EventManagerService } from '../events';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { dedupeByNormalizedKey, normalizeEntityName } from '@core/utils/normalization.util';
@@ -61,7 +61,7 @@ export class PantryStateService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly confirm = inject(ConfirmService);
-  private readonly eventLog = inject(EventLogService);
+  private readonly eventManager = inject(EventManagerService);
 
   // DATA
   readonly MeasurementUnit = MeasurementUnit;
@@ -70,8 +70,7 @@ export class PantryStateService {
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly pendingEventMeta = new Map<string, {
     batchId?: string;
-    locationId?: string;
-    adjustmentType?: 'add' | 'consume' | 'edit';
+    adjustmentType?: 'add' | 'consume';
     deltaQuantity?: number;
   }>();
   private readonly stockSaveDelay = 500;
@@ -295,40 +294,18 @@ export class PantryStateService {
             defaultLocationId,
           });
           await this.pantryStore.addItem(item);
-          const nextQuantity = this.pantryStore.getItemTotalQuantity(item);
-          await this.eventLog.logAddEvent({
-            productId: item._id,
-            quantity: entry.quantity,
-            deltaQuantity: entry.quantity,
-            previousQuantity: 0,
-            nextQuantity,
-            unit: item.batches[0]?.unit,
-            timestamp,
-            source: 'fast-add',
-          });
+          await this.eventManager.logFastAddNewItem(item, entry.quantity, timestamp);
           continue;
         }
 
-        const previousQuantity = this.pantryStore.getItemTotalQuantity(entry.item);
-        const unit = this.pantryStore.getItemPrimaryUnit(entry.item);
         const updated = await this.pantryService.addNewLot(entry.item._id, {
           quantity: entry.quantity,
           location: defaultLocationId,
-          unit,
+          unit: this.pantryStore.getItemPrimaryUnit(entry.item),
         });
         if (updated) {
           await this.pantryStore.updateItem(updated);
-          const nextQuantity = this.pantryStore.getItemTotalQuantity(updated);
-          await this.eventLog.logAddEvent({
-            productId: updated._id,
-            quantity: entry.quantity,
-            deltaQuantity: entry.quantity,
-            previousQuantity,
-            nextQuantity,
-            unit: String(unit),
-            timestamp,
-            source: 'fast-add',
-          });
+          await this.eventManager.logFastAddExistingItem(entry.item, updated, entry.quantity, timestamp);
         }
       }
       this.dismissFastAddModal();
@@ -517,16 +494,7 @@ export class PantryStateService {
     try {
       await this.delay(this.deleteAnimationDuration);
       await this.pantryStore.deleteItem(item._id);
-      await this.eventLog.logDeleteEvent({
-        productId: item._id,
-        quantity: this.pantryStore.getItemTotalQuantity(item),
-        deltaQuantity: -this.pantryStore.getItemTotalQuantity(item),
-        previousQuantity: this.pantryStore.getItemTotalQuantity(item),
-        nextQuantity: 0,
-        unit: String(this.pantryStore.getItemPrimaryUnit(item)),
-        source: 'edit',
-        reason: 'manual-delete',
-      });
+      await this.eventManager.logDeleteFromCard(item);
       this.expandedItems.delete(item._id);
     } catch (err) {
       console.error('[PantryStateService] deleteItem error', err);
@@ -797,6 +765,7 @@ export class PantryStateService {
       return;
     }
 
+    const targetBatchId = sanitizedBatches[batchIndex]?.batchId;
     if (nextBatchQuantity <= 0) {
       sanitizedBatches.splice(batchIndex, 1);
     } else {
@@ -811,8 +780,7 @@ export class PantryStateService {
     const nextTotal = this.getAvailableQuantityFor(updatedItem, normalizedLocation);
     await this.provideQuantityFeedback(originalTotal, nextTotal);
     this.triggerStockSave(item._id, updatedItem, {
-      batchId: sanitizedBatches[batchIndex]?.batchId,
-      locationId: normalizedLocation,
+      batchId: targetBatchId,
       adjustmentType: delta > 0 ? 'add' : 'consume',
       deltaQuantity: delta,
     });
@@ -934,8 +902,7 @@ export class PantryStateService {
     updated: PantryItem,
     meta?: {
       batchId?: string;
-      locationId?: string;
-      adjustmentType?: 'add' | 'consume' | 'edit';
+      adjustmentType?: 'add' | 'consume';
       deltaQuantity?: number;
     }
   ): void {
@@ -949,7 +916,6 @@ export class PantryStateService {
         const nextType = this.resolveAdjustmentType(existing.adjustmentType, meta.adjustmentType, nextDelta);
         this.pendingEventMeta.set(itemId, {
           batchId: meta.batchId ?? existing.batchId,
-          locationId: meta.locationId ?? existing.locationId,
           adjustmentType: nextType,
           deltaQuantity: Number.isFinite(nextDelta) ? nextDelta : undefined,
         });
@@ -975,50 +941,12 @@ export class PantryStateService {
             : pending;
 
           await this.pantryStore.updateItem(nextPayload);
-          const previousQuantity = latest
-            ? this.pantryStore.getItemTotalQuantity(latest)
-            : undefined;
-          const nextQuantity = this.pantryStore.getItemTotalQuantity(nextPayload);
           const eventMeta = this.pendingEventMeta.get(itemId);
           const deltaQuantity = eventMeta?.deltaQuantity;
-          const primaryUnit = String(this.pantryStore.getItemPrimaryUnit(nextPayload));
           if (eventMeta?.adjustmentType === 'add') {
-            await this.eventLog.logAddEvent({
-              productId: nextPayload._id,
-              quantity: Math.abs(deltaQuantity ?? 0),
-              deltaQuantity: deltaQuantity ?? undefined,
-              previousQuantity,
-              nextQuantity,
-              unit: primaryUnit,
-              batchId: eventMeta?.batchId,
-              locationId: eventMeta?.locationId,
-              source: 'stock-adjust',
-            });
+            await this.eventManager.logStockAdjust(latest, nextPayload, deltaQuantity ?? 0, eventMeta?.batchId);
           } else if (eventMeta?.adjustmentType === 'consume') {
-            await this.eventLog.logConsumeEvent({
-              productId: nextPayload._id,
-              quantity: Math.abs(deltaQuantity ?? 0),
-              deltaQuantity: deltaQuantity ?? undefined,
-              previousQuantity,
-              nextQuantity,
-              unit: primaryUnit,
-              batchId: eventMeta?.batchId,
-              locationId: eventMeta?.locationId,
-              source: 'stock-adjust',
-            });
-          } else {
-            await this.eventLog.logEditEvent({
-              productId: nextPayload._id,
-              quantity: nextQuantity,
-              deltaQuantity:
-                previousQuantity != null ? nextQuantity - previousQuantity : undefined,
-              previousQuantity,
-              nextQuantity,
-              unit: primaryUnit,
-              batchId: eventMeta?.batchId,
-              locationId: eventMeta?.locationId,
-              source: 'stock-adjust',
-            });
+            await this.eventManager.logStockAdjust(latest, nextPayload, deltaQuantity ?? 0, eventMeta?.batchId);
           }
         } catch (err) {
           console.error('[PantryListStateService] updateItem error', err);
@@ -1034,21 +962,16 @@ export class PantryStateService {
   }
 
   private resolveAdjustmentType(
-    current: 'add' | 'consume' | 'edit' | undefined,
-    next: 'add' | 'consume' | 'edit' | undefined,
+    current: 'add' | 'consume' | undefined,
+    next: 'add' | 'consume' | undefined,
     delta: number
-  ): 'add' | 'consume' | 'edit' {
-    if (current === 'edit' || next === 'edit') {
-      return 'edit';
+  ): 'add' | 'consume' {
+    if (Number.isFinite(delta) && delta !== 0) {
+      return delta > 0 ? 'add' : 'consume';
     }
-    if (current && next && current !== next) {
-      return 'edit';
-    }
-    if (delta === 0) {
-      return 'edit';
-    }
-    return next ?? current ?? 'edit';
+    return next ?? current ?? 'add';
   }
+
 
   private cancelPendingStockSaveInternal(itemId: string): void {
     const existingTimer = this.stockSaveTimers.get(itemId);

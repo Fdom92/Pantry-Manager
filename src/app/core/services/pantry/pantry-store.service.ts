@@ -1,19 +1,18 @@
 import { Signal, computed, inject, Injectable, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { getItemStatusState } from '@core/domain/pantry';
-import { classifyExpiry } from '@core/domain/pantry/pantry-stock/pantry-stock';
 import { PantryItem, PantrySummary } from '@core/models/pantry';
 import { MeasurementUnit, StockStatus } from '@core/models/shared';
 import { PantryService } from './pantry.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { EventLogService } from '../events';
+import { EventManagerService } from '../events';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
   // DI
   private readonly pantryService = inject(PantryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventLog = inject(EventLogService);
+  private readonly eventManager = inject(EventManagerService);
   // DATA
   private readonly knownMeasurementUnits = new Set(
     Object.values(MeasurementUnit).map(option => option.toLowerCase())
@@ -234,68 +233,12 @@ export class PantryStoreService {
     }
     this.expiredScanInProgress = true;
     try {
-      const existing = await this.eventLog.listEvents();
-      const seen = new Set(
-        existing
-          .filter(event => event.eventType === 'EXPIRE' || event.reason === 'expired')
-          .map(event => String(event.sourceMetadata?.['batchKey'] ?? '').trim())
-          .filter(Boolean)
-      );
-      const now = new Date();
-      const tasks: Promise<unknown>[] = [];
-
-      for (const item of items) {
-        for (const batch of item.batches ?? []) {
-          if (!batch?.expirationDate) {
-            continue;
-          }
-          if (classifyExpiry(batch.expirationDate, now, 0) !== 'expired') {
-            continue;
-          }
-          const batchKey = this.buildBatchKey(item._id, batch);
-          if (seen.has(batchKey)) {
-            continue;
-          }
-          const quantity = Number.isFinite(batch.quantity) ? batch.quantity : 0;
-          if (quantity <= 0) {
-            continue;
-          }
-          seen.add(batchKey);
-          tasks.push(
-            this.eventLog.logExpireEvent({
-              productId: item._id,
-              quantity,
-              unit: batch.unit,
-              batchId: batch.batchId,
-              locationId: batch.locationId,
-              reason: 'expired',
-              sourceMetadata: {
-                batchKey,
-                expirationDate: batch.expirationDate,
-              },
-              source: 'system',
-            })
-          );
-        }
-      }
-
-      if (tasks.length) {
-        await Promise.all(tasks);
-      }
+      await this.eventManager.logExpiredBatches(items);
     } catch (err) {
       console.error('[PantryStoreService] logExpiredBatchEvents error', err);
     } finally {
       this.expiredScanInProgress = false;
     }
-  }
-
-  private buildBatchKey(productId: string, batch: { batchId?: string; expirationDate?: string; locationId?: string }): string {
-    if (batch.batchId) {
-      return `${productId}::${batch.batchId}`;
-    }
-    const location = (batch.locationId ?? 'none').trim();
-    const expiry = (batch.expirationDate ?? 'none').trim();
-    return `${productId}::${location}::${expiry}`;
   }
 
   private buildMergeKey(item: PantryItem): string | null {
