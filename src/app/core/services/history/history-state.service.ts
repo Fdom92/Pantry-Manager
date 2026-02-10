@@ -92,7 +92,6 @@ export class HistoryStateService {
         edited: 0,
         expired: 0,
         deleted: 0,
-        imported: 0,
       } as Record<HistoryFilterKey, number>
     );
 
@@ -159,7 +158,8 @@ export class HistoryStateService {
   private async refreshEvents(): Promise<void> {
     try {
       const events = await this.eventLog.listEvents();
-      this.events.set(events);
+      const filtered = events.filter(event => (event.eventType as string) !== 'IMPORT');
+      this.events.set(filtered);
     } catch (err) {
       console.error('[HistoryStateService] refreshEvents error', err);
       this.events.set([]);
@@ -168,11 +168,9 @@ export class HistoryStateService {
 
   private buildEventCard(event: PantryEvent): HistoryEventCard {
     const locale = this.languageService.getCurrentLocale();
-    const productName = event.entityType === 'import' || event.eventType === 'IMPORT'
-      ? this.translate.instant('history.event.importTitle')
-      : ((event.productName ?? '').trim()
-        || this.productMap().get(event.productId)
-        || this.translate.instant('history.event.unknownProduct'));
+    const productName = (event.productName ?? '').trim()
+      || this.productMap().get(event.productId)
+      || this.translate.instant('history.event.unknownProduct');
     const meta = getHistoryEventMeta(event);
     const subtitle = this.translate.instant(meta.subtitleKey);
     const quantityLabel = meta.showQuantity ? this.buildQuantityLabel(event, locale, meta.signedQuantity) : '';

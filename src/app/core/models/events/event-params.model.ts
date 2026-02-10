@@ -3,7 +3,6 @@ import type { PantryEventType } from './event.model';
 export type BaseEventParams = {
   productId: string;
   productName?: string;
-  entityType?: 'product' | 'import';
   quantity: number;
   deltaQuantity?: number;
   previousQuantity?: number;

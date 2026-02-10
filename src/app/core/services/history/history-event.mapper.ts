@@ -1,6 +1,6 @@
 import type { PantryEvent } from '@core/models/events';
 
-export type HistoryEventKind = 'added' | 'consumed' | 'expired' | 'edited' | 'deleted' | 'imported';
+export type HistoryEventKind = 'added' | 'consumed' | 'expired' | 'edited' | 'deleted';
 
 export type HistoryEventMeta = {
   kind: HistoryEventKind;
@@ -10,7 +10,7 @@ export type HistoryEventMeta = {
   signedQuantity: boolean;
 };
 
-export type HistoryFilterKey = 'all' | 'added' | 'consumed' | 'edited' | 'expired' | 'deleted' | 'imported';
+export type HistoryFilterKey = 'all' | 'added' | 'consumed' | 'edited' | 'expired' | 'deleted';
 
 export type HistoryFilterDefinition = {
   key: HistoryFilterKey;
@@ -27,7 +27,6 @@ export const HISTORY_FILTER_DEFINITIONS: HistoryFilterDefinition[] = [
   { key: 'edited', labelKey: 'history.filters.edited', icon: 'create-outline', colorClass: 'chip--edited', eventType: 'EDIT' },
   { key: 'expired', labelKey: 'history.filters.expired', icon: 'alert-circle-outline', colorClass: 'chip--expired', eventType: 'EXPIRE' },
   { key: 'deleted', labelKey: 'history.filters.deleted', icon: 'trash-outline', colorClass: 'chip--deleted', eventType: 'DELETE' },
-  { key: 'imported', labelKey: 'history.filters.imported', icon: 'cloud-upload-outline', colorClass: 'chip--imported', eventType: 'IMPORT' },
 ];
 
 const EVENT_META_BY_TYPE: Record<PantryEvent['eventType'], HistoryEventMeta> = {
@@ -65,13 +64,6 @@ const EVENT_META_BY_TYPE: Record<PantryEvent['eventType'], HistoryEventMeta> = {
     subtitleKey: 'history.eventTypes.deleted',
     showQuantity: true,
     signedQuantity: true,
-  },
-  IMPORT: {
-    kind: 'imported',
-    icon: 'cloud-upload-outline',
-    subtitleKey: 'history.eventTypes.imported',
-    showQuantity: true,
-    signedQuantity: false,
   },
 };
 

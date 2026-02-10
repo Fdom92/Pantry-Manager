@@ -190,10 +190,6 @@ ion-title {
   background: var(--ion-color-dark);
 }
 
-.timeline-event--imported .timeline-event__dot {
-  background: var(--ion-color-primary);
-}
-
 .timeline-event__content {
   flex: 1 1 auto;
   background: var(--ion-card-background, var(--ion-item-background, var(--ion-background-color)));

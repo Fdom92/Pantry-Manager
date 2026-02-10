@@ -10,9 +10,6 @@ import { StorageService } from '../shared/storage.service';
 import { RevenuecatService } from '../upgrade/revenuecat.service';
 import { AppPreferencesService } from './app-preferences.service';
 import { PantryMigrationService } from '../migration/pantry-migration.service';
-import { EventManagerService } from '../events';
-import type { PantryItem } from '@core/models/pantry';
-import { sumQuantities } from '@core/domain/pantry/pantry-stock/pantry-stock';
 
 @Injectable()
 export class SettingsStateService {
@@ -23,7 +20,6 @@ export class SettingsStateService {
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly migrationService = inject(PantryMigrationService);
   private readonly revenuecat = inject(RevenuecatService);
-  private readonly eventManager = inject(EventManagerService);
   private readonly navCtrl = inject(NavController);
   private readonly download = inject(DownloadService);
   private readonly confirm = inject(ConfirmService);
@@ -184,21 +180,11 @@ export class SettingsStateService {
   private async applyImport(docs: BaseDoc[]): Promise<void> {
     await this.storage.clearAll();
     await this.storage.bulkSave(docs);
-    await this.logImportEventsIfNeeded(docs);
     await this.appPreferences.reload();
     this.migrationService.markMigrationCheckNeeded();
     if (this.lifecycle.isDestroyed()) {
       return;
     }
-  }
-
-  private async logImportEventsIfNeeded(docs: BaseDoc[]): Promise<void> {
-    const items = docs.filter(doc => doc.type === 'item') as PantryItem[];
-    if (!items.length) {
-      return;
-    }
-    const totalItems = items.length;
-    await this.eventManager.logImportGlobal(totalItems);
   }
 
   private reloadApp(): void {
