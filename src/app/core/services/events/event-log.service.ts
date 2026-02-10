@@ -8,6 +8,16 @@ import { StorageService } from '../shared/storage.service';
 export class EventLogService extends StorageService<PantryEvent> {
   private readonly TYPE = 'event';
 
+  async listEvents(): Promise<PantryEvent[]> {
+    const events = await this.listByType(this.TYPE);
+    return [...events].sort((a, b) => this.toTimestamp(b.timestamp) - this.toTimestamp(a.timestamp));
+  }
+
+  async listEventsByType(eventType: PantryEvent['eventType']): Promise<PantryEvent[]> {
+    const events = await this.findByField('eventType', eventType);
+    return [...events].sort((a, b) => this.toTimestamp(b.timestamp) - this.toTimestamp(a.timestamp));
+  }
+
   async logAddEvent(params: BaseEventParams): Promise<PantryEvent | null> {
     return this.logEvent({
       eventType: 'ADD',
@@ -33,6 +43,27 @@ export class EventLogService extends StorageService<PantryEvent> {
     });
   }
 
+  async logExpireEvent(params: BaseEventParams): Promise<PantryEvent | null> {
+    return this.logEvent({
+      eventType: 'EXPIRE',
+      ...params,
+    });
+  }
+
+  async logDeleteEvent(params: BaseEventParams): Promise<PantryEvent | null> {
+    return this.logEvent({
+      eventType: 'DELETE',
+      ...params,
+    });
+  }
+
+  async logImportEvent(params: BaseEventParams): Promise<PantryEvent | null> {
+    return this.logEvent({
+      eventType: 'IMPORT',
+      ...params,
+    });
+  }
+
   async logEvent(params: EventParams): Promise<PantryEvent | null> {
     const now = params.timestamp ?? new Date().toISOString();
     const quantities = buildEventQuantities(params);
@@ -41,18 +72,16 @@ export class EventLogService extends StorageService<PantryEvent> {
       type: this.TYPE,
       eventType: params.eventType,
       productId: params.productId,
+      productName: params.productName,
+      entityType: params.entityType,
       quantity: quantities.quantity,
       deltaQuantity: quantities.deltaQuantity,
       previousQuantity: quantities.previousQuantity,
       nextQuantity: quantities.nextQuantity,
       unit: params.unit,
       batchId: params.batchId,
-      locationId: params.locationId,
-      actorId: params.actorId,
-      reason: params.reason,
       sourceMetadata: params.sourceMetadata,
       timestamp: now,
-      source: params.source,
       createdAt: now,
       updatedAt: now,
     };
@@ -64,4 +93,10 @@ export class EventLogService extends StorageService<PantryEvent> {
       return null;
     }
   }
+
+  private toTimestamp(value: string): number {
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) ? date.getTime() : 0;
+  }
+
 }

@@ -84,3 +84,23 @@ export function formatDateTimeValue(
   const timePart = date.toLocaleTimeString(locale, timeOptions);
   return `${datePart} ${timePart}`.trim();
 }
+
+export function formatTimeValue(
+  value: string | Date | null | undefined,
+  locale: string,
+  {
+    fallback = '',
+    timeOptions = { hour: '2-digit', minute: '2-digit' } as Intl.DateTimeFormatOptions,
+  }: DateFormatOptions & {
+    timeOptions?: Intl.DateTimeFormatOptions;
+  } = {}
+): string {
+  if (!value) {
+    return fallback;
+  }
+  const date = typeof value === 'string' ? new Date(value) : value;
+  if (!Number.isFinite(date.getTime())) {
+    return fallback || (typeof value === 'string' ? value : '');
+  }
+  return date.toLocaleTimeString(locale, timeOptions);
+}

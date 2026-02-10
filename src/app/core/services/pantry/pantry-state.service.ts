@@ -7,6 +7,7 @@ import {
   computeEarliestExpiry,
   computeSupermarketSuggestions,
   formatCategoryName as formatCategoryNameCatalog,
+  getItemStatusState,
   getPresetLocationOptions,
   normalizeBatches,
   sumQuantities,
@@ -45,7 +46,7 @@ import {
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmService, withSignalFlag } from '../shared';
-import { EventLogService } from '../events';
+import { EventManagerService } from '../events';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { dedupeByNormalizedKey, normalizeEntityName } from '@core/utils/normalization.util';
@@ -60,14 +61,18 @@ export class PantryStateService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly confirm = inject(ConfirmService);
-  private readonly eventLog = inject(EventLogService);
+  private readonly eventManager = inject(EventManagerService);
 
   // DATA
   readonly MeasurementUnit = MeasurementUnit;
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
-  private readonly pendingEventMeta = new Map<string, { batchId?: string; locationId?: string }>();
+  private readonly pendingEventMeta = new Map<string, {
+    batchId?: string;
+    adjustmentType?: 'add' | 'consume';
+    deltaQuantity?: number;
+  }>();
   private readonly stockSaveDelay = 500;
   private readonly expandedItems = new Set<string>();
   private realtimeSubscribed = false;
@@ -289,40 +294,18 @@ export class PantryStateService {
             defaultLocationId,
           });
           await this.pantryStore.addItem(item);
-          const nextQuantity = this.pantryStore.getItemTotalQuantity(item);
-          await this.eventLog.logAddEvent({
-            productId: item._id,
-            quantity: entry.quantity,
-            deltaQuantity: entry.quantity,
-            previousQuantity: 0,
-            nextQuantity,
-            unit: item.batches[0]?.unit,
-            timestamp,
-            source: 'fast-add',
-          });
+          await this.eventManager.logFastAddNewItem(item, entry.quantity, timestamp);
           continue;
         }
 
-        const previousQuantity = this.pantryStore.getItemTotalQuantity(entry.item);
-        const unit = this.pantryStore.getItemPrimaryUnit(entry.item);
         const updated = await this.pantryService.addNewLot(entry.item._id, {
           quantity: entry.quantity,
           location: defaultLocationId,
-          unit,
+          unit: this.pantryStore.getItemPrimaryUnit(entry.item),
         });
         if (updated) {
           await this.pantryStore.updateItem(updated);
-          const nextQuantity = this.pantryStore.getItemTotalQuantity(updated);
-          await this.eventLog.logAddEvent({
-            productId: updated._id,
-            quantity: entry.quantity,
-            deltaQuantity: entry.quantity,
-            previousQuantity,
-            nextQuantity,
-            unit: String(unit),
-            timestamp,
-            source: 'fast-add',
-          });
+          await this.eventManager.logFastAddExistingItem(entry.item, updated, entry.quantity, timestamp);
         }
       }
       this.dismissFastAddModal();
@@ -511,6 +494,7 @@ export class PantryStateService {
     try {
       await this.delay(this.deleteAnimationDuration);
       await this.pantryStore.deleteItem(item._id);
+      await this.eventManager.logDeleteFromCard(item);
       this.expandedItems.delete(item._id);
     } catch (err) {
       console.error('[PantryStateService] deleteItem error', err);
@@ -591,18 +575,6 @@ export class PantryStateService {
     return this.pantryStore.getUnitLabel(this.getPrimaryUnit(item));
   }
 
-  isLowStock(item: PantryItem): boolean {
-    return this.pantryStore.isItemLowStock(item);
-  }
-
-  isExpired(item: PantryItem): boolean {
-    return this.pantryStore.isItemExpired(item);
-  }
-
-  isNearExpiry(item: PantryItem): boolean {
-    return this.pantryStore.isItemNearExpiry(item);
-  }
-
   hasOpenBatch(item: PantryItem): boolean {
     return this.pantryStore.hasItemOpenBatch(item);
   }
@@ -669,7 +641,7 @@ export class PantryStateService {
       opened: Boolean(entry.batch.opened),
     }));
 
-    const lowStock = this.isLowStock(item);
+    const lowStock = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock';
     const aggregates = this.computeProductAggregates(batches, lowStock);
     const colorClass = this.getColorClass(aggregates.status.state);
     const fallbackLabel = this.translate.instant('common.dates.none');
@@ -793,6 +765,7 @@ export class PantryStateService {
       return;
     }
 
+    const targetBatchId = sanitizedBatches[batchIndex]?.batchId;
     if (nextBatchQuantity <= 0) {
       sanitizedBatches.splice(batchIndex, 1);
     } else {
@@ -807,8 +780,9 @@ export class PantryStateService {
     const nextTotal = this.getAvailableQuantityFor(updatedItem, normalizedLocation);
     await this.provideQuantityFeedback(originalTotal, nextTotal);
     this.triggerStockSave(item._id, updatedItem, {
-      batchId: sanitizedBatches[batchIndex]?.batchId,
-      locationId: normalizedLocation,
+      batchId: targetBatchId,
+      adjustmentType: delta > 0 ? 'add' : 'consume',
+      deltaQuantity: delta,
     });
 
   }
@@ -926,11 +900,26 @@ export class PantryStateService {
   private triggerStockSave(
     itemId: string,
     updated: PantryItem,
-    meta?: { batchId?: string; locationId?: string }
+    meta?: {
+      batchId?: string;
+      adjustmentType?: 'add' | 'consume';
+      deltaQuantity?: number;
+    }
   ): void {
     this.pendingItems.set(itemId, updated);
     if (meta) {
-      this.pendingEventMeta.set(itemId, meta);
+      const existing = this.pendingEventMeta.get(itemId);
+      if (!existing) {
+        this.pendingEventMeta.set(itemId, meta);
+      } else {
+        const nextDelta = (existing.deltaQuantity ?? 0) + (meta.deltaQuantity ?? 0);
+        const nextType = this.resolveAdjustmentType(existing.adjustmentType, meta.adjustmentType, nextDelta);
+        this.pendingEventMeta.set(itemId, {
+          batchId: meta.batchId ?? existing.batchId,
+          adjustmentType: nextType,
+          deltaQuantity: Number.isFinite(nextDelta) ? nextDelta : undefined,
+        });
+      }
     }
     const existingTimer = this.stockSaveTimers.get(itemId);
     if (existingTimer) {
@@ -952,23 +941,13 @@ export class PantryStateService {
             : pending;
 
           await this.pantryStore.updateItem(nextPayload);
-          const previousQuantity = latest
-            ? this.pantryStore.getItemTotalQuantity(latest)
-            : undefined;
-          const nextQuantity = this.pantryStore.getItemTotalQuantity(nextPayload);
           const eventMeta = this.pendingEventMeta.get(itemId);
-          await this.eventLog.logEditEvent({
-            productId: nextPayload._id,
-            quantity: nextQuantity,
-            deltaQuantity:
-              previousQuantity != null ? nextQuantity - previousQuantity : undefined,
-            previousQuantity,
-            nextQuantity,
-            unit: String(this.pantryStore.getItemPrimaryUnit(nextPayload)),
-            batchId: eventMeta?.batchId,
-            locationId: eventMeta?.locationId,
-            source: 'stock-adjust',
-          });
+          const deltaQuantity = eventMeta?.deltaQuantity;
+          if (eventMeta?.adjustmentType === 'add') {
+            await this.eventManager.logStockAdjust(latest, nextPayload, deltaQuantity ?? 0, eventMeta?.batchId);
+          } else if (eventMeta?.adjustmentType === 'consume') {
+            await this.eventManager.logStockAdjust(latest, nextPayload, deltaQuantity ?? 0, eventMeta?.batchId);
+          }
         } catch (err) {
           console.error('[PantryListStateService] updateItem error', err);
         } finally {
@@ -981,6 +960,18 @@ export class PantryStateService {
 
     this.stockSaveTimers.set(itemId, timer);
   }
+
+  private resolveAdjustmentType(
+    current: 'add' | 'consume' | undefined,
+    next: 'add' | 'consume' | undefined,
+    delta: number
+  ): 'add' | 'consume' {
+    if (Number.isFinite(delta) && delta !== 0) {
+      return delta > 0 ? 'add' : 'consume';
+    }
+    return next ?? current ?? 'add';
+  }
+
 
   private cancelPendingStockSaveInternal(itemId: string): void {
     const existingTimer = this.stockSaveTimers.get(itemId);
@@ -1030,6 +1021,7 @@ export class PantryStateService {
 
   // -------- Summary / grouping / options --------
   private buildSummary(items: PantryItem[], totalCount: number): PantrySummaryMeta {
+    const now = new Date();
     const statusCounts = {
       expired: 0,
       expiring: 0,
@@ -1042,7 +1034,7 @@ export class PantryStateService {
       if (item.isBasic) {
         basicCount += 1;
       }
-      const state = this.getItemStatusState(item);
+      const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
       switch (state) {
         case 'expired':
           statusCounts.expired += 1;
@@ -1079,19 +1071,6 @@ export class PantryStateService {
         normal: 0,
       },
     };
-  }
-
-  private getItemStatusState(item: PantryItem): ProductStatusState {
-    if (this.isExpired(item)) {
-      return 'expired';
-    }
-    if (this.isNearExpiry(item)) {
-      return 'near-expiry';
-    }
-    if (this.isLowStock(item)) {
-      return 'low-stock';
-    }
-    return 'normal';
   }
 
   private buildFilterChips(
@@ -1207,6 +1186,7 @@ export class PantryStateService {
 
   private buildGroups(items: PantryItem[]): PantryGroup[] {
     const map = new Map<string, PantryGroup>();
+    const now = new Date();
 
     for (const item of items) {
       const key = normalizeCategoryId(item.categoryId);
@@ -1225,12 +1205,12 @@ export class PantryStateService {
       }
 
       group.items.push(item);
-      if (this.isLowStock(item)) {
+      const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
+      if (state === 'low-stock') {
         group.lowStockCount += 1;
-      }
-      if (this.isExpired(item)) {
+      } else if (state === 'expired') {
         group.expiredCount += 1;
-      } else if (this.isNearExpiry(item)) {
+      } else if (state === 'near-expiry') {
         group.expiringCount += 1;
       }
     }
@@ -1252,13 +1232,16 @@ export class PantryStateService {
   }
 
   private getExpirationWeight(item: PantryItem): number {
-    if (this.isExpired(item)) {
-      return 0;
+    switch (getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS)) {
+      case 'expired':
+        return 0;
+      case 'near-expiry':
+        return 1;
+      case 'low-stock':
+        return 2;
+      default:
+        return 3;
     }
-    if (this.isNearExpiry(item)) {
-      return 1;
-    }
-    return 2;
   }
 
   private formatCategoryName(key: string): string {
