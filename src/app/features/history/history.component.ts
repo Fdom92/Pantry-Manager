@@ -14,7 +14,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-import { HistoryStateService } from '@core/services/history';
+import { HistoryStateService } from '@core/services/history/history-state.service';
 import { NavController } from '@ionic/angular';
 
 @Component({

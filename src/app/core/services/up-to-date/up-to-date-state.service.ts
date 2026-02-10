@@ -1,7 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import type { InsightPendingReviewProduct, PantryItem } from '@core/models';
 import type { QuickEditPatch, UpToDateReason } from '@core/models/up-to-date';
-import { applyQuickEdit, getFirstExpiryDateInput, hasAnyExpiryDate, normalizeId } from '@core/domain/up-to-date';
+import { applyQuickEdit, getFirstExpiryDateInput, hasAnyExpiryDate } from '@core/domain/up-to-date';
 import { formatDateValue, formatQuantity } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,11 +13,12 @@ import { ReviewPromptService } from '../shared/review-prompt.service';
 import { withSignalFlag } from '../shared';
 import { EventManagerService } from '../events';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
-import { normalizeCategoryId, normalizeEntityName, normalizeKey } from '@core/utils/normalization.util';
+import { formatFriendlyName, normalizeCategoryId, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
 import { hasMeaningfulItemChanges } from '@core/utils';
 
 @Injectable()
 export class UpToDateStateService {
+  // DI
   private readonly pantryStore = inject(PantryStoreService);
   private readonly insightService = inject(InsightService);
   private readonly appPreferences = inject(AppPreferencesService);
@@ -26,7 +27,6 @@ export class UpToDateStateService {
   private readonly navCtrl = inject(NavController);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly eventManager = inject(EventManagerService);
-
   // SIGNALS
   readonly isLoading = signal(false);
   readonly hasLoaded = signal(false);
@@ -38,15 +38,12 @@ export class UpToDateStateService {
   readonly editTargetId = signal<string | null>(null);
   readonly editCategory = signal('');
   readonly editExpiryDate = signal('');
-
-  readonly pantryItems = this.pantryStore.items;
-  private doneRedirectTimeout: ReturnType<typeof setTimeout> | null = null;
-
+  // COMPUTED SIGNALS
   readonly pending = computed(() => this.insightService.getPendingReviewProducts(this.pantryItems()));
   readonly queue = computed(() => {
     const processed = this.processedIds();
     return this.pending().filter(entry => {
-      const id = normalizeId(entry.id);
+      const id = normalizeTrim(entry.id);
       return id && !processed.has(id);
     });
   });
@@ -56,22 +53,17 @@ export class UpToDateStateService {
   readonly isDone = computed(() => this.hasLoaded() && this.pendingCount() === 0);
   readonly categoryOptions = computed(() => this.appPreferences.preferences().categoryOptions ?? []);
   readonly pantryItemsById = computed(() => {
-    const map = new Map<string, PantryItem>();
-    for (const item of this.pantryItems()) {
-      if (item?._id) {
-        map.set(item._id, item);
-      }
-    }
-    return map;
+    const items = this.pantryItems().filter(item => Boolean(item?._id));
+    return new Map(items.map(item => [item._id, item] as const));
   });
   readonly currentEntry = computed(() => {
     const entries = this.queue();
-    const current = normalizeId(this.currentId());
+    const current = normalizeTrim(this.currentId());
     if (!entries.length) {
       return null;
     }
     if (current) {
-      const match = entries.find(entry => normalizeId(entry.id) === current);
+      const match = entries.find(entry => normalizeTrim(entry.id) === current);
       if (match) {
         return match;
       }
@@ -81,18 +73,18 @@ export class UpToDateStateService {
   readonly currentItem = computed(() => this.getPantryItem(this.currentEntry()?.id ?? null));
   readonly editTargetItem = computed(() => this.getPantryItem(this.editTargetId()));
   readonly editTargetEntry = computed(() => {
-    const targetId = normalizeId(this.editTargetId());
+    const targetId = normalizeTrim(this.editTargetId());
     if (!targetId) {
       return null;
     }
-    return this.queue().find(entry => normalizeId(entry.id) === targetId) ?? null;
+    return this.queue().find(entry => normalizeTrim(entry.id) === targetId) ?? null;
   });
   readonly isEditingCurrent = computed(() => {
     if (!this.isEditModalOpen()) {
       return false;
     }
-    const currentId = normalizeId(this.currentEntry()?.id);
-    const editId = normalizeId(this.editTargetId());
+    const currentId = normalizeTrim(this.currentEntry()?.id);
+    const editId = normalizeTrim(this.editTargetId());
     return Boolean(currentId) && currentId === editId;
   });
   readonly currentStep = computed(() => {
@@ -101,10 +93,9 @@ export class UpToDateStateService {
     }
     return Math.min(this.processedCount() + 1, this.totalSteps());
   });
-
   readonly editNeedsCategory = computed(() => {
     const item = this.editTargetItem();
-    return Boolean(item) && !Boolean((item?.categoryId ?? '').trim());
+    return Boolean(item) && !Boolean(normalizeTrim(item?.categoryId));
   });
   readonly editNeedsExpiry = computed(() => {
     const item = this.editTargetItem();
@@ -126,11 +117,14 @@ export class UpToDateStateService {
     if (!entry || !item) {
       return false;
     }
-    if (this.editNeedsCategory() && !this.editCategory().trim()) {
+    if (this.editNeedsCategory() && !normalizeTrim(this.editCategory())) {
       return false;
     }
     return true;
   });
+  // VARIABLES
+  readonly pantryItems = this.pantryStore.items;
+  private doneRedirectTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     effect(() => {
@@ -139,14 +133,14 @@ export class UpToDateStateService {
         this.currentId.set(null);
         return;
       }
-      const current = normalizeId(this.currentId());
+      const current = normalizeTrim(this.currentId());
       if (!current) {
-        const next = normalizeId(entries[0]?.id);
+        const next = normalizeTrim(entries[0]?.id);
         this.currentId.set(next || null);
         return;
       }
-      if (!entries.some(entry => normalizeId(entry.id) === current)) {
-        const next = normalizeId(entries[0]?.id);
+      if (!entries.some(entry => normalizeTrim(entry.id) === current)) {
+        const next = normalizeTrim(entries[0]?.id);
         this.currentId.set(next || null);
       }
     });
@@ -184,7 +178,7 @@ export class UpToDateStateService {
   }
 
   getPantryItem(id?: string | null): PantryItem | null {
-    const key = normalizeId(id);
+    const key = normalizeTrim(id);
     if (!key) {
       return null;
     }
@@ -192,7 +186,7 @@ export class UpToDateStateService {
   }
 
   isBusy(id?: string | null): boolean {
-    const key = normalizeId(id);
+    const key = normalizeTrim(id);
     if (!key) {
       return false;
     }
@@ -205,36 +199,24 @@ export class UpToDateStateService {
     if (!item) {
       return;
     }
-    if (this.isBusy(item._id)) {
-      return;
-    }
-    this.markBusy(item._id, true);
     const snapshot = this.queue();
-    try {
+    await this.runWithBusy(item._id, snapshot, async () => {
       const now = new Date().toISOString();
       await this.pantryStore.updateItem({ ...item, updatedAt: now });
       this.completeAndAdvance(id, snapshot);
-    } finally {
-      this.markBusy(item._id, false);
-    }
+    });
   }
 
   async remove(pending: InsightPendingReviewProduct): Promise<void> {
-    const id = normalizeId(pending?.id);
+    const id = normalizeTrim(pending?.id);
     if (!id) {
       return;
     }
-    if (this.isBusy(id)) {
-      return;
-    }
-    this.markBusy(id, true);
     const snapshot = this.queue();
-    try {
+    await this.runWithBusy(id, snapshot, async () => {
       await this.pantryStore.deleteItem(id);
       this.completeAndAdvance(id, snapshot);
-    } finally {
-      this.markBusy(id, false);
-    }
+    });
   }
 
   skip(pending: InsightPendingReviewProduct): void {
@@ -265,7 +247,7 @@ export class UpToDateStateService {
     if (!item) {
       return '';
     }
-    const categoryId = (item.categoryId ?? '').trim();
+    const categoryId = normalizeTrim(item.categoryId);
     return categoryId || this.translate.instant('pantry.form.uncategorized');
   }
 
@@ -274,9 +256,8 @@ export class UpToDateStateService {
       return '';
     }
     const total = this.pantryStore.getItemTotalQuantity(item);
-    const formatted = formatQuantity(total, this.languageService.getCurrentLocale(), { maximumFractionDigits: 1 });
-    const unitLabel = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
-    return `${formatted} ${unitLabel}`.trim();
+    const formatted = formatQuantity(total, this.languageService.getCurrentLocale());
+    return formatted;
   }
 
   getCategoryAutocompleteOptions(): AutocompleteItem<string>[] {
@@ -292,7 +273,7 @@ export class UpToDateStateService {
   }
 
   onEditCategorySelect(option: AutocompleteItem<string>): void {
-    const value = (option?.raw ?? '').toString().trim();
+    const value = normalizeTrim((option?.raw ?? '').toString());
     if (!value) {
       return;
     }
@@ -300,11 +281,11 @@ export class UpToDateStateService {
   }
 
   addCategoryOptionFromText(value: string): void {
-    const nextValue = (value ?? '').trim();
+    const nextValue = normalizeTrim(value);
     if (!nextValue) {
       return;
     }
-    const formatted = normalizeEntityName(nextValue, nextValue);
+    const formatted = formatFriendlyName(nextValue, nextValue);
     void this.addCategoryOption(formatted);
   }
 
@@ -313,13 +294,13 @@ export class UpToDateStateService {
   }
 
   openEditModal(pending: InsightPendingReviewProduct): void {
-    const id = normalizeId(pending?.id);
+    const id = normalizeTrim(pending?.id);
     if (!id) {
       return;
     }
     const item = this.getPantryItem(id);
     this.editTargetId.set(id);
-    this.editCategory.set((item?.categoryId ?? '').trim());
+    this.editCategory.set(normalizeTrim(item?.categoryId));
     this.editExpiryDate.set(getFirstExpiryDateInput(item));
     this.isEditModalOpen.set(true);
   }
@@ -331,12 +312,9 @@ export class UpToDateStateService {
   async saveEditModal(): Promise<void> {
     const entry = this.editTargetEntry();
     const item = this.editTargetItem();
-    const id = normalizeId(entry?.id);
+    const id = normalizeTrim(entry?.id);
     if (!entry || !item || !id) {
       this.closeEditModalInternal(true);
-      return;
-    }
-    if (this.isSavingEdit()) {
       return;
     }
     if (!this.canSaveEdit()) {
@@ -346,9 +324,9 @@ export class UpToDateStateService {
     const snapshot = this.queue();
     await withSignalFlag(this.isSavingEdit, async () => {
       const patch: QuickEditPatch = {
-        categoryId: this.editCategory().trim(),
-        expiryDateInput: this.editExpiryDate().trim(),
-        hasExpiry: Boolean(this.editExpiryDate().trim()),
+        categoryId: normalizeTrim(this.editCategory()),
+        expiryDateInput: normalizeTrim(this.editExpiryDate()),
+        hasExpiry: Boolean(normalizeTrim(this.editExpiryDate())),
         needsCategory: this.editNeedsCategory(),
         needsExpiry: this.editNeedsExpiry(),
       };
@@ -356,16 +334,14 @@ export class UpToDateStateService {
       const updated = applyQuickEdit({
         item,
         patch,
-        primaryUnit: String(this.pantryStore.getItemPrimaryUnit(item)),
+        nowIso: new Date().toISOString(),
       });
-      if (!this.hasMeaningfulChanges(item, updated)) {
-        this.closeEditModalInternal(true);
+      if (!hasMeaningfulItemChanges(item, updated)) {
         this.completeAndAdvance(id, snapshot);
         return;
       }
       await this.pantryStore.updateItem(updated);
       await this.eventManager.logQuickEdit(item, updated);
-      this.closeEditModalInternal(true);
       this.completeAndAdvance(id, snapshot);
     });
   }
@@ -384,12 +360,8 @@ export class UpToDateStateService {
     this.editExpiryDate.set('');
   }
 
-  private hasMeaningfulChanges(previous: PantryItem, next: PantryItem): boolean {
-    return hasMeaningfulItemChanges(previous, next);
-  }
-
   private markBusy(id: string, busy: boolean): void {
-    const key = normalizeId(id);
+    const key = normalizeTrim(id);
     if (!key) {
       return;
     }
@@ -404,6 +376,29 @@ export class UpToDateStateService {
     });
   }
 
+  private async runWithBusy(
+    id: string | null,
+    snapshot: InsightPendingReviewProduct[],
+    task: () => Promise<void>
+  ): Promise<void> {
+    const key = normalizeTrim(id);
+    if (!key) {
+      return;
+    }
+    if (this.isBusy(key)) {
+      return;
+    }
+    this.markBusy(key, true);
+    try {
+      await task();
+    } catch (err) {
+      console.error('[UpToDate] runWithBusy error', err, { key, snapshotLength: snapshot.length });
+      throw err;
+    } finally {
+      this.markBusy(key, false);
+    }
+  }
+
   private async addCategoryOption(value: string): Promise<void> {
     const normalized = normalizeCategoryId(value);
     if (!normalized) {
@@ -411,8 +406,8 @@ export class UpToDateStateService {
     }
     const current = await this.appPreferences.getPreferences();
     const existing = current.categoryOptions ?? [];
-    const normalizedKey = normalizeKey(normalized);
-    const existingMatch = existing.find(option => normalizeKey(normalizeCategoryId(option)) === normalizedKey);
+    const normalizedKey = normalizeLowercase(normalized);
+    const existingMatch = existing.find(option => normalizeLowercase(normalizeCategoryId(option)) === normalizedKey);
     if (existingMatch) {
       this.editCategory.set(existingMatch);
       return;
@@ -426,22 +421,22 @@ export class UpToDateStateService {
     if (!Array.isArray(snapshot) || snapshot.length === 0) {
       return null;
     }
-    const key = normalizeId(currentId);
+    const key = normalizeTrim(currentId);
     if (!key) {
-      const first = normalizeId(snapshot[0]?.id);
+      const first = normalizeTrim(snapshot[0]?.id);
       return first || null;
     }
-    const index = snapshot.findIndex(entry => normalizeId(entry.id) === key);
+    const index = snapshot.findIndex(entry => normalizeTrim(entry.id) === key);
     if (index < 0) {
-      const first = normalizeId(snapshot[0]?.id);
+      const first = normalizeTrim(snapshot[0]?.id);
       return first || null;
     }
-    const next = normalizeId(snapshot[index + 1]?.id);
+    const next = normalizeTrim(snapshot[index + 1]?.id);
     return next || null;
   }
 
   private completeAndAdvance(currentId: string | null, snapshot: InsightPendingReviewProduct[]): void {
-    const key = normalizeId(currentId);
+    const key = normalizeTrim(currentId);
     const nextId = this.getNextPendingId(key, snapshot);
     this.closeEditModalInternal(true);
     if (key) {

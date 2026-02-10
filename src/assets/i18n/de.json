@@ -241,7 +241,7 @@
     "lowStock": {
       "title": "Warnungen bei niedrigem Bestand",
       "subtitle": "Auf oder unter dem Mindestbestand",
-      "minLabel": "Min. {{ value }} {{ unit }}",
+      "minLabel": "Min. {{ value }}",
       "empty": "Alle Artikel liegen über ihrem Mindestbestand."
     },
     "batches": {
@@ -291,8 +291,8 @@
     "suggestions": {
       "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
-      "totalStock": "Gesamtbestand: {{ amount }} {{ unit }}",
-      "minStock": "Min.: {{ amount }} {{ unit }}",
+      "totalStock": "Gesamtbestand: {{ amount }}",
+      "minStock": "Min.: {{ amount }}",
       "empty": "Derzeit nichts zu erledigen. Ich informiere dich, wenn Nachschub nötig ist."
     },
     "share": {

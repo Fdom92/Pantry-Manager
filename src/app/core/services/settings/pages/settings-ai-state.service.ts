@@ -1,8 +1,9 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { PLANNER_MEMORY_LIMIT } from '@core/constants';
+import { PLANNER_MEMORY_MAX_LENGTH } from '@core/constants';
 import { withSignalFlag } from '../../shared';
 import { AppPreferencesService } from '../app-preferences.service';
 import { TranslateService } from '@ngx-translate/core';
+import { normalizeTrim } from '@core/utils/normalization.util';
 
 @Injectable()
 export class SettingsAiStateService {
@@ -13,7 +14,7 @@ export class SettingsAiStateService {
   readonly originalPlannerMemory = signal('');
   readonly isSaving = signal(false);
   readonly isLoading = signal(false);
-  readonly plannerMemoryLimit = PLANNER_MEMORY_LIMIT;
+  readonly plannerMemoryLimit = PLANNER_MEMORY_MAX_LENGTH;
 
   readonly hasChanges = computed(() => this.plannerMemory() !== this.originalPlannerMemory());
 
@@ -33,7 +34,7 @@ export class SettingsAiStateService {
 
     await withSignalFlag(this.isSaving, async () => {
       const current = await this.appPreferences.getPreferences();
-      const next = (this.plannerMemory() ?? '').trim();
+      const next = normalizeTrim(this.plannerMemory());
       await this.appPreferences.savePreferences({
         ...current,
         plannerMemory: next,

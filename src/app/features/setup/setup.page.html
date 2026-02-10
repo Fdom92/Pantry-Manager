@@ -43,14 +43,12 @@
   <div class="actions">
     <ion-button
       fill="clear"
-      [disabled]="!facade.canContinue()"
       (click)="skipStep()">
       {{ 'setup.actions.skip' | translate }}
     </ion-button>
     <ion-button
       color="primary"
       shape="round"
-      [disabled]="!facade.canContinue()"
       (click)="continueStep()">
       {{ facade.primaryActionLabelKey() | translate }}
     </ion-button>

@@ -2,25 +2,19 @@ import { computed, effect, Injectable, signal } from '@angular/core';
 import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import {
   collectBatches as collectBatchesItem,
+  computeEarliestExpiry as computeEarliestExpiryStock,
   computeExpirationStatus as computeExpirationStatusItem,
   getItemStatusState,
-  getItemEarliestExpiry as getItemEarliestExpiryItem,
-  getItemTotalMinThreshold as getItemTotalMinThresholdItem,
-  getItemTotalQuantity as getItemTotalQuantityItem,
   hasOpenBatch as hasOpenBatchItem,
-  shouldAutoAddToShoppingList as shouldAutoAddToShoppingListItem,
-} from '@core/domain/pantry/pantry-item';
-import {
-  computeEarliestExpiry as computeEarliestExpiryStock,
   mergeBatchesByExpiry as mergeBatchesByExpiryStock,
   normalizeBatches as normalizeBatchesStock,
+  shouldAutoAddToShoppingList as shouldAutoAddToShoppingListItem,
+  sumQuantities as sumQuantitiesStock,
   toNumberOrZero as toNumberOrZeroStock,
-} from '@core/domain/pantry/pantry-stock';
+} from '@core/domain/pantry';
 import { DEFAULT_PANTRY_FILTERS, ItemBatch, PantryFilterState, PantryItem } from '@core/models/pantry';
-import { ExpirationStatus, MeasurementUnit } from '@core/models/shared';
-import { normalizeLocationId, normalizeUnitValue } from '@core/utils/normalization.util';
+import { normalizeLocationId, normalizeSearchField, normalizeSearchQuery, normalizeSupermarketName, normalizeTrim } from '@core/utils/normalization.util';
 import { StorageService } from '../shared/storage.service';
-import type PouchDB from 'pouchdb-browser';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +30,7 @@ export class PantryService extends StorageService<PantryItem> {
   private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
   // SIGNALS
   readonly loadedProducts = signal<PantryItem[]>([]);
-  readonly activeProducts = computed(() => this.loadedProducts().filter(item => this.hasStock(item)));
+  readonly activeProducts = computed(() => this.loadedProducts().filter(item => this.getItemTotalQuantity(item) > 0));
   readonly filteredProducts = signal<PantryItem[]>([]);
   readonly searchQuery = signal('');
   readonly activeFilters = signal<PantryFilterState>({ ...DEFAULT_PANTRY_FILTERS });
@@ -168,7 +162,7 @@ export class PantryService extends StorageService<PantryItem> {
   /** Fetch every pantry item that currently has stock. */
   async getAllActive(): Promise<PantryItem[]> {
     const items = await this.getAll();
-    return items.filter(item => this.hasStock(item));
+    return items.filter(item => this.getItemTotalQuantity(item) > 0);
   }
 
   async deleteItem(id: string): Promise<boolean> {
@@ -185,7 +179,7 @@ export class PantryService extends StorageService<PantryItem> {
    */
   async addNewLot(
     productId: string,
-    lot: { quantity: number; expiryDate?: string | null; location?: string; unit?: string }
+    lot: { quantity: number; expiryDate?: string | null; location?: string }
   ): Promise<PantryItem | null> {
     const item = await this.get(productId);
     if (!item) {
@@ -193,20 +187,18 @@ export class PantryService extends StorageService<PantryItem> {
     }
 
     const current = this.applyDerivedFields(item);
-    const quantity = this.toNumberOrZero(lot?.quantity);
+    const quantity = toNumberOrZeroStock(lot?.quantity);
     if (quantity <= 0) {
       return current;
     }
 
-    const rawLocation = (lot?.location ?? '').trim();
+    const rawLocation = normalizeTrim(lot?.location);
     const locationId = rawLocation ? normalizeLocationId(rawLocation, UNASSIGNED_LOCATION_KEY) : undefined;
-    const unit = normalizeUnitValue(lot?.unit ?? current.batches[0]?.unit ?? MeasurementUnit.UNIT);
     const expiryDate = lot?.expiryDate ?? undefined;
 
     const newBatch: ItemBatch = {
       batchId: this.generateBatchId(),
       quantity,
-      unit,
       expirationDate: expiryDate || undefined,
       opened: false,
       locationId,
@@ -214,7 +206,7 @@ export class PantryService extends StorageService<PantryItem> {
 
     return this.saveItem({
       ...current,
-      batches: this.mergeBatchesByExpiry([...(current.batches ?? []), newBatch]),
+      batches: mergeBatchesByExpiryStock([...(current.batches ?? []), newBatch]),
     });
   }
 
@@ -329,7 +321,7 @@ export class PantryService extends StorageService<PantryItem> {
 
   /** Updates the global search term and restarts pagination so results reload from the beginning. */
   setSearchQuery(raw: string): void {
-    const normalized = (raw ?? '').trim();
+    const normalized = normalizeSearchQuery(raw ?? '');
     if (this.searchQuery() === normalized) {
       return;
     }
@@ -430,17 +422,17 @@ export class PantryService extends StorageService<PantryItem> {
   /** --- Public helpers for store/UI logic reuse --- */
   /** Sum every batch quantity into a single figure. */
   getItemTotalQuantity(item: PantryItem): number {
-    return getItemTotalQuantityItem(item);
+    return sumQuantitiesStock(item.batches ?? []);
   }
 
   /** Return the minimum threshold configured for the product (legacy handling happens during migration). */
   getItemTotalMinThreshold(item: PantryItem): number {
-    return getItemTotalMinThresholdItem(item);
+    return toNumberOrZeroStock(item.minThreshold);
   }
 
   /** Return the earliest expiry date among the defined batches. */
   getItemEarliestExpiry(item: PantryItem): string | undefined {
-    return getItemEarliestExpiryItem(item);
+    return computeEarliestExpiryStock(item.batches ?? []);
   }
 
   /** Return all batches currently tracked for the provided item. */
@@ -476,23 +468,22 @@ export class PantryService extends StorageService<PantryItem> {
    */
   private recomputeFilteredProducts(): void {
     const loaded = this.activeProducts();
-    const query = this.searchQuery().toLowerCase();
+    const query = normalizeSearchQuery(this.searchQuery());
     const filters = this.activeFilters();
 
     const filtered = loaded.filter(item => {
-      return this.hasStock(item) && this.matchesSearch(item, query) && this.matchesFilters(item, filters);
+      return this.getItemTotalQuantity(item) > 0 && this.matchesSearch(item, query) && this.matchesFilters(item, filters);
     });
     const sorted = this.sortItems(filtered);
     this.filteredProducts.set(sorted);
   }
 
   private matchesSearch(item: PantryItem, query: string): boolean {
-    const normalized = query.trim();
-    if (!normalized) {
+    if (!query) {
       return true;
     }
-    const name = (item.name ?? '').toLowerCase();
-    return name.includes(normalized);
+    const name = normalizeSearchField(item.name);
+    return name.includes(query);
   }
 
   private matchesFilters(item: PantryItem, filters: PantryFilterState): boolean {
@@ -518,10 +509,6 @@ export class PantryService extends StorageService<PantryItem> {
     return true;
   }
 
-  private hasStock(item: PantryItem): boolean {
-    return this.getItemTotalQuantity(item) > 0;
-  }
-
   private sortItems(items: PantryItem[]): PantryItem[] {
     if (items.length <= 1) {
       return items;
@@ -537,8 +524,8 @@ export class PantryService extends StorageService<PantryItem> {
       return expirationDiff;
     }
 
-    const labelA = (a.name ?? '').toLowerCase();
-    const labelB = (b.name ?? '').toLowerCase();
+    const labelA = normalizeSearchField(a.name);
+    const labelB = normalizeSearchField(b.name);
     return labelA.localeCompare(labelB);
   }
 
@@ -599,11 +586,8 @@ export class PantryService extends StorageService<PantryItem> {
   /** Compute aggregate fields without mutating the original payload. */
   private applyDerivedFields(item: PantryItem): PantryItem {
     const rawBatches = Array.isArray(item.batches) ? item.batches : [];
-    const fallbackUnit = normalizeUnitValue(
-      rawBatches.find(batch => Boolean(batch?.unit))?.unit ?? MeasurementUnit.UNIT
-    );
-    const batches = this.normalizeBatches(rawBatches, fallbackUnit);
-    const supermarket = this.normalizeSupermarketName(
+    const batches = this.normalizeBatches(rawBatches);
+    const supermarket = normalizeSupermarketName(
       (item.supermarket ?? (item as any).supermarketId) as string | undefined
     );
     const minThreshold = this.toNumberOrUndefined(item.minThreshold);
@@ -612,51 +596,22 @@ export class PantryService extends StorageService<PantryItem> {
       supermarket,
       batches,
       minThreshold,
-      expirationDate: this.computeEarliestExpiry(batches),
-      expirationStatus: this.computeExpirationStatus(batches),
+      expirationDate: computeEarliestExpiryStock(batches),
+      expirationStatus: computeExpirationStatusItem(batches, new Date(), NEAR_EXPIRY_WINDOW_DAYS),
     };
     delete (prepared as any).supermarketId;
     delete (prepared as any).locations;
     return prepared;
   }
 
-  private normalizeSupermarketName(raw?: string | null): string | undefined {
-    const trimmed = (raw ?? '').trim();
-    if (!trimmed) {
-      return undefined;
-    }
-    const normalizedWhitespace = trimmed.replace(/\s+/g, ' ');
-    const lower = normalizedWhitespace.toLowerCase();
-    return lower.replace(/\b\w/g, char => char.toUpperCase());
-  }
-
   getMigrationDatabase(): PouchDB.Database<PantryItem> {
     return this.database;
   }
 
-  private normalizeBatches(batches: ItemBatch[] | undefined, fallbackUnit: MeasurementUnit | string): ItemBatch[] {
-    return normalizeBatchesStock(batches, fallbackUnit, {
+  private normalizeBatches(batches: ItemBatch[] | undefined): ItemBatch[] {
+    return normalizeBatchesStock(batches, {
       generateBatchId: this.generateBatchId.bind(this),
     });
-  }
-
-  /** Merge batches that share the same expiration date so duplicate entries collapse automatically. */
-  private mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
-    return mergeBatchesByExpiryStock(batches);
-  }
-
-  /** Identify the earliest expiry date across all batches. */
-  private computeEarliestExpiry(batches: ItemBatch[]): string | undefined {
-    return computeEarliestExpiryStock(batches);
-  }
-
-  /** Project a high-level expiration status based on batch dates. */
-  private computeExpirationStatus(batches: ItemBatch[]): ExpirationStatus {
-    return computeExpirationStatusItem(batches, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
-  }
-
-  private toNumberOrZero(value: unknown): number {
-    return toNumberOrZeroStock(value);
   }
 
   private toNumberOrUndefined(value: unknown): number | undefined {

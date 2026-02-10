@@ -4,6 +4,7 @@ import { LlmClientError, LlmCompletionRequest, LlmCompletionResponse } from '@co
 import { firstValueFrom, timeout as rxTimeout } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { RevenuecatService } from '../upgrade/revenuecat.service';
+import { sleep } from '../shared/task.util';
 
 /**
  * Thin gateway around the backend LLM endpoint so agents don't need to know about HTTP.
@@ -57,14 +58,14 @@ export class LlmClientService {
             attempt,
             status: normalized.status,
           });
-          await this.delay(this.transientRetryDelayMs * attempt);
+          await sleep(this.transientRetryDelayMs * attempt);
           continue;
         }
         throw normalized;
       }
     }
 
-    throw lastError ?? this.buildDefaultError();
+    throw lastError ?? (new Error('Agent request failed') as LlmClientError);
   }
 
   private buildProHeaders(): Record<string, string> | undefined {
@@ -119,11 +120,4 @@ export class LlmClientService {
     return normalized;
   }
 
-  private buildDefaultError(): LlmClientError {
-    return new Error('Agent request failed') as LlmClientError;
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
 }

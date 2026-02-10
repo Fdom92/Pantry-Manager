@@ -6,9 +6,7 @@ import {
   classifyExpiry,
   computeEarliestExpiry,
   computeSupermarketSuggestions,
-  formatCategoryName as formatCategoryNameCatalog,
   getItemStatusState,
-  getPresetLocationOptions,
   normalizeBatches,
   sumQuantities,
   toNumberOrZero,
@@ -31,26 +29,27 @@ import {
   PantrySummaryMeta,
   ProductStatusState,
 } from '@core/models/pantry';
-import { ES_DATE_FORMAT_OPTIONS, MeasurementUnit } from '@core/models/shared';
+import { ES_DATE_FORMAT_OPTIONS } from '@core/models/shared';
 import { AppPreferencesService } from '../settings/app-preferences.service';
 import { LanguageService } from '../shared/language.service';
 import { PantryService } from './pantry.service';
 import { PantryStoreService } from './pantry-store.service';
 import { createDocumentId } from '@core/utils';
-import { formatDateValue, formatQuantity, formatShortDate, roundQuantity } from '@core/utils/formatting.util';
+import { formatDateValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import {
+  dedupeByNormalizedKey,
+  formatFriendlyName,
   normalizeCategoryId,
-  normalizeKey,
+  normalizeLowercase,
   normalizeLocationId,
-  normalizeUnitValue,
+  normalizeStringList,
+  normalizeTrim,
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfirmService, withSignalFlag } from '../shared';
+import { ConfirmService, sleep, withSignalFlag } from '../shared';
 import { EventManagerService } from '../events';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
-import { dedupeByNormalizedKey, normalizeEntityName } from '@core/utils/normalization.util';
-import { findEntryByKey, toEntitySelectorEntries } from '@core/utils/entity-selector.util';
 
 @Injectable()
 export class PantryStateService {
@@ -64,7 +63,6 @@ export class PantryStateService {
   private readonly eventManager = inject(EventManagerService);
 
   // DATA
-  readonly MeasurementUnit = MeasurementUnit;
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -75,7 +73,6 @@ export class PantryStateService {
   }>();
   private readonly stockSaveDelay = 500;
   private readonly expandedItems = new Set<string>();
-  private realtimeSubscribed = false;
   private readonly deleteAnimationDuration = 220;
 
   // SIGNALS / view state
@@ -97,18 +94,17 @@ export class PantryStateService {
   readonly fastAddQuery = signal('');
   readonly fastAddEntries = signal<FastAddEntry[]>([]);
   readonly fastAddEntryViewModels = computed<EntitySelectorEntry[]>(() =>
-    toEntitySelectorEntries(this.fastAddEntries(), entry => ({
+    this.fastAddEntries().map(entry => ({
       id: entry.id,
       title: entry.name,
       quantity: entry.quantity,
-      unitLabel: entry.unitLabel,
     }))
   );
   readonly hasFastAddEntries = computed(() => this.fastAddEntries().length > 0);
   readonly fastAddOptions = computed(() =>
     this.buildFastAddOptions(this.pantryService.loadedProducts(), this.fastAddEntries())
   );
-  readonly showFastAddEmptyAction = computed(() => this.fastAddQuery().trim().length >= 1);
+  readonly showFastAddEmptyAction = computed(() => normalizeTrim(this.fastAddQuery()).length >= 1);
   readonly fastAddEmptyActionLabel = computed(() => this.buildFastAddEmptyActionLabel());
   readonly addModeSheetOpen = signal(false);
 
@@ -133,7 +129,7 @@ export class PantryStateService {
   readonly filterChips = computed(() => this.buildFilterChips(this.summary(), this.statusFilter(), this.basicOnly()));
 
   // Options
-  readonly supermarketSuggestions = computed(() => this.computeSupermarketOptions(this.pantryItemsState()));
+  readonly supermarketSuggestions = computed(() => computeSupermarketSuggestions(this.pantryItemsState()));
   readonly presetLocationOptions = computed(() => this.computePresetLocationOptions());
 
   // Batches
@@ -301,7 +297,6 @@ export class PantryStateService {
         const updated = await this.pantryService.addNewLot(entry.item._id, {
           quantity: entry.quantity,
           location: defaultLocationId,
-          unit: this.pantryStore.getItemPrimaryUnit(entry.item),
         });
         if (updated) {
           await this.pantryStore.updateItem(updated);
@@ -323,7 +318,6 @@ export class PantryStateService {
     if (!item) {
       return;
     }
-    const unitLabel = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
     this.fastAddEntries.update(current => {
       const existingIndex = current.findIndex(entry => entry.item?._id === item._id);
       if (existingIndex >= 0) {
@@ -339,7 +333,6 @@ export class PantryStateService {
           id: `fast-add:${item._id}`,
           name: option.title,
           quantity: 1,
-          unitLabel,
           item,
           isNew: false,
         },
@@ -349,13 +342,13 @@ export class PantryStateService {
   }
 
   addFastAddEntryFromQuery(name?: string): void {
-    const nextName = (name ?? this.fastAddQuery()).trim();
+    const nextName = normalizeTrim(name ?? this.fastAddQuery());
     if (!nextName) {
       return;
     }
-    const normalized = normalizeKey(nextName);
+    const normalized = normalizeLowercase(nextName);
     const matchingItem = this.pantryService.loadedProducts()
-      .find(item => normalizeKey(item.name) === normalized);
+      .find(item => normalizeLowercase(item.name) === normalized);
     if (matchingItem) {
       const option: AutocompleteItem<PantryItem> = {
         id: matchingItem._id,
@@ -365,10 +358,9 @@ export class PantryStateService {
       this.addFastAddEntry(option);
       return;
     }
-    const formattedName = normalizeEntityName(nextName, nextName);
-    const unitLabel = this.pantryStore.getUnitLabel(MeasurementUnit.UNIT);
+    const formattedName = formatFriendlyName(nextName, nextName);
     this.fastAddEntries.update(current => {
-      const existingIndex = current.findIndex(entry => normalizeKey(entry.name) === normalized);
+      const existingIndex = current.findIndex(entry => normalizeLowercase(entry.name) === normalized);
       if (existingIndex >= 0) {
         const next = [...current];
         const updated = { ...next[existingIndex] };
@@ -382,7 +374,6 @@ export class PantryStateService {
           id: `fast-add:new:${normalized}`,
           name: formattedName,
           quantity: 1,
-          unitLabel,
           isNew: true,
         },
       ];
@@ -413,7 +404,7 @@ export class PantryStateService {
   }
 
   adjustFastAddEntryById(entryId: string, delta: number): void {
-    const entry = findEntryByKey(this.fastAddEntries(), entryId, current => current.id);
+    const entry = this.fastAddEntries().find(current => current.id === entryId);
     if (!entry) {
       return;
     }
@@ -492,7 +483,7 @@ export class PantryStateService {
     this.cancelPendingStockSave(item._id);
     this.markItemDeleting(item._id);
     try {
-      await this.delay(this.deleteAnimationDuration);
+      await sleep(this.deleteAnimationDuration);
       await this.pantryStore.deleteItem(item._id);
       await this.eventManager.logDeleteFromCard(item);
       this.expandedItems.delete(item._id);
@@ -563,18 +554,6 @@ export class PantryStateService {
     return this.pantryStore.getItemTotalQuantity(item);
   }
 
-  getPrimaryUnit(item: PantryItem): string {
-    return normalizeUnitValue(this.pantryStore.getItemPrimaryUnit(item));
-  }
-
-  getUnitLabel(unit: MeasurementUnit | string | undefined): string {
-    return this.pantryStore.getUnitLabel(unit);
-  }
-
-  getUnitLabelForItem(item: PantryItem): string {
-    return this.pantryStore.getUnitLabel(this.getPrimaryUnit(item));
-  }
-
   hasOpenBatch(item: PantryItem): boolean {
     return this.pantryStore.hasItemOpenBatch(item);
   }
@@ -612,15 +591,11 @@ export class PantryStateService {
 
   buildItemCardViewModel(item: PantryItem): PantryItemCardViewModel {
     const totalQuantity = this.getTotalQuantity(item);
-    const unitLabel = this.getUnitLabelForItem(item);
     const totalBatches = this.getTotalBatchCount(item);
     const locale = this.languageService.getCurrentLocale();
-    const formattedQuantityValue = formatQuantity(totalQuantity, locale, {
-      maximumFractionDigits: 2,
-    });
-    const baseQuantityLabel = unitLabel ? `${formattedQuantityValue} ${unitLabel}` : formattedQuantityValue;
+    const formattedQuantityValue = formatQuantity(totalQuantity, locale);
     const totalQuantityLabel = this.translate.instant('pantry.detail.totalQuantity', {
-      value: baseQuantityLabel,
+      value: formattedQuantityValue,
     });
     const totalBatchesLabel = this.translate.instant(
       totalBatches === 1 ? 'pantry.detail.batches.single' : 'pantry.detail.batches.plural',
@@ -632,12 +607,11 @@ export class PantryStateService {
       batch: entry.batch,
       locationId: entry.locationId,
       locationLabel: entry.locationLabel,
-      hasLocation: normalizeKey(entry.locationId) !== normalizeKey(UNASSIGNED_LOCATION_KEY),
+      hasLocation: normalizeLowercase(entry.locationId) !== normalizeLowercase(UNASSIGNED_LOCATION_KEY),
       status: entry.status,
       formattedDate: this.formatBatchDate(entry.batch),
-      quantityLabel: this.formatBatchQuantity(entry.batch, entry.locationUnit),
+      quantityLabel: this.formatBatchQuantity(entry.batch),
       quantityValue: toNumberOrZero(entry.batch.quantity),
-      unitLabel: this.getUnitLabel(normalizeUnitValue(entry.locationUnit)),
       opened: Boolean(entry.batch.opened),
     }));
 
@@ -645,9 +619,6 @@ export class PantryStateService {
     const aggregates = this.computeProductAggregates(batches, lowStock);
     const colorClass = this.getColorClass(aggregates.status.state);
     const fallbackLabel = this.translate.instant('common.dates.none');
-    const formattedEarliestExpirationShort = aggregates.earliestDate
-      ? formatShortDate(aggregates.earliestDate, locale, { fallback: aggregates.earliestDate })
-      : fallbackLabel;
     const formattedEarliestExpirationLong = aggregates.earliestDate
       ? formatDateValue(aggregates.earliestDate, locale, ES_DATE_FORMAT_OPTIONS.numeric, {
           fallback: aggregates.earliestDate,
@@ -658,13 +629,11 @@ export class PantryStateService {
       item,
       totalQuantity,
       totalQuantityLabel,
-      unitLabel,
       totalBatches,
       totalBatchesLabel,
       globalStatus: aggregates.status,
       colorClass,
       earliestExpirationDate: aggregates.earliestDate,
-      formattedEarliestExpirationShort,
       formattedEarliestExpirationLong,
       batchCountsLabel: aggregates.batchSummaryLabel,
       batchCounts: aggregates.counts,
@@ -682,12 +651,9 @@ export class PantryStateService {
     });
   }
 
-  formatBatchQuantity(batch: ItemBatch, locationUnit: string | MeasurementUnit | undefined): string {
-    const formatted = formatQuantity(toNumberOrZero(batch.quantity), this.languageService.getCurrentLocale(), {
-      maximumFractionDigits: 2,
-    });
-    const unitLabel = this.getUnitLabel(normalizeUnitValue(locationUnit));
-    return `${formatted} ${unitLabel}`;
+  formatBatchQuantity(batch: ItemBatch): string {
+    const formatted = formatQuantity(toNumberOrZero(batch.quantity), this.languageService.getCurrentLocale());
+    return formatted;
   }
 
   getBatchStatus(batch: ItemBatch): BatchStatusMeta {
@@ -738,9 +704,8 @@ export class PantryStateService {
     }
 
     const normalizedLocation = normalizeLocationId(locationId, UNASSIGNED_LOCATION_KEY);
-    const unit = normalizeUnitValue(batch.unit ?? this.pantryStore.getItemPrimaryUnit(item));
-    const originalTotal = this.getAvailableQuantityFor(item, normalizedLocation);
-    const sanitizedBatches = this.sanitizeBatches(item.batches ?? [], unit).map(entry => ({
+    const originalTotal = this.getLocationTotal(item, normalizedLocation);
+    const sanitizedBatches = this.sanitizeBatches(item.batches ?? []).map(entry => ({
       ...entry,
       locationId: normalizeLocationId(entry.locationId, UNASSIGNED_LOCATION_KEY),
     }));
@@ -777,7 +742,7 @@ export class PantryStateService {
     }
 
     const updatedItem = this.rebuildItemWithBatches(item, sanitizedBatches);
-    const nextTotal = this.getAvailableQuantityFor(updatedItem, normalizedLocation);
+    const nextTotal = this.getLocationTotal(updatedItem, normalizedLocation);
     await this.provideQuantityFeedback(originalTotal, nextTotal);
     this.triggerStockSave(item._id, updatedItem, {
       batchId: targetBatchId,
@@ -816,10 +781,6 @@ export class PantryStateService {
       next.delete(id);
       return next;
     });
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   private syncExpandedItems(source: PantryItem[] = this.pantryItemsState()): void {
@@ -864,8 +825,8 @@ export class PantryStateService {
     });
   }
 
-  private sanitizeBatches(batches: ItemBatch[] | undefined, unit: MeasurementUnit | string): ItemBatch[] {
-    return normalizeBatches(batches, unit, {
+  private sanitizeBatches(batches: ItemBatch[] | undefined): ItemBatch[] {
+    return normalizeBatches(batches, {
       generateBatchId: this.createTempBatchId.bind(this),
     });
   }
@@ -879,8 +840,7 @@ export class PantryStateService {
   }
 
   private rebuildItemWithBatches(item: PantryItem, batches: ItemBatch[]): PantryItem {
-    const fallbackUnit = this.getPrimaryUnit(item);
-    const normalized = this.sanitizeBatches(batches, fallbackUnit).map(batch => ({
+    const normalized = this.sanitizeBatches(batches).map(batch => ({
       ...batch,
       locationId: normalizeLocationId(batch.locationId, UNASSIGNED_LOCATION_KEY),
     }));
@@ -1008,15 +968,11 @@ export class PantryStateService {
   }
 
   private getLocationTotal(item: PantryItem, locationId: string): number {
-    const normalized = normalizeKey(locationId);
+    const normalized = normalizeLowercase(locationId);
     const batches = (item.batches ?? []).filter(
-      batch => normalizeKey(batch.locationId ?? UNASSIGNED_LOCATION_KEY) === normalized
+      batch => normalizeLowercase(batch.locationId ?? UNASSIGNED_LOCATION_KEY) === normalized
     );
     return this.sumBatchQuantities(batches);
-  }
-
-  private getAvailableQuantityFor(item: PantryItem, locationId: string): number {
-    return this.getLocationTotal(item, locationId);
   }
 
   // -------- Summary / grouping / options --------
@@ -1176,12 +1132,8 @@ export class PantryStateService {
     return 'all';
   }
 
-  private computeSupermarketOptions(items: PantryItem[]): string[] {
-    return computeSupermarketSuggestions(items);
-  }
-
   private computePresetLocationOptions(): string[] {
-    return getPresetLocationOptions(this.appPreferences.preferences());
+    return normalizeStringList(this.appPreferences.preferences().locationOptions, { fallback: [] });
   }
 
   private buildGroups(items: PantryItem[]): PantryGroup[] {
@@ -1245,7 +1197,7 @@ export class PantryStateService {
   }
 
   private formatCategoryName(key: string): string {
-    return formatCategoryNameCatalog(key, this.translate.instant('pantry.form.uncategorized'));
+    return formatFriendlyName(key, this.translate.instant('pantry.form.uncategorized'));
   }
 
   private buildFastAddOptions(items: PantryItem[], entries: FastAddEntry[]): AutocompleteItem<PantryItem>[] {
@@ -1256,29 +1208,28 @@ export class PantryStateService {
       .filter(item => !excluded.has(item._id))
       .map(item => {
         const total = this.pantryStore.getItemTotalQuantity(item);
-        const unit = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
-        const formattedQty = formatQuantity(total, locale, { maximumFractionDigits: 1 });
+        const formattedQty = formatQuantity(total, locale);
         return {
           id: item._id,
           title: item.name,
-          subtitle: `${formattedQty} ${unit}`.trim(),
+          subtitle: formattedQty,
           raw: item,
         };
       });
   }
 
   private buildFastAddEmptyActionLabel(): string {
-    const name = this.fastAddQuery().trim();
+    const name = normalizeTrim(this.fastAddQuery());
     if (!name) {
       return '';
     }
-    const formatted = normalizeEntityName(name, name);
+    const formatted = formatFriendlyName(name, name);
     return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   }
 
   private getDefaultLocationId(): string {
     const presets = this.presetLocationOptions();
-    const first = presets[0]?.trim();
+    const first = normalizeTrim(presets[0]);
     if (first) {
       return first;
     }
@@ -1292,16 +1243,13 @@ export class PantryStateService {
 
   private collectBatches(item: PantryItem): BatchEntryMeta[] {
     const batches: BatchEntryMeta[] = [];
-    const fallbackUnit = this.getPrimaryUnit(item);
-    for (const batch of this.sanitizeBatches(item.batches ?? [], fallbackUnit)) {
+    for (const batch of this.sanitizeBatches(item.batches ?? [])) {
       const locationId = normalizeLocationId(batch.locationId, UNASSIGNED_LOCATION_KEY);
       const locationLabel = this.getLocationLabel(locationId);
-      const locationUnit = normalizeUnitValue(batch.unit ?? fallbackUnit);
       batches.push({
         batch: { ...batch, locationId },
         locationId,
         locationLabel,
-        locationUnit,
         status: this.getBatchStatus(batch),
       });
     }
@@ -1335,7 +1283,6 @@ export class PantryStateService {
           batch: entry.batch,
           locationId: entry.locationId,
           locationLabel: entry.locationLabel,
-          locationUnit: entry.locationUnit,
           status: entry.status,
         }));
 

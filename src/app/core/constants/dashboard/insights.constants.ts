@@ -1,8 +1,8 @@
 import { AgentEntryContext } from '@core/models/agent';
 import { InsightDefinition, InsightId } from '@core/models/dashboard';
+import { isSundayAfternoon, isWithinHours } from '@core/utils';
 
-export const PENDING_REVIEW_STALE_WINDOW_DAYS = 7;
-
+export const PENDING_REVIEW_STALE_DAYS = 7;
 export const INSIGHTS_LIBRARY: InsightDefinition[] = [
   {
     id: InsightId.PENDING_PRODUCT_UPDATES,
@@ -11,13 +11,13 @@ export const INSIGHTS_LIBRARY: InsightDefinition[] = [
     priority: 0,
     audience: 'all',
     predicate: context => {
-      const missingOnlyCount = context.pendingReviewProducts.filter(
+      const missingInfoOnlyCount = context.pendingReviewProducts.filter(
         product => product.reasons.includes('missing-info') && !product.reasons.includes('stale-update')
       ).length;
-      const staleAndMissingCount = context.pendingReviewProducts.filter(
+      const staleAndMissingInfoCount = context.pendingReviewProducts.filter(
         product => product.reasons.includes('missing-info') && product.reasons.includes('stale-update')
       ).length;
-      return missingOnlyCount >= 5 || staleAndMissingCount >= 10;
+      return missingInfoOnlyCount >= 5 || staleAndMissingInfoCount >= 10;
     },
     dismissLabelKey: 'insights.library.pendingProductUpdates.dismiss',
     ctas: [
@@ -129,12 +129,3 @@ export const INSIGHTS_LIBRARY: InsightDefinition[] = [
     ],
   },
 ];
-
-function isWithinHours(date: Date, startHour: number, endHour: number): boolean {
-  const hour = date.getHours();
-  return hour >= startHour && hour < endHour;
-}
-
-function isSundayAfternoon(date: Date): boolean {
-  return date.getDay() === 0 && date.getHours() >= 15;
-}

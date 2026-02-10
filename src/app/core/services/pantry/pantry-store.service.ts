@@ -2,7 +2,8 @@ import { Signal, computed, inject, Injectable, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { getItemStatusState } from '@core/domain/pantry';
 import { PantryItem, PantrySummary } from '@core/models/pantry';
-import { MeasurementUnit, StockStatus } from '@core/models/shared';
+import { StockStatus } from '@core/models/shared';
+import { normalizeLowercase, normalizeOptionalTrim, normalizeTrim } from '@core/utils/normalization.util';
 import { PantryService } from './pantry.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { EventManagerService } from '../events';
@@ -13,10 +14,6 @@ export class PantryStoreService {
   private readonly pantryService = inject(PantryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly eventManager = inject(EventManagerService);
-  // DATA
-  private readonly knownMeasurementUnits = new Set(
-    Object.values(MeasurementUnit).map(option => option.toLowerCase())
-  );
   // SIGNALS
   readonly loading: Signal<boolean> = this.pantryService.loading;
   readonly endReached: Signal<boolean> = this.pantryService.endReached;
@@ -136,28 +133,6 @@ export class PantryStoreService {
     return StockStatus.NORMAL;
   }
 
-  /** Return a human friendly unit label; defaults to lowercase plural. */
-  getUnitLabel(unit: MeasurementUnit | string | undefined): string {
-    const value = typeof unit === 'string' && unit.trim() ? unit.trim() : MeasurementUnit.UNIT;
-    const lower = value.toLowerCase();
-    if (lower === MeasurementUnit.UNIT.toLowerCase()) {
-      return 'pcs';
-    }
-    if (this.knownMeasurementUnits.has(lower)) {
-      return lower;
-    }
-    return value;
-  }
-
-  /** Helper used by UI layers to choose a representative unit. */
-  getItemPrimaryUnit(item: PantryItem): MeasurementUnit | string {
-    const unit = item.batches[0]?.unit;
-    if (typeof unit === 'string' && unit.trim()) {
-      return unit.trim();
-    }
-    return MeasurementUnit.UNIT;
-  }
-
   /** Sum every batch quantity to avoid duplicating reduce logic in components. */
   getItemTotalQuantity(item: PantryItem): number {
     return this.pantryService.getItemTotalQuantity(item);
@@ -192,13 +167,13 @@ export class PantryStoreService {
   }
 
   private async findMergeCandidate(candidate: PantryItem): Promise<PantryItem | undefined> {
-    const barcode = this.normalizeBarcode(candidate.barcode);
+    const barcode = normalizeOptionalTrim(candidate.barcode) ?? null;
     const key = this.buildMergeKey(candidate);
 
     const localItems = this.items();
 
     if (barcode) {
-      const localBarcodeMatch = localItems.find(item => this.normalizeBarcode(item.barcode) === barcode);
+      const localBarcodeMatch = localItems.find(item => (normalizeOptionalTrim(item.barcode) ?? null) === barcode);
       if (localBarcodeMatch) {
         return localBarcodeMatch;
       }
@@ -214,7 +189,7 @@ export class PantryStoreService {
     const persisted = await this.pantryService.getAll();
 
     if (barcode) {
-      const remoteBarcode = persisted.find(item => this.normalizeBarcode(item.barcode) === barcode);
+      const remoteBarcode = persisted.find(item => (normalizeOptionalTrim(item.barcode) ?? null) === barcode);
       if (remoteBarcode) {
         return remoteBarcode;
       }
@@ -242,18 +217,13 @@ export class PantryStoreService {
   }
 
   private buildMergeKey(item: PantryItem): string | null {
-    const name = (item.name ?? '').trim().toLowerCase();
-    const category = (item.categoryId ?? '').trim();
-    const supermarket = (item.supermarket ?? '').trim().toLowerCase();
+    const name = normalizeLowercase(item.name);
+    const category = normalizeTrim(item.categoryId);
+    const supermarket = normalizeLowercase(item.supermarket);
     if (!name || !supermarket) {
       return null;
     }
     return `${name}::${category || 'uncategorized'}::${supermarket}`;
-  }
-
-  private normalizeBarcode(value?: string): string | null {
-    const trimmed = (value ?? '').trim();
-    return trimmed || null;
   }
 
   private mergeItemWithExisting(existing: PantryItem, incoming: PantryItem): PantryItem {

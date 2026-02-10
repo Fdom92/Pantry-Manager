@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { STORAGE_KEY_PRO } from '@core/constants';
+import { normalizePackages, pickPreferredPackage } from '@core/domain/upgrade';
 import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -8,12 +9,28 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class RevenuecatService {
-  // DATA
+  // VARIABLES
   private userId: string | null = null;
   private readonly publicApiKey = environment.revenueCatPublicKey;
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());
   readonly isPro$: Observable<boolean> = this.proSubject.asObservable();
   readonly canUseAgent$: Observable<boolean> = this.isPro$.pipe(map(isPro => isPro || !environment.production));
+  private readonly preferredPackageTypes: PACKAGE_TYPE[] = [
+    PACKAGE_TYPE.MONTHLY,
+    PACKAGE_TYPE.ANNUAL,
+  ];
+
+  isPro(): boolean {
+    return this.proSubject.value;
+  }
+
+  canUseAgent(): boolean {
+    return !environment.production || this.isPro();
+  }
+
+  getUserId(): string | null {
+    return this.userId;
+  }
 
   async init(userId: string): Promise<void> {
     this.userId = userId;
@@ -43,10 +60,6 @@ export class RevenuecatService {
     }
   }
 
-  getUserId(): string | null {
-    return this.userId;
-  }
-
   async getOfferings(): Promise<PurchasesOffering | null> {
     try {
       const offerings = await Purchases.getOfferings();
@@ -64,32 +77,13 @@ export class RevenuecatService {
       return [];
     }
 
-    const preferredTypes: PACKAGE_TYPE[] = [
-      PACKAGE_TYPE.MONTHLY,
-      PACKAGE_TYPE.ANNUAL,
-    ];
+    const candidates = [
+      offering.monthly,
+      offering.annual,
+      ...(offering.availablePackages ?? []),
+    ].filter(Boolean) as PurchasesPackage[];
 
-    const deduped: PurchasesPackage[] = [];
-    const seen = new Set<string>();
-    const push = (pkg: PurchasesPackage | null | undefined): void => {
-      if (!pkg) return;
-      if (seen.has(pkg.identifier)) return;
-      seen.add(pkg.identifier);
-      deduped.push(pkg);
-    };
-
-    push(offering.monthly);
-    push(offering.annual);
-    (offering.availablePackages ?? []).forEach(push);
-
-    const sorted = deduped.sort((a, b) => {
-      const idxA = preferredTypes.indexOf(a.packageType);
-      const idxB = preferredTypes.indexOf(b.packageType);
-      if (idxA === -1 && idxB === -1) return 0;
-      if (idxA === -1) return 1;
-      if (idxB === -1) return -1;
-      return idxA - idxB;
-    });
+    const sorted = normalizePackages(candidates, this.preferredPackageTypes);
 
     console.info(
       '[RevenuecatService] available packages',
@@ -113,19 +107,7 @@ export class RevenuecatService {
     if (!sorted.length) {
       return null;
     }
-    const preferredTypes: PACKAGE_TYPE[] = [
-      PACKAGE_TYPE.MONTHLY,
-      PACKAGE_TYPE.ANNUAL,
-    ];
-
-    for (const type of preferredTypes) {
-      const match = sorted.find(pkg => pkg.packageType === type);
-      if (match) {
-        return match;
-      }
-    }
-
-    return sorted[0];
+    return pickPreferredPackage(sorted, this.preferredPackageTypes);
   }
 
   async purchasePackage(aPackage: PurchasesPackage): Promise<boolean> {
@@ -168,14 +150,6 @@ export class RevenuecatService {
       console.error('[RevenuecatService] restore error', err);
       return false;
     }
-  }
-
-  isPro(): boolean {
-    return this.proSubject.value;
-  }
-
-  canUseAgent(): boolean {
-    return !environment.production || this.isPro();
   }
 
   private extractIsPro(info: any): boolean | null {

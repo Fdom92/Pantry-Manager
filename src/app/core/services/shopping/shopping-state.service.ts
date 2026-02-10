@@ -3,19 +3,17 @@ import { SHOPPING_LIST_NAME } from '@core/constants';
 import { determineSuggestionNeed, groupSuggestionsBySupermarket, incrementSummary } from '@core/domain/shopping';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
-import type { MeasurementUnit } from '@core/models/shared';
-import type {
+import {
   ShoppingReason,
-  ShoppingStateWithItem,
-  ShoppingSuggestionGroupWithItem,
-  ShoppingSuggestionWithItem,
-  ShoppingSummary,
+  type ShoppingStateWithItem,
+  type ShoppingSuggestionGroupWithItem,
+  type ShoppingSuggestionWithItem,
+  type ShoppingSummary,
 } from '@core/models/shopping';
-import { ShoppingReasonEnum } from '@core/models/shopping';
 import { LanguageService } from '../shared/language.service';
-import { DownloadService, ShareService, createLatestOnlyRunner, withSignalFlag } from '../shared';
+import { DownloadService, ShareService, createLatestOnlyRunner, shouldSkipShareOutcome, withSignalFlag } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
-import { normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
+import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
 import { PantryService } from '../pantry/pantry.service';
@@ -25,6 +23,7 @@ import { EventManagerService } from '../events';
 
 @Injectable()
 export class ShoppingStateService {
+  // DI
   private readonly destroyRef = inject(DestroyRef);
   private readonly shareTask = createLatestOnlyRunner(this.destroyRef);
   private readonly pantryStore = inject(PantryStoreService);
@@ -35,18 +34,13 @@ export class ShoppingStateService {
   private readonly languageService = inject(LanguageService);
   private readonly download = inject(DownloadService);
   private readonly share = inject(ShareService);
-
-  readonly loading = this.pantryStore.loading;
-  readonly items = this.pantryStore.items;
-
+  // SIGNALS
   readonly isSummaryExpanded = signal(true);
   readonly processingSuggestionIds = signal<Set<string>>(new Set());
   readonly isSharingListInProgress = signal(false);
-
-  // Purchase modal (template-driven; state holds only the target + open flag)
   readonly isPurchaseModalOpen = signal(false);
   readonly purchaseTarget = signal<ShoppingSuggestionWithItem | null>(null);
-
+  // COMPUTED SIGNALS
   readonly shoppingAnalysis = computed<ShoppingStateWithItem>(() => {
     const analysis = this.buildShoppingAnalysis(this.items());
     return {
@@ -54,6 +48,9 @@ export class ShoppingStateService {
       hasAlerts: analysis.summary.total > 0,
     };
   });
+  // VARIABLES
+  readonly loading = this.pantryStore.loading;
+  readonly items = this.pantryStore.items;
 
   async ionViewWillEnter(): Promise<void> {
     await this.pantryStore.loadAll();
@@ -73,7 +70,7 @@ export class ShoppingStateService {
   }
 
   closePurchaseModal(): void {
-    if (this.isPurchaseModalOpen()) {
+    if (!this.isPurchaseModalOpen()) {
       return;
     }
     this.isPurchaseModalOpen.set(false);
@@ -92,8 +89,7 @@ export class ShoppingStateService {
       return;
     }
 
-    this.processingSuggestionIds.update(ids => new Set(ids).add(id));
-    try {
+    await this.runWithProcessing(id, async () => {
       const updated = await this.pantryService.addNewLot(id, {
         quantity,
         expiryDate: data.expiryDate ?? undefined,
@@ -107,28 +103,18 @@ export class ShoppingStateService {
         this.reviewPrompt.markEngagement();
       }
       this.dismissPurchaseModal();
-    } finally {
-      this.processingSuggestionIds.update(ids => {
-        const next = new Set(ids);
-        next.delete(id);
-        return next;
-      });
-    }
+    });
   }
 
   getBadgeColorByReason(reason: ShoppingReason): string {
     switch (reason) {
-      case ShoppingReasonEnum.EMPTY:
+      case ShoppingReason.EMPTY:
         return 'danger';
-      case ShoppingReasonEnum.BELOW_MIN:
+      case ShoppingReason.BELOW_MIN:
         return 'warning';
       default:
         return 'primary';
     }
-  }
-
-  getUnitLabel(unit: MeasurementUnit | string): string {
-    return this.pantryStore.getUnitLabel(normalizeUnitValue(unit));
   }
 
   getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
@@ -161,11 +147,7 @@ export class ShoppingStateService {
           return;
         }
 
-        if (outcome === 'shared') {
-          return;
-        }
-
-        if (outcome === 'cancelled') {
+        if (shouldSkipShareOutcome(outcome)) {
           return;
         }
 
@@ -182,7 +164,7 @@ export class ShoppingStateService {
   private buildShoppingAnalysis(items: PantryItem[]): Omit<ShoppingStateWithItem, 'hasAlerts'> {
     const suggestions: ShoppingSuggestionWithItem[] = [];
     const uniqueSupermarkets = new Set<string>();
-    const summary: ShoppingSummary = {
+    let summary: ShoppingSummary = {
       total: 0,
       belowMin: 0,
       empty: 0,
@@ -192,8 +174,6 @@ export class ShoppingStateService {
     for (const item of items) {
       const minThreshold = item.minThreshold != null ? Number(item.minThreshold) : null;
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
-      const primaryBatch = item.batches?.[0];
-      const unit = normalizeUnitValue(primaryBatch?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
 
       const shouldAutoAdd = this.pantryStore.shouldAutoAddToShoppingList(item, {
         totalQuantity,
@@ -209,7 +189,7 @@ export class ShoppingStateService {
       if (reason) {
         const supermarket = normalizeSupermarketValue(item.supermarket);
         if (supermarket) {
-          uniqueSupermarkets.add(supermarket.toLowerCase());
+          uniqueSupermarkets.add(normalizeLowercase(supermarket));
         }
 
         suggestions.push({
@@ -218,11 +198,10 @@ export class ShoppingStateService {
           suggestedQuantity,
           currentQuantity: roundQuantity(totalQuantity),
           minThreshold: minThreshold != null ? roundQuantity(minThreshold) : undefined,
-          unit,
           supermarket,
         });
 
-        incrementSummary(summary, reason);
+        summary = incrementSummary(summary, reason);
       }
     }
 
@@ -284,7 +263,7 @@ export class ShoppingStateService {
       for (const suggestion of group.suggestions) {
         const row = {
           product: suggestion.item?.name ?? '',
-          quantity: this.formatQuantityLabel(suggestion.suggestedQuantity, suggestion.unit),
+          quantity: formatQuantity(suggestion.suggestedQuantity, this.languageService.getCurrentLocale()),
           supermarket: suggestion.supermarket ?? this.getUnassignedSupermarketLabel(),
         };
         const productLines = doc.splitTextToSize(row.product, columnWidth.product);
@@ -327,18 +306,24 @@ export class ShoppingStateService {
     return currentY;
   }
 
-  private formatQuantityLabel(value: number, unit: MeasurementUnit | string): string {
-    const locale = this.languageService.getCurrentLocale();
-    const formatted = formatQuantity(value, locale, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-    const unitLabel = this.getUnitLabel(unit);
-    return unitLabel ? `${formatted} ${unitLabel}` : formatted;
+  private buildShareFileName(): string {
+    return `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename(new Date())}.pdf`;
   }
 
-  private buildShareFileName(): string {
-    return `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename()}.pdf`;
+  private async runWithProcessing(id: string, task: () => Promise<void>): Promise<void> {
+    if (this.isSuggestionProcessing(id)) {
+      return;
+    }
+    this.processingSuggestionIds.update(ids => new Set(ids).add(id));
+    try {
+      await task();
+    } finally {
+      this.processingSuggestionIds.update(ids => {
+        const next = new Set(ids);
+        next.delete(id);
+        return next;
+      });
+    }
   }
 
 }

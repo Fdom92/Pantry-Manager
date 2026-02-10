@@ -23,13 +23,11 @@ import {
   formatDateTimeValue,
   formatDateValue,
   formatQuantity,
-  formatShortDate,
 } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
-import { findEntryByKey, toEntitySelectorEntries } from '@core/utils/entity-selector.util';
 
 
 @Injectable()
@@ -66,11 +64,10 @@ export class DashboardStateService {
   readonly isConsumeTodayOpen = signal(false);
   readonly consumeEntries = signal<ConsumeTodayEntry[]>([]);
   readonly consumeEntryViewModels = computed<EntitySelectorEntry[]>(() =>
-    toEntitySelectorEntries(this.consumeEntries(), entry => ({
+    this.consumeEntries().map(entry => ({
       id: entry.itemId,
       title: entry.title,
       quantity: entry.quantity,
-      unitLabel: entry.unitLabel,
       maxQuantity: entry.maxQuantity,
     }))
   );
@@ -218,6 +215,7 @@ export class DashboardStateService {
   }
 
   closeConsumeTodayModal(): void {
+    this.dismissConsumeTodayModal();
     this.consumeEntries.set([]);
     this.consumeSaving.set(false);
   }
@@ -231,7 +229,6 @@ export class DashboardStateService {
     if (maxQuantity <= 0) {
       return;
     }
-    const unitLabel = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
     this.consumeEntries.update(current => {
       const existingIndex = current.findIndex(entry => entry.itemId === item._id);
       if (existingIndex >= 0) {
@@ -247,7 +244,6 @@ export class DashboardStateService {
         {
           itemId: item._id,
           title: option.title,
-          unitLabel,
           quantity: Math.min(1, maxQuantity),
           maxQuantity,
           item,
@@ -280,7 +276,7 @@ export class DashboardStateService {
   }
 
   adjustConsumeEntryById(entryId: string, delta: number): void {
-    const entry = findEntryByKey(this.consumeEntries(), entryId, current => current.itemId);
+    const entry = this.consumeEntries().find(current => current.itemId === entryId);
     if (!entry) {
       return;
     }
@@ -307,7 +303,6 @@ export class DashboardStateService {
     }).catch(err => {
       console.error('[DashboardStateService] consume today error', err);
     });
-    this.dismissConsumeTodayModal();
     this.closeConsumeTodayModal();
   }
 
@@ -340,11 +335,6 @@ export class DashboardStateService {
     return this.pantryStore.getItemTotalQuantity(item);
   }
 
-  getItemUnitLabel(item: PantryItem): string {
-    const unit = this.pantryStore.getItemPrimaryUnit(item);
-    return this.pantryStore.getUnitLabel(unit);
-  }
-
   getItemTotalMinThreshold(item: PantryItem): number {
     return this.pantryStore.getItemTotalMinThreshold(item);
   }
@@ -359,13 +349,11 @@ export class DashboardStateService {
       .filter(item => this.pantryStore.getItemTotalQuantity(item) > 0)
       .map(item => {
       const total = this.pantryStore.getItemTotalQuantity(item);
-      const unit = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
-      const formattedQty = formatQuantity(total, locale, { maximumFractionDigits: 1 });
-      const subtitle = `${formattedQty} ${unit}`.trim();
+      const formattedQty = formatQuantity(total, locale);
       return {
         id: item._id,
         title: item.name,
-        subtitle,
+        subtitle: formattedQty,
         meta: this.getConsumeMetaLabel(item, locale),
         raw: item,
       };
@@ -403,7 +391,7 @@ export class DashboardStateService {
     if (!earliest) {
       return batchLabel;
     }
-    const formatted = formatShortDate(earliest, locale, { fallback: earliest });
+    const formatted = formatDateValue(earliest, locale, ES_DATE_FORMAT_OPTIONS.numeric, { fallback: earliest });
     return this.translate.instant('dashboard.batches.withExpiry', {
       batchLabel,
       date: formatted,

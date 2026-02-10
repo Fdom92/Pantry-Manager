@@ -4,7 +4,7 @@ import type { AppThemePreference } from '@core/models';
 import type { BaseDoc } from '@core/models/shared';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfirmService, DownloadService, ShareService, createLatestOnlyRunner, withSignalFlag } from '../shared';
+import { ConfirmService, DownloadService, ShareService, createLatestOnlyRunner, runIfIdle, shouldSkipShareOutcome, withSignalFlag } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { StorageService } from '../shared/storage.service';
 import { RevenuecatService } from '../upgrade/revenuecat.service';
@@ -45,7 +45,7 @@ export class SettingsStateService {
       return;
     }
 
-    await withSignalFlag(this.isResettingData, async () => {
+    await runIfIdle(this.isResettingData, async () => {
       await this.storage.clearAll();
       await this.appPreferences.reload();
       if (this.lifecycle.isDestroyed()) {
@@ -69,11 +69,7 @@ export class SettingsStateService {
     if (typeof document === 'undefined') {
       return;
     }
-    if (this.isExportingData()) {
-      return;
-    }
-
-    await withSignalFlag(this.isExportingData, async () => {
+    await runIfIdle(this.isExportingData, async () => {
       const docs = (await this.storage.all()).filter(doc => !doc._id.startsWith('_design/'));
       const json = JSON.stringify(docs, null, 2);
       const filename = buildExportFileName(new Date());
@@ -91,11 +87,7 @@ export class SettingsStateService {
         return;
       }
 
-      if (outcome === 'shared') {
-        return;
-      }
-
-      if (outcome === 'cancelled') {
+      if (shouldSkipShareOutcome(outcome)) {
         return;
       }
 
@@ -122,7 +114,7 @@ export class SettingsStateService {
 
     let shouldReload = false;
 
-    await withSignalFlag(this.isImportingData, async () => {
+    await runIfIdle(this.isImportingData, async () => {
       const fileContents = await file.text();
       const docs = parseBackup(fileContents, new Date().toISOString());
       await this.applyImport(docs);
@@ -150,7 +142,7 @@ export class SettingsStateService {
       return;
     }
 
-    await withSignalFlag(this.isUpdatingTheme, async () => {
+    await runIfIdle(this.isUpdatingTheme, async () => {
       const current = this.appPreferences.preferences();
       await this.appPreferences.savePreferences({
         ...current,

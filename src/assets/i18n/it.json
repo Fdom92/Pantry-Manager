@@ -241,7 +241,7 @@
     "lowStock": {
       "title": "Avvisi stock basso",
       "subtitle": "Al di sotto del livello minimo",
-      "minLabel": "min {{ value }} {{ unit }}",
+      "minLabel": "min {{ value }}",
       "empty": "Tutti gli articoli sono sopra il livello minimo."
     },
     "batches": {
@@ -291,8 +291,8 @@
     "suggestions": {
       "title": "Lista della spesa",
       "loading": "Sto creando la lista della spesa…",
-      "totalStock": "Stock totale: {{ amount }} {{ unit }}",
-      "minStock": "Min: {{ amount }} {{ unit }}",
+      "totalStock": "Stock totale: {{ amount }}",
+      "minStock": "Min: {{ amount }}",
       "empty": "Al momento non ci sono acquisti in sospeso. Ti avviserò quando sarà necessario riassortire."
     },
     "share": {

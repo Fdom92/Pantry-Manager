@@ -1,8 +1,9 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { ONBOARDING_SLIDES } from '@core/constants/onboarding';
 import { ONBOARDING_STORAGE_KEY, SETUP_STORAGE_KEY } from '@core/constants';
 import { isLastIndex } from '@core/domain/onboarding';
 import type { OnboardingSlide } from '@core/models/onboarding';
+import { getBooleanFlag, setBooleanFlag } from '@core/utils/storage-flag.util';
 import { NavController } from '@ionic/angular';
 import { register } from 'swiper/element/bundle';
 import type { SwiperOptions } from 'swiper/types';
@@ -12,8 +13,8 @@ let swiperRegistered = false;
 @Injectable()
 export class OnboardingStateService {
   private readonly navCtrl = inject(NavController);
-  private readonly alreadyCompletedOnboarding = this.getStoredFlag(ONBOARDING_STORAGE_KEY);
-  private readonly alreadyCompletedSetup = this.getStoredFlag(SETUP_STORAGE_KEY);
+  private readonly alreadyCompletedOnboarding = getBooleanFlag(ONBOARDING_STORAGE_KEY);
+  private readonly alreadyCompletedSetup = getBooleanFlag(SETUP_STORAGE_KEY);
 
   readonly slideOptions: SwiperOptions = {
     speed: 550,
@@ -29,9 +30,7 @@ export class OnboardingStateService {
 
   readonly currentSlideIndex = signal(0);
 
-  readonly availableSlides = computed<OnboardingSlide[]>(() => {
-    return ONBOARDING_SLIDES;
-  });
+  readonly availableSlides = ONBOARDING_SLIDES as OnboardingSlide[];
 
   constructor() {
     if (!swiperRegistered) {
@@ -57,7 +56,7 @@ export class OnboardingStateService {
   }
 
   isLastSlide(): boolean {
-    return isLastIndex(this.currentSlideIndex(), this.availableSlides().length);
+    return isLastIndex(this.currentSlideIndex(), this.availableSlides.length);
   }
 
   async goToNextSlide(swiperEl: any): Promise<void> {
@@ -74,27 +73,11 @@ export class OnboardingStateService {
   }
 
   async completeOnboarding(): Promise<void> {
-    this.persistOnboardingFlag();
+    setBooleanFlag(ONBOARDING_STORAGE_KEY, true);
     if (!this.alreadyCompletedOnboarding && !this.alreadyCompletedSetup) {
       await this.navCtrl.navigateRoot('/setup');
       return;
     }
     await this.navCtrl.navigateRoot('/dashboard');
-  }
-
-  private persistOnboardingFlag(): void {
-    try {
-      localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
-    } catch (err) {
-      console.warn('[Onboarding] failed to persist onboarding flag', err);
-    }
-  }
-
-  private getStoredFlag(key: string): boolean {
-    try {
-      return Boolean(localStorage.getItem(key));
-    } catch {
-      return false;
-    }
   }
 }

@@ -1,10 +1,10 @@
 import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
-import { QUICK_PROMPTS, USER_PROMPT_MAXLENGTH } from '@core/constants';
-import { trimToNull } from '@core/domain/agent';
+import { QUICK_PROMPTS, USER_PROMPT_MAX_LENGTH } from '@core/constants';
 import { AgentEntryContext } from '@core/models/agent';
 import type { AgentMessage, QuickPrompt } from '@core/models/agent';
+import { normalizeOptionalTrim } from '@core/utils/normalization.util';
 import { NavController } from '@ionic/angular';
 import type { IonContent, IonTextarea } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
@@ -41,7 +41,7 @@ export class AgentStateService {
 
   readonly composerControl = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.maxLength(USER_PROMPT_MAXLENGTH)],
+    validators: [Validators.maxLength(USER_PROMPT_MAX_LENGTH)],
   });
 
   constructor() {
@@ -112,7 +112,7 @@ export class AgentStateService {
       await this.navigateToUpgrade();
       return;
     }
-    const message = trimToNull(this.composerControl.value);
+    const message = normalizeOptionalTrim(this.composerControl.value);
     if (!message) {
       return;
     }
@@ -177,7 +177,7 @@ export class AgentStateService {
     userText: string,
     options?: { appendUserMessage?: boolean }
   ): Promise<void> {
-    const trimmed = trimToNull(userText);
+    const trimmed = normalizeOptionalTrim(userText);
     if (!trimmed) {
       return;
     }

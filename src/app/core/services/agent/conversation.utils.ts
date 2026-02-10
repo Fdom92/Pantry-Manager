@@ -1,10 +1,7 @@
 import { AgentMessage } from '@core/models/agent';
 
 export function isVisibleAgentMessage(message: AgentMessage): boolean {
-  if (message.uiHidden) {
-    return false;
-  }
-  return true;
+  return !message.uiHidden;
 }
 
 export function appendWithUserDedupe(history: AgentMessage[], message: AgentMessage): AgentMessage[] {

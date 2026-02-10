@@ -70,7 +70,6 @@ export class EventLogService extends StorageService<PantryEvent> {
       deltaQuantity: quantities.deltaQuantity,
       previousQuantity: quantities.previousQuantity,
       nextQuantity: quantities.nextQuantity,
-      unit: params.unit,
       batchId: params.batchId,
       sourceMetadata: params.sourceMetadata,
       timestamp: now,

@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { MeasurementUnit } from '@core/models/shared';
-import { normalizeLocationId, normalizeUnitValue } from '@core/utils/normalization.util';
-import { PantryService } from '@core/services/pantry/pantry.service';
-import type { ItemBatch } from '@core/models/pantry';
+import { mergeBatchesByExpiry, toNumberOrZero } from '@core/domain/pantry';
 import type { LegacyLocationStock, LegacyPantryItem } from '@core/models/migration/legacy-pantry.model';
+import type { ItemBatch } from '@core/models/pantry';
+import { PantryService } from '@core/services/pantry/pantry.service';
+import { normalizeLocationId } from '@core/utils/normalization.util';
+import { getBooleanFlag, setBooleanFlag } from '@core/utils/storage-flag.util';
 
 @Injectable({ providedIn: 'root' })
 export class PantryMigrationService {
@@ -12,7 +13,7 @@ export class PantryMigrationService {
   private readonly MIGRATION_CHECK_KEY = 'pantry:migration:2.6';
 
   async migrateIfNeeded(): Promise<void> {
-    if (!this.shouldCheckMigration()) {
+    if (!getBooleanFlag(this.MIGRATION_CHECK_KEY, true)) {
       return;
     }
     const db = this.pantryService.getMigrationDatabase();
@@ -43,7 +44,7 @@ export class PantryMigrationService {
     }
 
     if (!legacyItems.length) {
-      this.markMigrationChecked();
+      setBooleanFlag(this.MIGRATION_CHECK_KEY, false);
       return;
     }
 
@@ -51,10 +52,7 @@ export class PantryMigrationService {
       await Promise.all(
         legacyItems.map(async item => {
           const legacyLocations = Array.isArray(item.locations) ? item.locations : [];
-          const fallbackUnit = normalizeUnitValue(
-            legacyLocations.find(location => Boolean(location?.unit))?.unit ?? MeasurementUnit.UNIT
-          );
-          const batches = this.migrateLegacyLocations(legacyLocations, fallbackUnit);
+          const batches = this.migrateLegacyLocations(legacyLocations);
           const minThreshold = this.normalizeItemMinThreshold(item.minThreshold, legacyLocations);
           await this.pantryService.saveItem({
             ...(item as any),
@@ -64,23 +62,19 @@ export class PantryMigrationService {
           });
         })
       );
-      this.markMigrationChecked();
+      setBooleanFlag(this.MIGRATION_CHECK_KEY, false);
     } catch (err) {
       console.error('[PantryMigrationService] migrateIfNeeded error', err);
     }
   }
 
   markMigrationCheckNeeded(): void {
-    try {
-      localStorage.setItem(this.MIGRATION_CHECK_KEY, 'true');
-    } catch (err) {
-      console.warn('[PantryMigrationService] markMigrationCheckNeeded failed', err);
-    }
+    setBooleanFlag(this.MIGRATION_CHECK_KEY, true);
   }
 
   private shouldMigrate(item: LegacyPantryItem): boolean {
     const hasTaggedBatches =
-      Array.isArray(item.batches) && item.batches.some(batch => Boolean((batch.locationId ?? '').trim()));
+      Array.isArray(item.batches) && item.batches.some(batch => Boolean(normalizeLocationId(batch.locationId)));
     if (hasTaggedBatches) {
       return false;
     }
@@ -89,12 +83,12 @@ export class PantryMigrationService {
       if (Array.isArray(location.batches) && location.batches.length > 0) {
         return true;
       }
-      const legacyQuantity = this.toNumberOrZero((location as any).quantity);
+      const legacyQuantity = toNumberOrZero((location as any).quantity);
       return legacyQuantity > 0;
     });
   }
 
-  private migrateLegacyLocations(locations: LegacyLocationStock[], fallbackUnit: MeasurementUnit | string): ItemBatch[] {
+  private migrateLegacyLocations(locations: LegacyLocationStock[]): ItemBatch[] {
     if (!Array.isArray(locations) || locations.length === 0) {
       return [];
     }
@@ -105,29 +99,26 @@ export class PantryMigrationService {
         continue;
       }
       const locationId = normalizeLocationId(location.locationId);
-      const unit = normalizeUnitValue(location.unit ?? fallbackUnit);
       const legacyBatches = Array.isArray(location.batches) ? location.batches : [];
       for (const batch of legacyBatches) {
         batches.push({
           ...batch,
-          quantity: this.toNumberOrZero(batch.quantity),
-          unit: normalizeUnitValue(batch.unit ?? unit),
+          quantity: toNumberOrZero(batch.quantity),
           opened: batch.opened ?? false,
           locationId,
         });
       }
-      const legacyQuantity = this.toNumberOrZero((location as any).quantity);
+      const legacyQuantity = toNumberOrZero((location as any).quantity);
       if (legacyQuantity > 0 && legacyBatches.length === 0) {
         batches.push({
           quantity: legacyQuantity,
-          unit,
           opened: false,
           locationId,
         });
       }
     }
 
-    return this.mergeBatchesByExpiry(batches);
+    return mergeBatchesByExpiry(batches);
   }
 
   private normalizeItemMinThreshold(
@@ -147,43 +138,6 @@ export class PantryMigrationService {
     return legacyTotal > 0 ? legacyTotal : undefined;
   }
 
-  private mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
-    if (!Array.isArray(batches) || batches.length <= 1) {
-      return Array.isArray(batches) ? batches.map(batch => ({ ...batch })) : [];
-    }
-
-    const seen = new Map<string, ItemBatch>();
-    const merged: ItemBatch[] = [];
-
-    for (const batch of batches) {
-      const expiryKey = (batch.expirationDate ?? '').trim();
-      const locationKey = (batch.locationId ?? '').trim();
-      const key = expiryKey ? `${locationKey}::${expiryKey}` : '';
-      if (!key) {
-        merged.push({ ...batch });
-        continue;
-      }
-
-      const existing = seen.get(key);
-      if (!existing) {
-        const clone = { ...batch };
-        seen.set(key, clone);
-        merged.push(clone);
-        continue;
-      }
-
-      existing.quantity = this.toNumberOrZero(existing.quantity) + this.toNumberOrZero(batch.quantity);
-      existing.opened = Boolean(existing.opened || batch.opened);
-    }
-
-    return merged;
-  }
-
-  private toNumberOrZero(value: unknown): number {
-    const num = Number(value);
-    return Number.isFinite(num) ? num : 0;
-  }
-
   private toNumberOrUndefined(value: unknown): number | undefined {
     if (value == null || value === '') {
       return undefined;
@@ -192,20 +146,4 @@ export class PantryMigrationService {
     return Number.isFinite(num) ? num : undefined;
   }
 
-  private shouldCheckMigration(): boolean {
-    try {
-      const value = localStorage.getItem(this.MIGRATION_CHECK_KEY);
-      return value !== 'false';
-    } catch {
-      return true;
-    }
-  }
-
-  private markMigrationChecked(): void {
-    try {
-      localStorage.setItem(this.MIGRATION_CHECK_KEY, 'false');
-    } catch (err) {
-      console.warn('[PantryMigrationService] markMigrationChecked failed', err);
-    }
-  }
 }

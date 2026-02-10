@@ -23,7 +23,6 @@ export interface EntitySelectorEntry {
   id: string;
   title: string;
   quantity: number;
-  unitLabel: string;
   maxQuantity?: number;
 }
 

@@ -8,6 +8,7 @@ import {
   type HistoryEventKind,
 } from './history-event.mapper';
 import { formatDateValue, formatQuantity, formatTimeValue } from '@core/utils/formatting.util';
+import { normalizeTrim } from '@core/utils/normalization.util';
 import { EventLogService } from '../events';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { LanguageService } from '../shared/language.service';
@@ -56,13 +57,9 @@ export class HistoryStateService {
   readonly activeFilter = signal<HistoryFilterKey>('all');
   readonly skeletonPlaceholders = Array.from({ length: 6 }, (_, index) => index);
 
-  private readonly productMap = computed(() => {
-    const map = new Map<string, string>();
-    for (const item of this.pantryStore.items()) {
-      map.set(item._id, item.name);
-    }
-    return map;
-  });
+  private readonly productMap = computed(() =>
+    new Map(this.pantryStore.items().map(item => [item._id, item] as const))
+  );
 
   readonly visibleEvents = computed(() => {
     const events = this.events();
@@ -76,24 +73,7 @@ export class HistoryStateService {
 
   readonly filterChips = computed<HistoryFilterChip[]>(() => {
     const events = this.visibleEvents();
-    const counts = HISTORY_FILTER_DEFINITIONS.reduce(
-      (acc, definition) => {
-        if (definition.key === 'all') {
-          acc.all = events.length;
-        } else {
-          acc[definition.key] = events.filter(event => event.eventType === definition.eventType).length;
-        }
-        return acc;
-      },
-      {
-        all: 0,
-        added: 0,
-        consumed: 0,
-        edited: 0,
-        expired: 0,
-        deleted: 0,
-      } as Record<HistoryFilterKey, number>
-    );
+    const counts = this.buildFilterCounts(events);
 
     const active = this.activeFilter();
     return HISTORY_FILTER_DEFINITIONS.map(definition => ({
@@ -122,24 +102,24 @@ export class HistoryStateService {
 
   readonly groupedEvents = computed<HistoryDayGroup[]>(() => {
     const locale = this.languageService.getCurrentLocale();
-    const groups: HistoryDayGroup[] = [];
+    const groupsMap = new Map<string, HistoryDayGroup>();
     const events = this.eventCards();
 
     for (const event of events) {
       const dayKey = this.getDayKey(event.timestamp, event.id);
-      const existing = groups.find(group => group.key === dayKey);
+      const existing = groupsMap.get(dayKey);
       if (existing) {
         existing.events.push(event);
-      } else {
-        groups.push({
-          key: dayKey,
-          label: this.formatDayLabel(event.timestamp, locale),
-          events: [event],
-        });
+        continue;
       }
+      groupsMap.set(dayKey, {
+        key: dayKey,
+        label: this.formatDayLabel(event.timestamp, locale),
+        events: [event],
+      });
     }
 
-    return groups;
+    return Array.from(groupsMap.values());
   });
 
   async ionViewWillEnter(): Promise<void> {
@@ -168,8 +148,8 @@ export class HistoryStateService {
 
   private buildEventCard(event: PantryEvent): HistoryEventCard {
     const locale = this.languageService.getCurrentLocale();
-    const productName = (event.productName ?? '').trim()
-      || this.productMap().get(event.productId)
+    const productName = normalizeTrim(event.productName)
+      || this.productMap().get(event.productId)?.name
       || this.translate.instant('history.event.unknownProduct');
     const meta = getHistoryEventMeta(event);
     const subtitle = this.translate.instant(meta.subtitleKey);
@@ -190,11 +170,43 @@ export class HistoryStateService {
 
   private buildQuantityLabel(event: PantryEvent, locale: string, signed: boolean): string {
     const value = Number.isFinite(event.deltaQuantity) ? event.deltaQuantity : event.quantity;
-    const safeValue = typeof value === 'number' && Number.isFinite(value) ? value : 0;
-    const unit = event.unit ? this.pantryStore.getUnitLabel(event.unit) : '';
-    const formatted = formatQuantity(Math.abs(safeValue), locale, { maximumFractionDigits: 2 });
+    const safeValue = Number.isFinite(value) ? Number(value) : 0;
+    const formatted = formatQuantity(Math.abs(safeValue), locale);
     const sign = signed ? (safeValue < 0 ? '-' : safeValue > 0 ? '+' : '') : '';
-    return `${sign}${formatted}${unit ? ` ${unit}` : ''}`;
+    return `${sign}${formatted}`;
+  }
+
+  private buildFilterCounts(events: PantryEvent[]): Record<HistoryFilterKey, number> {
+    const counts: Record<HistoryFilterKey, number> = {
+      all: events.length,
+      added: 0,
+      consumed: 0,
+      edited: 0,
+      expired: 0,
+      deleted: 0,
+    };
+    for (const event of events) {
+      switch (event.eventType) {
+        case 'ADD':
+          counts.added += 1;
+          break;
+        case 'CONSUME':
+          counts.consumed += 1;
+          break;
+        case 'EDIT':
+          counts.edited += 1;
+          break;
+        case 'EXPIRE':
+          counts.expired += 1;
+          break;
+        case 'DELETE':
+          counts.deleted += 1;
+          break;
+        default:
+          break;
+      }
+    }
+    return counts;
   }
 
   private getDayKey(value: string, fallback: string): string {

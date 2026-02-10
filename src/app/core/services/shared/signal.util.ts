@@ -12,3 +12,12 @@ export async function withSignalFlag<T>(
   }
 }
 
+export async function runIfIdle<T>(
+  flag: WritableSignal<boolean>,
+  run: () => Promise<T>,
+): Promise<T | undefined> {
+  if (flag()) {
+    return undefined;
+  }
+  return withSignalFlag(flag, run);
+}

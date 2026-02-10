@@ -37,7 +37,7 @@
             [emptyActionLabel]="emptyActionLabel"
             (emptyAction)="emptyAction.emit()"
             (valueChange)="queryChange.emit($event)"
-            (onSelect)="selectItem.emit($event)">
+            (optionSelected)="selectItem.emit($event)">
           </app-entity-autocomplete>
 
           @if (entries.length) {

@@ -1,5 +1,5 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
-import { getPackageTypeTranslationKey, computeAnnualSavingsPercent } from '@core/domain/upgrade';
+import { buildPlanMeta } from '@core/domain/upgrade';
 import type { PlanViewModel } from '@core/models/upgrade';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -9,17 +9,18 @@ import { RevenuecatService } from './revenuecat.service';
 
 @Injectable()
 export class UpgradeStateService {
+  // DI
   private readonly destroyRef = inject(DestroyRef);
   private readonly lifecycle = createLatestOnlyRunner(this.destroyRef);
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
   private readonly revenuecat = inject(RevenuecatService);
-
+  // SIGNALS
   readonly isLoadingPlans = signal(false);
   readonly planOptions = signal<PlanViewModel[]>([]);
   readonly activePurchaseId = signal<string | null>(null);
   readonly isPro$ = this.revenuecat.isPro$;
-
+  // VARIABLES
   private monthlyPriceValue: number | null = null;
   private annualPriceValue: number | null = null;
   private readonly benefitKeys = [
@@ -31,32 +32,21 @@ export class UpgradeStateService {
 
   async ionViewWillEnter(): Promise<void> {
     if (this.revenuecat.isPro()) {
-      if (this.lifecycle.isDestroyed()) {
-        return;
-      }
-      await this.navCtrl.navigateRoot('/dashboard');
+      await this.goDashboard();
       return;
     }
     await this.loadAvailablePackages();
   }
 
   async skipUpgradeFlow(): Promise<void> {
-    if (this.lifecycle.isDestroyed()) {
-      return;
-    }
-    await this.navCtrl.navigateRoot('/dashboard');
+    await this.goDashboard();
   }
 
   async restorePurchases(): Promise<void> {
     const restored = await this.revenuecat.restore();
     if (restored || this.revenuecat.isPro()) {
-      if (this.lifecycle.isDestroyed()) {
-        return;
-      }
-      await this.navCtrl.navigateRoot('/dashboard');
+      await this.goDashboard();
       return;
-    }
-    if (!this.lifecycle.isDestroyed()) {
     }
   }
 
@@ -73,22 +63,14 @@ export class UpgradeStateService {
     try {
       const success = await this.revenuecat.purchasePackage(pkg);
       if (success) {
-        if (this.lifecycle.isDestroyed()) {
-          return;
-        }
-        await this.navCtrl.navigateRoot('/dashboard');
+        await this.goDashboard();
         return;
       }
 
       const restored = await this.revenuecat.restore();
       if (restored) {
-        if (this.lifecycle.isDestroyed()) {
-          return;
-        }
-        await this.navCtrl.navigateRoot('/dashboard');
+        await this.goDashboard();
         return;
-      }
-      if (!this.lifecycle.isDestroyed()) {
       }
     } finally {
       this.activePurchaseId.set(null);
@@ -129,55 +111,44 @@ export class UpgradeStateService {
   }
 
   private toPlanViewModel(pkg: PurchasesPackage): PlanViewModel {
-    const typeKey = getPackageTypeTranslationKey(pkg.packageType);
-    const isAnnual = pkg.packageType === PACKAGE_TYPE.ANNUAL;
-    const price = pkg.product?.priceString ?? '-';
-    const period = this.translate.instant(isAnnual ? 'upgrade.plans.perYear' : 'upgrade.plans.perMonth');
-    const badge = isAnnual ? this.translate.instant('upgrade.plans.badgeBestValue') : null;
-    const savings = isAnnual ? this.buildAnnualSavingsLabel() : null;
-    const trialLabel = this.buildTrialLabel(pkg);
-    const ctaLabel = trialLabel
-      ? this.translate.instant('upgrade.actions.startTrial')
-      : this.translate.instant('upgrade.actions.select');
-    return {
-      id: pkg.identifier,
-      type: pkg.packageType,
-      title: this.translate.instant(typeKey),
-      subtitle: pkg.product?.title ?? pkg.identifier,
-      price,
-      period,
-      badge,
-      savings,
-      trialLabel,
-      ctaLabel,
-      benefits: this.benefitKeys.map(key => this.translate.instant(key)),
-      highlight: isAnnual,
-    };
-  }
-
-  private buildTrialLabel(pkg: PurchasesPackage): string | null {
-    const introPrice = pkg.product?.introPrice;
-    if (!introPrice) {
-      return null;
-    }
-    if (introPrice.price === 0) {
-      return this.translate.instant('upgrade.plans.trialFree');
-    }
-    return this.translate.instant('upgrade.plans.trialDiscount', {
-      price: introPrice.priceString,
-      cycles: introPrice.cycles ?? 1,
-    });
-  }
-
-  private buildAnnualSavingsLabel(): string | null {
-    const savingsPercent = computeAnnualSavingsPercent({
+    const meta = buildPlanMeta({
+      pkg,
+      benefitKeys: this.benefitKeys,
       monthlyPrice: this.monthlyPriceValue,
       annualPrice: this.annualPriceValue,
     });
-    if (!savingsPercent) {
-      return null;
+    const trialLabel = meta.trial
+      ? meta.trial.kind === 'free'
+        ? this.translate.instant('upgrade.plans.trialFree')
+        : this.translate.instant('upgrade.plans.trialDiscount', {
+            price: meta.trial.price,
+            cycles: meta.trial.cycles,
+          })
+      : null;
+    const savingsLabel = meta.savingsPercent
+      ? this.translate.instant('upgrade.plans.savings', { value: meta.savingsPercent })
+      : null;
+    return {
+      id: meta.id,
+      type: meta.type,
+      title: this.translate.instant(meta.titleKey),
+      subtitle: meta.subtitle,
+      price: meta.price,
+      periodLabel: this.translate.instant(meta.periodKey),
+      badgeLabel: meta.badgeKey ? this.translate.instant(meta.badgeKey) : null,
+      savingsLabel,
+      trialLabel,
+      ctaLabel: this.translate.instant(meta.ctaKey),
+      benefits: meta.benefitsKeys.map(key => this.translate.instant(key)),
+      highlight: meta.highlight,
+    };
+  }
+
+  private async goDashboard(): Promise<void> {
+    if (this.lifecycle.isDestroyed()) {
+      return;
     }
-    return this.translate.instant('upgrade.plans.savings', { value: savingsPercent });
+    await this.navCtrl.navigateRoot('/dashboard');
   }
 
 }

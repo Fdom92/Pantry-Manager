@@ -43,10 +43,10 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   @Input() showClearButton = false;
   // OUTPUTS
   @Output() valueChange = new EventEmitter<string>();
-  @Output() onSelect = new EventEmitter<AutocompleteItem<TRaw, TMeta>>();
-  @Output() onClear = new EventEmitter<void>();
-  @Output() onFocus = new EventEmitter<void>();
-  @Output() onBlur = new EventEmitter<void>();
+  @Output() optionSelected = new EventEmitter<AutocompleteItem<TRaw, TMeta>>();
+  @Output() cleared = new EventEmitter<void>();
+  @Output() focused = new EventEmitter<void>();
+  @Output() blurred = new EventEmitter<void>();
   @Output() emptyAction = new EventEmitter<string>();
   // DATA
   inputValue = '';
@@ -83,7 +83,7 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
     }
     const value = this.getEventStringValue(event);
     if (value === '' && this.inputValue !== '') {
-      this.onClear.emit();
+      this.cleared.emit();
     }
     this.setValue(value);
   }
@@ -93,7 +93,7 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
       return;
     }
     this.isFocused = true;
-    this.onFocus.emit();
+    this.focused.emit();
     if (this.blurTimeoutId) {
       clearTimeout(this.blurTimeoutId);
       this.blurTimeoutId = null;
@@ -103,7 +103,7 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   handleBlur(): void {
     this.blurTimeoutId = setTimeout(() => {
       this.isFocused = false;
-      this.onBlur.emit();
+      this.blurred.emit();
       this.blurTimeoutId = null;
     }, 120);
   }
@@ -130,7 +130,7 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
       this.setValue(option.title ?? '');
     }
     this.isFocused = false;
-    this.onSelect.emit(option);
+    this.optionSelected.emit(option);
   }
 
   handleClearClick(): void {
@@ -138,7 +138,7 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
       return;
     }
     this.setValue('');
-    this.onClear.emit();
+    this.cleared.emit();
   }
 
   triggerEmptyAction(): void {

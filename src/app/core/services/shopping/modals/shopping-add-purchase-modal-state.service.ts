@@ -3,10 +3,12 @@ import { ShoppingStateService } from '../shopping-state.service';
 
 @Injectable()
 export class ShoppingAddPurchaseModalStateService {
+  // DI
   private readonly shopping = inject(ShoppingStateService);
-
+  // VARIABLES
   quantity = 1;
   expiryDate: string | null = null;
+  // GETTERS
   get canConfirm(): boolean {
     return this.quantity > 0;
   }

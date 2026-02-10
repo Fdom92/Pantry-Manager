@@ -3,32 +3,28 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import {
   buildUniqueSelectOptions,
-  formatCategoryName as formatCategoryNameCatalog,
   formatSupermarketLabel,
-  getPresetCategoryOptions,
-  getPresetLocationOptions,
-  getPresetSupermarketOptions,
-} from '@core/domain/pantry/pantry-catalog';
-import { normalizeEntityName } from '@core/utils/normalization.util';
+} from '@core/domain/pantry';
 import { toDateInputValue, toIsoDate } from '@core/domain/up-to-date';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
-import { MeasurementUnit } from '@core/models/shared';
 import { createDocumentId, hasMeaningfulItemChanges } from '@core/utils';
-import { formatQuantity, roundQuantity } from '@core/utils/formatting.util';
+import { formatQuantity } from '@core/utils/formatting.util';
 import {
+  formatFriendlyName,
   normalizeCategoryId,
-  normalizeKey,
+  normalizeLowercase,
   normalizeLocationId,
+  normalizeStringList,
   normalizeSupermarketValue,
-  normalizeUnitValue,
+  normalizeTrim,
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { AppPreferencesService } from '../../settings/app-preferences.service';
-import { EventManagerService } from '../../events';
-import { PantryStoreService } from '../pantry-store.service';
-import { PantryStateService } from '../pantry-state.service';
-import { PantryService } from '../pantry.service';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { EventManagerService } from '../../events';
+import { AppPreferencesService } from '../../settings/app-preferences.service';
+import { PantryStateService } from '../pantry-state.service';
+import { PantryStoreService } from '../pantry-store.service';
+import { PantryService } from '../pantry.service';
 
 @Injectable()
 export class PantryEditItemModalStateService {
@@ -49,13 +45,13 @@ export class PantryEditItemModalStateService {
   readonly selectorOptions = computed(() =>
     this.buildSelectorOptions(this.pantryService.loadedProducts())
   );
-  readonly selectorLocked = computed(() => this.selectorEnabled() && !!this.selectedName().trim());
+  readonly selectorLocked = computed(() => this.selectorEnabled() && !!normalizeTrim(this.selectedName()));
   readonly selectorInputValue = computed(() =>
     this.selectorLocked() ? this.selectedName() : this.selectorQuery()
   );
-  readonly showSelectorEmptyAction = computed(() => this.selectorQuery().trim().length >= 1);
+  readonly showSelectorEmptyAction = computed(() => normalizeTrim(this.selectorQuery()).length >= 1);
   readonly selectorEmptyActionLabel = computed(() =>
-    this.buildSelectorEmptyActionLabel(this.selectorQuery().trim())
+    this.buildSelectorEmptyActionLabel(normalizeTrim(this.selectorQuery()))
   );
 
   readonly form = this.fb.group({
@@ -148,12 +144,12 @@ export class PantryEditItemModalStateService {
     const options: Array<{ value: string; label: string }> = [];
 
     const addOption = (value: string, label?: string): void => {
-      const normalized = normalizeKey(value);
+      const normalized = normalizeLowercase(value);
       if (!normalized || seen.has(normalized)) {
         return;
       }
       seen.add(normalized);
-      const trimmed = value.trim();
+      const trimmed = normalizeTrim(value);
       const display = label ?? this.formatCategoryName(trimmed);
       options.push({ value: trimmed, label: display });
     };
@@ -164,7 +160,7 @@ export class PantryEditItemModalStateService {
 
     const control = this.form.get('categoryId');
     const currentValue = typeof control?.value === 'string' ? normalizeCategoryId(control.value) : '';
-    if (currentValue && !seen.has(normalizeKey(currentValue))) {
+    if (currentValue && !seen.has(normalizeLowercase(currentValue))) {
       addOption(currentValue);
     }
 
@@ -177,7 +173,7 @@ export class PantryEditItemModalStateService {
     const options: Array<{ value: string; label: string }> = [];
 
     const addOption = (value: string, label?: string): void => {
-      const normalized = normalizeKey(value);
+      const normalized = normalizeLowercase(value);
       if (!normalized || seen.has(normalized)) {
         return;
       }
@@ -192,7 +188,7 @@ export class PantryEditItemModalStateService {
 
     const batchGroup = this.batchesArray.at(index);
     const currentValue = normalizeLocationId(batchGroup?.get('locationId')?.value);
-    if (currentValue && !seen.has(normalizeKey(currentValue))) {
+    if (currentValue && !seen.has(normalizeLowercase(currentValue))) {
       addOption(currentValue);
     }
 
@@ -211,7 +207,7 @@ export class PantryEditItemModalStateService {
   getSupermarketSelectOptions(): Array<{ value: string; label: string }> {
     const presetOptions = this.presetSupermarketOptions();
     const control = this.form.get('supermarket');
-    const currentValue = (control?.value ?? '').trim();
+    const currentValue = normalizeTrim(control?.value ?? '');
     const options = buildUniqueSelectOptions([...presetOptions, currentValue], {
       labelFor: value =>
         formatSupermarketLabel(value, this.translate.instant('settings.catalogs.supermarkets.other')),
@@ -238,7 +234,7 @@ export class PantryEditItemModalStateService {
   }
 
   onCategoryAutocompleteSelect(option: AutocompleteItem<string>): void {
-    const value = (option?.raw ?? '').toString().trim();
+    const value = normalizeTrim((option?.raw ?? '').toString());
     if (!value) {
       return;
     }
@@ -246,7 +242,7 @@ export class PantryEditItemModalStateService {
   }
 
   onSupermarketAutocompleteSelect(option: AutocompleteItem<string>): void {
-    const value = (option?.raw ?? '').toString().trim();
+    const value = normalizeTrim((option?.raw ?? '').toString());
     if (!value) {
       return;
     }
@@ -254,7 +250,7 @@ export class PantryEditItemModalStateService {
   }
 
   onLocationAutocompleteSelect(index: number, option: AutocompleteItem<string>): void {
-    const value = (option?.raw ?? '').toString().trim();
+    const value = normalizeTrim((option?.raw ?? '').toString());
     if (!value) {
       return;
     }
@@ -263,29 +259,29 @@ export class PantryEditItemModalStateService {
   }
 
   addCategoryOptionFromText(value: string): void {
-    const nextValue = (value ?? '').trim();
+    const nextValue = normalizeTrim(value);
     if (!nextValue) {
       return;
     }
-    const formatted = normalizeEntityName(nextValue, nextValue);
+    const formatted = formatFriendlyName(nextValue, nextValue);
     void this.addCategoryOption(formatted);
   }
 
   addSupermarketOptionFromText(value: string): void {
-    const nextValue = (value ?? '').trim();
+    const nextValue = normalizeTrim(value);
     if (!nextValue) {
       return;
     }
-    const formatted = normalizeEntityName(nextValue, nextValue);
+    const formatted = formatFriendlyName(nextValue, nextValue);
     void this.addSupermarketOption(formatted);
   }
 
   addLocationOptionFromText(index: number, value: string): void {
-    const nextValue = (value ?? '').trim();
+    const nextValue = normalizeTrim(value);
     if (!nextValue) {
       return;
     }
-    const formatted = normalizeEntityName(nextValue, nextValue);
+    const formatted = formatFriendlyName(nextValue, nextValue);
     void this.addLocationOption(index, formatted);
   }
 
@@ -302,8 +298,8 @@ export class PantryEditItemModalStateService {
   }
 
   onSelectorCreateNew(value?: string): void {
-    const raw = (value ?? this.selectorQuery()).trim();
-    const nextName = raw ? normalizeEntityName(raw, raw) : '';
+    const raw = normalizeTrim(value ?? this.selectorQuery());
+    const nextName = raw ? formatFriendlyName(raw, raw) : '';
     this.selectingItem.set(false);
     this.selectorQuery.set('');
     this.selectedName.set(nextName);
@@ -328,8 +324,8 @@ export class PantryEditItemModalStateService {
     }
     const current = await this.appPreferences.getPreferences();
     const existing = current.supermarketOptions ?? [];
-    const normalizedKey = normalizeKey(normalized);
-    const existingMatch = existing.find(option => normalizeKey(option) === normalizedKey);
+    const normalizedKey = normalizeLowercase(normalized);
+    const existingMatch = existing.find(option => normalizeLowercase(option) === normalizedKey);
     if (existingMatch) {
       this.form.get('supermarket')?.setValue(existingMatch);
       return;
@@ -346,8 +342,8 @@ export class PantryEditItemModalStateService {
     }
     const current = await this.appPreferences.getPreferences();
     const existing = current.categoryOptions ?? [];
-    const normalizedKey = normalizeKey(normalized);
-    const existingMatch = existing.find(option => normalizeKey(normalizeCategoryId(option)) === normalizedKey);
+    const normalizedKey = normalizeLowercase(normalized);
+    const existingMatch = existing.find(option => normalizeLowercase(normalizeCategoryId(option)) === normalizedKey);
     if (existingMatch) {
       this.form.get('categoryId')?.setValue(existingMatch);
       return;
@@ -364,8 +360,8 @@ export class PantryEditItemModalStateService {
     }
     const current = await this.appPreferences.getPreferences();
     const existing = current.locationOptions ?? [];
-    const normalizedKey = normalizeKey(normalized);
-    const existingMatch = existing.find(option => normalizeKey(normalizeLocationId(option)) === normalizedKey);
+    const normalizedKey = normalizeLowercase(normalized);
+    const existingMatch = existing.find(option => normalizeLowercase(normalizeLocationId(option)) === normalizedKey);
     const nextValue = existingMatch ?? normalized;
     if (!existingMatch) {
       const next = [...existing, normalized];
@@ -390,7 +386,7 @@ export class PantryEditItemModalStateService {
       const item = this.buildItemPayload(existing ?? undefined);
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       if (existing) {
-        if (!this.hasMeaningfulChanges(existing, item)) {
+        if (!hasMeaningfulItemChanges(existing, item)) {
           this.dismiss();
           return;
         }
@@ -407,10 +403,6 @@ export class PantryEditItemModalStateService {
       this.isSaving.set(false);
       console.error('[PantryEditItemModalStateService] submitItem error', err);
     }
-  }
-
-  private hasMeaningfulChanges(existing: PantryItem, next: PantryItem): boolean {
-    return hasMeaningfulItemChanges(existing, next);
   }
 
   private resetBatchControls(batches: Array<Partial<ItemBatch>>): void {
@@ -474,7 +466,7 @@ export class PantryEditItemModalStateService {
     const rawLocation = normalizeLocationId(initial?.locationId);
     const locationId = rawLocation && rawLocation !== UNASSIGNED_LOCATION_KEY ? rawLocation : '';
     return this.fb.group({
-      batchId: this.fb.control((initial?.batchId ?? '').trim()),
+      batchId: this.fb.control(normalizeTrim(initial?.batchId)),
       locationId: this.fb.control(locationId, {
         nonNullable: true,
       }),
@@ -483,9 +475,6 @@ export class PantryEditItemModalStateService {
       }),
       expirationDate: this.fb.control(initial?.expirationDate ? toDateInputValue(initial.expirationDate) : ''),
       opened: this.fb.control(initial?.opened ?? false),
-      unit: this.fb.control(normalizeUnitValue(initial?.unit ?? MeasurementUnit.UNIT), {
-        nonNullable: true,
-      }),
     });
   }
 
@@ -513,16 +502,14 @@ export class PantryEditItemModalStateService {
             ? toIsoDate(batchValue.expirationDate) ?? undefined
             : undefined;
         const batchQuantity = batchValue?.quantity != null ? Number(batchValue.quantity) : 0;
-        const batchId = (batchValue?.batchId ?? '').trim() || undefined;
+    const batchId = normalizeTrim(batchValue?.batchId) || undefined;
         const opened = batchValue?.opened ? true : undefined;
         const locationId = normalizeLocationId(batchValue?.locationId) || undefined;
-        const unit = normalizeUnitValue(batchValue?.unit as MeasurementUnit | string | undefined);
         return {
           batchId,
           quantity: Number.isFinite(batchQuantity) ? batchQuantity : 0,
           expirationDate,
           opened,
-          unit,
           locationId,
         } as ItemBatch;
       })
@@ -536,7 +523,7 @@ export class PantryEditItemModalStateService {
       _rev: existing?._rev,
       type: 'item',
       householdId: existing?.householdId ?? DEFAULT_HOUSEHOLD_ID,
-      name: (name ?? '').trim(),
+      name: normalizeTrim(name),
       categoryId: normalizedCategory,
       batches,
       supermarket: normalizedSupermarket,
@@ -547,36 +534,31 @@ export class PantryEditItemModalStateService {
     };
   }
 
-  private getUnitLabel(unit: MeasurementUnit | string | undefined): string {
-    return this.pantryStore.getUnitLabel(unit);
-  }
-
   private presetCategoryOptions(): string[] {
-    return getPresetCategoryOptions(this.appPreferences.preferences());
+    return normalizeStringList(this.appPreferences.preferences().categoryOptions, { fallback: [] });
   }
 
   private presetLocationOptions(): string[] {
-    return getPresetLocationOptions(this.appPreferences.preferences());
+    return normalizeStringList(this.appPreferences.preferences().locationOptions, { fallback: [] });
   }
 
   private presetSupermarketOptions(): string[] {
-    return getPresetSupermarketOptions(this.appPreferences.preferences());
+    return normalizeStringList(this.appPreferences.preferences().supermarketOptions, { fallback: [] });
   }
 
   private formatCategoryName(key: string): string {
-    return formatCategoryNameCatalog(key, this.translate.instant('pantry.form.uncategorized'));
+    return formatFriendlyName(key, this.translate.instant('pantry.form.uncategorized'));
   }
 
   private buildSelectorOptions(items: PantryItem[]): AutocompleteItem<PantryItem>[] {
     const locale = this.translate.currentLang ?? 'es';
     return (items ?? []).map(item => {
       const total = this.pantryStore.getItemTotalQuantity(item);
-      const unit = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
-      const formattedQty = formatQuantity(total, locale, { maximumFractionDigits: 1 });
+      const formattedQty = formatQuantity(total, locale);
       return {
         id: item._id,
         title: item.name,
-        subtitle: `${formattedQty} ${unit}`.trim(),
+        subtitle: formattedQty,
         raw: item,
       };
     });
@@ -586,7 +568,7 @@ export class PantryEditItemModalStateService {
     if (!query) {
       return '';
     }
-    const formatted = normalizeEntityName(query, query);
+    const formatted = formatFriendlyName(query, query);
     return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   }
 

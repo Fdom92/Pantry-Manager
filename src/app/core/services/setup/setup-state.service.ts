@@ -4,9 +4,10 @@ import {
   SETUP_LOCATION_OPTIONS,
   SETUP_STEPS,
   SETUP_STORAGE_KEY,
-  SetupStepKey,
 } from '@core/constants';
+import { SetupStepKey } from '@core/models/setup';
 import { AppPreferencesService } from '@core/services/settings/app-preferences.service';
+import { setBooleanFlag } from '@core/utils/storage-flag.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -35,11 +36,8 @@ export class SetupStateService {
       total: this.steps.length,
     }),
   );
-  readonly canContinue = computed(() => {
-    return true;
-  });
   readonly primaryActionLabelKey = computed(() =>
-    this.isLastStep() ? 'setup.actions.finish' : 'setup.actions.continue',
+    this.currentStepIndex() >= this.steps.length - 1 ? 'setup.actions.finish' : 'setup.actions.continue',
   );
   readonly currentOptions = computed<SetupOptionViewModel[]>(() => {
     const step = this.currentStep();
@@ -53,15 +51,19 @@ export class SetupStateService {
 
   toggleOption(optionId: string): void {
     const step = this.currentStep();
-    if (step.key === 'locations') {
-      this.selectedLocations.set(this.toggleSelection(this.selectedLocations(), optionId));
-      return;
+    const selections = new Set(
+      step.key === 'locations' ? this.selectedLocations() : this.selectedCategories()
+    );
+    if (selections.has(optionId)) {
+      selections.delete(optionId);
+    } else {
+      selections.add(optionId);
     }
-    this.selectedCategories.set(this.toggleSelection(this.selectedCategories(), optionId));
+    this.setSelections(step.key, selections);
   }
 
   async skipStep(): Promise<void> {
-    this.clearSelections(this.currentStep().key);
+    this.setSelections(this.currentStep().key, new Set());
     await this.advanceStep();
   }
 
@@ -70,35 +72,13 @@ export class SetupStateService {
   }
 
   private async advanceStep(): Promise<void> {
-    if (this.isLastStep()) {
+    if (this.currentStepIndex() >= this.steps.length - 1) {
       await this.persistSelections();
-      this.persistSetupFlag();
+      setBooleanFlag(SETUP_STORAGE_KEY, true);
       await this.navCtrl.navigateRoot('/dashboard');
       return;
     }
     this.currentStepIndex.update(value => value + 1);
-  }
-
-  private isLastStep(): boolean {
-    return this.currentStepIndex() >= this.steps.length - 1;
-  }
-
-  private toggleSelection(current: Set<string>, optionId: string): Set<string> {
-    const next = new Set(current);
-    if (next.has(optionId)) {
-      next.delete(optionId);
-    } else {
-      next.add(optionId);
-    }
-    return next;
-  }
-
-  private clearSelections(stepKey: SetupStepKey): void {
-    if (stepKey === 'locations') {
-      this.selectedLocations.set(new Set());
-      return;
-    }
-    this.selectedCategories.set(new Set());
   }
 
   private async persistSelections(): Promise<void> {
@@ -120,11 +100,12 @@ export class SetupStateService {
       .map(option => this.translate.instant(option.labelKey));
   }
 
-  private persistSetupFlag(): void {
-    try {
-      localStorage.setItem(SETUP_STORAGE_KEY, 'true');
-    } catch (err) {
-      console.warn('[Setup] failed to persist setup flag', err);
+  private setSelections(stepKey: SetupStepKey, selections: Set<string>): void {
+    if (stepKey === 'locations') {
+      this.selectedLocations.set(selections);
+      return;
     }
+    this.selectedCategories.set(selections);
   }
+
 }

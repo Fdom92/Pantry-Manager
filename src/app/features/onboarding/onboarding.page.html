@@ -13,7 +13,7 @@
     #swiperRef
     class="onboarding-swiper"
     (slidechange)="onSlideChanged()">
-    <swiper-slide *ngFor="let slide of facade.availableSlides(); index as idx">
+    <swiper-slide *ngFor="let slide of facade.availableSlides; index as idx">
       <div class="slide-card" [class.is-pro]="slide.pro">
         @if (slide.badgeKey) {
         <div class="pill">

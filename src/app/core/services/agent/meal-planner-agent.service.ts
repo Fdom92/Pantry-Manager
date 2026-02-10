@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { getItemTotalQuantity } from '@core/domain/pantry/pantry-item';
+import { sumQuantities } from '@core/domain/pantry';
 import { PantryItem } from '@core/models/pantry';
-import { LlmClientService } from './llm-client.service';
+import { normalizeTrim } from '@core/utils/normalization.util';
 import { PantryService } from '../pantry/pantry.service';
 import { AppPreferencesService } from '../settings/app-preferences.service';
+import { LlmClientService } from './llm-client.service';
 
 export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
 
@@ -174,14 +175,14 @@ export class MealPlannerAgentService {
 
     return items
       .map(item => {
-        const total = getItemTotalQuantity(item);
+        const total = sumQuantities(item.batches ?? []);
         return `- ${item.name}: ${total}`;
       })
       .join('\n');
   }
 
   private buildUserPreferencesSection(memory?: string | null): string {
-    const trimmed = memory?.trim();
+    const trimmed = normalizeTrim(memory);
     if (!trimmed) {
       return 'USER PREFERENCES\n      The user has not provided additional preferences.';
     }

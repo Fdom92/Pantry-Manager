@@ -241,7 +241,7 @@
     "lowStock": {
       "title": "Alertas de stock baixo",
       "subtitle": "No ou abaixo do nível mínimo",
-      "minLabel": "mín {{ value }} {{ unit }}",
+      "minLabel": "mín {{ value }}",
       "empty": "Todos os itens estão acima do nível mínimo."
     },
     "batches": {
@@ -291,8 +291,8 @@
     "suggestions": {
       "title": "Lista de compras",
       "loading": "A criar lista de compras…",
-      "totalStock": "Stock total: {{ amount }} {{ unit }}",
-      "minStock": "Mín: {{ amount }} {{ unit }}",
+      "totalStock": "Stock total: {{ amount }}",
+      "minStock": "Mín: {{ amount }}",
       "empty": "Nada pendente neste momento. Aviso-te quando for necessário reabastecer."
     },
     "share": {

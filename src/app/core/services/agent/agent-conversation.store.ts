@@ -61,10 +61,6 @@ export class AgentConversationStore {
     this.retryAvailableSignal.set(value);
   }
 
-  isRetryAvailable(): boolean {
-    return this.retryAvailableSignal();
-  }
-
   setEntryContext(context: AgentEntryContext): void {
     this.entryContextSignal.set(context);
   }
