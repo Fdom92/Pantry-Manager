@@ -212,6 +212,7 @@ export class EventManagerService {
         if (!this.shouldLogQuantity(quantity)) {
           continue;
         }
+        const expiredAt = new Date(batch.expirationDate).toISOString();
         seen.add(batchKey);
         tasks.push(
           this.eventLog.logExpireEvent({
@@ -221,6 +222,7 @@ export class EventManagerService {
             quantity,
             unit: batch.unit,
             batchId: batch.batchId,
+            timestamp: expiredAt,
             sourceMetadata: {
               batchKey,
               expirationDate: batch.expirationDate,
