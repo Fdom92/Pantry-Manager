@@ -1,14 +1,18 @@
 import { Signal, computed, inject, Injectable, signal } from '@angular/core';
+import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { getItemStatusState } from '@core/domain/pantry';
 import { PantryItem, PantrySummary } from '@core/models/pantry';
 import { MeasurementUnit, StockStatus } from '@core/models/shared';
 import { PantryService } from './pantry.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
+import { EventManagerService } from '../events';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
   // DI
   private readonly pantryService = inject(PantryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly eventManager = inject(EventManagerService);
   // DATA
   private readonly knownMeasurementUnits = new Set(
     Object.values(MeasurementUnit).map(option => option.toLowerCase())
@@ -18,17 +22,21 @@ export class PantryStoreService {
   readonly endReached: Signal<boolean> = this.pantryService.endReached;
   readonly error = signal<string | null>(null);
   private realtimeSubscribed = false;
+  private expiredScanInProgress = false;
   // COMPUTED
   readonly items = computed(() => this.pantryService.activeProducts());
-  readonly expiredItems = computed(() =>
-    this.items().filter(item => this.pantryService.isItemExpired(item))
-  );
-  readonly nearExpiryItems = computed(() =>
-    this.items().filter(item => this.pantryService.isItemNearExpiry(item))
-  );
-  readonly lowStockItems = computed(() =>
-    this.items().filter(item => this.pantryService.isItemLowStock(item))
-  );
+  readonly expiredItems = computed(() => {
+    const now = new Date();
+    return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'expired');
+  });
+  readonly nearExpiryItems = computed(() => {
+    const now = new Date();
+    return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'near-expiry');
+  });
+  readonly lowStockItems = computed(() => {
+    const now = new Date();
+    return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock');
+  });
   readonly summary = computed<PantrySummary>(() => ({
     total: this.items().length,
     expired: this.expiredItems().length,
@@ -43,6 +51,7 @@ export class PantryStoreService {
       this.pantryService.startBackgroundLoad();
       this.watchRealtime();
       this.error.set(null);
+      void this.logExpiredBatchEvents(this.items());
     } catch (err: any) {
       console.error('[PantryStoreService] loadAll error', err);
       this.error.set(err.message || 'Error loading pantry items');
@@ -108,7 +117,9 @@ export class PantryStoreService {
       return;
     }
     this.realtimeSubscribed = true;
-    this.pantryService.watchPantryChanges(() => {});
+    this.pantryService.watchPantryChanges(() => {
+      void this.logExpiredBatchEvents(this.items());
+    });
   }
 
   /** Compute an aggregate stock status based on total quantity and thresholds. */
@@ -160,21 +171,6 @@ export class PantryStoreService {
   /** Earliest expiry date considering all batches. */
   getItemEarliestExpiry(item: PantryItem): string | undefined {
     return this.pantryService.getItemEarliestExpiry(item);
-  }
-
-  /** True when the item is in a low-stock situation. */
-  isItemLowStock(item: PantryItem): boolean {
-    return this.pantryService.isItemLowStock(item);
-  }
-
-  /** True when at least one batch has already expired. */
-  isItemExpired(item: PantryItem): boolean {
-    return this.pantryService.isItemExpired(item);
-  }
-
-  /** True when any batch expires within the near-expiry window. */
-  isItemNearExpiry(item: PantryItem): boolean {
-    return this.pantryService.isItemNearExpiry(item);
   }
 
   /** Flatten all batches associated with an item. */
@@ -229,6 +225,20 @@ export class PantryStoreService {
     }
 
     return undefined;
+  }
+
+  private async logExpiredBatchEvents(items: PantryItem[]): Promise<void> {
+    if (this.expiredScanInProgress) {
+      return;
+    }
+    this.expiredScanInProgress = true;
+    try {
+      await this.eventManager.logExpiredBatches(items);
+    } catch (err) {
+      console.error('[PantryStoreService] logExpiredBatchEvents error', err);
+    } finally {
+      this.expiredScanInProgress = false;
+    }
   }
 
   private buildMergeKey(item: PantryItem): string | null {

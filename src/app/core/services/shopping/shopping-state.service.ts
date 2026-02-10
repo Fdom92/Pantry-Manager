@@ -21,6 +21,7 @@ import jsPDF from 'jspdf';
 import { PantryService } from '../pantry/pantry.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
+import { EventManagerService } from '../events';
 
 @Injectable()
 export class ShoppingStateService {
@@ -29,6 +30,7 @@ export class ShoppingStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly eventManager = inject(EventManagerService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly download = inject(DownloadService);
@@ -85,16 +87,21 @@ export class ShoppingStateService {
   async confirmPurchaseForTarget(data: { quantity: number; expiryDate?: string | null }): Promise<void> {
     const suggestion = this.purchaseTarget();
     const id = suggestion?.item?._id;
-    if (!suggestion || !id || this.isSuggestionProcessing(id)) {
+    const quantity = Number(data.quantity ?? 0);
+    if (!suggestion || !id || this.isSuggestionProcessing(id) || !Number.isFinite(quantity) || quantity <= 0) {
       return;
     }
 
     this.processingSuggestionIds.update(ids => new Set(ids).add(id));
     try {
-      await this.pantryService.addNewLot(id, {
-        quantity: data.quantity,
+      const updated = await this.pantryService.addNewLot(id, {
+        quantity,
         expiryDate: data.expiryDate ?? undefined,
       });
+      if (updated) {
+        await this.pantryStore.updateItem(updated);
+        await this.eventManager.logShoppingAdd(suggestion.item, updated, quantity);
+      }
       await this.pantryStore.loadAll();
       if (this.shoppingAnalysis().summary.total === 0) {
         this.reviewPrompt.markEngagement();

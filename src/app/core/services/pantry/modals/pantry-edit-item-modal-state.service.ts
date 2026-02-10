@@ -13,7 +13,7 @@ import { normalizeEntityName } from '@core/utils/normalization.util';
 import { toDateInputValue, toIsoDate } from '@core/domain/up-to-date';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { MeasurementUnit } from '@core/models/shared';
-import { createDocumentId } from '@core/utils';
+import { createDocumentId, hasMeaningfulItemChanges } from '@core/utils';
 import { formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import {
   normalizeCategoryId,
@@ -24,7 +24,7 @@ import {
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { AppPreferencesService } from '../../settings/app-preferences.service';
-import { EventLogService } from '../../events';
+import { EventManagerService } from '../../events';
 import { PantryStoreService } from '../pantry-store.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryService } from '../pantry.service';
@@ -38,7 +38,7 @@ export class PantryEditItemModalStateService {
   private readonly appPreferences = inject(AppPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly listState = inject(PantryStateService);
-  private readonly eventLog = inject(EventLogService);
+  private readonly eventManager = inject(EventManagerService);
   readonly isOpen = signal(false);
   readonly isSaving = signal(false);
   readonly editingItem = signal<PantryItem | null>(null);
@@ -390,29 +390,16 @@ export class PantryEditItemModalStateService {
       const item = this.buildItemPayload(existing ?? undefined);
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       if (existing) {
-        const previousQuantity = this.pantryStore.getItemTotalQuantity(existing);
+        if (!this.hasMeaningfulChanges(existing, item)) {
+          this.dismiss();
+          return;
+        }
         this.listState.cancelPendingStockSave(item._id);
         await this.pantryStore.updateItem(item);
-        await this.eventLog.logEditEvent({
-          productId: item._id,
-          quantity: totalQuantity,
-          deltaQuantity: totalQuantity - previousQuantity,
-          previousQuantity,
-          nextQuantity: totalQuantity,
-          unit: String(this.pantryStore.getItemPrimaryUnit(item)),
-          source: 'advanced',
-        });
+        await this.eventManager.logAdvancedEdit(existing, item);
       } else {
         await this.pantryStore.addItem(item);
-        await this.eventLog.logAddEvent({
-          productId: item._id,
-          quantity: totalQuantity,
-          deltaQuantity: totalQuantity,
-          previousQuantity: 0,
-          nextQuantity: totalQuantity,
-          unit: String(this.pantryStore.getItemPrimaryUnit(item)),
-          source: 'advanced',
-        });
+        await this.eventManager.logAdvancedCreate(item);
       }
 
       this.dismiss();
@@ -420,6 +407,10 @@ export class PantryEditItemModalStateService {
       this.isSaving.set(false);
       console.error('[PantryEditItemModalStateService] submitItem error', err);
     }
+  }
+
+  private hasMeaningfulChanges(existing: PantryItem, next: PantryItem): boolean {
+    return hasMeaningfulItemChanges(existing, next);
   }
 
   private resetBatchControls(batches: Array<Partial<ItemBatch>>): void {

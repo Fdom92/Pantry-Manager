@@ -1,0 +1,89 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ 'history.title' | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="summary-bar" [attr.aria-label]="'history.filters.title' | translate">
+    <div class="summary-chips" role="tablist">
+      @for (chip of facade.filterChips(); track chip.key) {
+        <ion-chip
+          class="status-chip"
+          [class.active]="chip.active"
+          [ngClass]="chip.colorClass"
+          button="true"
+          size="small"
+          (click)="facade.setFilter(chip.key)"
+          [attr.aria-pressed]="chip.active"
+          [attr.aria-label]="(chip.labelKey | translate) + ' (' + chip.count + ')'">
+          <ion-icon [name]="chip.icon"></ion-icon>
+          <div class="chip-body">
+            <span class="chip-label">{{ chip.labelKey | translate }}</span>
+            <span class="chip-count">{{ chip.count }}</span>
+          </div>
+        </ion-chip>
+      }
+    </div>
+  </div>
+  @if (facade.loading() && facade.events().length === 0) {
+    <div class="skeleton-list">
+      @for (placeholder of facade.skeletonPlaceholders; track placeholder) {
+        <ion-card class="skeleton-card">
+          <ion-card-content>
+            <ion-skeleton-text animated style="width: 40%; height: 16px; margin-bottom: 10px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 75%; height: 14px; margin-bottom: 6px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 55%; height: 12px;"></ion-skeleton-text>
+          </ion-card-content>
+        </ion-card>
+      }
+    </div>
+  } @else if (facade.events().length === 0) {
+    <app-empty-state
+      class="list-empty-state"
+      icon="time-outline"
+      [titleKey]="'history.empty.title'"
+      [subtitleKey]="'history.empty.subtitle'">
+    </app-empty-state>
+  } @else if (facade.eventCards().length === 0) {
+    <app-empty-state
+      class="list-empty-state"
+      icon="filter-outline"
+      [titleKey]="'history.empty.filtered.title'"
+      [subtitleKey]="'history.empty.filtered.subtitle'">
+    </app-empty-state>
+  } @else {
+    <div class="timeline">
+      @for (group of facade.groupedEvents(); track group.key) {
+        <section class="timeline-day">
+          <div class="timeline-day__label">{{ group.label }}</div>
+          <div class="timeline-day__events">
+            @for (card of group.events; track card.id) {
+              <div class="timeline-event" [ngClass]="'timeline-event--' + card.kind">
+                <div class="timeline-event__dot"></div>
+                <div class="timeline-event__content">
+                  <div class="timeline-event__row">
+                    <div class="timeline-event__title">{{ card.title }}</div>
+                    <div class="timeline-event__quantity">{{ card.quantityLabel }}</div>
+                  </div>
+                  <div class="timeline-event__row timeline-event__row--meta">
+                    <div class="timeline-event__subtitle">{{ card.subtitle }}</div>
+                    <div class="timeline-event__time">{{ card.timeLabel }}</div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+  @if (facade.canSeeMore()) {
+    <div class="pro-pill">
+      <ion-chip color="primary" button="true" (click)="goToUpgrade()">
+        <ion-icon name="sparkles-outline"></ion-icon>
+        <ion-label>{{ 'history.pro.cta' | translate }}</ion-label>
+      </ion-chip>
+    </div>
+  }
+</ion-content>

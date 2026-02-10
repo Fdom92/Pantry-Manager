@@ -1,6 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { getItemStatusState } from '@core/domain/pantry';
 import { toNumberOrZero } from '@core/domain/pantry';
 import type {
   Insight,
@@ -14,7 +15,7 @@ import { AgentConversationStore } from '../agent/agent-conversation.store';
 import { LanguageService } from '../shared/language.service';
 import { ConfirmService, withSignalFlag } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { EventLogService } from '../events';
+import { EventManagerService } from '../events';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { PantryService } from '../pantry/pantry.service';
 import { InsightService } from './insight.service';
@@ -42,7 +43,7 @@ export class DashboardStateService {
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventLog = inject(EventLogService);
+  private readonly eventManager = inject(EventManagerService);
 
   private hasCompletedInitialLoad = false;
 
@@ -295,32 +296,14 @@ export class DashboardStateService {
       return;
     }
     await withSignalFlag(this.consumeSaving, async () => {
-      const updates: PantryItem[] = [];
-      const eventPromises: Promise<unknown>[] = [];
       for (const entry of entries) {
         const updated = this.applyConsumeToday(entry.item, entry.quantity);
         if (!updated) {
           continue;
         }
-        const previousQuantity = this.pantryStore.getItemTotalQuantity(entry.item);
-        const nextQuantity = this.pantryStore.getItemTotalQuantity(updated);
-        updates.push(updated);
-        eventPromises.push(
-          this.eventLog.logConsumeEvent({
-            productId: entry.item._id,
-            quantity: entry.quantity,
-            deltaQuantity: -entry.quantity,
-            previousQuantity,
-            nextQuantity,
-            unit: String(this.pantryStore.getItemPrimaryUnit(entry.item)),
-            source: 'consume',
-          })
-        );
+        await this.pantryStore.updateItem(updated);
+        await this.eventManager.logConsumeDashboard(entry.item, updated, entry.quantity);
       }
-      await Promise.all([
-        ...updates.map(item => this.pantryStore.updateItem(item)),
-        ...eventPromises,
-      ]);
     }).catch(err => {
       console.error('[DashboardStateService] consume today error', err);
     });
@@ -342,7 +325,12 @@ export class DashboardStateService {
     }
 
     await withSignalFlag(this.isDeletingExpiredItems, async () => {
-      await this.pantryStore.deleteExpiredItems();
+      const expiredItems = this.expiredItems();
+      if (!expiredItems.length) {
+        return;
+      }
+
+      await Promise.all(expiredItems.map(item => this.pantryStore.deleteItem(item._id)));
     }).catch(err => {
       console.error('[DashboardStateService] deleteExpiredItems error', err);
     });
@@ -496,11 +484,12 @@ export class DashboardStateService {
     }
 
     const pendingReviewProducts = this.insightService.getPendingReviewProducts(items);
+    const now = new Date();
 
     const context: InsightContext = {
       expiringSoonItems: expiringSoon.map(item => ({
         id: item._id,
-        isLowStock: this.pantryStore.isItemLowStock(item),
+        isLowStock: getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock',
         quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       expiredItems: expiredItems.map(item => ({

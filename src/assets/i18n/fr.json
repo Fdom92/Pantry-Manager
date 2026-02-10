@@ -112,6 +112,43 @@
       "title": "Liste d’achats vide"
     }
   },
+  "history": {
+    "title": "Historique",
+    "pro": {
+      "cta": "Voir plus d’événements avec PRO"
+    },
+    "filters": {
+      "title": "Filtres de l’historique",
+      "all": "Tout",
+      "added": "Ajoutés",
+      "consumed": "Consommés",
+      "edited": "Modifiés",
+      "expired": "Expirés",
+      "deleted": "Supprimés",
+      "imported": "Importés"
+    },
+    "eventTypes": {
+      "added": "Ajouté",
+      "consumed": "Consommé",
+      "expired": "Expiré",
+      "edited": "Modifié",
+      "deleted": "Supprimé",
+      "imported": "Importé"
+    },
+    "event": {
+      "unknownProduct": "Produit inconnu",
+      "importTitle": "Importation",
+      "editedTitle": "Modifié"
+    },
+    "empty": {
+      "title": "Aucun historique",
+      "subtitle": "Ajoutez et consommez des produits pour voir l’activité.",
+      "filtered": {
+        "title": "Aucun événement correspondant",
+        "subtitle": "Essayez un autre filtre."
+      }
+    }
+  },
   "locations": {
     "pantry": "Garde-manger"
   },

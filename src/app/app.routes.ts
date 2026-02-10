@@ -17,6 +17,11 @@ export const routes: Routes = [
           import('@features/pantry/pantry.component').then(m => m.PantryComponent),
       },
       {
+        path: 'history',
+        loadComponent: () =>
+          import('@features/history/history.component').then(m => m.HistoryComponent),
+      },
+      {
         path: 'shopping',
         loadComponent: () =>
           import('@features/shopping/shopping.component').then(m => m.ShoppingComponent),

@@ -1,6 +1,7 @@
 export * from './agent';
 export * from './dashboard';
 export * from './events';
+export * from './history';
 export * from './migration';
 export * from './onboarding';
 export * from './pantry';

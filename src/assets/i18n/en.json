@@ -112,6 +112,43 @@
       "title": "Shopping list is clear"
     }
   },
+  "history": {
+    "title": "History",
+    "pro": {
+      "cta": "See more events with PRO"
+    },
+    "filters": {
+      "title": "History filters",
+      "all": "All",
+      "added": "Added",
+      "consumed": "Consumed",
+      "edited": "Edited",
+      "expired": "Expired",
+      "deleted": "Deleted",
+      "imported": "Imported"
+    },
+    "eventTypes": {
+      "added": "Added",
+      "consumed": "Consumed",
+      "expired": "Expired",
+      "edited": "Edited",
+      "deleted": "Deleted",
+      "imported": "Imported"
+    },
+    "event": {
+      "unknownProduct": "Unknown item",
+      "importTitle": "Import",
+      "editedTitle": "Edited"
+    },
+    "empty": {
+      "title": "No history yet",
+      "subtitle": "Start adding and consuming items to see activity here.",
+      "filtered": {
+        "title": "No matching events",
+        "subtitle": "Try another filter to see more activity."
+      }
+    }
+  },
   "locations": {
     "pantry": "Pantry"
   },

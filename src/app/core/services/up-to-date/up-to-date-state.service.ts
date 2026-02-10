@@ -11,9 +11,10 @@ import { AppPreferencesService } from '../settings/app-preferences.service';
 import { LanguageService } from '../shared/language.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { withSignalFlag } from '../shared';
-import { EventLogService } from '../events';
+import { EventManagerService } from '../events';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { normalizeCategoryId, normalizeEntityName, normalizeKey } from '@core/utils/normalization.util';
+import { hasMeaningfulItemChanges } from '@core/utils';
 
 @Injectable()
 export class UpToDateStateService {
@@ -24,7 +25,7 @@ export class UpToDateStateService {
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventLog = inject(EventLogService);
+  private readonly eventManager = inject(EventManagerService);
 
   // SIGNALS
   readonly isLoading = signal(false);
@@ -357,18 +358,13 @@ export class UpToDateStateService {
         patch,
         primaryUnit: String(this.pantryStore.getItemPrimaryUnit(item)),
       });
-      const previousQuantity = this.pantryStore.getItemTotalQuantity(item);
-      const nextQuantity = this.pantryStore.getItemTotalQuantity(updated);
+      if (!this.hasMeaningfulChanges(item, updated)) {
+        this.closeEditModalInternal(true);
+        this.completeAndAdvance(id, snapshot);
+        return;
+      }
       await this.pantryStore.updateItem(updated);
-      await this.eventLog.logEditEvent({
-        productId: updated._id,
-        quantity: nextQuantity,
-        deltaQuantity: nextQuantity - previousQuantity,
-        previousQuantity,
-        nextQuantity,
-        unit: String(this.pantryStore.getItemPrimaryUnit(updated)),
-        source: 'quick-edit',
-      });
+      await this.eventManager.logQuickEdit(item, updated);
       this.closeEditModalInternal(true);
       this.completeAndAdvance(id, snapshot);
     });
@@ -386,6 +382,10 @@ export class UpToDateStateService {
     this.editTargetId.set(null);
     this.editCategory.set('');
     this.editExpiryDate.set('');
+  }
+
+  private hasMeaningfulChanges(previous: PantryItem, next: PantryItem): boolean {
+    return hasMeaningfulItemChanges(previous, next);
   }
 
   private markBusy(id: string, busy: boolean): void {
