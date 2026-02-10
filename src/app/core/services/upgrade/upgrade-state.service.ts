@@ -22,7 +22,11 @@ export class UpgradeStateService {
 
   private monthlyPriceValue: number | null = null;
   private annualPriceValue: number | null = null;
-  private readonly benefitKeys = ['upgrade.benefits.agent', 'upgrade.benefits.future'];
+  private readonly benefitKeys = [
+    'upgrade.benefits.agent',
+    'upgrade.benefits.history',
+    'upgrade.benefits.future',
+  ];
   private readonly availablePackages: PurchasesPackage[] = [];
 
   async ionViewWillEnter(): Promise<void> {

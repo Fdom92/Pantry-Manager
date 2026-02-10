@@ -115,7 +115,7 @@
   "history": {
     "title": "History",
     "pro": {
-      "cta": "See more events with PRO"
+      "cta": "Unlock full history with PRO"
     },
     "filters": {
       "title": "History filters",
@@ -589,6 +589,7 @@
     "subtitle": "Smarter automation and priority features.",
     "benefits": {
       "agent": "AI meal planner that proposes menus and recipes tailored to you.",
+      "history": "Unlock your full pantry history.",
       "future": "Early access to upcoming PRO features."
     },
     "actions": {
@@ -620,7 +621,7 @@
     "title": "Settings",
     "pro": {
       "statusDescription": "Thank you for supporting the project. PRO is active on this device.",
-      "upgradePrompt": "Upgrade to PRO to unlock premium features.",
+      "upgradePrompt": "Upgrade to PRO to unlock your full history and premium features.",
       "upgradeCta": "Upgrade to PRO",
       "badgePro": "PRO active"
     },

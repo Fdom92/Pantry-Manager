@@ -115,7 +115,7 @@
   "history": {
     "title": "Cronologia",
     "pro": {
-      "cta": "Vedi più eventi con PRO"
+      "cta": "Sblocca lo storico completo con PRO"
     },
     "filters": {
       "title": "Filtri cronologia",
@@ -589,6 +589,7 @@
     "subtitle": "Automazioni intelligenti e funzionalità prioritarie.",
     "benefits": {
       "agent": "Pianificatore AI che propone menù e ricette su misura per te.",
+      "history": "Sblocca lo storico completo della dispensa.",
       "future": "Accesso anticipato alle nuove funzionalità PRO."
     },
     "actions": {
@@ -620,7 +621,7 @@
     "title": "Impostazioni",
     "pro": {
       "statusDescription": "Grazie per supportare il progetto. PRO è attivo su questo dispositivo.",
-      "upgradePrompt": "Passa a PRO per sbloccare funzionalità premium.",
+      "upgradePrompt": "Passa a PRO per sbloccare lo storico completo e le funzionalità premium.",
       "upgradeCta": "Passa a PRO",
       "badgePro": "PRO attivo"
     },

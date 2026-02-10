@@ -115,7 +115,7 @@
   "history": {
     "title": "Historial",
     "pro": {
-      "cta": "Ver más eventos con PRO"
+      "cta": "Desbloquea el historial completo con PRO"
     },
     "filters": {
       "title": "Filtros del historial",
@@ -579,6 +579,7 @@
     "subtitle": "Automatización inteligente y funciones prioritarias.",
     "benefits": {
       "agent": "Planificador con IA para proponerte menús y recetas a tu medida.",
+      "history": "Desbloquea el historial completo de tu despensa.",
       "future": "Acceso anticipado a futuras funciones PRO."
     },
     "actions": {
@@ -610,7 +611,7 @@
     "title": "Ajustes",
     "pro": {
       "statusDescription": "Gracias por apoyar el proyecto. PRO está activo en este dispositivo.",
-      "upgradePrompt": "Hazte PRO para desbloquear funciones premium.",
+      "upgradePrompt": "Hazte PRO para desbloquear el historial completo y funciones premium.",
       "upgradeCta": "Hazte PRO",
       "badgePro": "PRO activo"
     },

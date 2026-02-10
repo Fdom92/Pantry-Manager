@@ -115,7 +115,7 @@
   "history": {
     "title": "Historique",
     "pro": {
-      "cta": "Voir plus d’événements avec PRO"
+      "cta": "Débloquez l’historique complet avec PRO"
     },
     "filters": {
       "title": "Filtres de l’historique",
@@ -589,6 +589,7 @@
     "subtitle": "Automatisation intelligente et fonctionnalités prioritaires.",
     "benefits": {
       "agent": "Planificateur IA qui vous propose des menus et des recettes sur mesure.",
+      "history": "Débloquez l’historique complet de votre garde-manger.",
       "future": "Accès anticipé aux futures fonctionnalités PRO."
     },
     "actions": {
@@ -620,7 +621,7 @@
     "title": "Paramètres",
     "pro": {
       "statusDescription": "Merci de soutenir le projet. PRO est actif sur cet appareil.",
-      "upgradePrompt": "Passez en PRO pour débloquer les fonctionnalités premium.",
+      "upgradePrompt": "Passez en PRO pour débloquer l’historique complet et les fonctionnalités premium.",
       "upgradeCta": "Passer en PRO",
       "badgePro": "PRO actif"
     },
