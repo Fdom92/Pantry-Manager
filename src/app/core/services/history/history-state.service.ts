@@ -176,7 +176,7 @@ export class HistoryStateService {
     const meta = getHistoryEventMeta(event);
     const subtitle = this.translate.instant(meta.subtitleKey);
     const quantityLabel = meta.showQuantity ? this.buildQuantityLabel(event, locale, meta.signedQuantity) : '';
-    const timeLabel = formatTimeValue(event.timestamp, locale, { fallback: '' });
+    const timeLabel = meta.kind === 'expired' ? '' : formatTimeValue(event.timestamp, locale, { fallback: '' });
 
     return {
       id: event._id,
