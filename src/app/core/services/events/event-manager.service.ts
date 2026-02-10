@@ -41,7 +41,6 @@ export class EventManagerService {
     return this.eventLog.logAddEvent({
       productId: item._id,
       productName: item.name,
-      entityType: 'product',
       quantity: addedQuantity,
       deltaQuantity: addedQuantity,
       previousQuantity: 0,
@@ -62,7 +61,6 @@ export class EventManagerService {
     return this.eventLog.logAddEvent({
       productId: updatedItem._id,
       productName: updatedItem.name,
-      entityType: 'product',
       quantity: addedQuantity,
       deltaQuantity: addedQuantity,
       previousQuantity,
@@ -78,7 +76,6 @@ export class EventManagerService {
     return this.eventLog.logAddEvent({
       productId: updatedItem._id,
       productName: updatedItem.name,
-      entityType: 'product',
       quantity: addedQuantity,
       deltaQuantity: addedQuantity,
       previousQuantity,
@@ -95,7 +92,6 @@ export class EventManagerService {
     return this.eventLog.logAddEvent({
       productId: item._id,
       productName: item.name,
-      entityType: 'product',
       quantity: totalQuantity,
       deltaQuantity: totalQuantity,
       previousQuantity: 0,
@@ -110,7 +106,6 @@ export class EventManagerService {
     return this.eventLog.logEditEvent({
       productId: updatedItem._id,
       productName: updatedItem.name,
-      entityType: 'product',
       quantity: nextQuantity,
       deltaQuantity: nextQuantity - previousQuantity,
       previousQuantity,
@@ -125,7 +120,6 @@ export class EventManagerService {
     return this.eventLog.logEditEvent({
       productId: updatedItem._id,
       productName: updatedItem.name,
-      entityType: 'product',
       quantity: nextQuantity,
       deltaQuantity: nextQuantity - previousQuantity,
       previousQuantity,
@@ -140,7 +134,6 @@ export class EventManagerService {
     return this.eventLog.logConsumeEvent({
       productId: updatedItem._id,
       productName: previousItem.name,
-      entityType: 'product',
       quantity: consumedQuantity,
       deltaQuantity: -consumedQuantity,
       previousQuantity,
@@ -163,7 +156,6 @@ export class EventManagerService {
       return this.eventLog.logAddEvent({
         productId: updatedItem._id,
         productName: previousItem?.name ?? updatedItem.name,
-        entityType: 'product',
         quantity,
         deltaQuantity,
         previousQuantity,
@@ -175,7 +167,6 @@ export class EventManagerService {
     return this.eventLog.logConsumeEvent({
       productId: updatedItem._id,
       productName: previousItem?.name ?? updatedItem.name,
-      entityType: 'product',
       quantity,
       deltaQuantity,
       previousQuantity,
@@ -212,15 +203,16 @@ export class EventManagerService {
         if (!this.shouldLogQuantity(quantity)) {
           continue;
         }
+        const expiredAt = new Date(batch.expirationDate).toISOString();
         seen.add(batchKey);
         tasks.push(
           this.eventLog.logExpireEvent({
             productId: item._id,
             productName: item.name,
-            entityType: 'product',
             quantity,
             unit: batch.unit,
             batchId: batch.batchId,
+            timestamp: expiredAt,
             sourceMetadata: {
               batchKey,
               expirationDate: batch.expirationDate,
@@ -240,7 +232,6 @@ export class EventManagerService {
     return this.eventLog.logDeleteEvent({
       productId: item._id,
       productName: item.name,
-      entityType: 'product',
       quantity: totalQuantity,
       deltaQuantity: -totalQuantity,
       previousQuantity: totalQuantity,
@@ -249,19 +240,4 @@ export class EventManagerService {
     });
   }
 
-  logImportGlobal(totalItems: number) {
-    return this.eventLog.logImportEvent({
-      productId: 'import',
-      entityType: 'import',
-      quantity: totalItems,
-      deltaQuantity: totalItems,
-      previousQuantity: 0,
-      nextQuantity: totalItems,
-      unit: MeasurementUnit.UNIT,
-      sourceMetadata: {
-        importItemCount: totalItems,
-      },
-      timestamp: new Date().toISOString(),
-    });
-  }
 }

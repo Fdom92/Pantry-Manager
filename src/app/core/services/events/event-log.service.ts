@@ -57,13 +57,6 @@ export class EventLogService extends StorageService<PantryEvent> {
     });
   }
 
-  async logImportEvent(params: BaseEventParams): Promise<PantryEvent | null> {
-    return this.logEvent({
-      eventType: 'IMPORT',
-      ...params,
-    });
-  }
-
   async logEvent(params: EventParams): Promise<PantryEvent | null> {
     const now = params.timestamp ?? new Date().toISOString();
     const quantities = buildEventQuantities(params);
@@ -73,7 +66,6 @@ export class EventLogService extends StorageService<PantryEvent> {
       eventType: params.eventType,
       productId: params.productId,
       productName: params.productName,
-      entityType: params.entityType,
       quantity: quantities.quantity,
       deltaQuantity: quantities.deltaQuantity,
       previousQuantity: quantities.previousQuantity,
