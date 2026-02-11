@@ -1,17 +1,4 @@
-export type SetupStepKey = 'locations' | 'categories';
-
-export interface SetupOption {
-  id: string;
-  labelKey: string;
-}
-
-export interface SetupStep {
-  key: SetupStepKey;
-  titleKey: string;
-  descriptionKey: string;
-  icon: string;
-  options: SetupOption[];
-}
+import { SetupOption, SetupStep } from '@core/models/setup';
 
 export const SETUP_LOCATION_OPTIONS: SetupOption[] = [
   { id: 'pantry', labelKey: 'setup.locations.options.pantry' },

@@ -6,6 +6,10 @@ export interface LatestOnlyRunner {
   isDestroyed(): boolean;
 }
 
+export function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /**
  * Runs async tasks in "latest-only" mode and cancels everything on destroy.
  * Useful to avoid late UI updates (toasts, navigation, signal updates) after route changes.

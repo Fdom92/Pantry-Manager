@@ -1,21 +1,11 @@
 import { collectBatches } from '@core/domain/pantry';
 import type { PantryItem } from '@core/models/pantry';
 import type { QuickEditPatch } from '@core/models/up-to-date';
-
-export function normalizeId(value?: string | null): string {
-  return (value ?? '').trim();
-}
+import { normalizeTrim } from '@core/utils/normalization.util';
+import { toDateInputValue, toIsoDate } from '@core/utils/date.util';
 
 export function hasAnyExpiryDate(item: PantryItem): boolean {
   return collectBatches(item.batches ?? []).some(batch => Boolean(batch.expirationDate));
-}
-
-export function toDateInputValue(dateIso: string): string {
-  try {
-    return new Date(dateIso).toISOString().slice(0, 10);
-  } catch {
-    return '';
-  }
 }
 
 export function getFirstExpiryDateInput(item: PantryItem | null): string {
@@ -23,7 +13,7 @@ export function getFirstExpiryDateInput(item: PantryItem | null): string {
     return '';
   }
   for (const batch of collectBatches(item.batches ?? [])) {
-    const iso = normalizeId(batch.expirationDate);
+    const iso = normalizeTrim(batch.expirationDate);
     if (iso) {
       return toDateInputValue(iso);
     }
@@ -31,25 +21,15 @@ export function getFirstExpiryDateInput(item: PantryItem | null): string {
   return '';
 }
 
-export function toIsoDate(dateInput: string): string | null {
-  const trimmed = dateInput.trim();
-  if (!trimmed) {
-    return null;
-  }
-  const date = new Date(trimmed);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-  return date.toISOString();
-}
-
 export function applyQuickEdit(params: {
   item: PantryItem;
   patch: QuickEditPatch;
-  primaryUnit: string;
+  nowIso: string;
 }): PantryItem {
-  const { item, patch } = params;
-  const nextCategory = patch.needsCategory ? patch.categoryId.trim() : (item.categoryId ?? '').trim();
+  const { item, patch, nowIso } = params;
+  const nextCategory = patch.needsCategory
+    ? normalizeTrim(patch.categoryId)
+    : normalizeTrim(item.categoryId);
   const nextBatches = Array.isArray(item.batches) ? item.batches.map(batch => ({ ...batch })) : [];
 
   if (patch.needsExpiry) {
@@ -59,7 +39,7 @@ export function applyQuickEdit(params: {
         categoryId: nextCategory,
         batches: nextBatches,
         noExpiry: true,
-        updatedAt: new Date().toISOString(),
+        updatedAt: nowIso,
       };
     }
 
@@ -71,7 +51,6 @@ export function applyQuickEdit(params: {
       } else {
         nextBatches.push({
           quantity: 0,
-          unit: params.primaryUnit,
           expirationDate: iso,
         });
       }
@@ -83,6 +62,6 @@ export function applyQuickEdit(params: {
     categoryId: nextCategory,
     batches: nextBatches,
     noExpiry: patch.needsExpiry ? false : item.noExpiry,
-    updatedAt: new Date().toISOString(),
+    updatedAt: nowIso,
   };
 }

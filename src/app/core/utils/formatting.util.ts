@@ -1,40 +1,39 @@
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models/shared';
 
-export interface QuantityFormatOptions {
-  decimals?: number;
-  minimumFractionDigits?: number;
-  maximumFractionDigits?: number;
-  fallback?: string;
-}
-
 export interface DateFormatOptions {
   fallback?: string;
 }
 
-export function roundQuantity(value: number | null | undefined, decimals = 2): number {
+export function roundQuantity(value: number | null | undefined): number {
   const num = Number(value ?? 0);
   if (!Number.isFinite(num)) {
     return 0;
   }
-  const factor = 10 ** decimals;
-  return Math.round(num * factor) / factor;
+  return Math.round(num);
 }
 
 export function formatQuantity(
   value: number | null | undefined,
-  locale: string,
-  options?: QuantityFormatOptions
+  locale: string
 ): string {
-  const decimals = options?.decimals ?? options?.maximumFractionDigits ?? 2;
-  const rounded = roundQuantity(value, decimals);
-  if (!Number.isFinite(rounded)) {
-    return options?.fallback ?? '0';
-  }
+  const rounded = roundQuantity(value);
   const formatter = new Intl.NumberFormat(locale, {
-    minimumFractionDigits: options?.minimumFractionDigits ?? 0,
-    maximumFractionDigits: options?.maximumFractionDigits ?? decimals,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   });
   return formatter.format(rounded);
+}
+
+function toDateOrNull(value: string | Date | null | undefined): Date | null {
+  if (!value) {
+    return null;
+  }
+  const date = typeof value === 'string' ? new Date(value) : value;
+  return Number.isFinite(date.getTime()) ? date : null;
+}
+
+function fallbackDateString(value: string | Date | null | undefined, fallback: string): string {
+  return fallback || (typeof value === 'string' ? value : '');
 }
 
 export function formatDateValue(
@@ -46,19 +45,8 @@ export function formatDateValue(
   if (!value) {
     return fallback;
   }
-  const date = typeof value === 'string' ? new Date(value) : value;
-  if (!Number.isFinite(date.getTime())) {
-    return fallback || (typeof value === 'string' ? value : '');
-  }
-  return date.toLocaleDateString(locale, options);
-}
-
-export function formatShortDate(
-  value: string | Date | null | undefined,
-  locale: string,
-  options?: DateFormatOptions
-): string {
-  return formatDateValue(value, locale, ES_DATE_FORMAT_OPTIONS.numeric, options);
+  const date = toDateOrNull(value);
+  return date ? date.toLocaleDateString(locale, options) : fallbackDateString(value, fallback);
 }
 
 export function formatDateTimeValue(
@@ -76,9 +64,9 @@ export function formatDateTimeValue(
   if (!value) {
     return fallback;
   }
-  const date = typeof value === 'string' ? new Date(value) : value;
-  if (!Number.isFinite(date.getTime())) {
-    return fallback || (typeof value === 'string' ? value : '');
+  const date = toDateOrNull(value);
+  if (!date) {
+    return fallbackDateString(value, fallback);
   }
   const datePart = date.toLocaleDateString(locale, dateOptions);
   const timePart = date.toLocaleTimeString(locale, timeOptions);
@@ -98,9 +86,6 @@ export function formatTimeValue(
   if (!value) {
     return fallback;
   }
-  const date = typeof value === 'string' ? new Date(value) : value;
-  if (!Number.isFinite(date.getTime())) {
-    return fallback || (typeof value === 'string' ? value : '');
-  }
-  return date.toLocaleTimeString(locale, timeOptions);
+  const date = toDateOrNull(value);
+  return date ? date.toLocaleTimeString(locale, timeOptions) : fallbackDateString(value, fallback);
 }

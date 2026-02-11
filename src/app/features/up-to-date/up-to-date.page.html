@@ -146,7 +146,7 @@
                       [value]="facade.editCategory()"
                       [clearOnSelect]="false"
                       (valueChange)="facade.onEditCategoryValueChange($event)"
-                      (onSelect)="facade.onEditCategorySelect($event)"
+                      (optionSelected)="facade.onEditCategorySelect($event)"
                       (emptyAction)="facade.addCategoryOptionFromText($event)">
                     </app-entity-autocomplete>
                   </div>

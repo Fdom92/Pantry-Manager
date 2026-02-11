@@ -31,7 +31,7 @@
                   {{ state.formatBatchDate(entry.batch) }}
                 </h3>
                 <p>
-                  {{ state.formatBatchQuantity(entry.batch, entry.locationUnit) }}
+                  {{ state.formatBatchQuantity(entry.batch) }}
                   @if (entry.locationLabel && entry.locationId !== 'unassigned') {
                     · {{ entry.locationLabel }}
                   }

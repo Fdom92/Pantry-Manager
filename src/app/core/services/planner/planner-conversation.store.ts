@@ -1,12 +1,10 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { AgentConversationInit, AgentEntryContext, AgentMessage, AgentPhase, AgentRole } from '@core/models/agent';
 import { createDocumentId } from '@core/utils';
-import { appendWithUserDedupe, isVisibleAgentMessage } from './conversation.utils';
-
 @Injectable({
   providedIn: 'root',
 })
-export class AgentConversationStore {
+export class PlannerConversationStore {
   private readonly historySignal = signal<AgentMessage[]>([]);
   private readonly thinkingSignal = signal(false);
   private readonly agentPhaseSignal = signal<AgentPhase>('idle');
@@ -14,11 +12,11 @@ export class AgentConversationStore {
   private readonly entryContextSignal = signal<AgentEntryContext>(AgentEntryContext.PLANNING);
   private readonly pendingConversationInitSignal = signal<AgentConversationInit | null>(null);
 
-  readonly messages = computed(() => this.historySignal().filter(message => isVisibleAgentMessage(message)));
+  readonly messages = computed(() => this.historySignal().filter(message => this.isVisibleMessage(message)));
   readonly thinking = this.thinkingSignal.asReadonly();
-  readonly agentPhase = computed(() => this.agentPhaseSignal());
-  readonly canRetry = computed(() => this.retryAvailableSignal());
-  readonly entryContext = computed(() => this.entryContextSignal());
+  readonly agentPhase = this.agentPhaseSignal.asReadonly();
+  readonly canRetry = this.retryAvailableSignal.asReadonly();
+  readonly entryContext = this.entryContextSignal.asReadonly();
 
   getHistorySnapshot(): AgentMessage[] {
     return this.historySignal();
@@ -35,7 +33,7 @@ export class AgentConversationStore {
   appendMessage(message: AgentMessage, options?: { dedupe?: boolean }): void {
     const dedupe = options?.dedupe ?? true;
     this.historySignal.update(history =>
-      dedupe ? appendWithUserDedupe(history, message) : [...history, message]
+      dedupe ? this.appendWithUserDedupe(history, message) : [...history, message]
     );
   }
 
@@ -61,16 +59,21 @@ export class AgentConversationStore {
     this.retryAvailableSignal.set(value);
   }
 
-  isRetryAvailable(): boolean {
-    return this.retryAvailableSignal();
-  }
-
   setEntryContext(context: AgentEntryContext): void {
     this.entryContextSignal.set(context);
   }
 
   getEntryContext(): AgentEntryContext {
     return this.entryContextSignal();
+  }
+
+  findLastUserMessageIndex(history: AgentMessage[] = this.historySignal()): number {
+    for (let i = history.length - 1; i >= 0; i -= 1) {
+      if (history[i]?.role === 'user') {
+        return i;
+      }
+    }
+    return -1;
   }
 
   setPendingConversationInit(init: AgentConversationInit | null): void {
@@ -95,6 +98,24 @@ export class AgentConversationStore {
       status,
       createdAt: new Date().toISOString(),
     };
+  }
+
+  private isVisibleMessage(message: AgentMessage): boolean {
+    return !message.uiHidden;
+  }
+
+  private appendWithUserDedupe(history: AgentMessage[], message: AgentMessage): AgentMessage[] {
+    if (message.role !== 'user') {
+      return [...history, message];
+    }
+    if (!history.length) {
+      return [...history, message];
+    }
+    const last = history[history.length - 1];
+    if (last.role === message.role && last.content === message.content) {
+      return [...history.slice(0, -1), message];
+    }
+    return [...history, message];
   }
 
 }

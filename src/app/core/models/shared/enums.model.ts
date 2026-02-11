@@ -1,12 +1,3 @@
-export enum MeasurementUnit {
-  GRAM = 'g',
-  KILOGRAM = 'kg',
-  LITER = 'l',
-  MILLILITER = 'ml',
-  PACKAGE = 'paquete',
-  UNIT = 'unidad',
-}
-
 export enum LocationType {
   PANTRY = 'pantry',
   KITCHEN = 'kitchen',

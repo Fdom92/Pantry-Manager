@@ -4,12 +4,12 @@ import type { AppThemePreference } from '@core/models';
 import type { BaseDoc } from '@core/models/shared';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfirmService, DownloadService, ShareService, createLatestOnlyRunner, withSignalFlag } from '../shared';
+import { ConfirmService, DownloadService, ShareService, createLatestOnlyRunner, runIfIdle, shouldSkipShareOutcome, withSignalFlag } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { StorageService } from '../shared/storage.service';
-import { RevenuecatService } from '../upgrade/revenuecat.service';
-import { AppPreferencesService } from './app-preferences.service';
-import { PantryMigrationService } from '../migration/pantry-migration.service';
+import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
+import { SettingsPreferencesService } from './settings-preferences.service';
+import { MigrationPantryService } from '../migration/migration-pantry.service';
 
 @Injectable()
 export class SettingsStateService {
@@ -17,9 +17,9 @@ export class SettingsStateService {
   private readonly lifecycle = createLatestOnlyRunner(this.destroyRef);
   private readonly translate = inject(TranslateService);
   private readonly storage = inject<StorageService<BaseDoc>>(StorageService);
-  private readonly appPreferences = inject(AppPreferencesService);
-  private readonly migrationService = inject(PantryMigrationService);
-  private readonly revenuecat = inject(RevenuecatService);
+  private readonly appPreferences = inject(SettingsPreferencesService);
+  private readonly migrationService = inject(MigrationPantryService);
+  private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly navCtrl = inject(NavController);
   private readonly download = inject(DownloadService);
   private readonly confirm = inject(ConfirmService);
@@ -35,7 +35,11 @@ export class SettingsStateService {
   readonly isUpdatingTheme = signal(false);
 
   async ionViewWillEnter(): Promise<void> {
-    await this.ensurePreferencesLoaded();
+    try {
+      await this.appPreferences.getPreferences();
+    } catch (err) {
+      console.error('[SettingsStateService] ensurePreferencesLoaded error', err);
+    }
   }
 
   async resetApplicationData(): Promise<void> {
@@ -45,7 +49,7 @@ export class SettingsStateService {
       return;
     }
 
-    await withSignalFlag(this.isResettingData, async () => {
+    await runIfIdle(this.isResettingData, async () => {
       await this.storage.clearAll();
       await this.appPreferences.reload();
       if (this.lifecycle.isDestroyed()) {
@@ -69,11 +73,7 @@ export class SettingsStateService {
     if (typeof document === 'undefined') {
       return;
     }
-    if (this.isExportingData()) {
-      return;
-    }
-
-    await withSignalFlag(this.isExportingData, async () => {
+    await runIfIdle(this.isExportingData, async () => {
       const docs = (await this.storage.all()).filter(doc => !doc._id.startsWith('_design/'));
       const json = JSON.stringify(docs, null, 2);
       const filename = buildExportFileName(new Date());
@@ -91,11 +91,7 @@ export class SettingsStateService {
         return;
       }
 
-      if (outcome === 'shared') {
-        return;
-      }
-
-      if (outcome === 'cancelled') {
+      if (shouldSkipShareOutcome(outcome)) {
         return;
       }
 
@@ -115,14 +111,14 @@ export class SettingsStateService {
       return;
     }
 
-    const confirmed = await this.confirmImport();
+    const confirmed = await this.confirm.confirm(this.translate.instant('settings.import.confirm'));
     if (!confirmed) {
       return;
     }
 
     let shouldReload = false;
 
-    await withSignalFlag(this.isImportingData, async () => {
+    await runIfIdle(this.isImportingData, async () => {
       const fileContents = await file.text();
       const docs = parseBackup(fileContents, new Date().toISOString());
       await this.applyImport(docs);
@@ -150,7 +146,7 @@ export class SettingsStateService {
       return;
     }
 
-    await withSignalFlag(this.isUpdatingTheme, async () => {
+    await runIfIdle(this.isUpdatingTheme, async () => {
       const current = this.appPreferences.preferences();
       await this.appPreferences.savePreferences({
         ...current,
@@ -163,18 +159,6 @@ export class SettingsStateService {
 
   navigateToUpgrade(): void {
     void this.navCtrl.navigateForward('/upgrade');
-  }
-
-  private async ensurePreferencesLoaded(): Promise<void> {
-    try {
-      await this.appPreferences.getPreferences();
-    } catch (err) {
-      console.error('[SettingsStateService] ensurePreferencesLoaded error', err);
-    }
-  }
-
-  private async confirmImport(): Promise<boolean> {
-    return this.confirm.confirm(this.translate.instant('settings.import.confirm'));
   }
 
   private async applyImport(docs: BaseDoc[]): Promise<void> {

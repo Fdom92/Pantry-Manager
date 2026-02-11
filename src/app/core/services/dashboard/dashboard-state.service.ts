@@ -1,8 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
-import { getItemStatusState } from '@core/domain/pantry';
-import { toNumberOrZero } from '@core/domain/pantry';
+import { getItemStatusState, toNumberOrZero } from '@core/domain/pantry';
 import type {
   Insight,
   InsightContext,
@@ -11,39 +10,37 @@ import type {
 } from '@core/models';
 import type { ConsumeTodayEntry, DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
-import { AgentConversationStore } from '../agent/agent-conversation.store';
+import { PlannerConversationStore } from '../planner/planner-conversation.store';
 import { LanguageService } from '../shared/language.service';
 import { ConfirmService, withSignalFlag } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { EventManagerService } from '../events';
+import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { PantryService } from '../pantry/pantry.service';
-import { InsightService } from './insight.service';
+import { DashboardInsightService } from './dashboard-insight.service';
 import {
   formatDateTimeValue,
   formatDateValue,
   formatQuantity,
-  formatShortDate,
 } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
-import { findEntryByKey, toEntitySelectorEntries } from '@core/utils/entity-selector.util';
 
 
 @Injectable()
 export class DashboardStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
-  private readonly insightService = inject(InsightService);
+  private readonly insightService = inject(DashboardInsightService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
-  private readonly conversationStore = inject(AgentConversationStore);
+  private readonly conversationStore = inject(PlannerConversationStore);
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventManager = inject(EventManagerService);
+  private readonly eventManager = inject(HistoryEventManagerService);
 
   private hasCompletedInitialLoad = false;
 
@@ -66,11 +63,10 @@ export class DashboardStateService {
   readonly isConsumeTodayOpen = signal(false);
   readonly consumeEntries = signal<ConsumeTodayEntry[]>([]);
   readonly consumeEntryViewModels = computed<EntitySelectorEntry[]>(() =>
-    toEntitySelectorEntries(this.consumeEntries(), entry => ({
+    this.consumeEntries().map(entry => ({
       id: entry.itemId,
       title: entry.title,
       quantity: entry.quantity,
-      unitLabel: entry.unitLabel,
       maxQuantity: entry.maxQuantity,
     }))
   );
@@ -218,6 +214,7 @@ export class DashboardStateService {
   }
 
   closeConsumeTodayModal(): void {
+    this.dismissConsumeTodayModal();
     this.consumeEntries.set([]);
     this.consumeSaving.set(false);
   }
@@ -231,7 +228,6 @@ export class DashboardStateService {
     if (maxQuantity <= 0) {
       return;
     }
-    const unitLabel = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
     this.consumeEntries.update(current => {
       const existingIndex = current.findIndex(entry => entry.itemId === item._id);
       if (existingIndex >= 0) {
@@ -247,7 +243,6 @@ export class DashboardStateService {
         {
           itemId: item._id,
           title: option.title,
-          unitLabel,
           quantity: Math.min(1, maxQuantity),
           maxQuantity,
           item,
@@ -280,7 +275,7 @@ export class DashboardStateService {
   }
 
   adjustConsumeEntryById(entryId: string, delta: number): void {
-    const entry = findEntryByKey(this.consumeEntries(), entryId, current => current.itemId);
+    const entry = this.consumeEntries().find(current => current.itemId === entryId);
     if (!entry) {
       return;
     }
@@ -307,7 +302,6 @@ export class DashboardStateService {
     }).catch(err => {
       console.error('[DashboardStateService] consume today error', err);
     });
-    this.dismissConsumeTodayModal();
     this.closeConsumeTodayModal();
   }
 
@@ -316,11 +310,11 @@ export class DashboardStateService {
   }
 
   async deleteExpiredItems(): Promise<void> {
-    if (!this.canDeleteExpiredItems()) {
+    if (this.isDeletingExpiredItems() || !this.hasExpiredItems()) {
       return;
     }
 
-    if (!this.hasConfirmedExpiredDeletion()) {
+    if (!this.confirm.confirm(this.translate.instant('dashboard.confirmDeleteExpired'))) {
       return;
     }
 
@@ -340,11 +334,6 @@ export class DashboardStateService {
     return this.pantryStore.getItemTotalQuantity(item);
   }
 
-  getItemUnitLabel(item: PantryItem): string {
-    const unit = this.pantryStore.getItemPrimaryUnit(item);
-    return this.pantryStore.getUnitLabel(unit);
-  }
-
   getItemTotalMinThreshold(item: PantryItem): number {
     return this.pantryStore.getItemTotalMinThreshold(item);
   }
@@ -358,18 +347,16 @@ export class DashboardStateService {
       .filter(item => !excludedIds.has(item._id))
       .filter(item => this.pantryStore.getItemTotalQuantity(item) > 0)
       .map(item => {
-      const total = this.pantryStore.getItemTotalQuantity(item);
-      const unit = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
-      const formattedQty = formatQuantity(total, locale, { maximumFractionDigits: 1 });
-      const subtitle = `${formattedQty} ${unit}`.trim();
-      return {
-        id: item._id,
-        title: item.name,
-        subtitle,
-        meta: this.getConsumeMetaLabel(item, locale),
-        raw: item,
-      };
-    });
+        const total = this.pantryStore.getItemTotalQuantity(item);
+        const formattedQty = formatQuantity(total, locale);
+        return {
+          id: item._id,
+          title: item.name,
+          subtitle: formattedQty,
+          meta: this.getConsumeMetaLabel(item, locale),
+          raw: item,
+        };
+      });
   }
 
   formatLastUpdated(value: string | null): string {
@@ -403,7 +390,7 @@ export class DashboardStateService {
     if (!earliest) {
       return batchLabel;
     }
-    const formatted = formatShortDate(earliest, locale, { fallback: earliest });
+    const formatted = formatDateValue(earliest, locale, ES_DATE_FORMAT_OPTIONS.numeric, { fallback: earliest });
     return this.translate.instant('dashboard.batches.withExpiry', {
       batchLabel,
       date: formatted,
@@ -462,14 +449,6 @@ export class DashboardStateService {
     }
     const time = Date.parse(value);
     return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time;
-  }
-
-  private canDeleteExpiredItems(): boolean {
-    return !this.isDeletingExpiredItems() && this.hasExpiredItems();
-  }
-
-  private hasConfirmedExpiredDeletion(): boolean {
-    return this.confirm.confirm(this.translate.instant('dashboard.confirmDeleteExpired'));
   }
 
   private refreshDashboardInsights(

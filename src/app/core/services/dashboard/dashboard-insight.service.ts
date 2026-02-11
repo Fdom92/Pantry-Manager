@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { INSIGHTS_LIBRARY, PENDING_REVIEW_STALE_WINDOW_DAYS } from '@core/constants';
+import { INSIGHTS_LIBRARY, PENDING_REVIEW_STALE_DAYS } from '@core/constants';
 import {
   Insight,
   InsightContext,
@@ -12,17 +12,18 @@ import {
   PantryItem,
 } from '@core/models';
 import { TranslateService } from '@ngx-translate/core';
-import { ProService } from '../upgrade/pro.service';
+import { normalizeTrim } from '@core/utils/normalization.util';
+import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 
 @Injectable({ providedIn: 'root' })
-export class InsightService {
+export class DashboardInsightService {
   private readonly translate = inject(TranslateService);
-  private readonly proService = inject(ProService);
+  private readonly revenueCat = inject(UpgradeRevenuecatService);
   private readonly dismissedInsightIds = new Set<string>();
-  private readonly pendingReviewStaleWindowDays = PENDING_REVIEW_STALE_WINDOW_DAYS;
+  private readonly pendingReviewStaleDays = PENDING_REVIEW_STALE_DAYS;
 
   buildDashboardInsights(context: InsightContext): Insight[] {
-    const isPro = this.proService.isPro();
+    const isPro = this.revenueCat.isPro();
     const helpers: InsightPredicateHelpers = { now: new Date() };
     return INSIGHTS_LIBRARY.filter(def => this.isAvailable(def, isPro))
       .filter(def => !def.predicate || def.predicate(context, helpers))
@@ -39,7 +40,7 @@ export class InsightService {
       return [];
     }
     const now = options?.now ?? new Date();
-    const staleWindowDays = options?.staleWindowDays ?? this.pendingReviewStaleWindowDays;
+    const staleWindowDays = options?.staleWindowDays ?? this.pendingReviewStaleDays;
     const products = items
       .map(item => {
         const reasons: InsightPendingReviewReason[] = [];
@@ -151,7 +152,7 @@ export class InsightService {
     if (!item) {
       return true;
     }
-    const hasCategory = Boolean((item.categoryId ?? '').trim());
+    const hasCategory = Boolean(normalizeTrim(item.categoryId));
     const hasExpiryDate =
       item.batches?.some(batch => Boolean(batch.expirationDate)) ?? false;
     const hasNoExpiryMarker = item.noExpiry === true;

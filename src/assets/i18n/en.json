@@ -115,7 +115,7 @@
   "history": {
     "title": "History",
     "pro": {
-      "cta": "See more events with PRO"
+      "cta": "Unlock full history with PRO"
     },
     "filters": {
       "title": "History filters",
@@ -241,7 +241,7 @@
     "lowStock": {
       "title": "Low stock alerts",
       "subtitle": "At or below the minimum level",
-      "minLabel": "min {{ value }} {{ unit }}",
+      "minLabel": "min {{ value }}",
       "empty": "All items are above their minimum level."
     },
     "batches": {
@@ -291,8 +291,8 @@
     "suggestions": {
       "title": "Shopping list",
       "loading": "Building shopping list…",
-      "totalStock": "Total stock: {{ amount }} {{ unit }}",
-      "minStock": "Min: {{ amount }} {{ unit }}",
+      "totalStock": "Total stock: {{ amount }}",
+      "minStock": "Min: {{ amount }}",
       "empty": "Nothing pending right now. I'll let you know when something needs restocking."
     },
     "share": {
@@ -589,6 +589,7 @@
     "subtitle": "Smarter automation and priority features.",
     "benefits": {
       "agent": "AI meal planner that proposes menus and recipes tailored to you.",
+      "history": "Unlock your full pantry history.",
       "future": "Early access to upcoming PRO features."
     },
     "actions": {
@@ -620,7 +621,7 @@
     "title": "Settings",
     "pro": {
       "statusDescription": "Thank you for supporting the project. PRO is active on this device.",
-      "upgradePrompt": "Upgrade to PRO to unlock premium features.",
+      "upgradePrompt": "Upgrade to PRO to unlock your full history and premium features.",
       "upgradeCta": "Upgrade to PRO",
       "badgePro": "PRO active"
     },

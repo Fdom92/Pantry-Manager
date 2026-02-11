@@ -2,12 +2,11 @@ import type { PantryItem } from '../pantry';
 import type { BaseDoc } from '../shared/base-doc.model';
 
 // ENUMS
-export enum ShoppingReasonEnum {
+export enum ShoppingReason {
   EMPTY = 'empty',
   BELOW_MIN = 'below-min',
 }
 // TYPES
-export type ShoppingReason = 'below-min' | 'empty';
 export type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;
 export type ShoppingSuggestionGroupWithItem = ShoppingSuggestionGroup<PantryItem>;
 export type ShoppingStateWithItem = ShoppingState<PantryItem>;
@@ -23,7 +22,6 @@ export interface ShoppingList extends BaseDoc {
 export interface ShoppingListItem {
   itemId: string;
   quantity: number;
-  unit: string;
   checked: boolean;
 }
 export interface ShoppingSuggestion<TItem = string> {
@@ -32,7 +30,6 @@ export interface ShoppingSuggestion<TItem = string> {
   suggestedQuantity: number;
   currentQuantity: number;
   minThreshold?: number;
-  unit: string;
   supermarket?: string;
 }
 export interface ShoppingSuggestionGroup<TItem = string> {
@@ -51,11 +48,4 @@ export interface ShoppingState<TItem = string> {
   groupedSuggestions: ShoppingSuggestionGroup<TItem>[];
   summary: ShoppingSummary;
   hasAlerts: boolean;
-}
-export interface ShoppingItem {
-  id?: string;
-  productId?: string;
-  quantity?: number;
-  suggestedQuantity?: number;
-  locationId?: string;
 }

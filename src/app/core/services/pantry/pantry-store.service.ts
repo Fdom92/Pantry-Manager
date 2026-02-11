@@ -1,29 +1,30 @@
-import { Signal, computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, Signal, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { getItemStatusState } from '@core/domain/pantry';
-import { PantryItem, PantrySummary } from '@core/models/pantry';
-import { MeasurementUnit, StockStatus } from '@core/models/shared';
-import { PantryService } from './pantry.service';
+import { PantryFilterState, PantryItem, PantrySummary } from '@core/models/pantry';
+import { StockStatus } from '@core/models/shared';
+import { normalizeLowercase, normalizeOptionalTrim, normalizeTrim } from '@core/utils/normalization.util';
+import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { EventManagerService } from '../events';
+import { PantryService } from './pantry.service';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
-  // DI
   private readonly pantryService = inject(PantryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventManager = inject(EventManagerService);
-  // DATA
-  private readonly knownMeasurementUnits = new Set(
-    Object.values(MeasurementUnit).map(option => option.toLowerCase())
-  );
-  // SIGNALS
-  readonly loading: Signal<boolean> = this.pantryService.loading;
-  readonly endReached: Signal<boolean> = this.pantryService.endReached;
-  readonly error = signal<string | null>(null);
+  private readonly eventManager = inject(HistoryEventManagerService);
   private realtimeSubscribed = false;
   private expiredScanInProgress = false;
-  // COMPUTED
+  readonly error = signal<string | null>(null);
+  readonly loading: Signal<boolean> = this.pantryService.loading;
+  readonly endReached: Signal<boolean> = this.pantryService.endReached;
+  readonly searchQuery: Signal<string> = this.pantryService.searchQuery;
+  readonly activeFilters: Signal<PantryFilterState> = this.pantryService.activeFilters;
+  readonly pipelineResetting: Signal<boolean> = this.pantryService.pipelineResetting;
+  readonly totalCount: Signal<number> = this.pantryService.totalCount;
+  readonly loadedProducts: Signal<PantryItem[]> = this.pantryService.loadedProducts;
+  readonly activeProducts: Signal<PantryItem[]> = this.pantryService.activeProducts;
+  readonly filteredProducts: Signal<PantryItem[]> = this.pantryService.filteredProducts;
   readonly items = computed(() => this.pantryService.activeProducts());
   readonly expiredItems = computed(() => {
     const now = new Date();
@@ -47,8 +48,8 @@ export class PantryStoreService {
   /** Load items from storage, updating loading/error signals accordingly. */
   async loadAll(): Promise<void> {
     try {
-      await this.pantryService.ensureFirstPageLoaded();
-      this.pantryService.startBackgroundLoad();
+      await this.ensureFirstPageLoaded();
+      this.startBackgroundLoad();
       this.watchRealtime();
       this.error.set(null);
       void this.logExpiredBatchEvents(this.items());
@@ -110,6 +111,37 @@ export class PantryStoreService {
     await this.loadAll();
   }
 
+  clearEntryFilters(): void {
+    this.pantryService.clearEntryFilters();
+  }
+
+  applyPendingNavigationPreset(): void {
+    this.pantryService.applyPendingNavigationPreset();
+  }
+
+  async ensureFirstPageLoaded(): Promise<void> {
+    await this.pantryService.ensureFirstPageLoaded();
+  }
+
+  startBackgroundLoad(): void {
+    this.pantryService.startBackgroundLoad();
+  }
+
+  setSearchQuery(value: string): void {
+    this.pantryService.setSearchQuery(value);
+  }
+
+  setFilters(filters: Partial<PantryFilterState>): void {
+    this.pantryService.setFilters(filters);
+  }
+
+  async addNewLot(
+    itemId: string,
+    params: { quantity: number; expiryDate?: string; location?: string }
+  ): Promise<PantryItem | null> {
+    return this.pantryService.addNewLot(itemId, params);
+  }
+
   /** Bridge live database change events into the signal-based store. */
   watchRealtime(): void {
     // PantryService already updates its internal cache; this store simply exposes it.
@@ -134,28 +166,6 @@ export class PantryStoreService {
       return StockStatus.LOW;
     }
     return StockStatus.NORMAL;
-  }
-
-  /** Return a human friendly unit label; defaults to lowercase plural. */
-  getUnitLabel(unit: MeasurementUnit | string | undefined): string {
-    const value = typeof unit === 'string' && unit.trim() ? unit.trim() : MeasurementUnit.UNIT;
-    const lower = value.toLowerCase();
-    if (lower === MeasurementUnit.UNIT.toLowerCase()) {
-      return 'pcs';
-    }
-    if (this.knownMeasurementUnits.has(lower)) {
-      return lower;
-    }
-    return value;
-  }
-
-  /** Helper used by UI layers to choose a representative unit. */
-  getItemPrimaryUnit(item: PantryItem): MeasurementUnit | string {
-    const unit = item.batches[0]?.unit;
-    if (typeof unit === 'string' && unit.trim()) {
-      return unit.trim();
-    }
-    return MeasurementUnit.UNIT;
   }
 
   /** Sum every batch quantity to avoid duplicating reduce logic in components. */
@@ -192,13 +202,13 @@ export class PantryStoreService {
   }
 
   private async findMergeCandidate(candidate: PantryItem): Promise<PantryItem | undefined> {
-    const barcode = this.normalizeBarcode(candidate.barcode);
+    const barcode = normalizeOptionalTrim(candidate.barcode) ?? null;
     const key = this.buildMergeKey(candidate);
 
     const localItems = this.items();
 
     if (barcode) {
-      const localBarcodeMatch = localItems.find(item => this.normalizeBarcode(item.barcode) === barcode);
+      const localBarcodeMatch = localItems.find(item => (normalizeOptionalTrim(item.barcode) ?? null) === barcode);
       if (localBarcodeMatch) {
         return localBarcodeMatch;
       }
@@ -214,7 +224,7 @@ export class PantryStoreService {
     const persisted = await this.pantryService.getAll();
 
     if (barcode) {
-      const remoteBarcode = persisted.find(item => this.normalizeBarcode(item.barcode) === barcode);
+      const remoteBarcode = persisted.find(item => (normalizeOptionalTrim(item.barcode) ?? null) === barcode);
       if (remoteBarcode) {
         return remoteBarcode;
       }
@@ -242,18 +252,13 @@ export class PantryStoreService {
   }
 
   private buildMergeKey(item: PantryItem): string | null {
-    const name = (item.name ?? '').trim().toLowerCase();
-    const category = (item.categoryId ?? '').trim();
-    const supermarket = (item.supermarket ?? '').trim().toLowerCase();
+    const name = normalizeLowercase(item.name);
+    const category = normalizeTrim(item.categoryId);
+    const supermarket = normalizeLowercase(item.supermarket);
     if (!name || !supermarket) {
       return null;
     }
     return `${name}::${category || 'uncategorized'}::${supermarket}`;
-  }
-
-  private normalizeBarcode(value?: string): string | null {
-    const trimmed = (value ?? '').trim();
-    return trimmed || null;
   }
 
   private mergeItemWithExisting(existing: PantryItem, incoming: PantryItem): PantryItem {

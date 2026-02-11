@@ -1,19 +1,33 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import type { PantryEvent } from '@core/models/events';
-import {
-  HISTORY_FILTER_DEFINITIONS,
-  type HistoryFilterKey,
-  getHistoryEventMeta,
-  type HistoryEventKind,
-} from './history-event.mapper';
 import { formatDateValue, formatQuantity, formatTimeValue } from '@core/utils/formatting.util';
-import { EventLogService } from '../events';
+import { normalizeTrim } from '@core/utils/normalization.util';
+import { HistoryEventLogService } from './history-event-log.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { LanguageService } from '../shared/language.service';
 import { withSignalFlag } from '../shared';
 import { TranslateService } from '@ngx-translate/core';
-import { RevenuecatService } from '../upgrade/revenuecat.service';
+import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
+
+type HistoryEventKind = 'added' | 'consumed' | 'expired' | 'edited' | 'deleted';
+type HistoryFilterKey = 'all' | 'added' | 'consumed' | 'edited' | 'expired' | 'deleted';
+
+type HistoryEventMeta = {
+  kind: HistoryEventKind;
+  icon: string;
+  subtitleKey: string;
+  showQuantity: boolean;
+  signedQuantity: boolean;
+};
+
+type HistoryFilterDefinition = {
+  key: HistoryFilterKey;
+  labelKey: string;
+  icon: string;
+  colorClass: string;
+  eventType?: PantryEvent['eventType'];
+};
 
 type HistoryFilterChip = {
   key: HistoryFilterKey;
@@ -41,13 +55,63 @@ type HistoryDayGroup = {
   events: HistoryEventCard[];
 };
 
+const HISTORY_FILTER_DEFINITIONS: HistoryFilterDefinition[] = [
+  { key: 'all', labelKey: 'history.filters.all', icon: 'layers-outline', colorClass: 'chip--all' },
+  { key: 'added', labelKey: 'history.filters.added', icon: 'add-circle-outline', colorClass: 'chip--added', eventType: 'ADD' },
+  { key: 'consumed', labelKey: 'history.filters.consumed', icon: 'remove-circle-outline', colorClass: 'chip--consumed', eventType: 'CONSUME' },
+  { key: 'edited', labelKey: 'history.filters.edited', icon: 'create-outline', colorClass: 'chip--edited', eventType: 'EDIT' },
+  { key: 'expired', labelKey: 'history.filters.expired', icon: 'alert-circle-outline', colorClass: 'chip--expired', eventType: 'EXPIRE' },
+  { key: 'deleted', labelKey: 'history.filters.deleted', icon: 'trash-outline', colorClass: 'chip--deleted', eventType: 'DELETE' },
+];
+
+const EVENT_META_BY_TYPE: Record<PantryEvent['eventType'], HistoryEventMeta> = {
+  ADD: {
+    kind: 'added',
+    icon: 'add-circle-outline',
+    subtitleKey: 'history.eventTypes.added',
+    showQuantity: true,
+    signedQuantity: true,
+  },
+  CONSUME: {
+    kind: 'consumed',
+    icon: 'remove-circle-outline',
+    subtitleKey: 'history.eventTypes.consumed',
+    showQuantity: true,
+    signedQuantity: true,
+  },
+  EDIT: {
+    kind: 'edited',
+    icon: 'create-outline',
+    subtitleKey: 'history.event.editedTitle',
+    showQuantity: false,
+    signedQuantity: false,
+  },
+  EXPIRE: {
+    kind: 'expired',
+    icon: 'alert-circle-outline',
+    subtitleKey: 'history.eventTypes.expired',
+    showQuantity: true,
+    signedQuantity: false,
+  },
+  DELETE: {
+    kind: 'deleted',
+    icon: 'trash-outline',
+    subtitleKey: 'history.eventTypes.deleted',
+    showQuantity: true,
+    signedQuantity: true,
+  },
+};
+
+const getHistoryEventMeta = (event: PantryEvent): HistoryEventMeta =>
+  EVENT_META_BY_TYPE[event.eventType] ?? EVENT_META_BY_TYPE.EDIT;
+
 @Injectable()
 export class HistoryStateService {
-  private readonly eventLog = inject(EventLogService);
+  private readonly eventLog = inject(HistoryEventLogService);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly languageService = inject(LanguageService);
   private readonly translate = inject(TranslateService);
-  private readonly revenuecat = inject(RevenuecatService);
+  private readonly revenuecat = inject(UpgradeRevenuecatService);
 
   readonly isPro = toSignal(this.revenuecat.isPro$, { initialValue: this.revenuecat.isPro() });
 
@@ -56,13 +120,9 @@ export class HistoryStateService {
   readonly activeFilter = signal<HistoryFilterKey>('all');
   readonly skeletonPlaceholders = Array.from({ length: 6 }, (_, index) => index);
 
-  private readonly productMap = computed(() => {
-    const map = new Map<string, string>();
-    for (const item of this.pantryStore.items()) {
-      map.set(item._id, item.name);
-    }
-    return map;
-  });
+  private readonly productMap = computed(() =>
+    new Map(this.pantryStore.items().map(item => [item._id, item] as const))
+  );
 
   readonly visibleEvents = computed(() => {
     const events = this.events();
@@ -76,24 +136,7 @@ export class HistoryStateService {
 
   readonly filterChips = computed<HistoryFilterChip[]>(() => {
     const events = this.visibleEvents();
-    const counts = HISTORY_FILTER_DEFINITIONS.reduce(
-      (acc, definition) => {
-        if (definition.key === 'all') {
-          acc.all = events.length;
-        } else {
-          acc[definition.key] = events.filter(event => event.eventType === definition.eventType).length;
-        }
-        return acc;
-      },
-      {
-        all: 0,
-        added: 0,
-        consumed: 0,
-        edited: 0,
-        expired: 0,
-        deleted: 0,
-      } as Record<HistoryFilterKey, number>
-    );
+    const counts = this.buildFilterCounts(events);
 
     const active = this.activeFilter();
     return HISTORY_FILTER_DEFINITIONS.map(definition => ({
@@ -122,24 +165,24 @@ export class HistoryStateService {
 
   readonly groupedEvents = computed<HistoryDayGroup[]>(() => {
     const locale = this.languageService.getCurrentLocale();
-    const groups: HistoryDayGroup[] = [];
+    const groupsMap = new Map<string, HistoryDayGroup>();
     const events = this.eventCards();
 
     for (const event of events) {
       const dayKey = this.getDayKey(event.timestamp, event.id);
-      const existing = groups.find(group => group.key === dayKey);
+      const existing = groupsMap.get(dayKey);
       if (existing) {
         existing.events.push(event);
-      } else {
-        groups.push({
-          key: dayKey,
-          label: this.formatDayLabel(event.timestamp, locale),
-          events: [event],
-        });
+        continue;
       }
+      groupsMap.set(dayKey, {
+        key: dayKey,
+        label: formatDateValue(event.timestamp, locale, undefined, { fallback: event.timestamp }),
+        events: [event],
+      });
     }
 
-    return groups;
+    return Array.from(groupsMap.values());
   });
 
   async ionViewWillEnter(): Promise<void> {
@@ -168,8 +211,8 @@ export class HistoryStateService {
 
   private buildEventCard(event: PantryEvent): HistoryEventCard {
     const locale = this.languageService.getCurrentLocale();
-    const productName = (event.productName ?? '').trim()
-      || this.productMap().get(event.productId)
+    const productName = normalizeTrim(event.productName)
+      || this.productMap().get(event.productId)?.name
       || this.translate.instant('history.event.unknownProduct');
     const meta = getHistoryEventMeta(event);
     const subtitle = this.translate.instant(meta.subtitleKey);
@@ -190,11 +233,43 @@ export class HistoryStateService {
 
   private buildQuantityLabel(event: PantryEvent, locale: string, signed: boolean): string {
     const value = Number.isFinite(event.deltaQuantity) ? event.deltaQuantity : event.quantity;
-    const safeValue = typeof value === 'number' && Number.isFinite(value) ? value : 0;
-    const unit = event.unit ? this.pantryStore.getUnitLabel(event.unit) : '';
-    const formatted = formatQuantity(Math.abs(safeValue), locale, { maximumFractionDigits: 2 });
+    const safeValue = Number.isFinite(value) ? Number(value) : 0;
+    const formatted = formatQuantity(Math.abs(safeValue), locale);
     const sign = signed ? (safeValue < 0 ? '-' : safeValue > 0 ? '+' : '') : '';
-    return `${sign}${formatted}${unit ? ` ${unit}` : ''}`;
+    return `${sign}${formatted}`;
+  }
+
+  private buildFilterCounts(events: PantryEvent[]): Record<HistoryFilterKey, number> {
+    const counts: Record<HistoryFilterKey, number> = {
+      all: events.length,
+      added: 0,
+      consumed: 0,
+      edited: 0,
+      expired: 0,
+      deleted: 0,
+    };
+    for (const event of events) {
+      switch (event.eventType) {
+        case 'ADD':
+          counts.added += 1;
+          break;
+        case 'CONSUME':
+          counts.consumed += 1;
+          break;
+        case 'EDIT':
+          counts.edited += 1;
+          break;
+        case 'EXPIRE':
+          counts.expired += 1;
+          break;
+        case 'DELETE':
+          counts.deleted += 1;
+          break;
+        default:
+          break;
+      }
+    }
+    return counts;
   }
 
   private getDayKey(value: string, fallback: string): string {
@@ -211,7 +286,4 @@ export class HistoryStateService {
     return `${year}-${month}-${day}`;
   }
 
-  private formatDayLabel(value: string, locale: string): string {
-    return formatDateValue(value, locale, undefined, { fallback: value });
-  }
 }

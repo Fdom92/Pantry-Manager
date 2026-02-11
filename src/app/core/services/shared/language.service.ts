@@ -2,6 +2,7 @@ import { Injectable, inject, Signal, signal } from '@angular/core';
 import { DEFAULT_LANGUAGE, LOCALES, SUPPORTED_LANGUAGES, SupportedLanguage } from '@core/constants';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
+import { normalizeLocaleCode } from '@core/utils/normalization.util';
 
 @Injectable({
   providedIn: 'root',
@@ -23,23 +24,9 @@ export class LanguageService {
     this.currentLanguage.set(language);
   }
 
-  language(): Signal<SupportedLanguage> {
-    return this.currentLanguage;
-  }
-
   getCurrentLocale(): string {
     const lang = this.currentLanguage();
     return LOCALES[lang] ?? LOCALES[DEFAULT_LANGUAGE];
-  }
-
-  /** Normalize a locale string (es-ES, en_GB) into its base language code. */
-  private normalizeLocale(locale?: string | null): string | null {
-    if (!locale) {
-      return null;
-    }
-    const normalized = locale.toLowerCase().replace('_', '-');
-    const [base] = normalized.split('-');
-    return base || null;
   }
 
   private isSupportedLanguage(lang: string | null): lang is SupportedLanguage {
@@ -50,7 +37,7 @@ export class LanguageService {
   }
 
   private resolveSupportedLanguage(locale: string | null): SupportedLanguage {
-    const base = this.normalizeLocale(locale);
+    const base = normalizeLocaleCode(locale);
     if (this.isSupportedLanguage(base)) {
       return base;
     }

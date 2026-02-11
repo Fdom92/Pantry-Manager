@@ -1,6 +1,6 @@
 <div class="plan-card" [class.plan-card--highlight]="highlight" [class.plan-card--selected]="selected">
-  @if (badge) {
-    <div class="plan-card__badge">{{ badge }}</div>
+  @if (badgeLabel) {
+    <div class="plan-card__badge">{{ badgeLabel }}</div>
   }
   <div class="plan-card__header">
     <p class="plan-card__eyebrow">{{ 'upgrade.plans.proLabel' | translate }}</p>
@@ -8,11 +8,11 @@
   </div>
   <div class="plan-card__price">
     <span class="plan-card__amount">{{ price }}</span>
-    <span class="plan-card__period">{{ period }}</span>
+    <span class="plan-card__period">{{ periodLabel }}</span>
   </div>
   <div class="plan-card__meta">
-    @if (savings) {
-      <span class="pill">{{ savings }}</span>
+    @if (savingsLabel) {
+      <span class="pill">{{ savingsLabel }}</span>
     }
     @if (trialLabel) {
       <span class="pill pill--trial">{{ trialLabel }}</span>

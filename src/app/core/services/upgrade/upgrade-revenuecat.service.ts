@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { STORAGE_KEY_PRO } from '@core/constants';
+import { normalizePackages, pickPreferredPackage } from '@core/domain/upgrade';
 import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -7,18 +8,34 @@ import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class RevenuecatService {
-  // DATA
+export class UpgradeRevenuecatService {
+  // VARIABLES
   private userId: string | null = null;
   private readonly publicApiKey = environment.revenueCatPublicKey;
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());
   readonly isPro$: Observable<boolean> = this.proSubject.asObservable();
   readonly canUseAgent$: Observable<boolean> = this.isPro$.pipe(map(isPro => isPro || !environment.production));
+  private readonly preferredPackageTypes: PACKAGE_TYPE[] = [
+    PACKAGE_TYPE.MONTHLY,
+    PACKAGE_TYPE.ANNUAL,
+  ];
+
+  isPro(): boolean {
+    return this.proSubject.value;
+  }
+
+  canUseAgent(): boolean {
+    return !environment.production || this.isPro();
+  }
+
+  getUserId(): string | null {
+    return this.userId;
+  }
 
   async init(userId: string): Promise<void> {
     this.userId = userId;
     if (!this.publicApiKey) {
-      console.error('[RevenuecatService] missing public API key in environment');
+      console.error('[UpgradeRevenuecatService] missing public API key in environment');
       return;
     }
     try {
@@ -26,7 +43,7 @@ export class RevenuecatService {
       Purchases.addCustomerInfoUpdateListener((info: any) => {
         const isPro = this.extractIsPro(info);
         if (isPro === null) {
-          console.warn('[RevenuecatService] customerInfo update without entitlement data; keeping previous state');
+          console.warn('[UpgradeRevenuecatService] customerInfo update without entitlement data; keeping previous state');
           return;
         }
         this.updateProState(isPro);
@@ -36,15 +53,11 @@ export class RevenuecatService {
       if (isPro !== null) {
         this.updateProState(isPro);
       } else {
-        console.warn('[RevenuecatService] init: no entitlement data, keeping stored state');
+        console.warn('[UpgradeRevenuecatService] init: no entitlement data, keeping stored state');
       }
     } catch (err) {
-      console.error('[RevenuecatService] init error', err);
+      console.error('[UpgradeRevenuecatService] init error', err);
     }
-  }
-
-  getUserId(): string | null {
-    return this.userId;
   }
 
   async getOfferings(): Promise<PurchasesOffering | null> {
@@ -52,7 +65,7 @@ export class RevenuecatService {
       const offerings = await Purchases.getOfferings();
       return offerings?.current ?? null;
     } catch (err) {
-      console.error('[RevenuecatService] getOfferings error', err);
+      console.error('[UpgradeRevenuecatService] getOfferings error', err);
       return null;
     }
   }
@@ -60,44 +73,25 @@ export class RevenuecatService {
   async getAvailablePackages(): Promise<PurchasesPackage[]> {
     const offering = await this.getOfferings();
     if (!offering) {
-      console.warn('[RevenuecatService] no active offering available');
+      console.warn('[UpgradeRevenuecatService] no active offering available');
       return [];
     }
 
-    const preferredTypes: PACKAGE_TYPE[] = [
-      PACKAGE_TYPE.MONTHLY,
-      PACKAGE_TYPE.ANNUAL,
-    ];
+    const candidates = [
+      offering.monthly,
+      offering.annual,
+      ...(offering.availablePackages ?? []),
+    ].filter(Boolean) as PurchasesPackage[];
 
-    const deduped: PurchasesPackage[] = [];
-    const seen = new Set<string>();
-    const push = (pkg: PurchasesPackage | null | undefined): void => {
-      if (!pkg) return;
-      if (seen.has(pkg.identifier)) return;
-      seen.add(pkg.identifier);
-      deduped.push(pkg);
-    };
-
-    push(offering.monthly);
-    push(offering.annual);
-    (offering.availablePackages ?? []).forEach(push);
-
-    const sorted = deduped.sort((a, b) => {
-      const idxA = preferredTypes.indexOf(a.packageType);
-      const idxB = preferredTypes.indexOf(b.packageType);
-      if (idxA === -1 && idxB === -1) return 0;
-      if (idxA === -1) return 1;
-      if (idxB === -1) return -1;
-      return idxA - idxB;
-    });
+    const sorted = normalizePackages(candidates, this.preferredPackageTypes);
 
     console.info(
-      '[RevenuecatService] available packages',
+      '[UpgradeRevenuecatService] available packages',
       sorted.map(pkg => `${pkg.packageType}:${pkg.identifier}`).join(', ')
     );
 
     if (!sorted.length) {
-      console.warn('[RevenuecatService] offering has no purchasable packages', {
+      console.warn('[UpgradeRevenuecatService] offering has no purchasable packages', {
         available: offering.availablePackages?.map(pkg => ({
           identifier: pkg.identifier,
           type: pkg.packageType,
@@ -109,23 +103,7 @@ export class RevenuecatService {
   }
 
   async getPreferredPackage(): Promise<PurchasesPackage | null> {
-    const sorted = await this.getAvailablePackages();
-    if (!sorted.length) {
-      return null;
-    }
-    const preferredTypes: PACKAGE_TYPE[] = [
-      PACKAGE_TYPE.MONTHLY,
-      PACKAGE_TYPE.ANNUAL,
-    ];
-
-    for (const type of preferredTypes) {
-      const match = sorted.find(pkg => pkg.packageType === type);
-      if (match) {
-        return match;
-      }
-    }
-
-    return sorted[0];
+    return pickPreferredPackage(await this.getAvailablePackages(), this.preferredPackageTypes);
   }
 
   async purchasePackage(aPackage: PurchasesPackage): Promise<boolean> {
@@ -137,7 +115,7 @@ export class RevenuecatService {
       }
       return Boolean(isPro ?? this.isPro());
     } catch (err) {
-      console.error('[RevenuecatService] purchasePackage error', err);
+      console.error('[UpgradeRevenuecatService] purchasePackage error', err);
       return false;
     }
   }
@@ -146,12 +124,12 @@ export class RevenuecatService {
     try {
       const selectedPackage = await this.getPreferredPackage();
       if (!selectedPackage) {
-        console.warn('[RevenuecatService] purchasePro aborted: no package available');
+        console.warn('[UpgradeRevenuecatService] purchasePro aborted: no package available');
         return false;
       }
       return this.purchasePackage(selectedPackage);
     } catch (err) {
-      console.error('[RevenuecatService] purchasePro error', err);
+      console.error('[UpgradeRevenuecatService] purchasePro error', err);
       return false;
     }
   }
@@ -165,23 +143,15 @@ export class RevenuecatService {
       }
       return Boolean(isPro ?? this.isPro());
     } catch (err) {
-      console.error('[RevenuecatService] restore error', err);
+      console.error('[UpgradeRevenuecatService] restore error', err);
       return false;
     }
-  }
-
-  isPro(): boolean {
-    return this.proSubject.value;
-  }
-
-  canUseAgent(): boolean {
-    return !environment.production || this.isPro();
   }
 
   private extractIsPro(info: any): boolean | null {
     const entitlements = info?.entitlements?.active ?? info?.subscriber?.entitlements?.active;
     if (!entitlements) {
-      console.warn('[RevenuecatService] entitlements missing in customer info', { info });
+      console.warn('[UpgradeRevenuecatService] entitlements missing in customer info', { info });
       return null;
     }
     const keys = Object.keys(entitlements);
@@ -202,10 +172,10 @@ export class RevenuecatService {
       info?.subscriber?.allPurchasedProductIdentifiers ??
       [];
     if (activeSubs.length) {
-      console.warn('[RevenuecatService] entitlements empty but active subscriptions present', { activeSubs });
+      console.warn('[UpgradeRevenuecatService] entitlements empty but active subscriptions present', { activeSubs });
       return true;
     }
-    console.warn('[RevenuecatService] no active entitlements found', { entitlements: keys, activeSubs });
+    console.warn('[UpgradeRevenuecatService] no active entitlements found', { entitlements: keys, activeSubs });
     return false;
   }
 
@@ -214,7 +184,7 @@ export class RevenuecatService {
     try {
       localStorage.setItem(STORAGE_KEY_PRO, JSON.stringify(isPro));
     } catch (err) {
-      console.warn('[RevenuecatService] failed to persist state', err);
+      console.warn('[UpgradeRevenuecatService] failed to persist state', err);
     }
   }
 

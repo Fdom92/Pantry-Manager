@@ -41,8 +41,8 @@
               [showClearButton]="state.selectorLocked()"
               (emptyAction)="state.onSelectorCreateNew($event)"
               (valueChange)="state.onSelectorQueryChange($event)"
-              (onSelect)="state.onSelectorSelect($event)"
-              (onClear)="state.onSelectorClear()">
+              (optionSelected)="state.onSelectorSelect($event)"
+              (cleared)="state.onSelectorClear()">
             </app-entity-autocomplete>
           </div>
         </div>
@@ -80,7 +80,7 @@
                 [emptyLabel]="'common.selects.noOptions' | translate"
                 [value]="state.form.get('categoryId')?.value ?? ''"
                 [clearOnSelect]="false"
-                (onSelect)="state.onCategoryAutocompleteSelect($event)"
+                (optionSelected)="state.onCategoryAutocompleteSelect($event)"
                 (emptyAction)="state.addCategoryOptionFromText($event)">
               </app-entity-autocomplete>
             </div>
@@ -98,7 +98,7 @@
                 [emptyLabel]="'common.selects.noOptions' | translate"
                 [value]="state.form.get('supermarket')?.value ?? ''"
                 [clearOnSelect]="false"
-                (onSelect)="state.onSupermarketAutocompleteSelect($event)"
+                (optionSelected)="state.onSupermarketAutocompleteSelect($event)"
                 (emptyAction)="state.addSupermarketOptionFromText($event)">
               </app-entity-autocomplete>
             </div>
@@ -169,7 +169,7 @@
                       [emptyLabel]="'common.selects.noOptions' | translate"
                       [value]="state.batchesArray.at(i).get('locationId')?.value ?? ''"
                       [clearOnSelect]="false"
-                      (onSelect)="state.onLocationAutocompleteSelect(i, $event)"
+                      (optionSelected)="state.onLocationAutocompleteSelect(i, $event)"
                       (emptyAction)="state.addLocationOptionFromText(i, $event)">
                     </app-entity-autocomplete>
                   </div>

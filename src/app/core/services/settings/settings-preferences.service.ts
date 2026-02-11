@@ -1,11 +1,10 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   DEFAULT_PREFERENCES,
-  DEFAULT_UNIT_OPTIONS,
   DOC_TYPE_PREFERENCES,
   NEAR_EXPIRY_WINDOW_DAYS,
   ONBOARDING_STORAGE_KEY,
-  PLANNER_MEMORY_LIMIT,
+  PLANNER_MEMORY_MAX_LENGTH,
   SETUP_STORAGE_KEY,
   STORAGE_KEY_PREFERENCES,
 } from '@core/constants';
@@ -13,22 +12,21 @@ import {
   AppPreferences,
   AppPreferencesDoc,
   AppThemePreference,
-  DefaultUnitPreference,
 } from '@core/models';
-import { MeasurementUnit } from '@core/models/shared';
-import { normalizeStringList } from '@core/utils/normalization.util';
+import { normalizeStringList, normalizeTrim } from '@core/utils/normalization.util';
+import { getBooleanFlag } from '@core/utils/storage-flag.util';
 import { StorageService } from '../shared/storage.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AppPreferencesService {
+export class SettingsPreferencesService {
   // DI
   private readonly storage = inject<StorageService<AppPreferencesDoc>>(StorageService);
   // DATA
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
-  private readonly plannerMemoryLimit = PLANNER_MEMORY_LIMIT;
+  private readonly plannerMemoryLimit = PLANNER_MEMORY_MAX_LENGTH;
   private readonly prefersDarkQuery =
     typeof window !== 'undefined' && typeof window.matchMedia === 'function'
       ? window.matchMedia('(prefers-color-scheme: dark)')
@@ -90,40 +88,25 @@ export class AppPreferencesService {
         this.preferencesSignal.set(normalized);
         this.applyTheme(normalized.theme);
       } else {
-        const defaults = { ...DEFAULT_PREFERENCES };
-        this.preferencesSignal.set(defaults);
-        this.cachedDoc = null;
-        this.applyTheme(defaults.theme);
+        this.applyDefaults();
       }
     } catch (err) {
-      console.error('[AppPreferencesService] loadFromStorage error', err);
-      const defaults = { ...DEFAULT_PREFERENCES };
-      this.preferencesSignal.set(defaults);
-      this.cachedDoc = null;
-      this.applyTheme(defaults.theme);
+      console.error('[SettingsPreferencesService] loadFromStorage error', err);
+      this.applyDefaults();
     }
   }
 
   private shouldSeedLocations(locationOptions: string[]): boolean {
     return (
-      this.hasSeenFlag(ONBOARDING_STORAGE_KEY) &&
-      !this.hasSeenFlag(SETUP_STORAGE_KEY) &&
+      getBooleanFlag(ONBOARDING_STORAGE_KEY) &&
+      !getBooleanFlag(SETUP_STORAGE_KEY) &&
       (!locationOptions || !locationOptions.length)
     );
-  }
-
-  private hasSeenFlag(key: string): boolean {
-    try {
-      return Boolean(localStorage.getItem(key));
-    } catch {
-      return false;
-    }
   }
 
   private normalizePreferences(input?: Partial<AppPreferences>): AppPreferences {
     return {
       theme: this.ensureTheme(input?.theme),
-      defaultUnit: this.ensureUnit(input?.defaultUnit),
       nearExpiryDays: NEAR_EXPIRY_WINDOW_DAYS,
       compactView: Boolean(input?.compactView),
       notificationsEnabled: Boolean(input?.notificationsEnabled),
@@ -133,7 +116,6 @@ export class AppPreferencesService {
       locationOptions: this.ensureLocationOptions(input?.locationOptions),
       categoryOptions: this.ensureCategoryOptions(input?.categoryOptions),
       supermarketOptions: this.ensureSupermarketOptions(input?.supermarketOptions),
-      unitOptions: this.ensureUnitOptions(input?.unitOptions),
       plannerMemory: this.ensurePlannerMemory(input?.plannerMemory),
     };
   }
@@ -175,13 +157,6 @@ export class AppPreferencesService {
     }
   }
 
-  private ensureUnit(unit?: string): DefaultUnitPreference {
-    if (unit === 'kg' || unit === 'g' || unit === 'l' || unit === 'unit') {
-      return unit;
-    }
-    return DEFAULT_PREFERENCES.defaultUnit;
-  }
-
   private ensureLocationOptions(options?: unknown): string[] {
     return normalizeStringList(options, {
       fallback: [],
@@ -200,21 +175,21 @@ export class AppPreferencesService {
     });
   }
 
-  private ensureUnitOptions(options?: unknown): string[] {
-    return normalizeStringList(options, {
-      fallback: DEFAULT_UNIT_OPTIONS,
-      ensure: [MeasurementUnit.UNIT],
-    });
-  }
-
   private ensurePlannerMemory(value?: unknown): string {
     if (typeof value !== 'string') {
       return '';
     }
-    const trimmed = value.trim();
+    const trimmed = normalizeTrim(value);
     if (!trimmed) {
       return '';
     }
     return trimmed.length > this.plannerMemoryLimit ? trimmed.slice(0, this.plannerMemoryLimit) : trimmed;
+  }
+
+  private applyDefaults(): void {
+    const defaults = { ...DEFAULT_PREFERENCES };
+    this.preferencesSignal.set(defaults);
+    this.cachedDoc = null;
+    this.applyTheme(defaults.theme);
   }
 }

@@ -1,23 +1,5 @@
-import { AppPreferences } from '@core/models';
-import { PantryItem } from '@core/models/pantry';
-import {
-  formatFriendlyName,
-  normalizeKey,
-  normalizeStringList,
-  normalizeSupermarketValue,
-} from '@core/utils/normalization.util';
-
-export function getPresetCategoryOptions(preferences: Pick<AppPreferences, 'categoryOptions'>): string[] {
-  return normalizeStringList(preferences.categoryOptions, { fallback: [] });
-}
-
-export function getPresetLocationOptions(preferences: Pick<AppPreferences, 'locationOptions'>): string[] {
-  return normalizeStringList(preferences.locationOptions, { fallback: [] });
-}
-
-export function getPresetSupermarketOptions(preferences: Pick<AppPreferences, 'supermarketOptions'>): string[] {
-  return normalizeStringList(preferences.supermarketOptions, { fallback: [] });
-}
+import type { PantryItem } from '@core/models/pantry';
+import { normalizeLowercase, normalizeSupermarketValue, normalizeTrim } from './normalization.util';
 
 export function computeSupermarketSuggestions(items: PantryItem[]): string[] {
   const options = new Map<string, string>();
@@ -26,7 +8,7 @@ export function computeSupermarketSuggestions(items: PantryItem[]): string[] {
     if (!normalizedValue) {
       continue;
     }
-    const key = normalizedValue.toLowerCase();
+    const key = normalizeLowercase(normalizedValue);
     if (!options.has(key)) {
       options.set(key, normalizedValue);
     }
@@ -34,13 +16,9 @@ export function computeSupermarketSuggestions(items: PantryItem[]): string[] {
   return Array.from(options.values()).sort((a, b) => a.localeCompare(b));
 }
 
-export function formatCategoryName(value: string, uncategorizedLabel: string): string {
-  return formatFriendlyName(value, uncategorizedLabel);
-}
-
 export function formatSupermarketLabel(value: string, otherLabel?: string): string {
-  const trimmed = value.trim();
-  const normalized = trimmed.toLowerCase();
+  const trimmed = normalizeTrim(value);
+  const normalized = normalizeLowercase(trimmed);
   if (normalized === 'otro') {
     return otherLabel ?? trimmed;
   }
@@ -55,11 +33,11 @@ export function buildUniqueSelectOptions(
   const options: Array<{ value: string; label: string }> = [];
 
   for (const value of values) {
-    const trimmed = (value ?? '').trim();
+    const trimmed = normalizeTrim(value);
     if (!trimmed) {
       continue;
     }
-    const normalized = normalizeKey(trimmed);
+    const normalized = normalizeLowercase(trimmed);
     if (!normalized || seen.has(normalized)) {
       continue;
     }

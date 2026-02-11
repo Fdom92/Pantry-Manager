@@ -1,16 +1,16 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
 import { PantryService } from '@core/services/pantry/pantry.service';
-import { normalizeCategoryId, normalizeKey, normalizeLocationId, normalizeStringList, normalizeSupermarketValue } from '@core/utils/normalization.util';
+import { normalizeCategoryId, normalizeLowercase, normalizeLocationId, normalizeStringList, normalizeSupermarketValue, normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { withSignalFlag } from '../../shared';
-import { AppPreferencesService } from '../app-preferences.service';
+import { withSignalFlag } from '../shared';
+import { SettingsPreferencesService } from './settings-preferences.service';
 
 type CatalogKind = 'category' | 'supermarket' | 'location';
 
 @Injectable()
 export class SettingsCatalogsStateService {
-  private readonly appPreferencesService = inject(AppPreferencesService);
+  private readonly appPreferencesService = inject(SettingsPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly pantryService = inject(PantryService);
 
@@ -32,32 +32,17 @@ export class SettingsCatalogsStateService {
     count: number;
     items: PantryItem[];
   } | null>(null);
-  readonly hasLocationChanges = computed(() => {
-    const draft = this.normalizeLocationOptions(this.locationOptionsDraft());
-    const original = this.originalLocationOptions();
-    if (draft.length !== original.length) {
-      return true;
-    }
-    return draft.some((value, index) => value !== original[index]);
-  });
+  readonly hasLocationChanges = computed(() =>
+    this.hasDraftChanges(this.locationOptionsDraft(), this.originalLocationOptions())
+  );
 
-  readonly hasCategoryChanges = computed(() => {
-    const draft = this.normalizeCategoryOptions(this.categoryOptionsDraft());
-    const original = this.originalCategoryOptions();
-    if (draft.length !== original.length) {
-      return true;
-    }
-    return draft.some((value, index) => value !== original[index]);
-  });
+  readonly hasCategoryChanges = computed(() =>
+    this.hasDraftChanges(this.categoryOptionsDraft(), this.originalCategoryOptions())
+  );
 
-  readonly hasSupermarketChanges = computed(() => {
-    const draft = this.normalizeSupermarketOptions(this.supermarketOptionsDraft());
-    const original = this.originalSupermarketOptions();
-    if (draft.length !== original.length) {
-      return true;
-    }
-    return draft.some((value, index) => value !== original[index]);
-  });
+  readonly hasSupermarketChanges = computed(() =>
+    this.hasDraftChanges(this.supermarketOptionsDraft(), this.originalSupermarketOptions())
+  );
 
   readonly hasAnyChanges = computed(
     () => this.hasLocationChanges() || this.hasCategoryChanges() || this.hasSupermarketChanges(),
@@ -145,7 +130,7 @@ export class SettingsCatalogsStateService {
       {
         text: this.translate.instant('common.actions.add'),
         handler: data => {
-          const value = (data?.value ?? '').trim();
+          const value = normalizeTrim(data?.value);
           if (!value) {
             return false;
           }
@@ -205,9 +190,9 @@ export class SettingsCatalogsStateService {
     if (this.hasDuplicateOptions()) {
       return;
     }
-    const normalizedLocations = this.normalizeLocationOptions(this.locationOptionsDraft());
-    const normalizedCategories = this.normalizeCategoryOptions(this.categoryOptionsDraft());
-    const normalizedSupermarkets = this.normalizeSupermarketOptions(this.supermarketOptionsDraft());
+    const normalizedLocations = this.normalizeOptions(this.locationOptionsDraft());
+    const normalizedCategories = this.normalizeOptions(this.categoryOptionsDraft());
+    const normalizedSupermarkets = this.normalizeOptions(this.supermarketOptionsDraft());
 
     const locationPayload = normalizedLocations;
     const categoryPayload = normalizedCategories;
@@ -227,7 +212,7 @@ export class SettingsCatalogsStateService {
       this.locationOptionsDraft.set([...locationPayload]);
       this.categoryOptionsDraft.set([...categoryPayload]);
       this.supermarketOptionsDraft.set([...supermarketPayload]);
-    }).catch(async err => {
+    }).catch(async (err: unknown) => {
       console.error('[SettingsCatalogsStateService] submitCatalogs error', err);
     });
   }
@@ -238,58 +223,55 @@ export class SettingsCatalogsStateService {
       this.syncLocationOptionsFromPreferences();
       this.syncCategoryOptionsFromPreferences();
       this.syncSupermarketOptionsFromPreferences();
-    }).catch(async err => {
+    }).catch(async (err: unknown) => {
       console.error('[SettingsCatalogsStateService] loadPreferences error', err);
     });
   }
 
   private syncLocationOptionsFromPreferences(): void {
-    const prefs = this.appPreferencesService.preferences();
-    const current = this.normalizeLocationOptions(prefs.locationOptions);
-    this.originalLocationOptions.set(current);
-    this.locationOptionsDraft.set([...current]);
+    this.syncOptionsFromPreferences(
+      () => this.appPreferencesService.preferences().locationOptions,
+      this.originalLocationOptions,
+      this.locationOptionsDraft,
+    );
   }
 
   private syncCategoryOptionsFromPreferences(): void {
-    const prefs = this.appPreferencesService.preferences();
-    const current = this.normalizeCategoryOptions(prefs.categoryOptions);
-    this.originalCategoryOptions.set(current);
-    this.categoryOptionsDraft.set([...current]);
+    this.syncOptionsFromPreferences(
+      () => this.appPreferencesService.preferences().categoryOptions,
+      this.originalCategoryOptions,
+      this.categoryOptionsDraft,
+    );
   }
 
   private syncSupermarketOptionsFromPreferences(): void {
-    const prefs = this.appPreferencesService.preferences();
-    const current = this.normalizeSupermarketOptions(prefs.supermarketOptions);
-    this.originalSupermarketOptions.set(current);
-    this.supermarketOptionsDraft.set([...current]);
+    this.syncOptionsFromPreferences(
+      () => this.appPreferencesService.preferences().supermarketOptions,
+      this.originalSupermarketOptions,
+      this.supermarketOptionsDraft,
+    );
   }
 
-  private normalizeLocationOptions(values: readonly string[] | null | undefined): string[] {
-    return normalizeStringList(values, {
-      fallback: [],
-    });
+  private normalizeOptions(values: readonly string[] | null | undefined): string[] {
+    return normalizeStringList(values, { fallback: [] });
   }
 
-  private normalizeCategoryOptions(values: readonly string[] | null | undefined): string[] {
-    return normalizeStringList(values, {
-      fallback: [],
-    });
-  }
-
-  private normalizeSupermarketOptions(values: readonly string[] | null | undefined): string[] {
-    return normalizeStringList(values, {
-      fallback: [],
-    });
+  private hasDraftChanges(draft: readonly string[], original: readonly string[]): boolean {
+    const normalizedDraft = this.normalizeOptions(draft);
+    if (normalizedDraft.length !== original.length) {
+      return true;
+    }
+    return normalizedDraft.some((value, index) => value !== original[index]);
   }
 
   private normalizeCatalogValue(kind: CatalogKind, rawValue: string | null | undefined): string {
     if (kind === 'category') {
-      return normalizeKey(normalizeCategoryId(rawValue));
+      return normalizeLowercase(normalizeCategoryId(rawValue));
     }
     if (kind === 'location') {
-      return normalizeKey(normalizeLocationId(rawValue));
+      return normalizeLowercase(normalizeLocationId(rawValue));
     }
-    return normalizeKey(normalizeSupermarketValue(rawValue) ?? '');
+    return normalizeLowercase(normalizeSupermarketValue(rawValue) ?? '');
   }
   private hasDuplicates(kind: CatalogKind, draft: string[]): boolean {
     const seen = new Set<string>();
@@ -309,7 +291,7 @@ export class SettingsCatalogsStateService {
   private async requestCatalogRemoval(kind: CatalogKind, index: number): Promise<void> {
     const config = this.getCatalogConfig(kind);
     const draft = config.getDraft();
-    const value = (draft[index] ?? '').trim();
+    const value = normalizeTrim(draft[index]);
     if (!value) {
       config.removeFromDraft(index);
       return;
@@ -337,115 +319,69 @@ export class SettingsCatalogsStateService {
     this.onRemovalPromptDismiss();
   }
 
-  private async getSupermarketUsage(value: string): Promise<{
-    count: number;
-    items: PantryItem[];
-  }> {
-    const normalizedKey = normalizeKey(value);
+  private async getSupermarketUsage(value: string): Promise<{ count: number; items: PantryItem[] }> {
+    const normalizedKey = normalizeLowercase(value);
     if (!normalizedKey) {
       return { count: 0, items: [] };
     }
-    const items = await this.pantryService.getAllActive();
-    const matches = items.filter(item => {
-      const itemKey = normalizeKey(normalizeSupermarketValue(item.supermarket) ?? '');
-      return itemKey === normalizedKey;
-    });
-    return {
-      count: matches.length,
-      items: matches,
-    };
+    return this.getUsage(items =>
+      items.filter(item => {
+        const itemKey = normalizeLowercase(normalizeSupermarketValue(item.supermarket) ?? '');
+        return itemKey === normalizedKey;
+      }),
+    );
   }
 
-  private async getCategoryUsage(value: string): Promise<{
-    count: number;
-    items: PantryItem[];
-  }> {
+  private async getCategoryUsage(value: string): Promise<{ count: number; items: PantryItem[] }> {
     const normalizedValue = normalizeCategoryId(value);
     if (!normalizedValue) {
       return { count: 0, items: [] };
     }
-    const normalizedKey = normalizeKey(normalizedValue);
+    const normalizedKey = normalizeLowercase(normalizedValue);
     if (!normalizedKey) {
       return { count: 0, items: [] };
     }
-    const items = await this.pantryService.getAllActive();
-    const matches = items.filter(item => normalizeKey(normalizeCategoryId(item.categoryId)) === normalizedKey);
-    return {
-      count: matches.length,
-      items: matches,
-    };
+    return this.getUsage(items =>
+      items.filter(item => normalizeLowercase(normalizeCategoryId(item.categoryId)) === normalizedKey),
+    );
   }
 
-  private async getLocationUsage(value: string): Promise<{
-    count: number;
-    items: PantryItem[];
-  }> {
+  private async getLocationUsage(value: string): Promise<{ count: number; items: PantryItem[] }> {
     const normalizedValue = normalizeLocationId(value);
-    const normalizedKey = normalizeKey(normalizedValue);
+    const normalizedKey = normalizeLowercase(normalizedValue);
     if (!normalizedKey) {
       return { count: 0, items: [] };
     }
-    const items = await this.pantryService.getAllActive();
-    const matches = items.filter(item =>
-      (item.batches ?? []).some(batch => normalizeKey(normalizeLocationId(batch.locationId)) === normalizedKey),
+    return this.getUsage(items =>
+      items.filter(item =>
+        (item.batches ?? []).some(batch => normalizeLowercase(normalizeLocationId(batch.locationId)) === normalizedKey),
+      ),
     );
-    return {
-      count: matches.length,
-      items: matches,
-    };
   }
 
   private async clearSupermarketFromItems(items: PantryItem[]): Promise<void> {
-    if (!items.length) {
-      return;
-    }
-    await Promise.all(
-      items.map(async item => {
-        await this.pantryService.saveItem({
-          ...item,
-          supermarket: undefined,
-        });
-      }),
-    );
+    await this.updateItems(items, item => ({ ...item, supermarket: undefined }));
   }
 
   private async clearCategoryFromItems(items: PantryItem[]): Promise<void> {
-    if (!items.length) {
-      return;
-    }
-    await Promise.all(
-      items.map(async item => {
-        await this.pantryService.saveItem({
-          ...item,
-          categoryId: '',
-        });
-      }),
-    );
+    await this.updateItems(items, item => ({ ...item, categoryId: '' }));
   }
 
   private async clearLocationFromItems(items: PantryItem[], value: string): Promise<void> {
-    const fromKey = normalizeKey(normalizeLocationId(value));
+    const fromKey = normalizeLowercase(normalizeLocationId(value));
     if (!fromKey) {
       return;
     }
-    await Promise.all(
-      items.map(async item => {
-        const batches = (item.batches ?? []).map(batch => {
-          const originalId = normalizeLocationId(batch.locationId);
-          if (normalizeKey(originalId) !== fromKey) {
-            return batch;
-          }
-          return {
-            ...batch,
-            locationId: undefined,
-          };
-        });
-        await this.pantryService.saveItem({
-          ...item,
-          batches,
-        });
+    await this.updateItems(items, item => ({
+      ...item,
+      batches: (item.batches ?? []).map(batch => {
+        const originalId = normalizeLocationId(batch.locationId);
+        if (normalizeLowercase(originalId) !== fromKey) {
+          return batch;
+        }
+        return { ...batch, locationId: undefined };
       }),
-    );
+    }));
   }
 
   private getCatalogConfig(kind?: CatalogKind): {
@@ -524,5 +460,36 @@ export class SettingsCatalogsStateService {
       return false;
     }
     return draft.some(value => this.normalizeCatalogValue(kind, value) === normalized);
+  }
+
+  private syncOptionsFromPreferences(
+    source: () => readonly string[] | null | undefined,
+    originalTarget: { set: (value: string[]) => void },
+    draftTarget: { set: (value: string[]) => void },
+  ): void {
+    const current = this.normalizeOptions(source());
+    originalTarget.set(current);
+    draftTarget.set([...current]);
+  }
+
+  private async getUsage(
+    matcher: (items: PantryItem[]) => PantryItem[],
+  ): Promise<{ count: number; items: PantryItem[] }> {
+    const items = await this.pantryService.getAllActive();
+    const matches = matcher(items);
+    return {
+      count: matches.length,
+      items: matches,
+    };
+  }
+
+  private async updateItems(
+    items: PantryItem[],
+    updater: (item: PantryItem) => PantryItem,
+  ): Promise<void> {
+    if (!items.length) {
+      return;
+    }
+    await Promise.all(items.map(item => this.pantryService.saveItem(updater(item))));
   }
 }

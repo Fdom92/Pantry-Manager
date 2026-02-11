@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { APP_DB_NAME } from '@core/constants';
 import { BaseDoc } from '@core/models/shared';
 import { createDocumentId } from '@core/utils';
+import { normalizeSearchField, normalizeSearchQuery, normalizeTrim } from '@core/utils/normalization.util';
 import PouchDB from 'pouchdb-browser';
 import PouchFind from 'pouchdb-find';
 
@@ -136,13 +137,6 @@ export class StorageService<T extends BaseDoc> {
   }
 
   /**
-   * listByType - helper for specific services.
-   */
-  protected async listByType(type: string): Promise<T[]> {
-    return this.all(type);
-  }
-
-  /**
    * countByType - returns the number of documents for the requested type without fetching full docs.
    */
   protected async countByType(type: string): Promise<number> {
@@ -257,11 +251,11 @@ export class StorageService<T extends BaseDoc> {
   }
 
   async search(text: string, fields: (keyof T)[]): Promise<T[]> {
-    if (!text.trim()) return [];
+    const normalizedText = normalizeSearchQuery(text);
+    if (!normalizedText) return [];
     const docs = await this.all();
-    const lower = text.toLowerCase();
     return docs.filter(doc =>
-      fields.some(f => String(doc[f] ?? '').toLowerCase().includes(lower))
+      fields.some(f => normalizeSearchField(doc[f]).includes(normalizedText))
     );
   }
 
@@ -271,7 +265,7 @@ export class StorageService<T extends BaseDoc> {
   }
 
   private ensureDocumentId(doc: T): T {
-    const rawId = (doc?._id ?? '').trim();
+    const rawId = normalizeTrim(doc?._id);
     if (rawId) {
       if (rawId !== doc._id) {
         return { ...doc, _id: rawId } as T;

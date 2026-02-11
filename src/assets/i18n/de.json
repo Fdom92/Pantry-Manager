@@ -115,7 +115,7 @@
   "history": {
     "title": "Verlauf",
     "pro": {
-      "cta": "Mehr Ereignisse mit PRO"
+      "cta": "Vollständigen Verlauf mit PRO freischalten"
     },
     "filters": {
       "title": "Verlaufsfilter",
@@ -241,7 +241,7 @@
     "lowStock": {
       "title": "Warnungen bei niedrigem Bestand",
       "subtitle": "Auf oder unter dem Mindestbestand",
-      "minLabel": "Min. {{ value }} {{ unit }}",
+      "minLabel": "Min. {{ value }}",
       "empty": "Alle Artikel liegen über ihrem Mindestbestand."
     },
     "batches": {
@@ -291,8 +291,8 @@
     "suggestions": {
       "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
-      "totalStock": "Gesamtbestand: {{ amount }} {{ unit }}",
-      "minStock": "Min.: {{ amount }} {{ unit }}",
+      "totalStock": "Gesamtbestand: {{ amount }}",
+      "minStock": "Min.: {{ amount }}",
       "empty": "Derzeit nichts zu erledigen. Ich informiere dich, wenn Nachschub nötig ist."
     },
     "share": {
@@ -589,6 +589,7 @@
     "subtitle": "Intelligente Automatisierung und priorisierte Funktionen.",
     "benefits": {
       "agent": "KI-Menüplaner, der dir passende Menüs und Rezepte vorschlägt.",
+      "history": "Schalte deinen vollständigen Vorratsverlauf frei.",
       "future": "Frühzeitiger Zugriff auf zukünftige PRO-Funktionen."
     },
     "actions": {
@@ -620,7 +621,7 @@
     "title": "Einstellungen",
     "pro": {
       "statusDescription": "Danke für deine Unterstützung. PRO ist auf diesem Gerät aktiv.",
-      "upgradePrompt": "Werde PRO, um Premium-Funktionen freizuschalten.",
+      "upgradePrompt": "Werde PRO, um deinen vollständigen Verlauf und Premium-Funktionen freizuschalten.",
       "upgradeCta": "PRO werden",
       "badgePro": "PRO aktiv"
     },

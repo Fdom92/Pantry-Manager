@@ -3,7 +3,6 @@ import type { PantryItem } from '@core/models/pantry';
 export interface ConsumeTodayEntry {
   itemId: string;
   title: string;
-  unitLabel: string;
   quantity: number;
   maxQuantity: number;
   item: PantryItem;

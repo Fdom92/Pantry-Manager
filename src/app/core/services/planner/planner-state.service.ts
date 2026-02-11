@@ -1,28 +1,27 @@
 import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
-import { QUICK_PROMPTS, USER_PROMPT_MAXLENGTH } from '@core/constants';
-import { trimToNull } from '@core/domain/agent';
+import { QUICK_PROMPTS, USER_PROMPT_MAX_LENGTH } from '@core/constants';
 import { AgentEntryContext } from '@core/models/agent';
 import type { AgentMessage, QuickPrompt } from '@core/models/agent';
+import { normalizeOptionalTrim } from '@core/utils/normalization.util';
 import { NavController } from '@ionic/angular';
 import type { IonContent, IonTextarea } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
-import { RevenuecatService } from '../upgrade/revenuecat.service';
-import { AgentConversationStore } from './agent-conversation.store';
-import { MealPlannerAgentService } from './meal-planner-agent.service';
-import { findLastUserMessageIndex } from './conversation.utils';
+import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
+import { PlannerConversationStore } from './planner-conversation.store';
+import { PlannerAgentService } from './planner-agent.service';
 import { createLatestOnlyRunner } from '../shared';
 
 @Injectable()
-export class AgentStateService {
-  private readonly conversationStore = inject(AgentConversationStore);
-  private readonly mealPlannerAgent = inject(MealPlannerAgentService);
-  private readonly revenuecat = inject(RevenuecatService);
+export class PlannerStateService {
+  private readonly conversationStore = inject(PlannerConversationStore);
+  private readonly mealPlannerAgent = inject(PlannerAgentService);
+  private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly navCtrl = inject(NavController);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly requestTask = createLatestOnlyRunner(this.destroyRef);
   private readonly translate = inject(TranslateService);
+  private readonly requestTask = createLatestOnlyRunner(this.destroyRef);
 
   private content?: IonContent;
   private composerInput?: IonTextarea;
@@ -41,7 +40,7 @@ export class AgentStateService {
 
   readonly composerControl = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.maxLength(USER_PROMPT_MAXLENGTH)],
+    validators: [Validators.maxLength(USER_PROMPT_MAX_LENGTH)],
   });
 
   constructor() {
@@ -84,8 +83,7 @@ export class AgentStateService {
       }
       return;
     }
-    if (!this.revenuecat.canUseAgent()) {
-      await this.navigateToUpgrade();
+    if (!(await this.ensureAgentAccess())) {
       return;
     }
     this.conversationStore.setEntryContext(pendingInit.entryContext);
@@ -108,11 +106,10 @@ export class AgentStateService {
   }
 
   async sendMessage(): Promise<void> {
-    if (!this.revenuecat.canUseAgent()) {
-      await this.navigateToUpgrade();
+    if (!(await this.ensureAgentAccess())) {
       return;
     }
-    const message = trimToNull(this.composerControl.value);
+    const message = normalizeOptionalTrim(this.composerControl.value);
     if (!message) {
       return;
     }
@@ -141,7 +138,7 @@ export class AgentStateService {
       return;
     }
     const history = this.conversationStore.getHistorySnapshot();
-    const lastUserIndex = findLastUserMessageIndex(history);
+    const lastUserIndex = this.conversationStore.findLastUserMessageIndex(history);
     if (lastUserIndex === -1) {
       return;
     }
@@ -150,8 +147,7 @@ export class AgentStateService {
   }
 
   async selectQuickPrompt(prompt: QuickPrompt): Promise<void> {
-    if (!this.revenuecat.canUseAgent()) {
-      await this.navigateToUpgrade();
+    if (!(await this.ensureAgentAccess())) {
       return;
     }
     if (prompt.behavior === 'composer') {
@@ -177,7 +173,7 @@ export class AgentStateService {
     userText: string,
     options?: { appendUserMessage?: boolean }
   ): Promise<void> {
-    const trimmed = trimToNull(userText);
+    const trimmed = normalizeOptionalTrim(userText);
     if (!trimmed) {
       return;
     }
@@ -207,7 +203,7 @@ export class AgentStateService {
         if (!isActive()) {
           return;
         }
-        console.error('[AgentStateService] Meal planner run failed', err);
+        console.error('[PlannerStateService] Meal planner run failed', err);
         const errorMessage = this.conversationStore.createMessage(
           'assistant',
           this.translate.instant('agent.messages.unifiedError'),
@@ -234,6 +230,14 @@ export class AgentStateService {
     setTimeout(() => {
       void this.composerInput?.setFocus();
     });
+  }
+
+  private async ensureAgentAccess(): Promise<boolean> {
+    if (this.revenuecat.canUseAgent()) {
+      return true;
+    }
+    await this.navigateToUpgrade();
+    return false;
   }
 
   private updateComposerAccess(isUnlocked: boolean): void {

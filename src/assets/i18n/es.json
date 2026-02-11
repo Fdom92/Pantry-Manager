@@ -115,7 +115,7 @@
   "history": {
     "title": "Historial",
     "pro": {
-      "cta": "Ver más eventos con PRO"
+      "cta": "Desbloquea el historial completo con PRO"
     },
     "filters": {
       "title": "Filtros del historial",
@@ -231,7 +231,7 @@
     "lowStock": {
       "title": "Alertas de bajo stock",
       "subtitle": "En o por debajo del nivel mínimo",
-      "minLabel": "mín {{ value }} {{ unit }}",
+      "minLabel": "mín {{ value }}",
       "empty": "Todos los artículos están por encima de su nivel mínimo."
     },
     "batches": {
@@ -281,8 +281,8 @@
     "suggestions": {
       "title": "Lista de la compra",
       "loading": "Generando lista de compras…",
-      "totalStock": "Stock total: {{ amount }} {{ unit }}",
-      "minStock": "Mín.: {{ amount }} {{ unit }}",
+      "totalStock": "Stock total: {{ amount }}",
+      "minStock": "Mín.: {{ amount }}",
       "empty": "Nada pendiente por ahora. Te avisaré cuando algo necesite reponerse."
     },
     "share": {
@@ -579,6 +579,7 @@
     "subtitle": "Automatización inteligente y funciones prioritarias.",
     "benefits": {
       "agent": "Planificador con IA para proponerte menús y recetas a tu medida.",
+      "history": "Desbloquea el historial completo de tu despensa.",
       "future": "Acceso anticipado a futuras funciones PRO."
     },
     "actions": {
@@ -610,7 +611,7 @@
     "title": "Ajustes",
     "pro": {
       "statusDescription": "Gracias por apoyar el proyecto. PRO está activo en este dispositivo.",
-      "upgradePrompt": "Hazte PRO para desbloquear funciones premium.",
+      "upgradePrompt": "Hazte PRO para desbloquear el historial completo y funciones premium.",
       "upgradeCta": "Hazte PRO",
       "badgePro": "PRO activo"
     },

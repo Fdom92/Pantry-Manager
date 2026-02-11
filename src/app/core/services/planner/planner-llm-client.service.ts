@@ -3,7 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { LlmClientError, LlmCompletionRequest, LlmCompletionResponse } from '@core/models';
 import { firstValueFrom, timeout as rxTimeout } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { RevenuecatService } from '../upgrade/revenuecat.service';
+import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
+import { sleep } from '../shared/task.util';
 
 /**
  * Thin gateway around the backend LLM endpoint so agents don't need to know about HTTP.
@@ -11,9 +12,9 @@ import { RevenuecatService } from '../upgrade/revenuecat.service';
 @Injectable({
   providedIn: 'root',
 })
-export class LlmClientService {
+export class PlannerLlmClientService {
   private readonly http = inject(HttpClient);
-  private readonly revenuecat = inject(RevenuecatService);
+  private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly endpoint = environment.agentApiUrl ?? '';
   private readonly requestTimeoutMs = 30000;
   private readonly transientStatusCodes = new Set([502, 503, 504]);
@@ -22,7 +23,7 @@ export class LlmClientService {
 
   async complete(payload: LlmCompletionRequest): Promise<LlmCompletionResponse> {
     if (!this.endpoint) {
-      throw new Error('[LlmClientService] agentApiUrl is empty');
+      throw new Error('[PlannerLlmClientService] agentApiUrl is empty');
     }
 
     let attempt = 0;
@@ -53,18 +54,18 @@ export class LlmClientService {
         lastError = normalized;
         if (this.shouldRetry(normalized, attempt)) {
           attempt += 1;
-          console.warn('[LlmClientService] complete retrying', {
+            console.warn('[PlannerLlmClientService] complete retrying', {
             attempt,
             status: normalized.status,
           });
-          await this.delay(this.transientRetryDelayMs * attempt);
+          await sleep(this.transientRetryDelayMs * attempt);
           continue;
         }
         throw normalized;
       }
     }
 
-    throw lastError ?? this.buildDefaultError();
+    throw lastError ?? (new Error('Agent request failed') as LlmClientError);
   }
 
   private buildProHeaders(): Record<string, string> | undefined {
@@ -119,11 +120,4 @@ export class LlmClientService {
     return normalized;
   }
 
-  private buildDefaultError(): LlmClientError {
-    return new Error('Agent request failed') as LlmClientError;
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
 }

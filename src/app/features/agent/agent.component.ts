@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AgentStateService } from '@core/services/agent/agent-state.service';
+import { PlannerStateService } from '@core/services/planner/planner-state.service';
 import {
   IonBadge,
   IonButton,
@@ -46,13 +46,13 @@ import { ViewWillEnter } from '@ionic/angular';
   templateUrl: './agent.component.html',
   styleUrls: ['./agent.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [AgentStateService],
+  providers: [PlannerStateService],
 })
 export class AgentComponent implements ViewWillEnter, AfterViewInit {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
   @ViewChild(IonTextarea, { static: false }) private composerInput?: IonTextarea;
 
-  readonly facade = inject(AgentStateService);
+  readonly facade = inject(PlannerStateService);
 
   ngAfterViewInit(): void {
     this.facade.attachView(this.content, this.composerInput);
