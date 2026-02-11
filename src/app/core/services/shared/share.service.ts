@@ -13,6 +13,10 @@ export interface ShareBlobParams {
   text?: string;
 }
 
+export function shouldSkipShareOutcome(outcome: ShareOutcome): boolean {
+  return outcome === 'shared' || outcome === 'cancelled';
+}
+
 @Injectable({ providedIn: 'root' })
 export class ShareService {
   private readonly shareTimeoutMs = 120_000;

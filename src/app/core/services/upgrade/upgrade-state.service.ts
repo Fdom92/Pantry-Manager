@@ -5,7 +5,7 @@ import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { createLatestOnlyRunner, withSignalFlag } from '../shared';
-import { RevenuecatService } from './revenuecat.service';
+import { UpgradeRevenuecatService } from './upgrade-revenuecat.service';
 
 @Injectable()
 export class UpgradeStateService {
@@ -14,7 +14,7 @@ export class UpgradeStateService {
   private readonly lifecycle = createLatestOnlyRunner(this.destroyRef);
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
-  private readonly revenuecat = inject(RevenuecatService);
+  private readonly revenuecat = inject(UpgradeRevenuecatService);
   // SIGNALS
   readonly isLoadingPlans = signal(false);
   readonly planOptions = signal<PlanViewModel[]>([]);
@@ -62,15 +62,8 @@ export class UpgradeStateService {
     this.activePurchaseId.set(pkg.identifier);
     try {
       const success = await this.revenuecat.purchasePackage(pkg);
-      if (success) {
+      if (success || (await this.revenuecat.restore())) {
         await this.goDashboard();
-        return;
-      }
-
-      const restored = await this.revenuecat.restore();
-      if (restored) {
-        await this.goDashboard();
-        return;
       }
     } finally {
       this.activePurchaseId.set(null);

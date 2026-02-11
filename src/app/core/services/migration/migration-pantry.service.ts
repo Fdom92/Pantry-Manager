@@ -7,7 +7,7 @@ import { normalizeLocationId } from '@core/utils/normalization.util';
 import { getBooleanFlag, setBooleanFlag } from '@core/utils/storage-flag.util';
 
 @Injectable({ providedIn: 'root' })
-export class PantryMigrationService {
+export class MigrationPantryService {
   private readonly pantryService = inject(PantryService);
   private readonly PAGE_SIZE = 200;
   private readonly MIGRATION_CHECK_KEY = 'pantry:migration:2.6';
@@ -51,7 +51,7 @@ export class PantryMigrationService {
     try {
       await Promise.all(
         legacyItems.map(async item => {
-          const legacyLocations = Array.isArray(item.locations) ? item.locations : [];
+          const legacyLocations = this.getLegacyLocations(item);
           const batches = this.migrateLegacyLocations(legacyLocations);
           const minThreshold = this.normalizeItemMinThreshold(item.minThreshold, legacyLocations);
           await this.pantryService.saveItem({
@@ -64,7 +64,7 @@ export class PantryMigrationService {
       );
       setBooleanFlag(this.MIGRATION_CHECK_KEY, false);
     } catch (err) {
-      console.error('[PantryMigrationService] migrateIfNeeded error', err);
+      console.error('[MigrationPantryService] migrateIfNeeded error', err);
     }
   }
 
@@ -78,9 +78,10 @@ export class PantryMigrationService {
     if (hasTaggedBatches) {
       return false;
     }
-    const legacyLocations = Array.isArray(item.locations) ? item.locations : [];
+    const legacyLocations = this.getLegacyLocations(item);
     return legacyLocations.some(location => {
-      if (Array.isArray(location.batches) && location.batches.length > 0) {
+      const legacyBatches = this.getLegacyBatches(location);
+      if (legacyBatches.length > 0) {
         return true;
       }
       const legacyQuantity = toNumberOrZero((location as any).quantity);
@@ -99,7 +100,7 @@ export class PantryMigrationService {
         continue;
       }
       const locationId = normalizeLocationId(location.locationId);
-      const legacyBatches = Array.isArray(location.batches) ? location.batches : [];
+      const legacyBatches = this.getLegacyBatches(location);
       for (const batch of legacyBatches) {
         batches.push({
           ...batch,
@@ -144,6 +145,14 @@ export class PantryMigrationService {
     }
     const num = Number(value);
     return Number.isFinite(num) ? num : undefined;
+  }
+
+  private getLegacyLocations(item: LegacyPantryItem): LegacyLocationStock[] {
+    return Array.isArray(item.locations) ? item.locations : [];
+  }
+
+  private getLegacyBatches(location: LegacyLocationStock | undefined): ItemBatch[] {
+    return Array.isArray(location?.batches) ? location.batches : [];
   }
 
 }

@@ -1,20 +1,20 @@
 import { Injectable, inject } from '@angular/core';
 import { sumQuantities } from '@core/domain/pantry';
-import { PantryItem } from '@core/models/pantry';
+import type { PantryItem } from '@core/models/pantry';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { PantryService } from '../pantry/pantry.service';
-import { AppPreferencesService } from '../settings/app-preferences.service';
-import { LlmClientService } from './llm-client.service';
+import { SettingsPreferencesService } from '../settings/settings-preferences.service';
+import { PlannerLlmClientService } from './planner-llm-client.service';
 
 export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
 
 @Injectable({
   providedIn: 'root',
 })
-export class MealPlannerAgentService {
+export class PlannerAgentService {
   private readonly pantryService = inject(PantryService);
-  private readonly llm = inject(LlmClientService);
-  private readonly appPreferences = inject(AppPreferencesService);
+  private readonly llm = inject(PlannerLlmClientService);
+  private readonly appPreferences = inject(SettingsPreferencesService);
 
   async run(userText: string): Promise<string> {
     const [pantry, preferences] = await Promise.all([
@@ -23,9 +23,43 @@ export class MealPlannerAgentService {
     ]);
     const pantryContext = this.buildPantryContext(pantry);
     const userPreferencesSection = this.buildUserPreferencesSection(preferences.plannerMemory);
+    const system = this.buildMealPlannerSystemPrompt({ pantryContext, userPreferencesSection });
 
-    const system =
-      `
+    const response = await this.llm.complete({
+      system,
+      messages: [{ role: 'user', content: userText }],
+    });
+
+    return response.content;
+  }
+
+  private buildPantryContext(items: PantryItem[]): string {
+    if (!items?.length) {
+      return 'La despensa está vacía.';
+    }
+
+    return items
+      .map(item => {
+        const total = sumQuantities(item.batches ?? []);
+        return `- ${item.name}: ${total}`;
+      })
+      .join('\n');
+  }
+
+  private buildUserPreferencesSection(memory?: string | null): string {
+    const trimmed = normalizeTrim(memory);
+    if (!trimmed) {
+      return 'USER PREFERENCES\n      The user has not provided additional preferences.';
+    }
+    const formatted = trimmed.replace(/\r?\n/g, '\n      ');
+    return `USER PREFERENCES\n      ${formatted}`;
+  }
+
+  private buildMealPlannerSystemPrompt(params: {
+    pantryContext: string;
+    userPreferencesSection: string;
+  }): string {
+    return `
       You are a Meal Planning and Recipe Assistant.
       Your ONLY responsibility is to:
       - Suggest recipes
@@ -132,11 +166,11 @@ export class MealPlannerAgentService {
       ━━━━━━━━━━━━━━━━━━
 
       9. CURRENT PANTRY DATA
-      ${pantryContext}
+      ${params.pantryContext}
 
       ━━━━━━━━━━━━━━━━━━
 
-      ${userPreferencesSection}
+      ${params.userPreferencesSection}
 
       ━━━━━━━━━━━━━━━━━━
 
@@ -159,34 +193,5 @@ export class MealPlannerAgentService {
       You only plan meals or suggest recipes.
       Nothing else.
       `;
-
-    const response = await this.llm.complete({
-      system,
-      messages: [{ role: 'user', content: userText }],
-    });
-
-    return response.content;
-  }
-
-  private buildPantryContext(items: PantryItem[]): string {
-    if (!items?.length) {
-      return 'La despensa está vacía.';
-    }
-
-    return items
-      .map(item => {
-        const total = sumQuantities(item.batches ?? []);
-        return `- ${item.name}: ${total}`;
-      })
-      .join('\n');
-  }
-
-  private buildUserPreferencesSection(memory?: string | null): string {
-    const trimmed = normalizeTrim(memory);
-    if (!trimmed) {
-      return 'USER PREFERENCES\n      The user has not provided additional preferences.';
-    }
-    const formatted = trimmed.replace(/\r?\n/g, '\n      ');
-    return `USER PREFERENCES\n      ${formatted}`;
   }
 }

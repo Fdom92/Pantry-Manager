@@ -13,12 +13,12 @@ import {
 } from '@core/models';
 import { TranslateService } from '@ngx-translate/core';
 import { normalizeTrim } from '@core/utils/normalization.util';
-import { RevenuecatService } from '../upgrade';
+import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 
 @Injectable({ providedIn: 'root' })
-export class InsightService {
+export class DashboardInsightService {
   private readonly translate = inject(TranslateService);
-  private readonly revenueCat = inject(RevenuecatService);
+  private readonly revenueCat = inject(UpgradeRevenuecatService);
   private readonly dismissedInsightIds = new Set<string>();
   private readonly pendingReviewStaleDays = PENDING_REVIEW_STALE_DAYS;
 

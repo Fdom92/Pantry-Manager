@@ -2,17 +2,10 @@ import { collectBatches } from '@core/domain/pantry';
 import type { PantryItem } from '@core/models/pantry';
 import type { QuickEditPatch } from '@core/models/up-to-date';
 import { normalizeTrim } from '@core/utils/normalization.util';
+import { toDateInputValue, toIsoDate } from '@core/utils/date.util';
 
 export function hasAnyExpiryDate(item: PantryItem): boolean {
   return collectBatches(item.batches ?? []).some(batch => Boolean(batch.expirationDate));
-}
-
-export function toDateInputValue(dateIso: string): string {
-  try {
-    return new Date(dateIso).toISOString().slice(0, 10);
-  } catch {
-    return '';
-  }
 }
 
 export function getFirstExpiryDateInput(item: PantryItem | null): string {
@@ -26,18 +19,6 @@ export function getFirstExpiryDateInput(item: PantryItem | null): string {
     }
   }
   return '';
-}
-
-export function toIsoDate(dateInput: string): string | null {
-  const trimmed = normalizeTrim(dateInput);
-  if (!trimmed) {
-    return null;
-  }
-  const date = new Date(trimmed);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-  return date.toISOString();
 }
 
 export function applyQuickEdit(params: {

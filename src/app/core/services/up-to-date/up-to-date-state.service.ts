@@ -5,13 +5,13 @@ import { applyQuickEdit, getFirstExpiryDateInput, hasAnyExpiryDate } from '@core
 import { formatDateValue, formatQuantity } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { InsightService } from '../dashboard/insight.service';
+import { DashboardInsightService } from '../dashboard/dashboard-insight.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
-import { AppPreferencesService } from '../settings/app-preferences.service';
+import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { LanguageService } from '../shared/language.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { withSignalFlag } from '../shared';
-import { EventManagerService } from '../events';
+import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { formatFriendlyName, normalizeCategoryId, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
 import { hasMeaningfulItemChanges } from '@core/utils';
@@ -20,13 +20,13 @@ import { hasMeaningfulItemChanges } from '@core/utils';
 export class UpToDateStateService {
   // DI
   private readonly pantryStore = inject(PantryStoreService);
-  private readonly insightService = inject(InsightService);
-  private readonly appPreferences = inject(AppPreferencesService);
+  private readonly insightService = inject(DashboardInsightService);
+  private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventManager = inject(EventManagerService);
+  private readonly eventManager = inject(HistoryEventManagerService);
   // SIGNALS
   readonly isLoading = signal(false);
   readonly hasLoaded = signal(false);
@@ -261,11 +261,7 @@ export class UpToDateStateService {
   }
 
   getCategoryAutocompleteOptions(): AutocompleteItem<string>[] {
-    return this.categoryOptions().map(option => ({
-      id: option,
-      title: option,
-      raw: option,
-    }));
+    return this.mapSelectOptions(this.categoryOptions());
   }
 
   onEditCategoryValueChange(value: string): void {
@@ -273,24 +269,16 @@ export class UpToDateStateService {
   }
 
   onEditCategorySelect(option: AutocompleteItem<string>): void {
-    const value = normalizeTrim((option?.raw ?? '').toString());
-    if (!value) {
-      return;
-    }
-    this.editCategory.set(value);
+    this.applyAutocompleteValue(option, value => this.editCategory.set(value));
   }
 
   addCategoryOptionFromText(value: string): void {
-    const nextValue = normalizeTrim(value);
-    if (!nextValue) {
-      return;
-    }
-    const formatted = formatFriendlyName(nextValue, nextValue);
-    void this.addCategoryOption(formatted);
+    this.addOptionFromText(value, formatted => this.addCategoryOption(formatted));
   }
 
   onEditExpiryChange(event: CustomEvent): void {
-    this.editExpiryDate.set(this.getEventStringValue(event));
+    const value = (event.detail as any)?.value ?? '';
+    this.editExpiryDate.set(typeof value === 'string' ? value : String(value));
   }
 
   openEditModal(pending: InsightPendingReviewProduct): void {
@@ -351,10 +339,6 @@ export class UpToDateStateService {
       return;
     }
     this.isEditModalOpen.set(false);
-    this.resetEditState();
-  }
-
-  private resetEditState(): void {
     this.editTargetId.set(null);
     this.editCategory.set('');
     this.editExpiryDate.set('');
@@ -417,6 +401,31 @@ export class UpToDateStateService {
     this.editCategory.set(normalized);
   }
 
+  private addOptionFromText(value: string, addOption: (formatted: string) => Promise<void>): void {
+    const nextValue = normalizeTrim(value);
+    if (!nextValue) {
+      return;
+    }
+    const formatted = formatFriendlyName(nextValue, nextValue);
+    void addOption(formatted);
+  }
+
+  private applyAutocompleteValue(option: AutocompleteItem<string>, setter: (value: string) => void): void {
+    const value = normalizeTrim((option?.raw ?? '').toString());
+    if (!value) {
+      return;
+    }
+    setter(value);
+  }
+
+  private mapSelectOptions(options: string[]): AutocompleteItem<string>[] {
+    return options.map(option => ({
+      id: option,
+      title: option,
+      raw: option,
+    }));
+  }
+
   private getNextPendingId(currentId: string | null, snapshot: InsightPendingReviewProduct[]): string | null {
     if (!Array.isArray(snapshot) || snapshot.length === 0) {
       return null;
@@ -445,8 +454,4 @@ export class UpToDateStateService {
     this.currentId.set(nextId);
   }
 
-  private getEventStringValue(event: CustomEvent): string {
-    const value = (event.detail as any)?.value ?? '';
-    return typeof value === 'string' ? value : String(value);
-  }
 }

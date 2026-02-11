@@ -20,7 +20,7 @@ import { StorageService } from '../shared/storage.service';
 @Injectable({
   providedIn: 'root',
 })
-export class AppPreferencesService {
+export class SettingsPreferencesService {
   // DI
   private readonly storage = inject<StorageService<AppPreferencesDoc>>(StorageService);
   // DATA
@@ -88,17 +88,11 @@ export class AppPreferencesService {
         this.preferencesSignal.set(normalized);
         this.applyTheme(normalized.theme);
       } else {
-        const defaults = { ...DEFAULT_PREFERENCES };
-        this.preferencesSignal.set(defaults);
-        this.cachedDoc = null;
-        this.applyTheme(defaults.theme);
+        this.applyDefaults();
       }
     } catch (err) {
-      console.error('[AppPreferencesService] loadFromStorage error', err);
-      const defaults = { ...DEFAULT_PREFERENCES };
-      this.preferencesSignal.set(defaults);
-      this.cachedDoc = null;
-      this.applyTheme(defaults.theme);
+      console.error('[SettingsPreferencesService] loadFromStorage error', err);
+      this.applyDefaults();
     }
   }
 
@@ -190,5 +184,12 @@ export class AppPreferencesService {
       return '';
     }
     return trimmed.length > this.plannerMemoryLimit ? trimmed.slice(0, this.plannerMemoryLimit) : trimmed;
+  }
+
+  private applyDefaults(): void {
+    const defaults = { ...DEFAULT_PREFERENCES };
+    this.preferencesSignal.set(defaults);
+    this.cachedDoc = null;
+    this.applyTheme(defaults.theme);
   }
 }

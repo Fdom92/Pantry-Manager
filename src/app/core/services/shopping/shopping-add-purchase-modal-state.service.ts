@@ -1,5 +1,5 @@
 import { Injectable, effect, inject } from '@angular/core';
-import { ShoppingStateService } from '../shopping-state.service';
+import { ShoppingStateService } from './shopping-state.service';
 
 @Injectable()
 export class ShoppingAddPurchaseModalStateService {
@@ -17,14 +17,11 @@ export class ShoppingAddPurchaseModalStateService {
     effect(() => {
       const suggestion = this.shopping.purchaseTarget();
       if (!suggestion) {
-        this.quantity = 1;
-        this.expiryDate = null;
+        this.resetForm();
         return;
       }
 
-      const product = suggestion.item;
-      const suggestedQuantity = Number(suggestion.suggestedQuantity ?? 0) || Number(product?.minThreshold ?? 0);
-      this.quantity = suggestedQuantity > 0 ? suggestedQuantity : 1;
+      this.quantity = this.getSuggestedQuantity(suggestion);
       this.expiryDate = null;
     });
   }
@@ -48,5 +45,15 @@ export class ShoppingAddPurchaseModalStateService {
       expiryDate: this.expiryDate || null,
     };
     await this.shopping.confirmPurchaseForTarget(payload);
+  }
+
+  private resetForm(): void {
+    this.quantity = 1;
+    this.expiryDate = null;
+  }
+
+  private getSuggestedQuantity(suggestion: { suggestedQuantity?: number; item?: { minThreshold?: number | null } }): number {
+    const raw = Number(suggestion.suggestedQuantity ?? 0) || Number(suggestion.item?.minThreshold ?? 0);
+    return raw > 0 ? raw : 1;
   }
 }

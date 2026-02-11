@@ -137,13 +137,6 @@ export class StorageService<T extends BaseDoc> {
   }
 
   /**
-   * listByType - helper for specific services.
-   */
-  protected async listByType(type: string): Promise<T[]> {
-    return this.all(type);
-  }
-
-  /**
    * countByType - returns the number of documents for the requested type without fetching full docs.
    */
   protected async countByType(type: string): Promise<number> {

@@ -20,15 +20,14 @@ import { StorageService } from '../shared/storage.service';
   providedIn: 'root'
 })
 export class PantryService extends StorageService<PantryItem> {
-  // DATA
   private readonly TYPE = 'item';
+  private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
   private currentLoadPromise: Promise<void> | null = null;
   private dbPreloaded = false;
   private productIndexReady = false;
   private pendingPipelineReset = false;
   private backgroundLoadPromise: Promise<void> | null = null;
-  private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
-  // SIGNALS
+  private readonly pendingNavigationPreset = signal<Partial<PantryFilterState> | null>(null);
   readonly loadedProducts = signal<PantryItem[]>([]);
   readonly activeProducts = computed(() => this.loadedProducts().filter(item => this.getItemTotalQuantity(item) > 0));
   readonly filteredProducts = signal<PantryItem[]>([]);
@@ -40,7 +39,6 @@ export class PantryService extends StorageService<PantryItem> {
   readonly pipelineResetting = signal(false);
   readonly endReached = signal(false);
   readonly totalCount = signal(0);
-  private readonly pendingNavigationPreset = signal<Partial<PantryFilterState> | null>(null);
 
   constructor() {
     super();
@@ -155,7 +153,7 @@ export class PantryService extends StorageService<PantryItem> {
 
   /** Fetch every pantry item, computing aggregate fields directly from stored data. */
   async getAll(): Promise<PantryItem[]> {
-    const docs = await this.listByType(this.TYPE);
+    const docs = await this.all(this.TYPE);
     return docs.map(doc => this.applyDerivedFields(doc));
   }
 
@@ -586,11 +584,19 @@ export class PantryService extends StorageService<PantryItem> {
   /** Compute aggregate fields without mutating the original payload. */
   private applyDerivedFields(item: PantryItem): PantryItem {
     const rawBatches = Array.isArray(item.batches) ? item.batches : [];
-    const batches = this.normalizeBatches(rawBatches);
+    const batches = normalizeBatchesStock(rawBatches, {
+      generateBatchId: this.generateBatchId.bind(this),
+    });
     const supermarket = normalizeSupermarketName(
       (item.supermarket ?? (item as any).supermarketId) as string | undefined
     );
-    const minThreshold = this.toNumberOrUndefined(item.minThreshold);
+    const rawMinThreshold = item.minThreshold;
+    const minThreshold =
+      rawMinThreshold == null || (typeof rawMinThreshold === 'string' && rawMinThreshold === '')
+        ? undefined
+        : Number.isFinite(Number(rawMinThreshold))
+          ? Number(rawMinThreshold)
+          : undefined;
     const prepared: PantryItem = {
       ...item,
       supermarket,
@@ -606,20 +612,6 @@ export class PantryService extends StorageService<PantryItem> {
 
   getMigrationDatabase(): PouchDB.Database<PantryItem> {
     return this.database;
-  }
-
-  private normalizeBatches(batches: ItemBatch[] | undefined): ItemBatch[] {
-    return normalizeBatchesStock(batches, {
-      generateBatchId: this.generateBatchId.bind(this),
-    });
-  }
-
-  private toNumberOrUndefined(value: unknown): number | undefined {
-    if (value == null || value === '') {
-      return undefined;
-    }
-    const num = Number(value);
-    return Number.isFinite(num) ? num : undefined;
   }
 
   private generateBatchId(): string {
@@ -673,7 +665,7 @@ export class PantryService extends StorageService<PantryItem> {
       return next;
     });
     if (added) {
-      this.incrementTotalCount();
+      this.totalCount.update(count => count + 1);
     }
   }
 
@@ -689,16 +681,8 @@ export class PantryService extends StorageService<PantryItem> {
       return next;
     });
     if (removed) {
-      this.decrementTotalCount();
+      this.totalCount.update(count => Math.max(0, count - 1));
     }
-  }
-
-  private incrementTotalCount(delta: number = 1): void {
-    this.totalCount.update(count => count + delta);
-  }
-
-  private decrementTotalCount(delta: number = 1): void {
-    this.totalCount.update(count => Math.max(0, count - delta));
   }
 
   private async loadAllPages(): Promise<void> {

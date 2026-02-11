@@ -6,7 +6,7 @@ import {
   SETUP_STORAGE_KEY,
 } from '@core/constants';
 import { SetupStepKey } from '@core/models/setup';
-import { AppPreferencesService } from '@core/services/settings/app-preferences.service';
+import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { setBooleanFlag } from '@core/utils/storage-flag.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -20,7 +20,7 @@ interface SetupOptionViewModel {
 @Injectable()
 export class SetupStateService {
   private readonly navCtrl = inject(NavController);
-  private readonly preferences = inject(AppPreferencesService);
+  private readonly preferences = inject(SettingsPreferencesService);
   private readonly translate = inject(TranslateService);
 
   readonly steps = SETUP_STEPS;
@@ -41,7 +41,7 @@ export class SetupStateService {
   );
   readonly currentOptions = computed<SetupOptionViewModel[]>(() => {
     const step = this.currentStep();
-    const selections = step.key === 'locations' ? this.selectedLocations() : this.selectedCategories();
+    const selections = this.getSelections(step.key);
     return step.options.map(option => ({
       id: option.id,
       label: this.translate.instant(option.labelKey),
@@ -51,9 +51,7 @@ export class SetupStateService {
 
   toggleOption(optionId: string): void {
     const step = this.currentStep();
-    const selections = new Set(
-      step.key === 'locations' ? this.selectedLocations() : this.selectedCategories()
-    );
+    const selections = new Set(this.getSelections(step.key));
     if (selections.has(optionId)) {
       selections.delete(optionId);
     } else {
@@ -94,10 +92,14 @@ export class SetupStateService {
 
   private getSelectedLabels(stepKey: SetupStepKey): string[] {
     const options = stepKey === 'locations' ? SETUP_LOCATION_OPTIONS : SETUP_CATEGORY_OPTIONS;
-    const selections = stepKey === 'locations' ? this.selectedLocations() : this.selectedCategories();
+    const selections = this.getSelections(stepKey);
     return options
       .filter(option => selections.has(option.id))
       .map(option => this.translate.instant(option.labelKey));
+  }
+
+  private getSelections(stepKey: SetupStepKey): Set<string> {
+    return stepKey === 'locations' ? this.selectedLocations() : this.selectedCategories();
   }
 
   private setSelections(stepKey: SetupStepKey, selections: Set<string>): void {

@@ -3,14 +3,14 @@ import type { PantryItem } from '@core/models/pantry';
 import { PantryService } from '@core/services/pantry/pantry.service';
 import { normalizeCategoryId, normalizeLowercase, normalizeLocationId, normalizeStringList, normalizeSupermarketValue, normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { withSignalFlag } from '../../shared';
-import { AppPreferencesService } from '../app-preferences.service';
+import { withSignalFlag } from '../shared';
+import { SettingsPreferencesService } from './settings-preferences.service';
 
 type CatalogKind = 'category' | 'supermarket' | 'location';
 
 @Injectable()
 export class SettingsCatalogsStateService {
-  private readonly appPreferencesService = inject(AppPreferencesService);
+  private readonly appPreferencesService = inject(SettingsPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly pantryService = inject(PantryService);
 
@@ -32,32 +32,17 @@ export class SettingsCatalogsStateService {
     count: number;
     items: PantryItem[];
   } | null>(null);
-  readonly hasLocationChanges = computed(() => {
-    const draft = this.normalizeOptions(this.locationOptionsDraft());
-    const original = this.originalLocationOptions();
-    if (draft.length !== original.length) {
-      return true;
-    }
-    return draft.some((value, index) => value !== original[index]);
-  });
+  readonly hasLocationChanges = computed(() =>
+    this.hasDraftChanges(this.locationOptionsDraft(), this.originalLocationOptions())
+  );
 
-  readonly hasCategoryChanges = computed(() => {
-    const draft = this.normalizeOptions(this.categoryOptionsDraft());
-    const original = this.originalCategoryOptions();
-    if (draft.length !== original.length) {
-      return true;
-    }
-    return draft.some((value, index) => value !== original[index]);
-  });
+  readonly hasCategoryChanges = computed(() =>
+    this.hasDraftChanges(this.categoryOptionsDraft(), this.originalCategoryOptions())
+  );
 
-  readonly hasSupermarketChanges = computed(() => {
-    const draft = this.normalizeOptions(this.supermarketOptionsDraft());
-    const original = this.originalSupermarketOptions();
-    if (draft.length !== original.length) {
-      return true;
-    }
-    return draft.some((value, index) => value !== original[index]);
-  });
+  readonly hasSupermarketChanges = computed(() =>
+    this.hasDraftChanges(this.supermarketOptionsDraft(), this.originalSupermarketOptions())
+  );
 
   readonly hasAnyChanges = computed(
     () => this.hasLocationChanges() || this.hasCategoryChanges() || this.hasSupermarketChanges(),
@@ -227,7 +212,7 @@ export class SettingsCatalogsStateService {
       this.locationOptionsDraft.set([...locationPayload]);
       this.categoryOptionsDraft.set([...categoryPayload]);
       this.supermarketOptionsDraft.set([...supermarketPayload]);
-    }).catch(async err => {
+    }).catch(async (err: unknown) => {
       console.error('[SettingsCatalogsStateService] submitCatalogs error', err);
     });
   }
@@ -238,7 +223,7 @@ export class SettingsCatalogsStateService {
       this.syncLocationOptionsFromPreferences();
       this.syncCategoryOptionsFromPreferences();
       this.syncSupermarketOptionsFromPreferences();
-    }).catch(async err => {
+    }).catch(async (err: unknown) => {
       console.error('[SettingsCatalogsStateService] loadPreferences error', err);
     });
   }
@@ -269,6 +254,14 @@ export class SettingsCatalogsStateService {
 
   private normalizeOptions(values: readonly string[] | null | undefined): string[] {
     return normalizeStringList(values, { fallback: [] });
+  }
+
+  private hasDraftChanges(draft: readonly string[], original: readonly string[]): boolean {
+    const normalizedDraft = this.normalizeOptions(draft);
+    if (normalizedDraft.length !== original.length) {
+      return true;
+    }
+    return normalizedDraft.some((value, index) => value !== original[index]);
   }
 
   private normalizeCatalogValue(kind: CatalogKind, rawValue: string | null | undefined): string {

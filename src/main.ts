@@ -9,7 +9,7 @@ import localePt from '@angular/common/locales/pt';
 import { APP_INITIALIZER, LOCALE_ID, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { AppPreferencesService, LanguageService } from '@core/services';
+import { LanguageService, SettingsPreferencesService } from '@core/services';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -82,7 +82,7 @@ function initLanguage(language: LanguageService): () => Promise<void> {
   return () => language.init();
 }
 
-function initPreferences(appPreferences: AppPreferencesService): () => Promise<void> {
+function initPreferences(appPreferences: SettingsPreferencesService): () => Promise<void> {
   return () => appPreferences.getPreferences().then(() => void 0);
 }
 
@@ -159,7 +159,7 @@ bootstrapApplication(AppComponent, {
       })
     ),
     { provide: APP_INITIALIZER, useFactory: initLanguage, deps: [LanguageService], multi: true },
-    { provide: APP_INITIALIZER, useFactory: initPreferences, deps: [AppPreferencesService], multi: true },
+    { provide: APP_INITIALIZER, useFactory: initPreferences, deps: [SettingsPreferencesService], multi: true },
     { provide: LOCALE_ID, useFactory: localeFactory, deps: [LanguageService] },
   ],
 }).catch(err => console.error(err));

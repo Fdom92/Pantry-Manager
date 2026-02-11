@@ -1,6 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { SHOPPING_LIST_NAME } from '@core/constants';
-import { determineSuggestionNeed, groupSuggestionsBySupermarket, incrementSummary } from '@core/domain/shopping';
+import { determineSuggestionNeed, incrementSummary } from '@core/domain/shopping';
+import { groupSuggestionsBySupermarket } from '@core/utils/shopping-grouping.util';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
 import {
@@ -19,7 +20,7 @@ import jsPDF from 'jspdf';
 import { PantryService } from '../pantry/pantry.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { EventManagerService } from '../events';
+import { HistoryEventManagerService } from '../history/history-event-manager.service';
 
 @Injectable()
 export class ShoppingStateService {
@@ -29,7 +30,7 @@ export class ShoppingStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventManager = inject(EventManagerService);
+  private readonly eventManager = inject(HistoryEventManagerService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly download = inject(DownloadService);
@@ -134,7 +135,7 @@ export class ShoppingStateService {
 
       await withSignalFlag(this.isSharingListInProgress, async () => {
         const pdfBlob = this.buildShoppingPdf(state.groupedSuggestions);
-        const filename = this.buildShareFileName();
+        const filename = `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename(new Date())}.pdf`;
         const { outcome } = await this.share.tryShareBlob({
           blob: pdfBlob,
           filename,
@@ -207,15 +208,12 @@ export class ShoppingStateService {
 
     summary.total = suggestions.length;
     summary.supermarketCount = uniqueSupermarkets.size;
+    const unassignedLabel = this.translate.instant('shopping.unassignedSupermarket');
     const groupedSuggestions = groupSuggestionsBySupermarket({
       suggestions,
-      labelForUnassigned: this.getUnassignedSupermarketLabel(),
+      labelForUnassigned: unassignedLabel,
     });
     return { suggestions, groupedSuggestions, summary };
-  }
-
-  private getUnassignedSupermarketLabel(): string {
-    return this.translate.instant('shopping.unassignedSupermarket');
   }
 
   private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {
@@ -233,9 +231,15 @@ export class ShoppingStateService {
       quantity: 30,
       supermarket: 45,
     };
+    const locale = this.languageService.getCurrentLocale();
+    const unassignedLabel = this.translate.instant('shopping.unassignedSupermarket');
     const title = this.translate.instant('shopping.share.pdfTitle');
     const generatedOn = this.translate.instant('shopping.share.generatedOn', {
-      date: this.formatExportDate(now),
+      date: formatDateTimeValue(now, locale, {
+        dateOptions: { year: 'numeric', month: 'long', day: 'numeric' },
+        timeOptions: { hour: '2-digit', minute: '2-digit' },
+        fallback: '',
+      }),
     });
 
     doc.setFontSize(16);
@@ -263,8 +267,8 @@ export class ShoppingStateService {
       for (const suggestion of group.suggestions) {
         const row = {
           product: suggestion.item?.name ?? '',
-          quantity: formatQuantity(suggestion.suggestedQuantity, this.languageService.getCurrentLocale()),
-          supermarket: suggestion.supermarket ?? this.getUnassignedSupermarketLabel(),
+          quantity: formatQuantity(suggestion.suggestedQuantity, locale),
+          supermarket: suggestion.supermarket ?? unassignedLabel,
         };
         const productLines = doc.splitTextToSize(row.product, columnWidth.product);
         const quantityLines = doc.splitTextToSize(row.quantity, columnWidth.quantity);
@@ -288,14 +292,6 @@ export class ShoppingStateService {
     return doc.output('blob') as Blob;
   }
 
-  private formatExportDate(date: Date): string {
-    return formatDateTimeValue(date, this.languageService.getCurrentLocale(), {
-      dateOptions: { year: 'numeric', month: 'long', day: 'numeric' },
-      timeOptions: { hour: '2-digit', minute: '2-digit' },
-      fallback: '',
-    });
-  }
-
   private ensurePageSpace(doc: jsPDF, currentY: number, neededSpace: number): number {
     const bottomMargin = 20;
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -304,10 +300,6 @@ export class ShoppingStateService {
       return 20;
     }
     return currentY;
-  }
-
-  private buildShareFileName(): string {
-    return `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename(new Date())}.pdf`;
   }
 
   private async runWithProcessing(id: string, task: () => Promise<void>): Promise<void> {

@@ -2,10 +2,9 @@ import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_PRODUCT_NAME } from '@core/constants';
 import { ExpirationStatus } from '@core/models';
 import type { BatchIdGenerator, ExpiryClassification, ItemBatch, PantryItem, ProductStatusState } from '@core/models/pantry';
 import { roundQuantity } from '@core/utils/formatting.util';
-import { normalizeLowercase, normalizeOptionalTrim, normalizeSupermarketValue, normalizeTrim } from '@core/utils/normalization.util';
+import { normalizeOptionalTrim, normalizeTrim } from '@core/utils/normalization.util';
 
-
-export function normalizeFastAddQuantity(value: string | number | undefined): number {
+function normalizeFastAddQuantity(value: string | number | undefined): number {
   if (typeof value === 'number') {
     const numericValue = Number(value);
     return Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 1;
@@ -50,53 +49,6 @@ export function buildFastAddItemPayload(params: {
     createdAt: params.nowIso,
     updatedAt: params.nowIso,
   };
-}
-
-export function computeSupermarketSuggestions(items: PantryItem[]): string[] {
-  const options = new Map<string, string>();
-  for (const item of items) {
-    const normalizedValue = normalizeSupermarketValue(item.supermarket);
-    if (!normalizedValue) {
-      continue;
-    }
-    const key = normalizeLowercase(normalizedValue);
-    if (!options.has(key)) {
-      options.set(key, normalizedValue);
-    }
-  }
-  return Array.from(options.values()).sort((a, b) => a.localeCompare(b));
-}
-
-export function formatSupermarketLabel(value: string, otherLabel?: string): string {
-  const trimmed = normalizeTrim(value);
-  const normalized = normalizeLowercase(trimmed);
-  if (normalized === 'otro') {
-    return otherLabel ?? trimmed;
-  }
-  return trimmed;
-}
-
-export function buildUniqueSelectOptions(
-  values: Array<string | null | undefined>,
-  config?: { labelFor?: (value: string) => string }
-): Array<{ value: string; label: string }> {
-  const seen = new Set<string>();
-  const options: Array<{ value: string; label: string }> = [];
-
-  for (const value of values) {
-    const trimmed = normalizeTrim(value);
-    if (!trimmed) {
-      continue;
-    }
-    const normalized = normalizeLowercase(trimmed);
-    if (!normalized || seen.has(normalized)) {
-      continue;
-    }
-    seen.add(normalized);
-    options.push({ value: trimmed, label: config?.labelFor ? config.labelFor(trimmed) : trimmed });
-  }
-
-  return options;
 }
 
 export function collectBatches(

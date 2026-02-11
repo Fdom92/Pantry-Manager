@@ -1,26 +1,30 @@
-import { Signal, computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, Signal, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { getItemStatusState } from '@core/domain/pantry';
-import { PantryItem, PantrySummary } from '@core/models/pantry';
+import { PantryFilterState, PantryItem, PantrySummary } from '@core/models/pantry';
 import { StockStatus } from '@core/models/shared';
 import { normalizeLowercase, normalizeOptionalTrim, normalizeTrim } from '@core/utils/normalization.util';
-import { PantryService } from './pantry.service';
+import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { EventManagerService } from '../events';
+import { PantryService } from './pantry.service';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
-  // DI
   private readonly pantryService = inject(PantryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventManager = inject(EventManagerService);
-  // SIGNALS
-  readonly loading: Signal<boolean> = this.pantryService.loading;
-  readonly endReached: Signal<boolean> = this.pantryService.endReached;
-  readonly error = signal<string | null>(null);
+  private readonly eventManager = inject(HistoryEventManagerService);
   private realtimeSubscribed = false;
   private expiredScanInProgress = false;
-  // COMPUTED
+  readonly error = signal<string | null>(null);
+  readonly loading: Signal<boolean> = this.pantryService.loading;
+  readonly endReached: Signal<boolean> = this.pantryService.endReached;
+  readonly searchQuery: Signal<string> = this.pantryService.searchQuery;
+  readonly activeFilters: Signal<PantryFilterState> = this.pantryService.activeFilters;
+  readonly pipelineResetting: Signal<boolean> = this.pantryService.pipelineResetting;
+  readonly totalCount: Signal<number> = this.pantryService.totalCount;
+  readonly loadedProducts: Signal<PantryItem[]> = this.pantryService.loadedProducts;
+  readonly activeProducts: Signal<PantryItem[]> = this.pantryService.activeProducts;
+  readonly filteredProducts: Signal<PantryItem[]> = this.pantryService.filteredProducts;
   readonly items = computed(() => this.pantryService.activeProducts());
   readonly expiredItems = computed(() => {
     const now = new Date();
@@ -44,8 +48,8 @@ export class PantryStoreService {
   /** Load items from storage, updating loading/error signals accordingly. */
   async loadAll(): Promise<void> {
     try {
-      await this.pantryService.ensureFirstPageLoaded();
-      this.pantryService.startBackgroundLoad();
+      await this.ensureFirstPageLoaded();
+      this.startBackgroundLoad();
       this.watchRealtime();
       this.error.set(null);
       void this.logExpiredBatchEvents(this.items());
@@ -105,6 +109,37 @@ export class PantryStoreService {
   /** Simple alias used by views to trigger a full reload. */
   async refresh(): Promise<void> {
     await this.loadAll();
+  }
+
+  clearEntryFilters(): void {
+    this.pantryService.clearEntryFilters();
+  }
+
+  applyPendingNavigationPreset(): void {
+    this.pantryService.applyPendingNavigationPreset();
+  }
+
+  async ensureFirstPageLoaded(): Promise<void> {
+    await this.pantryService.ensureFirstPageLoaded();
+  }
+
+  startBackgroundLoad(): void {
+    this.pantryService.startBackgroundLoad();
+  }
+
+  setSearchQuery(value: string): void {
+    this.pantryService.setSearchQuery(value);
+  }
+
+  setFilters(filters: Partial<PantryFilterState>): void {
+    this.pantryService.setFilters(filters);
+  }
+
+  async addNewLot(
+    itemId: string,
+    params: { quantity: number; expiryDate?: string; location?: string }
+  ): Promise<PantryItem | null> {
+    return this.pantryService.addNewLot(itemId, params);
   }
 
   /** Bridge live database change events into the signal-based store. */

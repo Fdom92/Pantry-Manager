@@ -2,11 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { classifyExpiry, sumQuantities } from '@core/domain/pantry';
 import type { PantryItem } from '@core/models/pantry';
 import { normalizeTrim, normalizeWhitespace } from '@core/utils/normalization.util';
-import { EventLogService } from './event-log.service';
+import { HistoryEventLogService } from './history-event-log.service';
 
 @Injectable({ providedIn: 'root' })
-export class EventManagerService {
-  private readonly eventLog = inject(EventLogService);
+export class HistoryEventManagerService {
+  private readonly eventLog = inject(HistoryEventLogService);
+
+  private getItemQuantity(item: PantryItem): number {
+    return sumQuantities(item.batches ?? []);
+  }
 
   private buildExpireBatchKey(productId: string, batch: { batchId?: string; expirationDate?: string }): string | null {
     if (batch.batchId) {
@@ -20,7 +24,7 @@ export class EventManagerService {
   }
 
   async logFastAddNewItem(item: PantryItem, addedQuantity: number, timestamp?: string) {
-    const nextQuantity = sumQuantities(item.batches ?? []);
+    const nextQuantity = this.getItemQuantity(item);
     return this.eventLog.logAddEvent({
       productId: item._id,
       productName: item.name,
@@ -38,34 +42,15 @@ export class EventManagerService {
     addedQuantity: number,
     timestamp?: string
   ) {
-    const previousQuantity = sumQuantities(previousItem.batches ?? []);
-    const nextQuantity = sumQuantities(updatedItem.batches ?? []);
-    return this.eventLog.logAddEvent({
-      productId: updatedItem._id,
-      productName: updatedItem.name,
-      quantity: addedQuantity,
-      deltaQuantity: addedQuantity,
-      previousQuantity,
-      nextQuantity,
-      timestamp,
-    });
+    return this.logAddWithDelta(previousItem, updatedItem, addedQuantity, timestamp);
   }
 
   async logShoppingAdd(previousItem: PantryItem, updatedItem: PantryItem, addedQuantity: number) {
-    const previousQuantity = sumQuantities(previousItem.batches ?? []);
-    const nextQuantity = sumQuantities(updatedItem.batches ?? []);
-    return this.eventLog.logAddEvent({
-      productId: updatedItem._id,
-      productName: updatedItem.name,
-      quantity: addedQuantity,
-      deltaQuantity: addedQuantity,
-      previousQuantity,
-      nextQuantity,
-    });
+    return this.logAddWithDelta(previousItem, updatedItem, addedQuantity);
   }
 
   async logAdvancedCreate(item: PantryItem) {
-    const totalQuantity = sumQuantities(item.batches ?? []);
+    const totalQuantity = this.getItemQuantity(item);
     if (!Number.isFinite(totalQuantity) || totalQuantity <= 0) {
       return null;
     }
@@ -88,8 +73,8 @@ export class EventManagerService {
   }
 
   private logEditWithDelta(previousItem: PantryItem, updatedItem: PantryItem) {
-    const previousQuantity = sumQuantities(previousItem.batches ?? []);
-    const nextQuantity = sumQuantities(updatedItem.batches ?? []);
+    const previousQuantity = this.getItemQuantity(previousItem);
+    const nextQuantity = this.getItemQuantity(updatedItem);
     return this.eventLog.logEditEvent({
       productId: updatedItem._id,
       productName: updatedItem.name,
@@ -101,8 +86,8 @@ export class EventManagerService {
   }
 
   async logConsumeDashboard(previousItem: PantryItem, updatedItem: PantryItem, consumedQuantity: number) {
-    const previousQuantity = sumQuantities(previousItem.batches ?? []);
-    const nextQuantity = sumQuantities(updatedItem.batches ?? []);
+    const previousQuantity = this.getItemQuantity(previousItem);
+    const nextQuantity = this.getItemQuantity(updatedItem);
     return this.eventLog.logConsumeEvent({
       productId: updatedItem._id,
       productName: previousItem.name,
@@ -117,8 +102,8 @@ export class EventManagerService {
     if (!Number.isFinite(deltaQuantity) || deltaQuantity === 0) {
       return null;
     }
-    const previousQuantity = previousItem ? sumQuantities(previousItem.batches ?? []) : undefined;
-    const nextQuantity = sumQuantities(updatedItem.batches ?? []);
+    const previousQuantity = previousItem ? this.getItemQuantity(previousItem) : undefined;
+    const nextQuantity = this.getItemQuantity(updatedItem);
     if (previousQuantity != null && previousQuantity === nextQuantity) {
       return null;
     }
@@ -185,7 +170,7 @@ export class EventManagerService {
   }
 
   async logDeleteFromCard(item: PantryItem) {
-    const totalQuantity = sumQuantities(item.batches ?? []);
+    const totalQuantity = this.getItemQuantity(item);
     return this.eventLog.logDeleteEvent({
       productId: item._id,
       productName: item.name,
@@ -209,6 +194,25 @@ export class EventManagerService {
       return this.eventLog.logAddEvent(params);
     }
     return this.eventLog.logConsumeEvent(params);
+  }
+
+  private logAddWithDelta(
+    previousItem: PantryItem,
+    updatedItem: PantryItem,
+    addedQuantity: number,
+    timestamp?: string
+  ) {
+    const previousQuantity = this.getItemQuantity(previousItem);
+    const nextQuantity = this.getItemQuantity(updatedItem);
+    return this.eventLog.logAddEvent({
+      productId: updatedItem._id,
+      productName: updatedItem.name,
+      quantity: addedQuantity,
+      deltaQuantity: addedQuantity,
+      previousQuantity,
+      nextQuantity,
+      timestamp,
+    });
   }
 
 }

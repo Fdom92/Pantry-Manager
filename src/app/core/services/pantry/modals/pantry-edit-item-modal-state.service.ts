@@ -1,11 +1,8 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_LOCATION_KEY } from '@core/constants';
-import {
-  buildUniqueSelectOptions,
-  formatSupermarketLabel,
-} from '@core/domain/pantry';
-import { toDateInputValue, toIsoDate } from '@core/domain/up-to-date';
+import { buildUniqueSelectOptions, formatSupermarketLabel } from '@core/utils/pantry-selectors.util';
+import { toDateInputValue, toIsoDate } from '@core/utils/date.util';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { createDocumentId, hasMeaningfulItemChanges } from '@core/utils';
 import { formatQuantity } from '@core/utils/formatting.util';
@@ -20,8 +17,8 @@ import {
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
-import { EventManagerService } from '../../events';
-import { AppPreferencesService } from '../../settings/app-preferences.service';
+import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { SettingsPreferencesService } from '../../settings/settings-preferences.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { PantryService } from '../pantry.service';
@@ -31,10 +28,11 @@ export class PantryEditItemModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
   private readonly fb = inject(FormBuilder);
-  private readonly appPreferences = inject(AppPreferencesService);
+  private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly listState = inject(PantryStateService);
-  private readonly eventManager = inject(EventManagerService);
+  private readonly eventManager = inject(HistoryEventManagerService);
+
   readonly isOpen = signal(false);
   readonly isSaving = signal(false);
   readonly editingItem = signal<PantryItem | null>(null);
@@ -42,17 +40,20 @@ export class PantryEditItemModalStateService {
   readonly selectorEnabled = signal(false);
   readonly selectorQuery = signal('');
   readonly selectedName = signal('');
-  readonly selectorOptions = computed(() =>
-    this.buildSelectorOptions(this.pantryService.loadedProducts())
-  );
+  readonly selectorOptions = computed(() => this.buildSelectorOptions(this.pantryService.loadedProducts()));
   readonly selectorLocked = computed(() => this.selectorEnabled() && !!normalizeTrim(this.selectedName()));
   readonly selectorInputValue = computed(() =>
     this.selectorLocked() ? this.selectedName() : this.selectorQuery()
   );
   readonly showSelectorEmptyAction = computed(() => normalizeTrim(this.selectorQuery()).length >= 1);
-  readonly selectorEmptyActionLabel = computed(() =>
-    this.buildSelectorEmptyActionLabel(normalizeTrim(this.selectorQuery()))
-  );
+  readonly selectorEmptyActionLabel = computed(() => {
+    const query = normalizeTrim(this.selectorQuery());
+    if (!query) {
+      return '';
+    }
+    const formatted = formatFriendlyName(query, query);
+    return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
+  });
 
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -139,150 +140,67 @@ export class PantryEditItemModalStateService {
   }
 
   getCategorySelectOptions(): Array<{ value: string; label: string }> {
-    const presetOptions = this.presetCategoryOptions();
-    const seen = new Set<string>();
-    const options: Array<{ value: string; label: string }> = [];
-
-    const addOption = (value: string, label?: string): void => {
-      const normalized = normalizeLowercase(value);
-      if (!normalized || seen.has(normalized)) {
-        return;
-      }
-      seen.add(normalized);
-      const trimmed = normalizeTrim(value);
-      const display = label ?? this.formatCategoryName(trimmed);
-      options.push({ value: trimmed, label: display });
-    };
-
-    for (const preset of presetOptions) {
-      addOption(preset);
-    }
-
-    const control = this.form.get('categoryId');
-    const currentValue = typeof control?.value === 'string' ? normalizeCategoryId(control.value) : '';
-    if (currentValue && !seen.has(normalizeLowercase(currentValue))) {
-      addOption(currentValue);
-    }
-
-    return options;
+    const presetOptions = normalizeStringList(this.appPreferences.preferences().categoryOptions, { fallback: [] });
+    const uncategorizedLabel = this.translate.instant('pantry.form.uncategorized');
+    const currentValue = this.getFormStringValue('categoryId', normalizeCategoryId);
+    return this.buildSelectOptions(presetOptions, currentValue, value =>
+      formatFriendlyName(value, uncategorizedLabel)
+    );
   }
 
   getLocationOptionsForBatch(index: number): Array<{ value: string; label: string }> {
-    const presetOptions = this.presetLocationOptions();
-    const seen = new Set<string>();
-    const options: Array<{ value: string; label: string }> = [];
-
-    const addOption = (value: string, label?: string): void => {
-      const normalized = normalizeLowercase(value);
-      if (!normalized || seen.has(normalized)) {
-        return;
-      }
-      seen.add(normalized);
-      const display = label ?? normalizeLocationId(value, this.translate.instant('common.locations.none'));
-      options.push({ value, label: display });
-    };
-
-    for (const preset of presetOptions) {
-      addOption(preset);
-    }
-
+    const presetOptions = normalizeStringList(this.appPreferences.preferences().locationOptions, { fallback: [] });
+    const noneLabel = this.translate.instant('common.locations.none');
     const batchGroup = this.batchesArray.at(index);
     const currentValue = normalizeLocationId(batchGroup?.get('locationId')?.value);
-    if (currentValue && !seen.has(normalizeLowercase(currentValue))) {
-      addOption(currentValue);
-    }
-
-    return options;
+    return this.buildSelectOptions(presetOptions, currentValue, value => normalizeLocationId(value, noneLabel));
   }
 
   getLocationAutocompleteOptionsForBatch(index: number): AutocompleteItem<string>[] {
-    return this.getLocationOptionsForBatch(index)
-      .map(option => ({
-        id: option.value,
-        title: option.label,
-        raw: option.value,
-      }));
+    return this.mapSelectOptions(this.getLocationOptionsForBatch(index));
   }
 
   getSupermarketSelectOptions(): Array<{ value: string; label: string }> {
-    const presetOptions = this.presetSupermarketOptions();
-    const control = this.form.get('supermarket');
-    const currentValue = normalizeTrim(control?.value ?? '');
-    const options = buildUniqueSelectOptions([...presetOptions, currentValue], {
-      labelFor: value =>
-        formatSupermarketLabel(value, this.translate.instant('settings.catalogs.supermarkets.other')),
-    });
-    return options;
+    const presetOptions = normalizeStringList(this.appPreferences.preferences().supermarketOptions, { fallback: [] });
+    const currentValue = this.getFormStringValue('supermarket');
+    return this.buildSelectOptions(presetOptions, currentValue, value =>
+      formatSupermarketLabel(value, this.translate.instant('settings.catalogs.supermarkets.other'))
+    );
   }
 
   getCategoryAutocompleteOptions(): AutocompleteItem<string>[] {
-    return this.getCategorySelectOptions()
-      .map(option => ({
-        id: option.value,
-        title: option.label,
-        raw: option.value,
-      }));
+    return this.mapSelectOptions(this.getCategorySelectOptions());
   }
 
   getSupermarketAutocompleteOptions(): AutocompleteItem<string>[] {
-    return this.getSupermarketSelectOptions()
-      .map(option => ({
-        id: option.value,
-        title: option.label,
-        raw: option.value,
-      }));
+    return this.mapSelectOptions(this.getSupermarketSelectOptions());
   }
 
   onCategoryAutocompleteSelect(option: AutocompleteItem<string>): void {
-    const value = normalizeTrim((option?.raw ?? '').toString());
-    if (!value) {
-      return;
-    }
-    this.form.get('categoryId')?.setValue(value);
+    this.applyAutocompleteValue(option, value => this.form.get('categoryId')?.setValue(value));
   }
 
   onSupermarketAutocompleteSelect(option: AutocompleteItem<string>): void {
-    const value = normalizeTrim((option?.raw ?? '').toString());
-    if (!value) {
-      return;
-    }
-    this.form.get('supermarket')?.setValue(value);
+    this.applyAutocompleteValue(option, value => this.form.get('supermarket')?.setValue(value));
   }
 
   onLocationAutocompleteSelect(index: number, option: AutocompleteItem<string>): void {
-    const value = normalizeTrim((option?.raw ?? '').toString());
-    if (!value) {
-      return;
-    }
-    const control = this.batchesArray.at(index);
-    control?.get('locationId')?.setValue(value);
+    this.applyAutocompleteValue(option, value => {
+      const control = this.batchesArray.at(index);
+      control?.get('locationId')?.setValue(value);
+    });
   }
 
   addCategoryOptionFromText(value: string): void {
-    const nextValue = normalizeTrim(value);
-    if (!nextValue) {
-      return;
-    }
-    const formatted = formatFriendlyName(nextValue, nextValue);
-    void this.addCategoryOption(formatted);
+    this.addOptionFromText(value, formatted => this.addCategoryOption(formatted));
   }
 
   addSupermarketOptionFromText(value: string): void {
-    const nextValue = normalizeTrim(value);
-    if (!nextValue) {
-      return;
-    }
-    const formatted = formatFriendlyName(nextValue, nextValue);
-    void this.addSupermarketOption(formatted);
+    this.addOptionFromText(value, formatted => this.addSupermarketOption(formatted));
   }
 
   addLocationOptionFromText(index: number, value: string): void {
-    const nextValue = normalizeTrim(value);
-    if (!nextValue) {
-      return;
-    }
-    const formatted = formatFriendlyName(nextValue, nextValue);
-    void this.addLocationOption(index, formatted);
+    this.addOptionFromText(value, formatted => this.addLocationOption(index, formatted));
   }
 
   onSelectorQueryChange(value: string): void {
@@ -318,58 +236,106 @@ export class PantryEditItemModalStateService {
   }
 
   private async addSupermarketOption(value: string): Promise<void> {
-    const normalized = normalizeSupermarketValue(value);
-    if (!normalized) {
-      return;
-    }
     const current = await this.appPreferences.getPreferences();
-    const existing = current.supermarketOptions ?? [];
-    const normalizedKey = normalizeLowercase(normalized);
-    const existingMatch = existing.find(option => normalizeLowercase(option) === normalizedKey);
-    if (existingMatch) {
-      this.form.get('supermarket')?.setValue(existingMatch);
-      return;
-    }
-    const next = [...existing, normalized];
-    await this.appPreferences.savePreferences({ ...current, supermarketOptions: next });
-    this.form.get('supermarket')?.setValue(normalized);
+    await this.addPreferenceOption({
+      value,
+      existing: current.supermarketOptions,
+      normalizeValue: normalizeSupermarketValue,
+      onSelected: selected => this.form.get('supermarket')?.setValue(selected),
+      onSave: next => this.appPreferences.savePreferences({ ...current, supermarketOptions: next }),
+    });
   }
 
   private async addCategoryOption(value: string): Promise<void> {
-    const normalized = normalizeCategoryId(value);
-    if (!normalized) {
-      return;
-    }
     const current = await this.appPreferences.getPreferences();
-    const existing = current.categoryOptions ?? [];
-    const normalizedKey = normalizeLowercase(normalized);
-    const existingMatch = existing.find(option => normalizeLowercase(normalizeCategoryId(option)) === normalizedKey);
-    if (existingMatch) {
-      this.form.get('categoryId')?.setValue(existingMatch);
-      return;
-    }
-    const next = [...existing, normalized];
-    await this.appPreferences.savePreferences({ ...current, categoryOptions: next });
-    this.form.get('categoryId')?.setValue(normalized);
+    await this.addPreferenceOption({
+      value,
+      existing: current.categoryOptions,
+      normalizeValue: normalizeCategoryId,
+      onSelected: selected => this.form.get('categoryId')?.setValue(selected),
+      onSave: next => this.appPreferences.savePreferences({ ...current, categoryOptions: next }),
+    });
   }
 
   private async addLocationOption(index: number, value: string): Promise<void> {
-    const normalized = normalizeLocationId(value);
+    const current = await this.appPreferences.getPreferences();
+    await this.addPreferenceOption({
+      value,
+      existing: current.locationOptions,
+      normalizeValue: normalizeLocationId,
+      onSelected: selected => {
+        const control = this.batchesArray.at(index);
+        control?.get('locationId')?.setValue(selected);
+      },
+      onSave: next => this.appPreferences.savePreferences({ ...current, locationOptions: next }),
+    });
+  }
+
+  private async addPreferenceOption(params: {
+    value: string;
+    existing: string[] | null | undefined;
+    normalizeValue: (value: string) => string | undefined;
+    onSelected: (value: string) => void;
+    onSave: (next: string[]) => Promise<void>;
+  }): Promise<void> {
+    const normalized = params.normalizeValue(params.value);
     if (!normalized) {
       return;
     }
-    const current = await this.appPreferences.getPreferences();
-    const existing = current.locationOptions ?? [];
+    const existing = params.existing ?? [];
     const normalizedKey = normalizeLowercase(normalized);
-    const existingMatch = existing.find(option => normalizeLowercase(normalizeLocationId(option)) === normalizedKey);
+    const existingMatch = existing.find(option => {
+      const normalizedOption = params.normalizeValue(option);
+      return normalizeLowercase(normalizedOption ?? '') === normalizedKey;
+    });
     const nextValue = existingMatch ?? normalized;
     if (!existingMatch) {
-      const next = [...existing, normalized];
-      await this.appPreferences.savePreferences({ ...current, locationOptions: next });
+      await params.onSave([...existing, normalized]);
     }
-    const control = this.batchesArray.at(index);
-    control?.get('locationId')?.setValue(nextValue);
+    params.onSelected(nextValue);
   }
+
+  private addOptionFromText(value: string, addOption: (formatted: string) => Promise<void>): void {
+    const nextValue = normalizeTrim(value);
+    if (!nextValue) {
+      return;
+    }
+    const formatted = formatFriendlyName(nextValue, nextValue);
+    void addOption(formatted);
+  }
+
+  private applyAutocompleteValue(option: AutocompleteItem<string>, setter: (value: string) => void): void {
+    const value = normalizeTrim((option?.raw ?? '').toString());
+    if (!value) {
+      return;
+    }
+    setter(value);
+  }
+
+  private buildSelectOptions(
+    presetOptions: string[],
+    currentValue: string,
+    labelFor: (value: string) => string
+  ): Array<{ value: string; label: string }> {
+    return buildUniqueSelectOptions([...presetOptions, currentValue], { labelFor });
+  }
+
+  private getFormStringValue(
+    controlName: string,
+    normalizeValue: (value: string) => string = normalizeTrim
+  ): string {
+    const control = this.form.get(controlName);
+    return typeof control?.value === 'string' ? normalizeValue(control.value) : '';
+  }
+
+  private mapSelectOptions(options: Array<{ value: string; label: string }>): AutocompleteItem<string>[] {
+    return options.map(option => ({
+      id: option.value,
+      title: option.label,
+      raw: option.value,
+    }));
+  }
+
   async submitItem(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -384,7 +350,6 @@ export class PantryEditItemModalStateService {
     try {
       const existing = this.editingItem();
       const item = this.buildItemPayload(existing ?? undefined);
-      const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
       if (existing) {
         if (!hasMeaningfulItemChanges(existing, item)) {
           this.dismiss();
@@ -502,7 +467,7 @@ export class PantryEditItemModalStateService {
             ? toIsoDate(batchValue.expirationDate) ?? undefined
             : undefined;
         const batchQuantity = batchValue?.quantity != null ? Number(batchValue.quantity) : 0;
-    const batchId = normalizeTrim(batchValue?.batchId) || undefined;
+        const batchId = normalizeTrim(batchValue?.batchId) || undefined;
         const opened = batchValue?.opened ? true : undefined;
         const locationId = normalizeLocationId(batchValue?.locationId) || undefined;
         return {
@@ -534,22 +499,6 @@ export class PantryEditItemModalStateService {
     };
   }
 
-  private presetCategoryOptions(): string[] {
-    return normalizeStringList(this.appPreferences.preferences().categoryOptions, { fallback: [] });
-  }
-
-  private presetLocationOptions(): string[] {
-    return normalizeStringList(this.appPreferences.preferences().locationOptions, { fallback: [] });
-  }
-
-  private presetSupermarketOptions(): string[] {
-    return normalizeStringList(this.appPreferences.preferences().supermarketOptions, { fallback: [] });
-  }
-
-  private formatCategoryName(key: string): string {
-    return formatFriendlyName(key, this.translate.instant('pantry.form.uncategorized'));
-  }
-
   private buildSelectorOptions(items: PantryItem[]): AutocompleteItem<PantryItem>[] {
     const locale = this.translate.currentLang ?? 'es';
     return (items ?? []).map(item => {
@@ -562,14 +511,6 @@ export class PantryEditItemModalStateService {
         raw: item,
       };
     });
-  }
-
-  private buildSelectorEmptyActionLabel(query: string): string {
-    if (!query) {
-      return '';
-    }
-    const formatted = formatFriendlyName(query, query);
-    return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   }
 
 }

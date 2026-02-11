@@ -1,13 +1,13 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { PLANNER_MEMORY_MAX_LENGTH } from '@core/constants';
-import { withSignalFlag } from '../../shared';
-import { AppPreferencesService } from '../app-preferences.service';
+import { withSignalFlag } from '../shared';
+import { SettingsPreferencesService } from './settings-preferences.service';
 import { TranslateService } from '@ngx-translate/core';
 import { normalizeTrim } from '@core/utils/normalization.util';
 
 @Injectable()
 export class SettingsAiStateService {
-  private readonly appPreferences = inject(AppPreferencesService);
+  private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly translate = inject(TranslateService);
 
   readonly plannerMemory = signal('');
@@ -41,7 +41,7 @@ export class SettingsAiStateService {
       });
       this.originalPlannerMemory.set(next);
       this.plannerMemory.set(next);
-    }).catch(async err => {
+    }).catch(async (err: unknown) => {
       console.error('[SettingsAiStateService] submitPlannerMemory error', err);
     });
   }
@@ -52,7 +52,7 @@ export class SettingsAiStateService {
       const stored = prefs.plannerMemory ?? '';
       this.plannerMemory.set(stored);
       this.originalPlannerMemory.set(stored);
-    }).catch(async err => {
+    }).catch(async (err: unknown) => {
       console.error('[SettingsAiStateService] loadPlannerMemory error', err);
     });
   }

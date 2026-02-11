@@ -5,17 +5,17 @@ import { createDocumentId } from '@core/utils';
 import { StorageService } from '../shared/storage.service';
 
 @Injectable({ providedIn: 'root' })
-export class EventLogService extends StorageService<PantryEvent> {
+export class HistoryEventLogService extends StorageService<PantryEvent> {
   private readonly TYPE = 'event';
 
   async listEvents(): Promise<PantryEvent[]> {
-    const events = await this.listByType(this.TYPE);
-    return [...events].sort((a, b) => this.toTimestamp(b.timestamp) - this.toTimestamp(a.timestamp));
+    const events = await this.all(this.TYPE);
+    return this.sortByTimestamp(events);
   }
 
   async listEventsByType(eventType: PantryEvent['eventType']): Promise<PantryEvent[]> {
     const events = await this.findByField('eventType', eventType);
-    return [...events].sort((a, b) => this.toTimestamp(b.timestamp) - this.toTimestamp(a.timestamp));
+    return this.sortByTimestamp(events);
   }
 
   async logAddEvent(params: BaseEventParams): Promise<PantryEvent | null> {
@@ -80,14 +80,17 @@ export class EventLogService extends StorageService<PantryEvent> {
     try {
       return await this.save(payload);
     } catch (err) {
-      console.error('[EventLogService] logEvent error', err);
+      console.error('[HistoryEventLogService] logEvent error', err);
       return null;
     }
   }
 
-  private toTimestamp(value: string): number {
-    const date = new Date(value);
-    return Number.isFinite(date.getTime()) ? date.getTime() : 0;
+  private sortByTimestamp(events: PantryEvent[]): PantryEvent[] {
+    const toTime = (value: string): number => {
+      const time = new Date(value).getTime();
+      return Number.isFinite(time) ? time : 0;
+    };
+    return [...events].sort((a, b) => toTime(b.timestamp) - toTime(a.timestamp));
   }
 
 }

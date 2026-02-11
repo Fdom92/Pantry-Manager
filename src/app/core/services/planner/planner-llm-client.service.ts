@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { LlmClientError, LlmCompletionRequest, LlmCompletionResponse } from '@core/models';
 import { firstValueFrom, timeout as rxTimeout } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { RevenuecatService } from '../upgrade/revenuecat.service';
+import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 import { sleep } from '../shared/task.util';
 
 /**
@@ -12,9 +12,9 @@ import { sleep } from '../shared/task.util';
 @Injectable({
   providedIn: 'root',
 })
-export class LlmClientService {
+export class PlannerLlmClientService {
   private readonly http = inject(HttpClient);
-  private readonly revenuecat = inject(RevenuecatService);
+  private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly endpoint = environment.agentApiUrl ?? '';
   private readonly requestTimeoutMs = 30000;
   private readonly transientStatusCodes = new Set([502, 503, 504]);
@@ -23,7 +23,7 @@ export class LlmClientService {
 
   async complete(payload: LlmCompletionRequest): Promise<LlmCompletionResponse> {
     if (!this.endpoint) {
-      throw new Error('[LlmClientService] agentApiUrl is empty');
+      throw new Error('[PlannerLlmClientService] agentApiUrl is empty');
     }
 
     let attempt = 0;
@@ -54,7 +54,7 @@ export class LlmClientService {
         lastError = normalized;
         if (this.shouldRetry(normalized, attempt)) {
           attempt += 1;
-          console.warn('[LlmClientService] complete retrying', {
+            console.warn('[PlannerLlmClientService] complete retrying', {
             attempt,
             status: normalized.status,
           });
