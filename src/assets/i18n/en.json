@@ -11,68 +11,37 @@
     "actions": {
       "skip": "Skip",
       "next": "Next",
-      "start": "Get started"
+      "start": "Start",
+      "skipHint": "You can skip this tutorial anytime."
     },
     "slides": {
-      "dashboard": {
-        "title": "Home",
-        "description": "Alerts and a quick pantry snapshot."
+      "problem": {
+        "title": "Don’t let food go to waste",
+        "description": "See what you have at home and avoid items expiring without you noticing."
       },
-      "pantry": {
-        "title": "Pantry",
-        "description": "Add items, track stock and expirations."
+      "simple": {
+        "title": "Organize your pantry in seconds",
+        "description": "Add products, track quantities, and get alerts before they expire."
       },
-      "planner": {
-        "title": "Planner",
-        "description": "Meal ideas and plans based on what you have."
+      "benefit": {
+        "title": "Save money and time",
+        "description": "Buy only what you need and use what you already have."
       },
-      "shopping": {
-        "title": "Shopping",
-        "description": "Build a list and tick items as you shop."
-      },
-      "settings": {
-        "title": "Settings",
-        "description": "Tune catalogs, alerts, and app preferences."
-      }
-    }
-  },
-  "setup": {
-    "tagline": "Personalize your pantry",
-    "stepIndicator": "Step {{ current }} of {{ total }}",
-    "actions": {
-      "skip": "Skip",
-      "continue": "Continue",
-      "finish": "Start"
-    },
-    "validation": {
-      "locationsOptional": "You can skip this step if you don’t want to add locations now.",
-      "categoriesOptional": "You can add categories later."
-    },
-    "locations": {
-      "title": "Where do you store things?",
-      "description": "Pick the locations you use most so we can suggest them later.",
-      "options": {
-        "pantry": "Pantry",
-        "fridge": "Fridge",
-        "kitchen": "Kitchen",
-        "freezer": "Freezer"
+      "action": {
+        "title": "Start by adding your first product",
+        "description": "Tap the + button and build your pantry in minutes."
       }
     },
-    "categories": {
-      "title": "What do you stock?",
-      "description": "Select the categories you usually buy. You can change them later.",
-      "options": {
-        "proteins": "Proteins",
-        "dairy": "Dairy",
-        "fruits": "Fruit",
-        "drinks": "Drinks",
-        "cereals": "Cereals",
-        "condiments": "Condiments",
-        "canned": "Canned goods",
-        "sweets": "Sweets",
-        "snacks": "Snacks",
-        "vegetables": "Vegetables",
-        "household": "Household"
+    "mock": {
+      "items": {
+        "milk": "Milk",
+        "pasta": "Pasta",
+        "tomatoes": "Tomatoes"
+      },
+      "status": {
+        "expired": "Expired",
+        "low": "Low",
+        "ok": "OK"
       }
     }
   },

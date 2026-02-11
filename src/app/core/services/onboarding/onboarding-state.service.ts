@@ -1,10 +1,11 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { ONBOARDING_SLIDES } from '@core/constants/onboarding';
-import { ONBOARDING_STORAGE_KEY, SETUP_STORAGE_KEY } from '@core/constants';
+import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { isLastIndex } from '@core/domain/onboarding';
 import type { OnboardingSlide } from '@core/models/onboarding';
 import { getBooleanFlag, setBooleanFlag } from '@core/utils/storage-flag.util';
 import { NavController } from '@ionic/angular';
+import { PantryService } from '../pantry/pantry.service';
 import { register } from 'swiper/element/bundle';
 import type { SwiperOptions } from 'swiper/types';
 
@@ -13,8 +14,8 @@ let swiperRegistered = false;
 @Injectable()
 export class OnboardingStateService {
   private readonly navCtrl = inject(NavController);
+  private readonly pantryService = inject(PantryService);
   private readonly alreadyCompletedOnboarding = getBooleanFlag(ONBOARDING_STORAGE_KEY);
-  private readonly alreadyCompletedSetup = getBooleanFlag(SETUP_STORAGE_KEY);
 
   readonly slideOptions: SwiperOptions = {
     speed: 550,
@@ -74,8 +75,9 @@ export class OnboardingStateService {
 
   async completeOnboarding(): Promise<void> {
     setBooleanFlag(ONBOARDING_STORAGE_KEY, true);
-    if (!this.alreadyCompletedOnboarding && !this.alreadyCompletedSetup) {
-      await this.navCtrl.navigateRoot('/setup');
+    const items = await this.pantryService.getAll();
+    if (!items.length) {
+      await this.navCtrl.navigateRoot('/pantry');
       return;
     }
     await this.navCtrl.navigateRoot('/dashboard');

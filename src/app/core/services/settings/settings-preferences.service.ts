@@ -5,7 +5,6 @@ import {
   NEAR_EXPIRY_WINDOW_DAYS,
   ONBOARDING_STORAGE_KEY,
   PLANNER_MEMORY_MAX_LENGTH,
-  SETUP_STORAGE_KEY,
   STORAGE_KEY_PREFERENCES,
 } from '@core/constants';
 import {
@@ -99,7 +98,6 @@ export class SettingsPreferencesService {
   private shouldSeedLocations(locationOptions: string[]): boolean {
     return (
       getBooleanFlag(ONBOARDING_STORAGE_KEY) &&
-      !getBooleanFlag(SETUP_STORAGE_KEY) &&
       (!locationOptions || !locationOptions.length)
     );
   }

@@ -11,68 +11,37 @@
     "actions": {
       "skip": "Saltar",
       "next": "Siguiente",
-      "start": "Empezar"
+      "start": "Empezar",
+      "skipHint": "Puedes saltar este tutorial cuando quieras."
     },
     "slides": {
-      "dashboard": {
-        "title": "Inicio",
-        "description": "Alertas y resumen de tu despensa de un vistazo."
+      "problem": {
+        "title": "No tires comida sin darte cuenta",
+        "description": "Controla lo que tienes en casa y evita que caduque sin que lo sepas."
       },
-      "pantry": {
-        "title": "Despensa",
-        "description": "Añade productos, controla el stock y las caducidades."
+      "simple": {
+        "title": "Organiza tu despensa en segundos",
+        "description": "Añade productos, controla cantidades y recibe avisos antes de que caduquen."
       },
-      "planner": {
-        "title": "Planificador",
-        "description": "Ideas y planes de comidas con lo que ya tienes."
+      "benefit": {
+        "title": "Ahorra dinero y tiempo",
+        "description": "Compra solo lo que necesitas y aprovecha lo que ya tienes."
       },
-      "shopping": {
-        "title": "Compras",
-        "description": "Crea tu lista y marca lo comprado al momento."
-      },
-      "settings": {
-        "title": "Ajustes",
-        "description": "Personaliza catálogos, alertas y preferencias de la app."
-      }
-    }
-  },
-  "setup": {
-    "tagline": "Personaliza tu despensa",
-    "stepIndicator": "Paso {{ current }} de {{ total }}",
-    "actions": {
-      "skip": "Saltar",
-      "continue": "Continuar",
-      "finish": "Entrar"
-    },
-    "validation": {
-      "locationsOptional": "Puedes saltarlo si no quieres añadir ubicaciones ahora.",
-      "categoriesOptional": "Podrás añadir categorías más adelante."
-    },
-    "locations": {
-      "title": "¿Dónde guardas las cosas?",
-      "description": "Elige las ubicaciones que usas más para sugerirlas después.",
-      "options": {
-        "pantry": "Despensa",
-        "fridge": "Nevera",
-        "kitchen": "Cocina",
-        "freezer": "Congelador"
+      "action": {
+        "title": "Empieza añadiendo tu primer producto",
+        "description": "Toca el botón + y crea tu despensa en minutos."
       }
     },
-    "categories": {
-      "title": "¿Qué sueles comprar?",
-      "description": "Selecciona las categorías habituales. Podrás cambiarlas más tarde.",
-      "options": {
-        "proteins": "Proteínas",
-        "dairy": "Lácteos",
-        "fruits": "Frutas",
-        "drinks": "Bebidas",
-        "cereals": "Cereales",
-        "condiments": "Condimentos",
-        "canned": "Conservas",
-        "sweets": "Dulces",
-        "snacks": "Snacks",
-        "vegetables": "Verduras",
-        "household": "Hogar"
+    "mock": {
+      "items": {
+        "milk": "Leche",
+        "pasta": "Pasta",
+        "tomatoes": "Tomates"
+      },
+      "status": {
+        "expired": "Caducado",
+        "low": "Bajo",
+        "ok": "OK"
       }
     }
   },
