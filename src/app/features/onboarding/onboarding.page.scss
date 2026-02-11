@@ -102,6 +102,73 @@
   }
 }
 
+.mock-preview {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--ion-card-background) 88%, transparent);
+  border: 1px solid var(--app-surface-border);
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+
+.mock-row {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: var(--app-surface-title);
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--ion-color-medium);
+  }
+
+  .badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &.expired {
+    .dot {
+      background: var(--ion-color-danger);
+    }
+    .badge {
+      color: var(--ion-color-danger);
+      border: 1px solid color-mix(in srgb, var(--ion-color-danger) 45%, transparent);
+    }
+  }
+
+  &.low {
+    .dot {
+      background: var(--ion-color-warning);
+    }
+    .badge {
+      color: var(--ion-color-warning);
+      border: 1px solid color-mix(in srgb, var(--ion-color-warning) 45%, transparent);
+    }
+  }
+
+  &.ok {
+    .dot {
+      background: var(--ion-color-success);
+    }
+    .badge {
+      color: var(--ion-color-success);
+      border: 1px solid color-mix(in srgb, var(--ion-color-success) 45%, transparent);
+    }
+  }
+}
+
 .slide-card.is-pro {
   border-color: color-mix(in srgb, var(--ion-color-secondary) 55%, transparent);
   box-shadow: 0 18px 50px color-mix(in srgb, var(--ion-color-secondary) 40%, transparent);
@@ -168,6 +235,18 @@
     font-weight: 700;
     text-transform: none;
   }
+}
+
+.skip-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(52px + var(--ion-safe-area-bottom));
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--app-surface-muted);
+  margin: 0;
+  z-index: 3;
 }
 
 .swiper-pagination {

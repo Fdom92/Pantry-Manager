@@ -55,11 +55,6 @@ export const routes: Routes = [
       import('@features/onboarding/onboarding.page').then(m => m.OnboardingPage),
   },
   {
-    path: 'setup',
-    loadComponent: () =>
-      import('@features/setup/setup.page').then(m => m.SetupPage),
-  },
-  {
     path: 'upgrade',
     loadComponent: () =>
       import('@features/upgrade/upgrade.page').then(m => m.UpgradePage),
