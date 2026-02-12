@@ -5,7 +5,13 @@
   <div class="top-bar">
     <div class="eyebrow">
       <ion-icon name="aperture-outline"></ion-icon>
-      <span>{{ 'onboarding.tagline' | translate }}</span>
+      <span>
+        {{
+          (facade.isLastSlide()
+            ? "onboarding.taglineDone"
+            : "onboarding.tagline") | translate
+        }}
+      </span>
     </div>
   </div>
 

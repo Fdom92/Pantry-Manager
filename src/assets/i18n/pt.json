@@ -8,6 +8,7 @@
   },
   "onboarding": {
     "tagline": "Configura tudo em menos de um minuto",
+    "taglineDone": "Tudo pronto",
     "actions": {
       "skip": "Ignorar",
       "next": "Seguinte",
