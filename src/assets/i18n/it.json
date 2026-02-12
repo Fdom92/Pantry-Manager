@@ -292,8 +292,7 @@
     "suggestions": {
       "title": "Lista della spesa",
       "loading": "Sto creando la lista della spesa…",
-      "totalStock": "Stock totale: {{ amount }}",
-      "minStock": "Min: {{ amount }}",
+      "toBuy": "Da comprare {{ amount }}",
       "empty": "Al momento non ci sono acquisti in sospeso. Ti avviserò quando sarà necessario riassortire."
     },
     "share": {

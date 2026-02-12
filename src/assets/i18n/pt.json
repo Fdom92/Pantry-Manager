@@ -292,8 +292,7 @@
     "suggestions": {
       "title": "Lista de compras",
       "loading": "A criar lista de compras…",
-      "totalStock": "Stock total: {{ amount }}",
-      "minStock": "Mín: {{ amount }}",
+      "toBuy": "Comprar {{ amount }}",
       "empty": "Nada pendente neste momento. Aviso-te quando for necessário reabastecer."
     },
     "share": {

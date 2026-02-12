@@ -261,8 +261,7 @@
     "suggestions": {
       "title": "Shopping list",
       "loading": "Building shopping list…",
-      "totalStock": "Total stock: {{ amount }}",
-      "minStock": "Min: {{ amount }}",
+      "toBuy": "Buy {{ amount }}",
       "empty": "Nothing pending right now. I'll let you know when something needs restocking."
     },
     "share": {

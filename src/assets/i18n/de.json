@@ -292,8 +292,7 @@
     "suggestions": {
       "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
-      "totalStock": "Gesamtbestand: {{ amount }}",
-      "minStock": "Min.: {{ amount }}",
+      "toBuy": "Kaufen {{ amount }}",
       "empty": "Derzeit nichts zu erledigen. Ich informiere dich, wenn Nachschub nötig ist."
     },
     "share": {
