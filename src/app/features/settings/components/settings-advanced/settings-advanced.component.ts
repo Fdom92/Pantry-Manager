@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { SettingsCatalogsStateService } from '@core/services/settings/settings-catalogs-state.service';
+import { RouterLink } from '@angular/router';
+import { SettingsStateService } from '@core/services/settings/settings-state.service';
 import {
   IonBackButton,
-  IonAlert,
   IonButton,
   IonButtons,
   IonCard,
@@ -17,16 +17,14 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonProgressBar,
   IonSpinner,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
-  selector: 'app-settings-catalogs',
+  selector: 'app-settings-advanced',
   standalone: true,
   imports: [
     IonHeader,
@@ -40,26 +38,24 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
     IonCardTitle,
     IonCardSubtitle,
     IonCardContent,
-    IonProgressBar,
     IonList,
-    IonAlert,
-    IonLabel,
     IonItem,
+    IonLabel,
     IonButton,
     IonIcon,
     IonSpinner,
     CommonModule,
+    RouterLink,
     TranslateModule,
-    EmptyStateComponent,
   ],
-  templateUrl: './settings-catalogs.component.html',
-  styleUrls: ['./settings-catalogs.component.scss'],
-  providers: [SettingsCatalogsStateService],
+  templateUrl: './settings-advanced.component.html',
+  styleUrls: ['./settings-advanced.component.scss'],
+  providers: [SettingsStateService],
 })
-export class SettingsCatalogsComponent {
-  readonly state = inject(SettingsCatalogsStateService);
+export class SettingsAdvancedComponent {
+  readonly facade = inject(SettingsStateService);
 
   async ionViewWillEnter(): Promise<void> {
-    await this.state.ionViewWillEnter();
+    await this.facade.ionViewWillEnter();
   }
 }

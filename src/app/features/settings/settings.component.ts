@@ -15,9 +15,6 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonSelect,
-  IonSelectOption,
-  IonSpinner,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
@@ -41,11 +38,8 @@ import { environment } from 'src/environments/environment';
     IonList,
     IonItem,
     IonLabel,
-    IonSelect,
-    IonSelectOption,
     IonButton,
     IonIcon,
-    IonSpinner,
     CommonModule,
     RouterLink,
     TranslateModule,
@@ -58,6 +52,7 @@ export class SettingsComponent {
   readonly facade = inject(SettingsStateService);
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
+  readonly isPro = this.facade.isPro;
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();

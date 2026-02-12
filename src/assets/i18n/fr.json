@@ -627,9 +627,9 @@
     },
     "appearance": {
       "title": "Apparence",
-      "subtitle": "Choisissez l’apparence de l’application.",
+      "subtitle": "Choisissez le style qui vous plaît.",
       "theme": "Thème",
-      "description": "Configurez le mode clair, sombre ou système.",
+      "description": "Choisissez clair, sombre ou suivez le système.",
       "light": "Clair",
       "dark": "Sombre",
       "system": "Système",
@@ -637,43 +637,49 @@
     },
     "ai": {
       "title": "IA",
-      "subtitle": "Partagez du contexte avec le planificateur.",
+      "subtitle": "Dites au planificateur quoi retenir.",
       "contextTitle": "Contexte / Mémoire",
-      "contextDescription": "Expliquez au planificateur votre foyer, vos régimes, allergies ou préférences à mémoriser.",
+      "contextDescription": "Partagez votre foyer, vos régimes, allergies ou tout ce que vous voulez que l’app retienne.",
       "contextPlaceholder": "Exemple : Nous sommes deux adultes et un enfant. Éviter la nourriture épicée et les arachides. Priorité aux recettes méditerranéennes.",
-      "saveAction": "Enregistrer le contexte IA",
+      "saveAction": "Enregistrer le contexte",
       "saveSuccess": "Contexte enregistré.",
       "saveError": "Impossible d’enregistrer le contexte."
     },
+    "advanced": {
+      "title": "Avancé",
+      "subtitle": "Outils pour les données et catalogues.",
+      "openTitle": "Ouvrir avancé",
+      "openSubtitle": "Gérer les catalogues et les données de l’appareil."
+    },
     "data": {
       "title": "Gestion des données",
-      "subtitle": "Contrôlez le stockage local de l’application.",
-      "resetTitle": "Effacer les données / Réinitialiser l’application",
-      "resetDescription": "Supprime toutes les informations stockées sur cet appareil.",
+      "subtitle": "Contrôlez ce qui est enregistré sur cet appareil.",
+      "resetTitle": "Effacer les données",
+      "resetDescription": "Supprime tout ce qui est enregistré sur cet appareil.",
       "resetAction": "Effacer",
       "exportTitle": "Exporter les données",
-      "exportDescription": "Téléchargez un fichier JSON avec vos données actuelles.",
+      "exportDescription": "Téléchargez un fichier de sauvegarde.",
       "exportAction": "Exporter",
       "importTitle": "Importer des données",
-      "importDescription": "Restaurez une sauvegarde JSON précédemment exportée.",
+      "importDescription": "Restaurez une sauvegarde exportée auparavant.",
       "importAction": "Importer"
     },
     "reset": {
-      "confirm": "Cela supprimera TOUTES les données locales de l’application.\nVoulez-vous continuer ?",
+      "confirm": "Cela supprimera toutes les données enregistrées sur cet appareil.\nVoulez-vous continuer ?",
       "success": "Données locales supprimées.",
       "error": "Impossible de nettoyer l’application."
     },
     "export": {
       "unavailable": "L’exportation n’est pas disponible dans cet environnement.",
-      "readyToShare": "📤 Données prêtes à être partagées.",
-      "success": "📦 Données exportées.",
+      "readyToShare": "Votre sauvegarde est prête à être partagée.",
+      "success": "Données exportées.",
       "error": "Impossible d’exporter les données.",
       "shareTitle": "Pantry Manager - Sauvegarde",
       "shareText": "Exportez ou partagez votre sauvegarde."
     },
     "import": {
       "confirm": "Cela remplacera vos données actuelles par le fichier sélectionné. Voulez-vous continuer ?",
-      "success": "✅ Données importées. Redémarrage de l’application…",
+      "success": "Données importées. Redémarrage de l’application…",
       "error": "Impossible d’importer les données. Vérifiez le fichier.",
       "invalid": "Le fichier sélectionné n’est pas une sauvegarde valide.",
       "empty": "Le fichier ne contient aucune donnée à importer."
@@ -681,9 +687,9 @@
     "loadError": "Un problème est survenu lors du chargement des paramètres.",
     "catalogs": {
       "title": "Catalogues",
-      "subtitle": "Gérez les listes réutilisables pour organiser le garde-manger.",
+      "subtitle": "Gérez les listes utilisées dans l’app.",
       "manageTitle": "Ouvrir le gestionnaire de catalogues",
-      "manageSubtitle": "Modifiez en détail les emplacements, catégories et supermarchés.",
+      "manageSubtitle": "Modifiez les emplacements, catégories et supermarchés.",
       "saveSuccess": "Catalogues mis à jour.",
       "saveError": "Impossible d’enregistrer les catalogues.",
       "loadError": "Impossible de charger les catalogues.",
@@ -716,7 +722,7 @@
       },
       "supermarkets": {
         "title": "Supermarchés",
-        "subtitle": "Définissez la liste disponible lors de l’attribution des supermarchés aux produits.",
+        "subtitle": "Choisissez quels supermarchés apparaissent lors de l’édition des produits.",
         "empty": "Ajoutez un supermarché pour commencer.",
         "field": "Supermarché {{ index }}",
         "add": "Ajouter un supermarché",
@@ -734,13 +740,13 @@
     },
     "dev": {
       "title": "Développement",
-      "subtitle": "Outils pour tester l’onboarding et le setup.",
+      "subtitle": "Outils pour tester l’onboarding et la configuration.",
       "setupTitle": "Voir le setup",
       "setupSubtitle": "Ouvrez le flux de setup pour configurer les catalogues."
     },
     "info": {
       "title": "Informations",
-      "subtitle": "Détails rapides de l’application.",
+      "subtitle": "Détails utiles de l’application.",
       "version": "Version",
       "feedbackTitle": "Envoyer des commentaires",
       "feedbackSubtitle": "Partagez des suggestions ou signalez des problèmes.",

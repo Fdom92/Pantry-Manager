@@ -627,9 +627,9 @@
     },
     "appearance": {
       "title": "Aparência",
-      "subtitle": "Escolhe o aspeto da aplicação.",
+      "subtitle": "Escolhe o estilo que preferes.",
       "theme": "Tema",
-      "description": "Alterna entre claro, escuro ou seguir o sistema.",
+      "description": "Escolhe claro, escuro ou segue o sistema.",
       "light": "Claro",
       "dark": "Escuro",
       "system": "Sistema",
@@ -637,35 +637,41 @@
     },
     "ai": {
       "title": "IA",
-      "subtitle": "Partilha contexto para o planeador.",
+      "subtitle": "Diz ao planeador o que lembrar.",
       "contextTitle": "Contexto / Memória",
-      "contextDescription": "Conta ao planeador sobre a tua casa, dietas, alergias ou preferências que ele deve lembrar sempre.",
+      "contextDescription": "Partilha a tua casa, dietas, alergias ou preferências que queres que sejam lembradas.",
       "contextPlaceholder": "Exemplo: Somos dois adultos e uma criança. Evitar comida picante e amendoim. Focar em receitas mediterrâneas.",
-      "saveAction": "Guardar contexto de IA",
+      "saveAction": "Guardar contexto",
       "saveSuccess": "Contexto guardado.",
       "saveError": "Não foi possível guardar o contexto."
     },
+    "advanced": {
+      "title": "Avançado",
+      "subtitle": "Ferramentas para dados e catálogos.",
+      "openTitle": "Abrir avançado",
+      "openSubtitle": "Gerir catálogos e dados do dispositivo."
+    },
     "data": {
       "title": "Gestão de dados",
-      "subtitle": "Controla o que é armazenado neste dispositivo.",
-      "resetTitle": "Limpar dados / Repor app",
-      "resetDescription": "Remove todas as informações guardadas neste dispositivo.",
+      "subtitle": "Controla o que fica guardado neste dispositivo.",
+      "resetTitle": "Limpar dados",
+      "resetDescription": "Remove tudo o que está guardado neste dispositivo.",
       "resetAction": "Limpar",
       "exportTitle": "Exportar dados",
-      "exportDescription": "Descarregar ficheiro JSON com os dados atuais.",
+      "exportDescription": "Descarregar um ficheiro de backup.",
       "exportAction": "Exportar",
       "importTitle": "Importar dados",
-      "importDescription": "Restaurar backup JSON previamente exportado.",
+      "importDescription": "Restaurar um backup exportado anteriormente.",
       "importAction": "Importar"
     },
     "reset": {
-      "confirm": "Isto irá eliminar TODOS os dados locais da app.\nQueres continuar?",
+      "confirm": "Isto irá eliminar todos os dados guardados neste dispositivo.\nQueres continuar?",
       "success": "Dados locais eliminados.",
       "error": "Não foi possível limpar a app."
     },
     "export": {
       "unavailable": "Exportação não disponível neste ambiente.",
-      "readyToShare": "Dados prontos para partilhar.",
+      "readyToShare": "O teu backup está pronto para partilhar.",
       "success": "Dados exportados.",
       "error": "Não foi possível exportar os dados.",
       "shareTitle": "Gestor de Despensa - Backup",
@@ -681,9 +687,9 @@
     "loadError": "Ocorreu um problema ao carregar as definições.",
     "catalogs": {
       "title": "Catálogos",
-      "subtitle": "Gerir listas reutilizáveis para organizar a despensa.",
+      "subtitle": "Gerir as listas usadas pela app.",
       "manageTitle": "Abrir gestor de catálogos",
-      "manageSubtitle": "Edita localizações, categorias e supermercados em detalhe.",
+      "manageSubtitle": "Edita localizações, categorias e supermercados.",
       "saveSuccess": "Catálogos atualizados.",
       "saveError": "Não foi possível guardar os catálogos.",
       "loadError": "Não foi possível carregar os catálogos.",
@@ -716,7 +722,7 @@
       },
       "supermarkets": {
         "title": "Supermercados",
-        "subtitle": "Define a lista apresentada ao atribuir supermercados aos produtos.",
+        "subtitle": "Escolhe quais os supermercados que aparecem ao editar produtos.",
         "empty": "Adiciona um supermercado para começar.",
         "field": "Supermercado {{ index }}",
         "add": "Adicionar supermercado",
@@ -730,17 +736,17 @@
     },
     "tutorial": {
       "title": "Ver tutorial",
-      "subtitle": "Reproduz o onboarding sempre que precisares."
+      "subtitle": "Revê o onboarding quando quiseres."
     },
     "dev": {
       "title": "Desenvolvimento",
-      "subtitle": "Ferramentas para testar onboarding e setup.",
+      "subtitle": "Ferramentas para testar onboarding e configuração.",
       "setupTitle": "Ver setup",
       "setupSubtitle": "Abre o fluxo de setup para configurar catálogos."
     },
     "info": {
       "title": "Informações",
-      "subtitle": "Detalhes rápidos da app.",
+      "subtitle": "Detalhes úteis da app.",
       "version": "Versão",
       "feedbackTitle": "Enviar feedback",
       "feedbackSubtitle": "Partilha sugestões ou reporta problemas.",

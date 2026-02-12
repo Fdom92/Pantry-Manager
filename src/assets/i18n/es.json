@@ -586,9 +586,9 @@
     },
     "appearance": {
       "title": "Apariencia",
-      "subtitle": "Elige cómo se ve la aplicación.",
+      "subtitle": "Elige el estilo que más te guste.",
       "theme": "Tema",
-      "description": "Configura modo claro, oscuro o sigue al sistema.",
+      "description": "Elige claro, oscuro o seguir el sistema.",
       "light": "Claro",
       "dark": "Oscuro",
       "system": "Sistema",
@@ -596,43 +596,49 @@
     },
     "ai": {
       "title": "IA",
-      "subtitle": "Comparte contexto para el planificador.",
+      "subtitle": "Cuéntale al planificador lo importante.",
       "contextTitle": "Contexto / Memoria",
-      "contextDescription": "Cuenta al planificador sobre tu hogar, dietas, alergias o preferencias que deba recordar siempre.",
+      "contextDescription": "Indica tu hogar, dietas, alergias o cualquier preferencia que quieras que recuerde.",
       "contextPlaceholder": "Ejemplo: Somos dos adultos y una niña. Evita picante y frutos secos. Prioriza recetas mediterráneas.",
-      "saveAction": "Guardar contexto IA",
+      "saveAction": "Guardar contexto",
       "saveSuccess": "Contexto guardado.",
       "saveError": "No se pudo guardar el contexto."
     },
+    "advanced": {
+      "title": "Avanzado",
+      "subtitle": "Herramientas para datos y catálogos.",
+      "openTitle": "Abrir avanzado",
+      "openSubtitle": "Gestiona catálogos y datos del dispositivo."
+    },
     "data": {
       "title": "Gestión de datos",
-      "subtitle": "Controla el almacenamiento local de la app.",
-      "resetTitle": "Limpiar datos / Restablecer app",
-      "resetDescription": "Elimina toda la información guardada en este dispositivo.",
+      "subtitle": "Controla lo que se guarda en este dispositivo.",
+      "resetTitle": "Borrar datos",
+      "resetDescription": "Elimina todo lo guardado en este dispositivo.",
       "resetAction": "Limpiar",
       "exportTitle": "Exportar datos",
-      "exportDescription": "Descarga un fichero JSON con tus datos actuales.",
+      "exportDescription": "Descarga un archivo de copia de seguridad.",
       "exportAction": "Exportar",
       "importTitle": "Importar datos",
-      "importDescription": "Restaura una copia de seguridad JSON previamente exportada.",
+      "importDescription": "Restaura una copia de seguridad anterior.",
       "importAction": "Importar"
     },
     "reset": {
-      "confirm": "Esto eliminará TODOS los datos locales de la aplicación.\n¿Quieres continuar?",
+      "confirm": "Esto eliminará todos los datos guardados en este dispositivo.\n¿Quieres continuar?",
       "success": "Datos locales eliminados.",
       "error": "No se pudo limpiar la aplicación."
     },
     "export": {
       "unavailable": "La exportación no está disponible en este entorno.",
-      "readyToShare": "📤 Datos listos para compartir.",
-      "success": "📦 Datos exportados.",
+      "readyToShare": "Tu copia está lista para compartir.",
+      "success": "Datos exportados.",
       "error": "No se pudieron exportar los datos.",
       "shareTitle": "Pantry Manager - Respaldo",
       "shareText": "Exporta o comparte tu copia de seguridad."
     },
     "import": {
       "confirm": "Esto reemplazará tus datos actuales con el archivo seleccionado. ¿Quieres continuar?",
-      "success": "✅ Datos importados. Reiniciando app...",
+      "success": "Datos importados. Reiniciando la app...",
       "error": "No se pudieron importar los datos. Comprueba el fichero.",
       "invalid": "El fichero seleccionado no es una copia válida.",
       "empty": "El fichero no contiene datos para importar."
@@ -640,9 +646,9 @@
     "loadError": "Ocurrió un problema cargando los ajustes.",
     "catalogs": {
       "title": "Catálogos",
-      "subtitle": "Gestiona las listas reutilizadas al organizar la despensa.",
+      "subtitle": "Gestiona las listas que usa la app.",
       "manageTitle": "Abrir gestor de catálogos",
-      "manageSubtitle": "Edita ubicaciones, categorías y supermercados con más detalle.",
+      "manageSubtitle": "Edita ubicaciones, categorías y supermercados.",
       "saveSuccess": "Catálogos actualizados.",
       "saveError": "No se pudieron guardar los catálogos.",
       "loadError": "No se pudieron cargar los catálogos.",
@@ -675,7 +681,7 @@
       },
       "supermarkets": {
         "title": "Supermercados",
-        "subtitle": "Define la lista disponible al asignar supermercados en los productos.",
+        "subtitle": "Elige qué supermercados aparecen al editar productos.",
         "empty": "Añade un supermercado para empezar.",
         "field": "Supermercado {{ index }}",
         "add": "Añadir supermercado",
@@ -689,17 +695,17 @@
     },
     "tutorial": {
       "title": "Ver tutorial",
-      "subtitle": "Revisa el onboarding inicial cuando quieras."
+      "subtitle": "Repite el onboarding cuando quieras."
     },
     "dev": {
       "title": "Desarrollo",
-      "subtitle": "Herramientas para probar onboarding y setup.",
+      "subtitle": "Herramientas para probar onboarding y configuración.",
       "setupTitle": "Ver setup",
       "setupSubtitle": "Abre el flujo de setup para configurar catálogos."
     },
     "info": {
       "title": "Información",
-      "subtitle": "Detalles rápidos de la aplicación.",
+      "subtitle": "Detalles útiles de la aplicación.",
       "version": "Versión",
       "feedbackTitle": "Enviar comentarios",
       "feedbackSubtitle": "Comparte sugerencias o reporta incidencias.",

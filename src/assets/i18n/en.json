@@ -596,9 +596,9 @@
     },
     "appearance": {
       "title": "Appearance",
-      "subtitle": "Choose how the app looks.",
+      "subtitle": "Pick the look that feels right.",
       "theme": "Theme",
-      "description": "Switch between light, dark or follow the system.",
+      "description": "Choose light, dark, or follow your device.",
       "light": "Light",
       "dark": "Dark",
       "system": "System",
@@ -606,35 +606,41 @@
     },
     "ai": {
       "title": "AI",
-      "subtitle": "Share context for the planner.",
+      "subtitle": "Tell the planner what to remember.",
       "contextTitle": "Context / Memory",
-      "contextDescription": "Tell the planner about your household, diets, dislikes or any preference it should always remember.",
+      "contextDescription": "Share your household, diets, dislikes, or anything you want us to keep in mind.",
       "contextPlaceholder": "Example: We are two adults and a toddler. Avoid spicy food and peanuts. Focus on Mediterranean recipes.",
-      "saveAction": "Save AI context",
+      "saveAction": "Save context",
       "saveSuccess": "Planner context saved.",
       "saveError": "Could not save the planner context."
     },
+    "advanced": {
+      "title": "Advanced",
+      "subtitle": "Tools for data and catalogs.",
+      "openTitle": "Open advanced",
+      "openSubtitle": "Manage catalogs and data on this device."
+    },
     "data": {
       "title": "Data management",
-      "subtitle": "Control what is stored on this device.",
-      "resetTitle": "Clear data / Reset app",
-      "resetDescription": "Remove all information saved on this device.",
+      "subtitle": "Control what’s saved on this device.",
+      "resetTitle": "Clear data",
+      "resetDescription": "Remove everything saved on this device.",
       "resetAction": "Clear",
       "exportTitle": "Export data",
-      "exportDescription": "Download a JSON file with your current data.",
+      "exportDescription": "Download a backup file with your data.",
       "exportAction": "Export",
       "importTitle": "Import data",
-      "importDescription": "Restore a JSON backup you exported earlier.",
+      "importDescription": "Restore a backup you exported earlier.",
       "importAction": "Import"
     },
     "reset": {
-      "confirm": "This will delete ALL local app data.\nDo you want to continue?",
+      "confirm": "This will delete all data saved on this device.\nDo you want to continue?",
       "success": "Local data removed.",
       "error": "Could not clear the app."
     },
     "export": {
       "unavailable": "Export is not available in this environment.",
-      "readyToShare": "Data ready to share.",
+      "readyToShare": "Your backup is ready to share.",
       "success": "Data exported.",
       "error": "Could not export the data.",
       "shareTitle": "Pantry Manager - Backup",
@@ -642,7 +648,7 @@
     },
     "import": {
       "confirm": "This will replace your current data with the selected file. Continue?",
-      "success": "Data imported. Restarting app...",
+      "success": "Data imported. Restarting the app...",
       "error": "Could not import the data. Please check the file.",
       "invalid": "The selected file is not a valid backup.",
       "empty": "The file has no data to import."
@@ -650,9 +656,9 @@
     "loadError": "There was a problem loading settings.",
     "catalogs": {
       "title": "Catalogs",
-      "subtitle": "Manage reusable lists for organizing your pantry.",
+      "subtitle": "Manage the lists you use in the app.",
       "manageTitle": "Open catalog manager",
-      "manageSubtitle": "Edit locations, categories and supermarkets in detail.",
+      "manageSubtitle": "Edit locations, categories, and supermarkets.",
       "saveSuccess": "Catalogs updated.",
       "saveError": "Could not save catalogs.",
       "loadError": "Could not load catalogs.",
@@ -685,7 +691,7 @@
       },
       "supermarkets": {
         "title": "Supermarkets",
-        "subtitle": "Define the list shown when assigning supermarkets to products.",
+        "subtitle": "Choose which supermarkets appear when editing products.",
         "empty": "Add a supermarket to get started.",
         "field": "Supermarket {{ index }}",
         "add": "Add supermarket",
@@ -699,20 +705,20 @@
     },
     "tutorial": {
       "title": "View tutorial",
-      "subtitle": "Replay the onboarding whenever you need it."
+      "subtitle": "Replay the onboarding anytime."
     },
     "dev": {
       "title": "Developer",
-      "subtitle": "Tools for testing onboarding and setup flows.",
+      "subtitle": "Tools for testing onboarding and setup.",
       "setupTitle": "View setup",
       "setupSubtitle": "Open the setup flow to configure catalogs."
     },
     "info": {
       "title": "Information",
-      "subtitle": "Quick app details.",
+      "subtitle": "Helpful app details.",
       "version": "Version",
       "feedbackTitle": "Send feedback",
-      "feedbackSubtitle": "Share suggestions or report issues.",
+      "feedbackSubtitle": "Share ideas or report issues.",
       "feedbackAction": "Send feedback"
     }
   },

@@ -22,32 +22,73 @@
               <h3>{{ "settings.appearance.theme" | translate }}</h3>
               <p>{{ "settings.appearance.description" | translate }}</p>
             </ion-label>
-            <ion-select
-              [value]="facade.themePreference()"
-              (ionChange)="facade.updateThemePreference($event.detail.value)"
+          </ion-item>
+          <div class="theme-grid" aria-label="{{ 'settings.appearance.theme' | translate }}">
+            <button
+              type="button"
+              class="theme-option"
+              [class.selected]="facade.themePreference() === 'light'"
+              [attr.aria-pressed]="facade.themePreference() === 'light'"
               [disabled]="facade.isUpdatingTheme()"
-              interface="popover"
-              class="theme-select"
+              (click)="facade.updateThemePreference('light')"
             >
-              <ion-select-option value="light">{{
-                "settings.appearance.light" | translate
-              }}</ion-select-option>
-              <ion-select-option value="dark">{{
-                "settings.appearance.dark" | translate
-              }}</ion-select-option>
-              <ion-select-option value="system">{{
-                "settings.appearance.system" | translate
-              }}</ion-select-option>
-            </ion-select>
-          </ion-item>
+              <ion-icon name="sunny-outline"></ion-icon>
+              <span>{{ "settings.appearance.light" | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="theme-option"
+              [class.selected]="facade.themePreference() === 'dark'"
+              [attr.aria-pressed]="facade.themePreference() === 'dark'"
+              [disabled]="facade.isUpdatingTheme()"
+              (click)="facade.updateThemePreference('dark')"
+            >
+              <ion-icon name="moon-outline"></ion-icon>
+              <span>{{ "settings.appearance.dark" | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="theme-option"
+              [class.selected]="facade.themePreference() === 'system'"
+              [attr.aria-pressed]="facade.themePreference() === 'system'"
+              [disabled]="facade.isUpdatingTheme()"
+              (click)="facade.updateThemePreference('system')"
+            >
+              <ion-icon name="desktop-outline"></ion-icon>
+              <span>{{ "settings.appearance.system" | translate }}</span>
+            </button>
+          </div>
         </ion-list>
       </ion-card-content>
     </ion-card>
+    @if (isPro) {
+      <ion-card class="settings-card">
+        <ion-card-header>
+          <ion-card-title>{{ "settings.ai.title" | translate }}</ion-card-title>
+          <ion-card-subtitle>{{ "settings.ai.subtitle" | translate }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list lines="none">
+            <ion-item
+              lines="none"
+              button
+              detail="true"
+              routerLink="/settings/ai"
+            >
+              <ion-label>
+                <h3>{{ "settings.ai.contextTitle" | translate }}</h3>
+                <p>{{ "settings.ai.contextDescription" | translate }}</p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    }
 
     <ion-card class="settings-card">
       <ion-card-header>
-        <ion-card-title>{{ "settings.ai.title" | translate }}</ion-card-title>
-        <ion-card-subtitle>{{ "settings.ai.subtitle" | translate }}</ion-card-subtitle>
+        <ion-card-title>{{ "settings.advanced.title" | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ "settings.advanced.subtitle" | translate }}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
         <ion-list lines="none">
@@ -55,123 +96,11 @@
             lines="none"
             button
             detail="true"
-            routerLink="/settings/ai"
+            routerLink="/settings/avanzado"
           >
             <ion-label>
-              <h3>{{ "settings.ai.contextTitle" | translate }}</h3>
-              <p>{{ "settings.ai.contextDescription" | translate }}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card class="settings-card">
-      <input
-        type="file"
-        accept="application/json,.json,*/*"
-        hidden
-        #importInput
-        (change)="facade.submitImportFileSelection($event)"
-      />
-      <ion-card-header>
-        <ion-card-title>{{ "settings.data.title" | translate }}</ion-card-title>
-        <ion-card-subtitle>{{
-          "settings.data.subtitle" | translate
-        }}</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list lines="none">
-          <ion-item lines="none">
-            <ion-label>
-              <h3>{{ "settings.data.resetTitle" | translate }}</h3>
-              <p>{{ "settings.data.resetDescription" | translate }}</p>
-            </ion-label>
-            <ion-button
-              color="danger"
-              fill="clear"
-              slot="end"
-              (click)="facade.resetApplicationData()"
-              [disabled]="facade.isResettingData()"
-              [attr.aria-label]="'settings.data.resetAction' | translate"
-            >
-              @if (facade.isResettingData()) {
-                <ion-spinner
-                  slot="icon-only"
-                  name="dots"
-                ></ion-spinner>
-              } @else {
-                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-              }
-            </ion-button>
-          </ion-item>
-
-          <ion-item lines="none">
-            <ion-label>
-              <h3>{{ "settings.data.exportTitle" | translate }}</h3>
-              <p>{{ "settings.data.exportDescription" | translate }}</p>
-            </ion-label>
-            <ion-button
-              slot="end"
-              fill="clear"
-              (click)="facade.exportDataBackup()"
-              [disabled]="facade.isExportingData()"
-              [attr.aria-label]="'settings.data.exportAction' | translate"
-            >
-              @if (facade.isExportingData()) {
-                <ion-spinner
-                  slot="icon-only"
-                  name="dots"
-                ></ion-spinner>
-              } @else {
-                <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
-              }
-            </ion-button>
-          </ion-item>
-
-          <ion-item lines="none">
-            <ion-label>
-              <h3>{{ "settings.data.importTitle" | translate }}</h3>
-              <p>{{ "settings.data.importDescription" | translate }}</p>
-            </ion-label>
-            <ion-button
-              slot="end"
-              color="secondary"
-              fill="clear"
-              (click)="facade.openImportPicker(importInput)"
-              [disabled]="facade.isImportingData()"
-              [attr.aria-label]="'settings.data.importAction' | translate"
-            >
-              @if (facade.isImportingData()) {
-                <ion-spinner
-                  slot="icon-only"
-                  name="dots"
-                ></ion-spinner>
-              } @else {
-                <ion-icon slot="icon-only" name="enter-outline"></ion-icon>
-              }
-            </ion-button>
-          </ion-item>
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card class="settings-card">
-      <ion-card-header>
-        <ion-card-title>{{ "settings.catalogs.title" | translate }}</ion-card-title>
-        <ion-card-subtitle>{{ "settings.catalogs.subtitle" | translate }}</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list lines="none">
-          <ion-item
-            lines="none"
-            button
-            detail="true"
-            routerLink="/settings/catalogos"
-          >
-            <ion-label>
-              <h3>{{ "settings.catalogs.manageTitle" | translate }}</h3>
-              <p>{{ "settings.catalogs.manageSubtitle" | translate }}</p>
+              <h3>{{ "settings.advanced.openTitle" | translate }}</h3>
+              <p>{{ "settings.advanced.openSubtitle" | translate }}</p>
             </ion-label>
           </ion-item>
         </ion-list>
