@@ -67,7 +67,7 @@
                   </div>
                   <div class="suggestion-action">
                     <ion-button size="small" color="success" fill="solid"
-                      (click)="facade.openPurchaseModalForSuggestion(suggestion)"
+                      (click)="facade.purchaseSuggestion(suggestion)"
                       [disabled]="facade.isSuggestionProcessing(suggestion.item._id)" class="purchase-action pressable">
                       @if (facade.isSuggestionProcessing(suggestion.item._id)) {
                       <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
@@ -88,5 +88,4 @@
     </ion-card-content>
   </ion-card>
   }
-  <app-add-purchase-modal></app-add-purchase-modal>
 </ion-content>

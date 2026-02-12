@@ -22,7 +22,7 @@ export function buildFastAddItemPayload(params: {
   nowIso: string;
   name: string;
   quantity: number;
-  defaultLocationId: string;
+  defaultLocationId?: string;
   householdId?: string;
 }): PantryItem {
   const normalizedName = normalizeTrim(params.name) || UNASSIGNED_PRODUCT_NAME;
@@ -31,7 +31,7 @@ export function buildFastAddItemPayload(params: {
 
   const batch: ItemBatch = {
     quantity: roundedQuantity,
-    locationId: normalizeTrim(params.defaultLocationId) || undefined,
+    locationId: normalizeTrim(params.defaultLocationId ?? '') || undefined,
   };
   const batches: ItemBatch[] = [batch];
 

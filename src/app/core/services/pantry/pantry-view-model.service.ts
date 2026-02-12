@@ -132,18 +132,7 @@ export class PantryViewModelService {
       },
     ];
 
-    const basicChip: FilterChipViewModel = {
-      key: 'basic',
-      kind: 'basic',
-      label: 'pantry.filters.basic',
-      description: 'pantry.filters.desc.basic',
-      count: summary.basicCount,
-      icon: 'star-outline',
-      colorClass: 'chip--basic',
-      active: basicActive,
-    };
-
-    return [...statusChips, basicChip];
+    return statusChips;
   }
 
   buildGroups(items: PantryItem[]): PantryGroup[] {

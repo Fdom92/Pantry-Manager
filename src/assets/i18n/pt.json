@@ -110,7 +110,7 @@
       "subtitle": "Adiciona o teu primeiro produto para acompanhar stock e validade."
     },
     "shopping": {
-      "title": "Lista de compras vazia"
+      "title": "Tudo em ordem"
     }
   },
   "history": {
@@ -280,14 +280,6 @@
     "reasons": {
       "below-min": "Stock baixo",
       "empty": "Sem stock"
-    },
-    "purchaseModal": {
-      "titleProduct": "Comprar produto",
-      "productName": "Nome",
-      "quantity": "Quantidade",
-      "quantityPlaceholder": "0",
-      "expiry": "Data de validade (opcional)",
-      "addToPantry": "Adicionar"
     },
     "suggestions": {
       "title": "Lista de compras",
@@ -505,7 +497,7 @@
         "title": "Adicionar supermercado",
         "placeholder": "Nome do supermercado"
       },
-      "basic": "Item essencial da despensa",
+      "basic": "Manter sempre em casa",
       "minThreshold": "Quantidade mínima",
       "location": "Localização",
       "locationPlaceholder": "Seleciona uma localização",

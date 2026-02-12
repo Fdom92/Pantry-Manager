@@ -110,7 +110,7 @@
       "subtitle": "Aggiungi il primo prodotto per tracciare stock e scadenze."
     },
     "shopping": {
-      "title": "Lista della spesa vuota"
+      "title": "Tutto in ordine"
     }
   },
   "history": {
@@ -280,14 +280,6 @@
     "reasons": {
       "below-min": "Stock basso",
       "empty": "Esaurito"
-    },
-    "purchaseModal": {
-      "titleProduct": "Acquista prodotto",
-      "productName": "Nome",
-      "quantity": "Quantità",
-      "quantityPlaceholder": "0",
-      "expiry": "Data di scadenza (opzionale)",
-      "addToPantry": "Aggiungi"
     },
     "suggestions": {
       "title": "Lista della spesa",
@@ -505,7 +497,7 @@
         "title": "Aggiungi supermercato",
         "placeholder": "Nome del supermercato"
       },
-      "basic": "Articolo essenziale della dispensa",
+      "basic": "Tenere sempre in casa",
       "minThreshold": "Quantità minima",
       "location": "Posizione",
       "locationPlaceholder": "Seleziona una posizione",

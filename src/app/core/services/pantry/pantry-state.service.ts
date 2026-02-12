@@ -265,8 +265,6 @@ export class PantryStateService {
     }
 
     await withSignalFlag(this.isFastAdding, async () => {
-      const presets = this.presetLocationOptions();
-      const defaultLocationId = normalizeTrim(presets[0]);
       for (const entry of entries) {
         const timestamp = new Date().toISOString();
         if (entry.isNew || !entry.item) {
@@ -275,7 +273,6 @@ export class PantryStateService {
             nowIso: timestamp,
             name: entry.name,
             quantity: entry.quantity,
-            defaultLocationId: defaultLocationId || '',
           });
           await this.pantryStore.addItem(item);
           await this.eventManager.logFastAddNewItem(item, entry.quantity, timestamp);
@@ -284,7 +281,6 @@ export class PantryStateService {
 
         const updated = await this.pantryStore.addNewLot(entry.item._id, {
           quantity: entry.quantity,
-          location: defaultLocationId || '',
         });
         if (updated) {
           await this.pantryStore.updateItem(updated);

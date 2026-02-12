@@ -3,7 +3,6 @@ import {
   DEFAULT_PREFERENCES,
   DOC_TYPE_PREFERENCES,
   NEAR_EXPIRY_WINDOW_DAYS,
-  ONBOARDING_STORAGE_KEY,
   PLANNER_MEMORY_MAX_LENGTH,
   STORAGE_KEY_PREFERENCES,
 } from '@core/constants';
@@ -13,7 +12,6 @@ import {
   AppThemePreference,
 } from '@core/models';
 import { normalizeStringList, normalizeTrim } from '@core/utils/normalization.util';
-import { getBooleanFlag } from '@core/utils/storage-flag.util';
 import { StorageService } from '../shared/storage.service';
 
 @Injectable({
@@ -80,10 +78,6 @@ export class SettingsPreferencesService {
       if (doc) {
         this.cachedDoc = doc;
         const normalized = this.normalizePreferences(doc);
-        if (this.shouldSeedLocations(normalized.locationOptions)) {
-          await this.savePreferences({ ...normalized, locationOptions: ['Pantry'] });
-          return;
-        }
         this.preferencesSignal.set(normalized);
         this.applyTheme(normalized.theme);
       } else {
@@ -93,13 +87,6 @@ export class SettingsPreferencesService {
       console.error('[SettingsPreferencesService] loadFromStorage error', err);
       this.applyDefaults();
     }
-  }
-
-  private shouldSeedLocations(locationOptions: string[]): boolean {
-    return (
-      getBooleanFlag(ONBOARDING_STORAGE_KEY) &&
-      (!locationOptions || !locationOptions.length)
-    );
   }
 
   private normalizePreferences(input?: Partial<AppPreferences>): AppPreferences {

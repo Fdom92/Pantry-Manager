@@ -39,7 +39,6 @@ export class ShoppingStateService {
   readonly isSummaryExpanded = signal(true);
   readonly processingSuggestionIds = signal<Set<string>>(new Set());
   readonly isSharingListInProgress = signal(false);
-  readonly isPurchaseModalOpen = signal(false);
   readonly purchaseTarget = signal<ShoppingSuggestionWithItem | null>(null);
   // COMPUTED SIGNALS
   readonly shoppingAnalysis = computed<ShoppingStateWithItem>(() => {
@@ -65,21 +64,27 @@ export class ShoppingStateService {
     return id ? this.processingSuggestionIds().has(id) : false;
   }
 
-  openPurchaseModalForSuggestion(suggestion: ShoppingSuggestionWithItem): void {
-    this.purchaseTarget.set(suggestion);
-    this.isPurchaseModalOpen.set(true);
-  }
-
-  closePurchaseModal(): void {
-    if (!this.isPurchaseModalOpen()) {
+  async purchaseSuggestion(suggestion: ShoppingSuggestionWithItem): Promise<void> {
+    const id = suggestion?.item?._id;
+    const quantity = Number(suggestion?.suggestedQuantity ?? 0);
+    if (!id || !Number.isFinite(quantity) || quantity <= 0) {
       return;
     }
-    this.isPurchaseModalOpen.set(false);
-    this.purchaseTarget.set(null);
-  }
 
-  dismissPurchaseModal(): void {
-    this.isPurchaseModalOpen.set(false);
+    await this.runWithProcessing(id, async () => {
+      const updated = await this.pantryService.addNewLot(id, {
+        quantity,
+        expiryDate: undefined,
+      });
+      if (updated) {
+        await this.pantryStore.updateItem(updated);
+        await this.eventManager.logShoppingAdd(suggestion.item, updated, quantity);
+      }
+      await this.pantryStore.loadAll();
+      if (this.shoppingAnalysis().summary.total === 0) {
+        this.reviewPrompt.markEngagement();
+      }
+    });
   }
 
   async confirmPurchaseForTarget(data: { quantity: number; expiryDate?: string | null }): Promise<void> {
@@ -103,7 +108,6 @@ export class ShoppingStateService {
       if (this.shoppingAnalysis().summary.total === 0) {
         this.reviewPrompt.markEngagement();
       }
-      this.dismissPurchaseModal();
     });
   }
 
