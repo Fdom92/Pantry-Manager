@@ -79,7 +79,7 @@
       "subtitle": "Add your first product to track stock and expirations."
     },
     "shopping": {
-      "title": "Shopping list is clear"
+      "title": "All set"
     }
   },
   "history": {
@@ -250,19 +250,10 @@
       "below-min": "Low stock",
       "empty": "Out of stock"
     },
-    "purchaseModal": {
-      "titleProduct": "Purchase product",
-      "productName": "Name",
-      "quantity": "Quantity",
-      "quantityPlaceholder": "0",
-      "expiry": "Expiry date (optional)",
-      "addToPantry": "Add"
-    },
     "suggestions": {
       "title": "Shopping list",
       "loading": "Building shopping list…",
-      "totalStock": "Total stock: {{ amount }}",
-      "minStock": "Min: {{ amount }}",
+      "toBuy": "Buy {{ amount }}",
       "empty": "Nothing pending right now. I'll let you know when something needs restocking."
     },
     "share": {
@@ -475,7 +466,7 @@
         "title": "Add supermarket",
         "placeholder": "Supermarket name"
       },
-      "basic": "Pantry staple item",
+      "basic": "Always keep at home",
       "minThreshold": "Minimum quantity",
       "location": "Location",
       "locationPlaceholder": "Select a location",

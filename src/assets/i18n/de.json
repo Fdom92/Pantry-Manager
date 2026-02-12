@@ -110,7 +110,7 @@
       "subtitle": "Füge dein erstes Produkt hinzu und behalte Bestand und Haltbarkeit im Blick."
     },
     "shopping": {
-      "title": "Einkaufsliste leer"
+      "title": "Alles in Ordnung"
     }
   },
   "history": {
@@ -281,19 +281,10 @@
       "below-min": "Niedriger Bestand",
       "empty": "Kein Bestand"
     },
-    "purchaseModal": {
-      "titleProduct": "Produkt kaufen",
-      "productName": "Name",
-      "quantity": "Menge",
-      "quantityPlaceholder": "0",
-      "expiry": "Haltbarkeitsdatum (optional)",
-      "addToPantry": "Hinzufügen"
-    },
     "suggestions": {
       "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
-      "totalStock": "Gesamtbestand: {{ amount }}",
-      "minStock": "Min.: {{ amount }}",
+      "toBuy": "Kaufen {{ amount }}",
       "empty": "Derzeit nichts zu erledigen. Ich informiere dich, wenn Nachschub nötig ist."
     },
     "share": {
@@ -506,7 +497,7 @@
         "title": "Supermarkt hinzufügen",
         "placeholder": "Supermarktname"
       },
-      "basic": "Grundprodukt der Vorratskammer",
+      "basic": "Immer zuhause vorrätig halten",
       "minThreshold": "Mindestmenge",
       "location": "Standort",
       "locationPlaceholder": "Standort auswählen",

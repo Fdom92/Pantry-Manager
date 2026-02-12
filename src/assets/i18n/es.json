@@ -79,7 +79,7 @@
       "subtitle": "Añade tu primer producto y controla el stock y las caducidades."
     },
     "shopping": {
-      "title": "Lista de compras limpia"
+      "title": "Todo en orden"
     }
   },
   "history": {
@@ -240,20 +240,11 @@
       "below-min": "Bajo stock",
       "empty": "Sin stock"
     },
-    "purchaseModal": {
-      "titleProduct": "Comprar producto",
-      "productName": "Nombre",
-      "quantity": "Cantidad",
-      "quantityPlaceholder": "0",
-      "expiry": "Fecha de caducidad (opcional)",
-      "addToPantry": "Añadir"
-    },
     "suggestions": {
       "title": "Lista de la compra",
       "loading": "Generando lista de compras…",
-      "totalStock": "Stock total: {{ amount }}",
-      "minStock": "Mín.: {{ amount }}",
-      "empty": "Nada pendiente por ahora. Te avisaré cuando algo necesite reponerse."
+      "toBuy": "Comprar {{ amount }}",
+      "empty": "Los productos que marques como \"mantener en casa\" aparecerán aquí cuando bajen del mínimo."
     },
     "share": {
       "button": "Compartir lista",
@@ -465,7 +456,7 @@
         "title": "Añadir supermercado",
         "placeholder": "Nombre del supermercado"
       },
-      "basic": "Producto básico de la despensa",
+      "basic": "Mantener siempre en casa",
       "minThreshold": "Cantidad mínima",
       "location": "Ubicación",
       "locationPlaceholder": "Selecciona una ubicación",

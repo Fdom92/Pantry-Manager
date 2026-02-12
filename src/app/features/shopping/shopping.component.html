@@ -8,103 +8,84 @@
   @let state = facade.shoppingAnalysis();
 
   @if (!facade.loading() && !state.summary.total) {
-    <app-empty-state
-      class="list-empty-state"
-      icon="cart-outline"
-      [iconColor]="'warning'"
-      [titleKey]="'emptyStates.shopping.title'"
-      [subtitle]="'shopping.suggestions.empty' | translate">
-    </app-empty-state>
+  <app-empty-state class="list-empty-state" icon="cart-outline" [iconColor]="'warning'"
+    [titleKey]="'emptyStates.shopping.title'" [subtitle]="'shopping.suggestions.empty' | translate">
+  </app-empty-state>
   } @else {
-    <ion-card class="suggestions-shell">
-      <ion-card-header class="suggestions-header">
-        <ion-card-title>
-          {{ 'shopping.suggestions.title' | translate }}
-          <ion-button
-            fill="clear"
-            color="primary"
-            class="share-icon-button"
-            (click)="facade.shareShoppingListReport()"
-            [disabled]="facade.loading() || facade.isSharingListInProgress() || !state.summary.total"
-            [attr.aria-label]="'shopping.share.button' | translate"
-          >
-            @if (facade.isSharingListInProgress()) {
-              <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
-            } @else {
-              <ion-icon slot="icon-only" name="share-outline"></ion-icon>
-            }
-          </ion-button>
-        </ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        @if (facade.loading()) {
-          <div class="suggestion-list shopping-skeleton-list">
-            @for (placeholder of [0, 1, 2]; track placeholder) {
-              <ion-card class="suggestion-card suggestion-card--skeleton">
-                <ion-card-content>
-                  <div class="suggestion-header">
-                    <ion-skeleton-text animated style="width: 45%; height: 16px;"></ion-skeleton-text>
-                    <ion-skeleton-text animated style="width: 72px; height: 22px;"></ion-skeleton-text>
-                  </div>
-                  <ion-skeleton-text animated style="width: 75%; height: 14px;"></ion-skeleton-text>
-                  <div class="suggestion-footer">
-                    <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 50%;"></ion-skeleton-text>
-                  </div>
-                </ion-card-content>
-              </ion-card>
-            }
-          </div>
-        } @else {
-          <div class="suggestion-groups fade-in-list">
-            @for (group of state.groupedSuggestions; track group.key) {
-              <div class="suggestion-group">
-                <h3 class="supermarket-heading">
-                  {{ group.label }}
-                  <ion-badge color="medium">{{ group.suggestions.length }}</ion-badge>
-                </h3>
-                <div class="suggestion-list">
-                  @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
-                    <ion-card class="suggestion-card">
-                      <ion-card-content>
-                        <div class="suggestion-header">
-                          <h3>{{ suggestion.item.name }}</h3>
-                          <ion-chip [color]="facade.getBadgeColorByReason(suggestion.reason)" [outline]="true">
-                            {{ ('shopping.reasons.' + suggestion.reason) | translate }}
-                          </ion-chip>
-                        </div>
-                        <p class="meta">
-                          {{ 'shopping.suggestions.totalStock' | translate:{ amount: (suggestion.currentQuantity | number:'1.0-2') } }}
-                          @if (suggestion.minThreshold !== undefined) {
-                            · {{ 'shopping.suggestions.minStock' | translate:{ amount: (suggestion.minThreshold | number:'1.0-2') } }}
-                          }
-                        </p>
-                        <div class="suggestion-footer">
-                          <ion-button
-                            size="small"
-                            color="success"
-                            fill="solid"
-                            (click)="facade.openPurchaseModalForSuggestion(suggestion)"
-                            [disabled]="facade.isSuggestionProcessing(suggestion.item._id)"
-                            class="purchase-action pressable"
-                          >
-                            @if (facade.isSuggestionProcessing(suggestion.item._id)) {
-                              <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
-                            } @else {
-                              <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                            }
-                          </ion-button>
-                        </div>
-                      </ion-card-content>
-                    </ion-card>
-                  }
-                </div>
+  <ion-card class="suggestions-shell">
+    <ion-card-header class="suggestions-header">
+      <ion-card-title>
+        {{ 'shopping.suggestions.title' | translate }}
+        <ion-button fill="clear" color="primary" class="share-icon-button" (click)="facade.shareShoppingListReport()"
+          [disabled]="facade.loading() || facade.isSharingListInProgress() || !state.summary.total"
+          [attr.aria-label]="'shopping.share.button' | translate">
+          @if (facade.isSharingListInProgress()) {
+          <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
+          } @else {
+          <ion-icon slot="icon-only" name="share-outline"></ion-icon>
+          }
+        </ion-button>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      @if (facade.loading()) {
+      <div class="suggestion-list shopping-skeleton-list">
+        @for (placeholder of [0, 1, 2]; track placeholder) {
+        <ion-card class="suggestion-card suggestion-card--skeleton">
+          <ion-card-content>
+            <div class="suggestion-content">
+              <div class="suggestion-data">
+                <ion-skeleton-text animated style="width: 120px; height: 17px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 60px; height: 14px;"></ion-skeleton-text>
               </div>
+              <div class="suggestion-action">
+                <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 50%;"></ion-skeleton-text>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+        }
+      </div>
+      } @else {
+      <div class="suggestion-groups fade-in-list">
+        @for (group of state.groupedSuggestions; track group.key) {
+        <div class="suggestion-group">
+          <h3 class="supermarket-heading">
+            {{ group.label }}
+          </h3>
+          <div class="suggestion-list">
+            @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
+            <ion-card class="suggestion-card">
+              <ion-card-content>
+                <div class="suggestion-content">
+                  <div class="suggestion-data">
+                    <h3>{{ suggestion.item.name }}</h3>
+                    <p class="meta">
+                      {{ 'shopping.suggestions.toBuy' | translate:{ amount: (suggestion.suggestedQuantity |
+                      number:'1.0-2') } }}
+                    </p>
+                  </div>
+                  <div class="suggestion-action">
+                    <ion-button size="small" color="success" fill="solid"
+                      (click)="facade.purchaseSuggestion(suggestion)"
+                      [disabled]="facade.isSuggestionProcessing(suggestion.item._id)" class="purchase-action pressable">
+                      @if (facade.isSuggestionProcessing(suggestion.item._id)) {
+                      <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
+                      } @else {
+                      <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+                      }
+                    </ion-button>
+                  </div>
+                </div>
+              </ion-card-content>
+            </ion-card>
             }
           </div>
+        </div>
         }
-      </ion-card-content>
-    </ion-card>
+      </div>
+      }
+    </ion-card-content>
+  </ion-card>
   }
-
-  <app-add-purchase-modal></app-add-purchase-modal>
 </ion-content>

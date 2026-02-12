@@ -1,5 +1,9 @@
 ion-card {
+  background: var(--ion-card-background, var(--ion-card-background)) !important;
+  --background: var(--ion-card-background, var(--ion-card-background));
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  color: var(--ion-text-color);
 }
 
 ion-card-title {
@@ -82,29 +86,16 @@ ion-title {
   padding: 16px;
 }
 
-.suggestion-footer {
+.suggestion-content {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.suggestion-header {
-  display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
 }
 
-.suggestion-header h3 {
+.suggestion-content h3 {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-}
-
-.suggestion-header ion-chip {
-  margin: 0;
 }
 
 .purchase-action {
