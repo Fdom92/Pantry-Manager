@@ -11,6 +11,19 @@ export function buildExportFileName(now: Date): string {
   return `${BACKUP_FILENAME}-${timestamp}.json`;
 }
 
+function isValidDoc(doc: any): boolean {
+  return (
+    doc &&
+    typeof doc === 'object' &&
+    typeof doc._id === 'string' &&
+    normalizeTrim(doc._id).length > 0 &&
+    typeof doc.type === 'string' &&
+    normalizeTrim(doc.type).length > 0 &&
+    !String(doc._id).startsWith('_design/') &&
+    doc._deleted !== true
+  );
+}
+
 export function parseBackup(raw: string, nowIso: string): BaseDoc[] {
   let parsed: unknown;
   try {
@@ -23,27 +36,17 @@ export function parseBackup(raw: string, nowIso: string): BaseDoc[] {
     throw new Error(IMPORT_INVALID_ERROR);
   }
 
-  const docs = parsed
-    .filter(entry => !!entry && typeof entry === 'object')
-    .map(entry => entry as any)
-    .filter(doc => typeof doc._id === 'string' && normalizeTrim(doc._id).length > 0)
-    .filter(doc => typeof doc.type === 'string' && normalizeTrim(doc.type).length > 0)
-    .filter(doc => !String(doc._id).startsWith('_design/'))
-    .filter(doc => doc._deleted !== true)
-    .map(doc => {
-      const sanitizedId = normalizeTrim(doc._id);
-      const sanitizedType = normalizeTrim(doc.type);
-      const createdAt = typeof doc.createdAt === 'string' && doc.createdAt ? doc.createdAt : nowIso;
-      const updatedAt = typeof doc.updatedAt === 'string' && doc.updatedAt ? doc.updatedAt : createdAt;
-      const { _rev, _revisions, _conflicts, _deleted, ...rest } = doc;
-      return {
-        ...rest,
-        _id: sanitizedId,
-        type: sanitizedType,
-        createdAt,
-        updatedAt,
-      } as BaseDoc;
-    });
+  const docs = parsed.filter(isValidDoc).map(doc => {
+    const createdAt = typeof doc.createdAt === 'string' && doc.createdAt ? doc.createdAt : nowIso;
+    const { _rev, _revisions, _conflicts, _deleted, ...rest } = doc;
+    return {
+      ...rest,
+      _id: normalizeTrim(doc._id),
+      type: normalizeTrim(doc.type),
+      createdAt,
+      updatedAt: typeof doc.updatedAt === 'string' && doc.updatedAt ? doc.updatedAt : createdAt,
+    } as BaseDoc;
+  });
 
   if (!docs.length) {
     throw new Error(IMPORT_EMPTY_ERROR);

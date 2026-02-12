@@ -1,8 +1,6 @@
-import type { BaseDoc } from '../shared/base-doc.model';
+import type { BaseColoredEntity } from '../shared';
 
-export interface Category extends BaseDoc {
+export interface Category extends BaseColoredEntity {
   type: 'category';
-  name: string;
   icon?: string;
-  color?: string;
 }

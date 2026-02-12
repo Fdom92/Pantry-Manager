@@ -4,12 +4,13 @@ export interface DateFormatOptions {
   fallback?: string;
 }
 
+export function toNumberOrZero(value: unknown): number {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+}
+
 export function roundQuantity(value: number | null | undefined): number {
-  const num = Number(value ?? 0);
-  if (!Number.isFinite(num)) {
-    return 0;
-  }
-  return Math.round(num);
+  return Math.round(toNumberOrZero(value ?? 0));
 }
 
 export function formatQuantity(

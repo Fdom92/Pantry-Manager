@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { PLANNER_MEMORY_MAX_LENGTH } from '@core/constants';
-import { withSignalFlag } from '../shared';
+import { withSignalFlag } from '@core/utils';
 import { SettingsPreferencesService } from './settings-preferences.service';
 import { TranslateService } from '@ngx-translate/core';
 import { normalizeTrim } from '@core/utils/normalization.util';

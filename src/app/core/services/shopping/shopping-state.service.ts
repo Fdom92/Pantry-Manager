@@ -12,7 +12,8 @@ import {
   type ShoppingSummary,
 } from '@core/models/shopping';
 import { LanguageService } from '../shared/language.service';
-import { DownloadService, ShareService, createLatestOnlyRunner, shouldSkipShareOutcome, withSignalFlag } from '../shared';
+import { createLatestOnlyRunner, withSignalFlag } from '@core/utils';
+import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';

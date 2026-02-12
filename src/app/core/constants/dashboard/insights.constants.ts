@@ -2,8 +2,9 @@ import { AgentEntryContext } from '@core/models/agent';
 import { InsightDefinition, InsightId } from '@core/models/dashboard';
 import { isSundayAfternoon, isWithinHours } from '@core/utils';
 
-export const PENDING_REVIEW_STALE_DAYS = 7;
-export const INSIGHTS_LIBRARY: InsightDefinition[] = [
+/** @deprecated Import from @core/constants/shared instead */
+export { PENDING_REVIEW_STALE_DAYS } from '../shared/shared.constants';
+export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
   {
     id: InsightId.PENDING_PRODUCT_UPDATES,
     titleKey: 'insights.library.pendingProductUpdates.title',
@@ -128,4 +129,4 @@ export const INSIGHTS_LIBRARY: InsightDefinition[] = [
       },
     ],
   },
-];
+] as const;

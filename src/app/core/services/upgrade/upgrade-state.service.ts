@@ -4,7 +4,7 @@ import type { PlanViewModel } from '@core/models/upgrade';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
-import { createLatestOnlyRunner, withSignalFlag } from '../shared';
+import { createLatestOnlyRunner, withSignalFlag } from '@core/utils';
 import { UpgradeRevenuecatService } from './upgrade-revenuecat.service';
 
 @Injectable()

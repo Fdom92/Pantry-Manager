@@ -3,6 +3,14 @@ export interface NormalizeStringListOptions {
   keyFn?: (value: string) => string;
 }
 
+/**
+ * Core normalization functions hierarchy:
+ * - normalizeTrim: Basic trim
+ * - normalizeWhitespace: Collapse multiple spaces + trim
+ * - normalizeLowercase: Trim + lowercase
+ * - normalizeWhitespaceLowercase: Collapse spaces + trim + lowercase
+ */
+
 export function normalizeWhitespace(value: string | null | undefined): string {
   return (value ?? '').replace(/\s+/g, ' ').trim();
 }
@@ -20,7 +28,7 @@ export function normalizeOptionalTrim(value?: string | null): string | undefined
   return trimmed || undefined;
 }
 
-function normalizeWhitespaceLowercase(value: string | null | undefined): string {
+export function normalizeWhitespaceLowercase(value: string | null | undefined): string {
   return normalizeWhitespace(value).toLowerCase();
 }
 

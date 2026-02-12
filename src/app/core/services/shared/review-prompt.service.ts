@@ -1,10 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { ONBOARDING_STORAGE_KEY, REVIEW_STORAGE_KEYS } from '@core/constants';
-import { getBooleanFlag, setBooleanFlag } from '@core/utils/storage-flag.util';
+import { getBooleanFlag, setBooleanFlag, sleep } from '@core/utils';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmService } from './confirm.service';
-import { sleep } from './task.util';
 
 interface InAppReviewPlugin {
   requestReview: () => Promise<void>;

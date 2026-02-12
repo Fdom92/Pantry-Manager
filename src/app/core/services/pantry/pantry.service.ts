@@ -1,19 +1,23 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
-import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
+import { DEFAULT_HOUSEHOLD_ID, DEFAULT_PANTRY_PAGE_SIZE, NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import {
   collectBatches as collectBatchesItem,
   computeEarliestExpiry as computeEarliestExpiryStock,
   computeExpirationStatus as computeExpirationStatusItem,
   getItemStatusState,
   hasOpenBatch as hasOpenBatchItem,
+  matchesFilters,
+  matchesSearchQuery,
   mergeBatchesByExpiry as mergeBatchesByExpiryStock,
   normalizeBatches as normalizeBatchesStock,
   shouldAutoAddToShoppingList as shouldAutoAddToShoppingListItem,
+  sortPantryItems,
   sumQuantities as sumQuantitiesStock,
-  toNumberOrZero as toNumberOrZeroStock,
 } from '@core/domain/pantry';
+import { toNumberOrZero as toNumberOrZeroStock } from '@core/utils/formatting.util';
 import { DEFAULT_PANTRY_FILTERS, ItemBatch, PantryFilterState, PantryItem } from '@core/models/pantry';
-import { normalizeLocationId, normalizeSearchField, normalizeSearchQuery, normalizeSupermarketName, normalizeTrim } from '@core/utils/normalization.util';
+import { normalizeLocationId, normalizeSearchQuery, normalizeSupermarketName, normalizeTrim } from '@core/utils/normalization.util';
+import { generateBatchId } from '@core/utils';
 import { StorageService } from '../shared/storage.service';
 
 @Injectable({
@@ -34,7 +38,7 @@ export class PantryService extends StorageService<PantryItem> {
   readonly searchQuery = signal('');
   readonly activeFilters = signal<PantryFilterState>({ ...DEFAULT_PANTRY_FILTERS });
   readonly pageOffset = signal(0);
-  readonly pageSize = signal(300);
+  readonly pageSize = signal(DEFAULT_PANTRY_PAGE_SIZE);
   readonly loading = signal(false);
   readonly pipelineResetting = signal(false);
   readonly endReached = signal(false);
@@ -195,7 +199,7 @@ export class PantryService extends StorageService<PantryItem> {
     const expiryDate = lot?.expiryDate ?? undefined;
 
     const newBatch: ItemBatch = {
-      batchId: this.generateBatchId(),
+      batchId: generateBatchId(),
       quantity,
       expirationDate: expiryDate || undefined,
       opened: false,
@@ -435,7 +439,7 @@ export class PantryService extends StorageService<PantryItem> {
 
   /** Return all batches currently tracked for the provided item. */
   getItemBatches(item: PantryItem): ItemBatch[] {
-    return collectBatchesItem(item.batches ?? [], { generateBatchId: this.generateBatchId.bind(this) });
+    return collectBatchesItem(item.batches ?? [], { generateBatchId });
   }
 
   /** Determine whether any batch in the item is marked as opened. */
@@ -470,61 +474,10 @@ export class PantryService extends StorageService<PantryItem> {
     const filters = this.activeFilters();
 
     const filtered = loaded.filter(item => {
-      return this.getItemTotalQuantity(item) > 0 && this.matchesSearch(item, query) && this.matchesFilters(item, filters);
+      return this.getItemTotalQuantity(item) > 0 && matchesSearchQuery(item, query) && matchesFilters(item, filters);
     });
-    const sorted = this.sortItems(filtered);
+    const sorted = sortPantryItems(filtered);
     this.filteredProducts.set(sorted);
-  }
-
-  private matchesSearch(item: PantryItem, query: string): boolean {
-    if (!query) {
-      return true;
-    }
-    const name = normalizeSearchField(item.name);
-    return name.includes(query);
-  }
-
-  private matchesFilters(item: PantryItem, filters: PantryFilterState): boolean {
-    if (filters.basic && !item.isBasic) {
-      return false;
-    }
-    const state = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
-    if (filters.expired && state !== 'expired') {
-      return false;
-    }
-    if (filters.expiring && state !== 'near-expiry') {
-      return false;
-    }
-    if (filters.lowStock && state !== 'low-stock') {
-      return false;
-    }
-    if (filters.recentlyAdded && !this.isRecentlyAdded(item)) {
-      return false;
-    }
-    if (filters.normalOnly && state !== 'normal') {
-      return false;
-    }
-    return true;
-  }
-
-  private sortItems(items: PantryItem[]): PantryItem[] {
-    if (items.length <= 1) {
-      return items;
-    }
-    const sorted = [...items];
-    sorted.sort((a, b) => this.compareItemsForSort(a, b));
-    return sorted;
-  }
-
-  private compareItemsForSort(a: PantryItem, b: PantryItem): number {
-    const expirationDiff = this.getExpirationWeight(a) - this.getExpirationWeight(b);
-    if (expirationDiff !== 0) {
-      return expirationDiff;
-    }
-
-    const labelA = normalizeSearchField(a.name);
-    const labelB = normalizeSearchField(b.name);
-    return labelA.localeCompare(labelB);
   }
 
   private requestPipelineReset(): void {
@@ -559,33 +512,13 @@ export class PantryService extends StorageService<PantryItem> {
     );
   }
 
-  private isRecentlyAdded(item: PantryItem): boolean {
-    const createdAt = new Date(item?.createdAt ?? '');
-    if (Number.isNaN(createdAt.getTime())) {
-      return false;
-    }
-    const windowMs = RECENTLY_ADDED_WINDOW_DAYS * 24 * 60 * 60 * 1000;
-    return Date.now() - createdAt.getTime() <= windowMs;
-  }
 
-  private getExpirationWeight(item: PantryItem): number {
-    switch (getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS)) {
-      case 'expired':
-        return 0;
-      case 'near-expiry':
-        return 1;
-      case 'low-stock':
-        return 2;
-      default:
-        return 3;
-    }
-  }
 
   /** Compute aggregate fields without mutating the original payload. */
   private applyDerivedFields(item: PantryItem): PantryItem {
     const rawBatches = Array.isArray(item.batches) ? item.batches : [];
     const batches = normalizeBatchesStock(rawBatches, {
-      generateBatchId: this.generateBatchId.bind(this),
+      generateBatchId,
     });
     const supermarket = normalizeSupermarketName(
       (item.supermarket ?? (item as any).supermarketId) as string | undefined
@@ -614,9 +547,6 @@ export class PantryService extends StorageService<PantryItem> {
     return this.database;
   }
 
-  private generateBatchId(): string {
-    return `batch:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-  }
 
   private async ensureProductIndex(): Promise<void> {
     if (this.productIndexReady) {
