@@ -8,6 +8,7 @@
   },
   "onboarding": {
     "tagline": "Commencez en 1 minute",
+    "taglineDone": "Tout est prêt",
     "actions": {
       "skip": "Passer",
       "next": "Suivant",
