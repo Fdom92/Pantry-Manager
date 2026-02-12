@@ -7,152 +7,155 @@
     </ion-toolbar>
   </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
   @if (state.isLoading()) {
     <ion-progress-bar type="indeterminate"></ion-progress-bar>
   }
   <div class="catalogs-content">
-    <ion-list lines="full">
-      <ion-list-header>
-        <ion-label>
-          <h2>{{ 'settings.catalogs.locations.title' | translate }}</h2>
-          <p>{{ 'settings.catalogs.locations.subtitle' | translate }}</p>
-        </ion-label>
-      </ion-list-header>
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>{{ 'settings.catalogs.locations.title' | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ 'settings.catalogs.locations.subtitle' | translate }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="full">
+          @if (!state.locationOptionsDraft().length) {
+            <ion-item lines="none">
+              <app-empty-state
+                class="list-empty-state"
+                icon="navigate-outline"
+                [title]="'settings.catalogs.locations.title' | translate"
+                [subtitle]="'settings.catalogs.locations.empty' | translate"
+                [compact]="true">
+              </app-empty-state>
+            </ion-item>
+          }
 
-      @if (!state.locationOptionsDraft().length) {
-        <ion-item lines="none">
-          <app-empty-state
-            class="list-empty-state"
-            icon="navigate-outline"
-            [title]="'settings.catalogs.locations.title' | translate"
-            [subtitle]="'settings.catalogs.locations.empty' | translate"
-            [compact]="true">
-          </app-empty-state>
-        </ion-item>
-      }
+          @for (location of state.locationOptionsDraft(); track $index; let i = $index) {
+            <ion-item>
+              <ion-label>
+                <h3>{{ 'settings.catalogs.locations.field' | translate:{ index: i + 1 } }}</h3>
+                <p>{{ location }}</p>
+              </ion-label>
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="primary"
+                [disabled]="state.locationOptionsDraft().length <= 0"
+                (click)="state.removeLocationOption(i)">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+          }
 
-      @for (location of state.locationOptionsDraft(); track $index; let i = $index) {
-        <ion-item>
-          <ion-label>
-            <h3>{{ 'settings.catalogs.locations.field' | translate:{ index: i + 1 } }}</h3>
-            <p>{{ location }}</p>
-          </ion-label>
-          <ion-button
-            slot="end"
-            fill="clear"
-            color="danger"
-            [disabled]="state.locationOptionsDraft().length <= 0"
-            (click)="state.removeLocationOption(i)">
-            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-          </ion-button>
-        </ion-item>
-      }
+          <div class="options-footer">
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="state.addLocationOption()">
+              <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+              {{ 'settings.catalogs.locations.add' | translate }}
+            </ion-button>
+          </div>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
 
-      <ion-item class="options-footer" lines="none">
-        <ion-button
-          fill="clear"
-          size="small"
-          (click)="state.addLocationOption()">
-          <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-          {{ 'settings.catalogs.locations.add' | translate }}
-        </ion-button>
-      </ion-item>
-    </ion-list>
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>{{ 'settings.catalogs.categories.title' | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ 'settings.catalogs.categories.subtitle' | translate }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="full">
+          @if (!state.categoryOptionsDraft().length) {
+            <ion-item lines="none">
+              <app-empty-state
+                class="list-empty-state"
+                icon="pricetag-outline"
+                [title]="'settings.catalogs.categories.title' | translate"
+                [subtitle]="'settings.catalogs.categories.empty' | translate"
+                [compact]="true">
+              </app-empty-state>
+            </ion-item>
+          }
 
-    <ion-list lines="full">
-      <ion-list-header>
-        <ion-label>
-          <h2>{{ 'settings.catalogs.categories.title' | translate }}</h2>
-          <p>{{ 'settings.catalogs.categories.subtitle' | translate }}</p>
-        </ion-label>
-      </ion-list-header>
+          @for (category of state.categoryOptionsDraft(); track $index; let i = $index) {
+            <ion-item>
+              <ion-label>
+                <h3>{{ 'settings.catalogs.categories.field' | translate:{ index: i + 1 } }}</h3>
+                <p>{{ category }}</p>
+              </ion-label>
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="primary"
+                (click)="state.removeCategoryOption(i)">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+          }
 
-      @if (!state.categoryOptionsDraft().length) {
-        <ion-item lines="none">
-          <app-empty-state
-            class="list-empty-state"
-            icon="pricetag-outline"
-            [title]="'settings.catalogs.categories.title' | translate"
-            [subtitle]="'settings.catalogs.categories.empty' | translate"
-            [compact]="true">
-          </app-empty-state>
-        </ion-item>
-      }
+          <div class="options-footer">
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="state.addCategoryOption()">
+              <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+              {{ 'settings.catalogs.categories.add' | translate }}
+            </ion-button>
+          </div>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
 
-      @for (category of state.categoryOptionsDraft(); track $index; let i = $index) {
-        <ion-item>
-          <ion-label>
-            <h3>{{ 'settings.catalogs.categories.field' | translate:{ index: i + 1 } }}</h3>
-            <p>{{ category }}</p>
-          </ion-label>
-          <ion-button
-            slot="end"
-            fill="clear"
-            color="danger"
-            (click)="state.removeCategoryOption(i)">
-            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-          </ion-button>
-        </ion-item>
-      }
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>{{ 'settings.catalogs.supermarkets.title' | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ 'settings.catalogs.supermarkets.subtitle' | translate }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="full">
+          @if (!state.supermarketOptionsDraft().length) {
+            <ion-item lines="none">
+              <app-empty-state
+                class="list-empty-state"
+                icon="storefront-outline"
+                [title]="'settings.catalogs.supermarkets.title' | translate"
+                [subtitle]="'settings.catalogs.supermarkets.empty' | translate"
+                [compact]="true">
+              </app-empty-state>
+            </ion-item>
+          }
 
-      <ion-item class="options-footer" lines="none">
-        <ion-button
-          fill="clear"
-          size="small"
-          (click)="state.addCategoryOption()">
-          <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-          {{ 'settings.catalogs.categories.add' | translate }}
-        </ion-button>
-      </ion-item>
-    </ion-list>
+          @for (supermarket of state.supermarketOptionsDraft(); track $index; let i = $index) {
+            <ion-item>
+              <ion-label>
+                <h3>{{ 'settings.catalogs.supermarkets.field' | translate:{ index: i + 1 } }}</h3>
+                <p>{{ supermarket }}</p>
+              </ion-label>
+              <ion-button
+                slot="end"
+                fill="clear"
+                color="primary"
+                (click)="state.removeSupermarketOption(i)">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+          }
 
-    <ion-list lines="full">
-      <ion-list-header>
-        <ion-label>
-          <h2>{{ 'settings.catalogs.supermarkets.title' | translate }}</h2>
-          <p>{{ 'settings.catalogs.supermarkets.subtitle' | translate }}</p>
-        </ion-label>
-      </ion-list-header>
-
-      @if (!state.supermarketOptionsDraft().length) {
-        <ion-item lines="none">
-          <app-empty-state
-            class="list-empty-state"
-            icon="storefront-outline"
-            [title]="'settings.catalogs.supermarkets.title' | translate"
-            [subtitle]="'settings.catalogs.supermarkets.empty' | translate"
-            [compact]="true">
-          </app-empty-state>
-        </ion-item>
-      }
-
-      @for (supermarket of state.supermarketOptionsDraft(); track $index; let i = $index) {
-        <ion-item>
-          <ion-label>
-            <h3>{{ 'settings.catalogs.supermarkets.field' | translate:{ index: i + 1 } }}</h3>
-            <p>{{ supermarket }}</p>
-          </ion-label>
-          <ion-button
-            slot="end"
-            fill="clear"
-            color="danger"
-            (click)="state.removeSupermarketOption(i)">
-            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-          </ion-button>
-        </ion-item>
-      }
-
-      <ion-item class="options-footer" lines="none">
-        <ion-button
-          fill="clear"
-          size="small"
-          (click)="state.addSupermarketOption()">
-          <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-          {{ 'settings.catalogs.supermarkets.add' | translate }}
-        </ion-button>
-      </ion-item>
-    </ion-list>
+          <div class="options-footer">
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="state.addSupermarketOption()">
+              <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+              {{ 'settings.catalogs.supermarkets.add' | translate }}
+            </ion-button>
+          </div>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
 
     <div class="catalog-actions">
       <ion-button

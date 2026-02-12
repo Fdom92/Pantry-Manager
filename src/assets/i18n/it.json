@@ -627,9 +627,9 @@
     },
     "appearance": {
       "title": "Aspetto",
-      "subtitle": "Scegli come appare l'app.",
+      "subtitle": "Scegli lo stile che preferisci.",
       "theme": "Tema",
-      "description": "Passa tra chiaro, scuro o segui il sistema.",
+      "description": "Scegli chiaro, scuro o segui il sistema.",
       "light": "Chiaro",
       "dark": "Scuro",
       "system": "Sistema",
@@ -637,35 +637,41 @@
     },
     "ai": {
       "title": "IA",
-      "subtitle": "Condividi il contesto con il planner.",
+      "subtitle": "Di' al planner cosa ricordare.",
       "contextTitle": "Contesto / Memoria",
-      "contextDescription": "Racconta al planner la tua famiglia, le diete, le allergie o qualsiasi preferenza da ricordare sempre.",
+      "contextDescription": "Condividi famiglia, diete, allergie o tutto ciò che vuoi far ricordare.",
       "contextPlaceholder": "Esempio: Siamo due adulti e una bambina. Evita cibi piccanti e arachidi. Preferisci ricette mediterranee.",
-      "saveAction": "Salva contesto IA",
+      "saveAction": "Salva contesto",
       "saveSuccess": "Contesto salvato.",
       "saveError": "Impossibile salvare il contesto."
     },
+    "advanced": {
+      "title": "Avanzate",
+      "subtitle": "Strumenti per dati e cataloghi.",
+      "openTitle": "Apri avanzate",
+      "openSubtitle": "Gestisci cataloghi e dati del dispositivo."
+    },
     "data": {
       "title": "Gestione dati",
-      "subtitle": "Controlla cosa è memorizzato su questo dispositivo.",
-      "resetTitle": "Cancella dati / Reimposta app",
-      "resetDescription": "Rimuovi tutte le informazioni salvate su questo dispositivo.",
+      "subtitle": "Controlla cosa è salvato su questo dispositivo.",
+      "resetTitle": "Cancella dati",
+      "resetDescription": "Rimuove tutto ciò che è salvato su questo dispositivo.",
       "resetAction": "Cancella",
       "exportTitle": "Esporta dati",
-      "exportDescription": "Scarica un file JSON con i dati correnti.",
+      "exportDescription": "Scarica un file di backup.",
       "exportAction": "Esporta",
       "importTitle": "Importa dati",
-      "importDescription": "Ripristina un backup JSON precedentemente esportato.",
+      "importDescription": "Ripristina un backup esportato in precedenza.",
       "importAction": "Importa"
     },
     "reset": {
-      "confirm": "Questo cancellerà TUTTI i dati locali dell'app.\nVuoi continuare?",
+      "confirm": "Questo cancellerà tutti i dati salvati su questo dispositivo.\nVuoi continuare?",
       "success": "Dati locali rimossi.",
       "error": "Impossibile cancellare l'app."
     },
     "export": {
       "unavailable": "L'esportazione non è disponibile in questo ambiente.",
-      "readyToShare": "Dati pronti per essere condivisi.",
+      "readyToShare": "Il tuo backup è pronto per essere condiviso.",
       "success": "Dati esportati.",
       "error": "Impossibile esportare i dati.",
       "shareTitle": "Pantry Manager - Backup",
@@ -681,9 +687,9 @@
     "loadError": "Si è verificato un problema durante il caricamento delle impostazioni.",
     "catalogs": {
       "title": "Cataloghi",
-      "subtitle": "Gestisci liste riutilizzabili per organizzare la tua dispensa.",
+      "subtitle": "Gestisci le liste usate dall'app.",
       "manageTitle": "Apri gestione cataloghi",
-      "manageSubtitle": "Modifica nel dettaglio posizioni, categorie e supermercati.",
+      "manageSubtitle": "Modifica posizioni, categorie e supermercati.",
       "saveSuccess": "Cataloghi aggiornati.",
       "saveError": "Impossibile salvare i cataloghi.",
       "loadError": "Impossibile caricare i cataloghi.",
@@ -716,7 +722,7 @@
       },
       "supermarkets": {
         "title": "Supermercati",
-        "subtitle": "Definisci la lista mostrata quando assegni supermercati ai prodotti.",
+        "subtitle": "Scegli quali supermercati compaiono quando modifichi i prodotti.",
         "empty": "Aggiungi un supermercato per iniziare.",
         "field": "Supermercato {{ index }}",
         "add": "Aggiungi supermercato",
@@ -734,13 +740,13 @@
     },
     "dev": {
       "title": "Sviluppo",
-      "subtitle": "Strumenti per testare onboarding e setup.",
+      "subtitle": "Strumenti per testare onboarding e configurazione.",
       "setupTitle": "Visualizza setup",
       "setupSubtitle": "Apri il flusso di setup per configurare i cataloghi."
     },
     "info": {
       "title": "Informazioni",
-      "subtitle": "Dettagli rapidi sull'app.",
+      "subtitle": "Dettagli utili sull'app.",
       "version": "Versione",
       "feedbackTitle": "Invia feedback",
       "feedbackSubtitle": "Condividi suggerimenti o segnala problemi.",

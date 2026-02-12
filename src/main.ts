@@ -33,6 +33,7 @@ import {
   constructOutline,
   createOutline,
   cubeOutline,
+  desktopOutline,
   ellipsisVerticalOutline,
   enterOutline,
   exitOutline,
@@ -45,6 +46,7 @@ import {
   listOutline,
   locationOutline,
   lockClosedOutline,
+  moonOutline,
   navigateOutline,
   paperPlaneOutline,
   pricetagOutline,
@@ -59,6 +61,7 @@ import {
   speedometerOutline,
   starOutline,
   storefrontOutline,
+  sunnyOutline,
   swapHorizontalOutline,
   timeOutline,
   trashOutline,
@@ -138,7 +141,10 @@ addIcons({
   'construct-outline': constructOutline,
   'clipboard-outline': clipboardOutline,
   'remove-circle-outline': removeCircleOutline,
-  'cloud-upload-outline': cloudUploadOutline
+  'cloud-upload-outline': cloudUploadOutline,
+  'sunny-outline': sunnyOutline,
+  'moon-outline': moonOutline,
+  'desktop-outline': desktopOutline
 });
 
 bootstrapApplication(AppComponent, {

@@ -2,13 +2,6 @@ ion-title, ion-back-button {
   color: var(--ion-text-color, var(--ion-text-color));
 }
 
-.catalogs-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 10px;
-}
-
 ion-card-title {
   margin: 0;
   font-size: 1.05rem;
@@ -21,8 +14,12 @@ ion-card-subtitle {
   color: var(--ion-color-medium);
 }
 
+ion-title {
+  color: var(--ion-text-color, var(--ion-text-color));
+}
+
 ion-card-content {
-  padding-bottom: 0;
+  padding-inline: 0;
 }
 
 ion-item h3 {
@@ -38,8 +35,14 @@ ion-item p {
 }
 
 ion-item {
-  --padding-start: 0;
-  --inner-padding-end: 0;
+  --background: transparent;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 10px;
 }
 
 .settings-card {
@@ -53,44 +56,4 @@ ion-item {
 
 .settings-card ion-list {
   background: transparent;
-}
-
-.list-empty-state {
-  width: 100%;
-  margin-top: 10px;
-}
-
-.list-empty-state .empty-state {
-  width: 100%;
-  box-shadow: none;
-}
-
-.options-footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 16px 4px;
-
-  ion-button {
-    margin: 0;
-  }
-}
-
-.catalog-actions {
-  padding: 0 16px 8px;
-}
-
-@media (min-width: 768px) {
-  .catalogs-content {
-    padding-left: 32px;
-    padding-right: 32px;
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
-  }
-
-  .catalog-actions {
-    padding-left: 32px;
-    padding-right: 32px;
-  }
 }

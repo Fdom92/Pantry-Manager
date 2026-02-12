@@ -26,7 +26,7 @@ export class SettingsStateService {
   private readonly share = inject(ShareService);
   private readonly reviewPrompt = inject(ReviewPromptService);
 
-  readonly isPro$ = this.revenuecat.isPro$;
+  readonly isPro = this.revenuecat.isPro();
   readonly themePreference = computed(() => this.appPreferences.preferences().theme);
 
   readonly isExportingData = signal(false);
