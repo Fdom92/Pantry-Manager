@@ -26,16 +26,24 @@
       }
     </div>
   </div>
-  @if (facade.loading() && facade.events().length === 0) {
+  @if (facade.showSkeleton()) {
     <div class="skeleton-list">
       @for (placeholder of facade.skeletonPlaceholders; track placeholder) {
-        <ion-card class="skeleton-card">
-          <ion-card-content>
-            <ion-skeleton-text animated style="width: 40%; height: 16px; margin-bottom: 10px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 75%; height: 14px; margin-bottom: 6px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 55%; height: 12px;"></ion-skeleton-text>
-          </ion-card-content>
-        </ion-card>
+        <div class="skeleton-timeline-event">
+          <div class="skeleton-timeline-dot"></div>
+          <ion-card class="skeleton-card">
+            <ion-card-content>
+              <div class="skeleton-row">
+                <ion-skeleton-text animated style="width: 65%; height: 16px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 20%; height: 16px;"></ion-skeleton-text>
+              </div>
+              <div class="skeleton-row">
+                <ion-skeleton-text animated style="width: 40%; height: 14px;"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 15%; height: 14px;"></ion-skeleton-text>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
       }
     </div>
   } @else if (facade.events().length === 0) {

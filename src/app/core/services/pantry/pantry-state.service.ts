@@ -21,6 +21,7 @@ import { PantryFastAddModalStateService } from './modals/pantry-fast-add-modal-s
 import { PantryListUiStateService } from './pantry-list-ui-state.service';
 import { PantryStoreService } from './pantry-store.service';
 import { PantryViewModelService } from './pantry-view-model.service';
+import { SkeletonLoadingManager } from '@core/utils';
 
 /**
  * Main orchestrator for pantry page state.
@@ -52,6 +53,9 @@ export class PantryStateService {
     basicCount: 0,
     statusCounts: { expired: 0, expiring: 0, lowStock: 0, normal: 0 },
   });
+
+  private readonly skeletonManager = new SkeletonLoadingManager();
+  readonly showSkeleton = this.skeletonManager.showSkeleton;
 
   // Delegated signals from specialized services
   readonly collapsedGroups = this.listUi.collapsedGroups;
@@ -110,10 +114,12 @@ export class PantryStateService {
 
   /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
   async ionViewWillEnter(): Promise<void> {
+    this.skeletonManager.startLoading();
     this.pantryStore.clearEntryFilters();
     this.pantryStore.applyPendingNavigationPreset();
     await this.loadItems();
     this.pantryStore.watchRealtime();
+    this.skeletonManager.stopLoading();
   }
 
   async loadItems(): Promise<void> {

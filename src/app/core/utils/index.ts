@@ -8,6 +8,7 @@ export * from './pantry-selectors.util';
 export * from './pantry-status.util';
 export * from './shopping-grouping.util';
 export * from './signal.util';
+export * from './skeleton.util';
 export * from './storage-flag.util';
 export * from './task.util';
 export * from './uuid.util';

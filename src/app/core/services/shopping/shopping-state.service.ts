@@ -12,7 +12,7 @@ import {
   type ShoppingSummary,
 } from '@core/models/shopping';
 import { LanguageService } from '../shared/language.service';
-import { createLatestOnlyRunner, withSignalFlag } from '@core/utils';
+import { createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
 import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
@@ -53,8 +53,13 @@ export class ShoppingStateService {
   readonly loading = this.pantryStore.loading;
   readonly items = this.pantryStore.items;
 
+  private readonly skeletonManager = new SkeletonLoadingManager();
+  readonly showSkeleton = this.skeletonManager.showSkeleton;
+
   async ionViewWillEnter(): Promise<void> {
+    this.skeletonManager.startLoading();
     await this.pantryStore.loadAll();
+    this.skeletonManager.stopLoading();
   }
 
   toggleSummaryCard(): void {

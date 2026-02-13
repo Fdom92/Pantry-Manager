@@ -130,10 +130,20 @@ ion-title, ion-buttons > ion-button {
 }
 
 .skeleton-card {
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 12px;
   position: relative;
   overflow: hidden;
+  background: var(--ion-card-background, var(--ion-card-background));
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+}
+
+.skeleton-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
 .skeleton-card::after {

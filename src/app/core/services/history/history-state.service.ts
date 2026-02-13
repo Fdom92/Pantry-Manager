@@ -6,7 +6,7 @@ import { normalizeTrim } from '@core/utils/normalization.util';
 import { HistoryEventLogService } from './history-event-log.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { LanguageService } from '../shared/language.service';
-import { withSignalFlag } from '@core/utils';
+import { SkeletonLoadingManager, withSignalFlag } from '@core/utils';
 import { TranslateService } from '@ngx-translate/core';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 
@@ -120,6 +120,9 @@ export class HistoryStateService {
   readonly activeFilter = signal<HistoryFilterKey>('all');
   readonly skeletonPlaceholders = Array.from({ length: 6 }, (_, index) => index);
 
+  private readonly skeletonManager = new SkeletonLoadingManager();
+  readonly showSkeleton = this.skeletonManager.showSkeleton;
+
   private readonly productMap = computed(() =>
     new Map(this.pantryStore.items().map(item => [item._id, item] as const))
   );
@@ -188,12 +191,16 @@ export class HistoryStateService {
   });
 
   async ionViewWillEnter(): Promise<void> {
+    this.skeletonManager.startLoading();
+
     await withSignalFlag(this.loading, async () => {
       await Promise.all([
         this.pantryStore.loadAll(),
         this.refreshEvents(),
       ]);
     });
+
+    this.skeletonManager.stopLoading();
   }
 
   setFilter(filter: HistoryFilterKey): void {

@@ -240,14 +240,41 @@ ion-title {
   gap: 12px;
 }
 
+.skeleton-timeline-event {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.skeleton-timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ion-color-medium);
+  margin-top: 16px;
+  flex-shrink: 0;
+}
+
 .skeleton-card {
   border-radius: 12px;
-  padding: 8px 12px 10px;
+  padding: 12px;
   position: relative;
   overflow: hidden;
   background: var(--ion-card-background, var(--ion-card-background));
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  flex: 1;
+}
+
+.skeleton-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.skeleton-row:last-child {
+  margin-bottom: 0;
 }
 
 .skeleton-card::after {
