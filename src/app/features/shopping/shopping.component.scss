@@ -135,9 +135,19 @@ ion-title {
   margin: 0;
 }
 
+.shopping-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .suggestion-card--skeleton {
   position: relative;
   overflow: hidden;
+  border-radius: 12px;
+  background: var(--ion-card-background, var(--ion-card-background));
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
 }
 
 .suggestion-card--skeleton::after {
