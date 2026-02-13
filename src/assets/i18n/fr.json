@@ -12,68 +12,37 @@
     "actions": {
       "skip": "Passer",
       "next": "Suivant",
-      "start": "Commencer"
+      "start": "Commencer",
+      "skipHint": "Vous pouvez passer ce tutoriel à tout moment."
     },
     "slides": {
-      "dashboard": {
-        "title": "Accueil",
-        "description": "Alertes et aperçu rapide de votre garde-manger."
+      "problem": {
+        "title": "Vous jetez des aliments que vous aviez oubliés ?",
+        "description": "Évitez de gaspiller nourriture et argent. Contrôlez ce que vous avez avant expiration."
       },
-      "pantry": {
-        "title": "Garde-manger",
-        "description": "Ajoutez des produits, suivez le stock et les dates de péremption."
+      "simple": {
+        "title": "Organisez votre garde-manger en quelques secondes",
+        "description": "Ajoutez des produits, suivez les quantités et recevez des alertes avant expiration."
       },
-      "planner": {
-        "title": "Planificateur",
-        "description": "Idées et plans de repas avec ce que vous avez déjà."
+      "benefit": {
+        "title": "Économisez argent et temps",
+        "description": "Achetez seulement ce dont vous avez besoin et utilisez ce que vous avez."
       },
-      "shopping": {
-        "title": "Achats",
-        "description": "Créez une liste et cochez au fur et à mesure."
-      },
-      "settings": {
-        "title": "Réglages",
-        "description": "Personnalisez les catalogues, alertes et préférences."
-      }
-    }
-  },
-  "setup": {
-    "tagline": "Personnalisez votre garde-manger",
-    "stepIndicator": "Étape {{ current }} sur {{ total }}",
-    "actions": {
-      "skip": "Passer",
-      "continue": "Continuer",
-      "finish": "Commencer"
-    },
-    "validation": {
-      "locationsOptional": "Vous pouvez passer cette étape si vous ne souhaitez pas ajouter d’emplacements maintenant.",
-      "categoriesOptional": "Vous pourrez ajouter des catégories plus tard."
-    },
-    "locations": {
-      "title": "Où rangez-vous les produits ?",
-      "description": "Choisissez les emplacements que vous utilisez le plus pour les proposer ensuite.",
-      "options": {
-        "pantry": "Garde-manger",
-        "fridge": "Réfrigérateur",
-        "kitchen": "Cuisine",
-        "freezer": "Congélateur"
+      "action": {
+        "title": "Commencez par ajouter votre premier produit",
+        "description": "Touchez le bouton + et créez votre garde-manger en quelques minutes."
       }
     },
-    "categories": {
-      "title": "Que stockez-vous ?",
-      "description": "Sélectionnez les catégories que vous achetez le plus souvent. Vous pourrez les modifier plus tard.",
-      "options": {
-        "proteins": "Protéines",
-        "dairy": "Produits laitiers",
-        "fruits": "Fruits",
-        "drinks": "Boissons",
-        "cereals": "Céréales",
-        "condiments": "Condiments",
-        "canned": "Conserves",
-        "sweets": "Douceurs",
-        "snacks": "Snacks",
-        "vegetables": "Légumes",
-        "household": "Maison"
+    "mock": {
+      "items": {
+        "milk": "Lait",
+        "pasta": "Pâtes",
+        "tomatoes": "Tomates"
+      },
+      "status": {
+        "expired": "Expiré",
+        "low": "Bas",
+        "ok": "OK"
       }
     }
   },
@@ -116,7 +85,7 @@
   "history": {
     "title": "Historique",
     "pro": {
-      "cta": "Débloquez l’historique complet avec PRO"
+      "cta": "Voir tout votre historique et analyser les tendances avec PRO"
     },
     "filters": {
       "title": "Filtres de l’historique",
@@ -213,9 +182,9 @@
           "action": "Voir"
         },
         "consumeToday": {
-          "title": "Consumed today",
-          "body": "Log what you used today",
-          "action": "Add"
+          "title": "Consommé aujourd'hui",
+          "body": "Enregistre ce que tu as utilisé aujourd'hui",
+          "action": "Ajouter"
         },
         "recentlyAdded": {
           "title": "Ajoutés récemment",
@@ -285,7 +254,7 @@
       "title": "Liste de courses",
       "loading": "Génération de la liste d’achats…",
       "toBuy": "À acheter {{ amount }}",
-      "empty": "Rien à acheter pour le moment. Je vous préviendrai si un réapprovisionnement est nécessaire."
+      "empty": "Marquez les produits comme \"toujours avoir\" pour être alerté quand ils s'épuisent."
     },
     "share": {
       "button": "Partager la liste",
@@ -580,9 +549,9 @@
     "headline": "Débloquez toute la puissance de votre garde-manger",
     "subtitle": "Automatisation intelligente et fonctionnalités prioritaires.",
     "benefits": {
-      "agent": "Planificateur IA qui vous propose des menus et des recettes sur mesure.",
-      "history": "Débloquez l’historique complet de votre garde-manger.",
-      "future": "Accès anticipé aux futures fonctionnalités PRO."
+      "agent": "Votre assistant cuisine personnel : menus et recettes adaptés à votre garde-manger et vos goûts.",
+      "history": "Historique illimité pour analyser les tendances et optimiser vos achats.",
+      "future": "Soyez le premier à essayer les nouvelles fonctionnalités avant tout le monde."
     },
     "actions": {
       "maybeLater": "Plus tard",
@@ -632,7 +601,7 @@
       "subtitle": "Dites au planificateur quoi retenir.",
       "contextTitle": "Contexte / Mémoire",
       "contextDescription": "Partagez votre foyer, vos régimes, allergies ou tout ce que vous voulez que l’app retienne.",
-      "contextPlaceholder": "Exemple : Nous sommes deux adultes et un enfant. Éviter la nourriture épicée et les arachides. Priorité aux recettes méditerranéennes.",
+      "contextPlaceholder": "Ex : Famille de 3, pas de noix, cuisine méditerranéenne.",
       "saveAction": "Enregistrer le contexte",
       "saveSuccess": "Contexte enregistré.",
       "saveError": "Impossible d’enregistrer le contexte."

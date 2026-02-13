@@ -12,68 +12,37 @@
     "actions": {
       "skip": "Salta",
       "next": "Avanti",
-      "start": "Inizia"
+      "start": "Inizia",
+      "skipHint": "Puoi saltare questo tutorial in qualsiasi momento."
     },
     "slides": {
-      "dashboard": {
-        "title": "Home",
-        "description": "Avvisi e panoramica rapida della dispensa."
+      "problem": {
+        "title": "Butti via cibo che avevi dimenticato?",
+        "description": "Evita di sprecare cibo e denaro. Controlla cosa hai prima che scada."
       },
-      "pantry": {
-        "title": "Dispensa",
-        "description": "Aggiungi prodotti e traccia stock e scadenze."
+      "simple": {
+        "title": "Organizza la tua dispensa in pochi secondi",
+        "description": "Aggiungi prodotti, traccia le quantità e ricevi avvisi prima della scadenza."
       },
-      "planner": {
-        "title": "Pianificatore",
-        "description": "Idee e piani pasti basati su ciò che hai."
+      "benefit": {
+        "title": "Risparmia denaro e tempo",
+        "description": "Compra solo ciò di cui hai bisogno e usa ciò che hai."
       },
-      "shopping": {
-        "title": "Spesa",
-        "description": "Crea la lista e spunta mentre fai la spesa."
-      },
-      "settings": {
-        "title": "Impostazioni",
-        "description": "Personalizza cataloghi, avvisi e preferenze dell’app."
-      }
-    }
-  },
-  "setup": {
-    "tagline": "Personalizza la tua dispensa",
-    "stepIndicator": "Passo {{ current }} di {{ total }}",
-    "actions": {
-      "skip": "Salta",
-      "continue": "Continua",
-      "finish": "Inizia"
-    },
-    "validation": {
-      "locationsOptional": "Puoi saltare questo passaggio se non vuoi aggiungere posizioni ora.",
-      "categoriesOptional": "Potrai aggiungere categorie in seguito."
-    },
-    "locations": {
-      "title": "Dove conservi i prodotti?",
-      "description": "Scegli le posizioni che usi di piu per suggerirle in seguito.",
-      "options": {
-        "pantry": "Dispensa",
-        "fridge": "Frigorifero",
-        "kitchen": "Cucina",
-        "freezer": "Congelatore"
+      "action": {
+        "title": "Inizia aggiungendo il tuo primo prodotto",
+        "description": "Tocca il pulsante + e crea la tua dispensa in pochi minuti."
       }
     },
-    "categories": {
-      "title": "Cosa compri di solito?",
-      "description": "Seleziona le categorie che acquisti piu spesso. Potrai cambiarle piu tardi.",
-      "options": {
-        "proteins": "Proteine",
-        "dairy": "Latticini",
-        "fruits": "Frutta",
-        "drinks": "Bevande",
-        "cereals": "Cereali",
-        "condiments": "Condimenti",
-        "canned": "Conserve",
-        "sweets": "Dolci",
-        "snacks": "Snack",
-        "vegetables": "Verdure",
-        "household": "Casa"
+    "mock": {
+      "items": {
+        "milk": "Latte",
+        "pasta": "Pasta",
+        "tomatoes": "Pomodori"
+      },
+      "status": {
+        "expired": "Scaduto",
+        "low": "Basso",
+        "ok": "OK"
       }
     }
   },
@@ -116,7 +85,7 @@
   "history": {
     "title": "Cronologia",
     "pro": {
-      "cta": "Sblocca lo storico completo con PRO"
+      "cta": "Visualizza tutta la cronologia e analizza i pattern con PRO"
     },
     "filters": {
       "title": "Filtri cronologia",
@@ -213,9 +182,9 @@
           "action": "Vedi"
         },
         "consumeToday": {
-          "title": "Consumed today",
-          "body": "Log what you used today",
-          "action": "Add"
+          "title": "Consumato oggi",
+          "body": "Registra ciò che hai usato oggi",
+          "action": "Aggiungi"
         },
         "recentlyAdded": {
           "title": "Aggiunti di recente",
@@ -285,7 +254,7 @@
       "title": "Lista della spesa",
       "loading": "Sto creando la lista della spesa…",
       "toBuy": "Da comprare {{ amount }}",
-      "empty": "Al momento non ci sono acquisti in sospeso. Ti avviserò quando sarà necessario riassortire."
+      "empty": "Contrassegna i prodotti come \"tieni sempre in casa\" per essere avvisato quando scarseggiano."
     },
     "share": {
       "button": "Condividi lista",
@@ -580,9 +549,9 @@
     "headline": "Sblocca tutte le superpotenzialità della dispensa",
     "subtitle": "Automazioni intelligenti e funzionalità prioritarie.",
     "benefits": {
-      "agent": "Pianificatore AI che propone menù e ricette su misura per te.",
-      "history": "Sblocca lo storico completo della dispensa.",
-      "future": "Accesso anticipato alle nuove funzionalità PRO."
+      "agent": "Il tuo assistente personale in cucina: menù e ricette su misura per la tua dispensa e i tuoi gusti.",
+      "history": "Cronologia illimitata per analizzare i pattern e ottimizzare la tua spesa.",
+      "future": "Sii il primo a provare le nuove funzionalità prima di tutti gli altri."
     },
     "actions": {
       "maybeLater": "Forse più tardi",
@@ -632,7 +601,7 @@
       "subtitle": "Di' al planner cosa ricordare.",
       "contextTitle": "Contesto / Memoria",
       "contextDescription": "Condividi famiglia, diete, allergie o tutto ciò che vuoi far ricordare.",
-      "contextPlaceholder": "Esempio: Siamo due adulti e una bambina. Evita cibi piccanti e arachidi. Preferisci ricette mediterranee.",
+      "contextPlaceholder": "Es.: Famiglia di 3, no noci, cucina mediterranea.",
       "saveAction": "Salva contesto",
       "saveSuccess": "Contesto salvato.",
       "saveError": "Impossibile salvare il contesto."

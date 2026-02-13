@@ -12,68 +12,37 @@
     "actions": {
       "skip": "Ignorar",
       "next": "Seguinte",
-      "start": "Começar"
+      "start": "Começar",
+      "skipHint": "Podes saltar este tutorial a qualquer momento."
     },
     "slides": {
-      "dashboard": {
-        "title": "Início",
-        "description": "Alertas e visão rápida do estado da despensa."
+      "problem": {
+        "title": "Deitas fora comida que tinhas esquecido?",
+        "description": "Evita desperdiçar comida e dinheiro. Controla o que tens antes de expirar."
       },
-      "pantry": {
-        "title": "Despensa",
-        "description": "Adiciona produtos e acompanha stock e validade."
+      "simple": {
+        "title": "Organiza a tua despensa em segundos",
+        "description": "Adiciona produtos, controla quantidades e recebe alertas antes de expirarem."
       },
-      "planner": {
-        "title": "Planeador",
-        "description": "Ideias e planos de refeições com o que tens."
+      "benefit": {
+        "title": "Poupa dinheiro e tempo",
+        "description": "Compra apenas o que precisas e usa o que já tens."
       },
-      "shopping": {
-        "title": "Compras",
-        "description": "Cria a lista e marca itens à medida que compras."
-      },
-      "settings": {
-        "title": "Definições",
-        "description": "Personaliza catálogos, alertas e preferências da app."
-      }
-    }
-  },
-  "setup": {
-    "tagline": "Personaliza a tua despensa",
-    "stepIndicator": "Passo {{ current }} de {{ total }}",
-    "actions": {
-      "skip": "Ignorar",
-      "continue": "Continuar",
-      "finish": "Entrar"
-    },
-    "validation": {
-      "locationsOptional": "Podes ignorar este passo se não quiseres adicionar localizações agora.",
-      "categoriesOptional": "Podes adicionar categorias mais tarde."
-    },
-    "locations": {
-      "title": "Onde guardas as coisas?",
-      "description": "Escolhe as localizações que usas mais para as sugerirmos depois.",
-      "options": {
-        "pantry": "Despensa",
-        "fridge": "Frigorífico",
-        "kitchen": "Cozinha",
-        "freezer": "Congelador"
+      "action": {
+        "title": "Começa por adicionar o teu primeiro produto",
+        "description": "Toca no botão + e cria a tua despensa em minutos."
       }
     },
-    "categories": {
-      "title": "O que costumas comprar?",
-      "description": "Seleciona as categorias que costumas comprar. Podes alterá-las mais tarde.",
-      "options": {
-        "proteins": "Proteínas",
-        "dairy": "Laticínios",
-        "fruits": "Frutas",
-        "drinks": "Bebidas",
-        "cereals": "Cereais",
-        "condiments": "Condimentos",
-        "canned": "Conservas",
-        "sweets": "Doces",
-        "snacks": "Snacks",
-        "vegetables": "Legumes",
-        "household": "Casa"
+    "mock": {
+      "items": {
+        "milk": "Leite",
+        "pasta": "Massa",
+        "tomatoes": "Tomates"
+      },
+      "status": {
+        "expired": "Expirado",
+        "low": "Baixo",
+        "ok": "OK"
       }
     }
   },
@@ -116,7 +85,7 @@
   "history": {
     "title": "Histórico",
     "pro": {
-      "cta": "Desbloqueia o histórico completo com PRO"
+      "cta": "Ver todo o teu histórico e analisar padrões com PRO"
     },
     "filters": {
       "title": "Filtros do histórico",
@@ -213,9 +182,9 @@
           "action": "Ver"
         },
         "consumeToday": {
-          "title": "Consumed today",
-          "body": "Log what you used today",
-          "action": "Add"
+          "title": "Consumido hoje",
+          "body": "Registra o que usaste hoje",
+          "action": "Adicionar"
         },
         "recentlyAdded": {
           "title": "Adicionados recentemente",
@@ -285,7 +254,7 @@
       "title": "Lista de compras",
       "loading": "A criar lista de compras…",
       "toBuy": "Comprar {{ amount }}",
-      "empty": "Nada pendente neste momento. Aviso-te quando for necessário reabastecer."
+      "empty": "Marca produtos como \"manter sempre em casa\" para seres notificado quando se esgotarem."
     },
     "share": {
       "button": "Partilhar lista",
@@ -580,9 +549,9 @@
     "headline": "Desbloqueia os superpoderes completos da despensa",
     "subtitle": "Automatização inteligente e funcionalidades prioritárias.",
     "benefits": {
-      "agent": "Planeador IA que te propõe menus e receitas à tua medida.",
-      "history": "Desbloqueia o histórico completo da despensa.",
-      "future": "Acesso antecipado a futuras funcionalidades PRO."
+      "agent": "O teu assistente pessoal de cozinha: menus e receitas adaptados à tua despensa e gostos.",
+      "history": "Histórico ilimitado para analisar padrões e otimizar as tuas compras.",
+      "future": "Sê o primeiro a experimentar novas funcionalidades antes de todos."
     },
     "actions": {
       "maybeLater": "Talvez mais tarde",
@@ -632,7 +601,7 @@
       "subtitle": "Diz ao planeador o que lembrar.",
       "contextTitle": "Contexto / Memória",
       "contextDescription": "Partilha a tua casa, dietas, alergias ou preferências que queres que sejam lembradas.",
-      "contextPlaceholder": "Exemplo: Somos dois adultos e uma criança. Evitar comida picante e amendoim. Focar em receitas mediterrâneas.",
+      "contextPlaceholder": "Ex: Família de 3, sem frutos secos, cozinha mediterrânea.",
       "saveAction": "Guardar contexto",
       "saveSuccess": "Contexto guardado.",
       "saveError": "Não foi possível guardar o contexto."
