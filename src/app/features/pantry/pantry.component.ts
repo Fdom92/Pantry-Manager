@@ -28,6 +28,10 @@ import { PantryEditItemModalComponent } from './components/edit-item-modal/edit-
 import { EntitySelectorModalComponent } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.component';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
+import { PantryBatchOperationsService } from '@core/services/pantry/pantry-batch-operations.service';
+import { PantryListUiStateService } from '@core/services/pantry/pantry-list-ui-state.service';
+import { PantryFastAddModalStateService } from '@core/services/pantry/modals/pantry-fast-add-modal-state.service';
+import { PantryBatchesModalStateService } from '@core/services/pantry/modals/pantry-batches-modal-state.service';
 
 @Component({
   selector: 'app-pantry',
@@ -63,7 +67,13 @@ import { PantryStateService } from '@core/services/pantry/pantry-state.service';
   templateUrl: './pantry.component.html',
   styleUrls: ['./pantry.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [PantryStateService],
+  providers: [
+    PantryStateService,
+    PantryBatchOperationsService,
+    PantryListUiStateService,
+    PantryFastAddModalStateService,
+    PantryBatchesModalStateService,
+  ],
 })
 export class PantryComponent implements OnDestroy {
   readonly facade = inject(PantryStateService);
