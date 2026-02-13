@@ -12,68 +12,37 @@
     "actions": {
       "skip": "Überspringen",
       "next": "Weiter",
-      "start": "Starten"
+      "start": "Starten",
+      "skipHint": "Du kannst dieses Tutorial jederzeit überspringen."
     },
     "slides": {
-      "dashboard": {
-        "title": "Start",
-        "description": "Warnungen und Überblick über deinen Vorrat auf einen Blick."
+      "problem": {
+        "title": "Wirfst du Essen weg, das du vergessen hattest?",
+        "description": "Vermeide, Essen und Geld wegzuwerfen. Behalte den Überblick, bevor es abläuft."
       },
-      "pantry": {
-        "title": "Vorratskammer",
-        "description": "Produkte hinzufügen, Bestand und Haltbarkeit im Blick behalten."
+      "simple": {
+        "title": "Organisiere deinen Vorrat in Sekunden",
+        "description": "Füge Produkte hinzu, verfolge Mengen und erhalte Warnungen vor Ablauf."
       },
-      "planner": {
-        "title": "Planer",
-        "description": "Essensideen und Pläne basierend auf dem, was du hast."
+      "benefit": {
+        "title": "Spare Geld und Zeit",
+        "description": "Kaufe nur, was du brauchst, und nutze, was du hast."
       },
-      "shopping": {
-        "title": "Einkauf",
-        "description": "Liste erstellen und beim Einkaufen abhaken."
-      },
-      "settings": {
-        "title": "Einstellungen",
-        "description": "Kataloge, Warnungen und App-Optionen anpassen."
-      }
-    }
-  },
-  "setup": {
-    "tagline": "Richte deine Vorratskammer ein",
-    "stepIndicator": "Schritt {{ current }} von {{ total }}",
-    "actions": {
-      "skip": "Überspringen",
-      "continue": "Weiter",
-      "finish": "Starten"
-    },
-    "validation": {
-      "locationsOptional": "Du kannst diesen Schritt überspringen, wenn du jetzt keine Standorte hinzufügen möchtest.",
-      "categoriesOptional": "Kategorien kannst du später hinzufügen."
-    },
-    "locations": {
-      "title": "Wo lagerst du Dinge?",
-      "description": "Wähle die Standorte, die du am häufigsten nutzt, damit wir sie später vorschlagen können.",
-      "options": {
-        "pantry": "Vorratskammer",
-        "fridge": "Kühlschrank",
-        "kitchen": "Küche",
-        "freezer": "Gefrierschrank"
+      "action": {
+        "title": "Beginne mit deinem ersten Produkt",
+        "description": "Tippe auf + und erstelle deinen Vorrat in Minuten."
       }
     },
-    "categories": {
-      "title": "Was kaufst du häufig?",
-      "description": "Wähle die Kategorien, die du normalerweise kaufst. Du kannst sie später ändern.",
-      "options": {
-        "proteins": "Proteine",
-        "dairy": "Milchprodukte",
-        "fruits": "Obst",
-        "drinks": "Getränke",
-        "cereals": "Cerealien",
-        "condiments": "Gewürze & Würzmittel",
-        "canned": "Konserven",
-        "sweets": "Süßes",
-        "snacks": "Snacks",
-        "vegetables": "Gemüse",
-        "household": "Haushalt"
+    "mock": {
+      "items": {
+        "milk": "Milch",
+        "pasta": "Nudeln",
+        "tomatoes": "Tomaten"
+      },
+      "status": {
+        "expired": "Abgelaufen",
+        "low": "Niedrig",
+        "ok": "OK"
       }
     }
   },
@@ -116,7 +85,7 @@
   "history": {
     "title": "Verlauf",
     "pro": {
-      "cta": "Vollständigen Verlauf mit PRO freischalten"
+      "cta": "Vollständigen Verlauf sehen und Muster mit PRO analysieren"
     },
     "filters": {
       "title": "Verlaufsfilter",
@@ -213,9 +182,9 @@
           "action": "Ansehen"
         },
         "consumeToday": {
-          "title": "Consumed today",
-          "body": "Log what you used today",
-          "action": "Add"
+          "title": "Heute verbraucht",
+          "body": "Erfasse, was du heute verwendet hast",
+          "action": "Hinzufügen"
         },
         "recentlyAdded": {
           "title": "Kürzlich hinzugefügt",
@@ -285,7 +254,7 @@
       "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
       "toBuy": "Kaufen {{ amount }}",
-      "empty": "Derzeit nichts zu erledigen. Ich informiere dich, wenn Nachschub nötig ist."
+      "empty": "Markiere Produkte als \"immer vorrätig\" um benachrichtigt zu werden, wenn sie zur Neige gehen."
     },
     "share": {
       "button": "Liste teilen",
@@ -580,9 +549,9 @@
     "headline": "Entfalte das volle Potenzial deiner Vorratskammer",
     "subtitle": "Intelligente Automatisierung und priorisierte Funktionen.",
     "benefits": {
-      "agent": "KI-Menüplaner, der dir passende Menüs und Rezepte vorschlägt.",
-      "history": "Schalte deinen vollständigen Vorratsverlauf frei.",
-      "future": "Frühzeitiger Zugriff auf zukünftige PRO-Funktionen."
+      "agent": "Dein persönlicher Kochassistent: Menüs und Rezepte auf deinen Vorrat und Geschmack abgestimmt.",
+      "history": "Unbegrenzter Verlauf zur Musteranalyse und Optimierung deiner Einkäufe.",
+      "future": "Sei der Erste, der neue Funktionen vor allen anderen testet."
     },
     "actions": {
       "maybeLater": "Vielleicht später",
@@ -632,7 +601,7 @@
       "subtitle": "Sag dem Planer, was er merken soll.",
       "contextTitle": "Kontext / Gedächtnis",
       "contextDescription": "Teile Haushalt, Ernährungsweisen, Abneigungen oder alles, was wir beachten sollen.",
-      "contextPlaceholder": "Beispiel: Wir sind zwei Erwachsene und ein Kleinkind. Kein scharfes Essen und keine Erdnüsse. Fokus auf mediterrane Rezepte.",
+      "contextPlaceholder": "Bsp.: Familie mit 3 Personen, keine Nüsse, mediterrane Küche.",
       "saveAction": "Kontext speichern",
       "saveSuccess": "Kontext gespeichert.",
       "saveError": "Planer-Kontext konnte nicht gespeichert werden."

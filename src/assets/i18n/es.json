@@ -17,8 +17,8 @@
     },
     "slides": {
       "problem": {
-        "title": "No tires comida sin darte cuenta",
-        "description": "Controla lo que tienes en casa y evita que caduque sin que lo sepas."
+        "title": "¿Tiras comida que no sabías que tenías?",
+        "description": "Evita tirar comida y dinero. Controla lo que tienes antes de que caduque."
       },
       "simple": {
         "title": "Organiza tu despensa en segundos",
@@ -85,7 +85,7 @@
   "history": {
     "title": "Historial",
     "pro": {
-      "cta": "Desbloquea el historial completo con PRO"
+      "cta": "Ver todo tu historial y analizar patrones con PRO"
     },
     "filters": {
       "title": "Filtros del historial",
@@ -244,7 +244,7 @@
       "title": "Lista de la compra",
       "loading": "Generando lista de compras…",
       "toBuy": "Comprar {{ amount }}",
-      "empty": "Los productos que marques como \"mantener en casa\" aparecerán aquí cuando bajen del mínimo."
+      "empty": "Marca productos como \"mantener en casa\" para recibir avisos cuando se agoten."
     },
     "share": {
       "button": "Compartir lista",
@@ -539,9 +539,9 @@
     "headline": "Desbloquea todo el poder de tu despensa",
     "subtitle": "Automatización inteligente y funciones prioritarias.",
     "benefits": {
-      "agent": "Planificador con IA para proponerte menús y recetas a tu medida.",
-      "history": "Desbloquea el historial completo de tu despensa.",
-      "future": "Acceso anticipado a futuras funciones PRO."
+      "agent": "Tu asistente personal de cocina: menús y recetas adaptados a tu despensa y gustos.",
+      "history": "Historial ilimitado para analizar patrones y optimizar tus compras.",
+      "future": "Sé el primero en probar nuevas funciones antes que nadie."
     },
     "actions": {
       "maybeLater": "Ahora no",
@@ -591,7 +591,7 @@
       "subtitle": "Cuéntale al planificador lo importante.",
       "contextTitle": "Contexto / Memoria",
       "contextDescription": "Indica tu hogar, dietas, alergias o cualquier preferencia que quieras que recuerde.",
-      "contextPlaceholder": "Ejemplo: Somos dos adultos y una niña. Evita picante y frutos secos. Prioriza recetas mediterráneas.",
+      "contextPlaceholder": "Ej: Familia de 3, sin frutos secos, cocina mediterránea.",
       "saveAction": "Guardar contexto",
       "saveSuccess": "Contexto guardado.",
       "saveError": "No se pudo guardar el contexto."

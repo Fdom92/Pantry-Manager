@@ -17,8 +17,8 @@
     },
     "slides": {
       "problem": {
-        "title": "Don’t let food go to waste",
-        "description": "See what you have at home and avoid items expiring without you noticing."
+        "title": "Throwing away food you forgot you had?",
+        "description": "Avoid throwing away food and money. Track what you have before it expires."
       },
       "simple": {
         "title": "Organize your pantry in seconds",
@@ -85,7 +85,7 @@
   "history": {
     "title": "History",
     "pro": {
-      "cta": "Unlock full history with PRO"
+      "cta": "View your complete history and analyze patterns with PRO"
     },
     "filters": {
       "title": "History filters",
@@ -254,7 +254,7 @@
       "title": "Shopping list",
       "loading": "Building shopping list…",
       "toBuy": "Buy {{ amount }}",
-      "empty": "Nothing pending right now. I'll let you know when something needs restocking."
+      "empty": "Mark products as \"always keep at home\" to get notified when they run low."
     },
     "share": {
       "button": "Share list",
@@ -549,9 +549,9 @@
     "headline": "Unlock the full pantry superpowers",
     "subtitle": "Smarter automation and priority features.",
     "benefits": {
-      "agent": "AI meal planner that proposes menus and recipes tailored to you.",
-      "history": "Unlock your full pantry history.",
-      "future": "Early access to upcoming PRO features."
+      "agent": "Your personal cooking assistant: menus and recipes tailored to your pantry and tastes.",
+      "history": "Unlimited history to analyze patterns and optimize your shopping.",
+      "future": "Be the first to try new features before anyone else."
     },
     "actions": {
       "maybeLater": "Maybe later",
@@ -601,7 +601,7 @@
       "subtitle": "Tell the planner what to remember.",
       "contextTitle": "Context / Memory",
       "contextDescription": "Share your household, diets, dislikes, or anything you want us to keep in mind.",
-      "contextPlaceholder": "Example: We are two adults and a toddler. Avoid spicy food and peanuts. Focus on Mediterranean recipes.",
+      "contextPlaceholder": "E.g.: Family of 3, no nuts, Mediterranean cuisine.",
       "saveAction": "Save context",
       "saveSuccess": "Planner context saved.",
       "saveError": "Could not save the planner context."
