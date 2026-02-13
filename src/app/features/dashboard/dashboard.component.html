@@ -146,78 +146,6 @@
       </section>
     }
 
-    <section class="overview-section">
-      <header class="overview-section-header">
-        <h2 class="overview-section-title">{{ 'dashboard.overview.sections.dailyActions.title' | translate }}</h2>
-      </header>
-      <div class="overview-grid" [attr.aria-label]="'dashboard.overview.sections.dailyActions.title' | translate">
-        <ion-card
-          class="overview-card overview-card--consume"
-          role="button"
-          tabindex="0"
-          (click)="facade.openConsumeTodayModal()"
-          (keydown.enter)="facade.openConsumeTodayModal()"
-          (keydown.space)="facade.openConsumeTodayModal(); $event.preventDefault()"
-          [attr.aria-label]="'dashboard.overview.cards.consumeToday.title' | translate"
-        >
-          <ion-card-header>
-            <div class="overview-card__header">
-              <div class="overview-card__icon">
-                <ion-icon name="restaurant-outline"></ion-icon>
-              </div>
-              <ion-card-title>{{ 'dashboard.overview.cards.consumeToday.title' | translate }}</ion-card-title>
-            </div>
-          </ion-card-header>
-          <ion-card-content>
-            <p class="overview-card__body">
-              {{ 'dashboard.overview.cards.consumeToday.body' | translate }}
-            </p>
-            <ion-button
-              size="small"
-              fill="clear"
-              (click)="facade.openConsumeTodayModal(); $event.stopPropagation()">
-              {{ 'dashboard.overview.cards.consumeToday.action' | translate }}
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-
-        <ion-card
-          class="overview-card overview-card--pending"
-          role="button"
-          tabindex="0"
-          (click)="onSummaryCardClick('pending-review')"
-          (keydown.enter)="onSummaryCardClick('pending-review')"
-          (keydown.space)="onSummaryCardClick('pending-review'); $event.preventDefault()"
-          [attr.aria-label]="'dashboard.overview.cards.pendingReview.title' | translate"
-        >
-          <ion-card-header>
-            <div class="overview-card__header">
-              <div class="overview-card__icon">
-                <ion-icon name="clipboard-outline"></ion-icon>
-              </div>
-              <ion-card-title>{{ 'dashboard.overview.cards.pendingReview.title' | translate }}</ion-card-title>
-            </div>
-          </ion-card-header>
-          <ion-card-content>
-            @if (facade.isInventoryLoading()) {
-              <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-            } @else {
-              <p class="overview-card__body">
-                {{ 'dashboard.overview.cards.pendingReview.body' | translate:{ count: facade.pendingReviewProducts().length } }}
-              </p>
-            }
-            <ion-button
-              size="small"
-              fill="clear"
-              (click)="onSummaryCardClick('pending-review'); $event.stopPropagation()">
-              {{ 'dashboard.overview.cards.pendingReview.action' | translate }}
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </div>
-    </section>
-
     @if (facade.isInventoryLoading() || facade.lowStockItems().length || facade.shoppingListCount()) {
       <section class="overview-section">
         <header class="overview-section-header">
@@ -375,28 +303,4 @@
       </section>
     }
   </div>
-
-  <app-entity-selector-modal
-    [isOpen]="facade.isConsumeTodayOpen()"
-    [title]="'dashboard.consumeToday.title' | translate"
-    [cardTitle]="'dashboard.consumeToday.cardTitle' | translate"
-    [subtitle]="'dashboard.consumeToday.selectHint' | translate"
-    [placeholder]="'dashboard.consumeToday.placeholder' | translate"
-    [emptyLabel]="'dashboard.consumeToday.noResults' | translate"
-    [entriesEmptyLabel]="'dashboard.consumeToday.empty' | translate"
-    [saveLabel]="'dashboard.consumeToday.save' | translate"
-    [saving]="facade.consumeSaving()"
-    [disableSave]="!facade.canSaveConsumeToday()"
-    [items]="facade.consumeTodayOptions()"
-    [entries]="facade.consumeEntryViewModels()"
-    [showSecondaryInfo]="true"
-    [showMeta]="true"
-    [showAllOnFocus]="true"
-    [autofocus]="true"
-    (willDismiss)="facade.dismissConsumeTodayModal()"
-    (didDismiss)="facade.closeConsumeTodayModal()"
-    (selectItem)="facade.addConsumeEntry($event)"
-    (adjustEntry)="facade.adjustConsumeEntryById($event.entry.id, $event.delta)"
-    (save)="facade.saveConsumeToday()">
-  </app-entity-selector-modal>
 </ion-content>

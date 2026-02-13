@@ -2,7 +2,6 @@ import type { AgentEntryContext } from '@core/models/agent';
 
 // ENUMS
 export enum InsightId {
-  PENDING_PRODUCT_UPDATES = 'pending_product_updates',
   WEEKLY_MEAL_PLANNING = 'weekly_meal_planning',
   COOK_BEFORE_EXPIRY = 'cook_before_expiry',
   WHAT_TO_COOK_NOW = 'what_to_cook_now',
@@ -14,7 +13,6 @@ export enum InsightId {
 export type InsightAudience = 'all' | 'pro' | 'non-pro';
 export type InsightTranslationParamsBuilder = (context: InsightContext, helpers: InsightPredicateHelpers) => Record<string, unknown>;
 export type InsightPredicate = (context: InsightContext, helpers: InsightPredicateHelpers) => boolean;
-export type InsightPendingReviewReason = 'stale-update' | 'missing-info';
 export type InsightCta =
   | {
       id: string;
@@ -81,11 +79,7 @@ export interface InsightContext {
   expiringSoonCount: number;
   lowStockCount: number;
   products: InsightProductSummary[];
-  pendingReviewProducts: InsightPendingReviewProduct[];
 }
 export interface InsightPredicateHelpers {
   now: Date;
-}
-export interface InsightPendingReviewProduct extends InsightProductSummary {
-  reasons: InsightPendingReviewReason[];
 }

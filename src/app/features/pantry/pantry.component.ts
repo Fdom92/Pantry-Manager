@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
 import {
   IonCard,
-  IonCardContent,
   IonCardHeader,
   IonCardTitle,
   IonChip,
@@ -46,7 +45,6 @@ import { PantryBatchesModalStateService } from '@core/services/pantry/modals/pan
     IonCard,
     IonCardHeader,
     IonCardTitle,
-    IonCardContent,
     IonFab,
     IonFabButton,
     IonChip,

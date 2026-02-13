@@ -142,9 +142,6 @@
         "alerts": {
           "title": "Alertas"
         },
-        "dailyActions": {
-          "title": "Daily actions"
-        },
         "control": {
           "title": "Control"
         },
@@ -166,11 +163,6 @@
           "body": "{{ count }} produtos expirados",
           "action": "Ver"
         },
-        "pendingReview": {
-          "title": "Despensa por completar",
-          "body": "{{ count }} produtos por rever",
-          "action": "Rever"
-        },
         "lowOrEmpty": {
           "title": "Stock baixo",
           "body": "{{ count }} produtos com stock baixo",
@@ -181,11 +173,6 @@
           "body": "{{ count }} produtos pendentes",
           "action": "Ver"
         },
-        "consumeToday": {
-          "title": "Consumido hoje",
-          "body": "Registra o que usaste hoje",
-          "action": "Adicionar"
-        },
         "recentlyAdded": {
           "title": "Adicionados recentemente",
           "body": "{{ count }} novos produtos",
@@ -195,7 +182,6 @@
       "toasts": {
         "expiredEmpty": "Está tudo bem — não há itens expirados.",
         "nearExpiryEmpty": "Está tudo bem — não há itens a expirar em breve.",
-        "pendingReviewEmpty": "Está tudo bem — não há nada por completar.",
         "lowOrEmptyEmpty": "Está tudo bem — não há itens com stock baixo.",
         "recentlyAddedEmpty": "Está tudo bem — não há itens adicionados recentemente.",
         "shoppingEmpty": "Está tudo bem — a tua lista de compras está vazia.",
@@ -214,11 +200,6 @@
       "minLabel": "mín {{ value }}",
       "empty": "Todos os itens estão acima do nível mínimo."
     },
-    "batches": {
-      "single": "1 lote",
-      "plural": "{{ count }} lotes",
-      "withExpiry": "{{ batchLabel }}, exp {{ date }}"
-    },
     "expired": {
       "title": "Itens expirados",
       "deleteAria": "Eliminar itens expirados",
@@ -231,16 +212,6 @@
       "updated": "Atualizado em {{ date }}",
       "badge": "Novo",
       "empty": "Sem atualizações recentes."
-    },
-    "consumeToday": {
-      "title": "Consumed today",
-      "cardTitle": "Add products",
-      "selectHint": "Pick what you used today, then set quantities.",
-      "listTitle": "Your list",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "empty": "No items added yet.",
-      "save": "Save"
     }
   },
   "shopping": {
@@ -312,34 +283,6 @@
         "description": "Desbloqueie o planejador PRO e organize seu menu com facilidade.",
         "cta": "Torne-se PRO"
       }
-    }
-  },
-  "upToDate": {
-    "title": "Pôr em dia",
-    "subtitle": "Revê alguns produtos para manter a tua despensa correta e atualizada.",
-    "progress": "Produtos pendentes {{ pending }} de {{ total }}",
-    "lastUpdated": "Última atualização: {{ date }}",
-    "fields": {
-      "expiry": "Validade",
-      "stock": "Stock"
-    },
-    "edit": {
-      "title": "Atualizar produto",
-      "expiryToggle": "Adicionar data de validade"
-    },
-    "reasons": {
-      "stale-update": "Sem atualização há algum tempo",
-      "missing-info": "Falta informação"
-    },
-    "actions": {
-      "keep": "Fica aqui",
-      "delete": "Eliminar",
-      "edit": "Editar",
-      "skip": "Saltar por agora"
-    },
-    "done": {
-      "title": "Despensa em dia, bom trabalho",
-      "subtitle": "A voltar ao dashboard…"
     }
   },
   "agent": {

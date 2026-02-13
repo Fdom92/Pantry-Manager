@@ -142,9 +142,6 @@
         "alerts": {
           "title": "Warnungen"
         },
-        "dailyActions": {
-          "title": "Daily actions"
-        },
         "control": {
           "title": "Control"
         },
@@ -166,11 +163,6 @@
           "body": "{{ count }} abgelaufene Produkte",
           "action": "Ansehen"
         },
-        "pendingReview": {
-          "title": "Vorrat vervollständigen",
-          "body": "{{ count }} Produkte zu prüfen",
-          "action": "Prüfen"
-        },
         "lowOrEmpty": {
           "title": "Niedriger Bestand",
           "body": "{{ count }} Produkte mit niedrigem Bestand",
@@ -181,11 +173,6 @@
           "body": "{{ count }} Artikel ausstehend",
           "action": "Ansehen"
         },
-        "consumeToday": {
-          "title": "Heute verbraucht",
-          "body": "Erfasse, was du heute verwendet hast",
-          "action": "Hinzufügen"
-        },
         "recentlyAdded": {
           "title": "Kürzlich hinzugefügt",
           "body": "{{ count }} neue Produkte",
@@ -195,7 +182,6 @@
       "toasts": {
         "expiredEmpty": "Alles gut — keine abgelaufenen Artikel.",
         "nearExpiryEmpty": "Alles gut — keine Artikel, die bald ablaufen.",
-        "pendingReviewEmpty": "Alles gut — nichts ausstehend zu vervollständigen.",
         "lowOrEmptyEmpty": "Alles gut — keine Artikel mit niedrigem Bestand.",
         "recentlyAddedEmpty": "Alles gut — keine kürzlich hinzugefügten Artikel.",
         "shoppingEmpty": "Alles gut — deine Einkaufsliste ist leer.",
@@ -214,11 +200,6 @@
       "minLabel": "Min. {{ value }}",
       "empty": "Alle Artikel liegen über ihrem Mindestbestand."
     },
-    "batches": {
-      "single": "1 Charge",
-      "plural": "{{ count }} Chargen",
-      "withExpiry": "{{ batchLabel }}, Ablauf {{ date }}"
-    },
     "expired": {
       "title": "Abgelaufene Artikel",
       "deleteAria": "Abgelaufene löschen",
@@ -231,16 +212,6 @@
       "updated": "Aktualisiert {{ date }}",
       "badge": "Neu",
       "empty": "Keine aktuellen Änderungen."
-    },
-    "consumeToday": {
-      "title": "Consumed today",
-      "cardTitle": "Add products",
-      "selectHint": "Pick what you used today, then set quantities.",
-      "listTitle": "Your list",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "empty": "No items added yet.",
-      "save": "Save"
     }
   },
   "shopping": {
@@ -312,34 +283,6 @@
         "description": "Schalte den PRO-Planer frei und organisiere dein Menü ganz leicht.",
         "cta": "PRO werden"
       }
-    }
-  },
-  "upToDate": {
-    "title": "Aktualisieren",
-    "subtitle": "Überprüfe ein paar Produkte, um deine Vorratskammer korrekt und aktuell zu halten.",
-    "progress": "Ausstehende Produkte {{ pending }} von {{ total }}",
-    "lastUpdated": "Zuletzt aktualisiert: {{ date }}",
-    "fields": {
-      "expiry": "Ablaufdatum",
-      "stock": "Bestand"
-    },
-    "edit": {
-      "title": "Produkt aktualisieren",
-      "expiryToggle": "Ablaufdatum hinzufügen"
-    },
-    "reasons": {
-      "stale-update": "Lange nicht aktualisiert",
-      "missing-info": "Fehlende Informationen"
-    },
-    "actions": {
-      "keep": "Hier lassen",
-      "delete": "Löschen",
-      "edit": "Bearbeiten",
-      "skip": "Jetzt überspringen"
-    },
-    "done": {
-      "title": "Vorrat aktualisiert, gute Arbeit",
-      "subtitle": "Zurück zum Dashboard…"
     }
   },
   "agent": {
