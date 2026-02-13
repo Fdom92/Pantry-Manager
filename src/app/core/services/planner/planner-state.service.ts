@@ -11,7 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 import { PlannerConversationStore } from './planner-conversation.store';
 import { PlannerAgentService } from './planner-agent.service';
-import { createLatestOnlyRunner } from '../shared';
+import { createLatestOnlyRunner } from '@core/utils';
 
 @Injectable()
 export class PlannerStateService {

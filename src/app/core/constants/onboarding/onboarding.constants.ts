@@ -1,6 +1,6 @@
 import type { OnboardingSlide } from '@core/models';
 
-export const ONBOARDING_SLIDES: OnboardingSlide[] = [
+export const ONBOARDING_SLIDES: readonly OnboardingSlide[] = [
   {
     key: 'problem',
     titleKey: 'onboarding.slides.problem.title',
@@ -25,4 +25,4 @@ export const ONBOARDING_SLIDES: OnboardingSlide[] = [
     descriptionKey: 'onboarding.slides.action.description',
     icon: 'add-outline',
   },
-];
+] as const;

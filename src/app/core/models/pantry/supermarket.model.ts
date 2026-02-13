@@ -1,8 +1,5 @@
-import type { BaseDoc } from '../shared/base-doc.model';
+import type { BaseColoredEntity } from '../shared';
 
-export interface Supermarket extends BaseDoc {
-  type: 'supermarket';
-  name: string;
-  color?: string;
-  preferred?: boolean;
+export interface Supermarket extends BaseColoredEntity {
+  readonly type: 'supermarket';
 }

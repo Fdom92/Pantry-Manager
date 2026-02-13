@@ -1,7 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
-import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
-import { getItemStatusState, toNumberOrZero } from '@core/domain/pantry';
+import { applyConsumeTodayToBatches, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { getItemStatusState } from '@core/domain/pantry';
 import type {
   Insight,
   InsightContext,
@@ -12,7 +12,8 @@ import type { ConsumeTodayEntry, DashboardOverviewCardId } from '@core/models/da
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { PlannerConversationStore } from '../planner/planner-conversation.store';
 import { LanguageService } from '../shared/language.service';
-import { ConfirmService, withSignalFlag } from '../shared';
+import { withSignalFlag } from '@core/utils';
+import { ConfirmService } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
@@ -22,7 +23,9 @@ import {
   formatDateTimeValue,
   formatDateValue,
   formatQuantity,
+  toNumberOrZero,
 } from '@core/utils/formatting.util';
+import { buildPantryItemAutocomplete } from '@core/utils';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
@@ -292,12 +295,10 @@ export class DashboardStateService {
     }
     await withSignalFlag(this.consumeSaving, async () => {
       for (const entry of entries) {
-        const updated = this.applyConsumeToday(entry.item, entry.quantity);
-        if (!updated) {
-          continue;
-        }
-        await this.pantryStore.updateItem(updated);
-        await this.eventManager.logConsumeDashboard(entry.item, updated, entry.quantity);
+        const result = applyConsumeTodayToBatches(entry.item, entry.quantity);
+        if (!result) continue;
+        await this.pantryStore.updateItem(result.updatedItem);
+        await this.eventManager.logConsumeDashboard(entry.item, result.updatedItem, entry.quantity);
       }
     }).catch(err => {
       console.error('[DashboardStateService] consume today error', err);
@@ -343,20 +344,13 @@ export class DashboardStateService {
     excludedIds: Set<string> = new Set()
   ): AutocompleteItem<PantryItem, string>[] {
     const locale = this.languageService.getCurrentLocale();
-    return (items ?? [])
-      .filter(item => !excludedIds.has(item._id))
-      .filter(item => this.pantryStore.getItemTotalQuantity(item) > 0)
-      .map(item => {
-        const total = this.pantryStore.getItemTotalQuantity(item);
-        const formattedQty = formatQuantity(total, locale);
-        return {
-          id: item._id,
-          title: item.name,
-          subtitle: formattedQty,
-          meta: this.getConsumeMetaLabel(item, locale),
-          raw: item,
-        };
-      });
+    const filtered = (items ?? []).filter(item => this.pantryStore.getItemTotalQuantity(item) > 0);
+    return buildPantryItemAutocomplete(filtered, {
+      locale,
+      excludeIds: excludedIds,
+      getQuantity: item => this.pantryStore.getItemTotalQuantity(item),
+      getMeta: item => this.getConsumeMetaLabel(item, locale),
+    });
   }
 
   formatLastUpdated(value: string | null): string {
@@ -397,59 +391,6 @@ export class DashboardStateService {
     });
   }
 
-  private applyConsumeToday(item: PantryItem, amount: number): PantryItem | null {
-    const delta = toNumberOrZero(amount);
-    if (delta <= 0) {
-      return null;
-    }
-    const nextBatches = (item.batches ?? []).map(batch => ({ ...batch }));
-    const ordered = nextBatches
-      .map((batch, index) => ({ batch, index }))
-      .filter(entry => toNumberOrZero(entry.batch.quantity) > 0)
-      .sort((a, b) => {
-        const left = this.getExpiryValue(a.batch.expirationDate);
-        const right = this.getExpiryValue(b.batch.expirationDate);
-        if (left === right) {
-          return a.index - b.index;
-        }
-        return left - right;
-      });
-
-    if (!ordered.length) {
-      return null;
-    }
-
-    let remaining = delta;
-    for (const entry of ordered) {
-      if (remaining <= 0) {
-        break;
-      }
-      const quantity = toNumberOrZero(entry.batch.quantity);
-      if (quantity <= 0) {
-        continue;
-      }
-      if (quantity <= remaining + 1e-9) {
-        remaining -= quantity;
-        entry.batch.quantity = 0;
-      } else {
-        entry.batch.quantity = quantity - remaining;
-        remaining = 0;
-      }
-    }
-
-    return {
-      ...item,
-      batches: nextBatches.filter(batch => toNumberOrZero(batch.quantity) > 0),
-    };
-  }
-
-  private getExpiryValue(value?: string): number {
-    if (!value) {
-      return Number.POSITIVE_INFINITY;
-    }
-    const time = Date.parse(value);
-    return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time;
-  }
 
   private refreshDashboardInsights(
     items: PantryItem[],
@@ -473,7 +414,6 @@ export class DashboardStateService {
       })),
       expiredItems: expiredItems.map(item => ({
         id: item._id,
-        quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       expiringSoonCount: expiringSoon.length,
       lowStockCount: lowStockItems.length,

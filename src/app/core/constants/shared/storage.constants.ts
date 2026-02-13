@@ -11,9 +11,17 @@ export const STORAGE_KEYS = {
 } as const;
 
 export const DEFAULT_HOUSEHOLD_ID = 'household:default';
+
+/** @deprecated Use STORAGE_KEYS.PREFERENCES instead */
 export const STORAGE_KEY_PREFERENCES = STORAGE_KEYS.PREFERENCES;
+
+/** @deprecated Use STORAGE_KEYS.PRO_STATUS instead */
 export const STORAGE_KEY_PRO = STORAGE_KEYS.PRO_STATUS;
+
+/** @deprecated Use STORAGE_KEYS.ONBOARDING_FLAG instead */
 export const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.ONBOARDING_FLAG;
+
+/** @deprecated Use STORAGE_KEYS.REVIEW_* properties instead */
 export const REVIEW_STORAGE_KEYS = {
   FIRST_USE_AT: STORAGE_KEYS.REVIEW_FIRST_USE_AT,
   LAUNCH_COUNT: STORAGE_KEYS.REVIEW_LAUNCH_COUNT,

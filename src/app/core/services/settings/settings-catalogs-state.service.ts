@@ -1,9 +1,10 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
+import { getCatalogUsage, isDuplicateCatalogValue, normalizeCatalogOptions } from '@core/domain/settings';
 import { PantryService } from '@core/services/pantry/pantry.service';
 import { normalizeCategoryId, normalizeLowercase, normalizeLocationId, normalizeStringList, normalizeSupermarketValue, normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { withSignalFlag } from '../shared';
+import { withSignalFlag } from '@core/utils';
 import { SettingsPreferencesService } from './settings-preferences.service';
 
 type CatalogKind = 'category' | 'supermarket' | 'location';
@@ -253,7 +254,7 @@ export class SettingsCatalogsStateService {
   }
 
   private normalizeOptions(values: readonly string[] | null | undefined): string[] {
-    return normalizeStringList(values, { fallback: [] });
+    return normalizeCatalogOptions(values as string[] ?? []);
   }
 
   private hasDraftChanges(draft: readonly string[], original: readonly string[]): boolean {
@@ -320,42 +321,39 @@ export class SettingsCatalogsStateService {
   }
 
   private async getSupermarketUsage(value: string): Promise<{ count: number; items: PantryItem[] }> {
-    const normalizedKey = normalizeLowercase(value);
-    if (!normalizedKey) {
-      return { count: 0, items: [] };
-    }
-    return this.getUsage(items =>
-      items.filter(item => {
+    const allItems = await this.pantryService.getAllActive();
+    return getCatalogUsage(
+      allItems,
+      value,
+      (item, normalizedValue) => {
         const itemKey = normalizeLowercase(normalizeSupermarketValue(item.supermarket) ?? '');
-        return itemKey === normalizedKey;
-      }),
+        return itemKey === normalizeLowercase(normalizedValue);
+      },
+      val => val
     );
   }
 
   private async getCategoryUsage(value: string): Promise<{ count: number; items: PantryItem[] }> {
-    const normalizedValue = normalizeCategoryId(value);
-    if (!normalizedValue) {
-      return { count: 0, items: [] };
-    }
-    const normalizedKey = normalizeLowercase(normalizedValue);
-    if (!normalizedKey) {
-      return { count: 0, items: [] };
-    }
-    return this.getUsage(items =>
-      items.filter(item => normalizeLowercase(normalizeCategoryId(item.categoryId)) === normalizedKey),
+    const allItems = await this.pantryService.getAllActive();
+    return getCatalogUsage(
+      allItems,
+      value,
+      (item, normalizedValue) =>
+        normalizeLowercase(normalizeCategoryId(item.categoryId)) === normalizeLowercase(normalizedValue),
+      normalizeCategoryId
     );
   }
 
   private async getLocationUsage(value: string): Promise<{ count: number; items: PantryItem[] }> {
-    const normalizedValue = normalizeLocationId(value);
-    const normalizedKey = normalizeLowercase(normalizedValue);
-    if (!normalizedKey) {
-      return { count: 0, items: [] };
-    }
-    return this.getUsage(items =>
-      items.filter(item =>
-        (item.batches ?? []).some(batch => normalizeLowercase(normalizeLocationId(batch.locationId)) === normalizedKey),
-      ),
+    const allItems = await this.pantryService.getAllActive();
+    return getCatalogUsage(
+      allItems,
+      value,
+      (item, normalizedValue) =>
+        (item.batches ?? []).some(batch =>
+          normalizeLowercase(normalizeLocationId(batch.locationId)) === normalizeLowercase(normalizedValue)
+        ),
+      normalizeLocationId
     );
   }
 
@@ -472,16 +470,6 @@ export class SettingsCatalogsStateService {
     draftTarget.set([...current]);
   }
 
-  private async getUsage(
-    matcher: (items: PantryItem[]) => PantryItem[],
-  ): Promise<{ count: number; items: PantryItem[] }> {
-    const items = await this.pantryService.getAllActive();
-    const matches = matcher(items);
-    return {
-      count: matches.length,
-      items: matches,
-    };
-  }
 
   private async updateItems(
     items: PantryItem[],

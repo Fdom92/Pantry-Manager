@@ -6,18 +6,15 @@ export function determineSuggestionNeed(params: {
   minThreshold: number | null;
 }): { reason: ShoppingReason | null; suggestedQuantity: number } {
   const { totalQuantity, minThreshold } = params;
+
   if (totalQuantity <= 0) {
-    return {
-      reason: ShoppingReason.EMPTY,
-      suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold ?? 1),
-    };
+    return { reason: ShoppingReason.EMPTY, suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold ?? 1) };
   }
+
   if (minThreshold != null && totalQuantity < minThreshold) {
-    return {
-      reason: ShoppingReason.BELOW_MIN,
-      suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold - totalQuantity, minThreshold),
-    };
+    return { reason: ShoppingReason.BELOW_MIN, suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold - totalQuantity, minThreshold) };
   }
+
   return { reason: null, suggestedQuantity: 0 };
 }
 

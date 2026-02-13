@@ -1,3 +1,4 @@
+import type { StatusColor } from '../shared/color.model';
 import { ItemBatch } from './item-batch.model';
 import { PantryItem } from './item.model';
 
@@ -38,14 +39,13 @@ export interface PantryGroup {
   expiredCount: number;
 }
 
-export type BatchStatusState = 'normal' | 'near-expiry' | 'expired' | 'unknown';
 export type ProductStatusState = 'normal' | 'near-expiry' | 'expired' | 'low-stock';
 
 export interface BatchStatusMeta {
   label: string;
   icon: string;
-  state: BatchStatusState;
-  color: 'danger' | 'warning' | 'success' | 'medium';
+  state: ExpiryClassification;
+  color: StatusColor;
 }
 
 export interface BatchEntryMeta {
@@ -72,8 +72,6 @@ export interface PantryItemGlobalStatus {
   state: ProductStatusState;
   label: string;
   accentColor: string;
-  chipColor: string;
-  chipTextColor: string;
 }
 
 export interface PantryItemBatchViewModel {
@@ -92,20 +90,9 @@ export interface PantryItemCardViewModel {
   item: PantryItem;
   globalStatus: PantryItemGlobalStatus;
   colorClass: string;
-  totalQuantity: number;
-  totalQuantityLabel: string;
-  totalBatches: number;
-  totalBatchesLabel: string;
-  earliestExpirationDate: string | null;
   formattedEarliestExpirationLong: string;
   batchCountsLabel: string;
-  batchCounts: BatchCountsMeta;
   batches: PantryItemBatchViewModel[];
-}
-
-export interface MoveBatchesResult {
-  moved: ItemBatch[];
-  remaining: ItemBatch[];
 }
 
 export type PantrySummary = Readonly<{

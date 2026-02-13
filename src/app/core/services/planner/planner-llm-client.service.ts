@@ -1,10 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { LlmClientError, LlmCompletionRequest, LlmCompletionResponse } from '@core/models';
+import { sleep } from '@core/utils';
 import { firstValueFrom, timeout as rxTimeout } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
-import { sleep } from '../shared/task.util';
 
 /**
  * Thin gateway around the backend LLM endpoint so agents don't need to know about HTTP.

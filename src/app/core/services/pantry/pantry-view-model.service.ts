@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
-import { classifyExpiry, getItemStatusState, normalizeBatches, sumQuantities, toNumberOrZero } from '@core/domain/pantry';
+import { classifyExpiry, getItemStatusState, normalizeBatches, sumQuantities } from '@core/domain/pantry';
+import { generateBatchId, getExpirationSortWeight } from '@core/utils';
 import type {
   BatchCountsMeta,
   BatchEntryMeta,
@@ -18,7 +19,7 @@ import type {
   ProductStatusState,
 } from '@core/models/pantry';
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models/shared';
-import { formatDateValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
+import { formatDateValue, formatQuantity, roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { formatFriendlyName, normalizeCategoryId, normalizeLowercase, normalizeLocationId, normalizeStringList } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '../shared/language.service';
@@ -215,19 +216,9 @@ export class PantryViewModelService {
   buildItemCardViewModel(params: {
     item: PantryItem;
     summary: BatchSummaryMeta;
-    totalQuantity: number;
-    totalBatches: number;
   }): PantryItemCardViewModel {
-    const { item, summary, totalQuantity, totalBatches } = params;
+    const { item, summary } = params;
     const locale = this.languageService.getCurrentLocale();
-    const formattedQuantityValue = formatQuantity(totalQuantity, locale);
-    const totalQuantityLabel = this.translate.instant('pantry.detail.totalQuantity', {
-      value: formattedQuantityValue,
-    });
-    const totalBatchesLabel = this.translate.instant(
-      totalBatches === 1 ? 'pantry.detail.batches.single' : 'pantry.detail.batches.plural',
-      { count: totalBatches }
-    );
 
     const batches = summary.sorted.map(entry => ({
       batch: entry.batch,
@@ -253,16 +244,10 @@ export class PantryViewModelService {
 
     return {
       item,
-      totalQuantity,
-      totalQuantityLabel,
-      totalBatches,
-      totalBatchesLabel,
       globalStatus: aggregates.status,
       colorClass,
-      earliestExpirationDate: aggregates.earliestDate,
       formattedEarliestExpirationLong,
       batchCountsLabel: aggregates.batchSummaryLabel,
-      batchCounts: aggregates.counts,
       batches,
     };
   }
@@ -324,7 +309,7 @@ export class PantryViewModelService {
   }
 
   private compareItems(a: PantryItem, b: PantryItem): number {
-    const expirationWeightDiff = this.getExpirationWeight(a) - this.getExpirationWeight(b);
+    const expirationWeightDiff = getExpirationSortWeight(a) - getExpirationSortWeight(b);
     if (expirationWeightDiff !== 0) {
       return expirationWeightDiff;
     }
@@ -332,22 +317,10 @@ export class PantryViewModelService {
     return (a.name ?? '').localeCompare(b.name ?? '');
   }
 
-  private getExpirationWeight(item: PantryItem): number {
-    switch (getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS)) {
-      case 'expired':
-        return 0;
-      case 'near-expiry':
-        return 1;
-      case 'low-stock':
-        return 2;
-      default:
-        return 3;
-    }
-  }
 
   private collectBatches(item: PantryItem): BatchEntryMeta[] {
     const batches: BatchEntryMeta[] = [];
-    for (const batch of this.sanitizeBatches(item.batches ?? [])) {
+    for (const batch of normalizeBatches(item.batches ?? [], { generateBatchId })) {
       const locationId = normalizeLocationId(batch.locationId, UNASSIGNED_LOCATION_KEY);
       const locationLabel = this.getLocationLabel(locationId);
       batches.push({
@@ -360,10 +333,6 @@ export class PantryViewModelService {
     return batches;
   }
 
-  private sanitizeBatches(batches: ItemBatch[] | undefined): ItemBatch[] {
-    const generateBatchId = () => `batch:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-    return normalizeBatches(batches, { generateBatchId });
-  }
 
   private getBatchTime(batch: ItemBatch): number | null {
     if (!batch.expirationDate) {
@@ -463,34 +432,26 @@ export class PantryViewModelService {
       case 'expired':
         return {
           state,
-          label: 'Caducado',
+          label: this.translate.instant('pantry.filters.status.expired'),
           accentColor: 'var(--ion-color-danger)',
-          chipColor: 'var(--ion-color-danger)',
-          chipTextColor: 'var(--ion-color-dark-contrast)',
         };
       case 'near-expiry':
         return {
           state,
-          label: 'Por caducar',
+          label: this.translate.instant('pantry.filters.status.expiring'),
           accentColor: 'var(--ion-color-warning)',
-          chipColor: 'var(--ion-color-warning)',
-          chipTextColor: 'var(--ion-text-color)',
         };
       case 'low-stock':
         return {
           state,
-          label: 'Bajo stock',
+          label: this.translate.instant('pantry.filters.status.low'),
           accentColor: 'var(--ion-color-warning)',
-          chipColor: 'var(--ion-color-warning)',
-          chipTextColor: 'var(--ion-color-dark)',
         };
       default:
         return {
           state: 'normal',
-          label: 'Stock',
+          label: this.translate.instant('pantry.filters.status.normal'),
           accentColor: 'var(--ion-color-primary)',
-          chipColor: 'var(--ion-color-primary)',
-          chipTextColor: 'var(--ion-color-primary-contrast)',
         };
     }
   }

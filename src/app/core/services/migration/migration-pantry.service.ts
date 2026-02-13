@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { mergeBatchesByExpiry, toNumberOrZero } from '@core/domain/pantry';
+import { mergeBatchesByExpiry } from '@core/domain/pantry';
+import { toNumberOrZero } from '@core/utils/formatting.util';
 import type { LegacyLocationStock, LegacyPantryItem } from '@core/models/migration/legacy-pantry.model';
 import type { ItemBatch } from '@core/models/pantry';
 import { PantryService } from '@core/services/pantry/pantry.service';

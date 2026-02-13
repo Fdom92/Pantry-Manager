@@ -3,7 +3,7 @@ import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { getItemStatusState } from '@core/domain/pantry';
 import { PantryFilterState, PantryItem, PantrySummary } from '@core/models/pantry';
 import { StockStatus } from '@core/models/shared';
-import { normalizeLowercase, normalizeOptionalTrim, normalizeTrim } from '@core/utils/normalization.util';
+import { normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { PantryService } from './pantry.service';
@@ -202,17 +202,9 @@ export class PantryStoreService {
   }
 
   private async findMergeCandidate(candidate: PantryItem): Promise<PantryItem | undefined> {
-    const barcode = normalizeOptionalTrim(candidate.barcode) ?? null;
     const key = this.buildMergeKey(candidate);
 
     const localItems = this.items();
-
-    if (barcode) {
-      const localBarcodeMatch = localItems.find(item => (normalizeOptionalTrim(item.barcode) ?? null) === barcode);
-      if (localBarcodeMatch) {
-        return localBarcodeMatch;
-      }
-    }
 
     if (key) {
       const localKeyMatch = localItems.find(item => this.buildMergeKey(item) === key);
@@ -222,13 +214,6 @@ export class PantryStoreService {
     }
 
     const persisted = await this.pantryService.getAll();
-
-    if (barcode) {
-      const remoteBarcode = persisted.find(item => (normalizeOptionalTrim(item.barcode) ?? null) === barcode);
-      if (remoteBarcode) {
-        return remoteBarcode;
-      }
-    }
 
     if (key) {
       return persisted.find(item => this.buildMergeKey(item) === key);
@@ -265,8 +250,6 @@ export class PantryStoreService {
     return {
       ...existing,
       batches: [...(existing.batches ?? []), ...(incoming.batches ?? [])],
-      brand: existing.brand ?? incoming.brand,
-      barcode: existing.barcode ?? incoming.barcode,
       minThreshold: existing.minThreshold ?? incoming.minThreshold,
       isBasic: existing.isBasic ?? incoming.isBasic,
     };

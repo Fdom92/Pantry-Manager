@@ -1,5 +1,11 @@
-import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import type { AppPreferences } from '@core/models/settings';
+
+/**
+ * Time window constants (in days) used across the application
+ */
+export const NEAR_EXPIRY_WINDOW_DAYS = 15;
+export const RECENTLY_ADDED_WINDOW_DAYS = 7;
+export const PENDING_REVIEW_STALE_DAYS = 7;
 
 export const UNASSIGNED_LOCATION_KEY = 'unassigned';
 export const UNASSIGNED_PRODUCT_NAME = 'Product';

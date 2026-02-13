@@ -7,10 +7,10 @@ import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { DashboardInsightService } from '../dashboard/dashboard-insight.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
-import { SettingsPreferencesService } from '../settings/settings-preferences.service';
+import { CatalogOptionsService, SettingsPreferencesService } from '../settings';
 import { LanguageService } from '../shared/language.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { withSignalFlag } from '../shared';
+import { withSignalFlag } from '@core/utils';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { formatFriendlyName, normalizeCategoryId, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
@@ -22,6 +22,7 @@ export class UpToDateStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly insightService = inject(DashboardInsightService);
   private readonly appPreferences = inject(SettingsPreferencesService);
+  private readonly catalogOptions = inject(CatalogOptionsService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
@@ -384,21 +385,8 @@ export class UpToDateStateService {
   }
 
   private async addCategoryOption(value: string): Promise<void> {
-    const normalized = normalizeCategoryId(value);
-    if (!normalized) {
-      return;
-    }
-    const current = await this.appPreferences.getPreferences();
-    const existing = current.categoryOptions ?? [];
-    const normalizedKey = normalizeLowercase(normalized);
-    const existingMatch = existing.find(option => normalizeLowercase(normalizeCategoryId(option)) === normalizedKey);
-    if (existingMatch) {
-      this.editCategory.set(existingMatch);
-      return;
-    }
-    const next = [...existing, normalized];
-    await this.appPreferences.savePreferences({ ...current, categoryOptions: next });
-    this.editCategory.set(normalized);
+    const selected = await this.catalogOptions.addCategoryOption(value);
+    this.editCategory.set(selected);
   }
 
   private addOptionFromText(value: string, addOption: (formatted: string) => Promise<void>): void {
