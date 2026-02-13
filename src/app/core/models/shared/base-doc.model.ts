@@ -1,7 +1,7 @@
 export interface BaseDoc {
-  _id: string;
+  readonly _id: string;
   _rev?: string;
-  type: string;
-  createdAt: string;
+  readonly type: string;
+  readonly createdAt: string;
   updatedAt: string;
 }

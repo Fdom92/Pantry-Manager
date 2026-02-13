@@ -1,3 +1,4 @@
+import type { StatusColor } from '../shared/color.model';
 import { ItemBatch } from './item-batch.model';
 import { PantryItem } from './item.model';
 
@@ -38,14 +39,13 @@ export interface PantryGroup {
   expiredCount: number;
 }
 
-export type BatchStatusState = 'normal' | 'near-expiry' | 'expired' | 'unknown';
 export type ProductStatusState = 'normal' | 'near-expiry' | 'expired' | 'low-stock';
 
 export interface BatchStatusMeta {
   label: string;
   icon: string;
-  state: BatchStatusState;
-  color: 'danger' | 'warning' | 'success' | 'medium';
+  state: ExpiryClassification;
+  color: StatusColor;
 }
 
 export interface BatchEntryMeta {

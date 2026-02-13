@@ -19,5 +19,5 @@ export interface BaseColoredEntity extends BaseNamedEntity {
  * Base interface for entities that belong to a household
  */
 export interface BaseHouseholdEntity extends BaseDoc {
-  householdId: string;
+  readonly householdId: string;
 }

@@ -12,7 +12,7 @@ export type ShoppingSuggestionGroupWithItem = ShoppingSuggestionGroup<PantryItem
 export type ShoppingStateWithItem = ShoppingState<PantryItem>;
 // INTERFACES
 export interface ShoppingList extends BaseDoc {
-  type: 'shopping-list';
+  readonly type: 'shopping-list';
   name: string;
   items: ShoppingListItem[];
   supermarketId?: string;

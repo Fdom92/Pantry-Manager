@@ -3,8 +3,8 @@ import type { ExpirationStatus } from '../shared/enums.model';
 import { ItemBatch } from './item-batch.model';
 
 export interface PantryItem extends BaseDoc {
-  type: 'item';
-  householdId: string;
+  readonly type: 'item';
+  readonly householdId: string;
   name: string;
   categoryId: string;
   supermarket?: string;

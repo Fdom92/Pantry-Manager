@@ -1,6 +1,6 @@
 import type { BaseColoredEntity } from '../shared';
 
 export interface Category extends BaseColoredEntity {
-  type: 'category';
+  readonly type: 'category';
   icon?: string;
 }
