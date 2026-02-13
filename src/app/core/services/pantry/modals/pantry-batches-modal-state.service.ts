@@ -7,7 +7,6 @@ import type {
   PantryItem,
   PantryItemCardViewModel,
 } from '@core/models/pantry';
-import { PantryStoreService } from '../pantry-store.service';
 import { PantryViewModelService } from '../pantry-view-model.service';
 
 /**
@@ -15,7 +14,6 @@ import { PantryViewModelService } from '../pantry-view-model.service';
  */
 @Injectable()
 export class PantryBatchesModalStateService {
-  private readonly pantryStore = inject(PantryStoreService);
   private readonly viewModel = inject(PantryViewModelService);
 
   readonly showBatchesModal = signal(false);
@@ -72,13 +70,10 @@ export class PantryBatchesModalStateService {
    * Build item card view model for display.
    */
   buildItemCardViewModel(item: PantryItem): PantryItemCardViewModel {
-    const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
     const summary = this.getBatchSummary(item);
     return this.viewModel.buildItemCardViewModel({
       item,
       summary,
-      totalQuantity,
-      totalBatches: summary.total,
     });
   }
 

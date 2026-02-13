@@ -69,7 +69,6 @@ export interface InsightExpiringItem {
 }
 export interface InsightExpiredItem {
   id?: string;
-  quantity: number;
 }
 export interface InsightProductSummary {
   id?: string;

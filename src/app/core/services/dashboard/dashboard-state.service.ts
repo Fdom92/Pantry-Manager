@@ -414,7 +414,6 @@ export class DashboardStateService {
       })),
       expiredItems: expiredItems.map(item => ({
         id: item._id,
-        quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       expiringSoonCount: expiringSoon.length,
       lowStockCount: lowStockItems.length,

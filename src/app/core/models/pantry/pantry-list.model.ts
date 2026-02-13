@@ -72,8 +72,6 @@ export interface PantryItemGlobalStatus {
   state: ProductStatusState;
   label: string;
   accentColor: string;
-  chipColor: string;
-  chipTextColor: string;
 }
 
 export interface PantryItemBatchViewModel {
@@ -92,20 +90,9 @@ export interface PantryItemCardViewModel {
   item: PantryItem;
   globalStatus: PantryItemGlobalStatus;
   colorClass: string;
-  totalQuantity: number;
-  totalQuantityLabel: string;
-  totalBatches: number;
-  totalBatchesLabel: string;
-  earliestExpirationDate: string | null;
   formattedEarliestExpirationLong: string;
   batchCountsLabel: string;
-  batchCounts: BatchCountsMeta;
   batches: PantryItemBatchViewModel[];
-}
-
-export interface MoveBatchesResult {
-  moved: ItemBatch[];
-  remaining: ItemBatch[];
 }
 
 export type PantrySummary = Readonly<{

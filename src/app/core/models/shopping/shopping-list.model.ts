@@ -14,15 +14,12 @@ export type ShoppingStateWithItem = ShoppingState<PantryItem>;
 export interface ShoppingList extends BaseDoc {
   type: 'shopping-list';
   name: string;
-  createdBy: string;
   items: ShoppingListItem[];
-  completed: boolean;
   supermarketId?: string;
 }
 export interface ShoppingListItem {
   itemId: string;
   quantity: number;
-  checked: boolean;
 }
 export interface ShoppingSuggestion<TItem = string> {
   item: TItem;

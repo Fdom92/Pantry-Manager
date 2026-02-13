@@ -9,8 +9,7 @@ export enum LocationType {
 export enum StockStatus {
   EMPTY = 'empty',
   LOW = 'low',
-  NORMAL = 'normal',
-  FULL = 'full'
+  NORMAL = 'normal'
 }
 
 export enum ExpirationStatus {

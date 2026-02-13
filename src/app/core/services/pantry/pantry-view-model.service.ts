@@ -216,19 +216,9 @@ export class PantryViewModelService {
   buildItemCardViewModel(params: {
     item: PantryItem;
     summary: BatchSummaryMeta;
-    totalQuantity: number;
-    totalBatches: number;
   }): PantryItemCardViewModel {
-    const { item, summary, totalQuantity, totalBatches } = params;
+    const { item, summary } = params;
     const locale = this.languageService.getCurrentLocale();
-    const formattedQuantityValue = formatQuantity(totalQuantity, locale);
-    const totalQuantityLabel = this.translate.instant('pantry.detail.totalQuantity', {
-      value: formattedQuantityValue,
-    });
-    const totalBatchesLabel = this.translate.instant(
-      totalBatches === 1 ? 'pantry.detail.batches.single' : 'pantry.detail.batches.plural',
-      { count: totalBatches }
-    );
 
     const batches = summary.sorted.map(entry => ({
       batch: entry.batch,
@@ -254,16 +244,10 @@ export class PantryViewModelService {
 
     return {
       item,
-      totalQuantity,
-      totalQuantityLabel,
-      totalBatches,
-      totalBatchesLabel,
       globalStatus: aggregates.status,
       colorClass,
-      earliestExpirationDate: aggregates.earliestDate,
       formattedEarliestExpirationLong,
       batchCountsLabel: aggregates.batchSummaryLabel,
-      batchCounts: aggregates.counts,
       batches,
     };
   }
@@ -450,32 +434,24 @@ export class PantryViewModelService {
           state,
           label: this.translate.instant('pantry.filters.status.expired'),
           accentColor: 'var(--ion-color-danger)',
-          chipColor: 'var(--ion-color-danger)',
-          chipTextColor: 'var(--ion-color-dark-contrast)',
         };
       case 'near-expiry':
         return {
           state,
           label: this.translate.instant('pantry.filters.status.expiring'),
           accentColor: 'var(--ion-color-warning)',
-          chipColor: 'var(--ion-color-warning)',
-          chipTextColor: 'var(--ion-text-color)',
         };
       case 'low-stock':
         return {
           state,
           label: this.translate.instant('pantry.filters.status.low'),
           accentColor: 'var(--ion-color-warning)',
-          chipColor: 'var(--ion-color-warning)',
-          chipTextColor: 'var(--ion-color-dark)',
         };
       default:
         return {
           state: 'normal',
           label: this.translate.instant('pantry.filters.status.normal'),
           accentColor: 'var(--ion-color-primary)',
-          chipColor: 'var(--ion-color-primary)',
-          chipTextColor: 'var(--ion-color-primary-contrast)',
         };
     }
   }

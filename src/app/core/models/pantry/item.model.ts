@@ -6,10 +6,8 @@ export interface PantryItem extends BaseDoc {
   type: 'item';
   householdId: string;
   name: string;
-  brand?: string;
   categoryId: string;
   supermarket?: string;
-  barcode?: string;
   batches: ItemBatch[];
   isBasic?: boolean;
   minThreshold?: number;
