@@ -135,6 +135,26 @@ ion-title {
   margin: 0;
 }
 
+.suggestion-card--skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+.suggestion-card--skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    color-mix(in srgb, var(--ion-color-primary) 8%, transparent) 40%,
+    color-mix(in srgb, var(--ion-color-primary) 16%, transparent) 60%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
 @keyframes fadeInList {
   from {
     opacity: 0;
@@ -143,5 +163,14 @@ ion-title {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }
