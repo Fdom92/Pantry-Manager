@@ -192,10 +192,12 @@ ion-title {
 
 .timeline-event__content {
   flex: 1 1 auto;
-  background: var(--ion-card-background, var(--ion-item-background, var(--ion-background-color)));
+  background: var(--ion-card-background, var(--ion-card-background));
   border-radius: 12px;
   padding: 10px 12px;
-  box-shadow: 0 6px 16px rgba(15, 20, 19, 0.08);
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  color: var(--ion-text-color);
 }
 
 .timeline-event__row {
@@ -239,10 +241,13 @@ ion-title {
 }
 
 .skeleton-card {
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 8px 12px 10px;
   position: relative;
   overflow: hidden;
+  background: var(--ion-card-background, var(--ion-card-background));
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
 }
 
 .skeleton-card::after {

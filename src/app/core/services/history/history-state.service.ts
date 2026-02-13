@@ -132,7 +132,9 @@ export class HistoryStateService {
     return events.slice(0, 20);
   });
 
-  readonly canSeeMore = computed(() => !this.isPro() && this.events().length > 20);
+  readonly canSeeMore = computed(() =>
+    !this.isPro() && this.events().length > 20 && this.eventCards().length > 0
+  );
 
   readonly filterChips = computed<HistoryFilterChip[]>(() => {
     const events = this.visibleEvents();
