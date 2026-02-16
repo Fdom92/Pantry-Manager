@@ -34,7 +34,6 @@ export class DashboardStateService {
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventManager = inject(HistoryEventManagerService);
 
   private hasCompletedInitialLoad = false;
 

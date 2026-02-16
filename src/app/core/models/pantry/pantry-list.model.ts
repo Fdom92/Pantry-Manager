@@ -39,13 +39,14 @@ export interface PantryGroup {
   expiredCount: number;
 }
 
+export type BatchStatusState = 'normal' | 'near-expiry' | 'expired' | 'unknown';
 export type ProductStatusState = 'normal' | 'near-expiry' | 'expired' | 'low-stock';
 
 export interface BatchStatusMeta {
   label: string;
   icon: string;
-  state: ExpiryClassification;
-  color: StatusColor;
+  state: BatchStatusState;
+  color: 'danger' | 'warning' | 'success' | 'medium';
 }
 
 export interface BatchEntryMeta {

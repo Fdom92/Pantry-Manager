@@ -29,6 +29,10 @@ export class LanguageService {
     return LOCALES[lang] ?? LOCALES[DEFAULT_LANGUAGE];
   }
 
+  getCurrentLanguage(): SupportedLanguage {
+    return this.currentLanguage();
+  }
+
   private isSupportedLanguage(lang: string | null): lang is SupportedLanguage {
     if (!lang) {
       return false;

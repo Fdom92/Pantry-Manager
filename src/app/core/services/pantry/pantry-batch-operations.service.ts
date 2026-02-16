@@ -94,6 +94,81 @@ export class PantryBatchOperationsService {
   }
 
   /**
+   * Adjust total quantity with automatic FIFO logic.
+   * - Increment: Creates a new unassigned batch with the added quantity
+   * - Decrement: Applies FIFO logic to consume from oldest batches first
+   */
+  async adjustTotalQuantityWithFIFO(
+    item: PantryItem,
+    change: number,
+    pantryItemsState?: WritableSignal<PantryItem[]>
+  ): Promise<void> {
+    if (!item?._id || !Number.isFinite(change) || change === 0) {
+      return;
+    }
+
+    if (change > 0) {
+      // Create a single new batch with the total quantity added
+      const newBatch: ItemBatch = {
+        batchId: generateBatchId(),
+        quantity: 0, // Start with 0, then adjust
+        locationId: UNASSIGNED_LOCATION_KEY,
+        expirationDate: undefined,
+      };
+
+      // Add the new batch to the item first
+      const updatedItem = {
+        ...item,
+        batches: [...(item.batches ?? []), newBatch],
+      };
+
+      // Now adjust the quantity
+      await this.adjustBatchQuantity(
+        updatedItem,
+        UNASSIGNED_LOCATION_KEY,
+        newBatch,
+        change,
+        undefined,
+        pantryItemsState
+      );
+    } else if (change < 0) {
+      // Apply FIFO logic to decrement the total amount
+      let remainingToDecrement = Math.abs(change);
+
+      // Sort batches by expiration date (FIFO - oldest first)
+      const sortedBatches = [...(item.batches ?? [])].sort((a, b) => {
+        const dateA = a.expirationDate ? new Date(a.expirationDate).getTime() : Infinity;
+        const dateB = b.expirationDate ? new Date(b.expirationDate).getTime() : Infinity;
+        return dateA - dateB;
+      });
+
+      // Decrement batches in FIFO order
+      for (const batch of sortedBatches) {
+        if (remainingToDecrement <= 0) {
+          break;
+        }
+
+        const currentQuantity = batch.quantity ?? 0;
+        if (currentQuantity > 0) {
+          const toDecrement = Math.min(currentQuantity, remainingToDecrement);
+          const locationId = normalizeLocationId(batch.locationId, UNASSIGNED_LOCATION_KEY);
+
+          await this.adjustBatchQuantity(
+            item,
+            locationId,
+            batch,
+            -toDecrement,
+            undefined,
+            pantryItemsState
+          );
+
+          remainingToDecrement -= toDecrement;
+        }
+      }
+    }
+  }
+
+  /**
    * Cancel pending stock save for an item.
    */
   cancelPendingStockSave(itemId: string): void {

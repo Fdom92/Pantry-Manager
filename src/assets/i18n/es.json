@@ -52,6 +52,7 @@
       "cancel": "Cancelar",
       "add": "Añadir",
       "save": "Guardar",
+      "edit": "Editar",
       "apply": "Aplicar",
       "clear": "Limpiar"
     },
@@ -139,10 +140,18 @@
     "overview": {
       "aria": "Resumen de la despensa",
       "sections": {
-        "alerts": { "title": "Alertas" },
-        "control": { "title": "Control" },
-        "insights": { "title": "Insights" },
-        "activity": { "title": "Actividad" }
+        "alerts": {
+          "title": "Alertas"
+        },
+        "control": {
+          "title": "Control"
+        },
+        "insights": {
+          "title": "Insights"
+        },
+        "activity": {
+          "title": "Actividad"
+        }
       },
       "cards": {
         "nearExpiry": {
@@ -356,7 +365,8 @@
       "submit": "Añadir a la despensa",
       "singleSuccess": "1 producto añadido",
       "success": "{{ count }} productos añadidos",
-      "error": "No se pudieron añadir los productos."
+      "error": "No se pudieron añadir los productos.",
+      "createAdvanced": "Crear producto con detalles avanzados"
     },
     "addMode": {
       "title": "Selecciona el modo",
@@ -378,7 +388,15 @@
     "batches": {
       "title": "Lotes del producto",
       "count": "{{ count }} lotes registrados",
-      "open": "Abierto"
+      "open": "Abierto",
+      "noExpiryDate": "Sin fecha de caducidad",
+      "expires": {
+        "today": "Caduca hoy",
+        "tomorrow": "Caduca mañana"
+      },
+      "expired": {
+        "yesterday": "Caducó ayer"
+      }
     },
     "form": {
       "editTitle": "Editar artículo",
@@ -406,7 +424,8 @@
       "location": "Ubicación",
       "locationPlaceholder": "Selecciona una ubicación",
       "locationAdd": {
-        "option": "+ Añadir ubicación"
+        "option": "+ Añadir ubicación",
+        "unassigned": "Sin asignar"
       },
       "batches": {
         "title": "Lotes",
@@ -415,12 +434,24 @@
         "titleIndex": "Lote {{ index }}",
         "quantity": "Cantidad",
         "expiry": "Fecha de caducidad",
+        "location": "Ubicación",
         "opened": "Abierto"
+      },
+      "quantity": {
+        "title": "Cantidad",
+        "current": "Cantidad",
+        "initial": "Cantidad inicial",
+        "hint": "Incrementa o reduce la cantidad total del producto"
       }
     },
     "detail": {
       "earliest": "Caduca primero: {{ date }}",
       "noBatches": "Sin lotes registrados.",
+      "noExpiry": "Sin caducidad",
+      "quantity": {
+        "single": "{{ quantity }} unidad",
+        "plural": "{{ quantity }} unidades"
+      },
       "batchSummary": {
         "none": "Sin lotes registrados",
         "total": {
@@ -465,6 +496,13 @@
         "expand": "Expandir detalles del producto",
         "collapse": "Contraer detalles del producto"
       }
+    },
+    "quantitySheet": {
+      "currentQuantity": "Cantidad",
+      "hint": "Ajusta la cantidad. Se guardará al cerrar.",
+      "increase": "Aumentar",
+      "decrease": "Disminuir",
+      "viewDetails": "Ver lotes"
     },
     "toasts": {
       "locationRequired": "Selecciona una ubicación antes de guardar.",

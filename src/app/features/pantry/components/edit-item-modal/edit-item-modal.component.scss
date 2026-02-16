@@ -147,3 +147,101 @@ ion-title, ion-back-button {
 .modal-footer ion-button {
   width: 100%;
 }
+
+.quantity-adjuster-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+}
+
+.quantity-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.quantity-hint {
+  font-size: 0.65rem;
+  color: color-mix(in srgb, var(--ion-text-color) 50%, transparent);
+  margin-top: -4px;
+  text-align: center;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.control-button {
+  --padding-start: 0;
+  --padding-end: 0;
+  --border-radius: 50%;
+  margin: 0;
+}
+
+.control-button--minus {
+  --background: color-mix(in srgb, var(--ion-color-danger) 10%, transparent);
+  --background-hover: color-mix(in srgb, var(--ion-color-danger) 15%, transparent);
+  --color: var(--ion-color-danger);
+}
+
+.control-button--minus:disabled {
+  --background: color-mix(in srgb, var(--ion-text-color) 5%, transparent);
+  --color: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
+}
+
+.control-button--plus {
+  --background: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
+  --background-hover: color-mix(in srgb, var(--ion-color-primary) 20%, transparent);
+  --color: var(--ion-color-primary);
+}
+
+.control-button ion-icon {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.quantity-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  min-width: 80px;
+  padding: 0 8px;
+}
+
+.quantity-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ion-text-color);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quantity-original {
+  color: color-mix(in srgb, var(--ion-text-color) 40%, transparent);
+  font-size: 1.5rem;
+}
+
+.quantity-arrow {
+  font-size: 1rem;
+  color: color-mix(in srgb, var(--ion-text-color) 40%, transparent);
+}
+
+.quantity-new {
+  color: var(--ion-color-primary);
+}
+
+.quantity-new--negative {
+  color: var(--ion-color-danger) !important;
+}

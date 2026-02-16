@@ -52,6 +52,7 @@
       "cancel": "Cancelar",
       "add": "Adicionar",
       "save": "Guardar",
+      "edit": "Editar",
       "apply": "Aplicar",
       "clear": "Limpar"
     },
@@ -364,7 +365,8 @@
       "submit": "Add to pantry",
       "singleSuccess": "1 produto adicionado",
       "success": "{{ count }} produtos adicionados",
-      "error": "Não foi possível adicionar os produtos."
+      "error": "Não foi possível adicionar os produtos.",
+      "createAdvanced": "Criar produto com detalhes avançados"
     },
     "addMode": {
       "title": "Selecionar modo",
@@ -386,7 +388,15 @@
     "batches": {
       "title": "Lotes de produtos",
       "count": "{{ count }} lotes registados",
-      "open": "Aberto"
+      "open": "Aberto",
+      "noExpiryDate": "Sem data de validade",
+      "expires": {
+        "today": "Expira hoje",
+        "tomorrow": "Expira amanhã"
+      },
+      "expired": {
+        "yesterday": "Expirou ontem"
+      }
     },
     "form": {
       "editTitle": "Editar item",
@@ -414,7 +424,8 @@
       "location": "Localização",
       "locationPlaceholder": "Seleciona uma localização",
       "locationAdd": {
-        "option": "+ Adicionar localização"
+        "option": "+ Adicionar localização",
+        "unassigned": "Não atribuído"
       },
       "batches": {
         "title": "Lotes",
@@ -423,12 +434,24 @@
         "titleIndex": "Lote {{ index }}",
         "quantity": "Quantidade",
         "expiry": "Data de validade",
+        "location": "Localização",
         "opened": "Aberto"
+      },
+      "quantity": {
+        "title": "Quantidade",
+        "current": "Quantidade",
+        "initial": "Quantidade inicial",
+        "hint": "Aumentar ou diminuir a quantidade total do produto"
       }
     },
     "detail": {
       "earliest": "Expira primeiro: {{ date }}",
       "noBatches": "Nenhum lote registado.",
+      "noExpiry": "Sem validade",
+      "quantity": {
+        "single": "{{ quantity }} unidade",
+        "plural": "{{ quantity }} unidades"
+      },
       "batchSummary": {
         "none": "Nenhum lote registado",
         "total": {
@@ -467,12 +490,18 @@
       },
       "actions": {
         "viewBatches": "Ver lotes",
-        "editItem": "Editar item",
+        "editItem": "Editar produto",
         "deleteItem": "Eliminar item",
         "menuLabel": "Abrir menu de ações",
         "expand": "Mostrar detalhes do item",
         "collapse": "Esconder detalhes do item"
       }
+    },
+    "quantitySheet": {
+      "currentQuantity": "Quantidade",
+      "increase": "Aumentar",
+      "decrease": "Diminuir",
+      "viewDetails": "Ver lotes"
     },
     "toasts": {
       "locationRequired": "Seleciona uma localização antes de guardar.",

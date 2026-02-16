@@ -1,0 +1,73 @@
+<ion-content class="quantity-sheet-content">
+  <div class="sheet-header">
+    <h2 class="sheet-title">{{ item.name }}</h2>
+    <ion-button
+      fill="clear"
+      size="small"
+      class="close-button"
+      (click)="handleClose()">
+      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <div class="quantity-section">
+    <span class="quantity-label">{{ 'pantry.quantitySheet.currentQuantity' | translate }}</span>
+    <span class="quantity-hint">{{ 'pantry.quantitySheet.hint' | translate }}</span>
+    <div class="quantity-controls">
+      <ion-button
+        fill="clear"
+        class="control-button control-button--minus"
+        [disabled]="displayQuantity <= 0"
+        (click)="handleDecrement()">
+        <ion-icon slot="icon-only" name="remove"></ion-icon>
+      </ion-button>
+      <div class="quantity-display">
+        @if (hasChanges) {
+          <span class="quantity-number">
+            <span class="quantity-original">{{ totalQuantity }}</span>
+            <ion-icon name="arrow-forward-outline" class="quantity-arrow"></ion-icon>
+            <span class="quantity-new" [class.quantity-new--negative]="isDecreasing">{{ displayQuantity }}</span>
+          </span>
+        } @else {
+          <span class="quantity-number">{{ totalQuantity }}</span>
+        }
+        @if (quantityUnit) {
+          <span class="quantity-unit">{{ quantityUnit }}</span>
+        }
+      </div>
+      <ion-button
+        fill="clear"
+        class="control-button control-button--plus"
+        (click)="handleIncrement()">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <div class="actions-section">
+    <ion-button
+      expand="block"
+      fill="clear"
+       class="details-button"
+      (click)="handleEdit()">
+      <ion-icon slot="start" name="create-outline"></ion-icon>
+      {{ 'pantry.detail.actions.editItem' | translate }}
+    </ion-button>
+    <ion-button
+      expand="block"
+      fill="clear"
+      class="details-button"
+      (click)="handleViewDetails()">
+      <ion-icon slot="start" name="list-outline"></ion-icon>
+      {{ 'pantry.quantitySheet.viewDetails' | translate }}
+    </ion-button>
+    <ion-button
+      expand="block"
+      fill="clear"
+       class="details-button"
+      (click)="handleDelete()">
+     <ion-icon slot="start" name="trash-outline"></ion-icon>
+      {{ 'pantry.detail.actions.deleteItem' | translate }}
+    </ion-button>
+  </div>
+</ion-content>

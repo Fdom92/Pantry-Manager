@@ -97,12 +97,6 @@
                     {{ 'dashboard.overview.cards.expired.body' | translate:{ count: facade.expiredItems().length } }}
                   </p>
                 }
-            <ion-button
-              size="small"
-              fill="clear"
-              (click)="onSummaryCardClick('expired'); $event.stopPropagation()">
-              {{ 'dashboard.overview.cards.expired.action' | translate }}
-            </ion-button>
               </ion-card-content>
             </ion-card>
           }
@@ -133,12 +127,6 @@
                     {{ 'dashboard.overview.cards.nearExpiry.body' | translate:{ count: facade.nearExpiryItems().length } }}
                   </p>
                 }
-            <ion-button
-              size="small"
-              fill="clear"
-              (click)="onSummaryCardClick('near-expiry'); $event.stopPropagation()">
-              {{ 'dashboard.overview.cards.nearExpiry.action' | translate }}
-            </ion-button>
               </ion-card-content>
             </ion-card>
           }
@@ -208,12 +196,6 @@
                     {{ 'dashboard.overview.cards.lowOrEmpty.body' | translate:{ count: facade.lowStockItems().length } }}
                   </p>
                 }
-            <ion-button
-              size="small"
-              fill="clear"
-                  (click)="onSummaryCardClick('low-or-empty'); $event.stopPropagation()">
-                  {{ 'dashboard.overview.cards.lowOrEmpty.action' | translate }}
-                </ion-button>
               </ion-card-content>
             </ion-card>
           }
@@ -245,12 +227,6 @@
                     {{ 'dashboard.overview.cards.shopping.body' | translate:{ count: facade.shoppingListCount() } }}
                   </p>
                 }
-            <ion-button
-              size="small"
-              fill="clear"
-                  (click)="onSummaryCardClick('shopping'); $event.stopPropagation()">
-                  {{ 'dashboard.overview.cards.shopping.action' | translate }}
-                </ion-button>
               </ion-card-content>
             </ion-card>
           }
@@ -291,12 +267,6 @@
                   {{ 'dashboard.overview.cards.recentlyAdded.body' | translate:{ count: facade.recentlyAddedCount() } }}
                 </p>
                 }
-              <ion-button
-                size="small"
-                fill="clear"
-                (click)="onSummaryCardClick('recently-added'); $event.stopPropagation()">
-                {{ 'dashboard.overview.cards.recentlyAdded.action' | translate }}
-              </ion-button>
             </ion-card-content>
           </ion-card>
         </div>

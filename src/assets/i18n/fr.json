@@ -52,6 +52,7 @@
       "cancel": "Annuler",
       "add": "Ajouter",
       "save": "Enregistrer",
+      "edit": "Modifier",
       "apply": "Appliquer",
       "clear": "Effacer"
     },
@@ -364,7 +365,8 @@
       "submit": "Add to pantry",
       "singleSuccess": "1 produit ajouté",
       "success": "{{ count }} produits ajoutés",
-      "error": "Impossible d’ajouter les produits."
+      "error": "Impossible d’ajouter les produits.",
+      "createAdvanced": "Créer un produit avec détails avancés"
     },
     "addMode": {
       "title": "Sélectionner le mode",
@@ -386,7 +388,15 @@
     "batches": {
       "title": "Lots du produit",
       "count": "{{ count }} lots enregistrés",
-      "open": "Ouvert"
+      "open": "Ouvert",
+      "noExpiryDate": "Sans date de péremption",
+      "expires": {
+        "today": "Expire aujourd'hui",
+        "tomorrow": "Expire demain"
+      },
+      "expired": {
+        "yesterday": "Expiré hier"
+      }
     },
     "form": {
       "editTitle": "Modifier l’article",
@@ -414,7 +424,8 @@
       "location": "Emplacement",
       "locationPlaceholder": "Sélectionnez un emplacement",
       "locationAdd": {
-        "option": "+ Ajouter un emplacement"
+        "option": "+ Ajouter un emplacement",
+        "unassigned": "Non assigné"
       },
       "batches": {
         "title": "Lots",
@@ -423,12 +434,24 @@
         "titleIndex": "Lot {{ index }}",
         "quantity": "Quantité",
         "expiry": "Date de péremption",
+        "location": "Emplacement",
         "opened": "Ouvert"
+      },
+      "quantity": {
+        "title": "Quantité",
+        "current": "Quantité",
+        "initial": "Quantité initiale",
+        "hint": "Augmenter ou diminuer la quantité totale du produit"
       }
     },
     "detail": {
       "earliest": "Expire en premier : {{ date }}",
       "noBatches": "Aucun lot enregistré.",
+      "noExpiry": "Sans date de péremption",
+      "quantity": {
+        "single": "{{ quantity }} unité",
+        "plural": "{{ quantity }} unités"
+      },
       "batchSummary": {
         "none": "Aucun lot enregistré",
         "total": {
@@ -473,6 +496,12 @@
         "expand": "Développer les détails du produit",
         "collapse": "Réduire les détails du produit"
       }
+    },
+    "quantitySheet": {
+      "currentQuantity": "Quantité",
+      "increase": "Augmenter",
+      "decrease": "Diminuer",
+      "viewDetails": "Voir les lots"
     },
     "toasts": {
       "locationRequired": "Sélectionnez un emplacement avant d’enregistrer.",

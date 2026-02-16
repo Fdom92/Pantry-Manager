@@ -18,10 +18,11 @@ import type {
   PantrySummaryMeta,
   ProductStatusState,
 } from '@core/models/pantry';
-import { ES_DATE_FORMAT_OPTIONS } from '@core/models/shared';
-import { formatDateValue, formatQuantity, roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
+import { formatQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { formatFriendlyName, normalizeCategoryId, normalizeLowercase, normalizeLocationId, normalizeStringList } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
+import { formatDistance } from 'date-fns';
+import { es, enUS, pt, fr, it, de, type Locale } from 'date-fns/locale';
 import { LanguageService } from '../shared/language.service';
 
 @Injectable({ providedIn: 'root' })
@@ -218,7 +219,6 @@ export class PantryViewModelService {
     summary: BatchSummaryMeta;
   }): PantryItemCardViewModel {
     const { item, summary } = params;
-    const locale = this.languageService.getCurrentLocale();
 
     const batches = summary.sorted.map(entry => ({
       batch: entry.batch,
@@ -235,12 +235,9 @@ export class PantryViewModelService {
     const lowStock = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock';
     const aggregates = this.computeProductAggregates(batches, lowStock);
     const colorClass = this.getColorClass(aggregates.status.state);
-    const fallbackLabel = this.translate.instant('common.dates.none');
     const formattedEarliestExpirationLong = aggregates.earliestDate
-      ? formatDateValue(aggregates.earliestDate, locale, ES_DATE_FORMAT_OPTIONS.numeric, {
-          fallback: aggregates.earliestDate,
-        })
-      : fallbackLabel;
+      ? this.formatBatchDate({ expirationDate: aggregates.earliestDate } as ItemBatch)
+      : '';
 
     return {
       item,
@@ -252,13 +249,57 @@ export class PantryViewModelService {
     };
   }
 
+  private getDateFnsLocale(): Locale {
+    const currentLang = this.languageService.getCurrentLanguage();
+    const localeMap: Record<string, Locale> = {
+      es,
+      en: enUS,
+      pt,
+      fr,
+      it,
+      de,
+    };
+    return localeMap[currentLang] || enUS;
+  }
+
+  private getCalendarDaysDifference(date1: Date, date2: Date): number {
+    // Normalize to midnight to compare only dates
+    const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
+    const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
+    const diffTime = d2.getTime() - d1.getTime();
+    return Math.round(diffTime / (1000 * 60 * 60 * 24));
+  }
+
   formatBatchDate(batch: ItemBatch): string {
     const value = batch.expirationDate;
     if (!value) {
-      return this.translate.instant('common.dates.none');
+      return this.translate.instant('pantry.batches.noExpiryDate');
     }
-    return formatDateValue(value, this.languageService.getCurrentLocale(), ES_DATE_FORMAT_OPTIONS.numeric, {
-      fallback: value,
+
+    const expiryDate = new Date(value);
+    const now = new Date();
+    const daysDiff = this.getCalendarDaysDifference(now, expiryDate);
+
+    // Handle special cases: today, tomorrow, yesterday
+    if (daysDiff === 0) {
+      return this.translate.instant('pantry.batches.expires.today');
+    }
+    if (daysDiff === 1) {
+      return this.translate.instant('pantry.batches.expires.tomorrow');
+    }
+    if (daysDiff === -1) {
+      return this.translate.instant('pantry.batches.expired.yesterday');
+    }
+
+    // For other dates, use date-fns with normalized dates (midnight)
+    // to calculate calendar days instead of exact time
+    const normalizedNow = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const normalizedExpiry = new Date(expiryDate.getFullYear(), expiryDate.getMonth(), expiryDate.getDate());
+
+    const locale = this.getDateFnsLocale();
+    return formatDistance(normalizedExpiry, normalizedNow, {
+      addSuffix: true,
+      locale,
     });
   }
 
@@ -342,6 +383,12 @@ export class PantryViewModelService {
     return Number.isFinite(time) ? time : null;
   }
 
+  private buildQuantityLabel(totalQuantity: number): string {
+    const formatted = formatQuantity(totalQuantity, this.languageService.getCurrentLocale());
+    const key = totalQuantity === 1 ? 'pantry.detail.quantity.single' : 'pantry.detail.quantity.plural';
+    return this.translate.instant(key, { quantity: formatted });
+  }
+
   private computeProductAggregates(
     batches: PantryItemBatchViewModel[],
     isLowStock: boolean
@@ -362,8 +409,11 @@ export class PantryViewModelService {
     let earliestDate: string | null = null;
     let earliestTime: number | null = null;
     let earliestStatus: ProductStatusState | null = null;
+    let totalQuantity = 0;
 
     for (const entry of batches) {
+      totalQuantity += entry.quantityValue;
+
       switch (entry.status.state) {
         case 'expired':
           counts.expired += 1;
@@ -404,7 +454,7 @@ export class PantryViewModelService {
     }
 
     const status = this.getProductStatusMeta(statusState);
-    const batchSummaryLabel = this.buildBatchSummaryLabel(counts);
+    const batchSummaryLabel = this.buildQuantityLabel(totalQuantity);
 
     return {
       status,
@@ -454,52 +504,5 @@ export class PantryViewModelService {
           accentColor: 'var(--ion-color-primary)',
         };
     }
-  }
-
-  private buildBatchSummaryLabel(counts: BatchCountsMeta): string {
-    if (!counts.total) {
-      return this.translate.instant('pantry.detail.batchSummary.none');
-    }
-
-    const descriptors: string[] = [];
-    if (counts.expired) {
-      const key =
-        counts.expired === 1
-          ? 'pantry.detail.batchSummary.expired.single'
-          : 'pantry.detail.batchSummary.expired.plural';
-      descriptors.push(this.translate.instant(key, { count: counts.expired }));
-    }
-    if (counts.nearExpiry) {
-      const key =
-        counts.nearExpiry === 1
-          ? 'pantry.detail.batchSummary.nearExpiry.single'
-          : 'pantry.detail.batchSummary.nearExpiry.plural';
-      descriptors.push(this.translate.instant(key, { count: counts.nearExpiry }));
-    }
-    if (counts.normal) {
-      const key =
-        counts.normal === 1 ? 'pantry.detail.batchSummary.normal.single' : 'pantry.detail.batchSummary.normal.plural';
-      descriptors.push(this.translate.instant(key, { count: counts.normal }));
-    }
-    if (counts.unknown) {
-      const key =
-        counts.unknown === 1
-          ? 'pantry.detail.batchSummary.unknown.single'
-          : 'pantry.detail.batchSummary.unknown.plural';
-      descriptors.push(this.translate.instant(key, { count: counts.unknown }));
-    }
-
-    const totalLabel = this.translate.instant(
-      counts.total === 1 ? 'pantry.detail.batchSummary.total.single' : 'pantry.detail.batchSummary.total.plural',
-      { count: counts.total }
-    );
-    if (!descriptors.length) {
-      return totalLabel;
-    }
-
-    return this.translate.instant('pantry.detail.batchSummary.withDescriptors', {
-      total: totalLabel,
-      descriptors: descriptors.join(', '),
-    });
   }
 }

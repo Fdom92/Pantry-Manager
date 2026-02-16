@@ -8,7 +8,7 @@ import { HistoryEventManagerService } from '../history/history-event-manager.ser
 import { PantryStoreService } from './pantry-store.service';
 
 /**
- * Manages pantry list UI state: expansion/collapse, deletion animations, keyboard handlers.
+ * Manages pantry list UI state: group collapse, deletion animations, keyboard handlers.
  */
 @Injectable()
 export class PantryListUiStateService {
@@ -21,7 +21,6 @@ export class PantryListUiStateService {
   readonly deletingItems: WritableSignal<Set<string>> = signal(new Set());
   readonly skeletonPlaceholders = Array.from({ length: 4 }, (_, index) => index);
 
-  private readonly expandedItems = new Set<string>();
   private readonly deleteAnimationDuration = ITEM_DELETE_ANIMATION_DURATION_MS;
 
   /**
@@ -29,36 +28,6 @@ export class PantryListUiStateService {
    */
   trackByItemId(_: number, item: PantryItem): string {
     return item._id;
-  }
-
-  /**
-   * Handle keyboard navigation on item summary (Enter/Space to toggle expansion).
-   */
-  onSummaryKeydown(item: PantryItem, event: KeyboardEvent): void {
-    const key = event.key.toLowerCase();
-    if (key === 'enter' || key === ' ') {
-      event.preventDefault();
-      this.toggleItemExpansion(item);
-    }
-  }
-
-  /**
-   * Check if item is expanded.
-   */
-  isExpanded(item: PantryItem): boolean {
-    return this.expandedItems.has(item._id);
-  }
-
-  /**
-   * Toggle item expansion state.
-   */
-  toggleItemExpansion(item: PantryItem, event?: Event): void {
-    event?.stopPropagation();
-    if (this.expandedItems.has(item._id)) {
-      this.expandedItems.delete(item._id);
-    } else {
-      this.expandedItems.add(item._id);
-    }
   }
 
   /**
@@ -134,23 +103,10 @@ export class PantryListUiStateService {
       await sleep(this.deleteAnimationDuration);
       await this.pantryStore.deleteItem(item._id);
       await this.eventManager.logDeleteFromCard(item);
-      this.expandedItems.delete(item._id);
     } catch (err) {
       console.error('[PantryListUiStateService] deleteItem error', err);
     } finally {
       this.unmarkItemDeleting(item._id);
-    }
-  }
-
-  /**
-   * Sync expanded items with current page items (cleanup invalid IDs).
-   */
-  syncExpandedItems(source: PantryItem[]): void {
-    const validIds = new Set(source.map(item => item._id));
-    for (const id of Array.from(this.expandedItems)) {
-      if (!validIds.has(id)) {
-        this.expandedItems.delete(id);
-      }
     }
   }
 

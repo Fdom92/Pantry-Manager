@@ -18,6 +18,7 @@ import { SettingsPreferencesService } from '../settings/settings-preferences.ser
 import { PantryBatchOperationsService } from './pantry-batch-operations.service';
 import { PantryBatchesModalStateService } from './modals/pantry-batches-modal-state.service';
 import { PantryFastAddModalStateService } from './modals/pantry-fast-add-modal-state.service';
+import { PantryQuantitySheetStateService } from './modals/pantry-quantity-sheet-state.service';
 import { PantryListUiStateService } from './pantry-list-ui-state.service';
 import { PantryStoreService } from './pantry-store.service';
 import { PantryViewModelService } from './pantry-view-model.service';
@@ -36,6 +37,7 @@ export class PantryStateService {
   private readonly listUi = inject(PantryListUiStateService);
   private readonly fastAddModal = inject(PantryFastAddModalStateService);
   private readonly batchesModal = inject(PantryBatchesModalStateService);
+  private readonly quantitySheet = inject(PantryQuantitySheetStateService);
 
   // Core state signals
   readonly skeletonPlaceholders = this.listUi.skeletonPlaceholders;
@@ -45,7 +47,6 @@ export class PantryStateService {
   readonly pipelineResetting: Signal<boolean> = this.pantryStore.pipelineResetting;
   readonly hasCompletedInitialLoad: WritableSignal<boolean> = signal(false);
   readonly editItemModalRequest: WritableSignal<{ mode: 'create' } | { mode: 'edit'; item: PantryItem } | null> = signal(null);
-  readonly addModeSheetOpen: WritableSignal<boolean> = signal(false);
   readonly pantryItemsState: WritableSignal<PantryItem[]> = signal([]);
   readonly summarySnapshot: WritableSignal<PantrySummaryMeta> = signal({
     total: 0,
@@ -71,6 +72,12 @@ export class PantryStateService {
   readonly fastAddEmptyActionLabel = this.fastAddModal.fastAddEmptyActionLabel;
   readonly showBatchesModal = this.batchesModal.showBatchesModal;
   readonly selectedBatchesItem = this.batchesModal.selectedBatchesItem;
+  readonly batchesEditMode = this.batchesModal.editMode;
+  readonly editedBatches = this.batchesModal.editedBatches;
+  readonly batchesIsSaving = this.batchesModal.isSaving;
+  readonly showQuantitySheet = this.quantitySheet.showQuantitySheet;
+  readonly selectedQuantitySheetItem = this.quantitySheet.selectedItem;
+  readonly pendingQuantityChange = this.quantitySheet.pendingQuantityChange;
 
   // Computed signals coordinating across services
   readonly groups = computed(() => this.viewModel.buildGroups(this.pantryItemsState()));
@@ -90,6 +97,15 @@ export class PantryStateService {
     // Provide batch summaries to batches modal service
     this.batchesModal.batchSummaries = this.batchSummaries;
 
+    // Provide location options to batches modal service
+    this.batchesModal.locationOptions = this.presetLocationOptions;
+
+    // Provide pantry items state to batches modal for optimistic updates
+    this.batchesModal.pantryItemsState = this.pantryItemsState;
+
+    // Provide pantry items state to quantity sheet service for optimistic updates
+    this.quantitySheet.pantryItemsState = this.pantryItemsState;
+
     // Keep UI in sync with filtered pipeline, merging optimistic batch edits
     effect(() => {
       const paginatedItems = this.pantryStore.filteredProducts();
@@ -107,8 +123,7 @@ export class PantryStateService {
       }
     });
 
-    // Sync expanded items and collapsed groups with current page
-    effect(() => this.listUi.syncExpandedItems(this.pantryItemsState()));
+    // Sync collapsed groups with current page
     effect(() => this.listUi.syncCollapsedGroups(this.groups()));
   }
 
@@ -167,29 +182,9 @@ export class PantryStateService {
     this.editItemModalRequest.set({ mode: 'create' });
   }
 
-  openAddModeSheet(event?: Event): void {
-    event?.stopPropagation();
-    this.addModeSheetOpen.set(true);
-  }
-
-  closeAddModeSheet(): void {
-    if (!this.addModeSheetOpen()) return;
-    this.addModeSheetOpen.set(false);
-  }
-
-  selectAddModeSimple(): void {
-    this.closeAddModeSheet();
-    this.fastAddModal.openFastAddModal();
-  }
-
-  selectAddModeAdvanced(): void {
-    this.closeAddModeSheet();
+  openAdvancedFromFastAdd(): void {
+    this.fastAddModal.closeFastAddModal();
     this.openAdvancedAddModal();
-  }
-
-  openEditItemModal(item: PantryItem, event?: Event): void {
-    event?.stopPropagation();
-    this.editItemModalRequest.set({ mode: 'edit', item });
   }
 
   clearEditItemModalRequest(): void {
@@ -209,9 +204,6 @@ export class PantryStateService {
 
   // -------- List UI state (delegates to PantryListUiStateService) --------
   trackByItemId = (index: number, item: PantryItem) => this.listUi.trackByItemId(index, item);
-  onSummaryKeydown = (item: PantryItem, event: KeyboardEvent) => this.listUi.onSummaryKeydown(item, event);
-  isExpanded = (item: PantryItem) => this.listUi.isExpanded(item);
-  toggleItemExpansion = (item: PantryItem, event?: Event) => this.listUi.toggleItemExpansion(item, event);
   isGroupCollapsed = (key: string) => this.listUi.isGroupCollapsed(key);
   toggleGroupCollapse = (key: string, event?: Event) => this.listUi.toggleGroupCollapse(key, event);
   onGroupHeaderKeydown = (key: string, event: KeyboardEvent) => this.listUi.onGroupHeaderKeydown(key, event);
@@ -292,6 +284,34 @@ export class PantryStateService {
   formatBatchDate = (batch: ItemBatch) => this.batchesModal.formatBatchDate(batch);
   formatBatchQuantity = (batch: ItemBatch) => this.batchesModal.formatBatchQuantity(batch);
   getBatchStatus = (batch: ItemBatch) => this.batchesModal.getBatchStatus(batch);
+  enterBatchesEditMode = () => this.batchesModal.enterEditMode();
+  cancelBatchesEditMode = () => this.batchesModal.cancelEditMode();
+  updateBatchQuantity = (index: number, quantity: number) => this.batchesModal.updateBatchQuantity(index, quantity);
+  updateBatchExpirationDate = (index: number, dateString: string) => this.batchesModal.updateBatchExpirationDate(index, dateString);
+  updateBatchLocation = (index: number, locationId: string) => this.batchesModal.updateBatchLocation(index, locationId);
+  getBatchDateInputValue = (batch: ItemBatch) => this.batchesModal.getBatchDateInputValue(batch);
+  saveBatches = async () => await this.batchesModal.saveBatches();
+
+  // -------- Quantity sheet (delegates to PantryQuantitySheetStateService) --------
+  openQuantitySheet = (item: PantryItem, event?: Event) => this.quantitySheet.openQuantitySheet(item, event);
+  dismissQuantitySheet = () => this.quantitySheet.dismissQuantitySheet();
+  incrementQuantity = (item: PantryItem) => this.quantitySheet.incrementQuantity(item);
+  decrementQuantity = (item: PantryItem) => this.quantitySheet.decrementQuantity(item);
+  getQuantitySheetTotalQuantity = (item: PantryItem) => this.quantitySheet.getTotalQuantity(item);
+
+  async closeQuantitySheetWithSave(): Promise<void> {
+    await this.quantitySheet.closeQuantitySheet();
+  }
+
+  openBatchesModalFromSheet(item: PantryItem): void {
+    this.quantitySheet.dismissQuantitySheet();
+    this.batchesModal.openBatchesModal(item);
+  }
+
+  openEditModalFromSheet(item: PantryItem): void {
+    this.quantitySheet.dismissQuantitySheet();
+    this.editItemModalRequest.set({ mode: 'edit', item });
+  }
 
   onDestroy(): void {
     this.batchOps.clearAll();

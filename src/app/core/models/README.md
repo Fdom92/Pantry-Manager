@@ -79,7 +79,6 @@ interface PantryItemCardViewModel {
 ```
 
 **Key changes (2026-02-13)**:
-
 - ❌ Removed unused properties: `totalQuantity`, `totalQuantityLabel`, `earliestExpirationDate`, `batchCounts`
 
 ## 🎨 Conventions

@@ -52,6 +52,7 @@
       "cancel": "Cancel",
       "add": "Add",
       "save": "Save",
+      "edit": "Edit",
       "apply": "Apply",
       "clear": "Clear"
     },
@@ -364,7 +365,8 @@
       "submit": "Add to pantry",
       "singleSuccess": "1 product added",
       "success": "{{ count }} products added",
-      "error": "Couldn't add the products."
+      "error": "Couldn't add the products.",
+      "createAdvanced": "Create product with advanced details"
     },
     "addMode": {
       "title": "Select mode",
@@ -386,7 +388,15 @@
     "batches": {
       "title": "Product batches",
       "count": "{{ count }} batches recorded",
-      "open": "Opened"
+      "open": "Opened",
+      "noExpiryDate": "No expiration date",
+      "expires": {
+        "today": "Expires today",
+        "tomorrow": "Expires tomorrow"
+      },
+      "expired": {
+        "yesterday": "Expired yesterday"
+      }
     },
     "form": {
       "editTitle": "Edit item",
@@ -414,7 +424,8 @@
       "location": "Location",
       "locationPlaceholder": "Select a location",
       "locationAdd": {
-        "option": "+ Add location"
+        "option": "+ Add location",
+        "unassigned": "Unassigned"
       },
       "batches": {
         "title": "Batches",
@@ -423,12 +434,24 @@
         "titleIndex": "Batch {{ index }}",
         "quantity": "Quantity",
         "expiry": "Expiration date",
+        "location": "Location",
         "opened": "Opened"
+      },
+      "quantity": {
+        "title": "Quantity",
+        "current": "Quantity",
+        "initial": "Initial quantity",
+        "hint": "Increase or decrease the total product quantity"
       }
     },
     "detail": {
       "earliest": "Expires first: {{ date }}",
       "noBatches": "No batches recorded.",
+      "noExpiry": "No expiration",
+      "quantity": {
+        "single": "{{ quantity }} unit",
+        "plural": "{{ quantity }} units"
+      },
       "batchSummary": {
         "none": "No batches recorded",
         "total": {
@@ -467,12 +490,19 @@
       },
       "actions": {
         "viewBatches": "View batches",
-        "editItem": "Edit item",
+        "editItem": "Edit product",
         "deleteItem": "Delete item",
         "menuLabel": "Open actions menu",
         "expand": "Expand item details",
         "collapse": "Collapse item details"
       }
+    },
+    "quantitySheet": {
+      "currentQuantity": "Quantity",
+      "hint": "Adjust the quantity. It will be saved when closed.",
+      "increase": "Increase",
+      "decrease": "Decrease",
+      "viewDetails": "View batches"
     },
     "toasts": {
       "locationRequired": "Select a location before saving.",

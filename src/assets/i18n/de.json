@@ -52,6 +52,7 @@
       "cancel": "Abbrechen",
       "add": "Hinzufügen",
       "save": "Speichern",
+      "edit": "Bearbeiten",
       "apply": "Anwenden",
       "clear": "Leeren"
     },
@@ -364,7 +365,8 @@
       "submit": "Add to pantry",
       "singleSuccess": "1 Produkt hinzugefügt",
       "success": "{{ count }} Produkte hinzugefügt",
-      "error": "Produkte konnten nicht hinzugefügt werden."
+      "error": "Produkte konnten nicht hinzugefügt werden.",
+      "createAdvanced": "Produkt mit erweiterten Details erstellen"
     },
     "addMode": {
       "title": "Modus auswählen",
@@ -386,7 +388,15 @@
     "batches": {
       "title": "Produktchargen",
       "count": "{{ count }} registrierte Chargen",
-      "open": "Geöffnet"
+      "open": "Geöffnet",
+      "noExpiryDate": "Kein Ablaufdatum",
+      "expires": {
+        "today": "Läuft heute ab",
+        "tomorrow": "Läuft morgen ab"
+      },
+      "expired": {
+        "yesterday": "Gestern abgelaufen"
+      }
     },
     "form": {
       "editTitle": "Artikel bearbeiten",
@@ -414,7 +424,8 @@
       "location": "Standort",
       "locationPlaceholder": "Standort auswählen",
       "locationAdd": {
-        "option": "+ Standort hinzufügen"
+        "option": "+ Standort hinzufügen",
+        "unassigned": "Nicht zugeordnet"
       },
       "batches": {
         "title": "Chargen",
@@ -423,12 +434,24 @@
         "titleIndex": "Charge {{ index }}",
         "quantity": "Menge",
         "expiry": "Haltbarkeitsdatum",
+        "location": "Standort",
         "opened": "Geöffnet"
+      },
+      "quantity": {
+        "title": "Menge",
+        "current": "Menge",
+        "initial": "Anfangsmenge",
+        "hint": "Gesamtmenge des Produkts erhöhen oder verringern"
       }
     },
     "detail": {
       "earliest": "Läuft zuerst ab: {{ date }}",
       "noBatches": "Keine Chargen erfasst.",
+      "noExpiry": "Kein Ablaufdatum",
+      "quantity": {
+        "single": "{{ quantity }} Einheit",
+        "plural": "{{ quantity }} Einheiten"
+      },
       "batchSummary": {
         "none": "Keine Chargen erfasst",
         "total": {
@@ -473,6 +496,12 @@
         "expand": "Produktdetails erweitern",
         "collapse": "Produktdetails reduzieren"
       }
+    },
+    "quantitySheet": {
+      "currentQuantity": "Menge",
+      "increase": "Erhöhen",
+      "decrease": "Verringern",
+      "viewDetails": "Chargen anzeigen"
     },
     "toasts": {
       "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
