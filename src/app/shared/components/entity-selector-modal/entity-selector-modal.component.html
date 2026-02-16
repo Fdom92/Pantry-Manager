@@ -74,6 +74,17 @@
           }
         </div>
       </div>
+      @if (showSecondaryAction && secondaryActionLabel) {
+        <div class="secondary-action-container">
+          <button
+            type="button"
+            class="secondary-action-link"
+            (click)="secondaryAction.emit()">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+            <span>{{ secondaryActionLabel }}</span>
+          </button>
+        </div>
+      }
     </ion-content>
     <ion-footer class="modal-footer">
       <ion-toolbar>

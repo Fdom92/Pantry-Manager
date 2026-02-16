@@ -6,31 +6,6 @@ import { isSundayAfternoon, isWithinHours } from '@core/utils';
 export { PENDING_REVIEW_STALE_DAYS } from '../shared/shared.constants';
 export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
   {
-    id: InsightId.PENDING_PRODUCT_UPDATES,
-    titleKey: 'insights.library.pendingProductUpdates.title',
-    descriptionKey: 'insights.library.pendingProductUpdates.description',
-    priority: 0,
-    audience: 'all',
-    predicate: context => {
-      const missingInfoOnlyCount = context.pendingReviewProducts.filter(
-        product => product.reasons.includes('missing-info') && !product.reasons.includes('stale-update')
-      ).length;
-      const staleAndMissingInfoCount = context.pendingReviewProducts.filter(
-        product => product.reasons.includes('missing-info') && product.reasons.includes('stale-update')
-      ).length;
-      return missingInfoOnlyCount >= 5 || staleAndMissingInfoCount >= 10;
-    },
-    dismissLabelKey: 'insights.library.pendingProductUpdates.dismiss',
-    ctas: [
-      {
-        id: 'review-pantry-items',
-        labelKey: 'insights.library.pendingProductUpdates.cta',
-        type: 'navigate',
-        route: '/up-to-date',
-      },
-    ],
-  },
-  {
     id: InsightId.WEEKLY_MEAL_PLANNING,
     titleKey: 'insights.library.weeklyMealPlanning.title',
     descriptionKey: 'insights.library.weeklyMealPlanning.description',

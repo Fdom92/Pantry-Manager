@@ -122,81 +122,59 @@
             }
           </div>
 
-          <div class="batch-form-header">
-            <h5>{{ 'pantry.form.batches.title' | translate }}</h5>
-            <ion-button fill="clear" size="small" (click)="state.addBatchEntry()">
-              <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-              {{ 'pantry.form.batches.add' | translate }}
-            </ion-button>
-          </div>
-          <div formArrayName="batches" class="batch-form-list">
-            @if (state.batchesArray.length === 0) {
-              <ion-list>
-                <ion-item lines="none">
-                  <app-empty-state
-                    class="list-empty-state"
-                    icon="cube-outline"
-                    [title]="'pantry.form.batches.title' | translate"
-                    [subtitle]="'pantry.form.batches.empty' | translate"
-                    [compact]="true">
-                  </app-empty-state>
-                </ion-item>
-              </ion-list>
-            }
-            @for (batchCtrl of state.batchesArray.controls; track $index; let i = $index) {
-              <div class="form-section batch-form-card" [formGroupName]="i">
-                <div class="batch-form-card-header">
-                  <h6>{{ 'pantry.form.batches.titleIndex' | translate:{ index: i + 1 } }}</h6>
-                  <ion-button
-                    fill="clear"
-                    size="small"
-                    color="danger"
-                    (click)="state.removeBatchEntry(i)">
-                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                  </ion-button>
+          @if (state.editingItem()) {
+            <!-- Edit mode: Quantity adjuster -->
+            <div class="form-section-header">
+              <h5>{{ 'pantry.form.quantity.title' | translate }}</h5>
+            </div>
+            <div class="form-section quantity-adjuster-section">
+              <span class="quantity-label">{{ 'pantry.form.quantity.current' | translate }}</span>
+              <div class="quantity-controls">
+                <ion-button
+                  fill="clear"
+                  class="control-button control-button--minus"
+                  [disabled]="state.getDisplayQuantity() <= 0"
+                  (click)="state.decrementQuantity()">
+                  <ion-icon slot="icon-only" name="remove"></ion-icon>
+                </ion-button>
+                <div class="quantity-display">
+                  @if (state.pendingQuantityChange() !== 0) {
+                    <span class="quantity-number">
+                      <span class="quantity-original">{{ state.getTotalQuantity() }}</span>
+                      <ion-icon name="arrow-forward-outline" class="quantity-arrow"></ion-icon>
+                      <span class="quantity-new" [class.quantity-new--negative]="state.pendingQuantityChange() < 0">{{ state.getDisplayQuantity() }}</span>
+                    </span>
+                  } @else {
+                    <span class="quantity-number">{{ state.getTotalQuantity() }}</span>
+                  }
                 </div>
-                <ion-list lines="none" class="batch-form-listing">
-                  <div class="form-autocomplete batch-row">
-                    <app-entity-autocomplete
-                      [items]="state.getLocationAutocompleteOptionsForBatch(i)"
-                      [label]="'pantry.form.location' | translate"
-                      labelPlacement="stacked"
-                      [placeholder]="'pantry.form.locationPlaceholder' | translate"
-                      [showAllOnFocus]="true"
-                      [showEmptyAction]="true"
-                      [showEmptyActionWhenNoExactMatch]="true"
-                      [emptyActionLabel]="'pantry.form.locationAdd.option' | translate"
-                      [emptyLabel]="'common.selects.noOptions' | translate"
-                      [value]="state.batchesArray.at(i).get('locationId')?.value ?? ''"
-                      [clearOnSelect]="false"
-                      (optionSelected)="state.onLocationAutocompleteSelect(i, $event)"
-                      (emptyAction)="state.addLocationOptionFromText(i, $event)">
-                    </app-entity-autocomplete>
-                  </div>
-                  <ion-item class="batch-row">
-                    <ion-input
-                      type="number"
-                      min="0"
-                      formControlName="quantity"
-                      label="{{ 'pantry.form.batches.quantity' | translate }}"
-                      labelPlacement="stacked">
-                    </ion-input>
-                  </ion-item>
-                  <ion-item class="batch-row">
-                    <ion-input
-                      type="date"
-                      formControlName="expirationDate"
-                      label="{{ 'pantry.form.batches.expiry' | translate }}"
-                      labelPlacement="stacked">
-                    </ion-input>
-                  </ion-item>
-                  <ion-item class="batch-row" lines="none">
-                    <ion-toggle formControlName="opened" justify="space-between">{{ 'pantry.form.batches.opened' | translate }}</ion-toggle>
-                  </ion-item>
-                </ion-list>
+                <ion-button
+                  fill="clear"
+                  class="control-button control-button--plus"
+                  (click)="state.incrementQuantity()">
+                  <ion-icon slot="icon-only" name="add"></ion-icon>
+                </ion-button>
               </div>
-            }
-          </div>
+              <span class="quantity-hint">{{ 'pantry.form.quantity.hint' | translate }}</span>
+            </div>
+          } @else {
+            <!-- Create mode: Initial quantity input -->
+            <div class="form-section-header">
+              <h5>{{ 'pantry.form.quantity.title' | translate }}</h5>
+            </div>
+            <div class="form-section">
+              <ion-item lines="none">
+                <ion-input
+                  type="number"
+                  min="0"
+                  formControlName="initialQuantity"
+                  label="{{ 'pantry.form.quantity.initial' | translate }}"
+                  labelPlacement="stacked"
+                  [placeholder]="'0'">
+                </ion-input>
+              </ion-item>
+            </div>
+          }
 
         </form>
       }

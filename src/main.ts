@@ -15,10 +15,12 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { addIcons } from 'ionicons';
 import {
+  add,
   addCircleOutline,
   addOutline,
   alertCircleOutline,
   apertureOutline,
+  arrowForwardOutline,
   basketOutline,
   bulbOutline,
   calendarOutline,
@@ -26,9 +28,11 @@ import {
   chatbubblesOutline,
   checkmarkCircleOutline,
   chevronDownOutline,
+  chevronForwardOutline,
   chevronUpOutline,
   clipboardOutline,
   close,
+  closeOutline,
   cloudUploadOutline,
   constructOutline,
   createOutline,
@@ -51,6 +55,7 @@ import {
   paperPlaneOutline,
   pricetagOutline,
   refreshOutline,
+  remove,
   removeCircleOutline,
   removeOutline,
   restaurantOutline,
@@ -94,6 +99,8 @@ function localeFactory(language: LanguageService): string {
 }
 
 addIcons({
+  add: add,
+  remove: remove,
   close: close,
   'home-outline': homeOutline,
   'basket-outline': basketOutline,
@@ -144,7 +151,10 @@ addIcons({
   'cloud-upload-outline': cloudUploadOutline,
   'sunny-outline': sunnyOutline,
   'moon-outline': moonOutline,
-  'desktop-outline': desktopOutline
+  'desktop-outline': desktopOutline,
+  'close-outline': closeOutline,
+  'arrow-forward-outline': arrowForwardOutline,
+  'chevron-forward-outline': chevronForwardOutline
 });
 
 bootstrapApplication(AppComponent, {

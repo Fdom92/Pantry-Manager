@@ -52,6 +52,7 @@
       "cancel": "Cancelar",
       "add": "Adicionar",
       "save": "Guardar",
+      "edit": "Editar",
       "apply": "Aplicar",
       "clear": "Limpar"
     },
@@ -142,9 +143,6 @@
         "alerts": {
           "title": "Alertas"
         },
-        "dailyActions": {
-          "title": "Daily actions"
-        },
         "control": {
           "title": "Control"
         },
@@ -166,11 +164,6 @@
           "body": "{{ count }} produtos expirados",
           "action": "Ver"
         },
-        "pendingReview": {
-          "title": "Despensa por completar",
-          "body": "{{ count }} produtos por rever",
-          "action": "Rever"
-        },
         "lowOrEmpty": {
           "title": "Stock baixo",
           "body": "{{ count }} produtos com stock baixo",
@@ -181,11 +174,6 @@
           "body": "{{ count }} produtos pendentes",
           "action": "Ver"
         },
-        "consumeToday": {
-          "title": "Consumido hoje",
-          "body": "Registra o que usaste hoje",
-          "action": "Adicionar"
-        },
         "recentlyAdded": {
           "title": "Adicionados recentemente",
           "body": "{{ count }} novos produtos",
@@ -195,7 +183,6 @@
       "toasts": {
         "expiredEmpty": "Está tudo bem — não há itens expirados.",
         "nearExpiryEmpty": "Está tudo bem — não há itens a expirar em breve.",
-        "pendingReviewEmpty": "Está tudo bem — não há nada por completar.",
         "lowOrEmptyEmpty": "Está tudo bem — não há itens com stock baixo.",
         "recentlyAddedEmpty": "Está tudo bem — não há itens adicionados recentemente.",
         "shoppingEmpty": "Está tudo bem — a tua lista de compras está vazia.",
@@ -214,11 +201,6 @@
       "minLabel": "mín {{ value }}",
       "empty": "Todos os itens estão acima do nível mínimo."
     },
-    "batches": {
-      "single": "1 lote",
-      "plural": "{{ count }} lotes",
-      "withExpiry": "{{ batchLabel }}, exp {{ date }}"
-    },
     "expired": {
       "title": "Itens expirados",
       "deleteAria": "Eliminar itens expirados",
@@ -231,16 +213,6 @@
       "updated": "Atualizado em {{ date }}",
       "badge": "Novo",
       "empty": "Sem atualizações recentes."
-    },
-    "consumeToday": {
-      "title": "Consumed today",
-      "cardTitle": "Add products",
-      "selectHint": "Pick what you used today, then set quantities.",
-      "listTitle": "Your list",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "empty": "No items added yet.",
-      "save": "Save"
     }
   },
   "shopping": {
@@ -312,34 +284,6 @@
         "description": "Desbloqueie o planejador PRO e organize seu menu com facilidade.",
         "cta": "Torne-se PRO"
       }
-    }
-  },
-  "upToDate": {
-    "title": "Pôr em dia",
-    "subtitle": "Revê alguns produtos para manter a tua despensa correta e atualizada.",
-    "progress": "Produtos pendentes {{ pending }} de {{ total }}",
-    "lastUpdated": "Última atualização: {{ date }}",
-    "fields": {
-      "expiry": "Validade",
-      "stock": "Stock"
-    },
-    "edit": {
-      "title": "Atualizar produto",
-      "expiryToggle": "Adicionar data de validade"
-    },
-    "reasons": {
-      "stale-update": "Sem atualização há algum tempo",
-      "missing-info": "Falta informação"
-    },
-    "actions": {
-      "keep": "Fica aqui",
-      "delete": "Eliminar",
-      "edit": "Editar",
-      "skip": "Saltar por agora"
-    },
-    "done": {
-      "title": "Despensa em dia, bom trabalho",
-      "subtitle": "A voltar ao dashboard…"
     }
   },
   "agent": {
@@ -421,7 +365,8 @@
       "submit": "Add to pantry",
       "singleSuccess": "1 produto adicionado",
       "success": "{{ count }} produtos adicionados",
-      "error": "Não foi possível adicionar os produtos."
+      "error": "Não foi possível adicionar os produtos.",
+      "createAdvanced": "Criar produto com detalhes avançados"
     },
     "addMode": {
       "title": "Selecionar modo",
@@ -443,7 +388,15 @@
     "batches": {
       "title": "Lotes de produtos",
       "count": "{{ count }} lotes registados",
-      "open": "Aberto"
+      "open": "Aberto",
+      "noExpiryDate": "Sem data de validade",
+      "expires": {
+        "today": "Expira hoje",
+        "tomorrow": "Expira amanhã"
+      },
+      "expired": {
+        "yesterday": "Expirou ontem"
+      }
     },
     "form": {
       "editTitle": "Editar item",
@@ -471,7 +424,8 @@
       "location": "Localização",
       "locationPlaceholder": "Seleciona uma localização",
       "locationAdd": {
-        "option": "+ Adicionar localização"
+        "option": "+ Adicionar localização",
+        "unassigned": "Não atribuído"
       },
       "batches": {
         "title": "Lotes",
@@ -480,12 +434,24 @@
         "titleIndex": "Lote {{ index }}",
         "quantity": "Quantidade",
         "expiry": "Data de validade",
+        "location": "Localização",
         "opened": "Aberto"
+      },
+      "quantity": {
+        "title": "Quantidade",
+        "current": "Quantidade",
+        "initial": "Quantidade inicial",
+        "hint": "Aumentar ou diminuir a quantidade total do produto"
       }
     },
     "detail": {
       "earliest": "Expira primeiro: {{ date }}",
       "noBatches": "Nenhum lote registado.",
+      "noExpiry": "Sem validade",
+      "quantity": {
+        "single": "{{ quantity }} unidade",
+        "plural": "{{ quantity }} unidades"
+      },
       "batchSummary": {
         "none": "Nenhum lote registado",
         "total": {
@@ -524,12 +490,18 @@
       },
       "actions": {
         "viewBatches": "Ver lotes",
-        "editItem": "Editar item",
+        "editItem": "Editar produto",
         "deleteItem": "Eliminar item",
         "menuLabel": "Abrir menu de ações",
         "expand": "Mostrar detalhes do item",
         "collapse": "Esconder detalhes do item"
       }
+    },
+    "quantitySheet": {
+      "currentQuantity": "Quantidade",
+      "increase": "Aumentar",
+      "decrease": "Diminuir",
+      "viewDetails": "Ver lotes"
     },
     "toasts": {
       "locationRequired": "Seleciona uma localização antes de guardar.",

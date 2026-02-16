@@ -52,6 +52,7 @@
       "cancel": "Cancel",
       "add": "Add",
       "save": "Save",
+      "edit": "Edit",
       "apply": "Apply",
       "clear": "Clear"
     },
@@ -142,9 +143,6 @@
         "alerts": {
           "title": "Alerts"
         },
-        "dailyActions": {
-          "title": "Daily actions"
-        },
         "control": {
           "title": "Control"
         },
@@ -166,11 +164,6 @@
           "body": "{{ count }} expired products",
           "action": "View"
         },
-        "pendingReview": {
-          "title": "Pantry to complete",
-          "body": "{{ count }} products to review",
-          "action": "Review"
-        },
         "lowOrEmpty": {
           "title": "Low stock",
           "body": "{{ count }} products low on stock",
@@ -181,11 +174,6 @@
           "body": "{{ count }} items pending",
           "action": "View"
         },
-        "consumeToday": {
-          "title": "Consumed today",
-          "body": "Log what you used today",
-          "action": "Add"
-        },
         "recentlyAdded": {
           "title": "Recently added",
           "body": "{{ count }} new products",
@@ -195,7 +183,6 @@
       "toasts": {
         "expiredEmpty": "All good — nothing expired.",
         "nearExpiryEmpty": "All good — nothing expiring soon.",
-        "pendingReviewEmpty": "All good — nothing pending to complete.",
         "lowOrEmptyEmpty": "All good — no low-stock items.",
         "recentlyAddedEmpty": "All good — nothing recently added.",
         "shoppingEmpty": "All good — your shopping list is empty.",
@@ -214,11 +201,6 @@
       "minLabel": "min {{ value }}",
       "empty": "All items are above their minimum level."
     },
-    "batches": {
-      "single": "1 batch",
-      "plural": "{{ count }} batches",
-      "withExpiry": "{{ batchLabel }}, exp {{ date }}"
-    },
     "expired": {
       "title": "Expired items",
       "deleteAria": "Delete expired items",
@@ -231,16 +213,6 @@
       "updated": "Updated {{ date }}",
       "badge": "New",
       "empty": "No recent updates."
-    },
-    "consumeToday": {
-      "title": "Consumed today",
-      "cardTitle": "Add products",
-      "selectHint": "Pick what you used today, then set quantities.",
-      "listTitle": "Your list",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "empty": "No items added yet.",
-      "save": "Save"
     }
   },
   "shopping": {
@@ -312,34 +284,6 @@
         "description": "Unlock the PRO planner and organize your menu easily.",
         "cta": "Go PRO"
       }
-    }
-  },
-  "upToDate": {
-    "title": "Get up to date",
-    "subtitle": "Review a few products to keep your pantry accurate and up to date",
-    "progress": "Products pending {{ pending }} of {{ total }}",
-    "lastUpdated": "Last updated: {{ date }}",
-    "fields": {
-      "expiry": "Expiry date",
-      "stock": "Stock"
-    },
-    "edit": {
-      "title": "Update product",
-      "expiryToggle": "Add expiry date"
-    },
-    "reasons": {
-      "stale-update": "Not updated in a while",
-      "missing-info": "Missing information"
-    },
-    "actions": {
-      "keep": "Keep it",
-      "delete": "Delete",
-      "edit": "Edit",
-      "skip": "Skip for now"
-    },
-    "done": {
-      "title": "Pantry up to date, nice work",
-      "subtitle": "Returning to your dashboard…"
     }
   },
   "agent": {
@@ -421,7 +365,8 @@
       "submit": "Add to pantry",
       "singleSuccess": "1 product added",
       "success": "{{ count }} products added",
-      "error": "Couldn't add the products."
+      "error": "Couldn't add the products.",
+      "createAdvanced": "Create product with advanced details"
     },
     "addMode": {
       "title": "Select mode",
@@ -443,7 +388,15 @@
     "batches": {
       "title": "Product batches",
       "count": "{{ count }} batches recorded",
-      "open": "Opened"
+      "open": "Opened",
+      "noExpiryDate": "No expiration date",
+      "expires": {
+        "today": "Expires today",
+        "tomorrow": "Expires tomorrow"
+      },
+      "expired": {
+        "yesterday": "Expired yesterday"
+      }
     },
     "form": {
       "editTitle": "Edit item",
@@ -471,7 +424,8 @@
       "location": "Location",
       "locationPlaceholder": "Select a location",
       "locationAdd": {
-        "option": "+ Add location"
+        "option": "+ Add location",
+        "unassigned": "Unassigned"
       },
       "batches": {
         "title": "Batches",
@@ -480,12 +434,24 @@
         "titleIndex": "Batch {{ index }}",
         "quantity": "Quantity",
         "expiry": "Expiration date",
+        "location": "Location",
         "opened": "Opened"
+      },
+      "quantity": {
+        "title": "Quantity",
+        "current": "Quantity",
+        "initial": "Initial quantity",
+        "hint": "Increase or decrease the total product quantity"
       }
     },
     "detail": {
       "earliest": "Expires first: {{ date }}",
       "noBatches": "No batches recorded.",
+      "noExpiry": "No expiration",
+      "quantity": {
+        "single": "{{ quantity }} unit",
+        "plural": "{{ quantity }} units"
+      },
       "batchSummary": {
         "none": "No batches recorded",
         "total": {
@@ -524,12 +490,19 @@
       },
       "actions": {
         "viewBatches": "View batches",
-        "editItem": "Edit item",
+        "editItem": "Edit product",
         "deleteItem": "Delete item",
         "menuLabel": "Open actions menu",
         "expand": "Expand item details",
         "collapse": "Collapse item details"
       }
+    },
+    "quantitySheet": {
+      "currentQuantity": "Quantity",
+      "hint": "Adjust the quantity. It will be saved when closed.",
+      "increase": "Increase",
+      "decrease": "Decrease",
+      "viewDetails": "View batches"
     },
     "toasts": {
       "locationRequired": "Select a location before saving.",

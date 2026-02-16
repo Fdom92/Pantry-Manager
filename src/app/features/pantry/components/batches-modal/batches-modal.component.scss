@@ -3,20 +3,78 @@ ion-title, ion-back-button {
 }
 
 .batches-modal-content {
-  padding: 0 0 24px;
+  --padding-bottom: 24px;
 }
 
-.batches-modal-header {
-  padding: 8px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.batches-modal-header h2 {
+.batches-card {
   margin: 0;
-  font-size: 1.1rem;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--ion-card-background, var(--ion-card-background));
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+}
+
+.batches-card__header {
+  margin-bottom: 16px;
+}
+
+.batches-card__title {
+  font-size: 1.25rem;
   font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.batches-card__subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ion-color-medium);
+}
+
+.batches-card ion-list {
+  background: transparent;
+  padding: 0;
+}
+
+.batches-card ion-item {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 12px;
+}
+
+.batches-card ion-item:last-child {
+  margin-bottom: 0;
+}
+
+.batches-card ion-item ion-label h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 4px 0;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.batches-card ion-item ion-label h3 ion-icon {
+  font-size: 16px;
+  color: var(--ion-color-medium);
+}
+
+.batches-card ion-item ion-label h3.no-date {
+  color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  font-weight: 500;
+}
+
+.batches-card ion-item ion-label p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+}
+
+.batches-card ion-item ion-badge {
+  margin-top: 6px;
 }
 
 .modal-spinner {
@@ -24,9 +82,54 @@ ion-title, ion-back-button {
   margin: 48px auto;
 }
 
-.modal-title-value {
-  font-size: 1.25rem;
-  font-weight: 600;
+.edit-batches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.edit-batch-card {
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ion-color-primary) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit-batch-row-inline {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.edit-batch-row-inline ion-input {
+  flex: 1;
+  --background: var(--ion-card-background);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border-radius: 8px;
+}
+
+.edit-batch-row ion-input,
+.edit-batch-row ion-select {
+  --background: var(--ion-card-background);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border-radius: 8px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+}
+
+.edit-actions ion-button {
   margin: 0;
 }
 

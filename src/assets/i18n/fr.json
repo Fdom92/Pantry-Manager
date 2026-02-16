@@ -52,6 +52,7 @@
       "cancel": "Annuler",
       "add": "Ajouter",
       "save": "Enregistrer",
+      "edit": "Modifier",
       "apply": "Appliquer",
       "clear": "Effacer"
     },
@@ -142,9 +143,6 @@
         "alerts": {
           "title": "Alertes"
         },
-        "dailyActions": {
-          "title": "Daily actions"
-        },
         "control": {
           "title": "Control"
         },
@@ -166,11 +164,6 @@
           "body": "{{ count }} produits périmés",
           "action": "Voir"
         },
-        "pendingReview": {
-          "title": "Garde-manger à compléter",
-          "body": "{{ count }} produits à mettre à jour",
-          "action": "Revoir"
-        },
         "lowOrEmpty": {
           "title": "Stock faible",
           "body": "{{ count }} produits en stock faible",
@@ -181,11 +174,6 @@
           "body": "{{ count }} articles à acheter",
           "action": "Voir"
         },
-        "consumeToday": {
-          "title": "Consommé aujourd'hui",
-          "body": "Enregistre ce que tu as utilisé aujourd'hui",
-          "action": "Ajouter"
-        },
         "recentlyAdded": {
           "title": "Ajoutés récemment",
           "body": "{{ count }} nouveaux produits",
@@ -195,7 +183,6 @@
       "toasts": {
         "expiredEmpty": "Tout va bien — aucun article périmé.",
         "nearExpiryEmpty": "Tout va bien — aucun article bientôt périmé.",
-        "pendingReviewEmpty": "Tout va bien — rien à compléter.",
         "lowOrEmptyEmpty": "Tout va bien — aucun article avec stock bas.",
         "recentlyAddedEmpty": "Tout va bien — aucun article ajouté récemment.",
         "shoppingEmpty": "Tout va bien — votre liste d’achats est vide.",
@@ -214,11 +201,6 @@
       "minLabel": "min {{ value }}",
       "empty": "Tous les articles sont au-dessus de leur seuil minimum."
     },
-    "batches": {
-      "single": "1 lot",
-      "plural": "{{ count }} lots",
-      "withExpiry": "{{ batchLabel }}, exp {{ date }}"
-    },
     "expired": {
       "title": "Articles périmés",
       "deleteAria": "Supprimer les périmés",
@@ -231,16 +213,6 @@
       "updated": "Mis à jour le {{ date }}",
       "badge": "Nouveau",
       "empty": "Aucune mise à jour récente."
-    },
-    "consumeToday": {
-      "title": "Consumed today",
-      "cardTitle": "Add products",
-      "selectHint": "Pick what you used today, then set quantities.",
-      "listTitle": "Your list",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "empty": "No items added yet.",
-      "save": "Save"
     }
   },
   "shopping": {
@@ -312,34 +284,6 @@
         "description": "Débloquez le planificateur PRO et organisez facilement votre menu.",
         "cta": "Devenir PRO"
       }
-    }
-  },
-  "upToDate": {
-    "title": "Mettre à jour",
-    "subtitle": "Passez en revue quelques produits pour garder votre garde-manger précis et à jour.",
-    "progress": "Produits en attente {{ pending }} sur {{ total }}",
-    "lastUpdated": "Dernière mise à jour : {{ date }}",
-    "fields": {
-      "expiry": "Date de péremption",
-      "stock": "Stock"
-    },
-    "edit": {
-      "title": "Mettre à jour le produit",
-      "expiryToggle": "Ajouter une date de péremption"
-    },
-    "reasons": {
-      "stale-update": "Pas mis à jour depuis un moment",
-      "missing-info": "Informations manquantes"
-    },
-    "actions": {
-      "keep": "Garder ici",
-      "delete": "Supprimer",
-      "edit": "Modifier",
-      "skip": "Passer pour l'instant"
-    },
-    "done": {
-      "title": "Réserve à jour, bravo",
-      "subtitle": "Retour au tableau de bord…"
     }
   },
   "agent": {
@@ -421,7 +365,8 @@
       "submit": "Add to pantry",
       "singleSuccess": "1 produit ajouté",
       "success": "{{ count }} produits ajoutés",
-      "error": "Impossible d’ajouter les produits."
+      "error": "Impossible d’ajouter les produits.",
+      "createAdvanced": "Créer un produit avec détails avancés"
     },
     "addMode": {
       "title": "Sélectionner le mode",
@@ -443,7 +388,15 @@
     "batches": {
       "title": "Lots du produit",
       "count": "{{ count }} lots enregistrés",
-      "open": "Ouvert"
+      "open": "Ouvert",
+      "noExpiryDate": "Sans date de péremption",
+      "expires": {
+        "today": "Expire aujourd'hui",
+        "tomorrow": "Expire demain"
+      },
+      "expired": {
+        "yesterday": "Expiré hier"
+      }
     },
     "form": {
       "editTitle": "Modifier l’article",
@@ -471,7 +424,8 @@
       "location": "Emplacement",
       "locationPlaceholder": "Sélectionnez un emplacement",
       "locationAdd": {
-        "option": "+ Ajouter un emplacement"
+        "option": "+ Ajouter un emplacement",
+        "unassigned": "Non assigné"
       },
       "batches": {
         "title": "Lots",
@@ -480,12 +434,24 @@
         "titleIndex": "Lot {{ index }}",
         "quantity": "Quantité",
         "expiry": "Date de péremption",
+        "location": "Emplacement",
         "opened": "Ouvert"
+      },
+      "quantity": {
+        "title": "Quantité",
+        "current": "Quantité",
+        "initial": "Quantité initiale",
+        "hint": "Augmenter ou diminuer la quantité totale du produit"
       }
     },
     "detail": {
       "earliest": "Expire en premier : {{ date }}",
       "noBatches": "Aucun lot enregistré.",
+      "noExpiry": "Sans date de péremption",
+      "quantity": {
+        "single": "{{ quantity }} unité",
+        "plural": "{{ quantity }} unités"
+      },
       "batchSummary": {
         "none": "Aucun lot enregistré",
         "total": {
@@ -530,6 +496,12 @@
         "expand": "Développer les détails du produit",
         "collapse": "Réduire les détails du produit"
       }
+    },
+    "quantitySheet": {
+      "currentQuantity": "Quantité",
+      "increase": "Augmenter",
+      "decrease": "Diminuer",
+      "viewDetails": "Voir les lots"
     },
     "toasts": {
       "locationRequired": "Sélectionnez un emplacement avant d’enregistrer.",

@@ -210,12 +210,6 @@ ion-title, ion-buttons > ion-button {
   height: 100%;
 }
 
-.virtual-item-card--expanded {
-  margin-top: 10px;
-  margin-bottom: 14px;
-  z-index: 5;
-}
-
 .group-header {
   display: flex;
   align-items: center;
@@ -315,29 +309,6 @@ section.group-details {
   margin-top: 16px;
 }
 
-.add-mode-sheet::part(content) {
-  border-radius: 18px 18px 0 0;
-  background: var(--ion-card-background, var(--ion-background-color));
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 10%, transparent);
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-}
-
-.add-mode-content {
-  --padding-top: 16px;
-  --padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-}
-
-.add-mode-title {
-  margin: 0 0 8px;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.add-mode-list ion-item {
-  --background: var(--ion-card-background, var(--ion-card-background));
-  border-radius: 12px;
-  margin-bottom: 8px;
-}
 
 .location-form-card {
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
@@ -420,6 +391,17 @@ ion-card-header {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+// Quantity sheet modal styles
+ion-modal.quantity-sheet {
+  --background: var(--ion-background-color);
+  --border-radius: 16px 16px 0 0;
+  --box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+}
+
+ion-modal.quantity-sheet ion-content {
+  --background: var(--ion-background-color);
 }
 
 @keyframes shimmer {

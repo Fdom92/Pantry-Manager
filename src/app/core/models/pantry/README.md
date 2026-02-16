@@ -648,31 +648,4 @@ const total = sumQuantities(item.batches);
 ---
 
 **Feature**: Pantry Models
-**Last updated**: 2026-02-13
-
----
-
-## 📝 Changelog
-
-### 2026-02-13 - Type Safety & Cleanup
-
-**Added**:
-
-- ✅ `readonly` modifiers to immutable fields (_id, type, createdAt, householdId)
-- ✅ New `StatusColor` shared type for UI consistency
-
-**Removed**:
-
-- ❌ `PantryItem.brand` and `PantryItem.barcode` (unused properties)
-- ❌ `PantryItemCardViewModel.totalQuantity`, `totalQuantityLabel`, `earliestExpirationDate`, `batchCounts` (unused)
-- ❌ `PantryItemGlobalStatus.chipColor`, `chipTextColor` (unused)
-- ❌ `BatchStatusState` type (duplicate of `ExpiryClassification`)
-- ❌ `MoveBatchesResult` interface (unused)
-
-**Changed**:
-
-- ✅ `BatchStatusMeta.state` now uses `ExpiryClassification` instead of `BatchStatusState`
-- ✅ `BatchStatusMeta.color` now uses shared `StatusColor` type
-- ✅ `buildItemCardViewModel` no longer requires `totalQuantity` parameter
-
-**Impact**: Better type safety, cleaner codebase, no breaking changes for existing databases
+**Last updated**: 2026-02-12

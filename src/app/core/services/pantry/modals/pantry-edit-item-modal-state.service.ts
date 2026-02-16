@@ -22,11 +22,13 @@ import { CatalogOptionsService, SettingsPreferencesService } from '../../setting
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { PantryService } from '../pantry.service';
+import { PantryBatchOperationsService } from '../pantry-batch-operations.service';
 
 @Injectable()
 export class PantryEditItemModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
+  private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly fb = inject(FormBuilder);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly catalogOptions = inject(CatalogOptionsService);
@@ -56,6 +58,9 @@ export class PantryEditItemModalStateService {
     return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   });
 
+  readonly pendingQuantityChange = signal(0);
+  readonly initialQuantity = signal(0);
+
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     categoryId: this.fb.control<string | null>(null),
@@ -66,12 +71,8 @@ export class PantryEditItemModalStateService {
     isBasic: this.fb.control(false),
     minThreshold: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
     notes: this.fb.control(''),
-    batches: this.fb.array([this.createBatchGroup()]),
+    initialQuantity: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
   });
-
-  get batchesArray(): FormArray<FormGroup> {
-    return this.form.get('batches') as FormArray<FormGroup>;
-  }
 
   constructor() {
     effect(() => {
@@ -129,15 +130,44 @@ export class PantryEditItemModalStateService {
     this.isOpen.set(false);
   }
 
-  addBatchEntry(): void {
-    this.batchesArray.push(this.createBatchGroup());
+  /**
+   * Get total quantity for the item being edited.
+   */
+  getTotalQuantity(): number {
+    const item = this.editingItem();
+    if (!item) {
+      return 0;
+    }
+    return this.pantryStore.getItemTotalQuantity(item);
   }
 
-  removeBatchEntry(index: number): void {
-    if (this.batchesArray.length <= 1) {
+  /**
+   * Get display quantity with pending changes.
+   */
+  getDisplayQuantity(): number {
+    return this.getTotalQuantity() + this.pendingQuantityChange();
+  }
+
+  /**
+   * Increment quantity (will create new batch on save).
+   */
+  incrementQuantity(): void {
+    this.pendingQuantityChange.update(current => current + 1);
+  }
+
+  /**
+   * Decrement quantity (will apply FIFO on save).
+   */
+  decrementQuantity(): void {
+    const currentTotal = this.getTotalQuantity();
+    const pendingChange = this.pendingQuantityChange();
+
+    // Don't allow going below 0
+    if (currentTotal + pendingChange <= 0) {
       return;
     }
-    this.batchesArray.removeAt(index);
+
+    this.pendingQuantityChange.update(current => current - 1);
   }
 
   getCategorySelectOptions(): Array<{ value: string; label: string }> {
@@ -149,17 +179,6 @@ export class PantryEditItemModalStateService {
     );
   }
 
-  getLocationOptionsForBatch(index: number): Array<{ value: string; label: string }> {
-    const presetOptions = normalizeStringList(this.appPreferences.preferences().locationOptions, { fallback: [] });
-    const noneLabel = this.translate.instant('common.locations.none');
-    const batchGroup = this.batchesArray.at(index);
-    const currentValue = normalizeLocationId(batchGroup?.get('locationId')?.value);
-    return this.buildSelectOptions(presetOptions, currentValue, value => normalizeLocationId(value, noneLabel));
-  }
-
-  getLocationAutocompleteOptionsForBatch(index: number): AutocompleteItem<string>[] {
-    return this.mapSelectOptions(this.getLocationOptionsForBatch(index));
-  }
 
   getSupermarketSelectOptions(): Array<{ value: string; label: string }> {
     const presetOptions = normalizeStringList(this.appPreferences.preferences().supermarketOptions, { fallback: [] });
@@ -185,23 +204,12 @@ export class PantryEditItemModalStateService {
     this.applyAutocompleteValue(option, value => this.form.get('supermarket')?.setValue(value));
   }
 
-  onLocationAutocompleteSelect(index: number, option: AutocompleteItem<string>): void {
-    this.applyAutocompleteValue(option, value => {
-      const control = this.batchesArray.at(index);
-      control?.get('locationId')?.setValue(value);
-    });
-  }
-
   addCategoryOptionFromText(value: string): void {
     this.addOptionFromText(value, formatted => this.addCategoryOption(formatted));
   }
 
   addSupermarketOptionFromText(value: string): void {
     this.addOptionFromText(value, formatted => this.addSupermarketOption(formatted));
-  }
-
-  addLocationOptionFromText(index: number, value: string): void {
-    this.addOptionFromText(value, formatted => this.addLocationOption(index, formatted));
   }
 
   onSelectorQueryChange(value: string): void {
@@ -244,12 +252,6 @@ export class PantryEditItemModalStateService {
   private async addCategoryOption(value: string): Promise<void> {
     const selected = await this.catalogOptions.addCategoryOption(value);
     this.form.get('categoryId')?.setValue(selected);
-  }
-
-  private async addLocationOption(index: number, value: string): Promise<void> {
-    const selected = await this.catalogOptions.addLocationOption(value);
-    const control = this.batchesArray.at(index);
-    control?.get('locationId')?.setValue(selected);
   }
 
   private addOptionFromText(value: string, addOption: (formatted: string) => Promise<void>): void {
@@ -307,15 +309,23 @@ export class PantryEditItemModalStateService {
     try {
       const existing = this.editingItem();
       const item = this.buildItemPayload(existing ?? undefined);
+
       if (existing) {
-        if (!hasMeaningfulItemChanges(existing, item)) {
-          this.dismiss();
-          return;
+        // Edit mode: Apply pending quantity changes with FIFO logic
+        const change = this.pendingQuantityChange();
+        if (change !== 0) {
+          this.listState.cancelPendingStockSave(item._id);
+          await this.batchOps.adjustTotalQuantityWithFIFO(existing, change, this.listState.pantryItemsState);
         }
-        this.listState.cancelPendingStockSave(item._id);
-        await this.pantryStore.updateItem(item);
-        await this.eventManager.logAdvancedEdit(existing, item);
+
+        // Update product details if there are meaningful changes
+        if (hasMeaningfulItemChanges(existing, item)) {
+          this.listState.cancelPendingStockSave(item._id);
+          await this.pantryStore.updateItem(item);
+          await this.eventManager.logAdvancedEdit(existing, item);
+        }
       } else {
+        // Create mode: item payload already includes initial batch
         await this.pantryStore.addItem(item);
         await this.eventManager.logAdvancedCreate(item);
       }
@@ -327,15 +337,6 @@ export class PantryEditItemModalStateService {
     }
   }
 
-  private resetBatchControls(batches: Array<Partial<ItemBatch>>): void {
-    while (this.batchesArray.length) {
-      this.batchesArray.removeAt(0);
-    }
-    for (const batch of batches) {
-      this.batchesArray.push(this.createBatchGroup(batch));
-    }
-  }
-
   private resetFormForCreate(): void {
     this.form.reset({
       name: '',
@@ -344,8 +345,9 @@ export class PantryEditItemModalStateService {
       isBasic: false,
       minThreshold: null,
       notes: '',
+      initialQuantity: null,
     });
-    this.resetBatchControls([{}]);
+    this.pendingQuantityChange.set(0);
   }
 
   private resetModalState(): void {
@@ -355,6 +357,7 @@ export class PantryEditItemModalStateService {
     this.selectorQuery.set('');
     this.selectorEnabled.set(false);
     this.selectedName.set('');
+    this.pendingQuantityChange.set(0);
   }
 
   private applyItemToForm(item: PantryItem): void {
@@ -366,47 +369,19 @@ export class PantryEditItemModalStateService {
       isBasic: Boolean(item.isBasic),
       minThreshold: item.minThreshold ?? null,
       notes: '',
+      initialQuantity: null,
     });
-    const batches = this.buildBatchEntries(item);
-    this.resetBatchControls(batches);
-  }
-
-  private buildBatchEntries(item: PantryItem): Array<Partial<ItemBatch>> {
-    if (Array.isArray(item.batches) && item.batches.length) {
-      return item.batches;
-    }
-
-    return [{}];
-  }
-
-  private createBatchGroup(initial?: Partial<ItemBatch>): FormGroup {
-    let normalizedQuantity: number | null = null;
-    if (initial?.quantity != null) {
-      const numericValue = Number(initial.quantity);
-      normalizedQuantity = Number.isFinite(numericValue) ? numericValue : null;
-    }
-    const rawLocation = normalizeLocationId(initial?.locationId);
-    const locationId = rawLocation && rawLocation !== UNASSIGNED_LOCATION_KEY ? rawLocation : '';
-    return this.fb.group({
-      batchId: this.fb.control(normalizeTrim(initial?.batchId)),
-      locationId: this.fb.control(locationId, {
-        nonNullable: true,
-      }),
-      quantity: this.fb.control<number | null>(normalizedQuantity, {
-        validators: [Validators.required, Validators.min(0)],
-      }),
-      expirationDate: this.fb.control(initial?.expirationDate ? toDateInputValue(initial.expirationDate) : ''),
-      opened: this.fb.control(initial?.opened ?? false),
-    });
+    this.pendingQuantityChange.set(0);
   }
 
   private buildItemPayload(existing?: PantryItem): PantryItem {
-    const { name, categoryId, isBasic, supermarket, minThreshold } = this.form.value as {
+    const { name, categoryId, isBasic, supermarket, minThreshold, initialQuantity } = this.form.value as {
       name?: string;
       categoryId?: string;
       isBasic?: boolean;
       supermarket?: string;
       minThreshold?: number | string | null;
+      initialQuantity?: number | null;
     };
     const identifier = existing?._id ?? createDocumentId('item');
     const now = new Date().toISOString();
@@ -416,26 +391,23 @@ export class PantryEditItemModalStateService {
       normalizedMinThreshold = Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
     }
 
-    const batches: ItemBatch[] = this.batchesArray.controls
-      .map(group => {
-        const batchValue = group.value as any;
-        const expirationDate =
-          typeof batchValue?.expirationDate === 'string'
-            ? toIsoDate(batchValue.expirationDate) ?? undefined
-            : undefined;
-        const batchQuantity = batchValue?.quantity != null ? Number(batchValue.quantity) : 0;
-        const batchId = normalizeTrim(batchValue?.batchId) || undefined;
-        const opened = batchValue?.opened ? true : undefined;
-        const locationId = normalizeLocationId(batchValue?.locationId) || undefined;
-        return {
-          batchId,
-          quantity: Number.isFinite(batchQuantity) ? batchQuantity : 0,
-          expirationDate,
-          opened,
-          locationId,
-        } as ItemBatch;
-      })
-      .filter(batch => batch.quantity > 0 || Boolean(batch.expirationDate) || Boolean(batch.opened));
+    let batches: ItemBatch[];
+    if (existing) {
+      // Edit mode: keep existing batches (quantity changes applied via FIFO)
+      batches = existing.batches ?? [];
+    } else {
+      // Create mode: create initial batch from initialQuantity field
+      const quantity = initialQuantity != null ? Number(initialQuantity) : 0;
+      if (quantity > 0) {
+        batches = [{
+          quantity,
+          locationId: UNASSIGNED_LOCATION_KEY,
+          expirationDate: undefined,
+        }];
+      } else {
+        batches = [];
+      }
+    }
 
     const normalizedSupermarket = normalizeSupermarketValue(supermarket);
     const normalizedCategory = normalizeCategoryId(categoryId);

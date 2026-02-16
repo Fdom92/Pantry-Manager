@@ -91,6 +91,42 @@ ion-modal::part(content) {
   margin-top: 12px;
 }
 
+.secondary-action-container {
+  padding: 16px 20px;
+  border-top: 1px solid color-mix(in srgb, var(--ion-text-color) 10%, transparent);
+  margin-top: 16px;
+}
+
+.secondary-action-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  color: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+.secondary-action-link:hover,
+.secondary-action-link:active {
+  color: var(--ion-color-primary);
+}
+
+.secondary-action-link ion-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.secondary-action-link span {
+  flex: 1;
+}
+
 .modal-footer ion-toolbar {
   --padding-start: 16px;
   --padding-end: 16px;
