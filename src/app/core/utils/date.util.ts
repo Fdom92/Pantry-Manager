@@ -7,6 +7,11 @@ export function isSundayAfternoon(date: Date): boolean {
   return date.getDay() === 0 && date.getHours() >= 15;
 }
 
+export function isWeekend(date: Date): boolean {
+  const day = date.getDay();
+  return day === 0 || day === 5 || day === 6; // Friday, Saturday, Sunday
+}
+
 export function toDateInputValue(dateIso: string): string {
   try {
     return new Date(dateIso).toISOString().slice(0, 10);

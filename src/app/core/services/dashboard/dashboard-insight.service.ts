@@ -20,11 +20,39 @@ export class DashboardInsightService {
   buildDashboardInsights(context: InsightContext): Insight[] {
     const isPro = this.revenueCat.isPro();
     const helpers: InsightPredicateHelpers = { now: new Date() };
-    return INSIGHTS_LIBRARY.filter(def => this.isAvailable(def, isPro))
+    const availableInsights = INSIGHTS_LIBRARY.filter(def => this.isAvailable(def, isPro))
       .filter(def => !def.predicate || def.predicate(context, helpers))
       .sort((a, b) => a.priority - b.priority)
-      .map(def => this.toInsight(def))
-      .slice(0, 2);
+      .map(def => this.toInsight(def));
+
+    // Apply category diversity: select up to 2 insights with different categories
+    return this.selectDiverseInsights(availableInsights, 2);
+  }
+
+  private selectDiverseInsights(insights: Insight[], maxCount: number): Insight[] {
+    const selected: Insight[] = [];
+    const usedCategories = new Set<string>();
+
+    for (const insight of insights) {
+      if (selected.length >= maxCount) {
+        break;
+      }
+
+      // First insight is always selected
+      if (selected.length === 0) {
+        selected.push(insight);
+        usedCategories.add(insight.category);
+        continue;
+      }
+
+      // Subsequent insights: only add if category is different
+      if (!usedCategories.has(insight.category)) {
+        selected.push(insight);
+        usedCategories.add(insight.category);
+      }
+    }
+
+    return selected;
   }
 
   getVisibleInsights(insights: Insight[]): Insight[] {
@@ -54,6 +82,7 @@ export class DashboardInsightService {
       id: definition.id,
       title: this.translateKey(definition.titleKey),
       description: this.translateKey(definition.descriptionKey),
+      category: definition.category,
       priority: definition.priority,
       dismissLabel: definition.dismissLabelKey ? this.translateKey(definition.dismissLabelKey) : undefined,
       ctas: definition.ctas?.map(cta => this.toCta(cta)).filter((cta): cta is InsightCta => Boolean(cta)),

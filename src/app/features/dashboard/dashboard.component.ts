@@ -3,10 +3,7 @@ import { Component, inject } from '@angular/core';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
 import {
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
+  IonButton,
   IonContent,
   IonHeader,
   IonIcon,
@@ -15,7 +12,6 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,15 +21,11 @@ import { InsightCardComponent } from '@shared/components/insight-card/insight-ca
     IonToolbar,
     IonTitle,
     IonContent,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
     IonIcon,
     IonSkeletonText,
+    IonButton,
     CommonModule,
     TranslateModule,
-    InsightCardComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],

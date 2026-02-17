@@ -1,4 +1,3 @@
-// INTERFACES
 export interface OnboardingSlide {
   key: string;
   titleKey: string;

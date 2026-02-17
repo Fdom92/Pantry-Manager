@@ -9,7 +9,6 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class UpgradeRevenuecatService {
-  // VARIABLES
   private userId: string | null = null;
   private readonly publicApiKey = environment.revenueCatPublicKey;
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());

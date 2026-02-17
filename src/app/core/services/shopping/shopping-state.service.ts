@@ -25,7 +25,6 @@ import { HistoryEventManagerService } from '../history/history-event-manager.ser
 
 @Injectable()
 export class ShoppingStateService {
-  // DI
   private readonly destroyRef = inject(DestroyRef);
   private readonly shareTask = createLatestOnlyRunner(this.destroyRef);
   private readonly pantryStore = inject(PantryStoreService);
@@ -36,12 +35,12 @@ export class ShoppingStateService {
   private readonly languageService = inject(LanguageService);
   private readonly download = inject(DownloadService);
   private readonly share = inject(ShareService);
-  // SIGNALS
+
   readonly isSummaryExpanded = signal(true);
   readonly processingSuggestionIds = signal<Set<string>>(new Set());
   readonly isSharingListInProgress = signal(false);
   readonly purchaseTarget = signal<ShoppingSuggestionWithItem | null>(null);
-  // COMPUTED SIGNALS
+
   readonly shoppingAnalysis = computed<ShoppingStateWithItem>(() => {
     const analysis = this.buildShoppingAnalysis(this.items());
     return {
@@ -49,7 +48,7 @@ export class ShoppingStateService {
       hasAlerts: analysis.summary.total > 0,
     };
   });
-  // VARIABLES
+
   readonly loading = this.pantryStore.loading;
   readonly items = this.pantryStore.items;
 

@@ -5,272 +5,78 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div class="overview" [attr.aria-label]="'dashboard.overview.aria' | translate">
+  <div class="dashboard" [attr.aria-label]="'dashboard.aria' | translate">
     @if (facade.isInitialInventoryLoading()) {
-      <section class="overview-section">
-        <header class="overview-section-header">
-          <h2 class="overview-section-title">{{ 'dashboard.overview.sections.alerts.title' | translate }}</h2>
-        </header>
-        <div class="overview-grid" [attr.aria-label]="'dashboard.overview.sections.alerts.title' | translate">
-          <ion-card class="overview-card overview-card--skeleton">
-            <ion-card-header>
-              <div class="overview-card__header">
-                <div class="overview-card__icon">
-                  <ion-skeleton-text animated style="width: 18px; height: 18px; border-radius: 6px;"></ion-skeleton-text>
-                </div>
-                <ion-card-title>
-                  <ion-skeleton-text animated style="width: 120px; height: 14px;"></ion-skeleton-text>
-                </ion-card-title>
-              </div>
-            </ion-card-header>
-            <ion-card-content>
-              <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-            </ion-card-content>
-          </ion-card>
-          <ion-card class="overview-card overview-card--skeleton">
-            <ion-card-header>
-              <div class="overview-card__header">
-                <div class="overview-card__icon">
-                  <ion-skeleton-text animated style="width: 18px; height: 18px; border-radius: 6px;"></ion-skeleton-text>
-                </div>
-                <ion-card-title>
-                  <ion-skeleton-text animated style="width: 120px; height: 14px;"></ion-skeleton-text>
-                </ion-card-title>
-              </div>
-            </ion-card-header>
-            <ion-card-content>
-              <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-            </ion-card-content>
-          </ion-card>
+      <!-- Loading skeleton -->
+      <section class="dashboard-section">
+        <div class="pantry-health pantry-health--skeleton">
+          <div class="pantry-health__icon">
+            <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 50%;"></ion-skeleton-text>
+          </div>
+          <div class="pantry-health__content">
+            <ion-skeleton-text animated style="width: 160px; height: 20px; margin-bottom: 8px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 220px; height: 14px;"></ion-skeleton-text>
+          </div>
         </div>
       </section>
     } @else {
-    @if (facade.visibleInsights().length) {
-      <section class="overview-section">
-        <header class="overview-section-header">
-          <h2 class="overview-section-title">{{ 'dashboard.overview.sections.insights.title' | translate }}</h2>
-        </header>
-        <div class="insights-stack">
-          @for (insight of facade.visibleInsights(); track insight.id) {
-            <app-insight-card
-              [insight]="insight"
-              (dismiss)="facade.dismissInsight(insight)"
-              (ctaSelect)="facade.onInsightAction(insight, $event)">
-            </app-insight-card>
-          }
+      <!-- LAYER 1: Health Status (Interpreted State) -->
+      <section class="dashboard-section">
+        <div class="pantry-health" [attr.data-state]="facade.pantryHealth().state">
+          <div class="pantry-health__icon">
+            <ion-icon [name]="facade.getHealthIcon(facade.pantryHealth().state)"></ion-icon>
+          </div>
+          <div class="pantry-health__content">
+            <h2 class="pantry-health__title">{{ facade.pantryHealth().title }}</h2>
+            <p class="pantry-health__description">{{ facade.pantryHealth().description }}</p>
+          </div>
         </div>
       </section>
-    }
 
-    @if (facade.expiredItems().length || facade.nearExpiryItems().length) {
-      <section class="overview-section">
-        <header class="overview-section-header">
-          <h2 class="overview-section-title">{{ 'dashboard.overview.sections.alerts.title' | translate }}</h2>
-        </header>
-        <div class="overview-grid" [attr.aria-label]="'dashboard.overview.sections.alerts.title' | translate">
-          @if (facade.expiredItems().length) {
-            <ion-card
-              class="overview-card overview-card--expired"
-              role="button"
-              tabindex="0"
-              (click)="onSummaryCardClick('expired')"
-              (keydown.enter)="onSummaryCardClick('expired')"
-              (keydown.space)="onSummaryCardClick('expired'); $event.preventDefault()"
-              [attr.aria-label]="'dashboard.overview.cards.expired.title' | translate"
-            >
-              <ion-card-header>
-                <div class="overview-card__header">
-                  <div class="overview-card__icon">
-                    <ion-icon name="alert-circle-outline"></ion-icon>
-                  </div>
-                  <ion-card-title>{{ 'dashboard.overview.cards.expired.title' | translate }}</ion-card-title>
+      <!-- LAYER 2: What to Do Now (Actions) -->
+      @if (facade.actions().length > 0) {
+        <section class="dashboard-section">
+          <header class="dashboard-section-header">
+            <h3 class="dashboard-section-title">{{ 'dashboard.sections.actions.title' | translate }}</h3>
+          </header>
+          <div class="actions-stack">
+            @for (action of facade.actions(); track action.id) {
+              <div class="action-card" [attr.data-priority]="action.priority" [attr.data-category]="action.category">
+                <div class="action-card__content">
+                  <h4 class="action-card__title">{{ action.title }}</h4>
+                  <p class="action-card__description">{{ action.description }}</p>
                 </div>
-              </ion-card-header>
-              <ion-card-content>
-                @if (facade.isInventoryLoading()) {
-                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-                } @else {
-                  <p class="overview-card__body">
-                    {{ 'dashboard.overview.cards.expired.body' | translate:{ count: facade.expiredItems().length } }}
-                  </p>
-                }
-              </ion-card-content>
-            </ion-card>
-          }
-          @if (facade.nearExpiryItems().length) {
-            <ion-card
-              class="overview-card overview-card--near-expiry"
-              role="button"
-              tabindex="0"
-              (click)="onSummaryCardClick('near-expiry')"
-              (keydown.enter)="onSummaryCardClick('near-expiry')"
-              (keydown.space)="onSummaryCardClick('near-expiry'); $event.preventDefault()"
-              [attr.aria-label]="'dashboard.overview.cards.nearExpiry.title' | translate"
-            >
-              <ion-card-header>
-                <div class="overview-card__header">
-                  <div class="overview-card__icon">
-                    <ion-icon name="hourglass-outline"></ion-icon>
-                  </div>
-                  <ion-card-title>{{ 'dashboard.overview.cards.nearExpiry.title' | translate }}</ion-card-title>
+                <div class="action-card__footer">
+                  <ion-button
+                    class="action-card__cta"
+                    size="small"
+                    [color]="action.category === 'critical' ? 'danger' : action.category === 'preventive' ? 'warning' : 'primary'"
+                    (click)="action.cta.action()">
+                    {{ action.cta.label }}
+                  </ion-button>
+                  @if (action.dismissible) {
+                    <button class="action-card__dismiss" (click)="facade.dismissAction(action)" aria-label="Dismiss">
+                      <ion-icon name="close-outline"></ion-icon>
+                    </button>
+                  }
                 </div>
-              </ion-card-header>
-              <ion-card-content>
-                @if (facade.isInventoryLoading()) {
-                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-                } @else {
-                  <p class="overview-card__body">
-                    {{ 'dashboard.overview.cards.nearExpiry.body' | translate:{ count: facade.nearExpiryItems().length } }}
-                  </p>
-                }
-              </ion-card-content>
-            </ion-card>
-          }
-        </div>
-      </section>
-    }
-
-    @if (facade.isInventoryLoading() || facade.lowStockItems().length || facade.shoppingListCount()) {
-      <section class="overview-section">
-        <header class="overview-section-header">
-          <h2 class="overview-section-title">{{ 'dashboard.overview.sections.control.title' | translate }}</h2>
-        </header>
-        <div class="overview-grid" [attr.aria-label]="'dashboard.overview.sections.control.title' | translate">
-          @if (facade.isInventoryLoading()) {
-            <ion-card class="overview-card overview-card--stock">
-              <ion-card-header>
-                <div class="overview-card__header">
-                  <div class="overview-card__icon">
-                    <ion-icon name="trending-down-outline"></ion-icon>
-                  </div>
-                  <ion-card-title>{{ 'dashboard.overview.cards.lowOrEmpty.title' | translate }}</ion-card-title>
-                </div>
-              </ion-card-header>
-              <ion-card-content>
-                <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-              </ion-card-content>
-            </ion-card>
-            <ion-card class="overview-card overview-card--shopping">
-              <ion-card-header>
-                <div class="overview-card__header">
-                  <div class="overview-card__icon">
-                    <ion-icon name="cart-outline"></ion-icon>
-                  </div>
-                  <ion-card-title>{{ 'dashboard.overview.cards.shopping.title' | translate }}</ion-card-title>
-                </div>
-              </ion-card-header>
-              <ion-card-content>
-                <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-              </ion-card-content>
-            </ion-card>
-          } @else if (facade.lowStockItems().length) {
-            <ion-card
-              class="overview-card overview-card--stock"
-              role="button"
-              tabindex="0"
-              (click)="onSummaryCardClick('low-or-empty')"
-              (keydown.enter)="onSummaryCardClick('low-or-empty')"
-              (keydown.space)="onSummaryCardClick('low-or-empty'); $event.preventDefault()"
-              [attr.aria-label]="'dashboard.overview.cards.lowOrEmpty.title' | translate"
-            >
-              <ion-card-header>
-                <div class="overview-card__header">
-                  <div class="overview-card__icon">
-                    <ion-icon name="trending-down-outline"></ion-icon>
-                  </div>
-                  <ion-card-title>{{ 'dashboard.overview.cards.lowOrEmpty.title' | translate }}</ion-card-title>
-                </div>
-              </ion-card-header>
-              <ion-card-content>
-                @if (facade.isInventoryLoading()) {
-                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-                } @else {
-                  <p class="overview-card__body">
-                    {{ 'dashboard.overview.cards.lowOrEmpty.body' | translate:{ count: facade.lowStockItems().length } }}
-                  </p>
-                }
-              </ion-card-content>
-            </ion-card>
-          }
-
-          @if (!facade.isInventoryLoading() && facade.shoppingListCount()) {
-            <ion-card
-              class="overview-card overview-card--shopping"
-              role="button"
-              tabindex="0"
-              (click)="onSummaryCardClick('shopping')"
-              (keydown.enter)="onSummaryCardClick('shopping')"
-              (keydown.space)="onSummaryCardClick('shopping'); $event.preventDefault()"
-              [attr.aria-label]="'dashboard.overview.cards.shopping.title' | translate"
-            >
-              <ion-card-header>
-                <div class="overview-card__header">
-                  <div class="overview-card__icon">
-                    <ion-icon name="cart-outline"></ion-icon>
-                  </div>
-                  <ion-card-title>{{ 'dashboard.overview.cards.shopping.title' | translate }}</ion-card-title>
-                </div>
-              </ion-card-header>
-              <ion-card-content>
-                @if (facade.isInventoryLoading()) {
-                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-                } @else {
-                  <p class="overview-card__body">
-                    {{ 'dashboard.overview.cards.shopping.body' | translate:{ count: facade.shoppingListCount() } }}
-                  </p>
-                }
-              </ion-card-content>
-            </ion-card>
-          }
-        </div>
-      </section>
-    }
-    }
-
-    @if (facade.recentlyAddedCount() > 0) {
-      <section class="overview-section">
-        <header class="overview-section-header">
-          <h2 class="overview-section-title">{{ 'dashboard.overview.sections.activity.title' | translate }}</h2>
-        </header>
-        <div class="overview-grid" [attr.aria-label]="'dashboard.overview.sections.activity.title' | translate">
-          <ion-card
-            class="overview-card overview-card--recent"
-            role="button"
-            tabindex="0"
-            (click)="onSummaryCardClick('recently-added')"
-            (keydown.enter)="onSummaryCardClick('recently-added')"
-            (keydown.space)="onSummaryCardClick('recently-added'); $event.preventDefault()"
-            [attr.aria-label]="'dashboard.overview.cards.recentlyAdded.title' | translate"
-          >
-            <ion-card-header>
-              <div class="overview-card__header">
-                <div class="overview-card__icon">
-                  <ion-icon name="sparkles-outline"></ion-icon>
-                </div>
-                <ion-card-title>{{ 'dashboard.overview.cards.recentlyAdded.title' | translate }}</ion-card-title>
               </div>
-              </ion-card-header>
-              <ion-card-content>
-                @if (facade.isInventoryLoading()) {
-                  <ion-skeleton-text animated style="width: 70%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-                  <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-                } @else {
-                  <p class="overview-card__body">
-                  {{ 'dashboard.overview.cards.recentlyAdded.body' | translate:{ count: facade.recentlyAddedCount() } }}
-                </p>
-                }
-            </ion-card-content>
-          </ion-card>
-        </div>
-      </section>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- LAYER 3: Additional Context (Optional) -->
+      @if (facade.showAdditionalContext() && facade.recentlyAddedCount() > 0 && facade.recentlyAddedCount() <= 5) {
+        <section class="dashboard-section">
+          <div class="context-section">
+            <div class="context-item">
+              <ion-icon name="add-circle-outline"></ion-icon>
+              <span>{{ 'dashboard.context.recentlyAdded' | translate:{ count: facade.recentlyAddedCount() } }}</span>
+            </div>
+          </div>
+        </section>
+      }
     }
   </div>
 </ion-content>

@@ -1,6 +1,5 @@
 import type { PantryItem } from '../pantry';
 
-// ENUMS
 export enum AgentEntryContext {
   PLANNING = 'planning',
   RECIPES = 'recipes',
@@ -8,13 +7,11 @@ export enum AgentEntryContext {
   INSIGHTS_RECIPES = 'insights-recipes',
 }
 
-// TYPES
 export type AgentRole = 'user' | 'assistant';
 export type AgentPhase = 'idle' | 'thinking' | 'fetching' | 'responding';
 export type QuickPromptBehavior = 'prompt' | 'composer';
 export type LlmRole = 'system' | 'user' | 'assistant';
 
-// INTERFACES
 export interface QuickPrompt {
   id: string;
   labelKey: string;

@@ -1,32 +1,16 @@
 import { AgentEntryContext } from '@core/models/agent';
-import { InsightDefinition, InsightId } from '@core/models/dashboard';
-import { isSundayAfternoon, isWithinHours } from '@core/utils';
+import { InsightCategory, InsightDefinition, InsightId } from '@core/models/dashboard';
+import { isWeekend, isWithinHours } from '@core/utils';
 
 /** @deprecated Import from @core/constants/shared instead */
 export { PENDING_REVIEW_STALE_DAYS } from '../shared/shared.constants';
 export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
   {
-    id: InsightId.WEEKLY_MEAL_PLANNING,
-    titleKey: 'insights.library.weeklyMealPlanning.title',
-    descriptionKey: 'insights.library.weeklyMealPlanning.description',
-    priority: 1,
-    audience: 'pro',
-    predicate: (_ctx, helpers) => isSundayAfternoon(helpers.now),
-    ctas: [
-      {
-        id: 'weekly-meal-plan',
-        labelKey: 'insights.library.weeklyMealPlanning.cta',
-        type: 'agent',
-        entryContext: AgentEntryContext.INSIGHTS,
-        promptKey: 'insights.library.weeklyMealPlanning.prompt',
-      },
-    ],
-  },
-  {
     id: InsightId.COOK_BEFORE_EXPIRY,
     titleKey: 'insights.library.cookBeforeExpiry.title',
     descriptionKey: 'insights.library.cookBeforeExpiry.description',
-    priority: 2,
+    category: InsightCategory.PREVENTIVE,
+    priority: 1,
     audience: 'pro',
     predicate: context => context.expiringSoonItems.some(item => (item.quantity ?? 0) > 0),
     ctas: [
@@ -40,52 +24,38 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
     ],
   },
   {
-    id: InsightId.WHAT_TO_COOK_FOR_LUNCH,
-    titleKey: 'insights.library.lunchIdeas.title',
-    descriptionKey: 'insights.library.lunchIdeas.description',
+    id: InsightId.WEEKLY_MEAL_PLANNING,
+    titleKey: 'insights.library.weeklyMealPlanning.title',
+    descriptionKey: 'insights.library.weeklyMealPlanning.description',
+    category: InsightCategory.PREVENTIVE,
+    priority: 2,
+    audience: 'pro',
+    predicate: (_ctx, helpers) => isWeekend(helpers.now),
+    ctas: [
+      {
+        id: 'weekly-meal-plan',
+        labelKey: 'insights.library.weeklyMealPlanning.cta',
+        type: 'agent',
+        entryContext: AgentEntryContext.INSIGHTS,
+        promptKey: 'insights.library.weeklyMealPlanning.prompt',
+      },
+    ],
+  },
+  {
+    id: InsightId.SMART_COOKING_IDEAS,
+    titleKey: 'insights.library.smartCookingIdeas.title',
+    descriptionKey: 'insights.library.smartCookingIdeas.description',
+    category: InsightCategory.OPTIMIZATION,
     priority: 3,
     audience: 'pro',
-    predicate: (_ctx, helpers) => isWithinHours(helpers.now, 11, 15),
+    predicate: context => !context.expiringSoonItems.some(item => (item.quantity ?? 0) > 0),
     ctas: [
       {
-        id: 'ideas-lunch',
-        labelKey: 'insights.library.lunchIdeas.cta',
+        id: 'smart-cooking-ideas',
+        labelKey: 'insights.library.smartCookingIdeas.cta',
         type: 'agent',
         entryContext: AgentEntryContext.INSIGHTS,
-        promptKey: 'insights.library.lunchIdeas.prompt',
-      },
-    ],
-  },
-  {
-    id: InsightId.WHAT_TO_COOK_FOR_DINNER,
-    titleKey: 'insights.library.dinnerIdeas.title',
-    descriptionKey: 'insights.library.dinnerIdeas.description',
-    priority: 4,
-    audience: 'pro',
-    predicate: (_ctx, helpers) => isWithinHours(helpers.now, 18, 22),
-    ctas: [
-      {
-        id: 'ideas-dinner',
-        labelKey: 'insights.library.dinnerIdeas.cta',
-        type: 'agent',
-        entryContext: AgentEntryContext.INSIGHTS,
-        promptKey: 'insights.library.dinnerIdeas.prompt',
-      },
-    ],
-  },
-  {
-    id: InsightId.WHAT_TO_COOK_NOW,
-    titleKey: 'insights.library.whatToCookNow.title',
-    descriptionKey: 'insights.library.whatToCookNow.description',
-    priority: 5,
-    audience: 'pro',
-    ctas: [
-      {
-        id: 'ideas-now',
-        labelKey: 'insights.library.whatToCookNow.cta',
-        type: 'agent',
-        entryContext: AgentEntryContext.INSIGHTS,
-        promptKey: 'insights.library.whatToCookNow.prompt',
+        promptKey: 'insights.library.smartCookingIdeas.prompt',
       },
     ],
   },
@@ -93,12 +63,46 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
     id: InsightId.PLAN_AND_SAVE_TIME,
     titleKey: 'insights.library.planAndSaveTime.title',
     descriptionKey: 'insights.library.planAndSaveTime.description',
-    priority: 6,
+    category: InsightCategory.OPTIMIZATION,
+    priority: 4,
     audience: 'non-pro',
     ctas: [
       {
         id: 'go-pro-upgrade',
         labelKey: 'insights.library.planAndSaveTime.cta',
+        type: 'navigate',
+        route: '/upgrade',
+      },
+    ],
+  },
+  {
+    id: InsightId.HISTORY_UNLIMITED,
+    titleKey: 'insights.library.historyUnlimited.title',
+    descriptionKey: 'insights.library.historyUnlimited.description',
+    category: InsightCategory.BEHAVIOR,
+    priority: 5,
+    audience: 'non-pro',
+    ctas: [
+      {
+        id: 'history-unlimited-upgrade',
+        labelKey: 'insights.library.historyUnlimited.cta',
+        type: 'navigate',
+        route: '/upgrade',
+      },
+    ],
+  },
+  {
+    id: InsightId.SMART_INSIGHTS,
+    titleKey: 'insights.library.smartInsights.title',
+    descriptionKey: 'insights.library.smartInsights.description',
+    category: InsightCategory.PREVENTIVE,
+    priority: 6,
+    audience: 'non-pro',
+    predicate: context => context.expiringSoonItems.length > 0,
+    ctas: [
+      {
+        id: 'smart-insights-upgrade',
+        labelKey: 'insights.library.smartInsights.cta',
         type: 'navigate',
         route: '/upgrade',
       },

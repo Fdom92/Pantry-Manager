@@ -125,7 +125,64 @@
   },
   "dashboard": {
     "title": "Início",
+    "aria": "Painel da sua despensa",
     "confirmDeleteExpired": "Isto irá eliminar todos os produtos expirados. Continuar?",
+    "health": {
+      "critical": {
+        "title": "A sua despensa precisa de atenção",
+        "description": "Há produtos que requerem ação imediata"
+      },
+      "attention": {
+        "title": "Verifique a sua despensa em breve",
+        "description": "Alguns produtos estão a expirar em breve",
+        "trackingTitle": "Melhore o seu controlo",
+        "trackingDescription": "Muitos produtos não têm datas de rastreio"
+      },
+      "optimal": {
+        "controlledTitle": "Tudo sob controlo",
+        "controlledDescription": "Tem produtos sem atividade recente",
+        "perfectTitle": "A sua despensa está perfeita",
+        "perfectDescription": "Sem produtos expirados ou a expirar"
+      }
+    },
+    "sections": {
+      "actions": {
+        "title": "O que fazer agora"
+      }
+    },
+    "actions": {
+      "expired": {
+        "title": "Rever produtos expirados",
+        "description_one": "{{ count }} produto expirou",
+        "description_other": "{{ count }} produtos expiraram",
+        "cta": "Ver produtos"
+      },
+      "nearExpiry": {
+        "title": "Produtos a expirar em breve",
+        "titlePro": "Planeie antes que expirem",
+        "description": "{{ count }} produtos expiram em {{ days }} dias",
+        "cta": "Ver produtos",
+        "ctaPro": "Gerar receitas"
+      },
+      "stale": {
+        "title": "Produtos sem atividade",
+        "description": "{{ count }} produtos não se mexeram há 30+ dias",
+        "cta": "Rever"
+      },
+      "weeklyPlan": {
+        "title": "Planeie a sua semana",
+        "description": "Otimize a sua despensa com um plano semanal",
+        "cta": "Criar plano"
+      },
+      "upgrade": {
+        "title": "Aproveite ao máximo a sua despensa",
+        "description": "Receitas personalizadas e planeamento semanal com IA",
+        "cta": "Descobrir PRO"
+      }
+    },
+    "context": {
+      "recentlyAdded": "{{ count }} produtos adicionados recentemente"
+    },
     "summary": {
       "title": "Visão geral da despensa",
       "toggle": "Alternar visão geral da despensa",
@@ -140,6 +197,9 @@
     "overview": {
       "aria": "Visão geral da despensa",
       "sections": {
+        "summary": {
+          "title": "Resumo"
+        },
         "alerts": {
           "title": "Alertas"
         },
@@ -154,6 +214,17 @@
         }
       },
       "cards": {
+        "summary": {
+          "total": "Total",
+          "basic": "Essenciais",
+          "complete": "Com datas",
+          "healthStatus": {
+            "allGood": "Tudo sob controlo",
+            "checkSoon": "Alguns produtos precisam de atenção",
+            "needsAttention": "A sua despensa precisa de atenção"
+          },
+          "staleItems": "{{ count }} produtos intocados há 30+ dias"
+        },
         "nearExpiry": {
           "title": "A expirar em breve",
           "body": "{{ count }} produtos esta semana",
@@ -250,39 +321,37 @@
         "dismiss": "Agora não"
       },
       "weeklyMealPlanning": {
-        "title": "Planeje as refeições da semana",
-        "description": "Planeje as refeições desta semana com o que você já tem.",
-        "cta": "Planejar agora",
+        "title": "Organizar a semana?",
+        "description": "É uma boa altura para planear as suas refeições com o que tem em casa.",
+        "cta": "Vamos lá",
         "prompt": "Planeje minhas refeições desta semana usando apenas o que já tenho na despensa."
       },
       "cookBeforeExpiry": {
-        "title": "Cozinhe antes de vencerem",
-        "description": "Aproveite os produtos que estão prestes a vencer e ainda têm estoque.",
-        "cta": "Usar itens críticos",
+        "title": "Tem produtos a ponto de vencer",
+        "description": "Vou sugerir receitas para aproveitá-los antes de se estragarem.",
+        "cta": "Dá-me ideias",
         "prompt": "Sugira receitas priorizando os produtos que vencem em breve na minha despensa."
       },
-      "lunchIdeas": {
-        "title": "O que posso preparar para o almoço?",
-        "description": "Ideias rápidas de almoço usando sua despensa.",
-        "cta": "Ver ideias",
-        "prompt": "Dê opções de almoço para hoje usando o que já tenho."
-      },
-      "dinnerIdeas": {
-        "title": "O que posso preparar para o jantar?",
-        "description": "Sugestões de jantar com o que você já tem.",
-        "cta": "Planejar jantar",
-        "prompt": "Planeje um jantar simples com os ingredientes da minha despensa."
-      },
-      "whatToCookNow": {
-        "title": "O que preparo agora?",
-        "description": "Não sabe o que comer? Eu te dou ideias com a sua despensa.",
-        "cta": "Me dê ideias",
-        "prompt": "Traga ideias rápidas do que cozinhar usando apenas os ingredientes que já possuo."
+      "smartCookingIdeas": {
+        "title": "O que cozinho hoje?",
+        "description": "Dou-lhe ideias com o que tem na despensa neste momento.",
+        "cta": "Inspira-me",
+        "prompt": "Dê-me ideias de culinária usando os ingredientes que tenho disponíveis."
       },
       "planAndSaveTime": {
-        "title": "Planeje suas refeições e economize tempo toda semana",
-        "description": "Desbloqueie o planejador PRO e organize seu menu com facilidade.",
-        "cta": "Torne-se PRO"
+        "title": "Planear a semana com IA",
+        "description": "Com PRO, organize o seu menu semanal e poupe tempo todos os dias.",
+        "cta": "Experimentar PRO"
+      },
+      "historyUnlimited": {
+        "title": "O que desperdiça mais?",
+        "description": "Com PRO, descubra o que deita fora e compre apenas o que precisa.",
+        "cta": "Saber mais"
+      },
+      "smartInsights": {
+        "title": "Avisos antes de vencerem",
+        "description": "Com PRO, digo-lhe o que cozinhar para não desperdiçar nada.",
+        "cta": "Saber mais"
       }
     }
   },

@@ -125,7 +125,64 @@
   },
   "dashboard": {
     "title": "Inicio",
+    "aria": "Dashboard de tu despensa",
     "confirmDeleteExpired": "Esto eliminará todos los productos caducados. ¿Quieres continuar?",
+    "health": {
+      "critical": {
+        "title": "Tu despensa necesita atención",
+        "description": "Hay productos que requieren acción inmediata"
+      },
+      "attention": {
+        "title": "Revisa tu despensa pronto",
+        "description": "Algunos productos están próximos a caducar",
+        "trackingTitle": "Mejora tu control",
+        "trackingDescription": "Muchos productos no tienen fechas de seguimiento"
+      },
+      "optimal": {
+        "controlledTitle": "Todo bajo control",
+        "controlledDescription": "Tienes productos sin actividad reciente",
+        "perfectTitle": "Tu despensa está perfecta",
+        "perfectDescription": "Sin productos caducados ni próximos a expirar"
+      }
+    },
+    "sections": {
+      "actions": {
+        "title": "Qué hacer ahora"
+      }
+    },
+    "actions": {
+      "expired": {
+        "title": "Revisa productos caducados",
+        "description_one": "{{ count }} producto ha caducado",
+        "description_other": "{{ count }} productos han caducado",
+        "cta": "Ver productos"
+      },
+      "nearExpiry": {
+        "title": "Productos próximos a caducar",
+        "titlePro": "Planifica antes de que caduquen",
+        "description": "{{ count }} productos expiran en {{ days }} días",
+        "cta": "Ver productos",
+        "ctaPro": "Genera recetas"
+      },
+      "stale": {
+        "title": "Productos sin actividad",
+        "description": "{{ count }} productos llevan 30+ días sin movimiento",
+        "cta": "Revisar"
+      },
+      "weeklyPlan": {
+        "title": "Planifica tu semana",
+        "description": "Optimiza tu despensa con un plan semanal",
+        "cta": "Crear plan"
+      },
+      "upgrade": {
+        "title": "Aprovecha tu despensa al máximo",
+        "description": "Recetas personalizadas y planificación semanal con IA",
+        "cta": "Descubre PRO"
+      }
+    },
+    "context": {
+      "recentlyAdded": "{{ count }} productos añadidos recientemente"
+    },
     "summary": {
       "title": "Resumen de la despensa",
       "toggle": "Alternar resumen de la despensa",
@@ -140,6 +197,9 @@
     "overview": {
       "aria": "Resumen de la despensa",
       "sections": {
+        "summary": {
+          "title": "Resumen"
+        },
         "alerts": {
           "title": "Alertas"
         },
@@ -154,6 +214,17 @@
         }
       },
       "cards": {
+        "summary": {
+          "total": "Total",
+          "basic": "Esenciales",
+          "complete": "Con fechas",
+          "healthStatus": {
+            "allGood": "Todo bajo control",
+            "checkSoon": "Algunos productos necesitan atención",
+            "needsAttention": "Tu despensa necesita un repaso"
+          },
+          "staleItems": "{{ count }} productos sin mover en 30+ días"
+        },
         "nearExpiry": {
           "title": "Caducan pronto",
           "body": "{{ count }} productos esta semana",
@@ -250,39 +321,37 @@
         "dismiss": "No ahora"
       },
       "weeklyMealPlanning": {
-        "title": "Planificar las comidas de la semana",
-        "description": "Planifica tus comidas de esta semana con lo que ya tienes.",
-        "cta": "Planificar ahora",
+        "title": "¿Organizamos la semana?",
+        "description": "Es buen momento para planificar tus comidas con lo que tienes en casa.",
+        "cta": "Vamos allá",
         "prompt": "Planifica mis comidas de esta semana usando solo lo que tengo en la despensa."
       },
       "cookBeforeExpiry": {
-        "title": "Cocina antes de que caduquen",
-        "description": "Aprovecha los productos que están a punto de caducar y aún tienen stock.",
-        "cta": "Usar productos críticos",
+        "title": "Tienes productos a punto de caducar",
+        "description": "Te sugiero recetas para aprovecharlos antes de que se echen a perder.",
+        "cta": "Dame ideas",
         "prompt": "Sugiere recetas priorizando los productos que caducan pronto en mi despensa."
       },
-      "lunchIdeas": {
-        "title": "¿Qué puedo preparar para comer?",
-        "description": "Ideas rápidas para la comida usando tu despensa.",
-        "cta": "Ver ideas",
-        "prompt": "Dame opciones de comida para hoy usando lo que tengo disponible."
-      },
-      "dinnerIdeas": {
-        "title": "¿Qué puedo preparar para cenar?",
-        "description": "Sugerencias para la cena con lo que ya tienes.",
-        "cta": "Ver cenas",
-        "prompt": "Planifica una cena sencilla con los ingredientes de mi despensa."
-      },
-      "whatToCookNow": {
-        "title": "¿Qué cocino ahora?",
-        "description": "No sabes qué comer. Te doy ideas con tu despensa.",
-        "cta": "Dame ideas",
-        "prompt": "Dame ideas rápidas de qué cocinar usando los ingredientes que ya tengo."
+      "smartCookingIdeas": {
+        "title": "¿Qué cocino hoy?",
+        "description": "Te doy ideas con lo que tienes ahora mismo en la despensa.",
+        "cta": "Inspírame",
+        "prompt": "Dame ideas de qué cocinar usando los ingredientes que tengo disponibles."
       },
       "planAndSaveTime": {
-        "title": "Planifica tus comidas y ahorra tiempo cada semana",
-        "description": "Desbloquea el planificador PRO y organiza tu menú fácilmente.",
-        "cta": "Hazte PRO"
+        "title": "Planifica la semana con IA",
+        "description": "Con PRO, organiza tu menú semanal y ahorra tiempo cada día.",
+        "cta": "Prueba PRO"
+      },
+      "historyUnlimited": {
+        "title": "¿Qué desperdicias más?",
+        "description": "Con PRO, descubre qué tiras más y compra solo lo que necesitas.",
+        "cta": "Ver más"
+      },
+      "smartInsights": {
+        "title": "Avisos antes de que caduquen",
+        "description": "Con PRO, te aviso qué cocinar para no tirar nada.",
+        "cta": "Saber más"
       }
     }
   },

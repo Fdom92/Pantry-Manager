@@ -1,6 +1,5 @@
 import { PACKAGE_TYPE } from '@revenuecat/purchases-capacitor';
 
-// INTERFACES
 export interface PlanViewModel {
   id: string;
   type: PACKAGE_TYPE;
@@ -15,7 +14,7 @@ export interface PlanViewModel {
   benefits: string[];
   highlight: boolean;
 }
-// TYPES
+
 export type PlanTrialMeta =
   | { kind: 'free' }
   | { kind: 'discount'; price: string; cycles: number };

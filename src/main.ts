@@ -18,6 +18,7 @@ import {
   add,
   addCircleOutline,
   addOutline,
+  alertCircle,
   alertCircleOutline,
   apertureOutline,
   arrowForwardOutline,
@@ -26,6 +27,7 @@ import {
   calendarOutline,
   cartOutline,
   chatbubblesOutline,
+  checkmarkCircle,
   checkmarkCircleOutline,
   chevronDownOutline,
   chevronForwardOutline,
@@ -46,6 +48,7 @@ import {
   flashOutline,
   homeOutline,
   hourglassOutline,
+  informationCircle,
   layersOutline,
   listOutline,
   locationOutline,
@@ -70,7 +73,8 @@ import {
   swapHorizontalOutline,
   timeOutline,
   trashOutline,
-  trendingDownOutline
+  trendingDownOutline,
+  warning
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -116,11 +120,15 @@ addIcons({
   'chevron-down-outline': chevronDownOutline,
   'filter-outline': filterOutline,
   'layers-outline': layersOutline,
+  'alert-circle': alertCircle,
   'alert-circle-outline': alertCircleOutline,
   'hourglass-outline': hourglassOutline,
   'time-outline': timeOutline,
   'trending-down-outline': trendingDownOutline,
+  'checkmark-circle': checkmarkCircle,
   'checkmark-circle-outline': checkmarkCircleOutline,
+  'information-circle': informationCircle,
+  'warning': warning,
   'list-outline': listOutline,
   'chatbubbles-outline': chatbubblesOutline,
   'star-outline': starOutline,

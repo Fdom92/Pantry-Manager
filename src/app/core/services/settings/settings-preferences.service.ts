@@ -18,9 +18,8 @@ import { StorageService } from '../shared/storage.service';
   providedIn: 'root',
 })
 export class SettingsPreferencesService {
-  // DI
   private readonly storage = inject<StorageService<AppPreferencesDoc>>(StorageService);
-  // DATA
+
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
   private readonly plannerMemoryLimit = PLANNER_MEMORY_MAX_LENGTH;
@@ -28,9 +27,9 @@ export class SettingsPreferencesService {
     typeof window !== 'undefined' && typeof window.matchMedia === 'function'
       ? window.matchMedia('(prefers-color-scheme: dark)')
       : null;
-  // SIGNALS
+
   private readonly preferencesSignal = signal<AppPreferences>({ ...DEFAULT_PREFERENCES });
-  // COMPUTED
+
   readonly preferences = computed(() => this.preferencesSignal());
 
   constructor() {

@@ -125,7 +125,64 @@
   },
   "dashboard": {
     "title": "Start",
+    "aria": "Dashboard deiner Speisekammer",
     "confirmDeleteExpired": "Dadurch werden alle abgelaufenen Produkte gelöscht. Möchtest du fortfahren?",
+    "health": {
+      "critical": {
+        "title": "Deine Speisekammer braucht Aufmerksamkeit",
+        "description": "Es gibt Produkte, die sofortige Maßnahmen erfordern"
+      },
+      "attention": {
+        "title": "Überprüfe deine Speisekammer bald",
+        "description": "Einige Produkte laufen bald ab",
+        "trackingTitle": "Verbessere deine Kontrolle",
+        "trackingDescription": "Viele Produkte haben keine Tracking-Daten"
+      },
+      "optimal": {
+        "controlledTitle": "Alles unter Kontrolle",
+        "controlledDescription": "Du hast Produkte ohne kürzliche Aktivität",
+        "perfectTitle": "Deine Speisekammer ist perfekt",
+        "perfectDescription": "Keine abgelaufenen oder ablaufenden Produkte"
+      }
+    },
+    "sections": {
+      "actions": {
+        "title": "Was jetzt zu tun ist"
+      }
+    },
+    "actions": {
+      "expired": {
+        "title": "Abgelaufene Produkte überprüfen",
+        "description_one": "{{ count }} Produkt ist abgelaufen",
+        "description_other": "{{ count }} Produkte sind abgelaufen",
+        "cta": "Produkte ansehen"
+      },
+      "nearExpiry": {
+        "title": "Produkte laufen bald ab",
+        "titlePro": "Plane, bevor sie ablaufen",
+        "description": "{{ count }} Produkte laufen in {{ days }} Tagen ab",
+        "cta": "Produkte ansehen",
+        "ctaPro": "Rezepte generieren"
+      },
+      "stale": {
+        "title": "Produkte ohne Aktivität",
+        "description": "{{ count }} Produkte haben sich seit 30+ Tagen nicht bewegt",
+        "cta": "Überprüfen"
+      },
+      "weeklyPlan": {
+        "title": "Plane deine Woche",
+        "description": "Optimiere deine Speisekammer mit einem Wochenplan",
+        "cta": "Plan erstellen"
+      },
+      "upgrade": {
+        "title": "Hole das Beste aus deiner Speisekammer",
+        "description": "Personalisierte Rezepte und Wochenplanung mit KI",
+        "cta": "PRO entdecken"
+      }
+    },
+    "context": {
+      "recentlyAdded": "{{ count }} kürzlich hinzugefügte Produkte"
+    },
     "summary": {
       "title": "Vorratsübersicht",
       "toggle": "Vorratsübersicht ein-/ausblenden",
@@ -140,6 +197,9 @@
     "overview": {
       "aria": "Vorratsübersicht",
       "sections": {
+        "summary": {
+          "title": "Zusammenfassung"
+        },
         "alerts": {
           "title": "Warnungen"
         },
@@ -154,6 +214,17 @@
         }
       },
       "cards": {
+        "summary": {
+          "total": "Gesamt",
+          "basic": "Grundprodukte",
+          "complete": "Mit Daten",
+          "healthStatus": {
+            "allGood": "Alles unter Kontrolle",
+            "checkSoon": "Einige Produkte brauchen Aufmerksamkeit",
+            "needsAttention": "Deine Speisekammer braucht Aufmerksamkeit"
+          },
+          "staleItems": "{{ count }} Produkte seit 30+ Tagen unberührt"
+        },
         "nearExpiry": {
           "title": "Bald ablaufend",
           "body": "{{ count }} Produkte diese Woche",
@@ -250,39 +321,37 @@
         "dismiss": "Nicht jetzt"
       },
       "weeklyMealPlanning": {
-        "title": "Plane deine Mahlzeiten für die Woche",
-        "description": "Plane die Mahlzeiten dieser Woche mit dem, was du bereits hast.",
-        "cta": "Jetzt planen",
+        "title": "Die Woche organisieren?",
+        "description": "Gute Zeit, um deine Mahlzeiten mit dem zu planen, was du zu Hause hast.",
+        "cta": "Los geht's",
         "prompt": "Plane meine Mahlzeiten für diese Woche nur mit den Vorräten, die ich bereits habe."
       },
       "cookBeforeExpiry": {
-        "title": "Koche bevor sie ablaufen",
-        "description": "Nutze Produkte, die bald ablaufen und noch Bestand haben.",
-        "cta": "Bald ablaufende nutzen",
+        "title": "Du hast Produkte, die bald ablaufen",
+        "description": "Ich schlage dir Rezepte vor, um sie zu nutzen, bevor sie verderben.",
+        "cta": "Gib mir Ideen",
         "prompt": "Schlage Rezepte vor, die die bald ablaufenden Produkte in meiner Speisekammer priorisieren."
       },
-      "lunchIdeas": {
-        "title": "Was kann ich zum Mittagessen zubereiten?",
-        "description": "Schnelle Mittagsideen mit deinen Vorräten.",
-        "cta": "Ideen anzeigen",
-        "prompt": "Gib mir Mittagsoptionen für heute mit dem, was ich bereits habe."
-      },
-      "dinnerIdeas": {
-        "title": "Was kann ich zum Abendessen zubereiten?",
-        "description": "Abendessen-Vorschläge mit dem, was schon da ist.",
-        "cta": "Abendessen planen",
-        "prompt": "Plane ein einfaches Abendessen mit den Zutaten in meiner Speisekammer."
-      },
-      "whatToCookNow": {
-        "title": "Was koche ich jetzt?",
-        "description": "Du weißt nicht, was du essen sollst? Ich gebe dir Ideen mit deinen Vorräten.",
-        "cta": "Gib mir Ideen",
-        "prompt": "Teile schnelle Kochideen mit nur den Zutaten, die ich bereits besitze."
+      "smartCookingIdeas": {
+        "title": "Was koche ich heute?",
+        "description": "Ich gebe dir Ideen mit dem, was du gerade in deiner Speisekammer hast.",
+        "cta": "Inspiriere mich",
+        "prompt": "Gib mir Kochideen mit den Zutaten, die ich verfügbar habe."
       },
       "planAndSaveTime": {
-        "title": "Plane deine Mahlzeiten und spare jede Woche Zeit",
-        "description": "Schalte den PRO-Planer frei und organisiere dein Menü ganz leicht.",
-        "cta": "PRO werden"
+        "title": "Woche mit KI planen",
+        "description": "Mit PRO organisierst du dein Wochenmenü und sparst jeden Tag Zeit.",
+        "cta": "PRO testen"
+      },
+      "historyUnlimited": {
+        "title": "Was verschwendest du am meisten?",
+        "description": "Mit PRO findest du heraus, was du wegwirfst, und kaufst nur, was du brauchst.",
+        "cta": "Mehr erfahren"
+      },
+      "smartInsights": {
+        "title": "Warnungen vor Ablauf",
+        "description": "Mit PRO sage ich dir, was du kochen sollst, um nichts zu verschwenden.",
+        "cta": "Mehr erfahren"
       }
     }
   },
