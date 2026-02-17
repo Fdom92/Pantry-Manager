@@ -1,8 +1,7 @@
 import type { BaseDoc } from '../shared/base-doc.model';
 
-// TYPES
 export type AppThemePreference = 'light' | 'dark' | 'system';
-// INTERFACES
+
 export interface AppPreferences {
   theme: AppThemePreference;
   nearExpiryDays: number;

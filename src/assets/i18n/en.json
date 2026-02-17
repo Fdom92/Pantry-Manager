@@ -125,7 +125,64 @@
   },
   "dashboard": {
     "title": "Home",
+    "aria": "Your pantry dashboard",
     "confirmDeleteExpired": "This will delete all expired products. Continue?",
+    "health": {
+      "critical": {
+        "title": "Your pantry needs attention",
+        "description": "There are products that require immediate action"
+      },
+      "attention": {
+        "title": "Check your pantry soon",
+        "description": "Some products are expiring soon",
+        "trackingTitle": "Improve your control",
+        "trackingDescription": "Many products don't have tracking dates"
+      },
+      "optimal": {
+        "controlledTitle": "Everything's under control",
+        "controlledDescription": "You have products with no recent activity",
+        "perfectTitle": "Your pantry is perfect",
+        "perfectDescription": "No expired or expiring products"
+      }
+    },
+    "sections": {
+      "actions": {
+        "title": "What to do now"
+      }
+    },
+    "actions": {
+      "expired": {
+        "title": "Review expired products",
+        "description_one": "{{ count }} product has expired",
+        "description_other": "{{ count }} products have expired",
+        "cta": "View products"
+      },
+      "nearExpiry": {
+        "title": "Products expiring soon",
+        "titlePro": "Plan before they expire",
+        "description": "{{ count }} products expire in {{ days }} days",
+        "cta": "View products",
+        "ctaPro": "Generate recipes"
+      },
+      "stale": {
+        "title": "Products with no activity",
+        "description": "{{ count }} products haven't moved in 30+ days",
+        "cta": "Review"
+      },
+      "weeklyPlan": {
+        "title": "Plan your week",
+        "description": "Optimize your pantry with a weekly plan",
+        "cta": "Create plan"
+      },
+      "upgrade": {
+        "title": "Make the most of your pantry",
+        "description": "Personalized recipes and weekly planning with AI",
+        "cta": "Discover PRO"
+      }
+    },
+    "context": {
+      "recentlyAdded": "{{ count }} recently added products"
+    },
     "summary": {
       "title": "Pantry overview",
       "toggle": "Toggle pantry overview",
@@ -140,6 +197,9 @@
     "overview": {
       "aria": "Pantry overview",
       "sections": {
+        "summary": {
+          "title": "Summary"
+        },
         "alerts": {
           "title": "Alerts"
         },
@@ -154,6 +214,17 @@
         }
       },
       "cards": {
+        "summary": {
+          "total": "Total",
+          "basic": "Essentials",
+          "complete": "With dates",
+          "healthStatus": {
+            "allGood": "Everything's under control",
+            "checkSoon": "Some items need attention",
+            "needsAttention": "Your pantry needs a check"
+          },
+          "staleItems": "{{ count }} items untouched for 30+ days"
+        },
         "nearExpiry": {
           "title": "Expiring soon",
           "body": "{{ count }} products this week",
@@ -250,39 +321,37 @@
         "dismiss": "Not now"
       },
       "weeklyMealPlanning": {
-        "title": "Plan your meals for the week",
-        "description": "Plan this week's meals with what you already have.",
-        "cta": "Plan now",
+        "title": "Plan the week?",
+        "description": "Good time to organize your meals with what you have at home.",
+        "cta": "Let's go",
         "prompt": "Plan my meals for this week using only what I already have in the pantry."
       },
       "cookBeforeExpiry": {
-        "title": "Cook before they expire",
-        "description": "Use up the products that are about to expire and still have stock.",
-        "cta": "Use expiring items",
+        "title": "You have items expiring soon",
+        "description": "I'll suggest recipes to use them before they go bad.",
+        "cta": "Give me ideas",
         "prompt": "Suggest recipes that prioritize the products expiring soon in my pantry."
       },
-      "lunchIdeas": {
-        "title": "What can I make for lunch?",
-        "description": "Quick lunch ideas using your pantry.",
-        "cta": "See ideas",
-        "prompt": "Give me lunch options for today using what I already have."
-      },
-      "dinnerIdeas": {
-        "title": "What can I make for dinner?",
-        "description": "Dinner suggestions with what you already have.",
-        "cta": "Plan dinner",
-        "prompt": "Plan a simple dinner using the ingredients in my pantry."
-      },
-      "whatToCookNow": {
-        "title": "What should I cook now?",
-        "description": "Not sure what to eat? I'll suggest ideas with your pantry.",
-        "cta": "Give me ideas",
-        "prompt": "Share quick meal ideas using only the ingredients I already own."
+      "smartCookingIdeas": {
+        "title": "What should I cook today?",
+        "description": "I'll give you ideas with what you have in your pantry right now.",
+        "cta": "Inspire me",
+        "prompt": "Give me cooking ideas using the ingredients I have available."
       },
       "planAndSaveTime": {
-        "title": "Plan meals and save time every week",
-        "description": "Unlock the PRO planner and organize your menu easily.",
-        "cta": "Go PRO"
+        "title": "Plan the week with AI",
+        "description": "With PRO, organize your weekly menu and save time every day.",
+        "cta": "Try PRO"
+      },
+      "historyUnlimited": {
+        "title": "What do you waste most?",
+        "description": "With PRO, discover what you throw away and buy only what you need.",
+        "cta": "Learn more"
+      },
+      "smartInsights": {
+        "title": "Alerts before expiry",
+        "description": "With PRO, I'll tell you what to cook so you don't waste anything.",
+        "cta": "Learn more"
       }
     }
   },

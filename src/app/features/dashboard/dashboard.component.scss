@@ -1,154 +1,235 @@
-ion-card {
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-}
-
-.insights-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 ion-title {
-  color: var(--ion-text-color, var(--ion-text-color));
+  color: var(--ion-text-color);
 }
 
-.overview-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.overview {
+.dashboard {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
 
-.overview-section-header {
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dashboard-section-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin: 6px 10px;
+  margin: 0 10px;
 }
 
-.overview-section-title {
+.dashboard-section-title {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--ion-color-text);
+  color: var(--ion-text-color);
   letter-spacing: 0.02em;
+  text-transform: uppercase;
+  opacity: 0.7;
 }
 
-.overview-card {
-  margin-inline: 10px;
-  margin-top: 0;
-  margin-bottom: 0;
-  cursor: pointer;
-  user-select: none;
-  transition:
-    box-shadow 140ms ease;
-  border-radius: 16px;
-  border: 1px solid var(--app-surface-border);
-  background:
-    radial-gradient(
-        circle at 20% 25%,
-        color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 22%, transparent),
-        transparent 38%
-      ),
-    radial-gradient(
-        circle at 80% 10%,
-        color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 18%, transparent),
-        transparent 36%
-      ),
-    var(--app-surface-bg);
-  color: var(--app-surface-text);
-}
-
-.overview-card ion-card-header {
-  padding-bottom: 6px;
-}
-
-.overview-card ion-card-title {
-  font-size: 1rem;
-  color: var(--app-surface-title);
-}
-
-.overview-card ion-card-content {
-  display: flex;
-  flex-direction: column;
-  padding-top: 0;
-}
-
-.overview-card__header {
+// LAYER 1: Pantry Health (Interpreted State)
+.pantry-health {
   display: flex;
   align-items: center;
+  gap: 16px;
+  margin-inline: 10px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--ion-card-background);
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  transition: all 140ms ease;
+
+  &--skeleton {
+    opacity: 0.6;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    margin: 0 0 6px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ion-text-color);
+    line-height: 1.3;
+  }
+
+  &__description {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ion-color-medium);
+    line-height: 1.4;
+  }
+
+  // State-specific styling
+  &[data-state='critical'] {
+    border-left: 4px solid var(--ion-color-danger);
+
+    .pantry-health__icon {
+      color: var(--ion-color-danger);
+      background: color-mix(in srgb, var(--ion-color-danger) 12%, transparent);
+    }
+  }
+
+  &[data-state='attention'] {
+    border-left: 4px solid var(--ion-color-warning);
+
+    .pantry-health__icon {
+      color: var(--ion-color-warning);
+      background: color-mix(in srgb, var(--ion-color-warning) 12%, transparent);
+    }
+  }
+
+  &[data-state='optimal'] {
+    border-left: 4px solid var(--ion-color-success);
+
+    .pantry-health__icon {
+      color: var(--ion-color-success);
+      background: color-mix(in srgb, var(--ion-color-success) 12%, transparent);
+    }
+  }
+}
+
+// LAYER 2: Actions (What to Do Now)
+.actions-stack {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
-.overview-card__icon {
-  display: inline-flex;
+.action-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-inline: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--ion-card-background);
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  transition: all 140ms ease;
+  position: relative;
+
+  &__content {
+    flex: 1;
+  }
+
+  &__title {
+    margin: 0 0 6px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ion-text-color);
+    line-height: 1.3;
+  }
+
+  &__description {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ion-color-medium);
+    line-height: 1.4;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__cta {
+    margin: 0;
+    --padding-start: 16px;
+    --padding-end: 16px;
+  }
+
+  &__dismiss {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ion-color-medium);
+    cursor: pointer;
+    transition: all 140ms ease;
+    flex-shrink: 0;
+    margin-left: auto;
+
+    ion-icon {
+      font-size: 20px;
+    }
+
+    &:hover {
+      background: color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  // Category-specific styling
+  &[data-category='critical'] {
+    border-left: 4px solid var(--ion-color-danger);
+  }
+
+  &[data-category='preventive'] {
+    border-left: 4px solid var(--ion-color-warning);
+  }
+
+  &[data-category='optimization'] {
+    border-left: 4px solid var(--ion-color-success);
+  }
+
+  &[data-category='conversion'] {
+    border-left: 4px solid var(--ion-color-secondary);
+  }
+}
+
+// LAYER 3: Additional Context (Optional)
+.context-section {
+  margin-inline: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
+}
+
+.context-item {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  --app-icon-badge-size: 64px;
-  --app-icon-size: 32px;
-  --app-icon-badge-radius: 18px;
-  width: var(--app-icon-badge-size);
-  height: var(--app-icon-badge-size);
-  border-radius: var(--app-icon-badge-radius);
-  color: var(--app-surface-title);
-  background: color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 35%, transparent);
-}
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--ion-text-color);
+  line-height: 1.4;
 
-.overview-card__icon ion-icon {
-  font-size: var(--app-icon-size);
-}
+  ion-icon {
+    font-size: 20px;
+    color: var(--ion-color-primary);
+    flex-shrink: 0;
+  }
 
-.overview-card__body {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--app-surface-muted);
-}
-
-.overview-card ion-button {
-  align-self: flex-start;
-  --border-color: color-mix(in srgb, var(--card-accent, var(--ion-color-primary)) 65%, transparent);
-  --color: var(--app-surface-title);
-}
-
-.overview-card--expired {
-  --card-accent: var(--ion-color-danger);
-}
-
-.overview-card--near-expiry {
-  --card-accent: var(--ion-color-warning);
-}
-
-.overview-card--skeleton {
-  --card-accent: var(--ion-color-step-300, #d0d3d8);
-}
-
-.overview-card--pending {
-  --card-accent: var(--ion-color-tertiary);
-}
-
-.overview-card--stock {
-  --card-accent: var(--ion-color-primary);
-}
-
-.overview-card--recent {
-  --card-accent: var(--ion-color-success);
-}
-
-.overview-card--shopping {
-  --card-accent: var(--ion-color-secondary);
-}
-
-.overview-card--consume {
-  --card-accent: var(--ion-color-success);
-}
-
-@media (max-width: 470px) {
-  .overview-grid {
-    grid-template-columns: 1fr;
+  span {
+    flex: 1;
   }
 }

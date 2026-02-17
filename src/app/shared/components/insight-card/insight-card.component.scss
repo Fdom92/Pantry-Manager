@@ -1,23 +1,27 @@
 .insight-card {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  margin-inline: 10px;
+  margin-top: 0;
+  margin-bottom: 0;
   border-radius: 16px;
-  background: var(--app-surface-bg);
-  color: var(--app-surface-text);
-  border: 1px solid var(--app-surface-border);
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.35);
+  background: var(--ion-card-background);
+  color: var(--ion-text-color);
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  border-left: 4px solid var(--ion-color-primary);
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  transition: box-shadow 140ms ease, border-color 140ms ease;
 
   &__message {
     margin: 0;
-    font-size: 0.8rem;
-    color: var(--app-surface-muted);
+    font-size: 0.85rem;
+    color: var(--ion-color-medium);
+    line-height: 1.4;
   }
 
   &__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    margin-top: 12px;
   }
 
   ion-button {
@@ -25,11 +29,17 @@
   }
 
   ion-card-header {
-    padding-bottom: 0;
+    padding-bottom: 8px;
   }
 
   ion-card-title {
     font-size: 1rem;
-    color: var(--app-surface-title);
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+
+  ion-card-content {
+    display: flex;
+    flex-direction: column;
   }
 }

@@ -125,7 +125,64 @@
   },
   "dashboard": {
     "title": "Home",
+    "aria": "Dashboard della tua dispensa",
     "confirmDeleteExpired": "Questo eliminerà tutti i prodotti scaduti. Continuare?",
+    "health": {
+      "critical": {
+        "title": "La tua dispensa ha bisogno di attenzione",
+        "description": "Ci sono prodotti che richiedono azione immediata"
+      },
+      "attention": {
+        "title": "Controlla la tua dispensa presto",
+        "description": "Alcuni prodotti stanno per scadere",
+        "trackingTitle": "Migliora il tuo controllo",
+        "trackingDescription": "Molti prodotti non hanno date di tracciamento"
+      },
+      "optimal": {
+        "controlledTitle": "Tutto sotto controllo",
+        "controlledDescription": "Hai prodotti senza attività recente",
+        "perfectTitle": "La tua dispensa è perfetta",
+        "perfectDescription": "Nessun prodotto scaduto o in scadenza"
+      }
+    },
+    "sections": {
+      "actions": {
+        "title": "Cosa fare ora"
+      }
+    },
+    "actions": {
+      "expired": {
+        "title": "Rivedi i prodotti scaduti",
+        "description_one": "{{ count }} prodotto è scaduto",
+        "description_other": "{{ count }} prodotti sono scaduti",
+        "cta": "Vedi prodotti"
+      },
+      "nearExpiry": {
+        "title": "Prodotti in scadenza presto",
+        "titlePro": "Pianifica prima che scadano",
+        "description": "{{ count }} prodotti scadono tra {{ days }} giorni",
+        "cta": "Vedi prodotti",
+        "ctaPro": "Genera ricette"
+      },
+      "stale": {
+        "title": "Prodotti senza attività",
+        "description": "{{ count }} prodotti non si sono mossi da 30+ giorni",
+        "cta": "Rivedi"
+      },
+      "weeklyPlan": {
+        "title": "Pianifica la tua settimana",
+        "description": "Ottimizza la tua dispensa con un piano settimanale",
+        "cta": "Crea piano"
+      },
+      "upgrade": {
+        "title": "Sfrutta al massimo la tua dispensa",
+        "description": "Ricette personalizzate e pianificazione settimanale con IA",
+        "cta": "Scopri PRO"
+      }
+    },
+    "context": {
+      "recentlyAdded": "{{ count }} prodotti aggiunti di recente"
+    },
     "summary": {
       "title": "Panoramica della dispensa",
       "toggle": "Mostra/nascondi panoramica della dispensa",
@@ -140,6 +197,9 @@
     "overview": {
       "aria": "Panoramica della dispensa",
       "sections": {
+        "summary": {
+          "title": "Riepilogo"
+        },
         "alerts": {
           "title": "Avvisi"
         },
@@ -154,6 +214,17 @@
         }
       },
       "cards": {
+        "summary": {
+          "total": "Totale",
+          "basic": "Essenziali",
+          "complete": "Con date",
+          "healthStatus": {
+            "allGood": "Tutto sotto controllo",
+            "checkSoon": "Alcuni prodotti richiedono attenzione",
+            "needsAttention": "La tua dispensa ha bisogno di attenzione"
+          },
+          "staleItems": "{{ count }} prodotti non toccati da 30+ giorni"
+        },
         "nearExpiry": {
           "title": "In scadenza a breve",
           "body": "{{ count }} prodotti questa settimana",
@@ -250,39 +321,37 @@
         "dismiss": "Non ora"
       },
       "weeklyMealPlanning": {
-        "title": "Pianifica i pasti della settimana",
-        "description": "Organizza i pasti di questa settimana con ciò che hai già.",
-        "cta": "Pianifica ora",
+        "title": "Organizziamo la settimana?",
+        "description": "È un buon momento per pianificare i pasti con ciò che hai in casa.",
+        "cta": "Andiamo",
         "prompt": "Pianifica i pasti di questa settimana usando solo ciò che ho già in dispensa."
       },
       "cookBeforeExpiry": {
-        "title": "Cucina prima che scadano",
-        "description": "Sfrutta i prodotti che stanno per scadere e hanno ancora scorte.",
-        "cta": "Usa prodotti critici",
+        "title": "Hai prodotti che stanno per scadere",
+        "description": "Ti suggerisco ricette per usarli prima che vadano a male.",
+        "cta": "Dammi idee",
         "prompt": "Suggerisci ricette che diano priorità ai prodotti in scadenza nella mia dispensa."
       },
-      "lunchIdeas": {
-        "title": "Cosa posso preparare per pranzo?",
-        "description": "Idee veloci per il pranzo usando la tua dispensa.",
-        "cta": "Vedi idee",
-        "prompt": "Dammi opzioni per il pranzo di oggi usando ciò che ho disponibile."
-      },
-      "dinnerIdeas": {
-        "title": "Cosa posso preparare per cena?",
-        "description": "Suggerimenti per la cena con ciò che hai già.",
-        "cta": "Pianifica la cena",
-        "prompt": "Organizza una cena semplice con gli ingredienti della mia dispensa."
-      },
-      "whatToCookNow": {
-        "title": "Cosa cucino adesso?",
-        "description": "Non sai cosa mangiare? Ti do idee con la tua dispensa.",
-        "cta": "Dammi idee",
-        "prompt": "Dammi idee rapide su cosa cucinare usando solo gli ingredienti che possiedo."
+      "smartCookingIdeas": {
+        "title": "Cosa cucino oggi?",
+        "description": "Ti do idee con quello che hai in dispensa proprio adesso.",
+        "cta": "Ispirami",
+        "prompt": "Dammi idee di cucina usando gli ingredienti che ho disponibili."
       },
       "planAndSaveTime": {
-        "title": "Pianifica i pasti e risparmia tempo ogni settimana",
-        "description": "Sblocca il pianificatore PRO e organizza il tuo menù facilmente.",
-        "cta": "Diventa PRO"
+        "title": "Pianifica la settimana con l'IA",
+        "description": "Con PRO, organizza il tuo menù settimanale e risparmia tempo ogni giorno.",
+        "cta": "Prova PRO"
+      },
+      "historyUnlimited": {
+        "title": "Cosa sprechi di più?",
+        "description": "Con PRO, scopri cosa butti e compra solo ciò che ti serve.",
+        "cta": "Scopri di più"
+      },
+      "smartInsights": {
+        "title": "Avvisi prima della scadenza",
+        "description": "Con PRO, ti dico cosa cucinare per non sprecare nulla.",
+        "cta": "Scopri di più"
       }
     }
   },

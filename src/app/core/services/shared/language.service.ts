@@ -8,9 +8,8 @@ import { normalizeLocaleCode } from '@core/utils/normalization.util';
   providedIn: 'root',
 })
 export class LanguageService {
-  // DI
   private readonly translate = inject(TranslateService);
-  // SIGNALS
+
   private readonly currentLanguage = signal<SupportedLanguage>(DEFAULT_LANGUAGE);
 
   async init(): Promise<void> {

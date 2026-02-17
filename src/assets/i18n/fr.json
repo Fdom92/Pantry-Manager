@@ -125,7 +125,64 @@
   },
   "dashboard": {
     "title": "Accueil",
+    "aria": "Tableau de bord de votre garde-manger",
     "confirmDeleteExpired": "Cela supprimera tous les produits périmés. Voulez-vous continuer ?",
+    "health": {
+      "critical": {
+        "title": "Votre garde-manger nécessite attention",
+        "description": "Il y a des produits qui nécessitent une action immédiate"
+      },
+      "attention": {
+        "title": "Vérifiez votre garde-manger bientôt",
+        "description": "Certains produits expirent bientôt",
+        "trackingTitle": "Améliorez votre contrôle",
+        "trackingDescription": "Beaucoup de produits n'ont pas de dates de suivi"
+      },
+      "optimal": {
+        "controlledTitle": "Tout est sous contrôle",
+        "controlledDescription": "Vous avez des produits sans activité récente",
+        "perfectTitle": "Votre garde-manger est parfait",
+        "perfectDescription": "Aucun produit périmé ou en cours d'expiration"
+      }
+    },
+    "sections": {
+      "actions": {
+        "title": "Que faire maintenant"
+      }
+    },
+    "actions": {
+      "expired": {
+        "title": "Vérifier les produits périmés",
+        "description_one": "{{ count }} produit a expiré",
+        "description_other": "{{ count }} produits ont expiré",
+        "cta": "Voir les produits"
+      },
+      "nearExpiry": {
+        "title": "Produits bientôt périmés",
+        "titlePro": "Planifier avant qu'ils n'expirent",
+        "description": "{{ count }} produits expirent dans {{ days }} jours",
+        "cta": "Voir les produits",
+        "ctaPro": "Générer des recettes"
+      },
+      "stale": {
+        "title": "Produits sans activité",
+        "description": "{{ count }} produits n'ont pas bougé depuis 30+ jours",
+        "cta": "Réviser"
+      },
+      "weeklyPlan": {
+        "title": "Planifiez votre semaine",
+        "description": "Optimisez votre garde-manger avec un plan hebdomadaire",
+        "cta": "Créer un plan"
+      },
+      "upgrade": {
+        "title": "Tirez le meilleur parti de votre garde-manger",
+        "description": "Recettes personnalisées et planification hebdomadaire avec IA",
+        "cta": "Découvrir PRO"
+      }
+    },
+    "context": {
+      "recentlyAdded": "{{ count }} produits récemment ajoutés"
+    },
     "summary": {
       "title": "Résumé du garde-manger",
       "toggle": "Afficher/Masquer le résumé du garde-manger",
@@ -140,6 +197,9 @@
     "overview": {
       "aria": "Résumé du garde-manger",
       "sections": {
+        "summary": {
+          "title": "Résumé"
+        },
         "alerts": {
           "title": "Alertes"
         },
@@ -154,6 +214,17 @@
         }
       },
       "cards": {
+        "summary": {
+          "total": "Total",
+          "basic": "Essentiels",
+          "complete": "Avec dates",
+          "healthStatus": {
+            "allGood": "Tout est sous contrôle",
+            "checkSoon": "Certains produits nécessitent attention",
+            "needsAttention": "Votre garde-manger a besoin d'attention"
+          },
+          "staleItems": "{{ count }} produits non touchés depuis 30+ jours"
+        },
         "nearExpiry": {
           "title": "Bientôt périmés",
           "body": "{{ count }} produits cette semaine",
@@ -250,39 +321,37 @@
         "dismiss": "Pas maintenant"
       },
       "weeklyMealPlanning": {
-        "title": "Planifiez les repas de la semaine",
-        "description": "Planifiez les repas de cette semaine avec ce que vous avez déjà.",
-        "cta": "Planifier maintenant",
+        "title": "Organiser la semaine ?",
+        "description": "C'est le bon moment pour planifier vos repas avec ce que vous avez chez vous.",
+        "cta": "C'est parti",
         "prompt": "Planifie mes repas de cette semaine en utilisant uniquement ce qui se trouve déjà dans mon garde-manger."
       },
       "cookBeforeExpiry": {
-        "title": "Cuisinez avant qu'ils expirent",
-        "description": "Profitez des produits qui vont bientôt périmer et qui ont encore du stock.",
-        "cta": "Utiliser les produits urgents",
+        "title": "Vous avez des produits qui expirent bientôt",
+        "description": "Je vous suggère des recettes pour les utiliser avant qu'ils ne se gâtent.",
+        "cta": "Donne-moi des idées",
         "prompt": "Suggère des recettes qui privilégient les produits bientôt périmés de mon garde-manger."
       },
-      "lunchIdeas": {
-        "title": "Que puis-je préparer pour le déjeuner ?",
-        "description": "Idées rapides de déjeuner avec votre garde-manger.",
-        "cta": "Voir des idées",
-        "prompt": "Donne-moi des options de déjeuner pour aujourd'hui avec ce que j'ai déjà."
-      },
-      "dinnerIdeas": {
-        "title": "Que puis-je préparer pour le dîner ?",
-        "description": "Suggestions de dîner avec ce que vous possédez déjà.",
-        "cta": "Planifier le dîner",
-        "prompt": "Planifie un dîner simple avec les ingrédients de mon garde-manger."
-      },
-      "whatToCookNow": {
-        "title": "Que cuisiner maintenant ?",
-        "description": "Vous ne savez pas quoi manger ? Je vous propose des idées avec votre garde-manger.",
-        "cta": "Donne-moi des idées",
-        "prompt": "Propose des idées rapides à cuisiner en utilisant uniquement les ingrédients que je possède déjà."
+      "smartCookingIdeas": {
+        "title": "Qu'est-ce que je cuisine aujourd'hui ?",
+        "description": "Je vous donne des idées avec ce que vous avez dans votre garde-manger en ce moment.",
+        "cta": "Inspire-moi",
+        "prompt": "Donne-moi des idées de cuisine en utilisant les ingrédients que j'ai disponibles."
       },
       "planAndSaveTime": {
-        "title": "Planifiez vos repas et gagnez du temps chaque semaine",
-        "description": "Débloquez le planificateur PRO et organisez facilement votre menu.",
-        "cta": "Devenir PRO"
+        "title": "Planifier la semaine avec l'IA",
+        "description": "Avec PRO, organisez votre menu hebdomadaire et gagnez du temps chaque jour.",
+        "cta": "Essayer PRO"
+      },
+      "historyUnlimited": {
+        "title": "Qu'est-ce que vous gaspillez le plus ?",
+        "description": "Avec PRO, découvrez ce que vous jetez et achetez seulement ce dont vous avez besoin.",
+        "cta": "En savoir plus"
+      },
+      "smartInsights": {
+        "title": "Alertes avant expiration",
+        "description": "Avec PRO, je vous dis quoi cuisiner pour ne rien gaspiller.",
+        "cta": "En savoir plus"
       }
     }
   },

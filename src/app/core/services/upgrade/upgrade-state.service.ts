@@ -9,18 +9,17 @@ import { UpgradeRevenuecatService } from './upgrade-revenuecat.service';
 
 @Injectable()
 export class UpgradeStateService {
-  // DI
   private readonly destroyRef = inject(DestroyRef);
   private readonly lifecycle = createLatestOnlyRunner(this.destroyRef);
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
-  // SIGNALS
+
   readonly isLoadingPlans = signal(false);
   readonly planOptions = signal<PlanViewModel[]>([]);
   readonly activePurchaseId = signal<string | null>(null);
   readonly isPro$ = this.revenuecat.isPro$;
-  // VARIABLES
+
   private monthlyPriceValue: number | null = null;
   private annualPriceValue: number | null = null;
   private readonly benefitKeys = [

@@ -1,16 +1,15 @@
 import type { PantryItem } from '../pantry';
 import type { BaseDoc } from '../shared/base-doc.model';
 
-// ENUMS
 export enum ShoppingReason {
   EMPTY = 'empty',
   BELOW_MIN = 'below-min',
 }
-// TYPES
+
 export type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;
 export type ShoppingSuggestionGroupWithItem = ShoppingSuggestionGroup<PantryItem>;
 export type ShoppingStateWithItem = ShoppingState<PantryItem>;
-// INTERFACES
+
 export interface ShoppingList extends BaseDoc {
   readonly type: 'shopping-list';
   name: string;
