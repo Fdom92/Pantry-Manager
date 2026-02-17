@@ -24,13 +24,16 @@
 <ion-content class="ion-padding">
   @if (canUseAgent) {
     @if (showQuickStart) {
-      <ion-card class="planning-empty">
-        <ion-card-content>
+      <div class="planning-empty">
+        <div class="planning-empty__icon">
+          <ion-icon name="sparkles-outline"></ion-icon>
+        </div>
+        <div class="planning-empty__content">
           <p class="eyebrow">{{ 'agent.quickStart.title' | translate }}</p>
           <h2>{{ 'agent.quickStart.headline' | translate }}</h2>
           <p class="muted">{{ 'agent.quickStart.subtitle' | translate }}</p>
-        </ion-card-content>
-      </ion-card>
+        </div>
+      </div>
     }
     <div class="chat">
       @for (message of facade.conversationMessages(); track facade.trackById($index, message)) {
@@ -126,7 +129,7 @@
 <ion-footer>
   @if (canUseAgent && showQuickStart) {
     <div class="quick-start">
-      <div>
+      <div class="quick-start__header">
         <p class="eyebrow">{{ 'agent.quickStart.ctaTitle' | translate }}</p>
         <p class="muted">{{ 'agent.quickStart.ctaSubtitle' | translate }}</p>
       </div>
@@ -140,6 +143,10 @@
     </div>
   } @else if (canUseAgent) {
     <div class="composer">
+      <p class="ai-disclaimer">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        {{ 'agent.disclaimer' | translate }}
+      </p>
       <ion-textarea
         #composerInput
         class="composer__input"

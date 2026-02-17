@@ -1,9 +1,9 @@
 ion-card {
-  background: var(--ion-card-background, var(--ion-card-background)) !important;
-  --background: var(--ion-card-background, var(--ion-card-background));
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  color: var(--ion-text-color);
+  background: var(--app-theme-card-bg) !important;
+  --background: var(--app-theme-card-bg);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  border-color: var(--app-theme-card-border-color);
+  color: var(--app-theme-text-color);
 }
 
 ion-card-title {
@@ -14,14 +14,14 @@ ion-card-title {
 }
 
 ion-title {
-  color: var(--ion-text-color, var(--ion-text-color));
+  color: var(--app-theme-text-color);
 }
 
 .suggestions-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
   padding-top: 0;
 }
 
@@ -33,57 +33,57 @@ ion-title {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 16px 0;
-  color: var(--ion-color-medium);
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-lg) 0;
+  color: var(--app-theme-text-muted);
 }
 
 .meta {
-  margin: 4px 0 0;
-  color: var(--ion-color-medium);
+  margin: var(--app-theme-spacing-xs) 0 0;
+  color: var(--app-theme-text-muted);
 }
 
 .suggestion-groups {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--app-theme-spacing-2xl);
 }
 
 .suggestion-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
 }
 
 .supermarket-heading {
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: var(--app-theme-font-weight-bold);
 }
 
 .supermarket-heading ion-badge {
-  margin-left: 4px;
+  margin-left: var(--app-theme-spacing-xs);
 }
 
 .suggestion-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--app-theme-spacing-lg);
 }
 
 .suggestion-card {
   margin: 0;
-  border-radius: 16px;
+  border-radius: var(--app-theme-card-border-radius);
 }
 
 .suggestion-card ion-card-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-lg);
 }
 
 .suggestion-content {
@@ -95,7 +95,7 @@ ion-title {
 .suggestion-content h3 {
   margin: 0;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: var(--app-theme-font-weight-bold);
 }
 
 .purchase-action {

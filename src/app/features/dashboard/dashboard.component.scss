@@ -1,31 +1,31 @@
 ion-title {
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
 }
 
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--app-theme-spacing-2xl);
 }
 
 .dashboard-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
 }
 
 .dashboard-section-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin: 0 10px;
+  margin: 0 var(--app-theme-card-margin-inline);
 }
 
 .dashboard-section-title {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
   letter-spacing: 0.02em;
   text-transform: uppercase;
   opacity: 0.7;
@@ -35,14 +35,14 @@ ion-title {
 .pantry-health {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-inline: 10px;
-  padding: 20px;
-  border-radius: 16px;
-  background: var(--ion-card-background);
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  transition: all 140ms ease;
+  gap: var(--app-theme-spacing-lg);
+  margin-inline: var(--app-theme-card-margin-inline);
+  padding: var(--app-theme-spacing-xl);
+  border-radius: var(--app-theme-card-border-radius);
+  background: var(--app-theme-card-bg);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  transition: var(--app-theme-card-transition);
 
   &--skeleton {
     opacity: 0.6;
@@ -66,23 +66,23 @@ ion-title {
   }
 
   &__title {
-    margin: 0 0 6px 0;
+    margin: 0 0 var(--app-theme-spacing-xs) 0;
     font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--ion-text-color);
-    line-height: 1.3;
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+    line-height: var(--app-theme-line-height-tight);
   }
 
   &__description {
     margin: 0;
-    font-size: 0.875rem;
-    color: var(--ion-color-medium);
-    line-height: 1.4;
+    font-size: var(--app-theme-font-size-body);
+    color: var(--app-theme-text-muted);
+    line-height: var(--app-theme-line-height-normal);
   }
 
   // State-specific styling
   &[data-state='critical'] {
-    border-left: 4px solid var(--ion-color-danger);
+    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-critical);
 
     .pantry-health__icon {
       color: var(--ion-color-danger);
@@ -91,20 +91,20 @@ ion-title {
   }
 
   &[data-state='attention'] {
-    border-left: 4px solid var(--ion-color-warning);
+    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-warning);
 
     .pantry-health__icon {
-      color: var(--ion-color-warning);
-      background: color-mix(in srgb, var(--ion-color-warning) 12%, transparent);
+      color: var(--app-theme-card-accent-warning);
+      background: color-mix(in srgb, var(--app-theme-card-accent-warning) 12%, transparent);
     }
   }
 
   &[data-state='optimal'] {
-    border-left: 4px solid var(--ion-color-success);
+    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-success);
 
     .pantry-health__icon {
-      color: var(--ion-color-success);
-      background: color-mix(in srgb, var(--ion-color-success) 12%, transparent);
+      color: var(--app-theme-card-accent-success);
+      background: color-mix(in srgb, var(--app-theme-card-accent-success) 12%, transparent);
     }
   }
 }
@@ -113,20 +113,20 @@ ion-title {
 .actions-stack {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
 }
 
 .action-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-inline: 10px;
-  padding: 16px;
-  border-radius: 16px;
-  background: var(--ion-card-background);
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  transition: all 140ms ease;
+  gap: var(--app-theme-spacing-md);
+  margin-inline: var(--app-theme-card-margin-inline);
+  padding: var(--app-theme-card-padding);
+  border-radius: var(--app-theme-card-border-radius);
+  background: var(--app-theme-card-bg);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  transition: var(--app-theme-card-transition);
   position: relative;
 
   &__content {
@@ -134,24 +134,24 @@ ion-title {
   }
 
   &__title {
-    margin: 0 0 6px 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--ion-text-color);
-    line-height: 1.3;
+    margin: 0 0 var(--app-theme-spacing-xs) 0;
+    font-size: var(--app-theme-font-size-title);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+    line-height: var(--app-theme-line-height-tight);
   }
 
   &__description {
     margin: 0;
-    font-size: 0.875rem;
-    color: var(--ion-color-medium);
-    line-height: 1.4;
+    font-size: var(--app-theme-font-size-body);
+    color: var(--app-theme-text-muted);
+    line-height: var(--app-theme-line-height-normal);
   }
 
   &__footer {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--app-theme-spacing-md);
   }
 
   &__cta {
@@ -167,11 +167,11 @@ ion-title {
     width: 32px;
     height: 32px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--app-theme-spacing-sm);
     background: transparent;
-    color: var(--ion-color-medium);
+    color: var(--app-theme-text-muted);
     cursor: pointer;
-    transition: all 140ms ease;
+    transition: var(--app-theme-transition-fast);
     flex-shrink: 0;
     margin-left: auto;
 
@@ -190,27 +190,27 @@ ion-title {
 
   // Category-specific styling
   &[data-category='critical'] {
-    border-left: 4px solid var(--ion-color-danger);
+    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-critical);
   }
 
   &[data-category='preventive'] {
-    border-left: 4px solid var(--ion-color-warning);
+    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-warning);
   }
 
   &[data-category='optimization'] {
-    border-left: 4px solid var(--ion-color-success);
+    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-success);
   }
 
   &[data-category='conversion'] {
-    border-left: 4px solid var(--ion-color-secondary);
+    border-left: var(--app-theme-card-accent-width) solid var(--ion-color-secondary);
   }
 }
 
 // LAYER 3: Additional Context (Optional)
 .context-section {
-  margin-inline: 10px;
-  padding: 12px 16px;
-  border-radius: 12px;
+  margin-inline: var(--app-theme-card-margin-inline);
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg);
+  border-radius: var(--app-theme-spacing-md);
   background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
   border: 1px solid color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
 }
@@ -218,10 +218,10 @@ ion-title {
 .context-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.875rem;
-  color: var(--ion-text-color);
-  line-height: 1.4;
+  gap: var(--app-theme-spacing-md);
+  font-size: var(--app-theme-font-size-body);
+  color: var(--app-theme-text-color);
+  line-height: var(--app-theme-line-height-normal);
 
   ion-icon {
     font-size: 20px;

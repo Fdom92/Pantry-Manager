@@ -51,7 +51,7 @@
         <form [formGroup]="state.form">
           @if (!state.selectorEnabled()) {
               <div class="form-section">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-input
                     formControlName="name"
                     label="{{ 'pantry.form.name' | translate }}"
