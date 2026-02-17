@@ -1,14 +1,14 @@
 ion-title, ion-buttons > ion-button {
-  color: var(--ion-text-color, var(--ion-text-color));
+  color: var(--app-theme-text-color);
 }
 
 .pantry-search {
-  margin-bottom: 6px;
+  margin-bottom: var(--app-theme-spacing-xs);
 }
 
 .pantry-search ion-searchbar {
-  --border-radius: 12px;
-  --background: var(--ion-card-background, var(--ion-item-background, var(--ion-background-color, var(--ion-background-color))));
+  --border-radius: var(--app-theme-spacing-md);
+  --background: var(--app-theme-card-bg);
   padding: 0;
 }
 
@@ -16,14 +16,14 @@ ion-title, ion-buttons > ion-button {
   position: sticky;
   top: -16px;
   z-index: 10;
-  margin-bottom: 6px;
+  margin-bottom: var(--app-theme-spacing-xs);
   background: var(--ion-background-color);
 }
 
 .summary-chips {
   display: flex;
   overflow-x: auto;
-  padding: 4px 2px;
+  padding: var(--app-theme-spacing-xs) 2px;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
 }
@@ -34,32 +34,32 @@ ion-title, ion-buttons > ion-button {
 
 .summary-chips .status-chip {
   flex: 0 0 auto;
-  --padding-start: 10px;
+  --padding-start: var(--app-theme-spacing-md);
   --padding-end: 14px;
   --ripple-color: color-mix(in srgb, var(--ion-color-dark-contrast) 20%, transparent);
-  font-weight: 600;
+  font-weight: var(--app-theme-font-weight-bold);
   scroll-snap-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: var(--app-theme-transition-normal);
   border-radius: 999px;
 }
 
 .summary-chips .status-chip ion-icon {
   font-size: 18px;
-  margin-right: 6px;
-  color: var(--ion-color-medium);
+  margin-right: var(--app-theme-spacing-xs);
+  color: var(--app-theme-text-muted);
 }
 
 
 .summary-chips .status-chip .chip-body {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs);
   line-height: 1.1;
 }
 
 .summary-chips .status-chip .chip-label {
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: var(--app-theme-font-size-body);
+  font-weight: var(--app-theme-font-weight-semibold);
 }
 
 .summary-chips .status-chip .chip-count {
@@ -75,7 +75,7 @@ ion-title, ion-buttons > ion-button {
 .summary-chips .status-chip.active {
   opacity: 1;
   box-shadow: 0 4px 14px rgba(15, 20, 19, 0.18);
-  outline: 2px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  outline: 2px solid var(--app-theme-card-border-color);
   outline-offset: 2px;
 }
 

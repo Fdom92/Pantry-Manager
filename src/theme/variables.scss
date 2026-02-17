@@ -69,14 +69,92 @@
   --ion-toolbar-background: #ffffff;
   --ion-toolbar-color: var(--ion-color-dark);
 
-  --app-surface-bg:
-    radial-gradient(circle at 20% 25%, rgba(58, 152, 130, 0.18), transparent 35%),
-    radial-gradient(circle at 80% 10%, rgba(136, 200, 175, 0.22), transparent 32%),
-    linear-gradient(150deg, #f8fbfa 0%, #eef6f2 60%, #e9f2ef 100%);
-  --app-surface-border: rgba(15, 23, 42, 0.08);
-  --app-surface-text: var(--ion-color-dark);
-  --app-surface-title: var(--ion-color-dark);
-  --app-surface-muted: rgba(15, 20, 19, 0.62);
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // APP THEME VARIABLES - Brand Design System
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🎴 CARDS
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-card-bg: var(--ion-card-background);
+  --app-theme-card-border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  --app-theme-card-border-width: 1px;
+  --app-theme-card-border-radius: 16px;
+  --app-theme-card-shadow: 0 10px 26px rgba(15, 20, 19, 0.18);
+  --app-theme-card-margin-inline: 10px;
+  --app-theme-card-padding: 16px;
+  --app-theme-card-transition: all 140ms ease;
+
+  // Card accent borders (for state indicators)
+  --app-theme-card-accent-width: 4px;
+  --app-theme-card-accent-critical: var(--ion-color-danger);
+  --app-theme-card-accent-warning: var(--ion-color-warning);
+  --app-theme-card-accent-success: var(--ion-color-success);
+  --app-theme-card-accent-primary: var(--ion-color-primary);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 📝 INPUTS & TEXTAREAS
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-input-bg: transparent;
+  --app-theme-input-border-color: color-mix(in srgb, var(--ion-text-color) 14%, transparent);
+  --app-theme-input-border-width: 1.5px;
+  --app-theme-input-border-radius: 0;
+  --app-theme-input-padding-inline: 12px;
+  --app-theme-input-padding-block: 12px;
+  --app-theme-input-textarea-padding-block: 14px;
+  --app-theme-input-transition: all 180ms ease;
+
+  // Input focus state
+  --app-theme-input-focus-border-color: var(--ion-color-primary);
+  --app-theme-input-focus-bg: color-mix(in srgb, var(--ion-color-primary) 3%, transparent);
+  --app-theme-input-placeholder-color: color-mix(in srgb, var(--ion-text-color) 55%, transparent);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🎨 TYPOGRAPHY
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-text-color: var(--ion-text-color);
+  --app-theme-text-muted: var(--ion-color-medium);
+
+  // Font sizes
+  --app-theme-font-size-title: 1rem;
+  --app-theme-font-size-body: 0.875rem;
+  --app-theme-font-size-small: 0.75rem;
+
+  // Font weights
+  --app-theme-font-weight-bold: 600;
+  --app-theme-font-weight-semibold: 500;
+  --app-theme-font-weight-normal: 400;
+
+  // Line heights
+  --app-theme-line-height-tight: 1.3;
+  --app-theme-line-height-normal: 1.4;
+  --app-theme-line-height-relaxed: 1.5;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 📐 SPACING
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-spacing-xs: 4px;
+  --app-theme-spacing-sm: 8px;
+  --app-theme-spacing-md: 12px;
+  --app-theme-spacing-lg: 16px;
+  --app-theme-spacing-xl: 20px;
+  --app-theme-spacing-2xl: 24px;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🎭 EFFECTS & ANIMATIONS
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-transition-fast: 140ms ease;
+  --app-theme-transition-normal: 180ms ease;
+  --app-theme-transition-slow: 250ms ease;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🔲 LEGACY (Deprecated - use theme variables above)
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-surface-bg: var(--app-theme-card-bg);
+  --app-surface-border: var(--app-theme-card-border-color);
+  --app-surface-text: var(--app-theme-text-color);
+  --app-surface-title: var(--app-theme-text-color);
+  --app-surface-muted: var(--app-theme-text-muted);
   --app-icon-badge-size: 64px;
   --app-icon-size: 32px;
   --app-icon-badge-radius: 18px;
@@ -85,12 +163,6 @@
 .ion-palette-dark,
 .dark,
 [data-theme='dark'] {
-  --app-surface-bg:
-    radial-gradient(circle at 20% 25%, rgba(99, 102, 241, 0.22), transparent 35%),
-    radial-gradient(circle at 80% 10%, rgba(16, 185, 129, 0.2), transparent 32%),
-    linear-gradient(150deg, #0b1021 0%, #0f172a 60%, #0b1226 100%);
-  --app-surface-border: rgba(148, 163, 184, 0.35);
-  --app-surface-text: #f6f7fb;
-  --app-surface-title: var(--ion-color-light);
-  --app-surface-muted: rgba(226, 232, 240, 0.9);
+  // Dark mode inherits from :root with automatic adaptation
+  // No need to redefine --app-surface-* variables
 }

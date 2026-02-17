@@ -4,11 +4,7 @@
 
 .autocomplete-shell {
   position: relative;
-}
-
-.autocomplete-input {
-  --inner-padding-end: 6px;
-}
+}º
 
 .autocomplete-clear {
   --padding-start: 4px;
@@ -20,16 +16,16 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(100% + 6px);
+  top: calc(100% + var(--app-theme-spacing-xs));
   z-index: 200;
   margin: 0;
-  padding: 4px 0;
+  padding: var(--app-theme-spacing-xs) 0;
   max-height: 240px;
   overflow-y: auto;
-  border-radius: 12px;
-  border: 1px solid var(--app-surface-border, var(--ion-color-step-150));
-  background: var(--app-surface-bg, var(--ion-background-color, #fff));
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  border-radius: var(--app-theme-card-border-radius);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  background: var(--app-theme-card-bg);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
 }
 
 .autocomplete-options ion-item:last-child {
@@ -52,27 +48,27 @@
 .autocomplete-option ion-label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--app-theme-spacing-xs);
 }
 
 .autocomplete-option h3 {
   margin: 0;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: var(--app-theme-font-weight-bold);
 }
 
 .autocomplete-option p {
   margin: 0;
-  color: var(--app-surface-muted, var(--ion-color-medium));
+  color: var(--app-theme-text-muted);
   font-size: 0.82rem;
 }
 
 .autocomplete-option .meta-info {
-  color: var(--ion-color-medium);
-  font-size: 0.76rem;
+  color: var(--app-theme-text-muted);
+  font-size: var(--app-theme-font-size-small);
 }
 
 .autocomplete-empty {
   --background: transparent;
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
 }
