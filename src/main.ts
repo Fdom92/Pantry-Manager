@@ -49,6 +49,7 @@ import {
   homeOutline,
   hourglassOutline,
   informationCircle,
+  informationOutline,
   layersOutline,
   listOutline,
   locationOutline,
@@ -162,7 +163,8 @@ addIcons({
   'desktop-outline': desktopOutline,
   'close-outline': closeOutline,
   'arrow-forward-outline': arrowForwardOutline,
-  'chevron-forward-outline': chevronForwardOutline
+  'chevron-forward-outline': chevronForwardOutline,
+  'information-circle-outline': informationOutline
 });
 
 bootstrapApplication(AppComponent, {

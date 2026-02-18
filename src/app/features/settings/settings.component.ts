@@ -3,7 +3,9 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SettingsStateService } from '@core/services/settings/settings-state.service';
 import {
+  IonBackButton,
   IonButton,
+  IonButtons,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -28,6 +30,8 @@ import { environment } from 'src/environments/environment';
   imports: [
     IonHeader,
     IonToolbar,
+    IonButtons,
+    IonBackButton,
     IonTitle,
     IonContent,
     IonCard,

@@ -11,13 +11,16 @@
         </ion-badge>
       </div>
     </ion-title>
-    @if (canUseAgent) {
-      <ion-buttons slot="end">
-        <ion-button fill="clear" color="text-color" (click)="facade.resetConversation()" [disabled]="facade.isAgentProcessing()" aria-label="{{ 'common.actions.clear' | translate }}">
-          <ion-icon name="trash-outline"></ion-icon>
+    <ion-buttons slot="end">
+      @if (facade.hasActiveConversation()) {
+        <ion-button (click)="facade.clearConversation()" [attr.aria-label]="'agent.actions.clear' | translate">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
         </ion-button>
-      </ion-buttons>
-    }
+      }
+      <ion-button [routerLink]="['/settings']" [attr.aria-label]="'settings.title' | translate">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -39,26 +42,10 @@
       @for (message of facade.conversationMessages(); track facade.trackById($index, message)) {
         <div class="message" [class.from-user]="message.role === 'user'" [class.from-agent]="message.role !== 'user'" [class.is-error]="message.status === 'error'">
           <div class="message__bubble">
-            <div class="message__content">
-              <p>{{ message.content }}</p>
-            </div>
+            <div class="message__content" [innerHTML]="message.content | markdownToHtml"></div>
             <div class="message__meta">
               <span class="message__time">{{ message.createdAt | date:'shortTime' }}</span>
             </div>
-            @if (message.data?.summary || message.data?.details?.length) {
-              <div class="result-card">
-                @if (message.data?.summary) {
-                  <div class="result-card__title">{{ message.data?.summary }}</div>
-                }
-                @if (message.data?.details?.length) {
-                  <ul class="result-card__list">
-                    @for (detail of message.data?.details; track detail) {
-                      <li>{{ detail }}</li>
-                    }
-                  </ul>
-                }
-              </div>
-            }
             @if (message.status === 'error' && facade.canRetryLastMessage()) {
               <div class="message__actions">
                 <ion-button fill="clear" color="primary" size="small" (click)="facade.retryLastAttempt()" [disabled]="facade.isAgentProcessing()">
@@ -70,7 +57,7 @@
         </div>
       }
 
-      @if (facade.agentExecutionPhase() !== 'idle') {
+      @if (facade.agentExecutionPhase() === 'thinking' || facade.agentExecutionPhase() === 'fetching') {
         <div class="message from-agent">
           <div class="message__bubble thinking">
             <ion-spinner name="dots"></ion-spinner>
@@ -84,7 +71,7 @@
       <div class="preview-card">
         <div class="preview-card__header">
           <div class="preview-icon">
-            <ion-icon name="star-outline"></ion-icon>
+            <ion-icon name="sparkles-outline"></ion-icon>
           </div>
           <div>
             <p class="eyebrow">{{ 'agent.preview.title' | translate }}</p>
@@ -93,16 +80,6 @@
           </div>
         </div>
         <div class="planning-preview">
-          <div class="planning-preview__chips">
-            <p class="eyebrow">{{ 'agent.preview.demo.chipsTitle' | translate }}</p>
-            <div class="planning-preview__chip-row">
-              @for (prompt of facade.quickPrompts; track prompt.id) {
-                @if ($index < 3) {
-                  <ion-chip disabled>{{ prompt.labelKey | translate }}</ion-chip>
-                }
-              }
-            </div>
-          </div>
           <div class="planning-preview__messages">
             <p class="eyebrow">{{ 'agent.preview.demo.sessionTitle' | translate }}</p>
             <div class="message from-user preview">
@@ -163,7 +140,7 @@
     </div>
   } @else {
     <div class="composer composer--preview-cta">
-      <ion-button expand="block" color="primary" size="large" (click)="facade.navigateToUpgrade()">
+      <ion-button color="primary" (click)="facade.navigateToUpgrade()">
         {{ 'agent.preview.cta' | translate }}
       </ion-button>
     </div>

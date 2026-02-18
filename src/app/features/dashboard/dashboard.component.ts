@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
 import {
   IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
@@ -20,11 +22,13 @@ import { TranslateModule } from '@ngx-translate/core';
     IonHeader,
     IonToolbar,
     IonTitle,
+    IonButtons,
     IonContent,
     IonIcon,
     IonSkeletonText,
     IonButton,
     CommonModule,
+    RouterLink,
     TranslateModule,
   ],
   templateUrl: './dashboard.component.html',

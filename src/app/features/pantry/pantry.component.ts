@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
+  IonButton,
+  IonButtons,
   IonCard,
   IonCardHeader,
   IonCardTitle,
@@ -39,6 +42,8 @@ import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pa
     IonHeader,
     IonToolbar,
     IonTitle,
+    IonButtons,
+    IonButton,
     IonContent,
     IonSearchbar,
     IonIcon,
@@ -52,6 +57,7 @@ import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pa
     IonSkeletonText,
     IonText,
     CommonModule,
+    RouterLink,
     PantryDetailComponent,
     TranslateModule,
     EmptyStateComponent,

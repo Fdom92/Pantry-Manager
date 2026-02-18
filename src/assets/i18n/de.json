@@ -365,7 +365,8 @@
     "placeholder": "Frag nach Rezepten, Essensplänen oder Ideen mit deinen Vorräten.",
     "actions": {
       "send": "Senden",
-      "retry": "Erneut versuchen"
+      "retry": "Erneut versuchen",
+      "clear": "Chat löschen"
     },
     "preview": {
       "badge": "Vorschau",
@@ -382,21 +383,32 @@
     },
     "quickStart": {
       "title": "Kontextueller Einstieg",
-      "headline": "Starte die Planung ohne leeren Chat",
-      "subtitle": "Wähle eine Intention und der Menüplaner reagiert sofort.",
+      "headline": "Fang mit etwas Konkretem an",
+      "subtitle": "Tippe eine Option an und der Planer legt direkt los.",
       "ctaTitle": "Mit einem Tipp starten",
-      "ctaSubtitle": "Bestimme, worauf du heute fokussierst.",
-      "today": "Was kann ich mit dem kochen, was ich habe?",
-      "quickIdeas": "Gib mir schnelle Rezeptideen",
-      "weeklyPlan": "Meine Mahlzeiten für diese Woche planen",
-      "useExpiring": "Zutaten verwenden, die bald ablaufen",
-      "decideForMe": "Entscheide für mich",
-      "customPrompt": "Etwas anderes fragen"
+      "ctaSubtitle": "Womit fangen wir heute an?",
+      "today": "Was koche ich heute?",
+      "todayPrompt": "Was kann ich heute mit dem kochen, was ich zuhause habe? Gib mir ein paar Ideen.",
+      "weeklyPlan": "Wochenplan",
+      "weeklyPlanPrompt": "Mach mir einen Wochenplan — 7 Tage, Frühstück, Mittagessen und Abendessen — mit dem was ich zuhause habe.",
+      "useExpiring": "Was läuft bald ab",
+      "useExpiringPrompt": "Ich hab Sachen, die bald ablaufen. Was koche ich, um sie nicht wegzuwerfen?",
+      "surpriseMe": "Überrasch mich",
+      "surpriseMePrompt": "Such dir ein Rezept aus, das ich mit dem machen kann, was ich habe, und überrasch mich. Nur eins.",
+      "customPrompt": "Eigene Frage ✏️"
     },
     "messages": {
       "noResponse": "Ich konnte keine Antwort erzeugen.",
       "unifiedError": "Der Menüplaner konnte im Moment nicht antworten. Bitte versuche es später erneut."
-    }
+    },
+    "errors": {
+      "coldStart": "Der Dienst startet. Versuche es in einigen Sekunden erneut.",
+      "rateLimit": "Zu viele Anfragen. Bitte warte einen Moment, bevor du es erneut versuchst.",
+      "timeout": "Die Anfrage hat zu lange gedauert. Überprüfe deine Verbindung und versuche es erneut.",
+      "offline": "Keine Internetverbindung. Bitte verbinde dich und versuche es erneut.",
+      "generic": "Etwas ist schiefgelaufen. Bitte versuche es in wenigen Momenten erneut."
+    },
+    "disclaimer": "Rezepte und Essenspläne werden von KI generiert und können Fehler enthalten."
   },
   "pantry": {
     "title": "Vorratskammer",

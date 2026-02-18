@@ -73,7 +73,7 @@ export class DashboardStateService {
   private readonly revenueCat = inject(UpgradeRevenuecatService);
 
   private hasCompletedInitialLoad = false;
-  private readonly dismissedActionIds = new Set<string>();
+  private readonly dismissedActionIds = signal(new Set<string>());
 
   readonly pantryItems = this.pantryStore.items;
   readonly lowStockItems = this.pantryStore.lowStockItems;
@@ -327,7 +327,7 @@ export class DashboardStateService {
         return action.category !== arr[0].category;
       })
       .slice(0, 2)
-      .filter(action => !this.dismissedActionIds.has(action.id));
+      .filter(action => !this.dismissedActionIds().has(action.id));
   });
 
   readonly showAdditionalContext = computed(() => {
@@ -431,7 +431,7 @@ export class DashboardStateService {
   }
 
   dismissAction(action: DashboardAction): void {
-    this.dismissedActionIds.add(action.id);
+    this.dismissedActionIds.update(ids => new Set([...ids, action.id]));
   }
 
   getHealthIcon(state: PantryHealthState): string {

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { sumQuantities } from '@core/domain/pantry';
-import type { PantryItem } from '@core/models/pantry';
+import type { LlmMessage, PantryItem } from '@core/models';
+import { ExpirationStatus } from '@core/models/shared/enums.model';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { PantryService } from '../pantry/pantry.service';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
@@ -16,7 +17,11 @@ export class PlannerAgentService {
   private readonly llm = inject(PlannerLlmClientService);
   private readonly appPreferences = inject(SettingsPreferencesService);
 
-  async run(userText: string): Promise<string> {
+  /**
+   * Streams the meal planner response chunk by chunk.
+   * Accepts the full conversation history so the LLM has multi-turn context.
+   */
+  async *stream(messages: LlmMessage[]): AsyncGenerator<string> {
     const [pantry, preferences] = await Promise.all([
       this.pantryService.getAllActive(),
       this.appPreferences.getPreferences(),
@@ -25,12 +30,7 @@ export class PlannerAgentService {
     const userPreferencesSection = this.buildUserPreferencesSection(preferences.plannerMemory);
     const system = this.buildMealPlannerSystemPrompt({ pantryContext, userPreferencesSection });
 
-    const response = await this.llm.complete({
-      system,
-      messages: [{ role: 'user', content: userText }],
-    });
-
-    return response.content;
+    yield* this.llm.stream({ system, messages });
   }
 
   private buildPantryContext(items: PantryItem[]): string {
@@ -41,7 +41,13 @@ export class PlannerAgentService {
     return items
       .map(item => {
         const total = sumQuantities(item.batches ?? []);
-        return `- ${item.name}: ${total}`;
+        let line = `- ${item.name}: ${total}`;
+        if (item.expirationStatus === ExpirationStatus.EXPIRED) {
+          line += ` [EXPIRED: ${item.expirationDate}]`;
+        } else if (item.expirationStatus === ExpirationStatus.NEAR_EXPIRY) {
+          line += ` [NEAR EXPIRY: ${item.expirationDate}]`;
+        }
+        return line;
       })
       .join('\n');
   }
@@ -107,9 +113,10 @@ export class PlannerAgentService {
 
       In PLANNING MODE:
       - Create a structured plan
-      - Include breakfast, lunch, and dinner
+      - Include breakfast, lunch, and dinner for each day
+      - If the user says "weekly" or "this week", plan exactly 7 days — do NOT ask how many days
       - Cover ONLY the requested time range
-      - Do NOT add extra days or meals
+      - Do NOT add extra days or meals beyond what was requested
 
       ━━━━━━━━━━━━━━━━━━
 
@@ -142,10 +149,11 @@ export class PlannerAgentService {
       ━━━━━━━━━━━━━━━━━━
 
       6. FORMATTING RULES
-      - Use plain text
-      - No markdown symbols (*, #, -, bullets)
-      - Clear spacing and simple sections
-      - Easy to read on mobile
+      - Use markdown formatting for readability
+      - Bold (**text**) for day names, meal names, or section titles
+      - Bullet lists (- item) for ingredients or options
+      - Keep it concise and easy to read on mobile
+      - Do NOT use headers (#) or deeply nested structures
 
       ━━━━━━━━━━━━━━━━━━
 

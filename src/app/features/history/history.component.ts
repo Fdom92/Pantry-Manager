@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
+  IonButton,
+  IonButtons,
   IonCard,
   IonCardContent,
   IonChip,
@@ -24,6 +27,8 @@ import { NavController } from '@ionic/angular';
     IonHeader,
     IonToolbar,
     IonTitle,
+    IonButtons,
+    IonButton,
     IonContent,
     IonIcon,
     IonChip,
@@ -32,6 +37,7 @@ import { NavController } from '@ionic/angular';
     IonCardContent,
     IonSkeletonText,
     CommonModule,
+    RouterLink,
     TranslateModule,
     EmptyStateComponent,
   ],
