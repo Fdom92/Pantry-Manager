@@ -41,7 +41,7 @@ ion-item {
 .settings-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--app-theme-spacing-lg);
   margin: 10px;
 }
 

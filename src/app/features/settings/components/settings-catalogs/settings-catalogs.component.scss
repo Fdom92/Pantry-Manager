@@ -2,13 +2,6 @@ ion-title, ion-back-button {
   color: var(--ion-text-color, var(--ion-text-color));
 }
 
-.catalogs-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 10px;
-}
-
 ion-card-title {
   margin: 0;
   font-size: 1.05rem;
@@ -40,6 +33,13 @@ ion-item p {
 ion-item {
   --padding-start: 0;
   --inner-padding-end: 0;
+}
+
+.catalogs-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-lg);
+  padding: 10px;
 }
 
 .settings-card {

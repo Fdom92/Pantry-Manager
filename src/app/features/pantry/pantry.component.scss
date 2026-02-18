@@ -186,7 +186,7 @@ ion-title, ion-buttons > ion-button {
 .virtual-item-card {
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 8px;
+  margin-bottom: var(--app-theme-spacing-lg);
   transition:
     height 0.25s ease,
     opacity 220ms ease,
