@@ -1,7 +1,6 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { LlmClientError, LlmCompletionRequest, LlmCompletionResponse } from '@core/models';
-import { sleep } from '@core/utils';
+import { LlmClientError, LlmCompletionRequest } from '@core/models';
 import { firstValueFrom, timeout as rxTimeout } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
@@ -16,108 +15,117 @@ export class PlannerLlmClientService {
   private readonly http = inject(HttpClient);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly endpoint = environment.agentApiUrl ?? '';
-  private readonly requestTimeoutMs = 30000;
-  private readonly transientStatusCodes = new Set([502, 503, 504]);
-  private readonly maxTransientRetries = 2;
-  private readonly transientRetryDelayMs = 600;
+  private readonly requestTimeoutMs = 20000; // 20s - before backend (18s) times out
 
-  async complete(payload: LlmCompletionRequest): Promise<LlmCompletionResponse> {
+  /**
+   * Streams the LLM response as SSE chunks via native fetch + ReadableStream.
+   * Yields text pieces as they arrive from the backend.
+   */
+  async *stream(payload: LlmCompletionRequest): AsyncGenerator<string> {
     if (!this.endpoint) {
       throw new Error('[PlannerLlmClientService] agentApiUrl is empty');
     }
 
-    let attempt = 0;
-    let lastError: LlmClientError | null = null;
-
-    while (attempt <= this.maxTransientRetries) {
-      try {
-        const response = await firstValueFrom(
-          this.http
-            .post<{ content?: string; message?: { content?: string } }>(
-              this.endpoint,
-              {
-                system: payload.system,
-                messages: payload.messages,
-                tools: [],
-              },
-              {
-                headers: this.buildProHeaders(),
-              }
-            )
-            .pipe(rxTimeout(this.requestTimeoutMs))
-        );
-
-        const content = response?.content ?? response?.message?.content ?? '';
-        return { content };
-      } catch (err) {
-        const normalized = this.normalizeHttpError(err);
-        lastError = normalized;
-        if (this.shouldRetry(normalized, attempt)) {
-          attempt += 1;
-            console.warn('[PlannerLlmClientService] complete retrying', {
-            attempt,
-            status: normalized.status,
-          });
-          await sleep(this.transientRetryDelayMs * attempt);
-          continue;
-        }
-        throw normalized;
-      }
-    }
-
-    throw lastError ?? (new Error('Agent request failed') as LlmClientError);
-  }
-
-  private buildProHeaders(): Record<string, string> | undefined {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     const userId = this.revenuecat.getUserId();
-    if (!userId) {
-      return undefined;
+    if (userId) headers['x-user-id'] = userId;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.requestTimeoutMs);
+
+    let response: Response;
+    try {
+      response = await fetch(this.endpoint, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ system: payload.system, messages: payload.messages }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        const timeoutErr = new Error('COLD_START_TIMEOUT') as LlmClientError;
+        timeoutErr.timeout = true;
+        throw timeoutErr;
+      }
+      throw this.normalizeError(err);
     }
-    return {
-      'x-user-id': userId,
-    };
+
+    if (!response.ok) {
+      throw Object.assign(new Error('Agent request failed'), { status: response.status });
+    }
+
+    if (!response.body) {
+      throw new Error('No response body');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6).trim();
+          if (data === '[DONE]') return;
+
+          let parsed: any;
+          try { parsed = JSON.parse(data); } catch { continue; }
+
+          if (parsed.t) yield parsed.t;
+          if (parsed.error) {
+            throw Object.assign(
+              new Error('Stream error'),
+              { status: parsed.error === 'RATE_LIMIT_EXCEEDED' ? 429 : 500 }
+            );
+          }
+        }
+      }
+    } finally {
+      reader.cancel();
+    }
   }
 
-  private shouldRetry(error: LlmClientError, attempt: number): boolean {
-    if (attempt >= this.maxTransientRetries) {
-      return false;
+  /**
+   * Preheat backend to avoid cold start on first user request.
+   * Called silently when app opens (if user is PRO).
+   */
+  async preheatBackend(): Promise<void> {
+    if (!this.endpoint) {
+      return;
     }
-    if (error.timeout) {
-      return true;
+
+    try {
+      const healthUrl = this.endpoint.replace('/agent/process', '/health');
+      await firstValueFrom(
+        this.http.get(healthUrl).pipe(rxTimeout(5000))
+      );
+      console.info('[PlannerLlmClientService] Backend preheated successfully');
+    } catch {
+      console.debug('[PlannerLlmClientService] Backend preheat failed (expected on cold start)');
     }
-    if (typeof error.status === 'number' && this.transientStatusCodes.has(error.status)) {
-      return true;
-    }
-    return false;
   }
 
-  private normalizeHttpError(err: unknown): LlmClientError {
+  private normalizeError(err: unknown): LlmClientError {
     const defaultMessage = 'Agent request failed';
     let normalized: LlmClientError;
     if (err instanceof Error) {
       normalized = err as LlmClientError;
-      if (!normalized.message) {
-        normalized.message = defaultMessage;
-      }
+      if (!normalized.message) normalized.message = defaultMessage;
     } else if (typeof err === 'string') {
       normalized = new Error(err) as LlmClientError;
     } else {
       normalized = new Error(defaultMessage) as LlmClientError;
     }
-
-    const status =
-      (err as HttpErrorResponse)?.status ??
-      (err as { status?: number })?.status ??
-      (err as { statusCode?: number })?.statusCode ??
-      (err as { response?: { status?: number } })?.response?.status ??
-      null;
-    if (typeof status === 'number') {
-      normalized.status = status;
-    }
-    if ((err as any)?.name === 'TimeoutError') {
-      normalized.timeout = true;
-    }
     return normalized;
   }
-
 }

@@ -5,27 +5,26 @@ export const QUICK_PROMPTS: readonly QuickPrompt[] = [
   {
     id: 'cook-today',
     labelKey: 'agent.quickStart.today',
+    promptKey: 'agent.quickStart.todayPrompt',
     context: AgentEntryContext.PLANNING,
-  },
-  {
-    id: 'quick-ideas',
-    labelKey: 'agent.quickStart.quickIdeas',
-    context: AgentEntryContext.RECIPES,
   },
   {
     id: 'weekly-plan',
     labelKey: 'agent.quickStart.weeklyPlan',
+    promptKey: 'agent.quickStart.weeklyPlanPrompt',
     context: AgentEntryContext.PLANNING,
   },
   {
     id: 'use-expiring',
     labelKey: 'agent.quickStart.useExpiring',
+    promptKey: 'agent.quickStart.useExpiringPrompt',
     context: AgentEntryContext.INSIGHTS,
   },
   {
-    id: 'decide-for-me',
-    labelKey: 'agent.quickStart.decideForMe',
-    context: AgentEntryContext.PLANNING,
+    id: 'surprise-me',
+    labelKey: 'agent.quickStart.surpriseMe',
+    promptKey: 'agent.quickStart.surpriseMePrompt',
+    context: AgentEntryContext.RECIPES,
   },
   {
     id: 'custom-question',

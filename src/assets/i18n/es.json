@@ -365,12 +365,13 @@
     "placeholder": "Pide recetas, planes o ideas con lo que tienes.",
     "actions": {
       "send": "Enviar",
-      "retry": "Reintentar"
+      "retry": "Reintentar",
+      "clear": "Limpiar chat"
     },
     "preview": {
       "badge": "Vista previa",
-      "title": "Así empieza la planificación inteligente",
-      "headline": "Ideas y planes con IA",
+      "title": "Planificador PRO",
+      "headline": "Recetas y menús con lo que tienes en casa",
       "subtitle": "Recibe recetas, menús e insights basados en tu despensa sin salir de la app.",
       "cta": "Desbloquear planificador",
       "demo": {
@@ -382,21 +383,32 @@
     },
     "quickStart": {
       "title": "Entrada contextual",
-      "headline": "Planifica sin chatear desde cero",
-      "subtitle": "Elige un enfoque y la IA arrancará con ideas útiles.",
+      "headline": "Empieza por algo concreto",
+      "subtitle": "Toca una opción y el planificador arranca solo.",
       "ctaTitle": "Empieza con un toque",
-      "ctaSubtitle": "Selecciona una intención para lanzar la conversación.",
-      "today": "¿Qué puedo cocinar con lo que tengo?",
-      "quickIdeas": "Dame ideas rápidas para cocinar",
-      "weeklyPlan": "Planificar mis comidas de la semana",
-      "useExpiring": "Usar lo que está a punto de caducar",
-      "decideForMe": "Decide por mí",
-      "customPrompt": "Preguntar otra cosa"
+      "ctaSubtitle": "¿Por dónde empezamos hoy?",
+      "today": "¿Qué cocino hoy?",
+      "todayPrompt": "¿Qué hago de comer hoy con lo que tengo en casa? Dame unas ideas directas.",
+      "weeklyPlan": "Plan semanal",
+      "weeklyPlanPrompt": "Hazme un menú para toda la semana —7 días, desayuno, comida y cena— con lo que tengo en casa.",
+      "useExpiring": "Lo que caduca",
+      "useExpiringPrompt": "Tengo cosas a punto de caducar. ¿Qué cocino para no tirarlas?",
+      "surpriseMe": "Sorpréndeme",
+      "surpriseMePrompt": "Elige tú una receta con lo que tengo y sorpréndeme. Solo una.",
+      "customPrompt": "Pregunta libre ✏️"
     },
     "messages": {
       "noResponse": "No pude generar respuesta.",
       "unifiedError": "El planificador no pudo responder en este momento. Inténtalo de nuevo en unos segundos."
-    }
+    },
+    "errors": {
+      "coldStart": "El servicio está iniciando. Intenta de nuevo en unos segundos.",
+      "rateLimit": "Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.",
+      "timeout": "La solicitud tardó demasiado. Verifica tu conexión e intenta de nuevo.",
+      "offline": "Sin conexión a internet. Conéctate e intenta de nuevo.",
+      "generic": "Algo salió mal. Intenta de nuevo en unos momentos."
+    },
+    "disclaimer": "Las recetas y planes son generados por IA y pueden contener errores."
   },
   "pantry": {
     "title": "Despensa",

@@ -365,7 +365,8 @@
     "placeholder": "Pede receitas, planos de refeições ou ideias com o que tens.",
     "actions": {
       "send": "Enviar",
-      "retry": "Tentar novamente"
+      "retry": "Tentar novamente",
+      "clear": "Limpar conversa"
     },
     "preview": {
       "badge": "Pré-visualização",
@@ -382,21 +383,32 @@
     },
     "quickStart": {
       "title": "Entrada contextual",
-      "headline": "Começa a planear sem um chat vazio",
-      "subtitle": "Escolhe uma intenção e o planeador responde de imediato.",
+      "headline": "Começa por algo concreto",
+      "subtitle": "Toca uma opção e o planeador arranca sozinho.",
       "ctaTitle": "Começa com um toque",
-      "ctaSubtitle": "Seleciona o foco para hoje.",
-      "today": "O que posso cozinhar com o que tenho?",
-      "quickIdeas": "Dá-me ideias rápidas de receitas",
-      "weeklyPlan": "Planear as refeições da semana",
-      "useExpiring": "Usar ingredientes que estão prestes a vencer",
-      "decideForMe": "Decide por mim",
-      "customPrompt": "Perguntar outra coisa"
+      "ctaSubtitle": "Por onde começamos hoje?",
+      "today": "O que cozinho hoje?",
+      "todayPrompt": "O que posso cozinhar hoje com o que tenho em casa? Dá-me algumas ideias.",
+      "weeklyPlan": "Plano semanal",
+      "weeklyPlanPrompt": "Faz-me um menu para a semana toda — 7 dias, pequeno-almoço, almoço e jantar — com o que tenho na despensa.",
+      "useExpiring": "O que está a vencer",
+      "useExpiringPrompt": "Tenho coisas prestes a vencer. O que cozinho para não as desperdiçar?",
+      "surpriseMe": "Surpreende-me",
+      "surpriseMePrompt": "Escolhe tu uma receita que possa fazer com o que tenho e surpreende-me. Só uma.",
+      "customPrompt": "Pergunta livre ✏️"
     },
     "messages": {
       "noResponse": "Não foi possível gerar uma resposta.",
       "unifiedError": "O planeador não conseguiu responder agora. Tenta novamente dentro de alguns segundos."
-    }
+    },
+    "errors": {
+      "coldStart": "O serviço está a iniciar. Tenta novamente em alguns segundos.",
+      "rateLimit": "Demasiados pedidos. Aguarda um momento antes de tentar novamente.",
+      "timeout": "O pedido demorou demasiado tempo. Verifica a tua ligação e tenta novamente.",
+      "offline": "Sem ligação à internet. Conecta-te e tenta novamente.",
+      "generic": "Algo correu mal. Tenta novamente em alguns instantes."
+    },
+    "disclaimer": "As receitas e planos são gerados por IA e podem conter erros."
   },
   "pantry": {
     "title": "Despensa",

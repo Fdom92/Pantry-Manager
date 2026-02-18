@@ -90,6 +90,12 @@ export class PlannerConversationStore {
     return init;
   }
 
+  updateMessageContent(id: string, content: string): void {
+    this.historySignal.update(history =>
+      history.map(m => (m.id === id ? { ...m, content } : m))
+    );
+  }
+
   createMessage(role: AgentRole, content: string, status: AgentMessage['status'] = 'ok'): AgentMessage {
     return {
       id: createDocumentId('msg'),

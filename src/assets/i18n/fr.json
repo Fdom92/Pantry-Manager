@@ -365,7 +365,8 @@
     "placeholder": "Demandez des recettes, des menus ou des idées avec ce que vous avez.",
     "actions": {
       "send": "Envoyer",
-      "retry": "Réessayer"
+      "retry": "Réessayer",
+      "clear": "Effacer la conversation"
     },
     "preview": {
       "badge": "Aperçu",
@@ -382,21 +383,32 @@
     },
     "quickStart": {
       "title": "Entrée contextuelle",
-      "headline": "Planifiez sans passer par un chat vide",
-      "subtitle": "Choisissez une intention et le planificateur réagit immédiatement.",
+      "headline": "Commencez par quelque chose de concret",
+      "subtitle": "Touchez une option et le planificateur se lance tout seul.",
       "ctaTitle": "Démarrer en un geste",
-      "ctaSubtitle": "Choisissez votre objectif du moment.",
-      "today": "Que puis-je cuisiner avec ce que j'ai ?",
-      "quickIdeas": "Donne-moi des idées de recettes rapides",
-      "weeklyPlan": "Planifier mes repas de la semaine",
-      "useExpiring": "Utiliser les produits qui vont bientôt expirer",
-      "decideForMe": "Décide pour moi",
-      "customPrompt": "Poser une autre question"
+      "ctaSubtitle": "Par où on commence aujourd'hui ?",
+      "today": "Que cuisiner aujourd'hui ?",
+      "todayPrompt": "Qu'est-ce que je peux cuisiner aujourd'hui avec ce que j'ai à la maison ? Donne-moi quelques idées.",
+      "weeklyPlan": "Plan de semaine",
+      "weeklyPlanPrompt": "Fais-moi un menu pour toute la semaine — 7 jours, petit-déjeuner, déjeuner et dîner — avec ce que j'ai chez moi.",
+      "useExpiring": "Ce qui expire bientôt",
+      "useExpiringPrompt": "J'ai des trucs qui vont bientôt expirer. Qu'est-ce que je cuisine pour ne pas les gaspiller ?",
+      "surpriseMe": "Surprends-moi",
+      "surpriseMePrompt": "Choisis une recette que je peux faire avec ce que j'ai et surprends-moi. Juste une.",
+      "customPrompt": "Question libre ✏️"
     },
     "messages": {
       "noResponse": "Impossible de générer une réponse.",
       "unifiedError": "Le planificateur ne peut pas répondre pour le moment. Réessayez dans quelques secondes."
-    }
+    },
+    "errors": {
+      "coldStart": "Le service démarre. Veuillez réessayer dans quelques secondes.",
+      "rateLimit": "Trop de requêtes. Veuillez attendre un moment avant de réessayer.",
+      "timeout": "La requête a pris trop de temps. Vérifiez votre connexion et réessayez.",
+      "offline": "Pas de connexion internet. Veuillez vous connecter et réessayer.",
+      "generic": "Quelque chose s'est mal passé. Veuillez réessayer dans quelques instants."
+    },
+    "disclaimer": "Les recettes et menus sont générés par IA et peuvent contenir des erreurs."
   },
   "pantry": {
     "title": "Garde-manger",

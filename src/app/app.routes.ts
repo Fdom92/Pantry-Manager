@@ -31,28 +31,28 @@ export const routes: Routes = [
         loadComponent: () =>
           import('@features/agent/agent.component').then(m => m.AgentComponent),
       },
-      {
-        path: 'settings/ai',
-        loadComponent: () =>
-          import('@features/settings/components/settings-ai/settings-ai.component').then(m => m.SettingsAiComponent),
-      },
-      {
-        path: 'settings/catalogos',
-        loadComponent: () =>
-          import('@features/settings/components/settings-catalogs/settings-catalogs.component').then(m => m.SettingsCatalogsComponent),
-      },
-      {
-        path: 'settings/avanzado',
-        loadComponent: () =>
-          import('@features/settings/components/settings-advanced/settings-advanced.component').then(m => m.SettingsAdvancedComponent),
-      },
-      {
-        path: 'settings',
-        loadComponent: () =>
-          import('@features/settings/settings.component').then(m => m.SettingsComponent),
-      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
+  },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('@features/settings/settings.component').then(m => m.SettingsComponent),
+  },
+  {
+    path: 'settings/ai',
+    loadComponent: () =>
+      import('@features/settings/components/settings-ai/settings-ai.component').then(m => m.SettingsAiComponent),
+  },
+  {
+    path: 'settings/catalogos',
+    loadComponent: () =>
+      import('@features/settings/components/settings-catalogs/settings-catalogs.component').then(m => m.SettingsCatalogsComponent),
+  },
+  {
+    path: 'settings/avanzado',
+    loadComponent: () =>
+      import('@features/settings/components/settings-advanced/settings-advanced.component').then(m => m.SettingsAdvancedComponent),
   },
   {
     path: 'onboarding',
