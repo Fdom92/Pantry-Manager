@@ -208,8 +208,11 @@ export class PantryStateService {
   toggleGroupCollapse = (key: string, event?: Event) => this.listUi.toggleGroupCollapse(key, event);
   onGroupHeaderKeydown = (key: string, event: KeyboardEvent) => this.listUi.onGroupHeaderKeydown(key, event);
   isDeleting = (item: PantryItem) => this.listUi.isDeleting(item);
-  deleteItem = (item: PantryItem, event?: Event, skipConfirm = false) =>
-    this.listUi.deleteItem(item, event, skipConfirm, itemId => this.batchOps.cancelPendingStockSave(itemId));
+
+  deleteItem(item: PantryItem, event?: Event, skipConfirm = false): Promise<void> {
+     this.quantitySheet.dismissQuantitySheet();
+     return this.listUi.deleteItem(item, event, skipConfirm, itemId => this.batchOps.cancelPendingStockSave(itemId));
+  }
 
   private applyStatusFilterPreset(preset: PantryStatusFilterValue): void {
     switch (preset) {
