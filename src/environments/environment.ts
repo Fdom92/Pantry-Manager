@@ -6,7 +6,7 @@ import { Environment } from './environment.model';
 
 export const environment: Environment = {
   production: false,
-  agentApiUrl: 'http://localhost:4000/agent/process',
+  agentApiUrl: 'https://pantry-manager-develop.onrender.com/agent/process',
   proApiUrl: 'https://pantry-manager-develop.onrender.com/api/payments',
   revenueCatPublicKey: 'goog_XAdxxyRVPtpNaFLROJWzPwjdJNx',
 };
