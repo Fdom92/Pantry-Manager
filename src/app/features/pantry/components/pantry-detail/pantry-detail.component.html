@@ -19,7 +19,7 @@
       <div class="info-row">
         <ion-icon name="calendar-outline"></ion-icon>
         @if(viewModel.formattedEarliestExpirationLong !== '') {
-          <span>Caduca {{ viewModel.formattedEarliestExpirationLong }}</span>
+          <span>{{ viewModel.formattedEarliestExpirationLong }}</span>
         } @else {
           <span>{{ 'pantry.detail.noExpiry' | translate }}</span>
         }

@@ -297,10 +297,13 @@ export class PantryViewModelService {
     const normalizedExpiry = new Date(expiryDate.getFullYear(), expiryDate.getMonth(), expiryDate.getDate());
 
     const locale = this.getDateFnsLocale();
-    return formatDistance(normalizedExpiry, normalizedNow, {
+    const relative = formatDistance(normalizedExpiry, normalizedNow, {
       addSuffix: true,
       locale,
     });
+
+    const key = daysDiff > 0 ? 'dashboard.nearExpiry.expires' : 'dashboard.expired.expires';
+    return this.translate.instant(key, { date: relative });
   }
 
   formatBatchQuantity(batch: ItemBatch): string {

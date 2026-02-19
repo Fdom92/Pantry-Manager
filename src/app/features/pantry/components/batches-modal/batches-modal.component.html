@@ -35,14 +35,10 @@
               @for (entry of state.getSortedBatches(selectedItem); track entry.batch.batchId ?? entry.batch.expirationDate ?? $index) {
                 <ion-item>
                   <ion-label>
-                    @if (entry.batch.expirationDate) {
-                      <h3>
-                        <ion-icon name="calendar-outline"></ion-icon>
-                        {{ state.formatBatchDate(entry.batch) }}
-                      </h3>
-                    } @else {
-                      <h3 class="no-date">{{ 'pantry.batches.noExpiryDate' | translate }}</h3>
-                    }
+                    <h3 [style.color]="'var(--ion-color-' + entry.status.color + ')'">
+                      <ion-icon [name]="entry.status.icon"></ion-icon>
+                      {{ state.formatBatchDate(entry.batch) }}
+                    </h3>
                     <p>
                       {{ state.formatBatchQuantity(entry.batch) }}
                       @if (entry.locationLabel && entry.locationId !== 'unassigned') {
@@ -53,10 +49,6 @@
                       <ion-badge color="tertiary" size="small">{{ 'pantry.batches.open' | translate }}</ion-badge>
                     }
                   </ion-label>
-                  <ion-chip slot="end" [color]="entry.status.color" size="small">
-                    <ion-icon [name]="entry.status.icon"></ion-icon>
-                    <ion-label>{{ entry.status.label }}</ion-label>
-                  </ion-chip>
                 </ion-item>
               }
             </ion-list>
