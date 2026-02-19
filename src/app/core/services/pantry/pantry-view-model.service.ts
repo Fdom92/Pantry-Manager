@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { classifyExpiry, getItemStatusState, normalizeBatches, sumQuantities } from '@core/domain/pantry';
-import { generateBatchId, getExpirationSortWeight } from '@core/utils';
+import { generateBatchId } from '@core/utils';
 import type {
   BatchCountsMeta,
   BatchEntryMeta,
@@ -353,11 +353,6 @@ export class PantryViewModelService {
   }
 
   private compareItems(a: PantryItem, b: PantryItem): number {
-    const expirationWeightDiff = getExpirationSortWeight(a) - getExpirationSortWeight(b);
-    if (expirationWeightDiff !== 0) {
-      return expirationWeightDiff;
-    }
-
     return (a.name ?? '').localeCompare(b.name ?? '');
   }
 
