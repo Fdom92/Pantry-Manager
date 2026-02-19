@@ -71,7 +71,20 @@
         </section>
       }
 
-      <!-- LAYER 3: Additional Context (Optional) -->
+      <!-- LAYER 3: Insights -->
+      @if (facade.visibleInsights().length > 0) {
+        <section class="dashboard-section">
+          @for (insight of facade.visibleInsights(); track insight.id) {
+            <app-insight-card
+              [insight]="insight"
+              (dismiss)="facade.dismissInsight(insight)"
+              (ctaSelect)="facade.onInsightAction(insight, $event)">
+            </app-insight-card>
+          }
+        </section>
+      }
+
+      <!-- LAYER 4: Additional Context (Optional) -->
       @if (facade.showAdditionalContext() && facade.recentlyAddedCount() > 0 && facade.recentlyAddedCount() <= 5) {
         <section class="dashboard-section">
           <div class="context-section">

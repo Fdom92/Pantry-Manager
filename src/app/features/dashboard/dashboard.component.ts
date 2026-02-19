@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
+import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
 import {
   IonButton,
   IonButtons,
@@ -30,6 +31,7 @@ import { TranslateModule } from '@ngx-translate/core';
     CommonModule,
     RouterLink,
     TranslateModule,
+    InsightCardComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
