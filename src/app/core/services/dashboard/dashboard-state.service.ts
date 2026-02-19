@@ -234,7 +234,7 @@ export class DashboardStateService {
     }
 
     // LAYER 2: PREVENTIVE (only if no critical OR there's space)
-    if (nearExpiry >= 3) {
+    if (nearExpiry > 0) {
       actions.push({
         id: 'near-expiry-action',
         priority: ActionPriority.HIGH,
