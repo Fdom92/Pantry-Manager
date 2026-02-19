@@ -163,6 +163,11 @@
 .ion-palette-dark,
 .dark,
 [data-theme='dark'] {
-  // Dark mode inherits from :root with automatic adaptation
-  // No need to redefine --app-surface-* variables
+  // :root hardcodes these via var(--ion-color-dark), which Ionic's dark palette
+  // can't reliably override due to equal CSS specificity + document load order.
+  // Setting them here (later in document order within this file) ensures dark mode works.
+  --ion-toolbar-color: var(--ion-text-color);
+  --ion-toolbar-background: var(--ion-background-color-step-50, #1e1e1e);
+  --ion-card-background: var(--ion-background-color-step-50, #1e1e1e);
+  --ion-item-background: var(--ion-background-color, #121212);
 }

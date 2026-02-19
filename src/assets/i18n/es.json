@@ -760,12 +760,15 @@
       "setupSubtitle": "Abre el flujo de setup para configurar catálogos."
     },
     "info": {
-      "title": "Información",
-      "subtitle": "Detalles útiles de la aplicación.",
+      "title": "Acerca de",
+      "subtitle": "Versión, valoraciones y soporte.",
       "version": "Versión",
       "feedbackTitle": "Enviar comentarios",
       "feedbackSubtitle": "Comparte sugerencias o reporta incidencias.",
-      "feedbackAction": "Enviar comentarios"
+      "feedbackAction": "Enviar comentarios",
+      "rateTitle": "Valorar la app",
+      "rateSubtitle": "¿Te gusta PantryMind? Déjanos una reseña.",
+      "rateAction": "Valorar en Play Store"
     }
   },
   "reviews": {

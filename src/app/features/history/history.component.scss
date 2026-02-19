@@ -1,5 +1,5 @@
 ion-title {
-  color: var(--ion-text-color, var(--ion-text-color));
+  color: var(--app-theme-text-color);
 }
 
 .summary-bar {
@@ -187,7 +187,7 @@ ion-title {
 }
 
 .timeline-event--deleted .timeline-event__dot {
-  background: var(--ion-color-dark);
+  background: color-mix(in srgb, var(--ion-text-color) 55%, transparent);
 }
 
 .timeline-event__content {

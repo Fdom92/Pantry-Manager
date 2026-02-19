@@ -68,33 +68,28 @@
     </div>
   } @else {
     <div class="pro-preview">
-      <div class="preview-card">
-        <div class="preview-card__header">
-          <div class="preview-icon">
-            <ion-icon name="sparkles-outline"></ion-icon>
-          </div>
-          <div>
-            <p class="eyebrow">{{ 'agent.preview.title' | translate }}</p>
-            <h2>{{ 'agent.preview.headline' | translate }}</h2>
-            <p class="muted">{{ 'agent.preview.subtitle' | translate }}</p>
+      <div class="preview-hero">
+        <div class="preview-icon">
+          <ion-icon name="sparkles-outline"></ion-icon>
+        </div>
+        <div class="preview-hero__content">
+          <p class="eyebrow">{{ 'agent.preview.title' | translate }}</p>
+          <h2>{{ 'agent.preview.headline' | translate }}</h2>
+          <p class="muted">{{ 'agent.preview.subtitle' | translate }}</p>
+        </div>
+      </div>
+      <div class="preview-demo">
+        <div class="message from-user preview">
+          <div class="message__bubble">
+            <div class="message__content">
+              <p>{{ 'agent.preview.demo.userMessage' | translate }}</p>
+            </div>
           </div>
         </div>
-        <div class="planning-preview">
-          <div class="planning-preview__messages">
-            <p class="eyebrow">{{ 'agent.preview.demo.sessionTitle' | translate }}</p>
-            <div class="message from-user preview">
-              <div class="message__bubble">
-                <div class="message__content">
-                  <p>{{ 'agent.preview.demo.userMessage' | translate }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="message from-agent preview">
-              <div class="message__bubble">
-                <div class="message__content">
-                  <p>{{ 'agent.preview.demo.agentMessage' | translate }}</p>
-                </div>
-              </div>
+        <div class="message from-agent preview">
+          <div class="message__bubble">
+            <div class="message__content">
+              <p>{{ 'agent.preview.demo.agentMessage' | translate }}</p>
             </div>
           </div>
         </div>

@@ -759,12 +759,15 @@
       "setupSubtitle": "Öffne den Setup-Flow zur Katalogkonfiguration."
     },
     "info": {
-      "title": "Informationen",
-      "subtitle": "Hilfreiche App-Details.",
+      "title": "Über die App",
+      "subtitle": "Version, Bewertungen und Support.",
       "version": "Version",
       "feedbackTitle": "Feedback senden",
       "feedbackSubtitle": "Teile Vorschläge oder melde Probleme.",
-      "feedbackAction": "Feedback senden"
+      "feedbackAction": "Feedback senden",
+      "rateTitle": "App bewerten",
+      "rateSubtitle": "Gefällt dir PantryMind? Hinterlasse eine Bewertung.",
+      "rateAction": "Im Play Store bewerten"
     }
   },
   "reviews": {

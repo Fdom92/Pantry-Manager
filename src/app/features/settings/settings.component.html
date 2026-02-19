@@ -161,6 +161,23 @@
 
           <ion-item lines="none">
             <ion-label>
+              <h3>{{ "settings.info.rateTitle" | translate }}</h3>
+              <p>{{ "settings.info.rateSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              slot="end"
+              fill="clear"
+              color="primary"
+              [attr.aria-label]="'settings.info.rateAction' | translate"
+              href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind"
+              target="_blank"
+            >
+              <ion-icon name="star-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
               <h3>{{ "settings.info.version" | translate }}</h3>
               <p>{{ appVersion }}</p>
             </ion-label>

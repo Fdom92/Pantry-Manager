@@ -1,4 +1,4 @@
-ion-title, ion-buttons > ion-button {
+ion-title {
   color: var(--app-theme-text-color);
 }
 
@@ -187,31 +187,17 @@ ion-title, ion-buttons > ion-button {
 
 .pro-preview {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--app-theme-spacing-sm) 0 var(--app-theme-spacing-xl);
-}
-
-.preview-card {
-  width: 100%;
-  max-width: 720px;
-  background: var(--app-theme-card-bg);
-  color: var(--app-theme-text-color);
-  padding: var(--app-theme-spacing-xl);
-  border-radius: var(--app-theme-card-border-radius);
-  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
-  border-top: var(--app-theme-card-accent-width) solid var(--ion-color-primary);
-  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
-  display: flex;
   flex-direction: column;
-  gap: var(--app-theme-spacing-lg);
+  padding: var(--app-theme-spacing-xl) 0 var(--app-theme-spacing-xl);
+  gap: var(--app-theme-spacing-xl);
 }
 
-.preview-card__header {
+.preview-hero {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: var(--app-theme-spacing-md);
   align-items: center;
+  padding-inline: var(--app-theme-card-margin-inline);
 
   h2 {
     margin: var(--app-theme-spacing-xs) 0 var(--app-theme-spacing-xs);
@@ -252,34 +238,14 @@ ion-title, ion-buttons > ion-button {
   background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
 }
 
-.planning-preview {
+.preview-demo {
   display: flex;
   flex-direction: column;
   gap: var(--app-theme-spacing-md);
 }
 
-.planning-preview__messages {
-  padding: var(--app-theme-spacing-md);
-  border-radius: var(--app-theme-card-border-radius);
-  background: var(--chat-green-softer);
-  border: var(--app-theme-card-border-width) solid color-mix(in srgb, var(--chat-green-base) 25%, transparent);
-
-  .eyebrow {
-    margin: 0 0 var(--app-theme-spacing-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: var(--app-theme-font-size-small);
-    font-weight: var(--app-theme-font-weight-bold);
-    color: color-mix(in srgb, var(--app-theme-text-color) 65%, transparent);
-  }
-}
-
-.planning-preview__messages .message.preview {
-  max-width: 100%;
-
-  .message__bubble {
-    box-shadow: none;
-  }
+.preview-demo .message.preview .message__bubble {
+  box-shadow: none;
 }
 
 .planning-empty {
