@@ -1,5 +1,4 @@
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
-import { getExpirationSortWeight } from '@core/utils/pantry-status.util';
 import { normalizeSearchField } from '@core/utils/normalization.util';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 import { getItemStatusState } from './pantry-status.domain';
@@ -41,16 +40,13 @@ export function isRecentlyAdded(item: PantryItem): boolean {
 }
 
 /**
- * Sort pantry items by expiration status, then alphabetically.
+ * Sort pantry items alphabetically by name.
  */
 export function sortPantryItems(items: PantryItem[]): PantryItem[] {
   if (items.length <= 1) return items;
 
   const sorted = [...items];
   sorted.sort((a, b) => {
-    const expirationDiff = getExpirationSortWeight(a) - getExpirationSortWeight(b);
-    if (expirationDiff !== 0) return expirationDiff;
-
     const labelA = normalizeSearchField(a.name);
     const labelB = normalizeSearchField(b.name);
     return labelA.localeCompare(labelB);
