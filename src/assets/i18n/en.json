@@ -760,12 +760,15 @@
       "setupSubtitle": "Open the setup flow to configure catalogs."
     },
     "info": {
-      "title": "Information",
-      "subtitle": "Helpful app details.",
+      "title": "About",
+      "subtitle": "Version, ratings and support.",
       "version": "Version",
       "feedbackTitle": "Send feedback",
       "feedbackSubtitle": "Share ideas or report issues.",
-      "feedbackAction": "Send feedback"
+      "feedbackAction": "Send feedback",
+      "rateTitle": "Rate the app",
+      "rateSubtitle": "Enjoying PantryMind? Leave us a review.",
+      "rateAction": "Rate on Play Store"
     }
   },
   "reviews": {
