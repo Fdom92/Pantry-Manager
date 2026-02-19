@@ -3,7 +3,6 @@
     <div class="plan-card__badge">{{ badgeLabel }}</div>
   }
   <div class="plan-card__header">
-    <p class="plan-card__eyebrow">{{ 'upgrade.plans.proLabel' | translate }}</p>
     <h3>{{ title }}</h3>
   </div>
   <div class="plan-card__price">
@@ -26,7 +25,7 @@
       </li>
     }
   </ul>
-  <ion-button expand="block" color="warning" size="large" [disabled]="disabled" (click)="onSelect()">
+  <ion-button expand="block" color="primary" size="large" [disabled]="disabled" (click)="onSelect()">
     {{ ctaLabel || ('upgrade.actions.select' | translate) }}
   </ion-button>
 </div>

@@ -1,17 +1,15 @@
 ion-title, ion-back-button {
-  color: var(--ion-text-color, var(--ion-text-color));
+  color: var(--app-theme-text-color);
 }
 
 .upgrade-hero {
   padding: 18px 16px;
   border-radius: 18px;
-  background: radial-gradient(circle at 10% 20%, color-mix(in srgb, var(--ion-color-primary) 18%, transparent), transparent 40%),
-    radial-gradient(circle at 90% 10%, color-mix(in srgb, var(--ion-color-primary) 12%, transparent), transparent 40%),
-    linear-gradient(135deg, var(--ion-color-primary), var(--ion-card-background));
+  background: linear-gradient(135deg, var(--ion-color-primary), color-mix(in srgb, var(--ion-color-primary) 65%, var(--ion-card-background)));
   color: var(--ion-text-color);
   text-align: center;
   margin-bottom: 18px;
-  box-shadow: 0 18px 45px rgba(15, 20, 19, 0.24);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--ion-color-primary) 28%, transparent);
   border: 1px solid var(--ion-color-primary-shade);
 
   h1 {
@@ -39,20 +37,6 @@ ion-title, ion-back-button {
   color: var(--ion-color-dark-contrast);
   font-weight: 800;
   letter-spacing: 0.08em;
-}
-
-.hero-actions {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 14px;
-
-  ion-button[color='light'] {
-    --ion-color-base: var(--ion-card-background) !important;
-    --ion-color-base-rgb: 255, 255, 255;
-    --ion-color-contrast: var(--ion-text-color);
-  }
 }
 
 .plans-section {
