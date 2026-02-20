@@ -352,6 +352,26 @@
         "title": "Avvisi prima della scadenza",
         "description": "Con PRO, ti dico cosa cucinare per non sprecare nulla.",
         "cta": "Scopri di più"
+      },
+      "pantryHealthy": {
+        "title": "La tua dispensa è in ottima forma",
+        "description": "Tutto sotto controllo. È un buon momento per pianificare la prossima spesa.",
+        "cta": "Vai alla lista"
+      },
+      "addExpiryDates": {
+        "title": "Aggiungi le date di scadenza",
+        "description": "Tieni traccia di cosa usare prima ed evita brutte sorprese nella dispensa.",
+        "cta": "Vai alla dispensa"
+      },
+      "lowStockReminder": {
+        "title": "Alcuni prodotti stanno finendo",
+        "description": "Aggiungili alla lista della spesa prima di rimanerne senza.",
+        "cta": "Vai alla lista"
+      },
+      "organizeWithCategories": {
+        "title": "Organizza la dispensa per categorie",
+        "description": "Raggruppa i prodotti per trovarli più velocemente e avere tutto sotto controllo.",
+        "cta": "Organizza ora"
       }
     }
   },

@@ -352,6 +352,26 @@
         "title": "Avisos antes de vencerem",
         "description": "Com PRO, digo-lhe o que cozinhar para não desperdiçar nada.",
         "cta": "Saber mais"
+      },
+      "pantryHealthy": {
+        "title": "A sua despensa está em ótima forma",
+        "description": "Tudo sob controlo. É um bom momento para planear a sua próxima lista de compras.",
+        "cta": "Ver lista"
+      },
+      "addExpiryDates": {
+        "title": "Adicione datas de validade",
+        "description": "Saiba sempre o que usar primeiro e evite surpresas desagradáveis na despensa.",
+        "cta": "Ir à despensa"
+      },
+      "lowStockReminder": {
+        "title": "Alguns produtos estão a acabar",
+        "description": "Adicione-os à sua lista de compras antes de ficar sem eles.",
+        "cta": "Ir à lista"
+      },
+      "organizeWithCategories": {
+        "title": "Organize a despensa por categorias",
+        "description": "Agrupe os seus produtos para os encontrar mais rapidamente e ter tudo sob controlo.",
+        "cta": "Organizar agora"
       }
     }
   },

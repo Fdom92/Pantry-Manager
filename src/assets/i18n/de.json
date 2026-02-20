@@ -352,6 +352,26 @@
         "title": "Warnungen vor Ablauf",
         "description": "Mit PRO sage ich dir, was du kochen sollst, um nichts zu verschwenden.",
         "cta": "Mehr erfahren"
+      },
+      "pantryHealthy": {
+        "title": "Deine Vorratskammer ist in top Form",
+        "description": "Alles unter Kontrolle. Ein guter Zeitpunkt, deine Einkaufsliste zu planen.",
+        "cta": "Liste ansehen"
+      },
+      "addExpiryDates": {
+        "title": "Ablaufdaten hinzufügen",
+        "description": "Behalte den Überblick, was zuerst verwendet werden soll, und vermeide unangenehme Überraschungen.",
+        "cta": "Zur Vorratskammer"
+      },
+      "lowStockReminder": {
+        "title": "Einige Produkte werden knapp",
+        "description": "Füge sie deiner Einkaufsliste hinzu, bevor du ohne sie dastehst.",
+        "cta": "Zur Liste"
+      },
+      "organizeWithCategories": {
+        "title": "Vorratskammer nach Kategorien ordnen",
+        "description": "Gruppiere deine Produkte, um sie schneller zu finden und alles im Griff zu haben.",
+        "cta": "Jetzt ordnen"
       }
     }
   },

@@ -352,6 +352,26 @@
         "title": "Alertes avant expiration",
         "description": "Avec PRO, je vous dis quoi cuisiner pour ne rien gaspiller.",
         "cta": "En savoir plus"
+      },
+      "pantryHealthy": {
+        "title": "Votre garde-manger est en parfaite forme",
+        "description": "Tout est sous contrôle. C'est le bon moment pour planifier votre prochaine liste de courses.",
+        "cta": "Voir la liste"
+      },
+      "addExpiryDates": {
+        "title": "Ajoutez des dates de péremption",
+        "description": "Sachez toujours quoi utiliser en premier et évitez les mauvaises surprises dans votre garde-manger.",
+        "cta": "Aller au garde-manger"
+      },
+      "lowStockReminder": {
+        "title": "Certains produits sont presque épuisés",
+        "description": "Ajoutez-les à votre liste de courses avant d'en manquer.",
+        "cta": "Aller à la liste"
+      },
+      "organizeWithCategories": {
+        "title": "Organisez votre garde-manger par catégories",
+        "description": "Regroupez vos produits pour les retrouver plus vite et tout garder sous contrôle.",
+        "cta": "Organiser maintenant"
       }
     }
   },

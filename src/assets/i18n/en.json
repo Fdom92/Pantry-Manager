@@ -352,6 +352,26 @@
         "title": "Alerts before expiry",
         "description": "With PRO, I'll tell you what to cook so you don't waste anything.",
         "cta": "Learn more"
+      },
+      "pantryHealthy": {
+        "title": "Your pantry is in great shape",
+        "description": "Everything's under control. A good time to plan your next shopping list.",
+        "cta": "View list"
+      },
+      "addExpiryDates": {
+        "title": "Add expiry dates to your items",
+        "description": "Track what to use first and avoid unpleasant surprises in your pantry.",
+        "cta": "Go to pantry"
+      },
+      "lowStockReminder": {
+        "title": "Some items are running low",
+        "description": "Add them to your shopping list so you don't run out.",
+        "cta": "Go to list"
+      },
+      "organizeWithCategories": {
+        "title": "Organize your pantry by category",
+        "description": "Group your products to find them faster and keep everything under control.",
+        "cta": "Organize now"
       }
     }
   },

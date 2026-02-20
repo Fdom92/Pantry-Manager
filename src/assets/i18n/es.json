@@ -352,6 +352,26 @@
         "title": "Avisos antes de que caduquen",
         "description": "Con PRO, te aviso qué cocinar para no tirar nada.",
         "cta": "Saber más"
+      },
+      "pantryHealthy": {
+        "title": "Tu despensa está en buena forma",
+        "description": "Todo bajo control. Es buen momento para revisar tu lista de compra.",
+        "cta": "Ver lista"
+      },
+      "addExpiryDates": {
+        "title": "Añade fechas de caducidad",
+        "description": "Con fechas en tus productos sabrás siempre qué usar primero y evitarás sorpresas.",
+        "cta": "Ir a despensa"
+      },
+      "lowStockReminder": {
+        "title": "Algunos productos se agotan",
+        "description": "Añádelos a tu lista de compra antes de quedarte sin ellos.",
+        "cta": "Ir a la lista"
+      },
+      "organizeWithCategories": {
+        "title": "Organiza tu despensa por categorías",
+        "description": "Agrupa tus productos para encontrarlos más rápido y tener todo bajo control.",
+        "cta": "Organizar ahora"
       }
     }
   },
