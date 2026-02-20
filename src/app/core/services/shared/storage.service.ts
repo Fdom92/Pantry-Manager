@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
-import { APP_DB_NAME } from '@core/constants';
+import { Injectable, inject } from '@angular/core';
+import { APP_DB_NAME, STORAGE_BULK_CHUNK_SIZE } from '@core/constants';
 import { BaseDoc } from '@core/models/shared';
 import { createDocumentId } from '@core/utils';
+import { normalizeSearchField, normalizeSearchQuery, normalizeTrim } from '@core/utils/normalization.util';
 import PouchDB from 'pouchdb-browser';
 import PouchFind from 'pouchdb-find';
+import { LoggerService } from './logger.service';
 
 PouchDB.plugin(PouchFind);
 
@@ -13,10 +15,10 @@ type PouchResponse = PouchDB.Core.Response;
   providedIn: 'root',
 })
 export class StorageService<T extends BaseDoc> {
-  // DATA
   private db: PouchDB.Database<T>;
-  private readonly LIST_CHUNK_SIZE = 250;
-  // GETTERS
+  private readonly LIST_CHUNK_SIZE = STORAGE_BULK_CHUNK_SIZE;
+  private readonly logger = inject(LoggerService);
+
   protected get database(): PouchDB.Database<T> {
     return this.db;
   }
@@ -50,13 +52,13 @@ export class StorageService<T extends BaseDoc> {
       });
 
       if (!existing && withId._rev) {
-        console.warn(`[StorageService] Dropping unexpected _rev for new doc`, { _id: docId, _rev: withId._rev });
+        this.logger.warn(`Dropping unexpected _rev for new doc: ${docId}`, { _rev: withId._rev });
       }
 
       if (existing && withId._rev && withId._rev !== existing._rev) {
-        console.warn(
-          `[StorageService] _rev mismatch detected before upsert`,
-          { _id: docId, incomingRev: withId._rev, storedRev: existing._rev }
+        this.logger.warn(
+          `_rev mismatch detected before upsert: ${docId}`,
+          { incomingRev: withId._rev, storedRev: existing._rev }
         );
       }
 
@@ -71,9 +73,9 @@ export class StorageService<T extends BaseDoc> {
       return { ...newDoc, _rev: res.rev } as T;
     } catch (err) {
       if ((err as any)?.status === 409) {
-        console.warn('[StorageService] Conflict while saving document', { _id: docId, error: err });
+        this.logger.warn(`Conflict while saving document: ${docId}`, err);
       }
-      console.error('[StorageService] upsert error', err);
+      this.logger.error('upsert error', err);
       throw err;
     }
   }
@@ -99,7 +101,7 @@ export class StorageService<T extends BaseDoc> {
       await this.db.remove(doc);
       return true;
     } catch (err) {
-      console.error('[StorageService] remove error', err);
+      this.logger.error('remove error', err);
       return false;
     }
   }
@@ -133,13 +135,6 @@ export class StorageService<T extends BaseDoc> {
     }
 
     return docs;
-  }
-
-  /**
-   * listByType - helper for specific services.
-   */
-  protected async listByType(type: string): Promise<T[]> {
-    return this.all(type);
   }
 
   /**
@@ -179,7 +174,7 @@ export class StorageService<T extends BaseDoc> {
       });
       return result.docs;
     } catch (err) {
-      console.error('[StorageService] findByField error', err);
+      this.logger.error('findByField error', err);
       return [];
     }
   }
@@ -192,7 +187,7 @@ export class StorageService<T extends BaseDoc> {
       await this.db.createIndex({ index: { fields } });
     } catch (err) {
       // Some errors appear when the index already exists; log and ignore them
-      console.warn('[StorageService] ensureIndex warning', err);
+      this.logger.warn('ensureIndex warning', err);
     }
   }
 
@@ -217,7 +212,7 @@ export class StorageService<T extends BaseDoc> {
       if (change.doc) onChange(change.doc);
     })
     .on('error', err => {
-      console.error('[StorageService] changes feed error', err);
+      this.logger.error('changes feed error', err);
     });
 
     return feed;
@@ -237,41 +232,23 @@ export class StorageService<T extends BaseDoc> {
 
     const duplicateIds = this.findDuplicateIds(prepared);
     if (duplicateIds.length) {
-      console.warn('[StorageService] bulkSave detected duplicate IDs', duplicateIds);
+      this.logger.warn('bulkSave detected duplicate IDs', duplicateIds);
     }
 
     const res = await this.db.bulkDocs(prepared as any);
     return prepared.map((doc, index) => {
       const outcome = res[index] as PouchDB.Core.Response & { error?: string };
       if (outcome?.error) {
-        console.error('[StorageService] bulkSave error for document', { _id: doc._id, error: outcome });
+        this.logger.error(`bulkSave error for document: ${doc._id}`, outcome);
         return doc;
       }
       return { ...doc, _rev: outcome.rev } as T;
     });
   }
 
-  async count(type?: string): Promise<number> {
-    const docs = await this.all(type);
-    return docs.length;
-  }
-
-  async search(text: string, fields: (keyof T)[]): Promise<T[]> {
-    if (!text.trim()) return [];
-    const docs = await this.all();
-    const lower = text.toLowerCase();
-    return docs.filter(doc =>
-      fields.some(f => String(doc[f] ?? '').toLowerCase().includes(lower))
-    );
-  }
-
-  async exists(id: string): Promise<boolean> {
-    const doc = await this.get(id);
-    return !!doc;
-  }
 
   private ensureDocumentId(doc: T): T {
-    const rawId = (doc?._id ?? '').trim();
+    const rawId = normalizeTrim(doc?._id);
     if (rawId) {
       if (rawId !== doc._id) {
         return { ...doc, _id: rawId } as T;
@@ -281,7 +258,7 @@ export class StorageService<T extends BaseDoc> {
 
     const typePrefix = ((doc as any)?.type ?? 'doc').toString().split(':')[0] || 'doc';
     const generatedId = createDocumentId(typePrefix);
-    console.warn('[StorageService] Generated missing _id for document', { generatedId, type: (doc as any)?.type });
+    this.logger.warn(`Generated missing _id for document`, { generatedId, type: (doc as any)?.type });
     return { ...doc, _id: generatedId } as T;
   }
 

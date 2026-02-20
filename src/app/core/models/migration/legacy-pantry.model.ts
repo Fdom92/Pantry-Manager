@@ -5,7 +5,6 @@ export type LegacyItemBatch = Omit<ItemBatch, 'locationId'>;
 
 export interface LegacyLocationStock {
   locationId?: string | null;
-  unit?: string | null;
   batches?: LegacyItemBatch[];
   quantity?: number | null;
   minThreshold?: number | null;

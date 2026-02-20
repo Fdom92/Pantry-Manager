@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { EXPORT_PATH } from '@core/constants';
+import { EXPORT_DIRECTORY } from '@core/constants';
+import { normalizeLowercase } from '@core/utils/normalization.util';
 
 export type ShareOutcome = 'shared' | 'cancelled' | 'unavailable' | 'failed';
 
@@ -10,6 +11,10 @@ export interface ShareBlobParams {
   mimeType: string;
   title?: string;
   text?: string;
+}
+
+export function shouldSkipShareOutcome(outcome: ShareOutcome): boolean {
+  return outcome === 'shared' || outcome === 'cancelled';
 }
 
 @Injectable({ providedIn: 'root' })
@@ -72,7 +77,7 @@ export class ShareService {
       ]);
 
       const base64Data = await this.blobToBase64(params.blob);
-      const path = this.joinPath(EXPORT_PATH, params.filename);
+      const path = this.joinPath(EXPORT_DIRECTORY, params.filename);
       let didTimeout = false;
 
       await Filesystem.writeFile({
@@ -159,7 +164,7 @@ export class ShareService {
     if (typeof DOMException !== 'undefined' && err instanceof DOMException) {
       return err.name === 'AbortError';
     }
-    const message = this.getErrorMessage(err).toLowerCase();
+    const message = normalizeLowercase(this.getErrorMessage(err));
     return message.includes('cancel');
   }
 

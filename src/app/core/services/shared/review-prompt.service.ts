@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { ONBOARDING_STORAGE_KEY, REVIEW_STORAGE_KEYS } from '@core/constants';
+import { getBooleanFlag, setBooleanFlag, sleep } from '@core/utils';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmService } from './confirm.service';
 
@@ -19,9 +20,10 @@ export class ReviewPromptService {
   private readonly minProductAddsForPrompt = 3;
   private readonly promptDelayMs = 1500;
   private lastTriggerAt = 0;
+  private readonly storageAvailable = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
 
   async handleDashboardEnter(): Promise<void> {
-    if (!this.canUseStorage()) {
+    if (!this.storageAvailable) {
       return;
     }
     const now = Date.now();
@@ -31,7 +33,7 @@ export class ReviewPromptService {
     this.lastTriggerAt = now;
 
     this.noteLaunch();
-    if (!this.hasPendingPrompt()) {
+    if (!getBooleanFlag(REVIEW_STORAGE_KEYS.PENDING)) {
       return;
     }
     const didPrompt = await this.promptIfEligible();
@@ -41,15 +43,15 @@ export class ReviewPromptService {
   }
 
   markEngagement(): void {
-    if (!this.canUseStorage()) {
+    if (!this.storageAvailable) {
       return;
     }
     this.noteFirstUse();
-    this.setPendingPrompt();
+    setBooleanFlag(REVIEW_STORAGE_KEYS.PENDING, true);
   }
 
   handleProductAdded(): void {
-    if (!this.canUseStorage()) {
+    if (!this.storageAvailable) {
       return;
     }
     this.noteFirstUse();
@@ -57,7 +59,7 @@ export class ReviewPromptService {
     const next = current + 1;
     this.setItem(REVIEW_STORAGE_KEYS.PRODUCT_ADD_COUNT, String(next));
     if (next >= this.minProductAddsForPrompt) {
-      this.setPendingPrompt();
+      setBooleanFlag(REVIEW_STORAGE_KEYS.PENDING, true);
     }
   }
 
@@ -80,7 +82,7 @@ export class ReviewPromptService {
       return false;
     }
 
-    await this.delay(this.promptDelayMs);
+    await sleep(this.promptDelayMs);
     if (!this.shouldPrompt()) {
       return false;
     }
@@ -99,18 +101,6 @@ export class ReviewPromptService {
     return true;
   }
 
-  private setPendingPrompt(): void {
-    this.setItem(REVIEW_STORAGE_KEYS.PENDING, 'true');
-  }
-
-  private hasPendingPrompt(): boolean {
-    try {
-      return localStorage.getItem(REVIEW_STORAGE_KEYS.PENDING) === 'true';
-    } catch {
-      return false;
-    }
-  }
-
   private clearPendingPrompt(): void {
     try {
       localStorage.removeItem(REVIEW_STORAGE_KEYS.PENDING);
@@ -123,7 +113,7 @@ export class ReviewPromptService {
     if (!Capacitor.isNativePlatform()) {
       return false;
     }
-    if (!this.hasCompletedOnboarding()) {
+    if (!getBooleanFlag(ONBOARDING_STORAGE_KEY)) {
       return false;
     }
     if (this.getStoredDate(REVIEW_STORAGE_KEYS.COMPLETED_AT)) {
@@ -159,14 +149,6 @@ export class ReviewPromptService {
       return true;
     } catch (err) {
       console.warn('[ReviewPromptService] In-app review unavailable', err);
-      return false;
-    }
-  }
-
-  private hasCompletedOnboarding(): boolean {
-    try {
-      return Boolean(localStorage.getItem(ONBOARDING_STORAGE_KEY));
-    } catch {
       return false;
     }
   }
@@ -210,11 +192,4 @@ export class ReviewPromptService {
     return Math.floor(diffMs / (24 * 60 * 60 * 1000));
   }
 
-  private canUseStorage(): boolean {
-    return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
 }

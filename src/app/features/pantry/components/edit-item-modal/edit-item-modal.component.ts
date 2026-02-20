@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ViewEncapsulation, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pantry-edit-item-modal-state.service';
 import {
   IonButton,
   IonButtons,
@@ -11,16 +12,12 @@ import {
   IonIcon,
   IonInput,
   IonItem,
-  IonList,
   IonModal,
   IonSpinner,
   IonTitle,
-  IonToggle,
-  IonToolbar,
+  IonToolbar
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pantry-edit-item-modal-state.service';
 import { EntityAutocompleteComponent } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 
 @Component({
@@ -30,7 +27,6 @@ import { EntityAutocompleteComponent } from '@shared/components/entity-autocompl
     CommonModule,
     ReactiveFormsModule,
     TranslateModule,
-    EmptyStateComponent,
     IonModal,
     IonHeader,
     IonToolbar,
@@ -39,11 +35,9 @@ import { EntityAutocompleteComponent } from '@shared/components/entity-autocompl
     IonButton,
     IonIcon,
     IonContent,
-    IonList,
     IonItem,
     IonInput,
     IonCheckbox,
-    IonToggle,
     IonFooter,
     IonSpinner,
     EntityAutocompleteComponent,

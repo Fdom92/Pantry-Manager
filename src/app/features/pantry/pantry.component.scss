@@ -1,14 +1,14 @@
-ion-title, ion-buttons > ion-button {
-  color: var(--ion-text-color, var(--ion-text-color));
+ion-title {
+  color: var(--app-theme-text-color);
 }
 
 .pantry-search {
-  margin-bottom: 6px;
+  margin-bottom: var(--app-theme-spacing-xs);
 }
 
 .pantry-search ion-searchbar {
-  --border-radius: 12px;
-  --background: var(--ion-card-background, var(--ion-item-background, var(--ion-background-color, var(--ion-background-color))));
+  --border-radius: var(--app-theme-spacing-md);
+  --background: var(--app-theme-card-bg);
   padding: 0;
 }
 
@@ -16,14 +16,14 @@ ion-title, ion-buttons > ion-button {
   position: sticky;
   top: -16px;
   z-index: 10;
-  margin-bottom: 6px;
+  margin-bottom: var(--app-theme-spacing-xs);
   background: var(--ion-background-color);
 }
 
 .summary-chips {
   display: flex;
   overflow-x: auto;
-  padding: 4px 2px;
+  padding: var(--app-theme-spacing-xs) 2px;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
 }
@@ -34,32 +34,32 @@ ion-title, ion-buttons > ion-button {
 
 .summary-chips .status-chip {
   flex: 0 0 auto;
-  --padding-start: 10px;
+  --padding-start: var(--app-theme-spacing-md);
   --padding-end: 14px;
   --ripple-color: color-mix(in srgb, var(--ion-color-dark-contrast) 20%, transparent);
-  font-weight: 600;
+  font-weight: var(--app-theme-font-weight-bold);
   scroll-snap-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: var(--app-theme-transition-normal);
   border-radius: 999px;
 }
 
 .summary-chips .status-chip ion-icon {
   font-size: 18px;
-  margin-right: 6px;
-  color: var(--ion-color-medium);
+  margin-right: var(--app-theme-spacing-xs);
+  color: var(--app-theme-text-muted);
 }
 
 
 .summary-chips .status-chip .chip-body {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs);
   line-height: 1.1;
 }
 
 .summary-chips .status-chip .chip-label {
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: var(--app-theme-font-size-body);
+  font-weight: var(--app-theme-font-weight-semibold);
 }
 
 .summary-chips .status-chip .chip-count {
@@ -75,7 +75,7 @@ ion-title, ion-buttons > ion-button {
 .summary-chips .status-chip.active {
   opacity: 1;
   box-shadow: 0 4px 14px rgba(15, 20, 19, 0.18);
-  outline: 2px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  outline: 2px solid var(--app-theme-card-border-color);
   outline-offset: 2px;
 }
 
@@ -130,10 +130,20 @@ ion-title, ion-buttons > ion-button {
 }
 
 .skeleton-card {
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 12px;
   position: relative;
   overflow: hidden;
+  background: var(--ion-card-background, var(--ion-card-background));
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+}
+
+.skeleton-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
 .skeleton-card::after {
@@ -176,7 +186,7 @@ ion-title, ion-buttons > ion-button {
 .virtual-item-card {
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 8px;
+  margin-bottom: var(--app-theme-spacing-lg);
   transition:
     height 0.25s ease,
     opacity 220ms ease,
@@ -198,12 +208,6 @@ ion-title, ion-buttons > ion-button {
   display: block;
   flex: 1 1 auto;
   height: 100%;
-}
-
-.virtual-item-card--expanded {
-  margin-top: 10px;
-  margin-bottom: 14px;
-  z-index: 5;
 }
 
 .group-header {
@@ -305,29 +309,6 @@ section.group-details {
   margin-top: 16px;
 }
 
-.add-mode-sheet::part(content) {
-  border-radius: 18px 18px 0 0;
-  background: var(--ion-card-background, var(--ion-background-color));
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 10%, transparent);
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-}
-
-.add-mode-content {
-  --padding-top: 16px;
-  --padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-}
-
-.add-mode-title {
-  margin: 0 0 8px;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.add-mode-list ion-item {
-  --background: var(--ion-card-background, var(--ion-card-background));
-  border-radius: 12px;
-  margin-bottom: 8px;
-}
 
 .location-form-card {
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
@@ -410,6 +391,17 @@ ion-card-header {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+// Quantity sheet modal styles
+ion-modal.quantity-sheet {
+  --background: var(--ion-background-color);
+  --border-radius: 16px 16px 0 0;
+  --box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+}
+
+ion-modal.quantity-sheet ion-content {
+  --background: var(--ion-background-color);
 }
 
 @keyframes shimmer {

@@ -1,13 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
+import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
 import {
   IonButton,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
+  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
@@ -16,8 +15,6 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
-import { EntitySelectorModalComponent } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,18 +23,15 @@ import { EntitySelectorModalComponent } from '@shared/components/entity-selector
     IonHeader,
     IonToolbar,
     IonTitle,
+    IonButtons,
     IonContent,
-    IonButton,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
     IonIcon,
     IonSkeletonText,
+    IonButton,
     CommonModule,
+    RouterLink,
     TranslateModule,
     InsightCardComponent,
-    EntitySelectorModalComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],

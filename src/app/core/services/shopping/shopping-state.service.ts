@@ -1,27 +1,27 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { SHOPPING_LIST_NAME } from '@core/constants';
-import { determineSuggestionNeed, groupSuggestionsBySupermarket, incrementSummary } from '@core/domain/shopping';
+import { determineSuggestionNeed, incrementSummary } from '@core/domain/shopping';
+import { groupSuggestionsBySupermarket } from '@core/utils/shopping-grouping.util';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
-import type { MeasurementUnit } from '@core/models/shared';
-import type {
+import {
   ShoppingReason,
-  ShoppingStateWithItem,
-  ShoppingSuggestionGroupWithItem,
-  ShoppingSuggestionWithItem,
-  ShoppingSummary,
+  type ShoppingStateWithItem,
+  type ShoppingSuggestionGroupWithItem,
+  type ShoppingSuggestionWithItem,
+  type ShoppingSummary,
 } from '@core/models/shopping';
-import { ShoppingReasonEnum } from '@core/models/shopping';
 import { LanguageService } from '../shared/language.service';
-import { DownloadService, ShareService, createLatestOnlyRunner, withSignalFlag } from '../shared';
+import { createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
+import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
-import { normalizeSupermarketValue, normalizeUnitValue } from '@core/utils/normalization.util';
+import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
 import { PantryService } from '../pantry/pantry.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { EventManagerService } from '../events';
+import { HistoryEventManagerService } from '../history/history-event-manager.service';
 
 @Injectable()
 export class ShoppingStateService {
@@ -30,21 +30,15 @@ export class ShoppingStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventManager = inject(EventManagerService);
+  private readonly eventManager = inject(HistoryEventManagerService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly download = inject(DownloadService);
   private readonly share = inject(ShareService);
 
-  readonly loading = this.pantryStore.loading;
-  readonly items = this.pantryStore.items;
-
   readonly isSummaryExpanded = signal(true);
   readonly processingSuggestionIds = signal<Set<string>>(new Set());
   readonly isSharingListInProgress = signal(false);
-
-  // Purchase modal (template-driven; state holds only the target + open flag)
-  readonly isPurchaseModalOpen = signal(false);
   readonly purchaseTarget = signal<ShoppingSuggestionWithItem | null>(null);
 
   readonly shoppingAnalysis = computed<ShoppingStateWithItem>(() => {
@@ -55,8 +49,16 @@ export class ShoppingStateService {
     };
   });
 
+  readonly loading = this.pantryStore.loading;
+  readonly items = this.pantryStore.items;
+
+  private readonly skeletonManager = new SkeletonLoadingManager();
+  readonly showSkeleton = this.skeletonManager.showSkeleton;
+
   async ionViewWillEnter(): Promise<void> {
+    this.skeletonManager.startLoading();
     await this.pantryStore.loadAll();
+    this.skeletonManager.stopLoading();
   }
 
   toggleSummaryCard(): void {
@@ -67,21 +69,27 @@ export class ShoppingStateService {
     return id ? this.processingSuggestionIds().has(id) : false;
   }
 
-  openPurchaseModalForSuggestion(suggestion: ShoppingSuggestionWithItem): void {
-    this.purchaseTarget.set(suggestion);
-    this.isPurchaseModalOpen.set(true);
-  }
-
-  closePurchaseModal(): void {
-    if (this.isPurchaseModalOpen()) {
+  async purchaseSuggestion(suggestion: ShoppingSuggestionWithItem): Promise<void> {
+    const id = suggestion?.item?._id;
+    const quantity = Number(suggestion?.suggestedQuantity ?? 0);
+    if (!id || !Number.isFinite(quantity) || quantity <= 0) {
       return;
     }
-    this.isPurchaseModalOpen.set(false);
-    this.purchaseTarget.set(null);
-  }
 
-  dismissPurchaseModal(): void {
-    this.isPurchaseModalOpen.set(false);
+    await this.runWithProcessing(id, async () => {
+      const updated = await this.pantryService.addNewLot(id, {
+        quantity,
+        expiryDate: undefined,
+      });
+      if (updated) {
+        await this.pantryStore.updateItem(updated);
+        await this.eventManager.logShoppingAdd(suggestion.item, updated, quantity);
+      }
+      await this.pantryStore.loadAll();
+      if (this.shoppingAnalysis().summary.total === 0) {
+        this.reviewPrompt.markEngagement();
+      }
+    });
   }
 
   async confirmPurchaseForTarget(data: { quantity: number; expiryDate?: string | null }): Promise<void> {
@@ -92,8 +100,7 @@ export class ShoppingStateService {
       return;
     }
 
-    this.processingSuggestionIds.update(ids => new Set(ids).add(id));
-    try {
+    await this.runWithProcessing(id, async () => {
       const updated = await this.pantryService.addNewLot(id, {
         quantity,
         expiryDate: data.expiryDate ?? undefined,
@@ -106,29 +113,18 @@ export class ShoppingStateService {
       if (this.shoppingAnalysis().summary.total === 0) {
         this.reviewPrompt.markEngagement();
       }
-      this.dismissPurchaseModal();
-    } finally {
-      this.processingSuggestionIds.update(ids => {
-        const next = new Set(ids);
-        next.delete(id);
-        return next;
-      });
-    }
+    });
   }
 
   getBadgeColorByReason(reason: ShoppingReason): string {
     switch (reason) {
-      case ShoppingReasonEnum.EMPTY:
+      case ShoppingReason.EMPTY:
         return 'danger';
-      case ShoppingReasonEnum.BELOW_MIN:
+      case ShoppingReason.BELOW_MIN:
         return 'warning';
       default:
         return 'primary';
     }
-  }
-
-  getUnitLabel(unit: MeasurementUnit | string): string {
-    return this.pantryStore.getUnitLabel(normalizeUnitValue(unit));
   }
 
   getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
@@ -148,7 +144,7 @@ export class ShoppingStateService {
 
       await withSignalFlag(this.isSharingListInProgress, async () => {
         const pdfBlob = this.buildShoppingPdf(state.groupedSuggestions);
-        const filename = this.buildShareFileName();
+        const filename = `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename(new Date())}.pdf`;
         const { outcome } = await this.share.tryShareBlob({
           blob: pdfBlob,
           filename,
@@ -161,11 +157,7 @@ export class ShoppingStateService {
           return;
         }
 
-        if (outcome === 'shared') {
-          return;
-        }
-
-        if (outcome === 'cancelled') {
+        if (shouldSkipShareOutcome(outcome)) {
           return;
         }
 
@@ -182,7 +174,7 @@ export class ShoppingStateService {
   private buildShoppingAnalysis(items: PantryItem[]): Omit<ShoppingStateWithItem, 'hasAlerts'> {
     const suggestions: ShoppingSuggestionWithItem[] = [];
     const uniqueSupermarkets = new Set<string>();
-    const summary: ShoppingSummary = {
+    let summary: ShoppingSummary = {
       total: 0,
       belowMin: 0,
       empty: 0,
@@ -192,8 +184,6 @@ export class ShoppingStateService {
     for (const item of items) {
       const minThreshold = item.minThreshold != null ? Number(item.minThreshold) : null;
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
-      const primaryBatch = item.batches?.[0];
-      const unit = normalizeUnitValue(primaryBatch?.unit ?? this.pantryStore.getItemPrimaryUnit(item));
 
       const shouldAutoAdd = this.pantryStore.shouldAutoAddToShoppingList(item, {
         totalQuantity,
@@ -209,7 +199,7 @@ export class ShoppingStateService {
       if (reason) {
         const supermarket = normalizeSupermarketValue(item.supermarket);
         if (supermarket) {
-          uniqueSupermarkets.add(supermarket.toLowerCase());
+          uniqueSupermarkets.add(normalizeLowercase(supermarket));
         }
 
         suggestions.push({
@@ -218,25 +208,21 @@ export class ShoppingStateService {
           suggestedQuantity,
           currentQuantity: roundQuantity(totalQuantity),
           minThreshold: minThreshold != null ? roundQuantity(minThreshold) : undefined,
-          unit,
           supermarket,
         });
 
-        incrementSummary(summary, reason);
+        summary = incrementSummary(summary, reason);
       }
     }
 
     summary.total = suggestions.length;
     summary.supermarketCount = uniqueSupermarkets.size;
+    const unassignedLabel = this.translate.instant('shopping.unassignedSupermarket');
     const groupedSuggestions = groupSuggestionsBySupermarket({
       suggestions,
-      labelForUnassigned: this.getUnassignedSupermarketLabel(),
+      labelForUnassigned: unassignedLabel,
     });
     return { suggestions, groupedSuggestions, summary };
-  }
-
-  private getUnassignedSupermarketLabel(): string {
-    return this.translate.instant('shopping.unassignedSupermarket');
   }
 
   private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {
@@ -254,9 +240,15 @@ export class ShoppingStateService {
       quantity: 30,
       supermarket: 45,
     };
+    const locale = this.languageService.getCurrentLocale();
+    const unassignedLabel = this.translate.instant('shopping.unassignedSupermarket');
     const title = this.translate.instant('shopping.share.pdfTitle');
     const generatedOn = this.translate.instant('shopping.share.generatedOn', {
-      date: this.formatExportDate(now),
+      date: formatDateTimeValue(now, locale, {
+        dateOptions: { year: 'numeric', month: 'long', day: 'numeric' },
+        timeOptions: { hour: '2-digit', minute: '2-digit' },
+        fallback: '',
+      }),
     });
 
     doc.setFontSize(16);
@@ -284,8 +276,8 @@ export class ShoppingStateService {
       for (const suggestion of group.suggestions) {
         const row = {
           product: suggestion.item?.name ?? '',
-          quantity: this.formatQuantityLabel(suggestion.suggestedQuantity, suggestion.unit),
-          supermarket: suggestion.supermarket ?? this.getUnassignedSupermarketLabel(),
+          quantity: formatQuantity(suggestion.suggestedQuantity, locale),
+          supermarket: suggestion.supermarket ?? unassignedLabel,
         };
         const productLines = doc.splitTextToSize(row.product, columnWidth.product);
         const quantityLines = doc.splitTextToSize(row.quantity, columnWidth.quantity);
@@ -309,14 +301,6 @@ export class ShoppingStateService {
     return doc.output('blob') as Blob;
   }
 
-  private formatExportDate(date: Date): string {
-    return formatDateTimeValue(date, this.languageService.getCurrentLocale(), {
-      dateOptions: { year: 'numeric', month: 'long', day: 'numeric' },
-      timeOptions: { hour: '2-digit', minute: '2-digit' },
-      fallback: '',
-    });
-  }
-
   private ensurePageSpace(doc: jsPDF, currentY: number, neededSpace: number): number {
     const bottomMargin = 20;
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -327,18 +311,20 @@ export class ShoppingStateService {
     return currentY;
   }
 
-  private formatQuantityLabel(value: number, unit: MeasurementUnit | string): string {
-    const locale = this.languageService.getCurrentLocale();
-    const formatted = formatQuantity(value, locale, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-    const unitLabel = this.getUnitLabel(unit);
-    return unitLabel ? `${formatted} ${unitLabel}` : formatted;
-  }
-
-  private buildShareFileName(): string {
-    return `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename()}.pdf`;
+  private async runWithProcessing(id: string, task: () => Promise<void>): Promise<void> {
+    if (this.isSuggestionProcessing(id)) {
+      return;
+    }
+    this.processingSuggestionIds.update(ids => new Set(ids).add(id));
+    try {
+      await task();
+    } finally {
+      this.processingSuggestionIds.update(ids => {
+        const next = new Set(ids);
+        next.delete(id);
+        return next;
+      });
+    }
   }
 
 }

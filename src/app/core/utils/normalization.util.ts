@@ -1,22 +1,65 @@
-import { MeasurementUnit } from '@core/models/shared';
-
 export interface NormalizeStringListOptions {
   fallback?: readonly string[];
-  ensure?: readonly string[];
   keyFn?: (value: string) => string;
 }
 
-export function normalizeKey(value: string | null | undefined): string {
-  return (value ?? '').trim().toLowerCase();
-}
+/**
+ * Core normalization functions hierarchy:
+ * - normalizeTrim: Basic trim
+ * - normalizeWhitespace: Collapse multiple spaces + trim
+ * - normalizeLowercase: Trim + lowercase
+ * - normalizeWhitespaceLowercase: Collapse spaces + trim + lowercase
+ */
 
 export function normalizeWhitespace(value: string | null | undefined): string {
   return (value ?? '').replace(/\s+/g, ' ').trim();
 }
 
+export function normalizeTrim(value?: string | null): string {
+  return (value ?? '').trim();
+}
+
+export function normalizeLowercase(value?: string | null): string {
+  return normalizeTrim(value).toLowerCase();
+}
+
+export function normalizeOptionalTrim(value?: string | null): string | undefined {
+  const trimmed = normalizeTrim(value);
+  return trimmed || undefined;
+}
+
+export function normalizeWhitespaceLowercase(value: string | null | undefined): string {
+  return normalizeWhitespace(value).toLowerCase();
+}
+
+export function normalizeSearchQuery(value: string | null | undefined): string {
+  return normalizeWhitespaceLowercase(value);
+}
+
+export function normalizeSearchField(value: unknown): string {
+  return normalizeWhitespaceLowercase(String(value ?? ''));
+}
+
+export function normalizeLocaleCode(locale?: string | null): string | null {
+  if (!locale) {
+    return null;
+  }
+  const normalized = normalizeLowercase(locale).replace('_', '-');
+  const [base] = normalized.split('-');
+  return base || null;
+}
+
+export function normalizeSupermarketName(value?: string | null): string | undefined {
+  const trimmed = normalizeWhitespace(value);
+  if (!trimmed) {
+    return undefined;
+  }
+  const lower = trimmed.toLowerCase();
+  return lower.replace(/\b\w/g, char => char.toUpperCase());
+}
+
 export function normalizeLocationId(value?: string | null, fallback: string = ''): string {
-  const trimmed = (value ?? '').trim();
-  return trimmed || fallback;
+  return normalizeTrim(value) || fallback;
 }
 
 export function normalizeCategoryId(value: string | null | undefined): string {
@@ -31,7 +74,7 @@ export function normalizeStringList(
   values: unknown,
   options: NormalizeStringListOptions = {},
 ): string[] {
-  const { fallback = [], ensure = [], keyFn = normalizeKey } = options;
+  const { fallback = [], keyFn = normalizeLowercase } = options;
   const source = Array.isArray(values) ? values : [];
   const seen = new Set<string>();
   const normalized: string[] = [];
@@ -56,29 +99,11 @@ export function normalizeStringList(
     addValue(entry);
   }
 
-  for (const entry of ensure) {
-    addValue(entry);
-  }
-
   if (!normalized.length) {
     return [...fallback];
   }
 
   return normalized;
-}
-
-export function normalizeUnitValue(
-  unit: MeasurementUnit | string | undefined,
-  fallback: MeasurementUnit | string = MeasurementUnit.UNIT,
-): string {
-  if (typeof unit !== 'string') {
-    return typeof fallback === 'string' ? fallback : MeasurementUnit.UNIT;
-  }
-  const trimmed = unit.trim();
-  if (!trimmed) {
-    return typeof fallback === 'string' ? fallback : MeasurementUnit.UNIT;
-  }
-  return trimmed;
 }
 
 export function normalizeSupermarketValue(value?: string | null): string | undefined {
@@ -87,7 +112,7 @@ export function normalizeSupermarketValue(value?: string | null): string | undef
 }
 
 export function formatFriendlyName(value: string, fallback: string): string {
-  const key = value?.trim();
+  const key = normalizeTrim(value);
   if (!key) {
     return fallback;
   }
@@ -99,10 +124,6 @@ export function formatFriendlyName(value: string, fallback: string): string {
     .join(' ');
 }
 
-export function normalizeEntityName(value: string, fallback: string): string {
-  return formatFriendlyName(value, fallback);
-}
-
 export function dedupeByNormalizedKey<T>(
   items: T[],
   keyFn: (item: T) => string,
@@ -110,7 +131,7 @@ export function dedupeByNormalizedKey<T>(
   const seen = new Set<string>();
   const result: T[] = [];
   for (const item of items) {
-    const key = normalizeKey(keyFn(item));
+    const key = normalizeLowercase(keyFn(item));
     if (!key || seen.has(key)) {
       continue;
     }

@@ -1,1 +1,1 @@
-export * from './pantry-migration.service';
+export * from './migration-pantry.service';

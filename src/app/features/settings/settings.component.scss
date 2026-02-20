@@ -1,17 +1,17 @@
 ion-card-title {
   margin: 0;
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: var(--app-theme-font-weight-bold);
 }
 
 ion-card-subtitle {
-  margin-top: 4px;
-  font-size: 0.85rem;
-  color: var(--ion-color-medium);
+  margin-top: var(--app-theme-spacing-xs);
+  font-size: var(--app-theme-font-size-body);
+  color: var(--app-theme-text-muted);
 }
 
 ion-title {
-  color: var(--ion-text-color, var(--ion-text-color));
+  color: var(--app-theme-text-color);
 }
 
 ion-card-content {
@@ -20,13 +20,13 @@ ion-card-content {
 
 ion-item h3 {
   font-size: 0.95rem;
-  font-weight: 600;
-  margin: 0 0 4px;
+  font-weight: var(--app-theme-font-weight-bold);
+  margin: 0 0 var(--app-theme-spacing-xs);
 }
 
 ion-item p {
-  font-size: 0.85rem;
-  color: var(--ion-color-medium);
+  font-size: var(--app-theme-font-size-body);
+  color: var(--app-theme-text-muted);
   margin: 0;
 }
 
@@ -37,8 +37,8 @@ ion-item {
 .settings-content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin: 10px;
+  gap: var(--app-theme-spacing-lg);
+  margin: var(--app-theme-card-margin-inline);
 }
 
 .pro-inline-banner {
@@ -47,11 +47,11 @@ ion-item {
 
 .settings-card {
   margin: 0;
-  background: var(--ion-card-background, var(--ion-card-background)) !important;
-  --background: var(--ion-card-background, var(--ion-card-background));
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  color: var(--ion-text-color);
+  background: var(--app-theme-card-bg) !important;
+  --background: var(--app-theme-card-bg);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  border-color: var(--app-theme-card-border-color);
+  color: var(--app-theme-text-color);
 }
 
 .settings-card ion-list {
@@ -62,14 +62,46 @@ ion-item {
   width: 100%;
 }
 
-.theme-select {
-  min-width: 160px;
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --padding-top: 8px;
-  --padding-bottom: 8px;
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 20%, transparent);
-  border-radius: 10px;
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--app-theme-spacing-md);
+  padding: 0 var(--app-theme-spacing-md) var(--app-theme-spacing-md);
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-spacing-md);
+  border: var(--app-theme-card-border-width) solid color-mix(in srgb, var(--ion-text-color) 18%, transparent);
+  background: color-mix(in srgb, var(--app-theme-card-bg) 94%, transparent);
+  color: var(--app-theme-text-color);
+  font-size: 0.9rem;
+  font-weight: var(--app-theme-font-weight-bold);
+  transition: var(--app-theme-transition-normal);
+}
+
+.theme-option ion-icon {
+  font-size: 1.1rem;
+}
+
+.theme-option.selected {
+  border-color: var(--ion-color-primary);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--ion-color-primary) 28%, transparent);
+  background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+}
+
+.theme-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.theme-option:not(:disabled):hover {
+  transform: translateY(-1px);
 }
 
 @media (min-width: 640px) {
@@ -77,7 +109,13 @@ ion-item {
     align-items: center;
   }
 
-  .theme-select {
-    max-width: 240px;
+  .theme-grid {
+    padding-inline: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .theme-grid {
+    grid-template-columns: 1fr;
   }
 }

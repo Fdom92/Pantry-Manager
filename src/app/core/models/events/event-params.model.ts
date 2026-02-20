@@ -7,7 +7,6 @@ export type BaseEventParams = {
   deltaQuantity?: number;
   previousQuantity?: number;
   nextQuantity?: number;
-  unit?: string;
   batchId?: string;
   sourceMetadata?: Record<string, unknown>;
   timestamp?: string;

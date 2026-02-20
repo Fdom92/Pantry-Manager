@@ -1,0 +1,59 @@
+ion-title, ion-back-button {
+  color: var(--ion-text-color, var(--ion-text-color));
+}
+
+ion-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+ion-card-subtitle {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+}
+
+ion-title {
+  color: var(--ion-text-color, var(--ion-text-color));
+}
+
+ion-card-content {
+  padding-inline: 0;
+}
+
+ion-item h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+ion-item p {
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
+  margin: 0;
+}
+
+ion-item {
+  --background: transparent;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-lg);
+  margin: 10px;
+}
+
+.settings-card {
+  margin: 0;
+  background: var(--ion-card-background, var(--ion-card-background)) !important;
+  --background: var(--ion-card-background, var(--ion-card-background));
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  color: var(--ion-text-color);
+}
+
+.settings-card ion-list {
+  background: transparent;
+}

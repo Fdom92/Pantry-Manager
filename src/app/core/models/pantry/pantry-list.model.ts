@@ -1,9 +1,9 @@
-import type { MeasurementUnit } from '../shared/enums.model';
+import type { StatusColor } from '../shared/color.model';
 import { ItemBatch } from './item-batch.model';
 import { PantryItem } from './item.model';
 
 export type PantryStatusFilterValue = 'all' | 'expired' | 'near-expiry' | 'low-stock' | 'normal';
-
+export type ExpiryClassification = 'expired' | 'near-expiry' | 'normal' | 'unknown';
 export type FilterChipKind = 'status' | 'basic';
 
 export interface FilterChipViewModel {
@@ -53,7 +53,6 @@ export interface BatchEntryMeta {
   batch: ItemBatch;
   locationId: string;
   locationLabel: string;
-  locationUnit: MeasurementUnit | string | undefined;
   status: BatchStatusMeta;
 }
 
@@ -74,8 +73,6 @@ export interface PantryItemGlobalStatus {
   state: ProductStatusState;
   label: string;
   accentColor: string;
-  chipColor: string;
-  chipTextColor: string;
 }
 
 export interface PantryItemBatchViewModel {
@@ -87,7 +84,6 @@ export interface PantryItemBatchViewModel {
   formattedDate: string;
   quantityLabel: string;
   quantityValue: number;
-  unitLabel: string;
   opened: boolean;
 }
 
@@ -95,22 +91,9 @@ export interface PantryItemCardViewModel {
   item: PantryItem;
   globalStatus: PantryItemGlobalStatus;
   colorClass: string;
-  totalQuantity: number;
-  totalQuantityLabel: string;
-  unitLabel: string;
-  totalBatches: number;
-  totalBatchesLabel: string;
-  earliestExpirationDate: string | null;
-  formattedEarliestExpirationShort: string;
   formattedEarliestExpirationLong: string;
   batchCountsLabel: string;
-  batchCounts: BatchCountsMeta;
   batches: PantryItemBatchViewModel[];
-}
-
-export interface MoveBatchesResult {
-  moved: ItemBatch[];
-  remaining: ItemBatch[];
 }
 
 export type PantrySummary = Readonly<{

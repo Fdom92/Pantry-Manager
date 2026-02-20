@@ -1,0 +1,122 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ "settings.advanced.title" | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="settings-content">
+    <ion-card class="settings-card">
+      <input
+        type="file"
+        accept="application/json,.json,*/*"
+        hidden
+        #importInput
+        (change)="facade.submitImportFileSelection($event)"
+      />
+      <ion-card-header>
+        <ion-card-title>{{ "settings.data.title" | translate }}</ion-card-title>
+        <ion-card-subtitle>{{
+          "settings.data.subtitle" | translate
+        }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.data.resetTitle" | translate }}</h3>
+              <p>{{ "settings.data.resetDescription" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="facade.resetApplicationData()"
+              [disabled]="facade.isResettingData()"
+              [attr.aria-label]="'settings.data.resetAction' | translate"
+            >
+              @if (facade.isResettingData()) {
+                <ion-spinner
+                  slot="icon-only"
+                  name="dots"
+                ></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.data.exportTitle" | translate }}</h3>
+              <p>{{ "settings.data.exportDescription" | translate }}</p>
+            </ion-label>
+            <ion-button
+              slot="end"
+              fill="clear"
+              (click)="facade.exportDataBackup()"
+              [disabled]="facade.isExportingData()"
+              [attr.aria-label]="'settings.data.exportAction' | translate"
+            >
+              @if (facade.isExportingData()) {
+                <ion-spinner
+                  slot="icon-only"
+                  name="dots"
+                ></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.data.importTitle" | translate }}</h3>
+              <p>{{ "settings.data.importDescription" | translate }}</p>
+            </ion-label>
+            <ion-button
+              slot="end"
+              fill="clear"
+              (click)="facade.openImportPicker(importInput)"
+              [disabled]="facade.isImportingData()"
+              [attr.aria-label]="'settings.data.importAction' | translate"
+            >
+              @if (facade.isImportingData()) {
+                <ion-spinner
+                  slot="icon-only"
+                  name="dots"
+                ></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="enter-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>{{ "settings.catalogs.title" | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ "settings.catalogs.subtitle" | translate }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item
+            lines="none"
+            button
+            detail="true"
+            routerLink="/settings/catalogos"
+          >
+            <ion-label>
+              <h3>{{ "settings.catalogs.manageTitle" | translate }}</h3>
+              <p>{{ "settings.catalogs.manageSubtitle" | translate }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

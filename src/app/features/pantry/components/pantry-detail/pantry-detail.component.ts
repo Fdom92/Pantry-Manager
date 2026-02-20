@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import type { PantryItemBatchViewModel, PantryItemCardViewModel } from '@core/models/pantry';
-import { ItemBatch } from '@core/models/pantry';
-import { IonButton, IonCard, IonIcon, IonItem, IonLabel, IonList, IonPopover, IonText } from '@ionic/angular/standalone';
+import type { PantryItemCardViewModel } from '@core/models/pantry';
+import { IonCard, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -11,13 +10,7 @@ import { TranslateModule } from '@ngx-translate/core';
   imports: [
     CommonModule,
     IonCard,
-    IonButton,
     IonIcon,
-    IonText,
-    IonPopover,
-    IonList,
-    IonItem,
-    IonLabel,
     TranslateModule,
   ],
   templateUrl: './pantry-detail.component.html',
@@ -26,49 +19,10 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class PantryDetailComponent {
   @Input({ required: true }) viewModel!: PantryItemCardViewModel;
-  @Input() expanded = false;
-  @Output() toggleRequested = new EventEmitter<Event | undefined>();
-  @Output() summaryKeydown = new EventEmitter<KeyboardEvent>();
-  @Output() openBatches = new EventEmitter<Event | undefined>();
-  @Output() editRequested = new EventEmitter<Event | undefined>();
-  @Output() deleteRequested = new EventEmitter<Event | undefined>();
-  @Output() adjustBatchRequested = new EventEmitter<{
-    locationId: string;
-    batch: ItemBatch;
-    delta: number;
-    event?: Event;
-  }>();
+  @Output() cardClicked = new EventEmitter<Event | undefined>();
 
-  handleToggle(event?: Event): void {
-    this.toggleRequested.emit(event);
+  handleCardClick(event?: Event): void {
+    this.cardClicked.emit(event);
   }
 
-  handleSummaryKeydown(event: KeyboardEvent): void {
-    this.summaryKeydown.emit(event);
-  }
-
-  handleOpenBatches(event?: Event): void {
-    this.openBatches.emit(event);
-  }
-
-  handleEdit(event?: Event): void {
-    this.editRequested.emit(event);
-  }
-
-  handleDelete(event?: Event): void {
-    this.deleteRequested.emit(event);
-  }
-
-  handleAdjustBatch(
-    locationId: string,
-    batch: ItemBatch,
-    delta: number,
-    event?: Event
-  ): void {
-    this.adjustBatchRequested.emit({ locationId, batch, delta, event });
-  }
-
-  trackBatch(index: number, batch: PantryItemBatchViewModel): string {
-    return batch.batch.batchId ?? batch.batch.expirationDate ?? `batch-${index}`;
-  }
 }

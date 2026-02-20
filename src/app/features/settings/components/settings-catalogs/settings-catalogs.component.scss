@@ -2,30 +2,20 @@ ion-title, ion-back-button {
   color: var(--ion-text-color, var(--ion-text-color));
 }
 
-.catalogs-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 16px;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 56px);
+ion-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
 }
 
-ion-list-header {
-  h2 {
-    margin: 0;
-    font-size: 1.05rem;
-    font-weight: 600;
-  }
-
-  p {
-    margin: 4px 0 0;
-    font-size: 0.85rem;
-    color: var(--ion-color-medium);
-  }
+ion-card-subtitle {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium);
 }
 
-ion-list {
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+ion-card-content {
+  padding-bottom: 0;
 }
 
 ion-item h3 {
@@ -38,6 +28,31 @@ ion-item p {
   font-size: 0.85rem;
   color: var(--ion-color-medium);
   margin: 0;
+}
+
+ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
+.catalogs-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-lg);
+  padding: 10px;
+}
+
+.settings-card {
+  margin: 0;
+  background: var(--ion-card-background, var(--ion-card-background)) !important;
+  --background: var(--ion-card-background, var(--ion-card-background));
+  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  color: var(--ion-text-color);
+}
+
+.settings-card ion-list {
+  background: transparent;
 }
 
 .list-empty-state {
@@ -55,6 +70,8 @@ ion-item p {
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
+  justify-content: center;
+  padding: 12px 16px 4px;
 
   ion-button {
     margin: 0;

@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { App as CapacitorApp } from '@capacitor/app';
 import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { PantryService } from '@core/services/pantry';
-import { PantryMigrationService } from '@core/services/migration/pantry-migration.service';
-import { RevenuecatService } from '@core/services/upgrade';
+import { MigrationPantryService } from '@core/services/migration/migration-pantry.service';
+import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
@@ -17,8 +17,8 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 export class AppComponent {
   // DI
   private readonly pantryService = inject(PantryService);
-  private readonly pantryMigration = inject(PantryMigrationService);
-  private readonly revenuecat = inject(RevenuecatService);
+  private readonly pantryMigration = inject(MigrationPantryService);
+  private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
 

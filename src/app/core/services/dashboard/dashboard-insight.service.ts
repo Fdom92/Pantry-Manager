@@ -1,0 +1,117 @@
+import { Injectable, inject } from '@angular/core';
+import { INSIGHTS_LIBRARY } from '@core/constants';
+import {
+  Insight,
+  InsightContext,
+  InsightCta,
+  InsightCtaDefinition,
+  InsightDefinition,
+  InsightPredicateHelpers,
+} from '@core/models';
+import { TranslateService } from '@ngx-translate/core';
+import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
+
+@Injectable({ providedIn: 'root' })
+export class DashboardInsightService {
+  private readonly translate = inject(TranslateService);
+  private readonly revenueCat = inject(UpgradeRevenuecatService);
+  private readonly dismissedInsightIds = new Set<string>();
+
+  buildDashboardInsights(context: InsightContext): Insight[] {
+    const isPro = this.revenueCat.isPro();
+    const helpers: InsightPredicateHelpers = { now: new Date() };
+    const availableInsights = INSIGHTS_LIBRARY.filter(def => this.isAvailable(def, isPro))
+      .filter(def => !def.predicate || def.predicate(context, helpers))
+      .sort((a, b) => a.priority - b.priority)
+      .map(def => this.toInsight(def));
+
+    // Apply category diversity: select up to 2 insights with different categories
+    return this.selectDiverseInsights(availableInsights, 2);
+  }
+
+  private selectDiverseInsights(insights: Insight[], maxCount: number): Insight[] {
+    const selected: Insight[] = [];
+    const usedCategories = new Set<string>();
+
+    for (const insight of insights) {
+      if (selected.length >= maxCount) {
+        break;
+      }
+
+      // First insight is always selected
+      if (selected.length === 0) {
+        selected.push(insight);
+        usedCategories.add(insight.category);
+        continue;
+      }
+
+      // Subsequent insights: only add if category is different
+      if (!usedCategories.has(insight.category)) {
+        selected.push(insight);
+        usedCategories.add(insight.category);
+      }
+    }
+
+    return selected;
+  }
+
+  getVisibleInsights(insights: Insight[]): Insight[] {
+    return insights.filter(insight => !this.dismissedInsightIds.has(insight.id));
+  }
+
+  dismiss(id: string): void {
+    this.dismissedInsightIds.add(id);
+  }
+
+  resetSession(): void {
+    this.dismissedInsightIds.clear();
+  }
+
+  private isAvailable(definition: InsightDefinition, isPro: boolean): boolean {
+    if (definition.audience === 'pro') {
+      return isPro;
+    }
+    if (definition.audience === 'non-pro') {
+      return !isPro;
+    }
+    return true;
+  }
+
+  private toInsight(definition: InsightDefinition): Insight {
+    return {
+      id: definition.id,
+      title: this.translateKey(definition.titleKey),
+      description: this.translateKey(definition.descriptionKey),
+      category: definition.category,
+      priority: definition.priority,
+      dismissLabel: definition.dismissLabelKey ? this.translateKey(definition.dismissLabelKey) : undefined,
+      ctas: definition.ctas?.map(cta => this.toCta(cta)).filter((cta): cta is InsightCta => Boolean(cta)),
+    };
+  }
+
+  private toCta(definition: InsightCtaDefinition): InsightCta | null {
+    if (definition.type === 'agent') {
+      const prompt = this.translateKey(definition.promptKey);
+      if (!prompt) {
+        return null;
+      }
+      return {
+        id: definition.id,
+        label: this.translateKey(definition.labelKey),
+        type: 'agent',
+        entryContext: definition.entryContext,
+        prompt,
+      };
+    }
+    return {
+      id: definition.id,
+      label: this.translateKey(definition.labelKey),
+      type: 'navigate',
+      route: definition.route,
+    };
+  }
+
+  private translateKey(key: string, params?: Record<string, unknown>): string {
+    return this.translate.instant(key, params);
+  }
+}

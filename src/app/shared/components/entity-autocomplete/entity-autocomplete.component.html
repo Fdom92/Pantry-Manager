@@ -11,7 +11,7 @@
       [autofocus]="autofocus"
       autocomplete="off"
       (ionInput)="onInput($event)"
-      (ionClear)="onClear.emit()"
+      (ionClear)="cleared.emit()"
       (ionFocus)="handleFocus()"
       (ionBlur)="handleBlur()"
       (keydown)="onKeyDown($event)">

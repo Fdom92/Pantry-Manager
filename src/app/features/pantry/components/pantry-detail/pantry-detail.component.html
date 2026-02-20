@@ -2,142 +2,32 @@
   class="pantry-item-card"
   [attr.data-status]="viewModel.globalStatus.state"
   [style.--card-accent]="viewModel.globalStatus.accentColor"
-  [ngClass]="[viewModel.colorClass, expanded ? 'is-expanded' : '']">
-  <div class="card-summary">
-    <div
-      class="summary-trigger"
-      role="button"
-      tabindex="0"
-      (click)="handleToggle($event)"
-      (keydown)="handleSummaryKeydown($event)">
-      <div class="summary-header">
-        <div class="summary-title">
-          <div class="title-row">
-            @if (viewModel.item.isBasic) {
-              <ion-icon class="basic-icon" name="star-outline"></ion-icon>
-            }
-            <span class="summary-name">{{ viewModel.item.name }}</span>
-          </div>
-        </div>
-      </div>
-      <div class="summary-info">
-        <div class="summary-row">
-          <ion-icon name="calendar-outline"></ion-icon>
-          <span>{{ 'pantry.detail.earliest' | translate:{ date: viewModel.formattedEarliestExpirationLong } }}</span>
-        </div>
-        <div class="summary-row meta">
-          <ion-icon name="layers-outline"></ion-icon>
-          <span>{{ viewModel.batchCountsLabel }}</span>
-        </div>
-      </div>
-    </div>
-    <div class="summary-controls">
-      <ion-button
-        fill="clear"
-        size="small"
-        class="summary-action-button"
-        (click)="handleToggle($event); $event.stopPropagation()"
-        [attr.aria-label]="expanded ? ('pantry.detail.actions.collapse' | translate) : ('pantry.detail.actions.expand' | translate)">
-        <ion-icon
-          slot="icon-only"
-          class="summary-toggle-icon"
-          [name]="expanded ? 'chevron-up-outline' : 'chevron-down-outline'">
-        </ion-icon>
-      </ion-button>
-      <ion-button
-        fill="clear"
-        size="small"
-        class="summary-action-button"
-        [attr.id]="'pantry-card-actions-' + viewModel.item._id"
-        (click)="$event.stopPropagation()"
-        [attr.aria-label]="'pantry.detail.actions.menuLabel' | translate">
-        <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
-      </ion-button>
-      <ion-popover
-        #actionsPopover
-        [trigger]="'pantry-card-actions-' + viewModel.item._id"
-        triggerAction="click"
-        dismissOnSelect="true"
-        reference="trigger">
-        <ng-template>
-          <ion-list lines="none" class="pantry-card-popover">
-            <ion-item button detail="false" (click)="$event.stopPropagation(); actionsPopover.dismiss(); handleOpenBatches($event)">
-              <ion-icon slot="start" name="list-outline"></ion-icon>
-              <ion-label>{{ 'pantry.detail.actions.viewBatches' | translate }}</ion-label>
-            </ion-item>
-            <ion-item button detail="false" (click)="$event.stopPropagation(); actionsPopover.dismiss(); handleEdit($event)">
-              <ion-icon slot="start" name="create-outline"></ion-icon>
-              <ion-label>{{ 'pantry.detail.actions.editItem' | translate }}</ion-label>
-            </ion-item>
-            <ion-item button detail="false" (click)="$event.stopPropagation(); actionsPopover.dismiss(); handleDelete($event)">
-              <ion-icon slot="start" name="trash-outline"></ion-icon>
-              <ion-label>{{ 'pantry.detail.actions.deleteItem' | translate }}</ion-label>
-            </ion-item>
-          </ion-list>
-        </ng-template>
-      </ion-popover>
-    </div>
-  </div>
-
-  <div
-    class="item-details"
-    [class.item-details--collapsed]="!expanded"
-    [attr.aria-hidden]="!expanded">
-    <div class="expanded-content">
-      <section class="batch-section">
-        @if (!viewModel.batches.length) {
-          <ion-text color="medium" class="empty-state">
-            {{ 'pantry.detail.noBatches' | translate }}
-          </ion-text>
-        } @else {
-          <div class="batch-list">
-            @for (batch of viewModel.batches; track trackBatch($index, batch)) {
-              <article class="batch-row" [attr.data-status]="batch.status.state">
-                <div class="batch-expiration">
-                  <span class="batch-date"><ion-icon name="calendar-outline"></ion-icon>{{ batch.formattedDate }}</span>
-                  <span class="status-chip" [attr.data-status]="batch.status.state">
-                    {{ batch.status.label }}
-                  </span>
-                </div>
-                <div class="batch-main">
-                  @if (batch.hasLocation) {
-                    <ion-icon class="batch-icon" name="location-outline"></ion-icon>
-                    <div class="batch-info">
-                      <span class="batch-location">{{ batch.locationLabel }}</span>
-                    </div>
-                  }
-                </div>
-                <div class="batch-meta">
-                  <span class="batch-quantity">
-                    {{ batch.quantityLabel }}
-                  </span>
-                  <!--  -->
-                  <div class="batch-actions">
-                    <ion-button
-                      fill="clear"
-                      size="small"
-                      color="primary"
-                      class="pressable"
-                      (click)="handleAdjustBatch(batch.locationId, batch.batch, -1, $event)"
-                      [disabled]="batch.quantityValue <= 0">
-                      <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
-                    </ion-button>
-                    <ion-button
-                      fill="clear"
-                      size="small"
-                      color="primary"
-                      class="pressable"
-                      (click)="handleAdjustBatch(batch.locationId, batch.batch, 1, $event)">
-                      <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-                    </ion-button>
-                  </div>
-                </div>
-              </article>
-            }
-          </div>
+  [ngClass]="viewModel.colorClass"
+  button="true"
+  (click)="handleCardClick($event)">
+  <div class="card-content">
+    <div class="card-header">
+      <div class="title-section">
+        @if (viewModel.item.isBasic) {
+          <ion-icon class="basic-icon" name="star-outline"></ion-icon>
         }
-      </section>
+        <h3 class="item-name">{{ viewModel.item.name }}</h3>
+      </div>
+    </div>
 
+    <div class="card-info">
+      <div class="info-row">
+        <ion-icon name="calendar-outline"></ion-icon>
+        @if(viewModel.formattedEarliestExpirationLong !== '') {
+          <span>{{ viewModel.formattedEarliestExpirationLong }}</span>
+        } @else {
+          <span>{{ 'pantry.detail.noExpiry' | translate }}</span>
+        }
+      </div>
+      <div class="info-row">
+        <ion-icon name="cube-outline"></ion-icon>
+        <span>{{ viewModel.batchCountsLabel }}</span>
+      </div>
     </div>
   </div>
 </ion-card>

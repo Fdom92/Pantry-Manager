@@ -1,40 +1,63 @@
 import { Request, Response } from 'express';
 import { openaiService } from '../services/openai.service.js';
+import { logger } from '../utils/logger.js';
 
 export const agentController = {
-  async process(req: Request, res: Response) {
-    try {
-      const body = req.body ?? {};
-      const { message } = body as { message?: string };
+  async process(req: Request, res: Response): Promise<void> {
+    const userId = (req as any).userId || 'unknown';
+    const body = req.body ?? {};
 
-      // Support simple string prompts and richer payloads (tools/history)
-      if (!message && !body.system && !body.messages) {
-        return res.status(400).json({ error: 'Message required' });
-      }
-
-      const result = message
-        ? await openaiService.ask(message)
-        : await openaiService.askStructured(body);
-
-      return res.json(result);
-    } catch (err) {
-      console.error('[agentController] process error', err);
-      return res.status(500).json({ error: 'Agent error' });
+    if (!body.system || !body.messages) {
+      res.status(400).json({ error: 'MESSAGE_REQUIRED' });
+      return;
     }
-  },
 
-  async telemetry(req: Request, res: Response) {
+    logger.info('Agent request', { userId });
+
+    let chunks: AsyncIterable<string>;
     try {
-      const payload = req.body ?? {};
-      const { event, timestamp } = payload as { event?: string; timestamp?: string };
-      console.info('[agentController] telemetry', {
-        event: event ?? 'unknown',
-        timestamp,
+      // Eagerly starts the OpenAI HTTP request — may throw 429, auth errors, etc.
+      // before we commit to SSE headers.
+      chunks = await openaiService.createStream(body);
+    } catch (err: any) {
+      logger.error('OpenAI stream creation failed', {
+        userId,
+        error: err.message,
+        status: err.status,
       });
-      return res.status(204).send();
-    } catch (err) {
-      console.error('[agentController] telemetry error', err);
-      return res.status(500).json({ error: 'Telemetry error' });
+
+      if (err.status === 429) {
+        res.status(429).json({ error: 'RATE_LIMIT_EXCEEDED' });
+      } else if (err.code === 'ECONNABORTED' || err.name === 'AbortError') {
+        res.status(504).json({ error: 'TIMEOUT' });
+      } else if (err.status && err.status >= 500) {
+        res.status(502).json({ error: 'OPENAI_ERROR' });
+      } else {
+        res.status(500).json({ error: 'INTERNAL_ERROR' });
+      }
+      return;
+    }
+
+    // Commit to SSE after successful connection to OpenAI
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    const startTime = Date.now();
+    try {
+      for await (const text of chunks) {
+        res.write(`data: ${JSON.stringify({ t: text })}\n\n`);
+        // Flush compression middleware buffer so chunks reach the client immediately
+        (res as any).flush?.();
+      }
+      res.write('data: [DONE]\n\n');
+      logger.info('Agent stream complete', { userId, duration: Date.now() - startTime });
+    } catch (err: any) {
+      logger.error('Agent stream error', { userId, error: err.message });
+      res.write(`data: ${JSON.stringify({ error: 'STREAM_ERROR' })}\n\n`);
+    } finally {
+      res.end();
     }
   },
 };

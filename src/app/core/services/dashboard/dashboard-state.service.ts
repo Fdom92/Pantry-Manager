@@ -2,50 +2,78 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
 import { getItemStatusState } from '@core/domain/pantry';
-import { toNumberOrZero } from '@core/domain/pantry';
 import type {
   Insight,
   InsightContext,
   InsightCta,
   PantryItem,
 } from '@core/models';
-import type { ConsumeTodayEntry, DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
+import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
-import { AgentConversationStore } from '../agent/agent-conversation.store';
+import { PlannerConversationStore } from '../planner/planner-conversation.store';
 import { LanguageService } from '../shared/language.service';
-import { ConfirmService, withSignalFlag } from '../shared';
+import { withSignalFlag, isWeekend } from '@core/utils';
+import { ConfirmService } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { EventManagerService } from '../events';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { PantryService } from '../pantry/pantry.service';
-import { InsightService } from './insight.service';
-import {
-  formatDateTimeValue,
-  formatDateValue,
-  formatQuantity,
-  formatShortDate,
-} from '@core/utils/formatting.util';
+import { DashboardInsightService } from './dashboard-insight.service';
+import { formatDateTimeValue, formatDateValue } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
-import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
-import { findEntryByKey, toEntitySelectorEntries } from '@core/utils/entity-selector.util';
+import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
+import { AgentEntryContext } from '@core/models/agent';
 
+export enum PantryHealthState {
+  CRITICAL = 'critical',
+  ATTENTION = 'attention',
+  OPTIMAL = 'optimal'
+}
+
+export interface PantryHealth {
+  state: PantryHealthState;
+  title: string;
+  description: string;
+  accentColor: 'danger' | 'warning' | 'success';
+}
+
+export enum ActionPriority {
+  CRITICAL = 0,
+  HIGH = 1,
+  MEDIUM = 2,
+  LOW = 3
+}
+
+export interface ActionCta {
+  label: string;
+  action: () => void | Promise<void> |Promise<boolean>;
+}
+
+export interface DashboardAction {
+  id: string;
+  priority: ActionPriority;
+  category: 'critical' | 'preventive' | 'optimization' | 'conversion';
+  title: string;
+  description: string;
+  cta: ActionCta;
+  dismissible: boolean;
+}
 
 @Injectable()
 export class DashboardStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
-  private readonly insightService = inject(InsightService);
+  private readonly insightService = inject(DashboardInsightService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
-  private readonly conversationStore = inject(AgentConversationStore);
+  private readonly conversationStore = inject(PlannerConversationStore);
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventManager = inject(EventManagerService);
+  private readonly revenueCat = inject(UpgradeRevenuecatService);
 
   private hasCompletedInitialLoad = false;
+  private readonly dismissedActionIds = signal(new Set<string>());
 
   readonly pantryItems = this.pantryStore.items;
   readonly lowStockItems = this.pantryStore.lowStockItems;
@@ -63,25 +91,24 @@ export class DashboardStateService {
   readonly lastRefreshTimestamp = signal<string | null>(null);
   readonly isDeletingExpiredItems = signal(false);
   readonly visibleInsights = signal<Insight[]>([]);
-  readonly isConsumeTodayOpen = signal(false);
-  readonly consumeEntries = signal<ConsumeTodayEntry[]>([]);
-  readonly consumeEntryViewModels = computed<EntitySelectorEntry[]>(() =>
-    toEntitySelectorEntries(this.consumeEntries(), entry => ({
-      id: entry.itemId,
-      title: entry.title,
-      quantity: entry.quantity,
-      unitLabel: entry.unitLabel,
-      maxQuantity: entry.maxQuantity,
-    }))
-  );
-  readonly consumeSaving = signal(false);
 
   readonly totalItems = computed(() => this.inventorySummary().total);
   readonly recentlyUpdatedItems = computed(() => getRecentItemsByUpdatedAt(this.pantryItems()));
   readonly hasExpiredItems = computed(() => this.expiredItems().length > 0);
-  readonly pendingReviewProducts = computed(() =>
-    this.insightService.getPendingReviewProducts(this.pantryItems(), { now: this.getReferenceNow() })
-  );
+  readonly basicProductsCount = computed(() => {
+    const items = this.pantryItems();
+    if (!items?.length) {
+      return 0;
+    }
+    return items.filter(item => item.isBasic === true).length;
+  });
+  readonly completeProductsCount = computed(() => {
+    const items = this.pantryItems();
+    if (!items?.length) {
+      return 0;
+    }
+    return items.filter(item => item.isBasic !== true && item.batches && item.batches.length > 0).length;
+  });
   readonly shoppingListCount = computed(() => {
     const items = this.pantryItems();
     if (!items?.length) {
@@ -104,15 +131,208 @@ export class DashboardStateService {
       return now.getTime() - createdAt.getTime() <= windowMs;
     }).length;
   });
-  readonly consumeTodayOptions = computed(() => {
-    const excluded = new Set(this.consumeEntries().map(entry => entry.itemId));
-    return this.buildConsumeTodayOptions(this.pantryItems(), excluded);
-  });
-  readonly canSaveConsumeToday = computed(() => {
-    if (this.consumeSaving()) {
-      return false;
+
+  readonly pantryHealth = computed((): PantryHealth => {
+    const expired = this.expiredItems().length;
+    const nearExpiry = this.nearExpiryItems().length;
+    const stale = this.stalePantryItemsCount();
+    const total = this.totalItems();
+    const withDates = this.completeProductsCount();
+
+    // CRITICAL: Urgent action required
+    if (expired > 0) {
+      return {
+        state: PantryHealthState.CRITICAL,
+        title: this.translate.instant('dashboard.health.critical.title'),
+        description: this.translate.instant('dashboard.health.critical.description'),
+        accentColor: 'danger',
+      };
     }
-    return this.consumeEntries().some(entry => entry.quantity > 0);
+
+    // ATTENTION: Prevention needed
+    if (nearExpiry > 0) {
+      return {
+        state: PantryHealthState.ATTENTION,
+        title: this.translate.instant('dashboard.health.attention.title'),
+        description: this.translate.instant('dashboard.health.attention.description'),
+        accentColor: 'warning',
+      };
+    }
+
+    // Low tracking but no urgency
+    if (total > 10 && withDates < total * 0.3) {
+      return {
+        state: PantryHealthState.ATTENTION,
+        title: this.translate.instant('dashboard.health.attention.trackingTitle'),
+        description: this.translate.instant('dashboard.health.attention.trackingDescription'),
+        accentColor: 'warning',
+      };
+    }
+
+    // OPTIMAL: Everything under control
+    if (stale > 5) {
+      return {
+        state: PantryHealthState.OPTIMAL,
+        title: this.translate.instant('dashboard.health.optimal.controlledTitle'),
+        description: this.translate.instant('dashboard.health.optimal.controlledDescription'),
+        accentColor: 'success',
+      };
+    }
+
+    return {
+      state: PantryHealthState.OPTIMAL,
+      title: this.translate.instant('dashboard.health.optimal.perfectTitle'),
+      description: this.translate.instant('dashboard.health.optimal.perfectDescription'),
+      accentColor: 'success',
+    };
+  });
+
+  readonly stalePantryItems = computed(() => {
+    const now = this.getReferenceNow();
+    const staleThresholdDays = 30;
+    const staleThresholdMs = staleThresholdDays * 24 * 60 * 60 * 1000;
+
+    return this.pantryItems().filter(item => {
+      const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
+      if (totalQuantity <= 0) {
+        return false;
+      }
+
+      const updatedAt = new Date(item.updatedAt);
+      if (Number.isNaN(updatedAt.getTime())) {
+        return false;
+      }
+
+      return now.getTime() - updatedAt.getTime() > staleThresholdMs;
+    });
+  });
+
+  readonly stalePantryItemsCount = computed(() => this.stalePantryItems().length);
+
+  readonly actions = computed((): DashboardAction[] => {
+    const actions: DashboardAction[] = [];
+    const expired = this.expiredItems().length;
+    const nearExpiry = this.nearExpiryItems().length;
+    const stale = this.stalePantryItemsCount();
+    const isPro = this.revenueCat.isPro();
+
+    // LAYER 1: CRITICAL (always first)
+    if (expired > 0) {
+      const descKey = expired === 1 ? 'dashboard.actions.expired.description_one' : 'dashboard.actions.expired.description_other';
+      actions.push({
+        id: 'expired-action',
+        priority: ActionPriority.CRITICAL,
+        category: 'critical',
+        title: this.translate.instant('dashboard.actions.expired.title'),
+        description: this.translate.instant(descKey, { count: expired }),
+        cta: {
+          label: this.translate.instant('dashboard.actions.expired.cta'),
+          action: () => this.onOverviewCardSelected('expired'),
+        },
+        dismissible: false,
+      });
+    }
+
+    // LAYER 2: PREVENTIVE (only if no critical OR there's space)
+    if (nearExpiry > 0) {
+      actions.push({
+        id: 'near-expiry-action',
+        priority: ActionPriority.HIGH,
+        category: 'preventive',
+        title: isPro
+          ? this.translate.instant('dashboard.actions.nearExpiry.titlePro')
+          : this.translate.instant('dashboard.actions.nearExpiry.title'),
+        description: this.translate.instant('dashboard.actions.nearExpiry.description', {
+          count: nearExpiry,
+          days: NEAR_EXPIRY_WINDOW_DAYS,
+        }),
+        cta: isPro
+          ? {
+              label: this.translate.instant('dashboard.actions.nearExpiry.ctaPro'),
+              action: () => this.launchAgentWithPrompt('cook-before-expiry'),
+            }
+          : {
+              label: this.translate.instant('dashboard.actions.nearExpiry.cta'),
+              action: () => this.onOverviewCardSelected('near-expiry'),
+            },
+        dismissible: true,
+      });
+    }
+
+    // LAYER 3: OPTIMIZATION (only if NO critical or preventive urgent)
+    if (actions.length === 0) {
+      if (stale > 5) {
+        actions.push({
+          id: 'stale-items-optimization',
+          priority: ActionPriority.MEDIUM,
+          category: 'optimization',
+          title: this.translate.instant('dashboard.actions.stale.title'),
+          description: this.translate.instant('dashboard.actions.stale.description', { count: stale }),
+          cta: {
+            label: this.translate.instant('dashboard.actions.stale.cta'),
+            action: () => {
+              // Navigate to pantry with stale filter
+              this.pantryService.setPendingNavigationPreset({ recentlyAdded: false });
+              void this.navCtrl.navigateRoot('/pantry');
+            },
+          },
+          dismissible: true,
+        });
+      }
+
+      // PRO users: Smart suggestions only when no urgency
+      if (isPro && isWeekend(new Date())) {
+        actions.push({
+          id: 'weekly-meal-planning',
+          priority: ActionPriority.MEDIUM,
+          category: 'optimization',
+          title: this.translate.instant('dashboard.actions.weeklyPlan.title'),
+          description: this.translate.instant('dashboard.actions.weeklyPlan.description'),
+          cta: {
+            label: this.translate.instant('dashboard.actions.weeklyPlan.cta'),
+            action: () => this.launchAgentWithPrompt('weekly-plan'),
+          },
+          dismissible: true,
+        });
+      }
+    }
+
+    // LAYER 4: CONVERSION (only if NO critical AND user is non-pro)
+    const hasCritical = actions.filter(a => a.category === 'critical').length > 0;
+    if (!hasCritical && !isPro) {
+      // Only show PRO if there's valuable context
+      if (nearExpiry > 0 || this.completeProductsCount() >= 5) {
+        actions.push({
+          id: 'upgrade-contextual',
+          priority: ActionPriority.LOW,
+          category: 'conversion',
+          title: this.translate.instant('dashboard.actions.upgrade.title'),
+          description: this.translate.instant('dashboard.actions.upgrade.description'),
+          cta: {
+            label: this.translate.instant('dashboard.actions.upgrade.cta'),
+            action: () => this.navCtrl.navigateForward('/upgrade'),
+          },
+          dismissible: true,
+        });
+      }
+    }
+
+    // Sort by priority and ensure category diversity, max 2
+    return actions
+      .sort((a, b) => a.priority - b.priority)
+      .filter((action, index, arr) => {
+        if (index === 0) {
+          return true;
+        }
+        return action.category !== arr[0].category;
+      })
+      .slice(0, 2)
+      .filter(action => !this.dismissedActionIds().has(action.id));
+  });
+
+  readonly showAdditionalContext = computed(() => {
+    const criticalActions = this.actions().filter(a => a.priority === ActionPriority.CRITICAL);
+    return criticalActions.length === 0;
   });
 
   get nearExpiryWindow(): number {
@@ -182,9 +402,6 @@ export class DashboardStateService {
     }
 
     switch (card) {
-      case 'pending-review':
-        await this.navCtrl.navigateForward('/up-to-date');
-        return;
       case 'expired':
         this.pantryService.setPendingNavigationPreset({ expired: true });
         await this.navCtrl.navigateRoot('/pantry');
@@ -209,118 +426,57 @@ export class DashboardStateService {
     }
   }
 
-  openConsumeTodayModal(): void {
-    this.isConsumeTodayOpen.set(true);
-  }
-
-  dismissConsumeTodayModal(): void {
-    this.isConsumeTodayOpen.set(false);
-  }
-
-  closeConsumeTodayModal(): void {
-    this.consumeEntries.set([]);
-    this.consumeSaving.set(false);
-  }
-
-  addConsumeEntry(option: AutocompleteItem<PantryItem>): void {
-    const item = option?.raw;
-    if (!item) {
-      return;
-    }
-    const maxQuantity = Math.max(0, this.pantryStore.getItemTotalQuantity(item));
-    if (maxQuantity <= 0) {
-      return;
-    }
-    const unitLabel = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
-    this.consumeEntries.update(current => {
-      const existingIndex = current.findIndex(entry => entry.itemId === item._id);
-      if (existingIndex >= 0) {
-        const next = [...current];
-        const updated = { ...next[existingIndex] };
-        updated.maxQuantity = maxQuantity;
-        updated.quantity = Math.min(maxQuantity, updated.quantity + 1);
-        next[existingIndex] = updated;
-        return next;
-      }
-      return [
-        ...current,
-        {
-          itemId: item._id,
-          title: option.title,
-          unitLabel,
-          quantity: Math.min(1, maxQuantity),
-          maxQuantity,
-          item,
-        },
-      ];
-    });
-  }
-
-  adjustConsumeEntry(entry: ConsumeTodayEntry, delta: number): void {
-    const nextDelta = Number.isFinite(delta) ? delta : 0;
-    if (!nextDelta) {
-      return;
-    }
-    this.consumeEntries.update(current => {
-      const index = current.findIndex(row => row.itemId === entry.itemId);
-      if (index < 0) {
-        return current;
-      }
-      const next = [...current];
-      const updated = { ...next[index] };
-      const maxQuantity = Math.max(0, updated.maxQuantity);
-      updated.quantity = Math.min(maxQuantity, Math.max(0, updated.quantity + nextDelta));
-      if (updated.quantity <= 0) {
-        next.splice(index, 1);
-        return next;
-      }
-      next[index] = updated;
-      return next;
-    });
-  }
-
-  adjustConsumeEntryById(entryId: string, delta: number): void {
-    const entry = findEntryByKey(this.consumeEntries(), entryId, current => current.itemId);
-    if (!entry) {
-      return;
-    }
-    this.adjustConsumeEntry(entry, delta);
-  }
-
-  async saveConsumeToday(): Promise<void> {
-    if (!this.canSaveConsumeToday()) {
-      return;
-    }
-    const entries = this.consumeEntries().filter(entry => entry.quantity > 0);
-    if (!entries.length) {
-      return;
-    }
-    await withSignalFlag(this.consumeSaving, async () => {
-      for (const entry of entries) {
-        const updated = this.applyConsumeToday(entry.item, entry.quantity);
-        if (!updated) {
-          continue;
-        }
-        await this.pantryStore.updateItem(updated);
-        await this.eventManager.logConsumeDashboard(entry.item, updated, entry.quantity);
-      }
-    }).catch(err => {
-      console.error('[DashboardStateService] consume today error', err);
-    });
-    this.dismissConsumeTodayModal();
-    this.closeConsumeTodayModal();
-  }
-
   toggleSnapshotCard(): void {
     this.isSnapshotCardExpanded.update(open => !open);
   }
 
+  dismissAction(action: DashboardAction): void {
+    this.dismissedActionIds.update(ids => new Set([...ids, action.id]));
+  }
+
+  getHealthIcon(state: PantryHealthState): string {
+    switch (state) {
+      case PantryHealthState.CRITICAL:
+        return 'alert-circle';
+      case PantryHealthState.ATTENTION:
+        return 'warning';
+      case PantryHealthState.OPTIMAL:
+        return 'checkmark-circle';
+      default:
+        return 'information-circle';
+    }
+  }
+
+  private launchAgentWithPrompt(promptId: string): void {
+    let prompt = '';
+    let entryContext = AgentEntryContext.INSIGHTS;
+
+    switch (promptId) {
+      case 'cook-before-expiry':
+        prompt = this.translate.instant('insights.library.cookBeforeExpiry.prompt');
+        entryContext = AgentEntryContext.INSIGHTS_RECIPES;
+        break;
+      case 'weekly-plan':
+        prompt = this.translate.instant('insights.library.weeklyMealPlanning.prompt');
+        entryContext = AgentEntryContext.INSIGHTS;
+        break;
+      default:
+        return;
+    }
+
+    this.conversationStore.prepareConversation({
+      entryContext,
+      initialPrompt: prompt,
+    });
+    void this.navCtrl.navigateForward('/agent');
+  }
+
   async deleteExpiredItems(): Promise<void> {
-    if (!this.canDeleteExpiredItems()) {
+    if (this.isDeletingExpiredItems() || !this.hasExpiredItems()) {
       return;
     }
 
-    if (!this.hasConfirmedExpiredDeletion()) {
+    if (!this.confirm.confirm(this.translate.instant('dashboard.confirmDeleteExpired'))) {
       return;
     }
 
@@ -340,36 +496,8 @@ export class DashboardStateService {
     return this.pantryStore.getItemTotalQuantity(item);
   }
 
-  getItemUnitLabel(item: PantryItem): string {
-    const unit = this.pantryStore.getItemPrimaryUnit(item);
-    return this.pantryStore.getUnitLabel(unit);
-  }
-
   getItemTotalMinThreshold(item: PantryItem): number {
     return this.pantryStore.getItemTotalMinThreshold(item);
-  }
-
-  buildConsumeTodayOptions(
-    items: PantryItem[],
-    excludedIds: Set<string> = new Set()
-  ): AutocompleteItem<PantryItem, string>[] {
-    const locale = this.languageService.getCurrentLocale();
-    return (items ?? [])
-      .filter(item => !excludedIds.has(item._id))
-      .filter(item => this.pantryStore.getItemTotalQuantity(item) > 0)
-      .map(item => {
-      const total = this.pantryStore.getItemTotalQuantity(item);
-      const unit = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
-      const formattedQty = formatQuantity(total, locale, { maximumFractionDigits: 1 });
-      const subtitle = `${formattedQty} ${unit}`.trim();
-      return {
-        id: item._id,
-        title: item.name,
-        subtitle,
-        meta: this.getConsumeMetaLabel(item, locale),
-        raw: item,
-      };
-    });
   }
 
   formatLastUpdated(value: string | null): string {
@@ -393,85 +521,6 @@ export class DashboardStateService {
     return new Date();
   }
 
-  private getConsumeMetaLabel(item: PantryItem, locale: string): string {
-    const batches = item.batches?.length ?? 0;
-    const batchLabel = this.translate.instant(
-      batches === 1 ? 'dashboard.batches.single' : 'dashboard.batches.plural',
-      { count: batches }
-    );
-    const earliest = this.pantryStore.getItemEarliestExpiry(item);
-    if (!earliest) {
-      return batchLabel;
-    }
-    const formatted = formatShortDate(earliest, locale, { fallback: earliest });
-    return this.translate.instant('dashboard.batches.withExpiry', {
-      batchLabel,
-      date: formatted,
-    });
-  }
-
-  private applyConsumeToday(item: PantryItem, amount: number): PantryItem | null {
-    const delta = toNumberOrZero(amount);
-    if (delta <= 0) {
-      return null;
-    }
-    const nextBatches = (item.batches ?? []).map(batch => ({ ...batch }));
-    const ordered = nextBatches
-      .map((batch, index) => ({ batch, index }))
-      .filter(entry => toNumberOrZero(entry.batch.quantity) > 0)
-      .sort((a, b) => {
-        const left = this.getExpiryValue(a.batch.expirationDate);
-        const right = this.getExpiryValue(b.batch.expirationDate);
-        if (left === right) {
-          return a.index - b.index;
-        }
-        return left - right;
-      });
-
-    if (!ordered.length) {
-      return null;
-    }
-
-    let remaining = delta;
-    for (const entry of ordered) {
-      if (remaining <= 0) {
-        break;
-      }
-      const quantity = toNumberOrZero(entry.batch.quantity);
-      if (quantity <= 0) {
-        continue;
-      }
-      if (quantity <= remaining + 1e-9) {
-        remaining -= quantity;
-        entry.batch.quantity = 0;
-      } else {
-        entry.batch.quantity = quantity - remaining;
-        remaining = 0;
-      }
-    }
-
-    return {
-      ...item,
-      batches: nextBatches.filter(batch => toNumberOrZero(batch.quantity) > 0),
-    };
-  }
-
-  private getExpiryValue(value?: string): number {
-    if (!value) {
-      return Number.POSITIVE_INFINITY;
-    }
-    const time = Date.parse(value);
-    return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time;
-  }
-
-  private canDeleteExpiredItems(): boolean {
-    return !this.isDeletingExpiredItems() && this.hasExpiredItems();
-  }
-
-  private hasConfirmedExpiredDeletion(): boolean {
-    return this.confirm.confirm(this.translate.instant('dashboard.confirmDeleteExpired'));
-  }
-
   private refreshDashboardInsights(
     items: PantryItem[],
     expiringSoon: PantryItem[],
@@ -483,7 +532,6 @@ export class DashboardStateService {
       return;
     }
 
-    const pendingReviewProducts = this.insightService.getPendingReviewProducts(items);
     const now = new Date();
 
     const context: InsightContext = {
@@ -494,7 +542,6 @@ export class DashboardStateService {
       })),
       expiredItems: expiredItems.map(item => ({
         id: item._id,
-        quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       expiringSoonCount: expiringSoon.length,
       lowStockCount: lowStockItems.length,
@@ -503,7 +550,6 @@ export class DashboardStateService {
         name: item.name,
         categoryId: item.categoryId,
       })),
-      pendingReviewProducts,
     };
 
     const generated = this.insightService.buildDashboardInsights(context);
@@ -516,8 +562,6 @@ export class DashboardStateService {
         return this.expiredItems().length;
       case 'near-expiry':
         return this.nearExpiryItems().length;
-      case 'pending-review':
-        return this.pendingReviewProducts().length;
       case 'low-or-empty':
         return this.lowStockItems().length;
       case 'recently-added':

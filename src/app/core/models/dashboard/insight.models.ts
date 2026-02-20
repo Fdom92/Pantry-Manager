@@ -1,20 +1,28 @@
 import type { AgentEntryContext } from '@core/models/agent';
 
-// ENUMS
 export enum InsightId {
-  PENDING_PRODUCT_UPDATES = 'pending_product_updates',
-  WEEKLY_MEAL_PLANNING = 'weekly_meal_planning',
   COOK_BEFORE_EXPIRY = 'cook_before_expiry',
-  WHAT_TO_COOK_NOW = 'what_to_cook_now',
+  WEEKLY_MEAL_PLANNING = 'weekly_meal_planning',
+  SMART_COOKING_IDEAS = 'smart_cooking_ideas',
+  PANTRY_HEALTHY = 'pantry_healthy',
+  ADD_EXPIRY_DATES = 'add_expiry_dates',
+  ORGANIZE_WITH_CATEGORIES = 'organize_with_categories',
+  LOW_STOCK_REMINDER = 'low_stock_reminder',
   PLAN_AND_SAVE_TIME = 'plan_and_save_time',
-  WHAT_TO_COOK_FOR_LUNCH = 'what_to_cook_for_lunch',
-  WHAT_TO_COOK_FOR_DINNER = 'what_to_cook_for_dinner',
+  HISTORY_UNLIMITED = 'history_unlimited',
+  SMART_INSIGHTS = 'smart_insights',
 }
-// TYPES
+
+export enum InsightCategory {
+  CRITICAL = 'critical',
+  PREVENTIVE = 'preventive',
+  BEHAVIOR = 'behavior',
+  OPTIMIZATION = 'optimization',
+}
+
 export type InsightAudience = 'all' | 'pro' | 'non-pro';
 export type InsightTranslationParamsBuilder = (context: InsightContext, helpers: InsightPredicateHelpers) => Record<string, unknown>;
 export type InsightPredicate = (context: InsightContext, helpers: InsightPredicateHelpers) => boolean;
-export type InsightPendingReviewReason = 'stale-update' | 'missing-info';
 export type InsightCta =
   | {
       id: string;
@@ -43,11 +51,11 @@ export type InsightCtaDefinition =
       type: 'navigate';
       route: string;
     };
-// INTERFACES
 export interface Insight {
   id: InsightId;
   title: string;
   description: string;
+  category: InsightCategory;
   ctas?: InsightCta[];
   priority: number;
   dismissLabel?: string;
@@ -56,6 +64,7 @@ export interface InsightDefinition {
   id: InsightId;
   titleKey: string;
   descriptionKey: string;
+  category: InsightCategory;
   ctas?: InsightCtaDefinition[];
   priority: number;
   audience: InsightAudience;
@@ -69,7 +78,6 @@ export interface InsightExpiringItem {
 }
 export interface InsightExpiredItem {
   id?: string;
-  quantity: number;
 }
 export interface InsightProductSummary {
   id?: string;
@@ -82,11 +90,7 @@ export interface InsightContext {
   expiringSoonCount: number;
   lowStockCount: number;
   products: InsightProductSummary[];
-  pendingReviewProducts: InsightPendingReviewProduct[];
 }
 export interface InsightPredicateHelpers {
   now: Date;
-}
-export interface InsightPendingReviewProduct extends InsightProductSummary {
-  reasons: InsightPendingReviewReason[];
 }
