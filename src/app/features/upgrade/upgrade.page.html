@@ -12,11 +12,6 @@
     <div class="pro-badge">PRO</div>
     <h1>{{ 'upgrade.headline' | translate }}</h1>
     <p>{{ 'upgrade.subtitle' | translate }}</p>
-    <div class="hero-actions">
-      <ion-button fill="clear" color="primary" (click)="facade.skipUpgradeFlow()">
-        {{ 'upgrade.actions.maybeLater' | translate }}
-      </ion-button>
-    </div>
   </div>
 
   <div class="plans-section">
@@ -27,12 +22,12 @@
             [title]="plan.title"
             [subtitle]="plan.subtitle"
             [price]="plan.price"
-            [period]="plan.period"
+            [periodLabel]="plan.periodLabel"
             [benefits]="plan.benefits"
-            [savings]="plan.savings"
+            [savingsLabel]="plan.savingsLabel"
             [trialLabel]="plan.trialLabel"
             [ctaLabel]="plan.ctaLabel"
-            [badge]="plan.badge"
+            [badgeLabel]="plan.badgeLabel"
             [highlight]="plan.highlight"
             [disabled]="!!facade.activePurchaseId() || facade.isLoadingPlans()"
             (selectPlan)="facade.selectPlan(plan)">

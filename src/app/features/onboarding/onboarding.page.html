@@ -5,7 +5,13 @@
   <div class="top-bar">
     <div class="eyebrow">
       <ion-icon name="aperture-outline"></ion-icon>
-      <span>{{ 'onboarding.tagline' | translate }}</span>
+      <span>
+        {{
+          (facade.isLastSlide()
+            ? "onboarding.taglineDone"
+            : "onboarding.tagline") | translate
+        }}
+      </span>
     </div>
   </div>
 
@@ -13,7 +19,7 @@
     #swiperRef
     class="onboarding-swiper"
     (slidechange)="onSlideChanged()">
-    <swiper-slide *ngFor="let slide of facade.availableSlides(); index as idx">
+    <swiper-slide *ngFor="let slide of facade.availableSlides; index as idx">
       <div class="slide-card" [class.is-pro]="slide.pro">
         @if (slide.badgeKey) {
         <div class="pill">
@@ -30,6 +36,25 @@
         <p>
           {{ slide.descriptionKey | translate }}
         </p>
+        @if (slide.key === 'action') {
+        <div class="mock-preview">
+          <div class="mock-row expired">
+            <span class="dot"></span>
+            <span class="name">{{ 'onboarding.mock.items.milk' | translate }}</span>
+            <span class="badge">{{ 'onboarding.mock.status.expired' | translate }}</span>
+          </div>
+          <div class="mock-row low">
+            <span class="dot"></span>
+            <span class="name">{{ 'onboarding.mock.items.pasta' | translate }}</span>
+            <span class="badge">{{ 'onboarding.mock.status.low' | translate }}</span>
+          </div>
+          <div class="mock-row ok">
+            <span class="dot"></span>
+            <span class="name">{{ 'onboarding.mock.items.tomatoes' | translate }}</span>
+            <span class="badge">{{ 'onboarding.mock.status.ok' | translate }}</span>
+          </div>
+        </div>
+        }
       </div>
     </swiper-slide>
   </swiper-container>
@@ -56,4 +81,7 @@
     </ion-button>
     }
   </div>
+  @if (facade.isLastSlide()) {
+  <p class="skip-hint">{{ 'onboarding.actions.skipHint' | translate }}</p>
+  }
 </ion-content>

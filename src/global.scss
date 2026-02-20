@@ -35,21 +35,63 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 @import "@ionic/angular/css/palettes/dark.class.css";
 
+// Modern card styling (using theme variables)
 ion-card {
-  --background: var(--app-surface-bg);
-  color: var(--app-surface-text);
-  border: 1px solid var(--app-surface-border);
-  background: var(--app-surface-bg);
+  --background: var(--app-theme-card-bg);
+  margin-inline: var(--app-theme-card-margin-inline);
+  margin-top: 0;
+  margin-bottom: 0;
+  border-radius: var(--app-theme-card-border-radius);
+  background: var(--app-theme-card-bg);
+  color: var(--app-theme-text-color);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  transition: var(--app-theme-card-transition);
 }
 
 ion-card-title {
-  color: var(--app-surface-title);
+  font-size: var(--app-theme-font-size-title);
+  font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-color);
 }
 
 ion-card-subtitle {
-  color: var(--app-surface-muted);
+  color: var(--app-theme-text-muted);
 }
 
 ion-card-content {
-  color: var(--app-surface-text);
+  color: var(--app-theme-text-color);
+  font-size: var(--app-theme-font-size-body);
+  line-height: var(--app-theme-line-height-normal);
+}
+
+// Modern input & textarea styling (using theme variables)
+ion-input,
+ion-textarea {
+  --padding-start: var(--app-theme-input-padding-inline);
+  --padding-end: var(--app-theme-input-padding-inline);
+  --padding-top: var(--app-theme-input-textarea-padding-block);
+  --padding-bottom: var(--app-theme-input-textarea-padding-block);
+  --background: var(--app-theme-input-bg);
+  --placeholder-color: var(--app-theme-input-placeholder-color);
+
+  border: none;
+  border-bottom: var(--app-theme-input-border-width) solid var(--app-theme-input-border-color);
+  border-radius: var(--app-theme-input-border-radius);
+  background: var(--app-theme-input-bg);
+  color: var(--app-theme-text-color);
+  caret-color: var(--ion-color-primary);
+  transition: var(--app-theme-input-transition);
+
+  &.has-focus,
+  &:focus-within {
+    border-bottom-color: var(--app-theme-input-focus-border-color);
+    background: var(--app-theme-input-focus-bg);
+  }
+}
+
+// Adjust padding for single-line inputs
+ion-input {
+  --padding-top: var(--app-theme-input-padding-block);
+  --padding-bottom: var(--app-theme-input-padding-block);
 }

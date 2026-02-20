@@ -1,6 +1,11 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>{{ 'pantry.title' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/settings']" [attr.aria-label]="'settings.title' | translate">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -36,17 +41,16 @@
     </div>
   </div>
 
-  @if ((facade.loading() || facade.pipelineResetting()) && facade.pantryItemsState().length === 0) {
+  @if (facade.showSkeleton()) {
     <div class="skeleton-list">
       @for (placeholder of facade.skeletonPlaceholders; track placeholder) {
         <ion-card class="skeleton-card">
           <ion-card-header>
-            <ion-skeleton-text animated style="width: 40%; height: 16px;"></ion-skeleton-text>
+            <div class="skeleton-header-row">
+              <ion-skeleton-text animated style="width: 35%; height: 18px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 15%; height: 14px;"></ion-skeleton-text>
+            </div>
           </ion-card-header>
-          <ion-card-content>
-            <ion-skeleton-text animated style="width: 100%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 80%; height: 14px;"></ion-skeleton-text>
-          </ion-card-content>
         </ion-card>
       }
     </div>
@@ -98,19 +102,12 @@
           @for (item of group.items; track facade.trackByItemId($index, item)) {
             <div
               class="virtual-item-card"
-              [class.virtual-item-card--expanded]="facade.isExpanded(item)"
               [class.virtual-item-card--deleting]="facade.isDeleting(item)">
               @let card = facade.buildItemCardViewModel(item);
               <app-pantry-detail
                 class="virtual-item-card__detail"
                 [viewModel]="card"
-                [expanded]="facade.isExpanded(item)"
-                (toggleRequested)="facade.toggleItemExpansion(item, $event)"
-                (summaryKeydown)="facade.onSummaryKeydown(item, $event)"
-                (openBatches)="facade.openBatchesModal(item, $event)"
-                (editRequested)="facade.openEditItemModal(item, $event)"
-                (deleteRequested)="facade.deleteItem(item, $event)"
-                (adjustBatchRequested)="facade.adjustBatchQuantity(item, $event.locationId, $event.batch, $event.delta, $event.event)"
+                (cardClicked)="facade.openQuantitySheet(item, $event)"
               ></app-pantry-detail>
             </div>
           }
@@ -139,50 +136,51 @@
     [showEmptyAction]="facade.showFastAddEmptyAction()"
     [showEmptyActionWhenNoExactMatch]="true"
     [emptyActionLabel]="facade.fastAddEmptyActionLabel()"
+    [showSecondaryAction]="true"
+    [secondaryActionLabel]="'pantry.fastAdd.createAdvanced' | translate"
     (willDismiss)="facade.dismissFastAddModal()"
     (didDismiss)="facade.closeFastAddModal()"
     (selectItem)="facade.addFastAddEntry($event)"
     (queryChange)="facade.onFastAddQueryChange($event)"
     (emptyAction)="facade.addFastAddEntryFromQuery($event)"
     (adjustEntry)="facade.adjustFastAddEntryById($event.entry.id, $event.delta)"
-    (save)="facade.submitFastAdd()">
+    (save)="facade.submitFastAdd()"
+    (secondaryAction)="facade.openAdvancedFromFastAdd()">
   </app-entity-selector-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>
+
+  <ion-modal
+    #quantityModal
+    class="quantity-sheet"
+    [isOpen]="facade.showQuantitySheet()"
+    [initialBreakpoint]="0.5"
+    [breakpoints]="[0, 0.5, 0.75]"
+    (didDismiss)="facade.dismissQuantitySheet()">
+    <ng-template>
+      @if (facade.selectedQuantitySheetItem(); as item) {
+        <app-pantry-quantity-sheet
+          [item]="item"
+          [totalQuantity]="facade.getQuantitySheetTotalQuantity(item)"
+          [pendingChange]="facade.pendingQuantityChange()"
+          [quantityUnit]="''"
+          (increment)="facade.incrementQuantity(item)"
+          (decrement)="facade.decrementQuantity(item)"
+          (viewDetails)="facade.openBatchesModalFromSheet(item)"
+          (editRequested)="facade.openEditModalFromSheet(item)"
+          (deleteRequested)="facade.deleteItem(item, $event)"
+          (close)="facade.closeQuantitySheetWithSave()">
+        </app-pantry-quantity-sheet>
+      }
+    </ng-template>
+  </ion-modal>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="add-fab">
     <ion-fab-button
       color="primary"
       [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
-      (click)="facade.openAddModeSheet($event)">
+      (click)="facade.openFastAddModal()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-
-  <ion-modal
-    class="add-mode-sheet"
-    [isOpen]="facade.addModeSheetOpen()"
-    [initialBreakpoint]="0.4"
-    [breakpoints]="[0, 0.4]"
-    (didDismiss)="facade.closeAddModeSheet()">
-    <ng-template>
-      <ion-content class="ion-padding add-mode-content">
-        <h3 class="add-mode-title">{{ 'pantry.addMode.title' | translate }}</h3>
-        <ion-list class="add-mode-list">
-          <ion-item button="true" detail="false" (click)="facade.selectAddModeSimple()">
-            <ion-label>
-              <h3>{{ 'pantry.addMode.simple' | translate }}</h3>
-              <p>{{ 'pantry.addMode.simpleDescription' | translate }}</p>
-            </ion-label>
-          </ion-item>
-          <ion-item button="true" detail="false" (click)="facade.selectAddModeAdvanced()">
-            <ion-label>
-              <h3>{{ 'pantry.addMode.advanced' | translate }}</h3>
-              <p>{{ 'pantry.addMode.advancedDescription' | translate }}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
 </ion-content>

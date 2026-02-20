@@ -8,71 +8,41 @@
   },
   "onboarding": {
     "tagline": "Configura tudo em menos de um minuto",
+    "taglineDone": "Tudo pronto",
     "actions": {
       "skip": "Ignorar",
       "next": "Seguinte",
-      "start": "Começar"
+      "start": "Começar",
+      "skipHint": "Podes saltar este tutorial a qualquer momento."
     },
     "slides": {
-      "dashboard": {
-        "title": "Início",
-        "description": "Alertas e visão rápida do estado da despensa."
+      "problem": {
+        "title": "Deitas fora comida que tinhas esquecido?",
+        "description": "Evita desperdiçar comida e dinheiro. Controla o que tens antes de expirar."
       },
-      "pantry": {
-        "title": "Despensa",
-        "description": "Adiciona produtos e acompanha stock e validade."
+      "simple": {
+        "title": "Organiza a tua despensa em segundos",
+        "description": "Adiciona produtos, controla quantidades e recebe alertas antes de expirarem."
       },
-      "planner": {
-        "title": "Planeador",
-        "description": "Ideias e planos de refeições com o que tens."
+      "benefit": {
+        "title": "Poupa dinheiro e tempo",
+        "description": "Compra apenas o que precisas e usa o que já tens."
       },
-      "shopping": {
-        "title": "Compras",
-        "description": "Cria a lista e marca itens à medida que compras."
-      },
-      "settings": {
-        "title": "Definições",
-        "description": "Personaliza catálogos, alertas e preferências da app."
-      }
-    }
-  },
-  "setup": {
-    "tagline": "Personaliza a tua despensa",
-    "stepIndicator": "Passo {{ current }} de {{ total }}",
-    "actions": {
-      "skip": "Ignorar",
-      "continue": "Continuar",
-      "finish": "Entrar"
-    },
-    "validation": {
-      "locationsOptional": "Podes ignorar este passo se não quiseres adicionar localizações agora.",
-      "categoriesOptional": "Podes adicionar categorias mais tarde."
-    },
-    "locations": {
-      "title": "Onde guardas as coisas?",
-      "description": "Escolhe as localizações que usas mais para as sugerirmos depois.",
-      "options": {
-        "pantry": "Despensa",
-        "fridge": "Frigorífico",
-        "kitchen": "Cozinha",
-        "freezer": "Congelador"
+      "action": {
+        "title": "Começa por adicionar o teu primeiro produto",
+        "description": "Toca no botão + e cria a tua despensa em minutos."
       }
     },
-    "categories": {
-      "title": "O que costumas comprar?",
-      "description": "Seleciona as categorias que costumas comprar. Podes alterá-las mais tarde.",
-      "options": {
-        "proteins": "Proteínas",
-        "dairy": "Laticínios",
-        "fruits": "Frutas",
-        "drinks": "Bebidas",
-        "cereals": "Cereais",
-        "condiments": "Condimentos",
-        "canned": "Conservas",
-        "sweets": "Doces",
-        "snacks": "Snacks",
-        "vegetables": "Legumes",
-        "household": "Casa"
+    "mock": {
+      "items": {
+        "milk": "Leite",
+        "pasta": "Massa",
+        "tomatoes": "Tomates"
+      },
+      "status": {
+        "expired": "Expirado",
+        "low": "Baixo",
+        "ok": "OK"
       }
     }
   },
@@ -82,6 +52,7 @@
       "cancel": "Cancelar",
       "add": "Adicionar",
       "save": "Guardar",
+      "edit": "Editar",
       "apply": "Aplicar",
       "clear": "Limpar"
     },
@@ -109,13 +80,13 @@
       "subtitle": "Adiciona o teu primeiro produto para acompanhar stock e validade."
     },
     "shopping": {
-      "title": "Lista de compras vazia"
+      "title": "Tudo em ordem"
     }
   },
   "history": {
     "title": "Histórico",
     "pro": {
-      "cta": "Ver mais eventos com PRO"
+      "cta": "Ver todo o teu histórico e analisar padrões com PRO"
     },
     "filters": {
       "title": "Filtros do histórico",
@@ -154,7 +125,64 @@
   },
   "dashboard": {
     "title": "Início",
+    "aria": "Painel da sua despensa",
     "confirmDeleteExpired": "Isto irá eliminar todos os produtos expirados. Continuar?",
+    "health": {
+      "critical": {
+        "title": "A sua despensa precisa de atenção",
+        "description": "Há produtos que requerem ação imediata"
+      },
+      "attention": {
+        "title": "Verifique a sua despensa em breve",
+        "description": "Alguns produtos estão a expirar em breve",
+        "trackingTitle": "Melhore o seu controlo",
+        "trackingDescription": "Muitos produtos não têm datas de rastreio"
+      },
+      "optimal": {
+        "controlledTitle": "Tudo sob controlo",
+        "controlledDescription": "Tem produtos sem atividade recente",
+        "perfectTitle": "A sua despensa está perfeita",
+        "perfectDescription": "Sem produtos expirados ou a expirar"
+      }
+    },
+    "sections": {
+      "actions": {
+        "title": "O que fazer agora"
+      }
+    },
+    "actions": {
+      "expired": {
+        "title": "Rever produtos expirados",
+        "description_one": "{{ count }} produto expirou",
+        "description_other": "{{ count }} produtos expiraram",
+        "cta": "Ver produtos"
+      },
+      "nearExpiry": {
+        "title": "Produtos a expirar em breve",
+        "titlePro": "Planeie antes que expirem",
+        "description": "{{ count }} produtos expiram em {{ days }} dias",
+        "cta": "Ver produtos",
+        "ctaPro": "Gerar receitas"
+      },
+      "stale": {
+        "title": "Produtos sem atividade",
+        "description": "{{ count }} produtos não se mexeram há 30+ dias",
+        "cta": "Rever"
+      },
+      "weeklyPlan": {
+        "title": "Planeie a sua semana",
+        "description": "Otimize a sua despensa com um plano semanal",
+        "cta": "Criar plano"
+      },
+      "upgrade": {
+        "title": "Aproveite ao máximo a sua despensa",
+        "description": "Receitas personalizadas e planeamento semanal com IA",
+        "cta": "Descobrir PRO"
+      }
+    },
+    "context": {
+      "recentlyAdded": "{{ count }} produtos adicionados recentemente"
+    },
     "summary": {
       "title": "Visão geral da despensa",
       "toggle": "Alternar visão geral da despensa",
@@ -169,11 +197,11 @@
     "overview": {
       "aria": "Visão geral da despensa",
       "sections": {
+        "summary": {
+          "title": "Resumo"
+        },
         "alerts": {
           "title": "Alertas"
-        },
-        "dailyActions": {
-          "title": "Daily actions"
         },
         "control": {
           "title": "Control"
@@ -186,6 +214,17 @@
         }
       },
       "cards": {
+        "summary": {
+          "total": "Total",
+          "basic": "Essenciais",
+          "complete": "Com datas",
+          "healthStatus": {
+            "allGood": "Tudo sob controlo",
+            "checkSoon": "Alguns produtos precisam de atenção",
+            "needsAttention": "A sua despensa precisa de atenção"
+          },
+          "staleItems": "{{ count }} produtos intocados há 30+ dias"
+        },
         "nearExpiry": {
           "title": "A expirar em breve",
           "body": "{{ count }} produtos esta semana",
@@ -195,11 +234,6 @@
           "title": "Expirados",
           "body": "{{ count }} produtos expirados",
           "action": "Ver"
-        },
-        "pendingReview": {
-          "title": "Despensa por completar",
-          "body": "{{ count }} produtos por rever",
-          "action": "Rever"
         },
         "lowOrEmpty": {
           "title": "Stock baixo",
@@ -211,11 +245,6 @@
           "body": "{{ count }} produtos pendentes",
           "action": "Ver"
         },
-        "consumeToday": {
-          "title": "Consumed today",
-          "body": "Log what you used today",
-          "action": "Add"
-        },
         "recentlyAdded": {
           "title": "Adicionados recentemente",
           "body": "{{ count }} novos produtos",
@@ -225,7 +254,6 @@
       "toasts": {
         "expiredEmpty": "Está tudo bem — não há itens expirados.",
         "nearExpiryEmpty": "Está tudo bem — não há itens a expirar em breve.",
-        "pendingReviewEmpty": "Está tudo bem — não há nada por completar.",
         "lowOrEmptyEmpty": "Está tudo bem — não há itens com stock baixo.",
         "recentlyAddedEmpty": "Está tudo bem — não há itens adicionados recentemente.",
         "shoppingEmpty": "Está tudo bem — a tua lista de compras está vazia.",
@@ -241,13 +269,8 @@
     "lowStock": {
       "title": "Alertas de stock baixo",
       "subtitle": "No ou abaixo do nível mínimo",
-      "minLabel": "mín {{ value }} {{ unit }}",
+      "minLabel": "mín {{ value }}",
       "empty": "Todos os itens estão acima do nível mínimo."
-    },
-    "batches": {
-      "single": "1 lote",
-      "plural": "{{ count }} lotes",
-      "withExpiry": "{{ batchLabel }}, exp {{ date }}"
     },
     "expired": {
       "title": "Itens expirados",
@@ -261,16 +284,6 @@
       "updated": "Atualizado em {{ date }}",
       "badge": "Novo",
       "empty": "Sem atualizações recentes."
-    },
-    "consumeToday": {
-      "title": "Consumed today",
-      "cardTitle": "Add products",
-      "selectHint": "Pick what you used today, then set quantities.",
-      "listTitle": "Your list",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "empty": "No items added yet.",
-      "save": "Save"
     }
   },
   "shopping": {
@@ -280,20 +293,11 @@
       "below-min": "Stock baixo",
       "empty": "Sem stock"
     },
-    "purchaseModal": {
-      "titleProduct": "Comprar produto",
-      "productName": "Nome",
-      "quantity": "Quantidade",
-      "quantityPlaceholder": "0",
-      "expiry": "Data de validade (opcional)",
-      "addToPantry": "Adicionar"
-    },
     "suggestions": {
       "title": "Lista de compras",
       "loading": "A criar lista de compras…",
-      "totalStock": "Stock total: {{ amount }} {{ unit }}",
-      "minStock": "Mín: {{ amount }} {{ unit }}",
-      "empty": "Nada pendente neste momento. Aviso-te quando for necessário reabastecer."
+      "toBuy": "Comprar {{ amount }}",
+      "empty": "Marca produtos como \"manter sempre em casa\" para seres notificado quando se esgotarem."
     },
     "share": {
       "button": "Partilhar lista",
@@ -317,68 +321,58 @@
         "dismiss": "Agora não"
       },
       "weeklyMealPlanning": {
-        "title": "Planeje as refeições da semana",
-        "description": "Planeje as refeições desta semana com o que você já tem.",
-        "cta": "Planejar agora",
+        "title": "Organizar a semana?",
+        "description": "É uma boa altura para planear as suas refeições com o que tem em casa.",
+        "cta": "Vamos lá",
         "prompt": "Planeje minhas refeições desta semana usando apenas o que já tenho na despensa."
       },
       "cookBeforeExpiry": {
-        "title": "Cozinhe antes de vencerem",
-        "description": "Aproveite os produtos que estão prestes a vencer e ainda têm estoque.",
-        "cta": "Usar itens críticos",
+        "title": "Tem produtos a ponto de vencer",
+        "description": "Vou sugerir receitas para aproveitá-los antes de se estragarem.",
+        "cta": "Dá-me ideias",
         "prompt": "Sugira receitas priorizando os produtos que vencem em breve na minha despensa."
       },
-      "lunchIdeas": {
-        "title": "O que posso preparar para o almoço?",
-        "description": "Ideias rápidas de almoço usando sua despensa.",
-        "cta": "Ver ideias",
-        "prompt": "Dê opções de almoço para hoje usando o que já tenho."
-      },
-      "dinnerIdeas": {
-        "title": "O que posso preparar para o jantar?",
-        "description": "Sugestões de jantar com o que você já tem.",
-        "cta": "Planejar jantar",
-        "prompt": "Planeje um jantar simples com os ingredientes da minha despensa."
-      },
-      "whatToCookNow": {
-        "title": "O que preparo agora?",
-        "description": "Não sabe o que comer? Eu te dou ideias com a sua despensa.",
-        "cta": "Me dê ideias",
-        "prompt": "Traga ideias rápidas do que cozinhar usando apenas os ingredientes que já possuo."
+      "smartCookingIdeas": {
+        "title": "O que cozinho hoje?",
+        "description": "Dou-lhe ideias com o que tem na despensa neste momento.",
+        "cta": "Inspira-me",
+        "prompt": "Dê-me ideias de culinária usando os ingredientes que tenho disponíveis."
       },
       "planAndSaveTime": {
-        "title": "Planeje suas refeições e economize tempo toda semana",
-        "description": "Desbloqueie o planejador PRO e organize seu menu com facilidade.",
-        "cta": "Torne-se PRO"
+        "title": "Planear a semana com IA",
+        "description": "Com PRO, organize o seu menu semanal e poupe tempo todos os dias.",
+        "cta": "Experimentar PRO"
+      },
+      "historyUnlimited": {
+        "title": "O que desperdiça mais?",
+        "description": "Com PRO, descubra o que deita fora e compre apenas o que precisa.",
+        "cta": "Saber mais"
+      },
+      "smartInsights": {
+        "title": "Avisos antes de vencerem",
+        "description": "Com PRO, digo-lhe o que cozinhar para não desperdiçar nada.",
+        "cta": "Saber mais"
+      },
+      "pantryHealthy": {
+        "title": "A sua despensa está em ótima forma",
+        "description": "Tudo sob controlo. É um bom momento para planear a sua próxima lista de compras.",
+        "cta": "Ver lista"
+      },
+      "addExpiryDates": {
+        "title": "Adicione datas de validade",
+        "description": "Saiba sempre o que usar primeiro e evite surpresas desagradáveis na despensa.",
+        "cta": "Ir à despensa"
+      },
+      "lowStockReminder": {
+        "title": "Alguns produtos estão a acabar",
+        "description": "Adicione-os à sua lista de compras antes de ficar sem eles.",
+        "cta": "Ir à lista"
+      },
+      "organizeWithCategories": {
+        "title": "Organize a despensa por categorias",
+        "description": "Agrupe os seus produtos para os encontrar mais rapidamente e ter tudo sob controlo.",
+        "cta": "Organizar agora"
       }
-    }
-  },
-  "upToDate": {
-    "title": "Pôr em dia",
-    "subtitle": "Revê alguns produtos para manter a tua despensa correta e atualizada.",
-    "progress": "Produtos pendentes {{ pending }} de {{ total }}",
-    "lastUpdated": "Última atualização: {{ date }}",
-    "fields": {
-      "expiry": "Validade",
-      "stock": "Stock"
-    },
-    "edit": {
-      "title": "Atualizar produto",
-      "expiryToggle": "Adicionar data de validade"
-    },
-    "reasons": {
-      "stale-update": "Sem atualização há algum tempo",
-      "missing-info": "Falta informação"
-    },
-    "actions": {
-      "keep": "Fica aqui",
-      "delete": "Eliminar",
-      "edit": "Editar",
-      "skip": "Saltar por agora"
-    },
-    "done": {
-      "title": "Despensa em dia, bom trabalho",
-      "subtitle": "A voltar ao dashboard…"
     }
   },
   "agent": {
@@ -391,7 +385,8 @@
     "placeholder": "Pede receitas, planos de refeições ou ideias com o que tens.",
     "actions": {
       "send": "Enviar",
-      "retry": "Tentar novamente"
+      "retry": "Tentar novamente",
+      "clear": "Limpar conversa"
     },
     "preview": {
       "badge": "Pré-visualização",
@@ -408,21 +403,32 @@
     },
     "quickStart": {
       "title": "Entrada contextual",
-      "headline": "Começa a planear sem um chat vazio",
-      "subtitle": "Escolhe uma intenção e o planeador responde de imediato.",
+      "headline": "Começa por algo concreto",
+      "subtitle": "Toca uma opção e o planeador arranca sozinho.",
       "ctaTitle": "Começa com um toque",
-      "ctaSubtitle": "Seleciona o foco para hoje.",
-      "today": "O que posso cozinhar com o que tenho?",
-      "quickIdeas": "Dá-me ideias rápidas de receitas",
-      "weeklyPlan": "Planear as refeições da semana",
-      "useExpiring": "Usar ingredientes que estão prestes a vencer",
-      "decideForMe": "Decide por mim",
-      "customPrompt": "Perguntar outra coisa"
+      "ctaSubtitle": "Por onde começamos hoje?",
+      "today": "O que cozinho hoje?",
+      "todayPrompt": "O que posso cozinhar hoje com o que tenho em casa? Dá-me algumas ideias.",
+      "weeklyPlan": "Plano semanal",
+      "weeklyPlanPrompt": "Faz-me um menu para a semana toda — 7 dias, pequeno-almoço, almoço e jantar — com o que tenho na despensa.",
+      "useExpiring": "O que está a vencer",
+      "useExpiringPrompt": "Tenho coisas prestes a vencer. O que cozinho para não as desperdiçar?",
+      "surpriseMe": "Surpreende-me",
+      "surpriseMePrompt": "Escolhe tu uma receita que possa fazer com o que tenho e surpreende-me. Só uma.",
+      "customPrompt": "Pergunta livre ✏️"
     },
     "messages": {
       "noResponse": "Não foi possível gerar uma resposta.",
       "unifiedError": "O planeador não conseguiu responder agora. Tenta novamente dentro de alguns segundos."
-    }
+    },
+    "errors": {
+      "coldStart": "O serviço está a iniciar. Tenta novamente em alguns segundos.",
+      "rateLimit": "Demasiados pedidos. Aguarda um momento antes de tentar novamente.",
+      "timeout": "O pedido demorou demasiado tempo. Verifica a tua ligação e tenta novamente.",
+      "offline": "Sem ligação à internet. Conecta-te e tenta novamente.",
+      "generic": "Algo correu mal. Tenta novamente em alguns instantes."
+    },
+    "disclaimer": "As receitas e planos são gerados por IA e podem conter erros."
   },
   "pantry": {
     "title": "Despensa",
@@ -460,7 +466,8 @@
       "submit": "Add to pantry",
       "singleSuccess": "1 produto adicionado",
       "success": "{{ count }} produtos adicionados",
-      "error": "Não foi possível adicionar os produtos."
+      "error": "Não foi possível adicionar os produtos.",
+      "createAdvanced": "Criar produto com detalhes avançados"
     },
     "addMode": {
       "title": "Selecionar modo",
@@ -482,7 +489,15 @@
     "batches": {
       "title": "Lotes de produtos",
       "count": "{{ count }} lotes registados",
-      "open": "Aberto"
+      "open": "Aberto",
+      "noExpiryDate": "Sem data de validade",
+      "expires": {
+        "today": "Expira hoje",
+        "tomorrow": "Expira amanhã"
+      },
+      "expired": {
+        "yesterday": "Expirou ontem"
+      }
     },
     "form": {
       "editTitle": "Editar item",
@@ -505,12 +520,13 @@
         "title": "Adicionar supermercado",
         "placeholder": "Nome do supermercado"
       },
-      "basic": "Item essencial da despensa",
+      "basic": "Manter sempre em casa",
       "minThreshold": "Quantidade mínima",
       "location": "Localização",
       "locationPlaceholder": "Seleciona uma localização",
       "locationAdd": {
-        "option": "+ Adicionar localização"
+        "option": "+ Adicionar localização",
+        "unassigned": "Não atribuído"
       },
       "batches": {
         "title": "Lotes",
@@ -519,12 +535,24 @@
         "titleIndex": "Lote {{ index }}",
         "quantity": "Quantidade",
         "expiry": "Data de validade",
+        "location": "Localização",
         "opened": "Aberto"
+      },
+      "quantity": {
+        "title": "Quantidade",
+        "current": "Quantidade",
+        "initial": "Quantidade inicial",
+        "hint": "Aumentar ou diminuir a quantidade total do produto"
       }
     },
     "detail": {
       "earliest": "Expira primeiro: {{ date }}",
       "noBatches": "Nenhum lote registado.",
+      "noExpiry": "Sem validade",
+      "quantity": {
+        "single": "{{ quantity }} unidade",
+        "plural": "{{ quantity }} unidades"
+      },
       "batchSummary": {
         "none": "Nenhum lote registado",
         "total": {
@@ -563,12 +591,18 @@
       },
       "actions": {
         "viewBatches": "Ver lotes",
-        "editItem": "Editar item",
+        "editItem": "Editar produto",
         "deleteItem": "Eliminar item",
         "menuLabel": "Abrir menu de ações",
         "expand": "Mostrar detalhes do item",
         "collapse": "Esconder detalhes do item"
       }
+    },
+    "quantitySheet": {
+      "currentQuantity": "Quantidade",
+      "increase": "Aumentar",
+      "decrease": "Diminuir",
+      "viewDetails": "Ver lotes"
     },
     "toasts": {
       "locationRequired": "Seleciona uma localização antes de guardar.",
@@ -588,8 +622,9 @@
     "headline": "Desbloqueia os superpoderes completos da despensa",
     "subtitle": "Automatização inteligente e funcionalidades prioritárias.",
     "benefits": {
-      "agent": "Planeador IA que te propõe menus e receitas à tua medida.",
-      "future": "Acesso antecipado a futuras funcionalidades PRO."
+      "agent": "O teu assistente pessoal de cozinha: menus e receitas adaptados à tua despensa e gostos.",
+      "history": "Histórico ilimitado para analisar padrões e otimizar as tuas compras.",
+      "future": "Sê o primeiro a experimentar novas funcionalidades antes de todos."
     },
     "actions": {
       "maybeLater": "Talvez mais tarde",
@@ -620,15 +655,15 @@
     "title": "Definições",
     "pro": {
       "statusDescription": "Obrigado por apoiares o projeto. PRO está ativo neste dispositivo.",
-      "upgradePrompt": "Atualiza para PRO para desbloquear funcionalidades premium.",
+      "upgradePrompt": "Atualiza para PRO para desbloquear o histórico completo e funcionalidades premium.",
       "upgradeCta": "Atualizar para PRO",
       "badgePro": "PRO ativo"
     },
     "appearance": {
       "title": "Aparência",
-      "subtitle": "Escolhe o aspeto da aplicação.",
+      "subtitle": "Escolhe o estilo que preferes.",
       "theme": "Tema",
-      "description": "Alterna entre claro, escuro ou seguir o sistema.",
+      "description": "Escolhe claro, escuro ou segue o sistema.",
       "light": "Claro",
       "dark": "Escuro",
       "system": "Sistema",
@@ -636,35 +671,41 @@
     },
     "ai": {
       "title": "IA",
-      "subtitle": "Partilha contexto para o planeador.",
+      "subtitle": "Diz ao planeador o que lembrar.",
       "contextTitle": "Contexto / Memória",
-      "contextDescription": "Conta ao planeador sobre a tua casa, dietas, alergias ou preferências que ele deve lembrar sempre.",
-      "contextPlaceholder": "Exemplo: Somos dois adultos e uma criança. Evitar comida picante e amendoim. Focar em receitas mediterrâneas.",
-      "saveAction": "Guardar contexto de IA",
+      "contextDescription": "Partilha a tua casa, dietas, alergias ou preferências que queres que sejam lembradas.",
+      "contextPlaceholder": "Ex: Família de 3, sem frutos secos, cozinha mediterrânea.",
+      "saveAction": "Guardar contexto",
       "saveSuccess": "Contexto guardado.",
       "saveError": "Não foi possível guardar o contexto."
     },
+    "advanced": {
+      "title": "Avançado",
+      "subtitle": "Ferramentas para dados e catálogos.",
+      "openTitle": "Abrir avançado",
+      "openSubtitle": "Gerir catálogos e dados do dispositivo."
+    },
     "data": {
       "title": "Gestão de dados",
-      "subtitle": "Controla o que é armazenado neste dispositivo.",
-      "resetTitle": "Limpar dados / Repor app",
-      "resetDescription": "Remove todas as informações guardadas neste dispositivo.",
+      "subtitle": "Controla o que fica guardado neste dispositivo.",
+      "resetTitle": "Limpar dados",
+      "resetDescription": "Remove tudo o que está guardado neste dispositivo.",
       "resetAction": "Limpar",
       "exportTitle": "Exportar dados",
-      "exportDescription": "Descarregar ficheiro JSON com os dados atuais.",
+      "exportDescription": "Descarregar um ficheiro de backup.",
       "exportAction": "Exportar",
       "importTitle": "Importar dados",
-      "importDescription": "Restaurar backup JSON previamente exportado.",
+      "importDescription": "Restaurar um backup exportado anteriormente.",
       "importAction": "Importar"
     },
     "reset": {
-      "confirm": "Isto irá eliminar TODOS os dados locais da app.\nQueres continuar?",
+      "confirm": "Isto irá eliminar todos os dados guardados neste dispositivo.\nQueres continuar?",
       "success": "Dados locais eliminados.",
       "error": "Não foi possível limpar a app."
     },
     "export": {
       "unavailable": "Exportação não disponível neste ambiente.",
-      "readyToShare": "Dados prontos para partilhar.",
+      "readyToShare": "O teu backup está pronto para partilhar.",
       "success": "Dados exportados.",
       "error": "Não foi possível exportar os dados.",
       "shareTitle": "Gestor de Despensa - Backup",
@@ -680,9 +721,9 @@
     "loadError": "Ocorreu um problema ao carregar as definições.",
     "catalogs": {
       "title": "Catálogos",
-      "subtitle": "Gerir listas reutilizáveis para organizar a despensa.",
+      "subtitle": "Gerir as listas usadas pela app.",
       "manageTitle": "Abrir gestor de catálogos",
-      "manageSubtitle": "Edita localizações, categorias e supermercados em detalhe.",
+      "manageSubtitle": "Edita localizações, categorias e supermercados.",
       "saveSuccess": "Catálogos atualizados.",
       "saveError": "Não foi possível guardar os catálogos.",
       "loadError": "Não foi possível carregar os catálogos.",
@@ -715,7 +756,7 @@
       },
       "supermarkets": {
         "title": "Supermercados",
-        "subtitle": "Define a lista apresentada ao atribuir supermercados aos produtos.",
+        "subtitle": "Escolhe quais os supermercados que aparecem ao editar produtos.",
         "empty": "Adiciona um supermercado para começar.",
         "field": "Supermercado {{ index }}",
         "add": "Adicionar supermercado",
@@ -729,21 +770,24 @@
     },
     "tutorial": {
       "title": "Ver tutorial",
-      "subtitle": "Reproduz o onboarding sempre que precisares."
+      "subtitle": "Revê o onboarding quando quiseres."
     },
     "dev": {
       "title": "Desenvolvimento",
-      "subtitle": "Ferramentas para testar onboarding e setup.",
+      "subtitle": "Ferramentas para testar onboarding e configuração.",
       "setupTitle": "Ver setup",
       "setupSubtitle": "Abre o fluxo de setup para configurar catálogos."
     },
     "info": {
-      "title": "Informações",
-      "subtitle": "Detalhes rápidos da app.",
+      "title": "Sobre",
+      "subtitle": "Versão, avaliações e suporte.",
       "version": "Versão",
       "feedbackTitle": "Enviar feedback",
       "feedbackSubtitle": "Partilha sugestões ou reporta problemas.",
-      "feedbackAction": "Enviar feedback"
+      "feedbackAction": "Enviar feedback",
+      "rateTitle": "Avaliar a app",
+      "rateSubtitle": "Gostas do PantryMind? Deixa-nos uma avaliação.",
+      "rateAction": "Avaliar no Play Store"
     }
   },
   "reviews": {

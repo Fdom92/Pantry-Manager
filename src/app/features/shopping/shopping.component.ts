@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ShoppingStateService } from '@core/services/shopping/shopping-state.service';
 import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
-import { AddPurchaseModalComponent } from './components/add-purchase-modal/add-purchase-modal.component';
 
 @Component({
   selector: 'app-shopping',
@@ -12,9 +12,9 @@ import { AddPurchaseModalComponent } from './components/add-purchase-modal/add-p
   imports: [
     IonicModule,
     CommonModule,
+    RouterLink,
     TranslateModule,
     EmptyStateComponent,
-    AddPurchaseModalComponent,
   ],
   templateUrl: './shopping.component.html',
   styleUrls: ['./shopping.component.scss'],

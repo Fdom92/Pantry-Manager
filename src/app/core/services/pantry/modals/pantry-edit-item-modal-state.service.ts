@@ -1,44 +1,41 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_LOCATION_KEY } from '@core/constants';
-import {
-  buildUniqueSelectOptions,
-  formatCategoryName as formatCategoryNameCatalog,
-  formatSupermarketLabel,
-  getPresetCategoryOptions,
-  getPresetLocationOptions,
-  getPresetSupermarketOptions,
-} from '@core/domain/pantry/pantry-catalog';
-import { normalizeEntityName } from '@core/utils/normalization.util';
-import { toDateInputValue, toIsoDate } from '@core/domain/up-to-date';
+import { buildPantryItemAutocomplete, buildUniqueSelectOptions, formatSupermarketLabel } from '@core/utils';
+import { toDateInputValue, toIsoDate } from '@core/utils/date.util';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
-import { MeasurementUnit } from '@core/models/shared';
 import { createDocumentId, hasMeaningfulItemChanges } from '@core/utils';
-import { formatQuantity, roundQuantity } from '@core/utils/formatting.util';
+import { formatQuantity } from '@core/utils/formatting.util';
 import {
+  formatFriendlyName,
   normalizeCategoryId,
-  normalizeKey,
+  normalizeLowercase,
   normalizeLocationId,
+  normalizeStringList,
   normalizeSupermarketValue,
-  normalizeUnitValue,
+  normalizeTrim,
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { AppPreferencesService } from '../../settings/app-preferences.service';
-import { EventManagerService } from '../../events';
-import { PantryStoreService } from '../pantry-store.service';
-import { PantryStateService } from '../pantry-state.service';
-import { PantryService } from '../pantry.service';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { CatalogOptionsService, SettingsPreferencesService } from '../../settings';
+import { PantryStateService } from '../pantry-state.service';
+import { PantryStoreService } from '../pantry-store.service';
+import { PantryService } from '../pantry.service';
+import { PantryBatchOperationsService } from '../pantry-batch-operations.service';
 
 @Injectable()
 export class PantryEditItemModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
+  private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly fb = inject(FormBuilder);
-  private readonly appPreferences = inject(AppPreferencesService);
+  private readonly appPreferences = inject(SettingsPreferencesService);
+  private readonly catalogOptions = inject(CatalogOptionsService);
   private readonly translate = inject(TranslateService);
   private readonly listState = inject(PantryStateService);
-  private readonly eventManager = inject(EventManagerService);
+  private readonly eventManager = inject(HistoryEventManagerService);
+
   readonly isOpen = signal(false);
   readonly isSaving = signal(false);
   readonly editingItem = signal<PantryItem | null>(null);
@@ -46,17 +43,23 @@ export class PantryEditItemModalStateService {
   readonly selectorEnabled = signal(false);
   readonly selectorQuery = signal('');
   readonly selectedName = signal('');
-  readonly selectorOptions = computed(() =>
-    this.buildSelectorOptions(this.pantryService.loadedProducts())
-  );
-  readonly selectorLocked = computed(() => this.selectorEnabled() && !!this.selectedName().trim());
+  readonly selectorOptions = computed(() => this.buildSelectorOptions(this.pantryService.loadedProducts()));
+  readonly selectorLocked = computed(() => this.selectorEnabled() && !!normalizeTrim(this.selectedName()));
   readonly selectorInputValue = computed(() =>
     this.selectorLocked() ? this.selectedName() : this.selectorQuery()
   );
-  readonly showSelectorEmptyAction = computed(() => this.selectorQuery().trim().length >= 1);
-  readonly selectorEmptyActionLabel = computed(() =>
-    this.buildSelectorEmptyActionLabel(this.selectorQuery().trim())
-  );
+  readonly showSelectorEmptyAction = computed(() => normalizeTrim(this.selectorQuery()).length >= 1);
+  readonly selectorEmptyActionLabel = computed(() => {
+    const query = normalizeTrim(this.selectorQuery());
+    if (!query) {
+      return '';
+    }
+    const formatted = formatFriendlyName(query, query);
+    return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
+  });
+
+  readonly pendingQuantityChange = signal(0);
+  readonly initialQuantity = signal(0);
 
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -68,12 +71,8 @@ export class PantryEditItemModalStateService {
     isBasic: this.fb.control(false),
     minThreshold: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
     notes: this.fb.control(''),
-    batches: this.fb.array([this.createBatchGroup()]),
+    initialQuantity: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
   });
-
-  get batchesArray(): FormArray<FormGroup> {
-    return this.form.get('batches') as FormArray<FormGroup>;
-  }
 
   constructor() {
     effect(() => {
@@ -131,162 +130,86 @@ export class PantryEditItemModalStateService {
     this.isOpen.set(false);
   }
 
-  addBatchEntry(): void {
-    this.batchesArray.push(this.createBatchGroup());
+  /**
+   * Get total quantity for the item being edited.
+   */
+  getTotalQuantity(): number {
+    const item = this.editingItem();
+    if (!item) {
+      return 0;
+    }
+    return this.pantryStore.getItemTotalQuantity(item);
   }
 
-  removeBatchEntry(index: number): void {
-    if (this.batchesArray.length <= 1) {
+  /**
+   * Get display quantity with pending changes.
+   */
+  getDisplayQuantity(): number {
+    return this.getTotalQuantity() + this.pendingQuantityChange();
+  }
+
+  /**
+   * Increment quantity (will create new batch on save).
+   */
+  incrementQuantity(): void {
+    this.pendingQuantityChange.update(current => current + 1);
+  }
+
+  /**
+   * Decrement quantity (will apply FIFO on save).
+   */
+  decrementQuantity(): void {
+    const currentTotal = this.getTotalQuantity();
+    const pendingChange = this.pendingQuantityChange();
+
+    // Don't allow going below 0
+    if (currentTotal + pendingChange <= 0) {
       return;
     }
-    this.batchesArray.removeAt(index);
+
+    this.pendingQuantityChange.update(current => current - 1);
   }
 
   getCategorySelectOptions(): Array<{ value: string; label: string }> {
-    const presetOptions = this.presetCategoryOptions();
-    const seen = new Set<string>();
-    const options: Array<{ value: string; label: string }> = [];
-
-    const addOption = (value: string, label?: string): void => {
-      const normalized = normalizeKey(value);
-      if (!normalized || seen.has(normalized)) {
-        return;
-      }
-      seen.add(normalized);
-      const trimmed = value.trim();
-      const display = label ?? this.formatCategoryName(trimmed);
-      options.push({ value: trimmed, label: display });
-    };
-
-    for (const preset of presetOptions) {
-      addOption(preset);
-    }
-
-    const control = this.form.get('categoryId');
-    const currentValue = typeof control?.value === 'string' ? normalizeCategoryId(control.value) : '';
-    if (currentValue && !seen.has(normalizeKey(currentValue))) {
-      addOption(currentValue);
-    }
-
-    return options;
+    const presetOptions = normalizeStringList(this.appPreferences.preferences().categoryOptions, { fallback: [] });
+    const uncategorizedLabel = this.translate.instant('pantry.form.uncategorized');
+    const currentValue = this.getFormStringValue('categoryId', normalizeCategoryId);
+    return this.buildSelectOptions(presetOptions, currentValue, value =>
+      formatFriendlyName(value, uncategorizedLabel)
+    );
   }
 
-  getLocationOptionsForBatch(index: number): Array<{ value: string; label: string }> {
-    const presetOptions = this.presetLocationOptions();
-    const seen = new Set<string>();
-    const options: Array<{ value: string; label: string }> = [];
-
-    const addOption = (value: string, label?: string): void => {
-      const normalized = normalizeKey(value);
-      if (!normalized || seen.has(normalized)) {
-        return;
-      }
-      seen.add(normalized);
-      const display = label ?? normalizeLocationId(value, this.translate.instant('common.locations.none'));
-      options.push({ value, label: display });
-    };
-
-    for (const preset of presetOptions) {
-      addOption(preset);
-    }
-
-    const batchGroup = this.batchesArray.at(index);
-    const currentValue = normalizeLocationId(batchGroup?.get('locationId')?.value);
-    if (currentValue && !seen.has(normalizeKey(currentValue))) {
-      addOption(currentValue);
-    }
-
-    return options;
-  }
-
-  getLocationAutocompleteOptionsForBatch(index: number): AutocompleteItem<string>[] {
-    return this.getLocationOptionsForBatch(index)
-      .map(option => ({
-        id: option.value,
-        title: option.label,
-        raw: option.value,
-      }));
-  }
 
   getSupermarketSelectOptions(): Array<{ value: string; label: string }> {
-    const presetOptions = this.presetSupermarketOptions();
-    const control = this.form.get('supermarket');
-    const currentValue = (control?.value ?? '').trim();
-    const options = buildUniqueSelectOptions([...presetOptions, currentValue], {
-      labelFor: value =>
-        formatSupermarketLabel(value, this.translate.instant('settings.catalogs.supermarkets.other')),
-    });
-    return options;
+    const presetOptions = normalizeStringList(this.appPreferences.preferences().supermarketOptions, { fallback: [] });
+    const currentValue = this.getFormStringValue('supermarket');
+    return this.buildSelectOptions(presetOptions, currentValue, value =>
+      formatSupermarketLabel(value, this.translate.instant('settings.catalogs.supermarkets.other'))
+    );
   }
 
   getCategoryAutocompleteOptions(): AutocompleteItem<string>[] {
-    return this.getCategorySelectOptions()
-      .map(option => ({
-        id: option.value,
-        title: option.label,
-        raw: option.value,
-      }));
+    return this.mapSelectOptions(this.getCategorySelectOptions());
   }
 
   getSupermarketAutocompleteOptions(): AutocompleteItem<string>[] {
-    return this.getSupermarketSelectOptions()
-      .map(option => ({
-        id: option.value,
-        title: option.label,
-        raw: option.value,
-      }));
+    return this.mapSelectOptions(this.getSupermarketSelectOptions());
   }
 
   onCategoryAutocompleteSelect(option: AutocompleteItem<string>): void {
-    const value = (option?.raw ?? '').toString().trim();
-    if (!value) {
-      return;
-    }
-    this.form.get('categoryId')?.setValue(value);
+    this.applyAutocompleteValue(option, value => this.form.get('categoryId')?.setValue(value));
   }
 
   onSupermarketAutocompleteSelect(option: AutocompleteItem<string>): void {
-    const value = (option?.raw ?? '').toString().trim();
-    if (!value) {
-      return;
-    }
-    this.form.get('supermarket')?.setValue(value);
-  }
-
-  onLocationAutocompleteSelect(index: number, option: AutocompleteItem<string>): void {
-    const value = (option?.raw ?? '').toString().trim();
-    if (!value) {
-      return;
-    }
-    const control = this.batchesArray.at(index);
-    control?.get('locationId')?.setValue(value);
+    this.applyAutocompleteValue(option, value => this.form.get('supermarket')?.setValue(value));
   }
 
   addCategoryOptionFromText(value: string): void {
-    const nextValue = (value ?? '').trim();
-    if (!nextValue) {
-      return;
-    }
-    const formatted = normalizeEntityName(nextValue, nextValue);
-    void this.addCategoryOption(formatted);
+    this.addOptionFromText(value, formatted => this.addCategoryOption(formatted));
   }
 
   addSupermarketOptionFromText(value: string): void {
-    const nextValue = (value ?? '').trim();
-    if (!nextValue) {
-      return;
-    }
-    const formatted = normalizeEntityName(nextValue, nextValue);
-    void this.addSupermarketOption(formatted);
-  }
-
-  addLocationOptionFromText(index: number, value: string): void {
-    const nextValue = (value ?? '').trim();
-    if (!nextValue) {
-      return;
-    }
-    const formatted = normalizeEntityName(nextValue, nextValue);
-    void this.addLocationOption(index, formatted);
+    this.addOptionFromText(value, formatted => this.addSupermarketOption(formatted));
   }
 
   onSelectorQueryChange(value: string): void {
@@ -302,8 +225,8 @@ export class PantryEditItemModalStateService {
   }
 
   onSelectorCreateNew(value?: string): void {
-    const raw = (value ?? this.selectorQuery()).trim();
-    const nextName = raw ? normalizeEntityName(raw, raw) : '';
+    const raw = normalizeTrim(value ?? this.selectorQuery());
+    const nextName = raw ? formatFriendlyName(raw, raw) : '';
     this.selectingItem.set(false);
     this.selectorQuery.set('');
     this.selectedName.set(nextName);
@@ -322,58 +245,56 @@ export class PantryEditItemModalStateService {
   }
 
   private async addSupermarketOption(value: string): Promise<void> {
-    const normalized = normalizeSupermarketValue(value);
-    if (!normalized) {
-      return;
-    }
-    const current = await this.appPreferences.getPreferences();
-    const existing = current.supermarketOptions ?? [];
-    const normalizedKey = normalizeKey(normalized);
-    const existingMatch = existing.find(option => normalizeKey(option) === normalizedKey);
-    if (existingMatch) {
-      this.form.get('supermarket')?.setValue(existingMatch);
-      return;
-    }
-    const next = [...existing, normalized];
-    await this.appPreferences.savePreferences({ ...current, supermarketOptions: next });
-    this.form.get('supermarket')?.setValue(normalized);
+    const selected = await this.catalogOptions.addSupermarketOption(value);
+    this.form.get('supermarket')?.setValue(selected);
   }
 
   private async addCategoryOption(value: string): Promise<void> {
-    const normalized = normalizeCategoryId(value);
-    if (!normalized) {
-      return;
-    }
-    const current = await this.appPreferences.getPreferences();
-    const existing = current.categoryOptions ?? [];
-    const normalizedKey = normalizeKey(normalized);
-    const existingMatch = existing.find(option => normalizeKey(normalizeCategoryId(option)) === normalizedKey);
-    if (existingMatch) {
-      this.form.get('categoryId')?.setValue(existingMatch);
-      return;
-    }
-    const next = [...existing, normalized];
-    await this.appPreferences.savePreferences({ ...current, categoryOptions: next });
-    this.form.get('categoryId')?.setValue(normalized);
+    const selected = await this.catalogOptions.addCategoryOption(value);
+    this.form.get('categoryId')?.setValue(selected);
   }
 
-  private async addLocationOption(index: number, value: string): Promise<void> {
-    const normalized = normalizeLocationId(value);
-    if (!normalized) {
+  private addOptionFromText(value: string, addOption: (formatted: string) => Promise<void>): void {
+    const nextValue = normalizeTrim(value);
+    if (!nextValue) {
       return;
     }
-    const current = await this.appPreferences.getPreferences();
-    const existing = current.locationOptions ?? [];
-    const normalizedKey = normalizeKey(normalized);
-    const existingMatch = existing.find(option => normalizeKey(normalizeLocationId(option)) === normalizedKey);
-    const nextValue = existingMatch ?? normalized;
-    if (!existingMatch) {
-      const next = [...existing, normalized];
-      await this.appPreferences.savePreferences({ ...current, locationOptions: next });
-    }
-    const control = this.batchesArray.at(index);
-    control?.get('locationId')?.setValue(nextValue);
+    const formatted = formatFriendlyName(nextValue, nextValue);
+    void addOption(formatted);
   }
+
+  private applyAutocompleteValue(option: AutocompleteItem<string>, setter: (value: string) => void): void {
+    const value = normalizeTrim((option?.raw ?? '').toString());
+    if (!value) {
+      return;
+    }
+    setter(value);
+  }
+
+  private buildSelectOptions(
+    presetOptions: string[],
+    currentValue: string,
+    labelFor: (value: string) => string
+  ): Array<{ value: string; label: string }> {
+    return buildUniqueSelectOptions([...presetOptions, currentValue], { labelFor });
+  }
+
+  private getFormStringValue(
+    controlName: string,
+    normalizeValue: (value: string) => string = normalizeTrim
+  ): string {
+    const control = this.form.get(controlName);
+    return typeof control?.value === 'string' ? normalizeValue(control.value) : '';
+  }
+
+  private mapSelectOptions(options: Array<{ value: string; label: string }>): AutocompleteItem<string>[] {
+    return options.map(option => ({
+      id: option.value,
+      title: option.label,
+      raw: option.value,
+    }));
+  }
+
   async submitItem(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -388,16 +309,23 @@ export class PantryEditItemModalStateService {
     try {
       const existing = this.editingItem();
       const item = this.buildItemPayload(existing ?? undefined);
-      const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
+
       if (existing) {
-        if (!this.hasMeaningfulChanges(existing, item)) {
-          this.dismiss();
-          return;
+        // Edit mode: Apply pending quantity changes with FIFO logic
+        const change = this.pendingQuantityChange();
+        if (change !== 0) {
+          this.listState.cancelPendingStockSave(item._id);
+          await this.batchOps.adjustTotalQuantityWithFIFO(existing, change, this.listState.pantryItemsState);
         }
-        this.listState.cancelPendingStockSave(item._id);
-        await this.pantryStore.updateItem(item);
-        await this.eventManager.logAdvancedEdit(existing, item);
+
+        // Update product details if there are meaningful changes
+        if (hasMeaningfulItemChanges(existing, item)) {
+          this.listState.cancelPendingStockSave(item._id);
+          await this.pantryStore.updateItem(item);
+          await this.eventManager.logAdvancedEdit(existing, item);
+        }
       } else {
+        // Create mode: item payload already includes initial batch
         await this.pantryStore.addItem(item);
         await this.eventManager.logAdvancedCreate(item);
       }
@@ -409,19 +337,6 @@ export class PantryEditItemModalStateService {
     }
   }
 
-  private hasMeaningfulChanges(existing: PantryItem, next: PantryItem): boolean {
-    return hasMeaningfulItemChanges(existing, next);
-  }
-
-  private resetBatchControls(batches: Array<Partial<ItemBatch>>): void {
-    while (this.batchesArray.length) {
-      this.batchesArray.removeAt(0);
-    }
-    for (const batch of batches) {
-      this.batchesArray.push(this.createBatchGroup(batch));
-    }
-  }
-
   private resetFormForCreate(): void {
     this.form.reset({
       name: '',
@@ -430,8 +345,9 @@ export class PantryEditItemModalStateService {
       isBasic: false,
       minThreshold: null,
       notes: '',
+      initialQuantity: null,
     });
-    this.resetBatchControls([{}]);
+    this.pendingQuantityChange.set(0);
   }
 
   private resetModalState(): void {
@@ -441,6 +357,7 @@ export class PantryEditItemModalStateService {
     this.selectorQuery.set('');
     this.selectorEnabled.set(false);
     this.selectedName.set('');
+    this.pendingQuantityChange.set(0);
   }
 
   private applyItemToForm(item: PantryItem): void {
@@ -452,50 +369,19 @@ export class PantryEditItemModalStateService {
       isBasic: Boolean(item.isBasic),
       minThreshold: item.minThreshold ?? null,
       notes: '',
+      initialQuantity: null,
     });
-    const batches = this.buildBatchEntries(item);
-    this.resetBatchControls(batches);
-  }
-
-  private buildBatchEntries(item: PantryItem): Array<Partial<ItemBatch>> {
-    if (Array.isArray(item.batches) && item.batches.length) {
-      return item.batches;
-    }
-
-    return [{}];
-  }
-
-  private createBatchGroup(initial?: Partial<ItemBatch>): FormGroup {
-    let normalizedQuantity: number | null = null;
-    if (initial?.quantity != null) {
-      const numericValue = Number(initial.quantity);
-      normalizedQuantity = Number.isFinite(numericValue) ? numericValue : null;
-    }
-    const rawLocation = normalizeLocationId(initial?.locationId);
-    const locationId = rawLocation && rawLocation !== UNASSIGNED_LOCATION_KEY ? rawLocation : '';
-    return this.fb.group({
-      batchId: this.fb.control((initial?.batchId ?? '').trim()),
-      locationId: this.fb.control(locationId, {
-        nonNullable: true,
-      }),
-      quantity: this.fb.control<number | null>(normalizedQuantity, {
-        validators: [Validators.required, Validators.min(0)],
-      }),
-      expirationDate: this.fb.control(initial?.expirationDate ? toDateInputValue(initial.expirationDate) : ''),
-      opened: this.fb.control(initial?.opened ?? false),
-      unit: this.fb.control(normalizeUnitValue(initial?.unit ?? MeasurementUnit.UNIT), {
-        nonNullable: true,
-      }),
-    });
+    this.pendingQuantityChange.set(0);
   }
 
   private buildItemPayload(existing?: PantryItem): PantryItem {
-    const { name, categoryId, isBasic, supermarket, minThreshold } = this.form.value as {
+    const { name, categoryId, isBasic, supermarket, minThreshold, initialQuantity } = this.form.value as {
       name?: string;
       categoryId?: string;
       isBasic?: boolean;
       supermarket?: string;
       minThreshold?: number | string | null;
+      initialQuantity?: number | null;
     };
     const identifier = existing?._id ?? createDocumentId('item');
     const now = new Date().toISOString();
@@ -505,28 +391,23 @@ export class PantryEditItemModalStateService {
       normalizedMinThreshold = Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
     }
 
-    const batches: ItemBatch[] = this.batchesArray.controls
-      .map(group => {
-        const batchValue = group.value as any;
-        const expirationDate =
-          typeof batchValue?.expirationDate === 'string'
-            ? toIsoDate(batchValue.expirationDate) ?? undefined
-            : undefined;
-        const batchQuantity = batchValue?.quantity != null ? Number(batchValue.quantity) : 0;
-        const batchId = (batchValue?.batchId ?? '').trim() || undefined;
-        const opened = batchValue?.opened ? true : undefined;
-        const locationId = normalizeLocationId(batchValue?.locationId) || undefined;
-        const unit = normalizeUnitValue(batchValue?.unit as MeasurementUnit | string | undefined);
-        return {
-          batchId,
-          quantity: Number.isFinite(batchQuantity) ? batchQuantity : 0,
-          expirationDate,
-          opened,
-          unit,
-          locationId,
-        } as ItemBatch;
-      })
-      .filter(batch => batch.quantity > 0 || Boolean(batch.expirationDate) || Boolean(batch.opened));
+    let batches: ItemBatch[];
+    if (existing) {
+      // Edit mode: keep existing batches (quantity changes applied via FIFO)
+      batches = existing.batches ?? [];
+    } else {
+      // Create mode: create initial batch from initialQuantity field
+      const quantity = initialQuantity != null ? Number(initialQuantity) : 0;
+      if (quantity > 0) {
+        batches = [{
+          quantity,
+          locationId: UNASSIGNED_LOCATION_KEY,
+          expirationDate: undefined,
+        }];
+      } else {
+        batches = [];
+      }
+    }
 
     const normalizedSupermarket = normalizeSupermarketValue(supermarket);
     const normalizedCategory = normalizeCategoryId(categoryId);
@@ -536,7 +417,7 @@ export class PantryEditItemModalStateService {
       _rev: existing?._rev,
       type: 'item',
       householdId: existing?.householdId ?? DEFAULT_HOUSEHOLD_ID,
-      name: (name ?? '').trim(),
+      name: normalizeTrim(name),
       categoryId: normalizedCategory,
       batches,
       supermarket: normalizedSupermarket,
@@ -547,47 +428,12 @@ export class PantryEditItemModalStateService {
     };
   }
 
-  private getUnitLabel(unit: MeasurementUnit | string | undefined): string {
-    return this.pantryStore.getUnitLabel(unit);
-  }
-
-  private presetCategoryOptions(): string[] {
-    return getPresetCategoryOptions(this.appPreferences.preferences());
-  }
-
-  private presetLocationOptions(): string[] {
-    return getPresetLocationOptions(this.appPreferences.preferences());
-  }
-
-  private presetSupermarketOptions(): string[] {
-    return getPresetSupermarketOptions(this.appPreferences.preferences());
-  }
-
-  private formatCategoryName(key: string): string {
-    return formatCategoryNameCatalog(key, this.translate.instant('pantry.form.uncategorized'));
-  }
-
   private buildSelectorOptions(items: PantryItem[]): AutocompleteItem<PantryItem>[] {
     const locale = this.translate.currentLang ?? 'es';
-    return (items ?? []).map(item => {
-      const total = this.pantryStore.getItemTotalQuantity(item);
-      const unit = this.pantryStore.getUnitLabel(this.pantryStore.getItemPrimaryUnit(item));
-      const formattedQty = formatQuantity(total, locale, { maximumFractionDigits: 1 });
-      return {
-        id: item._id,
-        title: item.name,
-        subtitle: `${formattedQty} ${unit}`.trim(),
-        raw: item,
-      };
+    return buildPantryItemAutocomplete(items, {
+      locale,
+      getQuantity: item => this.pantryStore.getItemTotalQuantity(item),
     });
-  }
-
-  private buildSelectorEmptyActionLabel(query: string): string {
-    if (!query) {
-      return '';
-    }
-    const formatted = normalizeEntityName(query, query);
-    return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   }
 
 }

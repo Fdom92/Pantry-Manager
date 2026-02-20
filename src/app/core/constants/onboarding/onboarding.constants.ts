@@ -1,34 +1,28 @@
 import type { OnboardingSlide } from '@core/models';
 
-export const ONBOARDING_SLIDES: OnboardingSlide[] = [
+export const ONBOARDING_SLIDES: readonly OnboardingSlide[] = [
   {
-    key: 'dashboard',
-    titleKey: 'onboarding.slides.dashboard.title',
-    descriptionKey: 'onboarding.slides.dashboard.description',
-    icon: 'home-outline',
+    key: 'problem',
+    titleKey: 'onboarding.slides.problem.title',
+    descriptionKey: 'onboarding.slides.problem.description',
+    icon: 'alert-circle-outline',
   },
   {
-    key: 'pantry',
-    titleKey: 'onboarding.slides.pantry.title',
-    descriptionKey: 'onboarding.slides.pantry.description',
+    key: 'simple',
+    titleKey: 'onboarding.slides.simple.title',
+    descriptionKey: 'onboarding.slides.simple.description',
     icon: 'basket-outline',
   },
   {
-    key: 'planner',
-    titleKey: 'onboarding.slides.planner.title',
-    descriptionKey: 'onboarding.slides.planner.description',
-    icon: 'restaurant-outline',
+    key: 'benefit',
+    titleKey: 'onboarding.slides.benefit.title',
+    descriptionKey: 'onboarding.slides.benefit.description',
+    icon: 'pricetag-outline',
   },
   {
-    key: 'shopping',
-    titleKey: 'onboarding.slides.shopping.title',
-    descriptionKey: 'onboarding.slides.shopping.description',
-    icon: 'cart-outline',
+    key: 'action',
+    titleKey: 'onboarding.slides.action.title',
+    descriptionKey: 'onboarding.slides.action.description',
+    icon: 'add-outline',
   },
-  {
-    key: 'settings',
-    titleKey: 'onboarding.slides.settings.title',
-    descriptionKey: 'onboarding.slides.settings.description',
-    icon: 'settings-outline',
-  },
-];
+] as const;

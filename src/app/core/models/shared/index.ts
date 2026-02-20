@@ -1,4 +1,6 @@
 export * from './base-doc.model';
+export * from './base-entity.model';
+export * from './color.model';
 export * from './date-format-options.model';
 export * from './empty-state.model';
 export * from './enums.model';

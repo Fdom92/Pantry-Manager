@@ -1,9 +1,13 @@
 import type { PantryItem, ItemBatch } from '@core/models/pantry';
 
 function normalizeBatches(batches: ItemBatch[] = []): ItemBatch[] {
+  const stableKey = (value: ItemBatch): string => {
+    const sortedKeys = Object.keys(value as unknown as Record<string, unknown>).sort();
+    return JSON.stringify(value, sortedKeys);
+  };
   return [...batches].map(batch => ({ ...batch })).sort((a, b) => {
-    const keyA = `${a.batchId ?? ''}::${a.expirationDate ?? ''}::${a.quantity ?? ''}`;
-    const keyB = `${b.batchId ?? ''}::${b.expirationDate ?? ''}::${b.quantity ?? ''}`;
+    const keyA = stableKey(a);
+    const keyB = stableKey(b);
     return keyA.localeCompare(keyB);
   });
 }

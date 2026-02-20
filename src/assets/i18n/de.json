@@ -8,71 +8,41 @@
   },
   "onboarding": {
     "tagline": "In 1 Minute starten",
+    "taglineDone": "Alles bereit",
     "actions": {
       "skip": "Überspringen",
       "next": "Weiter",
-      "start": "Starten"
+      "start": "Starten",
+      "skipHint": "Du kannst dieses Tutorial jederzeit überspringen."
     },
     "slides": {
-      "dashboard": {
-        "title": "Start",
-        "description": "Warnungen und Überblick über deinen Vorrat auf einen Blick."
+      "problem": {
+        "title": "Wirfst du Essen weg, das du vergessen hattest?",
+        "description": "Vermeide, Essen und Geld wegzuwerfen. Behalte den Überblick, bevor es abläuft."
       },
-      "pantry": {
-        "title": "Vorratskammer",
-        "description": "Produkte hinzufügen, Bestand und Haltbarkeit im Blick behalten."
+      "simple": {
+        "title": "Organisiere deinen Vorrat in Sekunden",
+        "description": "Füge Produkte hinzu, verfolge Mengen und erhalte Warnungen vor Ablauf."
       },
-      "planner": {
-        "title": "Planer",
-        "description": "Essensideen und Pläne basierend auf dem, was du hast."
+      "benefit": {
+        "title": "Spare Geld und Zeit",
+        "description": "Kaufe nur, was du brauchst, und nutze, was du hast."
       },
-      "shopping": {
-        "title": "Einkauf",
-        "description": "Liste erstellen und beim Einkaufen abhaken."
-      },
-      "settings": {
-        "title": "Einstellungen",
-        "description": "Kataloge, Warnungen und App-Optionen anpassen."
-      }
-    }
-  },
-  "setup": {
-    "tagline": "Richte deine Vorratskammer ein",
-    "stepIndicator": "Schritt {{ current }} von {{ total }}",
-    "actions": {
-      "skip": "Überspringen",
-      "continue": "Weiter",
-      "finish": "Starten"
-    },
-    "validation": {
-      "locationsOptional": "Du kannst diesen Schritt überspringen, wenn du jetzt keine Standorte hinzufügen möchtest.",
-      "categoriesOptional": "Kategorien kannst du später hinzufügen."
-    },
-    "locations": {
-      "title": "Wo lagerst du Dinge?",
-      "description": "Wähle die Standorte, die du am häufigsten nutzt, damit wir sie später vorschlagen können.",
-      "options": {
-        "pantry": "Vorratskammer",
-        "fridge": "Kühlschrank",
-        "kitchen": "Küche",
-        "freezer": "Gefrierschrank"
+      "action": {
+        "title": "Beginne mit deinem ersten Produkt",
+        "description": "Tippe auf + und erstelle deinen Vorrat in Minuten."
       }
     },
-    "categories": {
-      "title": "Was kaufst du häufig?",
-      "description": "Wähle die Kategorien, die du normalerweise kaufst. Du kannst sie später ändern.",
-      "options": {
-        "proteins": "Proteine",
-        "dairy": "Milchprodukte",
-        "fruits": "Obst",
-        "drinks": "Getränke",
-        "cereals": "Cerealien",
-        "condiments": "Gewürze & Würzmittel",
-        "canned": "Konserven",
-        "sweets": "Süßes",
-        "snacks": "Snacks",
-        "vegetables": "Gemüse",
-        "household": "Haushalt"
+    "mock": {
+      "items": {
+        "milk": "Milch",
+        "pasta": "Nudeln",
+        "tomatoes": "Tomaten"
+      },
+      "status": {
+        "expired": "Abgelaufen",
+        "low": "Niedrig",
+        "ok": "OK"
       }
     }
   },
@@ -82,6 +52,7 @@
       "cancel": "Abbrechen",
       "add": "Hinzufügen",
       "save": "Speichern",
+      "edit": "Bearbeiten",
       "apply": "Anwenden",
       "clear": "Leeren"
     },
@@ -109,13 +80,13 @@
       "subtitle": "Füge dein erstes Produkt hinzu und behalte Bestand und Haltbarkeit im Blick."
     },
     "shopping": {
-      "title": "Einkaufsliste leer"
+      "title": "Alles in Ordnung"
     }
   },
   "history": {
     "title": "Verlauf",
     "pro": {
-      "cta": "Mehr Ereignisse mit PRO"
+      "cta": "Vollständigen Verlauf sehen und Muster mit PRO analysieren"
     },
     "filters": {
       "title": "Verlaufsfilter",
@@ -154,7 +125,64 @@
   },
   "dashboard": {
     "title": "Start",
+    "aria": "Dashboard deiner Speisekammer",
     "confirmDeleteExpired": "Dadurch werden alle abgelaufenen Produkte gelöscht. Möchtest du fortfahren?",
+    "health": {
+      "critical": {
+        "title": "Deine Speisekammer braucht Aufmerksamkeit",
+        "description": "Es gibt Produkte, die sofortige Maßnahmen erfordern"
+      },
+      "attention": {
+        "title": "Überprüfe deine Speisekammer bald",
+        "description": "Einige Produkte laufen bald ab",
+        "trackingTitle": "Verbessere deine Kontrolle",
+        "trackingDescription": "Viele Produkte haben keine Tracking-Daten"
+      },
+      "optimal": {
+        "controlledTitle": "Alles unter Kontrolle",
+        "controlledDescription": "Du hast Produkte ohne kürzliche Aktivität",
+        "perfectTitle": "Deine Speisekammer ist perfekt",
+        "perfectDescription": "Keine abgelaufenen oder ablaufenden Produkte"
+      }
+    },
+    "sections": {
+      "actions": {
+        "title": "Was jetzt zu tun ist"
+      }
+    },
+    "actions": {
+      "expired": {
+        "title": "Abgelaufene Produkte überprüfen",
+        "description_one": "{{ count }} Produkt ist abgelaufen",
+        "description_other": "{{ count }} Produkte sind abgelaufen",
+        "cta": "Produkte ansehen"
+      },
+      "nearExpiry": {
+        "title": "Produkte laufen bald ab",
+        "titlePro": "Plane, bevor sie ablaufen",
+        "description": "{{ count }} Produkte laufen in {{ days }} Tagen ab",
+        "cta": "Produkte ansehen",
+        "ctaPro": "Rezepte generieren"
+      },
+      "stale": {
+        "title": "Produkte ohne Aktivität",
+        "description": "{{ count }} Produkte haben sich seit 30+ Tagen nicht bewegt",
+        "cta": "Überprüfen"
+      },
+      "weeklyPlan": {
+        "title": "Plane deine Woche",
+        "description": "Optimiere deine Speisekammer mit einem Wochenplan",
+        "cta": "Plan erstellen"
+      },
+      "upgrade": {
+        "title": "Hole das Beste aus deiner Speisekammer",
+        "description": "Personalisierte Rezepte und Wochenplanung mit KI",
+        "cta": "PRO entdecken"
+      }
+    },
+    "context": {
+      "recentlyAdded": "{{ count }} kürzlich hinzugefügte Produkte"
+    },
     "summary": {
       "title": "Vorratsübersicht",
       "toggle": "Vorratsübersicht ein-/ausblenden",
@@ -169,11 +197,11 @@
     "overview": {
       "aria": "Vorratsübersicht",
       "sections": {
+        "summary": {
+          "title": "Zusammenfassung"
+        },
         "alerts": {
           "title": "Warnungen"
-        },
-        "dailyActions": {
-          "title": "Daily actions"
         },
         "control": {
           "title": "Control"
@@ -186,6 +214,17 @@
         }
       },
       "cards": {
+        "summary": {
+          "total": "Gesamt",
+          "basic": "Grundprodukte",
+          "complete": "Mit Daten",
+          "healthStatus": {
+            "allGood": "Alles unter Kontrolle",
+            "checkSoon": "Einige Produkte brauchen Aufmerksamkeit",
+            "needsAttention": "Deine Speisekammer braucht Aufmerksamkeit"
+          },
+          "staleItems": "{{ count }} Produkte seit 30+ Tagen unberührt"
+        },
         "nearExpiry": {
           "title": "Bald ablaufend",
           "body": "{{ count }} Produkte diese Woche",
@@ -195,11 +234,6 @@
           "title": "Abgelaufen",
           "body": "{{ count }} abgelaufene Produkte",
           "action": "Ansehen"
-        },
-        "pendingReview": {
-          "title": "Vorrat vervollständigen",
-          "body": "{{ count }} Produkte zu prüfen",
-          "action": "Prüfen"
         },
         "lowOrEmpty": {
           "title": "Niedriger Bestand",
@@ -211,11 +245,6 @@
           "body": "{{ count }} Artikel ausstehend",
           "action": "Ansehen"
         },
-        "consumeToday": {
-          "title": "Consumed today",
-          "body": "Log what you used today",
-          "action": "Add"
-        },
         "recentlyAdded": {
           "title": "Kürzlich hinzugefügt",
           "body": "{{ count }} neue Produkte",
@@ -225,7 +254,6 @@
       "toasts": {
         "expiredEmpty": "Alles gut — keine abgelaufenen Artikel.",
         "nearExpiryEmpty": "Alles gut — keine Artikel, die bald ablaufen.",
-        "pendingReviewEmpty": "Alles gut — nichts ausstehend zu vervollständigen.",
         "lowOrEmptyEmpty": "Alles gut — keine Artikel mit niedrigem Bestand.",
         "recentlyAddedEmpty": "Alles gut — keine kürzlich hinzugefügten Artikel.",
         "shoppingEmpty": "Alles gut — deine Einkaufsliste ist leer.",
@@ -241,13 +269,8 @@
     "lowStock": {
       "title": "Warnungen bei niedrigem Bestand",
       "subtitle": "Auf oder unter dem Mindestbestand",
-      "minLabel": "Min. {{ value }} {{ unit }}",
+      "minLabel": "Min. {{ value }}",
       "empty": "Alle Artikel liegen über ihrem Mindestbestand."
-    },
-    "batches": {
-      "single": "1 Charge",
-      "plural": "{{ count }} Chargen",
-      "withExpiry": "{{ batchLabel }}, Ablauf {{ date }}"
     },
     "expired": {
       "title": "Abgelaufene Artikel",
@@ -261,16 +284,6 @@
       "updated": "Aktualisiert {{ date }}",
       "badge": "Neu",
       "empty": "Keine aktuellen Änderungen."
-    },
-    "consumeToday": {
-      "title": "Consumed today",
-      "cardTitle": "Add products",
-      "selectHint": "Pick what you used today, then set quantities.",
-      "listTitle": "Your list",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "empty": "No items added yet.",
-      "save": "Save"
     }
   },
   "shopping": {
@@ -280,20 +293,11 @@
       "below-min": "Niedriger Bestand",
       "empty": "Kein Bestand"
     },
-    "purchaseModal": {
-      "titleProduct": "Produkt kaufen",
-      "productName": "Name",
-      "quantity": "Menge",
-      "quantityPlaceholder": "0",
-      "expiry": "Haltbarkeitsdatum (optional)",
-      "addToPantry": "Hinzufügen"
-    },
     "suggestions": {
       "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
-      "totalStock": "Gesamtbestand: {{ amount }} {{ unit }}",
-      "minStock": "Min.: {{ amount }} {{ unit }}",
-      "empty": "Derzeit nichts zu erledigen. Ich informiere dich, wenn Nachschub nötig ist."
+      "toBuy": "Kaufen {{ amount }}",
+      "empty": "Markiere Produkte als \"immer vorrätig\" um benachrichtigt zu werden, wenn sie zur Neige gehen."
     },
     "share": {
       "button": "Liste teilen",
@@ -317,68 +321,58 @@
         "dismiss": "Nicht jetzt"
       },
       "weeklyMealPlanning": {
-        "title": "Plane deine Mahlzeiten für die Woche",
-        "description": "Plane die Mahlzeiten dieser Woche mit dem, was du bereits hast.",
-        "cta": "Jetzt planen",
+        "title": "Die Woche organisieren?",
+        "description": "Gute Zeit, um deine Mahlzeiten mit dem zu planen, was du zu Hause hast.",
+        "cta": "Los geht's",
         "prompt": "Plane meine Mahlzeiten für diese Woche nur mit den Vorräten, die ich bereits habe."
       },
       "cookBeforeExpiry": {
-        "title": "Koche bevor sie ablaufen",
-        "description": "Nutze Produkte, die bald ablaufen und noch Bestand haben.",
-        "cta": "Bald ablaufende nutzen",
+        "title": "Du hast Produkte, die bald ablaufen",
+        "description": "Ich schlage dir Rezepte vor, um sie zu nutzen, bevor sie verderben.",
+        "cta": "Gib mir Ideen",
         "prompt": "Schlage Rezepte vor, die die bald ablaufenden Produkte in meiner Speisekammer priorisieren."
       },
-      "lunchIdeas": {
-        "title": "Was kann ich zum Mittagessen zubereiten?",
-        "description": "Schnelle Mittagsideen mit deinen Vorräten.",
-        "cta": "Ideen anzeigen",
-        "prompt": "Gib mir Mittagsoptionen für heute mit dem, was ich bereits habe."
-      },
-      "dinnerIdeas": {
-        "title": "Was kann ich zum Abendessen zubereiten?",
-        "description": "Abendessen-Vorschläge mit dem, was schon da ist.",
-        "cta": "Abendessen planen",
-        "prompt": "Plane ein einfaches Abendessen mit den Zutaten in meiner Speisekammer."
-      },
-      "whatToCookNow": {
-        "title": "Was koche ich jetzt?",
-        "description": "Du weißt nicht, was du essen sollst? Ich gebe dir Ideen mit deinen Vorräten.",
-        "cta": "Gib mir Ideen",
-        "prompt": "Teile schnelle Kochideen mit nur den Zutaten, die ich bereits besitze."
+      "smartCookingIdeas": {
+        "title": "Was koche ich heute?",
+        "description": "Ich gebe dir Ideen mit dem, was du gerade in deiner Speisekammer hast.",
+        "cta": "Inspiriere mich",
+        "prompt": "Gib mir Kochideen mit den Zutaten, die ich verfügbar habe."
       },
       "planAndSaveTime": {
-        "title": "Plane deine Mahlzeiten und spare jede Woche Zeit",
-        "description": "Schalte den PRO-Planer frei und organisiere dein Menü ganz leicht.",
-        "cta": "PRO werden"
+        "title": "Woche mit KI planen",
+        "description": "Mit PRO organisierst du dein Wochenmenü und sparst jeden Tag Zeit.",
+        "cta": "PRO testen"
+      },
+      "historyUnlimited": {
+        "title": "Was verschwendest du am meisten?",
+        "description": "Mit PRO findest du heraus, was du wegwirfst, und kaufst nur, was du brauchst.",
+        "cta": "Mehr erfahren"
+      },
+      "smartInsights": {
+        "title": "Warnungen vor Ablauf",
+        "description": "Mit PRO sage ich dir, was du kochen sollst, um nichts zu verschwenden.",
+        "cta": "Mehr erfahren"
+      },
+      "pantryHealthy": {
+        "title": "Deine Vorratskammer ist in top Form",
+        "description": "Alles unter Kontrolle. Ein guter Zeitpunkt, deine Einkaufsliste zu planen.",
+        "cta": "Liste ansehen"
+      },
+      "addExpiryDates": {
+        "title": "Ablaufdaten hinzufügen",
+        "description": "Behalte den Überblick, was zuerst verwendet werden soll, und vermeide unangenehme Überraschungen.",
+        "cta": "Zur Vorratskammer"
+      },
+      "lowStockReminder": {
+        "title": "Einige Produkte werden knapp",
+        "description": "Füge sie deiner Einkaufsliste hinzu, bevor du ohne sie dastehst.",
+        "cta": "Zur Liste"
+      },
+      "organizeWithCategories": {
+        "title": "Vorratskammer nach Kategorien ordnen",
+        "description": "Gruppiere deine Produkte, um sie schneller zu finden und alles im Griff zu haben.",
+        "cta": "Jetzt ordnen"
       }
-    }
-  },
-  "upToDate": {
-    "title": "Aktualisieren",
-    "subtitle": "Überprüfe ein paar Produkte, um deine Vorratskammer korrekt und aktuell zu halten.",
-    "progress": "Ausstehende Produkte {{ pending }} von {{ total }}",
-    "lastUpdated": "Zuletzt aktualisiert: {{ date }}",
-    "fields": {
-      "expiry": "Ablaufdatum",
-      "stock": "Bestand"
-    },
-    "edit": {
-      "title": "Produkt aktualisieren",
-      "expiryToggle": "Ablaufdatum hinzufügen"
-    },
-    "reasons": {
-      "stale-update": "Lange nicht aktualisiert",
-      "missing-info": "Fehlende Informationen"
-    },
-    "actions": {
-      "keep": "Hier lassen",
-      "delete": "Löschen",
-      "edit": "Bearbeiten",
-      "skip": "Jetzt überspringen"
-    },
-    "done": {
-      "title": "Vorrat aktualisiert, gute Arbeit",
-      "subtitle": "Zurück zum Dashboard…"
     }
   },
   "agent": {
@@ -391,7 +385,8 @@
     "placeholder": "Frag nach Rezepten, Essensplänen oder Ideen mit deinen Vorräten.",
     "actions": {
       "send": "Senden",
-      "retry": "Erneut versuchen"
+      "retry": "Erneut versuchen",
+      "clear": "Chat löschen"
     },
     "preview": {
       "badge": "Vorschau",
@@ -408,21 +403,32 @@
     },
     "quickStart": {
       "title": "Kontextueller Einstieg",
-      "headline": "Starte die Planung ohne leeren Chat",
-      "subtitle": "Wähle eine Intention und der Menüplaner reagiert sofort.",
+      "headline": "Fang mit etwas Konkretem an",
+      "subtitle": "Tippe eine Option an und der Planer legt direkt los.",
       "ctaTitle": "Mit einem Tipp starten",
-      "ctaSubtitle": "Bestimme, worauf du heute fokussierst.",
-      "today": "Was kann ich mit dem kochen, was ich habe?",
-      "quickIdeas": "Gib mir schnelle Rezeptideen",
-      "weeklyPlan": "Meine Mahlzeiten für diese Woche planen",
-      "useExpiring": "Zutaten verwenden, die bald ablaufen",
-      "decideForMe": "Entscheide für mich",
-      "customPrompt": "Etwas anderes fragen"
+      "ctaSubtitle": "Womit fangen wir heute an?",
+      "today": "Was koche ich heute?",
+      "todayPrompt": "Was kann ich heute mit dem kochen, was ich zuhause habe? Gib mir ein paar Ideen.",
+      "weeklyPlan": "Wochenplan",
+      "weeklyPlanPrompt": "Mach mir einen Wochenplan — 7 Tage, Frühstück, Mittagessen und Abendessen — mit dem was ich zuhause habe.",
+      "useExpiring": "Was läuft bald ab",
+      "useExpiringPrompt": "Ich hab Sachen, die bald ablaufen. Was koche ich, um sie nicht wegzuwerfen?",
+      "surpriseMe": "Überrasch mich",
+      "surpriseMePrompt": "Such dir ein Rezept aus, das ich mit dem machen kann, was ich habe, und überrasch mich. Nur eins.",
+      "customPrompt": "Eigene Frage ✏️"
     },
     "messages": {
       "noResponse": "Ich konnte keine Antwort erzeugen.",
       "unifiedError": "Der Menüplaner konnte im Moment nicht antworten. Bitte versuche es später erneut."
-    }
+    },
+    "errors": {
+      "coldStart": "Der Dienst startet. Versuche es in einigen Sekunden erneut.",
+      "rateLimit": "Zu viele Anfragen. Bitte warte einen Moment, bevor du es erneut versuchst.",
+      "timeout": "Die Anfrage hat zu lange gedauert. Überprüfe deine Verbindung und versuche es erneut.",
+      "offline": "Keine Internetverbindung. Bitte verbinde dich und versuche es erneut.",
+      "generic": "Etwas ist schiefgelaufen. Bitte versuche es in wenigen Momenten erneut."
+    },
+    "disclaimer": "Rezepte und Essenspläne werden von KI generiert und können Fehler enthalten."
   },
   "pantry": {
     "title": "Vorratskammer",
@@ -460,7 +466,8 @@
       "submit": "Add to pantry",
       "singleSuccess": "1 Produkt hinzugefügt",
       "success": "{{ count }} Produkte hinzugefügt",
-      "error": "Produkte konnten nicht hinzugefügt werden."
+      "error": "Produkte konnten nicht hinzugefügt werden.",
+      "createAdvanced": "Produkt mit erweiterten Details erstellen"
     },
     "addMode": {
       "title": "Modus auswählen",
@@ -482,7 +489,15 @@
     "batches": {
       "title": "Produktchargen",
       "count": "{{ count }} registrierte Chargen",
-      "open": "Geöffnet"
+      "open": "Geöffnet",
+      "noExpiryDate": "Kein Ablaufdatum",
+      "expires": {
+        "today": "Läuft heute ab",
+        "tomorrow": "Läuft morgen ab"
+      },
+      "expired": {
+        "yesterday": "Gestern abgelaufen"
+      }
     },
     "form": {
       "editTitle": "Artikel bearbeiten",
@@ -505,12 +520,13 @@
         "title": "Supermarkt hinzufügen",
         "placeholder": "Supermarktname"
       },
-      "basic": "Grundprodukt der Vorratskammer",
+      "basic": "Immer zuhause vorrätig halten",
       "minThreshold": "Mindestmenge",
       "location": "Standort",
       "locationPlaceholder": "Standort auswählen",
       "locationAdd": {
-        "option": "+ Standort hinzufügen"
+        "option": "+ Standort hinzufügen",
+        "unassigned": "Nicht zugeordnet"
       },
       "batches": {
         "title": "Chargen",
@@ -519,12 +535,24 @@
         "titleIndex": "Charge {{ index }}",
         "quantity": "Menge",
         "expiry": "Haltbarkeitsdatum",
+        "location": "Standort",
         "opened": "Geöffnet"
+      },
+      "quantity": {
+        "title": "Menge",
+        "current": "Menge",
+        "initial": "Anfangsmenge",
+        "hint": "Gesamtmenge des Produkts erhöhen oder verringern"
       }
     },
     "detail": {
       "earliest": "Läuft zuerst ab: {{ date }}",
       "noBatches": "Keine Chargen erfasst.",
+      "noExpiry": "Kein Ablaufdatum",
+      "quantity": {
+        "single": "{{ quantity }} Einheit",
+        "plural": "{{ quantity }} Einheiten"
+      },
       "batchSummary": {
         "none": "Keine Chargen erfasst",
         "total": {
@@ -570,6 +598,12 @@
         "collapse": "Produktdetails reduzieren"
       }
     },
+    "quantitySheet": {
+      "currentQuantity": "Menge",
+      "increase": "Erhöhen",
+      "decrease": "Verringern",
+      "viewDetails": "Chargen anzeigen"
+    },
     "toasts": {
       "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
       "saveError": "Das Produkt konnte nicht gespeichert werden.",
@@ -588,8 +622,9 @@
     "headline": "Entfalte das volle Potenzial deiner Vorratskammer",
     "subtitle": "Intelligente Automatisierung und priorisierte Funktionen.",
     "benefits": {
-      "agent": "KI-Menüplaner, der dir passende Menüs und Rezepte vorschlägt.",
-      "future": "Frühzeitiger Zugriff auf zukünftige PRO-Funktionen."
+      "agent": "Dein persönlicher Kochassistent: Menüs und Rezepte auf deinen Vorrat und Geschmack abgestimmt.",
+      "history": "Unbegrenzter Verlauf zur Musteranalyse und Optimierung deiner Einkäufe.",
+      "future": "Sei der Erste, der neue Funktionen vor allen anderen testet."
     },
     "actions": {
       "maybeLater": "Vielleicht später",
@@ -620,15 +655,15 @@
     "title": "Einstellungen",
     "pro": {
       "statusDescription": "Danke für deine Unterstützung. PRO ist auf diesem Gerät aktiv.",
-      "upgradePrompt": "Werde PRO, um Premium-Funktionen freizuschalten.",
+      "upgradePrompt": "Werde PRO, um deinen vollständigen Verlauf und Premium-Funktionen freizuschalten.",
       "upgradeCta": "PRO werden",
       "badgePro": "PRO aktiv"
     },
     "appearance": {
       "title": "Erscheinungsbild",
-      "subtitle": "Lege fest, wie die App aussieht.",
+      "subtitle": "Wähle den Look, der dir gefällt.",
       "theme": "Design",
-      "description": "Hellen Modus, dunklen Modus oder Systemeinstellung verwenden.",
+      "description": "Wähle hell, dunkel oder folge dem System.",
       "light": "Hell",
       "dark": "Dunkel",
       "system": "System",
@@ -636,43 +671,49 @@
     },
     "ai": {
       "title": "KI",
-      "subtitle": "Gib dem Planer zusätzlichen Kontext.",
+      "subtitle": "Sag dem Planer, was er merken soll.",
       "contextTitle": "Kontext / Gedächtnis",
-      "contextDescription": "Beschreibe Haushalt, Ernährungsweisen, Abneigungen oder alles, was der Planer sich merken soll.",
-      "contextPlaceholder": "Beispiel: Wir sind zwei Erwachsene und ein Kleinkind. Kein scharfes Essen und keine Erdnüsse. Fokus auf mediterrane Rezepte.",
-      "saveAction": "KI-Kontext speichern",
+      "contextDescription": "Teile Haushalt, Ernährungsweisen, Abneigungen oder alles, was wir beachten sollen.",
+      "contextPlaceholder": "Bsp.: Familie mit 3 Personen, keine Nüsse, mediterrane Küche.",
+      "saveAction": "Kontext speichern",
       "saveSuccess": "Kontext gespeichert.",
       "saveError": "Planer-Kontext konnte nicht gespeichert werden."
     },
+    "advanced": {
+      "title": "Erweitert",
+      "subtitle": "Tools für Daten und Kataloge.",
+      "openTitle": "Erweitert öffnen",
+      "openSubtitle": "Kataloge und Gerätedaten verwalten."
+    },
     "data": {
       "title": "Datenverwaltung",
-      "subtitle": "Verwalte den lokalen Speicher der App.",
-      "resetTitle": "Daten löschen / App zurücksetzen",
-      "resetDescription": "Löscht alle auf diesem Gerät gespeicherten Informationen.",
+      "subtitle": "Verwalte, was auf diesem Gerät gespeichert ist.",
+      "resetTitle": "Daten löschen",
+      "resetDescription": "Entfernt alles, was auf diesem Gerät gespeichert ist.",
       "resetAction": "Löschen",
       "exportTitle": "Daten exportieren",
-      "exportDescription": "Lade eine JSON-Datei mit deinen aktuellen Daten herunter.",
+      "exportDescription": "Lade eine Sicherungsdatei herunter.",
       "exportAction": "Exportieren",
       "importTitle": "Daten importieren",
-      "importDescription": "Stelle eine zuvor exportierte JSON-Sicherung wieder her.",
+      "importDescription": "Stelle eine zuvor exportierte Sicherung wieder her.",
       "importAction": "Importieren"
     },
     "reset": {
-      "confirm": "Dadurch werden ALLE lokalen App-Daten gelöscht.\nMöchtest du fortfahren?",
+      "confirm": "Dadurch werden alle auf diesem Gerät gespeicherten Daten gelöscht.\nMöchtest du fortfahren?",
       "success": "Lokale Daten gelöscht.",
       "error": "Die App konnte nicht bereinigt werden."
     },
     "export": {
       "unavailable": "Der Export ist in dieser Umgebung nicht verfügbar.",
-      "readyToShare": "📤 Daten bereit zum Teilen.",
-      "success": "📦 Daten exportiert.",
+      "readyToShare": "Deine Sicherung ist bereit zum Teilen.",
+      "success": "Daten exportiert.",
       "error": "Die Daten konnten nicht exportiert werden.",
       "shareTitle": "Pantry Manager – Sicherung",
       "shareText": "Exportiere oder teile dein Backup."
     },
     "import": {
       "confirm": "Dies ersetzt deine aktuellen Daten durch die ausgewählte Datei. Möchtest du fortfahren?",
-      "success": "✅ Daten importiert. App wird neu gestartet…",
+      "success": "Daten importiert. App wird neu gestartet…",
       "error": "Die Daten konnten nicht importiert werden. Bitte überprüfe die Datei.",
       "invalid": "Die ausgewählte Datei ist kein gültiges Backup.",
       "empty": "Die Datei enthält keine importierbaren Daten."
@@ -680,9 +721,9 @@
     "loadError": "Beim Laden der Einstellungen ist ein Problem aufgetreten.",
     "catalogs": {
       "title": "Kataloge",
-      "subtitle": "Verwalte wiederverwendbare Listen zur Organisation der Vorratskammer.",
+      "subtitle": "Verwalte die Listen, die die App nutzt.",
       "manageTitle": "Katalogverwaltung öffnen",
-      "manageSubtitle": "Bearbeite Standorte, Kategorien und Supermärkte im Detail.",
+      "manageSubtitle": "Bearbeite Standorte, Kategorien und Supermärkte.",
       "saveSuccess": "Kataloge aktualisiert.",
       "saveError": "Kataloge konnten nicht gespeichert werden.",
       "loadError": "Kataloge konnten nicht geladen werden.",
@@ -715,7 +756,7 @@
       },
       "supermarkets": {
         "title": "Supermärkte",
-        "subtitle": "Lege die verfügbare Liste beim Zuweisen von Supermärkten fest.",
+        "subtitle": "Wähle, welche Supermärkte beim Bearbeiten angezeigt werden.",
         "empty": "Füge einen Supermarkt hinzu, um zu beginnen.",
         "field": "Supermarkt {{ index }}",
         "add": "Supermarkt hinzufügen",
@@ -729,21 +770,24 @@
     },
     "tutorial": {
       "title": "Tutorial ansehen",
-      "subtitle": "Sieh dir das Onboarding jederzeit erneut an."
+      "subtitle": "Onboarding jederzeit erneut ansehen."
     },
     "dev": {
       "title": "Entwicklung",
-      "subtitle": "Tools zum Testen von Onboarding und Setup.",
+      "subtitle": "Tools zum Testen von Onboarding und Einrichtung.",
       "setupTitle": "Setup ansehen",
       "setupSubtitle": "Öffne den Setup-Flow zur Katalogkonfiguration."
     },
     "info": {
-      "title": "Informationen",
-      "subtitle": "Kurze Details zur Anwendung.",
+      "title": "Über die App",
+      "subtitle": "Version, Bewertungen und Support.",
       "version": "Version",
       "feedbackTitle": "Feedback senden",
       "feedbackSubtitle": "Teile Vorschläge oder melde Probleme.",
-      "feedbackAction": "Feedback senden"
+      "feedbackAction": "Feedback senden",
+      "rateTitle": "App bewerten",
+      "rateSubtitle": "Gefällt dir PantryMind? Hinterlasse eine Bewertung.",
+      "rateAction": "Im Play Store bewerten"
     }
   },
   "reviews": {

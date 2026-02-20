@@ -1,9 +1,8 @@
 import type { BaseDoc } from './base-doc.model';
 
 export interface User extends BaseDoc {
-  type: 'user';
+  readonly type: 'user';
   name: string;
-  email?: string;
-  householdId: string;
+  readonly householdId: string;
   role: 'admin' | 'member';
 }

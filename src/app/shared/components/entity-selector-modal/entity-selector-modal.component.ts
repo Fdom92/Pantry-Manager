@@ -23,7 +23,6 @@ export interface EntitySelectorEntry {
   id: string;
   title: string;
   quantity: number;
-  unitLabel: string;
   maxQuantity?: number;
 }
 
@@ -73,6 +72,8 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Input() showMeta = false;
   @Input() showAllOnFocus = true;
   @Input() autofocus = true;
+  @Input() secondaryActionLabel = '';
+  @Input() showSecondaryAction = false;
 
   @Output() willDismiss = new EventEmitter<void>();
   @Output() didDismiss = new EventEmitter<void>();
@@ -81,6 +82,7 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Output() emptyAction = new EventEmitter<string>();
   @Output() adjustEntry = new EventEmitter<{ entry: EntitySelectorEntry; delta: number }>();
   @Output() save = new EventEmitter<void>();
+  @Output() secondaryAction = new EventEmitter<void>();
 
   canIncrease(entry: EntitySelectorEntry): boolean {
     if (entry.maxQuantity == null || !Number.isFinite(entry.maxQuantity)) {

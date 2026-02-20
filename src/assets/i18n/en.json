@@ -8,71 +8,41 @@
   },
   "onboarding": {
     "tagline": "Get set up in a minute",
+    "taglineDone": "Ready to start",
     "actions": {
       "skip": "Skip",
       "next": "Next",
-      "start": "Get started"
+      "start": "Start",
+      "skipHint": "You can skip this tutorial anytime."
     },
     "slides": {
-      "dashboard": {
-        "title": "Home",
-        "description": "Alerts and a quick pantry snapshot."
+      "problem": {
+        "title": "Throwing away food you forgot you had?",
+        "description": "Avoid throwing away food and money. Track what you have before it expires."
       },
-      "pantry": {
-        "title": "Pantry",
-        "description": "Add items, track stock and expirations."
+      "simple": {
+        "title": "Organize your pantry in seconds",
+        "description": "Add products, track quantities, and get alerts before they expire."
       },
-      "planner": {
-        "title": "Planner",
-        "description": "Meal ideas and plans based on what you have."
+      "benefit": {
+        "title": "Save money and time",
+        "description": "Buy only what you need and use what you already have."
       },
-      "shopping": {
-        "title": "Shopping",
-        "description": "Build a list and tick items as you shop."
-      },
-      "settings": {
-        "title": "Settings",
-        "description": "Tune catalogs, alerts, and app preferences."
-      }
-    }
-  },
-  "setup": {
-    "tagline": "Personalize your pantry",
-    "stepIndicator": "Step {{ current }} of {{ total }}",
-    "actions": {
-      "skip": "Skip",
-      "continue": "Continue",
-      "finish": "Start"
-    },
-    "validation": {
-      "locationsOptional": "You can skip this step if you don’t want to add locations now.",
-      "categoriesOptional": "You can add categories later."
-    },
-    "locations": {
-      "title": "Where do you store things?",
-      "description": "Pick the locations you use most so we can suggest them later.",
-      "options": {
-        "pantry": "Pantry",
-        "fridge": "Fridge",
-        "kitchen": "Kitchen",
-        "freezer": "Freezer"
+      "action": {
+        "title": "Start by adding your first product",
+        "description": "Tap the + button and build your pantry in minutes."
       }
     },
-    "categories": {
-      "title": "What do you stock?",
-      "description": "Select the categories you usually buy. You can change them later.",
-      "options": {
-        "proteins": "Proteins",
-        "dairy": "Dairy",
-        "fruits": "Fruit",
-        "drinks": "Drinks",
-        "cereals": "Cereals",
-        "condiments": "Condiments",
-        "canned": "Canned goods",
-        "sweets": "Sweets",
-        "snacks": "Snacks",
-        "vegetables": "Vegetables",
-        "household": "Household"
+    "mock": {
+      "items": {
+        "milk": "Milk",
+        "pasta": "Pasta",
+        "tomatoes": "Tomatoes"
+      },
+      "status": {
+        "expired": "Expired",
+        "low": "Low",
+        "ok": "OK"
       }
     }
   },
@@ -82,6 +52,7 @@
       "cancel": "Cancel",
       "add": "Add",
       "save": "Save",
+      "edit": "Edit",
       "apply": "Apply",
       "clear": "Clear"
     },
@@ -109,13 +80,13 @@
       "subtitle": "Add your first product to track stock and expirations."
     },
     "shopping": {
-      "title": "Shopping list is clear"
+      "title": "All set"
     }
   },
   "history": {
     "title": "History",
     "pro": {
-      "cta": "See more events with PRO"
+      "cta": "View your complete history and analyze patterns with PRO"
     },
     "filters": {
       "title": "History filters",
@@ -154,7 +125,64 @@
   },
   "dashboard": {
     "title": "Home",
+    "aria": "Your pantry dashboard",
     "confirmDeleteExpired": "This will delete all expired products. Continue?",
+    "health": {
+      "critical": {
+        "title": "Your pantry needs attention",
+        "description": "There are products that require immediate action"
+      },
+      "attention": {
+        "title": "Check your pantry soon",
+        "description": "Some products are expiring soon",
+        "trackingTitle": "Improve your control",
+        "trackingDescription": "Many products don't have tracking dates"
+      },
+      "optimal": {
+        "controlledTitle": "Everything's under control",
+        "controlledDescription": "You have products with no recent activity",
+        "perfectTitle": "Your pantry is perfect",
+        "perfectDescription": "No expired or expiring products"
+      }
+    },
+    "sections": {
+      "actions": {
+        "title": "What to do now"
+      }
+    },
+    "actions": {
+      "expired": {
+        "title": "Review expired products",
+        "description_one": "{{ count }} product has expired",
+        "description_other": "{{ count }} products have expired",
+        "cta": "View products"
+      },
+      "nearExpiry": {
+        "title": "Products expiring soon",
+        "titlePro": "Plan before they expire",
+        "description": "{{ count }} products expire in {{ days }} days",
+        "cta": "View products",
+        "ctaPro": "Generate recipes"
+      },
+      "stale": {
+        "title": "Products with no activity",
+        "description": "{{ count }} products haven't moved in 30+ days",
+        "cta": "Review"
+      },
+      "weeklyPlan": {
+        "title": "Plan your week",
+        "description": "Optimize your pantry with a weekly plan",
+        "cta": "Create plan"
+      },
+      "upgrade": {
+        "title": "Make the most of your pantry",
+        "description": "Personalized recipes and weekly planning with AI",
+        "cta": "Discover PRO"
+      }
+    },
+    "context": {
+      "recentlyAdded": "{{ count }} recently added products"
+    },
     "summary": {
       "title": "Pantry overview",
       "toggle": "Toggle pantry overview",
@@ -169,11 +197,11 @@
     "overview": {
       "aria": "Pantry overview",
       "sections": {
+        "summary": {
+          "title": "Summary"
+        },
         "alerts": {
           "title": "Alerts"
-        },
-        "dailyActions": {
-          "title": "Daily actions"
         },
         "control": {
           "title": "Control"
@@ -186,6 +214,17 @@
         }
       },
       "cards": {
+        "summary": {
+          "total": "Total",
+          "basic": "Essentials",
+          "complete": "With dates",
+          "healthStatus": {
+            "allGood": "Everything's under control",
+            "checkSoon": "Some items need attention",
+            "needsAttention": "Your pantry needs a check"
+          },
+          "staleItems": "{{ count }} items untouched for 30+ days"
+        },
         "nearExpiry": {
           "title": "Expiring soon",
           "body": "{{ count }} products this week",
@@ -195,11 +234,6 @@
           "title": "Expired",
           "body": "{{ count }} expired products",
           "action": "View"
-        },
-        "pendingReview": {
-          "title": "Pantry to complete",
-          "body": "{{ count }} products to review",
-          "action": "Review"
         },
         "lowOrEmpty": {
           "title": "Low stock",
@@ -211,11 +245,6 @@
           "body": "{{ count }} items pending",
           "action": "View"
         },
-        "consumeToday": {
-          "title": "Consumed today",
-          "body": "Log what you used today",
-          "action": "Add"
-        },
         "recentlyAdded": {
           "title": "Recently added",
           "body": "{{ count }} new products",
@@ -225,7 +254,6 @@
       "toasts": {
         "expiredEmpty": "All good — nothing expired.",
         "nearExpiryEmpty": "All good — nothing expiring soon.",
-        "pendingReviewEmpty": "All good — nothing pending to complete.",
         "lowOrEmptyEmpty": "All good — no low-stock items.",
         "recentlyAddedEmpty": "All good — nothing recently added.",
         "shoppingEmpty": "All good — your shopping list is empty.",
@@ -241,13 +269,8 @@
     "lowStock": {
       "title": "Low stock alerts",
       "subtitle": "At or below the minimum level",
-      "minLabel": "min {{ value }} {{ unit }}",
+      "minLabel": "min {{ value }}",
       "empty": "All items are above their minimum level."
-    },
-    "batches": {
-      "single": "1 batch",
-      "plural": "{{ count }} batches",
-      "withExpiry": "{{ batchLabel }}, exp {{ date }}"
     },
     "expired": {
       "title": "Expired items",
@@ -261,16 +284,6 @@
       "updated": "Updated {{ date }}",
       "badge": "New",
       "empty": "No recent updates."
-    },
-    "consumeToday": {
-      "title": "Consumed today",
-      "cardTitle": "Add products",
-      "selectHint": "Pick what you used today, then set quantities.",
-      "listTitle": "Your list",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "empty": "No items added yet.",
-      "save": "Save"
     }
   },
   "shopping": {
@@ -280,20 +293,11 @@
       "below-min": "Low stock",
       "empty": "Out of stock"
     },
-    "purchaseModal": {
-      "titleProduct": "Purchase product",
-      "productName": "Name",
-      "quantity": "Quantity",
-      "quantityPlaceholder": "0",
-      "expiry": "Expiry date (optional)",
-      "addToPantry": "Add"
-    },
     "suggestions": {
       "title": "Shopping list",
       "loading": "Building shopping list…",
-      "totalStock": "Total stock: {{ amount }} {{ unit }}",
-      "minStock": "Min: {{ amount }} {{ unit }}",
-      "empty": "Nothing pending right now. I'll let you know when something needs restocking."
+      "toBuy": "Buy {{ amount }}",
+      "empty": "Mark products as \"always keep at home\" to get notified when they run low."
     },
     "share": {
       "button": "Share list",
@@ -317,68 +321,58 @@
         "dismiss": "Not now"
       },
       "weeklyMealPlanning": {
-        "title": "Plan your meals for the week",
-        "description": "Plan this week's meals with what you already have.",
-        "cta": "Plan now",
+        "title": "Plan the week?",
+        "description": "Good time to organize your meals with what you have at home.",
+        "cta": "Let's go",
         "prompt": "Plan my meals for this week using only what I already have in the pantry."
       },
       "cookBeforeExpiry": {
-        "title": "Cook before they expire",
-        "description": "Use up the products that are about to expire and still have stock.",
-        "cta": "Use expiring items",
+        "title": "You have items expiring soon",
+        "description": "I'll suggest recipes to use them before they go bad.",
+        "cta": "Give me ideas",
         "prompt": "Suggest recipes that prioritize the products expiring soon in my pantry."
       },
-      "lunchIdeas": {
-        "title": "What can I make for lunch?",
-        "description": "Quick lunch ideas using your pantry.",
-        "cta": "See ideas",
-        "prompt": "Give me lunch options for today using what I already have."
-      },
-      "dinnerIdeas": {
-        "title": "What can I make for dinner?",
-        "description": "Dinner suggestions with what you already have.",
-        "cta": "Plan dinner",
-        "prompt": "Plan a simple dinner using the ingredients in my pantry."
-      },
-      "whatToCookNow": {
-        "title": "What should I cook now?",
-        "description": "Not sure what to eat? I'll suggest ideas with your pantry.",
-        "cta": "Give me ideas",
-        "prompt": "Share quick meal ideas using only the ingredients I already own."
+      "smartCookingIdeas": {
+        "title": "What should I cook today?",
+        "description": "I'll give you ideas with what you have in your pantry right now.",
+        "cta": "Inspire me",
+        "prompt": "Give me cooking ideas using the ingredients I have available."
       },
       "planAndSaveTime": {
-        "title": "Plan meals and save time every week",
-        "description": "Unlock the PRO planner and organize your menu easily.",
-        "cta": "Go PRO"
+        "title": "Plan the week with AI",
+        "description": "With PRO, organize your weekly menu and save time every day.",
+        "cta": "Try PRO"
+      },
+      "historyUnlimited": {
+        "title": "What do you waste most?",
+        "description": "With PRO, discover what you throw away and buy only what you need.",
+        "cta": "Learn more"
+      },
+      "smartInsights": {
+        "title": "Alerts before expiry",
+        "description": "With PRO, I'll tell you what to cook so you don't waste anything.",
+        "cta": "Learn more"
+      },
+      "pantryHealthy": {
+        "title": "Your pantry is in great shape",
+        "description": "Everything's under control. A good time to plan your next shopping list.",
+        "cta": "View list"
+      },
+      "addExpiryDates": {
+        "title": "Add expiry dates to your items",
+        "description": "Track what to use first and avoid unpleasant surprises in your pantry.",
+        "cta": "Go to pantry"
+      },
+      "lowStockReminder": {
+        "title": "Some items are running low",
+        "description": "Add them to your shopping list so you don't run out.",
+        "cta": "Go to list"
+      },
+      "organizeWithCategories": {
+        "title": "Organize your pantry by category",
+        "description": "Group your products to find them faster and keep everything under control.",
+        "cta": "Organize now"
       }
-    }
-  },
-  "upToDate": {
-    "title": "Get up to date",
-    "subtitle": "Review a few products to keep your pantry accurate and up to date",
-    "progress": "Products pending {{ pending }} of {{ total }}",
-    "lastUpdated": "Last updated: {{ date }}",
-    "fields": {
-      "expiry": "Expiry date",
-      "stock": "Stock"
-    },
-    "edit": {
-      "title": "Update product",
-      "expiryToggle": "Add expiry date"
-    },
-    "reasons": {
-      "stale-update": "Not updated in a while",
-      "missing-info": "Missing information"
-    },
-    "actions": {
-      "keep": "Keep it",
-      "delete": "Delete",
-      "edit": "Edit",
-      "skip": "Skip for now"
-    },
-    "done": {
-      "title": "Pantry up to date, nice work",
-      "subtitle": "Returning to your dashboard…"
     }
   },
   "agent": {
@@ -391,12 +385,13 @@
     "placeholder": "Ask for recipes, meal plans, or ways to use what you have.",
     "actions": {
       "send": "Send",
-      "retry": "Retry"
+      "retry": "Retry",
+      "clear": "Clear chat"
     },
     "preview": {
       "badge": "Preview",
-      "title": "See the planning layer",
-      "headline": "Ideas and plans powered by AI",
+      "title": "PRO Planner",
+      "headline": "Recipes and meal plans from what's in your pantry",
       "subtitle": "Get recipes, menus, and insights tailored to your pantry.",
       "cta": "Unlock meal planner",
       "demo": {
@@ -408,21 +403,32 @@
     },
     "quickStart": {
       "title": "Contextual entry",
-      "headline": "Start planning without an empty chat",
-      "subtitle": "Pick an intention and the planner reacts instantly.",
+      "headline": "Start with something specific",
+      "subtitle": "Tap an option and the planner gets going on its own.",
       "ctaTitle": "Start with one tap",
-      "ctaSubtitle": "Choose how you want to plan today.",
-      "today": "What can I cook with what I have?",
-      "quickIdeas": "Give me quick recipe ideas",
-      "weeklyPlan": "Plan my meals for this week",
-      "useExpiring": "Use ingredients that are about to expire",
-      "decideForMe": "Decide for me",
-      "customPrompt": "Ask something else"
+      "ctaSubtitle": "Where do we start today?",
+      "today": "What do I cook today?",
+      "todayPrompt": "What can I cook today with what I have at home? Give me a few ideas.",
+      "weeklyPlan": "Weekly plan",
+      "weeklyPlanPrompt": "Put together a weekly menu for me — 7 days, breakfast, lunch and dinner — using what's in my pantry.",
+      "useExpiring": "What's expiring",
+      "useExpiringPrompt": "I have things about to expire. What should I cook so they don't go to waste?",
+      "surpriseMe": "Surprise me",
+      "surpriseMePrompt": "Pick a recipe I can make with what I have and surprise me. Just one.",
+      "customPrompt": "Free question ✏️"
     },
     "messages": {
       "noResponse": "Couldn't generate a response.",
-      "unifiedError": "The meal planner couldn’t reply right now. Please try again in a few seconds."
-    }
+      "unifiedError": "The meal planner couldn't reply right now. Please try again in a few seconds."
+    },
+    "errors": {
+      "coldStart": "The service is starting up. Please try again in a few seconds.",
+      "rateLimit": "Too many requests. Please wait a moment before trying again.",
+      "timeout": "The request took too long. Check your connection and try again.",
+      "offline": "No internet connection. Please connect and try again.",
+      "generic": "Something went wrong. Please try again in a few moments."
+    },
+    "disclaimer": "Recipes and meal plans are generated by AI and may contain errors."
   },
   "pantry": {
     "title": "Pantry",
@@ -460,7 +466,8 @@
       "submit": "Add to pantry",
       "singleSuccess": "1 product added",
       "success": "{{ count }} products added",
-      "error": "Couldn't add the products."
+      "error": "Couldn't add the products.",
+      "createAdvanced": "Create product with advanced details"
     },
     "addMode": {
       "title": "Select mode",
@@ -482,7 +489,15 @@
     "batches": {
       "title": "Product batches",
       "count": "{{ count }} batches recorded",
-      "open": "Opened"
+      "open": "Opened",
+      "noExpiryDate": "No expiration date",
+      "expires": {
+        "today": "Expires today",
+        "tomorrow": "Expires tomorrow"
+      },
+      "expired": {
+        "yesterday": "Expired yesterday"
+      }
     },
     "form": {
       "editTitle": "Edit item",
@@ -505,12 +520,13 @@
         "title": "Add supermarket",
         "placeholder": "Supermarket name"
       },
-      "basic": "Pantry staple item",
+      "basic": "Always keep at home",
       "minThreshold": "Minimum quantity",
       "location": "Location",
       "locationPlaceholder": "Select a location",
       "locationAdd": {
-        "option": "+ Add location"
+        "option": "+ Add location",
+        "unassigned": "Unassigned"
       },
       "batches": {
         "title": "Batches",
@@ -519,12 +535,24 @@
         "titleIndex": "Batch {{ index }}",
         "quantity": "Quantity",
         "expiry": "Expiration date",
+        "location": "Location",
         "opened": "Opened"
+      },
+      "quantity": {
+        "title": "Quantity",
+        "current": "Quantity",
+        "initial": "Initial quantity",
+        "hint": "Increase or decrease the total product quantity"
       }
     },
     "detail": {
       "earliest": "Expires first: {{ date }}",
       "noBatches": "No batches recorded.",
+      "noExpiry": "No expiration",
+      "quantity": {
+        "single": "{{ quantity }} unit",
+        "plural": "{{ quantity }} units"
+      },
       "batchSummary": {
         "none": "No batches recorded",
         "total": {
@@ -563,12 +591,19 @@
       },
       "actions": {
         "viewBatches": "View batches",
-        "editItem": "Edit item",
+        "editItem": "Edit product",
         "deleteItem": "Delete item",
         "menuLabel": "Open actions menu",
         "expand": "Expand item details",
         "collapse": "Collapse item details"
       }
+    },
+    "quantitySheet": {
+      "currentQuantity": "Quantity",
+      "hint": "Adjust the quantity. It will be saved when closed.",
+      "increase": "Increase",
+      "decrease": "Decrease",
+      "viewDetails": "View batches"
     },
     "toasts": {
       "locationRequired": "Select a location before saving.",
@@ -588,8 +623,9 @@
     "headline": "Unlock the full pantry superpowers",
     "subtitle": "Smarter automation and priority features.",
     "benefits": {
-      "agent": "AI meal planner that proposes menus and recipes tailored to you.",
-      "future": "Early access to upcoming PRO features."
+      "agent": "Your personal cooking assistant: menus and recipes tailored to your pantry and tastes.",
+      "history": "Unlimited history to analyze patterns and optimize your shopping.",
+      "future": "Be the first to try new features before anyone else."
     },
     "actions": {
       "maybeLater": "Maybe later",
@@ -620,15 +656,15 @@
     "title": "Settings",
     "pro": {
       "statusDescription": "Thank you for supporting the project. PRO is active on this device.",
-      "upgradePrompt": "Upgrade to PRO to unlock premium features.",
+      "upgradePrompt": "Upgrade to PRO to unlock your full history and premium features.",
       "upgradeCta": "Upgrade to PRO",
       "badgePro": "PRO active"
     },
     "appearance": {
       "title": "Appearance",
-      "subtitle": "Choose how the app looks.",
+      "subtitle": "Pick the look that feels right.",
       "theme": "Theme",
-      "description": "Switch between light, dark or follow the system.",
+      "description": "Choose light, dark, or follow your device.",
       "light": "Light",
       "dark": "Dark",
       "system": "System",
@@ -636,35 +672,41 @@
     },
     "ai": {
       "title": "AI",
-      "subtitle": "Share context for the planner.",
+      "subtitle": "Tell the planner what to remember.",
       "contextTitle": "Context / Memory",
-      "contextDescription": "Tell the planner about your household, diets, dislikes or any preference it should always remember.",
-      "contextPlaceholder": "Example: We are two adults and a toddler. Avoid spicy food and peanuts. Focus on Mediterranean recipes.",
-      "saveAction": "Save AI context",
+      "contextDescription": "Share your household, diets, dislikes, or anything you want us to keep in mind.",
+      "contextPlaceholder": "E.g.: Family of 3, no nuts, Mediterranean cuisine.",
+      "saveAction": "Save context",
       "saveSuccess": "Planner context saved.",
       "saveError": "Could not save the planner context."
     },
+    "advanced": {
+      "title": "Advanced",
+      "subtitle": "Tools for data and catalogs.",
+      "openTitle": "Open advanced",
+      "openSubtitle": "Manage catalogs and data on this device."
+    },
     "data": {
       "title": "Data management",
-      "subtitle": "Control what is stored on this device.",
-      "resetTitle": "Clear data / Reset app",
-      "resetDescription": "Remove all information saved on this device.",
+      "subtitle": "Control what’s saved on this device.",
+      "resetTitle": "Clear data",
+      "resetDescription": "Remove everything saved on this device.",
       "resetAction": "Clear",
       "exportTitle": "Export data",
-      "exportDescription": "Download a JSON file with your current data.",
+      "exportDescription": "Download a backup file with your data.",
       "exportAction": "Export",
       "importTitle": "Import data",
-      "importDescription": "Restore a JSON backup you exported earlier.",
+      "importDescription": "Restore a backup you exported earlier.",
       "importAction": "Import"
     },
     "reset": {
-      "confirm": "This will delete ALL local app data.\nDo you want to continue?",
+      "confirm": "This will delete all data saved on this device.\nDo you want to continue?",
       "success": "Local data removed.",
       "error": "Could not clear the app."
     },
     "export": {
       "unavailable": "Export is not available in this environment.",
-      "readyToShare": "Data ready to share.",
+      "readyToShare": "Your backup is ready to share.",
       "success": "Data exported.",
       "error": "Could not export the data.",
       "shareTitle": "Pantry Manager - Backup",
@@ -672,7 +714,7 @@
     },
     "import": {
       "confirm": "This will replace your current data with the selected file. Continue?",
-      "success": "Data imported. Restarting app...",
+      "success": "Data imported. Restarting the app...",
       "error": "Could not import the data. Please check the file.",
       "invalid": "The selected file is not a valid backup.",
       "empty": "The file has no data to import."
@@ -680,9 +722,9 @@
     "loadError": "There was a problem loading settings.",
     "catalogs": {
       "title": "Catalogs",
-      "subtitle": "Manage reusable lists for organizing your pantry.",
+      "subtitle": "Manage the lists you use in the app.",
       "manageTitle": "Open catalog manager",
-      "manageSubtitle": "Edit locations, categories and supermarkets in detail.",
+      "manageSubtitle": "Edit locations, categories, and supermarkets.",
       "saveSuccess": "Catalogs updated.",
       "saveError": "Could not save catalogs.",
       "loadError": "Could not load catalogs.",
@@ -715,7 +757,7 @@
       },
       "supermarkets": {
         "title": "Supermarkets",
-        "subtitle": "Define the list shown when assigning supermarkets to products.",
+        "subtitle": "Choose which supermarkets appear when editing products.",
         "empty": "Add a supermarket to get started.",
         "field": "Supermarket {{ index }}",
         "add": "Add supermarket",
@@ -729,21 +771,24 @@
     },
     "tutorial": {
       "title": "View tutorial",
-      "subtitle": "Replay the onboarding whenever you need it."
+      "subtitle": "Replay the onboarding anytime."
     },
     "dev": {
       "title": "Developer",
-      "subtitle": "Tools for testing onboarding and setup flows.",
+      "subtitle": "Tools for testing onboarding and setup.",
       "setupTitle": "View setup",
       "setupSubtitle": "Open the setup flow to configure catalogs."
     },
     "info": {
-      "title": "Information",
-      "subtitle": "Quick app details.",
+      "title": "About",
+      "subtitle": "Version, ratings and support.",
       "version": "Version",
       "feedbackTitle": "Send feedback",
-      "feedbackSubtitle": "Share suggestions or report issues.",
-      "feedbackAction": "Send feedback"
+      "feedbackSubtitle": "Share ideas or report issues.",
+      "feedbackAction": "Send feedback",
+      "rateTitle": "Rate the app",
+      "rateSubtitle": "Enjoying PantryMind? Leave us a review.",
+      "rateAction": "Rate on Play Store"
     }
   },
   "reviews": {

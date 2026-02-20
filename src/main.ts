@@ -9,30 +9,37 @@ import localePt from '@angular/common/locales/pt';
 import { APP_INITIALIZER, LOCALE_ID, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { AppPreferencesService, LanguageService } from '@core/services';
+import { LanguageService, SettingsPreferencesService } from '@core/services';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { addIcons } from 'ionicons';
 import {
+  add,
   addCircleOutline,
   addOutline,
+  alertCircle,
   alertCircleOutline,
   apertureOutline,
+  arrowForwardOutline,
   basketOutline,
   bulbOutline,
   calendarOutline,
   cartOutline,
   chatbubblesOutline,
+  checkmarkCircle,
   checkmarkCircleOutline,
   chevronDownOutline,
+  chevronForwardOutline,
   chevronUpOutline,
   clipboardOutline,
   close,
+  closeOutline,
   cloudUploadOutline,
   constructOutline,
   createOutline,
   cubeOutline,
+  desktopOutline,
   ellipsisVerticalOutline,
   enterOutline,
   exitOutline,
@@ -41,14 +48,18 @@ import {
   flashOutline,
   homeOutline,
   hourglassOutline,
+  informationCircle,
+  informationOutline,
   layersOutline,
   listOutline,
   locationOutline,
   lockClosedOutline,
+  moonOutline,
   navigateOutline,
   paperPlaneOutline,
   pricetagOutline,
   refreshOutline,
+  remove,
   removeCircleOutline,
   removeOutline,
   restaurantOutline,
@@ -59,10 +70,12 @@ import {
   speedometerOutline,
   starOutline,
   storefrontOutline,
+  sunnyOutline,
   swapHorizontalOutline,
   timeOutline,
   trashOutline,
-  trendingDownOutline
+  trendingDownOutline,
+  warning
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -82,7 +95,7 @@ function initLanguage(language: LanguageService): () => Promise<void> {
   return () => language.init();
 }
 
-function initPreferences(appPreferences: AppPreferencesService): () => Promise<void> {
+function initPreferences(appPreferences: SettingsPreferencesService): () => Promise<void> {
   return () => appPreferences.getPreferences().then(() => void 0);
 }
 
@@ -91,6 +104,8 @@ function localeFactory(language: LanguageService): string {
 }
 
 addIcons({
+  add: add,
+  remove: remove,
   close: close,
   'home-outline': homeOutline,
   'basket-outline': basketOutline,
@@ -106,11 +121,15 @@ addIcons({
   'chevron-down-outline': chevronDownOutline,
   'filter-outline': filterOutline,
   'layers-outline': layersOutline,
+  'alert-circle': alertCircle,
   'alert-circle-outline': alertCircleOutline,
   'hourglass-outline': hourglassOutline,
   'time-outline': timeOutline,
   'trending-down-outline': trendingDownOutline,
+  'checkmark-circle': checkmarkCircle,
   'checkmark-circle-outline': checkmarkCircleOutline,
+  'information-circle': informationCircle,
+  'warning': warning,
   'list-outline': listOutline,
   'chatbubbles-outline': chatbubblesOutline,
   'star-outline': starOutline,
@@ -138,7 +157,14 @@ addIcons({
   'construct-outline': constructOutline,
   'clipboard-outline': clipboardOutline,
   'remove-circle-outline': removeCircleOutline,
-  'cloud-upload-outline': cloudUploadOutline
+  'cloud-upload-outline': cloudUploadOutline,
+  'sunny-outline': sunnyOutline,
+  'moon-outline': moonOutline,
+  'desktop-outline': desktopOutline,
+  'close-outline': closeOutline,
+  'arrow-forward-outline': arrowForwardOutline,
+  'chevron-forward-outline': chevronForwardOutline,
+  'information-circle-outline': informationOutline
 });
 
 bootstrapApplication(AppComponent, {
@@ -159,7 +185,7 @@ bootstrapApplication(AppComponent, {
       })
     ),
     { provide: APP_INITIALIZER, useFactory: initLanguage, deps: [LanguageService], multi: true },
-    { provide: APP_INITIALIZER, useFactory: initPreferences, deps: [AppPreferencesService], multi: true },
+    { provide: APP_INITIALIZER, useFactory: initPreferences, deps: [SettingsPreferencesService], multi: true },
     { provide: LOCALE_ID, useFactory: localeFactory, deps: [LanguageService] },
   ],
 }).catch(err => console.error(err));

@@ -14,9 +14,9 @@ export class PlanCardComponent {
   @Input() title = '';
   @Input() subtitle = '';
   @Input() price = '';
-  @Input() period = '';
-  @Input() badge?: string | null;
-  @Input() savings?: string | null;
+  @Input() periodLabel = '';
+  @Input() badgeLabel?: string | null;
+  @Input() savingsLabel?: string | null;
   @Input() trialLabel?: string | null;
   @Input() benefits: string[] = [];
   @Input() selected = false;
