@@ -59,12 +59,85 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
       },
     ],
   },
+  // Educational/tip insights visible to all users (teach app usage, no upgrade wall)
+  {
+    id: InsightId.PANTRY_HEALTHY,
+    titleKey: 'insights.library.pantryHealthy.title',
+    descriptionKey: 'insights.library.pantryHealthy.description',
+    category: InsightCategory.PREVENTIVE,
+    priority: 4,
+    audience: 'all',
+    predicate: context =>
+      context.products.length > 0 &&
+      context.expiringSoonCount === 0 &&
+      context.expiredItems.length === 0 &&
+      context.lowStockCount === 0,
+    ctas: [
+      {
+        id: 'pantry-healthy',
+        labelKey: 'insights.library.pantryHealthy.cta',
+        type: 'navigate',
+        route: '/shopping',
+      },
+    ],
+  },
+  {
+    id: InsightId.ADD_EXPIRY_DATES,
+    titleKey: 'insights.library.addExpiryDates.title',
+    descriptionKey: 'insights.library.addExpiryDates.description',
+    category: InsightCategory.BEHAVIOR,
+    priority: 5,
+    audience: 'all',
+    ctas: [
+      {
+        id: 'add-expiry-dates',
+        labelKey: 'insights.library.addExpiryDates.cta',
+        type: 'navigate',
+        route: '/pantry',
+      },
+    ],
+  },
+  {
+    id: InsightId.LOW_STOCK_REMINDER,
+    titleKey: 'insights.library.lowStockReminder.title',
+    descriptionKey: 'insights.library.lowStockReminder.description',
+    category: InsightCategory.CRITICAL,
+    priority: 6,
+    audience: 'all',
+    predicate: context => context.lowStockCount > 0,
+    ctas: [
+      {
+        id: 'low-stock-reminder',
+        labelKey: 'insights.library.lowStockReminder.cta',
+        type: 'navigate',
+        route: '/shopping',
+      },
+    ],
+  },
+  {
+    id: InsightId.ORGANIZE_WITH_CATEGORIES,
+    titleKey: 'insights.library.organizeWithCategories.title',
+    descriptionKey: 'insights.library.organizeWithCategories.description',
+    category: InsightCategory.OPTIMIZATION,
+    priority: 7,
+    audience: 'all',
+    predicate: context => context.products.some(p => !p.categoryId),
+    ctas: [
+      {
+        id: 'organize-with-categories',
+        labelKey: 'insights.library.organizeWithCategories.cta',
+        type: 'navigate',
+        route: '/pantry',
+      },
+    ],
+  },
+  // Non-pro upsell insights (fallback when no actionable insight applies)
   {
     id: InsightId.PLAN_AND_SAVE_TIME,
     titleKey: 'insights.library.planAndSaveTime.title',
     descriptionKey: 'insights.library.planAndSaveTime.description',
     category: InsightCategory.OPTIMIZATION,
-    priority: 4,
+    priority: 8,
     audience: 'non-pro',
     ctas: [
       {
@@ -80,7 +153,7 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
     titleKey: 'insights.library.historyUnlimited.title',
     descriptionKey: 'insights.library.historyUnlimited.description',
     category: InsightCategory.BEHAVIOR,
-    priority: 5,
+    priority: 9,
     audience: 'non-pro',
     ctas: [
       {
@@ -96,7 +169,7 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
     titleKey: 'insights.library.smartInsights.title',
     descriptionKey: 'insights.library.smartInsights.description',
     category: InsightCategory.PREVENTIVE,
-    priority: 6,
+    priority: 10,
     audience: 'non-pro',
     predicate: context => context.expiringSoonItems.length > 0,
     ctas: [
