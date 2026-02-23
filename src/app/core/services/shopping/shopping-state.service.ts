@@ -50,7 +50,7 @@ export class ShoppingStateService {
   });
 
   readonly loading = this.pantryStore.loading;
-  readonly items = this.pantryStore.items;
+  readonly items = this.pantryStore.loadedProducts;
 
   private readonly skeletonManager = new SkeletonLoadingManager();
   readonly showSkeleton = this.skeletonManager.showSkeleton;

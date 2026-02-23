@@ -34,15 +34,11 @@ ion-title {
 // LAYER 1: Pantry Health (Interpreted State)
 .pantry-health {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--app-theme-spacing-lg);
-  margin-inline: var(--app-theme-card-margin-inline);
-  padding: var(--app-theme-spacing-xl);
-  border-radius: var(--app-theme-card-border-radius);
-  background: var(--app-theme-card-bg);
-  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
-  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
-  transition: var(--app-theme-card-transition);
+  text-align: center;
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-xl) var(--app-theme-card-margin-inline);
 
   &--skeleton {
     opacity: 0.6;
@@ -52,16 +48,14 @@ ion-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 48px;
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    font-size: 28px;
+    font-size: 32px;
     flex-shrink: 0;
   }
 
   &__content {
-    flex: 1;
     min-width: 0;
   }
 
@@ -80,32 +74,20 @@ ion-title {
     line-height: var(--app-theme-line-height-normal);
   }
 
-  // State-specific styling
-  &[data-state='critical'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-critical);
-
-    .pantry-health__icon {
-      color: var(--ion-color-danger);
-      background: color-mix(in srgb, var(--ion-color-danger) 12%, transparent);
-    }
+  // State-specific icon coloring
+  &[data-state='critical'] .pantry-health__icon {
+    color: var(--ion-color-danger);
+    background: color-mix(in srgb, var(--ion-color-danger) 12%, transparent);
   }
 
-  &[data-state='attention'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-warning);
-
-    .pantry-health__icon {
-      color: var(--app-theme-card-accent-warning);
-      background: color-mix(in srgb, var(--app-theme-card-accent-warning) 12%, transparent);
-    }
+  &[data-state='attention'] .pantry-health__icon {
+    color: var(--app-theme-card-accent-warning);
+    background: color-mix(in srgb, var(--app-theme-card-accent-warning) 12%, transparent);
   }
 
-  &[data-state='optimal'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-success);
-
-    .pantry-health__icon {
-      color: var(--app-theme-card-accent-success);
-      background: color-mix(in srgb, var(--app-theme-card-accent-success) 12%, transparent);
-    }
+  &[data-state='optimal'] .pantry-health__icon {
+    color: var(--app-theme-card-accent-success);
+    background: color-mix(in srgb, var(--app-theme-card-accent-success) 12%, transparent);
   }
 }
 
