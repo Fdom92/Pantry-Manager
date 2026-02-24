@@ -602,7 +602,9 @@
       "currentQuantity": "Quantité",
       "increase": "Augmenter",
       "decrease": "Diminuer",
-      "viewDetails": "Voir les lots"
+      "viewDetails": "Voir les lots",
+      "zeroHint": "Il disparaîtra de votre garde-manger jusqu'à ce que vous en rajoutiez",
+      "zeroHintBasic": "Il disparaîtra de votre garde-manger et apparaîtra dans votre liste de courses"
     },
     "toasts": {
       "locationRequired": "Sélectionnez un emplacement avant d’enregistrer.",

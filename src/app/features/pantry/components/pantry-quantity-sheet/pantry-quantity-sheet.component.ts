@@ -42,6 +42,13 @@ export class PantryQuantitySheetComponent {
     return this.pendingChange < 0;
   }
 
+  get zeroHintKey(): string | null {
+    if (this.displayQuantity !== 0) return null;
+    return this.item.isBasic
+      ? 'pantry.quantitySheet.zeroHintBasic'
+      : 'pantry.quantitySheet.zeroHint';
+  }
+
   handleIncrement(): void {
     this.increment.emit();
   }
