@@ -32,6 +32,7 @@
     "@capacitor/filesystem": "^7.0.2",
     "@capacitor/haptics": "7.0.2",
     "@capacitor/keyboard": "7.0.3",
+    "@capacitor/local-notifications": "^7.0.5",
     "@capacitor/preferences": "^7.0.2",
     "@capacitor/share": "^7.0.2",
     "@capacitor/status-bar": "7.0.3",
