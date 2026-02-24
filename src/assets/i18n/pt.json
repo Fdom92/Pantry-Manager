@@ -602,7 +602,9 @@
       "currentQuantity": "Quantidade",
       "increase": "Aumentar",
       "decrease": "Diminuir",
-      "viewDetails": "Ver lotes"
+      "viewDetails": "Ver lotes",
+      "zeroHint": "Vai desaparecer da despensa até você adicionar mais",
+      "zeroHintBasic": "Vai desaparecer da despensa e aparecer na sua lista de compras"
     },
     "toasts": {
       "locationRequired": "Seleciona uma localização antes de guardar.",

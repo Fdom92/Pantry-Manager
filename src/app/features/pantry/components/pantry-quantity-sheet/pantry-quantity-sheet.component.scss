@@ -143,6 +143,16 @@
   color: color-mix(in srgb, var(--ion-text-color) 50%, transparent);
 }
 
+.quantity-zero-hint {
+  font-size: 0.75rem;
+  color: var(--ion-color-warning-shade);
+  text-align: center;
+  margin: 0;
+  padding: 6px 12px;
+  background: color-mix(in srgb, var(--ion-color-warning) 12%, transparent);
+  border-radius: 8px;
+}
+
 .actions-section {
   border-top: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
 }

@@ -603,7 +603,9 @@
       "hint": "Ajusta la cantidad. Se guardará al cerrar.",
       "increase": "Aumentar",
       "decrease": "Disminuir",
-      "viewDetails": "Ver lotes"
+      "viewDetails": "Ver lotes",
+      "zeroHint": "Desaparecerá de tu despensa hasta que añadas más",
+      "zeroHintBasic": "Desaparecerá de tu despensa y pasará a tu lista de la compra"
     },
     "toasts": {
       "locationRequired": "Selecciona una ubicación antes de guardar.",

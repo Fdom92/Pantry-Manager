@@ -603,7 +603,9 @@
       "hint": "Adjust the quantity. It will be saved when closed.",
       "increase": "Increase",
       "decrease": "Decrease",
-      "viewDetails": "View batches"
+      "viewDetails": "View batches",
+      "zeroHint": "It'll disappear from your pantry until you restock it",
+      "zeroHintBasic": "It'll disappear from your pantry and show up in your shopping list"
     },
     "toasts": {
       "locationRequired": "Select a location before saving.",

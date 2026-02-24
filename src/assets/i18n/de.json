@@ -602,7 +602,9 @@
       "currentQuantity": "Menge",
       "increase": "Erhöhen",
       "decrease": "Verringern",
-      "viewDetails": "Chargen anzeigen"
+      "viewDetails": "Chargen anzeigen",
+      "zeroHint": "Verschwindet aus deiner Speisekammer, bis du wieder Vorrat hinzufügst",
+      "zeroHintBasic": "Verschwindet aus deiner Speisekammer und taucht in deiner Einkaufsliste auf"
     },
     "toasts": {
       "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
