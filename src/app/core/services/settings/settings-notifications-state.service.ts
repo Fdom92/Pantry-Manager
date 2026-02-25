@@ -18,9 +18,6 @@ export class SettingsNotificationsStateService {
   readonly notifyOnLowStock = computed(() =>
     Boolean(this.appPreferences.preferences().notifyOnLowStock)
   );
-  readonly notifyOnShoppingList = computed(() =>
-    Boolean(this.appPreferences.preferences().notifyOnShoppingList)
-  );
 
   async ionViewWillEnter(): Promise<void> {
     await this.appPreferences.getPreferences();
@@ -40,10 +37,6 @@ export class SettingsNotificationsStateService {
 
   async setNotifyOnLowStock(value: boolean): Promise<void> {
     await this.save({ notifyOnLowStock: value });
-  }
-
-  async setNotifyOnShoppingList(value: boolean): Promise<void> {
-    await this.save({ notifyOnShoppingList: value });
   }
 
   private async save(patch: Partial<AppPreferences>): Promise<void> {

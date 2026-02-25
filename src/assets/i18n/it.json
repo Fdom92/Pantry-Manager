@@ -807,8 +807,6 @@
       "nearExpiryDescription": "Avviso quando ci sono prodotti in scadenza",
       "lowStockTitle": "Scorte basse",
       "lowStockDescription": "Avviso quando i prodotti essenziali sono sotto il minimo",
-      "shoppingListTitle": "Lista della spesa",
-      "shoppingListDescription": "Promemoria quando ci sono articoli in attesa nella lista della spesa"
     }
   },
   "reviews": {
@@ -826,10 +824,6 @@
     "lowStock": {
       "title": "Alcune scorte stanno finendo",
       "body": "{{ count }} prodotti essenziali sono sotto il minimo"
-    },
-    "shoppingList": {
-      "title": "La tua lista della spesa ti aspetta",
-      "body": "Hai {{ count }} articoli da comprare"
     }
   }
 }

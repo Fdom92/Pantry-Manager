@@ -70,12 +70,3 @@ export function filterLowStockItems(items: PantryItem[]): PantryItem[] {
     return min > 0 && total < min;
   });
 }
-
-export function filterShoppingListItems(items: PantryItem[]): PantryItem[] {
-  return items.filter(item => {
-    if (!item.isBasic) return false;
-    const total = sumQuantities(item.batches);
-    const min = toNumberOrZero(item.minThreshold);
-    return total <= 0 || (min > 0 && total < min);
-  });
-}

@@ -66,17 +66,6 @@
               ></ion-toggle>
             </ion-item>
 
-            <ion-item lines="none">
-              <ion-label>
-                <h3>{{ "settings.notifications.shoppingListTitle" | translate }}</h3>
-                <p>{{ "settings.notifications.shoppingListDescription" | translate }}</p>
-              </ion-label>
-              <ion-toggle
-                slot="end"
-                [checked]="facade.notifyOnShoppingList()"
-                (ionChange)="facade.setNotifyOnShoppingList($any($event).detail.checked)"
-              ></ion-toggle>
-            </ion-item>
           }
 
         </ion-list>

@@ -808,8 +808,6 @@
       "nearExpiryDescription": "Alerta cuando hay productos que caducan pronto",
       "lowStockTitle": "Stock bajo",
       "lowStockDescription": "Alerta cuando productos esenciales están por debajo del mínimo",
-      "shoppingListTitle": "Lista de la compra",
-      "shoppingListDescription": "Recordatorio cuando hay productos pendientes de comprar"
     }
   },
   "reviews": {
@@ -827,10 +825,6 @@
     "lowStock": {
       "title": "Se te están acabando algunas cosas",
       "body": "{{ count }} básicos están por debajo del mínimo que marcaste"
-    },
-    "shoppingList": {
-      "title": "Tienes cosas pendientes de comprar",
-      "body": "{{ count }} productos te esperan en la lista de la compra"
     }
   }
 }

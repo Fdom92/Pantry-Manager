@@ -807,8 +807,6 @@
       "nearExpiryDescription": "Benachrichtigung, wenn Produkte bald ablaufen",
       "lowStockTitle": "Niedriger Lagerbestand",
       "lowStockDescription": "Benachrichtigung, wenn wesentliche Produkte niedrig sind",
-      "shoppingListTitle": "Einkaufsliste",
-      "shoppingListDescription": "Erinnerung, wenn Artikel in Ihrer Einkaufsliste ausstehen"
     }
   },
   "reviews": {
@@ -826,10 +824,6 @@
     "lowStock": {
       "title": "Einige Vorräte werden knapp",
       "body": "{{ count }} wichtige Produkte liegen unter deinem Minimum"
-    },
-    "shoppingList": {
-      "title": "Deine Einkaufsliste wartet",
-      "body": "{{ count }} Artikel warten auf deiner Einkaufsliste"
     }
   }
 }

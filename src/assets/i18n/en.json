@@ -808,8 +808,6 @@
       "nearExpiryDescription": "Alert when products are about to expire",
       "lowStockTitle": "Low stock",
       "lowStockDescription": "Alert when essential products are running low",
-      "shoppingListTitle": "Shopping list",
-      "shoppingListDescription": "Reminder when items are pending in your shopping list"
     }
   },
   "reviews": {
@@ -827,10 +825,6 @@
     "lowStock": {
       "title": "Running low on some essentials",
       "body": "{{ count }} of your staples are getting low"
-    },
-    "shoppingList": {
-      "title": "Don't forget your shopping list",
-      "body": "You have {{ count }} items to pick up"
     }
   }
 }
