@@ -807,7 +807,7 @@
       "nearExpiryTitle": "Próximos a caducar",
       "nearExpiryDescription": "Alerta cuando hay productos que caducan pronto",
       "lowStockTitle": "Stock bajo",
-      "lowStockDescription": "Alerta cuando productos esenciales están por debajo del mínimo",
+      "lowStockDescription": "Alerta cuando productos esenciales están por debajo del mínimo"
     }
   },
   "reviews": {

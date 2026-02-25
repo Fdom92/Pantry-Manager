@@ -806,7 +806,7 @@
       "nearExpiryTitle": "Bald ablaufend",
       "nearExpiryDescription": "Benachrichtigung, wenn Produkte bald ablaufen",
       "lowStockTitle": "Niedriger Lagerbestand",
-      "lowStockDescription": "Benachrichtigung, wenn wesentliche Produkte niedrig sind",
+      "lowStockDescription": "Benachrichtigung, wenn wesentliche Produkte niedrig sind"
     }
   },
   "reviews": {

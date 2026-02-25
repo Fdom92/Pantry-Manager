@@ -806,7 +806,7 @@
       "nearExpiryTitle": "In scadenza",
       "nearExpiryDescription": "Avviso quando ci sono prodotti in scadenza",
       "lowStockTitle": "Scorte basse",
-      "lowStockDescription": "Avviso quando i prodotti essenziali sono sotto il minimo",
+      "lowStockDescription": "Avviso quando i prodotti essenziali sono sotto il minimo"
     }
   },
   "reviews": {

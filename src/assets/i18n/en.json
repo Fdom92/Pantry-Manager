@@ -807,7 +807,7 @@
       "nearExpiryTitle": "Expiring soon",
       "nearExpiryDescription": "Alert when products are about to expire",
       "lowStockTitle": "Low stock",
-      "lowStockDescription": "Alert when essential products are running low",
+      "lowStockDescription": "Alert when essential products are running low"
     }
   },
   "reviews": {

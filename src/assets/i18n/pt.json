@@ -806,7 +806,7 @@
       "nearExpiryTitle": "A expirar em breve",
       "nearExpiryDescription": "Alerta quando há produtos prestes a expirar",
       "lowStockTitle": "Estoque baixo",
-      "lowStockDescription": "Alerta quando produtos essenciais estão abaixo do mínimo",
+      "lowStockDescription": "Alerta quando produtos essenciais estão abaixo do mínimo"
     }
   },
   "reviews": {

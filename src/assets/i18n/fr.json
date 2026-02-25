@@ -806,7 +806,7 @@
       "nearExpiryTitle": "Bientôt périmés",
       "nearExpiryDescription": "Alerte lorsque des produits sont sur le point d'expirer",
       "lowStockTitle": "Stock faible",
-      "lowStockDescription": "Alerte lorsque des produits essentiels sont en rupture de stock",
+      "lowStockDescription": "Alerte lorsque des produits essentiels sont en rupture de stock"
     }
   },
   "reviews": {
