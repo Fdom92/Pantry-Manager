@@ -97,7 +97,6 @@ export class SettingsPreferencesService {
       notifyOnExpired: Boolean(input?.notifyOnExpired),
       notifyOnLowStock: Boolean(input?.notifyOnLowStock),
       notifyOnNearExpiry: Boolean(input?.notifyOnNearExpiry),
-      notifyOnShoppingList: Boolean(input?.notifyOnShoppingList),
       notificationHour: this.ensureNotificationHour(input?.notificationHour),
       lastSyncAt: input?.lastSyncAt ?? null,
       locationOptions: this.ensureLocationOptions(input?.locationOptions),

@@ -17,7 +17,6 @@ export const DEFAULT_PREFERENCES: AppPreferences = {
   notifyOnExpired: false,
   notifyOnLowStock: false,
   notifyOnNearExpiry: false,
-  notifyOnShoppingList: false,
   notificationHour: 9,
   lastSyncAt: null,
   locationOptions: [],
