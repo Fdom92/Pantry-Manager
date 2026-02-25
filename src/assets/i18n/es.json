@@ -779,7 +779,10 @@
       "title": "Desarrollo",
       "subtitle": "Herramientas para probar onboarding y configuración.",
       "setupTitle": "Ver setup",
-      "setupSubtitle": "Abre el flujo de setup para configurar catálogos."
+      "setupSubtitle": "Abre el flujo de setup para configurar catálogos.",
+      "testNotificationTitle": "Probar notificación",
+      "testNotificationSubtitle": "Se lanza en 5 segundos — minimiza la app para verla",
+      "testNotificationAction": "Probar"
     },
     "info": {
       "title": "Acerca de",
@@ -814,20 +817,20 @@
   },
   "notifications": {
     "expired": {
-      "title": "Productos caducados",
-      "body": "{{ count }} productos en tu despensa han caducado"
+      "title": "Tienes productos caducados",
+      "body": "{{ count }} productos de tu despensa ya han caducado"
     },
     "nearExpiry": {
-      "title": "Próximos a caducar",
-      "body": "{{ count }} productos caducan en {{ days }} días"
+      "title": "Algunos productos caducan pronto",
+      "body": "{{ count }} productos caducan, el primero en {{ nearestDays }} días"
     },
     "lowStock": {
-      "title": "Stock bajo",
-      "body": "{{ count }} productos esenciales están por debajo del mínimo"
+      "title": "Se te están acabando algunas cosas",
+      "body": "{{ count }} básicos están por debajo del mínimo que marcaste"
     },
     "shoppingList": {
-      "title": "Lista de la compra pendiente",
-      "body": "{{ count }} productos esperan en tu lista de la compra"
+      "title": "Tienes cosas pendientes de comprar",
+      "body": "{{ count }} productos te esperan en la lista de la compra"
     }
   }
 }

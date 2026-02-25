@@ -778,7 +778,10 @@
       "title": "Développement",
       "subtitle": "Outils pour tester l’onboarding et la configuration.",
       "setupTitle": "Voir le setup",
-      "setupSubtitle": "Ouvrez le flux de setup pour configurer les catalogues."
+      "setupSubtitle": "Ouvrez le flux de setup pour configurer les catalogues.",
+      "testNotificationTitle": "Tester la notification",
+      "testNotificationSubtitle": "Se déclenche dans 5 secondes — passe l'app en arrière-plan pour la voir",
+      "testNotificationAction": "Tester"
     },
     "info": {
       "title": "À propos",
@@ -813,20 +816,20 @@
   },
   "notifications": {
     "expired": {
-      "title": "Produits périmés",
-      "body": "{{ count }} produits dans votre garde-manger sont périmés"
+      "title": "Des produits ont expiré",
+      "body": "{{ count }} produits de votre garde-manger ont expiré"
     },
     "nearExpiry": {
-      "title": "Produits bientôt périmés",
-      "body": "{{ count }} produits expirent dans {{ days }} jours"
+      "title": "Certains produits expirent bientôt",
+      "body": "{{ count }} produits expirent, le plus proche dans {{ nearestDays }} jours"
     },
     "lowStock": {
-      "title": "Stock faible",
-      "body": "{{ count }} produits essentiels sont en rupture de stock"
+      "title": "Certains essentiels sont presque épuisés",
+      "body": "{{ count }} produits essentiels sont en dessous du minimum"
     },
     "shoppingList": {
-      "title": "Liste de courses en attente",
-      "body": "{{ count }} articles attendent sur votre liste de courses"
+      "title": "Vous avez des achats en attente",
+      "body": "{{ count }} articles vous attendent sur votre liste de courses"
     }
   }
 }

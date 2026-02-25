@@ -45,6 +45,23 @@ export function filterNearExpiryItems(
   });
 }
 
+/**
+ * Returns the number of days until the nearest expiry date across all given items.
+ * Result is clamped to a minimum of 1 to avoid "in 0 days" in copy.
+ */
+export function nearestExpiryDays(items: PantryItem[], now: Date): number {
+  let minMs = Infinity;
+  for (const item of items) {
+    for (const batch of item.batches ?? []) {
+      if (!batch.expirationDate) continue;
+      const ms = new Date(batch.expirationDate).getTime() - now.getTime();
+      if (ms >= 0 && ms < minMs) minMs = ms;
+    }
+  }
+  if (minMs === Infinity) return 1;
+  return Math.max(1, Math.ceil(minMs / (1000 * 60 * 60 * 24)));
+}
+
 export function filterLowStockItems(items: PantryItem[]): PantryItem[] {
   return items.filter(item => {
     if (!item.isBasic) return false;

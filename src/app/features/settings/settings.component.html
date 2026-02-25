@@ -151,6 +151,26 @@
               <p>{{ "settings.tutorial.subtitle" | translate }}</p>
             </ion-label>
           </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.testNotificationTitle" | translate }}</h3>
+              <p>{{ "settings.dev.testNotificationSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="testNotification()"
+              [disabled]="isTestingNotification()"
+              [attr.aria-label]="'settings.dev.testNotificationAction' | translate"
+            >
+              @if (isTestingNotification()) {
+                <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
         </ion-list>
       </ion-card-content>
     </ion-card>

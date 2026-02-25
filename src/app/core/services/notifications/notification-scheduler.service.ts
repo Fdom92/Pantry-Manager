@@ -101,4 +101,53 @@ export class NotificationSchedulerService {
       await this.plugin.cancel(allIds);
     }
   }
+
+  /**
+   * Dev-only: runs the real evaluation logic but fires the winning notification
+   * in 5 seconds regardless of the configured notification hour.
+   * Returns true if a notification was scheduled, false otherwise.
+   */
+  async scheduleTestNotification(): Promise<boolean> {
+    if (!Capacitor.isNativePlatform()) return false;
+
+    await this.permission.init();
+
+    if (!this.permission.isGranted()) {
+      const granted = await this.permission.request();
+      if (!granted) return false;
+    }
+
+    const preferences = this.preferencesService.preferences();
+    const items = this.pantryStore.loadedProducts();
+    const now = new Date();
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this.translate.instant(key, params);
+
+    const context: NotificationContext = { items, preferences, t, now };
+    const definitions = this.registry.getAll();
+
+    const candidates: Array<{ priority: number; payload: ScheduledNotification }> = [];
+
+    for (const definition of definitions) {
+      if (!definition.isEnabled(preferences)) continue;
+      const payload = definition.build(context);
+      if (payload) {
+        candidates.push({ priority: definition.priority, payload });
+      }
+    }
+
+    if (!candidates.length) return false;
+
+    candidates.sort((a, b) => b.priority - a.priority);
+    const winner = candidates[0].payload;
+
+    await this.plugin.schedule([{
+      id: winner.id,
+      title: winner.title,
+      body: winner.body,
+      scheduleAt: new Date(Date.now() + 5_000),
+    }]);
+
+    return true;
+  }
 }

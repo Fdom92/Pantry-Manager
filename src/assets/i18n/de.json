@@ -778,7 +778,10 @@
       "title": "Entwicklung",
       "subtitle": "Tools zum Testen von Onboarding und Einrichtung.",
       "setupTitle": "Setup ansehen",
-      "setupSubtitle": "Öffne den Setup-Flow zur Katalogkonfiguration."
+      "setupSubtitle": "Öffne den Setup-Flow zur Katalogkonfiguration.",
+      "testNotificationTitle": "Benachrichtigung testen",
+      "testNotificationSubtitle": "Wird in 5 Sekunden ausgelöst — minimiere die App um sie zu sehen",
+      "testNotificationAction": "Testen"
     },
     "info": {
       "title": "Über die App",
@@ -813,20 +816,20 @@
   },
   "notifications": {
     "expired": {
-      "title": "Abgelaufene Produkte",
-      "body": "{{ count }} Produkte in Ihrer Vorratskammer sind abgelaufen"
+      "title": "Du hast abgelaufene Produkte",
+      "body": "{{ count }} Produkte in deiner Speisekammer sind abgelaufen"
     },
     "nearExpiry": {
-      "title": "Produkte laufen bald ab",
-      "body": "{{ count }} Produkte laufen in {{ days }} Tagen ab"
+      "title": "Einige Produkte laufen bald ab",
+      "body": "{{ count }} Produkte laufen ab, das nächste in {{ nearestDays }} Tagen"
     },
     "lowStock": {
-      "title": "Niedriger Lagerbestand",
-      "body": "{{ count }} wesentliche Produkte haben den Mindestwert unterschritten"
+      "title": "Einige Vorräte werden knapp",
+      "body": "{{ count }} wichtige Produkte liegen unter deinem Minimum"
     },
     "shoppingList": {
-      "title": "Einkaufsliste ausstehend",
-      "body": "{{ count }} Artikel warten auf Ihrer Einkaufsliste"
+      "title": "Deine Einkaufsliste wartet",
+      "body": "{{ count }} Artikel warten auf deiner Einkaufsliste"
     }
   }
 }

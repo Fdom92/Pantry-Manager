@@ -1,5 +1,5 @@
 import { NEAR_EXPIRY_WINDOW_DAYS, NOTIFICATION_IDS } from '@core/constants';
-import { filterNearExpiryItems, buildNextTriggerDate } from '@core/domain/notifications';
+import { filterNearExpiryItems, nearestExpiryDays, buildNextTriggerDate } from '@core/domain/notifications';
 import type { NotificationContext, NotificationDefinition, ScheduledNotification } from '@core/models/notifications';
 import type { AppPreferences } from '@core/models/settings';
 
@@ -17,10 +17,11 @@ export class NearExpiryNotification implements NotificationDefinition {
     if (!nearExpiry.length) return null;
 
     const hour = preferences.notificationHour ?? 9;
+    const nearestDays = nearestExpiryDays(nearExpiry, now);
     return {
       id: this.id,
       title: t('notifications.nearExpiry.title'),
-      body: t('notifications.nearExpiry.body', { count: nearExpiry.length, days: NEAR_EXPIRY_WINDOW_DAYS }),
+      body: t('notifications.nearExpiry.body', { count: nearExpiry.length, nearestDays }),
       scheduleAt: buildNextTriggerDate(now, hour).toISOString(),
     };
   }

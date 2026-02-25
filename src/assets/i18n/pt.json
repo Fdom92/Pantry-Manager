@@ -778,7 +778,10 @@
       "title": "Desenvolvimento",
       "subtitle": "Ferramentas para testar onboarding e configuração.",
       "setupTitle": "Ver setup",
-      "setupSubtitle": "Abre o fluxo de setup para configurar catálogos."
+      "setupSubtitle": "Abre o fluxo de setup para configurar catálogos.",
+      "testNotificationTitle": "Testar notificação",
+      "testNotificationSubtitle": "Dispara em 5 segundos — minimize o app para vê-la",
+      "testNotificationAction": "Testar"
     },
     "info": {
       "title": "Sobre",
@@ -813,20 +816,20 @@
   },
   "notifications": {
     "expired": {
-      "title": "Produtos expirados",
-      "body": "{{ count }} produtos na sua despensa expiraram"
+      "title": "Você tem produtos vencidos",
+      "body": "{{ count }} produtos da sua despensa venceram"
     },
     "nearExpiry": {
-      "title": "Produtos a expirar em breve",
-      "body": "{{ count }} produtos expiram em {{ days }} dias"
+      "title": "Alguns produtos vencem em breve",
+      "body": "{{ count }} produtos vencem, o mais próximo em {{ nearestDays }} dias"
     },
     "lowStock": {
-      "title": "Estoque baixo",
-      "body": "{{ count }} produtos essenciais estão abaixo do mínimo"
+      "title": "Alguns itens essenciais estão acabando",
+      "body": "{{ count }} itens essenciais estão abaixo do mínimo"
     },
     "shoppingList": {
-      "title": "Lista de compras pendente",
-      "body": "{{ count }} itens aguardam na sua lista de compras"
+      "title": "Sua lista de compras está esperando",
+      "body": "Você tem {{ count }} itens para comprar"
     }
   }
 }

@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SettingsStateService } from '@core/services/settings/settings-state.service';
+import { NotificationSchedulerService } from '@core/services/notifications/notification-scheduler.service';
 import {
   IonBackButton,
   IonButton,
@@ -17,6 +18,7 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonSpinner,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
@@ -44,6 +46,7 @@ import { environment } from 'src/environments/environment';
     IonLabel,
     IonButton,
     IonIcon,
+    IonSpinner,
     CommonModule,
     RouterLink,
     TranslateModule,
@@ -54,11 +57,23 @@ import { environment } from 'src/environments/environment';
 })
 export class SettingsComponent {
   readonly facade = inject(SettingsStateService);
+  private readonly scheduler = inject(NotificationSchedulerService);
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
   readonly isPro = this.facade.isPro;
+  readonly isTestingNotification = signal(false);
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
+  }
+
+  async testNotification(): Promise<void> {
+    if (this.isTestingNotification()) return;
+    this.isTestingNotification.set(true);
+    try {
+      await this.scheduler.scheduleTestNotification();
+    } finally {
+      this.isTestingNotification.set(false);
+    }
   }
 }

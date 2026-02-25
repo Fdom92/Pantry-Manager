@@ -56,6 +56,7 @@ import {
   lockClosedOutline,
   moonOutline,
   navigateOutline,
+  notificationsOutline,
   paperPlaneOutline,
   pricetagOutline,
   refreshOutline,
@@ -164,7 +165,8 @@ addIcons({
   'close-outline': closeOutline,
   'arrow-forward-outline': arrowForwardOutline,
   'chevron-forward-outline': chevronForwardOutline,
-  'information-circle-outline': informationOutline
+  'information-circle-outline': informationOutline,
+  'notifications-outline': notificationsOutline
 });
 
 bootstrapApplication(AppComponent, {
