@@ -50,6 +50,11 @@ export const routes: Routes = [
       import('@features/settings/components/settings-catalogs/settings-catalogs.component').then(m => m.SettingsCatalogsComponent),
   },
   {
+    path: 'settings/notificaciones',
+    loadComponent: () =>
+      import('@features/settings/components/settings-notifications/settings-notifications.component').then(m => m.SettingsNotificationsComponent),
+  },
+  {
     path: 'settings/avanzado',
     loadComponent: () =>
       import('@features/settings/components/settings-advanced/settings-advanced.component').then(m => m.SettingsAdvancedComponent),

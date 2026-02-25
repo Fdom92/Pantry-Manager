@@ -791,9 +791,43 @@
       "rateTitle": "Rate the app",
       "rateSubtitle": "Enjoying PantryMind? Leave us a review.",
       "rateAction": "Rate on Play Store"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Configure daily alerts for your pantry",
+      "openTitle": "Notification settings",
+      "openSubtitle": "Manage alerts and what to be notified about",
+      "enabledTitle": "Enable notifications",
+      "enabledDescription": "Receive a daily summary of your pantry status",
+      "expiredTitle": "Expired products",
+      "expiredDescription": "Alert when items in your pantry have expired",
+      "nearExpiryTitle": "Expiring soon",
+      "nearExpiryDescription": "Alert when products are about to expire",
+      "lowStockTitle": "Low stock",
+      "lowStockDescription": "Alert when essential products are running low",
+      "shoppingListTitle": "Shopping list",
+      "shoppingListDescription": "Reminder when items are pending in your shopping list"
     }
   },
   "reviews": {
     "prompt": "If PantryMind is helping you, a review really helps us. Would you leave one?"
+  },
+  "notifications": {
+    "expired": {
+      "title": "Items have expired",
+      "body": "{{ count }} products in your pantry have expired"
+    },
+    "nearExpiry": {
+      "title": "Items expiring soon",
+      "body": "{{ count }} products expire within {{ days }} days"
+    },
+    "lowStock": {
+      "title": "Low stock alert",
+      "body": "{{ count }} essential products are running low"
+    },
+    "shoppingList": {
+      "title": "Shopping list pending",
+      "body": "{{ count }} items are waiting on your shopping list"
+    }
   }
 }

@@ -790,9 +790,43 @@
       "rateTitle": "Valuta l'app",
       "rateSubtitle": "Ti piace PantryMind? Lascia una recensione.",
       "rateAction": "Valuta sul Play Store"
+    },
+    "notifications": {
+      "title": "Notifiche",
+      "subtitle": "Configura avvisi quotidiani per la tua dispensa",
+      "openTitle": "Impostazioni notifiche",
+      "openSubtitle": "Gestisci gli avvisi e di cosa vuoi essere notificato",
+      "enabledTitle": "Attiva notifiche",
+      "enabledDescription": "Ricevi un riepilogo quotidiano dello stato della tua dispensa",
+      "expiredTitle": "Prodotti scaduti",
+      "expiredDescription": "Avviso quando ci sono prodotti scaduti nella tua dispensa",
+      "nearExpiryTitle": "In scadenza",
+      "nearExpiryDescription": "Avviso quando ci sono prodotti in scadenza",
+      "lowStockTitle": "Scorte basse",
+      "lowStockDescription": "Avviso quando i prodotti essenziali sono sotto il minimo",
+      "shoppingListTitle": "Lista della spesa",
+      "shoppingListDescription": "Promemoria quando ci sono articoli in attesa nella lista della spesa"
     }
   },
   "reviews": {
     "prompt": "Se PantryMind ti aiuta, una recensione ci aiuta davvero. Ne lasceresti una?"
+  },
+  "notifications": {
+    "expired": {
+      "title": "Prodotti scaduti",
+      "body": "{{ count }} prodotti nella tua dispensa sono scaduti"
+    },
+    "nearExpiry": {
+      "title": "Prodotti in scadenza",
+      "body": "{{ count }} prodotti scadono entro {{ days }} giorni"
+    },
+    "lowStock": {
+      "title": "Scorte basse",
+      "body": "{{ count }} prodotti essenziali sono sotto il minimo"
+    },
+    "shoppingList": {
+      "title": "Lista della spesa in attesa",
+      "body": "{{ count }} articoli sono in attesa nella lista della spesa"
+    }
   }
 }

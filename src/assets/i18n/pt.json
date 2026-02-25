@@ -790,9 +790,43 @@
       "rateTitle": "Avaliar a app",
       "rateSubtitle": "Gostas do PantryMind? Deixa-nos uma avaliação.",
       "rateAction": "Avaliar no Play Store"
+    },
+    "notifications": {
+      "title": "Notificações",
+      "subtitle": "Configure alertas diários para a sua despensa",
+      "openTitle": "Configurações de notificações",
+      "openSubtitle": "Gerencie alertas e sobre o que ser notificado",
+      "enabledTitle": "Ativar notificações",
+      "enabledDescription": "Receba um resumo diário do estado da sua despensa",
+      "expiredTitle": "Produtos expirados",
+      "expiredDescription": "Alerta quando há produtos expirados na sua despensa",
+      "nearExpiryTitle": "A expirar em breve",
+      "nearExpiryDescription": "Alerta quando há produtos prestes a expirar",
+      "lowStockTitle": "Estoque baixo",
+      "lowStockDescription": "Alerta quando produtos essenciais estão abaixo do mínimo",
+      "shoppingListTitle": "Lista de compras",
+      "shoppingListDescription": "Lembrete quando há itens pendentes na sua lista de compras"
     }
   },
   "reviews": {
     "prompt": "Se o PantryMind está ajudando, uma avaliação ajuda muito. Você deixaria uma?"
+  },
+  "notifications": {
+    "expired": {
+      "title": "Produtos expirados",
+      "body": "{{ count }} produtos na sua despensa expiraram"
+    },
+    "nearExpiry": {
+      "title": "Produtos a expirar em breve",
+      "body": "{{ count }} produtos expiram em {{ days }} dias"
+    },
+    "lowStock": {
+      "title": "Estoque baixo",
+      "body": "{{ count }} produtos essenciais estão abaixo do mínimo"
+    },
+    "shoppingList": {
+      "title": "Lista de compras pendente",
+      "body": "{{ count }} itens aguardam na sua lista de compras"
+    }
   }
 }

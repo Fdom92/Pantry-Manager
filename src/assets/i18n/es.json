@@ -791,9 +791,43 @@
       "rateTitle": "Valorar la app",
       "rateSubtitle": "¿Te gusta PantryMind? Déjanos una reseña.",
       "rateAction": "Valorar en Play Store"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "subtitle": "Configura alertas diarias para tu despensa",
+      "openTitle": "Configuración de notificaciones",
+      "openSubtitle": "Gestiona las alertas y sobre qué recibir avisos",
+      "enabledTitle": "Activar notificaciones",
+      "enabledDescription": "Recibe un resumen diario del estado de tu despensa",
+      "expiredTitle": "Productos caducados",
+      "expiredDescription": "Alerta cuando hay productos caducados en tu despensa",
+      "nearExpiryTitle": "Próximos a caducar",
+      "nearExpiryDescription": "Alerta cuando hay productos que caducan pronto",
+      "lowStockTitle": "Stock bajo",
+      "lowStockDescription": "Alerta cuando productos esenciales están por debajo del mínimo",
+      "shoppingListTitle": "Lista de la compra",
+      "shoppingListDescription": "Recordatorio cuando hay productos pendientes de comprar"
     }
   },
   "reviews": {
     "prompt": "Si PantryMind te está ayudando, una reseña nos ayuda mucho. ¿Te animas a dejar una?"
+  },
+  "notifications": {
+    "expired": {
+      "title": "Productos caducados",
+      "body": "{{ count }} productos en tu despensa han caducado"
+    },
+    "nearExpiry": {
+      "title": "Próximos a caducar",
+      "body": "{{ count }} productos caducan en {{ days }} días"
+    },
+    "lowStock": {
+      "title": "Stock bajo",
+      "body": "{{ count }} productos esenciales están por debajo del mínimo"
+    },
+    "shoppingList": {
+      "title": "Lista de la compra pendiente",
+      "body": "{{ count }} productos esperan en tu lista de la compra"
+    }
   }
 }

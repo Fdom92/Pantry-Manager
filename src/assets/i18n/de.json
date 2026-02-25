@@ -790,9 +790,43 @@
       "rateTitle": "App bewerten",
       "rateSubtitle": "Gefällt dir PantryMind? Hinterlasse eine Bewertung.",
       "rateAction": "Im Play Store bewerten"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "subtitle": "Tägliche Benachrichtigungen für Ihre Vorratskammer konfigurieren",
+      "openTitle": "Benachrichtigungseinstellungen",
+      "openSubtitle": "Verwalten Sie Benachrichtigungen und worüber Sie informiert werden möchten",
+      "enabledTitle": "Benachrichtigungen aktivieren",
+      "enabledDescription": "Erhalten Sie eine tägliche Zusammenfassung Ihres Vorratskammerstatus",
+      "expiredTitle": "Abgelaufene Produkte",
+      "expiredDescription": "Benachrichtigung, wenn Produkte abgelaufen sind",
+      "nearExpiryTitle": "Bald ablaufend",
+      "nearExpiryDescription": "Benachrichtigung, wenn Produkte bald ablaufen",
+      "lowStockTitle": "Niedriger Lagerbestand",
+      "lowStockDescription": "Benachrichtigung, wenn wesentliche Produkte niedrig sind",
+      "shoppingListTitle": "Einkaufsliste",
+      "shoppingListDescription": "Erinnerung, wenn Artikel in Ihrer Einkaufsliste ausstehen"
     }
   },
   "reviews": {
     "prompt": "Wenn PantryMind dir hilft, hilft uns eine Bewertung sehr. Würdest du eine dalassen?"
+  },
+  "notifications": {
+    "expired": {
+      "title": "Abgelaufene Produkte",
+      "body": "{{ count }} Produkte in Ihrer Vorratskammer sind abgelaufen"
+    },
+    "nearExpiry": {
+      "title": "Produkte laufen bald ab",
+      "body": "{{ count }} Produkte laufen in {{ days }} Tagen ab"
+    },
+    "lowStock": {
+      "title": "Niedriger Lagerbestand",
+      "body": "{{ count }} wesentliche Produkte haben den Mindestwert unterschritten"
+    },
+    "shoppingList": {
+      "title": "Einkaufsliste ausstehend",
+      "body": "{{ count }} Artikel warten auf Ihrer Einkaufsliste"
+    }
   }
 }

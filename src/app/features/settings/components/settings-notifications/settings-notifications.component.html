@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ "settings.notifications.title" | translate }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="settings-content">
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>{{ "settings.notifications.title" | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ "settings.notifications.subtitle" | translate }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.notifications.enabledTitle" | translate }}</h3>
+              <p>{{ "settings.notifications.enabledDescription" | translate }}</p>
+            </ion-label>
+            <ion-toggle
+              slot="end"
+              [checked]="facade.notificationsEnabled()"
+              (ionChange)="facade.setNotificationsEnabled($any($event).detail.checked)"
+            ></ion-toggle>
+          </ion-item>
+
+          @if (facade.notificationsEnabled()) {
+            <ion-item lines="none">
+              <ion-label>
+                <h3>{{ "settings.notifications.expiredTitle" | translate }}</h3>
+                <p>{{ "settings.notifications.expiredDescription" | translate }}</p>
+              </ion-label>
+              <ion-toggle
+                slot="end"
+                [checked]="facade.notifyOnExpired()"
+                (ionChange)="facade.setNotifyOnExpired($any($event).detail.checked)"
+              ></ion-toggle>
+            </ion-item>
+
+            <ion-item lines="none">
+              <ion-label>
+                <h3>{{ "settings.notifications.nearExpiryTitle" | translate }}</h3>
+                <p>{{ "settings.notifications.nearExpiryDescription" | translate }}</p>
+              </ion-label>
+              <ion-toggle
+                slot="end"
+                [checked]="facade.notifyOnNearExpiry()"
+                (ionChange)="facade.setNotifyOnNearExpiry($any($event).detail.checked)"
+              ></ion-toggle>
+            </ion-item>
+
+            <ion-item lines="none">
+              <ion-label>
+                <h3>{{ "settings.notifications.lowStockTitle" | translate }}</h3>
+                <p>{{ "settings.notifications.lowStockDescription" | translate }}</p>
+              </ion-label>
+              <ion-toggle
+                slot="end"
+                [checked]="facade.notifyOnLowStock()"
+                (ionChange)="facade.setNotifyOnLowStock($any($event).detail.checked)"
+              ></ion-toggle>
+            </ion-item>
+
+            <ion-item lines="none">
+              <ion-label>
+                <h3>{{ "settings.notifications.shoppingListTitle" | translate }}</h3>
+                <p>{{ "settings.notifications.shoppingListDescription" | translate }}</p>
+              </ion-label>
+              <ion-toggle
+                slot="end"
+                [checked]="facade.notifyOnShoppingList()"
+                (ionChange)="facade.setNotifyOnShoppingList($any($event).detail.checked)"
+              ></ion-toggle>
+            </ion-item>
+          }
+
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

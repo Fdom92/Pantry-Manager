@@ -5,6 +5,7 @@ import { ONBOARDING_STORAGE_KEY } from '@core/constants';
 import { PantryService } from '@core/services/pantry';
 import { MigrationPantryService } from '@core/services/migration/migration-pantry.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
+import { NotificationSchedulerService } from '@core/services/notifications';
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
@@ -21,6 +22,7 @@ export class AppComponent {
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
+  private readonly notificationScheduler = inject(NotificationSchedulerService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -33,6 +35,7 @@ export class AppComponent {
     await this.pantryMigration.migrateIfNeeded();
     await this.pantryService.ensureFirstPageLoaded();
     this.pantryService.startBackgroundLoad();
+    await this.notificationScheduler.scheduleAll();
   }
 
   private async initializeRevenueCat(): Promise<void> {
@@ -41,6 +44,7 @@ export class AppComponent {
     CapacitorApp.addListener('appStateChange', async state => {
       if (state.isActive) {
         await this.revenuecat.restore();
+        await this.notificationScheduler.scheduleAll();
       }
     });
   }

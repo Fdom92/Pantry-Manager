@@ -790,9 +790,43 @@
       "rateTitle": "Évaluer l'application",
       "rateSubtitle": "Vous aimez PantryMind ? Laissez-nous un avis.",
       "rateAction": "Évaluer sur le Play Store"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Configurez des alertes quotidiennes pour votre garde-manger",
+      "openTitle": "Paramètres de notifications",
+      "openSubtitle": "Gérez les alertes et ce dont vous souhaitez être notifié",
+      "enabledTitle": "Activer les notifications",
+      "enabledDescription": "Recevez un résumé quotidien de l'état de votre garde-manger",
+      "expiredTitle": "Produits périmés",
+      "expiredDescription": "Alerte lorsque des produits ont expiré",
+      "nearExpiryTitle": "Bientôt périmés",
+      "nearExpiryDescription": "Alerte lorsque des produits sont sur le point d'expirer",
+      "lowStockTitle": "Stock faible",
+      "lowStockDescription": "Alerte lorsque des produits essentiels sont en rupture de stock",
+      "shoppingListTitle": "Liste de courses",
+      "shoppingListDescription": "Rappel lorsque des articles sont en attente dans votre liste de courses"
     }
   },
   "reviews": {
     "prompt": "Si PantryMind vous aide, un avis nous aide beaucoup. Pourriez-vous en laisser un ?"
+  },
+  "notifications": {
+    "expired": {
+      "title": "Produits périmés",
+      "body": "{{ count }} produits dans votre garde-manger sont périmés"
+    },
+    "nearExpiry": {
+      "title": "Produits bientôt périmés",
+      "body": "{{ count }} produits expirent dans {{ days }} jours"
+    },
+    "lowStock": {
+      "title": "Stock faible",
+      "body": "{{ count }} produits essentiels sont en rupture de stock"
+    },
+    "shoppingList": {
+      "title": "Liste de courses en attente",
+      "body": "{{ count }} articles attendent sur votre liste de courses"
+    }
   }
 }
