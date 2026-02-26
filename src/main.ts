@@ -34,6 +34,7 @@ import {
   chevronUpOutline,
   clipboardOutline,
   close,
+  closeCircleOutline,
   closeOutline,
   cloudUploadOutline,
   constructOutline,
@@ -43,6 +44,7 @@ import {
   ellipsisVerticalOutline,
   enterOutline,
   exitOutline,
+  eyeOutline,
   fastFoodOutline,
   filterOutline,
   flashOutline,
@@ -67,6 +69,7 @@ import {
   sendOutline,
   settingsOutline,
   shareOutline,
+  skullOutline,
   sparklesOutline,
   speedometerOutline,
   starOutline,
@@ -76,7 +79,8 @@ import {
   timeOutline,
   trashOutline,
   trendingDownOutline,
-  warning
+  warning,
+  warningOutline
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -166,7 +170,11 @@ addIcons({
   'arrow-forward-outline': arrowForwardOutline,
   'chevron-forward-outline': chevronForwardOutline,
   'information-circle-outline': informationOutline,
-  'notifications-outline': notificationsOutline
+  'notifications-outline': notificationsOutline,
+  'skull-outline': skullOutline,
+  'close-circle-outline': closeCircleOutline,
+  'eye-outline': eyeOutline,
+  'warning-outline': warningOutline
 });
 
 bootstrapApplication(AppComponent, {

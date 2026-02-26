@@ -27,6 +27,12 @@ export class UpgradeRevenuecatService {
     return !environment.production || this.isPro();
   }
 
+  /** Dev-only: force a specific PRO state for testing purposes. No-op in production. */
+  setDevProState(isPro: boolean): void {
+    if (environment.production) return;
+    this.updateProState(isPro);
+  }
+
   getUserId(): string | null {
     return this.userId;
   }

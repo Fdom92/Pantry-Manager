@@ -140,17 +140,43 @@
       </ion-card-header>
       <ion-card-content>
         <ion-list lines="none">
-          <ion-item
-            lines="none"
-            button
-            detail="true"
-            routerLink="/onboarding"
-          >
+
+          <!-- ── Onboarding ─────────────────────────────────── -->
+          <ion-list-header>
+            <ion-label>{{ "settings.dev.groupOnboarding" | translate }}</ion-label>
+          </ion-list-header>
+
+          <ion-item lines="none" button detail="true" routerLink="/onboarding">
             <ion-label>
               <h3>{{ "settings.tutorial.title" | translate }}</h3>
               <p>{{ "settings.tutorial.subtitle" | translate }}</p>
             </ion-label>
           </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.resetOnboardingTitle" | translate }}</h3>
+              <p>{{ "settings.dev.resetOnboardingSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="resetOnboarding()"
+              [disabled]="isResettingOnboarding()"
+              [attr.aria-label]="'settings.dev.resetOnboardingTitle' | translate"
+            >
+              @if (isResettingOnboarding()) {
+                <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          <!-- ── Notifications ──────────────────────────────── -->
+          <ion-list-header>
+            <ion-label>{{ "settings.dev.groupNotifications" | translate }}</ion-label>
+          </ion-list-header>
 
           <ion-item lines="none">
             <ion-label>
@@ -171,6 +197,196 @@
               }
             </ion-button>
           </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.scheduleAtTimeTitle" | translate }}</h3>
+              <p>{{ "settings.dev.scheduleAtTimeSubtitle" | translate }}</p>
+            </ion-label>
+            <input
+              type="time"
+              [value]="scheduleAtTimeInput()"
+              (change)="onScheduleAtTimeChange($event)"
+              style="margin-inline-end: 8px;"
+            />
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="scheduleAtTime()"
+              [disabled]="isSchedulingAtTime()"
+              [attr.aria-label]="'settings.dev.scheduleAtTimeAction' | translate"
+            >
+              @if (isSchedulingAtTime()) {
+                <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="time-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.previewNotificationTitle" | translate }}</h3>
+              <p>{{ "settings.dev.previewNotificationSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="previewNotification()"
+              [disabled]="isPreviewingNotification()"
+              [attr.aria-label]="'settings.dev.previewNotificationTitle' | translate"
+            >
+              @if (isPreviewingNotification()) {
+                <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.cancelNotificationsTitle" | translate }}</h3>
+              <p>{{ "settings.dev.cancelNotificationsSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              color="danger"
+              (click)="cancelAllNotifications()"
+              [disabled]="isCancellingNotifications()"
+              [attr.aria-label]="'settings.dev.cancelNotificationsTitle' | translate"
+            >
+              @if (isCancellingNotifications()) {
+                <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          <!-- ── Data ───────────────────────────────────────── -->
+          <ion-list-header>
+            <ion-label>{{ "settings.dev.groupData" | translate }}</ion-label>
+          </ion-list-header>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.seedExpiredTitle" | translate }}</h3>
+              <p>{{ "settings.dev.seedExpiredSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="seedExpiredItems()"
+              [disabled]="isSeedingExpired()"
+              [attr.aria-label]="'settings.dev.seedExpiredTitle' | translate"
+            >
+              @if (isSeedingExpired()) {
+                <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="skull-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.seedNearExpiryTitle" | translate }}</h3>
+              <p>{{ "settings.dev.seedNearExpirySubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="seedNearExpiryItems()"
+              [disabled]="isSeedingNearExpiry()"
+              [attr.aria-label]="'settings.dev.seedNearExpiryTitle' | translate"
+            >
+              @if (isSeedingNearExpiry()) {
+                <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.seedLowStockTitle" | translate }}</h3>
+              <p>{{ "settings.dev.seedLowStockSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="seedLowStockItems()"
+              [disabled]="isSeedingLowStock()"
+              [attr.aria-label]="'settings.dev.seedLowStockTitle' | translate"
+            >
+              @if (isSeedingLowStock()) {
+                <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.clearPantryTitle" | translate }}</h3>
+              <p>{{ "settings.dev.clearPantrySubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              color="danger"
+              (click)="clearPantry()"
+              [disabled]="isClearingPantry()"
+              [attr.aria-label]="'settings.dev.clearPantryTitle' | translate"
+            >
+              @if (isClearingPantry()) {
+                <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          <!-- ── App State ───────────────────────────────────── -->
+          <ion-list-header>
+            <ion-label>{{ "settings.dev.groupState" | translate }}</ion-label>
+          </ion-list-header>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.toggleProTitle" | translate }}</h3>
+              <p>{{ "settings.dev.toggleProSubtitle" | translate: { status: devIsPro() ? 'ON' : 'OFF' } }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              [color]="devIsPro() ? 'warning' : 'medium'"
+              (click)="togglePro()"
+              [attr.aria-label]="'settings.dev.toggleProTitle' | translate"
+            >
+              <ion-icon slot="icon-only" [name]="devIsPro() ? 'star' : 'star-outline'"></ion-icon>
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.showAppStateTitle" | translate }}</h3>
+              <p>{{ "settings.dev.showAppStateSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="showAppState()"
+              [attr.aria-label]="'settings.dev.showAppStateTitle' | translate"
+            >
+              <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+
         </ion-list>
       </ion-card-content>
     </ion-card>

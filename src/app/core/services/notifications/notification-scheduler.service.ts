@@ -25,6 +25,7 @@ export class NotificationSchedulerService {
     // scheduled notification fires (scenarios #4 and #5).
     effect(() => {
       this.preferencesService.preferences(); // track dependency
+      this.pantryStore.loadedProducts();     // track dependency — re-run once products load from storage
       void this.scheduleAll();
     });
   }
@@ -100,6 +101,91 @@ export class NotificationSchedulerService {
     if (allIds.length) {
       await this.plugin.cancel(allIds);
     }
+  }
+
+  /**
+   * Dev-only: runs the real evaluation logic but fires the winning notification
+   * at the given hour:minute today.
+   * Returns true if a notification was scheduled, false otherwise.
+   */
+  async scheduleNotificationAtTime(hour: number, minute: number): Promise<boolean> {
+    if (!Capacitor.isNativePlatform()) return false;
+
+    await this.permission.init();
+
+    if (!this.permission.isGranted()) {
+      const granted = await this.permission.request();
+      if (!granted) return false;
+    }
+
+    const preferences = this.preferencesService.preferences();
+    const items = this.pantryStore.loadedProducts();
+    const now = new Date();
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this.translate.instant(key, params);
+
+    const context: NotificationContext = { items, preferences, t, now };
+    const definitions = this.registry.getAll();
+
+    const candidates: Array<{ priority: number; payload: ScheduledNotification }> = [];
+
+    for (const definition of definitions) {
+      if (!definition.isEnabled(preferences)) continue;
+      const payload = definition.build(context);
+      if (payload) {
+        candidates.push({ priority: definition.priority, payload });
+      }
+    }
+
+    if (!candidates.length) return false;
+
+    candidates.sort((a, b) => b.priority - a.priority);
+    const winner = candidates[0].payload;
+
+    const scheduleAt = new Date();
+    scheduleAt.setHours(hour, minute, 0, 0);
+
+    await this.plugin.schedule([{
+      id: winner.id,
+      title: winner.title,
+      body: winner.body,
+      scheduleAt,
+    }]);
+
+    return true;
+  }
+
+  /**
+   * Dev-only: evaluates all registered definitions and returns the winning
+   * notification payload without scheduling anything.
+   * Returns null if no notification would be scheduled.
+   */
+  async previewNextNotification(): Promise<{ title: string; body: string } | null> {
+    const preferences = this.preferencesService.preferences();
+    const items = this.pantryStore.loadedProducts();
+    const now = new Date();
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this.translate.instant(key, params);
+
+    const context: NotificationContext = { items, preferences, t, now };
+    const definitions = this.registry.getAll();
+
+    const candidates: Array<{ priority: number; payload: ScheduledNotification }> = [];
+
+    for (const definition of definitions) {
+      if (!definition.isEnabled(preferences)) continue;
+      const payload = definition.build(context);
+      if (payload) {
+        candidates.push({ priority: definition.priority, payload });
+      }
+    }
+
+    if (!candidates.length) return null;
+
+    candidates.sort((a, b) => b.priority - a.priority);
+    const winner = candidates[0].payload;
+
+    return { title: winner.title, body: winner.body };
   }
 
   /**
