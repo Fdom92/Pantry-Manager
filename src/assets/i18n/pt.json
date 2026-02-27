@@ -602,7 +602,9 @@
       "currentQuantity": "Quantidade",
       "increase": "Aumentar",
       "decrease": "Diminuir",
-      "viewDetails": "Ver lotes"
+      "viewDetails": "Ver lotes",
+      "zeroHint": "Vai desaparecer da despensa até você adicionar mais",
+      "zeroHintBasic": "Vai desaparecer da despensa e aparecer na sua lista de compras"
     },
     "toasts": {
       "locationRequired": "Seleciona uma localização antes de guardar.",
@@ -774,9 +776,46 @@
     },
     "dev": {
       "title": "Desenvolvimento",
-      "subtitle": "Ferramentas para testar onboarding e configuração.",
+      "subtitle": "Ferramentas para testar diferentes cenários.",
+      "groupOnboarding": "Onboarding",
+      "groupNotifications": "Notificações",
+      "groupData": "Dados",
+      "groupState": "Estado",
       "setupTitle": "Ver setup",
-      "setupSubtitle": "Abre o fluxo de setup para configurar catálogos."
+      "setupSubtitle": "Abre o fluxo de setup para configurar catálogos.",
+      "resetOnboardingTitle": "Repor onboarding",
+      "resetOnboardingSubtitle": "Marcar o onboarding como não visto no próximo início",
+      "testNotificationTitle": "Testar notificação",
+      "testNotificationSubtitle": "Dispara em 5 segundos — minimize o app para vê-la",
+      "testNotificationAction": "Testar",
+      "scheduleAtTimeTitle": "Agendar para uma hora hoje",
+      "scheduleAtTimeSubtitle": "Agenda a notificação para hoje à hora escolhida",
+      "scheduleAtTimeAction": "Agendar",
+      "previewNotificationTitle": "Pré-visualizar notificação",
+      "previewNotificationSubtitle": "Ver o que seria agendado com os dados atuais",
+      "cancelNotificationsTitle": "Cancelar todas as pendentes",
+      "cancelNotificationsSubtitle": "Remover todas as notificações agendadas",
+      "seedExpiredTitle": "Criar itens expirados",
+      "seedExpiredSubtitle": "Adicionar 3 itens com datas de validade passadas",
+      "seedNearExpiryTitle": "Criar itens próximos do prazo",
+      "seedNearExpirySubtitle": "Adicionar 3 itens a expirar em 2–7 dias",
+      "seedLowStockTitle": "Criar itens com stock baixo",
+      "seedLowStockSubtitle": "Adicionar 3 itens básicos abaixo do mínimo",
+      "clearPantryTitle": "Limpar toda a despensa",
+      "clearPantrySubtitle": "Eliminar permanentemente todos os itens",
+      "clearPantryConfirm": "Eliminar todos os itens? Esta ação não pode ser desfeita.",
+      "toggleProTitle": "Ativar/desativar PRO",
+      "toggleProSubtitle": "Simular estado PRO ({{ status }})",
+      "showAppStateTitle": "Ver estado da app",
+      "showAppStateSubtitle": "Resumo dos contadores atuais",
+      "appStateDialogTitle": "Estado da app",
+      "appStateTotal": "Total de itens",
+      "appStateExpired": "Expirados",
+      "appStateNearExpiry": "A expirar em breve",
+      "appStateLowStock": "Stock baixo",
+      "appStateIsPro": "Estado PRO",
+      "notificationPreviewDialogTitle": "Pré-visualização de notificação",
+      "notificationPreviewNone": "Nenhuma notificação seria agendada. Verifica se os itens e preferências correspondem aos critérios."
     },
     "info": {
       "title": "Sobre",
@@ -788,9 +827,37 @@
       "rateTitle": "Avaliar a app",
       "rateSubtitle": "Gostas do PantryMind? Deixa-nos uma avaliação.",
       "rateAction": "Avaliar no Play Store"
+    },
+    "notifications": {
+      "title": "Notificações",
+      "subtitle": "Configure alertas diários para a sua despensa",
+      "openTitle": "Configurações de notificações",
+      "openSubtitle": "Gerencie alertas e sobre o que ser notificado",
+      "enabledTitle": "Ativar notificações",
+      "enabledDescription": "Receba um resumo diário do estado da sua despensa",
+      "expiredTitle": "Produtos expirados",
+      "expiredDescription": "Alerta quando há produtos expirados na sua despensa",
+      "nearExpiryTitle": "A expirar em breve",
+      "nearExpiryDescription": "Alerta quando há produtos prestes a expirar",
+      "lowStockTitle": "Estoque baixo",
+      "lowStockDescription": "Alerta quando produtos essenciais estão abaixo do mínimo"
     }
   },
   "reviews": {
     "prompt": "Se o PantryMind está ajudando, uma avaliação ajuda muito. Você deixaria uma?"
+  },
+  "notifications": {
+    "expired": {
+      "title": "Você tem produtos vencidos",
+      "body": "{{ count }} produtos da sua despensa venceram"
+    },
+    "nearExpiry": {
+      "title": "Alguns produtos vencem em breve",
+      "body": "{{ count }} produtos vencem, o mais próximo em {{ nearestDays }} dias"
+    },
+    "lowStock": {
+      "title": "Alguns itens essenciais estão acabando",
+      "body": "{{ count }} itens essenciais estão abaixo do mínimo"
+    }
   }
 }

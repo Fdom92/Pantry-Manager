@@ -27,32 +27,28 @@ export class PantryQuantitySheetStateService {
   }
 
   /**
-   * Close quantity sheet and apply pending changes.
+   * Close the sheet. Pending changes are applied via didDismiss → dismissQuantitySheet().
    */
-  async closeQuantitySheet(): Promise<void> {
-    if (!this.showQuantitySheet()) {
-      return;
-    }
+  closeQuantitySheet(): void {
+    this.showQuantitySheet.set(false);
+  }
 
+  /**
+   * Apply pending changes (if any) and reset sheet state.
+   * Single save point for all dismiss paths: close button, swipe, backdrop, navigation.
+   * State is reset before the async save so double-calls are safe no-ops.
+   */
+  async dismissQuantitySheet(): Promise<void> {
     const item = this.selectedItem();
     const change = this.pendingQuantityChange();
+
+    this.showQuantitySheet.set(false);
+    this.selectedItem.set(null);
+    this.pendingQuantityChange.set(0);
 
     if (item && change !== 0) {
       await this.applyPendingChanges(item, change);
     }
-
-    this.showQuantitySheet.set(false);
-    this.selectedItem.set(null);
-    this.pendingQuantityChange.set(0);
-  }
-
-  /**
-   * Dismiss sheet without applying changes (for backdrop click).
-   */
-  dismissQuantitySheet(): void {
-    this.showQuantitySheet.set(false);
-    this.selectedItem.set(null);
-    this.pendingQuantityChange.set(0);
   }
 
   /**

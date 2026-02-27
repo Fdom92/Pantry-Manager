@@ -603,7 +603,9 @@
       "hint": "Adjust the quantity. It will be saved when closed.",
       "increase": "Increase",
       "decrease": "Decrease",
-      "viewDetails": "View batches"
+      "viewDetails": "View batches",
+      "zeroHint": "It'll disappear from your pantry until you restock it",
+      "zeroHintBasic": "It'll disappear from your pantry and show up in your shopping list"
     },
     "toasts": {
       "locationRequired": "Select a location before saving.",
@@ -775,9 +777,46 @@
     },
     "dev": {
       "title": "Developer",
-      "subtitle": "Tools for testing onboarding and setup.",
+      "subtitle": "Tools for testing different scenarios.",
+      "groupOnboarding": "Onboarding",
+      "groupNotifications": "Notifications",
+      "groupData": "Data",
+      "groupState": "App State",
       "setupTitle": "View setup",
-      "setupSubtitle": "Open the setup flow to configure catalogs."
+      "setupSubtitle": "Open the setup flow to configure catalogs.",
+      "resetOnboardingTitle": "Reset onboarding",
+      "resetOnboardingSubtitle": "Mark onboarding as unseen for next launch",
+      "testNotificationTitle": "Test notification",
+      "testNotificationSubtitle": "Fires in 5 seconds — background the app to see it",
+      "testNotificationAction": "Test",
+      "scheduleAtTimeTitle": "Schedule at a time today",
+      "scheduleAtTimeSubtitle": "Schedule the notification for today at the chosen time",
+      "scheduleAtTimeAction": "Schedule",
+      "previewNotificationTitle": "Preview notification",
+      "previewNotificationSubtitle": "See what would be scheduled with current data",
+      "cancelNotificationsTitle": "Cancel all pending",
+      "cancelNotificationsSubtitle": "Remove all scheduled notifications",
+      "seedExpiredTitle": "Seed expired items",
+      "seedExpiredSubtitle": "Add 3 items with past expiry dates",
+      "seedNearExpiryTitle": "Seed near-expiry items",
+      "seedNearExpirySubtitle": "Add 3 items expiring in 2–7 days",
+      "seedLowStockTitle": "Seed low stock items",
+      "seedLowStockSubtitle": "Add 3 basic items below minimum threshold",
+      "clearPantryTitle": "Clear all pantry items",
+      "clearPantrySubtitle": "Permanently delete every item in the pantry",
+      "clearPantryConfirm": "Delete all pantry items? This cannot be undone.",
+      "toggleProTitle": "Toggle PRO",
+      "toggleProSubtitle": "Simulate PRO status ({{ status }})",
+      "showAppStateTitle": "Show app state",
+      "showAppStateSubtitle": "Snapshot of current data counts",
+      "appStateDialogTitle": "App State",
+      "appStateTotal": "Total items",
+      "appStateExpired": "Expired",
+      "appStateNearExpiry": "Near expiry",
+      "appStateLowStock": "Low stock",
+      "appStateIsPro": "PRO status",
+      "notificationPreviewDialogTitle": "Notification Preview",
+      "notificationPreviewNone": "No notification would be scheduled. Check that items and preferences match the notification criteria."
     },
     "info": {
       "title": "About",
@@ -789,9 +828,37 @@
       "rateTitle": "Rate the app",
       "rateSubtitle": "Enjoying PantryMind? Leave us a review.",
       "rateAction": "Rate on Play Store"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Configure daily alerts for your pantry",
+      "openTitle": "Notification settings",
+      "openSubtitle": "Manage alerts and what to be notified about",
+      "enabledTitle": "Enable notifications",
+      "enabledDescription": "Receive a daily summary of your pantry status",
+      "expiredTitle": "Expired products",
+      "expiredDescription": "Alert when items in your pantry have expired",
+      "nearExpiryTitle": "Expiring soon",
+      "nearExpiryDescription": "Alert when products are about to expire",
+      "lowStockTitle": "Low stock",
+      "lowStockDescription": "Alert when essential products are running low"
     }
   },
   "reviews": {
     "prompt": "If PantryMind is helping you, a review really helps us. Would you leave one?"
+  },
+  "notifications": {
+    "expired": {
+      "title": "You have expired items",
+      "body": "{{ count }} items in your pantry have expired"
+    },
+    "nearExpiry": {
+      "title": "Some items are expiring soon",
+      "body": "{{ count }} items expiring, the nearest in {{ nearestDays }} days"
+    },
+    "lowStock": {
+      "title": "Running low on some essentials",
+      "body": "{{ count }} of your staples are getting low"
+    }
   }
 }

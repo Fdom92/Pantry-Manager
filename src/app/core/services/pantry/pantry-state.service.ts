@@ -302,8 +302,8 @@ export class PantryStateService {
   decrementQuantity = (item: PantryItem) => this.quantitySheet.decrementQuantity(item);
   getQuantitySheetTotalQuantity = (item: PantryItem) => this.quantitySheet.getTotalQuantity(item);
 
-  async closeQuantitySheetWithSave(): Promise<void> {
-    await this.quantitySheet.closeQuantitySheet();
+  closeQuantitySheetWithSave(): void {
+    this.quantitySheet.closeQuantitySheet();
   }
 
   openBatchesModalFromSheet(item: PantryItem): void {

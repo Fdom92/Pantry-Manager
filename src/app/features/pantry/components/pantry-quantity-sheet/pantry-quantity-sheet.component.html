@@ -42,6 +42,9 @@
         <ion-icon slot="icon-only" name="add"></ion-icon>
       </ion-button>
     </div>
+    @if (zeroHintKey) {
+      <p class="quantity-zero-hint">{{ zeroHintKey | translate }}</p>
+    }
   </div>
 
   <div class="actions-section">
