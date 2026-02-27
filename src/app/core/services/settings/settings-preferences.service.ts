@@ -96,12 +96,19 @@ export class SettingsPreferencesService {
       notificationsEnabled: Boolean(input?.notificationsEnabled),
       notifyOnExpired: Boolean(input?.notifyOnExpired),
       notifyOnLowStock: Boolean(input?.notifyOnLowStock),
+      notifyOnNearExpiry: Boolean(input?.notifyOnNearExpiry),
+      notificationHour: this.ensureNotificationHour(input?.notificationHour),
       lastSyncAt: input?.lastSyncAt ?? null,
       locationOptions: this.ensureLocationOptions(input?.locationOptions),
       categoryOptions: this.ensureCategoryOptions(input?.categoryOptions),
       supermarketOptions: this.ensureSupermarketOptions(input?.supermarketOptions),
       plannerMemory: this.ensurePlannerMemory(input?.plannerMemory),
     };
+  }
+
+  private ensureNotificationHour(value?: unknown): number {
+    const n = Number(value);
+    return Number.isInteger(n) && n >= 0 && n <= 23 ? n : 9;
   }
 
   private ensureTheme(theme?: string): AppThemePreference {

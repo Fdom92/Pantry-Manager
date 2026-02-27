@@ -602,7 +602,9 @@
       "currentQuantity": "Quantità",
       "increase": "Aumenta",
       "decrease": "Diminuisci",
-      "viewDetails": "Vedi lotti"
+      "viewDetails": "Vedi lotti",
+      "zeroHint": "Sparirà dalla dispensa finché non aggiungi scorte",
+      "zeroHintBasic": "Sparirà dalla dispensa e comparirà nella tua lista della spesa"
     },
     "toasts": {
       "locationRequired": "Seleziona una posizione prima di salvare.",
@@ -774,9 +776,46 @@
     },
     "dev": {
       "title": "Sviluppo",
-      "subtitle": "Strumenti per testare onboarding e configurazione.",
+      "subtitle": "Strumenti per testare diversi scenari.",
+      "groupOnboarding": "Onboarding",
+      "groupNotifications": "Notifiche",
+      "groupData": "Dati",
+      "groupState": "Stato",
       "setupTitle": "Visualizza setup",
-      "setupSubtitle": "Apri il flusso di setup per configurare i cataloghi."
+      "setupSubtitle": "Apri il flusso di setup per configurare i cataloghi.",
+      "resetOnboardingTitle": "Reimposta onboarding",
+      "resetOnboardingSubtitle": "Segna l'onboarding come non visto al prossimo avvio",
+      "testNotificationTitle": "Testa notifica",
+      "testNotificationSubtitle": "Si attiva in 5 secondi — manda l'app in background per vederla",
+      "testNotificationAction": "Testa",
+      "scheduleAtTimeTitle": "Programma a un orario oggi",
+      "scheduleAtTimeSubtitle": "Programma la notifica per oggi all'orario scelto",
+      "scheduleAtTimeAction": "Programma",
+      "previewNotificationTitle": "Anteprima notifica",
+      "previewNotificationSubtitle": "Vedi cosa verrebbe programmato con i dati attuali",
+      "cancelNotificationsTitle": "Cancella tutte le pendenti",
+      "cancelNotificationsSubtitle": "Rimuovi tutte le notifiche programmate",
+      "seedExpiredTitle": "Crea articoli scaduti",
+      "seedExpiredSubtitle": "Aggiungi 3 articoli con date di scadenza passate",
+      "seedNearExpiryTitle": "Crea articoli in scadenza",
+      "seedNearExpirySubtitle": "Aggiungi 3 articoli che scadono in 2–7 giorni",
+      "seedLowStockTitle": "Crea articoli con scorte basse",
+      "seedLowStockSubtitle": "Aggiungi 3 articoli di base sotto la soglia minima",
+      "clearPantryTitle": "Svuota tutta la dispensa",
+      "clearPantrySubtitle": "Elimina definitivamente tutti gli articoli",
+      "clearPantryConfirm": "Eliminare tutti gli articoli? Questa azione non può essere annullata.",
+      "toggleProTitle": "Attiva/disattiva PRO",
+      "toggleProSubtitle": "Simula lo stato PRO ({{ status }})",
+      "showAppStateTitle": "Mostra stato app",
+      "showAppStateSubtitle": "Riepilogo dei contatori attuali",
+      "appStateDialogTitle": "Stato app",
+      "appStateTotal": "Articoli totali",
+      "appStateExpired": "Scaduti",
+      "appStateNearExpiry": "In scadenza",
+      "appStateLowStock": "Scorte basse",
+      "appStateIsPro": "Stato PRO",
+      "notificationPreviewDialogTitle": "Anteprima notifica",
+      "notificationPreviewNone": "Nessuna notifica verrebbe programmata. Verifica che gli articoli e le preferenze corrispondano ai criteri."
     },
     "info": {
       "title": "Info app",
@@ -788,9 +827,37 @@
       "rateTitle": "Valuta l'app",
       "rateSubtitle": "Ti piace PantryMind? Lascia una recensione.",
       "rateAction": "Valuta sul Play Store"
+    },
+    "notifications": {
+      "title": "Notifiche",
+      "subtitle": "Configura avvisi quotidiani per la tua dispensa",
+      "openTitle": "Impostazioni notifiche",
+      "openSubtitle": "Gestisci gli avvisi e di cosa vuoi essere notificato",
+      "enabledTitle": "Attiva notifiche",
+      "enabledDescription": "Ricevi un riepilogo quotidiano dello stato della tua dispensa",
+      "expiredTitle": "Prodotti scaduti",
+      "expiredDescription": "Avviso quando ci sono prodotti scaduti nella tua dispensa",
+      "nearExpiryTitle": "In scadenza",
+      "nearExpiryDescription": "Avviso quando ci sono prodotti in scadenza",
+      "lowStockTitle": "Scorte basse",
+      "lowStockDescription": "Avviso quando i prodotti essenziali sono sotto il minimo"
     }
   },
   "reviews": {
     "prompt": "Se PantryMind ti aiuta, una recensione ci aiuta davvero. Ne lasceresti una?"
+  },
+  "notifications": {
+    "expired": {
+      "title": "Hai prodotti scaduti",
+      "body": "{{ count }} prodotti della tua dispensa sono scaduti"
+    },
+    "nearExpiry": {
+      "title": "Alcuni prodotti stanno per scadere",
+      "body": "{{ count }} prodotti in scadenza, il più vicino tra {{ nearestDays }} giorni"
+    },
+    "lowStock": {
+      "title": "Alcune scorte stanno finendo",
+      "body": "{{ count }} prodotti essenziali sono sotto il minimo"
+    }
   }
 }

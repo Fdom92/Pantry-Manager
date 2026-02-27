@@ -58,6 +58,25 @@ ion-item {
   background: transparent;
 }
 
+.settings-card ion-list-header {
+  padding-top: var(--app-theme-spacing-lg);
+  padding-bottom: 2px;
+  min-height: unset;
+
+  ion-label {
+    font-size: 0.7rem;
+    font-weight: var(--app-theme-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--ion-color-primary);
+    margin: 0;
+  }
+}
+
+.settings-card ion-list-header:first-of-type {
+  padding-top: var(--app-theme-spacing-xs);
+}
+
 .theme-item ion-label {
   width: 100%;
 }

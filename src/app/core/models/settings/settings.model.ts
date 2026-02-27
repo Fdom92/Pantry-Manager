@@ -9,6 +9,8 @@ export interface AppPreferences {
   notificationsEnabled?: boolean;
   notifyOnExpired?: boolean;
   notifyOnLowStock?: boolean;
+  notifyOnNearExpiry?: boolean;
+  notificationHour?: number;
   lastSyncAt?: string | null;
   locationOptions: string[];
   categoryOptions: string[];

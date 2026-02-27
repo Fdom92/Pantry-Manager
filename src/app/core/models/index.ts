@@ -1,4 +1,5 @@
 export * from './agent';
+export * from './notifications';
 export * from './dashboard';
 export * from './settings';
 export * from './pantry';

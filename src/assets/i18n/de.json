@@ -602,7 +602,9 @@
       "currentQuantity": "Menge",
       "increase": "Erhöhen",
       "decrease": "Verringern",
-      "viewDetails": "Chargen anzeigen"
+      "viewDetails": "Chargen anzeigen",
+      "zeroHint": "Verschwindet aus deiner Speisekammer, bis du wieder Vorrat hinzufügst",
+      "zeroHintBasic": "Verschwindet aus deiner Speisekammer und taucht in deiner Einkaufsliste auf"
     },
     "toasts": {
       "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
@@ -774,9 +776,46 @@
     },
     "dev": {
       "title": "Entwicklung",
-      "subtitle": "Tools zum Testen von Onboarding und Einrichtung.",
+      "subtitle": "Tools zum Testen verschiedener Szenarien.",
+      "groupOnboarding": "Onboarding",
+      "groupNotifications": "Benachrichtigungen",
+      "groupData": "Daten",
+      "groupState": "App-Status",
       "setupTitle": "Setup ansehen",
-      "setupSubtitle": "Öffne den Setup-Flow zur Katalogkonfiguration."
+      "setupSubtitle": "Öffne den Setup-Flow zur Katalogkonfiguration.",
+      "resetOnboardingTitle": "Onboarding zurücksetzen",
+      "resetOnboardingSubtitle": "Onboarding beim nächsten Start erneut anzeigen",
+      "testNotificationTitle": "Benachrichtigung testen",
+      "testNotificationSubtitle": "Wird in 5 Sekunden ausgelöst — minimiere die App um sie zu sehen",
+      "testNotificationAction": "Testen",
+      "scheduleAtTimeTitle": "Für eine Uhrzeit heute planen",
+      "scheduleAtTimeSubtitle": "Plant die Benachrichtigung für heute zur gewählten Uhrzeit",
+      "scheduleAtTimeAction": "Planen",
+      "previewNotificationTitle": "Benachrichtigung vorschau",
+      "previewNotificationSubtitle": "Zeigt, was mit aktuellen Daten geplant würde",
+      "cancelNotificationsTitle": "Alle ausstehenden abbrechen",
+      "cancelNotificationsSubtitle": "Alle geplanten Benachrichtigungen entfernen",
+      "seedExpiredTitle": "Abgelaufene Items erstellen",
+      "seedExpiredSubtitle": "3 Items mit vergangenen Ablaufdaten hinzufügen",
+      "seedNearExpiryTitle": "Bald ablaufende Items erstellen",
+      "seedNearExpirySubtitle": "3 Items hinzufügen, die in 2–7 Tagen ablaufen",
+      "seedLowStockTitle": "Items mit niedrigem Bestand erstellen",
+      "seedLowStockSubtitle": "3 Basis-Items unter Mindestschwelle hinzufügen",
+      "clearPantryTitle": "Alle Vorratskammer-Items löschen",
+      "clearPantrySubtitle": "Alle Items dauerhaft löschen",
+      "clearPantryConfirm": "Alle Items löschen? Dies kann nicht rückgängig gemacht werden.",
+      "toggleProTitle": "PRO umschalten",
+      "toggleProSubtitle": "PRO-Status simulieren ({{ status }})",
+      "showAppStateTitle": "App-Status anzeigen",
+      "showAppStateSubtitle": "Übersicht der aktuellen Datenzähler",
+      "appStateDialogTitle": "App-Status",
+      "appStateTotal": "Gesamt",
+      "appStateExpired": "Abgelaufen",
+      "appStateNearExpiry": "Bald ablaufend",
+      "appStateLowStock": "Niedriger Bestand",
+      "appStateIsPro": "PRO-Status",
+      "notificationPreviewDialogTitle": "Benachrichtigungsvorschau",
+      "notificationPreviewNone": "Keine Benachrichtigung würde geplant. Prüfe ob Items und Einstellungen den Kriterien entsprechen."
     },
     "info": {
       "title": "Über die App",
@@ -788,9 +827,37 @@
       "rateTitle": "App bewerten",
       "rateSubtitle": "Gefällt dir PantryMind? Hinterlasse eine Bewertung.",
       "rateAction": "Im Play Store bewerten"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "subtitle": "Tägliche Benachrichtigungen für Ihre Vorratskammer konfigurieren",
+      "openTitle": "Benachrichtigungseinstellungen",
+      "openSubtitle": "Verwalten Sie Benachrichtigungen und worüber Sie informiert werden möchten",
+      "enabledTitle": "Benachrichtigungen aktivieren",
+      "enabledDescription": "Erhalten Sie eine tägliche Zusammenfassung Ihres Vorratskammerstatus",
+      "expiredTitle": "Abgelaufene Produkte",
+      "expiredDescription": "Benachrichtigung, wenn Produkte abgelaufen sind",
+      "nearExpiryTitle": "Bald ablaufend",
+      "nearExpiryDescription": "Benachrichtigung, wenn Produkte bald ablaufen",
+      "lowStockTitle": "Niedriger Lagerbestand",
+      "lowStockDescription": "Benachrichtigung, wenn wesentliche Produkte niedrig sind"
     }
   },
   "reviews": {
     "prompt": "Wenn PantryMind dir hilft, hilft uns eine Bewertung sehr. Würdest du eine dalassen?"
+  },
+  "notifications": {
+    "expired": {
+      "title": "Du hast abgelaufene Produkte",
+      "body": "{{ count }} Produkte in deiner Speisekammer sind abgelaufen"
+    },
+    "nearExpiry": {
+      "title": "Einige Produkte laufen bald ab",
+      "body": "{{ count }} Produkte laufen ab, das nächste in {{ nearestDays }} Tagen"
+    },
+    "lowStock": {
+      "title": "Einige Vorräte werden knapp",
+      "body": "{{ count }} wichtige Produkte liegen unter deinem Minimum"
+    }
   }
 }

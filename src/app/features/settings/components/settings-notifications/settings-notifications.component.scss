@@ -1,0 +1,55 @@
+ion-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: var(--app-theme-font-weight-bold);
+}
+
+ion-card-subtitle {
+  margin-top: var(--app-theme-spacing-xs);
+  font-size: var(--app-theme-font-size-body);
+  color: var(--app-theme-text-muted);
+}
+
+ion-title {
+  color: var(--app-theme-text-color);
+}
+
+ion-card-content {
+  padding-inline: 0;
+}
+
+ion-item h3 {
+  font-size: 0.95rem;
+  font-weight: var(--app-theme-font-weight-bold);
+  margin: 0 0 var(--app-theme-spacing-xs);
+}
+
+ion-item p {
+  font-size: var(--app-theme-font-size-body);
+  color: var(--app-theme-text-muted);
+  margin: 0;
+}
+
+ion-item {
+  --background: transparent;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-lg);
+  margin: var(--app-theme-card-margin-inline);
+}
+
+.settings-card {
+  margin: 0;
+  background: var(--app-theme-card-bg) !important;
+  --background: var(--app-theme-card-bg);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  border-color: var(--app-theme-card-border-color);
+  color: var(--app-theme-text-color);
+}
+
+.settings-card ion-list {
+  background: transparent;
+}
