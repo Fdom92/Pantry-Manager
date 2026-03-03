@@ -491,6 +491,7 @@
       "count": "{{ count }} lotes registrados",
       "open": "Abierto",
       "noExpiryDate": "Sin fecha de caducidad",
+      "addBatch": "Añadir lote",
       "expires": {
         "today": "Caduca hoy",
         "tomorrow": "Caduca mañana"
@@ -603,7 +604,9 @@
       "hint": "Ajusta la cantidad. Se guardará al cerrar.",
       "increase": "Aumentar",
       "decrease": "Disminuir",
-      "viewDetails": "Ver lotes",
+      "viewDetails": "Ver lotes y fechas",
+      "expiryDate": "Fecha de caducidad (opcional)",
+      "noDate": "Sin fecha",
       "zeroHint": "Desaparecerá de tu despensa hasta que añadas más",
       "zeroHintBasic": "Desaparecerá de tu despensa y pasará a tu lista de la compra"
     },
@@ -841,7 +844,10 @@
       "nearExpiryTitle": "Próximos a caducar",
       "nearExpiryDescription": "Alerta cuando hay productos que caducan pronto",
       "lowStockTitle": "Stock bajo",
-      "lowStockDescription": "Alerta cuando productos esenciales están por debajo del mínimo"
+      "lowStockDescription": "Alerta cuando productos esenciales están por debajo del mínimo",
+      "permissionDeniedTitle": "Notificaciones bloqueadas",
+      "permissionDeniedMessage": "¡Vaya! Parece que anteriormente desactivaste el permiso de notificaciones. Para volver a activarlas, ve a los Ajustes de tu dispositivo, busca la app y activa las notificaciones desde ahí.",
+      "permissionDeniedButton": "Entendido"
     }
   },
   "reviews": {

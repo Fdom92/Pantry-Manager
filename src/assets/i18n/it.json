@@ -491,6 +491,7 @@
       "count": "{{ count }} lotti registrati",
       "open": "Aperto",
       "noExpiryDate": "Nessuna data di scadenza",
+      "addBatch": "Aggiungi lotto",
       "expires": {
         "today": "Scade oggi",
         "tomorrow": "Scade domani"
@@ -602,7 +603,9 @@
       "currentQuantity": "Quantità",
       "increase": "Aumenta",
       "decrease": "Diminuisci",
-      "viewDetails": "Vedi lotti",
+      "viewDetails": "Vedi lotti e date",
+      "expiryDate": "Data di scadenza (opzionale)",
+      "noDate": "Nessuna data",
       "zeroHint": "Sparirà dalla dispensa finché non aggiungi scorte",
       "zeroHintBasic": "Sparirà dalla dispensa e comparirà nella tua lista della spesa"
     },
@@ -840,7 +843,10 @@
       "nearExpiryTitle": "In scadenza",
       "nearExpiryDescription": "Avviso quando ci sono prodotti in scadenza",
       "lowStockTitle": "Scorte basse",
-      "lowStockDescription": "Avviso quando i prodotti essenziali sono sotto il minimo"
+      "lowStockDescription": "Avviso quando i prodotti essenziali sono sotto il minimo",
+      "permissionDeniedTitle": "Notifiche bloccate",
+      "permissionDeniedMessage": "Sembra che tu abbia precedentemente negato il permesso per le notifiche. Per riattivarle, vai nelle Impostazioni del dispositivo, trova l'app e attiva le notifiche da lì.",
+      "permissionDeniedButton": "Capito"
     }
   },
   "reviews": {

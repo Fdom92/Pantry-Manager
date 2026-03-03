@@ -73,6 +73,10 @@ ion-modal::part(content) {
   font-size: var(--app-theme-font-size-body);
 }
 
+.entity-selector-item app-date-chip {
+  margin-top: 4px;
+}
+
 .entity-selector-controls {
   display: inline-flex;
   align-items: center;

@@ -491,6 +491,7 @@
       "count": "{{ count }} lotes registados",
       "open": "Aberto",
       "noExpiryDate": "Sem data de validade",
+      "addBatch": "Adicionar lote",
       "expires": {
         "today": "Expira hoje",
         "tomorrow": "Expira amanhã"
@@ -602,7 +603,9 @@
       "currentQuantity": "Quantidade",
       "increase": "Aumentar",
       "decrease": "Diminuir",
-      "viewDetails": "Ver lotes",
+      "viewDetails": "Ver lotes e datas",
+      "expiryDate": "Data de validade (opcional)",
+      "noDate": "Sem data",
       "zeroHint": "Vai desaparecer da despensa até você adicionar mais",
       "zeroHintBasic": "Vai desaparecer da despensa e aparecer na sua lista de compras"
     },
@@ -840,7 +843,10 @@
       "nearExpiryTitle": "A expirar em breve",
       "nearExpiryDescription": "Alerta quando há produtos prestes a expirar",
       "lowStockTitle": "Estoque baixo",
-      "lowStockDescription": "Alerta quando produtos essenciais estão abaixo do mínimo"
+      "lowStockDescription": "Alerta quando produtos essenciais estão abaixo do mínimo",
+      "permissionDeniedTitle": "Notificações bloqueadas",
+      "permissionDeniedMessage": "Parece que anteriormente negaste a permissão de notificações. Para as reativar, vai às Definições do dispositivo, encontra a app e ativa as notificações a partir daí.",
+      "permissionDeniedButton": "Percebi"
     }
   },
   "reviews": {

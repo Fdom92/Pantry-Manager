@@ -20,6 +20,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
+import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
 
 @Component({
   selector: 'app-pantry-batches-modal',
@@ -43,6 +44,7 @@ import { PantryStateService } from '@core/services/pantry/pantry-state.service';
     IonSelect,
     IonSelectOption,
     IonSpinner,
+    DateChipComponent,
   ],
   templateUrl: './batches-modal.component.html',
   styleUrls: ['./batches-modal.component.scss'],

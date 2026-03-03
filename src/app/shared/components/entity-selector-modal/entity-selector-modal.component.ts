@@ -18,12 +18,14 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntityAutocompleteComponent, type AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
 
 export interface EntitySelectorEntry {
   id: string;
   title: string;
   quantity: number;
   maxQuantity?: number;
+  expirationDate?: string;
 }
 
 @Component({
@@ -39,6 +41,7 @@ export interface EntitySelectorEntry {
     IonButtons,
     IonButton,
     IonIcon,
+    DateChipComponent,
     IonContent,
     IonList,
     IonItem,
@@ -81,6 +84,7 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Output() queryChange = new EventEmitter<string>();
   @Output() emptyAction = new EventEmitter<string>();
   @Output() adjustEntry = new EventEmitter<{ entry: EntitySelectorEntry; delta: number }>();
+  @Output() entryDateChange = new EventEmitter<{ entry: EntitySelectorEntry; date: string | undefined }>();
   @Output() save = new EventEmitter<void>();
   @Output() secondaryAction = new EventEmitter<void>();
 

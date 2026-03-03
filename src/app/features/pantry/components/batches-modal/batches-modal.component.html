@@ -9,10 +9,10 @@
         <ion-buttons slot="end">
           @if (!state.batchesEditMode()) {
             <ion-button fill="clear" color="medium" (click)="state.enterBatchesEditMode()">
-              <ion-icon slot="start" name="create-outline"></ion-icon>
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
             </ion-button>
             <ion-button fill="clear" color="medium" (click)="state.dismissBatchesModal()">
-              <ion-icon name="close"></ion-icon>
+              <ion-icon slot="icon-only" name="close"></ion-icon>
             </ion-button>
           }
         </ion-buttons>
@@ -66,13 +66,13 @@
                       labelPlacement="stacked"
                       (ionInput)="state.updateBatchQuantity($index, +$any($event.target).value)">
                     </ion-input>
-                    <ion-input
-                      type="date"
-                      [value]="state.getBatchDateInputValue(batch)"
-                      label="{{ 'pantry.form.batches.expiry' | translate }}"
-                      labelPlacement="stacked"
-                      (ionInput)="state.updateBatchExpirationDate($index, $any($event.target).value)">
-                    </ion-input>
+                    <div class="batch-date-field">
+                      <span class="batch-date-label">{{ 'pantry.form.batches.expiry' | translate }}</span>
+                      <app-date-chip
+                        [date]="state.getBatchDateInputValue(batch) || undefined"
+                        (dateChange)="state.updateBatchExpirationDate($index, $event ?? '')">
+                      </app-date-chip>
+                    </div>
                   </div>
                   <div class="edit-batch-row">
                     <ion-select
@@ -90,6 +90,12 @@
                 </div>
               }
             </div>
+
+            <!-- Add batch -->
+            <ion-button expand="block" fill="clear" (click)="state.addBatchesEntry()">
+              <ion-icon slot="start" name="add-outline"></ion-icon>
+              {{ 'pantry.batches.addBatch' | translate }}
+            </ion-button>
 
             <!-- Edit mode actions -->
             <div class="edit-actions">

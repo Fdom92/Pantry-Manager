@@ -10,6 +10,8 @@ import type {
 import { PantryViewModelService } from '../pantry-view-model.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { toDateInputValue, toIsoDate } from '@core/utils/date.util';
+import { generateBatchId } from '@core/utils';
+import { UNASSIGNED_LOCATION_KEY } from '@core/constants';
 
 /**
  * Manages batches modal state and batch view models.
@@ -92,6 +94,22 @@ export class PantryBatchesModalStateService {
   cancelEditMode(): void {
     this.editMode.set(false);
     this.editedBatches.set([]);
+  }
+
+  /**
+   * Add a new empty batch, entering edit mode if needed.
+   */
+  addBatch(): void {
+    if (!this.editMode()) {
+      this.enterEditMode();
+    }
+    const newBatch: ItemBatch = {
+      batchId: generateBatchId(),
+      quantity: 1,
+      locationId: UNASSIGNED_LOCATION_KEY,
+      expirationDate: undefined,
+    };
+    this.editedBatches.update(batches => [...batches, newBatch]);
   }
 
   /**

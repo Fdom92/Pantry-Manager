@@ -156,6 +156,12 @@
                 </ion-button>
               </div>
               <span class="quantity-hint">{{ 'pantry.form.quantity.hint' | translate }}</span>
+              @if (state.pendingQuantityChange() > 0) {
+                <app-date-chip
+                  [date]="state.pendingExpiryDate()"
+                  (dateChange)="state.setExpiryDate($event)">
+                </app-date-chip>
+              }
             </div>
           } @else {
             <!-- Create mode: Initial quantity input -->

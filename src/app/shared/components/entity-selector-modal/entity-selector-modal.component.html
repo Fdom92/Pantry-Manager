@@ -46,6 +46,10 @@
                 <ion-item class="entity-selector-item">
                   <ion-label>
                     <h3>{{ entry.title }}</h3>
+                    <app-date-chip
+                      [date]="entry.expirationDate"
+                      (dateChange)="entryDateChange.emit({ entry, date: $event })">
+                    </app-date-chip>
                   </ion-label>
                   <div class="entity-selector-controls" slot="end">
                     <ion-button
