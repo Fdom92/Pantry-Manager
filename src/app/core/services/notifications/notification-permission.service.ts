@@ -6,7 +6,7 @@ import {
 } from '@core/constants';
 import { CapacitorNotificationPlugin } from './capacitor-notification.plugin';
 
-export type NotificationPermissionState = 'unknown' | 'granted' | 'denied';
+export type NotificationPermissionState = 'unknown' | 'granted' | 'prompt' | 'prompt-with-rationale' | 'denied';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationPermissionService {
@@ -14,6 +14,11 @@ export class NotificationPermissionService {
   private channelCreated = false;
 
   readonly permissionState = signal<NotificationPermissionState>('unknown');
+  private hasBeenRequested = false;
+
+  get wasRequested(): boolean {
+    return this.hasBeenRequested;
+  }
 
   async init(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
@@ -24,13 +29,14 @@ export class NotificationPermissionService {
     }
     // Only query the system if we don't have a definitive answer yet
     if (this.permissionState() === 'unknown') {
-      const granted = await this.plugin.checkPermission();
-      this.permissionState.set(granted ? 'granted' : 'denied');
+      const display = await this.plugin.checkPermission();
+      this.permissionState.set(display);
     }
   }
 
   async request(): Promise<boolean> {
     if (!Capacitor.isNativePlatform()) return false;
+    this.hasBeenRequested = true;
     const granted = await this.plugin.requestPermission();
     this.permissionState.set(granted ? 'granted' : 'denied');
     return granted;
@@ -38,6 +44,10 @@ export class NotificationPermissionService {
 
   isGranted(): boolean {
     return this.permissionState() === 'granted';
+  }
+
+  isPermanentlyDenied(): boolean {
+    return this.permissionState() === 'denied';
   }
 
   private async createChannel(): Promise<void> {
