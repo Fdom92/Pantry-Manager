@@ -140,6 +140,7 @@ export class SettingsCatalogsStateService {
             return false;
           }
           config.addToDraft(value);
+          void this.submitCatalogs();
           this.onAddPromptDismiss();
           return true;
         },
@@ -295,12 +296,14 @@ export class SettingsCatalogsStateService {
     const value = normalizeTrim(draft[index]);
     if (!value) {
       config.removeFromDraft(index);
+      void this.submitCatalogs();
       return;
     }
 
     const usage = await config.getUsage(value);
     if (!usage.count) {
       config.removeFromDraft(index);
+      void this.submitCatalogs();
       return;
     }
 

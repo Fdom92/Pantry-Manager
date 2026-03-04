@@ -157,21 +157,6 @@
       </ion-card-content>
     </ion-card>
 
-    <div class="catalog-actions">
-      <ion-button
-        expand="block"
-        color="primary"
-        (click)="state.submitCatalogs()"
-        [disabled]="!state.hasAnyChanges() || state.isSaving() || state.hasDuplicateOptions()">
-        @if (state.isSaving()) {
-          <ion-spinner
-            slot="start"
-            name="dots">
-          </ion-spinner>
-        }
-        {{ 'settings.catalogs.saveAction' | translate }}
-      </ion-button>
-    </div>
   </div>
 
   <ion-alert
