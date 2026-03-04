@@ -40,6 +40,7 @@
                       {{ state.formatBatchDate(entry.batch) }}
                     </h3>
                     <p>
+                      {{ 'pantry.batches.currentQuantity' | translate }}
                       {{ state.formatBatchQuantity(entry.batch) }}
                       @if (entry.locationLabel && entry.locationId !== 'unassigned') {
                         · {{ entry.locationLabel }}

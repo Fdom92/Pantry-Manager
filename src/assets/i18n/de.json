@@ -492,6 +492,7 @@
       "open": "Geöffnet",
       "noExpiryDate": "Kein Ablaufdatum",
       "addBatch": "Charge hinzufügen",
+      "currentQuantity": "Menge",
       "expires": {
         "today": "Läuft heute ab",
         "tomorrow": "Läuft morgen ab"

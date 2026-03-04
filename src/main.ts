@@ -34,6 +34,7 @@ import {
   chevronUpOutline,
   clipboardOutline,
   close,
+  closeCircle,
   closeCircleOutline,
   closeOutline,
   cloudUploadOutline,
@@ -174,7 +175,8 @@ addIcons({
   'skull-outline': skullOutline,
   'close-circle-outline': closeCircleOutline,
   'eye-outline': eyeOutline,
-  'warning-outline': warningOutline
+  'warning-outline': warningOutline,
+  'close-circle': closeCircle
 });
 
 bootstrapApplication(AppComponent, {

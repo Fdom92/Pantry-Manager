@@ -492,6 +492,7 @@
       "open": "Aperto",
       "noExpiryDate": "Nessuna data di scadenza",
       "addBatch": "Aggiungi lotto",
+      "currentQuantity": "Quantità",
       "expires": {
         "today": "Scade oggi",
         "tomorrow": "Scade domani"

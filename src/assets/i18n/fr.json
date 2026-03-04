@@ -492,6 +492,7 @@
       "open": "Ouvert",
       "noExpiryDate": "Sans date de péremption",
       "addBatch": "Ajouter un lot",
+      "currentQuantity": "Quantité",
       "expires": {
         "today": "Expire aujourd'hui",
         "tomorrow": "Expire demain"

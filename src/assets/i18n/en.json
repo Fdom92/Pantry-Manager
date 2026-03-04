@@ -492,6 +492,7 @@
       "open": "Opened",
       "noExpiryDate": "No expiration date",
       "addBatch": "Add batch",
+      "currentQuantity": "Quantity",
       "expires": {
         "today": "Expires today",
         "tomorrow": "Expires tomorrow"

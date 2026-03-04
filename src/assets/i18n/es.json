@@ -492,6 +492,7 @@
       "open": "Abierto",
       "noExpiryDate": "Sin fecha de caducidad",
       "addBatch": "Añadir lote",
+      "currentQuantity": "Cantidad",
       "expires": {
         "today": "Caduca hoy",
         "tomorrow": "Caduca mañana"
