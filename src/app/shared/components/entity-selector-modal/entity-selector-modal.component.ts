@@ -71,6 +71,7 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Input() showMeta = false;
   @Input() showAllOnFocus = true;
   @Input() autofocus = true;
+  @Input() maxOptions = 0;
   @Input() secondaryActionLabel = '';
   @Input() showSecondaryAction = false;
 

@@ -29,7 +29,7 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   @Input() disabled = false;
   @Input() readonly = false;
   @Input() minChars = 1;
-  @Input() maxOptions = 6;
+  @Input() maxOptions = 0;
   @Input() mode: 'consume' | 'add' | 'select' = 'select';
   @Input() showAllOnFocus = false;
   @Input() showSecondaryInfo = false;

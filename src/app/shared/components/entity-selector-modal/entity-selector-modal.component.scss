@@ -61,6 +61,7 @@ ion-modal::part(content) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 1px solid var(--ion-item-border-color, var(--ion-border-color, var(--ion-color-step-150, var(--ion-background-color-step-150, rgba(0, 0, 0, 0.13)))));
 }
 
 .entity-selector-item h3 {
