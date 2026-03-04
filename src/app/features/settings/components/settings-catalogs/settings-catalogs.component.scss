@@ -78,19 +78,10 @@ ion-item {
   }
 }
 
-.catalog-actions {
-  padding: 0 16px 8px;
-}
-
 @media (min-width: 768px) {
   .catalogs-content {
     padding-left: 32px;
     padding-right: 32px;
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
-  }
-
-  .catalog-actions {
-    padding-left: 32px;
-    padding-right: 32px;
   }
 }

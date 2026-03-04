@@ -505,7 +505,7 @@ export class DashboardStateService {
   }
 
   formatDate(value?: string | null): string {
-    return formatDateValue(value ?? null, this.languageService.getCurrentLocale(), ES_DATE_FORMAT_OPTIONS.numeric, {
+    return formatDateValue(value ?? null, this.languageService.getCurrentLocale(), ES_DATE_FORMAT_OPTIONS.short, {
       fallback: this.translate.instant('common.dates.none'),
     });
   }

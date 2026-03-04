@@ -78,6 +78,7 @@ export class PantryStateService {
   readonly showQuantitySheet = this.quantitySheet.showQuantitySheet;
   readonly selectedQuantitySheetItem = this.quantitySheet.selectedItem;
   readonly pendingQuantityChange = this.quantitySheet.pendingQuantityChange;
+  readonly pendingQuantitySheetExpiryDate = this.quantitySheet.pendingExpiryDate;
 
   // Computed signals coordinating across services
   readonly groups = computed(() => this.viewModel.buildGroups(this.pantryItemsState()));
@@ -201,6 +202,7 @@ export class PantryStateService {
   addFastAddEntryFromQuery = (name?: string) => this.fastAddModal.addFastAddEntryFromQuery(name);
   adjustFastAddEntry = (entry: FastAddEntry, delta: number) => this.fastAddModal.adjustFastAddEntry(entry, delta);
   adjustFastAddEntryById = (entryId: string, delta: number) => this.fastAddModal.adjustFastAddEntryById(entryId, delta);
+  setFastAddEntryDate = (entryId: string, date: string | undefined) => this.fastAddModal.setFastAddEntryDate(entryId, date);
 
   // -------- List UI state (delegates to PantryListUiStateService) --------
   trackByItemId = (index: number, item: PantryItem) => this.listUi.trackByItemId(index, item);
@@ -289,6 +291,7 @@ export class PantryStateService {
   getBatchStatus = (batch: ItemBatch) => this.batchesModal.getBatchStatus(batch);
   enterBatchesEditMode = () => this.batchesModal.enterEditMode();
   cancelBatchesEditMode = () => this.batchesModal.cancelEditMode();
+  addBatchesEntry = () => this.batchesModal.addBatch();
   updateBatchQuantity = (index: number, quantity: number) => this.batchesModal.updateBatchQuantity(index, quantity);
   updateBatchExpirationDate = (index: number, dateString: string) => this.batchesModal.updateBatchExpirationDate(index, dateString);
   updateBatchLocation = (index: number, locationId: string) => this.batchesModal.updateBatchLocation(index, locationId);
@@ -301,19 +304,22 @@ export class PantryStateService {
   incrementQuantity = (item: PantryItem) => this.quantitySheet.incrementQuantity(item);
   decrementQuantity = (item: PantryItem) => this.quantitySheet.decrementQuantity(item);
   getQuantitySheetTotalQuantity = (item: PantryItem) => this.quantitySheet.getTotalQuantity(item);
+  setQuantitySheetExpiryDate = (date: string | undefined) => this.quantitySheet.setExpiryDate(date);
 
   closeQuantitySheetWithSave(): void {
     this.quantitySheet.closeQuantitySheet();
   }
 
-  openBatchesModalFromSheet(item: PantryItem): void {
-    this.quantitySheet.dismissQuantitySheet();
-    this.batchesModal.openBatchesModal(item);
+  async openBatchesModalFromSheet(item: PantryItem): Promise<void> {
+    await this.quantitySheet.dismissQuantitySheet();
+    const updatedItem = this.pantryItemsState().find(i => i._id === item._id) ?? item;
+    this.batchesModal.openBatchesModal(updatedItem);
   }
 
-  openEditModalFromSheet(item: PantryItem): void {
-    this.quantitySheet.dismissQuantitySheet();
-    this.editItemModalRequest.set({ mode: 'edit', item });
+  async openEditModalFromSheet(item: PantryItem): Promise<void> {
+    await this.quantitySheet.dismissQuantitySheet();
+    const updatedItem = this.pantryItemsState().find(i => i._id === item._id) ?? item;
+    this.editItemModalRequest.set({ mode: 'edit', item: updatedItem });
   }
 
   onDestroy(): void {

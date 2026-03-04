@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { NOTIFICATION_CHANNEL_ID } from '@core/constants';
-import type { INotificationPlugin } from './notification.plugin';
+import type { INotificationPlugin, NotificationPermissionDisplay } from './notification.plugin';
 
 @Injectable({ providedIn: 'root' })
 export class CapacitorNotificationPlugin implements INotificationPlugin {
@@ -15,12 +15,12 @@ export class CapacitorNotificationPlugin implements INotificationPlugin {
     }
   }
 
-  async checkPermission(): Promise<boolean> {
+  async checkPermission(): Promise<NotificationPermissionDisplay> {
     try {
       const result = await LocalNotifications.checkPermissions();
-      return result.display === 'granted';
+      return result.display as NotificationPermissionDisplay;
     } catch {
-      return false;
+      return 'denied';
     }
   }
 

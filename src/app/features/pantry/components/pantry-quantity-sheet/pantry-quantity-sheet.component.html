@@ -45,6 +45,14 @@
     @if (zeroHintKey) {
       <p class="quantity-zero-hint">{{ zeroHintKey | translate }}</p>
     }
+    @if (pendingChange > 0) {
+      <div class="expiry-chip-wrapper">
+        <app-date-chip
+          [date]="pendingExpiryDate"
+          (dateChange)="expiryDateChange.emit($event)">
+        </app-date-chip>
+      </div>
+    }
   </div>
 
   <div class="actions-section">
