@@ -88,6 +88,46 @@ export function normalizeBatches(
   return mergeBatchesByExpiry(normalized);
 }
 
+/**
+ * Apply FIFO consumption to a batch list.
+ * Consumes from earliest expiring batches first; batches without date are consumed last.
+ * Returns a new array with exhausted batches removed.
+ */
+export function applyFifoConsumption(batches: ItemBatch[], amount: number): ItemBatch[] {
+  const delta = toNumberOrZero(amount);
+  if (delta <= 0) return batches.map(b => ({ ...b }));
+
+  const working = batches.map((batch, index) => ({ batch: { ...batch }, index }));
+  const ordered = working
+    .filter(e => toNumberOrZero(e.batch.quantity) > 0)
+    .sort((a, b) => {
+      const left = getExpiryTimestamp(a.batch.expirationDate);
+      const right = getExpiryTimestamp(b.batch.expirationDate);
+      return left === right ? a.index - b.index : left - right;
+    });
+
+  let remaining = delta;
+  for (const entry of ordered) {
+    if (remaining <= 0) break;
+    const qty = toNumberOrZero(entry.batch.quantity);
+    if (qty <= remaining + 1e-9) {
+      entry.batch.quantity = 0;
+      remaining -= qty;
+    } else {
+      entry.batch.quantity = qty - remaining;
+      remaining = 0;
+    }
+  }
+
+  return working.map(e => e.batch).filter(b => toNumberOrZero(b.quantity) > 0);
+}
+
+function getExpiryTimestamp(value?: string): number {
+  if (!value) return Number.POSITIVE_INFINITY;
+  const time = Date.parse(value);
+  return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time;
+}
+
 export function computeEarliestExpiry(batches: ItemBatch[] | undefined): string | undefined {
   const dates: string[] = [];
   for (const batch of batches ?? []) {

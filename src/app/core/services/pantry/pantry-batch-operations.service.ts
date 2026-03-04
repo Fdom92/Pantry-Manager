@@ -1,7 +1,7 @@
 import { Injectable, WritableSignal, inject } from '@angular/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { BATCH_STOCK_SAVE_DELAY_MS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
-import { computeEarliestExpiry, normalizeBatches, sumQuantities } from '@core/domain/pantry';
+import { applyFifoConsumption, computeEarliestExpiry, normalizeBatches, sumQuantities } from '@core/domain/pantry';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeLocationId, normalizeLowercase } from '@core/utils/normalization.util';
@@ -133,35 +133,8 @@ export class PantryBatchOperationsService {
         pantryItemsState
       );
     } else if (change < 0) {
-      // Apply FIFO logic to decrement the total amount
-      let remainingToDecrement = Math.abs(change);
       const originalTotal = sumQuantities(item.batches ?? [], { round: roundQuantity });
-
-      // Sort batches by expiration date (FIFO - oldest first, no-date batches consumed last)
-      const sortedBatches = [...(item.batches ?? [])].sort((a, b) => {
-        const dateA = a.expirationDate ? new Date(a.expirationDate).getTime() : Infinity;
-        const dateB = b.expirationDate ? new Date(b.expirationDate).getTime() : Infinity;
-        if (dateA === dateB) return 0;
-        return dateA - dateB;
-      });
-
-      // Apply all decrements in a single in-memory pass to avoid stale-item overwrites
-      const workingBatches = (item.batches ?? []).map(b => ({ ...b }));
-      for (const batch of sortedBatches) {
-        if (remainingToDecrement <= 0) break;
-        const workingBatch = workingBatches.find(b =>
-          b.batchId && batch.batchId ? b.batchId === batch.batchId : (b.expirationDate ?? '') === (batch.expirationDate ?? '')
-        );
-        if (!workingBatch) continue;
-        const currentQuantity = workingBatch.quantity ?? 0;
-        if (currentQuantity <= 0) continue;
-        const toDecrement = Math.min(currentQuantity, remainingToDecrement);
-        workingBatch.quantity = roundQuantity(Math.max(0, currentQuantity - toDecrement));
-        remainingToDecrement -= toDecrement;
-      }
-
-      // Remove exhausted batches and persist once
-      const finalBatches = workingBatches.filter(b => (b.quantity ?? 0) > 0);
+      const finalBatches = applyFifoConsumption(item.batches ?? [], Math.abs(change));
       const newTotal = sumQuantities(finalBatches, { round: roundQuantity });
       const updatedItem = this.rebuildItemWithBatches(item, finalBatches, pantryItemsState);
       await this.provideQuantityFeedback(originalTotal, newTotal);
