@@ -153,6 +153,13 @@
   border-radius: 8px;
 }
 
+.expiry-chip-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+
 .actions-section {
   border-top: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
 }

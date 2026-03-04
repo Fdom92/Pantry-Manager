@@ -57,13 +57,14 @@ ion-modal::part(content) {
   overflow: visible;
 }
 
-.entity-selector-list {
-  margin-top: var(--app-theme-spacing-xs);
+.entity-selector-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .entity-selector-item h3 {
   margin: 0;
-  font-size: 0.98rem;
   font-weight: var(--app-theme-font-weight-bold);
 }
 
@@ -73,10 +74,21 @@ ion-modal::part(content) {
   font-size: var(--app-theme-font-size-body);
 }
 
+.entity-selector-item app-date-chip {
+  margin-top: 4px;
+}
+
 .entity-selector-controls {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: var(--app-theme-spacing-xs);
+  flex-direction: column;
+  margin-bottom: 8px;
+  min-width: 40%;
+}
+
+.entity-selector-quantity {
+  display: flex;
+  align-items: center;
 }
 
 .entity-selector-qty {

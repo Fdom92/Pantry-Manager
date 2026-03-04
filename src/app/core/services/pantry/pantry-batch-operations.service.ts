@@ -101,7 +101,8 @@ export class PantryBatchOperationsService {
   async adjustTotalQuantityWithFIFO(
     item: PantryItem,
     change: number,
-    pantryItemsState?: WritableSignal<PantryItem[]>
+    pantryItemsState?: WritableSignal<PantryItem[]>,
+    expirationDate?: string
   ): Promise<void> {
     if (!item?._id || !Number.isFinite(change) || change === 0) {
       return;
@@ -113,7 +114,7 @@ export class PantryBatchOperationsService {
         batchId: generateBatchId(),
         quantity: 0, // Start with 0, then adjust
         locationId: UNASSIGNED_LOCATION_KEY,
-        expirationDate: undefined,
+        expirationDate: expirationDate ?? undefined,
       };
 
       // Add the new batch to the item first
@@ -134,37 +135,37 @@ export class PantryBatchOperationsService {
     } else if (change < 0) {
       // Apply FIFO logic to decrement the total amount
       let remainingToDecrement = Math.abs(change);
+      const originalTotal = sumQuantities(item.batches ?? [], { round: roundQuantity });
 
-      // Sort batches by expiration date (FIFO - oldest first)
+      // Sort batches by expiration date (FIFO - oldest first, no-date batches consumed last)
       const sortedBatches = [...(item.batches ?? [])].sort((a, b) => {
         const dateA = a.expirationDate ? new Date(a.expirationDate).getTime() : Infinity;
         const dateB = b.expirationDate ? new Date(b.expirationDate).getTime() : Infinity;
+        if (dateA === dateB) return 0;
         return dateA - dateB;
       });
 
-      // Decrement batches in FIFO order
+      // Apply all decrements in a single in-memory pass to avoid stale-item overwrites
+      const workingBatches = (item.batches ?? []).map(b => ({ ...b }));
       for (const batch of sortedBatches) {
-        if (remainingToDecrement <= 0) {
-          break;
-        }
-
-        const currentQuantity = batch.quantity ?? 0;
-        if (currentQuantity > 0) {
-          const toDecrement = Math.min(currentQuantity, remainingToDecrement);
-          const locationId = normalizeLocationId(batch.locationId, UNASSIGNED_LOCATION_KEY);
-
-          await this.adjustBatchQuantity(
-            item,
-            locationId,
-            batch,
-            -toDecrement,
-            undefined,
-            pantryItemsState
-          );
-
-          remainingToDecrement -= toDecrement;
-        }
+        if (remainingToDecrement <= 0) break;
+        const workingBatch = workingBatches.find(b =>
+          b.batchId && batch.batchId ? b.batchId === batch.batchId : (b.expirationDate ?? '') === (batch.expirationDate ?? '')
+        );
+        if (!workingBatch) continue;
+        const currentQuantity = workingBatch.quantity ?? 0;
+        if (currentQuantity <= 0) continue;
+        const toDecrement = Math.min(currentQuantity, remainingToDecrement);
+        workingBatch.quantity = roundQuantity(Math.max(0, currentQuantity - toDecrement));
+        remainingToDecrement -= toDecrement;
       }
+
+      // Remove exhausted batches and persist once
+      const finalBatches = workingBatches.filter(b => (b.quantity ?? 0) > 0);
+      const newTotal = sumQuantities(finalBatches, { round: roundQuantity });
+      const updatedItem = this.rebuildItemWithBatches(item, finalBatches, pantryItemsState);
+      await this.provideQuantityFeedback(originalTotal, newTotal);
+      this.triggerStockSave(item._id, updatedItem, { adjustmentType: 'consume', deltaQuantity: change });
     }
   }
 

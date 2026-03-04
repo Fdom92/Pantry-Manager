@@ -12,6 +12,7 @@ export class PantryQuantitySheetStateService {
   readonly showQuantitySheet = signal(false);
   readonly selectedItem = signal<PantryItem | null>(null);
   readonly pendingQuantityChange = signal(0);
+  readonly pendingExpiryDate = signal<string | undefined>(undefined);
 
   // Reference to pantry items state for optimistic updates
   pantryItemsState?: WritableSignal<PantryItem[]>;
@@ -23,6 +24,7 @@ export class PantryQuantitySheetStateService {
     event?.stopPropagation();
     this.selectedItem.set(item);
     this.pendingQuantityChange.set(0);
+    this.pendingExpiryDate.set(undefined);
     this.showQuantitySheet.set(true);
   }
 
@@ -41,14 +43,23 @@ export class PantryQuantitySheetStateService {
   async dismissQuantitySheet(): Promise<void> {
     const item = this.selectedItem();
     const change = this.pendingQuantityChange();
+    const expiryDate = this.pendingExpiryDate();
 
     this.showQuantitySheet.set(false);
     this.selectedItem.set(null);
     this.pendingQuantityChange.set(0);
+    this.pendingExpiryDate.set(undefined);
 
     if (item && change !== 0) {
-      await this.applyPendingChanges(item, change);
+      await this.applyPendingChanges(item, change, expiryDate);
     }
+  }
+
+  /**
+   * Set the optional expiry date for the new batch being incremented.
+   */
+  setExpiryDate(date: string | undefined): void {
+    this.pendingExpiryDate.set(date || undefined);
   }
 
   /**
@@ -83,8 +94,8 @@ export class PantryQuantitySheetStateService {
   /**
    * Apply accumulated quantity changes when closing the sheet.
    */
-  private async applyPendingChanges(item: PantryItem, change: number): Promise<void> {
-    await this.batchOps.adjustTotalQuantityWithFIFO(item, change, this.pantryItemsState);
+  private async applyPendingChanges(item: PantryItem, change: number, expiryDate?: string): Promise<void> {
+    await this.batchOps.adjustTotalQuantityWithFIFO(item, change, this.pantryItemsState, expiryDate);
   }
 
 

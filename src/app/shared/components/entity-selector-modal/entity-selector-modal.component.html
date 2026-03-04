@@ -41,32 +41,38 @@
           </app-entity-autocomplete>
 
           @if (entries.length) {
-            <ion-list class="entity-selector-list">
+            <section class="entity-selector-list">
               @for (entry of entries; track entry.id) {
-                <ion-item class="entity-selector-item">
+                <div class="entity-selector-item">
                   <ion-label>
                     <h3>{{ entry.title }}</h3>
                   </ion-label>
                   <div class="entity-selector-controls" slot="end">
-                    <ion-button
-                      fill="clear"
-                      size="small"
-                      [disabled]="entry.quantity <= 0"
-                      (click)="adjustEntry.emit({ entry, delta: -1 })">
-                      <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
-                    </ion-button>
-                    <ion-text class="entity-selector-qty">{{ entry.quantity }}</ion-text>
-                    <ion-button
-                      fill="clear"
-                      size="small"
-                      [disabled]="!canIncrease(entry)"
-                      (click)="adjustEntry.emit({ entry, delta: 1 })">
-                      <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-                    </ion-button>
+                    <div class="entity-selector-quantity">
+                      <ion-button
+                        fill="clear"
+                        size="small"
+                        [disabled]="entry.quantity <= 0"
+                        (click)="adjustEntry.emit({ entry, delta: -1 })">
+                        <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+                      </ion-button>
+                      <ion-text class="entity-selector-qty">{{ entry.quantity }}</ion-text>
+                      <ion-button
+                        fill="clear"
+                        size="small"
+                        [disabled]="!canIncrease(entry)"
+                        (click)="adjustEntry.emit({ entry, delta: 1 })">
+                        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                      </ion-button>
+                    </div>
+                    <app-date-chip
+                      [date]="entry.expirationDate"
+                      (dateChange)="entryDateChange.emit({ entry, date: $event })">
+                    </app-date-chip>
                   </div>
-                </ion-item>
+                </div>
               }
-            </ion-list>
+            </section>
           } @else if (entriesEmptyLabel) {
             <ion-text color="medium" class="entity-selector-empty">
               {{ entriesEmptyLabel }}

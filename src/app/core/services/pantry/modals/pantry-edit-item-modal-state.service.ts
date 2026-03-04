@@ -59,6 +59,7 @@ export class PantryEditItemModalStateService {
   });
 
   readonly pendingQuantityChange = signal(0);
+  readonly pendingExpiryDate = signal<string | undefined>(undefined);
   readonly initialQuantity = signal(0);
 
   readonly form = this.fb.group({
@@ -153,6 +154,10 @@ export class PantryEditItemModalStateService {
    */
   incrementQuantity(): void {
     this.pendingQuantityChange.update(current => current + 1);
+  }
+
+  setExpiryDate(date: string | undefined): void {
+    this.pendingExpiryDate.set(date);
   }
 
   /**
@@ -315,7 +320,7 @@ export class PantryEditItemModalStateService {
         const change = this.pendingQuantityChange();
         if (change !== 0) {
           this.listState.cancelPendingStockSave(item._id);
-          await this.batchOps.adjustTotalQuantityWithFIFO(existing, change, this.listState.pantryItemsState);
+          await this.batchOps.adjustTotalQuantityWithFIFO(existing, change, this.listState.pantryItemsState, this.pendingExpiryDate());
         }
 
         // Update product details if there are meaningful changes
@@ -348,6 +353,7 @@ export class PantryEditItemModalStateService {
       initialQuantity: null,
     });
     this.pendingQuantityChange.set(0);
+    this.pendingExpiryDate.set(undefined);
   }
 
   private resetModalState(): void {
@@ -358,6 +364,7 @@ export class PantryEditItemModalStateService {
     this.selectorEnabled.set(false);
     this.selectedName.set('');
     this.pendingQuantityChange.set(0);
+    this.pendingExpiryDate.set(undefined);
   }
 
   private applyItemToForm(item: PantryItem): void {
@@ -372,6 +379,7 @@ export class PantryEditItemModalStateService {
       initialQuantity: null,
     });
     this.pendingQuantityChange.set(0);
+    this.pendingExpiryDate.set(undefined);
   }
 
   private buildItemPayload(existing?: PantryItem): PantryItem {

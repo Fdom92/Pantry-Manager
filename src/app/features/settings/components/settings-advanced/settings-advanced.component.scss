@@ -43,6 +43,7 @@ ion-item {
   flex-direction: column;
   gap: var(--app-theme-spacing-lg);
   margin: 10px;
+  padding-bottom: calc(var(--app-theme-spacing-lg) + env(safe-area-inset-bottom, 0px));
 }
 
 .settings-card {

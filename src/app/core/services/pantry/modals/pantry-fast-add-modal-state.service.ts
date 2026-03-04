@@ -33,6 +33,7 @@ export class PantryFastAddModalStateService {
       title: entry.name,
       quantity: entry.quantity,
       isNew: entry.isNew,
+      expirationDate: entry.expirationDate,
     }))
   );
 
@@ -104,6 +105,7 @@ export class PantryFastAddModalStateService {
             nowIso: timestamp,
             name: entry.name,
             quantity: entry.quantity,
+            expirationDate: entry.expirationDate,
           });
           await this.pantryStore.addItem(item);
           await this.eventManager.logFastAddNewItem(item, entry.quantity, timestamp);
@@ -112,6 +114,7 @@ export class PantryFastAddModalStateService {
 
         const updated = await this.pantryStore.addNewLot(entry.item._id, {
           quantity: entry.quantity,
+          expiryDate: entry.expirationDate,
         });
         if (updated) {
           await this.pantryStore.updateItem(updated);
@@ -242,6 +245,19 @@ export class PantryFastAddModalStateService {
       return;
     }
     this.adjustFastAddEntry(entry, delta);
+  }
+
+  /**
+   * Set or clear the expiry date for an entry by ID.
+   */
+  setFastAddEntryDate(entryId: string, date: string | undefined): void {
+    this.fastAddEntries.update(current => {
+      const index = current.findIndex(row => row.id === entryId);
+      if (index < 0) return current;
+      const next = [...current];
+      next[index] = { ...next[index], expirationDate: date || undefined };
+      return next;
+    });
   }
 
   private buildFastAddOptions(items: PantryItem[], entries: FastAddEntry[]): AutocompleteItem<PantryItem>[] {
