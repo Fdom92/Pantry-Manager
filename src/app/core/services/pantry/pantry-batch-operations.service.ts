@@ -1,7 +1,7 @@
 import { Injectable, WritableSignal, inject } from '@angular/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { BATCH_STOCK_SAVE_DELAY_MS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
-import { computeEarliestExpiry, normalizeBatches, sumQuantities } from '@core/domain/pantry';
+import { applyFifoConsumption, computeEarliestExpiry, normalizeBatches, sumQuantities } from '@core/domain/pantry';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeLocationId, normalizeLowercase } from '@core/utils/normalization.util';
@@ -101,7 +101,8 @@ export class PantryBatchOperationsService {
   async adjustTotalQuantityWithFIFO(
     item: PantryItem,
     change: number,
-    pantryItemsState?: WritableSignal<PantryItem[]>
+    pantryItemsState?: WritableSignal<PantryItem[]>,
+    expirationDate?: string
   ): Promise<void> {
     if (!item?._id || !Number.isFinite(change) || change === 0) {
       return;
@@ -113,7 +114,7 @@ export class PantryBatchOperationsService {
         batchId: generateBatchId(),
         quantity: 0, // Start with 0, then adjust
         locationId: UNASSIGNED_LOCATION_KEY,
-        expirationDate: undefined,
+        expirationDate: expirationDate ?? undefined,
       };
 
       // Add the new batch to the item first
@@ -132,39 +133,12 @@ export class PantryBatchOperationsService {
         pantryItemsState
       );
     } else if (change < 0) {
-      // Apply FIFO logic to decrement the total amount
-      let remainingToDecrement = Math.abs(change);
-
-      // Sort batches by expiration date (FIFO - oldest first)
-      const sortedBatches = [...(item.batches ?? [])].sort((a, b) => {
-        const dateA = a.expirationDate ? new Date(a.expirationDate).getTime() : Infinity;
-        const dateB = b.expirationDate ? new Date(b.expirationDate).getTime() : Infinity;
-        return dateA - dateB;
-      });
-
-      // Decrement batches in FIFO order
-      for (const batch of sortedBatches) {
-        if (remainingToDecrement <= 0) {
-          break;
-        }
-
-        const currentQuantity = batch.quantity ?? 0;
-        if (currentQuantity > 0) {
-          const toDecrement = Math.min(currentQuantity, remainingToDecrement);
-          const locationId = normalizeLocationId(batch.locationId, UNASSIGNED_LOCATION_KEY);
-
-          await this.adjustBatchQuantity(
-            item,
-            locationId,
-            batch,
-            -toDecrement,
-            undefined,
-            pantryItemsState
-          );
-
-          remainingToDecrement -= toDecrement;
-        }
-      }
+      const originalTotal = sumQuantities(item.batches ?? [], { round: roundQuantity });
+      const finalBatches = applyFifoConsumption(item.batches ?? [], Math.abs(change));
+      const newTotal = sumQuantities(finalBatches, { round: roundQuantity });
+      const updatedItem = this.rebuildItemWithBatches(item, finalBatches, pantryItemsState);
+      await this.provideQuantityFeedback(originalTotal, newTotal);
+      this.triggerStockSave(item._id, updatedItem, { adjustmentType: 'consume', deltaQuantity: change });
     }
   }
 

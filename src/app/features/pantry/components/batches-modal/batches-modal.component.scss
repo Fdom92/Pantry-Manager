@@ -106,6 +106,18 @@ ion-title, ion-back-button {
   border-radius: 8px;
 }
 
+.batch-date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+}
+
+.batch-date-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
 .edit-batch-row ion-input,
 .edit-batch-row ion-select {
   --background: var(--ion-card-background);

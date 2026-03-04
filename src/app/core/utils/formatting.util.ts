@@ -40,7 +40,7 @@ function fallbackDateString(value: string | Date | null | undefined, fallback: s
 export function formatDateValue(
   value: string | Date | null | undefined,
   locale: string,
-  options: Intl.DateTimeFormatOptions = ES_DATE_FORMAT_OPTIONS.numeric,
+  options: Intl.DateTimeFormatOptions = ES_DATE_FORMAT_OPTIONS.short,
   { fallback = '' }: DateFormatOptions = {}
 ): string {
   if (!value) {
@@ -55,7 +55,7 @@ export function formatDateTimeValue(
   locale: string,
   {
     fallback = '',
-    dateOptions = ES_DATE_FORMAT_OPTIONS.numeric,
+    dateOptions = ES_DATE_FORMAT_OPTIONS.short,
     timeOptions = { hour: '2-digit', minute: '2-digit' } as Intl.DateTimeFormatOptions,
   }: DateFormatOptions & {
     dateOptions?: Intl.DateTimeFormatOptions;

@@ -1,11 +1,12 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
-import { getCatalogUsage, isDuplicateCatalogValue, normalizeCatalogOptions } from '@core/domain/settings';
+import { getCatalogUsage, normalizeCatalogOptions } from '@core/domain/settings';
 import { PantryService } from '@core/services/pantry/pantry.service';
-import { normalizeCategoryId, normalizeLowercase, normalizeLocationId, normalizeStringList, normalizeSupermarketValue, normalizeTrim } from '@core/utils/normalization.util';
+import { normalizeCategoryId, normalizeLowercase, normalizeLocationId, normalizeSupermarketValue, normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { withSignalFlag } from '@core/utils';
 import { SettingsPreferencesService } from './settings-preferences.service';
+import { AlertController } from '@ionic/angular/standalone';
 
 type CatalogKind = 'category' | 'supermarket' | 'location';
 
@@ -14,6 +15,7 @@ export class SettingsCatalogsStateService {
   private readonly appPreferencesService = inject(SettingsPreferencesService);
   private readonly translate = inject(TranslateService);
   private readonly pantryService = inject(PantryService);
+  private readonly alertController = inject(AlertController);
 
   readonly isLoading = signal(false);
   readonly isSaving = signal(false);
@@ -23,16 +25,7 @@ export class SettingsCatalogsStateService {
   readonly originalCategoryOptions = signal<string[]>([]);
   readonly supermarketOptionsDraft = signal<string[]>([]);
   readonly originalSupermarketOptions = signal<string[]>([]);
-  readonly isAddPromptOpen = signal(false);
-  readonly isRemovalPromptOpen = signal(false);
-  private readonly addTarget = signal<{ kind: CatalogKind } | null>(null);
-  private readonly removalTarget = signal<{
-    kind: CatalogKind;
-    index: number;
-    value: string;
-    count: number;
-    items: PantryItem[];
-  } | null>(null);
+
   readonly hasLocationChanges = computed(() =>
     this.hasDraftChanges(this.locationOptionsDraft(), this.originalLocationOptions())
   );
@@ -48,6 +41,7 @@ export class SettingsCatalogsStateService {
   readonly hasAnyChanges = computed(
     () => this.hasLocationChanges() || this.hasCategoryChanges() || this.hasSupermarketChanges(),
   );
+
   readonly hasDuplicateOptions = computed(() => {
     return (
       this.hasDuplicates('location', this.locationOptionsDraft()) ||
@@ -61,7 +55,7 @@ export class SettingsCatalogsStateService {
   }
 
   addLocationOption(): void {
-    this.requestCatalogAdd('location');
+    void this.showAddCatalogAlert('location');
   }
 
   removeLocationOption(index: number): void {
@@ -69,7 +63,7 @@ export class SettingsCatalogsStateService {
   }
 
   addCategoryOption(): void {
-    this.requestCatalogAdd('category');
+    void this.showAddCatalogAlert('category');
   }
 
   removeCategoryOption(index: number): void {
@@ -77,111 +71,11 @@ export class SettingsCatalogsStateService {
   }
 
   addSupermarketOption(): void {
-    this.requestCatalogAdd('supermarket');
+    void this.showAddCatalogAlert('supermarket');
   }
 
   removeSupermarketOption(index: number): void {
     void this.requestCatalogRemoval('supermarket', index);
-  }
-
-  onAddPromptDismiss(): void {
-    this.isAddPromptOpen.set(false);
-    this.addTarget.set(null);
-  }
-
-  getAddPromptHeaderKey(): string {
-    const target = this.addTarget();
-    return this.getCatalogConfig(target?.kind).addTitleKey;
-  }
-
-  getAddPromptInputs(): Array<{
-    type: string;
-    name: string;
-    placeholder: string;
-    value?: string;
-  }> {
-    const target = this.addTarget();
-    if (!target) {
-      return [];
-    }
-    const placeholderKey = this.getCatalogConfig(target.kind).addPlaceholderKey;
-    return [
-      {
-        type: 'text',
-        name: 'value',
-        placeholder: this.translate.instant(placeholderKey),
-      },
-    ];
-  }
-
-  getAddPromptButtons(): Array<{
-    text: string;
-    role?: string;
-    handler?: (data: { value?: string }) => boolean | void | Promise<boolean | void>;
-  }> {
-    const target = this.addTarget();
-    if (!target) {
-      return [];
-    }
-    return [
-      {
-        text: this.translate.instant('common.actions.cancel'),
-        role: 'cancel',
-      },
-      {
-        text: this.translate.instant('common.actions.add'),
-        handler: data => {
-          const value = normalizeTrim(data?.value);
-          if (!value) {
-            return false;
-          }
-          const config = this.getCatalogConfig(target.kind);
-          if (this.isDuplicateCatalogValue(target.kind, value, config.getDraft())) {
-            return false;
-          }
-          config.addToDraft(value);
-          this.onAddPromptDismiss();
-          return true;
-        },
-      },
-    ];
-  }
-
-  onRemovalPromptDismiss(): void {
-    this.isRemovalPromptOpen.set(false);
-    this.removalTarget.set(null);
-  }
-
-  getRemovalPromptHeaderKey(): string {
-    const target = this.removalTarget();
-    return this.getCatalogConfig(target?.kind).removalTitleKey;
-  }
-
-  getRemovalPromptMessage(): string {
-    const target = this.removalTarget();
-    const count = target?.count ?? 0;
-    const messageKey = this.getCatalogConfig(target?.kind).removalMessageKey;
-    return this.translate.instant(messageKey, { count });
-  }
-
-  getRemovalPromptButtons(): Array<{
-    text: string;
-    role?: string;
-    handler?: () => boolean | void | Promise<boolean | void>;
-  }> {
-    const actionKey = this.getCatalogConfig(this.removalTarget()?.kind).removalActionKey;
-    return [
-      {
-        text: this.translate.instant('common.actions.cancel'),
-        role: 'cancel',
-      },
-      {
-        text: this.translate.instant(actionKey),
-        handler: async () => {
-          await this.confirmCatalogRemoval();
-        },
-      },
-    ];
   }
 
   async submitCatalogs(): Promise<void> {
@@ -216,6 +110,42 @@ export class SettingsCatalogsStateService {
     }).catch(async (err: unknown) => {
       console.error('[SettingsCatalogsStateService] submitCatalogs error', err);
     });
+  }
+
+  private async showAddCatalogAlert(kind: CatalogKind): Promise<void> {
+    const config = this.getCatalogConfig(kind);
+    const alert = await this.alertController.create({
+      header: this.translate.instant(config.addTitleKey),
+      inputs: [
+        {
+          type: 'text',
+          name: 'value',
+          placeholder: this.translate.instant(config.addPlaceholderKey),
+        },
+      ],
+      buttons: [
+        {
+          text: this.translate.instant('common.actions.cancel'),
+          role: 'cancel',
+        },
+        {
+          text: this.translate.instant('common.actions.add'),
+          handler: (data: { value?: string }) => {
+            const value = normalizeTrim(data?.value);
+            if (!value) {
+              return false;
+            }
+            if (this.isDuplicateCatalogValue(kind, value, config.getDraft())) {
+              return false;
+            }
+            config.addToDraft(value);
+            void this.submitCatalogs();
+            return true;
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
   private async loadPreferences(): Promise<void> {
@@ -274,6 +204,7 @@ export class SettingsCatalogsStateService {
     }
     return normalizeLowercase(normalizeSupermarketValue(rawValue) ?? '');
   }
+
   private hasDuplicates(kind: CatalogKind, draft: string[]): boolean {
     const seen = new Set<string>();
     for (const value of draft) {
@@ -295,29 +226,37 @@ export class SettingsCatalogsStateService {
     const value = normalizeTrim(draft[index]);
     if (!value) {
       config.removeFromDraft(index);
+      void this.submitCatalogs();
       return;
     }
 
     const usage = await config.getUsage(value);
     if (!usage.count) {
       config.removeFromDraft(index);
+      void this.submitCatalogs();
       return;
     }
 
-    this.removalTarget.set({ kind, index, value, count: usage.count, items: usage.items });
-    this.isRemovalPromptOpen.set(true);
-  }
-
-  private async confirmCatalogRemoval(): Promise<void> {
-    const target = this.removalTarget();
-    if (!target) {
-      return;
-    }
-    const config = this.getCatalogConfig(target.kind);
-    await config.clearFromItems(target.items);
-    config.removeFromDraft(target.index);
-    await this.submitCatalogs();
-    this.onRemovalPromptDismiss();
+    const configWithValue = this.getCatalogConfig(kind, value);
+    const alert = await this.alertController.create({
+      header: this.translate.instant(config.removalTitleKey),
+      message: this.translate.instant(config.removalMessageKey, { count: usage.count }),
+      buttons: [
+        {
+          text: this.translate.instant('common.actions.cancel'),
+          role: 'cancel',
+        },
+        {
+          text: this.translate.instant(config.removalActionKey),
+          handler: async () => {
+            await configWithValue.clearFromItems(usage.items);
+            config.removeFromDraft(index);
+            await this.submitCatalogs();
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
   private async getSupermarketUsage(value: string): Promise<{ count: number; items: PantryItem[] }> {
@@ -382,7 +321,7 @@ export class SettingsCatalogsStateService {
     }));
   }
 
-  private getCatalogConfig(kind?: CatalogKind): {
+  private getCatalogConfig(kind?: CatalogKind, locationValue?: string): {
     removalTitleKey: string;
     removalMessageKey: string;
     removalActionKey: string;
@@ -407,7 +346,7 @@ export class SettingsCatalogsStateService {
     };
     const clear = {
       category: this.clearCategoryFromItems.bind(this),
-      location: (items: PantryItem[]) => this.clearLocationFromItems(items, this.removalTarget()?.value ?? ''),
+      location: (items: PantryItem[]) => this.clearLocationFromItems(items, locationValue ?? ''),
       supermarket: this.clearSupermarketFromItems.bind(this),
     };
     const strings = {
@@ -447,11 +386,6 @@ export class SettingsCatalogsStateService {
     };
   }
 
-  private requestCatalogAdd(kind: CatalogKind): void {
-    this.addTarget.set({ kind });
-    this.isAddPromptOpen.set(true);
-  }
-
   private isDuplicateCatalogValue(kind: CatalogKind, rawValue: string, draft: string[]): boolean {
     const normalized = this.normalizeCatalogValue(kind, rawValue);
     if (!normalized) {
@@ -469,7 +403,6 @@ export class SettingsCatalogsStateService {
     originalTarget.set(current);
     draftTarget.set([...current]);
   }
-
 
   private async updateItems(
     items: PantryItem[],

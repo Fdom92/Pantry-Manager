@@ -491,6 +491,8 @@
       "count": "{{ count }} lots enregistrés",
       "open": "Ouvert",
       "noExpiryDate": "Sans date de péremption",
+      "addBatch": "Ajouter un lot",
+      "currentQuantity": "Quantité",
       "expires": {
         "today": "Expire aujourd'hui",
         "tomorrow": "Expire demain"
@@ -602,7 +604,9 @@
       "currentQuantity": "Quantité",
       "increase": "Augmenter",
       "decrease": "Diminuer",
-      "viewDetails": "Voir les lots",
+      "viewDetails": "Voir lots et dates",
+      "expiryDate": "Date de péremption (optionnel)",
+      "noDate": "Sans date",
       "zeroHint": "Il disparaîtra de votre garde-manger jusqu'à ce que vous en rajoutiez",
       "zeroHintBasic": "Il disparaîtra de votre garde-manger et apparaîtra dans votre liste de courses"
     },
@@ -840,7 +844,10 @@
       "nearExpiryTitle": "Bientôt périmés",
       "nearExpiryDescription": "Alerte lorsque des produits sont sur le point d'expirer",
       "lowStockTitle": "Stock faible",
-      "lowStockDescription": "Alerte lorsque des produits essentiels sont en rupture de stock"
+      "lowStockDescription": "Alerte lorsque des produits essentiels sont en rupture de stock",
+      "permissionDeniedTitle": "Notifications bloquées",
+      "permissionDeniedMessage": "Il semble que tu aies précédemment refusé l'autorisation des notifications. Pour les réactiver, va dans les Paramètres de ton appareil, trouve l'app et active les notifications.",
+      "permissionDeniedButton": "Compris"
     }
   },
   "reviews": {

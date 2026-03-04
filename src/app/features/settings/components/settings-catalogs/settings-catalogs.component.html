@@ -157,36 +157,6 @@
       </ion-card-content>
     </ion-card>
 
-    <div class="catalog-actions">
-      <ion-button
-        expand="block"
-        color="primary"
-        (click)="state.submitCatalogs()"
-        [disabled]="!state.hasAnyChanges() || state.isSaving() || state.hasDuplicateOptions()">
-        @if (state.isSaving()) {
-          <ion-spinner
-            slot="start"
-            name="dots">
-          </ion-spinner>
-        }
-        {{ 'settings.catalogs.saveAction' | translate }}
-      </ion-button>
-    </div>
   </div>
 
-  <ion-alert
-    [isOpen]="state.isAddPromptOpen()"
-    [header]="state.getAddPromptHeaderKey() | translate"
-    [inputs]="state.getAddPromptInputs()"
-    [buttons]="state.getAddPromptButtons()"
-    (didDismiss)="state.onAddPromptDismiss()">
-  </ion-alert>
-
-  <ion-alert
-    [isOpen]="state.isRemovalPromptOpen()"
-    [header]="state.getRemovalPromptHeaderKey() | translate"
-    [message]="state.getRemovalPromptMessage()"
-    [buttons]="state.getRemovalPromptButtons()"
-    (didDismiss)="state.onRemovalPromptDismiss()">
-  </ion-alert>
 </ion-content>

@@ -52,8 +52,29 @@ export class NotificationSchedulerService {
       }
 
       if (!this.permission.isGranted()) {
+        if (this.permission.isPermanentlyDenied()) {
+          // User chose "Don't ask again" — cannot request. Auto-disable the toggle.
+          // The settings UI will show a friendly alert explaining how to re-enable.
+          await this.preferencesService.savePreferences({
+            ...this.preferencesService.preferences(),
+            notificationsEnabled: false,
+          });
+          return;
+        }
+        // Only request permission once per session to avoid showing the system dialog
+        // repeatedly (e.g. when the app resumes after the user dismisses the dialog).
+        if (this.permission.wasRequested) return;
         const granted = await this.permission.request();
-        if (!granted) return;
+        if (!granted) {
+          // Mirror the system decision back into preferences so the toggle goes OFF
+          // automatically — avoids the confusing state where toggle is ON but no
+          // notifications arrive.
+          await this.preferencesService.savePreferences({
+            ...this.preferencesService.preferences(),
+            notificationsEnabled: false,
+          });
+          return;
+        }
       }
 
       const items = this.pantryStore.loadedProducts();

@@ -491,6 +491,8 @@
       "count": "{{ count }} registrierte Chargen",
       "open": "Geöffnet",
       "noExpiryDate": "Kein Ablaufdatum",
+      "addBatch": "Charge hinzufügen",
+      "currentQuantity": "Menge",
       "expires": {
         "today": "Läuft heute ab",
         "tomorrow": "Läuft morgen ab"
@@ -602,7 +604,9 @@
       "currentQuantity": "Menge",
       "increase": "Erhöhen",
       "decrease": "Verringern",
-      "viewDetails": "Chargen anzeigen",
+      "viewDetails": "Chargen & Daten anzeigen",
+      "expiryDate": "Ablaufdatum (optional)",
+      "noDate": "Kein Datum",
       "zeroHint": "Verschwindet aus deiner Speisekammer, bis du wieder Vorrat hinzufügst",
       "zeroHintBasic": "Verschwindet aus deiner Speisekammer und taucht in deiner Einkaufsliste auf"
     },
@@ -840,7 +844,10 @@
       "nearExpiryTitle": "Bald ablaufend",
       "nearExpiryDescription": "Benachrichtigung, wenn Produkte bald ablaufen",
       "lowStockTitle": "Niedriger Lagerbestand",
-      "lowStockDescription": "Benachrichtigung, wenn wesentliche Produkte niedrig sind"
+      "lowStockDescription": "Benachrichtigung, wenn wesentliche Produkte niedrig sind",
+      "permissionDeniedTitle": "Benachrichtigungen blockiert",
+      "permissionDeniedMessage": "Du hast die Benachrichtigungsberechtigung zuvor abgelehnt. Um sie wieder zu aktivieren, gehe in die Geräteeinstellungen, suche die App und aktiviere dort die Benachrichtigungen.",
+      "permissionDeniedButton": "Verstanden"
     }
   },
   "reviews": {

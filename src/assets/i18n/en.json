@@ -491,6 +491,8 @@
       "count": "{{ count }} batches recorded",
       "open": "Opened",
       "noExpiryDate": "No expiration date",
+      "addBatch": "Add batch",
+      "currentQuantity": "Quantity",
       "expires": {
         "today": "Expires today",
         "tomorrow": "Expires tomorrow"
@@ -603,7 +605,9 @@
       "hint": "Adjust the quantity. It will be saved when closed.",
       "increase": "Increase",
       "decrease": "Decrease",
-      "viewDetails": "View batches",
+      "viewDetails": "View batches & dates",
+      "expiryDate": "Expiry date (optional)",
+      "noDate": "No date",
       "zeroHint": "It'll disappear from your pantry until you restock it",
       "zeroHintBasic": "It'll disappear from your pantry and show up in your shopping list"
     },
@@ -841,7 +845,10 @@
       "nearExpiryTitle": "Expiring soon",
       "nearExpiryDescription": "Alert when products are about to expire",
       "lowStockTitle": "Low stock",
-      "lowStockDescription": "Alert when essential products are running low"
+      "lowStockDescription": "Alert when essential products are running low",
+      "permissionDeniedTitle": "Notifications blocked",
+      "permissionDeniedMessage": "It looks like you previously denied notification permission. To enable them again, go to your device Settings, find the app and turn on notifications from there.",
+      "permissionDeniedButton": "Got it"
     }
   },
   "reviews": {

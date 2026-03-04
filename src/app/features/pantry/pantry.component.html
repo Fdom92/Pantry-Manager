@@ -144,6 +144,7 @@
     (queryChange)="facade.onFastAddQueryChange($event)"
     (emptyAction)="facade.addFastAddEntryFromQuery($event)"
     (adjustEntry)="facade.adjustFastAddEntryById($event.entry.id, $event.delta)"
+    (entryDateChange)="facade.setFastAddEntryDate($event.entry.id, $event.date)"
     (save)="facade.submitFastAdd()"
     (secondaryAction)="facade.openAdvancedFromFastAdd()">
   </app-entity-selector-modal>
@@ -163,9 +164,11 @@
           [item]="item"
           [totalQuantity]="facade.getQuantitySheetTotalQuantity(item)"
           [pendingChange]="facade.pendingQuantityChange()"
+          [pendingExpiryDate]="facade.pendingQuantitySheetExpiryDate()"
           [quantityUnit]="''"
           (increment)="facade.incrementQuantity(item)"
           (decrement)="facade.decrementQuantity(item)"
+          (expiryDateChange)="facade.setQuantitySheetExpiryDate($event)"
           (viewDetails)="facade.openBatchesModalFromSheet(item)"
           (editRequested)="facade.openEditModalFromSheet(item)"
           (deleteRequested)="facade.deleteItem(item, $event)"
