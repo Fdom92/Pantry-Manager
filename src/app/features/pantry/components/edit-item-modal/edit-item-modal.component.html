@@ -122,48 +122,7 @@
             }
           </div>
 
-          @if (state.editingItem()) {
-            <!-- Edit mode: Quantity adjuster -->
-            <div class="form-section-header">
-              <h5>{{ 'pantry.form.quantity.title' | translate }}</h5>
-            </div>
-            <div class="form-section quantity-adjuster-section">
-              <span class="quantity-label">{{ 'pantry.form.quantity.current' | translate }}</span>
-              <div class="quantity-controls">
-                <ion-button
-                  fill="clear"
-                  class="control-button control-button--minus"
-                  [disabled]="state.getDisplayQuantity() <= 0"
-                  (click)="state.decrementQuantity()">
-                  <ion-icon slot="icon-only" name="remove"></ion-icon>
-                </ion-button>
-                <div class="quantity-display">
-                  @if (state.pendingQuantityChange() !== 0) {
-                    <span class="quantity-number">
-                      <span class="quantity-original">{{ state.getTotalQuantity() }}</span>
-                      <ion-icon name="arrow-forward-outline" class="quantity-arrow"></ion-icon>
-                      <span class="quantity-new" [class.quantity-new--negative]="state.pendingQuantityChange() < 0">{{ state.getDisplayQuantity() }}</span>
-                    </span>
-                  } @else {
-                    <span class="quantity-number">{{ state.getTotalQuantity() }}</span>
-                  }
-                </div>
-                <ion-button
-                  fill="clear"
-                  class="control-button control-button--plus"
-                  (click)="state.incrementQuantity()">
-                  <ion-icon slot="icon-only" name="add"></ion-icon>
-                </ion-button>
-              </div>
-              <span class="quantity-hint">{{ 'pantry.form.quantity.hint' | translate }}</span>
-              @if (state.pendingQuantityChange() > 0) {
-                <app-date-chip
-                  [date]="state.pendingExpiryDate()"
-                  (dateChange)="state.setExpiryDate($event)">
-                </app-date-chip>
-              }
-            </div>
-          } @else {
+          @if (!state.editingItem()) {
             <!-- Create mode: Initial quantity input -->
             <div class="form-section-header">
               <h5>{{ 'pantry.form.quantity.title' | translate }}</h5>

@@ -1,19 +1,14 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_LOCATION_KEY } from '@core/constants';
-import { buildPantryItemAutocomplete, buildUniqueSelectOptions, formatSupermarketLabel } from '@core/utils';
-import { toDateInputValue, toIsoDate } from '@core/utils/date.util';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
-import { createDocumentId, hasMeaningfulItemChanges } from '@core/utils';
-import { formatQuantity } from '@core/utils/formatting.util';
+import { buildPantryItemAutocomplete, buildUniqueSelectOptions, createDocumentId, formatSupermarketLabel, hasMeaningfulItemChanges } from '@core/utils';
 import {
   formatFriendlyName,
   normalizeCategoryId,
-  normalizeLowercase,
-  normalizeLocationId,
   normalizeStringList,
   normalizeSupermarketValue,
-  normalizeTrim,
+  normalizeTrim
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
@@ -22,13 +17,11 @@ import { CatalogOptionsService, SettingsPreferencesService } from '../../setting
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { PantryService } from '../pantry.service';
-import { PantryBatchOperationsService } from '../pantry-batch-operations.service';
 
 @Injectable()
 export class PantryEditItemModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
-  private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly fb = inject(FormBuilder);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly catalogOptions = inject(CatalogOptionsService);
@@ -57,10 +50,6 @@ export class PantryEditItemModalStateService {
     const formatted = formatFriendlyName(query, query);
     return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   });
-
-  readonly pendingQuantityChange = signal(0);
-  readonly pendingExpiryDate = signal<string | undefined>(undefined);
-  readonly initialQuantity = signal(0);
 
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
@@ -129,50 +118,6 @@ export class PantryEditItemModalStateService {
 
   dismiss(): void {
     this.isOpen.set(false);
-  }
-
-  /**
-   * Get total quantity for the item being edited.
-   */
-  getTotalQuantity(): number {
-    const item = this.editingItem();
-    if (!item) {
-      return 0;
-    }
-    return this.pantryStore.getItemTotalQuantity(item);
-  }
-
-  /**
-   * Get display quantity with pending changes.
-   */
-  getDisplayQuantity(): number {
-    return this.getTotalQuantity() + this.pendingQuantityChange();
-  }
-
-  /**
-   * Increment quantity (will create new batch on save).
-   */
-  incrementQuantity(): void {
-    this.pendingQuantityChange.update(current => current + 1);
-  }
-
-  setExpiryDate(date: string | undefined): void {
-    this.pendingExpiryDate.set(date);
-  }
-
-  /**
-   * Decrement quantity (will apply FIFO on save).
-   */
-  decrementQuantity(): void {
-    const currentTotal = this.getTotalQuantity();
-    const pendingChange = this.pendingQuantityChange();
-
-    // Don't allow going below 0
-    if (currentTotal + pendingChange <= 0) {
-      return;
-    }
-
-    this.pendingQuantityChange.update(current => current - 1);
   }
 
   getCategorySelectOptions(): Array<{ value: string; label: string }> {
@@ -316,14 +261,6 @@ export class PantryEditItemModalStateService {
       const item = this.buildItemPayload(existing ?? undefined);
 
       if (existing) {
-        // Edit mode: Apply pending quantity changes with FIFO logic
-        const change = this.pendingQuantityChange();
-        if (change !== 0) {
-          this.listState.cancelPendingStockSave(item._id);
-          await this.batchOps.adjustTotalQuantityWithFIFO(existing, change, this.listState.pantryItemsState, this.pendingExpiryDate());
-        }
-
-        // Update product details if there are meaningful changes
         if (hasMeaningfulItemChanges(existing, item)) {
           this.listState.cancelPendingStockSave(item._id);
           await this.pantryStore.updateItem(item);
@@ -352,8 +289,6 @@ export class PantryEditItemModalStateService {
       notes: '',
       initialQuantity: null,
     });
-    this.pendingQuantityChange.set(0);
-    this.pendingExpiryDate.set(undefined);
   }
 
   private resetModalState(): void {
@@ -363,8 +298,6 @@ export class PantryEditItemModalStateService {
     this.selectorQuery.set('');
     this.selectorEnabled.set(false);
     this.selectedName.set('');
-    this.pendingQuantityChange.set(0);
-    this.pendingExpiryDate.set(undefined);
   }
 
   private applyItemToForm(item: PantryItem): void {
@@ -378,8 +311,6 @@ export class PantryEditItemModalStateService {
       notes: '',
       initialQuantity: null,
     });
-    this.pendingQuantityChange.set(0);
-    this.pendingExpiryDate.set(undefined);
   }
 
   private buildItemPayload(existing?: PantryItem): PantryItem {
