@@ -5,7 +5,6 @@ import { groupSuggestionsBySupermarket } from '@core/utils/shopping-grouping.uti
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
 import {
-  ShoppingReason,
   type ShoppingStateWithItem,
   type ShoppingSuggestionGroupWithItem,
   type ShoppingSuggestionWithItem,
@@ -18,35 +17,22 @@ import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/
 import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
-import { PantryService } from '../pantry/pantry.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
-import { ReviewPromptService } from '../shared/review-prompt.service';
-import { HistoryEventManagerService } from '../history/history-event-manager.service';
 
 @Injectable()
 export class ShoppingStateService {
   private readonly destroyRef = inject(DestroyRef);
   private readonly shareTask = createLatestOnlyRunner(this.destroyRef);
   private readonly pantryStore = inject(PantryStoreService);
-  private readonly pantryService = inject(PantryService);
-  private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly eventManager = inject(HistoryEventManagerService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly download = inject(DownloadService);
   private readonly share = inject(ShareService);
 
-  readonly isSummaryExpanded = signal(true);
-  readonly processingSuggestionIds = signal<Set<string>>(new Set());
   readonly isSharingListInProgress = signal(false);
-  readonly purchaseTarget = signal<ShoppingSuggestionWithItem | null>(null);
 
   readonly shoppingAnalysis = computed<ShoppingStateWithItem>(() => {
-    const analysis = this.buildShoppingAnalysis(this.items());
-    return {
-      ...analysis,
-      hasAlerts: analysis.summary.total > 0,
-    };
+    return this.buildShoppingAnalysis(this.items());
   });
 
   readonly loading = this.pantryStore.loading;
@@ -59,72 +45,6 @@ export class ShoppingStateService {
     this.skeletonManager.startLoading();
     await this.pantryStore.loadAll();
     this.skeletonManager.stopLoading();
-  }
-
-  toggleSummaryCard(): void {
-    this.isSummaryExpanded.update(isOpen => !isOpen);
-  }
-
-  isSuggestionProcessing(id: string | undefined): boolean {
-    return id ? this.processingSuggestionIds().has(id) : false;
-  }
-
-  async purchaseSuggestion(suggestion: ShoppingSuggestionWithItem): Promise<void> {
-    const id = suggestion?.item?._id;
-    const quantity = Number(suggestion?.suggestedQuantity ?? 0);
-    if (!id || !Number.isFinite(quantity) || quantity <= 0) {
-      return;
-    }
-
-    await this.runWithProcessing(id, async () => {
-      const updated = await this.pantryService.addNewLot(id, {
-        quantity,
-        expiryDate: undefined,
-      });
-      if (updated) {
-        await this.pantryStore.updateItem(updated);
-        await this.eventManager.logShoppingAdd(suggestion.item, updated, quantity);
-      }
-      await this.pantryStore.loadAll();
-      if (this.shoppingAnalysis().summary.total === 0) {
-        this.reviewPrompt.markEngagement();
-      }
-    });
-  }
-
-  async confirmPurchaseForTarget(data: { quantity: number; expiryDate?: string | null }): Promise<void> {
-    const suggestion = this.purchaseTarget();
-    const id = suggestion?.item?._id;
-    const quantity = Number(data.quantity ?? 0);
-    if (!suggestion || !id || this.isSuggestionProcessing(id) || !Number.isFinite(quantity) || quantity <= 0) {
-      return;
-    }
-
-    await this.runWithProcessing(id, async () => {
-      const updated = await this.pantryService.addNewLot(id, {
-        quantity,
-        expiryDate: data.expiryDate ?? undefined,
-      });
-      if (updated) {
-        await this.pantryStore.updateItem(updated);
-        await this.eventManager.logShoppingAdd(suggestion.item, updated, quantity);
-      }
-      await this.pantryStore.loadAll();
-      if (this.shoppingAnalysis().summary.total === 0) {
-        this.reviewPrompt.markEngagement();
-      }
-    });
-  }
-
-  getBadgeColorByReason(reason: ShoppingReason): string {
-    switch (reason) {
-      case ShoppingReason.EMPTY:
-        return 'danger';
-      case ShoppingReason.BELOW_MIN:
-        return 'warning';
-      default:
-        return 'primary';
-    }
   }
 
   getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
@@ -171,7 +91,7 @@ export class ShoppingStateService {
     });
   }
 
-  private buildShoppingAnalysis(items: PantryItem[]): Omit<ShoppingStateWithItem, 'hasAlerts'> {
+  private buildShoppingAnalysis(items: PantryItem[]): ShoppingStateWithItem {
     const suggestions: ShoppingSuggestionWithItem[] = [];
     const uniqueSupermarkets = new Set<string>();
     let summary: ShoppingSummary = {
@@ -309,22 +229,6 @@ export class ShoppingStateService {
       return 20;
     }
     return currentY;
-  }
-
-  private async runWithProcessing(id: string, task: () => Promise<void>): Promise<void> {
-    if (this.isSuggestionProcessing(id)) {
-      return;
-    }
-    this.processingSuggestionIds.update(ids => new Set(ids).add(id));
-    try {
-      await task();
-    } finally {
-      this.processingSuggestionIds.update(ids => {
-        const next = new Set(ids);
-        next.delete(id);
-        return next;
-      });
-    }
   }
 
 }
