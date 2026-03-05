@@ -19,7 +19,6 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntityAutocompleteComponent } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
-import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
 
 @Component({
   selector: 'app-pantry-edit-item-modal',
@@ -42,7 +41,6 @@ import { DateChipComponent } from '@shared/components/date-chip/date-chip.compon
     IonFooter,
     IonSpinner,
     EntityAutocompleteComponent,
-    DateChipComponent,
   ],
   templateUrl: './edit-item-modal.component.html',
   styleUrls: ['./edit-item-modal.component.scss'],
