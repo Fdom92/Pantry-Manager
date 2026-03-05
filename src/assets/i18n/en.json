@@ -287,7 +287,7 @@
     }
   },
   "shopping": {
-    "title": "Shopping",
+    "title": "List",
     "unassignedSupermarket": "Any supermarket",
     "reasons": {
       "below-min": "Low stock",
