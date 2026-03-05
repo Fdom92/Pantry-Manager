@@ -43,9 +43,6 @@
                 <ion-skeleton-text animated style="width: 120px; height: 17px;"></ion-skeleton-text>
                 <ion-skeleton-text animated style="width: 60px; height: 14px;"></ion-skeleton-text>
               </div>
-              <div class="suggestion-action">
-                <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 50%;"></ion-skeleton-text>
-              </div>
             </div>
           </ion-card-content>
         </ion-card>
@@ -69,17 +66,6 @@
                       {{ 'shopping.suggestions.toBuy' | translate:{ amount: (suggestion.suggestedQuantity |
                       number:'1.0-2') } }}
                     </p>
-                  </div>
-                  <div class="suggestion-action">
-                    <ion-button size="small" color="success" fill="solid"
-                      (click)="facade.purchaseSuggestion(suggestion)"
-                      [disabled]="facade.isSuggestionProcessing(suggestion.item._id)" class="purchase-action pressable">
-                      @if (facade.isSuggestionProcessing(suggestion.item._id)) {
-                      <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
-                      } @else {
-                      <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                      }
-                    </ion-button>
                   </div>
                 </div>
               </ion-card-content>
