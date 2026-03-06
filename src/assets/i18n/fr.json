@@ -190,6 +190,15 @@
       "fair": "Améliorable",
       "poor": "Nécessite attention"
     },
+    "foodCoverage": {
+      "title": "Couverture estimée",
+      "days_one": "≈ 1 jour de nourriture",
+      "days_other": "≈ {{ count }} jours de nourriture",
+      "months_one": "≈ 1 mois de nourriture",
+      "months_other": "≈ {{ count }} mois de nourriture",
+      "years_one": "≈ 1 an de nourriture",
+      "years_other": "≈ {{ count }} ans de nourriture"
+    },
     "summary": {
       "title": "Résumé du garde-manger",
       "toggle": "Afficher/Masquer le résumé du garde-manger",

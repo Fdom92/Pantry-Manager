@@ -64,3 +64,37 @@ export function computePantryScore(
 
   return { score, label };
 }
+
+export type FoodCoverageUnit = 'days' | 'months' | 'years';
+
+export interface FoodCoverageResult {
+  value: number;
+  unit: FoodCoverageUnit;
+}
+
+/**
+ * Estimates food coverage based on total batch quantity of active (non-expired) items.
+ * Assumes 3 meal portions consumed per day.
+ * Returns null when there is not enough data.
+ * Automatically scales the unit: days → months (≥30d) → years (≥365d).
+ */
+export function computeFoodCoverage(activeItems: PantryItem[]): FoodCoverageResult | null {
+  if (activeItems.length < 3) return null;
+
+  const totalUnits = activeItems.reduce((sum, item) => {
+    const batchTotal = (item.batches ?? []).reduce((bSum, b) => bSum + (b.quantity ?? 0), 0);
+    return sum + batchTotal;
+  }, 0);
+
+  if (totalUnits === 0) return null;
+
+  const days = Math.max(1, Math.round(totalUnits / 3));
+
+  if (days >= 365) {
+    return { value: Math.max(1, Math.round(days / 365)), unit: 'years' };
+  }
+  if (days >= 30) {
+    return { value: Math.max(1, Math.round(days / 30)), unit: 'months' };
+  }
+  return { value: days, unit: 'days' };
+}

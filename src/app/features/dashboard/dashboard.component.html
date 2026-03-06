@@ -53,6 +53,21 @@
         </section>
       }
 
+      <!-- Food Coverage -->
+      @if (facade.foodCoverage() !== null) {
+        <section class="dashboard-section">
+          <div class="pantry-score">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <div class="pantry-score__content">
+              <span class="pantry-score__title">{{ 'dashboard.foodCoverage.title' | translate }}</span>
+              <span class="pantry-score__value">
+                {{ (facade.foodCoverage()!.value === 1 ? 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_one' : 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_other') | translate:{ count: facade.foodCoverage()!.value } }}
+              </span>
+            </div>
+          </div>
+        </section>
+      }
+
       <!-- LAYER 2: What to Do Now (Actions) -->
       @if (facade.actions().length > 0) {
         <section class="dashboard-section">

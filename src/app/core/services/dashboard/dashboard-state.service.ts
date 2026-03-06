@@ -1,7 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
-import { computePantryScore, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
-import type { PantryScoreResult } from '@core/domain/dashboard';
+import { computeFoodCoverage, computePantryScore, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import type { FoodCoverageResult, PantryScoreResult } from '@core/domain/dashboard';
 import { getItemStatusState } from '@core/domain/pantry';
 import type {
   Insight,
@@ -152,6 +152,12 @@ export class DashboardStateService {
       this.lowStockItems().length,
       this.stalePantryItemsCount(),
     );
+  });
+
+  readonly foodCoverage = computed((): FoodCoverageResult | null => {
+    const expiredIds = new Set(this.expiredItems().map(i => i._id));
+    const activeItems = this.pantryItems().filter(i => !expiredIds.has(i._id));
+    return computeFoodCoverage(activeItems);
   });
 
   readonly pantryHealth = computed((): PantryHealth => {

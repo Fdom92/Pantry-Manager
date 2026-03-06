@@ -190,6 +190,15 @@
       "fair": "Migliorabile",
       "poor": "Richiede attenzione"
     },
+    "foodCoverage": {
+      "title": "Copertura stimata",
+      "days_one": "≈ 1 giorno di cibo",
+      "days_other": "≈ {{ count }} giorni di cibo",
+      "months_one": "≈ 1 mese di cibo",
+      "months_other": "≈ {{ count }} mesi di cibo",
+      "years_one": "≈ 1 anno di cibo",
+      "years_other": "≈ {{ count }} anni di cibo"
+    },
     "summary": {
       "title": "Panoramica della dispensa",
       "toggle": "Mostra/nascondi panoramica della dispensa",

@@ -190,6 +190,15 @@
       "fair": "Mejorable",
       "poor": "Necesita atención"
     },
+    "foodCoverage": {
+      "title": "Cobertura estimada",
+      "days_one": "≈ 1 día de comida",
+      "days_other": "≈ {{ count }} días de comida",
+      "months_one": "≈ 1 mes de comida",
+      "months_other": "≈ {{ count }} meses de comida",
+      "years_one": "≈ 1 año de comida",
+      "years_other": "≈ {{ count }} años de comida"
+    },
     "summary": {
       "title": "Resumen de la despensa",
       "toggle": "Alternar resumen de la despensa",

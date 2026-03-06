@@ -190,6 +190,15 @@
       "fair": "Could be better",
       "poor": "Needs attention"
     },
+    "foodCoverage": {
+      "title": "Estimated coverage",
+      "days_one": "≈ 1 day of food",
+      "days_other": "≈ {{ count }} days of food",
+      "months_one": "≈ 1 month of food",
+      "months_other": "≈ {{ count }} months of food",
+      "years_one": "≈ 1 year of food",
+      "years_other": "≈ {{ count }} years of food"
+    },
     "summary": {
       "title": "Pantry overview",
       "toggle": "Toggle pantry overview",
