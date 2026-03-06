@@ -183,6 +183,13 @@
     "context": {
       "recentlyAdded": "{{ count }} produits récemment ajoutés"
     },
+    "pantryScore": {
+      "title": "Santé du garde-manger",
+      "excellent": "Excellent",
+      "good": "Plutôt bien",
+      "fair": "Améliorable",
+      "poor": "Nécessite attention"
+    },
     "summary": {
       "title": "Résumé du garde-manger",
       "toggle": "Afficher/Masquer le résumé du garde-manger",

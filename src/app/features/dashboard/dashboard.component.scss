@@ -91,6 +91,49 @@ ion-title {
   }
 }
 
+// Pantry Score
+.pantry-score {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-md);
+  margin-inline: var(--app-theme-card-margin-inline);
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg);
+  border-radius: var(--app-theme-spacing-md);
+  background: var(--app-theme-card-bg);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+
+  ion-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: var(--app-theme-font-size-caption, 0.75rem);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__value {
+    font-size: var(--app-theme-font-size-body);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+  }
+
+  &[data-label='excellent'] ion-icon { color: var(--app-theme-card-accent-success); }
+  &[data-label='good'] ion-icon { color: var(--app-theme-card-accent-success); }
+  &[data-label='fair'] ion-icon { color: var(--app-theme-card-accent-warning); }
+  &[data-label='poor'] ion-icon { color: var(--app-theme-card-accent-critical); }
+}
+
 // LAYER 2: Actions (What to Do Now)
 .actions-stack {
   display: flex;

@@ -183,6 +183,13 @@
     "context": {
       "recentlyAdded": "{{ count }} recently added products"
     },
+    "pantryScore": {
+      "title": "Pantry health",
+      "excellent": "Excellent",
+      "good": "Pretty good",
+      "fair": "Could be better",
+      "poor": "Needs attention"
+    },
     "summary": {
       "title": "Pantry overview",
       "toggle": "Toggle pantry overview",

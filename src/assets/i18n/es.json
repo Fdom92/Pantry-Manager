@@ -183,6 +183,13 @@
     "context": {
       "recentlyAdded": "{{ count }} productos añadidos recientemente"
     },
+    "pantryScore": {
+      "title": "Salud de la despensa",
+      "excellent": "Excelente",
+      "good": "Bastante bien",
+      "fair": "Mejorable",
+      "poor": "Necesita atención"
+    },
     "summary": {
       "title": "Resumen de la despensa",
       "toggle": "Alternar resumen de la despensa",

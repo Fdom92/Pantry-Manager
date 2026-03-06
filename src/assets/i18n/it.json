@@ -183,6 +183,13 @@
     "context": {
       "recentlyAdded": "{{ count }} prodotti aggiunti di recente"
     },
+    "pantryScore": {
+      "title": "Salute della dispensa",
+      "excellent": "Eccellente",
+      "good": "Abbastanza bene",
+      "fair": "Migliorabile",
+      "poor": "Richiede attenzione"
+    },
     "summary": {
       "title": "Panoramica della dispensa",
       "toggle": "Mostra/nascondi panoramica della dispensa",

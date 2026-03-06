@@ -74,6 +74,7 @@ import {
   sparklesOutline,
   speedometerOutline,
   starOutline,
+  statsChartOutline,
   storefrontOutline,
   sunnyOutline,
   swapHorizontalOutline,
@@ -176,7 +177,8 @@ addIcons({
   'close-circle-outline': closeCircleOutline,
   'eye-outline': eyeOutline,
   'warning-outline': warningOutline,
-  'close-circle': closeCircle
+  'close-circle': closeCircle,
+  'stats-chart-outline': statsChartOutline
 });
 
 bootstrapApplication(AppComponent, {

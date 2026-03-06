@@ -1,6 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
-import { getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { computePantryScore, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import type { PantryScoreResult } from '@core/domain/dashboard';
 import { getItemStatusState } from '@core/domain/pantry';
 import type {
   Insight,
@@ -130,6 +131,27 @@ export class DashboardStateService {
       }
       return now.getTime() - createdAt.getTime() <= windowMs;
     }).length;
+  });
+
+  readonly noExpiryDateCount = computed(() => {
+    return this.pantryItems().filter(item => {
+      if (item.noExpiry) return false;
+      if (item.isBasic) return false;
+      const hasBatchDate = item.batches?.some(b => !!b.expirationDate);
+      const hasItemDate = !!item.expirationDate;
+      return !hasBatchDate && !hasItemDate;
+    }).length;
+  });
+
+  readonly pantryScore = computed((): PantryScoreResult | null => {
+    return computePantryScore(
+      this.totalItems(),
+      this.expiredItems().length,
+      this.nearExpiryItems().length,
+      this.noExpiryDateCount(),
+      this.lowStockItems().length,
+      this.stalePantryItemsCount(),
+    );
   });
 
   readonly pantryHealth = computed((): PantryHealth => {

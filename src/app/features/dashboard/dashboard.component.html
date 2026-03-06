@@ -38,6 +38,21 @@
         </div>
       </section>
 
+      <!-- Pantry Score -->
+      @if (facade.pantryScore()) {
+        <section class="dashboard-section">
+          <div class="pantry-score" [attr.data-label]="facade.pantryScore()!.label">
+            <ion-icon name="stats-chart-outline"></ion-icon>
+            <div class="pantry-score__content">
+              <span class="pantry-score__title">{{ 'dashboard.pantryScore.title' | translate }}</span>
+              <span class="pantry-score__value">
+                {{ facade.pantryScore()!.score }} · {{ 'dashboard.pantryScore.' + facade.pantryScore()!.label | translate }}
+              </span>
+            </div>
+          </div>
+        </section>
+      }
+
       <!-- LAYER 2: What to Do Now (Actions) -->
       @if (facade.actions().length > 0) {
         <section class="dashboard-section">

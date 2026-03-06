@@ -183,6 +183,13 @@
     "context": {
       "recentlyAdded": "{{ count }} kürzlich hinzugefügte Produkte"
     },
+    "pantryScore": {
+      "title": "Vorratsgesundheit",
+      "excellent": "Ausgezeichnet",
+      "good": "Ziemlich gut",
+      "fair": "Verbesserungswürdig",
+      "poor": "Braucht Aufmerksamkeit"
+    },
     "summary": {
       "title": "Vorratsübersicht",
       "toggle": "Vorratsübersicht ein-/ausblenden",
