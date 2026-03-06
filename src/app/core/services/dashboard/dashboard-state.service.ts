@@ -22,7 +22,7 @@ import { formatDateTimeValue, formatDateValue } from '@core/utils/formatting.uti
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
-import { AgentEntryContext } from '@core/models/agent';
+import { AgentEntryContext } from '@core/models/planner';
 
 export enum PantryHealthState {
   CRITICAL = 'critical',
@@ -392,7 +392,7 @@ export class DashboardStateService {
       entryContext: cta.entryContext,
       initialPrompt: cta.prompt,
     });
-    await this.navCtrl.navigateForward('/agent');
+    await this.navCtrl.navigateForward('/planner');
   }
 
   async onOverviewCardSelected(card: DashboardOverviewCardId): Promise<void> {
@@ -419,7 +419,7 @@ export class DashboardStateService {
         await this.navCtrl.navigateRoot('/pantry');
         return;
       case 'shopping':
-        await this.navCtrl.navigateRoot('/shopping');
+        await this.navCtrl.navigateRoot('/list');
         return;
       default:
         return;
@@ -468,7 +468,7 @@ export class DashboardStateService {
       entryContext,
       initialPrompt: prompt,
     });
-    void this.navCtrl.navigateForward('/agent');
+    void this.navCtrl.navigateForward('/planner');
   }
 
   async deleteExpiredItems(): Promise<void> {

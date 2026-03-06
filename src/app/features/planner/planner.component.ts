@@ -22,7 +22,7 @@ import { ViewWillEnter } from '@ionic/angular';
 import { MarkdownToHtmlPipe } from '@core/pipes/markdown-to-html.pipe';
 
 @Component({
-  selector: 'app-agent',
+  selector: 'app-planner',
   standalone: true,
   imports: [
     IonHeader,
@@ -43,12 +43,12 @@ import { MarkdownToHtmlPipe } from '@core/pipes/markdown-to-html.pipe';
     TranslateModule,
     MarkdownToHtmlPipe,
   ],
-  templateUrl: './agent.component.html',
-  styleUrls: ['./agent.component.scss'],
+  templateUrl: './planner.component.html',
+  styleUrls: ['./planner.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [PlannerStateService],
 })
-export class AgentComponent implements ViewWillEnter, AfterViewInit {
+export class PlannerComponent implements ViewWillEnter, AfterViewInit {
   @ViewChild(IonContent, { static: false }) private content?: IonContent;
   @ViewChild(IonTextarea, { static: false }) private composerInput?: IonTextarea;
 

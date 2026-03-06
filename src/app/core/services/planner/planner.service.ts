@@ -12,7 +12,7 @@ export type MealPlannerMode = 'recipes' | 'plan' | 'menu';
 @Injectable({
   providedIn: 'root',
 })
-export class PlannerAgentService {
+export class PlannerService {
   private readonly pantryService = inject(PantryService);
   private readonly llm = inject(PlannerLlmClientService);
   private readonly appPreferences = inject(SettingsPreferencesService);

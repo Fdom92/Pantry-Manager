@@ -1,4 +1,4 @@
-import { AgentEntryContext, type QuickPrompt } from '@core/models/agent';
+import { AgentEntryContext, type QuickPrompt } from '@core/models/planner';
 
 export const USER_PROMPT_MAX_LENGTH = 500;
 export const QUICK_PROMPTS: readonly QuickPrompt[] = [

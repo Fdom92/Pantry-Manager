@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { AgentConversationInit, AgentEntryContext, AgentMessage, AgentPhase, AgentRole } from '@core/models/agent';
+import { AgentConversationInit, AgentEntryContext, AgentMessage, AgentPhase, AgentRole } from '@core/models/planner';
 import { createDocumentId } from '@core/utils';
 @Injectable({
   providedIn: 'root',

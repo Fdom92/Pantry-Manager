@@ -1,4 +1,4 @@
-import type { AgentEntryContext } from '@core/models/agent';
+import type { AgentEntryContext } from '@core/models/planner';
 
 export enum InsightId {
   COOK_BEFORE_EXPIRY = 'cook_before_expiry',

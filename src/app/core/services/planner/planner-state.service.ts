@@ -2,15 +2,15 @@ import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angul
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
 import { QUICK_PROMPTS, USER_PROMPT_MAX_LENGTH } from '@core/constants';
-import { AgentEntryContext } from '@core/models/agent';
-import type { AgentMessage, LlmMessage, LlmRole, QuickPrompt } from '@core/models/agent';
+import { AgentEntryContext } from '@core/models/planner';
+import type { AgentMessage, LlmMessage, LlmRole, QuickPrompt } from '@core/models/planner';
 import { normalizeOptionalTrim } from '@core/utils/normalization.util';
 import { NavController } from '@ionic/angular';
 import type { IonContent, IonTextarea } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 import { PlannerConversationStore } from './planner-conversation.store';
-import { PlannerAgentService } from './planner-agent.service';
+import { PlannerService } from './planner.service';
 import { PlannerLlmClientService } from './planner-llm-client.service';
 import { NetworkService } from '../shared/network.service';
 import { createLatestOnlyRunner } from '@core/utils';
@@ -18,7 +18,7 @@ import { createLatestOnlyRunner } from '@core/utils';
 @Injectable()
 export class PlannerStateService {
   private readonly conversationStore = inject(PlannerConversationStore);
-  private readonly mealPlannerAgent = inject(PlannerAgentService);
+  private readonly mealPlannerAgent = inject(PlannerService);
   private readonly llmClient = inject(PlannerLlmClientService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly networkService = inject(NetworkService);

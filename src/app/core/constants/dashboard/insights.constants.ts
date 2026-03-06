@@ -1,4 +1,4 @@
-import { AgentEntryContext } from '@core/models/agent';
+import { AgentEntryContext } from '@core/models/planner';
 import { InsightCategory, InsightDefinition, InsightId } from '@core/models/dashboard';
 import { isWeekend, isWithinHours } from '@core/utils';
 
@@ -77,7 +77,7 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
         id: 'pantry-healthy',
         labelKey: 'insights.library.pantryHealthy.cta',
         type: 'navigate',
-        route: '/shopping',
+        route: '/list',
       },
     ],
   },
@@ -110,7 +110,7 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
         id: 'low-stock-reminder',
         labelKey: 'insights.library.lowStockReminder.cta',
         type: 'navigate',
-        route: '/shopping',
+        route: '/list',
       },
     ],
   },
