@@ -183,11 +183,6 @@ export class PantryStateService {
     this.editItemModalRequest.set({ mode: 'create' });
   }
 
-  openAdvancedFromFastAdd(): void {
-    this.fastAddModal.closeFastAddModal();
-    this.openAdvancedAddModal();
-  }
-
   clearEditItemModalRequest(): void {
     this.editItemModalRequest.set(null);
   }

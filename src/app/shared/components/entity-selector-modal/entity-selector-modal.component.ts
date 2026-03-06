@@ -72,10 +72,7 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Input() showAllOnFocus = true;
   @Input() autofocus = true;
   @Input() maxOptions = 0;
-  @Input() secondaryActionLabel = '';
-  @Input() showSecondaryAction = false;
-
-  @Output() willDismiss = new EventEmitter<void>();
+@Output() willDismiss = new EventEmitter<void>();
   @Output() didDismiss = new EventEmitter<void>();
   @Output() selectItem = new EventEmitter<AutocompleteItem<TRaw, TMeta>>();
   @Output() queryChange = new EventEmitter<string>();
@@ -83,8 +80,6 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Output() adjustEntry = new EventEmitter<{ entry: EntitySelectorEntry; delta: number }>();
   @Output() entryDateChange = new EventEmitter<{ entry: EntitySelectorEntry; date: string | undefined }>();
   @Output() save = new EventEmitter<void>();
-  @Output() secondaryAction = new EventEmitter<void>();
-
   canIncrease(entry: EntitySelectorEntry): boolean {
     if (entry.maxQuantity == null || !Number.isFinite(entry.maxQuantity)) {
       return true;
