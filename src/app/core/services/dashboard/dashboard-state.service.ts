@@ -2,7 +2,6 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { computeFoodCoverage, computePantryScore, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
 import type { FoodCoverageResult, PantryScoreResult } from '@core/domain/dashboard';
-import { getItemStatusState } from '@core/domain/pantry';
 import type {
   Insight,
   InsightContext,
@@ -13,7 +12,7 @@ import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-tod
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { PlannerConversationStore } from '../planner/planner-conversation.store';
 import { LanguageService } from '../shared/language.service';
-import { withSignalFlag, isWeekend } from '@core/utils';
+import { withSignalFlag } from '@core/utils';
 import { ConfirmService } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
@@ -22,8 +21,6 @@ import { DashboardInsightService } from './dashboard-insight.service';
 import { formatDateTimeValue, formatDateValue } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
-import { AgentEntryContext } from '@core/models/planner';
 
 export enum PantryHealthState {
   CRITICAL = 'critical',
@@ -71,7 +68,6 @@ export class DashboardStateService {
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly revenueCat = inject(UpgradeRevenuecatService);
 
   private hasCompletedInitialLoad = false;
   private readonly dismissedActionIds = signal(new Set<string>());
@@ -241,10 +237,10 @@ export class DashboardStateService {
     const actions: DashboardAction[] = [];
     const expired = this.expiredItems().length;
     const nearExpiry = this.nearExpiryItems().length;
+    const lowStock = this.lowStockItems().length;
     const stale = this.stalePantryItemsCount();
-    const isPro = this.revenueCat.isPro();
 
-    // LAYER 1: CRITICAL (always first)
+    // CRITICAL: expired items
     if (expired > 0) {
       const descKey = expired === 1 ? 'dashboard.actions.expired.description_one' : 'dashboard.actions.expired.description_other';
       actions.push({
@@ -261,101 +257,66 @@ export class DashboardStateService {
       });
     }
 
-    // LAYER 2: PREVENTIVE (only if no critical OR there's space)
+    // PREVENTIVE: near-expiry (PRO users get AI recipe suggestion via insights layer)
     if (nearExpiry > 0) {
       actions.push({
         id: 'near-expiry-action',
         priority: ActionPriority.HIGH,
         category: 'preventive',
-        title: isPro
-          ? this.translate.instant('dashboard.actions.nearExpiry.titlePro')
-          : this.translate.instant('dashboard.actions.nearExpiry.title'),
+        title: this.translate.instant('dashboard.actions.nearExpiry.title'),
         description: this.translate.instant('dashboard.actions.nearExpiry.description', {
           count: nearExpiry,
           days: NEAR_EXPIRY_WINDOW_DAYS,
         }),
-        cta: isPro
-          ? {
-              label: this.translate.instant('dashboard.actions.nearExpiry.ctaPro'),
-              action: () => this.launchAgentWithPrompt('cook-before-expiry'),
-            }
-          : {
-              label: this.translate.instant('dashboard.actions.nearExpiry.cta'),
-              action: () => this.onOverviewCardSelected('near-expiry'),
-            },
+        cta: {
+          label: this.translate.instant('dashboard.actions.nearExpiry.cta'),
+          action: () => this.onOverviewCardSelected('near-expiry'),
+        },
         dismissible: true,
       });
     }
 
-    // LAYER 3: OPTIMIZATION (only if NO critical or preventive urgent)
-    if (actions.length === 0) {
-      if (stale > 5) {
-        actions.push({
-          id: 'stale-items-optimization',
-          priority: ActionPriority.MEDIUM,
-          category: 'optimization',
-          title: this.translate.instant('dashboard.actions.stale.title'),
-          description: this.translate.instant('dashboard.actions.stale.description', { count: stale }),
-          cta: {
-            label: this.translate.instant('dashboard.actions.stale.cta'),
-            action: () => {
-              // Navigate to pantry with stale filter
-              this.pantryService.setPendingNavigationPreset({ recentlyAdded: false });
-              void this.navCtrl.navigateRoot('/pantry');
-            },
-          },
-          dismissible: true,
-        });
-      }
-
-      // PRO users: Smart suggestions only when no urgency
-      if (isPro && isWeekend(new Date())) {
-        actions.push({
-          id: 'weekly-meal-planning',
-          priority: ActionPriority.MEDIUM,
-          category: 'optimization',
-          title: this.translate.instant('dashboard.actions.weeklyPlan.title'),
-          description: this.translate.instant('dashboard.actions.weeklyPlan.description'),
-          cta: {
-            label: this.translate.instant('dashboard.actions.weeklyPlan.cta'),
-            action: () => this.launchAgentWithPrompt('weekly-plan'),
-          },
-          dismissible: true,
-        });
-      }
+    // CRITICAL: low stock
+    if (lowStock > 0) {
+      const descKey = lowStock === 1 ? 'dashboard.actions.lowStock.description_one' : 'dashboard.actions.lowStock.description_other';
+      actions.push({
+        id: 'low-stock-action',
+        priority: ActionPriority.MEDIUM,
+        category: 'critical',
+        title: this.translate.instant('dashboard.actions.lowStock.title'),
+        description: this.translate.instant(descKey, { count: lowStock }),
+        cta: {
+          label: this.translate.instant('dashboard.actions.lowStock.cta'),
+          action: () => this.onOverviewCardSelected('low-or-empty'),
+        },
+        dismissible: true,
+      });
     }
 
-    // LAYER 4: CONVERSION (only if NO critical AND user is non-pro)
-    const hasCritical = actions.filter(a => a.category === 'critical').length > 0;
-    if (!hasCritical && !isPro) {
-      // Only show PRO if there's valuable context
-      if (nearExpiry > 0 || this.completeProductsCount() >= 5) {
-        actions.push({
-          id: 'upgrade-contextual',
-          priority: ActionPriority.LOW,
-          category: 'conversion',
-          title: this.translate.instant('dashboard.actions.upgrade.title'),
-          description: this.translate.instant('dashboard.actions.upgrade.description'),
-          cta: {
-            label: this.translate.instant('dashboard.actions.upgrade.cta'),
-            action: () => this.navCtrl.navigateForward('/upgrade'),
+    // OPTIMIZATION: stale items (only if no urgency)
+    const hasUrgent = actions.some(a => a.category === 'critical' || a.category === 'preventive');
+    if (!hasUrgent && stale > 5) {
+      actions.push({
+        id: 'stale-items-optimization',
+        priority: ActionPriority.MEDIUM,
+        category: 'optimization',
+        title: this.translate.instant('dashboard.actions.stale.title'),
+        description: this.translate.instant('dashboard.actions.stale.description', { count: stale }),
+        cta: {
+          label: this.translate.instant('dashboard.actions.stale.cta'),
+          action: () => {
+            this.pantryService.setPendingNavigationPreset({ recentlyAdded: false });
+            void this.navCtrl.navigateRoot('/pantry');
           },
-          dismissible: true,
-        });
-      }
+        },
+        dismissible: true,
+      });
     }
 
-    // Sort by priority and ensure category diversity, max 2
     return actions
       .sort((a, b) => a.priority - b.priority)
-      .filter((action, index, arr) => {
-        if (index === 0) {
-          return true;
-        }
-        return action.category !== arr[0].category;
-      })
-      .slice(0, 2)
-      .filter(action => !this.dismissedActionIds().has(action.id));
+      .filter(action => !this.dismissedActionIds().has(action.id))
+      .slice(0, 2);
   });
 
   readonly showAdditionalContext = computed(() => {
@@ -385,12 +346,10 @@ export class DashboardStateService {
     effect(() => {
       const items = this.pantryItems();
       const expiringSoon = this.nearExpiryItems();
-      const expired = this.expiredItems();
-      const lowStock = this.lowStockItems();
       if (!this.hasCompletedInitialLoad) {
         return;
       }
-      this.refreshDashboardInsights(items, expiringSoon, expired, lowStock);
+      this.refreshDashboardInsights(items, expiringSoon);
     });
   }
 
@@ -475,30 +434,6 @@ export class DashboardStateService {
     }
   }
 
-  private launchAgentWithPrompt(promptId: string): void {
-    let prompt = '';
-    let entryContext = AgentEntryContext.INSIGHTS;
-
-    switch (promptId) {
-      case 'cook-before-expiry':
-        prompt = this.translate.instant('insights.library.cookBeforeExpiry.prompt');
-        entryContext = AgentEntryContext.INSIGHTS_RECIPES;
-        break;
-      case 'weekly-plan':
-        prompt = this.translate.instant('insights.library.weeklyMealPlanning.prompt');
-        entryContext = AgentEntryContext.INSIGHTS;
-        break;
-      default:
-        return;
-    }
-
-    this.conversationStore.prepareConversation({
-      entryContext,
-      initialPrompt: prompt,
-    });
-    void this.navCtrl.navigateForward('/planner');
-  }
-
   async deleteExpiredItems(): Promise<void> {
     if (this.isDeletingExpiredItems() || !this.hasExpiredItems()) {
       return;
@@ -549,30 +484,18 @@ export class DashboardStateService {
     return new Date();
   }
 
-  private refreshDashboardInsights(
-    items: PantryItem[],
-    expiringSoon: PantryItem[],
-    expiredItems: PantryItem[],
-    lowStockItems: PantryItem[],
-  ): void {
+  private refreshDashboardInsights(items: PantryItem[], expiringSoon: PantryItem[]): void {
     if (!items?.length) {
       this.visibleInsights.set([]);
       return;
     }
 
-    const now = new Date();
-
     const context: InsightContext = {
       expiringSoonItems: expiringSoon.map(item => ({
         id: item._id,
-        isLowStock: getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock',
         quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
-      expiredItems: expiredItems.map(item => ({
-        id: item._id,
-      })),
-      expiringSoonCount: expiringSoon.length,
-      lowStockCount: lowStockItems.length,
+      noExpiryDateCount: this.noExpiryDateCount(),
       products: items.map(item => ({
         id: item._id,
         name: item.name,

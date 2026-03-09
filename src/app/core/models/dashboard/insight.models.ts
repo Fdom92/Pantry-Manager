@@ -2,15 +2,9 @@ import type { AgentEntryContext } from '@core/models/planner';
 
 export enum InsightId {
   COOK_BEFORE_EXPIRY = 'cook_before_expiry',
-  WEEKLY_MEAL_PLANNING = 'weekly_meal_planning',
-  SMART_COOKING_IDEAS = 'smart_cooking_ideas',
-  PANTRY_HEALTHY = 'pantry_healthy',
   ADD_EXPIRY_DATES = 'add_expiry_dates',
   ORGANIZE_WITH_CATEGORIES = 'organize_with_categories',
-  LOW_STOCK_REMINDER = 'low_stock_reminder',
   PLAN_AND_SAVE_TIME = 'plan_and_save_time',
-  HISTORY_UNLIMITED = 'history_unlimited',
-  SMART_INSIGHTS = 'smart_insights',
 }
 
 export enum InsightCategory {
@@ -73,11 +67,7 @@ export interface InsightDefinition {
 }
 export interface InsightExpiringItem {
   id?: string;
-  isLowStock: boolean;
   quantity: number;
-}
-export interface InsightExpiredItem {
-  id?: string;
 }
 export interface InsightProductSummary {
   id?: string;
@@ -86,9 +76,7 @@ export interface InsightProductSummary {
 }
 export interface InsightContext {
   expiringSoonItems: InsightExpiringItem[];
-  expiredItems: InsightExpiredItem[];
-  expiringSoonCount: number;
-  lowStockCount: number;
+  noExpiryDateCount: number;
   products: InsightProductSummary[];
 }
 export interface InsightPredicateHelpers {
