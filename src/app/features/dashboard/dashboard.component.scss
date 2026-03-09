@@ -38,7 +38,7 @@ ion-title {
   align-items: center;
   text-align: center;
   gap: var(--app-theme-spacing-md);
-  padding: var(--app-theme-spacing-xl) var(--app-theme-card-margin-inline);
+  padding-inline: var(--app-theme-card-margin-inline);
 
   &--skeleton {
     opacity: 0.6;

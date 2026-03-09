@@ -36,11 +36,8 @@
             <p class="pantry-health__description">{{ facade.pantryHealth().description }}</p>
           </div>
         </div>
-      </section>
-
-      <!-- Pantry Score -->
-      @if (facade.pantryScore()) {
-        <section class="dashboard-section">
+        <!-- Pantry Score -->
+        @if (facade.pantryScore()) {
           <div class="pantry-score" [attr.data-label]="facade.pantryScore()!.label">
             <ion-icon name="stats-chart-outline"></ion-icon>
             <div class="pantry-score__content">
@@ -50,12 +47,9 @@
               </span>
             </div>
           </div>
-        </section>
-      }
-
-      <!-- Food Coverage -->
-      @if (facade.foodCoverage() !== null) {
-        <section class="dashboard-section">
+        }
+        <!-- Food Coverage -->
+        @if (facade.foodCoverage() !== null) {
           <div class="pantry-score">
             <ion-icon name="calendar-outline"></ion-icon>
             <div class="pantry-score__content">
@@ -65,8 +59,8 @@
               </span>
             </div>
           </div>
-        </section>
-      }
+        }
+      </section>
 
       <!-- LAYER 2: What to Do Now (Actions) -->
       @if (facade.actions().length > 0) {
