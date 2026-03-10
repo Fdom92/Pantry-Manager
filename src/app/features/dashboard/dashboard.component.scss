@@ -161,6 +161,15 @@ ion-title {
   box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
   transition: var(--app-theme-card-transition);
   position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--action-accent, var(--app-theme-card-accent-success));
+  }
 
   &__content {
     flex: 1;
@@ -221,22 +230,11 @@ ion-title {
     }
   }
 
-  // Category-specific styling
-  &[data-category='critical'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-critical);
-  }
-
-  &[data-category='preventive'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-warning);
-  }
-
-  &[data-category='optimization'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-success);
-  }
-
-  &[data-category='conversion'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--ion-color-secondary);
-  }
+  // Category-specific accent color
+  &[data-category='critical'] { --action-accent: var(--app-theme-card-accent-critical); }
+  &[data-category='preventive'] { --action-accent: var(--app-theme-card-accent-warning); }
+  &[data-category='optimization'] { --action-accent: var(--app-theme-card-accent-success); }
+  &[data-category='conversion'] { --action-accent: var(--ion-color-secondary); }
 }
 
 // LAYER 3: Additional Context (Optional)

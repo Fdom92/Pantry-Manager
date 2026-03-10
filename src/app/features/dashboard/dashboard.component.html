@@ -100,13 +100,18 @@
       <!-- LAYER 3: Insights -->
       @if (facade.visibleInsights().length > 0) {
         <section class="dashboard-section">
-          @for (insight of facade.visibleInsights(); track insight.id) {
-            <app-insight-card
-              [insight]="insight"
-              (dismiss)="facade.dismissInsight(insight)"
-              (ctaSelect)="facade.onInsightAction(insight, $event)">
-            </app-insight-card>
-          }
+          <header class="dashboard-section-header">
+            <h3 class="dashboard-section-title">{{ 'dashboard.sections.insights.title' | translate }}</h3>
+          </header>
+          <div class="actions-stack">
+            @for (insight of facade.visibleInsights(); track insight.id) {
+              <app-insight-card
+                [insight]="insight"
+                (dismiss)="facade.dismissInsight(insight)"
+                (ctaSelect)="facade.onInsightAction(insight, $event)">
+              </app-insight-card>
+            }
+          </div>
         </section>
       }
 
