@@ -110,8 +110,9 @@ ion-title {
   &__content {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 6px;
     min-width: 0;
+    flex: 1;
   }
 
   &__title {
@@ -127,10 +128,18 @@ ion-title {
     color: var(--app-theme-text-color);
   }
 
-  &[data-label='excellent'] ion-icon { color: var(--app-theme-card-accent-success); }
-  &[data-label='good'] ion-icon { color: var(--app-theme-card-accent-success); }
-  &[data-label='fair'] ion-icon { color: var(--app-theme-card-accent-warning); }
-  &[data-label='poor'] ion-icon { color: var(--app-theme-card-accent-critical); }
+  &__hint {
+    margin: 0;
+    font-size: 0.7rem;
+    color: var(--app-theme-text-muted);
+    line-height: 1.4;
+    opacity: 0.8;
+  }
+
+  &[data-label='excellent'] > ion-icon { color: var(--app-theme-card-accent-success); }
+  &[data-label='good'] > ion-icon { color: var(--app-theme-card-accent-success); }
+  &[data-label='fair'] > ion-icon { color: var(--app-theme-card-accent-warning); }
+  &[data-label='poor'] > ion-icon { color: var(--app-theme-card-accent-critical); }
 }
 
 // LAYER 2: Actions (What to Do Now)

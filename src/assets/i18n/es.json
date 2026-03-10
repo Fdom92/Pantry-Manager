@@ -179,6 +179,7 @@
     },
     "pantryScore": {
       "title": "Salud de la despensa",
+      "hint": "Puntuación basada en caducidades, stock y organización de tu despensa",
       "excellent": "Excelente",
       "good": "Bastante bien",
       "fair": "Mejorable",
@@ -186,6 +187,7 @@
     },
     "foodCoverage": {
       "title": "Cobertura estimada",
+      "hint": "Estimación basada en los productos de tu despensa",
       "days_one": "≈ 1 día de comida",
       "days_other": "≈ {{ count }} días de comida",
       "months_one": "≈ 1 mes de comida",

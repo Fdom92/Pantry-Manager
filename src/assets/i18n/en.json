@@ -179,6 +179,7 @@
     },
     "pantryScore": {
       "title": "Pantry health",
+      "hint": "Score based on expiry dates, stock and how your pantry is organized",
       "excellent": "Excellent",
       "good": "Pretty good",
       "fair": "Could be better",
@@ -186,6 +187,7 @@
     },
     "foodCoverage": {
       "title": "Estimated coverage",
+      "hint": "Estimate based on the products in your pantry",
       "days_one": "≈ 1 day of food",
       "days_other": "≈ {{ count }} days of food",
       "months_one": "≈ 1 month of food",

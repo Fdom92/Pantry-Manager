@@ -32,7 +32,7 @@
             <ion-icon [name]="facade.getHealthIcon(facade.pantryHealth().state)"></ion-icon>
           </div>
           <div class="pantry-health__content">
-            <h2 class="pantry-health__title">{{ facade.pantryHealth().title }}</h2>
+              <h2 class="pantry-health__title">{{ facade.pantryHealth().title }}</h2>
             <p class="pantry-health__description">{{ facade.pantryHealth().description }}</p>
           </div>
         </div>
@@ -45,6 +45,7 @@
               <span class="pantry-score__value">
                 {{ facade.pantryScore()!.score }} · {{ 'dashboard.pantryScore.' + facade.pantryScore()!.label | translate }}
               </span>
+              <p class="pantry-score__hint">{{ 'dashboard.pantryScore.hint' | translate }}</p>
             </div>
           </div>
         }
@@ -57,12 +58,13 @@
               <span class="pantry-score__value">
                 {{ (facade.foodCoverage()!.value === 1 ? 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_one' : 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_other') | translate:{ count: facade.foodCoverage()!.value } }}
               </span>
+              <p class="pantry-score__hint">{{ 'dashboard.foodCoverage.hint' | translate }}</p>
             </div>
           </div>
         }
       </section>
 
-      <!-- LAYER 2: What to Do Now (Actions) -->
+<!-- LAYER 2: What to Do Now (Actions) -->
       @if (facade.actions().length > 0) {
         <section class="dashboard-section">
           <header class="dashboard-section-header">

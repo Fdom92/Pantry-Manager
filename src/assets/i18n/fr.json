@@ -179,6 +179,7 @@
     },
     "pantryScore": {
       "title": "Santé du garde-manger",
+      "hint": "Score basé sur les dates d'expiration, le stock et l'organisation de votre garde-manger",
       "excellent": "Excellent",
       "good": "Plutôt bien",
       "fair": "Améliorable",
@@ -186,6 +187,7 @@
     },
     "foodCoverage": {
       "title": "Couverture estimée",
+      "hint": "Estimation basée sur les produits de votre garde-manger",
       "days_one": "≈ 1 jour de nourriture",
       "days_other": "≈ {{ count }} jours de nourriture",
       "months_one": "≈ 1 mois de nourriture",

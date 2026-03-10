@@ -179,6 +179,7 @@
     },
     "pantryScore": {
       "title": "Salute della dispensa",
+      "hint": "Punteggio basato su scadenze, scorte e organizzazione della tua dispensa",
       "excellent": "Eccellente",
       "good": "Abbastanza bene",
       "fair": "Migliorabile",
@@ -186,6 +187,7 @@
     },
     "foodCoverage": {
       "title": "Copertura stimata",
+      "hint": "Stima basata sui prodotti della tua dispensa",
       "days_one": "≈ 1 giorno di cibo",
       "days_other": "≈ {{ count }} giorni di cibo",
       "months_one": "≈ 1 mese di cibo",

@@ -179,6 +179,7 @@
     },
     "pantryScore": {
       "title": "Vorratsgesundheit",
+      "hint": "Bewertung basierend auf Ablaufdaten, Vorrat und Organisation deiner Speisekammer",
       "excellent": "Ausgezeichnet",
       "good": "Ziemlich gut",
       "fair": "Verbesserungswürdig",
@@ -186,6 +187,7 @@
     },
     "foodCoverage": {
       "title": "Geschätzte Reichweite",
+      "hint": "Schätzung basierend auf den Produkten in deiner Speisekammer",
       "days_one": "≈ 1 Tag Lebensmittel",
       "days_other": "≈ {{ count }} Tage Lebensmittel",
       "months_one": "≈ 1 Monat Lebensmittel",
