@@ -148,6 +148,9 @@
     "sections": {
       "actions": {
         "title": "What to do now"
+      },
+      "insights": {
+        "title": "Improve your pantry"
       }
     },
     "actions": {
@@ -159,29 +162,41 @@
       },
       "nearExpiry": {
         "title": "Products expiring soon",
-        "titlePro": "Plan before they expire",
         "description": "{{ count }} products expire in {{ days }} days",
-        "cta": "View products",
-        "ctaPro": "Generate recipes"
+        "cta": "View products"
+      },
+      "lowStock": {
+        "title": "Stock running low",
+        "description_one": "{{ count }} product is below minimum",
+        "description_other": "{{ count }} products are below minimum",
+        "cta": "Go to list"
       },
       "stale": {
         "title": "Products with no activity",
         "description": "{{ count }} products haven't moved in 30+ days",
         "cta": "Review"
-      },
-      "weeklyPlan": {
-        "title": "Plan your week",
-        "description": "Optimize your pantry with a weekly plan",
-        "cta": "Create plan"
-      },
-      "upgrade": {
-        "title": "Make the most of your pantry",
-        "description": "Personalized recipes and weekly planning with AI",
-        "cta": "Discover PRO"
       }
     },
     "context": {
       "recentlyAdded": "{{ count }} recently added products"
+    },
+    "pantryScore": {
+      "title": "Pantry health",
+      "hint": "Score based on expiry dates, stock and how your pantry is organized",
+      "excellent": "Excellent",
+      "good": "Pretty good",
+      "fair": "Could be better",
+      "poor": "Needs attention"
+    },
+    "foodCoverage": {
+      "title": "Estimated coverage",
+      "hint": "Estimate based on the products in your pantry",
+      "days_one": "≈ 1 day of food",
+      "days_other": "≈ {{ count }} days of food",
+      "months_one": "≈ 1 month of food",
+      "months_other": "≈ {{ count }} months of food",
+      "years_one": "≈ 1 year of food",
+      "years_other": "≈ {{ count }} years of food"
     },
     "summary": {
       "title": "Pantry overview",
@@ -320,58 +335,26 @@
         "cta": "Let's do it",
         "dismiss": "Not now"
       },
-      "weeklyMealPlanning": {
-        "title": "Plan the week?",
-        "description": "Good time to organize your meals with what you have at home.",
-        "cta": "Let's go",
-        "prompt": "Plan my meals for this week using only what I already have in the pantry."
-      },
       "cookBeforeExpiry": {
         "title": "You have items expiring soon",
         "description": "I'll suggest recipes to use them before they go bad.",
         "cta": "Give me ideas",
         "prompt": "Suggest recipes that prioritize the products expiring soon in my pantry."
       },
-      "smartCookingIdeas": {
-        "title": "What should I cook today?",
-        "description": "I'll give you ideas with what you have in your pantry right now.",
-        "cta": "Inspire me",
-        "prompt": "Give me cooking ideas using the ingredients I have available."
-      },
-      "planAndSaveTime": {
-        "title": "Plan the week with AI",
-        "description": "With PRO, organize your weekly menu and save time every day.",
-        "cta": "Try PRO"
-      },
-      "historyUnlimited": {
-        "title": "What do you waste most?",
-        "description": "With PRO, discover what you throw away and buy only what you need.",
-        "cta": "Learn more"
-      },
-      "smartInsights": {
-        "title": "Alerts before expiry",
-        "description": "With PRO, I'll tell you what to cook so you don't waste anything.",
-        "cta": "Learn more"
-      },
-      "pantryHealthy": {
-        "title": "Your pantry is in great shape",
-        "description": "Everything's under control. A good time to plan your next shopping list.",
-        "cta": "View list"
-      },
       "addExpiryDates": {
         "title": "Add expiry dates to your items",
         "description": "Track what to use first and avoid unpleasant surprises in your pantry.",
         "cta": "Go to pantry"
       },
-      "lowStockReminder": {
-        "title": "Some items are running low",
-        "description": "Add them to your shopping list so you don't run out.",
-        "cta": "Go to list"
-      },
       "organizeWithCategories": {
         "title": "Organize your pantry by category",
         "description": "Group your products to find them faster and keep everything under control.",
         "cta": "Organize now"
+      },
+      "planAndSaveTime": {
+        "title": "Plan the week with AI",
+        "description": "With PRO, organize your weekly menu and save time every day.",
+        "cta": "Try PRO"
       }
     }
   },

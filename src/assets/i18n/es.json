@@ -148,6 +148,9 @@
     "sections": {
       "actions": {
         "title": "Qué hacer ahora"
+      },
+      "insights": {
+        "title": "Mejorar tu despensa"
       }
     },
     "actions": {
@@ -159,29 +162,41 @@
       },
       "nearExpiry": {
         "title": "Productos próximos a caducar",
-        "titlePro": "Planifica antes de que caduquen",
         "description": "{{ count }} productos expiran en {{ days }} días",
-        "cta": "Ver productos",
-        "ctaPro": "Genera recetas"
+        "cta": "Ver productos"
+      },
+      "lowStock": {
+        "title": "Stock bajo",
+        "description_one": "{{ count }} producto está por debajo del mínimo",
+        "description_other": "{{ count }} productos están por debajo del mínimo",
+        "cta": "Ir a la lista"
       },
       "stale": {
         "title": "Productos sin actividad",
         "description": "{{ count }} productos llevan 30+ días sin movimiento",
         "cta": "Revisar"
-      },
-      "weeklyPlan": {
-        "title": "Planifica tu semana",
-        "description": "Optimiza tu despensa con un plan semanal",
-        "cta": "Crear plan"
-      },
-      "upgrade": {
-        "title": "Aprovecha tu despensa al máximo",
-        "description": "Recetas personalizadas y planificación semanal con IA",
-        "cta": "Descubre PRO"
       }
     },
     "context": {
       "recentlyAdded": "{{ count }} productos añadidos recientemente"
+    },
+    "pantryScore": {
+      "title": "Salud de la despensa",
+      "hint": "Puntuación basada en caducidades, stock y organización de tu despensa",
+      "excellent": "Excelente",
+      "good": "Bastante bien",
+      "fair": "Mejorable",
+      "poor": "Necesita atención"
+    },
+    "foodCoverage": {
+      "title": "Cobertura estimada",
+      "hint": "Estimación basada en los productos de tu despensa",
+      "days_one": "≈ 1 día de comida",
+      "days_other": "≈ {{ count }} días de comida",
+      "months_one": "≈ 1 mes de comida",
+      "months_other": "≈ {{ count }} meses de comida",
+      "years_one": "≈ 1 año de comida",
+      "years_other": "≈ {{ count }} años de comida"
     },
     "summary": {
       "title": "Resumen de la despensa",
@@ -320,58 +335,26 @@
         "cta": "Hacerlo",
         "dismiss": "No ahora"
       },
-      "weeklyMealPlanning": {
-        "title": "¿Organizamos la semana?",
-        "description": "Es buen momento para planificar tus comidas con lo que tienes en casa.",
-        "cta": "Vamos allá",
-        "prompt": "Planifica mis comidas de esta semana usando solo lo que tengo en la despensa."
-      },
       "cookBeforeExpiry": {
         "title": "Tienes productos a punto de caducar",
         "description": "Te sugiero recetas para aprovecharlos antes de que se echen a perder.",
         "cta": "Dame ideas",
         "prompt": "Sugiere recetas priorizando los productos que caducan pronto en mi despensa."
       },
-      "smartCookingIdeas": {
-        "title": "¿Qué cocino hoy?",
-        "description": "Te doy ideas con lo que tienes ahora mismo en la despensa.",
-        "cta": "Inspírame",
-        "prompt": "Dame ideas de qué cocinar usando los ingredientes que tengo disponibles."
-      },
-      "planAndSaveTime": {
-        "title": "Planifica la semana con IA",
-        "description": "Con PRO, organiza tu menú semanal y ahorra tiempo cada día.",
-        "cta": "Prueba PRO"
-      },
-      "historyUnlimited": {
-        "title": "¿Qué desperdicias más?",
-        "description": "Con PRO, descubre qué tiras más y compra solo lo que necesitas.",
-        "cta": "Ver más"
-      },
-      "smartInsights": {
-        "title": "Avisos antes de que caduquen",
-        "description": "Con PRO, te aviso qué cocinar para no tirar nada.",
-        "cta": "Saber más"
-      },
-      "pantryHealthy": {
-        "title": "Tu despensa está en buena forma",
-        "description": "Todo bajo control. Es buen momento para revisar tu lista de compra.",
-        "cta": "Ver lista"
-      },
       "addExpiryDates": {
         "title": "Añade fechas de caducidad",
         "description": "Con fechas en tus productos sabrás siempre qué usar primero y evitarás sorpresas.",
         "cta": "Ir a despensa"
       },
-      "lowStockReminder": {
-        "title": "Algunos productos se agotan",
-        "description": "Añádelos a tu lista de compra antes de quedarte sin ellos.",
-        "cta": "Ir a la lista"
-      },
       "organizeWithCategories": {
         "title": "Organiza tu despensa por categorías",
         "description": "Agrupa tus productos para encontrarlos más rápido y tener todo bajo control.",
         "cta": "Organizar ahora"
+      },
+      "planAndSaveTime": {
+        "title": "Planifica la semana con IA",
+        "description": "Con PRO, organiza tu menú semanal y ahorra tiempo cada día.",
+        "cta": "Prueba PRO"
       }
     }
   },

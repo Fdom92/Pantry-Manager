@@ -1,5 +1,5 @@
 import { roundQuantity } from '@core/utils/formatting.util';
-import { ShoppingReason, type ShoppingSummary } from '@core/models/shopping';
+import { ShoppingReason, type ShoppingSummary } from '@core/models/list';
 
 export function determineSuggestionNeed(params: {
   totalQuantity: number;

@@ -136,8 +136,6 @@
     [showEmptyAction]="facade.showFastAddEmptyAction()"
     [showEmptyActionWhenNoExactMatch]="true"
     [emptyActionLabel]="facade.fastAddEmptyActionLabel()"
-    [showSecondaryAction]="true"
-    [secondaryActionLabel]="'pantry.fastAdd.createAdvanced' | translate"
     (willDismiss)="facade.dismissFastAddModal()"
     (didDismiss)="facade.closeFastAddModal()"
     (selectItem)="facade.addFastAddEntry($event)"
@@ -145,8 +143,7 @@
     (emptyAction)="facade.addFastAddEntryFromQuery($event)"
     (adjustEntry)="facade.adjustFastAddEntryById($event.entry.id, $event.delta)"
     (entryDateChange)="facade.setFastAddEntryDate($event.entry.id, $event.date)"
-    (save)="facade.submitFastAdd()"
-    (secondaryAction)="facade.openAdvancedFromFastAdd()">
+    (save)="facade.submitFastAdd()">
   </app-entity-selector-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>

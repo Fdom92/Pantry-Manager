@@ -148,6 +148,9 @@
     "sections": {
       "actions": {
         "title": "Was jetzt zu tun ist"
+      },
+      "insights": {
+        "title": "Vorrat verbessern"
       }
     },
     "actions": {
@@ -159,29 +162,41 @@
       },
       "nearExpiry": {
         "title": "Produkte laufen bald ab",
-        "titlePro": "Plane, bevor sie ablaufen",
         "description": "{{ count }} Produkte laufen in {{ days }} Tagen ab",
-        "cta": "Produkte ansehen",
-        "ctaPro": "Rezepte generieren"
+        "cta": "Produkte ansehen"
+      },
+      "lowStock": {
+        "title": "Vorrat wird knapp",
+        "description_one": "{{ count }} Produkt liegt unter dem Minimum",
+        "description_other": "{{ count }} Produkte liegen unter dem Minimum",
+        "cta": "Zur Liste"
       },
       "stale": {
         "title": "Produkte ohne Aktivität",
         "description": "{{ count }} Produkte haben sich seit 30+ Tagen nicht bewegt",
         "cta": "Überprüfen"
-      },
-      "weeklyPlan": {
-        "title": "Plane deine Woche",
-        "description": "Optimiere deine Speisekammer mit einem Wochenplan",
-        "cta": "Plan erstellen"
-      },
-      "upgrade": {
-        "title": "Hole das Beste aus deiner Speisekammer",
-        "description": "Personalisierte Rezepte und Wochenplanung mit KI",
-        "cta": "PRO entdecken"
       }
     },
     "context": {
       "recentlyAdded": "{{ count }} kürzlich hinzugefügte Produkte"
+    },
+    "pantryScore": {
+      "title": "Vorratsgesundheit",
+      "hint": "Bewertung basierend auf Ablaufdaten, Vorrat und Organisation deiner Speisekammer",
+      "excellent": "Ausgezeichnet",
+      "good": "Ziemlich gut",
+      "fair": "Verbesserungswürdig",
+      "poor": "Braucht Aufmerksamkeit"
+    },
+    "foodCoverage": {
+      "title": "Geschätzte Reichweite",
+      "hint": "Schätzung basierend auf den Produkten in deiner Speisekammer",
+      "days_one": "≈ 1 Tag Lebensmittel",
+      "days_other": "≈ {{ count }} Tage Lebensmittel",
+      "months_one": "≈ 1 Monat Lebensmittel",
+      "months_other": "≈ {{ count }} Monate Lebensmittel",
+      "years_one": "≈ 1 Jahr Lebensmittel",
+      "years_other": "≈ {{ count }} Jahre Lebensmittel"
     },
     "summary": {
       "title": "Vorratsübersicht",
@@ -320,58 +335,26 @@
         "cta": "Los geht's",
         "dismiss": "Nicht jetzt"
       },
-      "weeklyMealPlanning": {
-        "title": "Die Woche organisieren?",
-        "description": "Gute Zeit, um deine Mahlzeiten mit dem zu planen, was du zu Hause hast.",
-        "cta": "Los geht's",
-        "prompt": "Plane meine Mahlzeiten für diese Woche nur mit den Vorräten, die ich bereits habe."
-      },
       "cookBeforeExpiry": {
         "title": "Du hast Produkte, die bald ablaufen",
         "description": "Ich schlage dir Rezepte vor, um sie zu nutzen, bevor sie verderben.",
         "cta": "Gib mir Ideen",
         "prompt": "Schlage Rezepte vor, die die bald ablaufenden Produkte in meiner Speisekammer priorisieren."
       },
-      "smartCookingIdeas": {
-        "title": "Was koche ich heute?",
-        "description": "Ich gebe dir Ideen mit dem, was du gerade in deiner Speisekammer hast.",
-        "cta": "Inspiriere mich",
-        "prompt": "Gib mir Kochideen mit den Zutaten, die ich verfügbar habe."
-      },
-      "planAndSaveTime": {
-        "title": "Woche mit KI planen",
-        "description": "Mit PRO organisierst du dein Wochenmenü und sparst jeden Tag Zeit.",
-        "cta": "PRO testen"
-      },
-      "historyUnlimited": {
-        "title": "Was verschwendest du am meisten?",
-        "description": "Mit PRO findest du heraus, was du wegwirfst, und kaufst nur, was du brauchst.",
-        "cta": "Mehr erfahren"
-      },
-      "smartInsights": {
-        "title": "Warnungen vor Ablauf",
-        "description": "Mit PRO sage ich dir, was du kochen sollst, um nichts zu verschwenden.",
-        "cta": "Mehr erfahren"
-      },
-      "pantryHealthy": {
-        "title": "Deine Vorratskammer ist in top Form",
-        "description": "Alles unter Kontrolle. Ein guter Zeitpunkt, deine Einkaufsliste zu planen.",
-        "cta": "Liste ansehen"
-      },
       "addExpiryDates": {
         "title": "Ablaufdaten hinzufügen",
         "description": "Behalte den Überblick, was zuerst verwendet werden soll, und vermeide unangenehme Überraschungen.",
         "cta": "Zur Vorratskammer"
       },
-      "lowStockReminder": {
-        "title": "Einige Produkte werden knapp",
-        "description": "Füge sie deiner Einkaufsliste hinzu, bevor du ohne sie dastehst.",
-        "cta": "Zur Liste"
-      },
       "organizeWithCategories": {
         "title": "Vorratskammer nach Kategorien ordnen",
         "description": "Gruppiere deine Produkte, um sie schneller zu finden und alles im Griff zu haben.",
         "cta": "Jetzt ordnen"
+      },
+      "planAndSaveTime": {
+        "title": "Woche mit KI planen",
+        "description": "Mit PRO organisierst du dein Wochenmenü und sparst jeden Tag Zeit.",
+        "cta": "PRO testen"
       }
     }
   },

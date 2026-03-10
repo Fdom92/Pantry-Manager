@@ -22,14 +22,14 @@ export const routes: Routes = [
           import('@features/history/history.component').then(m => m.HistoryComponent),
       },
       {
-        path: 'shopping',
+        path: 'list',
         loadComponent: () =>
-          import('@features/shopping/shopping.component').then(m => m.ShoppingComponent),
+          import('@features/list/list.component').then(m => m.ListComponent),
       },
       {
-        path: 'agent',
+        path: 'planner',
         loadComponent: () =>
-          import('@features/agent/agent.component').then(m => m.AgentComponent),
+          import('@features/planner/planner.component').then(m => m.PlannerComponent),
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

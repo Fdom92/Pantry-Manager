@@ -6,6 +6,6 @@ export * from './pantry';
 export * from './planner';
 export * from './settings';
 export * from './shared';
-export * from './shopping';
+export * from './list';
 export * from './tabs';
 export * from './upgrade';

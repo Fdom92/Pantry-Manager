@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { SHOPPING_LIST_NAME } from '@core/constants';
-import { determineSuggestionNeed, incrementSummary } from '@core/domain/shopping';
-import { groupSuggestionsBySupermarket } from '@core/utils/shopping-grouping.util';
+import { determineSuggestionNeed, incrementSummary } from '@core/domain/list';
+import { groupSuggestionsBySupermarket } from '@core/utils/list-grouping.util';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
 import {
@@ -9,7 +9,7 @@ import {
   type ShoppingSuggestionGroupWithItem,
   type ShoppingSuggestionWithItem,
   type ShoppingSummary,
-} from '@core/models/shopping';
+} from '@core/models/list';
 import { LanguageService } from '../shared/language.service';
 import { createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
 import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
@@ -20,7 +20,7 @@ import jsPDF from 'jspdf';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 
 @Injectable()
-export class ShoppingStateService {
+export class ListStateService {
   private readonly destroyRef = inject(DestroyRef);
   private readonly shareTask = createLatestOnlyRunner(this.destroyRef);
   private readonly pantryStore = inject(PantryStoreService);
@@ -86,7 +86,7 @@ export class ShoppingStateService {
         if (!isActive()) {
           return;
         }
-        console.error('[ShoppingStateService] shareShoppingList error', err);
+        console.error('[ListStateService] shareShoppingList error', err);
       });
     });
   }

@@ -13,10 +13,10 @@ import { LanguageService } from '../../shared/language.service';
 import { PantryStoreService } from '../pantry-store.service';
 
 /**
- * Manages fast-add modal state, entries, and submission.
+ * Manages add modal state, entries, and submission.
  */
 @Injectable()
-export class PantryFastAddModalStateService {
+export class PantryAddModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
@@ -55,7 +55,7 @@ export class PantryFastAddModalStateService {
   });
 
   /**
-   * Open fast-add modal and reset state.
+   * Open add modal and reset state.
    */
   openFastAddModal(): void {
     this.fastAddEntries.set([]);
@@ -65,7 +65,7 @@ export class PantryFastAddModalStateService {
   }
 
   /**
-   * Close fast-add modal and cleanup state.
+   * Close add modal and cleanup state.
    */
   closeFastAddModal(): void {
     if (!this.fastAddModalOpen()) {
@@ -85,7 +85,7 @@ export class PantryFastAddModalStateService {
   }
 
   /**
-   * Submit all fast-add entries (create new items or add lots).
+   * Submit all add entries (create new items or add lots).
    */
   async submitFastAdd(): Promise<void> {
     if (this.isFastAdding()) {
@@ -123,7 +123,7 @@ export class PantryFastAddModalStateService {
       }
       this.dismissFastAddModal();
     }).catch(async err => {
-      console.error('[PantryFastAddModalStateService] submitFastAdd error', err);
+      console.error('[PantryAddModalStateService] submitFastAdd error', err);
     });
   }
 
@@ -135,7 +135,7 @@ export class PantryFastAddModalStateService {
   }
 
   /**
-   * Add existing item to fast-add entries from autocomplete selection.
+   * Add existing item to add entries from autocomplete selection.
    */
   addFastAddEntry(option: AutocompleteItem<PantryItem>): void {
     const item = option?.raw;
@@ -154,7 +154,7 @@ export class PantryFastAddModalStateService {
       return [
         ...current,
         {
-          id: `fast-add:${item._id}`,
+          id: `add:${item._id}`,
           name: option.title,
           quantity: 1,
           item,
@@ -201,7 +201,7 @@ export class PantryFastAddModalStateService {
       return [
         ...current,
         {
-          id: `fast-add:new:${normalized}`,
+          id: `add:new:${normalized}`,
           name: formattedName,
           quantity: 1,
           isNew: true,

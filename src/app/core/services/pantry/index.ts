@@ -5,5 +5,5 @@ export * from './pantry-view-model.service';
 export * from './pantry-batch-operations.service';
 export * from './pantry-list-ui-state.service';
 export * from './modals/pantry-edit-item-modal-state.service';
-export * from './modals/pantry-fast-add-modal-state.service';
+export * from './modals/pantry-add-modal-state.service';
 export * from './modals/pantry-batches-modal-state.service';

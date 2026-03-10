@@ -30,7 +30,7 @@ import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
 import { PantryBatchOperationsService } from '@core/services/pantry/pantry-batch-operations.service';
 import { PantryListUiStateService } from '@core/services/pantry/pantry-list-ui-state.service';
-import { PantryFastAddModalStateService } from '@core/services/pantry/modals/pantry-fast-add-modal-state.service';
+import { PantryAddModalStateService } from '@core/services/pantry/modals/pantry-add-modal-state.service';
 import { PantryBatchesModalStateService } from '@core/services/pantry/modals/pantry-batches-modal-state.service';
 import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pantry-edit-item-modal-state.service';
 import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pantry-quantity-sheet-state.service';
@@ -73,7 +73,7 @@ import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pa
     PantryStateService,
     PantryBatchOperationsService,
     PantryListUiStateService,
-    PantryFastAddModalStateService,
+    PantryAddModalStateService,
     PantryBatchesModalStateService,
     PantryEditItemModalStateService,
     PantryQuantitySheetStateService,
