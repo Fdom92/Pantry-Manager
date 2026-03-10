@@ -315,8 +315,8 @@ export class DashboardStateService {
 
     return actions
       .sort((a, b) => a.priority - b.priority)
-      .filter(action => !this.dismissedActionIds().has(action.id))
-      .slice(0, 2);
+      .slice(0, 2)
+      .filter(action => !this.dismissedActionIds().has(action.id));
   });
 
   readonly showAdditionalContext = computed(() => {
