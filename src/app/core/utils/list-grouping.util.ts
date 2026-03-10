@@ -1,5 +1,5 @@
 import { UNASSIGNED_SUPERMARKET_KEY } from '@core/constants';
-import type { ShoppingSuggestionGroupWithItem, ShoppingSuggestionWithItem } from '@core/models/shopping';
+import type { ShoppingSuggestionGroupWithItem, ShoppingSuggestionWithItem } from '@core/models/list';
 import { normalizeLowercase } from './normalization.util';
 
 export function groupSuggestionsBySupermarket(params: {

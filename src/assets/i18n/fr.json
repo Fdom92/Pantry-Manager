@@ -148,6 +148,9 @@
     "sections": {
       "actions": {
         "title": "Que faire maintenant"
+      },
+      "insights": {
+        "title": "Améliorer votre garde-manger"
       }
     },
     "actions": {
@@ -159,29 +162,41 @@
       },
       "nearExpiry": {
         "title": "Produits bientôt périmés",
-        "titlePro": "Planifier avant qu'ils n'expirent",
         "description": "{{ count }} produits expirent dans {{ days }} jours",
-        "cta": "Voir les produits",
-        "ctaPro": "Générer des recettes"
+        "cta": "Voir les produits"
+      },
+      "lowStock": {
+        "title": "Stock faible",
+        "description_one": "{{ count }} produit est en dessous du minimum",
+        "description_other": "{{ count }} produits sont en dessous du minimum",
+        "cta": "Aller à la liste"
       },
       "stale": {
         "title": "Produits sans activité",
         "description": "{{ count }} produits n'ont pas bougé depuis 30+ jours",
         "cta": "Réviser"
-      },
-      "weeklyPlan": {
-        "title": "Planifiez votre semaine",
-        "description": "Optimisez votre garde-manger avec un plan hebdomadaire",
-        "cta": "Créer un plan"
-      },
-      "upgrade": {
-        "title": "Tirez le meilleur parti de votre garde-manger",
-        "description": "Recettes personnalisées et planification hebdomadaire avec IA",
-        "cta": "Découvrir PRO"
       }
     },
     "context": {
       "recentlyAdded": "{{ count }} produits récemment ajoutés"
+    },
+    "pantryScore": {
+      "title": "Santé du garde-manger",
+      "hint": "Score basé sur les dates d'expiration, le stock et l'organisation de votre garde-manger",
+      "excellent": "Excellent",
+      "good": "Plutôt bien",
+      "fair": "Améliorable",
+      "poor": "Nécessite attention"
+    },
+    "foodCoverage": {
+      "title": "Couverture estimée",
+      "hint": "Estimation basée sur les produits de votre garde-manger",
+      "days_one": "≈ 1 jour de nourriture",
+      "days_other": "≈ {{ count }} jours de nourriture",
+      "months_one": "≈ 1 mois de nourriture",
+      "months_other": "≈ {{ count }} mois de nourriture",
+      "years_one": "≈ 1 an de nourriture",
+      "years_other": "≈ {{ count }} ans de nourriture"
     },
     "summary": {
       "title": "Résumé du garde-manger",
@@ -320,58 +335,26 @@
         "cta": "Allons-y",
         "dismiss": "Pas maintenant"
       },
-      "weeklyMealPlanning": {
-        "title": "Organiser la semaine ?",
-        "description": "C'est le bon moment pour planifier vos repas avec ce que vous avez chez vous.",
-        "cta": "C'est parti",
-        "prompt": "Planifie mes repas de cette semaine en utilisant uniquement ce qui se trouve déjà dans mon garde-manger."
-      },
       "cookBeforeExpiry": {
         "title": "Vous avez des produits qui expirent bientôt",
         "description": "Je vous suggère des recettes pour les utiliser avant qu'ils ne se gâtent.",
         "cta": "Donne-moi des idées",
         "prompt": "Suggère des recettes qui privilégient les produits bientôt périmés de mon garde-manger."
       },
-      "smartCookingIdeas": {
-        "title": "Qu'est-ce que je cuisine aujourd'hui ?",
-        "description": "Je vous donne des idées avec ce que vous avez dans votre garde-manger en ce moment.",
-        "cta": "Inspire-moi",
-        "prompt": "Donne-moi des idées de cuisine en utilisant les ingrédients que j'ai disponibles."
-      },
-      "planAndSaveTime": {
-        "title": "Planifier la semaine avec l'IA",
-        "description": "Avec PRO, organisez votre menu hebdomadaire et gagnez du temps chaque jour.",
-        "cta": "Essayer PRO"
-      },
-      "historyUnlimited": {
-        "title": "Qu'est-ce que vous gaspillez le plus ?",
-        "description": "Avec PRO, découvrez ce que vous jetez et achetez seulement ce dont vous avez besoin.",
-        "cta": "En savoir plus"
-      },
-      "smartInsights": {
-        "title": "Alertes avant expiration",
-        "description": "Avec PRO, je vous dis quoi cuisiner pour ne rien gaspiller.",
-        "cta": "En savoir plus"
-      },
-      "pantryHealthy": {
-        "title": "Votre garde-manger est en parfaite forme",
-        "description": "Tout est sous contrôle. C'est le bon moment pour planifier votre prochaine liste de courses.",
-        "cta": "Voir la liste"
-      },
       "addExpiryDates": {
         "title": "Ajoutez des dates de péremption",
         "description": "Sachez toujours quoi utiliser en premier et évitez les mauvaises surprises dans votre garde-manger.",
         "cta": "Aller au garde-manger"
       },
-      "lowStockReminder": {
-        "title": "Certains produits sont presque épuisés",
-        "description": "Ajoutez-les à votre liste de courses avant d'en manquer.",
-        "cta": "Aller à la liste"
-      },
       "organizeWithCategories": {
         "title": "Organisez votre garde-manger par catégories",
         "description": "Regroupez vos produits pour les retrouver plus vite et tout garder sous contrôle.",
         "cta": "Organiser maintenant"
+      },
+      "planAndSaveTime": {
+        "title": "Planifier la semaine avec l'IA",
+        "description": "Avec PRO, organisez votre menu hebdomadaire et gagnez du temps chaque jour.",
+        "cta": "Essayer PRO"
       }
     }
   },

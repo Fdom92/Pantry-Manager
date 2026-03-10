@@ -148,6 +148,9 @@
     "sections": {
       "actions": {
         "title": "O que fazer agora"
+      },
+      "insights": {
+        "title": "Melhorar a tua despensa"
       }
     },
     "actions": {
@@ -159,29 +162,41 @@
       },
       "nearExpiry": {
         "title": "Produtos a expirar em breve",
-        "titlePro": "Planeie antes que expirem",
         "description": "{{ count }} produtos expiram em {{ days }} dias",
-        "cta": "Ver produtos",
-        "ctaPro": "Gerar receitas"
+        "cta": "Ver produtos"
+      },
+      "lowStock": {
+        "title": "Stock a esgotar",
+        "description_one": "{{ count }} produto está abaixo do mínimo",
+        "description_other": "{{ count }} produtos estão abaixo do mínimo",
+        "cta": "Ir à lista"
       },
       "stale": {
         "title": "Produtos sem atividade",
         "description": "{{ count }} produtos não se mexeram há 30+ dias",
         "cta": "Rever"
-      },
-      "weeklyPlan": {
-        "title": "Planeie a sua semana",
-        "description": "Otimize a sua despensa com um plano semanal",
-        "cta": "Criar plano"
-      },
-      "upgrade": {
-        "title": "Aproveite ao máximo a sua despensa",
-        "description": "Receitas personalizadas e planeamento semanal com IA",
-        "cta": "Descobrir PRO"
       }
     },
     "context": {
       "recentlyAdded": "{{ count }} produtos adicionados recentemente"
+    },
+    "pantryScore": {
+      "title": "Saúde da despensa",
+      "hint": "Pontuação baseada em validades, stock e organização da sua despensa",
+      "excellent": "Excelente",
+      "good": "Bem",
+      "fair": "Melhorável",
+      "poor": "Precisa de atenção"
+    },
+    "foodCoverage": {
+      "title": "Cobertura estimada",
+      "hint": "Estimativa baseada nos produtos da sua despensa",
+      "days_one": "≈ 1 dia de comida",
+      "days_other": "≈ {{ count }} dias de comida",
+      "months_one": "≈ 1 mês de comida",
+      "months_other": "≈ {{ count }} meses de comida",
+      "years_one": "≈ 1 ano de comida",
+      "years_other": "≈ {{ count }} anos de comida"
     },
     "summary": {
       "title": "Visão geral da despensa",
@@ -320,58 +335,26 @@
         "cta": "Vamos lá",
         "dismiss": "Agora não"
       },
-      "weeklyMealPlanning": {
-        "title": "Organizar a semana?",
-        "description": "É uma boa altura para planear as suas refeições com o que tem em casa.",
-        "cta": "Vamos lá",
-        "prompt": "Planeje minhas refeições desta semana usando apenas o que já tenho na despensa."
-      },
       "cookBeforeExpiry": {
         "title": "Tem produtos a ponto de vencer",
         "description": "Vou sugerir receitas para aproveitá-los antes de se estragarem.",
         "cta": "Dá-me ideias",
         "prompt": "Sugira receitas priorizando os produtos que vencem em breve na minha despensa."
       },
-      "smartCookingIdeas": {
-        "title": "O que cozinho hoje?",
-        "description": "Dou-lhe ideias com o que tem na despensa neste momento.",
-        "cta": "Inspira-me",
-        "prompt": "Dê-me ideias de culinária usando os ingredientes que tenho disponíveis."
-      },
-      "planAndSaveTime": {
-        "title": "Planear a semana com IA",
-        "description": "Com PRO, organize o seu menu semanal e poupe tempo todos os dias.",
-        "cta": "Experimentar PRO"
-      },
-      "historyUnlimited": {
-        "title": "O que desperdiça mais?",
-        "description": "Com PRO, descubra o que deita fora e compre apenas o que precisa.",
-        "cta": "Saber mais"
-      },
-      "smartInsights": {
-        "title": "Avisos antes de vencerem",
-        "description": "Com PRO, digo-lhe o que cozinhar para não desperdiçar nada.",
-        "cta": "Saber mais"
-      },
-      "pantryHealthy": {
-        "title": "A sua despensa está em ótima forma",
-        "description": "Tudo sob controlo. É um bom momento para planear a sua próxima lista de compras.",
-        "cta": "Ver lista"
-      },
       "addExpiryDates": {
         "title": "Adicione datas de validade",
         "description": "Saiba sempre o que usar primeiro e evite surpresas desagradáveis na despensa.",
         "cta": "Ir à despensa"
       },
-      "lowStockReminder": {
-        "title": "Alguns produtos estão a acabar",
-        "description": "Adicione-os à sua lista de compras antes de ficar sem eles.",
-        "cta": "Ir à lista"
-      },
       "organizeWithCategories": {
         "title": "Organize a despensa por categorias",
         "description": "Agrupe os seus produtos para os encontrar mais rapidamente e ter tudo sob controlo.",
         "cta": "Organizar agora"
+      },
+      "planAndSaveTime": {
+        "title": "Planear a semana com IA",
+        "description": "Com PRO, organize o seu menu semanal e poupe tempo todos os dias.",
+        "cta": "Experimentar PRO"
       }
     }
   },

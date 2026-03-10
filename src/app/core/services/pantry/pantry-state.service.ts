@@ -17,7 +17,7 @@ import type { EntitySelectorEntry } from '@shared/components/entity-selector-mod
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { PantryBatchOperationsService } from './pantry-batch-operations.service';
 import { PantryBatchesModalStateService } from './modals/pantry-batches-modal-state.service';
-import { PantryFastAddModalStateService } from './modals/pantry-fast-add-modal-state.service';
+import { PantryAddModalStateService } from './modals/pantry-add-modal-state.service';
 import { PantryQuantitySheetStateService } from './modals/pantry-quantity-sheet-state.service';
 import { PantryListUiStateService } from './pantry-list-ui-state.service';
 import { PantryStoreService } from './pantry-store.service';
@@ -35,7 +35,7 @@ export class PantryStateService {
   private readonly viewModel = inject(PantryViewModelService);
   private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly listUi = inject(PantryListUiStateService);
-  private readonly fastAddModal = inject(PantryFastAddModalStateService);
+  private readonly fastAddModal = inject(PantryAddModalStateService);
   private readonly batchesModal = inject(PantryBatchesModalStateService);
   private readonly quantitySheet = inject(PantryQuantitySheetStateService);
 
@@ -183,16 +183,11 @@ export class PantryStateService {
     this.editItemModalRequest.set({ mode: 'create' });
   }
 
-  openAdvancedFromFastAdd(): void {
-    this.fastAddModal.closeFastAddModal();
-    this.openAdvancedAddModal();
-  }
-
   clearEditItemModalRequest(): void {
     this.editItemModalRequest.set(null);
   }
 
-  // -------- Fast-add modal (delegates to PantryFastAddModalStateService) --------
+  // -------- Add modal (delegates to PantryAddModalStateService) --------
   openFastAddModal = () => this.fastAddModal.openFastAddModal();
   closeFastAddModal = () => this.fastAddModal.closeFastAddModal();
   dismissFastAddModal = () => this.fastAddModal.dismissFastAddModal();

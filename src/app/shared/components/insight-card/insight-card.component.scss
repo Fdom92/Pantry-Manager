@@ -6,9 +6,18 @@
   background: var(--app-theme-card-bg);
   color: var(--app-theme-text-color);
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
-  border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-primary);
   box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
   transition: var(--app-theme-card-transition);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--app-theme-card-accent-primary);
+  }
 
   &__message {
     margin: 0;

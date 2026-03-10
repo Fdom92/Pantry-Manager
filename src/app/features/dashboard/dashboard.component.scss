@@ -38,7 +38,7 @@ ion-title {
   align-items: center;
   text-align: center;
   gap: var(--app-theme-spacing-md);
-  padding: var(--app-theme-spacing-xl) var(--app-theme-card-margin-inline);
+  padding-inline: var(--app-theme-card-margin-inline);
 
   &--skeleton {
     opacity: 0.6;
@@ -91,6 +91,57 @@ ion-title {
   }
 }
 
+// Pantry Score
+.pantry-score {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-md);
+  margin-inline: var(--app-theme-card-margin-inline);
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg);
+  border-radius: var(--app-theme-spacing-md);
+  background: var(--app-theme-card-bg);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+
+  ion-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__title {
+    font-size: var(--app-theme-font-size-caption, 0.75rem);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  &__value {
+    font-size: var(--app-theme-font-size-body);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 0.7rem;
+    color: var(--app-theme-text-muted);
+    line-height: 1.4;
+    opacity: 0.8;
+  }
+
+  &[data-label='excellent'] > ion-icon { color: var(--app-theme-card-accent-success); }
+  &[data-label='good'] > ion-icon { color: var(--app-theme-card-accent-success); }
+  &[data-label='fair'] > ion-icon { color: var(--app-theme-card-accent-warning); }
+  &[data-label='poor'] > ion-icon { color: var(--app-theme-card-accent-critical); }
+}
+
 // LAYER 2: Actions (What to Do Now)
 .actions-stack {
   display: flex;
@@ -110,6 +161,15 @@ ion-title {
   box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
   transition: var(--app-theme-card-transition);
   position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--action-accent, var(--app-theme-card-accent-success));
+  }
 
   &__content {
     flex: 1;
@@ -170,22 +230,11 @@ ion-title {
     }
   }
 
-  // Category-specific styling
-  &[data-category='critical'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-critical);
-  }
-
-  &[data-category='preventive'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-warning);
-  }
-
-  &[data-category='optimization'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--app-theme-card-accent-success);
-  }
-
-  &[data-category='conversion'] {
-    border-left: var(--app-theme-card-accent-width) solid var(--ion-color-secondary);
-  }
+  // Category-specific accent color
+  &[data-category='critical'] { --action-accent: var(--app-theme-card-accent-critical); }
+  &[data-category='preventive'] { --action-accent: var(--app-theme-card-accent-warning); }
+  &[data-category='optimization'] { --action-accent: var(--app-theme-card-accent-success); }
+  &[data-category='conversion'] { --action-accent: var(--ion-color-secondary); }
 }
 
 // LAYER 3: Additional Context (Optional)

@@ -32,13 +32,39 @@
             <ion-icon [name]="facade.getHealthIcon(facade.pantryHealth().state)"></ion-icon>
           </div>
           <div class="pantry-health__content">
-            <h2 class="pantry-health__title">{{ facade.pantryHealth().title }}</h2>
+              <h2 class="pantry-health__title">{{ facade.pantryHealth().title }}</h2>
             <p class="pantry-health__description">{{ facade.pantryHealth().description }}</p>
           </div>
         </div>
+        <!-- Pantry Score -->
+        @if (facade.pantryScore()) {
+          <div class="pantry-score" [attr.data-label]="facade.pantryScore()!.label">
+            <ion-icon name="stats-chart-outline"></ion-icon>
+            <div class="pantry-score__content">
+              <span class="pantry-score__title">{{ 'dashboard.pantryScore.title' | translate }}</span>
+              <span class="pantry-score__value">
+                {{ facade.pantryScore()!.score }} · {{ 'dashboard.pantryScore.' + facade.pantryScore()!.label | translate }}
+              </span>
+              <p class="pantry-score__hint">{{ 'dashboard.pantryScore.hint' | translate }}</p>
+            </div>
+          </div>
+        }
+        <!-- Food Coverage -->
+        @if (facade.foodCoverage() !== null) {
+          <div class="pantry-score">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <div class="pantry-score__content">
+              <span class="pantry-score__title">{{ 'dashboard.foodCoverage.title' | translate }}</span>
+              <span class="pantry-score__value">
+                {{ (facade.foodCoverage()!.value === 1 ? 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_one' : 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_other') | translate:{ count: facade.foodCoverage()!.value } }}
+              </span>
+              <p class="pantry-score__hint">{{ 'dashboard.foodCoverage.hint' | translate }}</p>
+            </div>
+          </div>
+        }
       </section>
 
-      <!-- LAYER 2: What to Do Now (Actions) -->
+<!-- LAYER 2: What to Do Now (Actions) -->
       @if (facade.actions().length > 0) {
         <section class="dashboard-section">
           <header class="dashboard-section-header">
@@ -74,13 +100,18 @@
       <!-- LAYER 3: Insights -->
       @if (facade.visibleInsights().length > 0) {
         <section class="dashboard-section">
-          @for (insight of facade.visibleInsights(); track insight.id) {
-            <app-insight-card
-              [insight]="insight"
-              (dismiss)="facade.dismissInsight(insight)"
-              (ctaSelect)="facade.onInsightAction(insight, $event)">
-            </app-insight-card>
-          }
+          <header class="dashboard-section-header">
+            <h3 class="dashboard-section-title">{{ 'dashboard.sections.insights.title' | translate }}</h3>
+          </header>
+          <div class="actions-stack">
+            @for (insight of facade.visibleInsights(); track insight.id) {
+              <app-insight-card
+                [insight]="insight"
+                (dismiss)="facade.dismissInsight(insight)"
+                (ctaSelect)="facade.onInsightAction(insight, $event)">
+              </app-insight-card>
+            }
+          </div>
         </section>
       }
 
