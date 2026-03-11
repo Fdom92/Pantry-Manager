@@ -1,5 +1,5 @@
 ion-title, ion-back-button {
-  color: var(--ion-text-color, var(--ion-text-color));
+  color: var(--app-theme-text-color);
 }
 
 .create-item-modal-content {
@@ -35,7 +35,7 @@ ion-title, ion-back-button {
 .entity-selector-card__subtitle {
   margin: 4px 0 0;
   font-size: 0.85rem;
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
 }
 
 .entity-selector-card__content {
@@ -111,7 +111,7 @@ ion-title, ion-back-button {
 .location-total {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
   margin-left: 8px;
 }
 
@@ -164,14 +164,14 @@ ion-title, ion-back-button {
 .quantity-label {
   font-size: 0.7rem;
   font-weight: 500;
-  color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  color: var(--app-theme-text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .quantity-hint {
   font-size: 0.65rem;
-  color: color-mix(in srgb, var(--ion-text-color) 50%, transparent);
+  color: var(--app-theme-text-subtle);
   margin-top: -4px;
   text-align: center;
 }
@@ -225,7 +225,7 @@ ion-title, ion-back-button {
 .quantity-number {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   display: flex;

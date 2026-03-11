@@ -28,7 +28,7 @@ ion-title, ion-back-button {
 .batches-card__subtitle {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
 }
 
 .batches-card ion-list {
@@ -64,7 +64,7 @@ ion-title, ion-back-button {
 .batches-card ion-item ion-label p {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
 }
 
 .batches-card ion-item ion-badge {
@@ -116,7 +116,7 @@ ion-title, ion-back-button {
 .batch-date-label {
   font-size: 0.72rem;
   letter-spacing: 0.04em;
-  color: var(--ion-color-medium, #92949c);
+  color: var(--app-theme-text-muted);
 }
 
 .edit-batch-row ion-input {

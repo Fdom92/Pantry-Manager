@@ -23,7 +23,7 @@
 
 .selector-trigger__label {
   font-size: 0.75rem;
-  color: var(--ion-color-medium, #92949c);
+  color: var(--app-theme-text-muted);
   font-weight: 400;
 }
 
@@ -36,17 +36,17 @@
 
 .selector-trigger__text {
   font-size: 1rem;
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
   flex: 1;
 }
 
 .selector-trigger__text--empty {
-  color: var(--ion-color-medium, #92949c);
+  color: var(--app-theme-text-muted);
 }
 
 .selector-trigger__chevron {
   font-size: 1rem;
-  color: var(--ion-color-medium, #92949c);
+  color: var(--app-theme-text-muted);
   flex-shrink: 0;
 }
 
@@ -58,7 +58,7 @@
 }
 
 .selector-sheet__empty-label {
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
 }
 
 .modal-sheet ion-content {
