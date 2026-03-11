@@ -528,6 +528,16 @@
         "current": "Quantity",
         "initial": "Initial quantity",
         "hint": "Increase or decrease the total product quantity"
+      },
+      "foodType": {
+        "label": "Food type",
+        "placeholder": "Unclassified",
+        "protein": "Protein",
+        "carb": "Carbohydrate",
+        "vegetable": "Vegetable",
+        "fruit": "Fruit",
+        "dairy": "Dairy",
+        "other": "Other"
       }
     },
     "detail": {

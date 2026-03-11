@@ -120,6 +120,21 @@
                 </ion-input>
               </ion-item>
             }
+
+            <ion-item lines="none" class="form-row">
+              <ion-select
+                formControlName="foodType"
+                label="{{ 'pantry.form.foodType.label' | translate }}"
+                labelPlacement="stacked"
+                [placeholder]="'pantry.form.foodType.placeholder' | translate"
+                interface="action-sheet">
+                @for (type of state.foodTypes; track type) {
+                  <ion-select-option [value]="type">
+                    {{ 'pantry.form.foodType.' + type | translate }}
+                  </ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
           </div>
 
           @if (!state.editingItem()) {

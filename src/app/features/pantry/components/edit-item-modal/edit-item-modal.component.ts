@@ -13,6 +13,8 @@ import {
   IonInput,
   IonItem,
   IonModal,
+  IonSelect,
+  IonSelectOption,
   IonSpinner,
   IonTitle,
   IonToolbar
@@ -38,6 +40,8 @@ import { EntityAutocompleteComponent } from '@shared/components/entity-autocompl
     IonItem,
     IonInput,
     IonCheckbox,
+    IonSelect,
+    IonSelectOption,
     IonFooter,
     IonSpinner,
     EntityAutocompleteComponent,
