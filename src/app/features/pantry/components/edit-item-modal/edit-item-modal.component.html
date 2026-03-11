@@ -68,39 +68,45 @@
           </div>
           <div class="form-section form-section--details">
             <div class="form-autocomplete form-row">
-              <app-entity-autocomplete
+              <app-entity-selector-field
                 [items]="state.getCategoryAutocompleteOptions()"
                 [label]="'pantry.form.category' | translate"
-                labelPlacement="stacked"
                 [placeholder]="'pantry.form.categoryPlaceholder' | translate"
-                [showAllOnFocus]="true"
                 [showEmptyAction]="true"
                 [showEmptyActionWhenNoExactMatch]="true"
                 [emptyActionLabel]="'pantry.form.categoryAdd.option' | translate"
                 [emptyLabel]="'common.selects.noOptions' | translate"
-                [value]="state.form.get('categoryId')?.value ?? ''"
-                [clearOnSelect]="false"
+                [value]="state.getCategoryDisplayValue()"
                 (optionSelected)="state.onCategoryAutocompleteSelect($event)"
                 (emptyAction)="state.addCategoryOptionFromText($event)">
-              </app-entity-autocomplete>
+              </app-entity-selector-field>
             </div>
 
             <div class="form-autocomplete form-row">
-              <app-entity-autocomplete
+              <app-entity-selector-field
                 [items]="state.getSupermarketAutocompleteOptions()"
                 [label]="'pantry.form.supermarket' | translate"
-                labelPlacement="stacked"
                 [placeholder]="'pantry.form.supermarketPlaceholder' | translate"
-                [showAllOnFocus]="true"
                 [showEmptyAction]="true"
                 [showEmptyActionWhenNoExactMatch]="true"
                 [emptyActionLabel]="'pantry.form.supermarketAdd.option' | translate"
                 [emptyLabel]="'common.selects.noOptions' | translate"
-                [value]="state.form.get('supermarket')?.value ?? ''"
-                [clearOnSelect]="false"
+                [value]="state.getSupermarketDisplayValue()"
                 (optionSelected)="state.onSupermarketAutocompleteSelect($event)"
                 (emptyAction)="state.addSupermarketOptionFromText($event)">
-              </app-entity-autocomplete>
+              </app-entity-selector-field>
+            </div>
+
+            <div class="form-autocomplete form-row">
+              <app-entity-selector-field
+                [items]="state.getFoodTypeOptions()"
+                [label]="'pantry.form.foodType.label' | translate"
+                [placeholder]="'pantry.form.foodType.placeholder' | translate"
+                [showSearch]="false"
+                [emptyLabel]="'common.selects.noOptions' | translate"
+                [value]="state.getFoodTypeDisplayValue()"
+                (optionSelected)="state.onFoodTypeSelect($event)">
+              </app-entity-selector-field>
             </div>
 
             <ion-item lines="none" class="form-row">

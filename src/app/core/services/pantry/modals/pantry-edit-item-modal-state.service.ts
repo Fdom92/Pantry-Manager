@@ -1,6 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_LOCATION_KEY } from '@core/constants';
+import { FoodType } from '@core/models/shared/enums.model';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete, buildUniqueSelectOptions, createDocumentId, formatSupermarketLabel, hasMeaningfulItemChanges } from '@core/utils';
 import {
@@ -51,6 +52,30 @@ export class PantryEditItemModalStateService {
     return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   });
 
+  readonly foodTypes = Object.values(FoodType);
+
+  getFoodTypeOptions(): AutocompleteItem<FoodType>[] {
+    return this.foodTypes.map(type => ({
+      id: type,
+      title: this.translate.instant(`pantry.form.foodType.${type}`),
+      raw: type,
+    }));
+  }
+
+  getFoodTypeDisplayValue(): string {
+    const raw = this.getFormStringValue('foodType');
+    if (!raw) {
+      return '';
+    }
+    return this.translate.instant(`pantry.form.foodType.${raw}`);
+  }
+
+  onFoodTypeSelect(option: AutocompleteItem<FoodType>): void {
+    if (option?.raw) {
+      this.form.get('foodType')?.setValue(option.raw);
+    }
+  }
+
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     categoryId: this.fb.control<string | null>(null),
@@ -60,6 +85,7 @@ export class PantryEditItemModalStateService {
     }),
     isBasic: this.fb.control(false),
     minThreshold: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
+    foodType: this.fb.control<FoodType | null>(null),
     notes: this.fb.control(''),
     initialQuantity: this.fb.control<number | null>(null, { validators: [Validators.min(0)] }),
   });
@@ -144,6 +170,16 @@ export class PantryEditItemModalStateService {
 
   getSupermarketAutocompleteOptions(): AutocompleteItem<string>[] {
     return this.mapSelectOptions(this.getSupermarketSelectOptions());
+  }
+
+  getCategoryDisplayValue(): string {
+    const raw = this.getFormStringValue('categoryId');
+    return this.getCategoryAutocompleteOptions().find(o => o.raw === raw)?.title ?? raw;
+  }
+
+  getSupermarketDisplayValue(): string {
+    const raw = this.getFormStringValue('supermarket');
+    return this.getSupermarketAutocompleteOptions().find(o => o.raw === raw)?.title ?? raw;
   }
 
   onCategoryAutocompleteSelect(option: AutocompleteItem<string>): void {
@@ -286,6 +322,7 @@ export class PantryEditItemModalStateService {
       supermarket: '',
       isBasic: false,
       minThreshold: null,
+      foodType: null,
       notes: '',
       initialQuantity: null,
     });
@@ -308,18 +345,20 @@ export class PantryEditItemModalStateService {
       supermarket: item.supermarket ?? '',
       isBasic: Boolean(item.isBasic),
       minThreshold: item.minThreshold ?? null,
+      foodType: item.foodType ?? null,
       notes: '',
       initialQuantity: null,
     });
   }
 
   private buildItemPayload(existing?: PantryItem): PantryItem {
-    const { name, categoryId, isBasic, supermarket, minThreshold, initialQuantity } = this.form.value as {
+    const { name, categoryId, isBasic, supermarket, minThreshold, foodType, initialQuantity } = this.form.value as {
       name?: string;
       categoryId?: string;
       isBasic?: boolean;
       supermarket?: string;
       minThreshold?: number | string | null;
+      foodType?: FoodType | null;
       initialQuantity?: number | null;
     };
     const identifier = existing?._id ?? createDocumentId('item');
@@ -362,6 +401,7 @@ export class PantryEditItemModalStateService {
       supermarket: normalizedSupermarket,
       isBasic: isBasic ? true : undefined,
       minThreshold: normalizedMinThreshold,
+      foodType: foodType ?? undefined,
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     };

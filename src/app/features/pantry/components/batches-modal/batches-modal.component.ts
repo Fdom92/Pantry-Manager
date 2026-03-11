@@ -12,8 +12,6 @@ import {
   IonLabel,
   IonList,
   IonModal,
-  IonSelect,
-  IonSelectOption,
   IonSpinner,
   IonTitle,
   IonToolbar,
@@ -21,6 +19,7 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
 import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
+import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
 
 @Component({
   selector: 'app-pantry-batches-modal',
@@ -41,10 +40,9 @@ import { DateChipComponent } from '@shared/components/date-chip/date-chip.compon
     IonLabel,
     IonBadge,
     IonInput,
-    IonSelect,
-    IonSelectOption,
     IonSpinner,
     DateChipComponent,
+    EntitySelectorFieldComponent,
   ],
   templateUrl: './batches-modal.component.html',
   styleUrls: ['./batches-modal.component.scss'],

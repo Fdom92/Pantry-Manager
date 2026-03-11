@@ -528,6 +528,16 @@
         "current": "Quantidade",
         "initial": "Quantidade inicial",
         "hint": "Aumentar ou diminuir a quantidade total do produto"
+      },
+      "foodType": {
+        "label": "Tipo de alimento",
+        "placeholder": "Sem classificação",
+        "protein": "Proteína",
+        "carb": "Carboidrato",
+        "vegetable": "Vegetal",
+        "fruit": "Fruta",
+        "dairy": "Laticínio",
+        "other": "Outro"
       }
     },
     "detail": {

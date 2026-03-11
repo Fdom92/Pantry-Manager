@@ -11,7 +11,11 @@ import { PantryViewModelService } from '../pantry-view-model.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { toDateInputValue, toIsoDate } from '@core/utils/date.util';
 import { generateBatchId } from '@core/utils';
+import { formatFriendlyName, normalizeTrim } from '@core/utils/normalization.util';
 import { UNASSIGNED_LOCATION_KEY } from '@core/constants';
+import { TranslateService } from '@ngx-translate/core';
+import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { CatalogOptionsService } from '../../settings';
 
 /**
  * Manages batches modal state and batch view models.
@@ -20,6 +24,8 @@ import { UNASSIGNED_LOCATION_KEY } from '@core/constants';
 export class PantryBatchesModalStateService {
   private readonly viewModel = inject(PantryViewModelService);
   private readonly pantryStore = inject(PantryStoreService);
+  private readonly translate = inject(TranslateService);
+  private readonly catalogOptions = inject(CatalogOptionsService);
 
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
@@ -159,6 +165,56 @@ export class PantryBatchesModalStateService {
       locationId,
     };
     this.editedBatches.set(updated);
+  }
+
+  /**
+   * Build autocomplete options for location selector.
+   */
+  getLocationAutocompleteOptions(): AutocompleteItem<string>[] {
+    const unassigned: AutocompleteItem<string> = {
+      id: UNASSIGNED_LOCATION_KEY,
+      title: this.translate.instant('pantry.form.locationAdd.unassigned'),
+      raw: UNASSIGNED_LOCATION_KEY,
+    };
+    return [unassigned, ...this.locationOptions().map(loc => ({ id: loc, title: loc, raw: loc }))];
+  }
+
+  /**
+   * Get display value for a batch's location (for autocomplete input binding).
+   */
+  getLocationDisplayValue(batch: ItemBatch): string {
+    if (!batch.locationId || batch.locationId === UNASSIGNED_LOCATION_KEY) {
+      return this.translate.instant('pantry.form.locationAdd.unassigned');
+    }
+    return batch.locationId;
+  }
+
+  /**
+   * Handle location selection from entity autocomplete.
+   */
+  onLocationAutocompleteSelect(index: number, option: AutocompleteItem<string>): void {
+    const value = option?.raw;
+    if (!value) {
+      return;
+    }
+    this.updateBatchLocation(index, value);
+  }
+
+  /**
+   * Add a new location from typed text and assign it to the batch.
+   */
+  addLocationOptionFromText(index: number, value: string): void {
+    const nextValue = normalizeTrim(value);
+    if (!nextValue) {
+      return;
+    }
+    const formatted = formatFriendlyName(nextValue, nextValue);
+    void this.addAndAssignLocation(index, formatted);
+  }
+
+  private async addAndAssignLocation(index: number, value: string): Promise<void> {
+    const selected = await this.catalogOptions.addLocationOption(value);
+    this.updateBatchLocation(index, selected);
   }
 
   /**

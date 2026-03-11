@@ -528,6 +528,16 @@
         "current": "Menge",
         "initial": "Anfangsmenge",
         "hint": "Gesamtmenge des Produkts erhöhen oder verringern"
+      },
+      "foodType": {
+        "label": "Lebensmitteltyp",
+        "placeholder": "Nicht klassifiziert",
+        "protein": "Protein",
+        "carb": "Kohlenhydrat",
+        "vegetable": "Gemüse",
+        "fruit": "Obst",
+        "dairy": "Milchprodukt",
+        "other": "Sonstiges"
       }
     },
     "detail": {

@@ -292,6 +292,10 @@ export class PantryStateService {
   updateBatchLocation = (index: number, locationId: string) => this.batchesModal.updateBatchLocation(index, locationId);
   getBatchDateInputValue = (batch: ItemBatch) => this.batchesModal.getBatchDateInputValue(batch);
   saveBatches = async () => await this.batchesModal.saveBatches();
+  getLocationAutocompleteOptions = () => this.batchesModal.getLocationAutocompleteOptions();
+  getLocationDisplayValue = (batch: ItemBatch) => this.batchesModal.getLocationDisplayValue(batch);
+  onLocationAutocompleteSelect = (index: number, option: AutocompleteItem<string>) => this.batchesModal.onLocationAutocompleteSelect(index, option);
+  addLocationOptionFromText = (index: number, value: string) => this.batchesModal.addLocationOptionFromText(index, value);
 
   // -------- Quantity sheet (delegates to PantryQuantitySheetStateService) --------
   openQuantitySheet = (item: PantryItem, event?: Event) => this.quantitySheet.openQuantitySheet(item, event);

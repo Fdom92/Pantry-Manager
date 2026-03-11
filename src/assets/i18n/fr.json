@@ -528,6 +528,16 @@
         "current": "Quantité",
         "initial": "Quantité initiale",
         "hint": "Augmenter ou diminuer la quantité totale du produit"
+      },
+      "foodType": {
+        "label": "Type d'aliment",
+        "placeholder": "Non classifié",
+        "protein": "Protéine",
+        "carb": "Glucide",
+        "vegetable": "Légume",
+        "fruit": "Fruit",
+        "dairy": "Produit laitier",
+        "other": "Autre"
       }
     },
     "detail": {
