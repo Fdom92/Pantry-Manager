@@ -76,6 +76,11 @@ ion-title, ion-back-button {
   padding: 6px 0;
 }
 
+.form-autocomplete app-entity-selector-field .selector-trigger {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .form-section--details .form-row {
   padding: 6px 0;
 }

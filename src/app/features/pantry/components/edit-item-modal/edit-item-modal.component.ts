@@ -13,14 +13,13 @@ import {
   IonInput,
   IonItem,
   IonModal,
-  IonSelect,
-  IonSelectOption,
   IonSpinner,
   IonTitle,
   IonToolbar
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntityAutocompleteComponent } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
 
 @Component({
   selector: 'app-pantry-edit-item-modal',
@@ -40,11 +39,10 @@ import { EntityAutocompleteComponent } from '@shared/components/entity-autocompl
     IonItem,
     IonInput,
     IonCheckbox,
-    IonSelect,
-    IonSelectOption,
     IonFooter,
     IonSpinner,
     EntityAutocompleteComponent,
+    EntitySelectorFieldComponent,
   ],
   templateUrl: './edit-item-modal.component.html',
   styleUrls: ['./edit-item-modal.component.scss'],

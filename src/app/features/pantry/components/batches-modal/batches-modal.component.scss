@@ -118,12 +118,17 @@ ion-title, ion-back-button {
   letter-spacing: 0.04em;
 }
 
-.edit-batch-row ion-input,
-.edit-batch-row ion-select {
+.edit-batch-row ion-input {
   --background: var(--ion-card-background);
   --padding-start: 12px;
   --padding-end: 12px;
   border-radius: 8px;
+}
+
+.edit-batch-row app-entity-selector-field .selector-trigger {
+  background: var(--ion-card-background);
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 .edit-actions {

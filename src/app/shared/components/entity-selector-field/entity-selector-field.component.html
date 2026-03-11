@@ -1,0 +1,55 @@
+<div class="selector-trigger" (click)="openSheet()">
+  @if (label) {
+    <span class="selector-trigger__label">{{ label }}</span>
+  }
+  <div class="selector-trigger__value">
+    <span class="selector-trigger__text" [class.selector-trigger__text--empty]="!value">
+      {{ value || placeholder }}
+    </span>
+    <ion-icon name="chevron-down-outline" class="selector-trigger__chevron"></ion-icon>
+  </div>
+</div>
+
+<ion-modal
+  [isOpen]="isSheetOpen()"
+  [breakpoints]="[0, 0.9]"
+  [initialBreakpoint]="0.9"
+  (didDismiss)="closeSheet()">
+  <ng-template>
+    @if (showSearch) {
+      <ion-header>
+        <ion-toolbar>
+          <ion-searchbar
+            [value]="searchQuery()"
+            [placeholder]="searchPlaceholder || placeholder"
+            [debounce]="0"
+            autocomplete="off"
+            (ionInput)="onSearchInput($event)">
+          </ion-searchbar>
+        </ion-toolbar>
+      </ion-header>
+    }
+    <ion-content>
+      <ion-list lines="full">
+        @if (showEmptyActionItem()) {
+          <ion-item button (click)="triggerEmptyAction()">
+            <ion-label class="selector-sheet__action-label">{{ emptyActionLabel }}</ion-label>
+          </ion-item>
+        }
+        @for (option of filteredItems(); track option.id ?? option.title) {
+          <ion-item button (click)="selectOption(option)">
+            <ion-label>{{ option.title }}</ion-label>
+            @if (option.title === value) {
+              <ion-icon name="checkmark" slot="end" color="primary"></ion-icon>
+            }
+          </ion-item>
+        }
+        @if (!filteredItems().length && !showEmptyActionItem()) {
+          <ion-item>
+            <ion-label class="selector-sheet__empty-label">{{ emptyLabel }}</ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-modal>

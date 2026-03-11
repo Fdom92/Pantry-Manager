@@ -54,6 +54,28 @@ export class PantryEditItemModalStateService {
 
   readonly foodTypes = Object.values(FoodType);
 
+  getFoodTypeOptions(): AutocompleteItem<FoodType>[] {
+    return this.foodTypes.map(type => ({
+      id: type,
+      title: this.translate.instant(`pantry.form.foodType.${type}`),
+      raw: type,
+    }));
+  }
+
+  getFoodTypeDisplayValue(): string {
+    const raw = this.getFormStringValue('foodType');
+    if (!raw) {
+      return '';
+    }
+    return this.translate.instant(`pantry.form.foodType.${raw}`);
+  }
+
+  onFoodTypeSelect(option: AutocompleteItem<FoodType>): void {
+    if (option?.raw) {
+      this.form.get('foodType')?.setValue(option.raw);
+    }
+  }
+
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     categoryId: this.fb.control<string | null>(null),
@@ -148,6 +170,16 @@ export class PantryEditItemModalStateService {
 
   getSupermarketAutocompleteOptions(): AutocompleteItem<string>[] {
     return this.mapSelectOptions(this.getSupermarketSelectOptions());
+  }
+
+  getCategoryDisplayValue(): string {
+    const raw = this.getFormStringValue('categoryId');
+    return this.getCategoryAutocompleteOptions().find(o => o.raw === raw)?.title ?? raw;
+  }
+
+  getSupermarketDisplayValue(): string {
+    const raw = this.getFormStringValue('supermarket');
+    return this.getSupermarketAutocompleteOptions().find(o => o.raw === raw)?.title ?? raw;
   }
 
   onCategoryAutocompleteSelect(option: AutocompleteItem<string>): void {
