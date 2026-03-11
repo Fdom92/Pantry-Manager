@@ -436,21 +436,15 @@
       "search": "Search products"
     },
     "fastAdd": {
-      "cta": "Add quickly",
-      "advancedAction": "Advanced add",
-      "groupLabel": "Add products quickly",
-      "title": "Quick add",
+      "groupLabel": "Add products",
+      "title": "Add products",
       "cardTitle": "Select products",
       "subtitle": "Pick items and set quantities.",
       "placeholder": "Search products",
       "noResults": "No results",
       "addNew": "Add new product: {{ name }}",
       "empty": "No items added yet.",
-      "submit": "Add to pantry",
-      "singleSuccess": "1 product added",
-      "success": "{{ count }} products added",
-      "error": "Couldn't add the products.",
-      "createAdvanced": "Create product with advanced details"
+      "submit": "Add to pantry"
     },
     "addMode": {
       "title": "Select mode",

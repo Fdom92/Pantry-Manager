@@ -436,21 +436,15 @@
       "search": "Pesquisar produtos"
     },
     "fastAdd": {
-      "cta": "Adicionar rápido",
-      "advancedAction": "Adicionar avançado",
-      "groupLabel": "Adicionar produtos rapidamente",
-      "title": "Quick add",
-      "cardTitle": "Select products",
-      "subtitle": "Pick items and set quantities.",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "addNew": "Add new product: {{ name }}",
-      "empty": "No items added yet.",
-      "submit": "Add to pantry",
-      "singleSuccess": "1 produto adicionado",
-      "success": "{{ count }} produtos adicionados",
-      "error": "Não foi possível adicionar os produtos.",
-      "createAdvanced": "Criar produto com detalhes avançados"
+      "groupLabel": "Adicionar produtos",
+      "title": "Adicionar produtos",
+      "cardTitle": "Selecionar produtos",
+      "subtitle": "Escolhe produtos e ajusta as quantidades.",
+      "placeholder": "Pesquisar produtos",
+      "noResults": "Sem resultados",
+      "addNew": "Adicionar produto novo: {{ name }}",
+      "empty": "Ainda não adicionaste produtos.",
+      "submit": "Adicionar à despensa"
     },
     "addMode": {
       "title": "Selecionar modo",
