@@ -61,6 +61,6 @@
   color: var(--app-theme-text-muted);
 }
 
-.modal-sheet ion-content {
-  --background: white;
+ion-content {
+  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
 }
