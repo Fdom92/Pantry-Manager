@@ -127,7 +127,7 @@
                 label="{{ 'pantry.form.foodType.label' | translate }}"
                 labelPlacement="stacked"
                 [placeholder]="'pantry.form.foodType.placeholder' | translate"
-                interface="action-sheet">
+                interface="popover">
                 @for (type of state.foodTypes; track type) {
                   <ion-select-option [value]="type">
                     {{ 'pantry.form.foodType.' + type | translate }}
