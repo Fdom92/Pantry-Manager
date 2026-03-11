@@ -669,43 +669,43 @@
       "saveError": "Impossibile salvare il contesto."
     },
     "advanced": {
-      "title": "Avanzate",
-      "subtitle": "Strumenti per dati e cataloghi.",
-      "openTitle": "Apri avanzate",
-      "openSubtitle": "Gestisci cataloghi e dati del dispositivo."
+      "title": "Dati",
+      "subtitle": "Backup e cataloghi della tua dispensa.",
+      "openTitle": "Backup e cataloghi",
+      "openSubtitle": "Esporta i tuoi dati o gestisci categorie e posizioni."
     },
     "data": {
-      "title": "Gestione dati",
-      "subtitle": "Controlla cosa è salvato su questo dispositivo.",
-      "resetTitle": "Cancella dati",
-      "resetDescription": "Rimuove tutto ciò che è salvato su questo dispositivo.",
-      "resetAction": "Cancella",
-      "exportTitle": "Esporta dati",
-      "exportDescription": "Scarica un file di backup.",
+      "title": "Backup manuale",
+      "subtitle": "Salva o ripristina i tuoi dati come file. Utile quando cambi telefono o vuoi un archivio personale.",
+      "resetTitle": "Elimina tutti i dati",
+      "resetDescription": "Rimuove tutti gli articoli, la cronologia e le impostazioni da questo dispositivo. Non può essere annullato.",
+      "resetAction": "Elimina",
+      "exportTitle": "Salva backup",
+      "exportDescription": "Crea un file con tutti i tuoi dati. Salvalo su Drive, invialo via WhatsApp o come preferisci.",
       "exportAction": "Esporta",
-      "importTitle": "Importa dati",
-      "importDescription": "Ripristina un backup esportato in precedenza.",
+      "importTitle": "Ripristina backup",
+      "importDescription": "Importa un file di backup salvato in precedenza. Sostituirà i dati attuali.",
       "importAction": "Importa"
     },
     "reset": {
-      "confirm": "Questo cancellerà tutti i dati salvati su questo dispositivo.\nVuoi continuare?",
-      "success": "Dati locali rimossi.",
-      "error": "Impossibile cancellare l'app."
+      "confirm": "Verranno eliminati tutti gli articoli, la cronologia e le impostazioni da questo dispositivo.\n\nQuesta azione non può essere annullata. Vuoi continuare?",
+      "success": "Tutti i dati sono stati eliminati.",
+      "error": "Impossibile eliminare i dati."
     },
     "export": {
       "unavailable": "L'esportazione non è disponibile in questo ambiente.",
       "readyToShare": "Il tuo backup è pronto per essere condiviso.",
-      "success": "Dati esportati.",
-      "error": "Impossibile esportare i dati.",
-      "shareTitle": "Pantry Manager - Backup",
-      "shareText": "Esporta o condividi il backup della tua dispensa."
+      "success": "Backup esportato.",
+      "error": "Impossibile esportare il backup.",
+      "shareTitle": "PantryMind — Backup",
+      "shareText": "Salva o condividi il tuo backup di PantryMind."
     },
     "import": {
-      "confirm": "Questo sostituirà i dati correnti con il file selezionato. Continuare?",
-      "success": "Dati importati. Riavvio dell'app…",
-      "error": "Impossibile importare i dati. Controlla il file.",
+      "confirm": "Questo sostituirà tutti i tuoi dati attuali con quelli del file selezionato. Assicurati che sia il backup corretto. Continuare?",
+      "success": "Dati ripristinati. Riavvio dell'app...",
+      "error": "Impossibile ripristinare il backup. Controlla che il file sia corretto.",
       "invalid": "Il file selezionato non è un backup valido.",
-      "empty": "Il file non contiene dati da importare."
+      "empty": "Il file non contiene dati da ripristinare."
     },
     "loadError": "Si è verificato un problema durante il caricamento delle impostazioni.",
     "catalogs": {
@@ -805,7 +805,7 @@
       "notificationPreviewNone": "Nessuna notifica verrebbe programmata. Verifica che gli articoli e le preferenze corrispondano ai criteri."
     },
     "info": {
-      "title": "Info app",
+      "title": "Informazioni",
       "subtitle": "Versione, valutazioni e supporto.",
       "version": "Versione",
       "feedbackTitle": "Invia feedback",
@@ -816,10 +816,10 @@
       "rateAction": "Valuta sul Play Store"
     },
     "notifications": {
+      "subtitle": "Configura quando e su cosa vuoi ricevere avvisi.",
+      "openTitle": "Gestisci notifiche",
+      "openSubtitle": "Avvisi di scadenza, scorte basse e altro.",
       "title": "Notifiche",
-      "subtitle": "Configura avvisi quotidiani per la tua dispensa",
-      "openTitle": "Impostazioni notifiche",
-      "openSubtitle": "Gestisci gli avvisi e di cosa vuoi essere notificato",
       "enabledTitle": "Attiva notifiche",
       "enabledDescription": "Ricevi un riepilogo quotidiano dello stato della tua dispensa",
       "expiredTitle": "Prodotti scaduti",
@@ -848,6 +848,32 @@
     "lowStock": {
       "title": "Alcune scorte stanno finendo",
       "body": "{{ count }} prodotti essenziali sono sotto il minimo"
+    }
+  },
+  "sync": {
+    "title": "Dispensa condivisa",
+    "subtitle": "Sincronizza la dispensa con il tuo partner o la tua famiglia.",
+    "openTitle": "Sincronizza con un altro telefono",
+    "openSubtitle": "Invia o ricevi la dispensa completa da un altro dispositivo.",
+    "send": {
+      "title": "Invia la mia dispensa",
+      "subtitle": "Trasferisce una copia esatta della tua dispensa sull'altro dispositivo.",
+      "actionTitle": "Invia a un altro dispositivo",
+      "actionDescription": "Si aprirà il menu di condivisione. Scegli Nearby Share, WhatsApp o qualsiasi altra app.",
+      "shareTitle": "PantryMind — Sincronizzazione",
+      "shareText": "Aggiorna la dispensa su un altro dispositivo con PantryMind."
+    },
+    "receive": {
+      "title": "Come ricevere?",
+      "subtitle": "Nessuna configurazione speciale è necessaria sull'altro telefono.",
+      "howTitle": "Ricezione automatica",
+      "howDescription": "Quando ricevi il file dall'altro dispositivo, aprilo direttamente. PantryMind lo riconoscerà e ti chiederà se vuoi aggiornare la tua dispensa."
+    },
+    "incoming": {
+      "title": "Aggiornamento dispensa",
+      "message": "Un altro dispositivo vuole sincronizzare la sua dispensa con la tua. Questo sostituirà la tua dispensa attuale. Vuoi applicarlo?",
+      "confirm": "Sì, aggiorna",
+      "dismiss": "No, annulla"
     }
   }
 }

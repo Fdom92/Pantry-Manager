@@ -6,6 +6,7 @@ import { PantryService } from '@core/services/pantry';
 import { MigrationPantryService } from '@core/services/migration/migration-pantry.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
+import { SyncService } from '@core/services/sync/sync.service';
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
@@ -23,6 +24,7 @@ export class AppComponent {
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
   private readonly notificationScheduler = inject(NotificationSchedulerService);
+  private readonly syncService = inject(SyncService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -36,6 +38,32 @@ export class AppComponent {
     await this.pantryService.ensureFirstPageLoaded();
     this.pantryService.startBackgroundLoad();
     await this.notificationScheduler.scheduleAll();
+    await this.handleSyncLaunchUrl();
+    this.listenForSyncIntents();
+  }
+
+  private async handleSyncLaunchUrl(): Promise<void> {
+    try {
+      const result = await CapacitorApp.getLaunchUrl();
+      const url = result?.url;
+      if (url && this.isSyncFileUrl(url)) {
+        await this.syncService.handleIncomingIntent(url);
+      }
+    } catch {
+      // getLaunchUrl not available in web context
+    }
+  }
+
+  private listenForSyncIntents(): void {
+    CapacitorApp.addListener('appUrlOpen', ({ url }) => {
+      if (url && this.isSyncFileUrl(url)) {
+        void this.syncService.handleIncomingIntent(url);
+      }
+    });
+  }
+
+  private isSyncFileUrl(url: string): boolean {
+    return url.startsWith('content://') || url.startsWith('file://');
   }
 
   private async initializeRevenueCat(): Promise<void> {

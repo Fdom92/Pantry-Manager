@@ -70,6 +70,7 @@ import {
   sendOutline,
   settingsOutline,
   shareOutline,
+  shareSocialOutline,
   skullOutline,
   sparklesOutline,
   speedometerOutline,
@@ -178,7 +179,8 @@ addIcons({
   'eye-outline': eyeOutline,
   'warning-outline': warningOutline,
   'close-circle': closeCircle,
-  'stats-chart-outline': statsChartOutline
+  'stats-chart-outline': statsChartOutline,
+  'share-social-outline': shareSocialOutline
 });
 
 bootstrapApplication(AppComponent, {
