@@ -60,3 +60,7 @@
 .selector-sheet__empty-label {
   color: var(--ion-color-medium);
 }
+
+.modal-sheet ion-content {
+  --background: white;
+}

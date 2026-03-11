@@ -95,3 +95,8 @@ ion-input {
   --padding-top: var(--app-theme-input-padding-block);
   --padding-bottom: var(--app-theme-input-padding-block);
 }
+
+
+ion-input .label-text-wrapper {
+  color: var(--ion-color-medium, #92949c);
+}

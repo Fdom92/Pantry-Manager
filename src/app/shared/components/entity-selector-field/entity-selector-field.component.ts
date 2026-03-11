@@ -37,8 +37,10 @@ export class EntitySelectorFieldComponent<TRaw = unknown, TMeta = unknown> imple
 
   readonly isSheetOpen = signal(false);
   readonly searchQuery = signal('');
+  private readonly itemsVersion = signal(0);
 
   readonly filteredItems = computed(() => {
+    this.itemsVersion();
     const q = this.searchQuery().trim().toLowerCase();
     const items = Array.isArray(this.items) ? [...this.items] : [];
     if (!q) {
@@ -62,8 +64,8 @@ export class EntitySelectorFieldComponent<TRaw = unknown, TMeta = unknown> imple
   });
 
   ngOnChanges(changes: SimpleChanges): void {
-    if ('items' in changes && this.isSheetOpen()) {
-      // Recompute filtered items automatically via computed signal
+    if ('items' in changes) {
+      this.itemsVersion.update(v => v + 1);
     }
   }
 
