@@ -80,12 +80,12 @@ export interface FoodCoverageResult {
 // Vegetables: side dish at most meals, highest frequency.
 // Other (condiments, sauces): contributes less directly to meal coverage.
 const FOOD_TYPE_WEIGHTS: Record<FoodType, number> = {
-  [FoodType.PROTEIN]: 1.0,
-  [FoodType.CARB]: 1.2,
-  [FoodType.VEGETABLE]: 1.5,
-  [FoodType.FRUIT]: 1.0,
-  [FoodType.DAIRY]: 1.0,
-  [FoodType.OTHER]: 0.5,
+  [FoodType.PROTEIN]: 1.2,
+  [FoodType.CARB]: 1.1,
+  [FoodType.VEGETABLE]: 0.9,
+  [FoodType.FRUIT]: 0.6,
+  [FoodType.DAIRY]: 0.6,
+  [FoodType.OTHER]: 0.4,
 };
 
 // Minimum ratio of items with foodType assigned to use enhanced calculation.
@@ -113,7 +113,7 @@ export function computeFoodCoverage(activeItems: PantryItem[]): FoodCoverageResu
 
   if (totalPortions === 0) return null;
 
-  const days = Math.max(1, Math.round(totalPortions / 3));
+  const days = Math.max(1, Math.floor(totalPortions / 3));
 
   if (days >= 365) {
     return { value: Math.max(1, Math.round(days / 365)), unit: 'years', enhanced };
