@@ -45,7 +45,7 @@ ion-title, ion-back-button {
 .form-section {
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 10px 16px;
   gap: 0;
   border-radius: 16px;
   background: var(--ion-card-background, var(--ion-card-background));
@@ -70,6 +70,8 @@ ion-title, ion-back-button {
 
 .form-section ion-item {
   --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
 }
 
 .form-autocomplete {

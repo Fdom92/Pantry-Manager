@@ -101,7 +101,6 @@ ion-title, ion-back-button {
 .edit-batch-row-inline ion-input {
   flex: 1;
   --background: var(--ion-card-background);
-  --padding-start: 12px;
   --padding-end: 12px;
   border-radius: 8px;
 }
@@ -111,6 +110,7 @@ ion-title, ion-back-button {
   flex-direction: column;
   gap: 6px;
   padding-top: 10px;
+  align-items: end;
 }
 
 .batch-date-label {
@@ -132,8 +132,6 @@ ion-title, ion-back-button {
 
 .edit-batch-row app-entity-selector-field .selector-trigger {
   background: var(--ion-card-background);
-  padding-left: 12px;
-  padding-right: 12px;
 }
 
 .edit-actions {
