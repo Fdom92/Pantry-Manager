@@ -464,7 +464,7 @@
       "expand": "Expand {{ name }}"
     },
     "batches": {
-      "title": "Product batches",
+      "title": "Batches & dates",
       "count": "{{ count }} batches recorded",
       "open": "Opened",
       "noExpiryDate": "No expiration date",
@@ -487,41 +487,28 @@
       "category": "Category",
       "categoryPlaceholder": "Cereals, dairy...",
       "categoryAdd": {
-        "option": "+ Add category",
-        "title": "Add category",
-        "placeholder": "Category name"
+        "option": "+ Add category"
       },
       "uncategorized": "Uncategorized",
       "supermarket": "Supermarket",
       "supermarketPlaceholder": "Select a supermarket",
       "supermarketAdd": {
-        "option": "+ Add supermarket",
-        "title": "Add supermarket",
-        "placeholder": "Supermarket name"
+        "option": "+ Add supermarket"
       },
       "basic": "Always keep at home",
       "minThreshold": "Minimum quantity",
-      "location": "Location",
-      "locationPlaceholder": "Select a location",
       "locationAdd": {
         "option": "+ Add location",
         "unassigned": "Unassigned"
       },
       "batches": {
-        "title": "Batches",
-        "add": "Add batch",
-        "empty": "No batches yet. Add one to track expiry dates.",
-        "titleIndex": "Batch {{ index }}",
         "quantity": "Quantity",
         "expiry": "Expiration date",
-        "location": "Location",
-        "opened": "Opened"
+        "location": "Location"
       },
       "quantity": {
         "title": "Quantity",
-        "current": "Quantity",
-        "initial": "Initial quantity",
-        "hint": "Increase or decrease the total product quantity"
+        "initial": "Initial quantity"
       },
       "foodType": {
         "label": "Food type",

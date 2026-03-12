@@ -464,7 +464,7 @@
       "expand": "Expandir {{ name }}"
     },
     "batches": {
-      "title": "Lotes de produtos",
+      "title": "Lotes e datas",
       "count": "{{ count }} lotes registados",
       "open": "Aberto",
       "noExpiryDate": "Sem data de validade",
@@ -487,41 +487,28 @@
       "category": "Categoria",
       "categoryPlaceholder": "Cereais, laticínios...",
       "categoryAdd": {
-        "option": "+ Adicionar categoria",
-        "title": "Adicionar categoria",
-        "placeholder": "Nome da categoria"
+        "option": "+ Adicionar categoria"
       },
       "uncategorized": "Sem categoria",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Seleciona um supermercado",
       "supermarketAdd": {
-        "option": "+ Adicionar supermercado",
-        "title": "Adicionar supermercado",
-        "placeholder": "Nome do supermercado"
+        "option": "+ Adicionar supermercado"
       },
       "basic": "Manter sempre em casa",
       "minThreshold": "Quantidade mínima",
-      "location": "Localização",
-      "locationPlaceholder": "Seleciona uma localização",
       "locationAdd": {
         "option": "+ Adicionar localização",
         "unassigned": "Não atribuído"
       },
       "batches": {
-        "title": "Lotes",
-        "add": "Adicionar lote",
-        "empty": "Ainda não existem lotes. Adiciona um para acompanhar validade.",
-        "titleIndex": "Lote {{ index }}",
         "quantity": "Quantidade",
         "expiry": "Data de validade",
-        "location": "Localização",
-        "opened": "Aberto"
+        "location": "Localização"
       },
       "quantity": {
         "title": "Quantidade",
-        "current": "Quantidade",
-        "initial": "Quantidade inicial",
-        "hint": "Aumentar ou diminuir a quantidade total do produto"
+        "initial": "Quantidade inicial"
       },
       "foodType": {
         "label": "Tipo de alimento",

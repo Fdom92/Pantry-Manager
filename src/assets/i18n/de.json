@@ -464,7 +464,7 @@
       "expand": "{{ name }} ausklappen"
     },
     "batches": {
-      "title": "Produktchargen",
+      "title": "Chargen & Daten",
       "count": "{{ count }} registrierte Chargen",
       "open": "Geöffnet",
       "noExpiryDate": "Kein Ablaufdatum",
@@ -487,41 +487,28 @@
       "category": "Kategorie",
       "categoryPlaceholder": "Getreide, Milchprodukte…",
       "categoryAdd": {
-        "option": "+ Kategorie hinzufügen",
-        "title": "Kategorie hinzufügen",
-        "placeholder": "Kategoriename"
+        "option": "+ Kategorie hinzufügen"
       },
       "uncategorized": "Ohne Kategorie",
       "supermarket": "Supermarkt",
       "supermarketPlaceholder": "Supermarkt auswählen",
       "supermarketAdd": {
-        "option": "+ Supermarkt hinzufügen",
-        "title": "Supermarkt hinzufügen",
-        "placeholder": "Supermarktname"
+        "option": "+ Supermarkt hinzufügen"
       },
       "basic": "Immer zuhause vorrätig halten",
       "minThreshold": "Mindestmenge",
-      "location": "Standort",
-      "locationPlaceholder": "Standort auswählen",
       "locationAdd": {
         "option": "+ Standort hinzufügen",
         "unassigned": "Nicht zugeordnet"
       },
       "batches": {
-        "title": "Chargen",
-        "add": "Charge hinzufügen",
-        "empty": "Noch keine Chargen vorhanden. Füge eine hinzu, um Haltbarkeitsdaten zu verfolgen.",
-        "titleIndex": "Charge {{ index }}",
         "quantity": "Menge",
         "expiry": "Haltbarkeitsdatum",
-        "location": "Standort",
-        "opened": "Geöffnet"
+        "location": "Standort"
       },
       "quantity": {
         "title": "Menge",
-        "current": "Menge",
-        "initial": "Anfangsmenge",
-        "hint": "Gesamtmenge des Produkts erhöhen oder verringern"
+        "initial": "Anfangsmenge"
       },
       "foodType": {
         "label": "Lebensmitteltyp",

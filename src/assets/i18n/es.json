@@ -464,7 +464,7 @@
       "expand": "Expandir {{ name }}"
     },
     "batches": {
-      "title": "Lotes del producto",
+      "title": "Lotes y fechas",
       "count": "{{ count }} lotes registrados",
       "open": "Abierto",
       "noExpiryDate": "Sin fecha de caducidad",
@@ -479,7 +479,7 @@
       }
     },
     "form": {
-      "editTitle": "Editar artículo",
+      "editTitle": "Editar producto",
       "newTitle": "Nuevo artículo",
       "details": "Detalles",
       "name": "Nombre",
@@ -487,41 +487,28 @@
       "category": "Categoría",
       "categoryPlaceholder": "Cereales, lácteos...",
       "categoryAdd": {
-        "option": "+ Añadir categoría",
-        "title": "Añadir categoría",
-        "placeholder": "Nombre de la categoría"
+        "option": "+ Añadir categoría"
       },
       "uncategorized": "Sin categoría",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Selecciona un supermercado",
       "supermarketAdd": {
-        "option": "+ Añadir supermercado",
-        "title": "Añadir supermercado",
-        "placeholder": "Nombre del supermercado"
+        "option": "+ Añadir supermercado"
       },
       "basic": "Mantener siempre en casa",
       "minThreshold": "Cantidad mínima",
-      "location": "Ubicación",
-      "locationPlaceholder": "Selecciona una ubicación",
       "locationAdd": {
         "option": "+ Añadir ubicación",
         "unassigned": "Sin asignar"
       },
       "batches": {
-        "title": "Lotes",
-        "add": "Añadir lote",
-        "empty": "Todavía no hay lotes. Añade uno para controlar las fechas de caducidad.",
-        "titleIndex": "Lote {{ index }}",
         "quantity": "Cantidad",
         "expiry": "Fecha de caducidad",
-        "location": "Ubicación",
-        "opened": "Abierto"
+        "location": "Ubicación"
       },
       "quantity": {
         "title": "Cantidad",
-        "current": "Cantidad",
-        "initial": "Cantidad inicial",
-        "hint": "Incrementa o reduce la cantidad total del producto"
+        "initial": "Cantidad inicial"
       },
       "foodType": {
         "label": "Tipo de alimento",

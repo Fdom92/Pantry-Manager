@@ -464,7 +464,7 @@
       "expand": "Espandi {{ name }}"
     },
     "batches": {
-      "title": "Lotti prodotto",
+      "title": "Lotti e date",
       "count": "{{ count }} lotti registrati",
       "open": "Aperto",
       "noExpiryDate": "Nessuna data di scadenza",
@@ -487,41 +487,28 @@
       "category": "Categoria",
       "categoryPlaceholder": "Cereali, latticini...",
       "categoryAdd": {
-        "option": "+ Aggiungi categoria",
-        "title": "Aggiungi categoria",
-        "placeholder": "Nome della categoria"
+        "option": "+ Aggiungi categoria"
       },
       "uncategorized": "Senza categoria",
       "supermarket": "Supermercato",
       "supermarketPlaceholder": "Seleziona un supermercato",
       "supermarketAdd": {
-        "option": "+ Aggiungi supermercato",
-        "title": "Aggiungi supermercato",
-        "placeholder": "Nome del supermercato"
+        "option": "+ Aggiungi supermercato"
       },
       "basic": "Tenere sempre in casa",
       "minThreshold": "Quantità minima",
-      "location": "Posizione",
-      "locationPlaceholder": "Seleziona una posizione",
       "locationAdd": {
         "option": "+ Aggiungi posizione",
         "unassigned": "Non assegnato"
       },
       "batches": {
-        "title": "Lotti",
-        "add": "Aggiungi lotto",
-        "empty": "Nessun lotto ancora. Aggiungine uno per tracciare le scadenze.",
-        "titleIndex": "Lotto {{ index }}",
         "quantity": "Quantità",
         "expiry": "Data di scadenza",
-        "location": "Posizione",
-        "opened": "Aperto"
+        "location": "Posizione"
       },
       "quantity": {
         "title": "Quantità",
-        "current": "Quantità",
-        "initial": "Quantità iniziale",
-        "hint": "Aumenta o diminuisci la quantità totale del prodotto"
+        "initial": "Quantità iniziale"
       },
       "foodType": {
         "label": "Tipo di alimento",
