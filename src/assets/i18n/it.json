@@ -486,20 +486,23 @@
       "namePlaceholder": "Riso, latte...",
       "category": "Categoria",
       "categoryPlaceholder": "Cereali, latticini...",
+      "categorySearchPlaceholder": "Cerca o aggiungi categoria",
       "categoryAdd": {
-        "option": "+ Aggiungi categoria"
+        "option": "+ Aggiungi"
       },
       "uncategorized": "Senza categoria",
       "supermarket": "Supermercato",
       "supermarketPlaceholder": "Seleziona un supermercato",
+      "supermarketSearchPlaceholder": "Cerca o aggiungi supermercato",
       "supermarketAdd": {
-        "option": "+ Aggiungi supermercato"
+        "option": "+ Aggiungi"
       },
       "basic": "Tenere sempre in casa",
       "minThreshold": "Quantità minima",
       "locationAdd": {
-        "option": "+ Aggiungi posizione",
-        "unassigned": "Non assegnato"
+        "option": "+ Aggiungi",
+        "unassigned": "Non assegnato",
+        "searchPlaceholder": "Cerca o aggiungi posizione"
       },
       "batches": {
         "quantity": "Quantità",

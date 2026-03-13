@@ -486,20 +486,23 @@
       "namePlaceholder": "Arroz, leite...",
       "category": "Categoria",
       "categoryPlaceholder": "Cereais, laticínios...",
+      "categorySearchPlaceholder": "Pesquisar ou adicionar categoria",
       "categoryAdd": {
-        "option": "+ Adicionar categoria"
+        "option": "+ Adicionar"
       },
       "uncategorized": "Sem categoria",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Seleciona um supermercado",
+      "supermarketSearchPlaceholder": "Pesquisar ou adicionar supermercado",
       "supermarketAdd": {
-        "option": "+ Adicionar supermercado"
+        "option": "+ Adicionar"
       },
       "basic": "Manter sempre em casa",
       "minThreshold": "Quantidade mínima",
       "locationAdd": {
-        "option": "+ Adicionar localização",
-        "unassigned": "Não atribuído"
+        "option": "+ Adicionar",
+        "unassigned": "Não atribuído",
+        "searchPlaceholder": "Pesquisar ou adicionar localização"
       },
       "batches": {
         "quantity": "Quantidade",

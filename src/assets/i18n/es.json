@@ -486,20 +486,23 @@
       "namePlaceholder": "Arroz, leche...",
       "category": "Categoría",
       "categoryPlaceholder": "Cereales, lácteos...",
+      "categorySearchPlaceholder": "Buscar o añadir categoría",
       "categoryAdd": {
-        "option": "+ Añadir categoría"
+        "option": "+ Añadir"
       },
       "uncategorized": "Sin categoría",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Selecciona un supermercado",
+      "supermarketSearchPlaceholder": "Buscar o añadir supermercado",
       "supermarketAdd": {
-        "option": "+ Añadir supermercado"
+        "option": "+ Añadir"
       },
       "basic": "Mantener siempre en casa",
       "minThreshold": "Cantidad mínima",
       "locationAdd": {
-        "option": "+ Añadir ubicación",
-        "unassigned": "Sin asignar"
+        "option": "+ Añadir",
+        "unassigned": "Sin asignar",
+        "searchPlaceholder": "Buscar o añadir ubicación"
       },
       "batches": {
         "quantity": "Cantidad",

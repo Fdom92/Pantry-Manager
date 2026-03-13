@@ -486,20 +486,23 @@
       "namePlaceholder": "Reis, Milch…",
       "category": "Kategorie",
       "categoryPlaceholder": "Getreide, Milchprodukte…",
+      "categorySearchPlaceholder": "Kategorie suchen oder hinzufügen",
       "categoryAdd": {
-        "option": "+ Kategorie hinzufügen"
+        "option": "+ Hinzufügen"
       },
       "uncategorized": "Ohne Kategorie",
       "supermarket": "Supermarkt",
       "supermarketPlaceholder": "Supermarkt auswählen",
+      "supermarketSearchPlaceholder": "Supermarkt suchen oder hinzufügen",
       "supermarketAdd": {
-        "option": "+ Supermarkt hinzufügen"
+        "option": "+ Hinzufügen"
       },
       "basic": "Immer zuhause vorrätig halten",
       "minThreshold": "Mindestmenge",
       "locationAdd": {
-        "option": "+ Standort hinzufügen",
-        "unassigned": "Nicht zugeordnet"
+        "option": "+ Hinzufügen",
+        "unassigned": "Nicht zugeordnet",
+        "searchPlaceholder": "Standort suchen oder hinzufügen"
       },
       "batches": {
         "quantity": "Menge",

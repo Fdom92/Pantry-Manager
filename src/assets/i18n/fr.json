@@ -486,20 +486,23 @@
       "namePlaceholder": "Riz, lait…",
       "category": "Catégorie",
       "categoryPlaceholder": "Céréales, produits laitiers…",
+      "categorySearchPlaceholder": "Rechercher ou ajouter une catégorie",
       "categoryAdd": {
-        "option": "+ Ajouter une catégorie"
+        "option": "+ Ajouter"
       },
       "uncategorized": "Sans catégorie",
       "supermarket": "Supermarché",
       "supermarketPlaceholder": "Sélectionnez un supermarché",
+      "supermarketSearchPlaceholder": "Rechercher ou ajouter un supermarché",
       "supermarketAdd": {
-        "option": "+ Ajouter un supermarché"
+        "option": "+ Ajouter"
       },
       "basic": "Toujours garder à la maison",
       "minThreshold": "Quantité minimale",
       "locationAdd": {
-        "option": "+ Ajouter un emplacement",
-        "unassigned": "Non assigné"
+        "option": "+ Ajouter",
+        "unassigned": "Non assigné",
+        "searchPlaceholder": "Rechercher ou ajouter un emplacement"
       },
       "batches": {
         "quantity": "Quantité",

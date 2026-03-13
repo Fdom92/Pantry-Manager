@@ -49,6 +49,11 @@ export class EntitySelectorFieldComponent<TRaw = unknown, TMeta = unknown> imple
     return items.filter(item => (item.title ?? '').toLowerCase().includes(q));
   });
 
+  readonly dynamicActionLabel = computed(() => {
+    const q = this.searchQuery().trim();
+    return q ? `${this.emptyActionLabel} ${q}` : this.emptyActionLabel;
+  });
+
   readonly showEmptyActionItem = computed(() => {
     if (!this.showEmptyAction || !this.emptyActionLabel) {
       return false;

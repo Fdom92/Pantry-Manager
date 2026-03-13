@@ -33,7 +33,7 @@
       <ion-list lines="full">
         @if (showEmptyActionItem()) {
           <ion-item button (click)="triggerEmptyAction()">
-            <ion-label class="selector-sheet__action-label">{{ emptyActionLabel }}</ion-label>
+            <ion-label class="selector-sheet__action-label">{{ dynamicActionLabel() }}</ion-label>
           </ion-item>
         }
         @for (option of filteredItems(); track option.id ?? option.title) {

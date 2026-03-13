@@ -486,20 +486,23 @@
       "namePlaceholder": "Rice, milk...",
       "category": "Category",
       "categoryPlaceholder": "Cereals, dairy...",
+      "categorySearchPlaceholder": "Search or add category",
       "categoryAdd": {
-        "option": "+ Add category"
+        "option": "+ Add"
       },
       "uncategorized": "Uncategorized",
       "supermarket": "Supermarket",
       "supermarketPlaceholder": "Select a supermarket",
+      "supermarketSearchPlaceholder": "Search or add supermarket",
       "supermarketAdd": {
-        "option": "+ Add supermarket"
+        "option": "+ Add"
       },
       "basic": "Always keep at home",
       "minThreshold": "Minimum quantity",
       "locationAdd": {
-        "option": "+ Add location",
-        "unassigned": "Unassigned"
+        "option": "+ Add",
+        "unassigned": "Unassigned",
+        "searchPlaceholder": "Search or add location"
       },
       "batches": {
         "quantity": "Quantity",
