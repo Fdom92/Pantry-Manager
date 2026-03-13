@@ -5,9 +5,7 @@
   <ng-template>
     <ion-header>
       <ion-toolbar>
-        <ion-title>
-          @if (state.editingItem()) { {{ 'pantry.form.editTitle' | translate }} } @else { {{ 'pantry.form.newTitle' | translate }} }
-        </ion-title>
+        <ion-title>{{ 'pantry.form.editTitle' | translate }}</ion-title>
         <ion-buttons slot="end">
           <ion-button fill="clear" color="medium" (click)="state.dismiss()">
             <ion-icon slot="icon-only" name="close"></ion-icon>
@@ -16,164 +14,107 @@
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding create-item-modal-content">
-      @if (state.selectorEnabled()) {
-        <div class="entity-selector-card">
-          <div class="entity-selector-card__header">
-            <h3 class="entity-selector-card__title">{{ 'pantry.fastAdd.cardTitle' | translate }}</h3>
-            <p class="entity-selector-card__subtitle">{{ 'pantry.fastAdd.subtitle' | translate }}</p>
-          </div>
-          <div class="entity-selector-card__content">
-            <app-entity-autocomplete
-              [items]="state.selectorOptions()"
-              [placeholder]="'pantry.fastAdd.placeholder' | translate"
-              [minChars]="1"
-              mode="select"
-              [showSecondaryInfo]="true"
-              [showAllOnFocus]="true"
-              [autofocus]="true"
-              [emptyLabel]="'pantry.fastAdd.noResults' | translate"
-              [showEmptyAction]="state.showSelectorEmptyAction()"
-              [showEmptyActionWhenNoExactMatch]="true"
-              [emptyActionLabel]="state.selectorEmptyActionLabel()"
-              [value]="state.selectorInputValue()"
-              [readonly]="state.selectorLocked()"
-              [disabled]="state.selectorLocked()"
-              [showClearButton]="state.selectorLocked()"
-              (emptyAction)="state.onSelectorCreateNew($event)"
-              (valueChange)="state.onSelectorQueryChange($event)"
-              (optionSelected)="state.onSelectorSelect($event)"
-              (cleared)="state.onSelectorClear()">
-            </app-entity-autocomplete>
-          </div>
+      <form [formGroup]="state.form">
+        <div class="form-section">
+          <ion-item lines="none">
+            <ion-input
+              formControlName="name"
+              label="{{ 'pantry.form.name' | translate }}"
+              labelPlacement="stacked"
+              [placeholder]="'pantry.form.namePlaceholder' | translate"
+              required>
+            </ion-input>
+          </ion-item>
         </div>
-      }
-      @if (!state.selectingItem()) {
-        <form [formGroup]="state.form">
-          @if (!state.selectorEnabled()) {
-              <div class="form-section">
-                <ion-item lines="none">
-                  <ion-input
-                    formControlName="name"
-                    label="{{ 'pantry.form.name' | translate }}"
-                    labelPlacement="stacked"
-                    [placeholder]="'pantry.form.namePlaceholder' | translate"
-                    required>
-                  </ion-input>
-                </ion-item>
-              </div>
-          }
 
-          <div class="form-section-header">
-            <h5>{{ 'pantry.form.details' | translate }}</h5>
+        <div class="form-section-header">
+          <h5>{{ 'pantry.form.details' | translate }}</h5>
+        </div>
+        <div class="form-section form-section--details">
+          <div class="form-autocomplete form-row">
+            <app-entity-selector-field
+              [items]="state.getCategoryAutocompleteOptions()"
+              [label]="'pantry.form.category' | translate"
+              [placeholder]="'pantry.form.categoryPlaceholder' | translate"
+              [searchPlaceholder]="'pantry.form.categorySearchPlaceholder' | translate"
+              [clearLabel]="'pantry.form.uncategorized' | translate"
+              [showEmptyAction]="true"
+              [showEmptyActionWhenNoExactMatch]="true"
+              [emptyActionLabel]="'pantry.form.categoryAdd.option' | translate"
+              [emptyLabel]="'common.selects.noOptions' | translate"
+              [value]="state.getCategoryDisplayValue()"
+              (optionSelected)="state.onCategoryAutocompleteSelect($event)"
+              (emptyAction)="state.addCategoryOptionFromText($event)"
+              (cleared)="state.clearCategorySelection()">
+            </app-entity-selector-field>
           </div>
-          <div class="form-section form-section--details">
-            <div class="form-autocomplete form-row">
-              <app-entity-selector-field
-                [items]="state.getCategoryAutocompleteOptions()"
-                [label]="'pantry.form.category' | translate"
-                [placeholder]="'pantry.form.categoryPlaceholder' | translate"
-                [searchPlaceholder]="'pantry.form.categorySearchPlaceholder' | translate"
-                [clearLabel]="'pantry.form.uncategorized' | translate"
-                [showEmptyAction]="true"
-                [showEmptyActionWhenNoExactMatch]="true"
-                [emptyActionLabel]="'pantry.form.categoryAdd.option' | translate"
-                [emptyLabel]="'common.selects.noOptions' | translate"
-                [value]="state.getCategoryDisplayValue()"
-                (optionSelected)="state.onCategoryAutocompleteSelect($event)"
-                (emptyAction)="state.addCategoryOptionFromText($event)"
-                (cleared)="state.clearCategorySelection()">
-              </app-entity-selector-field>
-            </div>
 
-            <div class="form-autocomplete form-row">
-              <app-entity-selector-field
-                [items]="state.getSupermarketAutocompleteOptions()"
-                [label]="'pantry.form.supermarket' | translate"
-                [placeholder]="'pantry.form.supermarketPlaceholder' | translate"
-                [searchPlaceholder]="'pantry.form.supermarketSearchPlaceholder' | translate"
-                [clearLabel]="'pantry.form.supermarketAdd.unassigned' | translate"
-                [showEmptyAction]="true"
-                [showEmptyActionWhenNoExactMatch]="true"
-                [emptyActionLabel]="'pantry.form.supermarketAdd.option' | translate"
-                [emptyLabel]="'common.selects.noOptions' | translate"
-                [value]="state.getSupermarketDisplayValue()"
-                (optionSelected)="state.onSupermarketAutocompleteSelect($event)"
-                (emptyAction)="state.addSupermarketOptionFromText($event)"
-                (cleared)="state.clearSupermarketSelection()">
-              </app-entity-selector-field>
-            </div>
+          <div class="form-autocomplete form-row">
+            <app-entity-selector-field
+              [items]="state.getSupermarketAutocompleteOptions()"
+              [label]="'pantry.form.supermarket' | translate"
+              [placeholder]="'pantry.form.supermarketPlaceholder' | translate"
+              [searchPlaceholder]="'pantry.form.supermarketSearchPlaceholder' | translate"
+              [clearLabel]="'pantry.form.supermarketAdd.unassigned' | translate"
+              [showEmptyAction]="true"
+              [showEmptyActionWhenNoExactMatch]="true"
+              [emptyActionLabel]="'pantry.form.supermarketAdd.option' | translate"
+              [emptyLabel]="'common.selects.noOptions' | translate"
+              [value]="state.getSupermarketDisplayValue()"
+              (optionSelected)="state.onSupermarketAutocompleteSelect($event)"
+              (emptyAction)="state.addSupermarketOptionFromText($event)"
+              (cleared)="state.clearSupermarketSelection()">
+            </app-entity-selector-field>
+          </div>
 
-            <div class="form-autocomplete form-row">
-              <app-entity-selector-field
-                [items]="state.getFoodTypeOptions()"
-                [label]="'pantry.form.foodType.label' | translate"
-                [placeholder]="'pantry.form.foodType.placeholder' | translate"
-                [clearLabel]="'pantry.form.foodType.unassigned' | translate"
-                [showSearch]="false"
-                [emptyLabel]="'common.selects.noOptions' | translate"
-                [value]="state.getFoodTypeDisplayValue()"
-                (optionSelected)="state.onFoodTypeSelect($event)"
-                (cleared)="state.clearFoodTypeSelection()">
-              </app-entity-selector-field>
-            </div>
+          <div class="form-autocomplete form-row">
+            <app-entity-selector-field
+              [items]="state.getFoodTypeOptions()"
+              [label]="'pantry.form.foodType.label' | translate"
+              [placeholder]="'pantry.form.foodType.placeholder' | translate"
+              [clearLabel]="'pantry.form.foodType.unassigned' | translate"
+              [showSearch]="false"
+              [emptyLabel]="'common.selects.noOptions' | translate"
+              [value]="state.getFoodTypeDisplayValue()"
+              (optionSelected)="state.onFoodTypeSelect($event)"
+              (cleared)="state.clearFoodTypeSelection()">
+            </app-entity-selector-field>
+          </div>
 
+          <ion-item lines="none" class="form-row">
+            <ion-checkbox formControlName="isBasic" justify="space-between">
+              {{ 'pantry.form.basic' | translate }}
+            </ion-checkbox>
+          </ion-item>
+
+          @if (state.form.get('isBasic')?.value) {
             <ion-item lines="none" class="form-row">
-              <ion-checkbox formControlName="isBasic" justify="space-between">
-                {{ 'pantry.form.basic' | translate }}
-              </ion-checkbox>
+              <ion-input
+                type="number"
+                min="0"
+                formControlName="minThreshold"
+                label="{{ 'pantry.form.minThreshold' | translate }}"
+                labelPlacement="stacked">
+              </ion-input>
             </ion-item>
-
-            @if (state.form.get('isBasic')?.value) {
-              <ion-item lines="none" class="form-row">
-                <ion-input
-                  type="number"
-                  min="0"
-                  formControlName="minThreshold"
-                  label="{{ 'pantry.form.minThreshold' | translate }}"
-                  labelPlacement="stacked">
-                </ion-input>
-              </ion-item>
-            }
-          </div>
-
-          @if (!state.editingItem()) {
-            <!-- Create mode: Initial quantity input -->
-            <div class="form-section-header">
-              <h5>{{ 'pantry.form.quantity.title' | translate }}</h5>
-            </div>
-            <div class="form-section">
-              <ion-item lines="none">
-                <ion-input
-                  type="number"
-                  min="0"
-                  formControlName="initialQuantity"
-                  label="{{ 'pantry.form.quantity.initial' | translate }}"
-                  labelPlacement="stacked"
-                  [placeholder]="'0'">
-                </ion-input>
-              </ion-item>
-            </div>
           }
-
-        </form>
-      }
+        </div>
+      </form>
     </ion-content>
-    @if (!state.selectingItem()) {
-      <ion-footer class="modal-footer">
-        <ion-toolbar>
-          <ion-button
-            expand="block"
-            color="primary"
-            [disabled]="state.isSaving() || state.form.invalid"
-            (click)="state.submitItem()">
-            @if (state.isSaving()) {
-              <ion-spinner name="dots"></ion-spinner>
-            } @else {
-              {{ 'common.actions.save' | translate }}
-            }
-          </ion-button>
-        </ion-toolbar>
-      </ion-footer>
-    }
+    <ion-footer class="modal-footer">
+      <ion-toolbar>
+        <ion-button
+          expand="block"
+          color="primary"
+          [disabled]="state.isSaving() || state.form.invalid"
+          (click)="state.submitItem()">
+          @if (state.isSaving()) {
+            <ion-spinner name="dots"></ion-spinner>
+          } @else {
+            {{ 'common.actions.save' | translate }}
+          }
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
   </ng-template>
 </ion-modal>

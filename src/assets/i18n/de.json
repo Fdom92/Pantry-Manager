@@ -438,11 +438,11 @@
     "fastAdd": {
       "groupLabel": "Produkte hinzufügen",
       "title": "Produkte hinzufügen",
-      "cardTitle": "Produkte auswählen",
-      "subtitle": "Wähle Artikel aus und stelle Mengen ein.",
-      "placeholder": "Produkte suchen",
+      "cardTitle": "Produkt suchen oder erstellen",
+      "subtitle": "Suche ein vorhandenes Produkt zum Hinzufügen oder erstelle ein neues.",
+      "placeholder": "Produkt suchen oder neu erstellen",
       "noResults": "Keine Ergebnisse",
-      "addNew": "Neues Produkt hinzufügen: {{ name }}",
+      "addNew": "Produkt erstellen: {{ name }}",
       "empty": "Noch keine Artikel hinzugefügt.",
       "submit": "Zur Vorratskammer hinzufügen"
     },

@@ -18,7 +18,6 @@ import {
   IonToolbar
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { EntityAutocompleteComponent } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
 
 @Component({
@@ -41,7 +40,6 @@ import { EntitySelectorFieldComponent } from '@shared/components/entity-selector
     IonCheckbox,
     IonFooter,
     IonSpinner,
-    EntityAutocompleteComponent,
     EntitySelectorFieldComponent,
   ],
   templateUrl: './edit-item-modal.component.html',

@@ -438,11 +438,11 @@
     "fastAdd": {
       "groupLabel": "Add products",
       "title": "Add products",
-      "cardTitle": "Select products",
-      "subtitle": "Pick items and set quantities.",
-      "placeholder": "Search products",
+      "cardTitle": "Search or create a product",
+      "subtitle": "Search for an existing product to add or create a new one.",
+      "placeholder": "Search or create new product",
       "noResults": "No results",
-      "addNew": "Add new product: {{ name }}",
+      "addNew": "Create product: {{ name }}",
       "empty": "No items added yet.",
       "submit": "Add to pantry"
     },

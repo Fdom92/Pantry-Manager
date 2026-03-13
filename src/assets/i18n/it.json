@@ -438,11 +438,11 @@
     "fastAdd": {
       "groupLabel": "Aggiungi prodotti",
       "title": "Aggiungi prodotti",
-      "cardTitle": "Seleziona prodotti",
-      "subtitle": "Scegli i prodotti e imposta le quantità.",
-      "placeholder": "Cerca prodotti",
+      "cardTitle": "Cerca o crea un prodotto",
+      "subtitle": "Cerca un prodotto esistente da aggiungere o creane uno nuovo.",
+      "placeholder": "Cerca o crea nuovo prodotto",
       "noResults": "Nessun risultato",
-      "addNew": "Aggiungi nuovo prodotto: {{ name }}",
+      "addNew": "Crea prodotto: {{ name }}",
       "empty": "Nessun articolo aggiunto.",
       "submit": "Aggiungi alla dispensa"
     },
