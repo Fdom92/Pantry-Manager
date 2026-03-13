@@ -46,7 +46,7 @@ export interface BatchStatusMeta {
   label: string;
   icon: string;
   state: BatchStatusState;
-  color: 'danger' | 'warning' | 'success' | 'medium';
+  color: 'danger' | 'warning' | 'success' | 'text';
 }
 
 export interface BatchEntryMeta {

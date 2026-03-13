@@ -25,7 +25,7 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
 import { PantryBatchesModalComponent } from './components/batches-modal/batches-modal.component';
 import { PantryEditItemModalComponent } from './components/edit-item-modal/edit-item-modal.component';
 import { PantryQuantitySheetComponent } from './components/pantry-quantity-sheet/pantry-quantity-sheet.component';
-import { EntitySelectorModalComponent } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
+import { PantryAddModalComponent } from './components/add-modal/add-modal.component';
 import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.component';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
 import { PantryBatchOperationsService } from '@core/services/pantry/pantry-batch-operations.service';
@@ -61,7 +61,7 @@ import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pa
     PantryDetailComponent,
     TranslateModule,
     EmptyStateComponent,
-    EntitySelectorModalComponent,
+    PantryAddModalComponent,
     PantryBatchesModalComponent,
     PantryEditItemModalComponent,
     PantryQuantitySheetComponent,

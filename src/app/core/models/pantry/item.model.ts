@@ -1,5 +1,5 @@
 import type { BaseDoc } from '../shared/base-doc.model';
-import type { ExpirationStatus } from '../shared/enums.model';
+import type { ExpirationStatus, FoodType } from '../shared/enums.model';
 import { ItemBatch } from './item-batch.model';
 
 export interface PantryItem extends BaseDoc {
@@ -14,4 +14,5 @@ export interface PantryItem extends BaseDoc {
   noExpiry?: boolean;
   expirationDate?: string;
   expirationStatus?: ExpirationStatus;
+  foodType?: FoodType;
 }

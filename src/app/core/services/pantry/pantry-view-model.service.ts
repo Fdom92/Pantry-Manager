@@ -339,7 +339,7 @@ export class PantryViewModelService {
           label: this.translate.instant('common.dates.none'),
           icon: 'remove-circle-outline',
           state: 'unknown',
-          color: 'medium',
+          color: 'text',
         };
     }
   }
