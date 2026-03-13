@@ -265,13 +265,13 @@ export class DashboardStateService {
       });
     }
 
-    // CRITICAL: low stock
+    // PREVENTIVE: low stock
     if (lowStock > 0) {
       const descKey = lowStock === 1 ? 'dashboard.actions.lowStock.description_one' : 'dashboard.actions.lowStock.description_other';
       actions.push({
         id: 'low-stock-action',
         priority: ActionPriority.MEDIUM,
-        category: 'critical',
+        category: 'preventive',
         title: this.translate.instant('dashboard.actions.lowStock.title'),
         description: this.translate.instant(descKey, { count: lowStock }),
         cta: {
