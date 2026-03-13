@@ -213,7 +213,7 @@ ion-title {
     letter-spacing: 0.08em;
     font-size: var(--app-theme-font-size-small);
     font-weight: var(--app-theme-font-weight-bold);
-    color: color-mix(in srgb, var(--app-theme-text-color) 65%, transparent);
+    color: var(--app-theme-text-subtle);
   }
 
   .muted {
@@ -295,7 +295,7 @@ ion-title {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-weight: var(--app-theme-font-weight-bold);
-    color: color-mix(in srgb, var(--app-theme-text-color) 65%, transparent);
+    color: var(--app-theme-text-subtle);
   }
 
   .muted {
@@ -331,7 +331,7 @@ ion-title {
     margin: 0;
     font-size: 0.875rem;
     line-height: 1.4;
-    color: var(--ion-color-medium);
+    color: var(--app-theme-text-muted);
   }
 }
 
@@ -369,7 +369,7 @@ ion-title {
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  color: var(--app-theme-text-muted);
   margin: 0 0 8px;
   padding: 0 4px;
 

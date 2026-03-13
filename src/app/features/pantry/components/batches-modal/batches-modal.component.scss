@@ -28,7 +28,7 @@ ion-title, ion-back-button {
 .batches-card__subtitle {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
 }
 
 .batches-card ion-list {
@@ -64,7 +64,7 @@ ion-title, ion-back-button {
 .batches-card ion-item ion-label p {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
 }
 
 .batches-card ion-item ion-badge {
@@ -101,7 +101,6 @@ ion-title, ion-back-button {
 .edit-batch-row-inline ion-input {
   flex: 1;
   --background: var(--ion-card-background);
-  --padding-start: 12px;
   --padding-end: 12px;
   border-radius: 8px;
 }
@@ -111,19 +110,28 @@ ion-title, ion-back-button {
   flex-direction: column;
   gap: 6px;
   padding-top: 10px;
+  align-items: end;
 }
 
 .batch-date-label {
   font-size: 0.72rem;
   letter-spacing: 0.04em;
+  color: var(--app-theme-text-muted);
 }
 
-.edit-batch-row ion-input,
-.edit-batch-row ion-select {
+.edit-batch-row ion-input {
   --background: var(--ion-card-background);
   --padding-start: 12px;
   --padding-end: 12px;
   border-radius: 8px;
+}
+
+.edit-batch-row app-entity-selector-field {
+  width: 100%;
+}
+
+.edit-batch-row app-entity-selector-field .selector-trigger {
+  background: var(--ion-card-background);
 }
 
 .edit-actions {

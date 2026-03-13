@@ -436,21 +436,15 @@
       "search": "Produkte suchen"
     },
     "fastAdd": {
-      "cta": "Schnell hinzufügen",
-      "advancedAction": "Erweitertes Hinzufügen",
-      "groupLabel": "Produkte schnell hinzufügen",
-      "title": "Quick add",
-      "cardTitle": "Select products",
-      "subtitle": "Pick items and set quantities.",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "addNew": "Add new product: {{ name }}",
-      "empty": "No items added yet.",
-      "submit": "Add to pantry",
-      "singleSuccess": "1 Produkt hinzugefügt",
-      "success": "{{ count }} Produkte hinzugefügt",
-      "error": "Produkte konnten nicht hinzugefügt werden.",
-      "createAdvanced": "Produkt mit erweiterten Details erstellen"
+      "groupLabel": "Produkte hinzufügen",
+      "title": "Produkte hinzufügen",
+      "cardTitle": "Produkt suchen oder erstellen",
+      "subtitle": "Suche ein vorhandenes Produkt zum Hinzufügen oder erstelle ein neues.",
+      "placeholder": "Produkt suchen oder neu erstellen",
+      "noResults": "Keine Ergebnisse",
+      "addNew": "Produkt erstellen: {{ name }}",
+      "empty": "Noch keine Artikel hinzugefügt.",
+      "submit": "Zur Vorratskammer hinzufügen"
     },
     "addMode": {
       "title": "Modus auswählen",
@@ -470,7 +464,7 @@
       "expand": "{{ name }} ausklappen"
     },
     "batches": {
-      "title": "Produktchargen",
+      "title": "Chargen & Daten",
       "count": "{{ count }} registrierte Chargen",
       "open": "Geöffnet",
       "noExpiryDate": "Kein Ablaufdatum",
@@ -492,42 +486,44 @@
       "namePlaceholder": "Reis, Milch…",
       "category": "Kategorie",
       "categoryPlaceholder": "Getreide, Milchprodukte…",
+      "categorySearchPlaceholder": "Kategorie suchen oder hinzufügen",
       "categoryAdd": {
-        "option": "+ Kategorie hinzufügen",
-        "title": "Kategorie hinzufügen",
-        "placeholder": "Kategoriename"
+        "option": "+ Hinzufügen"
       },
       "uncategorized": "Ohne Kategorie",
       "supermarket": "Supermarkt",
       "supermarketPlaceholder": "Supermarkt auswählen",
+      "supermarketSearchPlaceholder": "Supermarkt suchen oder hinzufügen",
       "supermarketAdd": {
-        "option": "+ Supermarkt hinzufügen",
-        "title": "Supermarkt hinzufügen",
-        "placeholder": "Supermarktname"
+        "option": "+ Hinzufügen",
+        "unassigned": "Kein Supermarkt"
       },
       "basic": "Immer zuhause vorrätig halten",
       "minThreshold": "Mindestmenge",
-      "location": "Standort",
-      "locationPlaceholder": "Standort auswählen",
       "locationAdd": {
-        "option": "+ Standort hinzufügen",
-        "unassigned": "Nicht zugeordnet"
+        "option": "+ Hinzufügen",
+        "unassigned": "Nicht zugeordnet",
+        "searchPlaceholder": "Standort suchen oder hinzufügen"
       },
       "batches": {
-        "title": "Chargen",
-        "add": "Charge hinzufügen",
-        "empty": "Noch keine Chargen vorhanden. Füge eine hinzu, um Haltbarkeitsdaten zu verfolgen.",
-        "titleIndex": "Charge {{ index }}",
         "quantity": "Menge",
         "expiry": "Haltbarkeitsdatum",
-        "location": "Standort",
-        "opened": "Geöffnet"
+        "location": "Standort"
       },
       "quantity": {
         "title": "Menge",
-        "current": "Menge",
-        "initial": "Anfangsmenge",
-        "hint": "Gesamtmenge des Produkts erhöhen oder verringern"
+        "initial": "Anfangsmenge"
+      },
+      "foodType": {
+        "label": "Lebensmitteltyp",
+        "placeholder": "Nicht klassifiziert",
+        "unassigned": "Nicht klassifiziert",
+        "protein": "Protein",
+        "carb": "Kohlenhydrat",
+        "vegetable": "Gemüse",
+        "fruit": "Obst",
+        "dairy": "Milchprodukt",
+        "other": "Sonstiges"
       }
     },
     "detail": {

@@ -1,19 +1,15 @@
 import { Injectable, Signal, WritableSignal, computed, effect, inject, signal } from '@angular/core';
 import {
-  BatchEntryMeta,
-  BatchStatusMeta,
   FastAddEntry,
   FilterChipViewModel,
   ItemBatch,
   PantryFilterState,
   PantryItem,
-  PantryItemCardViewModel,
   PantryStatusFilterValue,
   PantrySummaryMeta,
 } from '@core/models/pantry';
 import { computeSupermarketSuggestions } from '@core/utils/pantry-selectors.util';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
-import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { PantryBatchOperationsService } from './pantry-batch-operations.service';
 import { PantryBatchesModalStateService } from './modals/pantry-batches-modal-state.service';
@@ -46,7 +42,7 @@ export class PantryStateService {
   readonly activeFilters: Signal<PantryFilterState> = this.pantryStore.activeFilters;
   readonly pipelineResetting: Signal<boolean> = this.pantryStore.pipelineResetting;
   readonly hasCompletedInitialLoad: WritableSignal<boolean> = signal(false);
-  readonly editItemModalRequest: WritableSignal<{ mode: 'create' } | { mode: 'edit'; item: PantryItem } | null> = signal(null);
+  readonly editItemModalRequest: WritableSignal<{ mode: 'edit'; item: PantryItem } | null> = signal(null);
   readonly pantryItemsState: WritableSignal<PantryItem[]> = signal([]);
   readonly summarySnapshot: WritableSignal<PantrySummaryMeta> = signal({
     total: 0,
@@ -178,11 +174,6 @@ export class PantryStateService {
   }
 
   // -------- Modal routing --------
-  openAdvancedAddModal(event?: Event): void {
-    event?.stopPropagation();
-    this.editItemModalRequest.set({ mode: 'create' });
-  }
-
   clearEditItemModalRequest(): void {
     this.editItemModalRequest.set(null);
   }
@@ -292,6 +283,11 @@ export class PantryStateService {
   updateBatchLocation = (index: number, locationId: string) => this.batchesModal.updateBatchLocation(index, locationId);
   getBatchDateInputValue = (batch: ItemBatch) => this.batchesModal.getBatchDateInputValue(batch);
   saveBatches = async () => await this.batchesModal.saveBatches();
+  getLocationAutocompleteOptions = () => this.batchesModal.getLocationAutocompleteOptions();
+  getLocationDisplayValue = (batch: ItemBatch) => this.batchesModal.getLocationDisplayValue(batch);
+  onLocationAutocompleteSelect = (index: number, option: AutocompleteItem<string>) => this.batchesModal.onLocationAutocompleteSelect(index, option);
+  addLocationOptionFromText = (index: number, value: string) => this.batchesModal.addLocationOptionFromText(index, value);
+  clearBatchLocation = (index: number) => this.batchesModal.clearBatchLocation(index);
 
   // -------- Quantity sheet (delegates to PantryQuantitySheetStateService) --------
   openQuantitySheet = (item: PantryItem, event?: Event) => this.quantitySheet.openQuantitySheet(item, event);

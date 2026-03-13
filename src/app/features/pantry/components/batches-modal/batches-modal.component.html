@@ -76,17 +76,21 @@
                     </div>
                   </div>
                   <div class="edit-batch-row">
-                    <ion-select
-                      [value]="batch.locationId"
-                      label="{{ 'pantry.form.batches.location' | translate }}"
-                      labelPlacement="stacked"
-                      interface="popover"
-                      (ionChange)="state.updateBatchLocation($index, $any($event.detail).value)">
-                      <ion-select-option value="unassigned">{{ 'pantry.form.locationAdd.unassigned' | translate }}</ion-select-option>
-                      @for (location of state.presetLocationOptions(); track location) {
-                        <ion-select-option [value]="location">{{ location }}</ion-select-option>
-                      }
-                    </ion-select>
+                    <app-entity-selector-field
+                      [items]="state.getLocationAutocompleteOptions()"
+                      [label]="'pantry.form.batches.location' | translate"
+                      [placeholder]="'pantry.form.locationAdd.unassigned' | translate"
+                      [searchPlaceholder]="'pantry.form.locationAdd.searchPlaceholder' | translate"
+                      [clearLabel]="'pantry.form.locationAdd.unassigned' | translate"
+                      [showEmptyAction]="true"
+                      [showEmptyActionWhenNoExactMatch]="true"
+                      [emptyActionLabel]="'pantry.form.locationAdd.option' | translate"
+                      [emptyLabel]="'common.selects.noOptions' | translate"
+                      [value]="state.getLocationDisplayValue(batch)"
+                      (optionSelected)="state.onLocationAutocompleteSelect($index, $event)"
+                      (emptyAction)="state.addLocationOptionFromText($index, $event)"
+                      (cleared)="state.clearBatchLocation($index)">
+                    </app-entity-selector-field>
                   </div>
                 </div>
               }
