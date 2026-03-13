@@ -32,8 +32,11 @@ export class EntitySelectorFieldComponent<TRaw = unknown, TMeta = unknown> imple
   @Input() emptyActionLabel = '';
   @Input() showSearch = true;
 
+  @Input() clearLabel = '';
+
   @Output() optionSelected = new EventEmitter<AutocompleteItem<TRaw, TMeta>>();
   @Output() emptyAction = new EventEmitter<string>();
+  @Output() cleared = new EventEmitter<void>();
 
   readonly isSheetOpen = signal(false);
   readonly searchQuery = signal('');
@@ -87,6 +90,11 @@ export class EntitySelectorFieldComponent<TRaw = unknown, TMeta = unknown> imple
   selectOption(option: AutocompleteItem<TRaw, TMeta>): void {
     this.closeSheet();
     this.optionSelected.emit(option);
+  }
+
+  triggerClear(): void {
+    this.closeSheet();
+    this.cleared.emit();
   }
 
   triggerEmptyAction(): void {

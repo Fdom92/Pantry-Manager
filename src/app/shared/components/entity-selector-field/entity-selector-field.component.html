@@ -31,6 +31,14 @@
     }
     <ion-content>
       <ion-list lines="full">
+        @if (clearLabel) {
+          <ion-item button (click)="triggerClear()">
+            <ion-label>{{ clearLabel }}</ion-label>
+            @if (!value) {
+              <ion-icon name="checkmark" slot="end" color="primary"></ion-icon>
+            }
+          </ion-item>
+        }
         @if (showEmptyActionItem()) {
           <ion-item button (click)="triggerEmptyAction()">
             <ion-label class="selector-sheet__action-label">{{ dynamicActionLabel() }}</ion-label>

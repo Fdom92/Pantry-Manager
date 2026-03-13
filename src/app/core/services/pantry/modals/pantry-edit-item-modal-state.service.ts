@@ -65,7 +65,7 @@ export class PantryEditItemModalStateService {
   getFoodTypeDisplayValue(): string {
     const raw = this.getFormStringValue('foodType');
     if (!raw) {
-      return '';
+      return this.translate.instant('pantry.form.foodType.unassigned');
     }
     return this.translate.instant(`pantry.form.foodType.${raw}`);
   }
@@ -174,11 +174,13 @@ export class PantryEditItemModalStateService {
 
   getCategoryDisplayValue(): string {
     const raw = this.getFormStringValue('categoryId');
+    if (!raw) return this.translate.instant('pantry.form.uncategorized');
     return this.getCategoryAutocompleteOptions().find(o => o.raw === raw)?.title ?? raw;
   }
 
   getSupermarketDisplayValue(): string {
     const raw = this.getFormStringValue('supermarket');
+    if (!raw) return this.translate.instant('pantry.form.supermarketAdd.unassigned');
     return this.getSupermarketAutocompleteOptions().find(o => o.raw === raw)?.title ?? raw;
   }
 
@@ -188,6 +190,18 @@ export class PantryEditItemModalStateService {
 
   onSupermarketAutocompleteSelect(option: AutocompleteItem<string>): void {
     this.applyAutocompleteValue(option, value => this.form.get('supermarket')?.setValue(value));
+  }
+
+  clearCategorySelection(): void {
+    this.form.get('categoryId')?.setValue(null);
+  }
+
+  clearSupermarketSelection(): void {
+    this.form.get('supermarket')?.setValue('');
+  }
+
+  clearFoodTypeSelection(): void {
+    this.form.get('foodType')?.setValue(null);
   }
 
   addCategoryOptionFromText(value: string): void {

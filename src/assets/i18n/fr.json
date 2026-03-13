@@ -495,7 +495,8 @@
       "supermarketPlaceholder": "Sélectionnez un supermarché",
       "supermarketSearchPlaceholder": "Rechercher ou ajouter un supermarché",
       "supermarketAdd": {
-        "option": "+ Ajouter"
+        "option": "+ Ajouter",
+        "unassigned": "Sans supermarché"
       },
       "basic": "Toujours garder à la maison",
       "minThreshold": "Quantité minimale",
@@ -516,6 +517,7 @@
       "foodType": {
         "label": "Type d'aliment",
         "placeholder": "Non classifié",
+        "unassigned": "Non classifié",
         "protein": "Protéine",
         "carb": "Glucide",
         "vegetable": "Légume",

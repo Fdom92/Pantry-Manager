@@ -296,6 +296,7 @@ export class PantryStateService {
   getLocationDisplayValue = (batch: ItemBatch) => this.batchesModal.getLocationDisplayValue(batch);
   onLocationAutocompleteSelect = (index: number, option: AutocompleteItem<string>) => this.batchesModal.onLocationAutocompleteSelect(index, option);
   addLocationOptionFromText = (index: number, value: string) => this.batchesModal.addLocationOptionFromText(index, value);
+  clearBatchLocation = (index: number) => this.batchesModal.clearBatchLocation(index);
 
   // -------- Quantity sheet (delegates to PantryQuantitySheetStateService) --------
   openQuantitySheet = (item: PantryItem, event?: Event) => this.quantitySheet.openQuantitySheet(item, event);

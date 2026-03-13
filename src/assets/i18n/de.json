@@ -495,7 +495,8 @@
       "supermarketPlaceholder": "Supermarkt auswählen",
       "supermarketSearchPlaceholder": "Supermarkt suchen oder hinzufügen",
       "supermarketAdd": {
-        "option": "+ Hinzufügen"
+        "option": "+ Hinzufügen",
+        "unassigned": "Kein Supermarkt"
       },
       "basic": "Immer zuhause vorrätig halten",
       "minThreshold": "Mindestmenge",
@@ -516,6 +517,7 @@
       "foodType": {
         "label": "Lebensmitteltyp",
         "placeholder": "Nicht klassifiziert",
+        "unassigned": "Nicht klassifiziert",
         "protein": "Protein",
         "carb": "Kohlenhydrat",
         "vegetable": "Gemüse",

@@ -171,12 +171,11 @@ export class PantryBatchesModalStateService {
    * Build autocomplete options for location selector.
    */
   getLocationAutocompleteOptions(): AutocompleteItem<string>[] {
-    const unassigned: AutocompleteItem<string> = {
-      id: UNASSIGNED_LOCATION_KEY,
-      title: this.translate.instant('pantry.form.locationAdd.unassigned'),
-      raw: UNASSIGNED_LOCATION_KEY,
-    };
-    return [unassigned, ...this.locationOptions().map(loc => ({ id: loc, title: loc, raw: loc }))];
+    return this.locationOptions().map(loc => ({ id: loc, title: loc, raw: loc }));
+  }
+
+  clearBatchLocation(index: number): void {
+    this.updateBatchLocation(index, UNASSIGNED_LOCATION_KEY);
   }
 
   /**

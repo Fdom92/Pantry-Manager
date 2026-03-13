@@ -495,7 +495,8 @@
       "supermarketPlaceholder": "Select a supermarket",
       "supermarketSearchPlaceholder": "Search or add supermarket",
       "supermarketAdd": {
-        "option": "+ Add"
+        "option": "+ Add",
+        "unassigned": "No supermarket"
       },
       "basic": "Always keep at home",
       "minThreshold": "Minimum quantity",
@@ -516,6 +517,7 @@
       "foodType": {
         "label": "Food type",
         "placeholder": "Unclassified",
+        "unassigned": "Unclassified",
         "protein": "Protein",
         "carb": "Carbohydrate",
         "vegetable": "Vegetable",

@@ -495,7 +495,8 @@
       "supermarketPlaceholder": "Seleziona un supermercato",
       "supermarketSearchPlaceholder": "Cerca o aggiungi supermercato",
       "supermarketAdd": {
-        "option": "+ Aggiungi"
+        "option": "+ Aggiungi",
+        "unassigned": "Senza supermercato"
       },
       "basic": "Tenere sempre in casa",
       "minThreshold": "Quantità minima",
@@ -516,6 +517,7 @@
       "foodType": {
         "label": "Tipo di alimento",
         "placeholder": "Non classificato",
+        "unassigned": "Non classificato",
         "protein": "Proteina",
         "carb": "Carboidrato",
         "vegetable": "Verdura",

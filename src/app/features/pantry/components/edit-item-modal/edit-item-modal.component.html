@@ -73,13 +73,15 @@
                 [label]="'pantry.form.category' | translate"
                 [placeholder]="'pantry.form.categoryPlaceholder' | translate"
                 [searchPlaceholder]="'pantry.form.categorySearchPlaceholder' | translate"
+                [clearLabel]="'pantry.form.uncategorized' | translate"
                 [showEmptyAction]="true"
                 [showEmptyActionWhenNoExactMatch]="true"
                 [emptyActionLabel]="'pantry.form.categoryAdd.option' | translate"
                 [emptyLabel]="'common.selects.noOptions' | translate"
                 [value]="state.getCategoryDisplayValue()"
                 (optionSelected)="state.onCategoryAutocompleteSelect($event)"
-                (emptyAction)="state.addCategoryOptionFromText($event)">
+                (emptyAction)="state.addCategoryOptionFromText($event)"
+                (cleared)="state.clearCategorySelection()">
               </app-entity-selector-field>
             </div>
 
@@ -89,13 +91,15 @@
                 [label]="'pantry.form.supermarket' | translate"
                 [placeholder]="'pantry.form.supermarketPlaceholder' | translate"
                 [searchPlaceholder]="'pantry.form.supermarketSearchPlaceholder' | translate"
+                [clearLabel]="'pantry.form.supermarketAdd.unassigned' | translate"
                 [showEmptyAction]="true"
                 [showEmptyActionWhenNoExactMatch]="true"
                 [emptyActionLabel]="'pantry.form.supermarketAdd.option' | translate"
                 [emptyLabel]="'common.selects.noOptions' | translate"
                 [value]="state.getSupermarketDisplayValue()"
                 (optionSelected)="state.onSupermarketAutocompleteSelect($event)"
-                (emptyAction)="state.addSupermarketOptionFromText($event)">
+                (emptyAction)="state.addSupermarketOptionFromText($event)"
+                (cleared)="state.clearSupermarketSelection()">
               </app-entity-selector-field>
             </div>
 
@@ -104,10 +108,12 @@
                 [items]="state.getFoodTypeOptions()"
                 [label]="'pantry.form.foodType.label' | translate"
                 [placeholder]="'pantry.form.foodType.placeholder' | translate"
+                [clearLabel]="'pantry.form.foodType.unassigned' | translate"
                 [showSearch]="false"
                 [emptyLabel]="'common.selects.noOptions' | translate"
                 [value]="state.getFoodTypeDisplayValue()"
-                (optionSelected)="state.onFoodTypeSelect($event)">
+                (optionSelected)="state.onFoodTypeSelect($event)"
+                (cleared)="state.clearFoodTypeSelection()">
               </app-entity-selector-field>
             </div>
 
