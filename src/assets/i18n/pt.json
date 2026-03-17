@@ -54,7 +54,8 @@
       "save": "Guardar",
       "edit": "Editar",
       "apply": "Aplicar",
-      "clear": "Limpar"
+      "clear": "Limpar",
+      "next": "Seguinte"
     },
     "loading": "A carregar…",
     "dates": {
@@ -350,6 +351,11 @@
         "title": "Organize a despensa por categorias",
         "description": "Agrupe os seus produtos para os encontrar mais rapidamente e ter tudo sob controlo.",
         "cta": "Organizar agora"
+      },
+      "missingFoodType": {
+        "title": "Classifique os tipos de alimento",
+        "description": "Atribua um tipo de alimento aos seus produtos para obter melhores análises e planeamento.",
+        "cta": "Classificar agora"
       },
       "planAndSaveTime": {
         "title": "Planear a semana com IA",
@@ -873,6 +879,31 @@
       "confirm": "Sim, atualizar",
       "dismiss": "Não, cancelar",
       "errorTitle": "Não foi possível aplicar a sincronização"
+    }
+  },
+  "batchEdit": {
+    "steps": {
+      "items": { "title": "Selecionar produtos" },
+      "action": { "title": "Escolher ação" },
+      "value": { "title": "Selecionar valor" },
+      "confirm": { "title": "Confirmar" }
+    },
+    "actions": {
+      "setFoodType": "Definir tipo de alimento",
+      "setCategory": "Definir categoria"
+    },
+    "items": {
+      "selectedCount_one": "1 produto selecionado",
+      "selectedCount_other": "{{ count }} produtos selecionados"
+    },
+    "confirm": {
+      "applying": "Aplicar a {{ count }} produtos:",
+      "apply_one": "Aplicar a 1 produto",
+      "apply_other": "Aplicar a {{ count }} produtos"
+    },
+    "toast": {
+      "updated_one": "1 produto atualizado",
+      "updated_other": "{{ count }} produtos atualizados"
     }
   }
 }

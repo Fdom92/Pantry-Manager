@@ -1,0 +1,143 @@
+<ion-modal
+  [isOpen]="state.isOpen()"
+  (willDismiss)="state.dismiss()"
+  (didDismiss)="state.close()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          @if (state.step() !== 'items') {
+            <ion-button fill="clear" color="medium" (click)="state.goBack()">
+              <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
+            </ion-button>
+          }
+        </ion-buttons>
+        <ion-title>{{ stepTitleKey() | translate }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" color="medium" (click)="state.dismiss()">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+
+      <!-- Step 1: Item selection -->
+      @if (state.step() === 'items') {
+        <p class="batch-edit-count">
+          {{ selectedCountKey() | translate:{ count: state.selectedCount() } }}
+        </p>
+        <ion-list lines="full">
+          @for (item of state.filteredItems(); track item._id) {
+            <ion-item button (click)="state.toggleItem(item._id)">
+              <ion-checkbox
+                slot="start"
+                [checked]="state.selectedIds().has(item._id)"
+                (click)="$event.stopPropagation()">
+              </ion-checkbox>
+              <ion-label>{{ item.name }}</ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      }
+
+      <!-- Step 2: Action selection -->
+      @if (state.step() === 'action') {
+        <ion-list lines="full">
+          <ion-item button (click)="state.setAction('setFoodType')">
+            <ion-icon slot="start" name="nutrition-outline"></ion-icon>
+            <ion-label>{{ 'batchEdit.actions.setFoodType' | translate }}</ion-label>
+            <ion-icon slot="end" name="chevron-forward-outline" color="medium"></ion-icon>
+          </ion-item>
+          <ion-item button (click)="state.setAction('setCategory')">
+            <ion-icon slot="start" name="folder-outline"></ion-icon>
+            <ion-label>{{ 'batchEdit.actions.setCategory' | translate }}</ion-label>
+            <ion-icon slot="end" name="chevron-forward-outline" color="medium"></ion-icon>
+          </ion-item>
+        </ion-list>
+      }
+
+      <!-- Step 3: Value selection -->
+      @if (state.step() === 'value') {
+        @if (state.selectedAction() === 'setFoodType') {
+          <app-entity-selector-field
+            [items]="state.getFoodTypeOptions()"
+            [label]="'pantry.form.foodType.label' | translate"
+            [placeholder]="'pantry.form.foodType.placeholder' | translate"
+            [clearLabel]="'pantry.form.foodType.unassigned' | translate"
+            [showSearch]="false"
+            [emptyLabel]="'common.selects.noOptions' | translate"
+            [value]="state.getFoodTypeDisplayValue()"
+            (optionSelected)="state.setFoodType($event.raw)"
+            (cleared)="state.clearFoodType()">
+          </app-entity-selector-field>
+        }
+        @if (state.selectedAction() === 'setCategory') {
+          <app-entity-selector-field
+            [items]="state.getCategoryOptions()"
+            [label]="'pantry.form.category' | translate"
+            [placeholder]="'pantry.form.categoryPlaceholder' | translate"
+            [searchPlaceholder]="'pantry.form.categorySearchPlaceholder' | translate"
+            [clearLabel]="'pantry.form.uncategorized' | translate"
+            [emptyLabel]="'common.selects.noOptions' | translate"
+            [value]="state.getCategoryDisplayValue()"
+            (optionSelected)="state.setCategoryId($event.raw)"
+            (cleared)="state.clearCategory()">
+          </app-entity-selector-field>
+        }
+      }
+
+      <!-- Step 4: Confirmation -->
+      @if (state.step() === 'confirm') {
+        <div class="batch-edit-confirm">
+          <p class="batch-edit-confirm__summary">
+            {{ 'batchEdit.confirm.applying' | translate:{ count: state.selectedCount() } }}
+          </p>
+          <div class="batch-edit-confirm__detail">
+            <span class="batch-edit-confirm__action">{{ state.confirmActionKey() | translate }}</span>
+            <ion-icon name="arrow-forward-outline"></ion-icon>
+            <span class="batch-edit-confirm__value">{{ state.confirmValueLabel() }}</span>
+          </div>
+        </div>
+      }
+
+    </ion-content>
+
+    <ion-footer class="modal-footer">
+      <ion-toolbar>
+        @if (state.step() === 'items') {
+          <ion-button
+            expand="block"
+            color="primary"
+            [disabled]="!state.canProceed()"
+            (click)="state.goToNextFromItems()">
+            {{ 'common.actions.next' | translate }}
+          </ion-button>
+        }
+        @if (state.step() === 'value') {
+          <ion-button
+            expand="block"
+            color="primary"
+            [disabled]="!state.canConfirm()"
+            (click)="state.goToConfirm()">
+            {{ 'common.actions.next' | translate }}
+          </ion-button>
+        }
+        @if (state.step() === 'confirm') {
+          <ion-button
+            expand="block"
+            color="primary"
+            [disabled]="state.isSaving()"
+            (click)="state.apply()">
+            @if (state.isSaving()) {
+              <ion-spinner name="dots"></ion-spinner>
+            } @else {
+              {{ applyButtonKey() | translate:{ count: state.selectedCount() } }}
+            }
+          </ion-button>
+        }
+      </ion-toolbar>
+    </ion-footer>
+  </ng-template>
+</ion-modal>

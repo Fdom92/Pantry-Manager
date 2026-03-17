@@ -54,7 +54,8 @@
       "save": "Enregistrer",
       "edit": "Modifier",
       "apply": "Appliquer",
-      "clear": "Effacer"
+      "clear": "Effacer",
+      "next": "Suivant"
     },
     "loading": "Chargement…",
     "dates": {
@@ -350,6 +351,11 @@
         "title": "Organisez votre garde-manger par catégories",
         "description": "Regroupez vos produits pour les retrouver plus vite et tout garder sous contrôle.",
         "cta": "Organiser maintenant"
+      },
+      "missingFoodType": {
+        "title": "Classifiez les types d'aliments",
+        "description": "Attribuez un type d'aliment à vos produits pour obtenir de meilleures analyses et planifications.",
+        "cta": "Classifier maintenant"
       },
       "planAndSaveTime": {
         "title": "Planifier la semaine avec l'IA",
@@ -873,6 +879,31 @@
       "confirm": "Oui, mettre à jour",
       "dismiss": "Non, annuler",
       "errorTitle": "Impossible d'appliquer la synchronisation"
+    }
+  },
+  "batchEdit": {
+    "steps": {
+      "items": { "title": "Sélectionner les produits" },
+      "action": { "title": "Choisir une action" },
+      "value": { "title": "Sélectionner une valeur" },
+      "confirm": { "title": "Confirmer" }
+    },
+    "actions": {
+      "setFoodType": "Définir le type d'aliment",
+      "setCategory": "Définir la catégorie"
+    },
+    "items": {
+      "selectedCount_one": "1 produit sélectionné",
+      "selectedCount_other": "{{ count }} produits sélectionnés"
+    },
+    "confirm": {
+      "applying": "Appliquer à {{ count }} produits :",
+      "apply_one": "Appliquer à 1 produit",
+      "apply_other": "Appliquer à {{ count }} produits"
+    },
+    "toast": {
+      "updated_one": "1 produit mis à jour",
+      "updated_other": "{{ count }} produits mis à jour"
     }
   }
 }

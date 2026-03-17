@@ -44,7 +44,7 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
       },
     ],
   },
-  // Data quality: nudge to organize by category
+  // Data quality: nudge to organize by category (batch-edit)
   {
     id: InsightId.ORGANIZE_WITH_CATEGORIES,
     titleKey: 'insights.library.organizeWithCategories.title',
@@ -57,8 +57,28 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
       {
         id: 'organize-with-categories',
         labelKey: 'insights.library.organizeWithCategories.cta',
-        type: 'navigate',
-        route: '/pantry',
+        type: 'batch-edit',
+        filter: 'noCategory',
+        action: 'setCategory',
+      },
+    ],
+  },
+  // Data quality: nudge to classify food types (batch-edit)
+  {
+    id: InsightId.MISSING_FOODTYPE,
+    titleKey: 'insights.library.missingFoodType.title',
+    descriptionKey: 'insights.library.missingFoodType.description',
+    category: InsightCategory.BEHAVIOR,
+    priority: 4,
+    audience: 'all',
+    predicate: context => context.products.some(p => !p.foodType),
+    ctas: [
+      {
+        id: 'set-food-types',
+        labelKey: 'insights.library.missingFoodType.cta',
+        type: 'batch-edit',
+        filter: 'noFoodType',
+        action: 'setFoodType',
       },
     ],
   },
@@ -68,7 +88,7 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
     titleKey: 'insights.library.planAndSaveTime.title',
     descriptionKey: 'insights.library.planAndSaveTime.description',
     category: InsightCategory.OPTIMIZATION,
-    priority: 4,
+    priority: 5,
     audience: 'non-pro',
     ctas: [
       {

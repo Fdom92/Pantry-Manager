@@ -18,6 +18,7 @@ import { ReviewPromptService } from '../shared/review-prompt.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { PantryService } from '../pantry/pantry.service';
 import { DashboardInsightService } from './dashboard-insight.service';
+import { BatchEditStateService } from './batch-edit-state.service';
 import { formatDateTimeValue, formatDateValue } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -68,6 +69,7 @@ export class DashboardStateService {
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly batchEdit = inject(BatchEditStateService);
 
   private hasCompletedInitialLoad = false;
   private readonly dismissedActionIds = signal(new Set<string>());
@@ -359,6 +361,10 @@ export class DashboardStateService {
       }
       return;
     }
+    if (cta.type === 'batch-edit') {
+      this.batchEdit.openFlow({ filter: cta.filter, action: cta.action });
+      return;
+    }
     this.conversationStore.prepareConversation({
       entryContext: cta.entryContext,
       initialPrompt: cta.prompt,
@@ -480,6 +486,7 @@ export class DashboardStateService {
         id: item._id,
         name: item.name,
         categoryId: item.categoryId,
+        foodType: item.foodType ?? null,
       })),
     };
 

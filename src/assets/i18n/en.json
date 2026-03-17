@@ -54,7 +54,8 @@
       "save": "Save",
       "edit": "Edit",
       "apply": "Apply",
-      "clear": "Clear"
+      "clear": "Clear",
+      "next": "Next"
     },
     "loading": "Loading…",
     "dates": {
@@ -350,6 +351,11 @@
         "title": "Organize your pantry by category",
         "description": "Group your products to find them faster and keep everything under control.",
         "cta": "Organize now"
+      },
+      "missingFoodType": {
+        "title": "Classify your food types",
+        "description": "Assign a food type to your items to get better insights and meal planning.",
+        "cta": "Classify now"
       },
       "planAndSaveTime": {
         "title": "Plan the week with AI",
@@ -874,6 +880,31 @@
       "confirm": "Yes, update",
       "dismiss": "No, cancel",
       "errorTitle": "Could not apply the sync"
+    }
+  },
+  "batchEdit": {
+    "steps": {
+      "items": { "title": "Select items" },
+      "action": { "title": "Choose action" },
+      "value": { "title": "Set value" },
+      "confirm": { "title": "Confirm" }
+    },
+    "actions": {
+      "setFoodType": "Set food type",
+      "setCategory": "Set category"
+    },
+    "items": {
+      "selectedCount_one": "1 item selected",
+      "selectedCount_other": "{{ count }} items selected"
+    },
+    "confirm": {
+      "applying": "Apply to {{ count }} items:",
+      "apply_one": "Apply to 1 item",
+      "apply_other": "Apply to {{ count }} items"
+    },
+    "toast": {
+      "updated_one": "1 item updated",
+      "updated_other": "{{ count }} items updated"
     }
   }
 }

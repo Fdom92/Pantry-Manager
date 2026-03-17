@@ -1,9 +1,12 @@
 import type { AgentEntryContext } from '@core/models/planner';
+import type { BatchEditAction, BatchEditFilter } from '@core/models/pantry/batch-edit.model';
+import type { FoodType } from '@core/models/shared/enums.model';
 
 export enum InsightId {
   COOK_BEFORE_EXPIRY = 'cook_before_expiry',
   ADD_EXPIRY_DATES = 'add_expiry_dates',
   ORGANIZE_WITH_CATEGORIES = 'organize_with_categories',
+  MISSING_FOODTYPE = 'missing_foodtype',
   PLAN_AND_SAVE_TIME = 'plan_and_save_time',
 }
 
@@ -30,6 +33,13 @@ export type InsightCta =
       label: string;
       type: 'navigate';
       route: string;
+    }
+  | {
+      id: string;
+      label: string;
+      type: 'batch-edit';
+      filter: BatchEditFilter;
+      action?: BatchEditAction;
     };
 export type InsightCtaDefinition =
   | {
@@ -44,6 +54,13 @@ export type InsightCtaDefinition =
       labelKey: string;
       type: 'navigate';
       route: string;
+    }
+  | {
+      id: string;
+      labelKey: string;
+      type: 'batch-edit';
+      filter: BatchEditFilter;
+      action?: BatchEditAction;
     };
 export interface Insight {
   id: InsightId;
@@ -73,6 +90,7 @@ export interface InsightProductSummary {
   id?: string;
   name: string;
   categoryId?: string | null;
+  foodType?: FoodType | null;
 }
 export interface InsightContext {
   expiringSoonItems: InsightExpiringItem[];
