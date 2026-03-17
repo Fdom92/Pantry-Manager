@@ -18,6 +18,8 @@ ion-title {
   z-index: 10;
   margin-bottom: var(--app-theme-spacing-xs);
   background: var(--ion-background-color);
+  margin-inline: calc(-1 * var(--ion-padding, 16px));
+  padding-inline: var(--ion-padding, 16px);
 }
 
 .summary-chips {

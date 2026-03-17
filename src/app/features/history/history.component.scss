@@ -8,6 +8,8 @@ ion-title {
   z-index: 10;
   margin-bottom: 6px;
   background: var(--ion-background-color);
+  margin-inline: calc(-1 * var(--ion-padding, 16px));
+  padding-inline: var(--ion-padding, 16px);
 }
 
 .pro-pill {

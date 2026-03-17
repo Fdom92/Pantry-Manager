@@ -171,6 +171,7 @@ export class PlannerStateService {
     if (!(await this.ensureAgentAccess())) {
       return;
     }
+    this.composerControl.setValue('', { emitEvent: false });
     if (prompt.behavior === 'composer') {
       this.prepareCustomPrompt();
       return;
