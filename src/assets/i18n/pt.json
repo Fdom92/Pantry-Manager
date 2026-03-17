@@ -436,21 +436,15 @@
       "search": "Pesquisar produtos"
     },
     "fastAdd": {
-      "cta": "Adicionar rápido",
-      "advancedAction": "Adicionar avançado",
-      "groupLabel": "Adicionar produtos rapidamente",
-      "title": "Quick add",
-      "cardTitle": "Select products",
-      "subtitle": "Pick items and set quantities.",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "addNew": "Add new product: {{ name }}",
-      "empty": "No items added yet.",
-      "submit": "Add to pantry",
-      "singleSuccess": "1 produto adicionado",
-      "success": "{{ count }} produtos adicionados",
-      "error": "Não foi possível adicionar os produtos.",
-      "createAdvanced": "Criar produto com detalhes avançados"
+      "groupLabel": "Adicionar produtos",
+      "title": "Adicionar produtos",
+      "cardTitle": "Pesquisar ou criar um produto",
+      "subtitle": "Pesquisa um produto existente para adicionar ou cria um novo.",
+      "placeholder": "Pesquisar ou criar novo produto",
+      "noResults": "Sem resultados",
+      "addNew": "Criar produto: {{ name }}",
+      "empty": "Ainda não adicionaste produtos.",
+      "submit": "Adicionar à despensa"
     },
     "addMode": {
       "title": "Selecionar modo",
@@ -470,7 +464,7 @@
       "expand": "Expandir {{ name }}"
     },
     "batches": {
-      "title": "Lotes de produtos",
+      "title": "Lotes e datas",
       "count": "{{ count }} lotes registados",
       "open": "Aberto",
       "noExpiryDate": "Sem data de validade",
@@ -492,42 +486,44 @@
       "namePlaceholder": "Arroz, leite...",
       "category": "Categoria",
       "categoryPlaceholder": "Cereais, laticínios...",
+      "categorySearchPlaceholder": "Pesquisar ou adicionar categoria",
       "categoryAdd": {
-        "option": "+ Adicionar categoria",
-        "title": "Adicionar categoria",
-        "placeholder": "Nome da categoria"
+        "option": "+ Adicionar"
       },
       "uncategorized": "Sem categoria",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Seleciona um supermercado",
+      "supermarketSearchPlaceholder": "Pesquisar ou adicionar supermercado",
       "supermarketAdd": {
-        "option": "+ Adicionar supermercado",
-        "title": "Adicionar supermercado",
-        "placeholder": "Nome do supermercado"
+        "option": "+ Adicionar",
+        "unassigned": "Sem supermercado"
       },
       "basic": "Manter sempre em casa",
       "minThreshold": "Quantidade mínima",
-      "location": "Localização",
-      "locationPlaceholder": "Seleciona uma localização",
       "locationAdd": {
-        "option": "+ Adicionar localização",
-        "unassigned": "Não atribuído"
+        "option": "+ Adicionar",
+        "unassigned": "Não atribuído",
+        "searchPlaceholder": "Pesquisar ou adicionar localização"
       },
       "batches": {
-        "title": "Lotes",
-        "add": "Adicionar lote",
-        "empty": "Ainda não existem lotes. Adiciona um para acompanhar validade.",
-        "titleIndex": "Lote {{ index }}",
         "quantity": "Quantidade",
         "expiry": "Data de validade",
-        "location": "Localização",
-        "opened": "Aberto"
+        "location": "Localização"
       },
       "quantity": {
         "title": "Quantidade",
-        "current": "Quantidade",
-        "initial": "Quantidade inicial",
-        "hint": "Aumentar ou diminuir a quantidade total do produto"
+        "initial": "Quantidade inicial"
+      },
+      "foodType": {
+        "label": "Tipo de alimento",
+        "placeholder": "Sem classificação",
+        "unassigned": "Sem classificação",
+        "protein": "Proteína",
+        "carb": "Carboidrato",
+        "vegetable": "Vegetal",
+        "fruit": "Fruta",
+        "dairy": "Laticínio",
+        "other": "Outro"
       }
     },
     "detail": {

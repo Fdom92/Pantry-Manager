@@ -436,21 +436,15 @@
       "search": "Search products"
     },
     "fastAdd": {
-      "cta": "Add quickly",
-      "advancedAction": "Advanced add",
-      "groupLabel": "Add products quickly",
-      "title": "Quick add",
-      "cardTitle": "Select products",
-      "subtitle": "Pick items and set quantities.",
-      "placeholder": "Search products",
+      "groupLabel": "Add products",
+      "title": "Add products",
+      "cardTitle": "Search or create a product",
+      "subtitle": "Search for an existing product to add or create a new one.",
+      "placeholder": "Search or create new product",
       "noResults": "No results",
-      "addNew": "Add new product: {{ name }}",
+      "addNew": "Create product: {{ name }}",
       "empty": "No items added yet.",
-      "submit": "Add to pantry",
-      "singleSuccess": "1 product added",
-      "success": "{{ count }} products added",
-      "error": "Couldn't add the products.",
-      "createAdvanced": "Create product with advanced details"
+      "submit": "Add to pantry"
     },
     "addMode": {
       "title": "Select mode",
@@ -470,7 +464,7 @@
       "expand": "Expand {{ name }}"
     },
     "batches": {
-      "title": "Product batches",
+      "title": "Batches & dates",
       "count": "{{ count }} batches recorded",
       "open": "Opened",
       "noExpiryDate": "No expiration date",
@@ -492,42 +486,44 @@
       "namePlaceholder": "Rice, milk...",
       "category": "Category",
       "categoryPlaceholder": "Cereals, dairy...",
+      "categorySearchPlaceholder": "Search or add category",
       "categoryAdd": {
-        "option": "+ Add category",
-        "title": "Add category",
-        "placeholder": "Category name"
+        "option": "+ Add"
       },
       "uncategorized": "Uncategorized",
       "supermarket": "Supermarket",
       "supermarketPlaceholder": "Select a supermarket",
+      "supermarketSearchPlaceholder": "Search or add supermarket",
       "supermarketAdd": {
-        "option": "+ Add supermarket",
-        "title": "Add supermarket",
-        "placeholder": "Supermarket name"
+        "option": "+ Add",
+        "unassigned": "No supermarket"
       },
       "basic": "Always keep at home",
       "minThreshold": "Minimum quantity",
-      "location": "Location",
-      "locationPlaceholder": "Select a location",
       "locationAdd": {
-        "option": "+ Add location",
-        "unassigned": "Unassigned"
+        "option": "+ Add",
+        "unassigned": "Unassigned",
+        "searchPlaceholder": "Search or add location"
       },
       "batches": {
-        "title": "Batches",
-        "add": "Add batch",
-        "empty": "No batches yet. Add one to track expiry dates.",
-        "titleIndex": "Batch {{ index }}",
         "quantity": "Quantity",
         "expiry": "Expiration date",
-        "location": "Location",
-        "opened": "Opened"
+        "location": "Location"
       },
       "quantity": {
         "title": "Quantity",
-        "current": "Quantity",
-        "initial": "Initial quantity",
-        "hint": "Increase or decrease the total product quantity"
+        "initial": "Initial quantity"
+      },
+      "foodType": {
+        "label": "Food type",
+        "placeholder": "Unclassified",
+        "unassigned": "Unclassified",
+        "protein": "Protein",
+        "carb": "Carbohydrate",
+        "vegetable": "Vegetable",
+        "fruit": "Fruit",
+        "dairy": "Dairy",
+        "other": "Other"
       }
     },
     "detail": {

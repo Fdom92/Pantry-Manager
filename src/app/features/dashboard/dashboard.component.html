@@ -114,18 +114,6 @@
           </div>
         </section>
       }
-
-      <!-- LAYER 4: Additional Context (Optional) -->
-      @if (facade.showAdditionalContext() && facade.recentlyAddedCount() > 0 && facade.recentlyAddedCount() <= 5) {
-        <section class="dashboard-section">
-          <div class="context-section">
-            <div class="context-item">
-              <ion-icon name="add-circle-outline"></ion-icon>
-              <span>{{ 'dashboard.context.recentlyAdded' | translate:{ count: facade.recentlyAddedCount() } }}</span>
-            </div>
-          </div>
-        </section>
-      }
     }
   </div>
 </ion-content>

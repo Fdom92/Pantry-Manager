@@ -114,6 +114,7 @@
   // ═══════════════════════════════════════════════════════════════════════════
   --app-theme-text-color: var(--ion-text-color);
   --app-theme-text-muted: var(--ion-color-medium);
+  --app-theme-text-subtle: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
 
   // Font sizes
   --app-theme-font-size-title: 1rem;

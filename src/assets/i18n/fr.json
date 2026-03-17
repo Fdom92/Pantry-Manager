@@ -436,21 +436,15 @@
       "search": "Rechercher des produits"
     },
     "fastAdd": {
-      "cta": "Ajouter rapidement",
-      "advancedAction": "Ajout avancé",
-      "groupLabel": "Ajouter des produits rapidement",
-      "title": "Quick add",
-      "cardTitle": "Select products",
-      "subtitle": "Pick items and set quantities.",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "addNew": "Add new product: {{ name }}",
-      "empty": "No items added yet.",
-      "submit": "Add to pantry",
-      "singleSuccess": "1 produit ajouté",
-      "success": "{{ count }} produits ajoutés",
-      "error": "Impossible d’ajouter les produits.",
-      "createAdvanced": "Créer un produit avec détails avancés"
+      "groupLabel": "Ajouter des produits",
+      "title": "Ajouter des produits",
+      "cardTitle": "Rechercher ou créer un produit",
+      "subtitle": "Recherchez un produit existant à ajouter ou créez-en un nouveau.",
+      "placeholder": "Rechercher ou créer un produit",
+      "noResults": "Aucun résultat",
+      "addNew": "Créer le produit : {{ name }}",
+      "empty": "Aucun article ajouté pour l’instant.",
+      "submit": "Ajouter au garde-manger"
     },
     "addMode": {
       "title": "Sélectionner le mode",
@@ -470,7 +464,7 @@
       "expand": "Développer {{ name }}"
     },
     "batches": {
-      "title": "Lots du produit",
+      "title": "Lots et dates",
       "count": "{{ count }} lots enregistrés",
       "open": "Ouvert",
       "noExpiryDate": "Sans date de péremption",
@@ -492,42 +486,44 @@
       "namePlaceholder": "Riz, lait…",
       "category": "Catégorie",
       "categoryPlaceholder": "Céréales, produits laitiers…",
+      "categorySearchPlaceholder": "Rechercher ou ajouter une catégorie",
       "categoryAdd": {
-        "option": "+ Ajouter une catégorie",
-        "title": "Ajouter une catégorie",
-        "placeholder": "Nom de la catégorie"
+        "option": "+ Ajouter"
       },
       "uncategorized": "Sans catégorie",
       "supermarket": "Supermarché",
       "supermarketPlaceholder": "Sélectionnez un supermarché",
+      "supermarketSearchPlaceholder": "Rechercher ou ajouter un supermarché",
       "supermarketAdd": {
-        "option": "+ Ajouter un supermarché",
-        "title": "Ajouter un supermarché",
-        "placeholder": "Nom du supermarché"
+        "option": "+ Ajouter",
+        "unassigned": "Sans supermarché"
       },
       "basic": "Toujours garder à la maison",
       "minThreshold": "Quantité minimale",
-      "location": "Emplacement",
-      "locationPlaceholder": "Sélectionnez un emplacement",
       "locationAdd": {
-        "option": "+ Ajouter un emplacement",
-        "unassigned": "Non assigné"
+        "option": "+ Ajouter",
+        "unassigned": "Non assigné",
+        "searchPlaceholder": "Rechercher ou ajouter un emplacement"
       },
       "batches": {
-        "title": "Lots",
-        "add": "Ajouter un lot",
-        "empty": "Aucun lot pour le moment. Ajoutez-en un pour suivre les dates de péremption.",
-        "titleIndex": "Lot {{ index }}",
         "quantity": "Quantité",
         "expiry": "Date de péremption",
-        "location": "Emplacement",
-        "opened": "Ouvert"
+        "location": "Emplacement"
       },
       "quantity": {
         "title": "Quantité",
-        "current": "Quantité",
-        "initial": "Quantité initiale",
-        "hint": "Augmenter ou diminuer la quantité totale du produit"
+        "initial": "Quantité initiale"
+      },
+      "foodType": {
+        "label": "Type d'aliment",
+        "placeholder": "Non classifié",
+        "unassigned": "Non classifié",
+        "protein": "Protéine",
+        "carb": "Glucide",
+        "vegetable": "Légume",
+        "fruit": "Fruit",
+        "dairy": "Produit laitier",
+        "other": "Autre"
       }
     },
     "detail": {

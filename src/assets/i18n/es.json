@@ -436,21 +436,15 @@
       "search": "Buscar productos"
     },
     "fastAdd": {
-      "cta": "Añadir rápido",
-      "advancedAction": "Añadir avanzado",
-      "groupLabel": "Añadir productos rápidamente",
-      "title": "Añadir rápido",
-      "cardTitle": "Selecciona productos",
-      "subtitle": "Elige productos y ajusta cantidades.",
-      "placeholder": "Buscar productos",
+      "groupLabel": "Añadir productos",
+      "title": "Añadir productos",
+      "cardTitle": "Busca o crea un producto",
+      "subtitle": "Busca un producto existente para añadir o crea uno nuevo.",
+      "placeholder": "Buscar o crear nuevo producto",
       "noResults": "Sin resultados",
-      "addNew": "Añadir producto nuevo: {{ name }}",
+      "addNew": "Crear producto: {{ name }}",
       "empty": "Todavía no has añadido productos.",
-      "submit": "Añadir a la despensa",
-      "singleSuccess": "1 producto añadido",
-      "success": "{{ count }} productos añadidos",
-      "error": "No se pudieron añadir los productos.",
-      "createAdvanced": "Crear producto con detalles avanzados"
+      "submit": "Añadir a la despensa"
     },
     "addMode": {
       "title": "Selecciona el modo",
@@ -470,7 +464,7 @@
       "expand": "Expandir {{ name }}"
     },
     "batches": {
-      "title": "Lotes del producto",
+      "title": "Lotes y fechas",
       "count": "{{ count }} lotes registrados",
       "open": "Abierto",
       "noExpiryDate": "Sin fecha de caducidad",
@@ -485,49 +479,51 @@
       }
     },
     "form": {
-      "editTitle": "Editar artículo",
+      "editTitle": "Editar producto",
       "newTitle": "Nuevo artículo",
       "details": "Detalles",
       "name": "Nombre",
       "namePlaceholder": "Arroz, leche...",
       "category": "Categoría",
       "categoryPlaceholder": "Cereales, lácteos...",
+      "categorySearchPlaceholder": "Buscar o añadir categoría",
       "categoryAdd": {
-        "option": "+ Añadir categoría",
-        "title": "Añadir categoría",
-        "placeholder": "Nombre de la categoría"
+        "option": "+ Añadir"
       },
       "uncategorized": "Sin categoría",
       "supermarket": "Supermercado",
       "supermarketPlaceholder": "Selecciona un supermercado",
+      "supermarketSearchPlaceholder": "Buscar o añadir supermercado",
       "supermarketAdd": {
-        "option": "+ Añadir supermercado",
-        "title": "Añadir supermercado",
-        "placeholder": "Nombre del supermercado"
+        "option": "+ Añadir",
+        "unassigned": "Sin supermercado"
       },
       "basic": "Mantener siempre en casa",
       "minThreshold": "Cantidad mínima",
-      "location": "Ubicación",
-      "locationPlaceholder": "Selecciona una ubicación",
       "locationAdd": {
-        "option": "+ Añadir ubicación",
-        "unassigned": "Sin asignar"
+        "option": "+ Añadir",
+        "unassigned": "Sin asignar",
+        "searchPlaceholder": "Buscar o añadir ubicación"
       },
       "batches": {
-        "title": "Lotes",
-        "add": "Añadir lote",
-        "empty": "Todavía no hay lotes. Añade uno para controlar las fechas de caducidad.",
-        "titleIndex": "Lote {{ index }}",
         "quantity": "Cantidad",
         "expiry": "Fecha de caducidad",
-        "location": "Ubicación",
-        "opened": "Abierto"
+        "location": "Ubicación"
       },
       "quantity": {
         "title": "Cantidad",
-        "current": "Cantidad",
-        "initial": "Cantidad inicial",
-        "hint": "Incrementa o reduce la cantidad total del producto"
+        "initial": "Cantidad inicial"
+      },
+      "foodType": {
+        "label": "Tipo de alimento",
+        "placeholder": "Sin clasificar",
+        "unassigned": "Sin clasificar",
+        "protein": "Proteína",
+        "carb": "Carbohidrato",
+        "vegetable": "Verdura",
+        "fruit": "Fruta",
+        "dairy": "Lácteo",
+        "other": "Otro"
       }
     },
     "detail": {

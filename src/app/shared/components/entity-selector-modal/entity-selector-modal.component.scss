@@ -118,7 +118,7 @@ ion-modal::part(content) {
   padding: var(--app-theme-spacing-sm) 0;
   background: transparent;
   border: none;
-  color: color-mix(in srgb, var(--app-theme-text-color) 70%, transparent);
+  color: var(--app-theme-text-subtle);
   font-size: var(--app-theme-font-size-body);
   font-weight: var(--app-theme-font-weight-semibold);
   text-align: left;

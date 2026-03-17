@@ -22,7 +22,7 @@
 .sheet-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
   margin: 0;
   flex: 1;
   overflow: hidden;
@@ -33,7 +33,7 @@
 .close-button {
   --padding-start: 6px;
   --padding-end: 6px;
-  --color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  --color: var(--app-theme-text-subtle);
   height: 32px;
   min-width: 32px;
   flex-shrink: 0;
@@ -50,14 +50,14 @@
 .quantity-label {
   font-size: 0.7rem;
   font-weight: 500;
-  color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  color: var(--app-theme-text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .quantity-hint {
   font-size: 0.65rem;
-  color: color-mix(in srgb, var(--ion-text-color) 50%, transparent);
+  color: var(--app-theme-text-subtle);
   margin-top: -4px;
   text-align: center;
 }
@@ -111,7 +111,7 @@
 .quantity-number {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   display: flex;
@@ -140,7 +140,7 @@
 .quantity-unit {
   font-size: 1rem;
   font-weight: 600;
-  color: color-mix(in srgb, var(--ion-text-color) 50%, transparent);
+  color: var(--app-theme-text-subtle);
 }
 
 .quantity-zero-hint {
@@ -168,7 +168,7 @@
   --padding-top: 12px;
   --padding-bottom: 12px;
   font-weight: 500;
-  color: color-mix(in srgb, var(--ion-text-color) 80%, transparent);
+  color: var(--ion-text-color);
 }
 
 .details-button ion-icon {

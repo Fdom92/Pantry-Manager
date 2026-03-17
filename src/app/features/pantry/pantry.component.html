@@ -116,35 +116,7 @@
     </div>
   }
 
-  <app-entity-selector-modal
-    [isOpen]="facade.fastAddModalOpen()"
-    [title]="'pantry.fastAdd.title' | translate"
-    [cardTitle]="'pantry.fastAdd.cardTitle' | translate"
-    [subtitle]="'pantry.fastAdd.subtitle' | translate"
-    [placeholder]="'pantry.fastAdd.placeholder' | translate"
-    [emptyLabel]="'pantry.fastAdd.noResults' | translate"
-    [entriesEmptyLabel]="'pantry.fastAdd.empty' | translate"
-    [saveLabel]="'pantry.fastAdd.submit' | translate"
-    [saving]="facade.isFastAdding()"
-    [disableSave]="!facade.hasFastAddEntries()"
-    [items]="facade.fastAddOptions()"
-    [entries]="facade.fastAddEntryViewModels()"
-    [showSecondaryInfo]="true"
-    [showMeta]="false"
-    [showAllOnFocus]="true"
-    [autofocus]="true"
-    [showEmptyAction]="facade.showFastAddEmptyAction()"
-    [showEmptyActionWhenNoExactMatch]="true"
-    [emptyActionLabel]="facade.fastAddEmptyActionLabel()"
-    (willDismiss)="facade.dismissFastAddModal()"
-    (didDismiss)="facade.closeFastAddModal()"
-    (selectItem)="facade.addFastAddEntry($event)"
-    (queryChange)="facade.onFastAddQueryChange($event)"
-    (emptyAction)="facade.addFastAddEntryFromQuery($event)"
-    (adjustEntry)="facade.adjustFastAddEntryById($event.entry.id, $event.delta)"
-    (entryDateChange)="facade.setFastAddEntryDate($event.entry.id, $event.date)"
-    (save)="facade.submitFastAdd()">
-  </app-entity-selector-modal>
+  <app-pantry-add-modal></app-pantry-add-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>
 

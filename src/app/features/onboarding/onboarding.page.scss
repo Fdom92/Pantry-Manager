@@ -3,7 +3,7 @@
   --onboarding-radial-b: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
   --onboarding-glass: color-mix(in srgb, #ffffff 12%, transparent);
   --onboarding-glass-border: color-mix(in srgb, #ffffff 20%, transparent);
-  --onboarding-pill-text: var(--ion-text-color);
+  --onboarding-pill-text: var(--app-theme-text-color);
   --background: radial-gradient(
       circle at 15% 20%,
       color-mix(in srgb, var(--ion-color-secondary) 22%, transparent),
@@ -18,7 +18,7 @@
       color-mix(in srgb, var(--ion-card-background) 88%, var(--ion-color-primary) 12%) 60%,
       var(--ion-card-background) 100%);
   position: relative;
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
 }
 
 .background-blur {
@@ -83,7 +83,7 @@
   border-radius: 24px;
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
   text-align: center;
   animation: floatIn 420ms ease;
   overflow: hidden;
@@ -93,14 +93,14 @@
     font-weight: 700;
     margin: 10px 0 12px;
     letter-spacing: -0.01em;
-    color: var(--ion-text-color);
+    color: var(--app-theme-text-color);
   }
 
   p {
     margin: 0;
     line-height: 1.5;
     font-size: 1rem;
-    color: var(--ion-color-medium);
+    color: var(--app-theme-text-muted);
   }
 }
 
@@ -121,7 +121,7 @@
   align-items: center;
   gap: 10px;
   font-size: 0.95rem;
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
 
   .dot {
     width: 10px;

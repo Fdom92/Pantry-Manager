@@ -1,5 +1,5 @@
 ion-title, ion-back-button {
-  color: var(--ion-text-color, var(--ion-text-color));
+  color: var(--app-theme-text-color);
 }
 
 .create-item-modal-content {
@@ -35,7 +35,7 @@ ion-title, ion-back-button {
 .entity-selector-card__subtitle {
   margin: 4px 0 0;
   font-size: 0.85rem;
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
 }
 
 .entity-selector-card__content {
@@ -45,7 +45,7 @@ ion-title, ion-back-button {
 .form-section {
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 10px 16px;
   gap: 0;
   border-radius: 16px;
   background: var(--ion-card-background, var(--ion-card-background));
@@ -70,10 +70,17 @@ ion-title, ion-back-button {
 
 .form-section ion-item {
   --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
 }
 
 .form-autocomplete {
   padding: 6px 0;
+}
+
+.form-autocomplete app-entity-selector-field .selector-trigger {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .form-section--details .form-row {
@@ -106,7 +113,7 @@ ion-title, ion-back-button {
 .location-total {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
   margin-left: 8px;
 }
 
@@ -159,14 +166,14 @@ ion-title, ion-back-button {
 .quantity-label {
   font-size: 0.7rem;
   font-weight: 500;
-  color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  color: var(--app-theme-text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .quantity-hint {
   font-size: 0.65rem;
-  color: color-mix(in srgb, var(--ion-text-color) 50%, transparent);
+  color: var(--app-theme-text-subtle);
   margin-top: -4px;
   text-align: center;
 }
@@ -220,7 +227,7 @@ ion-title, ion-back-button {
 .quantity-number {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   display: flex;

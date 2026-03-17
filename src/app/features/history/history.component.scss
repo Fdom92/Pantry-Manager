@@ -126,7 +126,7 @@ ion-title {
   font-weight: 700;
   font-size: 0.95rem;
   margin-bottom: 8px;
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
   display: inline-flex;
   align-items: center;
   padding: 4px 10px;
@@ -197,7 +197,7 @@ ion-title {
   padding: 10px 12px;
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
 }
 
 .timeline-event__row {
@@ -223,7 +223,7 @@ ion-title {
 
 .timeline-event__row--meta {
   font-size: 0.78rem;
-  color: var(--ion-color-medium);
+  color: var(--app-theme-text-muted);
 }
 
 .timeline-event__subtitle {

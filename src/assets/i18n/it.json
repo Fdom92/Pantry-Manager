@@ -436,21 +436,15 @@
       "search": "Cerca prodotti"
     },
     "fastAdd": {
-      "cta": "Aggiungi veloce",
-      "advancedAction": "Aggiungi avanzato",
-      "groupLabel": "Aggiungi prodotti velocemente",
-      "title": "Quick add",
-      "cardTitle": "Select products",
-      "subtitle": "Pick items and set quantities.",
-      "placeholder": "Search products",
-      "noResults": "No results",
-      "addNew": "Add new product: {{ name }}",
-      "empty": "No items added yet.",
-      "submit": "Add to pantry",
-      "singleSuccess": "1 prodotto aggiunto",
-      "success": "{{ count }} prodotti aggiunti",
-      "error": "Impossibile aggiungere i prodotti.",
-      "createAdvanced": "Crea prodotto con dettagli avanzati"
+      "groupLabel": "Aggiungi prodotti",
+      "title": "Aggiungi prodotti",
+      "cardTitle": "Cerca o crea un prodotto",
+      "subtitle": "Cerca un prodotto esistente da aggiungere o creane uno nuovo.",
+      "placeholder": "Cerca o crea nuovo prodotto",
+      "noResults": "Nessun risultato",
+      "addNew": "Crea prodotto: {{ name }}",
+      "empty": "Nessun articolo aggiunto.",
+      "submit": "Aggiungi alla dispensa"
     },
     "addMode": {
       "title": "Seleziona modalità",
@@ -470,7 +464,7 @@
       "expand": "Espandi {{ name }}"
     },
     "batches": {
-      "title": "Lotti prodotto",
+      "title": "Lotti e date",
       "count": "{{ count }} lotti registrati",
       "open": "Aperto",
       "noExpiryDate": "Nessuna data di scadenza",
@@ -492,42 +486,44 @@
       "namePlaceholder": "Riso, latte...",
       "category": "Categoria",
       "categoryPlaceholder": "Cereali, latticini...",
+      "categorySearchPlaceholder": "Cerca o aggiungi categoria",
       "categoryAdd": {
-        "option": "+ Aggiungi categoria",
-        "title": "Aggiungi categoria",
-        "placeholder": "Nome della categoria"
+        "option": "+ Aggiungi"
       },
       "uncategorized": "Senza categoria",
       "supermarket": "Supermercato",
       "supermarketPlaceholder": "Seleziona un supermercato",
+      "supermarketSearchPlaceholder": "Cerca o aggiungi supermercato",
       "supermarketAdd": {
-        "option": "+ Aggiungi supermercato",
-        "title": "Aggiungi supermercato",
-        "placeholder": "Nome del supermercato"
+        "option": "+ Aggiungi",
+        "unassigned": "Senza supermercato"
       },
       "basic": "Tenere sempre in casa",
       "minThreshold": "Quantità minima",
-      "location": "Posizione",
-      "locationPlaceholder": "Seleziona una posizione",
       "locationAdd": {
-        "option": "+ Aggiungi posizione",
-        "unassigned": "Non assegnato"
+        "option": "+ Aggiungi",
+        "unassigned": "Non assegnato",
+        "searchPlaceholder": "Cerca o aggiungi posizione"
       },
       "batches": {
-        "title": "Lotti",
-        "add": "Aggiungi lotto",
-        "empty": "Nessun lotto ancora. Aggiungine uno per tracciare le scadenze.",
-        "titleIndex": "Lotto {{ index }}",
         "quantity": "Quantità",
         "expiry": "Data di scadenza",
-        "location": "Posizione",
-        "opened": "Aperto"
+        "location": "Posizione"
       },
       "quantity": {
         "title": "Quantità",
-        "current": "Quantità",
-        "initial": "Quantità iniziale",
-        "hint": "Aumenta o diminuisci la quantità totale del prodotto"
+        "initial": "Quantità iniziale"
+      },
+      "foodType": {
+        "label": "Tipo di alimento",
+        "placeholder": "Non classificato",
+        "unassigned": "Non classificato",
+        "protein": "Proteina",
+        "carb": "Carboidrato",
+        "vegetable": "Verdura",
+        "fruit": "Frutta",
+        "dairy": "Latticino",
+        "other": "Altro"
       }
     },
     "detail": {

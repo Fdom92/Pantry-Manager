@@ -34,8 +34,7 @@
           @for (location of state.locationOptionsDraft(); track $index; let i = $index) {
             <ion-item>
               <ion-label>
-                <h3>{{ 'settings.catalogs.locations.field' | translate:{ index: i + 1 } }}</h3>
-                <p>{{ location }}</p>
+                <h3>{{ location }}</h3>
               </ion-label>
               <ion-button
                 slot="end"
@@ -83,8 +82,7 @@
           @for (category of state.categoryOptionsDraft(); track $index; let i = $index) {
             <ion-item>
               <ion-label>
-                <h3>{{ 'settings.catalogs.categories.field' | translate:{ index: i + 1 } }}</h3>
-                <p>{{ category }}</p>
+                <h3>{{ category }}</h3>
               </ion-label>
               <ion-button
                 slot="end"
@@ -131,8 +129,7 @@
           @for (supermarket of state.supermarketOptionsDraft(); track $index; let i = $index) {
             <ion-item>
               <ion-label>
-                <h3>{{ 'settings.catalogs.supermarkets.field' | translate:{ index: i + 1 } }}</h3>
-                <p>{{ supermarket }}</p>
+                <h3>{{ supermarket }}</h3>
               </ion-label>
               <ion-button
                 slot="end"

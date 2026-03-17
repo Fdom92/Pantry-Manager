@@ -117,17 +117,6 @@ export class DashboardStateService {
       return this.pantryStore.shouldAutoAddToShoppingList(item, { totalQuantity, minThreshold }) ? total + 1 : total;
     }, 0);
   });
-  readonly recentlyAddedCount = computed(() => {
-    const now = this.getReferenceNow();
-    const windowMs = RECENTLY_ADDED_WINDOW_DAYS * 24 * 60 * 60 * 1000;
-    return this.pantryItems().filter(item => {
-      const createdAt = new Date(item.createdAt);
-      if (Number.isNaN(createdAt.getTime())) {
-        return false;
-      }
-      return now.getTime() - createdAt.getTime() <= windowMs;
-    }).length;
-  });
 
   readonly noExpiryDateCount = computed(() => {
     return this.pantryItems().filter(item => {
@@ -276,13 +265,13 @@ export class DashboardStateService {
       });
     }
 
-    // CRITICAL: low stock
+    // PREVENTIVE: low stock
     if (lowStock > 0) {
       const descKey = lowStock === 1 ? 'dashboard.actions.lowStock.description_one' : 'dashboard.actions.lowStock.description_other';
       actions.push({
         id: 'low-stock-action',
         priority: ActionPriority.MEDIUM,
-        category: 'critical',
+        category: 'preventive',
         title: this.translate.instant('dashboard.actions.lowStock.title'),
         description: this.translate.instant(descKey, { count: lowStock }),
         cta: {
@@ -317,11 +306,6 @@ export class DashboardStateService {
       .sort((a, b) => a.priority - b.priority)
       .slice(0, 2)
       .filter(action => !this.dismissedActionIds().has(action.id));
-  });
-
-  readonly showAdditionalContext = computed(() => {
-    const criticalActions = this.actions().filter(a => a.priority === ActionPriority.CRITICAL);
-    return criticalActions.length === 0;
   });
 
   get nearExpiryWindow(): number {
@@ -399,10 +383,6 @@ export class DashboardStateService {
         return;
       case 'low-or-empty':
         this.pantryService.setPendingNavigationPreset({ lowStock: true });
-        await this.navCtrl.navigateRoot('/pantry');
-        return;
-      case 'recently-added':
-        this.pantryService.setPendingNavigationPreset({ recentlyAdded: true });
         await this.navCtrl.navigateRoot('/pantry');
         return;
       case 'shopping':
@@ -515,8 +495,6 @@ export class DashboardStateService {
         return this.nearExpiryItems().length;
       case 'low-or-empty':
         return this.lowStockItems().length;
-      case 'recently-added':
-        return this.recentlyAddedCount();
       case 'shopping':
         return this.shoppingListCount();
       default:

@@ -71,7 +71,7 @@
 .item-name {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--ion-text-color);
+  color: var(--app-theme-text-color);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -89,11 +89,11 @@
   align-items: center;
   gap: 7px;
   font-size: 0.85rem;
-  color: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
+  color: var(--app-theme-text-subtle);
 }
 
 .info-row ion-icon {
   font-size: 16px;
-  color: color-mix(in srgb, var(--ion-text-color) 50%, transparent);
+  color: var(--app-theme-text-subtle);
   flex-shrink: 0;
 }
