@@ -852,6 +852,7 @@
     "openTitle": "Synchroniser avec un autre téléphone",
     "openSubtitle": "Envoyez ou recevez le garde-manger complet depuis un autre appareil.",
     "send": {
+      "step": "Étape 1 — Sur ce téléphone",
       "title": "Envoyer mon garde-manger",
       "subtitle": "Transfère une copie exacte de votre garde-manger sur l'autre appareil.",
       "actionTitle": "Envoyer vers un autre appareil",
@@ -860,7 +861,8 @@
       "shareText": "Mettez à jour le garde-manger sur un autre appareil avec PantryMind."
     },
     "receive": {
-      "title": "Comment recevoir ?",
+      "step": "Étape 2 — Sur l'autre téléphone",
+      "title": "Recevoir le garde-manger",
       "subtitle": "Aucune configuration spéciale n'est nécessaire sur l'autre téléphone.",
       "howTitle": "Réception automatique",
       "howDescription": "Quand vous recevez le fichier de l'autre appareil, ouvrez-le simplement. PantryMind le détectera et vous demandera si vous souhaitez mettre à jour votre garde-manger."
@@ -869,7 +871,8 @@
       "title": "Mise à jour du garde-manger",
       "message": "Un autre appareil souhaite synchroniser son garde-manger avec le vôtre. Cela remplacera votre garde-manger actuel. Voulez-vous l'appliquer ?",
       "confirm": "Oui, mettre à jour",
-      "dismiss": "Non, annuler"
+      "dismiss": "Non, annuler",
+      "errorTitle": "Impossible d'appliquer la synchronisation"
     }
   }
 }

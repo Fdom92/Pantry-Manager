@@ -852,6 +852,7 @@
     "openTitle": "Sincronizza con un altro telefono",
     "openSubtitle": "Invia o ricevi la dispensa completa da un altro dispositivo.",
     "send": {
+      "step": "Passo 1 — Su questo telefono",
       "title": "Invia la mia dispensa",
       "subtitle": "Trasferisce una copia esatta della tua dispensa sull'altro dispositivo.",
       "actionTitle": "Invia a un altro dispositivo",
@@ -860,7 +861,8 @@
       "shareText": "Aggiorna la dispensa su un altro dispositivo con PantryMind."
     },
     "receive": {
-      "title": "Come ricevere?",
+      "step": "Passo 2 — Sull'altro telefono",
+      "title": "Ricevi la dispensa",
       "subtitle": "Nessuna configurazione speciale è necessaria sull'altro telefono.",
       "howTitle": "Ricezione automatica",
       "howDescription": "Quando ricevi il file dall'altro dispositivo, aprilo direttamente. PantryMind lo riconoscerà e ti chiederà se vuoi aggiornare la tua dispensa."
@@ -869,7 +871,8 @@
       "title": "Aggiornamento dispensa",
       "message": "Un altro dispositivo vuole sincronizzare la sua dispensa con la tua. Questo sostituirà la tua dispensa attuale. Vuoi applicarlo?",
       "confirm": "Sì, aggiorna",
-      "dismiss": "No, annulla"
+      "dismiss": "No, annulla",
+      "errorTitle": "Impossibile applicare la sincronizzazione"
     }
   }
 }

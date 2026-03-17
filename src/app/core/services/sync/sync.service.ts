@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { AlertController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { parseBackup, buildExportFileName } from '@core/domain/settings';
+import { IMPORT_EMPTY_ERROR, IMPORT_INVALID_ERROR } from '@core/constants';
 import type { BaseDoc } from '@core/models/shared';
 import { StorageService } from '../shared/storage.service';
 import { ShareService } from '../shared/share.service';
@@ -22,6 +23,18 @@ export class SyncService {
 
   // Called from AppComponent when the app receives a file intent
   async handleIncomingIntent(url: string): Promise<void> {
+    // Validate the file BEFORE asking the user — avoids confusing errors after confirmation
+    let docs: BaseDoc[];
+    try {
+      const response = await fetch(url);
+      const text = await response.text();
+      docs = parseBackup(text, new Date().toISOString());
+    } catch (err) {
+      console.error('[SyncService] handleIncomingIntent: invalid file', err);
+      await this.showSyncError(err);
+      return;
+    }
+
     const alert = await this.alertCtrl.create({
       header: this.translate.instant('sync.incoming.title'),
       message: this.translate.instant('sync.incoming.message'),
@@ -33,7 +46,7 @@ export class SyncService {
         {
           text: this.translate.instant('sync.incoming.confirm'),
           handler: () => {
-            void this.applyFromUri(url);
+            void this.doApplyImport(docs);
           },
         },
       ],
@@ -71,19 +84,31 @@ export class SyncService {
     this.migrationService.markMigrationCheckNeeded();
   }
 
-  private async applyFromUri(uri: string): Promise<void> {
+  private async doApplyImport(docs: BaseDoc[]): Promise<void> {
     if (this.isApplyingSync()) return;
     this.isApplyingSync.set(true);
     try {
-      const response = await fetch(uri);
-      const text = await response.text();
-      const docs = parseBackup(text, new Date().toISOString());
       await this.applyImport(docs);
       setTimeout(() => window.location.reload(), 600);
     } catch (err) {
-      console.error('[SyncService] applyFromUri error', err);
+      console.error('[SyncService] doApplyImport error', err);
     } finally {
       this.isApplyingSync.set(false);
     }
+  }
+
+  private async showSyncError(err: unknown): Promise<void> {
+    const msgKey =
+      err instanceof Error && err.message === IMPORT_EMPTY_ERROR
+        ? 'settings.import.empty'
+        : err instanceof Error && err.message === IMPORT_INVALID_ERROR
+          ? 'settings.import.invalid'
+          : 'settings.import.error';
+    const alert = await this.alertCtrl.create({
+      header: this.translate.instant('sync.incoming.errorTitle'),
+      message: this.translate.instant(msgKey),
+      buttons: [this.translate.instant('common.actions.close')],
+    });
+    await alert.present();
   }
 }

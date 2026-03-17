@@ -853,6 +853,7 @@
     "openTitle": "Sync with another phone",
     "openSubtitle": "Send or receive the full pantry from another device.",
     "send": {
+      "step": "Step 1 — On this phone",
       "title": "Send my pantry",
       "subtitle": "Transfer an exact copy of your pantry to the other device.",
       "actionTitle": "Send to another device",
@@ -861,7 +862,8 @@
       "shareText": "Update the pantry on another device with PantryMind."
     },
     "receive": {
-      "title": "How to receive?",
+      "step": "Step 2 — On the other phone",
+      "title": "Receive the pantry",
       "subtitle": "No special setup needed on the other phone.",
       "howTitle": "Automatic reception",
       "howDescription": "When you receive the file from the other device, just open it. PantryMind will detect it and ask if you want to update your pantry."
@@ -870,7 +872,8 @@
       "title": "Pantry update",
       "message": "Another device wants to sync its pantry with yours. This will replace your current pantry with theirs. Do you want to apply it?",
       "confirm": "Yes, update",
-      "dismiss": "No, cancel"
+      "dismiss": "No, cancel",
+      "errorTitle": "Could not apply the sync"
     }
   }
 }

@@ -80,6 +80,7 @@
             detail="true"
             routerLink="/settings/notificaciones"
           >
+            <ion-icon slot="start" name="notifications-outline" color="primary"></ion-icon>
             <ion-label>
               <h3>{{ "settings.notifications.openTitle" | translate }}</h3>
               <p>{{ "settings.notifications.openSubtitle" | translate }}</p>
@@ -88,26 +89,6 @@
         </ion-list>
       </ion-card-content>
     </ion-card>
-
-    <!-- ── Planificador IA (Pro) ──────────────────────────────── -->
-    @if (isPro) {
-      <ion-card class="settings-card">
-        <ion-card-header>
-          <ion-card-title>{{ "settings.ai.title" | translate }}</ion-card-title>
-          <ion-card-subtitle>{{ "settings.ai.subtitle" | translate }}</ion-card-subtitle>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-list lines="none">
-            <ion-item lines="none" button detail="true" routerLink="/settings/ai">
-              <ion-label>
-                <h3>{{ "settings.ai.contextTitle" | translate }}</h3>
-                <p>{{ "settings.ai.contextDescription" | translate }}</p>
-              </ion-label>
-            </ion-item>
-          </ion-list>
-        </ion-card-content>
-      </ion-card>
-    }
 
     <!-- ── Despensa compartida ─────────────────────────────────── -->
     <ion-card class="settings-card">
@@ -123,6 +104,7 @@
             detail="true"
             routerLink="/settings/sync"
           >
+            <ion-icon slot="start" name="swap-horizontal-outline" color="primary"></ion-icon>
             <ion-label>
               <h3>{{ "sync.openTitle" | translate }}</h3>
               <p>{{ "sync.openSubtitle" | translate }}</p>
@@ -146,6 +128,7 @@
             detail="true"
             routerLink="/settings/avanzado"
           >
+            <ion-icon slot="start" name="archive-outline" color="primary"></ion-icon>
             <ion-label>
               <h3>{{ "settings.advanced.openTitle" | translate }}</h3>
               <p>{{ "settings.advanced.openSubtitle" | translate }}</p>
@@ -154,6 +137,27 @@
         </ion-list>
       </ion-card-content>
     </ion-card>
+
+    <!-- ── Planificador IA (Pro) ──────────────────────────────── -->
+    @if (isPro) {
+      <ion-card class="settings-card">
+        <ion-card-header>
+          <ion-card-title>{{ "settings.ai.title" | translate }}</ion-card-title>
+          <ion-card-subtitle>{{ "settings.ai.subtitle" | translate }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list lines="none">
+            <ion-item lines="none" button detail="true" routerLink="/settings/ai">
+              <ion-icon slot="start" name="sparkles-outline" color="primary"></ion-icon>
+              <ion-label>
+                <h3>{{ "settings.ai.contextTitle" | translate }}</h3>
+                <p>{{ "settings.ai.contextDescription" | translate }}</p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    }
 
     @if (isDev) {
     <ion-card class="settings-card">

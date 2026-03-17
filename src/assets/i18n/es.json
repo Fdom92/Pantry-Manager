@@ -853,6 +853,7 @@
     "openTitle": "Sincronizar con otro móvil",
     "openSubtitle": "Envía o recibe la despensa completa desde otro dispositivo.",
     "send": {
+      "step": "Paso 1 — En este móvil",
       "title": "Enviar mi despensa",
       "subtitle": "Transfiere una copia exacta de tu despensa al otro dispositivo.",
       "actionTitle": "Enviar al otro dispositivo",
@@ -861,7 +862,8 @@
       "shareText": "Actualiza la despensa en otro dispositivo con PantryMind."
     },
     "receive": {
-      "title": "¿Cómo recibir?",
+      "step": "Paso 2 — En el otro móvil",
+      "title": "Recibir la despensa",
       "subtitle": "No hace falta hacer nada especial en el otro móvil.",
       "howTitle": "Recepción automática",
       "howDescription": "Cuando recibas el archivo del otro dispositivo, ábrelo directamente. PantryMind lo detectará y te preguntará si quieres actualizar tu despensa."
@@ -870,7 +872,8 @@
       "title": "Actualización de despensa",
       "message": "Otro dispositivo quiere sincronizar su despensa contigo. Esto reemplazará tu despensa actual por la suya. ¿Quieres aplicarlo?",
       "confirm": "Sí, actualizar",
-      "dismiss": "No, cancelar"
+      "dismiss": "No, cancelar",
+      "errorTitle": "No se pudo aplicar la sincronización"
     }
   }
 }

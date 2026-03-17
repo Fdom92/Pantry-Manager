@@ -852,6 +852,7 @@
     "openTitle": "Mit einem anderen Handy synchronisieren",
     "openSubtitle": "Sende oder empfange den gesamten Vorrat von einem anderen Gerät.",
     "send": {
+      "step": "Schritt 1 — Auf diesem Handy",
       "title": "Meinen Vorrat senden",
       "subtitle": "Überträgt eine exakte Kopie deines Vorrats auf das andere Gerät.",
       "actionTitle": "An anderes Gerät senden",
@@ -860,7 +861,8 @@
       "shareText": "Vorrat auf einem anderen Gerät mit PantryMind aktualisieren."
     },
     "receive": {
-      "title": "Wie empfangen?",
+      "step": "Schritt 2 — Auf dem anderen Handy",
+      "title": "Vorrat empfangen",
       "subtitle": "Auf dem anderen Handy ist keine besondere Einrichtung nötig.",
       "howTitle": "Automatischer Empfang",
       "howDescription": "Wenn du die Datei vom anderen Gerät erhältst, öffne sie einfach. PantryMind erkennt sie und fragt, ob du deinen Vorrat aktualisieren möchtest."
@@ -869,7 +871,8 @@
       "title": "Vorrat-Aktualisierung",
       "message": "Ein anderes Gerät möchte seinen Vorrat mit dir synchronisieren. Dein aktueller Vorrat wird dadurch ersetzt. Möchtest du es übernehmen?",
       "confirm": "Ja, übernehmen",
-      "dismiss": "Nein, abbrechen"
+      "dismiss": "Nein, abbrechen",
+      "errorTitle": "Synchronisierung konnte nicht angewendet werden"
     }
   }
 }

@@ -21,6 +21,7 @@ import {
   alertCircle,
   alertCircleOutline,
   apertureOutline,
+  archiveOutline,
   arrowForwardOutline,
   basketOutline,
   bulbOutline,
@@ -62,6 +63,7 @@ import {
   navigateOutline,
   notificationsOutline,
   paperPlaneOutline,
+  phonePortraitOutline,
   pricetagOutline,
   refreshOutline,
   remove,
@@ -184,7 +186,9 @@ addIcons({
   'warning-outline': warningOutline,
   'close-circle': closeCircle,
   'stats-chart-outline': statsChartOutline,
-  'share-social-outline': shareSocialOutline
+  'share-social-outline': shareSocialOutline,
+  'archive-outline': archiveOutline,
+  'phone-portrait-outline': phonePortraitOutline
 });
 
 bootstrapApplication(AppComponent, {

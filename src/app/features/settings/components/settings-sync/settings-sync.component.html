@@ -10,9 +10,10 @@
 <ion-content class="ion-padding">
   <div class="settings-content">
 
-    <!-- Send -->
+    <!-- Step 1: Send -->
     <ion-card class="settings-card">
       <ion-card-header>
+        <ion-note color="medium">{{ "sync.send.step" | translate }}</ion-note>
         <ion-card-title>{{ "sync.send.title" | translate }}</ion-card-title>
         <ion-card-subtitle>{{ "sync.send.subtitle" | translate }}</ion-card-subtitle>
       </ion-card-header>
@@ -41,9 +42,10 @@
       </ion-card-content>
     </ion-card>
 
-    <!-- Receive -->
+    <!-- Step 2: Receive -->
     <ion-card class="settings-card">
       <ion-card-header>
+        <ion-note color="medium">{{ "sync.receive.step" | translate }}</ion-note>
         <ion-card-title>{{ "sync.receive.title" | translate }}</ion-card-title>
         <ion-card-subtitle>{{ "sync.receive.subtitle" | translate }}</ion-card-subtitle>
       </ion-card-header>
@@ -54,7 +56,6 @@
               <h3>{{ "sync.receive.howTitle" | translate }}</h3>
               <p>{{ "sync.receive.howDescription" | translate }}</p>
             </ion-label>
-            <ion-icon slot="end" name="information-circle-outline" color="medium"></ion-icon>
           </ion-item>
         </ion-list>
       </ion-card-content>
