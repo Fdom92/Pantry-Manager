@@ -666,43 +666,43 @@
       "saveError": "No se pudo guardar el contexto."
     },
     "advanced": {
-      "title": "Avanzado",
-      "subtitle": "Herramientas para datos y catálogos.",
-      "openTitle": "Abrir avanzado",
-      "openSubtitle": "Gestiona catálogos y datos del dispositivo."
+      "title": "Datos",
+      "subtitle": "Copias de seguridad y catálogos de tu despensa.",
+      "openTitle": "Copia de seguridad y catálogos",
+      "openSubtitle": "Exporta tus datos o gestiona categorías y ubicaciones."
     },
     "data": {
-      "title": "Gestión de datos",
-      "subtitle": "Controla lo que se guarda en este dispositivo.",
-      "resetTitle": "Borrar datos",
-      "resetDescription": "Elimina todo lo guardado en este dispositivo.",
-      "resetAction": "Limpiar",
-      "exportTitle": "Exportar datos",
-      "exportDescription": "Descarga un archivo de copia de seguridad.",
+      "title": "Copia de seguridad manual",
+      "subtitle": "Guarda o restaura tus datos en un archivo. Útil para cambiar de móvil o guardar un respaldo.",
+      "resetTitle": "Borrar todos los datos",
+      "resetDescription": "Elimina toda la despensa y el historial de este dispositivo. No se puede deshacer.",
+      "resetAction": "Borrar",
+      "exportTitle": "Guardar copia de seguridad",
+      "exportDescription": "Genera un archivo con todos tus datos. Guárdalo en Drive, envíalo por WhatsApp o como prefieras.",
       "exportAction": "Exportar",
-      "importTitle": "Importar datos",
-      "importDescription": "Restaura una copia de seguridad anterior.",
+      "importTitle": "Restaurar copia de seguridad",
+      "importDescription": "Importa un archivo de respaldo guardado anteriormente. Reemplazará los datos actuales.",
       "importAction": "Importar"
     },
     "reset": {
-      "confirm": "Esto eliminará todos los datos guardados en este dispositivo.\n¿Quieres continuar?",
-      "success": "Datos locales eliminados.",
-      "error": "No se pudo limpiar la aplicación."
+      "confirm": "Esto eliminará toda la despensa, el historial y los ajustes de este dispositivo.\n\nEsta acción no se puede deshacer. ¿Quieres continuar?",
+      "success": "Todos los datos han sido eliminados.",
+      "error": "No se pudieron eliminar los datos."
     },
     "export": {
       "unavailable": "La exportación no está disponible en este entorno.",
       "readyToShare": "Tu copia está lista para compartir.",
-      "success": "Datos exportados.",
-      "error": "No se pudieron exportar los datos.",
-      "shareTitle": "Pantry Manager - Respaldo",
-      "shareText": "Exporta o comparte tu copia de seguridad."
+      "success": "Copia de seguridad exportada.",
+      "error": "No se pudo exportar la copia de seguridad.",
+      "shareTitle": "PantryMind — Copia de seguridad",
+      "shareText": "Guarda o comparte tu copia de seguridad de PantryMind."
     },
     "import": {
-      "confirm": "Esto reemplazará tus datos actuales con el archivo seleccionado. ¿Quieres continuar?",
-      "success": "Datos importados. Reiniciando la app...",
-      "error": "No se pudieron importar los datos. Comprueba el fichero.",
-      "invalid": "El fichero seleccionado no es una copia válida.",
-      "empty": "El fichero no contiene datos para importar."
+      "confirm": "Esto reemplazará todos tus datos actuales con los del archivo seleccionado. Asegúrate de que es la copia correcta. ¿Continuar?",
+      "success": "Datos restaurados. Reiniciando la app...",
+      "error": "No se pudo restaurar la copia. Comprueba que el archivo es correcto.",
+      "invalid": "El archivo seleccionado no es una copia de seguridad válida.",
+      "empty": "El archivo no contiene datos para restaurar."
     },
     "loadError": "Ocurrió un problema cargando los ajustes.",
     "catalogs": {
@@ -802,7 +802,7 @@
       "notificationPreviewNone": "No se programaría ninguna notificación. Comprueba que los items y preferencias coincidan con los criterios."
     },
     "info": {
-      "title": "Acerca de",
+      "title": "Información",
       "subtitle": "Versión, valoraciones y soporte.",
       "version": "Versión",
       "feedbackTitle": "Enviar comentarios",
@@ -813,10 +813,10 @@
       "rateAction": "Valorar en Play Store"
     },
     "notifications": {
+      "subtitle": "Configura cuándo y sobre qué quieres recibir avisos.",
+      "openTitle": "Gestionar notificaciones",
+      "openSubtitle": "Alertas de caducidad, stock bajo y más.",
       "title": "Notificaciones",
-      "subtitle": "Configura alertas diarias para tu despensa",
-      "openTitle": "Configuración de notificaciones",
-      "openSubtitle": "Gestiona las alertas y sobre qué recibir avisos",
       "enabledTitle": "Activar notificaciones",
       "enabledDescription": "Recibe un resumen diario del estado de tu despensa",
       "expiredTitle": "Productos caducados",
@@ -845,6 +845,32 @@
     "lowStock": {
       "title": "Se te están acabando algunas cosas",
       "body": "{{ count }} básicos están por debajo del mínimo que marcaste"
+    }
+  },
+  "sync": {
+    "title": "Despensa compartida",
+    "subtitle": "Sincroniza la despensa con tu pareja o familia.",
+    "openTitle": "Sincronizar con otro móvil",
+    "openSubtitle": "Envía o recibe la despensa completa desde otro dispositivo.",
+    "send": {
+      "title": "Enviar mi despensa",
+      "subtitle": "Transfiere una copia exacta de tu despensa al otro dispositivo.",
+      "actionTitle": "Enviar al otro dispositivo",
+      "actionDescription": "Se abrirá el menú de compartir. Elige Nearby Share, WhatsApp o cualquier otra app.",
+      "shareTitle": "PantryMind — Sincronización",
+      "shareText": "Actualiza la despensa en otro dispositivo con PantryMind."
+    },
+    "receive": {
+      "title": "¿Cómo recibir?",
+      "subtitle": "No hace falta hacer nada especial en el otro móvil.",
+      "howTitle": "Recepción automática",
+      "howDescription": "Cuando recibas el archivo del otro dispositivo, ábrelo directamente. PantryMind lo detectará y te preguntará si quieres actualizar tu despensa."
+    },
+    "incoming": {
+      "title": "Actualización de despensa",
+      "message": "Otro dispositivo quiere sincronizar su despensa contigo. Esto reemplazará tu despensa actual por la suya. ¿Quieres aplicarlo?",
+      "confirm": "Sí, actualizar",
+      "dismiss": "No, cancelar"
     }
   }
 }

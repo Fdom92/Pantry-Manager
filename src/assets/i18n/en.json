@@ -666,43 +666,43 @@
       "saveError": "Could not save the planner context."
     },
     "advanced": {
-      "title": "Advanced",
-      "subtitle": "Tools for data and catalogs.",
-      "openTitle": "Open advanced",
-      "openSubtitle": "Manage catalogs and data on this device."
+      "title": "Data",
+      "subtitle": "Backups and your pantry catalogs.",
+      "openTitle": "Backup & catalogs",
+      "openSubtitle": "Export your data or manage categories and locations."
     },
     "data": {
-      "title": "Data management",
-      "subtitle": "Control what’s saved on this device.",
-      "resetTitle": "Clear data",
-      "resetDescription": "Remove everything saved on this device.",
-      "resetAction": "Clear",
-      "exportTitle": "Export data",
-      "exportDescription": "Download a backup file with your data.",
+      "title": "Manual backup",
+      "subtitle": "Save or restore your data as a file. Useful when switching phones or keeping a personal backup.",
+      "resetTitle": "Delete all data",
+      "resetDescription": "Removes all pantry items, history and settings from this device. Cannot be undone.",
+      "resetAction": "Delete",
+      "exportTitle": "Save backup",
+      "exportDescription": "Creates a file with all your data. Save it to Drive, send it via WhatsApp or however you prefer.",
       "exportAction": "Export",
-      "importTitle": "Import data",
-      "importDescription": "Restore a backup you exported earlier.",
+      "importTitle": "Restore backup",
+      "importDescription": "Import a previously saved backup file. This will replace your current data.",
       "importAction": "Import"
     },
     "reset": {
-      "confirm": "This will delete all data saved on this device.\nDo you want to continue?",
-      "success": "Local data removed.",
-      "error": "Could not clear the app."
+      "confirm": "This will delete all pantry items, history and settings from this device.\n\nThis action cannot be undone. Do you want to continue?",
+      "success": "All data has been deleted.",
+      "error": "Could not delete the data."
     },
     "export": {
       "unavailable": "Export is not available in this environment.",
       "readyToShare": "Your backup is ready to share.",
-      "success": "Data exported.",
-      "error": "Could not export the data.",
-      "shareTitle": "Pantry Manager - Backup",
-      "shareText": "Export or share your pantry backup."
+      "success": "Backup exported.",
+      "error": "Could not export the backup.",
+      "shareTitle": "PantryMind — Backup",
+      "shareText": "Save or share your PantryMind backup."
     },
     "import": {
-      "confirm": "This will replace your current data with the selected file. Continue?",
-      "success": "Data imported. Restarting the app...",
-      "error": "Could not import the data. Please check the file.",
+      "confirm": "This will replace all your current data with the selected file. Make sure it is the right backup. Continue?",
+      "success": "Data restored. Restarting app...",
+      "error": "Could not restore the backup. Check that the file is correct.",
       "invalid": "The selected file is not a valid backup.",
-      "empty": "The file has no data to import."
+      "empty": "The file contains no data to restore."
     },
     "loadError": "There was a problem loading settings.",
     "catalogs": {
@@ -802,7 +802,7 @@
       "notificationPreviewNone": "No notification would be scheduled. Check that items and preferences match the notification criteria."
     },
     "info": {
-      "title": "About",
+      "title": "Information",
       "subtitle": "Version, ratings and support.",
       "version": "Version",
       "feedbackTitle": "Send feedback",
@@ -813,10 +813,10 @@
       "rateAction": "Rate on Play Store"
     },
     "notifications": {
+      "subtitle": "Configure when and what you want to be notified about.",
+      "openTitle": "Manage notifications",
+      "openSubtitle": "Expiry alerts, low stock and more.",
       "title": "Notifications",
-      "subtitle": "Configure daily alerts for your pantry",
-      "openTitle": "Notification settings",
-      "openSubtitle": "Manage alerts and what to be notified about",
       "enabledTitle": "Enable notifications",
       "enabledDescription": "Receive a daily summary of your pantry status",
       "expiredTitle": "Expired products",
@@ -845,6 +845,32 @@
     "lowStock": {
       "title": "Running low on some essentials",
       "body": "{{ count }} of your staples are getting low"
+    }
+  },
+  "sync": {
+    "title": "Shared pantry",
+    "subtitle": "Keep the pantry in sync with your partner or family.",
+    "openTitle": "Sync with another phone",
+    "openSubtitle": "Send or receive the full pantry from another device.",
+    "send": {
+      "title": "Send my pantry",
+      "subtitle": "Transfer an exact copy of your pantry to the other device.",
+      "actionTitle": "Send to another device",
+      "actionDescription": "The share menu will open. Choose Nearby Share, WhatsApp or any other app.",
+      "shareTitle": "PantryMind — Sync",
+      "shareText": "Update the pantry on another device with PantryMind."
+    },
+    "receive": {
+      "title": "How to receive?",
+      "subtitle": "No special setup needed on the other phone.",
+      "howTitle": "Automatic reception",
+      "howDescription": "When you receive the file from the other device, just open it. PantryMind will detect it and ask if you want to update your pantry."
+    },
+    "incoming": {
+      "title": "Pantry update",
+      "message": "Another device wants to sync its pantry with yours. This will replace your current pantry with theirs. Do you want to apply it?",
+      "confirm": "Yes, update",
+      "dismiss": "No, cancel"
     }
   }
 }

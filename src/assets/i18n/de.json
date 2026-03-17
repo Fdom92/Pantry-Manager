@@ -665,43 +665,43 @@
       "saveError": "Planer-Kontext konnte nicht gespeichert werden."
     },
     "advanced": {
-      "title": "Erweitert",
-      "subtitle": "Tools für Daten und Kataloge.",
-      "openTitle": "Erweitert öffnen",
-      "openSubtitle": "Kataloge und Gerätedaten verwalten."
+      "title": "Daten",
+      "subtitle": "Sicherungen und Kataloge deines Vorrats.",
+      "openTitle": "Sicherung & Kataloge",
+      "openSubtitle": "Daten exportieren oder Kategorien und Standorte verwalten."
     },
     "data": {
-      "title": "Datenverwaltung",
-      "subtitle": "Verwalte, was auf diesem Gerät gespeichert ist.",
-      "resetTitle": "Daten löschen",
-      "resetDescription": "Entfernt alles, was auf diesem Gerät gespeichert ist.",
+      "title": "Manuelle Sicherung",
+      "subtitle": "Speichere oder stelle deine Daten als Datei wieder her. Praktisch beim Gerätewechsel.",
+      "resetTitle": "Alle Daten löschen",
+      "resetDescription": "Entfernt alle Vorratsgegenstände, den Verlauf und die Einstellungen von diesem Gerät. Kann nicht rückgängig gemacht werden.",
       "resetAction": "Löschen",
-      "exportTitle": "Daten exportieren",
-      "exportDescription": "Lade eine Sicherungsdatei herunter.",
+      "exportTitle": "Sicherung speichern",
+      "exportDescription": "Erstellt eine Datei mit allen deinen Daten. Speichere sie auf Drive, sende sie per WhatsApp oder wie du möchtest.",
       "exportAction": "Exportieren",
-      "importTitle": "Daten importieren",
-      "importDescription": "Stelle eine zuvor exportierte Sicherung wieder her.",
+      "importTitle": "Sicherung wiederherstellen",
+      "importDescription": "Importiere eine zuvor gespeicherte Sicherungsdatei. Dies ersetzt deine aktuellen Daten.",
       "importAction": "Importieren"
     },
     "reset": {
-      "confirm": "Dadurch werden alle auf diesem Gerät gespeicherten Daten gelöscht.\nMöchtest du fortfahren?",
-      "success": "Lokale Daten gelöscht.",
-      "error": "Die App konnte nicht bereinigt werden."
+      "confirm": "Dies löscht alle Vorratsgegenstände, den Verlauf und die Einstellungen von diesem Gerät.\n\nDieser Vorgang kann nicht rückgängig gemacht werden. Möchtest du fortfahren?",
+      "success": "Alle Daten wurden gelöscht.",
+      "error": "Daten konnten nicht gelöscht werden."
     },
     "export": {
-      "unavailable": "Der Export ist in dieser Umgebung nicht verfügbar.",
+      "unavailable": "Export ist in dieser Umgebung nicht verfügbar.",
       "readyToShare": "Deine Sicherung ist bereit zum Teilen.",
-      "success": "Daten exportiert.",
-      "error": "Die Daten konnten nicht exportiert werden.",
-      "shareTitle": "Pantry Manager – Sicherung",
-      "shareText": "Exportiere oder teile dein Backup."
+      "success": "Sicherung exportiert.",
+      "error": "Sicherung konnte nicht exportiert werden.",
+      "shareTitle": "PantryMind — Sicherung",
+      "shareText": "Speichere oder teile deine PantryMind-Sicherung."
     },
     "import": {
-      "confirm": "Dies ersetzt deine aktuellen Daten durch die ausgewählte Datei. Möchtest du fortfahren?",
-      "success": "Daten importiert. App wird neu gestartet…",
-      "error": "Die Daten konnten nicht importiert werden. Bitte überprüfe die Datei.",
-      "invalid": "Die ausgewählte Datei ist kein gültiges Backup.",
-      "empty": "Die Datei enthält keine importierbaren Daten."
+      "confirm": "Dies ersetzt alle aktuellen Daten durch die ausgewählte Datei. Stelle sicher, dass es die richtige Sicherung ist. Fortfahren?",
+      "success": "Daten wiederhergestellt. App wird neu gestartet...",
+      "error": "Sicherung konnte nicht wiederhergestellt werden. Überprüfe die Datei.",
+      "invalid": "Die ausgewählte Datei ist keine gültige Sicherung.",
+      "empty": "Die Datei enthält keine Daten zur Wiederherstellung."
     },
     "loadError": "Beim Laden der Einstellungen ist ein Problem aufgetreten.",
     "catalogs": {
@@ -801,7 +801,7 @@
       "notificationPreviewNone": "Keine Benachrichtigung würde geplant. Prüfe ob Items und Einstellungen den Kriterien entsprechen."
     },
     "info": {
-      "title": "Über die App",
+      "title": "Informationen",
       "subtitle": "Version, Bewertungen und Support.",
       "version": "Version",
       "feedbackTitle": "Feedback senden",
@@ -812,10 +812,10 @@
       "rateAction": "Im Play Store bewerten"
     },
     "notifications": {
+      "subtitle": "Konfiguriere, wann und worüber du benachrichtigt werden möchtest.",
+      "openTitle": "Benachrichtigungen verwalten",
+      "openSubtitle": "Ablaufwarnungen, geringer Lagerbestand und mehr.",
       "title": "Benachrichtigungen",
-      "subtitle": "Tägliche Benachrichtigungen für Ihre Vorratskammer konfigurieren",
-      "openTitle": "Benachrichtigungseinstellungen",
-      "openSubtitle": "Verwalten Sie Benachrichtigungen und worüber Sie informiert werden möchten",
       "enabledTitle": "Benachrichtigungen aktivieren",
       "enabledDescription": "Erhalten Sie eine tägliche Zusammenfassung Ihres Vorratskammerstatus",
       "expiredTitle": "Abgelaufene Produkte",
@@ -844,6 +844,32 @@
     "lowStock": {
       "title": "Einige Vorräte werden knapp",
       "body": "{{ count }} wichtige Produkte liegen unter deinem Minimum"
+    }
+  },
+  "sync": {
+    "title": "Geteilter Vorrat",
+    "subtitle": "Halte den Vorrat mit deinem Partner oder deiner Familie synchron.",
+    "openTitle": "Mit einem anderen Handy synchronisieren",
+    "openSubtitle": "Sende oder empfange den gesamten Vorrat von einem anderen Gerät.",
+    "send": {
+      "title": "Meinen Vorrat senden",
+      "subtitle": "Überträgt eine exakte Kopie deines Vorrats auf das andere Gerät.",
+      "actionTitle": "An anderes Gerät senden",
+      "actionDescription": "Das Teilen-Menü öffnet sich. Wähle Nearby Share, WhatsApp oder eine andere App.",
+      "shareTitle": "PantryMind — Synchronisierung",
+      "shareText": "Vorrat auf einem anderen Gerät mit PantryMind aktualisieren."
+    },
+    "receive": {
+      "title": "Wie empfangen?",
+      "subtitle": "Auf dem anderen Handy ist keine besondere Einrichtung nötig.",
+      "howTitle": "Automatischer Empfang",
+      "howDescription": "Wenn du die Datei vom anderen Gerät erhältst, öffne sie einfach. PantryMind erkennt sie und fragt, ob du deinen Vorrat aktualisieren möchtest."
+    },
+    "incoming": {
+      "title": "Vorrat-Aktualisierung",
+      "message": "Ein anderes Gerät möchte seinen Vorrat mit dir synchronisieren. Dein aktueller Vorrat wird dadurch ersetzt. Möchtest du es übernehmen?",
+      "confirm": "Ja, übernehmen",
+      "dismiss": "Nein, abbrechen"
     }
   }
 }
