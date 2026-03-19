@@ -345,7 +345,7 @@
       "addExpiryDates": {
         "title": "Aggiungi le date di scadenza",
         "description": "Tieni traccia di cosa usare prima ed evita brutte sorprese nella dispensa.",
-        "cta": "Vai alla dispensa"
+        "cta": "Aggiungi date"
       },
       "organizeWithCategories": {
         "title": "Organizza la dispensa per categorie",
@@ -882,6 +882,7 @@
     }
   },
   "batchEdit": {
+    "expiryDateHint": "Vengono mostrati solo i prodotti con un singolo lotto.",
     "actions": {
       "setFoodType": "Imposta tipo di alimento",
       "setCategory": "Imposta categoria",

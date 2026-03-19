@@ -345,7 +345,7 @@
       "addExpiryDates": {
         "title": "Añade fechas de caducidad",
         "description": "Con fechas en tus productos sabrás siempre qué usar primero y evitarás sorpresas.",
-        "cta": "Ir a despensa"
+        "cta": "Añadir fechas"
       },
       "organizeWithCategories": {
         "title": "Organiza tu despensa por categorías",
@@ -883,6 +883,7 @@
     }
   },
   "batchEdit": {
+    "expiryDateHint": "Solo se muestran productos con un único lote.",
     "actions": {
       "setFoodType": "Asignar tipo de alimento",
       "setCategory": "Asignar categoría",

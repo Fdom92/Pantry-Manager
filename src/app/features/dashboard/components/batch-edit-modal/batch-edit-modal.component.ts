@@ -41,6 +41,7 @@ import { BatchEditStateService } from '@core/services/dashboard/batch-edit-state
     DateChipComponent,
   ],
   templateUrl: './batch-edit-modal.component.html',
+  styleUrls: ['./batch-edit-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BatchEditModalComponent {

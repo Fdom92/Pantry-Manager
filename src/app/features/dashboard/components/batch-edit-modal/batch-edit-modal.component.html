@@ -50,6 +50,7 @@
 
       <!-- Expiry date: date chip per item -->
       @if (state.action() === 'setExpiryDate') {
+        <p class="batch-edit-hint">{{ 'batchEdit.expiryDateHint' | translate }}</p>
         <ion-list lines="full">
           @for (item of state.filteredItems(); track item._id) {
             <ion-item>

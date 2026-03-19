@@ -345,7 +345,7 @@
       "addExpiryDates": {
         "title": "Add expiry dates to your items",
         "description": "Track what to use first and avoid unpleasant surprises in your pantry.",
-        "cta": "Go to pantry"
+        "cta": "Add dates"
       },
       "organizeWithCategories": {
         "title": "Organize your pantry by category",
@@ -883,6 +883,7 @@
     }
   },
   "batchEdit": {
+    "expiryDateHint": "Only products with a single batch are shown.",
     "actions": {
       "setFoodType": "Set food type",
       "setCategory": "Set category",

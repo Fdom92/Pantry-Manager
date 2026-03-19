@@ -345,7 +345,7 @@
       "addExpiryDates": {
         "title": "Ajoutez des dates de péremption",
         "description": "Sachez toujours quoi utiliser en premier et évitez les mauvaises surprises dans votre garde-manger.",
-        "cta": "Aller au garde-manger"
+        "cta": "Ajouter les dates"
       },
       "organizeWithCategories": {
         "title": "Organisez votre garde-manger par catégories",
@@ -882,6 +882,7 @@
     }
   },
   "batchEdit": {
+    "expiryDateHint": "Seuls les produits avec un seul lot sont affichés.",
     "actions": {
       "setFoodType": "Définir le type d'aliment",
       "setCategory": "Définir la catégorie",

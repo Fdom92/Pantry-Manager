@@ -345,7 +345,7 @@
       "addExpiryDates": {
         "title": "Ablaufdaten hinzufügen",
         "description": "Behalte den Überblick, was zuerst verwendet werden soll, und vermeide unangenehme Überraschungen.",
-        "cta": "Zur Vorratskammer"
+        "cta": "Daten hinzufügen"
       },
       "organizeWithCategories": {
         "title": "Vorratskammer nach Kategorien ordnen",
@@ -882,6 +882,7 @@
     }
   },
   "batchEdit": {
+    "expiryDateHint": "Es werden nur Produkte mit einer einzigen Charge angezeigt.",
     "actions": {
       "setFoodType": "Lebensmitteltyp festlegen",
       "setCategory": "Kategorie festlegen",
