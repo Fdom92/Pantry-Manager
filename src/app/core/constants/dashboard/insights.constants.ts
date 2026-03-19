@@ -68,7 +68,7 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
     id: InsightId.MISSING_FOODTYPE,
     titleKey: 'insights.library.missingFoodType.title',
     descriptionKey: 'insights.library.missingFoodType.description',
-    category: InsightCategory.BEHAVIOR,
+    category: InsightCategory.OPTIMIZATION,
     priority: 4,
     audience: 'all',
     predicate: context => context.products.some(p => !p.foodType),
