@@ -26,7 +26,7 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
       },
     ],
   },
-  // Data quality: nudge to add expiry dates (only shown when relevant)
+  // Data quality: nudge to add expiry dates via batch edit (single-batch items only)
   {
     id: InsightId.ADD_EXPIRY_DATES,
     titleKey: 'insights.library.addExpiryDates.title',
@@ -34,13 +34,14 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
     category: InsightCategory.BEHAVIOR,
     priority: 2,
     audience: 'all',
-    predicate: context => context.noExpiryDateCount > 0,
+    predicate: context => context.singleBatchNoExpiryCount > 0,
     ctas: [
       {
         id: 'add-expiry-dates',
         labelKey: 'insights.library.addExpiryDates.cta',
-        type: 'navigate',
-        route: '/pantry',
+        type: 'batch-edit',
+        filter: 'noExpiryDateSingleBatch',
+        action: 'setExpiryDate',
       },
     ],
   },

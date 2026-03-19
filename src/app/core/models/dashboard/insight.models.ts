@@ -95,6 +95,7 @@ export interface InsightProductSummary {
 export interface InsightContext {
   expiringSoonItems: InsightExpiringItem[];
   noExpiryDateCount: number;
+  singleBatchNoExpiryCount: number;
   products: InsightProductSummary[];
 }
 export interface InsightPredicateHelpers {

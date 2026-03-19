@@ -11,7 +11,6 @@ export interface PantryItem extends BaseDoc {
   batches: ItemBatch[];
   isBasic?: boolean;
   minThreshold?: number;
-  noExpiry?: boolean;
   expirationDate?: string;
   expirationStatus?: ExpirationStatus;
   foodType?: FoodType;

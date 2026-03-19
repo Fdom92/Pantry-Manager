@@ -884,7 +884,8 @@
   "batchEdit": {
     "actions": {
       "setFoodType": "Lebensmitteltyp festlegen",
-      "setCategory": "Kategorie festlegen"
+      "setCategory": "Kategorie festlegen",
+      "setExpiryDate": "Ablaufdatum festlegen"
     },
     "toast": {
       "updated_one": "1 Produkt aktualisiert",

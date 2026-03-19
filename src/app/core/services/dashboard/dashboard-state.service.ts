@@ -1,6 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { computeFoodCoverage, computePantryScore, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { applyBatchEditFilter } from '@core/models/pantry/batch-edit.model';
 import type { FoodCoverageResult, PantryScoreResult } from '@core/domain/dashboard';
 import type {
   Insight,
@@ -122,7 +123,6 @@ export class DashboardStateService {
 
   readonly noExpiryDateCount = computed(() => {
     return this.pantryItems().filter(item => {
-      if (item.noExpiry) return false;
       if (item.isBasic) return false;
       const hasBatchDate = item.batches?.some(b => !!b.expirationDate);
       const hasItemDate = !!item.expirationDate;
@@ -482,6 +482,7 @@ export class DashboardStateService {
         quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       noExpiryDateCount: this.noExpiryDateCount(),
+      singleBatchNoExpiryCount: applyBatchEditFilter(items, 'noExpiryDateSingleBatch').length,
       products: items.map(item => ({
         id: item._id,
         name: item.name,

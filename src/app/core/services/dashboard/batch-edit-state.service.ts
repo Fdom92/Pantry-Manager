@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { ToastController } from '@ionic/angular/standalone';
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
+import { applyBatchEditFilter } from '@core/models/pantry/batch-edit.model';
 import type { BatchEditAction, BatchEditFilter, BatchEditFlowConfig } from '@core/models/pantry/batch-edit.model';
 import { buildUniqueSelectOptions } from '@core/utils';
 import { formatFriendlyName, normalizeStringList } from '@core/utils/normalization.util';
@@ -38,6 +39,7 @@ export class BatchEditStateService {
     const action = this.config()?.action;
     if (action === 'setFoodType') return 'batchEdit.actions.setFoodType';
     if (action === 'setCategory') return 'batchEdit.actions.setCategory';
+    if (action === 'setExpiryDate') return 'batchEdit.actions.setExpiryDate';
     return 'batchEdit.actions.setCategory';
   });
 
@@ -84,6 +86,10 @@ export class BatchEditStateService {
     });
   }
 
+  getItemExpiryDate(id: string): string | undefined {
+    return this.itemValues().get(id) ?? undefined;
+  }
+
   getItemDisplayValue(id: string): string {
     const value = this.itemValues().get(id);
     if (this.action() === 'setFoodType') {
@@ -125,14 +131,12 @@ export class BatchEditStateService {
     const base = { ...item, updatedAt: now };
     if (action === 'setFoodType') return { ...base, foodType: value as FoodType };
     if (action === 'setCategory') return { ...base, categoryId: value };
+    if (action === 'setExpiryDate') return { ...base, batches: [{ ...base.batches[0], expirationDate: value }] };
     return base;
   }
 
   private filterItems(items: PantryItem[], filter: BatchEditFilter): PantryItem[] {
-    switch (filter) {
-      case 'noFoodType': return items.filter(i => !i.foodType);
-      case 'noCategory': return items.filter(i => !i.categoryId);
-    }
+    return applyBatchEditFilter(items, filter);
   }
 
   private async showSuccessToast(count: number): Promise<void> {

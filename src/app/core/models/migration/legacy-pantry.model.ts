@@ -22,5 +22,4 @@ export interface LegacyPantryItem extends BaseDoc {
   batches?: ItemBatch[];
   isBasic?: boolean;
   minThreshold?: number;
-  noExpiry?: boolean;
 }
