@@ -54,7 +54,8 @@
       "save": "Guardar",
       "edit": "Editar",
       "apply": "Aplicar",
-      "clear": "Limpar"
+      "clear": "Limpar",
+      "next": "Seguinte"
     },
     "loading": "A carregar…",
     "dates": {
@@ -344,12 +345,17 @@
       "addExpiryDates": {
         "title": "Adicione datas de validade",
         "description": "Saiba sempre o que usar primeiro e evite surpresas desagradáveis na despensa.",
-        "cta": "Ir à despensa"
+        "cta": "Adicionar datas"
       },
       "organizeWithCategories": {
         "title": "Organize a despensa por categorias",
         "description": "Agrupe os seus produtos para os encontrar mais rapidamente e ter tudo sob controlo.",
         "cta": "Organizar agora"
+      },
+      "missingFoodType": {
+        "title": "Classifique os tipos de alimento",
+        "description": "Atribua um tipo de alimento aos seus produtos para obter melhores análises e planeamento.",
+        "cta": "Classificar agora"
       },
       "planAndSaveTime": {
         "title": "Planear a semana com IA",
@@ -873,6 +879,18 @@
       "confirm": "Sim, atualizar",
       "dismiss": "Não, cancelar",
       "errorTitle": "Não foi possível aplicar a sincronização"
+    }
+  },
+  "batchEdit": {
+    "expiryDateHint": "Apenas produtos com um único lote são exibidos.",
+    "actions": {
+      "setFoodType": "Definir tipo de alimento",
+      "setCategory": "Definir categoria",
+      "setExpiryDate": "Definir data de validade"
+    },
+    "toast": {
+      "updated_one": "1 produto atualizado",
+      "updated_other": "{{ count }} produtos atualizados"
     }
   }
 }

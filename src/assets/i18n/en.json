@@ -54,7 +54,8 @@
       "save": "Save",
       "edit": "Edit",
       "apply": "Apply",
-      "clear": "Clear"
+      "clear": "Clear",
+      "next": "Next"
     },
     "loading": "Loading…",
     "dates": {
@@ -344,12 +345,17 @@
       "addExpiryDates": {
         "title": "Add expiry dates to your items",
         "description": "Track what to use first and avoid unpleasant surprises in your pantry.",
-        "cta": "Go to pantry"
+        "cta": "Add dates"
       },
       "organizeWithCategories": {
         "title": "Organize your pantry by category",
         "description": "Group your products to find them faster and keep everything under control.",
         "cta": "Organize now"
+      },
+      "missingFoodType": {
+        "title": "Classify your food types",
+        "description": "Assign a food type to your items to get better insights and meal planning.",
+        "cta": "Classify now"
       },
       "planAndSaveTime": {
         "title": "Plan the week with AI",
@@ -874,6 +880,18 @@
       "confirm": "Yes, update",
       "dismiss": "No, cancel",
       "errorTitle": "Could not apply the sync"
+    }
+  },
+  "batchEdit": {
+    "expiryDateHint": "Only products with a single batch are shown.",
+    "actions": {
+      "setFoodType": "Set food type",
+      "setCategory": "Set category",
+      "setExpiryDate": "Set expiry date"
+    },
+    "toast": {
+      "updated_one": "1 item updated",
+      "updated_other": "{{ count }} items updated"
     }
   }
 }

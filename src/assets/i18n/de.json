@@ -54,7 +54,8 @@
       "save": "Speichern",
       "edit": "Bearbeiten",
       "apply": "Anwenden",
-      "clear": "Leeren"
+      "clear": "Leeren",
+      "next": "Weiter"
     },
     "loading": "Lädt…",
     "dates": {
@@ -344,12 +345,17 @@
       "addExpiryDates": {
         "title": "Ablaufdaten hinzufügen",
         "description": "Behalte den Überblick, was zuerst verwendet werden soll, und vermeide unangenehme Überraschungen.",
-        "cta": "Zur Vorratskammer"
+        "cta": "Daten hinzufügen"
       },
       "organizeWithCategories": {
         "title": "Vorratskammer nach Kategorien ordnen",
         "description": "Gruppiere deine Produkte, um sie schneller zu finden und alles im Griff zu haben.",
         "cta": "Jetzt ordnen"
+      },
+      "missingFoodType": {
+        "title": "Lebensmitteltypen klassifizieren",
+        "description": "Weise deinen Produkten einen Lebensmitteltyp zu, um bessere Einblicke und Mahlzeitenplanung zu erhalten.",
+        "cta": "Jetzt klassifizieren"
       },
       "planAndSaveTime": {
         "title": "Woche mit KI planen",
@@ -873,6 +879,18 @@
       "confirm": "Ja, übernehmen",
       "dismiss": "Nein, abbrechen",
       "errorTitle": "Synchronisierung konnte nicht angewendet werden"
+    }
+  },
+  "batchEdit": {
+    "expiryDateHint": "Es werden nur Produkte mit einer einzigen Charge angezeigt.",
+    "actions": {
+      "setFoodType": "Lebensmitteltyp festlegen",
+      "setCategory": "Kategorie festlegen",
+      "setExpiryDate": "Ablaufdatum festlegen"
+    },
+    "toast": {
+      "updated_one": "1 Produkt aktualisiert",
+      "updated_other": "{{ count }} Produkte aktualisiert"
     }
   }
 }

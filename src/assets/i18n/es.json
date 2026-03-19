@@ -54,7 +54,8 @@
       "save": "Guardar",
       "edit": "Editar",
       "apply": "Aplicar",
-      "clear": "Limpiar"
+      "clear": "Limpiar",
+      "next": "Siguiente"
     },
     "loading": "Cargando…",
     "dates": {
@@ -344,12 +345,17 @@
       "addExpiryDates": {
         "title": "Añade fechas de caducidad",
         "description": "Con fechas en tus productos sabrás siempre qué usar primero y evitarás sorpresas.",
-        "cta": "Ir a despensa"
+        "cta": "Añadir fechas"
       },
       "organizeWithCategories": {
         "title": "Organiza tu despensa por categorías",
         "description": "Agrupa tus productos para encontrarlos más rápido y tener todo bajo control.",
         "cta": "Organizar ahora"
+      },
+      "missingFoodType": {
+        "title": "Clasifica el tipo de alimento",
+        "description": "Asigna un tipo de alimento a tus productos para obtener mejores análisis y planificación.",
+        "cta": "Clasificar ahora"
       },
       "planAndSaveTime": {
         "title": "Planifica la semana con IA",
@@ -874,6 +880,18 @@
       "confirm": "Sí, actualizar",
       "dismiss": "No, cancelar",
       "errorTitle": "No se pudo aplicar la sincronización"
+    }
+  },
+  "batchEdit": {
+    "expiryDateHint": "Solo se muestran productos con un único lote.",
+    "actions": {
+      "setFoodType": "Asignar tipo de alimento",
+      "setCategory": "Asignar categoría",
+      "setExpiryDate": "Establecer fecha de caducidad"
+    },
+    "toast": {
+      "updated_one": "1 producto actualizado",
+      "updated_other": "{{ count }} productos actualizados"
     }
   }
 }

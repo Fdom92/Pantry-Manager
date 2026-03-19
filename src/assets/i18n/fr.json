@@ -54,7 +54,8 @@
       "save": "Enregistrer",
       "edit": "Modifier",
       "apply": "Appliquer",
-      "clear": "Effacer"
+      "clear": "Effacer",
+      "next": "Suivant"
     },
     "loading": "Chargement…",
     "dates": {
@@ -344,12 +345,17 @@
       "addExpiryDates": {
         "title": "Ajoutez des dates de péremption",
         "description": "Sachez toujours quoi utiliser en premier et évitez les mauvaises surprises dans votre garde-manger.",
-        "cta": "Aller au garde-manger"
+        "cta": "Ajouter les dates"
       },
       "organizeWithCategories": {
         "title": "Organisez votre garde-manger par catégories",
         "description": "Regroupez vos produits pour les retrouver plus vite et tout garder sous contrôle.",
         "cta": "Organiser maintenant"
+      },
+      "missingFoodType": {
+        "title": "Classifiez les types d'aliments",
+        "description": "Attribuez un type d'aliment à vos produits pour obtenir de meilleures analyses et planifications.",
+        "cta": "Classifier maintenant"
       },
       "planAndSaveTime": {
         "title": "Planifier la semaine avec l'IA",
@@ -873,6 +879,18 @@
       "confirm": "Oui, mettre à jour",
       "dismiss": "Non, annuler",
       "errorTitle": "Impossible d'appliquer la synchronisation"
+    }
+  },
+  "batchEdit": {
+    "expiryDateHint": "Seuls les produits avec un seul lot sont affichés.",
+    "actions": {
+      "setFoodType": "Définir le type d'aliment",
+      "setCategory": "Définir la catégorie",
+      "setExpiryDate": "Définir la date d'expiration"
+    },
+    "toast": {
+      "updated_one": "1 produit mis à jour",
+      "updated_other": "{{ count }} produits mis à jour"
     }
   }
 }
