@@ -11,8 +11,6 @@ import { HistoryEventManagerService } from '../history/history-event-manager.ser
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 
-export type BatchEditStep = 'items' | 'action' | 'value' | 'confirm';
-
 @Injectable({ providedIn: 'root' })
 export class BatchEditStateService {
   private readonly pantryStore = inject(PantryStoreService);
@@ -22,12 +20,8 @@ export class BatchEditStateService {
   private readonly toastCtrl = inject(ToastController);
 
   readonly isOpen = signal(false);
-  readonly step = signal<BatchEditStep>('items');
   readonly config = signal<BatchEditFlowConfig | null>(null);
-  readonly selectedIds = signal<Set<string>>(new Set());
-  readonly selectedAction = signal<BatchEditAction | null>(null);
-  readonly selectedFoodType = signal<FoodType | null>(null);
-  readonly selectedCategoryId = signal<string | null>(null);
+  readonly itemValues = signal<Map<string, string>>(new Map());
   readonly isSaving = signal(false);
 
   readonly filteredItems = computed((): PantryItem[] => {
@@ -36,41 +30,37 @@ export class BatchEditStateService {
     return this.filterItems(this.pantryStore.items(), cfg.filter);
   });
 
-  readonly selectedCount = computed(() => this.selectedIds().size);
-  readonly canProceed = computed(() => this.selectedCount() > 0);
+  readonly action = computed(() => this.config()?.action ?? null);
 
-  readonly selectedFoodTypeLabel = computed(() => {
-    const ft = this.selectedFoodType();
-    if (!ft) return '';
-    return this.translate.instant(`pantry.form.foodType.${ft}`);
+  readonly canSave = computed(() => this.itemValues().size > 0);
+
+  readonly titleKey = computed(() => {
+    const action = this.config()?.action;
+    if (action === 'setFoodType') return 'batchEdit.actions.setFoodType';
+    if (action === 'setCategory') return 'batchEdit.actions.setCategory';
+    return 'batchEdit.actions.setCategory';
   });
 
-  readonly selectedCategoryLabel = computed(() => {
-    const id = this.selectedCategoryId();
-    if (!id) return '';
-    return this.getCategoryOptions().find(o => o.raw === id)?.title ?? id;
-  });
+  readonly foodTypeOptions = computed((): AutocompleteItem<FoodType>[] =>
+    Object.values(FoodType).map(type => ({
+      id: type,
+      title: this.translate.instant(`pantry.form.foodType.${type}`),
+      raw: type,
+    }))
+  );
 
-  readonly confirmValueLabel = computed(() => {
-    const action = this.selectedAction() ?? this.config()?.action;
-    if (!action) return '';
-    if (action === 'setFoodType') return this.selectedFoodTypeLabel();
-    if (action === 'setCategory') return this.selectedCategoryLabel();
-    return '';
+  readonly categoryOptions = computed((): AutocompleteItem<string>[] => {
+    const presetOptions = normalizeStringList(this.appPreferences.preferences().categoryOptions, { fallback: [] });
+    const uncategorizedLabel = this.translate.instant('pantry.form.uncategorized');
+    return buildUniqueSelectOptions(presetOptions, { labelFor: v => formatFriendlyName(v, uncategorizedLabel) })
+      .map(opt => ({ id: opt.value, title: opt.label, raw: opt.value }));
   });
 
   openFlow(config: BatchEditFlowConfig): void {
     this.config.set(config);
-    this.selectedAction.set(config.action ?? null);
-    this.selectedFoodType.set(null);
-    this.selectedCategoryId.set(null);
+    this.itemValues.set(new Map());
     this.isSaving.set(false);
-    const ids = new Set(this.filteredItems().map(i => i._id));
-    if (ids.size === 0) {
-      return;
-    }
-    this.selectedIds.set(ids);
-    this.step.set('items');
+    if (this.filteredItems().length === 0) return;
     this.isOpen.set(true);
   }
 
@@ -82,91 +72,48 @@ export class BatchEditStateService {
     this.reset();
   }
 
-  toggleItem(id: string): void {
-    this.selectedIds.update(ids => {
-      const next = new Set(ids);
-      if (next.has(id)) {
+  setItemValue(id: string, value: string | null): void {
+    this.itemValues.update(map => {
+      const next = new Map(map);
+      if (value == null) {
         next.delete(id);
       } else {
-        next.add(id);
+        next.set(id, value);
       }
       return next;
     });
   }
 
-  goToNextFromItems(): void {
-    if (!this.canProceed()) return;
-    this.step.set(this.config()?.action ? 'value' : 'action');
-  }
-
-  setAction(action: BatchEditAction): void {
-    this.selectedAction.set(action);
-    this.step.set('value');
-  }
-
-  setFoodType(type: FoodType | undefined): void {
-    this.selectedFoodType.set(type ?? null);
-  }
-
-  clearFoodType(): void {
-    this.selectedFoodType.set(null);
-  }
-
-  setCategoryId(id: string | undefined): void {
-    this.selectedCategoryId.set(id ?? null);
-  }
-
-  clearCategory(): void {
-    this.selectedCategoryId.set(null);
-  }
-
-  canConfirm(): boolean {
-    const action = this.selectedAction() ?? this.config()?.action;
-    if (!action) return false;
-    if (action === 'setFoodType') return !!this.selectedFoodType();
-    if (action === 'setCategory') return !!this.selectedCategoryId();
-    return false;
-  }
-
-  goToConfirm(): void {
-    if (!this.canConfirm()) return;
-    this.step.set('confirm');
-  }
-
-  goBack(): void {
-    const current = this.step();
-    if (current === 'confirm') {
-      this.step.set('value');
-    } else if (current === 'value') {
-      this.step.set(this.config()?.action ? 'items' : 'action');
-    } else if (current === 'action') {
-      this.step.set('items');
+  getItemDisplayValue(id: string): string {
+    const value = this.itemValues().get(id);
+    if (this.action() === 'setFoodType') {
+      if (!value) return this.translate.instant('pantry.form.foodType.unassigned');
+      return this.translate.instant(`pantry.form.foodType.${value}`);
     }
-  }
-
-  confirmActionKey(): string {
-    const action = this.selectedAction() ?? this.config()?.action;
-    if (action === 'setFoodType') return 'batchEdit.actions.setFoodType';
-    if (action === 'setCategory') return 'batchEdit.actions.setCategory';
+    if (this.action() === 'setCategory') {
+      if (!value) return this.translate.instant('pantry.form.uncategorized');
+      return this.categoryOptions().find(o => o.raw === value)?.title ?? value;
+    }
     return '';
   }
 
   async apply(): Promise<void> {
     if (this.isSaving()) return;
-    const ids = this.selectedIds();
-    const action = this.selectedAction() ?? this.config()?.action;
-    if (!action || !ids.size) return;
+    const values = this.itemValues();
+    const action = this.config()?.action;
+    if (!action || !values.size) return;
     this.isSaving.set(true);
     try {
-      const items = this.filteredItems().filter(i => ids.has(i._id));
+      const items = this.filteredItems().filter(i => values.has(i._id));
       const now = new Date().toISOString();
       await Promise.all(items.map(async item => {
-        const updated = this.buildUpdatedItem(item, action, now);
+        const value = values.get(item._id)!;
+        const updated = this.buildUpdatedItem(item, action, value, now);
         await this.pantryStore.updateItem(updated);
         await this.eventManager.logAdvancedEdit(item, updated);
       }));
       this.dismiss();
-      await this.showSuccessToast(ids.size);
+      await this.showSuccessToast(items.length);
     } catch (err) {
       console.error('[BatchEditStateService] apply error', err);
     } finally {
@@ -174,50 +121,17 @@ export class BatchEditStateService {
     }
   }
 
-  getFoodTypeOptions(): AutocompleteItem<FoodType>[] {
-    return Object.values(FoodType).map(type => ({
-      id: type,
-      title: this.translate.instant(`pantry.form.foodType.${type}`),
-      raw: type,
-    }));
-  }
-
-  getFoodTypeDisplayValue(): string {
-    const ft = this.selectedFoodType();
-    if (!ft) return this.translate.instant('pantry.form.foodType.unassigned');
-    return this.translate.instant(`pantry.form.foodType.${ft}`);
-  }
-
-  getCategoryOptions(): AutocompleteItem<string>[] {
-    const presetOptions = normalizeStringList(this.appPreferences.preferences().categoryOptions, { fallback: [] });
-    const uncategorizedLabel = this.translate.instant('pantry.form.uncategorized');
-    return buildUniqueSelectOptions(presetOptions, { labelFor: v => formatFriendlyName(v, uncategorizedLabel) })
-      .map(opt => ({ id: opt.value, title: opt.label, raw: opt.value }));
-  }
-
-  getCategoryDisplayValue(): string {
-    const id = this.selectedCategoryId();
-    if (!id) return this.translate.instant('pantry.form.uncategorized');
-    return this.getCategoryOptions().find(o => o.raw === id)?.title ?? id;
-  }
-
-  private buildUpdatedItem(item: PantryItem, action: BatchEditAction, now: string): PantryItem {
+  private buildUpdatedItem(item: PantryItem, action: BatchEditAction, value: string, now: string): PantryItem {
     const base = { ...item, updatedAt: now };
-    if (action === 'setFoodType') {
-      return { ...base, foodType: this.selectedFoodType() ?? undefined };
-    }
-    if (action === 'setCategory') {
-      return { ...base, categoryId: this.selectedCategoryId() ?? '' };
-    }
+    if (action === 'setFoodType') return { ...base, foodType: value as FoodType };
+    if (action === 'setCategory') return { ...base, categoryId: value };
     return base;
   }
 
   private filterItems(items: PantryItem[], filter: BatchEditFilter): PantryItem[] {
     switch (filter) {
-      case 'noFoodType':
-        return items.filter(i => !i.foodType);
-      case 'noCategory':
-        return items.filter(i => !i.categoryId);
+      case 'noFoodType': return items.filter(i => !i.foodType);
+      case 'noCategory': return items.filter(i => !i.categoryId);
     }
   }
 
@@ -233,12 +147,8 @@ export class BatchEditStateService {
 
   private reset(): void {
     this.config.set(null);
-    this.selectedIds.set(new Set());
-    this.selectedAction.set(null);
-    this.selectedFoodType.set(null);
-    this.selectedCategoryId.set(null);
+    this.itemValues.set(new Map());
     this.isSaving.set(false);
-    this.step.set('items');
     this.isOpen.set(false);
   }
 }

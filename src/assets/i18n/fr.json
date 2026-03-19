@@ -882,24 +882,9 @@
     }
   },
   "batchEdit": {
-    "steps": {
-      "items": { "title": "Sélectionner les produits" },
-      "action": { "title": "Choisir une action" },
-      "value": { "title": "Sélectionner une valeur" },
-      "confirm": { "title": "Confirmer" }
-    },
     "actions": {
       "setFoodType": "Définir le type d'aliment",
       "setCategory": "Définir la catégorie"
-    },
-    "items": {
-      "selectedCount_one": "1 produit sélectionné",
-      "selectedCount_other": "{{ count }} produits sélectionnés"
-    },
-    "confirm": {
-      "applying": "Appliquer à {{ count }} produits :",
-      "apply_one": "Appliquer à 1 produit",
-      "apply_other": "Appliquer à {{ count }} produits"
     },
     "toast": {
       "updated_one": "1 produit mis à jour",

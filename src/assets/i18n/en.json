@@ -883,24 +883,9 @@
     }
   },
   "batchEdit": {
-    "steps": {
-      "items": { "title": "Select items" },
-      "action": { "title": "Choose action" },
-      "value": { "title": "Set value" },
-      "confirm": { "title": "Confirm" }
-    },
     "actions": {
       "setFoodType": "Set food type",
       "setCategory": "Set category"
-    },
-    "items": {
-      "selectedCount_one": "1 item selected",
-      "selectedCount_other": "{{ count }} items selected"
-    },
-    "confirm": {
-      "applying": "Apply to {{ count }} items:",
-      "apply_one": "Apply to 1 item",
-      "apply_other": "Apply to {{ count }} items"
     },
     "toast": {
       "updated_one": "1 item updated",
