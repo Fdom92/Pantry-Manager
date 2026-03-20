@@ -678,17 +678,18 @@
       "openSubtitle": "Export your data or manage categories and locations."
     },
     "data": {
-      "title": "Manual backup",
-      "subtitle": "Save or restore your data as a file. Useful when switching phones or keeping a personal backup.",
+      "title": "Backup",
+      "subtitle": "Export your data to save it or share it with someone else.",
       "resetTitle": "Delete all data",
       "resetDescription": "Removes all pantry items, history and settings from this device. Cannot be undone.",
       "resetAction": "Delete",
-      "exportTitle": "Save backup",
-      "exportDescription": "Creates a file with all your data. Save it to Drive, send it via WhatsApp or however you prefer.",
+      "exportTitle": "Save / Share",
+      "exportDescription": "Creates a file with all your data. Save it, send it via WhatsApp or share it. If someone else opens it, PantryMind will load it automatically.",
       "exportAction": "Export",
-      "importTitle": "Restore backup",
-      "importDescription": "Import a previously saved backup file. This will replace your current data.",
-      "importAction": "Import"
+      "importTitle": "Import file",
+      "importDescription": "Load data from a .json file. This will replace your current data.",
+      "importAction": "Import",
+      "syncNote": "Want to share your pantry? Export the file and send it to the other person. When they open it, PantryMind will load it automatically."
     },
     "reset": {
       "confirm": "This will delete all pantry items, history and settings from this device.\n\nThis action cannot be undone. Do you want to continue?",

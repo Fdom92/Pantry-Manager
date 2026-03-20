@@ -60,11 +60,6 @@ export const routes: Routes = [
       import('@features/settings/components/settings-advanced/settings-advanced.component').then(m => m.SettingsAdvancedComponent),
   },
   {
-    path: 'settings/sync',
-    loadComponent: () =>
-      import('@features/settings/components/settings-sync/settings-sync.component').then(m => m.SettingsSyncComponent),
-  },
-  {
     path: 'onboarding',
     loadComponent: () =>
       import('@features/onboarding/onboarding.page').then(m => m.OnboardingPage),

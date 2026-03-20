@@ -678,17 +678,18 @@
       "openSubtitle": "Exporta tus datos o gestiona categorías y ubicaciones."
     },
     "data": {
-      "title": "Copia de seguridad manual",
-      "subtitle": "Guarda o restaura tus datos en un archivo. Útil para cambiar de móvil o guardar un respaldo.",
+      "title": "Copia de seguridad",
+      "subtitle": "Exporta tus datos para guardarlos o compartirlos con otra persona.",
       "resetTitle": "Borrar todos los datos",
       "resetDescription": "Elimina toda la despensa y el historial de este dispositivo. No se puede deshacer.",
       "resetAction": "Borrar",
-      "exportTitle": "Guardar copia de seguridad",
-      "exportDescription": "Genera un archivo con todos tus datos. Guárdalo en Drive, envíalo por WhatsApp o como prefieras.",
+      "exportTitle": "Guardar / Compartir",
+      "exportDescription": "Genera un archivo con todos tus datos. Guárdalo, envíalo por WhatsApp o compártelo. Si la otra persona lo abre, PantryMind lo cargará automáticamente.",
       "exportAction": "Exportar",
-      "importTitle": "Restaurar copia de seguridad",
-      "importDescription": "Importa un archivo de respaldo guardado anteriormente. Reemplazará los datos actuales.",
-      "importAction": "Importar"
+      "importTitle": "Importar archivo",
+      "importDescription": "Carga datos desde un archivo .json. Reemplazará los datos actuales.",
+      "importAction": "Importar",
+      "syncNote": "¿Quieres compartir tu despensa? Exporta el archivo y envíaselo a la otra persona. Cuando lo abran, PantryMind lo cargará automáticamente."
     },
     "reset": {
       "confirm": "Esto eliminará toda la despensa, el historial y los ajustes de este dispositivo.\n\nEsta acción no se puede deshacer. ¿Quieres continuar?",

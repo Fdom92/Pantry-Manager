@@ -677,17 +677,18 @@
       "openSubtitle": "Esporta i tuoi dati o gestisci categorie e posizioni."
     },
     "data": {
-      "title": "Backup manuale",
-      "subtitle": "Salva o ripristina i tuoi dati come file. Utile quando cambi telefono o vuoi un archivio personale.",
+      "title": "Backup",
+      "subtitle": "Esporta i tuoi dati per salvarli o condividerli con qualcuno.",
       "resetTitle": "Elimina tutti i dati",
       "resetDescription": "Rimuove tutti gli articoli, la cronologia e le impostazioni da questo dispositivo. Non può essere annullato.",
       "resetAction": "Elimina",
-      "exportTitle": "Salva backup",
-      "exportDescription": "Crea un file con tutti i tuoi dati. Salvalo su Drive, invialo via WhatsApp o come preferisci.",
+      "exportTitle": "Salva / Condividi",
+      "exportDescription": "Crea un file con tutti i tuoi dati. Salvalo, invialo via WhatsApp o condividilo. Se qualcuno lo apre, PantryMind lo caricherà automaticamente.",
       "exportAction": "Esporta",
-      "importTitle": "Ripristina backup",
-      "importDescription": "Importa un file di backup salvato in precedenza. Sostituirà i dati attuali.",
-      "importAction": "Importa"
+      "importTitle": "Importa file",
+      "importDescription": "Carica dati da un file .json. Sostituirà i dati attuali.",
+      "importAction": "Importa",
+      "syncNote": "Vuoi condividere la tua dispensa? Esporta il file e invialo all'altra persona. Quando lo apre, PantryMind lo caricherà automaticamente."
     },
     "reset": {
       "confirm": "Verranno eliminati tutti gli articoli, la cronologia e le impostazioni da questo dispositivo.\n\nQuesta azione non può essere annullata. Vuoi continuare?",

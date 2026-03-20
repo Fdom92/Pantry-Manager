@@ -677,17 +677,18 @@
       "openSubtitle": "Exportez vos données ou gérez vos catégories et emplacements."
     },
     "data": {
-      "title": "Sauvegarde manuelle",
-      "subtitle": "Sauvegardez ou restaurez vos données sous forme de fichier. Utile lors d'un changement de téléphone.",
+      "title": "Sauvegarde",
+      "subtitle": "Exportez vos données pour les sauvegarder ou les partager avec quelqu'un.",
       "resetTitle": "Supprimer toutes les données",
       "resetDescription": "Supprime tous les articles, l'historique et les paramètres de cet appareil. Irréversible.",
       "resetAction": "Supprimer",
-      "exportTitle": "Enregistrer une sauvegarde",
-      "exportDescription": "Crée un fichier avec toutes vos données. Sauvegardez-le sur Drive, envoyez-le par WhatsApp ou comme vous préférez.",
+      "exportTitle": "Enregistrer / Partager",
+      "exportDescription": "Crée un fichier avec toutes vos données. Sauvegardez-le, envoyez-le par WhatsApp ou partagez-le. Si quelqu'un l'ouvre, PantryMind le chargera automatiquement.",
       "exportAction": "Exporter",
-      "importTitle": "Restaurer une sauvegarde",
-      "importDescription": "Importez un fichier de sauvegarde enregistré précédemment. Cela remplacera vos données actuelles.",
-      "importAction": "Importer"
+      "importTitle": "Importer un fichier",
+      "importDescription": "Chargez des données depuis un fichier .json. Cela remplacera vos données actuelles.",
+      "importAction": "Importer",
+      "syncNote": "Vous souhaitez partager votre garde-manger ? Exportez le fichier et envoyez-le à l'autre personne. Quand elle l'ouvre, PantryMind le chargera automatiquement."
     },
     "reset": {
       "confirm": "Cela supprimera tous les articles, l'historique et les paramètres de cet appareil.\n\nCette action est irréversible. Voulez-vous continuer ?",

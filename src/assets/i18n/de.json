@@ -677,17 +677,18 @@
       "openSubtitle": "Daten exportieren oder Kategorien und Standorte verwalten."
     },
     "data": {
-      "title": "Manuelle Sicherung",
-      "subtitle": "Speichere oder stelle deine Daten als Datei wieder her. Praktisch beim Gerätewechsel.",
+      "title": "Sicherung",
+      "subtitle": "Exportiere deine Daten zum Speichern oder Teilen mit jemandem.",
       "resetTitle": "Alle Daten löschen",
       "resetDescription": "Entfernt alle Vorratsgegenstände, den Verlauf und die Einstellungen von diesem Gerät. Kann nicht rückgängig gemacht werden.",
       "resetAction": "Löschen",
-      "exportTitle": "Sicherung speichern",
-      "exportDescription": "Erstellt eine Datei mit allen deinen Daten. Speichere sie auf Drive, sende sie per WhatsApp oder wie du möchtest.",
+      "exportTitle": "Speichern / Teilen",
+      "exportDescription": "Erstellt eine Datei mit allen deinen Daten. Speichere sie, sende sie per WhatsApp oder teile sie. Wenn jemand die Datei öffnet, lädt PantryMind sie automatisch.",
       "exportAction": "Exportieren",
-      "importTitle": "Sicherung wiederherstellen",
-      "importDescription": "Importiere eine zuvor gespeicherte Sicherungsdatei. Dies ersetzt deine aktuellen Daten.",
-      "importAction": "Importieren"
+      "importTitle": "Datei importieren",
+      "importDescription": "Lade Daten aus einer .json-Datei. Dies ersetzt deine aktuellen Daten.",
+      "importAction": "Importieren",
+      "syncNote": "Möchtest du deinen Vorrat teilen? Exportiere die Datei und sende sie an die andere Person. Wenn sie die Datei öffnen, lädt PantryMind sie automatisch."
     },
     "reset": {
       "confirm": "Dies löscht alle Vorratsgegenstände, den Verlauf und die Einstellungen von diesem Gerät.\n\nDieser Vorgang kann nicht rückgängig gemacht werden. Möchtest du fortfahren?",
