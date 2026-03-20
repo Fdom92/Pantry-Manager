@@ -90,9 +90,11 @@ export class SyncService {
     this.isApplyingSync.set(true);
     try {
       await this.applyImport(docs);
+      sessionStorage.setItem('sync:postReload', '1');
       setTimeout(() => window.location.reload(), 600);
     } catch (err) {
       console.error('[SyncService] doApplyImport error', err);
+      await this.showSyncError(err);
     } finally {
       this.isApplyingSync.set(false);
     }

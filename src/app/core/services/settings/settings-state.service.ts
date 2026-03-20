@@ -173,6 +173,7 @@ export class SettingsStateService {
     if (typeof window === 'undefined') {
       return;
     }
+    sessionStorage.setItem('sync:postReload', '1');
     setTimeout(() => window.location.reload(), 600);
   }
 }

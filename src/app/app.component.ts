@@ -17,7 +17,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
-  private lastHandledLaunchUrl: string | null = null;
+  private readonly handledUrls = new Set<string>();
 
   // DI
   private readonly pantryService = inject(PantryService);
@@ -46,10 +46,14 @@ export class AppComponent {
 
   private async handleSyncLaunchUrl(): Promise<void> {
     try {
+      if (sessionStorage.getItem('sync:postReload')) {
+        sessionStorage.removeItem('sync:postReload');
+        return;
+      }
       const result = await CapacitorApp.getLaunchUrl();
       const url = result?.url;
       if (url && this.isSyncFileUrl(url)) {
-        this.lastHandledLaunchUrl = url;
+        this.markHandled(url);
         await this.syncService.handleIncomingIntent(url);
       }
     } catch {
@@ -59,14 +63,16 @@ export class AppComponent {
 
   private listenForSyncIntents(): void {
     CapacitorApp.addListener('appUrlOpen', ({ url }) => {
-      if (url && this.isSyncFileUrl(url)) {
-        if (url === this.lastHandledLaunchUrl) {
-          this.lastHandledLaunchUrl = null;
-          return;
-        }
+      if (url && this.isSyncFileUrl(url) && !this.handledUrls.has(url)) {
+        this.markHandled(url);
         void this.syncService.handleIncomingIntent(url);
       }
     });
+  }
+
+  private markHandled(url: string): void {
+    this.handledUrls.add(url);
+    setTimeout(() => this.handledUrls.delete(url), 10_000);
   }
 
   private isSyncFileUrl(url: string): boolean {
