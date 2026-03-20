@@ -17,6 +17,8 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
+  private lastHandledLaunchUrl: string | null = null;
+
   // DI
   private readonly pantryService = inject(PantryService);
   private readonly pantryMigration = inject(MigrationPantryService);
@@ -47,6 +49,7 @@ export class AppComponent {
       const result = await CapacitorApp.getLaunchUrl();
       const url = result?.url;
       if (url && this.isSyncFileUrl(url)) {
+        this.lastHandledLaunchUrl = url;
         await this.syncService.handleIncomingIntent(url);
       }
     } catch {
@@ -57,6 +60,10 @@ export class AppComponent {
   private listenForSyncIntents(): void {
     CapacitorApp.addListener('appUrlOpen', ({ url }) => {
       if (url && this.isSyncFileUrl(url)) {
+        if (url === this.lastHandledLaunchUrl) {
+          this.lastHandledLaunchUrl = null;
+          return;
+        }
         void this.syncService.handleIncomingIntent(url);
       }
     });

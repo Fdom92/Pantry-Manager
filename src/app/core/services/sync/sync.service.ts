@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { AlertController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
+import { Filesystem, Encoding } from '@capacitor/filesystem';
 import { parseBackup, buildExportFileName } from '@core/domain/settings';
 import { IMPORT_EMPTY_ERROR, IMPORT_INVALID_ERROR } from '@core/constants';
 import type { BaseDoc } from '@core/models/shared';
@@ -26,8 +27,8 @@ export class SyncService {
     // Validate the file BEFORE asking the user — avoids confusing errors after confirmation
     let docs: BaseDoc[];
     try {
-      const response = await fetch(url);
-      const text = await response.text();
+      const result = await Filesystem.readFile({ path: url, encoding: Encoding.UTF8 });
+      const text = result.data as string;
       docs = parseBackup(text, new Date().toISOString());
     } catch (err) {
       console.error('[SyncService] handleIncomingIntent: invalid file', err);

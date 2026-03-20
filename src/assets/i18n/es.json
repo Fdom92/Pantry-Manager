@@ -885,9 +885,9 @@
   "batchEdit": {
     "expiryDateHint": "Solo se muestran productos con un único lote.",
     "actions": {
-      "setFoodType": "Asignar tipo de alimento",
+      "setFoodType": "Asignar tipo",
       "setCategory": "Asignar categoría",
-      "setExpiryDate": "Establecer fecha de caducidad"
+      "setExpiryDate": "Asignar fecha"
     },
     "toast": {
       "updated_one": "1 producto actualizado",
