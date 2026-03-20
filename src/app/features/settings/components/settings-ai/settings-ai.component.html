@@ -26,20 +26,19 @@
         [placeholder]="'settings.ai.contextPlaceholder' | translate"
       ></ion-textarea>
     </ion-card-content>
+    <div class="save-row">
+      <ion-button
+        fill="outline"
+        size="small"
+        (click)="state.submitPlannerMemory()"
+        [disabled]="!state.hasChanges() || state.isSaving() || state.isLoading()"
+        [attr.aria-label]="'settings.ai.saveAction' | translate"
+      >
+        @if (state.isSaving()) {
+          <ion-spinner slot="start" name="dots"></ion-spinner>
+        }
+        {{ "settings.ai.saveAction" | translate }}
+      </ion-button>
+    </div>
   </ion-card>
-
-  <ion-button
-    expand="block"
-    color="primary"
-    (click)="state.submitPlannerMemory()"
-    [disabled]="!state.hasChanges() || state.isSaving() || state.isLoading()"
-  >
-    @if (state.isSaving()) {
-      <ion-spinner
-        slot="start"
-        name="dots"
-      ></ion-spinner>
-    }
-    {{ "settings.ai.saveAction" | translate }}
-  </ion-button>
 </ion-content>

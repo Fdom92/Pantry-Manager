@@ -1,0 +1,86 @@
+<ion-modal
+  [isOpen]="state.isOpen()"
+  (willDismiss)="state.dismiss()"
+  (didDismiss)="state.close()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ state.titleKey() | translate }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" color="medium" (click)="state.dismiss()">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+
+      <!-- Category / food type: entity selector field per item -->
+      @if (state.action() !== 'setExpiryDate') {
+        @for (item of state.filteredItems(); track item._id) {
+          @if (state.action() === 'setFoodType') {
+            <app-entity-selector-field
+              class="batch-edit-selector"
+              [label]="item.name"
+              [items]="state.foodTypeOptions()"
+              [clearLabel]="'pantry.form.foodType.unassigned' | translate"
+              [showSearch]="false"
+              [emptyLabel]="'common.selects.noOptions' | translate"
+              [value]="state.getItemDisplayValue(item._id)"
+              (optionSelected)="state.setItemValue(item._id, $event.raw ?? null)"
+              (cleared)="state.setItemValue(item._id, null)">
+            </app-entity-selector-field>
+          }
+          @if (state.action() === 'setCategory') {
+            <app-entity-selector-field
+              class="batch-edit-selector"
+              [label]="item.name"
+              [items]="state.categoryOptions()"
+              [searchPlaceholder]="'pantry.form.categorySearchPlaceholder' | translate"
+              [clearLabel]="'pantry.form.uncategorized' | translate"
+              [emptyLabel]="'common.selects.noOptions' | translate"
+              [value]="state.getItemDisplayValue(item._id)"
+              (optionSelected)="state.setItemValue(item._id, $event.raw ?? null)"
+              (cleared)="state.setItemValue(item._id, null)">
+            </app-entity-selector-field>
+          }
+        }
+      }
+
+      <!-- Expiry date: date chip per item -->
+      @if (state.action() === 'setExpiryDate') {
+        <p class="batch-edit-hint">{{ 'batchEdit.expiryDateHint' | translate }}</p>
+        <ion-list lines="full">
+          @for (item of state.filteredItems(); track item._id) {
+            <ion-item>
+              <ion-label>{{ item.name }}</ion-label>
+              <app-date-chip
+                slot="end"
+                [date]="state.getItemExpiryDate(item._id)"
+                (dateChange)="state.setItemValue(item._id, $event ?? null)">
+              </app-date-chip>
+            </ion-item>
+          }
+        </ion-list>
+      }
+
+    </ion-content>
+
+    <ion-footer class="modal-footer">
+      <ion-toolbar>
+        <ion-button
+          expand="block"
+          color="primary"
+          [disabled]="!state.canSave() || state.isSaving()"
+          (click)="state.apply()">
+          @if (state.isSaving()) {
+            <ion-spinner name="dots"></ion-spinner>
+          } @else {
+            {{ 'common.actions.save' | translate }}
+          }
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
+  </ng-template>
+</ion-modal>

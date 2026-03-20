@@ -1,6 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
 import { computeFoodCoverage, computePantryScore, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { applyBatchEditFilter } from '@core/models/pantry/batch-edit.model';
 import type { FoodCoverageResult, PantryScoreResult } from '@core/domain/dashboard';
 import type {
   Insight,
@@ -18,6 +19,7 @@ import { ReviewPromptService } from '../shared/review-prompt.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { PantryService } from '../pantry/pantry.service';
 import { DashboardInsightService } from './dashboard-insight.service';
+import { BatchEditStateService } from './batch-edit-state.service';
 import { formatDateTimeValue, formatDateValue } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -68,6 +70,7 @@ export class DashboardStateService {
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly batchEdit = inject(BatchEditStateService);
 
   private hasCompletedInitialLoad = false;
   private readonly dismissedActionIds = signal(new Set<string>());
@@ -120,7 +123,6 @@ export class DashboardStateService {
 
   readonly noExpiryDateCount = computed(() => {
     return this.pantryItems().filter(item => {
-      if (item.noExpiry) return false;
       if (item.isBasic) return false;
       const hasBatchDate = item.batches?.some(b => !!b.expirationDate);
       const hasItemDate = !!item.expirationDate;
@@ -359,6 +361,10 @@ export class DashboardStateService {
       }
       return;
     }
+    if (cta.type === 'batch-edit') {
+      this.batchEdit.openFlow({ filter: cta.filter, action: cta.action });
+      return;
+    }
     this.conversationStore.prepareConversation({
       entryContext: cta.entryContext,
       initialPrompt: cta.prompt,
@@ -476,10 +482,12 @@ export class DashboardStateService {
         quantity: this.pantryStore.getItemTotalQuantity(item),
       })),
       noExpiryDateCount: this.noExpiryDateCount(),
+      singleBatchNoExpiryCount: applyBatchEditFilter(items, 'noExpiryDateSingleBatch').length,
       products: items.map(item => ({
         id: item._id,
         name: item.name,
         categoryId: item.categoryId,
+        foodType: item.foodType ?? null,
       })),
     };
 

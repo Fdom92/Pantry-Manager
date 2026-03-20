@@ -54,7 +54,8 @@
       "save": "Enregistrer",
       "edit": "Modifier",
       "apply": "Appliquer",
-      "clear": "Effacer"
+      "clear": "Effacer",
+      "next": "Suivant"
     },
     "loading": "Chargement…",
     "dates": {
@@ -344,12 +345,17 @@
       "addExpiryDates": {
         "title": "Ajoutez des dates de péremption",
         "description": "Sachez toujours quoi utiliser en premier et évitez les mauvaises surprises dans votre garde-manger.",
-        "cta": "Aller au garde-manger"
+        "cta": "Ajouter les dates"
       },
       "organizeWithCategories": {
         "title": "Organisez votre garde-manger par catégories",
         "description": "Regroupez vos produits pour les retrouver plus vite et tout garder sous contrôle.",
         "cta": "Organiser maintenant"
+      },
+      "missingFoodType": {
+        "title": "Classifiez les types d'aliments",
+        "description": "Attribuez un type d'aliment à vos produits pour obtenir de meilleures analyses et planifications.",
+        "cta": "Classifier maintenant"
       },
       "planAndSaveTime": {
         "title": "Planifier la semaine avec l'IA",
@@ -665,43 +671,44 @@
       "saveError": "Impossible d’enregistrer le contexte."
     },
     "advanced": {
-      "title": "Avancé",
-      "subtitle": "Outils pour les données et catalogues.",
-      "openTitle": "Ouvrir avancé",
-      "openSubtitle": "Gérer les catalogues et les données de l’appareil."
+      "title": "Données",
+      "subtitle": "Sauvegardes et catalogues de votre garde-manger.",
+      "openTitle": "Sauvegarde & catalogues",
+      "openSubtitle": "Exportez vos données ou gérez vos catégories et emplacements."
     },
     "data": {
-      "title": "Gestion des données",
-      "subtitle": "Contrôlez ce qui est enregistré sur cet appareil.",
-      "resetTitle": "Effacer les données",
-      "resetDescription": "Supprime tout ce qui est enregistré sur cet appareil.",
-      "resetAction": "Effacer",
-      "exportTitle": "Exporter les données",
-      "exportDescription": "Téléchargez un fichier de sauvegarde.",
+      "title": "Sauvegarde",
+      "subtitle": "Exportez vos données pour les sauvegarder ou les partager avec quelqu'un.",
+      "resetTitle": "Supprimer toutes les données",
+      "resetDescription": "Supprime tous les articles, l'historique et les paramètres de cet appareil. Irréversible.",
+      "resetAction": "Supprimer",
+      "exportTitle": "Enregistrer / Partager",
+      "exportDescription": "Crée un fichier avec toutes vos données. Sauvegardez-le, envoyez-le par WhatsApp ou partagez-le. Si quelqu'un l'ouvre, PantryMind le chargera automatiquement.",
       "exportAction": "Exporter",
-      "importTitle": "Importer des données",
-      "importDescription": "Restaurez une sauvegarde exportée auparavant.",
-      "importAction": "Importer"
+      "importTitle": "Importer un fichier",
+      "importDescription": "Chargez des données depuis un fichier .json. Cela remplacera vos données actuelles.",
+      "importAction": "Importer",
+      "syncNote": "Vous souhaitez partager votre garde-manger ? Exportez le fichier et envoyez-le à l'autre personne. Quand elle l'ouvre, PantryMind le chargera automatiquement."
     },
     "reset": {
-      "confirm": "Cela supprimera toutes les données enregistrées sur cet appareil.\nVoulez-vous continuer ?",
-      "success": "Données locales supprimées.",
-      "error": "Impossible de nettoyer l’application."
+      "confirm": "Cela supprimera tous les articles, l'historique et les paramètres de cet appareil.\n\nCette action est irréversible. Voulez-vous continuer ?",
+      "success": "Toutes les données ont été supprimées.",
+      "error": "Impossible de supprimer les données."
     },
     "export": {
-      "unavailable": "L’exportation n’est pas disponible dans cet environnement.",
+      "unavailable": "L'exportation n'est pas disponible dans cet environnement.",
       "readyToShare": "Votre sauvegarde est prête à être partagée.",
-      "success": "Données exportées.",
-      "error": "Impossible d’exporter les données.",
-      "shareTitle": "Pantry Manager - Sauvegarde",
-      "shareText": "Exportez ou partagez votre sauvegarde."
+      "success": "Sauvegarde exportée.",
+      "error": "Impossible d'exporter la sauvegarde.",
+      "shareTitle": "PantryMind — Sauvegarde",
+      "shareText": "Enregistrez ou partagez votre sauvegarde PantryMind."
     },
     "import": {
-      "confirm": "Cela remplacera vos données actuelles par le fichier sélectionné. Voulez-vous continuer ?",
-      "success": "Données importées. Redémarrage de l’application…",
-      "error": "Impossible d’importer les données. Vérifiez le fichier.",
-      "invalid": "Le fichier sélectionné n’est pas une sauvegarde valide.",
-      "empty": "Le fichier ne contient aucune donnée à importer."
+      "confirm": "Cela remplacera toutes vos données actuelles par celles du fichier sélectionné. Assurez-vous qu'il s'agit de la bonne sauvegarde. Continuer ?",
+      "success": "Données restaurées. Redémarrage de l'app...",
+      "error": "Impossible de restaurer la sauvegarde. Vérifiez que le fichier est correct.",
+      "invalid": "Le fichier sélectionné n'est pas une sauvegarde valide.",
+      "empty": "Le fichier ne contient aucune donnée à restaurer."
     },
     "loadError": "Un problème est survenu lors du chargement des paramètres.",
     "catalogs": {
@@ -801,8 +808,8 @@
       "notificationPreviewNone": "Aucune notification ne serait programmée. Vérifiez que les articles et les préférences correspondent aux critères."
     },
     "info": {
-      "title": "À propos",
-      "subtitle": "Version, avis et assistance.",
+      "title": "Informations",
+      "subtitle": "Version, avis et support.",
       "version": "Version",
       "feedbackTitle": "Envoyer des commentaires",
       "feedbackSubtitle": "Partagez des suggestions ou signalez des problèmes.",
@@ -812,10 +819,10 @@
       "rateAction": "Évaluer sur le Play Store"
     },
     "notifications": {
+      "subtitle": "Configurez quand et sur quoi vous souhaitez être notifié.",
+      "openTitle": "Gérer les notifications",
+      "openSubtitle": "Alertes d'expiration, stock faible et plus encore.",
       "title": "Notifications",
-      "subtitle": "Configurez des alertes quotidiennes pour votre garde-manger",
-      "openTitle": "Paramètres de notifications",
-      "openSubtitle": "Gérez les alertes et ce dont vous souhaitez être notifié",
       "enabledTitle": "Activer les notifications",
       "enabledDescription": "Recevez un résumé quotidien de l'état de votre garde-manger",
       "expiredTitle": "Produits périmés",
@@ -844,6 +851,47 @@
     "lowStock": {
       "title": "Certains essentiels sont presque épuisés",
       "body": "{{ count }} produits essentiels sont en dessous du minimum"
+    }
+  },
+  "sync": {
+    "title": "Garde-manger partagé",
+    "subtitle": "Synchronisez le garde-manger avec votre partenaire ou famille.",
+    "openTitle": "Synchroniser avec un autre téléphone",
+    "openSubtitle": "Envoyez ou recevez le garde-manger complet depuis un autre appareil.",
+    "send": {
+      "step": "Étape 1 — Sur ce téléphone",
+      "title": "Envoyer mon garde-manger",
+      "subtitle": "Transfère une copie exacte de votre garde-manger sur l'autre appareil.",
+      "actionTitle": "Envoyer vers un autre appareil",
+      "actionDescription": "Le menu de partage s'ouvrira. Choisissez Nearby Share, WhatsApp ou toute autre app.",
+      "shareTitle": "PantryMind — Synchronisation",
+      "shareText": "Mettez à jour le garde-manger sur un autre appareil avec PantryMind."
+    },
+    "receive": {
+      "step": "Étape 2 — Sur l'autre téléphone",
+      "title": "Recevoir le garde-manger",
+      "subtitle": "Aucune configuration spéciale n'est nécessaire sur l'autre téléphone.",
+      "howTitle": "Réception automatique",
+      "howDescription": "Quand vous recevez le fichier de l'autre appareil, ouvrez-le simplement. PantryMind le détectera et vous demandera si vous souhaitez mettre à jour votre garde-manger."
+    },
+    "incoming": {
+      "title": "Mise à jour du garde-manger",
+      "message": "Un autre appareil souhaite synchroniser son garde-manger avec le vôtre. Cela remplacera votre garde-manger actuel. Voulez-vous l'appliquer ?",
+      "confirm": "Oui, mettre à jour",
+      "dismiss": "Non, annuler",
+      "errorTitle": "Impossible d'appliquer la synchronisation"
+    }
+  },
+  "batchEdit": {
+    "expiryDateHint": "Seuls les produits avec un seul lot sont affichés.",
+    "actions": {
+      "setFoodType": "Définir le type d'aliment",
+      "setCategory": "Définir la catégorie",
+      "setExpiryDate": "Définir la date d'expiration"
+    },
+    "toast": {
+      "updated_one": "1 produit mis à jour",
+      "updated_other": "{{ count }} produits mis à jour"
     }
   }
 }

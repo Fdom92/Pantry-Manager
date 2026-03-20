@@ -103,6 +103,15 @@ export class DashboardInsightService {
         prompt,
       };
     }
+    if (definition.type === 'batch-edit') {
+      return {
+        id: definition.id,
+        label: this.translateKey(definition.labelKey),
+        type: 'batch-edit',
+        filter: definition.filter,
+        action: definition.action,
+      };
+    }
     return {
       id: definition.id,
       label: this.translateKey(definition.labelKey),
