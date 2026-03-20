@@ -10,7 +10,7 @@ import { ReviewPromptService } from '../shared/review-prompt.service';
 import { StorageService } from '../shared/storage.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 import { SettingsPreferencesService } from './settings-preferences.service';
-import { MigrationPantryService } from '../migration/migration-pantry.service';
+import { SyncService } from '../sync/sync.service';
 
 @Injectable()
 export class SettingsStateService {
@@ -19,13 +19,13 @@ export class SettingsStateService {
   private readonly translate = inject(TranslateService);
   private readonly storage = inject<StorageService<BaseDoc>>(StorageService);
   private readonly appPreferences = inject(SettingsPreferencesService);
-  private readonly migrationService = inject(MigrationPantryService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly navCtrl = inject(NavController);
   private readonly download = inject(DownloadService);
   private readonly confirm = inject(ConfirmService);
   private readonly share = inject(ShareService);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly syncService = inject(SyncService);
 
   readonly isPro = this.revenuecat.isPro();
   readonly themePreference = computed(() => this.appPreferences.preferences().theme);
@@ -163,10 +163,7 @@ export class SettingsStateService {
   }
 
   private async applyImport(docs: BaseDoc[]): Promise<void> {
-    await this.storage.clearAll();
-    await this.storage.bulkSave(docs);
-    await this.appPreferences.reload();
-    this.migrationService.markMigrationCheckNeeded();
+    await this.syncService.applyImport(docs);
     if (this.lifecycle.isDestroyed()) {
       return;
     }
@@ -176,6 +173,7 @@ export class SettingsStateService {
     if (typeof window === 'undefined') {
       return;
     }
+    sessionStorage.setItem('sync:postReload', '1');
     setTimeout(() => window.location.reload(), 600);
   }
 }

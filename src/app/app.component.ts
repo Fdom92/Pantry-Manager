@@ -6,6 +6,7 @@ import { PantryService } from '@core/services/pantry';
 import { MigrationPantryService } from '@core/services/migration/migration-pantry.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
+import { SyncService } from '@core/services/sync/sync.service';
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
@@ -16,6 +17,8 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
+  private readonly handledUrls = new Set<string>();
+
   // DI
   private readonly pantryService = inject(PantryService);
   private readonly pantryMigration = inject(MigrationPantryService);
@@ -23,6 +26,7 @@ export class AppComponent {
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
   private readonly notificationScheduler = inject(NotificationSchedulerService);
+  private readonly syncService = inject(SyncService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -36,6 +40,43 @@ export class AppComponent {
     await this.pantryService.ensureFirstPageLoaded();
     this.pantryService.startBackgroundLoad();
     await this.notificationScheduler.scheduleAll();
+    await this.handleSyncLaunchUrl();
+    this.listenForSyncIntents();
+  }
+
+  private async handleSyncLaunchUrl(): Promise<void> {
+    try {
+      if (sessionStorage.getItem('sync:postReload')) {
+        sessionStorage.removeItem('sync:postReload');
+        return;
+      }
+      const result = await CapacitorApp.getLaunchUrl();
+      const url = result?.url;
+      if (url && this.isSyncFileUrl(url)) {
+        this.markHandled(url);
+        await this.syncService.handleIncomingIntent(url);
+      }
+    } catch {
+      // getLaunchUrl not available in web context
+    }
+  }
+
+  private listenForSyncIntents(): void {
+    CapacitorApp.addListener('appUrlOpen', ({ url }) => {
+      if (url && this.isSyncFileUrl(url) && !this.handledUrls.has(url)) {
+        this.markHandled(url);
+        void this.syncService.handleIncomingIntent(url);
+      }
+    });
+  }
+
+  private markHandled(url: string): void {
+    this.handledUrls.add(url);
+    setTimeout(() => this.handledUrls.delete(url), 10_000);
+  }
+
+  private isSyncFileUrl(url: string): boolean {
+    return url.startsWith('content://') || url.startsWith('file://');
   }
 
   private async initializeRevenueCat(): Promise<void> {

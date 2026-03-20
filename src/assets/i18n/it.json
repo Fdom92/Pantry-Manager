@@ -54,7 +54,8 @@
       "save": "Salva",
       "edit": "Modifica",
       "apply": "Applica",
-      "clear": "Pulisci"
+      "clear": "Pulisci",
+      "next": "Avanti"
     },
     "loading": "Caricamento…",
     "dates": {
@@ -344,12 +345,17 @@
       "addExpiryDates": {
         "title": "Aggiungi le date di scadenza",
         "description": "Tieni traccia di cosa usare prima ed evita brutte sorprese nella dispensa.",
-        "cta": "Vai alla dispensa"
+        "cta": "Aggiungi date"
       },
       "organizeWithCategories": {
         "title": "Organizza la dispensa per categorie",
         "description": "Raggruppa i prodotti per trovarli più velocemente e avere tutto sotto controllo.",
         "cta": "Organizza ora"
+      },
+      "missingFoodType": {
+        "title": "Classifica i tipi di alimento",
+        "description": "Assegna un tipo di alimento ai tuoi prodotti per ottenere analisi e pianificazione migliori.",
+        "cta": "Classifica ora"
       },
       "planAndSaveTime": {
         "title": "Pianifica la settimana con l'IA",
@@ -665,43 +671,44 @@
       "saveError": "Impossibile salvare il contesto."
     },
     "advanced": {
-      "title": "Avanzate",
-      "subtitle": "Strumenti per dati e cataloghi.",
-      "openTitle": "Apri avanzate",
-      "openSubtitle": "Gestisci cataloghi e dati del dispositivo."
+      "title": "Dati",
+      "subtitle": "Backup e cataloghi della tua dispensa.",
+      "openTitle": "Backup e cataloghi",
+      "openSubtitle": "Esporta i tuoi dati o gestisci categorie e posizioni."
     },
     "data": {
-      "title": "Gestione dati",
-      "subtitle": "Controlla cosa è salvato su questo dispositivo.",
-      "resetTitle": "Cancella dati",
-      "resetDescription": "Rimuove tutto ciò che è salvato su questo dispositivo.",
-      "resetAction": "Cancella",
-      "exportTitle": "Esporta dati",
-      "exportDescription": "Scarica un file di backup.",
+      "title": "Backup",
+      "subtitle": "Esporta i tuoi dati per salvarli o condividerli con qualcuno.",
+      "resetTitle": "Elimina tutti i dati",
+      "resetDescription": "Rimuove tutti gli articoli, la cronologia e le impostazioni da questo dispositivo. Non può essere annullato.",
+      "resetAction": "Elimina",
+      "exportTitle": "Salva / Condividi",
+      "exportDescription": "Crea un file con tutti i tuoi dati. Salvalo, invialo via WhatsApp o condividilo. Se qualcuno lo apre, PantryMind lo caricherà automaticamente.",
       "exportAction": "Esporta",
-      "importTitle": "Importa dati",
-      "importDescription": "Ripristina un backup esportato in precedenza.",
-      "importAction": "Importa"
+      "importTitle": "Importa file",
+      "importDescription": "Carica dati da un file .json. Sostituirà i dati attuali.",
+      "importAction": "Importa",
+      "syncNote": "Vuoi condividere la tua dispensa? Esporta il file e invialo all'altra persona. Quando lo apre, PantryMind lo caricherà automaticamente."
     },
     "reset": {
-      "confirm": "Questo cancellerà tutti i dati salvati su questo dispositivo.\nVuoi continuare?",
-      "success": "Dati locali rimossi.",
-      "error": "Impossibile cancellare l'app."
+      "confirm": "Verranno eliminati tutti gli articoli, la cronologia e le impostazioni da questo dispositivo.\n\nQuesta azione non può essere annullata. Vuoi continuare?",
+      "success": "Tutti i dati sono stati eliminati.",
+      "error": "Impossibile eliminare i dati."
     },
     "export": {
       "unavailable": "L'esportazione non è disponibile in questo ambiente.",
       "readyToShare": "Il tuo backup è pronto per essere condiviso.",
-      "success": "Dati esportati.",
-      "error": "Impossibile esportare i dati.",
-      "shareTitle": "Pantry Manager - Backup",
-      "shareText": "Esporta o condividi il backup della tua dispensa."
+      "success": "Backup esportato.",
+      "error": "Impossibile esportare il backup.",
+      "shareTitle": "PantryMind — Backup",
+      "shareText": "Salva o condividi il tuo backup di PantryMind."
     },
     "import": {
-      "confirm": "Questo sostituirà i dati correnti con il file selezionato. Continuare?",
-      "success": "Dati importati. Riavvio dell'app…",
-      "error": "Impossibile importare i dati. Controlla il file.",
+      "confirm": "Questo sostituirà tutti i tuoi dati attuali con quelli del file selezionato. Assicurati che sia il backup corretto. Continuare?",
+      "success": "Dati ripristinati. Riavvio dell'app...",
+      "error": "Impossibile ripristinare il backup. Controlla che il file sia corretto.",
       "invalid": "Il file selezionato non è un backup valido.",
-      "empty": "Il file non contiene dati da importare."
+      "empty": "Il file non contiene dati da ripristinare."
     },
     "loadError": "Si è verificato un problema durante il caricamento delle impostazioni.",
     "catalogs": {
@@ -801,7 +808,7 @@
       "notificationPreviewNone": "Nessuna notifica verrebbe programmata. Verifica che gli articoli e le preferenze corrispondano ai criteri."
     },
     "info": {
-      "title": "Info app",
+      "title": "Informazioni",
       "subtitle": "Versione, valutazioni e supporto.",
       "version": "Versione",
       "feedbackTitle": "Invia feedback",
@@ -812,10 +819,10 @@
       "rateAction": "Valuta sul Play Store"
     },
     "notifications": {
+      "subtitle": "Configura quando e su cosa vuoi ricevere avvisi.",
+      "openTitle": "Gestisci notifiche",
+      "openSubtitle": "Avvisi di scadenza, scorte basse e altro.",
       "title": "Notifiche",
-      "subtitle": "Configura avvisi quotidiani per la tua dispensa",
-      "openTitle": "Impostazioni notifiche",
-      "openSubtitle": "Gestisci gli avvisi e di cosa vuoi essere notificato",
       "enabledTitle": "Attiva notifiche",
       "enabledDescription": "Ricevi un riepilogo quotidiano dello stato della tua dispensa",
       "expiredTitle": "Prodotti scaduti",
@@ -844,6 +851,47 @@
     "lowStock": {
       "title": "Alcune scorte stanno finendo",
       "body": "{{ count }} prodotti essenziali sono sotto il minimo"
+    }
+  },
+  "sync": {
+    "title": "Dispensa condivisa",
+    "subtitle": "Sincronizza la dispensa con il tuo partner o la tua famiglia.",
+    "openTitle": "Sincronizza con un altro telefono",
+    "openSubtitle": "Invia o ricevi la dispensa completa da un altro dispositivo.",
+    "send": {
+      "step": "Passo 1 — Su questo telefono",
+      "title": "Invia la mia dispensa",
+      "subtitle": "Trasferisce una copia esatta della tua dispensa sull'altro dispositivo.",
+      "actionTitle": "Invia a un altro dispositivo",
+      "actionDescription": "Si aprirà il menu di condivisione. Scegli Nearby Share, WhatsApp o qualsiasi altra app.",
+      "shareTitle": "PantryMind — Sincronizzazione",
+      "shareText": "Aggiorna la dispensa su un altro dispositivo con PantryMind."
+    },
+    "receive": {
+      "step": "Passo 2 — Sull'altro telefono",
+      "title": "Ricevi la dispensa",
+      "subtitle": "Nessuna configurazione speciale è necessaria sull'altro telefono.",
+      "howTitle": "Ricezione automatica",
+      "howDescription": "Quando ricevi il file dall'altro dispositivo, aprilo direttamente. PantryMind lo riconoscerà e ti chiederà se vuoi aggiornare la tua dispensa."
+    },
+    "incoming": {
+      "title": "Aggiornamento dispensa",
+      "message": "Un altro dispositivo vuole sincronizzare la sua dispensa con la tua. Questo sostituirà la tua dispensa attuale. Vuoi applicarlo?",
+      "confirm": "Sì, aggiorna",
+      "dismiss": "No, annulla",
+      "errorTitle": "Impossibile applicare la sincronizzazione"
+    }
+  },
+  "batchEdit": {
+    "expiryDateHint": "Vengono mostrati solo i prodotti con un singolo lotto.",
+    "actions": {
+      "setFoodType": "Imposta tipo di alimento",
+      "setCategory": "Imposta categoria",
+      "setExpiryDate": "Imposta data di scadenza"
+    },
+    "toast": {
+      "updated_one": "1 prodotto aggiornato",
+      "updated_other": "{{ count }} prodotti aggiornati"
     }
   }
 }

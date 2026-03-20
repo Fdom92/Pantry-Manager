@@ -54,7 +54,8 @@
       "save": "Speichern",
       "edit": "Bearbeiten",
       "apply": "Anwenden",
-      "clear": "Leeren"
+      "clear": "Leeren",
+      "next": "Weiter"
     },
     "loading": "Lädt…",
     "dates": {
@@ -344,12 +345,17 @@
       "addExpiryDates": {
         "title": "Ablaufdaten hinzufügen",
         "description": "Behalte den Überblick, was zuerst verwendet werden soll, und vermeide unangenehme Überraschungen.",
-        "cta": "Zur Vorratskammer"
+        "cta": "Daten hinzufügen"
       },
       "organizeWithCategories": {
         "title": "Vorratskammer nach Kategorien ordnen",
         "description": "Gruppiere deine Produkte, um sie schneller zu finden und alles im Griff zu haben.",
         "cta": "Jetzt ordnen"
+      },
+      "missingFoodType": {
+        "title": "Lebensmitteltypen klassifizieren",
+        "description": "Weise deinen Produkten einen Lebensmitteltyp zu, um bessere Einblicke und Mahlzeitenplanung zu erhalten.",
+        "cta": "Jetzt klassifizieren"
       },
       "planAndSaveTime": {
         "title": "Woche mit KI planen",
@@ -665,43 +671,44 @@
       "saveError": "Planer-Kontext konnte nicht gespeichert werden."
     },
     "advanced": {
-      "title": "Erweitert",
-      "subtitle": "Tools für Daten und Kataloge.",
-      "openTitle": "Erweitert öffnen",
-      "openSubtitle": "Kataloge und Gerätedaten verwalten."
+      "title": "Daten",
+      "subtitle": "Sicherungen und Kataloge deines Vorrats.",
+      "openTitle": "Sicherung & Kataloge",
+      "openSubtitle": "Daten exportieren oder Kategorien und Standorte verwalten."
     },
     "data": {
-      "title": "Datenverwaltung",
-      "subtitle": "Verwalte, was auf diesem Gerät gespeichert ist.",
-      "resetTitle": "Daten löschen",
-      "resetDescription": "Entfernt alles, was auf diesem Gerät gespeichert ist.",
+      "title": "Sicherung",
+      "subtitle": "Exportiere deine Daten zum Speichern oder Teilen mit jemandem.",
+      "resetTitle": "Alle Daten löschen",
+      "resetDescription": "Entfernt alle Vorratsgegenstände, den Verlauf und die Einstellungen von diesem Gerät. Kann nicht rückgängig gemacht werden.",
       "resetAction": "Löschen",
-      "exportTitle": "Daten exportieren",
-      "exportDescription": "Lade eine Sicherungsdatei herunter.",
+      "exportTitle": "Speichern / Teilen",
+      "exportDescription": "Erstellt eine Datei mit allen deinen Daten. Speichere sie, sende sie per WhatsApp oder teile sie. Wenn jemand die Datei öffnet, lädt PantryMind sie automatisch.",
       "exportAction": "Exportieren",
-      "importTitle": "Daten importieren",
-      "importDescription": "Stelle eine zuvor exportierte Sicherung wieder her.",
-      "importAction": "Importieren"
+      "importTitle": "Datei importieren",
+      "importDescription": "Lade Daten aus einer .json-Datei. Dies ersetzt deine aktuellen Daten.",
+      "importAction": "Importieren",
+      "syncNote": "Möchtest du deinen Vorrat teilen? Exportiere die Datei und sende sie an die andere Person. Wenn sie die Datei öffnen, lädt PantryMind sie automatisch."
     },
     "reset": {
-      "confirm": "Dadurch werden alle auf diesem Gerät gespeicherten Daten gelöscht.\nMöchtest du fortfahren?",
-      "success": "Lokale Daten gelöscht.",
-      "error": "Die App konnte nicht bereinigt werden."
+      "confirm": "Dies löscht alle Vorratsgegenstände, den Verlauf und die Einstellungen von diesem Gerät.\n\nDieser Vorgang kann nicht rückgängig gemacht werden. Möchtest du fortfahren?",
+      "success": "Alle Daten wurden gelöscht.",
+      "error": "Daten konnten nicht gelöscht werden."
     },
     "export": {
-      "unavailable": "Der Export ist in dieser Umgebung nicht verfügbar.",
+      "unavailable": "Export ist in dieser Umgebung nicht verfügbar.",
       "readyToShare": "Deine Sicherung ist bereit zum Teilen.",
-      "success": "Daten exportiert.",
-      "error": "Die Daten konnten nicht exportiert werden.",
-      "shareTitle": "Pantry Manager – Sicherung",
-      "shareText": "Exportiere oder teile dein Backup."
+      "success": "Sicherung exportiert.",
+      "error": "Sicherung konnte nicht exportiert werden.",
+      "shareTitle": "PantryMind — Sicherung",
+      "shareText": "Speichere oder teile deine PantryMind-Sicherung."
     },
     "import": {
-      "confirm": "Dies ersetzt deine aktuellen Daten durch die ausgewählte Datei. Möchtest du fortfahren?",
-      "success": "Daten importiert. App wird neu gestartet…",
-      "error": "Die Daten konnten nicht importiert werden. Bitte überprüfe die Datei.",
-      "invalid": "Die ausgewählte Datei ist kein gültiges Backup.",
-      "empty": "Die Datei enthält keine importierbaren Daten."
+      "confirm": "Dies ersetzt alle aktuellen Daten durch die ausgewählte Datei. Stelle sicher, dass es die richtige Sicherung ist. Fortfahren?",
+      "success": "Daten wiederhergestellt. App wird neu gestartet...",
+      "error": "Sicherung konnte nicht wiederhergestellt werden. Überprüfe die Datei.",
+      "invalid": "Die ausgewählte Datei ist keine gültige Sicherung.",
+      "empty": "Die Datei enthält keine Daten zur Wiederherstellung."
     },
     "loadError": "Beim Laden der Einstellungen ist ein Problem aufgetreten.",
     "catalogs": {
@@ -801,7 +808,7 @@
       "notificationPreviewNone": "Keine Benachrichtigung würde geplant. Prüfe ob Items und Einstellungen den Kriterien entsprechen."
     },
     "info": {
-      "title": "Über die App",
+      "title": "Informationen",
       "subtitle": "Version, Bewertungen und Support.",
       "version": "Version",
       "feedbackTitle": "Feedback senden",
@@ -812,10 +819,10 @@
       "rateAction": "Im Play Store bewerten"
     },
     "notifications": {
+      "subtitle": "Konfiguriere, wann und worüber du benachrichtigt werden möchtest.",
+      "openTitle": "Benachrichtigungen verwalten",
+      "openSubtitle": "Ablaufwarnungen, geringer Lagerbestand und mehr.",
       "title": "Benachrichtigungen",
-      "subtitle": "Tägliche Benachrichtigungen für Ihre Vorratskammer konfigurieren",
-      "openTitle": "Benachrichtigungseinstellungen",
-      "openSubtitle": "Verwalten Sie Benachrichtigungen und worüber Sie informiert werden möchten",
       "enabledTitle": "Benachrichtigungen aktivieren",
       "enabledDescription": "Erhalten Sie eine tägliche Zusammenfassung Ihres Vorratskammerstatus",
       "expiredTitle": "Abgelaufene Produkte",
@@ -844,6 +851,47 @@
     "lowStock": {
       "title": "Einige Vorräte werden knapp",
       "body": "{{ count }} wichtige Produkte liegen unter deinem Minimum"
+    }
+  },
+  "sync": {
+    "title": "Geteilter Vorrat",
+    "subtitle": "Halte den Vorrat mit deinem Partner oder deiner Familie synchron.",
+    "openTitle": "Mit einem anderen Handy synchronisieren",
+    "openSubtitle": "Sende oder empfange den gesamten Vorrat von einem anderen Gerät.",
+    "send": {
+      "step": "Schritt 1 — Auf diesem Handy",
+      "title": "Meinen Vorrat senden",
+      "subtitle": "Überträgt eine exakte Kopie deines Vorrats auf das andere Gerät.",
+      "actionTitle": "An anderes Gerät senden",
+      "actionDescription": "Das Teilen-Menü öffnet sich. Wähle Nearby Share, WhatsApp oder eine andere App.",
+      "shareTitle": "PantryMind — Synchronisierung",
+      "shareText": "Vorrat auf einem anderen Gerät mit PantryMind aktualisieren."
+    },
+    "receive": {
+      "step": "Schritt 2 — Auf dem anderen Handy",
+      "title": "Vorrat empfangen",
+      "subtitle": "Auf dem anderen Handy ist keine besondere Einrichtung nötig.",
+      "howTitle": "Automatischer Empfang",
+      "howDescription": "Wenn du die Datei vom anderen Gerät erhältst, öffne sie einfach. PantryMind erkennt sie und fragt, ob du deinen Vorrat aktualisieren möchtest."
+    },
+    "incoming": {
+      "title": "Vorrat-Aktualisierung",
+      "message": "Ein anderes Gerät möchte seinen Vorrat mit dir synchronisieren. Dein aktueller Vorrat wird dadurch ersetzt. Möchtest du es übernehmen?",
+      "confirm": "Ja, übernehmen",
+      "dismiss": "Nein, abbrechen",
+      "errorTitle": "Synchronisierung konnte nicht angewendet werden"
+    }
+  },
+  "batchEdit": {
+    "expiryDateHint": "Es werden nur Produkte mit einer einzigen Charge angezeigt.",
+    "actions": {
+      "setFoodType": "Lebensmitteltyp festlegen",
+      "setCategory": "Kategorie festlegen",
+      "setExpiryDate": "Ablaufdatum festlegen"
+    },
+    "toast": {
+      "updated_one": "1 Produkt aktualisiert",
+      "updated_other": "{{ count }} Produkte aktualisiert"
     }
   }
 }

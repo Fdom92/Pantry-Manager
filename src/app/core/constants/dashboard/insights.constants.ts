@@ -26,7 +26,7 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
       },
     ],
   },
-  // Data quality: nudge to add expiry dates (only shown when relevant)
+  // Data quality: nudge to add expiry dates via batch edit (single-batch items only)
   {
     id: InsightId.ADD_EXPIRY_DATES,
     titleKey: 'insights.library.addExpiryDates.title',
@@ -34,17 +34,18 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
     category: InsightCategory.BEHAVIOR,
     priority: 2,
     audience: 'all',
-    predicate: context => context.noExpiryDateCount > 0,
+    predicate: context => context.singleBatchNoExpiryCount > 0,
     ctas: [
       {
         id: 'add-expiry-dates',
         labelKey: 'insights.library.addExpiryDates.cta',
-        type: 'navigate',
-        route: '/pantry',
+        type: 'batch-edit',
+        filter: 'noExpiryDateSingleBatch',
+        action: 'setExpiryDate',
       },
     ],
   },
-  // Data quality: nudge to organize by category
+  // Data quality: nudge to organize by category (batch-edit)
   {
     id: InsightId.ORGANIZE_WITH_CATEGORIES,
     titleKey: 'insights.library.organizeWithCategories.title',
@@ -57,8 +58,28 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
       {
         id: 'organize-with-categories',
         labelKey: 'insights.library.organizeWithCategories.cta',
-        type: 'navigate',
-        route: '/pantry',
+        type: 'batch-edit',
+        filter: 'noCategory',
+        action: 'setCategory',
+      },
+    ],
+  },
+  // Data quality: nudge to classify food types (batch-edit)
+  {
+    id: InsightId.MISSING_FOODTYPE,
+    titleKey: 'insights.library.missingFoodType.title',
+    descriptionKey: 'insights.library.missingFoodType.description',
+    category: InsightCategory.OPTIMIZATION,
+    priority: 4,
+    audience: 'all',
+    predicate: context => context.products.some(p => !p.foodType),
+    ctas: [
+      {
+        id: 'set-food-types',
+        labelKey: 'insights.library.missingFoodType.cta',
+        type: 'batch-edit',
+        filter: 'noFoodType',
+        action: 'setFoodType',
       },
     ],
   },
@@ -68,7 +89,7 @@ export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
     titleKey: 'insights.library.planAndSaveTime.title',
     descriptionKey: 'insights.library.planAndSaveTime.description',
     category: InsightCategory.OPTIMIZATION,
-    priority: 4,
+    priority: 5,
     audience: 'non-pro',
     ctas: [
       {

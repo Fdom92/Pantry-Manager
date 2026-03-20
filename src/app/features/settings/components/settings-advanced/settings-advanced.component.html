@@ -27,29 +27,6 @@
         <ion-list lines="none">
           <ion-item lines="none">
             <ion-label>
-              <h3>{{ "settings.data.resetTitle" | translate }}</h3>
-              <p>{{ "settings.data.resetDescription" | translate }}</p>
-            </ion-label>
-            <ion-button
-              fill="clear"
-              slot="end"
-              (click)="facade.resetApplicationData()"
-              [disabled]="facade.isResettingData()"
-              [attr.aria-label]="'settings.data.resetAction' | translate"
-            >
-              @if (facade.isResettingData()) {
-                <ion-spinner
-                  slot="icon-only"
-                  name="dots"
-                ></ion-spinner>
-              } @else {
-                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-              }
-            </ion-button>
-          </ion-item>
-
-          <ion-item lines="none">
-            <ion-label>
               <h3>{{ "settings.data.exportTitle" | translate }}</h3>
               <p>{{ "settings.data.exportDescription" | translate }}</p>
             </ion-label>
@@ -66,7 +43,7 @@
                   name="dots"
                 ></ion-spinner>
               } @else {
-                <ion-icon slot="icon-only" name="exit-outline"></ion-icon>
+                <ion-icon slot="icon-only" name="share-social-outline"></ion-icon>
               }
             </ion-button>
           </ion-item>
@@ -93,6 +70,32 @@
               }
             </ion-button>
           </ion-item>
+
+          <ion-item-divider></ion-item-divider>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.data.resetTitle" | translate }}</h3>
+              <p>{{ "settings.data.resetDescription" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              color="danger"
+              (click)="facade.resetApplicationData()"
+              [disabled]="facade.isResettingData()"
+              [attr.aria-label]="'settings.data.resetAction' | translate"
+            >
+              @if (facade.isResettingData()) {
+                <ion-spinner
+                  slot="icon-only"
+                  name="dots"
+                ></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
         </ion-list>
       </ion-card-content>
     </ion-card>
@@ -110,6 +113,7 @@
             detail="true"
             routerLink="/settings/catalogos"
           >
+            <ion-icon slot="start" name="list-outline" color="primary"></ion-icon>
             <ion-label>
               <h3>{{ "settings.catalogs.manageTitle" | translate }}</h3>
               <p>{{ "settings.catalogs.manageSubtitle" | translate }}</p>

@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
 import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
+import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edit-modal.component';
 import {
   IonButton,
   IonButtons,
@@ -32,6 +33,7 @@ import { TranslateModule } from '@ngx-translate/core';
     RouterLink,
     TranslateModule,
     InsightCardComponent,
+    BatchEditModalComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
