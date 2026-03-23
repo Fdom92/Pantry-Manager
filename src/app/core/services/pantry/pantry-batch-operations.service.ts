@@ -6,6 +6,7 @@ import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeLocationId, normalizeLowercase } from '@core/utils/normalization.util';
 import { generateBatchId } from '@core/utils';
+import type { EventSource } from '@core/models/events';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { PantryStoreService } from './pantry-store.service';
 import { PantryViewModelService } from './pantry-view-model.service';
@@ -25,6 +26,7 @@ export class PantryBatchOperationsService {
     batchId?: string;
     adjustmentType?: 'add' | 'consume';
     deltaQuantity?: number;
+    source?: EventSource;
   }>();
   private readonly stockSaveDelay = BATCH_STOCK_SAVE_DELAY_MS;
 
@@ -37,7 +39,8 @@ export class PantryBatchOperationsService {
     batch: ItemBatch,
     delta: number,
     event?: Event,
-    pantryItemsState?: WritableSignal<PantryItem[]>
+    pantryItemsState?: WritableSignal<PantryItem[]>,
+    source?: EventSource
   ): Promise<void> {
     event?.stopPropagation();
     if (!item?._id || !Number.isFinite(delta) || delta === 0) {
@@ -90,6 +93,7 @@ export class PantryBatchOperationsService {
       batchId: targetBatchId,
       adjustmentType: delta > 0 ? 'add' : 'consume',
       deltaQuantity: delta,
+      source,
     });
   }
 
@@ -102,7 +106,8 @@ export class PantryBatchOperationsService {
     item: PantryItem,
     change: number,
     pantryItemsState?: WritableSignal<PantryItem[]>,
-    expirationDate?: string
+    expirationDate?: string,
+    source?: EventSource
   ): Promise<void> {
     if (!item?._id || !Number.isFinite(change) || change === 0) {
       return;
@@ -130,7 +135,8 @@ export class PantryBatchOperationsService {
         newBatch,
         change,
         undefined,
-        pantryItemsState
+        pantryItemsState,
+        source
       );
     } else if (change < 0) {
       const originalTotal = sumQuantities(item.batches ?? [], { round: roundQuantity });
@@ -138,7 +144,7 @@ export class PantryBatchOperationsService {
       const newTotal = sumQuantities(finalBatches, { round: roundQuantity });
       const updatedItem = this.rebuildItemWithBatches(item, finalBatches, pantryItemsState);
       await this.provideQuantityFeedback(originalTotal, newTotal);
-      this.triggerStockSave(item._id, updatedItem, { adjustmentType: 'consume', deltaQuantity: change });
+      this.triggerStockSave(item._id, updatedItem, { adjustmentType: 'consume', deltaQuantity: change, source });
     }
   }
 
@@ -234,6 +240,7 @@ export class PantryBatchOperationsService {
       batchId?: string;
       adjustmentType?: 'add' | 'consume';
       deltaQuantity?: number;
+      source?: EventSource;
     }
   ): void {
     this.pendingItems.set(itemId, updated);
@@ -248,6 +255,7 @@ export class PantryBatchOperationsService {
           batchId: meta.batchId ?? existing.batchId,
           adjustmentType: nextType,
           deltaQuantity: Number.isFinite(nextDelta) ? nextDelta : undefined,
+          source: meta.source ?? existing.source,
         });
       }
     }
@@ -274,10 +282,8 @@ export class PantryBatchOperationsService {
           await this.pantryStore.updateItem(nextPayload);
           const eventMeta = this.pendingEventMeta.get(itemId);
           const deltaQuantity = eventMeta?.deltaQuantity;
-          if (eventMeta?.adjustmentType === 'add') {
-            await this.eventManager.logStockAdjust(latest, nextPayload, deltaQuantity ?? 0, eventMeta?.batchId);
-          } else if (eventMeta?.adjustmentType === 'consume') {
-            await this.eventManager.logStockAdjust(latest, nextPayload, deltaQuantity ?? 0, eventMeta?.batchId);
+          if (eventMeta?.adjustmentType === 'add' || eventMeta?.adjustmentType === 'consume') {
+            await this.eventManager.logStockAdjust(latest, nextPayload, deltaQuantity ?? 0, eventMeta?.batchId, eventMeta?.source);
           }
         } catch (err) {
           console.error('[PantryBatchOperationsService] updateItem error', err);

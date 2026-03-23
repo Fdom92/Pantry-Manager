@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { classifyExpiry, sumQuantities } from '@core/domain/pantry';
 import type { PantryItem } from '@core/models/pantry';
+import type { EventSource } from '@core/models/events';
 import { normalizeTrim, normalizeWhitespace } from '@core/utils/normalization.util';
 import { HistoryEventLogService } from './history-event-log.service';
 
@@ -32,6 +33,8 @@ export class HistoryEventManagerService {
       deltaQuantity: addedQuantity,
       previousQuantity: 0,
       nextQuantity,
+      source: 'fast_add',
+      categoryId: item.categoryId,
       timestamp,
     });
   }
@@ -42,11 +45,7 @@ export class HistoryEventManagerService {
     addedQuantity: number,
     timestamp?: string
   ) {
-    return this.logAddWithDelta(previousItem, updatedItem, addedQuantity, timestamp);
-  }
-
-  async logShoppingAdd(previousItem: PantryItem, updatedItem: PantryItem, addedQuantity: number) {
-    return this.logAddWithDelta(previousItem, updatedItem, addedQuantity);
+    return this.logAddWithDelta(previousItem, updatedItem, addedQuantity, 'fast_add', timestamp);
   }
 
   async logAdvancedCreate(item: PantryItem) {
@@ -61,6 +60,8 @@ export class HistoryEventManagerService {
       deltaQuantity: totalQuantity,
       previousQuantity: 0,
       nextQuantity: totalQuantity,
+      source: 'edit_modal',
+      categoryId: item.categoryId,
     });
   }
 
@@ -82,6 +83,8 @@ export class HistoryEventManagerService {
       deltaQuantity: nextQuantity - previousQuantity,
       previousQuantity,
       nextQuantity,
+      source: 'edit_modal',
+      categoryId: updatedItem.categoryId,
     });
   }
 
@@ -95,10 +98,18 @@ export class HistoryEventManagerService {
       deltaQuantity: -consumedQuantity,
       previousQuantity,
       nextQuantity,
+      source: 'dashboard',
+      categoryId: updatedItem.categoryId,
     });
   }
 
-  async logStockAdjust(previousItem: PantryItem | undefined, updatedItem: PantryItem, deltaQuantity: number, batchId?: string) {
+  async logStockAdjust(
+    previousItem: PantryItem | undefined,
+    updatedItem: PantryItem,
+    deltaQuantity: number,
+    batchId?: string,
+    source?: EventSource
+  ) {
     if (!Number.isFinite(deltaQuantity) || deltaQuantity === 0) {
       return null;
     }
@@ -116,6 +127,8 @@ export class HistoryEventManagerService {
       previousQuantity,
       nextQuantity,
       batchId,
+      source,
+      categoryId: updatedItem.categoryId,
     });
   }
 
@@ -154,6 +167,8 @@ export class HistoryEventManagerService {
             productName: item.name,
             quantity,
             batchId: batch.batchId,
+            source: 'system',
+            categoryId: item.categoryId,
             timestamp: expiredAt,
             sourceMetadata: {
               batchKey,
@@ -178,6 +193,8 @@ export class HistoryEventManagerService {
       deltaQuantity: -totalQuantity,
       previousQuantity: totalQuantity,
       nextQuantity: 0,
+      source: 'quantity_sheet',
+      categoryId: item.categoryId,
     });
   }
 
@@ -200,6 +217,7 @@ export class HistoryEventManagerService {
     previousItem: PantryItem,
     updatedItem: PantryItem,
     addedQuantity: number,
+    source?: EventSource,
     timestamp?: string
   ) {
     const previousQuantity = this.getItemQuantity(previousItem);
@@ -211,6 +229,8 @@ export class HistoryEventManagerService {
       deltaQuantity: addedQuantity,
       previousQuantity,
       nextQuantity,
+      source,
+      categoryId: updatedItem.categoryId,
       timestamp,
     });
   }

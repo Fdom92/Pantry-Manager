@@ -71,6 +71,8 @@ export class HistoryEventLogService extends StorageService<PantryEvent> {
       previousQuantity: quantities.previousQuantity,
       nextQuantity: quantities.nextQuantity,
       batchId: params.batchId,
+      source: params.source,
+      categoryId: params.categoryId,
       sourceMetadata: params.sourceMetadata,
       timestamp: now,
       createdAt: now,
