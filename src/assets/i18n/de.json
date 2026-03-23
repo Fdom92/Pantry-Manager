@@ -606,7 +606,20 @@
       "stockUpdatedSimple": "💾 Bestand aktualisiert.",
       "saved": "💾 Änderungen gespeichert."
     },
-    "confirmDelete": "„{{ name }}“ löschen?"
+    "confirmDelete": "„{{ name }}“ löschen?",
+    "fab": {
+      "groupLabel": "Aktionen"
+    },
+    "consume": {
+      "groupLabel": "Produkte verbrauchen",
+      "title": "Produkte verbrauchen",
+      "cardTitle": "Produkt suchen",
+      "subtitle": "Suche ein Produkt in deiner Vorratskammer, um den Verbrauch zu erfassen.",
+      "placeholder": "Produkt suchen",
+      "noResults": "Keine Ergebnisse",
+      "empty": "Noch keine Artikel hinzugefügt.",
+      "submit": "Verbrauch erfassen"
+    }
   },
   "upgrade": {
     "title": "PRO werden",

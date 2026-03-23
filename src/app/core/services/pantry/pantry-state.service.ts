@@ -14,6 +14,7 @@ import { SettingsPreferencesService } from '../settings/settings-preferences.ser
 import { PantryBatchOperationsService } from './pantry-batch-operations.service';
 import { PantryBatchesModalStateService } from './modals/pantry-batches-modal-state.service';
 import { PantryAddModalStateService } from './modals/pantry-add-modal-state.service';
+import { PantryConsumeModalStateService } from './modals/pantry-consume-modal-state.service';
 import { PantryQuantitySheetStateService } from './modals/pantry-quantity-sheet-state.service';
 import { PantryListUiStateService } from './pantry-list-ui-state.service';
 import { PantryStoreService } from './pantry-store.service';
@@ -32,6 +33,7 @@ export class PantryStateService {
   private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly listUi = inject(PantryListUiStateService);
   private readonly fastAddModal = inject(PantryAddModalStateService);
+  private readonly consumeModal = inject(PantryConsumeModalStateService);
   private readonly batchesModal = inject(PantryBatchesModalStateService);
   private readonly quantitySheet = inject(PantryQuantitySheetStateService);
 
@@ -66,6 +68,13 @@ export class PantryStateService {
   readonly fastAddOptions = this.fastAddModal.fastAddOptions;
   readonly showFastAddEmptyAction = this.fastAddModal.showFastAddEmptyAction;
   readonly fastAddEmptyActionLabel = this.fastAddModal.fastAddEmptyActionLabel;
+  readonly consumeModalOpen = this.consumeModal.consumeModalOpen;
+  readonly isConsuming = this.consumeModal.isConsuming;
+  readonly consumeQuery = this.consumeModal.consumeQuery;
+  readonly consumeEntries = this.consumeModal.consumeEntries;
+  readonly consumeEntryViewModels = this.consumeModal.consumeEntryViewModels;
+  readonly hasConsumeEntries = this.consumeModal.hasConsumeEntries;
+  readonly consumeOptions = this.consumeModal.consumeOptions;
   readonly showBatchesModal = this.batchesModal.showBatchesModal;
   readonly selectedBatchesItem = this.batchesModal.selectedBatchesItem;
   readonly batchesEditMode = this.batchesModal.editMode;
@@ -102,6 +111,9 @@ export class PantryStateService {
 
     // Provide pantry items state to quantity sheet service for optimistic updates
     this.quantitySheet.pantryItemsState = this.pantryItemsState;
+
+    // Provide pantry items state to consume modal for optimistic updates
+    this.consumeModal.pantryItemsState = this.pantryItemsState;
 
     // Keep UI in sync with filtered pipeline, merging optimistic batch edits
     effect(() => {
@@ -189,6 +201,15 @@ export class PantryStateService {
   adjustFastAddEntry = (entry: FastAddEntry, delta: number) => this.fastAddModal.adjustFastAddEntry(entry, delta);
   adjustFastAddEntryById = (entryId: string, delta: number) => this.fastAddModal.adjustFastAddEntryById(entryId, delta);
   setFastAddEntryDate = (entryId: string, date: string | undefined) => this.fastAddModal.setFastAddEntryDate(entryId, date);
+
+  // -------- Consume modal (delegates to PantryConsumeModalStateService) --------
+  openConsumeModal = () => this.consumeModal.openConsumeModal();
+  closeConsumeModal = () => this.consumeModal.closeConsumeModal();
+  dismissConsumeModal = () => this.consumeModal.dismissConsumeModal();
+  submitConsume = () => this.consumeModal.submitConsume();
+  onConsumeQueryChange = (value: string) => this.consumeModal.onConsumeQueryChange(value);
+  addConsumeEntry = (option: AutocompleteItem<PantryItem>) => this.consumeModal.addConsumeEntry(option);
+  adjustConsumeEntryById = (entryId: string, delta: number) => this.consumeModal.adjustConsumeEntryById(entryId, delta);
 
   // -------- List UI state (delegates to PantryListUiStateService) --------
   trackByItemId = (index: number, item: PantryItem) => this.listUi.trackByItemId(index, item);

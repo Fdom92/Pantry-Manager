@@ -66,10 +66,12 @@
                         <ion-icon slot="icon-only" name="add-outline"></ion-icon>
                       </ion-button>
                     </div>
-                    <app-date-chip
-                      [date]="entry.expirationDate"
-                      (dateChange)="entryDateChange.emit({ entry, date: $event })">
-                    </app-date-chip>
+                    @if (showEntryDate) {
+                      <app-date-chip
+                        [date]="entry.expirationDate"
+                        (dateChange)="entryDateChange.emit({ entry, date: $event })">
+                      </app-date-chip>
+                    }
                   </div>
                 </div>
               }

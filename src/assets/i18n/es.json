@@ -607,7 +607,20 @@
       "stockUpdatedSimple": "💾 Stock actualizado.",
       "saved": "💾 Cambios guardados."
     },
-    "confirmDelete": "¿Eliminar \"{{ name }}\"?"
+    "confirmDelete": "¿Eliminar \"{{ name }}\"?",
+    "fab": {
+      "groupLabel": "Acciones"
+    },
+    "consume": {
+      "groupLabel": "Consumir productos",
+      "title": "Consumir productos",
+      "cardTitle": "Busca un producto",
+      "subtitle": "Busca un producto de tu despensa para registrar su consumo.",
+      "placeholder": "Buscar producto",
+      "noResults": "Sin resultados",
+      "empty": "Todavía no has añadido productos.",
+      "submit": "Registrar consumo"
+    }
   },
   "upgrade": {
     "title": "Hazte PRO",

@@ -11,6 +11,7 @@ import {
   IonContent,
   IonFab,
   IonFabButton,
+  IonFabList,
   IonHeader,
   IonIcon,
   IonModal,
@@ -26,11 +27,13 @@ import { PantryBatchesModalComponent } from './components/batches-modal/batches-
 import { PantryEditItemModalComponent } from './components/edit-item-modal/edit-item-modal.component';
 import { PantryQuantitySheetComponent } from './components/pantry-quantity-sheet/pantry-quantity-sheet.component';
 import { PantryAddModalComponent } from './components/add-modal/add-modal.component';
+import { PantryConsumeModalComponent } from './components/consume-modal/consume-modal.component';
 import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.component';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
 import { PantryBatchOperationsService } from '@core/services/pantry/pantry-batch-operations.service';
 import { PantryListUiStateService } from '@core/services/pantry/pantry-list-ui-state.service';
 import { PantryAddModalStateService } from '@core/services/pantry/modals/pantry-add-modal-state.service';
+import { PantryConsumeModalStateService } from '@core/services/pantry/modals/pantry-consume-modal-state.service';
 import { PantryBatchesModalStateService } from '@core/services/pantry/modals/pantry-batches-modal-state.service';
 import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pantry-edit-item-modal-state.service';
 import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pantry-quantity-sheet-state.service';
@@ -52,6 +55,7 @@ import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pa
     IonCardTitle,
     IonFab,
     IonFabButton,
+    IonFabList,
     IonChip,
     IonModal,
     IonSkeletonText,
@@ -62,6 +66,7 @@ import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pa
     TranslateModule,
     EmptyStateComponent,
     PantryAddModalComponent,
+    PantryConsumeModalComponent,
     PantryBatchesModalComponent,
     PantryEditItemModalComponent,
     PantryQuantitySheetComponent,
@@ -74,6 +79,7 @@ import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pa
     PantryBatchOperationsService,
     PantryListUiStateService,
     PantryAddModalStateService,
+    PantryConsumeModalStateService,
     PantryBatchesModalStateService,
     PantryEditItemModalStateService,
     PantryQuantitySheetStateService,
