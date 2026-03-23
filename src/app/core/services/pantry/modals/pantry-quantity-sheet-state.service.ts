@@ -1,5 +1,6 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
+import { ReviewPromptService } from '../../shared/review-prompt.service';
 import { PantryBatchOperationsService } from '../pantry-batch-operations.service';
 
 /**
@@ -8,6 +9,7 @@ import { PantryBatchOperationsService } from '../pantry-batch-operations.service
 @Injectable()
 export class PantryQuantitySheetStateService {
   private readonly batchOps = inject(PantryBatchOperationsService);
+  private readonly reviewPrompt = inject(ReviewPromptService);
 
   readonly showQuantitySheet = signal(false);
   readonly selectedItem = signal<PantryItem | null>(null);
@@ -52,6 +54,9 @@ export class PantryQuantitySheetStateService {
 
     if (item && change !== 0) {
       await this.applyPendingChanges(item, change, expiryDate);
+      if (change < 0) {
+        this.reviewPrompt.handleConsumeCompleted();
+      }
     }
   }
 

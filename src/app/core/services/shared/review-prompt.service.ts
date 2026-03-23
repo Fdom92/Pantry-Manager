@@ -15,9 +15,11 @@ export class ReviewPromptService {
   private readonly translate = inject(TranslateService);
 
   private readonly minDaysSinceFirstUse = 7;
-  private readonly minLaunches = 7;
+  private readonly minLaunches = 5;
   private readonly cooldownDays = 30;
+  private readonly completedCooldownDays = 90;
   private readonly minProductAddsForPrompt = 3;
+  private readonly minConsumesForPrompt = 3;
   private readonly promptDelayMs = 1500;
   private lastTriggerAt = 0;
   private readonly storageAvailable = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
@@ -59,6 +61,19 @@ export class ReviewPromptService {
     const next = current + 1;
     this.setItem(REVIEW_STORAGE_KEYS.PRODUCT_ADD_COUNT, String(next));
     if (next >= this.minProductAddsForPrompt) {
+      setBooleanFlag(REVIEW_STORAGE_KEYS.PENDING, true);
+    }
+  }
+
+  handleConsumeCompleted(): void {
+    if (!this.storageAvailable) {
+      return;
+    }
+    this.noteFirstUse();
+    const current = this.getStoredNumber(REVIEW_STORAGE_KEYS.CONSUME_COUNT) ?? 0;
+    const next = current + 1;
+    this.setItem(REVIEW_STORAGE_KEYS.CONSUME_COUNT, String(next));
+    if (next >= this.minConsumesForPrompt) {
       setBooleanFlag(REVIEW_STORAGE_KEYS.PENDING, true);
     }
   }
@@ -116,7 +131,8 @@ export class ReviewPromptService {
     if (!getBooleanFlag(ONBOARDING_STORAGE_KEY)) {
       return false;
     }
-    if (this.getStoredDate(REVIEW_STORAGE_KEYS.COMPLETED_AT)) {
+    const completedAt = this.getStoredDate(REVIEW_STORAGE_KEYS.COMPLETED_AT);
+    if (completedAt && this.getDaysSince(completedAt) < this.completedCooldownDays) {
       return false;
     }
 
