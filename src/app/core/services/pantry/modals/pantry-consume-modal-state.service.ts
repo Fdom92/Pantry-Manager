@@ -6,6 +6,7 @@ import { withSignalFlag } from '@core/utils';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { LanguageService } from '../../shared/language.service';
+import { ReviewPromptService } from '../../shared/review-prompt.service';
 import { PantryBatchOperationsService } from '../pantry-batch-operations.service';
 import { PantryStoreService } from '../pantry-store.service';
 
@@ -17,6 +18,7 @@ export class PantryConsumeModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly languageService = inject(LanguageService);
+  private readonly reviewPrompt = inject(ReviewPromptService);
 
   // Reference to pantry items state for optimistic updates
   pantryItemsState?: WritableSignal<PantryItem[]>;
@@ -95,6 +97,7 @@ export class PantryConsumeModalStateService {
         );
       }
       this.dismissConsumeModal();
+      this.reviewPrompt.handleConsumeCompleted();
     }).catch(err => {
       console.error('[PantryConsumeModalStateService] submitConsume error', err);
     });
