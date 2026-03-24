@@ -69,6 +69,7 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Input() entries: readonly EntitySelectorEntry[] = [];
   @Input() showSecondaryInfo = false;
   @Input() showMeta = false;
+  @Input() showEntryDate = true;
   @Input() showAllOnFocus = true;
   @Input() autofocus = true;
   @Input() maxOptions = 0;

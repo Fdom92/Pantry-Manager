@@ -606,7 +606,20 @@
       "stockUpdatedSimple": "💾 Stock mis à jour.",
       "saved": "💾 Modifications enregistrées."
     },
-    "confirmDelete": "Supprimer \"{{ name }}\" ?"
+    "confirmDelete": "Supprimer \"{{ name }}\" ?",
+    "fab": {
+      "groupLabel": "Actions"
+    },
+    "consume": {
+      "groupLabel": "Consommer des produits",
+      "title": "Consommer des produits",
+      "cardTitle": "Rechercher un produit",
+      "subtitle": "Recherchez un produit dans votre garde-manger pour enregistrer sa consommation.",
+      "placeholder": "Rechercher un produit",
+      "noResults": "Aucun résultat",
+      "empty": "Aucun article ajouté pour l'instant.",
+      "submit": "Enregistrer la consommation"
+    }
   },
   "upgrade": {
     "title": "Passer en PRO",

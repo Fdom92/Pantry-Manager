@@ -117,6 +117,7 @@
   }
 
   <app-pantry-add-modal></app-pantry-add-modal>
+  <app-pantry-consume-modal></app-pantry-consume-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>
 
@@ -147,12 +148,23 @@
     </ng-template>
   </ion-modal>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="add-fab">
-    <ion-fab-button
-      color="primary"
-      [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
-      (click)="facade.openFastAddModal()">
-      <ion-icon name="add-outline"></ion-icon>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="action-fab">
+    <ion-fab-button color="primary" [attr.aria-label]="'pantry.fab.groupLabel' | translate">
+      <ion-icon name="ellipsis-vertical-outline"></ion-icon>
     </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button
+        color="primary"
+        [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
+        (click)="facade.openFastAddModal()">
+        <ion-icon name="add-outline"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button
+        color="secondary"
+        [attr.aria-label]="'pantry.consume.groupLabel' | translate"
+        (click)="facade.openConsumeModal()">
+        <ion-icon name="remove-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
   </ion-fab>
 </ion-content>
