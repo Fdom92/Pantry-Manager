@@ -206,6 +206,8 @@ export class HistoryEventManagerService {
     previousQuantity?: number;
     nextQuantity: number;
     batchId?: string;
+    source?: EventSource;
+    categoryId?: string,
   }) {
     if (params.deltaQuantity > 0) {
       return this.eventLog.logAddEvent(params);
