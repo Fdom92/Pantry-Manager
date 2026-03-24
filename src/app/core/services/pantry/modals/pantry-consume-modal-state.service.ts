@@ -93,7 +93,9 @@ export class PantryConsumeModalStateService {
         await this.batchOps.adjustTotalQuantityWithFIFO(
           latestItem,
           -entry.quantity,
-          this.pantryItemsState
+          this.pantryItemsState,
+          latestItem.expirationDate ?? undefined,
+          'consume_modal'
         );
       }
       this.dismissConsumeModal();
