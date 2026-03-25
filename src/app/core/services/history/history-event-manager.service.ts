@@ -65,40 +65,16 @@ export class HistoryEventManagerService {
     });
   }
 
-  async logAdvancedEdit(previousItem: PantryItem, updatedItem: PantryItem) {
-    return this.logEditWithDelta(previousItem, updatedItem);
-  }
-
-  async logQuickEdit(previousItem: PantryItem, updatedItem: PantryItem) {
-    return this.logEditWithDelta(previousItem, updatedItem);
-  }
-
-  private logEditWithDelta(previousItem: PantryItem, updatedItem: PantryItem) {
+  async logAdvancedEdit(previousItem: PantryItem, updatedItem: PantryItem, source: EventSource = 'edit_modal') {
     const previousQuantity = this.getItemQuantity(previousItem);
     const nextQuantity = this.getItemQuantity(updatedItem);
     return this.eventLog.logEditEvent({
       productId: updatedItem._id,
       productName: updatedItem.name,
       quantity: nextQuantity,
-      deltaQuantity: nextQuantity - previousQuantity,
       previousQuantity,
       nextQuantity,
-      source: 'edit_modal',
-      categoryId: updatedItem.categoryId,
-    });
-  }
-
-  async logConsumeDashboard(previousItem: PantryItem, updatedItem: PantryItem, consumedQuantity: number) {
-    const previousQuantity = this.getItemQuantity(previousItem);
-    const nextQuantity = this.getItemQuantity(updatedItem);
-    return this.eventLog.logConsumeEvent({
-      productId: updatedItem._id,
-      productName: previousItem.name,
-      quantity: consumedQuantity,
-      deltaQuantity: -consumedQuantity,
-      previousQuantity,
-      nextQuantity,
-      source: 'dashboard',
+      source,
       categoryId: updatedItem.categoryId,
     });
   }
@@ -193,7 +169,7 @@ export class HistoryEventManagerService {
       deltaQuantity: -totalQuantity,
       previousQuantity: totalQuantity,
       nextQuantity: 0,
-      source: 'quantity_sheet',
+      source: 'pantry_card',
       categoryId: item.categoryId,
     });
   }

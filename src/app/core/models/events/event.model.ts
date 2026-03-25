@@ -8,6 +8,7 @@ export type EventSource =
   | 'quantity_sheet'
   | 'batches_modal'
   | 'edit_modal'
+  | 'pantry_card'
   | 'dashboard'
   | 'system';
 

@@ -19,3 +19,27 @@ export function hasMeaningfulItemChanges(previous: PantryItem, next: PantryItem)
   };
   return JSON.stringify(stripMeta(previous)) !== JSON.stringify(stripMeta(next));
 }
+
+/**
+ * Returns true if any batch has a changed expirationDate, locationId, or opened flag
+ * (ignoring quantity changes, which are tracked via ADD/CONSUME events).
+ */
+export function hasBatchMetadataChanged(prev: ItemBatch[], next: ItemBatch[]): boolean {
+  const prevMap = new Map(prev.map(b => [b.batchId, b]));
+  for (const batch of next) {
+    const prevBatch = prevMap.get(batch.batchId ?? '');
+    if (!prevBatch) {
+      continue;
+    }
+    if (prevBatch.expirationDate !== batch.expirationDate) {
+      return true;
+    }
+    if ((prevBatch.locationId ?? '') !== (batch.locationId ?? '')) {
+      return true;
+    }
+    if (!!prevBatch.opened !== !!batch.opened) {
+      return true;
+    }
+  }
+  return false;
+}

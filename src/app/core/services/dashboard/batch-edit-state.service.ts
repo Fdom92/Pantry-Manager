@@ -116,7 +116,7 @@ export class BatchEditStateService {
         const value = values.get(item._id)!;
         const updated = this.buildUpdatedItem(item, action, value, now);
         await this.pantryStore.updateItem(updated);
-        await this.eventManager.logAdvancedEdit(item, updated);
+        await this.eventManager.logAdvancedEdit(item, updated, 'dashboard');
       }));
       this.dismiss();
       await this.showSuccessToast(items.length);
