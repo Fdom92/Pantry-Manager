@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonChip, IonContent, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
 
@@ -12,7 +12,9 @@ import { DateChipComponent } from '@shared/components/date-chip/date-chip.compon
     CommonModule,
     IonContent,
     IonButton,
+    IonChip,
     IonIcon,
+    IonLabel,
     DateChipComponent,
     TranslateModule,
   ],
@@ -26,9 +28,11 @@ export class PantryQuantitySheetComponent {
   @Input({ required: true }) pendingChange = 0;
   @Input({ required: true }) quantityUnit?: string;
   @Input() pendingExpiryDate?: string;
+  @Input() pendingNoExpiry = false;
   @Output() increment = new EventEmitter<void>();
   @Output() decrement = new EventEmitter<void>();
   @Output() expiryDateChange = new EventEmitter<string | undefined>();
+  @Output() noExpiryToggle = new EventEmitter<void>();
   @Output() viewDetails = new EventEmitter<void>();
   @Output() editRequested = new EventEmitter<Event | undefined>();
   @Output() deleteRequested = new EventEmitter<Event | undefined>();

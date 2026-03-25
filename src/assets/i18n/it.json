@@ -482,7 +482,8 @@
       },
       "expired": {
         "yesterday": "Scaduto ieri"
-      }
+      },
+      "noExpiryIntentional": "Senza scadenza"
     },
     "form": {
       "editTitle": "Modifica articolo",
@@ -591,7 +592,7 @@
       "decrease": "Diminuisci",
       "viewDetails": "Vedi lotti e date",
       "expiryDate": "Data di scadenza (opzionale)",
-      "noDate": "Nessuna data",
+      "noDate": "Aggiungi data",
       "zeroHint": "Sparirà dalla dispensa finché non aggiungi scorte",
       "zeroHintBasic": "Sparirà dalla dispensa e comparirà nella tua lista della spesa"
     },

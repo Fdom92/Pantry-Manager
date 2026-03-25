@@ -482,7 +482,8 @@
       },
       "expired": {
         "yesterday": "Expired yesterday"
-      }
+      },
+      "noExpiryIntentional": "No expiry"
     },
     "form": {
       "editTitle": "Edit item",
@@ -592,7 +593,7 @@
       "decrease": "Decrease",
       "viewDetails": "View batches & dates",
       "expiryDate": "Expiry date (optional)",
-      "noDate": "No date",
+      "noDate": "Add date",
       "zeroHint": "It'll disappear from your pantry until you restock it",
       "zeroHintBasic": "It'll disappear from your pantry and show up in your shopping list"
     },

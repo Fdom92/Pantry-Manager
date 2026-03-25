@@ -482,7 +482,8 @@
       },
       "expired": {
         "yesterday": "Expiré hier"
-      }
+      },
+      "noExpiryIntentional": "Sans date"
     },
     "form": {
       "editTitle": "Modifier l’article",
@@ -591,7 +592,7 @@
       "decrease": "Diminuer",
       "viewDetails": "Voir lots et dates",
       "expiryDate": "Date de péremption (optionnel)",
-      "noDate": "Sans date",
+      "noDate": "Ajouter date",
       "zeroHint": "Il disparaîtra de votre garde-manger jusqu'à ce que vous en rajoutiez",
       "zeroHintBasic": "Il disparaîtra de votre garde-manger et apparaîtra dans votre liste de courses"
     },

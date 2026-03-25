@@ -34,6 +34,7 @@ export class PantryAddModalStateService {
       quantity: entry.quantity,
       isNew: entry.isNew,
       expirationDate: entry.expirationDate,
+      noExpiry: entry.noExpiry,
     }))
   );
 
@@ -106,6 +107,7 @@ export class PantryAddModalStateService {
             name: entry.name,
             quantity: entry.quantity,
             expirationDate: entry.expirationDate,
+            noExpiry: entry.noExpiry,
           });
           await this.pantryStore.addItem(item);
           await this.eventManager.logFastAddNewItem(item, entry.quantity, timestamp);
@@ -115,6 +117,7 @@ export class PantryAddModalStateService {
         const updated = await this.pantryStore.addNewLot(entry.item._id, {
           quantity: entry.quantity,
           expiryDate: entry.expirationDate,
+          noExpiry: entry.noExpiry,
         });
         if (updated) {
           await this.pantryStore.updateItem(updated);
@@ -249,13 +252,28 @@ export class PantryAddModalStateService {
 
   /**
    * Set or clear the expiry date for an entry by ID.
+   * Clears noExpiry when a real date is set.
    */
   setFastAddEntryDate(entryId: string, date: string | undefined): void {
     this.fastAddEntries.update(current => {
       const index = current.findIndex(row => row.id === entryId);
       if (index < 0) return current;
       const next = [...current];
-      next[index] = { ...next[index], expirationDate: date || undefined };
+      next[index] = { ...next[index], expirationDate: date || undefined, noExpiry: date ? undefined : next[index].noExpiry };
+      return next;
+    });
+  }
+
+  /**
+   * Toggle "intentionally no expiry" for an entry. Clears expirationDate.
+   */
+  setFastAddEntryNoExpiry(entryId: string): void {
+    this.fastAddEntries.update(current => {
+      const index = current.findIndex(row => row.id === entryId);
+      if (index < 0) return current;
+      const next = [...current];
+      const toggled = !next[index].noExpiry;
+      next[index] = { ...next[index], noExpiry: toggled || undefined, expirationDate: toggled ? undefined : next[index].expirationDate };
       return next;
     });
   }

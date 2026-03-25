@@ -482,7 +482,8 @@
       },
       "expired": {
         "yesterday": "Gestern abgelaufen"
-      }
+      },
+      "noExpiryIntentional": "Kein Ablaufdatum"
     },
     "form": {
       "editTitle": "Artikel bearbeiten",
@@ -591,7 +592,7 @@
       "decrease": "Verringern",
       "viewDetails": "Chargen & Daten anzeigen",
       "expiryDate": "Ablaufdatum (optional)",
-      "noDate": "Kein Datum",
+      "noDate": "Datum wählen",
       "zeroHint": "Verschwindet aus deiner Speisekammer, bis du wieder Vorrat hinzufügst",
       "zeroHintBasic": "Verschwindet aus deiner Speisekammer und taucht in deiner Einkaufsliste auf"
     },

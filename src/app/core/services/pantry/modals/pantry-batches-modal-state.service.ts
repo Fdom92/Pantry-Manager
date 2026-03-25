@@ -140,6 +140,7 @@ export class PantryBatchesModalStateService {
 
   /**
    * Update expiration date for a batch at given index.
+   * Clears noExpiry when a real date is set.
    */
   updateBatchExpirationDate(index: number, dateString: string): void {
     const batches = this.editedBatches();
@@ -151,6 +152,25 @@ export class PantryBatchesModalStateService {
     updated[index] = {
       ...updated[index],
       expirationDate: isoDate,
+      noExpiry: isoDate ? undefined : updated[index].noExpiry,
+    };
+    this.editedBatches.set(updated);
+  }
+
+  /**
+   * Toggle "intentionally no expiry" for a batch at given index. Clears expirationDate.
+   */
+  updateBatchNoExpiry(index: number): void {
+    const batches = this.editedBatches();
+    if (index < 0 || index >= batches.length) {
+      return;
+    }
+    const updated = [...batches];
+    const toggled = !updated[index].noExpiry;
+    updated[index] = {
+      ...updated[index],
+      noExpiry: toggled || undefined,
+      expirationDate: toggled ? undefined : updated[index].expirationDate,
     };
     this.editedBatches.set(updated);
   }

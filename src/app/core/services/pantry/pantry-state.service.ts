@@ -84,6 +84,7 @@ export class PantryStateService {
   readonly selectedQuantitySheetItem = this.quantitySheet.selectedItem;
   readonly pendingQuantityChange = this.quantitySheet.pendingQuantityChange;
   readonly pendingQuantitySheetExpiryDate = this.quantitySheet.pendingExpiryDate;
+  readonly pendingQuantitySheetNoExpiry = this.quantitySheet.pendingNoExpiry;
 
   // Computed signals coordinating across services
   readonly groups = computed(() => this.viewModel.buildGroups(this.pantryItemsState()));
@@ -301,6 +302,7 @@ export class PantryStateService {
   addBatchesEntry = () => this.batchesModal.addBatch();
   updateBatchQuantity = (index: number, quantity: number) => this.batchesModal.updateBatchQuantity(index, quantity);
   updateBatchExpirationDate = (index: number, dateString: string) => this.batchesModal.updateBatchExpirationDate(index, dateString);
+  updateBatchNoExpiry = (index: number) => this.batchesModal.updateBatchNoExpiry(index);
   updateBatchLocation = (index: number, locationId: string) => this.batchesModal.updateBatchLocation(index, locationId);
   getBatchDateInputValue = (batch: ItemBatch) => this.batchesModal.getBatchDateInputValue(batch);
   saveBatches = async () => await this.batchesModal.saveBatches();
@@ -317,6 +319,7 @@ export class PantryStateService {
   decrementQuantity = (item: PantryItem) => this.quantitySheet.decrementQuantity(item);
   getQuantitySheetTotalQuantity = (item: PantryItem) => this.quantitySheet.getTotalQuantity(item);
   setQuantitySheetExpiryDate = (date: string | undefined) => this.quantitySheet.setExpiryDate(date);
+  toggleQuantitySheetNoExpiry = () => this.quantitySheet.toggleNoExpiry();
 
   closeQuantitySheetWithSave(): void {
     this.quantitySheet.closeQuantitySheet();

@@ -23,6 +23,7 @@ import {
   apertureOutline,
   archiveOutline,
   arrowForwardOutline,
+  banOutline,
   basketOutline,
   bulbOutline,
   calendarOutline,
@@ -188,7 +189,8 @@ addIcons({
   'stats-chart-outline': statsChartOutline,
   'share-social-outline': shareSocialOutline,
   'archive-outline': archiveOutline,
-  'phone-portrait-outline': phonePortraitOutline
+  'phone-portrait-outline': phonePortraitOutline,
+  'ban-outline': banOutline
 });
 
 bootstrapApplication(AppComponent, {

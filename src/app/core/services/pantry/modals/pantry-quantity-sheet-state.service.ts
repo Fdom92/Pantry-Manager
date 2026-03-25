@@ -15,6 +15,7 @@ export class PantryQuantitySheetStateService {
   readonly selectedItem = signal<PantryItem | null>(null);
   readonly pendingQuantityChange = signal(0);
   readonly pendingExpiryDate = signal<string | undefined>(undefined);
+  readonly pendingNoExpiry = signal(false);
 
   // Reference to pantry items state for optimistic updates
   pantryItemsState?: WritableSignal<PantryItem[]>;
@@ -27,6 +28,7 @@ export class PantryQuantitySheetStateService {
     this.selectedItem.set(item);
     this.pendingQuantityChange.set(0);
     this.pendingExpiryDate.set(undefined);
+    this.pendingNoExpiry.set(false);
     this.showQuantitySheet.set(true);
   }
 
@@ -47,13 +49,15 @@ export class PantryQuantitySheetStateService {
     const change = this.pendingQuantityChange();
     const expiryDate = this.pendingExpiryDate();
 
+    const noExpiry = this.pendingNoExpiry();
     this.showQuantitySheet.set(false);
     this.selectedItem.set(null);
     this.pendingQuantityChange.set(0);
     this.pendingExpiryDate.set(undefined);
+    this.pendingNoExpiry.set(false);
 
     if (item && change !== 0) {
-      await this.applyPendingChanges(item, change, expiryDate);
+      await this.applyPendingChanges(item, change, expiryDate, noExpiry);
       if (change < 0) {
         this.reviewPrompt.handleConsumeCompleted();
       }
@@ -62,9 +66,24 @@ export class PantryQuantitySheetStateService {
 
   /**
    * Set the optional expiry date for the new batch being incremented.
+   * Clears noExpiry when a real date is set.
    */
   setExpiryDate(date: string | undefined): void {
     this.pendingExpiryDate.set(date || undefined);
+    if (date) {
+      this.pendingNoExpiry.set(false);
+    }
+  }
+
+  /**
+   * Toggle "intentionally no expiry" for the new batch. Clears pending date.
+   */
+  toggleNoExpiry(): void {
+    const next = !this.pendingNoExpiry();
+    this.pendingNoExpiry.set(next);
+    if (next) {
+      this.pendingExpiryDate.set(undefined);
+    }
   }
 
   /**
@@ -99,8 +118,8 @@ export class PantryQuantitySheetStateService {
   /**
    * Apply accumulated quantity changes when closing the sheet.
    */
-  private async applyPendingChanges(item: PantryItem, change: number, expiryDate?: string): Promise<void> {
-    await this.batchOps.adjustTotalQuantityWithFIFO(item, change, this.pantryItemsState, expiryDate, 'quantity_sheet');
+  private async applyPendingChanges(item: PantryItem, change: number, expiryDate?: string, noExpiry?: boolean): Promise<void> {
+    await this.batchOps.adjustTotalQuantityWithFIFO(item, change, this.pantryItemsState, expiryDate, 'quantity_sheet', noExpiry);
   }
 
 

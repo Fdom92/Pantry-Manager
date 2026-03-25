@@ -12,6 +12,7 @@ export function buildFastAddItemPayload(params: {
   defaultLocationId?: string;
   householdId?: string;
   expirationDate?: string;
+  noExpiry?: boolean;
 }): PantryItem {
   const normalizedName = normalizeTrim(params.name) || UNASSIGNED_PRODUCT_NAME;
 
@@ -31,6 +32,7 @@ export function buildFastAddItemPayload(params: {
       quantity: roundQuantity(Math.max(1, sanitizedQuantity)),
       locationId: normalizeTrim(params.defaultLocationId ?? '') || undefined,
       expirationDate: params.expirationDate ?? undefined,
+      noExpiry: params.noExpiry || undefined,
     },
   ];
 

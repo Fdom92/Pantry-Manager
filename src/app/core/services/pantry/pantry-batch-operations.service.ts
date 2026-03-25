@@ -107,7 +107,8 @@ export class PantryBatchOperationsService {
     change: number,
     pantryItemsState?: WritableSignal<PantryItem[]>,
     expirationDate?: string,
-    source?: EventSource
+    source?: EventSource,
+    noExpiry?: boolean
   ): Promise<void> {
     if (!item?._id || !Number.isFinite(change) || change === 0) {
       return;
@@ -120,6 +121,7 @@ export class PantryBatchOperationsService {
         quantity: 0, // Start with 0, then adjust
         locationId: UNASSIGNED_LOCATION_KEY,
         expirationDate: expirationDate ?? undefined,
+        noExpiry: noExpiry || undefined,
       };
 
       // Add the new batch to the item first

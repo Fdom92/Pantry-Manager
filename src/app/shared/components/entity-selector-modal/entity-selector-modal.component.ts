@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import {
   IonButton,
   IonButtons,
+  IonChip,
   IonContent,
   IonFooter,
   IonHeader,
@@ -24,6 +25,7 @@ export interface EntitySelectorEntry {
   quantity: number;
   maxQuantity?: number;
   expirationDate?: string;
+  noExpiry?: boolean;
 }
 
 @Component({
@@ -39,6 +41,7 @@ export interface EntitySelectorEntry {
     IonButtons,
     IonButton,
     IonIcon,
+    IonChip,
     DateChipComponent,
     IonContent,
     IonLabel,
@@ -70,6 +73,7 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Input() showSecondaryInfo = false;
   @Input() showMeta = false;
   @Input() showEntryDate = true;
+  @Input() showEntryNoExpiry = false;
   @Input() showAllOnFocus = true;
   @Input() autofocus = true;
   @Input() maxOptions = 0;
@@ -80,6 +84,7 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Output() emptyAction = new EventEmitter<string>();
   @Output() adjustEntry = new EventEmitter<{ entry: EntitySelectorEntry; delta: number }>();
   @Output() entryDateChange = new EventEmitter<{ entry: EntitySelectorEntry; date: string | undefined }>();
+  @Output() entryNoExpiryToggle = new EventEmitter<{ entry: EntitySelectorEntry }>();
   @Output() save = new EventEmitter<void>();
   canIncrease(entry: EntitySelectorEntry): boolean {
     if (entry.maxQuantity == null || !Number.isFinite(entry.maxQuantity)) {
