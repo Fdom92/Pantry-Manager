@@ -4,7 +4,7 @@ import {
   DOC_TYPE_PREFERENCES,
   NEAR_EXPIRY_WINDOW_DAYS,
   PLANNER_MEMORY_MAX_LENGTH,
-  STORAGE_KEY_PREFERENCES,
+  STORAGE_KEYS,
 } from '@core/constants';
 import {
   AppPreferences,
@@ -55,7 +55,7 @@ export class SettingsPreferencesService {
     const now = new Date().toISOString();
 
     const doc: AppPreferencesDoc = {
-      _id: STORAGE_KEY_PREFERENCES,
+      _id: STORAGE_KEYS.PREFERENCES,
       type: DOC_TYPE_PREFERENCES,
       createdAt: this.cachedDoc?.createdAt ?? now,
       updatedAt: now,
@@ -73,7 +73,7 @@ export class SettingsPreferencesService {
 
   private async loadFromStorage(): Promise<void> {
     try {
-      const doc = await this.storage.get(STORAGE_KEY_PREFERENCES);
+      const doc = await this.storage.get(STORAGE_KEYS.PREFERENCES);
       if (doc) {
         this.cachedDoc = doc;
         const normalized = this.normalizePreferences(doc);

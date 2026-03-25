@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { STORAGE_KEY_PRO } from '@core/constants';
+import { STORAGE_KEYS } from '@core/constants';
 import { normalizePackages, pickPreferredPackage } from '@core/domain/upgrade';
 import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { BehaviorSubject, Observable, map } from 'rxjs';
@@ -187,7 +187,7 @@ export class UpgradeRevenuecatService {
   private updateProState(isPro: boolean): void {
     this.proSubject.next(isPro);
     try {
-      localStorage.setItem(STORAGE_KEY_PRO, JSON.stringify(isPro));
+      localStorage.setItem(STORAGE_KEYS.PRO_STATUS, JSON.stringify(isPro));
     } catch (err) {
       console.warn('[UpgradeRevenuecatService] failed to persist state', err);
     }
@@ -195,7 +195,7 @@ export class UpgradeRevenuecatService {
 
   private loadStoredState(): boolean {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY_PRO);
+      const raw = localStorage.getItem(STORAGE_KEYS.PRO_STATUS);
       return raw ? JSON.parse(raw) : false;
     } catch {
       return false;

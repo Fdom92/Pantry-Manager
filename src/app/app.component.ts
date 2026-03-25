@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { App as CapacitorApp } from '@capacitor/app';
-import { ONBOARDING_STORAGE_KEY } from '@core/constants';
+import { STORAGE_KEYS } from '@core/constants';
 import { PantryService } from '@core/services/pantry';
 import { MigrationPantryService } from '@core/services/migration/migration-pantry.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
@@ -105,7 +105,7 @@ export class AppComponent {
 
   private redirectToFirstRunFlows(): void {
     try {
-      const hasSeenOnboarding = localStorage.getItem(ONBOARDING_STORAGE_KEY);
+      const hasSeenOnboarding = localStorage.getItem(STORAGE_KEYS.ONBOARDING_FLAG);
       const currentUrl = this.router.url ?? '';
       const alreadyOnboarding = currentUrl.startsWith('/onboarding');
       if (!hasSeenOnboarding && !alreadyOnboarding) {
