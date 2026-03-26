@@ -530,7 +530,8 @@
         "vegetable": "Verdura",
         "fruit": "Frutta",
         "dairy": "Latticino",
-        "other": "Altro"
+        "other": "Altro",
+        "household": "Casa"
       }
     },
     "detail": {

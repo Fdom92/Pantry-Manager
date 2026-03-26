@@ -86,6 +86,7 @@ const FOOD_TYPE_WEIGHTS: Record<FoodType, number> = {
   [FoodType.FRUIT]: 0.6,
   [FoodType.DAIRY]: 0.6,
   [FoodType.OTHER]: 0.4,
+  [FoodType.HOUSEHOLD]: 0,
 };
 
 // Minimum ratio of items with foodType assigned to use enhanced calculation.

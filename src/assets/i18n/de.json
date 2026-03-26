@@ -530,7 +530,8 @@
         "vegetable": "Gemüse",
         "fruit": "Obst",
         "dairy": "Milchprodukt",
-        "other": "Sonstiges"
+        "other": "Sonstiges",
+        "household": "Haushalt"
       }
     },
     "detail": {

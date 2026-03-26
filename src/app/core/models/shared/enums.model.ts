@@ -24,5 +24,6 @@ export enum FoodType {
   VEGETABLE = 'vegetable',
   FRUIT = 'fruit',
   DAIRY = 'dairy',
+  HOUSEHOLD = 'household',
   OTHER = 'other'
 }
