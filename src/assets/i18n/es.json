@@ -482,7 +482,8 @@
       },
       "expired": {
         "yesterday": "Caducó ayer"
-      }
+      },
+      "noExpiryIntentional": "Sin caducidad"
     },
     "form": {
       "editTitle": "Editar producto",
@@ -592,7 +593,7 @@
       "decrease": "Disminuir",
       "viewDetails": "Ver lotes y fechas",
       "expiryDate": "Fecha de caducidad (opcional)",
-      "noDate": "Sin fecha",
+      "noDate": "Añadir fecha",
       "zeroHint": "Desaparecerá de tu despensa hasta que añadas más",
       "zeroHintBasic": "Desaparecerá de tu despensa y pasará a tu lista de la compra"
     },

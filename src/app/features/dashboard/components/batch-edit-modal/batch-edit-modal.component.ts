@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   IonButton,
   IonButtons,
+  IonChip,
   IonContent,
   IonFooter,
   IonHeader,
@@ -29,6 +30,7 @@ import { BatchEditStateService } from '@core/services/dashboard/batch-edit-state
     IonTitle,
     IonButtons,
     IonButton,
+    IonChip,
     IonIcon,
     IonContent,
     IonList,

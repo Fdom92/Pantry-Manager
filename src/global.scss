@@ -100,3 +100,25 @@ ion-input {
 ion-input .label-text-wrapper {
   color: var(--app-theme-text-muted);
 }
+
+// No-expiry chip — shared across quantity sheet, batches modal, add modal, batch edit
+.no-expiry-chip {
+  --background: color-mix(in srgb, var(--ion-text-color) 10%, transparent);
+  --color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  font-size: 0.82rem;
+  height: 28px;
+  margin: 0 0 0 6px;
+  padding: 0 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  ion-icon {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  &.no-expiry-chip--active {
+    --background: var(--ion-color-medium);
+    --color: var(--ion-color-medium-contrast);
+  }
+}

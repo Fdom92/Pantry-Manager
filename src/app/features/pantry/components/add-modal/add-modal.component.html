@@ -24,6 +24,8 @@
   (queryChange)="state.onFastAddQueryChange($event)"
   (emptyAction)="state.addFastAddEntryFromQuery($event)"
   (adjustEntry)="state.adjustFastAddEntryById($event.entry.id, $event.delta)"
+  [showEntryNoExpiry]="true"
   (entryDateChange)="state.setFastAddEntryDate($event.entry.id, $event.date)"
+  (entryNoExpiryToggle)="state.setFastAddEntryNoExpiry($event.entry.id)"
   (save)="state.submitFastAdd()">
 </app-entity-selector-modal>

@@ -51,15 +51,23 @@
       <!-- Expiry date: date chip per item -->
       @if (state.action() === 'setExpiryDate') {
         <p class="batch-edit-hint">{{ 'batchEdit.expiryDateHint' | translate }}</p>
-        <ion-list lines="full">
+        <ion-list lines="none" class="batch-edit-date-list">
           @for (item of state.filteredItems(); track item._id) {
             <ion-item>
               <ion-label>{{ item.name }}</ion-label>
-              <app-date-chip
-                slot="end"
-                [date]="state.getItemExpiryDate(item._id)"
-                (dateChange)="state.setItemValue(item._id, $event ?? null)">
-              </app-date-chip>
+              <div slot="end" class="batch-edit-date-cell">
+                <app-date-chip
+                  [date]="state.getItemExpiryDate(item._id)"
+                  (dateChange)="state.setItemValue(item._id, $event ?? null)">
+                </app-date-chip>
+                <ion-chip
+                  class="no-expiry-chip"
+                  [class.no-expiry-chip--active]="state.getItemNoExpiry(item._id)"
+                  (click)="state.setItemNoExpiry(item._id)">
+                  <ion-icon [name]="state.getItemNoExpiry(item._id) ? 'ban' : 'ban-outline'"></ion-icon>
+                  <ion-label>{{ 'pantry.batches.noExpiryIntentional' | translate }}</ion-label>
+                </ion-chip>
+              </div>
             </ion-item>
           }
         </ion-list>

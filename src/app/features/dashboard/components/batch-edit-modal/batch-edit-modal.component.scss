@@ -3,3 +3,15 @@
   color: var(--app-theme-text-muted);
   margin: 0 0 12px;
 }
+
+.batch-edit-date-list {
+  background: transparent;
+
+  ion-item {
+    --background: transparent;
+    --border-width: 0;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    width: 100%;
+  }
+}

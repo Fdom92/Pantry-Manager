@@ -7,4 +7,5 @@ export interface FastAddEntry {
   item?: PantryItem;
   isNew: boolean;
   expirationDate?: string;
+  noExpiry?: boolean;
 }

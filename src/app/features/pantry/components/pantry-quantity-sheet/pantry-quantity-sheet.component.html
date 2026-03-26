@@ -51,6 +51,13 @@
           [date]="pendingExpiryDate"
           (dateChange)="expiryDateChange.emit($event)">
         </app-date-chip>
+        <ion-chip
+          class="no-expiry-chip"
+          [class.no-expiry-chip--active]="pendingNoExpiry"
+          (click)="noExpiryToggle.emit()">
+          <ion-icon [name]="pendingNoExpiry ? 'ban' : 'ban-outline'"></ion-icon>
+          <ion-label>{{ 'pantry.batches.noExpiryIntentional' | translate }}</ion-label>
+        </ion-chip>
       </div>
     }
   </div>
