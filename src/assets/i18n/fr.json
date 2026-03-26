@@ -530,7 +530,8 @@
         "vegetable": "Légume",
         "fruit": "Fruit",
         "dairy": "Produit laitier",
-        "other": "Autre"
+        "other": "Autre",
+        "household": "Ménage"
       }
     },
     "detail": {
