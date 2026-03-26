@@ -75,8 +75,25 @@ ion-modal::part(content) {
   font-size: var(--app-theme-font-size-body);
 }
 
-.entity-selector-item app-date-chip {
+.entry-expiry-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
   margin-top: 4px;
+
+  .no-expiry-chip {
+    margin-left: 0;
+    padding: 0 6px;
+
+    ion-label {
+      display: none;
+    }
+
+    ion-icon {
+      font-size: 18px;
+    }
+  }
 }
 
 .entity-selector-controls {
