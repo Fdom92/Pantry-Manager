@@ -3,10 +3,10 @@ import { IonChip, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
 /**
- * Reusable no-expiry chip: shows a ban icon + "No expiry" label.
- * Responsive: label collapses to icon-only when space is constrained.
+ * No-expiry chip: shows a ban icon + label.
+ * Mutually exclusive with the date chip — only one is visible at a time.
  *
- * @input  active   - whether the chip is in active (no-expiry set) state
+ * @input  active   - whether no-expiry is set
  * @output clicked  - emits when the chip is clicked
  */
 @Component({
@@ -19,9 +19,7 @@ import { TranslateModule } from '@ngx-translate/core';
       [class.no-expiry-chip--active]="active"
       (click)="clicked.emit()">
       <ion-icon [name]="active ? 'ban' : 'ban-outline'"></ion-icon>
-      @if (!iconOnly) {
-        <ion-label>{{ 'pantry.batches.noExpiryIntentional' | translate }}</ion-label>
-      }
+      <ion-label>{{ 'pantry.batches.noExpiryIntentional' | translate }}</ion-label>
     </ion-chip>
   `,
   styles: [`
@@ -29,23 +27,23 @@ import { TranslateModule } from '@ngx-translate/core';
     .no-expiry-chip {
       --background: color-mix(in srgb, var(--ion-text-color) 10%, transparent);
       --color: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
-      font-size: 0.82rem;
-      height: 28px;
+      font-size: var(--chip-font-size, 0.82rem);
+      height: var(--chip-height, 28px);
       margin: 0;
       cursor: pointer;
       transition: background 0.15s ease;
+      padding-inline: var(--chip-padding-inline, 8px);
     }
     .no-expiry-chip.no-expiry-chip--active {
       --background: color-mix(in srgb, var(--ion-color-warning) 20%, transparent);
       --color: var(--ion-color-warning-shade);
     }
-    .no-expiry-chip ion-icon { font-size: 15px; }
+    .no-expiry-chip ion-icon { font-size: var(--chip-icon-size, 15px); margin: 0; }
     .no-expiry-chip ion-label { margin-inline-start: 4px; }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NoExpiryChipComponent {
   @Input() active = false;
-  @Input() iconOnly = false;
   @Output() clicked = new EventEmitter<void>();
 }

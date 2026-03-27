@@ -68,15 +68,15 @@
                     </div>
                     @if (showEntryDate) {
                       <div class="entry-expiry-row">
-                        <app-date-chip
-                          [date]="entry.expirationDate"
-                          [iconOnly]="true"
-                          (dateChange)="entryDateChange.emit({ entry, date: $event })">
-                        </app-date-chip>
-                        @if (showEntryNoExpiry) {
+                        @if (!entry.noExpiry) {
+                          <app-date-chip
+                            [date]="entry.expirationDate"
+                            (dateChange)="entryDateChange.emit({ entry, date: $event })">
+                          </app-date-chip>
+                        }
+                        @if (showEntryNoExpiry && !entry.expirationDate) {
                           <app-no-expiry-chip
                             [active]="entry.noExpiry ?? false"
-                            [iconOnly]="true"
                             (clicked)="entryNoExpiryToggle.emit({ entry })">
                           </app-no-expiry-chip>
                         }

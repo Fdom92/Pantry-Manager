@@ -4,13 +4,23 @@
   margin: 0 0 12px;
 }
 
+.batch-edit-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-block: 8px;
+  width: 100%;
+}
+
+.batch-edit-item-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
 .batch-edit-date-cell {
   display: flex;
   align-items: center;
   gap: 6px;
-  overflow: hidden;
-  min-width: 0;
-  flex-shrink: 1;
 }
 
 .batch-edit-date-list {
@@ -22,5 +32,6 @@
     --padding-start: 0;
     --inner-padding-end: 0;
     width: 100%;
+    --min-height: auto;
   }
 }
