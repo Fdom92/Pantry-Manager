@@ -49,12 +49,13 @@ import { TranslateModule } from '@ngx-translate/core';
       margin: 0;
       cursor: pointer;
       transition: background 0.15s ease;
+      padding-inline: 8px;
     }
     .date-chip.date-chip--set {
       --background: var(--ion-color-primary);
       --color: var(--ion-color-primary-contrast);
     }
-    .date-chip ion-icon { font-size: 15px; }
+    .date-chip ion-icon { font-size: 15px; margin: 0; }
     .date-chip ion-label { margin-inline-start: 4px; }
     .date-chip ion-icon + ion-label + ion-icon { margin-inline-start: 4px; }
   `],
