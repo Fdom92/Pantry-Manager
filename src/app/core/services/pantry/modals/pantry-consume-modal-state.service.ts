@@ -1,6 +1,6 @@
 import { Injectable, WritableSignal, computed, inject, signal } from '@angular/core';
 import type { ConsumeEntry, PantryItem } from '@core/models/pantry';
-import { buildPantryItemAutocomplete } from '@core/utils';
+import { buildPantryItemAutocomplete, createDocumentId } from '@core/utils';
 import { dedupeByNormalizedKey } from '@core/utils/normalization.util';
 import { withSignalFlag } from '@core/utils';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
@@ -86,6 +86,7 @@ export class PantryConsumeModalStateService {
     }
 
     await withSignalFlag(this.isConsuming, async () => {
+      const sessionId = entries.length > 1 ? createDocumentId('session') : undefined;
       for (const entry of entries) {
         // Re-fetch the latest item state for accurate FIFO application
         const latestItem =
@@ -95,7 +96,9 @@ export class PantryConsumeModalStateService {
           -entry.quantity,
           this.pantryItemsState,
           latestItem.expirationDate ?? undefined,
-          'consume_modal'
+          'consume_modal',
+          undefined,
+          sessionId
         );
       }
       this.dismissConsumeModal();

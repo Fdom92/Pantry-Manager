@@ -1,6 +1,6 @@
 import { Injectable, Signal, WritableSignal, computed, effect, inject, signal } from '@angular/core';
 import {
-  FastAddEntry,
+  AddEntry,
   FilterChipViewModel,
   ItemBatch,
   PantryFilterState,
@@ -32,7 +32,7 @@ export class PantryStateService {
   private readonly viewModel = inject(PantryViewModelService);
   private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly listUi = inject(PantryListUiStateService);
-  private readonly fastAddModal = inject(PantryAddModalStateService);
+  private readonly addModal = inject(PantryAddModalStateService);
   private readonly consumeModal = inject(PantryConsumeModalStateService);
   private readonly batchesModal = inject(PantryBatchesModalStateService);
   private readonly quantitySheet = inject(PantryQuantitySheetStateService);
@@ -59,15 +59,15 @@ export class PantryStateService {
   // Delegated signals from specialized services
   readonly collapsedGroups = this.listUi.collapsedGroups;
   readonly deletingItems = this.listUi.deletingItems;
-  readonly fastAddModalOpen = this.fastAddModal.fastAddModalOpen;
-  readonly isFastAdding = this.fastAddModal.isFastAdding;
-  readonly fastAddQuery = this.fastAddModal.fastAddQuery;
-  readonly fastAddEntries = this.fastAddModal.fastAddEntries;
-  readonly fastAddEntryViewModels = this.fastAddModal.fastAddEntryViewModels;
-  readonly hasFastAddEntries = this.fastAddModal.hasFastAddEntries;
-  readonly fastAddOptions = this.fastAddModal.fastAddOptions;
-  readonly showFastAddEmptyAction = this.fastAddModal.showFastAddEmptyAction;
-  readonly fastAddEmptyActionLabel = this.fastAddModal.fastAddEmptyActionLabel;
+  readonly addModalOpen = this.addModal.addModalOpen;
+  readonly isAdding = this.addModal.isAdding;
+  readonly addQuery = this.addModal.addQuery;
+  readonly addEntries = this.addModal.addEntries;
+  readonly addEntryViewModels = this.addModal.addEntryViewModels;
+  readonly hasAddEntries = this.addModal.hasAddEntries;
+  readonly addOptions = this.addModal.addOptions;
+  readonly showAddEmptyAction = this.addModal.showAddEmptyAction;
+  readonly addEmptyActionLabel = this.addModal.addEmptyActionLabel;
   readonly consumeModalOpen = this.consumeModal.consumeModalOpen;
   readonly isConsuming = this.consumeModal.isConsuming;
   readonly consumeQuery = this.consumeModal.consumeQuery;
@@ -192,16 +192,16 @@ export class PantryStateService {
   }
 
   // -------- Add modal (delegates to PantryAddModalStateService) --------
-  openFastAddModal = () => this.fastAddModal.openFastAddModal();
-  closeFastAddModal = () => this.fastAddModal.closeFastAddModal();
-  dismissFastAddModal = () => this.fastAddModal.dismissFastAddModal();
-  submitFastAdd = () => this.fastAddModal.submitFastAdd();
-  onFastAddQueryChange = (value: string) => this.fastAddModal.onFastAddQueryChange(value);
-  addFastAddEntry = (option: AutocompleteItem<PantryItem>) => this.fastAddModal.addFastAddEntry(option);
-  addFastAddEntryFromQuery = (name?: string) => this.fastAddModal.addFastAddEntryFromQuery(name);
-  adjustFastAddEntry = (entry: FastAddEntry, delta: number) => this.fastAddModal.adjustFastAddEntry(entry, delta);
-  adjustFastAddEntryById = (entryId: string, delta: number) => this.fastAddModal.adjustFastAddEntryById(entryId, delta);
-  setFastAddEntryDate = (entryId: string, date: string | undefined) => this.fastAddModal.setFastAddEntryDate(entryId, date);
+  openAddModal = () => this.addModal.openAddModal();
+  closeAddModal = () => this.addModal.closeAddModal();
+  dismissAddModal = () => this.addModal.dismissAddModal();
+  submitAdd = () => this.addModal.submitAdd();
+  onAddQueryChange = (value: string) => this.addModal.onAddQueryChange(value);
+  addEntry = (option: AutocompleteItem<PantryItem>) => this.addModal.addEntry(option);
+  addEntryFromQuery = (name?: string) => this.addModal.addEntryFromQuery(name);
+  adjustEntry = (entry: AddEntry, delta: number) => this.addModal.adjustEntry(entry, delta);
+  adjustEntryById = (entryId: string, delta: number) => this.addModal.adjustEntryById(entryId, delta);
+  setEntryDate = (entryId: string, date: string | undefined) => this.addModal.setEntryDate(entryId, date);
 
   // -------- Consume modal (delegates to PantryConsumeModalStateService) --------
   openConsumeModal = () => this.consumeModal.openConsumeModal();

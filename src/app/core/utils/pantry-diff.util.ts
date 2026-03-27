@@ -1,5 +1,24 @@
 import type { PantryItem, ItemBatch } from '@core/models/pantry';
 
+/**
+ * Returns the list of top-level PantryItem fields that changed between two versions.
+ * Batch metadata changes are reported as 'batches'.
+ * Quantity changes (tracked via ADD/CONSUME) are intentionally excluded.
+ */
+export function computeEditedFields(prev: PantryItem, next: PantryItem): string[] {
+  const fields: string[] = [];
+  const scalarKeys: (keyof PantryItem)[] = ['name', 'categoryId', 'foodType', 'supermarket', 'isBasic', 'minThreshold'];
+  for (const key of scalarKeys) {
+    if (prev[key] !== next[key]) {
+      fields.push(key);
+    }
+  }
+  if (hasBatchMetadataChanged(prev.batches ?? [], next.batches ?? [])) {
+    fields.push('batches');
+  }
+  return fields;
+}
+
 function normalizeBatches(batches: ItemBatch[] = []): ItemBatch[] {
   const stableKey = (value: ItemBatch): string => {
     const sortedKeys = Object.keys(value as unknown as Record<string, unknown>).sort();
@@ -32,6 +51,9 @@ export function hasBatchMetadataChanged(prev: ItemBatch[], next: ItemBatch[]): b
       continue;
     }
     if (prevBatch.expirationDate !== batch.expirationDate) {
+      return true;
+    }
+    if (!!prevBatch.noExpiry !== !!batch.noExpiry) {
       return true;
     }
     if ((prevBatch.locationId ?? '') !== (batch.locationId ?? '')) {

@@ -1,6 +1,6 @@
 import type { PantryItem } from './item.model';
 
-export interface FastAddEntry {
+export interface AddEntry {
   id: string;
   name: string;
   quantity: number;

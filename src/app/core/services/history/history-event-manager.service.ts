@@ -1,31 +1,26 @@
 import { Injectable, inject } from '@angular/core';
 import { classifyExpiry, sumQuantities } from '@core/domain/pantry';
+import { buildExpireBatchKey } from '@core/domain/events';
 import type { PantryItem } from '@core/models/pantry';
 import type { EventSource } from '@core/models/events';
-import { normalizeTrim, normalizeWhitespace } from '@core/utils/normalization.util';
+import { normalizeTrim } from '@core/utils/normalization.util';
+import { computeEditedFields } from '@core/utils/pantry-diff.util';
 import { HistoryEventLogService } from './history-event-log.service';
+
+export type StockAdjustOptions = {
+  deltaQuantity: number;
+  batchId?: string;
+  source?: EventSource;
+  expirationDate?: string;
+  sessionId?: string;
+};
 
 @Injectable({ providedIn: 'root' })
 export class HistoryEventManagerService {
   private readonly eventLog = inject(HistoryEventLogService);
 
-  private getItemQuantity(item: PantryItem): number {
-    return sumQuantities(item.batches ?? []);
-  }
-
-  private buildExpireBatchKey(productId: string, batch: { batchId?: string; expirationDate?: string }): string | null {
-    if (batch.batchId) {
-      return `${productId}::${batch.batchId}`;
-    }
-    const expiry = normalizeWhitespace(batch.expirationDate);
-    if (!expiry) {
-      return null;
-    }
-    return `${productId}::${expiry}`;
-  }
-
-  async logFastAddNewItem(item: PantryItem, addedQuantity: number, timestamp?: string) {
-    const nextQuantity = this.getItemQuantity(item);
+  async logAddNewItem(item: PantryItem, addedQuantity: number, sessionId?: string, timestamp?: string) {
+    const nextQuantity = sumQuantities(item.batches ?? []);
     return this.eventLog.logAddEvent({
       productId: item._id,
       productName: item.name,
@@ -33,41 +28,45 @@ export class HistoryEventManagerService {
       deltaQuantity: addedQuantity,
       previousQuantity: 0,
       nextQuantity,
-      source: 'fast_add',
+      source: 'add_modal',
       categoryId: item.categoryId,
+      foodType: item.foodType,
+      expirationDate: item.batches?.[0]?.expirationDate,
+      sessionId,
       timestamp,
     });
   }
 
-  async logFastAddExistingItem(
+  async logAddExistingItem(
     previousItem: PantryItem,
     updatedItem: PantryItem,
     addedQuantity: number,
+    expirationDate?: string,
+    sessionId?: string,
     timestamp?: string
   ) {
-    return this.logAddWithDelta(previousItem, updatedItem, addedQuantity, 'fast_add', timestamp);
-  }
-
-  async logAdvancedCreate(item: PantryItem) {
-    const totalQuantity = this.getItemQuantity(item);
-    if (!Number.isFinite(totalQuantity) || totalQuantity <= 0) {
-      return null;
-    }
+    const previousQuantity = sumQuantities(previousItem.batches ?? []);
+    const nextQuantity = sumQuantities(updatedItem.batches ?? []);
     return this.eventLog.logAddEvent({
-      productId: item._id,
-      productName: item.name,
-      quantity: totalQuantity,
-      deltaQuantity: totalQuantity,
-      previousQuantity: 0,
-      nextQuantity: totalQuantity,
-      source: 'edit_modal',
-      categoryId: item.categoryId,
+      productId: updatedItem._id,
+      productName: updatedItem.name,
+      quantity: addedQuantity,
+      deltaQuantity: addedQuantity,
+      previousQuantity,
+      nextQuantity,
+      source: 'add_modal',
+      categoryId: updatedItem.categoryId,
+      foodType: updatedItem.foodType,
+      expirationDate,
+      sessionId,
+      timestamp,
     });
   }
 
   async logAdvancedEdit(previousItem: PantryItem, updatedItem: PantryItem, source: EventSource = 'edit_modal') {
-    const previousQuantity = this.getItemQuantity(previousItem);
-    const nextQuantity = this.getItemQuantity(updatedItem);
+    const previousQuantity = sumQuantities(previousItem.batches ?? []);
+    const nextQuantity = sumQuantities(updatedItem.batches ?? []);
+    const editedFields = computeEditedFields(previousItem, updatedItem);
     return this.eventLog.logEditEvent({
       productId: updatedItem._id,
       productName: updatedItem.name,
@@ -76,43 +75,49 @@ export class HistoryEventManagerService {
       nextQuantity,
       source,
       categoryId: updatedItem.categoryId,
+      foodType: updatedItem.foodType,
+      expirationDate: updatedItem.expirationDate,
+      editedFields: editedFields.length > 0 ? editedFields : undefined,
     });
   }
 
   async logStockAdjust(
     previousItem: PantryItem | undefined,
     updatedItem: PantryItem,
-    deltaQuantity: number,
-    batchId?: string,
-    source?: EventSource
+    options: StockAdjustOptions
   ) {
+    const { deltaQuantity, batchId, source, expirationDate, sessionId } = options;
     if (!Number.isFinite(deltaQuantity) || deltaQuantity === 0) {
       return null;
     }
-    const previousQuantity = previousItem ? this.getItemQuantity(previousItem) : undefined;
-    const nextQuantity = this.getItemQuantity(updatedItem);
+    const previousQuantity = previousItem ? sumQuantities(previousItem.batches ?? []) : undefined;
+    const nextQuantity = sumQuantities(updatedItem.batches ?? []);
     if (previousQuantity != null && previousQuantity === nextQuantity) {
       return null;
     }
-    const quantity = Math.abs(deltaQuantity);
-    return this.logStockEvent({
+    const params = {
       productId: updatedItem._id,
       productName: previousItem?.name ?? updatedItem.name,
-      quantity,
+      quantity: Math.abs(deltaQuantity),
       deltaQuantity,
       previousQuantity,
       nextQuantity,
       batchId,
       source,
       categoryId: updatedItem.categoryId,
-    });
+      foodType: updatedItem.foodType,
+      expirationDate,
+      sessionId,
+    };
+    return deltaQuantity > 0
+      ? this.eventLog.logAddEvent(params)
+      : this.eventLog.logConsumeEvent(params);
   }
 
   async logExpiredBatches(items: PantryItem[]): Promise<void> {
-    const existing = await this.eventLog.listEvents();
+    const expireEvents = await this.eventLog.listEventsByType('EXPIRE');
     const seen = new Set(
-      existing
-        .filter(event => event.eventType === 'EXPIRE')
+      expireEvents
         .map(event => normalizeTrim(String(event.sourceMetadata?.['batchKey'] ?? '')))
         .filter(Boolean)
     );
@@ -121,21 +126,12 @@ export class HistoryEventManagerService {
 
     for (const item of items) {
       for (const batch of item.batches ?? []) {
-        if (!batch?.expirationDate) {
-          continue;
-        }
-        if (classifyExpiry(batch.expirationDate, now, 0) !== 'expired') {
-          continue;
-        }
-        const batchKey = this.buildExpireBatchKey(item._id, batch);
-        if (!batchKey || seen.has(batchKey)) {
-          continue;
-        }
+        if (!batch?.expirationDate) continue;
+        if (classifyExpiry(batch.expirationDate, now, 0) !== 'expired') continue;
+        const batchKey = buildExpireBatchKey(item._id, batch);
+        if (!batchKey || seen.has(batchKey)) continue;
         const quantity = Number.isFinite(batch.quantity) ? batch.quantity : 0;
-        if (!Number.isFinite(quantity) || quantity <= 0) {
-          continue;
-        }
-        const expiredAt = new Date(batch.expirationDate).toISOString();
+        if (!Number.isFinite(quantity) || quantity <= 0) continue;
         seen.add(batchKey);
         tasks.push(
           this.eventLog.logExpireEvent({
@@ -145,11 +141,10 @@ export class HistoryEventManagerService {
             batchId: batch.batchId,
             source: 'system',
             categoryId: item.categoryId,
-            timestamp: expiredAt,
-            sourceMetadata: {
-              batchKey,
-              expirationDate: batch.expirationDate,
-            },
+            foodType: item.foodType,
+            expirationDate: batch.expirationDate,
+            timestamp: new Date(batch.expirationDate).toISOString(),
+            sourceMetadata: { batchKey },
           })
         );
       }
@@ -161,7 +156,7 @@ export class HistoryEventManagerService {
   }
 
   async logDeleteFromCard(item: PantryItem) {
-    const totalQuantity = this.getItemQuantity(item);
+    const totalQuantity = sumQuantities(item.batches ?? []);
     return this.eventLog.logDeleteEvent({
       productId: item._id,
       productName: item.name,
@@ -171,46 +166,7 @@ export class HistoryEventManagerService {
       nextQuantity: 0,
       source: 'pantry_card',
       categoryId: item.categoryId,
+      foodType: item.foodType,
     });
   }
-
-  private logStockEvent(params: {
-    productId: string;
-    productName?: string;
-    quantity: number;
-    deltaQuantity: number;
-    previousQuantity?: number;
-    nextQuantity: number;
-    batchId?: string;
-    source?: EventSource;
-    categoryId?: string,
-  }) {
-    if (params.deltaQuantity > 0) {
-      return this.eventLog.logAddEvent(params);
-    }
-    return this.eventLog.logConsumeEvent(params);
-  }
-
-  private logAddWithDelta(
-    previousItem: PantryItem,
-    updatedItem: PantryItem,
-    addedQuantity: number,
-    source?: EventSource,
-    timestamp?: string
-  ) {
-    const previousQuantity = this.getItemQuantity(previousItem);
-    const nextQuantity = this.getItemQuantity(updatedItem);
-    return this.eventLog.logAddEvent({
-      productId: updatedItem._id,
-      productName: updatedItem.name,
-      quantity: addedQuantity,
-      deltaQuantity: addedQuantity,
-      previousQuantity,
-      nextQuantity,
-      source,
-      categoryId: updatedItem.categoryId,
-      timestamp,
-    });
-  }
-
 }

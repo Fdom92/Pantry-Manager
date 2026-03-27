@@ -283,7 +283,7 @@ export class PantryBatchesModalStateService {
 
       // Log ADD or CONSUME if total quantity changed
       if (deltaQuantity !== 0) {
-        await this.eventManager.logStockAdjust(item, updatedItem, deltaQuantity, undefined, 'batches_modal');
+        await this.eventManager.logStockAdjust(item, updatedItem, { deltaQuantity, source: 'batches_modal' });
       }
 
       // Log EDIT if batch metadata changed (dates, locations, opened flag)

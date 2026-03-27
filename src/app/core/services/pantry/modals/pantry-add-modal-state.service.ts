@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { buildFastAddItemPayload } from '@core/domain/pantry';
-import type { FastAddEntry, PantryItem } from '@core/models/pantry';
+import { buildAddItemPayload } from '@core/domain/pantry';
+import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete, createDocumentId } from '@core/utils';
 import { formatFriendlyName, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
 import { dedupeByNormalizedKey } from '@core/utils/normalization.util';
@@ -22,13 +22,13 @@ export class PantryAddModalStateService {
   private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
 
-  readonly fastAddModalOpen = signal(false);
-  readonly isFastAdding = signal(false);
-  readonly fastAddQuery = signal('');
-  readonly fastAddEntries = signal<FastAddEntry[]>([]);
+  readonly addModalOpen = signal(false);
+  readonly isAdding = signal(false);
+  readonly addQuery = signal('');
+  readonly addEntries = signal<AddEntry[]>([]);
 
-  readonly fastAddEntryViewModels = computed<EntitySelectorEntry[]>(() =>
-    this.fastAddEntries().map(entry => ({
+  readonly addEntryViewModels = computed<EntitySelectorEntry[]>(() =>
+    this.addEntries().map(entry => ({
       id: entry.id,
       title: entry.name,
       quantity: entry.quantity,
@@ -38,16 +38,16 @@ export class PantryAddModalStateService {
     }))
   );
 
-  readonly hasFastAddEntries = computed(() => this.fastAddEntries().length > 0);
+  readonly hasAddEntries = computed(() => this.addEntries().length > 0);
 
-  readonly fastAddOptions = computed(() =>
-    this.buildFastAddOptions(this.pantryStore.loadedProducts(), this.fastAddEntries())
+  readonly addOptions = computed(() =>
+    this.buildAddOptions(this.pantryStore.loadedProducts(), this.addEntries())
   );
 
-  readonly showFastAddEmptyAction = computed(() => normalizeTrim(this.fastAddQuery()).length >= 1);
+  readonly showAddEmptyAction = computed(() => normalizeTrim(this.addQuery()).length >= 1);
 
-  readonly fastAddEmptyActionLabel = computed(() => {
-    const name = normalizeTrim(this.fastAddQuery());
+  readonly addEmptyActionLabel = computed(() => {
+    const name = normalizeTrim(this.addQuery());
     if (!name) {
       return '';
     }
@@ -58,50 +58,51 @@ export class PantryAddModalStateService {
   /**
    * Open add modal and reset state.
    */
-  openFastAddModal(): void {
-    this.fastAddEntries.set([]);
-    this.fastAddQuery.set('');
-    this.fastAddModalOpen.set(true);
-    this.isFastAdding.set(false);
+  openAddModal(): void {
+    this.addEntries.set([]);
+    this.addQuery.set('');
+    this.addModalOpen.set(true);
+    this.isAdding.set(false);
   }
 
   /**
    * Close add modal and cleanup state.
    */
-  closeFastAddModal(): void {
-    if (!this.fastAddModalOpen()) {
+  closeAddModal(): void {
+    if (!this.addModalOpen()) {
       return;
     }
-    this.fastAddModalOpen.set(false);
-    this.isFastAdding.set(false);
-    this.fastAddEntries.set([]);
-    this.fastAddQuery.set('');
+    this.addModalOpen.set(false);
+    this.isAdding.set(false);
+    this.addEntries.set([]);
+    this.addQuery.set('');
   }
 
   /**
    * Dismiss modal without cleanup (for backdrop click).
    */
-  dismissFastAddModal(): void {
-    this.fastAddModalOpen.set(false);
+  dismissAddModal(): void {
+    this.addModalOpen.set(false);
   }
 
   /**
    * Submit all add entries (create new items or add lots).
    */
-  async submitFastAdd(): Promise<void> {
-    if (this.isFastAdding()) {
+  async submitAdd(): Promise<void> {
+    if (this.isAdding()) {
       return;
     }
-    const entries = this.fastAddEntries().filter(entry => entry.quantity > 0);
+    const entries = this.addEntries().filter(entry => entry.quantity > 0);
     if (!entries.length) {
       return;
     }
 
-    await withSignalFlag(this.isFastAdding, async () => {
+    await withSignalFlag(this.isAdding, async () => {
+      const sessionId = entries.length > 1 ? createDocumentId('session') : undefined;
       for (const entry of entries) {
         const timestamp = new Date().toISOString();
         if (entry.isNew || !entry.item) {
-          const item = buildFastAddItemPayload({
+          const item = buildAddItemPayload({
             id: createDocumentId('item'),
             nowIso: timestamp,
             name: entry.name,
@@ -110,7 +111,7 @@ export class PantryAddModalStateService {
             noExpiry: entry.noExpiry,
           });
           await this.pantryStore.addItem(item);
-          await this.eventManager.logFastAddNewItem(item, entry.quantity, timestamp);
+          await this.eventManager.logAddNewItem(item, entry.quantity, sessionId, timestamp);
           continue;
         }
 
@@ -121,31 +122,31 @@ export class PantryAddModalStateService {
         });
         if (updated) {
           await this.pantryStore.updateItem(updated);
-          await this.eventManager.logFastAddExistingItem(entry.item, updated, entry.quantity, timestamp);
+          await this.eventManager.logAddExistingItem(entry.item, updated, entry.quantity, entry.expirationDate, sessionId, timestamp);
         }
       }
-      this.dismissFastAddModal();
+      this.dismissAddModal();
     }).catch(async err => {
-      console.error('[PantryAddModalStateService] submitFastAdd error', err);
+      console.error('[PantryAddModalStateService] submitAdd error', err);
     });
   }
 
   /**
    * Update search query.
    */
-  onFastAddQueryChange(value: string): void {
-    this.fastAddQuery.set(value ?? '');
+  onAddQueryChange(value: string): void {
+    this.addQuery.set(value ?? '');
   }
 
   /**
    * Add existing item to add entries from autocomplete selection.
    */
-  addFastAddEntry(option: AutocompleteItem<PantryItem>): void {
+  addEntry(option: AutocompleteItem<PantryItem>): void {
     const item = option?.raw;
     if (!item) {
       return;
     }
-    this.fastAddEntries.update(current => {
+    this.addEntries.update(current => {
       const existingIndex = current.findIndex(entry => entry.item?._id === item._id);
       if (existingIndex >= 0) {
         const next = [...current];
@@ -165,14 +166,14 @@ export class PantryAddModalStateService {
         },
       ];
     });
-    this.fastAddQuery.set('');
+    this.addQuery.set('');
   }
 
   /**
    * Add new or existing item from query text.
    */
-  addFastAddEntryFromQuery(name?: string): void {
-    const nextName = normalizeTrim(name ?? this.fastAddQuery());
+  addEntryFromQuery(name?: string): void {
+    const nextName = normalizeTrim(name ?? this.addQuery());
     if (!nextName) {
       return;
     }
@@ -187,12 +188,12 @@ export class PantryAddModalStateService {
         title: matchingItem.name,
         raw: matchingItem,
       };
-      this.addFastAddEntry(option);
+      this.addEntry(option);
       return;
     }
 
     const formattedName = formatFriendlyName(nextName, nextName);
-    this.fastAddEntries.update(current => {
+    this.addEntries.update(current => {
       const existingIndex = current.findIndex(entry => normalizeLowercase(entry.name) === normalized);
       if (existingIndex >= 0) {
         const next = [...current];
@@ -211,18 +212,18 @@ export class PantryAddModalStateService {
         },
       ];
     });
-    this.fastAddQuery.set('');
+    this.addQuery.set('');
   }
 
   /**
    * Adjust quantity of an entry (remove if quantity becomes 0).
    */
-  adjustFastAddEntry(entry: FastAddEntry, delta: number): void {
+  adjustEntry(entry: AddEntry, delta: number): void {
     const nextDelta = Number.isFinite(delta) ? delta : 0;
     if (!nextDelta) {
       return;
     }
-    this.fastAddEntries.update(current => {
+    this.addEntries.update(current => {
       const index = current.findIndex(row => row.id === entry.id);
       if (index < 0) {
         return current;
@@ -242,20 +243,20 @@ export class PantryAddModalStateService {
   /**
    * Adjust quantity by entry ID.
    */
-  adjustFastAddEntryById(entryId: string, delta: number): void {
-    const entry = this.fastAddEntries().find(current => current.id === entryId);
+  adjustEntryById(entryId: string, delta: number): void {
+    const entry = this.addEntries().find(current => current.id === entryId);
     if (!entry) {
       return;
     }
-    this.adjustFastAddEntry(entry, delta);
+    this.adjustEntry(entry, delta);
   }
 
   /**
    * Set or clear the expiry date for an entry by ID.
    * Clears noExpiry when a real date is set.
    */
-  setFastAddEntryDate(entryId: string, date: string | undefined): void {
-    this.fastAddEntries.update(current => {
+  setEntryDate(entryId: string, date: string | undefined): void {
+    this.addEntries.update(current => {
       const index = current.findIndex(row => row.id === entryId);
       if (index < 0) return current;
       const next = [...current];
@@ -267,8 +268,8 @@ export class PantryAddModalStateService {
   /**
    * Toggle "intentionally no expiry" for an entry. Clears expirationDate.
    */
-  setFastAddEntryNoExpiry(entryId: string): void {
-    this.fastAddEntries.update(current => {
+  setEntryNoExpiry(entryId: string): void {
+    this.addEntries.update(current => {
       const index = current.findIndex(row => row.id === entryId);
       if (index < 0) return current;
       const next = [...current];
@@ -278,7 +279,7 @@ export class PantryAddModalStateService {
     });
   }
 
-  private buildFastAddOptions(items: PantryItem[], entries: FastAddEntry[]): AutocompleteItem<PantryItem>[] {
+  private buildAddOptions(items: PantryItem[], entries: AddEntry[]): AutocompleteItem<PantryItem>[] {
     const locale = this.languageService.getCurrentLocale();
     const uniqueEntries = dedupeByNormalizedKey(entries, entry => entry.name);
     const excluded = new Set(uniqueEntries.map(entry => entry.item?._id).filter(Boolean) as string[]);

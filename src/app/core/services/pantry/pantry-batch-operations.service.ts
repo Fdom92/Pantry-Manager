@@ -27,6 +27,8 @@ export class PantryBatchOperationsService {
     adjustmentType?: 'add' | 'consume';
     deltaQuantity?: number;
     source?: EventSource;
+    expirationDate?: string;
+    sessionId?: string;
   }>();
   private readonly stockSaveDelay = BATCH_STOCK_SAVE_DELAY_MS;
 
@@ -40,7 +42,8 @@ export class PantryBatchOperationsService {
     delta: number,
     event?: Event,
     pantryItemsState?: WritableSignal<PantryItem[]>,
-    source?: EventSource
+    source?: EventSource,
+    sessionId?: string
   ): Promise<void> {
     event?.stopPropagation();
     if (!item?._id || !Number.isFinite(delta) || delta === 0) {
@@ -94,6 +97,8 @@ export class PantryBatchOperationsService {
       adjustmentType: delta > 0 ? 'add' : 'consume',
       deltaQuantity: delta,
       source,
+      expirationDate: batch.expirationDate,
+      sessionId,
     });
   }
 
@@ -108,7 +113,8 @@ export class PantryBatchOperationsService {
     pantryItemsState?: WritableSignal<PantryItem[]>,
     expirationDate?: string,
     source?: EventSource,
-    noExpiry?: boolean
+    noExpiry?: boolean,
+    sessionId?: string
   ): Promise<void> {
     if (!item?._id || !Number.isFinite(change) || change === 0) {
       return;
@@ -138,7 +144,8 @@ export class PantryBatchOperationsService {
         change,
         undefined,
         pantryItemsState,
-        source
+        source,
+        sessionId
       );
     } else if (change < 0) {
       const originalTotal = sumQuantities(item.batches ?? [], { round: roundQuantity });
@@ -146,7 +153,7 @@ export class PantryBatchOperationsService {
       const newTotal = sumQuantities(finalBatches, { round: roundQuantity });
       const updatedItem = this.rebuildItemWithBatches(item, finalBatches, pantryItemsState);
       await this.provideQuantityFeedback(originalTotal, newTotal);
-      this.triggerStockSave(item._id, updatedItem, { adjustmentType: 'consume', deltaQuantity: change, source });
+      this.triggerStockSave(item._id, updatedItem, { adjustmentType: 'consume', deltaQuantity: change, source, expirationDate: item.expirationDate, sessionId });
     }
   }
 
@@ -243,6 +250,8 @@ export class PantryBatchOperationsService {
       adjustmentType?: 'add' | 'consume';
       deltaQuantity?: number;
       source?: EventSource;
+      expirationDate?: string;
+      sessionId?: string;
     }
   ): void {
     this.pendingItems.set(itemId, updated);
@@ -258,6 +267,8 @@ export class PantryBatchOperationsService {
           adjustmentType: nextType,
           deltaQuantity: Number.isFinite(nextDelta) ? nextDelta : undefined,
           source: meta.source ?? existing.source,
+          expirationDate: existing.expirationDate ?? meta.expirationDate,
+          sessionId: existing.sessionId ?? meta.sessionId,
         });
       }
     }
@@ -285,7 +296,13 @@ export class PantryBatchOperationsService {
           const eventMeta = this.pendingEventMeta.get(itemId);
           const deltaQuantity = eventMeta?.deltaQuantity;
           if (eventMeta?.adjustmentType === 'add' || eventMeta?.adjustmentType === 'consume') {
-            await this.eventManager.logStockAdjust(latest, nextPayload, deltaQuantity ?? 0, eventMeta?.batchId, eventMeta?.source);
+            await this.eventManager.logStockAdjust(latest, nextPayload, {
+                deltaQuantity: deltaQuantity ?? 0,
+                batchId: eventMeta?.batchId,
+                source: eventMeta?.source,
+                expirationDate: eventMeta?.expirationDate,
+                sessionId: eventMeta?.sessionId,
+              });
           }
         } catch (err) {
           console.error('[PantryBatchOperationsService] updateItem error', err);
