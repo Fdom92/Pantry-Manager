@@ -27,7 +27,10 @@ import { TranslateModule } from '@ngx-translate/core';
         class="date-chip"
         [class.date-chip--set]="date"
         (click)="$any(dateEl).showPicker?.()">
-        <ion-label>{{ date ? formattedDate : (noDateKey | translate) }}</ion-label>
+        <ion-icon name="calendar-outline"></ion-icon>
+        @if (!iconOnly) {
+          <ion-label>{{ date ? formattedDate : (noDateKey | translate) }}</ion-label>
+        }
         @if (date) {
           <ion-icon name="close-circle" (click)="onClear($event)"></ion-icon>
         }
@@ -51,7 +54,9 @@ import { TranslateModule } from '@ngx-translate/core';
       --background: var(--ion-color-primary);
       --color: var(--ion-color-primary-contrast);
     }
-    .date-chip ion-icon { font-size: 15px; margin-inline-start: 4px; }
+    .date-chip ion-icon { font-size: 15px; }
+    .date-chip ion-label { margin-inline-start: 4px; }
+    .date-chip ion-icon + ion-label + ion-icon { margin-inline-start: 4px; }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -62,6 +67,8 @@ export class DateChipComponent {
   @Input() date?: string;
   /** i18n key for the placeholder text when no date is set */
   @Input() noDateKey = 'pantry.quantitySheet.noDate';
+  /** When true, only the calendar icon is shown (no label text) */
+  @Input() iconOnly = false;
   /** Emits YYYY-MM-DD when a date is selected, or undefined when cleared */
   @Output() dateChange = new EventEmitter<string | undefined>();
 

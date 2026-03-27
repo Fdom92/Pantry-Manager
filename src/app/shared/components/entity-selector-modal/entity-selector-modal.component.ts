@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import {
   IonButton,
   IonButtons,
-  IonChip,
   IonContent,
   IonFooter,
   IonHeader,
@@ -18,6 +17,7 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { EntityAutocompleteComponent, type AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
+import { NoExpiryChipComponent } from '@shared/components/no-expiry-chip/no-expiry-chip.component';
 
 export interface EntitySelectorEntry {
   id: string;
@@ -41,8 +41,8 @@ export interface EntitySelectorEntry {
     IonButtons,
     IonButton,
     IonIcon,
-    IonChip,
     DateChipComponent,
+    NoExpiryChipComponent,
     IonContent,
     IonLabel,
     IonText,

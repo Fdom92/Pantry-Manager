@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   IonButton,
   IonButtons,
-  IonChip,
   IonContent,
   IonFooter,
   IonHeader,
@@ -18,6 +17,7 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
 import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
+import { NoExpiryChipComponent } from '@shared/components/no-expiry-chip/no-expiry-chip.component';
 import { BatchEditStateService } from '@core/services/dashboard/batch-edit-state.service';
 
 @Component({
@@ -30,7 +30,6 @@ import { BatchEditStateService } from '@core/services/dashboard/batch-edit-state
     IonTitle,
     IonButtons,
     IonButton,
-    IonChip,
     IonIcon,
     IonContent,
     IonList,
@@ -41,6 +40,7 @@ import { BatchEditStateService } from '@core/services/dashboard/batch-edit-state
     TranslateModule,
     EntitySelectorFieldComponent,
     DateChipComponent,
+    NoExpiryChipComponent,
   ],
   templateUrl: './batch-edit-modal.component.html',
   styleUrls: ['./batch-edit-modal.component.scss'],

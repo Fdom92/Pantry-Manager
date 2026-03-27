@@ -4,6 +4,15 @@
   margin: 0 0 12px;
 }
 
+.batch-edit-date-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
 .batch-edit-date-list {
   background: transparent;
 

@@ -4,7 +4,6 @@ import {
   IonBadge,
   IonButton,
   IonButtons,
-  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
@@ -20,6 +19,7 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
 import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
+import { NoExpiryChipComponent } from '@shared/components/no-expiry-chip/no-expiry-chip.component';
 import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
 
 @Component({
@@ -34,7 +34,6 @@ import { EntitySelectorFieldComponent } from '@shared/components/entity-selector
     IonTitle,
     IonButtons,
     IonButton,
-    IonChip,
     IonIcon,
     IonContent,
     IonList,
@@ -44,6 +43,7 @@ import { EntitySelectorFieldComponent } from '@shared/components/entity-selector
     IonInput,
     IonSpinner,
     DateChipComponent,
+    NoExpiryChipComponent,
     EntitySelectorFieldComponent,
   ],
   templateUrl: './batches-modal.component.html',

@@ -70,16 +70,15 @@
                       <div class="entry-expiry-row">
                         <app-date-chip
                           [date]="entry.expirationDate"
+                          [iconOnly]="true"
                           (dateChange)="entryDateChange.emit({ entry, date: $event })">
                         </app-date-chip>
                         @if (showEntryNoExpiry) {
-                          <ion-chip
-                            class="no-expiry-chip"
-                            [class.no-expiry-chip--active]="entry.noExpiry"
-                            (click)="entryNoExpiryToggle.emit({ entry })">
-                            <ion-icon [name]="entry.noExpiry ? 'ban' : 'ban-outline'"></ion-icon>
-                            <ion-label>{{ 'pantry.batches.noExpiryIntentional' | translate }}</ion-label>
-                          </ion-chip>
+                          <app-no-expiry-chip
+                            [active]="entry.noExpiry ?? false"
+                            [iconOnly]="true"
+                            (clicked)="entryNoExpiryToggle.emit({ entry })">
+                          </app-no-expiry-chip>
                         }
                       </div>
                     }

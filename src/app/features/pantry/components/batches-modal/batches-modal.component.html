@@ -69,17 +69,18 @@
                     </ion-input>
                     <div class="batch-date-field">
                       <span class="batch-date-label">{{ 'pantry.form.batches.expiry' | translate }}</span>
-                      <app-date-chip
-                        [date]="state.getBatchDateInputValue(batch) || undefined"
-                        (dateChange)="state.updateBatchExpirationDate($index, $event ?? '')">
-                      </app-date-chip>
-                      <ion-chip
-                        class="no-expiry-chip"
-                        [class.no-expiry-chip--active]="batch.noExpiry"
-                        (click)="state.updateBatchNoExpiry($index)">
-                        <ion-icon [name]="batch.noExpiry ? 'ban' : 'ban-outline'"></ion-icon>
-                        <ion-label>{{ 'pantry.batches.noExpiryIntentional' | translate }}</ion-label>
-                      </ion-chip>
+                      <div class="batch-date-chips">
+                        <app-date-chip
+                          [date]="state.getBatchDateInputValue(batch) || undefined"
+                          [iconOnly]="true"
+                          (dateChange)="state.updateBatchExpirationDate($index, $event ?? '')">
+                        </app-date-chip>
+                        <app-no-expiry-chip
+                          [active]="batch.noExpiry ?? false"
+                          [iconOnly]="true"
+                          (clicked)="state.updateBatchNoExpiry($index)">
+                        </app-no-expiry-chip>
+                      </div>
                     </div>
                   </div>
                   <div class="edit-batch-row">

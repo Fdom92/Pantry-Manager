@@ -113,6 +113,14 @@ ion-title, ion-back-button {
   align-items: end;
 }
 
+.batch-date-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  min-width: 0;
+}
+
 .batch-date-label {
   font-size: 0.72rem;
   letter-spacing: 0.04em;

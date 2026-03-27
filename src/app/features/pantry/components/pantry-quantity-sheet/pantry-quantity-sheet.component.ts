@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
-import { IonButton, IonChip, IonContent, IonIcon, IonLabel } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
+import { NoExpiryChipComponent } from '@shared/components/no-expiry-chip/no-expiry-chip.component';
 
 @Component({
   selector: 'app-pantry-quantity-sheet',
@@ -12,10 +13,9 @@ import { DateChipComponent } from '@shared/components/date-chip/date-chip.compon
     CommonModule,
     IonContent,
     IonButton,
-    IonChip,
     IonIcon,
-    IonLabel,
     DateChipComponent,
+    NoExpiryChipComponent,
     TranslateModule,
   ],
   templateUrl: './pantry-quantity-sheet.component.html',
