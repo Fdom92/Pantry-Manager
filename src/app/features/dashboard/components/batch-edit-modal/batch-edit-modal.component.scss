@@ -24,6 +24,17 @@
   gap: 6px;
 }
 
+.modal-footer ion-toolbar {
+  --padding-start: var(--app-theme-spacing-lg);
+  --padding-end: var(--app-theme-spacing-lg);
+  --padding-top: var(--app-theme-spacing-md);
+  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
+}
+
+.modal-footer ion-button {
+  width: 100%;
+}
+
 .batch-edit-date-list {
   background: transparent;
 
