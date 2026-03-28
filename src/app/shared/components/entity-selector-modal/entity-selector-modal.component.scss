@@ -59,33 +59,34 @@ ion-modal::part(content) {
 
 .entity-selector-item {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
   padding-block: 8px;
   border-bottom: 1px solid var(--ion-item-border-color, var(--ion-border-color, var(--ion-color-step-150, var(--ion-background-color-step-150, rgba(0, 0, 0, 0.13)))));
 }
 
-.entity-selector-item-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.entity-selector-item h3 {
+.entity-selector-item-name {
   margin: 0;
   font-weight: var(--app-theme-font-weight-bold);
+  font-size: 0.95rem;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.entity-selector-item p {
-  margin: 0;
-  color: var(--app-theme-text-muted);
-  font-size: var(--app-theme-font-size-body);
+.entity-selector-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .entry-expiry-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .entity-selector-quantity {

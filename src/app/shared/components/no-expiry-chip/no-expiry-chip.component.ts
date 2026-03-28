@@ -19,7 +19,9 @@ import { TranslateModule } from '@ngx-translate/core';
       [class.no-expiry-chip--active]="active"
       (click)="clicked.emit()">
       <ion-icon [name]="active ? 'ban' : 'ban-outline'"></ion-icon>
-      <ion-label>{{ 'pantry.batches.noExpiryIntentional' | translate }}</ion-label>
+      @if (!iconOnly) {
+        <ion-label>{{ 'pantry.batches.noExpiryIntentional' | translate }}</ion-label>
+      }
     </ion-chip>
   `,
   styles: [`
@@ -39,11 +41,12 @@ import { TranslateModule } from '@ngx-translate/core';
       --color: var(--ion-color-warning-shade);
     }
     .no-expiry-chip ion-icon { font-size: var(--chip-icon-size, 15px); margin: 0; }
-    .no-expiry-chip ion-label { margin-inline-start: 4px; }
+    .no-expiry-chip ion-label { margin-inline-start: 4px; white-space: nowrap; }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NoExpiryChipComponent {
   @Input() active = false;
+  @Input() iconOnly = false;
   @Output() clicked = new EventEmitter<void>();
 }
