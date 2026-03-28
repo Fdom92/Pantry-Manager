@@ -45,10 +45,10 @@
             <section class="entity-selector-list">
               @for (entry of entries; track entry.id) {
                 <div class="entity-selector-item">
-                  <ion-label>
-                    <h3>{{ entry.title }}</h3>
-                  </ion-label>
-                  <div class="entity-selector-controls" slot="end">
+                  <div class="entity-selector-item-top">
+                    <ion-label>
+                      <h3>{{ entry.title }}</h3>
+                    </ion-label>
                     <div class="entity-selector-quantity">
                       <ion-button
                         fill="clear"
@@ -66,23 +66,23 @@
                         <ion-icon slot="icon-only" name="add-outline"></ion-icon>
                       </ion-button>
                     </div>
-                    @if (showEntryDate) {
-                      <div class="entry-expiry-row">
-                        @if (!entry.noExpiry) {
-                          <app-date-chip
-                            [date]="entry.expirationDate"
-                            (dateChange)="entryDateChange.emit({ entry, date: $event })">
-                          </app-date-chip>
-                        }
-                        @if (showEntryNoExpiry && !entry.expirationDate) {
-                          <app-no-expiry-chip
-                            [active]="entry.noExpiry ?? false"
-                            (clicked)="entryNoExpiryToggle.emit({ entry })">
-                          </app-no-expiry-chip>
-                        }
-                      </div>
-                    }
                   </div>
+                  @if (showEntryDate) {
+                    <div class="entry-expiry-row">
+                      @if (!entry.noExpiry) {
+                        <app-date-chip
+                          [date]="entry.expirationDate"
+                          (dateChange)="entryDateChange.emit({ entry, date: $event })">
+                        </app-date-chip>
+                      }
+                      @if (showEntryNoExpiry && !entry.expirationDate) {
+                        <app-no-expiry-chip
+                          [active]="entry.noExpiry ?? false"
+                          (clicked)="entryNoExpiryToggle.emit({ entry })">
+                        </app-no-expiry-chip>
+                      }
+                    </div>
+                  }
                 </div>
               }
             </section>
