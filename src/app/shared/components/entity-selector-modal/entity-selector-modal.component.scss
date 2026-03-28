@@ -106,42 +106,6 @@ ion-modal::part(content) {
   margin-top: var(--app-theme-spacing-md);
 }
 
-.secondary-action-container {
-  padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-xl);
-  border-top: var(--app-theme-card-border-width) solid color-mix(in srgb, var(--ion-text-color) 10%, transparent);
-  margin-top: var(--app-theme-spacing-lg);
-}
-
-.secondary-action-link {
-  display: flex;
-  align-items: center;
-  gap: var(--app-theme-spacing-sm);
-  width: 100%;
-  padding: var(--app-theme-spacing-sm) 0;
-  background: transparent;
-  border: none;
-  color: var(--app-theme-text-subtle);
-  font-size: var(--app-theme-font-size-body);
-  font-weight: var(--app-theme-font-weight-semibold);
-  text-align: left;
-  cursor: pointer;
-  transition: var(--app-theme-transition-normal);
-}
-
-.secondary-action-link:hover,
-.secondary-action-link:active {
-  color: var(--ion-color-primary);
-}
-
-.secondary-action-link ion-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.secondary-action-link span {
-  flex: 1;
-}
-
 .modal-footer ion-toolbar {
   --padding-start: var(--app-theme-spacing-lg);
   --padding-end: var(--app-theme-spacing-lg);
