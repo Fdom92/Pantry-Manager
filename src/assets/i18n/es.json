@@ -482,7 +482,8 @@
       },
       "expired": {
         "yesterday": "Caducó ayer"
-      }
+      },
+      "noExpiryIntentional": "Sin caducidad"
     },
     "form": {
       "editTitle": "Editar producto",
@@ -529,7 +530,8 @@
         "vegetable": "Verdura",
         "fruit": "Fruta",
         "dairy": "Lácteo",
-        "other": "Otro"
+        "other": "Otro",
+        "household": "Hogar"
       }
     },
     "detail": {
@@ -592,7 +594,7 @@
       "decrease": "Disminuir",
       "viewDetails": "Ver lotes y fechas",
       "expiryDate": "Fecha de caducidad (opcional)",
-      "noDate": "Sin fecha",
+      "noDate": "Añadir fecha",
       "zeroHint": "Desaparecerá de tu despensa hasta que añadas más",
       "zeroHintBasic": "Desaparecerá de tu despensa y pasará a tu lista de la compra"
     },
@@ -607,7 +609,20 @@
       "stockUpdatedSimple": "💾 Stock actualizado.",
       "saved": "💾 Cambios guardados."
     },
-    "confirmDelete": "¿Eliminar \"{{ name }}\"?"
+    "confirmDelete": "¿Eliminar \"{{ name }}\"?",
+    "fab": {
+      "groupLabel": "Acciones"
+    },
+    "consume": {
+      "groupLabel": "Consumir productos",
+      "title": "Consumir productos",
+      "cardTitle": "Busca un producto",
+      "subtitle": "Busca un producto de tu despensa para registrar su consumo.",
+      "placeholder": "Buscar producto",
+      "noResults": "Sin resultados",
+      "empty": "Todavía no has añadido productos.",
+      "submit": "Registrar consumo"
+    }
   },
   "upgrade": {
     "title": "Hazte PRO",

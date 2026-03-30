@@ -181,7 +181,7 @@ export class PantryService extends StorageService<PantryItem> {
    */
   async addNewLot(
     productId: string,
-    lot: { quantity: number; expiryDate?: string | null; location?: string }
+    lot: { quantity: number; expiryDate?: string | null; location?: string; noExpiry?: boolean }
   ): Promise<PantryItem | null> {
     const item = await this.get(productId);
     if (!item) {
@@ -202,6 +202,7 @@ export class PantryService extends StorageService<PantryItem> {
       batchId: generateBatchId(),
       quantity,
       expirationDate: expiryDate || undefined,
+      noExpiry: lot.noExpiry || undefined,
       opened: false,
       locationId,
     };

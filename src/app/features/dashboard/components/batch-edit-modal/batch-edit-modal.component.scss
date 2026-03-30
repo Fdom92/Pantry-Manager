@@ -3,3 +3,47 @@
   color: var(--app-theme-text-muted);
   margin: 0 0 12px;
 }
+
+.batch-edit-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-block: 8px;
+  width: 100%;
+}
+
+.batch-edit-item-name {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--app-theme-text-muted);
+}
+
+.batch-edit-date-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal-footer ion-toolbar {
+  --padding-start: var(--app-theme-spacing-lg);
+  --padding-end: var(--app-theme-spacing-lg);
+  --padding-top: var(--app-theme-spacing-md);
+  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
+}
+
+.modal-footer ion-button {
+  width: 100%;
+}
+
+.batch-edit-date-list {
+  background: transparent;
+
+  ion-item {
+    --background: transparent;
+    --border-width: 0;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    width: 100%;
+    --min-height: auto;
+  }
+}

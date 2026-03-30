@@ -482,7 +482,8 @@
       },
       "expired": {
         "yesterday": "Expiré hier"
-      }
+      },
+      "noExpiryIntentional": "Sans date"
     },
     "form": {
       "editTitle": "Modifier l’article",
@@ -529,7 +530,8 @@
         "vegetable": "Légume",
         "fruit": "Fruit",
         "dairy": "Produit laitier",
-        "other": "Autre"
+        "other": "Autre",
+        "household": "Ménage"
       }
     },
     "detail": {
@@ -591,7 +593,7 @@
       "decrease": "Diminuer",
       "viewDetails": "Voir lots et dates",
       "expiryDate": "Date de péremption (optionnel)",
-      "noDate": "Sans date",
+      "noDate": "Ajouter date",
       "zeroHint": "Il disparaîtra de votre garde-manger jusqu'à ce que vous en rajoutiez",
       "zeroHintBasic": "Il disparaîtra de votre garde-manger et apparaîtra dans votre liste de courses"
     },
@@ -606,7 +608,20 @@
       "stockUpdatedSimple": "💾 Stock mis à jour.",
       "saved": "💾 Modifications enregistrées."
     },
-    "confirmDelete": "Supprimer \"{{ name }}\" ?"
+    "confirmDelete": "Supprimer \"{{ name }}\" ?",
+    "fab": {
+      "groupLabel": "Actions"
+    },
+    "consume": {
+      "groupLabel": "Consommer des produits",
+      "title": "Consommer des produits",
+      "cardTitle": "Rechercher un produit",
+      "subtitle": "Recherchez un produit dans votre garde-manger pour enregistrer sa consommation.",
+      "placeholder": "Rechercher un produit",
+      "noResults": "Aucun résultat",
+      "empty": "Aucun article ajouté pour l'instant.",
+      "submit": "Enregistrer la consommation"
+    }
   },
   "upgrade": {
     "title": "Passer en PRO",

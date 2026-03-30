@@ -273,7 +273,9 @@ export class PantryViewModelService {
   formatBatchDate(batch: ItemBatch): string {
     const value = batch.expirationDate;
     if (!value) {
-      return this.translate.instant('pantry.batches.noExpiryDate');
+      return this.translate.instant(
+        batch.noExpiry ? 'pantry.batches.noExpiryIntentional' : 'pantry.batches.noExpiryDate'
+      );
     }
 
     const expiryDate = new Date(value);

@@ -482,7 +482,8 @@
       },
       "expired": {
         "yesterday": "Expirou ontem"
-      }
+      },
+      "noExpiryIntentional": "Sem validade"
     },
     "form": {
       "editTitle": "Editar item",
@@ -529,7 +530,8 @@
         "vegetable": "Vegetal",
         "fruit": "Fruta",
         "dairy": "Laticínio",
-        "other": "Outro"
+        "other": "Outro",
+        "household": "Casa"
       }
     },
     "detail": {
@@ -591,7 +593,7 @@
       "decrease": "Diminuir",
       "viewDetails": "Ver lotes e datas",
       "expiryDate": "Data de validade (opcional)",
-      "noDate": "Sem data",
+      "noDate": "Adicionar data",
       "zeroHint": "Vai desaparecer da despensa até você adicionar mais",
       "zeroHintBasic": "Vai desaparecer da despensa e aparecer na sua lista de compras"
     },
@@ -606,7 +608,20 @@
       "stockUpdatedSimple": "💾 Stock atualizado.",
       "saved": "💾 Alterações guardadas."
     },
-    "confirmDelete": "Eliminar \"{{ name }}\"?"
+    "confirmDelete": "Eliminar \"{{ name }}\"?",
+    "fab": {
+      "groupLabel": "Ações"
+    },
+    "consume": {
+      "groupLabel": "Consumir produtos",
+      "title": "Consumir produtos",
+      "cardTitle": "Pesquisar um produto",
+      "subtitle": "Pesquisa um produto na tua despensa para registar o consumo.",
+      "placeholder": "Pesquisar produto",
+      "noResults": "Sem resultados",
+      "empty": "Ainda não adicionaste produtos.",
+      "submit": "Registar consumo"
+    }
   },
   "upgrade": {
     "title": "Atualizar para PRO",

@@ -7,7 +7,6 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
-  IonLabel,
   IonList,
   IonModal,
   IonSpinner,
@@ -16,7 +15,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
-import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
+import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 import { BatchEditStateService } from '@core/services/dashboard/batch-edit-state.service';
 
 @Component({
@@ -33,12 +32,11 @@ import { BatchEditStateService } from '@core/services/dashboard/batch-edit-state
     IonContent,
     IonList,
     IonItem,
-    IonLabel,
     IonFooter,
     IonSpinner,
     TranslateModule,
     EntitySelectorFieldComponent,
-    DateChipComponent,
+    ExpiryPickerComponent,
   ],
   templateUrl: './batch-edit-modal.component.html',
   styleUrls: ['./batch-edit-modal.component.scss'],

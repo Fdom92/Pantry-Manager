@@ -7,7 +7,6 @@ import {
   IonFooter,
   IonHeader,
   IonIcon,
-  IonLabel,
   IonModal,
   IonSpinner,
   IonText,
@@ -16,7 +15,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntityAutocompleteComponent, type AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
-import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
+import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 
 export interface EntitySelectorEntry {
   id: string;
@@ -24,6 +23,7 @@ export interface EntitySelectorEntry {
   quantity: number;
   maxQuantity?: number;
   expirationDate?: string;
+  noExpiry?: boolean;
 }
 
 @Component({
@@ -39,9 +39,8 @@ export interface EntitySelectorEntry {
     IonButtons,
     IonButton,
     IonIcon,
-    DateChipComponent,
+    ExpiryPickerComponent,
     IonContent,
-    IonLabel,
     IonText,
     IonFooter,
     IonSpinner,
@@ -69,6 +68,8 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Input() entries: readonly EntitySelectorEntry[] = [];
   @Input() showSecondaryInfo = false;
   @Input() showMeta = false;
+  @Input() showEntryDate = true;
+  @Input() showEntryNoExpiry = false;
   @Input() showAllOnFocus = true;
   @Input() autofocus = true;
   @Input() maxOptions = 0;
@@ -79,6 +80,7 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Output() emptyAction = new EventEmitter<string>();
   @Output() adjustEntry = new EventEmitter<{ entry: EntitySelectorEntry; delta: number }>();
   @Output() entryDateChange = new EventEmitter<{ entry: EntitySelectorEntry; date: string | undefined }>();
+  @Output() entryNoExpiryToggle = new EventEmitter<{ entry: EntitySelectorEntry }>();
   @Output() save = new EventEmitter<void>();
   canIncrease(entry: EntitySelectorEntry): boolean {
     if (entry.maxQuantity == null || !Number.isFinite(entry.maxQuantity)) {

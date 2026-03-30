@@ -7,28 +7,11 @@ export const STORAGE_KEYS = {
   REVIEW_LAST_PROMPT_AT: 'review:lastPromptAt',
   REVIEW_COMPLETED_AT: 'review:completedAt',
   REVIEW_PRODUCT_ADD_COUNT: 'review:productAddCount',
+  REVIEW_CONSUME_COUNT: 'review:consumeCount',
   REVIEW_PENDING: 'review:pending',
 } as const;
 
 export const DEFAULT_HOUSEHOLD_ID = 'household:default';
 
-/** @deprecated Use STORAGE_KEYS.PREFERENCES instead */
-export const STORAGE_KEY_PREFERENCES = STORAGE_KEYS.PREFERENCES;
-
-/** @deprecated Use STORAGE_KEYS.PRO_STATUS instead */
-export const STORAGE_KEY_PRO = STORAGE_KEYS.PRO_STATUS;
-
-/** @deprecated Use STORAGE_KEYS.ONBOARDING_FLAG instead */
-export const ONBOARDING_STORAGE_KEY = STORAGE_KEYS.ONBOARDING_FLAG;
-
-/** @deprecated Use STORAGE_KEYS.REVIEW_* properties instead */
-export const REVIEW_STORAGE_KEYS = {
-  FIRST_USE_AT: STORAGE_KEYS.REVIEW_FIRST_USE_AT,
-  LAUNCH_COUNT: STORAGE_KEYS.REVIEW_LAUNCH_COUNT,
-  LAST_PROMPT_AT: STORAGE_KEYS.REVIEW_LAST_PROMPT_AT,
-  COMPLETED_AT: STORAGE_KEYS.REVIEW_COMPLETED_AT,
-  PRODUCT_ADD_COUNT: STORAGE_KEYS.REVIEW_PRODUCT_ADD_COUNT,
-  PENDING: STORAGE_KEYS.REVIEW_PENDING,
-} as const;
 export const DOC_TYPE_PREFERENCES = 'app-preferences';
 export const APP_DB_NAME = 'pantry-db';

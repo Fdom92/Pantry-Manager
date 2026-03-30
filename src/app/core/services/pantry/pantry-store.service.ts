@@ -137,7 +137,7 @@ export class PantryStoreService {
 
   async addNewLot(
     itemId: string,
-    params: { quantity: number; expiryDate?: string; location?: string }
+    params: { quantity: number; expiryDate?: string; location?: string; noExpiry?: boolean }
   ): Promise<PantryItem | null> {
     return this.pantryService.addNewLot(itemId, params);
   }

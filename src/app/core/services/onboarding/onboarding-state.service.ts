@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { ONBOARDING_SLIDES } from '@core/constants/onboarding';
-import { ONBOARDING_STORAGE_KEY } from '@core/constants';
+import { STORAGE_KEYS } from '@core/constants';
 import { isLastIndex } from '@core/domain/onboarding';
 import type { OnboardingSlide } from '@core/models/onboarding';
 import { getBooleanFlag, setBooleanFlag } from '@core/utils/storage-flag.util';
@@ -15,7 +15,7 @@ let swiperRegistered = false;
 export class OnboardingStateService {
   private readonly navCtrl = inject(NavController);
   private readonly pantryService = inject(PantryService);
-  private readonly alreadyCompletedOnboarding = getBooleanFlag(ONBOARDING_STORAGE_KEY);
+  private readonly alreadyCompletedOnboarding = getBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG);
 
   readonly slideOptions: SwiperOptions = {
     speed: 550,
@@ -74,7 +74,7 @@ export class OnboardingStateService {
   }
 
   async completeOnboarding(): Promise<void> {
-    setBooleanFlag(ONBOARDING_STORAGE_KEY, true);
+    setBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG, true);
     const items = await this.pantryService.getAll();
     if (!items.length) {
       await this.navCtrl.navigateRoot('/pantry');
