@@ -126,7 +126,10 @@ export class DashboardStateService {
       if (item.isBasic) return false;
       const hasBatchDate = item.batches?.some(b => !!b.expirationDate);
       const hasItemDate = !!item.expirationDate;
-      return !hasBatchDate && !hasItemDate;
+      if (hasBatchDate || hasItemDate) return false;
+      // Exclude items where all batches are explicitly marked as no-expiry
+      const allMarkedNoExpiry = item.batches?.length > 0 && item.batches.every(b => !!b.noExpiry);
+      return !allMarkedNoExpiry;
     }).length;
   });
 

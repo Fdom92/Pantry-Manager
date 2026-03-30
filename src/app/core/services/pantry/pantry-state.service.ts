@@ -1,6 +1,6 @@
 import { Injectable, Signal, WritableSignal, computed, effect, inject, signal } from '@angular/core';
 import {
-  FastAddEntry,
+  AddEntry,
   FilterChipViewModel,
   ItemBatch,
   PantryFilterState,
@@ -14,6 +14,7 @@ import { SettingsPreferencesService } from '../settings/settings-preferences.ser
 import { PantryBatchOperationsService } from './pantry-batch-operations.service';
 import { PantryBatchesModalStateService } from './modals/pantry-batches-modal-state.service';
 import { PantryAddModalStateService } from './modals/pantry-add-modal-state.service';
+import { PantryConsumeModalStateService } from './modals/pantry-consume-modal-state.service';
 import { PantryQuantitySheetStateService } from './modals/pantry-quantity-sheet-state.service';
 import { PantryListUiStateService } from './pantry-list-ui-state.service';
 import { PantryStoreService } from './pantry-store.service';
@@ -31,7 +32,8 @@ export class PantryStateService {
   private readonly viewModel = inject(PantryViewModelService);
   private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly listUi = inject(PantryListUiStateService);
-  private readonly fastAddModal = inject(PantryAddModalStateService);
+  private readonly addModal = inject(PantryAddModalStateService);
+  private readonly consumeModal = inject(PantryConsumeModalStateService);
   private readonly batchesModal = inject(PantryBatchesModalStateService);
   private readonly quantitySheet = inject(PantryQuantitySheetStateService);
 
@@ -57,15 +59,22 @@ export class PantryStateService {
   // Delegated signals from specialized services
   readonly collapsedGroups = this.listUi.collapsedGroups;
   readonly deletingItems = this.listUi.deletingItems;
-  readonly fastAddModalOpen = this.fastAddModal.fastAddModalOpen;
-  readonly isFastAdding = this.fastAddModal.isFastAdding;
-  readonly fastAddQuery = this.fastAddModal.fastAddQuery;
-  readonly fastAddEntries = this.fastAddModal.fastAddEntries;
-  readonly fastAddEntryViewModels = this.fastAddModal.fastAddEntryViewModels;
-  readonly hasFastAddEntries = this.fastAddModal.hasFastAddEntries;
-  readonly fastAddOptions = this.fastAddModal.fastAddOptions;
-  readonly showFastAddEmptyAction = this.fastAddModal.showFastAddEmptyAction;
-  readonly fastAddEmptyActionLabel = this.fastAddModal.fastAddEmptyActionLabel;
+  readonly addModalOpen = this.addModal.addModalOpen;
+  readonly isAdding = this.addModal.isAdding;
+  readonly addQuery = this.addModal.addQuery;
+  readonly addEntries = this.addModal.addEntries;
+  readonly addEntryViewModels = this.addModal.addEntryViewModels;
+  readonly hasAddEntries = this.addModal.hasAddEntries;
+  readonly addOptions = this.addModal.addOptions;
+  readonly showAddEmptyAction = this.addModal.showAddEmptyAction;
+  readonly addEmptyActionLabel = this.addModal.addEmptyActionLabel;
+  readonly consumeModalOpen = this.consumeModal.consumeModalOpen;
+  readonly isConsuming = this.consumeModal.isConsuming;
+  readonly consumeQuery = this.consumeModal.consumeQuery;
+  readonly consumeEntries = this.consumeModal.consumeEntries;
+  readonly consumeEntryViewModels = this.consumeModal.consumeEntryViewModels;
+  readonly hasConsumeEntries = this.consumeModal.hasConsumeEntries;
+  readonly consumeOptions = this.consumeModal.consumeOptions;
   readonly showBatchesModal = this.batchesModal.showBatchesModal;
   readonly selectedBatchesItem = this.batchesModal.selectedBatchesItem;
   readonly batchesEditMode = this.batchesModal.editMode;
@@ -75,6 +84,7 @@ export class PantryStateService {
   readonly selectedQuantitySheetItem = this.quantitySheet.selectedItem;
   readonly pendingQuantityChange = this.quantitySheet.pendingQuantityChange;
   readonly pendingQuantitySheetExpiryDate = this.quantitySheet.pendingExpiryDate;
+  readonly pendingQuantitySheetNoExpiry = this.quantitySheet.pendingNoExpiry;
 
   // Computed signals coordinating across services
   readonly groups = computed(() => this.viewModel.buildGroups(this.pantryItemsState()));
@@ -102,6 +112,9 @@ export class PantryStateService {
 
     // Provide pantry items state to quantity sheet service for optimistic updates
     this.quantitySheet.pantryItemsState = this.pantryItemsState;
+
+    // Provide pantry items state to consume modal for optimistic updates
+    this.consumeModal.pantryItemsState = this.pantryItemsState;
 
     // Keep UI in sync with filtered pipeline, merging optimistic batch edits
     effect(() => {
@@ -179,16 +192,25 @@ export class PantryStateService {
   }
 
   // -------- Add modal (delegates to PantryAddModalStateService) --------
-  openFastAddModal = () => this.fastAddModal.openFastAddModal();
-  closeFastAddModal = () => this.fastAddModal.closeFastAddModal();
-  dismissFastAddModal = () => this.fastAddModal.dismissFastAddModal();
-  submitFastAdd = () => this.fastAddModal.submitFastAdd();
-  onFastAddQueryChange = (value: string) => this.fastAddModal.onFastAddQueryChange(value);
-  addFastAddEntry = (option: AutocompleteItem<PantryItem>) => this.fastAddModal.addFastAddEntry(option);
-  addFastAddEntryFromQuery = (name?: string) => this.fastAddModal.addFastAddEntryFromQuery(name);
-  adjustFastAddEntry = (entry: FastAddEntry, delta: number) => this.fastAddModal.adjustFastAddEntry(entry, delta);
-  adjustFastAddEntryById = (entryId: string, delta: number) => this.fastAddModal.adjustFastAddEntryById(entryId, delta);
-  setFastAddEntryDate = (entryId: string, date: string | undefined) => this.fastAddModal.setFastAddEntryDate(entryId, date);
+  openAddModal = () => this.addModal.openAddModal();
+  closeAddModal = () => this.addModal.closeAddModal();
+  dismissAddModal = () => this.addModal.dismissAddModal();
+  submitAdd = () => this.addModal.submitAdd();
+  onAddQueryChange = (value: string) => this.addModal.onAddQueryChange(value);
+  addEntry = (option: AutocompleteItem<PantryItem>) => this.addModal.addEntry(option);
+  addEntryFromQuery = (name?: string) => this.addModal.addEntryFromQuery(name);
+  adjustEntry = (entry: AddEntry, delta: number) => this.addModal.adjustEntry(entry, delta);
+  adjustEntryById = (entryId: string, delta: number) => this.addModal.adjustEntryById(entryId, delta);
+  setEntryDate = (entryId: string, date: string | undefined) => this.addModal.setEntryDate(entryId, date);
+
+  // -------- Consume modal (delegates to PantryConsumeModalStateService) --------
+  openConsumeModal = () => this.consumeModal.openConsumeModal();
+  closeConsumeModal = () => this.consumeModal.closeConsumeModal();
+  dismissConsumeModal = () => this.consumeModal.dismissConsumeModal();
+  submitConsume = () => this.consumeModal.submitConsume();
+  onConsumeQueryChange = (value: string) => this.consumeModal.onConsumeQueryChange(value);
+  addConsumeEntry = (option: AutocompleteItem<PantryItem>) => this.consumeModal.addConsumeEntry(option);
+  adjustConsumeEntryById = (entryId: string, delta: number) => this.consumeModal.adjustConsumeEntryById(entryId, delta);
 
   // -------- List UI state (delegates to PantryListUiStateService) --------
   trackByItemId = (index: number, item: PantryItem) => this.listUi.trackByItemId(index, item);
@@ -280,6 +302,7 @@ export class PantryStateService {
   addBatchesEntry = () => this.batchesModal.addBatch();
   updateBatchQuantity = (index: number, quantity: number) => this.batchesModal.updateBatchQuantity(index, quantity);
   updateBatchExpirationDate = (index: number, dateString: string) => this.batchesModal.updateBatchExpirationDate(index, dateString);
+  updateBatchNoExpiry = (index: number) => this.batchesModal.updateBatchNoExpiry(index);
   updateBatchLocation = (index: number, locationId: string) => this.batchesModal.updateBatchLocation(index, locationId);
   getBatchDateInputValue = (batch: ItemBatch) => this.batchesModal.getBatchDateInputValue(batch);
   saveBatches = async () => await this.batchesModal.saveBatches();
@@ -296,6 +319,7 @@ export class PantryStateService {
   decrementQuantity = (item: PantryItem) => this.quantitySheet.decrementQuantity(item);
   getQuantitySheetTotalQuantity = (item: PantryItem) => this.quantitySheet.getTotalQuantity(item);
   setQuantitySheetExpiryDate = (date: string | undefined) => this.quantitySheet.setExpiryDate(date);
+  toggleQuantitySheetNoExpiry = () => this.quantitySheet.toggleNoExpiry();
 
   closeQuantitySheetWithSave(): void {
     this.quantitySheet.closeQuantitySheet();

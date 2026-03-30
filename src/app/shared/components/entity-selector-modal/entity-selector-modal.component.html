@@ -45,10 +45,8 @@
             <section class="entity-selector-list">
               @for (entry of entries; track entry.id) {
                 <div class="entity-selector-item">
-                  <ion-label>
-                    <h3>{{ entry.title }}</h3>
-                  </ion-label>
-                  <div class="entity-selector-controls" slot="end">
+                  <h3 class="entity-selector-item-name">{{ entry.title }}</h3>
+                  <div class="entity-selector-controls">
                     <div class="entity-selector-quantity">
                       <ion-button
                         fill="clear"
@@ -66,10 +64,14 @@
                         <ion-icon slot="icon-only" name="add-outline"></ion-icon>
                       </ion-button>
                     </div>
-                    <app-date-chip
-                      [date]="entry.expirationDate"
-                      (dateChange)="entryDateChange.emit({ entry, date: $event })">
-                    </app-date-chip>
+                    @if (showEntryDate) {
+                      <app-expiry-picker
+                        [date]="entry.expirationDate"
+                        [noExpiry]="entry.noExpiry ?? false"
+                        (dateChange)="entryDateChange.emit({ entry, date: $event })"
+                        (noExpiryToggle)="entryNoExpiryToggle.emit({ entry })">
+                      </app-expiry-picker>
+                    }
                   </div>
                 </div>
               }

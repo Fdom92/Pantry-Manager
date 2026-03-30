@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { ONBOARDING_STORAGE_KEY, REVIEW_STORAGE_KEYS } from '@core/constants';
+import { STORAGE_KEYS } from '@core/constants';
 import { getBooleanFlag, setBooleanFlag, sleep } from '@core/utils';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmService } from './confirm.service';
@@ -15,9 +15,11 @@ export class ReviewPromptService {
   private readonly translate = inject(TranslateService);
 
   private readonly minDaysSinceFirstUse = 7;
-  private readonly minLaunches = 7;
+  private readonly minLaunches = 5;
   private readonly cooldownDays = 30;
+  private readonly completedCooldownDays = 90;
   private readonly minProductAddsForPrompt = 3;
+  private readonly minConsumesForPrompt = 3;
   private readonly promptDelayMs = 1500;
   private lastTriggerAt = 0;
   private readonly storageAvailable = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
@@ -33,7 +35,7 @@ export class ReviewPromptService {
     this.lastTriggerAt = now;
 
     this.noteLaunch();
-    if (!getBooleanFlag(REVIEW_STORAGE_KEYS.PENDING)) {
+    if (!getBooleanFlag(STORAGE_KEYS.REVIEW_PENDING)) {
       return;
     }
     const didPrompt = await this.promptIfEligible();
@@ -47,7 +49,7 @@ export class ReviewPromptService {
       return;
     }
     this.noteFirstUse();
-    setBooleanFlag(REVIEW_STORAGE_KEYS.PENDING, true);
+    setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
   }
 
   handleProductAdded(): void {
@@ -55,25 +57,38 @@ export class ReviewPromptService {
       return;
     }
     this.noteFirstUse();
-    const current = this.getStoredNumber(REVIEW_STORAGE_KEYS.PRODUCT_ADD_COUNT) ?? 0;
+    const current = this.getStoredNumber(STORAGE_KEYS.REVIEW_PRODUCT_ADD_COUNT) ?? 0;
     const next = current + 1;
-    this.setItem(REVIEW_STORAGE_KEYS.PRODUCT_ADD_COUNT, String(next));
+    this.setItem(STORAGE_KEYS.REVIEW_PRODUCT_ADD_COUNT, String(next));
     if (next >= this.minProductAddsForPrompt) {
-      setBooleanFlag(REVIEW_STORAGE_KEYS.PENDING, true);
+      setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
+    }
+  }
+
+  handleConsumeCompleted(): void {
+    if (!this.storageAvailable) {
+      return;
+    }
+    this.noteFirstUse();
+    const current = this.getStoredNumber(STORAGE_KEYS.REVIEW_CONSUME_COUNT) ?? 0;
+    const next = current + 1;
+    this.setItem(STORAGE_KEYS.REVIEW_CONSUME_COUNT, String(next));
+    if (next >= this.minConsumesForPrompt) {
+      setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
     }
   }
 
   private noteLaunch(): void {
     this.noteFirstUse();
-    const launchCount = this.getStoredNumber(REVIEW_STORAGE_KEYS.LAUNCH_COUNT) ?? 0;
-    this.setItem(REVIEW_STORAGE_KEYS.LAUNCH_COUNT, String(launchCount + 1));
+    const launchCount = this.getStoredNumber(STORAGE_KEYS.REVIEW_LAUNCH_COUNT) ?? 0;
+    this.setItem(STORAGE_KEYS.REVIEW_LAUNCH_COUNT, String(launchCount + 1));
   }
 
   private noteFirstUse(): void {
     const now = new Date().toISOString();
-    const firstUse = this.getStoredDate(REVIEW_STORAGE_KEYS.FIRST_USE_AT);
+    const firstUse = this.getStoredDate(STORAGE_KEYS.REVIEW_FIRST_USE_AT);
     if (!firstUse) {
-      this.setItem(REVIEW_STORAGE_KEYS.FIRST_USE_AT, now);
+      this.setItem(STORAGE_KEYS.REVIEW_FIRST_USE_AT, now);
     }
   }
 
@@ -89,21 +104,21 @@ export class ReviewPromptService {
 
     const accepted = this.confirm.confirm(this.translate.instant('reviews.prompt'));
     const promptTimestamp = new Date().toISOString();
-    this.setItem(REVIEW_STORAGE_KEYS.LAST_PROMPT_AT, promptTimestamp);
+    this.setItem(STORAGE_KEYS.REVIEW_LAST_PROMPT_AT, promptTimestamp);
     if (!accepted) {
       return true;
     }
 
     const didRequest = await this.requestNativeReview();
     if (didRequest) {
-      this.setItem(REVIEW_STORAGE_KEYS.COMPLETED_AT, promptTimestamp);
+      this.setItem(STORAGE_KEYS.REVIEW_COMPLETED_AT, promptTimestamp);
     }
     return true;
   }
 
   private clearPendingPrompt(): void {
     try {
-      localStorage.removeItem(REVIEW_STORAGE_KEYS.PENDING);
+      localStorage.removeItem(STORAGE_KEYS.REVIEW_PENDING);
     } catch {
       // Ignore storage failures.
     }
@@ -113,14 +128,15 @@ export class ReviewPromptService {
     if (!Capacitor.isNativePlatform()) {
       return false;
     }
-    if (!getBooleanFlag(ONBOARDING_STORAGE_KEY)) {
+    if (!getBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG)) {
       return false;
     }
-    if (this.getStoredDate(REVIEW_STORAGE_KEYS.COMPLETED_AT)) {
+    const completedAt = this.getStoredDate(STORAGE_KEYS.REVIEW_COMPLETED_AT);
+    if (completedAt && this.getDaysSince(completedAt) < this.completedCooldownDays) {
       return false;
     }
 
-    const firstUse = this.getStoredDate(REVIEW_STORAGE_KEYS.FIRST_USE_AT);
+    const firstUse = this.getStoredDate(STORAGE_KEYS.REVIEW_FIRST_USE_AT);
     if (!firstUse) {
       return false;
     }
@@ -128,12 +144,12 @@ export class ReviewPromptService {
       return false;
     }
 
-    const launchCount = this.getStoredNumber(REVIEW_STORAGE_KEYS.LAUNCH_COUNT) ?? 0;
+    const launchCount = this.getStoredNumber(STORAGE_KEYS.REVIEW_LAUNCH_COUNT) ?? 0;
     if (launchCount < this.minLaunches) {
       return false;
     }
 
-    const lastPrompt = this.getStoredDate(REVIEW_STORAGE_KEYS.LAST_PROMPT_AT);
+    const lastPrompt = this.getStoredDate(STORAGE_KEYS.REVIEW_LAST_PROMPT_AT);
     if (lastPrompt && this.getDaysSince(lastPrompt) < this.cooldownDays) {
       return false;
     }

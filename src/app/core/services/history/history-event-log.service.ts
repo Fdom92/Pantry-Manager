@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import type { BaseEventParams, EventParams, PantryEvent } from '@core/models/events';
-import { buildEventQuantities } from '@core/domain/events';
+import { buildEventQuantities, computeDaysToExpiry } from '@core/domain/events';
 import { createDocumentId } from '@core/utils';
 import { StorageService } from '../shared/storage.service';
 
@@ -71,6 +71,13 @@ export class HistoryEventLogService extends StorageService<PantryEvent> {
       previousQuantity: quantities.previousQuantity,
       nextQuantity: quantities.nextQuantity,
       batchId: params.batchId,
+      source: params.source,
+      categoryId: params.categoryId,
+      foodType: params.foodType,
+      expirationDate: params.expirationDate,
+      daysToExpiry: params.daysToExpiry ?? computeDaysToExpiry(params.expirationDate, now),
+      editedFields: params.editedFields,
+      sessionId: params.sessionId,
       sourceMetadata: params.sourceMetadata,
       timestamp: now,
       createdAt: now,

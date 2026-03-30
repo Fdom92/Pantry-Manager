@@ -2,7 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { ToastController } from '@ionic/angular/standalone';
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
-import { applyBatchEditFilter } from '@core/models/pantry/batch-edit.model';
+import { NO_EXPIRY_SENTINEL, applyBatchEditFilter } from '@core/models/pantry/batch-edit.model';
 import type { BatchEditAction, BatchEditFilter, BatchEditFlowConfig } from '@core/models/pantry/batch-edit.model';
 import { buildUniqueSelectOptions } from '@core/utils';
 import { formatFriendlyName, normalizeStringList } from '@core/utils/normalization.util';
@@ -87,7 +87,21 @@ export class BatchEditStateService {
   }
 
   getItemExpiryDate(id: string): string | undefined {
-    return this.itemValues().get(id) ?? undefined;
+    const v = this.itemValues().get(id);
+    return v === NO_EXPIRY_SENTINEL ? undefined : v;
+  }
+
+  getItemNoExpiry(id: string): boolean {
+    return this.itemValues().get(id) === NO_EXPIRY_SENTINEL;
+  }
+
+  setItemNoExpiry(id: string): void {
+    const current = this.itemValues().get(id);
+    if (current === NO_EXPIRY_SENTINEL) {
+      this.setItemValue(id, null);
+    } else {
+      this.setItemValue(id, NO_EXPIRY_SENTINEL);
+    }
   }
 
   getItemDisplayValue(id: string): string {
@@ -116,7 +130,7 @@ export class BatchEditStateService {
         const value = values.get(item._id)!;
         const updated = this.buildUpdatedItem(item, action, value, now);
         await this.pantryStore.updateItem(updated);
-        await this.eventManager.logAdvancedEdit(item, updated);
+        await this.eventManager.logAdvancedEdit(item, updated, 'dashboard');
       }));
       this.dismiss();
       await this.showSuccessToast(items.length);
@@ -131,7 +145,12 @@ export class BatchEditStateService {
     const base = { ...item, updatedAt: now };
     if (action === 'setFoodType') return { ...base, foodType: value as FoodType };
     if (action === 'setCategory') return { ...base, categoryId: value };
-    if (action === 'setExpiryDate') return { ...base, batches: [{ ...base.batches[0], expirationDate: value }] };
+    if (action === 'setExpiryDate') {
+      if (value === NO_EXPIRY_SENTINEL) {
+        return { ...base, batches: [{ ...base.batches[0], expirationDate: undefined, noExpiry: true }] };
+      }
+      return { ...base, batches: [{ ...base.batches[0], expirationDate: value, noExpiry: undefined }] };
+    }
     return base;
   }
 

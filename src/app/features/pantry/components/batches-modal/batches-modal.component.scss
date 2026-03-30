@@ -71,10 +71,6 @@ ion-title, ion-back-button {
   margin-top: 6px;
 }
 
-.modal-spinner {
-  display: block;
-  margin: 48px auto;
-}
 
 .edit-batches-list {
   display: flex;
@@ -110,7 +106,8 @@ ion-title, ion-back-button {
   flex-direction: column;
   gap: 6px;
   padding-top: 10px;
-  align-items: end;
+  align-items: flex-end;
+  flex-shrink: 0;
 }
 
 .batch-date-label {

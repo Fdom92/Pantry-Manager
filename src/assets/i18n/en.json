@@ -482,7 +482,8 @@
       },
       "expired": {
         "yesterday": "Expired yesterday"
-      }
+      },
+      "noExpiryIntentional": "No expiry"
     },
     "form": {
       "editTitle": "Edit item",
@@ -529,7 +530,8 @@
         "vegetable": "Vegetable",
         "fruit": "Fruit",
         "dairy": "Dairy",
-        "other": "Other"
+        "other": "Other",
+        "household": "Household"
       }
     },
     "detail": {
@@ -592,7 +594,7 @@
       "decrease": "Decrease",
       "viewDetails": "View batches & dates",
       "expiryDate": "Expiry date (optional)",
-      "noDate": "No date",
+      "noDate": "Add date",
       "zeroHint": "It'll disappear from your pantry until you restock it",
       "zeroHintBasic": "It'll disappear from your pantry and show up in your shopping list"
     },
@@ -607,7 +609,20 @@
       "stockUpdatedSimple": "💾 Stock updated.",
       "saved": "💾 Changes saved."
     },
-    "confirmDelete": "Delete \"{{ name }}\"?"
+    "confirmDelete": "Delete \"{{ name }}\"?",
+    "fab": {
+      "groupLabel": "Actions"
+    },
+    "consume": {
+      "groupLabel": "Consume products",
+      "title": "Consume products",
+      "cardTitle": "Search a product",
+      "subtitle": "Search for a product in your pantry to log its consumption.",
+      "placeholder": "Search product",
+      "noResults": "No results",
+      "empty": "No items added yet.",
+      "submit": "Log consumption"
+    }
   },
   "upgrade": {
     "title": "Upgrade to PRO",

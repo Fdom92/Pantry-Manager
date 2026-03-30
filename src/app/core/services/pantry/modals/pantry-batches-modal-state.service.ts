@@ -7,15 +7,18 @@ import type {
   PantryItem,
   PantryItemCardViewModel,
 } from '@core/models/pantry';
+import { sumQuantities } from '@core/domain/pantry';
 import { PantryViewModelService } from '../pantry-view-model.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { toDateInputValue, toIsoDate } from '@core/utils/date.util';
 import { generateBatchId } from '@core/utils';
+import { hasBatchMetadataChanged } from '@core/utils/pantry-diff.util';
 import { formatFriendlyName, normalizeTrim } from '@core/utils/normalization.util';
 import { UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { CatalogOptionsService } from '../../settings';
+import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 
 /**
  * Manages batches modal state and batch view models.
@@ -26,6 +29,7 @@ export class PantryBatchesModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly translate = inject(TranslateService);
   private readonly catalogOptions = inject(CatalogOptionsService);
+  private readonly eventManager = inject(HistoryEventManagerService);
 
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
@@ -136,6 +140,7 @@ export class PantryBatchesModalStateService {
 
   /**
    * Update expiration date for a batch at given index.
+   * Clears noExpiry when a real date is set.
    */
   updateBatchExpirationDate(index: number, dateString: string): void {
     const batches = this.editedBatches();
@@ -147,6 +152,25 @@ export class PantryBatchesModalStateService {
     updated[index] = {
       ...updated[index],
       expirationDate: isoDate,
+      noExpiry: isoDate ? undefined : updated[index].noExpiry,
+    };
+    this.editedBatches.set(updated);
+  }
+
+  /**
+   * Toggle "intentionally no expiry" for a batch at given index. Clears expirationDate.
+   */
+  updateBatchNoExpiry(index: number): void {
+    const batches = this.editedBatches();
+    if (index < 0 || index >= batches.length) {
+      return;
+    }
+    const updated = [...batches];
+    const toggled = !updated[index].noExpiry;
+    updated[index] = {
+      ...updated[index],
+      noExpiry: toggled || undefined,
+      expirationDate: toggled ? undefined : updated[index].expirationDate,
     };
     this.editedBatches.set(updated);
   }
@@ -234,8 +258,12 @@ export class PantryBatchesModalStateService {
 
     this.isSaving.set(true);
     try {
-      // Filter out batches with 0 quantity
+      const prevBatches = item.batches ?? [];
       const validBatches = this.editedBatches().filter(batch => (batch.quantity ?? 0) > 0);
+
+      const prevQuantity = sumQuantities(prevBatches);
+      const nextQuantity = sumQuantities(validBatches);
+      const deltaQuantity = nextQuantity - prevQuantity;
 
       const updatedItem: PantryItem = {
         ...item,
@@ -252,6 +280,16 @@ export class PantryBatchesModalStateService {
 
       // Save to store
       await this.pantryStore.updateItem(updatedItem);
+
+      // Log ADD or CONSUME if total quantity changed
+      if (deltaQuantity !== 0) {
+        await this.eventManager.logStockAdjust(item, updatedItem, { deltaQuantity, source: 'batches_modal' });
+      }
+
+      // Log EDIT if batch metadata changed (dates, locations, opened flag)
+      if (hasBatchMetadataChanged(prevBatches, validBatches)) {
+        await this.eventManager.logAdvancedEdit(item, updatedItem, 'batches_modal');
+      }
 
       // Update selected item and exit edit mode
       this.selectedBatchesItem.set(updatedItem);

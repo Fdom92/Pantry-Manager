@@ -11,7 +11,7 @@ Configuration constants and fixed values organized by feature.
 
 ## 📂 Structure
 
-```
+```text
 constants/
 ├── agent/          # AI agent config
 ├── dashboard/      # Dashboard and insights
@@ -38,7 +38,14 @@ export const UNASSIGNED_LOCATION_KEY = 'location:none';
 export const STORAGE_KEYS = {
   PREFERENCES: 'app:preferences',
   PRO_STATUS: 'revenuecat:isPro',
-  ONBOARDING_FLAG: 'hasSeenOnboarding'
+  ONBOARDING_FLAG: 'hasSeenOnboarding',
+  REVIEW_FIRST_USE_AT: 'review:firstUseAt',
+  REVIEW_LAUNCH_COUNT: 'review:launchCount',
+  REVIEW_LAST_PROMPT_AT: 'review:lastPromptAt',
+  REVIEW_COMPLETED_AT: 'review:completedAt',
+  REVIEW_PRODUCT_ADD_COUNT: 'review:productAddCount',
+  REVIEW_CONSUME_COUNT: 'review:consumeCount',
+  REVIEW_PENDING: 'review:pending',
 } as const;
 
 export const APP_DB_NAME = 'pantry-db';

@@ -61,31 +61,28 @@ ion-modal::part(content) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-block: 8px;
   border-bottom: 1px solid var(--ion-item-border-color, var(--ion-border-color, var(--ion-color-step-150, var(--ion-background-color-step-150, rgba(0, 0, 0, 0.13)))));
 }
 
-.entity-selector-item h3 {
+.entity-selector-item-name {
   margin: 0;
   font-weight: var(--app-theme-font-weight-bold);
-}
-
-.entity-selector-item p {
-  margin: 0;
-  color: var(--app-theme-text-muted);
-  font-size: var(--app-theme-font-size-body);
-}
-
-.entity-selector-item app-date-chip {
-  margin-top: 4px;
+  font-size: 0.95rem;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .entity-selector-controls {
   display: flex;
   align-items: center;
-  flex-direction: column;
-  margin-bottom: 8px;
-  min-width: 40%;
+  gap: 4px;
+  flex-shrink: 0;
 }
+
 
 .entity-selector-quantity {
   display: flex;
@@ -102,42 +99,6 @@ ion-modal::part(content) {
   display: block;
   text-align: center;
   margin-top: var(--app-theme-spacing-md);
-}
-
-.secondary-action-container {
-  padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-xl);
-  border-top: var(--app-theme-card-border-width) solid color-mix(in srgb, var(--ion-text-color) 10%, transparent);
-  margin-top: var(--app-theme-spacing-lg);
-}
-
-.secondary-action-link {
-  display: flex;
-  align-items: center;
-  gap: var(--app-theme-spacing-sm);
-  width: 100%;
-  padding: var(--app-theme-spacing-sm) 0;
-  background: transparent;
-  border: none;
-  color: var(--app-theme-text-subtle);
-  font-size: var(--app-theme-font-size-body);
-  font-weight: var(--app-theme-font-weight-semibold);
-  text-align: left;
-  cursor: pointer;
-  transition: var(--app-theme-transition-normal);
-}
-
-.secondary-action-link:hover,
-.secondary-action-link:active {
-  color: var(--ion-color-primary);
-}
-
-.secondary-action-link ion-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.secondary-action-link span {
-  flex: 1;
 }
 
 .modal-footer ion-toolbar {

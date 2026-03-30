@@ -4,7 +4,7 @@ import { roundQuantity } from '@core/utils/formatting.util';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { computeEarliestExpiry } from './pantry-batch.domain';
 
-export function buildFastAddItemPayload(params: {
+export function buildAddItemPayload(params: {
   id: string;
   nowIso: string;
   name: string;
@@ -12,10 +12,11 @@ export function buildFastAddItemPayload(params: {
   defaultLocationId?: string;
   householdId?: string;
   expirationDate?: string;
+  noExpiry?: boolean;
 }): PantryItem {
   const normalizedName = normalizeTrim(params.name) || UNASSIGNED_PRODUCT_NAME;
 
-  // Inline normalizeFastAddQuantity logic
+  // Inline normalizeAddQuantity logic
   let sanitizedQuantity = 1;
   if (typeof params.quantity === 'number') {
     const numericValue = Number(params.quantity);
@@ -31,6 +32,7 @@ export function buildFastAddItemPayload(params: {
       quantity: roundQuantity(Math.max(1, sanitizedQuantity)),
       locationId: normalizeTrim(params.defaultLocationId ?? '') || undefined,
       expirationDate: params.expirationDate ?? undefined,
+      noExpiry: params.noExpiry || undefined,
     },
   ];
 
