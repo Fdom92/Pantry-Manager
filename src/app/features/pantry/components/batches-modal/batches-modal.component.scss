@@ -105,13 +105,9 @@ ion-title, ion-back-button {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  align-items: flex-start;
-}
-
-.batch-date-chips {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  padding-top: 10px;
+  align-items: flex-end;
+  flex-shrink: 0;
 }
 
 .batch-date-label {

@@ -47,14 +47,13 @@
     }
     @if (pendingChange > 0) {
       <div class="expiry-chip-wrapper">
-        <app-date-chip
+        <app-expiry-picker
           [date]="pendingExpiryDate"
-          (dateChange)="expiryDateChange.emit($event)">
-        </app-date-chip>
-        <app-no-expiry-chip
-          [active]="pendingNoExpiry"
-          (clicked)="noExpiryToggle.emit()">
-        </app-no-expiry-chip>
+          [noExpiry]="pendingNoExpiry"
+          (dateChange)="expiryDateChange.emit($event)"
+          (noExpiryToggle)="noExpiryToggle.emit()">
+        </app-expiry-picker>
+
       </div>
     }
   </div>

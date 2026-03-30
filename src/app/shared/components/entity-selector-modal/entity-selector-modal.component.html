@@ -65,22 +65,12 @@
                       </ion-button>
                     </div>
                     @if (showEntryDate) {
-                      <div class="entry-expiry-row">
-                        @if (!entry.noExpiry) {
-                          <app-date-chip
-                            [date]="entry.expirationDate"
-                            [iconOnly]="!entry.expirationDate"
-                            (dateChange)="entryDateChange.emit({ entry, date: $event })">
-                          </app-date-chip>
-                        }
-                        @if (showEntryNoExpiry && !entry.expirationDate) {
-                          <app-no-expiry-chip
-                            [active]="entry.noExpiry ?? false"
-                            [iconOnly]="!entry.noExpiry"
-                            (clicked)="entryNoExpiryToggle.emit({ entry })">
-                          </app-no-expiry-chip>
-                        }
-                      </div>
+                      <app-expiry-picker
+                        [date]="entry.expirationDate"
+                        [noExpiry]="entry.noExpiry ?? false"
+                        (dateChange)="entryDateChange.emit({ entry, date: $event })"
+                        (noExpiryToggle)="entryNoExpiryToggle.emit({ entry })">
+                      </app-expiry-picker>
                     }
                   </div>
                 </div>

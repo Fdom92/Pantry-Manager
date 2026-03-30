@@ -15,8 +15,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntityAutocompleteComponent, type AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
-import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
-import { NoExpiryChipComponent } from '@shared/components/no-expiry-chip/no-expiry-chip.component';
+import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 
 export interface EntitySelectorEntry {
   id: string;
@@ -40,8 +39,7 @@ export interface EntitySelectorEntry {
     IonButtons,
     IonButton,
     IonIcon,
-    DateChipComponent,
-    NoExpiryChipComponent,
+    ExpiryPickerComponent,
     IonContent,
     IonText,
     IonFooter,

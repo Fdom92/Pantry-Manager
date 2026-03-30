@@ -18,8 +18,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
-import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
-import { NoExpiryChipComponent } from '@shared/components/no-expiry-chip/no-expiry-chip.component';
+import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
 
 @Component({
@@ -42,8 +41,7 @@ import { EntitySelectorFieldComponent } from '@shared/components/entity-selector
     IonBadge,
     IonInput,
     IonSpinner,
-    DateChipComponent,
-    NoExpiryChipComponent,
+    ExpiryPickerComponent,
     EntitySelectorFieldComponent,
   ],
   templateUrl: './batches-modal.component.html',

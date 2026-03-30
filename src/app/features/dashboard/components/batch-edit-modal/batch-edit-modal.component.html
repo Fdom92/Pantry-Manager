@@ -57,18 +57,12 @@
               <div class="batch-edit-item-content">
                 <span class="batch-edit-item-name">{{ item.name }}</span>
                 <div class="batch-edit-date-cell">
-                  @if (!state.getItemNoExpiry(item._id)) {
-                    <app-date-chip
-                      [date]="state.getItemExpiryDate(item._id)"
-                      (dateChange)="state.setItemValue(item._id, $event ?? null)">
-                    </app-date-chip>
-                  }
-                  @if (!state.getItemExpiryDate(item._id)) {
-                    <app-no-expiry-chip
-                      [active]="state.getItemNoExpiry(item._id)"
-                      (clicked)="state.setItemNoExpiry(item._id)">
-                    </app-no-expiry-chip>
-                  }
+                  <app-expiry-picker
+                    [date]="state.getItemExpiryDate(item._id)"
+                    [noExpiry]="state.getItemNoExpiry(item._id)"
+                    (dateChange)="state.setItemValue(item._id, $event ?? null)"
+                    (noExpiryToggle)="state.setItemNoExpiry(item._id)">
+                  </app-expiry-picker>
                 </div>
               </div>
             </ion-item>

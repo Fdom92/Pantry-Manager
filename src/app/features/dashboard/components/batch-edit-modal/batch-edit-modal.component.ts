@@ -15,8 +15,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
-import { DateChipComponent } from '@shared/components/date-chip/date-chip.component';
-import { NoExpiryChipComponent } from '@shared/components/no-expiry-chip/no-expiry-chip.component';
+import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 import { BatchEditStateService } from '@core/services/dashboard/batch-edit-state.service';
 
 @Component({
@@ -37,8 +36,7 @@ import { BatchEditStateService } from '@core/services/dashboard/batch-edit-state
     IonSpinner,
     TranslateModule,
     EntitySelectorFieldComponent,
-    DateChipComponent,
-    NoExpiryChipComponent,
+    ExpiryPickerComponent,
   ],
   templateUrl: './batch-edit-modal.component.html',
   styleUrls: ['./batch-edit-modal.component.scss'],

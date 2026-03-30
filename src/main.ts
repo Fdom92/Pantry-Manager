@@ -54,6 +54,8 @@ import {
   flashOutline,
   homeOutline,
   hourglassOutline,
+  infinite,
+  infiniteOutline,
   informationCircle,
   informationOutline,
   layersOutline,
@@ -122,6 +124,7 @@ addIcons({
   close: close,
   star: star,
   checkmark: checkmark,
+  infinite: infinite,
   'home-outline': homeOutline,
   'basket-outline': basketOutline,
   'cart-outline': cartOutline,
@@ -190,7 +193,7 @@ addIcons({
   'share-social-outline': shareSocialOutline,
   'archive-outline': archiveOutline,
   'phone-portrait-outline': phonePortraitOutline,
-  'ban-outline': banOutline
+  'infinite-outline': infiniteOutline
 });
 
 bootstrapApplication(AppComponent, {
