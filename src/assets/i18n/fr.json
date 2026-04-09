@@ -147,11 +147,43 @@
       }
     },
     "sections": {
+      "today": {
+        "title": "Recommandé pour aujourd'hui"
+      },
       "actions": {
         "title": "Que faire maintenant"
       },
       "insights": {
         "title": "Améliorer votre garde-manger"
+      }
+    },
+    "today": {
+      "reason": {
+        "expirestoday": "Expire aujourd'hui — utilisez-le pour éviter le gaspillage",
+        "expiringsoon": "Expire bientôt — mieux vaut l'utiliser aujourd'hui",
+        "lowstock": "Il n'en reste plus beaucoup — utilisez-le ou réapprovisionnez"
+      },
+      "combine": "Expire aussi bientôt :",
+      "cta": {
+        "primary": "Utiliser aujourd'hui"
+      },
+      "expiry": {
+        "today": "Expire aujourd'hui",
+        "tomorrow": "Expire demain",
+        "inDays": "Expire dans {{ count }} jours"
+      },
+      "confirm": {
+        "question": "Avez-vous utilisé ces ingrédients ?",
+        "yes": "Oui, marquer comme utilisés",
+        "cancel": "Annuler"
+      },
+      "success": {
+        "title": "Ingrédients utilisés",
+        "hint": "Garde-manger mis à jour"
+      },
+      "allGood": {
+        "title": "Tout est sous contrôle",
+        "hint": "Rien d'urgent aujourd'hui — votre garde-manger est en parfait état"
       }
     },
     "actions": {

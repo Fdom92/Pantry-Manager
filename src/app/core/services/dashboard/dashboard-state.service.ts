@@ -1,8 +1,9 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
-import { computeFoodCoverage, computePantryScore, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { computeFoodCoverage, computePantryScore, computeTodaySuggestion, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { applyFifoConsumption } from '@core/domain/pantry';
 import { applyBatchEditFilter } from '@core/models/pantry/batch-edit.model';
-import type { FoodCoverageResult, PantryScoreResult } from '@core/domain/dashboard';
+import type { FoodCoverageResult, PantryScoreResult, TodaySuggestion } from '@core/domain/dashboard';
 import type {
   Insight,
   InsightContext,
@@ -91,6 +92,11 @@ export class DashboardStateService {
   readonly lastRefreshTimestamp = signal<string | null>(null);
   readonly isDeletingExpiredItems = signal(false);
   readonly visibleInsights = signal<Insight[]>([]);
+
+  // Today's suggestion block
+  readonly isCookingConfirmed = signal(false);
+  readonly isConsumingToday = signal(false);
+  private readonly lastProtagonistId = signal<string | undefined>(undefined);
 
   readonly totalItems = computed(() => this.inventorySummary().total);
   readonly recentlyUpdatedItems = computed(() => getRecentItemsByUpdatedAt(this.pantryItems()));
@@ -226,6 +232,10 @@ export class DashboardStateService {
   });
 
   readonly stalePantryItemsCount = computed(() => this.stalePantryItems().length);
+
+  readonly todaySuggestion = computed((): TodaySuggestion | null =>
+    computeTodaySuggestion(this.nearExpiryItems(), this.pantryItems(), this.lastProtagonistId())
+  );
 
   readonly actions = computed((): DashboardAction[] => {
     const actions: DashboardAction[] = [];
@@ -408,6 +418,34 @@ export class DashboardStateService {
 
   dismissAction(action: DashboardAction): void {
     this.dismissedActionIds.update(ids => new Set([...ids, action.id]));
+  }
+
+  async cookToday(): Promise<void> {
+    const suggestion = this.todaySuggestion();
+    if (!suggestion || this.isConsumingToday()) return;
+
+    this.isConsumingToday.set(true);
+    try {
+      const item = this.pantryItems().find(i => i._id === suggestion.protagonist.id);
+      if (item?.batches?.length) {
+        const updatedBatches = applyFifoConsumption(item.batches, 1);
+        await this.pantryStore.updateItem({ ...item, batches: updatedBatches });
+      }
+      this.lastProtagonistId.set(suggestion.protagonist.id);
+      this.isCookingConfirmed.set(true);
+      void this.reviewPrompt.handleConsumeCompleted();
+      setTimeout(() => this.isCookingConfirmed.set(false), 2500);
+    } finally {
+      this.isConsumingToday.set(false);
+    }
+  }
+
+  formatExpiryRelative(value: string | undefined): string | null {
+    if (!value) return null;
+    const diffDays = Math.ceil((Date.parse(value) - Date.now()) / 86_400_000);
+    if (diffDays <= 0) return this.translate.instant('dashboard.today.expiry.today');
+    if (diffDays === 1) return this.translate.instant('dashboard.today.expiry.tomorrow');
+    return this.translate.instant('dashboard.today.expiry.inDays', { count: diffDays });
   }
 
   getHealthIcon(state: PantryHealthState): string {

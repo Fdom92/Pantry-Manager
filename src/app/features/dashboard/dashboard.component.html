@@ -64,6 +64,66 @@
         }
       </section>
 
+<!-- LAYER HOY: Today's suggestion -->
+      @if (facade.totalItems() > 0) {
+        <section class="dashboard-section">
+          <header class="dashboard-section-header">
+            <h3 class="dashboard-section-title">{{ 'dashboard.sections.today.title' | translate }}</h3>
+          </header>
+
+          @if (facade.isCookingConfirmed()) {
+            <div class="today-card today-card--confirmed">
+              <div class="today-card__success-row">
+                <ion-icon name="checkmark-circle"></ion-icon>
+                <div>
+                  <p class="today-card__success-title">{{ 'dashboard.today.success.title' | translate }}</p>
+                  <p class="today-card__success-hint">{{ 'dashboard.today.success.hint' | translate }}</p>
+                </div>
+              </div>
+            </div>
+          } @else if (!facade.todaySuggestion()) {
+            <div class="today-card today-card--all-good">
+              <div class="today-card__all-good-row">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+                <div>
+                  <p class="today-card__all-good-title">{{ 'dashboard.today.allGood.title' | translate }}</p>
+                  <p class="today-card__all-good-hint">{{ 'dashboard.today.allGood.hint' | translate }}</p>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <div class="today-card">
+              <div class="today-card__protagonist">
+                <span class="today-card__protagonist-name">{{ facade.todaySuggestion()!.protagonist.name }}</span>
+                @if (facade.todaySuggestion()!.protagonist.expirationDate) {
+                  <span class="today-card__protagonist-expiry">
+                    <ion-icon name="time-outline"></ion-icon>
+                    {{ facade.formatExpiryRelative(facade.todaySuggestion()!.protagonist.expirationDate) }}
+                  </span>
+                }
+              </div>
+              <p class="today-card__reason">{{ facade.todaySuggestion()!.reasonKey | translate }}</p>
+              @if (facade.todaySuggestion()!.secondaryItems.length > 0) {
+                <p class="today-card__secondary">
+                  {{ 'dashboard.today.combine' | translate }}
+                  @for (item of facade.todaySuggestion()!.secondaryItems; track item.id; let last = $last) {
+                    {{ item.name }}{{ !last ? ',' : '' }}
+                  }
+                </p>
+              }
+              <div class="today-card__footer">
+                <ion-button
+                  size="small"
+                  [disabled]="facade.isConsumingToday()"
+                  (click)="facade.cookToday()">
+                  {{ 'dashboard.today.cta.primary' | translate }}
+                </ion-button>
+              </div>
+            </div>
+          }
+        </section>
+      }
+
 <!-- LAYER 2: What to Do Now (Actions) -->
       @if (facade.actions().length > 0) {
         <section class="dashboard-section">

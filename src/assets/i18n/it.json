@@ -147,11 +147,43 @@
       }
     },
     "sections": {
+      "today": {
+        "title": "Consigliato per oggi"
+      },
       "actions": {
         "title": "Cosa fare ora"
       },
       "insights": {
         "title": "Migliora la tua dispensa"
+      }
+    },
+    "today": {
+      "reason": {
+        "expirestoday": "Scade oggi — usalo per evitare sprechi",
+        "expiringsoon": "Scade presto — meglio usarlo oggi",
+        "lowstock": "Ne rimane poco — usalo o rifornisciti prima che finisca"
+      },
+      "combine": "Scade presto anche:",
+      "cta": {
+        "primary": "Usalo oggi"
+      },
+      "expiry": {
+        "today": "Scade oggi",
+        "tomorrow": "Scade domani",
+        "inDays": "Scade in {{ count }} giorni"
+      },
+      "confirm": {
+        "question": "Hai usato questi ingredienti?",
+        "yes": "Sì, segna come usati",
+        "cancel": "Annulla"
+      },
+      "success": {
+        "title": "Ingredienti utilizzati",
+        "hint": "Dispensa aggiornata"
+      },
+      "allGood": {
+        "title": "Tutto sotto controllo",
+        "hint": "Niente di urgente oggi — la tua dispensa è in ottima forma"
       }
     },
     "actions": {

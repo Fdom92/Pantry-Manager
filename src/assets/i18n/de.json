@@ -147,11 +147,43 @@
       }
     },
     "sections": {
+      "today": {
+        "title": "Empfohlen für heute"
+      },
       "actions": {
         "title": "Was jetzt zu tun ist"
       },
       "insights": {
         "title": "Vorrat verbessern"
+      }
+    },
+    "today": {
+      "reason": {
+        "expirestoday": "Läuft heute ab — jetzt verwenden, um Verschwendung zu vermeiden",
+        "expiringsoon": "Läuft bald ab — heute besser verwenden",
+        "lowstock": "Nur noch wenig da — verwenden oder nachkaufen"
+      },
+      "combine": "Läuft auch bald ab:",
+      "cta": {
+        "primary": "Heute verwenden"
+      },
+      "expiry": {
+        "today": "Läuft heute ab",
+        "tomorrow": "Läuft morgen ab",
+        "inDays": "Läuft in {{ count }} Tagen ab"
+      },
+      "confirm": {
+        "question": "Hast du diese Zutaten verwendet?",
+        "yes": "Ja, als verwendet markieren",
+        "cancel": "Abbrechen"
+      },
+      "success": {
+        "title": "Zutaten verwendet",
+        "hint": "Vorrat aktualisiert"
+      },
+      "allGood": {
+        "title": "Alles unter Kontrolle",
+        "hint": "Heute nichts Dringendes — dein Vorrat ist in guter Verfassung"
       }
     },
     "actions": {

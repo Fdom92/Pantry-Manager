@@ -1,6 +1,161 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 
+// ─── Today's Suggestion ───────────────────────────────────────────────────────
+
+// Food type score: higher = more useful as a meal protagonist.
+// Dairy/snacks are not excluded — just deprioritised so proteins/carbs win when available.
+const HOY_FOOD_TYPE_SCORE: Partial<Record<FoodType, number>> = {
+  [FoodType.PROTEIN]:   40,
+  [FoodType.CARB]:      30,
+  [FoodType.VEGETABLE]: 30,
+  [FoodType.FRUIT]:     15,
+  [FoodType.DAIRY]:     10,
+  [FoodType.OTHER]:      5,
+  // HOUSEHOLD always excluded before scoring
+};
+
+// Minimum score for an item to be worth surfacing in the HOY block.
+const HOY_MIN_SCORE = 30;
+
+// Urgency score based on days until expiry.
+// Capped at 90 (not 100) so food type score can tip the balance between two
+// equally urgent items (e.g. chicken expiring in 2 days beats yoghurt expiring today).
+const getUrgencyScore = (days: number | null): number => {
+  if (days === null) return 0;
+  if (days <= 0)     return 85;
+  if (days === 1)    return 80;
+  if (days === 2)    return 75;
+  if (days <= 5)     return 50;
+  return 0;
+};
+
+export interface TodaySuggestionItem {
+  id: string;
+  name: string;
+  quantity: number;
+  expirationDate?: string;
+  daysToExpiry: number | null;
+}
+
+export interface TodaySuggestion {
+  protagonist: TodaySuggestionItem;
+  reasonKey: string;
+  secondaryItems: TodaySuggestionItem[];
+}
+
+/**
+ * Selects the single most important item the user should consume today via a
+ * priority score (urgency + food-type weight), plus up to 2 secondary urgent items.
+ * Proteins/carbs win over dairy/snacks when expiry urgency is similar.
+ * Falls back to low-stock dated items when nothing is near expiry.
+ * Returns null when there is nothing actionable above HOY_MIN_SCORE ("all good" state).
+ *
+ * @param skipId - ID of the item shown last session; avoided if a comparable alternative exists.
+ */
+export function computeTodaySuggestion(
+  nearExpiryItems: PantryItem[],
+  allItems: PantryItem[],
+  skipId?: string,
+): TodaySuggestion | null {
+  const nowMs = Date.now();
+
+  const getStock = (item: PantryItem): number =>
+    (item.batches ?? []).reduce((s, b) => s + (b.quantity ?? 0), 0);
+
+  const getEarliestExpiryDate = (item: PantryItem): string | undefined =>
+    (item.batches ?? [])
+      .filter(b => b.expirationDate)
+      .sort((a, b) => Date.parse(a.expirationDate!) - Date.parse(b.expirationDate!))[0]
+      ?.expirationDate;
+
+  const getDaysToExpiry = (item: PantryItem): number | null => {
+    const date = getEarliestExpiryDate(item);
+    return date ? Math.ceil((Date.parse(date) - nowMs) / 86_400_000) : null;
+  };
+
+  const isFood = (item: PantryItem): boolean =>
+    !!item.foodType && item.foodType !== FoodType.HOUSEHOLD;
+
+  const hasStock = (item: PantryItem): boolean => getStock(item) > 0;
+
+  const toItem = (item: PantryItem): TodaySuggestionItem => ({
+    id: item._id,
+    name: item.name,
+    quantity: getStock(item),
+    expirationDate: getEarliestExpiryDate(item),
+    daysToExpiry: getDaysToExpiry(item),
+  });
+
+  const scoreItem = (item: PantryItem): number => {
+    const days = getDaysToExpiry(item);
+    return getUrgencyScore(days) + (HOY_FOOD_TYPE_SCORE[item.foodType as FoodType] ?? 0);
+  };
+
+  // Items without an expiry date are excluded — this block is about urgency, not general stock.
+  const hasDatedBatch = (item: PantryItem): boolean => !!getEarliestExpiryDate(item);
+
+  const foodItems = allItems.filter(i => isFood(i) && hasStock(i) && hasDatedBatch(i));
+  if (!foodItems.length) return null;
+
+  // Tiebreaker: score DESC → daysToExpiry ASC (more urgent first) → quantity DESC
+  const sortCandidates = (
+    a: { item: PantryItem; score: number; days: number | null },
+    b: { item: PantryItem; score: number; days: number | null },
+  ): number => {
+    if (b.score !== a.score) return b.score - a.score;
+    const ad = a.days ?? Infinity;
+    const bd = b.days ?? Infinity;
+    if (ad !== bd) return ad - bd;
+    return getStock(b.item) - getStock(a.item);
+  };
+
+  // Candidates: near-expiry dated items scored by urgency + food type
+  const nearCandidates = nearExpiryItems
+    .filter(i => isFood(i) && hasStock(i) && hasDatedBatch(i))
+    .map(i => ({ item: i, score: scoreItem(i), days: getDaysToExpiry(i) }))
+    .filter(({ score }) => score > 0)
+    .sort(sortCandidates);
+
+  // Fallback: low-stock dated items (quantity = 1) when nothing is near expiry
+  const lowStockCandidates = foodItems
+    .filter(i => getStock(i) === 1)
+    .map(i => ({ item: i, score: scoreItem(i), days: getDaysToExpiry(i) }))
+    .sort(sortCandidates);
+
+  const ranked = nearCandidates.length ? nearCandidates : lowStockCandidates;
+  if (!ranked.length) return null;
+
+  // Minimum score guard: nothing worth surfacing → "all good" state
+  if (ranked[0].score < HOY_MIN_SCORE) return null;
+
+  // Anti-repetition: if the top scorer was shown last session and an alternative
+  // with a comparable score (within 30 points) exists, prefer the alternative.
+  let topIndex = 0;
+  if (skipId && ranked[0].item._id === skipId && ranked.length > 1 && ranked[0].score - ranked[1].score < 30) {
+    topIndex = 1;
+  }
+
+  const { item: protagonist, days: protagonistDays } = ranked[topIndex];
+
+  const reasonKey =
+    protagonistDays !== null && protagonistDays <= 0 ? 'dashboard.today.reason.expirestoday' :
+    protagonistDays !== null && protagonistDays <= 2  ? 'dashboard.today.reason.expiringsoon' :
+                                                        'dashboard.today.reason.lowstock';
+
+  // Secondary: next highest-scored near-expiry items (not the protagonist), up to 2
+  const secondaryPool = nearCandidates
+    .filter(({ item }) => item._id !== protagonist._id)
+    .slice(0, 2)
+    .map(({ item }) => toItem(item));
+
+  return {
+    protagonist: toItem(protagonist),
+    reasonKey,
+    secondaryItems: secondaryPool,
+  };
+}
+
 export function compareIsoDatesNewestFirst(a?: string, b?: string): number {
   const aTime = a ? new Date(a).getTime() : Number.NEGATIVE_INFINITY;
   const bTime = b ? new Date(b).getTime() : Number.NEGATIVE_INFINITY;
