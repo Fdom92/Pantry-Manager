@@ -159,8 +159,8 @@
     },
     "today": {
       "reason": {
-        "expirestoday": "Expires today — use it to avoid waste",
-        "expiringsoon": "Expiring soon — better to use it today",
+        "expiringsoon": "Expiring very soon — use it today",
+        "expirestoday": "Expiring soon — start thinking about using it",
         "lowstock": "Running low — use it or restock before it runs out"
       },
       "combine": "Also expiring soon:",

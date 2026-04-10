@@ -159,8 +159,8 @@
     },
     "today": {
       "reason": {
-        "expirestoday": "Caduca hoy — úsalo para evitar desperdicio",
-        "expiringsoon": "Caduca pronto — mejor usarlo hoy",
+        "expiringsoon": "Caduca muy pronto — úsalo hoy",
+        "expirestoday": "Caduca pronto — ve pensando en usarlo",
         "lowstock": "Te queda poco — repón o úsalo antes de que se acabe"
       },
       "combine": "También caduca pronto:",

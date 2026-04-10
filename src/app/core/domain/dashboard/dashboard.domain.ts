@@ -19,16 +19,31 @@ const HOY_FOOD_TYPE_SCORE: Partial<Record<FoodType, number>> = {
 const HOY_MIN_SCORE = 30;
 
 // Urgency score based on days until expiry.
-// Capped at 90 (not 100) so food type score can tip the balance between two
-// equally urgent items (e.g. chicken expiring in 2 days beats yoghurt expiring today).
+// Expired items (≤0) are excluded before scoring — they belong to the "Qué hacer ahora" section.
 const getUrgencyScore = (days: number | null): number => {
-  if (days === null) return 0;
-  if (days <= 0)     return 85;
-  if (days === 1)    return 80;
-  if (days === 2)    return 75;
-  if (days <= 5)     return 50;
+  if (days === null || days <= 0) return 0;
+  if (days === 1)  return 80;
+  if (days === 2)  return 75;
+  if (days <= 5)   return 50;
   return 0;
 };
+
+// Minimum quantity threshold before an item is considered low stock, by food type.
+// Higher-rotation types (dairy, fruit) deplete faster so the threshold is higher.
+const getLowStockThreshold = (foodType: FoodType): number => {
+  switch (foodType) {
+    case FoodType.DAIRY:     return 4;
+    case FoodType.FRUIT:     return 3;
+    case FoodType.VEGETABLE: return 2;
+    default:                 return 1; // PROTEIN, CARB, OTHER
+  }
+};
+
+// Fast-moving types consume more quickly and benefit from an urgency bump.
+const isFastMoving = (foodType: FoodType): boolean =>
+  foodType === FoodType.DAIRY ||
+  foodType === FoodType.FRUIT ||
+  foodType === FoodType.VEGETABLE;
 
 export interface TodaySuggestionItem {
   id: string;
@@ -88,14 +103,28 @@ export function computeTodaySuggestion(
   });
 
   const scoreItem = (item: PantryItem): number => {
-    const days = getDaysToExpiry(item);
-    return getUrgencyScore(days) + (HOY_FOOD_TYPE_SCORE[item.foodType as FoodType] ?? 0);
+    const days  = getDaysToExpiry(item);
+    const stock = getStock(item);
+    const type  = item.foodType as FoodType;
+    const isLowStock = stock <= getLowStockThreshold(type);
+
+    let urgency = getUrgencyScore(days);
+    if (isLowStock)        urgency += 25; // bonus: running out soon
+    if (isFastMoving(type)) urgency += 10; // bonus: high-rotation type
+
+    return urgency + (HOY_FOOD_TYPE_SCORE[type] ?? 0);
   };
 
   // Items without an expiry date are excluded — this block is about urgency, not general stock.
   const hasDatedBatch = (item: PantryItem): boolean => !!getEarliestExpiryDate(item);
 
-  const foodItems = allItems.filter(i => isFood(i) && hasStock(i) && hasDatedBatch(i));
+  // Expired items (daysToExpiry ≤ 0) are handled by "Qué hacer ahora" and must not appear here.
+  const isNotExpired = (item: PantryItem): boolean => {
+    const d = getDaysToExpiry(item);
+    return d === null || d > 0;
+  };
+
+  const foodItems = allItems.filter(i => isFood(i) && hasStock(i) && hasDatedBatch(i) && isNotExpired(i));
   if (!foodItems.length) return null;
 
   // Tiebreaker: score DESC → daysToExpiry ASC (more urgent first) → quantity DESC
@@ -110,16 +139,16 @@ export function computeTodaySuggestion(
     return getStock(b.item) - getStock(a.item);
   };
 
-  // Candidates: near-expiry dated items scored by urgency + food type
+  // Candidates: near-expiry dated non-expired items, scored by urgency + food type + bonuses
   const nearCandidates = nearExpiryItems
-    .filter(i => isFood(i) && hasStock(i) && hasDatedBatch(i))
+    .filter(i => isFood(i) && hasStock(i) && hasDatedBatch(i) && isNotExpired(i))
     .map(i => ({ item: i, score: scoreItem(i), days: getDaysToExpiry(i) }))
     .filter(({ score }) => score > 0)
     .sort(sortCandidates);
 
-  // Fallback: low-stock dated items (quantity = 1) when nothing is near expiry
+  // Fallback: low-stock dated non-expired items when nothing is near expiry
   const lowStockCandidates = foodItems
-    .filter(i => getStock(i) === 1)
+    .filter(i => getStock(i) <= getLowStockThreshold(i.foodType as FoodType))
     .map(i => ({ item: i, score: scoreItem(i), days: getDaysToExpiry(i) }))
     .sort(sortCandidates);
 
@@ -138,10 +167,11 @@ export function computeTodaySuggestion(
 
   const { item: protagonist, days: protagonistDays } = ranked[topIndex];
 
+  // reasonKey reflects actual urgency: very soon (≤2d), soon (3-5d), or low stock
   const reasonKey =
-    protagonistDays !== null && protagonistDays <= 0 ? 'dashboard.today.reason.expirestoday' :
-    protagonistDays !== null && protagonistDays <= 2  ? 'dashboard.today.reason.expiringsoon' :
-                                                        'dashboard.today.reason.lowstock';
+    protagonistDays !== null && protagonistDays <= 2 ? 'dashboard.today.reason.expiringsoon' :
+    protagonistDays !== null && protagonistDays <= 5 ? 'dashboard.today.reason.expirestoday' :
+                                                       'dashboard.today.reason.lowstock';
 
   // Secondary: next highest-scored near-expiry items (not the protagonist), up to 2
   const secondaryPool = nearCandidates
