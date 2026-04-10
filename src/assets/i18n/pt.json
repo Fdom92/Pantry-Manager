@@ -147,11 +147,43 @@
       }
     },
     "sections": {
+      "today": {
+        "title": "Recomendado para hoje"
+      },
       "actions": {
         "title": "O que fazer agora"
       },
       "insights": {
         "title": "Melhorar a tua despensa"
+      }
+    },
+    "today": {
+      "reason": {
+        "expiringsoon": "Expira muito em breve — use-o hoje",
+        "expirestoday": "Expira em breve — pense em usá-lo nos próximos dias",
+        "lowstock": "Resta pouco — use-o ou reponha antes que acabe"
+      },
+      "combine": "Expira em breve também:",
+      "cta": {
+        "primary": "Usar isso hoje"
+      },
+      "expiry": {
+        "today": "Expira hoje",
+        "tomorrow": "Expira amanhã",
+        "inDays": "Expira em {{ count }} dias"
+      },
+      "confirm": {
+        "question": "Usou estes ingredientes?",
+        "yes": "Sim, marcar como usados",
+        "cancel": "Cancelar"
+      },
+      "success": {
+        "title": "Ingredientes usados",
+        "hint": "Despensa atualizada"
+      },
+      "allGood": {
+        "title": "Tudo sob controlo",
+        "hint": "Nada urgente hoje — a sua despensa está em ótima forma"
       }
     },
     "actions": {

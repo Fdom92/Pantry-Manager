@@ -147,11 +147,43 @@
       }
     },
     "sections": {
+      "today": {
+        "title": "Recommended for today"
+      },
       "actions": {
         "title": "What to do now"
       },
       "insights": {
         "title": "Improve your pantry"
+      }
+    },
+    "today": {
+      "reason": {
+        "expiringsoon": "Expiring very soon — use it today",
+        "expirestoday": "Expiring soon — start thinking about using it",
+        "lowstock": "Running low — use it or restock before it runs out"
+      },
+      "combine": "Also expiring soon:",
+      "cta": {
+        "primary": "Use this today"
+      },
+      "expiry": {
+        "today": "Expires today",
+        "tomorrow": "Expires tomorrow",
+        "inDays": "Expires in {{ count }} days"
+      },
+      "confirm": {
+        "question": "Did you use these ingredients?",
+        "yes": "Yes, mark as used",
+        "cancel": "Cancel"
+      },
+      "success": {
+        "title": "Ingredients used",
+        "hint": "Pantry updated"
+      },
+      "allGood": {
+        "title": "All under control",
+        "hint": "Nothing urgent today — your pantry is in great shape"
       }
     },
     "actions": {

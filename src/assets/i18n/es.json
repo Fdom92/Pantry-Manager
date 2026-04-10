@@ -147,11 +147,43 @@
       }
     },
     "sections": {
+      "today": {
+        "title": "Recomendado para hoy"
+      },
       "actions": {
         "title": "Qué hacer ahora"
       },
       "insights": {
         "title": "Mejorar tu despensa"
+      }
+    },
+    "today": {
+      "reason": {
+        "expiringsoon": "Caduca muy pronto — úsalo hoy",
+        "expirestoday": "Caduca pronto — ve pensando en usarlo",
+        "lowstock": "Te queda poco — repón o úsalo antes de que se acabe"
+      },
+      "combine": "También caduca pronto:",
+      "cta": {
+        "primary": "Usar esto hoy"
+      },
+      "expiry": {
+        "today": "Caduca hoy",
+        "tomorrow": "Caduca mañana",
+        "inDays": "Caduca en {{ count }} días"
+      },
+      "confirm": {
+        "question": "¿Has usado estos ingredientes?",
+        "yes": "Sí, ya los he usado",
+        "cancel": "Cancelar"
+      },
+      "success": {
+        "title": "Ingredientes usados",
+        "hint": "Despensa actualizada"
+      },
+      "allGood": {
+        "title": "Todo bajo control",
+        "hint": "Nada urgente hoy — tu despensa está en orden"
       }
     },
     "actions": {
