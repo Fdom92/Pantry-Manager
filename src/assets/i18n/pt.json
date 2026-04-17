@@ -161,11 +161,14 @@
       "reason": {
         "expiringsoon": "Expira muito em breve — use-o hoje",
         "expirestoday": "Expira em breve — pense em usá-lo nos próximos dias",
-        "lowstock": "Resta pouco — use-o ou reponha antes que acabe"
+        "lowstock": "Resta pouco — adicione-o à lista de compras",
+        "expiringlater": "Expira nos próximos dias — comece a pensar em usá-lo"
       },
       "combine": "Expira em breve também:",
       "cta": {
-        "primary": "Usar isso hoje"
+        "primary": "Usar isso hoje",
+        "restock": "Ver lista de compras",
+        "dismiss": "Agora não"
       },
       "expiry": {
         "today": "Expira hoje",
@@ -183,7 +186,11 @@
       },
       "allGood": {
         "title": "Tudo sob controlo",
-        "hint": "Nada urgente hoje — a sua despensa está em ótima forma"
+        "hint": "Nada urgente hoje — a sua despensa está em ótima forma",
+        "nextExpiry": "Próxima validade: {{name}} em {{days}} dias"
+      },
+      "secondary": {
+        "days": "{{count}}d"
       }
     },
     "actions": {

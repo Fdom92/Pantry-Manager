@@ -97,6 +97,7 @@ export class DashboardStateService {
   readonly isCookingConfirmed = signal(false);
   readonly isConsumingToday = signal(false);
   private readonly lastProtagonistId = signal<string | undefined>(undefined);
+  private readonly dismissedTodayIds = signal(new Set<string>());
 
   readonly totalItems = computed(() => this.inventorySummary().total);
   readonly recentlyUpdatedItems = computed(() => getRecentItemsByUpdatedAt(this.pantryItems()));
@@ -233,9 +234,31 @@ export class DashboardStateService {
 
   readonly stalePantryItemsCount = computed(() => this.stalePantryItems().length);
 
-  readonly todaySuggestion = computed((): TodaySuggestion | null =>
-    computeTodaySuggestion(this.nearExpiryItems(), this.pantryItems(), this.lastProtagonistId())
-  );
+  readonly todaySuggestion = computed((): TodaySuggestion | null => {
+    const raw = computeTodaySuggestion(this.nearExpiryItems(), this.pantryItems(), this.lastProtagonistId());
+    if (!raw) return null;
+    if (this.dismissedTodayIds().has(raw.protagonist.id)) return null;
+    return raw;
+  });
+
+  readonly nextExpiringItem = computed((): { name: string; daysToExpiry: number } | null => {
+    if (this.todaySuggestion()) return null;
+    const nowMs = Date.now();
+    let earliest: { name: string; daysToExpiry: number } | null = null;
+    for (const item of this.pantryItems()) {
+      const stock = (item.batches ?? []).reduce((s, b) => s + (b.quantity ?? 0), 0);
+      if (stock <= 0) continue;
+      for (const batch of item.batches ?? []) {
+        if (!batch.expirationDate) continue;
+        const days = Math.ceil((Date.parse(batch.expirationDate) - nowMs) / 86_400_000);
+        if (days <= 0) continue;
+        if (!earliest || days < earliest.daysToExpiry) {
+          earliest = { name: item.name, daysToExpiry: days };
+        }
+      }
+    }
+    return earliest;
+  });
 
   readonly actions = computed((): DashboardAction[] => {
     const actions: DashboardAction[] = [];
@@ -420,7 +443,13 @@ export class DashboardStateService {
     this.dismissedActionIds.update(ids => new Set([...ids, action.id]));
   }
 
-  async cookToday(): Promise<void> {
+  dismissToday(): void {
+    const suggestion = this.todaySuggestion();
+    if (!suggestion) return;
+    this.dismissedTodayIds.update(ids => new Set([...ids, suggestion.protagonist.id]));
+  }
+
+  async actOnToday(): Promise<void> {
     const suggestion = this.todaySuggestion();
     if (!suggestion || this.isConsumingToday()) return;
 

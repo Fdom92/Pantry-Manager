@@ -87,7 +87,16 @@
                 <ion-icon name="checkmark-circle-outline"></ion-icon>
                 <div>
                   <p class="today-card__all-good-title">{{ 'dashboard.today.allGood.title' | translate }}</p>
-                  <p class="today-card__all-good-hint">{{ 'dashboard.today.allGood.hint' | translate }}</p>
+                  @if (facade.nextExpiringItem()) {
+                    <p class="today-card__all-good-hint">
+                      {{ 'dashboard.today.allGood.nextExpiry' | translate:{
+                        name: facade.nextExpiringItem()!.name,
+                        days: facade.nextExpiringItem()!.daysToExpiry
+                      } }}
+                    </p>
+                  } @else {
+                    <p class="today-card__all-good-hint">{{ 'dashboard.today.allGood.hint' | translate }}</p>
+                  }
                 </div>
               </div>
             </div>
@@ -95,29 +104,46 @@
             <div class="today-card">
               <div class="today-card__protagonist">
                 <span class="today-card__protagonist-name">{{ facade.todaySuggestion()!.protagonist.name }}</span>
+                <span class="today-card__protagonist-qty">×{{ facade.todaySuggestion()!.protagonist.quantity }}</span>
                 @if (facade.todaySuggestion()!.protagonist.expirationDate) {
-                  <span class="today-card__protagonist-expiry">
+                  <span class="today-card__protagonist-expiry"
+                    [attr.data-urgency]="facade.todaySuggestion()!.protagonist.daysToExpiry !== null
+                      ? (facade.todaySuggestion()!.protagonist.daysToExpiry! <= 2 ? 'critical'
+                        : facade.todaySuggestion()!.protagonist.daysToExpiry! <= 5 ? 'warning' : 'neutral')
+                      : 'neutral'">
                     <ion-icon name="time-outline"></ion-icon>
                     {{ facade.formatExpiryRelative(facade.todaySuggestion()!.protagonist.expirationDate) }}
                   </span>
                 }
               </div>
-              <p class="today-card__reason">{{ facade.todaySuggestion()!.reasonKey | translate }}</p>
+              @if (facade.todaySuggestion()!.protagonist.daysToExpiry === null || facade.todaySuggestion()!.protagonist.daysToExpiry! <= 5) {
+                <p class="today-card__reason">{{ facade.todaySuggestion()!.reasonKey | translate }}</p>
+              }
               @if (facade.todaySuggestion()!.secondaryItems.length > 0) {
-                <p class="today-card__secondary">
-                  {{ 'dashboard.today.combine' | translate }}
-                  @for (item of facade.todaySuggestion()!.secondaryItems; track item.id; let last = $last) {
-                    {{ item.name }}{{ !last ? ',' : '' }}
+                <div class="today-card__secondary">
+                  <span class="today-card__secondary-label">{{ 'dashboard.today.combine' | translate }}</span>
+                  @for (item of facade.todaySuggestion()!.secondaryItems; track item.id) {
+                    <span class="today-card__secondary-item">
+                      {{ item.name }}
+                      @if (item.daysToExpiry !== null) {
+                        <span class="today-card__secondary-days">
+                          · {{ 'dashboard.today.secondary.days' | translate:{ count: item.daysToExpiry } }}
+                        </span>
+                      }
+                    </span>
                   }
-                </p>
+                </div>
               }
               <div class="today-card__footer">
                 <ion-button
                   size="small"
                   [disabled]="facade.isConsumingToday()"
-                  (click)="facade.cookToday()">
+                  (click)="facade.actOnToday()">
                   {{ 'dashboard.today.cta.primary' | translate }}
                 </ion-button>
+                <button class="today-card__dismiss" (click)="facade.dismissToday()">
+                  {{ 'dashboard.today.cta.dismiss' | translate }}
+                </button>
               </div>
             </div>
           }

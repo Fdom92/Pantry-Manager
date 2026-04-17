@@ -25,6 +25,8 @@ const getUrgencyScore = (days: number | null): number => {
   if (days === 1)  return 80;
   if (days === 2)  return 75;
   if (days <= 5)   return 50;
+  if (days <= 10)  return 25;
+  if (days <= 15)  return 10;
   return 0;
 };
 
@@ -90,7 +92,7 @@ export function computeTodaySuggestion(
   };
 
   const isFood = (item: PantryItem): boolean =>
-    !!item.foodType && item.foodType !== FoodType.HOUSEHOLD;
+    item.foodType !== FoodType.HOUSEHOLD;
 
   const hasStock = (item: PantryItem): boolean => getStock(item) > 0;
 
@@ -146,13 +148,7 @@ export function computeTodaySuggestion(
     .filter(({ score }) => score > 0)
     .sort(sortCandidates);
 
-  // Fallback: low-stock dated non-expired items when nothing is near expiry
-  const lowStockCandidates = foodItems
-    .filter(i => getStock(i) <= getLowStockThreshold(i.foodType as FoodType))
-    .map(i => ({ item: i, score: scoreItem(i), days: getDaysToExpiry(i) }))
-    .sort(sortCandidates);
-
-  const ranked = nearCandidates.length ? nearCandidates : lowStockCandidates;
+  const ranked = nearCandidates;
   if (!ranked.length) return null;
 
   // Minimum score guard: nothing worth surfacing → "all good" state
@@ -167,11 +163,11 @@ export function computeTodaySuggestion(
 
   const { item: protagonist, days: protagonistDays } = ranked[topIndex];
 
-  // reasonKey reflects actual urgency: very soon (≤2d), soon (3-5d), or low stock
+  // reasonKey reflects actual urgency: very soon (≤2d), soon (3-5d), or coming up (6-15d)
   const reasonKey =
     protagonistDays !== null && protagonistDays <= 2 ? 'dashboard.today.reason.expiringsoon' :
     protagonistDays !== null && protagonistDays <= 5 ? 'dashboard.today.reason.expirestoday' :
-                                                       'dashboard.today.reason.lowstock';
+                                                       'dashboard.today.reason.expiringlater';
 
   // Secondary: next highest-scored near-expiry items (not the protagonist), up to 2
   const secondaryPool = nearCandidates

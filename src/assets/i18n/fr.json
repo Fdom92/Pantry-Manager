@@ -161,11 +161,14 @@
       "reason": {
         "expiringsoon": "Expire très bientôt — utilisez-le aujourd'hui",
         "expirestoday": "Expire bientôt — pensez à l'utiliser prochainement",
-        "lowstock": "Il n'en reste plus beaucoup — utilisez-le ou réapprovisionnez"
+        "lowstock": "Il n'en reste plus beaucoup — ajoutez-le à la liste de courses",
+        "expiringlater": "Expire dans les prochains jours — commencez à y penser"
       },
       "combine": "Expire aussi bientôt :",
       "cta": {
-        "primary": "Utiliser aujourd'hui"
+        "primary": "Utiliser aujourd'hui",
+        "restock": "Voir la liste de courses",
+        "dismiss": "Pas maintenant"
       },
       "expiry": {
         "today": "Expire aujourd'hui",
@@ -183,7 +186,11 @@
       },
       "allGood": {
         "title": "Tout est sous contrôle",
-        "hint": "Rien d'urgent aujourd'hui — votre garde-manger est en parfait état"
+        "hint": "Rien d'urgent aujourd'hui — votre garde-manger est en parfait état",
+        "nextExpiry": "Prochaine expiration : {{name}} dans {{days}} jours"
+      },
+      "secondary": {
+        "days": "{{count}}j"
       }
     },
     "actions": {

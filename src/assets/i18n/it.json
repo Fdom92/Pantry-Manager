@@ -161,11 +161,14 @@
       "reason": {
         "expiringsoon": "Scade molto presto — usalo oggi",
         "expirestoday": "Scade presto — inizia a pensare di usarlo",
-        "lowstock": "Ne rimane poco — usalo o rifornisciti prima che finisca"
+        "lowstock": "Ne rimane poco — aggiungilo alla lista della spesa",
+        "expiringlater": "Scade nei prossimi giorni — inizia a pensarci"
       },
       "combine": "Scade presto anche:",
       "cta": {
-        "primary": "Usalo oggi"
+        "primary": "Usalo oggi",
+        "restock": "Vai alla lista della spesa",
+        "dismiss": "Non ora"
       },
       "expiry": {
         "today": "Scade oggi",
@@ -183,7 +186,11 @@
       },
       "allGood": {
         "title": "Tutto sotto controllo",
-        "hint": "Niente di urgente oggi — la tua dispensa è in ottima forma"
+        "hint": "Niente di urgente oggi — la tua dispensa è in ottima forma",
+        "nextExpiry": "Prossima scadenza: {{name}} tra {{days}} giorni"
+      },
+      "secondary": {
+        "days": "{{count}}g"
       }
     },
     "actions": {
