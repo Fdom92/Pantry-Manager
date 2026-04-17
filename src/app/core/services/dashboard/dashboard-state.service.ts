@@ -1,8 +1,9 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
-import { computeFoodCoverage, computePantryScore, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { computeFoodCoverage, computePantryScore, computeTodaySuggestion, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { applyFifoConsumption } from '@core/domain/pantry';
 import { applyBatchEditFilter } from '@core/models/pantry/batch-edit.model';
-import type { FoodCoverageResult, PantryScoreResult } from '@core/domain/dashboard';
+import type { FoodCoverageResult, PantryScoreResult, TodaySuggestion } from '@core/domain/dashboard';
 import type {
   Insight,
   InsightContext,
@@ -91,6 +92,12 @@ export class DashboardStateService {
   readonly lastRefreshTimestamp = signal<string | null>(null);
   readonly isDeletingExpiredItems = signal(false);
   readonly visibleInsights = signal<Insight[]>([]);
+
+  // Today's suggestion block
+  readonly isCookingConfirmed = signal(false);
+  readonly isConsumingToday = signal(false);
+  private readonly lastProtagonistId = signal<string | undefined>(undefined);
+  private readonly dismissedTodayIds = signal(new Set<string>());
 
   readonly totalItems = computed(() => this.inventorySummary().total);
   readonly recentlyUpdatedItems = computed(() => getRecentItemsByUpdatedAt(this.pantryItems()));
@@ -226,6 +233,36 @@ export class DashboardStateService {
   });
 
   readonly stalePantryItemsCount = computed(() => this.stalePantryItems().length);
+
+  readonly todaySuggestion = computed((): TodaySuggestion | null => {
+    const raw = computeTodaySuggestion(this.nearExpiryItems(), this.pantryItems(), this.lastProtagonistId());
+    if (!raw) return null;
+    if (this.dismissedTodayIds().has(raw.protagonist.id)) return null;
+    return raw;
+  });
+
+  readonly hasLowDataQuality = computed((): boolean =>
+    !this.todaySuggestion() && this.noExpiryDateCount() >= 3
+  );
+
+  readonly nextExpiringItem = computed((): { name: string; daysToExpiry: number } | null => {
+    if (this.todaySuggestion()) return null;
+    const nowMs = Date.now();
+    let earliest: { name: string; daysToExpiry: number } | null = null;
+    for (const item of this.pantryItems()) {
+      const stock = (item.batches ?? []).reduce((s, b) => s + (b.quantity ?? 0), 0);
+      if (stock <= 0) continue;
+      for (const batch of item.batches ?? []) {
+        if (!batch.expirationDate) continue;
+        const days = Math.ceil((Date.parse(batch.expirationDate) - nowMs) / 86_400_000);
+        if (days <= 0) continue;
+        if (!earliest || days < earliest.daysToExpiry) {
+          earliest = { name: item.name, daysToExpiry: days };
+        }
+      }
+    }
+    return earliest;
+  });
 
   readonly actions = computed((): DashboardAction[] => {
     const actions: DashboardAction[] = [];
@@ -408,6 +445,40 @@ export class DashboardStateService {
 
   dismissAction(action: DashboardAction): void {
     this.dismissedActionIds.update(ids => new Set([...ids, action.id]));
+  }
+
+  dismissToday(): void {
+    const suggestion = this.todaySuggestion();
+    if (!suggestion) return;
+    this.dismissedTodayIds.update(ids => new Set([...ids, suggestion.protagonist.id]));
+  }
+
+  async actOnToday(): Promise<void> {
+    const suggestion = this.todaySuggestion();
+    if (!suggestion || this.isConsumingToday()) return;
+
+    this.isConsumingToday.set(true);
+    try {
+      const item = this.pantryItems().find(i => i._id === suggestion.protagonist.id);
+      if (item?.batches?.length) {
+        const updatedBatches = applyFifoConsumption(item.batches, 1);
+        await this.pantryStore.updateItem({ ...item, batches: updatedBatches });
+      }
+      this.lastProtagonistId.set(suggestion.protagonist.id);
+      this.isCookingConfirmed.set(true);
+      void this.reviewPrompt.handleConsumeCompleted();
+      setTimeout(() => this.isCookingConfirmed.set(false), 2500);
+    } finally {
+      this.isConsumingToday.set(false);
+    }
+  }
+
+  formatExpiryRelative(value: string | undefined): string | null {
+    if (!value) return null;
+    const diffDays = Math.ceil((Date.parse(value) - Date.now()) / 86_400_000);
+    if (diffDays <= 0) return this.translate.instant('dashboard.today.expiry.today');
+    if (diffDays === 1) return this.translate.instant('dashboard.today.expiry.tomorrow');
+    return this.translate.instant('dashboard.today.expiry.inDays', { count: diffDays });
   }
 
   getHealthIcon(state: PantryHealthState): string {
