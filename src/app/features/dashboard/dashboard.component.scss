@@ -142,6 +142,195 @@ ion-title {
   &[data-label='poor'] > ion-icon { color: var(--app-theme-card-accent-critical); }
 }
 
+// LAYER HOY: Today's suggestion
+.today-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-md);
+  margin-inline: var(--app-theme-card-margin-inline);
+  padding: var(--app-theme-card-padding);
+  border-radius: var(--app-theme-card-border-radius);
+  background: var(--app-theme-card-bg);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--ion-color-primary);
+  }
+
+  &__protagonist {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__protagonist-name {
+    font-size: 1.1rem;
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+    line-height: var(--app-theme-line-height-tight);
+  }
+
+  &__protagonist-qty {
+    font-size: 0.78rem;
+    color: var(--app-theme-text-muted);
+    font-weight: 500;
+  }
+
+  &__protagonist-expiry {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.78rem;
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-muted);
+
+    ion-icon { font-size: 13px; }
+
+    &[data-urgency='critical'] { color: var(--app-theme-card-accent-critical); }
+    &[data-urgency='warning']  { color: var(--app-theme-card-accent-warning); }
+    &[data-urgency='neutral']  { color: var(--app-theme-text-muted); opacity: 0.8; }
+  }
+
+  &__reason {
+    margin: 0;
+    font-size: var(--app-theme-font-size-body);
+    color: var(--app-theme-text-muted);
+    line-height: 1.4;
+  }
+
+  &__secondary {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__secondary-label {
+    font-size: 0.75rem;
+    color: var(--app-theme-text-muted);
+    opacity: 0.7;
+  }
+
+  &__secondary-item {
+    font-size: 0.82rem;
+    color: var(--app-theme-text-muted);
+    line-height: 1.4;
+  }
+
+  &__secondary-days {
+    opacity: 0.7;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: var(--app-theme-spacing-sm);
+
+    ion-button { margin: 0; }
+  }
+
+  &__dismiss {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    font-size: 0.82rem;
+    color: var(--app-theme-text-muted);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+
+    &:active { opacity: 1; }
+  }
+
+  // All-good state (nothing urgent to suggest)
+  &--all-good {
+    background: color-mix(in srgb, var(--ion-color-primary) 5%, var(--app-theme-card-bg));
+    border-color: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
+
+    &::before {
+      background: var(--ion-color-primary);
+      opacity: 0.4;
+    }
+  }
+
+  // Low data quality state (missing expiry dates)
+  &--low-data {
+    background: color-mix(in srgb, var(--app-theme-card-accent-warning) 5%, var(--app-theme-card-bg));
+    border-color: color-mix(in srgb, var(--app-theme-card-accent-warning) 20%, transparent);
+
+    &::before { background: var(--app-theme-card-accent-warning); opacity: 0.5; }
+
+    .today-card__all-good-row ion-icon { color: var(--app-theme-card-accent-warning); }
+  }
+
+  &__all-good-row {
+    display: flex;
+    align-items: center;
+    gap: var(--app-theme-spacing-md);
+
+    ion-icon {
+      font-size: 26px;
+      color: var(--ion-color-primary);
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+  }
+
+  &__all-good-title {
+    margin: 0 0 4px 0;
+    font-size: var(--app-theme-font-size-title);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+  }
+
+  &__all-good-hint {
+    margin: 0;
+    font-size: var(--app-theme-font-size-body);
+    color: var(--app-theme-text-muted);
+  }
+
+  // Success / confirmed state
+  &--confirmed {
+    background: color-mix(in srgb, var(--app-theme-card-accent-success) 8%, var(--app-theme-card-bg));
+    border-color: color-mix(in srgb, var(--app-theme-card-accent-success) 25%, transparent);
+
+    &::before {
+      background: var(--app-theme-card-accent-success);
+    }
+  }
+
+  &__success-row {
+    display: flex;
+    align-items: center;
+    gap: var(--app-theme-spacing-md);
+
+    ion-icon {
+      font-size: 28px;
+      color: var(--app-theme-card-accent-success);
+      flex-shrink: 0;
+    }
+  }
+
+  &__success-title {
+    margin: 0 0 4px 0;
+    font-size: var(--app-theme-font-size-title);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+  }
+
+  &__success-hint {
+    margin: 0;
+    font-size: var(--app-theme-font-size-body);
+    color: var(--app-theme-text-muted);
+  }
+}
+
 // LAYER 2: Actions (What to Do Now)
 .actions-stack {
   display: flex;

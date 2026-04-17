@@ -147,11 +147,51 @@
       }
     },
     "sections": {
+      "today": {
+        "title": "Recommandé pour aujourd'hui"
+      },
       "actions": {
         "title": "Que faire maintenant"
       },
       "insights": {
         "title": "Améliorer votre garde-manger"
+      }
+    },
+    "today": {
+      "reason": {
+        "expiringsoon": "Expire très bientôt — utilisez-le aujourd'hui",
+        "expirestoday": "Expire bientôt — pensez à l'utiliser prochainement",
+        "lowstock": "Il n'en reste plus beaucoup — ajoutez-le à la liste de courses",
+        "expiringlater": "Expire dans les prochains jours — commencez à y penser"
+      },
+      "combine": "Expire aussi bientôt :",
+      "cta": {
+        "primary": "Utiliser aujourd'hui",
+        "restock": "Voir la liste de courses",
+        "dismiss": "Pas maintenant"
+      },
+      "expiry": {
+        "today": "Expire aujourd'hui",
+        "tomorrow": "Expire demain",
+        "inDays": "Expire dans {{ count }} jours"
+      },
+      "confirm": {
+        "question": "Avez-vous utilisé ces ingrédients ?",
+        "yes": "Oui, marquer comme utilisés",
+        "cancel": "Annuler"
+      },
+      "success": {
+        "title": "Ingrédients utilisés",
+        "hint": "Garde-manger mis à jour"
+      },
+      "allGood": {
+        "title": "Tout est sous contrôle",
+        "hint": "Rien d'urgent aujourd'hui — votre garde-manger est en parfait état",
+        "nextExpiry": "Prochaine expiration : {{name}} dans {{days}} jours",
+        "missingDates": "{{count}} produits sans date d'expiration · ajoutez-les pour voir des suggestions"
+      },
+      "secondary": {
+        "days": "{{count}}j"
       }
     },
     "actions": {
