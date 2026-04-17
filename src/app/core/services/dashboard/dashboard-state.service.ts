@@ -241,6 +241,10 @@ export class DashboardStateService {
     return raw;
   });
 
+  readonly hasLowDataQuality = computed((): boolean =>
+    !this.todaySuggestion() && this.noExpiryDateCount() >= 3
+  );
+
   readonly nextExpiringItem = computed((): { name: string; daysToExpiry: number } | null => {
     if (this.todaySuggestion()) return null;
     const nowMs = Date.now();

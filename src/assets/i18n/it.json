@@ -187,7 +187,8 @@
       "allGood": {
         "title": "Tutto sotto controllo",
         "hint": "Niente di urgente oggi — la tua dispensa è in ottima forma",
-        "nextExpiry": "Prossima scadenza: {{name}} tra {{days}} giorni"
+        "nextExpiry": "Prossima scadenza: {{name}} tra {{days}} giorni",
+        "missingDates": "{{count}} prodotti senza data di scadenza · aggiungile per vedere i suggerimenti"
       },
       "secondary": {
         "days": "{{count}}g"

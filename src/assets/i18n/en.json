@@ -187,7 +187,8 @@
       "allGood": {
         "title": "All under control",
         "hint": "Nothing urgent today — your pantry is in great shape",
-        "nextExpiry": "Next expiry: {{name}} in {{days}} days"
+        "nextExpiry": "Next expiry: {{name}} in {{days}} days",
+        "missingDates": "{{count}} products without expiry date · add them to see suggestions"
       },
       "secondary": {
         "days": "{{count}}d"

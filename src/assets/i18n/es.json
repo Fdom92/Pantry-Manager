@@ -187,7 +187,8 @@
       "allGood": {
         "title": "Todo bajo control",
         "hint": "Nada urgente hoy — tu despensa está en orden",
-        "nextExpiry": "Próxima caducidad: {{name}} en {{days}} días"
+        "nextExpiry": "Próxima caducidad: {{name}} en {{days}} días",
+        "missingDates": "{{count}} productos sin fecha de caducidad · añádelas para ver sugerencias"
       },
       "secondary": {
         "days": "{{count}}d"

@@ -82,12 +82,16 @@
               </div>
             </div>
           } @else if (!facade.todaySuggestion()) {
-            <div class="today-card today-card--all-good">
+            <div class="today-card" [class.today-card--all-good]="!facade.hasLowDataQuality()" [class.today-card--low-data]="facade.hasLowDataQuality()">
               <div class="today-card__all-good-row">
-                <ion-icon name="checkmark-circle-outline"></ion-icon>
+                <ion-icon [name]="facade.hasLowDataQuality() ? 'alert-circle-outline' : 'checkmark-circle-outline'"></ion-icon>
                 <div>
                   <p class="today-card__all-good-title">{{ 'dashboard.today.allGood.title' | translate }}</p>
-                  @if (facade.nextExpiringItem()) {
+                  @if (facade.hasLowDataQuality()) {
+                    <p class="today-card__all-good-hint">
+                      {{ 'dashboard.today.allGood.missingDates' | translate:{ count: facade.noExpiryDateCount() } }}
+                    </p>
+                  } @else if (facade.nextExpiringItem()) {
                     <p class="today-card__all-good-hint">
                       {{ 'dashboard.today.allGood.nextExpiry' | translate:{
                         name: facade.nextExpiringItem()!.name,

@@ -259,6 +259,16 @@ ion-title {
     }
   }
 
+  // Low data quality state (missing expiry dates)
+  &--low-data {
+    background: color-mix(in srgb, var(--app-theme-card-accent-warning) 5%, var(--app-theme-card-bg));
+    border-color: color-mix(in srgb, var(--app-theme-card-accent-warning) 20%, transparent);
+
+    &::before { background: var(--app-theme-card-accent-warning); opacity: 0.5; }
+
+    .today-card__all-good-row ion-icon { color: var(--app-theme-card-accent-warning); }
+  }
+
   &__all-good-row {
     display: flex;
     align-items: center;

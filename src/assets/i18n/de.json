@@ -187,7 +187,8 @@
       "allGood": {
         "title": "Alles unter Kontrolle",
         "hint": "Heute nichts Dringendes — dein Vorrat ist in guter Verfassung",
-        "nextExpiry": "Nächstes Ablaufdatum: {{name}} in {{days}} Tagen"
+        "nextExpiry": "Nächstes Ablaufdatum: {{name}} in {{days}} Tagen",
+        "missingDates": "{{count}} Produkte ohne Ablaufdatum · füge sie hinzu, um Vorschläge zu sehen"
       },
       "secondary": {
         "days": "{{count}}T"

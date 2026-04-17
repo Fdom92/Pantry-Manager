@@ -187,7 +187,8 @@
       "allGood": {
         "title": "Tudo sob controlo",
         "hint": "Nada urgente hoje — a sua despensa está em ótima forma",
-        "nextExpiry": "Próxima validade: {{name}} em {{days}} dias"
+        "nextExpiry": "Próxima validade: {{name}} em {{days}} dias",
+        "missingDates": "{{count}} produtos sem data de validade · adicione-as para ver sugestões"
       },
       "secondary": {
         "days": "{{count}}d"
