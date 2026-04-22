@@ -1,0 +1,80 @@
+<ion-modal [isOpen]="state.isOpen()" (didDismiss)="state.close()" (ionModalWillPresent)="dateChips?.reset()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ 'pantry.fresh.addModal.title' | translate }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="state.close()">
+            {{ 'common.cancel' | translate }}
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <div class="fresh-add-modal__body">
+
+        <!-- Basics quick-select chips -->
+        <div class="fresh-add-modal__basics">
+          @for (key of basicKeys; track key) {
+            <button
+              class="fresh-add-modal__basic-chip"
+              type="button"
+              (click)="onBasicChipSelected(key)">
+              {{ key | translate }}
+            </button>
+          }
+        </div>
+
+        <!-- Name input -->
+        <ion-item lines="none" class="fresh-add-modal__name-item">
+          <ion-input
+            [placeholder]="'pantry.fresh.addModal.namePlaceholder' | translate"
+            [value]="state.name()"
+            (ionInput)="onNameChange($any($event))"
+            clearInput="true">
+          </ion-input>
+        </ion-item>
+
+        <!-- Expiry chips -->
+        <div class="fresh-add-modal__section">
+          <p class="fresh-add-modal__section-label">
+            {{ 'pantry.fresh.addModal.whenExpires' | translate }}
+          </p>
+          <app-quick-date-chips
+            [emphasizedKeys]="['today', 'twoDays']"
+            (dateSelected)="onDateSelected($event)">
+          </app-quick-date-chips>
+        </div>
+
+        <!-- Keep in stock toggle -->
+        <ion-item lines="none" class="fresh-add-modal__keep-item">
+          <ion-label>
+            <p class="fresh-add-modal__keep-label">{{ 'pantry.fresh.keepInStock' | translate }}</p>
+            <p class="fresh-add-modal__keep-hint">{{ 'pantry.fresh.keepInStockHint' | translate }}</p>
+          </ion-label>
+          <ion-toggle
+            slot="end"
+            [checked]="state.keepInStock()"
+            (ionChange)="state.toggleKeepInStock()">
+          </ion-toggle>
+        </ion-item>
+
+      </div>
+    </ion-content>
+
+    <ion-footer>
+      <ion-toolbar>
+        <div class="fresh-add-modal__footer-btn">
+          <ion-button
+            expand="block"
+            [disabled]="!state.canSubmit() || state.isSubmitting()"
+            (click)="onSubmit()">
+            {{ 'pantry.fresh.addModal.submit' | translate }}
+          </ion-button>
+        </div>
+      </ion-toolbar>
+    </ion-footer>
+
+  </ng-template>
+</ion-modal>

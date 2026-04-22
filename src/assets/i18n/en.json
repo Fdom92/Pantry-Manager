@@ -162,13 +162,15 @@
         "expiringsoon": "Expiring very soon — use it today",
         "expirestoday": "Expiring soon — start thinking about using it",
         "lowstock": "Running low — add it to your shopping list",
-        "expiringlater": "Expiring in the coming days — start thinking about using it"
+        "expiringlater": "Expiring in the coming days — start thinking about using it",
+        "freshExpiring": "About to expire"
       },
       "combine": "Also expiring soon:",
       "cta": {
         "primary": "Use this today",
         "restock": "View shopping list",
-        "dismiss": "Not now"
+        "dismiss": "Not now",
+        "markFreshOut": "I don't have it anymore"
       },
       "expiry": {
         "today": "Expires today",
@@ -662,6 +664,57 @@
       "noResults": "No results",
       "empty": "No items added yet.",
       "submit": "Log consumption"
+    },
+    "sections": {
+      "fresh": "Fresh",
+      "pantry": "Pantry"
+    },
+    "fresh": {
+      "addButton": "Add fresh item",
+      "showMore": "See all ({{ count }})",
+      "showLess": "See less",
+      "emptyState": {
+        "title": "What you use daily",
+        "subtitle": "Mark it in seconds",
+        "cta": "+ Add fresh items"
+      },
+      "keepInStock": "Restock automatically",
+      "keepInStockHint": "Will reappear when you mark it as out",
+      "toggle": { "have": "Have it", "out": "Out" },
+      "addModal": {
+        "title": "New fresh item",
+        "namePlaceholder": "Product name",
+        "whenExpires": "When does it expire?",
+        "submit": "Add"
+      },
+      "quickDate": {
+        "today": "Today",
+        "twoDays": "2 days",
+        "fiveDays": "5 days",
+        "oneWeek": "1 week",
+        "twoWeeks": "2 weeks",
+        "noDate": "No date"
+      },
+      "card": {
+        "expired": "Expired",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "soon": "Soon",
+        "ok": "Good",
+        "noDate": "No date",
+        "out": "Out"
+      },
+      "basics": {
+        "yogurt": "Yoghurt",
+        "milk": "Milk",
+        "eggs": "Eggs",
+        "tomatoes": "Tomatoes",
+        "fruit": "Fruit"
+      },
+      "toast": {
+        "updated": "✓ You have it",
+        "markedOut": "Out of stock"
+      }
     }
   },
   "upgrade": {

@@ -74,8 +74,29 @@ export function computeTodaySuggestion(
   nearExpiryItems: PantryItem[],
   allItems: PantryItem[],
   skipId?: string,
+  urgentFreshItems?: PantryItem[],
 ): TodaySuggestion | null {
   const nowMs = Date.now();
+
+  // Block priority: if any fresh item is critical (≤1 day), it wins immediately.
+  if (urgentFreshItems?.length) {
+    const freshItem = urgentFreshItems[0];
+    const freshBatch = freshItem.batches?.[0];
+    const daysToExpiry = freshBatch?.expirationDate
+      ? Math.ceil((Date.parse(freshBatch.expirationDate) - nowMs) / 86_400_000)
+      : null;
+    return {
+      protagonist: {
+        id: freshItem._id,
+        name: freshItem.name,
+        quantity: freshBatch?.quantity ?? 1,
+        expirationDate: freshBatch?.expirationDate,
+        daysToExpiry,
+      },
+      reasonKey: 'dashboard.today.reason.freshExpiring',
+      secondaryItems: [],
+    };
+  }
 
   const getStock = (item: PantryItem): number =>
     (item.batches ?? []).reduce((s, b) => s + (b.quantity ?? 0), 0);

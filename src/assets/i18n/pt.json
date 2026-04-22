@@ -162,13 +162,15 @@
         "expiringsoon": "Expira muito em breve — use-o hoje",
         "expirestoday": "Expira em breve — pense em usá-lo nos próximos dias",
         "lowstock": "Resta pouco — adicione-o à lista de compras",
-        "expiringlater": "Expira nos próximos dias — comece a pensar em usá-lo"
+        "expiringlater": "Expira nos próximos dias — comece a pensar em usá-lo",
+        "freshExpiring": "Está prestes a vencer"
       },
       "combine": "Expira em breve também:",
       "cta": {
         "primary": "Usar isso hoje",
         "restock": "Ver lista de compras",
-        "dismiss": "Agora não"
+        "dismiss": "Agora não",
+        "markFreshOut": "Já não tenho"
       },
       "expiry": {
         "today": "Expira hoje",
@@ -661,6 +663,57 @@
       "noResults": "Sem resultados",
       "empty": "Ainda não adicionaste produtos.",
       "submit": "Registar consumo"
+    },
+    "sections": {
+      "fresh": "Frescos",
+      "pantry": "Despensa"
+    },
+    "fresh": {
+      "addButton": "Adicionar fresco",
+      "showMore": "Ver todos ({{ count }})",
+      "showLess": "Ver menos",
+      "emptyState": {
+        "title": "O que usas diariamente",
+        "subtitle": "Marca em segundos",
+        "cta": "+ Adicionar frescos"
+      },
+      "keepInStock": "Reabastecer automaticamente",
+      "keepInStockHint": "Reaparecerá quando o marcares como esgotado",
+      "toggle": { "have": "Tenho", "out": "Esgotado" },
+      "addModal": {
+        "title": "Novo produto fresco",
+        "namePlaceholder": "Nome do produto",
+        "whenExpires": "Quando expira?",
+        "submit": "Adicionar"
+      },
+      "quickDate": {
+        "today": "Hoje",
+        "twoDays": "2 dias",
+        "fiveDays": "5 dias",
+        "oneWeek": "1 semana",
+        "twoWeeks": "2 semanas",
+        "noDate": "Sem data"
+      },
+      "card": {
+        "expired": "Expirado",
+        "today": "Hoje",
+        "tomorrow": "Amanhã",
+        "soon": "Em breve",
+        "ok": "Bem",
+        "noDate": "Sem data",
+        "out": "Esgotado"
+      },
+      "basics": {
+        "yogurt": "Iogurtes",
+        "milk": "Leite",
+        "eggs": "Ovos",
+        "tomatoes": "Tomates",
+        "fruit": "Fruta"
+      },
+      "toast": {
+        "updated": "✓ Tens",
+        "markedOut": "Esgotado"
+      }
     }
   },
   "upgrade": {

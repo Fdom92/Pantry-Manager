@@ -1,0 +1,16 @@
+<div class="fresh-item-card">
+
+  <div class="fresh-item-card__info" role="button" (click)="onEdit()">
+    <span class="fresh-item-card__name">{{ item.name }}</span>
+    <span class="fresh-item-card__expiry" [attr.data-urgency]="expiryUrgency()">
+      {{ expiryLabel() | translate }}
+    </span>
+  </div>
+
+  <button
+    class="fresh-item-card__toggle"
+    (click)="onToggle()"
+    [attr.aria-label]="(isOut() ? 'pantry.fresh.toggle.have' : 'pantry.fresh.toggle.out') | translate">
+    <ion-icon [name]="isOut() ? 'radio-button-off-outline' : 'checkmark-circle'"></ion-icon>
+  </button>
+</div>

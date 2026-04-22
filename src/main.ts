@@ -57,6 +57,7 @@ import {
   notificationsOutline,
   paperPlaneOutline,
   pricetagOutline,
+  radioButtonOffOutline,
   refreshOutline,
   remove,
   removeCircleOutline,
@@ -162,7 +163,8 @@ addIcons({
   'stats-chart-outline': statsChartOutline,
   'share-social-outline': shareSocialOutline,
   'archive-outline': archiveOutline,
-  'infinite-outline': infiniteOutline
+  'infinite-outline': infiniteOutline,
+  'radio-button-off-outline': radioButtonOffOutline
 });
 
 bootstrapApplication(AppComponent, {

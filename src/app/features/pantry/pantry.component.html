@@ -54,72 +54,137 @@
         </ion-card>
       }
     </div>
-  } @else if (facade.summary().total === 0) {
-    <app-empty-state
-      class="list-empty-state"
-      icon="fast-food-outline"
-      [titleKey]="'emptyStates.pantry.title'"
-      [subtitleKey]="'emptyStates.pantry.subtitle'">
-    </app-empty-state>
-  } @else if (facade.pantryItemsState().length === 0) {
-    <app-empty-state
-      class="list-empty-state"
-      icon="filter-outline"
-      [subtitle]="'pantry.empty.filters' | translate">
-    </app-empty-state>
   } @else {
-    <div class="category-stack fade-in-list">
-      @for (group of facade.groups(); track group.key) {
-        <div class="virtual-category-card">
-          <ion-card>
-            <ion-card-header
-              class="group-header"
-              role="button"
-              tabindex="0"
-              [attr.aria-expanded]="!facade.isGroupCollapsed(group.key)"
-              [attr.aria-label]="facade.isGroupCollapsed(group.key) ? ('pantry.group.expand' | translate:{ name: group.name }) : ('pantry.group.collapse' | translate:{ name: group.name })"
-              (click)="facade.toggleGroupCollapse(group.key, $event)"
-              (keydown)="facade.onGroupHeaderKeydown(group.key, $event)"
-              [class.group-header--collapsed]="facade.isGroupCollapsed(group.key)">
-              <section class="group-details">
-                <div class="group-title">
-                  <ion-card-title>{{ group.name }}</ion-card-title>
-                </div>
-                <div class="group-meta">
-                  <ion-text color="medium">
-                    {{ 'pantry.group.count' | translate:{ count: group.items.length } }}
-                  </ion-text>
-                  <ion-icon
-                    class="group-toggle-icon"
-                    [name]="facade.isGroupCollapsed(group.key) ? 'chevron-down-outline' : 'chevron-up-outline'">
-                  </ion-icon>
-                </div>
-              </section>
-            </ion-card-header>
-          </ion-card>
+    <!-- FRESCOS SECTION -->
+    <section class="pantry-section pantry-section--fresh">
+      <header class="pantry-section__header">
+        <h3 class="pantry-section__title">{{ 'pantry.sections.fresh' | translate }}</h3>
+        <button class="pantry-section__add-btn" [attr.aria-label]="'pantry.fresh.addButton' | translate" (click)="facade.openFreshAddModal()">
+          <ion-icon name="add-outline"></ion-icon>
+        </button>
+      </header>
+
+      @if (facade.freshItems().length === 0) {
+        <div class="fresh-empty-state">
+          <p class="fresh-empty-state__title">{{ 'pantry.fresh.emptyState.title' | translate }}</p>
+          <p class="fresh-empty-state__subtitle">{{ 'pantry.fresh.emptyState.subtitle' | translate }}</p>
+          <button class="fresh-empty-state__cta" (click)="facade.openFreshAddModal()">
+            {{ 'pantry.fresh.emptyState.cta' | translate }}
+          </button>
         </div>
-        @if (!facade.isGroupCollapsed(group.key)) {
-          @for (item of group.items; track facade.trackByItemId($index, item)) {
-            <div
-              class="virtual-item-card"
-              [class.virtual-item-card--deleting]="facade.isDeleting(item)">
-              @let card = facade.buildItemCardViewModel(item);
-              <app-pantry-detail
-                class="virtual-item-card__detail"
-                [viewModel]="card"
-                (cardClicked)="facade.openQuantitySheet(item, $event)"
-              ></app-pantry-detail>
-            </div>
+      } @else {
+        <div class="fresh-list">
+          @for (item of facade.visibleFreshItems(); track item._id) {
+            <app-fresh-item-card
+              [item]="item"
+              (toggled)="facade.toggleFreshItem($event)"
+              (editRequested)="facade.openEditModalFromSheet($event)">
+            </app-fresh-item-card>
           }
+        </div>
+        @if (facade.freshItems().length > 4) {
+          <button type="button" class="fresh-show-more" (click)="facade.toggleShowAllFresh()">
+            @if (!facade.showAllFresh()) {
+              {{ 'pantry.fresh.showMore' | translate:{ count: facade.freshItems().length } }}
+            } @else {
+              {{ 'pantry.fresh.showLess' | translate }}
+            }
+          </button>
         }
       }
-    </div>
+    </section>
+
+    <div class="pantry-section-divider"></div>
+
+    <!-- DESPENSA SECTION -->
+    <section class="pantry-section pantry-section--despensa">
+      <header class="pantry-section__header pantry-section__header--despensa">
+        <h3 class="pantry-section__title">{{ 'pantry.sections.pantry' | translate }}</h3>
+        <div class="pantry-section__actions">
+          <button
+            class="pantry-section__add-btn"
+            [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
+            (click)="facade.openAddModal()">
+            <ion-icon name="add-circle-outline"></ion-icon>
+          </button>
+          <button
+            class="pantry-section__add-btn pantry-section__consume-btn"
+            [attr.aria-label]="'pantry.consume.groupLabel' | translate"
+            (click)="facade.openConsumeModal()">
+            <ion-icon name="remove-circle-outline"></ion-icon>
+          </button>
+        </div>
+      </header>
+
+      @if (facade.summary().total === 0) {
+        <app-empty-state
+          class="list-empty-state"
+          icon="fast-food-outline"
+          [titleKey]="'emptyStates.pantry.title'"
+          [subtitleKey]="'emptyStates.pantry.subtitle'">
+        </app-empty-state>
+      } @else if (facade.despensaItems().length === 0) {
+        <app-empty-state
+          class="list-empty-state"
+          icon="filter-outline"
+          [subtitle]="'pantry.empty.filters' | translate">
+        </app-empty-state>
+      } @else {
+        <div class="category-stack fade-in-list">
+          @for (group of facade.groups(); track group.key) {
+            <div class="virtual-category-card">
+              <ion-card>
+                <ion-card-header
+                  class="group-header"
+                  role="button"
+                  tabindex="0"
+                  [attr.aria-expanded]="!facade.isGroupCollapsed(group.key)"
+                  [attr.aria-label]="facade.isGroupCollapsed(group.key) ? ('pantry.group.expand' | translate:{ name: group.name }) : ('pantry.group.collapse' | translate:{ name: group.name })"
+                  (click)="facade.toggleGroupCollapse(group.key, $event)"
+                  (keydown)="facade.onGroupHeaderKeydown(group.key, $event)"
+                  [class.group-header--collapsed]="facade.isGroupCollapsed(group.key)">
+                  <section class="group-details">
+                    <div class="group-title">
+                      <ion-card-title>{{ group.name }}</ion-card-title>
+                    </div>
+                    <div class="group-meta">
+                      <ion-text color="medium">
+                        {{ 'pantry.group.count' | translate:{ count: group.items.length } }}
+                      </ion-text>
+                      <ion-icon
+                        class="group-toggle-icon"
+                        [name]="facade.isGroupCollapsed(group.key) ? 'chevron-down-outline' : 'chevron-up-outline'">
+                      </ion-icon>
+                    </div>
+                  </section>
+                </ion-card-header>
+              </ion-card>
+            </div>
+            @if (!facade.isGroupCollapsed(group.key)) {
+              @for (item of group.items; track facade.trackByItemId($index, item)) {
+                <div
+                  class="virtual-item-card"
+                  [class.virtual-item-card--deleting]="facade.isDeleting(item)">
+                  @let card = facade.buildItemCardViewModel(item);
+                  <app-pantry-detail
+                    class="virtual-item-card__detail"
+                    [viewModel]="card"
+                    (cardClicked)="facade.openQuantitySheet(item, $event)"
+                  ></app-pantry-detail>
+                </div>
+              }
+            }
+          }
+        </div>
+      }
+    </section>
   }
 
   <app-pantry-add-modal></app-pantry-add-modal>
   <app-pantry-consume-modal></app-pantry-consume-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>
+  <app-fresh-add-modal></app-fresh-add-modal>
 
   <ion-modal
     #quantityModal
@@ -150,23 +215,4 @@
     </ng-template>
   </ion-modal>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="action-fab">
-    <ion-fab-button color="primary" [attr.aria-label]="'pantry.fab.groupLabel' | translate">
-      <ion-icon name="ellipsis-vertical-outline"></ion-icon>
-    </ion-fab-button>
-    <ion-fab-list side="top">
-      <ion-fab-button
-        color="primary"
-        [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
-        (click)="facade.openAddModal()">
-        <ion-icon name="add-outline"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-button
-        color="secondary"
-        [attr.aria-label]="'pantry.consume.groupLabel' | translate"
-        (click)="facade.openConsumeModal()">
-        <ion-icon name="remove-outline"></ion-icon>
-      </ion-fab-button>
-    </ion-fab-list>
-  </ion-fab>
 </ion-content>

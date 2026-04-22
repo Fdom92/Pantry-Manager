@@ -162,13 +162,15 @@
         "expiringsoon": "Läuft sehr bald ab — heute verwenden",
         "expirestoday": "Läuft bald ab — schon mal ans Verwenden denken",
         "lowstock": "Nur noch wenig da — zur Einkaufsliste hinzufügen",
-        "expiringlater": "Läuft in den nächsten Tagen ab — schon jetzt daran denken"
+        "expiringlater": "Läuft in den nächsten Tagen ab — schon jetzt daran denken",
+        "freshExpiring": "Läuft bald ab"
       },
       "combine": "Läuft auch bald ab:",
       "cta": {
         "primary": "Heute verwenden",
         "restock": "Einkaufsliste ansehen",
-        "dismiss": "Nicht jetzt"
+        "dismiss": "Nicht jetzt",
+        "markFreshOut": "Ich habe es nicht mehr"
       },
       "expiry": {
         "today": "Läuft heute ab",
@@ -661,6 +663,57 @@
       "noResults": "Keine Ergebnisse",
       "empty": "Noch keine Artikel hinzugefügt.",
       "submit": "Verbrauch erfassen"
+    },
+    "sections": {
+      "fresh": "Frisches",
+      "pantry": "Vorratskammer"
+    },
+    "fresh": {
+      "addButton": "Frisches hinzufügen",
+      "showMore": "Alle anzeigen ({{ count }})",
+      "showLess": "Weniger anzeigen",
+      "emptyState": {
+        "title": "Was du täglich nutzt",
+        "subtitle": "In Sekunden markieren",
+        "cta": "+ Frische Produkte hinzufügen"
+      },
+      "keepInStock": "Automatisch nachkaufen",
+      "keepInStockHint": "Erscheint wieder, wenn du es als leer markierst",
+      "toggle": { "have": "Vorhanden", "out": "Leer" },
+      "addModal": {
+        "title": "Neues Frischprodukt",
+        "namePlaceholder": "Produktname",
+        "whenExpires": "Wann läuft es ab?",
+        "submit": "Hinzufügen"
+      },
+      "quickDate": {
+        "today": "Heute",
+        "twoDays": "2 Tage",
+        "fiveDays": "5 Tage",
+        "oneWeek": "1 Woche",
+        "twoWeeks": "2 Wochen",
+        "noDate": "Kein Datum"
+      },
+      "card": {
+        "expired": "Abgelaufen",
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "soon": "Bald",
+        "ok": "Gut",
+        "noDate": "Kein Datum",
+        "out": "Leer"
+      },
+      "basics": {
+        "yogurt": "Joghurt",
+        "milk": "Milch",
+        "eggs": "Eier",
+        "tomatoes": "Tomaten",
+        "fruit": "Obst"
+      },
+      "toast": {
+        "updated": "✓ Du hast es",
+        "markedOut": "Aufgebraucht"
+      }
     }
   },
   "upgrade": {

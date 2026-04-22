@@ -162,13 +162,15 @@
         "expiringsoon": "Scade molto presto — usalo oggi",
         "expirestoday": "Scade presto — inizia a pensare di usarlo",
         "lowstock": "Ne rimane poco — aggiungilo alla lista della spesa",
-        "expiringlater": "Scade nei prossimi giorni — inizia a pensarci"
+        "expiringlater": "Scade nei prossimi giorni — inizia a pensarci",
+        "freshExpiring": "Sta per scadere"
       },
       "combine": "Scade presto anche:",
       "cta": {
         "primary": "Usalo oggi",
         "restock": "Vai alla lista della spesa",
-        "dismiss": "Non ora"
+        "dismiss": "Non ora",
+        "markFreshOut": "Non ce l'ho più"
       },
       "expiry": {
         "today": "Scade oggi",
@@ -661,6 +663,57 @@
       "noResults": "Nessun risultato",
       "empty": "Nessun articolo aggiunto.",
       "submit": "Registra consumo"
+    },
+    "sections": {
+      "fresh": "Freschi",
+      "pantry": "Dispensa"
+    },
+    "fresh": {
+      "addButton": "Aggiungi fresco",
+      "showMore": "Vedi tutti ({{ count }})",
+      "showLess": "Vedi meno",
+      "emptyState": {
+        "title": "Quello che usi ogni giorno",
+        "subtitle": "Segnalo in secondi",
+        "cta": "+ Aggiungi freschi"
+      },
+      "keepInStock": "Rifornisci automaticamente",
+      "keepInStockHint": "Riapparirà quando lo segni come esaurito",
+      "toggle": { "have": "Ce l'ho", "out": "Esaurito" },
+      "addModal": {
+        "title": "Nuovo prodotto fresco",
+        "namePlaceholder": "Nome del prodotto",
+        "whenExpires": "Quando scade?",
+        "submit": "Aggiungi"
+      },
+      "quickDate": {
+        "today": "Oggi",
+        "twoDays": "2 giorni",
+        "fiveDays": "5 giorni",
+        "oneWeek": "1 settimana",
+        "twoWeeks": "2 settimane",
+        "noDate": "Senza data"
+      },
+      "card": {
+        "expired": "Scaduto",
+        "today": "Oggi",
+        "tomorrow": "Domani",
+        "soon": "Presto",
+        "ok": "Ok",
+        "noDate": "Senza data",
+        "out": "Esaurito"
+      },
+      "basics": {
+        "yogurt": "Yogurt",
+        "milk": "Latte",
+        "eggs": "Uova",
+        "tomatoes": "Pomodori",
+        "fruit": "Frutta"
+      },
+      "toast": {
+        "updated": "✓ Ce l'hai",
+        "markedOut": "Esaurito"
+      }
     }
   },
   "upgrade": {
