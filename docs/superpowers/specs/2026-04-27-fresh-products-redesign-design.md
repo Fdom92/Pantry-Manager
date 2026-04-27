@@ -266,25 +266,16 @@ Cambios en los 6 idiomas (`es`, `en`, `de`, `fr`, `it`, `pt`):
 
 ## 10. Testing
 
-Estilo del proyecto: tests unitarios para domain functions; los componentes Ionic se prueban a mano.
+Verificación manual en dispositivo / emulador (no se añaden tests unitarios en este cambio):
 
-**Tests unitarios obligatorios** (`fresh.domain.spec.ts`):
-- `qtyToFreshState` y `freshStateToQty` redondean según las reglas (`>=3` suficiente, `1-2` poco, `0` nada).
-- `consolidateBatchesForFresh` con 0, 1 y N lotes; preserva la fecha más cercana; descarta locations; respeta `opened` (true si cualquiera).
-- `buildConvertToFreshPreview` produce el preview correcto en cada combinación.
-
-**Test de items legacy:**
-- Un `PantryItem` con `productType` undefined nunca aparece en `freshItems()`.
-- Aparece en `despensaItems()` y se cuenta en los conteos de despensa.
-
-**Verificación manual** (ya que la app es móvil + Ionic):
 - Flujo completo de añadir fresco con autocomplete (existente y nuevo).
 - Cambio de estado desde la tarjeta — sin perder fecha ni keep-in-stock.
 - Edición desde modal específico.
-- Conversión despensa → fresco con 1 lote y con varios lotes (verificar diálogo).
+- Conversión despensa → fresco con 1 lote y con varios lotes (verificar diálogo en ambos casos).
 - Conversión fresco → despensa.
-- Filtros aplicados a frescos: la sección se oculta cuando queda vacía.
+- Filtros aplicados a frescos: la sección se oculta cuando queda vacía pero hay frescos creados; el empty state se mantiene cuando no hay ninguno.
 - "Hoy" del dashboard surfacea correctamente un fresco caducado.
+- Items legacy sin `productType`: aparecen en despensa y nunca en frescos.
 
 ## 11. Riesgos y mitigaciones
 
