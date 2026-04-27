@@ -161,11 +161,29 @@ Conteos de los chips de filtro: incluyen ambas listas (despensa + frescos). El t
 
 ### 5.7. Bloque "Hoy" del dashboard
 
-Pequeño ajuste en `urgentFreshItems` ([dashboard-state.service.ts:84-95](src/app/core/services/dashboard/dashboard-state.service.ts#L84-L95)):
+La fecha de caducidad de un fresco es **orientativa** (la pone el usuario por estimación: "Hoy", "2 días"…), mientras que la de un lote de despensa viene impresa en el envase. Tratarlas con el mismo peso satura el bloque HOY de falsos positivos.
 
-- La condición actual `days >= 0 && days <= 1` excluye los frescos ya caducados.
-- Cambio: incluir también `days < 0` (caducados). Un fresco caducado debería ser MÁS urgente que uno que caduca hoy.
-- El orden interno de prioridad se mantiene: caducado < hoy < mañana.
+**Modelo simplificado:**
+
+1. **Eliminar el "auto-win" de frescos.** Hoy, [dashboard-state.service.ts:84-95](src/app/core/services/dashboard/dashboard-state.service.ts#L84-L95) hace que cualquier fresco con días ∈ [0, 1] gane el bloque inmediatamente. Se elimina por completo este atajo.
+
+2. **Factor de confianza:** los frescos compiten en el mismo pool que los productos de despensa, pero su urgency score se multiplica por una constante **`FRESH_URGENCY_FACTOR = 0.7`** antes de combinarlo con el food-type score y los demás bonuses. Refleja que la fecha es menos vinculante.
+
+3. **Excepción única — fresco agotado que se repone solo:** si el item es fresco con estado **Nada** (`qty === 0`) y `keepInStock` activo, se le suma un **bonus de +80 al score**. Esta es la única regla especial; representa una señal genuina (te quedaste sin un fresco que sueles tener en casa).
+
+4. **Sin más reglas por días.** Los frescos caducados orientativamente, los que caducan hoy/mañana, y los que están en estado Poco simplemente compiten con el score reducido. Si ganan, ganan; si no, no aparecen en HOY.
+
+**Inclusión en el pool de candidatos:**
+
+- Los frescos con `expirationDate` y `qty > 0` ya entran en `nearExpiryItems` por el pipeline existente.
+- Los frescos con estado Nada + keepInStock no tienen por qué tener fecha; entran al pool de candidatos por una ruta nueva en `computeTodaySuggestion` (no dependen de `hasDatedBatch`).
+
+**Reason keys** — solo dos para frescos:
+
+- `dashboard.today.reason.freshOut` — ganador por la excepción del +80 (fresco en Nada con keepInStock).
+- `dashboard.today.reason.freshExpiring` — ganador por score normal (con factor 0.7 aplicado).
+
+La asignación se hace al final de `computeTodaySuggestion`: si el protagonista es fresh + Nada + keepInStock → `freshOut`; si es fresh por cualquier otra razón → `freshExpiring`; si no es fresh, las reasons existentes (`expiringsoon`, `expirestoday`, `expiringlater`).
 
 ## 6. Flujos clave
 
@@ -233,6 +251,46 @@ export function buildConvertToFreshPreview(item: PantryItem): ConvertToFreshPrev
 
 Funciones puras, cero deps de Angular, fáciles de testear.
 
+**Cambios en `core/domain/dashboard/dashboard.domain.ts`:**
+
+Nueva constante exportada:
+
+```ts
+export const FRESH_URGENCY_FACTOR = 0.7;
+export const FRESH_OUT_BONUS = 80;
+```
+
+`scoreItem` (interna a `computeTodaySuggestion`) pasa a aplicar:
+
+```ts
+const isFresh = item.productType === 'fresh';
+let urgency = getUrgencyScore(days);
+if (isLowStock)         urgency += 25;
+if (isFastMoving(type))  urgency += 10;
+if (isFresh)             urgency *= FRESH_URGENCY_FACTOR;     // factor de confianza
+
+let total = urgency + (HOY_FOOD_TYPE_SCORE[type] ?? 0);
+
+const isFreshOut = isFresh && stock === 0 && (item.minThreshold ?? 0) >= 1;
+if (isFreshOut) total += FRESH_OUT_BONUS;                      // excepción única
+
+return total;
+```
+
+`computeTodaySuggestion`:
+
+- **Eliminar el bloque inicial de auto-win por `urgentFreshItems`** (deja de recibir ese parámetro; la firma se simplifica).
+- El pool de candidatos se amplía: además de `nearExpiryItems`, se incluyen los frescos con `qty === 0 && keepInStock` aunque no tengan `expirationDate` y aunque no estén en `nearExpiryItems`. Estos no requieren `hasDatedBatch`.
+- Tras seleccionar al protagonista, asignar `reasonKey`:
+  - Si es fresh + Nada + keepInStock → `dashboard.today.reason.freshOut`.
+  - Si es fresh por cualquier otra razón → `dashboard.today.reason.freshExpiring`.
+  - Si no es fresh → reasons existentes (`expiringsoon` / `expirestoday` / `expiringlater`).
+
+**Cambios en `dashboard-state.service.ts`:**
+
+- Eliminar el computed `urgentFreshItems` (ya no se usa).
+- `todaySuggestion` deja de pasarle el cuarto argumento; la nueva firma de `computeTodaySuggestion` es `(nearExpiryItems, allItems, skipId)`.
+
 ## 8. Bugs a resolver en el mismo cambio
 
 1. **`common.cancel` no existe** ([fresh-add-modal.component.html:8](src/app/features/pantry/components/fresh-add-modal/fresh-add-modal.component.html#L8)) → cambiar a `common.actions.cancel`.
@@ -261,6 +319,8 @@ Cambios en los 6 idiomas (`es`, `en`, `de`, `fr`, `it`, `pt`):
 - `pantry.fresh.convertToFresh.dialog.title`, `dialog.body`, `dialog.confirm`, `dialog.cancel`.
 - `pantry.fresh.convertToFresh.dialog.bodyMultiBatch` con interpolación `{batches}, {total}, {state}, {date}`.
 - `pantry.fresh.empty.filters` — empty state corto cuando los filtros no dejan ningún fresco.
+- `dashboard.today.reason.freshOut` — texto cuando el protagonista es un fresco agotado con keep-in-stock.
+- `dashboard.today.reason.freshExpiring` — ya existe; se mantiene y se reutiliza para frescos que ganan por score normal.
 
 **Modificar:**
 - `pantry.fresh.addModal.title`: "Nuevo producto fresco" → "Nuevo fresco".
