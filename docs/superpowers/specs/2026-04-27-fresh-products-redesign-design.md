@@ -152,10 +152,10 @@ Sin cambios estructurales. Los filtros existentes (`expired`, `expiring`, `lowSt
 
 - `freshItems` se computa a partir de `pantryItemsState` (filtrado), no de `loadedProducts()` (sin filtrar). Así los filtros impactan también a la sección Frescos.
 - `despensaItems` sigue filtrando por `productType !== 'fresh'` sobre el mismo `pantryItemsState`.
-- Distinción importante:
-  - **0 frescos en absoluto** (sin filtros): se muestra el **empty state** existente (cabecera + CTA "Añadir frescos").
-  - **>0 frescos pero 0 visibles tras filtro**: **se oculta la sección Frescos entera** (cabecera incluida).
-- La distinción se hace comparando el total de frescos en el dataset crudo (`loadedProducts().filter(i => i.productType === 'fresh').length`) con `freshItems().length` (filtrado).
+- Distinción importante (espejo del comportamiento de despensa):
+  - **0 frescos en absoluto** (sin filtros): se muestra el **empty state de onboarding** existente (cabecera + CTA "Añadir frescos").
+  - **>0 frescos pero 0 visibles tras filtro**: la sección sigue visible con un **empty state corto de "ningún fresco coincide con los filtros"**, igual que hace la despensa cuando no hay matches. Esto mantiene unidad visual entre ambas secciones y evita que la sección "salte" al filtrar.
+- La distinción entre los dos casos se hace comparando el total de frescos en el dataset crudo (`loadedProducts().filter(i => i.productType === 'fresh').length`) con `freshItems().length` (filtrado).
 
 Conteos de los chips de filtro: incluyen ambas listas (despensa + frescos). El total visible queda coherente con la suma de las dos secciones.
 
@@ -197,7 +197,7 @@ Pequeño ajuste en `urgentFreshItems` ([dashboard-state.service.ts:84-95](src/ap
 ### 6.5. Filtrar
 1. Usuario tap en chip de filtro (ej. "Caducados").
 2. Pipeline existente filtra `pantryItemsState`.
-3. Sección Frescos: si quedan ≥1 frescos que cumplen, se muestra solo esos; si 0, sección oculta.
+3. Sección Frescos: si quedan ≥1 frescos que cumplen, se muestran; si hay frescos creados pero ninguno coincide, se muestra empty state corto ("Ningún fresco coincide con los filtros").
 4. Sección Despensa: igual que antes.
 
 ## 7. Capa de dominio
@@ -260,6 +260,7 @@ Cambios en los 6 idiomas (`es`, `en`, `de`, `fr`, `it`, `pt`):
 - `pantry.fresh.convertToFresh.button` (en modal de despensa).
 - `pantry.fresh.convertToFresh.dialog.title`, `dialog.body`, `dialog.confirm`, `dialog.cancel`.
 - `pantry.fresh.convertToFresh.dialog.bodyMultiBatch` con interpolación `{batches}, {total}, {state}, {date}`.
+- `pantry.fresh.empty.filters` — empty state corto cuando los filtros no dejan ningún fresco.
 
 **Modificar:**
 - `pantry.fresh.addModal.title`: "Nuevo producto fresco" → "Nuevo fresco".
@@ -273,7 +274,7 @@ Verificación manual en dispositivo / emulador (no se añaden tests unitarios en
 - Edición desde modal específico.
 - Conversión despensa → fresco con 1 lote y con varios lotes (verificar diálogo en ambos casos).
 - Conversión fresco → despensa.
-- Filtros aplicados a frescos: la sección se oculta cuando queda vacía pero hay frescos creados; el empty state se mantiene cuando no hay ninguno.
+- Filtros aplicados a frescos: la sección muestra empty state corto cuando hay frescos creados pero ninguno coincide con los filtros; el empty state de onboarding se mantiene cuando no hay ningún fresco creado.
 - "Hoy" del dashboard surfacea correctamente un fresco caducado.
 - Items legacy sin `productType`: aparecen en despensa y nunca en frescos.
 
