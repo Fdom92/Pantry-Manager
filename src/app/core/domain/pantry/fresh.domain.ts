@@ -51,6 +51,7 @@ export interface ConvertToFreshPreview {
   totalQty: number;
   resultingState: FreshState;
   resultingExpiration?: string;
+  resultingNoExpiry: boolean;
   hadMultipleBatches: boolean;
   hadLocations: boolean;
   batchesCount: number;
@@ -63,6 +64,7 @@ export function buildConvertToFreshPreview(item: PantryItem): ConvertToFreshPrev
     totalQty,
     resultingState: qtyToFreshState(totalQty),
     resultingExpiration: pickClosestExpiration(batches),
+    resultingNoExpiry: batches.length === 0 || pickClosestExpiration(batches) === undefined,
     hadMultipleBatches: batches.length > 1,
     hadLocations: batches.some(b => !!b.locationId),
     batchesCount: batches.length,
