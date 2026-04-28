@@ -163,7 +163,8 @@
         "expirestoday": "Expira em breve — pense em usá-lo nos próximos dias",
         "lowstock": "Resta pouco — adicione-o à lista de compras",
         "expiringlater": "Expira nos próximos dias — comece a pensar em usá-lo",
-        "freshExpiring": "Está prestes a vencer"
+        "freshExpiring": "O seu {{name}} vence em breve.",
+        "freshOut": "Você ficou sem {{name}}."
       },
       "combine": "Expira em breve também:",
       "cta": {
@@ -679,12 +680,22 @@
       },
       "keepInStock": "Reabastecer automaticamente",
       "keepInStockHint": "Reaparecerá quando o marcares como esgotado",
-      "toggle": { "have": "Tenho", "out": "Esgotado" },
       "addModal": {
         "title": "Novo fresco",
         "namePlaceholder": "Nome do produto",
         "whenExpires": "Quando expira?",
-        "submit": "Adicionar"
+        "submit": "Adicionar",
+        "cardTitle": "Adicionar frescos rápido",
+        "subtitle": "Escolha ou crie um fresco.",
+        "placeholder": "Buscar fresco",
+        "noResults": "Sem resultados",
+        "empty": "Nada adicionado."
+      },
+      "state": {
+        "label": "Estado",
+        "sufficient": "Suficiente",
+        "low": "Pouco",
+        "none": "Nada"
       },
       "quickDate": {
         "today": "Hoje",
@@ -699,16 +710,30 @@
         "today": "Hoje",
         "tomorrow": "Amanhã",
         "soon": "Em breve",
-        "ok": "Bem",
         "noDate": "Sem data",
         "out": "Esgotado"
       },
-      "basics": {
-        "yogurt": "Iogurtes",
-        "milk": "Leite",
-        "eggs": "Ovos",
-        "tomatoes": "Tomates",
-        "fruit": "Fruta"
+      "editModal": {
+        "title": "Editar fresco",
+        "stateLabel": "Quanto resta?"
+      },
+      "convertToPantry": {
+        "button": "Mover para despensa",
+        "toast": "Movido para despensa"
+      },
+      "convertToFresh": {
+        "button": "Mover para frescos",
+        "toast": "Movido para frescos",
+        "dialog": {
+          "title": "Mover para frescos",
+          "bodySingle": "Ficará assim:\n· Estado: {{state}} ({{total}} unidades)\n· Vence: {{date}}",
+          "bodyMulti": "Seu produto tem {{batches}} lotes ({{total}} unidades). Serão unidos em um:\n· Estado: {{state}}\n· Vence: {{date}}",
+          "locationsLost": "As localizações serão perdidas.",
+          "confirm": "Mover"
+        }
+      },
+      "empty": {
+        "filters": "Nenhum fresco corresponde aos filtros."
       },
       "toast": {
         "updated": "✓ Tens",

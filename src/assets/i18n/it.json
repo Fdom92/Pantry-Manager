@@ -163,7 +163,8 @@
         "expirestoday": "Scade presto — inizia a pensare di usarlo",
         "lowstock": "Ne rimane poco — aggiungilo alla lista della spesa",
         "expiringlater": "Scade nei prossimi giorni — inizia a pensarci",
-        "freshExpiring": "Sta per scadere"
+        "freshExpiring": "Il tuo {{name}} scade presto.",
+        "freshOut": "{{name}} è finito."
       },
       "combine": "Scade presto anche:",
       "cta": {
@@ -679,12 +680,22 @@
       },
       "keepInStock": "Rifornisci automaticamente",
       "keepInStockHint": "Riapparirà quando lo segni come esaurito",
-      "toggle": { "have": "Ce l'ho", "out": "Esaurito" },
       "addModal": {
         "title": "Nuovo fresco",
         "namePlaceholder": "Nome del prodotto",
         "whenExpires": "Quando scade?",
-        "submit": "Aggiungi"
+        "submit": "Aggiungi",
+        "cardTitle": "Aggiungi frescos veloce",
+        "subtitle": "Scegli o crea un fresco.",
+        "placeholder": "Cerca fresco",
+        "noResults": "Nessun risultato",
+        "empty": "Niente aggiunto."
+      },
+      "state": {
+        "label": "Stato",
+        "sufficient": "Sufficiente",
+        "low": "Poco",
+        "none": "Niente"
       },
       "quickDate": {
         "today": "Oggi",
@@ -699,16 +710,30 @@
         "today": "Oggi",
         "tomorrow": "Domani",
         "soon": "Presto",
-        "ok": "Ok",
         "noDate": "Senza data",
         "out": "Esaurito"
       },
-      "basics": {
-        "yogurt": "Yogurt",
-        "milk": "Latte",
-        "eggs": "Uova",
-        "tomatoes": "Pomodori",
-        "fruit": "Frutta"
+      "editModal": {
+        "title": "Modifica fresco",
+        "stateLabel": "Quanto ne resta?"
+      },
+      "convertToPantry": {
+        "button": "Sposta in dispensa",
+        "toast": "Spostato in dispensa"
+      },
+      "convertToFresh": {
+        "button": "Sposta in frescos",
+        "toast": "Spostato in frescos",
+        "dialog": {
+          "title": "Sposta in frescos",
+          "bodySingle": "Sarà così:\n· Stato: {{state}} ({{total}} unità)\n· Scade: {{date}}",
+          "bodyMulti": "Il tuo prodotto ha {{batches}} lotti ({{total}} unità). Saranno uniti in uno:\n· Stato: {{state}}\n· Scade: {{date}}",
+          "locationsLost": "Le posizioni andranno perse.",
+          "confirm": "Sposta"
+        }
+      },
+      "empty": {
+        "filters": "Nessun fresco corrisponde ai filtri."
       },
       "toast": {
         "updated": "✓ Ce l'hai",

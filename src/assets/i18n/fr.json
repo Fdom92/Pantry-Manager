@@ -163,7 +163,8 @@
         "expirestoday": "Expire bientôt — pensez à l'utiliser prochainement",
         "lowstock": "Il n'en reste plus beaucoup — ajoutez-le à la liste de courses",
         "expiringlater": "Expire dans les prochains jours — commencez à y penser",
-        "freshExpiring": "Va bientôt expirer"
+        "freshExpiring": "Ton {{name}} expire bientôt.",
+        "freshOut": "Tu n'as plus de {{name}}."
       },
       "combine": "Expire aussi bientôt :",
       "cta": {
@@ -679,12 +680,22 @@
       },
       "keepInStock": "Réapprovisionner automatiquement",
       "keepInStockHint": "Réapparaîtra quand tu le marqueras comme épuisé",
-      "toggle": { "have": "J'en ai", "out": "Épuisé" },
       "addModal": {
         "title": "Nouveau frais",
         "namePlaceholder": "Nom du produit",
         "whenExpires": "Quand expire-t-il ?",
-        "submit": "Ajouter"
+        "submit": "Ajouter",
+        "cardTitle": "Ajout rapide frais",
+        "subtitle": "Choisis ou crée un frais.",
+        "placeholder": "Rechercher frais",
+        "noResults": "Aucun résultat",
+        "empty": "Rien d'ajouté."
+      },
+      "state": {
+        "label": "État",
+        "sufficient": "Assez",
+        "low": "Peu",
+        "none": "Vide"
       },
       "quickDate": {
         "today": "Aujourd'hui",
@@ -699,16 +710,30 @@
         "today": "Aujourd'hui",
         "tomorrow": "Demain",
         "soon": "Bientôt",
-        "ok": "Bien",
         "noDate": "Sans date",
         "out": "Épuisé"
       },
-      "basics": {
-        "yogurt": "Yaourts",
-        "milk": "Lait",
-        "eggs": "Œufs",
-        "tomatoes": "Tomates",
-        "fruit": "Fruits"
+      "editModal": {
+        "title": "Modifier frais",
+        "stateLabel": "Combien il reste ?"
+      },
+      "convertToPantry": {
+        "button": "Convertir en garde-manger",
+        "toast": "Déplacé vers garde-manger"
+      },
+      "convertToFresh": {
+        "button": "Convertir en frais",
+        "toast": "Déplacé vers frais",
+        "dialog": {
+          "title": "Convertir en frais",
+          "bodySingle": "Voilà ce que ça donnera :\n· État : {{state}} ({{total}} unités)\n· Expire : {{date}}",
+          "bodyMulti": "Ton produit a {{batches}} lots ({{total}} unités). Ils seront fusionnés en un seul :\n· État : {{state}}\n· Expire : {{date}}",
+          "locationsLost": "Les emplacements seront perdus.",
+          "confirm": "Convertir"
+        }
+      },
+      "empty": {
+        "filters": "Aucun frais ne correspond aux filtres."
       },
       "toast": {
         "updated": "✓ Tu l'as",

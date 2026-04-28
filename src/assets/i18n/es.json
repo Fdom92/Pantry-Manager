@@ -163,7 +163,8 @@
         "expirestoday": "Caduca pronto — ve pensando en usarlo",
         "lowstock": "Te queda poco — añádelo a la lista de la compra",
         "expiringlater": "Caduca en los próximos días — ve pensando en usarlo",
-        "freshExpiring": "Está a punto de vencer"
+        "freshExpiring": "Tu {{name}} caduca pronto.",
+        "freshOut": "Te quedaste sin {{name}}."
       },
       "combine": "También caduca pronto:",
       "cta": {
@@ -680,12 +681,22 @@
       },
       "keepInStock": "Volver a comprar automáticamente",
       "keepInStockHint": "Aparecerá de nuevo cuando lo marques como agotado",
-      "toggle": { "have": "Tengo", "out": "Agotado" },
       "addModal": {
         "title": "Nuevo fresco",
         "namePlaceholder": "Nombre del producto",
         "whenExpires": "¿Cuándo caduca?",
-        "submit": "Añadir"
+        "submit": "Añadir",
+        "cardTitle": "Añade frescos rápido",
+        "subtitle": "Selecciona un fresco existente o crea uno nuevo.",
+        "placeholder": "Buscar fresco",
+        "noResults": "Sin resultados",
+        "empty": "Aún no has añadido nada."
+      },
+      "state": {
+        "label": "Estado",
+        "sufficient": "Suficiente",
+        "low": "Poco",
+        "none": "Nada"
       },
       "quickDate": {
         "today": "Hoy",
@@ -700,16 +711,30 @@
         "today": "Hoy",
         "tomorrow": "Mañana",
         "soon": "Pronto",
-        "ok": "Bien",
         "noDate": "Sin fecha",
         "out": "Agotado"
       },
-      "basics": {
-        "yogurt": "Yogures",
-        "milk": "Leche",
-        "eggs": "Huevos",
-        "tomatoes": "Tomates",
-        "fruit": "Fruta"
+      "editModal": {
+        "title": "Editar fresco",
+        "stateLabel": "¿Cuánto te queda?"
+      },
+      "convertToPantry": {
+        "button": "Convertir a despensa",
+        "toast": "Movido a despensa"
+      },
+      "convertToFresh": {
+        "button": "Convertir a fresco",
+        "toast": "Movido a frescos",
+        "dialog": {
+          "title": "Convertir a fresco",
+          "bodySingle": "Quedará así:\n· Estado: {{state}} ({{total}} unidades)\n· Caduca: {{date}}",
+          "bodyMulti": "Tu producto tiene {{batches}} lotes ({{total}} unidades). Se unirán en un solo lote:\n· Estado: {{state}}\n· Caduca: {{date}}",
+          "locationsLost": "Las ubicaciones se perderán.",
+          "confirm": "Convertir"
+        }
+      },
+      "empty": {
+        "filters": "Ningún fresco coincide con los filtros."
       },
       "toast": {
         "updated": "✓ Lo tienes",

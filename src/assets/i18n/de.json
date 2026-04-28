@@ -163,7 +163,8 @@
         "expirestoday": "Läuft bald ab — schon mal ans Verwenden denken",
         "lowstock": "Nur noch wenig da — zur Einkaufsliste hinzufügen",
         "expiringlater": "Läuft in den nächsten Tagen ab — schon jetzt daran denken",
-        "freshExpiring": "Läuft bald ab"
+        "freshExpiring": "Dein {{name}} läuft bald ab.",
+        "freshOut": "{{name}} ist aufgebraucht."
       },
       "combine": "Läuft auch bald ab:",
       "cta": {
@@ -679,12 +680,22 @@
       },
       "keepInStock": "Automatisch nachkaufen",
       "keepInStockHint": "Erscheint wieder, wenn du es als leer markierst",
-      "toggle": { "have": "Vorhanden", "out": "Leer" },
       "addModal": {
         "title": "Neuer Frischeartikel",
         "namePlaceholder": "Produktname",
         "whenExpires": "Wann läuft es ab?",
-        "submit": "Hinzufügen"
+        "submit": "Hinzufügen",
+        "cardTitle": "Frische schnell hinzufügen",
+        "subtitle": "Wähle oder erstelle ein frisches Produkt.",
+        "placeholder": "Frische suchen",
+        "noResults": "Keine Ergebnisse",
+        "empty": "Noch nichts hinzugefügt."
+      },
+      "state": {
+        "label": "Status",
+        "sufficient": "Genug",
+        "low": "Wenig",
+        "none": "Leer"
       },
       "quickDate": {
         "today": "Heute",
@@ -699,16 +710,30 @@
         "today": "Heute",
         "tomorrow": "Morgen",
         "soon": "Bald",
-        "ok": "Gut",
         "noDate": "Kein Datum",
         "out": "Leer"
       },
-      "basics": {
-        "yogurt": "Joghurt",
-        "milk": "Milch",
-        "eggs": "Eier",
-        "tomatoes": "Tomaten",
-        "fruit": "Obst"
+      "editModal": {
+        "title": "Frische bearbeiten",
+        "stateLabel": "Wie viel bleibt?"
+      },
+      "convertToPantry": {
+        "button": "In Vorrat umwandeln",
+        "toast": "In Vorrat verschoben"
+      },
+      "convertToFresh": {
+        "button": "In Frische umwandeln",
+        "toast": "In Frische verschoben",
+        "dialog": {
+          "title": "In Frische umwandeln",
+          "bodySingle": "Es wird so aussehen:\n· Status: {{state}} ({{total}} Stück)\n· Läuft ab: {{date}}",
+          "bodyMulti": "Dein Produkt hat {{batches}} Chargen ({{total}} Stück). Sie werden zu einer zusammengeführt:\n· Status: {{state}}\n· Läuft ab: {{date}}",
+          "locationsLost": "Standorte gehen verloren.",
+          "confirm": "Umwandeln"
+        }
+      },
+      "empty": {
+        "filters": "Keine frischen Produkte passen zu den Filtern."
       },
       "toast": {
         "updated": "✓ Du hast es",

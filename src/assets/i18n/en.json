@@ -163,7 +163,8 @@
         "expirestoday": "Expiring soon — start thinking about using it",
         "lowstock": "Running low — add it to your shopping list",
         "expiringlater": "Expiring in the coming days — start thinking about using it",
-        "freshExpiring": "About to expire"
+        "freshExpiring": "Your {{name}} expires soon.",
+        "freshOut": "You ran out of {{name}}."
       },
       "combine": "Also expiring soon:",
       "cta": {
@@ -680,12 +681,22 @@
       },
       "keepInStock": "Restock automatically",
       "keepInStockHint": "Will reappear when you mark it as out",
-      "toggle": { "have": "Have it", "out": "Out" },
       "addModal": {
         "title": "New fresh",
         "namePlaceholder": "Product name",
         "whenExpires": "When does it expire?",
-        "submit": "Add"
+        "submit": "Add",
+        "cardTitle": "Quick add fresh",
+        "subtitle": "Pick or create a fresh product.",
+        "placeholder": "Search fresh",
+        "noResults": "No results",
+        "empty": "Nothing added yet."
+      },
+      "state": {
+        "label": "State",
+        "sufficient": "Plenty",
+        "low": "Low",
+        "none": "Out"
       },
       "quickDate": {
         "today": "Today",
@@ -700,16 +711,30 @@
         "today": "Today",
         "tomorrow": "Tomorrow",
         "soon": "Soon",
-        "ok": "Good",
         "noDate": "No date",
         "out": "Out"
       },
-      "basics": {
-        "yogurt": "Yoghurt",
-        "milk": "Milk",
-        "eggs": "Eggs",
-        "tomatoes": "Tomatoes",
-        "fruit": "Fruit"
+      "editModal": {
+        "title": "Edit fresh",
+        "stateLabel": "How much is left?"
+      },
+      "convertToPantry": {
+        "button": "Convert to pantry",
+        "toast": "Moved to pantry"
+      },
+      "convertToFresh": {
+        "button": "Convert to fresh",
+        "toast": "Moved to fresh",
+        "dialog": {
+          "title": "Convert to fresh",
+          "bodySingle": "It will look like this:\n· State: {{state}} ({{total}} units)\n· Expires: {{date}}",
+          "bodyMulti": "Your product has {{batches}} lots ({{total}} units). They will be merged into one:\n· State: {{state}}\n· Expires: {{date}}",
+          "locationsLost": "Locations will be lost.",
+          "confirm": "Convert"
+        }
+      },
+      "empty": {
+        "filters": "No fresh products match the filters."
       },
       "toast": {
         "updated": "✓ You have it",
