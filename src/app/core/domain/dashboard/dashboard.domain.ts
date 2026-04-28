@@ -18,6 +18,13 @@ const HOY_FOOD_TYPE_SCORE: Partial<Record<FoodType, number>> = {
 // Minimum score for an item to be worth surfacing in the HOY block.
 const HOY_MIN_SCORE = 30;
 
+// Factor de confianza para fechas de frescos (estimativas, no impresas en envase).
+export const FRESH_URGENCY_FACTOR = 0.7;
+
+// Bonus de score cuando un fresco está agotado y el usuario lo marcó keep-in-stock.
+// Es la única regla especial que tienen los frescos en el bloque HOY.
+export const FRESH_OUT_BONUS = 80;
+
 // Urgency score based on days until expiry.
 // Expired items (≤0) are excluded before scoring — they belong to the "Qué hacer ahora" section.
 const getUrgencyScore = (days: number | null): number => {
@@ -74,29 +81,8 @@ export function computeTodaySuggestion(
   nearExpiryItems: PantryItem[],
   allItems: PantryItem[],
   skipId?: string,
-  urgentFreshItems?: PantryItem[],
 ): TodaySuggestion | null {
   const nowMs = Date.now();
-
-  // Block priority: if any fresh item is critical (≤1 day), it wins immediately.
-  if (urgentFreshItems?.length) {
-    const freshItem = urgentFreshItems[0];
-    const freshBatch = freshItem.batches?.[0];
-    const daysToExpiry = freshBatch?.expirationDate
-      ? Math.ceil((Date.parse(freshBatch.expirationDate) - nowMs) / 86_400_000)
-      : null;
-    return {
-      protagonist: {
-        id: freshItem._id,
-        name: freshItem.name,
-        quantity: freshBatch?.quantity ?? 1,
-        expirationDate: freshBatch?.expirationDate,
-        daysToExpiry,
-      },
-      reasonKey: 'dashboard.today.reason.freshExpiring',
-      secondaryItems: [],
-    };
-  }
 
   const getStock = (item: PantryItem): number =>
     (item.batches ?? []).reduce((s, b) => s + (b.quantity ?? 0), 0);
@@ -130,12 +116,20 @@ export function computeTodaySuggestion(
     const stock = getStock(item);
     const type  = item.foodType as FoodType;
     const isLowStock = stock <= getLowStockThreshold(type);
+    const isFresh = item.productType === 'fresh';
 
     let urgency = getUrgencyScore(days);
-    if (isLowStock)        urgency += 25; // bonus: running out soon
-    if (isFastMoving(type)) urgency += 10; // bonus: high-rotation type
+    if (isLowStock)        urgency += 25;
+    if (isFastMoving(type)) urgency += 10;
+    if (isFresh)           urgency *= FRESH_URGENCY_FACTOR;
 
-    return urgency + (HOY_FOOD_TYPE_SCORE[type] ?? 0);
+    let total = urgency + (HOY_FOOD_TYPE_SCORE[type] ?? 0);
+
+    // Excepción: fresco agotado con keep-in-stock activo es señal genuina (te falta algo importante).
+    const isFreshOut = isFresh && stock === 0 && (item.minThreshold ?? 0) >= 1;
+    if (isFreshOut) total += FRESH_OUT_BONUS;
+
+    return total;
   };
 
   // Items without an expiry date are excluded — this block is about urgency, not general stock.
@@ -162,9 +156,21 @@ export function computeTodaySuggestion(
     return getStock(b.item) - getStock(a.item);
   };
 
+  const isFreshOutCandidate = (item: PantryItem): boolean =>
+    item.productType === 'fresh'
+    && getStock(item) === 0
+    && (item.minThreshold ?? 0) >= 1;
+
+  const freshOutPool = allItems.filter(isFreshOutCandidate);
+
+  const candidatePool = [...new Map(
+    [...nearExpiryItems, ...freshOutPool].map(i => [i._id, i]),
+  ).values()];
+
   // Candidates: near-expiry dated non-expired items, scored by urgency + food type + bonuses
-  const nearCandidates = nearExpiryItems
-    .filter(i => isFood(i) && hasStock(i) && hasDatedBatch(i) && isNotExpired(i))
+  const nearCandidates = candidatePool
+    .filter(i => isFood(i))
+    .filter(i => isFreshOutCandidate(i) || (hasStock(i) && hasDatedBatch(i) && isNotExpired(i)))
     .map(i => ({ item: i, score: scoreItem(i), days: getDaysToExpiry(i) }))
     .filter(({ score }) => score > 0)
     .sort(sortCandidates);
@@ -185,10 +191,22 @@ export function computeTodaySuggestion(
   const { item: protagonist, days: protagonistDays } = ranked[topIndex];
 
   // reasonKey reflects actual urgency: very soon (≤2d), soon (3-5d), or coming up (6-15d)
-  const reasonKey =
-    protagonistDays !== null && protagonistDays <= 2 ? 'dashboard.today.reason.expiringsoon' :
-    protagonistDays !== null && protagonistDays <= 5 ? 'dashboard.today.reason.expirestoday' :
-                                                       'dashboard.today.reason.expiringlater';
+  const isFreshProtagonist = protagonist.productType === 'fresh';
+  const protagonistStock = getStock(protagonist);
+  const protagonistKeepInStock = (protagonist.minThreshold ?? 0) >= 1;
+
+  let reasonKey: string;
+  if (isFreshProtagonist && protagonistStock === 0 && protagonistKeepInStock) {
+    reasonKey = 'dashboard.today.reason.freshOut';
+  } else if (isFreshProtagonist) {
+    reasonKey = 'dashboard.today.reason.freshExpiring';
+  } else if (protagonistDays !== null && protagonistDays <= 2) {
+    reasonKey = 'dashboard.today.reason.expiringsoon';
+  } else if (protagonistDays !== null && protagonistDays <= 5) {
+    reasonKey = 'dashboard.today.reason.expirestoday';
+  } else {
+    reasonKey = 'dashboard.today.reason.expiringlater';
+  }
 
   // Secondary: next highest-scored near-expiry items (not the protagonist), up to 2
   const secondaryPool = nearCandidates
