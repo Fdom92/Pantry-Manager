@@ -141,6 +141,7 @@ export function computeTodaySuggestion(
     return d === null || d > 0;
   };
 
+  // minThreshold >= 1 encodes "keep in stock" for fresh items (set in fresh add/edit modals).
   // Fresh item with zero stock but keep-in-stock active: a genuine "buy this today" signal.
   const isFreshOutCandidate = (item: PantryItem): boolean =>
     item.productType === 'fresh'
@@ -170,7 +171,7 @@ export function computeTodaySuggestion(
     [...nearExpiryItems, ...freshOutPool].map(i => [i._id, i]),
   ).values()];
 
-  // Candidates: near-expiry dated non-expired items, scored by urgency + food type + bonuses
+  // Pool: near-expiry items plus fresh items in Nada+keepInStock (without dated batch).
   const nearCandidates = candidatePool
     .filter(i => isFood(i))
     .filter(i => isFreshOutCandidate(i) || (hasStock(i) && hasDatedBatch(i) && isNotExpired(i)))
