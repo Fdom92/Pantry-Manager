@@ -23,6 +23,7 @@ import { SkeletonLoadingManager } from '@core/utils';
 import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
 import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { type FreshState, freshStateToQty } from '@core/domain/pantry';
 
 /**
  * Main orchestrator for pantry page state.
@@ -95,7 +96,7 @@ export class PantryStateService {
 
   // Computed signals coordinating across services
   readonly freshItems = computed(() =>
-    this.pantryStore.loadedProducts()
+    this.pantryItemsState()
       .filter(i => i.productType === 'fresh')
       .sort((a, b) => {
         const aQty = a.batches?.[0]?.quantity ?? 0;
@@ -109,6 +110,20 @@ export class PantryStateService {
         return 0;
       })
   );
+
+  /** Total de frescos en el dataset crudo, sin filtrar. */
+  readonly totalFreshCount = computed(() =>
+    this.pantryStore.loadedProducts().filter(i => i.productType === 'fresh').length,
+  );
+
+  /** True si hay frescos creados pero los filtros activos los esconden todos. */
+  readonly hasFreshButFilteredEmpty = computed(() =>
+    this.totalFreshCount() > 0 && this.freshItems().length === 0,
+  );
+
+  /** True si no hay ningún fresco en absoluto (empty state de onboarding). */
+  readonly hasNoFreshAtAll = computed(() => this.totalFreshCount() === 0);
+
   readonly showAllFresh = signal(false);
   readonly visibleFreshItems = computed(() => {
     const items = this.freshItems();
@@ -369,16 +384,23 @@ export class PantryStateService {
     this.editItemModalRequest.set({ mode: 'edit', item: updatedItem });
   }
 
-  async toggleFreshItem(item: PantryItem): Promise<void> {
-    const currentQty = item.batches?.[0]?.quantity ?? 0;
-    const newQty = currentQty === 0 ? 1 : 0;
-    const updatedBatch = { ...(item.batches?.[0] ?? { quantity: 0 }), quantity: newQty };
-    await this.pantryStore.updateItem({ ...item, batches: [updatedBatch] });
+  async setFreshState(item: PantryItem, state: FreshState): Promise<void> {
+    const newQty = freshStateToQty(state);
+    const currentBatches = item.batches ?? [];
+    // Convención: un fresco tiene exactamente 1 lote. Defensivamente, si llegan más,
+    // actualizamos el primero y conservamos los demás intactos.
+    const updatedBatches = currentBatches.length > 0
+      ? [{ ...currentBatches[0], quantity: newQty }, ...currentBatches.slice(1)]
+      : [{ batchId: `batch-${Date.now()}`, quantity: newQty }];
 
-    const msgKey = newQty === 1 ? 'pantry.fresh.toast.updated' : 'pantry.fresh.toast.markedOut';
+    await this.pantryStore.updateItem({ ...item, batches: updatedBatches });
+
+    const msgKey = state === 'none'
+      ? 'pantry.fresh.toast.markedOut'
+      : 'pantry.fresh.toast.updated';
     const toast = await this.toastCtrl.create({
       message: this.translate.instant(msgKey),
-      duration: 1500,
+      duration: 1200,
       position: 'bottom',
     });
     await toast.present();
