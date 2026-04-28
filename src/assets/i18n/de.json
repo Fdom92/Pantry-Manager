@@ -681,7 +681,7 @@
       "keepInStockHint": "Erscheint wieder, wenn du es als leer markierst",
       "toggle": { "have": "Vorhanden", "out": "Leer" },
       "addModal": {
-        "title": "Neues Frischprodukt",
+        "title": "Neuer Frischeartikel",
         "namePlaceholder": "Produktname",
         "whenExpires": "Wann läuft es ab?",
         "submit": "Hinzufügen"

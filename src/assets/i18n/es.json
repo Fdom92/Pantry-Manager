@@ -682,7 +682,7 @@
       "keepInStockHint": "Aparecerá de nuevo cuando lo marques como agotado",
       "toggle": { "have": "Tengo", "out": "Agotado" },
       "addModal": {
-        "title": "Nuevo producto fresco",
+        "title": "Nuevo fresco",
         "namePlaceholder": "Nombre del producto",
         "whenExpires": "¿Cuándo caduca?",
         "submit": "Añadir"

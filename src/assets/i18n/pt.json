@@ -681,7 +681,7 @@
       "keepInStockHint": "Reaparecerá quando o marcares como esgotado",
       "toggle": { "have": "Tenho", "out": "Esgotado" },
       "addModal": {
-        "title": "Novo produto fresco",
+        "title": "Novo fresco",
         "namePlaceholder": "Nome do produto",
         "whenExpires": "Quando expira?",
         "submit": "Adicionar"

@@ -682,7 +682,7 @@
       "keepInStockHint": "Will reappear when you mark it as out",
       "toggle": { "have": "Have it", "out": "Out" },
       "addModal": {
-        "title": "New fresh item",
+        "title": "New fresh",
         "namePlaceholder": "Product name",
         "whenExpires": "When does it expire?",
         "submit": "Add"

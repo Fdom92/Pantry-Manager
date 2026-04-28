@@ -681,7 +681,7 @@
       "keepInStockHint": "Réapparaîtra quand tu le marqueras comme épuisé",
       "toggle": { "have": "J'en ai", "out": "Épuisé" },
       "addModal": {
-        "title": "Nouveau produit frais",
+        "title": "Nouveau frais",
         "namePlaceholder": "Nom du produit",
         "whenExpires": "Quand expire-t-il ?",
         "submit": "Ajouter"
