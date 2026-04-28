@@ -528,6 +528,14 @@ ion-modal.quantity-sheet ion-content {
   }
 }
 
+.fresh-empty-state--filtered {
+  padding: var(--app-theme-spacing-sm) var(--app-theme-card-margin-inline);
+
+  .fresh-empty-state__subtitle {
+    font-style: italic;
+  }
+}
+
 .fresh-show-more {
   display: block;
   width: 100%;

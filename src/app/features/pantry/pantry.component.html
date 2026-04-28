@@ -64,7 +64,7 @@
         </button>
       </header>
 
-      @if (facade.freshItems().length === 0) {
+      @if (facade.hasNoFreshAtAll()) {
         <div class="fresh-empty-state">
           <p class="fresh-empty-state__title">{{ 'pantry.fresh.emptyState.title' | translate }}</p>
           <p class="fresh-empty-state__subtitle">{{ 'pantry.fresh.emptyState.subtitle' | translate }}</p>
@@ -72,12 +72,16 @@
             {{ 'pantry.fresh.emptyState.cta' | translate }}
           </button>
         </div>
+      } @else if (facade.hasFreshButFilteredEmpty()) {
+        <div class="fresh-empty-state fresh-empty-state--filtered">
+          <p class="fresh-empty-state__subtitle">{{ 'pantry.fresh.empty.filters' | translate }}</p>
+        </div>
       } @else {
         <div class="fresh-list">
           @for (item of facade.visibleFreshItems(); track item._id) {
             <app-fresh-item-card
               [item]="item"
-              (toggled)="facade.toggleFreshItem($event)"
+              (stateChange)="facade.setFreshState($event.item, $event.state)"
               (editRequested)="facade.openEditModalFromSheet($event)">
             </app-fresh-item-card>
           }
