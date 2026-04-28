@@ -81,18 +81,6 @@ export class DashboardStateService {
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
   readonly expiredItems = this.pantryStore.expiredItems;
 
-  private readonly urgentFreshItems = computed((): PantryItem[] => {
-    const nowMs = Date.now();
-    return this.pantryItems().filter(item => {
-      if (item.productType !== 'fresh') return false;
-      const qty = item.batches?.[0]?.quantity ?? 0;
-      if (qty === 0) return false;
-      const dateStr = item.batches?.[0]?.expirationDate;
-      if (!dateStr) return false;
-      const days = Math.ceil((Date.parse(dateStr) - nowMs) / 86_400_000);
-      return days >= 0 && days <= 1;
-    });
-  });
   readonly inventorySummary = this.pantryStore.summary;
   readonly isInventoryLoading = computed(() =>
     this.pantryStore.loading() || !this.pantryStore.endReached()
@@ -252,7 +240,6 @@ export class DashboardStateService {
       this.nearExpiryItems(),
       this.pantryItems(),
       this.lastProtagonistId(),
-      this.urgentFreshItems(),
     );
     if (!raw) return null;
     if (this.dismissedTodayIds().has(raw.protagonist.id)) return null;
