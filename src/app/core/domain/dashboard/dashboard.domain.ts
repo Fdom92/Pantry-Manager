@@ -141,7 +141,15 @@ export function computeTodaySuggestion(
     return d === null || d > 0;
   };
 
-  const foodItems = allItems.filter(i => isFood(i) && hasStock(i) && hasDatedBatch(i) && isNotExpired(i));
+  // Fresh item with zero stock but keep-in-stock active: a genuine "buy this today" signal.
+  const isFreshOutCandidate = (item: PantryItem): boolean =>
+    item.productType === 'fresh'
+    && getStock(item) === 0
+    && (item.minThreshold ?? 0) >= 1;
+
+  const foodItems = allItems.filter(i => isFood(i) && (
+    isFreshOutCandidate(i) || (hasStock(i) && hasDatedBatch(i) && isNotExpired(i))
+  ));
   if (!foodItems.length) return null;
 
   // Tiebreaker: score DESC → daysToExpiry ASC (more urgent first) → quantity DESC
@@ -155,11 +163,6 @@ export function computeTodaySuggestion(
     if (ad !== bd) return ad - bd;
     return getStock(b.item) - getStock(a.item);
   };
-
-  const isFreshOutCandidate = (item: PantryItem): boolean =>
-    item.productType === 'fresh'
-    && getStock(item) === 0
-    && (item.minThreshold ?? 0) >= 1;
 
   const freshOutPool = allItems.filter(isFreshOutCandidate);
 
