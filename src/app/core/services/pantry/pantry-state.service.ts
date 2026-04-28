@@ -93,7 +93,6 @@ export class PantryStateService {
   readonly pendingQuantityChange = this.quantitySheet.pendingQuantityChange;
   readonly pendingQuantitySheetExpiryDate = this.quantitySheet.pendingExpiryDate;
   readonly pendingQuantitySheetNoExpiry = this.quantitySheet.pendingNoExpiry;
-  readonly freshAddModalOpen = this.freshAddModal.isOpen;
 
   // Computed signals coordinating across services
   readonly freshItems = computed(() =>

@@ -710,9 +710,7 @@
         "expired": "Scaduto",
         "today": "Oggi",
         "tomorrow": "Domani",
-        "soon": "Presto",
-        "noDate": "Senza data",
-        "out": "Esaurito"
+        "soon": "Presto"
       },
       "editModal": {
         "title": "Modifica fresco",

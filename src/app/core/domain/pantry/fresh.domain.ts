@@ -16,6 +16,7 @@ export function freshStateToQty(state: FreshState): number {
 
 /**
  * Devuelve la fecha de caducidad más cercana a hoy entre los lotes con fecha.
+ * Prefiere fechas futuras; si todas son pasadas, devuelve la más reciente.
  */
 function pickClosestExpiration(batches: ItemBatch[]): string | undefined {
   const now = Date.now();
@@ -23,9 +24,11 @@ function pickClosestExpiration(batches: ItemBatch[]): string | undefined {
     .map(b => b.expirationDate)
     .filter((d): d is string => !!d);
   if (!dated.length) return undefined;
-  return dated
-    .slice()
-    .sort((a, b) => Math.abs(Date.parse(a) - now) - Math.abs(Date.parse(b) - now))[0];
+
+  // Prefer the soonest future date; if all are past, prefer the most recent past date.
+  const future = dated.filter(d => Date.parse(d) >= now);
+  const pool = future.length ? future : dated;
+  return pool.slice().sort((a, b) => Date.parse(a) - Date.parse(b))[0];
 }
 
 /**

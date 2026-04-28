@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -27,7 +27,6 @@ import type { FreshState } from '@core/domain/pantry';
 })
 export class FreshEditItemModalComponent {
   readonly state = inject(PantryFreshEditModalStateService);
-  @ViewChild(QuickDateChipsComponent) readonly dateChips?: QuickDateChipsComponent;
 
   labelKey(state: FreshState): string {
     return `pantry.fresh.state.${state}`;

@@ -710,9 +710,7 @@
         "expired": "Expiré",
         "today": "Aujourd'hui",
         "tomorrow": "Demain",
-        "soon": "Bientôt",
-        "noDate": "Sans date",
-        "out": "Épuisé"
+        "soon": "Bientôt"
       },
       "editModal": {
         "title": "Modifier frais",

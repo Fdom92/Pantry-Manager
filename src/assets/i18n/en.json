@@ -711,9 +711,7 @@
         "expired": "Expired",
         "today": "Today",
         "tomorrow": "Tomorrow",
-        "soon": "Soon",
-        "noDate": "No date",
-        "out": "Out"
+        "soon": "Soon"
       },
       "editModal": {
         "title": "Edit fresh",
