@@ -40,20 +40,25 @@ const CHIPS: DateChip[] = [
       gap: 8px;
 
       ion-chip {
-        --background: var(--app-theme-card-border-color);
-        --color: var(--app-theme-text-muted);
+        --background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
+        --color: var(--app-theme-text-color);
+        border: 1px solid color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
         margin: 0;
         font-size: 0.85rem;
+        opacity: 0.85;
 
         &.active {
           --background: var(--ion-color-primary);
           --color: var(--ion-color-primary-contrast);
+          border-color: var(--ion-color-primary);
+          opacity: 1;
         }
 
         &.chip--emphasized:not(.active) {
-          --background: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
+          --background: color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
           --color: var(--ion-color-primary);
           font-weight: 600;
+          opacity: 1;
         }
       }
     }
