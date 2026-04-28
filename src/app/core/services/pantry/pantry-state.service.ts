@@ -52,6 +52,7 @@ export class PantryStateService {
   readonly pipelineResetting: Signal<boolean> = this.pantryStore.pipelineResetting;
   readonly hasCompletedInitialLoad: WritableSignal<boolean> = signal(false);
   readonly editItemModalRequest: WritableSignal<{ mode: 'edit'; item: PantryItem } | null> = signal(null);
+  readonly editFreshItemModalRequest: WritableSignal<{ mode: 'edit'; item: PantryItem } | null> = signal(null);
   readonly pantryItemsState: WritableSignal<PantryItem[]> = signal([]);
   readonly summarySnapshot: WritableSignal<PantrySummaryMeta> = signal({
     total: 0,
@@ -238,6 +239,10 @@ export class PantryStateService {
     this.editItemModalRequest.set(null);
   }
 
+  clearEditFreshItemModalRequest(): void {
+    this.editFreshItemModalRequest.set(null);
+  }
+
   // -------- Add modal (delegates to PantryAddModalStateService) --------
   openAddModal = () => this.addModal.openAddModal();
   closeAddModal = () => this.addModal.closeAddModal();
@@ -381,6 +386,10 @@ export class PantryStateService {
   async openEditModalFromSheet(item: PantryItem): Promise<void> {
     await this.quantitySheet.dismissQuantitySheet();
     const updatedItem = this.pantryItemsState().find(i => i._id === item._id) ?? item;
+    if (updatedItem.productType === 'fresh') {
+      this.editFreshItemModalRequest.set({ mode: 'edit', item: updatedItem });
+      return;
+    }
     this.editItemModalRequest.set({ mode: 'edit', item: updatedItem });
   }
 

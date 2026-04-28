@@ -36,6 +36,7 @@ import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pa
 import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pantry-quantity-sheet-state.service';
 import { FreshItemCardComponent } from './components/fresh-item-card/fresh-item-card.component';
 import { FreshAddModalComponent } from './components/fresh-add-modal/fresh-add-modal.component';
+import { FreshEditItemModalComponent } from './components/fresh-edit-item-modal/fresh-edit-item-modal.component';
 import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
 
 @Component({
@@ -69,6 +70,7 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
     PantryQuantitySheetComponent,
     FreshItemCardComponent,
     FreshAddModalComponent,
+    FreshEditItemModalComponent,
   ],
   templateUrl: './pantry.component.html',
   styleUrls: ['./pantry.component.scss'],
