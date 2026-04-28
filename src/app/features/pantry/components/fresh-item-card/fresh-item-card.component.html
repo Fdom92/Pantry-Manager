@@ -1,5 +1,11 @@
 <div class="fresh-item-card">
-  <div class="fresh-item-card__info" role="button" (click)="onEdit()">
+  <div
+    class="fresh-item-card__info"
+    role="button"
+    tabindex="0"
+    (click)="onEdit()"
+    (keydown.enter)="onEdit()"
+    (keydown.space)="$event.preventDefault(); onEdit()">
     <span class="fresh-item-card__name">{{ item.name }}</span>
     @if (expiryLabel()) {
       <span class="fresh-item-card__expiry" [attr.data-urgency]="expiryUrgency()">
@@ -16,7 +22,7 @@
         class="fresh-item-card__segment-btn"
         [class.is-active]="currentState() === state"
         [attr.data-state]="state"
-        [attr.aria-checked]="currentState() === state"
+        [attr.aria-checked]="currentState() === state ? 'true' : 'false'"
         [attr.aria-label]="(labelKey(state) | translate)"
         (click)="onStateSelected(state)">
         {{ labelKey(state) | translate }}
