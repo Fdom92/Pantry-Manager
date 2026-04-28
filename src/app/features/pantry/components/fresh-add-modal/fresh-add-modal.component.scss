@@ -1,31 +1,6 @@
 .fresh-add-modal {
-  &__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--app-theme-spacing-lg);
-    padding-top: var(--app-theme-spacing-md);
-  }
-
-  &__name-item {
-    --background: var(--app-theme-card-bg);
-    --border-radius: var(--app-theme-card-border-radius);
-    border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
-    border-radius: var(--app-theme-card-border-radius);
-  }
-
-  &__section {
-    display: flex;
-    flex-direction: column;
-    gap: var(--app-theme-spacing-sm);
-  }
-
-  &__section-label {
-    margin: 0;
-    font-size: 0.85rem;
-    font-weight: var(--app-theme-font-weight-bold);
-    color: var(--app-theme-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+  &__keep {
+    padding: 0 16px 12px;
   }
 
   &__keep-item {
@@ -47,32 +22,5 @@
     color: var(--app-theme-text-muted);
     margin: 0;
     line-height: 1.4;
-  }
-
-  &__footer-btn {
-    padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-md);
-  }
-
-  &__basics {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 12px 16px 4px;
-  }
-
-  &__basic-chip {
-    padding: 5px 12px;
-    border: 1px solid color-mix(in srgb, var(--ion-color-primary) 30%, transparent);
-    border-radius: 16px;
-    background: color-mix(in srgb, var(--ion-color-primary) 8%, transparent);
-    color: var(--ion-color-primary);
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-
-    &:active {
-      background: color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
-      border-color: color-mix(in srgb, var(--ion-color-primary) 50%, transparent);
-    }
   }
 }
