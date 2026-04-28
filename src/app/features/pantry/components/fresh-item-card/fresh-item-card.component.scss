@@ -2,11 +2,10 @@
   display: flex;
   align-items: center;
   gap: var(--app-theme-spacing-md);
-  padding: 6px var(--app-theme-spacing-md);
+  padding: 8px var(--app-theme-spacing-md);
   border-radius: var(--app-theme-card-border-radius);
   background: var(--app-theme-card-bg);
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
-  transition: opacity 0.2s;
 
   &__info {
     flex: 1;
@@ -34,30 +33,45 @@
     &[data-urgency='warning']  { color: var(--app-theme-card-accent-warning);  font-weight: 600; }
   }
 
-  &__expiry-dash {
-    opacity: 0.4;
+  &__segment {
+    display: inline-flex;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
+    padding: 2px;
+    gap: 2px;
   }
 
-  &__toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
+  &__segment-btn {
+    appearance: none;
     border: none;
     background: transparent;
+    color: var(--app-theme-text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 999px;
     cursor: pointer;
-    flex-shrink: 0;
-    border-radius: 50%;
-    transition: background 0.15s;
-    color: var(--app-theme-card-accent-success);
+    transition: background 0.15s, color 0.15s;
+    min-width: 52px;
+    text-transform: capitalize;
 
-    ion-icon {
-      font-size: 30px;
+    &.is-active[data-state='sufficient'] {
+      background: var(--app-theme-card-accent-success, var(--ion-color-success));
+      color: var(--ion-color-success-contrast, white);
+    }
+    &.is-active[data-state='low'] {
+      background: var(--app-theme-card-accent-warning, var(--ion-color-warning));
+      color: var(--ion-color-dark);
+    }
+    &.is-active[data-state='none'] {
+      background: var(--app-theme-card-accent-critical, var(--ion-color-medium));
+      color: var(--ion-color-medium-contrast, white);
     }
 
-    &:active {
-      background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+    &:not(.is-active):active {
+      background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
     }
   }
 }

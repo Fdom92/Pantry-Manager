@@ -1,16 +1,26 @@
 <div class="fresh-item-card">
-
   <div class="fresh-item-card__info" role="button" (click)="onEdit()">
     <span class="fresh-item-card__name">{{ item.name }}</span>
-    <span class="fresh-item-card__expiry" [attr.data-urgency]="expiryUrgency()">
-      {{ expiryLabel() | translate }}
-    </span>
+    @if (expiryLabel()) {
+      <span class="fresh-item-card__expiry" [attr.data-urgency]="expiryUrgency()">
+        {{ expiryLabel() | translate }}
+      </span>
+    }
   </div>
 
-  <button
-    class="fresh-item-card__toggle"
-    (click)="onToggle()"
-    [attr.aria-label]="(isOut() ? 'pantry.fresh.toggle.have' : 'pantry.fresh.toggle.out') | translate">
-    <ion-icon [name]="isOut() ? 'radio-button-off-outline' : 'checkmark-circle'"></ion-icon>
-  </button>
+  <div class="fresh-item-card__segment" role="radiogroup" [attr.aria-label]="('pantry.fresh.state.label' | translate)">
+    @for (state of states; track state) {
+      <button
+        type="button"
+        role="radio"
+        class="fresh-item-card__segment-btn"
+        [class.is-active]="currentState() === state"
+        [attr.data-state]="state"
+        [attr.aria-checked]="currentState() === state"
+        [attr.aria-label]="(labelKey(state) | translate)"
+        (click)="onStateSelected(state)">
+        {{ labelKey(state) | translate }}
+      </button>
+    }
+  </div>
 </div>
