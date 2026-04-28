@@ -102,7 +102,7 @@ export class PantryAddModalStateService {
       for (const entry of entries) {
         const timestamp = new Date().toISOString();
         if (entry.isNew || !entry.item) {
-          const item = buildAddItemPayload({
+          const base = buildAddItemPayload({
             id: createDocumentId('item'),
             nowIso: timestamp,
             name: entry.name,
@@ -110,6 +110,7 @@ export class PantryAddModalStateService {
             expirationDate: entry.expirationDate,
             noExpiry: entry.noExpiry,
           });
+          const item: PantryItem = { ...base, productType: 'pantry' };
           await this.pantryStore.addItem(item);
           await this.eventManager.logAddNewItem(item, entry.quantity, sessionId, timestamp);
           continue;
@@ -180,7 +181,7 @@ export class PantryAddModalStateService {
     const normalized = normalizeLowercase(nextName);
     const matchingItem = this.pantryStore
       .loadedProducts()
-      .find(item => normalizeLowercase(item.name) === normalized);
+      .find(item => item.productType !== 'fresh' && normalizeLowercase(item.name) === normalized);
 
     if (matchingItem) {
       const option: AutocompleteItem<PantryItem> = {
@@ -283,7 +284,9 @@ export class PantryAddModalStateService {
     const locale = this.languageService.getCurrentLocale();
     const uniqueEntries = dedupeByNormalizedKey(entries, entry => entry.name);
     const excluded = new Set(uniqueEntries.map(entry => entry.item?._id).filter(Boolean) as string[]);
-    return buildPantryItemAutocomplete(items, {
+    // Items legacy sin productType caen como despensa por convención.
+    const nonFresh = items.filter(item => item.productType !== 'fresh');
+    return buildPantryItemAutocomplete(nonFresh, {
       locale,
       excludeIds: excluded,
       getQuantity: item => this.pantryStore.getItemTotalQuantity(item),
