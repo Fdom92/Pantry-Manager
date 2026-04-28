@@ -1,0 +1,89 @@
+.fresh-edit-modal {
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-theme-spacing-lg);
+    padding-top: var(--app-theme-spacing-md);
+  }
+
+  &__row {
+    --background: var(--app-theme-card-bg);
+    --border-radius: var(--app-theme-card-border-radius);
+    border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+    border-radius: var(--app-theme-card-border-radius);
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-theme-spacing-sm);
+  }
+
+  &__section-label {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__segment {
+    display: inline-flex;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
+    padding: 4px;
+    gap: 4px;
+    width: fit-content;
+  }
+
+  &__segment-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--app-theme-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+
+    &.is-active[data-state='sufficient'] {
+      background: var(--app-theme-card-accent-success, var(--ion-color-success));
+      color: var(--ion-color-success-contrast, white);
+    }
+    &.is-active[data-state='low'] {
+      background: var(--app-theme-card-accent-warning, var(--ion-color-warning));
+      color: var(--ion-color-dark);
+    }
+    &.is-active[data-state='none'] {
+      background: var(--app-theme-card-accent-critical, var(--ion-color-medium));
+      color: var(--ion-color-medium-contrast, white);
+    }
+  }
+
+  &__keep-label {
+    font-size: var(--app-theme-font-size-body);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+    margin: 0 0 2px 0;
+  }
+
+  &__keep-hint {
+    font-size: 0.75rem;
+    color: var(--app-theme-text-muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  &__danger-zone {
+    margin-top: var(--app-theme-spacing-lg);
+    padding-top: var(--app-theme-spacing-md);
+    border-top: 1px solid var(--app-theme-card-border-color);
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-theme-spacing-sm);
+  }
+}
