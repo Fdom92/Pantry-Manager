@@ -55,7 +55,8 @@
       "edit": "Bearbeiten",
       "apply": "Anwenden",
       "clear": "Leeren",
-      "next": "Weiter"
+      "next": "Weiter",
+      "delete": "Löschen"
     },
     "loading": "Lädt…",
     "dates": {
@@ -715,7 +716,11 @@
       },
       "editModal": {
         "title": "Frische bearbeiten",
-        "stateLabel": "Wie viel bleibt?"
+        "stateLabel": "Wie viel bleibt?",
+        "deleteConfirm": {
+          "title": "Produkt löschen",
+          "message": "{{ name }} löschen? Kann nicht rückgängig gemacht werden."
+        }
       },
       "convertToPantry": {
         "button": "In Vorrat umwandeln",

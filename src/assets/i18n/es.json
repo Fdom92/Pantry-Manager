@@ -55,7 +55,8 @@
       "edit": "Editar",
       "apply": "Aplicar",
       "clear": "Limpiar",
-      "next": "Siguiente"
+      "next": "Siguiente",
+      "delete": "Eliminar"
     },
     "loading": "Cargando…",
     "dates": {
@@ -716,7 +717,11 @@
       },
       "editModal": {
         "title": "Editar fresco",
-        "stateLabel": "¿Cuánto te queda?"
+        "stateLabel": "¿Cuánto te queda?",
+        "deleteConfirm": {
+          "title": "Eliminar producto",
+          "message": "¿Eliminar {{ name }}? No se puede deshacer."
+        }
       },
       "convertToPantry": {
         "button": "Convertir a despensa",

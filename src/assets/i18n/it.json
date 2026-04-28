@@ -55,7 +55,8 @@
       "edit": "Modifica",
       "apply": "Applica",
       "clear": "Pulisci",
-      "next": "Avanti"
+      "next": "Avanti",
+      "delete": "Elimina"
     },
     "loading": "Caricamento…",
     "dates": {
@@ -715,7 +716,11 @@
       },
       "editModal": {
         "title": "Modifica fresco",
-        "stateLabel": "Quanto ne resta?"
+        "stateLabel": "Quanto ne resta?",
+        "deleteConfirm": {
+          "title": "Elimina prodotto",
+          "message": "Eliminare {{ name }}? Operazione irreversibile."
+        }
       },
       "convertToPantry": {
         "button": "Sposta in dispensa",

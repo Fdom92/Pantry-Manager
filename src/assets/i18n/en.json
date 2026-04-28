@@ -55,7 +55,8 @@
       "edit": "Edit",
       "apply": "Apply",
       "clear": "Clear",
-      "next": "Next"
+      "next": "Next",
+      "delete": "Delete"
     },
     "loading": "Loading…",
     "dates": {
@@ -716,7 +717,11 @@
       },
       "editModal": {
         "title": "Edit fresh",
-        "stateLabel": "How much is left?"
+        "stateLabel": "How much is left?",
+        "deleteConfirm": {
+          "title": "Delete product",
+          "message": "Delete {{ name }}? This can't be undone."
+        }
       },
       "convertToPantry": {
         "button": "Convert to pantry",

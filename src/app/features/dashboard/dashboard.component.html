@@ -108,7 +108,7 @@
             <div class="today-card">
               <div class="today-card__protagonist">
                 <span class="today-card__protagonist-name">{{ facade.todaySuggestion()!.protagonist.name }}</span>
-                @if (facade.todaySuggestion()!.reasonKey !== 'dashboard.today.reason.freshExpiring') {
+                @if (facade.todaySuggestion()!.reasonKey !== 'dashboard.today.reason.freshExpiring' && facade.todaySuggestion()!.reasonKey !== 'dashboard.today.reason.freshOut') {
                   <span class="today-card__protagonist-qty">×{{ facade.todaySuggestion()!.protagonist.quantity }}</span>
                 }
                 @if (facade.todaySuggestion()!.protagonist.expirationDate) {
@@ -141,7 +141,13 @@
                 </div>
               }
               <div class="today-card__footer">
-                @if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshExpiring') {
+                @if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshOut') {
+                  <ion-button
+                    size="small"
+                    (click)="facade.dismissToday()">
+                    {{ 'dashboard.today.cta.dismiss' | translate }}
+                  </ion-button>
+                } @else if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshExpiring') {
                   <ion-button
                     size="small"
                     [disabled]="facade.isConsumingToday()"

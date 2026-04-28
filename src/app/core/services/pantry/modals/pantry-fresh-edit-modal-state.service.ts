@@ -4,7 +4,7 @@ import { type FreshState, freshStateToQty, qtyToFreshState } from '@core/domain/
 import type { PantryItem } from '@core/models/pantry';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
@@ -16,6 +16,7 @@ export class PantryFreshEditModalStateService {
   private readonly listState = inject(PantryStateService);
   private readonly translate = inject(TranslateService);
   private readonly toastCtrl = inject(ToastController);
+  private readonly alertCtrl = inject(AlertController);
   private readonly eventManager = inject(HistoryEventManagerService);
 
   readonly isOpen = signal(false);
@@ -141,6 +142,19 @@ export class PantryFreshEditModalStateService {
   async deleteItem(): Promise<void> {
     const existing = this.editingItem();
     if (!existing) return;
+
+    const alert = await this.alertCtrl.create({
+      header: this.translate.instant('pantry.fresh.editModal.deleteConfirm.title'),
+      message: this.translate.instant('pantry.fresh.editModal.deleteConfirm.message', { name: existing.name }),
+      buttons: [
+        { text: this.translate.instant('common.actions.cancel'), role: 'cancel' },
+        { text: this.translate.instant('common.actions.delete'), role: 'confirm' },
+      ],
+    });
+    await alert.present();
+    const result = await alert.onDidDismiss();
+    if (result.role !== 'confirm') return;
+
     this.isSaving.set(true);
     try {
       await this.pantryStore.deleteItem(existing._id);

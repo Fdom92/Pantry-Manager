@@ -176,8 +176,8 @@ export class PantryStateService {
       const isLoading = this.pantryStore.loading();
       const shouldUseFreshSummary = !isLoading || loadedItems.length > 0 || totalCount === 0;
       if (shouldUseFreshSummary) {
-        const despensaItems = loadedItems.filter(i => i.productType !== 'fresh');
-        this.summarySnapshot.set(this.viewModel.buildSummary(despensaItems, despensaItems.length));
+        // Include both fresh and pantry items so chip counts reflect both sections.
+        this.summarySnapshot.set(this.viewModel.buildSummary(loadedItems, loadedItems.length));
       }
     });
 

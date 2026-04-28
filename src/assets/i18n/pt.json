@@ -55,7 +55,8 @@
       "edit": "Editar",
       "apply": "Aplicar",
       "clear": "Limpar",
-      "next": "Seguinte"
+      "next": "Seguinte",
+      "delete": "Excluir"
     },
     "loading": "A carregar…",
     "dates": {
@@ -715,7 +716,11 @@
       },
       "editModal": {
         "title": "Editar fresco",
-        "stateLabel": "Quanto resta?"
+        "stateLabel": "Quanto resta?",
+        "deleteConfirm": {
+          "title": "Excluir produto",
+          "message": "Excluir {{ name }}? Não pode ser desfeito."
+        }
       },
       "convertToPantry": {
         "button": "Mover para despensa",

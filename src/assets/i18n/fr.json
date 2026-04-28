@@ -55,7 +55,8 @@
       "edit": "Modifier",
       "apply": "Appliquer",
       "clear": "Effacer",
-      "next": "Suivant"
+      "next": "Suivant",
+      "delete": "Supprimer"
     },
     "loading": "Chargement…",
     "dates": {
@@ -715,7 +716,11 @@
       },
       "editModal": {
         "title": "Modifier frais",
-        "stateLabel": "Combien il reste ?"
+        "stateLabel": "Combien il reste ?",
+        "deleteConfirm": {
+          "title": "Supprimer le produit",
+          "message": "Supprimer {{ name }} ? Action irréversible."
+        }
       },
       "convertToPantry": {
         "button": "Convertir en garde-manger",
