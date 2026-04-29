@@ -714,7 +714,8 @@
         "expired": "Expiré",
         "today": "Aujourd'hui",
         "tomorrow": "Demain",
-        "soon": "Bientôt"
+        "soon": "Bientôt",
+        "keepBadge": "Auto"
       },
       "editModal": {
         "title": "Modifier frais",
@@ -744,7 +745,8 @@
       },
       "toast": {
         "updated": "✓ Tu l'as",
-        "markedOut": "Épuisé"
+        "markedOut": "Épuisé",
+        "keepInStock": "Sera ajouté à ta liste quand tu en manqueras"
       }
     }
   },

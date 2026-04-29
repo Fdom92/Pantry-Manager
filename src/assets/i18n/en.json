@@ -715,7 +715,8 @@
         "expired": "Expired",
         "today": "Today",
         "tomorrow": "Tomorrow",
-        "soon": "Soon"
+        "soon": "Soon",
+        "keepBadge": "Auto"
       },
       "editModal": {
         "title": "Edit fresh",
@@ -745,7 +746,8 @@
       },
       "toast": {
         "updated": "✓ You have it",
-        "markedOut": "Out of stock"
+        "markedOut": "Out of stock",
+        "keepInStock": "Will be added to your list when you run out"
       }
     }
   },

@@ -7,7 +7,12 @@
     (click)="onEdit()"
     (keydown.enter)="onEdit()"
     (keydown.space)="$event.preventDefault(); onEdit()">
-    <span class="fresh-item-card__name">{{ item.name }}</span>
+    <div class="fresh-item-card__name-row">
+      <span class="fresh-item-card__name">{{ item.name }}</span>
+      @if (hasKeepInStock()) {
+        <span class="fresh-item-card__keep-badge">{{ 'pantry.fresh.card.keepBadge' | translate }}</span>
+      }
+    </div>
     @if (expiryLabel()) {
       <span class="fresh-item-card__expiry" [attr.data-urgency]="expiryUrgency()">
         {{ expiryLabel() | translate }}
@@ -15,11 +20,7 @@
     }
   </div>
 
-  <div
-    class="fresh-item-card__segment"
-    [attr.data-expired]="isExpired() || null"
-    role="radiogroup"
-    [attr.aria-label]="('pantry.fresh.state.label' | translate)">
+  <div class="fresh-item-card__segment" role="radiogroup" [attr.aria-label]="('pantry.fresh.state.label' | translate)">
     @for (state of states; track state) {
       <button
         type="button"
@@ -29,7 +30,6 @@
         [attr.data-state]="state"
         [attr.aria-checked]="currentState() === state ? 'true' : 'false'"
         [attr.aria-label]="(labelKey(state) | translate)"
-        [disabled]="isExpired()"
         (click)="onStateSelected(state)">
         {{ labelKey(state) | translate }}
       </button>

@@ -43,6 +43,15 @@ export class PantryFreshEditModalStateService {
       this.openEdit(request.item);
       this.listState.clearEditFreshItemModalRequest();
     });
+
+    this.form.get('keepInStock')!.valueChanges.subscribe(value => {
+      if (!value) return;
+      this.toastCtrl.create({
+        message: this.translate.instant('pantry.fresh.toast.keepInStock'),
+        duration: 2200,
+        position: 'bottom',
+      }).then(t => t.present());
+    });
   }
 
   openEdit(item: PantryItem): void {

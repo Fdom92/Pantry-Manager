@@ -714,7 +714,8 @@
         "expired": "Abgelaufen",
         "today": "Heute",
         "tomorrow": "Morgen",
-        "soon": "Bald"
+        "soon": "Bald",
+        "keepBadge": "Auto"
       },
       "editModal": {
         "title": "Frische bearbeiten",
@@ -744,7 +745,8 @@
       },
       "toast": {
         "updated": "✓ Du hast es",
-        "markedOut": "Aufgebraucht"
+        "markedOut": "Aufgebraucht",
+        "keepInStock": "Wird zur Liste hinzugefügt, wenn aufgebraucht"
       }
     }
   },

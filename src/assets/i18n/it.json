@@ -714,7 +714,8 @@
         "expired": "Scaduto",
         "today": "Oggi",
         "tomorrow": "Domani",
-        "soon": "Presto"
+        "soon": "Presto",
+        "keepBadge": "Auto"
       },
       "editModal": {
         "title": "Modifica fresco",
@@ -744,7 +745,8 @@
       },
       "toast": {
         "updated": "✓ Ce l'hai",
-        "markedOut": "Esaurito"
+        "markedOut": "Esaurito",
+        "keepInStock": "Verrà aggiunto alla lista quando esaurito"
       }
     }
   },

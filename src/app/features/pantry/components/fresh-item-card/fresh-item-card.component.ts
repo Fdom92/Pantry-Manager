@@ -21,6 +21,7 @@ export class FreshItemCardComponent implements OnChanges {
 
   readonly currentState = signal<FreshState>('none');
   readonly daysToExpiry = signal<number | null>(null);
+  readonly hasKeepInStock = signal(false);
 
   readonly isExpired = computed((): boolean => {
     const d = this.daysToExpiry();
@@ -59,10 +60,10 @@ export class FreshItemCardComponent implements OnChanges {
     } else {
       this.daysToExpiry.set(null);
     }
+    this.hasKeepInStock.set((this.item?.minThreshold ?? 0) >= 1);
   }
 
   onStateSelected(state: FreshState): void {
-    if (this.isExpired()) return;
     if (state === this.currentState()) return;
     this.stateChange.emit({ item: this.item, state });
   }

@@ -13,7 +13,8 @@
   [entries]="state.entryViewModels()"
   [showSecondaryInfo]="true"
   [showMeta]="false"
-  [showEntryDate]="false"
+  [showEntryDate]="true"
+  [showEntryNoExpiry]="true"
   [showEntryQuantity]="false"
   [showAllOnFocus]="true"
   [autofocus]="true"
@@ -26,5 +27,7 @@
   (queryChange)="state.onQueryChange($event)"
   (emptyAction)="state.addEntryFromQuery($event)"
   (adjustEntry)="state.adjustEntryById($event.entry.id, $event.delta)"
+  (entryDateChange)="state.setEntryDate($event.entry.id, $event.date)"
+  (entryNoExpiryToggle)="state.setEntryNoExpiry($event.entry.id)"
   (save)="state.submit()">
 </app-entity-selector-modal>

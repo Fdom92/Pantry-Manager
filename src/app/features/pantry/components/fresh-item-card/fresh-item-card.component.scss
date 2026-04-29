@@ -16,6 +16,13 @@
     cursor: pointer;
   }
 
+  &__name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
   &__name {
     font-size: var(--app-theme-font-size-body);
     font-weight: var(--app-theme-font-weight-bold);
@@ -23,6 +30,20 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  &__keep-badge {
+    flex-shrink: 0;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--ion-color-primary);
+    background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ion-color-primary) 25%, transparent);
+    border-radius: 4px;
+    padding: 1px 5px;
+    line-height: 1.5;
   }
 
   &__expiry {
@@ -75,20 +96,11 @@
     }
   }
 
-  // Estado expirado: barrita roja en __info, segment desactivado
+  // Estado expirado: solo feedback visual en __info (barrita roja)
+  // El segment permanece activo para permitir actualizar en 1 tap
 
   &__info[data-expired] {
     border-left: 3px solid var(--app-theme-card-accent-critical, var(--ion-color-danger));
     padding-left: 8px;
-  }
-
-  &__segment[data-expired] {
-    opacity: 0.6;
-    pointer-events: none;
-
-    .fresh-item-card__segment-btn.is-active {
-      background: var(--ion-color-medium);
-      color: var(--ion-color-medium-contrast, white);
-    }
   }
 }
