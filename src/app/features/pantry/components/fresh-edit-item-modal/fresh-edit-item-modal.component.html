@@ -17,18 +17,22 @@
     <ion-content class="ion-padding fresh-edit-modal">
       <form [formGroup]="state.form" class="fresh-edit-modal__form">
 
-        <ion-item lines="none" class="fresh-edit-modal__row">
-          <ion-input
-            formControlName="name"
-            label="{{ 'pantry.form.name' | translate }}"
-            labelPlacement="stacked"
-            [placeholder]="'pantry.form.namePlaceholder' | translate"
-            required>
-          </ion-input>
-        </ion-item>
+        <div class="form-section">
+          <ion-item lines="none">
+            <ion-input
+              formControlName="name"
+              label="{{ 'pantry.form.name' | translate }}"
+              labelPlacement="stacked"
+              [placeholder]="'pantry.form.namePlaceholder' | translate"
+              required>
+            </ion-input>
+          </ion-item>
+        </div>
 
-        <div class="fresh-edit-modal__section">
-          <p class="fresh-edit-modal__section-label">{{ 'pantry.fresh.editModal.stateLabel' | translate }}</p>
+        <div class="form-section-header">
+          <h5>{{ 'pantry.fresh.editModal.stateLabel' | translate }}</h5>
+        </div>
+        <div class="form-section fresh-edit-modal__segment-card">
           <div class="fresh-edit-modal__segment" role="radiogroup">
             @for (s of state.states; track s) {
               <button
@@ -45,24 +49,28 @@
           </div>
         </div>
 
-        <div class="fresh-edit-modal__section">
-          <p class="fresh-edit-modal__section-label">{{ 'pantry.fresh.addModal.whenExpires' | translate }}</p>
+        <div class="form-section-header">
+          <h5>{{ 'pantry.fresh.addModal.whenExpires' | translate }}</h5>
+        </div>
+        <div class="form-section fresh-edit-modal__date-card">
           <app-quick-date-chips
             [emphasizedKeys]="['today', 'twoDays']"
             (dateSelected)="onDateSelected($event)">
           </app-quick-date-chips>
         </div>
 
-        <ion-item lines="none" class="fresh-edit-modal__row">
-          <ion-label>
-            <p class="fresh-edit-modal__keep-label">{{ 'pantry.fresh.keepInStock' | translate }}</p>
-            <p class="fresh-edit-modal__keep-hint">{{ 'pantry.fresh.keepInStockHint' | translate }}</p>
-          </ion-label>
-          <ion-toggle
-            slot="end"
-            formControlName="keepInStock">
-          </ion-toggle>
-        </ion-item>
+        <div class="form-section">
+          <ion-item lines="none">
+            <ion-label>
+              <p class="fresh-edit-modal__keep-label">{{ 'pantry.fresh.keepInStock' | translate }}</p>
+              <p class="fresh-edit-modal__keep-hint">{{ 'pantry.fresh.keepInStockHint' | translate }}</p>
+            </ion-label>
+            <ion-toggle
+              slot="end"
+              formControlName="keepInStock">
+            </ion-toggle>
+          </ion-item>
+        </div>
 
       </form>
 
