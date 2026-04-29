@@ -98,17 +98,7 @@ export class PantryStateService {
   readonly freshItems = computed(() =>
     this.pantryItemsState()
       .filter(i => i.productType === 'fresh')
-      .sort((a, b) => {
-        const aQty = a.batches?.[0]?.quantity ?? 0;
-        const bQty = b.batches?.[0]?.quantity ?? 0;
-        if (aQty !== bQty) return bQty - aQty;
-        const aDate = a.batches?.[0]?.expirationDate;
-        const bDate = b.batches?.[0]?.expirationDate;
-        if (aDate && bDate) return Date.parse(aDate) - Date.parse(bDate);
-        if (aDate) return -1;
-        if (bDate) return 1;
-        return 0;
-      })
+      .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
   );
 
   /** Total de frescos en el dataset crudo, sin filtrar. */
