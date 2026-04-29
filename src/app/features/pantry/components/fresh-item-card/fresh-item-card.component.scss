@@ -29,7 +29,7 @@
     font-size: 0.75rem;
     color: var(--app-theme-text-muted);
 
-    &[data-urgency='critical'] { color: var(--app-theme-card-accent-critical); font-weight: 600; }
+    &[data-urgency='critical'] { color: var(--app-theme-card-accent-critical); font-weight: 600; font-size: 0.8rem; }
     &[data-urgency='warning']  { color: var(--app-theme-card-accent-warning);  font-weight: 600; }
   }
 
@@ -80,10 +80,6 @@
   &__info[data-expired] {
     border-left: 3px solid var(--app-theme-card-accent-critical, var(--ion-color-danger));
     padding-left: 8px;
-  }
-
-  &__expiry[data-urgency='critical'] {
-    font-size: 0.8rem;
   }
 
   &__segment[data-expired] {
