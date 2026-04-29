@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy, Component, EventEmitter,
   Input, OnChanges, Output, computed, signal,
 } from '@angular/core';
+import { IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import type { PantryItem } from '@core/models/pantry';
 import { type FreshState, qtyToFreshState } from '@core/domain/pantry';
@@ -9,7 +10,7 @@ import { type FreshState, qtyToFreshState } from '@core/domain/pantry';
 @Component({
   selector: 'app-fresh-item-card',
   standalone: true,
-  imports: [TranslateModule],
+  imports: [TranslateModule, IonIcon],
   templateUrl: './fresh-item-card.component.html',
   styleUrls: ['./fresh-item-card.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

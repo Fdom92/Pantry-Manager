@@ -32,18 +32,10 @@
     text-overflow: ellipsis;
   }
 
-  &__keep-badge {
+  &__keep-icon {
+    font-size: 14px;
+    color: var(--ion-color-warning);
     flex-shrink: 0;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    color: var(--ion-color-primary);
-    background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--ion-color-primary) 25%, transparent);
-    border-radius: 4px;
-    padding: 1px 5px;
-    line-height: 1.5;
   }
 
   &__expiry {

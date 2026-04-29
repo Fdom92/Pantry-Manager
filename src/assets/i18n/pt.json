@@ -714,8 +714,7 @@
         "expired": "Expirado",
         "today": "Hoje",
         "tomorrow": "Amanhã",
-        "soon": "Em breve",
-        "keepBadge": "Auto"
+        "soon": "Em breve"
       },
       "editModal": {
         "title": "Editar fresco",

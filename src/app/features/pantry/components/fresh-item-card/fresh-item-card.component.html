@@ -8,10 +8,10 @@
     (keydown.enter)="onEdit()"
     (keydown.space)="$event.preventDefault(); onEdit()">
     <div class="fresh-item-card__name-row">
-      <span class="fresh-item-card__name">{{ item.name }}</span>
       @if (hasKeepInStock()) {
-        <span class="fresh-item-card__keep-badge">{{ 'pantry.fresh.card.keepBadge' | translate }}</span>
+        <ion-icon class="fresh-item-card__keep-icon" name="star-outline"></ion-icon>
       }
+      <span class="fresh-item-card__name">{{ item.name }}</span>
     </div>
     @if (expiryLabel()) {
       <span class="fresh-item-card__expiry" [attr.data-urgency]="expiryUrgency()">

@@ -714,8 +714,7 @@
         "expired": "Expiré",
         "today": "Aujourd'hui",
         "tomorrow": "Demain",
-        "soon": "Bientôt",
-        "keepBadge": "Auto"
+        "soon": "Bientôt"
       },
       "editModal": {
         "title": "Modifier frais",
