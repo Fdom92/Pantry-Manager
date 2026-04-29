@@ -1,6 +1,7 @@
 <div class="fresh-item-card">
   <div
     class="fresh-item-card__info"
+    [attr.data-expired]="isExpired() || null"
     role="button"
     tabindex="0"
     (click)="onEdit()"
@@ -14,7 +15,11 @@
     }
   </div>
 
-  <div class="fresh-item-card__segment" role="radiogroup" [attr.aria-label]="('pantry.fresh.state.label' | translate)">
+  <div
+    class="fresh-item-card__segment"
+    [attr.data-expired]="isExpired() || null"
+    role="radiogroup"
+    [attr.aria-label]="('pantry.fresh.state.label' | translate)">
     @for (state of states; track state) {
       <button
         type="button"
@@ -24,6 +29,7 @@
         [attr.data-state]="state"
         [attr.aria-checked]="currentState() === state ? 'true' : 'false'"
         [attr.aria-label]="(labelKey(state) | translate)"
+        [disabled]="isExpired()"
         (click)="onStateSelected(state)">
         {{ labelKey(state) | translate }}
       </button>

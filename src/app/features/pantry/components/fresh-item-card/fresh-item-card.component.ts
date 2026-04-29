@@ -21,16 +21,22 @@ export class FreshItemCardComponent implements OnChanges {
 
   readonly currentState = signal<FreshState>('none');
   readonly daysToExpiry = signal<number | null>(null);
+
+  readonly isExpired = computed((): boolean => {
+    const d = this.daysToExpiry();
+    return d !== null && d < 0;
+  });
+
   readonly expiryUrgency = computed((): 'critical' | 'warning' | 'neutral' => {
-    if (this.currentState() === 'none') return 'neutral';
     const d = this.daysToExpiry();
     if (d === null) return 'neutral';
+    if (d < 0) return 'critical';
     if (d <= 1) return 'critical';
     if (d <= 3) return 'warning';
     return 'neutral';
   });
+
   readonly expiryLabel = computed((): string => {
-    if (this.currentState() === 'none') return '';
     const d = this.daysToExpiry();
     if (d === null) return '';
     if (d < 0) return 'pantry.fresh.card.expired';
@@ -56,7 +62,8 @@ export class FreshItemCardComponent implements OnChanges {
   }
 
   onStateSelected(state: FreshState): void {
-    if (state === this.currentState()) return; // idempotent
+    if (this.isExpired()) return;
+    if (state === this.currentState()) return;
     this.stateChange.emit({ item: this.item, state });
   }
 

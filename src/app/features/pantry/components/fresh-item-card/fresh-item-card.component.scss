@@ -74,4 +74,25 @@
       background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
     }
   }
+
+  // Estado expirado: barrita roja en __info, segment desactivado
+
+  &__info[data-expired] {
+    border-left: 3px solid var(--app-theme-card-accent-critical, var(--ion-color-danger));
+    padding-left: 8px;
+  }
+
+  &__expiry[data-urgency='critical'] {
+    font-size: 0.8rem;
+  }
+
+  &__segment[data-expired] {
+    opacity: 0.6;
+    pointer-events: none;
+
+    .fresh-item-card__segment-btn.is-active {
+      background: var(--ion-color-medium);
+      color: var(--ion-color-medium-contrast, white);
+    }
+  }
 }
