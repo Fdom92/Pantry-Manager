@@ -668,7 +668,11 @@
     },
     "sections": {
       "fresh": "Frais",
-      "pantry": "Garde-manger"
+      "pantry": "Garde-manger",
+      "groupToggle": {
+        "flat": "Grouper par catégorie",
+        "grouped": "Vue liste"
+      }
     },
     "fresh": {
       "addButton": "Ajouter un frais",

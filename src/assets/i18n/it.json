@@ -668,7 +668,11 @@
     },
     "sections": {
       "fresh": "Freschi",
-      "pantry": "Dispensa"
+      "pantry": "Dispensa",
+      "groupToggle": {
+        "flat": "Raggruppa per categoria",
+        "grouped": "Vista lista"
+      }
     },
     "fresh": {
       "addButton": "Aggiungi fresco",

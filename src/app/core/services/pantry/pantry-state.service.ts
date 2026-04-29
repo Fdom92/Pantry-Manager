@@ -124,6 +124,11 @@ export class PantryStateService {
     this.pantryItemsState().filter(i => i.productType !== 'fresh')
   );
   readonly groups = computed(() => this.viewModel.buildGroups(this.despensaItems()));
+  readonly groupByCategory = signal(false);
+  toggleGroupByCategory(): void { this.groupByCategory.update(v => !v); }
+  readonly flatDespensaItems = computed(() =>
+    [...this.despensaItems()].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+  );
   readonly statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
   readonly basicOnly = computed(() => this.activeFilters().basic);
   readonly summary = computed<PantrySummaryMeta>(() => this.summarySnapshot());

@@ -668,7 +668,11 @@
     },
     "sections": {
       "fresh": "Frisches",
-      "pantry": "Vorratskammer"
+      "pantry": "Vorratskammer",
+      "groupToggle": {
+        "flat": "Nach Kategorie gruppieren",
+        "grouped": "Listenansicht"
+      }
     },
     "fresh": {
       "addButton": "Frisches hinzufügen",

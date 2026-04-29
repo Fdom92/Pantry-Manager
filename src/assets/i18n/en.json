@@ -669,7 +669,11 @@
     },
     "sections": {
       "fresh": "Fresh",
-      "pantry": "Pantry"
+      "pantry": "Pantry",
+      "groupToggle": {
+        "flat": "Group by category",
+        "grouped": "Flat list"
+      }
     },
     "fresh": {
       "addButton": "Add fresh item",

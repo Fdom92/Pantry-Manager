@@ -669,7 +669,11 @@
     },
     "sections": {
       "fresh": "Frescos",
-      "pantry": "Despensa"
+      "pantry": "Despensa",
+      "groupToggle": {
+        "flat": "Agrupar por categoría",
+        "grouped": "Vista plana"
+      }
     },
     "fresh": {
       "addButton": "Añadir fresco",
