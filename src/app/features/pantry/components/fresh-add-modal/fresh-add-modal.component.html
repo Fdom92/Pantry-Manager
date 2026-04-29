@@ -13,6 +13,8 @@
   [entries]="state.entryViewModels()"
   [showSecondaryInfo]="true"
   [showMeta]="false"
+  [showEntryDate]="false"
+  [showEntryQuantity]="false"
   [showAllOnFocus]="true"
   [autofocus]="true"
   [showEmptyAction]="state.showEmptyAction()"
@@ -24,22 +26,5 @@
   (queryChange)="state.onQueryChange($event)"
   (emptyAction)="state.addEntryFromQuery($event)"
   (adjustEntry)="state.adjustEntryById($event.entry.id, $event.delta)"
-  [showEntryNoExpiry]="true"
-  (entryDateChange)="state.setEntryDate($event.entry.id, $event.date)"
-  (entryNoExpiryToggle)="state.setEntryNoExpiry($event.entry.id)"
   (save)="state.submit()">
-
-  <div extras class="fresh-add-modal__keep">
-    <ion-item lines="none" class="fresh-add-modal__keep-item">
-      <ion-label>
-        <p class="fresh-add-modal__keep-label">{{ 'pantry.fresh.keepInStock' | translate }}</p>
-        <p class="fresh-add-modal__keep-hint">{{ 'pantry.fresh.keepInStockHint' | translate }}</p>
-      </ion-label>
-      <ion-toggle
-        slot="end"
-        [checked]="state.keepInStock()"
-        (ionChange)="state.toggleKeepInStock()">
-      </ion-toggle>
-    </ion-item>
-  </div>
 </app-entity-selector-modal>

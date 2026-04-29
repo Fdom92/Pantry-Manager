@@ -26,7 +26,6 @@ export class PantryFreshAddModalStateService {
   readonly isSubmitting = signal(false);
   readonly query = signal('');
   readonly entries = signal<AddEntry[]>([]);
-  readonly keepInStock = signal(false);
 
   readonly entryViewModels = computed<EntitySelectorEntry[]>(() =>
     this.entries().map(entry => ({
@@ -55,7 +54,6 @@ export class PantryFreshAddModalStateService {
   open(): void {
     this.entries.set([]);
     this.query.set('');
-    this.keepInStock.set(false);
     this.isOpen.set(true);
     this.isSubmitting.set(false);
   }
@@ -66,7 +64,6 @@ export class PantryFreshAddModalStateService {
     this.isSubmitting.set(false);
     this.entries.set([]);
     this.query.set('');
-    this.keepInStock.set(false);
   }
 
   dismiss(): void {
@@ -75,10 +72,6 @@ export class PantryFreshAddModalStateService {
 
   onQueryChange(value: string): void {
     this.query.set(value ?? '');
-  }
-
-  toggleKeepInStock(): void {
-    this.keepInStock.update(v => !v);
   }
 
   /** Selección de un item existente desde el autocomplete. */
@@ -147,31 +140,10 @@ export class PantryFreshAddModalStateService {
     });
   }
 
-  setEntryDate(entryId: string, date: string | undefined): void {
-    this.entries.update(current => {
-      const idx = current.findIndex(e => e.id === entryId);
-      if (idx < 0) return current;
-      const next = [...current];
-      next[idx] = { ...next[idx], expirationDate: date || undefined, noExpiry: date ? undefined : next[idx].noExpiry };
-      return next;
-    });
-  }
-
-  setEntryNoExpiry(entryId: string): void {
-    this.entries.update(current => {
-      const idx = current.findIndex(e => e.id === entryId);
-      if (idx < 0) return current;
-      const next = [...current];
-      const toggled = !next[idx].noExpiry;
-      next[idx] = { ...next[idx], noExpiry: toggled || undefined, expirationDate: toggled ? undefined : next[idx].expirationDate };
-      return next;
-    });
-  }
-
   /**
    * Submission. Cada entry se materializa así:
    * - isNew → crea PantryItem con productType='fresh', batch único qty=3 (Suficiente),
-   *           expirationDate del entry, minThreshold=1 si keepInStock global está activo.
+   *           expirationDate del entry, minThreshold=undefined.
    * - existing → sobrescribe el batch único del fresco (qty=3, fecha si proporcionada).
    *              Esto preserva la convención "fresco = 1 lote" en lugar de añadir nuevos lotes.
    */
@@ -182,7 +154,6 @@ export class PantryFreshAddModalStateService {
 
     await withSignalFlag(this.isSubmitting, async () => {
       const sessionId = entries.length > 1 ? createDocumentId('session') : undefined;
-      const minThreshold = this.keepInStock() ? 1 : undefined;
 
       for (const entry of entries) {
         const timestamp = new Date().toISOString();
@@ -199,7 +170,7 @@ export class PantryFreshAddModalStateService {
           const freshItem: PantryItem = {
             ...base,
             productType: 'fresh',
-            minThreshold,
+            minThreshold: undefined,
             isBasic: false,
           };
           await this.pantryStore.addItem(freshItem);
@@ -221,7 +192,7 @@ export class PantryFreshAddModalStateService {
         const updated: PantryItem = {
           ...existing,
           batches: [updatedBatch],
-          minThreshold: minThreshold ?? existing.minThreshold,
+          minThreshold: existing.minThreshold,
           updatedAt: timestamp,
         };
         await this.pantryStore.updateItem(updated);
