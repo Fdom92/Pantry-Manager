@@ -652,7 +652,9 @@
       "stockUpdatedSimple": "💾 Bestand aktualisiert.",
       “saved”: “💾 Änderungen gespeichert.”,
       “isBasicOn”: “⭐ Zur Einkaufsliste hinzugefügt”,
-      “isBasicOff”: “Von der Einkaufsliste entfernt”
+      “isBasicOff”: “Von der Einkaufsliste entfernt”,
+      “addedToList”: “🛒 Zur Einkaufsliste hinzugefügt”,
+      “multipleAdded”: “✅ {{count}} Produkte hinzugefügt”
     },
     “confirmDelete”: “„{{ name }}” löschen?”,
     "fab": {
@@ -747,7 +749,9 @@
       "toast": {
         "updated": "✓ Du hast es",
         "markedOut": "Aufgebraucht",
-        "keepInStock": "Wird zur Liste hinzugefügt, wenn aufgebraucht"
+        "keepInStock": "Wird zur Liste hinzugefügt, wenn aufgebraucht",
+        "addSuccess_one": "✅ {{name}} hinzugefügt",
+        "addSuccess_other": "✅ {{count}} Frischeprodukte hinzugefügt"
       }
     }
   },
@@ -992,8 +996,12 @@
       "body": "{{ count }} Produkte laufen ab, das nächste in {{ nearestDays }} Tagen"
     },
     "lowStock": {
-      "title": "Einige Vorräte werden knapp",
-      "body": "{{ count }} wichtige Produkte liegen unter deinem Minimum"
+      "title": "Basics werden knapp",
+      "body": "{{ count }} Basics müssen nachgekauft werden"
+    },
+    "reEngagement": {
+      "title": "Wie sieht's mit deinen Frischprodukten aus?",
+      "body": "Du hast dich ein paar Tage nicht eingeloggt. Kurz nachschauen und alles ist wieder aktuell."
     }
   },
   "sync": {

@@ -652,7 +652,9 @@
       "stockUpdatedSimple": "💾 Stock aggiornato.",
       "saved": "💾 Modifiche salvate.",
       "isBasicOn": "⭐ Aggiunto alla lista della spesa",
-      "isBasicOff": "Rimosso dalla lista della spesa"
+      "isBasicOff": "Rimosso dalla lista della spesa",
+      "addedToList": "🛒 Aggiunto alla lista della spesa",
+      "multipleAdded": "✅ {{count}} prodotti aggiunti"
     },
     "confirmDelete": "Eliminare \"{{ name }}\"?",
     "fab": {
@@ -747,7 +749,9 @@
       "toast": {
         "updated": "✓ Ce l'hai",
         "markedOut": "Esaurito",
-        "keepInStock": "Verrà aggiunto alla lista quando esaurito"
+        "keepInStock": "Verrà aggiunto alla lista quando esaurito",
+        "addSuccess_one": "✅ {{name}} aggiunto",
+        "addSuccess_other": "✅ {{count}} freschi aggiunti"
       }
     }
   },
@@ -992,8 +996,12 @@
       "body": "{{ count }} prodotti in scadenza, il più vicino tra {{ nearestDays }} giorni"
     },
     "lowStock": {
-      "title": "Alcune scorte stanno finendo",
-      "body": "{{ count }} prodotti essenziali sono sotto il minimo"
+      "title": "I tuoi essenziali stanno finendo",
+      "body": "{{ count }} essenziali hanno bisogno di essere riforniti"
+    },
+    "reEngagement": {
+      "title": "Come stanno i tuoi freschi?",
+      "body": "Sono passati alcuni giorni dall'ultima visita. Un momento per tenere tutto aggiornato."
     }
   },
   "sync": {

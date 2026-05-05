@@ -398,12 +398,17 @@ export class PantryStateService {
 
     await this.pantryStore.updateItem({ ...item, batches: updatedBatches });
 
-    const msgKey = state === 'none'
-      ? 'pantry.fresh.toast.markedOut'
-      : 'pantry.fresh.toast.updated';
+    let msgKey: string;
+    if (state === 'none' && item.isBasic) {
+      msgKey = 'pantry.toasts.addedToList';
+    } else if (state === 'none') {
+      msgKey = 'pantry.fresh.toast.markedOut';
+    } else {
+      msgKey = 'pantry.fresh.toast.updated';
+    }
     const toast = await this.toastCtrl.create({
       message: this.translate.instant(msgKey),
-      duration: 1200,
+      duration: 1500,
       position: 'bottom',
     });
     await toast.present();

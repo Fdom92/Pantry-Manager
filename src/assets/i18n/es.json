@@ -653,7 +653,9 @@
       "stockUpdatedSimple": "💾 Stock actualizado.",
       "saved": "💾 Cambios guardados.",
       "isBasicOn": "⭐ Aparecerá en tu lista de compra",
-      "isBasicOff": "Eliminado de la lista de compra"
+      "isBasicOff": "Eliminado de la lista de compra",
+      "addedToList": "🛒 Añadido a tu lista de compra",
+      "multipleAdded": "✅ {{count}} productos añadidos"
     },
     "confirmDelete": "¿Eliminar \"{{ name }}\"?",
     "fab": {
@@ -748,7 +750,9 @@
       "toast": {
         "updated": "✓ Lo tienes",
         "markedOut": "Agotado",
-        "keepInStock": "Se añadirá a tu lista cuando se acabe"
+        "keepInStock": "Se añadirá a tu lista cuando se acabe",
+        "addSuccess_one": "✅ {{name}} añadido",
+        "addSuccess_other": "✅ {{count}} frescos añadidos"
       }
     }
   },
@@ -993,8 +997,12 @@
       "body": "{{ count }} productos caducan, el primero en {{ nearestDays }} días"
     },
     "lowStock": {
-      "title": "Se te están acabando algunas cosas",
-      "body": "{{ count }} básicos están por debajo del mínimo que marcaste"
+      "title": "Se te están acabando básicos",
+      "body": "{{ count }} básicos necesitan reposición"
+    },
+    "reEngagement": {
+      "title": "¿Cómo van tus frescos?",
+      "body": "Hace unos días que no revisas la despensa. Solo un momento y tienes todo al día."
     }
   },
   "sync": {
