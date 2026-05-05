@@ -5,7 +5,7 @@ import {
 import { IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import type { PantryItem } from '@core/models/pantry';
-import { type FreshState, qtyToFreshState } from '@core/domain/pantry';
+import { type FreshState, isFreshKeepInStock, qtyToFreshState } from '@core/domain/pantry';
 
 @Component({
   selector: 'app-fresh-item-card',
@@ -19,10 +19,11 @@ export class FreshItemCardComponent implements OnChanges {
   @Input({ required: true }) item!: PantryItem;
   @Output() readonly stateChange = new EventEmitter<{ item: PantryItem; state: FreshState }>();
   @Output() readonly editRequested = new EventEmitter<PantryItem>();
+  @Output() readonly basicToggle = new EventEmitter<PantryItem>();
 
   readonly currentState = signal<FreshState>('none');
   readonly daysToExpiry = signal<number | null>(null);
-  readonly hasKeepInStock = signal(false);
+  readonly isBasic = signal(false);
 
   readonly isExpired = computed((): boolean => {
     const d = this.daysToExpiry();
@@ -61,7 +62,7 @@ export class FreshItemCardComponent implements OnChanges {
     } else {
       this.daysToExpiry.set(null);
     }
-    this.hasKeepInStock.set((this.item?.minThreshold ?? 0) >= 1);
+    this.isBasic.set(isFreshKeepInStock(this.item));
   }
 
   onStateSelected(state: FreshState): void {
@@ -71,6 +72,11 @@ export class FreshItemCardComponent implements OnChanges {
 
   onEdit(): void {
     this.editRequested.emit(this.item);
+  }
+
+  onBasicToggle(event: Event): void {
+    event.stopPropagation();
+    this.basicToggle.emit(this.item);
   }
 
   labelKey(state: FreshState): string {

@@ -125,8 +125,8 @@ export function computeTodaySuggestion(
 
     let total = urgency + (HOY_FOOD_TYPE_SCORE[type] ?? 0);
 
-    // Excepción: fresco agotado con keep-in-stock activo es señal genuina (te falta algo importante).
-    const isFreshOut = isFresh && stock === 0 && (item.minThreshold ?? 0) >= 1;
+    // Excepción: fresco agotado con isBasic activo es señal genuina (te falta algo importante).
+    const isFreshOut = isFresh && stock === 0 && item.isBasic === true;
     if (isFreshOut) total += FRESH_OUT_BONUS;
 
     return total;
@@ -141,12 +141,12 @@ export function computeTodaySuggestion(
     return d === null || d > 0;
   };
 
-  // minThreshold >= 1 encodes "keep in stock" for fresh items (set in fresh add/edit modals).
-  // Fresh item with zero stock but keep-in-stock active: a genuine "buy this today" signal.
+  // isBasic encodes "keep in stock" for fresh items.
+  // Fresh item with zero stock but isBasic active: a genuine "buy this today" signal.
   const isFreshOutCandidate = (item: PantryItem): boolean =>
     item.productType === 'fresh'
     && getStock(item) === 0
-    && (item.minThreshold ?? 0) >= 1;
+    && item.isBasic === true;
 
   const foodItems = allItems.filter(i => isFood(i) && (
     isFreshOutCandidate(i) || (hasStock(i) && hasDatedBatch(i) && isNotExpired(i))
@@ -197,7 +197,7 @@ export function computeTodaySuggestion(
   // reasonKey reflects actual urgency: very soon (≤2d), soon (3-5d), or coming up (6-15d)
   const isFreshProtagonist = protagonist.productType === 'fresh';
   const protagonistStock = getStock(protagonist);
-  const protagonistKeepInStock = (protagonist.minThreshold ?? 0) >= 1;
+  const protagonistKeepInStock = protagonist.isBasic === true;
 
   let reasonKey: string;
   if (isFreshProtagonist && protagonistStock === 0 && protagonistKeepInStock) {

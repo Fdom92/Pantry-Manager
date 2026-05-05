@@ -6,20 +6,6 @@
     padding-top: var(--app-theme-spacing-md);
   }
 
-  &__keep-label {
-    font-size: var(--app-theme-font-size-body);
-    font-weight: var(--app-theme-font-weight-bold);
-    color: var(--app-theme-text-color);
-    margin: 0 0 2px 0;
-  }
-
-  &__keep-hint {
-    font-size: 0.75rem;
-    color: var(--app-theme-text-muted);
-    margin: 0;
-    line-height: 1.4;
-  }
-
   &__segment {
     display: inline-flex;
     border-radius: 999px;
@@ -72,6 +58,17 @@
     flex-direction: column;
     gap: var(--app-theme-spacing-sm);
   }
+}
+
+.modal-footer ion-toolbar {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 12px;
+  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+.modal-footer ion-button {
+  width: 100%;
 }
 
 // form-section pattern (same visual as pantry edit modal)

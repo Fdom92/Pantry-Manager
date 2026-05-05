@@ -55,21 +55,9 @@
         <div class="form-section fresh-edit-modal__date-card">
           <app-quick-date-chips
             [emphasizedKeys]="['today', 'twoDays']"
+            [initialDate]="currentExpirationDate"
             (dateSelected)="onDateSelected($event)">
           </app-quick-date-chips>
-        </div>
-
-        <div class="form-section">
-          <ion-item lines="none">
-            <ion-label>
-              <p class="fresh-edit-modal__keep-label">{{ 'pantry.fresh.keepInStock' | translate }}</p>
-              <p class="fresh-edit-modal__keep-hint">{{ 'pantry.fresh.keepInStockHint' | translate }}</p>
-            </ion-label>
-            <ion-toggle
-              slot="end"
-              formControlName="keepInStock">
-            </ion-toggle>
-          </ion-item>
         </div>
 
       </form>
@@ -85,7 +73,7 @@
       </div>
     </ion-content>
 
-    <ion-footer>
+    <ion-footer class="modal-footer">
       <ion-toolbar>
         <ion-button
           expand="block"

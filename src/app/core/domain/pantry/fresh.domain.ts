@@ -14,6 +14,10 @@ export function freshStateToQty(state: FreshState): number {
   return FRESH_QTY[state];
 }
 
+export function isFreshKeepInStock(item: PantryItem): boolean {
+  return item.isBasic === true;
+}
+
 /**
  * Devuelve la fecha de caducidad más cercana a hoy entre los lotes con fecha.
  * Prefiere fechas futuras; si todas son pasadas, devuelve la más reciente.

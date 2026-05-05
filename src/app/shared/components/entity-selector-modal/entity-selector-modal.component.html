@@ -75,12 +75,20 @@
                       </ion-button>
                     }
                     @if (showEntryDate) {
-                      <app-expiry-picker
-                        [date]="entry.expirationDate"
-                        [noExpiry]="entry.noExpiry ?? false"
-                        (dateChange)="entryDateChange.emit({ entry, date: $event })"
-                        (noExpiryToggle)="entryNoExpiryToggle.emit({ entry })">
-                      </app-expiry-picker>
+                      @if (entryDateQuickOnly) {
+                        <app-quick-date-chips
+                          [emphasizedKeys]="['today', 'twoDays']"
+                          [initialDate]="entry.expirationDate"
+                          (dateSelected)="entryDateChange.emit({ entry, date: $event ?? undefined })">
+                        </app-quick-date-chips>
+                      } @else {
+                        <app-expiry-picker
+                          [date]="entry.expirationDate"
+                          [noExpiry]="entry.noExpiry ?? false"
+                          (dateChange)="entryDateChange.emit({ entry, date: $event })"
+                          (noExpiryToggle)="entryNoExpiryToggle.emit({ entry })">
+                        </app-expiry-picker>
+                      }
                     }
                   </div>
                 </div>

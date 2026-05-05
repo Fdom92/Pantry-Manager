@@ -1,10 +1,11 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { type FreshState, freshStateToQty, qtyToFreshState } from '@core/domain/pantry';
 import type { PantryItem } from '@core/models/pantry';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
@@ -15,7 +16,6 @@ export class PantryFreshEditModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly listState = inject(PantryStateService);
   private readonly translate = inject(TranslateService);
-  private readonly toastCtrl = inject(ToastController);
   private readonly alertCtrl = inject(AlertController);
   private readonly eventManager = inject(HistoryEventManagerService);
 
@@ -28,7 +28,6 @@ export class PantryFreshEditModalStateService {
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     expirationDate: this.fb.control<string | null>(null),
-    keepInStock: this.fb.control(false, { nonNullable: true }),
   });
 
   readonly canSave = computed(() => {
@@ -43,15 +42,6 @@ export class PantryFreshEditModalStateService {
       this.openEdit(request.item);
       this.listState.clearEditFreshItemModalRequest();
     });
-
-    this.form.get('keepInStock')!.valueChanges.subscribe(value => {
-      if (!value) return;
-      this.toastCtrl.create({
-        message: this.translate.instant('pantry.fresh.toast.keepInStock'),
-        duration: 2200,
-        position: 'bottom',
-      }).then(t => t.present());
-    });
   }
 
   openEdit(item: PantryItem): void {
@@ -65,7 +55,6 @@ export class PantryFreshEditModalStateService {
     this.form.reset({
       name: item.name ?? '',
       expirationDate: batch?.expirationDate ?? null,
-      keepInStock: (item.minThreshold ?? 0) >= 1,
     });
     this.isSaving.set(false);
     this.isOpen.set(true);
@@ -95,7 +84,7 @@ export class PantryFreshEditModalStateService {
 
     this.isSaving.set(true);
     try {
-      const { name, expirationDate, keepInStock } = this.form.value;
+      const { name, expirationDate } = this.form.value;
       const previousBatch = existing.batches?.[0];
       const updatedBatch = {
         batchId: previousBatch?.batchId ?? `batch-${Date.now()}`,
@@ -109,7 +98,6 @@ export class PantryFreshEditModalStateService {
         ...existing,
         name: normalizeTrim(name ?? existing.name),
         batches: [updatedBatch],
-        minThreshold: keepInStock ? 1 : undefined,
         updatedAt: new Date().toISOString(),
       };
       await this.pantryStore.updateItem(updated);
@@ -122,7 +110,6 @@ export class PantryFreshEditModalStateService {
     }
   }
 
-  /** Convierte el fresco actual a producto de despensa y cierra el modal. */
   async convertToPantry(): Promise<void> {
     const existing = this.editingItem();
     if (!existing) return;
@@ -134,12 +121,6 @@ export class PantryFreshEditModalStateService {
         updatedAt: new Date().toISOString(),
       };
       await this.pantryStore.updateItem(updated);
-      const toast = await this.toastCtrl.create({
-        message: this.translate.instant('pantry.fresh.convertToPantry.toast'),
-        duration: 1500,
-        position: 'bottom',
-      });
-      await toast.present();
       this.dismiss();
     } catch (err) {
       console.error('[PantryFreshEditModalStateService] convertToPantry error', err);

@@ -82,7 +82,8 @@
             <app-fresh-item-card
               [item]="item"
               (stateChange)="facade.setFreshState($event.item, $event.state)"
-              (editRequested)="facade.openEditModalFromSheet($event)">
+              (editRequested)="facade.openEditModalFromSheet($event)"
+              (basicToggle)="facade.toggleItemBasic($event)">
             </app-fresh-item-card>
           }
         </div>
@@ -181,6 +182,7 @@
                       class="virtual-item-card__detail"
                       [viewModel]="card"
                       (cardClicked)="facade.openQuantitySheet(item, $event)"
+                      (basicToggle)="facade.toggleItemBasic(item)"
                     ></app-pantry-detail>
                   </div>
                 }

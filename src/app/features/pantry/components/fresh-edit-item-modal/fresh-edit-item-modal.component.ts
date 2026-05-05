@@ -4,8 +4,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import {
   IonButton, IonButtons, IonContent, IonFooter, IonHeader,
-  IonIcon, IonInput, IonItem, IonLabel, IonModal, IonSpinner,
-  IonTitle, IonToggle, IonToolbar,
+  IonIcon, IonInput, IonItem, IonModal, IonSpinner,
+  IonTitle, IonToolbar,
 } from '@ionic/angular/standalone';
 import { QuickDateChipsComponent } from '@shared/components/quick-date-chips/quick-date-chips.component';
 import { PantryFreshEditModalStateService } from '@core/services/pantry/modals/pantry-fresh-edit-modal-state.service';
@@ -17,7 +17,7 @@ import type { FreshState } from '@core/domain/pantry';
   imports: [
     CommonModule, ReactiveFormsModule, TranslateModule,
     IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
-    IonContent, IonItem, IonInput, IonLabel, IonToggle, IonIcon,
+    IonContent, IonItem, IonInput, IonIcon,
     IonFooter, IonSpinner, QuickDateChipsComponent,
   ],
   templateUrl: './fresh-edit-item-modal.component.html',
@@ -30,6 +30,10 @@ export class FreshEditItemModalComponent {
 
   labelKey(state: FreshState): string {
     return `pantry.fresh.state.${state}`;
+  }
+
+  get currentExpirationDate(): string | null {
+    return this.state.form.get('expirationDate')?.value ?? null;
   }
 
   onStateClick(state: FreshState): void {

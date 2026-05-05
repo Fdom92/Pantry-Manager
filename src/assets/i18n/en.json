@@ -651,7 +651,9 @@
       "locationsUpdated": "📦 Locations updated: {{ breakdown }}.",
       "stockUpdated": "💾 Stock updated: {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Stock updated.",
-      "saved": "💾 Changes saved."
+      "saved": "💾 Changes saved.",
+      "isBasicOn": "⭐ Added to shopping list",
+      "isBasicOff": "Removed from shopping list"
     },
     "confirmDelete": "Delete \"{{ name }}\"?",
     "fab": {

@@ -8,9 +8,16 @@
     (keydown.enter)="onEdit()"
     (keydown.space)="$event.preventDefault(); onEdit()">
     <div class="fresh-item-card__name-row">
-      @if (hasKeepInStock()) {
-        <ion-icon class="fresh-item-card__keep-icon" name="star-outline"></ion-icon>
-      }
+      <ion-icon
+        class="fresh-item-card__keep-icon"
+        [name]="isBasic() ? 'star' : 'star-outline'"
+        [class.fresh-item-card__keep-icon--active]="isBasic()"
+        role="button"
+        tabindex="0"
+        (click)="onBasicToggle($event)"
+        (keydown.enter)="onBasicToggle($event)"
+        (keydown.space)="$event.preventDefault(); onBasicToggle($event)">
+      </ion-icon>
       <span class="fresh-item-card__name">{{ item.name }}</span>
     </div>
     @if (expiryLabel()) {

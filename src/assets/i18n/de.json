@@ -650,9 +650,11 @@
       "locationsUpdated": "📦 Standorte aktualisiert: {{ breakdown }}.",
       "stockUpdated": "💾 Bestand aktualisiert: {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Bestand aktualisiert.",
-      "saved": "💾 Änderungen gespeichert."
+      “saved”: “💾 Änderungen gespeichert.”,
+      “isBasicOn”: “⭐ Zur Einkaufsliste hinzugefügt”,
+      “isBasicOff”: “Von der Einkaufsliste entfernt”
     },
-    "confirmDelete": "„{{ name }}“ löschen?",
+    “confirmDelete”: “„{{ name }}” löschen?”,
     "fab": {
       "groupLabel": "Aktionen"
     },

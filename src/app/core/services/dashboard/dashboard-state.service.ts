@@ -132,6 +132,8 @@ export class DashboardStateService {
   readonly noExpiryDateCount = computed(() => {
     return this.pantryItems().filter(item => {
       if (item.isBasic) return false;
+      // Fresh items naturally lack precise dates — exclude from quality warnings
+      if (item.productType === 'fresh') return false;
       const hasBatchDate = item.batches?.some(b => !!b.expirationDate);
       const hasItemDate = !!item.expirationDate;
       if (hasBatchDate || hasItemDate) return false;

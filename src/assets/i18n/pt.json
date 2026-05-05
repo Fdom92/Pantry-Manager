@@ -650,7 +650,9 @@
       "locationsUpdated": "📦 Localizações atualizadas: {{ breakdown }}.",
       "stockUpdated": "💾 Stock atualizado: {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Stock atualizado.",
-      "saved": "💾 Alterações guardadas."
+      "saved": "💾 Alterações guardadas.",
+      "isBasicOn": "⭐ Adicionado à lista de compras",
+      "isBasicOff": "Removido da lista de compras"
     },
     "confirmDelete": "Eliminar \"{{ name }}\"?",
     "fab": {

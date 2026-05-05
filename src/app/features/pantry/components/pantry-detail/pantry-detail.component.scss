@@ -63,9 +63,22 @@
 }
 
 .basic-icon {
-  font-size: 18px;
-  color: var(--ion-color-warning);
+  font-size: 16px;
+  color: color-mix(in srgb, var(--ion-text-color) 25%, transparent);
   flex-shrink: 0;
+  cursor: pointer;
+  transition: color 0.15s, transform 0.1s;
+  padding: 4px;
+  margin: -4px;
+  border-radius: 50%;
+
+  &--active {
+    color: var(--ion-color-warning);
+  }
+
+  &:active {
+    transform: scale(0.85);
+  }
 }
 
 .item-name {

@@ -133,17 +133,6 @@ export class PantryFreshAddModalStateService {
     });
   }
 
-  setEntryNoExpiry(entryId: string): void {
-    this.entries.update(current => {
-      const idx = current.findIndex(e => e.id === entryId);
-      if (idx < 0) return current;
-      const next = [...current];
-      const toggled = !next[idx].noExpiry;
-      next[idx] = { ...next[idx], noExpiry: toggled || undefined, expirationDate: toggled ? undefined : next[idx].expirationDate };
-      return next;
-    });
-  }
-
   adjustEntryById(entryId: string, delta: number): void {
     const d = Number.isFinite(delta) ? delta : 0;
     if (!d) return;

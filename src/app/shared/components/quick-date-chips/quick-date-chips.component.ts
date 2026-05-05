@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from '@angular/core';
 import { IonChip } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -65,12 +65,22 @@ const CHIPS: DateChip[] = [
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QuickDateChipsComponent {
+export class QuickDateChipsComponent implements OnChanges {
   @Input() emphasizedKeys: string[] = [];
+  @Input() initialDate?: string | null;
   @Output() readonly dateSelected = new EventEmitter<string | null>();
 
   readonly chips = CHIPS;
   readonly selectedKey = signal<string | null>(null);
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['initialDate']) return;
+    const value = this.initialDate;
+    if (!value) { this.selectedKey.set(null); return; }
+    const dayOffset = Math.round((Date.parse(value) - Date.now()) / 86_400_000);
+    const match = CHIPS.find(c => c.offsetDays !== null && c.offsetDays === dayOffset);
+    this.selectedKey.set(match?.key ?? null);
+  }
 
   select(chip: DateChip): void {
     if (this.selectedKey() === chip.key) {
