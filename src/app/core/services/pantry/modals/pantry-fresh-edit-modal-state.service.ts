@@ -1,11 +1,10 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { type FreshState, freshStateToQty, qtyToFreshState } from '@core/domain/pantry';
 import type { PantryItem } from '@core/models/pantry';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
@@ -17,6 +16,7 @@ export class PantryFreshEditModalStateService {
   private readonly listState = inject(PantryStateService);
   private readonly translate = inject(TranslateService);
   private readonly alertCtrl = inject(AlertController);
+  private readonly toastCtrl = inject(ToastController);
   private readonly eventManager = inject(HistoryEventManagerService);
 
   readonly isOpen = signal(false);
@@ -103,6 +103,12 @@ export class PantryFreshEditModalStateService {
       await this.pantryStore.updateItem(updated);
       await this.eventManager.logAdvancedEdit(existing, updated);
       this.dismiss();
+      const toast = await this.toastCtrl.create({
+        message: this.translate.instant('pantry.toasts.saved'),
+        duration: 1200,
+        position: 'bottom',
+      });
+      void toast.present();
     } catch (err) {
       console.error('[PantryFreshEditModalStateService] save error', err);
     } finally {
@@ -122,6 +128,12 @@ export class PantryFreshEditModalStateService {
       };
       await this.pantryStore.updateItem(updated);
       this.dismiss();
+      const toast = await this.toastCtrl.create({
+        message: this.translate.instant('pantry.fresh.convertToPantry.toast'),
+        duration: 1200,
+        position: 'bottom',
+      });
+      void toast.present();
     } catch (err) {
       console.error('[PantryFreshEditModalStateService] convertToPantry error', err);
     } finally {
@@ -149,6 +161,12 @@ export class PantryFreshEditModalStateService {
     try {
       await this.pantryStore.deleteItem(existing._id);
       this.dismiss();
+      const toast = await this.toastCtrl.create({
+        message: this.translate.instant('pantry.toasts.deleted'),
+        duration: 1200,
+        position: 'bottom',
+      });
+      void toast.present();
     } catch (err) {
       console.error('[PantryFreshEditModalStateService] deleteItem error', err);
     } finally {

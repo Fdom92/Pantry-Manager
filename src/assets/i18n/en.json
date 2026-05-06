@@ -653,7 +653,9 @@
       "stockUpdatedSimple": "💾 Stock updated.",
       "saved": "💾 Changes saved.",
       "isBasicOn": "⭐ Added to shopping list",
-      "isBasicOff": "Removed from shopping list"
+      "isBasicOff": "Removed from shopping list",
+      "addedToList": "🛒 Added to your shopping list",
+      "multipleAdded": "✅ {{count}} items added"
     },
     "confirmDelete": "Delete \"{{ name }}\"?",
     "fab": {
@@ -748,7 +750,9 @@
       "toast": {
         "updated": "✓ You have it",
         "markedOut": "Out of stock",
-        "keepInStock": "Will be added to your list when you run out"
+        "keepInStock": "Will be added to your list when you run out",
+        "addSuccess_one": "✅ {{name}} added",
+        "addSuccess_other": "✅ {{count}} fresh items added"
       }
     }
   },
@@ -993,8 +997,12 @@
       "body": "{{ count }} items expiring, the nearest in {{ nearestDays }} days"
     },
     "lowStock": {
-      "title": "Running low on some essentials",
-      "body": "{{ count }} of your staples are getting low"
+      "title": "Running low on essentials",
+      "body": "{{ count }} staples need restocking"
+    },
+    "reEngagement": {
+      "title": "How are your fresh items doing?",
+      "body": "It's been a few days since you checked the pantry. Just a moment to keep everything up to date."
     }
   },
   "sync": {

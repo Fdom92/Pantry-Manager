@@ -3,6 +3,7 @@ import { buildAddItemPayload } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete, createDocumentId, withSignalFlag } from '@core/utils';
 import { dedupeByNormalizedKey, formatFriendlyName, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
+import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
@@ -19,6 +20,7 @@ import { PantryStoreService } from '../pantry-store.service';
 export class PantryFreshAddModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly translate = inject(TranslateService);
+  private readonly toastCtrl = inject(ToastController);
   private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
 
@@ -209,6 +211,11 @@ export class PantryFreshAddModalStateService {
         await this.eventManager.logAddExistingItem(existing, updated, 3, entry.expirationDate, sessionId, timestamp);
       }
       this.dismiss();
+      const msg = entries.length === 1
+        ? this.translate.instant('pantry.fresh.toast.addSuccess_one', { name: entries[0].name })
+        : this.translate.instant('pantry.fresh.toast.addSuccess_other', { count: entries.length });
+      const toast = await this.toastCtrl.create({ message: msg, duration: 1500, position: 'bottom' });
+      void toast.present();
     }).catch(err => console.error('[PantryFreshAddModalStateService] submit error', err));
   }
 

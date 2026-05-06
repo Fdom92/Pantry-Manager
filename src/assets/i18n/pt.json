@@ -652,7 +652,9 @@
       "stockUpdatedSimple": "💾 Stock atualizado.",
       "saved": "💾 Alterações guardadas.",
       "isBasicOn": "⭐ Adicionado à lista de compras",
-      "isBasicOff": "Removido da lista de compras"
+      "isBasicOff": "Removido da lista de compras",
+      "addedToList": "🛒 Adicionado à lista de compras",
+      "multipleAdded": "✅ {{count}} produtos adicionados"
     },
     "confirmDelete": "Eliminar \"{{ name }}\"?",
     "fab": {
@@ -747,7 +749,9 @@
       "toast": {
         "updated": "✓ Tens",
         "markedOut": "Esgotado",
-        "keepInStock": "Será adicionado à lista quando acabar"
+        "keepInStock": "Será adicionado à lista quando acabar",
+        "addSuccess_one": "✅ {{name}} adicionado",
+        "addSuccess_other": "✅ {{count}} frescos adicionados"
       }
     }
   },
@@ -992,8 +996,12 @@
       "body": "{{ count }} produtos vencem, o mais próximo em {{ nearestDays }} dias"
     },
     "lowStock": {
-      "title": "Alguns itens essenciais estão acabando",
-      "body": "{{ count }} itens essenciais estão abaixo do mínimo"
+      "title": "Básicos a acabar",
+      "body": "{{ count }} básicos precisam de ser repostos"
+    },
+    "reEngagement": {
+      "title": "Como estão os seus frescos?",
+      "body": "Já faz alguns dias que não abre a app. Um momento para manter tudo atualizado."
     }
   },
   "sync": {

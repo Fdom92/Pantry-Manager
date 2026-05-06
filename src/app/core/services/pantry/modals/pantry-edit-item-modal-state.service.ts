@@ -241,6 +241,12 @@ export class PantryEditItemModalStateService {
         await this.eventManager.logAdvancedEdit(existing, item);
       }
       this.dismiss();
+      const toast = await this.toastCtrl.create({
+        message: this.translate.instant('pantry.toasts.saved'),
+        duration: 1200,
+        position: 'bottom',
+      });
+      void toast.present();
     } catch (err) {
       this.isSaving.set(false);
       console.error('[PantryEditItemModalStateService] submitItem error', err);

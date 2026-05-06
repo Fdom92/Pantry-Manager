@@ -23,11 +23,16 @@ export class PantryDetailComponent {
   @Output() basicToggle = new EventEmitter<void>();
 
   handleCardClick(event?: Event): void {
+    // ion-card[button] may fire even after stopPropagation on child elements.
+    // Guard against clicks originating from the star icon.
+    const target = event?.target as HTMLElement | null;
+    if (target?.closest('.basic-icon')) return;
     this.cardClicked.emit(event);
   }
 
   onBasicToggle(event: Event): void {
     event.stopPropagation();
+    event.stopImmediatePropagation();
     this.basicToggle.emit();
   }
 }

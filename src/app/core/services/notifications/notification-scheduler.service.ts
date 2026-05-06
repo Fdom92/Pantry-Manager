@@ -1,9 +1,13 @@
 import { Injectable, effect, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { NotificationContext, ScheduledNotification } from '@core/models/notifications';
+import { NOTIFICATION_IDS } from '@core/constants';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
+import { PantryService } from '@core/services/pantry/pantry.service';
 import { NotificationRegistryService } from './notification-registry.service';
 import { NotificationPermissionService } from './notification-permission.service';
 import { CapacitorNotificationPlugin } from './capacitor-notification.plugin';
@@ -15,19 +19,39 @@ export class NotificationSchedulerService {
   private readonly plugin = inject(CapacitorNotificationPlugin);
   private readonly preferencesService = inject(SettingsPreferencesService);
   private readonly pantryStore = inject(PantryStoreService);
+  private readonly pantryService = inject(PantryService);
+  private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
 
   private isScheduling = false;
 
   constructor() {
-    // React to any notification preference change so the schedule stays in sync
-    // even if the user changes settings without reopening the app before the
-    // scheduled notification fires (scenarios #4 and #5).
     effect(() => {
-      this.preferencesService.preferences(); // track dependency
-      this.pantryStore.loadedProducts();     // track dependency — re-run once products load from storage
+      this.preferencesService.preferences();
+      this.pantryStore.loadedProducts();
       void this.scheduleAll();
     });
+
+    if (Capacitor.isNativePlatform()) {
+      void LocalNotifications.addListener('localNotificationActionPerformed', action => {
+        void this.handleNotificationTap(action.notification.id);
+      });
+    }
+  }
+
+  private async handleNotificationTap(id: number): Promise<void> {
+    switch (id) {
+      case NOTIFICATION_IDS.EXPIRED_ITEMS:
+        this.pantryService.setPendingNavigationPreset({ expired: true });
+        break;
+      case NOTIFICATION_IDS.NEAR_EXPIRY:
+        this.pantryService.setPendingNavigationPreset({ expiring: true });
+        break;
+      case NOTIFICATION_IDS.LOW_STOCK:
+        this.pantryService.setPendingNavigationPreset({ lowStock: true });
+        break;
+    }
+    await this.navCtrl.navigateRoot('/pantry');
   }
 
   /**

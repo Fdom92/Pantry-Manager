@@ -652,7 +652,9 @@
       "stockUpdatedSimple": "💾 Stock mis à jour.",
       "saved": "💾 Modifications enregistrées.",
       "isBasicOn": "⭐ Ajouté à la liste de courses",
-      "isBasicOff": "Retiré de la liste de courses"
+      "isBasicOff": "Retiré de la liste de courses",
+      "addedToList": "🛒 Ajouté à ta liste de courses",
+      "multipleAdded": "✅ {{count}} produits ajoutés"
     },
     "confirmDelete": "Supprimer \"{{ name }}\" ?",
     "fab": {
@@ -747,7 +749,9 @@
       "toast": {
         "updated": "✓ Tu l'as",
         "markedOut": "Épuisé",
-        "keepInStock": "Sera ajouté à ta liste quand tu en manqueras"
+        "keepInStock": "Sera ajouté à ta liste quand tu en manqueras",
+        "addSuccess_one": "✅ {{name}} ajouté",
+        "addSuccess_other": "✅ {{count}} produits frais ajoutés"
       }
     }
   },
@@ -992,8 +996,12 @@
       "body": "{{ count }} produits expirent, le plus proche dans {{ nearestDays }} jours"
     },
     "lowStock": {
-      "title": "Certains essentiels sont presque épuisés",
-      "body": "{{ count }} produits essentiels sont en dessous du minimum"
+      "title": "Des essentiels manquent",
+      "body": "{{ count }} produits essentiels ont besoin d'être réapprovisionnés"
+    },
+    "reEngagement": {
+      "title": "Comment vont tes produits frais ?",
+      "body": "Quelques jours sans ouvrir l'app. Un instant suffit pour tout remettre à jour."
     }
   },
   "sync": {

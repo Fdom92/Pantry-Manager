@@ -3,6 +3,7 @@ import type { NotificationDefinition } from '@core/models/notifications';
 import { ExpiredItemsNotification } from './definitions/expired-items.notification';
 import { NearExpiryNotification } from './definitions/near-expiry.notification';
 import { LowStockNotification } from './definitions/low-stock.notification';
+import { ReEngagementNotification } from './definitions/re-engagement.notification';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationRegistryService {
@@ -10,6 +11,7 @@ export class NotificationRegistryService {
     new ExpiredItemsNotification(),
     new NearExpiryNotification(),
     new LowStockNotification(),
+    new ReEngagementNotification(),
   ];
 
   getAll(): readonly NotificationDefinition[] {
