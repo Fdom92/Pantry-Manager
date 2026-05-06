@@ -582,6 +582,11 @@
       "earliest": "Läuft zuerst ab: {{ date }}",
       "noBatches": "Keine Chargen erfasst.",
       "noExpiry": "Kein Ablaufdatum",
+      "subinfo": {
+        "expired": "Abgelaufen",
+        "tomorrow": "Läuft morgen ab",
+        "inDays": "Läuft in {{count}} Tagen ab"
+      },
       "quantity": {
         "single": "{{ quantity }} Einheit",
         "plural": "{{ quantity }} Einheiten"

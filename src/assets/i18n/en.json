@@ -582,6 +582,11 @@
       "earliest": "Expires first: {{ date }}",
       "noBatches": "No batches recorded.",
       "noExpiry": "No expiration",
+      "subinfo": {
+        "expired": "Expired",
+        "tomorrow": "Expires tomorrow",
+        "inDays": "Expires in {{count}} days"
+      },
       "quantity": {
         "single": "{{ quantity }} unit",
         "plural": "{{ quantity }} units"

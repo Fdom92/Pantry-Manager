@@ -582,6 +582,11 @@
       "earliest": "Scade per primo: {{ date }}",
       "noBatches": "Nessun lotto registrato.",
       "noExpiry": "Nessuna scadenza",
+      "subinfo": {
+        "expired": "Scaduto",
+        "tomorrow": "Scade domani",
+        "inDays": "Scade tra {{count}} giorni"
+      },
       "quantity": {
         "single": "{{ quantity }} unità",
         "plural": "{{ quantity }} unità"

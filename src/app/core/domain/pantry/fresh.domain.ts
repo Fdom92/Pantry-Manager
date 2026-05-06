@@ -2,6 +2,10 @@ import type { ItemBatch, PantryItem } from '@core/models/pantry';
 
 export const FRESH_QTY = { sufficient: 3, low: 1, none: 0 } as const;
 
+// Fresh items have estimated dates (max 2 weeks). Use a tighter near-expiry window
+// so only truly urgent items (matching the card's "Pronto" label) trigger the filter.
+export const FRESH_NEAR_EXPIRY_WINDOW_DAYS = 3;
+
 export type FreshState = 'sufficient' | 'low' | 'none';
 
 export function qtyToFreshState(qty: number): FreshState {

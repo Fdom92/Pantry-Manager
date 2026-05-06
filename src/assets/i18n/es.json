@@ -582,6 +582,11 @@
       "earliest": "Caduca primero: {{ date }}",
       "noBatches": "Sin lotes registrados.",
       "noExpiry": "Sin caducidad",
+      "subinfo": {
+        "expired": "Caducado",
+        "tomorrow": "Caduca mañana",
+        "inDays": "Caduca en {{count}} días"
+      },
       "quantity": {
         "single": "{{ quantity }} unidad",
         "plural": "{{ quantity }} unidades"

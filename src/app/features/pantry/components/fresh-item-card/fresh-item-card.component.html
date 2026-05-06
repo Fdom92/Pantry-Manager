@@ -1,4 +1,4 @@
-<div class="fresh-item-card">
+<div class="fresh-item-card" [attr.data-bar]="barStatus()">
   <div
     class="fresh-item-card__info"
     [attr.data-expired]="isExpired() || null"

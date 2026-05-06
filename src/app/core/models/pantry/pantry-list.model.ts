@@ -93,6 +93,7 @@ export interface PantryItemCardViewModel {
   colorClass: string;
   formattedEarliestExpirationLong: string;
   batchCountsLabel: string;
+  subinfo: string;
   batches: PantryItemBatchViewModel[];
 }
 

@@ -245,6 +245,7 @@ export class PantryViewModelService {
       colorClass,
       formattedEarliestExpirationLong,
       batchCountsLabel: aggregates.batchSummaryLabel,
+      subinfo: this.buildSubinfo(aggregates.status.state, aggregates.earliestDate, formattedEarliestExpirationLong, aggregates.batchSummaryLabel),
       batches,
     };
   }
@@ -381,6 +382,22 @@ export class PantryViewModelService {
     }
     const time = new Date(batch.expirationDate).getTime();
     return Number.isFinite(time) ? time : null;
+  }
+
+  private buildSubinfo(state: ProductStatusState, earliestDate: string | null, formattedDate: string, quantityLabel: string): string {
+    const expiry = this.buildExpiryPart(state, earliestDate, formattedDate);
+    return expiry ? `${expiry} · ${quantityLabel}` : quantityLabel;
+  }
+
+  private buildExpiryPart(state: ProductStatusState, earliestDate: string | null, formattedDate: string): string {
+    if (!earliestDate) return this.translate.instant('pantry.detail.noExpiry');
+    if (state === 'expired') return this.translate.instant('pantry.detail.subinfo.expired');
+    const days = Math.ceil((Date.parse(earliestDate) - Date.now()) / 86_400_000);
+    if (days <= 0) return this.translate.instant('pantry.detail.subinfo.expired');
+    if (days === 1) return this.translate.instant('pantry.detail.subinfo.tomorrow');
+    // Within 7 days: show relative urgency. Beyond: show the date-fns formatted date.
+    if (days <= 7) return this.translate.instant('pantry.detail.subinfo.inDays', { count: days });
+    return formattedDate;
   }
 
   private buildQuantityLabel(totalQuantity: number): string {

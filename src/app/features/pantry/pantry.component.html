@@ -182,7 +182,7 @@
                       class="virtual-item-card__detail"
                       [viewModel]="card"
                       (cardClicked)="facade.openQuantitySheet(item, $event)"
-                      (basicToggle)="facade.toggleItemBasic(item)"
+                      (basicToggle)="facade.toggleItemBasic($event)"
                     ></app-pantry-detail>
                   </div>
                 }
@@ -200,6 +200,7 @@
                   class="virtual-item-card__detail"
                   [viewModel]="card"
                   (cardClicked)="facade.openQuantitySheet(item, $event)"
+                  (basicToggle)="facade.toggleItemBasic($event)"
                 ></app-pantry-detail>
               </div>
             }

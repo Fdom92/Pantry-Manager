@@ -2,10 +2,26 @@
   display: flex;
   align-items: center;
   gap: var(--app-theme-spacing-md);
-  padding: 8px var(--app-theme-spacing-md);
+  padding: 8px var(--app-theme-spacing-md) 8px 20px;
   border-radius: var(--app-theme-card-border-radius);
   background: var(--app-theme-card-bg);
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--fresh-bar, transparent);
+    pointer-events: none;
+  }
+
+  &[data-bar='expired']  { --fresh-bar: var(--ion-color-danger); }
+  &[data-bar='warning']  { --fresh-bar: var(--ion-color-warning); }
+  &[data-bar='empty']    { --fresh-bar: var(--ion-color-medium); }
+  &[data-bar='normal']   { --fresh-bar: transparent; }
 
   &__info {
     flex: 1;
