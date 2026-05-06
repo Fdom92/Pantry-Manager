@@ -55,7 +55,8 @@
       "edit": "Modifica",
       "apply": "Applica",
       "clear": "Pulisci",
-      "next": "Avanti"
+      "next": "Avanti",
+      "delete": "Elimina"
     },
     "loading": "Caricamento…",
     "dates": {
@@ -162,13 +163,16 @@
         "expiringsoon": "Scade molto presto — usalo oggi",
         "expirestoday": "Scade presto — inizia a pensare di usarlo",
         "lowstock": "Ne rimane poco — aggiungilo alla lista della spesa",
-        "expiringlater": "Scade nei prossimi giorni — inizia a pensarci"
+        "expiringlater": "Scade nei prossimi giorni — inizia a pensarci",
+        "freshExpiring": "Il tuo {{name}} scade presto.",
+        "freshOut": "{{name}} è finito."
       },
       "combine": "Scade presto anche:",
       "cta": {
         "primary": "Usalo oggi",
         "restock": "Vai alla lista della spesa",
-        "dismiss": "Non ora"
+        "dismiss": "Non ora",
+        "markFreshOut": "Non ce l'ho più"
       },
       "expiry": {
         "today": "Scade oggi",
@@ -646,7 +650,9 @@
       "locationsUpdated": "📦 Posizioni aggiornate: {{ breakdown }}.",
       "stockUpdated": "💾 Stock aggiornato: {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Stock aggiornato.",
-      "saved": "💾 Modifiche salvate."
+      "saved": "💾 Modifiche salvate.",
+      "isBasicOn": "⭐ Aggiunto alla lista della spesa",
+      "isBasicOff": "Rimosso dalla lista della spesa"
     },
     "confirmDelete": "Eliminare \"{{ name }}\"?",
     "fab": {
@@ -661,6 +667,88 @@
       "noResults": "Nessun risultato",
       "empty": "Nessun articolo aggiunto.",
       "submit": "Registra consumo"
+    },
+    "sections": {
+      "fresh": "Freschi",
+      "pantry": "Dispensa",
+      "groupToggle": {
+        "flat": "Raggruppa per categoria",
+        "grouped": "Vista lista"
+      }
+    },
+    "fresh": {
+      "addButton": "Aggiungi fresco",
+      "showMore": "Vedi tutti ({{ count }})",
+      "showLess": "Vedi meno",
+      "emptyState": {
+        "title": "Quello che usi ogni giorno",
+        "subtitle": "Segnalo in secondi",
+        "cta": "+ Aggiungi freschi"
+      },
+      "keepInStock": "Rifornisci automaticamente",
+      "keepInStockHint": "Riapparirà quando lo segni come esaurito",
+      "addModal": {
+        "title": "Nuovo fresco",
+        "namePlaceholder": "Nome del prodotto",
+        "whenExpires": "Quando scade?",
+        "submit": "Aggiungi",
+        "cardTitle": "Aggiungi frescos veloce",
+        "subtitle": "Scegli o crea un fresco.",
+        "placeholder": "Cerca fresco",
+        "noResults": "Nessun risultato",
+        "empty": "Niente aggiunto."
+      },
+      "state": {
+        "label": "Stato",
+        "sufficient": "Sufficiente",
+        "low": "Poco",
+        "none": "Niente"
+      },
+      "quickDate": {
+        "today": "Oggi",
+        "twoDays": "2 giorni",
+        "fiveDays": "5 giorni",
+        "oneWeek": "1 settimana",
+        "twoWeeks": "2 settimane",
+        "noDate": "Senza data"
+      },
+      "card": {
+        "expired": "Scaduto",
+        "today": "Oggi",
+        "tomorrow": "Domani",
+        "soon": "Presto"
+      },
+      "editModal": {
+        "title": "Modifica fresco",
+        "stateLabel": "Quanto ne resta?",
+        "deleteConfirm": {
+          "title": "Elimina prodotto",
+          "message": "Eliminare {{ name }}? Operazione irreversibile."
+        }
+      },
+      "convertToPantry": {
+        "button": "Sposta in dispensa",
+        "toast": "Spostato in dispensa"
+      },
+      "convertToFresh": {
+        "button": "Sposta in frescos",
+        "toast": "Spostato in frescos",
+        "dialog": {
+          "title": "Sposta in frescos",
+          "bodySingle": "Sarà così:\n· Stato: {{state}} ({{total}} unità)\n· Scade: {{date}}",
+          "bodyMulti": "Il tuo prodotto ha {{batches}} lotti ({{total}} unità). Saranno uniti in uno:\n· Stato: {{state}}\n· Scade: {{date}}",
+          "locationsLost": "Le posizioni andranno perse.",
+          "confirm": "Sposta"
+        }
+      },
+      "empty": {
+        "filters": "Nessun fresco corrisponde ai filtri."
+      },
+      "toast": {
+        "updated": "✓ Ce l'hai",
+        "markedOut": "Esaurito",
+        "keepInStock": "Verrà aggiunto alla lista quando esaurito"
+      }
     }
   },
   "upgrade": {

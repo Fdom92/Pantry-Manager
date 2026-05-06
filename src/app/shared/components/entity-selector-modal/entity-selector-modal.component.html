@@ -47,30 +47,48 @@
                 <div class="entity-selector-item">
                   <h3 class="entity-selector-item-name">{{ entry.title }}</h3>
                   <div class="entity-selector-controls">
-                    <div class="entity-selector-quantity">
+                    @if (showEntryQuantity) {
+                      <div class="entity-selector-quantity">
+                        <ion-button
+                          fill="clear"
+                          size="small"
+                          [disabled]="entry.quantity <= 0"
+                          (click)="adjustEntry.emit({ entry, delta: -1 })">
+                          <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+                        </ion-button>
+                        <ion-text class="entity-selector-qty">{{ entry.quantity }}</ion-text>
+                        <ion-button
+                          fill="clear"
+                          size="small"
+                          [disabled]="!canIncrease(entry)"
+                          (click)="adjustEntry.emit({ entry, delta: 1 })">
+                          <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                        </ion-button>
+                      </div>
+                    } @else {
                       <ion-button
                         fill="clear"
                         size="small"
-                        [disabled]="entry.quantity <= 0"
+                        color="medium"
                         (click)="adjustEntry.emit({ entry, delta: -1 })">
-                        <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+                        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
                       </ion-button>
-                      <ion-text class="entity-selector-qty">{{ entry.quantity }}</ion-text>
-                      <ion-button
-                        fill="clear"
-                        size="small"
-                        [disabled]="!canIncrease(entry)"
-                        (click)="adjustEntry.emit({ entry, delta: 1 })">
-                        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-                      </ion-button>
-                    </div>
+                    }
                     @if (showEntryDate) {
-                      <app-expiry-picker
-                        [date]="entry.expirationDate"
-                        [noExpiry]="entry.noExpiry ?? false"
-                        (dateChange)="entryDateChange.emit({ entry, date: $event })"
-                        (noExpiryToggle)="entryNoExpiryToggle.emit({ entry })">
-                      </app-expiry-picker>
+                      @if (entryDateQuickOnly) {
+                        <app-quick-date-chips
+                          [emphasizedKeys]="['today', 'twoDays']"
+                          [initialDate]="entry.expirationDate"
+                          (dateSelected)="entryDateChange.emit({ entry, date: $event ?? undefined })">
+                        </app-quick-date-chips>
+                      } @else {
+                        <app-expiry-picker
+                          [date]="entry.expirationDate"
+                          [noExpiry]="entry.noExpiry ?? false"
+                          (dateChange)="entryDateChange.emit({ entry, date: $event })"
+                          (noExpiryToggle)="entryNoExpiryToggle.emit({ entry })">
+                        </app-expiry-picker>
+                      }
                     }
                   </div>
                 </div>
@@ -84,6 +102,9 @@
         </div>
       </div>
     </ion-content>
+    <div class="entity-selector-modal__extras">
+      <ng-content select="[extras]"></ng-content>
+    </div>
     <ion-footer class="modal-footer">
       <ion-toolbar>
         <ion-button

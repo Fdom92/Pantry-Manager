@@ -1,0 +1,26 @@
+.fresh-add-modal {
+  &__keep {
+    padding: 0 16px 12px;
+  }
+
+  &__keep-item {
+    --background: var(--app-theme-card-bg);
+    --border-radius: var(--app-theme-card-border-radius);
+    border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+    border-radius: var(--app-theme-card-border-radius);
+  }
+
+  &__keep-label {
+    font-size: var(--app-theme-font-size-body);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+    margin: 0 0 2px 0;
+  }
+
+  &__keep-hint {
+    font-size: 0.75rem;
+    color: var(--app-theme-text-muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+}

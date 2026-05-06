@@ -1,8 +1,9 @@
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { AlertController, ToastController } from '@ionic/angular';
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
-import { buildUniqueSelectOptions, formatSupermarketLabel, hasMeaningfulItemChanges } from '@core/utils';
+import { buildUniqueSelectOptions, createDocumentId, formatSupermarketLabel, hasMeaningfulItemChanges } from '@core/utils';
 import {
   formatFriendlyName,
   normalizeCategoryId,
@@ -16,6 +17,7 @@ import { HistoryEventManagerService } from '../../history/history-event-manager.
 import { CatalogOptionsService, SettingsPreferencesService } from '../../settings';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
+import { buildConvertToFreshPreview, consolidateBatchesForFresh } from '@core/domain/pantry';
 
 @Injectable()
 export class PantryEditItemModalStateService {
@@ -26,6 +28,8 @@ export class PantryEditItemModalStateService {
   private readonly translate = inject(TranslateService);
   private readonly listState = inject(PantryStateService);
   private readonly eventManager = inject(HistoryEventManagerService);
+  private readonly alertCtrl = inject(AlertController);
+  private readonly toastCtrl = inject(ToastController);
 
   readonly isOpen = signal(false);
   readonly isSaving = signal(false);
@@ -240,6 +244,73 @@ export class PantryEditItemModalStateService {
     } catch (err) {
       this.isSaving.set(false);
       console.error('[PantryEditItemModalStateService] submitItem error', err);
+    }
+  }
+
+  async convertToFresh(): Promise<void> {
+    const existing = this.editingItem();
+    if (!existing || existing.productType === 'fresh') return;
+
+    const preview = buildConvertToFreshPreview(existing);
+
+    const stateLabel = this.translate.instant(`pantry.fresh.state.${preview.resultingState}`);
+    const dateLabel = preview.resultingExpiration
+      ? new Date(preview.resultingExpiration).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })
+      : this.translate.instant('common.dates.none');
+
+    const titleKey = 'pantry.fresh.convertToFresh.dialog.title';
+    const bodyKey = preview.hadMultipleBatches
+      ? 'pantry.fresh.convertToFresh.dialog.bodyMulti'
+      : 'pantry.fresh.convertToFresh.dialog.bodySingle';
+    const locationsLineKey = 'pantry.fresh.convertToFresh.dialog.locationsLost';
+
+    const bodyParams = {
+      batches: preview.batchesCount,
+      total: preview.totalQty,
+      state: stateLabel,
+      date: dateLabel,
+    };
+    let message = this.translate.instant(bodyKey, bodyParams);
+    if (preview.hadLocations) {
+      message += '\n\n' + this.translate.instant(locationsLineKey);
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: this.translate.instant(titleKey),
+      message,
+      buttons: [
+        { text: this.translate.instant('common.actions.cancel'), role: 'cancel' },
+        {
+          text: this.translate.instant('pantry.fresh.convertToFresh.dialog.confirm'),
+          role: 'confirm',
+        },
+      ],
+    });
+    await alert.present();
+    const result = await alert.onDidDismiss();
+    if (result.role !== 'confirm') return;
+
+    this.isSaving.set(true);
+    try {
+      const newBatch = consolidateBatchesForFresh(existing.batches ?? [], createDocumentId('batch'));
+      const updated = {
+        ...existing,
+        productType: 'fresh' as const,
+        batches: [newBatch],
+        updatedAt: new Date().toISOString(),
+      };
+      await this.pantryStore.updateItem(updated);
+      const toast = await this.toastCtrl.create({
+        message: this.translate.instant('pantry.fresh.convertToFresh.toast'),
+        duration: 1500,
+        position: 'bottom',
+      });
+      await toast.present();
+      this.dismiss();
+    } catch (err) {
+      console.error('[PantryEditItemModalStateService] convertToFresh error', err);
+    } finally {
+      this.isSaving.set(false);
     }
   }
 

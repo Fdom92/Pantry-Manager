@@ -20,9 +20,14 @@ import { TranslateModule } from '@ngx-translate/core';
 export class PantryDetailComponent {
   @Input({ required: true }) viewModel!: PantryItemCardViewModel;
   @Output() cardClicked = new EventEmitter<Event | undefined>();
+  @Output() basicToggle = new EventEmitter<void>();
 
   handleCardClick(event?: Event): void {
     this.cardClicked.emit(event);
   }
 
+  onBasicToggle(event: Event): void {
+    event.stopPropagation();
+    this.basicToggle.emit();
+  }
 }

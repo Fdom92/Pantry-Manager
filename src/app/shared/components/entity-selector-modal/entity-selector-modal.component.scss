@@ -111,3 +111,7 @@ ion-modal::part(content) {
 .modal-footer ion-button {
   width: 100%;
 }
+
+.entity-selector-modal__extras:empty {
+  display: none;
+}

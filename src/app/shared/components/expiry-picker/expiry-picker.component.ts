@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject
 import { LanguageService } from '@core/services/shared/language.service';
 import { IonChip, IonContent, IonIcon, IonLabel, IonModal } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
+import { QuickDateChipsComponent } from '../quick-date-chips/quick-date-chips.component';
 
 /**
  * Combined expiry picker: a single chip showing the current date/no-expiry state.
@@ -17,7 +18,7 @@ import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-expiry-picker',
   standalone: true,
-  imports: [IonChip, IonLabel, IonIcon, IonModal, IonContent, TranslateModule],
+  imports: [IonChip, IonLabel, IonIcon, IonModal, IonContent, TranslateModule, QuickDateChipsComponent],
   template: `
     <ion-chip
       class="expiry-chip"
@@ -44,6 +45,11 @@ import { TranslateModule } from '@ngx-translate/core';
       <ng-template>
         <ion-content>
           <div class="expiry-sheet">
+            <app-quick-date-chips
+              [emphasizedKeys]="['today', 'twoDays']"
+              (dateSelected)="onQuickDate($event)">
+            </app-quick-date-chips>
+            <div class="expiry-sheet__separator"></div>
             <input
               #dateEl
               type="date"
@@ -191,6 +197,11 @@ export class ExpiryPickerComponent {
 
   onNoExpiryClick(): void {
     this.noExpiryToggle.emit();
+  }
+
+  onQuickDate(date: string | null): void {
+    this.dateChange.emit(date ?? undefined);
+    this.sheetOpen.set(false);
   }
 
   onClear(event: Event): void {

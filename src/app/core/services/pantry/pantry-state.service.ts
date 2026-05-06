@@ -20,6 +20,10 @@ import { PantryListUiStateService } from './pantry-list-ui-state.service';
 import { PantryStoreService } from './pantry-store.service';
 import { PantryViewModelService } from './pantry-view-model.service';
 import { SkeletonLoadingManager } from '@core/utils';
+import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
+import { ToastController } from '@ionic/angular';
+import { TranslateService } from '@ngx-translate/core';
+import { type FreshState, freshStateToQty } from '@core/domain/pantry';
 
 /**
  * Main orchestrator for pantry page state.
@@ -36,6 +40,9 @@ export class PantryStateService {
   private readonly consumeModal = inject(PantryConsumeModalStateService);
   private readonly batchesModal = inject(PantryBatchesModalStateService);
   private readonly quantitySheet = inject(PantryQuantitySheetStateService);
+  private readonly freshAddModal = inject(PantryFreshAddModalStateService);
+  private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
 
   // Core state signals
   readonly skeletonPlaceholders = this.listUi.skeletonPlaceholders;
@@ -45,6 +52,7 @@ export class PantryStateService {
   readonly pipelineResetting: Signal<boolean> = this.pantryStore.pipelineResetting;
   readonly hasCompletedInitialLoad: WritableSignal<boolean> = signal(false);
   readonly editItemModalRequest: WritableSignal<{ mode: 'edit'; item: PantryItem } | null> = signal(null);
+  readonly editFreshItemModalRequest: WritableSignal<{ mode: 'edit'; item: PantryItem } | null> = signal(null);
   readonly pantryItemsState: WritableSignal<PantryItem[]> = signal([]);
   readonly summarySnapshot: WritableSignal<PantrySummaryMeta> = signal({
     total: 0,
@@ -87,7 +95,40 @@ export class PantryStateService {
   readonly pendingQuantitySheetNoExpiry = this.quantitySheet.pendingNoExpiry;
 
   // Computed signals coordinating across services
-  readonly groups = computed(() => this.viewModel.buildGroups(this.pantryItemsState()));
+  readonly freshItems = computed(() =>
+    this.pantryItemsState()
+      .filter(i => i.productType === 'fresh')
+      .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+  );
+
+  /** Total de frescos en el dataset crudo, sin filtrar. */
+  readonly totalFreshCount = computed(() =>
+    this.pantryStore.loadedProducts().filter(i => i.productType === 'fresh').length,
+  );
+
+  /** True si hay frescos creados pero los filtros activos los esconden todos. */
+  readonly hasFreshButFilteredEmpty = computed(() =>
+    this.totalFreshCount() > 0 && this.freshItems().length === 0,
+  );
+
+  /** True si no hay ningún fresco en absoluto (empty state de onboarding). */
+  readonly hasNoFreshAtAll = computed(() => this.totalFreshCount() === 0);
+
+  readonly showAllFresh = signal(false);
+  readonly visibleFreshItems = computed(() => {
+    const items = this.freshItems();
+    return this.showAllFresh() ? items : items.slice(0, 4);
+  });
+
+  readonly despensaItems = computed(() =>
+    this.pantryItemsState().filter(i => i.productType !== 'fresh')
+  );
+  readonly groups = computed(() => this.viewModel.buildGroups(this.despensaItems()));
+  readonly groupByCategory = signal(false);
+  toggleGroupByCategory(): void { this.groupByCategory.update(v => !v); }
+  readonly flatDespensaItems = computed(() =>
+    [...this.despensaItems()].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
+  );
   readonly statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
   readonly basicOnly = computed(() => this.activeFilters().basic);
   readonly summary = computed<PantrySummaryMeta>(() => this.summarySnapshot());
@@ -129,6 +170,7 @@ export class PantryStateService {
       const isLoading = this.pantryStore.loading();
       const shouldUseFreshSummary = !isLoading || loadedItems.length > 0 || totalCount === 0;
       if (shouldUseFreshSummary) {
+        // Include both fresh and pantry items so chip counts reflect both sections.
         this.summarySnapshot.set(this.viewModel.buildSummary(loadedItems, loadedItems.length));
       }
     });
@@ -189,6 +231,10 @@ export class PantryStateService {
   // -------- Modal routing --------
   clearEditItemModalRequest(): void {
     this.editItemModalRequest.set(null);
+  }
+
+  clearEditFreshItemModalRequest(): void {
+    this.editFreshItemModalRequest.set(null);
   }
 
   // -------- Add modal (delegates to PantryAddModalStateService) --------
@@ -334,7 +380,53 @@ export class PantryStateService {
   async openEditModalFromSheet(item: PantryItem): Promise<void> {
     await this.quantitySheet.dismissQuantitySheet();
     const updatedItem = this.pantryItemsState().find(i => i._id === item._id) ?? item;
+    if (updatedItem.productType === 'fresh') {
+      this.editFreshItemModalRequest.set({ mode: 'edit', item: updatedItem });
+      return;
+    }
     this.editItemModalRequest.set({ mode: 'edit', item: updatedItem });
+  }
+
+  async setFreshState(item: PantryItem, state: FreshState): Promise<void> {
+    const newQty = freshStateToQty(state);
+    const currentBatches = item.batches ?? [];
+    // Convención: un fresco tiene exactamente 1 lote. Defensivamente, si llegan más,
+    // actualizamos el primero y conservamos los demás intactos.
+    const updatedBatches = currentBatches.length > 0
+      ? [{ ...currentBatches[0], quantity: newQty }, ...currentBatches.slice(1)]
+      : [{ batchId: `batch-${Date.now()}`, quantity: newQty }];
+
+    await this.pantryStore.updateItem({ ...item, batches: updatedBatches });
+
+    const msgKey = state === 'none'
+      ? 'pantry.fresh.toast.markedOut'
+      : 'pantry.fresh.toast.updated';
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant(msgKey),
+      duration: 1200,
+      position: 'bottom',
+    });
+    await toast.present();
+  }
+
+  async toggleItemBasic(item: PantryItem): Promise<void> {
+    const isBasic = !item.isBasic;
+    await this.pantryStore.updateItem({ ...item, isBasic, updatedAt: new Date().toISOString() });
+    const msgKey = isBasic ? 'pantry.toasts.isBasicOn' : 'pantry.toasts.isBasicOff';
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant(msgKey),
+      duration: 1200,
+      position: 'bottom',
+    });
+    await toast.present();
+  }
+
+  openFreshAddModal(): void {
+    this.freshAddModal.open();
+  }
+
+  toggleShowAllFresh(): void {
+    this.showAllFresh.update(v => !v);
   }
 
   onDestroy(): void {

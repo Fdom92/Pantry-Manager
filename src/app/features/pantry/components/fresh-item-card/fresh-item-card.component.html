@@ -1,0 +1,45 @@
+<div class="fresh-item-card">
+  <div
+    class="fresh-item-card__info"
+    [attr.data-expired]="isExpired() || null"
+    role="button"
+    tabindex="0"
+    (click)="onEdit()"
+    (keydown.enter)="onEdit()"
+    (keydown.space)="$event.preventDefault(); onEdit()">
+    <div class="fresh-item-card__name-row">
+      <ion-icon
+        class="fresh-item-card__keep-icon"
+        [name]="isBasic() ? 'star' : 'star-outline'"
+        [class.fresh-item-card__keep-icon--active]="isBasic()"
+        role="button"
+        tabindex="0"
+        (click)="onBasicToggle($event)"
+        (keydown.enter)="onBasicToggle($event)"
+        (keydown.space)="$event.preventDefault(); onBasicToggle($event)">
+      </ion-icon>
+      <span class="fresh-item-card__name">{{ item.name }}</span>
+    </div>
+    @if (expiryLabel()) {
+      <span class="fresh-item-card__expiry" [attr.data-urgency]="expiryUrgency()">
+        {{ expiryLabel() | translate }}
+      </span>
+    }
+  </div>
+
+  <div class="fresh-item-card__segment" role="radiogroup" [attr.aria-label]="('pantry.fresh.state.label' | translate)">
+    @for (state of states; track state) {
+      <button
+        type="button"
+        role="radio"
+        class="fresh-item-card__segment-btn"
+        [class.is-active]="currentState() === state"
+        [attr.data-state]="state"
+        [attr.aria-checked]="currentState() === state ? 'true' : 'false'"
+        [attr.aria-label]="(labelKey(state) | translate)"
+        (click)="onStateSelected(state)">
+        {{ labelKey(state) | translate }}
+      </button>
+    }
+  </div>
+</div>

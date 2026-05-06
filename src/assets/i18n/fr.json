@@ -55,7 +55,8 @@
       "edit": "Modifier",
       "apply": "Appliquer",
       "clear": "Effacer",
-      "next": "Suivant"
+      "next": "Suivant",
+      "delete": "Supprimer"
     },
     "loading": "Chargement…",
     "dates": {
@@ -162,13 +163,16 @@
         "expiringsoon": "Expire très bientôt — utilisez-le aujourd'hui",
         "expirestoday": "Expire bientôt — pensez à l'utiliser prochainement",
         "lowstock": "Il n'en reste plus beaucoup — ajoutez-le à la liste de courses",
-        "expiringlater": "Expire dans les prochains jours — commencez à y penser"
+        "expiringlater": "Expire dans les prochains jours — commencez à y penser",
+        "freshExpiring": "Ton {{name}} expire bientôt.",
+        "freshOut": "Tu n'as plus de {{name}}."
       },
       "combine": "Expire aussi bientôt :",
       "cta": {
         "primary": "Utiliser aujourd'hui",
         "restock": "Voir la liste de courses",
-        "dismiss": "Pas maintenant"
+        "dismiss": "Pas maintenant",
+        "markFreshOut": "Je ne l'ai plus"
       },
       "expiry": {
         "today": "Expire aujourd'hui",
@@ -646,7 +650,9 @@
       "locationsUpdated": "📦 Emplacements mis à jour : {{ breakdown }}.",
       "stockUpdated": "💾 Stock mis à jour : {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Stock mis à jour.",
-      "saved": "💾 Modifications enregistrées."
+      "saved": "💾 Modifications enregistrées.",
+      "isBasicOn": "⭐ Ajouté à la liste de courses",
+      "isBasicOff": "Retiré de la liste de courses"
     },
     "confirmDelete": "Supprimer \"{{ name }}\" ?",
     "fab": {
@@ -661,6 +667,88 @@
       "noResults": "Aucun résultat",
       "empty": "Aucun article ajouté pour l'instant.",
       "submit": "Enregistrer la consommation"
+    },
+    "sections": {
+      "fresh": "Frais",
+      "pantry": "Garde-manger",
+      "groupToggle": {
+        "flat": "Grouper par catégorie",
+        "grouped": "Vue liste"
+      }
+    },
+    "fresh": {
+      "addButton": "Ajouter un frais",
+      "showMore": "Voir tous ({{ count }})",
+      "showLess": "Voir moins",
+      "emptyState": {
+        "title": "Ce que tu utilises chaque jour",
+        "subtitle": "Marque-le en secondes",
+        "cta": "+ Ajouter des frais"
+      },
+      "keepInStock": "Réapprovisionner automatiquement",
+      "keepInStockHint": "Réapparaîtra quand tu le marqueras comme épuisé",
+      "addModal": {
+        "title": "Nouveau frais",
+        "namePlaceholder": "Nom du produit",
+        "whenExpires": "Quand expire-t-il ?",
+        "submit": "Ajouter",
+        "cardTitle": "Ajout rapide frais",
+        "subtitle": "Choisis ou crée un frais.",
+        "placeholder": "Rechercher frais",
+        "noResults": "Aucun résultat",
+        "empty": "Rien d'ajouté."
+      },
+      "state": {
+        "label": "État",
+        "sufficient": "Assez",
+        "low": "Peu",
+        "none": "Vide"
+      },
+      "quickDate": {
+        "today": "Aujourd'hui",
+        "twoDays": "2 jours",
+        "fiveDays": "5 jours",
+        "oneWeek": "1 semaine",
+        "twoWeeks": "2 semaines",
+        "noDate": "Sans date"
+      },
+      "card": {
+        "expired": "Expiré",
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "soon": "Bientôt"
+      },
+      "editModal": {
+        "title": "Modifier frais",
+        "stateLabel": "Combien il reste ?",
+        "deleteConfirm": {
+          "title": "Supprimer le produit",
+          "message": "Supprimer {{ name }} ? Action irréversible."
+        }
+      },
+      "convertToPantry": {
+        "button": "Convertir en garde-manger",
+        "toast": "Déplacé vers garde-manger"
+      },
+      "convertToFresh": {
+        "button": "Convertir en frais",
+        "toast": "Déplacé vers frais",
+        "dialog": {
+          "title": "Convertir en frais",
+          "bodySingle": "Voilà ce que ça donnera :\n· État : {{state}} ({{total}} unités)\n· Expire : {{date}}",
+          "bodyMulti": "Ton produit a {{batches}} lots ({{total}} unités). Ils seront fusionnés en un seul :\n· État : {{state}}\n· Expire : {{date}}",
+          "locationsLost": "Les emplacements seront perdus.",
+          "confirm": "Convertir"
+        }
+      },
+      "empty": {
+        "filters": "Aucun frais ne correspond aux filtres."
+      },
+      "toast": {
+        "updated": "✓ Tu l'as",
+        "markedOut": "Épuisé",
+        "keepInStock": "Sera ajouté à ta liste quand tu en manqueras"
+      }
     }
   },
   "upgrade": {

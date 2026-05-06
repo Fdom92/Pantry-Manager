@@ -8,9 +8,16 @@
   <div class="card-content">
     <div class="card-header">
       <div class="title-section">
-        @if (viewModel.item.isBasic) {
-          <ion-icon class="basic-icon" name="star-outline"></ion-icon>
-        }
+        <ion-icon
+          class="basic-icon"
+          [name]="viewModel.item.isBasic ? 'star' : 'star-outline'"
+          [class.basic-icon--active]="viewModel.item.isBasic"
+          role="button"
+          tabindex="0"
+          (click)="onBasicToggle($event)"
+          (keydown.enter)="onBasicToggle($event)"
+          (keydown.space)="$event.preventDefault(); onBasicToggle($event)">
+        </ion-icon>
         <h3 class="item-name">{{ viewModel.item.name }}</h3>
       </div>
     </div>

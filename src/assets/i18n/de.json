@@ -55,7 +55,8 @@
       "edit": "Bearbeiten",
       "apply": "Anwenden",
       "clear": "Leeren",
-      "next": "Weiter"
+      "next": "Weiter",
+      "delete": "Löschen"
     },
     "loading": "Lädt…",
     "dates": {
@@ -162,13 +163,16 @@
         "expiringsoon": "Läuft sehr bald ab — heute verwenden",
         "expirestoday": "Läuft bald ab — schon mal ans Verwenden denken",
         "lowstock": "Nur noch wenig da — zur Einkaufsliste hinzufügen",
-        "expiringlater": "Läuft in den nächsten Tagen ab — schon jetzt daran denken"
+        "expiringlater": "Läuft in den nächsten Tagen ab — schon jetzt daran denken",
+        "freshExpiring": "Dein {{name}} läuft bald ab.",
+        "freshOut": "{{name}} ist aufgebraucht."
       },
       "combine": "Läuft auch bald ab:",
       "cta": {
         "primary": "Heute verwenden",
         "restock": "Einkaufsliste ansehen",
-        "dismiss": "Nicht jetzt"
+        "dismiss": "Nicht jetzt",
+        "markFreshOut": "Ich habe es nicht mehr"
       },
       "expiry": {
         "today": "Läuft heute ab",
@@ -646,9 +650,11 @@
       "locationsUpdated": "📦 Standorte aktualisiert: {{ breakdown }}.",
       "stockUpdated": "💾 Bestand aktualisiert: {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Bestand aktualisiert.",
-      "saved": "💾 Änderungen gespeichert."
+      “saved”: “💾 Änderungen gespeichert.”,
+      “isBasicOn”: “⭐ Zur Einkaufsliste hinzugefügt”,
+      “isBasicOff”: “Von der Einkaufsliste entfernt”
     },
-    "confirmDelete": "„{{ name }}“ löschen?",
+    “confirmDelete”: “„{{ name }}” löschen?”,
     "fab": {
       "groupLabel": "Aktionen"
     },
@@ -661,6 +667,88 @@
       "noResults": "Keine Ergebnisse",
       "empty": "Noch keine Artikel hinzugefügt.",
       "submit": "Verbrauch erfassen"
+    },
+    "sections": {
+      "fresh": "Frisches",
+      "pantry": "Vorratskammer",
+      "groupToggle": {
+        "flat": "Nach Kategorie gruppieren",
+        "grouped": "Listenansicht"
+      }
+    },
+    "fresh": {
+      "addButton": "Frisches hinzufügen",
+      "showMore": "Alle anzeigen ({{ count }})",
+      "showLess": "Weniger anzeigen",
+      "emptyState": {
+        "title": "Was du täglich nutzt",
+        "subtitle": "In Sekunden markieren",
+        "cta": "+ Frische Produkte hinzufügen"
+      },
+      "keepInStock": "Automatisch nachkaufen",
+      "keepInStockHint": "Erscheint wieder, wenn du es als leer markierst",
+      "addModal": {
+        "title": "Neuer Frischeartikel",
+        "namePlaceholder": "Produktname",
+        "whenExpires": "Wann läuft es ab?",
+        "submit": "Hinzufügen",
+        "cardTitle": "Frische schnell hinzufügen",
+        "subtitle": "Wähle oder erstelle ein frisches Produkt.",
+        "placeholder": "Frische suchen",
+        "noResults": "Keine Ergebnisse",
+        "empty": "Noch nichts hinzugefügt."
+      },
+      "state": {
+        "label": "Status",
+        "sufficient": "Genug",
+        "low": "Wenig",
+        "none": "Leer"
+      },
+      "quickDate": {
+        "today": "Heute",
+        "twoDays": "2 Tage",
+        "fiveDays": "5 Tage",
+        "oneWeek": "1 Woche",
+        "twoWeeks": "2 Wochen",
+        "noDate": "Kein Datum"
+      },
+      "card": {
+        "expired": "Abgelaufen",
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "soon": "Bald"
+      },
+      "editModal": {
+        "title": "Frische bearbeiten",
+        "stateLabel": "Wie viel bleibt?",
+        "deleteConfirm": {
+          "title": "Produkt löschen",
+          "message": "{{ name }} löschen? Kann nicht rückgängig gemacht werden."
+        }
+      },
+      "convertToPantry": {
+        "button": "In Vorrat umwandeln",
+        "toast": "In Vorrat verschoben"
+      },
+      "convertToFresh": {
+        "button": "In Frische umwandeln",
+        "toast": "In Frische verschoben",
+        "dialog": {
+          "title": "In Frische umwandeln",
+          "bodySingle": "Es wird so aussehen:\n· Status: {{state}} ({{total}} Stück)\n· Läuft ab: {{date}}",
+          "bodyMulti": "Dein Produkt hat {{batches}} Chargen ({{total}} Stück). Sie werden zu einer zusammengeführt:\n· Status: {{state}}\n· Läuft ab: {{date}}",
+          "locationsLost": "Standorte gehen verloren.",
+          "confirm": "Umwandeln"
+        }
+      },
+      "empty": {
+        "filters": "Keine frischen Produkte passen zu den Filtern."
+      },
+      "toast": {
+        "updated": "✓ Du hast es",
+        "markedOut": "Aufgebraucht",
+        "keepInStock": "Wird zur Liste hinzugefügt, wenn aufgebraucht"
+      }
     }
   },
   "upgrade": {

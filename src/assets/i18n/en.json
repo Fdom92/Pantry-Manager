@@ -55,7 +55,8 @@
       "edit": "Edit",
       "apply": "Apply",
       "clear": "Clear",
-      "next": "Next"
+      "next": "Next",
+      "delete": "Delete"
     },
     "loading": "Loading…",
     "dates": {
@@ -162,13 +163,16 @@
         "expiringsoon": "Expiring very soon — use it today",
         "expirestoday": "Expiring soon — start thinking about using it",
         "lowstock": "Running low — add it to your shopping list",
-        "expiringlater": "Expiring in the coming days — start thinking about using it"
+        "expiringlater": "Expiring in the coming days — start thinking about using it",
+        "freshExpiring": "Your {{name}} expires soon.",
+        "freshOut": "You ran out of {{name}}."
       },
       "combine": "Also expiring soon:",
       "cta": {
         "primary": "Use this today",
         "restock": "View shopping list",
-        "dismiss": "Not now"
+        "dismiss": "Not now",
+        "markFreshOut": "I don't have it anymore"
       },
       "expiry": {
         "today": "Expires today",
@@ -647,7 +651,9 @@
       "locationsUpdated": "📦 Locations updated: {{ breakdown }}.",
       "stockUpdated": "💾 Stock updated: {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Stock updated.",
-      "saved": "💾 Changes saved."
+      "saved": "💾 Changes saved.",
+      "isBasicOn": "⭐ Added to shopping list",
+      "isBasicOff": "Removed from shopping list"
     },
     "confirmDelete": "Delete \"{{ name }}\"?",
     "fab": {
@@ -662,6 +668,88 @@
       "noResults": "No results",
       "empty": "No items added yet.",
       "submit": "Log consumption"
+    },
+    "sections": {
+      "fresh": "Fresh",
+      "pantry": "Pantry",
+      "groupToggle": {
+        "flat": "Group by category",
+        "grouped": "Flat list"
+      }
+    },
+    "fresh": {
+      "addButton": "Add fresh item",
+      "showMore": "See all ({{ count }})",
+      "showLess": "See less",
+      "emptyState": {
+        "title": "What you use daily",
+        "subtitle": "Mark it in seconds",
+        "cta": "+ Add fresh items"
+      },
+      "keepInStock": "Restock automatically",
+      "keepInStockHint": "Will reappear when you mark it as out",
+      "addModal": {
+        "title": "New fresh",
+        "namePlaceholder": "Product name",
+        "whenExpires": "When does it expire?",
+        "submit": "Add",
+        "cardTitle": "Quick add fresh",
+        "subtitle": "Pick or create a fresh product.",
+        "placeholder": "Search fresh",
+        "noResults": "No results",
+        "empty": "Nothing added yet."
+      },
+      "state": {
+        "label": "State",
+        "sufficient": "Plenty",
+        "low": "Low",
+        "none": "Out"
+      },
+      "quickDate": {
+        "today": "Today",
+        "twoDays": "2 days",
+        "fiveDays": "5 days",
+        "oneWeek": "1 week",
+        "twoWeeks": "2 weeks",
+        "noDate": "No date"
+      },
+      "card": {
+        "expired": "Expired",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "soon": "Soon"
+      },
+      "editModal": {
+        "title": "Edit fresh",
+        "stateLabel": "How much is left?",
+        "deleteConfirm": {
+          "title": "Delete product",
+          "message": "Delete {{ name }}? This can't be undone."
+        }
+      },
+      "convertToPantry": {
+        "button": "Convert to pantry",
+        "toast": "Moved to pantry"
+      },
+      "convertToFresh": {
+        "button": "Convert to fresh",
+        "toast": "Moved to fresh",
+        "dialog": {
+          "title": "Convert to fresh",
+          "bodySingle": "It will look like this:\n· State: {{state}} ({{total}} units)\n· Expires: {{date}}",
+          "bodyMulti": "Your product has {{batches}} lots ({{total}} units). They will be merged into one:\n· State: {{state}}\n· Expires: {{date}}",
+          "locationsLost": "Locations will be lost.",
+          "confirm": "Convert"
+        }
+      },
+      "empty": {
+        "filters": "No fresh products match the filters."
+      },
+      "toast": {
+        "updated": "✓ You have it",
+        "markedOut": "Out of stock",
+        "keepInStock": "Will be added to your list when you run out"
+      }
     }
   },
   "upgrade": {
