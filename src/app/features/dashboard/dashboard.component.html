@@ -107,10 +107,12 @@
           } @else {
             <div class="today-card">
               <div class="today-card__protagonist">
-                <span class="today-card__protagonist-name">{{ facade.todaySuggestion()!.protagonist.name }}</span>
-                @if (facade.todaySuggestion()!.reasonKey !== 'dashboard.today.reason.freshExpiring' && facade.todaySuggestion()!.reasonKey !== 'dashboard.today.reason.freshOut') {
-                  <span class="today-card__protagonist-qty">×{{ facade.todaySuggestion()!.protagonist.quantity }}</span>
-                }
+                <div class="today-card__protagonist-main">
+                  <span class="today-card__protagonist-name">{{ facade.todaySuggestion()!.protagonist.name }}</span>
+                  @if (facade.todaySuggestion()!.reasonKey !== 'dashboard.today.reason.freshExpiring' && facade.todaySuggestion()!.reasonKey !== 'dashboard.today.reason.freshOut') {
+                    <span class="today-card__protagonist-qty">×{{ facade.todaySuggestion()!.protagonist.quantity }}</span>
+                  }
+                </div>
                 @if (facade.todaySuggestion()!.protagonist.expirationDate) {
                   <span class="today-card__protagonist-expiry"
                     [attr.data-urgency]="facade.todaySuggestion()!.protagonist.daysToExpiry !== null
@@ -126,19 +128,9 @@
                 <p class="today-card__reason">{{ facade.todaySuggestion()!.reasonKey | translate: { name: facade.todaySuggestion()!.protagonist.name } }}</p>
               }
               @if (facade.todaySuggestion()!.secondaryItems.length > 0) {
-                <div class="today-card__secondary">
-                  <span class="today-card__secondary-label">{{ 'dashboard.today.combine' | translate }}</span>
-                  @for (item of facade.todaySuggestion()!.secondaryItems; track item.id) {
-                    <span class="today-card__secondary-item">
-                      {{ item.name }}
-                      @if (item.daysToExpiry !== null) {
-                        <span class="today-card__secondary-days">
-                          · {{ 'dashboard.today.secondary.days' | translate:{ count: item.daysToExpiry } }}
-                        </span>
-                      }
-                    </span>
-                  }
-                </div>
+                <p class="today-card__secondary">
+                  <span class="today-card__secondary-label">{{ 'dashboard.today.combine' | translate }} </span>@for (item of facade.todaySuggestion()!.secondaryItems; track item.id; let last = $last) {<span class="today-card__secondary-item">{{ item.name }}@if (item.daysToExpiry !== null) { <span class="today-card__secondary-days">· {{ 'dashboard.today.secondary.days' | translate:{ count: item.daysToExpiry } }}</span>}@if (!last) {, }</span>}
+                </p>
               }
               <div class="today-card__footer">
                 @if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshOut') {

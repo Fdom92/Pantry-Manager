@@ -91,19 +91,20 @@ export function getItemStatusState(
   windowDays: number,
   context?: { totalQuantity?: number; minThreshold?: number | null }
 ): ProductStatusState {
-  const expirationStatus = computeExpirationStatus(item.batches, now, windowDays);
-  if (expirationStatus === ExpirationStatus.EXPIRED) return 'expired';
-  if (expirationStatus === ExpirationStatus.NEAR_EXPIRY) return 'near-expiry';
-
-  // Fresh items use a discrete 3-state model with a tighter near-expiry window.
-  // Dates up to 2 weeks are normal for fresh items — only ≤3 days is truly "próx a caducar".
+  // Fresh items have their own classification: tighter near-expiry window (3 days)
+  // and discrete qty states. Must run BEFORE the general expiry check so the
+  // 15-day pantry window doesn't catch 14-day fresh dates as near-expiry.
   if (item.productType === 'fresh') {
     const freshExpiry = computeExpirationStatus(item.batches, now, FRESH_NEAR_EXPIRY_WINDOW_DAYS);
+    if (freshExpiry === ExpirationStatus.EXPIRED) return 'expired';
     if (freshExpiry === ExpirationStatus.NEAR_EXPIRY) return 'near-expiry';
     const qty = sumQuantities(item.batches ?? []);
     return qty < FRESH_QTY.sufficient ? 'low-stock' : 'normal';
   }
 
+  const expirationStatus = computeExpirationStatus(item.batches, now, windowDays);
+  if (expirationStatus === ExpirationStatus.EXPIRED) return 'expired';
+  if (expirationStatus === ExpirationStatus.NEAR_EXPIRY) return 'near-expiry';
   if (isItemLowStock(item, context)) return 'low-stock';
   return 'normal';
 }
