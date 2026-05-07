@@ -17,8 +17,8 @@
     },
     "slides": {
       "problem": {
-        "title": "Wirfst du Essen weg, das du vergessen hattest?",
-        "description": "Vermeide, Essen und Geld wegzuwerfen. Behalte den Überblick, bevor es abläuft."
+        "title": "Vermeide Lebensmittelverschwendung",
+        "description": "Behalte den Überblick, ohne darüber nachdenken zu müssen."
       },
       "simple": {
         "title": "Organisiere deinen Vorrat in Sekunden",
@@ -29,8 +29,12 @@
         "description": "Kaufe nur, was du brauchst, und nutze, was du hast."
       },
       "action": {
-        "title": "Beginne mit deinem ersten Produkt",
-        "description": "Tippe auf + und erstelle deinen Vorrat in Minuten."
+        "title": "Jetzt starten",
+        "description": "Füge dein erstes Produkt hinzu."
+      },
+      "fresh": {
+        "title": "Füge hinzu, was du kaufst",
+        "description": "Wir informieren dich, wenn etwas fehlt."
       }
     },
     "mock": {
@@ -79,7 +83,7 @@
     },
     "pantry": {
       "title": "Die Vorratskammer ist leer",
-      "subtitle": "Füge dein erstes Produkt hinzu und behalte Bestand und Haltbarkeit im Blick."
+      "subtitle": "Füge Produkte hinzu, die du verfolgen möchtest\n(mit Menge und Ablaufdatum)"
     },
     "shopping": {
       "title": "Alles in Ordnung"
@@ -167,7 +171,7 @@
         "freshExpiring": "Dein {{name}} läuft bald ab.",
         "freshOut": "{{name}} ist aufgebraucht."
       },
-      "combine": "Kombiniere mit:",
+      "combine": "Läuft auch bald ab:",
       "cta": {
         "primary": "Heute nutzen",
         "restock": "Einkaufsliste ansehen",
@@ -430,7 +434,7 @@
       "demo": {
         "chipsTitle": "Starte mit einer Absicht",
         "sessionTitle": "Beispielkonversation",
-        "userMessage": "„Plane Abendessen mit allem, was diese Woche abläuft.“",
+        "userMessage": "„Plane Abendessen mit allem, was diese Woche abläuft.",
         "agentMessage": "Klingt gut. Spinat und Feta laufen in 2 Tagen ab. Vorschlag: Heute Spinat-Pesto-Pasta und morgen ein griechisches Omelett."
       }
     },
@@ -648,18 +652,18 @@
       "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
       "saveError": "Das Produkt konnte nicht gespeichert werden.",
       "deleted": "🗑️ Produkt gelöscht.",
-      "addedToShopping": "„{{ name }}“ zu Einkaufsvorschlägen hinzugefügt.",
+      "addedToShopping": "„{{ name }}\" zu Einkaufsvorschlägen hinzugefügt.",
       "createSuccess": "✅ {{ name }} hinzugefügt{{ quantity }}{{ breakdown }}.",
       "locationsUpdated": "📦 Standorte aktualisiert: {{ breakdown }}.",
       "stockUpdated": "💾 Bestand aktualisiert: {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Bestand aktualisiert.",
-      “saved”: “💾 Änderungen gespeichert.”,
-      “isBasicOn”: “⭐ Zur Einkaufsliste hinzugefügt”,
-      “isBasicOff”: “Von der Einkaufsliste entfernt”,
-      “addedToList”: “🛒 Zur Einkaufsliste hinzugefügt”,
-      “multipleAdded”: “✅ {{count}} Produkte hinzugefügt”
+      "saved": "💾 Änderungen gespeichert.",
+      "isBasicOn": "⭐ Zur Einkaufsliste hinzugefügt",
+      "isBasicOff": "Von der Einkaufsliste entfernt",
+      "addedToList": "🛒 Zur Einkaufsliste hinzugefügt",
+      "multipleAdded": "✅ {{count}} Produkte hinzugefügt"
     },
-    “confirmDelete”: “„{{ name }}” löschen?”,
+    "confirmDelete": "„{{ name }}\" löschen?",
     "fab": {
       "groupLabel": "Aktionen"
     },
@@ -686,8 +690,8 @@
       "showMore": "Alle anzeigen ({{ count }})",
       "showLess": "Weniger anzeigen",
       "emptyState": {
-        "title": "Was du täglich nutzt",
-        "subtitle": "In Sekunden markieren",
+        "title": "Frische Produkte",
+        "subtitle": "Füge hinzu, was du jede Woche verwendest\n(ohne genaue Daten)",
         "cta": "+ Frische Produkte hinzufügen"
       },
       "keepInStock": "Automatisch nachkaufen",
@@ -1002,10 +1006,10 @@
     },
     "lowStock": {
       "title": "Basics werden knapp",
-      "body": "{{ count }} Basics müssen nachgekauft werden"
+      "body": "{{count}} Basics müssen nachgekauft werden"
     },
     "reEngagement": {
-      "title": "Wie sieht's mit deinen Frischprodukten aus?",
+      "title": "Wie läuft es mit deinen Frischprodukten?",
       "body": "Du hast dich ein paar Tage nicht eingeloggt. Kurz nachschauen und alles ist wieder aktuell."
     }
   },

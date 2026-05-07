@@ -17,8 +17,8 @@
     },
     "slides": {
       "problem": {
-        "title": "Vous jetez des aliments que vous aviez oubliés ?",
-        "description": "Évitez de gaspiller nourriture et argent. Contrôlez ce que vous avez avant expiration."
+        "title": "Arrête de gaspiller",
+        "description": "Suis ce que tu as sans y penser."
       },
       "simple": {
         "title": "Organisez votre garde-manger en quelques secondes",
@@ -28,9 +28,13 @@
         "title": "Économisez argent et temps",
         "description": "Achetez seulement ce dont vous avez besoin et utilisez ce que vous avez."
       },
+      "fresh": {
+        "title": "Ajoute ce que tu achètes",
+        "description": "On te prévient quand il manque quelque chose."
+      },
       "action": {
-        "title": "Commencez par ajouter votre premier produit",
-        "description": "Touchez le bouton + et créez votre garde-manger en quelques minutes."
+        "title": "Commence maintenant",
+        "description": "Ajoute ton premier produit."
       }
     },
     "mock": {
@@ -79,7 +83,7 @@
     },
     "pantry": {
       "title": "Le garde-manger est vide",
-      "subtitle": "Ajoutez votre premier produit et suivez le stock et les dates de péremption."
+      "subtitle": "Ajoute les produits que tu veux surveiller\n(avec quantité et date de péremption)"
     },
     "shopping": {
       "title": "Tout est en ordre"
@@ -167,7 +171,7 @@
         "freshExpiring": "Ton {{name}} expire bientôt.",
         "freshOut": "Tu n'as plus de {{name}}."
       },
-      "combine": "Combine avec :",
+      "combine": "Expire aussi bientôt :",
       "cta": {
         "primary": "Utiliser auj.",
         "restock": "Voir la liste de courses",
@@ -686,8 +690,8 @@
       "showMore": "Voir tous ({{ count }})",
       "showLess": "Voir moins",
       "emptyState": {
-        "title": "Ce que tu utilises chaque jour",
-        "subtitle": "Marque-le en secondes",
+        "title": "Produits frais",
+        "subtitle": "Ajoute ce que tu utilises chaque semaine\n(sans dates exactes)",
         "cta": "+ Ajouter des frais"
       },
       "keepInStock": "Réapprovisionner automatiquement",

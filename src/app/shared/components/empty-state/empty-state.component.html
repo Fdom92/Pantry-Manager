@@ -3,7 +3,9 @@
     <ion-icon [name]="icon"></ion-icon>
   </div>
   <div class="empty-copy">
-    <h3>{{ title || (titleKey | translate) }}</h3>
+    @if (!hideTitle) {
+      <h3>{{ title || (titleKey | translate) }}</h3>
+    }
     <p>{{ subtitle || (subtitleKey | translate) }}</p>
   </div>
   @if (showAction) {

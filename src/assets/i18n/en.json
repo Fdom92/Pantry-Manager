@@ -17,8 +17,8 @@
     },
     "slides": {
       "problem": {
-        "title": "Throwing away food you forgot you had?",
-        "description": "Avoid throwing away food and money. Track what you have before it expires."
+        "title": "Stop wasting food",
+        "description": "Track what you have without thinking about it."
       },
       "simple": {
         "title": "Organize your pantry in seconds",
@@ -28,9 +28,13 @@
         "title": "Save money and time",
         "description": "Buy only what you need and use what you already have."
       },
+      "fresh": {
+        "title": "Add what you buy",
+        "description": "We let you know when something runs out."
+      },
       "action": {
-        "title": "Start by adding your first product",
-        "description": "Tap the + button and build your pantry in minutes."
+        "title": "Start now",
+        "description": "Add your first product."
       }
     },
     "mock": {
@@ -79,7 +83,7 @@
     },
     "pantry": {
       "title": "Pantry is empty",
-      "subtitle": "Add your first product to track stock and expirations."
+      "subtitle": "Add products you want to track\n(with quantity and expiry)"
     },
     "shopping": {
       "title": "All set"
@@ -167,7 +171,7 @@
         "freshExpiring": "Your {{name}} expires soon.",
         "freshOut": "You ran out of {{name}}."
       },
-      "combine": "Combine with:",
+      "combine": "Also expiring soon:",
       "cta": {
         "primary": "Use today",
         "restock": "View shopping list",
@@ -687,8 +691,8 @@
       "showMore": "See all ({{ count }})",
       "showLess": "See less",
       "emptyState": {
-        "title": "What you use daily",
-        "subtitle": "Mark it in seconds",
+        "title": "Fresh items",
+        "subtitle": "Add what you use every week\n(no exact dates needed)",
         "cta": "+ Add fresh items"
       },
       "keepInStock": "Restock automatically",

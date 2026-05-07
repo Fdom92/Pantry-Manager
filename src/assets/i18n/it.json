@@ -17,8 +17,8 @@
     },
     "slides": {
       "problem": {
-        "title": "Butti via cibo che avevi dimenticato?",
-        "description": "Evita di sprecare cibo e denaro. Controlla cosa hai prima che scada."
+        "title": "Smetti di sprecare",
+        "description": "Tieni traccia di quello che hai senza pensarci."
       },
       "simple": {
         "title": "Organizza la tua dispensa in pochi secondi",
@@ -28,9 +28,13 @@
         "title": "Risparmia denaro e tempo",
         "description": "Compra solo ciò di cui hai bisogno e usa ciò che hai."
       },
+      "fresh": {
+        "title": "Aggiungi quello che compri",
+        "description": "Ti avvisiamo quando manca qualcosa."
+      },
       "action": {
-        "title": "Inizia aggiungendo il tuo primo prodotto",
-        "description": "Tocca il pulsante + e crea la tua dispensa in pochi minuti."
+        "title": "Inizia ora",
+        "description": "Aggiungi il tuo primo prodotto."
       }
     },
     "mock": {
@@ -79,7 +83,7 @@
     },
     "pantry": {
       "title": "La dispensa è vuota",
-      "subtitle": "Aggiungi il primo prodotto per tracciare stock e scadenze."
+      "subtitle": "Aggiungi i prodotti che vuoi controllare\n(con quantità e scadenza)"
     },
     "shopping": {
       "title": "Tutto in ordine"
@@ -167,7 +171,7 @@
         "freshExpiring": "Il tuo {{name}} scade presto.",
         "freshOut": "{{name}} è finito."
       },
-      "combine": "Combina con:",
+      "combine": "Scade presto anche:",
       "cta": {
         "primary": "Usa oggi",
         "restock": "Vai alla lista della spesa",
@@ -686,8 +690,8 @@
       "showMore": "Vedi tutti ({{ count }})",
       "showLess": "Vedi meno",
       "emptyState": {
-        "title": "Quello che usi ogni giorno",
-        "subtitle": "Segnalo in secondi",
+        "title": "Prodotti freschi",
+        "subtitle": "Aggiungi quello che usi ogni settimana\n(senza date esatte)",
         "cta": "+ Aggiungi freschi"
       },
       "keepInStock": "Rifornisci automaticamente",

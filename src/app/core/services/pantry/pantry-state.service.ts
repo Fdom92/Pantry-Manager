@@ -261,7 +261,6 @@ export class PantryStateService {
           lowStock: false,
           recentlyAdded: false,
           normalOnly: false,
-          basic: false,
         });
         break;
       case 'near-expiry':
@@ -271,7 +270,6 @@ export class PantryStateService {
           lowStock: false,
           recentlyAdded: false,
           normalOnly: false,
-          basic: false,
         });
         break;
       case 'low-stock':
@@ -281,7 +279,6 @@ export class PantryStateService {
           lowStock: true,
           recentlyAdded: false,
           normalOnly: false,
-          basic: false,
         });
         break;
       case 'normal':
@@ -291,7 +288,6 @@ export class PantryStateService {
           lowStock: false,
           recentlyAdded: false,
           normalOnly: true,
-          basic: false,
         });
         break;
       default:
@@ -301,7 +297,6 @@ export class PantryStateService {
           lowStock: false,
           recentlyAdded: false,
           normalOnly: false,
-          basic: false,
         });
         break;
     }

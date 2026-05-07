@@ -52,6 +52,7 @@ import {
   informationCircle,
   informationOutline,
   layersOutline,
+  leafOutline,
   listOutline,
   moonOutline,
   navigateOutline,
@@ -164,7 +165,8 @@ addIcons({
   'share-social-outline': shareSocialOutline,
   'archive-outline': archiveOutline,
   'infinite-outline': infiniteOutline,
-  'apps-outline': appsOutline
+  'apps-outline': appsOutline,
+  'leaf-outline': leafOutline
 });
 
 bootstrapApplication(AppComponent, {

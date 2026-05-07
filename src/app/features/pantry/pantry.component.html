@@ -65,13 +65,12 @@
       </header>
 
       @if (facade.hasNoFreshAtAll()) {
-        <div class="fresh-empty-state">
-          <p class="fresh-empty-state__title">{{ 'pantry.fresh.emptyState.title' | translate }}</p>
-          <p class="fresh-empty-state__subtitle">{{ 'pantry.fresh.emptyState.subtitle' | translate }}</p>
-          <button class="fresh-empty-state__cta" (click)="facade.openFreshAddModal()">
-            {{ 'pantry.fresh.emptyState.cta' | translate }}
-          </button>
-        </div>
+        <app-empty-state
+          class="list-empty-state"
+          icon="leaf-outline"
+          [hideTitle]="true"
+          [subtitleKey]="'pantry.fresh.emptyState.subtitle'">
+        </app-empty-state>
       } @else if (facade.hasFreshButFilteredEmpty()) {
         <div class="fresh-empty-state fresh-empty-state--filtered">
           <p class="fresh-empty-state__subtitle">{{ 'pantry.fresh.empty.filters' | translate }}</p>
@@ -131,7 +130,7 @@
         <app-empty-state
           class="list-empty-state"
           icon="fast-food-outline"
-          [titleKey]="'emptyStates.pantry.title'"
+          [hideTitle]="true"
           [subtitleKey]="'emptyStates.pantry.subtitle'">
         </app-empty-state>
       } @else if (facade.despensaItems().length === 0) {

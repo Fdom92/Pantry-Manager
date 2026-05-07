@@ -17,8 +17,8 @@
     },
     "slides": {
       "problem": {
-        "title": "¿Tiras comida que no sabías que tenías?",
-        "description": "Evita tirar comida y dinero. Controla lo que tienes antes de que caduque."
+        "title": "Evita tirar comida",
+        "description": "Controla lo que tienes sin pensarlo."
       },
       "simple": {
         "title": "Organiza tu despensa en segundos",
@@ -28,9 +28,13 @@
         "title": "Ahorra dinero y tiempo",
         "description": "Compra solo lo que necesitas y aprovecha lo que ya tienes."
       },
+      "fresh": {
+        "title": "Añade lo que compras",
+        "description": "Nosotros te avisamos cuando algo falte."
+      },
       "action": {
-        "title": "Empieza añadiendo tu primer producto",
-        "description": "Toca el botón + y crea tu despensa en minutos."
+        "title": "Empieza ahora",
+        "description": "Añade tu primer producto."
       }
     },
     "mock": {
@@ -79,7 +83,7 @@
     },
     "pantry": {
       "title": "La despensa está vacía",
-      "subtitle": "Añade tu primer producto y controla el stock y las caducidades."
+      "subtitle": "Añade productos que quieras controlar\n(con cantidad y caducidad)"
     },
     "shopping": {
       "title": "Todo en orden"
@@ -167,7 +171,7 @@
         "freshExpiring": "Tu {{name}} caduca pronto.",
         "freshOut": "Te quedaste sin {{name}}."
       },
-      "combine": "Combina con:",
+      "combine": "Caduca pronto también:",
       "cta": {
         "primary": "Usar hoy",
         "restock": "Ver lista de la compra",
@@ -687,8 +691,8 @@
       "showMore": "Ver todos ({{ count }})",
       "showLess": "Ver menos",
       "emptyState": {
-        "title": "Lo que usas a diario",
-        "subtitle": "Márcalo en segundos",
+        "title": "Frescos",
+        "subtitle": "Añade lo que usas cada semana\n(sin fechas exactas)",
         "cta": "+ Añadir frescos"
       },
       "keepInStock": "Volver a comprar automáticamente",

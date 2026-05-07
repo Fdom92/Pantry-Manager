@@ -510,8 +510,7 @@ export class PantryService extends StorageService<PantryItem> {
       a.expired === b.expired &&
       a.expiring === b.expiring &&
       a.recentlyAdded === b.recentlyAdded &&
-      a.normalOnly === b.normalOnly &&
-      a.basic === b.basic
+      a.normalOnly === b.normalOnly
     );
   }
 

@@ -113,6 +113,7 @@ ion-title {
 
 .fade-in-list {
   animation: fadeInList 240ms ease;
+  padding: 0 var(--app-theme-card-margin-inline);
 }
 
 .list-empty-state {

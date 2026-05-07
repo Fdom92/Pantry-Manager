@@ -17,8 +17,8 @@
     },
     "slides": {
       "problem": {
-        "title": "Deitas fora comida que tinhas esquecido?",
-        "description": "Evita desperdiçar comida e dinheiro. Controla o que tens antes de expirar."
+        "title": "Para de desperdiçar",
+        "description": "Controla o que tens sem pensar nisso."
       },
       "simple": {
         "title": "Organiza a tua despensa em segundos",
@@ -28,9 +28,13 @@
         "title": "Poupa dinheiro e tempo",
         "description": "Compra apenas o que precisas e usa o que já tens."
       },
+      "fresh": {
+        "title": "Adiciona o que compras",
+        "description": "Avisamos-te quando falta alguma coisa."
+      },
       "action": {
-        "title": "Começa por adicionar o teu primeiro produto",
-        "description": "Toca no botão + e cria a tua despensa em minutos."
+        "title": "Começa agora",
+        "description": "Adiciona o teu primeiro produto."
       }
     },
     "mock": {
@@ -79,7 +83,7 @@
     },
     "pantry": {
       "title": "A despensa está vazia",
-      "subtitle": "Adiciona o teu primeiro produto para acompanhar stock e validade."
+      "subtitle": "Adiciona produtos que queiras controlar\n(com quantidade e validade)"
     },
     "shopping": {
       "title": "Tudo em ordem"
@@ -167,7 +171,7 @@
         "freshExpiring": "O seu {{name}} vence em breve.",
         "freshOut": "Você ficou sem {{name}}."
       },
-      "combine": "Combina com:",
+      "combine": "Expira em breve também:",
       "cta": {
         "primary": "Usar hoje",
         "restock": "Ver lista de compras",
@@ -686,8 +690,8 @@
       "showMore": "Ver todos ({{ count }})",
       "showLess": "Ver menos",
       "emptyState": {
-        "title": "O que usas diariamente",
-        "subtitle": "Marca em segundos",
+        "title": "Frescos",
+        "subtitle": "Adiciona o que usas cada semana\n(sem datas exatas)",
         "cta": "+ Adicionar frescos"
       },
       "keepInStock": "Reabastecer automaticamente",
