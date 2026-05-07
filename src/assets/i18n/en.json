@@ -167,9 +167,9 @@
         "freshExpiring": "Your {{name}} expires soon.",
         "freshOut": "You ran out of {{name}}."
       },
-      "combine": "Also expiring soon:",
+      "combine": "Combine with:",
       "cta": {
-        "primary": "Use this today",
+        "primary": "Use today",
         "restock": "View shopping list",
         "dismiss": "Not now",
         "markFreshOut": "I don't have it anymore"
@@ -195,7 +195,7 @@
         "missingDates": "{{count}} products without expiry date · add them to see suggestions"
       },
       "secondary": {
-        "days": "{{count}}d"
+        "days": "{{count}} days"
       }
     },
     "actions": {
@@ -476,7 +476,7 @@
         "expired": "Review and discard"
       },
       "status": {
-        "normal": "In stock",
+        "normal": "No alerts",
         "low": "Low stock",
         "expiring": "Near expiry",
         "expired": "Expired"
@@ -752,7 +752,9 @@
       },
       "toast": {
         "updated": "✓ You have it",
+        "updatedLow": "Running low",
         "markedOut": "Out of stock",
+        "markedOutHint": "Out of stock · Activate ⭐ to add it to your list",
         "keepInStock": "Will be added to your list when you run out",
         "addSuccess_one": "✅ {{name}} added",
         "addSuccess_other": "✅ {{count}} fresh items added"

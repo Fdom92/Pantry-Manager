@@ -167,9 +167,9 @@
         "freshExpiring": "Ton {{name}} expire bientôt.",
         "freshOut": "Tu n'as plus de {{name}}."
       },
-      "combine": "Expire aussi bientôt :",
+      "combine": "Combine avec :",
       "cta": {
-        "primary": "Utiliser aujourd'hui",
+        "primary": "Utiliser auj.",
         "restock": "Voir la liste de courses",
         "dismiss": "Pas maintenant",
         "markFreshOut": "Je ne l'ai plus"
@@ -195,7 +195,7 @@
         "missingDates": "{{count}} produits sans date d'expiration · ajoutez-les pour voir des suggestions"
       },
       "secondary": {
-        "days": "{{count}}j"
+        "days": "{{count}} jours"
       }
     },
     "actions": {
@@ -476,7 +476,7 @@
         "expired": "À vérifier et jeter"
       },
       "status": {
-        "normal": "En stock",
+        "normal": "Sans alertes",
         "low": "Stock faible",
         "expiring": "Bientôt périmé",
         "expired": "Périmé"
@@ -751,7 +751,9 @@
       },
       "toast": {
         "updated": "✓ Tu l'as",
+        "updatedLow": "Il en reste peu",
         "markedOut": "Épuisé",
+        "markedOutHint": "Épuisé · Active ⭐ pour l'ajouter à ta liste",
         "keepInStock": "Sera ajouté à ta liste quand tu en manqueras",
         "addSuccess_one": "✅ {{name}} ajouté",
         "addSuccess_other": "✅ {{count}} produits frais ajoutés"

@@ -167,9 +167,9 @@
         "freshExpiring": "O seu {{name}} vence em breve.",
         "freshOut": "Você ficou sem {{name}}."
       },
-      "combine": "Expira em breve também:",
+      "combine": "Combina com:",
       "cta": {
-        "primary": "Usar isso hoje",
+        "primary": "Usar hoje",
         "restock": "Ver lista de compras",
         "dismiss": "Agora não",
         "markFreshOut": "Já não tenho"
@@ -195,7 +195,7 @@
         "missingDates": "{{count}} produtos sem data de validade · adicione-as para ver sugestões"
       },
       "secondary": {
-        "days": "{{count}}d"
+        "days": "{{count}} dias"
       }
     },
     "actions": {
@@ -476,7 +476,7 @@
         "expired": "Rever e descartar"
       },
       "status": {
-        "normal": "Em stock",
+        "normal": "Sem alertas",
         "low": "Stock baixo",
         "expiring": "Perto da validade",
         "expired": "Expirado"
@@ -751,7 +751,9 @@
       },
       "toast": {
         "updated": "✓ Tens",
+        "updatedLow": "Está a acabar",
         "markedOut": "Esgotado",
+        "markedOutHint": "Esgotado · Ativa ⭐ para adicionar à tua lista",
         "keepInStock": "Será adicionado à lista quando acabar",
         "addSuccess_one": "✅ {{name}} adicionado",
         "addSuccess_other": "✅ {{count}} frescos adicionados"

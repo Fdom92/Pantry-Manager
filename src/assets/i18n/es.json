@@ -167,9 +167,9 @@
         "freshExpiring": "Tu {{name}} caduca pronto.",
         "freshOut": "Te quedaste sin {{name}}."
       },
-      "combine": "También caduca pronto:",
+      "combine": "Combina con:",
       "cta": {
-        "primary": "Usar esto hoy",
+        "primary": "Usar hoy",
         "restock": "Ver lista de la compra",
         "dismiss": "Ahora no",
         "markFreshOut": "Ya no lo tengo"
@@ -195,7 +195,7 @@
         "missingDates": "{{count}} productos sin fecha de caducidad · añádelas para ver sugerencias"
       },
       "secondary": {
-        "days": "{{count}}d"
+        "days": "{{count}} días"
       }
     },
     "actions": {
@@ -476,7 +476,7 @@
         "expired": "Revisar y descartar"
       },
       "status": {
-        "normal": "Con stock",
+        "normal": "Sin alertas",
         "low": "Stock bajo",
         "expiring": "Próx. caducar",
         "expired": "Caducados"
@@ -752,7 +752,9 @@
       },
       "toast": {
         "updated": "✓ Lo tienes",
+        "updatedLow": "Queda poco",
         "markedOut": "Agotado",
+        "markedOutHint": "Agotado · Activa ⭐ para añadirlo a tu lista",
         "keepInStock": "Se añadirá a tu lista cuando se acabe",
         "addSuccess_one": "✅ {{name}} añadido",
         "addSuccess_other": "✅ {{count}} frescos añadidos"
