@@ -113,7 +113,6 @@ ion-title {
 
 .fade-in-list {
   animation: fadeInList 240ms ease;
-  padding: 0 var(--app-theme-card-margin-inline);
 }
 
 .list-empty-state {
@@ -422,7 +421,6 @@ ion-modal.quantity-sheet ion-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 var(--app-theme-card-margin-inline);
   }
 
   &__header--despensa {
@@ -486,7 +484,6 @@ ion-modal.quantity-sheet ion-content {
   display: flex;
   flex-direction: column;
   gap: var(--app-theme-spacing-xs);
-  padding: 0 var(--app-theme-card-margin-inline);
 }
 
 .fresh-empty-state {
