@@ -4,7 +4,7 @@ import { PantryItem } from './item.model';
 
 export type PantryStatusFilterValue = 'all' | 'expired' | 'near-expiry' | 'low-stock' | 'normal';
 export type ExpiryClassification = 'expired' | 'near-expiry' | 'normal' | 'unknown';
-export type FilterChipKind = 'status' | 'basic';
+export type FilterChipKind = 'status';
 
 export interface FilterChipViewModel {
   key: string;
@@ -21,7 +21,6 @@ export interface FilterChipViewModel {
 export interface PantrySummaryMeta {
   total: number;
   visible: number;
-  basicCount: number;
   statusCounts: {
     expired: number;
     expiring: number;

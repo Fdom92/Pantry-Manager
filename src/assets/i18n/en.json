@@ -473,8 +473,7 @@
         "normal": "Products without active alerts",
         "low": "Need replenishment soon",
         "expiring": "Expiring in a few days",
-        "expired": "Review and discard",
-        "basic": "Show only items marked as staples"
+        "expired": "Review and discard"
       },
       "status": {
         "normal": "In stock",
@@ -482,7 +481,6 @@
         "expiring": "Near expiry",
         "expired": "Expired"
       },
-      "basic": "Staples",
       "search": "Search products"
     },
     "fastAdd": {

@@ -57,7 +57,6 @@ export class PantryStateService {
   readonly summarySnapshot: WritableSignal<PantrySummaryMeta> = signal({
     total: 0,
     visible: 0,
-    basicCount: 0,
     statusCounts: { expired: 0, expiring: 0, lowStock: 0, normal: 0 },
   });
 
@@ -130,10 +129,9 @@ export class PantryStateService {
     [...this.despensaItems()].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
   );
   readonly statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
-  readonly basicOnly = computed(() => this.activeFilters().basic);
   readonly summary = computed<PantrySummaryMeta>(() => this.summarySnapshot());
   readonly filterChips = computed(() =>
-    this.viewModel.buildFilterChips(this.summary(), this.statusFilter(), this.basicOnly())
+    this.viewModel.buildFilterChips(this.summary(), this.statusFilter())
   );
   readonly supermarketSuggestions = computed(() => computeSupermarketSuggestions(this.pantryItemsState()));
   readonly presetLocationOptions = computed(() =>
@@ -205,27 +203,11 @@ export class PantryStateService {
   }
 
   onFilterChipSelected(chip: FilterChipViewModel): void {
-    if (chip.kind === 'basic') {
-      this.toggleBasicFilter();
-      return;
-    }
     if (chip.value) {
       this.applyStatusFilterPreset(chip.value);
       return;
     }
     this.applyStatusFilterPreset('all');
-  }
-
-  toggleBasicFilter(): void {
-    const next = !this.basicOnly();
-    this.pantryStore.setFilters({
-      basic: next,
-      expired: false,
-      expiring: false,
-      lowStock: false,
-      recentlyAdded: false,
-      normalOnly: false,
-    });
   }
 
   // -------- Modal routing --------

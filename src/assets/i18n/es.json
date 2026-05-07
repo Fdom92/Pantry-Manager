@@ -473,8 +473,7 @@
         "normal": "Productos sin alertas activas",
         "low": "Necesitan reposición pronto",
         "expiring": "Caducan en pocos días",
-        "expired": "Revisar y descartar",
-        "basic": "Mostrar solo los productos marcados como básicos"
+        "expired": "Revisar y descartar"
       },
       "status": {
         "normal": "Con stock",
@@ -482,7 +481,6 @@
         "expiring": "Próx. caducar",
         "expired": "Caducados"
       },
-      "basic": "Básicos",
       "search": "Buscar productos"
     },
     "fastAdd": {

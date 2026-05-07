@@ -473,8 +473,7 @@
         "normal": "Prodotti senza avvisi attivi",
         "low": "Necessitano di riassortimento presto",
         "expiring": "In scadenza tra pochi giorni",
-        "expired": "Controlla ed elimina",
-        "basic": "Mostra solo articoli essenziali"
+        "expired": "Controlla ed elimina"
       },
       "status": {
         "normal": "In stock",
@@ -482,7 +481,6 @@
         "expiring": "Vicino alla scadenza",
         "expired": "Scaduto"
       },
-      "basic": "Essenziali",
       "search": "Cerca prodotti"
     },
     "fastAdd": {

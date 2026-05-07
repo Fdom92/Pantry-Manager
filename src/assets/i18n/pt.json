@@ -473,8 +473,7 @@
         "normal": "Produtos sem alertas ativos",
         "low": "Necessitam de reabastecimento em breve",
         "expiring": "A expirar em poucos dias",
-        "expired": "Rever e descartar",
-        "basic": "Mostrar apenas itens essenciais"
+        "expired": "Rever e descartar"
       },
       "status": {
         "normal": "Em stock",
@@ -482,7 +481,6 @@
         "expiring": "Perto da validade",
         "expired": "Expirado"
       },
-      "basic": "Essenciais",
       "search": "Pesquisar produtos"
     },
     "fastAdd": {

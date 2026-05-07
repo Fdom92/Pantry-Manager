@@ -473,8 +473,7 @@
         "normal": "Produkte ohne aktive Warnungen",
         "low": "Müssen bald nachgefüllt werden",
         "expiring": "Laufen in wenigen Tagen ab",
-        "expired": "Überprüfen und entsorgen",
-        "basic": "Nur als Grundprodukte markierte Produkte anzeigen"
+        "expired": "Überprüfen und entsorgen"
       },
       "status": {
         "normal": "Auf Lager",
@@ -482,7 +481,6 @@
         "expiring": "Bald ablaufend",
         "expired": "Abgelaufen"
       },
-      "basic": "Grundprodukte",
       "search": "Produkte suchen"
     },
     "fastAdd": {

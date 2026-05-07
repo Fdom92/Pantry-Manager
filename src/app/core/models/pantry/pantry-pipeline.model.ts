@@ -4,7 +4,6 @@ export interface PantryFilterState {
   expiring: boolean;
   recentlyAdded: boolean;
   normalOnly: boolean;
-  basic: boolean;
 }
 
 export const DEFAULT_PANTRY_FILTERS: PantryFilterState = {
@@ -13,5 +12,4 @@ export const DEFAULT_PANTRY_FILTERS: PantryFilterState = {
   expiring: false,
   recentlyAdded: false,
   normalOnly: false,
-  basic: false,
 };

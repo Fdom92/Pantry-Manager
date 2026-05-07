@@ -38,13 +38,7 @@ export class PantryViewModelService {
       lowStock: 0,
       normal: 0,
     };
-    let basicCount = 0;
-
     for (const item of items) {
-      if (item.isBasic) {
-        basicCount += 1;
-      }
-
       const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
       switch (state) {
         case 'expired':
@@ -65,7 +59,6 @@ export class PantryViewModelService {
     return {
       total: totalCount,
       visible: items.length,
-      basicCount,
       statusCounts,
     };
   }
@@ -73,7 +66,6 @@ export class PantryViewModelService {
   buildFilterChips(
     summary: PantrySummaryMeta,
     activeStatus: PantryStatusFilterValue,
-    basicActive: boolean,
   ): FilterChipViewModel[] {
     const counts = summary.statusCounts;
     const statusChips: FilterChipViewModel[] = [
