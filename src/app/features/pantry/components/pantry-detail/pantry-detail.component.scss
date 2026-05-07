@@ -1,6 +1,8 @@
+@use '../../../../shared/styles/card-status-bar' as bar;
+
 .pantry-item-card {
-  position: relative;
-  overflow: hidden;
+  @include bar.apply;
+
   border-radius: 16px;
   background: var(--ion-card-background, var(--ion-card-background)) !important;
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
@@ -14,31 +16,12 @@
     transform: scale(0.985);
     opacity: 0.88;
   }
-}
 
-.pantry-item-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--card-accent, var(--ion-color-primary));
-  transition: background 180ms ease;
+  // Colored borders — pantry-specific, not shared
+  &[data-status='expired']                      { border-color: color-mix(in srgb, var(--ion-color-danger)  28%, transparent); }
+  &[data-status='near-expiry'],
+  &[data-status='low-stock']                    { border-color: color-mix(in srgb, var(--ion-color-warning) 28%, transparent); }
 }
-
-// Expired: red sidebar + red border
-.pantry-item-card[data-status='expired'] {
-  --card-accent: var(--ion-color-danger);
-  border-color: color-mix(in srgb, var(--ion-color-danger) 28%, transparent);
-}
-
-// Near-expiry + low-stock: amber sidebar + amber border
-.pantry-item-card[data-status='near-expiry'],
-.pantry-item-card[data-status='low-stock'] {
-  --card-accent: var(--ion-color-warning);
-  border-color: color-mix(in srgb, var(--ion-color-warning) 28%, transparent);
-}
-
-// Normal: primary sidebar, no colored border (default gray applies)
 
 .card-content {
   display: flex;
