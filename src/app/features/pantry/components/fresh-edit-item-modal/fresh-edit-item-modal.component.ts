@@ -7,7 +7,7 @@ import {
   IonIcon, IonInput, IonItem, IonModal, IonSpinner,
   IonTitle, IonToolbar,
 } from '@ionic/angular/standalone';
-import { QuickDateChipsComponent } from '@shared/components/quick-date-chips/quick-date-chips.component';
+import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 import { PantryFreshEditModalStateService } from '@core/services/pantry/modals/pantry-fresh-edit-modal-state.service';
 import type { FreshState } from '@core/domain/pantry';
 
@@ -18,7 +18,7 @@ import type { FreshState } from '@core/domain/pantry';
     CommonModule, ReactiveFormsModule, TranslateModule,
     IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
     IonContent, IonItem, IonInput, IonIcon,
-    IonFooter, IonSpinner, QuickDateChipsComponent,
+    IonFooter, IonSpinner, ExpiryPickerComponent,
   ],
   templateUrl: './fresh-edit-item-modal.component.html',
   styleUrls: ['./fresh-edit-item-modal.component.scss'],
@@ -40,7 +40,7 @@ export class FreshEditItemModalComponent {
     this.state.setState(state);
   }
 
-  onDateSelected(date: string | null): void {
-    this.state.setExpirationDate(date);
+  onDateSelected(date: string | undefined): void {
+    this.state.setExpirationDate(date ?? null);
   }
 }

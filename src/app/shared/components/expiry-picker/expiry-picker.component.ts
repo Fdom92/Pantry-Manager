@@ -38,45 +38,52 @@ import { QuickDateChipsComponent } from '../quick-date-chips/quick-date-chips.co
 
     <ion-modal
       [isOpen]="sheetOpen()"
-      [breakpoints]="[0, 0.42]"
-      [initialBreakpoint]="0.42"
+      [breakpoints]="[0, sheetBreakpoint]"
+      [initialBreakpoint]="sheetBreakpoint"
       [handle]="true"
       (didDismiss)="sheetOpen.set(false)">
       <ng-template>
         <ion-content>
           <div class="expiry-sheet">
-            <app-quick-date-chips
-              [emphasizedKeys]="['today', 'twoDays']"
-              (dateSelected)="onQuickDate($event)">
-            </app-quick-date-chips>
-            <div class="expiry-sheet__separator"></div>
-            <input
-              #dateEl
-              type="date"
-              class="expiry-date-input"
-              [value]="date ?? ''"
-              (change)="onDateChange($event)">
+            @if (mode !== 'picker-only') {
+              <app-quick-date-chips
+                [emphasizedKeys]="['today', 'twoDays']"
+                [initialDate]="date"
+                (dateSelected)="onQuickDate($event)">
+              </app-quick-date-chips>
+            }
+            @if (mode === 'full') {
+              <div class="expiry-sheet__separator"></div>
+            }
+            @if (mode !== 'chips-only') {
+              <input
+                #dateEl
+                type="date"
+                class="expiry-date-input"
+                [value]="date ?? ''"
+                (change)="onDateChange($event)">
 
-            <div class="expiry-sheet__row" (click)="$any(dateEl).showPicker?.()">
-              <ion-icon name="calendar-outline"></ion-icon>
-              <span class="expiry-sheet__label">
-                @if (date) { {{ formattedDate }} }
-                @else { {{ noDateKey | translate }} }
-              </span>
-              @if (date) {
-                <ion-icon name="close-circle" class="expiry-sheet__clear" (click)="onDateClear($event)"></ion-icon>
-              }
-            </div>
+              <div class="expiry-sheet__row" (click)="$any(dateEl).showPicker?.()">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span class="expiry-sheet__label">
+                  @if (date) { {{ formattedDate }} }
+                  @else { {{ noDateKey | translate }} }
+                </span>
+                @if (date) {
+                  <ion-icon name="close-circle" class="expiry-sheet__clear" (click)="onDateClear($event)"></ion-icon>
+                }
+              </div>
 
-            <div class="expiry-sheet__separator"></div>
+              <div class="expiry-sheet__separator"></div>
 
-            <div class="expiry-sheet__row" [class.expiry-sheet__row--active]="noExpiry" (click)="onNoExpiryClick()">
-              <ion-icon [name]="noExpiry ? 'infinite' : 'infinite-outline'"></ion-icon>
-              <span class="expiry-sheet__label">{{ 'pantry.batches.noExpiryIntentional' | translate }}</span>
-              @if (noExpiry) {
-                <ion-icon name="checkmark-circle" color="warning"></ion-icon>
-              }
-            </div>
+              <div class="expiry-sheet__row" [class.expiry-sheet__row--active]="noExpiry" (click)="onNoExpiryClick()">
+                <ion-icon [name]="noExpiry ? 'infinite' : 'infinite-outline'"></ion-icon>
+                <span class="expiry-sheet__label">{{ 'pantry.batches.noExpiryIntentional' | translate }}</span>
+                @if (noExpiry) {
+                  <ion-icon name="checkmark-circle" color="warning"></ion-icon>
+                }
+              </div>
+            }
           </div>
         </ion-content>
       </ng-template>
@@ -167,11 +174,18 @@ import { QuickDateChipsComponent } from '../quick-date-chips/quick-date-chips.co
 export class ExpiryPickerComponent {
   private readonly languageService = inject(LanguageService);
 
+  @Input() mode: 'full' | 'chips-only' | 'picker-only' = 'full';
   @Input() date?: string;
   @Input() noExpiry = false;
   @Input() noDateKey = 'pantry.quantitySheet.noDate';
   @Output() dateChange = new EventEmitter<string | undefined>();
   @Output() noExpiryToggle = new EventEmitter<void>();
+
+  get sheetBreakpoint(): number {
+    if (this.mode === 'chips-only') return 0.32;
+    if (this.mode === 'picker-only') return 0.35;
+    return 0.42;
+  }
 
   protected sheetOpen = signal(false);
 

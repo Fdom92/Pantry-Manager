@@ -53,11 +53,11 @@
           <h5>{{ 'pantry.fresh.addModal.whenExpires' | translate }}</h5>
         </div>
         <div class="form-section fresh-edit-modal__date-card">
-          <app-quick-date-chips
-            [emphasizedKeys]="['today', 'twoDays']"
-            [initialDate]="currentExpirationDate"
-            (dateSelected)="onDateSelected($event)">
-          </app-quick-date-chips>
+          <app-expiry-picker
+            [mode]="'chips-only'"
+            [date]="currentExpirationDate ?? undefined"
+            (dateChange)="onDateSelected($event)">
+          </app-expiry-picker>
         </div>
 
       </form>

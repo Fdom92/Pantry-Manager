@@ -76,13 +76,14 @@
                     }
                     @if (showEntryDate) {
                       @if (entryDateQuickOnly) {
-                        <app-quick-date-chips
-                          [emphasizedKeys]="['today', 'twoDays']"
-                          [initialDate]="entry.expirationDate"
-                          (dateSelected)="entryDateChange.emit({ entry, date: $event ?? undefined })">
-                        </app-quick-date-chips>
+                        <app-expiry-picker
+                          [mode]="'chips-only'"
+                          [date]="entry.expirationDate"
+                          (dateChange)="entryDateChange.emit({ entry, date: $event })">
+                        </app-expiry-picker>
                       } @else {
                         <app-expiry-picker
+                          [mode]="'picker-only'"
                           [date]="entry.expirationDate"
                           [noExpiry]="entry.noExpiry ?? false"
                           (dateChange)="entryDateChange.emit({ entry, date: $event })"

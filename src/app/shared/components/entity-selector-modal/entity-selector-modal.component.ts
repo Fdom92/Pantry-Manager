@@ -16,7 +16,6 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { EntityAutocompleteComponent, type AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
-import { QuickDateChipsComponent } from '@shared/components/quick-date-chips/quick-date-chips.component';
 
 export interface EntitySelectorEntry {
   id: string;
@@ -41,7 +40,6 @@ export interface EntitySelectorEntry {
     IonButton,
     IonIcon,
     ExpiryPickerComponent,
-    QuickDateChipsComponent,
     IonContent,
     IonText,
     IonFooter,
