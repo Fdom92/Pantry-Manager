@@ -31,7 +31,7 @@ export class FreshItemCardComponent implements OnChanges {
   });
 
   readonly barStatus = computed((): string => {
-    if (this.isExpired() || this.expiryUrgency() === 'critical') return 'expired';
+    if (this.isExpired() || this.expiryUrgency() === 'critical' || this.currentState() === 'none') return 'expired';
     if (this.expiryUrgency() === 'warning' || this.currentState() === 'low') return 'near-expiry';
     return 'normal';
   });
