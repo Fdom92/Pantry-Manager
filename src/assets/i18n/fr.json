@@ -506,7 +506,7 @@
       "advancedDescription": "Ajoutez plus de détails."
     },
     "empty": {
-      "filters": "Aucun produit ne correspond aux filtres actuels."
+      "filters": "Aucun produit dans cet état."
     },
     "group": {
       "count": "{{ count }} articles",
@@ -751,7 +751,7 @@
         }
       },
       "empty": {
-        "filters": "Aucun frais ne correspond aux filtres."
+        "filters": "Aucun frais dans cet état."
       },
       "toast": {
         "updated": "✓ Tu l'as",

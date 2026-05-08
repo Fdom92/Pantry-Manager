@@ -72,9 +72,12 @@
           [subtitleKey]="'pantry.fresh.emptyState.subtitle'">
         </app-empty-state>
       } @else if (facade.hasFreshButFilteredEmpty()) {
-        <div class="fresh-empty-state fresh-empty-state--filtered">
-          <p class="fresh-empty-state__subtitle">{{ 'pantry.fresh.empty.filters' | translate }}</p>
-        </div>
+        <app-empty-state
+          class="list-empty-state"
+          icon="leaf-outline"
+          [hideTitle]="true"
+          [subtitleKey]="'pantry.fresh.empty.filters'">
+        </app-empty-state>
       } @else {
         <div class="fresh-list">
           @for (item of facade.visibleFreshItems(); track item._id) {
@@ -136,8 +139,9 @@
       } @else if (facade.despensaItems().length === 0) {
         <app-empty-state
           class="list-empty-state"
-          icon="filter-outline"
-          [subtitle]="'pantry.empty.filters' | translate">
+          icon="fast-food-outline"
+          [hideTitle]="true"
+          [subtitleKey]="'pantry.empty.filters'">
         </app-empty-state>
       } @else {
         @if (facade.groupByCategory()) {

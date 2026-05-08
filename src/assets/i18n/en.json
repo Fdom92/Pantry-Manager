@@ -506,7 +506,7 @@
       "advancedDescription": "Add with more details."
     },
     "empty": {
-      "filters": "No product matches the current filters."
+      "filters": "No products in this state."
     },
     "group": {
       "count": "{{ count }} items",
@@ -752,7 +752,7 @@
         }
       },
       "empty": {
-        "filters": "No fresh products match the filters."
+        "filters": "No fresh products in this state."
       },
       "toast": {
         "updated": "✓ You have it",

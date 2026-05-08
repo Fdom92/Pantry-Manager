@@ -506,7 +506,7 @@
       "advancedDescription": "Añade con más detalles."
     },
     "empty": {
-      "filters": "Ningún producto coincide con los filtros actuales."
+      "filters": "No hay productos en este estado."
     },
     "group": {
       "count": "{{ count }} artículos",
@@ -752,7 +752,7 @@
         }
       },
       "empty": {
-        "filters": "Ningún fresco coincide con los filtros."
+        "filters": "No hay frescos en este estado."
       },
       "toast": {
         "updated": "✓ Lo tienes",
