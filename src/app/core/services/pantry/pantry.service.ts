@@ -33,7 +33,9 @@ export class PantryService extends StorageService<PantryItem> {
   private backgroundLoadPromise: Promise<void> | null = null;
   private readonly pendingNavigationPreset = signal<Partial<PantryFilterState> | null>(null);
   readonly loadedProducts = signal<PantryItem[]>([]);
-  readonly activeProducts = computed(() => this.loadedProducts().filter(item => this.getItemTotalQuantity(item) > 0));
+  readonly activeProducts = computed(() => this.loadedProducts().filter(item =>
+    item.productType === 'fresh' || this.getItemTotalQuantity(item) > 0
+  ));
   readonly filteredProducts = signal<PantryItem[]>([]);
   readonly searchQuery = signal('');
   readonly activeFilters = signal<PantryFilterState>({ ...DEFAULT_PANTRY_FILTERS });
@@ -474,9 +476,9 @@ export class PantryService extends StorageService<PantryItem> {
     const query = normalizeSearchQuery(this.searchQuery());
     const filters = this.activeFilters();
 
-    const filtered = loaded.filter(item => {
-      return this.getItemTotalQuantity(item) > 0 && matchesSearchQuery(item, query) && matchesFilters(item, filters);
-    });
+    const filtered = loaded.filter(item =>
+      matchesSearchQuery(item, query) && matchesFilters(item, filters)
+    );
     const sorted = sortPantryItems(filtered);
     this.filteredProducts.set(sorted);
   }
@@ -508,8 +510,7 @@ export class PantryService extends StorageService<PantryItem> {
       a.expired === b.expired &&
       a.expiring === b.expiring &&
       a.recentlyAdded === b.recentlyAdded &&
-      a.normalOnly === b.normalOnly &&
-      a.basic === b.basic
+      a.normalOnly === b.normalOnly
     );
   }
 

@@ -100,6 +100,15 @@
           }
         </div>
       </form>
+      <div class="edit-item-modal__danger-zone">
+        <ion-button
+          fill="outline"
+          color="medium"
+          [disabled]="state.isSaving()"
+          (click)="state.convertToFresh()">
+          {{ 'pantry.fresh.convertToFresh.button' | translate }}
+        </ion-button>
+      </div>
     </ion-content>
     <ion-footer class="modal-footer">
       <ion-toolbar>

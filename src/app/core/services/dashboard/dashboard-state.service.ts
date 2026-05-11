@@ -80,6 +80,7 @@ export class DashboardStateService {
   readonly lowStockItems = this.pantryStore.lowStockItems;
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
   readonly expiredItems = this.pantryStore.expiredItems;
+
   readonly inventorySummary = this.pantryStore.summary;
   readonly isInventoryLoading = computed(() =>
     this.pantryStore.loading() || !this.pantryStore.endReached()
@@ -131,6 +132,8 @@ export class DashboardStateService {
   readonly noExpiryDateCount = computed(() => {
     return this.pantryItems().filter(item => {
       if (item.isBasic) return false;
+      // Fresh items naturally lack precise dates — exclude from quality warnings
+      if (item.productType === 'fresh') return false;
       const hasBatchDate = item.batches?.some(b => !!b.expirationDate);
       const hasItemDate = !!item.expirationDate;
       if (hasBatchDate || hasItemDate) return false;
@@ -235,7 +238,11 @@ export class DashboardStateService {
   readonly stalePantryItemsCount = computed(() => this.stalePantryItems().length);
 
   readonly todaySuggestion = computed((): TodaySuggestion | null => {
-    const raw = computeTodaySuggestion(this.nearExpiryItems(), this.pantryItems(), this.lastProtagonistId());
+    const raw = computeTodaySuggestion(
+      this.nearExpiryItems(),
+      this.pantryItems(),
+      this.lastProtagonistId(),
+    );
     if (!raw) return null;
     if (this.dismissedTodayIds().has(raw.protagonist.id)) return null;
     return raw;
@@ -467,6 +474,22 @@ export class DashboardStateService {
       this.lastProtagonistId.set(suggestion.protagonist.id);
       this.isCookingConfirmed.set(true);
       void this.reviewPrompt.handleConsumeCompleted();
+      setTimeout(() => this.isCookingConfirmed.set(false), 2500);
+    } finally {
+      this.isConsumingToday.set(false);
+    }
+  }
+
+  async markFreshItemOut(id: string): Promise<void> {
+    if (this.isConsumingToday()) return;
+    const item = this.pantryItems().find(i => i._id === id);
+    if (!item) return;
+    this.isConsumingToday.set(true);
+    try {
+      const updatedBatch = { ...(item.batches?.[0] ?? { quantity: 0 }), quantity: 0 };
+      await this.pantryStore.updateItem({ ...item, batches: [updatedBatch] });
+      this.lastProtagonistId.set(id);
+      this.isCookingConfirmed.set(true);
       setTimeout(() => this.isCookingConfirmed.set(false), 2500);
     } finally {
       this.isConsumingToday.set(false);

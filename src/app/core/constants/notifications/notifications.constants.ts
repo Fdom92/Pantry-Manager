@@ -2,6 +2,7 @@ export const NOTIFICATION_IDS = {
   EXPIRED_ITEMS: 100,
   NEAR_EXPIRY: 101,
   LOW_STOCK: 110,
+  RE_ENGAGEMENT: 120,
 } as const;
 
 export const NOTIFICATION_CHANNEL_ID = 'pantry-alerts';

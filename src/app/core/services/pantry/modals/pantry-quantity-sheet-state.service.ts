@@ -1,5 +1,7 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
+import { ToastController } from '@ionic/angular';
+import { TranslateService } from '@ngx-translate/core';
 import { ReviewPromptService } from '../../shared/review-prompt.service';
 import { PantryBatchOperationsService } from '../pantry-batch-operations.service';
 
@@ -10,6 +12,8 @@ import { PantryBatchOperationsService } from '../pantry-batch-operations.service
 export class PantryQuantitySheetStateService {
   private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly toastCtrl = inject(ToastController);
+  private readonly translate = inject(TranslateService);
 
   readonly showQuantitySheet = signal(false);
   readonly selectedItem = signal<PantryItem | null>(null);
@@ -57,9 +61,26 @@ export class PantryQuantitySheetStateService {
     this.pendingNoExpiry.set(false);
 
     if (item && change !== 0) {
+      const previousTotal = this.getTotalQuantity(item);
       await this.applyPendingChanges(item, change, expiryDate, noExpiry);
       if (change < 0) {
         this.reviewPrompt.handleConsumeCompleted();
+        const newTotal = previousTotal + change;
+        if (newTotal <= 0 && item.isBasic) {
+          const toast = await this.toastCtrl.create({
+            message: this.translate.instant('pantry.toasts.addedToList'),
+            duration: 1500,
+            position: 'bottom',
+          });
+          void toast.present();
+        } else if (newTotal <= 0) {
+          const toast = await this.toastCtrl.create({
+            message: this.translate.instant('pantry.toasts.hiddenUntilStock'),
+            duration: 2000,
+            position: 'bottom',
+          });
+          void toast.present();
+        }
       }
     }
   }

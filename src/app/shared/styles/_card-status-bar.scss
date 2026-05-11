@@ -1,0 +1,27 @@
+// Shared status sidebar bar mixin.
+// Apply to any card root element that has [data-status] bound to a ProductStatusState value.
+// Consumed by: fresh-item-card, pantry-detail
+//
+// Visual rules:
+//   data-status='expired'                  → red bar
+//   data-status='near-expiry' | 'low-stock' → amber bar
+//   anything else                          → no bar (transparent)
+
+@mixin apply {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--status-bar-color, transparent);
+    pointer-events: none;
+    transition: background 180ms ease;
+  }
+
+  &[data-status='expired']                      { --status-bar-color: var(--ion-color-danger);  }
+  &[data-status='near-expiry'],
+  &[data-status='low-stock']                    { --status-bar-color: var(--ion-color-warning); }
+}

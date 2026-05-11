@@ -16,8 +16,6 @@ export function matchesSearchQuery(item: PantryItem, query: string): boolean {
  * Check if item matches active filters.
  */
 export function matchesFilters(item: PantryItem, filters: PantryFilterState): boolean {
-  if (filters.basic && !item.isBasic) return false;
-
   const state = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
 
   if (filters.expired && state !== 'expired') return false;

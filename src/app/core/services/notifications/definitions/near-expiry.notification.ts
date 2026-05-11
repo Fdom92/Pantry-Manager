@@ -17,11 +17,19 @@ export class NearExpiryNotification implements NotificationDefinition {
     if (!nearExpiry.length) return null;
 
     const hour = preferences.notificationHour ?? 9;
+    const count = nearExpiry.length;
     const nearestDays = nearestExpiryDays(nearExpiry, now);
+    const titleKey = count === 1 ? 'notifications.nearExpiry.title_one' : 'notifications.nearExpiry.title';
+    let bodyKey: string;
+    if (count === 1) {
+      bodyKey = nearestDays === 1 ? 'notifications.nearExpiry.body_one_tomorrow' : 'notifications.nearExpiry.body_one';
+    } else {
+      bodyKey = nearestDays === 1 ? 'notifications.nearExpiry.body_tomorrow' : 'notifications.nearExpiry.body';
+    }
     return {
       id: this.id,
-      title: t('notifications.nearExpiry.title'),
-      body: t('notifications.nearExpiry.body', { count: nearExpiry.length, nearestDays }),
+      title: t(titleKey),
+      body: t(bodyKey, { count, nearestDays }),
       scheduleAt: buildNextTriggerDate(now, hour).toISOString(),
     };
   }

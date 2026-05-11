@@ -252,3 +252,12 @@ ion-title, ion-back-button {
 .quantity-new--negative {
   color: var(--ion-color-danger) !important;
 }
+
+.edit-item-modal__danger-zone {
+  margin-top: var(--app-theme-spacing-lg);
+  padding-top: var(--app-theme-spacing-md);
+  border-top: 1px solid var(--app-theme-card-border-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-sm);
+}

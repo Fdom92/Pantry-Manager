@@ -17,10 +17,13 @@ export class LowStockNotification implements NotificationDefinition {
     if (!lowStock.length) return null;
 
     const hour = preferences.notificationHour ?? 9;
+    const count = lowStock.length;
+    const titleKey = count === 1 ? 'notifications.lowStock.title_one' : 'notifications.lowStock.title';
+    const bodyKey = count === 1 ? 'notifications.lowStock.body_one' : 'notifications.lowStock.body';
     return {
       id: this.id,
-      title: t('notifications.lowStock.title'),
-      body: t('notifications.lowStock.body', { count: lowStock.length }),
+      title: t(titleKey),
+      body: t(bodyKey, { count }),
       scheduleAt: buildNextTriggerDate(now, hour).toISOString(),
     };
   }
