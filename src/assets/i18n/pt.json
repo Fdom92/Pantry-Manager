@@ -658,8 +658,9 @@
       "stockUpdated": "💾 Stock atualizado: {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Stock atualizado.",
       "saved": "💾 Alterações guardadas.",
-      "isBasicOn": "⭐ Adicionado à lista de compras",
-      "isBasicOff": "Removido da lista de compras",
+      "isBasicOn": "Será adicionado à sua lista quando acabar",
+      "isBasicOff": "Não será mais adicionado automaticamente",
+      "isBasicOffDepleted": "Removido da sua lista de compras",
       "addedToList": "🛒 Adicionado à lista de compras",
       "hiddenUntilStock": "Será ocultado até que você adicione estoque novamente.",
       "multipleAdded": "✅ {{count}} produtos adicionados"
