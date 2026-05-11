@@ -661,6 +661,7 @@
       "isBasicOn": "⭐ Aggiunto alla lista della spesa",
       "isBasicOff": "Rimosso dalla lista della spesa",
       "addedToList": "🛒 Aggiunto alla lista della spesa",
+      "hiddenUntilStock": "Sarà nascosto finché non aggiungerai nuovamente dello stock.",
       "multipleAdded": "✅ {{count}} prodotti aggiunti"
     },
     "confirmDelete": "Eliminare \"{{ name }}\"?",

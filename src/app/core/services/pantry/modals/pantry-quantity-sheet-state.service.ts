@@ -73,6 +73,13 @@ export class PantryQuantitySheetStateService {
             position: 'bottom',
           });
           void toast.present();
+        } else if (newTotal <= 0) {
+          const toast = await this.toastCtrl.create({
+            message: this.translate.instant('pantry.toasts.hiddenUntilStock'),
+            duration: 2000,
+            position: 'bottom',
+          });
+          void toast.present();
         }
       }
     }

@@ -3,6 +3,7 @@ import { ITEM_DELETE_ANIMATION_DURATION_MS } from '@core/constants';
 import type { PantryGroup, PantryItem } from '@core/models/pantry';
 import { sleep } from '@core/utils';
 import { TranslateService } from '@ngx-translate/core';
+import { ToastController } from '@ionic/angular';
 import { ConfirmService } from '../shared';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { PantryStoreService } from './pantry-store.service';
@@ -14,6 +15,7 @@ import { PantryStoreService } from './pantry-store.service';
 export class PantryListUiStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly translate = inject(TranslateService);
+  private readonly toastCtrl = inject(ToastController);
   private readonly confirm = inject(ConfirmService);
   private readonly eventManager = inject(HistoryEventManagerService);
 
@@ -103,6 +105,12 @@ export class PantryListUiStateService {
       await sleep(this.deleteAnimationDuration);
       await this.pantryStore.deleteItem(item._id);
       await this.eventManager.logDeleteFromCard(item);
+      const toast = await this.toastCtrl.create({
+        message: this.translate.instant('pantry.toasts.deleted'),
+        duration: 1500,
+        position: 'bottom',
+      });
+      void toast.present();
     } catch (err) {
       console.error('[PantryListUiStateService] deleteItem error', err);
     } finally {

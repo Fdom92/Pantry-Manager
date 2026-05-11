@@ -661,6 +661,7 @@
       "isBasicOn": "⭐ Ajouté à la liste de courses",
       "isBasicOff": "Retiré de la liste de courses",
       "addedToList": "🛒 Ajouté à ta liste de courses",
+      "hiddenUntilStock": "Il sera masqué jusqu'à ce que tu rajouttes du stock.",
       "multipleAdded": "✅ {{count}} produits ajoutés"
     },
     "confirmDelete": "Supprimer \"{{ name }}\" ?",

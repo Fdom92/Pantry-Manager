@@ -662,6 +662,7 @@
       "isBasicOn": "⭐ Aparecerá en tu lista de compra",
       "isBasicOff": "Eliminado de la lista de compra",
       "addedToList": "🛒 Añadido a tu lista de compra",
+      "hiddenUntilStock": "Se ocultará hasta que vuelvas a añadir stock.",
       "multipleAdded": "✅ {{count}} productos añadidos"
     },
     "confirmDelete": "¿Eliminar \"{{ name }}\"?",
