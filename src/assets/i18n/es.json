@@ -17,8 +17,8 @@
     },
     "slides": {
       "problem": {
-        "title": "¿Tiras comida que no sabías que tenías?",
-        "description": "Evita tirar comida y dinero. Controla lo que tienes antes de que caduque."
+        "title": "Evita tirar comida",
+        "description": "Controla lo que tienes sin pensarlo."
       },
       "simple": {
         "title": "Organiza tu despensa en segundos",
@@ -28,9 +28,13 @@
         "title": "Ahorra dinero y tiempo",
         "description": "Compra solo lo que necesitas y aprovecha lo que ya tienes."
       },
+      "fresh": {
+        "title": "Añade lo que compras",
+        "description": "Nosotros te avisamos cuando algo falte."
+      },
       "action": {
-        "title": "Empieza añadiendo tu primer producto",
-        "description": "Toca el botón + y crea tu despensa en minutos."
+        "title": "Empieza ahora",
+        "description": "Añade tu primer producto."
       }
     },
     "mock": {
@@ -55,7 +59,8 @@
       "edit": "Editar",
       "apply": "Aplicar",
       "clear": "Limpiar",
-      "next": "Siguiente"
+      "next": "Siguiente",
+      "delete": "Eliminar"
     },
     "loading": "Cargando…",
     "dates": {
@@ -78,7 +83,7 @@
     },
     "pantry": {
       "title": "La despensa está vacía",
-      "subtitle": "Añade tu primer producto y controla el stock y las caducidades."
+      "subtitle": "Añade productos que quieras controlar\n(con cantidad y caducidad)"
     },
     "shopping": {
       "title": "Todo en orden"
@@ -162,13 +167,16 @@
         "expiringsoon": "Caduca muy pronto — úsalo hoy",
         "expirestoday": "Caduca pronto — ve pensando en usarlo",
         "lowstock": "Te queda poco — añádelo a la lista de la compra",
-        "expiringlater": "Caduca en los próximos días — ve pensando en usarlo"
+        "expiringlater": "Caduca en los próximos días — ve pensando en usarlo",
+        "freshExpiring": "Tu {{name}} caduca pronto.",
+        "freshOut": "Te quedaste sin {{name}}."
       },
-      "combine": "También caduca pronto:",
+      "combine": "Caduca pronto también:",
       "cta": {
-        "primary": "Usar esto hoy",
+        "primary": "Usar hoy",
         "restock": "Ver lista de la compra",
-        "dismiss": "Ahora no"
+        "dismiss": "Ahora no",
+        "markFreshOut": "Ya no lo tengo"
       },
       "expiry": {
         "today": "Caduca hoy",
@@ -191,7 +199,7 @@
         "missingDates": "{{count}} productos sin fecha de caducidad · añádelas para ver sugerencias"
       },
       "secondary": {
-        "days": "{{count}}d"
+        "days": "{{count}} días"
       }
     },
     "actions": {
@@ -469,16 +477,14 @@
         "normal": "Productos sin alertas activas",
         "low": "Necesitan reposición pronto",
         "expiring": "Caducan en pocos días",
-        "expired": "Revisar y descartar",
-        "basic": "Mostrar solo los productos marcados como básicos"
+        "expired": "Revisar y descartar"
       },
       "status": {
-        "normal": "Con stock",
+        "normal": "Sin alertas",
         "low": "Stock bajo",
         "expiring": "Próx. caducar",
         "expired": "Caducados"
       },
-      "basic": "Básicos",
       "search": "Buscar productos"
     },
     "fastAdd": {
@@ -500,7 +506,7 @@
       "advancedDescription": "Añade con más detalles."
     },
     "empty": {
-      "filters": "Ningún producto coincide con los filtros actuales."
+      "filters": "No hay productos en este estado."
     },
     "group": {
       "count": "{{ count }} artículos",
@@ -578,6 +584,11 @@
       "earliest": "Caduca primero: {{ date }}",
       "noBatches": "Sin lotes registrados.",
       "noExpiry": "Sin caducidad",
+      "subinfo": {
+        "expired": "Caducado",
+        "tomorrow": "Caduca mañana",
+        "inDays": "Caduca en {{count}} días"
+      },
       "quantity": {
         "single": "{{ quantity }} unidad",
         "plural": "{{ quantity }} unidades"
@@ -647,7 +658,13 @@
       "locationsUpdated": "📦 Ubicaciones actualizadas: {{ breakdown }}.",
       "stockUpdated": "💾 Stock actualizado: {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Stock actualizado.",
-      "saved": "💾 Cambios guardados."
+      "saved": "💾 Cambios guardados.",
+      "isBasicOn": "Se añadirá a tu lista cuando se agote",
+      "isBasicOff": "Ya no se añadirá automáticamente",
+      "isBasicOffDepleted": "Eliminado de tu lista de compra",
+      "addedToList": "🛒 Añadido a tu lista de compra",
+      "hiddenUntilStock": "Se ocultará hasta que vuelvas a añadir stock.",
+      "multipleAdded": "✅ {{count}} productos añadidos"
     },
     "confirmDelete": "¿Eliminar \"{{ name }}\"?",
     "fab": {
@@ -662,6 +679,92 @@
       "noResults": "Sin resultados",
       "empty": "Todavía no has añadido productos.",
       "submit": "Registrar consumo"
+    },
+    "sections": {
+      "fresh": "Frescos",
+      "pantry": "Despensa",
+      "groupToggle": {
+        "flat": "Agrupar por categoría",
+        "grouped": "Vista plana"
+      }
+    },
+    "fresh": {
+      "addButton": "Añadir fresco",
+      "showMore": "Ver todos ({{ count }})",
+      "showLess": "Ver menos",
+      "emptyState": {
+        "title": "Frescos",
+        "subtitle": "Añade lo que usas cada semana\n(sin fechas exactas)",
+        "cta": "+ Añadir frescos"
+      },
+      "keepInStock": "Volver a comprar automáticamente",
+      "keepInStockHint": "Aparecerá de nuevo cuando lo marques como agotado",
+      "addModal": {
+        "title": "Nuevo fresco",
+        "namePlaceholder": "Nombre del producto",
+        "whenExpires": "¿Cuándo caduca?",
+        "submit": "Añadir",
+        "cardTitle": "Añade frescos rápido",
+        "subtitle": "Selecciona un fresco existente o crea uno nuevo.",
+        "placeholder": "Buscar fresco",
+        "noResults": "Sin resultados",
+        "empty": "Aún no has añadido nada."
+      },
+      "state": {
+        "label": "Estado",
+        "sufficient": "Suficiente",
+        "low": "Poco",
+        "none": "Nada"
+      },
+      "quickDate": {
+        "today": "Hoy",
+        "twoDays": "2 días",
+        "fiveDays": "5 días",
+        "oneWeek": "1 semana",
+        "twoWeeks": "2 semanas",
+        "noDate": "Sin fecha"
+      },
+      "card": {
+        "expired": "Caducado",
+        "today": "Hoy",
+        "tomorrow": "Mañana",
+        "soon": "Pronto"
+      },
+      "editModal": {
+        "title": "Editar fresco",
+        "stateLabel": "¿Cuánto te queda?",
+        "deleteConfirm": {
+          "title": "Eliminar producto",
+          "message": "¿Eliminar {{ name }}? No se puede deshacer."
+        }
+      },
+      "convertToPantry": {
+        "button": "Convertir a despensa",
+        "toast": "Movido a despensa"
+      },
+      "convertToFresh": {
+        "button": "Convertir a fresco",
+        "toast": "Movido a frescos",
+        "dialog": {
+          "title": "Convertir a fresco",
+          "bodySingle": "Quedará así:\n· Estado: {{state}} ({{total}} unidades)\n· Caduca: {{date}}",
+          "bodyMulti": "Tu producto tiene {{batches}} lotes ({{total}} unidades). Se unirán en un solo lote:\n· Estado: {{state}}\n· Caduca: {{date}}",
+          "locationsLost": "Las ubicaciones se perderán.",
+          "confirm": "Convertir"
+        }
+      },
+      "empty": {
+        "filters": "No hay frescos en este estado."
+      },
+      "toast": {
+        "updated": "✓ Lo tienes",
+        "updatedLow": "Queda poco",
+        "markedOut": "Agotado",
+        "markedOutHint": "Agotado · Activa ⭐ para añadirlo a tu lista",
+        "keepInStock": "Se añadirá a tu lista cuando se acabe",
+        "addSuccess_one": "✅ {{name}} añadido",
+        "addSuccess_other": "✅ {{count}} frescos añadidos"
+      }
     }
   },
   "upgrade": {
@@ -898,15 +1001,27 @@
   "notifications": {
     "expired": {
       "title": "Tienes productos caducados",
-      "body": "{{ count }} productos de tu despensa ya han caducado"
+      "title_one": "Tienes un producto caducado",
+      "body": "{{ count }} productos de tu despensa ya han caducado",
+      "body_one": "Un producto de tu despensa ya ha caducado"
     },
     "nearExpiry": {
-      "title": "Algunos productos caducan pronto",
-      "body": "{{ count }} productos caducan, el primero en {{ nearestDays }} días"
+      "title": "{{ count }} productos caducan pronto",
+      "title_one": "1 producto caduca pronto",
+      "body": "El primero en {{ nearestDays }} días",
+      "body_tomorrow": "El primero caduca mañana",
+      "body_one": "Caduca en {{ nearestDays }} días",
+      "body_one_tomorrow": "Caduca mañana"
     },
     "lowStock": {
-      "title": "Se te están acabando algunas cosas",
-      "body": "{{ count }} básicos están por debajo del mínimo que marcaste"
+      "title": "Se te están acabando básicos",
+      "title_one": "Se te está acabando un básico",
+      "body": "{{ count }} básicos necesitan reposición",
+      "body_one": "Un básico necesita reposición"
+    },
+    "reEngagement": {
+      "title": "¿Cómo van tus frescos?",
+      "body": "Hace unos días que no revisas la despensa. Solo un momento y tienes todo al día."
     }
   },
   "sync": {

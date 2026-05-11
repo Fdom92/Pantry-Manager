@@ -1,0 +1,92 @@
+<ion-modal
+  [isOpen]="state.isOpen()"
+  (willDismiss)="state.dismiss()"
+  (didDismiss)="state.close()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ 'pantry.fresh.editModal.title' | translate }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button fill="clear" color="medium" (click)="state.dismiss()">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding fresh-edit-modal">
+      <form [formGroup]="state.form" class="fresh-edit-modal__form">
+
+        <div class="form-section">
+          <ion-item lines="none">
+            <ion-input
+              formControlName="name"
+              label="{{ 'pantry.form.name' | translate }}"
+              labelPlacement="stacked"
+              [placeholder]="'pantry.form.namePlaceholder' | translate"
+              required>
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <div class="form-section-header">
+          <h5>{{ 'pantry.fresh.editModal.stateLabel' | translate }}</h5>
+        </div>
+        <div class="form-section fresh-edit-modal__segment-card">
+          <div class="fresh-edit-modal__segment" role="radiogroup">
+            @for (s of state.states; track s) {
+              <button
+                type="button"
+                role="radio"
+                class="fresh-edit-modal__segment-btn"
+                [class.is-active]="state.currentState() === s"
+                [attr.data-state]="s"
+                [attr.aria-checked]="state.currentState() === s ? 'true' : 'false'"
+                (click)="onStateClick(s)">
+                {{ labelKey(s) | translate }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="form-section-header">
+          <h5>{{ 'pantry.fresh.addModal.whenExpires' | translate }}</h5>
+        </div>
+        <div class="form-section fresh-edit-modal__date-card">
+          <app-expiry-picker
+            [mode]="'chips-only'"
+            [date]="currentExpirationDate ?? undefined"
+            (dateChange)="onDateSelected($event)">
+          </app-expiry-picker>
+        </div>
+
+      </form>
+
+      <div class="fresh-edit-modal__danger-zone">
+        <ion-button fill="outline" color="medium" (click)="state.convertToPantry()" [disabled]="state.isSaving()">
+          {{ 'pantry.fresh.convertToPantry.button' | translate }}
+        </ion-button>
+        <ion-button fill="clear" color="danger" (click)="state.deleteItem()" [disabled]="state.isSaving()">
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          {{ 'common.actions.delete' | translate }}
+        </ion-button>
+      </div>
+    </ion-content>
+
+    <ion-footer class="modal-footer">
+      <ion-toolbar>
+        <ion-button
+          expand="block"
+          color="primary"
+          [disabled]="!state.canSave() || state.isSaving()"
+          (click)="state.save()">
+          @if (state.isSaving()) {
+            <ion-spinner name="dots"></ion-spinner>
+          } @else {
+            {{ 'common.actions.save' | translate }}
+          }
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
+  </ng-template>
+</ion-modal>

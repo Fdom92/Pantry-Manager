@@ -21,6 +21,7 @@ import {
   alertCircle,
   alertCircleOutline,
   apertureOutline,
+  appsOutline,
   archiveOutline,
   arrowForwardOutline,
   basketOutline,
@@ -51,6 +52,7 @@ import {
   informationCircle,
   informationOutline,
   layersOutline,
+  leafOutline,
   listOutline,
   moonOutline,
   navigateOutline,
@@ -162,7 +164,9 @@ addIcons({
   'stats-chart-outline': statsChartOutline,
   'share-social-outline': shareSocialOutline,
   'archive-outline': archiveOutline,
-  'infinite-outline': infiniteOutline
+  'infinite-outline': infiniteOutline,
+  'apps-outline': appsOutline,
+  'leaf-outline': leafOutline
 });
 
 bootstrapApplication(AppComponent, {

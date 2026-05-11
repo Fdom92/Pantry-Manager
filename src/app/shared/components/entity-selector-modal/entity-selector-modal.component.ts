@@ -70,6 +70,8 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Input() showMeta = false;
   @Input() showEntryDate = true;
   @Input() showEntryNoExpiry = false;
+  @Input() showEntryQuantity = true;
+  @Input() entryDateQuickOnly = false;
   @Input() showAllOnFocus = true;
   @Input() autofocus = true;
   @Input() maxOptions = 0;

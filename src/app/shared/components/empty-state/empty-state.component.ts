@@ -17,6 +17,7 @@ export class EmptyStateComponent {
   @Input() subtitle?: string;
   @Input() titleKey = 'emptyStates.generic.title';
   @Input() subtitleKey = 'emptyStates.generic.subtitle';
+  @Input() hideTitle = false;
   @Input() showAction = false;
   @Input() actionLabel?: string;
   @Input() compact = false;

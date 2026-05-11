@@ -17,8 +17,8 @@
     },
     "slides": {
       "problem": {
-        "title": "Vous jetez des aliments que vous aviez oubliés ?",
-        "description": "Évitez de gaspiller nourriture et argent. Contrôlez ce que vous avez avant expiration."
+        "title": "Arrête de gaspiller",
+        "description": "Suis ce que tu as sans y penser."
       },
       "simple": {
         "title": "Organisez votre garde-manger en quelques secondes",
@@ -28,9 +28,13 @@
         "title": "Économisez argent et temps",
         "description": "Achetez seulement ce dont vous avez besoin et utilisez ce que vous avez."
       },
+      "fresh": {
+        "title": "Ajoute ce que tu achètes",
+        "description": "On te prévient quand il manque quelque chose."
+      },
       "action": {
-        "title": "Commencez par ajouter votre premier produit",
-        "description": "Touchez le bouton + et créez votre garde-manger en quelques minutes."
+        "title": "Commence maintenant",
+        "description": "Ajoute ton premier produit."
       }
     },
     "mock": {
@@ -55,7 +59,8 @@
       "edit": "Modifier",
       "apply": "Appliquer",
       "clear": "Effacer",
-      "next": "Suivant"
+      "next": "Suivant",
+      "delete": "Supprimer"
     },
     "loading": "Chargement…",
     "dates": {
@@ -78,7 +83,7 @@
     },
     "pantry": {
       "title": "Le garde-manger est vide",
-      "subtitle": "Ajoutez votre premier produit et suivez le stock et les dates de péremption."
+      "subtitle": "Ajoute les produits que tu veux surveiller\n(avec quantité et date de péremption)"
     },
     "shopping": {
       "title": "Tout est en ordre"
@@ -162,13 +167,16 @@
         "expiringsoon": "Expire très bientôt — utilisez-le aujourd'hui",
         "expirestoday": "Expire bientôt — pensez à l'utiliser prochainement",
         "lowstock": "Il n'en reste plus beaucoup — ajoutez-le à la liste de courses",
-        "expiringlater": "Expire dans les prochains jours — commencez à y penser"
+        "expiringlater": "Expire dans les prochains jours — commencez à y penser",
+        "freshExpiring": "Ton {{name}} expire bientôt.",
+        "freshOut": "Tu n'as plus de {{name}}."
       },
       "combine": "Expire aussi bientôt :",
       "cta": {
-        "primary": "Utiliser aujourd'hui",
+        "primary": "Utiliser auj.",
         "restock": "Voir la liste de courses",
-        "dismiss": "Pas maintenant"
+        "dismiss": "Pas maintenant",
+        "markFreshOut": "Je ne l'ai plus"
       },
       "expiry": {
         "today": "Expire aujourd'hui",
@@ -191,7 +199,7 @@
         "missingDates": "{{count}} produits sans date d'expiration · ajoutez-les pour voir des suggestions"
       },
       "secondary": {
-        "days": "{{count}}j"
+        "days": "{{count}} jours"
       }
     },
     "actions": {
@@ -469,16 +477,14 @@
         "normal": "Produits sans alertes actives",
         "low": "À réapprovisionner bientôt",
         "expiring": "Expirent dans quelques jours",
-        "expired": "À vérifier et jeter",
-        "basic": "Afficher uniquement les produits marqués comme essentiels"
+        "expired": "À vérifier et jeter"
       },
       "status": {
-        "normal": "En stock",
+        "normal": "Sans alertes",
         "low": "Stock faible",
         "expiring": "Bientôt périmé",
         "expired": "Périmé"
       },
-      "basic": "Essentiels",
       "search": "Rechercher des produits"
     },
     "fastAdd": {
@@ -500,7 +506,7 @@
       "advancedDescription": "Ajoutez plus de détails."
     },
     "empty": {
-      "filters": "Aucun produit ne correspond aux filtres actuels."
+      "filters": "Aucun produit dans cet état."
     },
     "group": {
       "count": "{{ count }} articles",
@@ -578,6 +584,11 @@
       "earliest": "Expire en premier : {{ date }}",
       "noBatches": "Aucun lot enregistré.",
       "noExpiry": "Sans date de péremption",
+      "subinfo": {
+        "expired": "Expiré",
+        "tomorrow": "Expire demain",
+        "inDays": "Expire dans {{count}} jours"
+      },
       "quantity": {
         "single": "{{ quantity }} unité",
         "plural": "{{ quantity }} unités"
@@ -646,7 +657,13 @@
       "locationsUpdated": "📦 Emplacements mis à jour : {{ breakdown }}.",
       "stockUpdated": "💾 Stock mis à jour : {{ name }} ({{ quantity }}).",
       "stockUpdatedSimple": "💾 Stock mis à jour.",
-      "saved": "💾 Modifications enregistrées."
+      "saved": "💾 Modifications enregistrées.",
+      "isBasicOn": "Sera ajouté à ta liste quand il sera épuisé",
+      "isBasicOff": "Ne sera plus ajouté automatiquement",
+      "isBasicOffDepleted": "Retiré de ta liste de courses",
+      "addedToList": "🛒 Ajouté à ta liste de courses",
+      "hiddenUntilStock": "Il sera masqué jusqu'à ce que tu rajouttes du stock.",
+      "multipleAdded": "✅ {{count}} produits ajoutés"
     },
     "confirmDelete": "Supprimer \"{{ name }}\" ?",
     "fab": {
@@ -661,6 +678,92 @@
       "noResults": "Aucun résultat",
       "empty": "Aucun article ajouté pour l'instant.",
       "submit": "Enregistrer la consommation"
+    },
+    "sections": {
+      "fresh": "Frais",
+      "pantry": "Garde-manger",
+      "groupToggle": {
+        "flat": "Grouper par catégorie",
+        "grouped": "Vue liste"
+      }
+    },
+    "fresh": {
+      "addButton": "Ajouter un frais",
+      "showMore": "Voir tous ({{ count }})",
+      "showLess": "Voir moins",
+      "emptyState": {
+        "title": "Produits frais",
+        "subtitle": "Ajoute ce que tu utilises chaque semaine\n(sans dates exactes)",
+        "cta": "+ Ajouter des frais"
+      },
+      "keepInStock": "Réapprovisionner automatiquement",
+      "keepInStockHint": "Réapparaîtra quand tu le marqueras comme épuisé",
+      "addModal": {
+        "title": "Nouveau frais",
+        "namePlaceholder": "Nom du produit",
+        "whenExpires": "Quand expire-t-il ?",
+        "submit": "Ajouter",
+        "cardTitle": "Ajout rapide frais",
+        "subtitle": "Choisis ou crée un frais.",
+        "placeholder": "Rechercher frais",
+        "noResults": "Aucun résultat",
+        "empty": "Rien d'ajouté."
+      },
+      "state": {
+        "label": "État",
+        "sufficient": "Assez",
+        "low": "Peu",
+        "none": "Vide"
+      },
+      "quickDate": {
+        "today": "Aujourd'hui",
+        "twoDays": "2 jours",
+        "fiveDays": "5 jours",
+        "oneWeek": "1 semaine",
+        "twoWeeks": "2 semaines",
+        "noDate": "Sans date"
+      },
+      "card": {
+        "expired": "Expiré",
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "soon": "Bientôt"
+      },
+      "editModal": {
+        "title": "Modifier frais",
+        "stateLabel": "Combien il reste ?",
+        "deleteConfirm": {
+          "title": "Supprimer le produit",
+          "message": "Supprimer {{ name }} ? Action irréversible."
+        }
+      },
+      "convertToPantry": {
+        "button": "Convertir en garde-manger",
+        "toast": "Déplacé vers garde-manger"
+      },
+      "convertToFresh": {
+        "button": "Convertir en frais",
+        "toast": "Déplacé vers frais",
+        "dialog": {
+          "title": "Convertir en frais",
+          "bodySingle": "Voilà ce que ça donnera :\n· État : {{state}} ({{total}} unités)\n· Expire : {{date}}",
+          "bodyMulti": "Ton produit a {{batches}} lots ({{total}} unités). Ils seront fusionnés en un seul :\n· État : {{state}}\n· Expire : {{date}}",
+          "locationsLost": "Les emplacements seront perdus.",
+          "confirm": "Convertir"
+        }
+      },
+      "empty": {
+        "filters": "Aucun frais dans cet état."
+      },
+      "toast": {
+        "updated": "✓ Tu l'as",
+        "updatedLow": "Il en reste peu",
+        "markedOut": "Épuisé",
+        "markedOutHint": "Épuisé · Active ⭐ pour l'ajouter à ta liste",
+        "keepInStock": "Sera ajouté à ta liste quand tu en manqueras",
+        "addSuccess_one": "✅ {{name}} ajouté",
+        "addSuccess_other": "✅ {{count}} produits frais ajoutés"
+      }
     }
   },
   "upgrade": {
@@ -897,15 +1000,27 @@
   "notifications": {
     "expired": {
       "title": "Des produits ont expiré",
-      "body": "{{ count }} produits de votre garde-manger ont expiré"
+      "title_one": "Un produit a expiré",
+      "body": "{{ count }} produits de votre garde-manger ont expiré",
+      "body_one": "Un produit de ton garde-manger a expiré"
     },
     "nearExpiry": {
-      "title": "Certains produits expirent bientôt",
-      "body": "{{ count }} produits expirent, le plus proche dans {{ nearestDays }} jours"
+      "title": "{{ count }} produits expirent bientôt",
+      "title_one": "1 produit expire bientôt",
+      "body": "Le plus proche dans {{ nearestDays }} jours",
+      "body_tomorrow": "Le plus proche expire demain",
+      "body_one": "Expire dans {{ nearestDays }} jours",
+      "body_one_tomorrow": "Expire demain"
     },
     "lowStock": {
-      "title": "Certains essentiels sont presque épuisés",
-      "body": "{{ count }} produits essentiels sont en dessous du minimum"
+      "title": "Des essentiels manquent",
+      "title_one": "Un essentiel manque",
+      "body": "{{ count }} produits essentiels ont besoin d'être réapprovisionnés",
+      "body_one": "1 produit essentiel a besoin d'être réapprovisionné"
+    },
+    "reEngagement": {
+      "title": "Comment vont tes produits frais ?",
+      "body": "Quelques jours sans ouvrir l'app. Un instant suffit pour tout remettre à jour."
     }
   },
   "sync": {

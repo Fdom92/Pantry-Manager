@@ -9,9 +9,6 @@ import {
   IonCardTitle,
   IonChip,
   IonContent,
-  IonFab,
-  IonFabButton,
-  IonFabList,
   IonHeader,
   IonIcon,
   IonModal,
@@ -37,6 +34,10 @@ import { PantryConsumeModalStateService } from '@core/services/pantry/modals/pan
 import { PantryBatchesModalStateService } from '@core/services/pantry/modals/pantry-batches-modal-state.service';
 import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pantry-edit-item-modal-state.service';
 import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pantry-quantity-sheet-state.service';
+import { FreshItemCardComponent } from './components/fresh-item-card/fresh-item-card.component';
+import { FreshAddModalComponent } from './components/fresh-add-modal/fresh-add-modal.component';
+import { FreshEditItemModalComponent } from './components/fresh-edit-item-modal/fresh-edit-item-modal.component';
+import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
 
 @Component({
   selector: 'app-pantry',
@@ -53,9 +54,6 @@ import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pa
     IonCard,
     IonCardHeader,
     IonCardTitle,
-    IonFab,
-    IonFabButton,
-    IonFabList,
     IonChip,
     IonModal,
     IonSkeletonText,
@@ -70,6 +68,9 @@ import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pa
     PantryBatchesModalComponent,
     PantryEditItemModalComponent,
     PantryQuantitySheetComponent,
+    FreshItemCardComponent,
+    FreshAddModalComponent,
+    FreshEditItemModalComponent,
   ],
   templateUrl: './pantry.component.html',
   styleUrls: ['./pantry.component.scss'],
@@ -83,6 +84,7 @@ import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pa
     PantryBatchesModalStateService,
     PantryEditItemModalStateService,
     PantryQuantitySheetStateService,
+    PantryFreshAddModalStateService,
   ],
 })
 export class PantryComponent implements OnDestroy {

@@ -4,6 +4,7 @@ import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete, createDocumentId } from '@core/utils';
 import { formatFriendlyName, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
 import { dedupeByNormalizedKey } from '@core/utils/normalization.util';
+import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
@@ -19,6 +20,7 @@ import { PantryStoreService } from '../pantry-store.service';
 export class PantryAddModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly translate = inject(TranslateService);
+  private readonly toastCtrl = inject(ToastController);
   private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
 
@@ -102,7 +104,7 @@ export class PantryAddModalStateService {
       for (const entry of entries) {
         const timestamp = new Date().toISOString();
         if (entry.isNew || !entry.item) {
-          const item = buildAddItemPayload({
+          const base = buildAddItemPayload({
             id: createDocumentId('item'),
             nowIso: timestamp,
             name: entry.name,
@@ -110,6 +112,7 @@ export class PantryAddModalStateService {
             expirationDate: entry.expirationDate,
             noExpiry: entry.noExpiry,
           });
+          const item: PantryItem = { ...base, productType: 'pantry' };
           await this.pantryStore.addItem(item);
           await this.eventManager.logAddNewItem(item, entry.quantity, sessionId, timestamp);
           continue;
@@ -126,6 +129,11 @@ export class PantryAddModalStateService {
         }
       }
       this.dismissAddModal();
+      const msg = entries.length === 1
+        ? this.translate.instant('pantry.toasts.createSuccess', { name: entries[0].name, quantity: '', breakdown: '' })
+        : this.translate.instant('pantry.toasts.multipleAdded', { count: entries.length });
+      const toast = await this.toastCtrl.create({ message: msg, duration: 1500, position: 'bottom' });
+      void toast.present();
     }).catch(async err => {
       console.error('[PantryAddModalStateService] submitAdd error', err);
     });
@@ -180,7 +188,7 @@ export class PantryAddModalStateService {
     const normalized = normalizeLowercase(nextName);
     const matchingItem = this.pantryStore
       .loadedProducts()
-      .find(item => normalizeLowercase(item.name) === normalized);
+      .find(item => item.productType !== 'fresh' && normalizeLowercase(item.name) === normalized);
 
     if (matchingItem) {
       const option: AutocompleteItem<PantryItem> = {
@@ -283,7 +291,9 @@ export class PantryAddModalStateService {
     const locale = this.languageService.getCurrentLocale();
     const uniqueEntries = dedupeByNormalizedKey(entries, entry => entry.name);
     const excluded = new Set(uniqueEntries.map(entry => entry.item?._id).filter(Boolean) as string[]);
-    return buildPantryItemAutocomplete(items, {
+    // Items legacy sin productType caen como despensa por convención.
+    const nonFresh = items.filter(item => item.productType !== 'fresh');
+    return buildPantryItemAutocomplete(nonFresh, {
       locale,
       excludeIds: excluded,
       getQuantity: item => this.pantryStore.getItemTotalQuantity(item),

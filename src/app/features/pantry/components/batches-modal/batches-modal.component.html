@@ -72,6 +72,7 @@
                       <app-expiry-picker
                         [date]="state.getBatchDateInputValue(batch) || undefined"
                         [noExpiry]="batch.noExpiry ?? false"
+                        [mode]="'picker-only'"
                         (dateChange)="state.updateBatchExpirationDate($index, $event ?? '')"
                         (noExpiryToggle)="state.updateBatchNoExpiry($index)">
                       </app-expiry-picker>

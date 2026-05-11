@@ -66,6 +66,9 @@ export function filterLowStockItems(items: PantryItem[]): PantryItem[] {
   return items.filter(item => {
     if (!item.isBasic) return false;
     const total = sumQuantities(item.batches);
+    // Include items that ran out (qty=0) even without a minThreshold —
+    // captures fresh isBasic items that have been consumed.
+    if (total <= 0) return true;
     const min = toNumberOrZero(item.minThreshold);
     return min > 0 && total < min;
   });

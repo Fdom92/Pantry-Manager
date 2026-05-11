@@ -1,33 +1,30 @@
-<ion-card
+<div
   class="pantry-item-card"
   [attr.data-status]="viewModel.globalStatus.state"
-  [style.--card-accent]="viewModel.globalStatus.accentColor"
-  [ngClass]="viewModel.colorClass"
-  button="true"
-  (click)="handleCardClick($event)">
-  <div class="card-content">
+  [ngClass]="viewModel.colorClass">
+  <div
+    class="card-content"
+    role="button"
+    tabindex="0"
+    (click)="handleCardClick($event)"
+    (keydown.enter)="handleCardClick($event)"
+    (keydown.space)="$event.preventDefault(); handleCardClick($event)">
     <div class="card-header">
       <div class="title-section">
-        @if (viewModel.item.isBasic) {
-          <ion-icon class="basic-icon" name="star-outline"></ion-icon>
-        }
+        <ion-icon
+          class="basic-icon"
+          [name]="viewModel.item.isBasic ? 'star' : 'star-outline'"
+          [class.basic-icon--active]="viewModel.item.isBasic"
+          role="button"
+          tabindex="0"
+          (click)="onBasicToggle($event)"
+          (keydown.enter)="onBasicToggle($event)"
+          (keydown.space)="$event.preventDefault(); onBasicToggle($event)">
+        </ion-icon>
         <h3 class="item-name">{{ viewModel.item.name }}</h3>
       </div>
     </div>
 
-    <div class="card-info">
-      <div class="info-row">
-        <ion-icon name="calendar-outline"></ion-icon>
-        @if(viewModel.formattedEarliestExpirationLong !== '') {
-          <span>{{ viewModel.formattedEarliestExpirationLong }}</span>
-        } @else {
-          <span>{{ 'pantry.detail.noExpiry' | translate }}</span>
-        }
-      </div>
-      <div class="info-row">
-        <ion-icon name="cube-outline"></ion-icon>
-        <span>{{ viewModel.batchCountsLabel }}</span>
-      </div>
-    </div>
+    <p class="item-subinfo" [attr.data-status]="viewModel.globalStatus.state">{{ viewModel.subinfo }}</p>
   </div>
-</ion-card>
+</div>

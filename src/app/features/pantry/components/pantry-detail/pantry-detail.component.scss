@@ -1,57 +1,40 @@
+@use '../../../../shared/styles/card-status-bar' as bar;
+
 .pantry-item-card {
-  position: relative;
-  overflow: hidden;
+  @include bar.apply;
+
   border-radius: 16px;
   background: var(--ion-card-background, var(--ion-card-background)) !important;
   box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
   margin: 0;
   padding: 0;
+  cursor: pointer;
   transition: transform 180ms ease, box-shadow 220ms ease, border-color 180ms ease;
-}
 
-.pantry-item-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--card-accent, var(--ion-color-primary));
-  transition: background 180ms ease;
-}
+  &:active {
+    transform: scale(0.985);
+    opacity: 0.88;
+  }
 
-.pantry-item-card[data-status='expired'] {
-  --card-accent: var(--ion-color-danger);
-  border-color: color-mix(in srgb, var(--ion-color-danger) 20%, transparent);
-}
-
-.pantry-item-card[data-status='expiring'] {
-  --card-accent: var(--ion-color-warning);
-  border-color: color-mix(in srgb, var(--ion-color-warning) 20%, transparent);
-}
-
-.pantry-item-card[data-status='low-stock'] {
-  --card-accent: var(--ion-color-warning);
-  border-color: color-mix(in srgb, var(--ion-color-warning) 20%, transparent);
-}
-
-.pantry-item-card[data-status='ok'] {
-  --card-accent: var(--ion-color-primary);
-  border-color: color-mix(in srgb, var(--ion-color-primary) 20%, transparent);
+  // Colored borders — pantry-specific, not shared
+  &[data-status='expired']                      { border-color: color-mix(in srgb, var(--ion-color-danger)  28%, transparent); }
+  &[data-status='near-expiry'],
+  &[data-status='low-stock']                    { border-color: color-mix(in srgb, var(--ion-color-warning) 28%, transparent); }
 }
 
 .card-content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  padding-left: 20px;
+  gap: 3px;
+  padding: 10px 12px 10px 20px;
 }
 
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
 .title-section {
@@ -63,13 +46,26 @@
 }
 
 .basic-icon {
-  font-size: 18px;
-  color: var(--ion-color-warning);
+  font-size: 16px;
+  color: color-mix(in srgb, var(--ion-text-color) 25%, transparent);
   flex-shrink: 0;
+  cursor: pointer;
+  transition: color 0.15s, transform 0.1s;
+  padding: 4px;
+  margin: -4px;
+  border-radius: 50%;
+
+  &--active {
+    color: var(--ion-color-warning);
+  }
+
+  &:active {
+    transform: scale(0.85);
+  }
 }
 
 .item-name {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--app-theme-text-color);
   margin: 0;
@@ -78,22 +74,20 @@
   white-space: nowrap;
 }
 
-.card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.item-subinfo {
+  font-size: 0.75rem;
+  color: var(--app-theme-text-muted);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 0.85rem;
-  color: var(--app-theme-text-subtle);
-}
+  &[data-status='expired'] {
+    color: var(--app-theme-card-accent-critical, var(--ion-color-danger));
+    font-weight: 500;
+  }
 
-.info-row ion-icon {
-  font-size: 16px;
-  color: var(--app-theme-text-subtle);
-  flex-shrink: 0;
+  &[data-status='near-expiry'] {
+    color: var(--app-theme-card-accent-warning, var(--ion-color-warning-shade));
+  }
 }
