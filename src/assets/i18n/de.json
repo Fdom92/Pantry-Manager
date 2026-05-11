@@ -1000,15 +1000,23 @@
   "notifications": {
     "expired": {
       "title": "Du hast abgelaufene Produkte",
-      "body": "{{ count }} Produkte in deiner Speisekammer sind abgelaufen"
+      "title_one": "Du hast ein abgelaufenes Produkt",
+      "body": "{{ count }} Produkte in deiner Speisekammer sind abgelaufen",
+      "body_one": "Ein Produkt in deiner Speisekammer ist abgelaufen"
     },
     "nearExpiry": {
-      "title": "Einige Produkte laufen bald ab",
-      "body": "{{ count }} Produkte laufen ab, das nächste in {{ nearestDays }} Tagen"
+      "title": "{{ count }} Produkte laufen bald ab",
+      "title_one": "1 Produkt läuft bald ab",
+      "body": "Das nächste in {{ nearestDays }} Tagen",
+      "body_tomorrow": "Das nächste läuft morgen ab",
+      "body_one": "Läuft ab in {{ nearestDays }} Tagen",
+      "body_one_tomorrow": "Läuft morgen ab"
     },
     "lowStock": {
       "title": "Basics werden knapp",
-      "body": "{{count}} Basics müssen nachgekauft werden"
+      "title_one": "Ein Basic wird knapp",
+      "body": "{{count}} Basics müssen nachgekauft werden",
+      "body_one": "1 Basic muss nachgekauft werden"
     },
     "reEngagement": {
       "title": "Wie läuft es mit deinen Frischprodukten?",

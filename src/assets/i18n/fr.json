@@ -1000,15 +1000,23 @@
   "notifications": {
     "expired": {
       "title": "Des produits ont expiré",
-      "body": "{{ count }} produits de votre garde-manger ont expiré"
+      "title_one": "Un produit a expiré",
+      "body": "{{ count }} produits de votre garde-manger ont expiré",
+      "body_one": "Un produit de ton garde-manger a expiré"
     },
     "nearExpiry": {
-      "title": "Certains produits expirent bientôt",
-      "body": "{{ count }} produits expirent, le plus proche dans {{ nearestDays }} jours"
+      "title": "{{ count }} produits expirent bientôt",
+      "title_one": "1 produit expire bientôt",
+      "body": "Le plus proche dans {{ nearestDays }} jours",
+      "body_tomorrow": "Le plus proche expire demain",
+      "body_one": "Expire dans {{ nearestDays }} jours",
+      "body_one_tomorrow": "Expire demain"
     },
     "lowStock": {
       "title": "Des essentiels manquent",
-      "body": "{{ count }} produits essentiels ont besoin d'être réapprovisionnés"
+      "title_one": "Un essentiel manque",
+      "body": "{{ count }} produits essentiels ont besoin d'être réapprovisionnés",
+      "body_one": "1 produit essentiel a besoin d'être réapprovisionné"
     },
     "reEngagement": {
       "title": "Comment vont tes produits frais ?",

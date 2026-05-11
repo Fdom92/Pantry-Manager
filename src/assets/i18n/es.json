@@ -1001,15 +1001,23 @@
   "notifications": {
     "expired": {
       "title": "Tienes productos caducados",
-      "body": "{{ count }} productos de tu despensa ya han caducado"
+      "title_one": "Tienes un producto caducado",
+      "body": "{{ count }} productos de tu despensa ya han caducado",
+      "body_one": "Un producto de tu despensa ya ha caducado"
     },
     "nearExpiry": {
-      "title": "Algunos productos caducan pronto",
-      "body": "{{ count }} productos caducan, el primero en {{ nearestDays }} días"
+      "title": "{{ count }} productos caducan pronto",
+      "title_one": "1 producto caduca pronto",
+      "body": "El primero en {{ nearestDays }} días",
+      "body_tomorrow": "El primero caduca mañana",
+      "body_one": "Caduca en {{ nearestDays }} días",
+      "body_one_tomorrow": "Caduca mañana"
     },
     "lowStock": {
       "title": "Se te están acabando básicos",
-      "body": "{{ count }} básicos necesitan reposición"
+      "title_one": "Se te está acabando un básico",
+      "body": "{{ count }} básicos necesitan reposición",
+      "body_one": "Un básico necesita reposición"
     },
     "reEngagement": {
       "title": "¿Cómo van tus frescos?",

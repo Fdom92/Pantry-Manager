@@ -1000,15 +1000,23 @@
   "notifications": {
     "expired": {
       "title": "Hai prodotti scaduti",
-      "body": "{{ count }} prodotti della tua dispensa sono scaduti"
+      "title_one": "Hai un prodotto scaduto",
+      "body": "{{ count }} prodotti della tua dispensa sono scaduti",
+      "body_one": "Un prodotto della tua dispensa è scaduto"
     },
     "nearExpiry": {
-      "title": "Alcuni prodotti stanno per scadere",
-      "body": "{{ count }} prodotti in scadenza, il più vicino tra {{ nearestDays }} giorni"
+      "title": "{{ count }} prodotti in scadenza a breve",
+      "title_one": "1 prodotto in scadenza a breve",
+      "body": "Il più vicino tra {{ nearestDays }} giorni",
+      "body_tomorrow": "Il più vicino scade domani",
+      "body_one": "Scade tra {{ nearestDays }} giorni",
+      "body_one_tomorrow": "Scade domani"
     },
     "lowStock": {
       "title": "I tuoi essenziali stanno finendo",
-      "body": "{{ count }} essenziali hanno bisogno di essere riforniti"
+      "title_one": "Un essenziale sta finendo",
+      "body": "{{ count }} essenziali hanno bisogno di essere riforniti",
+      "body_one": "1 essenziale ha bisogno di essere rifornito"
     },
     "reEngagement": {
       "title": "Come stanno i tuoi freschi?",

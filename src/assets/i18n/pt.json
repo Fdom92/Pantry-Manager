@@ -1000,15 +1000,23 @@
   "notifications": {
     "expired": {
       "title": "Você tem produtos vencidos",
-      "body": "{{ count }} produtos da sua despensa venceram"
+      "title_one": "Você tem um produto vencido",
+      "body": "{{ count }} produtos da sua despensa venceram",
+      "body_one": "Um produto da sua despensa venceu"
     },
     "nearExpiry": {
-      "title": "Alguns produtos vencem em breve",
-      "body": "{{ count }} produtos vencem, o mais próximo em {{ nearestDays }} dias"
+      "title": "{{ count }} produtos vencem em breve",
+      "title_one": "1 produto vence em breve",
+      "body": "O mais próximo em {{ nearestDays }} dias",
+      "body_tomorrow": "O mais próximo vence amanhã",
+      "body_one": "Vence em {{ nearestDays }} dias",
+      "body_one_tomorrow": "Vence amanhã"
     },
     "lowStock": {
       "title": "Básicos a acabar",
-      "body": "{{ count }} básicos precisam de ser repostos"
+      "title_one": "Um básico a acabar",
+      "body": "{{ count }} básicos precisam de ser repostos",
+      "body_one": "1 básico precisa de ser reposto"
     },
     "reEngagement": {
       "title": "Como estão os seus frescos?",

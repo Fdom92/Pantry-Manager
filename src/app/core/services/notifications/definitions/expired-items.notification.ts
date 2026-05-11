@@ -17,10 +17,13 @@ export class ExpiredItemsNotification implements NotificationDefinition {
     if (!expired.length) return null;
 
     const hour = preferences.notificationHour ?? 9;
+    const count = expired.length;
+    const titleKey = count === 1 ? 'notifications.expired.title_one' : 'notifications.expired.title';
+    const bodyKey = count === 1 ? 'notifications.expired.body_one' : 'notifications.expired.body';
     return {
       id: this.id,
-      title: t('notifications.expired.title'),
-      body: t('notifications.expired.body', { count: expired.length }),
+      title: t(titleKey),
+      body: t(bodyKey, { count }),
       scheduleAt: buildNextTriggerDate(now, hour).toISOString(),
     };
   }
