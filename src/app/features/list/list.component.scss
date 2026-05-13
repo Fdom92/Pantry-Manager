@@ -179,11 +179,11 @@ ion-title {
 
 // --- Item list (replaces cards) ---
 .item-list {
-  background: transparent;
   --ion-item-background: var(--app-theme-card-bg);
   border-radius: var(--app-theme-card-border-radius);
-  overflow: hidden;
   border: 1px solid var(--app-theme-card-border-color);
+  overflow: hidden;
+  padding: 0;
 }
 
 .suggestion-item {
@@ -218,11 +218,6 @@ ion-title {
   font-size: 0.85rem;
   color: var(--app-theme-text-muted);
   margin-top: 2px;
-}
-
-.cart-icon {
-  font-size: 1.2rem;
-  opacity: 0.4;
 }
 
 // --- Reason chips ---
@@ -321,4 +316,45 @@ ion-title {
 // --- FAB override ---
 ion-fab-button[size="small"] {
   --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+// --- Buy button ---
+.buy-btn {
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+// --- Ignored section ---
+.ignored-section {
+  margin-top: var(--app-theme-spacing-sm);
+}
+
+.ignored-section-header {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-sm);
+  font-size: 0.9rem;
+  color: var(--app-theme-text-muted);
+  padding: var(--app-theme-spacing-xs) 0;
+}
+
+.ignored-list {
+  opacity: 0.5;
+}
+
+.ignored-item {
+  --padding-start: var(--app-theme-spacing-lg);
+}
+
+.ignored-name {
+  color: var(--app-theme-text-muted);
 }
