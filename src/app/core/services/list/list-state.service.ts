@@ -1,15 +1,23 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
-import { SHOPPING_LIST_NAME } from '@core/constants';
-import { determineSuggestionNeed, incrementSummary } from '@core/domain/list';
+import { SHOPPING_LIST_NAME, UNASSIGNED_SUPERMARKET_KEY } from '@core/constants';
+import {
+  determineSuggestionNeed,
+  incrementSummary,
+  sortSuggestionsByUrgency,
+} from '@core/domain/list';
 import { groupSuggestionsBySupermarket } from '@core/utils/list-grouping.util';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
 import {
+  type BoughtItem,
+  type ManualItem,
   type ShoppingStateWithItem,
   type ShoppingSuggestionGroupWithItem,
   type ShoppingSuggestionWithItem,
   type ShoppingSummary,
+  ShoppingReason,
 } from '@core/models/list';
+import { FRESH_QTY } from '@core/domain/pantry/fresh.domain';
 import { LanguageService } from '../shared/language.service';
 import { createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
 import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
@@ -31,8 +39,20 @@ export class ListStateService {
 
   readonly isSharingListInProgress = signal(false);
 
+  // Ephemeral state — cleared on ionViewWillLeave
+  readonly boughtItemIds  = signal<Set<string>>(new Set());
+  readonly removedAutoIds = signal<Set<string>>(new Set());
+  readonly manualItems    = signal<ManualItem[]>([]);
+  readonly boughtManuals  = signal<BoughtItem[]>([]);
+
   readonly shoppingAnalysis = computed<ShoppingStateWithItem>(() => {
-    return this.buildShoppingAnalysis(this.items());
+    return this.buildShoppingAnalysis(
+      this.items(),
+      this.boughtItemIds(),
+      this.removedAutoIds(),
+      this.manualItems(),
+      this.boughtManuals(),
+    );
   });
 
   readonly loading = this.pantryStore.loading;
@@ -45,6 +65,13 @@ export class ListStateService {
     this.skeletonManager.startLoading();
     await this.pantryStore.loadAll();
     this.skeletonManager.stopLoading();
+  }
+
+  async ionViewWillLeave(): Promise<void> {
+    this.boughtItemIds.set(new Set());
+    this.removedAutoIds.set(new Set());
+    this.manualItems.set([]);
+    this.boughtManuals.set([]);
   }
 
   getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
@@ -91,14 +118,22 @@ export class ListStateService {
     });
   }
 
-  private buildShoppingAnalysis(items: PantryItem[]): ShoppingStateWithItem {
-    const suggestions: ShoppingSuggestionWithItem[] = [];
+  private buildShoppingAnalysis(
+    items: PantryItem[],
+    boughtIds: Set<string>,
+    removedIds: Set<string>,
+    manualItems: ManualItem[],
+    boughtManuals: BoughtItem[],
+  ): ShoppingStateWithItem {
+    const pendingSuggestions: ShoppingSuggestionWithItem[] = [];
+    const boughtAutoItems: BoughtItem[] = [];
     const uniqueSupermarkets = new Set<string>();
     let summary: ShoppingSummary = {
       total: 0,
       belowMin: 0,
       empty: 0,
       supermarketCount: 0,
+      boughtCount: 0,
     };
 
     for (const item of items) {
@@ -114,35 +149,73 @@ export class ListStateService {
         continue;
       }
 
-      const { reason, suggestedQuantity } = determineSuggestionNeed({ totalQuantity, minThreshold });
+      const supermarket = normalizeSupermarketValue(item.supermarket);
+      const id = item._id;
+
+      if (boughtIds.has(id)) {
+        boughtAutoItems.push({ id, name: item.name, supermarket: supermarket || undefined });
+        summary.boughtCount += 1;
+        continue;
+      }
+
+      if (removedIds.has(id)) {
+        continue;
+      }
+
+      const { reason, suggestedQuantity } = determineSuggestionNeed({
+        totalQuantity,
+        minThreshold,
+        isFresh: item.productType === 'fresh',
+      });
 
       if (reason) {
-        const supermarket = normalizeSupermarketValue(item.supermarket);
         if (supermarket) {
           uniqueSupermarkets.add(normalizeLowercase(supermarket));
         }
-
-        suggestions.push({
+        pendingSuggestions.push({
           item,
           reason,
           suggestedQuantity,
           currentQuantity: roundQuantity(totalQuantity),
           minThreshold: minThreshold != null ? roundQuantity(minThreshold) : undefined,
-          supermarket,
+          supermarket: supermarket || undefined,
         });
-
         summary = incrementSummary(summary, reason);
       }
     }
 
-    summary.total = suggestions.length;
+    summary.total = pendingSuggestions.length;
     summary.supermarketCount = uniqueSupermarkets.size;
+    summary.boughtCount += boughtManuals.length;
+
     const unassignedLabel = this.translate.instant('shopping.unassignedSupermarket');
     const groupedSuggestions = groupSuggestionsBySupermarket({
-      suggestions,
+      suggestions: pendingSuggestions,
       labelForUnassigned: unassignedLabel,
     });
-    return { suggestions, groupedSuggestions, summary };
+
+    // Sort pending items within each group by urgency
+    for (const group of groupedSuggestions) {
+      group.suggestions = sortSuggestionsByUrgency(group.suggestions);
+    }
+
+    // Distribute bought auto items into their supermarket groups
+    for (const boughtItem of boughtAutoItems) {
+      const groupKey = normalizeLowercase(boughtItem.supermarket) || UNASSIGNED_SUPERMARKET_KEY;
+      const group = groupedSuggestions.find(g => g.key === groupKey);
+      if (group) {
+        group.boughtItems.push(boughtItem);
+      } else {
+        groupedSuggestions.push({
+          key: groupKey,
+          label: boughtItem.supermarket ?? unassignedLabel,
+          suggestions: [],
+          boughtItems: [boughtItem],
+        });
+      }
+    }
+
+    return { suggestions: pendingSuggestions, groupedSuggestions, summary };
   }
 
   private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {
