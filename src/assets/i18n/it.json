@@ -394,6 +394,15 @@
     },
     "emptyState": {
       "autoHint": "I prodotti esauriti appariranno qui automaticamente."
+    },
+    "ignored": {
+      "sectionTitle": "Nascosti ora"
+    },
+    "toasts": {
+      "bought": "✓ {{name}} acquistato. Scorta aggiornata.",
+      "boughtManual": "✓ {{name}} acquistato.",
+      "ignored": "{{name}} nascosto ora — riapparirà la prossima volta.",
+      "removedManual": "{{name}} rimosso dalla lista."
     }
   },
   "insights": {

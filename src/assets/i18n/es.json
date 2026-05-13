@@ -394,6 +394,15 @@
     },
     "emptyState": {
       "autoHint": "Los productos agotados aparecerán aquí automáticamente."
+    },
+    "ignored": {
+      "sectionTitle": "Ocultos ahora"
+    },
+    "toasts": {
+      "bought": "✓ {{name}} comprado. Inventario actualizado.",
+      "boughtManual": "✓ {{name}} comprado.",
+      "ignored": "{{name}} oculto por ahora — volverá la próxima vez.",
+      "removedManual": "{{name}} eliminado de la lista."
     }
   },
   "insights": {

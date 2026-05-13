@@ -394,6 +394,15 @@
     },
     "emptyState": {
       "autoHint": "Aufgebrauchte Produkte erscheinen hier automatisch."
+    },
+    "ignored": {
+      "sectionTitle": "Jetzt ausgeblendet"
+    },
+    "toasts": {
+      "bought": "✓ {{name}} gekauft. Vorrat aktualisiert.",
+      "boughtManual": "✓ {{name}} gekauft.",
+      "ignored": "{{name}} jetzt ausgeblendet — erscheint beim nächsten Mal wieder.",
+      "removedManual": "{{name}} aus der Liste entfernt."
     }
   },
   "insights": {
