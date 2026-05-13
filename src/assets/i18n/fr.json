@@ -351,7 +351,7 @@
     }
   },
   "shopping": {
-    "title": "Liste",
+    "title": "Liste de courses",
     "unassignedSupermarket": "N’importe quel supermarché",
     "reasons": {
       "below-min": "Stock faible",
@@ -361,7 +361,8 @@
       "title": "Liste de courses",
       "loading": "Génération de la liste d’achats…",
       "toBuy": "À acheter {{ amount }}",
-      "empty": "Marquez les produits comme \"toujours avoir\" pour être alerté quand ils s'épuisent."
+      "empty": "Marquez les produits comme \"toujours avoir\" pour être alerté quand ils s’épuisent.",
+      "belowMinQty": "Il manque {{qty}} pour le minimum"
     },
     "share": {
       "button": "Partager la liste",
@@ -373,7 +374,39 @@
       "generatedOn": "Générée le {{ date }}",
       "dialogTitle": "Liste d’achats",
       "dialogText": "Partagez votre liste en PDF."
-    }
+    },
+    "chips": {
+      "freshEmpty": "Frais épuisé",
+      "empty": "Épuisé",
+      "belowMin": "Stock bas",
+      "basic": "Essentiel",
+      "manual": "Ajouté par toi"
+    },
+    "bought": {
+      "sectionTitle": "Acheté",
+      "restore": "Restaurer",
+      "count": "{{count}} acheté"
+    },
+    "manualAdd": {
+      "sectionTitle": "Autres",
+      "placeholder": "Nom du produit",
+      "alertTitle": "Ajouter à la liste",
+      "alertButton": "Ajouter",
+      "inlineHint": "Ajouter un produit à la liste..."
+    },
+    "emptyState": {
+      "autoHint": "Les produits épuisés apparaîtront ici automatiquement."
+    },
+    "ignored": {
+      "sectionTitle": "Masqués pour l'instant"
+    },
+    "toasts": {
+      "bought": "✓ {{name}} acheté. Stock mis à jour.",
+      "boughtManual": "✓ {{name}} acheté.",
+      "ignored": "{{name}} masqué pour l'instant — réapparaîtra la prochaine fois.",
+      "removedManual": "{{name}} retiré de la liste."
+    },
+    "tabTitle": "Courses"
   },
   "insights": {
     "ctaDefault": "Compris",

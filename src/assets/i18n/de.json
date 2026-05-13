@@ -351,7 +351,7 @@
     }
   },
   "shopping": {
-    "title": "Liste",
+    "title": "Einkaufsliste",
     "unassignedSupermarket": "Beliebiger Supermarkt",
     "reasons": {
       "below-min": "Niedriger Bestand",
@@ -361,7 +361,8 @@
       "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
       "toBuy": "Kaufen {{ amount }}",
-      "empty": "Markiere Produkte als \"immer vorrätig\" um benachrichtigt zu werden, wenn sie zur Neige gehen."
+      "empty": "Markiere Produkte als \"immer vorrätig\" um benachrichtigt zu werden, wenn sie zur Neige gehen.",
+      "belowMinQty": "Noch {{qty}} bis zum Minimum"
     },
     "share": {
       "button": "Liste teilen",
@@ -373,7 +374,39 @@
       "generatedOn": "Erstellt am {{ date }}",
       "dialogTitle": "Einkaufsliste",
       "dialogText": "Teile deine Einkaufsliste als PDF."
-    }
+    },
+    "chips": {
+      "freshEmpty": "Frisch — leer",
+      "empty": "Aufgebraucht",
+      "belowMin": "Wenig Vorrat",
+      "basic": "Grundprodukt",
+      "manual": "Von dir hinzugefügt"
+    },
+    "bought": {
+      "sectionTitle": "Gekauft",
+      "restore": "Wiederherstellen",
+      "count": "{{count}} gekauft"
+    },
+    "manualAdd": {
+      "sectionTitle": "Sonstige",
+      "placeholder": "Produktname",
+      "alertTitle": "Zur Liste hinzufügen",
+      "alertButton": "Hinzufügen",
+      "inlineHint": "Produkt zur Liste hinzufügen..."
+    },
+    "emptyState": {
+      "autoHint": "Aufgebrauchte Produkte erscheinen hier automatisch."
+    },
+    "ignored": {
+      "sectionTitle": "Jetzt ausgeblendet"
+    },
+    "toasts": {
+      "bought": "✓ {{name}} gekauft. Vorrat aktualisiert.",
+      "boughtManual": "✓ {{name}} gekauft.",
+      "ignored": "{{name}} jetzt ausgeblendet — erscheint beim nächsten Mal wieder.",
+      "removedManual": "{{name}} aus der Liste entfernt."
+    },
+    "tabTitle": "Einkauf"
   },
   "insights": {
     "ctaDefault": "Verstanden",

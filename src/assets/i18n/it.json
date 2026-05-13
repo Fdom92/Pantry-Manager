@@ -351,7 +351,7 @@
     }
   },
   "shopping": {
-    "title": "Lista",
+    "title": "Lista della spesa",
     "unassignedSupermarket": "Qualsiasi supermercato",
     "reasons": {
       "below-min": "Stock basso",
@@ -361,7 +361,8 @@
       "title": "Lista della spesa",
       "loading": "Sto creando la lista della spesa…",
       "toBuy": "Da comprare {{ amount }}",
-      "empty": "Contrassegna i prodotti come \"tieni sempre in casa\" per essere avvisato quando scarseggiano."
+      "empty": "Contrassegna i prodotti come \"tieni sempre in casa\" per essere avvisato quando scarseggiano.",
+      "belowMinQty": "Mancano {{qty}} al minimo"
     },
     "share": {
       "button": "Condividi lista",
@@ -373,7 +374,39 @@
       "generatedOn": "Generata il {{ date }}",
       "dialogTitle": "Lista della spesa",
       "dialogText": "Condividi la tua lista in PDF."
-    }
+    },
+    "chips": {
+      "freshEmpty": "Fresco esaurito",
+      "empty": "Esaurito",
+      "belowMin": "Scorta bassa",
+      "basic": "Prodotto base",
+      "manual": "Aggiunto da te"
+    },
+    "bought": {
+      "sectionTitle": "Acquistato",
+      "restore": "Ripristina",
+      "count": "{{count}} acquistato"
+    },
+    "manualAdd": {
+      "sectionTitle": "Altri",
+      "placeholder": "Nome prodotto",
+      "alertTitle": "Aggiungi alla lista",
+      "alertButton": "Aggiungi",
+      "inlineHint": "Aggiungi un prodotto alla lista..."
+    },
+    "emptyState": {
+      "autoHint": "I prodotti esauriti appariranno qui automaticamente."
+    },
+    "ignored": {
+      "sectionTitle": "Nascosti ora"
+    },
+    "toasts": {
+      "bought": "✓ {{name}} acquistato. Scorta aggiornata.",
+      "boughtManual": "✓ {{name}} acquistato.",
+      "ignored": "{{name}} nascosto ora — riapparirà la prossima volta.",
+      "removedManual": "{{name}} rimosso dalla lista."
+    },
+    "tabTitle": "Spesa"
   },
   "insights": {
     "ctaDefault": "Capito",
