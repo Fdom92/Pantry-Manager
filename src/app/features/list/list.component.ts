@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ListStateService } from '@core/services/list/list-state.service';
 import { AlertController, IonicModule } from '@ionic/angular';
@@ -19,14 +19,15 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
   providers: [ListStateService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListComponent {
   readonly facade = inject(ListStateService);
   private readonly alertController = inject(AlertController);
   private readonly translate = inject(TranslateService);
 
-  private readonly collapsedGroups = new Set<string>();
-  private readonly collapsedBoughtSections = new Set<string>();
+  private readonly collapsedGroups = signal<Set<string>>(new Set());
+  private readonly collapsedBoughtSections = signal<Set<string>>(new Set());
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
@@ -34,32 +35,32 @@ export class ListComponent {
 
   async ionViewWillLeave(): Promise<void> {
     await this.facade.ionViewWillLeave();
-    this.collapsedGroups.clear();
-    this.collapsedBoughtSections.clear();
+    this.collapsedGroups.set(new Set());
+    this.collapsedBoughtSections.set(new Set());
   }
 
   toggleGroup(key: string): void {
-    if (this.collapsedGroups.has(key)) {
-      this.collapsedGroups.delete(key);
-    } else {
-      this.collapsedGroups.add(key);
-    }
+    this.collapsedGroups.update(set => {
+      const next = new Set(set);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
   }
 
   isGroupCollapsed(key: string): boolean {
-    return this.collapsedGroups.has(key);
+    return this.collapsedGroups().has(key);
   }
 
   toggleBoughtSection(key: string): void {
-    if (this.collapsedBoughtSections.has(key)) {
-      this.collapsedBoughtSections.delete(key);
-    } else {
-      this.collapsedBoughtSections.add(key);
-    }
+    this.collapsedBoughtSections.update(set => {
+      const next = new Set(set);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
   }
 
   isBoughtSectionExpanded(key: string): boolean {
-    return this.collapsedBoughtSections.has(key);
+    return this.collapsedBoughtSections().has(key);
   }
 
   async openManualAdd(): Promise<void> {
@@ -72,7 +73,7 @@ export class ListComponent {
         },
       ],
       buttons: [
-        { text: this.translate.instant('common.cancel'), role: 'cancel' },
+        { text: this.translate.instant('common.actions.cancel'), role: 'cancel' },
         {
           text: this.translate.instant('shopping.manualAdd.alertButton'),
           handler: (data: Record<number, string>) => {
