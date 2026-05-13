@@ -2,6 +2,16 @@
   <ion-toolbar>
     <ion-title>{{ 'shopping.title' | translate }}</ion-title>
     <ion-buttons slot="end">
+      <ion-button
+        (click)="facade.shareShoppingListReport()"
+        [disabled]="facade.loading() || facade.isSharingListInProgress() || !facade.shoppingAnalysis().summary.total"
+        [attr.aria-label]="'shopping.share.button' | translate">
+        @if (facade.isSharingListInProgress()) {
+          <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
+        } @else {
+          <ion-icon slot="icon-only" name="share-outline"></ion-icon>
+        }
+      </ion-button>
       <ion-button [routerLink]="['/settings']" [attr.aria-label]="'settings.title' | translate">
         <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
       </ion-button>
@@ -32,6 +42,12 @@
   } @else {
     <div class="suggestion-groups fade-in-list">
 
+      <!-- Inline manual add row -->
+      <button class="manual-add-row pressable" (click)="openManualAdd()">
+        <ion-icon name="add-circle-outline" color="medium"></ion-icon>
+        <span>{{ 'shopping.manualAdd.inlineHint' | translate }}</span>
+      </button>
+
       @for (group of state.groupedSuggestions; track group.key) {
         @if (group.suggestions.length) {
           <div class="suggestion-group">
@@ -42,7 +58,7 @@
               <ion-badge color="medium" class="group-count">{{ group.suggestions.length }}</ion-badge>
               <ion-icon
                 class="collapse-icon"
-                [name]="isGroupCollapsed(group.key) ? 'chevron-forward-outline' : 'chevron-down-outline'">
+                [name]="isGroupCollapsed(group.key) ? 'chevron-up-outline' : 'chevron-down-outline'">
               </ion-icon>
             </button>
 
@@ -145,7 +161,7 @@
             <ion-badge color="success" class="group-count">{{ state.allBoughtItems.length }}</ion-badge>
             <ion-icon
               class="collapse-icon"
-              [name]="globalBoughtExpanded() ? 'chevron-down-outline' : 'chevron-forward-outline'">
+              [name]="globalBoughtExpanded() ? 'chevron-down-outline' : 'chevron-up-outline'">
             </ion-icon>
           </button>
           @if (globalBoughtExpanded()) {
@@ -177,7 +193,7 @@
             <ion-badge color="medium" class="group-count">{{ state.allIgnoredItems.length }}</ion-badge>
             <ion-icon
               class="collapse-icon"
-              [name]="globalIgnoredExpanded() ? 'chevron-down-outline' : 'chevron-forward-outline'">
+              [name]="globalIgnoredExpanded() ? 'chevron-down-outline' : 'chevron-up-outline'">
             </ion-icon>
           </button>
           @if (globalIgnoredExpanded()) {
@@ -196,33 +212,5 @@
     </div>
   }
 
-  <!-- Share button (secondary action) -->
-  @if (!facade.loading() && state.summary.total) {
-    <div class="share-row">
-      <ion-button
-        fill="clear"
-        color="medium"
-        size="small"
-        (click)="facade.shareShoppingListReport()"
-        [disabled]="facade.isSharingListInProgress()">
-        @if (facade.isSharingListInProgress()) {
-          <ion-spinner slot="start" name="lines-small"></ion-spinner>
-        } @else {
-          <ion-icon slot="start" name="share-outline"></ion-icon>
-        }
-        {{ 'shopping.share.button' | translate }}
-      </ion-button>
-    </div>
-  }
 
 </ion-content>
-
-<ion-fab slot="fixed" vertical="bottom" horizontal="end">
-  <ion-fab-button
-    size="small"
-    color="medium"
-    (click)="openManualAdd()"
-    [attr.aria-label]="'shopping.manualAdd.alertTitle' | translate">
-    <ion-icon name="add-outline"></ion-icon>
-  </ion-fab-button>
-</ion-fab>

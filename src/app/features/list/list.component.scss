@@ -358,3 +358,29 @@ ion-fab-button[size="small"] {
 .ignored-name {
   color: var(--app-theme-text-muted);
 }
+
+// --- Inline manual add row ---
+.manual-add-row {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-sm);
+  width: 100%;
+  padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
+  background: transparent;
+  border: 1px dashed color-mix(in srgb, var(--ion-text-color) 18%, transparent);
+  border-radius: var(--app-theme-card-border-radius);
+  color: var(--app-theme-text-muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-align: left;
+  transition: opacity 120ms ease;
+
+  ion-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+}
+
+.manual-add-row:active {
+  opacity: 0.5;
+}

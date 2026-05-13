@@ -390,7 +390,8 @@
       "sectionTitle": "Autres",
       "placeholder": "Nom du produit",
       "alertTitle": "Ajouter à la liste",
-      "alertButton": "Ajouter"
+      "alertButton": "Ajouter",
+      "inlineHint": "Ajouter un produit à la liste..."
     },
     "emptyState": {
       "autoHint": "Les produits épuisés apparaîtront ici automatiquement."

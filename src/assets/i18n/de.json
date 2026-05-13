@@ -390,7 +390,8 @@
       "sectionTitle": "Sonstige",
       "placeholder": "Produktname",
       "alertTitle": "Zur Liste hinzufügen",
-      "alertButton": "Hinzufügen"
+      "alertButton": "Hinzufügen",
+      "inlineHint": "Produkt zur Liste hinzufügen..."
     },
     "emptyState": {
       "autoHint": "Aufgebrauchte Produkte erscheinen hier automatisch."

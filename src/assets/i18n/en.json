@@ -390,7 +390,8 @@
       "sectionTitle": "Other",
       "placeholder": "Product name",
       "alertTitle": "Add to list",
-      "alertButton": "Add"
+      "alertButton": "Add",
+      "inlineHint": "Add a product to the list..."
     },
     "emptyState": {
       "autoHint": "Out-of-stock items will appear here automatically."
