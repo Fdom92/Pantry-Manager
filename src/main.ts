@@ -24,6 +24,7 @@ import {
   appsOutline,
   archiveOutline,
   arrowForwardOutline,
+  arrowUndoOutline,
   basketOutline,
   calendarOutline,
   cartOutline,
@@ -31,6 +32,7 @@ import {
   checkmarkCircle,
   checkmarkCircleOutline,
   chevronDownOutline,
+  chevronForwardOutline,
   chevronUpOutline,
   close,
   closeCircle,
@@ -42,6 +44,7 @@ import {
   ellipse,
   ellipsisVerticalOutline,
   enterOutline,
+  eyeOffOutline,
   eyeOutline,
   fastFoodOutline,
   filterOutline,
@@ -166,7 +169,9 @@ addIcons({
   'archive-outline': archiveOutline,
   'infinite-outline': infiniteOutline,
   'apps-outline': appsOutline,
-  'leaf-outline': leafOutline
+  'leaf-outline': leafOutline,
+  'eye-off-outline': eyeOffOutline,
+  'arrow-undo-outline': arrowUndoOutline
 });
 
 bootstrapApplication(AppComponent, {
