@@ -272,41 +272,13 @@ export class ListStateService {
       suggestions: sortSuggestionsByUrgency(group.suggestions),
     }));
 
-    // Distribute bought auto items into their supermarket groups
-    for (const boughtItem of boughtAutoItems) {
-      const groupKey = normalizeLowercase(boughtItem.supermarket) || UNASSIGNED_SUPERMARKET_KEY;
-      const group = sortedGroups.find(g => g.key === groupKey);
-      if (group) {
-        group.boughtItems.push(boughtItem);
-      } else {
-        sortedGroups.push({
-          key: groupKey,
-          label: boughtItem.supermarket ?? unassignedLabel,
-          suggestions: [],
-          boughtItems: [boughtItem],
-          ignoredItems: [],
-        });
-      }
-    }
-
-    // Distribute ignored auto items into their supermarket groups
-    for (const ignoredItem of ignoredAutoItems) {
-      const groupKey = normalizeLowercase(ignoredItem.supermarket) || UNASSIGNED_SUPERMARKET_KEY;
-      const group = sortedGroups.find(g => g.key === groupKey);
-      if (group) {
-        group.ignoredItems.push(ignoredItem);
-      } else {
-        sortedGroups.push({
-          key: groupKey,
-          label: ignoredItem.supermarket ?? unassignedLabel,
-          suggestions: [],
-          boughtItems: [],
-          ignoredItems: [ignoredItem],
-        });
-      }
-    }
-
-    return { suggestions: pendingSuggestions, groupedSuggestions: sortedGroups, summary };
+    return {
+      suggestions: pendingSuggestions,
+      groupedSuggestions: sortedGroups,
+      summary,
+      allBoughtItems: [...boughtAutoItems, ...boughtManuals],
+      allIgnoredItems: ignoredAutoItems,
+    };
   }
 
   private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {

@@ -27,8 +27,8 @@ export class ListComponent {
   private readonly translate = inject(TranslateService);
 
   private readonly collapsedGroups = signal<Set<string>>(new Set());
-  private readonly collapsedBoughtSections = signal<Set<string>>(new Set());
-  private readonly collapsedIgnoredSections = signal<Set<string>>(new Set());
+  readonly globalBoughtExpanded = signal(false);
+  readonly globalIgnoredExpanded = signal(false);
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
@@ -37,8 +37,8 @@ export class ListComponent {
   async ionViewWillLeave(): Promise<void> {
     await this.facade.ionViewWillLeave();
     this.collapsedGroups.set(new Set());
-    this.collapsedBoughtSections.set(new Set());
-    this.collapsedIgnoredSections.set(new Set());
+    this.globalBoughtExpanded.set(false);
+    this.globalIgnoredExpanded.set(false);
   }
 
   toggleGroup(key: string): void {
@@ -53,28 +53,12 @@ export class ListComponent {
     return this.collapsedGroups().has(key);
   }
 
-  toggleBoughtSection(key: string): void {
-    this.collapsedBoughtSections.update(set => {
-      const next = new Set(set);
-      next.has(key) ? next.delete(key) : next.add(key);
-      return next;
-    });
+  toggleGlobalBought(): void {
+    this.globalBoughtExpanded.update(v => !v);
   }
 
-  isBoughtSectionExpanded(key: string): boolean {
-    return this.collapsedBoughtSections().has(key);
-  }
-
-  toggleIgnoredSection(key: string): void {
-    this.collapsedIgnoredSections.update(set => {
-      const next = new Set(set);
-      next.has(key) ? next.delete(key) : next.add(key);
-      return next;
-    });
-  }
-
-  isIgnoredSectionExpanded(key: string): boolean {
-    return this.collapsedIgnoredSections().has(key);
+  toggleGlobalIgnored(): void {
+    this.globalIgnoredExpanded.update(v => !v);
   }
 
   async openManualAdd(): Promise<void> {

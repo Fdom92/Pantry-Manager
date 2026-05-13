@@ -35,8 +35,6 @@ export interface ShoppingSuggestionGroup<TItem = string> {
   key: string;
   label: string;
   suggestions: ShoppingSuggestion<TItem>[];
-  boughtItems: BoughtItem[];
-  ignoredItems: BoughtItem[];
 }
 
 export interface ShoppingSummary {
@@ -51,4 +49,6 @@ export interface ShoppingState<TItem = string> {
   suggestions: ShoppingSuggestion<TItem>[];
   groupedSuggestions: ShoppingSuggestionGroup<TItem>[];
   summary: ShoppingSummary;
+  allBoughtItems: BoughtItem[];
+  allIgnoredItems: BoughtItem[];
 }
