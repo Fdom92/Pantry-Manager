@@ -189,3 +189,149 @@ ion-title {
     transform: translateX(100%);
   }
 }
+
+// --- Item list (replaces cards) ---
+.item-list {
+  background: transparent;
+  --ion-item-background: var(--app-theme-card-bg);
+  border-radius: var(--app-theme-card-border-radius);
+  overflow: hidden;
+  border: 1px solid var(--app-theme-card-border-color);
+}
+
+.suggestion-item {
+  --padding-start: var(--app-theme-spacing-lg);
+  --padding-end: var(--app-theme-spacing-lg);
+  --inner-padding-end: 0;
+  cursor: pointer;
+}
+
+.item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--app-theme-spacing-sm) 0;
+  flex: 1;
+}
+
+.item-name {
+  font-size: 1rem;
+  font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-color);
+}
+
+.item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.item-qty {
+  font-size: 0.85rem;
+  color: var(--app-theme-text-muted);
+  margin-top: 2px;
+}
+
+.cart-icon {
+  font-size: 1.2rem;
+  opacity: 0.4;
+}
+
+// --- Reason chips ---
+.reason-chip {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  height: auto;
+  line-height: 1.4;
+}
+
+.reason-chip--basic {
+  --background: transparent;
+  --color: var(--ion-color-medium);
+  border: 1px solid var(--ion-color-medium);
+}
+
+// --- Supermarket heading ---
+.supermarket-heading {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-sm);
+  font-size: 1.05rem;
+  font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-color);
+  padding: var(--app-theme-spacing-xs) 0;
+}
+
+.manual-heading {
+  cursor: default;
+}
+
+.group-count {
+  font-size: 0.75rem;
+}
+
+.collapse-icon {
+  margin-left: auto;
+  font-size: 1rem;
+  color: var(--app-theme-text-muted);
+}
+
+// --- Bought section ---
+.bought-section {
+  margin-top: var(--app-theme-spacing-sm);
+}
+
+.bought-section-header {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-sm);
+  font-size: 0.9rem;
+  color: var(--app-theme-text-muted);
+  padding: var(--app-theme-spacing-xs) 0;
+}
+
+.bought-list {
+  opacity: 0.6;
+}
+
+.bought-item {
+  --padding-start: var(--app-theme-spacing-lg);
+}
+
+.bought-name {
+  font-weight: var(--app-theme-font-weight-normal, 400);
+  text-decoration: line-through;
+  color: var(--app-theme-text-muted);
+}
+
+// --- Share row ---
+.share-row {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--app-theme-spacing-md);
+}
+
+// --- Skeleton items ---
+.skeleton-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+// --- FAB override ---
+ion-fab-button[size="small"] {
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
