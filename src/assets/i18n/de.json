@@ -361,7 +361,8 @@
       "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
       "toBuy": "Kaufen {{ amount }}",
-      "empty": "Markiere Produkte als \"immer vorrätig\" um benachrichtigt zu werden, wenn sie zur Neige gehen."
+      "empty": "Markiere Produkte als \"immer vorrätig\" um benachrichtigt zu werden, wenn sie zur Neige gehen.",
+      "belowMinQty": "Noch {{qty}} bis zum Minimum"
     },
     "share": {
       "button": "Liste teilen",
@@ -373,6 +374,26 @@
       "generatedOn": "Erstellt am {{ date }}",
       "dialogTitle": "Einkaufsliste",
       "dialogText": "Teile deine Einkaufsliste als PDF."
+    },
+    "chips": {
+      "freshEmpty": "Frisch — leer",
+      "empty": "Aufgebraucht",
+      "belowMin": "Wenig Vorrat",
+      "basic": "Grundprodukt"
+    },
+    "bought": {
+      "sectionTitle": "Gekauft",
+      "restore": "Wiederherstellen",
+      "count": "{{count}} gekauft"
+    },
+    "manualAdd": {
+      "sectionTitle": "Sonstige",
+      "placeholder": "Produktname",
+      "alertTitle": "Zur Liste hinzufügen",
+      "alertButton": "Hinzufügen"
+    },
+    "emptyState": {
+      "autoHint": "Aufgebrauchte Produkte erscheinen hier automatisch."
     }
   },
   "insights": {

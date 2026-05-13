@@ -361,7 +361,8 @@
       "title": "Lista de compras",
       "loading": "A criar lista de compras…",
       "toBuy": "Comprar {{ amount }}",
-      "empty": "Marca produtos como \"manter sempre em casa\" para seres notificado quando se esgotarem."
+      "empty": "Marca produtos como \"manter sempre em casa\" para seres notificado quando se esgotarem.",
+      "belowMinQty": "Faltam {{qty}} para o mínimo"
     },
     "share": {
       "button": "Partilhar lista",
@@ -373,6 +374,26 @@
       "generatedOn": "Gerada em {{ date }}",
       "dialogTitle": "Lista de compras",
       "dialogText": "Partilha a tua lista em PDF."
+    },
+    "chips": {
+      "freshEmpty": "Fresco esgotado",
+      "empty": "Esgotado",
+      "belowMin": "Estoque baixo",
+      "basic": "Produto básico"
+    },
+    "bought": {
+      "sectionTitle": "Comprado",
+      "restore": "Restaurar",
+      "count": "{{count}} comprado"
+    },
+    "manualAdd": {
+      "sectionTitle": "Outros",
+      "placeholder": "Nome do produto",
+      "alertTitle": "Adicionar à lista",
+      "alertButton": "Adicionar"
+    },
+    "emptyState": {
+      "autoHint": "Os produtos esgotados aparecerão aqui automaticamente."
     }
   },
   "insights": {

@@ -361,7 +361,8 @@
       "title": "Lista della spesa",
       "loading": "Sto creando la lista della spesa…",
       "toBuy": "Da comprare {{ amount }}",
-      "empty": "Contrassegna i prodotti come \"tieni sempre in casa\" per essere avvisato quando scarseggiano."
+      "empty": "Contrassegna i prodotti come \"tieni sempre in casa\" per essere avvisato quando scarseggiano.",
+      "belowMinQty": "Mancano {{qty}} al minimo"
     },
     "share": {
       "button": "Condividi lista",
@@ -373,6 +374,26 @@
       "generatedOn": "Generata il {{ date }}",
       "dialogTitle": "Lista della spesa",
       "dialogText": "Condividi la tua lista in PDF."
+    },
+    "chips": {
+      "freshEmpty": "Fresco esaurito",
+      "empty": "Esaurito",
+      "belowMin": "Scorta bassa",
+      "basic": "Prodotto base"
+    },
+    "bought": {
+      "sectionTitle": "Acquistato",
+      "restore": "Ripristina",
+      "count": "{{count}} acquistato"
+    },
+    "manualAdd": {
+      "sectionTitle": "Altri",
+      "placeholder": "Nome prodotto",
+      "alertTitle": "Aggiungi alla lista",
+      "alertButton": "Aggiungi"
+    },
+    "emptyState": {
+      "autoHint": "I prodotti esauriti appariranno qui automaticamente."
     }
   },
   "insights": {

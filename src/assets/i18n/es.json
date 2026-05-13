@@ -361,7 +361,8 @@
       "title": "Lista de la compra",
       "loading": "Generando lista de compras…",
       "toBuy": "Comprar {{ amount }}",
-      "empty": "Marca productos como \"mantener en casa\" para recibir avisos cuando se agoten."
+      "empty": "Marca productos como \"mantener en casa\" para recibir avisos cuando se agoten.",
+      "belowMinQty": "Faltan {{qty}} para el mínimo"
     },
     "share": {
       "button": "Compartir lista",
@@ -373,6 +374,26 @@
       "generatedOn": "Generada el {{ date }}",
       "dialogTitle": "Lista de la compra",
       "dialogText": "Comparte tu lista en PDF."
+    },
+    "chips": {
+      "freshEmpty": "Fresco agotado",
+      "empty": "Agotado",
+      "belowMin": "Stock bajo",
+      "basic": "Básico"
+    },
+    "bought": {
+      "sectionTitle": "Comprado",
+      "restore": "Restaurar",
+      "count": "{{count}} comprado"
+    },
+    "manualAdd": {
+      "sectionTitle": "Otros",
+      "placeholder": "Nombre del producto",
+      "alertTitle": "Añadir a la lista",
+      "alertButton": "Añadir"
+    },
+    "emptyState": {
+      "autoHint": "Los productos agotados aparecerán aquí automáticamente."
     }
   },
   "insights": {
