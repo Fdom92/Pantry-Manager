@@ -380,7 +380,7 @@
       "empty": "Aufgebraucht",
       "belowMin": "Wenig Vorrat",
       "basic": "Grundprodukt",
-      "manual": "Manuell"
+      "manual": "Von dir hinzugefügt"
     },
     "bought": {
       "sectionTitle": "Gekauft",

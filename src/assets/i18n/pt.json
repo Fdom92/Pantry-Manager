@@ -380,7 +380,7 @@
       "empty": "Esgotado",
       "belowMin": "Estoque baixo",
       "basic": "Produto básico",
-      "manual": "Manual"
+      "manual": "Adicionado por você"
     },
     "bought": {
       "sectionTitle": "Comprado",

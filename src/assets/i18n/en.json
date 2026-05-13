@@ -380,7 +380,7 @@
       "empty": "Out of stock",
       "belowMin": "Low stock",
       "basic": "Staple",
-      "manual": "Manual"
+      "manual": "Added by you"
     },
     "bought": {
       "sectionTitle": "Bought",
