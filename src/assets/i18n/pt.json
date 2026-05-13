@@ -351,7 +351,7 @@
     }
   },
   "shopping": {
-    "title": "Lista",
+    "title": "Lista de compras",
     "unassignedSupermarket": "Qualquer supermercado",
     "reasons": {
       "below-min": "Stock baixo",
@@ -405,7 +405,8 @@
       "boughtManual": "✓ {{name}} comprado.",
       "ignored": "{{name}} oculto agora — voltará na próxima vez.",
       "removedManual": "{{name}} removido da lista."
-    }
+    },
+    "tabTitle": "Compras"
   },
   "insights": {
     "ctaDefault": "Entendi",
