@@ -22,7 +22,7 @@ export function groupSuggestionsBySupermarket(params: {
       key === UNASSIGNED_SUPERMARKET_KEY
         ? params.labelForUnassigned
         : list[0]?.supermarket ?? params.labelForUnassigned;
-    return { key, label, suggestions: list };
+    return { key, label, suggestions: list, boughtItems: [] };
   });
 
   return groups.sort((a, b) => {
