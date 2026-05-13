@@ -122,7 +122,7 @@ export class ListStateService {
     items: PantryItem[],
     boughtIds: Set<string>,
     removedIds: Set<string>,
-    manualItems: ManualItem[],
+    _manualItems: ManualItem[], // tracked as signal dep so computed re-runs; rendered directly in template
     boughtManuals: BoughtItem[],
   ): ShoppingStateWithItem {
     const pendingSuggestions: ShoppingSuggestionWithItem[] = [];
@@ -154,7 +154,6 @@ export class ListStateService {
 
       if (boughtIds.has(id)) {
         boughtAutoItems.push({ id, name: item.name, supermarket: supermarket || undefined });
-        summary.boughtCount += 1;
         continue;
       }
 
@@ -186,7 +185,7 @@ export class ListStateService {
 
     summary.total = pendingSuggestions.length;
     summary.supermarketCount = uniqueSupermarkets.size;
-    summary.boughtCount += boughtManuals.length;
+    summary.boughtCount = boughtAutoItems.length + boughtManuals.length;
 
     const unassignedLabel = this.translate.instant('shopping.unassignedSupermarket');
     const groupedSuggestions = groupSuggestionsBySupermarket({
@@ -195,18 +194,19 @@ export class ListStateService {
     });
 
     // Sort pending items within each group by urgency
-    for (const group of groupedSuggestions) {
-      group.suggestions = sortSuggestionsByUrgency(group.suggestions);
-    }
+    const sortedGroups = groupedSuggestions.map(group => ({
+      ...group,
+      suggestions: sortSuggestionsByUrgency(group.suggestions),
+    }));
 
     // Distribute bought auto items into their supermarket groups
     for (const boughtItem of boughtAutoItems) {
       const groupKey = normalizeLowercase(boughtItem.supermarket) || UNASSIGNED_SUPERMARKET_KEY;
-      const group = groupedSuggestions.find(g => g.key === groupKey);
+      const group = sortedGroups.find(g => g.key === groupKey);
       if (group) {
         group.boughtItems.push(boughtItem);
       } else {
-        groupedSuggestions.push({
+        sortedGroups.push({
           key: groupKey,
           label: boughtItem.supermarket ?? unassignedLabel,
           suggestions: [],
@@ -215,7 +215,7 @@ export class ListStateService {
       }
     }
 
-    return { suggestions: pendingSuggestions, groupedSuggestions, summary };
+    return { suggestions: pendingSuggestions, groupedSuggestions: sortedGroups, summary };
   }
 
   private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {
