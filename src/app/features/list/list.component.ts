@@ -28,6 +28,7 @@ export class ListComponent {
 
   private readonly collapsedGroups = signal<Set<string>>(new Set());
   private readonly collapsedBoughtSections = signal<Set<string>>(new Set());
+  private readonly collapsedIgnoredSections = signal<Set<string>>(new Set());
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
@@ -37,6 +38,7 @@ export class ListComponent {
     await this.facade.ionViewWillLeave();
     this.collapsedGroups.set(new Set());
     this.collapsedBoughtSections.set(new Set());
+    this.collapsedIgnoredSections.set(new Set());
   }
 
   toggleGroup(key: string): void {
@@ -61,6 +63,18 @@ export class ListComponent {
 
   isBoughtSectionExpanded(key: string): boolean {
     return this.collapsedBoughtSections().has(key);
+  }
+
+  toggleIgnoredSection(key: string): void {
+    this.collapsedIgnoredSections.update(set => {
+      const next = new Set(set);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  }
+
+  isIgnoredSectionExpanded(key: string): boolean {
+    return this.collapsedIgnoredSections().has(key);
   }
 
   async openManualAdd(): Promise<void> {
