@@ -379,7 +379,8 @@
       "freshEmpty": "Fresco esaurito",
       "empty": "Esaurito",
       "belowMin": "Scorta bassa",
-      "basic": "Prodotto base"
+      "basic": "Prodotto base",
+      "manual": "Manuale"
     },
     "bought": {
       "sectionTitle": "Acquistato",

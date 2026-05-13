@@ -235,6 +235,13 @@ ion-title {
   border: 1px solid var(--ion-color-medium);
 }
 
+.reason-chip--manual {
+  --background: transparent;
+  --color: var(--app-theme-text-muted);
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 20%, transparent);
+  font-style: italic;
+}
+
 // --- Supermarket heading ---
 .supermarket-heading {
   background: transparent;

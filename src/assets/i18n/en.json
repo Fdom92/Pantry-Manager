@@ -379,7 +379,8 @@
       "freshEmpty": "Fresh — out of stock",
       "empty": "Out of stock",
       "belowMin": "Low stock",
-      "basic": "Staple"
+      "basic": "Staple",
+      "manual": "Manual"
     },
     "bought": {
       "sectionTitle": "Bought",

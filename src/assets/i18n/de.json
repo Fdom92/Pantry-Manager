@@ -379,7 +379,8 @@
       "freshEmpty": "Frisch — leer",
       "empty": "Aufgebraucht",
       "belowMin": "Wenig Vorrat",
-      "basic": "Grundprodukt"
+      "basic": "Grundprodukt",
+      "manual": "Manuell"
     },
     "bought": {
       "sectionTitle": "Gekauft",
