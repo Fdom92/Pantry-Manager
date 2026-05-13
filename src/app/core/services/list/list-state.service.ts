@@ -107,9 +107,11 @@ export class ListStateService {
   }
 
   removeAutoItem(id: string): void {
-    const name = this.items().find(i => i._id === id)?.name ?? '';
+    const name = this.items().find(i => i._id === id)?.name;
     this.removedAutoIds.update(set => new Set([...set, id]));
-    void this.showToast(this.translate.instant('shopping.toasts.ignored', { name }));
+    if (name) {
+      void this.showToast(this.translate.instant('shopping.toasts.ignored', { name }));
+    }
   }
 
   removeManualItem(id: string): void {
