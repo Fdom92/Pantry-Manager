@@ -36,6 +36,7 @@ export interface ShoppingSuggestionGroup<TItem = string> {
   label: string;
   suggestions: ShoppingSuggestion<TItem>[];
   boughtItems: BoughtItem[];
+  ignoredItems: BoughtItem[];
 }
 
 export interface ShoppingSummary {
