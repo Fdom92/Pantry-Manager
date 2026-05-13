@@ -74,6 +74,56 @@ export class ListStateService {
     this.boughtManuals.set([]);
   }
 
+  async markAsBought(suggestion: ShoppingSuggestionWithItem): Promise<void> {
+    const id = suggestion.item._id;
+    this.boughtItemIds.update(set => new Set([...set, id]));
+
+    const qty = suggestion.reason === ShoppingReason.FRESH_EMPTY
+      ? FRESH_QTY.sufficient
+      : suggestion.suggestedQuantity;
+
+    try {
+      await this.pantryStore.addNewLot(id, { quantity: qty });
+    } catch (err) {
+      console.error('[ListStateService] markAsBought: addNewLot failed', err);
+      // Revert optimistic update
+      this.boughtItemIds.update(set => {
+        const next = new Set(set);
+        next.delete(id);
+        return next;
+      });
+    }
+  }
+
+  markManualAsBought(id: string): void {
+    const item = this.manualItems().find(m => m.id === id);
+    if (!item) return;
+    this.manualItems.update(list => list.filter(m => m.id !== id));
+    this.boughtManuals.update(list => [...list, { id, name: item.name }]);
+  }
+
+  removeAutoItem(id: string): void {
+    this.removedAutoIds.update(set => new Set([...set, id]));
+  }
+
+  removeManualItem(id: string): void {
+    this.manualItems.update(list => list.filter(m => m.id !== id));
+  }
+
+  restoreFromBought(id: string): void {
+    this.boughtItemIds.update(set => {
+      const next = new Set(set);
+      next.delete(id);
+      return next;
+    });
+    this.boughtManuals.update(list => list.filter(b => b.id !== id));
+  }
+
+  addManualItem(name: string): void {
+    const id = crypto.randomUUID();
+    this.manualItems.update(list => [...list, { id, name }]);
+  }
+
   getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
     return suggestion.item?._id ?? suggestion.item?.name ?? 'item';
   }
