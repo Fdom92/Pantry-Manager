@@ -56,10 +56,8 @@
                   @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
                     <ion-item-sliding>
                       <ion-item
-                        button
                         detail="false"
-                        class="suggestion-item pressable"
-                        (click)="facade.markAsBought(suggestion)">
+                        class="suggestion-item">
                         <div class="item-body" slot="start">
                           <span class="item-name">{{ suggestion.item.name }}</span>
                           <div class="item-meta">
@@ -90,13 +88,21 @@
                             }
                           </span>
                         </div>
-                        <ion-icon slot="end" name="cart-outline" color="medium" class="cart-icon"></ion-icon>
+                        <ion-button
+                          slot="end"
+                          fill="solid"
+                          color="primary"
+                          shape="round"
+                          class="buy-btn"
+                          (click)="facade.markAsBought(suggestion)">
+                          <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+                        </ion-button>
                       </ion-item>
                       <ion-item-options side="end">
                         <ion-item-option
-                          color="danger"
+                          color="medium"
                           (click)="facade.removeAutoItem(suggestion.item._id)">
-                          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                          <ion-icon slot="icon-only" name="eye-off-outline"></ion-icon>
                         </ion-item-option>
                       </ion-item-options>
                     </ion-item-sliding>
@@ -133,6 +139,33 @@
                             </ion-item-option>
                           </ion-item-options>
                         </ion-item-sliding>
+                      }
+                    </ion-list>
+                  }
+                </div>
+              }
+
+              <!-- Ignored items for this group -->
+              @if (group.ignoredItems.length) {
+                <div class="ignored-section">
+                  <button
+                    class="ignored-section-header pressable"
+                    (click)="toggleIgnoredSection(group.key)">
+                    <ion-icon name="eye-off-outline" color="medium"></ion-icon>
+                    <span>{{ 'shopping.ignored.sectionTitle' | translate }}</span>
+                    <ion-badge color="medium" class="group-count">{{ group.ignoredItems.length }}</ion-badge>
+                    <ion-icon
+                      class="collapse-icon"
+                      [name]="isIgnoredSectionExpanded(group.key) ? 'chevron-down-outline' : 'chevron-forward-outline'">
+                    </ion-icon>
+                  </button>
+                  @if (isIgnoredSectionExpanded(group.key)) {
+                    <ion-list class="item-list ignored-list" lines="none">
+                      @for (ignored of group.ignoredItems; track ignored.id) {
+                        <ion-item detail="false" class="ignored-item">
+                          <ion-icon slot="start" name="eye-off-outline" color="medium"></ion-icon>
+                          <span class="item-name ignored-name">{{ ignored.name }}</span>
+                        </ion-item>
                       }
                     </ion-list>
                   }
