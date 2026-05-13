@@ -33,7 +33,7 @@
     <div class="suggestion-groups fade-in-list">
 
       @for (group of state.groupedSuggestions; track group.key) {
-        @if (group.suggestions.length || group.boughtItems.length) {
+        @if (group.suggestions.length || group.boughtItems.length || group.ignoredItems.length) {
           <div class="suggestion-group">
 
             <!-- Group header -->
@@ -194,7 +194,7 @@
                     class="suggestion-item pressable"
                     (click)="facade.markManualAsBought(manual.id)">
                     <span slot="start" class="item-name">{{ manual.name }}</span>
-                    <ion-icon slot="end" name="cart-outline" color="medium" class="cart-icon"></ion-icon>
+                    <ion-icon slot="end" name="cart-outline" color="medium"></ion-icon>
                   </ion-item>
                   <ion-item-options side="end">
                     <ion-item-option color="danger" (click)="facade.removeManualItem(manual.id)">
