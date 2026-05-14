@@ -70,4 +70,17 @@ export class InsightsComponent {
     };
     return map[foodType] ?? foodType;
   }
+
+  readonly proSections = [
+    { key: 'patterns',        icon: 'analytics-outline',  labelKey: 'insights.pro.sections.patterns' },
+    { key: 'problems',        icon: 'warning-outline',    labelKey: 'insights.pro.sections.problems' },
+    { key: 'recommendations', icon: 'bulb-outline',       labelKey: 'insights.pro.sections.recommendations' },
+    { key: 'suggestions',     icon: 'calendar-outline',   labelKey: 'insights.pro.sections.suggestions' },
+  ] as const;
+
+  getAnalysisSection(key: string): string[] {
+    const a = this.facade.proAnalysis();
+    if (!a) return [];
+    return (a as Record<string, string[]>)[key] ?? [];
+  }
 }

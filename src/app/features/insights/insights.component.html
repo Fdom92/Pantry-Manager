@@ -107,8 +107,67 @@
         </section>
       }
 
-      <!-- SECTION D: PRO teaser (non-PRO only) -->
-      @if (!facade.isPro()) {
+      <!-- SECTION D: PRO analysis / teaser -->
+      @if (facade.isPro()) {
+        <section class="insights-section">
+          <h3 class="insights-section__title">{{ 'insights.pro.title' | translate }}</h3>
+
+          @if (!facade.proAnalysis() && !facade.proAnalysisLoading() && !facade.proAnalysisError()) {
+            <div class="pro-generate">
+              <ion-icon name="sparkles-outline" class="pro-generate__icon"></ion-icon>
+              <ion-button (click)="facade.triggerProAnalysis()">
+                {{ 'insights.pro.generate' | translate }}
+              </ion-button>
+            </div>
+          }
+
+          @if (facade.proAnalysisLoading()) {
+            <ion-skeleton-text animated style="width: 100%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 90%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 60%; height: 14px;"></ion-skeleton-text>
+          }
+
+          @if (facade.proAnalysis() && !facade.proAnalysisLoading()) {
+            <div class="pro-analysis-header">
+              @if (facade.proAnalysisStale()) {
+                <span class="pro-analysis-header__stale">{{ 'insights.pro.staleHint' | translate }}</span>
+              }
+              <button class="pro-analysis-header__refresh"
+                (click)="facade.triggerProAnalysis()"
+                [disabled]="facade.proAnalysisLoading()">
+                <ion-icon name="refresh-outline"></ion-icon>
+                {{ 'insights.pro.refresh' | translate }}
+              </button>
+            </div>
+            @for (section of proSections; track section.key) {
+              @if (getAnalysisSection(section.key).length > 0) {
+                <div class="pro-section">
+                  <h4 class="pro-section__title">
+                    <ion-icon [name]="section.icon"></ion-icon>
+                    {{ section.labelKey | translate }}
+                  </h4>
+                  <ul class="pro-section__list">
+                    @for (item of getAnalysisSection(section.key); track item) {
+                      <li>{{ item }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+            }
+          }
+
+          @if (facade.proAnalysisError() && !facade.proAnalysisLoading()) {
+            <div class="pro-error">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <span>{{ 'insights.pro.error' | translate }}</span>
+              <ion-button size="small" (click)="facade.triggerProAnalysis()">
+                {{ 'insights.pro.retry' | translate }}
+              </ion-button>
+            </div>
+          }
+        </section>
+      } @else {
         <section class="insights-section insights-section--pro-teaser">
           <div class="pro-teaser">
             <div class="pro-teaser__lock">
