@@ -427,7 +427,18 @@
     "pro": {
       "title": "Smart AI analysis",
       "description": "Detects patterns, predicts waste and gives personalised recommendations.",
-      "cta": "See PRO"
+      "cta": "See PRO",
+      "generate": "Generate analysis",
+      "refresh": "Refresh",
+      "staleHint": "Analysis may be outdated",
+      "error": "Could not generate analysis",
+      "retry": "Retry",
+      "sections": {
+        "patterns": "Patterns",
+        "problems": "Detected issues",
+        "recommendations": "Recommendations",
+        "suggestions": "This week"
+      }
     }
   },
   "pantry": {

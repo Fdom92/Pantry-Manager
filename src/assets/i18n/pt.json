@@ -427,7 +427,18 @@
     "pro": {
       "title": "Análise inteligente com IA",
       "description": "Deteta padrões, prevê desperdício e dá recomendações personalizadas.",
-      "cta": "Ver PRO"
+      "cta": "Ver PRO",
+      "generate": "Gerar análise",
+      "refresh": "Atualizar",
+      "staleHint": "Análise pode estar desatualizada",
+      "error": "Não foi possível gerar a análise",
+      "retry": "Tentar novamente",
+      "sections": {
+        "patterns": "Padrões",
+        "problems": "Problemas detetados",
+        "recommendations": "Recomendações",
+        "suggestions": "Esta semana"
+      }
     }
   },
   "pantry": {

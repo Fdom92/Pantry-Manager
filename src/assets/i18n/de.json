@@ -427,7 +427,18 @@
     "pro": {
       "title": "Intelligente KI-Analyse",
       "description": "Erkennt Muster, prognostiziert Verluste und gibt persönliche Empfehlungen.",
-      "cta": "PRO ansehen"
+      "cta": "PRO ansehen",
+      "generate": "Analyse generieren",
+      "refresh": "Aktualisieren",
+      "staleHint": "Analyse möglicherweise veraltet",
+      "error": "Analyse konnte nicht erstellt werden",
+      "retry": "Wiederholen",
+      "sections": {
+        "patterns": "Muster",
+        "problems": "Erkannte Probleme",
+        "recommendations": "Empfehlungen",
+        "suggestions": "Diese Woche"
+      }
     }
   },
   "pantry": {

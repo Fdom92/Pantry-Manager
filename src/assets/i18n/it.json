@@ -427,7 +427,18 @@
     "pro": {
       "title": "Analisi IA intelligente",
       "description": "Rileva schemi, prevede gli sprechi e fornisce raccomandazioni personalizzate.",
-      "cta": "Vedi PRO"
+      "cta": "Vedi PRO",
+      "generate": "Genera analisi",
+      "refresh": "Aggiorna",
+      "staleHint": "Analisi potrebbe essere obsoleta",
+      "error": "Impossibile generare l'analisi",
+      "retry": "Riprova",
+      "sections": {
+        "patterns": "Tendenze",
+        "problems": "Problemi rilevati",
+        "recommendations": "Raccomandazioni",
+        "suggestions": "Questa settimana"
+      }
     }
   },
   "pantry": {

@@ -427,7 +427,18 @@
     "pro": {
       "title": "Analyse IA intelligente",
       "description": "Détecte les tendances, prédit le gaspillage et donne des recommandations personnalisées.",
-      "cta": "Voir PRO"
+      "cta": "Voir PRO",
+      "generate": "Générer l'analyse",
+      "refresh": "Actualiser",
+      "staleHint": "Analyse peut-être obsolète",
+      "error": "Impossible de générer l'analyse",
+      "retry": "Réessayer",
+      "sections": {
+        "patterns": "Tendances",
+        "problems": "Problèmes détectés",
+        "recommendations": "Recommandations",
+        "suggestions": "Cette semaine"
+      }
     }
   },
   "pantry": {
