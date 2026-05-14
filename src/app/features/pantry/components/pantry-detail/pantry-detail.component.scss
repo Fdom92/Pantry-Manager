@@ -21,6 +21,7 @@
   &[data-status='expired']                      { border-color: color-mix(in srgb, var(--ion-color-danger)  28%, transparent); }
   &[data-status='near-expiry'],
   &[data-status='low-stock']                    { border-color: color-mix(in srgb, var(--ion-color-warning) 28%, transparent); }
+  &[data-status='review']                       { border-color: color-mix(in srgb, var(--ion-color-warning-shade) 28%, transparent); }
 }
 
 .card-content {

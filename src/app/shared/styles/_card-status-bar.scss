@@ -24,4 +24,5 @@
   &[data-status='expired']                      { --status-bar-color: var(--ion-color-danger);  }
   &[data-status='near-expiry'],
   &[data-status='low-stock']                    { --status-bar-color: var(--ion-color-warning); }
+  &[data-status='review']                       { --status-bar-color: var(--ion-color-warning-shade); }
 }
