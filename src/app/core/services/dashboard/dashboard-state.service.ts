@@ -12,7 +12,6 @@ import type {
 } from '@core/models';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
 import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
-import { PlannerConversationStore } from '../planner/planner-conversation.store';
 import { LanguageService } from '../shared/language.service';
 import { withSignalFlag } from '@core/utils';
 import { ConfirmService } from '../shared';
@@ -67,7 +66,6 @@ export class DashboardStateService {
   private readonly insightService = inject(DashboardInsightService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
-  private readonly conversationStore = inject(PlannerConversationStore);
   private readonly navCtrl = inject(NavController);
   private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
@@ -413,11 +411,6 @@ export class DashboardStateService {
       this.batchEdit.openFlow({ filter: cta.filter, action: cta.action });
       return;
     }
-    this.conversationStore.prepareConversation({
-      entryContext: cta.entryContext,
-      initialPrompt: cta.prompt,
-    });
-    await this.navCtrl.navigateForward('/planner');
   }
 
   async onOverviewCardSelected(card: DashboardOverviewCardId): Promise<void> {

@@ -417,12 +417,6 @@
         "cta": "Allons-y",
         "dismiss": "Pas maintenant"
       },
-      "cookBeforeExpiry": {
-        "title": "Vous avez des produits qui expirent bientôt",
-        "description": "Je vous suggère des recettes pour les utiliser avant qu'ils ne se gâtent.",
-        "cta": "Donne-moi des idées",
-        "prompt": "Suggère des recettes qui privilégient les produits bientôt périmés de mon garde-manger."
-      },
       "addExpiryDates": {
         "title": "Ajoutez des dates de péremption",
         "description": "Sachez toujours quoi utiliser en premier et évitez les mauvaises surprises dans votre garde-manger.",
@@ -444,61 +438,6 @@
         "cta": "Essayer PRO"
       }
     }
-  },
-  "agent": {
-    "title": "Planification",
-    "states": {
-      "thinking": "Réflexion…",
-      "fetching": "Consultation de votre garde-manger…",
-      "responding": "Génération de la réponse…"
-    },
-    "placeholder": "Demandez des recettes, des menus ou des idées avec ce que vous avez.",
-    "actions": {
-      "send": "Envoyer",
-      "retry": "Réessayer",
-      "clear": "Effacer la conversation"
-    },
-    "preview": {
-      "badge": "Aperçu",
-      "title": "Voici la couche de planification",
-      "headline": "Idées et plans alimentés par l’IA",
-      "subtitle": "Recevez recettes, menus et insights adaptés à votre garde-manger.",
-      "cta": "Débloquer le planificateur",
-      "demo": {
-        "chipsTitle": "Lancez-vous avec une intention",
-        "sessionTitle": "Conversation exemple",
-        "userMessage": "« Planifie des dîners avec ce qui expire cette semaine. »",
-        "agentMessage": "Bonne idée. Tu as des épinards et de la feta qui expirent dans 2 jours. Je propose un pesto d’épinards pour ce soir et une omelette grecque demain."
-      }
-    },
-    "quickStart": {
-      "title": "Entrée contextuelle",
-      "headline": "Commencez par quelque chose de concret",
-      "subtitle": "Touchez une option et le planificateur se lance tout seul.",
-      "ctaTitle": "Démarrer en un geste",
-      "ctaSubtitle": "Par où on commence aujourd'hui ?",
-      "today": "Que cuisiner aujourd'hui ?",
-      "todayPrompt": "Qu'est-ce que je peux cuisiner aujourd'hui avec ce que j'ai à la maison ? Donne-moi quelques idées.",
-      "weeklyPlan": "Plan de semaine",
-      "weeklyPlanPrompt": "Fais-moi un menu pour toute la semaine — 7 jours, petit-déjeuner, déjeuner et dîner — avec ce que j'ai chez moi.",
-      "useExpiring": "Ce qui expire bientôt",
-      "useExpiringPrompt": "J'ai des trucs qui vont bientôt expirer. Qu'est-ce que je cuisine pour ne pas les gaspiller ?",
-      "surpriseMe": "Surprends-moi",
-      "surpriseMePrompt": "Choisis une recette que je peux faire avec ce que j'ai et surprends-moi. Juste une.",
-      "customPrompt": "Question libre ✏️"
-    },
-    "messages": {
-      "noResponse": "Impossible de générer une réponse.",
-      "unifiedError": "Le planificateur ne peut pas répondre pour le moment. Réessayez dans quelques secondes."
-    },
-    "errors": {
-      "coldStart": "Le service démarre. Veuillez réessayer dans quelques secondes.",
-      "rateLimit": "Trop de requêtes. Veuillez attendre un moment avant de réessayer.",
-      "timeout": "La requête a pris trop de temps. Vérifiez votre connexion et réessayez.",
-      "offline": "Pas de connexion internet. Veuillez vous connecter et réessayer.",
-      "generic": "Quelque chose s'est mal passé. Veuillez réessayer dans quelques instants."
-    },
-    "disclaimer": "Les recettes et menus sont générés par IA et peuvent contenir des erreurs."
   },
   "pantry": {
     "title": "Garde-manger",
@@ -853,16 +792,6 @@
       "dark": "Sombre",
       "system": "Système",
       "error": "Impossible de mettre à jour le thème."
-    },
-    "ai": {
-      "title": "IA",
-      "subtitle": "Dites au planificateur quoi retenir.",
-      "contextTitle": "Contexte / Mémoire",
-      "contextDescription": "Partagez votre foyer, vos régimes, allergies ou tout ce que vous voulez que l’app retienne.",
-      "contextPlaceholder": "Ex : Famille de 3, pas de noix, cuisine méditerranéenne.",
-      "saveAction": "Enregistrer le contexte",
-      "saveSuccess": "Contexte enregistré.",
-      "saveError": "Impossible d’enregistrer le contexte."
     },
     "advanced": {
       "title": "Données",

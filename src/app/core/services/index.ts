@@ -3,7 +3,6 @@ export * from './history';
 export * from './migration';
 export * from './onboarding';
 export * from './pantry';
-export * from './planner';
 export * from './settings';
 export * from './shared';
 export * from './list';

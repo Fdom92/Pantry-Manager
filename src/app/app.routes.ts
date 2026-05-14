@@ -26,11 +26,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('@features/list/list.component').then(m => m.ListComponent),
       },
-      {
-        path: 'planner',
-        loadComponent: () =>
-          import('@features/planner/planner.component').then(m => m.PlannerComponent),
-      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
@@ -38,11 +33,6 @@ export const routes: Routes = [
     path: 'settings',
     loadComponent: () =>
       import('@features/settings/settings.component').then(m => m.SettingsComponent),
-  },
-  {
-    path: 'settings/ai',
-    loadComponent: () =>
-      import('@features/settings/components/settings-ai/settings-ai.component').then(m => m.SettingsAiComponent),
   },
   {
     path: 'settings/catalogos',

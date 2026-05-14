@@ -417,12 +417,6 @@
         "cta": "Hacerlo",
         "dismiss": "No ahora"
       },
-      "cookBeforeExpiry": {
-        "title": "Tienes productos a punto de caducar",
-        "description": "Te sugiero recetas para aprovecharlos antes de que se echen a perder.",
-        "cta": "Dame ideas",
-        "prompt": "Sugiere recetas priorizando los productos que caducan pronto en mi despensa."
-      },
       "addExpiryDates": {
         "title": "Añade fechas de caducidad",
         "description": "Con fechas en tus productos sabrás siempre qué usar primero y evitarás sorpresas.",
@@ -444,61 +438,6 @@
         "cta": "Prueba PRO"
       }
     }
-  },
-  "agent": {
-    "title": "Planificación",
-    "states": {
-      "thinking": "Pensando…",
-      "fetching": "Consultando tu despensa…",
-      "responding": "Generando respuesta…"
-    },
-    "placeholder": "Pide recetas, planes o ideas con lo que tienes.",
-    "actions": {
-      "send": "Enviar",
-      "retry": "Reintentar",
-      "clear": "Limpiar chat"
-    },
-    "preview": {
-      "badge": "Vista previa",
-      "title": "Planificador PRO",
-      "headline": "Recetas y menús con lo que tienes en casa",
-      "subtitle": "Recibe recetas, menús e insights basados en tu despensa sin salir de la app.",
-      "cta": "Desbloquear planificador",
-      "demo": {
-        "chipsTitle": "Empieza con una intención",
-        "sessionTitle": "Conversación de ejemplo",
-        "userMessage": "“Planifica cenas usando lo que caduca esta semana.”",
-        "agentMessage": "Perfecto. Tienes espinaca y feta que caducan en 2 días. Te propongo pasta con pesto de espinaca para hoy y una tortilla griega mañana."
-      }
-    },
-    "quickStart": {
-      "title": "Entrada contextual",
-      "headline": "Empieza por algo concreto",
-      "subtitle": "Toca una opción y el planificador arranca solo.",
-      "ctaTitle": "Empieza con un toque",
-      "ctaSubtitle": "¿Por dónde empezamos hoy?",
-      "today": "¿Qué cocino hoy?",
-      "todayPrompt": "¿Qué hago de comer hoy con lo que tengo en casa? Dame unas ideas directas.",
-      "weeklyPlan": "Plan semanal",
-      "weeklyPlanPrompt": "Hazme un menú para toda la semana —7 días, desayuno, comida y cena— con lo que tengo en casa.",
-      "useExpiring": "Lo que caduca",
-      "useExpiringPrompt": "Tengo cosas a punto de caducar. ¿Qué cocino para no tirarlas?",
-      "surpriseMe": "Sorpréndeme",
-      "surpriseMePrompt": "Elige tú una receta con lo que tengo y sorpréndeme. Solo una.",
-      "customPrompt": "Pregunta libre ✏️"
-    },
-    "messages": {
-      "noResponse": "No pude generar respuesta.",
-      "unifiedError": "El planificador no pudo responder en este momento. Inténtalo de nuevo en unos segundos."
-    },
-    "errors": {
-      "coldStart": "El servicio está iniciando. Intenta de nuevo en unos segundos.",
-      "rateLimit": "Demasiadas solicitudes. Espera un momento antes de intentar de nuevo.",
-      "timeout": "La solicitud tardó demasiado. Verifica tu conexión e intenta de nuevo.",
-      "offline": "Sin conexión a internet. Conéctate e intenta de nuevo.",
-      "generic": "Algo salió mal. Intenta de nuevo en unos momentos."
-    },
-    "disclaimer": "Las recetas y planes son generados por IA y pueden contener errores."
   },
   "pantry": {
     "title": "Despensa",
@@ -854,16 +793,6 @@
       "dark": "Oscuro",
       "system": "Sistema",
       "error": "No se pudo actualizar el tema."
-    },
-    "ai": {
-      "title": "IA",
-      "subtitle": "Cuéntale al planificador lo importante.",
-      "contextTitle": "Contexto / Memoria",
-      "contextDescription": "Indica tu hogar, dietas, alergias o cualquier preferencia que quieras que recuerde.",
-      "contextPlaceholder": "Ej: Familia de 3, sin frutos secos, cocina mediterránea.",
-      "saveAction": "Guardar contexto",
-      "saveSuccess": "Contexto guardado.",
-      "saveError": "No se pudo guardar el contexto."
     },
     "advanced": {
       "title": "Datos",

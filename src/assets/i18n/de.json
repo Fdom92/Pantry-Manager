@@ -417,12 +417,6 @@
         "cta": "Los geht's",
         "dismiss": "Nicht jetzt"
       },
-      "cookBeforeExpiry": {
-        "title": "Du hast Produkte, die bald ablaufen",
-        "description": "Ich schlage dir Rezepte vor, um sie zu nutzen, bevor sie verderben.",
-        "cta": "Gib mir Ideen",
-        "prompt": "Schlage Rezepte vor, die die bald ablaufenden Produkte in meiner Speisekammer priorisieren."
-      },
       "addExpiryDates": {
         "title": "Ablaufdaten hinzufügen",
         "description": "Behalte den Überblick, was zuerst verwendet werden soll, und vermeide unangenehme Überraschungen.",
@@ -444,61 +438,6 @@
         "cta": "PRO testen"
       }
     }
-  },
-  "agent": {
-    "title": "Planung",
-    "states": {
-      "thinking": "Denkt nach…",
-      "fetching": "Vorratskammer wird abgefragt…",
-      "responding": "Antwort wird erstellt…"
-    },
-    "placeholder": "Frag nach Rezepten, Essensplänen oder Ideen mit deinen Vorräten.",
-    "actions": {
-      "send": "Senden",
-      "retry": "Erneut versuchen",
-      "clear": "Chat löschen"
-    },
-    "preview": {
-      "badge": "Vorschau",
-      "title": "Das Planungserlebnis",
-      "headline": "Ideen und Pläne mit KI",
-      "subtitle": "Erhalte Rezepte, Menüs und Insights passend zu deinem Vorrat.",
-      "cta": "Menüplaner freischalten",
-      "demo": {
-        "chipsTitle": "Starte mit einer Absicht",
-        "sessionTitle": "Beispielkonversation",
-        "userMessage": "„Plane Abendessen mit allem, was diese Woche abläuft.",
-        "agentMessage": "Klingt gut. Spinat und Feta laufen in 2 Tagen ab. Vorschlag: Heute Spinat-Pesto-Pasta und morgen ein griechisches Omelett."
-      }
-    },
-    "quickStart": {
-      "title": "Kontextueller Einstieg",
-      "headline": "Fang mit etwas Konkretem an",
-      "subtitle": "Tippe eine Option an und der Planer legt direkt los.",
-      "ctaTitle": "Mit einem Tipp starten",
-      "ctaSubtitle": "Womit fangen wir heute an?",
-      "today": "Was koche ich heute?",
-      "todayPrompt": "Was kann ich heute mit dem kochen, was ich zuhause habe? Gib mir ein paar Ideen.",
-      "weeklyPlan": "Wochenplan",
-      "weeklyPlanPrompt": "Mach mir einen Wochenplan — 7 Tage, Frühstück, Mittagessen und Abendessen — mit dem was ich zuhause habe.",
-      "useExpiring": "Was läuft bald ab",
-      "useExpiringPrompt": "Ich hab Sachen, die bald ablaufen. Was koche ich, um sie nicht wegzuwerfen?",
-      "surpriseMe": "Überrasch mich",
-      "surpriseMePrompt": "Such dir ein Rezept aus, das ich mit dem machen kann, was ich habe, und überrasch mich. Nur eins.",
-      "customPrompt": "Eigene Frage ✏️"
-    },
-    "messages": {
-      "noResponse": "Ich konnte keine Antwort erzeugen.",
-      "unifiedError": "Der Menüplaner konnte im Moment nicht antworten. Bitte versuche es später erneut."
-    },
-    "errors": {
-      "coldStart": "Der Dienst startet. Versuche es in einigen Sekunden erneut.",
-      "rateLimit": "Zu viele Anfragen. Bitte warte einen Moment, bevor du es erneut versuchst.",
-      "timeout": "Die Anfrage hat zu lange gedauert. Überprüfe deine Verbindung und versuche es erneut.",
-      "offline": "Keine Internetverbindung. Bitte verbinde dich und versuche es erneut.",
-      "generic": "Etwas ist schiefgelaufen. Bitte versuche es in wenigen Momenten erneut."
-    },
-    "disclaimer": "Rezepte und Essenspläne werden von KI generiert und können Fehler enthalten."
   },
   "pantry": {
     "title": "Vorratskammer",
@@ -853,16 +792,6 @@
       "dark": "Dunkel",
       "system": "System",
       "error": "Das Design konnte nicht aktualisiert werden."
-    },
-    "ai": {
-      "title": "KI",
-      "subtitle": "Sag dem Planer, was er merken soll.",
-      "contextTitle": "Kontext / Gedächtnis",
-      "contextDescription": "Teile Haushalt, Ernährungsweisen, Abneigungen oder alles, was wir beachten sollen.",
-      "contextPlaceholder": "Bsp.: Familie mit 3 Personen, keine Nüsse, mediterrane Küche.",
-      "saveAction": "Kontext speichern",
-      "saveSuccess": "Kontext gespeichert.",
-      "saveError": "Planer-Kontext konnte nicht gespeichert werden."
     },
     "advanced": {
       "title": "Daten",

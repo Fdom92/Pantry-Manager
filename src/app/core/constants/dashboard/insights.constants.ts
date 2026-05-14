@@ -1,4 +1,3 @@
-import { AgentEntryContext } from '@core/models/planner';
 import { InsightCategory, InsightDefinition, InsightId } from '@core/models/dashboard';
 
 /** @deprecated Import from @core/constants/shared instead */
@@ -7,25 +6,6 @@ export { PENDING_REVIEW_STALE_DAYS } from '../shared/shared.constants';
 // Insights focus on data quality improvement and PRO premium value.
 // Urgency (expired, near-expiry, low stock) is handled by the actions layer.
 export const INSIGHTS_LIBRARY: readonly InsightDefinition[] = [
-  // PRO premium: AI-powered recipe suggestion for expiring items
-  {
-    id: InsightId.COOK_BEFORE_EXPIRY,
-    titleKey: 'insights.library.cookBeforeExpiry.title',
-    descriptionKey: 'insights.library.cookBeforeExpiry.description',
-    category: InsightCategory.PREVENTIVE,
-    priority: 1,
-    audience: 'pro',
-    predicate: context => context.expiringSoonItems.some(item => (item.quantity ?? 0) > 0),
-    ctas: [
-      {
-        id: 'cook-before-expiry',
-        labelKey: 'insights.library.cookBeforeExpiry.cta',
-        type: 'agent',
-        entryContext: AgentEntryContext.INSIGHTS_RECIPES,
-        promptKey: 'insights.library.cookBeforeExpiry.prompt',
-      },
-    ],
-  },
   // Data quality: nudge to add expiry dates via batch edit (single-batch items only)
   {
     id: InsightId.ADD_EXPIRY_DATES,

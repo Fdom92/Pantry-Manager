@@ -22,5 +22,4 @@ export const DEFAULT_PREFERENCES: AppPreferences = {
   locationOptions: [],
   categoryOptions: [],
   supermarketOptions: [],
-  plannerMemory: '',
 };

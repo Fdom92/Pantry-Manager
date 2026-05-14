@@ -90,19 +90,6 @@ export class DashboardInsightService {
   }
 
   private toCta(definition: InsightCtaDefinition): InsightCta | null {
-    if (definition.type === 'agent') {
-      const prompt = this.translateKey(definition.promptKey);
-      if (!prompt) {
-        return null;
-      }
-      return {
-        id: definition.id,
-        label: this.translateKey(definition.labelKey),
-        type: 'agent',
-        entryContext: definition.entryContext,
-        prompt,
-      };
-    }
     if (definition.type === 'batch-edit') {
       return {
         id: definition.id,

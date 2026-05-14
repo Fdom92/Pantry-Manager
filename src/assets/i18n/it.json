@@ -417,12 +417,6 @@
         "cta": "Facciamolo",
         "dismiss": "Non ora"
       },
-      "cookBeforeExpiry": {
-        "title": "Hai prodotti che stanno per scadere",
-        "description": "Ti suggerisco ricette per usarli prima che vadano a male.",
-        "cta": "Dammi idee",
-        "prompt": "Suggerisci ricette che diano priorità ai prodotti in scadenza nella mia dispensa."
-      },
       "addExpiryDates": {
         "title": "Aggiungi le date di scadenza",
         "description": "Tieni traccia di cosa usare prima ed evita brutte sorprese nella dispensa.",
@@ -444,61 +438,6 @@
         "cta": "Prova PRO"
       }
     }
-  },
-  "agent": {
-    "title": "Pianificazione",
-    "states": {
-      "thinking": "Pensando…",
-      "fetching": "Consultando la tua dispensa…",
-      "responding": "Generando la risposta…"
-    },
-    "placeholder": "Chiedi ricette, piani pasto o idee con quello che hai.",
-    "actions": {
-      "send": "Invia",
-      "retry": "Riprova",
-      "clear": "Cancella chat"
-    },
-    "preview": {
-      "badge": "Anteprima",
-      "title": "La nuova area di pianificazione",
-      "headline": "Idee e piani guidati dall'AI",
-      "subtitle": "Ricevi ricette, menù e insight su misura per la tua dispensa.",
-      "cta": "Sblocca il pianificatore PRO",
-      "demo": {
-        "chipsTitle": "Parti da un'intenzione",
-        "sessionTitle": "Conversazione di esempio",
-        "userMessage": "“Pianifica le cene usando ciò che scade questa settimana.”",
-        "agentMessage": "Ottimo. Hai spinaci e feta che scadono tra 2 giorni. Propongo pasta al pesto di spinaci stasera e frittata greca domani."
-      }
-    },
-    "quickStart": {
-      "title": "Ingresso contestuale",
-      "headline": "Parti da qualcosa di concreto",
-      "subtitle": "Tocca un'opzione e il pianificatore parte da solo.",
-      "ctaTitle": "Parti con un tocco",
-      "ctaSubtitle": "Da dove partiamo oggi?",
-      "today": "Cosa cucino oggi?",
-      "todayPrompt": "Cosa posso cucinare oggi con quello che ho in casa? Dammi qualche idea.",
-      "weeklyPlan": "Piano settimanale",
-      "weeklyPlanPrompt": "Fammi un menu per tutta la settimana — 7 giorni, colazione, pranzo e cena — con quello che ho in dispensa.",
-      "useExpiring": "Cosa scade presto",
-      "useExpiringPrompt": "Ho delle cose in scadenza. Cosa cucino per non buttarle?",
-      "surpriseMe": "Sorprendimi",
-      "surpriseMePrompt": "Scegli tu una ricetta che posso fare con quello che ho e sorprendimi. Solo una.",
-      "customPrompt": "Domanda libera ✏️"
-    },
-    "messages": {
-      "noResponse": "Impossibile generare una risposta.",
-      "unifiedError": "Il pianificatore non può rispondere in questo momento. Riprova tra qualche secondo."
-    },
-    "errors": {
-      "coldStart": "Il servizio si sta avviando. Riprova tra qualche secondo.",
-      "rateLimit": "Troppe richieste. Attendi un momento prima di riprovare.",
-      "timeout": "La richiesta ha impiegato troppo tempo. Controlla la connessione e riprova.",
-      "offline": "Nessuna connessione internet. Connettiti e riprova.",
-      "generic": "Qualcosa è andato storto. Riprova tra qualche istante."
-    },
-    "disclaimer": "Le ricette e i piani sono generati da AI e possono contenere errori."
   },
   "pantry": {
     "title": "Dispensa",
@@ -853,16 +792,6 @@
       "dark": "Scuro",
       "system": "Sistema",
       "error": "Impossibile aggiornare il tema."
-    },
-    "ai": {
-      "title": "IA",
-      "subtitle": "Di' al planner cosa ricordare.",
-      "contextTitle": "Contesto / Memoria",
-      "contextDescription": "Condividi famiglia, diete, allergie o tutto ciò che vuoi far ricordare.",
-      "contextPlaceholder": "Es.: Famiglia di 3, no noci, cucina mediterranea.",
-      "saveAction": "Salva contesto",
-      "saveSuccess": "Contesto salvato.",
-      "saveError": "Impossibile salvare il contesto."
     },
     "advanced": {
       "title": "Dati",
