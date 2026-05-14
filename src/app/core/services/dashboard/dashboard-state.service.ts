@@ -163,7 +163,7 @@ export class DashboardStateService {
 
   readonly pantryHealth = computed((): PantryHealth => {
     const expired = this.expiredItems().length;
-    const nearExpiry = this.nearExpiryItems().length;
+    const nearExpiry = this.nearExpiryItems().length + this.reviewItems().length;
     const stale = this.stalePantryItemsCount();
     const total = this.totalItems();
     const withDates = this.completeProductsCount();

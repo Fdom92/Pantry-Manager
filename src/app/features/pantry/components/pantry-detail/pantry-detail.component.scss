@@ -91,4 +91,6 @@
   &[data-status='near-expiry'] {
     color: var(--app-theme-card-accent-warning, var(--ion-color-warning-shade));
   }
+
+  &[data-status='review']    { color: var(--ion-color-warning-shade); }
 }

@@ -239,8 +239,9 @@ export class PantryViewModelService {
       opened: Boolean(entry.batch.opened),
     }));
 
-    const lowStock = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock';
-    const aggregates = this.computeProductAggregates(batches, lowStock);
+    const itemState = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
+    const lowStock = itemState === 'low-stock';
+    const aggregates = this.computeProductAggregates(batches, lowStock, itemState);
     const colorClass = this.getColorClass(aggregates.status.state);
     const formattedEarliestExpirationLong = aggregates.earliestDate
       ? this.formatBatchDate({ expirationDate: aggregates.earliestDate } as ItemBatch)
@@ -416,7 +417,8 @@ export class PantryViewModelService {
 
   private computeProductAggregates(
     batches: PantryItemBatchViewModel[],
-    isLowStock: boolean
+    isLowStock: boolean,
+    itemState?: ProductStatusState
   ): {
     status: PantryItemGlobalStatus;
     earliestDate: string | null;
@@ -468,7 +470,9 @@ export class PantryViewModelService {
     }
 
     let statusState: ProductStatusState;
-    if (earliestStatus === 'expired') {
+    if (itemState === 'review') {
+      statusState = 'review';
+    } else if (earliestStatus === 'expired') {
       statusState = 'expired';
     } else if (earliestStatus === 'near-expiry') {
       statusState = 'near-expiry';
