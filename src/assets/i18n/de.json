@@ -510,13 +510,15 @@
         "normal": "Produkte ohne aktive Warnungen",
         "low": "Müssen bald nachgefüllt werden",
         "expiring": "Laufen in wenigen Tagen ab",
-        "expired": "Überprüfen und entsorgen"
+        "expired": "Überprüfen und entsorgen",
+        "review": "Datum überschritten, evtl. noch gut"
       },
       "status": {
         "normal": "Keine Probleme",
         "low": "Niedriger Bestand",
         "expiring": "Bald ablaufend",
-        "expired": "Abgelaufen"
+        "expired": "Abgelaufen",
+        "review": "Prüfen"
       },
       "search": "Produkte suchen"
     },
@@ -620,7 +622,8 @@
       "subinfo": {
         "expired": "Abgelaufen",
         "tomorrow": "Läuft morgen ab",
-        "inDays": "Läuft in {{count}} Tagen ab"
+        "inDays": "Läuft in {{count}} Tagen ab",
+        "review": "Bald verbrauchen"
       },
       "quantity": {
         "single": "{{ quantity }} Einheit",

@@ -510,13 +510,15 @@
         "normal": "Products without active alerts",
         "low": "Need replenishment soon",
         "expiring": "Expiring in a few days",
-        "expired": "Review and discard"
+        "expired": "Review and discard",
+        "review": "Past date, may still be fine"
       },
       "status": {
         "normal": "No alerts",
         "low": "Low stock",
         "expiring": "Near expiry",
-        "expired": "Expired"
+        "expired": "Expired",
+        "review": "Check"
       },
       "search": "Search products"
     },
@@ -620,7 +622,8 @@
       "subinfo": {
         "expired": "Expired",
         "tomorrow": "Expires tomorrow",
-        "inDays": "Expires in {{count}} days"
+        "inDays": "Expires in {{count}} days",
+        "review": "Use soon"
       },
       "quantity": {
         "single": "{{ quantity }} unit",

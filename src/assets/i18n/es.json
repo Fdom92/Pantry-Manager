@@ -510,13 +510,15 @@
         "normal": "Productos sin alertas activas",
         "low": "Necesitan reposición pronto",
         "expiring": "Caducan en pocos días",
-        "expired": "Revisar y descartar"
+        "expired": "Revisar y descartar",
+        "review": "Pasó la fecha, pero puede estar bien"
       },
       "status": {
         "normal": "Sin alertas",
         "low": "Stock bajo",
         "expiring": "Próx. caducar",
-        "expired": "Caducados"
+        "expired": "Caducados",
+        "review": "Revisar"
       },
       "search": "Buscar productos"
     },
@@ -620,7 +622,8 @@
       "subinfo": {
         "expired": "Caducado",
         "tomorrow": "Caduca mañana",
-        "inDays": "Caduca en {{count}} días"
+        "inDays": "Caduca en {{count}} días",
+        "review": "Consumir pronto"
       },
       "quantity": {
         "single": "{{ quantity }} unidad",
