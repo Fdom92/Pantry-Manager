@@ -35,6 +35,7 @@ export class PantryViewModelService {
     const statusCounts = {
       expired: 0,
       expiring: 0,
+      review: 0,
       lowStock: 0,
       normal: 0,
     };
@@ -46,6 +47,9 @@ export class PantryViewModelService {
           break;
         case 'near-expiry':
           statusCounts.expiring += 1;
+          break;
+        case 'review':
+          statusCounts.review += 1;
           break;
         case 'low-stock':
           statusCounts.lowStock += 1;
@@ -112,6 +116,17 @@ export class PantryViewModelService {
         description: 'pantry.filters.desc.expiring',
         colorClass: 'chip--expiring',
         active: activeStatus === 'near-expiry',
+      },
+      {
+        key: 'status-review',
+        kind: 'status',
+        value: 'review',
+        label: 'pantry.filters.status.review',
+        count: counts.review,
+        icon: 'eye-outline',
+        description: 'pantry.filters.desc.review',
+        colorClass: 'chip--review',
+        active: activeStatus === 'review',
       },
       {
         key: 'status-expired',
@@ -384,6 +399,7 @@ export class PantryViewModelService {
   private buildExpiryPart(state: ProductStatusState, earliestDate: string | null, formattedDate: string): string {
     if (!earliestDate) return this.translate.instant('pantry.detail.noExpiry');
     if (state === 'expired') return this.translate.instant('pantry.detail.subinfo.expired');
+    if (state === 'review') return this.translate.instant('pantry.detail.subinfo.review');
     const days = Math.ceil((Date.parse(earliestDate) - Date.now()) / 86_400_000);
     if (days <= 0) return this.translate.instant('pantry.detail.subinfo.expired');
     if (days === 1) return this.translate.instant('pantry.detail.subinfo.tomorrow');
@@ -481,6 +497,8 @@ export class PantryViewModelService {
         return 'state-expiring';
       case 'low-stock':
         return 'state-low-stock';
+      case 'review':
+        return 'state-review';
       default:
         return 'state-ok';
     }
@@ -505,6 +523,12 @@ export class PantryViewModelService {
           state,
           label: this.translate.instant('pantry.filters.status.low'),
           accentColor: 'var(--ion-color-warning)',
+        };
+      case 'review':
+        return {
+          state,
+          label: this.translate.instant('pantry.filters.status.review'),
+          accentColor: 'var(--ion-color-warning-shade)',
         };
       default:
         return {
