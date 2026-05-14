@@ -81,6 +81,6 @@ export class InsightsComponent {
   getAnalysisSection(key: string): string[] {
     const a = this.facade.proAnalysis();
     if (!a) return [];
-    return (a as Record<string, string[]>)[key] ?? [];
+    return (a as unknown as Record<string, string[]>)[key] ?? [];
   }
 }
