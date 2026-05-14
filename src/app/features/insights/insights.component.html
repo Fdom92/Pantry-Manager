@@ -79,6 +79,51 @@
         </div>
       </section>
 
+      <!-- SECTION C: Distribución por tipo de alimento -->
+      @if (facade.distribution().topFoodTypes.length > 0) {
+        <section class="insights-section">
+          <h3 class="insights-section__title">{{ 'insights.distribution.title' | translate }}</h3>
+          <div class="food-type-bars">
+            @for (ft of facade.distribution().topFoodTypes; track ft.foodType) {
+              <div class="food-type-bar">
+                <span class="food-type-bar__label">{{ getFoodTypeKey(ft.foodType) }}</span>
+                <div class="food-type-bar__track">
+                  <div
+                    class="food-type-bar__fill"
+                    [style.width]="getBarWidth(ft.count, facade.distribution().topFoodTypes[0].count)">
+                  </div>
+                </div>
+                <span class="food-type-bar__count">{{ ft.count }}</span>
+              </div>
+            }
+          </div>
+          @if (facade.distribution().mostWastedFoodType) {
+            <p class="most-wasted-hint">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              {{ 'insights.distribution.mostWasted' | translate }}:
+              {{ getFoodTypeKey(facade.distribution().mostWastedFoodType!) }}
+            </p>
+          }
+        </section>
+      }
+
+      <!-- SECTION D: PRO teaser (non-PRO only) -->
+      @if (!facade.isPro()) {
+        <section class="insights-section insights-section--pro-teaser">
+          <div class="pro-teaser">
+            <div class="pro-teaser__lock">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+            </div>
+            <ion-icon name="sparkles-outline" class="pro-teaser__icon"></ion-icon>
+            <h3 class="pro-teaser__title">{{ 'insights.pro.title' | translate }}</h3>
+            <p class="pro-teaser__description">{{ 'insights.pro.description' | translate }}</p>
+            <ion-button [routerLink]="['/upgrade']" size="small" color="primary">
+              {{ 'insights.pro.cta' | translate }}
+            </ion-button>
+          </div>
+        </section>
+      }
+
     }
   </div>
 </ion-content>
