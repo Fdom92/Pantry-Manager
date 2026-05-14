@@ -79,6 +79,7 @@ export class DashboardStateService {
   readonly pantryItems = this.pantryStore.items;
   readonly lowStockItems = this.pantryStore.lowStockItems;
   readonly nearExpiryItems = this.pantryStore.nearExpiryItems;
+  readonly reviewItems = this.pantryStore.reviewItems;
   readonly expiredItems = this.pantryStore.expiredItems;
 
   readonly inventorySummary = this.pantryStore.summary;
@@ -147,7 +148,7 @@ export class DashboardStateService {
     return computePantryScore(
       this.totalItems(),
       this.expiredItems().length,
-      this.nearExpiryItems().length,
+      this.nearExpiryItems().length + this.reviewItems().length,
       this.noExpiryDateCount(),
       this.lowStockItems().length,
       this.stalePantryItemsCount(),
