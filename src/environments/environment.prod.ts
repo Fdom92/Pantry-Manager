@@ -5,4 +5,5 @@ export const environment: Environment = {
   agentApiUrl: 'https://pantry-manager.onrender.com/agent/process',
   proApiUrl: 'https://pantry-manager.onrender.com/api/payments',
   revenueCatPublicKey: 'goog_QWDXnEcbnxIKMCjuMLHcOtwxmrR',
+  insightsApiUrl: 'https://pantry-manager.onrender.com/insights/analyze',
 };

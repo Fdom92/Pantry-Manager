@@ -3,4 +3,5 @@ export interface Environment {
   agentApiUrl: string;
   proApiUrl: string;
   revenueCatPublicKey: string;
+  insightsApiUrl: string;
 }
