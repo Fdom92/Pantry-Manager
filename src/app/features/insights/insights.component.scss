@@ -1,1 +1,218 @@
-// styles added in Task 6
+.insights {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.insights-section {
+  background: var(--ion-card-background, var(--ion-color-light));
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+
+  &__title {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: color-mix(in srgb, var(--ion-text-color) 55%, transparent);
+    margin: 0 0 12px;
+  }
+
+  &--pro-teaser {
+    border: 1px dashed color-mix(in srgb, var(--ion-color-primary) 40%, transparent);
+    background: color-mix(in srgb, var(--ion-color-primary) 4%, transparent);
+  }
+}
+
+// Section A — snapshot grid
+.snapshot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ion-text-color) 5%, transparent);
+  gap: 4px;
+
+  &__value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  &__label {
+    font-size: 11px;
+    text-align: center;
+    color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  }
+
+  &--warning {
+    background: color-mix(in srgb, var(--ion-color-warning) 15%, transparent);
+    .metric-card__value { color: var(--ion-color-warning-shade); }
+  }
+
+  &--danger {
+    background: color-mix(in srgb, var(--ion-color-danger) 12%, transparent);
+    .metric-card__value { color: var(--ion-color-danger); }
+  }
+}
+
+.no-expiry-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: color-mix(in srgb, var(--ion-text-color) 55%, transparent);
+}
+
+// Section B — activity
+.activity-row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 14px;
+}
+
+.activity-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+
+  &__value {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  &__label {
+    font-size: 11px;
+    color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  }
+}
+
+.waste-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: color-mix(in srgb, var(--ion-text-color) 6%, transparent);
+
+  ion-icon { font-size: 16px; }
+
+  &.waste-none,
+  &.waste-low {
+    background: color-mix(in srgb, var(--ion-color-success) 12%, transparent);
+    color: var(--ion-color-success-shade);
+    ion-icon { color: var(--ion-color-success); }
+  }
+
+  &.waste-medium {
+    background: color-mix(in srgb, var(--ion-color-warning) 15%, transparent);
+    color: var(--ion-color-warning-shade);
+    ion-icon { color: var(--ion-color-warning); }
+  }
+
+  &.waste-high {
+    background: color-mix(in srgb, var(--ion-color-danger) 12%, transparent);
+    color: var(--ion-color-danger);
+    ion-icon { color: var(--ion-color-danger); }
+  }
+}
+
+// Section C — distribution bars
+.food-type-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.food-type-bar {
+  display: grid;
+  grid-template-columns: 80px 1fr 32px;
+  align-items: center;
+  gap: 8px;
+
+  &__label {
+    font-size: 12px;
+    color: color-mix(in srgb, var(--ion-text-color) 80%, transparent);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__track {
+    background: color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    background: var(--ion-color-primary);
+    border-radius: 4px;
+    transition: width 300ms ease;
+  }
+
+  &__count {
+    font-size: 12px;
+    font-weight: 600;
+    text-align: right;
+    color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  }
+}
+
+.most-wasted-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--ion-color-warning-shade);
+  ion-icon { font-size: 14px; }
+}
+
+// Section D — PRO teaser
+.pro-teaser {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 8px 0;
+
+  &__lock {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: color-mix(in srgb, var(--ion-color-primary) 50%, transparent);
+    ion-icon { font-size: 18px; }
+  }
+
+  &__icon {
+    font-size: 36px;
+    color: var(--ion-color-primary);
+    margin-bottom: 4px;
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  &__description {
+    font-size: 13px;
+    color: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
+    margin: 0;
+    line-height: 1.4;
+  }
+}
