@@ -17,11 +17,6 @@ export const routes: Routes = [
           import('@features/pantry/pantry.component').then(m => m.PantryComponent),
       },
       {
-        path: 'history',
-        loadComponent: () =>
-          import('@features/history/history.component').then(m => m.HistoryComponent),
-      },
-      {
         path: 'list',
         loadComponent: () =>
           import('@features/list/list.component').then(m => m.ListComponent),
