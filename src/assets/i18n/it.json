@@ -400,6 +400,34 @@
         "description": "Con PRO, organizza il tuo menù settimanale e risparmia tempo ogni giorno.",
         "cta": "Prova PRO"
       }
+    },
+    "tabTitle": "Insights",
+    "title": "Analisi",
+    "snapshot": {
+      "title": "La tua dispensa ora",
+      "active": "Attivi",
+      "expired": "Scaduti",
+      "review": "Verificare",
+      "basicsOut": "Essenziali esauriti",
+      "noExpiry": "Senza data: {{count}} su {{total}} prodotti"
+    },
+    "activity": {
+      "title": "Ultimi 30 giorni",
+      "added": "Aggiunti",
+      "consumed": "Consumati",
+      "expired": "Scaduti",
+      "wasteRatio": "Spreco",
+      "noActivity": "Nessuna attività registrata",
+      "noWaste": "Nessuno spreco"
+    },
+    "distribution": {
+      "title": "Per tipo di cibo",
+      "mostWasted": "Più scaduti"
+    },
+    "pro": {
+      "title": "Analisi IA intelligente",
+      "description": "Rileva schemi, prevede gli sprechi e fornisce raccomandazioni personalizzate.",
+      "cta": "Vedi PRO"
     }
   },
   "pantry": {

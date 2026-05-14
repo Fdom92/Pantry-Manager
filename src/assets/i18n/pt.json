@@ -400,6 +400,34 @@
         "description": "Com PRO, organize o seu menu semanal e poupe tempo todos os dias.",
         "cta": "Experimentar PRO"
       }
+    },
+    "tabTitle": "Insights",
+    "title": "Análise",
+    "snapshot": {
+      "title": "A tua despensa agora",
+      "active": "Ativos",
+      "expired": "Expirados",
+      "review": "Verificar",
+      "basicsOut": "Básicos sem stock",
+      "noExpiry": "Sem data: {{count}} de {{total}} produtos"
+    },
+    "activity": {
+      "title": "Últimos 30 dias",
+      "added": "Adicionados",
+      "consumed": "Consumidos",
+      "expired": "Expirados",
+      "wasteRatio": "Desperdício",
+      "noActivity": "Sem atividade registada",
+      "noWaste": "Sem desperdício"
+    },
+    "distribution": {
+      "title": "Por tipo de alimento",
+      "mostWasted": "Mais expirados"
+    },
+    "pro": {
+      "title": "Análise inteligente com IA",
+      "description": "Deteta padrões, prevê desperdício e dá recomendações personalizadas.",
+      "cta": "Ver PRO"
     }
   },
   "pantry": {

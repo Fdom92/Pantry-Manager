@@ -377,7 +377,7 @@
       "pendingProductUpdates": {
         "title": "Pantry updates pending",
         "description": "There are a few products you could refresh. It’ll take less than a minute.",
-        "cta": "Let's do it",
+        "cta": "Let’s do it",
         "dismiss": "Not now"
       },
       "addExpiryDates": {
@@ -400,6 +400,34 @@
         "description": "With PRO, organize your weekly menu and save time every day.",
         "cta": "Try PRO"
       }
+    },
+    "tabTitle": "Insights",
+    "title": "Analysis",
+    "snapshot": {
+      "title": "Your pantry now",
+      "active": "Active",
+      "expired": "Expired",
+      "review": "Check",
+      "basicsOut": "Basics out",
+      "noExpiry": "No date: {{count}} of {{total}} items"
+    },
+    "activity": {
+      "title": "Last 30 days",
+      "added": "Added",
+      "consumed": "Consumed",
+      "expired": "Expired",
+      "wasteRatio": "Waste rate",
+      "noActivity": "No activity recorded",
+      "noWaste": "No waste"
+    },
+    "distribution": {
+      "title": "By food type",
+      "mostWasted": "Most expired"
+    },
+    "pro": {
+      "title": "Smart AI analysis",
+      "description": "Detects patterns, predicts waste and gives personalised recommendations.",
+      "cta": "See PRO"
     }
   },
   "pantry": {

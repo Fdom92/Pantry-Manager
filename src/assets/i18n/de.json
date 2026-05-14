@@ -400,6 +400,34 @@
         "description": "Mit PRO organisierst du dein Wochenmenü und sparst jeden Tag Zeit.",
         "cta": "PRO testen"
       }
+    },
+    "tabTitle": "Insights",
+    "title": "Analyse",
+    "snapshot": {
+      "title": "Dein Vorrat jetzt",
+      "active": "Aktiv",
+      "expired": "Abgelaufen",
+      "review": "Prüfen",
+      "basicsOut": "Basis leer",
+      "noExpiry": "Kein Datum: {{count}} von {{total}} Produkten"
+    },
+    "activity": {
+      "title": "Letzte 30 Tage",
+      "added": "Hinzugefügt",
+      "consumed": "Verbraucht",
+      "expired": "Abgelaufen",
+      "wasteRatio": "Verschwendung",
+      "noActivity": "Keine Aktivität aufgezeichnet",
+      "noWaste": "Kein Verlust"
+    },
+    "distribution": {
+      "title": "Nach Lebensmitteltyp",
+      "mostWasted": "Meiste abgelaufen"
+    },
+    "pro": {
+      "title": "Intelligente KI-Analyse",
+      "description": "Erkennt Muster, prognostiziert Verluste und gibt persönliche Empfehlungen.",
+      "cta": "PRO ansehen"
     }
   },
   "pantry": {

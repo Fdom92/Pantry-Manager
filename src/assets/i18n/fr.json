@@ -400,6 +400,34 @@
         "description": "Avec PRO, organisez votre menu hebdomadaire et gagnez du temps chaque jour.",
         "cta": "Essayer PRO"
       }
+    },
+    "tabTitle": "Insights",
+    "title": "Analyse",
+    "snapshot": {
+      "title": "Ton garde-manger",
+      "active": "Actifs",
+      "expired": "Périmés",
+      "review": "Vérifier",
+      "basicsOut": "Essentiels vides",
+      "noExpiry": "Sans date: {{count}} sur {{total}} produits"
+    },
+    "activity": {
+      "title": "30 derniers jours",
+      "added": "Ajoutés",
+      "consumed": "Consommés",
+      "expired": "Périmés",
+      "wasteRatio": "Gaspillage",
+      "noActivity": "Aucune activité enregistrée",
+      "noWaste": "Aucun gaspillage"
+    },
+    "distribution": {
+      "title": "Par type d'aliment",
+      "mostWasted": "Plus périmés"
+    },
+    "pro": {
+      "title": "Analyse IA intelligente",
+      "description": "Détecte les tendances, prédit le gaspillage et donne des recommandations personnalisées.",
+      "cta": "Voir PRO"
     }
   },
   "pantry": {
