@@ -510,13 +510,15 @@
         "normal": "Prodotti senza avvisi attivi",
         "low": "Necessitano di riassortimento presto",
         "expiring": "In scadenza tra pochi giorni",
-        "expired": "Controlla ed elimina"
+        "expired": "Controlla ed elimina",
+        "review": "Data superata, potrebbe essere ok"
       },
       "status": {
         "normal": "Nessun problema",
         "low": "Stock basso",
         "expiring": "Vicino alla scadenza",
-        "expired": "Scaduto"
+        "expired": "Scaduto",
+        "review": "Verificare"
       },
       "search": "Cerca prodotti"
     },
@@ -620,7 +622,8 @@
       "subinfo": {
         "expired": "Scaduto",
         "tomorrow": "Scade domani",
-        "inDays": "Scade tra {{count}} giorni"
+        "inDays": "Scade tra {{count}} giorni",
+        "review": "Consumare presto"
       },
       "quantity": {
         "single": "{{ quantity }} unità",
