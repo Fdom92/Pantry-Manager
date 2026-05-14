@@ -5,5 +5,80 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <p>Insights FREE — shell</p>
+  <div class="insights">
+
+    @if (facade.isLoadingEvents()) {
+      <section class="insights-section">
+        <ion-skeleton-text animated style="width: 60%; height: 20px; margin-bottom: 16px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 100%; height: 80px;"></ion-skeleton-text>
+      </section>
+    } @else {
+
+      <!-- SECTION A: Estado actual -->
+      <section class="insights-section">
+        <h3 class="insights-section__title">{{ 'insights.snapshot.title' | translate }}</h3>
+        <div class="snapshot-grid">
+          <div class="metric-card">
+            <span class="metric-card__value">{{ facade.inventorySnapshot().active }}</span>
+            <span class="metric-card__label">{{ 'insights.snapshot.active' | translate }}</span>
+          </div>
+          <div class="metric-card" [class.metric-card--danger]="facade.inventorySnapshot().expired > 0">
+            <span class="metric-card__value">{{ facade.inventorySnapshot().expired }}</span>
+            <span class="metric-card__label">{{ 'insights.snapshot.expired' | translate }}</span>
+          </div>
+          <div class="metric-card" [class.metric-card--warning]="facade.inventorySnapshot().review > 0">
+            <span class="metric-card__value">{{ facade.inventorySnapshot().review }}</span>
+            <span class="metric-card__label">{{ 'insights.snapshot.review' | translate }}</span>
+          </div>
+          <div class="metric-card" [class.metric-card--warning]="facade.inventorySnapshot().basicsOutOfStock > 0">
+            <span class="metric-card__value">{{ facade.inventorySnapshot().basicsOutOfStock }}</span>
+            <span class="metric-card__label">{{ 'insights.snapshot.basicsOut' | translate }}</span>
+          </div>
+        </div>
+        @if (facade.inventorySnapshot().noExpiryDate > 0) {
+          <p class="no-expiry-hint">
+            {{ 'insights.snapshot.noExpiry' | translate:{
+              count: facade.inventorySnapshot().noExpiryDate,
+              total: facade.inventorySnapshot().total
+            } }}
+          </p>
+        }
+      </section>
+
+      <!-- SECTION B: Actividad últimos 30 días -->
+      <section class="insights-section">
+        <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
+        <div class="activity-row">
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().added }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.added' | translate }}</span>
+          </div>
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().consumed }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.consumed' | translate }}</span>
+          </div>
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().expired }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.expired' | translate }}</span>
+          </div>
+        </div>
+        <div class="waste-badge" [ngClass]="getWasteRatioColor(facade.activityMetrics().wasteRatio)">
+          @if (facade.activityMetrics().wasteRatio === null) {
+            <ion-icon name="time-outline"></ion-icon>
+            <span>{{ 'insights.activity.noActivity' | translate }}</span>
+          } @else if (facade.activityMetrics().wasteRatio === 0) {
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>{{ 'insights.activity.noWaste' | translate }}</span>
+          } @else {
+            <ion-icon name="warning-outline"></ion-icon>
+            <span>
+              {{ 'insights.activity.wasteRatio' | translate }}:
+              {{ formatPercent(facade.activityMetrics().wasteRatio!) }}
+            </span>
+          }
+        </div>
+      </section>
+
+    }
+  </div>
 </ion-content>
