@@ -49,4 +49,18 @@ export const openaiService = {
       }
     })();
   },
+
+  async createCompletion(payload: { system: string; userMessage: string }): Promise<string> {
+    const client = getClient();
+    const response = await client.chat.completions.create({
+      model,
+      messages: [
+        { role: 'system', content: String(payload.system) },
+        { role: 'user', content: String(payload.userMessage) },
+      ],
+      response_format: { type: 'json_object' },
+      stream: false,
+    });
+    return response.choices[0]?.message?.content ?? '{}';
+  },
 };
