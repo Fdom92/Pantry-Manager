@@ -57,7 +57,7 @@ export class PantryStateService {
   readonly summarySnapshot: WritableSignal<PantrySummaryMeta> = signal({
     total: 0,
     visible: 0,
-    statusCounts: { expired: 0, expiring: 0, lowStock: 0, normal: 0 },
+    statusCounts: { expired: 0, expiring: 0, review: 0, lowStock: 0, normal: 0 },
   });
 
   private readonly skeletonManager = new SkeletonLoadingManager();
@@ -261,6 +261,7 @@ export class PantryStateService {
           lowStock: false,
           recentlyAdded: false,
           normalOnly: false,
+          review: false,
         });
         break;
       case 'near-expiry':
@@ -270,6 +271,7 @@ export class PantryStateService {
           lowStock: false,
           recentlyAdded: false,
           normalOnly: false,
+          review: false,
         });
         break;
       case 'low-stock':
@@ -279,6 +281,7 @@ export class PantryStateService {
           lowStock: true,
           recentlyAdded: false,
           normalOnly: false,
+          review: false,
         });
         break;
       case 'normal':
@@ -288,6 +291,17 @@ export class PantryStateService {
           lowStock: false,
           recentlyAdded: false,
           normalOnly: true,
+          review: false,
+        });
+        break;
+      case 'review':
+        this.pantryStore.setFilters({
+          expired: false,
+          expiring: false,
+          lowStock: false,
+          recentlyAdded: false,
+          normalOnly: false,
+          review: true,
         });
         break;
       default:
@@ -297,6 +311,7 @@ export class PantryStateService {
           lowStock: false,
           recentlyAdded: false,
           normalOnly: false,
+          review: false,
         });
         break;
     }
@@ -428,6 +443,7 @@ export class PantryStateService {
   // -------- Private helpers --------
   private getStatusFilterValue(filters: PantryFilterState): PantryStatusFilterValue {
     if (filters.expired) return 'expired';
+    if (filters.review) return 'review';
     if (filters.expiring) return 'near-expiry';
     if (filters.lowStock) return 'low-stock';
     if (filters.normalOnly) return 'normal';
