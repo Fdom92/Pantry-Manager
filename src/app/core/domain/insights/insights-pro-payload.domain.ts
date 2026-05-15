@@ -33,7 +33,10 @@ export interface InsightsPatternSignals {
 export interface InsightsCategoryBreakdown {
   foodType: string;
   count: number;
+  consumedCount: number;
+  consumptionShare: number;
   expiredRatio: number;
+  rotationScore: 'high' | 'medium' | 'low';
 }
 
 export interface InsightsProductSignals {
@@ -46,6 +49,7 @@ export interface InsightsDerivedFeatures {
   inventoryTrend: 'up' | 'down' | 'stable';
   wasteTrend: 'improving' | 'worsening' | 'stable';
   riskLevel: 'low' | 'medium' | 'high';
+  inventoryBalanceScore: 'balanced' | 'imbalanced' | 'highly_imbalanced';
 }
 
 export interface InsightsSignalsPayload {
@@ -240,6 +244,8 @@ export function computeCategoryBreakdown(
       consumedByType.set(e.foodType, (consumedByType.get(e.foodType) ?? 0) + 1);
   }
 
+  const totalConsumed = Array.from(consumedByType.values()).reduce((s, n) => s + n, 0);
+
   return Array.from(countByType.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
@@ -247,7 +253,11 @@ export function computeCategoryBreakdown(
       const expired = expiredByType.get(foodType) ?? 0;
       const consumed = consumedByType.get(foodType) ?? 0;
       const expiredRatio = expired + consumed === 0 ? 0 : expired / (expired + consumed);
-      return { foodType, count, expiredRatio };
+      const consumptionShare = totalConsumed === 0 ? 0 : consumed / totalConsumed;
+      const rotationEvents = consumed + expired;
+      const rotationScore: 'high' | 'medium' | 'low' =
+        rotationEvents / count > 1.5 ? 'high' : rotationEvents / count > 0.5 ? 'medium' : 'low';
+      return { foodType, count, consumedCount: consumed, consumptionShare, expiredRatio, rotationScore };
     });
 }
 
@@ -304,7 +314,8 @@ export function computeProductSignals(
 
 export function computeDerivedFeatures(
   inventory: InsightsInventorySignals,
-  activity: InsightsActivitySignals
+  activity: InsightsActivitySignals,
+  categoryBreakdown: InsightsCategoryBreakdown[]
 ): InsightsDerivedFeatures {
   const inventoryTrend: 'up' | 'down' | 'stable' =
     activity.inventoryDelta === 'growing'
@@ -327,5 +338,12 @@ export function computeDerivedFeatures(
   const riskLevel: 'low' | 'medium' | 'high' =
     riskScore > 0.3 ? 'high' : riskScore > 0.1 ? 'medium' : 'low';
 
-  return { inventoryTrend, wasteTrend, riskLevel };
+  const totalCategoryItems = categoryBreakdown.reduce((s, c) => s + c.count, 0);
+  const topShare = totalCategoryItems === 0 || categoryBreakdown.length === 0
+    ? 0
+    : categoryBreakdown[0].count / totalCategoryItems;
+  const inventoryBalanceScore: 'balanced' | 'imbalanced' | 'highly_imbalanced' =
+    topShare > 0.5 ? 'highly_imbalanced' : topShare > 0.3 ? 'imbalanced' : 'balanced';
+
+  return { inventoryTrend, wasteTrend, riskLevel, inventoryBalanceScore };
 }

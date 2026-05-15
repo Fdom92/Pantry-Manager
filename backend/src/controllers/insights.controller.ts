@@ -2,32 +2,74 @@ import { Request, Response } from 'express';
 import { openaiService } from '../services/openai.service.js';
 import { logger } from '../utils/logger.js';
 
-const SYSTEM_PROMPT = `You are a behavioral analyst for household food consumption habits.
+const SYSTEM_PROMPT = `You are a domestic intelligence system that analyzes pantry behavior. You state facts. You do not summarize dashboards.
 
-You receive pre-computed signals about a user's pantry — do NOT recompute or describe these numbers.
+The backend has pre-computed all signals. Your only job: phrase them in the user's language following the section rules below.
 
-Your task:
-- Detect non-obvious behavioral patterns from the signals
-- Identify real problems with concrete impact on food waste or spending
-- Give specific, personalized recommendations based on the actual data
-- Optionally suggest one strategic improvement
+═══ SECTION ROLES — each section answers ONE question ═══
 
-STRICT RULES — violating any of these means a failed output:
-- Do NOT repeat visible metrics (counts, percentages, ratios)
-- Do NOT enumerate statistics literally (e.g. "you have 5 expired items")
-- Do NOT suggest app features or explain how to use the app
-- Do NOT suggest recipes or meal planning
-- Do NOT write generic advice (e.g. "try to improve your habits", "consider organizing...")
-- Each insight must be specific to the user's actual signals — no copy-paste insights
-- Explain the behavioral WHY, not the data WHAT
-- Write ALL string values in the JSON in the language specified at the top of the user message (RESPONSE LANGUAGE field)
+PATTERNS  → "What is happening?" — structural behavior facts, dominant categories, consumption distribution
+PROBLEMS  → "What is failing?" — waste, stagnation, expiry risk, clear imbalances
+RECOMMENDATIONS → "What should change?" — concrete single actions, no diagnosis repetition
+SUGGESTIONS → "One strategic improvement" — optional, only if genuinely useful
+
+═══ ANTI-DUPLICATION LAW ═══
+If a topic appears in PATTERNS it must NOT reappear in PROBLEMS or RECOMMENDATIONS.
+If a topic appears in PROBLEMS it must NOT reappear in RECOMMENDATIONS.
+Before writing each item: check — did I already say this? If yes, skip it.
+Each item must introduce information not present in any other item.
+
+═══ FORBIDDEN LANGUAGE ═══
+Hedging words — forbidden in ALL languages:
+  ES: puede, podría, sugiere, parece, quizás, es posible, posiblemente
+  EN: may, might, could, seems, suggests, possibly, perhaps
+  DE: könnte, möglicherweise, vielleicht, scheint, schlägt vor
+  FR: peut, pourrait, semble, suggère, peut-être, il est possible
+  IT: potrebbe, sembra, suggerisce, forse, è possibile
+  PT: pode, poderia, sugere, parece, talvez, é possível
+
+Consultant/passive style — forbidden in ALL languages:
+  ES: "es necesario", "se debe", "se recomienda", "se sugiere"
+  EN: "it is recommended", "one should", "it is necessary"
+  DE: "es ist notwendig", "es wird empfohlen", "sollte man"
+  FR: "il est nécessaire", "il est recommandé", "on devrait"
+  IT: "è necessario", "si consiglia", "si dovrebbe"
+  PT: "é necessário", "recomenda-se", "deve-se"
+
+Also forbidden across all languages:
+- Psychological causes: do not explain WHY users behave a certain way
+- Dietary/nutritional advice
+- Raw metric repetition: do not repeat counts, percentages, or ratios from the input
+
+═══ REQUIRED STYLE ═══
+- Short declarative sentences — max 12 words each
+- Direct verbs: "Reducir", "Aumentar", "Mejorar", "Revisar" — not "Se debería reducir"
+- One idea per sentence
+- If signals are balanced with no real issue: state that the pantry shows balanced behavior — do not invent problems. Write this in the RESPONSE LANGUAGE.
+
+═══ STYLE EXAMPLES (shown in Spanish — same rules apply in every language) ═══
+BAD PATTERN: "Las proteínas podrían estar dominando la despensa, lo que puede llevar a un desequilibrio."
+GOOD PATTERN: "Las proteínas concentran la mayor parte del inventario activo."
+
+BAD PROBLEM: "Se detecta que los lácteos no se consumen con la frecuencia adecuada."
+GOOD PROBLEM: "Los lácteos acumulan el mayor desperdicio relativo."
+
+BAD RECOMMENDATION: "Se recomienda prestar atención al consumo de frutas y verduras para mejorar la rotación."
+GOOD RECOMMENDATION: "Aumentar el consumo de frutas antes de añadir nuevas unidades."
+
+═══ SELF-VALIDATION (do this before returning) ═══
+1. Does any topic repeat across sections? → remove it from the later section
+2. Does any sentence contain a forbidden word? → rewrite it
+3. Does any sentence restate a raw number from the input? → remove it
+4. Does each section answer only its assigned question? → verify
 
 OUTPUT: Return ONLY valid JSON with no text outside it:
 {"patterns":[],"problems":[],"recommendations":[],"suggestions":[]}
 
-Each array item MUST be a plain string sentence — no nested objects, no keys, no JSON sub-fields.
+Each array item: one plain string sentence, no nested objects.
+Write ALL strings in the language specified by RESPONSE LANGUAGE at the top of the user message.
 
-LIMITS: max 2 patterns, max 2 problems (0 is valid if no real problems exist), max 2 recommendations, max 1 suggestion (0 is valid)`;
+LIMITS: max 2 patterns, max 2 problems (0 valid), max 2 recommendations, max 1 suggestion (0 valid)`;
 
 const LOCALE_TO_LANGUAGE: Record<string, string> = {
   es: 'Spanish',
@@ -39,53 +81,46 @@ const LOCALE_TO_LANGUAGE: Record<string, string> = {
 };
 
 function buildUserMessage(body: any): string {
-  const { locale, signals, activity, patterns, inventory, products, derived } = body;
+  const { locale, activity, patterns, inventory, products, derived } = body;
   const language = LOCALE_TO_LANGUAGE[locale as string] ?? 'English';
+  const pct = (v: number | null | undefined): string =>
+    v == null ? '?' : `${(v * 100).toFixed(0)}%`;
 
-  const fmt = (v: number | null | undefined, decimals = 0): string =>
-    v == null ? 'unknown' : (v * 100).toFixed(decimals) + '%';
-
-  const categoryLines =
-    Array.isArray(inventory) && inventory.length > 0
-      ? inventory
-          .map(
-            (c: any) =>
-              `  - ${c.foodType}: ${c.count} items, waste ratio ${fmt(c.expiredRatio)}`
-          )
-          .join('\n')
-      : '  - no category data';
-
+  const cats: any[] = Array.isArray(inventory) ? inventory : [];
   const productLine = (label: string, names: string[]) =>
     `${label}: ${names?.length ? names.join(', ') : 'none'}`;
 
-  return `RESPONSE LANGUAGE: ${language} — ALL string values in your JSON output MUST be written in ${language}.
+  const categoryLines = cats.length > 0
+    ? cats.map((c: any) =>
+        `  - ${c.foodType}: rotation=${c.rotationScore ?? '?'}, waste_ratio=${pct(c.expiredRatio)}, consumption_share=${pct(c.consumptionShare)}`
+      ).join('\n')
+    : '  - no category data';
 
-INVENTORY STATE:
-  Risk level: ${derived?.riskLevel ?? 'unknown'}
-  Inventory trend: ${derived?.inventoryTrend ?? 'unknown'}
+  return `RESPONSE LANGUAGE: ${language} — ALL string values in your JSON MUST be written in ${language}.
+
+INVENTORY PROFILE:
+  Balance: ${derived?.inventoryBalanceScore ?? 'unknown'}
+  Risk: ${derived?.riskLevel ?? 'unknown'}
   Waste trend: ${derived?.wasteTrend ?? 'unknown'}
-  Total products: ${signals?.totalProducts ?? 0}
-  No-expiry ratio: ${fmt(signals?.noExpiryRatio)}
+  Inventory trend: ${derived?.inventoryTrend ?? 'unknown'}
+
+CATEGORY SIGNALS (pre-computed, sorted by inventory size):
+${categoryLines}
+
+KEY PATTERNS (pre-computed by backend — use these directly):
+  Dominant waste category: ${patterns?.mostWastefulFoodType ?? 'none'}
+  Most consumed category: ${patterns?.mostConsumedFoodType ?? 'none'}
+  Least rotating category: ${patterns?.leastRotatingFoodType ?? 'none'}
+  Overrepresented category: ${patterns?.overrepresentedCategory ?? 'none'}
+  Underused category (0 consumption): ${patterns?.underusedCategory ?? 'none'}
 
 ACTIVITY (last 30 days):
-  Added: ${activity?.addedCount ?? 0} | Consumed: ${activity?.consumedCount ?? 0} | Expired unused: ${activity?.expiredCount ?? 0}
-  Inventory delta: ${activity?.inventoryDelta ?? 'unknown'}
-  Activity waste ratio: ${fmt(activity?.wasteRatio)}
-
-BEHAVIORAL PATTERNS:
-  Most wasteful food type: ${patterns?.mostWastefulFoodType ?? 'none'}
-  Most consumed food type: ${patterns?.mostConsumedFoodType ?? 'none'}
-  Least rotating food type: ${patterns?.leastRotatingFoodType ?? 'none'}
-  Overrepresented category: ${patterns?.overrepresentedCategory ?? 'none'}
-  Underused category: ${patterns?.underusedCategory ?? 'none'}
-
-TOP CATEGORIES WITH WASTE RATIO:
-${categoryLines}
+  Net flow: ${activity?.inventoryDelta ?? 'unknown'} (added=${activity?.addedCount ?? 0}, consumed=${activity?.consumedCount ?? 0}, expired=${activity?.expiredCount ?? 0})
 
 PRODUCTS OF CONCERN:
   ${productLine('Near expiry', products?.nearExpiryProducts)}
   ${productLine('Recently expired', products?.recentlyExpiredProducts)}
-  ${productLine('Stale (no movement 30d)', products?.staleProducts)}`;
+  ${productLine('No movement 30d', products?.staleProducts)}`;
 }
 
 function validateBody(body: any): boolean {
@@ -100,14 +135,16 @@ function validateBody(body: any): boolean {
   );
 }
 
-function validateAnalysis(parsed: any): boolean {
-  return (
-    parsed &&
-    Array.isArray(parsed.patterns) &&
-    Array.isArray(parsed.problems) &&
-    Array.isArray(parsed.recommendations) &&
-    Array.isArray(parsed.suggestions)
-  );
+function normalizeAnalysis(raw: any): Record<string, string[]> | null {
+  const candidate = raw?.analysis ?? raw?.data ?? raw?.result ?? raw;
+  if (!candidate || typeof candidate !== 'object') return null;
+  const toArr = (v: unknown): string[] => (Array.isArray(v) ? v : []);
+  return {
+    patterns: toArr(candidate.patterns),
+    problems: toArr(candidate.problems),
+    recommendations: toArr(candidate.recommendations),
+    suggestions: toArr(candidate.suggestions),
+  };
 }
 
 export const insightsController = {
@@ -154,16 +191,11 @@ export const insightsController = {
       return;
     }
 
-    // Unwrap common wrapper patterns: {"analysis":{...}} or {"data":{...}}
-    if (!validateAnalysis(parsed)) {
-      const inner = parsed?.analysis ?? parsed?.data ?? parsed?.result;
-      if (inner && validateAnalysis(inner)) {
-        parsed = inner;
-      } else {
-        logger.error('OpenAI response missing required keys', { userId, parsed: JSON.stringify(parsed).slice(0, 200) });
-        res.status(500).json({ error: 'INVALID_RESPONSE' });
-        return;
-      }
+    const normalized = normalizeAnalysis(parsed);
+    if (!normalized) {
+      logger.error('OpenAI response unparseable structure', { userId, parsed: JSON.stringify(parsed).slice(0, 200) });
+      res.status(500).json({ error: 'INVALID_RESPONSE' });
+      return;
     }
 
     const toStrings = (arr: any[]): string[] =>
@@ -173,10 +205,10 @@ export const insightsController = {
 
     res.json({
       analysis: {
-        patterns: toStrings(parsed.patterns).slice(0, 2),
-        problems: toStrings(parsed.problems).slice(0, 2),
-        recommendations: toStrings(parsed.recommendations).slice(0, 2),
-        suggestions: toStrings(parsed.suggestions).slice(0, 1),
+        patterns: toStrings(normalized.patterns).slice(0, 2),
+        problems: toStrings(normalized.problems).slice(0, 2),
+        recommendations: toStrings(normalized.recommendations).slice(0, 2),
+        suggestions: toStrings(normalized.suggestions).slice(0, 1),
         generatedAt: new Date().toISOString(),
       },
     });

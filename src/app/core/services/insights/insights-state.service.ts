@@ -106,7 +106,7 @@ export class InsightsStateService {
     const patterns = computePatternSignals(items, events, now, 30);
     const inventory = computeCategoryBreakdown(items, events, now, 30);
     const products = computeProductSignals(items, events, now, 30);
-    const derived = computeDerivedFeatures(signals, activity);
+    const derived = computeDerivedFeatures(signals, activity, inventory);
 
     return { locale, signals, inventory, activity, patterns, products, derived };
   }
