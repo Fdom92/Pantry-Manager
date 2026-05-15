@@ -1,18 +1,27 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import type { PantryEvent } from '@core/models/events';
-import type { InsightsAnalysis, InsightsAnalysisPayload } from '@core/models/insights/insights-analysis.model';
+import type { InsightsAnalysis, InsightsSignalsPayload } from '@core/models/insights/insights-analysis.model';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { HistoryEventLogService } from '../history/history-event-log.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 import { InsightsCacheStorageService } from './insights-cache-storage.service';
 import { InsightsLlmClientService } from './insights-llm-client.service';
 import type { InsightsClientError } from './insights-llm-client.service';
+import { LanguageService } from '../shared/language.service';
 import {
   computeActivityMetrics,
   computeDistribution,
   computeInventorySnapshot,
 } from '@core/domain/insights/insights-free.domain';
 import type { ActivityMetrics, DistributionMetrics, InventorySnapshot } from '@core/domain/insights/insights-free.domain';
+import {
+  computeActivitySignals,
+  computeCategoryBreakdown,
+  computeDerivedFeatures,
+  computeInventorySignals,
+  computePatternSignals,
+  computeProductSignals,
+} from '@core/domain/insights/insights-pro-payload.domain';
+import type { PantryEvent } from '@core/models/events';
 
 export type { ActivityMetrics, DistributionMetrics, InventorySnapshot };
 
@@ -25,6 +34,7 @@ export class InsightsStateService {
   private readonly revenueCat = inject(UpgradeRevenuecatService);
   private readonly cacheStorage = inject(InsightsCacheStorageService);
   private readonly llmClient = inject(InsightsLlmClientService);
+  private readonly languageService = inject(LanguageService);
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
@@ -85,33 +95,20 @@ export class InsightsStateService {
     }
   }
 
-  private buildPayload(): InsightsAnalysisPayload {
-    const now = Date.now();
-    const cutoff = now - 30 * 24 * 60 * 60 * 1000;
+  private buildPayload(): InsightsSignalsPayload {
+    const now = new Date();
+    const items = this.pantryStore.items();
+    const events = this.events();
+    const locale = this.languageService.getCurrentLanguage();
 
-    const recentEvents = this.events()
-      .filter(e => new Date(e.timestamp).getTime() >= cutoff)
-      .filter(e => e.eventType === 'ADD' || e.eventType === 'CONSUME' || e.eventType === 'EXPIRE')
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, 200)
-      .map(e => ({
-        eventType: e.eventType as 'ADD' | 'CONSUME' | 'EXPIRE',
-        foodType: e.foodType,
-        timestamp: e.timestamp,
-        productName: e.productName,
-      }));
+    const signals = computeInventorySignals(items, now);
+    const activity = computeActivitySignals(events, 30, now);
+    const patterns = computePatternSignals(items, events, now, 30);
+    const inventory = computeCategoryBreakdown(items, events, now, 30);
+    const products = computeProductSignals(items, events, now, 30);
+    const derived = computeDerivedFeatures(signals, activity);
 
-    const snap = this.inventorySnapshot();
-    return {
-      events: recentEvents,
-      snapshot: {
-        total: snap.total,
-        expired: snap.expired,
-        review: snap.review,
-        nearExpiry: snap.nearExpiry,
-        basicsOutOfStock: snap.basicsOutOfStock,
-      },
-    };
+    return { locale, signals, inventory, activity, patterns, products, derived };
   }
 
   private isStaleAnalysis(analysis: InsightsAnalysis): boolean {

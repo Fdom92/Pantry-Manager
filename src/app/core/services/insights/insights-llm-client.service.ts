@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
-import type { InsightsAnalysis, InsightsAnalysisPayload } from '@core/models/insights/insights-analysis.model';
+import type { InsightsAnalysis, InsightsSignalsPayload } from '@core/models/insights/insights-analysis.model';
 import { environment } from 'src/environments/environment';
 
 export type InsightsClientError = 'RATE_LIMIT' | 'TIMEOUT' | 'PRO_REQUIRED' | 'ANALYSIS_FAILED';
@@ -11,7 +11,7 @@ export class InsightsLlmClientService {
   private readonly endpoint = environment.insightsApiUrl;
   private readonly timeoutMs = 20000;
 
-  async analyze(payload: InsightsAnalysisPayload): Promise<InsightsAnalysis> {
+  async analyze(payload: InsightsSignalsPayload): Promise<InsightsAnalysis> {
     if (!this.endpoint) {
       throw this.makeError('ANALYSIS_FAILED');
     }
@@ -45,12 +45,15 @@ export class InsightsLlmClientService {
     const body = await response.json();
     const analysis = body?.analysis;
 
+    const isStringArray = (v: unknown) =>
+      Array.isArray(v) && v.every(i => typeof i === 'string');
+
     if (
       !analysis ||
-      !Array.isArray(analysis.patterns) ||
-      !Array.isArray(analysis.problems) ||
-      !Array.isArray(analysis.recommendations) ||
-      !Array.isArray(analysis.suggestions)
+      !isStringArray(analysis.patterns) ||
+      !isStringArray(analysis.problems) ||
+      !isStringArray(analysis.recommendations) ||
+      !isStringArray(analysis.suggestions)
     ) {
       throw this.makeError('ANALYSIS_FAILED');
     }

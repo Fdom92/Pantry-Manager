@@ -6,21 +6,7 @@ export interface InsightsAnalysis {
   generatedAt: string;
 }
 
-export interface InsightsAnalysisPayload {
-  events: Array<{
-    eventType: 'ADD' | 'CONSUME' | 'EXPIRE';
-    foodType?: string;
-    timestamp: string;
-    productName?: string;
-  }>;
-  snapshot: {
-    total: number;
-    expired: number;
-    review: number;
-    nearExpiry: number;
-    basicsOutOfStock: number;
-  };
-}
+export type { InsightsSignalsPayload } from '@core/domain/insights/insights-pro-payload.domain';
 
 export interface InsightsAnalysisCache {
   readonly _id: 'insights-analysis-cache';

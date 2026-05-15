@@ -27,6 +27,7 @@ import {
   arrowForwardOutline,
   arrowUndoOutline,
   basketOutline,
+  bulbOutline,
   calendarOutline,
   cartOutline,
   checkmark,
@@ -175,7 +176,8 @@ addIcons({
   'eye-off-outline': eyeOffOutline,
   'arrow-undo-outline': arrowUndoOutline,
   'lock-closed-outline': lockClosedOutline,
-  'analytics-outline': analyticsOutline
+  'analytics-outline': analyticsOutline,
+  'bulb-outline': bulbOutline
 });
 
 bootstrapApplication(AppComponent, {
