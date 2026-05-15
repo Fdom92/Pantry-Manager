@@ -48,6 +48,7 @@
     @if (pendingChange > 0) {
       <div class="expiry-chip-wrapper">
         <app-expiry-picker
+          [mode]="'picker-only'"
           [date]="pendingExpiryDate"
           [noExpiry]="pendingNoExpiry"
           (dateChange)="expiryDateChange.emit($event)"

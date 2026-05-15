@@ -20,12 +20,14 @@ import {
   addOutline,
   alertCircle,
   alertCircleOutline,
+  analyticsOutline,
   apertureOutline,
   appsOutline,
   archiveOutline,
   arrowForwardOutline,
   arrowUndoOutline,
   basketOutline,
+  bulbOutline,
   calendarOutline,
   cartOutline,
   checkmark,
@@ -57,6 +59,7 @@ import {
   layersOutline,
   leafOutline,
   listOutline,
+  lockClosedOutline,
   moonOutline,
   navigateOutline,
   notificationsOutline,
@@ -171,7 +174,10 @@ addIcons({
   'apps-outline': appsOutline,
   'leaf-outline': leafOutline,
   'eye-off-outline': eyeOffOutline,
-  'arrow-undo-outline': arrowUndoOutline
+  'arrow-undo-outline': arrowUndoOutline,
+  'lock-closed-outline': lockClosedOutline,
+  'analytics-outline': analyticsOutline,
+  'bulb-outline': bulbOutline
 });
 
 bootstrapApplication(AppComponent, {

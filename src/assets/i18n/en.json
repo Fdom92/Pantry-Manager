@@ -89,43 +89,6 @@
       "title": "All set"
     }
   },
-  "history": {
-    "title": "History",
-    "pro": {
-      "cta": "View your complete history and analyze patterns with PRO"
-    },
-    "filters": {
-      "title": "History filters",
-      "all": "All",
-      "added": "Added",
-      "consumed": "Consumed",
-      "edited": "Edited",
-      "expired": "Expired",
-      "deleted": "Deleted",
-      "imported": "Imported"
-    },
-    "eventTypes": {
-      "added": "Added",
-      "consumed": "Consumed",
-      "expired": "Expired",
-      "edited": "Edited",
-      "deleted": "Deleted",
-      "imported": "Imported"
-    },
-    "event": {
-      "unknownProduct": "Unknown item",
-      "importTitle": "Import",
-      "editedTitle": "Edited"
-    },
-    "empty": {
-      "title": "No history yet",
-      "subtitle": "Start adding and consuming items to see activity here.",
-      "filtered": {
-        "title": "No matching events",
-        "subtitle": "Try another filter to see more activity."
-      }
-    }
-  },
   "locations": {
     "pantry": "Pantry"
   },
@@ -414,14 +377,8 @@
       "pendingProductUpdates": {
         "title": "Pantry updates pending",
         "description": "There are a few products you could refresh. It’ll take less than a minute.",
-        "cta": "Let's do it",
+        "cta": "Let’s do it",
         "dismiss": "Not now"
-      },
-      "cookBeforeExpiry": {
-        "title": "You have items expiring soon",
-        "description": "I'll suggest recipes to use them before they go bad.",
-        "cta": "Give me ideas",
-        "prompt": "Suggest recipes that prioritize the products expiring soon in my pantry."
       },
       "addExpiryDates": {
         "title": "Add expiry dates to your items",
@@ -443,62 +400,46 @@
         "description": "With PRO, organize your weekly menu and save time every day.",
         "cta": "Try PRO"
       }
-    }
-  },
-  "agent": {
-    "title": "Planning",
-    "states": {
-      "thinking": "Thinking…",
-      "fetching": "Checking your pantry…",
-      "responding": "Crafting the response…"
     },
-    "placeholder": "Ask for recipes, meal plans, or ways to use what you have.",
-    "actions": {
-      "send": "Send",
+    "tabTitle": "Insights",
+    "title": "Analysis",
+    "snapshot": {
+      "title": "Your pantry now",
+      "active": "Active",
+      "expired": "Expired",
+      "review": "Check",
+      "basicsOut": "Basics out",
+      "noExpiry": "No date: {{count}} of {{total}} items"
+    },
+    "activity": {
+      "title": "Last 30 days",
+      "added": "Added",
+      "consumed": "Consumed",
+      "expired": "Expired",
+      "wasteRatio": "Waste rate",
+      "noActivity": "No activity recorded",
+      "noWaste": "No waste"
+    },
+    "distribution": {
+      "title": "By food type",
+      "mostWasted": "Most expired"
+    },
+    "pro": {
+      "title": "Smart AI analysis",
+      "description": "Detects patterns, predicts waste and gives personalised recommendations.",
+      "cta": "See PRO",
+      "generate": "Generate analysis",
+      "refresh": "Refresh",
+      "staleHint": "Analysis may be outdated",
+      "error": "Could not generate analysis",
       "retry": "Retry",
-      "clear": "Clear chat"
-    },
-    "preview": {
-      "badge": "Preview",
-      "title": "PRO Planner",
-      "headline": "Recipes and meal plans from what's in your pantry",
-      "subtitle": "Get recipes, menus, and insights tailored to your pantry.",
-      "cta": "Unlock meal planner",
-      "demo": {
-        "chipsTitle": "Start with a quick prompt",
-        "sessionTitle": "Sample conversation",
-        "userMessage": "“Use what expires this week to plan dinners.”",
-        "agentMessage": "Great idea. You have spinach and feta that expire in 2 days. How about a spinach pesto pasta tonight and a Greek-style omelette tomorrow?"
+      "sections": {
+        "patterns": "Patterns",
+        "problems": "Detected issues",
+        "recommendations": "Recommendations",
+        "suggestions": "This week"
       }
-    },
-    "quickStart": {
-      "title": "Contextual entry",
-      "headline": "Start with something specific",
-      "subtitle": "Tap an option and the planner gets going on its own.",
-      "ctaTitle": "Start with one tap",
-      "ctaSubtitle": "Where do we start today?",
-      "today": "What do I cook today?",
-      "todayPrompt": "What can I cook today with what I have at home? Give me a few ideas.",
-      "weeklyPlan": "Weekly plan",
-      "weeklyPlanPrompt": "Put together a weekly menu for me — 7 days, breakfast, lunch and dinner — using what's in my pantry.",
-      "useExpiring": "What's expiring",
-      "useExpiringPrompt": "I have things about to expire. What should I cook so they don't go to waste?",
-      "surpriseMe": "Surprise me",
-      "surpriseMePrompt": "Pick a recipe I can make with what I have and surprise me. Just one.",
-      "customPrompt": "Free question ✏️"
-    },
-    "messages": {
-      "noResponse": "Couldn't generate a response.",
-      "unifiedError": "The meal planner couldn't reply right now. Please try again in a few seconds."
-    },
-    "errors": {
-      "coldStart": "The service is starting up. Please try again in a few seconds.",
-      "rateLimit": "Too many requests. Please wait a moment before trying again.",
-      "timeout": "The request took too long. Check your connection and try again.",
-      "offline": "No internet connection. Please connect and try again.",
-      "generic": "Something went wrong. Please try again in a few moments."
-    },
-    "disclaimer": "Recipes and meal plans are generated by AI and may contain errors."
+    }
   },
   "pantry": {
     "title": "Pantry",
@@ -854,16 +795,6 @@
       "dark": "Dark",
       "system": "System",
       "error": "Could not update the theme."
-    },
-    "ai": {
-      "title": "AI",
-      "subtitle": "Tell the planner what to remember.",
-      "contextTitle": "Context / Memory",
-      "contextDescription": "Share your household, diets, dislikes, or anything you want us to keep in mind.",
-      "contextPlaceholder": "E.g.: Family of 3, no nuts, Mediterranean cuisine.",
-      "saveAction": "Save context",
-      "saveSuccess": "Planner context saved.",
-      "saveError": "Could not save the planner context."
     },
     "advanced": {
       "title": "Data",

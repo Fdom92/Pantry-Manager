@@ -89,43 +89,6 @@
       "title": "Alles in Ordnung"
     }
   },
-  "history": {
-    "title": "Verlauf",
-    "pro": {
-      "cta": "Vollständigen Verlauf sehen und Muster mit PRO analysieren"
-    },
-    "filters": {
-      "title": "Verlaufsfilter",
-      "all": "Alle",
-      "added": "Hinzugefügt",
-      "consumed": "Verbraucht",
-      "edited": "Bearbeitet",
-      "expired": "Abgelaufen",
-      "deleted": "Gelöscht",
-      "imported": "Importiert"
-    },
-    "eventTypes": {
-      "added": "Hinzugefügt",
-      "consumed": "Verbraucht",
-      "expired": "Abgelaufen",
-      "edited": "Bearbeitet",
-      "deleted": "Gelöscht",
-      "imported": "Importiert"
-    },
-    "event": {
-      "unknownProduct": "Unbekannter Artikel",
-      "importTitle": "Import",
-      "editedTitle": "Bearbeitet"
-    },
-    "empty": {
-      "title": "Noch kein Verlauf",
-      "subtitle": "Füge Produkte hinzu und verbrauche sie, um Aktivitäten zu sehen.",
-      "filtered": {
-        "title": "Keine passenden Ereignisse",
-        "subtitle": "Probiere einen anderen Filter."
-      }
-    }
-  },
   "locations": {
     "pantry": "Vorratskammer"
   },
@@ -417,12 +380,6 @@
         "cta": "Los geht's",
         "dismiss": "Nicht jetzt"
       },
-      "cookBeforeExpiry": {
-        "title": "Du hast Produkte, die bald ablaufen",
-        "description": "Ich schlage dir Rezepte vor, um sie zu nutzen, bevor sie verderben.",
-        "cta": "Gib mir Ideen",
-        "prompt": "Schlage Rezepte vor, die die bald ablaufenden Produkte in meiner Speisekammer priorisieren."
-      },
       "addExpiryDates": {
         "title": "Ablaufdaten hinzufügen",
         "description": "Behalte den Überblick, was zuerst verwendet werden soll, und vermeide unangenehme Überraschungen.",
@@ -443,62 +400,46 @@
         "description": "Mit PRO organisierst du dein Wochenmenü und sparst jeden Tag Zeit.",
         "cta": "PRO testen"
       }
-    }
-  },
-  "agent": {
-    "title": "Planung",
-    "states": {
-      "thinking": "Denkt nach…",
-      "fetching": "Vorratskammer wird abgefragt…",
-      "responding": "Antwort wird erstellt…"
     },
-    "placeholder": "Frag nach Rezepten, Essensplänen oder Ideen mit deinen Vorräten.",
-    "actions": {
-      "send": "Senden",
-      "retry": "Erneut versuchen",
-      "clear": "Chat löschen"
+    "tabTitle": "Insights",
+    "title": "Analyse",
+    "snapshot": {
+      "title": "Dein Vorrat jetzt",
+      "active": "Aktiv",
+      "expired": "Abgelaufen",
+      "review": "Prüfen",
+      "basicsOut": "Basis leer",
+      "noExpiry": "Kein Datum: {{count}} von {{total}} Produkten"
     },
-    "preview": {
-      "badge": "Vorschau",
-      "title": "Das Planungserlebnis",
-      "headline": "Ideen und Pläne mit KI",
-      "subtitle": "Erhalte Rezepte, Menüs und Insights passend zu deinem Vorrat.",
-      "cta": "Menüplaner freischalten",
-      "demo": {
-        "chipsTitle": "Starte mit einer Absicht",
-        "sessionTitle": "Beispielkonversation",
-        "userMessage": "„Plane Abendessen mit allem, was diese Woche abläuft.",
-        "agentMessage": "Klingt gut. Spinat und Feta laufen in 2 Tagen ab. Vorschlag: Heute Spinat-Pesto-Pasta und morgen ein griechisches Omelett."
+    "activity": {
+      "title": "Letzte 30 Tage",
+      "added": "Hinzugefügt",
+      "consumed": "Verbraucht",
+      "expired": "Abgelaufen",
+      "wasteRatio": "Verschwendung",
+      "noActivity": "Keine Aktivität aufgezeichnet",
+      "noWaste": "Kein Verlust"
+    },
+    "distribution": {
+      "title": "Nach Lebensmitteltyp",
+      "mostWasted": "Meiste abgelaufen"
+    },
+    "pro": {
+      "title": "Intelligente KI-Analyse",
+      "description": "Erkennt Muster, prognostiziert Verluste und gibt persönliche Empfehlungen.",
+      "cta": "PRO ansehen",
+      "generate": "Analyse generieren",
+      "refresh": "Aktualisieren",
+      "staleHint": "Analyse möglicherweise veraltet",
+      "error": "Analyse konnte nicht erstellt werden",
+      "retry": "Wiederholen",
+      "sections": {
+        "patterns": "Muster",
+        "problems": "Erkannte Probleme",
+        "recommendations": "Empfehlungen",
+        "suggestions": "Diese Woche"
       }
-    },
-    "quickStart": {
-      "title": "Kontextueller Einstieg",
-      "headline": "Fang mit etwas Konkretem an",
-      "subtitle": "Tippe eine Option an und der Planer legt direkt los.",
-      "ctaTitle": "Mit einem Tipp starten",
-      "ctaSubtitle": "Womit fangen wir heute an?",
-      "today": "Was koche ich heute?",
-      "todayPrompt": "Was kann ich heute mit dem kochen, was ich zuhause habe? Gib mir ein paar Ideen.",
-      "weeklyPlan": "Wochenplan",
-      "weeklyPlanPrompt": "Mach mir einen Wochenplan — 7 Tage, Frühstück, Mittagessen und Abendessen — mit dem was ich zuhause habe.",
-      "useExpiring": "Was läuft bald ab",
-      "useExpiringPrompt": "Ich hab Sachen, die bald ablaufen. Was koche ich, um sie nicht wegzuwerfen?",
-      "surpriseMe": "Überrasch mich",
-      "surpriseMePrompt": "Such dir ein Rezept aus, das ich mit dem machen kann, was ich habe, und überrasch mich. Nur eins.",
-      "customPrompt": "Eigene Frage ✏️"
-    },
-    "messages": {
-      "noResponse": "Ich konnte keine Antwort erzeugen.",
-      "unifiedError": "Der Menüplaner konnte im Moment nicht antworten. Bitte versuche es später erneut."
-    },
-    "errors": {
-      "coldStart": "Der Dienst startet. Versuche es in einigen Sekunden erneut.",
-      "rateLimit": "Zu viele Anfragen. Bitte warte einen Moment, bevor du es erneut versuchst.",
-      "timeout": "Die Anfrage hat zu lange gedauert. Überprüfe deine Verbindung und versuche es erneut.",
-      "offline": "Keine Internetverbindung. Bitte verbinde dich und versuche es erneut.",
-      "generic": "Etwas ist schiefgelaufen. Bitte versuche es in wenigen Momenten erneut."
-    },
-    "disclaimer": "Rezepte und Essenspläne werden von KI generiert und können Fehler enthalten."
+    }
   },
   "pantry": {
     "title": "Vorratskammer",
@@ -853,16 +794,6 @@
       "dark": "Dunkel",
       "system": "System",
       "error": "Das Design konnte nicht aktualisiert werden."
-    },
-    "ai": {
-      "title": "KI",
-      "subtitle": "Sag dem Planer, was er merken soll.",
-      "contextTitle": "Kontext / Gedächtnis",
-      "contextDescription": "Teile Haushalt, Ernährungsweisen, Abneigungen oder alles, was wir beachten sollen.",
-      "contextPlaceholder": "Bsp.: Familie mit 3 Personen, keine Nüsse, mediterrane Küche.",
-      "saveAction": "Kontext speichern",
-      "saveSuccess": "Kontext gespeichert.",
-      "saveError": "Planer-Kontext konnte nicht gespeichert werden."
     },
     "advanced": {
       "title": "Daten",
