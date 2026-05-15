@@ -2,7 +2,24 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ListStateService } from '@core/services/list/list-state.service';
-import { AlertController, IonicModule } from '@ionic/angular';
+import {
+  AlertController,
+  IonBadge,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
+  IonList,
+  IonSkeletonText,
+  IonSpinner,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
@@ -10,11 +27,13 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
   selector: 'app-list',
   standalone: true,
   imports: [
-    IonicModule,
     CommonModule,
     RouterLink,
     TranslateModule,
     EmptyStateComponent,
+    IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
+    IonContent, IonIcon, IonSpinner, IonSkeletonText, IonBadge,
+    IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   ],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
