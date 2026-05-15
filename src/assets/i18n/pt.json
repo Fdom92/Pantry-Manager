@@ -323,9 +323,9 @@
     "suggestions": {
       "title": "Lista de compras",
       "loading": "A criar lista de compras…",
-      "toBuy": "Comprar {{ amount }}",
-      "empty": "Marca produtos como \"manter sempre em casa\" para seres notificado quando se esgotarem.",
-      "belowMinQty": "Faltam {{qty}} para o mínimo"
+      "restock": "Repor {{amount}}",
+      "restockFresh": "Repor",
+      "empty": "Marca produtos como \"manter sempre em casa\" para seres notificado quando se esgotarem."
     },
     "share": {
       "button": "Partilhar lista",

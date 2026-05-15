@@ -323,9 +323,9 @@
     "suggestions": {
       "title": "Shopping list",
       "loading": "Building shopping list…",
-      "toBuy": "Buy {{ amount }}",
-      "empty": "Mark products as \"always keep at home\" to get notified when they run low.",
-      "belowMinQty": "{{qty}} short of minimum"
+      "restock": "Restock {{amount}}",
+      "restockFresh": "Restock",
+      "empty": "Mark products as \"always keep at home\" to get notified when they run low."
     },
     "share": {
       "button": "Share list",

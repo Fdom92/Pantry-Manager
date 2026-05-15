@@ -92,10 +92,10 @@
                           }
                         </div>
                         <span class="item-qty">
-                          @if (suggestion.reason === 'below-min') {
-                            {{ 'shopping.suggestions.belowMinQty' | translate:{ qty: suggestion.suggestedQuantity } }}
+                          @if (suggestion.reason === 'fresh-empty') {
+                            {{ 'shopping.suggestions.restockFresh' | translate }}
                           } @else {
-                            {{ 'shopping.suggestions.toBuy' | translate:{ amount: suggestion.suggestedQuantity } }}
+                            {{ 'shopping.suggestions.restock' | translate:{ amount: suggestion.suggestedQuantity } }}
                           }
                         </span>
                       </div>

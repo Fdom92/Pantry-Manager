@@ -323,9 +323,9 @@
     "suggestions": {
       "title": "Liste de courses",
       "loading": "Génération de la liste d’achats…",
-      "toBuy": "À acheter {{ amount }}",
-      "empty": "Marquez les produits comme \"toujours avoir\" pour être alerté quand ils s’épuisent.",
-      "belowMinQty": "Il manque {{qty}} pour le minimum"
+      "restock": "Réapprovisionner {{amount}}",
+      "restockFresh": "Réapprovisionner",
+      "empty": "Marquez les produits comme \"toujours avoir\" pour être alerté quand ils s’épuisent."
     },
     "share": {
       "button": "Partager la liste",

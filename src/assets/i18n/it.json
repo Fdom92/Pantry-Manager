@@ -323,9 +323,9 @@
     "suggestions": {
       "title": "Lista della spesa",
       "loading": "Sto creando la lista della spesa…",
-      "toBuy": "Da comprare {{ amount }}",
-      "empty": "Contrassegna i prodotti come \"tieni sempre in casa\" per essere avvisato quando scarseggiano.",
-      "belowMinQty": "Mancano {{qty}} al minimo"
+      "restock": "Rifornire {{amount}}",
+      "restockFresh": "Rifornire",
+      "empty": "Contrassegna i prodotti come \"tieni sempre in casa\" per essere avvisato quando scarseggiano."
     },
     "share": {
       "button": "Condividi lista",

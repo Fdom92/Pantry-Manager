@@ -323,9 +323,9 @@
     "suggestions": {
       "title": "Einkaufsliste",
       "loading": "Einkaufsliste wird erstellt…",
-      "toBuy": "Kaufen {{ amount }}",
-      "empty": "Markiere Produkte als \"immer vorrätig\" um benachrichtigt zu werden, wenn sie zur Neige gehen.",
-      "belowMinQty": "Noch {{qty}} bis zum Minimum"
+      "restock": "{{amount}} nachkaufen",
+      "restockFresh": "Nachkaufen",
+      "empty": "Markiere Produkte als \"immer vorrätig\" um benachrichtigt zu werden, wenn sie zur Neige gehen."
     },
     "share": {
       "button": "Liste teilen",
