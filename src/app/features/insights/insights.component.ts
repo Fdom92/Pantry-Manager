@@ -10,6 +10,7 @@ import {
   IonSkeletonText,
   IonTitle,
   IonToolbar,
+  IonButtons,
 } from '@ionic/angular/standalone';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
 import { FoodType } from '@core/models/shared/enums.model';
@@ -28,6 +29,7 @@ import { FoodType } from '@core/models/shared/enums.model';
     IonIcon,
     IonButton,
     IonSkeletonText,
+    IonButtons,
   ],
   templateUrl: './insights.component.html',
   styleUrls: ['./insights.component.scss'],
