@@ -132,7 +132,8 @@
         "lowstock": "Running low — add it to your shopping list",
         "expiringlater": "Expiring in the coming days — start thinking about using it",
         "freshExpiring": "Your {{name}} expires soon.",
-        "freshOut": "You ran out of {{name}}."
+        "freshOut": "You ran out of {{name}}.",
+        "reviewExpiry": "Past best before — use it today"
       },
       "combine": "Also expiring soon:",
       "cta": {
@@ -364,7 +365,7 @@
       "sectionTitle": "Hidden for now"
     },
     "toasts": {
-      "bought": "✓ {{name}} bought. Inventory updated.",
+      "bought": "✓ {{name}} bought. Pantry updated.",
       "boughtManual": "✓ {{name}} bought.",
       "ignored": "{{name}} hidden for now — it will come back next time.",
       "removedManual": "{{name}} removed from list."

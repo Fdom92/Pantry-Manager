@@ -5,7 +5,7 @@ import type { AppPreferences } from '@core/models/settings';
 
 export class LowStockNotification implements NotificationDefinition {
   readonly id = NOTIFICATION_IDS.LOW_STOCK;
-  readonly priority = 20;
+  readonly priority = 30;
 
   isEnabled(preferences: AppPreferences): boolean {
     return Boolean(preferences.notificationsEnabled && preferences.notifyOnLowStock);

@@ -132,7 +132,8 @@
         "lowstock": "Te queda poco — añádelo a la lista de la compra",
         "expiringlater": "Caduca en los próximos días — ve pensando en usarlo",
         "freshExpiring": "Tu {{name}} caduca pronto.",
-        "freshOut": "Te quedaste sin {{name}}."
+        "freshOut": "Te quedaste sin {{name}}.",
+        "reviewExpiry": "Ya pasó su fecha — úsalo hoy"
       },
       "combine": "Caduca pronto también:",
       "cta": {
@@ -314,7 +315,7 @@
     }
   },
   "shopping": {
-    "title": "Lista de compra",
+    "title": "Lista de la compra",
     "unassignedSupermarket": "Cualquier supermercado",
     "reasons": {
       "below-min": "Bajo stock",
@@ -364,7 +365,7 @@
       "sectionTitle": "Ocultos ahora"
     },
     "toasts": {
-      "bought": "✓ {{name}} comprado. Inventario actualizado.",
+      "bought": "✓ {{name}} comprado. Despensa actualizada.",
       "boughtManual": "✓ {{name}} comprado.",
       "ignored": "{{name}} oculto por ahora — volverá la próxima vez.",
       "removedManual": "{{name}} eliminado de la lista."
@@ -401,7 +402,7 @@
         "cta": "Prueba PRO"
       }
     },
-    "tabTitle": "Insights",
+    "tabTitle": "Análisis",
     "title": "Análisis",
     "snapshot": {
       "title": "Tu despensa ahora",

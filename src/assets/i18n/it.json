@@ -132,7 +132,8 @@
         "lowstock": "Ne rimane poco — aggiungilo alla lista della spesa",
         "expiringlater": "Scade nei prossimi giorni — inizia a pensarci",
         "freshExpiring": "Il tuo {{name}} scade presto.",
-        "freshOut": "{{name}} è finito."
+        "freshOut": "{{name}} è finito.",
+        "reviewExpiry": "Data superata — usalo oggi"
       },
       "combine": "Scade presto anche:",
       "cta": {
@@ -364,7 +365,7 @@
       "sectionTitle": "Nascosti ora"
     },
     "toasts": {
-      "bought": "✓ {{name}} acquistato. Scorta aggiornata.",
+      "bought": "✓ {{name}} acquistato. Dispensa aggiornata.",
       "boughtManual": "✓ {{name}} acquistato.",
       "ignored": "{{name}} nascosto ora — riapparirà la prossima volta.",
       "removedManual": "{{name}} rimosso dalla lista."
@@ -401,7 +402,7 @@
         "cta": "Prova PRO"
       }
     },
-    "tabTitle": "Insights",
+    "tabTitle": "Analisi",
     "title": "Analisi",
     "snapshot": {
       "title": "La tua dispensa ora",

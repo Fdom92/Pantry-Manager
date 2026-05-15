@@ -1,5 +1,8 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
+import { getItemStatusState } from '@core/domain/pantry/pantry-status.domain';
+import { calculateUrgencyScore } from '@core/domain/pantry/urgency.domain';
+import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 // ─── Today's Suggestion ───────────────────────────────────────────────────────
 
@@ -25,17 +28,6 @@ export const FRESH_URGENCY_FACTOR = 0.7;
 // Es la única regla especial que tienen los frescos en el bloque HOY.
 export const FRESH_OUT_BONUS = 80;
 
-// Urgency score based on days until expiry.
-// Expired items (≤0) are excluded before scoring — they belong to the "Qué hacer ahora" section.
-const getUrgencyScore = (days: number | null): number => {
-  if (days === null || days <= 0) return 0;
-  if (days === 1)  return 80;
-  if (days === 2)  return 75;
-  if (days <= 5)   return 50;
-  if (days <= 10)  return 25;
-  if (days <= 15)  return 10;
-  return 0;
-};
 
 // Minimum quantity threshold before an item is considered low stock, by food type.
 // Higher-rotation types (dairy, fruit) deplete faster so the threshold is higher.
@@ -83,6 +75,7 @@ export function computeTodaySuggestion(
   skipId?: string,
 ): TodaySuggestion | null {
   const nowMs = Date.now();
+  const now = new Date(nowMs);
 
   const getStock = (item: PantryItem): number =>
     (item.batches ?? []).reduce((s, b) => s + (b.quantity ?? 0), 0);
@@ -118,10 +111,14 @@ export function computeTodaySuggestion(
     const isLowStock = stock <= getLowStockThreshold(type);
     const isFresh = item.productType === 'fresh';
 
-    let urgency = getUrgencyScore(days);
-    if (isLowStock)        urgency += 25;
-    if (isFastMoving(type)) urgency += 10;
-    if (isFresh)           urgency *= FRESH_URGENCY_FACTOR;
+    const state = getState(item);
+    let urgency = calculateUrgencyScore(state, days).score;
+
+    if (state !== 'review') {
+      if (isLowStock)         urgency += 25;
+      if (isFastMoving(type)) urgency += 10;
+      if (isFresh)            urgency *= FRESH_URGENCY_FACTOR;
+    }
 
     let total = urgency + (HOY_FOOD_TYPE_SCORE[type] ?? 0);
 
@@ -135,11 +132,10 @@ export function computeTodaySuggestion(
   // Items without an expiry date are excluded — this block is about urgency, not general stock.
   const hasDatedBatch = (item: PantryItem): boolean => !!getEarliestExpiryDate(item);
 
-  // Expired items (daysToExpiry ≤ 0) are handled by "Qué hacer ahora" and must not appear here.
-  const isNotExpired = (item: PantryItem): boolean => {
-    const d = getDaysToExpiry(item);
-    return d === null || d > 0;
-  };
+  const getState = (item: PantryItem) => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
+
+  // Expired items belong to "Qué hacer ahora". Review items (flexible grace) ARE shown here.
+  const isNotExpired = (item: PantryItem): boolean => getState(item) !== 'expired';
 
   // isBasic encodes "keep in stock" for fresh items.
   // Fresh item with zero stock but isBasic active: a genuine "buy this today" signal.
@@ -166,9 +162,12 @@ export function computeTodaySuggestion(
   };
 
   const freshOutPool = allItems.filter(isFreshOutCandidate);
+  const reviewPool = allItems.filter(i =>
+    isFood(i) && hasStock(i) && hasDatedBatch(i) && getState(i) === 'review'
+  );
 
   const candidatePool = [...new Map(
-    [...nearExpiryItems, ...freshOutPool].map(i => [i._id, i]),
+    [...nearExpiryItems, ...freshOutPool, ...reviewPool].map(i => [i._id, i]),
   ).values()];
 
   // Pool: near-expiry items plus fresh items in Nada+keepInStock (without dated batch).
@@ -204,6 +203,8 @@ export function computeTodaySuggestion(
     reasonKey = 'dashboard.today.reason.freshOut';
   } else if (isFreshProtagonist) {
     reasonKey = 'dashboard.today.reason.freshExpiring';
+  } else if (getState(protagonist) === 'review') {
+    reasonKey = 'dashboard.today.reason.reviewExpiry';
   } else if (protagonistDays !== null && protagonistDays <= 2) {
     reasonKey = 'dashboard.today.reason.expiringsoon';
   } else if (protagonistDays !== null && protagonistDays <= 5) {

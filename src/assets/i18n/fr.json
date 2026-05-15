@@ -132,7 +132,8 @@
         "lowstock": "Il n'en reste plus beaucoup — ajoutez-le à la liste de courses",
         "expiringlater": "Expire dans les prochains jours — commencez à y penser",
         "freshExpiring": "Ton {{name}} expire bientôt.",
-        "freshOut": "Tu n'as plus de {{name}}."
+        "freshOut": "Tu n'as plus de {{name}}.",
+        "reviewExpiry": "Date dépassée — à utiliser aujourd'hui"
       },
       "combine": "Expire aussi bientôt :",
       "cta": {
@@ -364,7 +365,7 @@
       "sectionTitle": "Masqués pour l'instant"
     },
     "toasts": {
-      "bought": "✓ {{name}} acheté. Stock mis à jour.",
+      "bought": "✓ {{name}} acheté. Garde-manger mis à jour.",
       "boughtManual": "✓ {{name}} acheté.",
       "ignored": "{{name}} masqué pour l'instant — réapparaîtra la prochaine fois.",
       "removedManual": "{{name}} retiré de la liste."
@@ -401,7 +402,7 @@
         "cta": "Essayer PRO"
       }
     },
-    "tabTitle": "Insights",
+    "tabTitle": "Analyse",
     "title": "Analyse",
     "snapshot": {
       "title": "Ton garde-manger",

@@ -132,7 +132,8 @@
         "lowstock": "Resta pouco — adicione-o à lista de compras",
         "expiringlater": "Expira nos próximos dias — comece a pensar em usá-lo",
         "freshExpiring": "O seu {{name}} vence em breve.",
-        "freshOut": "Você ficou sem {{name}}."
+        "freshOut": "Você ficou sem {{name}}.",
+        "reviewExpiry": "Prazo ultrapassado — usa hoje"
       },
       "combine": "Expira em breve também:",
       "cta": {
@@ -364,7 +365,7 @@
       "sectionTitle": "Ocultos agora"
     },
     "toasts": {
-      "bought": "✓ {{name}} comprado. Estoque atualizado.",
+      "bought": "✓ {{name}} comprado. Despensa atualizada.",
       "boughtManual": "✓ {{name}} comprado.",
       "ignored": "{{name}} oculto agora — voltará na próxima vez.",
       "removedManual": "{{name}} removido da lista."
@@ -401,7 +402,7 @@
         "cta": "Experimentar PRO"
       }
     },
-    "tabTitle": "Insights",
+    "tabTitle": "Análise",
     "title": "Análise",
     "snapshot": {
       "title": "A tua despensa agora",

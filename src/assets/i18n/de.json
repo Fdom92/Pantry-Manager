@@ -132,7 +132,8 @@
         "lowstock": "Nur noch wenig da — zur Einkaufsliste hinzufügen",
         "expiringlater": "Läuft in den nächsten Tagen ab — schon jetzt daran denken",
         "freshExpiring": "Dein {{name}} läuft bald ab.",
-        "freshOut": "{{name}} ist aufgebraucht."
+        "freshOut": "{{name}} ist aufgebraucht.",
+        "reviewExpiry": "Mindesthaltbarkeit überschritten — heute verwenden"
       },
       "combine": "Läuft auch bald ab:",
       "cta": {
@@ -401,7 +402,7 @@
         "cta": "PRO testen"
       }
     },
-    "tabTitle": "Insights",
+    "tabTitle": "Analyse",
     "title": "Analyse",
     "snapshot": {
       "title": "Dein Vorrat jetzt",
