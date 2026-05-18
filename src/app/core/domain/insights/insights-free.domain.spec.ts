@@ -193,15 +193,17 @@ describe('computeDistribution', () => {
   const now = new Date('2026-05-14');
   const recentTs = new Date('2026-04-20').toISOString();
 
-  it('returns top food types sorted by count descending', () => {
+  it('returns food types in fixed order (PROTEIN → VEGETABLE → FRUIT → DAIRY → CARB → OTHER)', () => {
     const items = [
       makeItem({ foodType: FoodType.DAIRY, batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
       makeItem({ foodType: FoodType.DAIRY, batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
-      makeItem({ foodType: FoodType.CARB, batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
+      makeItem({ foodType: FoodType.PROTEIN, batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
     ];
     const result = computeDistribution(items, [], now, 30);
-    expect(result.topFoodTypes[0].foodType).toBe(FoodType.DAIRY);
-    expect(result.topFoodTypes[0].count).toBe(2);
+    // PROTEIN comes before DAIRY in fixed order even though DAIRY has higher count
+    expect(result.foodTypes[0].foodType).toBe(FoodType.PROTEIN);
+    expect(result.foodTypes[1].foodType).toBe(FoodType.DAIRY);
+    expect(result.foodTypes[1].count).toBe(2);
   });
 
   it('excludes HOUSEHOLD from top food types', () => {
@@ -209,7 +211,7 @@ describe('computeDistribution', () => {
       makeItem({ foodType: FoodType.HOUSEHOLD, batches: [{ batchId: 'b1', quantity: 1 }] }),
     ];
     const result = computeDistribution(items, [], now, 30);
-    expect(result.topFoodTypes.length).toBe(0);
+    expect(result.foodTypes.length).toBe(0);
   });
 
   it('excludes fresh items from top food types', () => {
@@ -217,7 +219,36 @@ describe('computeDistribution', () => {
       makeItem({ productType: 'fresh', foodType: FoodType.DAIRY, batches: [] }),
     ];
     const result = computeDistribution(items, [], now, 30);
-    expect(result.topFoodTypes.length).toBe(0);
+    expect(result.foodTypes.length).toBe(0);
+  });
+
+  describe('leastRotatingFoodType', () => {
+    const recentTs = new Date('2026-04-20').toISOString();
+    const now = new Date('2026-05-14');
+
+    it('returns null when no food type has >= 2 active items', () => {
+      const items = [
+        makeItem({ foodType: FoodType.PROTEIN, batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
+      ];
+      const result = computeDistribution(items, [], now, 30);
+      expect(result.leastRotatingFoodType).toBeNull();
+    });
+
+    it('returns food type with lowest consumed/count ratio (min 2 items)', () => {
+      const items = [
+        makeItem({ _id: 'p1', foodType: FoodType.PROTEIN, batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
+        makeItem({ _id: 'p2', foodType: FoodType.PROTEIN, batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
+        makeItem({ _id: 'd1', foodType: FoodType.DAIRY, batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
+        makeItem({ _id: 'd2', foodType: FoodType.DAIRY, batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
+      ];
+      // DAIRY has 0 consumed events → lower rotation than PROTEIN
+      const events = [
+        makeEvent({ eventType: 'CONSUME', foodType: FoodType.PROTEIN, timestamp: recentTs }),
+        makeEvent({ eventType: 'CONSUME', foodType: FoodType.PROTEIN, timestamp: recentTs }),
+      ];
+      const result = computeDistribution(items, events, now, 30);
+      expect(result.leastRotatingFoodType).toBe(FoodType.DAIRY);
+    });
   });
 
   it('mostWastedFoodType returns null when no EXPIRE events with foodType', () => {

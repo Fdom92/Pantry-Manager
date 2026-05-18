@@ -25,9 +25,19 @@ export interface ActivityMetrics {
   windowDays: number;
 }
 
+const FOOD_TYPE_DISPLAY_ORDER: FoodType[] = [
+  FoodType.PROTEIN,
+  FoodType.VEGETABLE,
+  FoodType.FRUIT,
+  FoodType.DAIRY,
+  FoodType.CARB,
+  FoodType.OTHER,
+];
+
 export interface DistributionMetrics {
-  topFoodTypes: { foodType: FoodType; count: number }[];
+  foodTypes: { foodType: FoodType; count: number }[];
   mostWastedFoodType: FoodType | null;
+  leastRotatingFoodType: FoodType | null;
 }
 
 export function computeInventorySnapshot(items: PantryItem[], now: Date): InventorySnapshot {
@@ -111,7 +121,7 @@ export function computeDistribution(
   items: PantryItem[],
   events: PantryEvent[],
   now: Date,
-  windowDays: number
+  windowDays: number,
 ): DistributionMetrics {
   const foodTypeCounts = new Map<FoodType, number>();
   for (const item of items) {
@@ -122,21 +132,30 @@ export function computeDistribution(
     foodTypeCounts.set(item.foodType, (foodTypeCounts.get(item.foodType) ?? 0) + 1);
   }
 
-  const topFoodTypes = Array.from(foodTypeCounts.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-    .map(([foodType, count]) => ({ foodType, count }));
+  // Fixed display order — "Otros" never first
+  const foodTypes = FOOD_TYPE_DISPLAY_ORDER
+    .filter(ft => foodTypeCounts.has(ft))
+    .map(ft => ({ foodType: ft, count: foodTypeCounts.get(ft)! }));
 
   const cutoff = now.getTime() - windowDays * 24 * 60 * 60 * 1000;
+  const recent = events.filter(e => new Date(e.timestamp).getTime() >= cutoff);
+
   const expiredFoodTypeCounts = new Map<FoodType, number>();
-  for (const e of events) {
-    if (e.eventType !== 'EXPIRE') continue;
-    if (new Date(e.timestamp).getTime() < cutoff) continue;
+  const consumedByType = new Map<FoodType, number>();
+
+  for (const e of recent) {
     if (!e.foodType || e.foodType === FoodType.HOUSEHOLD) continue;
-    expiredFoodTypeCounts.set(
-      e.foodType as FoodType,
-      (expiredFoodTypeCounts.get(e.foodType as FoodType) ?? 0) + 1
-    );
+    if (e.eventType === 'EXPIRE') {
+      expiredFoodTypeCounts.set(
+        e.foodType as FoodType,
+        (expiredFoodTypeCounts.get(e.foodType as FoodType) ?? 0) + 1,
+      );
+    } else if (e.eventType === 'CONSUME') {
+      consumedByType.set(
+        e.foodType as FoodType,
+        (consumedByType.get(e.foodType as FoodType) ?? 0) + 1,
+      );
+    }
   }
 
   const mostWastedFoodType =
@@ -144,7 +163,19 @@ export function computeDistribution(
       ? null
       : Array.from(expiredFoodTypeCounts.entries()).sort((a, b) => b[1] - a[1])[0][0];
 
-  return { topFoodTypes, mostWastedFoodType };
+  let leastRotatingFoodType: FoodType | null = null;
+  let lowestRatio = Infinity;
+  for (const [ft, count] of foodTypeCounts.entries()) {
+    if (count < 2) continue;
+    const consumed = consumedByType.get(ft) ?? 0;
+    const ratio = consumed / count;
+    if (ratio < lowestRatio) {
+      lowestRatio = ratio;
+      leastRotatingFoodType = ft;
+    }
+  }
+
+  return { foodTypes, mostWastedFoodType, leastRotatingFoodType };
 }
 
 // ─── Pantry Score ─────────────────────────────────────────────────────────────
