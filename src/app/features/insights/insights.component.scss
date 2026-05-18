@@ -95,37 +95,6 @@
   }
 }
 
-.waste-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  background: color-mix(in srgb, var(--ion-text-color) 6%, transparent);
-
-  ion-icon { font-size: 16px; }
-
-  &.waste-none,
-  &.waste-low {
-    background: color-mix(in srgb, var(--ion-color-success) 12%, transparent);
-    color: var(--ion-color-success-shade);
-    ion-icon { color: var(--ion-color-success); }
-  }
-
-  &.waste-medium {
-    background: color-mix(in srgb, var(--ion-color-warning) 15%, transparent);
-    color: var(--ion-color-warning-shade);
-    ion-icon { color: var(--ion-color-warning); }
-  }
-
-  &.waste-high {
-    background: color-mix(in srgb, var(--ion-color-danger) 12%, transparent);
-    color: var(--ion-color-danger);
-    ion-icon { color: var(--ion-color-danger); }
-  }
-}
-
 // Section C — distribution bars
 .food-type-bars {
   display: flex;
@@ -167,16 +136,6 @@
     text-align: right;
     color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
   }
-}
-
-.most-wasted-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--ion-color-warning-shade);
-  ion-icon { font-size: 14px; }
 }
 
 // Section D — PRO teaser

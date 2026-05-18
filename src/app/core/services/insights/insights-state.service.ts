@@ -13,8 +13,6 @@ import {
   computeInventorySnapshot,
   computePantryScore,
   computeFoodCoverage,
-  computePantryHealthState,
-  PantryHealthState,
 } from '@core/domain/insights/insights-free.domain';
 import type {
   ActivityMetrics,
@@ -36,7 +34,6 @@ import {
 import type { PantryEvent } from '@core/models/events';
 
 export type { ActivityMetrics, DistributionMetrics, InventorySnapshot };
-export { PantryHealthState };
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -83,22 +80,6 @@ export class InsightsStateService {
   readonly distribution = computed((): DistributionMetrics =>
     computeDistribution(this.pantryStore.items(), this.events(), new Date(), 30)
   );
-
-  readonly pantryHealthState = computed((): PantryHealthState => {
-    const snapshot = this.inventorySnapshot();
-    const items = this.pantryStore.items();
-    const withDates = items.filter(i => {
-      if (i.productType === 'fresh') return false;
-      return (i.batches ?? []).some(b => !!b.expirationDate);
-    }).length;
-    return computePantryHealthState(
-      snapshot.expired,
-      snapshot.nearExpiry,
-      snapshot.total,
-      withDates,
-      this.staleCount(),
-    );
-  });
 
   readonly pantryScore = computed((): PantryScoreResult | null => {
     const snapshot = this.inventorySnapshot();

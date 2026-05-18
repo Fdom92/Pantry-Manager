@@ -80,7 +80,7 @@
             <span class="activity-stat__label">{{ 'insights.activity.wasteRatio' | translate }}</span>
           </div>
         </div>
-        <div class="rotation-badge" [attr.data-level]="facade.activityMetrics().rotationRatio">
+        <div class="rotation-badge">
           <ion-icon name="refresh-outline"></ion-icon>
           <span>{{ getRotationLabel(facade.activityMetrics().rotationRatio) | translate }}</span>
         </div>
@@ -107,7 +107,7 @@
           <div class="distribution-badges">
             @if (facade.distribution().mostWastedFoodType) {
               <p class="distribution-badge">
-                <ion-icon name="alert-circle-outline"></ion-icon>
+                <ion-icon name="analytics-outline"></ion-icon>
                 {{ 'insights.distribution.mostWasted' | translate }}:
                 {{ getFoodTypeLabel(facade.distribution().mostWastedFoodType!) }}
               </p>
