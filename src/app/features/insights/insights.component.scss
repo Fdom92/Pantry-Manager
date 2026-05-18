@@ -306,30 +306,6 @@
   span { flex: 1; }
 }
 
-// Status banner
-.insights-status-banner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-
-  &[data-state='critical'] {
-    background: rgba(var(--ion-color-danger-rgb), 0.12);
-    color: var(--ion-color-danger);
-  }
-  &[data-state='attention'] {
-    background: rgba(var(--ion-color-warning-rgb), 0.12);
-    color: var(--ion-color-warning-shade);
-  }
-  &[data-state='optimal'] {
-    background: rgba(var(--ion-color-success-rgb), 0.12);
-    color: var(--ion-color-success-shade);
-  }
-}
-
 // Coverage card
 .coverage-card {
   display: flex;
@@ -357,10 +333,6 @@
   font-weight: 500;
   background: var(--ion-item-background);
   color: var(--ion-color-medium);
-
-  &[data-level='high']   { background: rgba(var(--ion-color-success-rgb), 0.12); color: var(--ion-color-success-shade); }
-  &[data-level='medium'] { background: rgba(var(--ion-color-warning-rgb), 0.12); color: var(--ion-color-warning-shade); }
-  &[data-level='low']    { background: rgba(var(--ion-color-danger-rgb),  0.10); color: var(--ion-color-danger); }
 }
 
 // Distribution badges
@@ -372,9 +344,6 @@
   font-size: 13px;
   margin-bottom: 4px;
   color: var(--ion-color-medium);
-
-  &--waste    { color: var(--ion-color-danger); }
-  &--rotation { color: var(--ion-color-warning-shade); }
 }
 
 // Quality score
