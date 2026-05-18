@@ -78,7 +78,7 @@
                   </span>
                 }
               </div>
-              @if (facade.todaySuggestion()!.protagonist.daysToExpiry === null || facade.todaySuggestion()!.protagonist.daysToExpiry! <= 5) {
+              @if (shouldShowReason()) {
                 <p class="today-card__reason">{{ facade.todaySuggestion()!.reasonKey | translate: { name: facade.todaySuggestion()!.protagonist.name } }}</p>
               }
               @if (facade.todaySuggestion()!.secondaryItems.length > 0) {
