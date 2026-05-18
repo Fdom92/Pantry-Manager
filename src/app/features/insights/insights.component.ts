@@ -13,7 +13,6 @@ import {
   IonButtons,
 } from '@ionic/angular/standalone';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
-import { PantryHealthState } from '@core/domain/insights/insights-free.domain';
 import { FoodType } from '@core/models/shared/enums.model';
 
 @Component({
@@ -39,7 +38,6 @@ import { FoodType } from '@core/models/shared/enums.model';
 export class InsightsComponent {
   readonly facade = inject(InsightsStateService);
   readonly FoodType = FoodType;
-  readonly PantryHealthState = PantryHealthState;
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
@@ -63,23 +61,6 @@ export class InsightsComponent {
     const foodTypes = this.facade.distribution().foodTypes;
     if (!foodTypes.length) return 0;
     return Math.max(...foodTypes.map(f => f.count));
-  }
-
-  getWasteRatioColor(ratio: number | null): string {
-    if (ratio === null) return '';
-    if (ratio === 0) return 'waste-none';
-    if (ratio <= 0.2) return 'waste-low';
-    if (ratio <= 0.4) return 'waste-medium';
-    return 'waste-high';
-  }
-
-  getPantryHealthIcon(state: PantryHealthState): string {
-    switch (state) {
-      case PantryHealthState.CRITICAL:  return 'alert-circle';
-      case PantryHealthState.ATTENTION: return 'warning';
-      case PantryHealthState.OPTIMAL:   return 'checkmark-circle';
-      default: return 'information-circle';
-    }
   }
 
   getRotationLabel(ratio: 'high' | 'medium' | 'low' | null): string {
