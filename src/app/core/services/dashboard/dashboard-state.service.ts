@@ -71,7 +71,6 @@ export class DashboardStateService {
   private readonly dismissedTodayIds = signal(new Set<string>());
 
   readonly totalItems = computed(() => this.inventorySummary().total);
-  readonly hasExpiredItems = computed(() => this.expiredItems().length > 0);
   readonly shoppingListCount = computed(() => {
     const items = this.pantryItems();
     if (!items?.length) {
