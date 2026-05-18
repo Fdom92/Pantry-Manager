@@ -141,7 +141,7 @@
             <div class="quality-bar-row">
               <span class="quality-bar-row__label">{{ 'insights.quality.withDate' | translate }}</span>
               <div class="quality-bar-row__track">
-                <div class="quality-bar-row__fill"
+                <div class="quality-bar-row__fill quality-bar-row__fill--good"
                   [style.width]="getQualityBarWidth(
                     facade.inventorySnapshot().total - facade.inventorySnapshot().noExpiryDate,
                     facade.inventorySnapshot().total)">
@@ -154,7 +154,7 @@
             <div class="quality-bar-row">
               <span class="quality-bar-row__label">{{ 'insights.quality.noDate' | translate }}</span>
               <div class="quality-bar-row__track">
-                <div class="quality-bar-row__fill"
+                <div class="quality-bar-row__fill quality-bar-row__fill--warning"
                   [style.width]="getQualityBarWidth(facade.inventorySnapshot().noExpiryDate, facade.inventorySnapshot().total)">
                 </div>
               </div>
@@ -165,7 +165,7 @@
             <div class="quality-bar-row">
               <span class="quality-bar-row__label">{{ 'insights.quality.reviewable' | translate }}</span>
               <div class="quality-bar-row__track">
-                <div class="quality-bar-row__fill"
+                <div class="quality-bar-row__fill quality-bar-row__fill--warning"
                   [style.width]="getQualityBarWidth(facade.inventorySnapshot().review, facade.inventorySnapshot().total)">
                 </div>
               </div>
@@ -176,7 +176,7 @@
             <div class="quality-bar-row">
               <span class="quality-bar-row__label">{{ 'insights.quality.expired' | translate }}</span>
               <div class="quality-bar-row__track">
-                <div class="quality-bar-row__fill"
+                <div class="quality-bar-row__fill quality-bar-row__fill--danger"
                   [style.width]="getQualityBarWidth(facade.inventorySnapshot().expired, facade.inventorySnapshot().total)">
                 </div>
               </div>

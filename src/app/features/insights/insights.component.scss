@@ -329,13 +329,13 @@
   align-items: center;
   gap: 8px;
 
-  &__label { font-size: 13px; color: var(--ion-color-medium); }
-  &__pct   { font-size: 12px; text-align: right; color: var(--ion-color-medium); }
+  &__label { font-size: 13px; }
+  &__pct   { font-size: 12px; text-align: right; }
 
   &__track {
-    height: 6px;
+    height: 8px;
     background: var(--ion-color-light-shade);
-    border-radius: 3px;
+    border-radius: 4px;
     overflow: hidden;
   }
   &__fill {
@@ -343,5 +343,9 @@
     border-radius: 3px;
     background: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
     transition: width 0.3s ease;
+
+    &--good    { background: var(--ion-color-success); }
+    &--warning { background: var(--ion-color-warning); }
+    &--danger  { background: var(--ion-color-danger); }
   }
 }
