@@ -120,37 +120,72 @@ describe('computeActivityMetrics', () => {
       makeEvent({ eventType: 'ADD', timestamp: recentTs }),
       makeEvent({ eventType: 'ADD', timestamp: oldTs }),
     ];
-    const result = computeActivityMetrics(events, 30, now);
+    const result = computeActivityMetrics(events, 30, now, 10);
     expect(result.added).toBe(1);
   });
 
   it('counts CONSUME events within window', () => {
     const events = [makeEvent({ eventType: 'CONSUME', timestamp: recentTs })];
-    const result = computeActivityMetrics(events, 30, now);
+    const result = computeActivityMetrics(events, 30, now, 10);
     expect(result.consumed).toBe(1);
   });
 
   it('counts EXPIRE events within window', () => {
     const events = [makeEvent({ eventType: 'EXPIRE', timestamp: recentTs })];
-    const result = computeActivityMetrics(events, 30, now);
+    const result = computeActivityMetrics(events, 30, now, 10);
     expect(result.expired).toBe(1);
   });
 
   it('wasteRatio is null when no consumed or expired', () => {
-    const result = computeActivityMetrics([], 30, now);
+    const result = computeActivityMetrics([], 30, now, 10);
     expect(result.wasteRatio).toBeNull();
   });
 
   it('wasteRatio is 0 when consumed > 0 and expired = 0', () => {
     const events = [makeEvent({ eventType: 'CONSUME', timestamp: recentTs })];
-    const result = computeActivityMetrics(events, 30, now);
+    const result = computeActivityMetrics(events, 30, now, 10);
     expect(result.wasteRatio).toBe(0);
   });
 
   it('wasteRatio is 1 when expired > 0 and consumed = 0', () => {
     const events = [makeEvent({ eventType: 'EXPIRE', timestamp: recentTs })];
-    const result = computeActivityMetrics(events, 30, now);
+    const result = computeActivityMetrics(events, 30, now, 10);
     expect(result.wasteRatio).toBe(1);
+  });
+
+  describe('rotationRatio', () => {
+    const recentTs = new Date('2026-04-20').toISOString();
+    const now = new Date('2026-05-14');
+
+    it('is null when activeInventory is 0', () => {
+      const result = computeActivityMetrics([], 30, now, 0);
+      expect(result.rotationRatio).toBeNull();
+    });
+
+    it('is high when consumed / activeInventory >= 0.3', () => {
+      const events = Array.from({ length: 6 }, () =>
+        makeEvent({ eventType: 'CONSUME', timestamp: recentTs })
+      );
+      // 6 consumed / 10 active = 0.6 → high
+      const result = computeActivityMetrics(events, 30, now, 10);
+      expect(result.rotationRatio).toBe('high');
+    });
+
+    it('is medium when consumed / activeInventory is between 0.1 and 0.3', () => {
+      const events = Array.from({ length: 2 }, () =>
+        makeEvent({ eventType: 'CONSUME', timestamp: recentTs })
+      );
+      // 2 consumed / 10 active = 0.2 → medium
+      const result = computeActivityMetrics(events, 30, now, 10);
+      expect(result.rotationRatio).toBe('medium');
+    });
+
+    it('is low when consumed / activeInventory < 0.1', () => {
+      const events = [makeEvent({ eventType: 'CONSUME', timestamp: recentTs })];
+      // 1 consumed / 20 active = 0.05 → low
+      const result = computeActivityMetrics(events, 30, now, 20);
+      expect(result.rotationRatio).toBe('low');
+    });
   });
 });
 

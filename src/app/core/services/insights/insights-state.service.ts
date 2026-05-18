@@ -53,7 +53,7 @@ export class InsightsStateService {
   );
 
   readonly activityMetrics = computed((): ActivityMetrics =>
-    computeActivityMetrics(this.events(), 30, new Date())
+    computeActivityMetrics(this.events(), 30, new Date(), this.inventorySnapshot().active)
   );
 
   readonly distribution = computed((): DistributionMetrics =>

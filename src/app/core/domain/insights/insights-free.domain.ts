@@ -21,6 +21,7 @@ export interface ActivityMetrics {
   consumed: number;
   expired: number;
   wasteRatio: number | null;
+  rotationRatio: 'high' | 'medium' | 'low' | null;
   windowDays: number;
 }
 
@@ -76,7 +77,8 @@ export function computeInventorySnapshot(items: PantryItem[], now: Date): Invent
 export function computeActivityMetrics(
   events: PantryEvent[],
   windowDays: number,
-  now: Date
+  now: Date,
+  activeInventory: number,
 ): ActivityMetrics {
   const cutoff = now.getTime() - windowDays * 24 * 60 * 60 * 1000;
   const recent = events.filter(e => new Date(e.timestamp).getTime() >= cutoff);
@@ -94,7 +96,15 @@ export function computeActivityMetrics(
   const wasteRatio =
     expired + consumed === 0 ? null : expired / (expired + consumed);
 
-  return { added, consumed, expired, wasteRatio, windowDays };
+  let rotationRatio: 'high' | 'medium' | 'low' | null = null;
+  if (activeInventory > 0) {
+    const ratio = consumed / activeInventory;
+    if (ratio >= 0.3) rotationRatio = 'high';
+    else if (ratio >= 0.1) rotationRatio = 'medium';
+    else rotationRatio = 'low';
+  }
+
+  return { added, consumed, expired, wasteRatio, rotationRatio, windowDays };
 }
 
 export function computeDistribution(
