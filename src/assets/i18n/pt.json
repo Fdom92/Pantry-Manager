@@ -404,13 +404,22 @@
     },
     "tabTitle": "Análise",
     "title": "Análise",
+    "status": {
+      "critical": "Produtos expirados detectados",
+      "attention": "Produtos precisam de atenção",
+      "optimal": "Tudo em ordem"
+    },
     "snapshot": {
       "title": "A tua despensa agora",
       "active": "Ativos",
       "expired": "Expirados",
       "review": "Verificar",
+      "noDate": "Sem data",
       "basicsOut": "Básicos sem stock",
       "noExpiry": "Sem data: {{count}} de {{total}} produtos"
+    },
+    "coverage": {
+      "title": "Cobertura estimada"
     },
     "activity": {
       "title": "Últimos 30 dias",
@@ -419,11 +428,24 @@
       "expired": "Expirados",
       "wasteRatio": "Desperdício",
       "noActivity": "Sem atividade registada",
-      "noWaste": "Sem desperdício"
+      "noWaste": "Sem desperdício",
+      "rotationHigh": "Rotação alta",
+      "rotationMedium": "Rotação média",
+      "rotationLow": "Rotação baixa",
+      "rotationNone": "Sem atividade"
     },
     "distribution": {
       "title": "Por tipo de alimento",
-      "mostWasted": "Mais expirados"
+      "mostWasted": "Mais expirados",
+      "leastRotating": "Menor rotação"
+    },
+    "quality": {
+      "title": "Qualidade do inventário",
+      "score": "Pontuação",
+      "withDate": "Rastreados",
+      "noDate": "Sem data",
+      "reviewable": "Revisáveis",
+      "expired": "Expirados"
     },
     "pro": {
       "title": "Análise inteligente com IA",

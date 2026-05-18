@@ -404,13 +404,22 @@
     },
     "tabTitle": "Analisi",
     "title": "Analisi",
+    "status": {
+      "critical": "Prodotti scaduti rilevati",
+      "attention": "Prodotti richiedono attenzione",
+      "optimal": "Tutto sotto controllo"
+    },
     "snapshot": {
       "title": "La tua dispensa ora",
       "active": "Attivi",
       "expired": "Scaduti",
       "review": "Verificare",
+      "noDate": "Senza data",
       "basicsOut": "Essenziali esauriti",
       "noExpiry": "Senza data: {{count}} su {{total}} prodotti"
+    },
+    "coverage": {
+      "title": "Copertura stimata"
     },
     "activity": {
       "title": "Ultimi 30 giorni",
@@ -419,11 +428,24 @@
       "expired": "Scaduti",
       "wasteRatio": "Spreco",
       "noActivity": "Nessuna attività registrata",
-      "noWaste": "Nessuno spreco"
+      "noWaste": "Nessuno spreco",
+      "rotationHigh": "Rotazione alta",
+      "rotationMedium": "Rotazione media",
+      "rotationLow": "Rotazione bassa",
+      "rotationNone": "Nessuna attività"
     },
     "distribution": {
       "title": "Per tipo di cibo",
-      "mostWasted": "Più scaduti"
+      "mostWasted": "Più scaduti",
+      "leastRotating": "Rotazione minore"
+    },
+    "quality": {
+      "title": "Qualità dell'inventario",
+      "score": "Punteggio",
+      "withDate": "Tracciati",
+      "noDate": "Senza data",
+      "reviewable": "Da verificare",
+      "expired": "Scaduti"
     },
     "pro": {
       "title": "Analisi IA intelligente",

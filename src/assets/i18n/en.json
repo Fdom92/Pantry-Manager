@@ -404,13 +404,22 @@
     },
     "tabTitle": "Insights",
     "title": "Analysis",
+    "status": {
+      "critical": "Expired items detected",
+      "attention": "Items need attention",
+      "optimal": "Everything looks good"
+    },
     "snapshot": {
       "title": "Your pantry now",
       "active": "Active",
       "expired": "Expired",
       "review": "Check",
+      "noDate": "No date",
       "basicsOut": "Basics out",
       "noExpiry": "No date: {{count}} of {{total}} items"
+    },
+    "coverage": {
+      "title": "Estimated coverage"
     },
     "activity": {
       "title": "Last 30 days",
@@ -419,11 +428,24 @@
       "expired": "Expired",
       "wasteRatio": "Waste rate",
       "noActivity": "No activity recorded",
-      "noWaste": "No waste"
+      "noWaste": "No waste",
+      "rotationHigh": "High rotation",
+      "rotationMedium": "Medium rotation",
+      "rotationLow": "Low rotation",
+      "rotationNone": "No activity"
     },
     "distribution": {
       "title": "By food type",
-      "mostWasted": "Most expired"
+      "mostWasted": "Most expired",
+      "leastRotating": "Lowest rotation"
+    },
+    "quality": {
+      "title": "Inventory quality",
+      "score": "Score",
+      "withDate": "Tracked",
+      "noDate": "No date",
+      "reviewable": "Reviewable",
+      "expired": "Expired"
     },
     "pro": {
       "title": "Smart AI analysis",

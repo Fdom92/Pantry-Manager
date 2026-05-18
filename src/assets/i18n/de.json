@@ -404,13 +404,22 @@
     },
     "tabTitle": "Analyse",
     "title": "Analyse",
+    "status": {
+      "critical": "Abgelaufene Produkte erkannt",
+      "attention": "Produkte benötigen Aufmerksamkeit",
+      "optimal": "Alles in Ordnung"
+    },
     "snapshot": {
       "title": "Dein Vorrat jetzt",
       "active": "Aktiv",
       "expired": "Abgelaufen",
       "review": "Prüfen",
+      "noDate": "Kein Datum",
       "basicsOut": "Basis leer",
       "noExpiry": "Kein Datum: {{count}} von {{total}} Produkten"
+    },
+    "coverage": {
+      "title": "Geschätzte Reichweite"
     },
     "activity": {
       "title": "Letzte 30 Tage",
@@ -419,11 +428,24 @@
       "expired": "Abgelaufen",
       "wasteRatio": "Verschwendung",
       "noActivity": "Keine Aktivität aufgezeichnet",
-      "noWaste": "Kein Verlust"
+      "noWaste": "Kein Verlust",
+      "rotationHigh": "Hohe Rotation",
+      "rotationMedium": "Mittlere Rotation",
+      "rotationLow": "Niedrige Rotation",
+      "rotationNone": "Keine Aktivität"
     },
     "distribution": {
       "title": "Nach Lebensmitteltyp",
-      "mostWasted": "Meiste abgelaufen"
+      "mostWasted": "Meiste abgelaufen",
+      "leastRotating": "Geringste Rotation"
+    },
+    "quality": {
+      "title": "Inventarqualität",
+      "score": "Bewertung",
+      "withDate": "Mit Datum",
+      "noDate": "Ohne Datum",
+      "reviewable": "Zu prüfen",
+      "expired": "Abgelaufen"
     },
     "pro": {
       "title": "Intelligente KI-Analyse",

@@ -404,13 +404,22 @@
     },
     "tabTitle": "Análisis",
     "title": "Análisis",
+    "status": {
+      "critical": "Productos caducados detectados",
+      "attention": "Hay productos que necesitan atención",
+      "optimal": "Todo en orden"
+    },
     "snapshot": {
       "title": "Tu despensa ahora",
       "active": "Activos",
       "expired": "Caducados",
       "review": "Revisar",
+      "noDate": "Sin fecha",
       "basicsOut": "Básicos sin stock",
       "noExpiry": "Sin fecha: {{count}} de {{total}} productos"
+    },
+    "coverage": {
+      "title": "Cobertura estimada"
     },
     "activity": {
       "title": "Últimos 30 días",
@@ -419,11 +428,24 @@
       "expired": "Caducados",
       "wasteRatio": "Desperdicio",
       "noActivity": "Sin actividad registrada",
-      "noWaste": "Sin desperdicio"
+      "noWaste": "Sin desperdicio",
+      "rotationHigh": "Rotación alta",
+      "rotationMedium": "Rotación media",
+      "rotationLow": "Rotación baja",
+      "rotationNone": "Sin actividad"
     },
     "distribution": {
       "title": "Por tipo de alimento",
-      "mostWasted": "Más caducados"
+      "mostWasted": "Más caducados",
+      "leastRotating": "Menor rotación"
+    },
+    "quality": {
+      "title": "Calidad del inventario",
+      "score": "Puntuación",
+      "withDate": "Con seguimiento",
+      "noDate": "Sin fecha",
+      "reviewable": "Revisables",
+      "expired": "Caducados"
     },
     "pro": {
       "title": "Análisis inteligente con IA",

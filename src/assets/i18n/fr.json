@@ -404,13 +404,22 @@
     },
     "tabTitle": "Analyse",
     "title": "Analyse",
+    "status": {
+      "critical": "Produits périmés détectés",
+      "attention": "Des produits nécessitent attention",
+      "optimal": "Tout est en ordre"
+    },
     "snapshot": {
       "title": "Ton garde-manger",
       "active": "Actifs",
       "expired": "Périmés",
       "review": "Vérifier",
+      "noDate": "Sans date",
       "basicsOut": "Essentiels vides",
       "noExpiry": "Sans date: {{count}} sur {{total}} produits"
+    },
+    "coverage": {
+      "title": "Couverture estimée"
     },
     "activity": {
       "title": "30 derniers jours",
@@ -419,11 +428,24 @@
       "expired": "Périmés",
       "wasteRatio": "Gaspillage",
       "noActivity": "Aucune activité enregistrée",
-      "noWaste": "Aucun gaspillage"
+      "noWaste": "Aucun gaspillage",
+      "rotationHigh": "Rotation élevée",
+      "rotationMedium": "Rotation moyenne",
+      "rotationLow": "Rotation faible",
+      "rotationNone": "Aucune activité"
     },
     "distribution": {
       "title": "Par type d'aliment",
-      "mostWasted": "Plus périmés"
+      "mostWasted": "Plus périmés",
+      "leastRotating": "Moins de rotation"
+    },
+    "quality": {
+      "title": "Qualité de l'inventaire",
+      "score": "Score",
+      "withDate": "Suivi",
+      "noDate": "Sans date",
+      "reviewable": "À vérifier",
+      "expired": "Périmés"
     },
     "pro": {
       "title": "Analyse IA intelligente",
