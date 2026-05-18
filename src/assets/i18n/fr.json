@@ -405,9 +405,9 @@
     "tabTitle": "Analyse",
     "title": "Analyse",
     "status": {
-      "critical": "Produits périmés détectés",
-      "attention": "Des produits nécessitent attention",
-      "optimal": "Tout est en ordre"
+      "critical": "Périmés en stock",
+      "attention": "Produits à vérifier",
+      "optimal": "Inventaire à jour"
     },
     "snapshot": {
       "title": "Ton garde-manger",
@@ -436,8 +436,8 @@
     },
     "distribution": {
       "title": "Par type d'aliment",
-      "mostWasted": "Plus périmés",
-      "leastRotating": "Moins de rotation"
+      "mostWasted": "Incidence élevée",
+      "leastRotating": "Faible rotation"
     },
     "quality": {
       "title": "Qualité de l'inventaire",

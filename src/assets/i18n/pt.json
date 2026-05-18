@@ -405,9 +405,9 @@
     "tabTitle": "Análise",
     "title": "Análise",
     "status": {
-      "critical": "Produtos expirados detectados",
-      "attention": "Produtos precisam de atenção",
-      "optimal": "Tudo em ordem"
+      "critical": "Expirados no inventário",
+      "attention": "Produtos a verificar",
+      "optimal": "Inventário atualizado"
     },
     "snapshot": {
       "title": "A tua despensa agora",
@@ -436,8 +436,8 @@
     },
     "distribution": {
       "title": "Por tipo de alimento",
-      "mostWasted": "Mais expirados",
-      "leastRotating": "Menor rotação"
+      "mostWasted": "Maior incidência",
+      "leastRotating": "Baixa rotação"
     },
     "quality": {
       "title": "Qualidade do inventário",

@@ -405,9 +405,9 @@
     "tabTitle": "Analisi",
     "title": "Analisi",
     "status": {
-      "critical": "Prodotti scaduti rilevati",
-      "attention": "Prodotti richiedono attenzione",
-      "optimal": "Tutto sotto controllo"
+      "critical": "Scaduti in magazzino",
+      "attention": "Prodotti da verificare",
+      "optimal": "Inventario aggiornato"
     },
     "snapshot": {
       "title": "La tua dispensa ora",
@@ -436,8 +436,8 @@
     },
     "distribution": {
       "title": "Per tipo di cibo",
-      "mostWasted": "Più scaduti",
-      "leastRotating": "Rotazione minore"
+      "mostWasted": "Incidenza maggiore",
+      "leastRotating": "Bassa rotazione"
     },
     "quality": {
       "title": "Qualità dell'inventario",

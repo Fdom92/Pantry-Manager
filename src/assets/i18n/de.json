@@ -405,9 +405,9 @@
     "tabTitle": "Analyse",
     "title": "Analyse",
     "status": {
-      "critical": "Abgelaufene Produkte erkannt",
-      "attention": "Produkte benötigen Aufmerksamkeit",
-      "optimal": "Alles in Ordnung"
+      "critical": "Abgelaufene im Vorrat",
+      "attention": "Produkte zu prüfen",
+      "optimal": "Vorrat aktuell"
     },
     "snapshot": {
       "title": "Dein Vorrat jetzt",
@@ -436,8 +436,8 @@
     },
     "distribution": {
       "title": "Nach Lebensmitteltyp",
-      "mostWasted": "Meiste abgelaufen",
-      "leastRotating": "Geringste Rotation"
+      "mostWasted": "Häufiger abgelaufen",
+      "leastRotating": "Niedrige Rotation"
     },
     "quality": {
       "title": "Inventarqualität",

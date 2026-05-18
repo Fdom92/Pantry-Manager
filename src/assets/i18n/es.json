@@ -405,9 +405,9 @@
     "tabTitle": "Análisis",
     "title": "Análisis",
     "status": {
-      "critical": "Productos caducados detectados",
-      "attention": "Hay productos que necesitan atención",
-      "optimal": "Todo en orden"
+      "critical": "Caducados en inventario",
+      "attention": "Productos a revisar",
+      "optimal": "Inventario al día"
     },
     "snapshot": {
       "title": "Tu despensa ahora",
@@ -436,8 +436,8 @@
     },
     "distribution": {
       "title": "Por tipo de alimento",
-      "mostWasted": "Más caducados",
-      "leastRotating": "Menor rotación"
+      "mostWasted": "Mayor incidencia",
+      "leastRotating": "Baja rotación"
     },
     "quality": {
       "title": "Calidad del inventario",

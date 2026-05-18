@@ -405,9 +405,9 @@
     "tabTitle": "Insights",
     "title": "Analysis",
     "status": {
-      "critical": "Expired items detected",
-      "attention": "Items need attention",
-      "optimal": "Everything looks good"
+      "critical": "Expired items in inventory",
+      "attention": "Items to review",
+      "optimal": "Inventory up to date"
     },
     "snapshot": {
       "title": "Your pantry now",
@@ -436,8 +436,8 @@
     },
     "distribution": {
       "title": "By food type",
-      "mostWasted": "Most expired",
-      "leastRotating": "Lowest rotation"
+      "mostWasted": "Higher incidence",
+      "leastRotating": "Low rotation"
     },
     "quality": {
       "title": "Inventory quality",
