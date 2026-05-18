@@ -5,9 +5,9 @@ import { SettingsStateService } from '@core/services/settings/settings-state.ser
 import { NotificationSchedulerService } from '@core/services/notifications/notification-scheduler.service';
 import { PantryService } from '@core/services/pantry/pantry.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
-import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
-import { generateBatchId } from '@core/utils';
-import type { PantryItem } from '@core/models/pantry';
+import { LanguageService } from '@core/services/shared/language.service';
+import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
+import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
 import {
   IonBackButton,
   IonButton,
@@ -68,10 +68,14 @@ export class SettingsComponent {
   private readonly pantry = inject(PantryService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly translate = inject(TranslateService);
+  private readonly language = inject(LanguageService);
+  private readonly marketingSeeder = inject(DevMarketingSeederService);
 
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
   readonly isPro = this.facade.isPro;
+  readonly SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
+  readonly currentLanguage = this.language.currentLanguage;
 
   // Notifications
   readonly isTestingNotification = signal(false);
@@ -81,9 +85,7 @@ export class SettingsComponent {
   readonly isCancellingNotifications = signal(false);
 
   // Data
-  readonly isSeedingExpired = signal(false);
-  readonly isSeedingNearExpiry = signal(false);
-  readonly isSeedingLowStock = signal(false);
+  readonly isSeedingMarketing = signal(false);
   readonly isClearingPantry = signal(false);
 
   // App state
@@ -147,85 +149,23 @@ export class SettingsComponent {
     }
   }
 
+  // ─── Language ─────────────────────────────────────────────────────────────
+
+  async setLanguage(lang: SupportedLanguage): Promise<void> {
+    await this.language.setLanguage(lang);
+  }
+
   // ─── Data ─────────────────────────────────────────────────────────────────
 
-  async seedExpiredItems(): Promise<void> {
-    if (this.isSeedingExpired()) return;
-    this.isSeedingExpired.set(true);
+  async seedMarketingDatabase(): Promise<void> {
+    if (this.isSeedingMarketing()) return;
+    const confirmed = window.confirm(this.translate.instant('settings.dev.seedMarketingConfirm'));
+    if (!confirmed) return;
+    this.isSeedingMarketing.set(true);
     try {
-      const now = new Date();
-      const seeds = [
-        { name: 'Leche (caducada)', daysOffset: -7 },
-        { name: 'Yogur (caducado)', daysOffset: -3 },
-        { name: 'Pan de molde (caducado)', daysOffset: -1 },
-      ];
-      for (const { name, daysOffset } of seeds) {
-        const expiryDate = new Date(now);
-        expiryDate.setDate(expiryDate.getDate() + daysOffset);
-        await this.pantry.saveItem({
-          _id: `item:dev-expired-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-          type: 'item',
-          householdId: DEFAULT_HOUSEHOLD_ID,
-          name,
-          categoryId: '',
-          batches: [{ batchId: generateBatchId(), quantity: 1, expirationDate: expiryDate.toISOString() }],
-        } as PantryItem);
-      }
+      await this.marketingSeeder.seedMarketingDatabase();
     } finally {
-      this.isSeedingExpired.set(false);
-    }
-  }
-
-  async seedNearExpiryItems(): Promise<void> {
-    if (this.isSeedingNearExpiry()) return;
-    this.isSeedingNearExpiry.set(true);
-    try {
-      const now = new Date();
-      const seeds = [
-        { name: 'Queso (próx. caducidad)', daysOffset: 2 },
-        { name: 'Zumo de naranja (próx. caducidad)', daysOffset: 5 },
-        { name: 'Mantequilla (próx. caducidad)', daysOffset: 10 },
-      ];
-      for (const { name, daysOffset } of seeds) {
-        const expiryDate = new Date(now);
-        expiryDate.setDate(expiryDate.getDate() + daysOffset);
-        await this.pantry.saveItem({
-          _id: `item:dev-near-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-          type: 'item',
-          householdId: DEFAULT_HOUSEHOLD_ID,
-          name,
-          categoryId: '',
-          batches: [{ batchId: generateBatchId(), quantity: 1, expirationDate: expiryDate.toISOString() }],
-        } as PantryItem);
-      }
-    } finally {
-      this.isSeedingNearExpiry.set(false);
-    }
-  }
-
-  async seedLowStockItems(): Promise<void> {
-    if (this.isSeedingLowStock()) return;
-    this.isSeedingLowStock.set(true);
-    try {
-      const seeds = [
-        { name: 'Aceite de oliva (stock bajo)', minThreshold: 3 },
-        { name: 'Sal (stock bajo)', minThreshold: 2 },
-        { name: 'Arroz (stock bajo)', minThreshold: 3 },
-      ];
-      for (const { name, minThreshold } of seeds) {
-        await this.pantry.saveItem({
-          _id: `item:dev-lowstock-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-          type: 'item',
-          householdId: DEFAULT_HOUSEHOLD_ID,
-          name,
-          categoryId: '',
-          isBasic: true,
-          minThreshold,
-          batches: [{ batchId: generateBatchId(), quantity: 1 }],
-        } as PantryItem);
-      }
-    } finally {
-      this.isSeedingLowStock.set(false);
+      this.isSeedingMarketing.set(false);
     }
   }
 

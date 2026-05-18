@@ -954,7 +954,13 @@
       "appStateLowStock": "Stock bajo",
       "appStateIsPro": "Estado PRO",
       "notificationPreviewDialogTitle": "Vista previa de notificación",
-      "notificationPreviewNone": "No se programaría ninguna notificación. Comprueba que los items y preferencias coincidan con los criterios."
+      "notificationPreviewNone": "No se programaría ninguna notificación. Comprueba que los items y preferencias coincidan con los criterios.",
+      "groupLanguage": "Idioma",
+      "languageSelectorTitle": "Cambiar idioma manualmente",
+      "languageSelectorSubtitle": "Fuerza el idioma de la UI para capturas sin cambiar los ajustes del móvil",
+      "seedMarketingTitle": "Cargar base de datos de marketing",
+      "seedMarketingSubtitle": "Borra todos los datos y carga contenido demo realista para capturas",
+      "seedMarketingConfirm": "¿Borrar todos los datos actuales y reemplazarlos con el dataset de marketing? Esta acción no se puede deshacer."
     },
     "info": {
       "title": "Información",

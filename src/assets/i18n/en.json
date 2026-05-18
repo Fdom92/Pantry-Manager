@@ -954,7 +954,13 @@
       "appStateLowStock": "Low stock",
       "appStateIsPro": "PRO status",
       "notificationPreviewDialogTitle": "Notification Preview",
-      "notificationPreviewNone": "No notification would be scheduled. Check that items and preferences match the notification criteria."
+      "notificationPreviewNone": "No notification would be scheduled. Check that items and preferences match the notification criteria.",
+      "groupLanguage": "Language",
+      "languageSelectorTitle": "Override language",
+      "languageSelectorSubtitle": "Force UI language for screenshots without changing device settings",
+      "seedMarketingTitle": "Load marketing database",
+      "seedMarketingSubtitle": "Clear all data and seed realistic demo content for screenshots",
+      "seedMarketingConfirm": "This will delete all current data and replace it with the marketing dataset. Continue?"
     },
     "info": {
       "title": "Information",

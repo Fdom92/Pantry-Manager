@@ -953,7 +953,13 @@
       "appStateLowStock": "Stock faible",
       "appStateIsPro": "Statut PRO",
       "notificationPreviewDialogTitle": "Aperçu de la notification",
-      "notificationPreviewNone": "Aucune notification ne serait programmée. Vérifiez que les articles et les préférences correspondent aux critères."
+      "notificationPreviewNone": "Aucune notification ne serait programmée. Vérifiez que les articles et les préférences correspondent aux critères.",
+      "groupLanguage": "Language",
+      "languageSelectorTitle": "Override language",
+      "languageSelectorSubtitle": "Force UI language for screenshots without changing device settings",
+      "seedMarketingTitle": "Load marketing database",
+      "seedMarketingSubtitle": "Clear all data and seed realistic demo content for screenshots",
+      "seedMarketingConfirm": "This will delete all current data and replace it with the marketing dataset. Continue?"
     },
     "info": {
       "title": "Informations",
