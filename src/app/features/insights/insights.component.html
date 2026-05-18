@@ -95,7 +95,7 @@
           <div class="food-type-bars">
             @for (ft of facade.distribution().foodTypes; track ft.foodType) {
               <div class="food-type-bar">
-                <span class="food-type-bar__label">{{ getFoodTypeLabel(ft.foodType) }}</span>
+                <span class="food-type-bar__label">{{ getFoodTypeLabel(ft.foodType) | translate }}</span>
                 <div class="food-type-bar__track">
                   <div
                     class="food-type-bar__fill"
@@ -111,14 +111,14 @@
               <p class="distribution-badge">
                 <ion-icon name="analytics-outline"></ion-icon>
                 {{ 'insights.distribution.mostWasted' | translate }}:
-                {{ getFoodTypeLabel(facade.distribution().mostWastedFoodType!) }}
+                {{ getFoodTypeLabel(facade.distribution().mostWastedFoodType!) | translate }}
               </p>
             }
             @if (facade.distribution().leastRotatingFoodType) {
               <p class="distribution-badge">
                 <ion-icon name="time-outline"></ion-icon>
                 {{ 'insights.distribution.leastRotating' | translate }}:
-                {{ getFoodTypeLabel(facade.distribution().leastRotatingFoodType!) }}
+                {{ getFoodTypeLabel(facade.distribution().leastRotatingFoodType!) | translate }}
               </p>
             }
           </div>

@@ -646,7 +646,8 @@
       "expiryDate": "Data de validade (opcional)",
       "noDate": "Adicionar data",
       "zeroHint": "Vai desaparecer da despensa até você adicionar mais",
-      "zeroHintBasic": "Vai desaparecer da despensa e aparecer na sua lista de compras"
+      "zeroHintBasic": "Vai desaparecer da despensa e aparecer na sua lista de compras",
+      "hint": "Ajuste a quantidade. Será guardada ao fechar."
     },
     "toasts": {
       "locationRequired": "Seleciona uma localização antes de guardar.",

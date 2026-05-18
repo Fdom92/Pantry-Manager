@@ -69,16 +69,7 @@ export class InsightsComponent {
   }
 
   getFoodTypeLabel(foodType: FoodType): string {
-    const map: Record<FoodType, string> = {
-      [FoodType.PROTEIN]:   'Proteínas',
-      [FoodType.CARB]:      'Carbohidratos',
-      [FoodType.VEGETABLE]: 'Verduras',
-      [FoodType.FRUIT]:     'Fruta',
-      [FoodType.DAIRY]:     'Lácteos',
-      [FoodType.HOUSEHOLD]: 'Hogar',
-      [FoodType.OTHER]:     'Otros',
-    };
-    return map[foodType] ?? foodType;
+    return `pantry.form.foodType.${foodType}`;
   }
 
   readonly proSections = [

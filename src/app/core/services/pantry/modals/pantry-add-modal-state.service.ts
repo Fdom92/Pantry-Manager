@@ -49,6 +49,7 @@ export class PantryAddModalStateService {
   readonly showAddEmptyAction = computed(() => normalizeTrim(this.addQuery()).length >= 1);
 
   readonly addEmptyActionLabel = computed(() => {
+    void this.languageService.currentLanguage();
     const name = normalizeTrim(this.addQuery());
     if (!name) {
       return '';

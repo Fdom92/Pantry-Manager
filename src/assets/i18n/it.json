@@ -646,7 +646,8 @@
       "expiryDate": "Data di scadenza (opzionale)",
       "noDate": "Aggiungi data",
       "zeroHint": "Sparirà dalla dispensa finché non aggiungi scorte",
-      "zeroHintBasic": "Sparirà dalla dispensa e comparirà nella tua lista della spesa"
+      "zeroHintBasic": "Sparirà dalla dispensa e comparirà nella tua lista della spesa",
+      "hint": "Regola la quantità. Verrà salvata alla chiusura."
     },
     "toasts": {
       "locationRequired": "Seleziona una posizione prima di salvare.",

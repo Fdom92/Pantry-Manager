@@ -646,7 +646,8 @@
       "expiryDate": "Date de péremption (optionnel)",
       "noDate": "Ajouter date",
       "zeroHint": "Il disparaîtra de votre garde-manger jusqu'à ce que vous en rajoutiez",
-      "zeroHintBasic": "Il disparaîtra de votre garde-manger et apparaîtra dans votre liste de courses"
+      "zeroHintBasic": "Il disparaîtra de votre garde-manger et apparaîtra dans votre liste de courses",
+      "hint": "Ajustez la quantité. Elle sera sauvegardée à la fermeture."
     },
     "toasts": {
       "locationRequired": "Sélectionnez un emplacement avant d’enregistrer.",

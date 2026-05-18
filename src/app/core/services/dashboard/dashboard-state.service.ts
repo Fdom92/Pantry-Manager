@@ -154,6 +154,7 @@ export class DashboardStateService {
   });
 
   readonly actions = computed((): DashboardAction[] => {
+    void this.languageService.currentLanguage(); // re-run on language change
     const actions: DashboardAction[] = [];
     const expired = this.expiredItems().length;
     const nearExpiry = this.nearExpiryItems().length;
