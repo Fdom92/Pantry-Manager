@@ -3,6 +3,8 @@ import {
   computeActivityMetrics,
   computeDistribution,
   computeInventorySnapshot,
+  computePantryScore,
+  computeFoodCoverage,
 } from './insights-free.domain';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
@@ -194,5 +196,83 @@ describe('computeDistribution', () => {
     ];
     const result = computeDistribution([], events, now, 30);
     expect(result.mostWastedFoodType).toBe(FoodType.DAIRY);
+  });
+});
+
+describe('computePantryScore', () => {
+  it('returns null when fewer than 3 items', () => {
+    expect(computePantryScore(2, 0, 0, 0, 0, 0)).toBeNull();
+  });
+
+  it('returns excellent label when score >= 85 with no issues', () => {
+    const result = computePantryScore(10, 0, 0, 0, 0, 0);
+    expect(result).not.toBeNull();
+    expect(result!.score).toBe(100);
+    expect(result!.label).toBe('excellent');
+  });
+
+  it('applies strong penalty for expired items', () => {
+    const result = computePantryScore(10, 2, 0, 0, 0, 0);
+    expect(result).not.toBeNull();
+    expect(result!.score).toBeLessThan(85);
+    expect(result!.label).not.toBe('excellent');
+  });
+
+  it('applies soft penalty for no-date items', () => {
+    const perfect = computePantryScore(10, 0, 0, 0, 0, 0)!;
+    const withNoDate = computePantryScore(10, 0, 0, 5, 0, 0)!;
+    expect(withNoDate.score).toBeLessThan(perfect.score);
+  });
+
+  it('returns poor label when score < 40', () => {
+    // max expired penalty (40) + max nearExpiry penalty (20) + noDate penalty (15) = 75 deducted → score 25
+    const result = computePantryScore(10, 10, 10, 10, 0, 0);
+    expect(result!.score).toBeLessThan(40);
+    expect(result!.label).toBe('poor');
+  });
+});
+
+describe('computeFoodCoverage', () => {
+  it('returns null when fewer than 3 items', () => {
+    const items = [makeItem(), makeItem()];
+    expect(computeFoodCoverage(items)).toBeNull();
+  });
+
+  it('returns null when total portions are 0', () => {
+    const items = [
+      makeItem({ batches: [{ batchId: 'b1', quantity: 0 }] }),
+      makeItem({ batches: [{ batchId: 'b1', quantity: 0 }] }),
+      makeItem({ batches: [{ batchId: 'b1', quantity: 0 }] }),
+    ];
+    expect(computeFoodCoverage(items)).toBeNull();
+  });
+
+  it('returns days unit for small quantities', () => {
+    const items = [
+      makeItem({ batches: [{ batchId: 'b1', quantity: 3 }] }),
+      makeItem({ batches: [{ batchId: 'b1', quantity: 3 }] }),
+      makeItem({ batches: [{ batchId: 'b1', quantity: 3 }] }),
+    ];
+    const result = computeFoodCoverage(items)!;
+    expect(result.unit).toBe('days');
+    expect(result.value).toBeGreaterThan(0);
+  });
+
+  it('returns months unit when >= 30 days', () => {
+    const items = Array.from({ length: 5 }, () =>
+      makeItem({ batches: [{ batchId: 'b1', quantity: 20 }] })
+    );
+    const result = computeFoodCoverage(items)!;
+    expect(['months', 'years']).toContain(result.unit);
+  });
+
+  it('enhanced flag is true when >= 50% of items have foodType', () => {
+    const items = [
+      makeItem({ foodType: FoodType.PROTEIN, batches: [{ batchId: 'b1', quantity: 5 }] }),
+      makeItem({ foodType: FoodType.CARB, batches: [{ batchId: 'b1', quantity: 5 }] }),
+      makeItem({ foodType: FoodType.DAIRY, batches: [{ batchId: 'b1', quantity: 5 }] }),
+    ];
+    const result = computeFoodCoverage(items)!;
+    expect(result.enhanced).toBe(true);
   });
 });
