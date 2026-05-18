@@ -54,15 +54,6 @@
     color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
   }
 
-  &--warning {
-    background: color-mix(in srgb, var(--ion-color-warning) 15%, transparent);
-    .metric-card__value { color: var(--ion-color-warning-shade); }
-  }
-
-  &--danger {
-    background: color-mix(in srgb, var(--ion-color-danger) 12%, transparent);
-    .metric-card__value { color: var(--ion-color-danger); }
-  }
 }
 
 .no-expiry-hint {
@@ -350,10 +341,7 @@
   &__fill {
     height: 100%;
     border-radius: 3px;
+    background: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
     transition: width 0.3s ease;
-
-    &--good    { background: var(--ion-color-success); }
-    &--warning { background: var(--ion-color-warning); }
-    &--danger  { background: var(--ion-color-danger); }
   }
 }
