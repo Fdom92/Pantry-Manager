@@ -1,41 +1,18 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
-import { computeFoodCoverage, computePantryScore, computeTodaySuggestion, getRecentItemsByUpdatedAt } from '@core/domain/dashboard';
+import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { computeTodaySuggestion } from '@core/domain/dashboard';
 import { applyFifoConsumption } from '@core/domain/pantry';
-import { applyBatchEditFilter } from '@core/models/pantry/batch-edit.model';
-import type { FoodCoverageResult, PantryScoreResult, TodaySuggestion } from '@core/domain/dashboard';
+import type { TodaySuggestion } from '@core/domain/dashboard';
 import type {
-  Insight,
-  InsightContext,
-  InsightCta,
   PantryItem,
 } from '@core/models';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
-import { ES_DATE_FORMAT_OPTIONS } from '@core/models';
 import { LanguageService } from '../shared/language.service';
-import { withSignalFlag } from '@core/utils';
-import { ConfirmService } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { PantryService } from '../pantry/pantry.service';
-import { DashboardInsightService } from './dashboard-insight.service';
-import { BatchEditStateService } from './batch-edit-state.service';
-import { formatDateTimeValue, formatDateValue } from '@core/utils/formatting.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-
-export enum PantryHealthState {
-  CRITICAL = 'critical',
-  ATTENTION = 'attention',
-  OPTIMAL = 'optimal'
-}
-
-export interface PantryHealth {
-  state: PantryHealthState;
-  title: string;
-  description: string;
-  accentColor: 'danger' | 'warning' | 'success';
-}
 
 export enum ActionPriority {
   CRITICAL = 0,
@@ -63,13 +40,10 @@ export interface DashboardAction {
 export class DashboardStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly pantryService = inject(PantryService);
-  private readonly insightService = inject(DashboardInsightService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
-  private readonly confirm = inject(ConfirmService);
   private readonly reviewPrompt = inject(ReviewPromptService);
-  private readonly batchEdit = inject(BatchEditStateService);
 
   private hasCompletedInitialLoad = false;
   private readonly dismissedActionIds = signal(new Set<string>());
@@ -88,10 +62,7 @@ export class DashboardStateService {
     !this.hasCompletedInitialLoad && (this.pantryStore.loading() || !this.pantryStore.endReached())
   );
 
-  readonly isSnapshotCardExpanded = signal(true);
   readonly lastRefreshTimestamp = signal<string | null>(null);
-  readonly isDeletingExpiredItems = signal(false);
-  readonly visibleInsights = signal<Insight[]>([]);
 
   // Today's suggestion block
   readonly isCookingConfirmed = signal(false);
@@ -100,22 +71,7 @@ export class DashboardStateService {
   private readonly dismissedTodayIds = signal(new Set<string>());
 
   readonly totalItems = computed(() => this.inventorySummary().total);
-  readonly recentlyUpdatedItems = computed(() => getRecentItemsByUpdatedAt(this.pantryItems()));
   readonly hasExpiredItems = computed(() => this.expiredItems().length > 0);
-  readonly basicProductsCount = computed(() => {
-    const items = this.pantryItems();
-    if (!items?.length) {
-      return 0;
-    }
-    return items.filter(item => item.isBasic === true).length;
-  });
-  readonly completeProductsCount = computed(() => {
-    const items = this.pantryItems();
-    if (!items?.length) {
-      return 0;
-    }
-    return items.filter(item => item.isBasic !== true && item.batches && item.batches.length > 0).length;
-  });
   readonly shoppingListCount = computed(() => {
     const items = this.pantryItems();
     if (!items?.length) {
@@ -140,78 +96,6 @@ export class DashboardStateService {
       const allMarkedNoExpiry = item.batches?.length > 0 && item.batches.every(b => !!b.noExpiry);
       return !allMarkedNoExpiry;
     }).length;
-  });
-
-  readonly pantryScore = computed((): PantryScoreResult | null => {
-    return computePantryScore(
-      this.totalItems(),
-      this.expiredItems().length,
-      this.nearExpiryItems().length + this.reviewItems().length,
-      this.noExpiryDateCount(),
-      this.lowStockItems().length,
-      this.stalePantryItemsCount(),
-    );
-  });
-
-  readonly foodCoverage = computed((): FoodCoverageResult | null => {
-    const expiredIds = new Set(this.expiredItems().map(i => i._id));
-    const activeItems = this.pantryItems().filter(i => !expiredIds.has(i._id));
-    return computeFoodCoverage(activeItems);
-  });
-
-  readonly pantryHealth = computed((): PantryHealth => {
-    const expired = this.expiredItems().length;
-    const nearExpiry = this.nearExpiryItems().length + this.reviewItems().length;
-    const stale = this.stalePantryItemsCount();
-    const total = this.totalItems();
-    const withDates = this.completeProductsCount();
-
-    // CRITICAL: Urgent action required
-    if (expired > 0) {
-      return {
-        state: PantryHealthState.CRITICAL,
-        title: this.translate.instant('dashboard.health.critical.title'),
-        description: this.translate.instant('dashboard.health.critical.description'),
-        accentColor: 'danger',
-      };
-    }
-
-    // ATTENTION: Prevention needed
-    if (nearExpiry > 0) {
-      return {
-        state: PantryHealthState.ATTENTION,
-        title: this.translate.instant('dashboard.health.attention.title'),
-        description: this.translate.instant('dashboard.health.attention.description'),
-        accentColor: 'warning',
-      };
-    }
-
-    // Low tracking but no urgency
-    if (total > 10 && withDates < total * 0.3) {
-      return {
-        state: PantryHealthState.ATTENTION,
-        title: this.translate.instant('dashboard.health.attention.trackingTitle'),
-        description: this.translate.instant('dashboard.health.attention.trackingDescription'),
-        accentColor: 'warning',
-      };
-    }
-
-    // OPTIMAL: Everything under control
-    if (stale > 5) {
-      return {
-        state: PantryHealthState.OPTIMAL,
-        title: this.translate.instant('dashboard.health.optimal.controlledTitle'),
-        description: this.translate.instant('dashboard.health.optimal.controlledDescription'),
-        accentColor: 'success',
-      };
-    }
-
-    return {
-      state: PantryHealthState.OPTIMAL,
-      title: this.translate.instant('dashboard.health.optimal.perfectTitle'),
-      description: this.translate.instant('dashboard.health.optimal.perfectDescription'),
-      accentColor: 'success',
-    };
   });
 
   readonly stalePantryItems = computed(() => {
@@ -374,15 +258,6 @@ export class DashboardStateService {
       }
       this.lastRefreshTimestamp.set(new Date().toISOString());
     });
-
-    effect(() => {
-      const items = this.pantryItems();
-      const expiringSoon = this.nearExpiryItems();
-      if (!this.hasCompletedInitialLoad) {
-        return;
-      }
-      this.refreshDashboardInsights(items, expiringSoon);
-    });
   }
 
   async ionViewWillEnter(): Promise<void> {
@@ -390,27 +265,6 @@ export class DashboardStateService {
     this.hasCompletedInitialLoad = true;
     this.lastRefreshTimestamp.set(new Date().toISOString());
     void this.reviewPrompt.handleDashboardEnter();
-  }
-
-  dismissInsight(insight: Insight): void {
-    this.insightService.dismiss(insight.id);
-    this.visibleInsights.update(current => current.filter(item => item.id !== insight.id));
-  }
-
-  async onInsightAction(_: Insight, cta: InsightCta): Promise<void> {
-    if (!cta) {
-      return;
-    }
-    if (cta.type === 'navigate') {
-      if (cta.route) {
-        await this.navCtrl.navigateForward(cta.route);
-      }
-      return;
-    }
-    if (cta.type === 'batch-edit') {
-      this.batchEdit.openFlow({ filter: cta.filter, action: cta.action });
-      return;
-    }
   }
 
   async onOverviewCardSelected(card: DashboardOverviewCardId): Promise<void> {
@@ -438,10 +292,6 @@ export class DashboardStateService {
       default:
         return;
     }
-  }
-
-  toggleSnapshotCard(): void {
-    this.isSnapshotCardExpanded.update(open => !open);
   }
 
   dismissAction(action: DashboardAction): void {
@@ -498,58 +348,6 @@ export class DashboardStateService {
     return this.translate.instant('dashboard.today.expiry.inDays', { count: diffDays });
   }
 
-  getHealthIcon(state: PantryHealthState): string {
-    switch (state) {
-      case PantryHealthState.CRITICAL:
-        return 'alert-circle';
-      case PantryHealthState.ATTENTION:
-        return 'warning';
-      case PantryHealthState.OPTIMAL:
-        return 'checkmark-circle';
-      default:
-        return 'information-circle';
-    }
-  }
-
-  async deleteExpiredItems(): Promise<void> {
-    if (this.isDeletingExpiredItems() || !this.hasExpiredItems()) {
-      return;
-    }
-
-    if (!this.confirm.confirm(this.translate.instant('dashboard.confirmDeleteExpired'))) {
-      return;
-    }
-
-    await withSignalFlag(this.isDeletingExpiredItems, async () => {
-      const expiredItems = this.expiredItems();
-      if (!expiredItems.length) {
-        return;
-      }
-
-      await Promise.all(expiredItems.map(item => this.pantryStore.deleteItem(item._id)));
-    }).catch(err => {
-      console.error('[DashboardStateService] deleteExpiredItems error', err);
-    });
-  }
-
-  getItemTotalQuantity(item: PantryItem): number {
-    return this.pantryStore.getItemTotalQuantity(item);
-  }
-
-  getItemTotalMinThreshold(item: PantryItem): number {
-    return this.pantryStore.getItemTotalMinThreshold(item);
-  }
-
-  formatLastUpdated(value: string | null): string {
-    return formatDateTimeValue(value, this.languageService.getCurrentLocale(), { fallback: '' });
-  }
-
-  formatDate(value?: string | null): string {
-    return formatDateValue(value ?? null, this.languageService.getCurrentLocale(), ES_DATE_FORMAT_OPTIONS.short, {
-      fallback: this.translate.instant('common.dates.none'),
-    });
-  }
-
   private getReferenceNow(): Date {
     const timestamp = this.lastRefreshTimestamp();
     if (timestamp) {
@@ -559,31 +357,6 @@ export class DashboardStateService {
       }
     }
     return new Date();
-  }
-
-  private refreshDashboardInsights(items: PantryItem[], expiringSoon: PantryItem[]): void {
-    if (!items?.length) {
-      this.visibleInsights.set([]);
-      return;
-    }
-
-    const context: InsightContext = {
-      expiringSoonItems: expiringSoon.map(item => ({
-        id: item._id,
-        quantity: this.pantryStore.getItemTotalQuantity(item),
-      })),
-      noExpiryDateCount: this.noExpiryDateCount(),
-      singleBatchNoExpiryCount: applyBatchEditFilter(items, 'noExpiryDateSingleBatch').length,
-      products: items.map(item => ({
-        id: item._id,
-        name: item.name,
-        categoryId: item.categoryId,
-        foodType: item.foodType ?? null,
-      })),
-    };
-
-    const generated = this.insightService.buildDashboardInsights(context);
-    this.visibleInsights.set(this.insightService.getVisibleInsights(generated));
   }
 
   private getOverviewCardCount(card: DashboardOverviewCardId): number {
