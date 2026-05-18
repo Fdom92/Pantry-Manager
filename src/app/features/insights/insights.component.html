@@ -19,12 +19,6 @@
       </section>
     } @else {
 
-      <!-- SECTION 1: Status banner -->
-      <section class="insights-status-banner" [attr.data-state]="facade.pantryHealthState()">
-        <ion-icon [name]="getPantryHealthIcon(facade.pantryHealthState())"></ion-icon>
-        <span>{{ 'insights.status.' + facade.pantryHealthState() | translate }}</span>
-      </section>
-
       <!-- SECTION 2: Tu despensa ahora -->
       <section class="insights-section">
         <h3 class="insights-section__title">{{ 'insights.snapshot.title' | translate }}</h3>
@@ -33,15 +27,15 @@
             <span class="metric-card__value">{{ facade.inventorySnapshot().active }}</span>
             <span class="metric-card__label">{{ 'insights.snapshot.active' | translate }}</span>
           </div>
-          <div class="metric-card" [class.metric-card--danger]="facade.inventorySnapshot().expired > 0">
+          <div class="metric-card">
             <span class="metric-card__value">{{ facade.inventorySnapshot().expired }}</span>
             <span class="metric-card__label">{{ 'insights.snapshot.expired' | translate }}</span>
           </div>
-          <div class="metric-card" [class.metric-card--warning]="facade.inventorySnapshot().review > 0">
+          <div class="metric-card">
             <span class="metric-card__value">{{ facade.inventorySnapshot().review }}</span>
             <span class="metric-card__label">{{ 'insights.snapshot.review' | translate }}</span>
           </div>
-          <div class="metric-card" [class.metric-card--warning]="facade.inventorySnapshot().noExpiryDate > 0">
+          <div class="metric-card">
             <span class="metric-card__value">{{ facade.inventorySnapshot().noExpiryDate }}</span>
             <span class="metric-card__label">{{ 'insights.snapshot.noDate' | translate }}</span>
           </div>
@@ -112,14 +106,14 @@
           </div>
           <div class="distribution-badges">
             @if (facade.distribution().mostWastedFoodType) {
-              <p class="distribution-badge distribution-badge--waste">
+              <p class="distribution-badge">
                 <ion-icon name="alert-circle-outline"></ion-icon>
                 {{ 'insights.distribution.mostWasted' | translate }}:
                 {{ getFoodTypeLabel(facade.distribution().mostWastedFoodType!) }}
               </p>
             }
             @if (facade.distribution().leastRotatingFoodType) {
-              <p class="distribution-badge distribution-badge--rotation">
+              <p class="distribution-badge">
                 <ion-icon name="time-outline"></ion-icon>
                 {{ 'insights.distribution.leastRotating' | translate }}:
                 {{ getFoodTypeLabel(facade.distribution().leastRotatingFoodType!) }}
