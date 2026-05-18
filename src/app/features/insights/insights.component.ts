@@ -13,6 +13,7 @@ import {
   IonButtons,
 } from '@ionic/angular/standalone';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
+import { PantryHealthState } from '@core/domain/insights/insights-free.domain';
 import { FoodType } from '@core/models/shared/enums.model';
 
 @Component({
@@ -38,6 +39,7 @@ import { FoodType } from '@core/models/shared/enums.model';
 export class InsightsComponent {
   readonly facade = inject(InsightsStateService);
   readonly FoodType = FoodType;
+  readonly PantryHealthState = PantryHealthState;
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
@@ -45,6 +47,22 @@ export class InsightsComponent {
 
   formatPercent(ratio: number): string {
     return `${Math.round(ratio * 100)}%`;
+  }
+
+  getBarWidth(count: number, maxCount: number): string {
+    if (maxCount === 0) return '0%';
+    return `${Math.round((count / maxCount) * 100)}%`;
+  }
+
+  getQualityBarWidth(count: number, total: number): string {
+    if (total === 0) return '0%';
+    return `${Math.round((count / total) * 100)}%`;
+  }
+
+  getMaxFoodTypeCount(): number {
+    const foodTypes = this.facade.distribution().foodTypes;
+    if (!foodTypes.length) return 0;
+    return Math.max(...foodTypes.map(f => f.count));
   }
 
   getWasteRatioColor(ratio: number | null): string {
@@ -55,20 +73,29 @@ export class InsightsComponent {
     return 'waste-high';
   }
 
-  getBarWidth(count: number, maxCount: number): string {
-    if (maxCount === 0) return '0%';
-    return `${Math.round((count / maxCount) * 100)}%`;
+  getPantryHealthIcon(state: PantryHealthState): string {
+    switch (state) {
+      case PantryHealthState.CRITICAL:  return 'alert-circle';
+      case PantryHealthState.ATTENTION: return 'warning';
+      case PantryHealthState.OPTIMAL:   return 'checkmark-circle';
+      default: return 'information-circle';
+    }
   }
 
-  getFoodTypeKey(foodType: FoodType): string {
+  getRotationLabel(ratio: 'high' | 'medium' | 'low' | null): string {
+    if (ratio === null) return 'insights.activity.rotationNone';
+    return `insights.activity.rotation${ratio.charAt(0).toUpperCase()}${ratio.slice(1)}`;
+  }
+
+  getFoodTypeLabel(foodType: FoodType): string {
     const map: Record<FoodType, string> = {
-      [FoodType.PROTEIN]: 'Proteínas',
-      [FoodType.CARB]: 'Carbohidratos',
+      [FoodType.PROTEIN]:   'Proteínas',
+      [FoodType.CARB]:      'Carbohidratos',
       [FoodType.VEGETABLE]: 'Verduras',
-      [FoodType.FRUIT]: 'Fruta',
-      [FoodType.DAIRY]: 'Lácteos',
+      [FoodType.FRUIT]:     'Fruta',
+      [FoodType.DAIRY]:     'Lácteos',
       [FoodType.HOUSEHOLD]: 'Hogar',
-      [FoodType.OTHER]: 'Otros',
+      [FoodType.OTHER]:     'Otros',
     };
     return map[foodType] ?? foodType;
   }
