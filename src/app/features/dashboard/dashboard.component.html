@@ -12,59 +12,13 @@
 <ion-content class="ion-padding">
   <div class="dashboard" [attr.aria-label]="'dashboard.aria' | translate">
     @if (facade.isInitialInventoryLoading()) {
-      <!-- Loading skeleton -->
       <section class="dashboard-section">
-        <div class="pantry-health pantry-health--skeleton">
-          <div class="pantry-health__icon">
-            <ion-skeleton-text animated style="width: 32px; height: 32px; border-radius: 50%;"></ion-skeleton-text>
-          </div>
-          <div class="pantry-health__content">
-            <ion-skeleton-text animated style="width: 160px; height: 20px; margin-bottom: 8px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 220px; height: 14px;"></ion-skeleton-text>
-          </div>
-        </div>
+        <ion-skeleton-text animated style="width: 60%; height: 20px; margin-bottom: 16px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 100%; height: 80px;"></ion-skeleton-text>
       </section>
     } @else {
-      <!-- LAYER 1: Health Status (Interpreted State) -->
-      <section class="dashboard-section">
-        <div class="pantry-health" [attr.data-state]="facade.pantryHealth().state">
-          <div class="pantry-health__icon">
-            <ion-icon [name]="facade.getHealthIcon(facade.pantryHealth().state)"></ion-icon>
-          </div>
-          <div class="pantry-health__content">
-              <h2 class="pantry-health__title">{{ facade.pantryHealth().title }}</h2>
-            <p class="pantry-health__description">{{ facade.pantryHealth().description }}</p>
-          </div>
-        </div>
-        <!-- Pantry Score -->
-        @if (facade.pantryScore()) {
-          <div class="pantry-score" [attr.data-label]="facade.pantryScore()!.label">
-            <ion-icon name="stats-chart-outline"></ion-icon>
-            <div class="pantry-score__content">
-              <span class="pantry-score__title">{{ 'dashboard.pantryScore.title' | translate }}</span>
-              <span class="pantry-score__value">
-                {{ facade.pantryScore()!.score }} · {{ 'dashboard.pantryScore.' + facade.pantryScore()!.label | translate }}
-              </span>
-              <p class="pantry-score__hint">{{ 'dashboard.pantryScore.hint' | translate }}</p>
-            </div>
-          </div>
-        }
-        <!-- Food Coverage -->
-        @if (facade.foodCoverage() !== null) {
-          <div class="pantry-score">
-            <ion-icon name="calendar-outline"></ion-icon>
-            <div class="pantry-score__content">
-              <span class="pantry-score__title">{{ 'dashboard.foodCoverage.title' | translate }}</span>
-              <span class="pantry-score__value">
-                {{ (facade.foodCoverage()!.value === 1 ? 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_one' : 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_other') | translate:{ count: facade.foodCoverage()!.value } }}
-              </span>
-              <p class="pantry-score__hint">{{ 'dashboard.foodCoverage.hint' | translate }}</p>
-            </div>
-          </div>
-        }
-      </section>
 
-<!-- LAYER HOY: Today's suggestion -->
+      <!-- Today's suggestion -->
       @if (facade.totalItems() > 0) {
         <section class="dashboard-section">
           <header class="dashboard-section-header">
@@ -124,7 +78,7 @@
                   </span>
                 }
               </div>
-              @if (facade.todaySuggestion()!.protagonist.daysToExpiry === null || facade.todaySuggestion()!.protagonist.daysToExpiry! <= 5) {
+              @if (shouldShowReason()) {
                 <p class="today-card__reason">{{ facade.todaySuggestion()!.reasonKey | translate: { name: facade.todaySuggestion()!.protagonist.name } }}</p>
               }
               @if (facade.todaySuggestion()!.secondaryItems.length > 0) {
@@ -134,9 +88,7 @@
               }
               <div class="today-card__footer">
                 @if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshOut') {
-                  <ion-button
-                    size="small"
-                    (click)="facade.dismissToday()">
+                  <ion-button size="small" (click)="facade.dismissToday()">
                     {{ 'dashboard.today.cta.dismiss' | translate }}
                   </ion-button>
                 } @else if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshExpiring') {
@@ -163,7 +115,7 @@
         </section>
       }
 
-<!-- LAYER 2: What to Do Now (Actions) -->
+      <!-- What to do now -->
       @if (facade.actions().length > 0) {
         <section class="dashboard-section">
           <header class="dashboard-section-header">
@@ -191,24 +143,6 @@
                   }
                 </div>
               </div>
-            }
-          </div>
-        </section>
-      }
-
-      <!-- LAYER 3: Insights -->
-      @if (facade.visibleInsights().length > 0) {
-        <section class="dashboard-section">
-          <header class="dashboard-section-header">
-            <h3 class="dashboard-section-title">{{ 'dashboard.sections.insights.title' | translate }}</h3>
-          </header>
-          <div class="actions-stack">
-            @for (insight of facade.visibleInsights(); track insight.id) {
-              <app-insight-card
-                [insight]="insight"
-                (dismiss)="facade.dismissInsight(insight)"
-                (ctaSelect)="facade.onInsightAction(insight, $event)">
-              </app-insight-card>
             }
           </div>
         </section>

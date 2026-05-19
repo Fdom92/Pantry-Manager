@@ -1,21 +1,41 @@
 import { roundQuantity } from '@core/utils/formatting.util';
-import { ShoppingReason, type ShoppingSummary } from '@core/models/list';
+import { ShoppingReason, type ShoppingSummary, type ShoppingSuggestionWithItem } from '@core/models/list';
+
+export const URGENCY_WEIGHT: Record<ShoppingReason, number> = {
+  [ShoppingReason.FRESH_EMPTY]: 1,
+  [ShoppingReason.EMPTY]:       2,
+  [ShoppingReason.BELOW_MIN]:   3,
+  [ShoppingReason.MANUAL]:      4,
+};
 
 export function determineSuggestionNeed(params: {
   totalQuantity: number;
   minThreshold: number | null;
+  isFresh?: boolean;
 }): { reason: ShoppingReason | null; suggestedQuantity: number } {
-  const { totalQuantity, minThreshold } = params;
+  const { totalQuantity, minThreshold, isFresh } = params;
 
   if (totalQuantity <= 0) {
-    return { reason: ShoppingReason.EMPTY, suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold ?? 1) };
+    const reason = isFresh ? ShoppingReason.FRESH_EMPTY : ShoppingReason.EMPTY;
+    return { reason, suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold ?? 1) };
   }
 
   if (minThreshold != null && totalQuantity < minThreshold) {
-    return { reason: ShoppingReason.BELOW_MIN, suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold - totalQuantity, minThreshold) };
+    return {
+      reason: ShoppingReason.BELOW_MIN,
+      suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold - totalQuantity, minThreshold),
+    };
   }
 
   return { reason: null, suggestedQuantity: 0 };
+}
+
+export function sortSuggestionsByUrgency(
+  suggestions: ShoppingSuggestionWithItem[]
+): ShoppingSuggestionWithItem[] {
+  return [...suggestions].sort(
+    (a, b) => (URGENCY_WEIGHT[a.reason] ?? 99) - (URGENCY_WEIGHT[b.reason] ?? 99)
+  );
 }
 
 export function incrementSummary(summary: ShoppingSummary, reason: ShoppingReason): ShoppingSummary {
@@ -23,6 +43,7 @@ export function incrementSummary(summary: ShoppingSummary, reason: ShoppingReaso
     case ShoppingReason.BELOW_MIN:
       return { ...summary, belowMin: summary.belowMin + 1 };
     case ShoppingReason.EMPTY:
+    case ShoppingReason.FRESH_EMPTY:
       return { ...summary, empty: summary.empty + 1 };
     default:
       return summary;
@@ -34,10 +55,8 @@ export function ensureMinimumSuggestedQuantity(value: number, fallback?: number)
   if (rounded > 0) {
     return rounded;
   }
-
   if (fallback != null && fallback > 0) {
     return roundQuantity(fallback);
   }
-
   return 1;
 }

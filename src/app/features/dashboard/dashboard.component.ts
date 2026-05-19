@@ -3,7 +3,6 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
-import { InsightCardComponent } from '@shared/components/insight-card/insight-card.component';
 import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edit-modal.component';
 import {
   IonButton,
@@ -32,7 +31,6 @@ import { TranslateModule } from '@ngx-translate/core';
     CommonModule,
     RouterLink,
     TranslateModule,
-    InsightCardComponent,
     BatchEditModalComponent,
   ],
   templateUrl: './dashboard.component.html',
@@ -42,12 +40,23 @@ import { TranslateModule } from '@ngx-translate/core';
 export class DashboardComponent {
   readonly facade = inject(DashboardStateService);
 
-  /** Lifecycle hook: populate dashboard data and stamp the refresh time. */
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
   }
 
   onSummaryCardClick(card: DashboardOverviewCardId): void {
     void this.facade.onOverviewCardSelected(card);
+  }
+
+  shouldShowReason(): boolean {
+    const s = this.facade.todaySuggestion();
+    if (!s) return false;
+    const { daysToExpiry, expirationDate } = s.protagonist;
+    const timeOnlyReasons = new Set([
+      'dashboard.today.reason.expiringsoon',
+      'dashboard.today.reason.expirestoday',
+    ]);
+    if (expirationDate && timeOnlyReasons.has(s.reasonKey)) return false;
+    return daysToExpiry === null || daysToExpiry <= 5;
   }
 }

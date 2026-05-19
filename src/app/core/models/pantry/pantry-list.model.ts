@@ -2,7 +2,7 @@ import type { StatusColor } from '../shared/color.model';
 import { ItemBatch } from './item-batch.model';
 import { PantryItem } from './item.model';
 
-export type PantryStatusFilterValue = 'all' | 'expired' | 'near-expiry' | 'low-stock' | 'normal';
+export type PantryStatusFilterValue = 'all' | 'expired' | 'review' | 'near-expiry' | 'low-stock' | 'normal';
 export type ExpiryClassification = 'expired' | 'near-expiry' | 'normal' | 'unknown';
 export type FilterChipKind = 'status';
 
@@ -24,6 +24,7 @@ export interface PantrySummaryMeta {
   statusCounts: {
     expired: number;
     expiring: number;
+    review: number;
     lowStock: number;
     normal: number;
   };
@@ -39,7 +40,7 @@ export interface PantryGroup {
 }
 
 export type BatchStatusState = 'normal' | 'near-expiry' | 'expired' | 'unknown';
-export type ProductStatusState = 'normal' | 'near-expiry' | 'expired' | 'low-stock';
+export type ProductStatusState = 'normal' | 'near-expiry' | 'review' | 'expired' | 'low-stock';
 
 export interface BatchStatusMeta {
   label: string;

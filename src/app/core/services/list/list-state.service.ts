@@ -1,15 +1,24 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
-import { SHOPPING_LIST_NAME } from '@core/constants';
-import { determineSuggestionNeed, incrementSummary } from '@core/domain/list';
+import { ToastController } from '@ionic/angular';
+import { SHOPPING_LIST_NAME, UNASSIGNED_SUPERMARKET_KEY } from '@core/constants';
+import {
+  determineSuggestionNeed,
+  incrementSummary,
+  sortSuggestionsByUrgency,
+} from '@core/domain/list';
 import { groupSuggestionsBySupermarket } from '@core/utils/list-grouping.util';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
 import {
+  type BoughtItem,
+  type ManualItem,
   type ShoppingStateWithItem,
   type ShoppingSuggestionGroupWithItem,
   type ShoppingSuggestionWithItem,
   type ShoppingSummary,
+  ShoppingReason,
 } from '@core/models/list';
+import { FRESH_QTY } from '@core/domain/pantry/fresh.domain';
 import { LanguageService } from '../shared/language.service';
 import { createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
 import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
@@ -28,11 +37,24 @@ export class ListStateService {
   private readonly languageService = inject(LanguageService);
   private readonly download = inject(DownloadService);
   private readonly share = inject(ShareService);
+  private readonly toastController = inject(ToastController);
 
   readonly isSharingListInProgress = signal(false);
 
+  // Ephemeral state — cleared on ionViewWillLeave
+  readonly boughtItemIds  = signal<Set<string>>(new Set());
+  readonly removedAutoIds = signal<Set<string>>(new Set());
+  readonly manualItems    = signal<ManualItem[]>([]);
+  readonly boughtManuals  = signal<BoughtItem[]>([]);
+
   readonly shoppingAnalysis = computed<ShoppingStateWithItem>(() => {
-    return this.buildShoppingAnalysis(this.items());
+    return this.buildShoppingAnalysis(
+      this.items(),
+      this.boughtItemIds(),
+      this.removedAutoIds(),
+      this.manualItems(),
+      this.boughtManuals(),
+    );
   });
 
   readonly loading = this.pantryStore.loading;
@@ -45,6 +67,82 @@ export class ListStateService {
     this.skeletonManager.startLoading();
     await this.pantryStore.loadAll();
     this.skeletonManager.stopLoading();
+  }
+
+  async ionViewWillLeave(): Promise<void> {
+    this.boughtItemIds.set(new Set());
+    this.removedAutoIds.set(new Set());
+    this.manualItems.set([]);
+    this.boughtManuals.set([]);
+  }
+
+  async markAsBought(suggestion: ShoppingSuggestionWithItem): Promise<void> {
+    const id = suggestion.item._id;
+    const name = suggestion.item.name;
+    this.boughtItemIds.update(set => new Set([...set, id]));
+
+    const qty = suggestion.reason === ShoppingReason.FRESH_EMPTY
+      ? FRESH_QTY.sufficient
+      : suggestion.suggestedQuantity;
+
+    try {
+      await this.pantryStore.addNewLot(id, { quantity: qty });
+      void this.showToast(this.translate.instant('shopping.toasts.bought', { name }));
+    } catch (err) {
+      console.error('[ListStateService] markAsBought: addNewLot failed', err);
+      this.boughtItemIds.update(set => {
+        const next = new Set(set);
+        next.delete(id);
+        return next;
+      });
+    }
+  }
+
+  markManualAsBought(id: string): void {
+    const item = this.manualItems().find(m => m.id === id);
+    if (!item) return;
+    this.manualItems.update(list => list.filter(m => m.id !== id));
+    this.boughtManuals.update(list => [...list, { id, name: item.name }]);
+    void this.showToast(this.translate.instant('shopping.toasts.boughtManual', { name: item.name }));
+  }
+
+  removeAutoItem(id: string): void {
+    const name = this.items().find(i => i._id === id)?.name;
+    this.removedAutoIds.update(set => new Set([...set, id]));
+    if (name) {
+      void this.showToast(this.translate.instant('shopping.toasts.ignored', { name }));
+    }
+  }
+
+  removeManualItem(id: string): void {
+    const item = this.manualItems().find(m => m.id === id);
+    this.manualItems.update(list => list.filter(m => m.id !== id));
+    if (item) {
+      void this.showToast(this.translate.instant('shopping.toasts.removedManual', { name: item.name }));
+    }
+  }
+
+  restoreFromBought(id: string): void {
+    this.boughtItemIds.update(set => {
+      const next = new Set(set);
+      next.delete(id);
+      return next;
+    });
+    this.boughtManuals.update(list => list.filter(b => b.id !== id));
+  }
+
+  addManualItem(name: string): void {
+    const id = crypto.randomUUID();
+    this.manualItems.update(list => [...list, { id, name }]);
+  }
+
+  private async showToast(message: string, duration = 2500): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration,
+      position: 'bottom',
+    });
+    await toast.present();
   }
 
   getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
@@ -91,19 +189,36 @@ export class ListStateService {
     });
   }
 
-  private buildShoppingAnalysis(items: PantryItem[]): ShoppingStateWithItem {
-    const suggestions: ShoppingSuggestionWithItem[] = [];
+  private buildShoppingAnalysis(
+    items: PantryItem[],
+    boughtIds: Set<string>,
+    removedIds: Set<string>,
+    _manualItems: ManualItem[], // tracked as signal dep so computed re-runs; rendered directly in template
+    boughtManuals: BoughtItem[],
+  ): ShoppingStateWithItem {
+    const pendingSuggestions: ShoppingSuggestionWithItem[] = [];
+    const boughtAutoItems: BoughtItem[] = [];
+    const ignoredAutoItems: BoughtItem[] = [];
     const uniqueSupermarkets = new Set<string>();
     let summary: ShoppingSummary = {
       total: 0,
       belowMin: 0,
       empty: 0,
       supermarketCount: 0,
+      boughtCount: 0,
     };
 
     for (const item of items) {
       const minThreshold = item.minThreshold != null ? Number(item.minThreshold) : null;
       const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
+      const supermarket = normalizeSupermarketValue(item.supermarket);
+      const id = item._id;
+
+      // Check bought FIRST — item stays in "Comprado" even after restock
+      if (boughtIds.has(id)) {
+        boughtAutoItems.push({ id, name: item.name, supermarket: supermarket || undefined });
+        continue;
+      }
 
       const shouldAutoAdd = this.pantryStore.shouldAutoAddToShoppingList(item, {
         totalQuantity,
@@ -114,35 +229,56 @@ export class ListStateService {
         continue;
       }
 
-      const { reason, suggestedQuantity } = determineSuggestionNeed({ totalQuantity, minThreshold });
+      // Track ignored items so they appear in the "Ocultos ahora" section
+      if (removedIds.has(id)) {
+        ignoredAutoItems.push({ id, name: item.name, supermarket: supermarket || undefined });
+        continue;
+      }
+
+      const { reason, suggestedQuantity } = determineSuggestionNeed({
+        totalQuantity,
+        minThreshold,
+        isFresh: item.productType === 'fresh',
+      });
 
       if (reason) {
-        const supermarket = normalizeSupermarketValue(item.supermarket);
         if (supermarket) {
           uniqueSupermarkets.add(normalizeLowercase(supermarket));
         }
-
-        suggestions.push({
+        pendingSuggestions.push({
           item,
           reason,
           suggestedQuantity,
           currentQuantity: roundQuantity(totalQuantity),
           minThreshold: minThreshold != null ? roundQuantity(minThreshold) : undefined,
-          supermarket,
+          supermarket: supermarket || undefined,
         });
-
         summary = incrementSummary(summary, reason);
       }
     }
 
-    summary.total = suggestions.length;
+    summary.total = pendingSuggestions.length;
     summary.supermarketCount = uniqueSupermarkets.size;
+    summary.boughtCount = boughtAutoItems.length + boughtManuals.length;
+
     const unassignedLabel = this.translate.instant('shopping.unassignedSupermarket');
     const groupedSuggestions = groupSuggestionsBySupermarket({
-      suggestions,
+      suggestions: pendingSuggestions,
       labelForUnassigned: unassignedLabel,
     });
-    return { suggestions, groupedSuggestions, summary };
+
+    const sortedGroups = groupedSuggestions.map(group => ({
+      ...group,
+      suggestions: sortSuggestionsByUrgency(group.suggestions),
+    }));
+
+    return {
+      suggestions: pendingSuggestions,
+      groupedSuggestions: sortedGroups,
+      summary,
+      allBoughtItems: [...boughtAutoItems, ...boughtManuals],
+      allIgnoredItems: ignoredAutoItems,
+    };
   }
 
   private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {

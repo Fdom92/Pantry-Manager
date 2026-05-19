@@ -58,6 +58,7 @@
                 <span class="batch-edit-item-name">{{ item.name }}</span>
                 <div class="batch-edit-date-cell">
                   <app-expiry-picker
+                    [mode]="item.productType === 'fresh' ? 'chips-only' : 'picker-only'"
                     [date]="state.getItemExpiryDate(item._id)"
                     [noExpiry]="state.getItemNoExpiry(item._id)"
                     (dateChange)="state.setItemValue(item._id, $event ?? null)"

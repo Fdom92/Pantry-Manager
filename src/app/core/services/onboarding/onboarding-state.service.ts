@@ -1,7 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { ONBOARDING_SLIDES } from '@core/constants/onboarding';
 import { STORAGE_KEYS } from '@core/constants';
-import { isLastIndex } from '@core/domain/onboarding';
 import type { OnboardingSlide } from '@core/models/onboarding';
 import { getBooleanFlag, setBooleanFlag } from '@core/utils/storage-flag.util';
 import { NavController } from '@ionic/angular';
@@ -57,7 +56,8 @@ export class OnboardingStateService {
   }
 
   isLastSlide(): boolean {
-    return isLastIndex(this.currentSlideIndex(), this.availableSlides.length);
+    const idx = this.currentSlideIndex();
+    return Number.isFinite(idx) && idx >= 0 && idx >= this.availableSlides.length - 1;
   }
 
   async goToNextSlide(swiperEl: any): Promise<void> {

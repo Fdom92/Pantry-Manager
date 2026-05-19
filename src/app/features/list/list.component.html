@@ -2,6 +2,16 @@
   <ion-toolbar>
     <ion-title>{{ 'shopping.title' | translate }}</ion-title>
     <ion-buttons slot="end">
+      <ion-button
+        (click)="facade.shareShoppingListReport()"
+        [disabled]="facade.loading() || facade.isSharingListInProgress() || !facade.shoppingAnalysis().summary.total"
+        [attr.aria-label]="'shopping.share.button' | translate">
+        @if (facade.isSharingListInProgress()) {
+          <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
+        } @else {
+          <ion-icon slot="icon-only" name="share-outline"></ion-icon>
+        }
+      </ion-button>
       <ion-button [routerLink]="['/settings']" [attr.aria-label]="'settings.title' | translate">
         <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
       </ion-button>
@@ -12,71 +22,206 @@
 <ion-content class="ion-padding">
   @let state = facade.shoppingAnalysis();
 
-  @if (!facade.loading() && !state.summary.total) {
-  <app-empty-state class="list-empty-state" icon="cart-outline" [iconColor]="'warning'"
-    [titleKey]="'emptyStates.shopping.title'" [subtitle]="'shopping.suggestions.empty' | translate">
-  </app-empty-state>
+  @if (facade.loading()) {
+    <div class="suggestion-groups">
+      @for (placeholder of [0, 1, 2]; track placeholder) {
+        <div class="skeleton-item">
+          <ion-skeleton-text animated style="width: 120px; height: 17px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 60px; height: 14px;"></ion-skeleton-text>
+        </div>
+      }
+    </div>
+  } @else if (!state.summary.total && !state.allBoughtItems.length && !state.allIgnoredItems.length && !facade.manualItems().length) {
+    <app-empty-state
+      class="list-empty-state"
+      icon="cart-outline"
+      [iconColor]="'warning'"
+      [titleKey]="'emptyStates.shopping.title'"
+      [subtitle]="'shopping.emptyState.autoHint' | translate">
+    </app-empty-state>
   } @else {
-  <ion-card class="suggestions-shell">
-    <ion-card-header class="suggestions-header">
-      <ion-card-title>
-        {{ 'shopping.suggestions.title' | translate }}
-        <ion-button fill="clear" color="primary" class="share-icon-button" (click)="facade.shareShoppingListReport()"
-          [disabled]="facade.loading() || facade.isSharingListInProgress() || !state.summary.total"
-          [attr.aria-label]="'shopping.share.button' | translate">
-          @if (facade.isSharingListInProgress()) {
-          <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
-          } @else {
-          <ion-icon slot="icon-only" name="share-outline"></ion-icon>
-          }
-        </ion-button>
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      @if (facade.loading()) {
-      <div class="suggestion-list shopping-skeleton-list">
-        @for (placeholder of [0, 1, 2]; track placeholder) {
-        <ion-card class="suggestion-card suggestion-card--skeleton">
-          <ion-card-content>
-            <div class="suggestion-content">
-              <div class="suggestion-data">
-                <ion-skeleton-text animated style="width: 120px; height: 17px;"></ion-skeleton-text>
-                <ion-skeleton-text animated style="width: 60px; height: 14px;"></ion-skeleton-text>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
-        }
-      </div>
-      } @else {
-      <div class="suggestion-groups fade-in-list">
-        @for (group of state.groupedSuggestions; track group.key) {
-        <div class="suggestion-group">
-          <h3 class="supermarket-heading">
-            {{ group.label }}
-          </h3>
-          <div class="suggestion-list">
-            @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
-            <ion-card class="suggestion-card">
-              <ion-card-content>
-                <div class="suggestion-content">
-                  <div class="suggestion-data">
-                    <h3>{{ suggestion.item.name }}</h3>
-                    <p class="meta">
-                      {{ 'shopping.suggestions.toBuy' | translate:{ amount: (suggestion.suggestedQuantity |
-                      number:'1.0-2') } }}
-                    </p>
-                  </div>
-                </div>
-              </ion-card-content>
-            </ion-card>
+    <div class="suggestion-groups fade-in-list">
+
+      <!-- Inline manual add row -->
+      <button class="manual-add-row pressable" (click)="openManualAdd()">
+        <ion-icon name="add-circle-outline" color="medium"></ion-icon>
+        <span>{{ 'shopping.manualAdd.inlineHint' | translate }}</span>
+      </button>
+
+      @for (group of state.groupedSuggestions; track group.key) {
+        @if (group.suggestions.length) {
+          <div class="suggestion-group">
+
+            <!-- Group header -->
+            <button class="supermarket-heading pressable" (click)="toggleGroup(group.key)">
+              <span>{{ group.label }}</span>
+              <ion-badge color="medium" class="group-count">{{ group.suggestions.length }}</ion-badge>
+              <ion-icon
+                class="collapse-icon"
+                [name]="isGroupCollapsed(group.key) ? 'chevron-up-outline' : 'chevron-down-outline'">
+              </ion-icon>
+            </button>
+
+            @if (!isGroupCollapsed(group.key)) {
+              <ion-list class="item-list" lines="none">
+                @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
+                  <ion-item-sliding>
+                    <ion-item
+                      detail="false"
+                      class="suggestion-item">
+                      <div class="item-body" slot="start">
+                        <span class="item-name">{{ suggestion.item.name }}</span>
+                        <div class="item-meta">
+                          @if (suggestion.reason === 'fresh-empty') {
+                            <ion-badge color="success" class="reason-chip">
+                              🥬 {{ 'shopping.chips.freshEmpty' | translate }}
+                            </ion-badge>
+                          } @else if (suggestion.reason === 'empty') {
+                            <ion-badge color="danger" class="reason-chip">
+                              {{ 'shopping.chips.empty' | translate }}
+                            </ion-badge>
+                          } @else if (suggestion.reason === 'below-min') {
+                            <ion-badge color="warning" class="reason-chip">
+                              {{ 'shopping.chips.belowMin' | translate }}
+                            </ion-badge>
+                          }
+                          @if (suggestion.item.isBasic) {
+                            <ion-badge color="primary" class="reason-chip reason-chip--basic">
+                              ⭐ {{ 'shopping.chips.basic' | translate }}
+                            </ion-badge>
+                          }
+                        </div>
+                        <span class="item-qty">
+                          @if (suggestion.reason === 'fresh-empty') {
+                            {{ 'shopping.suggestions.restockFresh' | translate }}
+                          } @else {
+                            {{ 'shopping.suggestions.restock' | translate:{ amount: suggestion.suggestedQuantity } }}
+                          }
+                        </span>
+                      </div>
+                      <ion-button
+                        slot="end"
+                        fill="solid"
+                        color="primary"
+                        shape="round"
+                        class="buy-btn"
+                        (click)="facade.markAsBought(suggestion)">
+                        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+                      </ion-button>
+                    </ion-item>
+                    <ion-item-options side="end">
+                      <ion-item-option
+                        color="medium"
+                        (click)="facade.removeAutoItem(suggestion.item._id)">
+                        <ion-icon slot="icon-only" name="eye-off-outline"></ion-icon>
+                      </ion-item-option>
+                    </ion-item-options>
+                  </ion-item-sliding>
+                }
+              </ion-list>
             }
           </div>
-        </div>
         }
-      </div>
       }
-    </ion-card-content>
-  </ion-card>
+
+      <!-- Manual items (pending) -->
+      @if (facade.manualItems().length) {
+        <div class="suggestion-group">
+          <div class="supermarket-heading manual-heading">
+            <span>{{ 'shopping.manualAdd.sectionTitle' | translate }}</span>
+          </div>
+          <ion-list class="item-list" lines="none">
+            @for (manual of facade.manualItems(); track manual.id) {
+              <ion-item-sliding>
+                <ion-item detail="false" class="suggestion-item">
+                  <div class="item-body" slot="start">
+                    <span class="item-name">{{ manual.name }}</span>
+                    <div class="item-meta">
+                      <ion-badge color="medium" class="reason-chip reason-chip--manual">
+                        {{ 'shopping.chips.manual' | translate }}
+                      </ion-badge>
+                    </div>
+                  </div>
+                  <ion-button
+                    slot="end"
+                    fill="solid"
+                    color="primary"
+                    shape="round"
+                    class="buy-btn"
+                    (click)="facade.markManualAsBought(manual.id)">
+                    <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+                  </ion-button>
+                </ion-item>
+                <ion-item-options side="end">
+                  <ion-item-option color="danger" (click)="facade.removeManualItem(manual.id)">
+                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                  </ion-item-option>
+                </ion-item-options>
+              </ion-item-sliding>
+            }
+          </ion-list>
+        </div>
+      }
+
+      <!-- Global "Comprado" section -->
+      @if (state.allBoughtItems.length) {
+        <div class="suggestion-group">
+          <button class="bought-section-header pressable" (click)="toggleGlobalBought()">
+            <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+            <span>{{ 'shopping.bought.sectionTitle' | translate }}</span>
+            <ion-badge color="success" class="group-count">{{ state.allBoughtItems.length }}</ion-badge>
+            <ion-icon
+              class="collapse-icon"
+              [name]="globalBoughtExpanded() ? 'chevron-down-outline' : 'chevron-up-outline'">
+            </ion-icon>
+          </button>
+          @if (globalBoughtExpanded()) {
+            <ion-list class="item-list bought-list" lines="none">
+              @for (bought of state.allBoughtItems; track bought.id) {
+                <ion-item-sliding>
+                  <ion-item class="bought-item" detail="false">
+                    <ion-icon slot="start" name="checkmark-circle" color="success"></ion-icon>
+                    <span class="item-name bought-name">{{ bought.name }}</span>
+                  </ion-item>
+                  <ion-item-options side="start">
+                    <ion-item-option (click)="facade.restoreFromBought(bought.id)">
+                      <ion-icon slot="icon-only" name="arrow-undo-outline"></ion-icon>
+                    </ion-item-option>
+                  </ion-item-options>
+                </ion-item-sliding>
+              }
+            </ion-list>
+          }
+        </div>
+      }
+
+      <!-- Global "Ignorados" section -->
+      @if (state.allIgnoredItems.length) {
+        <div class="suggestion-group">
+          <button class="ignored-section-header pressable" (click)="toggleGlobalIgnored()">
+            <ion-icon name="eye-off-outline" color="medium"></ion-icon>
+            <span>{{ 'shopping.ignored.sectionTitle' | translate }}</span>
+            <ion-badge color="medium" class="group-count">{{ state.allIgnoredItems.length }}</ion-badge>
+            <ion-icon
+              class="collapse-icon"
+              [name]="globalIgnoredExpanded() ? 'chevron-down-outline' : 'chevron-up-outline'">
+            </ion-icon>
+          </button>
+          @if (globalIgnoredExpanded()) {
+            <ion-list class="item-list ignored-list" lines="none">
+              @for (ignored of state.allIgnoredItems; track ignored.id) {
+                <ion-item detail="false" class="ignored-item">
+                  <ion-icon slot="start" name="eye-off-outline" color="medium"></ion-icon>
+                  <span class="item-name ignored-name">{{ ignored.name }}</span>
+                </ion-item>
+              }
+            </ion-list>
+          }
+        </div>
+      }
+
+    </div>
   }
+
+
 </ion-content>

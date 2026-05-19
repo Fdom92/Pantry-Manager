@@ -5,7 +5,7 @@ import type { AppPreferences } from '@core/models/settings';
 
 export class NearExpiryNotification implements NotificationDefinition {
   readonly id = NOTIFICATION_IDS.NEAR_EXPIRY;
-  readonly priority = 30;
+  readonly priority = 60;
 
   isEnabled(preferences: AppPreferences): boolean {
     return Boolean(preferences.notificationsEnabled && preferences.notifyOnNearExpiry);

@@ -1,0 +1,271 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ 'insights.title' | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/settings']" [attr.aria-label]="'settings.title' | translate">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="insights">
+
+    @if (facade.isLoadingEvents()) {
+      <section class="insights-section">
+        <ion-skeleton-text animated style="width: 60%; height: 20px; margin-bottom: 16px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 100%; height: 80px;"></ion-skeleton-text>
+      </section>
+    } @else {
+
+      <!-- SECTION 2: Tu despensa ahora -->
+      <section class="insights-section">
+        <h3 class="insights-section__title">{{ 'insights.snapshot.title' | translate }}</h3>
+        <div class="snapshot-grid">
+          <div class="metric-card">
+            <span class="metric-card__value">{{ facade.inventorySnapshot().active }}</span>
+            <span class="metric-card__label">{{ 'insights.snapshot.active' | translate }}</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-card__value">{{ facade.inventorySnapshot().expired }}</span>
+            <span class="metric-card__label">{{ 'insights.snapshot.expired' | translate }}</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-card__value">{{ facade.inventorySnapshot().review }}</span>
+            <span class="metric-card__label">{{ 'insights.snapshot.review' | translate }}</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-card__value">{{ facade.inventorySnapshot().noExpiryDate }}</span>
+            <span class="metric-card__label">{{ 'insights.snapshot.noDate' | translate }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: Cobertura estimada -->
+      @if (facade.foodCoverage()) {
+        <section class="insights-section">
+          <h3 class="insights-section__title">{{ 'insights.coverage.title' | translate }}</h3>
+          <div class="coverage-card">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <div class="coverage-card__info">
+              <span class="coverage-card__value">
+                {{ (facade.foodCoverage()!.value === 1
+                      ? 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_one'
+                      : 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_other')
+                    | translate:{ count: facade.foodCoverage()!.value } }}
+              </span>
+              <span class="coverage-card__hint">{{ 'dashboard.foodCoverage.hint' | translate }}</span>
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- SECTION 4: Últimos 30 días -->
+      <section class="insights-section">
+        <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
+        <div class="activity-row">
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().consumed }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.consumed' | translate }}</span>
+          </div>
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().expired }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.expired' | translate }}</span>
+          </div>
+          <div class="activity-stat">
+            @if (facade.activityMetrics().wasteRatio !== null && facade.activityMetrics().wasteRatio! > 0) {
+              <span class="activity-stat__value">{{ formatPercent(facade.activityMetrics().wasteRatio!) }}</span>
+            } @else {
+              <span class="activity-stat__value">—</span>
+            }
+            <span class="activity-stat__label">{{ 'insights.activity.wasteRatio' | translate }}</span>
+          </div>
+        </div>
+        <div class="rotation-badge">
+          <ion-icon name="refresh-outline"></ion-icon>
+          <span>{{ getRotationLabel(facade.activityMetrics().rotationRatio) | translate }}</span>
+        </div>
+      </section>
+
+      <!-- SECTION 5: Por tipo de alimento -->
+      @if (facade.distribution().foodTypes.length > 0) {
+        <section class="insights-section">
+          <h3 class="insights-section__title">{{ 'insights.distribution.title' | translate }}</h3>
+          <div class="food-type-bars">
+            @for (ft of facade.distribution().foodTypes; track ft.foodType) {
+              <div class="food-type-bar">
+                <span class="food-type-bar__label">{{ getFoodTypeLabel(ft.foodType) | translate }}</span>
+                <div class="food-type-bar__track">
+                  <div
+                    class="food-type-bar__fill"
+                    [style.width]="getBarWidth(ft.count, getMaxFoodTypeCount())">
+                  </div>
+                </div>
+                <span class="food-type-bar__count">{{ ft.count }}</span>
+              </div>
+            }
+          </div>
+          <div class="distribution-badges">
+            @if (facade.distribution().mostWastedFoodType) {
+              <p class="distribution-badge">
+                <ion-icon name="analytics-outline"></ion-icon>
+                {{ 'insights.distribution.mostWasted' | translate }}:
+                {{ getFoodTypeLabel(facade.distribution().mostWastedFoodType!) | translate }}
+              </p>
+            }
+            @if (facade.distribution().leastRotatingFoodType) {
+              <p class="distribution-badge">
+                <ion-icon name="time-outline"></ion-icon>
+                {{ 'insights.distribution.leastRotating' | translate }}:
+                {{ getFoodTypeLabel(facade.distribution().leastRotatingFoodType!) | translate }}
+              </p>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- SECTION 6: Calidad del inventario -->
+      @if (facade.inventorySnapshot().total >= 3) {
+        <section class="insights-section">
+          <h3 class="insights-section__title">{{ 'insights.quality.title' | translate }}</h3>
+
+          @if (facade.pantryScore()) {
+            <div class="quality-score" [attr.data-label]="facade.pantryScore()!.label">
+              <span class="quality-score__value">{{ facade.pantryScore()!.score }}</span>
+              <span class="quality-score__label">
+                {{ 'dashboard.pantryScore.' + facade.pantryScore()!.label | translate }}
+              </span>
+            </div>
+          }
+
+          <div class="quality-bars">
+            <div class="quality-bar-row">
+              <span class="quality-bar-row__label">{{ 'insights.quality.withDate' | translate }}</span>
+              <div class="quality-bar-row__track">
+                <div class="quality-bar-row__fill quality-bar-row__fill--good"
+                  [style.width]="getQualityBarWidth(
+                    facade.inventorySnapshot().total - facade.inventorySnapshot().noExpiryDate,
+                    facade.inventorySnapshot().total)">
+                </div>
+              </div>
+              <span class="quality-bar-row__pct">
+                {{ formatPercent((facade.inventorySnapshot().total - facade.inventorySnapshot().noExpiryDate) / facade.inventorySnapshot().total) }}
+              </span>
+            </div>
+            <div class="quality-bar-row">
+              <span class="quality-bar-row__label">{{ 'insights.quality.noDate' | translate }}</span>
+              <div class="quality-bar-row__track">
+                <div class="quality-bar-row__fill quality-bar-row__fill--warning"
+                  [style.width]="getQualityBarWidth(facade.inventorySnapshot().noExpiryDate, facade.inventorySnapshot().total)">
+                </div>
+              </div>
+              <span class="quality-bar-row__pct">
+                {{ formatPercent(facade.inventorySnapshot().noExpiryDate / facade.inventorySnapshot().total) }}
+              </span>
+            </div>
+            <div class="quality-bar-row">
+              <span class="quality-bar-row__label">{{ 'insights.quality.reviewable' | translate }}</span>
+              <div class="quality-bar-row__track">
+                <div class="quality-bar-row__fill quality-bar-row__fill--warning"
+                  [style.width]="getQualityBarWidth(facade.inventorySnapshot().review, facade.inventorySnapshot().total)">
+                </div>
+              </div>
+              <span class="quality-bar-row__pct">
+                {{ formatPercent(facade.inventorySnapshot().review / facade.inventorySnapshot().total) }}
+              </span>
+            </div>
+            <div class="quality-bar-row">
+              <span class="quality-bar-row__label">{{ 'insights.quality.expired' | translate }}</span>
+              <div class="quality-bar-row__track">
+                <div class="quality-bar-row__fill quality-bar-row__fill--danger"
+                  [style.width]="getQualityBarWidth(facade.inventorySnapshot().expired, facade.inventorySnapshot().total)">
+                </div>
+              </div>
+              <span class="quality-bar-row__pct">
+                {{ formatPercent(facade.inventorySnapshot().expired / facade.inventorySnapshot().total) }}
+              </span>
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- SECTION 7: PRO analysis / teaser -->
+      @if (facade.isPro()) {
+        <section class="insights-section">
+          <h3 class="insights-section__title">{{ 'insights.pro.title' | translate }}</h3>
+
+          @if (!facade.proAnalysis() && !facade.proAnalysisLoading() && !facade.proAnalysisError()) {
+            <div class="pro-generate">
+              <ion-icon name="sparkles-outline" class="pro-generate__icon"></ion-icon>
+              <ion-button (click)="facade.triggerProAnalysis()">
+                {{ 'insights.pro.generate' | translate }}
+              </ion-button>
+            </div>
+          }
+
+          @if (facade.proAnalysisLoading()) {
+            <ion-skeleton-text animated style="width: 100%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 80%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 90%; height: 14px; margin-bottom: 8px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 60%; height: 14px;"></ion-skeleton-text>
+          }
+
+          @if (facade.proAnalysis() && !facade.proAnalysisLoading()) {
+            <div class="pro-analysis-header">
+              @if (facade.proAnalysisStale()) {
+                <span class="pro-analysis-header__stale">{{ 'insights.pro.staleHint' | translate }}</span>
+              }
+              <button class="pro-analysis-header__refresh"
+                (click)="facade.triggerProAnalysis()"
+                [disabled]="facade.proAnalysisLoading()">
+                <ion-icon name="refresh-outline"></ion-icon>
+                {{ 'insights.pro.refresh' | translate }}
+              </button>
+            </div>
+            @for (section of proSections; track section.key) {
+              @if (getAnalysisSection(section.key).length > 0) {
+                <div class="pro-section">
+                  <h4 class="pro-section__title">
+                    <ion-icon [name]="section.icon"></ion-icon>
+                    {{ section.labelKey | translate }}
+                  </h4>
+                  <ul class="pro-section__list">
+                    @for (item of getAnalysisSection(section.key); track item) {
+                      <li>{{ item }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+            }
+          }
+
+          @if (facade.proAnalysisError() && !facade.proAnalysisLoading()) {
+            <div class="pro-error">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <span>{{ 'insights.pro.error' | translate }}</span>
+              <ion-button size="small" (click)="facade.triggerProAnalysis()">
+                {{ 'insights.pro.retry' | translate }}
+              </ion-button>
+            </div>
+          }
+        </section>
+      } @else {
+        <section class="insights-section insights-section--pro-teaser">
+          <div class="pro-teaser">
+            <div class="pro-teaser__lock">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+            </div>
+            <ion-icon name="sparkles-outline" class="pro-teaser__icon"></ion-icon>
+            <h3 class="pro-teaser__title">{{ 'insights.pro.title' | translate }}</h3>
+            <p class="pro-teaser__description">{{ 'insights.pro.description' | translate }}</p>
+            <ion-button [routerLink]="['/upgrade']" size="small" color="primary">
+              {{ 'insights.pro.cta' | translate }}
+            </ion-button>
+          </div>
+        </section>
+      }
+
+    }
+  </div>
+</ion-content>

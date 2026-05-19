@@ -3,7 +3,6 @@ import {
   DEFAULT_PREFERENCES,
   DOC_TYPE_PREFERENCES,
   NEAR_EXPIRY_WINDOW_DAYS,
-  PLANNER_MEMORY_MAX_LENGTH,
   STORAGE_KEYS,
 } from '@core/constants';
 import {
@@ -11,7 +10,7 @@ import {
   AppPreferencesDoc,
   AppThemePreference,
 } from '@core/models';
-import { normalizeStringList, normalizeTrim } from '@core/utils/normalization.util';
+import { normalizeStringList } from '@core/utils/normalization.util';
 import { StorageService } from '../shared/storage.service';
 
 @Injectable({
@@ -22,7 +21,6 @@ export class SettingsPreferencesService {
 
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
-  private readonly plannerMemoryLimit = PLANNER_MEMORY_MAX_LENGTH;
   private readonly prefersDarkQuery =
     typeof window !== 'undefined' && typeof window.matchMedia === 'function'
       ? window.matchMedia('(prefers-color-scheme: dark)')
@@ -102,7 +100,6 @@ export class SettingsPreferencesService {
       locationOptions: this.ensureLocationOptions(input?.locationOptions),
       categoryOptions: this.ensureCategoryOptions(input?.categoryOptions),
       supermarketOptions: this.ensureSupermarketOptions(input?.supermarketOptions),
-      plannerMemory: this.ensurePlannerMemory(input?.plannerMemory),
     };
   }
 
@@ -164,17 +161,6 @@ export class SettingsPreferencesService {
     return normalizeStringList(options, {
       fallback: [],
     });
-  }
-
-  private ensurePlannerMemory(value?: unknown): string {
-    if (typeof value !== 'string') {
-      return '';
-    }
-    const trimmed = normalizeTrim(value);
-    if (!trimmed) {
-      return '';
-    }
-    return trimmed.length > this.plannerMemoryLimit ? trimmed.slice(0, this.plannerMemoryLimit) : trimmed;
   }
 
   private applyDefaults(): void {

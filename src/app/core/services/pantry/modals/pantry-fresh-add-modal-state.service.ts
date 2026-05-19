@@ -47,6 +47,7 @@ export class PantryFreshAddModalStateService {
   readonly showEmptyAction = computed(() => normalizeTrim(this.query()).length >= 1);
 
   readonly emptyActionLabel = computed(() => {
+    void this.languageService.currentLanguage();
     const name = normalizeTrim(this.query());
     if (!name) return '';
     const formatted = formatFriendlyName(name, name);

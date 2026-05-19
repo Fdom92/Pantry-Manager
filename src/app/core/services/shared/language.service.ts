@@ -10,7 +10,7 @@ import { normalizeLocaleCode } from '@core/utils/normalization.util';
 export class LanguageService {
   private readonly translate = inject(TranslateService);
 
-  private readonly currentLanguage = signal<SupportedLanguage>(DEFAULT_LANGUAGE);
+  readonly currentLanguage = signal<SupportedLanguage>(DEFAULT_LANGUAGE);
 
   async init(): Promise<void> {
     this.translate.addLangs([...SUPPORTED_LANGUAGES]);
@@ -30,6 +30,11 @@ export class LanguageService {
 
   getCurrentLanguage(): SupportedLanguage {
     return this.currentLanguage();
+  }
+
+  async setLanguage(lang: SupportedLanguage): Promise<void> {
+    await firstValueFrom(this.translate.use(lang));
+    this.currentLanguage.set(lang);
   }
 
   private isSupportedLanguage(lang: string | null): lang is SupportedLanguage {

@@ -89,43 +89,6 @@
       "title": "Tout est en ordre"
     }
   },
-  "history": {
-    "title": "Historique",
-    "pro": {
-      "cta": "Voir tout votre historique et analyser les tendances avec PRO"
-    },
-    "filters": {
-      "title": "Filtres de l’historique",
-      "all": "Tout",
-      "added": "Ajoutés",
-      "consumed": "Consommés",
-      "edited": "Modifiés",
-      "expired": "Expirés",
-      "deleted": "Supprimés",
-      "imported": "Importés"
-    },
-    "eventTypes": {
-      "added": "Ajouté",
-      "consumed": "Consommé",
-      "expired": "Expiré",
-      "edited": "Modifié",
-      "deleted": "Supprimé",
-      "imported": "Importé"
-    },
-    "event": {
-      "unknownProduct": "Produit inconnu",
-      "importTitle": "Importation",
-      "editedTitle": "Modifié"
-    },
-    "empty": {
-      "title": "Aucun historique",
-      "subtitle": "Ajoutez et consommez des produits pour voir l’activité.",
-      "filtered": {
-        "title": "Aucun événement correspondant",
-        "subtitle": "Essayez un autre filtre."
-      }
-    }
-  },
   "locations": {
     "pantry": "Garde-manger"
   },
@@ -169,7 +132,8 @@
         "lowstock": "Il n'en reste plus beaucoup — ajoutez-le à la liste de courses",
         "expiringlater": "Expire dans les prochains jours — commencez à y penser",
         "freshExpiring": "Ton {{name}} expire bientôt.",
-        "freshOut": "Tu n'as plus de {{name}}."
+        "freshOut": "Tu n'as plus de {{name}}.",
+        "reviewExpiry": "Date dépassée — à utiliser aujourd'hui"
       },
       "combine": "Expire aussi bientôt :",
       "cta": {
@@ -351,7 +315,7 @@
     }
   },
   "shopping": {
-    "title": "Liste",
+    "title": "Liste de courses",
     "unassignedSupermarket": "N’importe quel supermarché",
     "reasons": {
       "below-min": "Stock faible",
@@ -360,8 +324,9 @@
     "suggestions": {
       "title": "Liste de courses",
       "loading": "Génération de la liste d’achats…",
-      "toBuy": "À acheter {{ amount }}",
-      "empty": "Marquez les produits comme \"toujours avoir\" pour être alerté quand ils s'épuisent."
+      "restock": "Réapprovisionner {{amount}}",
+      "restockFresh": "Réapprovisionner",
+      "empty": "Marquez les produits comme \"toujours avoir\" pour être alerté quand ils s’épuisent."
     },
     "share": {
       "button": "Partager la liste",
@@ -373,7 +338,39 @@
       "generatedOn": "Générée le {{ date }}",
       "dialogTitle": "Liste d’achats",
       "dialogText": "Partagez votre liste en PDF."
-    }
+    },
+    "chips": {
+      "freshEmpty": "Frais épuisé",
+      "empty": "Épuisé",
+      "belowMin": "Stock bas",
+      "basic": "Essentiel",
+      "manual": "Ajouté par toi"
+    },
+    "bought": {
+      "sectionTitle": "Acheté",
+      "restore": "Restaurer",
+      "count": "{{count}} acheté"
+    },
+    "manualAdd": {
+      "sectionTitle": "Autres",
+      "placeholder": "Nom du produit",
+      "alertTitle": "Ajouter à la liste",
+      "alertButton": "Ajouter",
+      "inlineHint": "Ajouter un produit à la liste..."
+    },
+    "emptyState": {
+      "autoHint": "Les produits épuisés apparaîtront ici automatiquement."
+    },
+    "ignored": {
+      "sectionTitle": "Masqués pour l'instant"
+    },
+    "toasts": {
+      "bought": "✓ {{name}} acheté. Garde-manger mis à jour.",
+      "boughtManual": "✓ {{name}} acheté.",
+      "ignored": "{{name}} masqué pour l'instant — réapparaîtra la prochaine fois.",
+      "removedManual": "{{name}} retiré de la liste."
+    },
+    "tabTitle": "Courses"
   },
   "insights": {
     "ctaDefault": "Compris",
@@ -383,12 +380,6 @@
         "description": "Il y a quelques produits que tu pourrais mettre à jour. Ça te prendra moins d'une minute.",
         "cta": "Allons-y",
         "dismiss": "Pas maintenant"
-      },
-      "cookBeforeExpiry": {
-        "title": "Vous avez des produits qui expirent bientôt",
-        "description": "Je vous suggère des recettes pour les utiliser avant qu'ils ne se gâtent.",
-        "cta": "Donne-moi des idées",
-        "prompt": "Suggère des recettes qui privilégient les produits bientôt périmés de mon garde-manger."
       },
       "addExpiryDates": {
         "title": "Ajoutez des dates de péremption",
@@ -410,62 +401,68 @@
         "description": "Avec PRO, organisez votre menu hebdomadaire et gagnez du temps chaque jour.",
         "cta": "Essayer PRO"
       }
-    }
-  },
-  "agent": {
-    "title": "Planification",
-    "states": {
-      "thinking": "Réflexion…",
-      "fetching": "Consultation de votre garde-manger…",
-      "responding": "Génération de la réponse…"
     },
-    "placeholder": "Demandez des recettes, des menus ou des idées avec ce que vous avez.",
-    "actions": {
-      "send": "Envoyer",
+    "tabTitle": "Analyse",
+    "title": "Analyse",
+    "status": {
+      "critical": "Périmés en stock",
+      "attention": "Produits à vérifier",
+      "optimal": "Inventaire à jour"
+    },
+    "snapshot": {
+      "title": "Ton garde-manger",
+      "active": "Actifs",
+      "expired": "Périmés",
+      "review": "Vérifier",
+      "noDate": "Sans date",
+      "basicsOut": "Essentiels vides",
+      "noExpiry": "Sans date: {{count}} sur {{total}} produits"
+    },
+    "coverage": {
+      "title": "Couverture estimée"
+    },
+    "activity": {
+      "title": "30 derniers jours",
+      "added": "Ajoutés",
+      "consumed": "Consommés",
+      "expired": "Périmés",
+      "wasteRatio": "Gaspillage",
+      "noActivity": "Aucune activité enregistrée",
+      "noWaste": "Aucun gaspillage",
+      "rotationHigh": "Rotation élevée",
+      "rotationMedium": "Rotation moyenne",
+      "rotationLow": "Rotation faible",
+      "rotationNone": "Aucune activité"
+    },
+    "distribution": {
+      "title": "Par type d'aliment",
+      "mostWasted": "Incidence élevée",
+      "leastRotating": "Faible rotation"
+    },
+    "quality": {
+      "title": "Qualité de l'inventaire",
+      "score": "Score",
+      "withDate": "Suivi",
+      "noDate": "Sans date",
+      "reviewable": "À vérifier",
+      "expired": "Périmés"
+    },
+    "pro": {
+      "title": "Analyse IA intelligente",
+      "description": "Détecte les tendances, prédit le gaspillage et donne des recommandations personnalisées.",
+      "cta": "Voir PRO",
+      "generate": "Générer l'analyse",
+      "refresh": "Actualiser",
+      "staleHint": "Analyse peut-être obsolète",
+      "error": "Impossible de générer l'analyse",
       "retry": "Réessayer",
-      "clear": "Effacer la conversation"
-    },
-    "preview": {
-      "badge": "Aperçu",
-      "title": "Voici la couche de planification",
-      "headline": "Idées et plans alimentés par l’IA",
-      "subtitle": "Recevez recettes, menus et insights adaptés à votre garde-manger.",
-      "cta": "Débloquer le planificateur",
-      "demo": {
-        "chipsTitle": "Lancez-vous avec une intention",
-        "sessionTitle": "Conversation exemple",
-        "userMessage": "« Planifie des dîners avec ce qui expire cette semaine. »",
-        "agentMessage": "Bonne idée. Tu as des épinards et de la feta qui expirent dans 2 jours. Je propose un pesto d’épinards pour ce soir et une omelette grecque demain."
+      "sections": {
+        "patterns": "Tendances",
+        "problems": "Problèmes détectés",
+        "recommendations": "Recommandations",
+        "suggestions": "Cette semaine"
       }
-    },
-    "quickStart": {
-      "title": "Entrée contextuelle",
-      "headline": "Commencez par quelque chose de concret",
-      "subtitle": "Touchez une option et le planificateur se lance tout seul.",
-      "ctaTitle": "Démarrer en un geste",
-      "ctaSubtitle": "Par où on commence aujourd'hui ?",
-      "today": "Que cuisiner aujourd'hui ?",
-      "todayPrompt": "Qu'est-ce que je peux cuisiner aujourd'hui avec ce que j'ai à la maison ? Donne-moi quelques idées.",
-      "weeklyPlan": "Plan de semaine",
-      "weeklyPlanPrompt": "Fais-moi un menu pour toute la semaine — 7 jours, petit-déjeuner, déjeuner et dîner — avec ce que j'ai chez moi.",
-      "useExpiring": "Ce qui expire bientôt",
-      "useExpiringPrompt": "J'ai des trucs qui vont bientôt expirer. Qu'est-ce que je cuisine pour ne pas les gaspiller ?",
-      "surpriseMe": "Surprends-moi",
-      "surpriseMePrompt": "Choisis une recette que je peux faire avec ce que j'ai et surprends-moi. Juste une.",
-      "customPrompt": "Question libre ✏️"
-    },
-    "messages": {
-      "noResponse": "Impossible de générer une réponse.",
-      "unifiedError": "Le planificateur ne peut pas répondre pour le moment. Réessayez dans quelques secondes."
-    },
-    "errors": {
-      "coldStart": "Le service démarre. Veuillez réessayer dans quelques secondes.",
-      "rateLimit": "Trop de requêtes. Veuillez attendre un moment avant de réessayer.",
-      "timeout": "La requête a pris trop de temps. Vérifiez votre connexion et réessayez.",
-      "offline": "Pas de connexion internet. Veuillez vous connecter et réessayer.",
-      "generic": "Quelque chose s'est mal passé. Veuillez réessayer dans quelques instants."
-    },
-    "disclaimer": "Les recettes et menus sont générés par IA et peuvent contenir des erreurs."
+    }
   },
   "pantry": {
     "title": "Garde-manger",
@@ -477,13 +474,15 @@
         "normal": "Produits sans alertes actives",
         "low": "À réapprovisionner bientôt",
         "expiring": "Expirent dans quelques jours",
-        "expired": "À vérifier et jeter"
+        "expired": "À vérifier et jeter",
+        "review": "Date dépassée, peut encore être bon"
       },
       "status": {
         "normal": "Sans alertes",
         "low": "Stock faible",
         "expiring": "Bientôt périmé",
-        "expired": "Périmé"
+        "expired": "Périmé",
+        "review": "Vérifier"
       },
       "search": "Rechercher des produits"
     },
@@ -587,7 +586,8 @@
       "subinfo": {
         "expired": "Expiré",
         "tomorrow": "Expire demain",
-        "inDays": "Expire dans {{count}} jours"
+        "inDays": "Expire dans {{count}} jours",
+        "review": "À consommer vite"
       },
       "quantity": {
         "single": "{{ quantity }} unité",
@@ -646,7 +646,8 @@
       "expiryDate": "Date de péremption (optionnel)",
       "noDate": "Ajouter date",
       "zeroHint": "Il disparaîtra de votre garde-manger jusqu'à ce que vous en rajoutiez",
-      "zeroHintBasic": "Il disparaîtra de votre garde-manger et apparaîtra dans votre liste de courses"
+      "zeroHintBasic": "Il disparaîtra de votre garde-manger et apparaîtra dans votre liste de courses",
+      "hint": "Ajustez la quantité. Elle sera sauvegardée à la fermeture."
     },
     "toasts": {
       "locationRequired": "Sélectionnez un emplacement avant d’enregistrer.",
@@ -818,16 +819,6 @@
       "system": "Système",
       "error": "Impossible de mettre à jour le thème."
     },
-    "ai": {
-      "title": "IA",
-      "subtitle": "Dites au planificateur quoi retenir.",
-      "contextTitle": "Contexte / Mémoire",
-      "contextDescription": "Partagez votre foyer, vos régimes, allergies ou tout ce que vous voulez que l’app retienne.",
-      "contextPlaceholder": "Ex : Famille de 3, pas de noix, cuisine méditerranéenne.",
-      "saveAction": "Enregistrer le contexte",
-      "saveSuccess": "Contexte enregistré.",
-      "saveError": "Impossible d’enregistrer le contexte."
-    },
     "advanced": {
       "title": "Données",
       "subtitle": "Sauvegardes et catalogues de votre garde-manger.",
@@ -963,7 +954,13 @@
       "appStateLowStock": "Stock faible",
       "appStateIsPro": "Statut PRO",
       "notificationPreviewDialogTitle": "Aperçu de la notification",
-      "notificationPreviewNone": "Aucune notification ne serait programmée. Vérifiez que les articles et les préférences correspondent aux critères."
+      "notificationPreviewNone": "Aucune notification ne serait programmée. Vérifiez que les articles et les préférences correspondent aux critères.",
+      "groupLanguage": "Language",
+      "languageSelectorTitle": "Override language",
+      "languageSelectorSubtitle": "Force UI language for screenshots without changing device settings",
+      "seedMarketingTitle": "Load marketing database",
+      "seedMarketingSubtitle": "Clear all data and seed realistic demo content for screenshots",
+      "seedMarketingConfirm": "This will delete all current data and replace it with the marketing dataset. Continue?"
     },
     "info": {
       "title": "Informations",

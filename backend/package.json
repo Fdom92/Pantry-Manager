@@ -1,6 +1,6 @@
 {
   "name": "pantrymind-backend",
-  "version": "3.0",
+  "version": "4.0",
   "type": "module",
   "scripts": {
     "dev": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm --no-warnings ./src/app.ts",
