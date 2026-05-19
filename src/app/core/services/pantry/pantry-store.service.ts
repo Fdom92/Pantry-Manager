@@ -34,6 +34,10 @@ export class PantryStoreService {
     const now = new Date();
     return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'near-expiry');
   });
+  readonly reviewItems = computed(() => {
+    const now = new Date();
+    return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'review');
+  });
   readonly lowStockItems = computed(() => {
     const now = new Date();
     return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock');

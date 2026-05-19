@@ -1,8 +1,51 @@
 import { ExpirationStatus } from '@core/models';
 import type { ExpiryClassification, ItemBatch, PantryItem, ProductStatusState } from '@core/models/pantry';
+import { FoodType } from '@core/models/shared/enums.model';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { collectBatches, sumQuantities } from './pantry-batch.domain';
 import { FRESH_NEAR_EXPIRY_WINDOW_DAYS, FRESH_QTY } from './fresh.domain';
+
+export const REVIEW_GRACE_DAYS = 7;
+
+export function getExpiryModeFromFoodType(
+  foodType: FoodType | undefined
+): 'strict' | 'flexible' | 'ignore' {
+  switch (foodType) {
+    case FoodType.DAIRY:
+    case FoodType.CARB:
+      return 'flexible';
+    case FoodType.HOUSEHOLD:
+      return 'ignore';
+    default:
+      return 'strict';
+  }
+}
+
+function getDaysPastExpiry(
+  batches: ItemBatch[] | undefined,
+  now: Date
+): number | null {
+  const reference = new Date(now);
+  reference.setHours(0, 0, 0, 0);
+  const referenceTime = reference.getTime();
+
+  let latestExpiredTime: number | null = null;
+
+  for (const batch of collectBatches(batches)) {
+    if (!batch.expirationDate) continue;
+    const exp = new Date(batch.expirationDate);
+    if (!Number.isFinite(exp.getTime())) continue;
+    exp.setHours(0, 0, 0, 0);
+    if (exp < reference) {
+      if (latestExpiredTime === null || exp.getTime() > latestExpiredTime) {
+        latestExpiredTime = exp.getTime();
+      }
+    }
+  }
+
+  if (latestExpiredTime === null) return null;
+  return Math.round((referenceTime - latestExpiredTime) / (1000 * 60 * 60 * 24));
+}
 
 /**
  * Helper to extract stock context values with fallbacks
@@ -103,7 +146,17 @@ export function getItemStatusState(
   }
 
   const expirationStatus = computeExpirationStatus(item.batches, now, windowDays);
-  if (expirationStatus === ExpirationStatus.EXPIRED) return 'expired';
+  if (expirationStatus === ExpirationStatus.EXPIRED) {
+    const mode = getExpiryModeFromFoodType(item.foodType);
+    if (mode === 'flexible') {
+      const daysPast = getDaysPastExpiry(item.batches, now);
+      if (daysPast !== null && daysPast <= REVIEW_GRACE_DAYS) {
+        return 'review';
+      }
+    }
+    if (mode === 'ignore') return 'normal';
+    return 'expired';
+  }
   if (expirationStatus === ExpirationStatus.NEAR_EXPIRY) return 'near-expiry';
   if (isItemLowStock(item, context)) return 'low-stock';
   return 'normal';

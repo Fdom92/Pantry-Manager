@@ -101,6 +101,11 @@ ion-title {
   --color: var(--ion-color-dark);
 }
 
+.summary-chips .status-chip.chip--review {
+  --background: var(--ion-color-warning-shade);
+  --color: var(--ion-color-dark);
+}
+
 .summary-chips .status-chip.chip--expired {
   --background: var(--ion-color-danger);
   --color: var(--ion-color-danger-contrast);

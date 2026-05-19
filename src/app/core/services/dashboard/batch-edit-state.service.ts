@@ -11,12 +11,14 @@ import type { AutocompleteItem } from '@shared/components/entity-autocomplete/en
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
+import { LanguageService } from '../shared/language.service';
 
 @Injectable({ providedIn: 'root' })
 export class BatchEditStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly translate = inject(TranslateService);
+  private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly toastCtrl = inject(ToastController);
 
@@ -43,15 +45,17 @@ export class BatchEditStateService {
     return 'batchEdit.actions.setCategory';
   });
 
-  readonly foodTypeOptions = computed((): AutocompleteItem<FoodType>[] =>
-    Object.values(FoodType).map(type => ({
+  readonly foodTypeOptions = computed((): AutocompleteItem<FoodType>[] => {
+    void this.languageService.currentLanguage();
+    return Object.values(FoodType).map(type => ({
       id: type,
       title: this.translate.instant(`pantry.form.foodType.${type}`),
       raw: type,
-    }))
-  );
+    }));
+  });
 
   readonly categoryOptions = computed((): AutocompleteItem<string>[] => {
+    void this.languageService.currentLanguage();
     const presetOptions = normalizeStringList(this.appPreferences.preferences().categoryOptions, { fallback: [] });
     const uncategorizedLabel = this.translate.instant('pantry.form.uncategorized');
     return buildUniqueSelectOptions(presetOptions, { labelFor: v => formatFriendlyName(v, uncategorizedLabel) })

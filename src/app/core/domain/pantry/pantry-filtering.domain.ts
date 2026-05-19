@@ -20,6 +20,7 @@ export function matchesFilters(item: PantryItem, filters: PantryFilterState): bo
 
   if (filters.expired && state !== 'expired') return false;
   if (filters.expiring && state !== 'near-expiry') return false;
+  if (filters.review && state !== 'review') return false;
   if (filters.lowStock && state !== 'low-stock') return false;
   if (filters.recentlyAdded && !isRecentlyAdded(item)) return false;
   if (filters.normalOnly && state !== 'normal') return false;

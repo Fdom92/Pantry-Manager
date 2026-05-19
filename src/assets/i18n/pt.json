@@ -89,43 +89,6 @@
       "title": "Tudo em ordem"
     }
   },
-  "history": {
-    "title": "Histórico",
-    "pro": {
-      "cta": "Ver todo o teu histórico e analisar padrões com PRO"
-    },
-    "filters": {
-      "title": "Filtros do histórico",
-      "all": "Todos",
-      "added": "Adicionados",
-      "consumed": "Consumidos",
-      "edited": "Editados",
-      "expired": "Vencidos",
-      "deleted": "Eliminados",
-      "imported": "Importados"
-    },
-    "eventTypes": {
-      "added": "Adicionado",
-      "consumed": "Consumido",
-      "expired": "Vencido",
-      "edited": "Editado",
-      "deleted": "Eliminado",
-      "imported": "Importado"
-    },
-    "event": {
-      "unknownProduct": "Produto desconhecido",
-      "importTitle": "Importação",
-      "editedTitle": "Editado"
-    },
-    "empty": {
-      "title": "Sem histórico",
-      "subtitle": "Adiciona e consome produtos para ver a atividade.",
-      "filtered": {
-        "title": "Sem eventos correspondentes",
-        "subtitle": "Tenta outro filtro."
-      }
-    }
-  },
   "locations": {
     "pantry": "Despensa"
   },
@@ -169,7 +132,8 @@
         "lowstock": "Resta pouco — adicione-o à lista de compras",
         "expiringlater": "Expira nos próximos dias — comece a pensar em usá-lo",
         "freshExpiring": "O seu {{name}} vence em breve.",
-        "freshOut": "Você ficou sem {{name}}."
+        "freshOut": "Você ficou sem {{name}}.",
+        "reviewExpiry": "Prazo ultrapassado — usa hoje"
       },
       "combine": "Expira em breve também:",
       "cta": {
@@ -351,7 +315,7 @@
     }
   },
   "shopping": {
-    "title": "Lista",
+    "title": "Lista de compras",
     "unassignedSupermarket": "Qualquer supermercado",
     "reasons": {
       "below-min": "Stock baixo",
@@ -360,7 +324,8 @@
     "suggestions": {
       "title": "Lista de compras",
       "loading": "A criar lista de compras…",
-      "toBuy": "Comprar {{ amount }}",
+      "restock": "Repor {{amount}}",
+      "restockFresh": "Repor",
       "empty": "Marca produtos como \"manter sempre em casa\" para seres notificado quando se esgotarem."
     },
     "share": {
@@ -373,7 +338,39 @@
       "generatedOn": "Gerada em {{ date }}",
       "dialogTitle": "Lista de compras",
       "dialogText": "Partilha a tua lista em PDF."
-    }
+    },
+    "chips": {
+      "freshEmpty": "Fresco esgotado",
+      "empty": "Esgotado",
+      "belowMin": "Estoque baixo",
+      "basic": "Produto básico",
+      "manual": "Adicionado por você"
+    },
+    "bought": {
+      "sectionTitle": "Comprado",
+      "restore": "Restaurar",
+      "count": "{{count}} comprado"
+    },
+    "manualAdd": {
+      "sectionTitle": "Outros",
+      "placeholder": "Nome do produto",
+      "alertTitle": "Adicionar à lista",
+      "alertButton": "Adicionar",
+      "inlineHint": "Adicionar produto à lista..."
+    },
+    "emptyState": {
+      "autoHint": "Os produtos esgotados aparecerão aqui automaticamente."
+    },
+    "ignored": {
+      "sectionTitle": "Ocultos agora"
+    },
+    "toasts": {
+      "bought": "✓ {{name}} comprado. Despensa atualizada.",
+      "boughtManual": "✓ {{name}} comprado.",
+      "ignored": "{{name}} oculto agora — voltará na próxima vez.",
+      "removedManual": "{{name}} removido da lista."
+    },
+    "tabTitle": "Compras"
   },
   "insights": {
     "ctaDefault": "Entendi",
@@ -383,12 +380,6 @@
         "description": "Há alguns produtos que podes pôr em dia. Leva menos de um minuto.",
         "cta": "Vamos lá",
         "dismiss": "Agora não"
-      },
-      "cookBeforeExpiry": {
-        "title": "Tem produtos a ponto de vencer",
-        "description": "Vou sugerir receitas para aproveitá-los antes de se estragarem.",
-        "cta": "Dá-me ideias",
-        "prompt": "Sugira receitas priorizando os produtos que vencem em breve na minha despensa."
       },
       "addExpiryDates": {
         "title": "Adicione datas de validade",
@@ -410,62 +401,68 @@
         "description": "Com PRO, organize o seu menu semanal e poupe tempo todos os dias.",
         "cta": "Experimentar PRO"
       }
-    }
-  },
-  "agent": {
-    "title": "Planeamento",
-    "states": {
-      "thinking": "A pensar…",
-      "fetching": "A consultar a tua despensa…",
-      "responding": "A gerar resposta…"
     },
-    "placeholder": "Pede receitas, planos de refeições ou ideias com o que tens.",
-    "actions": {
-      "send": "Enviar",
+    "tabTitle": "Análise",
+    "title": "Análise",
+    "status": {
+      "critical": "Expirados no inventário",
+      "attention": "Produtos a verificar",
+      "optimal": "Inventário atualizado"
+    },
+    "snapshot": {
+      "title": "A tua despensa agora",
+      "active": "Ativos",
+      "expired": "Expirados",
+      "review": "Verificar",
+      "noDate": "Sem data",
+      "basicsOut": "Básicos sem stock",
+      "noExpiry": "Sem data: {{count}} de {{total}} produtos"
+    },
+    "coverage": {
+      "title": "Cobertura estimada"
+    },
+    "activity": {
+      "title": "Últimos 30 dias",
+      "added": "Adicionados",
+      "consumed": "Consumidos",
+      "expired": "Expirados",
+      "wasteRatio": "Desperdício",
+      "noActivity": "Sem atividade registada",
+      "noWaste": "Sem desperdício",
+      "rotationHigh": "Rotação alta",
+      "rotationMedium": "Rotação média",
+      "rotationLow": "Rotação baixa",
+      "rotationNone": "Sem atividade"
+    },
+    "distribution": {
+      "title": "Por tipo de alimento",
+      "mostWasted": "Maior incidência",
+      "leastRotating": "Baixa rotação"
+    },
+    "quality": {
+      "title": "Qualidade do inventário",
+      "score": "Pontuação",
+      "withDate": "Rastreados",
+      "noDate": "Sem data",
+      "reviewable": "Revisáveis",
+      "expired": "Expirados"
+    },
+    "pro": {
+      "title": "Análise inteligente com IA",
+      "description": "Deteta padrões, prevê desperdício e dá recomendações personalizadas.",
+      "cta": "Ver PRO",
+      "generate": "Gerar análise",
+      "refresh": "Atualizar",
+      "staleHint": "Análise pode estar desatualizada",
+      "error": "Não foi possível gerar a análise",
       "retry": "Tentar novamente",
-      "clear": "Limpar conversa"
-    },
-    "preview": {
-      "badge": "Pré-visualização",
-      "title": "Camada de planeamento inteligente",
-      "headline": "Ideias e planos com IA",
-      "subtitle": "Recebe receitas, menus e insights feitos para a tua despensa.",
-      "cta": "Desbloquear planeador PRO",
-      "demo": {
-        "chipsTitle": "Começa com uma intenção",
-        "sessionTitle": "Conversa exemplo",
-        "userMessage": "“Planeia jantares com o que vence esta semana.”",
-        "agentMessage": "Perfeito. Tens espinafre e feta que vencem em 2 dias. Sugestão: hoje pesto de espinafre com massa e amanhã omelete grega."
+      "sections": {
+        "patterns": "Padrões",
+        "problems": "Problemas detetados",
+        "recommendations": "Recomendações",
+        "suggestions": "Esta semana"
       }
-    },
-    "quickStart": {
-      "title": "Entrada contextual",
-      "headline": "Começa por algo concreto",
-      "subtitle": "Toca uma opção e o planeador arranca sozinho.",
-      "ctaTitle": "Começa com um toque",
-      "ctaSubtitle": "Por onde começamos hoje?",
-      "today": "O que cozinho hoje?",
-      "todayPrompt": "O que posso cozinhar hoje com o que tenho em casa? Dá-me algumas ideias.",
-      "weeklyPlan": "Plano semanal",
-      "weeklyPlanPrompt": "Faz-me um menu para a semana toda — 7 dias, pequeno-almoço, almoço e jantar — com o que tenho na despensa.",
-      "useExpiring": "O que está a vencer",
-      "useExpiringPrompt": "Tenho coisas prestes a vencer. O que cozinho para não as desperdiçar?",
-      "surpriseMe": "Surpreende-me",
-      "surpriseMePrompt": "Escolhe tu uma receita que possa fazer com o que tenho e surpreende-me. Só uma.",
-      "customPrompt": "Pergunta livre ✏️"
-    },
-    "messages": {
-      "noResponse": "Não foi possível gerar uma resposta.",
-      "unifiedError": "O planeador não conseguiu responder agora. Tenta novamente dentro de alguns segundos."
-    },
-    "errors": {
-      "coldStart": "O serviço está a iniciar. Tenta novamente em alguns segundos.",
-      "rateLimit": "Demasiados pedidos. Aguarda um momento antes de tentar novamente.",
-      "timeout": "O pedido demorou demasiado tempo. Verifica a tua ligação e tenta novamente.",
-      "offline": "Sem ligação à internet. Conecta-te e tenta novamente.",
-      "generic": "Algo correu mal. Tenta novamente em alguns instantes."
-    },
-    "disclaimer": "As receitas e planos são gerados por IA e podem conter erros."
+    }
   },
   "pantry": {
     "title": "Despensa",
@@ -477,13 +474,15 @@
         "normal": "Produtos sem alertas ativos",
         "low": "Necessitam de reabastecimento em breve",
         "expiring": "A expirar em poucos dias",
-        "expired": "Rever e descartar"
+        "expired": "Rever e descartar",
+        "review": "Passou a data, pode ainda estar bom"
       },
       "status": {
         "normal": "Sem alertas",
         "low": "Stock baixo",
         "expiring": "Perto da validade",
-        "expired": "Expirado"
+        "expired": "Expirado",
+        "review": "Verificar"
       },
       "search": "Pesquisar produtos"
     },
@@ -587,7 +586,8 @@
       "subinfo": {
         "expired": "Expirado",
         "tomorrow": "Expira amanhã",
-        "inDays": "Expira em {{count}} dias"
+        "inDays": "Expira em {{count}} dias",
+        "review": "Consumir em breve"
       },
       "quantity": {
         "single": "{{ quantity }} unidade",
@@ -646,7 +646,8 @@
       "expiryDate": "Data de validade (opcional)",
       "noDate": "Adicionar data",
       "zeroHint": "Vai desaparecer da despensa até você adicionar mais",
-      "zeroHintBasic": "Vai desaparecer da despensa e aparecer na sua lista de compras"
+      "zeroHintBasic": "Vai desaparecer da despensa e aparecer na sua lista de compras",
+      "hint": "Ajuste a quantidade. Será guardada ao fechar."
     },
     "toasts": {
       "locationRequired": "Seleciona uma localização antes de guardar.",
@@ -818,16 +819,6 @@
       "system": "Sistema",
       "error": "Não foi possível atualizar o tema."
     },
-    "ai": {
-      "title": "IA",
-      "subtitle": "Diz ao planeador o que lembrar.",
-      "contextTitle": "Contexto / Memória",
-      "contextDescription": "Partilha a tua casa, dietas, alergias ou preferências que queres que sejam lembradas.",
-      "contextPlaceholder": "Ex: Família de 3, sem frutos secos, cozinha mediterrânea.",
-      "saveAction": "Guardar contexto",
-      "saveSuccess": "Contexto guardado.",
-      "saveError": "Não foi possível guardar o contexto."
-    },
     "advanced": {
       "title": "Dados",
       "subtitle": "Backups e catálogos da sua despensa.",
@@ -963,7 +954,13 @@
       "appStateLowStock": "Stock baixo",
       "appStateIsPro": "Estado PRO",
       "notificationPreviewDialogTitle": "Pré-visualização de notificação",
-      "notificationPreviewNone": "Nenhuma notificação seria agendada. Verifica se os itens e preferências correspondem aos critérios."
+      "notificationPreviewNone": "Nenhuma notificação seria agendada. Verifica se os itens e preferências correspondem aos critérios.",
+      "groupLanguage": "Language",
+      "languageSelectorTitle": "Override language",
+      "languageSelectorSubtitle": "Force UI language for screenshots without changing device settings",
+      "seedMarketingTitle": "Load marketing database",
+      "seedMarketingSubtitle": "Clear all data and seed realistic demo content for screenshots",
+      "seedMarketingConfirm": "This will delete all current data and replace it with the marketing dataset. Continue?"
     },
     "info": {
       "title": "Informações",

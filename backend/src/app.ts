@@ -3,6 +3,7 @@ import cors from 'cors';
 import compression from 'compression';
 import 'dotenv/config';
 import agentRoutes from './routes/agent.routes.js';
+import insightsRoutes from './routes/insights.routes.js';
 import paymentsRoutes from './routes/payments.js';
 import { loadEnvConfig } from './config/env.js';
 import { logger } from './utils/logger.js';
@@ -51,6 +52,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/payments', paymentsRoutes);
 app.use('/agent', agentRoutes);
+app.use('/insights', insightsRoutes);
 
 // Global error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

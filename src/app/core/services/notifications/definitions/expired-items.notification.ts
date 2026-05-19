@@ -5,7 +5,7 @@ import type { AppPreferences } from '@core/models/settings';
 
 export class ExpiredItemsNotification implements NotificationDefinition {
   readonly id = NOTIFICATION_IDS.EXPIRED_ITEMS;
-  readonly priority = 40;
+  readonly priority = 100;
 
   isEnabled(preferences: AppPreferences): boolean {
     return Boolean(preferences.notificationsEnabled && preferences.notifyOnExpired);

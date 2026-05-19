@@ -134,8 +134,33 @@ ion-item {
   }
 }
 
+.lang-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.lang-code {
+  font-size: 0.85rem;
+  font-weight: var(--app-theme-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dev-time-input {
+  margin-inline-end: 8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: var(--app-theme-card-border-width) solid color-mix(in srgb, var(--ion-text-color) 20%, transparent);
+  background: color-mix(in srgb, var(--app-theme-card-bg) 94%, transparent);
+  color: var(--app-theme-text-color);
+  font-size: 0.9rem;
+}
+
 @media (max-width: 420px) {
   .theme-grid {
     grid-template-columns: 1fr;
+  }
+
+  .lang-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

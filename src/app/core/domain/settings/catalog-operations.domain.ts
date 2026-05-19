@@ -49,18 +49,6 @@ export function getCatalogUsage<T = PantryItem>(
   };
 }
 
-/**
- * Clear a catalog value from items by applying a transformation.
- */
-export async function clearCatalogFromItems<T = PantryItem>(
-  items: T[],
-  transform: (item: T) => T,
-  updateFn: (updatedItems: T[]) => Promise<void>
-): Promise<void> {
-  if (!items.length) return;
-  const updated = items.map(transform);
-  await updateFn(updated);
-}
 
 /**
  * Normalize a list of catalog options (trim and filter empty).
