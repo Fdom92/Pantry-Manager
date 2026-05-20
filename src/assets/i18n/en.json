@@ -772,9 +772,7 @@
     "headline": "Unlock the full pantry superpowers",
     "subtitle": "Smarter automation and priority features.",
     "benefits": {
-      "agent": "Your personal cooking assistant: menus and recipes tailored to your pantry and tastes.",
-      "history": "Unlimited history to analyze patterns and optimize your shopping.",
-      "future": "Be the first to try new features before anyone else."
+      "agent": "Discover what expires most, what piles up, and how to improve your rotation. Concrete recommendations based on your own consumption history."
     },
     "actions": {
       "maybeLater": "Maybe later",

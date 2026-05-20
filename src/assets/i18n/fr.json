@@ -772,9 +772,7 @@
     "headline": "Débloquez toute la puissance de votre garde-manger",
     "subtitle": "Automatisation intelligente et fonctionnalités prioritaires.",
     "benefits": {
-      "agent": "Votre assistant cuisine personnel : menus et recettes adaptés à votre garde-manger et vos goûts.",
-      "history": "Historique illimité pour analyser les tendances et optimiser vos achats.",
-      "future": "Soyez le premier à essayer les nouvelles fonctionnalités avant tout le monde."
+      "agent": "Découvrez ce qui périme le plus, ce qui s'accumule et comment améliorer votre rotation. Des recommandations concrètes basées sur votre propre historique de consommation."
     },
     "actions": {
       "maybeLater": "Plus tard",

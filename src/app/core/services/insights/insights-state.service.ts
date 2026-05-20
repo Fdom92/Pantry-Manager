@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import type { InsightsAnalysis, InsightsSignalsPayload } from '@core/models/insights/insights-analysis.model';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { HistoryEventLogService } from '../history/history-event-log.service';
@@ -101,7 +102,7 @@ export class InsightsStateService {
     return computeFoodCoverage(activeItems);
   });
 
-  readonly isPro = computed(() => this.revenueCat.isPro());
+  readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
   async ionViewWillEnter(): Promise<void> {
     await this.pantryStore.loadAll();
@@ -111,6 +112,7 @@ export class InsightsStateService {
     this.isLoadingEvents.set(false);
 
     if (this.isPro()) {
+      void this.llmClient.warmup();
       const cached = await this.cacheStorage.loadCache();
       if (cached && !this.isStaleAnalysis(cached.analysis)) {
         this.proAnalysis.set(cached.analysis);
