@@ -772,9 +772,7 @@
     "headline": "Desbloquea todo el poder de tu despensa",
     "subtitle": "Automatización inteligente y funciones prioritarias.",
     "benefits": {
-      "agent": "Tu asistente personal de cocina: menús y recetas adaptados a tu despensa y gustos.",
-      "history": "Historial ilimitado para analizar patrones y optimizar tus compras.",
-      "future": "Sé el primero en probar nuevas funciones antes que nadie."
+      "agent": "Descubre qué caducas más, qué acumulas y cómo mejorar tu rotación. Recomendaciones concretas basadas en tu propio historial de consumo."
     },
     "actions": {
       "maybeLater": "Ahora no",

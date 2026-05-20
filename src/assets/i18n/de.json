@@ -772,9 +772,7 @@
     "headline": "Entfalte das volle Potenzial deiner Vorratskammer",
     "subtitle": "Intelligente Automatisierung und priorisierte Funktionen.",
     "benefits": {
-      "agent": "Dein persönlicher Kochassistent: Menüs und Rezepte auf deinen Vorrat und Geschmack abgestimmt.",
-      "history": "Unbegrenzter Verlauf zur Musteranalyse und Optimierung deiner Einkäufe.",
-      "future": "Sei der Erste, der neue Funktionen vor allen anderen testet."
+      "agent": "Erkenne, was am meisten abläuft, was sich ansammelt und wie du die Rotation verbessern kannst. Konkrete Empfehlungen aus deinem eigenen Verbrauchsverlauf."
     },
     "actions": {
       "maybeLater": "Vielleicht später",
