@@ -9,7 +9,8 @@ export type InsightsClientError = 'RATE_LIMIT' | 'TIMEOUT' | 'PRO_REQUIRED' | 'A
 export class InsightsLlmClientService {
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly endpoint = environment.insightsApiUrl;
-  private readonly timeoutMs = 20000;
+  private readonly timeoutMs = 45000;
+  private warmupInFlight = false;
 
   async analyze(payload: InsightsSignalsPayload): Promise<InsightsAnalysis> {
     if (!this.endpoint) {
@@ -59,6 +60,27 @@ export class InsightsLlmClientService {
     }
 
     return analysis as InsightsAnalysis;
+  }
+
+  async warmup(): Promise<void> {
+    if (!this.endpoint || this.warmupInFlight) return;
+    let healthUrl: string;
+    try {
+      healthUrl = new URL(this.endpoint).origin + '/health';
+    } catch {
+      return;
+    }
+    this.warmupInFlight = true;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    try {
+      await fetch(healthUrl, { method: 'GET', signal: controller.signal });
+    } catch {
+      // best-effort
+    } finally {
+      clearTimeout(timeoutId);
+      this.warmupInFlight = false;
+    }
   }
 
   private makeError(code: InsightsClientError): Error & { code: InsightsClientError } {

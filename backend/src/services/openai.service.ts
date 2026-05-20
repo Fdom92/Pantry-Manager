@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 
 const apiKey = process.env.OPENAI_API_KEY ?? '';
 const model = process.env.OPENAI_MODEL ?? 'gpt-4o-mini';
-const OPENAI_TIMEOUT_MS = 18000; // 18s - before frontend (20s) and Render (30s)
+const OPENAI_TIMEOUT_MS = 35000; // 35s - within frontend (45s) and Render boot budget
 
 
 // Singleton client
