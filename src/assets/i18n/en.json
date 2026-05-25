@@ -445,7 +445,8 @@
       "withDate": "Tracked",
       "noDate": "No date",
       "reviewable": "Reviewable",
-      "expired": "Expired"
+      "expired": "Expired",
+      "noFoodType": "Without food type"
     },
     "pro": {
       "title": "Smart AI analysis",
@@ -475,14 +476,16 @@
         "low": "Need replenishment soon",
         "expiring": "Expiring in a few days",
         "expired": "Review and discard",
-        "review": "Past date, may still be fine"
+        "review": "Past date, may still be fine",
+        "pendientes": "Products with incomplete information"
       },
       "status": {
         "normal": "No alerts",
         "low": "Low stock",
         "expiring": "Near expiry",
         "expired": "Expired",
-        "review": "Check"
+        "review": "Check",
+        "pendientes": "Pending"
       },
       "search": "Search products"
     },

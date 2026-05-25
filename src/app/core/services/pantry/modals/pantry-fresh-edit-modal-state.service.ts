@@ -54,7 +54,7 @@ export class PantryFreshEditModalStateService {
     this.currentState.set(qtyToFreshState(batch?.quantity ?? 0));
     this.form.reset({
       name: item.name ?? '',
-      expirationDate: batch?.expirationDate ?? null,
+      expirationDate: batch?.expirationDate || null,
     });
     this.isSaving.set(false);
     this.isOpen.set(true);
@@ -89,7 +89,7 @@ export class PantryFreshEditModalStateService {
       const updatedBatch = {
         batchId: previousBatch?.batchId ?? `batch-${Date.now()}`,
         quantity: freshStateToQty(this.currentState()),
-        expirationDate: expirationDate ?? undefined,
+        expirationDate: expirationDate || undefined,
         noExpiry: previousBatch?.noExpiry,
         opened: previousBatch?.opened,
         locationId: previousBatch?.locationId,

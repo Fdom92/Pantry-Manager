@@ -445,7 +445,8 @@
       "withDate": "Suivi",
       "noDate": "Sans date",
       "reviewable": "À vérifier",
-      "expired": "Périmés"
+      "expired": "Périmés",
+      "noFoodType": "Sans type d'aliment"
     },
     "pro": {
       "title": "Analyse IA intelligente",
@@ -475,14 +476,16 @@
         "low": "À réapprovisionner bientôt",
         "expiring": "Expirent dans quelques jours",
         "expired": "À vérifier et jeter",
-        "review": "Date dépassée, peut encore être bon"
+        "review": "Date dépassée, peut encore être bon",
+        "pendientes": "Produits avec informations incomplètes"
       },
       "status": {
         "normal": "Sans alertes",
         "low": "Stock faible",
         "expiring": "Bientôt périmé",
         "expired": "Périmé",
-        "review": "Vérifier"
+        "review": "Vérifier",
+        "pendientes": "En attente"
       },
       "search": "Rechercher des produits"
     },

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
-import { classifyExpiry, getItemStatusState, normalizeBatches, sumQuantities } from '@core/domain/pantry';
+import { classifyExpiry, getItemStatusState, isIncomplete, normalizeBatches, sumQuantities } from '@core/domain/pantry';
 import { generateBatchId } from '@core/utils';
 import type {
   BatchCountsMeta,
@@ -38,6 +38,7 @@ export class PantryViewModelService {
       review: 0,
       lowStock: 0,
       normal: 0,
+      pendientes: 0,
     };
     for (const item of items) {
       const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
@@ -57,6 +58,9 @@ export class PantryViewModelService {
         default:
           statusCounts.normal += 1;
           break;
+      }
+      if (isIncomplete(item)) {
+        statusCounts.pendientes += 1;
       }
     }
 
@@ -140,6 +144,20 @@ export class PantryViewModelService {
         active: activeStatus === 'expired',
       },
     ];
+
+    if (counts.pendientes > 0) {
+      statusChips.push({
+        key: 'status-pendientes',
+        kind: 'status',
+        value: 'pendientes',
+        label: 'pantry.filters.status.pendientes',
+        count: counts.pendientes,
+        icon: 'create-outline',
+        description: 'pantry.filters.desc.pendientes',
+        colorClass: 'chip--pendientes',
+        active: activeStatus === 'pendientes',
+      });
+    }
 
     return statusChips;
   }

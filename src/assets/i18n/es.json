@@ -445,7 +445,8 @@
       "withDate": "Con seguimiento",
       "noDate": "Sin fecha",
       "reviewable": "Revisables",
-      "expired": "Caducados"
+      "expired": "Caducados",
+      "noFoodType": "Sin tipo de alimento"
     },
     "pro": {
       "title": "Análisis inteligente con IA",
@@ -475,14 +476,16 @@
         "low": "Necesitan reposición pronto",
         "expiring": "Caducan en pocos días",
         "expired": "Revisar y descartar",
-        "review": "Pasó la fecha, pero puede estar bien"
+        "review": "Pasó la fecha, pero puede estar bien",
+        "pendientes": "Productos con información incompleta"
       },
       "status": {
         "normal": "Sin alertas",
         "low": "Stock bajo",
         "expiring": "Próx. caducar",
         "expired": "Caducados",
-        "review": "Revisar"
+        "review": "Revisar",
+        "pendientes": "Pendientes"
       },
       "search": "Buscar productos"
     },

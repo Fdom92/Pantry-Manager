@@ -58,7 +58,8 @@
               <ion-badge color="medium" class="group-count">{{ group.suggestions.length }}</ion-badge>
               <ion-icon
                 class="collapse-icon"
-                [name]="isGroupCollapsed(group.key) ? 'chevron-up-outline' : 'chevron-down-outline'">
+                [class.collapse-icon--expanded]="!isGroupCollapsed(group.key)"
+                name="chevron-down-outline">
               </ion-icon>
             </button>
 

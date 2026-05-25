@@ -5,6 +5,7 @@ export interface PantryFilterState {
   recentlyAdded: boolean;
   normalOnly: boolean;
   review: boolean;
+  pendientes: boolean;
 }
 
 export const DEFAULT_PANTRY_FILTERS: PantryFilterState = {
@@ -14,4 +15,5 @@ export const DEFAULT_PANTRY_FILTERS: PantryFilterState = {
   recentlyAdded: false,
   normalOnly: false,
   review: false,
+  pendientes: false,
 };

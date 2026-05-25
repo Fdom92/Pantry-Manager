@@ -116,11 +116,18 @@ export class HistoryEventManagerService {
 
   async logExpiredBatches(items: PantryItem[]): Promise<void> {
     const expireEvents = await this.eventLog.listEventsByType('EXPIRE');
-    const seen = new Set(
-      expireEvents
-        .map(event => normalizeTrim(String(event.sourceMetadata?.['batchKey'] ?? '')))
-        .filter(Boolean)
-    );
+    const seen = new Set<string>();
+    for (const event of expireEvents) {
+      const batchKey = normalizeTrim(String(event.sourceMetadata?.['batchKey'] ?? ''));
+      if (batchKey) seen.add(batchKey);
+      // Also index by productId::date so old batchId-based keys cover fresh items
+      // whose batchId may have been regenerated since the event was recorded.
+      const dateKey = event.productId && event.expirationDate
+        ? `${event.productId}::${normalizeTrim(event.expirationDate)}`
+        : null;
+      if (dateKey) seen.add(dateKey);
+    }
+
     const now = new Date();
     const tasks: Promise<unknown>[] = [];
 
@@ -128,7 +135,13 @@ export class HistoryEventManagerService {
       for (const batch of item.batches ?? []) {
         if (!batch?.expirationDate) continue;
         if (classifyExpiry(batch.expirationDate, now, 0) !== 'expired') continue;
-        const batchKey = buildExpireBatchKey(item._id, batch);
+
+        // Fresh items use a date-based key because their batchId is regenerated on every
+        // consolidation — using batchId would cause duplicate EXPIRE events after any edit.
+        const batchKey = item.productType === 'fresh'
+          ? `${item._id}::${normalizeTrim(batch.expirationDate)}`
+          : buildExpireBatchKey(item._id, batch);
+
         if (!batchKey || seen.has(batchKey)) continue;
         const quantity = Number.isFinite(batch.quantity) ? batch.quantity : 0;
         if (!Number.isFinite(quantity) || quantity <= 0) continue;

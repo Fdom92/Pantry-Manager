@@ -445,7 +445,8 @@
       "withDate": "Rastreados",
       "noDate": "Sem data",
       "reviewable": "Revisáveis",
-      "expired": "Expirados"
+      "expired": "Expirados",
+      "noFoodType": "Sem tipo de alimento"
     },
     "pro": {
       "title": "Análise inteligente com IA",
@@ -475,14 +476,16 @@
         "low": "Necessitam de reabastecimento em breve",
         "expiring": "A expirar em poucos dias",
         "expired": "Rever e descartar",
-        "review": "Passou a data, pode ainda estar bom"
+        "review": "Passou a data, pode ainda estar bom",
+        "pendientes": "Produtos com informações incompletas"
       },
       "status": {
         "normal": "Sem alertas",
         "low": "Stock baixo",
         "expiring": "Perto da validade",
         "expired": "Expirado",
-        "review": "Verificar"
+        "review": "Verificar",
+        "pendientes": "Pendentes"
       },
       "search": "Pesquisar produtos"
     },

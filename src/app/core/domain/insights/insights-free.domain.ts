@@ -1,7 +1,7 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
-import { getItemStatusState, sumQuantities } from '@core/domain/pantry';
+import { getItemStatusState, isIncomplete, sumQuantities } from '@core/domain/pantry';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 export interface InventorySnapshot {
@@ -13,6 +13,8 @@ export interface InventorySnapshot {
   lowStock: number;
   basicsOutOfStock: number;
   noExpiryDate: number;
+  noFoodType: number;
+  pendientes: number;
   expiredRatio: number;
 }
 
@@ -50,6 +52,8 @@ export function computeInventorySnapshot(items: PantryItem[], now: Date): Invent
     lowStock: 0,
     basicsOutOfStock: 0,
     noExpiryDate: 0,
+    noFoodType: 0,
+    pendientes: 0,
     expiredRatio: 0,
   };
 
@@ -77,6 +81,14 @@ export function computeInventorySnapshot(items: PantryItem[], now: Date): Invent
       if (!hasBatchDate && !allMarkedNoExpiry) {
         result.noExpiryDate += 1;
       }
+    }
+
+    if (!item.foodType) {
+      result.noFoodType += 1;
+    }
+
+    if (isIncomplete(item)) {
+      result.pendientes += 1;
     }
   }
 
@@ -188,38 +200,21 @@ export interface PantryScoreResult {
 }
 
 /**
- * Computes a 0–100 pantry health score.
+ * Computes a 0–100 data quality score: % of items with complete data (foodType + expiry).
  * Returns null when fewer than 3 items (not enough signal).
  */
 export function computePantryScore(
   total: number,
-  expired: number,
-  nearExpiry: number,
-  noDateCount: number,
-  lowStock: number,
-  stale: number,
+  pendientes: number,
 ): PantryScoreResult | null {
   if (total < 3) return null;
 
-  let score = 100;
-
-  if (expired > 0) {
-    score -= Math.min(40, 15 + (expired / total) * 30);
-  }
-  if (nearExpiry > 0) {
-    score -= Math.min(20, 8 + (nearExpiry / total) * 15);
-  }
-
-  score -= (noDateCount / total) * 15;
-  score -= (lowStock / total) * 10;
-  score -= (stale / total) * 5;
-
-  score = Math.round(Math.max(0, Math.min(100, score)));
+  const score = Math.round((1 - pendientes / total) * 100);
 
   let label: PantryScoreLabel;
-  if (score >= 85) label = 'excellent';
-  else if (score >= 65) label = 'good';
-  else if (score >= 40) label = 'fair';
+  if (score >= 90) label = 'excellent';
+  else if (score >= 70) label = 'good';
+  else if (score >= 50) label = 'fair';
   else label = 'poor';
 
   return { score, label };

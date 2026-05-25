@@ -269,6 +269,12 @@ ion-title {
   margin-left: auto;
   font-size: 1rem;
   color: var(--app-theme-text-muted);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotate(0deg);
+
+  &--expanded {
+    transform: rotate(180deg);
+  }
 }
 
 // --- Bought section ---
