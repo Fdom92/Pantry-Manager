@@ -1,7 +1,7 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
-import { getItemStatusState, sumQuantities } from '@core/domain/pantry';
+import { getItemStatusState, isIncomplete, sumQuantities } from '@core/domain/pantry';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 export interface InventorySnapshot {
@@ -13,6 +13,7 @@ export interface InventorySnapshot {
   lowStock: number;
   basicsOutOfStock: number;
   noExpiryDate: number;
+  pendientes: number;
   expiredRatio: number;
 }
 
@@ -50,6 +51,7 @@ export function computeInventorySnapshot(items: PantryItem[], now: Date): Invent
     lowStock: 0,
     basicsOutOfStock: 0,
     noExpiryDate: 0,
+    pendientes: 0,
     expiredRatio: 0,
   };
 
@@ -77,6 +79,10 @@ export function computeInventorySnapshot(items: PantryItem[], now: Date): Invent
       if (!hasBatchDate && !allMarkedNoExpiry) {
         result.noExpiryDate += 1;
       }
+    }
+
+    if (isIncomplete(item)) {
+      result.pendientes += 1;
     }
   }
 

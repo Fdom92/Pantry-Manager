@@ -445,7 +445,8 @@
       "withDate": "Tracciati",
       "noDate": "Senza data",
       "reviewable": "Da verificare",
-      "expired": "Scaduti"
+      "expired": "Scaduti",
+      "pendientes": "Dati incompleti"
     },
     "pro": {
       "title": "Analisi IA intelligente",
@@ -475,14 +476,16 @@
         "low": "Necessitano di riassortimento presto",
         "expiring": "In scadenza tra pochi giorni",
         "expired": "Controlla ed elimina",
-        "review": "Data superata, potrebbe essere ok"
+        "review": "Data superata, potrebbe essere ok",
+        "pendientes": "Prodotti con informazioni incomplete"
       },
       "status": {
         "normal": "Nessun problema",
         "low": "Stock basso",
         "expiring": "Vicino alla scadenza",
         "expired": "Scaduto",
-        "review": "Verificare"
+        "review": "Verificare",
+        "pendientes": "In attesa"
       },
       "search": "Cerca prodotti"
     },

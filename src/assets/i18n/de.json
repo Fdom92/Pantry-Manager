@@ -445,7 +445,8 @@
       "withDate": "Mit Datum",
       "noDate": "Ohne Datum",
       "reviewable": "Zu prüfen",
-      "expired": "Abgelaufen"
+      "expired": "Abgelaufen",
+      "pendientes": "Unvollständige Daten"
     },
     "pro": {
       "title": "Intelligente KI-Analyse",
@@ -475,14 +476,16 @@
         "low": "Müssen bald nachgefüllt werden",
         "expiring": "Laufen in wenigen Tagen ab",
         "expired": "Überprüfen und entsorgen",
-        "review": "Datum überschritten, evtl. noch gut"
+        "review": "Datum überschritten, evtl. noch gut",
+        "pendientes": "Produkte mit unvollständigen Angaben"
       },
       "status": {
         "normal": "Keine Probleme",
         "low": "Niedriger Bestand",
         "expiring": "Bald ablaufend",
         "expired": "Abgelaufen",
-        "review": "Prüfen"
+        "review": "Prüfen",
+        "pendientes": "Ausstehend"
       },
       "search": "Produkte suchen"
     },

@@ -176,6 +176,17 @@
               </span>
             </div>
             <div class="quality-bar-row">
+              <span class="quality-bar-row__label">{{ 'insights.quality.pendientes' | translate }}</span>
+              <div class="quality-bar-row__track">
+                <div class="quality-bar-row__fill quality-bar-row__fill--warning"
+                  [style.width]="getQualityBarWidth(facade.inventorySnapshot().pendientes, facade.inventorySnapshot().total)">
+                </div>
+              </div>
+              <span class="quality-bar-row__pct">
+                {{ formatPercent(facade.inventorySnapshot().pendientes / facade.inventorySnapshot().total) }}
+              </span>
+            </div>
+            <div class="quality-bar-row">
               <span class="quality-bar-row__label">{{ 'insights.quality.expired' | translate }}</span>
               <div class="quality-bar-row__track">
                 <div class="quality-bar-row__fill quality-bar-row__fill--danger"
