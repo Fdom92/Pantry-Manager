@@ -62,7 +62,7 @@ export class FreshItemCardComponent implements OnChanges {
     const qty = batch?.quantity ?? 0;
     this.currentState.set(qtyToFreshState(qty));
     const dateStr = batch?.expirationDate;
-    if (dateStr) {
+    if (dateStr && qty > 0) {
       const days = Math.ceil((Date.parse(dateStr) - Date.now()) / 86_400_000);
       this.daysToExpiry.set(days);
     } else {

@@ -41,6 +41,6 @@ export class FreshEditItemModalComponent {
   }
 
   onDateSelected(date: string | undefined): void {
-    this.state.setExpirationDate(date ?? null);
+    this.state.setExpirationDate(date || null);
   }
 }

@@ -138,10 +138,13 @@ export function getItemStatusState(
   // and discrete qty states. Must run BEFORE the general expiry check so the
   // 15-day pantry window doesn't catch 14-day fresh dates as near-expiry.
   if (item.productType === 'fresh') {
+    const qty = sumQuantities(item.batches ?? []);
+    // Depleted items are low-stock, not expired — prevents false positives when a
+    // stale expiry date lingers on a zero-quantity fresh item.
+    if (qty <= 0) return 'low-stock';
     const freshExpiry = computeExpirationStatus(item.batches, now, FRESH_NEAR_EXPIRY_WINDOW_DAYS);
     if (freshExpiry === ExpirationStatus.EXPIRED) return 'expired';
     if (freshExpiry === ExpirationStatus.NEAR_EXPIRY) return 'near-expiry';
-    const qty = sumQuantities(item.batches ?? []);
     return qty < FRESH_QTY.sufficient ? 'low-stock' : 'normal';
   }
 
