@@ -446,7 +446,7 @@
       "noDate": "Sem data",
       "reviewable": "Revisáveis",
       "expired": "Expirados",
-      "pendientes": "Dados incompletos"
+      "noFoodType": "Sem tipo de alimento"
     },
     "pro": {
       "title": "Análise inteligente com IA",

@@ -446,7 +446,7 @@
       "noDate": "Ohne Datum",
       "reviewable": "Zu prüfen",
       "expired": "Abgelaufen",
-      "pendientes": "Unvollständige Daten"
+      "noFoodType": "Ohne Lebensmitteltyp"
     },
     "pro": {
       "title": "Intelligente KI-Analyse",

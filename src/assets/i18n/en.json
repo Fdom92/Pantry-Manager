@@ -446,7 +446,7 @@
       "noDate": "No date",
       "reviewable": "Reviewable",
       "expired": "Expired",
-      "pendientes": "Incomplete data"
+      "noFoodType": "Without food type"
     },
     "pro": {
       "title": "Smart AI analysis",

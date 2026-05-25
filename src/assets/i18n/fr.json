@@ -446,7 +446,7 @@
       "noDate": "Sans date",
       "reviewable": "À vérifier",
       "expired": "Périmés",
-      "pendientes": "Données incomplètes"
+      "noFoodType": "Sans type d'aliment"
     },
     "pro": {
       "title": "Analyse IA intelligente",
