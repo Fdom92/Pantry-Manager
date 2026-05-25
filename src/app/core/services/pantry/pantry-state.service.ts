@@ -57,7 +57,7 @@ export class PantryStateService {
   readonly summarySnapshot: WritableSignal<PantrySummaryMeta> = signal({
     total: 0,
     visible: 0,
-    statusCounts: { expired: 0, expiring: 0, review: 0, lowStock: 0, normal: 0 },
+    statusCounts: { expired: 0, expiring: 0, review: 0, lowStock: 0, normal: 0, pendientes: 0 },
   });
 
   private readonly skeletonManager = new SkeletonLoadingManager();
@@ -262,6 +262,7 @@ export class PantryStateService {
           recentlyAdded: false,
           normalOnly: false,
           review: false,
+          pendientes: false,
         });
         break;
       case 'near-expiry':
@@ -272,6 +273,7 @@ export class PantryStateService {
           recentlyAdded: false,
           normalOnly: false,
           review: false,
+          pendientes: false,
         });
         break;
       case 'low-stock':
@@ -282,6 +284,7 @@ export class PantryStateService {
           recentlyAdded: false,
           normalOnly: false,
           review: false,
+          pendientes: false,
         });
         break;
       case 'normal':
@@ -292,6 +295,7 @@ export class PantryStateService {
           recentlyAdded: false,
           normalOnly: true,
           review: false,
+          pendientes: false,
         });
         break;
       case 'review':
@@ -302,6 +306,18 @@ export class PantryStateService {
           recentlyAdded: false,
           normalOnly: false,
           review: true,
+          pendientes: false,
+        });
+        break;
+      case 'pendientes':
+        this.pantryStore.setFilters({
+          expired: false,
+          expiring: false,
+          lowStock: false,
+          recentlyAdded: false,
+          normalOnly: false,
+          review: false,
+          pendientes: true,
         });
         break;
       default:
@@ -312,6 +328,7 @@ export class PantryStateService {
           recentlyAdded: false,
           normalOnly: false,
           review: false,
+          pendientes: false,
         });
         break;
     }
@@ -447,6 +464,7 @@ export class PantryStateService {
     if (filters.expiring) return 'near-expiry';
     if (filters.lowStock) return 'low-stock';
     if (filters.normalOnly) return 'normal';
+    if (filters.pendientes) return 'pendientes';
     return 'all';
   }
 }

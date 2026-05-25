@@ -111,6 +111,11 @@ ion-title {
   --color: var(--ion-color-danger-contrast);
 }
 
+.summary-chips .status-chip.chip--pendientes {
+  --background: var(--ion-color-medium);
+  --color: var(--ion-color-medium-contrast);
+}
+
 .summary-chips .status-chip.chip--basic {
   --background: var(--ion-color-tertiary);
   --color: var(--ion-color-tertiary-contrast);
@@ -266,7 +271,12 @@ section.group-details {
 
 .group-toggle-icon {
   font-size: 20px;
-  transition: color 0.18s ease;
+  transition: color 0.18s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotate(0deg);
+
+  &--expanded {
+    transform: rotate(180deg);
+  }
 }
 
 .group-header:hover {

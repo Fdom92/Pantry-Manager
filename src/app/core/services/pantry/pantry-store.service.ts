@@ -123,6 +123,10 @@ export class PantryStoreService {
     this.pantryService.applyPendingNavigationPreset();
   }
 
+  setPendingNavigationPreset(preset: Partial<PantryFilterState>): void {
+    this.pantryService.setPendingNavigationPreset(preset);
+  }
+
   async ensureFirstPageLoaded(): Promise<void> {
     await this.pantryService.ensureFirstPageLoaded();
   }

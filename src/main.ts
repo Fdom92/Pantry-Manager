@@ -182,7 +182,7 @@ addIcons({
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideIonicAngular(),
+    provideIonicAngular({ backButtonText: '' }),
     provideRouter(routes),
     provideHttpClient(),
     importProvidersFrom(

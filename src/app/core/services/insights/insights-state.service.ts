@@ -84,14 +84,7 @@ export class InsightsStateService {
 
   readonly pantryScore = computed((): PantryScoreResult | null => {
     const snapshot = this.inventorySnapshot();
-    return computePantryScore(
-      snapshot.total,
-      snapshot.expired,
-      snapshot.nearExpiry + snapshot.review,
-      snapshot.noExpiryDate,
-      snapshot.lowStock,
-      this.staleCount(),
-    );
+    return computePantryScore(snapshot.total, snapshot.pendientes);
   });
 
   readonly foodCoverage = computed((): FoodCoverageResult | null => {

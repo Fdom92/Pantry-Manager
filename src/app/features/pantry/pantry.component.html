@@ -168,7 +168,8 @@
                         </ion-text>
                         <ion-icon
                           class="group-toggle-icon"
-                          [name]="facade.isGroupCollapsed(group.key) ? 'chevron-down-outline' : 'chevron-up-outline'">
+                          [class.group-toggle-icon--expanded]="!facade.isGroupCollapsed(group.key)"
+                          name="chevron-down-outline">
                         </ion-icon>
                       </div>
                     </section>

@@ -24,8 +24,21 @@ export function matchesFilters(item: PantryItem, filters: PantryFilterState): bo
   if (filters.lowStock && state !== 'low-stock') return false;
   if (filters.recentlyAdded && !isRecentlyAdded(item)) return false;
   if (filters.normalOnly && state !== 'normal') return false;
+  if (filters.pendientes && !isIncomplete(item)) return false;
 
   return true;
+}
+
+/**
+ * Check if item is missing relevant tracking data (no foodType or no expiry date).
+ */
+export function isIncomplete(item: PantryItem): boolean {
+  if (!item.foodType) return true;
+  if (item.productType === 'fresh') return false;
+  const batches = item.batches ?? [];
+  const hasBatchDate = batches.some(b => !!b.expirationDate);
+  const allMarkedNoExpiry = batches.length > 0 && batches.every(b => !!b.noExpiry);
+  return !hasBatchDate && !allMarkedNoExpiry;
 }
 
 /**
