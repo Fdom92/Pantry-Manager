@@ -8,6 +8,7 @@ import {
   IonTitle, IonToolbar,
 } from '@ionic/angular/standalone';
 import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
+import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
 import { PantryFreshEditModalStateService } from '@core/services/pantry/modals/pantry-fresh-edit-modal-state.service';
 import type { FreshState } from '@core/domain/pantry';
 
@@ -18,7 +19,7 @@ import type { FreshState } from '@core/domain/pantry';
     CommonModule, ReactiveFormsModule, TranslateModule,
     IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
     IonContent, IonItem, IonInput, IonIcon,
-    IonFooter, IonSpinner, ExpiryPickerComponent,
+    IonFooter, IonSpinner, ExpiryPickerComponent, EntitySelectorFieldComponent,
   ],
   templateUrl: './fresh-edit-item-modal.component.html',
   styleUrls: ['./fresh-edit-item-modal.component.scss'],

@@ -3,6 +3,7 @@ import { ShoppingReason, type ShoppingSummary, type ShoppingSuggestionWithItem }
 
 export const URGENCY_WEIGHT: Record<ShoppingReason, number> = {
   [ShoppingReason.FRESH_EMPTY]: 1,
+  [ShoppingReason.FRESH_LOW]:   1.5,
   [ShoppingReason.EMPTY]:       2,
   [ShoppingReason.BELOW_MIN]:   3,
   [ShoppingReason.MANUAL]:      4,
@@ -17,7 +18,11 @@ export function determineSuggestionNeed(params: {
 
   if (totalQuantity <= 0) {
     const reason = isFresh ? ShoppingReason.FRESH_EMPTY : ShoppingReason.EMPTY;
-    return { reason, suggestedQuantity: ensureMinimumSuggestedQuantity(minThreshold ?? 1) };
+    return { reason, suggestedQuantity: isFresh ? 0 : ensureMinimumSuggestedQuantity(minThreshold ?? 1) };
+  }
+
+  if (isFresh) {
+    return { reason: ShoppingReason.FRESH_LOW, suggestedQuantity: 0 };
   }
 
   if (minThreshold != null && totalQuantity < minThreshold) {
@@ -45,6 +50,8 @@ export function incrementSummary(summary: ShoppingSummary, reason: ShoppingReaso
     case ShoppingReason.EMPTY:
     case ShoppingReason.FRESH_EMPTY:
       return { ...summary, empty: summary.empty + 1 };
+    case ShoppingReason.FRESH_LOW:
+      return { ...summary, belowMin: summary.belowMin + 1 };
     default:
       return summary;
   }

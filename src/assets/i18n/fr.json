@@ -326,6 +326,7 @@
       "loading": "Génération de la liste d’achats…",
       "restock": "Réapprovisionner {{amount}}",
       "restockFresh": "Réapprovisionner",
+      "freshLow": "Presque épuisé, à réapprovisionner",
       "empty": "Marquez les produits comme \"toujours avoir\" pour être alerté quand ils s’épuisent."
     },
     "share": {
@@ -341,10 +342,11 @@
     },
     "chips": {
       "freshEmpty": "Frais épuisé",
-      "empty": "Épuisé",
+      "freshLow": "Presque épuisé",
+      "empty": "Produit épuisé",
       "belowMin": "Stock bas",
-      "basic": "Essentiel",
-      "manual": "Ajouté par toi"
+      "basic": "Automatique",
+      "manual": "Manuel"
     },
     "bought": {
       "sectionTitle": "Acheté",
