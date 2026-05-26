@@ -139,6 +139,16 @@ export class PantryStateService {
   );
   readonly batchSummaries = computed(() => this.viewModel.computeBatchSummaries(this.pantryItemsState()));
 
+  // True while any item-editing modal is open. Used to freeze pantryItemsState so
+  // items do not vanish from the list mid-edit when they leave the active filter.
+  private readonly isAnyEditModalOpen = computed(() =>
+    this.batchesModal.showBatchesModal() ||
+    this.editItemModalRequest() !== null ||
+    this.editFreshItemModalRequest() !== null ||
+    this.quantitySheet.showQuantitySheet() ||
+    this.consumeModal.consumeModalOpen()
+  );
+
   constructor() {
     // Provide batch summaries to batches modal service
     this.batchesModal.batchSummaries = this.batchSummaries;
@@ -155,8 +165,11 @@ export class PantryStateService {
     // Provide pantry items state to consume modal for optimistic updates
     this.consumeModal.pantryItemsState = this.pantryItemsState;
 
-    // Keep UI in sync with filtered pipeline, merging optimistic batch edits
+    // Keep UI in sync with filtered pipeline, merging optimistic batch edits.
+    // Frozen while any edit modal is open so items don't vanish mid-edit when
+    // they leave the active filter. List refreshes automatically on modal close.
     effect(() => {
+      if (this.isAnyEditModalOpen()) return;
       const paginatedItems = this.pantryStore.filteredProducts();
       this.pantryItemsState.set(this.batchOps.mergePendingItems(paginatedItems));
     });

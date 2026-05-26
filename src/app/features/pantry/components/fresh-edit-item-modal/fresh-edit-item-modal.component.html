@@ -27,6 +27,19 @@
               required>
             </ion-input>
           </ion-item>
+          <div class="form-autocomplete">
+            <app-entity-selector-field
+              [items]="state.getFoodTypeOptions()"
+              [label]="'pantry.form.foodType.label' | translate"
+              [placeholder]="'pantry.form.foodType.placeholder' | translate"
+              [clearLabel]="'pantry.form.foodType.unassigned' | translate"
+              [showSearch]="false"
+              [emptyLabel]="'common.selects.noOptions' | translate"
+              [value]="state.getFoodTypeDisplayValue()"
+              (optionSelected)="state.onFoodTypeSelect($event)"
+              (cleared)="state.clearFoodTypeSelection()">
+            </app-entity-selector-field>
+          </div>
         </div>
 
         <div class="form-section-header">

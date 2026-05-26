@@ -2,9 +2,11 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { type FreshState, freshStateToQty, qtyToFreshState } from '@core/domain/pantry';
 import type { PantryItem } from '@core/models/pantry';
+import { FoodType } from '@core/models/shared/enums.model';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { AlertController, ToastController } from '@ionic/angular';
+import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
@@ -25,9 +27,36 @@ export class PantryFreshEditModalStateService {
   readonly currentState = signal<FreshState>('none');
   readonly states: readonly FreshState[] = ['sufficient', 'low', 'none'];
 
+  readonly foodTypes = Object.values(FoodType);
+
+  getFoodTypeOptions(): AutocompleteItem<FoodType>[] {
+    return this.foodTypes.map(type => ({
+      id: type,
+      title: this.translate.instant(`pantry.form.foodType.${type}`),
+      raw: type,
+    }));
+  }
+
+  getFoodTypeDisplayValue(): string {
+    const raw = this.form.get('foodType')?.value as FoodType | null;
+    if (!raw) return this.translate.instant('pantry.form.foodType.unassigned');
+    return this.translate.instant(`pantry.form.foodType.${raw}`);
+  }
+
+  onFoodTypeSelect(option: AutocompleteItem<FoodType>): void {
+    if (option?.raw) {
+      this.form.get('foodType')?.setValue(option.raw);
+    }
+  }
+
+  clearFoodTypeSelection(): void {
+    this.form.get('foodType')?.setValue(null);
+  }
+
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     expirationDate: this.fb.control<string | null>(null),
+    foodType: this.fb.control<FoodType | null>(null),
   });
 
   readonly canSave = computed(() => {
@@ -55,6 +84,7 @@ export class PantryFreshEditModalStateService {
     this.form.reset({
       name: item.name ?? '',
       expirationDate: batch?.expirationDate || null,
+      foodType: item.foodType ?? null,
     });
     this.isSaving.set(false);
     this.isOpen.set(true);
@@ -84,7 +114,7 @@ export class PantryFreshEditModalStateService {
 
     this.isSaving.set(true);
     try {
-      const { name, expirationDate } = this.form.value;
+      const { name, expirationDate, foodType } = this.form.value;
       const previousBatch = existing.batches?.[0];
       const updatedBatch = {
         batchId: previousBatch?.batchId ?? `batch-${Date.now()}`,
@@ -98,6 +128,7 @@ export class PantryFreshEditModalStateService {
         ...existing,
         name: normalizeTrim(name ?? existing.name),
         batches: [updatedBatch],
+        foodType: foodType ?? undefined,
         updatedAt: new Date().toISOString(),
       };
       await this.pantryStore.updateItem(updated);
