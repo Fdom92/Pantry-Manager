@@ -357,9 +357,9 @@ export class PantryBatchesModalStateService {
   }
 
   private getBatchSummary(item: PantryItem): BatchSummaryMeta {
-    if (!this.batchSummaries) {
-      return { total: 0, sorted: [] };
-    }
-    return this.batchSummaries().get(item._id) ?? { total: 0, sorted: [] };
+    const fromMap = this.batchSummaries?.().get(item._id);
+    if (fromMap) return fromMap;
+    // Item may have left the active filter after a save; compute directly from item.
+    return this.viewModel.computeBatchSummaries([item]).get(item._id) ?? { total: 0, sorted: [] };
   }
 }

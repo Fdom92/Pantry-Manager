@@ -81,7 +81,7 @@ export class ListStateService {
     const name = suggestion.item.name;
     this.boughtItemIds.update(set => new Set([...set, id]));
 
-    const qty = suggestion.reason === ShoppingReason.FRESH_EMPTY
+    const qty = (suggestion.reason === ShoppingReason.FRESH_EMPTY || suggestion.reason === ShoppingReason.FRESH_LOW)
       ? FRESH_QTY.sufficient
       : suggestion.suggestedQuantity;
 

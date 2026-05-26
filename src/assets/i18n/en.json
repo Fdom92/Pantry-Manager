@@ -326,6 +326,7 @@
       "loading": "Building shopping list…",
       "restock": "Restock {{amount}}",
       "restockFresh": "Restock",
+      "freshLow": "Running low, restock soon",
       "empty": "Mark products as \"always keep at home\" to get notified when they run low."
     },
     "share": {
@@ -341,10 +342,11 @@
     },
     "chips": {
       "freshEmpty": "Fresh — out of stock",
+      "freshLow": "Running low",
       "empty": "Out of stock",
       "belowMin": "Low stock",
-      "basic": "Staple",
-      "manual": "Added by you"
+      "basic": "Automatic",
+      "manual": "Manual"
     },
     "bought": {
       "sectionTitle": "Bought",

@@ -326,6 +326,7 @@
       "loading": "Sto creando la lista della spesa…",
       "restock": "Rifornire {{amount}}",
       "restockFresh": "Rifornire",
+      "freshLow": "Quasi esaurito, rifornire presto",
       "empty": "Contrassegna i prodotti come \"tieni sempre in casa\" per essere avvisato quando scarseggiano."
     },
     "share": {
@@ -341,10 +342,11 @@
     },
     "chips": {
       "freshEmpty": "Fresco esaurito",
-      "empty": "Esaurito",
+      "freshLow": "Quasi esaurito",
+      "empty": "Prodotto esaurito",
       "belowMin": "Scorta bassa",
-      "basic": "Prodotto base",
-      "manual": "Aggiunto da te"
+      "basic": "Automatico",
+      "manual": "Manuale"
     },
     "bought": {
       "sectionTitle": "Acquistato",

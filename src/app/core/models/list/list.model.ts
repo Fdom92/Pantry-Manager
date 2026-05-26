@@ -4,6 +4,7 @@ export enum ShoppingReason {
   EMPTY       = 'empty',
   BELOW_MIN   = 'below-min',
   FRESH_EMPTY = 'fresh-empty',
+  FRESH_LOW   = 'fresh-low',
   MANUAL      = 'manual',
 }
 
