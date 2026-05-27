@@ -144,7 +144,7 @@ export class DashboardStateService {
       for (const batch of item.batches ?? []) {
         if (!batch.expirationDate) continue;
         const days = Math.ceil((Date.parse(batch.expirationDate) - nowMs) / 86_400_000);
-        if (days <= 0) continue;
+        if (days < 0) continue; // exclude expired batches; today (days=0) is valid
         if (!earliest || days < earliest.daysToExpiry) {
           earliest = { name: item.name, daysToExpiry: days };
         }
