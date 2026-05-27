@@ -33,7 +33,7 @@ const FOOD_TYPE_DISPLAY_ORDER: FoodType[] = [
   FoodType.FRUIT,
   FoodType.DAIRY,
   FoodType.CARB,
-  FoodType.OTHER,
+  // OTHER excluded: too generic to surface meaningful insights
 ];
 
 export interface DistributionMetrics {
