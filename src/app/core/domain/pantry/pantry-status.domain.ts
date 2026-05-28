@@ -4,6 +4,7 @@ import { FoodType } from '@core/models/shared/enums.model';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { collectBatches, sumQuantities } from './pantry-batch.domain';
 import { FRESH_NEAR_EXPIRY_WINDOW_DAYS, FRESH_QTY } from './fresh.domain';
+import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 export const REVIEW_GRACE_DAYS = 7;
 
@@ -120,7 +121,7 @@ export function hasOpenBatch(item: PantryItem): boolean {
   return collectBatches(item.batches).some(batch => Boolean(batch.opened));
 }
 
-export function isItemLowStock(
+function isItemLowStock(
   item: PantryItem,
   context?: { totalQuantity?: number; minThreshold?: number | null }
 ): boolean {
@@ -178,4 +179,27 @@ export function shouldAutoAddToShoppingList(
     return totalQuantity < FRESH_QTY.sufficient;
   }
   return totalQuantity <= 0 || (minThreshold > 0 && totalQuantity < minThreshold);
+}
+
+// ─── Sort weight helpers (moved from utils/ — domain logic, not utilities) ───
+
+/**
+ * Maps a ProductStatusState to a numeric sort weight.
+ * Lower weight = higher priority (appears earlier in sorted lists).
+ */
+export function getStatusSortWeight(state: ProductStatusState): number {
+  switch (state) {
+    case 'expired':    return 0;
+    case 'near-expiry': return 1;
+    case 'low-stock':  return 2;
+    default:           return 3;
+  }
+}
+
+/**
+ * Compute expiration-based sort weight for a pantry item.
+ * Convenience wrapper around getItemStatusState + getStatusSortWeight.
+ */
+export function getExpirationSortWeight(item: PantryItem, now: Date = new Date()): number {
+  return getStatusSortWeight(getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS));
 }

@@ -1,7 +1,8 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { computeTodaySuggestion } from '@core/domain/dashboard';
-import { applyFifoConsumption } from '@core/domain/pantry';
+import { applyFifoConsumption, sumQuantities } from '@core/domain/pantry';
+import { daysUntilExpiry } from '@core/utils/date.util';
 import type { TodaySuggestion } from '@core/domain/dashboard';
 import type {
   PantryItem,
@@ -9,8 +10,8 @@ import type {
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
 import { LanguageService } from '../shared/language.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
+import { PantryNavigationPresetService } from '../pantry/pantry-navigation-preset.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
-import { PantryService } from '../pantry/pantry.service';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -39,7 +40,7 @@ export interface DashboardAction {
 @Injectable()
 export class DashboardStateService {
   private readonly pantryStore = inject(PantryStoreService);
-  private readonly pantryService = inject(PantryService);
+  private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
@@ -139,12 +140,12 @@ export class DashboardStateService {
     const nowMs = Date.now();
     let earliest: { name: string; daysToExpiry: number } | null = null;
     for (const item of this.pantryItems()) {
-      const stock = (item.batches ?? []).reduce((s, b) => s + (b.quantity ?? 0), 0);
+      const stock = sumQuantities(item.batches);
       if (stock <= 0) continue;
       for (const batch of item.batches ?? []) {
         if (!batch.expirationDate) continue;
-        const days = Math.ceil((Date.parse(batch.expirationDate) - nowMs) / 86_400_000);
-        if (days <= 0) continue;
+        const days = daysUntilExpiry(batch.expirationDate, nowMs);
+        if (days < 0) continue;
         if (!earliest || days < earliest.daysToExpiry) {
           earliest = { name: item.name, daysToExpiry: days };
         }
@@ -226,7 +227,7 @@ export class DashboardStateService {
         cta: {
           label: this.translate.instant('dashboard.actions.stale.cta'),
           action: () => {
-            this.pantryService.setPendingNavigationPreset({ recentlyAdded: false });
+            this.navigationPreset.setPending({ recentlyAdded: false });
             void this.navCtrl.navigateRoot('/pantry');
           },
         },
@@ -275,15 +276,15 @@ export class DashboardStateService {
 
     switch (card) {
       case 'expired':
-        this.pantryService.setPendingNavigationPreset({ expired: true });
+        this.navigationPreset.setPending({ expired: true });
         await this.navCtrl.navigateRoot('/pantry');
         return;
       case 'near-expiry':
-        this.pantryService.setPendingNavigationPreset({ expiring: true });
+        this.navigationPreset.setPending({ expiring: true });
         await this.navCtrl.navigateRoot('/pantry');
         return;
       case 'low-or-empty':
-        this.pantryService.setPendingNavigationPreset({ lowStock: true });
+        this.navigationPreset.setPending({ lowStock: true });
         await this.navCtrl.navigateRoot('/pantry');
         return;
       case 'shopping':
@@ -304,6 +305,10 @@ export class DashboardStateService {
     this.dismissedTodayIds.update(ids => new Set([...ids, suggestion.protagonist.id]));
   }
 
+  async goToShoppingList(): Promise<void> {
+    await this.navCtrl.navigateRoot('/list');
+  }
+
   async actOnToday(): Promise<void> {
     const suggestion = this.todaySuggestion();
     if (!suggestion || this.isConsumingToday()) return;
@@ -317,7 +322,7 @@ export class DashboardStateService {
       }
       this.lastProtagonistId.set(suggestion.protagonist.id);
       this.isCookingConfirmed.set(true);
-      void this.reviewPrompt.handleConsumeCompleted();
+      void this.reviewPrompt.handleIngredientUsed();
       setTimeout(() => this.isCookingConfirmed.set(false), 2500);
     } finally {
       this.isConsumingToday.set(false);
@@ -334,6 +339,7 @@ export class DashboardStateService {
       await this.pantryStore.updateItem({ ...item, batches: [updatedBatch] });
       this.lastProtagonistId.set(id);
       this.isCookingConfirmed.set(true);
+      void this.reviewPrompt.handlePositiveAction();
       setTimeout(() => this.isCookingConfirmed.set(false), 2500);
     } finally {
       this.isConsumingToday.set(false);
@@ -342,7 +348,7 @@ export class DashboardStateService {
 
   formatExpiryRelative(value: string | undefined): string | null {
     if (!value) return null;
-    const diffDays = Math.ceil((Date.parse(value) - Date.now()) / 86_400_000);
+    const diffDays = daysUntilExpiry(value);
     if (diffDays <= 0) return this.translate.instant('dashboard.today.expiry.today');
     if (diffDays === 1) return this.translate.instant('dashboard.today.expiry.tomorrow');
     return this.translate.instant('dashboard.today.expiry.inDays', { count: diffDays });

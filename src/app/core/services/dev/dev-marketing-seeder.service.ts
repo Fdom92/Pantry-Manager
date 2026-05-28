@@ -4,7 +4,7 @@ import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import type { EventParams } from '@core/models/events';
 import { generateBatchId } from '@core/utils';
-import { PantryService } from '../pantry/pantry.service';
+import { PantryQueryService } from '../pantry/pantry-query.service';
 import { HistoryEventLogService } from '../history/history-event-log.service';
 
 interface ItemSeed {
@@ -20,7 +20,7 @@ interface ItemSeed {
 
 @Injectable({ providedIn: 'root' })
 export class DevMarketingSeederService {
-  private readonly pantry = inject(PantryService);
+  private readonly pantry = inject(PantryQueryService);
   private readonly eventLog = inject(HistoryEventLogService);
 
   async seedMarketingDatabase(): Promise<void> {

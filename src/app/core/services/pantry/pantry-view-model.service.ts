@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { classifyExpiry, getItemStatusState, isIncomplete, normalizeBatches, sumQuantities } from '@core/domain/pantry';
-import { generateBatchId } from '@core/utils';
+import { daysUntilExpiry, generateBatchId } from '@core/utils';
 import type {
   BatchCountsMeta,
   BatchEntryMeta,
@@ -419,7 +419,7 @@ export class PantryViewModelService {
     if (!earliestDate) return this.translate.instant('pantry.detail.noExpiry');
     if (state === 'expired') return this.translate.instant('pantry.detail.subinfo.expired');
     if (state === 'review') return this.translate.instant('pantry.detail.subinfo.review');
-    const days = Math.ceil((Date.parse(earliestDate) - Date.now()) / 86_400_000);
+    const days = daysUntilExpiry(earliestDate);
     if (days <= 0) return this.translate.instant('pantry.detail.subinfo.expired');
     if (days === 1) return this.translate.instant('pantry.detail.subinfo.tomorrow');
     // Within 7 days: show relative urgency. Beyond: show the date-fns formatted date.

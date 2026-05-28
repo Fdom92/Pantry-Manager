@@ -150,7 +150,7 @@ export function computePatternSignals(
   const addedByType = new Map<string, number>();
 
   for (const e of recent) {
-    if (!e.foodType || e.foodType === FoodType.HOUSEHOLD) continue;
+    if (!e.foodType || e.foodType === FoodType.HOUSEHOLD || e.foodType === FoodType.OTHER) continue;
     if (e.eventType === 'EXPIRE')
       expiredByType.set(e.foodType, (expiredByType.get(e.foodType) ?? 0) + 1);
     else if (e.eventType === 'CONSUME')
@@ -171,7 +171,7 @@ export function computePatternSignals(
 
   const inventoryByType = new Map<string, number>();
   for (const item of items) {
-    if (!item.foodType || item.foodType === FoodType.HOUSEHOLD) continue;
+    if (!item.foodType || item.foodType === FoodType.HOUSEHOLD || item.foodType === FoodType.OTHER) continue;
     const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
     if (state === 'expired') continue;
     inventoryByType.set(item.foodType, (inventoryByType.get(item.foodType) ?? 0) + 1);
@@ -228,7 +228,7 @@ export function computeCategoryBreakdown(
 
   const countByType = new Map<string, number>();
   for (const item of items) {
-    if (!item.foodType || item.foodType === FoodType.HOUSEHOLD) continue;
+    if (!item.foodType || item.foodType === FoodType.HOUSEHOLD || item.foodType === FoodType.OTHER) continue;
     const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
     if (state === 'expired') continue;
     countByType.set(item.foodType, (countByType.get(item.foodType) ?? 0) + 1);
@@ -237,7 +237,7 @@ export function computeCategoryBreakdown(
   const expiredByType = new Map<string, number>();
   const consumedByType = new Map<string, number>();
   for (const e of recent) {
-    if (!e.foodType || e.foodType === FoodType.HOUSEHOLD) continue;
+    if (!e.foodType || e.foodType === FoodType.HOUSEHOLD || e.foodType === FoodType.OTHER) continue;
     if (e.eventType === 'EXPIRE')
       expiredByType.set(e.foodType, (expiredByType.get(e.foodType) ?? 0) + 1);
     else if (e.eventType === 'CONSUME')

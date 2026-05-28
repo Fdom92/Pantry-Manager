@@ -733,7 +733,8 @@
         "expired": "Abgelaufen",
         "today": "Heute",
         "tomorrow": "Morgen",
-        "soon": "Bald"
+        "soon": "Bald",
+        "twoDays": "2 Tage"
       },
       "editModal": {
         "title": "Frische bearbeiten",
@@ -995,7 +996,10 @@
     }
   },
   "reviews": {
-    "prompt": "Wenn PantryMind dir hilft, hilft uns eine Bewertung sehr. Würdest du eine dalassen?"
+    "prompt": "Wenn PantryMind dir hilft, hilft uns eine Bewertung sehr. Würdest du eine dalassen?",
+    "accept": "Bewertung abgeben",
+    "decline": "Später",
+    "promptHoy": "Du hast deine Zutaten genutzt, bevor sie abliefen. Würdest du uns eine Bewertung hinterlassen?"
   },
   "notifications": {
     "expired": {

@@ -7,6 +7,7 @@ import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capac
 import { createLatestOnlyRunner, withSignalFlag } from '@core/utils';
 import { environment } from 'src/environments/environment';
 import { UpgradeRevenuecatService } from './upgrade-revenuecat.service';
+import { ReviewPromptService } from '../shared/review-prompt.service';
 
 @Injectable()
 export class UpgradeStateService {
@@ -15,6 +16,7 @@ export class UpgradeStateService {
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
+  private readonly reviewPrompt = inject(ReviewPromptService);
 
   readonly isLoadingPlans = signal(false);
   readonly planOptions = signal<PlanViewModel[]>([]);
@@ -59,6 +61,7 @@ export class UpgradeStateService {
     try {
       const success = await this.revenuecat.purchasePackage(pkg);
       if (success || (await this.revenuecat.restore())) {
+        this.reviewPrompt.markEngagement();
         await this.goDashboard();
       }
     } finally {

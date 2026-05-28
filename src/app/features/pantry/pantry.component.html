@@ -90,7 +90,7 @@
           }
         </div>
         @if (facade.freshItems().length > 4) {
-          <button type="button" class="fresh-show-more" (click)="facade.toggleShowAllFresh()">
+          <button type="button" class="fresh-show-more" (click)="onToggleShowAllFresh()">
             @if (!facade.showAllFresh()) {
               {{ 'pantry.fresh.showMore' | translate:{ count: facade.freshItems().length } }}
             } @else {

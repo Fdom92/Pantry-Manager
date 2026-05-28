@@ -23,6 +23,7 @@ import type {
   FoodCoverageResult,
 } from '@core/domain/insights/insights-free.domain';
 import { getItemStatusState } from '@core/domain/pantry/pantry-status.domain';
+import { sumQuantities } from '@core/domain/pantry/pantry-batch.domain';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import {
   computeActivitySignals,
@@ -54,7 +55,7 @@ export class InsightsStateService {
     const now = Date.now();
     const STALE_MS = 30 * 24 * 60 * 60 * 1000;
     return this.pantryStore.items().filter(item => {
-      const qty = (item.batches ?? []).reduce((s, b) => s + (b.quantity ?? 0), 0);
+      const qty = sumQuantities(item.batches);
       if (qty <= 0) return false;
       const updated = new Date(item.updatedAt).getTime();
       return !Number.isNaN(updated) && now - updated > STALE_MS;

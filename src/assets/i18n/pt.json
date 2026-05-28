@@ -733,7 +733,8 @@
         "expired": "Expirado",
         "today": "Hoje",
         "tomorrow": "Amanhã",
-        "soon": "Em breve"
+        "soon": "Em breve",
+        "twoDays": "2 dias"
       },
       "editModal": {
         "title": "Editar fresco",
@@ -995,7 +996,10 @@
     }
   },
   "reviews": {
-    "prompt": "Se o PantryMind está ajudando, uma avaliação ajuda muito. Você deixaria uma?"
+    "prompt": "Se o PantryMind está ajudando, uma avaliação ajuda muito. Você deixaria uma?",
+    "accept": "Deixar uma avaliação",
+    "decline": "Agora não",
+    "promptHoy": "Aproveitaste os ingredientes antes de expirarem. Ajudas-nos com uma avaliação?"
   },
   "notifications": {
     "expired": {

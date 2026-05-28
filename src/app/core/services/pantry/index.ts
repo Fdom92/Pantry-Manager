@@ -1,3 +1,5 @@
+export * from './pantry-navigation-preset.service';
+export * from './pantry-query.service';
 export * from './pantry.service';
 export * from './pantry-store.service';
 export * from './pantry-state.service';
