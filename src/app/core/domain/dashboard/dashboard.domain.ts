@@ -2,7 +2,9 @@ import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import { getItemStatusState } from '@core/domain/pantry/pantry-status.domain';
 import { calculateUrgencyScore } from '@core/domain/pantry/urgency.domain';
+import { sumQuantities } from '@core/domain/pantry/pantry-batch.domain';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { daysUntilExpiry } from '@core/utils/date.util';
 
 // ─── Today's Suggestion ───────────────────────────────────────────────────────
 
@@ -77,8 +79,7 @@ export function computeTodaySuggestion(
   const nowMs = Date.now();
   const now = new Date(nowMs);
 
-  const getStock = (item: PantryItem): number =>
-    (item.batches ?? []).reduce((s, b) => s + (b.quantity ?? 0), 0);
+  const getStock = (item: PantryItem): number => sumQuantities(item.batches);
 
   const getEarliestExpiryDate = (item: PantryItem): string | undefined =>
     (item.batches ?? [])
@@ -88,7 +89,7 @@ export function computeTodaySuggestion(
 
   const getDaysToExpiry = (item: PantryItem): number | null => {
     const date = getEarliestExpiryDate(item);
-    return date ? Math.ceil((Date.parse(date) - nowMs) / 86_400_000) : null;
+    return date ? daysUntilExpiry(date, nowMs) : null;
   };
 
   const isFood = (item: PantryItem): boolean =>

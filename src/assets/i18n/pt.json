@@ -731,7 +731,8 @@
         "expired": "Expirado",
         "today": "Hoje",
         "tomorrow": "Amanhã",
-        "soon": "Em breve"
+        "soon": "Em breve",
+        "twoDays": "2 dias"
       },
       "editModal": {
         "title": "Editar fresco",

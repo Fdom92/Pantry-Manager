@@ -5,7 +5,8 @@ import {
 import { IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import type { PantryItem } from '@core/models/pantry';
-import { type FreshState, isFreshKeepInStock, qtyToFreshState } from '@core/domain/pantry';
+import { type FreshState, getFreshExpiryUrgency, isFreshKeepInStock, qtyToFreshState } from '@core/domain/pantry';
+import { daysUntilExpiry } from '@core/utils';
 
 @Component({
   selector: 'app-fresh-item-card',
@@ -36,14 +37,9 @@ export class FreshItemCardComponent implements OnChanges {
     return 'normal';
   });
 
-  readonly expiryUrgency = computed((): 'critical' | 'warning' | 'neutral' => {
-    const d = this.daysToExpiry();
-    if (d === null) return 'neutral';
-    if (d < 0) return 'critical';
-    if (d <= 1) return 'critical';
-    if (d <= 3) return 'warning';
-    return 'neutral';
-  });
+  readonly expiryUrgency = computed((): 'critical' | 'warning' | 'neutral' =>
+    getFreshExpiryUrgency(this.daysToExpiry()),
+  );
 
   readonly expiryLabel = computed((): string => {
     const d = this.daysToExpiry();
@@ -51,6 +47,7 @@ export class FreshItemCardComponent implements OnChanges {
     if (d < 0) return 'pantry.fresh.card.expired';
     if (d === 0) return 'pantry.fresh.card.today';
     if (d === 1) return 'pantry.fresh.card.tomorrow';
+    if (d === 2) return 'pantry.fresh.card.twoDays';  // critical band → concise, matches red bar
     if (d <= 3) return 'pantry.fresh.card.soon';
     return '';
   });
@@ -63,7 +60,7 @@ export class FreshItemCardComponent implements OnChanges {
     this.currentState.set(qtyToFreshState(qty));
     const dateStr = batch?.expirationDate;
     if (dateStr && qty > 0) {
-      const days = Math.ceil((Date.parse(dateStr) - Date.now()) / 86_400_000);
+      const days = daysUntilExpiry(dateStr);
       this.daysToExpiry.set(days);
     } else {
       this.daysToExpiry.set(null);

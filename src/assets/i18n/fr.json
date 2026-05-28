@@ -731,7 +731,8 @@
         "expired": "Expiré",
         "today": "Aujourd'hui",
         "tomorrow": "Demain",
-        "soon": "Bientôt"
+        "soon": "Bientôt",
+        "twoDays": "2 jours"
       },
       "editModal": {
         "title": "Modifier frais",

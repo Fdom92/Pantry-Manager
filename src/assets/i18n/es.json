@@ -731,7 +731,8 @@
         "expired": "Caducado",
         "today": "Hoy",
         "tomorrow": "Mañana",
-        "soon": "Pronto"
+        "soon": "Pronto",
+        "twoDays": "2 días"
       },
       "editModal": {
         "title": "Editar fresco",

@@ -731,7 +731,8 @@
         "expired": "Abgelaufen",
         "today": "Heute",
         "tomorrow": "Morgen",
-        "soon": "Bald"
+        "soon": "Bald",
+        "twoDays": "2 Tage"
       },
       "editModal": {
         "title": "Frische bearbeiten",
