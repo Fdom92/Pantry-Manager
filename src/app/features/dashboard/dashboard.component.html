@@ -63,7 +63,7 @@
               <div class="today-card__protagonist">
                 <div class="today-card__protagonist-main">
                   <span class="today-card__protagonist-name">{{ facade.todaySuggestion()!.protagonist.name }}</span>
-                  @if (facade.todaySuggestion()!.reasonKey !== 'dashboard.today.reason.freshExpiring' && facade.todaySuggestion()!.reasonKey !== 'dashboard.today.reason.freshOut') {
+                  @if (facade.todaySuggestion()!.reasonKey !== 'dashboard.today.reason.freshExpiring') {
                     <span class="today-card__protagonist-qty">×{{ facade.todaySuggestion()!.protagonist.quantity }}</span>
                   }
                 </div>
@@ -83,15 +83,11 @@
               }
               @if (facade.todaySuggestion()!.secondaryItems.length > 0) {
                 <p class="today-card__secondary">
-                  <span class="today-card__secondary-label">{{ 'dashboard.today.combine' | translate }} </span>@for (item of facade.todaySuggestion()!.secondaryItems; track item.id; let last = $last) {<span class="today-card__secondary-item">{{ item.name }}@if (item.daysToExpiry !== null) { <span class="today-card__secondary-days">· {{ 'dashboard.today.secondary.days' | translate:{ count: item.daysToExpiry } }}</span>}@if (!last) {, }</span>}
+                  <span class="today-card__secondary-label">{{ 'dashboard.today.combine' | translate }} </span>@for (item of facade.todaySuggestion()!.secondaryItems; track item.id; let last = $last) {<span class="today-card__secondary-item">{{ item.name }}@if (item.daysToExpiry !== null && item.daysToExpiry > 0) { <span class="today-card__secondary-days">· {{ 'dashboard.today.secondary.days' | translate:{ count: item.daysToExpiry } }}</span>}@if (!last) {, }</span>}
                 </p>
               }
               <div class="today-card__footer">
-                @if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshOut') {
-                  <ion-button size="small" (click)="facade.goToShoppingList()">
-                    {{ 'dashboard.today.cta.restock' | translate }}
-                  </ion-button>
-                } @else if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshExpiring') {
+                @if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshExpiring') {
                   <ion-button
                     size="small"
                     [disabled]="facade.isConsumingToday()"

@@ -82,12 +82,8 @@ export class PantryFreshAddModalStateService {
     const item = option?.raw;
     if (!item) return;
     this.entries.update(current => {
-      const idx = current.findIndex(e => e.item?._id === item._id);
-      if (idx >= 0) {
-        const next = [...current];
-        next[idx] = { ...next[idx], quantity: Math.max(0, next[idx].quantity + 1) };
-        return next;
-      }
+      const alreadyPresent = current.some(e => e.item?._id === item._id);
+      if (alreadyPresent) return current;
       return [
         ...current,
         { id: `fresh:${item._id}`, name: option.title, quantity: 1, item, isNew: false },
@@ -112,12 +108,8 @@ export class PantryFreshAddModalStateService {
 
     const formatted = formatFriendlyName(next, next);
     this.entries.update(current => {
-      const idx = current.findIndex(e => normalizeLowercase(e.name) === normalized);
-      if (idx >= 0) {
-        const nextArr = [...current];
-        nextArr[idx] = { ...nextArr[idx], quantity: Math.max(0, nextArr[idx].quantity + 1) };
-        return nextArr;
-      }
+      const alreadyPresent = current.some(e => normalizeLowercase(e.name) === normalized);
+      if (alreadyPresent) return current;
       return [
         ...current,
         { id: `fresh:new:${normalized}`, name: formatted, quantity: 1, isNew: true },

@@ -326,6 +326,7 @@
       "loading": "Generando lista de compras…",
       "restock": "Reponer {{amount}}",
       "restockFresh": "Reponer",
+      "freshLow": "Queda poco, reponer pronto",
       "empty": "Marca productos como \"mantener en casa\" para recibir avisos cuando se agoten."
     },
     "share": {
@@ -341,10 +342,11 @@
     },
     "chips": {
       "freshEmpty": "Fresco agotado",
-      "empty": "Agotado",
+      "freshLow": "Queda poco",
+      "empty": "Producto agotado",
       "belowMin": "Stock bajo",
-      "basic": "Básico",
-      "manual": "Añadido por ti"
+      "basic": "Automático",
+      "manual": "Manual"
     },
     "bought": {
       "sectionTitle": "Comprado",

@@ -326,6 +326,7 @@
       "loading": "Einkaufsliste wird erstellt…",
       "restock": "{{amount}} nachkaufen",
       "restockFresh": "Nachkaufen",
+      "freshLow": "Wenig übrig, bald nachkaufen",
       "empty": "Markiere Produkte als \"immer vorrätig\" um benachrichtigt zu werden, wenn sie zur Neige gehen."
     },
     "share": {
@@ -341,10 +342,11 @@
     },
     "chips": {
       "freshEmpty": "Frisch — leer",
-      "empty": "Aufgebraucht",
+      "freshLow": "Wenig übrig",
+      "empty": "Produkt aufgebraucht",
       "belowMin": "Wenig Vorrat",
-      "basic": "Grundprodukt",
-      "manual": "Von dir hinzugefügt"
+      "basic": "Automatisch",
+      "manual": "Manuell"
     },
     "bought": {
       "sectionTitle": "Gekauft",

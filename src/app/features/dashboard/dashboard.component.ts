@@ -49,14 +49,9 @@ export class DashboardComponent {
   }
 
   shouldShowReason(): boolean {
-    const s = this.facade.todaySuggestion();
-    if (!s) return false;
-    const { daysToExpiry, expirationDate } = s.protagonist;
-    const timeOnlyReasons = new Set([
-      'dashboard.today.reason.expiringsoon',
-      'dashboard.today.reason.expirestoday',
-    ]);
-    if (expirationDate && timeOnlyReasons.has(s.reasonKey)) return false;
-    return daysToExpiry === null || daysToExpiry <= 5;
+    // Spec invariant: reason is ALWAYS shown when a suggestion is active.
+    // The contextual text ("Caduca hoy", "Caduca pronto", "En revisión"…)
+    // helps the user understand why this item is being surfaced right now.
+    return !!this.facade.todaySuggestion();
   }
 }
