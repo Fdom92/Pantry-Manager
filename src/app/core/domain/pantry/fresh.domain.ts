@@ -1,4 +1,6 @@
-import type { ItemBatch, PantryItem } from '@core/models/pantry';
+import type { ItemBatch, PantryItem, ProductStatusState } from '@core/models/pantry';
+import { sumQuantities } from './pantry-batch.domain';
+import { calculateUrgencyScore } from './urgency.domain';
 
 export const FRESH_QTY = { sufficient: 3, low: 1, none: 0 } as const;
 
@@ -46,7 +48,7 @@ export function consolidateBatchesForFresh(
   batches: ItemBatch[],
   newBatchId: string,
 ): ItemBatch {
-  const total = (batches ?? []).reduce((sum, b) => sum + (b.quantity ?? 0), 0);
+  const total = sumQuantities(batches);
   const state = qtyToFreshState(total);
   const expirationDate = pickClosestExpiration(batches ?? []);
   const opened = (batches ?? []).some(b => !!b.opened);
@@ -70,7 +72,7 @@ export interface ConvertToFreshPreview {
 
 export function buildConvertToFreshPreview(item: PantryItem): ConvertToFreshPreview {
   const batches = item.batches ?? [];
-  const totalQty = batches.reduce((sum, b) => sum + (b.quantity ?? 0), 0);
+  const totalQty = sumQuantities(batches);
   return {
     totalQty,
     resultingState: qtyToFreshState(totalQty),
@@ -80,4 +82,21 @@ export function buildConvertToFreshPreview(item: PantryItem): ConvertToFreshPrev
     hadLocations: batches.some(b => !!b.locationId),
     batchesCount: batches.length,
   };
+}
+
+/**
+ * Maps raw daysToExpiry to a fresh-card urgency level, using calculateUrgencyScore
+ * as the single source of truth for thresholds.
+ *
+ * Outside the 3-day fresh window → 'neutral' (item is not urgent in fresh context).
+ * d=2 → 'critical' (aligns with urgency domain: 2-day band is critical).
+ */
+export function getFreshExpiryUrgency(days: number | null): 'critical' | 'warning' | 'neutral' {
+  if (days === null) return 'neutral';
+  if (days > FRESH_NEAR_EXPIRY_WINDOW_DAYS) return 'neutral'; // outside fresh 3-day window
+  const state: ProductStatusState = days < 0 ? 'expired' : 'near-expiry';
+  const { level } = calculateUrgencyScore(state, Math.max(0, days));
+  if (level === 'critical') return 'critical';
+  if (level === 'alert') return 'warning';
+  return 'neutral';
 }

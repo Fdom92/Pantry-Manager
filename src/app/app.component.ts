@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { App as CapacitorApp } from '@capacitor/app';
 import { STORAGE_KEYS } from '@core/constants';
-import { PantryService } from '@core/services/pantry';
+import { PantryQueryService } from '@core/services/pantry';
 import { MigrationPantryService } from '@core/services/migration/migration-pantry.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
@@ -20,7 +20,7 @@ export class AppComponent {
   private readonly handledUrls = new Set<string>();
 
   // DI
-  private readonly pantryService = inject(PantryService);
+  private readonly pantryQuery = inject(PantryQueryService);
   private readonly pantryMigration = inject(MigrationPantryService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly router = inject(Router);
@@ -35,10 +35,10 @@ export class AppComponent {
 
   private async initializeApp(): Promise<void> {
     await this.initializeRevenueCat();
-    await this.pantryService.initialize();
+    await this.pantryQuery.initialize();
     await this.pantryMigration.migrateIfNeeded();
-    await this.pantryService.ensureFirstPageLoaded();
-    this.pantryService.startBackgroundLoad();
+    await this.pantryQuery.ensureFirstPageLoaded();
+    this.pantryQuery.startBackgroundLoad();
     await this.notificationScheduler.scheduleAll();
     await this.handleSyncLaunchUrl();
     this.listenForSyncIntents();

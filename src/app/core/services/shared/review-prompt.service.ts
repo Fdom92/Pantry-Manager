@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { STORAGE_KEYS } from '@core/constants';
 import { getBooleanFlag, setBooleanFlag, sleep } from '@core/utils';
+import { AlertController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfirmService } from './confirm.service';
 
 interface InAppReviewPlugin {
   requestReview: () => Promise<void>;
@@ -11,15 +11,15 @@ interface InAppReviewPlugin {
 
 @Injectable({ providedIn: 'root' })
 export class ReviewPromptService {
-  private readonly confirm = inject(ConfirmService);
+  private readonly alertCtrl = inject(AlertController);
   private readonly translate = inject(TranslateService);
 
-  private readonly minDaysSinceFirstUse = 7;
-  private readonly minLaunches = 5;
+  private readonly minDaysSinceFirstUse = 3;
+  private readonly minLaunches = 3;
   private readonly cooldownDays = 30;
   private readonly completedCooldownDays = 90;
-  private readonly minProductAddsForPrompt = 3;
-  private readonly minConsumesForPrompt = 3;
+  private readonly minProductAddsForPrompt = 2;
+  private readonly minConsumesForPrompt = 2;
   private readonly promptDelayMs = 1500;
   private lastTriggerAt = 0;
   private readonly storageAvailable = typeof window !== 'undefined' && typeof localStorage !== 'undefined';
@@ -78,6 +78,35 @@ export class ReviewPromptService {
     }
   }
 
+  /**
+   * Call immediately after a successful HOY "used ingredients" confirmation.
+   * High-intent moment: user just saved food from expiring — peak satisfaction.
+   * Skips the launch-count gate. Uses contextual text tied to the action.
+   */
+  async handleIngredientUsed(): Promise<void> {
+    if (!this.storageAvailable) return;
+    this.noteFirstUse();
+    setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
+    const didPrompt = await this.promptIfEligibleNoLaunchGate('reviews.promptHoy');
+    if (didPrompt) this.clearPendingPrompt();
+  }
+
+  /**
+   * Generic immediate prompt for positive actions outside the dashboard
+   * (e.g. marking items bought, marking fresh items out).
+   *
+   * Does NOT wait for the next dashboard visit — the user might close the
+   * app without ever going to the dashboard, losing the moment entirely.
+   * Skips the launch-count gate: the action itself proves engagement.
+   */
+  async handlePositiveAction(): Promise<void> {
+    if (!this.storageAvailable) return;
+    this.noteFirstUse();
+    setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
+    const didPrompt = await this.promptIfEligibleNoLaunchGate('reviews.prompt');
+    if (didPrompt) this.clearPendingPrompt();
+  }
+
   private noteLaunch(): void {
     this.noteFirstUse();
     const launchCount = this.getStoredNumber(STORAGE_KEYS.REVIEW_LAUNCH_COUNT) ?? 0;
@@ -92,28 +121,48 @@ export class ReviewPromptService {
     }
   }
 
-  private async promptIfEligible(): Promise<boolean> {
-    if (!this.shouldPrompt()) {
-      return false;
-    }
-
+  private async promptIfEligible(messageKey = 'reviews.prompt'): Promise<boolean> {
+    if (!this.shouldPrompt()) return false;
     await sleep(this.promptDelayMs);
-    if (!this.shouldPrompt()) {
-      return false;
-    }
+    if (!this.shouldPrompt()) return false;
+    return this.doPrompt(messageKey);
+  }
 
-    const accepted = this.confirm.confirm(this.translate.instant('reviews.prompt'));
+  /** Same as promptIfEligible but skips the launch-count gate. Used for high-intent moments. */
+  private async promptIfEligibleNoLaunchGate(messageKey = 'reviews.prompt'): Promise<boolean> {
+    if (!this.shouldPromptNoLaunchGate()) return false;
+    await sleep(this.promptDelayMs);
+    if (!this.shouldPromptNoLaunchGate()) return false;
+    return this.doPrompt(messageKey);
+  }
+
+  private async doPrompt(messageKey: string): Promise<boolean> {
+    const accepted = await this.showReviewAlert(messageKey);
     const promptTimestamp = new Date().toISOString();
     this.setItem(STORAGE_KEYS.REVIEW_LAST_PROMPT_AT, promptTimestamp);
-    if (!accepted) {
-      return true;
-    }
-
+    if (!accepted) return true;
     const didRequest = await this.requestNativeReview();
-    if (didRequest) {
-      this.setItem(STORAGE_KEYS.REVIEW_COMPLETED_AT, promptTimestamp);
-    }
+    if (didRequest) this.setItem(STORAGE_KEYS.REVIEW_COMPLETED_AT, promptTimestamp);
     return true;
+  }
+
+  private showReviewAlert(messageKey: string): Promise<boolean> {
+    return new Promise(resolve => {
+      this.alertCtrl.create({
+        message: this.translate.instant(messageKey),
+        buttons: [
+          {
+            text: this.translate.instant('reviews.decline'),
+            role: 'cancel',
+            handler: () => resolve(false),
+          },
+          {
+            text: this.translate.instant('reviews.accept'),
+            handler: () => resolve(true),
+          },
+        ],
+      }).then(alert => alert.present());
+    });
   }
 
   private clearPendingPrompt(): void {
@@ -125,34 +174,29 @@ export class ReviewPromptService {
   }
 
   private shouldPrompt(): boolean {
-    if (!Capacitor.isNativePlatform()) {
-      return false;
-    }
-    if (!getBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG)) {
-      return false;
-    }
+    if (!this.meetsBasicGates()) return false;
+    const launchCount = this.getStoredNumber(STORAGE_KEYS.REVIEW_LAUNCH_COUNT) ?? 0;
+    if (launchCount < this.minLaunches) return false;
+    return true;
+  }
+
+  /** Skips launch-count check — for high-intent triggers like HOY ingredient confirmation. */
+  private shouldPromptNoLaunchGate(): boolean {
+    return this.meetsBasicGates();
+  }
+
+  private meetsBasicGates(): boolean {
+    if (!Capacitor.isNativePlatform()) return false;
+    if (!getBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG)) return false;
+
     const completedAt = this.getStoredDate(STORAGE_KEYS.REVIEW_COMPLETED_AT);
-    if (completedAt && this.getDaysSince(completedAt) < this.completedCooldownDays) {
-      return false;
-    }
+    if (completedAt && this.getDaysSince(completedAt) < this.completedCooldownDays) return false;
 
     const firstUse = this.getStoredDate(STORAGE_KEYS.REVIEW_FIRST_USE_AT);
-    if (!firstUse) {
-      return false;
-    }
-    if (this.getDaysSince(firstUse) < this.minDaysSinceFirstUse) {
-      return false;
-    }
-
-    const launchCount = this.getStoredNumber(STORAGE_KEYS.REVIEW_LAUNCH_COUNT) ?? 0;
-    if (launchCount < this.minLaunches) {
-      return false;
-    }
+    if (!firstUse || this.getDaysSince(firstUse) < this.minDaysSinceFirstUse) return false;
 
     const lastPrompt = this.getStoredDate(STORAGE_KEYS.REVIEW_LAST_PROMPT_AT);
-    if (lastPrompt && this.getDaysSince(lastPrompt) < this.cooldownDays) {
-      return false;
-    }
+    if (lastPrompt && this.getDaysSince(lastPrompt) < this.cooldownDays) return false;
 
     return true;
   }

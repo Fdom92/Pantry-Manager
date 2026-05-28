@@ -3,7 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SettingsStateService } from '@core/services/settings/settings-state.service';
 import { NotificationSchedulerService } from '@core/services/notifications/notification-scheduler.service';
-import { PantryService } from '@core/services/pantry/pantry.service';
+import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
@@ -65,7 +65,7 @@ import { environment } from 'src/environments/environment';
 export class SettingsComponent {
   readonly facade = inject(SettingsStateService);
   private readonly scheduler = inject(NotificationSchedulerService);
-  private readonly pantry = inject(PantryService);
+  private readonly pantry = inject(PantryQueryService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly translate = inject(TranslateService);
   private readonly language = inject(LanguageService);

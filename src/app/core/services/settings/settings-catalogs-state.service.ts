@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
 import { getCatalogUsage, normalizeCatalogOptions } from '@core/domain/settings';
-import { PantryService } from '@core/services/pantry/pantry.service';
+import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
 import { normalizeCategoryId, normalizeLowercase, normalizeLocationId, normalizeSupermarketValue, normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { withSignalFlag } from '@core/utils';
@@ -14,7 +14,7 @@ type CatalogKind = 'category' | 'supermarket' | 'location';
 export class SettingsCatalogsStateService {
   private readonly appPreferencesService = inject(SettingsPreferencesService);
   private readonly translate = inject(TranslateService);
-  private readonly pantryService = inject(PantryService);
+  private readonly pantryService = inject(PantryQueryService);
   private readonly alertController = inject(AlertController);
 
   readonly isLoading = signal(false);

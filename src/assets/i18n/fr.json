@@ -733,7 +733,8 @@
         "expired": "Expiré",
         "today": "Aujourd'hui",
         "tomorrow": "Demain",
-        "soon": "Bientôt"
+        "soon": "Bientôt",
+        "twoDays": "2 jours"
       },
       "editModal": {
         "title": "Modifier frais",
@@ -995,7 +996,10 @@
     }
   },
   "reviews": {
-    "prompt": "Si PantryMind vous aide, un avis nous aide beaucoup. Pourriez-vous en laisser un ?"
+    "prompt": "Si PantryMind vous aide, un avis nous aide beaucoup. Pourriez-vous en laisser un ?",
+    "accept": "Laisser un avis",
+    "decline": "Pas maintenant",
+    "promptHoy": "Tu as utilisé tes ingrédients avant qu'ils expirent. Nous aiderais-tu avec un avis ?"
   },
   "notifications": {
     "expired": {

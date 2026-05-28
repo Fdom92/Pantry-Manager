@@ -1,140 +1,73 @@
-import { computed, effect, Injectable, signal } from '@angular/core';
-import { DEFAULT_HOUSEHOLD_ID, DEFAULT_PANTRY_PAGE_SIZE, NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
+import { Injectable } from '@angular/core';
+import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import {
-  collectBatches as collectBatchesItem,
   computeEarliestExpiry as computeEarliestExpiryStock,
   computeExpirationStatus as computeExpirationStatusItem,
   getItemStatusState,
-  hasOpenBatch as hasOpenBatchItem,
-  matchesFilters,
-  matchesSearchQuery,
   mergeBatchesByExpiry as mergeBatchesByExpiryStock,
   normalizeBatches as normalizeBatchesStock,
-  shouldAutoAddToShoppingList as shouldAutoAddToShoppingListItem,
-  sortPantryItems,
   sumQuantities as sumQuantitiesStock,
 } from '@core/domain/pantry';
 import { toNumberOrZero as toNumberOrZeroStock } from '@core/utils/formatting.util';
-import { DEFAULT_PANTRY_FILTERS, ItemBatch, PantryFilterState, PantryItem } from '@core/models/pantry';
-import { normalizeLocationId, normalizeSearchQuery, normalizeSupermarketName, normalizeTrim } from '@core/utils/normalization.util';
+import type { ItemBatch, PantryItem } from '@core/models/pantry';
+import { normalizeLocationId, normalizeSupermarketName, normalizeTrim } from '@core/utils/normalization.util';
 import { generateBatchId } from '@core/utils';
 import { StorageService } from '../shared/storage.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+/**
+ * PouchDB persistence layer for pantry items.
+ *
+ * Responsibilities:
+ *  - CRUD: saveItem, getAll, getAllActive, deleteItem, addNewLot, getSummary
+ *  - Paginated reads: getPaginatedProducts
+ *  - Live-change feed: watchPantryChanges
+ *  - Derived-field computation: applyDerivedFields (called on every read/write)
+ *  - DB warmup / index management: initialize
+ *
+ * Not responsible for:
+ *  - Reactive signals or in-memory cache → PantryQueryService
+ *  - Pagination/filter/search state → PantryQueryService
+ *  - Navigation presets → PantryNavigationPresetService
+ */
+@Injectable({ providedIn: 'root' })
 export class PantryService extends StorageService<PantryItem> {
   private readonly TYPE = 'item';
   private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
-  private currentLoadPromise: Promise<void> | null = null;
   private dbPreloaded = false;
   private productIndexReady = false;
-  private pendingPipelineReset = false;
-  private backgroundLoadPromise: Promise<void> | null = null;
-  private readonly pendingNavigationPreset = signal<Partial<PantryFilterState> | null>(null);
-  readonly loadedProducts = signal<PantryItem[]>([]);
-  readonly activeProducts = computed(() => this.loadedProducts().filter(item =>
-    item.productType === 'fresh' || this.getItemTotalQuantity(item) > 0
-  ));
-  readonly filteredProducts = signal<PantryItem[]>([]);
-  readonly searchQuery = signal('');
-  readonly activeFilters = signal<PantryFilterState>({ ...DEFAULT_PANTRY_FILTERS });
-  readonly pageOffset = signal(0);
-  readonly pageSize = signal(DEFAULT_PANTRY_PAGE_SIZE);
-  readonly loading = signal(false);
-  readonly pipelineResetting = signal(false);
-  readonly endReached = signal(false);
-  readonly totalCount = signal(0);
-
-  constructor() {
-    super();
-    effect(() => {
-      this.recomputeFilteredProducts();
-    });
-  }
 
   /**
    * Warms up the database during bootstrap to eliminate the initial lag and
    * ensures the index required by paginated queries is available.
    */
   async initialize(): Promise<void> {
-    if (this.dbPreloaded) {
-      return;
-    }
+    if (this.dbPreloaded) return;
     this.dbPreloaded = true;
     try {
       await this.database.info();
       await this.ensureProductIndex();
-      await this.refreshTotalCount();
     } catch (err) {
       console.warn('[PantryService] Database warmup failed', err);
       this.dbPreloaded = false;
     }
   }
 
-  /** Clears pagination state and wipes the cached product batches. */
-  resetPagination(): void {
-    this.pageOffset.set(0);
-    this.loadedProducts.set([]);
-    this.filteredProducts.set([]);
-    this.endReached.set(false);
-  }
-
-  /** Reloads from the beginning by fetching the first full page from PouchDB. */
-  async reloadFromStart(): Promise<void> {
-    this.resetPagination();
-    await this.loadAllPages();
-  }
-
-  /** Ensure at least one page is available to render something immediately. */
-  async ensureFirstPageLoaded(): Promise<void> {
-    if (this.loadedProducts().length > 0) {
-      return;
+  /** Returns the total number of pantry items stored in PouchDB. */
+  async getTotalCount(): Promise<number> {
+    try {
+      return await this.countByType(this.TYPE);
+    } catch (err) {
+      console.warn('[PantryService] Failed to count items', err);
+      return 0;
     }
-
-    if (this.endReached() && !this.pipelineResetting()) {
-      return;
-    }
-
-    if (this.currentLoadPromise) {
-      await this.currentLoadPromise;
-      if (this.loadedProducts().length > 0) {
-        return;
-      }
-    }
-
-    this.resetPagination();
-    await this.loadNextPage();
-  }
-
-  /** Continue loading remaining pages without blocking the UI. */
-  startBackgroundLoad(): void {
-    if (this.backgroundLoadPromise || this.endReached()) {
-      return;
-    }
-    this.backgroundLoadPromise = (async () => {
-      try {
-        await this.ensureFirstPageLoaded();
-        while (!this.endReached()) {
-          await this.loadNextPage();
-        }
-      } catch (err) {
-        console.warn('[PantryService] background load failed', err);
-      } finally {
-        this.backgroundLoadPromise = null;
-      }
-    })();
   }
 
   /**
    * Fetches a page of normalized products using skip/limit.
-   * @param offset Starting position (0 for the first page)
-   * @param limit Batch size to retrieve
+   * Pagination state is managed by PantryQueryService.
    */
   async getPaginatedProducts(offset: number, limit: number): Promise<PantryItem[]> {
-    if (limit <= 0) {
-      return [];
-    }
+    if (limit <= 0) return [];
     await this.ensureProductIndex();
     const response = await this.database.find({
       selector: { type: this.TYPE },
@@ -144,7 +77,10 @@ export class PantryService extends StorageService<PantryItem> {
     return response.docs.map(doc => this.applyDerivedFields(doc));
   }
 
-  /** Persist an item ensuring aggregate fields (type, household, expirations) stay in sync. */
+  /**
+   * Persist an item ensuring aggregate fields (type, household, expirations) stay in sync.
+   * Returns the normalized saved item — does NOT update any reactive cache.
+   */
   async saveItem(item: PantryItem): Promise<PantryItem> {
     const prepared = this.applyDerivedFields({
       ...item,
@@ -152,9 +88,7 @@ export class PantryService extends StorageService<PantryItem> {
       householdId: item.householdId ?? DEFAULT_HOUSEHOLD_ID,
     });
     const saved = await this.upsert(prepared);
-    const normalized = this.applyDerivedFields(saved);
-    this.replaceProductInCache(normalized);
-    return normalized;
+    return this.applyDerivedFields(saved);
   }
 
   /** Fetch every pantry item, computing aggregate fields directly from stored data. */
@@ -166,44 +100,38 @@ export class PantryService extends StorageService<PantryItem> {
   /** Fetch every pantry item that currently has stock. */
   async getAllActive(): Promise<PantryItem[]> {
     const items = await this.getAll();
-    return items.filter(item => this.getItemTotalQuantity(item) > 0);
+    return items.filter(item => sumQuantitiesStock(item.batches ?? []) > 0);
   }
 
+  /** Remove an item from PouchDB. Returns true when the deletion succeeded. */
   async deleteItem(id: string): Promise<boolean> {
-    const ok = await this.remove(id);
-    if (ok) {
-      this.removeProductFromCache(id);
-    }
-    return ok;
+    return this.remove(id);
   }
 
   /**
    * Append a brand new batch to the requested product without altering other batches.
-   * If a location is provided, it will be normalized and stored on the batch.
+   * If a location is provided it will be normalized and stored on the batch.
    */
   async addNewLot(
     productId: string,
     lot: { quantity: number; expiryDate?: string | null; location?: string; noExpiry?: boolean }
   ): Promise<PantryItem | null> {
     const item = await this.get(productId);
-    if (!item) {
-      return null;
-    }
+    if (!item) return null;
 
     const current = this.applyDerivedFields(item);
     const quantity = toNumberOrZeroStock(lot?.quantity);
-    if (quantity <= 0) {
-      return current;
-    }
+    if (quantity <= 0) return current;
 
     const rawLocation = normalizeTrim(lot?.location);
-    const locationId = rawLocation ? normalizeLocationId(rawLocation, UNASSIGNED_LOCATION_KEY) : undefined;
-    const expiryDate = lot?.expiryDate ?? undefined;
+    const locationId = rawLocation
+      ? normalizeLocationId(rawLocation, UNASSIGNED_LOCATION_KEY)
+      : undefined;
 
     const newBatch: ItemBatch = {
       batchId: generateBatchId(),
       quantity,
-      expirationDate: expiryDate || undefined,
+      expirationDate: lot?.expiryDate ?? undefined,
       noExpiry: lot.noExpiry || undefined,
       opened: false,
       locationId,
@@ -224,306 +152,46 @@ export class PantryService extends StorageService<PantryItem> {
   }> {
     const items = await this.getAllActive();
     const now = new Date();
-
     let expired = 0, nearExpiry = 0, lowStock = 0;
 
     for (const item of items) {
       const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
       switch (state) {
-        case 'expired':
-          expired += 1;
-          break;
-        case 'near-expiry':
-          nearExpiry += 1;
-          break;
-        case 'low-stock':
-          lowStock += 1;
-          break;
-        default:
-          break;
+        case 'expired':    expired += 1;    break;
+        case 'near-expiry': nearExpiry += 1; break;
+        case 'low-stock':  lowStock += 1;   break;
       }
     }
 
-    return {
-      total: items.length,
-      expired,
-      nearExpiry,
-      lowStock
-    };
+    return { total: items.length, expired, nearExpiry, lowStock };
   }
 
-  /** Subscribe to live-updates while ensuring consumers always see consistent payloads. */
-  watchPantryChanges(onChange: (item: PantryItem | null, meta?: { deleted?: boolean; id: string }) => void) {
+  /**
+   * Subscribe to live PouchDB changes, firing with normalized items.
+   * Cache updates are handled by PantryQueryService which wraps this method.
+   */
+  watchPantryChanges(
+    onChange: (item: PantryItem | null, meta?: { deleted?: boolean; id: string }) => void
+  ) {
     return this.watchChanges(doc => {
-      if (doc.type !== this.TYPE) {
-        return;
-      }
+      if (doc.type !== this.TYPE) return;
       const deleted = (doc as any)._deleted === true;
       if (deleted) {
-        this.removeProductFromCache(doc._id);
         onChange(null, { deleted: true, id: doc._id });
         return;
       }
-      const normalized = this.applyDerivedFields(doc);
-      this.replaceProductInCache(normalized);
-      onChange(normalized, { id: doc._id });
+      onChange(this.applyDerivedFields(doc), { id: doc._id });
     });
   }
 
-  /**
-   * Loads the next raw page from PouchDB using skip/limit.
-   * It never applies filters or sorting here; the reactive pipeline handles that in memory.
-   */
-  async loadNextPage(): Promise<void> {
-    if (this.loading()) {
-      return this.currentLoadPromise ?? Promise.resolve();
-    }
-
-    if (this.endReached()) {
-      return;
-    }
-
-    const limit = this.pageSize();
-    if (limit <= 0) {
-      return;
-    }
-
-    const loadPromise = (async () => {
-      this.loading.set(true);
-      try {
-        await this.initialize();
-        const offset = this.pageOffset();
-        const docs = await this.getPaginatedProducts(offset, limit);
-        if (docs.length) {
-          this.appendBatchToLoadedProducts(docs);
-          this.pageOffset.update(value => value + docs.length);
-        } else if (offset === 0) {
-          this.loadedProducts.set([]);
-          this.filteredProducts.set([]);
-        }
-        if (docs.length < limit) {
-          this.endReached.set(true);
-        }
-      } finally {
-        this.loading.set(false);
-      }
-
-      if (this.pendingPipelineReset) {
-        await this.performPendingPipelineReset();
-      }
-    })();
-
-    this.currentLoadPromise = loadPromise;
-
-    try {
-      await loadPromise;
-    } finally {
-      if (this.currentLoadPromise === loadPromise) {
-        this.currentLoadPromise = null;
-      }
-    }
+  getMigrationDatabase(): PouchDB.Database<PantryItem> {
+    return this.database;
   }
-
-  /** Updates the global search term and restarts pagination so results reload from the beginning. */
-  setSearchQuery(raw: string): void {
-    const normalized = normalizeSearchQuery(raw ?? '');
-    if (this.searchQuery() === normalized) {
-      return;
-    }
-    this.searchQuery.set(normalized);
-    this.requestPipelineReset();
-  }
-
-  /** Updates a single filter entry and restarts the paginated load. */
-  setFilter<K extends keyof PantryFilterState>(key: K, value: PantryFilterState[K]): void {
-    this.setFilters({ [key]: value } as Partial<PantryFilterState>);
-  }
-
-  /** Allows batching multiple filter updates in one call. */
-  setFilters(updates: Partial<PantryFilterState>): void {
-    const current = this.activeFilters();
-    const next = { ...current, ...updates };
-    if (this.areFiltersEqual(current, next)) {
-      return;
-    }
-    this.activeFilters.set(next);
-    this.requestPipelineReset();
-  }
-
-  /** Resets filters and search text, forcing a fresh load from the start. */
-  resetSearchAndFilters(): void {
-    const hasSearch = Boolean(this.searchQuery());
-    const currentFilters = this.activeFilters();
-    const filtersChanged = !this.areFiltersEqual(currentFilters, DEFAULT_PANTRY_FILTERS);
-    if (!hasSearch && !filtersChanged) {
-      return;
-    }
-    this.searchQuery.set('');
-    this.activeFilters.set({ ...DEFAULT_PANTRY_FILTERS });
-    this.requestPipelineReset();
-  }
-
-  /**
-   * Stores a one-shot preset to be applied by the pantry page on entry.
-   * This avoids mutating the shared pantry cache (and other views) before navigation completes.
-   */
-  setPendingNavigationPreset(preset: Partial<PantryFilterState>): void {
-    this.pendingNavigationPreset.set(preset);
-  }
-
-  /**
-   * Clears search/filters on pantry entry unless a dashboard preset is pending.
-   * This is a UX helper to ensure the pantry tab opens in a consistent state.
-   */
-  clearEntryFilters(): void {
-    if (this.pendingNavigationPreset()) {
-      return;
-    }
-
-    const defaultFilters: PantryFilterState = { ...DEFAULT_PANTRY_FILTERS };
-    const searchChanged = Boolean(this.searchQuery());
-    const filtersChanged = !this.areFiltersEqual(this.activeFilters(), defaultFilters);
-
-    if (!searchChanged && !filtersChanged) {
-      return;
-    }
-
-    if (searchChanged) {
-      this.searchQuery.set('');
-    }
-    if (filtersChanged) {
-      this.activeFilters.set(defaultFilters);
-    }
-  }
-
-  /** Applies and clears any pending navigation preset. */
-  applyPendingNavigationPreset(): void {
-    const preset = this.pendingNavigationPreset();
-    if (!preset) {
-      return;
-    }
-    this.pendingNavigationPreset.set(null);
-    this.applyNavigationPreset(preset);
-  }
-
-  private applyNavigationPreset(preset: Partial<PantryFilterState>): void {
-    const nextFilters: PantryFilterState = { ...DEFAULT_PANTRY_FILTERS, ...preset };
-    const searchChanged = Boolean(this.searchQuery());
-    const filtersChanged = !this.areFiltersEqual(this.activeFilters(), nextFilters);
-
-    if (!searchChanged && !filtersChanged) {
-      return;
-    }
-
-    if (searchChanged) {
-      this.searchQuery.set('');
-    }
-    if (filtersChanged) {
-      this.activeFilters.set(nextFilters);
-    }
-    this.requestPipelineReset();
-  }
-
-  /** --- Public helpers for store/UI logic reuse --- */
-  /** Sum every batch quantity into a single figure. */
-  getItemTotalQuantity(item: PantryItem): number {
-    return sumQuantitiesStock(item.batches ?? []);
-  }
-
-  /** Return the minimum threshold configured for the product (legacy handling happens during migration). */
-  getItemTotalMinThreshold(item: PantryItem): number {
-    return toNumberOrZeroStock(item.minThreshold);
-  }
-
-  /** Return the earliest expiry date among the defined batches. */
-  getItemEarliestExpiry(item: PantryItem): string | undefined {
-    return computeEarliestExpiryStock(item.batches ?? []);
-  }
-
-  /** Return all batches currently tracked for the provided item. */
-  getItemBatches(item: PantryItem): ItemBatch[] {
-    return collectBatchesItem(item.batches ?? [], { generateBatchId });
-  }
-
-  /** Determine whether any batch in the item is marked as opened. */
-  hasOpenBatch(item: PantryItem): boolean {
-    return hasOpenBatchItem(item);
-  }
-
-  /** Decide if the item should appear automatically in the shopping list. */
-  shouldAutoAddToShoppingList(
-    item: PantryItem,
-    context?: { totalQuantity?: number; minThreshold?: number | null }
-  ): boolean {
-    return shouldAutoAddToShoppingListItem(item, context);
-  }
-
-  private async refreshTotalCount(): Promise<void> {
-    try {
-      const total = await this.countByType(this.TYPE);
-      this.totalCount.set(total);
-    } catch (err) {
-      console.warn('[PantryService] Failed to refresh total count', err);
-    }
-  }
-
-  /**
-   * Recomputes the filtered list whenever the raw items, search term, filters,
-   * or sorting rules change.
-   */
-  private recomputeFilteredProducts(): void {
-    const loaded = this.activeProducts();
-    const query = normalizeSearchQuery(this.searchQuery());
-    const filters = this.activeFilters();
-
-    const filtered = loaded.filter(item =>
-      matchesSearchQuery(item, query) && matchesFilters(item, filters)
-    );
-    const sorted = sortPantryItems(filtered);
-    this.filteredProducts.set(sorted);
-  }
-
-  private requestPipelineReset(): void {
-    this.pipelineResetting.set(true);
-    this.pendingPipelineReset = true;
-    if (!this.loading()) {
-      void this.performPendingPipelineReset();
-    }
-  }
-
-  private async performPendingPipelineReset(): Promise<void> {
-    if (!this.pendingPipelineReset) {
-      return;
-    }
-    this.pendingPipelineReset = false;
-    try {
-      this.resetPagination();
-      await this.loadAllPages();
-    } finally {
-      this.pipelineResetting.set(false);
-    }
-  }
-
-  private areFiltersEqual(a: PantryFilterState, b: PantryFilterState): boolean {
-    return (
-      a.lowStock === b.lowStock &&
-      a.expired === b.expired &&
-      a.expiring === b.expiring &&
-      a.recentlyAdded === b.recentlyAdded &&
-      a.normalOnly === b.normalOnly &&
-      a.review === b.review &&
-      a.pendientes === b.pendientes
-    );
-  }
-
-
 
   /** Compute aggregate fields without mutating the original payload. */
   private applyDerivedFields(item: PantryItem): PantryItem {
     const rawBatches = Array.isArray(item.batches) ? item.batches : [];
-    const batches = normalizeBatchesStock(rawBatches, {
-      generateBatchId,
-    });
+    const batches = normalizeBatchesStock(rawBatches, { generateBatchId });
     const supermarket = normalizeSupermarketName(
       (item.supermarket ?? (item as any).supermarketId) as string | undefined
     );
@@ -547,81 +215,9 @@ export class PantryService extends StorageService<PantryItem> {
     return prepared;
   }
 
-  getMigrationDatabase(): PouchDB.Database<PantryItem> {
-    return this.database;
-  }
-
-
   private async ensureProductIndex(): Promise<void> {
-    if (this.productIndexReady) {
-      return;
-    }
+    if (this.productIndexReady) return;
     await this.ensureIndex(this.PRODUCT_INDEX_FIELDS);
     this.productIndexReady = true;
-  }
-
-  /** Adds or replaces freshly loaded documents while preserving the cached order. */
-  private appendBatchToLoadedProducts(batch: PantryItem[]): void {
-    if (!batch.length) {
-      return;
-    }
-    this.loadedProducts.update(items => {
-      if (!items.length) {
-        return [...batch];
-      }
-      const next = [...items];
-      const indexById = new Map<string, number>();
-      next.forEach((item, idx) => indexById.set(item._id, idx));
-      for (const doc of batch) {
-        const existingIndex = indexById.get(doc._id);
-        if (existingIndex != null) {
-          next[existingIndex] = doc;
-        } else {
-          indexById.set(doc._id, next.length);
-          next.push(doc);
-        }
-      }
-      return next;
-    });
-  }
-
-  /** Updates the reactive cache with a freshly modified document to avoid broad re-queries. */
-  private replaceProductInCache(item: PantryItem): void {
-    let added = false;
-    this.loadedProducts.update(items => {
-      const index = items.findIndex(existing => existing._id === item._id);
-      if (index < 0) {
-        added = true;
-        return [item, ...items];
-      }
-      const next = [...items];
-      next[index] = item;
-      return next;
-    });
-    if (added) {
-      this.totalCount.update(count => count + 1);
-    }
-  }
-
-  /** Removes a product from the paginated cache when it gets deleted via UI or sync. */
-  private removeProductFromCache(id: string): void {
-    if (!id) {
-      return;
-    }
-    let removed = false;
-    this.loadedProducts.update(items => {
-      const next = items.filter(item => item._id !== id);
-      removed = next.length !== items.length;
-      return next;
-    });
-    if (removed) {
-      this.totalCount.update(count => Math.max(0, count - 1));
-    }
-  }
-
-  private async loadAllPages(): Promise<void> {
-    while (!this.endReached()) {
-      await this.loadNextPage();
-    }
   }
 }

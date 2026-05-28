@@ -6,8 +6,8 @@ import { TranslateService } from '@ngx-translate/core';
 import type { NotificationContext, ScheduledNotification } from '@core/models/notifications';
 import { NOTIFICATION_IDS } from '@core/constants';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
+import { PantryNavigationPresetService } from '@core/services/pantry/pantry-navigation-preset.service';
 import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
-import { PantryService } from '@core/services/pantry/pantry.service';
 import { NotificationRegistryService } from './notification-registry.service';
 import { NotificationPermissionService } from './notification-permission.service';
 import { CapacitorNotificationPlugin } from './capacitor-notification.plugin';
@@ -19,7 +19,7 @@ export class NotificationSchedulerService {
   private readonly plugin = inject(CapacitorNotificationPlugin);
   private readonly preferencesService = inject(SettingsPreferencesService);
   private readonly pantryStore = inject(PantryStoreService);
-  private readonly pantryService = inject(PantryService);
+  private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
 
@@ -42,13 +42,13 @@ export class NotificationSchedulerService {
   private async handleNotificationTap(id: number): Promise<void> {
     switch (id) {
       case NOTIFICATION_IDS.EXPIRED_ITEMS:
-        this.pantryService.setPendingNavigationPreset({ expired: true });
+        this.navigationPreset.setPending({ expired: true });
         break;
       case NOTIFICATION_IDS.NEAR_EXPIRY:
-        this.pantryService.setPendingNavigationPreset({ expiring: true });
+        this.navigationPreset.setPending({ expiring: true });
         break;
       case NOTIFICATION_IDS.LOW_STOCK:
-        this.pantryService.setPendingNavigationPreset({ lowStock: true });
+        this.navigationPreset.setPending({ lowStock: true });
         break;
     }
     await this.navCtrl.navigateRoot('/pantry');
