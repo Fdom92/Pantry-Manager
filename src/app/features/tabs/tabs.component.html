@@ -7,8 +7,10 @@
 
     <ion-tab-button tab="pantry" [routerLink]="['/pantry']">
       <ion-icon name="basket-outline"></ion-icon>
-      @if (facade.pantryAlertCount() > 0) {
-        <ion-badge color="danger">{{ facade.pantryAlertCount() }}</ion-badge>
+      @if (facade.expiredCount() > 0) {
+        <ion-badge color="danger">{{ facade.expiredCount() }}</ion-badge>
+      } @else if (facade.nearExpiryUrgentCount() > 0) {
+        <ion-badge color="warning">{{ facade.nearExpiryUrgentCount() }}</ion-badge>
       }
       <ion-label>{{ 'pantry.title' | translate }}</ion-label>
     </ion-tab-button>
