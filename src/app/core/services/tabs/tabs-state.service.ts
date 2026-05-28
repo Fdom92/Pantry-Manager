@@ -35,14 +35,12 @@ export class TabsStateService {
 
   /**
    * Auto-suggestion count for the shopping list tab badge.
-   * Matches what the user sees when they open the list on a fresh session
-   * (manualItems is page-scoped and resets on each visit — not counted here).
-   *
-   * Uses shouldAutoAddToShoppingList: isBasic && (qty=0 OR qty < minThreshold).
-   * Both cases appear in the list; the badge should reflect both.
+   * Uses loadedProducts (not activeProducts/items) so that isBasic pantry
+   * items at qty=0 are included — activeProducts excludes qty=0 pantry items,
+   * but the list iterates loadedProducts and shows them.
    */
   readonly shoppingListCount = computed(() =>
-    this.pantryStore.items().reduce((total, item) => {
+    this.pantryStore.loadedProducts().reduce((total, item) => {
       const totalQuantity = sumQuantities(item.batches ?? []);
       const minThreshold = toNumberOrZero(item.minThreshold);
       return shouldAutoAddToShoppingList(item, { totalQuantity, minThreshold }) ? total + 1 : total;
