@@ -27,6 +27,7 @@ import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/norma
 import { TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
 import { PantryStoreService } from '../pantry/pantry-store.service';
+import { ReviewPromptService } from '../shared/review-prompt.service';
 
 @Injectable()
 export class ListStateService {
@@ -38,6 +39,7 @@ export class ListStateService {
   private readonly download = inject(DownloadService);
   private readonly share = inject(ShareService);
   private readonly toastController = inject(ToastController);
+  private readonly reviewPrompt = inject(ReviewPromptService);
 
   readonly isSharingListInProgress = signal(false);
 
@@ -88,6 +90,7 @@ export class ListStateService {
     try {
       await this.pantryStore.addNewLot(id, { quantity: qty });
       void this.showToast(this.translate.instant('shopping.toasts.bought', { name }));
+      void this.reviewPrompt.handleConsumeCompleted();
     } catch (err) {
       console.error('[ListStateService] markAsBought: addNewLot failed', err);
       this.boughtItemIds.update(set => {
