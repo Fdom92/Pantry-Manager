@@ -11,6 +11,7 @@ import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
 import { NotificationRegistryService } from './notification-registry.service';
 import { NotificationPermissionService } from './notification-permission.service';
 import { CapacitorNotificationPlugin } from './capacitor-notification.plugin';
+import { AppPreferences, PantryItem } from '@core/models';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationSchedulerService {
