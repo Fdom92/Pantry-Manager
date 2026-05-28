@@ -154,7 +154,8 @@
       },
       "success": {
         "title": "Ingredientes usados",
-        "hint": "Despensa atualizada"
+        "hint": "Despensa atualizada",
+        "itemSaved": "Excelente! Você usou {{name}} antes de expirar."
       },
       "allGood": {
         "title": "Tudo sob controlo",
@@ -1025,6 +1026,10 @@
     "reEngagement": {
       "title": "Como estão os seus frescos?",
       "body": "Já faz alguns dias que não abre a app. Um momento para manter tudo atualizado."
+    },
+    "weeklyReminder": {
+      "title": "O que você comprou esta semana?",
+      "body": "Adicione os novos itens para manter o rastreamento atualizado"
     }
   },
   "sync": {

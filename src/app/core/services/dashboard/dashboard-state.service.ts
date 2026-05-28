@@ -133,6 +133,13 @@ export class DashboardStateService {
     return raw;
   });
 
+  readonly lastConsumedItemName = computed((): string | null => {
+    const id = this.lastProtagonistId();
+    if (!id) return null;
+    const item = this.pantryItems().find(i => i._id === id);
+    return item?.name ?? null;
+  });
+
   readonly hasLowDataQuality = computed((): boolean =>
     !this.todaySuggestion() && this.noExpiryDateCount() >= 3
   );

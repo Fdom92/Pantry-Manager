@@ -154,7 +154,8 @@
       },
       "success": {
         "title": "Zutaten verwendet",
-        "hint": "Vorrat aktualisiert"
+        "hint": "Vorrat aktualisiert",
+        "itemSaved": "Großartig! Du hast {{name}} verwendet, bevor es ablief."
       },
       "allGood": {
         "title": "Alles unter Kontrolle",
@@ -1025,6 +1026,10 @@
     "reEngagement": {
       "title": "Wie läuft es mit deinen Frischprodukten?",
       "body": "Du hast dich ein paar Tage nicht eingeloggt. Kurz nachschauen und alles ist wieder aktuell."
+    },
+    "weeklyReminder": {
+      "title": "Was hast du diese Woche gekauft?",
+      "body": "Füge die Neueinkäufe hinzu, damit der Überblick aktuell bleibt"
     }
   },
   "sync": {
