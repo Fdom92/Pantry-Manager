@@ -1,3 +1,12 @@
+/**
+ * Days from now until a date string expires.
+ * Positive = future (expires in N days), negative = past (expired N days ago), 0 = today.
+ * Uses Math.ceil so "today at 23:59" counts as 0, not -1.
+ */
+export function daysUntilExpiry(dateStr: string, nowMs = Date.now()): number {
+  return Math.ceil((Date.parse(dateStr) - nowMs) / 86_400_000);
+}
+
 export function isWithinHours(date: Date, startHour: number, endHour: number): boolean {
   const hour = date.getHours();
   return hour >= startHour && hour < endHour;

@@ -253,7 +253,7 @@ export function computeFoodCoverage(activeItems: PantryItem[]): FoodCoverageResu
   const enhanced = classifiedCount / activeItems.length >= FOOD_TYPE_COVERAGE_THRESHOLD;
 
   const totalPortions = activeItems.reduce((sum, item) => {
-    const quantity = (item.batches ?? []).reduce((s, b) => s + (b.quantity ?? 0), 0);
+    const quantity = sumQuantities(item.batches);
     const weight = enhanced && item.foodType ? FOOD_TYPE_WEIGHTS[item.foodType] : 1.0;
     return sum + quantity * weight;
   }, 0);

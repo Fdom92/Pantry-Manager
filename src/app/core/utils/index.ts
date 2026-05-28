@@ -5,7 +5,6 @@ export * from './normalization.util';
 export * from './pantry-autocomplete.util';
 export * from './pantry-diff.util';
 export * from './pantry-selectors.util';
-export * from './pantry-status.util';
 export * from './list-grouping.util';
 export * from './signal.util';
 export * from './skeleton.util';
