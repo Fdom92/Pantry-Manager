@@ -41,15 +41,15 @@ export class PantryBatchesModalStateService {
 
   /**
    * Computed batch summaries for all items.
-   * Must be provided from parent service via parameter to avoid circular dependency.
+   * Initialized to empty; should be overridden from parent service via direct property assignment.
    */
-  batchSummaries!: Signal<Map<string, BatchSummaryMeta>>;
+  batchSummaries: Signal<Map<string, BatchSummaryMeta>> = signal(new Map());
 
   /**
    * Location options for batch location selector.
-   * Must be provided from parent service.
+   * Initialized to empty; should be overridden from parent service via direct property assignment.
    */
-  locationOptions!: Signal<string[]>;
+  locationOptions: Signal<string[]> = signal([]);
 
   // Reference to pantry items state for optimistic updates
   pantryItemsState?: WritableSignal<PantryItem[]>;

@@ -91,7 +91,7 @@ export class PantryFreshEditModalStateService {
   }
 
   close(): void {
-    if (this.isOpen()) return;
+    if (!this.isOpen()) return;
     this.editingItem.set(null);
     this.isSaving.set(false);
   }

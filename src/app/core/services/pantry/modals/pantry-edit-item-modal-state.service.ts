@@ -91,7 +91,7 @@ export class PantryEditItemModalStateService {
   }
 
   close(): void {
-    if (this.isOpen()) {
+    if (!this.isOpen()) {
       return;
     }
     this.resetModalState();
