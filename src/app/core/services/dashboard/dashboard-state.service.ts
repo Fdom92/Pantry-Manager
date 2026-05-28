@@ -322,7 +322,6 @@ export class DashboardStateService {
       }
       this.lastProtagonistId.set(suggestion.protagonist.id);
       this.isCookingConfirmed.set(true);
-      void this.reviewPrompt.handleConsumeCompleted();
       void this.reviewPrompt.handleIngredientUsed();
       setTimeout(() => this.isCookingConfirmed.set(false), 2500);
     } finally {

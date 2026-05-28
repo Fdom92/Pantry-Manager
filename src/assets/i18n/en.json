@@ -996,7 +996,10 @@
     }
   },
   "reviews": {
-    "prompt": "If PantryMind is helping you, a review really helps us. Would you leave one?"
+    "prompt": "If PantryMind is helping you, a review really helps us. Would you leave one?",
+    "accept": "Leave a review",
+    "decline": "Not now",
+    "promptHoy": "You made the most of your ingredients before they expired. Would you help us with a review?"
   },
   "notifications": {
     "expired": {

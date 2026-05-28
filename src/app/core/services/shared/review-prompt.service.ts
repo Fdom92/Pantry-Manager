@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { STORAGE_KEYS } from '@core/constants';
 import { getBooleanFlag, setBooleanFlag, sleep } from '@core/utils';
+import { AlertController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { ConfirmService } from './confirm.service';
 
 interface InAppReviewPlugin {
   requestReview: () => Promise<void>;
@@ -11,7 +11,7 @@ interface InAppReviewPlugin {
 
 @Injectable({ providedIn: 'root' })
 export class ReviewPromptService {
-  private readonly confirm = inject(ConfirmService);
+  private readonly alertCtrl = inject(AlertController);
   private readonly translate = inject(TranslateService);
 
   private readonly minDaysSinceFirstUse = 3;
@@ -82,12 +82,13 @@ export class ReviewPromptService {
    * Call immediately after a successful HOY "used ingredients" confirmation.
    * High-intent moment: user just saved food from expiring — peak satisfaction.
    * Skips the launch-count gate since the trigger itself signals engagement.
+   * Uses contextual text tied to the action, not the generic review ask.
    */
   async handleIngredientUsed(): Promise<void> {
     if (!this.storageAvailable) return;
     this.noteFirstUse();
     setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
-    const didPrompt = await this.promptIfEligibleNoLaunchGate();
+    const didPrompt = await this.promptIfEligibleNoLaunchGate('reviews.promptHoy');
     if (didPrompt) this.clearPendingPrompt();
   }
 
@@ -105,29 +106,48 @@ export class ReviewPromptService {
     }
   }
 
-  private async promptIfEligible(): Promise<boolean> {
+  private async promptIfEligible(messageKey = 'reviews.prompt'): Promise<boolean> {
     if (!this.shouldPrompt()) return false;
     await sleep(this.promptDelayMs);
     if (!this.shouldPrompt()) return false;
-    return this.doPrompt();
+    return this.doPrompt(messageKey);
   }
 
   /** Same as promptIfEligible but skips the launch-count gate. Used for high-intent moments. */
-  private async promptIfEligibleNoLaunchGate(): Promise<boolean> {
+  private async promptIfEligibleNoLaunchGate(messageKey = 'reviews.prompt'): Promise<boolean> {
     if (!this.shouldPromptNoLaunchGate()) return false;
     await sleep(this.promptDelayMs);
     if (!this.shouldPromptNoLaunchGate()) return false;
-    return this.doPrompt();
+    return this.doPrompt(messageKey);
   }
 
-  private async doPrompt(): Promise<boolean> {
-    const accepted = this.confirm.confirm(this.translate.instant('reviews.prompt'));
+  private async doPrompt(messageKey: string): Promise<boolean> {
+    const accepted = await this.showReviewAlert(messageKey);
     const promptTimestamp = new Date().toISOString();
     this.setItem(STORAGE_KEYS.REVIEW_LAST_PROMPT_AT, promptTimestamp);
     if (!accepted) return true;
     const didRequest = await this.requestNativeReview();
     if (didRequest) this.setItem(STORAGE_KEYS.REVIEW_COMPLETED_AT, promptTimestamp);
     return true;
+  }
+
+  private showReviewAlert(messageKey: string): Promise<boolean> {
+    return new Promise(resolve => {
+      this.alertCtrl.create({
+        message: this.translate.instant(messageKey),
+        buttons: [
+          {
+            text: this.translate.instant('reviews.decline'),
+            role: 'cancel',
+            handler: () => resolve(false),
+          },
+          {
+            text: this.translate.instant('reviews.accept'),
+            handler: () => resolve(true),
+          },
+        ],
+      }).then(alert => alert.present());
+    });
   }
 
   private clearPendingPrompt(): void {

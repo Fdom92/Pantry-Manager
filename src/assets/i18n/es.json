@@ -996,7 +996,10 @@
     }
   },
   "reviews": {
-    "prompt": "Si PantryMind te está ayudando, una reseña nos ayuda mucho. ¿Te animas a dejar una?"
+    "prompt": "Si PantryMind te está ayudando, una reseña nos ayuda mucho. ¿Te animas a dejar una?",
+    "accept": "Dejar una reseña",
+    "decline": "Ahora no",
+    "promptHoy": "Has aprovechado tus ingredientes antes de que caducaran. ¿Nos ayudas con una reseña?"
   },
   "notifications": {
     "expired": {
