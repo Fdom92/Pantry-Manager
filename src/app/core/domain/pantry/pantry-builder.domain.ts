@@ -1,6 +1,6 @@
 import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_PRODUCT_NAME } from '@core/constants';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
-import { roundQuantity } from '@core/utils/formatting.util';
+import { roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { computeEarliestExpiry } from './pantry-batch.domain';
 
@@ -16,16 +16,11 @@ export function buildAddItemPayload(params: {
 }): PantryItem {
   const normalizedName = normalizeTrim(params.name) || UNASSIGNED_PRODUCT_NAME;
 
-  // Inline normalizeAddQuantity logic
-  let sanitizedQuantity = 1;
-  if (typeof params.quantity === 'number') {
-    const numericValue = Number(params.quantity);
-    sanitizedQuantity = Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 1;
-  } else if (typeof params.quantity === 'string') {
-    const normalized = normalizeTrim(params.quantity.replace(',', '.'));
-    const numericValue = Number(normalized);
-    sanitizedQuantity = Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 1;
-  }
+  // Normalize quantity: accept comma-decimal strings, guard against 0/negative/NaN
+  const rawQty = typeof params.quantity === 'string'
+    ? normalizeTrim(params.quantity.replace(',', '.'))
+    : params.quantity;
+  const sanitizedQuantity = Math.max(1, toNumberOrZero(rawQty));
 
   const batches: ItemBatch[] = [
     {

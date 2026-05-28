@@ -49,6 +49,12 @@ export function normalizeLocaleCode(locale?: string | null): string | null {
   return base || null;
 }
 
+/**
+ * Normalize for **storage** — title-cases the name so it's display-ready
+ * when read back from PouchDB (e.g. "mercadona" → "Mercadona").
+ * Used in PantryService.applyDerivedFields.
+ * Contrast with normalizeSupermarketValue (for display/keys, no case change).
+ */
 export function normalizeSupermarketName(value?: string | null): string | undefined {
   const trimmed = normalizeWhitespace(value);
   if (!trimmed) {
@@ -106,6 +112,11 @@ export function normalizeStringList(
   return normalized;
 }
 
+/**
+ * Normalize for **display/grouping keys** — trims whitespace, returns undefined
+ * for empty. Does NOT title-case (preserves whatever case is stored).
+ * Used in list grouping and display. Contrast with normalizeSupermarketName.
+ */
 export function normalizeSupermarketValue(value?: string | null): string | undefined {
   const normalized = normalizeWhitespace(value);
   return normalized || undefined;
