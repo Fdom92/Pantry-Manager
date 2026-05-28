@@ -33,9 +33,9 @@ export class InsightsLlmClientService {
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       clearTimeout(timeoutId);
-      if (err.name === 'AbortError') throw this.makeError('TIMEOUT');
+      if ((err as any)?.name === 'AbortError') throw this.makeError('TIMEOUT');
       throw this.makeError('ANALYSIS_FAILED');
     }
 

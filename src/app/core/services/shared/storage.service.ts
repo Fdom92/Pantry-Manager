@@ -46,8 +46,8 @@ export class StorageService<T extends BaseDoc> {
     const now = new Date().toISOString();
 
     try {
-      const existing = await this.db.get(docId).catch((err: any) => {
-        if (err?.status === 404) return undefined;
+      const existing = await this.db.get(docId).catch((err: unknown) => {
+        if ((err as any)?.status === 404) return undefined;
         throw err;
       });
 
@@ -86,8 +86,8 @@ export class StorageService<T extends BaseDoc> {
   async get(id: string): Promise<T | null> {
     try {
       return await this.db.get(id);
-    } catch (err: any) {
-      if (err?.status === 404) return null;
+    } catch (err: unknown) {
+      if ((err as any)?.status === 404) return null;
       throw err;
     }
   }

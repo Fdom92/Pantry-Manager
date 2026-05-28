@@ -84,9 +84,10 @@ export class PantryStoreService {
       this.watchRealtime();
       this.error.set(null);
       void this.logExpiredBatchEvents(this.items());
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[PantryStoreService] loadAll error', err);
-      this.error.set(err.message || 'Error loading pantry items');
+      const msg = err instanceof Error ? err.message : 'Error loading pantry items';
+      this.error.set(msg);
     }
   }
 
@@ -101,7 +102,7 @@ export class PantryStoreService {
       }
       await this.pantryQuery.saveItem(item);
       this.reviewPrompt.handleProductAdded();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[PantryStoreService] addItem error', err);
       this.error.set('Failed to add item');
     }
@@ -111,7 +112,7 @@ export class PantryStoreService {
   async updateItem(item: PantryItem): Promise<void> {
     try {
       await this.pantryQuery.saveItem(item);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[PantryStoreService] updateItem error', err);
       this.error.set('Failed to update item');
     }
@@ -121,7 +122,7 @@ export class PantryStoreService {
   async deleteItem(id: string): Promise<void> {
     try {
       await this.pantryQuery.deleteItem(id);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[PantryStoreService] deleteItem error', err);
       this.error.set('Failed to delete item');
     }

@@ -172,7 +172,7 @@ export class PantryStateService {
       if (this.isAnyEditModalOpen()) return;
       const paginatedItems = this.pantryStore.filteredProducts();
       this.pantryItemsState.set(this.batchOps.mergePendingItems(paginatedItems));
-    });
+    }, { allowSignalWrites: true });
 
     // Update summary when items change
     effect(() => {
@@ -184,7 +184,7 @@ export class PantryStateService {
         // Include both fresh and pantry items so chip counts reflect both sections.
         this.summarySnapshot.set(this.viewModel.buildSummary(loadedItems, loadedItems.length));
       }
-    });
+    }, { allowSignalWrites: true });
 
     // Sync collapsed groups with current page
     effect(() => this.listUi.syncCollapsedGroups(this.groups()));
