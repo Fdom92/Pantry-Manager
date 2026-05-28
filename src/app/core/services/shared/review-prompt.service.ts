@@ -81,14 +81,29 @@ export class ReviewPromptService {
   /**
    * Call immediately after a successful HOY "used ingredients" confirmation.
    * High-intent moment: user just saved food from expiring — peak satisfaction.
-   * Skips the launch-count gate since the trigger itself signals engagement.
-   * Uses contextual text tied to the action, not the generic review ask.
+   * Skips the launch-count gate. Uses contextual text tied to the action.
    */
   async handleIngredientUsed(): Promise<void> {
     if (!this.storageAvailable) return;
     this.noteFirstUse();
     setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
     const didPrompt = await this.promptIfEligibleNoLaunchGate('reviews.promptHoy');
+    if (didPrompt) this.clearPendingPrompt();
+  }
+
+  /**
+   * Generic immediate prompt for positive actions outside the dashboard
+   * (e.g. marking items bought, marking fresh items out).
+   *
+   * Does NOT wait for the next dashboard visit — the user might close the
+   * app without ever going to the dashboard, losing the moment entirely.
+   * Skips the launch-count gate: the action itself proves engagement.
+   */
+  async handlePositiveAction(): Promise<void> {
+    if (!this.storageAvailable) return;
+    this.noteFirstUse();
+    setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
+    const didPrompt = await this.promptIfEligibleNoLaunchGate('reviews.prompt');
     if (didPrompt) this.clearPendingPrompt();
   }
 

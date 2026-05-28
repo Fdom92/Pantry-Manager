@@ -90,7 +90,7 @@ export class ListStateService {
     try {
       await this.pantryStore.addNewLot(id, { quantity: qty });
       void this.showToast(this.translate.instant('shopping.toasts.bought', { name }));
-      void this.reviewPrompt.handleConsumeCompleted();
+      void this.reviewPrompt.handlePositiveAction();
     } catch (err) {
       console.error('[ListStateService] markAsBought: addNewLot failed', err);
       this.boughtItemIds.update(set => {

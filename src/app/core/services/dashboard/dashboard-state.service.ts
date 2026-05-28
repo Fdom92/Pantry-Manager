@@ -339,7 +339,7 @@ export class DashboardStateService {
       await this.pantryStore.updateItem({ ...item, batches: [updatedBatch] });
       this.lastProtagonistId.set(id);
       this.isCookingConfirmed.set(true);
-      void this.reviewPrompt.handleConsumeCompleted();
+      void this.reviewPrompt.handlePositiveAction();
       setTimeout(() => this.isCookingConfirmed.set(false), 2500);
     } finally {
       this.isConsumingToday.set(false);
