@@ -305,6 +305,10 @@ export class DashboardStateService {
     this.dismissedTodayIds.update(ids => new Set([...ids, suggestion.protagonist.id]));
   }
 
+  async goToShoppingList(): Promise<void> {
+    await this.navCtrl.navigateRoot('/list');
+  }
+
   async actOnToday(): Promise<void> {
     const suggestion = this.todaySuggestion();
     if (!suggestion || this.isConsumingToday()) return;
