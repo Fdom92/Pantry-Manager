@@ -175,6 +175,9 @@ export function shouldAutoAddToShoppingList(
   }
 
   const { totalQuantity, minThreshold } = extractStockContext(item, context);
+  if (item.productType === 'fresh') {
+    return totalQuantity < FRESH_QTY.sufficient;
+  }
   return totalQuantity <= 0 || (minThreshold > 0 && totalQuantity < minThreshold);
 }
 

@@ -74,8 +74,12 @@
                         <span class="item-name">{{ suggestion.item.name }}</span>
                         <div class="item-meta">
                           @if (suggestion.reason === 'fresh-empty') {
-                            <ion-badge color="success" class="reason-chip">
-                              🥬 {{ 'shopping.chips.freshEmpty' | translate }}
+                            <ion-badge color="danger" class="reason-chip">
+                              {{ 'shopping.chips.freshEmpty' | translate }}
+                            </ion-badge>
+                          } @else if (suggestion.reason === 'fresh-low') {
+                            <ion-badge color="warning" class="reason-chip">
+                              {{ 'shopping.chips.freshLow' | translate }}
                             </ion-badge>
                           } @else if (suggestion.reason === 'empty') {
                             <ion-badge color="danger" class="reason-chip">
@@ -88,13 +92,15 @@
                           }
                           @if (suggestion.item.isBasic) {
                             <ion-badge color="primary" class="reason-chip reason-chip--basic">
-                              ⭐ {{ 'shopping.chips.basic' | translate }}
+                              {{ 'shopping.chips.basic' | translate }}
                             </ion-badge>
                           }
                         </div>
                         <span class="item-qty">
                           @if (suggestion.reason === 'fresh-empty') {
                             {{ 'shopping.suggestions.restockFresh' | translate }}
+                          } @else if (suggestion.reason === 'fresh-low') {
+                            {{ 'shopping.suggestions.freshLow' | translate }}
                           } @else {
                             {{ 'shopping.suggestions.restock' | translate:{ amount: suggestion.suggestedQuantity } }}
                           }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   IonButton,
@@ -89,9 +89,18 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 })
 export class PantryComponent implements OnDestroy {
   readonly facade = inject(PantryStateService);
+  @ViewChild(IonContent) private content!: IonContent;
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
+  }
+
+  onToggleShowAllFresh(): void {
+    const wasExpanded = this.facade.showAllFresh();
+    this.facade.toggleShowAllFresh();
+    if (wasExpanded) {
+      this.content.scrollToTop(300);
+    }
   }
 
   ngOnDestroy(): void {
