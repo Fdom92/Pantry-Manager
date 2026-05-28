@@ -25,6 +25,11 @@ export class PantryStoreService {
   private realtimeSubscribed = false;
   private expiredScanInProgress = false;
 
+  // ─── Clock signal for consistent timestamps across all computed properties ──
+  // Ensures expiredItems, nearExpiryItems, etc. all use the same point-in-time.
+  // Without this, items could disagree on status during midnight transitions.
+  private readonly nowMs = signal(Date.now());
+
   // ─── Exposed signals (delegated from PantryQueryService) ──────────────────
 
   readonly error = signal<string | null>(null);
@@ -43,22 +48,22 @@ export class PantryStoreService {
   readonly items = computed(() => this.pantryQuery.activeProducts());
 
   readonly expiredItems = computed(() => {
-    const now = new Date();
+    const now = new Date(this.nowMs());
     return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'expired');
   });
 
   readonly nearExpiryItems = computed(() => {
-    const now = new Date();
+    const now = new Date(this.nowMs());
     return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'near-expiry');
   });
 
   readonly reviewItems = computed(() => {
-    const now = new Date();
+    const now = new Date(this.nowMs());
     return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'review');
   });
 
   readonly lowStockItems = computed(() => {
-    const now = new Date();
+    const now = new Date(this.nowMs());
     return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock');
   });
 
