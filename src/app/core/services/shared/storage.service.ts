@@ -11,6 +11,15 @@ PouchDB.plugin(PouchFind);
 
 type PouchResponse = PouchDB.Core.Response;
 
+interface PouchDbError {
+  status: number;
+  message?: string;
+}
+
+function isPouchDbError(err: unknown): err is PouchDbError {
+  return typeof (err as any)?.status === 'number';
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -47,7 +56,7 @@ export class StorageService<T extends BaseDoc> {
 
     try {
       const existing = await this.db.get(docId).catch((err: unknown) => {
-        if ((err as any)?.status === 404) return undefined;
+        if (isPouchDbError(err) && err.status === 404) return undefined;
         throw err;
       });
 
@@ -71,8 +80,8 @@ export class StorageService<T extends BaseDoc> {
 
       const res: PouchResponse = await this.db.put(newDoc as any);
       return { ...newDoc, _rev: res.rev } as T;
-    } catch (err) {
-      if ((err as any)?.status === 409) {
+    } catch (err: unknown) {
+      if (isPouchDbError(err) && err.status === 409) {
         this.logger.warn(`Conflict while saving document: ${docId}`, err);
       }
       this.logger.error('upsert error', err);
@@ -87,7 +96,7 @@ export class StorageService<T extends BaseDoc> {
     try {
       return await this.db.get(id);
     } catch (err: unknown) {
-      if ((err as any)?.status === 404) return null;
+      if (isPouchDbError(err) && err.status === 404) return null;
       throw err;
     }
   }
