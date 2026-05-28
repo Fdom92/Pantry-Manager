@@ -1,6 +1,7 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getItemStatusState, sumQuantities } from '@core/domain/pantry';
+import { getItemStatusState, shouldAutoAddToShoppingList, sumQuantities } from '@core/domain/pantry';
+import { toNumberOrZero } from '@core/utils/formatting.util';
 import { environment } from 'src/environments/environment';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
@@ -33,17 +34,18 @@ export class TabsStateService {
   });
 
   /**
-   * Basics completely out of stock — shown on List tab.
+   * Auto-suggestion count for the shopping list tab badge.
+   * Matches what the user sees when they open the list on a fresh session
+   * (manualItems is page-scoped and resets on each visit — not counted here).
    *
-   * Intentionally narrower than shouldAutoAddToShoppingList (which also fires
-   * when qty < minThreshold). Only qty === 0 + isBasic is used here because:
-   * 1. It never diverges from what the user sees (no session state dependency)
-   * 2. "Below threshold" items are still stocked — not urgent enough for a tab badge
-   * 3. "Completely out" is unambiguous — the user knows immediately what the number means
+   * Uses shouldAutoAddToShoppingList: isBasic && (qty=0 OR qty < minThreshold).
+   * Both cases appear in the list; the badge should reflect both.
    */
   readonly shoppingListCount = computed(() =>
-    this.pantryStore.items().filter(
-      item => item.isBasic === true && sumQuantities(item.batches ?? []) === 0
-    ).length
+    this.pantryStore.items().reduce((total, item) => {
+      const totalQuantity = sumQuantities(item.batches ?? []);
+      const minThreshold = toNumberOrZero(item.minThreshold);
+      return shouldAutoAddToShoppingList(item, { totalQuantity, minThreshold }) ? total + 1 : total;
+    }, 0)
   );
 }
