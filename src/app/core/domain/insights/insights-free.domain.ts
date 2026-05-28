@@ -138,7 +138,7 @@ export function computeDistribution(
   const foodTypeCounts = new Map<FoodType, number>();
   for (const item of items) {
     if (item.productType === 'fresh') continue;
-    if (!item.foodType || item.foodType === FoodType.HOUSEHOLD) continue;
+    if (!item.foodType || item.foodType === FoodType.HOUSEHOLD || item.foodType === FoodType.OTHER) continue;
     const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
     if (state === 'expired') continue;
     foodTypeCounts.set(item.foodType, (foodTypeCounts.get(item.foodType) ?? 0) + 1);
@@ -156,7 +156,7 @@ export function computeDistribution(
   const consumedByType = new Map<FoodType, number>();
 
   for (const e of recent) {
-    if (!e.foodType || e.foodType === FoodType.HOUSEHOLD) continue;
+    if (!e.foodType || e.foodType === FoodType.HOUSEHOLD || e.foodType === FoodType.OTHER) continue;
     if (e.eventType === 'EXPIRE') {
       expiredFoodTypeCounts.set(
         e.foodType as FoodType,
