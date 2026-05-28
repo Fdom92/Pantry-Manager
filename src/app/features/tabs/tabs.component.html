@@ -7,11 +7,17 @@
 
     <ion-tab-button tab="pantry" [routerLink]="['/pantry']">
       <ion-icon name="basket-outline"></ion-icon>
+      @if (facade.pantryAlertCount() > 0) {
+        <ion-badge color="danger">{{ facade.pantryAlertCount() }}</ion-badge>
+      }
       <ion-label>{{ 'pantry.title' | translate }}</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="list" [routerLink]="['/list']">
       <ion-icon name="cart-outline"></ion-icon>
+      @if (facade.shoppingListCount() > 0) {
+        <ion-badge color="primary">{{ facade.shoppingListCount() }}</ion-badge>
+      }
       <ion-label>{{ 'shopping.tabTitle' | translate }}</ion-label>
     </ion-tab-button>
 
