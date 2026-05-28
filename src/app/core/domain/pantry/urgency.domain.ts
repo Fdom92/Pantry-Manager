@@ -19,6 +19,7 @@ export interface UrgencyResult {
  *
  * Score table:
  *   expired            → 100  critical
+ *   expires today      →  95  critical  ← daysToExpiry === 0
  *   expires tomorrow   →  90  critical
  *   expires in 2 days  →  80  critical
  *   expires in 3-5d    →  60  alert
@@ -34,12 +35,13 @@ export function calculateUrgencyScore(
   if (state === 'expired') return { score: 100, level: 'critical' };
   if (state === 'review')  return { score: 55,  level: 'alert' };
 
-  if (daysToExpiry !== null && daysToExpiry > 0) {
-    if (daysToExpiry === 1) return { score: 90, level: 'critical' };
-    if (daysToExpiry === 2) return { score: 80, level: 'critical' };
-    if (daysToExpiry <= 5)  return { score: 60, level: 'alert' };
-    if (daysToExpiry <= 10) return { score: 30, level: 'preventive' };
-    if (daysToExpiry <= 15) return { score: 15, level: 'preventive' };
+  if (daysToExpiry !== null && daysToExpiry >= 0) {
+    if (daysToExpiry === 0) return { score: 95,  level: 'critical' };
+    if (daysToExpiry === 1) return { score: 90,  level: 'critical' };
+    if (daysToExpiry === 2) return { score: 80,  level: 'critical' };
+    if (daysToExpiry <= 5)  return { score: 60,  level: 'alert' };
+    if (daysToExpiry <= 10) return { score: 30,  level: 'preventive' };
+    if (daysToExpiry <= 15) return { score: 15,  level: 'preventive' };
   }
 
   return { score: 0, level: 'none' };

@@ -88,8 +88,8 @@
               }
               <div class="today-card__footer">
                 @if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshOut') {
-                  <ion-button size="small" (click)="facade.dismissToday()">
-                    {{ 'dashboard.today.cta.dismiss' | translate }}
+                  <ion-button size="small" (click)="facade.goToShoppingList()">
+                    {{ 'dashboard.today.cta.restock' | translate }}
                   </ion-button>
                 } @else if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshExpiring') {
                   <ion-button

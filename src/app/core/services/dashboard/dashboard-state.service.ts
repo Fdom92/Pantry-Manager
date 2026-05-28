@@ -305,6 +305,10 @@ export class DashboardStateService {
     this.dismissedTodayIds.update(ids => new Set([...ids, suggestion.protagonist.id]));
   }
 
+  async goToShoppingList(): Promise<void> {
+    await this.navCtrl.navigateRoot('/list');
+  }
+
   async actOnToday(): Promise<void> {
     const suggestion = this.todaySuggestion();
     if (!suggestion || this.isConsumingToday()) return;
@@ -319,6 +323,7 @@ export class DashboardStateService {
       this.lastProtagonistId.set(suggestion.protagonist.id);
       this.isCookingConfirmed.set(true);
       void this.reviewPrompt.handleConsumeCompleted();
+      void this.reviewPrompt.handleIngredientUsed();
       setTimeout(() => this.isCookingConfirmed.set(false), 2500);
     } finally {
       this.isConsumingToday.set(false);
