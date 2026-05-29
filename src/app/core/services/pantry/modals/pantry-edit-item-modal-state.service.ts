@@ -18,9 +18,10 @@ import { CatalogOptionsService, SettingsPreferencesService } from '../../setting
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { buildConvertToFreshPreview, consolidateBatchesForFresh } from '@core/domain/pantry';
+import { PantryEditModalBase } from './pantry-edit-modal-base';
 
 @Injectable()
-export class PantryEditItemModalStateService {
+export class PantryEditItemModalStateService extends PantryEditModalBase {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly fb = inject(FormBuilder);
   private readonly appPreferences = inject(SettingsPreferencesService);
@@ -30,10 +31,6 @@ export class PantryEditItemModalStateService {
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly alertCtrl = inject(AlertController);
   private readonly toastCtrl = inject(ToastController);
-
-  readonly isOpen = signal(false);
-  readonly isSaving = signal(false);
-  readonly editingItem = signal<PantryItem | null>(null);
 
   readonly foodTypes = Object.values(FoodType);
 
@@ -73,6 +70,7 @@ export class PantryEditItemModalStateService {
   });
 
   constructor() {
+    super();
     effect(() => {
       const request = this.listState.editItemModalRequest();
       if (!request) {
@@ -91,14 +89,10 @@ export class PantryEditItemModalStateService {
   }
 
   close(): void {
-    if (this.isOpen()) {
+    if (!this.isOpen()) {
       return;
     }
     this.resetModalState();
-  }
-
-  dismiss(): void {
-    this.isOpen.set(false);
   }
 
   getCategorySelectOptions(): Array<{ value: string; label: string }> {

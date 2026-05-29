@@ -10,9 +10,10 @@ import type { AutocompleteItem } from '@shared/components/entity-autocomplete/en
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
+import { PantryEditModalBase } from './pantry-edit-modal-base';
 
 @Injectable()
-export class PantryFreshEditModalStateService {
+export class PantryFreshEditModalStateService extends PantryEditModalBase {
   private readonly fb = inject(FormBuilder);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly listState = inject(PantryStateService);
@@ -21,9 +22,6 @@ export class PantryFreshEditModalStateService {
   private readonly toastCtrl = inject(ToastController);
   private readonly eventManager = inject(HistoryEventManagerService);
 
-  readonly isOpen = signal(false);
-  readonly isSaving = signal(false);
-  readonly editingItem = signal<PantryItem | null>(null);
   readonly currentState = signal<FreshState>('none');
   readonly states: readonly FreshState[] = ['sufficient', 'low', 'none'];
 
@@ -65,6 +63,7 @@ export class PantryFreshEditModalStateService {
   });
 
   constructor() {
+    super();
     effect(() => {
       const request = this.listState.editFreshItemModalRequest();
       if (!request) return;
@@ -91,13 +90,9 @@ export class PantryFreshEditModalStateService {
   }
 
   close(): void {
-    if (this.isOpen()) return;
+    if (!this.isOpen()) return;
     this.editingItem.set(null);
     this.isSaving.set(false);
-  }
-
-  dismiss(): void {
-    this.isOpen.set(false);
   }
 
   setState(state: FreshState): void {
@@ -178,7 +173,8 @@ export class PantryFreshEditModalStateService {
 
     const alert = await this.alertCtrl.create({
       header: this.translate.instant('pantry.fresh.editModal.deleteConfirm.title'),
-      message: this.translate.instant('pantry.fresh.editModal.deleteConfirm.message', { name: existing.name }),
+      message: this.translate.instant('pantry.fresh.editModal.deleteConfirm.message')
+        .replace('{{ name }}', existing.name),
       buttons: [
         { text: this.translate.instant('common.actions.cancel'), role: 'cancel' },
         { text: this.translate.instant('common.actions.delete'), role: 'confirm' },

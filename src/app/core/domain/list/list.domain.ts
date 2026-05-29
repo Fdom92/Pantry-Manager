@@ -9,6 +9,14 @@ export const URGENCY_WEIGHT: Record<ShoppingReason, number> = {
   [ShoppingReason.MANUAL]:      4,
 };
 
+/**
+ * Determine whether an item needs restocking and what reason to assign.
+ *
+ * For fresh items the caller is responsible for only passing items where
+ * shouldAutoAddToShoppingList() returned true — i.e. items that are actually
+ * below their configured threshold. This function does not re-check that gate
+ * for fresh items because fresh threshold logic lives in pantry-status.domain.
+ */
 export function determineSuggestionNeed(params: {
   totalQuantity: number;
   minThreshold: number | null;
@@ -22,6 +30,7 @@ export function determineSuggestionNeed(params: {
   }
 
   if (isFresh) {
+    // qty > 0 but below the fresh keep-in-stock threshold (caller already verified this)
     return { reason: ShoppingReason.FRESH_LOW, suggestedQuantity: 0 };
   }
 

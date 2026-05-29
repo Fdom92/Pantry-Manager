@@ -107,7 +107,8 @@ export class UpgradeStateService {
         price: '€29.99',
         periodLabel: this.translate.instant('upgrade.plans.perYear'),
         badgeLabel: this.translate.instant('upgrade.plans.badgeBestValue'),
-        savingsLabel: this.translate.instant('upgrade.plans.savings', { value: 37 }),
+        savingsLabel: this.translate.instant('upgrade.plans.savings')
+          .replace('{{ value }}', '37'),
         trialLabel: null,
         ctaLabel: this.translate.instant('upgrade.actions.select'),
         benefits: this.benefitKeys.map(k => this.translate.instant(k)),
@@ -149,13 +150,13 @@ export class UpgradeStateService {
     const trialLabel = meta.trial
       ? meta.trial.kind === 'free'
         ? this.translate.instant('upgrade.plans.trialFree')
-        : this.translate.instant('upgrade.plans.trialDiscount', {
-            price: meta.trial.price,
-            cycles: meta.trial.cycles,
-          })
+        : this.translate.instant('upgrade.plans.trialDiscount')
+            .replace('{{ price }}', meta.trial.price)
+            .replace('{{ cycles }}', String(meta.trial.cycles))
       : null;
     const savingsLabel = meta.savingsPercent
-      ? this.translate.instant('upgrade.plans.savings', { value: meta.savingsPercent })
+      ? this.translate.instant('upgrade.plans.savings')
+          .replace('{{ value }}', String(meta.savingsPercent))
       : null;
     return {
       id: meta.id,

@@ -7,12 +7,14 @@ import { NavController } from '@ionic/angular';
 import { PantryService } from '../pantry/pantry.service';
 import { register } from 'swiper/element/bundle';
 import type { SwiperOptions } from 'swiper/types';
+import { Router } from '@angular/router';
 
 let swiperRegistered = false;
 
 @Injectable()
 export class OnboardingStateService {
   private readonly navCtrl = inject(NavController);
+  private readonly router = inject(Router);
   private readonly pantryService = inject(PantryService);
   private readonly alreadyCompletedOnboarding = getBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG);
 
@@ -77,7 +79,8 @@ export class OnboardingStateService {
     setBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG, true);
     const items = await this.pantryService.getAll();
     if (!items.length) {
-      await this.navCtrl.navigateRoot('/pantry');
+      // User has no items yet — navigate to pantry with add modal open for first engagement
+      await this.router.navigate(['/pantry'], { queryParams: { openAddModal: 'true' } });
       return;
     }
     await this.navCtrl.navigateRoot('/dashboard');

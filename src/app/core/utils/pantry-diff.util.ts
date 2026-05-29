@@ -33,7 +33,7 @@ function normalizeBatches(batches: ItemBatch[] = []): ItemBatch[] {
 
 export function hasMeaningfulItemChanges(previous: PantryItem, next: PantryItem): boolean {
   const stripMeta = (value: PantryItem) => {
-    const { _id, _rev, createdAt, updatedAt, ...rest } = value as any;
+    const { _id, _rev, createdAt, updatedAt, ...rest } = value as unknown as Record<string, unknown>;
     return { ...rest, batches: normalizeBatches(value.batches ?? []) };
   };
   return JSON.stringify(stripMeta(previous)) !== JSON.stringify(stripMeta(next));

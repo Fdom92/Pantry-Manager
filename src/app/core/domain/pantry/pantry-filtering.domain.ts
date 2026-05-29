@@ -14,9 +14,12 @@ export function matchesSearchQuery(item: PantryItem, query: string): boolean {
 
 /**
  * Check if item matches active filters.
+ * @param now - Reference timestamp. Defaults to Date.now() but should be passed
+ *   explicitly in hot render paths to guarantee all items are evaluated against
+ *   the same instant (multiple new Date() calls in a loop can differ by ms).
  */
-export function matchesFilters(item: PantryItem, filters: PantryFilterState): boolean {
-  const state = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
+export function matchesFilters(item: PantryItem, filters: PantryFilterState, now = new Date()): boolean {
+  const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
 
   if (filters.expired && state !== 'expired') return false;
   if (filters.expiring && state !== 'near-expiry') return false;

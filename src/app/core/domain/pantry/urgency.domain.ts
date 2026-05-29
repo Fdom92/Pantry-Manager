@@ -28,6 +28,12 @@ export interface UrgencyResult {
  *   11-15 days            →  40  preventive
  *   otherwise             →   0  none
  *
+ * NOTE: 6-10d (60) > 3-5d (80) appears inverted but is intentional.
+ * The HOY display cutoff (≥60) ensures both bands pass filtering, then
+ * sorting by score places 3-5d items FIRST (higher score). This strategy
+ * prevents "nearby items" from stealing prominence while keeping scores
+ * semantically meaningful within their urgency level.
+ *
  * Negative daysToExpiry (timezone edge-cases: same-day expiry parsed as -0.x, ceil = 0)
  * is normalised to 0 (today, score 95).
  */

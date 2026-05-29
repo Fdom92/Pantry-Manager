@@ -154,7 +154,8 @@
       },
       "success": {
         "title": "Ingredients used",
-        "hint": "Pantry updated"
+        "hint": "Pantry updated",
+        "itemSaved": "Great! You used {{name}} before it expired."
       },
       "allGood": {
         "title": "All under control",
@@ -1025,6 +1026,10 @@
     "reEngagement": {
       "title": "How are your fresh items doing?",
       "body": "It's been a few days since you checked the pantry. Just a moment to keep everything up to date."
+    },
+    "weeklyReminder": {
+      "title": "What did you buy this week?",
+      "body": "Add the new items to your pantry for accurate tracking"
     }
   },
   "sync": {

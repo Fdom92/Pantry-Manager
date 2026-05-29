@@ -15,7 +15,7 @@ export class LoggerService {
   /**
    * Log informational messages (development only)
    */
-  log(message: string, ...args: any[]): void {
+  log(message: string, ...args: unknown[]): void {
     if (this.isDev) {
       console.log(`${this.prefix} ${message}`, ...args);
     }
@@ -24,7 +24,7 @@ export class LoggerService {
   /**
    * Log debug messages (development only)
    */
-  debug(message: string, ...args: any[]): void {
+  debug(message: string, ...args: unknown[]): void {
     if (this.isDev) {
       console.debug(`${this.prefix} [DEBUG] ${message}`, ...args);
     }
@@ -33,7 +33,7 @@ export class LoggerService {
   /**
    * Log informational messages (development only)
    */
-  info(message: string, ...args: any[]): void {
+  info(message: string, ...args: unknown[]): void {
     if (this.isDev) {
       console.info(`${this.prefix} [INFO] ${message}`, ...args);
     }
@@ -42,14 +42,14 @@ export class LoggerService {
   /**
    * Log warning messages (always enabled)
    */
-  warn(message: string, ...args: any[]): void {
+  warn(message: string, ...args: unknown[]): void {
     console.warn(`${this.prefix} [WARN] ${message}`, ...args);
   }
 
   /**
    * Log error messages (always enabled)
    */
-  error(message: string, error?: Error | any, ...args: any[]): void {
+  error(message: string, error?: Error | unknown, ...args: unknown[]): void {
     if (error instanceof Error) {
       console.error(`${this.prefix} [ERROR] ${message}`, error, ...args);
     } else {

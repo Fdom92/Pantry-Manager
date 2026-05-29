@@ -154,7 +154,8 @@
       },
       "success": {
         "title": "Ingredientes usados",
-        "hint": "Despensa actualizada"
+        "hint": "Despensa actualizada",
+        "itemSaved": "Excelente, aprovechaste {{name}} antes de que caducara."
       },
       "allGood": {
         "title": "Todo bajo control",
@@ -1025,6 +1026,10 @@
     "reEngagement": {
       "title": "¿Cómo van tus frescos?",
       "body": "Hace unos días que no revisas la despensa. Solo un momento y tienes todo al día."
+    },
+    "weeklyReminder": {
+      "title": "¿Qué compraste esta semana?",
+      "body": "Añade lo nuevo a tu despensa para un control actualizado"
     }
   },
   "sync": {

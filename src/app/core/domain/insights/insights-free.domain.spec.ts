@@ -269,34 +269,42 @@ describe('computeDistribution', () => {
 
 describe('computePantryScore', () => {
   it('returns null when fewer than 3 items', () => {
-    expect(computePantryScore(2, 0, 0, 0, 0, 0)).toBeNull();
+    expect(computePantryScore(2, 0)).toBeNull();
   });
 
-  it('returns excellent label when score >= 85 with no issues', () => {
-    const result = computePantryScore(10, 0, 0, 0, 0, 0);
+  it('returns score 100 and excellent when no pendientes', () => {
+    const result = computePantryScore(10, 0);
     expect(result).not.toBeNull();
     expect(result!.score).toBe(100);
     expect(result!.label).toBe('excellent');
   });
 
-  it('applies strong penalty for expired items', () => {
-    const result = computePantryScore(10, 2, 0, 0, 0, 0);
-    expect(result).not.toBeNull();
-    expect(result!.score).toBeLessThan(85);
-    expect(result!.label).not.toBe('excellent');
+  it('returns good label at 70% completeness', () => {
+    // 3 of 10 pendientes → score 70
+    const result = computePantryScore(10, 3);
+    expect(result!.score).toBe(70);
+    expect(result!.label).toBe('good');
   });
 
-  it('applies soft penalty for no-date items', () => {
-    const perfect = computePantryScore(10, 0, 0, 0, 0, 0)!;
-    const withNoDate = computePantryScore(10, 0, 0, 5, 0, 0)!;
-    expect(withNoDate.score).toBeLessThan(perfect.score);
+  it('returns fair label at 50% completeness', () => {
+    // 5 of 10 pendientes → score 50
+    const result = computePantryScore(10, 5);
+    expect(result!.score).toBe(50);
+    expect(result!.label).toBe('fair');
   });
 
-  it('returns poor label when score < 40', () => {
-    // max expired penalty (40) + max nearExpiry penalty (20) + noDate penalty (15) = 75 deducted → score 25
-    const result = computePantryScore(10, 10, 10, 10, 0, 0);
-    expect(result!.score).toBeLessThan(40);
+  it('returns poor label below 50% completeness', () => {
+    // 8 of 10 pendientes → score 20
+    const result = computePantryScore(10, 8);
+    expect(result!.score).toBeLessThan(50);
     expect(result!.label).toBe('poor');
+  });
+
+  it('score scales linearly with pendientes ratio', () => {
+    const full = computePantryScore(100, 0)!;
+    const half = computePantryScore(100, 50)!;
+    expect(full.score).toBe(100);
+    expect(half.score).toBe(50);
   });
 });
 

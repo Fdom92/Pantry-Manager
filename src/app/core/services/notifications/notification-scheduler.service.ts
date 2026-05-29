@@ -11,6 +11,7 @@ import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
 import { NotificationRegistryService } from './notification-registry.service';
 import { NotificationPermissionService } from './notification-permission.service';
 import { CapacitorNotificationPlugin } from './capacitor-notification.plugin';
+import { AppPreferences, PantryItem } from '@core/models';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationSchedulerService {
@@ -50,6 +51,10 @@ export class NotificationSchedulerService {
       case NOTIFICATION_IDS.LOW_STOCK:
         this.navigationPreset.setPending({ lowStock: true });
         break;
+      case NOTIFICATION_IDS.RE_ENGAGEMENT:
+        // Weekly reminder: navigate to pantry with add modal open for shopping entry
+        await this.navCtrl.navigateRoot('/pantry', { queryParams: { openAddModal: 'true' } });
+        return;
     }
     await this.navCtrl.navigateRoot('/pantry');
   }
@@ -106,27 +111,11 @@ export class NotificationSchedulerService {
       const t = (key: string, params?: Record<string, unknown>): string =>
         this.translate.instant(key, params);
 
-      const context: NotificationContext = { items, preferences, t, now };
-      const definitions = this.registry.getAll();
-
-      const candidates: Array<{ priority: number; payload: ScheduledNotification }> = [];
-
-      for (const definition of definitions) {
-        if (!definition.isEnabled(preferences)) continue;
-        const payload = definition.build(context);
-        if (payload) {
-          candidates.push({ priority: definition.priority, payload });
-        }
-      }
-
       // Cancel all known IDs before rescheduling
       await this.cancelAll();
 
-      if (!candidates.length) return;
-
-      // Sort descending by priority and take the winner
-      candidates.sort((a, b) => b.priority - a.priority);
-      const winner = candidates[0].payload;
+      const winner = this.evaluateWinningNotification(preferences, items, now, t);
+      if (!winner) return;
 
       await this.plugin.schedule([{
         id: winner.id,
@@ -169,23 +158,8 @@ export class NotificationSchedulerService {
     const t = (key: string, params?: Record<string, unknown>): string =>
       this.translate.instant(key, params);
 
-    const context: NotificationContext = { items, preferences, t, now };
-    const definitions = this.registry.getAll();
-
-    const candidates: Array<{ priority: number; payload: ScheduledNotification }> = [];
-
-    for (const definition of definitions) {
-      if (!definition.isEnabled(preferences)) continue;
-      const payload = definition.build(context);
-      if (payload) {
-        candidates.push({ priority: definition.priority, payload });
-      }
-    }
-
-    if (!candidates.length) return false;
-
-    candidates.sort((a, b) => b.priority - a.priority);
-    const winner = candidates[0].payload;
+    const winner = this.evaluateWinningNotification(preferences, items, now, t);
+    if (!winner) return false;
 
     const scheduleAt = new Date();
     scheduleAt.setHours(hour, minute, 0, 0);
@@ -212,23 +186,8 @@ export class NotificationSchedulerService {
     const t = (key: string, params?: Record<string, unknown>): string =>
       this.translate.instant(key, params);
 
-    const context: NotificationContext = { items, preferences, t, now };
-    const definitions = this.registry.getAll();
-
-    const candidates: Array<{ priority: number; payload: ScheduledNotification }> = [];
-
-    for (const definition of definitions) {
-      if (!definition.isEnabled(preferences)) continue;
-      const payload = definition.build(context);
-      if (payload) {
-        candidates.push({ priority: definition.priority, payload });
-      }
-    }
-
-    if (!candidates.length) return null;
-
-    candidates.sort((a, b) => b.priority - a.priority);
-    const winner = candidates[0].payload;
+    const winner = this.evaluateWinningNotification(preferences, items, now, t);
+    if (!winner) return null;
 
     return { title: winner.title, body: winner.body };
   }
@@ -254,9 +213,28 @@ export class NotificationSchedulerService {
     const t = (key: string, params?: Record<string, unknown>): string =>
       this.translate.instant(key, params);
 
-    const context: NotificationContext = { items, preferences, t, now };
-    const definitions = this.registry.getAll();
+    const winner = this.evaluateWinningNotification(preferences, items, now, t);
+    if (!winner) return false;
 
+    await this.plugin.schedule([{
+      id: winner.id,
+      title: winner.title,
+      body: winner.body,
+      scheduleAt: new Date(Date.now() + 5_000),
+    }]);
+
+    return true;
+  }
+
+  /** Evaluate all notification definitions and return the highest-priority payload. */
+  private evaluateWinningNotification(
+    preferences: AppPreferences,
+    items: PantryItem[],
+    now: Date,
+    translate: (key: string, params?: Record<string, unknown>) => string
+  ): ScheduledNotification | null {
+    const context: NotificationContext = { items, preferences, t: translate, now };
+    const definitions = this.registry.getAll();
     const candidates: Array<{ priority: number; payload: ScheduledNotification }> = [];
 
     for (const definition of definitions) {
@@ -267,18 +245,9 @@ export class NotificationSchedulerService {
       }
     }
 
-    if (!candidates.length) return false;
+    if (!candidates.length) return null;
 
     candidates.sort((a, b) => b.priority - a.priority);
-    const winner = candidates[0].payload;
-
-    await this.plugin.schedule([{
-      id: winner.id,
-      title: winner.title,
-      body: winner.body,
-      scheduleAt: new Date(Date.now() + 5_000),
-    }]);
-
-    return true;
+    return candidates[0].payload;
   }
 }

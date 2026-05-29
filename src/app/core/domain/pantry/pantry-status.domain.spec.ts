@@ -128,3 +128,74 @@ describe('getItemStatusState — review behavior', () => {
     expect(getItemStatusState(item, now, windowDays)).toBe('expired');
   });
 });
+
+// ── shouldAutoAddToShoppingList ───────────────────────────────────────────────
+
+import { shouldAutoAddToShoppingList, getStatusSortWeight } from './pantry-status.domain';
+
+describe('shouldAutoAddToShoppingList', () => {
+  function item(isBasic: boolean | undefined, qty: number, min?: number): PantryItem {
+    return makeItem({
+      isBasic,
+      batches: [{ batchId: 'b1', quantity: qty }],
+      minThreshold: min,
+    });
+  }
+
+  it('returns false when isBasic is false', () => {
+    expect(shouldAutoAddToShoppingList(item(false, 0))).toBeFalse();
+  });
+
+  it('returns false when isBasic is undefined', () => {
+    expect(shouldAutoAddToShoppingList(item(undefined, 0))).toBeFalse();
+  });
+
+  it('returns true when isBasic and qty is 0', () => {
+    expect(shouldAutoAddToShoppingList(item(true, 0))).toBeTrue();
+  });
+
+  it('returns true when isBasic, qty > 0, and qty < minThreshold', () => {
+    expect(shouldAutoAddToShoppingList(item(true, 1, 3))).toBeTrue();
+  });
+
+  it('returns false when isBasic, qty >= minThreshold', () => {
+    expect(shouldAutoAddToShoppingList(item(true, 3, 3))).toBeFalse();
+    expect(shouldAutoAddToShoppingList(item(true, 5, 3))).toBeFalse();
+  });
+
+  it('returns false when isBasic, qty > 0, no minThreshold', () => {
+    expect(shouldAutoAddToShoppingList(item(true, 1))).toBeFalse();
+  });
+
+  it('uses context.totalQuantity when provided', () => {
+    const i = item(true, 10, 3); // stored qty=10 but context overrides
+    expect(shouldAutoAddToShoppingList(i, { totalQuantity: 1, minThreshold: 3 })).toBeTrue();
+  });
+
+  it('fresh item: returns true when isBasic and qty < FRESH_QTY.sufficient (3)', () => {
+    const i = makeItem({ isBasic: true, productType: 'fresh', batches: [{ batchId: 'b1', quantity: 2 }] });
+    expect(shouldAutoAddToShoppingList(i)).toBeTrue();
+  });
+
+  it('fresh item: returns false when qty >= FRESH_QTY.sufficient', () => {
+    const i = makeItem({ isBasic: true, productType: 'fresh', batches: [{ batchId: 'b1', quantity: 3 }] });
+    expect(shouldAutoAddToShoppingList(i)).toBeFalse();
+  });
+});
+
+// ── getStatusSortWeight ───────────────────────────────────────────────────────
+
+describe('getStatusSortWeight', () => {
+  it('expired has lowest weight (highest priority)', () => {
+    expect(getStatusSortWeight('expired')).toBeLessThan(getStatusSortWeight('near-expiry'));
+  });
+
+  it('near-expiry < low-stock < normal', () => {
+    expect(getStatusSortWeight('near-expiry')).toBeLessThan(getStatusSortWeight('low-stock'));
+    expect(getStatusSortWeight('low-stock')).toBeLessThan(getStatusSortWeight('normal'));
+  });
+
+  it('expired = 0 (first in sorted list)', () => {
+    expect(getStatusSortWeight('expired')).toBe(0);
+  });
+});

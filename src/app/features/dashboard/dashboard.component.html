@@ -31,7 +31,13 @@
                 <ion-icon name="checkmark-circle"></ion-icon>
                 <div>
                   <p class="today-card__success-title">{{ 'dashboard.today.success.title' | translate }}</p>
-                  <p class="today-card__success-hint">{{ 'dashboard.today.success.hint' | translate }}</p>
+                  @if (facade.lastConsumedItemName()) {
+                    <p class="today-card__success-hint">
+                      {{ 'dashboard.today.success.itemSaved' | translate:{ name: facade.lastConsumedItemName() } }}
+                    </p>
+                  } @else {
+                    <p class="today-card__success-hint">{{ 'dashboard.today.success.hint' | translate }}</p>
+                  }
                 </div>
               </div>
             </div>

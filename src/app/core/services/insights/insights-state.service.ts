@@ -124,8 +124,8 @@ export class InsightsStateService {
       const analysis = await this.llmClient.analyze(payload);
       await this.cacheStorage.saveCache(analysis);
       this.proAnalysis.set(analysis);
-    } catch (err: any) {
-      const code: InsightsClientError = err?.code ?? 'ANALYSIS_FAILED';
+    } catch (err: unknown) {
+      const code: InsightsClientError = (err as any)?.code ?? 'ANALYSIS_FAILED';
       this.proAnalysisError.set(code);
     } finally {
       this.proAnalysisLoading.set(false);

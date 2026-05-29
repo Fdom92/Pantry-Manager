@@ -129,6 +129,19 @@ function isItemLowStock(
   return minThreshold > 0 && totalQuantity < minThreshold;
 }
 
+/**
+ * Classify a pantry item's status state.
+ *
+ * @param windowDays - Near-expiry window for **pantry** items only.
+ *   Fresh items always use FRESH_NEAR_EXPIRY_WINDOW_DAYS (3d) regardless of
+ *   this value — callers should not pass windowDays expecting it to affect fresh items.
+ *
+ * Note on date math: uses classifyExpiry() which normalises dates to midnight
+ * (setHours 0,0,0,0). This differs from daysUntilExpiry() in date.util which
+ * uses raw timestamps + Math.ceil. Both treat "today" as 0 for typical date
+ * strings, but can diverge near midnight — getItemStatusState is the
+ * authoritative source for status; daysUntilExpiry is for display/scoring only.
+ */
 export function getItemStatusState(
   item: PantryItem,
   now: Date,

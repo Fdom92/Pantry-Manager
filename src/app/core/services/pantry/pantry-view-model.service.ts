@@ -257,7 +257,7 @@ export class PantryViewModelService {
       opened: Boolean(entry.batch.opened),
     }));
 
-    const itemState = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
+    const itemState = getItemStatusState(item, new Date(), NEAR_EXPIRY_WINDOW_DAYS); // isolated call — not part of a loop
     const lowStock = itemState === 'low-stock';
     const aggregates = this.computeProductAggregates(batches, lowStock, itemState);
     const colorClass = this.getColorClass(aggregates.status.state);
@@ -340,7 +340,8 @@ export class PantryViewModelService {
   }
 
   getBatchStatus(batch: ItemBatch): BatchStatusMeta {
-    const state = classifyExpiry(batch.expirationDate, new Date(), NEAR_EXPIRY_WINDOW_DAYS);
+    const now = new Date();
+    const state = classifyExpiry(batch.expirationDate, now, NEAR_EXPIRY_WINDOW_DAYS);
     switch (state) {
       case 'expired':
         return {
@@ -423,7 +424,8 @@ export class PantryViewModelService {
     if (days <= 0) return this.translate.instant('pantry.detail.subinfo.expired');
     if (days === 1) return this.translate.instant('pantry.detail.subinfo.tomorrow');
     // Within 7 days: show relative urgency. Beyond: show the date-fns formatted date.
-    if (days <= 7) return this.translate.instant('pantry.detail.subinfo.inDays', { count: days });
+    if (days <= 7) return this.translate.instant('pantry.detail.subinfo.inDays')
+      .replace('{{count}}', String(days));
     return formattedDate;
   }
 

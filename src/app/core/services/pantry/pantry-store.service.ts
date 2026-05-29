@@ -25,6 +25,11 @@ export class PantryStoreService {
   private realtimeSubscribed = false;
   private expiredScanInProgress = false;
 
+  // ─── Clock signal for consistent timestamps across all computed properties ──
+  // Ensures expiredItems, nearExpiryItems, etc. all use the same point-in-time.
+  // Without this, items could disagree on status during midnight transitions.
+  private readonly nowMs = signal(Date.now());
+
   // ─── Exposed signals (delegated from PantryQueryService) ──────────────────
 
   readonly error = signal<string | null>(null);
@@ -43,22 +48,22 @@ export class PantryStoreService {
   readonly items = computed(() => this.pantryQuery.activeProducts());
 
   readonly expiredItems = computed(() => {
-    const now = new Date();
+    const now = new Date(this.nowMs());
     return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'expired');
   });
 
   readonly nearExpiryItems = computed(() => {
-    const now = new Date();
+    const now = new Date(this.nowMs());
     return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'near-expiry');
   });
 
   readonly reviewItems = computed(() => {
-    const now = new Date();
+    const now = new Date(this.nowMs());
     return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'review');
   });
 
   readonly lowStockItems = computed(() => {
-    const now = new Date();
+    const now = new Date(this.nowMs());
     return this.items().filter(item => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS) === 'low-stock');
   });
 
@@ -79,9 +84,10 @@ export class PantryStoreService {
       this.watchRealtime();
       this.error.set(null);
       void this.logExpiredBatchEvents(this.items());
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[PantryStoreService] loadAll error', err);
-      this.error.set(err.message || 'Error loading pantry items');
+      const msg = err instanceof Error ? err.message : 'Error loading pantry items';
+      this.error.set(msg);
     }
   }
 
@@ -96,7 +102,7 @@ export class PantryStoreService {
       }
       await this.pantryQuery.saveItem(item);
       this.reviewPrompt.handleProductAdded();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[PantryStoreService] addItem error', err);
       this.error.set('Failed to add item');
     }
@@ -106,7 +112,7 @@ export class PantryStoreService {
   async updateItem(item: PantryItem): Promise<void> {
     try {
       await this.pantryQuery.saveItem(item);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[PantryStoreService] updateItem error', err);
       this.error.set('Failed to update item');
     }
@@ -116,7 +122,7 @@ export class PantryStoreService {
   async deleteItem(id: string): Promise<void> {
     try {
       await this.pantryQuery.deleteItem(id);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[PantryStoreService] deleteItem error', err);
       this.error.set('Failed to delete item');
     }

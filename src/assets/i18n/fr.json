@@ -154,7 +154,8 @@
       },
       "success": {
         "title": "Ingrédients utilisés",
-        "hint": "Garde-manger mis à jour"
+        "hint": "Garde-manger mis à jour",
+        "itemSaved": "Excellent ! Vous avez utilisé {{name}} avant qu'il n'expire."
       },
       "allGood": {
         "title": "Tout est sous contrôle",
@@ -1025,6 +1026,10 @@
     "reEngagement": {
       "title": "Comment vont tes produits frais ?",
       "body": "Quelques jours sans ouvrir l'app. Un instant suffit pour tout remettre à jour."
+    },
+    "weeklyReminder": {
+      "title": "Qu'as-tu acheté cette semaine ?",
+      "body": "Ajoute tes nouveaux articles pour un suivi à jour"
     }
   },
   "sync": {

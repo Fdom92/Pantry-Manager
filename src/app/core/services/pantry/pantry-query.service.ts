@@ -55,7 +55,7 @@ export class PantryQueryService {
   constructor() {
     effect(() => {
       this.recomputeFilteredProducts();
-    });
+    }, { allowSignalWrites: true });
   }
 
   // ─── Initialization / Pagination ──────────────────────────────────────────

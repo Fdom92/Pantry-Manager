@@ -127,7 +127,7 @@ export class SettingsStateService {
       if (!this.lifecycle.isDestroyed()) {
         shouldReload = true;
       }
-    }).catch(async (err: any) => {
+    }).catch(async (err: unknown) => {
       console.error('[SettingsStateService] submitImportFileSelection error', err);
       if (this.lifecycle.isDestroyed()) {
         return;

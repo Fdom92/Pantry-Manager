@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 
 export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
@@ -20,6 +20,7 @@ export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
 export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implements OnChanges {
   // DI
   private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly destroyRef = inject(DestroyRef);
   // INPUTS
   @Input() items: readonly AutocompleteItem<TRaw, TMeta>[] = [];
   @Input() placeholder?: string;
@@ -52,6 +53,14 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   inputValue = '';
   isFocused = false;
   private blurTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.blurTimeoutId) {
+        clearTimeout(this.blurTimeoutId);
+      }
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('value' in changes) {

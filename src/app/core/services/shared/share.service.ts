@@ -175,8 +175,8 @@ export class ShareService {
     if (typeof err === 'string') {
       return err;
     }
-    if (typeof err === 'object' && 'message' in err && typeof (err as any).message === 'string') {
-      return (err as any).message;
+    if (err instanceof Error) {
+      return err.message;
     }
     return '';
   }
