@@ -1,27 +1,27 @@
 .batch-edit-hint {
-  font-size: 0.75rem;
+  font-size: var(--app-theme-font-size-small);
   color: var(--app-theme-text-muted);
-  margin: 0 0 12px;
+  margin: 0 0 var(--app-theme-spacing-md);
 }
 
 .batch-edit-item-content {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-block: 8px;
+  gap: var(--app-theme-spacing-xs-plus);
+  padding-block: var(--app-theme-spacing-sm);
   width: 100%;
 }
 
 .batch-edit-item-name {
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-normal);
   color: var(--app-theme-text-muted);
 }
 
 .batch-edit-date-cell {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs-plus);
 }
 
 .modal-footer ion-toolbar {

@@ -12,6 +12,8 @@ ion-title {
   padding: 0;
 }
 
+// ── Summary bar (status chips) ────────────────────────────────────────────────
+
 .summary-bar {
   position: sticky;
   top: -16px;
@@ -25,7 +27,7 @@ ion-title {
 .summary-chips {
   display: flex;
   overflow-x: auto;
-  padding: var(--app-theme-spacing-xs) 2px;
+  padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-2xs);
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
 }
@@ -37,12 +39,12 @@ ion-title {
 .summary-chips .status-chip {
   flex: 0 0 auto;
   --padding-start: var(--app-theme-spacing-md);
-  --padding-end: 14px;
+  --padding-end: var(--app-theme-spacing-md-plus);
   --ripple-color: color-mix(in srgb, var(--ion-color-dark-contrast) 20%, transparent);
   font-weight: var(--app-theme-font-weight-bold);
   scroll-snap-align: center;
   transition: var(--app-theme-transition-normal);
-  border-radius: 999px;
+  border-radius: var(--app-theme-radius-pill);
 }
 
 .summary-chips .status-chip ion-icon {
@@ -50,7 +52,6 @@ ion-title {
   margin-right: var(--app-theme-spacing-xs);
   color: var(--app-theme-text-muted);
 }
-
 
 .summary-chips .status-chip .chip-body {
   display: flex;
@@ -65,8 +66,8 @@ ion-title {
 }
 
 .summary-chips .status-chip .chip-count {
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: var(--app-theme-font-size-md);
+  font-weight: var(--app-theme-font-weight-extra-bold);
   font-variant-numeric: tabular-nums;
 }
 
@@ -76,7 +77,7 @@ ion-title {
 
 .summary-chips .status-chip.active {
   opacity: 1;
-  box-shadow: 0 4px 14px rgba(15, 20, 19, 0.18);
+  box-shadow: var(--app-theme-shadow-md);
   outline: 2px solid var(--app-theme-card-border-color);
   outline-offset: 2px;
 }
@@ -91,11 +92,7 @@ ion-title {
   --color: var(--ion-color-primary-contrast);
 }
 
-.summary-chips .status-chip.chip--low {
-  --background: var(--ion-color-warning);
-  --color: var(--ion-color-dark);
-}
-
+.summary-chips .status-chip.chip--low,
 .summary-chips .status-chip.chip--expiring {
   --background: var(--ion-color-warning);
   --color: var(--ion-color-dark);
@@ -121,36 +118,38 @@ ion-title {
   --color: var(--ion-color-tertiary-contrast);
 }
 
+// ── List + empty state + skeleton ────────────────────────────────────────────
+
 .fade-in-list {
   animation: fadeInList 240ms ease;
 }
 
 .list-empty-state {
   display: block;
-  margin: 14px 0 6px;
+  margin: var(--app-theme-spacing-md-plus) 0 var(--app-theme-spacing-xs-plus);
 }
 
 .skeleton-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
 }
 
 .skeleton-card {
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: var(--app-theme-radius-md);
+  padding: var(--app-theme-spacing-md);
   position: relative;
   overflow: hidden;
-  background: var(--ion-card-background, var(--ion-card-background));
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  background: var(--ion-card-background);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  border: 1px solid var(--app-theme-card-border-color);
 }
 
 .skeleton-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
 }
 
 .skeleton-card::after {
@@ -168,8 +167,10 @@ ion-title {
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
+// ── Category stack + virtual cards ──────────────────────────────────────────
+
 .category-stack ion-card + ion-card {
-  margin-top: 16px;
+  margin-top: var(--app-theme-spacing-lg);
 }
 
 .category-stack ion-card {
@@ -181,7 +182,7 @@ ion-title {
 .virtual-category-card {
   width: 100%;
   display: flex;
-  margin-bottom: 8px;
+  margin-bottom: var(--app-theme-spacing-sm);
 }
 
 .virtual-category-card ion-card {
@@ -195,7 +196,7 @@ ion-title {
   box-sizing: border-box;
   margin-bottom: var(--app-theme-spacing-lg);
   transition:
-    height 0.25s ease,
+    height 250ms ease,
     opacity 220ms ease,
     transform 220ms ease;
   overflow: visible;
@@ -207,7 +208,7 @@ ion-title {
 
 .virtual-item-card--deleting {
   opacity: 0;
-  transform: translateX(-14px);
+  transform: translateX(calc(-1 * var(--app-theme-spacing-md-plus)));
   pointer-events: none;
 }
 
@@ -217,15 +218,19 @@ ion-title {
   height: 100%;
 }
 
+// ── Group header (category fold) ────────────────────────────────────────────
+
 .group-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
   justify-content: space-between;
   cursor: pointer;
-  padding: 10px 6px;
-  border-radius: 12px;
-  transition: background 0.15s ease, outline 0.15s ease;
+  padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-xs-plus);
+  border-radius: var(--app-theme-radius-md);
+  transition:
+    background var(--app-theme-transition-fast),
+    outline var(--app-theme-transition-fast);
 }
 
 section.group-details {
@@ -238,7 +243,7 @@ section.group-details {
 .group-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -264,14 +269,16 @@ section.group-details {
 .group-meta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
   flex-shrink: 0;
   justify-content: flex-end;
 }
 
 .group-toggle-icon {
   font-size: 20px;
-  transition: color 0.18s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    color var(--app-theme-transition-normal),
+    transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
   transform: rotate(0deg);
 
   &--expanded {
@@ -284,29 +291,31 @@ section.group-details {
 }
 
 .group-header:focus-visible {
-  outline: 2px solid var(--ion-color-primary, var(--ion-color-primary));
-  outline-offset: 4px;
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: var(--app-theme-spacing-xs);
 }
 
 .group-meta ion-text {
-  font-size: 0.9rem;
+  font-size: var(--app-theme-font-size-body);
 }
 
+// ── Batches modal embedded styles ───────────────────────────────────────────
+
 .batches-modal-content {
-  padding: 0 0 24px;
+  padding: 0 0 var(--app-theme-spacing-2xl);
 }
 
 .batches-modal-header {
-  padding: 8px 0;
+  padding: var(--app-theme-spacing-sm) 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--app-theme-spacing-xs);
 }
 
 .batches-modal-header h2 {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: var(--app-theme-font-size-lg);
+  font-weight: var(--app-theme-font-weight-bold);
 }
 
 .modal-spinner {
@@ -314,22 +323,23 @@ section.group-details {
   margin: 48px auto;
 }
 
+// ── Location + batch form (location-form-list) ─────────────────────────────
+
 .location-form-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 16px;
+  gap: var(--app-theme-spacing-lg);
+  margin-top: var(--app-theme-spacing-lg);
 }
 
-
 .location-form-card {
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  border-radius: 12px;
-  padding: 12px;
+  border: 1px solid var(--app-theme-card-border-color);
+  border-radius: var(--app-theme-radius-md);
+  padding: var(--app-theme-spacing-md);
   background: color-mix(in srgb, var(--ion-color-dark-contrast) 6%, transparent);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
 }
 
 .location-form-header {
@@ -339,16 +349,16 @@ section.group-details {
 }
 
 .location-total {
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: var(--app-theme-font-size-body);
+  font-weight: var(--app-theme-font-weight-semibold);
   color: var(--app-theme-text-muted);
-  margin-left: 8px;
+  margin-left: var(--app-theme-spacing-sm);
 }
 
 .batch-form-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
 }
 
 .batch-form-header {
@@ -359,11 +369,11 @@ section.group-details {
 
 .batch-form-card {
   border: 1px dashed color-mix(in srgb, var(--ion-text-color) 20%, transparent);
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: var(--app-theme-radius-sm-plus, 10px);
+  padding: var(--app-theme-spacing-sm-plus);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--app-theme-spacing-sm-plus);
   background: color-mix(in srgb, var(--ion-color-dark-contrast) 4%, transparent);
 }
 
@@ -373,10 +383,8 @@ section.group-details {
   justify-content: space-between;
 }
 
-
-
 ion-modal ion-list {
-  border-radius: 8px;
+  border-radius: var(--app-theme-radius-sm);
 }
 
 ion-card-header {
@@ -385,35 +393,26 @@ ion-card-header {
 }
 
 .create-item-modal-content {
-  --padding-bottom: 24px;
+  --padding-bottom: var(--app-theme-spacing-2xl);
 }
 
 .modal-title-value {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: var(--app-theme-font-size-xl);
+  font-weight: var(--app-theme-font-weight-bold);
   margin: 0;
 }
+
+// ── Animations ──────────────────────────────────────────────────────────────
 
 @keyframes fadeInList {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(var(--app-theme-spacing-xs-plus));
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-// Quantity sheet modal styles
-ion-modal.quantity-sheet {
-  --background: var(--ion-background-color);
-  --border-radius: 16px 16px 0 0;
-  --box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
-}
-
-ion-modal.quantity-sheet ion-content {
-  --background: var(--ion-background-color);
 }
 
 @keyframes shimmer {
@@ -425,7 +424,19 @@ ion-modal.quantity-sheet ion-content {
   }
 }
 
-// ── Two-section layout ─────────────────────────────────────────────────────
+// ── Quantity sheet modal ────────────────────────────────────────────────────
+
+ion-modal.quantity-sheet {
+  --background: var(--ion-background-color);
+  --border-radius: var(--app-theme-radius-lg) var(--app-theme-radius-lg) 0 0;
+  --box-shadow: 0 -4px 16px color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+}
+
+ion-modal.quantity-sheet ion-content {
+  --background: var(--ion-background-color);
+}
+
+// ── Two-section layout (Fresh + Despensa) ──────────────────────────────────
 
 .pantry-section {
   display: flex;
@@ -444,8 +455,8 @@ ion-modal.quantity-sheet ion-content {
 
   &__title {
     margin: 0;
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-size: var(--app-theme-font-size-caption);
+    font-weight: var(--app-theme-font-weight-extra-bold);
     color: var(--app-theme-text-color);
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -463,7 +474,7 @@ ion-modal.quantity-sheet ion-content {
     background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
     color: var(--ion-color-primary);
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background var(--app-theme-transition-fast);
 
     ion-icon { font-size: 20px; }
 
@@ -517,7 +528,7 @@ ion-modal.quantity-sheet ion-content {
 
   &__subtitle {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: var(--app-theme-font-size-small);
     color: var(--app-theme-text-muted);
     opacity: 0.6;
   }
@@ -525,15 +536,15 @@ ion-modal.quantity-sheet ion-content {
   &__cta {
     align-self: flex-start;
     margin-top: var(--app-theme-spacing-xs);
-    padding: 6px 14px;
+    padding: var(--app-theme-spacing-xs-plus) var(--app-theme-spacing-md-plus);
     border: none;
-    border-radius: 20px;
+    border-radius: var(--app-theme-radius-xl);
     background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
     color: var(--ion-color-primary);
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: var(--app-theme-font-size-caption);
+    font-weight: var(--app-theme-font-weight-bold);
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background var(--app-theme-transition-fast);
 
     &:active {
       background: color-mix(in srgb, var(--ion-color-primary) 22%, transparent);
@@ -552,15 +563,15 @@ ion-modal.quantity-sheet ion-content {
 .fresh-show-more {
   display: block;
   width: 100%;
-  padding: 8px var(--app-theme-card-margin-inline);
+  padding: var(--app-theme-spacing-sm) var(--app-theme-card-margin-inline);
   background: none;
   border: none;
   color: var(--ion-color-primary);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: var(--app-theme-font-size-caption);
+  font-weight: var(--app-theme-font-weight-bold);
   cursor: pointer;
   text-align: center;
-  transition: opacity 0.15s;
+  transition: opacity var(--app-theme-transition-fast);
 
   &:active {
     opacity: 0.6;

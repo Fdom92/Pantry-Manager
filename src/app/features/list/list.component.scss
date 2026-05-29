@@ -17,9 +17,7 @@ ion-card-title {
   justify-content: space-between;
 }
 
-ion-title {
-  color: var(--app-theme-text-color);
-}
+// ── Header + meta ────────────────────────────────────────────────────────────
 
 .suggestions-header {
   display: flex;
@@ -46,6 +44,8 @@ ion-title {
   margin: var(--app-theme-spacing-xs) 0 0;
   color: var(--app-theme-text-muted);
 }
+
+// ── Suggestion groups + cards ────────────────────────────────────────────────
 
 .suggestion-groups {
   display: flex;
@@ -85,7 +85,7 @@ ion-title {
 
 .suggestion-content h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: var(--app-theme-font-size-lg);
   font-weight: var(--app-theme-font-weight-bold);
 }
 
@@ -101,7 +101,9 @@ ion-title {
 }
 
 .pressable {
-  transition: transform 140ms ease, box-shadow 140ms ease;
+  transition:
+    transform var(--app-theme-transition-fast),
+    box-shadow var(--app-theme-transition-fast);
 }
 
 .pressable:active,
@@ -109,13 +111,15 @@ ion-title {
   transform: scale(0.94);
 }
 
+// ── Empty + skeleton ─────────────────────────────────────────────────────────
+
 .fade-in-list {
   animation: fadeInList 240ms ease;
 }
 
 .list-empty-state {
   display: block;
-  margin: 12px 0 4px;
+  margin: var(--app-theme-spacing-md) 0 var(--app-theme-spacing-xs);
 }
 
 .suggestions-shell {
@@ -124,22 +128,22 @@ ion-title {
   border: none;
   box-shadow: none;
   margin: 0;
-  padding-bottom: 16px;
+  padding-bottom: var(--app-theme-spacing-lg);
 }
 
 .shopping-skeleton-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
 }
 
 .suggestion-card--skeleton {
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
-  background: var(--ion-card-background, var(--ion-card-background));
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  border-radius: var(--app-theme-radius-md);
+  background: var(--ion-card-background);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
 }
 
 .suggestion-card--skeleton::after {
@@ -157,10 +161,12 @@ ion-title {
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
+// ── Animations ───────────────────────────────────────────────────────────────
+
 @keyframes fadeInList {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(var(--app-theme-spacing-xs-plus));
   }
   to {
     opacity: 1;
@@ -177,11 +183,12 @@ ion-title {
   }
 }
 
-// --- Item list (replaces cards) ---
+// ── Item list ────────────────────────────────────────────────────────────────
+
 .item-list {
   --ion-item-background: var(--app-theme-card-bg);
   border-radius: var(--app-theme-card-border-radius);
-  border: 1px solid var(--app-theme-card-border-color);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
   overflow: hidden;
   padding: 0;
 }
@@ -196,12 +203,12 @@ ion-title {
 .item-body {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--app-theme-spacing-2xs);
   padding: var(--app-theme-spacing-sm) 0;
 }
 
 .item-name {
-  font-size: 1rem;
+  font-size: var(--app-theme-font-size-title);
   font-weight: var(--app-theme-font-weight-bold);
   color: var(--app-theme-text-color);
 }
@@ -209,23 +216,24 @@ ion-title {
 .item-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 2px;
+  gap: var(--app-theme-spacing-xs);
+  margin-top: var(--app-theme-spacing-2xs);
 }
 
 .item-qty {
-  font-size: 0.85rem;
+  font-size: var(--app-theme-font-size-caption);
   color: var(--app-theme-text-muted);
-  margin-top: 2px;
+  margin-top: var(--app-theme-spacing-2xs);
 }
 
-// --- Reason chips ---
+// ── Reason chips ─────────────────────────────────────────────────────────────
+
 .reason-chip {
-  font-size: 0.72rem;
-  padding: 2px 8px;
-  border-radius: 20px;
+  font-size: var(--app-theme-font-size-micro);
+  padding: var(--app-theme-spacing-2xs) var(--app-theme-spacing-sm);
+  border-radius: var(--app-theme-radius-xl);
   height: auto;
-  line-height: 1.4;
+  line-height: var(--app-theme-line-height-normal);
 }
 
 .reason-chip--basic {
@@ -241,7 +249,8 @@ ion-title {
   font-style: italic;
 }
 
-// --- Supermarket heading ---
+// ── Supermarket heading ──────────────────────────────────────────────────────
+
 .supermarket-heading {
   background: transparent;
   border: none;
@@ -251,7 +260,7 @@ ion-title {
   display: flex;
   align-items: center;
   gap: var(--app-theme-spacing-sm);
-  font-size: 1.05rem;
+  font-size: var(--app-theme-font-size-lg);
   font-weight: var(--app-theme-font-weight-bold);
   color: var(--app-theme-text-color);
   padding: var(--app-theme-spacing-xs) 0;
@@ -262,14 +271,14 @@ ion-title {
 }
 
 .group-count {
-  font-size: 0.75rem;
+  font-size: var(--app-theme-font-size-small);
 }
 
 .collapse-icon {
   margin-left: auto;
-  font-size: 1rem;
+  font-size: var(--app-theme-font-size-title);
   color: var(--app-theme-text-muted);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
   transform: rotate(0deg);
 
   &--expanded {
@@ -277,7 +286,8 @@ ion-title {
   }
 }
 
-// --- Bought section ---
+// ── Bought section ───────────────────────────────────────────────────────────
+
 .bought-section {
   margin-top: var(--app-theme-spacing-sm);
 }
@@ -291,7 +301,7 @@ ion-title {
   display: flex;
   align-items: center;
   gap: var(--app-theme-spacing-sm);
-  font-size: 0.9rem;
+  font-size: var(--app-theme-font-size-body);
   color: var(--app-theme-text-muted);
   padding: var(--app-theme-spacing-xs) 0;
 }
@@ -305,32 +315,32 @@ ion-title {
 }
 
 .bought-name {
-  font-weight: var(--app-theme-font-weight-normal, 400);
+  font-weight: var(--app-theme-font-weight-normal);
   text-decoration: line-through;
   color: var(--app-theme-text-muted);
 }
 
-// --- Share row ---
+// ── Share row ────────────────────────────────────────────────────────────────
+
 .share-row {
   display: flex;
   justify-content: flex-end;
   padding-top: var(--app-theme-spacing-md);
 }
 
-// --- Skeleton items ---
 .skeleton-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 0;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-md) 0;
 }
 
-// --- FAB override ---
+// ── FAB ─────────────────────────────────────────────────────────────────────
+
 ion-fab-button[size="small"] {
-  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --box-shadow: 0 2px 8px color-mix(in srgb, var(--ion-text-color) 15%, transparent);
 }
 
-// --- Buy button ---
 .buy-btn {
   --padding-start: 0;
   --padding-end: 0;
@@ -340,7 +350,8 @@ ion-fab-button[size="small"] {
   flex-shrink: 0;
 }
 
-// --- Ignored section ---
+// ── Ignored section ──────────────────────────────────────────────────────────
+
 .ignored-section {
   margin-top: var(--app-theme-spacing-sm);
 }
@@ -354,7 +365,7 @@ ion-fab-button[size="small"] {
   display: flex;
   align-items: center;
   gap: var(--app-theme-spacing-sm);
-  font-size: 0.9rem;
+  font-size: var(--app-theme-font-size-body);
   color: var(--app-theme-text-muted);
   padding: var(--app-theme-spacing-xs) 0;
 }
@@ -371,7 +382,8 @@ ion-fab-button[size="small"] {
   color: var(--app-theme-text-muted);
 }
 
-// --- Inline manual add row ---
+// ── Inline manual add row ────────────────────────────────────────────────────
+
 .manual-add-row {
   display: flex;
   align-items: center;
@@ -382,13 +394,13 @@ ion-fab-button[size="small"] {
   border: 1px dashed color-mix(in srgb, var(--ion-text-color) 18%, transparent);
   border-radius: var(--app-theme-card-border-radius);
   color: var(--app-theme-text-muted);
-  font-size: 0.875rem;
+  font-size: var(--app-theme-font-size-body);
   cursor: pointer;
   text-align: left;
   transition: opacity 120ms ease;
 
   ion-icon {
-    font-size: 1.1rem;
+    font-size: var(--app-theme-font-size-lg);
     flex-shrink: 0;
   }
 }

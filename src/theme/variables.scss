@@ -1,4 +1,8 @@
 :root {
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // IONIC PALETTE
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
   --ion-color-primary: #3A9882;
   --ion-color-primary-rgb: 58, 152, 130;
   --ion-color-primary-contrast: #000000;
@@ -70,8 +74,71 @@
   --ion-toolbar-color: var(--ion-color-dark);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // APP THEME VARIABLES - Brand Design System
+  // APP THEME — Brand Design System v2 (4.4)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  //
+  // Scales below are deliberately closed sets. Components MUST pick the
+  // closest token instead of inventing px / rem values. New design needs
+  // start by extending these scales, not bypassing them.
+  //
+  // Naming follows a t-shirt scale (xs → 2xl) for typography, spacing,
+  // and radius so the three systems stay symmetrical.
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🎨 TYPOGRAPHY
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-text-color: var(--ion-text-color);
+  --app-theme-text-muted: var(--ion-color-medium);
+  --app-theme-text-subtle: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+
+  // Font sizes — values preserved from v1 to avoid regression; new entries fill gaps.
+  --app-theme-font-size-micro: 0.72rem;    // ~11.5px — timestamps, badges
+  --app-theme-font-size-tiny: 0.78rem;     // ~12.5px — chip text, secondary meta
+  --app-theme-font-size-small: 0.82rem;    // ~13px — captions, helper text (v1: 0.75 - bumped)
+  --app-theme-font-size-caption: 0.85rem;  // ~13.6px — between small and body
+  --app-theme-font-size-body: 0.9rem;      // ~14.5px — default body (v1: 0.875 - normalized)
+  --app-theme-font-size-md: 0.95rem;       // ~15.2px — section h3
+  --app-theme-font-size-title: 1rem;       // 16px — card titles, modal titles
+  --app-theme-font-size-lg: 1.05rem;       // ~16.8px — emphasized title
+  --app-theme-font-size-xl: 1.25rem;       // 20px — page headlines, plan card title
+
+  // Font weights
+  --app-theme-font-weight-normal: 400;
+  --app-theme-font-weight-semibold: 500;
+  --app-theme-font-weight-bold: 600;
+  --app-theme-font-weight-extra-bold: 700;
+
+  // Line heights
+  --app-theme-line-height-tight: 1.3;
+  --app-theme-line-height-normal: 1.4;
+  --app-theme-line-height-relaxed: 1.5;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 📐 SPACING — 11-step scale (2px → 32px)
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-spacing-2xs: 2px;
+  --app-theme-spacing-xs: 4px;
+  --app-theme-spacing-xs-plus: 6px;
+  --app-theme-spacing-sm: 8px;
+  --app-theme-spacing-sm-plus: 10px;
+  --app-theme-spacing-md: 12px;
+  --app-theme-spacing-md-plus: 14px;
+  --app-theme-spacing-lg: 16px;
+  --app-theme-spacing-lg-plus: 18px;
+  --app-theme-spacing-xl: 20px;
+  --app-theme-spacing-2xl: 24px;
+  --app-theme-spacing-3xl: 32px;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🟦 BORDER RADIUS — 6-step scale + pill
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-radius-xs: 6px;
+  --app-theme-radius-sm: 8px;
+  --app-theme-radius-md: 12px;
+  --app-theme-radius-lg: 16px;   // card default
+  --app-theme-radius-xl: 20px;
+  --app-theme-radius-2xl: 24px;
+  --app-theme-radius-pill: 999px;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 🎴 CARDS
@@ -79,13 +146,13 @@
   --app-theme-card-bg: var(--ion-card-background);
   --app-theme-card-border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
   --app-theme-card-border-width: 1px;
-  --app-theme-card-border-radius: 16px;
-  --app-theme-card-shadow: 0 10px 26px rgba(15, 20, 19, 0.18);
-  --app-theme-card-margin-inline: 10px;
-  --app-theme-card-padding: 16px;
+  --app-theme-card-border-radius: var(--app-theme-radius-lg);
+  --app-theme-card-shadow: 0 10px 26px color-mix(in srgb, var(--ion-text-color) 18%, transparent);
+  --app-theme-card-margin-inline: var(--app-theme-spacing-sm-plus);
+  --app-theme-card-padding: var(--app-theme-spacing-lg);
   --app-theme-card-transition: all 140ms ease;
 
-  // Card accent borders (for state indicators)
+  // Card accent borders (state indicators)
   --app-theme-card-accent-width: 4px;
   --app-theme-card-accent-critical: var(--ion-color-danger);
   --app-theme-card-accent-warning: var(--ion-color-warning);
@@ -99,47 +166,14 @@
   --app-theme-input-border-color: color-mix(in srgb, var(--ion-text-color) 14%, transparent);
   --app-theme-input-border-width: 1.5px;
   --app-theme-input-border-radius: 0;
-  --app-theme-input-padding-inline: 12px;
-  --app-theme-input-padding-block: 12px;
-  --app-theme-input-textarea-padding-block: 14px;
+  --app-theme-input-padding-inline: var(--app-theme-spacing-md);
+  --app-theme-input-padding-block: var(--app-theme-spacing-md);
+  --app-theme-input-textarea-padding-block: var(--app-theme-spacing-md-plus);
   --app-theme-input-transition: all 180ms ease;
 
-  // Input focus state
   --app-theme-input-focus-border-color: var(--ion-color-primary);
   --app-theme-input-focus-bg: color-mix(in srgb, var(--ion-color-primary) 3%, transparent);
   --app-theme-input-placeholder-color: color-mix(in srgb, var(--ion-text-color) 55%, transparent);
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // 🎨 TYPOGRAPHY
-  // ═══════════════════════════════════════════════════════════════════════════
-  --app-theme-text-color: var(--ion-text-color);
-  --app-theme-text-muted: var(--ion-color-medium);
-  --app-theme-text-subtle: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
-
-  // Font sizes
-  --app-theme-font-size-title: 1rem;
-  --app-theme-font-size-body: 0.875rem;
-  --app-theme-font-size-small: 0.75rem;
-
-  // Font weights
-  --app-theme-font-weight-bold: 600;
-  --app-theme-font-weight-semibold: 500;
-  --app-theme-font-weight-normal: 400;
-
-  // Line heights
-  --app-theme-line-height-tight: 1.3;
-  --app-theme-line-height-normal: 1.4;
-  --app-theme-line-height-relaxed: 1.5;
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // 📐 SPACING
-  // ═══════════════════════════════════════════════════════════════════════════
-  --app-theme-spacing-xs: 4px;
-  --app-theme-spacing-sm: 8px;
-  --app-theme-spacing-md: 12px;
-  --app-theme-spacing-lg: 16px;
-  --app-theme-spacing-xl: 20px;
-  --app-theme-spacing-2xl: 24px;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 🎭 EFFECTS & ANIMATIONS
@@ -148,17 +182,11 @@
   --app-theme-transition-normal: 180ms ease;
   --app-theme-transition-slow: 250ms ease;
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // 🔲 LEGACY (Deprecated - use theme variables above)
-  // ═══════════════════════════════════════════════════════════════════════════
-  --app-surface-bg: var(--app-theme-card-bg);
-  --app-surface-border: var(--app-theme-card-border-color);
-  --app-surface-text: var(--app-theme-text-color);
-  --app-surface-title: var(--app-theme-text-color);
-  --app-surface-muted: var(--app-theme-text-muted);
-  --app-icon-badge-size: 64px;
-  --app-icon-size: 32px;
-  --app-icon-badge-radius: 18px;
+  // Shadows (semantic, dark-mode-safe via color-mix)
+  --app-theme-shadow-sm: 0 2px 10px color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  --app-theme-shadow-md: 0 4px 14px color-mix(in srgb, var(--ion-text-color) 14%, transparent);
+  --app-theme-shadow-lg: var(--app-theme-card-shadow);
+
 }
 
 .ion-palette-dark,
