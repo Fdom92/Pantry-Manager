@@ -23,8 +23,8 @@
       "notifications": {
         "title": "Hinweis vor dem Ablaufen",
         "description": "Wir benachrichtigen dich, wenn etwas bald abläuft oder zur Neige geht.",
-        "previewTitle": "🥛 Joghurt läuft morgen ab",
-        "previewBody": "Ideen: Smoothie, kalte Sauce"
+        "previewTitle": "Produkte laufen bald ab",
+        "previewBody": "3 Produkte laufen diese Woche ab"
       },
       "seed": {
         "title": "Was hast du jetzt in der Vorratskammer?",
@@ -34,9 +34,13 @@
       },
       "confirm": {
         "title": "Deine Vorratskammer ist bereit 👌",
-        "description": "Tippe jedes Produkt an, um Daten und Mengen anzupassen.",
+        "description": "Wir haben deine Auswahl hinzugefügt.",
+        "titleEmpty": "Kein Problem",
+        "descriptionEmpty": "Du kannst deine Produkte hinzufügen, wann du willst.",
+        "emptyBody": "Füge sie einzeln aus der Vorratskammer hinzu.",
         "noExpiryLabel": "Kein Ablaufdatum",
-        "needsDateLabel": "Tippen, um Datum hinzuzufügen"
+        "needsDateLabel": "Datum ausstehend",
+        "adjustHint": "Daten und Mengen kannst du später in deiner Vorratskammer anpassen."
       }
     },
     "quickSeed": {
@@ -113,6 +117,10 @@
   "dashboard": {
     "title": "Start",
     "aria": "Dashboard deiner Speisekammer",
+    "empty": {
+      "title": "Noch keine Daten",
+      "subtitle": "Füge Produkte im Tab Vorratskammer hinzu, um hier Übersicht, Hinweise und Vorschläge zu sehen."
+    },
     "confirmDeleteExpired": "Dadurch werden alle abgelaufenen Produkte gelöscht. Möchtest du fortfahren?",
     "health": {
       "critical": {

@@ -23,8 +23,8 @@
       "notifications": {
         "title": "Heads-up before it expires",
         "description": "We notify you when something is about to expire or runs out.",
-        "previewTitle": "🥛 Yogurt expires tomorrow",
-        "previewBody": "Ideas: smoothie, cold sauce"
+        "previewTitle": "Products expiring soon",
+        "previewBody": "3 products expire this week"
       },
       "seed": {
         "title": "What do you have in your pantry?",
@@ -34,9 +34,13 @@
       },
       "confirm": {
         "title": "Your pantry is ready 👌",
-        "description": "Adjust dates and quantities anytime by tapping each product.",
+        "description": "We've added your selection to your pantry.",
+        "titleEmpty": "No problem",
+        "descriptionEmpty": "You can add your products whenever you want.",
+        "emptyBody": "Add them one by one from your pantry.",
         "noExpiryLabel": "No expiry",
-        "needsDateLabel": "Tap to add date"
+        "needsDateLabel": "Date pending",
+        "adjustHint": "Adjust dates and quantities later in your pantry."
       }
     },
     "quickSeed": {
@@ -113,6 +117,10 @@
   "dashboard": {
     "title": "Home",
     "aria": "Your pantry dashboard",
+    "empty": {
+      "title": "Nothing here yet",
+      "subtitle": "Add products from the Pantry tab to see your summary, alerts, and suggestions here."
+    },
     "confirmDeleteExpired": "This will delete all expired products. Continue?",
     "health": {
       "critical": {

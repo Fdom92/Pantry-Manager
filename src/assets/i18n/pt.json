@@ -23,8 +23,8 @@
       "notifications": {
         "title": "Aviso antes de expirar",
         "description": "Avisamos-te quando algo está prestes a expirar ou a acabar.",
-        "previewTitle": "🥛 Iogurte expira amanhã",
-        "previewBody": "Ideias: smoothie, molho frio"
+        "previewTitle": "Produtos a expirar em breve",
+        "previewBody": "3 produtos expiram esta semana"
       },
       "seed": {
         "title": "O que tens agora na despensa?",
@@ -34,9 +34,13 @@
       },
       "confirm": {
         "title": "A tua despensa está pronta 👌",
-        "description": "Ajusta datas e quantidades a qualquer momento tocando em cada produto.",
+        "description": "Adicionámos a tua seleção à despensa.",
+        "titleEmpty": "Sem problema",
+        "descriptionEmpty": "Adicionarás os teus produtos quando quiseres.",
+        "emptyBody": "Adiciona-os um a um a partir da despensa.",
         "noExpiryLabel": "Sem validade",
-        "needsDateLabel": "Toca para adicionar data"
+        "needsDateLabel": "Data por definir",
+        "adjustHint": "Ajusta datas e quantidades depois na tua despensa."
       }
     },
     "quickSeed": {
@@ -113,6 +117,10 @@
   "dashboard": {
     "title": "Início",
     "aria": "Painel da sua despensa",
+    "empty": {
+      "title": "Ainda sem dados",
+      "subtitle": "Adiciona produtos no separador Despensa para veres aqui resumo, avisos e sugestões."
+    },
     "confirmDeleteExpired": "Isto irá eliminar todos os produtos expirados. Continuar?",
     "health": {
       "critical": {

@@ -1,22 +1,22 @@
 .seed-grid {
-  margin-top: 16px;
+  margin-top: var(--app-theme-spacing-lg);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
   width: 100%;
 }
 
 .seed-cell {
   position: relative;
-  padding: 10px 6px 8px;
+  padding: 10px var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
   border-radius: 14px;
-  border: 1.5px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  border: 1.5px solid var(--app-theme-card-border-color);
   background: color-mix(in srgb, var(--ion-card-background) 88%, transparent);
   color: var(--app-theme-text-color);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: var(--app-theme-spacing-xs);
   cursor: pointer;
   transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
   -webkit-tap-highlight-color: transparent;
@@ -37,8 +37,8 @@
 }
 
 .seed-name {
-  font-size: 0.74rem;
-  font-weight: 500;
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-semibold);
   text-align: center;
   line-height: 1.15;
   color: var(--app-theme-text-color);
@@ -46,7 +46,7 @@
 
 .seed-check {
   position: absolute;
-  top: 4px;
+  top: var(--app-theme-spacing-xs);
   right: 6px;
   width: 16px;
   height: 16px;
@@ -54,8 +54,8 @@
   place-items: center;
   border-radius: 999px;
   background: var(--ion-color-primary);
-  color: var(--ion-color-light, #fff);
+  color: var(--ion-color-primary-contrast);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: var(--app-theme-font-weight-bold);
   line-height: 1;
 }

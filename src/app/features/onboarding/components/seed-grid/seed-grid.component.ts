@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { TranslateModule } from '@ngx-translate/core';
 import type { OnboardingQuickSeedItem } from '@core/constants';
 import { OnboardingStateService } from '@core/services/onboarding/onboarding-state.service';
@@ -9,7 +8,7 @@ import { OnboardingStateService } from '@core/services/onboarding/onboarding-sta
 @Component({
   selector: 'app-onboarding-seed-grid',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [TranslateModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './seed-grid.component.html',
   styleUrls: ['./seed-grid.component.scss'],
@@ -19,20 +18,19 @@ export class OnboardingSeedGridComponent {
 
   readonly items = input<OnboardingQuickSeedItem[]>([]);
 
-  readonly selectedCount = computed(() => this.facade.selectedCount());
-
   isSelected(key: string): boolean {
     return this.facade.isSeedItemSelected(key);
   }
 
   async onToggle(key: string): Promise<void> {
     this.facade.toggleSeedItem(key);
-    if (Capacitor.isNativePlatform()) {
-      try {
-        await Haptics.impact({ style: ImpactStyle.Light });
-      } catch {
-        // haptic optional
-      }
+    if (!Capacitor.isNativePlatform()) {
+      return;
+    }
+    try {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    } catch {
+      // Haptics are best-effort: never block the toggle on a missing haptic engine.
     }
   }
 }

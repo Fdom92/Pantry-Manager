@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -16,7 +15,7 @@ import { OnboardingSeedGridComponent } from './components/seed-grid/seed-grid.co
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [IonContent, IonButton, IonIcon, CommonModule, TranslateModule, OnboardingSeedGridComponent],
+  imports: [IonContent, IonButton, IonIcon, TranslateModule, OnboardingSeedGridComponent],
   templateUrl: './onboarding.page.html',
   styleUrls: ['./onboarding.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,7 +23,7 @@ import { OnboardingSeedGridComponent } from './components/seed-grid/seed-grid.co
   providers: [OnboardingStateService],
 })
 export class OnboardingPage implements AfterViewInit {
-  @ViewChild('swiperRef') swiperElement?: ElementRef<any>;
+  @ViewChild('swiperRef') swiperElement?: ElementRef<HTMLElement>;
   readonly facade = inject(OnboardingStateService);
 
   ngAfterViewInit(): void {
@@ -33,10 +32,6 @@ export class OnboardingPage implements AfterViewInit {
 
   onSlideChanged(): void {
     this.facade.onSlideChanged(this.swiperElement?.nativeElement);
-  }
-
-  isLastSlide(): boolean {
-    return this.facade.isLastSlide();
   }
 
   async goToNextSlide(): Promise<void> {

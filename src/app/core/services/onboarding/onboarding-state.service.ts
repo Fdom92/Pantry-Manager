@@ -5,31 +5,39 @@ import { buildAddItemPayload } from '@core/domain/pantry';
 import type { OnboardingSlide } from '@core/models/onboarding';
 import type { PantryItem } from '@core/models/pantry';
 import { createDocumentId } from '@core/utils';
-import { getBooleanFlag, setBooleanFlag } from '@core/utils/storage-flag.util';
+import { setBooleanFlag } from '@core/utils/storage-flag.util';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { PantryService } from '../pantry/pantry.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { NotificationPermissionService } from '../notifications/notification-permission.service';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { register } from 'swiper/element/bundle';
 import type { SwiperOptions } from 'swiper/types';
-import { Router } from '@angular/router';
+
+/** Minimal shape of a Swiper web component element we touch. */
+interface SwiperElementLike extends HTMLElement {
+  initialize?: () => void;
+  swiper?: {
+    isEnd?: boolean;
+    realIndex?: number;
+    activeIndex?: number;
+    slideNext: (speed?: number) => void;
+  };
+}
+
+type NotificationsDecision = 'granted' | 'denied' | 'later' | null;
 
 let swiperRegistered = false;
 
 @Injectable()
 export class OnboardingStateService {
   private readonly navCtrl = inject(NavController);
-  private readonly router = inject(Router);
-  private readonly pantryService = inject(PantryService);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly historyManager = inject(HistoryEventManagerService);
   private readonly notificationPermission = inject(NotificationPermissionService);
   private readonly preferences = inject(SettingsPreferencesService);
   private readonly translate = inject(TranslateService);
-  private readonly alreadyCompletedOnboarding = getBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG);
 
   readonly slideOptions: SwiperOptions = {
     speed: 550,
@@ -50,7 +58,7 @@ export class OnboardingStateService {
   readonly quickSeedItems = ONBOARDING_QUICK_SEED_ITEMS as OnboardingQuickSeedItem[];
 
   /** Notification permission decision flag. null = not yet asked. */
-  readonly notificationsDecision = signal<'granted' | 'denied' | 'later' | null>(null);
+  readonly notificationsDecision = signal<NotificationsDecision>(null);
 
   /** Set of selected quick-seed item keys (slide 2). */
   readonly selectedSeedKeys = signal<ReadonlySet<string>>(new Set());
@@ -70,7 +78,7 @@ export class OnboardingStateService {
     }
   }
 
-  initializeSwiper(swiperEl: any): void {
+  initializeSwiper(swiperEl: SwiperElementLike | null | undefined): void {
     if (!swiperEl) {
       return;
     }
@@ -78,7 +86,7 @@ export class OnboardingStateService {
     swiperEl.initialize?.();
   }
 
-  onSlideChanged(swiperEl: any): void {
+  onSlideChanged(swiperEl: SwiperElementLike | null | undefined): void {
     const swiper = swiperEl?.swiper;
     if (!swiper) {
       return;
@@ -91,7 +99,7 @@ export class OnboardingStateService {
     return Number.isFinite(idx) && idx >= 0 && idx >= this.availableSlides.length - 1;
   }
 
-  async goToNextSlide(swiperEl: any): Promise<void> {
+  async goToNextSlide(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
     const swiper = swiperEl?.swiper;
     if (!swiper || swiper.isEnd) {
       await this.completeOnboarding();
@@ -101,7 +109,7 @@ export class OnboardingStateService {
   }
 
   /** User accepted notifications on slide 1. Requests OS permission and persists prefs. */
-  async acceptNotifications(swiperEl: any): Promise<void> {
+  async acceptNotifications(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
     const granted = await this.notificationPermission.request();
     this.notificationsDecision.set(granted ? 'granted' : 'denied');
     if (granted) {
@@ -118,7 +126,7 @@ export class OnboardingStateService {
   }
 
   /** User postponed notifications on slide 1. */
-  async dismissNotifications(swiperEl: any): Promise<void> {
+  async dismissNotifications(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
     this.notificationsDecision.set('later');
     await this.goToNextSlide(swiperEl);
   }
@@ -144,12 +152,7 @@ export class OnboardingStateService {
 
   async completeOnboarding(): Promise<void> {
     setBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG, true);
-    const seeded = await this.bulkCreateSeedItems();
-    const items = await this.pantryService.getAll();
-    if (!items.length && !seeded) {
-      await this.router.navigate(['/pantry'], { queryParams: { openAddModal: 'true' } });
-      return;
-    }
+    await this.bulkCreateSeedItems();
     await this.navCtrl.navigateRoot('/dashboard');
   }
 
@@ -159,14 +162,14 @@ export class OnboardingStateService {
    * expirationDate set so the user fills it as they actually need it (Option A
    * — never invent dates).
    */
-  private async bulkCreateSeedItems(): Promise<boolean> {
+  private async bulkCreateSeedItems(): Promise<void> {
     const selected = this.selectedSeedItems();
     if (!selected.length) {
-      return false;
+      return;
     }
+    const timestamp = new Date().toISOString();
     const sessionId = selected.length > 1 ? createDocumentId('session') : undefined;
     for (const seed of selected) {
-      const timestamp = new Date().toISOString();
       const name = this.translate.instant(`onboarding.quickSeed.items.${seed.key}`);
       const base = buildAddItemPayload({
         id: createDocumentId('item'),
@@ -183,6 +186,5 @@ export class OnboardingStateService {
       await this.pantryStore.addItem(item);
       await this.historyManager.logAddNewItem(item, 1, sessionId, timestamp);
     }
-    return true;
   }
 }

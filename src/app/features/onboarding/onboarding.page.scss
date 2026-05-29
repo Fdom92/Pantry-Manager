@@ -1,9 +1,14 @@
+// ── Onboarding page ────────────────────────────────────────────────────────────
+// Uses the app design tokens (--app-theme-*) so light/dark themes adapt without
+// extra rules. The only deliberate hardcoded values are the glassmorphism layer
+// (--onboarding-glass*), which sits over the gradient background and must keep a
+// constant white tint to stay readable across themes.
+
 .onboarding {
   --onboarding-radial-a: color-mix(in srgb, var(--ion-color-secondary) 18%, transparent);
   --onboarding-radial-b: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
   --onboarding-glass: color-mix(in srgb, #ffffff 12%, transparent);
   --onboarding-glass-border: color-mix(in srgb, #ffffff 20%, transparent);
-  --onboarding-pill-text: var(--app-theme-text-color);
   --background: radial-gradient(
       circle at 15% 20%,
       color-mix(in srgb, var(--ion-color-secondary) 22%, transparent),
@@ -20,6 +25,8 @@
   position: relative;
   color: var(--app-theme-text-color);
 }
+
+// ── Background decorations ────────────────────────────────────────────────────
 
 .background-blur {
   position: absolute;
@@ -38,20 +45,24 @@
   background: radial-gradient(circle at 90% 60%, var(--onboarding-radial-b), transparent 28%);
 }
 
+// ── Top bar ───────────────────────────────────────────────────────────────────
+
 .top-bar {
   position: relative;
   z-index: 3;
-  padding: calc(16px + var(--ion-safe-area-top)) 16px 6px;
+  padding: calc(var(--app-theme-spacing-lg) + var(--ion-safe-area-top))
+    var(--app-theme-spacing-lg)
+    6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
 }
 
 .skip-corner {
   --color: var(--app-theme-text-muted);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: var(--app-theme-font-weight-semibold);
   text-transform: none;
   letter-spacing: 0;
 }
@@ -60,14 +71,14 @@
   display: inline-flex;
   gap: 10px;
   align-items: center;
-  padding: 8px 12px;
+  padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
   border-radius: 999px;
   background: var(--onboarding-glass);
   border: 1px solid var(--onboarding-glass-border);
   backdrop-filter: blur(12px);
   font-size: 14px;
   letter-spacing: 0.02em;
-  color: var(--onboarding-pill-text);
+  color: var(--app-theme-text-color);
 
   ion-icon {
     font-size: 18px;
@@ -75,24 +86,28 @@
   }
 }
 
+// ── Swiper + slide card ───────────────────────────────────────────────────────
+
 .onboarding-swiper {
   position: relative;
   z-index: 2;
   margin: 10px;
-  height: calc(100% - 140px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
-  padding: calc(16px + var(--ion-safe-area-top)) 16px calc(72px + var(--ion-safe-area-bottom));
+  height: calc(100% - 60px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
+  padding: calc(var(--app-theme-spacing-sm) + var(--ion-safe-area-top))
+    var(--app-theme-spacing-lg)
+    calc(var(--app-theme-spacing-lg) + var(--ion-safe-area-bottom));
 }
 
 .slide-card {
   max-width: 520px;
   width: 100%;
   margin: 28px auto 0;
-  padding: 24px 16px;
+  padding: var(--app-theme-spacing-2xl) var(--app-theme-spacing-lg);
   position: relative;
-  background: var(--ion-card-background, var(--ion-card-background));
+  background: var(--ion-card-background);
   border-radius: 24px;
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  border: 1px solid var(--app-theme-card-border-color);
+  box-shadow: var(--app-theme-card-shadow);
   color: var(--app-theme-text-color);
   text-align: center;
   animation: floatIn 420ms ease;
@@ -107,7 +122,7 @@
   h1 {
     font-size: 1.25rem;
     font-weight: 700;
-    margin: 10px 0 12px;
+    margin: 10px 0 var(--app-theme-spacing-md);
     letter-spacing: -0.01em;
     color: var(--app-theme-text-color);
   }
@@ -118,115 +133,10 @@
     font-size: 1rem;
     color: var(--app-theme-text-muted);
   }
-}
 
-.mock-preview {
-  margin-top: 18px;
-  padding: 14px;
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--ion-card-background) 92%, transparent);
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  display: grid;
-  gap: 10px;
-  text-align: left;
-}
-
-.mock-row {
-  display: grid;
-  grid-template-columns: 12px 1fr auto;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-  color: var(--app-theme-text-color);
-
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-    background: var(--ion-color-medium);
-  }
-
-  .badge {
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  &.expired {
-    .dot {
-      background: var(--ion-color-danger);
-    }
-    .badge {
-      color: var(--ion-color-danger);
-      border: 1px solid color-mix(in srgb, var(--ion-color-danger) 45%, transparent);
-    }
-  }
-
-  &.low {
-    .dot {
-      background: var(--ion-color-warning);
-    }
-    .badge {
-      color: var(--ion-color-warning);
-      border: 1px solid color-mix(in srgb, var(--ion-color-warning) 45%, transparent);
-    }
-  }
-
-  &.ok {
-    .dot {
-      background: var(--ion-color-success);
-    }
-    .badge {
-      color: var(--ion-color-success);
-      border: 1px solid color-mix(in srgb, var(--ion-color-success) 45%, transparent);
-    }
-  }
-}
-
-.icon-burst {
-  position: relative;
-  --app-icon-badge-size: 72px;
-  --app-icon-size: 36px;
-  --app-icon-badge-radius: 20px;
-  width: var(--app-icon-badge-size);
-  height: var(--app-icon-badge-size);
-  display: grid;
-  place-items: center;
-  border-radius: var(--app-icon-badge-radius);
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--ion-color-primary) 80%, var(--ion-text-color) 20%),
-    color-mix(in srgb, var(--ion-color-secondary) 85%, var(--ion-color-dark-contrast) 15%)
-  );
-  overflow: hidden;
-}
-
-.icon-burst ion-icon {
-  font-size: var(--app-icon-size);
-  color: var(--ion-color-dark-contrast);
-  position: relative;
-  z-index: 2;
-  animation: none;
-}
-
-.actions {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(90px + var(--ion-safe-area-bottom));
-  padding: 0 24px;
-  z-index: 3;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
+  // Buttons inside any slide share the same rounded-pill look. Declared once
+  // here instead of inside every slide-specific wrapper.
   ion-button {
-    --padding-start: 18px;
-    --padding-end: 18px;
     --border-radius: 16px;
     font-weight: 700;
     text-transform: none;
@@ -234,22 +144,64 @@
   }
 }
 
+// ── Icon burst (slide hero) ───────────────────────────────────────────────────
+
+.icon-burst {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ion-color-primary) 80%, var(--ion-text-color) 20%),
+    color-mix(in srgb, var(--ion-color-secondary) 85%, var(--ion-color-dark-contrast) 15%)
+  );
+  overflow: hidden;
+
+  ion-icon {
+    font-size: 36px;
+    color: var(--ion-color-dark-contrast);
+    position: relative;
+    z-index: 2;
+  }
+}
+
+// ── Sticky bottom CTAs ────────────────────────────────────────────────────────
+
+.slide-sticky-footer {
+  margin-top: var(--app-theme-spacing-lg);
+  padding-top: var(--app-theme-spacing-md);
+  display: grid;
+  gap: 10px;
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    var(--ion-card-background) 24%,
+    var(--ion-card-background) 100%
+  );
+}
+
+// ── Slide: notifications (mock preview + CTA stack) ───────────────────────────
+
 .notif-preview {
   margin-top: 18px;
-  padding: 14px 16px;
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg);
   border-radius: 18px;
   background: color-mix(in srgb, var(--ion-card-background) 92%, transparent);
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 14%, transparent);
   text-align: left;
   display: grid;
   gap: 6px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--ion-text-color) 12%, transparent);
 }
 
 .notif-app-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
   margin-bottom: 2px;
 }
 
@@ -262,8 +214,8 @@
 }
 
 .notif-app-name {
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-bold);
   letter-spacing: 0.02em;
   color: var(--app-theme-text-muted);
   text-transform: uppercase;
@@ -271,38 +223,31 @@
 
 .notif-app-time {
   margin-left: auto;
-  font-size: 0.72rem;
+  font-size: var(--app-theme-font-size-small);
   color: var(--app-theme-text-muted);
 }
 
 .notif-title {
-  font-size: 0.98rem;
-  font-weight: 600;
+  font-size: var(--app-theme-font-size-title);
+  font-weight: var(--app-theme-font-weight-bold);
   color: var(--app-theme-text-color);
 }
 
 .notif-body {
-  font-size: 0.88rem;
+  font-size: var(--app-theme-font-size-body);
   color: var(--app-theme-text-muted);
   line-height: 1.35;
 }
 
 .slide-cta-stack {
-  margin-top: 20px;
+  margin-top: var(--app-theme-spacing-xl);
   display: grid;
   gap: 6px;
   width: 100%;
-
-  ion-button {
-    --border-radius: 16px;
-    font-weight: 700;
-    text-transform: none;
-    margin: 0;
-  }
 }
 
 .slide-decision-mark {
-  margin-top: 20px;
+  margin-top: var(--app-theme-spacing-xl);
   display: grid;
   place-items: center;
 
@@ -312,33 +257,22 @@
   }
 }
 
-.slide-placeholder {
-  margin-top: 18px;
-  padding: 16px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--ion-text-color) 6%, transparent);
-  color: var(--app-theme-text-muted);
-  font-size: 0.85rem;
-  font-style: italic;
-}
-
-.seed-footer {
-  margin-top: 14px;
-  display: flex;
-  justify-content: center;
-}
+// ── Slide: seed (grid is its own component; this is the footer chip) ──────────
 
 .seed-count {
-  padding: 6px 14px;
+  justify-self: center;
+  padding: 6px var(--app-theme-spacing-md);
   border-radius: 999px;
   background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
   color: var(--ion-color-primary);
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: var(--app-theme-font-weight-bold);
 }
 
+// ── Slide: confirm (review list) ──────────────────────────────────────────────
+
 .confirm-list {
-  margin: 16px 0 0;
+  margin: var(--app-theme-spacing-lg) 0 0;
   padding: 0;
   list-style: none;
   display: grid;
@@ -353,8 +287,8 @@
   grid-template-columns: 24px 1fr auto;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
-  border-radius: 12px;
+  padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-spacing-md);
   background: color-mix(in srgb, var(--ion-text-color) 4%, transparent);
 }
 
@@ -365,31 +299,41 @@
 
 .confirm-name {
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: var(--app-theme-font-weight-semibold);
   color: var(--app-theme-text-color);
 }
 
 .confirm-meta {
-  font-size: 0.72rem;
+  font-size: var(--app-theme-font-size-small);
   color: var(--app-theme-text-muted);
   white-space: nowrap;
 }
 
 .confirm-empty {
-  margin-top: 16px;
+  margin-top: var(--app-theme-spacing-lg);
   font-size: 0.85rem;
   color: var(--app-theme-text-muted);
   font-style: italic;
 }
+
+.confirm-hint {
+  margin-top: var(--app-theme-spacing-md);
+  font-size: 0.78rem;
+  color: var(--app-theme-text-muted);
+  text-align: center;
+  line-height: 1.4;
+}
+
+// ── Swiper pagination ─────────────────────────────────────────────────────────
 
 .swiper-pagination {
   bottom: 30px !important;
 }
 
 .swiper-pagination-bullet {
-  width: 12px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.4);
+  width: var(--app-theme-spacing-md);
+  height: var(--app-theme-spacing-md);
+  background: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
   opacity: 1;
   transition: width 180ms ease, background 180ms ease;
 }
@@ -400,24 +344,28 @@
   background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
 }
 
+// ── Responsive ────────────────────────────────────────────────────────────────
+
 @media (max-width: 600px) {
   .onboarding-swiper {
-    padding: 10px 6px 90px;
+    padding: 10px 6px calc(var(--app-theme-spacing-lg) + var(--ion-safe-area-bottom));
   }
 
   .slide-card {
-    margin-top: 8px;
+    margin-top: var(--app-theme-spacing-sm);
     padding: 28px 22px;
 
     h1 {
-      font-size: 24px;
+      font-size: 22px;
     }
 
     p {
-      font-size: 15px;
+      font-size: 14px;
     }
   }
 }
+
+// ── Animations ────────────────────────────────────────────────────────────────
 
 @keyframes floatIn {
   from {

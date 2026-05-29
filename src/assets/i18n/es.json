@@ -23,8 +23,8 @@
       "notifications": {
         "title": "Avisos antes de que caduque",
         "description": "Te avisamos cuando algo esté a punto de caducar o se acabe.",
-        "previewTitle": "🥛 Yogur caduca mañana",
-        "previewBody": "Ideas: smoothie, salsa fría"
+        "previewTitle": "Productos próximos a caducar",
+        "previewBody": "3 productos expiran esta semana"
       },
       "seed": {
         "title": "¿Qué tienes ahora en la despensa?",
@@ -34,9 +34,13 @@
       },
       "confirm": {
         "title": "Tu despensa lista 👌",
-        "description": "Ajusta fechas y cantidades cuando quieras tocando cada producto.",
+        "description": "Hemos añadido lo que has seleccionado a tu despensa.",
+        "titleEmpty": "Sin problema",
+        "descriptionEmpty": "Añadirás tus productos cuando quieras.",
+        "emptyBody": "Puedes añadirlos uno a uno desde la despensa.",
         "noExpiryLabel": "Sin caducidad",
-        "needsDateLabel": "Toca para añadir fecha"
+        "needsDateLabel": "Pendiente fecha",
+        "adjustHint": "Ajusta fechas y cantidades en tu despensa cuando quieras."
       }
     },
     "quickSeed": {
@@ -113,6 +117,10 @@
   "dashboard": {
     "title": "Inicio",
     "aria": "Dashboard de tu despensa",
+    "empty": {
+      "title": "Aún sin datos",
+      "subtitle": "Añade productos desde la pestaña Despensa para ver tu resumen, avisos y sugerencias aquí."
+    },
     "confirmDeleteExpired": "Esto eliminará todos los productos caducados. ¿Quieres continuar?",
     "health": {
       "critical": {

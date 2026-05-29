@@ -111,10 +111,6 @@ export class PantryComponent implements OnDestroy {
     }
   }
 
-  openAddModal(): void {
-    this.addModalState.openAddModal();
-  }
-
   onToggleShowAllFresh(): void {
     const wasExpanded = this.facade.showAllFresh();
     this.facade.toggleShowAllFresh();

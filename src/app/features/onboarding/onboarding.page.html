@@ -26,13 +26,26 @@
     #swiperRef
     class="onboarding-swiper"
     (slidechange)="onSlideChanged()">
-    <swiper-slide *ngFor="let slide of facade.availableSlides; index as idx">
+    @for (slide of facade.availableSlides; track slide.key) {
+    <swiper-slide>
       <div class="slide-card" [attr.data-slide]="slide.key">
         <div class="icon-burst">
           <ion-icon [name]="slide.icon"></ion-icon>
         </div>
-        <h1>{{ slide.titleKey | translate }}</h1>
-        <p>{{ slide.descriptionKey | translate }}</p>
+        <h1>
+          @if (slide.key === 'confirm' && facade.selectedCount() === 0) {
+            {{ 'onboarding.slides.confirm.titleEmpty' | translate }}
+          } @else {
+            {{ slide.titleKey | translate }}
+          }
+        </h1>
+        <p>
+          @if (slide.key === 'confirm' && facade.selectedCount() === 0) {
+            {{ 'onboarding.slides.confirm.descriptionEmpty' | translate }}
+          } @else {
+            {{ slide.descriptionKey | translate }}
+          }
+        </p>
 
         @switch (slide.key) {
           @case ('notifications') {
@@ -40,7 +53,7 @@
               <div class="notif-app-row">
                 <img
                   class="notif-app-icon"
-                  src="assets/icon/favicon.png"
+                  src="assets/icon/app-icon.png"
                   alt="PantryMind" />
                 <span class="notif-app-name">PantryMind</span>
                 <span class="notif-app-time">now</span>
@@ -79,13 +92,20 @@
           }
           @case ('seed') {
             <app-onboarding-seed-grid [items]="facade.quickSeedItems" />
-            <div class="seed-footer">
+            <div class="slide-sticky-footer">
               <span class="seed-count">
                 {{
                   'onboarding.slides.seed.selectedCount'
                     | translate : { count: facade.selectedCount() }
                 }}
               </span>
+              <ion-button
+                color="primary"
+                shape="round"
+                expand="block"
+                (click)="goToNextSlide()">
+                {{ 'onboarding.actions.continue' | translate }}
+              </ion-button>
             </div>
           }
           @case ('confirm') {
@@ -107,36 +127,27 @@
                   </li>
                 }
               </ul>
+              <p class="confirm-hint">
+                {{ 'onboarding.slides.confirm.adjustHint' | translate }}
+              </p>
             } @else {
               <p class="confirm-empty">
-                {{ 'onboarding.slides.seed.skip' | translate }}
+                {{ 'onboarding.slides.confirm.emptyBody' | translate }}
               </p>
             }
+            <div class="slide-sticky-footer">
+              <ion-button
+                color="primary"
+                shape="round"
+                expand="block"
+                (click)="completeOnboarding()">
+                {{ 'onboarding.actions.enter' | translate }}
+              </ion-button>
+            </div>
           }
         }
       </div>
     </swiper-slide>
+    }
   </swiper-container>
-
-  @if (!facade.isLastSlide() && facade.availableSlides[facade.currentSlideIndex()].key !== 'notifications') {
-    <div class="actions">
-      <ion-button
-        color="primary"
-        shape="round"
-        expand="block"
-        (click)="goToNextSlide()">
-        {{ 'onboarding.actions.continue' | translate }}
-      </ion-button>
-    </div>
-  } @else if (facade.isLastSlide()) {
-    <div class="actions">
-      <ion-button
-        color="primary"
-        shape="round"
-        expand="block"
-        (click)="completeOnboarding()">
-        {{ 'onboarding.actions.enter' | translate }}
-      </ion-button>
-    </div>
-  }
 </ion-content>

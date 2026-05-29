@@ -23,8 +23,8 @@
       "notifications": {
         "title": "Avviso prima della scadenza",
         "description": "Ti avvisiamo quando qualcosa sta per scadere o finire.",
-        "previewTitle": "🥛 Lo yogurt scade domani",
-        "previewBody": "Idee: smoothie, salsa fredda"
+        "previewTitle": "Prodotti in scadenza",
+        "previewBody": "3 prodotti scadono questa settimana"
       },
       "seed": {
         "title": "Cosa hai ora in dispensa?",
@@ -34,9 +34,13 @@
       },
       "confirm": {
         "title": "La tua dispensa è pronta 👌",
-        "description": "Tocca ogni prodotto per regolare date e quantità quando vuoi.",
+        "description": "Abbiamo aggiunto la tua selezione alla dispensa.",
+        "titleEmpty": "Nessun problema",
+        "descriptionEmpty": "Aggiungerai i tuoi prodotti quando vorrai.",
+        "emptyBody": "Aggiungili uno per uno dalla dispensa.",
         "noExpiryLabel": "Senza scadenza",
-        "needsDateLabel": "Tocca per aggiungere data"
+        "needsDateLabel": "Data da impostare",
+        "adjustHint": "Regola date e quantità più tardi nella tua dispensa."
       }
     },
     "quickSeed": {
@@ -113,6 +117,10 @@
   "dashboard": {
     "title": "Home",
     "aria": "Dashboard della tua dispensa",
+    "empty": {
+      "title": "Ancora niente",
+      "subtitle": "Aggiungi prodotti dalla scheda Dispensa per vedere qui riepilogo, avvisi e suggerimenti."
+    },
     "confirmDeleteExpired": "Questo eliminerà tutti i prodotti scaduti. Continuare?",
     "health": {
       "critical": {

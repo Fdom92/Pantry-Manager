@@ -23,8 +23,8 @@
       "notifications": {
         "title": "Alerte avant l'expiration",
         "description": "On te prévient quand quelque chose va expirer ou s'épuiser.",
-        "previewTitle": "🥛 Le yaourt expire demain",
-        "previewBody": "Idées : smoothie, sauce froide"
+        "previewTitle": "Produits bientôt expirés",
+        "previewBody": "3 produits expirent cette semaine"
       },
       "seed": {
         "title": "Qu'as-tu maintenant dans ton garde-manger ?",
@@ -34,9 +34,13 @@
       },
       "confirm": {
         "title": "Ton garde-manger est prêt 👌",
-        "description": "Ajuste dates et quantités à tout moment en touchant chaque produit.",
+        "description": "Ta sélection a été ajoutée à ton garde-manger.",
+        "titleEmpty": "Pas de souci",
+        "descriptionEmpty": "Tu ajouteras tes produits quand tu voudras.",
+        "emptyBody": "Ajoute-les un par un depuis ton garde-manger.",
         "noExpiryLabel": "Sans expiration",
-        "needsDateLabel": "Touche pour ajouter une date"
+        "needsDateLabel": "Date à définir",
+        "adjustHint": "Tu pourras ajuster dates et quantités plus tard dans ton garde-manger."
       }
     },
     "quickSeed": {
@@ -113,6 +117,10 @@
   "dashboard": {
     "title": "Accueil",
     "aria": "Tableau de bord de votre garde-manger",
+    "empty": {
+      "title": "Rien pour l'instant",
+      "subtitle": "Ajoute des produits depuis l'onglet Garde-manger pour voir ici ton résumé, alertes et suggestions."
+    },
     "confirmDeleteExpired": "Cela supprimera tous les produits périmés. Voulez-vous continuer ?",
     "health": {
       "critical": {
