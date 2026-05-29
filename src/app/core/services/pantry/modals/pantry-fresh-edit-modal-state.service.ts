@@ -173,7 +173,8 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
 
     const alert = await this.alertCtrl.create({
       header: this.translate.instant('pantry.fresh.editModal.deleteConfirm.title'),
-      message: this.translate.instant('pantry.fresh.editModal.deleteConfirm.message', { name: existing.name }),
+      message: this.translate.instant('pantry.fresh.editModal.deleteConfirm.message')
+        .replace('{{ name }}', existing.name),
       buttons: [
         { text: this.translate.instant('common.actions.cancel'), role: 'cancel' },
         { text: this.translate.instant('common.actions.delete'), role: 'confirm' },
