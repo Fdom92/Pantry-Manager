@@ -161,7 +161,10 @@ export class ReviewPromptService {
             handler: () => resolve(true),
           },
         ],
-      }).then(alert => alert.present());
+      }).then(alert => alert.present()).catch(err => {
+        console.error('Failed to present review alert:', err);
+        resolve(false);
+      });
     });
   }
 
