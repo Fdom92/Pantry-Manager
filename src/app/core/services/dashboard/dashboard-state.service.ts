@@ -195,10 +195,9 @@ export class DashboardStateService {
         priority: ActionPriority.HIGH,
         category: 'preventive',
         title: this.translate.instant('dashboard.actions.nearExpiry.title'),
-        description: this.translate.instant('dashboard.actions.nearExpiry.description', {
-          count: nearExpiry,
-          days: NEAR_EXPIRY_WINDOW_DAYS,
-        }),
+        description: this.translate.instant('dashboard.actions.nearExpiry.description')
+          .replace('{{ count }}', String(nearExpiry))
+          .replace('{{ days }}', String(NEAR_EXPIRY_WINDOW_DAYS)),
         cta: {
           label: this.translate.instant('dashboard.actions.nearExpiry.cta'),
           action: () => this.onOverviewCardSelected('near-expiry'),
@@ -232,7 +231,8 @@ export class DashboardStateService {
         priority: ActionPriority.MEDIUM,
         category: 'optimization',
         title: this.translate.instant('dashboard.actions.stale.title'),
-        description: this.translate.instant('dashboard.actions.stale.description', { count: stale }),
+        description: this.translate.instant('dashboard.actions.stale.description')
+          .replace('{{ count }}', String(stale)),
         cta: {
           label: this.translate.instant('dashboard.actions.stale.cta'),
           action: () => {
@@ -369,7 +369,8 @@ export class DashboardStateService {
     const diffDays = daysUntilExpiry(value);
     if (diffDays <= 0) return this.translate.instant('dashboard.today.expiry.today');
     if (diffDays === 1) return this.translate.instant('dashboard.today.expiry.tomorrow');
-    return this.translate.instant('dashboard.today.expiry.inDays', { count: diffDays });
+    return this.translate.instant('dashboard.today.expiry.inDays')
+      .replace('{{ count }}', String(diffDays));
   }
 
   private getReferenceNow(): Date {
