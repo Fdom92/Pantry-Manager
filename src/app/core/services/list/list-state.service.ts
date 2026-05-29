@@ -89,7 +89,8 @@ export class ListStateService {
 
     try {
       await this.pantryStore.addNewLot(id, { quantity: qty });
-      void this.showToast(this.translate.instant('shopping.toasts.bought', { name }));
+      const msg = this.translate.instant('shopping.toasts.bought').replace('{{name}}', name);
+      void this.showToast(msg);
       void this.reviewPrompt.handlePositiveAction();
     } catch (err) {
       console.error('[ListStateService] markAsBought: addNewLot failed', err);
@@ -106,14 +107,16 @@ export class ListStateService {
     if (!item) return;
     this.manualItems.update(list => list.filter(m => m.id !== id));
     this.boughtManuals.update(list => [...list, { id, name: item.name }]);
-    void this.showToast(this.translate.instant('shopping.toasts.boughtManual', { name: item.name }));
+    const msg = this.translate.instant('shopping.toasts.boughtManual').replace('{{name}}', item.name);
+    void this.showToast(msg);
   }
 
   removeAutoItem(id: string): void {
     const name = this.items().find(i => i._id === id)?.name;
     this.removedAutoIds.update(set => new Set([...set, id]));
     if (name) {
-      void this.showToast(this.translate.instant('shopping.toasts.ignored', { name }));
+      const msg = this.translate.instant('shopping.toasts.ignored').replace('{{name}}', name);
+      void this.showToast(msg);
     }
   }
 
@@ -121,7 +124,8 @@ export class ListStateService {
     const item = this.manualItems().find(m => m.id === id);
     this.manualItems.update(list => list.filter(m => m.id !== id));
     if (item) {
-      void this.showToast(this.translate.instant('shopping.toasts.removedManual', { name: item.name }));
+      const msg = this.translate.instant('shopping.toasts.removedManual').replace('{{name}}', item.name);
+      void this.showToast(msg);
     }
   }
 
@@ -302,13 +306,13 @@ export class ListStateService {
     const locale = this.languageService.getCurrentLocale();
     const unassignedLabel = this.translate.instant('shopping.unassignedSupermarket');
     const title = this.translate.instant('shopping.share.pdfTitle');
-    const generatedOn = this.translate.instant('shopping.share.generatedOn', {
-      date: formatDateTimeValue(now, locale, {
-        dateOptions: { year: 'numeric', month: 'long', day: 'numeric' },
-        timeOptions: { hour: '2-digit', minute: '2-digit' },
-        fallback: '',
-      }),
+    const dateStr = formatDateTimeValue(now, locale, {
+      dateOptions: { year: 'numeric', month: 'long', day: 'numeric' },
+      timeOptions: { hour: '2-digit', minute: '2-digit' },
+      fallback: '',
     });
+    const generatedOn = this.translate.instant('shopping.share.generatedOn')
+      .replace('{{ date }}', dateStr);
 
     doc.setFontSize(16);
     doc.text(title, marginX, 20);

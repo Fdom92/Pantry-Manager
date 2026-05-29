@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, ViewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   IonButton,
   IonButtons,
@@ -89,10 +89,18 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 })
 export class PantryComponent implements OnDestroy {
   readonly facade = inject(PantryStateService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly addModalState = inject(PantryAddModalStateService);
   @ViewChild(IonContent) private content!: IonContent;
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
+
+    // Check if onboarding requested to open add modal (first engagement)
+    const shouldOpenModal = this.route.snapshot.queryParams['openAddModal'] === 'true';
+    if (shouldOpenModal) {
+      this.addModalState.openAddModal();
+    }
   }
 
   onToggleShowAllFresh(): void {

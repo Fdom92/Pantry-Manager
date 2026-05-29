@@ -154,7 +154,8 @@
       },
       "success": {
         "title": "Ingredienti utilizzati",
-        "hint": "Dispensa aggiornata"
+        "hint": "Dispensa aggiornata",
+        "itemSaved": "Ottimo! Hai usato {{name}} prima che scadesse."
       },
       "allGood": {
         "title": "Tutto sotto controllo",
@@ -1025,6 +1026,10 @@
     "reEngagement": {
       "title": "Come stanno i tuoi freschi?",
       "body": "Sono passati alcuni giorni dall'ultima visita. Un momento per tenere tutto aggiornato."
+    },
+    "weeklyReminder": {
+      "title": "Cosa hai comprato questa settimana?",
+      "body": "Aggiungi i nuovi articoli per un monitoraggio accurato"
     }
   },
   "sync": {

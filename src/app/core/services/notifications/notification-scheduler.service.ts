@@ -51,6 +51,10 @@ export class NotificationSchedulerService {
       case NOTIFICATION_IDS.LOW_STOCK:
         this.navigationPreset.setPending({ lowStock: true });
         break;
+      case NOTIFICATION_IDS.RE_ENGAGEMENT:
+        // Weekly reminder: navigate to pantry with add modal open for shopping entry
+        await this.navCtrl.navigateRoot('/pantry', { queryParams: { openAddModal: 'true' } });
+        return;
     }
     await this.navCtrl.navigateRoot('/pantry');
   }
