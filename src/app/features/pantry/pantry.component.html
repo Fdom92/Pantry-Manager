@@ -131,10 +131,12 @@
 
       @if (facade.summary().total === 0) {
         <app-empty-state
-          class="list-empty-state"
+          class="list-empty-state pantry-first-run"
           icon="fast-food-outline"
-          [hideTitle]="true"
-          [subtitleKey]="'emptyStates.pantry.subtitle'">
+          [titleKey]="'emptyStates.pantry.title'"
+          [subtitleKey]="'emptyStates.pantry.subtitle'"
+          [showAction]="true"
+          (action)="openAddModal()">
         </app-empty-state>
       } @else if (facade.despensaItems().length === 0) {
         <app-empty-state

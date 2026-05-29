@@ -13,6 +13,13 @@
         }}
       </span>
     </div>
+    <ion-button
+      fill="clear"
+      size="small"
+      class="skip-corner"
+      (click)="skipOnboarding()">
+      {{ 'onboarding.actions.skip' | translate }}
+    </ion-button>
   </div>
 
   <swiper-container
@@ -20,68 +27,116 @@
     class="onboarding-swiper"
     (slidechange)="onSlideChanged()">
     <swiper-slide *ngFor="let slide of facade.availableSlides; index as idx">
-      <div class="slide-card" [class.is-pro]="slide.pro">
-        @if (slide.badgeKey) {
-        <div class="pill">
-          {{ slide.badgeKey | translate }}
-        </div>
-        }
+      <div class="slide-card" [attr.data-slide]="slide.key">
         <div class="icon-burst">
-          <div class="glow"></div>
           <ion-icon [name]="slide.icon"></ion-icon>
         </div>
-        <h1>
-          {{ slide.titleKey | translate }}
-        </h1>
-        <p>
-          {{ slide.descriptionKey | translate }}
-        </p>
-        @if (slide.key === 'action') {
-        <div class="mock-preview">
-          <div class="mock-row expired">
-            <span class="dot"></span>
-            <span class="name">{{ 'onboarding.mock.items.milk' | translate }}</span>
-            <span class="badge">{{ 'onboarding.mock.status.expired' | translate }}</span>
-          </div>
-          <div class="mock-row low">
-            <span class="dot"></span>
-            <span class="name">{{ 'onboarding.mock.items.pasta' | translate }}</span>
-            <span class="badge">{{ 'onboarding.mock.status.low' | translate }}</span>
-          </div>
-          <div class="mock-row ok">
-            <span class="dot"></span>
-            <span class="name">{{ 'onboarding.mock.items.tomatoes' | translate }}</span>
-            <span class="badge">{{ 'onboarding.mock.status.ok' | translate }}</span>
-          </div>
-        </div>
+        <h1>{{ slide.titleKey | translate }}</h1>
+        <p>{{ slide.descriptionKey | translate }}</p>
+
+        @switch (slide.key) {
+          @case ('notifications') {
+            <div class="notif-preview">
+              <div class="notif-app-row">
+                <img
+                  class="notif-app-icon"
+                  src="assets/icon/favicon.png"
+                  alt="PantryMind" />
+                <span class="notif-app-name">PantryMind</span>
+                <span class="notif-app-time">now</span>
+              </div>
+              <div class="notif-title">
+                {{ 'onboarding.slides.notifications.previewTitle' | translate }}
+              </div>
+              <div class="notif-body">
+                {{ 'onboarding.slides.notifications.previewBody' | translate }}
+              </div>
+            </div>
+            @if (facade.notificationsDecision() === null) {
+              <div class="slide-cta-stack">
+                <ion-button
+                  expand="block"
+                  shape="round"
+                  color="primary"
+                  (click)="onAcceptNotifications()">
+                  {{ 'onboarding.actions.notifyMe' | translate }}
+                </ion-button>
+                <ion-button
+                  expand="block"
+                  fill="clear"
+                  size="small"
+                  (click)="onDismissNotifications()">
+                  {{ 'onboarding.actions.notifyLater' | translate }}
+                </ion-button>
+              </div>
+            } @else {
+              <div class="slide-decision-mark">
+                <ion-icon
+                  [name]="facade.notificationsDecision() === 'granted' ? 'checkmark-circle' : 'time-outline'">
+                </ion-icon>
+              </div>
+            }
+          }
+          @case ('seed') {
+            <app-onboarding-seed-grid [items]="facade.quickSeedItems" />
+            <div class="seed-footer">
+              <span class="seed-count">
+                {{
+                  'onboarding.slides.seed.selectedCount'
+                    | translate : { count: facade.selectedCount() }
+                }}
+              </span>
+            </div>
+          }
+          @case ('confirm') {
+            @if (facade.selectedCount() > 0) {
+              <ul class="confirm-list">
+                @for (seed of facade.selectedSeedItems(); track seed.key) {
+                  <li class="confirm-row">
+                    <span class="confirm-emoji" aria-hidden="true">{{ seed.emoji }}</span>
+                    <span class="confirm-name">
+                      {{ 'onboarding.quickSeed.items.' + seed.key | translate }}
+                    </span>
+                    <span class="confirm-meta">
+                      @if (seed.alwaysNoExpiry) {
+                        {{ 'onboarding.slides.confirm.noExpiryLabel' | translate }}
+                      } @else {
+                        {{ 'onboarding.slides.confirm.needsDateLabel' | translate }}
+                      }
+                    </span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="confirm-empty">
+                {{ 'onboarding.slides.seed.skip' | translate }}
+              </p>
+            }
+          }
         }
       </div>
     </swiper-slide>
   </swiper-container>
 
-  <div class="actions">
-    <ion-button
-      fill="clear"
-      (click)="skipOnboarding()">
-      {{ 'onboarding.actions.skip' | translate }}
-    </ion-button>
-    @if (!facade.isLastSlide()) {
+  @if (!facade.isLastSlide() && facade.availableSlides[facade.currentSlideIndex()].key !== 'notifications') {
+    <div class="actions">
       <ion-button
         color="primary"
         shape="round"
+        expand="block"
         (click)="goToNextSlide()">
-      {{ 'onboarding.actions.next' | translate }}
-    </ion-button>
-    } @else {
+        {{ 'onboarding.actions.continue' | translate }}
+      </ion-button>
+    </div>
+  } @else if (facade.isLastSlide()) {
+    <div class="actions">
       <ion-button
         color="primary"
         shape="round"
+        expand="block"
         (click)="completeOnboarding()">
-      {{ 'onboarding.actions.start' | translate }}
-    </ion-button>
-    }
-  </div>
-  @if (facade.isLastSlide()) {
-  <p class="skip-hint">{{ 'onboarding.actions.skipHint' | translate }}</p>
+        {{ 'onboarding.actions.enter' | translate }}
+      </ion-button>
+    </div>
   }
 </ion-content>

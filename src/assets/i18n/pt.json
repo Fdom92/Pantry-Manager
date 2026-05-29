@@ -13,40 +13,58 @@
       "skip": "Ignorar",
       "next": "Seguinte",
       "start": "Começar",
-      "skipHint": "Podes saltar este tutorial a qualquer momento."
+      "skipHint": "Podes saltar este tutorial a qualquer momento.",
+      "continue": "Continuar",
+      "enter": "Abrir a minha despensa",
+      "notifyMe": "Sim, avisa-me",
+      "notifyLater": "Mais tarde"
     },
     "slides": {
-      "problem": {
-        "title": "Para de desperdiçar",
-        "description": "Controla o que tens sem pensar nisso."
+      "notifications": {
+        "title": "Aviso antes de expirar",
+        "description": "Avisamos-te quando algo está prestes a expirar ou a acabar.",
+        "previewTitle": "🥛 Iogurte expira amanhã",
+        "previewBody": "Ideias: smoothie, molho frio"
       },
-      "simple": {
-        "title": "Organiza a tua despensa em segundos",
-        "description": "Adiciona produtos, controla quantidades e recebe alertas antes de expirarem."
+      "seed": {
+        "title": "O que tens agora na despensa?",
+        "description": "Toca no que já tens. As quantidades ajustas depois. Podes saltar este passo.",
+        "selectedCount": "{{ count }} selecionados",
+        "skip": "Saltar este passo"
       },
-      "benefit": {
-        "title": "Poupa dinheiro e tempo",
-        "description": "Compra apenas o que precisas e usa o que já tens."
-      },
-      "fresh": {
-        "title": "Adiciona o que compras",
-        "description": "Avisamos-te quando falta alguma coisa."
-      },
-      "action": {
-        "title": "Começa agora",
-        "description": "Adiciona o teu primeiro produto."
+      "confirm": {
+        "title": "A tua despensa está pronta 👌",
+        "description": "Ajusta datas e quantidades a qualquer momento tocando em cada produto.",
+        "noExpiryLabel": "Sem validade",
+        "needsDateLabel": "Toca para adicionar data"
       }
     },
-    "mock": {
+    "quickSeed": {
       "items": {
         "milk": "Leite",
+        "eggs": "Ovos",
+        "cheese": "Queijo",
+        "butter": "Manteiga",
+        "yogurt": "Iogurte",
+        "cannedTuna": "Atum",
+        "bread": "Pão",
         "pasta": "Massa",
-        "tomatoes": "Tomates"
-      },
-      "status": {
-        "expired": "Expirado",
-        "low": "Baixo",
-        "ok": "OK"
+        "rice": "Arroz",
+        "flour": "Farinha",
+        "chickpeas": "Grão-de-bico",
+        "lentils": "Lentilhas",
+        "tomato": "Tomate",
+        "onion": "Cebola",
+        "potato": "Batata",
+        "lemon": "Limão",
+        "apple": "Maçã",
+        "banana": "Banana",
+        "oliveOil": "Azeite",
+        "salt": "Sal",
+        "pepper": "Pimenta",
+        "sugar": "Açúcar",
+        "coffee": "Café",
+        "vinegar": "Vinagre"
       }
     }
   },

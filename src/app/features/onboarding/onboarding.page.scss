@@ -40,11 +40,20 @@
 
 .top-bar {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   padding: calc(16px + var(--ion-safe-area-top)) 16px 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+}
+
+.skip-corner {
+  --color: var(--app-theme-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .eyebrow {
@@ -76,6 +85,7 @@
 
 .slide-card {
   max-width: 520px;
+  width: 100%;
   margin: 28px auto 0;
   padding: 24px 16px;
   position: relative;
@@ -86,7 +96,13 @@
   color: var(--app-theme-text-color);
   text-align: center;
   animation: floatIn 420ms ease;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: calc(100% - 28px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 
   h1 {
     font-size: 1.25rem;
@@ -171,25 +187,6 @@
   }
 }
 
-.slide-card.is-pro {
-  border-color: color-mix(in srgb, var(--ion-color-secondary) 45%, transparent);
-  box-shadow:
-    var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18)),
-    0 0 24px color-mix(in srgb, var(--ion-color-secondary) 28%, transparent);
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ion-color-secondary) 35%, transparent);
-  color: var(--ion-color-light);
-  font-size: 13px;
-  border: 1px solid color-mix(in srgb, var(--ion-color-secondary) 55%, transparent);
-  margin-bottom: 4px;
-}
-
 .icon-burst {
   position: relative;
   --app-icon-badge-size: 72px;
@@ -216,21 +213,16 @@
   animation: none;
 }
 
-.icon-burst .glow {
-  display: none;
-}
-
 .actions {
   position: absolute;
   left: 0;
   right: 0;
   bottom: calc(90px + var(--ion-safe-area-bottom));
-  padding: 0 16px;
+  padding: 0 24px;
   z-index: 3;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
 
   ion-button {
     --padding-start: 18px;
@@ -238,19 +230,156 @@
     --border-radius: 16px;
     font-weight: 700;
     text-transform: none;
+    margin: 0;
   }
 }
 
-.skip-hint {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(52px + var(--ion-safe-area-bottom));
-  text-align: center;
+.notif-preview {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--ion-card-background) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 14%, transparent);
+  text-align: left;
+  display: grid;
+  gap: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.notif-app-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.notif-app-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  object-fit: cover;
+  display: block;
+}
+
+.notif-app-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--app-theme-text-muted);
+  text-transform: uppercase;
+}
+
+.notif-app-time {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--app-theme-text-muted);
+}
+
+.notif-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--app-theme-text-color);
+}
+
+.notif-body {
+  font-size: 0.88rem;
+  color: var(--app-theme-text-muted);
+  line-height: 1.35;
+}
+
+.slide-cta-stack {
+  margin-top: 20px;
+  display: grid;
+  gap: 6px;
+  width: 100%;
+
+  ion-button {
+    --border-radius: 16px;
+    font-weight: 700;
+    text-transform: none;
+    margin: 0;
+  }
+}
+
+.slide-decision-mark {
+  margin-top: 20px;
+  display: grid;
+  place-items: center;
+
+  ion-icon {
+    font-size: 36px;
+    color: var(--ion-color-success);
+  }
+}
+
+.slide-placeholder {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ion-text-color) 6%, transparent);
+  color: var(--app-theme-text-muted);
   font-size: 0.85rem;
-  color: var(--app-surface-muted);
-  margin: 0;
-  z-index: 3;
+  font-style: italic;
+}
+
+.seed-footer {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+.seed-count {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
+  color: var(--ion-color-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.confirm-list {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.confirm-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ion-text-color) 4%, transparent);
+}
+
+.confirm-emoji {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.confirm-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--app-theme-text-color);
+}
+
+.confirm-meta {
+  font-size: 0.72rem;
+  color: var(--app-theme-text-muted);
+  white-space: nowrap;
+}
+
+.confirm-empty {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  color: var(--app-theme-text-muted);
+  font-style: italic;
 }
 
 .swiper-pagination {

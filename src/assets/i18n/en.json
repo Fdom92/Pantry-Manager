@@ -13,40 +13,58 @@
       "skip": "Skip",
       "next": "Next",
       "start": "Start",
-      "skipHint": "You can skip this tutorial anytime."
+      "skipHint": "You can skip this tutorial anytime.",
+      "continue": "Continue",
+      "enter": "Open my pantry",
+      "notifyMe": "Yes, notify me",
+      "notifyLater": "Later"
     },
     "slides": {
-      "problem": {
-        "title": "Stop wasting food",
-        "description": "Track what you have without thinking about it."
+      "notifications": {
+        "title": "Heads-up before it expires",
+        "description": "We notify you when something is about to expire or runs out.",
+        "previewTitle": "🥛 Yogurt expires tomorrow",
+        "previewBody": "Ideas: smoothie, cold sauce"
       },
-      "simple": {
-        "title": "Organize your pantry in seconds",
-        "description": "Add products, track quantities, and get alerts before they expire."
+      "seed": {
+        "title": "What do you have in your pantry?",
+        "description": "Tap what you already have. You can edit quantities later. You can skip this step.",
+        "selectedCount": "{{ count }} selected",
+        "skip": "Skip this step"
       },
-      "benefit": {
-        "title": "Save money and time",
-        "description": "Buy only what you need and use what you already have."
-      },
-      "fresh": {
-        "title": "Add what you buy",
-        "description": "We let you know when something runs out."
-      },
-      "action": {
-        "title": "Start now",
-        "description": "Add your first product."
+      "confirm": {
+        "title": "Your pantry is ready 👌",
+        "description": "Adjust dates and quantities anytime by tapping each product.",
+        "noExpiryLabel": "No expiry",
+        "needsDateLabel": "Tap to add date"
       }
     },
-    "mock": {
+    "quickSeed": {
       "items": {
         "milk": "Milk",
+        "eggs": "Eggs",
+        "cheese": "Cheese",
+        "butter": "Butter",
+        "yogurt": "Yogurt",
+        "cannedTuna": "Tuna",
+        "bread": "Bread",
         "pasta": "Pasta",
-        "tomatoes": "Tomatoes"
-      },
-      "status": {
-        "expired": "Expired",
-        "low": "Low",
-        "ok": "OK"
+        "rice": "Rice",
+        "flour": "Flour",
+        "chickpeas": "Chickpeas",
+        "lentils": "Lentils",
+        "tomato": "Tomato",
+        "onion": "Onion",
+        "potato": "Potato",
+        "lemon": "Lemon",
+        "apple": "Apple",
+        "banana": "Banana",
+        "oliveOil": "Oil",
+        "salt": "Salt",
+        "pepper": "Pepper",
+        "sugar": "Sugar",
+        "coffee": "Coffee",
+        "vinegar": "Vinegar"
       }
     }
   },
