@@ -13,40 +13,62 @@
       "skip": "Passer",
       "next": "Suivant",
       "start": "Commencer",
-      "skipHint": "Vous pouvez passer ce tutoriel à tout moment."
+      "skipHint": "Vous pouvez passer ce tutoriel à tout moment.",
+      "continue": "Continuer",
+      "enter": "Ouvrir mon garde-manger",
+      "notifyMe": "Oui, préviens-moi",
+      "notifyLater": "Plus tard"
     },
     "slides": {
-      "problem": {
-        "title": "Arrête de gaspiller",
-        "description": "Suis ce que tu as sans y penser."
+      "notifications": {
+        "title": "Alerte avant l'expiration",
+        "description": "On te prévient quand quelque chose va expirer ou s'épuiser.",
+        "previewTitle": "Produits bientôt expirés",
+        "previewBody": "3 produits expirent cette semaine"
       },
-      "simple": {
-        "title": "Organisez votre garde-manger en quelques secondes",
-        "description": "Ajoutez des produits, suivez les quantités et recevez des alertes avant expiration."
+      "seed": {
+        "title": "Qu'as-tu maintenant dans ton garde-manger ?",
+        "description": "Touche ce que tu as déjà. Tu modifies les quantités plus tard. Tu peux passer cette étape.",
+        "selectedCount": "{{ count }} sélectionnés",
+        "skip": "Passer cette étape"
       },
-      "benefit": {
-        "title": "Économisez argent et temps",
-        "description": "Achetez seulement ce dont vous avez besoin et utilisez ce que vous avez."
-      },
-      "fresh": {
-        "title": "Ajoute ce que tu achètes",
-        "description": "On te prévient quand il manque quelque chose."
-      },
-      "action": {
-        "title": "Commence maintenant",
-        "description": "Ajoute ton premier produit."
+      "confirm": {
+        "title": "Ton garde-manger est prêt 👌",
+        "description": "Ta sélection a été ajoutée à ton garde-manger.",
+        "titleEmpty": "Pas de souci",
+        "descriptionEmpty": "Tu ajouteras tes produits quand tu voudras.",
+        "emptyBody": "Ajoute-les un par un depuis ton garde-manger.",
+        "noExpiryLabel": "Sans expiration",
+        "needsDateLabel": "Date à définir",
+        "adjustHint": "Tu pourras ajuster dates et quantités plus tard dans ton garde-manger."
       }
     },
-    "mock": {
+    "quickSeed": {
       "items": {
         "milk": "Lait",
+        "eggs": "Œufs",
+        "cheese": "Fromage",
+        "butter": "Beurre",
+        "yogurt": "Yaourt",
+        "cannedTuna": "Thon",
+        "bread": "Pain",
         "pasta": "Pâtes",
-        "tomatoes": "Tomates"
-      },
-      "status": {
-        "expired": "Expiré",
-        "low": "Bas",
-        "ok": "OK"
+        "rice": "Riz",
+        "flour": "Farine",
+        "chickpeas": "Pois chiches",
+        "lentils": "Lentilles",
+        "tomato": "Tomate",
+        "onion": "Oignon",
+        "potato": "Pomme de terre",
+        "lemon": "Citron",
+        "apple": "Pomme",
+        "banana": "Banane",
+        "oliveOil": "Huile",
+        "salt": "Sel",
+        "pepper": "Poivre",
+        "sugar": "Sucre",
+        "coffee": "Café",
+        "vinegar": "Vinaigre"
       }
     }
   },
@@ -95,6 +117,10 @@
   "dashboard": {
     "title": "Accueil",
     "aria": "Tableau de bord de votre garde-manger",
+    "empty": {
+      "title": "Rien pour l'instant",
+      "subtitle": "Ajoute des produits depuis l'onglet Garde-manger pour voir ici ton résumé, alertes et suggestions."
+    },
     "confirmDeleteExpired": "Cela supprimera tous les produits périmés. Voulez-vous continuer ?",
     "health": {
       "critical": {

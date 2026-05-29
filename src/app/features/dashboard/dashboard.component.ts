@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edit-modal.component';
 import {
   IonButton,
@@ -32,6 +33,7 @@ import { TranslateModule } from '@ngx-translate/core';
     RouterLink,
     TranslateModule,
     BatchEditModalComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],

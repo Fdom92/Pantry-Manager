@@ -18,6 +18,16 @@
       </section>
     } @else {
 
+      <!-- Empty pantry: nothing to summarize -->
+      @if (facade.totalItems() === 0) {
+        <app-empty-state
+          class="dashboard-empty"
+          icon="basket-outline"
+          [titleKey]="'dashboard.empty.title'"
+          [subtitleKey]="'dashboard.empty.subtitle'">
+        </app-empty-state>
+      }
+
       <!-- Today's suggestion -->
       @if (facade.totalItems() > 0) {
         <section class="dashboard-section">

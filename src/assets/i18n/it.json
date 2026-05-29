@@ -13,40 +13,62 @@
       "skip": "Salta",
       "next": "Avanti",
       "start": "Inizia",
-      "skipHint": "Puoi saltare questo tutorial in qualsiasi momento."
+      "skipHint": "Puoi saltare questo tutorial in qualsiasi momento.",
+      "continue": "Continua",
+      "enter": "Apri la mia dispensa",
+      "notifyMe": "Sì, avvisami",
+      "notifyLater": "Più tardi"
     },
     "slides": {
-      "problem": {
-        "title": "Smetti di sprecare",
-        "description": "Tieni traccia di quello che hai senza pensarci."
+      "notifications": {
+        "title": "Avviso prima della scadenza",
+        "description": "Ti avvisiamo quando qualcosa sta per scadere o finire.",
+        "previewTitle": "Prodotti in scadenza",
+        "previewBody": "3 prodotti scadono questa settimana"
       },
-      "simple": {
-        "title": "Organizza la tua dispensa in pochi secondi",
-        "description": "Aggiungi prodotti, traccia le quantità e ricevi avvisi prima della scadenza."
+      "seed": {
+        "title": "Cosa hai ora in dispensa?",
+        "description": "Tocca quello che hai già. Modifichi le quantità dopo. Puoi saltare questo passaggio.",
+        "selectedCount": "{{ count }} selezionati",
+        "skip": "Salta questo passaggio"
       },
-      "benefit": {
-        "title": "Risparmia denaro e tempo",
-        "description": "Compra solo ciò di cui hai bisogno e usa ciò che hai."
-      },
-      "fresh": {
-        "title": "Aggiungi quello che compri",
-        "description": "Ti avvisiamo quando manca qualcosa."
-      },
-      "action": {
-        "title": "Inizia ora",
-        "description": "Aggiungi il tuo primo prodotto."
+      "confirm": {
+        "title": "La tua dispensa è pronta 👌",
+        "description": "Abbiamo aggiunto la tua selezione alla dispensa.",
+        "titleEmpty": "Nessun problema",
+        "descriptionEmpty": "Aggiungerai i tuoi prodotti quando vorrai.",
+        "emptyBody": "Aggiungili uno per uno dalla dispensa.",
+        "noExpiryLabel": "Senza scadenza",
+        "needsDateLabel": "Data da impostare",
+        "adjustHint": "Regola date e quantità più tardi nella tua dispensa."
       }
     },
-    "mock": {
+    "quickSeed": {
       "items": {
         "milk": "Latte",
+        "eggs": "Uova",
+        "cheese": "Formaggio",
+        "butter": "Burro",
+        "yogurt": "Yogurt",
+        "cannedTuna": "Tonno",
+        "bread": "Pane",
         "pasta": "Pasta",
-        "tomatoes": "Pomodori"
-      },
-      "status": {
-        "expired": "Scaduto",
-        "low": "Basso",
-        "ok": "OK"
+        "rice": "Riso",
+        "flour": "Farina",
+        "chickpeas": "Ceci",
+        "lentils": "Lenticchie",
+        "tomato": "Pomodoro",
+        "onion": "Cipolla",
+        "potato": "Patata",
+        "lemon": "Limone",
+        "apple": "Mela",
+        "banana": "Banana",
+        "oliveOil": "Olio",
+        "salt": "Sale",
+        "pepper": "Pepe",
+        "sugar": "Zucchero",
+        "coffee": "Caffè",
+        "vinegar": "Aceto"
       }
     }
   },
@@ -95,6 +117,10 @@
   "dashboard": {
     "title": "Home",
     "aria": "Dashboard della tua dispensa",
+    "empty": {
+      "title": "Ancora niente",
+      "subtitle": "Aggiungi prodotti dalla scheda Dispensa per vedere qui riepilogo, avvisi e suggerimenti."
+    },
     "confirmDeleteExpired": "Questo eliminerà tutti i prodotti scaduti. Continuare?",
     "health": {
       "critical": {
