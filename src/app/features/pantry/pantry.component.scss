@@ -16,7 +16,7 @@ ion-title {
 
 .summary-bar {
   position: sticky;
-  top: 0;
+  top: -16px;
   z-index: var(--app-theme-z-sticky);
   margin-bottom: var(--app-theme-spacing-xs);
   padding-block: var(--app-theme-spacing-xs);
