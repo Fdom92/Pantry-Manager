@@ -56,8 +56,8 @@
 }
 
 .plan-card__amount {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: var(--app-theme-font-size-3xl);
+  font-weight: var(--app-theme-font-weight-display);
 }
 
 .plan-card__period {

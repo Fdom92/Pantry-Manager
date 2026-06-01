@@ -49,10 +49,10 @@ ion-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
+    width: var(--app-theme-control-size-xl);
+    height: var(--app-theme-control-size-xl);
     border-radius: 50%;
-    font-size: 32px;
+    font-size: var(--app-theme-icon-size-xl);
     flex-shrink: 0;
   }
 
@@ -105,7 +105,7 @@ ion-title {
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
 
   ion-icon {
-    font-size: 20px;
+    font-size: var(--app-theme-icon-size-md);
     flex-shrink: 0;
   }
 
@@ -132,7 +132,7 @@ ion-title {
 
   &__hint {
     margin: 0;
-    font-size: 0.7rem;
+    font-size: var(--app-theme-font-size-micro);
     color: var(--app-theme-text-muted);
     line-height: var(--app-theme-line-height-normal);
     opacity: 0.8;
@@ -209,7 +209,7 @@ ion-title {
     flex-shrink: 0;
     white-space: nowrap;
 
-    ion-icon { font-size: 12px; }
+    ion-icon { font-size: var(--app-theme-icon-size-xs); }
 
     &[data-urgency='critical'] { color: var(--app-theme-card-accent-critical); }
     &[data-urgency='warning']  { color: var(--app-theme-card-accent-warning); }
@@ -297,7 +297,7 @@ ion-title {
     gap: var(--app-theme-spacing-md);
 
     ion-icon {
-      font-size: 26px;
+      font-size: var(--app-theme-icon-size-lg);
       color: var(--ion-color-primary);
       flex-shrink: 0;
       opacity: 0.7;
@@ -333,7 +333,7 @@ ion-title {
     gap: var(--app-theme-spacing-md);
 
     ion-icon {
-      font-size: 28px;
+      font-size: var(--app-theme-icon-size-lg);
       color: var(--app-theme-card-accent-success);
       flex-shrink: 0;
     }
@@ -418,8 +418,8 @@ ion-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: var(--app-theme-control-size-md);
+    height: var(--app-theme-control-size-md);
     border: none;
     border-radius: var(--app-theme-radius-sm);
     background: transparent;
@@ -430,7 +430,7 @@ ion-title {
     margin-left: auto;
 
     ion-icon {
-      font-size: 20px;
+      font-size: var(--app-theme-icon-size-md);
     }
 
     &:hover {
@@ -468,7 +468,7 @@ ion-title {
   line-height: var(--app-theme-line-height-normal);
 
   ion-icon {
-    font-size: 20px;
+    font-size: var(--app-theme-icon-size-md);
     color: var(--ion-color-primary);
     flex-shrink: 0;
   }

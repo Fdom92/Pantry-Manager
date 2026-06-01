@@ -48,7 +48,7 @@ ion-title {
 }
 
 .summary-chips .status-chip ion-icon {
-  font-size: 18px;
+  font-size: var(--app-theme-icon-size-sm);
   margin-right: var(--app-theme-spacing-xs);
   color: var(--app-theme-text-muted);
 }
@@ -121,7 +121,7 @@ ion-title {
 // ── List + empty state + skeleton ────────────────────────────────────────────
 
 .fade-in-list {
-  animation: fadeInList 240ms ease;
+  animation: fadeInList var(--app-theme-transition-slow);
 }
 
 .list-empty-state {
@@ -196,14 +196,14 @@ ion-title {
   box-sizing: border-box;
   margin-bottom: var(--app-theme-spacing-lg);
   transition:
-    height 250ms ease,
-    opacity 220ms ease,
-    transform 220ms ease;
+    height var(--app-theme-transition-slow),
+    opacity var(--app-theme-transition-normal),
+    transform var(--app-theme-transition-normal);
   overflow: visible;
   display: flex;
   position: relative;
   z-index: 1;
-  animation: fadeInList 260ms ease;
+  animation: fadeInList var(--app-theme-transition-slow);
 }
 
 .virtual-item-card--deleting {
@@ -275,7 +275,7 @@ section.group-details {
 }
 
 .group-toggle-icon {
-  font-size: 20px;
+  font-size: var(--app-theme-icon-size-md);
   transition:
     color var(--app-theme-transition-normal),
     transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -467,8 +467,8 @@ ion-modal.quantity-sheet ion-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: var(--app-theme-control-size-md);
+    height: var(--app-theme-control-size-md);
     border: none;
     border-radius: 50%;
     background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
@@ -476,7 +476,7 @@ ion-modal.quantity-sheet ion-content {
     cursor: pointer;
     transition: background var(--app-theme-transition-fast);
 
-    ion-icon { font-size: 20px; }
+    ion-icon { font-size: var(--app-theme-icon-size-md); }
 
     &:active {
       background: color-mix(in srgb, var(--ion-color-primary) 22%, transparent);

@@ -67,7 +67,7 @@ ion-item {
   min-height: unset;
 
   ion-label {
-    font-size: 0.7rem;
+    font-size: var(--app-theme-font-size-micro);
     font-weight: var(--app-theme-font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.07em;

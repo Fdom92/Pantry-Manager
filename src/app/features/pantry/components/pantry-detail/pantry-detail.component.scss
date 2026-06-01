@@ -12,7 +12,7 @@
   cursor: pointer;
   transition:
     transform var(--app-theme-transition-normal),
-    box-shadow 220ms ease,
+    box-shadow var(--app-theme-transition-normal),
     border-color var(--app-theme-transition-normal);
 
   &:active {
@@ -50,13 +50,13 @@
 }
 
 .basic-icon {
-  font-size: 16px;
+  font-size: var(--app-theme-icon-size-sm);
   color: color-mix(in srgb, var(--ion-text-color) 25%, transparent);
   flex-shrink: 0;
   cursor: pointer;
   transition:
     color var(--app-theme-transition-fast),
-    transform 100ms ease;
+    transform var(--app-theme-transition-fast);
   padding: var(--app-theme-spacing-xs);
   margin: calc(-1 * var(--app-theme-spacing-xs));
   border-radius: 50%;

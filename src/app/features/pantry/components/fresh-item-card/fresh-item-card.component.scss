@@ -37,13 +37,13 @@
   }
 
   &__keep-icon {
-    font-size: 14px;
+    font-size: var(--app-theme-icon-size-xs);
     color: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
     flex-shrink: 0;
     cursor: pointer;
     transition:
       color var(--app-theme-transition-fast),
-      transform 100ms ease;
+      transform var(--app-theme-transition-fast);
     padding: var(--app-theme-spacing-xs);
     margin: calc(-1 * var(--app-theme-spacing-xs));
     border-radius: 50%;

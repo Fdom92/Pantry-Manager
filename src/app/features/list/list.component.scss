@@ -114,7 +114,7 @@ ion-card-title {
 // ── Empty + skeleton ─────────────────────────────────────────────────────────
 
 .fade-in-list {
-  animation: fadeInList 240ms ease;
+  animation: fadeInList var(--app-theme-transition-slow);
 }
 
 .list-empty-state {
@@ -397,7 +397,7 @@ ion-fab-button[size="small"] {
   font-size: var(--app-theme-font-size-body);
   cursor: pointer;
   text-align: left;
-  transition: opacity 120ms ease;
+  transition: opacity var(--app-theme-transition-fast);
 
   ion-icon {
     font-size: var(--app-theme-font-size-lg);

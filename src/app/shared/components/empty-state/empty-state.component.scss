@@ -7,7 +7,7 @@
   padding: var(--app-theme-spacing-lg-plus) var(--app-theme-spacing-lg);
   border-radius: var(--app-theme-radius-lg);
   text-align: center;
-  animation: emptyFade 240ms ease;
+  animation: emptyFade var(--app-theme-transition-slow);
 }
 
 .empty-state--compact {
@@ -25,7 +25,7 @@
   place-items: center;
   background: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
   color: var(--ion-color-primary);
-  font-size: 26px;
+  font-size: var(--app-theme-icon-size-lg);
 }
 
 .empty-icon.color-warning {

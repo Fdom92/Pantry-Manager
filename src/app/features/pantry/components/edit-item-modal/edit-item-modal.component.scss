@@ -173,7 +173,7 @@ ion-title, ion-back-button {
 }
 
 .quantity-label {
-  font-size: 0.7rem;
+  font-size: var(--app-theme-font-size-micro); // uppercase label — visually correct at ~11.5px
   font-weight: var(--app-theme-font-weight-semibold);
   color: var(--app-theme-text-subtle);
   text-transform: uppercase;
@@ -181,7 +181,7 @@ ion-title, ion-back-button {
 }
 
 .quantity-hint {
-  font-size: 0.65rem;
+  font-size: 0.65rem; // intentionally smaller than micro — secondary context hint
   color: var(--app-theme-text-subtle);
   margin-top: calc(-1 * var(--app-theme-spacing-xs));
   text-align: center;
@@ -220,7 +220,7 @@ ion-title, ion-back-button {
 }
 
 .control-button ion-icon {
-  font-size: 22px;
+  font-size: var(--app-theme-icon-size-md);
   font-weight: var(--app-theme-font-weight-extra-bold);
 }
 
@@ -234,7 +234,7 @@ ion-title, ion-back-button {
 }
 
 .quantity-number {
-  font-size: 2rem;
+  font-size: var(--app-theme-font-size-3xl);
   font-weight: var(--app-theme-font-weight-extra-bold);
   color: var(--app-theme-text-color);
   line-height: 1;
@@ -246,7 +246,7 @@ ion-title, ion-back-button {
 
 .quantity-original {
   color: color-mix(in srgb, var(--ion-text-color) 40%, transparent);
-  font-size: 1.5rem;
+  font-size: var(--app-theme-font-size-2xl);
 }
 
 .quantity-arrow {

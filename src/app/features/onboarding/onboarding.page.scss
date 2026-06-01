@@ -101,11 +101,11 @@
 .slide-card {
   max-width: 520px;
   width: 100%;
-  margin: 28px auto 0;
+  margin: var(--app-theme-spacing-3xl) auto 0;
   padding: var(--app-theme-spacing-2xl) var(--app-theme-spacing-lg);
   position: relative;
   background: var(--ion-card-background);
-  border-radius: 24px;
+  border-radius: var(--app-theme-radius-2xl);
   border: 1px solid var(--app-theme-card-border-color);
   box-shadow: var(--app-theme-card-shadow);
   color: var(--app-theme-text-color);
@@ -114,31 +114,31 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-height: calc(100% - 28px);
+  max-height: calc(100% - var(--app-theme-spacing-3xl));
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 
   h1 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 10px 0 var(--app-theme-spacing-md);
+    font-size: var(--app-theme-font-size-xl);
+    font-weight: var(--app-theme-font-weight-extra-bold);
+    margin: var(--app-theme-spacing-sm-plus) 0 var(--app-theme-spacing-md);
     letter-spacing: -0.01em;
     color: var(--app-theme-text-color);
   }
 
   p {
     margin: 0;
-    line-height: 1.5;
-    font-size: 1rem;
+    line-height: var(--app-theme-line-height-relaxed);
+    font-size: var(--app-theme-font-size-title);
     color: var(--app-theme-text-muted);
   }
 
   // Buttons inside any slide share the same rounded-pill look. Declared once
   // here instead of inside every slide-specific wrapper.
   ion-button {
-    --border-radius: 16px;
-    font-weight: 700;
+    --border-radius: var(--app-theme-radius-lg);
+    font-weight: var(--app-theme-font-weight-extra-bold);
     text-transform: none;
     margin: 0;
   }
@@ -151,7 +151,7 @@
   height: 72px;
   display: grid;
   place-items: center;
-  border-radius: 20px;
+  border-radius: var(--app-theme-radius-xl);
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--ion-color-primary) 80%, var(--ion-text-color) 20%),
@@ -160,7 +160,7 @@
   overflow: hidden;
 
   ion-icon {
-    font-size: 36px;
+    font-size: var(--app-theme-icon-size-xl);
     color: var(--ion-color-dark-contrast);
     position: relative;
     z-index: 2;
@@ -187,15 +187,15 @@
 // ── Slide: notifications (mock preview + CTA stack) ───────────────────────────
 
 .notif-preview {
-  margin-top: 18px;
+  margin-top: var(--app-theme-spacing-lg-plus);
   padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg);
-  border-radius: 18px;
+  border-radius: var(--app-theme-radius-lg-plus, 18px);
   background: color-mix(in srgb, var(--ion-card-background) 92%, transparent);
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 14%, transparent);
   text-align: left;
   display: grid;
-  gap: 6px;
-  box-shadow: 0 2px 10px color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  gap: var(--app-theme-spacing-xs-plus);
+  box-shadow: var(--app-theme-shadow-sm);
 }
 
 .notif-app-row {
@@ -208,7 +208,7 @@
 .notif-app-icon {
   width: 22px;
   height: 22px;
-  border-radius: 6px;
+  border-radius: var(--app-theme-radius-xs);
   object-fit: cover;
   display: block;
 }
@@ -252,7 +252,7 @@
   place-items: center;
 
   ion-icon {
-    font-size: 36px;
+    font-size: var(--app-theme-icon-size-xl);
     color: var(--ion-color-success);
   }
 }
@@ -261,11 +261,11 @@
 
 .seed-count {
   justify-self: center;
-  padding: 6px var(--app-theme-spacing-md);
-  border-radius: 999px;
+  padding: var(--app-theme-spacing-xs-plus) var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-radius-pill);
   background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
   color: var(--ion-color-primary);
-  font-size: 0.82rem;
+  font-size: var(--app-theme-font-size-small);
   font-weight: var(--app-theme-font-weight-bold);
 }
 
@@ -293,12 +293,12 @@
 }
 
 .confirm-emoji {
-  font-size: 20px;
+  font-size: var(--app-theme-icon-size-md);
   line-height: 1;
 }
 
 .confirm-name {
-  font-size: 0.9rem;
+  font-size: var(--app-theme-font-size-body);
   font-weight: var(--app-theme-font-weight-semibold);
   color: var(--app-theme-text-color);
 }
@@ -311,17 +311,17 @@
 
 .confirm-empty {
   margin-top: var(--app-theme-spacing-lg);
-  font-size: 0.85rem;
+  font-size: var(--app-theme-font-size-caption);
   color: var(--app-theme-text-muted);
   font-style: italic;
 }
 
 .confirm-hint {
   margin-top: var(--app-theme-spacing-md);
-  font-size: 0.78rem;
+  font-size: var(--app-theme-font-size-tiny);
   color: var(--app-theme-text-muted);
   text-align: center;
-  line-height: 1.4;
+  line-height: var(--app-theme-line-height-normal);
 }
 
 // ── Swiper pagination ─────────────────────────────────────────────────────────
@@ -335,12 +335,12 @@
   height: var(--app-theme-spacing-md);
   background: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
   opacity: 1;
-  transition: width 180ms ease, background 180ms ease;
+  transition: width var(--app-theme-transition-normal), background var(--app-theme-transition-normal);
 }
 
 .swiper-pagination-bullet-active {
   width: 28px;
-  border-radius: 999px;
+  border-radius: var(--app-theme-radius-pill);
   background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
 }
 
@@ -348,19 +348,22 @@
 
 @media (max-width: 600px) {
   .onboarding-swiper {
-    padding: 10px 6px calc(var(--app-theme-spacing-lg) + var(--ion-safe-area-bottom));
+    padding:
+      var(--app-theme-spacing-sm-plus)
+      var(--app-theme-spacing-xs-plus)
+      calc(var(--app-theme-spacing-lg) + var(--ion-safe-area-bottom));
   }
 
   .slide-card {
     margin-top: var(--app-theme-spacing-sm);
-    padding: 28px 22px;
+    padding: var(--app-theme-spacing-3xl) var(--app-theme-spacing-2xl);
 
     h1 {
-      font-size: 22px;
+      font-size: var(--app-theme-font-size-xl);
     }
 
     p {
-      font-size: 14px;
+      font-size: var(--app-theme-font-size-body);
     }
   }
 }
@@ -369,7 +372,7 @@
 
 @keyframes floatIn {
   from {
-    transform: translateY(10px);
+    transform: translateY(var(--app-theme-spacing-sm-plus));
     opacity: 0;
   }
   to {

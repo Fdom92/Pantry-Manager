@@ -18,8 +18,8 @@ ion-title, ion-back-button {
 
   h1 {
     margin: var(--app-theme-spacing-sm-plus) 0 var(--app-theme-spacing-xs-plus);
-    font-weight: 800;
-    font-size: 26px;
+    font-weight: var(--app-theme-font-weight-display);
+    font-size: var(--app-theme-font-size-3xl);
     color: var(--app-theme-text-color);
     text-shadow: none;
   }
@@ -39,7 +39,7 @@ ion-title, ion-back-button {
   border-radius: var(--app-theme-radius-pill);
   background: var(--ion-color-primary);
   color: var(--ion-color-dark-contrast);
-  font-weight: 800;
+  font-weight: var(--app-theme-font-weight-display);
   letter-spacing: 0.08em;
 }
 
