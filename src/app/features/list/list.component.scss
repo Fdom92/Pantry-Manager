@@ -114,7 +114,7 @@ ion-card-title {
 // ── Empty + skeleton ─────────────────────────────────────────────────────────
 
 .fade-in-list {
-  animation: fadeInList var(--app-theme-transition-slow);
+  animation: app-fade-in-list var(--app-theme-transition-slow);
 }
 
 .list-empty-state {
@@ -158,30 +158,10 @@ ion-card-title {
     transparent 100%
   );
   transform: translateX(-100%);
-  animation: shimmer 1.4s ease-in-out infinite;
+  animation: app-shimmer 1.4s ease-in-out infinite;
 }
 
-// ── Animations ───────────────────────────────────────────────────────────────
-
-@keyframes fadeInList {
-  from {
-    opacity: 0;
-    transform: translateY(var(--app-theme-spacing-xs-plus));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
+// Animations now live in global.scss: app-fade-in-list, app-shimmer.
 
 // ── Item list ────────────────────────────────────────────────────────────────
 

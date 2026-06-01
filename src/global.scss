@@ -130,6 +130,29 @@ ion-input .label-text-wrapper {
   color: var(--app-theme-text-muted);
 }
 
+// ── Shared animations ───────────────────────────────────────────────────────
+// Defined once globally so every list/card across the app uses the same fade
+// motion. Previously duplicated in pantry.scss and list.scss.
+
+@keyframes app-fade-in-list {
+  from {
+    opacity: 0;
+    transform: translateY(var(--app-theme-spacing-xs-plus));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes app-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+// Utility — apply to any container that should fade its contents on mount.
+.app-fade-in { animation: app-fade-in-list var(--app-theme-transition-slow); }
+
 // No-expiry chip — shared across quantity sheet, batches modal, add modal, batch edit
 .no-expiry-chip {
   --background: color-mix(in srgb, var(--ion-text-color) 10%, transparent);

@@ -133,7 +133,7 @@ ion-title {
 // ── List + empty state + skeleton ────────────────────────────────────────────
 
 .fade-in-list {
-  animation: fadeInList var(--app-theme-transition-slow);
+  animation: app-fade-in-list var(--app-theme-transition-slow);
 }
 
 .list-empty-state {
@@ -176,7 +176,7 @@ ion-title {
     transparent 100%
   );
   transform: translateX(-100%);
-  animation: shimmer 1.4s ease-in-out infinite;
+  animation: app-shimmer 1.4s ease-in-out infinite;
 }
 
 // ── Category stack + virtual cards ──────────────────────────────────────────
@@ -215,7 +215,7 @@ ion-title {
   display: flex;
   position: relative;
   z-index: 1;
-  animation: fadeInList var(--app-theme-transition-slow);
+  animation: app-fade-in-list var(--app-theme-transition-slow);
 }
 
 .virtual-item-card--deleting {
@@ -414,27 +414,7 @@ ion-card-header {
   margin: 0;
 }
 
-// ── Animations ──────────────────────────────────────────────────────────────
-
-@keyframes fadeInList {
-  from {
-    opacity: 0;
-    transform: translateY(var(--app-theme-spacing-xs-plus));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
+// Animations now live in global.scss: app-fade-in-list, app-shimmer.
 
 // ── Quantity sheet modal ────────────────────────────────────────────────────
 
