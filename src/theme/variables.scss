@@ -213,9 +213,14 @@
   // 🪟 GLASS SURFACES — backdrop-blur tokens for sticky/floating UI.
   // Used by summary-bar, tab-bar, modal headers. Falls back to solid when
   // backdrop-filter unsupported.
+  //
+  // Bg uses --ion-background-color (page bg) instead of --ion-card-background
+  // so sticky bars blend with surrounding page — in dark mode card-bg sits a
+  // step lighter than page-bg, which made the sticky bar read as a bright
+  // band cutting across the dark surface.
   // ═══════════════════════════════════════════════════════════════════════════
-  --app-theme-glass-bg: color-mix(in srgb, var(--ion-card-background) 78%, transparent);
-  --app-theme-glass-border: color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+  --app-theme-glass-bg: color-mix(in srgb, var(--ion-background-color) 88%, transparent);
+  --app-theme-glass-border: color-mix(in srgb, var(--ion-text-color) 6%, transparent);
   --app-theme-glass-blur: blur(20px) saturate(180%);
 
   // ═══════════════════════════════════════════════════════════════════════════

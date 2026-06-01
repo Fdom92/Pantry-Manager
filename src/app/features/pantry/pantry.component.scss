@@ -16,15 +16,16 @@ ion-title {
 
 .summary-bar {
   position: sticky;
-  top: -16px;
+  top: 0;
   z-index: 10;
   margin-bottom: var(--app-theme-spacing-xs);
-  // Glass surface — translucent + backdrop-blur for a premium sticky header
-  // feel. Falls back to solid card-bg when backdrop-filter unsupported.
+  padding-block: var(--app-theme-spacing-xs);
+  // Glass surface — translucent + backdrop-blur. Edge-to-edge bleed via
+  // negative inline margin matched by positive inline padding so chips align
+  // with content padding while the bar bg covers the full row.
   background: var(--app-theme-glass-bg);
   backdrop-filter: var(--app-theme-glass-blur);
   -webkit-backdrop-filter: var(--app-theme-glass-blur);
-  border-bottom: 1px solid var(--app-theme-glass-border);
   margin-inline: calc(-1 * var(--ion-padding, 16px));
   padding-inline: var(--ion-padding, 16px);
 }
@@ -59,7 +60,9 @@ ion-title {
 .summary-chips .status-chip ion-icon {
   font-size: var(--app-theme-icon-size-sm);
   margin-right: var(--app-theme-spacing-xs);
-  color: var(--app-theme-text-muted);
+  // Inherit chip color so icon never collides with bg (e.g. pendientes chip
+  // was medium-bg + medium-icon → invisible when active).
+  color: inherit;
 }
 
 .summary-chips .status-chip .chip-body {
