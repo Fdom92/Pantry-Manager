@@ -83,13 +83,18 @@ ion-title {
   font-variant-numeric: tabular-nums;
 }
 
-// Chips use the ghost-vs-filled pattern (v4.4-refresh):
+// Chips use the tonal-vs-outline pattern (v4.4-refresh, revised):
 //   inactive → outline-only, full opacity, accent-tinted text
-//   active   → filled with state color, no border, soft shadow
-// Replaces the previous opacity:0.5 inactive treatment which looked muted/dirty.
+//   active   → soft tonal fill (accent at ~22% over surface) + accent text
 //
-// Per-chip CSS variables expose --chip-accent and --chip-on-accent so the
-// filled active rule can pick them up generically.
+// Tonal-fill chosen over solid-fill because solid required mixing white text
+// (primary/success/danger/tertiary) with dark text (warning/medium) for WCAG
+// contrast. The mix produced inconsistent visual weight across the chip rail.
+// Tonal keeps a single text-color rule per chip (always the accent itself),
+// passes contrast (accent text on accent-tinted surface), and reads as a
+// unified family rather than 7 unrelated badges.
+//
+// Per-chip CSS variable: --chip-accent.
 
 .summary-chips .status-chip {
   --background: transparent;
@@ -104,49 +109,26 @@ ion-title {
 }
 
 .summary-chips .status-chip.active {
-  --background: var(--chip-accent);
-  --color: var(--chip-on-accent, var(--ion-color-dark-contrast));
-  border-color: transparent;
-  box-shadow: var(--app-theme-shadow-sm);
+  // Tonal fill: accent mixed into card surface so text (accent) keeps high
+  // contrast regardless of the underlying accent's luminance.
+  --background: color-mix(in srgb, var(--chip-accent) 22%, var(--ion-card-background));
+  --color: var(--chip-accent);
+  border-color: color-mix(in srgb, var(--chip-accent) 45%, transparent);
+  box-shadow: var(--app-theme-shadow-xs);
+  font-weight: var(--app-theme-font-weight-extra-bold);
 }
 
-.summary-chips .status-chip.chip--all {
-  --chip-accent: var(--ion-color-success);
-  --chip-on-accent: var(--ion-color-success-contrast);
-}
-
-.summary-chips .status-chip.chip--normal {
-  --chip-accent: var(--ion-color-primary);
-  --chip-on-accent: var(--ion-color-primary-contrast);
-}
-
+.summary-chips .status-chip.chip--all       { --chip-accent: var(--ion-color-success); }
+.summary-chips .status-chip.chip--normal    { --chip-accent: var(--ion-color-primary); }
 .summary-chips .status-chip.chip--low,
-.summary-chips .status-chip.chip--expiring {
-  --chip-accent: var(--ion-color-warning);
-  --chip-on-accent: var(--ion-color-dark);
-}
-
-.summary-chips .status-chip.chip--review {
-  --chip-accent: var(--ion-color-warning-shade);
-  --chip-on-accent: var(--ion-color-dark);
-}
-
-.summary-chips .status-chip.chip--expired {
-  --chip-accent: var(--ion-color-danger);
-  --chip-on-accent: var(--ion-color-danger-contrast);
-}
-
-.summary-chips .status-chip.chip--pendientes {
-  --chip-accent: var(--ion-color-medium);
-  --chip-on-accent: var(--ion-color-medium-contrast);
-}
+.summary-chips .status-chip.chip--expiring  { --chip-accent: var(--ion-color-warning-shade); }
+.summary-chips .status-chip.chip--review    { --chip-accent: var(--ion-color-warning-shade); }
+.summary-chips .status-chip.chip--expired   { --chip-accent: var(--ion-color-danger); }
+.summary-chips .status-chip.chip--pendientes{ --chip-accent: var(--ion-color-medium-shade); }
 
 // chip--basic kept on medium tone (NOT tertiary — tertiary is now reserved
 // for PRO/premium; basic items are operational, not premium).
-.summary-chips .status-chip.chip--basic {
-  --chip-accent: var(--ion-color-medium-shade);
-  --chip-on-accent: var(--ion-color-medium-contrast);
-}
+.summary-chips .status-chip.chip--basic     { --chip-accent: var(--ion-color-medium-shade); }
 
 // ── List + empty state + skeleton ────────────────────────────────────────────
 
