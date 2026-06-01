@@ -234,21 +234,17 @@ ion-card-title {
   line-height: var(--app-theme-line-height-normal);
 }
 
-// Map Ionic color="..." attributes to the accent driver. Ionic adds
-// .ion-color-<name> classes for these attributes; we just point --chip-accent
-// at the matching ion-color variable so the chip's bg + text + border are
-// derived consistently. Using -shade variants gives the text enough darkness
-// to clear 4.5:1 on the tonal-tinted background.
-.reason-chip.ion-color-danger   { --chip-accent: var(--ion-color-danger); }
-.reason-chip.ion-color-warning  { --chip-accent: var(--ion-color-warning-shade); }
-.reason-chip.ion-color-success  { --chip-accent: var(--ion-color-success-shade); }
-.reason-chip.ion-color-primary  { --chip-accent: var(--ion-color-primary); }
-.reason-chip.ion-color-medium   { --chip-accent: var(--ion-color-medium-shade); }
-
-// Variants that don't map to a single ion-color (composed via class).
-.reason-chip--basic {
-  --chip-accent: var(--ion-color-medium-shade);
-}
+// Per-variant accent. Driven via .reason-chip--<variant> classes (NOT the
+// Ionic color="..." attribute — that attribute makes Ionic apply its own
+// :host(.ion-color) rule which forces a solid `background:` and overrides
+// our --background custom property, bypassing the tonal pattern entirely).
+// Using -shade variants where needed so accent text clears 4.5:1 on the
+// 18% tonal-tinted background.
+.reason-chip--danger  { --chip-accent: var(--ion-color-danger); }
+.reason-chip--warning { --chip-accent: var(--ion-color-warning-shade); }
+.reason-chip--success { --chip-accent: var(--ion-color-success-shade); }
+.reason-chip--primary { --chip-accent: var(--ion-color-primary); }
+.reason-chip--basic   { --chip-accent: var(--ion-color-medium-shade); }
 
 .reason-chip--manual {
   --chip-accent: var(--app-theme-text-soft);

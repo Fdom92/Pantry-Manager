@@ -73,24 +73,24 @@
                         <span class="item-name">{{ suggestion.item.name }}</span>
                         <div class="item-meta">
                           @if (suggestion.reason === 'fresh-empty') {
-                            <ion-badge color="danger" class="reason-chip">
+                            <ion-badge class="reason-chip reason-chip--danger">
                               {{ 'shopping.chips.freshEmpty' | translate }}
                             </ion-badge>
                           } @else if (suggestion.reason === 'fresh-low') {
-                            <ion-badge color="warning" class="reason-chip">
+                            <ion-badge class="reason-chip reason-chip--warning">
                               {{ 'shopping.chips.freshLow' | translate }}
                             </ion-badge>
                           } @else if (suggestion.reason === 'empty') {
-                            <ion-badge color="danger" class="reason-chip">
+                            <ion-badge class="reason-chip reason-chip--danger">
                               {{ 'shopping.chips.empty' | translate }}
                             </ion-badge>
                           } @else if (suggestion.reason === 'below-min') {
-                            <ion-badge color="warning" class="reason-chip">
+                            <ion-badge class="reason-chip reason-chip--warning">
                               {{ 'shopping.chips.belowMin' | translate }}
                             </ion-badge>
                           }
                           @if (suggestion.item.isBasic) {
-                            <ion-badge color="primary" class="reason-chip reason-chip--basic">
+                            <ion-badge class="reason-chip reason-chip--basic">
                               {{ 'shopping.chips.basic' | translate }}
                             </ion-badge>
                           }
@@ -143,7 +143,7 @@
                   <div class="item-body" slot="start">
                     <span class="item-name">{{ manual.name }}</span>
                     <div class="item-meta">
-                      <ion-badge color="medium" class="reason-chip reason-chip--manual">
+                      <ion-badge class="reason-chip reason-chip--manual">
                         {{ 'shopping.chips.manual' | translate }}
                       </ion-badge>
                     </div>
