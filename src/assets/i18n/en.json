@@ -13,40 +13,62 @@
       "skip": "Skip",
       "next": "Next",
       "start": "Start",
-      "skipHint": "You can skip this tutorial anytime."
+      "skipHint": "You can skip this tutorial anytime.",
+      "continue": "Continue",
+      "enter": "Open my pantry",
+      "notifyMe": "Yes, notify me",
+      "notifyLater": "Later"
     },
     "slides": {
-      "problem": {
-        "title": "Stop wasting food",
-        "description": "Track what you have without thinking about it."
+      "notifications": {
+        "title": "Heads-up before it expires",
+        "description": "We notify you when something is about to expire or runs out.",
+        "previewTitle": "Products expiring soon",
+        "previewBody": "3 products expire this week"
       },
-      "simple": {
-        "title": "Organize your pantry in seconds",
-        "description": "Add products, track quantities, and get alerts before they expire."
+      "seed": {
+        "title": "What do you have in your pantry?",
+        "description": "Tap what you already have. You can edit quantities later. You can skip this step.",
+        "selectedCount": "{{ count }} selected",
+        "skip": "Skip this step"
       },
-      "benefit": {
-        "title": "Save money and time",
-        "description": "Buy only what you need and use what you already have."
-      },
-      "fresh": {
-        "title": "Add what you buy",
-        "description": "We let you know when something runs out."
-      },
-      "action": {
-        "title": "Start now",
-        "description": "Add your first product."
+      "confirm": {
+        "title": "Your pantry is ready 👌",
+        "description": "We've added your selection to your pantry.",
+        "titleEmpty": "No problem",
+        "descriptionEmpty": "You can add your products whenever you want.",
+        "emptyBody": "Add them one by one from your pantry.",
+        "noExpiryLabel": "No expiry",
+        "needsDateLabel": "Date pending",
+        "adjustHint": "Adjust dates and quantities later in your pantry."
       }
     },
-    "mock": {
+    "quickSeed": {
       "items": {
         "milk": "Milk",
+        "eggs": "Eggs",
+        "cheese": "Cheese",
+        "butter": "Butter",
+        "yogurt": "Yogurt",
+        "cannedTuna": "Tuna",
+        "bread": "Bread",
         "pasta": "Pasta",
-        "tomatoes": "Tomatoes"
-      },
-      "status": {
-        "expired": "Expired",
-        "low": "Low",
-        "ok": "OK"
+        "rice": "Rice",
+        "flour": "Flour",
+        "chickpeas": "Chickpeas",
+        "lentils": "Lentils",
+        "tomato": "Tomato",
+        "onion": "Onion",
+        "potato": "Potato",
+        "lemon": "Lemon",
+        "apple": "Apple",
+        "banana": "Banana",
+        "oliveOil": "Oil",
+        "salt": "Salt",
+        "pepper": "Pepper",
+        "sugar": "Sugar",
+        "coffee": "Coffee",
+        "vinegar": "Vinegar"
       }
     }
   },
@@ -95,6 +117,10 @@
   "dashboard": {
     "title": "Home",
     "aria": "Your pantry dashboard",
+    "empty": {
+      "title": "Nothing here yet",
+      "subtitle": "Add products from the Pantry tab to see your summary, alerts, and suggestions here."
+    },
     "confirmDeleteExpired": "This will delete all expired products. Continue?",
     "health": {
       "critical": {

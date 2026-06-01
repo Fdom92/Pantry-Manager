@@ -6,16 +6,22 @@
   display: flex;
   align-items: center;
   gap: var(--app-theme-spacing-md);
-  padding: 8px var(--app-theme-spacing-md) 8px 20px;
+  padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md) var(--app-theme-spacing-sm) var(--app-theme-spacing-xl);
   border-radius: var(--app-theme-card-border-radius);
   background: var(--app-theme-card-bg);
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  // Match the baseline card shadow used by pantry-item-card so Fresh and
+  // Despensa sections feel like the same surface family.
+  box-shadow: var(--app-theme-card-shadow);
+  // Mount fade — matches the virtual-item-card animation in Despensa so both
+  // sections feel uniform when entering the Pantry tab.
+  animation: app-fade-in-list var(--app-theme-transition-slow);
 
   &__info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--app-theme-spacing-2xs);
     min-width: 0;
     cursor: pointer;
   }
@@ -23,7 +29,7 @@
   &__name-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--app-theme-spacing-xs-plus);
     min-width: 0;
   }
 
@@ -37,13 +43,15 @@
   }
 
   &__keep-icon {
-    font-size: 14px;
+    font-size: var(--app-theme-icon-size-xs);
     color: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
     flex-shrink: 0;
     cursor: pointer;
-    transition: color 0.15s, transform 0.1s;
-    padding: 4px;
-    margin: -4px;
+    transition:
+      color var(--app-theme-transition-fast),
+      transform var(--app-theme-transition-fast);
+    padding: var(--app-theme-spacing-xs);
+    margin: calc(-1 * var(--app-theme-spacing-xs));
     border-radius: 50%;
 
     &--active {
@@ -56,21 +64,28 @@
   }
 
   &__expiry {
-    font-size: 0.75rem;
+    font-size: var(--app-theme-font-size-small);
     color: var(--app-theme-text-muted);
 
-    &[data-urgency='critical'] { color: var(--app-theme-card-accent-critical); font-weight: 600; font-size: 0.8rem; }
-    &[data-urgency='warning']  { color: var(--app-theme-card-accent-warning);  font-weight: 600; }
+    &[data-urgency='critical'] {
+      color: var(--app-theme-card-accent-critical);
+      font-weight: var(--app-theme-font-weight-bold);
+      font-size: var(--app-theme-font-size-small);
+    }
+    &[data-urgency='warning'] {
+      color: var(--app-theme-card-accent-warning);
+      font-weight: var(--app-theme-font-weight-bold);
+    }
   }
 
   &__segment {
     display: inline-flex;
     flex-shrink: 0;
-    border-radius: 999px;
+    border-radius: var(--app-theme-radius-pill);
     background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
     border: 1px solid color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
-    padding: 2px;
-    gap: 2px;
+    padding: var(--app-theme-spacing-2xs);
+    gap: var(--app-theme-spacing-2xs);
   }
 
   &__segment-btn {
@@ -78,31 +93,32 @@
     border: none;
     background: transparent;
     color: var(--app-theme-text-muted);
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 999px;
+    font-size: var(--app-theme-font-size-micro);
+    font-weight: var(--app-theme-font-weight-bold);
+    padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
+    border-radius: var(--app-theme-radius-pill);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition:
+      background var(--app-theme-transition-fast),
+      color var(--app-theme-transition-fast);
     min-width: 52px;
     text-transform: capitalize;
 
     &.is-active[data-state='sufficient'] {
-      background: var(--app-theme-card-accent-success, var(--ion-color-success));
-      color: var(--ion-color-success-contrast, white);
+      background: var(--app-theme-card-accent-success);
+      color: var(--ion-color-success-contrast);
     }
     &.is-active[data-state='low'] {
-      background: var(--app-theme-card-accent-warning, var(--ion-color-warning));
+      background: var(--app-theme-card-accent-warning);
       color: var(--ion-color-dark);
     }
     &.is-active[data-state='none'] {
-      background: var(--app-theme-card-accent-critical, var(--ion-color-medium));
-      color: var(--ion-color-medium-contrast, white);
+      background: var(--app-theme-card-accent-critical);
+      color: var(--ion-color-medium-contrast);
     }
 
     &:not(.is-active):active {
       background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
     }
   }
-
 }

@@ -1,9 +1,14 @@
+// ── Onboarding page ────────────────────────────────────────────────────────────
+// Uses the app design tokens (--app-theme-*) so light/dark themes adapt without
+// extra rules. The only deliberate hardcoded values are the glassmorphism layer
+// (--onboarding-glass*), which sits over the gradient background and must keep a
+// constant white tint to stay readable across themes.
+
 .onboarding {
   --onboarding-radial-a: color-mix(in srgb, var(--ion-color-secondary) 18%, transparent);
   --onboarding-radial-b: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
   --onboarding-glass: color-mix(in srgb, #ffffff 12%, transparent);
   --onboarding-glass-border: color-mix(in srgb, #ffffff 20%, transparent);
-  --onboarding-pill-text: var(--app-theme-text-color);
   --background: radial-gradient(
       circle at 15% 20%,
       color-mix(in srgb, var(--ion-color-secondary) 22%, transparent),
@@ -20,6 +25,8 @@
   position: relative;
   color: var(--app-theme-text-color);
 }
+
+// ── Background decorations ────────────────────────────────────────────────────
 
 .background-blur {
   position: absolute;
@@ -38,27 +45,40 @@
   background: radial-gradient(circle at 90% 60%, var(--onboarding-radial-b), transparent 28%);
 }
 
+// ── Top bar ───────────────────────────────────────────────────────────────────
+
 .top-bar {
   position: relative;
-  z-index: 2;
-  padding: calc(16px + var(--ion-safe-area-top)) 16px 6px;
+  z-index: 3;
+  padding: calc(var(--app-theme-spacing-lg) + var(--ion-safe-area-top))
+    var(--app-theme-spacing-lg)
+    6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--app-theme-spacing-sm);
+}
+
+.skip-corner {
+  --color: var(--app-theme-text-muted);
+  font-size: 13px;
+  font-weight: var(--app-theme-font-weight-semibold);
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .eyebrow {
   display: inline-flex;
   gap: 10px;
   align-items: center;
-  padding: 8px 12px;
+  padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
   border-radius: 999px;
   background: var(--onboarding-glass);
   border: 1px solid var(--onboarding-glass-border);
   backdrop-filter: blur(12px);
   font-size: 14px;
   letter-spacing: 0.02em;
-  color: var(--onboarding-pill-text);
+  color: var(--app-theme-text-color);
 
   ion-icon {
     font-size: 18px;
@@ -66,233 +86,293 @@
   }
 }
 
+// ── Swiper + slide card ───────────────────────────────────────────────────────
+
 .onboarding-swiper {
   position: relative;
   z-index: 2;
   margin: 10px;
-  height: calc(100% - 140px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
-  padding: calc(16px + var(--ion-safe-area-top)) 16px calc(72px + var(--ion-safe-area-bottom));
+  height: calc(100% - 60px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
+  padding: calc(var(--app-theme-spacing-sm) + var(--ion-safe-area-top))
+    var(--app-theme-spacing-lg)
+    calc(var(--app-theme-spacing-lg) + var(--ion-safe-area-bottom));
 }
 
 .slide-card {
   max-width: 520px;
-  margin: 28px auto 0;
-  padding: 24px 16px;
+  width: 100%;
+  margin: var(--app-theme-spacing-3xl) auto 0;
+  padding: var(--app-theme-spacing-2xl) var(--app-theme-spacing-lg);
   position: relative;
-  background: var(--ion-card-background, var(--ion-card-background));
-  border-radius: 24px;
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
+  background: var(--ion-card-background);
+  border-radius: var(--app-theme-radius-2xl);
+  border: 1px solid var(--app-theme-card-border-color);
+  box-shadow: var(--app-theme-card-shadow);
   color: var(--app-theme-text-color);
   text-align: center;
   animation: floatIn 420ms ease;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: calc(100% - var(--app-theme-spacing-3xl));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 
   h1 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 10px 0 12px;
+    font-size: var(--app-theme-font-size-xl);
+    font-weight: var(--app-theme-font-weight-extra-bold);
+    margin: var(--app-theme-spacing-sm-plus) 0 var(--app-theme-spacing-md);
     letter-spacing: -0.01em;
     color: var(--app-theme-text-color);
   }
 
   p {
     margin: 0;
-    line-height: 1.5;
-    font-size: 1rem;
+    line-height: var(--app-theme-line-height-relaxed);
+    font-size: var(--app-theme-font-size-title);
     color: var(--app-theme-text-muted);
   }
-}
 
-.mock-preview {
-  margin-top: 18px;
-  padding: 14px;
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--ion-card-background) 92%, transparent);
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  display: grid;
-  gap: 10px;
-  text-align: left;
-}
-
-.mock-row {
-  display: grid;
-  grid-template-columns: 12px 1fr auto;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-  color: var(--app-theme-text-color);
-
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-    background: var(--ion-color-medium);
-  }
-
-  .badge {
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  &.expired {
-    .dot {
-      background: var(--ion-color-danger);
-    }
-    .badge {
-      color: var(--ion-color-danger);
-      border: 1px solid color-mix(in srgb, var(--ion-color-danger) 45%, transparent);
-    }
-  }
-
-  &.low {
-    .dot {
-      background: var(--ion-color-warning);
-    }
-    .badge {
-      color: var(--ion-color-warning);
-      border: 1px solid color-mix(in srgb, var(--ion-color-warning) 45%, transparent);
-    }
-  }
-
-  &.ok {
-    .dot {
-      background: var(--ion-color-success);
-    }
-    .badge {
-      color: var(--ion-color-success);
-      border: 1px solid color-mix(in srgb, var(--ion-color-success) 45%, transparent);
-    }
+  // Buttons inside any slide share the same rounded-pill look. Declared once
+  // here instead of inside every slide-specific wrapper.
+  ion-button {
+    --border-radius: var(--app-theme-radius-lg);
+    font-weight: var(--app-theme-font-weight-extra-bold);
+    text-transform: none;
+    margin: 0;
   }
 }
 
-.slide-card.is-pro {
-  border-color: color-mix(in srgb, var(--ion-color-secondary) 45%, transparent);
-  box-shadow:
-    var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18)),
-    0 0 24px color-mix(in srgb, var(--ion-color-secondary) 28%, transparent);
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ion-color-secondary) 35%, transparent);
-  color: var(--ion-color-light);
-  font-size: 13px;
-  border: 1px solid color-mix(in srgb, var(--ion-color-secondary) 55%, transparent);
-  margin-bottom: 4px;
-}
+// ── Icon burst (slide hero) ───────────────────────────────────────────────────
 
 .icon-burst {
-  position: relative;
-  --app-icon-badge-size: 72px;
-  --app-icon-size: 36px;
-  --app-icon-badge-radius: 20px;
-  width: var(--app-icon-badge-size);
-  height: var(--app-icon-badge-size);
+  width: 72px;
+  height: 72px;
   display: grid;
   place-items: center;
-  border-radius: var(--app-icon-badge-radius);
+  border-radius: var(--app-theme-radius-xl);
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--ion-color-primary) 80%, var(--ion-text-color) 20%),
     color-mix(in srgb, var(--ion-color-secondary) 85%, var(--ion-color-dark-contrast) 15%)
   );
   overflow: hidden;
-}
 
-.icon-burst ion-icon {
-  font-size: var(--app-icon-size);
-  color: var(--ion-color-dark-contrast);
-  position: relative;
-  z-index: 2;
-  animation: none;
-}
-
-.icon-burst .glow {
-  display: none;
-}
-
-.actions {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(90px + var(--ion-safe-area-bottom));
-  padding: 0 16px;
-  z-index: 3;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-
-  ion-button {
-    --padding-start: 18px;
-    --padding-end: 18px;
-    --border-radius: 16px;
-    font-weight: 700;
-    text-transform: none;
+  ion-icon {
+    font-size: var(--app-theme-icon-size-xl);
+    color: var(--ion-color-dark-contrast);
+    position: relative;
+    z-index: 2;
   }
 }
 
-.skip-hint {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(52px + var(--ion-safe-area-bottom));
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--app-surface-muted);
-  margin: 0;
-  z-index: 3;
+// ── Sticky bottom CTAs ────────────────────────────────────────────────────────
+
+.slide-sticky-footer {
+  margin-top: var(--app-theme-spacing-lg);
+  padding-top: var(--app-theme-spacing-md);
+  display: grid;
+  gap: 10px;
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    var(--ion-card-background) 24%,
+    var(--ion-card-background) 100%
+  );
 }
+
+// ── Slide: notifications (mock preview + CTA stack) ───────────────────────────
+
+.notif-preview {
+  margin-top: var(--app-theme-spacing-lg-plus);
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg);
+  border-radius: var(--app-theme-radius-lg-plus, 18px);
+  background: color-mix(in srgb, var(--ion-card-background) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ion-text-color) 14%, transparent);
+  text-align: left;
+  display: grid;
+  gap: var(--app-theme-spacing-xs-plus);
+  box-shadow: var(--app-theme-shadow-sm);
+}
+
+.notif-app-row {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-sm);
+  margin-bottom: 2px;
+}
+
+.notif-app-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--app-theme-radius-xs);
+  object-fit: cover;
+  display: block;
+}
+
+.notif-app-name {
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-bold);
+  letter-spacing: 0.02em;
+  color: var(--app-theme-text-muted);
+  text-transform: uppercase;
+}
+
+.notif-app-time {
+  margin-left: auto;
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-muted);
+}
+
+.notif-title {
+  font-size: var(--app-theme-font-size-title);
+  font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-color);
+}
+
+.notif-body {
+  font-size: var(--app-theme-font-size-body);
+  color: var(--app-theme-text-muted);
+  line-height: 1.35;
+}
+
+.slide-cta-stack {
+  margin-top: var(--app-theme-spacing-xl);
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+
+.slide-decision-mark {
+  margin-top: var(--app-theme-spacing-xl);
+  display: grid;
+  place-items: center;
+
+  ion-icon {
+    font-size: var(--app-theme-icon-size-xl);
+    color: var(--ion-color-success);
+  }
+}
+
+// ── Slide: seed (grid is its own component; this is the footer chip) ──────────
+
+.seed-count {
+  justify-self: center;
+  padding: var(--app-theme-spacing-xs-plus) var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-radius-pill);
+  background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
+  color: var(--ion-color-primary);
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-bold);
+}
+
+// ── Slide: confirm (review list) ──────────────────────────────────────────────
+
+.confirm-list {
+  margin: var(--app-theme-spacing-lg) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.confirm-row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-spacing-md);
+  background: color-mix(in srgb, var(--ion-text-color) 4%, transparent);
+}
+
+.confirm-emoji {
+  font-size: var(--app-theme-icon-size-md);
+  line-height: 1;
+}
+
+.confirm-name {
+  font-size: var(--app-theme-font-size-body);
+  font-weight: var(--app-theme-font-weight-semibold);
+  color: var(--app-theme-text-color);
+}
+
+.confirm-meta {
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-muted);
+  white-space: nowrap;
+}
+
+.confirm-empty {
+  margin-top: var(--app-theme-spacing-lg);
+  font-size: var(--app-theme-font-size-caption);
+  color: var(--app-theme-text-muted);
+  font-style: italic;
+}
+
+.confirm-hint {
+  margin-top: var(--app-theme-spacing-md);
+  font-size: var(--app-theme-font-size-tiny);
+  color: var(--app-theme-text-muted);
+  text-align: center;
+  line-height: var(--app-theme-line-height-normal);
+}
+
+// ── Swiper pagination ─────────────────────────────────────────────────────────
 
 .swiper-pagination {
   bottom: 30px !important;
 }
 
 .swiper-pagination-bullet {
-  width: 12px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.4);
+  width: var(--app-theme-spacing-md);
+  height: var(--app-theme-spacing-md);
+  background: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
   opacity: 1;
-  transition: width 180ms ease, background 180ms ease;
+  transition: width var(--app-theme-transition-normal), background var(--app-theme-transition-normal);
 }
 
 .swiper-pagination-bullet-active {
   width: 28px;
-  border-radius: 999px;
+  border-radius: var(--app-theme-radius-pill);
   background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
 }
 
+// ── Responsive ────────────────────────────────────────────────────────────────
+
 @media (max-width: 600px) {
   .onboarding-swiper {
-    padding: 10px 6px 90px;
+    padding:
+      var(--app-theme-spacing-sm-plus)
+      var(--app-theme-spacing-xs-plus)
+      calc(var(--app-theme-spacing-lg) + var(--ion-safe-area-bottom));
   }
 
   .slide-card {
-    margin-top: 8px;
-    padding: 28px 22px;
+    margin-top: var(--app-theme-spacing-sm);
+    padding: var(--app-theme-spacing-3xl) var(--app-theme-spacing-2xl);
 
     h1 {
-      font-size: 24px;
+      font-size: var(--app-theme-font-size-xl);
     }
 
     p {
-      font-size: 15px;
+      font-size: var(--app-theme-font-size-body);
     }
   }
 }
 
+// ── Animations ────────────────────────────────────────────────────────────────
+
 @keyframes floatIn {
   from {
-    transform: translateY(10px);
+    transform: translateY(var(--app-theme-spacing-sm-plus));
     opacity: 0;
   }
   to {

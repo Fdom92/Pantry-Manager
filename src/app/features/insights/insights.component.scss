@@ -1,35 +1,53 @@
 .insights {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--app-theme-spacing-xl);
 }
 
 .insights-section {
-  background: var(--ion-card-background, var(--ion-color-light));
-  border-radius: 16px;
-  padding: 16px;
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+  background: var(--ion-card-background);
+  border-radius: var(--app-theme-card-border-radius);
+  padding: var(--app-theme-spacing-lg);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  // Baseline card shadow — Insights sections are surface cards, same tier as
+  // settings-card / today-card / list .item-list.
+  box-shadow: var(--app-theme-card-shadow);
+  // Mount fade — matches the per-item fade used in Pantry and Shopping tabs.
+  animation: app-fade-in-list var(--app-theme-transition-slow);
+  transition:
+    transform var(--app-theme-transition-normal),
+    box-shadow var(--app-theme-transition-normal),
+    border-color var(--app-theme-transition-normal);
+
+  @media (hover: hover) {
+    &:hover {
+      transform: var(--app-theme-card-hover-transform);
+      box-shadow: var(--app-theme-card-hover-shadow);
+    }
+  }
 
   &__title {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--app-theme-font-size-body);
+    font-weight: var(--app-theme-font-weight-bold);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: color-mix(in srgb, var(--ion-text-color) 55%, transparent);
-    margin: 0 0 12px;
+    letter-spacing: var(--app-theme-letter-spacing-eyebrow);
+    color: var(--app-theme-text-muted);
+    margin: 0 0 var(--app-theme-spacing-md);
   }
 
   &--pro-teaser {
-    border: 1px dashed color-mix(in srgb, var(--ion-color-primary) 40%, transparent);
-    background: color-mix(in srgb, var(--ion-color-primary) 4%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--ion-color-tertiary) 45%, transparent);
+    background: color-mix(in srgb, var(--ion-color-tertiary) 5%, transparent);
+    box-shadow: none;
   }
 }
 
-// Section A — snapshot grid
+// ── Section A — snapshot grid ────────────────────────────────────────────────
+
 .snapshot-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: var(--app-theme-spacing-sm-plus);
 }
 
 .metric-card {
@@ -37,70 +55,71 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12px 8px;
-  border-radius: 12px;
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-sm);
+  border-radius: var(--app-theme-radius-md);
   background: color-mix(in srgb, var(--ion-text-color) 5%, transparent);
-  gap: 4px;
+  gap: var(--app-theme-spacing-xs);
 
   &__value {
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1;
+    font-size: var(--app-theme-font-size-3xl);
+    font-weight: var(--app-theme-font-weight-extra-bold);
+    line-height: var(--app-theme-line-height-display);
   }
 
   &__label {
-    font-size: 11px;
+    font-size: var(--app-theme-font-size-micro);
     text-align: center;
     color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
   }
-
 }
 
 .no-expiry-hint {
-  margin: 10px 0 0;
-  font-size: 12px;
+  margin: var(--app-theme-spacing-sm-plus) 0 0;
+  font-size: var(--app-theme-font-size-small);
   color: color-mix(in srgb, var(--ion-text-color) 55%, transparent);
 }
 
-// Section B — activity
+// ── Section B — activity ─────────────────────────────────────────────────────
+
 .activity-row {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 14px;
+  margin-bottom: var(--app-theme-spacing-md-plus);
 }
 
 .activity-stat {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: var(--app-theme-spacing-xs);
 
   &__value {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: var(--app-theme-font-size-2xl);
+    font-weight: var(--app-theme-font-weight-extra-bold);
   }
 
   &__label {
-    font-size: 11px;
+    font-size: var(--app-theme-font-size-micro);
     color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
   }
 }
 
-// Section C — distribution bars
+// ── Section C — distribution bars ────────────────────────────────────────────
+
 .food-type-bars {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--app-theme-spacing-sm-plus);
 }
 
 .food-type-bar {
   display: grid;
   grid-template-columns: 80px 1fr 32px;
   align-items: center;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
 
   &__label {
-    font-size: 12px;
+    font-size: var(--app-theme-font-size-small);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -108,74 +127,76 @@
 
   &__track {
     background: color-mix(in srgb, var(--ion-text-color) 8%, transparent);
-    border-radius: 4px;
-    height: 8px;
+    border-radius: var(--app-theme-spacing-xs);
+    height: var(--app-theme-spacing-sm);
     overflow: hidden;
   }
 
   &__fill {
     height: 100%;
     background: var(--ion-color-primary);
-    border-radius: 4px;
-    transition: width 300ms ease;
+    border-radius: var(--app-theme-spacing-xs);
+    transition: width var(--app-theme-transition-slow);
   }
 
   &__count {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--app-theme-font-size-small);
+    font-weight: var(--app-theme-font-weight-bold);
     text-align: right;
   }
 }
 
-// Section D — PRO teaser
+// ── Section D — PRO teaser ───────────────────────────────────────────────────
+
 .pro-teaser {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 8px;
-  padding: 8px 0;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-sm) 0;
 
   &__lock {
     position: absolute;
     top: 0;
     right: 0;
-    color: color-mix(in srgb, var(--ion-color-primary) 50%, transparent);
-    ion-icon { font-size: 18px; }
+    color: color-mix(in srgb, var(--ion-color-tertiary) 55%, transparent);
+    ion-icon { font-size: var(--app-theme-icon-size-sm); }
   }
 
   &__icon {
-    font-size: 36px;
-    color: var(--ion-color-primary);
-    margin-bottom: 4px;
+    font-size: var(--app-theme-icon-size-xl);
+    color: var(--ion-color-tertiary);
+    margin-bottom: var(--app-theme-spacing-xs);
   }
 
   &__title {
-    font-size: 16px;
-    font-weight: 700;
+    font-size: var(--app-theme-font-size-title);
+    font-weight: var(--app-theme-font-weight-extra-bold);
     margin: 0;
   }
 
   &__description {
-    font-size: 13px;
+    font-size: var(--app-theme-font-size-small);
     color: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
     margin: 0;
-    line-height: 1.4;
+    line-height: var(--app-theme-line-height-normal);
   }
 }
 
-// PRO Analysis section
+// ── PRO Analysis section ─────────────────────────────────────────────────────
+
 .pro-generate {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 8px 0;
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-sm) 0;
 
   &__icon {
-    font-size: 40px;
-    color: var(--ion-color-primary);
+    font-size: var(--app-theme-icon-size-xl);
+    color: var(--ion-color-tertiary);
   }
 }
 
@@ -183,11 +204,11 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: var(--app-theme-spacing-sm);
+  margin-bottom: var(--app-theme-spacing-md);
 
   &__stale {
-    font-size: 11px;
+    font-size: var(--app-theme-font-size-micro);
     color: color-mix(in srgb, var(--ion-text-color) 45%, transparent);
     flex: 1;
   }
@@ -195,48 +216,51 @@
   &__refresh {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    color: var(--ion-color-primary);
+    gap: var(--app-theme-spacing-xs);
+    font-size: var(--app-theme-font-size-small);
+    color: var(--ion-color-tertiary);
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
+    padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
+    border-radius: var(--app-theme-radius-xs);
 
-    ion-icon { font-size: 14px; }
+    ion-icon { font-size: var(--app-theme-icon-size-xs); }
 
     &:disabled { opacity: 0.4; cursor: default; }
   }
 }
 
 .pro-section {
-  margin-bottom: 14px;
+  margin-bottom: var(--app-theme-spacing-md-plus);
 
   &:last-child { margin-bottom: 0; }
 
   &__title {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    margin: 0 0 8px;
+    gap: var(--app-theme-spacing-xs-plus);
+    font-size: var(--app-theme-font-size-small);
+    font-weight: var(--app-theme-font-weight-bold);
+    margin: 0 0 var(--app-theme-spacing-sm);
     color: color-mix(in srgb, var(--ion-text-color) 80%, transparent);
 
-    ion-icon { font-size: 16px; color: var(--ion-color-primary); }
+    ion-icon {
+      font-size: var(--app-theme-icon-size-sm);
+      color: var(--ion-color-tertiary);
+    }
   }
 
   &__list {
     margin: 0;
-    padding-left: 16px;
+    padding-left: var(--app-theme-spacing-lg);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--app-theme-spacing-xs);
 
     li {
-      font-size: 13px;
-      line-height: 1.4;
+      font-size: var(--app-theme-font-size-small);
+      line-height: var(--app-theme-line-height-normal);
       color: color-mix(in srgb, var(--ion-text-color) 85%, transparent);
     }
   }
@@ -245,70 +269,90 @@
 .pro-error {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  gap: var(--app-theme-spacing-sm);
+  font-size: var(--app-theme-font-size-small);
   color: var(--ion-color-danger);
 
-  ion-icon { font-size: 18px; flex-shrink: 0; }
-
+  ion-icon { font-size: var(--app-theme-icon-size-sm); flex-shrink: 0; }
   span { flex: 1; }
 }
 
-// Coverage card
+// ── Coverage card ────────────────────────────────────────────────────────────
+
 .coverage-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px;
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-md-plus);
   background: var(--ion-item-background);
-  border-radius: 10px;
+  border-radius: var(--app-theme-radius-sm-plus, 10px);
 
-  ion-icon { font-size: 22px; color: var(--ion-color-primary); color: color-mix(in srgb, var(--ion-text-color) 60%, transparent); }
+  ion-icon {
+    font-size: var(--app-theme-icon-size-md);
+    color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  }
 
-  &__value { font-size: 16px; font-weight: 600; flex: 1; }
-  &__hint { font-size: 12px; color: color-mix(in srgb, var(--ion-text-color) 60%, transparent); }
-  &__info { display: flex; flex-direction: column; }
+  &__value {
+    font-size: var(--app-theme-font-size-title);
+    font-weight: var(--app-theme-font-weight-bold);
+    flex: 1;
+  }
+
+  &__hint {
+    font-size: var(--app-theme-font-size-small);
+    color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
-// Rotation badge
+// ── Rotation badge ───────────────────────────────────────────────────────────
+
 .rotation-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
+  gap: var(--app-theme-spacing-xs-plus);
+  margin-top: var(--app-theme-spacing-sm-plus);
+  padding: var(--app-theme-spacing-xs-plus) var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-radius-xl);
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-semibold);
   background: var(--ion-item-background);
   color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
 }
 
-// Distribution badges
-.distribution-badges { margin-top: 12px; }
+// ── Distribution badges ──────────────────────────────────────────────────────
+
+.distribution-badges { margin-top: var(--app-theme-spacing-md); }
+
 .distribution-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  margin-bottom: 4px;
+  gap: var(--app-theme-spacing-xs-plus);
+  font-size: var(--app-theme-font-size-small);
+  margin-bottom: var(--app-theme-spacing-xs);
   color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
 }
 
-// Quality score
+// ── Quality score ────────────────────────────────────────────────────────────
+
 .quality-score {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: var(--app-theme-spacing-sm);
+  margin-bottom: var(--app-theme-spacing-lg);
 
   &__value {
-    font-size: 36px;
-    font-weight: 700;
-    line-height: 1;
+    font-size: var(--app-theme-font-size-display);
+    font-weight: var(--app-theme-font-weight-extra-bold);
+    line-height: var(--app-theme-line-height-display);
   }
+
   &__label {
-    font-size: 14px;
+    font-size: var(--app-theme-font-size-body);
     color: var(--ion-color-medium);
     text-transform: capitalize;
   }
@@ -319,29 +363,35 @@
   &[data-label='poor']      .quality-score__value { color: var(--ion-color-danger); }
 }
 
-// Quality bars
-.quality-bars { display: flex; flex-direction: column; gap: 10px; }
+// ── Quality bars ─────────────────────────────────────────────────────────────
+
+.quality-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-sm-plus);
+}
 
 .quality-bar-row {
   display: grid;
   grid-template-columns: 90px 1fr 40px;
   align-items: center;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
 
-  &__label { font-size: 13px; }
-  &__pct   { font-size: 12px; text-align: right; }
+  &__label { font-size: var(--app-theme-font-size-small); }
+  &__pct   { font-size: var(--app-theme-font-size-small); text-align: right; }
 
   &__track {
-    height: 8px;
+    height: var(--app-theme-spacing-sm);
     background: var(--ion-color-light-shade);
-    border-radius: 4px;
+    border-radius: var(--app-theme-spacing-xs);
     overflow: hidden;
   }
+
   &__fill {
     height: 100%;
-    border-radius: 3px;
+    border-radius: var(--app-theme-radius-2xs);
     background: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
-    transition: width 0.3s ease;
+    transition: width var(--app-theme-transition-slow);
 
     &--good    { background: var(--ion-color-success); }
     &--warning { background: var(--ion-color-warning); }

@@ -4,10 +4,10 @@
 }
 
 .quantity-sheet-content {
-  --padding-top: 16px;
-  --padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-  --padding-start: 20px;
-  --padding-end: 20px;
+  --padding-top: var(--app-theme-spacing-lg);
+  --padding-bottom: calc(var(--app-theme-spacing-xl) + env(safe-area-inset-bottom, 0px));
+  --padding-start: var(--app-theme-spacing-xl);
+  --padding-end: var(--app-theme-spacing-xl);
   height: 100%;
 }
 
@@ -15,13 +15,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: var(--app-theme-spacing-md);
+  margin-bottom: var(--app-theme-spacing-lg);
 }
 
 .sheet-title {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: var(--app-theme-font-size-lg);
+  font-weight: var(--app-theme-font-weight-bold);
   color: var(--app-theme-text-color);
   margin: 0;
   flex: 1;
@@ -31,8 +31,8 @@
 }
 
 .close-button {
-  --padding-start: 6px;
-  --padding-end: 6px;
+  --padding-start: var(--app-theme-spacing-xs-plus);
+  --padding-end: var(--app-theme-spacing-xs-plus);
   --color: var(--app-theme-text-subtle);
   height: 32px;
   min-width: 32px;
@@ -43,22 +43,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: var(--app-theme-spacing-sm);
+  margin-bottom: var(--app-theme-spacing-lg);
 }
 
 .quantity-label {
-  font-size: 0.7rem;
-  font-weight: 500;
+  font-size: var(--app-theme-font-size-micro); // uppercase label — visually correct at ~11.5px
+  font-weight: var(--app-theme-font-weight-semibold);
   color: var(--app-theme-text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .quantity-hint {
-  font-size: 0.65rem;
+  font-size: 0.65rem; // intentionally smaller than micro — secondary context hint
   color: var(--app-theme-text-subtle);
-  margin-top: -4px;
+  margin-top: calc(-1 * var(--app-theme-spacing-xs));
   text-align: center;
 }
 
@@ -66,8 +66,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin-top: 4px;
+  gap: var(--app-theme-spacing-lg);
+  margin-top: var(--app-theme-spacing-xs);
 }
 
 .control-button {
@@ -95,37 +95,37 @@
 }
 
 .control-button ion-icon {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: var(--app-theme-icon-size-md);
+  font-weight: var(--app-theme-font-weight-extra-bold);
 }
 
 .quantity-display {
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs-plus);
   min-width: 80px;
-  padding: 0 8px;
+  padding: 0 var(--app-theme-spacing-sm);
 }
 
 .quantity-number {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: var(--app-theme-font-size-3xl);
+  font-weight: var(--app-theme-font-weight-extra-bold);
   color: var(--app-theme-text-color);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs-plus);
 }
 
 .quantity-original {
   color: color-mix(in srgb, var(--ion-text-color) 40%, transparent);
-  font-size: 1.5rem;
+  font-size: var(--app-theme-font-size-2xl);
 }
 
 .quantity-arrow {
-  font-size: 1rem;
+  font-size: var(--app-theme-font-size-title);
   color: color-mix(in srgb, var(--ion-text-color) 40%, transparent);
 }
 
@@ -138,43 +138,42 @@
 }
 
 .quantity-unit {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: var(--app-theme-font-size-title);
+  font-weight: var(--app-theme-font-weight-bold);
   color: var(--app-theme-text-subtle);
 }
 
 .quantity-zero-hint {
-  font-size: 0.75rem;
+  font-size: var(--app-theme-font-size-small);
   color: var(--ion-color-warning-shade);
   text-align: center;
   margin: 0;
-  padding: 6px 12px;
+  padding: var(--app-theme-spacing-xs-plus) var(--app-theme-spacing-md);
   background: color-mix(in srgb, var(--ion-color-warning) 12%, transparent);
-  border-radius: 8px;
+  border-radius: var(--app-theme-radius-sm);
 }
 
 .expiry-chip-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs-plus);
   overflow: hidden;
   min-width: 0;
-  margin-top: 4px;
+  margin-top: var(--app-theme-spacing-xs);
 }
 
-
 .actions-section {
-  border-top: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  border-top: 1px solid var(--app-theme-card-border-color);
 }
 
 .details-button {
-  --padding-top: 12px;
-  --padding-bottom: 12px;
-  font-weight: 500;
+  --padding-top: var(--app-theme-spacing-md);
+  --padding-bottom: var(--app-theme-spacing-md);
+  font-weight: var(--app-theme-font-weight-semibold);
   color: var(--ion-text-color);
 }
 
 .details-button ion-icon {
-  font-size: 20px;
+  font-size: var(--app-theme-icon-size-md);
 }

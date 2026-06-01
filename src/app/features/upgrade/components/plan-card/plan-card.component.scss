@@ -1,92 +1,102 @@
 :host {
-  --plan-card-green: var(--ion-color-success, #2dd36f);
-  --plan-card-green-strong: color-mix(in srgb, var(--plan-card-green) 80%, #09140b);
-  --plan-card-green-soft: color-mix(in srgb, var(--ion-card-background) 70%, var(--plan-card-green) 30%);
-  --plan-card-green-softer: color-mix(in srgb, var(--ion-card-background) 88%, var(--plan-card-green) 12%);
-  --plan-card-border: color-mix(in srgb, var(--plan-card-green) 40%, transparent);
-  --plan-card-text: color-mix(in srgb, var(--ion-text-color) 90%, #0a120c);
-  --plan-card-pill-bg: color-mix(in srgb, var(--plan-card-green) 24%, transparent);
+  // PRO accent — tertiary (violet) anchors premium surfaces. Renamed locally
+  // from --plan-card-green (was --ion-color-success) in v4.4-refresh.
+  --plan-card-accent: var(--ion-color-tertiary);
+  --plan-card-accent-strong: color-mix(in srgb, var(--plan-card-accent) 80%, var(--ion-text-color));
+  --plan-card-accent-soft: color-mix(in srgb, var(--ion-card-background) 70%, var(--plan-card-accent) 30%);
+  --plan-card-accent-softer: color-mix(in srgb, var(--ion-card-background) 88%, var(--plan-card-accent) 12%);
+  --plan-card-border: color-mix(in srgb, var(--plan-card-accent) 40%, transparent);
+  --plan-card-text: color-mix(in srgb, var(--ion-text-color) 90%, var(--ion-text-color));
+  --plan-card-pill-bg: color-mix(in srgb, var(--plan-card-accent) 24%, transparent);
 }
 
 .plan-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 18px;
-  border-radius: 18px;
-  background: linear-gradient(140deg, var(--plan-card-green-softer), var(--plan-card-green-soft));
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-lg-plus);
+  border-radius: var(--app-theme-radius-xl);
+  background: linear-gradient(140deg, var(--plan-card-accent-softer), var(--plan-card-accent-soft));
   color: var(--plan-card-text);
   border: 1px solid var(--plan-card-border);
-  box-shadow: 0 18px 42px color-mix(in srgb, var(--plan-card-green) 18%, transparent);
+  box-shadow: var(--app-theme-shadow-lg);
+  transition: transform var(--app-theme-transition-normal), box-shadow var(--app-theme-transition-normal);
+
+  &:hover {
+    transform: var(--app-theme-card-hover-transform);
+    box-shadow: var(--app-theme-card-hover-shadow);
+  }
 }
 
 .plan-card--selected {
-  border-color: color-mix(in srgb, var(--plan-card-green) 65%, transparent);
-  box-shadow: 0 20px 48px color-mix(in srgb, var(--plan-card-green) 35%, transparent);
+  border-color: color-mix(in srgb, var(--plan-card-accent) 65%, transparent);
+  box-shadow: var(--app-theme-shadow-xl);
 }
 
 .plan-card--highlight {
-  background: linear-gradient(135deg, var(--plan-card-green-strong), var(--plan-card-green));
-  color: var(--ion-color-success-contrast, #050a05);
-  box-shadow: 0 20px 50px color-mix(in srgb, var(--plan-card-green) 45%, transparent);
+  background: linear-gradient(135deg, var(--plan-card-accent-strong), var(--plan-card-accent));
+  color: var(--ion-color-tertiary-contrast);
+  box-shadow: var(--app-theme-shadow-xl);
 }
 
 .plan-card__badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  padding: 6px 10px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--plan-card-green) 20%, transparent);
+  top: var(--app-theme-spacing-md);
+  right: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-xs-plus) var(--app-theme-spacing-sm-plus);
+  border-radius: var(--app-theme-radius-md);
+  background: color-mix(in srgb, var(--plan-card-accent) 20%, transparent);
   color: var(--plan-card-text);
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-weight: var(--app-theme-font-weight-extra-bold);
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow);
 }
 
 .plan-card__header h3 {
-  margin: 4px 0 2px;
-  font-size: 20px;
+  margin: var(--app-theme-spacing-xs) 0 var(--app-theme-spacing-2xs);
+  font-size: var(--app-theme-font-size-xl);
+  letter-spacing: var(--app-theme-letter-spacing-tight);
 }
 
 .plan-card__price {
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs-plus);
 }
 
 .plan-card__amount {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: var(--app-theme-font-size-3xl);
+  font-weight: var(--app-theme-font-weight-display);
+  letter-spacing: var(--app-theme-letter-spacing-display);
 }
 
 .plan-card__period {
-  font-size: 14px;
+  font-size: var(--app-theme-font-size-body);
   opacity: 0.78;
 }
 
 .plan-card__meta {
   display: flex;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
   flex-wrap: wrap;
 }
 
 .pill {
-  padding: 6px 10px;
-  border-radius: 12px;
+  padding: var(--app-theme-spacing-xs-plus) var(--app-theme-spacing-sm-plus);
+  border-radius: var(--app-theme-radius-md);
   background: var(--plan-card-pill-bg);
   color: var(--plan-card-text);
-  font-weight: 600;
+  font-weight: var(--app-theme-font-weight-bold);
 }
 
 .pill--trial {
-  background: color-mix(in srgb, var(--plan-card-green) 30%, transparent);
-  color: var(--ion-color-success-contrast, #061408);
+  background: color-mix(in srgb, var(--plan-card-accent) 30%, transparent);
+  color: var(--ion-color-tertiary-contrast);
 }
 
 .plan-card--highlight .pill--trial {
-  background: color-mix(in srgb, var(--ion-color-success-contrast, #051005) 18%, transparent);
-  color: var(--ion-color-success-contrast, #051005);
+  background: color-mix(in srgb, var(--ion-color-tertiary-contrast) 18%, transparent);
+  color: var(--ion-color-tertiary-contrast);
 }
 
 .plan-card__list {
@@ -95,14 +105,14 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
   color: inherit;
 }
 
 .plan-card__list li {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
 }
 
 .plan-card ion-button {

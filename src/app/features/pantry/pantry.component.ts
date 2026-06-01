@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, ViewChild } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
   IonButtons,
@@ -90,16 +90,24 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 export class PantryComponent implements OnDestroy {
   readonly facade = inject(PantryStateService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly addModalState = inject(PantryAddModalStateService);
   @ViewChild(IonContent) private content!: IonContent;
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
 
-    // Check if onboarding requested to open add modal (first engagement)
+    // Onboarding may request a fresh add-modal open (first engagement).
+    // Consume the query param right away so it does not re-trigger on tab switches.
     const shouldOpenModal = this.route.snapshot.queryParams['openAddModal'] === 'true';
     if (shouldOpenModal) {
       this.addModalState.openAddModal();
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { openAddModal: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
     }
   }
 

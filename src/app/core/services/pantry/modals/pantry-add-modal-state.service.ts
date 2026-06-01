@@ -55,8 +55,7 @@ export class PantryAddModalStateService {
       return '';
     }
     const formatted = formatFriendlyName(name, name);
-    return this.translate.instant('pantry.fastAdd.addNew')
-      .replace('{{ name }}', formatted);
+    return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   });
 
   /**
@@ -132,12 +131,8 @@ export class PantryAddModalStateService {
       }
       this.dismissAddModal();
       const msg = entries.length === 1
-        ? this.translate.instant('pantry.toasts.createSuccess')
-          .replace('{{ name }}', entries[0].name)
-          .replace('{{ quantity }}', '')
-          .replace('{{ breakdown }}', '')
-        : this.translate.instant('pantry.toasts.multipleAdded')
-          .replace('{{ count }}', String(entries.length));
+        ? this.translate.instant('pantry.toasts.createSuccess', { name: entries[0].name, quantity: '', breakdown: '' })
+        : this.translate.instant('pantry.toasts.multipleAdded', { count: entries.length });
       const toast = await this.toastCtrl.create({ message: msg, duration: 1500, position: 'bottom' });
       void toast.present();
     }).catch(async err => {

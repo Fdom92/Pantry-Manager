@@ -3,44 +3,56 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 18px 16px;
-  border-radius: 16px;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-lg-plus) var(--app-theme-spacing-lg);
+  border-radius: var(--app-theme-radius-lg);
   text-align: center;
-  animation: emptyFade 240ms ease;
+  animation: emptyFade var(--app-theme-transition-slow);
 }
 
 .empty-state--compact {
-  padding: 12px 10px;
-  gap: 6px;
-  border-radius: 12px;
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-sm-plus);
+  gap: var(--app-theme-spacing-xs-plus);
+  border-radius: var(--app-theme-radius-md);
   box-shadow: none;
 }
 
 .empty-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+  width: var(--app-theme-control-size-xl);   // 56px — was 52px hardcoded
+  height: var(--app-theme-control-size-xl);
+  border-radius: var(--app-theme-radius-md);
   display: grid;
   place-items: center;
   background: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
   color: var(--ion-color-primary);
-  font-size: 26px;
+  font-size: var(--app-theme-icon-size-lg);
 }
 
+// Color variants — each maps to the matching ion-color token. Names previously
+// lied (warning→secondary mint, success→primary teal). Fixed v4.4-refresh.
 .empty-icon.color-warning {
-  background: color-mix(in srgb, var(--ion-color-secondary) 18%, transparent);
-  color: var(--ion-color-secondary);
+  background: color-mix(in srgb, var(--ion-color-warning) 18%, transparent);
+  color: var(--ion-color-warning);
 }
 
 .empty-icon.color-success {
-  background: color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
-  color: var(--ion-color-primary);
+  background: color-mix(in srgb, var(--ion-color-success) 18%, transparent);
+  color: var(--ion-color-success);
+}
+
+.empty-icon.color-danger {
+  background: color-mix(in srgb, var(--ion-color-danger) 15%, transparent);
+  color: var(--ion-color-danger);
+}
+
+.empty-icon.color-tertiary {
+  background: color-mix(in srgb, var(--ion-color-tertiary) 18%, transparent);
+  color: var(--ion-color-tertiary);
 }
 
 .empty-icon.color-secondary {
-  background: color-mix(in srgb, var(--ion-text-color) 18%, transparent);
-  color: var(--ion-text-color);
+  background: color-mix(in srgb, var(--ion-color-secondary) 60%, transparent);
+  color: var(--ion-color-secondary-contrast);
 }
 
 .empty-icon.color-medium {
@@ -49,31 +61,31 @@
 }
 
 .empty-copy h3 {
-  margin: 4px 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--app-surface-title);
+  margin: var(--app-theme-spacing-xs) 0;
+  font-size: var(--app-theme-font-size-title);
+  font-weight: var(--app-theme-font-weight-extra-bold);
+  color: var(--app-theme-text-color);
 }
 
 .empty-copy p {
   margin: 0;
-  color: var(--app-surface-muted);
-  line-height: 1.4;
-  font-size: 12px;
+  color: var(--app-theme-text-muted);
+  line-height: var(--app-theme-line-height-normal);
+  font-size: var(--app-theme-font-size-tiny);
 }
 
 .empty-action {
   margin-top: 2px;
-  --border-radius: 14px;
-  --padding-start: 16px;
-  --padding-end: 16px;
-  font-weight: 700;
+  --border-radius: var(--app-theme-radius-md);
+  --padding-start: var(--app-theme-spacing-lg);
+  --padding-end: var(--app-theme-spacing-lg);
+  font-weight: var(--app-theme-font-weight-extra-bold);
 }
 
 @keyframes emptyFade {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(var(--app-theme-spacing-xs-plus));
   }
   to {
     opacity: 1;

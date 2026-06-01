@@ -13,40 +13,62 @@
       "skip": "Überspringen",
       "next": "Weiter",
       "start": "Starten",
-      "skipHint": "Du kannst dieses Tutorial jederzeit überspringen."
+      "skipHint": "Du kannst dieses Tutorial jederzeit überspringen.",
+      "continue": "Weiter",
+      "enter": "Vorratskammer öffnen",
+      "notifyMe": "Ja, benachrichtige mich",
+      "notifyLater": "Später"
     },
     "slides": {
-      "problem": {
-        "title": "Vermeide Lebensmittelverschwendung",
-        "description": "Behalte den Überblick, ohne darüber nachdenken zu müssen."
+      "notifications": {
+        "title": "Hinweis vor dem Ablaufen",
+        "description": "Wir benachrichtigen dich, wenn etwas bald abläuft oder zur Neige geht.",
+        "previewTitle": "Produkte laufen bald ab",
+        "previewBody": "3 Produkte laufen diese Woche ab"
       },
-      "simple": {
-        "title": "Organisiere deinen Vorrat in Sekunden",
-        "description": "Füge Produkte hinzu, verfolge Mengen und erhalte Warnungen vor Ablauf."
+      "seed": {
+        "title": "Was hast du jetzt in der Vorratskammer?",
+        "description": "Tippe an, was du schon hast. Mengen bearbeitest du später. Kannst diesen Schritt überspringen.",
+        "selectedCount": "{{ count }} ausgewählt",
+        "skip": "Diesen Schritt überspringen"
       },
-      "benefit": {
-        "title": "Spare Geld und Zeit",
-        "description": "Kaufe nur, was du brauchst, und nutze, was du hast."
-      },
-      "action": {
-        "title": "Jetzt starten",
-        "description": "Füge dein erstes Produkt hinzu."
-      },
-      "fresh": {
-        "title": "Füge hinzu, was du kaufst",
-        "description": "Wir informieren dich, wenn etwas fehlt."
+      "confirm": {
+        "title": "Deine Vorratskammer ist bereit 👌",
+        "description": "Wir haben deine Auswahl hinzugefügt.",
+        "titleEmpty": "Kein Problem",
+        "descriptionEmpty": "Du kannst deine Produkte hinzufügen, wann du willst.",
+        "emptyBody": "Füge sie einzeln aus der Vorratskammer hinzu.",
+        "noExpiryLabel": "Kein Ablaufdatum",
+        "needsDateLabel": "Datum ausstehend",
+        "adjustHint": "Daten und Mengen kannst du später in deiner Vorratskammer anpassen."
       }
     },
-    "mock": {
+    "quickSeed": {
       "items": {
         "milk": "Milch",
+        "eggs": "Eier",
+        "cheese": "Käse",
+        "butter": "Butter",
+        "yogurt": "Joghurt",
+        "cannedTuna": "Thunfisch",
+        "bread": "Brot",
         "pasta": "Nudeln",
-        "tomatoes": "Tomaten"
-      },
-      "status": {
-        "expired": "Abgelaufen",
-        "low": "Niedrig",
-        "ok": "OK"
+        "rice": "Reis",
+        "flour": "Mehl",
+        "chickpeas": "Kichererbsen",
+        "lentils": "Linsen",
+        "tomato": "Tomate",
+        "onion": "Zwiebel",
+        "potato": "Kartoffel",
+        "lemon": "Zitrone",
+        "apple": "Apfel",
+        "banana": "Banane",
+        "oliveOil": "Öl",
+        "salt": "Salz",
+        "pepper": "Pfeffer",
+        "sugar": "Zucker",
+        "coffee": "Kaffee",
+        "vinegar": "Essig"
       }
     }
   },
@@ -95,6 +117,10 @@
   "dashboard": {
     "title": "Start",
     "aria": "Dashboard deiner Speisekammer",
+    "empty": {
+      "title": "Noch keine Daten",
+      "subtitle": "Füge Produkte im Tab Vorratskammer hinzu, um hier Übersicht, Hinweise und Vorschläge zu sehen."
+    },
     "confirmDeleteExpired": "Dadurch werden alle abgelaufenen Produkte gelöscht. Möchtest du fortfahren?",
     "health": {
       "critical": {
