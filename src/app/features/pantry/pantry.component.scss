@@ -514,11 +514,19 @@ ion-modal.quantity-sheet ion-content {
   }
 }
 
+// Section divider — subtle gradient fade, strongest at center, transparent
+// at edges. Reads as a soft transition rather than a hard rule. More elegant
+// than a solid 1px border, more visible than the previous 0.25 opacity.
+// If you ever want a hard divider, use `background: var(--app-theme-card-border-color)`.
 .pantry-section-divider {
   height: 1px;
-  background: var(--app-theme-card-border-color);
-  margin: var(--app-theme-spacing-md) var(--app-theme-card-margin-inline);
-  opacity: 0.25;
+  margin: var(--app-theme-spacing-lg) var(--app-theme-card-margin-inline);
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--ion-text-color) 18%, transparent) 50%,
+    transparent
+  );
 }
 
 .fresh-list {
