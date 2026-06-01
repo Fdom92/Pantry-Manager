@@ -1,11 +1,13 @@
 :host {
-  --plan-card-green: var(--ion-color-success);
-  --plan-card-green-strong: color-mix(in srgb, var(--plan-card-green) 80%, var(--ion-text-color));
-  --plan-card-green-soft: color-mix(in srgb, var(--ion-card-background) 70%, var(--plan-card-green) 30%);
-  --plan-card-green-softer: color-mix(in srgb, var(--ion-card-background) 88%, var(--plan-card-green) 12%);
-  --plan-card-border: color-mix(in srgb, var(--plan-card-green) 40%, transparent);
+  // PRO accent — tertiary (violet) anchors premium surfaces. Renamed locally
+  // from --plan-card-green (was --ion-color-success) in v4.4-refresh.
+  --plan-card-accent: var(--ion-color-tertiary);
+  --plan-card-accent-strong: color-mix(in srgb, var(--plan-card-accent) 80%, var(--ion-text-color));
+  --plan-card-accent-soft: color-mix(in srgb, var(--ion-card-background) 70%, var(--plan-card-accent) 30%);
+  --plan-card-accent-softer: color-mix(in srgb, var(--ion-card-background) 88%, var(--plan-card-accent) 12%);
+  --plan-card-border: color-mix(in srgb, var(--plan-card-accent) 40%, transparent);
   --plan-card-text: color-mix(in srgb, var(--ion-text-color) 90%, var(--ion-text-color));
-  --plan-card-pill-bg: color-mix(in srgb, var(--plan-card-green) 24%, transparent);
+  --plan-card-pill-bg: color-mix(in srgb, var(--plan-card-accent) 24%, transparent);
 }
 
 .plan-card {
@@ -15,21 +17,27 @@
   gap: var(--app-theme-spacing-md);
   padding: var(--app-theme-spacing-lg-plus);
   border-radius: var(--app-theme-radius-xl);
-  background: linear-gradient(140deg, var(--plan-card-green-softer), var(--plan-card-green-soft));
+  background: linear-gradient(140deg, var(--plan-card-accent-softer), var(--plan-card-accent-soft));
   color: var(--plan-card-text);
   border: 1px solid var(--plan-card-border);
-  box-shadow: 0 18px 42px color-mix(in srgb, var(--plan-card-green) 18%, transparent);
+  box-shadow: var(--app-theme-shadow-lg);
+  transition: transform var(--app-theme-transition-normal), box-shadow var(--app-theme-transition-normal);
+
+  &:hover {
+    transform: var(--app-theme-card-hover-transform);
+    box-shadow: var(--app-theme-card-hover-shadow);
+  }
 }
 
 .plan-card--selected {
-  border-color: color-mix(in srgb, var(--plan-card-green) 65%, transparent);
-  box-shadow: 0 20px 48px color-mix(in srgb, var(--plan-card-green) 35%, transparent);
+  border-color: color-mix(in srgb, var(--plan-card-accent) 65%, transparent);
+  box-shadow: var(--app-theme-shadow-xl);
 }
 
 .plan-card--highlight {
-  background: linear-gradient(135deg, var(--plan-card-green-strong), var(--plan-card-green));
-  color: var(--ion-color-success-contrast);
-  box-shadow: 0 20px 50px color-mix(in srgb, var(--plan-card-green) 45%, transparent);
+  background: linear-gradient(135deg, var(--plan-card-accent-strong), var(--plan-card-accent));
+  color: var(--ion-color-tertiary-contrast);
+  box-shadow: var(--app-theme-shadow-xl);
 }
 
 .plan-card__badge {
@@ -38,15 +46,16 @@
   right: var(--app-theme-spacing-md);
   padding: var(--app-theme-spacing-xs-plus) var(--app-theme-spacing-sm-plus);
   border-radius: var(--app-theme-radius-md);
-  background: color-mix(in srgb, var(--plan-card-green) 20%, transparent);
+  background: color-mix(in srgb, var(--plan-card-accent) 20%, transparent);
   color: var(--plan-card-text);
   font-weight: var(--app-theme-font-weight-extra-bold);
-  letter-spacing: 0.05em;
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow);
 }
 
 .plan-card__header h3 {
   margin: var(--app-theme-spacing-xs) 0 var(--app-theme-spacing-2xs);
   font-size: var(--app-theme-font-size-xl);
+  letter-spacing: var(--app-theme-letter-spacing-tight);
 }
 
 .plan-card__price {
@@ -58,6 +67,7 @@
 .plan-card__amount {
   font-size: var(--app-theme-font-size-3xl);
   font-weight: var(--app-theme-font-weight-display);
+  letter-spacing: var(--app-theme-letter-spacing-display);
 }
 
 .plan-card__period {
@@ -80,13 +90,13 @@
 }
 
 .pill--trial {
-  background: color-mix(in srgb, var(--plan-card-green) 30%, transparent);
-  color: var(--ion-color-success-contrast);
+  background: color-mix(in srgb, var(--plan-card-accent) 30%, transparent);
+  color: var(--ion-color-tertiary-contrast);
 }
 
 .plan-card--highlight .pill--trial {
-  background: color-mix(in srgb, var(--ion-color-success-contrast) 18%, transparent);
-  color: var(--ion-color-success-contrast);
+  background: color-mix(in srgb, var(--ion-color-tertiary-contrast) 18%, transparent);
+  color: var(--ion-color-tertiary-contrast);
 }
 
 .plan-card__list {

@@ -114,7 +114,7 @@ ion-card-title {
 // ── Empty + skeleton ─────────────────────────────────────────────────────────
 
 .fade-in-list {
-  animation: fadeInList var(--app-theme-transition-slow);
+  animation: app-fade-in-list var(--app-theme-transition-slow);
 }
 
 .list-empty-state {
@@ -158,30 +158,10 @@ ion-card-title {
     transparent 100%
   );
   transform: translateX(-100%);
-  animation: shimmer 1.4s ease-in-out infinite;
+  animation: app-shimmer 1.4s ease-in-out infinite;
 }
 
-// ── Animations ───────────────────────────────────────────────────────────────
-
-@keyframes fadeInList {
-  from {
-    opacity: 0;
-    transform: translateY(var(--app-theme-spacing-xs-plus));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
+// Animations now live in global.scss: app-fade-in-list, app-shimmer.
 
 // ── Item list ────────────────────────────────────────────────────────────────
 
@@ -189,6 +169,9 @@ ion-card-title {
   --ion-item-background: var(--app-theme-card-bg);
   border-radius: var(--app-theme-card-border-radius);
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  // Baseline card shadow — list wrapper is a surface container, same tier as
+  // settings-card and other card-like containers across the app.
+  box-shadow: var(--app-theme-card-shadow);
   overflow: hidden;
   padding: 0;
 }
@@ -306,8 +289,10 @@ ion-card-title {
   padding: var(--app-theme-spacing-xs) 0;
 }
 
+// Bought rows already line-through their .bought-name; no global opacity dim
+// so the row stays legible instead of looking faded/disabled.
 .bought-list {
-  opacity: 0.6;
+  filter: saturate(0.6);
 }
 
 .bought-item {
@@ -338,7 +323,7 @@ ion-card-title {
 // ── FAB ─────────────────────────────────────────────────────────────────────
 
 ion-fab-button[size="small"] {
-  --box-shadow: 0 2px 8px color-mix(in srgb, var(--ion-text-color) 15%, transparent);
+  --box-shadow: var(--app-theme-shadow-md);
 }
 
 .buy-btn {

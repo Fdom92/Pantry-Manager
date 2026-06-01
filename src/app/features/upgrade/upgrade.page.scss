@@ -5,27 +5,29 @@ ion-title, ion-back-button {
 .upgrade-hero {
   padding: var(--app-theme-spacing-lg-plus) var(--app-theme-spacing-lg);
   border-radius: var(--app-theme-radius-xl);
+  // PRO accent — tertiary (violet) anchors all premium surfaces post v4.4-refresh.
   background: linear-gradient(
     135deg,
-    var(--ion-color-primary),
-    color-mix(in srgb, var(--ion-color-primary) 65%, var(--ion-card-background))
+    var(--ion-color-tertiary),
+    color-mix(in srgb, var(--ion-color-tertiary) 60%, var(--ion-card-background))
   );
-  color: var(--app-theme-text-color);
+  color: var(--ion-color-tertiary-contrast);
   text-align: center;
   margin-bottom: var(--app-theme-spacing-lg-plus);
-  box-shadow: 0 12px 32px color-mix(in srgb, var(--ion-color-primary) 28%, transparent);
-  border: 1px solid var(--ion-color-primary-shade);
+  box-shadow: var(--app-theme-shadow-xl);
+  border: 1px solid color-mix(in srgb, var(--ion-color-tertiary) 40%, transparent);
 
   h1 {
     margin: var(--app-theme-spacing-sm-plus) 0 var(--app-theme-spacing-xs-plus);
     font-weight: var(--app-theme-font-weight-display);
     font-size: var(--app-theme-font-size-3xl);
-    color: var(--app-theme-text-color);
+    color: var(--ion-color-tertiary-contrast);
+    letter-spacing: var(--app-theme-letter-spacing-display);
     text-shadow: none;
   }
 
   p {
-    color: var(--ion-text-color);
+    color: color-mix(in srgb, var(--ion-color-tertiary-contrast) 88%, transparent);
     margin: 0;
     text-shadow: none;
   }
@@ -37,10 +39,10 @@ ion-title, ion-back-button {
   justify-content: center;
   padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-lg);
   border-radius: var(--app-theme-radius-pill);
-  background: var(--ion-color-primary);
-  color: var(--ion-color-dark-contrast);
+  background: color-mix(in srgb, var(--ion-color-tertiary-contrast) 18%, transparent);
+  color: var(--ion-color-tertiary-contrast);
   font-weight: var(--app-theme-font-weight-display);
-  letter-spacing: 0.08em;
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow);
 }
 
 .plans-section {

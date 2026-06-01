@@ -81,19 +81,30 @@ export class ListStateService {
   async markAsBought(suggestion: ShoppingSuggestionWithItem): Promise<void> {
     const id = suggestion.item._id;
     const name = suggestion.item.name;
+    const isFresh = suggestion.reason === ShoppingReason.FRESH_EMPTY
+      || suggestion.reason === ShoppingReason.FRESH_LOW;
     this.boughtItemIds.update(set => new Set([...set, id]));
 
-    const qty = (suggestion.reason === ShoppingReason.FRESH_EMPTY || suggestion.reason === ShoppingReason.FRESH_LOW)
-      ? FRESH_QTY.sufficient
-      : suggestion.suggestedQuantity;
-
     try {
-      await this.pantryStore.addNewLot(id, { quantity: qty });
-      const msg = this.translate.instant('shopping.toasts.bought').replace('{{name}}', name);
+      if (isFresh) {
+        const item = suggestion.item;
+        const existingBatches = item.batches ?? [];
+        const updatedBatches = existingBatches.length > 0
+          ? [{ ...existingBatches[0], quantity: FRESH_QTY.sufficient }, ...existingBatches.slice(1)]
+          : [{ batchId: `batch-${Date.now()}`, quantity: FRESH_QTY.sufficient }];
+        await this.pantryStore.updateItem({
+          ...item,
+          batches: updatedBatches,
+          updatedAt: new Date().toISOString(),
+        });
+      } else {
+        await this.pantryStore.addNewLot(id, { quantity: suggestion.suggestedQuantity });
+      }
+      const msg = this.translate.instant('shopping.toasts.bought', { name });
       void this.showToast(msg);
       void this.reviewPrompt.handlePositiveAction();
     } catch (err) {
-      console.error('[ListStateService] markAsBought: addNewLot failed', err);
+      console.error('[ListStateService] markAsBought failed', err);
       this.boughtItemIds.update(set => {
         const next = new Set(set);
         next.delete(id);
@@ -107,7 +118,7 @@ export class ListStateService {
     if (!item) return;
     this.manualItems.update(list => list.filter(m => m.id !== id));
     this.boughtManuals.update(list => [...list, { id, name: item.name }]);
-    const msg = this.translate.instant('shopping.toasts.boughtManual').replace('{{name}}', item.name);
+    const msg = this.translate.instant('shopping.toasts.boughtManual', { name: item.name });
     void this.showToast(msg);
   }
 
@@ -115,7 +126,7 @@ export class ListStateService {
     const name = this.items().find(i => i._id === id)?.name;
     this.removedAutoIds.update(set => new Set([...set, id]));
     if (name) {
-      const msg = this.translate.instant('shopping.toasts.ignored').replace('{{name}}', name);
+      const msg = this.translate.instant('shopping.toasts.ignored', { name });
       void this.showToast(msg);
     }
   }
@@ -124,7 +135,7 @@ export class ListStateService {
     const item = this.manualItems().find(m => m.id === id);
     this.manualItems.update(list => list.filter(m => m.id !== id));
     if (item) {
-      const msg = this.translate.instant('shopping.toasts.removedManual').replace('{{name}}', item.name);
+      const msg = this.translate.instant('shopping.toasts.removedManual', { name: item.name });
       void this.showToast(msg);
     }
   }
@@ -311,8 +322,7 @@ export class ListStateService {
       timeOptions: { hour: '2-digit', minute: '2-digit' },
       fallback: '',
     });
-    const generatedOn = this.translate.instant('shopping.share.generatedOn')
-      .replace('{{ date }}', dateStr);
+    const generatedOn = this.translate.instant('shopping.share.generatedOn', { date: dateStr });
 
     doc.setFontSize(16);
     doc.text(title, marginX, 20);
@@ -337,9 +347,11 @@ export class ListStateService {
       y += lineHeight;
 
       for (const suggestion of group.suggestions) {
+        const isFresh = suggestion.reason === ShoppingReason.FRESH_EMPTY
+          || suggestion.reason === ShoppingReason.FRESH_LOW;
         const row = {
           product: suggestion.item?.name ?? '',
-          quantity: formatQuantity(suggestion.suggestedQuantity, locale),
+          quantity: isFresh ? '' : formatQuantity(suggestion.suggestedQuantity, locale),
           supermarket: suggestion.supermarket ?? unassignedLabel,
         };
         const productLines = doc.splitTextToSize(row.product, columnWidth.product);

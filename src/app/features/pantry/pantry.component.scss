@@ -16,12 +16,22 @@ ion-title {
 
 .summary-bar {
   position: sticky;
-  top: -16px;
+  top: 0;
   z-index: 10;
   margin-bottom: var(--app-theme-spacing-xs);
-  background: var(--ion-background-color);
+  padding-block: var(--app-theme-spacing-xs);
+  // Glass surface — translucent + backdrop-blur. Edge-to-edge bleed via
+  // negative inline margin matched by positive inline padding so chips align
+  // with content padding while the bar bg covers the full row.
+  background: var(--app-theme-glass-bg);
+  backdrop-filter: var(--app-theme-glass-blur);
+  -webkit-backdrop-filter: var(--app-theme-glass-blur);
   margin-inline: calc(-1 * var(--ion-padding, 16px));
   padding-inline: var(--ion-padding, 16px);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .summary-bar { background: var(--ion-background-color); }
 }
 
 .summary-chips {
@@ -50,7 +60,9 @@ ion-title {
 .summary-chips .status-chip ion-icon {
   font-size: var(--app-theme-icon-size-sm);
   margin-right: var(--app-theme-spacing-xs);
-  color: var(--app-theme-text-muted);
+  // Inherit chip color so icon never collides with bg (e.g. pendientes chip
+  // was medium-bg + medium-icon → invisible when active).
+  color: inherit;
 }
 
 .summary-chips .status-chip .chip-body {
@@ -71,57 +83,57 @@ ion-title {
   font-variant-numeric: tabular-nums;
 }
 
-.summary-chips .status-chip:not(.active) {
-  opacity: 0.5;
+// Chips use the tonal-vs-outline pattern (v4.4-refresh, revised):
+//   inactive → outline-only, full opacity, accent-tinted text
+//   active   → soft tonal fill (accent at ~22% over surface) + accent text
+//
+// Tonal-fill chosen over solid-fill because solid required mixing white text
+// (primary/success/danger/tertiary) with dark text (warning/medium) for WCAG
+// contrast. The mix produced inconsistent visual weight across the chip rail.
+// Tonal keeps a single text-color rule per chip (always the accent itself),
+// passes contrast (accent text on accent-tinted surface), and reads as a
+// unified family rather than 7 unrelated badges.
+//
+// Per-chip CSS variable: --chip-accent.
+
+.summary-chips .status-chip {
+  --background: transparent;
+  --color: var(--chip-accent, var(--app-theme-text-muted));
+  border: 1px solid color-mix(in srgb, var(--chip-accent, var(--ion-text-color)) 28%, transparent);
+  box-shadow: none;
+  transition:
+    background var(--app-theme-transition-fast),
+    color var(--app-theme-transition-fast),
+    border-color var(--app-theme-transition-fast),
+    box-shadow var(--app-theme-transition-fast);
 }
 
 .summary-chips .status-chip.active {
-  opacity: 1;
-  box-shadow: var(--app-theme-shadow-md);
-  outline: 2px solid var(--app-theme-card-border-color);
-  outline-offset: 2px;
+  // Tonal fill: accent mixed into card surface so text (accent) keeps high
+  // contrast regardless of the underlying accent's luminance.
+  --background: color-mix(in srgb, var(--chip-accent) 22%, var(--ion-card-background));
+  --color: var(--chip-accent);
+  border-color: color-mix(in srgb, var(--chip-accent) 45%, transparent);
+  box-shadow: var(--app-theme-shadow-xs);
+  font-weight: var(--app-theme-font-weight-extra-bold);
 }
 
-.summary-chips .status-chip.chip--all {
-  --background: var(--ion-color-success-tint);
-  --color: var(--ion-color-success-contrast);
-}
-
-.summary-chips .status-chip.chip--normal {
-  --background: var(--ion-color-primary);
-  --color: var(--ion-color-primary-contrast);
-}
-
+.summary-chips .status-chip.chip--all       { --chip-accent: var(--ion-color-success); }
+.summary-chips .status-chip.chip--normal    { --chip-accent: var(--ion-color-primary); }
 .summary-chips .status-chip.chip--low,
-.summary-chips .status-chip.chip--expiring {
-  --background: var(--ion-color-warning);
-  --color: var(--ion-color-dark);
-}
+.summary-chips .status-chip.chip--expiring  { --chip-accent: var(--ion-color-warning-shade); }
+.summary-chips .status-chip.chip--review    { --chip-accent: var(--ion-color-warning-shade); }
+.summary-chips .status-chip.chip--expired   { --chip-accent: var(--ion-color-danger); }
+.summary-chips .status-chip.chip--pendientes{ --chip-accent: var(--ion-color-medium-shade); }
 
-.summary-chips .status-chip.chip--review {
-  --background: var(--ion-color-warning-shade);
-  --color: var(--ion-color-dark);
-}
-
-.summary-chips .status-chip.chip--expired {
-  --background: var(--ion-color-danger);
-  --color: var(--ion-color-danger-contrast);
-}
-
-.summary-chips .status-chip.chip--pendientes {
-  --background: var(--ion-color-medium);
-  --color: var(--ion-color-medium-contrast);
-}
-
-.summary-chips .status-chip.chip--basic {
-  --background: var(--ion-color-tertiary);
-  --color: var(--ion-color-tertiary-contrast);
-}
+// chip--basic kept on medium tone (NOT tertiary — tertiary is now reserved
+// for PRO/premium; basic items are operational, not premium).
+.summary-chips .status-chip.chip--basic     { --chip-accent: var(--ion-color-medium-shade); }
 
 // ── List + empty state + skeleton ────────────────────────────────────────────
 
 .fade-in-list {
-  animation: fadeInList var(--app-theme-transition-slow);
+  animation: app-fade-in-list var(--app-theme-transition-slow);
 }
 
 .list-empty-state {
@@ -164,7 +176,7 @@ ion-title {
     transparent 100%
   );
   transform: translateX(-100%);
-  animation: shimmer 1.4s ease-in-out infinite;
+  animation: app-shimmer 1.4s ease-in-out infinite;
 }
 
 // ── Category stack + virtual cards ──────────────────────────────────────────
@@ -203,7 +215,7 @@ ion-title {
   display: flex;
   position: relative;
   z-index: 1;
-  animation: fadeInList var(--app-theme-transition-slow);
+  animation: app-fade-in-list var(--app-theme-transition-slow);
 }
 
 .virtual-item-card--deleting {
@@ -402,34 +414,14 @@ ion-card-header {
   margin: 0;
 }
 
-// ── Animations ──────────────────────────────────────────────────────────────
-
-@keyframes fadeInList {
-  from {
-    opacity: 0;
-    transform: translateY(var(--app-theme-spacing-xs-plus));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
+// Animations now live in global.scss: app-fade-in-list, app-shimmer.
 
 // ── Quantity sheet modal ────────────────────────────────────────────────────
 
 ion-modal.quantity-sheet {
   --background: var(--ion-background-color);
   --border-radius: var(--app-theme-radius-lg) var(--app-theme-radius-lg) 0 0;
-  --box-shadow: 0 -4px 16px color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  --box-shadow: var(--app-theme-shadow-sheet);
 }
 
 ion-modal.quantity-sheet ion-content {
@@ -489,21 +481,32 @@ ion-modal.quantity-sheet ion-content {
     gap: var(--app-theme-spacing-xs);
   }
 
+  // Consume action — uses success (leaf green). Eating/consuming is a positive
+  // depletion, semantically aligned with success. Previously used secondary
+  // (mint), which is now cream and would no longer read as actionable.
   &__consume-btn {
-    background: color-mix(in srgb, var(--ion-color-secondary) 12%, transparent);
-    color: var(--ion-color-secondary);
+    background: color-mix(in srgb, var(--ion-color-success) 12%, transparent);
+    color: var(--ion-color-success);
 
     &:active {
-      background: color-mix(in srgb, var(--ion-color-secondary) 22%, transparent);
+      background: color-mix(in srgb, var(--ion-color-success) 22%, transparent);
     }
   }
 }
 
+// Section divider — subtle gradient fade, strongest at center, transparent
+// at edges. Reads as a soft transition rather than a hard rule. More elegant
+// than a solid 1px border, more visible than the previous 0.25 opacity.
+// If you ever want a hard divider, use `background: var(--app-theme-card-border-color)`.
 .pantry-section-divider {
   height: 1px;
-  background: var(--app-theme-card-border-color);
-  margin: var(--app-theme-spacing-md) var(--app-theme-card-margin-inline);
-  opacity: 0.25;
+  margin: var(--app-theme-spacing-lg) var(--app-theme-card-margin-inline);
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--ion-text-color) 18%, transparent) 50%,
+    transparent
+  );
 }
 
 .fresh-list {

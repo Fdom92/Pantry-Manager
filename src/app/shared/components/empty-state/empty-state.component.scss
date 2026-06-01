@@ -18,8 +18,8 @@
 }
 
 .empty-icon {
-  width: 52px;
-  height: 52px;
+  width: var(--app-theme-control-size-xl);   // 56px — was 52px hardcoded
+  height: var(--app-theme-control-size-xl);
   border-radius: var(--app-theme-radius-md);
   display: grid;
   place-items: center;
@@ -28,19 +28,31 @@
   font-size: var(--app-theme-icon-size-lg);
 }
 
+// Color variants — each maps to the matching ion-color token. Names previously
+// lied (warning→secondary mint, success→primary teal). Fixed v4.4-refresh.
 .empty-icon.color-warning {
-  background: color-mix(in srgb, var(--ion-color-secondary) 18%, transparent);
-  color: var(--ion-color-secondary);
+  background: color-mix(in srgb, var(--ion-color-warning) 18%, transparent);
+  color: var(--ion-color-warning);
 }
 
 .empty-icon.color-success {
-  background: color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
-  color: var(--ion-color-primary);
+  background: color-mix(in srgb, var(--ion-color-success) 18%, transparent);
+  color: var(--ion-color-success);
+}
+
+.empty-icon.color-danger {
+  background: color-mix(in srgb, var(--ion-color-danger) 15%, transparent);
+  color: var(--ion-color-danger);
+}
+
+.empty-icon.color-tertiary {
+  background: color-mix(in srgb, var(--ion-color-tertiary) 18%, transparent);
+  color: var(--ion-color-tertiary);
 }
 
 .empty-icon.color-secondary {
-  background: color-mix(in srgb, var(--ion-text-color) 18%, transparent);
-  color: var(--ion-text-color);
+  background: color-mix(in srgb, var(--ion-color-secondary) 60%, transparent);
+  color: var(--ion-color-secondary-contrast);
 }
 
 .empty-icon.color-medium {

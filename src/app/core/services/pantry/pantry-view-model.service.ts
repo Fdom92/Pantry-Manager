@@ -424,8 +424,7 @@ export class PantryViewModelService {
     if (days <= 0) return this.translate.instant('pantry.detail.subinfo.expired');
     if (days === 1) return this.translate.instant('pantry.detail.subinfo.tomorrow');
     // Within 7 days: show relative urgency. Beyond: show the date-fns formatted date.
-    if (days <= 7) return this.translate.instant('pantry.detail.subinfo.inDays')
-      .replace('{{count}}', String(days));
+    if (days <= 7) return this.translate.instant('pantry.detail.subinfo.inDays', { count: days });
     return formattedDate;
   }
 

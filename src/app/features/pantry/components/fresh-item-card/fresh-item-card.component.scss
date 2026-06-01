@@ -10,6 +10,12 @@
   border-radius: var(--app-theme-card-border-radius);
   background: var(--app-theme-card-bg);
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  // Match the baseline card shadow used by pantry-item-card so Fresh and
+  // Despensa sections feel like the same surface family.
+  box-shadow: var(--app-theme-card-shadow);
+  // Mount fade — matches the virtual-item-card animation in Despensa so both
+  // sections feel uniform when entering the Pantry tab.
+  animation: app-fade-in-list var(--app-theme-transition-slow);
 
   &__info {
     flex: 1;

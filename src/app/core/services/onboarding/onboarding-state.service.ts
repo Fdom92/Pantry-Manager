@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { ONBOARDING_QUICK_SEED_ITEMS, ONBOARDING_SLIDES, STORAGE_KEYS } from '@core/constants';
 import type { OnboardingQuickSeedItem } from '@core/constants';
-import { buildAddItemPayload } from '@core/domain/pantry';
+import { buildAddItemPayload, FRESH_QTY } from '@core/domain/pantry';
 import type { OnboardingSlide } from '@core/models/onboarding';
 import type { PantryItem } from '@core/models/pantry';
 import { createDocumentId } from '@core/utils';
@@ -171,11 +171,12 @@ export class OnboardingStateService {
     const sessionId = selected.length > 1 ? createDocumentId('session') : undefined;
     for (const seed of selected) {
       const name = this.translate.instant(`onboarding.quickSeed.items.${seed.key}`);
+      const quantity = seed.productType === 'fresh' ? FRESH_QTY.sufficient : 1;
       const base = buildAddItemPayload({
         id: createDocumentId('item'),
         nowIso: timestamp,
         name,
-        quantity: 1,
+        quantity,
         noExpiry: seed.alwaysNoExpiry,
       });
       const item: PantryItem = {
@@ -184,7 +185,7 @@ export class OnboardingStateService {
         foodType: seed.foodType,
       };
       await this.pantryStore.addItem(item);
-      await this.historyManager.logAddNewItem(item, 1, sessionId, timestamp);
+      await this.historyManager.logAddNewItem(item, quantity, sessionId, timestamp);
     }
   }
 }
