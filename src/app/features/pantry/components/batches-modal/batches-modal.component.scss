@@ -3,31 +3,31 @@ ion-title, ion-back-button {
 }
 
 .batches-modal-content {
-  --padding-bottom: 24px;
+  --padding-bottom: var(--app-theme-spacing-2xl);
 }
 
 .batches-card {
   margin: 0;
-  padding: 16px;
-  border-radius: 16px;
-  background: var(--ion-card-background, var(--ion-card-background));
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  padding: var(--app-theme-spacing-lg);
+  border-radius: var(--app-theme-card-border-radius);
+  background: var(--ion-card-background);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
 }
 
 .batches-card__header {
-  margin-bottom: 16px;
+  margin-bottom: var(--app-theme-spacing-lg);
 }
 
 .batches-card__title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 8px 0;
+  font-size: var(--app-theme-font-size-xl);
+  font-weight: var(--app-theme-font-weight-bold);
+  margin: 0 0 var(--app-theme-spacing-sm) 0;
 }
 
 .batches-card__subtitle {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--app-theme-font-size-body);
   color: var(--app-theme-text-muted);
 }
 
@@ -41,7 +41,7 @@ ion-title, ion-back-button {
   --padding-start: 0;
   --padding-end: 0;
   --inner-padding-end: 0;
-  margin-bottom: 12px;
+  margin-bottom: var(--app-theme-spacing-md);
 }
 
 .batches-card ion-item:last-child {
@@ -51,76 +51,77 @@ ion-title, ion-back-button {
 .batches-card ion-item ion-label h3 {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 0 0 4px 0;
-  font-size: 0.98rem;
-  font-weight: 600;
+  gap: var(--app-theme-spacing-xs-plus);
+  margin: 0 0 var(--app-theme-spacing-xs) 0;
+  font-size: var(--app-theme-font-size-md);
+  font-weight: var(--app-theme-font-weight-bold);
 }
 
 .batches-card ion-item ion-label h3 ion-icon {
-  font-size: 16px;
+  font-size: var(--app-theme-icon-size-sm);
 }
 
 .batches-card ion-item ion-label p {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: var(--app-theme-font-size-caption);
   color: var(--app-theme-text-muted);
 }
 
 .batches-card ion-item ion-badge {
-  margin-top: 6px;
+  margin-top: var(--app-theme-spacing-xs-plus);
 }
 
+// ── Edit batches form ────────────────────────────────────────────────────────
 
 .edit-batches-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
+  gap: var(--app-theme-spacing-md);
+  margin-top: var(--app-theme-spacing-sm);
 }
 
 .edit-batch-card {
-  padding: 12px;
-  border-radius: 12px;
+  padding: var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-radius-md);
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
 }
 
 .edit-batch-row-inline {
   display: flex;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
   align-items: flex-start;
 }
 
 .edit-batch-row-inline ion-input {
   flex: 1;
   --background: var(--ion-card-background);
-  --padding-end: 12px;
-  border-radius: 8px;
+  --padding-end: var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-radius-sm);
 }
 
 .batch-date-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding-top: 10px;
+  gap: var(--app-theme-spacing-xs-plus);
+  padding-top: var(--app-theme-spacing-sm-plus);
   align-items: flex-end;
   flex-shrink: 0;
 }
 
 .batch-date-label {
-  font-size: 0.72rem;
+  font-size: var(--app-theme-font-size-micro);
   letter-spacing: 0.04em;
   color: var(--app-theme-text-muted);
 }
 
 .edit-batch-row ion-input {
   --background: var(--ion-card-background);
-  --padding-start: 12px;
-  --padding-end: 12px;
-  border-radius: 8px;
+  --padding-start: var(--app-theme-spacing-md);
+  --padding-end: var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-radius-sm);
 }
 
 .edit-batch-row app-entity-selector-field {
@@ -133,13 +134,12 @@ ion-title, ion-back-button {
 
 .edit-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  gap: var(--app-theme-spacing-md);
+  margin-top: var(--app-theme-spacing-xl);
+  padding-top: var(--app-theme-spacing-lg);
+  border-top: 1px solid var(--app-theme-card-border-color);
 }
 
 .edit-actions ion-button {
   margin: 0;
 }
-

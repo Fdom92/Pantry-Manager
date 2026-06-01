@@ -7,12 +7,12 @@
 .selector-trigger {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--app-theme-spacing-xs);
   min-height: 56px;
   justify-content: center;
   cursor: pointer;
-  border-radius: 8px;
-  transition: background 0.12s ease;
+  border-radius: var(--app-theme-radius-sm);
+  transition: background var(--app-theme-transition-fast);
   user-select: none;
 
   &:active {
@@ -21,26 +21,26 @@
 }
 
 .selector-trigger__label {
-  font-size: 0.75rem;
+  font-size: var(--app-theme-font-size-tiny);
   color: var(--app-theme-text-muted);
-  font-weight: 400;
+  font-weight: var(--app-theme-font-weight-normal);
 }
 
 .selector-trigger__value {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
 }
 
 .selector-trigger__text {
-  font-size: 1rem;
+  font-size: var(--app-theme-font-size-title);
   color: var(--app-theme-text-color);
   flex: 1;
 }
 
 .selector-trigger__chevron {
-  font-size: 1rem;
+  font-size: var(--app-theme-font-size-title);
   color: var(--app-theme-text-muted);
   flex-shrink: 0;
 }
@@ -48,7 +48,7 @@
 // --- Sheet content ---
 
 .selector-sheet__action-label {
-  font-weight: 600;
+  font-weight: var(--app-theme-font-weight-bold);
   color: var(--ion-color-primary);
 }
 
@@ -57,6 +57,6 @@
 }
 
 ion-content {
-  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-  --background: var(--ion-card-background, var(--ion-card-background));
+  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-lg));
+  --background: var(--ion-card-background);
 }

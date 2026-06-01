@@ -23,15 +23,16 @@ ion-title {
 
 .dashboard-section-title {
   margin: 0;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: var(--app-theme-font-size-md);
+  font-weight: var(--app-theme-font-weight-extra-bold);
   color: var(--app-theme-text-color);
   letter-spacing: 0.02em;
   text-transform: uppercase;
   opacity: 0.7;
 }
 
-// LAYER 1: Pantry Health (Interpreted State)
+// ── LAYER 1 — Pantry Health (Interpreted State) ──────────────────────────────
+
 .pantry-health {
   display: flex;
   flex-direction: column;
@@ -48,10 +49,10 @@ ion-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
+    width: var(--app-theme-control-size-xl);
+    height: var(--app-theme-control-size-xl);
     border-radius: 50%;
-    font-size: 32px;
+    font-size: var(--app-theme-icon-size-xl);
     flex-shrink: 0;
   }
 
@@ -61,7 +62,7 @@ ion-title {
 
   &__title {
     margin: 0 0 var(--app-theme-spacing-xs) 0;
-    font-size: 1.1rem;
+    font-size: var(--app-theme-font-size-lg);
     font-weight: var(--app-theme-font-weight-bold);
     color: var(--app-theme-text-color);
     line-height: var(--app-theme-line-height-tight);
@@ -91,32 +92,33 @@ ion-title {
   }
 }
 
-// Pantry Score
+// ── Pantry Score ──────────────────────────────────────────────────────────────
+
 .pantry-score {
   display: flex;
   align-items: center;
   gap: var(--app-theme-spacing-md);
   margin-inline: var(--app-theme-card-margin-inline);
   padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg);
-  border-radius: var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-radius-md);
   background: var(--app-theme-card-bg);
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
 
   ion-icon {
-    font-size: 20px;
+    font-size: var(--app-theme-icon-size-md);
     flex-shrink: 0;
   }
 
   &__content {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--app-theme-spacing-xs-plus);
     min-width: 0;
     flex: 1;
   }
 
   &__title {
-    font-size: var(--app-theme-font-size-caption, 0.75rem);
+    font-size: var(--app-theme-font-size-tiny);
     font-weight: var(--app-theme-font-weight-bold);
     color: var(--app-theme-text-muted);
     letter-spacing: 0.04em;
@@ -130,25 +132,26 @@ ion-title {
 
   &__hint {
     margin: 0;
-    font-size: 0.7rem;
+    font-size: var(--app-theme-font-size-micro);
     color: var(--app-theme-text-muted);
-    line-height: 1.4;
+    line-height: var(--app-theme-line-height-normal);
     opacity: 0.8;
   }
 
-  &[data-label='excellent'] > ion-icon { color: var(--app-theme-card-accent-success); }
-  &[data-label='good'] > ion-icon { color: var(--app-theme-card-accent-success); }
-  &[data-label='fair'] > ion-icon { color: var(--app-theme-card-accent-warning); }
-  &[data-label='poor'] > ion-icon { color: var(--app-theme-card-accent-critical); }
+  &[data-label='excellent'] > ion-icon,
+  &[data-label='good']      > ion-icon { color: var(--app-theme-card-accent-success); }
+  &[data-label='fair']      > ion-icon { color: var(--app-theme-card-accent-warning); }
+  &[data-label='poor']      > ion-icon { color: var(--app-theme-card-accent-critical); }
 }
 
-// LAYER HOY: Today's suggestion
+// ── LAYER "Hoy" — Today's suggestion ─────────────────────────────────────────
+
 .today-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--app-theme-spacing-sm);
   margin-inline: var(--app-theme-card-margin-inline);
-  padding: 12px 14px 14px;
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-md-plus) var(--app-theme-spacing-md-plus);
   border-radius: var(--app-theme-card-border-radius);
   background: var(--app-theme-card-bg);
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
@@ -160,7 +163,7 @@ ion-title {
     content: '';
     position: absolute;
     inset: 0 auto 0 0;
-    width: 3px;
+    width: var(--app-theme-card-accent-width);
     background: var(--ion-color-primary);
   }
 
@@ -169,19 +172,19 @@ ion-title {
     flex-direction: column;
     align-items: baseline;
     justify-content: space-between;
-    gap: 4px;
+    gap: var(--app-theme-spacing-xs);
   }
 
   &__protagonist-main {
     display: flex;
     align-items: baseline;
-    gap: 6px;
+    gap: var(--app-theme-spacing-xs-plus);
     min-width: 0;
     flex: 1;
   }
 
   &__protagonist-name {
-    font-size: 1rem;
+    font-size: var(--app-theme-font-size-title);
     font-weight: var(--app-theme-font-weight-bold);
     color: var(--app-theme-text-color);
     line-height: var(--app-theme-line-height-tight);
@@ -191,9 +194,9 @@ ion-title {
   }
 
   &__protagonist-qty {
-    font-size: 0.75rem;
+    font-size: var(--app-theme-font-size-small);
     color: var(--app-theme-text-muted);
-    font-weight: 500;
+    font-weight: var(--app-theme-font-weight-semibold);
     flex-shrink: 0;
   }
 
@@ -201,12 +204,12 @@ ion-title {
     display: flex;
     align-items: center;
     gap: 3px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: var(--app-theme-font-size-small);
+    font-weight: var(--app-theme-font-weight-bold);
     flex-shrink: 0;
     white-space: nowrap;
 
-    ion-icon { font-size: 12px; }
+    ion-icon { font-size: var(--app-theme-icon-size-xs); }
 
     &[data-urgency='critical'] { color: var(--app-theme-card-accent-critical); }
     &[data-urgency='warning']  { color: var(--app-theme-card-accent-warning); }
@@ -215,26 +218,22 @@ ion-title {
 
   &__reason {
     margin: 0;
-    font-size: 0.82rem;
+    font-size: var(--app-theme-font-size-small);
     color: var(--app-theme-text-muted);
-    line-height: 1.4;
+    line-height: var(--app-theme-line-height-normal);
   }
 
   &__secondary {
     margin: 0;
-    font-size: 0.78rem;
+    font-size: var(--app-theme-font-size-tiny);
     color: var(--app-theme-text-muted);
-    line-height: 1.4;
+    line-height: var(--app-theme-line-height-normal);
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   &__secondary-label {
     opacity: 0.7;
-  }
-
-  &__secondary-item {
-    // inline — rendered as text nodes within the <p>
   }
 
   &__secondary-days {
@@ -245,7 +244,7 @@ ion-title {
     display: flex;
     align-items: center;
     gap: var(--app-theme-spacing-sm);
-    margin-top: 2px;
+    margin-top: var(--app-theme-spacing-2xs);
 
     ion-button {
       margin: 0;
@@ -256,12 +255,12 @@ ion-title {
   &__dismiss {
     background: none;
     border: none;
-    padding: 4px 8px;
-    font-size: 0.82rem;
+    padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
+    font-size: var(--app-theme-font-size-small);
     color: var(--app-theme-text-muted);
     cursor: pointer;
     opacity: 0.7;
-    transition: opacity 0.15s;
+    transition: opacity var(--app-theme-transition-fast);
 
     &:active { opacity: 1; }
   }
@@ -282,9 +281,14 @@ ion-title {
     background: color-mix(in srgb, var(--app-theme-card-accent-warning) 5%, var(--app-theme-card-bg));
     border-color: color-mix(in srgb, var(--app-theme-card-accent-warning) 20%, transparent);
 
-    &::before { background: var(--app-theme-card-accent-warning); opacity: 0.5; }
+    &::before {
+      background: var(--app-theme-card-accent-warning);
+      opacity: 0.5;
+    }
 
-    .today-card__all-good-row ion-icon { color: var(--app-theme-card-accent-warning); }
+    .today-card__all-good-row ion-icon {
+      color: var(--app-theme-card-accent-warning);
+    }
   }
 
   &__all-good-row {
@@ -293,7 +297,7 @@ ion-title {
     gap: var(--app-theme-spacing-md);
 
     ion-icon {
-      font-size: 26px;
+      font-size: var(--app-theme-icon-size-lg);
       color: var(--ion-color-primary);
       flex-shrink: 0;
       opacity: 0.7;
@@ -301,7 +305,7 @@ ion-title {
   }
 
   &__all-good-title {
-    margin: 0 0 4px 0;
+    margin: 0 0 var(--app-theme-spacing-xs) 0;
     font-size: var(--app-theme-font-size-title);
     font-weight: var(--app-theme-font-weight-bold);
     color: var(--app-theme-text-color);
@@ -329,14 +333,14 @@ ion-title {
     gap: var(--app-theme-spacing-md);
 
     ion-icon {
-      font-size: 28px;
+      font-size: var(--app-theme-icon-size-lg);
       color: var(--app-theme-card-accent-success);
       flex-shrink: 0;
     }
   }
 
   &__success-title {
-    margin: 0 0 4px 0;
+    margin: 0 0 var(--app-theme-spacing-xs) 0;
     font-size: var(--app-theme-font-size-title);
     font-weight: var(--app-theme-font-weight-bold);
     color: var(--app-theme-text-color);
@@ -349,7 +353,8 @@ ion-title {
   }
 }
 
-// LAYER 2: Actions (What to Do Now)
+// ── LAYER 2 — Actions (What to Do Now) ───────────────────────────────────────
+
 .actions-stack {
   display: flex;
   flex-direction: column;
@@ -374,7 +379,7 @@ ion-title {
     content: '';
     position: absolute;
     inset: 0 auto 0 0;
-    width: 3px;
+    width: var(--app-theme-card-accent-width);
     background: var(--action-accent, var(--app-theme-card-accent-success));
   }
 
@@ -405,18 +410,18 @@ ion-title {
 
   &__cta {
     margin: 0;
-    --padding-start: 16px;
-    --padding-end: 16px;
+    --padding-start: var(--app-theme-spacing-lg);
+    --padding-end: var(--app-theme-spacing-lg);
   }
 
   &__dismiss {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: var(--app-theme-control-size-md);
+    height: var(--app-theme-control-size-md);
     border: none;
-    border-radius: var(--app-theme-spacing-sm);
+    border-radius: var(--app-theme-radius-sm);
     background: transparent;
     color: var(--app-theme-text-muted);
     cursor: pointer;
@@ -425,7 +430,7 @@ ion-title {
     margin-left: auto;
 
     ion-icon {
-      font-size: 20px;
+      font-size: var(--app-theme-icon-size-md);
     }
 
     &:hover {
@@ -438,17 +443,18 @@ ion-title {
   }
 
   // Category-specific accent color
-  &[data-category='critical'] { --action-accent: var(--app-theme-card-accent-critical); }
-  &[data-category='preventive'] { --action-accent: var(--app-theme-card-accent-warning); }
+  &[data-category='critical']     { --action-accent: var(--app-theme-card-accent-critical); }
+  &[data-category='preventive']   { --action-accent: var(--app-theme-card-accent-warning); }
   &[data-category='optimization'] { --action-accent: var(--app-theme-card-accent-success); }
-  &[data-category='conversion'] { --action-accent: var(--ion-color-secondary); }
+  &[data-category='conversion']   { --action-accent: var(--ion-color-secondary); }
 }
 
-// LAYER 3: Additional Context (Optional)
+// ── LAYER 3 — Additional Context (Optional) ──────────────────────────────────
+
 .context-section {
   margin-inline: var(--app-theme-card-margin-inline);
   padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg);
-  border-radius: var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-radius-md);
   background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
   border: 1px solid color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
 }
@@ -462,7 +468,7 @@ ion-title {
   line-height: var(--app-theme-line-height-normal);
 
   ion-icon {
-    font-size: 20px;
+    font-size: var(--app-theme-icon-size-md);
     color: var(--ion-color-primary);
     flex-shrink: 0;
   }

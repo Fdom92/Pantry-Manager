@@ -1,6 +1,6 @@
 ion-card-title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: var(--app-theme-font-size-lg);
   font-weight: var(--app-theme-font-weight-bold);
 }
 
@@ -19,7 +19,7 @@ ion-card-content {
 }
 
 ion-item h3 {
-  font-size: 0.95rem;
+  font-size: var(--app-theme-font-size-md);
   font-weight: var(--app-theme-font-weight-bold);
   margin: 0 0 var(--app-theme-spacing-xs);
 }
@@ -33,6 +33,8 @@ ion-item p {
 ion-item {
   --background: transparent;
 }
+
+// ── Settings layout ──────────────────────────────────────────────────────────
 
 .settings-content {
   display: flex;
@@ -61,11 +63,11 @@ ion-item {
 
 .settings-card ion-list-header {
   padding-top: var(--app-theme-spacing-lg);
-  padding-bottom: 2px;
+  padding-bottom: var(--app-theme-spacing-2xs);
   min-height: unset;
 
   ion-label {
-    font-size: 0.7rem;
+    font-size: var(--app-theme-font-size-micro);
     font-weight: var(--app-theme-font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.07em;
@@ -77,6 +79,8 @@ ion-item {
 .settings-card ion-list-header:first-of-type {
   padding-top: var(--app-theme-spacing-xs);
 }
+
+// ── Theme picker ─────────────────────────────────────────────────────────────
 
 .theme-item ion-label {
   width: 100%;
@@ -94,18 +98,18 @@ ion-item {
   align-items: center;
   justify-content: center;
   gap: var(--app-theme-spacing-sm);
-  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-md);
-  border-radius: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-radius-md);
   border: var(--app-theme-card-border-width) solid color-mix(in srgb, var(--ion-text-color) 18%, transparent);
   background: color-mix(in srgb, var(--app-theme-card-bg) 94%, transparent);
   color: var(--app-theme-text-color);
-  font-size: 0.9rem;
+  font-size: var(--app-theme-font-size-body);
   font-weight: var(--app-theme-font-weight-bold);
   transition: var(--app-theme-transition-normal);
 }
 
 .theme-option ion-icon {
-  font-size: 1.1rem;
+  font-size: var(--app-theme-font-size-lg);
 }
 
 .theme-option.selected {
@@ -130,29 +134,33 @@ ion-item {
   }
 
   .theme-grid {
-    padding-inline: 12px;
+    padding-inline: var(--app-theme-spacing-md);
   }
 }
+
+// ── Language picker ──────────────────────────────────────────────────────────
 
 .lang-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .lang-code {
-  font-size: 0.85rem;
+  font-size: var(--app-theme-font-size-caption);
   font-weight: var(--app-theme-font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
+// ── Dev time input ───────────────────────────────────────────────────────────
+
 .dev-time-input {
-  margin-inline-end: 8px;
-  padding: 4px 8px;
-  border-radius: 6px;
+  margin-inline-end: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
+  border-radius: var(--app-theme-radius-xs);
   border: var(--app-theme-card-border-width) solid color-mix(in srgb, var(--ion-text-color) 20%, transparent);
   background: color-mix(in srgb, var(--app-theme-card-bg) 94%, transparent);
   color: var(--app-theme-text-color);
-  font-size: 0.9rem;
+  font-size: var(--app-theme-font-size-body);
 }
 
 @media (max-width: 420px) {

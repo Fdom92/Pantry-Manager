@@ -1,57 +1,65 @@
 :root {
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // IONIC PALETTE
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
   --ion-color-primary: #3A9882;
   --ion-color-primary-rgb: 58, 152, 130;
-  --ion-color-primary-contrast: #000000;
-  --ion-color-primary-contrast-rgb: 0, 0, 0;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
   --ion-color-primary-shade: #338672;
   --ion-color-primary-tint: #4ea28f;
 
   --ion-color-secondary: #88C8AF;
   --ion-color-secondary-rgb: 136, 200, 175;
-  --ion-color-secondary-contrast: #000000;
-  --ion-color-secondary-contrast-rgb: 0, 0, 0;
+  --ion-color-secondary-contrast: #0f1413;
+  --ion-color-secondary-contrast-rgb: 15, 20, 19;
   --ion-color-secondary-shade: #78b09a;
   --ion-color-secondary-tint: #94ceb7;
 
-  --ion-color-tertiary: #5fae9a;
-  --ion-color-tertiary-rgb: 95, 174, 154;
-  --ion-color-tertiary-contrast: #000000;
-  --ion-color-tertiary-contrast-rgb: 0, 0, 0;
-  --ion-color-tertiary-shade: #549988;
-  --ion-color-tertiary-tint: #6fb6a4;
+  // Tertiary — warm amber. Doubles as premium / PRO accent and "basic items"
+  // highlight, providing a hue counterweight to the otherwise all-green palette.
+  --ion-color-tertiary: #d99a4e;
+  --ion-color-tertiary-rgb: 217, 154, 78;
+  --ion-color-tertiary-contrast: #1a1206;
+  --ion-color-tertiary-contrast-rgb: 26, 18, 6;
+  --ion-color-tertiary-shade: #bf8745;
+  --ion-color-tertiary-tint: #dca561;
 
-  --ion-color-success: #2e7d6b;
-  --ion-color-success-rgb: 46, 125, 107;
+  // Success — leaf green (~140° hue) so it sits visibly apart from primary teal.
+  --ion-color-success: #3d9b5f;
+  --ion-color-success-rgb: 61, 155, 95;
   --ion-color-success-contrast: #ffffff;
   --ion-color-success-contrast-rgb: 255, 255, 255;
-  --ion-color-success-shade: #286e5e;
-  --ion-color-success-tint: #438a7a;
+  --ion-color-success-shade: #368855;
+  --ion-color-success-tint: #50a56f;
 
-  --ion-color-warning: #e6b800;
-  --ion-color-warning-rgb: 230, 184, 0;
-  --ion-color-warning-contrast: #000000;
-  --ion-color-warning-contrast-rgb: 0, 0, 0;
-  --ion-color-warning-shade: #caa200;
-  --ion-color-warning-tint: #e9bf1a;
+  // Warning — softer amber (sat 100→76%) for a less alarmist look.
+  --ion-color-warning: #e5a93a;
+  --ion-color-warning-rgb: 229, 169, 58;
+  --ion-color-warning-contrast: #1a1206;
+  --ion-color-warning-contrast-rgb: 26, 18, 6;
+  --ion-color-warning-shade: #ca9533;
+  --ion-color-warning-tint: #e8b24e;
 
   --ion-color-danger: #d64545;
   --ion-color-danger-rgb: 214, 69, 69;
-  --ion-color-danger-contrast: #000000;
-  --ion-color-danger-contrast-rgb: 0, 0, 0;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
   --ion-color-danger-shade: #bc3d3d;
   --ion-color-danger-tint: #da5858;
 
   --ion-color-light: #f6faf8;
   --ion-color-light-rgb: 246, 250, 248;
-  --ion-color-light-contrast: #000000;
-  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-contrast: #0f1413;
+  --ion-color-light-contrast-rgb: 15, 20, 19;
   --ion-color-light-shade: #d8dcda;
   --ion-color-light-tint: #f7fbf9;
 
   --ion-color-medium: #9fbeb6;
   --ion-color-medium-rgb: 159, 190, 182;
-  --ion-color-medium-contrast: #000000;
-  --ion-color-medium-contrast-rgb: 0, 0, 0;
+  --ion-color-medium-contrast: #0f1413;
+  --ion-color-medium-contrast-rgb: 15, 20, 19;
   --ion-color-medium-shade: #8ca7a0;
   --ion-color-medium-tint: #a9c5bd;
 
@@ -70,8 +78,89 @@
   --ion-toolbar-color: var(--ion-color-dark);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // APP THEME VARIABLES - Brand Design System
+  // APP THEME — Brand Design System v3 (4.4)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  //
+  // Scales below are deliberately closed sets. Components MUST pick the
+  // closest token instead of inventing px / rem values. New design needs
+  // start by extending these scales, not bypassing them.
+  //
+  // Naming follows a t-shirt scale (xs → 2xl) for typography, spacing,
+  // and radius so the three systems stay symmetrical.
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🎨 TYPOGRAPHY
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-text-color: var(--ion-text-color);
+  --app-theme-text-muted: var(--ion-color-medium);
+  --app-theme-text-subtle: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+
+  // Font sizes — closed scale, rem-based.
+  --app-theme-font-size-micro: 0.72rem;    // ~11.5px — timestamps, badges
+  --app-theme-font-size-tiny: 0.78rem;     // ~12.5px — chip text, secondary meta
+  --app-theme-font-size-small: 0.82rem;    // ~13px — captions, helper text
+  --app-theme-font-size-caption: 0.85rem;  // ~13.6px — between small and body
+  --app-theme-font-size-body: 0.9rem;      // ~14.5px — default body
+  --app-theme-font-size-md: 0.95rem;       // ~15.2px — section h3
+  --app-theme-font-size-title: 1rem;       // 16px — card titles, modal titles
+  --app-theme-font-size-lg: 1.05rem;       // ~16.8px — emphasized title
+  --app-theme-font-size-xl: 1.25rem;       // 20px — page headlines, plan card title
+  --app-theme-font-size-2xl: 1.5rem;       // 24px — section headers
+  --app-theme-font-size-3xl: 1.75rem;      // 28px — hero numbers, stats
+  --app-theme-font-size-display: 2.25rem;  // 36px — display numerals, quantity adjuster
+
+  // Font weights
+  --app-theme-font-weight-normal: 400;
+  --app-theme-font-weight-semibold: 500;
+  --app-theme-font-weight-bold: 600;
+  --app-theme-font-weight-extra-bold: 700;
+  --app-theme-font-weight-display: 800;    // hero number weights only
+
+  // Line heights
+  --app-theme-line-height-display: 1.1;    // huge numerals, hero titles
+  --app-theme-line-height-tight: 1.3;
+  --app-theme-line-height-normal: 1.4;
+  --app-theme-line-height-relaxed: 1.5;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 📐 SPACING — 14-step scale (2px → 48px)
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-spacing-2xs: 2px;
+  --app-theme-spacing-xs: 4px;
+  --app-theme-spacing-xs-plus: 6px;
+  --app-theme-spacing-sm: 8px;
+  --app-theme-spacing-sm-plus: 10px;
+  --app-theme-spacing-md: 12px;
+  --app-theme-spacing-md-plus: 14px;
+  --app-theme-spacing-lg: 16px;
+  --app-theme-spacing-lg-plus: 18px;
+  --app-theme-spacing-xl: 20px;
+  --app-theme-spacing-2xl: 24px;
+  --app-theme-spacing-3xl: 32px;
+  --app-theme-spacing-4xl: 40px;
+  --app-theme-spacing-5xl: 48px;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🟦 BORDER RADIUS — 7-step scale + pill
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-radius-2xs: 3px;            // accent bars, dividers
+  --app-theme-radius-xs: 6px;
+  --app-theme-radius-sm: 8px;
+  --app-theme-radius-md: 12px;
+  --app-theme-radius-lg: 16px;            // card default
+  --app-theme-radius-xl: 20px;
+  --app-theme-radius-2xl: 24px;
+  --app-theme-radius-pill: 999px;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🔘 ICON SIZES — closed scale for ion-icon usage
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-icon-size-xs: 14px;         // inside chips, badges
+  --app-theme-icon-size-sm: 18px;         // inline buttons, list items
+  --app-theme-icon-size-md: 22px;         // toolbar actions, control buttons
+  --app-theme-icon-size-lg: 28px;         // empty-state medium
+  --app-theme-icon-size-xl: 36px;         // hero / PRO teaser
+  --app-theme-icon-size-2xl: 48px;        // brand moments
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 🎴 CARDS
@@ -79,13 +168,12 @@
   --app-theme-card-bg: var(--ion-card-background);
   --app-theme-card-border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
   --app-theme-card-border-width: 1px;
-  --app-theme-card-border-radius: 16px;
-  --app-theme-card-shadow: 0 10px 26px rgba(15, 20, 19, 0.18);
-  --app-theme-card-margin-inline: 10px;
-  --app-theme-card-padding: 16px;
+  --app-theme-card-border-radius: var(--app-theme-radius-lg);
+  --app-theme-card-margin-inline: var(--app-theme-spacing-sm-plus);
+  --app-theme-card-padding: var(--app-theme-spacing-lg);
   --app-theme-card-transition: all 140ms ease;
 
-  // Card accent borders (for state indicators)
+  // Card accent borders (state indicators)
   --app-theme-card-accent-width: 4px;
   --app-theme-card-accent-critical: var(--ion-color-danger);
   --app-theme-card-accent-warning: var(--ion-color-warning);
@@ -99,66 +187,50 @@
   --app-theme-input-border-color: color-mix(in srgb, var(--ion-text-color) 14%, transparent);
   --app-theme-input-border-width: 1.5px;
   --app-theme-input-border-radius: 0;
-  --app-theme-input-padding-inline: 12px;
-  --app-theme-input-padding-block: 12px;
-  --app-theme-input-textarea-padding-block: 14px;
+  --app-theme-input-padding-inline: var(--app-theme-spacing-md);
+  --app-theme-input-padding-block: var(--app-theme-spacing-md);
+  --app-theme-input-textarea-padding-block: var(--app-theme-spacing-md-plus);
   --app-theme-input-transition: all 180ms ease;
 
-  // Input focus state
   --app-theme-input-focus-border-color: var(--ion-color-primary);
   --app-theme-input-focus-bg: color-mix(in srgb, var(--ion-color-primary) 3%, transparent);
   --app-theme-input-placeholder-color: color-mix(in srgb, var(--ion-text-color) 55%, transparent);
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 🎨 TYPOGRAPHY
+  // 🎮 CONTROLS — circular buttons, avatar slots, fixed-size affordances
   // ═══════════════════════════════════════════════════════════════════════════
-  --app-theme-text-color: var(--ion-text-color);
-  --app-theme-text-muted: var(--ion-color-medium);
-  --app-theme-text-subtle: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
-
-  // Font sizes
-  --app-theme-font-size-title: 1rem;
-  --app-theme-font-size-body: 0.875rem;
-  --app-theme-font-size-small: 0.75rem;
-
-  // Font weights
-  --app-theme-font-weight-bold: 600;
-  --app-theme-font-weight-semibold: 500;
-  --app-theme-font-weight-normal: 400;
-
-  // Line heights
-  --app-theme-line-height-tight: 1.3;
-  --app-theme-line-height-normal: 1.4;
-  --app-theme-line-height-relaxed: 1.5;
+  --app-theme-control-size-sm: 24px;       // chip, badge buttons
+  --app-theme-control-size-md: 32px;       // section action btns (FAB inline)
+  --app-theme-control-size-lg: 40px;       // primary circular buttons
+  --app-theme-control-size-xl: 56px;       // hero icons (health card)
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 📐 SPACING
-  // ═══════════════════════════════════════════════════════════════════════════
-  --app-theme-spacing-xs: 4px;
-  --app-theme-spacing-sm: 8px;
-  --app-theme-spacing-md: 12px;
-  --app-theme-spacing-lg: 16px;
-  --app-theme-spacing-xl: 20px;
-  --app-theme-spacing-2xl: 24px;
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // 🎭 EFFECTS & ANIMATIONS
+  // 🎭 EFFECTS — transitions, shadows
   // ═══════════════════════════════════════════════════════════════════════════
   --app-theme-transition-fast: 140ms ease;
   --app-theme-transition-normal: 180ms ease;
   --app-theme-transition-slow: 250ms ease;
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // 🔲 LEGACY (Deprecated - use theme variables above)
-  // ═══════════════════════════════════════════════════════════════════════════
-  --app-surface-bg: var(--app-theme-card-bg);
-  --app-surface-border: var(--app-theme-card-border-color);
-  --app-surface-text: var(--app-theme-text-color);
-  --app-surface-title: var(--app-theme-text-color);
-  --app-surface-muted: var(--app-theme-text-muted);
-  --app-icon-badge-size: 64px;
-  --app-icon-size: 32px;
-  --app-icon-badge-radius: 18px;
+  // Shadows — layered for premium depth (sm → xl). Each tier stacks two drops
+  // so the elevation feels physical instead of a flat blur. color-mix with
+  // --ion-text-color keeps them dark-mode safe.
+  --app-theme-shadow-xs:
+    0 1px 2px color-mix(in srgb, var(--ion-text-color) 6%, transparent);
+  --app-theme-shadow-sm:
+    0 2px 4px color-mix(in srgb, var(--ion-text-color) 8%, transparent),
+    0 1px 2px color-mix(in srgb, var(--ion-text-color) 4%, transparent);
+  --app-theme-shadow-md:
+    0 4px 8px color-mix(in srgb, var(--ion-text-color) 10%, transparent),
+    0 2px 4px color-mix(in srgb, var(--ion-text-color) 6%, transparent);
+  --app-theme-shadow-lg:
+    0 10px 18px color-mix(in srgb, var(--ion-text-color) 12%, transparent),
+    0 4px 6px color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+  --app-theme-shadow-xl:
+    0 20px 28px color-mix(in srgb, var(--ion-text-color) 14%, transparent),
+    0 8px 12px color-mix(in srgb, var(--ion-text-color) 10%, transparent);
+
+  // Default card shadow uses the medium tier; modals/overlays should use lg or xl.
+  --app-theme-card-shadow: var(--app-theme-shadow-md);
 }
 
 .ion-palette-dark,

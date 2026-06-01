@@ -15,10 +15,10 @@
     content: '';
     position: absolute;
     inset: 0 auto 0 0;
-    width: 4px;
+    width: var(--app-theme-card-accent-width);
     background: var(--status-bar-color, transparent);
     pointer-events: none;
-    transition: background 180ms ease;
+    transition: background var(--app-theme-transition-normal);
   }
 
   &[data-status='expired']                      { --status-bar-color: var(--ion-color-danger);  }

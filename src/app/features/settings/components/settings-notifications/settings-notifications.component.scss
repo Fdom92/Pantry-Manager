@@ -1,6 +1,6 @@
 ion-card-title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: var(--app-theme-font-size-lg);
   font-weight: var(--app-theme-font-weight-bold);
 }
 
@@ -19,7 +19,7 @@ ion-card-content {
 }
 
 ion-item h3 {
-  font-size: 0.95rem;
+  font-size: var(--app-theme-font-size-md);
   font-weight: var(--app-theme-font-weight-bold);
   margin: 0 0 var(--app-theme-spacing-xs);
 }
