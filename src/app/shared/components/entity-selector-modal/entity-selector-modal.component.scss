@@ -15,7 +15,7 @@ ion-title, ion-back-button {
 
 .entity-selector-card {
   margin: 0;
-  padding: var(--app-theme-spacing-md) 14px;
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-md-plus);
   border-radius: var(--app-theme-card-border-radius);
   background: var(--app-theme-card-bg);
   box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
@@ -43,7 +43,7 @@ ion-modal::part(content) {
 
 .entity-selector-card__title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: var(--app-theme-font-size-lg);
   font-weight: var(--app-theme-font-weight-bold);
 }
 
@@ -61,14 +61,14 @@ ion-modal::part(content) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-block: 8px;
-  border-bottom: 1px solid var(--ion-item-border-color, var(--ion-border-color, var(--ion-color-step-150, var(--ion-background-color-step-150, rgba(0, 0, 0, 0.13)))));
+  padding-block: var(--app-theme-spacing-sm);
+  border-bottom: 1px solid var(--ion-item-border-color, var(--ion-border-color, var(--ion-color-step-150, var(--ion-background-color-step-150, color-mix(in srgb, var(--ion-text-color) 13%, transparent)))));
 }
 
 .entity-selector-item-name {
   margin: 0;
   font-weight: var(--app-theme-font-weight-bold);
-  font-size: 0.95rem;
+  font-size: var(--app-theme-font-size-md);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -79,7 +79,7 @@ ion-modal::part(content) {
 .entity-selector-controls {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--app-theme-spacing-xs);
   flex-shrink: 0;
 }
 

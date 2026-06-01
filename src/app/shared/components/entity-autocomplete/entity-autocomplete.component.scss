@@ -4,11 +4,11 @@
 
 .autocomplete-shell {
   position: relative;
-}º
+}
 
 .autocomplete-clear {
-  --padding-start: 4px;
-  --padding-end: 4px;
+  --padding-start: var(--app-theme-spacing-xs);
+  --padding-end: var(--app-theme-spacing-xs);
   height: 28px;
 }
 
@@ -36,12 +36,12 @@
 .autocomplete-option {
   --background: transparent;
   --background-hover: color-mix(in srgb, var(--ion-color-primary) 8%, transparent);
-  --padding-end: 16px;
+  --padding-end: var(--app-theme-spacing-lg);
   cursor: pointer;
 }
 
 .autocomplete-option--empty ion-label {
-  font-weight: 600;
+  font-weight: var(--app-theme-font-weight-bold);
   color: var(--ion-color-primary);
 }
 
@@ -53,14 +53,14 @@
 
 .autocomplete-option h3 {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: var(--app-theme-font-size-md);
   font-weight: var(--app-theme-font-weight-bold);
 }
 
 .autocomplete-option p {
   margin: 0;
   color: var(--app-theme-text-muted);
-  font-size: 0.82rem;
+  font-size: var(--app-theme-font-size-small);
 }
 
 .autocomplete-option .meta-info {

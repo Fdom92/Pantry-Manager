@@ -23,7 +23,7 @@ export class LowStockNotification implements NotificationDefinition {
     return {
       id: this.id,
       title: t(titleKey),
-      body: t(bodyKey).replace('{{ count }}', String(count)),
+      body: t(bodyKey, { count }),
       scheduleAt: buildNextTriggerDate(now, hour).toISOString(),
     };
   }

@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -11,11 +10,12 @@ import {
 import { OnboardingStateService } from '@core/services/onboarding/onboarding-state.service';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
+import { OnboardingSeedGridComponent } from './components/seed-grid/seed-grid.component';
 
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [IonContent, IonButton, IonIcon, CommonModule, TranslateModule],
+  imports: [IonContent, IonButton, IonIcon, TranslateModule, OnboardingSeedGridComponent],
   templateUrl: './onboarding.page.html',
   styleUrls: ['./onboarding.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,7 +23,7 @@ import { TranslateModule } from '@ngx-translate/core';
   providers: [OnboardingStateService],
 })
 export class OnboardingPage implements AfterViewInit {
-  @ViewChild('swiperRef') swiperElement?: ElementRef<any>;
+  @ViewChild('swiperRef') swiperElement?: ElementRef<HTMLElement>;
   readonly facade = inject(OnboardingStateService);
 
   ngAfterViewInit(): void {
@@ -32,10 +32,6 @@ export class OnboardingPage implements AfterViewInit {
 
   onSlideChanged(): void {
     this.facade.onSlideChanged(this.swiperElement?.nativeElement);
-  }
-
-  isLastSlide(): boolean {
-    return this.facade.isLastSlide();
   }
 
   async goToNextSlide(): Promise<void> {
@@ -48,5 +44,13 @@ export class OnboardingPage implements AfterViewInit {
 
   async completeOnboarding(): Promise<void> {
     await this.facade.completeOnboarding();
+  }
+
+  async onAcceptNotifications(): Promise<void> {
+    await this.facade.acceptNotifications(this.swiperElement?.nativeElement);
+  }
+
+  async onDismissNotifications(): Promise<void> {
+    await this.facade.dismissNotifications(this.swiperElement?.nativeElement);
   }
 }

@@ -3,7 +3,7 @@ ion-title, ion-back-button {
 }
 
 .create-item-modal-content {
-  --padding-bottom: 24px;
+  --padding-bottom: var(--app-theme-spacing-2xl);
 }
 
 .modal-spinner {
@@ -11,30 +11,31 @@ ion-title, ion-back-button {
   margin: 48px auto;
 }
 
+// ── Entity selector card (item picker) ───────────────────────────────────────
+
 .entity-selector-card {
-  margin: 0;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: var(--ion-card-background, var(--ion-card-background));
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  margin: 0 0 var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-md-plus);
+  border-radius: var(--app-theme-card-border-radius);
+  background: var(--ion-card-background);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
   overflow: visible;
-  margin-bottom: 12px;
 }
 
 .entity-selector-card__header {
-  margin-bottom: 10px;
+  margin-bottom: var(--app-theme-spacing-sm-plus);
 }
 
 .entity-selector-card__title {
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: var(--app-theme-font-size-lg);
+  font-weight: var(--app-theme-font-weight-bold);
 }
 
 .entity-selector-card__subtitle {
-  margin: 4px 0 0;
-  font-size: 0.85rem;
+  margin: var(--app-theme-spacing-xs) 0 0;
+  font-size: var(--app-theme-font-size-caption);
   color: var(--app-theme-text-muted);
 }
 
@@ -42,15 +43,17 @@ ion-title, ion-back-button {
   overflow: visible;
 }
 
+// ── Form section + autocomplete row ─────────────────────────────────────────
+
 .form-section {
   display: flex;
   flex-direction: column;
-  padding: 10px 16px;
+  padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-lg);
   gap: 0;
-  border-radius: 16px;
-  background: var(--ion-card-background, var(--ion-card-background));
-  box-shadow: var(--ion-card-box-shadow, 0 10px 26px rgba(15, 20, 19, 0.18));
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  border-radius: var(--app-theme-card-border-radius);
+  background: var(--ion-card-background);
+  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
   overflow: visible;
 }
 
@@ -58,14 +61,14 @@ ion-title, ion-back-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 2px 6px;
-  margin-top: 12px;
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-2xs) var(--app-theme-spacing-xs-plus);
+  margin-top: var(--app-theme-spacing-md);
 }
 
 .form-section-header h5 {
   margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: var(--app-theme-font-size-md);
+  font-weight: var(--app-theme-font-weight-bold);
 }
 
 .form-section ion-item {
@@ -75,7 +78,7 @@ ion-title, ion-back-button {
 }
 
 .form-autocomplete {
-  padding: 6px 0;
+  padding: var(--app-theme-spacing-xs-plus) 0;
 }
 
 .form-autocomplete app-entity-selector-field .selector-trigger {
@@ -84,24 +87,26 @@ ion-title, ion-back-button {
 }
 
 .form-section--details .form-row {
-  padding: 6px 0;
+  padding: var(--app-theme-spacing-xs-plus) 0;
 }
+
+// ── Location + batch form ───────────────────────────────────────────────────
 
 .location-form-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 16px;
+  gap: var(--app-theme-spacing-lg);
+  margin-top: var(--app-theme-spacing-lg);
 }
 
 .location-form-card {
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 12%, transparent);
-  border-radius: 12px;
-  padding: 12px;
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  border-radius: var(--app-theme-radius-md);
+  padding: var(--app-theme-spacing-md);
   background: color-mix(in srgb, var(--ion-color-dark-contrast) 6%, transparent);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
 }
 
 .location-form-header {
@@ -111,31 +116,31 @@ ion-title, ion-back-button {
 }
 
 .location-total {
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: var(--app-theme-font-size-body);
+  font-weight: var(--app-theme-font-weight-semibold);
   color: var(--app-theme-text-muted);
-  margin-left: 8px;
+  margin-left: var(--app-theme-spacing-sm);
 }
 
 .batch-form-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--app-theme-spacing-md);
 }
 
 .batch-form-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12px;
+  margin-top: var(--app-theme-spacing-md);
 }
 
 .batch-form-card {
-  border-radius: 10px;
-  padding: 10px 12px;
+  border-radius: var(--app-theme-radius-sm-plus, 10px);
+  padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-md);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--app-theme-spacing-sm-plus);
 }
 
 .batch-form-card-header {
@@ -144,37 +149,41 @@ ion-title, ion-back-button {
   justify-content: space-between;
 }
 
+// ── Modal footer ────────────────────────────────────────────────────────────
+
 .modal-footer ion-toolbar {
-  --padding-start: 16px;
-  --padding-end: 16px;
-  --padding-top: 12px;
-  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  --padding-start: var(--app-theme-spacing-lg);
+  --padding-end: var(--app-theme-spacing-lg);
+  --padding-top: var(--app-theme-spacing-md);
+  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
 }
 
 .modal-footer ion-button {
   width: 100%;
 }
 
+// ── Quantity adjuster (single-batch quick view) ─────────────────────────────
+
 .quantity-adjuster-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px 12px;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-md);
 }
 
 .quantity-label {
-  font-size: 0.7rem;
-  font-weight: 500;
+  font-size: var(--app-theme-font-size-micro); // uppercase label — visually correct at ~11.5px
+  font-weight: var(--app-theme-font-weight-semibold);
   color: var(--app-theme-text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .quantity-hint {
-  font-size: 0.65rem;
+  font-size: 0.65rem; // intentionally smaller than micro — secondary context hint
   color: var(--app-theme-text-subtle);
-  margin-top: -4px;
+  margin-top: calc(-1 * var(--app-theme-spacing-xs));
   text-align: center;
 }
 
@@ -182,8 +191,8 @@ ion-title, ion-back-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin-top: 4px;
+  gap: var(--app-theme-spacing-lg);
+  margin-top: var(--app-theme-spacing-xs);
 }
 
 .control-button {
@@ -211,37 +220,37 @@ ion-title, ion-back-button {
 }
 
 .control-button ion-icon {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: var(--app-theme-icon-size-md);
+  font-weight: var(--app-theme-font-weight-extra-bold);
 }
 
 .quantity-display {
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs-plus);
   min-width: 80px;
-  padding: 0 8px;
+  padding: 0 var(--app-theme-spacing-sm);
 }
 
 .quantity-number {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: var(--app-theme-font-size-3xl);
+  font-weight: var(--app-theme-font-weight-extra-bold);
   color: var(--app-theme-text-color);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs-plus);
 }
 
 .quantity-original {
   color: color-mix(in srgb, var(--ion-text-color) 40%, transparent);
-  font-size: 1.5rem;
+  font-size: var(--app-theme-font-size-2xl);
 }
 
 .quantity-arrow {
-  font-size: 1rem;
+  font-size: var(--app-theme-font-size-title);
   color: color-mix(in srgb, var(--ion-text-color) 40%, transparent);
 }
 
@@ -252,6 +261,8 @@ ion-title, ion-back-button {
 .quantity-new--negative {
   color: var(--ion-color-danger) !important;
 }
+
+// ── Danger zone ─────────────────────────────────────────────────────────────
 
 .edit-item-modal__danger-zone {
   margin-top: var(--app-theme-spacing-lg);

@@ -32,12 +32,16 @@ export function normalizeWhitespaceLowercase(value: string | null | undefined): 
   return normalizeWhitespace(value).toLowerCase();
 }
 
+export function stripDiacritics(value: string): string {
+  return value.normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
 export function normalizeSearchQuery(value: string | null | undefined): string {
-  return normalizeWhitespaceLowercase(value);
+  return stripDiacritics(normalizeWhitespaceLowercase(value));
 }
 
 export function normalizeSearchField(value: unknown): string {
-  return normalizeWhitespaceLowercase(String(value ?? ''));
+  return stripDiacritics(normalizeWhitespaceLowercase(String(value ?? '')));
 }
 
 export function normalizeLocaleCode(locale?: string | null): string | null {

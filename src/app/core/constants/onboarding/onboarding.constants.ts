@@ -2,21 +2,21 @@ import type { OnboardingSlide } from '@core/models';
 
 export const ONBOARDING_SLIDES: readonly OnboardingSlide[] = [
   {
-    key: 'problem',
-    titleKey: 'onboarding.slides.problem.title',
-    descriptionKey: 'onboarding.slides.problem.description',
-    icon: 'alert-circle-outline',
+    key: 'notifications',
+    titleKey: 'onboarding.slides.notifications.title',
+    descriptionKey: 'onboarding.slides.notifications.description',
+    icon: 'notifications-outline',
   },
   {
-    key: 'fresh',
-    titleKey: 'onboarding.slides.fresh.title',
-    descriptionKey: 'onboarding.slides.fresh.description',
-    icon: 'leaf-outline',
+    key: 'seed',
+    titleKey: 'onboarding.slides.seed.title',
+    descriptionKey: 'onboarding.slides.seed.description',
+    icon: 'basket-outline',
   },
   {
-    key: 'action',
-    titleKey: 'onboarding.slides.action.title',
-    descriptionKey: 'onboarding.slides.action.description',
-    icon: 'add-outline',
+    key: 'confirm',
+    titleKey: 'onboarding.slides.confirm.title',
+    descriptionKey: 'onboarding.slides.confirm.description',
+    icon: 'checkmark-circle-outline',
   },
 ] as const;

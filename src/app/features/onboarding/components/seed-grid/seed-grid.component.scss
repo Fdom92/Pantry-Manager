@@ -1,0 +1,64 @@
+.seed-grid {
+  margin-top: var(--app-theme-spacing-lg);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--app-theme-spacing-sm);
+  width: 100%;
+}
+
+.seed-cell {
+  position: relative;
+  padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
+  border-radius: var(--app-theme-radius-md);
+  border: 1.5px solid var(--app-theme-card-border-color);
+  background: color-mix(in srgb, var(--ion-card-background) 88%, transparent);
+  color: var(--app-theme-text-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--app-theme-spacing-xs);
+  cursor: pointer;
+  transition:
+    transform var(--app-theme-transition-fast),
+    border-color var(--app-theme-transition-fast),
+    background var(--app-theme-transition-fast);
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    transform: scale(0.94);
+  }
+
+  &.is-selected {
+    border-color: var(--ion-color-primary);
+    background: color-mix(in srgb, var(--ion-color-primary) 16%, var(--ion-card-background));
+  }
+}
+
+.seed-emoji {
+  font-size: var(--app-theme-icon-size-lg); // emoji grid cell
+  line-height: 1.1;
+}
+
+.seed-name {
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-semibold);
+  text-align: center;
+  line-height: 1.15;
+  color: var(--app-theme-text-color);
+}
+
+.seed-check {
+  position: absolute;
+  top: var(--app-theme-spacing-xs);
+  right: var(--app-theme-spacing-xs-plus);
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--app-theme-radius-pill);
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  font-size: var(--app-theme-font-size-micro); // ~11.5px — checkmark badge
+  font-weight: var(--app-theme-font-weight-bold);
+  line-height: 1;
+}

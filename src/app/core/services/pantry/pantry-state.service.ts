@@ -442,7 +442,15 @@ export class PantryStateService {
 
   async toggleItemBasic(item: PantryItem): Promise<void> {
     const isBasic = !item.isBasic;
-    await this.pantryStore.updateItem({ ...item, isBasic, updatedAt: new Date().toISOString() });
+    const updated: PantryItem = {
+      ...item,
+      isBasic,
+      updatedAt: new Date().toISOString(),
+    };
+    if (!isBasic) {
+      updated.minThreshold = undefined;
+    }
+    await this.pantryStore.updateItem(updated);
     const isDepleted = this.batchOps.getTotalQuantity(item) <= 0;
     let msgKey: string;
     if (isBasic) {

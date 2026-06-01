@@ -1,0 +1,17 @@
+<div class="seed-grid">
+  @for (item of items(); track item.key) {
+    <button
+      type="button"
+      class="seed-cell"
+      [class.is-selected]="isSelected(item.key)"
+      (click)="onToggle(item.key)">
+      <span class="seed-emoji" aria-hidden="true">{{ item.emoji }}</span>
+      <span class="seed-name">
+        {{ 'onboarding.quickSeed.items.' + item.key | translate }}
+      </span>
+      @if (isSelected(item.key)) {
+        <span class="seed-check" aria-hidden="true">✓</span>
+      }
+    </button>
+  }
+</div>

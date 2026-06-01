@@ -1,6 +1,6 @@
 .fresh-add-modal {
   &__keep {
-    padding: 0 16px 12px;
+    padding: 0 var(--app-theme-spacing-lg) var(--app-theme-spacing-md);
   }
 
   &__keep-item {
@@ -14,13 +14,13 @@
     font-size: var(--app-theme-font-size-body);
     font-weight: var(--app-theme-font-weight-bold);
     color: var(--app-theme-text-color);
-    margin: 0 0 2px 0;
+    margin: 0 0 var(--app-theme-spacing-2xs) 0;
   }
 
   &__keep-hint {
-    font-size: 0.75rem;
+    font-size: var(--app-theme-font-size-small);
     color: var(--app-theme-text-muted);
     margin: 0;
-    line-height: 1.4;
+    line-height: var(--app-theme-line-height-normal);
   }
 }

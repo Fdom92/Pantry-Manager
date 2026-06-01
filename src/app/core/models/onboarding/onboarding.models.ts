@@ -3,6 +3,4 @@ export interface OnboardingSlide {
   titleKey: string;
   descriptionKey: string;
   icon: string;
-  badgeKey?: string | null;
-  pro?: boolean;
 }

@@ -51,8 +51,7 @@ export class PantryFreshAddModalStateService {
     const name = normalizeTrim(this.query());
     if (!name) return '';
     const formatted = formatFriendlyName(name, name);
-    return this.translate.instant('pantry.fastAdd.addNew')
-      .replace('{{ name }}', formatted);
+    return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
   });
 
   open(): void {
@@ -206,10 +205,8 @@ export class PantryFreshAddModalStateService {
       }
       this.dismiss();
       const msg = entries.length === 1
-        ? this.translate.instant('pantry.fresh.toast.addSuccess_one')
-          .replace('{{name}}', entries[0].name)
-        : this.translate.instant('pantry.fresh.toast.addSuccess_other')
-          .replace('{{count}}', String(entries.length));
+        ? this.translate.instant('pantry.fresh.toast.addSuccess_one', { name: entries[0].name })
+        : this.translate.instant('pantry.fresh.toast.addSuccess_other', { count: entries.length });
       const toast = await this.toastCtrl.create({ message: msg, duration: 1500, position: 'bottom' });
       void toast.present();
     }).catch(err => console.error('[PantryFreshAddModalStateService] submit error', err));
