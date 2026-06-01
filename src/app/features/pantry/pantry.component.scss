@@ -206,7 +206,7 @@ ion-title {
 .virtual-item-card {
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: var(--app-theme-spacing-lg);
+  margin-bottom: var(--app-theme-spacing-sm);
   transition:
     height var(--app-theme-transition-slow),
     opacity var(--app-theme-transition-normal),
@@ -512,7 +512,7 @@ ion-modal.quantity-sheet ion-content {
 .fresh-list {
   display: flex;
   flex-direction: column;
-  gap: var(--app-theme-spacing-xs);
+  gap: var(--app-theme-spacing-sm);
 }
 
 .fresh-empty-state {
