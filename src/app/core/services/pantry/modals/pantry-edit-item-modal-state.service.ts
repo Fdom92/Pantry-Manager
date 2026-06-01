@@ -357,7 +357,7 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
       categoryId: normalizedCategory,
       supermarket: normalizedSupermarket,
       isBasic: isBasic ? true : undefined,
-      minThreshold: normalizedMinThreshold,
+      minThreshold: isBasic ? normalizedMinThreshold : undefined,
       foodType: foodType ?? undefined,
       updatedAt: now,
     };

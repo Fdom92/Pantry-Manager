@@ -28,10 +28,8 @@ export class NearExpiryNotification implements NotificationDefinition {
     }
     return {
       id: this.id,
-      title: t(titleKey),
-      body: t(bodyKey)
-        .replace('{{ count }}', String(count))
-        .replace('{{ nearestDays }}', String(nearestDays)),
+      title: t(titleKey, { count }),
+      body: t(bodyKey, { count, nearestDays }),
       scheduleAt: buildNextTriggerDate(now, hour).toISOString(),
     };
   }
