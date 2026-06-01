@@ -189,6 +189,9 @@ ion-card-title {
   --ion-item-background: var(--app-theme-card-bg);
   border-radius: var(--app-theme-card-border-radius);
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  // Baseline card shadow — list wrapper is a surface container, same tier as
+  // settings-card and other card-like containers across the app.
+  box-shadow: var(--app-theme-card-shadow);
   overflow: hidden;
   padding: 0;
 }

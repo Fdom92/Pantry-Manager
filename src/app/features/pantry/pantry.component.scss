@@ -441,7 +441,7 @@ ion-card-header {
 ion-modal.quantity-sheet {
   --background: var(--ion-background-color);
   --border-radius: var(--app-theme-radius-lg) var(--app-theme-radius-lg) 0 0;
-  --box-shadow: 0 -4px 16px color-mix(in srgb, var(--ion-text-color) 12%, transparent);
+  --box-shadow: var(--app-theme-shadow-sheet);
 }
 
 ion-modal.quantity-sheet ion-content {

@@ -277,8 +277,21 @@
     0 20px 28px color-mix(in srgb, var(--ion-text-color) 14%, transparent),
     0 8px 12px color-mix(in srgb, var(--ion-text-color) 10%, transparent);
 
-  // Default card shadow uses the medium tier; modals/overlays should use lg or xl.
+  // Shadow tier usage guide:
+  //   xs  → chips, badges, small floating bits
+  //   sm  → previews, nested mini surfaces
+  //   md  → DEFAULT — every card, every settings shell, every list wrapper
+  //   lg  → premium / elevated tier (plan cards, hero CTAs)
+  //   xl  → hero or selected premium emphasis (upgrade hero, selected plan)
+  // Cards should NEVER inline a shadow expression — always reference a token.
   --app-theme-card-shadow: var(--app-theme-shadow-md);
+
+  // Bottom-sheet shadow — drops upward instead of downward. Used by sheet
+  // modals (quantity-sheet, future bottom-sheet patterns) so the elevation
+  // physically points toward the floating surface.
+  --app-theme-shadow-sheet:
+    0 -4px 8px color-mix(in srgb, var(--ion-text-color) 10%, transparent),
+    0 -1px 2px color-mix(in srgb, var(--ion-text-color) 6%, transparent);
 }
 
 .ion-palette-dark,
