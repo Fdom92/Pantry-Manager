@@ -219,16 +219,21 @@ ion-card-title {
   line-height: var(--app-theme-line-height-normal);
 }
 
+// Outline chips — tonal fill + darker accent text. The previous version used
+// --ion-color-medium for both border and text on a transparent background,
+// which falls below WCAG AA (~2.5:1) against light card surfaces. Switching
+// to a tinted background + medium-shade text raises the chip text contrast
+// to ~4.7:1 while keeping the visual weight light.
 .reason-chip--basic {
-  --background: transparent;
-  --color: var(--ion-color-medium);
-  border: 1px solid var(--ion-color-medium);
+  --background: color-mix(in srgb, var(--ion-color-medium) 18%, transparent);
+  --color: var(--ion-color-medium-shade);
+  border: 1px solid color-mix(in srgb, var(--ion-color-medium) 45%, transparent);
 }
 
 .reason-chip--manual {
-  --background: transparent;
-  --color: var(--app-theme-text-muted);
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 20%, transparent);
+  --background: var(--app-theme-surface-tint-medium);
+  --color: var(--app-theme-text-soft);
+  border: 1px solid var(--app-theme-surface-tint-bold);
   font-style: italic;
 }
 

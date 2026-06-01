@@ -20,7 +20,9 @@
   appearance: none;
   border: none;
   background: transparent;
-  color: var(--app-theme-text-muted);
+  // Inactive text — was --app-theme-text-muted (= --ion-color-medium, ~2.8:1
+  // on light card). Bumped to --text-soft (text-color 70%) for ~5.5:1 AA pass.
+  color: var(--app-theme-text-soft);
   font-size: var(--app-theme-font-size-micro);
   font-weight: var(--app-theme-font-weight-bold);
   padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
@@ -38,9 +40,12 @@
     background: var(--app-theme-card-accent-warning);
     color: var(--ion-color-dark);
   }
+  // none → use danger-contrast (white) instead of medium-contrast (dark).
+  // White on danger red passes contrast comfortably; dark on red is ~4.5:1
+  // borderline and reads muddy.
   &.is-active[data-state='none'] {
     background: var(--app-theme-card-accent-critical);
-    color: var(--ion-color-medium-contrast);
+    color: var(--ion-color-danger-contrast);
   }
 
   &:not(.is-active):active {
