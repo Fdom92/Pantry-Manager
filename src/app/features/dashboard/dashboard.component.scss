@@ -442,11 +442,12 @@ ion-title {
     }
   }
 
-  // Category-specific accent color
+  // Category-specific accent color. Conversion uses tertiary (violet) since
+  // tertiary now anchors all PRO/upgrade surfaces post v4.4-refresh.
   &[data-category='critical']     { --action-accent: var(--app-theme-card-accent-critical); }
   &[data-category='preventive']   { --action-accent: var(--app-theme-card-accent-warning); }
   &[data-category='optimization'] { --action-accent: var(--app-theme-card-accent-success); }
-  &[data-category='conversion']   { --action-accent: var(--ion-color-secondary); }
+  &[data-category='conversion']   { --action-accent: var(--app-theme-card-accent-premium); }
 }
 
 // ── LAYER 3 — Additional Context (Optional) ──────────────────────────────────

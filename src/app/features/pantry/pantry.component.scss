@@ -19,9 +19,18 @@ ion-title {
   top: -16px;
   z-index: 10;
   margin-bottom: var(--app-theme-spacing-xs);
-  background: var(--ion-background-color);
+  // Glass surface — translucent + backdrop-blur for a premium sticky header
+  // feel. Falls back to solid card-bg when backdrop-filter unsupported.
+  background: var(--app-theme-glass-bg);
+  backdrop-filter: var(--app-theme-glass-blur);
+  -webkit-backdrop-filter: var(--app-theme-glass-blur);
+  border-bottom: 1px solid var(--app-theme-glass-border);
   margin-inline: calc(-1 * var(--ion-padding, 16px));
   padding-inline: var(--ion-padding, 16px);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .summary-bar { background: var(--ion-background-color); }
 }
 
 .summary-chips {
@@ -71,51 +80,69 @@ ion-title {
   font-variant-numeric: tabular-nums;
 }
 
-.summary-chips .status-chip:not(.active) {
-  opacity: 0.5;
+// Chips use the ghost-vs-filled pattern (v4.4-refresh):
+//   inactive → outline-only, full opacity, accent-tinted text
+//   active   → filled with state color, no border, soft shadow
+// Replaces the previous opacity:0.5 inactive treatment which looked muted/dirty.
+//
+// Per-chip CSS variables expose --chip-accent and --chip-on-accent so the
+// filled active rule can pick them up generically.
+
+.summary-chips .status-chip {
+  --background: transparent;
+  --color: var(--chip-accent, var(--app-theme-text-muted));
+  border: 1px solid color-mix(in srgb, var(--chip-accent, var(--ion-text-color)) 28%, transparent);
+  box-shadow: none;
+  transition:
+    background var(--app-theme-transition-fast),
+    color var(--app-theme-transition-fast),
+    border-color var(--app-theme-transition-fast),
+    box-shadow var(--app-theme-transition-fast);
 }
 
 .summary-chips .status-chip.active {
-  opacity: 1;
-  box-shadow: var(--app-theme-shadow-md);
-  outline: 2px solid var(--app-theme-card-border-color);
-  outline-offset: 2px;
+  --background: var(--chip-accent);
+  --color: var(--chip-on-accent, var(--ion-color-dark-contrast));
+  border-color: transparent;
+  box-shadow: var(--app-theme-shadow-sm);
 }
 
 .summary-chips .status-chip.chip--all {
-  --background: var(--ion-color-success-tint);
-  --color: var(--ion-color-success-contrast);
+  --chip-accent: var(--ion-color-success);
+  --chip-on-accent: var(--ion-color-success-contrast);
 }
 
 .summary-chips .status-chip.chip--normal {
-  --background: var(--ion-color-primary);
-  --color: var(--ion-color-primary-contrast);
+  --chip-accent: var(--ion-color-primary);
+  --chip-on-accent: var(--ion-color-primary-contrast);
 }
 
 .summary-chips .status-chip.chip--low,
 .summary-chips .status-chip.chip--expiring {
-  --background: var(--ion-color-warning);
-  --color: var(--ion-color-dark);
+  --chip-accent: var(--ion-color-warning);
+  --chip-on-accent: var(--ion-color-dark);
 }
 
 .summary-chips .status-chip.chip--review {
-  --background: var(--ion-color-warning-shade);
-  --color: var(--ion-color-dark);
+  --chip-accent: var(--ion-color-warning-shade);
+  --chip-on-accent: var(--ion-color-dark);
 }
 
 .summary-chips .status-chip.chip--expired {
-  --background: var(--ion-color-danger);
-  --color: var(--ion-color-danger-contrast);
+  --chip-accent: var(--ion-color-danger);
+  --chip-on-accent: var(--ion-color-danger-contrast);
 }
 
 .summary-chips .status-chip.chip--pendientes {
-  --background: var(--ion-color-medium);
-  --color: var(--ion-color-medium-contrast);
+  --chip-accent: var(--ion-color-medium);
+  --chip-on-accent: var(--ion-color-medium-contrast);
 }
 
+// chip--basic kept on medium tone (NOT tertiary — tertiary is now reserved
+// for PRO/premium; basic items are operational, not premium).
 .summary-chips .status-chip.chip--basic {
-  --background: var(--ion-color-tertiary);
-  --color: var(--ion-color-tertiary-contrast);
+  --chip-accent: var(--ion-color-medium-shade);
+  --chip-on-accent: var(--ion-color-medium-contrast);
 }
 
 // ── List + empty state + skeleton ────────────────────────────────────────────
@@ -489,12 +516,15 @@ ion-modal.quantity-sheet ion-content {
     gap: var(--app-theme-spacing-xs);
   }
 
+  // Consume action — uses success (leaf green). Eating/consuming is a positive
+  // depletion, semantically aligned with success. Previously used secondary
+  // (mint), which is now cream and would no longer read as actionable.
   &__consume-btn {
-    background: color-mix(in srgb, var(--ion-color-secondary) 12%, transparent);
-    color: var(--ion-color-secondary);
+    background: color-mix(in srgb, var(--ion-color-success) 12%, transparent);
+    color: var(--ion-color-success);
 
     &:active {
-      background: color-mix(in srgb, var(--ion-color-secondary) 22%, transparent);
+      background: color-mix(in srgb, var(--ion-color-success) 22%, transparent);
     }
   }
 }

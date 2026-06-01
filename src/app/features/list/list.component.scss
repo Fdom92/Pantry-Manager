@@ -306,8 +306,10 @@ ion-card-title {
   padding: var(--app-theme-spacing-xs) 0;
 }
 
+// Bought rows already line-through their .bought-name; no global opacity dim
+// so the row stays legible instead of looking faded/disabled.
 .bought-list {
-  opacity: 0.6;
+  filter: saturate(0.6);
 }
 
 .bought-item {
@@ -338,7 +340,7 @@ ion-card-title {
 // ── FAB ─────────────────────────────────────────────────────────────────────
 
 ion-fab-button[size="small"] {
-  --box-shadow: 0 2px 8px color-mix(in srgb, var(--ion-text-color) 15%, transparent);
+  --box-shadow: var(--app-theme-shadow-md);
 }
 
 .buy-btn {

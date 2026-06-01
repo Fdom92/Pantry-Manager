@@ -114,7 +114,7 @@ ion-item {
 
 .theme-option.selected {
   border-color: var(--ion-color-primary);
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--ion-color-primary) 28%, transparent);
+  box-shadow: var(--app-theme-shadow-md);
   background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
 }
 

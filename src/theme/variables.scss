@@ -10,21 +10,30 @@
   --ion-color-primary-shade: #338672;
   --ion-color-primary-tint: #4ea28f;
 
-  --ion-color-secondary: #88C8AF;
-  --ion-color-secondary-rgb: 136, 200, 175;
+  // Secondary — warm cream (sand). Neutral elevated-surface accent.
+  // Pivoted off mint green (#88C8AF) in v4.4-refresh: mint sat too close to
+  // primary teal and washed out, contributing to the previously monochromatic
+  // palette. Cream gives a complementary warm tone for subtle elevated
+  // surfaces without competing with primary.
+  --ion-color-secondary: #EFE7D8;
+  --ion-color-secondary-rgb: 239, 231, 216;
   --ion-color-secondary-contrast: #0f1413;
   --ion-color-secondary-contrast-rgb: 15, 20, 19;
-  --ion-color-secondary-shade: #78b09a;
-  --ion-color-secondary-tint: #94ceb7;
+  --ion-color-secondary-shade: #d2cbbd;
+  --ion-color-secondary-tint: #f1eadc;
 
-  // Tertiary — warm amber. Doubles as premium / PRO accent and "basic items"
-  // highlight, providing a hue counterweight to the otherwise all-green palette.
-  --ion-color-tertiary: #d99a4e;
-  --ion-color-tertiary-rgb: 217, 154, 78;
-  --ion-color-tertiary-contrast: #1a1206;
-  --ion-color-tertiary-contrast-rgb: 26, 18, 6;
-  --ion-color-tertiary-shade: #bf8745;
-  --ion-color-tertiary-tint: #dca561;
+  // Tertiary — violet. DEDICATED premium / PRO accent.
+  // Was warm amber (#d99a4e) until v4.4-refresh; amber collided with warning
+  // (~9° hue apart) and never signalled "premium." Violet sits ~210° from
+  // primary teal and gives upgrade flows a distinct, contemporary signal.
+  // Reserved EXCLUSIVELY for premium UI — do NOT reuse for "basic items"
+  // or other generic accents.
+  --ion-color-tertiary: #7C5CFF;
+  --ion-color-tertiary-rgb: 124, 92, 255;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #6d51e0;
+  --ion-color-tertiary-tint: #896cff;
 
   // Success — leaf green (~140° hue) so it sits visibly apart from primary teal.
   --ion-color-success: #3d9b5f;
@@ -96,6 +105,7 @@
   --app-theme-text-subtle: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
 
   // Font sizes — closed scale, rem-based.
+  --app-theme-font-size-2xs: 0.65rem;      // ~10.4px — secondary context hints
   --app-theme-font-size-micro: 0.72rem;    // ~11.5px — timestamps, badges
   --app-theme-font-size-tiny: 0.78rem;     // ~12.5px — chip text, secondary meta
   --app-theme-font-size-small: 0.82rem;    // ~13px — captions, helper text
@@ -109,12 +119,19 @@
   --app-theme-font-size-3xl: 1.75rem;      // 28px — hero numbers, stats
   --app-theme-font-size-display: 2.25rem;  // 36px — display numerals, quantity adjuster
 
-  // Font weights
+  // Font weights — v4.4-refresh lowered display 800→700 and extra-bold 700→650.
+  // Modern UIs (Linear, Things, Notion) max at ~700 for headlines; 800 reads
+  // shouty and dated on small screens. Bold stays at 600 for solid body emphasis.
   --app-theme-font-weight-normal: 400;
   --app-theme-font-weight-semibold: 500;
   --app-theme-font-weight-bold: 600;
-  --app-theme-font-weight-extra-bold: 700;
-  --app-theme-font-weight-display: 800;    // hero number weights only
+  --app-theme-font-weight-extra-bold: 650;
+  --app-theme-font-weight-display: 700;    // hero number weights only
+
+  // Letter spacing — tighten on display tier for editorial feel.
+  --app-theme-letter-spacing-display: -0.02em;
+  --app-theme-letter-spacing-tight: -0.01em;
+  --app-theme-letter-spacing-eyebrow: 0.06em;   // uppercase labels, list headers
 
   // Line heights
   --app-theme-line-height-display: 1.1;    // huge numerals, hero titles
@@ -146,11 +163,15 @@
   --app-theme-radius-2xs: 3px;            // accent bars, dividers
   --app-theme-radius-xs: 6px;
   --app-theme-radius-sm: 8px;
+  --app-theme-radius-sm-plus: 10px;
   --app-theme-radius-md: 12px;
-  --app-theme-radius-lg: 16px;            // card default
+  --app-theme-radius-md-plus: 14px;       // card default (was 16px — tighter feels editorial)
+  --app-theme-radius-lg: 16px;
+  --app-theme-radius-lg-plus: 18px;
   --app-theme-radius-xl: 20px;
   --app-theme-radius-2xl: 24px;
   --app-theme-radius-pill: 999px;
+  --app-theme-radius-circle: 50%;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 🔘 ICON SIZES — closed scale for ion-icon usage
@@ -168,7 +189,7 @@
   --app-theme-card-bg: var(--ion-card-background);
   --app-theme-card-border-color: color-mix(in srgb, var(--ion-text-color) 12%, transparent);
   --app-theme-card-border-width: 1px;
-  --app-theme-card-border-radius: var(--app-theme-radius-lg);
+  --app-theme-card-border-radius: var(--app-theme-radius-md-plus);   // 14px — see comment in radius section
   --app-theme-card-margin-inline: var(--app-theme-spacing-sm-plus);
   --app-theme-card-padding: var(--app-theme-spacing-lg);
   --app-theme-card-transition: all 140ms ease;
@@ -179,6 +200,23 @@
   --app-theme-card-accent-warning: var(--ion-color-warning);
   --app-theme-card-accent-success: var(--ion-color-success);
   --app-theme-card-accent-primary: var(--ion-color-primary);
+  --app-theme-card-accent-premium: var(--ion-color-tertiary);   // PRO / upgrade flows
+
+  // Hover lift — universal card affordance. Apply via:
+  //   transform: var(--app-theme-card-hover-transform);
+  //   box-shadow: var(--app-theme-card-hover-shadow);
+  // inside :hover state. Pair with --app-theme-card-transition.
+  --app-theme-card-hover-transform: translateY(-1px);
+  --app-theme-card-hover-shadow: var(--app-theme-shadow-lg);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🪟 GLASS SURFACES — backdrop-blur tokens for sticky/floating UI.
+  // Used by summary-bar, tab-bar, modal headers. Falls back to solid when
+  // backdrop-filter unsupported.
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-glass-bg: color-mix(in srgb, var(--ion-card-background) 78%, transparent);
+  --app-theme-glass-border: color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+  --app-theme-glass-blur: blur(20px) saturate(180%);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 📝 INPUTS & TEXTAREAS
@@ -210,6 +248,11 @@
   --app-theme-transition-fast: 140ms ease;
   --app-theme-transition-normal: 180ms ease;
   --app-theme-transition-slow: 250ms ease;
+
+  // Easings — snap is the Material expressive curve for state changes;
+  // standard is for entrances/exits.
+  --app-theme-easing-snap: cubic-bezier(0.4, 0, 0.2, 1);
+  --app-theme-easing-standard: cubic-bezier(0.2, 0, 0, 1);
 
   // Shadows — layered for premium depth (sm → xl). Each tier stacks two drops
   // so the elevation feels physical instead of a flat blur. color-mix with
