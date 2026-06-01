@@ -47,7 +47,7 @@
       {{ 'upgrade.note' | translate }}
     </ion-note>
     @if (facade.isPro$ | async) {
-      <ion-badge color="success">{{ 'upgrade.alreadyPro' | translate }}</ion-badge>
+      <ion-badge class="already-pro-chip">{{ 'upgrade.alreadyPro' | translate }}</ion-badge>
     }
   </div>
 </ion-content>

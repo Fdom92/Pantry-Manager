@@ -54,7 +54,7 @@
             <!-- Group header -->
             <button class="supermarket-heading pressable" (click)="toggleGroup(group.key)">
               <span>{{ group.label }}</span>
-              <ion-badge color="medium" class="group-count">{{ group.suggestions.length }}</ion-badge>
+              <ion-badge class="group-count group-count--medium">{{ group.suggestions.length }}</ion-badge>
               <ion-icon
                 class="collapse-icon"
                 [class.collapse-icon--expanded]="!isGroupCollapsed(group.key)"
@@ -175,7 +175,7 @@
           <button class="bought-section-header pressable" (click)="toggleGlobalBought()">
             <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
             <span>{{ 'shopping.bought.sectionTitle' | translate }}</span>
-            <ion-badge color="success" class="group-count">{{ state.allBoughtItems.length }}</ion-badge>
+            <ion-badge class="group-count group-count--success">{{ state.allBoughtItems.length }}</ion-badge>
             <ion-icon
               class="collapse-icon"
               [name]="globalBoughtExpanded() ? 'chevron-down-outline' : 'chevron-up-outline'">
@@ -207,7 +207,7 @@
           <button class="ignored-section-header pressable" (click)="toggleGlobalIgnored()">
             <ion-icon name="eye-off-outline" color="medium"></ion-icon>
             <span>{{ 'shopping.ignored.sectionTitle' | translate }}</span>
-            <ion-badge color="medium" class="group-count">{{ state.allIgnoredItems.length }}</ion-badge>
+            <ion-badge class="group-count group-count--medium">{{ state.allIgnoredItems.length }}</ion-badge>
             <ion-icon
               class="collapse-icon"
               [name]="globalIgnoredExpanded() ? 'chevron-down-outline' : 'chevron-up-outline'">

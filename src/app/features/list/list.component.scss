@@ -1,3 +1,5 @@
+@use '../../shared/styles/chip' as chip;
+
 ion-title {
   color: var(--app-theme-text-color);
 }
@@ -210,44 +212,20 @@ ion-card-title {
 }
 
 // ── Reason chips ─────────────────────────────────────────────────────────────
-//
-// Unified tonal pattern across every reason chip (danger / warning / primary /
-// medium / basic / manual variants). Active background = accent at 18% over
-// surface; text = accent shade for high contrast. Replaces the previous mix
-// of solid-filled (warning/danger) and outline-only (basic/manual) chips,
-// which produced visual chaos when several chips sat on the same row.
-//
-// All chips share one --chip-accent driver so adding a new color is just one
-// rule. The base .reason-chip rule sets a sane default for cases where
-// ion-badge color="..." is also present (Ionic adds .ion-color-* classes
-// that we hook into below).
+// See shared/styles/_chip.scss for the tonal pattern. Per-variant accent
+// driven via .reason-chip--<variant> classes (NOT Ionic color="..." — that
+// makes Ionic apply :host(.ion-color), bypassing our custom-property API).
 
-.reason-chip {
-  --background: color-mix(in srgb, var(--chip-accent, var(--ion-color-medium)) 18%, transparent);
-  --color: var(--chip-accent, var(--app-theme-text-soft));
-  font-size: var(--app-theme-font-size-micro);
-  font-weight: var(--app-theme-font-weight-bold);
-  padding: var(--app-theme-spacing-2xs) var(--app-theme-spacing-sm);
-  border-radius: var(--app-theme-radius-pill);
-  border: 1px solid color-mix(in srgb, var(--chip-accent, var(--app-theme-text-muted)) 35%, transparent);
-  height: auto;
-  line-height: var(--app-theme-line-height-normal);
-}
+.reason-chip { @include chip.tonal; }
 
-// Per-variant accent. Driven via .reason-chip--<variant> classes (NOT the
-// Ionic color="..." attribute — that attribute makes Ionic apply its own
-// :host(.ion-color) rule which forces a solid `background:` and overrides
-// our --background custom property, bypassing the tonal pattern entirely).
-// Using -shade variants where needed so accent text clears 4.5:1 on the
-// 18% tonal-tinted background.
-.reason-chip--danger  { --chip-accent: var(--ion-color-danger); }
-.reason-chip--warning { --chip-accent: var(--ion-color-warning-shade); }
-.reason-chip--success { --chip-accent: var(--ion-color-success-shade); }
-.reason-chip--primary { --chip-accent: var(--ion-color-primary); }
-.reason-chip--basic   { --chip-accent: var(--ion-color-medium-shade); }
+.reason-chip--danger  { @include chip.accent-danger; }
+.reason-chip--warning { @include chip.accent-warning; }
+.reason-chip--success { @include chip.accent-success; }
+.reason-chip--primary { @include chip.accent-primary; }
+.reason-chip--basic   { @include chip.accent-medium; }
 
 .reason-chip--manual {
-  --chip-accent: var(--app-theme-text-soft);
+  @include chip.accent-muted;
   font-style: italic;
 }
 
@@ -273,8 +251,14 @@ ion-card-title {
 }
 
 .group-count {
+  @include chip.tonal;
   font-size: var(--app-theme-font-size-small);
+  // Group counts are inline numeric pills, slightly more padded than reason chips.
+  padding: var(--app-theme-spacing-2xs) var(--app-theme-spacing-sm-plus);
 }
+
+.group-count--medium  { @include chip.accent-medium; }
+.group-count--success { @include chip.accent-success; }
 
 .collapse-icon {
   margin-left: auto;
