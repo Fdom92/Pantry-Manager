@@ -1,0 +1,46 @@
+@use '../../../shared/styles/chip' as chip;
+
+.quick-date-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--app-theme-spacing-sm);
+
+  ion-chip {
+    @include chip.tonal;
+    @include chip.accent-primary;
+
+    // Tonal mixin sets the base. Override only the bits this component needs
+    // to differ from a generic content chip:
+    margin: 0;
+    font-size: var(--app-theme-font-size-caption);
+    // Inactive items read slightly dimmer than reason chips since several
+    // sit on screen at once and only one is selected.
+    --background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
+    --color: var(--app-theme-text-color);
+    background: var(--background);
+    color: var(--color);
+    border: 1px solid color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
+
+    &.active {
+      // Switch to the tonal active treatment used by pantry summary chips:
+      // accent at 22% over surface + saturated accent text. Was solid
+      // primary + primary-contrast, which made the active chip clash
+      // against the surrounding tonal palette.
+      --background: color-mix(in srgb, var(--ion-color-primary) 22%, var(--ion-card-background));
+      --color: var(--ion-color-primary);
+      background: var(--background);
+      color: var(--color);
+      border-color: color-mix(in srgb, var(--ion-color-primary) 45%, transparent);
+    }
+
+    &.chip--emphasized:not(.active) {
+      // "Recommended" preset chips (Hoy / 2 días) — slightly bolder than
+      // the rest of the inactive group so the user's gaze lands first.
+      --background: color-mix(in srgb, var(--ion-color-primary) 18%, transparent);
+      --color: var(--ion-color-primary);
+      background: var(--background);
+      color: var(--color);
+      font-weight: var(--app-theme-font-weight-bold);
+    }
+  }
+}
