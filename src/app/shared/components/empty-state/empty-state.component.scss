@@ -7,7 +7,7 @@
   padding: var(--app-theme-spacing-lg-plus) var(--app-theme-spacing-lg);
   border-radius: var(--app-theme-radius-lg);
   text-align: center;
-  animation: emptyFade var(--app-theme-transition-slow);
+  animation: app-empty-fade var(--app-theme-transition-slow);
 }
 
 .empty-state--compact {
@@ -82,13 +82,4 @@
   font-weight: var(--app-theme-font-weight-extra-bold);
 }
 
-@keyframes emptyFade {
-  from {
-    opacity: 0;
-    transform: translateY(var(--app-theme-spacing-xs-plus));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+// Animation app-empty-fade now lives in global.scss alongside app-fade-in-list.

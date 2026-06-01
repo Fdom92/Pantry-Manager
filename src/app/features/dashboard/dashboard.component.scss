@@ -26,7 +26,7 @@ ion-title {
   font-size: var(--app-theme-font-size-md);
   font-weight: var(--app-theme-font-weight-extra-bold);
   color: var(--app-theme-text-color);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow-sm);
   text-transform: uppercase;
   opacity: 0.7;
 }
@@ -42,7 +42,7 @@ ion-title {
   padding-inline: var(--app-theme-card-margin-inline);
 
   &--skeleton {
-    opacity: 0.6;
+    opacity: var(--app-theme-opacity-muted);
   }
 
   &__icon {
@@ -51,7 +51,7 @@ ion-title {
     justify-content: center;
     width: var(--app-theme-control-size-xl);
     height: var(--app-theme-control-size-xl);
-    border-radius: 50%;
+    border-radius: var(--app-theme-radius-circle);
     font-size: var(--app-theme-icon-size-xl);
     flex-shrink: 0;
   }
@@ -121,7 +121,7 @@ ion-title {
     font-size: var(--app-theme-font-size-tiny);
     font-weight: var(--app-theme-font-weight-bold);
     color: var(--app-theme-text-muted);
-    letter-spacing: 0.04em;
+    letter-spacing: var(--app-theme-letter-spacing-eyebrow-sm);
   }
 
   &__value {
@@ -272,7 +272,7 @@ ion-title {
 
     &::before {
       background: var(--ion-color-primary);
-      opacity: 0.4;
+      opacity: var(--app-theme-opacity-disabled);
     }
   }
 

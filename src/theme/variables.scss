@@ -128,16 +128,57 @@
   --app-theme-font-weight-extra-bold: 650;
   --app-theme-font-weight-display: 700;    // hero number weights only
 
-  // Letter spacing — tighten on display tier for editorial feel.
-  --app-theme-letter-spacing-display: -0.02em;
-  --app-theme-letter-spacing-tight: -0.01em;
-  --app-theme-letter-spacing-eyebrow: 0.06em;   // uppercase labels, list headers
+  // Letter spacing — closed scale.
+  // Negative for editorial titles, positive for uppercase eyebrow labels.
+  --app-theme-letter-spacing-display: -0.02em;   // hero numerals, plan amounts
+  --app-theme-letter-spacing-tight: -0.01em;     // headlines
+  --app-theme-letter-spacing-eyebrow-sm: 0.04em; // small uppercase (chip, label)
+  --app-theme-letter-spacing-eyebrow: 0.06em;    // standard uppercase
+  --app-theme-letter-spacing-eyebrow-lg: 0.08em; // large uppercase (badge, PRO)
 
   // Line heights
   --app-theme-line-height-display: 1.1;    // huge numerals, hero titles
   --app-theme-line-height-tight: 1.3;
   --app-theme-line-height-normal: 1.4;
   --app-theme-line-height-relaxed: 1.5;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 👻 OPACITY SCALE — closed set replaces ad-hoc 0.4/0.5/0.6/0.7/0.78 etc.
+  // Components MUST pick a step instead of inventing decimals.
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-opacity-disabled: 0.4;     // disabled controls, refresh buttons
+  --app-theme-opacity-muted: 0.6;        // de-emphasized rows (bought items, ignored)
+  --app-theme-opacity-subtle: 0.75;      // partially de-emphasized
+  --app-theme-opacity-hint: 0.85;        // not full, hint-level dim
+  --app-theme-opacity-pressed: 0.88;     // active/pressed feedback
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🌒 TEXT MIX SCALE — closed set of --ion-text-color mix percentages.
+  // Each step is also exposed as a color for direct `color:` usage.
+  // Replaces scattered color-mix(..., var(--ion-text-color) N%, transparent).
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-text-strong: color-mix(in srgb, var(--ion-text-color) 85%, transparent);
+  --app-theme-text-soft: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
+  // --app-theme-text-muted defined below (consumes --ion-color-medium); kept for back-compat.
+  --app-theme-text-faint: color-mix(in srgb, var(--ion-text-color) 45%, transparent);
+  --app-theme-text-whisper: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
+
+  // Surface-tint scale — when something needs a subtle tinted bg derived from
+  // text color (e.g. metric cards, neutral panels). Step values match
+  // common patterns we found in audit (5/8/14/18%).
+  --app-theme-surface-tint-soft: color-mix(in srgb, var(--ion-text-color) 5%, transparent);
+  --app-theme-surface-tint-medium: color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+  --app-theme-surface-tint-strong: color-mix(in srgb, var(--ion-text-color) 14%, transparent);
+  --app-theme-surface-tint-bold: color-mix(in srgb, var(--ion-text-color) 18%, transparent);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🪜 Z-INDEX SCALE — closed set so layering stays predictable.
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-z-base: 1;          // virtual list items, default stacking
+  --app-theme-z-elevated: 2;      // glassy nested cards above siblings
+  --app-theme-z-sticky: 10;       // pantry summary-bar, sticky headers
+  --app-theme-z-dropdown: 200;    // autocomplete options, popovers
+  --app-theme-z-modal: 1000;      // ion-modal layer (informational; Ionic sets its own)
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 📐 SPACING — 14-step scale (2px → 48px)

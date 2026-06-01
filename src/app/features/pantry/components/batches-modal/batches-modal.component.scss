@@ -113,7 +113,7 @@ ion-title, ion-back-button {
 
 .batch-date-label {
   font-size: var(--app-theme-font-size-micro);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow-sm);
   color: var(--app-theme-text-muted);
 }
 

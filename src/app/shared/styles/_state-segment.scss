@@ -1,0 +1,49 @@
+// Shared 3-state pill segment used by fresh-item-card and
+// fresh-edit-item-modal. States: sufficient / low / none.
+//
+// Usage:
+//   @use '../../shared/styles/state-segment' as segment;
+//   .my-segment { @include segment.container; }
+//   .my-segment__btn { @include segment.button; }
+
+@mixin container {
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: var(--app-theme-radius-pill);
+  background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
+  padding: var(--app-theme-spacing-2xs);
+  gap: var(--app-theme-spacing-2xs);
+}
+
+@mixin button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--app-theme-text-muted);
+  font-size: var(--app-theme-font-size-micro);
+  font-weight: var(--app-theme-font-weight-bold);
+  padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
+  border-radius: var(--app-theme-radius-pill);
+  cursor: pointer;
+  transition:
+    background var(--app-theme-transition-fast),
+    color var(--app-theme-transition-fast);
+
+  &.is-active[data-state='sufficient'] {
+    background: var(--app-theme-card-accent-success);
+    color: var(--ion-color-success-contrast);
+  }
+  &.is-active[data-state='low'] {
+    background: var(--app-theme-card-accent-warning);
+    color: var(--ion-color-dark);
+  }
+  &.is-active[data-state='none'] {
+    background: var(--app-theme-card-accent-critical);
+    color: var(--ion-color-medium-contrast);
+  }
+
+  &:not(.is-active):active {
+    background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
+  }
+}

@@ -3,7 +3,7 @@ ion-title {
 }
 
 ion-card {
-  background: var(--app-theme-card-bg) !important;
+  background: var(--app-theme-card-bg);
   --background: var(--app-theme-card-bg);
   box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
   border-color: var(--app-theme-card-border-color);
@@ -92,7 +92,7 @@ ion-card-title {
 .purchase-action {
   --padding-start: 0;
   --padding-end: 0;
-  --border-radius: 50%;
+  --border-radius: var(--app-theme-radius-circle);
   width: 32px;
   height: 32px;
   display: inline-flex;
@@ -124,7 +124,7 @@ ion-card-title {
 
 .suggestions-shell {
   --background: transparent;
-  background: transparent !important;
+  background: transparent;
   border: none;
   box-shadow: none;
   margin: 0;
@@ -261,7 +261,7 @@ ion-card-title {
   margin-left: auto;
   font-size: var(--app-theme-font-size-title);
   color: var(--app-theme-text-muted);
-  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 250ms var(--app-theme-easing-snap);
   transform: rotate(0deg);
 
   &--expanded {

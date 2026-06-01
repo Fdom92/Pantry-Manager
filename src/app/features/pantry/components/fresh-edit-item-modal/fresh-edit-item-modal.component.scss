@@ -1,3 +1,6 @@
+@use "../../../../shared/styles/modal-footer" as footer;
+@use "../../../../shared/styles/state-segment" as segment;
+
 .fresh-edit-modal {
   &__form {
     display: flex;
@@ -7,41 +10,17 @@
   }
 
   &__segment {
-    display: inline-flex;
-    border-radius: var(--app-theme-radius-pill);
-    background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
-    border: 1px solid color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
+    @include segment.container;
+    width: fit-content;
+    // Modal uses slightly more breathing room than the inline card variant.
     padding: var(--app-theme-spacing-xs);
     gap: var(--app-theme-spacing-xs);
-    width: fit-content;
   }
 
   &__segment-btn {
-    appearance: none;
-    border: none;
-    background: transparent;
-    color: var(--app-theme-text-muted);
+    @include segment.button;
     font-size: var(--app-theme-font-size-caption);
-    font-weight: var(--app-theme-font-weight-bold);
     padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-lg-plus);
-    border-radius: var(--app-theme-radius-pill);
-    cursor: pointer;
-    transition:
-      background var(--app-theme-transition-fast),
-      color var(--app-theme-transition-fast);
-
-    &.is-active[data-state='sufficient'] {
-      background: var(--app-theme-card-accent-success);
-      color: var(--ion-color-success-contrast);
-    }
-    &.is-active[data-state='low'] {
-      background: var(--app-theme-card-accent-warning);
-      color: var(--ion-color-dark);
-    }
-    &.is-active[data-state='none'] {
-      background: var(--app-theme-card-accent-critical);
-      color: var(--ion-color-medium-contrast);
-    }
   }
 
   &__segment-card,
@@ -59,16 +38,7 @@
   }
 }
 
-.modal-footer ion-toolbar {
-  --padding-start: var(--app-theme-spacing-lg);
-  --padding-end: var(--app-theme-spacing-lg);
-  --padding-top: var(--app-theme-spacing-md);
-  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
-}
-
-.modal-footer ion-button {
-  width: 100%;
-}
+.modal-footer { @include footer.apply; }
 
 // form-section pattern (same visual as pantry edit modal)
 .form-section {

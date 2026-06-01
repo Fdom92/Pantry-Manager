@@ -32,7 +32,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: var(--app-theme-z-base);
   filter: blur(64px);
   opacity: 0.8;
 }
@@ -49,10 +49,10 @@
 
 .top-bar {
   position: relative;
-  z-index: 3;
+  z-index: var(--app-theme-z-sticky);
   padding: calc(var(--app-theme-spacing-lg) + var(--ion-safe-area-top))
     var(--app-theme-spacing-lg)
-    6px;
+    var(--app-theme-spacing-xs-plus);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -61,7 +61,7 @@
 
 .skip-corner {
   --color: var(--app-theme-text-muted);
-  font-size: 13px;
+  font-size: var(--app-theme-font-size-small);
   font-weight: var(--app-theme-font-weight-semibold);
   text-transform: none;
   letter-spacing: 0;
@@ -69,19 +69,19 @@
 
 .eyebrow {
   display: inline-flex;
-  gap: 10px;
+  gap: var(--app-theme-spacing-sm-plus);
   align-items: center;
   padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
-  border-radius: 999px;
+  border-radius: var(--app-theme-radius-pill);
   background: var(--onboarding-glass);
   border: 1px solid var(--onboarding-glass-border);
   backdrop-filter: blur(12px);
-  font-size: 14px;
-  letter-spacing: 0.02em;
+  font-size: var(--app-theme-font-size-body);
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow-sm);
   color: var(--app-theme-text-color);
 
   ion-icon {
-    font-size: 18px;
+    font-size: var(--app-theme-font-size-lg);
     color: var(--ion-color-primary);
   }
 }
@@ -90,8 +90,8 @@
 
 .onboarding-swiper {
   position: relative;
-  z-index: 2;
-  margin: 10px;
+  z-index: var(--app-theme-z-elevated);
+  margin: var(--app-theme-spacing-sm-plus);
   height: calc(100% - 60px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
   padding: calc(var(--app-theme-spacing-sm) + var(--ion-safe-area-top))
     var(--app-theme-spacing-lg)
@@ -110,7 +110,7 @@
   box-shadow: var(--app-theme-card-shadow);
   color: var(--app-theme-text-color);
   text-align: center;
-  animation: floatIn 420ms ease;
+  animation: app-float-in 420ms var(--app-theme-easing-standard);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -123,7 +123,7 @@
     font-size: var(--app-theme-font-size-xl);
     font-weight: var(--app-theme-font-weight-extra-bold);
     margin: var(--app-theme-spacing-sm-plus) 0 var(--app-theme-spacing-md);
-    letter-spacing: -0.01em;
+    letter-spacing: var(--app-theme-letter-spacing-tight);
     color: var(--app-theme-text-color);
   }
 
@@ -163,7 +163,7 @@
     font-size: var(--app-theme-icon-size-xl);
     color: var(--ion-color-dark-contrast);
     position: relative;
-    z-index: 2;
+    z-index: var(--app-theme-z-elevated);
   }
 }
 
@@ -173,7 +173,7 @@
   margin-top: var(--app-theme-spacing-lg);
   padding-top: var(--app-theme-spacing-md);
   display: grid;
-  gap: 10px;
+  gap: var(--app-theme-spacing-sm-plus);
   position: sticky;
   bottom: 0;
   background: linear-gradient(
@@ -189,7 +189,7 @@
 .notif-preview {
   margin-top: var(--app-theme-spacing-lg-plus);
   padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg);
-  border-radius: var(--app-theme-radius-lg-plus, 18px);
+  border-radius: var(--app-theme-radius-lg-plus);
   background: color-mix(in srgb, var(--ion-card-background) 92%, transparent);
   border: 1px solid color-mix(in srgb, var(--ion-text-color) 14%, transparent);
   text-align: left;
@@ -202,7 +202,7 @@
   display: flex;
   align-items: center;
   gap: var(--app-theme-spacing-sm);
-  margin-bottom: 2px;
+  margin-bottom: var(--app-theme-spacing-2xs);
 }
 
 .notif-app-icon {
@@ -216,7 +216,7 @@
 .notif-app-name {
   font-size: var(--app-theme-font-size-small);
   font-weight: var(--app-theme-font-weight-bold);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow-sm);
   color: var(--app-theme-text-muted);
   text-transform: uppercase;
 }
@@ -242,7 +242,7 @@
 .slide-cta-stack {
   margin-top: var(--app-theme-spacing-xl);
   display: grid;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs-plus);
   width: 100%;
 }
 
@@ -276,7 +276,7 @@
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 6px;
+  gap: var(--app-theme-spacing-xs-plus);
   max-height: 260px;
   overflow-y: auto;
   text-align: left;
@@ -284,9 +284,9 @@
 
 .confirm-row {
   display: grid;
-  grid-template-columns: 24px 1fr auto;
+  grid-template-columns: var(--app-theme-spacing-2xl) 1fr auto;
   align-items: center;
-  gap: 10px;
+  gap: var(--app-theme-spacing-sm-plus);
   padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
   border-radius: var(--app-theme-spacing-md);
   background: color-mix(in srgb, var(--ion-text-color) 4%, transparent);
@@ -368,15 +368,4 @@
   }
 }
 
-// ── Animations ────────────────────────────────────────────────────────────────
-
-@keyframes floatIn {
-  from {
-    transform: translateY(var(--app-theme-spacing-sm-plus));
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
+// Animation app-float-in now lives in global.scss alongside app-fade-in-list.

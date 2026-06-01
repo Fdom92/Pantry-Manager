@@ -57,7 +57,7 @@
   justify-content: center;
   padding: var(--app-theme-spacing-md) var(--app-theme-spacing-sm);
   border-radius: var(--app-theme-radius-md);
-  background: color-mix(in srgb, var(--ion-text-color) 5%, transparent);
+  background: var(--app-theme-surface-tint-soft);
   gap: var(--app-theme-spacing-xs);
 
   &__value {
@@ -69,14 +69,14 @@
   &__label {
     font-size: var(--app-theme-font-size-micro);
     text-align: center;
-    color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+    color: var(--app-theme-text-subtle);
   }
 }
 
 .no-expiry-hint {
   margin: var(--app-theme-spacing-sm-plus) 0 0;
   font-size: var(--app-theme-font-size-small);
-  color: color-mix(in srgb, var(--ion-text-color) 55%, transparent);
+  color: var(--app-theme-text-subtle);
 }
 
 // ── Section B — activity ─────────────────────────────────────────────────────
@@ -100,7 +100,7 @@
 
   &__label {
     font-size: var(--app-theme-font-size-micro);
-    color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+    color: var(--app-theme-text-subtle);
   }
 }
 
@@ -126,7 +126,7 @@
   }
 
   &__track {
-    background: color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+    background: var(--app-theme-surface-tint-medium);
     border-radius: var(--app-theme-spacing-xs);
     height: var(--app-theme-spacing-sm);
     overflow: hidden;
@@ -179,7 +179,7 @@
 
   &__description {
     font-size: var(--app-theme-font-size-small);
-    color: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
+    color: var(--app-theme-text-soft);
     margin: 0;
     line-height: var(--app-theme-line-height-normal);
   }
@@ -209,7 +209,7 @@
 
   &__stale {
     font-size: var(--app-theme-font-size-micro);
-    color: color-mix(in srgb, var(--ion-text-color) 45%, transparent);
+    color: var(--app-theme-text-faint);
     flex: 1;
   }
 
@@ -227,7 +227,7 @@
 
     ion-icon { font-size: var(--app-theme-icon-size-xs); }
 
-    &:disabled { opacity: 0.4; cursor: default; }
+    &:disabled { opacity: var(--app-theme-opacity-disabled); cursor: default; }
   }
 }
 
@@ -243,7 +243,7 @@
     font-size: var(--app-theme-font-size-small);
     font-weight: var(--app-theme-font-weight-bold);
     margin: 0 0 var(--app-theme-spacing-sm);
-    color: color-mix(in srgb, var(--ion-text-color) 80%, transparent);
+    color: var(--app-theme-text-soft);
 
     ion-icon {
       font-size: var(--app-theme-icon-size-sm);
@@ -261,7 +261,7 @@
     li {
       font-size: var(--app-theme-font-size-small);
       line-height: var(--app-theme-line-height-normal);
-      color: color-mix(in srgb, var(--ion-text-color) 85%, transparent);
+      color: var(--app-theme-text-strong);
     }
   }
 }
@@ -285,11 +285,11 @@
   gap: var(--app-theme-spacing-md);
   padding: var(--app-theme-spacing-md-plus);
   background: var(--ion-item-background);
-  border-radius: var(--app-theme-radius-sm-plus, 10px);
+  border-radius: var(--app-theme-radius-sm-plus);
 
   ion-icon {
     font-size: var(--app-theme-icon-size-md);
-    color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+    color: var(--app-theme-text-subtle);
   }
 
   &__value {
@@ -300,7 +300,7 @@
 
   &__hint {
     font-size: var(--app-theme-font-size-small);
-    color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+    color: var(--app-theme-text-subtle);
   }
 
   &__info {
@@ -321,7 +321,7 @@
   font-size: var(--app-theme-font-size-small);
   font-weight: var(--app-theme-font-weight-semibold);
   background: var(--ion-item-background);
-  color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  color: var(--app-theme-text-subtle);
 }
 
 // ── Distribution badges ──────────────────────────────────────────────────────
@@ -334,7 +334,7 @@
   gap: var(--app-theme-spacing-xs-plus);
   font-size: var(--app-theme-font-size-small);
   margin-bottom: var(--app-theme-spacing-xs);
-  color: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
+  color: var(--app-theme-text-subtle);
 }
 
 // ── Quality score ────────────────────────────────────────────────────────────

@@ -150,6 +150,30 @@ ion-input .label-text-wrapper {
   100% { transform: translateX(100%); }
 }
 
+// Empty-state mount — gentler rise than app-fade-in-list (no horizontal drift).
+@keyframes app-empty-fade {
+  from {
+    opacity: 0;
+    transform: translateY(var(--app-theme-spacing-xs-plus));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Onboarding slide mount — lifts from a deeper offset and uses a softer ease.
+@keyframes app-float-in {
+  from {
+    transform: translateY(var(--app-theme-spacing-sm-plus));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 // Utility — apply to any container that should fade its contents on mount.
 .app-fade-in { animation: app-fade-in-list var(--app-theme-transition-slow); }
 
