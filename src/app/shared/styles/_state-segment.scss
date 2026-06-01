@@ -20,8 +20,8 @@
   appearance: none;
   border: none;
   background: transparent;
-  // Inactive text — was --app-theme-text-muted (= --ion-color-medium, ~2.8:1
-  // on light card). Bumped to --text-soft (text-color 70%) for ~5.5:1 AA pass.
+  // Inactive text uses --text-soft (text-color 70%) for ~5.5:1 contrast on
+  // light card surfaces — was --text-muted (medium hue, ~2.8:1, AA fail).
   color: var(--app-theme-text-soft);
   font-size: var(--app-theme-font-size-micro);
   font-weight: var(--app-theme-font-weight-bold);
@@ -32,21 +32,19 @@
     background var(--app-theme-transition-fast),
     color var(--app-theme-transition-fast);
 
-  &.is-active[data-state='sufficient'] {
-    background: var(--app-theme-card-accent-success);
-    color: var(--ion-color-success-contrast);
+  // Active states use the tonal pattern (accent at 22% over surface + accent
+  // text) so the rail reads as a unified family — same language as the pantry
+  // summary chips and the shopping reason chips. Each state shares one
+  // --segment-accent driver; only the accent variable changes per state.
+  &.is-active {
+    background: color-mix(in srgb, var(--segment-accent) 22%, var(--ion-card-background));
+    color: var(--segment-accent);
+    box-shadow: var(--app-theme-shadow-xs);
   }
-  &.is-active[data-state='low'] {
-    background: var(--app-theme-card-accent-warning);
-    color: var(--ion-color-dark);
-  }
-  // none → use danger-contrast (white) instead of medium-contrast (dark).
-  // White on danger red passes contrast comfortably; dark on red is ~4.5:1
-  // borderline and reads muddy.
-  &.is-active[data-state='none'] {
-    background: var(--app-theme-card-accent-critical);
-    color: var(--ion-color-danger-contrast);
-  }
+
+  &.is-active[data-state='sufficient'] { --segment-accent: var(--ion-color-success); }
+  &.is-active[data-state='low']        { --segment-accent: var(--ion-color-warning-shade); }
+  &.is-active[data-state='none']       { --segment-accent: var(--ion-color-danger); }
 
   &:not(.is-active):active {
     background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);

@@ -210,30 +210,48 @@ ion-card-title {
 }
 
 // ── Reason chips ─────────────────────────────────────────────────────────────
+//
+// Unified tonal pattern across every reason chip (danger / warning / primary /
+// medium / basic / manual variants). Active background = accent at 18% over
+// surface; text = accent shade for high contrast. Replaces the previous mix
+// of solid-filled (warning/danger) and outline-only (basic/manual) chips,
+// which produced visual chaos when several chips sat on the same row.
+//
+// All chips share one --chip-accent driver so adding a new color is just one
+// rule. The base .reason-chip rule sets a sane default for cases where
+// ion-badge color="..." is also present (Ionic adds .ion-color-* classes
+// that we hook into below).
 
 .reason-chip {
+  --background: color-mix(in srgb, var(--chip-accent, var(--ion-color-medium)) 18%, transparent);
+  --color: var(--chip-accent, var(--app-theme-text-soft));
   font-size: var(--app-theme-font-size-micro);
+  font-weight: var(--app-theme-font-weight-bold);
   padding: var(--app-theme-spacing-2xs) var(--app-theme-spacing-sm);
-  border-radius: var(--app-theme-radius-xl);
+  border-radius: var(--app-theme-radius-pill);
+  border: 1px solid color-mix(in srgb, var(--chip-accent, var(--app-theme-text-muted)) 35%, transparent);
   height: auto;
   line-height: var(--app-theme-line-height-normal);
 }
 
-// Outline chips — tonal fill + darker accent text. The previous version used
-// --ion-color-medium for both border and text on a transparent background,
-// which falls below WCAG AA (~2.5:1) against light card surfaces. Switching
-// to a tinted background + medium-shade text raises the chip text contrast
-// to ~4.7:1 while keeping the visual weight light.
+// Map Ionic color="..." attributes to the accent driver. Ionic adds
+// .ion-color-<name> classes for these attributes; we just point --chip-accent
+// at the matching ion-color variable so the chip's bg + text + border are
+// derived consistently. Using -shade variants gives the text enough darkness
+// to clear 4.5:1 on the tonal-tinted background.
+.reason-chip.ion-color-danger   { --chip-accent: var(--ion-color-danger); }
+.reason-chip.ion-color-warning  { --chip-accent: var(--ion-color-warning-shade); }
+.reason-chip.ion-color-success  { --chip-accent: var(--ion-color-success-shade); }
+.reason-chip.ion-color-primary  { --chip-accent: var(--ion-color-primary); }
+.reason-chip.ion-color-medium   { --chip-accent: var(--ion-color-medium-shade); }
+
+// Variants that don't map to a single ion-color (composed via class).
 .reason-chip--basic {
-  --background: color-mix(in srgb, var(--ion-color-medium) 18%, transparent);
-  --color: var(--ion-color-medium-shade);
-  border: 1px solid color-mix(in srgb, var(--ion-color-medium) 45%, transparent);
+  --chip-accent: var(--ion-color-medium-shade);
 }
 
 .reason-chip--manual {
-  --background: var(--app-theme-surface-tint-medium);
-  --color: var(--app-theme-text-soft);
-  border: 1px solid var(--app-theme-surface-tint-bold);
+  --chip-accent: var(--app-theme-text-soft);
   font-style: italic;
 }
 
