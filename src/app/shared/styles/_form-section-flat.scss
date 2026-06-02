@@ -15,12 +15,17 @@
 //   .form-section:last-child { @include ff.section-last; }
 //   .form-section__label { @include ff.section-label; }
 
+// Sections separated by generous whitespace (no inline dividers). The eyebrow
+// section labels do the visual chunking — same pattern iOS Settings uses for
+// grouped tables. Dividers added visual noise when sections were small and
+// looked uneven when section heights varied.
 @mixin section {
   display: flex;
   flex-direction: column;
   gap: var(--app-theme-spacing-md);
   padding-block: var(--app-theme-form-section-padding-block);
-  border-bottom: var(--app-theme-form-section-divider);
+
+  &:first-of-type { padding-top: 0; }
 
   // Strip individual ion-item chrome so fields read as part of the section,
   // not as nested cards.
@@ -33,7 +38,6 @@
 }
 
 @mixin section-last {
-  border-bottom: none;
   padding-bottom: 0;
 }
 

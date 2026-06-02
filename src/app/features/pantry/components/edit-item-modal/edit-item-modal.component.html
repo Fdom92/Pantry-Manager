@@ -1,6 +1,9 @@
 <ion-modal
   class="app-sheet-modal"
   [isOpen]="state.isOpen()"
+  [breakpoints]="[0, 0.92, 1]"
+  [initialBreakpoint]="0.92"
+  [handle]="false"
   (willDismiss)="state.dismiss()"
   (didDismiss)="state.close()">
   <ng-template>
