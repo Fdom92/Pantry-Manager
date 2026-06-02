@@ -15,6 +15,12 @@
   // lifts that to ~4.86:1 with minimal visual change. Kept under the
   // --app-theme-* namespace so the brand color stays untouched.
   --app-theme-primary-deep: #2A7E70;
+  // Primary used AS TEXT on the page/card surface (link-style labels, inline
+  // "refresh" buttons, autocomplete option highlights). The default primary
+  // teal is 3.47:1 on white and 4.1:1 on dark — both fail WCAG AA for normal
+  // text. This token resolves to the deep variant in light mode (4.86:1 ✓)
+  // and is overridden to a lighter teal in dark mode below (~6:1 ✓).
+  --app-theme-primary-on-surface: var(--app-theme-primary-deep);
 
   // Secondary — warm cream (sand). Neutral elevated-surface accent.
   // Pivoted off mint green (#88C8AF) in v4.4-refresh: mint sat too close to
@@ -107,7 +113,13 @@
   // 🎨 TYPOGRAPHY
   // ═══════════════════════════════════════════════════════════════════════════
   --app-theme-text-color: var(--ion-text-color);
-  --app-theme-text-muted: var(--ion-color-medium);
+  // text-muted was previously --ion-color-medium (#9fbeb6 fixed), which on a
+  // white card only hits ~2.5:1 — below WCAG AA for normal text (4.5:1) AND
+  // below the 3:1 icon threshold. Redefined as a mode-adaptive 65% mix of
+  // --ion-text-color so it tracks light/dark surfaces:
+  //   light card (#fff): effective #595959 → ~6.6:1 ✓
+  //   dark  card (#1e1e1e): effective #ABABAB → ~6.4:1 ✓
+  --app-theme-text-muted: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
   --app-theme-text-subtle: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
 
   // Font sizes — closed scale, rem-based.
@@ -351,4 +363,15 @@
   --ion-toolbar-background: var(--ion-background-color-step-50, #1e1e1e);
   --ion-card-background: var(--ion-background-color-step-50, #1e1e1e);
   --ion-item-background: var(--ion-background-color, #121212);
+
+  // Primary teal #3A9882 on dark cards (#1e1e1e) only hits ~4.1:1 — fails
+  // WCAG AA for normal text (4.5:1). Switch the link-style primary text
+  // token to a lighter teal that lifts contrast to ~6:1 in dark mode.
+  // Brand primary (chips, fills) stays untouched.
+  --app-theme-primary-on-surface: #5DBDA9;
+
+  // In dark mode, the filled-solid primary button bg also flips: the deeper
+  // teal (#2A7E70) reads too close to the page bg, undermining the CTA. Push
+  // back toward the brand color which is bright enough against dark surfaces.
+  --app-theme-primary-deep: var(--ion-color-primary);
 }

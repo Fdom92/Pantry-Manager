@@ -464,7 +464,7 @@ ion-modal.quantity-sheet ion-content {
     border: none;
     border-radius: var(--app-theme-radius-circle);
     background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
-    color: var(--ion-color-primary);
+    color: var(--app-theme-primary-on-surface);
     cursor: pointer;
     transition: background var(--app-theme-transition-fast);
 
@@ -543,7 +543,7 @@ ion-modal.quantity-sheet ion-content {
     border: none;
     border-radius: var(--app-theme-radius-xl);
     background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
-    color: var(--ion-color-primary);
+    color: var(--app-theme-primary-on-surface);
     font-size: var(--app-theme-font-size-caption);
     font-weight: var(--app-theme-font-weight-bold);
     cursor: pointer;
@@ -569,7 +569,7 @@ ion-modal.quantity-sheet ion-content {
   padding: var(--app-theme-spacing-sm) var(--app-theme-card-margin-inline);
   background: none;
   border: none;
-  color: var(--ion-color-primary);
+  color: var(--app-theme-primary-on-surface);
   font-size: var(--app-theme-font-size-caption);
   font-weight: var(--app-theme-font-weight-bold);
   cursor: pointer;

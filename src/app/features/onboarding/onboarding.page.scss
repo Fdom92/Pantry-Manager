@@ -82,7 +82,7 @@
 
   ion-icon {
     font-size: var(--app-theme-font-size-lg);
-    color: var(--ion-color-primary);
+    color: var(--app-theme-primary-on-surface);
   }
 }
 
@@ -264,7 +264,7 @@
   padding: var(--app-theme-spacing-xs-plus) var(--app-theme-spacing-md);
   border-radius: var(--app-theme-radius-pill);
   background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
-  color: var(--ion-color-primary);
+  color: var(--app-theme-primary-on-surface);
   font-size: var(--app-theme-font-size-small);
   font-weight: var(--app-theme-font-weight-bold);
 }

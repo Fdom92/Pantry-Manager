@@ -24,7 +24,7 @@
   display: grid;
   place-items: center;
   background: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
-  color: var(--ion-color-primary);
+  color: var(--app-theme-primary-on-surface);
   font-size: var(--app-theme-icon-size-lg);
 }
 

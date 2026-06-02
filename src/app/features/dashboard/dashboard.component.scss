@@ -298,7 +298,7 @@ ion-title {
 
     ion-icon {
       font-size: var(--app-theme-icon-size-lg);
-      color: var(--ion-color-primary);
+      color: var(--app-theme-primary-on-surface);
       flex-shrink: 0;
       opacity: 0.7;
     }
@@ -470,7 +470,7 @@ ion-title {
 
   ion-icon {
     font-size: var(--app-theme-icon-size-md);
-    color: var(--ion-color-primary);
+    color: var(--app-theme-primary-on-surface);
     flex-shrink: 0;
   }
 
