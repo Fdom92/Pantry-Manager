@@ -131,12 +131,33 @@ ion-input .label-text-wrapper {
 }
 
 // ── Button contrast overrides ────────────────────────────────────────────────
-// Ionic's color="medium" resolves to --ion-color-medium (greenish-grey
-// ~#9fbeb6) which on a white card only hits ~2.5:1 — below WCAG AA for
-// small text and below 3:1 for icons. Most uses of color="medium" + fill
-// "clear"/"outline" in this app are dismiss / secondary buttons; bump them
-// to --text-soft (~5.5:1) so the affordance reads cleanly without going
-// full dark (which would clash with dark mode).
+//
+// Contrast audit reference:
+//   #3A9882 (primary teal) on white     → 3.47:1  ✓ icon AA  ✗ text AA
+//   #338672 (primary-shade) on white    → ~3.7:1  ✓ icon     ✗ text
+//   #2A7E70 (--app-theme-primary-deep)  → ~4.86:1 ✓ icon ✓ text
+//   #d64545 (danger) on white           → ~4.6:1  ✓ both
+//   #7C5CFF (tertiary violet) on white  → ~5.0:1  ✓ both
+//   #9fbeb6 (medium) on white           → ~2.5:1  ✗ both
+//   white on #e5a93a (warning amber)    → ~2.3:1  ✗ (use dark contrast)
+//   dark  on #e5a93a (warning amber)    → ~9.0:1  ✓
+//
+// Rules below codify the fixes for sub-AA cases.
+
+// Filled-solid primary buttons — bump bg to the deeper teal so text-on-button
+// clears 4.5:1. Brand color stays unchanged elsewhere (chips, accents).
+ion-button[color='primary']:not([fill='clear']):not([fill='outline']) {
+  --background: var(--app-theme-primary-deep);
+  --background-hover: var(--app-theme-primary-deep);
+  --background-activated: var(--app-theme-primary-deep);
+  --background-focused: var(--app-theme-primary-deep);
+}
+
+// color="medium" used on clear/outline secondary buttons — Ionic's
+// --ion-color-medium (~#9fbeb6) on white only hits ~2.5:1, fails both text
+// AA (4.5:1) and icon AA (3:1). Bump --color to --text-soft (~5.5:1) so
+// dismiss / secondary affordances read cleanly without going full dark
+// (which would also clash in dark mode).
 ion-button[color='medium'][fill='clear'],
 ion-button[color='medium'][fill='outline'] {
   --color: var(--app-theme-text-soft);

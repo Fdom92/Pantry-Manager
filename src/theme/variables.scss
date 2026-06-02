@@ -9,6 +9,12 @@
   --ion-color-primary-contrast-rgb: 255, 255, 255;
   --ion-color-primary-shade: #338672;
   --ion-color-primary-tint: #4ea28f;
+  // Deep primary — darker variant used as the background for filled-solid
+  // ion-button[color='primary']. The brand teal #3A9882 hits ~3.47:1 against
+  // white (pass for non-text but fail for text-on-button at 4.5:1). #2A7E70
+  // lifts that to ~4.86:1 with minimal visual change. Kept under the
+  // --app-theme-* namespace so the brand color stays untouched.
+  --app-theme-primary-deep: #2A7E70;
 
   // Secondary — warm cream (sand). Neutral elevated-surface accent.
   // Pivoted off mint green (#88C8AF) in v4.4-refresh: mint sat too close to
