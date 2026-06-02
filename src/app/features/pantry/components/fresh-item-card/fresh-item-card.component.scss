@@ -1,4 +1,5 @@
 @use '../../../../shared/styles/card-status-bar' as bar;
+@use '../../../../shared/styles/state-segment' as segment;
 
 .fresh-item-card {
   @include bar.apply;
@@ -52,10 +53,10 @@
       transform var(--app-theme-transition-fast);
     padding: var(--app-theme-spacing-xs);
     margin: calc(-1 * var(--app-theme-spacing-xs));
-    border-radius: 50%;
+    border-radius: var(--app-theme-radius-circle);
 
     &--active {
-      color: var(--ion-color-warning);
+      color: var(--app-theme-warning-deep);
     }
 
     &:active {
@@ -73,52 +74,16 @@
       font-size: var(--app-theme-font-size-small);
     }
     &[data-urgency='warning'] {
-      color: var(--app-theme-card-accent-warning);
+      color: var(--app-theme-warning-deep);
       font-weight: var(--app-theme-font-weight-bold);
     }
   }
 
-  &__segment {
-    display: inline-flex;
-    flex-shrink: 0;
-    border-radius: var(--app-theme-radius-pill);
-    background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
-    border: 1px solid color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
-    padding: var(--app-theme-spacing-2xs);
-    gap: var(--app-theme-spacing-2xs);
-  }
+  &__segment { @include segment.container; }
 
   &__segment-btn {
-    appearance: none;
-    border: none;
-    background: transparent;
-    color: var(--app-theme-text-muted);
-    font-size: var(--app-theme-font-size-micro);
-    font-weight: var(--app-theme-font-weight-bold);
-    padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
-    border-radius: var(--app-theme-radius-pill);
-    cursor: pointer;
-    transition:
-      background var(--app-theme-transition-fast),
-      color var(--app-theme-transition-fast);
+    @include segment.button;
     min-width: 52px;
     text-transform: capitalize;
-
-    &.is-active[data-state='sufficient'] {
-      background: var(--app-theme-card-accent-success);
-      color: var(--ion-color-success-contrast);
-    }
-    &.is-active[data-state='low'] {
-      background: var(--app-theme-card-accent-warning);
-      color: var(--ion-color-dark);
-    }
-    &.is-active[data-state='none'] {
-      background: var(--app-theme-card-accent-critical);
-      color: var(--ion-color-medium-contrast);
-    }
-
-    &:not(.is-active):active {
-      background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
-    }
   }
 }

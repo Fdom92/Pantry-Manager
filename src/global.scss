@@ -130,6 +130,56 @@ ion-input .label-text-wrapper {
   color: var(--app-theme-text-muted);
 }
 
+// ── Button contrast overrides ────────────────────────────────────────────────
+//
+// Contrast audit reference:
+//   #3A9882 (primary teal) on white     → 3.47:1  ✓ icon AA  ✗ text AA
+//   #338672 (primary-shade) on white    → ~3.7:1  ✓ icon     ✗ text
+//   #2A7E70 (--app-theme-primary-deep)  → ~4.86:1 ✓ icon ✓ text
+//   #d64545 (danger) on white           → ~4.6:1  ✓ both
+//   #7C5CFF (tertiary violet) on white  → ~5.0:1  ✓ both
+//   #9fbeb6 (medium) on white           → ~2.5:1  ✗ both
+//   white on #e5a93a (warning amber)    → ~2.3:1  ✗ (use dark contrast)
+//   dark  on #e5a93a (warning amber)    → ~9.0:1  ✓
+//
+// Rules below codify the fixes for sub-AA cases.
+
+// Filled-solid primary buttons — bump bg to the deeper teal so text-on-button
+// clears 4.5:1. Brand color stays unchanged elsewhere (chips, accents).
+ion-button[color='primary']:not([fill='clear']):not([fill='outline']) {
+  --background: var(--app-theme-primary-deep);
+  --background-hover: var(--app-theme-primary-deep);
+  --background-activated: var(--app-theme-primary-deep);
+  --background-focused: var(--app-theme-primary-deep);
+}
+
+// Same treatment for filled-solid success buttons (action-card optimization
+// CTA). Brand #3d9b5f hits ~3.5:1 white-on-success — fails text AA. Deep
+// variant #2D7848 lifts to ~5.4:1.
+ion-button[color='success']:not([fill='clear']):not([fill='outline']) {
+  --background: var(--app-theme-success-deep);
+  --background-hover: var(--app-theme-success-deep);
+  --background-activated: var(--app-theme-success-deep);
+  --background-focused: var(--app-theme-success-deep);
+}
+
+// color="medium" used on clear/outline secondary buttons — Ionic's
+// --ion-color-medium (~#9fbeb6) on white only hits ~2.5:1, fails both text
+// AA (4.5:1) and icon AA (3:1). Bump --color to --text-soft (~5.5:1) so
+// dismiss / secondary affordances read cleanly without going full dark
+// (which would also clash in dark mode).
+ion-button[color='medium'][fill='clear'],
+ion-button[color='medium'][fill='outline'] {
+  --color: var(--app-theme-text-soft);
+}
+
+// Same issue with standalone ion-icon color="medium" — used inline in list
+// section headers (bought, ignored), tab buttons, etc. Force the icon color
+// to --text-soft so it passes 3:1 icon AA in both modes.
+ion-icon[color='medium'] {
+  color: var(--app-theme-text-soft);
+}
+
 // ── Shared animations ───────────────────────────────────────────────────────
 // Defined once globally so every list/card across the app uses the same fade
 // motion. Previously duplicated in pantry.scss and list.scss.
@@ -148,6 +198,30 @@ ion-input .label-text-wrapper {
 @keyframes app-shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
+}
+
+// Empty-state mount — gentler rise than app-fade-in-list (no horizontal drift).
+@keyframes app-empty-fade {
+  from {
+    opacity: 0;
+    transform: translateY(var(--app-theme-spacing-xs-plus));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Onboarding slide mount — lifts from a deeper offset and uses a softer ease.
+@keyframes app-float-in {
+  from {
+    transform: translateY(var(--app-theme-spacing-sm-plus));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 // Utility — apply to any container that should fade its contents on mount.

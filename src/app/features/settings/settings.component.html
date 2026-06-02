@@ -332,7 +332,7 @@
           </ion-list-header>
 
           <ion-item lines="none">
-            <ion-icon slot="start" [name]="devIsPro() ? 'star' : 'star-outline'" [color]="devIsPro() ? 'warning' : 'medium'"></ion-icon>
+            <ion-icon slot="start" [name]="devIsPro() ? 'star' : 'star-outline'" [color]="devIsPro() ? 'tertiary' : 'medium'"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.toggleProTitle" | translate }}</h3>
               <p>{{ "settings.dev.toggleProSubtitle" | translate: { status: devIsPro() ? 'ON' : 'OFF' } }}</p>
@@ -340,7 +340,7 @@
             <ion-button
               fill="clear"
               slot="end"
-              [color]="devIsPro() ? 'warning' : 'medium'"
+              [color]="devIsPro() ? 'tertiary' : 'medium'"
               (click)="togglePro()"
               [attr.aria-label]="'settings.dev.toggleProTitle' | translate"
             >

@@ -1,3 +1,5 @@
+@use "../../../shared/styles/modal-footer" as footer;
+
 :host {
   display: block;
 }
@@ -22,7 +24,7 @@ ion-title, ion-back-button {
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
   overflow: visible;
   position: relative;
-  z-index: 2;
+  z-index: var(--app-theme-z-elevated);
 }
 
 ion-content {
@@ -101,16 +103,7 @@ ion-modal::part(content) {
   margin-top: var(--app-theme-spacing-md);
 }
 
-.modal-footer ion-toolbar {
-  --padding-start: var(--app-theme-spacing-lg);
-  --padding-end: var(--app-theme-spacing-lg);
-  --padding-top: var(--app-theme-spacing-md);
-  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
-}
-
-.modal-footer ion-button {
-  width: 100%;
-}
+.modal-footer { @include footer.apply; }
 
 .entity-selector-modal__extras:empty {
   display: none;

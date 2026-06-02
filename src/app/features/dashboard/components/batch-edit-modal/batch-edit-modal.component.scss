@@ -1,3 +1,5 @@
+@use "../../../../shared/styles/modal-footer" as footer;
+
 .batch-edit-hint {
   font-size: var(--app-theme-font-size-small);
   color: var(--app-theme-text-muted);
@@ -24,16 +26,7 @@
   gap: var(--app-theme-spacing-xs-plus);
 }
 
-.modal-footer ion-toolbar {
-  --padding-start: var(--app-theme-spacing-lg);
-  --padding-end: var(--app-theme-spacing-lg);
-  --padding-top: var(--app-theme-spacing-md);
-  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
-}
-
-.modal-footer ion-button {
-  width: 100%;
-}
+.modal-footer { @include footer.apply; }
 
 .batch-edit-date-list {
   background: transparent;

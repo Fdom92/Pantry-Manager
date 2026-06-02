@@ -1,5 +1,16 @@
+@use '../../../../shared/styles/chip' as chip;
+
 ion-title, ion-back-button {
   color: var(--app-theme-text-color);
+}
+
+// "Open" batch indicator. Was color="tertiary" (violet PRO accent) which
+// misrepresented the concept — opened batches aren't premium, they're a
+// state warning ("clock starts ticking once opened"). Switched to a tonal
+// warning chip via the shared mixin.
+.batch-open-chip {
+  @include chip.tonal;
+  @include chip.accent-warning;
 }
 
 .batches-modal-content {
@@ -113,7 +124,7 @@ ion-title, ion-back-button {
 
 .batch-date-label {
   font-size: var(--app-theme-font-size-micro);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow-sm);
   color: var(--app-theme-text-muted);
 }
 

@@ -1,0 +1,52 @@
+// Shared 3-state pill segment used by fresh-item-card and
+// fresh-edit-item-modal. States: sufficient / low / none.
+//
+// Usage:
+//   @use '../../shared/styles/state-segment' as segment;
+//   .my-segment { @include segment.container; }
+//   .my-segment__btn { @include segment.button; }
+
+@mixin container {
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: var(--app-theme-radius-pill);
+  background: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
+  padding: var(--app-theme-spacing-2xs);
+  gap: var(--app-theme-spacing-2xs);
+}
+
+@mixin button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  // Inactive text uses --text-soft (text-color 70%) for ~5.5:1 contrast on
+  // light card surfaces — was --text-muted (medium hue, ~2.8:1, AA fail).
+  color: var(--app-theme-text-soft);
+  font-size: var(--app-theme-font-size-micro);
+  font-weight: var(--app-theme-font-weight-bold);
+  padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
+  border-radius: var(--app-theme-radius-pill);
+  cursor: pointer;
+  transition:
+    background var(--app-theme-transition-fast),
+    color var(--app-theme-transition-fast);
+
+  // Active states use the tonal pattern (accent at 22% over surface + accent
+  // text) so the rail reads as a unified family — same language as the pantry
+  // summary chips and the shopping reason chips. Each state shares one
+  // --segment-accent driver; only the accent variable changes per state.
+  &.is-active {
+    background: color-mix(in srgb, var(--segment-accent) 22%, var(--ion-card-background));
+    color: var(--segment-accent);
+    box-shadow: var(--app-theme-shadow-xs);
+  }
+
+  &.is-active[data-state='sufficient'] { --segment-accent: var(--ion-color-success); }
+  &.is-active[data-state='low']        { --segment-accent: var(--ion-color-warning-shade); }
+  &.is-active[data-state='none']       { --segment-accent: var(--ion-color-danger); }
+
+  &:not(.is-active):active {
+    background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
+  }
+}

@@ -9,6 +9,26 @@
   --ion-color-primary-contrast-rgb: 255, 255, 255;
   --ion-color-primary-shade: #338672;
   --ion-color-primary-tint: #4ea28f;
+  // Deep primary — darker variant used as the background for filled-solid
+  // ion-button[color='primary']. The brand teal #3A9882 hits ~3.47:1 against
+  // white (pass for non-text but fail for text-on-button at 4.5:1). #2A7E70
+  // lifts that to ~4.86:1 with minimal visual change. Kept under the
+  // --app-theme-* namespace so the brand color stays untouched.
+  --app-theme-primary-deep: #2A7E70;
+  // Primary used AS TEXT on the page/card surface (link-style labels, inline
+  // "refresh" buttons, autocomplete option highlights). The default primary
+  // teal is 3.47:1 on white and 4.1:1 on dark — both fail WCAG AA for normal
+  // text. This token resolves to the deep variant in light mode (4.86:1 ✓)
+  // and is overridden to a lighter teal in dark mode below (~6:1 ✓).
+  --app-theme-primary-on-surface: var(--app-theme-primary-deep);
+  // Success deep — same role as --primary-deep for filled-solid success
+  // buttons. The brand success #3d9b5f sits at ~3.5:1 against white (icon
+  // pass, text fail). #2D7848 lifts to ~5.4:1.
+  --app-theme-success-deep: #2D7848;
+  // Warning deep — needed when warning is used AS TEXT on a light tinted bg
+  // (tonal action-card CTAs). The brand warning #e5a93a hits ~2.4:1 against
+  // white (fail). #7d5c1c lifts to ~6:1.
+  --app-theme-warning-deep: #7d5c1c;
 
   // Secondary — warm cream (sand). Neutral elevated-surface accent.
   // Pivoted off mint green (#88C8AF) in v4.4-refresh: mint sat too close to
@@ -101,7 +121,13 @@
   // 🎨 TYPOGRAPHY
   // ═══════════════════════════════════════════════════════════════════════════
   --app-theme-text-color: var(--ion-text-color);
-  --app-theme-text-muted: var(--ion-color-medium);
+  // text-muted was previously --ion-color-medium (#9fbeb6 fixed), which on a
+  // white card only hits ~2.5:1 — below WCAG AA for normal text (4.5:1) AND
+  // below the 3:1 icon threshold. Redefined as a mode-adaptive 65% mix of
+  // --ion-text-color so it tracks light/dark surfaces:
+  //   light card (#fff): effective #595959 → ~6.6:1 ✓
+  //   dark  card (#1e1e1e): effective #ABABAB → ~6.4:1 ✓
+  --app-theme-text-muted: color-mix(in srgb, var(--ion-text-color) 65%, transparent);
   --app-theme-text-subtle: color-mix(in srgb, var(--ion-text-color) 60%, transparent);
 
   // Font sizes — closed scale, rem-based.
@@ -128,16 +154,57 @@
   --app-theme-font-weight-extra-bold: 650;
   --app-theme-font-weight-display: 700;    // hero number weights only
 
-  // Letter spacing — tighten on display tier for editorial feel.
-  --app-theme-letter-spacing-display: -0.02em;
-  --app-theme-letter-spacing-tight: -0.01em;
-  --app-theme-letter-spacing-eyebrow: 0.06em;   // uppercase labels, list headers
+  // Letter spacing — closed scale.
+  // Negative for editorial titles, positive for uppercase eyebrow labels.
+  --app-theme-letter-spacing-display: -0.02em;   // hero numerals, plan amounts
+  --app-theme-letter-spacing-tight: -0.01em;     // headlines
+  --app-theme-letter-spacing-eyebrow-sm: 0.04em; // small uppercase (chip, label)
+  --app-theme-letter-spacing-eyebrow: 0.06em;    // standard uppercase
+  --app-theme-letter-spacing-eyebrow-lg: 0.08em; // large uppercase (badge, PRO)
 
   // Line heights
   --app-theme-line-height-display: 1.1;    // huge numerals, hero titles
   --app-theme-line-height-tight: 1.3;
   --app-theme-line-height-normal: 1.4;
   --app-theme-line-height-relaxed: 1.5;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 👻 OPACITY SCALE — closed set replaces ad-hoc 0.4/0.5/0.6/0.7/0.78 etc.
+  // Components MUST pick a step instead of inventing decimals.
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-opacity-disabled: 0.4;     // disabled controls, refresh buttons
+  --app-theme-opacity-muted: 0.6;        // de-emphasized rows (bought items, ignored)
+  --app-theme-opacity-subtle: 0.75;      // partially de-emphasized
+  --app-theme-opacity-hint: 0.85;        // not full, hint-level dim
+  --app-theme-opacity-pressed: 0.88;     // active/pressed feedback
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🌒 TEXT MIX SCALE — closed set of --ion-text-color mix percentages.
+  // Each step is also exposed as a color for direct `color:` usage.
+  // Replaces scattered color-mix(..., var(--ion-text-color) N%, transparent).
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-text-strong: color-mix(in srgb, var(--ion-text-color) 85%, transparent);
+  --app-theme-text-soft: color-mix(in srgb, var(--ion-text-color) 70%, transparent);
+  // --app-theme-text-muted defined below (consumes --ion-color-medium); kept for back-compat.
+  --app-theme-text-faint: color-mix(in srgb, var(--ion-text-color) 45%, transparent);
+  --app-theme-text-whisper: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
+
+  // Surface-tint scale — when something needs a subtle tinted bg derived from
+  // text color (e.g. metric cards, neutral panels). Step values match
+  // common patterns we found in audit (5/8/14/18%).
+  --app-theme-surface-tint-soft: color-mix(in srgb, var(--ion-text-color) 5%, transparent);
+  --app-theme-surface-tint-medium: color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+  --app-theme-surface-tint-strong: color-mix(in srgb, var(--ion-text-color) 14%, transparent);
+  --app-theme-surface-tint-bold: color-mix(in srgb, var(--ion-text-color) 18%, transparent);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🪜 Z-INDEX SCALE — closed set so layering stays predictable.
+  // ═══════════════════════════════════════════════════════════════════════════
+  --app-theme-z-base: 1;          // virtual list items, default stacking
+  --app-theme-z-elevated: 2;      // glassy nested cards above siblings
+  --app-theme-z-sticky: 10;       // pantry summary-bar, sticky headers
+  --app-theme-z-dropdown: 200;    // autocomplete options, popovers
+  --app-theme-z-modal: 1000;      // ion-modal layer (informational; Ionic sets its own)
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 📐 SPACING — 14-step scale (2px → 48px)
@@ -304,4 +371,21 @@
   --ion-toolbar-background: var(--ion-background-color-step-50, #1e1e1e);
   --ion-card-background: var(--ion-background-color-step-50, #1e1e1e);
   --ion-item-background: var(--ion-background-color, #121212);
+
+  // Primary teal #3A9882 on dark cards (#1e1e1e) only hits ~4.1:1 — fails
+  // WCAG AA for normal text (4.5:1). Switch the link-style primary text
+  // token to a lighter teal that lifts contrast to ~6:1 in dark mode.
+  // Brand primary (chips, fills) stays untouched.
+  --app-theme-primary-on-surface: #5DBDA9;
+
+  // In dark mode, the filled-solid primary button bg also flips: the deeper
+  // teal (#2A7E70) reads too close to the page bg, undermining the CTA. Push
+  // back toward the brand color which is bright enough against dark surfaces.
+  --app-theme-primary-deep: var(--ion-color-primary);
+  // Same flip for success — deep variant gets lost on dark surfaces. Restore
+  // brand success which stays bright enough.
+  --app-theme-success-deep: var(--ion-color-success);
+  // Warning deep also flips back to brand (#e5a93a) on dark surfaces — the
+  // brown deep variant disappears against dark bg.
+  --app-theme-warning-deep: var(--ion-color-warning);
 }

@@ -1,3 +1,8 @@
+@use "../../../../shared/styles/modal-footer" as footer;
+@use "../../../../shared/styles/quantity-adjuster" as qa;
+
+@include qa.apply;
+
 ion-title, ion-back-button {
   color: var(--app-theme-text-color);
 }
@@ -136,7 +141,7 @@ ion-title, ion-back-button {
 }
 
 .batch-form-card {
-  border-radius: var(--app-theme-radius-sm-plus, 10px);
+  border-radius: var(--app-theme-radius-sm-plus);
   padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-md);
   display: flex;
   flex-direction: column;
@@ -151,16 +156,7 @@ ion-title, ion-back-button {
 
 // ── Modal footer ────────────────────────────────────────────────────────────
 
-.modal-footer ion-toolbar {
-  --padding-start: var(--app-theme-spacing-lg);
-  --padding-end: var(--app-theme-spacing-lg);
-  --padding-top: var(--app-theme-spacing-md);
-  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
-}
-
-.modal-footer ion-button {
-  width: 100%;
-}
+.modal-footer { @include footer.apply; }
 
 // ── Quantity adjuster (single-batch quick view) ─────────────────────────────
 
@@ -170,96 +166,6 @@ ion-title, ion-back-button {
   align-items: center;
   gap: var(--app-theme-spacing-sm);
   padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-md);
-}
-
-.quantity-label {
-  font-size: var(--app-theme-font-size-micro); // uppercase label — visually correct at ~11.5px
-  font-weight: var(--app-theme-font-weight-semibold);
-  color: var(--app-theme-text-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.quantity-hint {
-  font-size: 0.65rem; // intentionally smaller than micro — secondary context hint
-  color: var(--app-theme-text-subtle);
-  margin-top: calc(-1 * var(--app-theme-spacing-xs));
-  text-align: center;
-}
-
-.quantity-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--app-theme-spacing-lg);
-  margin-top: var(--app-theme-spacing-xs);
-}
-
-.control-button {
-  --padding-start: 0;
-  --padding-end: 0;
-  --border-radius: 50%;
-  margin: 0;
-}
-
-.control-button--minus {
-  --background: color-mix(in srgb, var(--ion-color-danger) 10%, transparent);
-  --background-hover: color-mix(in srgb, var(--ion-color-danger) 15%, transparent);
-  --color: var(--ion-color-danger);
-}
-
-.control-button--minus:disabled {
-  --background: color-mix(in srgb, var(--ion-text-color) 5%, transparent);
-  --color: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
-}
-
-.control-button--plus {
-  --background: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
-  --background-hover: color-mix(in srgb, var(--ion-color-primary) 20%, transparent);
-  --color: var(--ion-color-primary);
-}
-
-.control-button ion-icon {
-  font-size: var(--app-theme-icon-size-md);
-  font-weight: var(--app-theme-font-weight-extra-bold);
-}
-
-.quantity-display {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: var(--app-theme-spacing-xs-plus);
-  min-width: 80px;
-  padding: 0 var(--app-theme-spacing-sm);
-}
-
-.quantity-number {
-  font-size: var(--app-theme-font-size-3xl);
-  font-weight: var(--app-theme-font-weight-extra-bold);
-  color: var(--app-theme-text-color);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  display: flex;
-  align-items: center;
-  gap: var(--app-theme-spacing-xs-plus);
-}
-
-.quantity-original {
-  color: color-mix(in srgb, var(--ion-text-color) 40%, transparent);
-  font-size: var(--app-theme-font-size-2xl);
-}
-
-.quantity-arrow {
-  font-size: var(--app-theme-font-size-title);
-  color: color-mix(in srgb, var(--ion-text-color) 40%, transparent);
-}
-
-.quantity-new {
-  color: var(--ion-color-primary);
-}
-
-.quantity-new--negative {
-  color: var(--ion-color-danger) !important;
 }
 
 // ── Danger zone ─────────────────────────────────────────────────────────────
