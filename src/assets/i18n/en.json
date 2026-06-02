@@ -945,6 +945,32 @@
       "subtitle": "Replay the onboarding anytime."
     },
     "dev": {
+      "notifications": {
+        "title": "Notifications (developer)",
+        "subtitle": "Inspect and trigger notifications manually",
+        "permissionLabel": "System permission",
+        "preferenceLabel": "Notifications enabled",
+        "previewButton": "Preview next",
+        "fireWinningButton": "Fire winning in 5s",
+        "fireExpired": "Fire 'expired' in 5s",
+        "fireNearExpiry": "Fire 'near-expiry' in 5s",
+        "fireLowStock": "Fire 'low-stock' in 5s",
+        "fireReEngagement": "Fire weekly in 5s",
+        "fireWelcome": "Fire welcome in 5s",
+        "fireRecoveryD2": "Fire D2 in 5s",
+        "fireRecoveryD5": "Fire D5 in 5s",
+        "fireRecoveryD10": "Fire D10 in 5s",
+        "pendingTitle": "Pending",
+        "pendingEmpty": "No pending notifications",
+        "refreshPending": "Refresh list",
+        "cancelAll": "Cancel all",
+        "previewEmpty": "Nothing to fire — no items match",
+        "previewResultTitle": "Next notification",
+        "toast": {
+          "scheduled": "Scheduled in 5 seconds",
+          "noop": "Nothing to fire"
+        }
+      },
       "title": "Developer",
       "subtitle": "Tools for testing different scenarios.",
       "groupOnboarding": "Onboarding",

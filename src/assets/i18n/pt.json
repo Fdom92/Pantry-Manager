@@ -945,6 +945,32 @@
       "subtitle": "Revê o onboarding quando quiseres."
     },
     "dev": {
+      "notifications": {
+        "title": "Notificações (programador)",
+        "subtitle": "Inspeciona e dispara notificações manualmente",
+        "permissionLabel": "Permissão do sistema",
+        "preferenceLabel": "Notificações ativadas",
+        "previewButton": "Previsualizar próxima",
+        "fireWinningButton": "Disparar vencedora em 5s",
+        "fireExpired": "Disparar 'caducados' em 5s",
+        "fireNearExpiry": "Disparar 'prestes a caducar' em 5s",
+        "fireLowStock": "Disparar 'stock baixo' em 5s",
+        "fireReEngagement": "Disparar semanal em 5s",
+        "fireWelcome": "Disparar boas-vindas em 5s",
+        "fireRecoveryD2": "Disparar D2 em 5s",
+        "fireRecoveryD5": "Disparar D5 em 5s",
+        "fireRecoveryD10": "Disparar D10 em 5s",
+        "pendingTitle": "Programadas",
+        "pendingEmpty": "Sem notificações programadas",
+        "refreshPending": "Atualizar lista",
+        "cancelAll": "Cancelar todas",
+        "previewEmpty": "Nada para disparar — sem items que cumpram",
+        "previewResultTitle": "Próxima notificação",
+        "toast": {
+          "scheduled": "Programada em 5 segundos",
+          "noop": "Nada para disparar"
+        }
+      },
       "title": "Desenvolvimento",
       "subtitle": "Ferramentas para testar diferentes cenários.",
       "groupOnboarding": "Onboarding",

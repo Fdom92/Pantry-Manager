@@ -945,6 +945,32 @@
       "subtitle": "Revoir l’onboarding initial à tout moment."
     },
     "dev": {
+      "notifications": {
+        "title": "Notifications (développeur)",
+        "subtitle": "Inspecter et déclencher manuellement les notifications",
+        "permissionLabel": "Autorisation système",
+        "preferenceLabel": "Notifications activées",
+        "previewButton": "Prévisualiser la suivante",
+        "fireWinningButton": "Déclencher la gagnante dans 5s",
+        "fireExpired": "Déclencher 'expirés' dans 5s",
+        "fireNearExpiry": "Déclencher 'bientôt' dans 5s",
+        "fireLowStock": "Déclencher 'stock bas' dans 5s",
+        "fireReEngagement": "Déclencher hebdomadaire dans 5s",
+        "fireWelcome": "Déclencher bienvenue dans 5s",
+        "fireRecoveryD2": "Déclencher D2 dans 5s",
+        "fireRecoveryD5": "Déclencher D5 dans 5s",
+        "fireRecoveryD10": "Déclencher D10 dans 5s",
+        "pendingTitle": "Programmées",
+        "pendingEmpty": "Aucune notification programmée",
+        "refreshPending": "Rafraîchir la liste",
+        "cancelAll": "Tout annuler",
+        "previewEmpty": "Rien à déclencher — aucun item correspondant",
+        "previewResultTitle": "Prochaine notification",
+        "toast": {
+          "scheduled": "Programmée dans 5 secondes",
+          "noop": "Rien à déclencher"
+        }
+      },
       "title": "Développement",
       "subtitle": "Outils pour tester différents scénarios.",
       "groupOnboarding": "Onboarding",

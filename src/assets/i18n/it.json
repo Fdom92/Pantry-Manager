@@ -945,6 +945,32 @@
       "subtitle": "Rivedi l'onboarding quando vuoi."
     },
     "dev": {
+      "notifications": {
+        "title": "Notifiche (sviluppatore)",
+        "subtitle": "Ispeziona e attiva notifiche manualmente",
+        "permissionLabel": "Permesso di sistema",
+        "preferenceLabel": "Notifiche attive",
+        "previewButton": "Anteprima prossima",
+        "fireWinningButton": "Attiva vincente in 5s",
+        "fireExpired": "Attiva 'scaduti' in 5s",
+        "fireNearExpiry": "Attiva 'in scadenza' in 5s",
+        "fireLowStock": "Attiva 'poco stock' in 5s",
+        "fireReEngagement": "Attiva settimanale in 5s",
+        "fireWelcome": "Attiva benvenuto in 5s",
+        "fireRecoveryD2": "Attiva D2 in 5s",
+        "fireRecoveryD5": "Attiva D5 in 5s",
+        "fireRecoveryD10": "Attiva D10 in 5s",
+        "pendingTitle": "Programmate",
+        "pendingEmpty": "Nessuna notifica programmata",
+        "refreshPending": "Aggiorna lista",
+        "cancelAll": "Annulla tutte",
+        "previewEmpty": "Niente da attivare — nessun item corrispondente",
+        "previewResultTitle": "Prossima notifica",
+        "toast": {
+          "scheduled": "Programmata in 5 secondi",
+          "noop": "Niente da attivare"
+        }
+      },
       "title": "Sviluppo",
       "subtitle": "Strumenti per testare diversi scenari.",
       "groupOnboarding": "Onboarding",
