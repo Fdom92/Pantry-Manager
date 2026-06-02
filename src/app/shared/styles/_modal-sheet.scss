@@ -68,8 +68,7 @@
   flex: 1 1 auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg)
-           var(--app-theme-spacing-lg);
+  padding: 0 var(--app-theme-spacing-lg) var(--app-theme-spacing-lg);
 }
 
 @mixin footer {
