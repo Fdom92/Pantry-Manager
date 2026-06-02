@@ -124,25 +124,29 @@
           </section>
         }
       }
-
-      @if (selectedItem && state.batchesEditMode()) {
-        <footer class="sheet-footer sheet-footer--row">
-          <ion-button expand="block" fill="clear" (click)="state.cancelBatchesEditMode()">
-            {{ 'common.actions.cancel' | translate }}
-          </ion-button>
-          <ion-button
-            expand="block"
-            color="primary"
-            [disabled]="state.batchesIsSaving()"
-            (click)="state.saveBatches()">
-            @if (state.batchesIsSaving()) {
-              <ion-spinner name="dots"></ion-spinner>
-            } @else {
-              {{ 'common.actions.save' | translate }}
-            }
-          </ion-button>
-        </footer>
-      }
     </ion-content>
+
+    @if (selectedItem && state.batchesEditMode()) {
+      <ion-footer class="sheet-footer sheet-footer--row">
+        <ion-toolbar>
+          <div class="sheet-footer__row">
+            <ion-button expand="block" fill="clear" (click)="state.cancelBatchesEditMode()">
+              {{ 'common.actions.cancel' | translate }}
+            </ion-button>
+            <ion-button
+              expand="block"
+              color="primary"
+              [disabled]="state.batchesIsSaving()"
+              (click)="state.saveBatches()">
+              @if (state.batchesIsSaving()) {
+                <ion-spinner name="dots"></ion-spinner>
+              } @else {
+                {{ 'common.actions.save' | translate }}
+              }
+            </ion-button>
+          </div>
+        </ion-toolbar>
+      </ion-footer>
+    }
   </ng-template>
 </ion-modal>

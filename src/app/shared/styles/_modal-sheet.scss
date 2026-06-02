@@ -66,21 +66,22 @@
   }
 }
 
-// Footer variant when not using a separate header (drag-handle does the work).
-// Apply directly to the action strip element.
+// Footer for ion-footer-wrapped action strips. ion-footer is naturally
+// pinned to the bottom of the modal viewport (outside ion-content) so we
+// don't have to fight position: sticky inside the scroll container —
+// avoids the issue where the CTA got cut off at smaller sheet breakpoints.
 @mixin footer {
-  position: sticky;
-  bottom: 0;
-  z-index: var(--app-theme-z-sticky);
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-theme-spacing-sm);
-  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg)
-           calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
-  background: var(--app-theme-modal-footer-bg);
-  backdrop-filter: var(--app-theme-modal-footer-blur);
-  -webkit-backdrop-filter: var(--app-theme-modal-footer-blur);
-  border-top: var(--app-theme-modal-footer-divider);
+  ion-toolbar {
+    --background: var(--app-theme-modal-footer-bg);
+    --border-color: transparent;
+    --padding-start: var(--app-theme-spacing-lg);
+    --padding-end: var(--app-theme-spacing-lg);
+    --padding-top: var(--app-theme-spacing-md);
+    --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
+    backdrop-filter: var(--app-theme-modal-footer-blur);
+    -webkit-backdrop-filter: var(--app-theme-modal-footer-blur);
+    border-top: var(--app-theme-modal-footer-divider);
+  }
 
   ion-button {
     margin: 0;

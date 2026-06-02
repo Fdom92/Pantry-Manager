@@ -1,14 +1,13 @@
 <ion-modal
   class="app-sheet-modal"
   [isOpen]="state.isOpen()"
-  [breakpoints]="[0, 0.8, 1]"
-  [initialBreakpoint]="0.8"
+  [breakpoints]="[0, 0.85, 1]"
+  [initialBreakpoint]="0.85"
   [handle]="false"
   (willDismiss)="state.dismiss()"
   (didDismiss)="state.close()">
   <ng-template>
     <ion-content class="edit-item-modal__content">
-      <!-- Drag handle + inline title (replaces toolbar) -->
       <div class="sheet-handle" aria-hidden="true"></div>
 
       <header class="sheet-header">
@@ -26,7 +25,6 @@
       </header>
 
       <form [formGroup]="state.form" class="edit-item-modal__form">
-        <!-- Section: name (no label, primary field) -->
         <section class="form-section">
           <ion-item lines="none">
             <ion-input
@@ -39,7 +37,6 @@
           </ion-item>
         </section>
 
-        <!-- Section: details with eyebrow label -->
         <section class="form-section">
           <h3 class="form-section__label">{{ 'pantry.form.details' | translate }}</h3>
 
@@ -112,21 +109,21 @@
           }
         </section>
 
-        <!-- Section: danger zone (no label, just the convert action) -->
         <section class="form-section edit-item-modal__danger-zone">
           <ion-button
-            fill="outline"
+            fill="clear"
             color="medium"
+            size="small"
             [disabled]="state.isSaving()"
             (click)="state.convertToFresh()">
             {{ 'pantry.fresh.convertToFresh.button' | translate }}
           </ion-button>
         </section>
       </form>
+    </ion-content>
 
-      <!-- Sticky glass footer (lives inside ion-content so position:sticky
-           anchors against the scroll container) -->
-      <footer class="sheet-footer">
+    <ion-footer class="sheet-footer">
+      <ion-toolbar>
         <ion-button
           expand="block"
           color="primary"
@@ -138,7 +135,7 @@
             {{ 'common.actions.save' | translate }}
           }
         </ion-button>
-      </footer>
-    </ion-content>
+      </ion-toolbar>
+    </ion-footer>
   </ng-template>
 </ion-modal>

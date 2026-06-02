@@ -4,10 +4,12 @@ import {
   IonBadge,
   IonButton,
   IonContent,
+  IonFooter,
   IonIcon,
   IonInput,
   IonModal,
   IonSpinner,
+  IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
@@ -27,6 +29,8 @@ import { EntitySelectorFieldComponent } from '@shared/components/entity-selector
     IonBadge,
     IonInput,
     IonSpinner,
+    IonFooter,
+    IonToolbar,
     ExpiryPickerComponent,
     EntitySelectorFieldComponent,
   ],

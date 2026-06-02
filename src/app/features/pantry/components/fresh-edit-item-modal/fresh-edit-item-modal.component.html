@@ -78,17 +78,19 @@
         </section>
 
         <section class="form-section fresh-edit-modal__danger-zone">
-          <ion-button fill="outline" color="medium" (click)="state.convertToPantry()" [disabled]="state.isSaving()">
+          <ion-button fill="clear" color="medium" size="small" (click)="state.convertToPantry()" [disabled]="state.isSaving()">
             {{ 'pantry.fresh.convertToPantry.button' | translate }}
           </ion-button>
-          <ion-button fill="clear" color="danger" (click)="state.deleteItem()" [disabled]="state.isSaving()">
+          <ion-button fill="clear" color="danger" size="small" (click)="state.deleteItem()" [disabled]="state.isSaving()">
             <ion-icon slot="start" name="trash-outline"></ion-icon>
             {{ 'common.actions.delete' | translate }}
           </ion-button>
         </section>
       </form>
+    </ion-content>
 
-      <footer class="sheet-footer">
+    <ion-footer class="sheet-footer">
+      <ion-toolbar>
         <ion-button
           expand="block"
           color="primary"
@@ -100,7 +102,7 @@
             {{ 'common.actions.save' | translate }}
           }
         </ion-button>
-      </footer>
-    </ion-content>
+      </ion-toolbar>
+    </ion-footer>
   </ng-template>
 </ion-modal>

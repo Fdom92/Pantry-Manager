@@ -6,11 +6,13 @@ import {
   IonButton,
   IonCheckbox,
   IonContent,
+  IonFooter,
   IonIcon,
   IonInput,
   IonItem,
   IonModal,
-  IonSpinner
+  IonSpinner,
+  IonToolbar
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
@@ -29,6 +31,8 @@ import { EntitySelectorFieldComponent } from '@shared/components/entity-selector
     IonItem,
     IonInput,
     IonCheckbox,
+    IonFooter,
+    IonToolbar,
     IonSpinner,
     EntitySelectorFieldComponent,
   ],
