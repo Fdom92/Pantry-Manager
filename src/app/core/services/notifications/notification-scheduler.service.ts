@@ -249,6 +249,41 @@ export class NotificationSchedulerService {
     return true;
   }
 
+  /**
+   * Dev-only: build a single specific definition (regardless of priority) and
+   * fire it in ~5 seconds. Returns false if the definition is not registered,
+   * or if its build() returns null (no items to notify about).
+   */
+  async fireDefinitionInFiveSeconds(definitionId: number): Promise<boolean> {
+    const def = this.registry.getById(definitionId);
+    if (!def) return false;
+
+    await this.permission.init();
+    if (!this.permission.isGranted()) {
+      const granted = await this.permission.request();
+      if (!granted) return false;
+    }
+
+    const preferences = this.preferencesService.preferences();
+    const items = this.pantryStore.loadedProducts();
+    const now = new Date();
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this.translate.instant(key, params);
+
+    const payload = def.build({ items, preferences, t, now });
+    if (!payload) return false;
+
+    await this.plugin.schedule([{
+      id: payload.id,
+      title: payload.title,
+      body: payload.body,
+      scheduleAt: new Date(Date.now() + 5_000),
+      extra: payload.extra,
+    }]);
+
+    return true;
+  }
+
   /** Evaluate all notification definitions and return the highest-priority payload. */
   private evaluateWinningNotification(
     preferences: AppPreferences,
