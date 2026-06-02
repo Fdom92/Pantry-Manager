@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { NOTIFICATION_CHANNEL_ID } from '@core/constants';
-import type { INotificationPlugin, NotificationPermissionDisplay } from './notification.plugin';
+import type {
+  INotificationPlugin,
+  NotificationPermissionDisplay,
+  PendingNotification,
+  ScheduledNotificationInput,
+} from './notification.plugin';
 
 @Injectable({ providedIn: 'root' })
 export class CapacitorNotificationPlugin implements INotificationPlugin {
@@ -24,12 +29,7 @@ export class CapacitorNotificationPlugin implements INotificationPlugin {
     }
   }
 
-  async schedule(notifications: Array<{
-    id: number;
-    title: string;
-    body: string;
-    scheduleAt: Date;
-  }>): Promise<void> {
+  async schedule(notifications: ScheduledNotificationInput[]): Promise<void> {
     if (!notifications.length) return;
     await LocalNotifications.schedule({
       notifications: notifications.map(n => ({
@@ -38,6 +38,7 @@ export class CapacitorNotificationPlugin implements INotificationPlugin {
         body: n.body,
         schedule: { at: n.scheduleAt },
         channelId: NOTIFICATION_CHANNEL_ID,
+        extra: n.extra ?? undefined,
       })),
     });
   }
@@ -61,6 +62,21 @@ export class CapacitorNotificationPlugin implements INotificationPlugin {
       });
     } catch {
       // silently ignored on iOS
+    }
+  }
+
+  async getPending(): Promise<PendingNotification[]> {
+    try {
+      const result = await LocalNotifications.getPending();
+      return (result?.notifications ?? []).map(n => ({
+        id: typeof n.id === 'number' ? n.id : Number(n.id),
+        title: n.title,
+        body: n.body,
+        scheduleAt: n.schedule?.at instanceof Date ? n.schedule.at.toISOString() : undefined,
+        extra: (n.extra as Record<string, unknown> | undefined) ?? undefined,
+      }));
+    } catch {
+      return [];
     }
   }
 }
