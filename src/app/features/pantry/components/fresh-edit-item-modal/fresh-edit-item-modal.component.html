@@ -7,91 +7,88 @@
   (willDismiss)="state.dismiss()"
   (didDismiss)="state.close()">
   <ng-template>
-    <ion-header class="sheet-header">
-      <div class="sheet-handle" aria-hidden="true"></div>
-      <ion-toolbar>
-        <h2 class="sheet-header__title">{{ 'pantry.fresh.editModal.title' | translate }}</h2>
-        <ion-buttons slot="end">
-          <ion-button
-            class="sheet-header__dismiss"
-            fill="clear"
-            color="medium"
-            (click)="state.dismiss()"
-            [attr.aria-label]="'common.actions.close' | translate">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
     <ion-content class="fresh-edit-modal__content">
-      <form [formGroup]="state.form" class="fresh-edit-modal__form">
-        <section class="form-section">
-          <ion-item lines="none">
-            <ion-input
-              formControlName="name"
-              label="{{ 'pantry.form.name' | translate }}"
-              labelPlacement="stacked"
-              [placeholder]="'pantry.form.namePlaceholder' | translate"
-              required>
-            </ion-input>
-          </ion-item>
-          <div class="form-autocomplete">
-            <app-entity-selector-field
-              [items]="state.getFoodTypeOptions()"
-              [label]="'pantry.form.foodType.label' | translate"
-              [placeholder]="'pantry.form.foodType.placeholder' | translate"
-              [clearLabel]="'pantry.form.foodType.unassigned' | translate"
-              [showSearch]="false"
-              [emptyLabel]="'common.selects.noOptions' | translate"
-              [value]="state.getFoodTypeDisplayValue()"
-              (optionSelected)="state.onFoodTypeSelect($event)"
-              (cleared)="state.clearFoodTypeSelection()">
-            </app-entity-selector-field>
-          </div>
-        </section>
+      <div class="sheet-handle" aria-hidden="true"></div>
 
-        <section class="form-section">
-          <h3 class="form-section__label">{{ 'pantry.fresh.editModal.stateLabel' | translate }}</h3>
-          <div class="fresh-edit-modal__segment" role="radiogroup">
-            @for (s of state.states; track s) {
-              <button
-                type="button"
-                role="radio"
-                class="fresh-edit-modal__segment-btn"
-                [class.is-active]="state.currentState() === s"
-                [attr.data-state]="s"
-                [attr.aria-checked]="state.currentState() === s ? 'true' : 'false'"
-                (click)="onStateClick(s)">
-                {{ labelKey(s) | translate }}
-              </button>
-            }
-          </div>
-        </section>
+      <header class="sheet-header">
+        <h2 class="sheet-header__title">{{ 'pantry.fresh.editModal.title' | translate }}</h2>
+        <ion-button
+          class="sheet-header__dismiss"
+          fill="clear"
+          color="medium"
+          (click)="state.dismiss()"
+          [attr.aria-label]="'common.actions.close' | translate">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </header>
 
-        <section class="form-section">
-          <h3 class="form-section__label">{{ 'pantry.fresh.addModal.whenExpires' | translate }}</h3>
-          <app-expiry-picker
-            [mode]="'chips-only'"
-            [date]="currentExpirationDate ?? undefined"
-            (dateChange)="onDateSelected($event)">
-          </app-expiry-picker>
-        </section>
+      <div class="sheet-body">
+        <form [formGroup]="state.form" class="fresh-edit-modal__form">
+          <section class="form-section">
+            <ion-item lines="none">
+              <ion-input
+                formControlName="name"
+                label="{{ 'pantry.form.name' | translate }}"
+                labelPlacement="stacked"
+                [placeholder]="'pantry.form.namePlaceholder' | translate"
+                required>
+              </ion-input>
+            </ion-item>
+            <div class="form-autocomplete">
+              <app-entity-selector-field
+                [items]="state.getFoodTypeOptions()"
+                [label]="'pantry.form.foodType.label' | translate"
+                [placeholder]="'pantry.form.foodType.placeholder' | translate"
+                [clearLabel]="'pantry.form.foodType.unassigned' | translate"
+                [showSearch]="false"
+                [emptyLabel]="'common.selects.noOptions' | translate"
+                [value]="state.getFoodTypeDisplayValue()"
+                (optionSelected)="state.onFoodTypeSelect($event)"
+                (cleared)="state.clearFoodTypeSelection()">
+              </app-entity-selector-field>
+            </div>
+          </section>
 
-        <section class="form-section fresh-edit-modal__danger-zone">
-          <ion-button fill="clear" color="medium" size="small" (click)="state.convertToPantry()" [disabled]="state.isSaving()">
-            {{ 'pantry.fresh.convertToPantry.button' | translate }}
-          </ion-button>
-          <ion-button fill="clear" color="danger" size="small" (click)="state.deleteItem()" [disabled]="state.isSaving()">
-            <ion-icon slot="start" name="trash-outline"></ion-icon>
-            {{ 'common.actions.delete' | translate }}
-          </ion-button>
-        </section>
-      </form>
-    </ion-content>
+          <section class="form-section">
+            <h3 class="form-section__label">{{ 'pantry.fresh.editModal.stateLabel' | translate }}</h3>
+            <div class="fresh-edit-modal__segment" role="radiogroup">
+              @for (s of state.states; track s) {
+                <button
+                  type="button"
+                  role="radio"
+                  class="fresh-edit-modal__segment-btn"
+                  [class.is-active]="state.currentState() === s"
+                  [attr.data-state]="s"
+                  [attr.aria-checked]="state.currentState() === s ? 'true' : 'false'"
+                  (click)="onStateClick(s)">
+                  {{ labelKey(s) | translate }}
+                </button>
+              }
+            </div>
+          </section>
 
-    <ion-footer class="sheet-footer">
-      <ion-toolbar>
+          <section class="form-section">
+            <h3 class="form-section__label">{{ 'pantry.fresh.addModal.whenExpires' | translate }}</h3>
+            <app-expiry-picker
+              [mode]="'chips-only'"
+              [date]="currentExpirationDate ?? undefined"
+              (dateChange)="onDateSelected($event)">
+            </app-expiry-picker>
+          </section>
+
+          <section class="form-section fresh-edit-modal__danger-zone">
+            <ion-button fill="clear" color="medium" size="small" (click)="state.convertToPantry()" [disabled]="state.isSaving()">
+              {{ 'pantry.fresh.convertToPantry.button' | translate }}
+            </ion-button>
+            <ion-button fill="clear" color="danger" size="small" (click)="state.deleteItem()" [disabled]="state.isSaving()">
+              <ion-icon slot="start" name="trash-outline"></ion-icon>
+              {{ 'common.actions.delete' | translate }}
+            </ion-button>
+          </section>
+        </form>
+      </div>
+
+      <footer class="sheet-footer">
         <ion-button
           expand="block"
           color="primary"
@@ -103,7 +100,7 @@
             {{ 'common.actions.save' | translate }}
           }
         </ion-button>
-      </ion-toolbar>
-    </ion-footer>
+      </footer>
+    </ion-content>
   </ng-template>
 </ion-modal>

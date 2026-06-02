@@ -3,15 +3,11 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   IonBadge,
   IonButton,
-  IonButtons,
   IonContent,
-  IonFooter,
-  IonHeader,
   IonIcon,
   IonInput,
   IonModal,
   IonSpinner,
-  IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
@@ -26,15 +22,11 @@ import { EntitySelectorFieldComponent } from '@shared/components/entity-selector
     TranslateModule,
     IonModal,
     IonButton,
-    IonButtons,
     IonIcon,
     IonContent,
-    IonHeader,
     IonBadge,
     IonInput,
     IonSpinner,
-    IonFooter,
-    IonToolbar,
     ExpiryPickerComponent,
     EntitySelectorFieldComponent,
   ],

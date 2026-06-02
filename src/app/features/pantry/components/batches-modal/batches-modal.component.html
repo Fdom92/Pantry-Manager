@@ -9,9 +9,10 @@
   <ng-template>
     @let selectedItem = state.selectedBatchesItem();
 
-    <ion-header class="sheet-header">
+    <ion-content class="batches-modal__content">
       <div class="sheet-handle" aria-hidden="true"></div>
-      <ion-toolbar>
+
+      <header class="sheet-header">
         <div class="sheet-header__titles">
           @if (selectedItem) {
             <h2 class="sheet-header__title">{{ selectedItem.name }}</h2>
@@ -22,7 +23,7 @@
             <h2 class="sheet-header__title">{{ 'pantry.batches.title' | translate }}</h2>
           }
         </div>
-        <ion-buttons slot="end">
+        <div class="sheet-header__actions">
           @if (selectedItem && !state.batchesEditMode()) {
             <ion-button
               fill="clear"
@@ -39,97 +40,93 @@
             [attr.aria-label]="'common.actions.close' | translate">
             <ion-icon slot="icon-only" name="close"></ion-icon>
           </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+        </div>
+      </header>
 
-    <ion-content class="batches-modal__content">
-      @if (selectedItem) {
-        @if (!state.batchesEditMode()) {
-          <!-- Read-only view: flat list, no card chrome -->
-          <ul class="batches-list">
-            @for (entry of state.getSortedBatches(selectedItem); track entry.batch.batchId ?? entry.batch.expirationDate ?? $index) {
-              <li class="batch-row">
-                <ion-icon
-                  class="batch-row__icon"
-                  [name]="entry.status.icon"
-                  [attr.data-status-color]="entry.status.color">
-                </ion-icon>
-                <div class="batch-row__body">
-                  <p class="batch-row__date" [attr.data-status-color]="entry.status.color">
-                    {{ state.formatBatchDate(entry.batch) }}
-                  </p>
-                  <p class="batch-row__meta">
-                    {{ 'pantry.batches.currentQuantity' | translate }}
-                    {{ state.formatBatchQuantity(entry.batch) }}
-                    @if (entry.locationLabel && entry.locationId !== 'unassigned') {
-                      · {{ entry.locationLabel }}
-                    }
-                  </p>
-                </div>
-                @if (entry.batch.opened) {
-                  <ion-badge class="batch-open-chip">{{ 'pantry.batches.open' | translate }}</ion-badge>
-                }
-              </li>
-            }
-          </ul>
-        } @else {
-          <!-- Edit mode -->
-          <section class="form-section batches-modal__edit-list">
-            @for (batch of state.editedBatches(); track $index) {
-              <article class="edit-batch-card">
-                <div class="edit-batch-row-inline">
-                  <ion-input
-                    type="number"
-                    min="0"
-                    [value]="batch.quantity"
-                    label="{{ 'pantry.form.batches.quantity' | translate }}"
-                    labelPlacement="stacked"
-                    (ionInput)="state.updateBatchQuantity($index, +$any($event.target).value)">
-                  </ion-input>
-                  <div class="batch-date-field">
-                    <span class="batch-date-label">{{ 'pantry.form.batches.expiry' | translate }}</span>
-                    <app-expiry-picker
-                      [date]="state.getBatchDateInputValue(batch) || undefined"
-                      [noExpiry]="batch.noExpiry ?? false"
-                      [mode]="'picker-only'"
-                      (dateChange)="state.updateBatchExpirationDate($index, $event ?? '')"
-                      (noExpiryToggle)="state.updateBatchNoExpiry($index)">
-                    </app-expiry-picker>
+      <div class="sheet-body">
+        @if (selectedItem) {
+          @if (!state.batchesEditMode()) {
+            <ul class="batches-list">
+              @for (entry of state.getSortedBatches(selectedItem); track entry.batch.batchId ?? entry.batch.expirationDate ?? $index) {
+                <li class="batch-row">
+                  <ion-icon
+                    class="batch-row__icon"
+                    [name]="entry.status.icon"
+                    [attr.data-status-color]="entry.status.color">
+                  </ion-icon>
+                  <div class="batch-row__body">
+                    <p class="batch-row__date" [attr.data-status-color]="entry.status.color">
+                      {{ state.formatBatchDate(entry.batch) }}
+                    </p>
+                    <p class="batch-row__meta">
+                      {{ 'pantry.batches.currentQuantity' | translate }}
+                      {{ state.formatBatchQuantity(entry.batch) }}
+                      @if (entry.locationLabel && entry.locationId !== 'unassigned') {
+                        · {{ entry.locationLabel }}
+                      }
+                    </p>
                   </div>
-                </div>
-                <div class="edit-batch-row">
-                  <app-entity-selector-field
-                    [items]="state.getLocationAutocompleteOptions()"
-                    [label]="'pantry.form.batches.location' | translate"
-                    [placeholder]="'pantry.form.locationAdd.unassigned' | translate"
-                    [searchPlaceholder]="'pantry.form.locationAdd.searchPlaceholder' | translate"
-                    [clearLabel]="'pantry.form.locationAdd.unassigned' | translate"
-                    [showEmptyAction]="true"
-                    [showEmptyActionWhenNoExactMatch]="true"
-                    [emptyActionLabel]="'pantry.form.locationAdd.option' | translate"
-                    [emptyLabel]="'common.selects.noOptions' | translate"
-                    [value]="state.getLocationDisplayValue(batch)"
-                    (optionSelected)="state.onLocationAutocompleteSelect($index, $event)"
-                    (emptyAction)="state.addLocationOptionFromText($index, $event)"
-                    (cleared)="state.clearBatchLocation($index)">
-                  </app-entity-selector-field>
-                </div>
-              </article>
-            }
+                  @if (entry.batch.opened) {
+                    <ion-badge class="batch-open-chip">{{ 'pantry.batches.open' | translate }}</ion-badge>
+                  }
+                </li>
+              }
+            </ul>
+          } @else {
+            <section class="form-section batches-modal__edit-list">
+              @for (batch of state.editedBatches(); track $index) {
+                <article class="edit-batch-card">
+                  <div class="edit-batch-row-inline">
+                    <ion-input
+                      type="number"
+                      min="0"
+                      [value]="batch.quantity"
+                      label="{{ 'pantry.form.batches.quantity' | translate }}"
+                      labelPlacement="stacked"
+                      (ionInput)="state.updateBatchQuantity($index, +$any($event.target).value)">
+                    </ion-input>
+                    <div class="batch-date-field">
+                      <span class="batch-date-label">{{ 'pantry.form.batches.expiry' | translate }}</span>
+                      <app-expiry-picker
+                        [date]="state.getBatchDateInputValue(batch) || undefined"
+                        [noExpiry]="batch.noExpiry ?? false"
+                        [mode]="'picker-only'"
+                        (dateChange)="state.updateBatchExpirationDate($index, $event ?? '')"
+                        (noExpiryToggle)="state.updateBatchNoExpiry($index)">
+                      </app-expiry-picker>
+                    </div>
+                  </div>
+                  <div class="edit-batch-row">
+                    <app-entity-selector-field
+                      [items]="state.getLocationAutocompleteOptions()"
+                      [label]="'pantry.form.batches.location' | translate"
+                      [placeholder]="'pantry.form.locationAdd.unassigned' | translate"
+                      [searchPlaceholder]="'pantry.form.locationAdd.searchPlaceholder' | translate"
+                      [clearLabel]="'pantry.form.locationAdd.unassigned' | translate"
+                      [showEmptyAction]="true"
+                      [showEmptyActionWhenNoExactMatch]="true"
+                      [emptyActionLabel]="'pantry.form.locationAdd.option' | translate"
+                      [emptyLabel]="'common.selects.noOptions' | translate"
+                      [value]="state.getLocationDisplayValue(batch)"
+                      (optionSelected)="state.onLocationAutocompleteSelect($index, $event)"
+                      (emptyAction)="state.addLocationOptionFromText($index, $event)"
+                      (cleared)="state.clearBatchLocation($index)">
+                    </app-entity-selector-field>
+                  </div>
+                </article>
+              }
 
-            <ion-button expand="block" fill="clear" (click)="state.addBatchesEntry()">
-              <ion-icon slot="start" name="add-outline"></ion-icon>
-              {{ 'pantry.batches.addBatch' | translate }}
-            </ion-button>
-          </section>
+              <ion-button expand="block" fill="clear" (click)="state.addBatchesEntry()">
+                <ion-icon slot="start" name="add-outline"></ion-icon>
+                {{ 'pantry.batches.addBatch' | translate }}
+              </ion-button>
+            </section>
+          }
         }
-      }
-    </ion-content>
+      </div>
 
-    @if (selectedItem && state.batchesEditMode()) {
-      <ion-footer class="sheet-footer sheet-footer--row">
-        <ion-toolbar>
+      @if (selectedItem && state.batchesEditMode()) {
+        <footer class="sheet-footer sheet-footer--row">
           <div class="sheet-footer__row">
             <ion-button expand="block" fill="clear" (click)="state.cancelBatchesEditMode()">
               {{ 'common.actions.cancel' | translate }}
@@ -146,8 +143,8 @@
               }
             </ion-button>
           </div>
-        </ion-toolbar>
-      </ion-footer>
-    }
+        </footer>
+      }
+    </ion-content>
   </ng-template>
 </ion-modal>

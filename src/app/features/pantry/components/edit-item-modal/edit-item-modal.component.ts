@@ -4,17 +4,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pantry-edit-item-modal-state.service';
 import {
   IonButton,
-  IonButtons,
   IonCheckbox,
   IonContent,
-  IonFooter,
-  IonHeader,
   IonIcon,
   IonInput,
   IonItem,
   IonModal,
-  IonSpinner,
-  IonToolbar
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
@@ -28,15 +24,11 @@ import { EntitySelectorFieldComponent } from '@shared/components/entity-selector
     TranslateModule,
     IonModal,
     IonButton,
-    IonButtons,
     IonIcon,
     IonContent,
-    IonHeader,
     IonItem,
     IonInput,
     IonCheckbox,
-    IonFooter,
-    IonToolbar,
     IonSpinner,
     EntitySelectorFieldComponent,
   ],

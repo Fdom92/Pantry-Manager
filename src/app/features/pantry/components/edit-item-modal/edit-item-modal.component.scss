@@ -9,28 +9,36 @@ ion-modal.app-sheet-modal {
   @include sheet.field-flat;
 }
 
-.sheet-header {
-  @include sheet.header;
+.edit-item-modal__content {
+  @include sheet.layout;
 }
 
 .sheet-handle {
   @include sheet.handle;
 }
 
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
+}
+
 .sheet-header__title {
   @include sheet.header-title;
+  flex: 1;
 }
 
 .sheet-header__dismiss {
   margin: 0;
+  flex-shrink: 0;
+}
+
+.sheet-body {
+  @include sheet.body;
 }
 
 .sheet-footer {
   @include sheet.footer;
-}
-
-.edit-item-modal__content {
-  @include sheet.content-pad;
+  @include sheet.glass-fallback;
 }
 
 .edit-item-modal__form {

@@ -8,15 +8,16 @@ ion-modal.app-sheet-modal {
 }
 
 .batches-modal__content {
-  @include sheet.content-pad;
-}
-
-.sheet-header {
-  @include sheet.header;
+  @include sheet.layout;
 }
 
 .sheet-handle {
   @include sheet.handle;
+}
+
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
 }
 
 .sheet-header__titles {
@@ -32,8 +33,20 @@ ion-modal.app-sheet-modal {
   @include sheet.header-subtitle;
 }
 
+.sheet-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-xs);
+  flex-shrink: 0;
+}
+
+.sheet-body {
+  @include sheet.body;
+}
+
 .sheet-footer {
   @include sheet.footer;
+  @include sheet.glass-fallback;
 }
 
 .sheet-footer__row {

@@ -9,27 +9,35 @@ ion-modal.app-sheet-modal {
 }
 
 .fresh-edit-modal__content {
-  @include sheet.content-pad;
-}
-
-.sheet-header {
-  @include sheet.header;
+  @include sheet.layout;
 }
 
 .sheet-handle {
   @include sheet.handle;
 }
 
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
+}
+
 .sheet-header__title {
   @include sheet.header-title;
+  flex: 1;
 }
 
 .sheet-header__dismiss {
   margin: 0;
+  flex-shrink: 0;
+}
+
+.sheet-body {
+  @include sheet.body;
 }
 
 .sheet-footer {
   @include sheet.footer;
+  @include sheet.glass-fallback;
 }
 
 // ── Flat form layout ────────────────────────────────────────────────────────
