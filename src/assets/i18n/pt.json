@@ -734,7 +734,7 @@
       "addModal": {
         "title": "Novo fresco",
         "namePlaceholder": "Nome do produto",
-        "whenExpires": "Quando expira?",
+        "whenExpires": "Validade",
         "submit": "Adicionar",
         "cardTitle": "Adicionar frescos rápido",
         "subtitle": "Escolha ou crie um fresco.",
@@ -765,7 +765,7 @@
       },
       "editModal": {
         "title": "Editar fresco",
-        "stateLabel": "Quanto resta?",
+        "stateLabel": "Estado",
         "deleteConfirm": {
           "title": "Excluir produto",
           "message": "Excluir {{ name }}? Não pode ser desfeito."

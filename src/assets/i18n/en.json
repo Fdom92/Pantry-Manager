@@ -734,7 +734,7 @@
       "addModal": {
         "title": "New fresh",
         "namePlaceholder": "Product name",
-        "whenExpires": "When does it expire?",
+        "whenExpires": "Expiration",
         "submit": "Add",
         "cardTitle": "Quick add fresh",
         "subtitle": "Pick or create a fresh product.",
@@ -765,7 +765,7 @@
       },
       "editModal": {
         "title": "Edit fresh",
-        "stateLabel": "How much is left?",
+        "stateLabel": "State",
         "deleteConfirm": {
           "title": "Delete product",
           "message": "Delete {{ name }}? This can't be undone."

@@ -89,6 +89,12 @@
 }
 
 @mixin content-pad {
+  // Match ion-content background to the sheet host (--ion-card-background)
+  // so the entire sheet surface reads as one tone. Default ion-content
+  // uses --ion-background-color (page bg) which sat off-white against the
+  // white sheet host, making nested fields with --ion-card-background look
+  // like floating tiles.
+  --background: var(--ion-card-background);
   --padding-start: var(--app-theme-spacing-lg);
   --padding-end: var(--app-theme-spacing-lg);
   --padding-top: var(--app-theme-spacing-md);

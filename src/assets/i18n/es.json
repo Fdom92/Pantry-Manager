@@ -734,7 +734,7 @@
       "addModal": {
         "title": "Nuevo fresco",
         "namePlaceholder": "Nombre del producto",
-        "whenExpires": "¿Cuándo caduca?",
+        "whenExpires": "Caducidad",
         "submit": "Añadir",
         "cardTitle": "Añade frescos rápido",
         "subtitle": "Selecciona un fresco existente o crea uno nuevo.",
@@ -765,7 +765,7 @@
       },
       "editModal": {
         "title": "Editar fresco",
-        "stateLabel": "¿Cuánto te queda?",
+        "stateLabel": "Estado",
         "deleteConfirm": {
           "title": "Eliminar producto",
           "message": "¿Eliminar {{ name }}? No se puede deshacer."

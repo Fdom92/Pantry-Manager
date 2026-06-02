@@ -143,9 +143,12 @@ ion-modal.app-sheet-modal {
   align-items: flex-start;
 }
 
+// Inputs inherit the surrounding sheet bg — explicit --background was
+// painting a solid white tile that floated above the off-white edit-batch
+// card and broke surface uniformity.
 .edit-batch-row-inline ion-input {
   flex: 1;
-  --background: var(--ion-card-background);
+  --background: transparent;
   --padding-end: var(--app-theme-spacing-md);
   border-radius: var(--app-theme-radius-sm);
 }
@@ -166,7 +169,7 @@ ion-modal.app-sheet-modal {
 }
 
 .edit-batch-row ion-input {
-  --background: var(--ion-card-background);
+  --background: transparent;
   --padding-start: var(--app-theme-spacing-md);
   --padding-end: var(--app-theme-spacing-md);
   border-radius: var(--app-theme-radius-sm);
@@ -177,5 +180,5 @@ ion-modal.app-sheet-modal {
 }
 
 .edit-batch-row app-entity-selector-field .selector-trigger {
-  background: var(--ion-card-background);
+  background: transparent;
 }

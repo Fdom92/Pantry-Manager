@@ -734,7 +734,7 @@
       "addModal": {
         "title": "Nouveau frais",
         "namePlaceholder": "Nom du produit",
-        "whenExpires": "Quand expire-t-il ?",
+        "whenExpires": "Expiration",
         "submit": "Ajouter",
         "cardTitle": "Ajout rapide frais",
         "subtitle": "Choisis ou crée un frais.",
@@ -765,7 +765,7 @@
       },
       "editModal": {
         "title": "Modifier frais",
-        "stateLabel": "Combien il reste ?",
+        "stateLabel": "État",
         "deleteConfirm": {
           "title": "Supprimer le produit",
           "message": "Supprimer {{ name }} ? Action irréversible."
