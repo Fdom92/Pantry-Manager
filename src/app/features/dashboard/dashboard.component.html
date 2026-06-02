@@ -144,11 +144,6 @@
                   <ion-button
                     class="action-card__cta"
                     size="small"
-                    [color]="action.category === 'critical'     ? 'danger'
-                            : action.category === 'preventive'   ? 'warning'
-                            : action.category === 'optimization' ? 'success'
-                            : action.category === 'conversion'   ? 'tertiary'
-                            : 'primary'"
                     (click)="action.cta.action()">
                     {{ action.cta.label }}
                   </ion-button>

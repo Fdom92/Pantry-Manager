@@ -25,6 +25,10 @@
   // buttons. The brand success #3d9b5f sits at ~3.5:1 against white (icon
   // pass, text fail). #2D7848 lifts to ~5.4:1.
   --app-theme-success-deep: #2D7848;
+  // Warning deep — needed when warning is used AS TEXT on a light tinted bg
+  // (tonal action-card CTAs). The brand warning #e5a93a hits ~2.4:1 against
+  // white (fail). #7d5c1c lifts to ~6:1.
+  --app-theme-warning-deep: #7d5c1c;
 
   // Secondary — warm cream (sand). Neutral elevated-surface accent.
   // Pivoted off mint green (#88C8AF) in v4.4-refresh: mint sat too close to
@@ -381,4 +385,7 @@
   // Same flip for success — deep variant gets lost on dark surfaces. Restore
   // brand success which stays bright enough.
   --app-theme-success-deep: var(--ion-color-success);
+  // Warning deep also flips back to brand (#e5a93a) on dark surfaces — the
+  // brown deep variant disappears against dark bg.
+  --app-theme-warning-deep: var(--ion-color-warning);
 }

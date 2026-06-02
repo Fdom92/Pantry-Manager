@@ -408,10 +408,24 @@ ion-title {
     gap: var(--app-theme-spacing-md);
   }
 
+  // CTA buttons render with the tonal pattern — accent text on accent-tinted
+  // bg — instead of Ionic's filled-solid scheme. The default Ionic colors
+  // (danger / warning / success / tertiary / primary) force a split between
+  // white-text variants and dark-text variants (warning is the only one with
+  // dark contrast) which made the action-card stack read as a mosaic.
+  // Tonal keeps a single text-color rule per accent (always the accent
+  // itself) so the rail reads as one family, matching chips + segment buttons.
   &__cta {
     margin: 0;
+    --background: color-mix(in srgb, var(--action-accent) 18%, var(--ion-card-background));
+    --background-hover: color-mix(in srgb, var(--action-accent) 28%, var(--ion-card-background));
+    --background-activated: color-mix(in srgb, var(--action-accent) 28%, var(--ion-card-background));
+    --background-focused: color-mix(in srgb, var(--action-accent) 28%, var(--ion-card-background));
+    --color: var(--cta-text-color, var(--action-accent));
+    --box-shadow: none;
     --padding-start: var(--app-theme-spacing-lg);
     --padding-end: var(--app-theme-spacing-lg);
+    font-weight: var(--app-theme-font-weight-bold);
   }
 
   &__dismiss {
@@ -442,12 +456,26 @@ ion-title {
     }
   }
 
-  // Category-specific accent color. Conversion uses tertiary (violet) since
-  // tertiary now anchors all PRO/upgrade surfaces post v4.4-refresh.
-  &[data-category='critical']     { --action-accent: var(--app-theme-card-accent-critical); }
-  &[data-category='preventive']   { --action-accent: var(--app-theme-card-accent-warning); }
-  &[data-category='optimization'] { --action-accent: var(--app-theme-card-accent-success); }
-  &[data-category='conversion']   { --action-accent: var(--app-theme-card-accent-premium); }
+  // Category-specific accent color drives both the left strip and the CTA
+  // tonal pattern. --cta-text-color uses the deep variant where the base
+  // accent fails WCAG AA as text on its own 18% tint (warning / success /
+  // primary are too light without the deep shift).
+  &[data-category='critical'] {
+    --action-accent: var(--app-theme-card-accent-critical);
+    --cta-text-color: var(--ion-color-danger);            // ~4.6:1 ✓
+  }
+  &[data-category='preventive'] {
+    --action-accent: var(--app-theme-card-accent-warning);
+    --cta-text-color: var(--app-theme-warning-deep);      // ~6:1 ✓
+  }
+  &[data-category='optimization'] {
+    --action-accent: var(--app-theme-card-accent-success);
+    --cta-text-color: var(--app-theme-success-deep);      // ~5.4:1 ✓
+  }
+  &[data-category='conversion'] {
+    --action-accent: var(--app-theme-card-accent-premium);
+    --cta-text-color: var(--ion-color-tertiary);          // ~5:1 ✓
+  }
 }
 
 // ── LAYER 3 — Additional Context (Optional) ──────────────────────────────────
