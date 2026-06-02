@@ -24,8 +24,9 @@ Ship three notification-driven retention bets on the `release/4.5` branch before
 | **H — Welcome notification** | ~0.5d | First-impression confirmation +5min after opt-in |
 | **B — Recovery push window** | ~3d | D2 / D5 / D10 silent pushes, cancel-on-return |
 | **A — Smart copy + deep-link** | ~4-5d | Item names in body, `extra.itemId` payload, `/pantry?focusItem=<id>` deep-link |
+| **D — Developer notifications panel** | ~1d | Settings → Advanced → Notifications dev section. Preview, fire-now per definition, cancel-all, view pending, view permission state |
 
-Total: ~1.5 weeks. Sequence: H → B → A (each independent, can ship incrementally).
+Total: ~2 weeks. Sequence: H → B → A → D (D can ship in parallel with any — pure additive UI).
 
 ---
 
@@ -277,6 +278,93 @@ Medium. Touches shared `ScheduledNotification` interface + Capacitor plugin wiri
 
 ---
 
+## Bet D — Developer Notifications Panel
+
+### Intent
+
+Settings → Advanced today has zero notification controls. Scheduler already exposes `previewNextNotification()`, `scheduleTestNotification()`, and `scheduleNotificationAtTime()` but no UI calls them — so QA-ing a notification means waiting for the real schedule or hacking a debug build.
+
+Add a dedicated developer notifications section so:
+- Each definition (regular + new welcome/recovery) can be fired manually in 5s for verification.
+- The currently scheduled pending notifications can be inspected.
+- Permission state + preferences are visible at a glance.
+- Cancel-all is one tap.
+
+This pays for itself during H/B/A QA and stays useful for v4.6 retention bets.
+
+### Mechanics
+
+New card inside `settings-advanced.component.html` titled "Notificaciones (desarrollador)". Card is **always visible** (no env gating) — the existing data export/reset card already takes the same "advanced user accepts the risk" stance, and dev mode toggles add complexity without payoff at this scale. Optional follow-up: gate the section behind a 5-tap-on-version-number gesture if it leaks.
+
+UI rows:
+
+| Row | Action |
+|---|---|
+| Permission state | Read-only display: granted / denied / prompt / unknown |
+| Notifications enabled (preference) | Read-only display (mirrors Settings → Notifications toggle) |
+| Preview next | Calls `scheduler.previewNextNotification()` → alert with `{title, body}` or "Nothing would fire" |
+| Fire winning in 5s | Calls `scheduler.scheduleTestNotification()` |
+| Fire `EXPIRED_ITEMS` in 5s | Per-definition forced fire (new scheduler method `fireDefinitionInFiveSeconds(id)`) |
+| Fire `NEAR_EXPIRY` in 5s | idem |
+| Fire `LOW_STOCK` in 5s | idem |
+| Fire `RE_ENGAGEMENT` in 5s | idem |
+| Fire `WELCOME` in 5s | Calls `welcomeNotif.scheduleWelcomeNotification({ delayMs: 5000 })` (new optional param) |
+| Fire `RECOVERY_D2` in 5s | Calls `recoveryNotif.fireRecoveryNotification('d2', { delayMs: 5000 })` (new method) |
+| Fire `RECOVERY_D5` in 5s | idem |
+| Fire `RECOVERY_D10` in 5s | idem |
+| Pending notifications | List from `LocalNotifications.getPending()` — id, title, scheduleAt |
+| Cancel all scheduled | Calls `scheduler.cancelAll()` + cancels welcome + recovery ids |
+| Refresh pending list | Re-reads `getPending()` |
+
+### Files touched
+
+| File | Change |
+|---|---|
+| `core/services/notifications/notification-scheduler.service.ts` | new method `fireDefinitionInFiveSeconds(definitionId: number): Promise<boolean>` — looks up the definition in the registry, builds its payload with current context, schedules at `now + 5s` (skips priority gating so even non-winners can be tested) |
+| `core/services/notifications/welcome-notification.service.ts` (new in H) | accept optional `{ delayMs?: number }` param on `scheduleWelcomeNotification` for dev override |
+| `core/services/notifications/recovery-notifications.service.ts` (new in B) | new method `fireRecoveryNotification(slot: 'd2'\|'d5'\|'d10', opts?: { delayMs?: number })` — fires a single recovery slot now (does not affect the real D2/D5/D10 schedule) |
+| `core/services/notifications/capacitor-notification.plugin.ts` | expose `getPending(): Promise<PendingNotification[]>` wrapping Capacitor `LocalNotifications.getPending()` |
+| `core/services/notifications/notification.plugin.ts` | extend `INotificationPlugin` with `getPending()` |
+| `core/services/settings/settings-notifications-dev-state.service.ts` (new, page-scoped) | facade for the dev panel: `permissionState`, `notificationsEnabled`, `pending` signals; methods `previewNext`, `fireWinning`, `fireDefinition(id)`, `fireWelcome`, `fireRecovery(slot)`, `cancelAll`, `refreshPending` |
+| `features/settings/components/settings-advanced/settings-advanced.component.{ts,html}` | inject new state service, add the "Notificaciones (desarrollador)" card after data card |
+| `assets/i18n/{es,en,de,fr,it,pt}.json` | add `settings.dev.notifications.*` (title, subtitle, row labels, button labels, empty-pending copy) |
+
+### Why this scope
+
+Existing dev hooks (`scheduleTestNotification`, `scheduleNotificationAtTime`, `previewNextNotification`) cover only the "winning" notification path. Manual QA of bet A needs:
+- Forcing a specific definition (e.g. `NEAR_EXPIRY`) when expired-items would otherwise win → `fireDefinitionInFiveSeconds`.
+- Verifying that welcome and recovery fire correctly without waiting 5/10 days.
+- Confirming `extra.itemId` payload arrives via tap (read from `getPending()` and tap to test).
+
+### Edge cases
+
+| Case | Behavior |
+|---|---|
+| Definition `.build()` returns `null` (no items match filter) | Show toast: "Nada que disparar — no hay items que cumplan". No crash. |
+| Web platform (`!Capacitor.isNativePlatform()`) | Panel still visible; fire buttons short-circuit and toast "Notificaciones sólo en Android". Pending list shows empty. |
+| Permission not granted when tapping fire | Request permission first via `scheduler.permission.request()`. If denied, toast. |
+| User taps a fired notification that points to a deleted item (A) | Tap handler already has fallback (`/pantry` plain) — verified manually via this panel |
+| Pending list stale after fire | `fireDefinitionInFiveSeconds` triggers `refreshPending` automatically |
+
+### Risk
+
+Very low. Pure additive UI + scheduler method that does not interact with the regular scheduling loop. `cancelAll` from the panel uses the same path as the normal cancel — no orphan-id risk.
+
+### Test plan
+
+- Unit: `fireDefinitionInFiveSeconds(NOTIFICATION_IDS.EXPIRED_ITEMS)` calls `plugin.schedule` with the expired definition's payload at `now + 5000`.
+- Unit: `fireDefinitionInFiveSeconds` with unregistered id returns `false`.
+- Manual: each fire button → wait 5s → notif arrives → tap → correct routing.
+- Manual: cancel-all wipes pending list.
+
+### Out-of-scope (defer)
+
+- 5-tap-on-version gate to hide the panel from non-devs.
+- Custom payload editor (manually set title/body/extra) — useful but high-effort vs payoff.
+- Notification history viewer (which notifs actually fired in last 7 days) — needs persistent log, not built today.
+
+---
+
 ## Cross-cutting concerns
 
 ### Notification ID map after this work
@@ -321,9 +409,10 @@ All six language files must ship together (loader is fail-fast; mismatched shape
 
 ### Documentation updates after implementation
 
-- `.claude/NOTIFICATIONS.md` — update id map, document welcome + recovery services as outside-registry, document `extra` field, document deep-link routing.
-- `.claude/STATE.md` — move H/B/A from "Retention roadmap reference" pending to "What shipped in v4.5".
+- `.claude/NOTIFICATIONS.md` — update id map, document welcome + recovery services as outside-registry, document `extra` field, document deep-link routing, document developer panel + new scheduler methods.
+- `.claude/STATE.md` — move H/B/A/D from "Retention roadmap reference" pending to "What shipped in v4.5".
 - `.claude/I18N.md` — no change (namespace structure unchanged).
+- `.claude/FILE-MAP.md` — add new services (`welcome-notification.service`, `recovery-notifications.service`, `settings-notifications-dev-state.service`).
 
 ---
 
@@ -331,14 +420,16 @@ All six language files must ship together (loader is fail-fast; mismatched shape
 
 1. **H** first — smallest, no shared interface changes. Validates Capacitor schedule path with new id outside registry.
 2. **B** second — same pattern as H (outside-registry one-shots, scheduled at onboarding). Adds the `app.component.ts` cancel-on-resume hook.
-3. **A** last — touches shared `ScheduledNotification` interface, plugin wiring, three definitions, plus deep-link param. Most surface area.
+3. **A** third — touches shared `ScheduledNotification` interface, plugin wiring, three definitions, plus deep-link param. Most surface area.
+4. **D** last (but can shift earlier) — pure additive UI. Implementing D **between H and B** is also valid: it gives a manual QA surface for the rest of the work and pays back via faster iteration. Choose timing once H is implemented and the actual QA pain shows.
 
-Each bet is independently shippable. If A slips, H+B still deliver value.
+Each bet is independently shippable. If A slips, H+B+D still deliver value.
 
 ## Success gates
 
 - H: manual QA — opt-in onboarding → notif arrives in ~5min → tap lands appropriately.
-- B: manual QA via dev-tool-forced D2 → notif arrives → tap → `/dashboard` → cancel on open verified.
+- B: manual QA via dev panel (D) forcing recovery → notif arrives → tap → `/dashboard` → cancel on open verified.
 - A: per-definition QA with seeded pantry — body shows item name + tap lands on pantry-detail for that item.
+- D: every fire button produces a notification within 5 seconds on a real Android device; cancel-all clears the pending list.
 
 Long-term success can only be measured once analytics ships (v4.6). For v4.5 the bar is "ships without regressing existing notification behavior."
