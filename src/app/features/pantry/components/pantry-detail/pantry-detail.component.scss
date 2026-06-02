@@ -62,7 +62,7 @@
   border-radius: var(--app-theme-radius-circle);
 
   &--active {
-    color: var(--ion-color-warning);
+    color: var(--app-theme-warning-deep);
   }
 
   &:active {
@@ -94,8 +94,8 @@
   }
 
   &[data-status='near-expiry'] {
-    color: var(--app-theme-card-accent-warning);
+    color: var(--app-theme-warning-deep);
   }
 
-  &[data-status='review']    { color: var(--ion-color-warning-shade); }
+  &[data-status='review']    { color: var(--app-theme-warning-deep); }
 }

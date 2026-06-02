@@ -56,7 +56,7 @@
     border-radius: var(--app-theme-radius-circle);
 
     &--active {
-      color: var(--ion-color-warning);
+      color: var(--app-theme-warning-deep);
     }
 
     &:active {
@@ -74,7 +74,7 @@
       font-size: var(--app-theme-font-size-small);
     }
     &[data-urgency='warning'] {
-      color: var(--app-theme-card-accent-warning);
+      color: var(--app-theme-warning-deep);
       font-weight: var(--app-theme-font-weight-bold);
     }
   }

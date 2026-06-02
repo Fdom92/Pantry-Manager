@@ -173,6 +173,13 @@ ion-button[color='medium'][fill='outline'] {
   --color: var(--app-theme-text-soft);
 }
 
+// Same issue with standalone ion-icon color="medium" — used inline in list
+// section headers (bought, ignored), tab buttons, etc. Force the icon color
+// to --text-soft so it passes 3:1 icon AA in both modes.
+ion-icon[color='medium'] {
+  color: var(--app-theme-text-soft);
+}
+
 // ── Shared animations ───────────────────────────────────────────────────────
 // Defined once globally so every list/card across the app uses the same fade
 // motion. Previously duplicated in pantry.scss and list.scss.

@@ -82,7 +82,7 @@
 .expiry-sheet__row--active {
   background: color-mix(in srgb, var(--ion-color-warning) 15%, transparent);
 
-  ion-icon:first-child { color: var(--ion-color-warning-shade); }
+  ion-icon:first-child { color: var(--app-theme-warning-deep); }
 }
 
 .expiry-sheet__label {

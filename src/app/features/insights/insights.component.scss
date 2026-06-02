@@ -357,9 +357,9 @@
     text-transform: capitalize;
   }
 
-  &[data-label='excellent'] .quality-score__value { color: var(--ion-color-success); }
+  &[data-label='excellent'] .quality-score__value { color: var(--app-theme-success-deep); }
   &[data-label='good']      .quality-score__value { color: var(--ion-color-success-shade); }
-  &[data-label='fair']      .quality-score__value { color: var(--ion-color-warning-shade); }
+  &[data-label='fair']      .quality-score__value { color: var(--app-theme-warning-deep); }
   &[data-label='poor']      .quality-score__value { color: var(--ion-color-danger); }
 }
 

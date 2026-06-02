@@ -32,12 +32,12 @@
 // lied (warning→secondary mint, success→primary teal). Fixed v4.4-refresh.
 .empty-icon.color-warning {
   background: color-mix(in srgb, var(--ion-color-warning) 18%, transparent);
-  color: var(--ion-color-warning);
+  color: var(--app-theme-warning-deep);
 }
 
 .empty-icon.color-success {
   background: color-mix(in srgb, var(--ion-color-success) 18%, transparent);
-  color: var(--ion-color-success);
+  color: var(--app-theme-success-deep);
 }
 
 .empty-icon.color-danger {

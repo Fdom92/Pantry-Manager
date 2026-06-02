@@ -82,12 +82,12 @@ ion-title {
   }
 
   &[data-state='attention'] .pantry-health__icon {
-    color: var(--app-theme-card-accent-warning);
+    color: var(--app-theme-warning-deep);
     background: color-mix(in srgb, var(--app-theme-card-accent-warning) 12%, transparent);
   }
 
   &[data-state='optimal'] .pantry-health__icon {
-    color: var(--app-theme-card-accent-success);
+    color: var(--app-theme-success-deep);
     background: color-mix(in srgb, var(--app-theme-card-accent-success) 12%, transparent);
   }
 }
@@ -139,8 +139,8 @@ ion-title {
   }
 
   &[data-label='excellent'] > ion-icon,
-  &[data-label='good']      > ion-icon { color: var(--app-theme-card-accent-success); }
-  &[data-label='fair']      > ion-icon { color: var(--app-theme-card-accent-warning); }
+  &[data-label='good']      > ion-icon { color: var(--app-theme-success-deep); }
+  &[data-label='fair']      > ion-icon { color: var(--app-theme-warning-deep); }
   &[data-label='poor']      > ion-icon { color: var(--app-theme-card-accent-critical); }
 }
 
@@ -218,7 +218,7 @@ ion-title {
     ion-icon { font-size: var(--app-theme-icon-size-xs); }
 
     &[data-urgency='critical'] { color: var(--app-theme-card-accent-critical); }
-    &[data-urgency='warning']  { color: var(--app-theme-card-accent-warning); }
+    &[data-urgency='warning']  { color: var(--app-theme-warning-deep); }
     &[data-urgency='neutral']  { color: var(--app-theme-text-muted); }
   }
 
@@ -304,7 +304,7 @@ ion-title {
     }
 
     .today-card__all-good-row ion-icon {
-      color: var(--app-theme-card-accent-warning);
+      color: var(--app-theme-warning-deep);
     }
   }
 
@@ -350,7 +350,7 @@ ion-title {
 
     ion-icon {
       font-size: var(--app-theme-icon-size-lg);
-      color: var(--app-theme-card-accent-success);
+      color: var(--app-theme-success-deep);
       flex-shrink: 0;
     }
   }

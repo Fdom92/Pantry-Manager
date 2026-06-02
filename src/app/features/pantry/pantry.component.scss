@@ -486,7 +486,7 @@ ion-modal.quantity-sheet ion-content {
   // (mint), which is now cream and would no longer read as actionable.
   &__consume-btn {
     background: color-mix(in srgb, var(--ion-color-success) 12%, transparent);
-    color: var(--ion-color-success);
+    color: var(--app-theme-success-deep);
 
     &:active {
       background: color-mix(in srgb, var(--ion-color-success) 22%, transparent);
