@@ -1,100 +1,137 @@
+@use '../../../../shared/styles/modal-sheet' as sheet;
+@use '../../../../shared/styles/form-section-flat' as ff;
 @use '../../../../shared/styles/chip' as chip;
 
-ion-title, ion-back-button {
-  color: var(--app-theme-text-color);
+ion-modal.app-sheet-modal {
+  @include sheet.sheet-base;
 }
 
-// "Open" batch indicator. Was color="tertiary" (violet PRO accent) which
-// misrepresented the concept — opened batches aren't premium, they're a
-// state warning ("clock starts ticking once opened"). Switched to a tonal
-// warning chip via the shared mixin.
+.batches-modal__content {
+  @include sheet.content-pad;
+  --padding-top: 0;
+}
+
+.sheet-handle {
+  @include sheet.handle;
+}
+
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
+}
+
+.sheet-header__titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.sheet-header__title {
+  margin: 0;
+  font-size: var(--app-theme-font-size-lg);
+  font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-color);
+  line-height: var(--app-theme-line-height-tight);
+}
+
+.sheet-header__subtitle {
+  margin: var(--app-theme-spacing-2xs) 0 0;
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-muted);
+}
+
+.sheet-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-xs);
+  flex-shrink: 0;
+}
+
+.sheet-footer {
+  @include sheet.footer;
+  @include sheet.glass-fallback;
+}
+
+.sheet-footer--row {
+  flex-direction: row;
+  gap: var(--app-theme-spacing-md);
+
+  ion-button {
+    flex: 1;
+    width: auto;
+  }
+}
+
+// ── Read-only batch list ────────────────────────────────────────────────────
+
+.batches-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--app-theme-spacing-md) 0 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.batch-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-md) 0;
+  border-bottom: var(--app-theme-form-section-divider);
+
+  &:last-child { border-bottom: none; }
+
+  &__icon {
+    font-size: var(--app-theme-icon-size-md);
+    flex-shrink: 0;
+
+    &[data-status-color='danger']  { color: var(--ion-color-danger); }
+    &[data-status-color='warning'] { color: var(--app-theme-warning-deep); }
+    &[data-status-color='success'] { color: var(--app-theme-success-deep); }
+    &[data-status-color='medium']  { color: var(--app-theme-text-soft); }
+  }
+
+  &__body {
+    min-width: 0;
+  }
+
+  &__date {
+    margin: 0;
+    font-size: var(--app-theme-font-size-md);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+
+    &[data-status-color='danger']  { color: var(--ion-color-danger); }
+    &[data-status-color='warning'] { color: var(--app-theme-warning-deep); }
+    &[data-status-color='success'] { color: var(--app-theme-success-deep); }
+    &[data-status-color='medium']  { color: var(--app-theme-text-color); }
+  }
+
+  &__meta {
+    margin: var(--app-theme-spacing-2xs) 0 0;
+    font-size: var(--app-theme-font-size-caption);
+    color: var(--app-theme-text-muted);
+  }
+}
+
 .batch-open-chip {
   @include chip.tonal;
   @include chip.accent-warning;
 }
 
-.batches-modal-content {
-  --padding-bottom: var(--app-theme-spacing-2xl);
-}
+// ── Edit mode ───────────────────────────────────────────────────────────────
 
-.batches-card {
-  margin: 0;
-  padding: var(--app-theme-spacing-lg);
-  border-radius: var(--app-theme-card-border-radius);
-  background: var(--ion-card-background);
-  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
-  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
-}
-
-.batches-card__header {
-  margin-bottom: var(--app-theme-spacing-lg);
-}
-
-.batches-card__title {
-  font-size: var(--app-theme-font-size-xl);
-  font-weight: var(--app-theme-font-weight-bold);
-  margin: 0 0 var(--app-theme-spacing-sm) 0;
-}
-
-.batches-card__subtitle {
-  margin: 0;
-  font-size: var(--app-theme-font-size-body);
-  color: var(--app-theme-text-muted);
-}
-
-.batches-card ion-list {
-  background: transparent;
-  padding: 0;
-}
-
-.batches-card ion-item {
-  --background: transparent;
-  --padding-start: 0;
-  --padding-end: 0;
-  --inner-padding-end: 0;
-  margin-bottom: var(--app-theme-spacing-md);
-}
-
-.batches-card ion-item:last-child {
-  margin-bottom: 0;
-}
-
-.batches-card ion-item ion-label h3 {
-  display: flex;
-  align-items: center;
-  gap: var(--app-theme-spacing-xs-plus);
-  margin: 0 0 var(--app-theme-spacing-xs) 0;
-  font-size: var(--app-theme-font-size-md);
-  font-weight: var(--app-theme-font-weight-bold);
-}
-
-.batches-card ion-item ion-label h3 ion-icon {
-  font-size: var(--app-theme-icon-size-sm);
-}
-
-.batches-card ion-item ion-label p {
-  margin: 0;
-  font-size: var(--app-theme-font-size-caption);
-  color: var(--app-theme-text-muted);
-}
-
-.batches-card ion-item ion-badge {
-  margin-top: var(--app-theme-spacing-xs-plus);
-}
-
-// ── Edit batches form ────────────────────────────────────────────────────────
-
-.edit-batches-list {
-  display: flex;
-  flex-direction: column;
+.batches-modal__edit-list {
+  @include ff.section;
+  border-bottom: none;
+  padding-block: var(--app-theme-spacing-md) var(--app-theme-spacing-2xl);
   gap: var(--app-theme-spacing-md);
-  margin-top: var(--app-theme-spacing-sm);
 }
 
 .edit-batch-card {
   padding: var(--app-theme-spacing-md);
   border-radius: var(--app-theme-radius-md);
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
+  border: 1px solid var(--app-theme-surface-tint-medium);
   display: flex;
   flex-direction: column;
   gap: var(--app-theme-spacing-sm);
@@ -141,16 +178,4 @@ ion-title, ion-back-button {
 
 .edit-batch-row app-entity-selector-field .selector-trigger {
   background: var(--ion-card-background);
-}
-
-.edit-actions {
-  display: flex;
-  gap: var(--app-theme-spacing-md);
-  margin-top: var(--app-theme-spacing-xl);
-  padding-top: var(--app-theme-spacing-lg);
-  border-top: 1px solid var(--app-theme-card-border-color);
-}
-
-.edit-actions ion-button {
-  margin: 0;
 }

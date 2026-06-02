@@ -1,0 +1,47 @@
+// Flat form-section density — replaces the card-chrome variant
+// (.form-section with border + shadow + bg) with a flat group separated
+// by a thin divider. Matches iOS Settings / Linear's modal density.
+//
+// Mixins:
+//   section          → apply to a wrapper around grouped fields. Adds
+//                       padding-block and a subtle bottom divider.
+//   section-last     → apply to the last section in a form (drops divider).
+//   section-label    → apply to an eyebrow label above a section (uppercase
+//                       micro text, replaces the old <h5> chrome).
+//
+// Usage:
+//   @use '../../shared/styles/form-section-flat' as ff;
+//   .form-section { @include ff.section; }
+//   .form-section:last-child { @include ff.section-last; }
+//   .form-section__label { @include ff.section-label; }
+
+@mixin section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-md);
+  padding-block: var(--app-theme-form-section-padding-block);
+  border-bottom: var(--app-theme-form-section-divider);
+
+  // Strip individual ion-item chrome so fields read as part of the section,
+  // not as nested cards.
+  ion-item {
+    --background: transparent;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --border-color: transparent;
+  }
+}
+
+@mixin section-last {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+@mixin section-label {
+  margin: 0 0 var(--app-theme-form-section-label-margin);
+  font-size: var(--app-theme-form-section-label-size);
+  font-weight: var(--app-theme-form-section-label-weight);
+  color: var(--app-theme-form-section-label-color);
+  text-transform: uppercase;
+  letter-spacing: var(--app-theme-form-section-label-spacing);
+}

@@ -1,0 +1,103 @@
+// Modern bottom-sheet / sheet-style modal styling.
+//
+// Mixins:
+//   sheet-base     → applies to ion-modal (rounded top corners, sheet bg).
+//   handle         → drag-handle styling for a ::before or div at the top
+//                    of the sheet content.
+//   header         → glass header strip (sits above scrollable content,
+//                    appears solid only when content scrolls under).
+//   footer         → sticky glass footer (CTA strip floating above content).
+//   content-pad    → consistent inset for sheet body.
+//
+// Usage example (in a modal component scss):
+//   @use '../../shared/styles/modal-sheet' as sheet;
+//   ion-modal { @include sheet.sheet-base; }
+//   .sheet-handle { @include sheet.handle; }
+//   .sheet-header { @include sheet.header; }
+//   .sheet-footer { @include sheet.footer; }
+
+@mixin sheet-base {
+  --background: var(--ion-card-background);
+  --border-radius: var(--app-theme-radius-xl) var(--app-theme-radius-xl) 0 0;
+  --box-shadow: var(--app-theme-shadow-sheet);
+}
+
+@mixin handle {
+  display: block;
+  width: var(--app-theme-modal-handle-width);
+  height: var(--app-theme-modal-handle-height);
+  margin: var(--app-theme-modal-handle-margin-block) auto;
+  background: var(--app-theme-modal-handle-color);
+  border-radius: var(--app-theme-modal-handle-radius);
+  pointer-events: none;
+}
+
+@mixin header {
+  position: sticky;
+  top: 0;
+  z-index: var(--app-theme-z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-modal-header-padding-block) var(--app-theme-spacing-lg);
+  background: var(--app-theme-modal-header-bg);
+  backdrop-filter: var(--app-theme-modal-header-blur);
+  -webkit-backdrop-filter: var(--app-theme-modal-header-blur);
+  border-bottom: var(--app-theme-modal-header-divider);
+
+  // Title sits inline (replaces the Ionic <ion-title> centred toolbar style).
+  // The dismiss action lives to the right as a small ion-button.
+  &__title {
+    margin: 0;
+    flex: 1;
+    font-size: var(--app-theme-font-size-lg);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+    line-height: var(--app-theme-line-height-tight);
+  }
+
+  &__subtitle {
+    margin: var(--app-theme-spacing-2xs) 0 0;
+    font-size: var(--app-theme-font-size-small);
+    color: var(--app-theme-text-soft);
+  }
+}
+
+// Footer variant when not using a separate header (drag-handle does the work).
+// Apply directly to the action strip element.
+@mixin footer {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--app-theme-z-sticky);
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg)
+           calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
+  background: var(--app-theme-modal-footer-bg);
+  backdrop-filter: var(--app-theme-modal-footer-blur);
+  -webkit-backdrop-filter: var(--app-theme-modal-footer-blur);
+  border-top: var(--app-theme-modal-footer-divider);
+
+  ion-button {
+    margin: 0;
+    width: 100%;
+  }
+}
+
+@mixin content-pad {
+  --padding-start: var(--app-theme-spacing-lg);
+  --padding-end: var(--app-theme-spacing-lg);
+  --padding-top: var(--app-theme-spacing-md);
+  --padding-bottom: var(--app-theme-spacing-2xl);
+}
+
+// @supports fallback — when backdrop-filter is unsupported, replace the
+// translucent glass with the solid card background so the header/footer
+// stay legible.
+@mixin glass-fallback {
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--ion-card-background);
+  }
+}

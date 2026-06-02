@@ -1,21 +1,30 @@
 <ion-modal
+  class="app-sheet-modal"
   [isOpen]="state.isOpen()"
   (willDismiss)="state.dismiss()"
   (didDismiss)="state.close()">
   <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>{{ 'pantry.form.editTitle' | translate }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button fill="clear" color="medium" (click)="state.dismiss()">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content class="ion-padding create-item-modal-content">
-      <form [formGroup]="state.form">
-        <div class="form-section">
+    <ion-content class="edit-item-modal__content">
+      <!-- Drag handle + inline title (replaces toolbar) -->
+      <div class="sheet-handle" aria-hidden="true"></div>
+
+      <header class="sheet-header">
+        <div class="sheet-header__titles">
+          <h2 class="sheet-header__title">{{ 'pantry.form.editTitle' | translate }}</h2>
+        </div>
+        <ion-button
+          class="sheet-header__dismiss"
+          fill="clear"
+          color="medium"
+          (click)="state.dismiss()"
+          [attr.aria-label]="'common.actions.close' | translate">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </header>
+
+      <form [formGroup]="state.form" class="edit-item-modal__form">
+        <!-- Section: name (no label, primary field) -->
+        <section class="form-section">
           <ion-item lines="none">
             <ion-input
               formControlName="name"
@@ -25,13 +34,13 @@
               required>
             </ion-input>
           </ion-item>
-        </div>
+        </section>
 
-        <div class="form-section-header">
-          <h5>{{ 'pantry.form.details' | translate }}</h5>
-        </div>
-        <div class="form-section form-section--details">
-          <div class="form-autocomplete form-row">
+        <!-- Section: details with eyebrow label -->
+        <section class="form-section">
+          <h3 class="form-section__label">{{ 'pantry.form.details' | translate }}</h3>
+
+          <div class="form-autocomplete">
             <app-entity-selector-field
               [items]="state.getCategoryAutocompleteOptions()"
               [label]="'pantry.form.category' | translate"
@@ -49,7 +58,7 @@
             </app-entity-selector-field>
           </div>
 
-          <div class="form-autocomplete form-row">
+          <div class="form-autocomplete">
             <app-entity-selector-field
               [items]="state.getSupermarketAutocompleteOptions()"
               [label]="'pantry.form.supermarket' | translate"
@@ -67,7 +76,7 @@
             </app-entity-selector-field>
           </div>
 
-          <div class="form-autocomplete form-row">
+          <div class="form-autocomplete">
             <app-entity-selector-field
               [items]="state.getFoodTypeOptions()"
               [label]="'pantry.form.foodType.label' | translate"
@@ -81,14 +90,14 @@
             </app-entity-selector-field>
           </div>
 
-          <ion-item lines="none" class="form-row">
+          <ion-item lines="none">
             <ion-checkbox formControlName="isBasic" justify="space-between">
               {{ 'pantry.form.basic' | translate }}
             </ion-checkbox>
           </ion-item>
 
           @if (state.form.get('isBasic')?.value) {
-            <ion-item lines="none" class="form-row">
+            <ion-item lines="none">
               <ion-input
                 type="number"
                 min="0"
@@ -98,32 +107,35 @@
               </ion-input>
             </ion-item>
           }
-        </div>
+        </section>
+
+        <!-- Section: danger zone -->
+        <section class="form-section edit-item-modal__danger-zone">
+          <h3 class="form-section__label">{{ 'common.actions.more' | translate }}</h3>
+          <ion-button
+            fill="outline"
+            color="medium"
+            [disabled]="state.isSaving()"
+            (click)="state.convertToFresh()">
+            {{ 'pantry.fresh.convertToFresh.button' | translate }}
+          </ion-button>
+        </section>
       </form>
-      <div class="edit-item-modal__danger-zone">
-        <ion-button
-          fill="outline"
-          color="medium"
-          [disabled]="state.isSaving()"
-          (click)="state.convertToFresh()">
-          {{ 'pantry.fresh.convertToFresh.button' | translate }}
-        </ion-button>
-      </div>
     </ion-content>
-    <ion-footer class="modal-footer">
-      <ion-toolbar>
-        <ion-button
-          expand="block"
-          color="primary"
-          [disabled]="state.isSaving() || state.form.invalid"
-          (click)="state.submitItem()">
-          @if (state.isSaving()) {
-            <ion-spinner name="dots"></ion-spinner>
-          } @else {
-            {{ 'common.actions.save' | translate }}
-          }
-        </ion-button>
-      </ion-toolbar>
-    </ion-footer>
+
+    <!-- Sticky glass footer -->
+    <footer class="sheet-footer">
+      <ion-button
+        expand="block"
+        color="primary"
+        [disabled]="state.isSaving() || state.form.invalid"
+        (click)="state.submitItem()">
+        @if (state.isSaving()) {
+          <ion-spinner name="dots"></ion-spinner>
+        } @else {
+          {{ 'common.actions.save' | translate }}
+        }
+      </ion-button>
+    </footer>
   </ng-template>
 </ion-modal>

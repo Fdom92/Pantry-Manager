@@ -1,89 +1,69 @@
-@use "../../../../shared/styles/modal-footer" as footer;
+@use "../../../../shared/styles/modal-sheet" as sheet;
+@use "../../../../shared/styles/form-section-flat" as ff;
 @use "../../../../shared/styles/quantity-adjuster" as qa;
 
 @include qa.apply;
 
-ion-title, ion-back-button {
-  color: var(--app-theme-text-color);
+// Sheet-style edit modal — drag handle + inline title + glass header that
+// solidifies on scroll + sticky glass footer with the primary CTA.
+ion-modal.app-sheet-modal {
+  @include sheet.sheet-base;
 }
 
-.create-item-modal-content {
-  --padding-bottom: var(--app-theme-spacing-2xl);
+.edit-item-modal__content {
+  @include sheet.content-pad;
+  --padding-top: 0;
 }
 
-.modal-spinner {
-  display: block;
-  margin: 48px auto;
+.sheet-handle {
+  @include sheet.handle;
 }
 
-// ── Entity selector card (item picker) ───────────────────────────────────────
-
-.entity-selector-card {
-  margin: 0 0 var(--app-theme-spacing-md);
-  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-md-plus);
-  border-radius: var(--app-theme-card-border-radius);
-  background: var(--ion-card-background);
-  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
-  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
-  overflow: visible;
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
 }
 
-.entity-selector-card__header {
-  margin-bottom: var(--app-theme-spacing-sm-plus);
+.sheet-header__titles {
+  flex: 1;
+  min-width: 0;
 }
 
-.entity-selector-card__title {
+.sheet-header__title {
   margin: 0;
   font-size: var(--app-theme-font-size-lg);
   font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-color);
+  line-height: var(--app-theme-line-height-tight);
 }
 
-.entity-selector-card__subtitle {
-  margin: var(--app-theme-spacing-xs) 0 0;
-  font-size: var(--app-theme-font-size-caption);
-  color: var(--app-theme-text-muted);
+.sheet-header__dismiss {
+  margin: 0;
+  flex-shrink: 0;
 }
 
-.entity-selector-card__content {
-  overflow: visible;
+.sheet-footer {
+  @include sheet.footer;
+  @include sheet.glass-fallback;
 }
 
-// ── Form section + autocomplete row ─────────────────────────────────────────
+// ── Flat form layout ────────────────────────────────────────────────────────
 
-.form-section {
+.edit-item-modal__form {
   display: flex;
   flex-direction: column;
-  padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-lg);
-  gap: 0;
-  border-radius: var(--app-theme-card-border-radius);
-  background: var(--ion-card-background);
-  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
-  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
-  overflow: visible;
 }
 
-.form-section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-2xs) var(--app-theme-spacing-xs-plus);
-  margin-top: var(--app-theme-spacing-md);
+.form-section {
+  @include ff.section;
+
+  &:last-of-type {
+    @include ff.section-last;
+  }
 }
 
-.form-section-header h5 {
-  margin: 0;
-  font-size: var(--app-theme-font-size-md);
-  font-weight: var(--app-theme-font-weight-bold);
-}
-
-.form-section ion-item {
-  --background: transparent;
-  --padding-start: 0;
-  --inner-padding-end: 0;
-}
-
-.form-autocomplete {
-  padding: var(--app-theme-spacing-xs-plus) 0;
+.form-section__label {
+  @include ff.section-label;
 }
 
 .form-autocomplete app-entity-selector-field .selector-trigger {
@@ -91,90 +71,9 @@ ion-title, ion-back-button {
   padding-right: 0;
 }
 
-.form-section--details .form-row {
-  padding: var(--app-theme-spacing-xs-plus) 0;
-}
-
-// ── Location + batch form ───────────────────────────────────────────────────
-
-.location-form-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-theme-spacing-lg);
-  margin-top: var(--app-theme-spacing-lg);
-}
-
-.location-form-card {
-  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
-  border-radius: var(--app-theme-radius-md);
-  padding: var(--app-theme-spacing-md);
-  background: color-mix(in srgb, var(--ion-color-dark-contrast) 6%, transparent);
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-theme-spacing-md);
-}
-
-.location-form-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.location-total {
-  font-size: var(--app-theme-font-size-body);
-  font-weight: var(--app-theme-font-weight-semibold);
-  color: var(--app-theme-text-muted);
-  margin-left: var(--app-theme-spacing-sm);
-}
-
-.batch-form-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-theme-spacing-md);
-}
-
-.batch-form-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: var(--app-theme-spacing-md);
-}
-
-.batch-form-card {
-  border-radius: var(--app-theme-radius-sm-plus);
-  padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-theme-spacing-sm-plus);
-}
-
-.batch-form-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-// ── Modal footer ────────────────────────────────────────────────────────────
-
-.modal-footer { @include footer.apply; }
-
-// ── Quantity adjuster (single-batch quick view) ─────────────────────────────
-
-.quantity-adjuster-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--app-theme-spacing-sm);
-  padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-md);
-}
-
-// ── Danger zone ─────────────────────────────────────────────────────────────
-
 .edit-item-modal__danger-zone {
-  margin-top: var(--app-theme-spacing-lg);
-  padding-top: var(--app-theme-spacing-md);
-  border-top: 1px solid var(--app-theme-card-border-color);
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-theme-spacing-sm);
+  ion-button {
+    margin: 0;
+    width: 100%;
+  }
 }
