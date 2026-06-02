@@ -1056,6 +1056,10 @@
     "weeklyReminder": {
       "title": "What did you buy this week?",
       "body": "Add the new items to your pantry for accurate tracking"
+    },
+    "welcome": {
+      "title": "PantryMind is ready ✓",
+      "body": "Notifications are working. Add your first product and we'll alert you before it expires."
     }
   },
   "sync": {

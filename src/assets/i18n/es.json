@@ -1056,6 +1056,10 @@
     "weeklyReminder": {
       "title": "¿Qué compraste esta semana?",
       "body": "Añade lo nuevo a tu despensa para un control actualizado"
+    },
+    "welcome": {
+      "title": "PantryMind está listo ✓",
+      "body": "Las notificaciones funcionan correctamente. Añade tu primer producto y te avisaremos antes de que caduque."
     }
   },
   "sync": {
