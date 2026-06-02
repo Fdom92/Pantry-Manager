@@ -21,6 +21,10 @@
   // text. This token resolves to the deep variant in light mode (4.86:1 ✓)
   // and is overridden to a lighter teal in dark mode below (~6:1 ✓).
   --app-theme-primary-on-surface: var(--app-theme-primary-deep);
+  // Success deep — same role as --primary-deep for filled-solid success
+  // buttons. The brand success #3d9b5f sits at ~3.5:1 against white (icon
+  // pass, text fail). #2D7848 lifts to ~5.4:1.
+  --app-theme-success-deep: #2D7848;
 
   // Secondary — warm cream (sand). Neutral elevated-surface accent.
   // Pivoted off mint green (#88C8AF) in v4.4-refresh: mint sat too close to
@@ -374,4 +378,7 @@
   // teal (#2A7E70) reads too close to the page bg, undermining the CTA. Push
   // back toward the brand color which is bright enough against dark surfaces.
   --app-theme-primary-deep: var(--ion-color-primary);
+  // Same flip for success — deep variant gets lost on dark surfaces. Restore
+  // brand success which stays bright enough.
+  --app-theme-success-deep: var(--ion-color-success);
 }

@@ -153,6 +153,16 @@ ion-button[color='primary']:not([fill='clear']):not([fill='outline']) {
   --background-focused: var(--app-theme-primary-deep);
 }
 
+// Same treatment for filled-solid success buttons (action-card optimization
+// CTA). Brand #3d9b5f hits ~3.5:1 white-on-success — fails text AA. Deep
+// variant #2D7848 lifts to ~5.4:1.
+ion-button[color='success']:not([fill='clear']):not([fill='outline']) {
+  --background: var(--app-theme-success-deep);
+  --background-hover: var(--app-theme-success-deep);
+  --background-activated: var(--app-theme-success-deep);
+  --background-focused: var(--app-theme-success-deep);
+}
+
 // color="medium" used on clear/outline secondary buttons — Ionic's
 // --ion-color-medium (~#9fbeb6) on white only hits ~2.5:1, fails both text
 // AA (4.5:1) and icon AA (3:1). Bump --color to --text-soft (~5.5:1) so
