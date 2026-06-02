@@ -521,13 +521,13 @@
     "fastAdd": {
       "groupLabel": "Add products",
       "title": "Add products",
-      "cardTitle": "Search or create a product",
-      "subtitle": "Search for an existing product to add or create a new one.",
-      "placeholder": "Search or create new product",
+      "cardTitle": "Add to pantry",
+      "subtitle": "Search for an existing product or create a new one.",
+      "placeholder": "Search or create product",
       "noResults": "No results",
       "addNew": "Create product: {{ name }}",
-      "empty": "No items added yet.",
-      "submit": "Add to pantry"
+      "empty": "You haven't added anything yet.",
+      "submit": "Add"
     },
     "addMode": {
       "title": "Select mode",
@@ -736,11 +736,11 @@
         "namePlaceholder": "Product name",
         "whenExpires": "Expiration",
         "submit": "Add",
-        "cardTitle": "Quick add fresh",
-        "subtitle": "Pick or create a fresh product.",
-        "placeholder": "Search fresh",
+        "cardTitle": "Add fresh items",
+        "subtitle": "Search for an existing fresh item or create a new one.",
+        "placeholder": "Search or create fresh item",
         "noResults": "No results",
-        "empty": "Nothing added yet."
+        "empty": "You haven't added anything yet."
       },
       "state": {
         "label": "State",

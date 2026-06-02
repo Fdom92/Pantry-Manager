@@ -521,13 +521,13 @@
     "fastAdd": {
       "groupLabel": "Produkte hinzufügen",
       "title": "Produkte hinzufügen",
-      "cardTitle": "Produkt suchen oder erstellen",
-      "subtitle": "Suche ein vorhandenes Produkt zum Hinzufügen oder erstelle ein neues.",
-      "placeholder": "Produkt suchen oder neu erstellen",
+      "cardTitle": "Zur Vorratskammer hinzufügen",
+      "subtitle": "Suche ein vorhandenes Produkt oder erstelle ein neues.",
+      "placeholder": "Produkt suchen oder erstellen",
       "noResults": "Keine Ergebnisse",
       "addNew": "Produkt erstellen: {{ name }}",
-      "empty": "Noch keine Artikel hinzugefügt.",
-      "submit": "Zur Vorratskammer hinzufügen"
+      "empty": "Du hast noch nichts hinzugefügt.",
+      "submit": "Hinzufügen"
     },
     "addMode": {
       "title": "Modus auswählen",
@@ -736,11 +736,11 @@
         "namePlaceholder": "Produktname",
         "whenExpires": "Ablauf",
         "submit": "Hinzufügen",
-        "cardTitle": "Frische schnell hinzufügen",
-        "subtitle": "Wähle oder erstelle ein frisches Produkt.",
-        "placeholder": "Frische suchen",
+        "cardTitle": "Frische Produkte hinzufügen",
+        "subtitle": "Suche ein vorhandenes frisches Produkt oder erstelle ein neues.",
+        "placeholder": "Frisches Produkt suchen oder erstellen",
         "noResults": "Keine Ergebnisse",
-        "empty": "Noch nichts hinzugefügt."
+        "empty": "Du hast noch nichts hinzugefügt."
       },
       "state": {
         "label": "Status",

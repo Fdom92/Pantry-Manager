@@ -521,13 +521,13 @@
     "fastAdd": {
       "groupLabel": "Adicionar produtos",
       "title": "Adicionar produtos",
-      "cardTitle": "Pesquisar ou criar um produto",
-      "subtitle": "Pesquisa um produto existente para adicionar ou cria um novo.",
-      "placeholder": "Pesquisar ou criar novo produto",
+      "cardTitle": "Adicionar à despensa",
+      "subtitle": "Procura um produto existente ou cria um novo.",
+      "placeholder": "Procurar ou criar produto",
       "noResults": "Sem resultados",
       "addNew": "Criar produto: {{ name }}",
-      "empty": "Ainda não adicionaste produtos.",
-      "submit": "Adicionar à despensa"
+      "empty": "Ainda não adicionaste nada.",
+      "submit": "Adicionar"
     },
     "addMode": {
       "title": "Selecionar modo",
@@ -736,11 +736,11 @@
         "namePlaceholder": "Nome do produto",
         "whenExpires": "Validade",
         "submit": "Adicionar",
-        "cardTitle": "Adicionar frescos rápido",
-        "subtitle": "Escolha ou crie um fresco.",
-        "placeholder": "Buscar fresco",
+        "cardTitle": "Adicionar frescos",
+        "subtitle": "Procura um produto fresco existente ou cria um novo.",
+        "placeholder": "Procurar ou criar produto fresco",
         "noResults": "Sem resultados",
-        "empty": "Nada adicionado."
+        "empty": "Ainda não adicionaste nada."
       },
       "state": {
         "label": "Estado",
