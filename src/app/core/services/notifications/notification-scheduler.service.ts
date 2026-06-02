@@ -55,6 +55,12 @@ export class NotificationSchedulerService {
         // Weekly reminder: navigate to pantry with add modal open for shopping entry
         await this.navCtrl.navigateRoot('/pantry', { queryParams: { openAddModal: 'true' } });
         return;
+      case NOTIFICATION_IDS.WELCOME: {
+        const count = this.pantryStore.loadedProducts().length;
+        const queryParams = count > 0 ? {} : { openAddModal: 'true' };
+        await this.navCtrl.navigateRoot('/pantry', { queryParams });
+        return;
+      }
     }
     await this.navCtrl.navigateRoot('/pantry');
   }
