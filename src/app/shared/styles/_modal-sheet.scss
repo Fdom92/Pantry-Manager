@@ -1,12 +1,12 @@
 // Modern bottom-sheet modal styling.
 //
-// Ionic's <ion-modal> in sheet mode (with [breakpoints]) only sizes around
-// <ion-content>, NOT around sibling <ion-header>/<ion-footer> children. To
-// keep a sticky drag-handle, header bar, and CTA footer all visible at every
-// breakpoint without content scrolling past them, we keep everything inside
-// <ion-content> and turn its internal scroll part into a flex column:
+// Structure: a plain <div class="sheet-shell"> wrapper inside <ng-template>
+// (NOT <ion-content> — its shadow-DOM scroll part doesn't reliably accept
+// `display: flex` overrides, leaving the footer off-screen at small sheet
+// breakpoints). The shell is a bare flex column that flex-distributes its
+// children:
 //
-//   ion-content
+//   .sheet-shell
 //   ├─ .sheet-handle       (flex auto, top)
 //   ├─ .sheet-header       (flex auto, glass)
 //   ├─ .sheet-body         (flex 1,   scrolls)
@@ -14,7 +14,7 @@
 //
 // Mixins:
 //   sheet-base    → applies to <ion-modal>
-//   layout        → applies to <ion-content>; flex-column the scroll part
+//   layout        → applies to .sheet-shell (flex column container)
 //   handle        → applies to the drag-handle <div>
 //   header        → applies to the header bar element
 //   body          → applies to the scrolling form wrapper
@@ -29,20 +29,16 @@
   --box-shadow: var(--app-theme-shadow-sheet);
 }
 
+// Apply to a plain <div class="sheet-shell"> wrapper inside <ng-template>
+// (no <ion-content> — its shadow-DOM scroll part doesn't reliably accept
+// display: flex from outside, leaving the footer off-screen at small sheet
+// breakpoints). A bare flex column is unambiguous and Just Works.
 @mixin layout {
-  --background: var(--ion-card-background);
-  --padding-start: 0;
-  --padding-end: 0;
-  --padding-top: 0;
-  --padding-bottom: 0;
-
-  // Turn ion-content's scroll container into a flex column so handle +
-  // header + footer stay pinned and only the body scrolls.
-  &::part(scroll) {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ion-card-background);
+  overflow: hidden;
 }
 
 @mixin handle {

@@ -7,7 +7,7 @@
   (willDismiss)="state.dismiss()"
   (didDismiss)="state.close()">
   <ng-template>
-    <ion-content class="fresh-edit-modal__content">
+    <div class="sheet-shell fresh-edit-modal__content">
       <div class="sheet-handle" aria-hidden="true"></div>
 
       <header class="sheet-header">
@@ -101,6 +101,6 @@
           }
         </ion-button>
       </footer>
-    </ion-content>
+    </div>
   </ng-template>
 </ion-modal>

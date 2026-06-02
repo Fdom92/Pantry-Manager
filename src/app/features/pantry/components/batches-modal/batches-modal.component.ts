@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   IonBadge,
   IonButton,
-  IonContent,
   IonIcon,
   IonInput,
   IonModal,
@@ -23,7 +22,6 @@ import { EntitySelectorFieldComponent } from '@shared/components/entity-selector
     IonModal,
     IonButton,
     IonIcon,
-    IonContent,
     IonBadge,
     IonInput,
     IonSpinner,

@@ -7,7 +7,7 @@ ion-modal.app-sheet-modal {
   @include sheet.field-flat;
 }
 
-.batches-modal__content {
+.sheet-shell {
   @include sheet.layout;
 }
 

@@ -130,21 +130,6 @@ ion-input .label-text-wrapper {
   color: var(--app-theme-text-muted);
 }
 
-// ── Sheet-modal layout ───────────────────────────────────────────────────────
-// Global rule so every sheet modal (.app-sheet-modal) gets the same
-// flex-column scroll layout, independent of which class the component
-// applies to its <ion-content>. Targets ion-content's shadow ::part(scroll)
-// directly so handle / header / body / footer can flex-distribute and the
-// CTA footer always stays visible at the bottom of the sheet area.
-ion-modal.app-sheet-modal {
-  ion-content::part(scroll) {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 100%;
-  }
-}
-
 // ── Button text-transform ────────────────────────────────────────────────────
 // Drop Ionic's default uppercase on every ion-button — modern apps use
 // sentence case ("Guardar" not "GUARDAR"). Ionic MD applies

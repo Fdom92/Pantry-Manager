@@ -5,7 +5,6 @@ import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pa
 import {
   IonButton,
   IonCheckbox,
-  IonContent,
   IonIcon,
   IonInput,
   IonItem,
@@ -25,7 +24,6 @@ import { EntitySelectorFieldComponent } from '@shared/components/entity-selector
     IonModal,
     IonButton,
     IonIcon,
-    IonContent,
     IonItem,
     IonInput,
     IonCheckbox,

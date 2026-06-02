@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import {
-  IonButton, IonContent, IonIcon, IonInput, IonItem, IonModal, IonSpinner,
+  IonButton, IonIcon, IonInput, IonItem, IonModal, IonSpinner,
 } from '@ionic/angular/standalone';
 import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
@@ -15,7 +15,7 @@ import type { FreshState } from '@core/domain/pantry';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, TranslateModule,
-    IonModal, IonButton, IonContent, IonItem, IonInput, IonIcon, IonSpinner,
+    IonModal, IonButton, IonItem, IonInput, IonIcon, IonSpinner,
     ExpiryPickerComponent, EntitySelectorFieldComponent,
   ],
   templateUrl: './fresh-edit-item-modal.component.html',

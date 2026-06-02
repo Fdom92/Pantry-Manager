@@ -9,7 +9,7 @@ ion-modal.app-sheet-modal {
   @include sheet.field-flat;
 }
 
-.edit-item-modal__content {
+.sheet-shell {
   @include sheet.layout;
 }
 
