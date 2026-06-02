@@ -53,9 +53,11 @@
 // Primary CTA section — last form-section in a modal, holds the Save
 // button (filled, full-width). Sits at the end of the natural scroll flow
 // instead of as a sticky footer. Extra top padding so it visually settles
-// after the danger-zone secondary actions.
+// after the danger-zone secondary actions; safe-area-aware bottom padding
+// so the CTA doesn't hug the home-indicator on iOS / nav-pill on Android.
 @mixin section-cta {
-  padding-top: var(--app-theme-spacing-lg);
+  padding-top: var(--app-theme-spacing-xl);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
 
   ion-button {
     margin: 0;
