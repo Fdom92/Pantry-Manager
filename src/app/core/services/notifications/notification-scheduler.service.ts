@@ -35,12 +35,24 @@ export class NotificationSchedulerService {
 
     if (Capacitor.isNativePlatform()) {
       void LocalNotifications.addListener('localNotificationActionPerformed', action => {
-        void this.handleNotificationTap(action.notification.id);
+        const extra = (action.notification.extra as Record<string, unknown> | undefined) ?? undefined;
+        void this.handleNotificationTap(action.notification.id, extra);
       });
     }
   }
 
-  private async handleNotificationTap(id: number): Promise<void> {
+  private async handleNotificationTap(id: number, extra?: Record<string, unknown>): Promise<void> {
+    // Per-item deep-link path (bet A). Items may have been deleted between
+    // schedule and tap, so we fall back to plain pantry if the id is unknown.
+    const itemId = typeof extra?.['itemId'] === 'string' ? (extra['itemId'] as string) : undefined;
+    if (itemId) {
+      const exists = this.pantryStore.loadedProducts().some(p => p._id === itemId);
+      if (exists) {
+        await this.navCtrl.navigateRoot('/pantry', { queryParams: { focusItem: itemId } });
+        return;
+      }
+      // fall through to id-based routing if the item is gone
+    }
     switch (id) {
       case NOTIFICATION_IDS.EXPIRED_ITEMS:
         this.navigationPreset.setPending({ expired: true });
