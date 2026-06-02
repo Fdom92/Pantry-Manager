@@ -327,17 +327,17 @@
   // taking visual space, fields can sit closer without feeling cramped.
   // Tightened both intra-section and inter-section gaps so the sheet
   // height shrinks ~25%.
-  --app-theme-form-section-padding-block: var(--app-theme-spacing-md-plus); // was lg
+  --app-theme-form-section-padding-block: var(--app-theme-spacing-sm);      // density v3: snug
   --app-theme-form-section-divider: 1px solid var(--app-theme-surface-tint-soft);
   --app-theme-form-section-label-color: var(--app-theme-text-color);
   --app-theme-form-section-label-size: var(--app-theme-font-size-md);
   --app-theme-form-section-label-weight: var(--app-theme-font-weight-bold);
   --app-theme-form-section-label-spacing: var(--app-theme-letter-spacing-tight);
-  --app-theme-form-section-label-margin: var(--app-theme-spacing-sm-plus);  // was md-plus
+  --app-theme-form-section-label-margin: var(--app-theme-spacing-sm-plus);
   --app-theme-form-section-gap: var(--app-theme-spacing-md);
 
   // Field row spacing inside a section (between sequential ion-items).
-  --app-theme-form-field-gap: var(--app-theme-spacing-md);                  // was lg
+  --app-theme-form-field-gap: var(--app-theme-spacing-xs);                  // density v3: tight
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 📝 INPUTS & TEXTAREAS
