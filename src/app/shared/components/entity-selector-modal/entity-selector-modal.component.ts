@@ -2,16 +2,9 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   IonButton,
-  IonButtons,
-  IonContent,
-  IonFooter,
-  IonHeader,
   IonIcon,
   IonModal,
   IonSpinner,
-  IonText,
-  IonTitle,
-  IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntityAutocompleteComponent, type AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
@@ -33,17 +26,10 @@ export interface EntitySelectorEntry {
     CommonModule,
     TranslateModule,
     IonModal,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
     IonButton,
     IonIcon,
-    ExpiryPickerComponent,
-    IonContent,
-    IonText,
-    IonFooter,
     IonSpinner,
+    ExpiryPickerComponent,
     EntityAutocompleteComponent,
   ],
   templateUrl: './entity-selector-modal.component.html',

@@ -1,62 +1,63 @@
-@use "../../../shared/styles/modal-footer" as footer;
+@use '../../../shared/styles/modal-sheet' as sheet;
+@use '../../../shared/styles/form-section-flat' as ff;
 
 :host {
   display: block;
 }
 
-ion-title, ion-back-button {
-  color: var(--app-theme-text-color);
+ion-modal.app-sheet-modal {
+  @include sheet.sheet-base;
+  @include sheet.field-flat;
 }
 
-.entity-selector-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-theme-spacing-lg);
-  overflow: visible;
+.sheet-shell {
+  @include sheet.layout;
 }
 
-.entity-selector-card {
+.sheet-handle {
+  @include sheet.handle;
+}
+
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
+}
+
+.sheet-header__titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.sheet-header__title {
+  @include sheet.header-title;
+}
+
+.sheet-header__subtitle {
+  @include sheet.header-subtitle;
+}
+
+.sheet-header__dismiss {
   margin: 0;
-  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-md-plus);
-  border-radius: var(--app-theme-card-border-radius);
-  background: var(--app-theme-card-bg);
-  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
-  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
-  overflow: visible;
+  flex-shrink: 0;
+}
+
+.sheet-body {
+  @include sheet.body;
+}
+
+.form-section--cta { @include ff.section-cta; }
+
+// ── Search row ──────────────────────────────────────────────────────────────
+
+.entity-selector-modal__search {
   position: relative;
   z-index: var(--app-theme-z-elevated);
 }
 
-ion-content {
-  --overflow: visible;
-}
+// ── Picked entries list ─────────────────────────────────────────────────────
 
-ion-modal::part(content) {
-  overflow: visible;
-}
-
-.entity-selector-card ion-item {
-  --background: transparent;
-}
-
-.entity-selector-card__header {
-  margin-bottom: var(--app-theme-spacing-md);
-}
-
-.entity-selector-card__title {
-  margin: 0;
-  font-size: var(--app-theme-font-size-lg);
-  font-weight: var(--app-theme-font-weight-bold);
-}
-
-.entity-selector-card__subtitle {
-  margin: var(--app-theme-spacing-xs) 0 0;
-  font-size: var(--app-theme-font-size-body);
-  color: var(--app-theme-text-muted);
-}
-
-.entity-selector-card__content {
-  overflow: visible;
+.entity-selector-modal__list {
+  gap: 0;
 }
 
 .entity-selector-item {
@@ -64,13 +65,16 @@ ion-modal::part(content) {
   align-items: center;
   justify-content: space-between;
   padding-block: var(--app-theme-spacing-sm);
-  border-bottom: 1px solid var(--ion-item-border-color, var(--ion-border-color, var(--ion-color-step-150, var(--ion-background-color-step-150, color-mix(in srgb, var(--ion-text-color) 13%, transparent)))));
+  border-bottom: var(--app-theme-form-section-divider);
+
+  &:last-child { border-bottom: none; }
 }
 
 .entity-selector-item-name {
   margin: 0;
   font-weight: var(--app-theme-font-weight-bold);
   font-size: var(--app-theme-font-size-md);
+  color: var(--app-theme-text-color);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -85,7 +89,6 @@ ion-modal::part(content) {
   flex-shrink: 0;
 }
 
-
 .entity-selector-quantity {
   display: flex;
   align-items: center;
@@ -95,15 +98,17 @@ ion-modal::part(content) {
   min-width: 28px;
   text-align: center;
   font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-color);
 }
 
-.entity-selector-empty {
-  display: block;
+// ── Empty + extras ──────────────────────────────────────────────────────────
+
+.entity-selector-modal__empty {
+  margin: var(--app-theme-spacing-md) 0;
   text-align: center;
-  margin-top: var(--app-theme-spacing-md);
+  color: var(--app-theme-text-muted);
+  font-size: var(--app-theme-font-size-small);
 }
-
-.modal-footer { @include footer.apply; }
 
 .entity-selector-modal__extras:empty {
   display: none;

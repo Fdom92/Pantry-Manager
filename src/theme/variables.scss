@@ -291,6 +291,55 @@
   --app-theme-glass-blur: blur(20px) saturate(180%);
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // 📋 MODAL / SHEET — modern bottom-sheet + flat form pattern
+  // ═══════════════════════════════════════════════════════════════════════════
+  //
+  // Drag handle visible at the top of sheet-style modals (signals
+  // swipe-down-to-dismiss). Sized + colored to match the iOS / Material
+  // bottom-sheet convention without the heavy native-toolbar chrome.
+  --app-theme-modal-handle-width: 36px;
+  --app-theme-modal-handle-height: 4px;
+  --app-theme-modal-handle-color: var(--app-theme-surface-tint-strong);
+  --app-theme-modal-handle-margin-block: var(--app-theme-spacing-sm);
+  --app-theme-modal-handle-radius: var(--app-theme-radius-pill);
+
+  // Glass header strip — appears (or solidifies) when modal content scrolls,
+  // replacing the always-on solid Ionic toolbar. Uses --ion-card-background
+  // (not the page bg via --glass-bg) so the header tone matches the sheet
+  // surface and doesn't inherit the green-tinted page tint.
+  --app-theme-modal-header-bg: color-mix(in srgb, var(--ion-card-background) 88%, transparent);
+  --app-theme-modal-header-blur: var(--app-theme-glass-blur);
+  --app-theme-modal-header-divider: 1px solid var(--app-theme-surface-tint-medium);
+  --app-theme-modal-header-padding-block: var(--app-theme-spacing-md);
+
+  // Sticky footer (CTA strip) — glass surface tied to the sheet surface
+  // for the same reason as the header.
+  --app-theme-modal-footer-bg: color-mix(in srgb, var(--ion-card-background) 88%, transparent);
+  --app-theme-modal-footer-blur: var(--app-theme-glass-blur);
+  --app-theme-modal-footer-divider: 1px solid var(--app-theme-surface-tint-medium);
+
+  // Flat form-section density. Sections separated by snug gap (no inline
+  // dividers). Section labels render as sentence-case bold (not uppercase
+  // eyebrow) so they live in the same case family as the field labels
+  // below them — uniform within the form.
+  //
+  // Density v2 (post-flat-field): with no input underlines or card chrome
+  // taking visual space, fields can sit closer without feeling cramped.
+  // Tightened both intra-section and inter-section gaps so the sheet
+  // height shrinks ~25%.
+  --app-theme-form-section-padding-block: var(--app-theme-spacing-sm);      // density v3: snug
+  --app-theme-form-section-divider: 1px solid var(--app-theme-surface-tint-soft);
+  --app-theme-form-section-label-color: var(--app-theme-text-color);
+  --app-theme-form-section-label-size: var(--app-theme-font-size-md);
+  --app-theme-form-section-label-weight: var(--app-theme-font-weight-bold);
+  --app-theme-form-section-label-spacing: var(--app-theme-letter-spacing-tight);
+  --app-theme-form-section-label-margin: var(--app-theme-spacing-sm-plus);
+  --app-theme-form-section-gap: var(--app-theme-spacing-md);
+
+  // Field row spacing inside a section (between sequential ion-items).
+  --app-theme-form-field-gap: var(--app-theme-spacing-xs);                  // density v3: tight
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // 📝 INPUTS & TEXTAREAS
   // ═══════════════════════════════════════════════════════════════════════════
   --app-theme-input-bg: transparent;

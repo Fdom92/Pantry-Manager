@@ -521,13 +521,13 @@
     "fastAdd": {
       "groupLabel": "Ajouter des produits",
       "title": "Ajouter des produits",
-      "cardTitle": "Rechercher ou créer un produit",
-      "subtitle": "Recherchez un produit existant à ajouter ou créez-en un nouveau.",
-      "placeholder": "Rechercher ou créer un produit",
+      "cardTitle": "Ajouter au garde-manger",
+      "subtitle": "Cherche un produit existant ou crées-en un nouveau.",
+      "placeholder": "Chercher ou créer un produit",
       "noResults": "Aucun résultat",
       "addNew": "Créer le produit : {{ name }}",
-      "empty": "Aucun article ajouté pour l’instant.",
-      "submit": "Ajouter au garde-manger"
+      "empty": "Tu n'as encore rien ajouté.",
+      "submit": "Ajouter"
     },
     "addMode": {
       "title": "Sélectionner le mode",
@@ -705,12 +705,12 @@
     "consume": {
       "groupLabel": "Consommer des produits",
       "title": "Consommer des produits",
-      "cardTitle": "Rechercher un produit",
-      "subtitle": "Recherchez un produit dans votre garde-manger pour enregistrer sa consommation.",
-      "placeholder": "Rechercher un produit",
+      "cardTitle": "Marquer consommé",
+      "subtitle": "Cherche des produits à déduire de ton garde-manger.",
+      "placeholder": "Chercher un produit",
       "noResults": "Aucun résultat",
-      "empty": "Aucun article ajouté pour l'instant.",
-      "submit": "Enregistrer la consommation"
+      "empty": "Tu n'as encore rien ajouté.",
+      "submit": "Enregistrer"
     },
     "sections": {
       "fresh": "Frais",
@@ -734,13 +734,13 @@
       "addModal": {
         "title": "Nouveau frais",
         "namePlaceholder": "Nom du produit",
-        "whenExpires": "Quand expire-t-il ?",
+        "whenExpires": "Expiration",
         "submit": "Ajouter",
-        "cardTitle": "Ajout rapide frais",
-        "subtitle": "Choisis ou crée un frais.",
-        "placeholder": "Rechercher frais",
+        "cardTitle": "Ajouter des frais",
+        "subtitle": "Cherche un produit frais existant ou crées-en un nouveau.",
+        "placeholder": "Chercher ou créer un produit frais",
         "noResults": "Aucun résultat",
-        "empty": "Rien d'ajouté."
+        "empty": "Tu n'as encore rien ajouté."
       },
       "state": {
         "label": "État",
@@ -765,7 +765,7 @@
       },
       "editModal": {
         "title": "Modifier frais",
-        "stateLabel": "Combien il reste ?",
+        "stateLabel": "État",
         "deleteConfirm": {
           "title": "Supprimer le produit",
           "message": "Supprimer {{ name }} ? Action irréversible."

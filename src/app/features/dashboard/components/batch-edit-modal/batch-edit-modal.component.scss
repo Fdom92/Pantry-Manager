@@ -1,4 +1,41 @@
-@use "../../../../shared/styles/modal-footer" as footer;
+@use "../../../../shared/styles/modal-sheet" as sheet;
+@use "../../../../shared/styles/form-section-flat" as ff;
+
+ion-modal.app-sheet-modal {
+  @include sheet.sheet-base;
+  @include sheet.field-flat;
+}
+
+.sheet-shell {
+  @include sheet.layout;
+}
+
+.sheet-handle {
+  @include sheet.handle;
+}
+
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
+}
+
+.sheet-header__title {
+  @include sheet.header-title;
+  flex: 1;
+}
+
+.sheet-header__dismiss {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.sheet-body {
+  @include sheet.body;
+}
+
+.form-section--cta { @include ff.section-cta; }
+
+// ── Date list (setExpiryDate mode) ──────────────────────────────────────────
 
 .batch-edit-hint {
   font-size: var(--app-theme-font-size-small);
@@ -6,37 +43,31 @@
   margin: 0 0 var(--app-theme-spacing-md);
 }
 
-.batch-edit-item-content {
+.batch-edit-date-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--app-theme-spacing-xs-plus);
-  padding-block: var(--app-theme-spacing-sm);
-  width: 100%;
 }
 
-.batch-edit-item-name {
-  font-size: var(--app-theme-font-size-small);
-  font-weight: var(--app-theme-font-weight-normal);
-  color: var(--app-theme-text-muted);
-}
-
-.batch-edit-date-cell {
+.batch-edit-row {
   display: flex;
   align-items: center;
-  gap: var(--app-theme-spacing-xs-plus);
-}
+  justify-content: space-between;
+  gap: var(--app-theme-spacing-md);
+  padding-block: var(--app-theme-spacing-sm);
+  border-bottom: var(--app-theme-form-section-divider);
 
-.modal-footer { @include footer.apply; }
+  &:last-child { border-bottom: none; }
 
-.batch-edit-date-list {
-  background: transparent;
-
-  ion-item {
-    --background: transparent;
-    --border-width: 0;
-    --padding-start: 0;
-    --inner-padding-end: 0;
-    width: 100%;
-    --min-height: auto;
+  &__name {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--app-theme-font-size-body);
+    color: var(--app-theme-text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

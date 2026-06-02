@@ -521,13 +521,13 @@
     "fastAdd": {
       "groupLabel": "Aggiungi prodotti",
       "title": "Aggiungi prodotti",
-      "cardTitle": "Cerca o crea un prodotto",
-      "subtitle": "Cerca un prodotto esistente da aggiungere o creane uno nuovo.",
-      "placeholder": "Cerca o crea nuovo prodotto",
+      "cardTitle": "Aggiungi alla dispensa",
+      "subtitle": "Cerca un prodotto esistente o creane uno nuovo.",
+      "placeholder": "Cerca o crea un prodotto",
       "noResults": "Nessun risultato",
       "addNew": "Crea prodotto: {{ name }}",
-      "empty": "Nessun articolo aggiunto.",
-      "submit": "Aggiungi alla dispensa"
+      "empty": "Non hai ancora aggiunto nulla.",
+      "submit": "Aggiungi"
     },
     "addMode": {
       "title": "Seleziona modalità",
@@ -705,12 +705,12 @@
     "consume": {
       "groupLabel": "Consuma prodotti",
       "title": "Consuma prodotti",
-      "cardTitle": "Cerca un prodotto",
-      "subtitle": "Cerca un prodotto nella tua dispensa per registrarne il consumo.",
+      "cardTitle": "Segna consumato",
+      "subtitle": "Cerca i prodotti da scalare dalla tua dispensa.",
       "placeholder": "Cerca prodotto",
       "noResults": "Nessun risultato",
-      "empty": "Nessun articolo aggiunto.",
-      "submit": "Registra consumo"
+      "empty": "Non hai ancora aggiunto nulla.",
+      "submit": "Registra"
     },
     "sections": {
       "fresh": "Freschi",
@@ -734,13 +734,13 @@
       "addModal": {
         "title": "Nuovo fresco",
         "namePlaceholder": "Nome del prodotto",
-        "whenExpires": "Quando scade?",
+        "whenExpires": "Scadenza",
         "submit": "Aggiungi",
-        "cardTitle": "Aggiungi frescos veloce",
-        "subtitle": "Scegli o crea un fresco.",
-        "placeholder": "Cerca fresco",
+        "cardTitle": "Aggiungi freschi",
+        "subtitle": "Cerca un prodotto fresco esistente o creane uno nuovo.",
+        "placeholder": "Cerca o crea un prodotto fresco",
         "noResults": "Nessun risultato",
-        "empty": "Niente aggiunto."
+        "empty": "Non hai ancora aggiunto nulla."
       },
       "state": {
         "label": "Stato",
@@ -765,7 +765,7 @@
       },
       "editModal": {
         "title": "Modifica fresco",
-        "stateLabel": "Quanto ne resta?",
+        "stateLabel": "Stato",
         "deleteConfirm": {
           "title": "Elimina prodotto",
           "message": "Eliminare {{ name }}? Operazione irreversibile."

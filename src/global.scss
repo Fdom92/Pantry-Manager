@@ -130,6 +130,30 @@ ion-input .label-text-wrapper {
   color: var(--app-theme-text-muted);
 }
 
+// ── Sheet modal base ─────────────────────────────────────────────────────────
+// Every sheet-style ion-modal opts in via .app-sheet-modal. The radius / bg /
+// shadow tokens are applied globally so every sheet shares the same top
+// corners, surface tone, and elevation — no per-component repetition,
+// no divergence.
+ion-modal.app-sheet-modal {
+  --background: var(--ion-card-background);
+  --border-radius: var(--app-theme-radius-xl) var(--app-theme-radius-xl) 0 0;
+  --box-shadow: var(--app-theme-shadow-sheet);
+}
+
+// ── Button text-transform ────────────────────────────────────────────────────
+// Drop Ionic's default uppercase on every ion-button — modern apps use
+// sentence case ("Guardar" not "GUARDAR"). Ionic MD applies
+// `text-transform: uppercase` directly on the host (it does NOT respect a
+// --text-transform custom property), so we override both the host and the
+// shadow-DOM `native` part to be safe across versions.
+ion-button {
+  text-transform: none;
+}
+ion-button::part(native) {
+  text-transform: none;
+}
+
 // ── Button contrast overrides ────────────────────────────────────────────────
 //
 // Contrast audit reference:

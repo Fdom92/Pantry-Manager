@@ -418,14 +418,14 @@ ion-card-header {
 
 // ── Quantity sheet modal ────────────────────────────────────────────────────
 
-ion-modal.quantity-sheet {
-  --background: var(--ion-background-color);
-  --border-radius: var(--app-theme-radius-lg) var(--app-theme-radius-lg) 0 0;
-  --box-shadow: var(--app-theme-shadow-sheet);
-}
-
+// Quantity sheet — opted into the canonical .app-sheet-modal class above
+// so it inherits --border-radius (xl), --background (--ion-card-background)
+// and --box-shadow (shadow-sheet) from the global sheet-base via the shared
+// modal-sheet mixin used by every other sheet modal. No per-modal radius
+// or background override needed here — the only thing left is matching the
+// inner ion-content bg.
 ion-modal.quantity-sheet ion-content {
-  --background: var(--ion-background-color);
+  --background: var(--ion-card-background);
 }
 
 // ── Two-section layout (Fresh + Despensa) ──────────────────────────────────

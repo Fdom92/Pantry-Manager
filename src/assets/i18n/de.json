@@ -521,13 +521,13 @@
     "fastAdd": {
       "groupLabel": "Produkte hinzufügen",
       "title": "Produkte hinzufügen",
-      "cardTitle": "Produkt suchen oder erstellen",
-      "subtitle": "Suche ein vorhandenes Produkt zum Hinzufügen oder erstelle ein neues.",
-      "placeholder": "Produkt suchen oder neu erstellen",
+      "cardTitle": "Zur Vorratskammer hinzufügen",
+      "subtitle": "Suche ein vorhandenes Produkt oder erstelle ein neues.",
+      "placeholder": "Produkt suchen oder erstellen",
       "noResults": "Keine Ergebnisse",
       "addNew": "Produkt erstellen: {{ name }}",
-      "empty": "Noch keine Artikel hinzugefügt.",
-      "submit": "Zur Vorratskammer hinzufügen"
+      "empty": "Du hast noch nichts hinzugefügt.",
+      "submit": "Hinzufügen"
     },
     "addMode": {
       "title": "Modus auswählen",
@@ -705,12 +705,12 @@
     "consume": {
       "groupLabel": "Produkte verbrauchen",
       "title": "Produkte verbrauchen",
-      "cardTitle": "Produkt suchen",
-      "subtitle": "Suche ein Produkt in deiner Vorratskammer, um den Verbrauch zu erfassen.",
+      "cardTitle": "Als verbraucht markieren",
+      "subtitle": "Suche Produkte, um sie aus deiner Vorratskammer abzuziehen.",
       "placeholder": "Produkt suchen",
       "noResults": "Keine Ergebnisse",
-      "empty": "Noch keine Artikel hinzugefügt.",
-      "submit": "Verbrauch erfassen"
+      "empty": "Du hast noch nichts hinzugefügt.",
+      "submit": "Eintragen"
     },
     "sections": {
       "fresh": "Frisches",
@@ -734,13 +734,13 @@
       "addModal": {
         "title": "Neuer Frischeartikel",
         "namePlaceholder": "Produktname",
-        "whenExpires": "Wann läuft es ab?",
+        "whenExpires": "Ablauf",
         "submit": "Hinzufügen",
-        "cardTitle": "Frische schnell hinzufügen",
-        "subtitle": "Wähle oder erstelle ein frisches Produkt.",
-        "placeholder": "Frische suchen",
+        "cardTitle": "Frische Produkte hinzufügen",
+        "subtitle": "Suche ein vorhandenes frisches Produkt oder erstelle ein neues.",
+        "placeholder": "Frisches Produkt suchen oder erstellen",
         "noResults": "Keine Ergebnisse",
-        "empty": "Noch nichts hinzugefügt."
+        "empty": "Du hast noch nichts hinzugefügt."
       },
       "state": {
         "label": "Status",
@@ -765,7 +765,7 @@
       },
       "editModal": {
         "title": "Frische bearbeiten",
-        "stateLabel": "Wie viel bleibt?",
+        "stateLabel": "Status",
         "deleteConfirm": {
           "title": "Produkt löschen",
           "message": "{{ name }} löschen? Kann nicht rückgängig gemacht werden."

@@ -521,13 +521,13 @@
     "fastAdd": {
       "groupLabel": "Add products",
       "title": "Add products",
-      "cardTitle": "Search or create a product",
-      "subtitle": "Search for an existing product to add or create a new one.",
-      "placeholder": "Search or create new product",
+      "cardTitle": "Add to pantry",
+      "subtitle": "Search for an existing product or create a new one.",
+      "placeholder": "Search or create product",
       "noResults": "No results",
       "addNew": "Create product: {{ name }}",
-      "empty": "No items added yet.",
-      "submit": "Add to pantry"
+      "empty": "You haven't added anything yet.",
+      "submit": "Add"
     },
     "addMode": {
       "title": "Select mode",
@@ -705,12 +705,12 @@
     "consume": {
       "groupLabel": "Consume products",
       "title": "Consume products",
-      "cardTitle": "Search a product",
-      "subtitle": "Search for a product in your pantry to log its consumption.",
+      "cardTitle": "Mark consumed",
+      "subtitle": "Search for products to deduct from your pantry.",
       "placeholder": "Search product",
       "noResults": "No results",
-      "empty": "No items added yet.",
-      "submit": "Log consumption"
+      "empty": "You haven't added anything yet.",
+      "submit": "Register"
     },
     "sections": {
       "fresh": "Fresh",
@@ -734,13 +734,13 @@
       "addModal": {
         "title": "New fresh",
         "namePlaceholder": "Product name",
-        "whenExpires": "When does it expire?",
+        "whenExpires": "Expiration",
         "submit": "Add",
-        "cardTitle": "Quick add fresh",
-        "subtitle": "Pick or create a fresh product.",
-        "placeholder": "Search fresh",
+        "cardTitle": "Add fresh items",
+        "subtitle": "Search for an existing fresh item or create a new one.",
+        "placeholder": "Search or create fresh item",
         "noResults": "No results",
-        "empty": "Nothing added yet."
+        "empty": "You haven't added anything yet."
       },
       "state": {
         "label": "State",
@@ -765,7 +765,7 @@
       },
       "editModal": {
         "title": "Edit fresh",
-        "stateLabel": "How much is left?",
+        "stateLabel": "State",
         "deleteConfirm": {
           "title": "Delete product",
           "message": "Delete {{ name }}? This can't be undone."
