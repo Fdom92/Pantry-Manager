@@ -61,6 +61,11 @@ export class NotificationSchedulerService {
         await this.navCtrl.navigateRoot('/pantry', { queryParams });
         return;
       }
+      case NOTIFICATION_IDS.RECOVERY_D2:
+      case NOTIFICATION_IDS.RECOVERY_D5:
+      case NOTIFICATION_IDS.RECOVERY_D10:
+        await this.navCtrl.navigateRoot('/dashboard');
+        return;
     }
     await this.navCtrl.navigateRoot('/pantry');
   }
