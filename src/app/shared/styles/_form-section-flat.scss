@@ -15,14 +15,14 @@
 //   .form-section:last-child { @include ff.section-last; }
 //   .form-section__label { @include ff.section-label; }
 
-// Sections separated by generous whitespace (no inline dividers). The eyebrow
-// section labels do the visual chunking — same pattern iOS Settings uses for
-// grouped tables. Dividers added visual noise when sections were small and
-// looked uneven when section heights varied.
+// Sections separated by generous whitespace (no inline dividers). Section
+// labels render as sentence-case bold (not uppercase eyebrow) so they live
+// in the same case family as the Ionic field labels below them — the form
+// reads as a single uniform typography rhythm, not "eyebrow above sentence".
 @mixin section {
   display: flex;
   flex-direction: column;
-  gap: var(--app-theme-spacing-md);
+  gap: var(--app-theme-form-field-gap);
   padding-block: var(--app-theme-form-section-padding-block);
 
   &:first-of-type { padding-top: 0; }
@@ -46,6 +46,6 @@
   font-size: var(--app-theme-form-section-label-size);
   font-weight: var(--app-theme-form-section-label-weight);
   color: var(--app-theme-form-section-label-color);
-  text-transform: uppercase;
   letter-spacing: var(--app-theme-form-section-label-spacing);
+  line-height: var(--app-theme-line-height-tight);
 }

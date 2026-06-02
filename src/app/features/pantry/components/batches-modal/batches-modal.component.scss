@@ -128,13 +128,20 @@ ion-modal.app-sheet-modal {
   gap: var(--app-theme-spacing-md);
 }
 
+// Edit-batch card — flat. The wrapper used to have border+padding+radius
+// (a nested card) which broke the sheet's uniform-surface look. Now just
+// a flex container; per-row dividers (between lots) come from
+// :not(:last-child) { border-bottom } so multiple lots stay legible
+// without the floating-tile feel.
 .edit-batch-card {
-  padding: var(--app-theme-spacing-md);
-  border-radius: var(--app-theme-radius-md);
-  border: 1px solid var(--app-theme-surface-tint-medium);
   display: flex;
   flex-direction: column;
-  gap: var(--app-theme-spacing-sm);
+  gap: var(--app-theme-spacing-md);
+  padding-block: var(--app-theme-spacing-md);
+
+  &:not(:last-child) {
+    border-bottom: var(--app-theme-form-section-divider);
+  }
 }
 
 .edit-batch-row-inline {
