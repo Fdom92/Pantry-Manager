@@ -10,39 +10,26 @@ ion-modal.app-sheet-modal {
 
 .fresh-edit-modal__content {
   @include sheet.content-pad;
-  --padding-top: 0;
+}
+
+.sheet-header {
+  @include sheet.header;
 }
 
 .sheet-handle {
   @include sheet.handle;
 }
 
-.sheet-header {
-  @include sheet.header;
-  @include sheet.glass-fallback;
-}
-
-.sheet-header__titles {
-  flex: 1;
-  min-width: 0;
-}
-
 .sheet-header__title {
-  margin: 0;
-  font-size: var(--app-theme-font-size-lg);
-  font-weight: var(--app-theme-font-weight-bold);
-  color: var(--app-theme-text-color);
-  line-height: var(--app-theme-line-height-tight);
+  @include sheet.header-title;
 }
 
 .sheet-header__dismiss {
   margin: 0;
-  flex-shrink: 0;
 }
 
 .sheet-footer {
   @include sheet.footer;
-  @include sheet.glass-fallback;
 }
 
 // ── Flat form layout ────────────────────────────────────────────────────────

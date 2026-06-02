@@ -4,51 +4,34 @@
 
 @include qa.apply;
 
-// Sheet-style edit modal — drag handle + inline title + glass header that
-// solidifies on scroll + sticky glass footer with the primary CTA.
 ion-modal.app-sheet-modal {
   @include sheet.sheet-base;
   @include sheet.field-flat;
 }
 
-.edit-item-modal__content {
-  @include sheet.content-pad;
-  --padding-top: 0;
+.sheet-header {
+  @include sheet.header;
 }
 
 .sheet-handle {
   @include sheet.handle;
 }
 
-.sheet-header {
-  @include sheet.header;
-  @include sheet.glass-fallback;
-}
-
-.sheet-header__titles {
-  flex: 1;
-  min-width: 0;
-}
-
 .sheet-header__title {
-  margin: 0;
-  font-size: var(--app-theme-font-size-lg);
-  font-weight: var(--app-theme-font-weight-bold);
-  color: var(--app-theme-text-color);
-  line-height: var(--app-theme-line-height-tight);
+  @include sheet.header-title;
 }
 
 .sheet-header__dismiss {
   margin: 0;
-  flex-shrink: 0;
 }
 
 .sheet-footer {
   @include sheet.footer;
-  @include sheet.glass-fallback;
 }
 
-// ── Flat form layout ────────────────────────────────────────────────────────
+.edit-item-modal__content {
+  @include sheet.content-pad;
+}
 
 .edit-item-modal__form {
   display: flex;
@@ -73,8 +56,9 @@ ion-modal.app-sheet-modal {
 }
 
 .edit-item-modal__danger-zone {
+  align-items: center;
+
   ion-button {
     margin: 0;
-    width: 100%;
   }
 }

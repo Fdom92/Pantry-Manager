@@ -1,20 +1,19 @@
 // Modern bottom-sheet / sheet-style modal styling.
 //
-// Mixins:
-//   sheet-base     → applies to ion-modal (rounded top corners, sheet bg).
-//   handle         → drag-handle styling for a ::before or div at the top
-//                    of the sheet content.
-//   header         → glass header strip (sits above scrollable content,
-//                    appears solid only when content scrolls under).
-//   footer         → sticky glass footer (CTA strip floating above content).
-//   content-pad    → consistent inset for sheet body.
+// Pattern: <ion-modal> wraps <ion-header> + <ion-content> + <ion-footer>
+// (the canonical Ionic structure). ion-header carries the drag-handle and
+// title row; ion-footer auto-pins the CTA strip — using the native Ionic
+// layout instead of custom sticky elements makes the footer reliable at
+// every sheet breakpoint.
 //
-// Usage example (in a modal component scss):
-//   @use '../../shared/styles/modal-sheet' as sheet;
-//   ion-modal { @include sheet.sheet-base; }
-//   .sheet-handle { @include sheet.handle; }
-//   .sheet-header { @include sheet.header; }
-//   .sheet-footer { @include sheet.footer; }
+// Mixins:
+//   sheet-base    → applies to <ion-modal>
+//   handle        → drag-handle div (above the toolbar inside ion-header)
+//   header        → applies to <ion-header>; styles ion-toolbar inside
+//   footer        → applies to <ion-footer>; styles ion-toolbar inside
+//   content-pad   → padding + bg for <ion-content>
+//   field-flat    → strips ion-input chrome inside sheet modals
+//   glass-fallback → @supports no-backdrop-filter fallback
 
 @mixin sheet-base {
   --background: var(--ion-card-background);
@@ -33,43 +32,24 @@
 }
 
 @mixin header {
-  position: sticky;
-  top: 0;
-  z-index: var(--app-theme-z-sticky);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--app-theme-spacing-md);
-  padding: var(--app-theme-modal-header-padding-block) var(--app-theme-spacing-lg);
-  background: var(--app-theme-modal-header-bg);
-  backdrop-filter: var(--app-theme-modal-header-blur);
-  -webkit-backdrop-filter: var(--app-theme-modal-header-blur);
-  // Divider removed — header reads cleanly against content via glass blur.
-  // Re-add `border-bottom: var(--app-theme-modal-header-divider)` if a hard
-  // separation becomes necessary on dense forms.
+  // Hide Ionic MD's drop-shadow pseudo so the header reads as a clean
+  // continuation of the sheet surface, not a floating bar.
+  &::after { display: none !important; }
 
-  // Title sits inline (replaces the Ionic <ion-title> centred toolbar style).
-  // The dismiss action lives to the right as a small ion-button.
-  &__title {
-    margin: 0;
-    flex: 1;
-    font-size: var(--app-theme-font-size-lg);
-    font-weight: var(--app-theme-font-weight-bold);
-    color: var(--app-theme-text-color);
-    line-height: var(--app-theme-line-height-tight);
-  }
-
-  &__subtitle {
-    margin: var(--app-theme-spacing-2xs) 0 0;
-    font-size: var(--app-theme-font-size-small);
-    color: var(--app-theme-text-soft);
+  ion-toolbar {
+    --background: var(--app-theme-modal-header-bg);
+    --border-color: transparent;
+    --border-width: 0;
+    --min-height: auto;
+    --padding-start: var(--app-theme-spacing-lg);
+    --padding-end: var(--app-theme-spacing-lg);
+    --padding-top: var(--app-theme-spacing-xs);
+    --padding-bottom: var(--app-theme-modal-header-padding-block);
+    backdrop-filter: var(--app-theme-modal-header-blur);
+    -webkit-backdrop-filter: var(--app-theme-modal-header-blur);
   }
 }
 
-// Footer for ion-footer-wrapped action strips. ion-footer is naturally
-// pinned to the bottom of the modal viewport (outside ion-content) so we
-// don't have to fight position: sticky inside the scroll container —
-// avoids the issue where the CTA got cut off at smaller sheet breakpoints.
 @mixin footer {
   ion-toolbar {
     --background: var(--app-theme-modal-footer-bg);
@@ -91,22 +71,16 @@
 
 @mixin content-pad {
   // Match ion-content background to the sheet host (--ion-card-background)
-  // so the entire sheet surface reads as one tone. Default ion-content
-  // uses --ion-background-color (page bg) which sat off-white against the
-  // white sheet host, making nested fields with --ion-card-background look
-  // like floating tiles.
+  // so the entire sheet surface reads as one tone.
   --background: var(--ion-card-background);
   --padding-start: var(--app-theme-spacing-lg);
   --padding-end: var(--app-theme-spacing-lg);
-  --padding-top: var(--app-theme-spacing-md);
-  --padding-bottom: var(--app-theme-spacing-2xl);
+  --padding-top: var(--app-theme-spacing-sm);
+  --padding-bottom: var(--app-theme-spacing-lg);
 }
 
 // Strip ion-input chrome inside sheet-style modals so they look the same as
-// entity-selector-field (custom trigger with no underline). Modern modal
-// fields read as label + value pairs separated by whitespace, not by
-// hairline underlines. Applied at the modal-host scope so it's scoped to
-// sheet modals only — page-level inputs (e.g. searchbar) keep the default.
+// entity-selector-field (no underline, no padding chrome).
 @mixin field-flat {
   ion-input,
   ion-textarea {
@@ -116,8 +90,6 @@
     --background: transparent;
   }
 
-  // Field label tier — both ion-input's stacked label and the
-  // entity-selector-field's __label resolve to the same visual tier here.
   ion-input .label-text-wrapper,
   ion-textarea .label-text-wrapper {
     font-size: var(--app-theme-font-size-tiny);
@@ -126,11 +98,25 @@
   }
 }
 
-// @supports fallback — when backdrop-filter is unsupported, replace the
-// translucent glass with the solid card background so the header/footer
-// stay legible.
 @mixin glass-fallback {
   @supports not (backdrop-filter: blur(1px)) {
     background: var(--ion-card-background);
   }
+}
+
+// Title classes for the header row content. Components apply
+// .sheet-header__title + .sheet-header__subtitle on the elements they put
+// inside <ion-toolbar>'s slot=start (or its default content area).
+@mixin header-title {
+  margin: 0;
+  font-size: var(--app-theme-font-size-lg);
+  font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-color);
+  line-height: var(--app-theme-line-height-tight);
+}
+
+@mixin header-subtitle {
+  margin: var(--app-theme-spacing-2xs) 0 0;
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-soft);
 }

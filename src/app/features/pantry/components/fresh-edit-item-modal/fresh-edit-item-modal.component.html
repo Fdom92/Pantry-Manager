@@ -7,23 +7,24 @@
   (willDismiss)="state.dismiss()"
   (didDismiss)="state.close()">
   <ng-template>
-    <ion-content class="fresh-edit-modal__content">
+    <ion-header class="sheet-header">
       <div class="sheet-handle" aria-hidden="true"></div>
+      <ion-toolbar>
+        <h2 class="sheet-header__title">{{ 'pantry.fresh.editModal.title' | translate }}</h2>
+        <ion-buttons slot="end">
+          <ion-button
+            class="sheet-header__dismiss"
+            fill="clear"
+            color="medium"
+            (click)="state.dismiss()"
+            [attr.aria-label]="'common.actions.close' | translate">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
 
-      <header class="sheet-header">
-        <div class="sheet-header__titles">
-          <h2 class="sheet-header__title">{{ 'pantry.fresh.editModal.title' | translate }}</h2>
-        </div>
-        <ion-button
-          class="sheet-header__dismiss"
-          fill="clear"
-          color="medium"
-          (click)="state.dismiss()"
-          [attr.aria-label]="'common.actions.close' | translate">
-          <ion-icon slot="icon-only" name="close"></ion-icon>
-        </ion-button>
-      </header>
-
+    <ion-content class="fresh-edit-modal__content">
       <form [formGroup]="state.form" class="fresh-edit-modal__form">
         <section class="form-section">
           <ion-item lines="none">

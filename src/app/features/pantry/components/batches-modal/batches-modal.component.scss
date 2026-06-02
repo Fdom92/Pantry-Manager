@@ -9,16 +9,14 @@ ion-modal.app-sheet-modal {
 
 .batches-modal__content {
   @include sheet.content-pad;
-  --padding-top: 0;
-}
-
-.sheet-handle {
-  @include sheet.handle;
 }
 
 .sheet-header {
   @include sheet.header;
-  @include sheet.glass-fallback;
+}
+
+.sheet-handle {
+  @include sheet.handle;
 }
 
 .sheet-header__titles {
@@ -27,29 +25,15 @@ ion-modal.app-sheet-modal {
 }
 
 .sheet-header__title {
-  margin: 0;
-  font-size: var(--app-theme-font-size-lg);
-  font-weight: var(--app-theme-font-weight-bold);
-  color: var(--app-theme-text-color);
-  line-height: var(--app-theme-line-height-tight);
+  @include sheet.header-title;
 }
 
 .sheet-header__subtitle {
-  margin: var(--app-theme-spacing-2xs) 0 0;
-  font-size: var(--app-theme-font-size-small);
-  color: var(--app-theme-text-muted);
-}
-
-.sheet-header__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--app-theme-spacing-xs);
-  flex-shrink: 0;
+  @include sheet.header-subtitle;
 }
 
 .sheet-footer {
   @include sheet.footer;
-  @include sheet.glass-fallback;
 }
 
 .sheet-footer__row {
