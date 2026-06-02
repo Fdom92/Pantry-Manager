@@ -1060,6 +1060,20 @@
     "welcome": {
       "title": "PantryMind est prêt ✓",
       "body": "Les notifications fonctionnent. Ajoute ton premier produit et on te préviendra avant qu'il n'expire."
+    },
+    "recovery": {
+      "d2": {
+        "title": "Comment va ton garde-manger ?",
+        "body": "Jette un œil à ce que tu as. On t'aide à ne rien oublier."
+      },
+      "d5": {
+        "title": "Ça fait 5 jours qu'on ne s'est pas vu",
+        "body": "Certains produits pourraient bientôt expirer. Un coup d'œil s'impose."
+      },
+      "d10": {
+        "title": "Ton garde-manger a besoin de toi",
+        "body": "Reviens et évite de jeter de la nourriture. 30 secondes suffisent."
+      }
     }
   },
   "sync": {

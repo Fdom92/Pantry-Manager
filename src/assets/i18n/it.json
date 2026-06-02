@@ -1060,6 +1060,20 @@
     "welcome": {
       "title": "PantryMind è pronto ✓",
       "body": "Le notifiche funzionano. Aggiungi il tuo primo prodotto e ti avviseremo prima che scada."
+    },
+    "recovery": {
+      "d2": {
+        "title": "Come va la tua dispensa?",
+        "body": "Dai un'occhiata a quello che hai. Ti aiutiamo a non dimenticare nulla."
+      },
+      "d5": {
+        "title": "Sono passati 5 giorni",
+        "body": "Alcuni prodotti potrebbero scadere presto. Dacci un'occhiata."
+      },
+      "d10": {
+        "title": "La tua dispensa ha bisogno di te",
+        "body": "Torna ed evita di buttare cibo. Bastano 30 secondi."
+      }
     }
   },
   "sync": {

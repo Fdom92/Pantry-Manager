@@ -1060,6 +1060,20 @@
     "welcome": {
       "title": "PantryMind ist bereit ✓",
       "body": "Benachrichtigungen funktionieren. Füge dein erstes Produkt hinzu — wir melden uns, bevor es abläuft."
+    },
+    "recovery": {
+      "d2": {
+        "title": "Wie läuft's mit deiner Vorratskammer?",
+        "body": "Schau kurz vorbei. Wir helfen dir, den Überblick zu behalten."
+      },
+      "d5": {
+        "title": "Es sind 5 Tage vergangen",
+        "body": "Einige Produkte könnten bald ablaufen. Lohnt sich ein Blick."
+      },
+      "d10": {
+        "title": "Deine Vorratskammer braucht dich",
+        "body": "Komm zurück und vermeide Lebensmittelverschwendung. 30 Sekunden reichen."
+      }
     }
   },
   "sync": {

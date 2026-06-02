@@ -1060,6 +1060,20 @@
     "welcome": {
       "title": "PantryMind is ready ✓",
       "body": "Notifications are working. Add your first product and we'll alert you before it expires."
+    },
+    "recovery": {
+      "d2": {
+        "title": "How's your pantry doing?",
+        "body": "Take a quick look at what you have. We'll help you keep track."
+      },
+      "d5": {
+        "title": "It's been 5 days",
+        "body": "Some items might be close to expiring. Worth a glance."
+      },
+      "d10": {
+        "title": "Your pantry needs you",
+        "body": "Come back and avoid wasting food. 30 seconds is all it takes."
+      }
     }
   },
   "sync": {

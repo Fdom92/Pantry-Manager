@@ -1060,6 +1060,20 @@
     "welcome": {
       "title": "PantryMind está listo ✓",
       "body": "Las notificaciones funcionan correctamente. Añade tu primer producto y te avisaremos antes de que caduque."
+    },
+    "recovery": {
+      "d2": {
+        "title": "¿Cómo va tu despensa?",
+        "body": "Revisa qué tienes en casa. Te ayudamos a no olvidar nada."
+      },
+      "d5": {
+        "title": "Hace 5 días que no nos vemos",
+        "body": "Algunos productos podrían estar cerca de caducar. Échales un ojo."
+      },
+      "d10": {
+        "title": "Tu despensa te necesita",
+        "body": "Vuelve y evita tirar comida. Tardas 30 segundos en revisarla."
+      }
     }
   },
   "sync": {
