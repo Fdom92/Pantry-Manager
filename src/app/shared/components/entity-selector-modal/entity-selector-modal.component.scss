@@ -8,9 +8,6 @@
 ion-modal.app-sheet-modal {
   @include sheet.sheet-base;
   @include sheet.field-flat;
-
-  // Autocomplete dropdown needs visible overflow so options can spill.
-  &::part(content) { overflow: visible; }
 }
 
 .sheet-shell {
@@ -46,7 +43,6 @@ ion-modal.app-sheet-modal {
 
 .sheet-body {
   @include sheet.body;
-  overflow: visible auto;   // autocomplete options can escape horizontally
 }
 
 .form-section--cta { @include ff.section-cta; }
