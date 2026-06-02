@@ -130,6 +130,14 @@ ion-input .label-text-wrapper {
   color: var(--app-theme-text-muted);
 }
 
+// ── Button text-transform ────────────────────────────────────────────────────
+// Drop Ionic's default uppercase on every ion-button — modern apps use
+// sentence case ("Guardar" not "GUARDAR"). Less shouty, more readable.
+// Override on the host so descendant button-native picks it up via cascade.
+ion-button {
+  --text-transform: none;
+}
+
 // ── Button contrast overrides ────────────────────────────────────────────────
 //
 // Contrast audit reference:

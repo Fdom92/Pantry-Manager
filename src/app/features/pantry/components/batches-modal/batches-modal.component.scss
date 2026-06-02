@@ -4,6 +4,7 @@
 
 ion-modal.app-sheet-modal {
   @include sheet.sheet-base;
+  @include sheet.field-flat;
 }
 
 .batches-modal__content {

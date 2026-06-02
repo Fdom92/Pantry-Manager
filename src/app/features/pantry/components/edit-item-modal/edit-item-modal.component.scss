@@ -8,6 +8,7 @@
 // solidifies on scroll + sticky glass footer with the primary CTA.
 ion-modal.app-sheet-modal {
   @include sheet.sheet-base;
+  @include sheet.field-flat;
 }
 
 .edit-item-modal__content {

@@ -5,6 +5,7 @@
 // Bottom-sheet edit modal for Fresh items — denser, no global header toolbar.
 ion-modal.app-sheet-modal {
   @include sheet.sheet-base;
+  @include sheet.field-flat;
 }
 
 .fresh-edit-modal__content {

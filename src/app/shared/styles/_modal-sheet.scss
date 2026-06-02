@@ -101,6 +101,30 @@
   --padding-bottom: var(--app-theme-spacing-2xl);
 }
 
+// Strip ion-input chrome inside sheet-style modals so they look the same as
+// entity-selector-field (custom trigger with no underline). Modern modal
+// fields read as label + value pairs separated by whitespace, not by
+// hairline underlines. Applied at the modal-host scope so it's scoped to
+// sheet modals only — page-level inputs (e.g. searchbar) keep the default.
+@mixin field-flat {
+  ion-input,
+  ion-textarea {
+    border-bottom: none;
+    --padding-start: 0;
+    --padding-end: 0;
+    --background: transparent;
+  }
+
+  // Field label tier — both ion-input's stacked label and the
+  // entity-selector-field's __label resolve to the same visual tier here.
+  ion-input .label-text-wrapper,
+  ion-textarea .label-text-wrapper {
+    font-size: var(--app-theme-font-size-tiny);
+    font-weight: var(--app-theme-font-weight-normal);
+    color: var(--app-theme-text-muted);
+  }
+}
+
 // @supports fallback — when backdrop-filter is unsupported, replace the
 // translucent glass with the solid card background so the header/footer
 // stay legible.
