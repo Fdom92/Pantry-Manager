@@ -36,10 +36,7 @@ ion-modal.app-sheet-modal {
   @include sheet.body;
 }
 
-.sheet-footer {
-  @include sheet.footer;
-  @include sheet.glass-fallback;
-}
+.form-section--cta { @include ff.section-cta; }
 
 .edit-item-modal__form {
   display: flex;

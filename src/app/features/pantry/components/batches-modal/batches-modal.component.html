@@ -121,30 +121,26 @@
                 {{ 'pantry.batches.addBatch' | translate }}
               </ion-button>
             </section>
+
+            <section class="form-section form-section--cta form-section--cta-row">
+              <ion-button fill="clear" color="medium" (click)="state.cancelBatchesEditMode()">
+                {{ 'common.actions.cancel' | translate }}
+              </ion-button>
+              <ion-button
+                expand="block"
+                color="primary"
+                [disabled]="state.batchesIsSaving()"
+                (click)="state.saveBatches()">
+                @if (state.batchesIsSaving()) {
+                  <ion-spinner name="dots"></ion-spinner>
+                } @else {
+                  {{ 'common.actions.save' | translate }}
+                }
+              </ion-button>
+            </section>
           }
         }
       </div>
-
-      @if (selectedItem && state.batchesEditMode()) {
-        <footer class="sheet-footer sheet-footer--row">
-          <div class="sheet-footer__row">
-            <ion-button expand="block" fill="clear" (click)="state.cancelBatchesEditMode()">
-              {{ 'common.actions.cancel' | translate }}
-            </ion-button>
-            <ion-button
-              expand="block"
-              color="primary"
-              [disabled]="state.batchesIsSaving()"
-              (click)="state.saveBatches()">
-              @if (state.batchesIsSaving()) {
-                <ion-spinner name="dots"></ion-spinner>
-              } @else {
-                {{ 'common.actions.save' | translate }}
-              }
-            </ion-button>
-          </div>
-        </footer>
-      }
     </div>
   </ng-template>
 </ion-modal>

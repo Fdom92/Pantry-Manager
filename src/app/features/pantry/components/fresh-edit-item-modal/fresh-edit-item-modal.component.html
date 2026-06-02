@@ -85,22 +85,22 @@
               {{ 'common.actions.delete' | translate }}
             </ion-button>
           </section>
+
+          <section class="form-section form-section--cta">
+            <ion-button
+              expand="block"
+              color="primary"
+              [disabled]="!state.canSave() || state.isSaving()"
+              (click)="state.save()">
+              @if (state.isSaving()) {
+                <ion-spinner name="dots"></ion-spinner>
+              } @else {
+                {{ 'common.actions.save' | translate }}
+              }
+            </ion-button>
+          </section>
         </form>
       </div>
-
-      <footer class="sheet-footer">
-        <ion-button
-          expand="block"
-          color="primary"
-          [disabled]="!state.canSave() || state.isSaving()"
-          (click)="state.save()">
-          @if (state.isSaving()) {
-            <ion-spinner name="dots"></ion-spinner>
-          } @else {
-            {{ 'common.actions.save' | translate }}
-          }
-        </ion-button>
-      </footer>
     </div>
   </ng-template>
 </ion-modal>

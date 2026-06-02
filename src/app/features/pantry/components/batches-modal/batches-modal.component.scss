@@ -44,21 +44,8 @@ ion-modal.app-sheet-modal {
   @include sheet.body;
 }
 
-.sheet-footer {
-  @include sheet.footer;
-  @include sheet.glass-fallback;
-}
-
-.sheet-footer__row {
-  display: flex;
-  gap: var(--app-theme-spacing-md);
-
-  ion-button {
-    flex: 1;
-    width: auto;
-    margin: 0;
-  }
-}
+.form-section--cta     { @include ff.section-cta; }
+.form-section--cta-row { @include ff.section-cta-row; }
 
 // ── Read-only batch list ────────────────────────────────────────────────────
 

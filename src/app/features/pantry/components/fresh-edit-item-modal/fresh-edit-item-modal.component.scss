@@ -35,10 +35,7 @@ ion-modal.app-sheet-modal {
   @include sheet.body;
 }
 
-.sheet-footer {
-  @include sheet.footer;
-  @include sheet.glass-fallback;
-}
+.form-section--cta { @include ff.section-cta; }
 
 // ── Flat form layout ────────────────────────────────────────────────────────
 
