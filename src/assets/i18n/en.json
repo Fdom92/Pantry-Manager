@@ -705,12 +705,12 @@
     "consume": {
       "groupLabel": "Consume products",
       "title": "Consume products",
-      "cardTitle": "Search a product",
-      "subtitle": "Search for a product in your pantry to log its consumption.",
+      "cardTitle": "Mark consumed",
+      "subtitle": "Search for products to deduct from your pantry.",
       "placeholder": "Search product",
       "noResults": "No results",
-      "empty": "No items added yet.",
-      "submit": "Log consumption"
+      "empty": "You haven't added anything yet.",
+      "submit": "Register"
     },
     "sections": {
       "fresh": "Fresh",

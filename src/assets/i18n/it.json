@@ -705,12 +705,12 @@
     "consume": {
       "groupLabel": "Consuma prodotti",
       "title": "Consuma prodotti",
-      "cardTitle": "Cerca un prodotto",
-      "subtitle": "Cerca un prodotto nella tua dispensa per registrarne il consumo.",
+      "cardTitle": "Segna consumato",
+      "subtitle": "Cerca i prodotti da scalare dalla tua dispensa.",
       "placeholder": "Cerca prodotto",
       "noResults": "Nessun risultato",
-      "empty": "Nessun articolo aggiunto.",
-      "submit": "Registra consumo"
+      "empty": "Non hai ancora aggiunto nulla.",
+      "submit": "Registra"
     },
     "sections": {
       "fresh": "Freschi",

@@ -705,12 +705,12 @@
     "consume": {
       "groupLabel": "Produkte verbrauchen",
       "title": "Produkte verbrauchen",
-      "cardTitle": "Produkt suchen",
-      "subtitle": "Suche ein Produkt in deiner Vorratskammer, um den Verbrauch zu erfassen.",
+      "cardTitle": "Als verbraucht markieren",
+      "subtitle": "Suche Produkte, um sie aus deiner Vorratskammer abzuziehen.",
       "placeholder": "Produkt suchen",
       "noResults": "Keine Ergebnisse",
-      "empty": "Noch keine Artikel hinzugefügt.",
-      "submit": "Verbrauch erfassen"
+      "empty": "Du hast noch nichts hinzugefügt.",
+      "submit": "Eintragen"
     },
     "sections": {
       "fresh": "Frisches",

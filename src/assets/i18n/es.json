@@ -705,12 +705,12 @@
     "consume": {
       "groupLabel": "Consumir productos",
       "title": "Consumir productos",
-      "cardTitle": "Busca un producto",
-      "subtitle": "Busca un producto de tu despensa para registrar su consumo.",
+      "cardTitle": "Marcar consumido",
+      "subtitle": "Busca productos para descontar de tu despensa.",
       "placeholder": "Buscar producto",
       "noResults": "Sin resultados",
-      "empty": "Todavía no has añadido productos.",
-      "submit": "Registrar consumo"
+      "empty": "Aún no has añadido nada.",
+      "submit": "Registrar"
     },
     "sections": {
       "fresh": "Frescos",

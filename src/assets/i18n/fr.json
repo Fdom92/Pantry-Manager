@@ -705,12 +705,12 @@
     "consume": {
       "groupLabel": "Consommer des produits",
       "title": "Consommer des produits",
-      "cardTitle": "Rechercher un produit",
-      "subtitle": "Recherchez un produit dans votre garde-manger pour enregistrer sa consommation.",
-      "placeholder": "Rechercher un produit",
+      "cardTitle": "Marquer consommé",
+      "subtitle": "Cherche des produits à déduire de ton garde-manger.",
+      "placeholder": "Chercher un produit",
       "noResults": "Aucun résultat",
-      "empty": "Aucun article ajouté pour l'instant.",
-      "submit": "Enregistrer la consommation"
+      "empty": "Tu n'as encore rien ajouté.",
+      "submit": "Enregistrer"
     },
     "sections": {
       "fresh": "Frais",
