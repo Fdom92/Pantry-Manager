@@ -1,27 +1,34 @@
 <ion-modal
+  class="app-sheet-modal entity-selector-modal"
   [isOpen]="isOpen"
+  [breakpoints]="[0, 0.85, 1]"
+  [initialBreakpoint]="0.85"
+  [handle]="false"
   (willDismiss)="willDismiss.emit()"
   (didDismiss)="didDismiss.emit()">
   <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>{{ title }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button fill="clear" color="medium" (click)="willDismiss.emit()">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content class="ion-padding entity-selector-content">
-      <div class="entity-selector-card">
-        <div class="entity-selector-card__header">
-          <h3 class="entity-selector-card__title">{{ cardTitle }}</h3>
+    <div class="sheet-shell entity-selector-modal__content">
+      <div class="sheet-handle" aria-hidden="true"></div>
+
+      <header class="sheet-header">
+        <div class="sheet-header__titles">
+          <h2 class="sheet-header__title">{{ cardTitle || title }}</h2>
           @if (subtitle) {
-            <p class="entity-selector-card__subtitle">{{ subtitle }}</p>
+            <p class="sheet-header__subtitle">{{ subtitle }}</p>
           }
         </div>
-        <div class="entity-selector-card__content">
+        <ion-button
+          class="sheet-header__dismiss"
+          fill="clear"
+          color="medium"
+          (click)="willDismiss.emit()"
+          [attr.aria-label]="'common.actions.close' | translate">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </header>
+
+      <div class="sheet-body">
+        <section class="form-section entity-selector-modal__search">
           <app-entity-autocomplete
             [items]="items"
             [placeholder]="placeholder"
@@ -40,85 +47,83 @@
             (valueChange)="queryChange.emit($event)"
             (optionSelected)="selectItem.emit($event)">
           </app-entity-autocomplete>
+        </section>
 
-          @if (entries.length) {
-            <section class="entity-selector-list">
-              @for (entry of entries; track entry.id) {
-                <div class="entity-selector-item">
-                  <h3 class="entity-selector-item-name">{{ entry.title }}</h3>
-                  <div class="entity-selector-controls">
-                    @if (showEntryQuantity) {
-                      <div class="entity-selector-quantity">
-                        <ion-button
-                          fill="clear"
-                          size="small"
-                          [disabled]="entry.quantity <= 0"
-                          (click)="adjustEntry.emit({ entry, delta: -1 })">
-                          <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
-                        </ion-button>
-                        <ion-text class="entity-selector-qty">{{ entry.quantity }}</ion-text>
-                        <ion-button
-                          fill="clear"
-                          size="small"
-                          [disabled]="!canIncrease(entry)"
-                          (click)="adjustEntry.emit({ entry, delta: 1 })">
-                          <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-                        </ion-button>
-                      </div>
-                    } @else {
+        @if (entries.length) {
+          <section class="form-section entity-selector-modal__list">
+            @for (entry of entries; track entry.id) {
+              <div class="entity-selector-item">
+                <h3 class="entity-selector-item-name">{{ entry.title }}</h3>
+                <div class="entity-selector-controls">
+                  @if (showEntryQuantity) {
+                    <div class="entity-selector-quantity">
                       <ion-button
                         fill="clear"
                         size="small"
-                        color="medium"
+                        [disabled]="entry.quantity <= 0"
                         (click)="adjustEntry.emit({ entry, delta: -1 })">
-                        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+                        <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
                       </ion-button>
+                      <span class="entity-selector-qty">{{ entry.quantity }}</span>
+                      <ion-button
+                        fill="clear"
+                        size="small"
+                        [disabled]="!canIncrease(entry)"
+                        (click)="adjustEntry.emit({ entry, delta: 1 })">
+                        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+                      </ion-button>
+                    </div>
+                  } @else {
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      color="medium"
+                      (click)="adjustEntry.emit({ entry, delta: -1 })">
+                      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+                    </ion-button>
+                  }
+                  @if (showEntryDate) {
+                    @if (entryDateQuickOnly) {
+                      <app-expiry-picker
+                        [mode]="'chips-only'"
+                        [date]="entry.expirationDate"
+                        (dateChange)="entryDateChange.emit({ entry, date: $event })">
+                      </app-expiry-picker>
+                    } @else {
+                      <app-expiry-picker
+                        [mode]="'picker-only'"
+                        [date]="entry.expirationDate"
+                        [noExpiry]="entry.noExpiry ?? false"
+                        (dateChange)="entryDateChange.emit({ entry, date: $event })"
+                        (noExpiryToggle)="entryNoExpiryToggle.emit({ entry })">
+                      </app-expiry-picker>
                     }
-                    @if (showEntryDate) {
-                      @if (entryDateQuickOnly) {
-                        <app-expiry-picker
-                          [mode]="'chips-only'"
-                          [date]="entry.expirationDate"
-                          (dateChange)="entryDateChange.emit({ entry, date: $event })">
-                        </app-expiry-picker>
-                      } @else {
-                        <app-expiry-picker
-                          [mode]="'picker-only'"
-                          [date]="entry.expirationDate"
-                          [noExpiry]="entry.noExpiry ?? false"
-                          (dateChange)="entryDateChange.emit({ entry, date: $event })"
-                          (noExpiryToggle)="entryNoExpiryToggle.emit({ entry })">
-                        </app-expiry-picker>
-                      }
-                    }
-                  </div>
+                  }
                 </div>
-              }
-            </section>
-          } @else if (entriesEmptyLabel) {
-            <ion-text color="medium" class="entity-selector-empty">
-              {{ entriesEmptyLabel }}
-            </ion-text>
-          }
+              </div>
+            }
+          </section>
+        } @else if (entriesEmptyLabel) {
+          <p class="entity-selector-modal__empty">{{ entriesEmptyLabel }}</p>
+        }
+
+        <div class="entity-selector-modal__extras">
+          <ng-content select="[extras]"></ng-content>
         </div>
+
+        <section class="form-section form-section--cta">
+          <ion-button
+            expand="block"
+            color="primary"
+            [disabled]="disableSave || saving"
+            (click)="save.emit()">
+            @if (saving) {
+              <ion-spinner slot="start" name="lines-small"></ion-spinner>
+            }
+            {{ saveLabel }}
+          </ion-button>
+        </section>
       </div>
-    </ion-content>
-    <div class="entity-selector-modal__extras">
-      <ng-content select="[extras]"></ng-content>
     </div>
-    <ion-footer class="modal-footer">
-      <ion-toolbar>
-        <ion-button
-          expand="block"
-          color="primary"
-          [disabled]="disableSave || saving"
-          (click)="save.emit()">
-          @if (saving) {
-            <ion-spinner slot="start" name="lines-small"></ion-spinner>
-          }
-          {{ saveLabel }}
-        </ion-button>
-      </ion-toolbar>
-    </ion-footer>
   </ng-template>
 </ion-modal>
