@@ -112,9 +112,8 @@
           }
         </section>
 
-        <!-- Section: danger zone -->
+        <!-- Section: danger zone (no label, just the convert action) -->
         <section class="form-section edit-item-modal__danger-zone">
-          <h3 class="form-section__label">{{ 'common.actions.more' | translate }}</h3>
           <ion-button
             fill="outline"
             color="medium"
@@ -124,21 +123,22 @@
           </ion-button>
         </section>
       </form>
-    </ion-content>
 
-    <!-- Sticky glass footer -->
-    <footer class="sheet-footer">
-      <ion-button
-        expand="block"
-        color="primary"
-        [disabled]="state.isSaving() || state.form.invalid"
-        (click)="state.submitItem()">
-        @if (state.isSaving()) {
-          <ion-spinner name="dots"></ion-spinner>
-        } @else {
-          {{ 'common.actions.save' | translate }}
-        }
-      </ion-button>
-    </footer>
+      <!-- Sticky glass footer (lives inside ion-content so position:sticky
+           anchors against the scroll container) -->
+      <footer class="sheet-footer">
+        <ion-button
+          expand="block"
+          color="primary"
+          [disabled]="state.isSaving() || state.form.invalid"
+          (click)="state.submitItem()">
+          @if (state.isSaving()) {
+            <ion-spinner name="dots"></ion-spinner>
+          } @else {
+            {{ 'common.actions.save' | translate }}
+          }
+        </ion-button>
+      </footer>
+    </ion-content>
   </ng-template>
 </ion-modal>

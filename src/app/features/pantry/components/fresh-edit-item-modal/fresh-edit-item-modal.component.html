@@ -87,20 +87,20 @@
           </ion-button>
         </section>
       </form>
-    </ion-content>
 
-    <footer class="sheet-footer">
-      <ion-button
-        expand="block"
-        color="primary"
-        [disabled]="!state.canSave() || state.isSaving()"
-        (click)="state.save()">
-        @if (state.isSaving()) {
-          <ion-spinner name="dots"></ion-spinner>
-        } @else {
-          {{ 'common.actions.save' | translate }}
-        }
-      </ion-button>
-    </footer>
+      <footer class="sheet-footer">
+        <ion-button
+          expand="block"
+          color="primary"
+          [disabled]="!state.canSave() || state.isSaving()"
+          (click)="state.save()">
+          @if (state.isSaving()) {
+            <ion-spinner name="dots"></ion-spinner>
+          } @else {
+            {{ 'common.actions.save' | translate }}
+          }
+        </ion-button>
+      </footer>
+    </ion-content>
   </ng-template>
 </ion-modal>

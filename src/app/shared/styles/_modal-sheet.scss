@@ -44,7 +44,9 @@
   background: var(--app-theme-modal-header-bg);
   backdrop-filter: var(--app-theme-modal-header-blur);
   -webkit-backdrop-filter: var(--app-theme-modal-header-blur);
-  border-bottom: var(--app-theme-modal-header-divider);
+  // Divider removed — header reads cleanly against content via glass blur.
+  // Re-add `border-bottom: var(--app-theme-modal-header-divider)` if a hard
+  // separation becomes necessary on dense forms.
 
   // Title sits inline (replaces the Ionic <ion-title> centred toolbar style).
   // The dismiss action lives to the right as a small ion-button.
