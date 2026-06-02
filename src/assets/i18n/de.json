@@ -1033,7 +1033,9 @@
       "title": "Du hast abgelaufene Produkte",
       "title_one": "Du hast ein abgelaufenes Produkt",
       "body": "{{ count }} Produkte in deiner Speisekammer sind abgelaufen",
-      "body_one": "Ein Produkt in deiner Speisekammer ist abgelaufen"
+      "body_one": "Ein Produkt in deiner Speisekammer ist abgelaufen",
+      "body_one_named": "Dein {{name}} ist abgelaufen. Aufbewahren oder wegwerfen?",
+      "body_many_named": "Dein {{name}} und {{others}} weitere sind abgelaufen."
     },
     "nearExpiry": {
       "title": "{{ count }} Produkte laufen bald ab",
@@ -1041,13 +1043,19 @@
       "body": "Das nächste in {{ nearestDays }} Tagen",
       "body_tomorrow": "Das nächste läuft morgen ab",
       "body_one": "Läuft ab in {{ nearestDays }} Tagen",
-      "body_one_tomorrow": "Läuft morgen ab"
+      "body_one_tomorrow": "Läuft morgen ab",
+      "body_one_named": "Dein {{name}} läuft in {{days}} Tagen ab.",
+      "body_one_named_tomorrow": "Dein {{name}} läuft morgen ab. Heute aufbrauchen.",
+      "body_many_named": "Dein {{name}} und {{others}} weitere laufen bald ab.",
+      "body_many_named_tomorrow": "Dein {{name}} läuft morgen ab und {{others}} weitere sind kurz davor."
     },
     "lowStock": {
       "title": "Basics werden knapp",
       "title_one": "Ein Basic wird knapp",
       "body": "{{count}} Basics müssen nachgekauft werden",
-      "body_one": "1 Basic muss nachgekauft werden"
+      "body_one": "1 Basic muss nachgekauft werden",
+      "body_one_named": "Wenig {{name}} übrig. Setz es auf die Liste.",
+      "body_many_named": "Wenig Vorrat: {{name}} und {{others}} weitere."
     },
     "reEngagement": {
       "title": "Wie läuft es mit deinen Frischprodukten?",

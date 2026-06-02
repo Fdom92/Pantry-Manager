@@ -1033,7 +1033,9 @@
       "title": "You have expired items",
       "title_one": "You have an expired item",
       "body": "{{ count }} items in your pantry have expired",
-      "body_one": "An item in your pantry has expired"
+      "body_one": "An item in your pantry has expired",
+      "body_one_named": "Your {{name}} has expired. Decide whether to keep or toss.",
+      "body_many_named": "Your {{name}} and {{others}} more have expired."
     },
     "nearExpiry": {
       "title": "{{ count }} items expiring soon",
@@ -1041,13 +1043,19 @@
       "body": "The nearest in {{ nearestDays }} days",
       "body_tomorrow": "The nearest expires tomorrow",
       "body_one": "Expires in {{ nearestDays }} days",
-      "body_one_tomorrow": "Expires tomorrow"
+      "body_one_tomorrow": "Expires tomorrow",
+      "body_one_named": "Your {{name}} expires in {{days}} days.",
+      "body_one_named_tomorrow": "Your {{name}} expires tomorrow. Use it today.",
+      "body_many_named": "Your {{name}} and {{others}} more expire soon.",
+      "body_many_named_tomorrow": "Your {{name}} expires tomorrow and {{others}} more are close."
     },
     "lowStock": {
       "title": "Running low on essentials",
       "title_one": "Running low on an essential",
       "body": "{{ count }} staples need restocking",
-      "body_one": "1 staple needs restocking"
+      "body_one": "1 staple needs restocking",
+      "body_one_named": "Low on {{name}}. Add it to your list.",
+      "body_many_named": "Low stock: {{name}} and {{others}} more."
     },
     "reEngagement": {
       "title": "How are your fresh items doing?",

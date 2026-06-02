@@ -1033,7 +1033,9 @@
       "title": "Hai prodotti scaduti",
       "title_one": "Hai un prodotto scaduto",
       "body": "{{ count }} prodotti della tua dispensa sono scaduti",
-      "body_one": "Un prodotto della tua dispensa è scaduto"
+      "body_one": "Un prodotto della tua dispensa è scaduto",
+      "body_one_named": "Il tuo {{name}} è scaduto. Tenere o buttare?",
+      "body_many_named": "Il tuo {{name}} e altri {{others}} sono scaduti."
     },
     "nearExpiry": {
       "title": "{{ count }} prodotti in scadenza a breve",
@@ -1041,13 +1043,19 @@
       "body": "Il più vicino tra {{ nearestDays }} giorni",
       "body_tomorrow": "Il più vicino scade domani",
       "body_one": "Scade tra {{ nearestDays }} giorni",
-      "body_one_tomorrow": "Scade domani"
+      "body_one_tomorrow": "Scade domani",
+      "body_one_named": "Il tuo {{name}} scade tra {{days}} giorni.",
+      "body_one_named_tomorrow": "Il tuo {{name}} scade domani. Consumalo oggi.",
+      "body_many_named": "Il tuo {{name}} e altri {{others}} scadono presto.",
+      "body_many_named_tomorrow": "Il tuo {{name}} scade domani e altri {{others}} sono vicini."
     },
     "lowStock": {
       "title": "I tuoi essenziali stanno finendo",
       "title_one": "Un essenziale sta finendo",
       "body": "{{ count }} essenziali hanno bisogno di essere riforniti",
-      "body_one": "1 essenziale ha bisogno di essere rifornito"
+      "body_one": "1 essenziale ha bisogno di essere rifornito",
+      "body_one_named": "Poco {{name}} rimasto. Aggiungilo alla lista.",
+      "body_many_named": "Scorta bassa: {{name}} e altri {{others}}."
     },
     "reEngagement": {
       "title": "Come stanno i tuoi freschi?",

@@ -1033,7 +1033,9 @@
       "title": "Tienes productos caducados",
       "title_one": "Tienes un producto caducado",
       "body": "{{ count }} productos de tu despensa ya han caducado",
-      "body_one": "Un producto de tu despensa ya ha caducado"
+      "body_one": "Un producto de tu despensa ya ha caducado",
+      "body_one_named": "Tu {{name}} ya caducó. Decide si conservarlo o tirarlo.",
+      "body_many_named": "Tu {{name}} y {{others}} más han caducado."
     },
     "nearExpiry": {
       "title": "{{ count }} productos caducan pronto",
@@ -1041,13 +1043,19 @@
       "body": "El primero en {{ nearestDays }} días",
       "body_tomorrow": "El primero caduca mañana",
       "body_one": "Caduca en {{ nearestDays }} días",
-      "body_one_tomorrow": "Caduca mañana"
+      "body_one_tomorrow": "Caduca mañana",
+      "body_one_named": "Tu {{name}} caduca en {{days}} días.",
+      "body_one_named_tomorrow": "Tu {{name}} caduca mañana. Consúmelo hoy.",
+      "body_many_named": "Tu {{name}} y {{others}} más caducan pronto.",
+      "body_many_named_tomorrow": "Tu {{name}} caduca mañana y {{others}} más están cerca."
     },
     "lowStock": {
       "title": "Se te están acabando básicos",
       "title_one": "Se te está acabando un básico",
       "body": "{{ count }} básicos necesitan reposición",
-      "body_one": "Un básico necesita reposición"
+      "body_one": "Un básico necesita reposición",
+      "body_one_named": "Te queda poco {{name}}. Añádelo a la lista.",
+      "body_many_named": "Poco stock de {{name}} y {{others}} más."
     },
     "reEngagement": {
       "title": "¿Cómo van tus frescos?",

@@ -1033,7 +1033,9 @@
       "title": "Você tem produtos vencidos",
       "title_one": "Você tem um produto vencido",
       "body": "{{ count }} produtos da sua despensa venceram",
-      "body_one": "Um produto da sua despensa venceu"
+      "body_one": "Um produto da sua despensa venceu",
+      "body_one_named": "O teu {{name}} já caducou. Guarda ou deita fora?",
+      "body_many_named": "O teu {{name}} e mais {{others}} caducaram."
     },
     "nearExpiry": {
       "title": "{{ count }} produtos vencem em breve",
@@ -1041,13 +1043,19 @@
       "body": "O mais próximo em {{ nearestDays }} dias",
       "body_tomorrow": "O mais próximo vence amanhã",
       "body_one": "Vence em {{ nearestDays }} dias",
-      "body_one_tomorrow": "Vence amanhã"
+      "body_one_tomorrow": "Vence amanhã",
+      "body_one_named": "O teu {{name}} caduca em {{days}} dias.",
+      "body_one_named_tomorrow": "O teu {{name}} caduca amanhã. Usa-o hoje.",
+      "body_many_named": "O teu {{name}} e mais {{others}} caducam em breve.",
+      "body_many_named_tomorrow": "O teu {{name}} caduca amanhã e mais {{others}} estão perto."
     },
     "lowStock": {
       "title": "Básicos a acabar",
       "title_one": "Um básico a acabar",
       "body": "{{ count }} básicos precisam de ser repostos",
-      "body_one": "1 básico precisa de ser reposto"
+      "body_one": "1 básico precisa de ser reposto",
+      "body_one_named": "Pouco {{name}} restante. Adiciona-o à lista.",
+      "body_many_named": "Stock baixo: {{name}} e mais {{others}}."
     },
     "reEngagement": {
       "title": "Como estão os seus frescos?",
