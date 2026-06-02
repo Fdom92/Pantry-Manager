@@ -147,6 +147,12 @@ ion-title {
 // ── LAYER "Hoy" — Today's suggestion ─────────────────────────────────────────
 
 .today-card {
+  // Accent driver — drives both the left strip and the footer CTA. Variants
+  // override --today-accent + --today-cta-text-color (deep variant where
+  // accent fails AA as text on its own 18% tint, mirrors action-card).
+  --today-accent: var(--ion-color-primary);
+  --today-cta-text-color: var(--app-theme-primary-deep);
+
   display: flex;
   flex-direction: column;
   gap: var(--app-theme-spacing-sm);
@@ -164,7 +170,7 @@ ion-title {
     position: absolute;
     inset: 0 auto 0 0;
     width: var(--app-theme-card-accent-width);
-    background: var(--ion-color-primary);
+    background: var(--today-accent);
   }
 
   &__protagonist {
@@ -246,9 +252,19 @@ ion-title {
     gap: var(--app-theme-spacing-sm);
     margin-top: var(--app-theme-spacing-2xs);
 
+    // Primary CTA uses the tonal pattern (matches action-card CTAs). Tonal
+    // bg = accent at 18% over card surface; text = accent shade. Removes
+    // the white-on-teal mosaic against neighbouring tonal CTAs in the stack.
     ion-button {
       margin: 0;
       --text-transform: none;
+      --background: color-mix(in srgb, var(--today-accent) 18%, var(--ion-card-background));
+      --background-hover: color-mix(in srgb, var(--today-accent) 28%, var(--ion-card-background));
+      --background-activated: color-mix(in srgb, var(--today-accent) 28%, var(--ion-card-background));
+      --background-focused: color-mix(in srgb, var(--today-accent) 28%, var(--ion-card-background));
+      --color: var(--today-cta-text-color, var(--today-accent));
+      --box-shadow: none;
+      font-weight: var(--app-theme-font-weight-bold);
     }
   }
 
@@ -265,24 +281,25 @@ ion-title {
     &:active { opacity: 1; }
   }
 
-  // All-good state (nothing urgent to suggest)
+  // All-good state (nothing urgent to suggest) — accent stays primary.
   &--all-good {
     background: color-mix(in srgb, var(--ion-color-primary) 5%, var(--app-theme-card-bg));
     border-color: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
 
     &::before {
-      background: var(--ion-color-primary);
       opacity: var(--app-theme-opacity-disabled);
     }
   }
 
-  // Low data quality state (missing expiry dates)
+  // Low data quality state (missing expiry dates) — accent swaps to warning.
   &--low-data {
+    --today-accent: var(--app-theme-card-accent-warning);
+    --today-cta-text-color: var(--app-theme-warning-deep);
+
     background: color-mix(in srgb, var(--app-theme-card-accent-warning) 5%, var(--app-theme-card-bg));
     border-color: color-mix(in srgb, var(--app-theme-card-accent-warning) 20%, transparent);
 
     &::before {
-      background: var(--app-theme-card-accent-warning);
       opacity: 0.5;
     }
 
@@ -317,14 +334,13 @@ ion-title {
     color: var(--app-theme-text-muted);
   }
 
-  // Success / confirmed state
+  // Success / confirmed state — accent swaps to success.
   &--confirmed {
+    --today-accent: var(--app-theme-card-accent-success);
+    --today-cta-text-color: var(--app-theme-success-deep);
+
     background: color-mix(in srgb, var(--app-theme-card-accent-success) 8%, var(--app-theme-card-bg));
     border-color: color-mix(in srgb, var(--app-theme-card-accent-success) 25%, transparent);
-
-    &::before {
-      background: var(--app-theme-card-accent-success);
-    }
   }
 
   &__success-row {
