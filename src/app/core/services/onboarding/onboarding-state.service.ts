@@ -166,7 +166,9 @@ export class OnboardingStateService {
         // never block onboarding completion on a scheduling failure
       }
     }
-    await this.navCtrl.navigateRoot('/dashboard');
+    // First post-onboarding view = pantry so user sees their seeded products.
+    // Subsequent app launches default-route back to /dashboard.
+    await this.navCtrl.navigateRoot('/pantry');
   }
 
   /**
