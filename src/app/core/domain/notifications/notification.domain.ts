@@ -73,3 +73,38 @@ export function filterLowStockItems(items: PantryItem[]): PantryItem[] {
     return min > 0 && total < min;
   });
 }
+
+export type NotificationItemKind = 'expired' | 'near-expiry' | 'low-stock';
+
+/**
+ * Pick the single most representative item for a notification body.
+ * - expired / near-expiry: earliest expiry first; ties break on name lex sort.
+ * - low-stock: alphabetical (no expiry signal that's relevant here).
+ * Returns null when the list is empty.
+ */
+export function pickPriorityItem(
+  items: PantryItem[],
+  kind: NotificationItemKind,
+  _now: Date,
+): PantryItem | null {
+  if (!items.length) return null;
+  if (kind === 'low-stock') {
+    return [...items].sort((a, b) => a.name.localeCompare(b.name))[0];
+  }
+  const byEarliestExpiry = [...items].sort((a, b) => {
+    const aDate = earliestBatchExpiry(a);
+    const bDate = earliestBatchExpiry(b);
+    if (aDate === bDate) return a.name.localeCompare(b.name);
+    if (aDate === undefined) return 1;
+    if (bDate === undefined) return -1;
+    return aDate.localeCompare(bDate);
+  });
+  return byEarliestExpiry[0] ?? items[0];
+}
+
+function earliestBatchExpiry(item: PantryItem): string | undefined {
+  if (!item.batches?.length) return undefined;
+  const dated = item.batches.map(b => b.expirationDate).filter((d): d is string => !!d);
+  if (!dated.length) return undefined;
+  return dated.sort((a, b) => a.localeCompare(b))[0];
+}

@@ -78,7 +78,10 @@ export class ListStateService {
     this.boughtManuals.set([]);
   }
 
-  async markAsBought(suggestion: ShoppingSuggestionWithItem): Promise<void> {
+  async markAsBought(
+    suggestion: ShoppingSuggestionWithItem,
+    opts?: { quantityOverride?: number },
+  ): Promise<void> {
     const id = suggestion.item._id;
     const name = suggestion.item.name;
     const isFresh = suggestion.reason === ShoppingReason.FRESH_EMPTY
@@ -98,7 +101,10 @@ export class ListStateService {
           updatedAt: new Date().toISOString(),
         });
       } else {
-        await this.pantryStore.addNewLot(id, { quantity: suggestion.suggestedQuantity });
+        const quantity = opts?.quantityOverride && opts.quantityOverride > 0
+          ? opts.quantityOverride
+          : suggestion.suggestedQuantity;
+        await this.pantryStore.addNewLot(id, { quantity });
       }
       const msg = this.translate.instant('shopping.toasts.bought', { name });
       void this.showToast(msg);

@@ -17,7 +17,7 @@
   left: 0;
   right: 0;
   top: calc(100% + var(--app-theme-spacing-xs));
-  z-index: 200;
+  z-index: var(--app-theme-z-dropdown);
   margin: 0;
   padding: var(--app-theme-spacing-xs) 0;
   max-height: 240px;
@@ -42,7 +42,7 @@
 
 .autocomplete-option--empty ion-label {
   font-weight: var(--app-theme-font-weight-bold);
-  color: var(--ion-color-primary);
+  color: var(--app-theme-primary-on-surface);
 }
 
 .autocomplete-option ion-label {

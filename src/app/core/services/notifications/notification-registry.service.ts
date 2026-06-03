@@ -18,6 +18,10 @@ export class NotificationRegistryService {
     return this.definitions;
   }
 
+  getById(id: number): NotificationDefinition | undefined {
+    return this.getAll().find(d => d.id === id);
+  }
+
   /** Register an additional definition at runtime. Adding a new notification type = create a class + call this. */
   register(definition: NotificationDefinition): void {
     const exists = this.definitions.some(d => d.id === definition.id);

@@ -1,17 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   IonButton,
-  IonButtons,
-  IonContent,
-  IonFooter,
-  IonHeader,
   IonIcon,
-  IonItem,
-  IonList,
   IonModal,
   IonSpinner,
-  IonTitle,
-  IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntitySelectorFieldComponent } from '@shared/components/entity-selector-field/entity-selector-field.component';
@@ -23,16 +15,8 @@ import { BatchEditStateService } from '@core/services/dashboard/batch-edit-state
   standalone: true,
   imports: [
     IonModal,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
     IonButton,
     IonIcon,
-    IonContent,
-    IonList,
-    IonItem,
-    IonFooter,
     IonSpinner,
     TranslateModule,
     EntitySelectorFieldComponent,

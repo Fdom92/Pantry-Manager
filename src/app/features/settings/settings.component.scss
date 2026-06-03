@@ -1,64 +1,11 @@
-ion-card-title {
-  margin: 0;
-  font-size: var(--app-theme-font-size-lg);
-  font-weight: var(--app-theme-font-weight-bold);
-}
+@use '../../shared/styles/settings-shell' as shell;
+@use '../../shared/styles/tonal-icon' as tonal;
 
-ion-card-subtitle {
-  margin-top: var(--app-theme-spacing-xs);
-  font-size: var(--app-theme-font-size-body);
-  color: var(--app-theme-text-muted);
-}
-
-ion-title {
-  color: var(--app-theme-text-color);
-}
-
-ion-card-content {
-  padding-inline: 0;
-}
-
-ion-item h3 {
-  font-size: var(--app-theme-font-size-md);
-  font-weight: var(--app-theme-font-weight-bold);
-  margin: 0 0 var(--app-theme-spacing-xs);
-}
-
-ion-item p {
-  font-size: var(--app-theme-font-size-body);
-  color: var(--app-theme-text-muted);
-  margin: 0;
-}
-
-ion-item {
-  --background: transparent;
-}
-
-// ── Settings layout ──────────────────────────────────────────────────────────
-
-.settings-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-theme-spacing-lg);
-  margin: var(--app-theme-card-margin-inline);
-  padding-bottom: calc(var(--app-theme-spacing-lg) + env(safe-area-inset-bottom, 0px));
-}
+@include shell.apply;
+@include tonal.apply;
 
 .pro-inline-banner {
   margin: 0;
-}
-
-.settings-card {
-  margin: 0;
-  background: var(--app-theme-card-bg) !important;
-  --background: var(--app-theme-card-bg);
-  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
-  border-color: var(--app-theme-card-border-color);
-  color: var(--app-theme-text-color);
-}
-
-.settings-card ion-list {
-  background: transparent;
 }
 
 .settings-card ion-list-header {
@@ -70,8 +17,8 @@ ion-item {
     font-size: var(--app-theme-font-size-micro);
     font-weight: var(--app-theme-font-weight-bold);
     text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--ion-color-primary);
+    letter-spacing: var(--app-theme-letter-spacing-eyebrow);
+    color: var(--app-theme-primary-on-surface);
     margin: 0;
   }
 }
@@ -100,7 +47,7 @@ ion-item {
   gap: var(--app-theme-spacing-sm);
   padding: var(--app-theme-spacing-md);
   border-radius: var(--app-theme-radius-md);
-  border: var(--app-theme-card-border-width) solid color-mix(in srgb, var(--ion-text-color) 18%, transparent);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-surface-tint-bold);
   background: color-mix(in srgb, var(--app-theme-card-bg) 94%, transparent);
   color: var(--app-theme-text-color);
   font-size: var(--app-theme-font-size-body);
@@ -148,7 +95,7 @@ ion-item {
   font-size: var(--app-theme-font-size-caption);
   font-weight: var(--app-theme-font-weight-bold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow-sm);
 }
 
 // ── Dev time input ───────────────────────────────────────────────────────────
@@ -171,4 +118,169 @@ ion-item {
   .lang-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+// ── Dev notification state chips ─────────────────────────────────────────────
+
+.dev-notif-state {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--app-theme-spacing-xs);
+  padding: 0 var(--app-theme-spacing-md) var(--app-theme-spacing-md);
+}
+
+.dev-notif-state__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-2xs);
+  --chip-accent: var(--app-theme-text-soft);
+  background: color-mix(in srgb, var(--chip-accent) 14%, transparent);
+  color: var(--chip-accent);
+  font-size: var(--app-theme-font-size-tiny);
+  font-weight: var(--app-theme-font-weight-bold);
+  padding: var(--app-theme-spacing-2xs) var(--app-theme-spacing-sm);
+  border-radius: var(--app-theme-radius-pill);
+  border: 1px solid color-mix(in srgb, var(--chip-accent) 30%, transparent);
+
+  ion-icon {
+    font-size: var(--app-theme-font-size-small);
+  }
+}
+
+.dev-notif-state__chip[data-state='granted'] {
+  --chip-accent: var(--ion-color-success-shade);
+}
+.dev-notif-state__chip[data-state='denied'] {
+  --chip-accent: var(--ion-color-danger);
+}
+.dev-notif-state__chip[data-state='prompt'],
+.dev-notif-state__chip[data-state='prompt-with-rationale'] {
+  --chip-accent: var(--ion-color-warning-shade);
+}
+
+// ── Dev fire grid ─────────────────────────────────────────────────────────────
+
+.dev-fire-grid-label {
+  font-size: var(--app-theme-font-size-micro);
+  font-weight: var(--app-theme-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow);
+  color: var(--app-theme-text-muted);
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-md) var(--app-theme-spacing-xs);
+}
+
+.dev-fire-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--app-theme-spacing-sm);
+  padding: 0 var(--app-theme-spacing-md) var(--app-theme-spacing-md);
+}
+
+.dev-fire-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-theme-spacing-xs);
+  min-height: 86px;
+  padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-xs);
+  border-radius: var(--app-theme-radius-md);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-surface-tint-bold);
+  background: color-mix(in srgb, var(--app-theme-card-bg) 94%, transparent);
+  color: var(--app-theme-text-color);
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-bold);
+  text-align: center;
+  transition: var(--app-theme-transition-normal);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--app-theme-shadow-md);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.dev-fire-tile__icon {
+  --tile-accent: var(--ion-color-primary);
+  font-size: 20px;
+  width: 34px;
+  height: 34px;
+  padding: 7px;
+  border-radius: var(--app-theme-radius-circle);
+  background: color-mix(in srgb, var(--tile-accent) 14%, transparent);
+  color: var(--tile-accent);
+}
+
+.dev-fire-tile__icon--primary   { --tile-accent: var(--ion-color-primary); }
+.dev-fire-tile__icon--success   { --tile-accent: var(--ion-color-success-shade); }
+.dev-fire-tile__icon--warning   { --tile-accent: var(--ion-color-warning-shade); }
+.dev-fire-tile__icon--danger    { --tile-accent: var(--ion-color-danger); }
+.dev-fire-tile__icon--tertiary  { --tile-accent: var(--ion-color-tertiary); }
+.dev-fire-tile__icon--medium    { --tile-accent: var(--ion-color-medium-shade); }
+
+.dev-fire-tile__label {
+  font-size: var(--app-theme-font-size-tiny);
+  line-height: 1.2;
+}
+
+// ── Dev pending list ──────────────────────────────────────────────────────────
+
+.dev-pending-empty {
+  font-size: var(--app-theme-font-size-caption);
+  color: var(--app-theme-text-muted);
+  text-align: center;
+  padding: var(--app-theme-spacing-md);
+  font-style: italic;
+}
+
+.dev-pending-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--app-theme-spacing-md) var(--app-theme-spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-xs);
+}
+
+.dev-pending-item {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-sm);
+  border-radius: var(--app-theme-radius-sm);
+  background: color-mix(in srgb, var(--ion-color-medium) 8%, transparent);
+}
+
+.dev-pending-item__badge {
+  font-size: var(--app-theme-font-size-micro);
+  font-weight: var(--app-theme-font-weight-bold);
+  padding: var(--app-theme-spacing-2xs) var(--app-theme-spacing-sm);
+  border-radius: var(--app-theme-radius-pill);
+  background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
+  color: var(--app-theme-primary-on-surface);
+}
+
+.dev-pending-item__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.dev-pending-item__title {
+  font-size: var(--app-theme-font-size-caption);
+  font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dev-pending-item__time {
+  font-size: var(--app-theme-font-size-micro);
+  color: var(--app-theme-text-muted);
 }

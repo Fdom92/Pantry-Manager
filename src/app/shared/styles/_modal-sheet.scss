@@ -1,0 +1,127 @@
+// Modern bottom-sheet modal styling.
+//
+// Structure: a plain <div class="sheet-shell"> wrapper inside <ng-template>
+// (NOT <ion-content> — its shadow-DOM scroll part doesn't reliably accept
+// `display: flex` overrides, leaving the footer off-screen at small sheet
+// breakpoints). The shell is a bare flex column that flex-distributes its
+// children:
+//
+//   .sheet-shell
+//   ├─ .sheet-handle       (flex auto, top)
+//   ├─ .sheet-header       (flex auto, glass)
+//   ├─ .sheet-body         (flex 1,   scrolls)
+//   └─ .sheet-footer       (flex auto, glass CTA — ALWAYS visible)
+//
+// Mixins:
+//   sheet-base    → applies to <ion-modal>
+//   layout        → applies to .sheet-shell (flex column container)
+//   handle        → applies to the drag-handle <div>
+//   header        → applies to the header bar element
+//   body          → applies to the scrolling form wrapper
+//   footer        → applies to the CTA footer element
+//   field-flat    → strips ion-input chrome inside sheet modals
+//   header-title / header-subtitle → typography helpers
+//   glass-fallback → @supports no-backdrop-filter fallback
+
+@mixin sheet-base {
+  --background: var(--ion-card-background);
+  --border-radius: var(--app-theme-radius-xl) var(--app-theme-radius-xl) 0 0;
+  --box-shadow: var(--app-theme-shadow-sheet);
+}
+
+// Apply to a plain <div class="sheet-shell"> wrapper inside <ng-template>
+// (no <ion-content> — its shadow-DOM scroll part doesn't reliably accept
+// display: flex from outside, leaving the footer off-screen at small sheet
+// breakpoints). A bare flex column is unambiguous and Just Works.
+@mixin layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ion-card-background);
+  overflow: hidden;
+}
+
+@mixin handle {
+  flex: 0 0 auto;
+  display: block;
+  width: var(--app-theme-modal-handle-width);
+  height: var(--app-theme-modal-handle-height);
+  margin: var(--app-theme-modal-handle-margin-block) auto;
+  background: var(--app-theme-modal-handle-color);
+  border-radius: var(--app-theme-modal-handle-radius);
+  pointer-events: none;
+}
+
+@mixin header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-modal-header-padding-block) var(--app-theme-spacing-lg);
+  background: var(--app-theme-modal-header-bg);
+  backdrop-filter: var(--app-theme-modal-header-blur);
+  -webkit-backdrop-filter: var(--app-theme-modal-header-blur);
+}
+
+@mixin body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 var(--app-theme-spacing-lg) var(--app-theme-spacing-lg);
+}
+
+@mixin footer {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-md) var(--app-theme-spacing-lg)
+           calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
+  background: var(--app-theme-modal-footer-bg);
+  backdrop-filter: var(--app-theme-modal-footer-blur);
+  -webkit-backdrop-filter: var(--app-theme-modal-footer-blur);
+  border-top: var(--app-theme-modal-footer-divider);
+
+  ion-button {
+    margin: 0;
+    width: 100%;
+  }
+}
+
+@mixin field-flat {
+  ion-input,
+  ion-textarea {
+    border-bottom: none;
+    --padding-start: 0;
+    --padding-end: 0;
+    --background: transparent;
+  }
+
+  ion-input .label-text-wrapper,
+  ion-textarea .label-text-wrapper {
+    font-size: var(--app-theme-font-size-tiny);
+    font-weight: var(--app-theme-font-weight-normal);
+    color: var(--app-theme-text-muted);
+  }
+}
+
+@mixin header-title {
+  margin: 0;
+  font-size: var(--app-theme-font-size-lg);
+  font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-color);
+  line-height: var(--app-theme-line-height-tight);
+}
+
+@mixin header-subtitle {
+  margin: var(--app-theme-spacing-2xs) 0 0;
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-muted);
+}
+
+@mixin glass-fallback {
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--ion-card-background);
+  }
+}

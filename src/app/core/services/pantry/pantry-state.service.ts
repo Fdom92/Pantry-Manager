@@ -409,6 +409,23 @@ export class PantryStateService {
     this.editItemModalRequest.set({ mode: 'edit', item: updatedItem });
   }
 
+  /**
+   * Open the edit modal for the item with the given id, if it still exists in
+   * the loaded products list. Called by deep-link entry from a tapped
+   * notification carrying extra.itemId. Fresh items route to the fresh-edit
+   * modal; everything else to the despensa edit modal, matching the existing
+   * openEditModalFromSheet branch.
+   */
+  focusItemById(itemId: string): void {
+    const item = this.pantryItemsState().find(p => p._id === itemId);
+    if (!item) return;
+    if (item.productType === 'fresh') {
+      this.editFreshItemModalRequest.set({ mode: 'edit', item });
+      return;
+    }
+    this.editItemModalRequest.set({ mode: 'edit', item });
+  }
+
   async setFreshState(item: PantryItem, state: FreshState): Promise<void> {
     const newQty = freshStateToQty(state);
     const currentBatches = item.batches ?? [];

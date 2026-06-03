@@ -17,3 +17,9 @@ ion-tab-button {
   --color-selected: var(--ion-color-primary);
   transition: color var(--app-theme-transition-fast);
 }
+
+// Tab notification badges are deliberately solid (not tonal). They follow the
+// iOS / Material small notification-pill convention: tiny floating count pills
+// over an icon. Tonal would lose contrast at this size against the glass tab
+// bar. The color="danger|warning|primary" attribute on these ion-badge nodes
+// is intentional.
