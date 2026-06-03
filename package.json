@@ -11,7 +11,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "prepare:build": "npm run build && npx cap copy && npx cap sync",
-    "prepare:prod-build": "npm run build -- --configuration production && npx cap copy && npx cap sync"
+    "prepare:prod-build": "npm run build -- --configuration production && npx cap copy && npx cap sync",
+    "prepare": "husky"
   },
   "private": true,
   "dependencies": {
@@ -74,6 +75,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jsdoc": "^48.2.1",
     "eslint-plugin-prefer-arrow": "1.2.2",
+    "husky": "^9.1.7",
     "jasmine-core": "~5.1.0",
     "jasmine-spec-reporter": "~5.0.0",
     "karma": "~6.4.0",
