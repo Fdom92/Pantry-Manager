@@ -11,6 +11,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { NotificationPermissionService } from '../notifications/notification-permission.service';
+import { RecoveryNotificationsService } from '../notifications/recovery-notifications.service';
+import { WelcomeNotificationService } from '../notifications/welcome-notification.service';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { register } from 'swiper/element/bundle';
 import type { SwiperOptions } from 'swiper/types';
@@ -37,6 +39,8 @@ export class OnboardingStateService {
   private readonly historyManager = inject(HistoryEventManagerService);
   private readonly notificationPermission = inject(NotificationPermissionService);
   private readonly preferences = inject(SettingsPreferencesService);
+  private readonly welcomeNotif = inject(WelcomeNotificationService);
+  private readonly recoveryNotif = inject(RecoveryNotificationsService);
   private readonly translate = inject(TranslateService);
 
   readonly slideOptions: SwiperOptions = {
@@ -121,6 +125,7 @@ export class OnboardingStateService {
         notifyOnNearExpiry: true,
         notifyOnLowStock: true,
       });
+      await this.welcomeNotif.scheduleWelcomeNotification();
     }
     await this.goToNextSlide(swiperEl);
   }
@@ -153,7 +158,17 @@ export class OnboardingStateService {
   async completeOnboarding(): Promise<void> {
     setBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG, true);
     await this.bulkCreateSeedItems();
-    await this.navCtrl.navigateRoot('/dashboard');
+    // Recovery window only makes sense if we can actually push to the user.
+    if (this.notificationsDecision() === 'granted') {
+      try {
+        await this.recoveryNotif.scheduleRecoveryWindow();
+      } catch {
+        // never block onboarding completion on a scheduling failure
+      }
+    }
+    // First post-onboarding view = pantry so user sees their seeded products.
+    // Subsequent app launches default-route back to /dashboard.
+    await this.navCtrl.navigateRoot('/pantry');
   }
 
   /**

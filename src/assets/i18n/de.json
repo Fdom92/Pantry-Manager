@@ -399,6 +399,14 @@
       "ignored": "{{name}} jetzt ausgeblendet — erscheint beim nächsten Mal wieder.",
       "removedManual": "{{name}} aus der Liste entfernt."
     },
+    "buySheet": {
+      "title": "Wie viele hast du gekauft?",
+      "hint": "Passe die tatsächliche Menge an, damit dein Vorrat stimmt.",
+      "confirm": "Bestätigen",
+      "cancel": "Abbrechen",
+      "increment": "Menge erhöhen",
+      "decrement": "Menge verringern"
+    },
     "tabTitle": "Einkauf"
   },
   "insights": {
@@ -945,6 +953,32 @@
       "subtitle": "Onboarding jederzeit erneut ansehen."
     },
     "dev": {
+      "notifications": {
+        "title": "Benachrichtigungen (Entwickler)",
+        "subtitle": "Benachrichtigungen einsehen und manuell auslösen",
+        "permissionLabel": "Systemberechtigung",
+        "preferenceLabel": "Benachrichtigungen aktiviert",
+        "fireExpired": "'Abgelaufen' in 5s auslösen",
+        "fireNearExpiry": "'Bald abgelaufen' in 5s auslösen",
+        "fireLowStock": "'Wenig Vorrat' in 5s auslösen",
+        "fireReEngagement": "Wöchentliche in 5s auslösen",
+        "fireWelcome": "Willkommen in 5s auslösen",
+        "fireRecoveryD2": "D2 in 5s auslösen",
+        "fireRecoveryD5": "D5 in 5s auslösen",
+        "fireRecoveryD10": "D10 in 5s auslösen",
+        "fireSectionRegistered": "Registrierte Definitionen",
+        "fireSectionRetention": "Retention (Willkommen + Wiederherstellung)",
+        "pendingTitle": "Geplant",
+        "pendingEmpty": "Keine geplanten Benachrichtigungen",
+        "refreshPending": "Liste aktualisieren",
+        "cancelAll": "Alle abbrechen",
+        "previewEmpty": "Nichts zum Auslösen — keine passenden Items",
+        "previewResultTitle": "Nächste Benachrichtigung",
+        "toast": {
+          "scheduled": "In 5 Sekunden geplant",
+          "noop": "Nichts zum Auslösen"
+        }
+      },
       "title": "Entwicklung",
       "subtitle": "Tools zum Testen verschiedener Szenarien.",
       "groupOnboarding": "Onboarding",
@@ -963,8 +997,6 @@
       "scheduleAtTimeAction": "Planen",
       "previewNotificationTitle": "Benachrichtigung vorschau",
       "previewNotificationSubtitle": "Zeigt, was mit aktuellen Daten geplant würde",
-      "cancelNotificationsTitle": "Alle ausstehenden abbrechen",
-      "cancelNotificationsSubtitle": "Alle geplanten Benachrichtigungen entfernen",
       "seedExpiredTitle": "Abgelaufene Items erstellen",
       "seedExpiredSubtitle": "3 Items mit vergangenen Ablaufdaten hinzufügen",
       "seedNearExpiryTitle": "Bald ablaufende Items erstellen",
@@ -1033,7 +1065,9 @@
       "title": "Du hast abgelaufene Produkte",
       "title_one": "Du hast ein abgelaufenes Produkt",
       "body": "{{ count }} Produkte in deiner Speisekammer sind abgelaufen",
-      "body_one": "Ein Produkt in deiner Speisekammer ist abgelaufen"
+      "body_one": "Ein Produkt in deiner Speisekammer ist abgelaufen",
+      "body_one_named": "Dein {{name}} ist abgelaufen. Aufbewahren oder wegwerfen?",
+      "body_many_named": "Dein {{name}} und {{others}} weitere sind abgelaufen."
     },
     "nearExpiry": {
       "title": "{{ count }} Produkte laufen bald ab",
@@ -1041,13 +1075,19 @@
       "body": "Das nächste in {{ nearestDays }} Tagen",
       "body_tomorrow": "Das nächste läuft morgen ab",
       "body_one": "Läuft ab in {{ nearestDays }} Tagen",
-      "body_one_tomorrow": "Läuft morgen ab"
+      "body_one_tomorrow": "Läuft morgen ab",
+      "body_one_named": "Dein {{name}} läuft in {{days}} Tagen ab.",
+      "body_one_named_tomorrow": "Dein {{name}} läuft morgen ab. Heute aufbrauchen.",
+      "body_many_named": "Dein {{name}} und {{others}} weitere laufen bald ab.",
+      "body_many_named_tomorrow": "Dein {{name}} läuft morgen ab und {{others}} weitere sind kurz davor."
     },
     "lowStock": {
       "title": "Basics werden knapp",
       "title_one": "Ein Basic wird knapp",
       "body": "{{count}} Basics müssen nachgekauft werden",
-      "body_one": "1 Basic muss nachgekauft werden"
+      "body_one": "1 Basic muss nachgekauft werden",
+      "body_one_named": "Wenig {{name}} übrig. Setz es auf die Liste.",
+      "body_many_named": "Wenig Vorrat: {{name}} und {{others}} weitere."
     },
     "reEngagement": {
       "title": "Wie läuft es mit deinen Frischprodukten?",
@@ -1056,6 +1096,24 @@
     "weeklyReminder": {
       "title": "Was hast du diese Woche gekauft?",
       "body": "Füge die Neueinkäufe hinzu, damit der Überblick aktuell bleibt"
+    },
+    "welcome": {
+      "title": "PantryMind ist bereit ✓",
+      "body": "Benachrichtigungen funktionieren. Füge dein erstes Produkt hinzu — wir melden uns, bevor es abläuft."
+    },
+    "recovery": {
+      "d2": {
+        "title": "Wie läuft's mit deiner Vorratskammer?",
+        "body": "Schau kurz vorbei. Wir helfen dir, den Überblick zu behalten."
+      },
+      "d5": {
+        "title": "Es sind 5 Tage vergangen",
+        "body": "Einige Produkte könnten bald ablaufen. Lohnt sich ein Blick."
+      },
+      "d10": {
+        "title": "Deine Vorratskammer braucht dich",
+        "body": "Komm zurück und vermeide Lebensmittelverschwendung. 30 Sekunden reichen."
+      }
     }
   },
   "sync": {

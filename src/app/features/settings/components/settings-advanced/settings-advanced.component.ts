@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { NOTIFICATION_IDS } from '@core/constants';
 import { SettingsStateService } from '@core/services/settings/settings-state.service';
 import {
   IonBackButton,
@@ -56,6 +57,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class SettingsAdvancedComponent {
   readonly facade = inject(SettingsStateService);
+  protected readonly NOTIFICATION_IDS = NOTIFICATION_IDS;
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();

@@ -399,6 +399,14 @@
       "ignored": "{{name}} masqué pour l'instant — réapparaîtra la prochaine fois.",
       "removedManual": "{{name}} retiré de la liste."
     },
+    "buySheet": {
+      "title": "Combien en as-tu acheté ?",
+      "hint": "Ajuste la quantité réelle pour garder ton garde-manger à jour.",
+      "confirm": "Confirmer",
+      "cancel": "Annuler",
+      "increment": "Augmenter la quantité",
+      "decrement": "Diminuer la quantité"
+    },
     "tabTitle": "Courses"
   },
   "insights": {
@@ -945,6 +953,32 @@
       "subtitle": "Revoir l’onboarding initial à tout moment."
     },
     "dev": {
+      "notifications": {
+        "title": "Notifications (développeur)",
+        "subtitle": "Inspecter et déclencher manuellement les notifications",
+        "permissionLabel": "Autorisation système",
+        "preferenceLabel": "Notifications activées",
+        "fireExpired": "Déclencher 'expirés' dans 5s",
+        "fireNearExpiry": "Déclencher 'bientôt' dans 5s",
+        "fireLowStock": "Déclencher 'stock bas' dans 5s",
+        "fireReEngagement": "Déclencher hebdomadaire dans 5s",
+        "fireWelcome": "Déclencher bienvenue dans 5s",
+        "fireRecoveryD2": "Déclencher D2 dans 5s",
+        "fireRecoveryD5": "Déclencher D5 dans 5s",
+        "fireRecoveryD10": "Déclencher D10 dans 5s",
+        "fireSectionRegistered": "Définitions enregistrées",
+        "fireSectionRetention": "Rétention (bienvenue + récupération)",
+        "pendingTitle": "Programmées",
+        "pendingEmpty": "Aucune notification programmée",
+        "refreshPending": "Rafraîchir la liste",
+        "cancelAll": "Tout annuler",
+        "previewEmpty": "Rien à déclencher — aucun item correspondant",
+        "previewResultTitle": "Prochaine notification",
+        "toast": {
+          "scheduled": "Programmée dans 5 secondes",
+          "noop": "Rien à déclencher"
+        }
+      },
       "title": "Développement",
       "subtitle": "Outils pour tester différents scénarios.",
       "groupOnboarding": "Onboarding",
@@ -963,8 +997,6 @@
       "scheduleAtTimeAction": "Programmer",
       "previewNotificationTitle": "Aperçu de la notification",
       "previewNotificationSubtitle": "Voir ce qui serait programmé avec les données actuelles",
-      "cancelNotificationsTitle": "Annuler toutes les notifications",
-      "cancelNotificationsSubtitle": "Supprimer toutes les notifications programmées",
       "seedExpiredTitle": "Créer des articles expirés",
       "seedExpiredSubtitle": "Ajouter 3 articles avec des dates de péremption passées",
       "seedNearExpiryTitle": "Créer des articles proches de l’expiration",
@@ -1033,7 +1065,9 @@
       "title": "Des produits ont expiré",
       "title_one": "Un produit a expiré",
       "body": "{{ count }} produits de votre garde-manger ont expiré",
-      "body_one": "Un produit de ton garde-manger a expiré"
+      "body_one": "Un produit de ton garde-manger a expiré",
+      "body_one_named": "Ton {{name}} a expiré. Garder ou jeter ?",
+      "body_many_named": "Ton {{name}} et {{others}} autres ont expiré."
     },
     "nearExpiry": {
       "title": "{{ count }} produits expirent bientôt",
@@ -1041,13 +1075,19 @@
       "body": "Le plus proche dans {{ nearestDays }} jours",
       "body_tomorrow": "Le plus proche expire demain",
       "body_one": "Expire dans {{ nearestDays }} jours",
-      "body_one_tomorrow": "Expire demain"
+      "body_one_tomorrow": "Expire demain",
+      "body_one_named": "Ton {{name}} expire dans {{days}} jours.",
+      "body_one_named_tomorrow": "Ton {{name}} expire demain. Consomme-le aujourd'hui.",
+      "body_many_named": "Ton {{name}} et {{others}} autres expirent bientôt.",
+      "body_many_named_tomorrow": "Ton {{name}} expire demain et {{others}} autres sont proches."
     },
     "lowStock": {
       "title": "Des essentiels manquent",
       "title_one": "Un essentiel manque",
       "body": "{{ count }} produits essentiels ont besoin d'être réapprovisionnés",
-      "body_one": "1 produit essentiel a besoin d'être réapprovisionné"
+      "body_one": "1 produit essentiel a besoin d'être réapprovisionné",
+      "body_one_named": "Il reste peu de {{name}}. Ajoute-le à la liste.",
+      "body_many_named": "Stock bas : {{name}} et {{others}} autres."
     },
     "reEngagement": {
       "title": "Comment vont tes produits frais ?",
@@ -1056,6 +1096,24 @@
     "weeklyReminder": {
       "title": "Qu'as-tu acheté cette semaine ?",
       "body": "Ajoute tes nouveaux articles pour un suivi à jour"
+    },
+    "welcome": {
+      "title": "PantryMind est prêt ✓",
+      "body": "Les notifications fonctionnent. Ajoute ton premier produit et on te préviendra avant qu'il n'expire."
+    },
+    "recovery": {
+      "d2": {
+        "title": "Comment va ton garde-manger ?",
+        "body": "Jette un œil à ce que tu as. On t'aide à ne rien oublier."
+      },
+      "d5": {
+        "title": "Ça fait 5 jours qu'on ne s'est pas vu",
+        "body": "Certains produits pourraient bientôt expirer. Un coup d'œil s'impose."
+      },
+      "d10": {
+        "title": "Ton garde-manger a besoin de toi",
+        "body": "Reviens et évite de jeter de la nourriture. 30 secondes suffisent."
+      }
     }
   },
   "sync": {

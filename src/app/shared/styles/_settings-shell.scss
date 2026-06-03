@@ -20,6 +20,7 @@
     margin: 0;
     font-size: var(--app-theme-font-size-lg);
     font-weight: var(--app-theme-font-weight-bold);
+    letter-spacing: var(--app-theme-letter-spacing-tight);
   }
 
   ion-card-subtitle {
@@ -51,7 +52,7 @@
   .settings-content {
     display: flex;
     flex-direction: column;
-    gap: var(--app-theme-spacing-lg);
+    gap: var(--app-theme-spacing-lg-plus);
     margin: var(--app-theme-card-margin-inline);
     padding-bottom: calc(var(--app-theme-spacing-lg) + env(safe-area-inset-bottom, 0px));
   }
