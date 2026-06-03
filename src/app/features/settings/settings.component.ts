@@ -7,7 +7,7 @@ import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
-import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
+import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
 import {
   IonBackButton,
   IonButton,
@@ -31,6 +31,8 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import packageJson from '../../../../package.json';
 import { environment } from 'src/environments/environment';
+import { SettingsNotificationsDevStateService } from '@core/services/settings/settings-notifications-dev-state.service';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-settings',
@@ -60,22 +62,25 @@ import { environment } from 'src/environments/environment';
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
-  providers: [SettingsStateService],
+  providers: [SettingsStateService, SettingsNotificationsDevStateService],
 })
 export class SettingsComponent {
   readonly facade = inject(SettingsStateService);
+  readonly dev = inject(SettingsNotificationsDevStateService);
   private readonly scheduler = inject(NotificationSchedulerService);
   private readonly pantry = inject(PantryQueryService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly translate = inject(TranslateService);
   private readonly language = inject(LanguageService);
   private readonly marketingSeeder = inject(DevMarketingSeederService);
+  private readonly alertCtrl = inject(AlertController);
 
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
   readonly isPro = this.facade.isPro;
   readonly SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
   readonly currentLanguage = this.language.currentLanguage;
+  protected readonly NOTIFICATION_IDS = NOTIFICATION_IDS;
 
   // Notifications
   readonly isTestingNotification = signal(false);
@@ -106,6 +111,19 @@ export class SettingsComponent {
     } finally {
       this.isTestingNotification.set(false);
     }
+  }
+
+  async showPreview(): Promise<void> {
+    const result = await this.dev.previewNext();
+    const message = result
+      ? `${result.title}\n\n${result.body}`
+      : this.translate.instant('settings.dev.notifications.previewEmpty');
+    const alert = await this.alertCtrl.create({
+      header: this.translate.instant('settings.dev.notifications.previewResultTitle'),
+      message,
+      buttons: ['OK'],
+    });
+    await alert.present();
   }
 
   onScheduleAtTimeChange(event: Event): void {

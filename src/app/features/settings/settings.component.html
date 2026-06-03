@@ -278,6 +278,103 @@
             </ion-button>
           </ion-item>
 
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ 'settings.dev.notifications.permissionLabel' | translate }}</h3>
+              <p>{{ dev.permissionState() }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ 'settings.dev.notifications.preferenceLabel' | translate }}</h3>
+              <p>{{ dev.notificationsEnabled() ? '✓' : '✗' }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" (click)="showPreview()">
+              {{ 'settings.dev.notifications.previewButton' | translate }}
+            </ion-button>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" (click)="dev.fireWinning()">
+              {{ 'settings.dev.notifications.fireWinningButton' | translate }}
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" (click)="dev.fireDefinition(NOTIFICATION_IDS.EXPIRED_ITEMS)">
+              {{ 'settings.dev.notifications.fireExpired' | translate }}
+            </ion-button>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" (click)="dev.fireDefinition(NOTIFICATION_IDS.NEAR_EXPIRY)">
+              {{ 'settings.dev.notifications.fireNearExpiry' | translate }}
+            </ion-button>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" (click)="dev.fireDefinition(NOTIFICATION_IDS.LOW_STOCK)">
+              {{ 'settings.dev.notifications.fireLowStock' | translate }}
+            </ion-button>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" (click)="dev.fireDefinition(NOTIFICATION_IDS.RE_ENGAGEMENT)">
+              {{ 'settings.dev.notifications.fireReEngagement' | translate }}
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" (click)="dev.fireWelcome()">
+              {{ 'settings.dev.notifications.fireWelcome' | translate }}
+            </ion-button>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" (click)="dev.fireRecovery('d2')">
+              {{ 'settings.dev.notifications.fireRecoveryD2' | translate }}
+            </ion-button>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" (click)="dev.fireRecovery('d5')">
+              {{ 'settings.dev.notifications.fireRecoveryD5' | translate }}
+            </ion-button>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" (click)="dev.fireRecovery('d10')">
+              {{ 'settings.dev.notifications.fireRecoveryD10' | translate }}
+            </ion-button>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ 'settings.dev.notifications.pendingTitle' | translate }}</h3>
+            </ion-label>
+            <ion-button slot="end" fill="clear" (click)="dev.refreshPending()">
+              {{ 'settings.dev.notifications.refreshPending' | translate }}
+            </ion-button>
+          </ion-item>
+          @if (dev.pending().length === 0) {
+            <ion-item lines="none">
+              <ion-label>
+                <p>{{ 'settings.dev.notifications.pendingEmpty' | translate }}</p>
+              </ion-label>
+            </ion-item>
+          } @else {
+            @for (n of dev.pending(); track n.id) {
+              <ion-item lines="none">
+                <ion-label>
+                  <h3>#{{ n.id }} — {{ n.title || '—' }}</h3>
+                  <p>{{ n.scheduleAt || '—' }}</p>
+                </ion-label>
+              </ion-item>
+            }
+          }
+
+          <ion-item lines="none">
+            <ion-button slot="end" fill="clear" color="danger" (click)="dev.cancelAll()">
+              {{ 'settings.dev.notifications.cancelAll' | translate }}
+            </ion-button>
+          </ion-item>
+
           <!-- ── Data ───────────────────────────────────────── -->
           <ion-list-header>
             <ion-label>{{ "settings.dev.groupData" | translate }}</ion-label>
