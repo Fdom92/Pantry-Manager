@@ -8,6 +8,7 @@ import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenue
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
 import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
+import { formatDateTimeValue } from '@core/utils/formatting.util';
 import {
   IonBackButton,
   IonButton,
@@ -81,6 +82,11 @@ export class SettingsComponent {
   readonly SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
   readonly currentLanguage = this.language.currentLanguage;
   protected readonly NOTIFICATION_IDS = NOTIFICATION_IDS;
+
+  /** Pretty-print a pending notification scheduleAt ISO for the dev panel. */
+  formatPendingTime(iso?: string): string {
+    return formatDateTimeValue(iso, this.language.getCurrentLocale(), { fallback: '—' });
+  }
 
   // Notifications
   readonly isTestingNotification = signal(false);

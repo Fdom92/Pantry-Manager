@@ -117,6 +117,7 @@ export class PantryComponent implements OnDestroy {
         relativeTo: this.route,
         queryParams: { focusItem: null },
         queryParamsHandling: 'merge',
+        replaceUrl: true,
       });
     }
   }

@@ -331,7 +331,7 @@
                   <span class="dev-pending-item__badge">#{{ n.id }}</span>
                   <div class="dev-pending-item__body">
                     <span class="dev-pending-item__title">{{ n.title || '—' }}</span>
-                    <span class="dev-pending-item__time">{{ n.scheduleAt || '—' }}</span>
+                    <span class="dev-pending-item__time">{{ formatPendingTime(n.scheduleAt) }}</span>
                   </div>
                 </li>
               }
