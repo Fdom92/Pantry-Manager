@@ -3,6 +3,16 @@ export interface Environment {
   revenueCatPublicKey: string;
   insightsApiUrl: string;
   analytics: AnalyticsEnvironment;
+  sentry: SentryEnvironment;
+}
+
+export interface SentryEnvironment {
+  /** Sentry DSN. Empty string disables Sentry init entirely. */
+  dsn: string;
+  /** When false, the SDK is never initialised (dev safety). */
+  enabled: boolean;
+  /** Tag set on every event — `Sentry.init({ environment })`. */
+  envTag: 'dev' | 'prod';
 }
 
 export interface AnalyticsEnvironment {

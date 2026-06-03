@@ -5,7 +5,8 @@ import { Device } from '@capacitor/device';
 import { TranslateService } from '@ngx-translate/core';
 import posthog, { type PostHog } from 'posthog-js';
 import { environment } from 'src/environments/environment';
-import { ANALYTICS_EVENTS } from '@core/constants';
+import { ANALYTICS_EVENTS, STORAGE_KEYS } from '@core/constants';
+import { setBooleanFlag } from '@core/utils/storage-flag.util';
 import type {
   AnalyticsEventProps,
   AnalyticsSuperProps,
@@ -57,6 +58,11 @@ export class AnalyticsService {
     this.superProps = await this.resolveSuperProps();
     this.subscribeToReactiveSuperProps();
 
+    // Keep the localStorage mirror used by the Sentry `beforeSend` gate aligned
+    // with the canonical PouchDB preference. Important after a backup-restore
+    // or any path that bypasses `optIn/optOut`.
+    setBooleanFlag(STORAGE_KEYS.ERROR_REPORTING_ENABLED, prefs.analyticsEnabled === true);
+
     if (prefs.analyticsEnabled === true) {
       this.startPosthog();
     } else {
@@ -89,6 +95,9 @@ export class AnalyticsService {
       analyticsEnabled: true,
       analyticsDecidedAt: new Date().toISOString(),
     });
+    // Mirror to localStorage so the Sentry `beforeSend` callback (which runs
+    // before PouchDB is ready) can read consent synchronously on next launch.
+    setBooleanFlag(STORAGE_KEYS.ERROR_REPORTING_ENABLED, true);
     if (this.isProviderConfigured() && !this.posthog) {
       this.startPosthog();
     } else if (this.posthog) {
@@ -105,6 +114,7 @@ export class AnalyticsService {
       analyticsEnabled: false,
       analyticsDecidedAt: new Date().toISOString(),
     });
+    setBooleanFlag(STORAGE_KEYS.ERROR_REPORTING_ENABLED, false);
     // Send opt-out event BEFORE killing the client so it actually flushes.
     this.track(ANALYTICS_EVENTS.ANALYTICS_OPT_OUT);
     if (this.posthog) {

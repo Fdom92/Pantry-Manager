@@ -11,4 +11,9 @@ export const environment: Environment = {
     enabled: true,
     envTag: 'prod',
   },
+  sentry: {
+    dsn: environmentSecrets.sentry.prodDsn,
+    enabled: true,
+    envTag: 'prod',
+  },
 };

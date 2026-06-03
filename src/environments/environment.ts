@@ -19,6 +19,12 @@ export const environment: Environment = {
     enabled: true,
     envTag: 'dev',
   },
+  sentry: {
+    dsn: environmentSecrets.sentry.devDsn,
+    // Flip to true to validate crash reporting wiring while developing.
+    enabled: true,
+    envTag: 'dev',
+  },
 };
 
 /*

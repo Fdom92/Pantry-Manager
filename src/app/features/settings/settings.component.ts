@@ -90,6 +90,16 @@ export class SettingsComponent {
     await this.facade.toggleAnalytics(Boolean(event.detail?.checked));
   }
 
+  /**
+   * Dev panel: throw a synthetic error so Sentry's Angular `ErrorHandler`
+   * captures it and we can verify the wiring end-to-end without DevTools.
+   * Requires analytics consent ON — otherwise `beforeSend` will drop the event.
+   */
+  triggerTestCrash(): void {
+    const ts = new Date().toISOString();
+    throw new Error(`[Dev] Sentry wiring test — fired at ${ts}`);
+  }
+
   /** Pretty-print a pending notification scheduleAt ISO for the dev panel. */
   formatPendingTime(iso?: string): string {
     return formatDateTimeValue(iso, this.language.getCurrentLocale(), { fallback: '—' });

@@ -1031,7 +1031,10 @@
       "languageSelectorSubtitle": "Fuerza el idioma de la UI para capturas sin cambiar los ajustes del móvil",
       "seedMarketingTitle": "Cargar base de datos de marketing",
       "seedMarketingSubtitle": "Borra todos los datos y carga contenido demo realista para capturas",
-      "seedMarketingConfirm": "¿Borrar todos los datos actuales y reemplazarlos con el dataset de marketing? Esta acción no se puede deshacer."
+      "seedMarketingConfirm": "¿Borrar todos los datos actuales y reemplazarlos con el dataset de marketing? Esta acción no se puede deshacer.",
+      "groupTelemetry": "Telemetría",
+      "testCrashTitle": "Disparar crash de prueba",
+      "testCrashSubtitle": "Lanza un error sintético para verificar Sentry."
     },
     "info": {
       "title": "Información",

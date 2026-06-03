@@ -1031,7 +1031,10 @@
       "languageSelectorSubtitle": "Force UI language for screenshots without changing device settings",
       "seedMarketingTitle": "Load marketing database",
       "seedMarketingSubtitle": "Clear all data and seed realistic demo content for screenshots",
-      "seedMarketingConfirm": "This will delete all current data and replace it with the marketing dataset. Continue?"
+      "seedMarketingConfirm": "This will delete all current data and replace it with the marketing dataset. Continue?",
+      "groupTelemetry": "Telemetrie",
+      "testCrashTitle": "Test-Crash auslösen",
+      "testCrashSubtitle": "Synthetischen Fehler werfen, um Sentry zu prüfen."
     },
     "info": {
       "title": "Informationen",

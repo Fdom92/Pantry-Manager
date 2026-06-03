@@ -22,6 +22,12 @@ export interface EnvironmentSecrets {
     /** Google Play public SDK key for the **prod** RevenueCat project. */
     prodKey: string;
   };
+  sentry: {
+    /** Sentry DSN for the **dev** project. */
+    devDsn: string;
+    /** Sentry DSN for the **prod** project. */
+    prodDsn: string;
+  };
 }
 
 export const environmentSecrets: EnvironmentSecrets = {
@@ -35,5 +41,11 @@ export const environmentSecrets: EnvironmentSecrets = {
     // scrapers can't harvest them from the public repo for abuse.
     devKey: '',
     prodKey: '',
+  },
+  sentry: {
+    // Copy from https://sentry.io → Project → Settings → Client Keys (DSN).
+    // Use the EU region (de.sentry.io) for GDPR alignment.
+    devDsn: '',
+    prodDsn: '',
   },
 };

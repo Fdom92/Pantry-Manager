@@ -38,6 +38,12 @@ export const STORAGE_KEYS = {
   REVIEW_PENDING: 'review:pending',
   /** Set once the post-update re-consent sheet has been shown (one-shot). */
   RECONSENT_SHOWN: 'reconsent:shown',
+  /**
+   * Mirror of `AppPreferences.analyticsEnabled` kept in localStorage so the
+   * Sentry SDK — initialised synchronously in `main.ts` before Angular boots
+   * and PouchDB is ready — can decide whether to forward events.
+   */
+  ERROR_REPORTING_ENABLED: 'errorReporting:enabled',
 } as const;
 
 export const DEFAULT_HOUSEHOLD_ID = 'household:default';
