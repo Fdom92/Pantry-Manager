@@ -1,0 +1,56 @@
+<ion-modal
+  class="app-sheet-modal shopping-buy-sheet"
+  [isOpen]="state.isOpen()"
+  [initialBreakpoint]="1"
+  [breakpoints]="[0, 1]"
+  (didDismiss)="state.closeSheet()">
+  <ng-template>
+    <div class="sheet-shell shopping-buy-sheet__content">
+      @if (state.targetSuggestion(); as suggestion) {
+        <div class="sheet-header">
+          <h2 class="sheet-header__title">{{ 'shopping.buySheet.title' | translate }}</h2>
+          <p class="sheet-header__subtitle">{{ suggestion.item.name }}</p>
+        </div>
+
+        <div class="shopping-buy-sheet__quantity">
+          <ion-button
+            fill="clear"
+            class="qty-button"
+            [disabled]="!state.canDecrement()"
+            (click)="state.decrement()"
+            [attr.aria-label]="'shopping.buySheet.decrement' | translate">
+            <ion-icon slot="icon-only" name="remove"></ion-icon>
+          </ion-button>
+          <span class="qty-display">{{ state.pendingQuantity() }}</span>
+          <ion-button
+            fill="clear"
+            class="qty-button"
+            (click)="state.increment()"
+            [attr.aria-label]="'shopping.buySheet.increment' | translate">
+            <ion-icon slot="icon-only" name="add"></ion-icon>
+          </ion-button>
+        </div>
+
+        <p class="shopping-buy-sheet__hint">{{ 'shopping.buySheet.hint' | translate }}</p>
+      }
+    </div>
+
+    <ion-footer>
+      <div class="sheet-footer">
+        <ion-button
+          expand="block"
+          fill="clear"
+          color="medium"
+          (click)="state.closeSheet()">
+          {{ 'shopping.buySheet.cancel' | translate }}
+        </ion-button>
+        <ion-button
+          expand="block"
+          color="primary"
+          (click)="state.confirm()">
+          {{ 'shopping.buySheet.confirm' | translate }}
+        </ion-button>
+      </div>
+    </ion-footer>
+  </ng-template>
+</ion-modal>

@@ -399,6 +399,14 @@
       "ignored": "{{name}} nascosto ora — riapparirà la prossima volta.",
       "removedManual": "{{name}} rimosso dalla lista."
     },
+    "buySheet": {
+      "title": "Quanti ne hai comprati?",
+      "hint": "Regola la quantità reale per tenere la dispensa aggiornata.",
+      "confirm": "Conferma",
+      "cancel": "Annulla",
+      "increment": "Aumenta quantità",
+      "decrement": "Riduci quantità"
+    },
     "tabTitle": "Spesa"
   },
   "insights": {

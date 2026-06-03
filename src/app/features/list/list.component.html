@@ -111,7 +111,7 @@
                         color="primary"
                         shape="round"
                         class="buy-btn"
-                        (click)="facade.markAsBought(suggestion)">
+                        (click)="onBuyTap(suggestion)">
                         <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
                       </ion-button>
                     </ion-item>
@@ -229,5 +229,6 @@
     </div>
   }
 
+  <app-shopping-buy-sheet></app-shopping-buy-sheet>
 
 </ion-content>

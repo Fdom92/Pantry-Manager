@@ -22,6 +22,10 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
+import { ShoppingBuySheetComponent } from './components/shopping-buy-sheet/shopping-buy-sheet.component';
+import { ShoppingBuySheetStateService } from './components/shopping-buy-sheet/shopping-buy-sheet-state.service';
+import { ShoppingReason } from '@core/models/list/list.model';
+import type { ShoppingSuggestionWithItem } from '@core/models/list/list.model';
 
 @Component({
   selector: 'app-list',
@@ -31,17 +35,19 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
     RouterLink,
     TranslateModule,
     EmptyStateComponent,
+    ShoppingBuySheetComponent,
     IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
     IonContent, IonIcon, IonSpinner, IonSkeletonText, IonBadge,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   ],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
-  providers: [ListStateService],
+  providers: [ListStateService, ShoppingBuySheetStateService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListComponent {
   readonly facade = inject(ListStateService);
+  readonly buySheet = inject(ShoppingBuySheetStateService);
   private readonly alertController = inject(AlertController);
   private readonly translate = inject(TranslateService);
 
@@ -78,6 +84,16 @@ export class ListComponent {
 
   toggleGlobalIgnored(): void {
     this.globalIgnoredExpanded.update(v => !v);
+  }
+
+  onBuyTap(suggestion: ShoppingSuggestionWithItem): void {
+    const isFresh = suggestion.reason === ShoppingReason.FRESH_EMPTY
+      || suggestion.reason === ShoppingReason.FRESH_LOW;
+    if (isFresh) {
+      void this.facade.markAsBought(suggestion);
+      return;
+    }
+    this.buySheet.openSheet(suggestion);
   }
 
   async openManualAdd(): Promise<void> {

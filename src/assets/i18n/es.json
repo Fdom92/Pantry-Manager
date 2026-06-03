@@ -399,6 +399,14 @@
       "ignored": "{{name}} oculto por ahora — volverá la próxima vez.",
       "removedManual": "{{name}} eliminado de la lista."
     },
+    "buySheet": {
+      "title": "¿Cuántas unidades compraste?",
+      "hint": "Ajusta la cantidad real para mantener tu despensa al día.",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "increment": "Aumentar cantidad",
+      "decrement": "Reducir cantidad"
+    },
     "tabTitle": "Compra"
   },
   "insights": {

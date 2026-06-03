@@ -399,6 +399,14 @@
       "ignored": "{{name}} masqué pour l'instant — réapparaîtra la prochaine fois.",
       "removedManual": "{{name}} retiré de la liste."
     },
+    "buySheet": {
+      "title": "Combien en as-tu acheté ?",
+      "hint": "Ajuste la quantité réelle pour garder ton garde-manger à jour.",
+      "confirm": "Confirmer",
+      "cancel": "Annuler",
+      "increment": "Augmenter la quantité",
+      "decrement": "Diminuer la quantité"
+    },
     "tabTitle": "Courses"
   },
   "insights": {

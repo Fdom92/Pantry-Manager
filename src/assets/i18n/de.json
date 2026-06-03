@@ -399,6 +399,14 @@
       "ignored": "{{name}} jetzt ausgeblendet — erscheint beim nächsten Mal wieder.",
       "removedManual": "{{name}} aus der Liste entfernt."
     },
+    "buySheet": {
+      "title": "Wie viele hast du gekauft?",
+      "hint": "Passe die tatsächliche Menge an, damit dein Vorrat stimmt.",
+      "confirm": "Bestätigen",
+      "cancel": "Abbrechen",
+      "increment": "Menge erhöhen",
+      "decrement": "Menge verringern"
+    },
     "tabTitle": "Einkauf"
   },
   "insights": {

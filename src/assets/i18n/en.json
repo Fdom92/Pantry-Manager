@@ -399,6 +399,14 @@
       "ignored": "{{name}} hidden for now — it will come back next time.",
       "removedManual": "{{name}} removed from list."
     },
+    "buySheet": {
+      "title": "How many did you buy?",
+      "hint": "Adjust the real quantity to keep your pantry accurate.",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "increment": "Increase quantity",
+      "decrement": "Decrease quantity"
+    },
     "tabTitle": "Shop"
   },
   "insights": {
