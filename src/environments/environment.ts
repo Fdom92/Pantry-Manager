@@ -7,7 +7,7 @@ import { environmentSecrets } from './environment.secrets';
 
 export const environment: Environment = {
   production: false,
-  revenueCatPublicKey: 'goog_XAdxxyRVPtpNaFLROJWzPwjdJNx',
+  revenueCatPublicKey: environmentSecrets.revenuecat.devKey,
   insightsApiUrl: 'https://pantry-manager-develop.onrender.com/insights/analyze',
   analytics: {
     // Free-tier limits us to 1 PostHog project so dev shares the prod key,

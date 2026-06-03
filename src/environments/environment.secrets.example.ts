@@ -16,11 +16,24 @@ import type { AnalyticsEnvironment } from './environment.model';
 
 export interface EnvironmentSecrets {
   analytics: Pick<AnalyticsEnvironment, 'posthogKey'>;
+  revenuecat: {
+    /** Google Play public SDK key for the **dev** RevenueCat project. */
+    devKey: string;
+    /** Google Play public SDK key for the **prod** RevenueCat project. */
+    prodKey: string;
+  };
 }
 
 export const environmentSecrets: EnvironmentSecrets = {
   analytics: {
     // Replace with the value you copied from https://eu.posthog.com (Project Settings → Project API Key).
     posthogKey: '',
+  },
+  revenuecat: {
+    // Copy from https://app.revenuecat.com → Project → API keys → "Public SDK keys".
+    // Public-by-design (the mobile client needs them), but kept out of git so
+    // scrapers can't harvest them from the public repo for abuse.
+    devKey: '',
+    prodKey: '',
   },
 };

@@ -3,7 +3,7 @@ import { environmentSecrets } from './environment.secrets';
 
 export const environment: Environment = {
   production: true,
-  revenueCatPublicKey: 'goog_QWDXnEcbnxIKMCjuMLHcOtwxmrR',
+  revenueCatPublicKey: environmentSecrets.revenuecat.prodKey,
   insightsApiUrl: 'https://pantry-manager.onrender.com/insights/analyze',
   analytics: {
     posthogKey: environmentSecrets.analytics.posthogKey,
