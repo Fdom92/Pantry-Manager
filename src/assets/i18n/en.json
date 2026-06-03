@@ -960,6 +960,8 @@
         "fireRecoveryD2": "Fire D2 in 5s",
         "fireRecoveryD5": "Fire D5 in 5s",
         "fireRecoveryD10": "Fire D10 in 5s",
+        "fireSectionRegistered": "Registered definitions",
+        "fireSectionRetention": "Retention (welcome + recovery)",
         "pendingTitle": "Pending",
         "pendingEmpty": "No pending notifications",
         "refreshPending": "Refresh list",

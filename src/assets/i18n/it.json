@@ -960,6 +960,8 @@
         "fireRecoveryD2": "Attiva D2 in 5s",
         "fireRecoveryD5": "Attiva D5 in 5s",
         "fireRecoveryD10": "Attiva D10 in 5s",
+        "fireSectionRegistered": "Definizioni registrate",
+        "fireSectionRetention": "Retention (benvenuto + recupero)",
         "pendingTitle": "Programmate",
         "pendingEmpty": "Nessuna notifica programmata",
         "refreshPending": "Aggiorna lista",

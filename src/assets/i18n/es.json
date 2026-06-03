@@ -960,6 +960,8 @@
         "fireRecoveryD2": "Disparar D2 en 5s",
         "fireRecoveryD5": "Disparar D5 en 5s",
         "fireRecoveryD10": "Disparar D10 en 5s",
+        "fireSectionRegistered": "Definiciones registradas",
+        "fireSectionRetention": "Retención (bienvenida + recovery)",
         "pendingTitle": "Programadas",
         "pendingEmpty": "Sin notificaciones programadas",
         "refreshPending": "Actualizar lista",
