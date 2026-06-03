@@ -17,7 +17,9 @@
       "continue": "Continue",
       "enter": "Open my pantry",
       "notifyMe": "Yes, notify me",
-      "notifyLater": "Later"
+      "notifyLater": "Later",
+      "analyticsAccept": "Yes, help out",
+      "analyticsLater": "Not now"
     },
     "slides": {
       "notifications": {
@@ -41,6 +43,12 @@
         "noExpiryLabel": "No expiry",
         "needsDateLabel": "Date pending",
         "adjustHint": "Adjust dates and quantities later in your pantry."
+      },
+      "analytics": {
+        "title": "Help us improve",
+        "description": "Share anonymous usage data. No names, no products, no location.",
+        "previewTitle": "Anonymous analytics",
+        "previewBody": "We only measure how you use the app: screens, taps and drop-offs. Nothing personal."
       }
     },
     "quickSeed": {
@@ -1052,6 +1060,12 @@
       "permissionDeniedTitle": "Notifications blocked",
       "permissionDeniedMessage": "It looks like you previously denied notification permission. To enable them again, go to your device Settings, find the app and turn on notifications from there.",
       "permissionDeniedButton": "Got it"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "subtitle": "Control what data the app shares.",
+      "analyticsLabel": "Share usage data",
+      "analyticsDescription": "Anonymous data to understand what works. You can change this anytime."
     }
   },
   "reviews": {
@@ -1155,6 +1169,23 @@
     "toast": {
       "updated_one": "1 item updated",
       "updated_other": "{{ count }} items updated"
+    }
+  },
+  "reconsent": {
+    "title": "A couple of new options",
+    "intro": "We've added features that need your permission. You can change this anytime in Settings.",
+    "footnote": "Your privacy matters. Nothing leaves your device without permission.",
+    "notifications": {
+      "label": "Get alerts",
+      "description": "We'll ping you when something is about to expire or run out."
+    },
+    "analytics": {
+      "label": "Share anonymous data",
+      "description": "We only measure how you use the app. No names, no products."
+    },
+    "actions": {
+      "confirm": "Done",
+      "later": "Not now"
     }
   }
 }

@@ -2,6 +2,8 @@ import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
 import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../../analytics/analytics.service';
 import { ReviewPromptService } from '../../shared/review-prompt.service';
 import { PantryBatchOperationsService } from '../pantry-batch-operations.service';
 
@@ -14,6 +16,7 @@ export class PantryQuantitySheetStateService {
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly toastCtrl = inject(ToastController);
   private readonly translate = inject(TranslateService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly showQuantitySheet = signal(false);
   readonly selectedItem = signal<PantryItem | null>(null);
@@ -63,6 +66,11 @@ export class PantryQuantitySheetStateService {
     if (item && change !== 0) {
       const previousTotal = this.getTotalQuantity(item);
       await this.applyPendingChanges(item, change, expiryDate, noExpiry);
+      this.analytics.track(ANALYTICS_EVENTS.PANTRY_QUANTITY_ADJUSTED, {
+        kind: item.productType === 'fresh' ? 'fresh' : 'despensa',
+        delta: change,
+        direction: change > 0 ? 'increment' : 'decrement',
+      });
       if (change < 0) {
         this.reviewPrompt.handleConsumeCompleted();
         const newTotal = previousTotal + change;

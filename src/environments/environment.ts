@@ -3,11 +3,22 @@
 // The list of file replacements can be found in `angular.json`.
 
 import { Environment } from './environment.model';
+import { environmentSecrets } from './environment.secrets';
 
 export const environment: Environment = {
   production: false,
   revenueCatPublicKey: 'goog_XAdxxyRVPtpNaFLROJWzPwjdJNx',
   insightsApiUrl: 'https://pantry-manager-develop.onrender.com/insights/analyze',
+  analytics: {
+    // Free-tier limits us to 1 PostHog project so dev shares the prod key,
+    // distinguished only by the `environment: 'dev'` super-prop. Real key is
+    // loaded from `environment.secrets.ts` (gitignored).
+    posthogKey: environmentSecrets.analytics.posthogKey,
+    posthogHost: 'https://eu.i.posthog.com',
+    // Flip to true to validate event wiring while developing.
+    enabled: true,
+    envTag: 'dev',
+  },
 };
 
 /*

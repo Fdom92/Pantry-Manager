@@ -5,3 +5,4 @@ export * from './pantry';
 export * from './settings';
 export * from './shared';
 export * from './list';
+export * from './analytics';

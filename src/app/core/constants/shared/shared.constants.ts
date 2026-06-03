@@ -18,6 +18,8 @@ export const DEFAULT_PREFERENCES: AppPreferences = {
   notifyOnLowStock: false,
   notifyOnNearExpiry: false,
   notificationHour: 9,
+  analyticsEnabled: false,
+  analyticsDecidedAt: null,
   lastSyncAt: null,
   locationOptions: [],
   categoryOptions: [],

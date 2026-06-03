@@ -5,12 +5,14 @@ import type { BaseDoc } from '@core/models/shared';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { createLatestOnlyRunner, runIfIdle, withSignalFlag } from '@core/utils';
+import { ANALYTICS_EVENTS } from '@core/constants';
 import { ConfirmService, DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { StorageService } from '../shared/storage.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 import { SettingsPreferencesService } from './settings-preferences.service';
 import { SyncService } from '../sync/sync.service';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 @Injectable()
 export class SettingsStateService {
@@ -26,9 +28,14 @@ export class SettingsStateService {
   private readonly share = inject(ShareService);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly syncService = inject(SyncService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly isPro = this.revenuecat.isPro();
   readonly themePreference = computed(() => this.appPreferences.preferences().theme);
+  readonly analyticsEnabled = computed(
+    () => this.appPreferences.preferences().analyticsEnabled === true
+  );
+  readonly isUpdatingAnalytics = signal(false);
 
   readonly isExportingData = signal(false);
   readonly isImportingData = signal(false);
@@ -153,6 +160,10 @@ export class SettingsStateService {
         ...current,
         theme: nextTheme,
       });
+      this.analytics.track(ANALYTICS_EVENTS.PREFERENCE_CHANGED, {
+        key: 'theme',
+        value: nextTheme,
+      });
     }).catch(async err => {
       console.error('[SettingsStateService] updateThemePreference error', err);
     });
@@ -160,6 +171,25 @@ export class SettingsStateService {
 
   navigateToUpgrade(): void {
     void this.navCtrl.navigateForward('/upgrade');
+  }
+
+  /**
+   * Toggle anonymous analytics opt-in. Writes consent to preferences via
+   * `AnalyticsService.optIn/optOut`, which also (de)initialises PostHog.
+   */
+  async toggleAnalytics(next: boolean): Promise<void> {
+    if (next === this.analyticsEnabled()) {
+      return;
+    }
+    await runIfIdle(this.isUpdatingAnalytics, async () => {
+      if (next) {
+        await this.analytics.optIn();
+      } else {
+        await this.analytics.optOut();
+      }
+    }).catch(err => {
+      console.error('[SettingsStateService] toggleAnalytics error', err);
+    });
   }
 
   private async applyImport(docs: BaseDoc[]): Promise<void> {

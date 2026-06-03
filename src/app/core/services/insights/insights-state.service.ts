@@ -24,7 +24,8 @@ import type {
 } from '@core/domain/insights/insights-free.domain';
 import { getItemStatusState } from '@core/domain/pantry/pantry-status.domain';
 import { sumQuantities } from '@core/domain/pantry/pantry-batch.domain';
-import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { ANALYTICS_EVENTS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { AnalyticsService } from '../analytics/analytics.service';
 import {
   computeActivitySignals,
   computeCategoryBreakdown,
@@ -47,6 +48,7 @@ export class InsightsStateService {
   private readonly cacheStorage = inject(InsightsCacheStorageService);
   private readonly llmClient = inject(InsightsLlmClientService);
   private readonly languageService = inject(LanguageService);
+  private readonly analytics = inject(AnalyticsService);
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
@@ -105,12 +107,20 @@ export class InsightsStateService {
     this.events.set(loaded);
     this.isLoadingEvents.set(false);
 
+    this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_VIEWED, {
+      is_pro: this.isPro(),
+      has_events: loaded.length > 0,
+    });
+
     if (this.isPro()) {
       void this.llmClient.warmup();
       const cached = await this.cacheStorage.loadCache();
       if (cached && !this.isStaleAnalysis(cached.analysis)) {
         this.proAnalysis.set(cached.analysis);
       }
+    } else {
+      // Free user → they're staring at the paywall teaser.
+      this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_PAYWALL_VIEWED);
     }
   }
 
@@ -119,14 +129,25 @@ export class InsightsStateService {
     this.proAnalysisError.set(null);
 
     const payload = this.buildPayload();
+    const startedAt = Date.now();
+    this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_PRO_ANALYSIS_TRIGGERED);
 
     try {
       const analysis = await this.llmClient.analyze(payload);
       await this.cacheStorage.saveCache(analysis);
       this.proAnalysis.set(analysis);
+      this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_PRO_ANALYSIS_COMPLETED, {
+        success: true,
+        duration_ms: Date.now() - startedAt,
+      });
     } catch (err: unknown) {
       const code: InsightsClientError = (err as any)?.code ?? 'ANALYSIS_FAILED';
       this.proAnalysisError.set(code);
+      this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_PRO_ANALYSIS_COMPLETED, {
+        success: false,
+        duration_ms: Date.now() - startedAt,
+        error_code: code,
+      });
     } finally {
       this.proAnalysisLoading.set(false);
     }

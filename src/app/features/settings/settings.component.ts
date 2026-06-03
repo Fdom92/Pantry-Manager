@@ -7,7 +7,7 @@ import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
-import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
+import { NOTIFICATION_IDS, STORAGE_KEYS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import {
   IonBackButton,
@@ -27,6 +27,7 @@ import {
   IonListHeader,
   IonSpinner,
   IonTitle,
+  IonToggle,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -57,6 +58,7 @@ import { AlertController } from '@ionic/angular';
     IonButton,
     IonIcon,
     IonSpinner,
+    IonToggle,
     CommonModule,
     RouterLink,
     TranslateModule,
@@ -82,6 +84,11 @@ export class SettingsComponent {
   readonly SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
   readonly currentLanguage = this.language.currentLanguage;
   protected readonly NOTIFICATION_IDS = NOTIFICATION_IDS;
+
+  /** Toggle anonymous analytics opt-in/out via the Privacidad card. */
+  async onAnalyticsToggle(event: CustomEvent<{ checked: boolean }>): Promise<void> {
+    await this.facade.toggleAnalytics(Boolean(event.detail?.checked));
+  }
 
   /** Pretty-print a pending notification scheduleAt ISO for the dev panel. */
   formatPendingTime(iso?: string): string {
@@ -215,7 +222,10 @@ export class SettingsComponent {
     if (this.isResettingOnboarding()) return;
     this.isResettingOnboarding.set(true);
     try {
-      localStorage.removeItem('hasSeenOnboarding');
+      // Wipe every per-device flag so the Dev "Reset onboarding" button gives a
+      // truly fresh-install experience (onboarding + re-consent + review prompts).
+      localStorage.removeItem(STORAGE_KEYS.ONBOARDING_FLAG);
+      localStorage.removeItem(STORAGE_KEYS.RECONSENT_SHOWN);
     } finally {
       this.isResettingOnboarding.set(false);
     }

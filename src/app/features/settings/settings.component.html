@@ -90,6 +90,31 @@
       </ion-card-content>
     </ion-card>
 
+    <!-- ── Privacidad ─────────────────────────────────────────── -->
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>{{ "settings.privacy.title" | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ "settings.privacy.subtitle" | translate }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item lines="none">
+            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="analytics-outline"></ion-icon>
+            <ion-label>
+              <h3>{{ "settings.privacy.analyticsLabel" | translate }}</h3>
+              <p>{{ "settings.privacy.analyticsDescription" | translate }}</p>
+            </ion-label>
+            <ion-toggle
+              slot="end"
+              [checked]="facade.analyticsEnabled()"
+              [disabled]="facade.isUpdatingAnalytics()"
+              (ionChange)="onAnalyticsToggle($event)"
+            ></ion-toggle>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
     <!-- ── Datos ───────────────────────────────────────────────── -->
     <ion-card class="settings-card">
       <ion-card-header>

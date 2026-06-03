@@ -7,3 +7,5 @@ export * from './shared';
 export * from './list';
 export * from './tabs';
 export * from './upgrade';
+export * from './analytics';
+export * from './reconsent';

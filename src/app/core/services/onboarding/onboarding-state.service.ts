@@ -1,5 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { ONBOARDING_QUICK_SEED_ITEMS, ONBOARDING_SLIDES, STORAGE_KEYS } from '@core/constants';
+import { ANALYTICS_EVENTS, ONBOARDING_QUICK_SEED_ITEMS, ONBOARDING_SLIDES, STORAGE_KEYS } from '@core/constants';
+import { AnalyticsService } from '../analytics/analytics.service';
 import type { OnboardingQuickSeedItem } from '@core/constants';
 import { buildAddItemPayload, FRESH_QTY } from '@core/domain/pantry';
 import type { OnboardingSlide } from '@core/models/onboarding';
@@ -29,6 +30,7 @@ interface SwiperElementLike extends HTMLElement {
 }
 
 type NotificationsDecision = 'granted' | 'denied' | 'later' | null;
+type AnalyticsDecision = 'granted' | 'denied' | null;
 
 let swiperRegistered = false;
 
@@ -42,6 +44,7 @@ export class OnboardingStateService {
   private readonly welcomeNotif = inject(WelcomeNotificationService);
   private readonly recoveryNotif = inject(RecoveryNotificationsService);
   private readonly translate = inject(TranslateService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly slideOptions: SwiperOptions = {
     speed: 550,
@@ -63,6 +66,9 @@ export class OnboardingStateService {
 
   /** Notification permission decision flag. null = not yet asked. */
   readonly notificationsDecision = signal<NotificationsDecision>(null);
+
+  /** Analytics consent decision flag. null = not yet asked. */
+  readonly analyticsDecision = signal<AnalyticsDecision>(null);
 
   /** Set of selected quick-seed item keys (slide 2). */
   readonly selectedSeedKeys = signal<ReadonlySet<string>>(new Set());
@@ -95,7 +101,17 @@ export class OnboardingStateService {
     if (!swiper) {
       return;
     }
-    this.currentSlideIndex.set(swiper.realIndex ?? swiper.activeIndex ?? 0);
+    const idx = swiper.realIndex ?? swiper.activeIndex ?? 0;
+    this.currentSlideIndex.set(idx);
+    const slide = this.availableSlides[idx];
+    if (slide) {
+      // Only fires for users who already opted in on the analytics slide; the
+      // analytics slide itself records its own event via accept/dismiss handlers.
+      this.analytics.track(ANALYTICS_EVENTS.ONBOARDING_STEP_VIEWED, {
+        step_index: idx,
+        step_key: slide.key,
+      });
+    }
   }
 
   isLastSlide(): boolean {
@@ -136,6 +152,20 @@ export class OnboardingStateService {
     await this.goToNextSlide(swiperEl);
   }
 
+  /** User accepted anonymous analytics on the analytics slide. */
+  async acceptAnalytics(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
+    this.analyticsDecision.set('granted');
+    await this.analytics.optIn();
+    await this.goToNextSlide(swiperEl);
+  }
+
+  /** User declined anonymous analytics. */
+  async dismissAnalytics(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
+    this.analyticsDecision.set('denied');
+    await this.analytics.optOut();
+    await this.goToNextSlide(swiperEl);
+  }
+
   /** Toggle quick-seed item selection (slide 2). */
   toggleSeedItem(key: string): void {
     const current = new Set(this.selectedSeedKeys());
@@ -152,11 +182,20 @@ export class OnboardingStateService {
   }
 
   async skipOnboarding(): Promise<void> {
-    await this.completeOnboarding();
+    this.analytics.track(ANALYTICS_EVENTS.ONBOARDING_SKIPPED, {
+      from_slide_index: this.currentSlideIndex(),
+    });
+    await this.completeOnboarding({ skipped: true });
   }
 
-  async completeOnboarding(): Promise<void> {
+  async completeOnboarding(options?: { skipped?: boolean }): Promise<void> {
     setBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG, true);
+    this.analytics.track(ANALYTICS_EVENTS.ONBOARDING_COMPLETED, {
+      seed_count: this.selectedCount(),
+      notif_granted: this.notificationsDecision() === 'granted',
+      analytics_granted: this.analyticsDecision() === 'granted',
+      skipped: options?.skipped ?? false,
+    });
     await this.bulkCreateSeedItems();
     // Recovery window only makes sense if we can actually push to the user.
     if (this.notificationsDecision() === 'granted') {

@@ -17,7 +17,9 @@
       "continue": "Continua",
       "enter": "Apri la mia dispensa",
       "notifyMe": "Sì, avvisami",
-      "notifyLater": "Più tardi"
+      "notifyLater": "Più tardi",
+      "analyticsAccept": "Sì, aiuta",
+      "analyticsLater": "Non ora"
     },
     "slides": {
       "notifications": {
@@ -41,6 +43,12 @@
         "noExpiryLabel": "Senza scadenza",
         "needsDateLabel": "Data da impostare",
         "adjustHint": "Regola date e quantità più tardi nella tua dispensa."
+      },
+      "analytics": {
+        "title": "Aiutaci a migliorare",
+        "description": "Condividi dati di utilizzo anonimi. Nessun nome, nessun prodotto, nessuna posizione.",
+        "previewTitle": "Analisi anonime",
+        "previewBody": "Misuriamo solo come usi l’app: schermate, tap e abbandoni. Niente di personale."
       }
     },
     "quickSeed": {
@@ -1052,6 +1060,12 @@
       "permissionDeniedTitle": "Notifiche bloccate",
       "permissionDeniedMessage": "Sembra che tu abbia precedentemente negato il permesso per le notifiche. Per riattivarle, vai nelle Impostazioni del dispositivo, trova l'app e attiva le notifiche da lì.",
       "permissionDeniedButton": "Capito"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "subtitle": "Controlla quali dati condivide l’app.",
+      "analyticsLabel": "Condividi dati d’uso",
+      "analyticsDescription": "Dati anonimi per capire cosa funziona. Puoi cambiare in qualsiasi momento."
     }
   },
   "reviews": {
@@ -1155,6 +1169,23 @@
     "toast": {
       "updated_one": "1 prodotto aggiornato",
       "updated_other": "{{ count }} prodotti aggiornati"
+    }
+  },
+  "reconsent": {
+    "title": "Nuove opzioni",
+    "intro": "Abbiamo aggiunto funzioni che richiedono il tuo permesso. Modificabile in qualsiasi momento nelle Impostazioni.",
+    "footnote": "La tua privacy conta. Nulla esce dal tuo dispositivo senza permesso.",
+    "notifications": {
+      "label": "Ricevere avvisi",
+      "description": "Ti avvisiamo quando qualcosa sta per scadere o finire."
+    },
+    "analytics": {
+      "label": "Condividere dati anonimi",
+      "description": "Misuriamo solo come usi l'app. Nessun nome, nessun prodotto."
+    },
+    "actions": {
+      "confirm": "Fatto",
+      "later": "Non ora"
     }
   }
 }
