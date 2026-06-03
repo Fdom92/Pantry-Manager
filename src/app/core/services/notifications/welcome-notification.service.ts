@@ -23,4 +23,9 @@ export class WelcomeNotificationService {
       },
     ]);
   }
+
+  /** Cancel any pending welcome notification. Safe to call when none scheduled. */
+  async cancelWelcomeNotification(): Promise<void> {
+    await this.plugin.cancel([NOTIFICATION_IDS.WELCOME]);
+  }
 }

@@ -11,6 +11,8 @@ import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
 import { NotificationRegistryService } from './notification-registry.service';
 import { NotificationPermissionService } from './notification-permission.service';
 import { CapacitorNotificationPlugin } from './capacitor-notification.plugin';
+import { WelcomeNotificationService } from './welcome-notification.service';
+import { RecoveryNotificationsService } from './recovery-notifications.service';
 import { AppPreferences, PantryItem } from '@core/models';
 
 @Injectable({ providedIn: 'root' })
@@ -23,6 +25,8 @@ export class NotificationSchedulerService {
   private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
+  private readonly welcomeNotif = inject(WelcomeNotificationService);
+  private readonly recoveryNotif = inject(RecoveryNotificationsService);
 
   private isScheduling = false;
 
@@ -99,7 +103,12 @@ export class NotificationSchedulerService {
       const preferences = this.preferencesService.preferences();
 
       if (!preferences.notificationsEnabled) {
+        // Master off — kill registered notifs AND retention nudges (welcome +
+        // recovery window). Trust the user's preference; don't honour scheduled
+        // retention pushes that contradict the silent state.
         await this.cancelAll();
+        await this.welcomeNotif.cancelWelcomeNotification();
+        await this.recoveryNotif.cancelRecoveryWindow();
         return;
       }
 
