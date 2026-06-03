@@ -1,8 +1,8 @@
 <ion-modal
   class="app-sheet-modal shopping-buy-sheet"
   [isOpen]="state.isOpen()"
-  [initialBreakpoint]="1"
-  [breakpoints]="[0, 1]"
+  [initialBreakpoint]="0.45"
+  [breakpoints]="[0, 0.45, 1]"
   (didDismiss)="state.closeSheet()">
   <ng-template>
     <div class="sheet-shell shopping-buy-sheet__content">
@@ -33,9 +33,7 @@
 
         <p class="shopping-buy-sheet__hint">{{ 'shopping.buySheet.hint' | translate }}</p>
       }
-    </div>
 
-    <ion-footer>
       <div class="sheet-footer">
         <ion-button
           expand="block"
@@ -51,6 +49,6 @@
           {{ 'shopping.buySheet.confirm' | translate }}
         </ion-button>
       </div>
-    </ion-footer>
+    </div>
   </ng-template>
 </ion-modal>

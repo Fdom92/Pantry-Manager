@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { IonButton, IonFooter, IonIcon, IonModal } from '@ionic/angular/standalone';
+import { IonButton, IonIcon, IonModal } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { ShoppingBuySheetStateService } from './shopping-buy-sheet-state.service';
 
@@ -10,7 +10,6 @@ import { ShoppingBuySheetStateService } from './shopping-buy-sheet-state.service
   imports: [
     CommonModule,
     IonModal,
-    IonFooter,
     IonButton,
     IonIcon,
     TranslateModule,
