@@ -1,5 +1,14 @@
+@use '../../shared/styles/chip' as chip;
+
 ion-title, ion-back-button {
   color: var(--app-theme-text-color);
+}
+
+// "Already PRO" confirmation chip — tonal tertiary (violet) so it aligns with
+// the rest of the PRO accent surfaces (upgrade-hero, plan-card, insights teaser).
+.already-pro-chip {
+  @include chip.tonal;
+  @include chip.accent-tertiary;
 }
 
 .upgrade-hero {

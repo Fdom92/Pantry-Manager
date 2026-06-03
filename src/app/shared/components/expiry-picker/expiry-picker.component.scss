@@ -1,0 +1,103 @@
+@use '../../../shared/styles/chip' as chip;
+
+:host { display: inline-flex; }
+
+// ── Trigger chip ────────────────────────────────────────────────────────────
+//
+// Three visual states driven by class:
+//   default (no date, no no-expiry) → muted tonal, "Sin fecha"
+//   --date                          → tonal primary, formatted date
+//   --no-expiry                     → tonal warning, "Sin caducidad" label
+//
+// All three use the shared chip.tonal pattern for consistency with reason
+// chips, summary chips, and segment buttons elsewhere in the app.
+
+.expiry-chip {
+  @include chip.tonal;
+  @include chip.accent-muted;
+  cursor: pointer;
+  margin: 0;
+  font-size: var(--app-theme-font-size-small);
+  height: 28px;
+  padding-inline: var(--app-theme-spacing-sm);
+  transition: background var(--app-theme-transition-fast);
+
+  &.expiry-chip--date {
+    @include chip.accent-primary;
+  }
+
+  &.expiry-chip--no-expiry {
+    @include chip.accent-warning;
+  }
+
+  ion-icon {
+    font-size: var(--app-theme-icon-size-xs);
+    margin: 0;
+  }
+
+  ion-label {
+    margin-inline-start: var(--app-theme-spacing-xs);
+    white-space: nowrap;
+  }
+
+  ion-icon + ion-label + ion-icon {
+    margin-inline-start: var(--app-theme-spacing-xs);
+  }
+}
+
+// ── Bottom-sheet ────────────────────────────────────────────────────────────
+
+.expiry-date-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.expiry-sheet {
+  padding: var(--app-theme-spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-xs);
+}
+
+.expiry-sheet__row {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-md-plus) var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-radius-sm-plus);
+  cursor: pointer;
+  background: var(--app-theme-surface-tint-soft);
+  transition: background var(--app-theme-transition-fast);
+
+  ion-icon:first-child {
+    font-size: var(--app-theme-icon-size-md);
+    color: var(--app-theme-text-soft);
+    flex-shrink: 0;
+  }
+}
+
+.expiry-sheet__row--active {
+  background: color-mix(in srgb, var(--ion-color-warning) 15%, transparent);
+
+  ion-icon:first-child { color: var(--app-theme-warning-deep); }
+}
+
+.expiry-sheet__label {
+  flex: 1;
+  font-size: var(--app-theme-font-size-title);
+  color: var(--app-theme-text-color);
+}
+
+.expiry-sheet__clear {
+  font-size: var(--app-theme-icon-size-sm);
+  color: var(--app-theme-text-faint);
+}
+
+.expiry-sheet__separator {
+  height: 1px;
+  background: var(--app-theme-surface-tint-medium);
+  margin-inline: var(--app-theme-spacing-xs);
+}

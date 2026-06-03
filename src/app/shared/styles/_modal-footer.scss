@@ -1,0 +1,20 @@
+// Shared modal-footer styling. The fixed bottom toolbar pattern used by every
+// edit/select modal in the app: edge-padded toolbar, safe-area aware bottom
+// inset, full-width primary action button.
+//
+// Usage:
+//   @use '../../../shared/styles/modal-footer' as footer;
+//   .modal-footer { @include footer.apply; }
+
+@mixin apply {
+  ion-toolbar {
+    --padding-start: var(--app-theme-spacing-lg);
+    --padding-end: var(--app-theme-spacing-lg);
+    --padding-top: var(--app-theme-spacing-md);
+    --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--app-theme-spacing-md));
+  }
+
+  ion-button {
+    width: 100%;
+  }
+}

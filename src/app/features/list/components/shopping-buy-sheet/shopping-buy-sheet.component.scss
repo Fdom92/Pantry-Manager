@@ -1,0 +1,71 @@
+// Sheet shell — flex column filling the modal, footer pinned to bottom.
+.shopping-buy-sheet__content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-lg) 0;
+  background: var(--ion-card-background);
+}
+
+.sheet-header__title {
+  margin: 0;
+  font-size: var(--app-theme-font-size-lg);
+  font-weight: var(--app-theme-font-weight-bold);
+  letter-spacing: var(--app-theme-letter-spacing-tight);
+}
+
+.sheet-header__subtitle {
+  margin: var(--app-theme-spacing-xs) 0 0;
+  font-size: var(--app-theme-font-size-caption);
+  color: var(--app-theme-text-muted);
+}
+
+.shopping-buy-sheet__quantity {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-theme-spacing-xl);
+  padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-md);
+}
+
+.qty-button {
+  --background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+  --color: var(--app-theme-primary-on-surface);
+  --border-radius: var(--app-theme-radius-circle);
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 52px;
+  height: 52px;
+  margin: 0;
+}
+
+.qty-display {
+  font-size: var(--app-theme-font-size-display);
+  font-weight: var(--app-theme-font-weight-display);
+  letter-spacing: var(--app-theme-letter-spacing-display);
+  color: var(--app-theme-text-color);
+  min-width: 72px;
+  text-align: center;
+}
+
+.shopping-buy-sheet__hint {
+  margin: 0;
+  font-size: var(--app-theme-font-size-caption);
+  color: var(--app-theme-text-muted);
+  text-align: center;
+}
+
+// Footer pinned to bottom via margin-top: auto, matching other sheets.
+// No border — matches sheet-modal pattern (clean glass-less footer for
+// small purpose-built sheets).
+.sheet-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-xs);
+  padding: var(--app-theme-spacing-md) 0
+           calc(var(--app-theme-spacing-md) + env(safe-area-inset-bottom, 0px));
+
+  ion-button {
+    margin: 0;
+  }
+}

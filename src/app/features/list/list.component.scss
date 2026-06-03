@@ -1,9 +1,11 @@
+@use '../../shared/styles/chip' as chip;
+
 ion-title {
   color: var(--app-theme-text-color);
 }
 
 ion-card {
-  background: var(--app-theme-card-bg) !important;
+  background: var(--app-theme-card-bg);
   --background: var(--app-theme-card-bg);
   box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
   border-color: var(--app-theme-card-border-color);
@@ -92,7 +94,7 @@ ion-card-title {
 .purchase-action {
   --padding-start: 0;
   --padding-end: 0;
-  --border-radius: 50%;
+  --border-radius: var(--app-theme-radius-circle);
   width: 32px;
   height: 32px;
   display: inline-flex;
@@ -124,7 +126,7 @@ ion-card-title {
 
 .suggestions-shell {
   --background: transparent;
-  background: transparent !important;
+  background: transparent;
   border: none;
   box-shadow: none;
   margin: 0;
@@ -210,25 +212,20 @@ ion-card-title {
 }
 
 // ── Reason chips ─────────────────────────────────────────────────────────────
+// See shared/styles/_chip.scss for the tonal pattern. Per-variant accent
+// driven via .reason-chip--<variant> classes (NOT Ionic color="..." — that
+// makes Ionic apply :host(.ion-color), bypassing our custom-property API).
 
-.reason-chip {
-  font-size: var(--app-theme-font-size-micro);
-  padding: var(--app-theme-spacing-2xs) var(--app-theme-spacing-sm);
-  border-radius: var(--app-theme-radius-xl);
-  height: auto;
-  line-height: var(--app-theme-line-height-normal);
-}
+.reason-chip { @include chip.tonal; }
 
-.reason-chip--basic {
-  --background: transparent;
-  --color: var(--ion-color-medium);
-  border: 1px solid var(--ion-color-medium);
-}
+.reason-chip--danger  { @include chip.accent-danger; }
+.reason-chip--warning { @include chip.accent-warning; }
+.reason-chip--success { @include chip.accent-success; }
+.reason-chip--primary { @include chip.accent-primary; }
+.reason-chip--basic   { @include chip.accent-medium; }
 
 .reason-chip--manual {
-  --background: transparent;
-  --color: var(--app-theme-text-muted);
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 20%, transparent);
+  @include chip.accent-muted;
   font-style: italic;
 }
 
@@ -254,14 +251,20 @@ ion-card-title {
 }
 
 .group-count {
+  @include chip.tonal;
   font-size: var(--app-theme-font-size-small);
+  // Group counts are inline numeric pills, slightly more padded than reason chips.
+  padding: var(--app-theme-spacing-2xs) var(--app-theme-spacing-sm-plus);
 }
+
+.group-count--medium  { @include chip.accent-medium; }
+.group-count--success { @include chip.accent-success; }
 
 .collapse-icon {
   margin-left: auto;
   font-size: var(--app-theme-font-size-title);
   color: var(--app-theme-text-muted);
-  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 250ms var(--app-theme-easing-snap);
   transform: rotate(0deg);
 
   &--expanded {

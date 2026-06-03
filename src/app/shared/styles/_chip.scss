@@ -1,0 +1,39 @@
+// Shared tonal chip pattern.
+// Applies the same accent-tonal styling used across the app (pantry summary
+// chips, shopping reason chips, fresh state-segment actives): bg = accent at
+// 18% over the card surface, text = saturated accent, border = accent 35%.
+//
+// Variants are driven by a single --chip-accent CSS variable so adding a new
+// color is one rule: `.my-chip--cool { --chip-accent: var(--ion-color-X); }`.
+//
+// Usage:
+//   @use '../../shared/styles/chip' as chip;
+//   .my-chip { @include chip.tonal; }
+//
+// IMPORTANT: when applying this to ion-badge / ion-chip, DO NOT also set the
+// element's color="..." attribute. Ionic emits a :host(.ion-color) rule that
+// directly assigns `background:` and `color:` on the host, overriding the
+// custom-property pattern below. Use a class-only API.
+
+@mixin tonal {
+  --background: color-mix(in srgb, var(--chip-accent, var(--ion-color-medium)) 18%, transparent);
+  --color: var(--chip-accent, var(--app-theme-text-soft));
+  background: var(--background);
+  color: var(--color);
+  font-size: var(--app-theme-font-size-micro);
+  font-weight: var(--app-theme-font-weight-bold);
+  padding: var(--app-theme-spacing-2xs) var(--app-theme-spacing-sm);
+  border-radius: var(--app-theme-radius-pill);
+  border: 1px solid color-mix(in srgb, var(--chip-accent, var(--app-theme-text-muted)) 35%, transparent);
+  height: auto;
+  line-height: var(--app-theme-line-height-normal);
+}
+
+// Accent presets — apply alongside the base tonal include for common variants.
+@mixin accent-danger   { --chip-accent: var(--ion-color-danger); }
+@mixin accent-warning  { --chip-accent: var(--ion-color-warning-shade); }
+@mixin accent-success  { --chip-accent: var(--ion-color-success-shade); }
+@mixin accent-primary  { --chip-accent: var(--ion-color-primary); }
+@mixin accent-tertiary { --chip-accent: var(--ion-color-tertiary); }
+@mixin accent-medium   { --chip-accent: var(--ion-color-medium-shade); }
+@mixin accent-muted    { --chip-accent: var(--app-theme-text-soft); }

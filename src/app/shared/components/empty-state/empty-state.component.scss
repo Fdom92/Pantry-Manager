@@ -7,7 +7,7 @@
   padding: var(--app-theme-spacing-lg-plus) var(--app-theme-spacing-lg);
   border-radius: var(--app-theme-radius-lg);
   text-align: center;
-  animation: emptyFade var(--app-theme-transition-slow);
+  animation: app-empty-fade var(--app-theme-transition-slow);
 }
 
 .empty-state--compact {
@@ -24,7 +24,7 @@
   display: grid;
   place-items: center;
   background: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
-  color: var(--ion-color-primary);
+  color: var(--app-theme-primary-on-surface);
   font-size: var(--app-theme-icon-size-lg);
 }
 
@@ -32,12 +32,12 @@
 // lied (warning→secondary mint, success→primary teal). Fixed v4.4-refresh.
 .empty-icon.color-warning {
   background: color-mix(in srgb, var(--ion-color-warning) 18%, transparent);
-  color: var(--ion-color-warning);
+  color: var(--app-theme-warning-deep);
 }
 
 .empty-icon.color-success {
   background: color-mix(in srgb, var(--ion-color-success) 18%, transparent);
-  color: var(--ion-color-success);
+  color: var(--app-theme-success-deep);
 }
 
 .empty-icon.color-danger {
@@ -82,13 +82,4 @@
   font-weight: var(--app-theme-font-weight-extra-bold);
 }
 
-@keyframes emptyFade {
-  from {
-    opacity: 0;
-    transform: translateY(var(--app-theme-spacing-xs-plus));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+// Animation app-empty-fade now lives in global.scss alongside app-fade-in-list.

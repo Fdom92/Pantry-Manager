@@ -1,92 +1,133 @@
-ion-title, ion-back-button {
-  color: var(--app-theme-text-color);
+@use '../../../../shared/styles/modal-sheet' as sheet;
+@use '../../../../shared/styles/form-section-flat' as ff;
+@use '../../../../shared/styles/chip' as chip;
+
+ion-modal.app-sheet-modal {
+  @include sheet.sheet-base;
+  @include sheet.field-flat;
 }
 
-.batches-modal-content {
-  --padding-bottom: var(--app-theme-spacing-2xl);
+.sheet-shell {
+  @include sheet.layout;
 }
 
-.batches-card {
-  margin: 0;
-  padding: var(--app-theme-spacing-lg);
-  border-radius: var(--app-theme-card-border-radius);
-  background: var(--ion-card-background);
-  box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
-  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+.sheet-handle {
+  @include sheet.handle;
 }
 
-.batches-card__header {
-  margin-bottom: var(--app-theme-spacing-lg);
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
 }
 
-.batches-card__title {
-  font-size: var(--app-theme-font-size-xl);
-  font-weight: var(--app-theme-font-weight-bold);
-  margin: 0 0 var(--app-theme-spacing-sm) 0;
+.sheet-header__titles {
+  flex: 1;
+  min-width: 0;
 }
 
-.batches-card__subtitle {
-  margin: 0;
-  font-size: var(--app-theme-font-size-body);
-  color: var(--app-theme-text-muted);
+.sheet-header__title {
+  @include sheet.header-title;
 }
 
-.batches-card ion-list {
-  background: transparent;
-  padding: 0;
+.sheet-header__subtitle {
+  @include sheet.header-subtitle;
 }
 
-.batches-card ion-item {
-  --background: transparent;
-  --padding-start: 0;
-  --padding-end: 0;
-  --inner-padding-end: 0;
-  margin-bottom: var(--app-theme-spacing-md);
-}
-
-.batches-card ion-item:last-child {
-  margin-bottom: 0;
-}
-
-.batches-card ion-item ion-label h3 {
+.sheet-header__actions {
   display: flex;
   align-items: center;
-  gap: var(--app-theme-spacing-xs-plus);
-  margin: 0 0 var(--app-theme-spacing-xs) 0;
-  font-size: var(--app-theme-font-size-md);
-  font-weight: var(--app-theme-font-weight-bold);
+  gap: var(--app-theme-spacing-xs);
+  flex-shrink: 0;
 }
 
-.batches-card ion-item ion-label h3 ion-icon {
-  font-size: var(--app-theme-icon-size-sm);
+.sheet-body {
+  @include sheet.body;
 }
 
-.batches-card ion-item ion-label p {
-  margin: 0;
-  font-size: var(--app-theme-font-size-caption);
-  color: var(--app-theme-text-muted);
+.form-section--cta     { @include ff.section-cta; }
+.form-section--cta-row { @include ff.section-cta-row; }
+
+// ── Read-only batch list ────────────────────────────────────────────────────
+
+.batches-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--app-theme-spacing-md) 0 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.batches-card ion-item ion-badge {
-  margin-top: var(--app-theme-spacing-xs-plus);
+.batch-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-md) 0;
+  border-bottom: var(--app-theme-form-section-divider);
+
+  &:last-child { border-bottom: none; }
+
+  &__icon {
+    font-size: var(--app-theme-icon-size-md);
+    flex-shrink: 0;
+
+    &[data-status-color='danger']  { color: var(--ion-color-danger); }
+    &[data-status-color='warning'] { color: var(--app-theme-warning-deep); }
+    &[data-status-color='success'] { color: var(--app-theme-success-deep); }
+    &[data-status-color='medium']  { color: var(--app-theme-text-soft); }
+  }
+
+  &__body {
+    min-width: 0;
+  }
+
+  &__date {
+    margin: 0;
+    font-size: var(--app-theme-font-size-md);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+
+    &[data-status-color='danger']  { color: var(--ion-color-danger); }
+    &[data-status-color='warning'] { color: var(--app-theme-warning-deep); }
+    &[data-status-color='success'] { color: var(--app-theme-success-deep); }
+    &[data-status-color='medium']  { color: var(--app-theme-text-color); }
+  }
+
+  &__meta {
+    margin: var(--app-theme-spacing-2xs) 0 0;
+    font-size: var(--app-theme-font-size-caption);
+    color: var(--app-theme-text-muted);
+  }
 }
 
-// ── Edit batches form ────────────────────────────────────────────────────────
+.batch-open-chip {
+  @include chip.tonal;
+  @include chip.accent-warning;
+}
 
-.edit-batches-list {
+// ── Edit mode ───────────────────────────────────────────────────────────────
+
+.batches-modal__edit-list {
+  @include ff.section;
+  border-bottom: none;
+  padding-block: var(--app-theme-spacing-md) var(--app-theme-spacing-2xl);
+  gap: var(--app-theme-spacing-md);
+}
+
+// Edit-batch card — flat. The wrapper used to have border+padding+radius
+// (a nested card) which broke the sheet's uniform-surface look. Now just
+// a flex container; per-row dividers (between lots) come from
+// :not(:last-child) { border-bottom } so multiple lots stay legible
+// without the floating-tile feel.
+.edit-batch-card {
   display: flex;
   flex-direction: column;
   gap: var(--app-theme-spacing-md);
-  margin-top: var(--app-theme-spacing-sm);
-}
+  padding-block: var(--app-theme-spacing-md);
 
-.edit-batch-card {
-  padding: var(--app-theme-spacing-md);
-  border-radius: var(--app-theme-radius-md);
-  border: 1px solid color-mix(in srgb, var(--ion-text-color) 8%, transparent);
-  display: flex;
-  flex-direction: column;
-  gap: var(--app-theme-spacing-sm);
+  &:not(:last-child) {
+    border-bottom: var(--app-theme-form-section-divider);
+  }
 }
 
 .edit-batch-row-inline {
@@ -95,9 +136,12 @@ ion-title, ion-back-button {
   align-items: flex-start;
 }
 
+// Inputs inherit the surrounding sheet bg — explicit --background was
+// painting a solid white tile that floated above the off-white edit-batch
+// card and broke surface uniformity.
 .edit-batch-row-inline ion-input {
   flex: 1;
-  --background: var(--ion-card-background);
+  --background: transparent;
   --padding-end: var(--app-theme-spacing-md);
   border-radius: var(--app-theme-radius-sm);
 }
@@ -113,12 +157,12 @@ ion-title, ion-back-button {
 
 .batch-date-label {
   font-size: var(--app-theme-font-size-micro);
-  letter-spacing: 0.04em;
+  letter-spacing: var(--app-theme-letter-spacing-eyebrow-sm);
   color: var(--app-theme-text-muted);
 }
 
 .edit-batch-row ion-input {
-  --background: var(--ion-card-background);
+  --background: transparent;
   --padding-start: var(--app-theme-spacing-md);
   --padding-end: var(--app-theme-spacing-md);
   border-radius: var(--app-theme-radius-sm);
@@ -129,17 +173,5 @@ ion-title, ion-back-button {
 }
 
 .edit-batch-row app-entity-selector-field .selector-trigger {
-  background: var(--ion-card-background);
-}
-
-.edit-actions {
-  display: flex;
-  gap: var(--app-theme-spacing-md);
-  margin-top: var(--app-theme-spacing-xl);
-  padding-top: var(--app-theme-spacing-lg);
-  border-top: 1px solid var(--app-theme-card-border-color);
-}
-
-.edit-actions ion-button {
-  margin: 0;
+  background: transparent;
 }

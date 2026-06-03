@@ -399,6 +399,14 @@
       "ignored": "{{name}} hidden for now — it will come back next time.",
       "removedManual": "{{name}} removed from list."
     },
+    "buySheet": {
+      "title": "How many did you buy?",
+      "hint": "Adjust the real quantity to keep your pantry accurate.",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "increment": "Increase quantity",
+      "decrement": "Decrease quantity"
+    },
     "tabTitle": "Shop"
   },
   "insights": {
@@ -521,13 +529,13 @@
     "fastAdd": {
       "groupLabel": "Add products",
       "title": "Add products",
-      "cardTitle": "Search or create a product",
-      "subtitle": "Search for an existing product to add or create a new one.",
-      "placeholder": "Search or create new product",
+      "cardTitle": "Add to pantry",
+      "subtitle": "Search for an existing product or create a new one.",
+      "placeholder": "Search or create product",
       "noResults": "No results",
       "addNew": "Create product: {{ name }}",
-      "empty": "No items added yet.",
-      "submit": "Add to pantry"
+      "empty": "You haven't added anything yet.",
+      "submit": "Add"
     },
     "addMode": {
       "title": "Select mode",
@@ -705,12 +713,12 @@
     "consume": {
       "groupLabel": "Consume products",
       "title": "Consume products",
-      "cardTitle": "Search a product",
-      "subtitle": "Search for a product in your pantry to log its consumption.",
+      "cardTitle": "Mark consumed",
+      "subtitle": "Search for products to deduct from your pantry.",
       "placeholder": "Search product",
       "noResults": "No results",
-      "empty": "No items added yet.",
-      "submit": "Log consumption"
+      "empty": "You haven't added anything yet.",
+      "submit": "Register"
     },
     "sections": {
       "fresh": "Fresh",
@@ -734,13 +742,13 @@
       "addModal": {
         "title": "New fresh",
         "namePlaceholder": "Product name",
-        "whenExpires": "When does it expire?",
+        "whenExpires": "Expiration",
         "submit": "Add",
-        "cardTitle": "Quick add fresh",
-        "subtitle": "Pick or create a fresh product.",
-        "placeholder": "Search fresh",
+        "cardTitle": "Add fresh items",
+        "subtitle": "Search for an existing fresh item or create a new one.",
+        "placeholder": "Search or create fresh item",
         "noResults": "No results",
-        "empty": "Nothing added yet."
+        "empty": "You haven't added anything yet."
       },
       "state": {
         "label": "State",
@@ -765,7 +773,7 @@
       },
       "editModal": {
         "title": "Edit fresh",
-        "stateLabel": "How much is left?",
+        "stateLabel": "State",
         "deleteConfirm": {
           "title": "Delete product",
           "message": "Delete {{ name }}? This can't be undone."
@@ -945,6 +953,32 @@
       "subtitle": "Replay the onboarding anytime."
     },
     "dev": {
+      "notifications": {
+        "title": "Notifications (developer)",
+        "subtitle": "Inspect and trigger notifications manually",
+        "permissionLabel": "System permission",
+        "preferenceLabel": "Notifications enabled",
+        "fireExpired": "Fire 'expired' in 5s",
+        "fireNearExpiry": "Fire 'near-expiry' in 5s",
+        "fireLowStock": "Fire 'low-stock' in 5s",
+        "fireReEngagement": "Fire weekly in 5s",
+        "fireWelcome": "Fire welcome in 5s",
+        "fireRecoveryD2": "Fire D2 in 5s",
+        "fireRecoveryD5": "Fire D5 in 5s",
+        "fireRecoveryD10": "Fire D10 in 5s",
+        "fireSectionRegistered": "Registered definitions",
+        "fireSectionRetention": "Retention (welcome + recovery)",
+        "pendingTitle": "Pending",
+        "pendingEmpty": "No pending notifications",
+        "refreshPending": "Refresh list",
+        "cancelAll": "Cancel all",
+        "previewEmpty": "Nothing to fire — no items match",
+        "previewResultTitle": "Next notification",
+        "toast": {
+          "scheduled": "Scheduled in 5 seconds",
+          "noop": "Nothing to fire"
+        }
+      },
       "title": "Developer",
       "subtitle": "Tools for testing different scenarios.",
       "groupOnboarding": "Onboarding",
@@ -963,8 +997,6 @@
       "scheduleAtTimeAction": "Schedule",
       "previewNotificationTitle": "Preview notification",
       "previewNotificationSubtitle": "See what would be scheduled with current data",
-      "cancelNotificationsTitle": "Cancel all pending",
-      "cancelNotificationsSubtitle": "Remove all scheduled notifications",
       "seedExpiredTitle": "Seed expired items",
       "seedExpiredSubtitle": "Add 3 items with past expiry dates",
       "seedNearExpiryTitle": "Seed near-expiry items",
@@ -1033,7 +1065,9 @@
       "title": "You have expired items",
       "title_one": "You have an expired item",
       "body": "{{ count }} items in your pantry have expired",
-      "body_one": "An item in your pantry has expired"
+      "body_one": "An item in your pantry has expired",
+      "body_one_named": "Your {{name}} has expired. Decide whether to keep or toss.",
+      "body_many_named": "Your {{name}} and {{others}} more have expired."
     },
     "nearExpiry": {
       "title": "{{ count }} items expiring soon",
@@ -1041,13 +1075,19 @@
       "body": "The nearest in {{ nearestDays }} days",
       "body_tomorrow": "The nearest expires tomorrow",
       "body_one": "Expires in {{ nearestDays }} days",
-      "body_one_tomorrow": "Expires tomorrow"
+      "body_one_tomorrow": "Expires tomorrow",
+      "body_one_named": "Your {{name}} expires in {{days}} days.",
+      "body_one_named_tomorrow": "Your {{name}} expires tomorrow. Use it today.",
+      "body_many_named": "Your {{name}} and {{others}} more expire soon.",
+      "body_many_named_tomorrow": "Your {{name}} expires tomorrow and {{others}} more are close."
     },
     "lowStock": {
       "title": "Running low on essentials",
       "title_one": "Running low on an essential",
       "body": "{{ count }} staples need restocking",
-      "body_one": "1 staple needs restocking"
+      "body_one": "1 staple needs restocking",
+      "body_one_named": "Low on {{name}}. Add it to your list.",
+      "body_many_named": "Low stock: {{name}} and {{others}} more."
     },
     "reEngagement": {
       "title": "How are your fresh items doing?",
@@ -1056,6 +1096,24 @@
     "weeklyReminder": {
       "title": "What did you buy this week?",
       "body": "Add the new items to your pantry for accurate tracking"
+    },
+    "welcome": {
+      "title": "PantryMind is ready ✓",
+      "body": "Notifications are working. Add your first product and we'll alert you before it expires."
+    },
+    "recovery": {
+      "d2": {
+        "title": "How's your pantry doing?",
+        "body": "Take a quick look at what you have. We'll help you keep track."
+      },
+      "d5": {
+        "title": "It's been 5 days",
+        "body": "Some items might be close to expiring. Worth a glance."
+      },
+      "d10": {
+        "title": "Your pantry needs you",
+        "body": "Come back and avoid wasting food. 30 seconds is all it takes."
+      }
     }
   },
   "sync": {

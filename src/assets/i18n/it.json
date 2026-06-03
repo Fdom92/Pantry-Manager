@@ -399,6 +399,14 @@
       "ignored": "{{name}} nascosto ora — riapparirà la prossima volta.",
       "removedManual": "{{name}} rimosso dalla lista."
     },
+    "buySheet": {
+      "title": "Quanti ne hai comprati?",
+      "hint": "Regola la quantità reale per tenere la dispensa aggiornata.",
+      "confirm": "Conferma",
+      "cancel": "Annulla",
+      "increment": "Aumenta quantità",
+      "decrement": "Riduci quantità"
+    },
     "tabTitle": "Spesa"
   },
   "insights": {
@@ -521,13 +529,13 @@
     "fastAdd": {
       "groupLabel": "Aggiungi prodotti",
       "title": "Aggiungi prodotti",
-      "cardTitle": "Cerca o crea un prodotto",
-      "subtitle": "Cerca un prodotto esistente da aggiungere o creane uno nuovo.",
-      "placeholder": "Cerca o crea nuovo prodotto",
+      "cardTitle": "Aggiungi alla dispensa",
+      "subtitle": "Cerca un prodotto esistente o creane uno nuovo.",
+      "placeholder": "Cerca o crea un prodotto",
       "noResults": "Nessun risultato",
       "addNew": "Crea prodotto: {{ name }}",
-      "empty": "Nessun articolo aggiunto.",
-      "submit": "Aggiungi alla dispensa"
+      "empty": "Non hai ancora aggiunto nulla.",
+      "submit": "Aggiungi"
     },
     "addMode": {
       "title": "Seleziona modalità",
@@ -705,12 +713,12 @@
     "consume": {
       "groupLabel": "Consuma prodotti",
       "title": "Consuma prodotti",
-      "cardTitle": "Cerca un prodotto",
-      "subtitle": "Cerca un prodotto nella tua dispensa per registrarne il consumo.",
+      "cardTitle": "Segna consumato",
+      "subtitle": "Cerca i prodotti da scalare dalla tua dispensa.",
       "placeholder": "Cerca prodotto",
       "noResults": "Nessun risultato",
-      "empty": "Nessun articolo aggiunto.",
-      "submit": "Registra consumo"
+      "empty": "Non hai ancora aggiunto nulla.",
+      "submit": "Registra"
     },
     "sections": {
       "fresh": "Freschi",
@@ -734,13 +742,13 @@
       "addModal": {
         "title": "Nuovo fresco",
         "namePlaceholder": "Nome del prodotto",
-        "whenExpires": "Quando scade?",
+        "whenExpires": "Scadenza",
         "submit": "Aggiungi",
-        "cardTitle": "Aggiungi frescos veloce",
-        "subtitle": "Scegli o crea un fresco.",
-        "placeholder": "Cerca fresco",
+        "cardTitle": "Aggiungi freschi",
+        "subtitle": "Cerca un prodotto fresco esistente o creane uno nuovo.",
+        "placeholder": "Cerca o crea un prodotto fresco",
         "noResults": "Nessun risultato",
-        "empty": "Niente aggiunto."
+        "empty": "Non hai ancora aggiunto nulla."
       },
       "state": {
         "label": "Stato",
@@ -765,7 +773,7 @@
       },
       "editModal": {
         "title": "Modifica fresco",
-        "stateLabel": "Quanto ne resta?",
+        "stateLabel": "Stato",
         "deleteConfirm": {
           "title": "Elimina prodotto",
           "message": "Eliminare {{ name }}? Operazione irreversibile."
@@ -945,6 +953,32 @@
       "subtitle": "Rivedi l'onboarding quando vuoi."
     },
     "dev": {
+      "notifications": {
+        "title": "Notifiche (sviluppatore)",
+        "subtitle": "Ispeziona e attiva notifiche manualmente",
+        "permissionLabel": "Permesso di sistema",
+        "preferenceLabel": "Notifiche attive",
+        "fireExpired": "Attiva 'scaduti' in 5s",
+        "fireNearExpiry": "Attiva 'in scadenza' in 5s",
+        "fireLowStock": "Attiva 'poco stock' in 5s",
+        "fireReEngagement": "Attiva settimanale in 5s",
+        "fireWelcome": "Attiva benvenuto in 5s",
+        "fireRecoveryD2": "Attiva D2 in 5s",
+        "fireRecoveryD5": "Attiva D5 in 5s",
+        "fireRecoveryD10": "Attiva D10 in 5s",
+        "fireSectionRegistered": "Definizioni registrate",
+        "fireSectionRetention": "Retention (benvenuto + recupero)",
+        "pendingTitle": "Programmate",
+        "pendingEmpty": "Nessuna notifica programmata",
+        "refreshPending": "Aggiorna lista",
+        "cancelAll": "Annulla tutte",
+        "previewEmpty": "Niente da attivare — nessun item corrispondente",
+        "previewResultTitle": "Prossima notifica",
+        "toast": {
+          "scheduled": "Programmata in 5 secondi",
+          "noop": "Niente da attivare"
+        }
+      },
       "title": "Sviluppo",
       "subtitle": "Strumenti per testare diversi scenari.",
       "groupOnboarding": "Onboarding",
@@ -963,8 +997,6 @@
       "scheduleAtTimeAction": "Programma",
       "previewNotificationTitle": "Anteprima notifica",
       "previewNotificationSubtitle": "Vedi cosa verrebbe programmato con i dati attuali",
-      "cancelNotificationsTitle": "Cancella tutte le pendenti",
-      "cancelNotificationsSubtitle": "Rimuovi tutte le notifiche programmate",
       "seedExpiredTitle": "Crea articoli scaduti",
       "seedExpiredSubtitle": "Aggiungi 3 articoli con date di scadenza passate",
       "seedNearExpiryTitle": "Crea articoli in scadenza",
@@ -1033,7 +1065,9 @@
       "title": "Hai prodotti scaduti",
       "title_one": "Hai un prodotto scaduto",
       "body": "{{ count }} prodotti della tua dispensa sono scaduti",
-      "body_one": "Un prodotto della tua dispensa è scaduto"
+      "body_one": "Un prodotto della tua dispensa è scaduto",
+      "body_one_named": "Il tuo {{name}} è scaduto. Tenere o buttare?",
+      "body_many_named": "Il tuo {{name}} e altri {{others}} sono scaduti."
     },
     "nearExpiry": {
       "title": "{{ count }} prodotti in scadenza a breve",
@@ -1041,13 +1075,19 @@
       "body": "Il più vicino tra {{ nearestDays }} giorni",
       "body_tomorrow": "Il più vicino scade domani",
       "body_one": "Scade tra {{ nearestDays }} giorni",
-      "body_one_tomorrow": "Scade domani"
+      "body_one_tomorrow": "Scade domani",
+      "body_one_named": "Il tuo {{name}} scade tra {{days}} giorni.",
+      "body_one_named_tomorrow": "Il tuo {{name}} scade domani. Consumalo oggi.",
+      "body_many_named": "Il tuo {{name}} e altri {{others}} scadono presto.",
+      "body_many_named_tomorrow": "Il tuo {{name}} scade domani e altri {{others}} sono vicini."
     },
     "lowStock": {
       "title": "I tuoi essenziali stanno finendo",
       "title_one": "Un essenziale sta finendo",
       "body": "{{ count }} essenziali hanno bisogno di essere riforniti",
-      "body_one": "1 essenziale ha bisogno di essere rifornito"
+      "body_one": "1 essenziale ha bisogno di essere rifornito",
+      "body_one_named": "Poco {{name}} rimasto. Aggiungilo alla lista.",
+      "body_many_named": "Scorta bassa: {{name}} e altri {{others}}."
     },
     "reEngagement": {
       "title": "Come stanno i tuoi freschi?",
@@ -1056,6 +1096,24 @@
     "weeklyReminder": {
       "title": "Cosa hai comprato questa settimana?",
       "body": "Aggiungi i nuovi articoli per un monitoraggio accurato"
+    },
+    "welcome": {
+      "title": "PantryMind è pronto ✓",
+      "body": "Le notifiche funzionano. Aggiungi il tuo primo prodotto e ti avviseremo prima che scada."
+    },
+    "recovery": {
+      "d2": {
+        "title": "Come va la tua dispensa?",
+        "body": "Dai un'occhiata a quello che hai. Ti aiutiamo a non dimenticare nulla."
+      },
+      "d5": {
+        "title": "Sono passati 5 giorni",
+        "body": "Alcuni prodotti potrebbero scadere presto. Dacci un'occhiata."
+      },
+      "d10": {
+        "title": "La tua dispensa ha bisogno di te",
+        "body": "Torna ed evita di buttare cibo. Bastano 30 secondi."
+      }
     }
   },
   "sync": {

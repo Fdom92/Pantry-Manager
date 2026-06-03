@@ -13,6 +13,8 @@ export interface ScheduledNotification {
   title: string;
   body: string;
   scheduleAt: string;
+  /** Arbitrary payload passed to the OS so the tap handler can read it back. */
+  extra?: Record<string, unknown>;
 }
 
 export interface NotificationDefinition {

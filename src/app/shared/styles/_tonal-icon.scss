@@ -1,0 +1,31 @@
+// Tonal icon pattern: soft accent-tinted circle bg + saturated accent icon.
+// Used for ion-item leading icons across settings, dashboard action cards,
+// and similar list-row surfaces that need stronger affordance than a flat
+// colored icon.
+//
+// Usage on an ion-icon slot="start":
+//   <ion-icon slot="start" name="..." class="tonal-icon tonal-icon--primary"></ion-icon>
+//
+// Variants: --tonal-accent CSS var drives the color. Presets below for the
+// common ion-color tokens.
+
+@mixin apply {
+  ion-icon.tonal-icon {
+    --tonal-accent: var(--ion-color-primary);
+    width: 36px;
+    height: 36px;
+    padding: 8px;
+    border-radius: var(--app-theme-radius-circle);
+    background: color-mix(in srgb, var(--tonal-accent) 14%, transparent);
+    color: var(--tonal-accent);
+    font-size: var(--app-theme-font-size-md);
+    margin-inline-end: var(--app-theme-spacing-sm);
+  }
+
+  ion-icon.tonal-icon.tonal-icon--primary   { --tonal-accent: var(--ion-color-primary); }
+  ion-icon.tonal-icon.tonal-icon--success   { --tonal-accent: var(--ion-color-success-shade); }
+  ion-icon.tonal-icon.tonal-icon--warning   { --tonal-accent: var(--ion-color-warning-shade); }
+  ion-icon.tonal-icon.tonal-icon--danger    { --tonal-accent: var(--ion-color-danger); }
+  ion-icon.tonal-icon.tonal-icon--tertiary  { --tonal-accent: var(--ion-color-tertiary); }
+  ion-icon.tonal-icon.tonal-icon--medium    { --tonal-accent: var(--ion-color-medium-shade); }
+}

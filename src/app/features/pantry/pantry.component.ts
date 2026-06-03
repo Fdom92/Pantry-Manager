@@ -109,6 +109,17 @@ export class PantryComponent implements OnDestroy {
         replaceUrl: true,
       });
     }
+
+    const focusItemId = this.route.snapshot.queryParams['focusItem'];
+    if (focusItemId) {
+      this.facade.focusItemById(focusItemId);
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { focusItem: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
   }
 
   onToggleShowAllFresh(): void {

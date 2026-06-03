@@ -16,8 +16,8 @@ ion-title {
 
 .summary-bar {
   position: sticky;
-  top: 0;
-  z-index: 10;
+  top: -16px;
+  z-index: var(--app-theme-z-sticky);
   margin-bottom: var(--app-theme-spacing-xs);
   padding-block: var(--app-theme-spacing-xs);
   // Glass surface — translucent + backdrop-blur. Edge-to-edge bleed via
@@ -214,7 +214,7 @@ ion-title {
   overflow: visible;
   display: flex;
   position: relative;
-  z-index: 1;
+  z-index: var(--app-theme-z-base);
   animation: app-fade-in-list var(--app-theme-transition-slow);
 }
 
@@ -290,7 +290,7 @@ section.group-details {
   font-size: var(--app-theme-icon-size-md);
   transition:
     color var(--app-theme-transition-normal),
-    transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform 250ms var(--app-theme-easing-snap);
   transform: rotate(0deg);
 
   &--expanded {
@@ -381,7 +381,7 @@ section.group-details {
 
 .batch-form-card {
   border: 1px dashed color-mix(in srgb, var(--ion-text-color) 20%, transparent);
-  border-radius: var(--app-theme-radius-sm-plus, 10px);
+  border-radius: var(--app-theme-radius-sm-plus);
   padding: var(--app-theme-spacing-sm-plus);
   display: flex;
   flex-direction: column;
@@ -418,14 +418,14 @@ ion-card-header {
 
 // ── Quantity sheet modal ────────────────────────────────────────────────────
 
-ion-modal.quantity-sheet {
-  --background: var(--ion-background-color);
-  --border-radius: var(--app-theme-radius-lg) var(--app-theme-radius-lg) 0 0;
-  --box-shadow: var(--app-theme-shadow-sheet);
-}
-
+// Quantity sheet — opted into the canonical .app-sheet-modal class above
+// so it inherits --border-radius (xl), --background (--ion-card-background)
+// and --box-shadow (shadow-sheet) from the global sheet-base via the shared
+// modal-sheet mixin used by every other sheet modal. No per-modal radius
+// or background override needed here — the only thing left is matching the
+// inner ion-content bg.
 ion-modal.quantity-sheet ion-content {
-  --background: var(--ion-background-color);
+  --background: var(--ion-card-background);
 }
 
 // ── Two-section layout (Fresh + Despensa) ──────────────────────────────────
@@ -450,7 +450,7 @@ ion-modal.quantity-sheet ion-content {
     font-size: var(--app-theme-font-size-caption);
     font-weight: var(--app-theme-font-weight-extra-bold);
     color: var(--app-theme-text-color);
-    letter-spacing: 0.04em;
+    letter-spacing: var(--app-theme-letter-spacing-eyebrow-sm);
     text-transform: uppercase;
     opacity: 0.65;
   }
@@ -462,9 +462,9 @@ ion-modal.quantity-sheet ion-content {
     width: var(--app-theme-control-size-md);
     height: var(--app-theme-control-size-md);
     border: none;
-    border-radius: 50%;
+    border-radius: var(--app-theme-radius-circle);
     background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
-    color: var(--ion-color-primary);
+    color: var(--app-theme-primary-on-surface);
     cursor: pointer;
     transition: background var(--app-theme-transition-fast);
 
@@ -486,7 +486,7 @@ ion-modal.quantity-sheet ion-content {
   // (mint), which is now cream and would no longer read as actionable.
   &__consume-btn {
     background: color-mix(in srgb, var(--ion-color-success) 12%, transparent);
-    color: var(--ion-color-success);
+    color: var(--app-theme-success-deep);
 
     &:active {
       background: color-mix(in srgb, var(--ion-color-success) 22%, transparent);
@@ -526,14 +526,14 @@ ion-modal.quantity-sheet ion-content {
     font-size: var(--app-theme-font-size-body);
     font-weight: var(--app-theme-font-weight-bold);
     color: var(--app-theme-text-color);
-    opacity: 0.75;
+    opacity: var(--app-theme-opacity-subtle);
   }
 
   &__subtitle {
     margin: 0;
     font-size: var(--app-theme-font-size-small);
     color: var(--app-theme-text-muted);
-    opacity: 0.6;
+    opacity: var(--app-theme-opacity-muted);
   }
 
   &__cta {
@@ -543,7 +543,7 @@ ion-modal.quantity-sheet ion-content {
     border: none;
     border-radius: var(--app-theme-radius-xl);
     background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
-    color: var(--ion-color-primary);
+    color: var(--app-theme-primary-on-surface);
     font-size: var(--app-theme-font-size-caption);
     font-weight: var(--app-theme-font-weight-bold);
     cursor: pointer;
@@ -569,7 +569,7 @@ ion-modal.quantity-sheet ion-content {
   padding: var(--app-theme-spacing-sm) var(--app-theme-card-margin-inline);
   background: none;
   border: none;
-  color: var(--ion-color-primary);
+  color: var(--app-theme-primary-on-surface);
   font-size: var(--app-theme-font-size-caption);
   font-weight: var(--app-theme-font-weight-bold);
   cursor: pointer;
@@ -577,6 +577,6 @@ ion-modal.quantity-sheet ion-content {
   transition: opacity var(--app-theme-transition-fast);
 
   &:active {
-    opacity: 0.6;
+    opacity: var(--app-theme-opacity-muted);
   }
 }

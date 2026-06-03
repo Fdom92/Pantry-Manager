@@ -1,62 +1,68 @@
 <ion-modal
+  class="app-sheet-modal batch-edit-modal"
   [isOpen]="state.isOpen()"
+  [breakpoints]="[0, 0.75, 1]"
+  [initialBreakpoint]="0.75"
+  [handle]="false"
   (willDismiss)="state.dismiss()"
   (didDismiss)="state.close()">
   <ng-template>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>{{ state.titleKey() | translate }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button fill="clear" color="medium" (click)="state.dismiss()">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+    <div class="sheet-shell batch-edit-modal__content">
+      <div class="sheet-handle" aria-hidden="true"></div>
 
-    <ion-content class="ion-padding">
+      <header class="sheet-header">
+        <h2 class="sheet-header__title">{{ state.titleKey() | translate }}</h2>
+        <ion-button
+          class="sheet-header__dismiss"
+          fill="clear"
+          color="medium"
+          (click)="state.dismiss()"
+          [attr.aria-label]="'common.actions.close' | translate">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </header>
 
-      <!-- Category / food type: entity selector field per item -->
-      @if (state.action() !== 'setExpiryDate') {
-        @for (item of state.filteredItems(); track item._id) {
-          @if (state.action() === 'setFoodType') {
-            <app-entity-selector-field
-              class="batch-edit-selector"
-              [label]="item.name"
-              [items]="state.foodTypeOptions()"
-              [clearLabel]="'pantry.form.foodType.unassigned' | translate"
-              [showSearch]="false"
-              [emptyLabel]="'common.selects.noOptions' | translate"
-              [value]="state.getItemDisplayValue(item._id)"
-              (optionSelected)="state.setItemValue(item._id, $event.raw ?? null)"
-              (cleared)="state.setItemValue(item._id, null)">
-            </app-entity-selector-field>
-          }
-          @if (state.action() === 'setCategory') {
-            <app-entity-selector-field
-              class="batch-edit-selector"
-              [label]="item.name"
-              [items]="state.categoryOptions()"
-              [searchPlaceholder]="'pantry.form.categorySearchPlaceholder' | translate"
-              [clearLabel]="'pantry.form.uncategorized' | translate"
-              [emptyLabel]="'common.selects.noOptions' | translate"
-              [value]="state.getItemDisplayValue(item._id)"
-              (optionSelected)="state.setItemValue(item._id, $event.raw ?? null)"
-              (cleared)="state.setItemValue(item._id, null)">
-            </app-entity-selector-field>
-          }
+      <div class="sheet-body">
+        @if (state.action() !== 'setExpiryDate') {
+          <section class="form-section">
+            @for (item of state.filteredItems(); track item._id) {
+              @if (state.action() === 'setFoodType') {
+                <app-entity-selector-field
+                  class="batch-edit-selector"
+                  [label]="item.name"
+                  [items]="state.foodTypeOptions()"
+                  [clearLabel]="'pantry.form.foodType.unassigned' | translate"
+                  [showSearch]="false"
+                  [emptyLabel]="'common.selects.noOptions' | translate"
+                  [value]="state.getItemDisplayValue(item._id)"
+                  (optionSelected)="state.setItemValue(item._id, $event.raw ?? null)"
+                  (cleared)="state.setItemValue(item._id, null)">
+                </app-entity-selector-field>
+              }
+              @if (state.action() === 'setCategory') {
+                <app-entity-selector-field
+                  class="batch-edit-selector"
+                  [label]="item.name"
+                  [items]="state.categoryOptions()"
+                  [searchPlaceholder]="'pantry.form.categorySearchPlaceholder' | translate"
+                  [clearLabel]="'pantry.form.uncategorized' | translate"
+                  [emptyLabel]="'common.selects.noOptions' | translate"
+                  [value]="state.getItemDisplayValue(item._id)"
+                  (optionSelected)="state.setItemValue(item._id, $event.raw ?? null)"
+                  (cleared)="state.setItemValue(item._id, null)">
+                </app-entity-selector-field>
+              }
+            }
+          </section>
         }
-      }
 
-      <!-- Expiry date: date chip per item -->
-      @if (state.action() === 'setExpiryDate') {
-        <p class="batch-edit-hint">{{ 'batchEdit.expiryDateHint' | translate }}</p>
-        <ion-list lines="none" class="batch-edit-date-list">
-          @for (item of state.filteredItems(); track item._id) {
-            <ion-item>
-              <div class="batch-edit-item-content">
-                <span class="batch-edit-item-name">{{ item.name }}</span>
-                <div class="batch-edit-date-cell">
+        @if (state.action() === 'setExpiryDate') {
+          <section class="form-section">
+            <p class="batch-edit-hint">{{ 'batchEdit.expiryDateHint' | translate }}</p>
+            <ul class="batch-edit-date-list">
+              @for (item of state.filteredItems(); track item._id) {
+                <li class="batch-edit-row">
+                  <span class="batch-edit-row__name">{{ item.name }}</span>
                   <app-expiry-picker
                     [mode]="item.productType === 'fresh' ? 'chips-only' : 'picker-only'"
                     [date]="state.getItemExpiryDate(item._id)"
@@ -64,29 +70,26 @@
                     (dateChange)="state.setItemValue(item._id, $event ?? null)"
                     (noExpiryToggle)="state.setItemNoExpiry(item._id)">
                   </app-expiry-picker>
-                </div>
-              </div>
-            </ion-item>
-          }
-        </ion-list>
-      }
+                </li>
+              }
+            </ul>
+          </section>
+        }
 
-    </ion-content>
-
-    <ion-footer class="modal-footer">
-      <ion-toolbar>
-        <ion-button
-          expand="block"
-          color="primary"
-          [disabled]="!state.canSave() || state.isSaving()"
-          (click)="state.apply()">
-          @if (state.isSaving()) {
-            <ion-spinner name="dots"></ion-spinner>
-          } @else {
-            {{ 'common.actions.save' | translate }}
-          }
-        </ion-button>
-      </ion-toolbar>
-    </ion-footer>
+        <section class="form-section form-section--cta">
+          <ion-button
+            expand="block"
+            color="primary"
+            [disabled]="!state.canSave() || state.isSaving()"
+            (click)="state.apply()">
+            @if (state.isSaving()) {
+              <ion-spinner name="dots"></ion-spinner>
+            } @else {
+              {{ 'common.actions.save' | translate }}
+            }
+          </ion-button>
+        </section>
+      </div>
+    </div>
   </ng-template>
 </ion-modal>

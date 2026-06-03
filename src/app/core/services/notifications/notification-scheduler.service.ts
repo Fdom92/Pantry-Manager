@@ -11,6 +11,8 @@ import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
 import { NotificationRegistryService } from './notification-registry.service';
 import { NotificationPermissionService } from './notification-permission.service';
 import { CapacitorNotificationPlugin } from './capacitor-notification.plugin';
+import { WelcomeNotificationService } from './welcome-notification.service';
+import { RecoveryNotificationsService } from './recovery-notifications.service';
 import { AppPreferences, PantryItem } from '@core/models';
 
 @Injectable({ providedIn: 'root' })
@@ -23,6 +25,8 @@ export class NotificationSchedulerService {
   private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
+  private readonly welcomeNotif = inject(WelcomeNotificationService);
+  private readonly recoveryNotif = inject(RecoveryNotificationsService);
 
   private isScheduling = false;
 
@@ -35,12 +39,24 @@ export class NotificationSchedulerService {
 
     if (Capacitor.isNativePlatform()) {
       void LocalNotifications.addListener('localNotificationActionPerformed', action => {
-        void this.handleNotificationTap(action.notification.id);
+        const extra = (action.notification.extra as Record<string, unknown> | undefined) ?? undefined;
+        void this.handleNotificationTap(action.notification.id, extra);
       });
     }
   }
 
-  private async handleNotificationTap(id: number): Promise<void> {
+  private async handleNotificationTap(id: number, extra?: Record<string, unknown>): Promise<void> {
+    // Per-item deep-link path (bet A). Items may have been deleted between
+    // schedule and tap, so we fall back to plain pantry if the id is unknown.
+    const itemId = typeof extra?.['itemId'] === 'string' ? (extra['itemId'] as string) : undefined;
+    if (itemId) {
+      const exists = this.pantryStore.loadedProducts().some(p => p._id === itemId);
+      if (exists) {
+        await this.navCtrl.navigateRoot('/pantry', { queryParams: { focusItem: itemId } });
+        return;
+      }
+      // fall through to id-based routing if the item is gone
+    }
     switch (id) {
       case NOTIFICATION_IDS.EXPIRED_ITEMS:
         this.navigationPreset.setPending({ expired: true });
@@ -54,6 +70,17 @@ export class NotificationSchedulerService {
       case NOTIFICATION_IDS.RE_ENGAGEMENT:
         // Weekly reminder: navigate to pantry with add modal open for shopping entry
         await this.navCtrl.navigateRoot('/pantry', { queryParams: { openAddModal: 'true' } });
+        return;
+      case NOTIFICATION_IDS.WELCOME: {
+        const count = this.pantryStore.loadedProducts().length;
+        const queryParams = count > 0 ? {} : { openAddModal: 'true' };
+        await this.navCtrl.navigateRoot('/pantry', { queryParams });
+        return;
+      }
+      case NOTIFICATION_IDS.RECOVERY_D2:
+      case NOTIFICATION_IDS.RECOVERY_D5:
+      case NOTIFICATION_IDS.RECOVERY_D10:
+        await this.navCtrl.navigateRoot('/dashboard');
         return;
     }
     await this.navCtrl.navigateRoot('/pantry');
@@ -76,7 +103,12 @@ export class NotificationSchedulerService {
       const preferences = this.preferencesService.preferences();
 
       if (!preferences.notificationsEnabled) {
+        // Master off — kill registered notifs AND retention nudges (welcome +
+        // recovery window). Trust the user's preference; don't honour scheduled
+        // retention pushes that contradict the silent state.
         await this.cancelAll();
+        await this.welcomeNotif.cancelWelcomeNotification();
+        await this.recoveryNotif.cancelRecoveryWindow();
         return;
       }
 
@@ -221,6 +253,41 @@ export class NotificationSchedulerService {
       title: winner.title,
       body: winner.body,
       scheduleAt: new Date(Date.now() + 5_000),
+    }]);
+
+    return true;
+  }
+
+  /**
+   * Dev-only: build a single specific definition (regardless of priority) and
+   * fire it in ~5 seconds. Returns false if the definition is not registered,
+   * or if its build() returns null (no items to notify about).
+   */
+  async fireDefinitionInFiveSeconds(definitionId: number): Promise<boolean> {
+    const def = this.registry.getById(definitionId);
+    if (!def) return false;
+
+    await this.permission.init();
+    if (!this.permission.isGranted()) {
+      const granted = await this.permission.request();
+      if (!granted) return false;
+    }
+
+    const preferences = this.preferencesService.preferences();
+    const items = this.pantryStore.loadedProducts();
+    const now = new Date();
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this.translate.instant(key, params);
+
+    const payload = def.build({ items, preferences, t, now });
+    if (!payload) return false;
+
+    await this.plugin.schedule([{
+      id: payload.id,
+      title: payload.title,
+      body: payload.body,
+      scheduleAt: new Date(Date.now() + 5_000),
+      extra: payload.extra,
     }]);
 
     return true;

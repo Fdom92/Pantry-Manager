@@ -1,0 +1,72 @@
+// Shared shell for settings-style pages (settings, notifications, catalogs,
+// advanced). Applies the common typography + card chrome + content padding
+// in one mixin so each page only needs page-specific rules.
+//
+// Usage in a component scss:
+//   @use '../../../shared/styles/settings-shell' as shell;
+//   :host { @include shell.apply; }
+//
+// Or, at root (no :host wrapper), include directly:
+//   @use '../../shared/styles/settings-shell' as shell;
+//   @include shell.apply;
+
+@mixin apply {
+  ion-title,
+  ion-back-button {
+    color: var(--app-theme-text-color);
+  }
+
+  ion-card-title {
+    margin: 0;
+    font-size: var(--app-theme-font-size-lg);
+    font-weight: var(--app-theme-font-weight-bold);
+    letter-spacing: var(--app-theme-letter-spacing-tight);
+  }
+
+  ion-card-subtitle {
+    margin-top: var(--app-theme-spacing-xs);
+    font-size: var(--app-theme-font-size-caption);
+    color: var(--app-theme-text-muted);
+  }
+
+  ion-card-content {
+    padding-inline: 0;
+  }
+
+  ion-item h3 {
+    font-size: var(--app-theme-font-size-md);
+    font-weight: var(--app-theme-font-weight-bold);
+    margin: 0 0 var(--app-theme-spacing-xs);
+  }
+
+  ion-item p {
+    font-size: var(--app-theme-font-size-caption);
+    color: var(--app-theme-text-muted);
+    margin: 0;
+  }
+
+  ion-item {
+    --background: transparent;
+  }
+
+  .settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-theme-spacing-lg-plus);
+    margin: var(--app-theme-card-margin-inline);
+    padding-bottom: calc(var(--app-theme-spacing-lg) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .settings-card {
+    margin: 0;
+    background: var(--app-theme-card-bg);
+    --background: var(--app-theme-card-bg);
+    box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
+    border-color: var(--app-theme-card-border-color);
+    color: var(--app-theme-text-color);
+  }
+
+  .settings-card ion-list {
+    background: transparent;
+  }
+}

@@ -4,7 +4,7 @@
   @include bar.apply;
 
   border-radius: var(--app-theme-card-border-radius);
-  background: var(--ion-card-background) !important;
+  background: var(--ion-card-background);
   box-shadow: var(--ion-card-box-shadow, var(--app-theme-card-shadow));
   border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
   margin: 0;
@@ -59,10 +59,10 @@
     transform var(--app-theme-transition-fast);
   padding: var(--app-theme-spacing-xs);
   margin: calc(-1 * var(--app-theme-spacing-xs));
-  border-radius: 50%;
+  border-radius: var(--app-theme-radius-circle);
 
   &--active {
-    color: var(--ion-color-warning);
+    color: var(--app-theme-warning-deep);
   }
 
   &:active {
@@ -94,8 +94,8 @@
   }
 
   &[data-status='near-expiry'] {
-    color: var(--app-theme-card-accent-warning);
+    color: var(--app-theme-warning-deep);
   }
 
-  &[data-status='review']    { color: var(--ion-color-warning-shade); }
+  &[data-status='review']    { color: var(--app-theme-warning-deep); }
 }

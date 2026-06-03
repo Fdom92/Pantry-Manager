@@ -54,7 +54,7 @@
             <!-- Group header -->
             <button class="supermarket-heading pressable" (click)="toggleGroup(group.key)">
               <span>{{ group.label }}</span>
-              <ion-badge color="medium" class="group-count">{{ group.suggestions.length }}</ion-badge>
+              <ion-badge class="group-count group-count--medium">{{ group.suggestions.length }}</ion-badge>
               <ion-icon
                 class="collapse-icon"
                 [class.collapse-icon--expanded]="!isGroupCollapsed(group.key)"
@@ -73,24 +73,24 @@
                         <span class="item-name">{{ suggestion.item.name }}</span>
                         <div class="item-meta">
                           @if (suggestion.reason === 'fresh-empty') {
-                            <ion-badge color="danger" class="reason-chip">
+                            <ion-badge class="reason-chip reason-chip--danger">
                               {{ 'shopping.chips.freshEmpty' | translate }}
                             </ion-badge>
                           } @else if (suggestion.reason === 'fresh-low') {
-                            <ion-badge color="warning" class="reason-chip">
+                            <ion-badge class="reason-chip reason-chip--warning">
                               {{ 'shopping.chips.freshLow' | translate }}
                             </ion-badge>
                           } @else if (suggestion.reason === 'empty') {
-                            <ion-badge color="danger" class="reason-chip">
+                            <ion-badge class="reason-chip reason-chip--danger">
                               {{ 'shopping.chips.empty' | translate }}
                             </ion-badge>
                           } @else if (suggestion.reason === 'below-min') {
-                            <ion-badge color="warning" class="reason-chip">
+                            <ion-badge class="reason-chip reason-chip--warning">
                               {{ 'shopping.chips.belowMin' | translate }}
                             </ion-badge>
                           }
                           @if (suggestion.item.isBasic) {
-                            <ion-badge color="primary" class="reason-chip reason-chip--basic">
+                            <ion-badge class="reason-chip reason-chip--basic">
                               {{ 'shopping.chips.basic' | translate }}
                             </ion-badge>
                           }
@@ -111,7 +111,7 @@
                         color="primary"
                         shape="round"
                         class="buy-btn"
-                        (click)="facade.markAsBought(suggestion)">
+                        (click)="onBuyTap(suggestion)">
                         <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
                       </ion-button>
                     </ion-item>
@@ -143,7 +143,7 @@
                   <div class="item-body" slot="start">
                     <span class="item-name">{{ manual.name }}</span>
                     <div class="item-meta">
-                      <ion-badge color="medium" class="reason-chip reason-chip--manual">
+                      <ion-badge class="reason-chip reason-chip--manual">
                         {{ 'shopping.chips.manual' | translate }}
                       </ion-badge>
                     </div>
@@ -175,7 +175,7 @@
           <button class="bought-section-header pressable" (click)="toggleGlobalBought()">
             <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
             <span>{{ 'shopping.bought.sectionTitle' | translate }}</span>
-            <ion-badge color="success" class="group-count">{{ state.allBoughtItems.length }}</ion-badge>
+            <ion-badge class="group-count group-count--success">{{ state.allBoughtItems.length }}</ion-badge>
             <ion-icon
               class="collapse-icon"
               [name]="globalBoughtExpanded() ? 'chevron-down-outline' : 'chevron-up-outline'">
@@ -207,7 +207,7 @@
           <button class="ignored-section-header pressable" (click)="toggleGlobalIgnored()">
             <ion-icon name="eye-off-outline" color="medium"></ion-icon>
             <span>{{ 'shopping.ignored.sectionTitle' | translate }}</span>
-            <ion-badge color="medium" class="group-count">{{ state.allIgnoredItems.length }}</ion-badge>
+            <ion-badge class="group-count group-count--medium">{{ state.allIgnoredItems.length }}</ion-badge>
             <ion-icon
               class="collapse-icon"
               [name]="globalIgnoredExpanded() ? 'chevron-down-outline' : 'chevron-up-outline'">
@@ -229,5 +229,6 @@
     </div>
   }
 
+  <app-shopping-buy-sheet></app-shopping-buy-sheet>
 
 </ion-content>

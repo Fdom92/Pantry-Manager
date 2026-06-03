@@ -1,0 +1,99 @@
+// Shared quantity-adjuster styling used by pantry-quantity-sheet and
+// edit-item-modal's single-batch quick view. Encapsulates the +/- circular
+// control buttons, the large display number, and the before→after arrow.
+//
+// Usage:
+//   @use '../../../shared/styles/quantity-adjuster' as qa;
+//   @include qa.apply;
+
+@mixin apply {
+  .quantity-label {
+    font-size: var(--app-theme-font-size-micro);
+    font-weight: var(--app-theme-font-weight-semibold);
+    color: var(--app-theme-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: var(--app-theme-letter-spacing-eyebrow-lg);
+  }
+
+  .quantity-hint {
+    font-size: var(--app-theme-font-size-2xs);   // 0.65rem — context hint below label
+    color: var(--app-theme-text-subtle);
+    margin-top: calc(-1 * var(--app-theme-spacing-xs));
+    text-align: center;
+  }
+
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--app-theme-spacing-lg);
+    margin-top: var(--app-theme-spacing-xs);
+  }
+
+  .control-button {
+    --padding-start: 0;
+    --padding-end: 0;
+    --border-radius: var(--app-theme-radius-circle);
+    margin: 0;
+  }
+
+  .control-button--minus {
+    --background: color-mix(in srgb, var(--ion-color-danger) 10%, transparent);
+    --background-hover: color-mix(in srgb, var(--ion-color-danger) 15%, transparent);
+    --color: var(--ion-color-danger);
+  }
+
+  .control-button--minus:disabled {
+    --background: var(--app-theme-surface-tint-soft);
+    --color: var(--app-theme-text-whisper);
+  }
+
+  .control-button--plus {
+    --background: color-mix(in srgb, var(--ion-color-primary) 15%, transparent);
+    --background-hover: color-mix(in srgb, var(--ion-color-primary) 20%, transparent);
+    --color: var(--ion-color-primary);
+  }
+
+  .control-button ion-icon {
+    font-size: var(--app-theme-icon-size-md);
+    font-weight: var(--app-theme-font-weight-extra-bold);
+  }
+
+  .quantity-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: var(--app-theme-spacing-xs-plus);
+    min-width: 80px;
+    padding: 0 var(--app-theme-spacing-sm);
+  }
+
+  .quantity-number {
+    font-size: var(--app-theme-font-size-3xl);
+    font-weight: var(--app-theme-font-weight-extra-bold);
+    color: var(--app-theme-text-color);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: center;
+    gap: var(--app-theme-spacing-xs-plus);
+  }
+
+  .quantity-original {
+    color: var(--app-theme-text-faint);
+    font-size: var(--app-theme-font-size-2xl);
+  }
+
+  .quantity-arrow {
+    font-size: var(--app-theme-font-size-title);
+    color: var(--app-theme-text-faint);
+  }
+
+  .quantity-new {
+    color: var(--ion-color-primary);
+  }
+
+  .quantity-new--negative {
+    color: var(--ion-color-danger);
+  }
+}
