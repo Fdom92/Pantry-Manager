@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
+import { ReconsentSheetComponent } from '@shared/components/reconsent-sheet/reconsent-sheet.component';
 import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edit-modal.component';
 import {
   IonButton,
@@ -34,6 +35,7 @@ import { TranslateModule } from '@ngx-translate/core';
     TranslateModule,
     BatchEditModalComponent,
     EmptyStateComponent,
+    ReconsentSheetComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
@@ -41,9 +43,27 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class DashboardComponent {
   readonly facade = inject(DashboardStateService);
+  @ViewChild(ReconsentSheetComponent) private reconsentSheet?: ReconsentSheetComponent;
+
+  /** Guard so the re-consent sheet is evaluated only once per visit session. */
+  private reconsentEvaluated = false;
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
+    this.maybePresentReconsentSheet();
+  }
+
+  /**
+   * Defer the prompt by a short delay so the dashboard animates in first.
+   * One-shot per visit; deeper protection lives in `ReconsentPromptService`
+   * (`RECONSENT_SHOWN` localStorage flag, one-shot per install).
+   */
+  private maybePresentReconsentSheet(): void {
+    if (this.reconsentEvaluated) return;
+    this.reconsentEvaluated = true;
+    setTimeout(() => {
+      void this.reconsentSheet?.maybePresent();
+    }, 1500);
   }
 
   onSummaryCardClick(card: DashboardOverviewCardId): void {

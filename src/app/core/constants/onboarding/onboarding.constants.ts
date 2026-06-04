@@ -8,6 +8,12 @@ export const ONBOARDING_SLIDES: readonly OnboardingSlide[] = [
     icon: 'notifications-outline',
   },
   {
+    key: 'analytics',
+    titleKey: 'onboarding.slides.analytics.title',
+    descriptionKey: 'onboarding.slides.analytics.description',
+    icon: 'analytics-outline',
+  },
+  {
     key: 'seed',
     titleKey: 'onboarding.slides.seed.title',
     descriptionKey: 'onboarding.slides.seed.description',

@@ -8,6 +8,8 @@ import { createLatestOnlyRunner, withSignalFlag } from '@core/utils';
 import { environment } from 'src/environments/environment';
 import { UpgradeRevenuecatService } from './upgrade-revenuecat.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
+import { AnalyticsService } from '../analytics/analytics.service';
+import { ANALYTICS_EVENTS } from '@core/constants';
 
 @Injectable()
 export class UpgradeStateService {
@@ -17,6 +19,7 @@ export class UpgradeStateService {
   private readonly translate = inject(TranslateService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly isLoadingPlans = signal(false);
   readonly planOptions = signal<PlanViewModel[]>([]);
@@ -58,10 +61,23 @@ export class UpgradeStateService {
       return;
     }
     this.activePurchaseId.set(pkg.identifier);
+    this.analytics.track(ANALYTICS_EVENTS.UPGRADE_TAPPED, {
+      plan_id: pkg.identifier,
+      package_type: pkg.packageType,
+    });
+    this.analytics.track(ANALYTICS_EVENTS.UPGRADE_PURCHASE_STARTED, {
+      plan_id: pkg.identifier,
+      package_type: pkg.packageType,
+    });
     try {
       const success = await this.revenuecat.purchasePackage(pkg);
-      if (success || (await this.revenuecat.restore())) {
+      const finalised = success || (await this.revenuecat.restore());
+      if (finalised) {
         this.reviewPrompt.markEngagement();
+        this.analytics.track(ANALYTICS_EVENTS.UPGRADE_PURCHASE_COMPLETED, {
+          plan_id: pkg.identifier,
+          package_type: pkg.packageType,
+        });
         await this.goDashboard();
       }
     } finally {

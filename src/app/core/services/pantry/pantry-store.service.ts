@@ -1,5 +1,6 @@
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
-import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { ANALYTICS_EVENTS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { AnalyticsService } from '../analytics/analytics.service';
 import {
   collectBatches,
   computeEarliestExpiry,
@@ -22,6 +23,7 @@ export class PantryStoreService {
   private readonly pantryQuery = inject(PantryQueryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly eventManager = inject(HistoryEventManagerService);
+  private readonly analytics = inject(AnalyticsService);
   private realtimeSubscribed = false;
   private expiredScanInProgress = false;
 
@@ -120,8 +122,12 @@ export class PantryStoreService {
 
   /** Remove an item from the local cache once deletion succeeds. */
   async deleteItem(id: string): Promise<void> {
+    // Capture kind BEFORE deletion so analytics keeps full context.
+    const target = this.items().find(i => i._id === id);
+    const kind = target?.productType === 'fresh' ? 'fresh' : 'despensa';
     try {
       await this.pantryQuery.deleteItem(id);
+      this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_DELETED, { kind });
     } catch (err: unknown) {
       console.error('[PantryStoreService] deleteItem error', err);
       this.error.set('Failed to delete item');

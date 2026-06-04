@@ -1,0 +1,55 @@
+// Re-uses the canonical .app-sheet-modal global pattern. Local tweaks only.
+
+.reconsent-sheet {
+  --height: auto;
+}
+
+.sheet-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.reconsent-intro {
+  margin: 0 0 var(--spacing-md, 16px);
+  color: var(--ion-color-step-600);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.reconsent-list {
+  background: transparent;
+  padding: 0;
+}
+
+.reconsent-item {
+  --background: var(--ion-color-step-50);
+  --border-radius: var(--radius-md, 12px);
+  margin-bottom: var(--spacing-sm, 8px);
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+
+  ion-label h3 {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  ion-label p {
+    font-size: 0.85rem;
+    color: var(--ion-color-step-550);
+  }
+}
+
+.reconsent-footnote {
+  margin-top: var(--spacing-md, 16px);
+  color: var(--ion-color-step-500);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.reconsent-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  padding: 0 var(--spacing-md, 16px);
+}

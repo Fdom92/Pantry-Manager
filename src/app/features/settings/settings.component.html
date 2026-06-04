@@ -9,6 +9,44 @@
 
 <ion-content class="ion-padding">
   <div class="settings-content">
+    <!-- ── PRO hero card ──────────────────────────────────────── -->
+    <ion-card class="settings-card settings-pro-card" [class.is-pro]="isPro()">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="sparkles-outline" class="settings-pro-card__icon"></ion-icon>
+          @if (isPro()) {
+            {{ "settings.pro.activeTitle" | translate }}
+          } @else {
+            {{ "settings.pro.upgradeTitle" | translate }}
+          }
+        </ion-card-title>
+        <ion-card-subtitle>
+          @if (isPro()) {
+            {{ "settings.pro.statusDescription" | translate }}
+          } @else {
+            {{ "settings.pro.upgradePrompt" | translate }}
+          }
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        @if (isPro()) {
+          <ion-badge color="tertiary">
+            {{ "settings.pro.badgePro" | translate }}
+          </ion-badge>
+        } @else {
+          <ion-button
+            expand="block"
+            shape="round"
+            color="tertiary"
+            (click)="onUpgradeTap()"
+          >
+            <ion-icon slot="start" name="sparkles-outline"></ion-icon>
+            {{ "settings.pro.upgradeCta" | translate }}
+          </ion-button>
+        }
+      </ion-card-content>
+    </ion-card>
+
     <!-- ── Apariencia ─────────────────────────────────────────── -->
     <ion-card class="settings-card">
       <ion-card-header>
@@ -62,6 +100,26 @@
               <span>{{ "settings.appearance.system" | translate }}</span>
             </button>
           </div>
+
+          <ion-item lines="none" class="theme-item language-item">
+            <ion-label>
+              <h3>{{ "settings.appearance.language" | translate }}</h3>
+              <p>{{ "settings.appearance.languageDescription" | translate }}</p>
+            </ion-label>
+          </ion-item>
+          <div class="theme-grid lang-grid" aria-label="{{ 'settings.appearance.language' | translate }}">
+            @for (lang of SUPPORTED_LANGUAGES; track lang) {
+              <button
+                type="button"
+                class="theme-option"
+                [class.selected]="currentLanguage() === lang"
+                [attr.aria-pressed]="currentLanguage() === lang"
+                (click)="setLanguage(lang)"
+              >
+                <span class="lang-code">{{ lang }}</span>
+              </button>
+            }
+          </div>
         </ion-list>
       </ion-card-content>
     </ion-card>
@@ -84,6 +142,46 @@
             <ion-label>
               <h3>{{ "settings.notifications.openTitle" | translate }}</h3>
               <p>{{ "settings.notifications.openSubtitle" | translate }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- ── Privacidad ─────────────────────────────────────────── -->
+    <ion-card class="settings-card">
+      <ion-card-header>
+        <ion-card-title>{{ "settings.privacy.title" | translate }}</ion-card-title>
+        <ion-card-subtitle>{{ "settings.privacy.subtitle" | translate }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item lines="none">
+            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="analytics-outline"></ion-icon>
+            <ion-label>
+              <h3>{{ "settings.privacy.analyticsLabel" | translate }}</h3>
+              <p>{{ "settings.privacy.analyticsDescription" | translate }}</p>
+            </ion-label>
+            <ion-toggle
+              slot="end"
+              [checked]="facade.analyticsEnabled()"
+              [disabled]="facade.isUpdatingAnalytics()"
+              (ionChange)="onAnalyticsToggle($event)"
+            ></ion-toggle>
+          </ion-item>
+
+          <ion-item
+            lines="none"
+            button
+            detail="true"
+            href="https://fdom92.github.io/Pantry-Manager/privacy-policy"
+            target="_blank"
+            rel="noopener"
+          >
+            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="shield-checkmark-outline"></ion-icon>
+            <ion-label>
+              <h3>{{ "settings.privacy.policyLinkTitle" | translate }}</h3>
+              <p>{{ "settings.privacy.policyLinkSubtitle" | translate }}</p>
             </ion-label>
           </ion-item>
         </ion-list>
@@ -157,30 +255,7 @@
             </ion-button>
           </ion-item>
 
-          <!-- ── Language ───────────────────────────────────── -->
-          <ion-list-header>
-            <ion-label>{{ "settings.dev.groupLanguage" | translate }}</ion-label>
-          </ion-list-header>
-
-          <ion-item lines="none" class="theme-item">
-            <ion-label>
-              <h3>{{ "settings.dev.languageSelectorTitle" | translate }}</h3>
-              <p>{{ "settings.dev.languageSelectorSubtitle" | translate }}</p>
-            </ion-label>
-          </ion-item>
-          <div class="theme-grid lang-grid" aria-label="{{ 'settings.dev.languageSelectorTitle' | translate }}">
-            @for (lang of SUPPORTED_LANGUAGES; track lang) {
-              <button
-                type="button"
-                class="theme-option"
-                [class.selected]="currentLanguage() === lang"
-                [attr.aria-pressed]="currentLanguage() === lang"
-                (click)="setLanguage(lang)"
-              >
-                <span class="lang-code">{{ lang }}</span>
-              </button>
-            }
-          </div>
+          <!-- Language picker promoted to the Apariencia card in v4.6. -->
 
           <!-- ── Notifications ──────────────────────────────── -->
           <ion-list-header>
@@ -435,6 +510,28 @@
             </ion-button>
           </ion-item>
 
+          <!-- ── Telemetry diagnostics ──────────────────────────── -->
+          <ion-list-header>
+            <ion-label>{{ "settings.dev.groupTelemetry" | translate }}</ion-label>
+          </ion-list-header>
+
+          <ion-item lines="none">
+            <ion-icon slot="start" class="tonal-icon tonal-icon--danger" name="skull-outline"></ion-icon>
+            <ion-label>
+              <h3>{{ "settings.dev.testCrashTitle" | translate }}</h3>
+              <p>{{ "settings.dev.testCrashSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              color="danger"
+              (click)="triggerTestCrash()"
+              [attr.aria-label]="'settings.dev.testCrashTitle' | translate"
+            >
+              <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+
         </ion-list>
       </ion-card-content>
     </ion-card>
@@ -442,14 +539,15 @@
 
     <ion-card class="settings-card">
       <ion-card-header>
-        <ion-card-title>{{ "settings.info.title" | translate }}</ion-card-title>
+        <ion-card-title>{{ "settings.help.title" | translate }}</ion-card-title>
         <ion-card-subtitle>{{
-          "settings.info.subtitle" | translate
+          "settings.help.subtitle" | translate
         }}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
         <ion-list lines="none">
           <ion-item lines="none">
+            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="paper-plane-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.info.feedbackTitle" | translate }}</h3>
               <p>{{ "settings.info.feedbackSubtitle" | translate }}</p>
@@ -466,6 +564,7 @@
           </ion-item>
 
           <ion-item lines="none">
+            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="star-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.info.rateTitle" | translate }}</h3>
               <p>{{ "settings.info.rateSubtitle" | translate }}</p>
@@ -482,7 +581,23 @@
             </ion-button>
           </ion-item>
 
+          <ion-item
+            lines="none"
+            button
+            detail="true"
+            href="https://fdom92.github.io/Pantry-Manager/terms-of-use"
+            target="_blank"
+            rel="noopener"
+          >
+            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="document-text-outline"></ion-icon>
+            <ion-label>
+              <h3>{{ "settings.help.termsTitle" | translate }}</h3>
+              <p>{{ "settings.help.termsSubtitle" | translate }}</p>
+            </ion-label>
+          </ion-item>
+
           <ion-item lines="none">
+            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="information-circle-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.info.version" | translate }}</h3>
               <p>{{ appVersion }}</p>

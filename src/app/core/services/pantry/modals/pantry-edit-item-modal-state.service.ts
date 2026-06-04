@@ -13,6 +13,8 @@ import {
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { CatalogOptionsService, SettingsPreferencesService } from '../../settings';
 import { PantryStateService } from '../pantry-state.service';
@@ -28,6 +30,7 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
   private readonly catalogOptions = inject(CatalogOptionsService);
   private readonly translate = inject(TranslateService);
   private readonly listState = inject(PantryStateService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly alertCtrl = inject(AlertController);
   private readonly toastCtrl = inject(ToastController);
@@ -86,6 +89,9 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
     this.applyItemToForm(item);
     this.isSaving.set(false);
     this.isOpen.set(true);
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_EDIT_MODAL_OPENED, {
+      kind: item.productType === 'fresh' ? 'fresh' : 'despensa',
+    });
   }
 
   close(): void {
@@ -233,6 +239,9 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
         this.listState.cancelPendingStockSave(item._id);
         await this.pantryStore.updateItem(item);
         await this.eventManager.logAdvancedEdit(existing, item);
+        this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_EDITED, {
+          kind: item.productType === 'fresh' ? 'fresh' : 'despensa',
+        });
       }
       this.dismiss();
       const toast = await this.toastCtrl.create({

@@ -53,4 +53,12 @@ export class OnboardingPage implements AfterViewInit {
   async onDismissNotifications(): Promise<void> {
     await this.facade.dismissNotifications(this.swiperElement?.nativeElement);
   }
+
+  async onAcceptAnalytics(): Promise<void> {
+    await this.facade.acceptAnalytics(this.swiperElement?.nativeElement);
+  }
+
+  async onDismissAnalytics(): Promise<void> {
+    await this.facade.dismissAnalytics(this.swiperElement?.nativeElement);
+  }
 }

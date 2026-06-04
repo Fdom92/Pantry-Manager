@@ -1,14 +1,16 @@
 import { Injectable, inject, Signal, signal } from '@angular/core';
-import { DEFAULT_LANGUAGE, LOCALES, SUPPORTED_LANGUAGES, SupportedLanguage } from '@core/constants';
+import { ANALYTICS_EVENTS, DEFAULT_LANGUAGE, LOCALES, SUPPORTED_LANGUAGES, SupportedLanguage } from '@core/constants';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { normalizeLocaleCode } from '@core/utils/normalization.util';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LanguageService {
   private readonly translate = inject(TranslateService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly currentLanguage = signal<SupportedLanguage>(DEFAULT_LANGUAGE);
 
@@ -33,8 +35,15 @@ export class LanguageService {
   }
 
   async setLanguage(lang: SupportedLanguage): Promise<void> {
+    const previous = this.currentLanguage();
     await firstValueFrom(this.translate.use(lang));
     this.currentLanguage.set(lang);
+    if (previous !== lang) {
+      this.analytics.track(ANALYTICS_EVENTS.PREFERENCE_CHANGED, {
+        key: 'language',
+        value: lang,
+      });
+    }
   }
 
   private isSupportedLanguage(lang: string | null): lang is SupportedLanguage {
