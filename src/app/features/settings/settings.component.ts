@@ -34,7 +34,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import packageJson from '../../../../package.json';
 import { environment } from 'src/environments/environment';
 import { SettingsNotificationsDevStateService } from '@core/services/settings/settings-notifications-dev-state.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-settings',
@@ -77,6 +77,7 @@ export class SettingsComponent {
   private readonly language = inject(LanguageService);
   private readonly marketingSeeder = inject(DevMarketingSeederService);
   private readonly alertCtrl = inject(AlertController);
+  private readonly toastCtrl = inject(ToastController);
 
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
@@ -87,7 +88,17 @@ export class SettingsComponent {
 
   /** Toggle anonymous analytics opt-in/out via the Privacidad card. */
   async onAnalyticsToggle(event: CustomEvent<{ checked: boolean }>): Promise<void> {
-    await this.facade.toggleAnalytics(Boolean(event.detail?.checked));
+    const next = Boolean(event.detail?.checked);
+    await this.facade.toggleAnalytics(next);
+    const messageKey = next
+      ? 'settings.privacy.toastEnabled'
+      : 'settings.privacy.toastDisabled';
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant(messageKey),
+      duration: 1500,
+      position: 'bottom',
+    });
+    void toast.present();
   }
 
   /**

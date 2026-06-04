@@ -1068,7 +1068,11 @@
       "title": "Privacidade",
       "subtitle": "Controla que dados a app partilha.",
       "analyticsLabel": "Partilhar dados de uso",
-      "analyticsDescription": "Dados anónimos para perceber o que funciona. Podes mudar quando quiseres."
+      "analyticsDescription": "Dados anónimos para perceber o que funciona. Podes mudar quando quiseres.",
+      "policyLinkTitle": "Política de privacidade",
+      "policyLinkSubtitle": "Como tratamos os teus dados.",
+      "toastEnabled": "Dados de uso ativados",
+      "toastDisabled": "Dados de uso desativados"
     }
   },
   "reviews": {

@@ -111,6 +111,21 @@
               (ionChange)="onAnalyticsToggle($event)"
             ></ion-toggle>
           </ion-item>
+
+          <ion-item
+            lines="none"
+            button
+            detail="true"
+            href="https://fdom92.github.io/Pantry-Manager/privacy-policy"
+            target="_blank"
+            rel="noopener"
+          >
+            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="shield-checkmark-outline"></ion-icon>
+            <ion-label>
+              <h3>{{ "settings.privacy.policyLinkTitle" | translate }}</h3>
+              <p>{{ "settings.privacy.policyLinkSubtitle" | translate }}</p>
+            </ion-label>
+          </ion-item>
         </ion-list>
       </ion-card-content>
     </ion-card>

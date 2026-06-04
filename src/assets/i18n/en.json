@@ -1068,7 +1068,11 @@
       "title": "Privacy",
       "subtitle": "Control what data the app shares.",
       "analyticsLabel": "Share usage data",
-      "analyticsDescription": "Anonymous data to understand what works. You can change this anytime."
+      "analyticsDescription": "Anonymous data to understand what works. You can change this anytime.",
+      "policyLinkTitle": "Privacy policy",
+      "policyLinkSubtitle": "How we handle your data.",
+      "toastEnabled": "Usage data enabled",
+      "toastDisabled": "Usage data disabled"
     }
   },
   "reviews": {
