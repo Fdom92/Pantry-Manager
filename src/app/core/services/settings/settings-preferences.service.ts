@@ -96,6 +96,8 @@ export class SettingsPreferencesService {
       notifyOnLowStock: Boolean(input?.notifyOnLowStock),
       notifyOnNearExpiry: Boolean(input?.notifyOnNearExpiry),
       notificationHour: this.ensureNotificationHour(input?.notificationHour),
+      analyticsEnabled: typeof input?.analyticsEnabled === 'boolean' ? input.analyticsEnabled : undefined,
+      analyticsDecidedAt: input?.analyticsDecidedAt ?? null,
       lastSyncAt: input?.lastSyncAt ?? null,
       locationOptions: this.ensureLocationOptions(input?.locationOptions),
       categoryOptions: this.ensureCategoryOptions(input?.categoryOptions),

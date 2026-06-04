@@ -4,7 +4,8 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { NotificationContext, ScheduledNotification } from '@core/models/notifications';
-import { NOTIFICATION_IDS } from '@core/constants';
+import { ANALYTICS_EVENTS, NOTIFICATION_IDS } from '@core/constants';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { PantryNavigationPresetService } from '@core/services/pantry/pantry-navigation-preset.service';
 import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
@@ -27,6 +28,7 @@ export class NotificationSchedulerService {
   private readonly translate = inject(TranslateService);
   private readonly welcomeNotif = inject(WelcomeNotificationService);
   private readonly recoveryNotif = inject(RecoveryNotificationsService);
+  private readonly analytics = inject(AnalyticsService);
 
   private isScheduling = false;
 
@@ -49,6 +51,10 @@ export class NotificationSchedulerService {
     // Per-item deep-link path (bet A). Items may have been deleted between
     // schedule and tap, so we fall back to plain pantry if the id is unknown.
     const itemId = typeof extra?.['itemId'] === 'string' ? (extra['itemId'] as string) : undefined;
+    this.analytics.track(ANALYTICS_EVENTS.NOTIFICATION_TAPPED, {
+      notification_id: id,
+      has_deep_link: Boolean(itemId),
+    });
     if (itemId) {
       const exists = this.pantryStore.loadedProducts().some(p => p._id === itemId);
       if (exists) {
@@ -155,6 +161,12 @@ export class NotificationSchedulerService {
         body: winner.body,
         scheduleAt: new Date(winner.scheduleAt),
       }]);
+      this.analytics.track(ANALYTICS_EVENTS.NOTIFICATION_SCHEDULED, {
+        notification_id: winner.id,
+        offset_min: Math.round(
+          (new Date(winner.scheduleAt).getTime() - Date.now()) / 60000
+        ),
+      });
     } catch (err) {
       console.error('[NotificationSchedulerService] scheduleAll error', err);
     } finally {

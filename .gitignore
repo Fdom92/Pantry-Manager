@@ -71,3 +71,6 @@ Thumbs.db
 
 # Claude
 .claude
+
+# Local secrets — must NEVER be committed (public repo).
+src/environments/environment.secrets.ts

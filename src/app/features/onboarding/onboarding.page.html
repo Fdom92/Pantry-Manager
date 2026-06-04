@@ -90,6 +90,43 @@
               </div>
             }
           }
+          @case ('analytics') {
+            <div class="notif-preview analytics-preview">
+              <div class="notif-app-row">
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+                <span class="notif-app-name">
+                  {{ 'onboarding.slides.analytics.previewTitle' | translate }}
+                </span>
+              </div>
+              <div class="notif-body">
+                {{ 'onboarding.slides.analytics.previewBody' | translate }}
+              </div>
+            </div>
+            @if (facade.analyticsDecision() === null) {
+              <div class="slide-cta-stack">
+                <ion-button
+                  expand="block"
+                  shape="round"
+                  color="primary"
+                  (click)="onAcceptAnalytics()">
+                  {{ 'onboarding.actions.analyticsAccept' | translate }}
+                </ion-button>
+                <ion-button
+                  expand="block"
+                  fill="clear"
+                  size="small"
+                  (click)="onDismissAnalytics()">
+                  {{ 'onboarding.actions.analyticsLater' | translate }}
+                </ion-button>
+              </div>
+            } @else {
+              <div class="slide-decision-mark">
+                <ion-icon
+                  [name]="facade.analyticsDecision() === 'granted' ? 'checkmark-circle' : 'close-circle-outline'">
+                </ion-icon>
+              </div>
+            }
+          }
           @case ('seed') {
             <app-onboarding-seed-grid [items]="facade.quickSeedItems" />
             <div class="slide-sticky-footer">
