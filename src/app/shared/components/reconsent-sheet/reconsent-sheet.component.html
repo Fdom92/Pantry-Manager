@@ -1,9 +1,12 @@
+<!--
+  No sheet breakpoints here — the reconsent modal is short (1-2 toggles +
+  footer), so we use auto-height + bottom-aligned positioning instead. This
+  keeps the footer with the CTA buttons reliably above the viewport bottom
+  edge, regardless of how much content the visible questions take.
+-->
 <ion-modal
   class="app-sheet-modal reconsent-sheet"
   [isOpen]="isOpen()"
-  [breakpoints]="[0, 0.85, 1]"
-  [initialBreakpoint]="0.85"
-  [handle]="false"
   [backdropDismiss]="true"
   (didDismiss)="close()"
 >

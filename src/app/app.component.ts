@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { App as CapacitorApp } from '@capacitor/app';
 import { PantryQueryService } from '@core/services/pantry';
@@ -46,6 +46,20 @@ export class AppComponent {
    * cardinality low and stable in PostHog.
    */
   private subscribeToNavigation(): void {
+    // Blur the active element before the transition begins. Ionic flags the
+    // outgoing page with `aria-hidden="true"` (the `ion-page-hidden` class),
+    // and the browser logs a violation if a descendant of that page still
+    // owns focus — typically the tab-bar button the user just tapped.
+    this.router.events
+      .pipe(filter((evt): evt is NavigationStart => evt instanceof NavigationStart))
+      .subscribe(() => {
+        const el = (typeof document !== 'undefined' ? document.activeElement : null) as
+          | (HTMLElement | null);
+        if (el && typeof el.blur === 'function') {
+          el.blur();
+        }
+      });
+
     this.router.events
       .pipe(filter((evt): evt is NavigationEnd => evt instanceof NavigationEnd))
       .subscribe((evt) => {

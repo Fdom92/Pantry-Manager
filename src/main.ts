@@ -106,6 +106,7 @@ import {
   lockClosedOutline,
   moonOutline,
   navigateOutline,
+  notificationsOffOutline,
   notificationsOutline,
   paperPlaneOutline,
   pricetagOutline,
@@ -129,6 +130,7 @@ import {
   storefrontOutline,
   sunnyOutline,
   timeOutline,
+  toggleOutline,
   trashOutline,
   trendingDownOutline,
   warning,
@@ -238,7 +240,9 @@ addIcons({
   'checkmark-outline': checkmarkOutline,
   'send-outline': sendOutline,
   'alarm-outline': alarmOutline,
-  'search-outline': searchOutline
+  'search-outline': searchOutline,
+  'notifications-off-outline': notificationsOffOutline,
+  'toggle-outline': toggleOutline
 });
 
 bootstrapApplication(AppComponent, {
