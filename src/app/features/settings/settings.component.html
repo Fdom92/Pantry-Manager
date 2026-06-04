@@ -532,6 +532,22 @@
             </ion-button>
           </ion-item>
 
+          <ion-item lines="none">
+            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="shield-checkmark-outline"></ion-icon>
+            <ion-label>
+              <h3>{{ "settings.dev.triggerReconsentTitle" | translate }}</h3>
+              <p>{{ "settings.dev.triggerReconsentSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="triggerReconsentSheet()"
+              [attr.aria-label]="'settings.dev.triggerReconsentTitle' | translate"
+            >
+              <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+
         </ion-list>
       </ion-card-content>
     </ion-card>

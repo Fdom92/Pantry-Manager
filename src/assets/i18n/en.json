@@ -1039,7 +1039,9 @@
       "seedMarketingConfirm": "This will delete all current data and replace it with the marketing dataset. Continue?",
       "groupTelemetry": "Telemetry",
       "testCrashTitle": "Trigger test crash",
-      "testCrashSubtitle": "Throw a synthetic error to verify Sentry wiring."
+      "testCrashSubtitle": "Throw a synthetic error to verify Sentry wiring.",
+      "triggerReconsentTitle": "Test reconsent sheet",
+      "triggerReconsentSubtitle": "Resets flags and pops the sheet on the dashboard."
     },
     "info": {
       "title": "Information",

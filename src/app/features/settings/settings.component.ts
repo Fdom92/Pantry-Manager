@@ -10,6 +10,7 @@ import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seed
 import { ANALYTICS_EVENTS, NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
 import { AnalyticsService } from '@core/services/analytics';
 import { LocalStorageService } from '@core/services/shared';
+import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import {
   IonBackButton,
@@ -84,6 +85,7 @@ export class SettingsComponent {
   private readonly toastCtrl = inject(ToastController);
   private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
+  private readonly appPreferences = inject(SettingsPreferencesService);
 
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
@@ -124,6 +126,42 @@ export class SettingsComponent {
   triggerTestCrash(): void {
     const ts = new Date().toISOString();
     throw new Error(`[Dev] Sentry wiring test — fired at ${ts}`);
+  }
+
+  /**
+   * Dev panel: reset every gate that controls the re-consent sheet so the
+   * dashboard sheet pops on the next visit. Useful for QA — testing the
+   * upgrade path from v4.5 → v4.6 without uninstalling.
+   *
+   * Flow:
+   *  - Keep `hasSeenOnboarding = true` (user must look existing).
+   *  - Clear the one-shot `reconsent:shown` flag.
+   *  - Wipe the consent decision timestamps from PouchDB preferences so
+   *    `ReconsentPromptService.resolvePendingQuestions()` reports both as
+   *    pending.
+   *  - Hard-reload onto `/dashboard` to ensure the timer-based prompt fires
+   *    cleanly (no router race against the freshly-saved prefs doc).
+   */
+  async triggerReconsentSheet(): Promise<void> {
+    this.localStorage.onboarding.setSeen(true);
+    // Direct primitive — we want the flag *cleared*, the service only exposes
+    // markShown(). Calling the underlying remove is acceptable in a dev tool.
+    localStorage.removeItem('reconsent:shown');
+
+    try {
+      const prefs = await this.appPreferences.getPreferences();
+      await this.appPreferences.savePreferences({
+        ...prefs,
+        analyticsDecidedAt: null,
+        notificationsDecidedAt: null,
+        analyticsEnabled: undefined,
+      });
+    } catch (err) {
+      console.warn('[Dev] reconsent reset prefs error', err);
+    }
+
+    sessionStorage.setItem('sync:postReload', '1');
+    window.location.href = '/dashboard';
   }
 
   /** Pretty-print a pending notification scheduleAt ISO for the dev panel. */

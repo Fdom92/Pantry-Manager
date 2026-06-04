@@ -1039,7 +1039,9 @@
       "seedMarketingConfirm": "This will delete all current data and replace it with the marketing dataset. Continue?",
       "groupTelemetry": "Telemetria",
       "testCrashTitle": "Disparar crash de teste",
-      "testCrashSubtitle": "Lança um erro sintético para verificar o Sentry."
+      "testCrashSubtitle": "Lança um erro sintético para verificar o Sentry.",
+      "triggerReconsentTitle": "Testar reconsent sheet",
+      "triggerReconsentSubtitle": "Reinicia as flags e abre o sheet no dashboard."
     },
     "info": {
       "title": "Informações",
