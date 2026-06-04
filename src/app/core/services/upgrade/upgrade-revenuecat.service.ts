@@ -1,14 +1,15 @@
-import { Injectable } from '@angular/core';
-import { STORAGE_KEYS } from '@core/constants';
+import { Injectable, inject } from '@angular/core';
 import { normalizePackages, pickPreferredPackage } from '@core/domain/upgrade';
 import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { LocalStorageService } from '../shared/local-storage.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UpgradeRevenuecatService {
+  private readonly storage = inject(LocalStorageService);
   private userId: string | null = null;
   private readonly publicApiKey = environment.revenueCatPublicKey;
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());
@@ -186,19 +187,10 @@ export class UpgradeRevenuecatService {
 
   private updateProState(isPro: boolean): void {
     this.proSubject.next(isPro);
-    try {
-      localStorage.setItem(STORAGE_KEYS.PRO_STATUS, JSON.stringify(isPro));
-    } catch (err) {
-      console.warn('[UpgradeRevenuecatService] failed to persist state', err);
-    }
+    this.storage.pro.setStatus(isPro);
   }
 
   private loadStoredState(): boolean {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEYS.PRO_STATUS);
-      return raw ? JSON.parse(raw) : false;
-    } catch {
-      return false;
-    }
+    return this.storage.pro.getStatus() ?? false;
   }
 }

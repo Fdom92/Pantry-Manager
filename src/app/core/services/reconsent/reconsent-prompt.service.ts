@@ -1,8 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { STORAGE_KEYS } from '@core/constants';
-import { getBooleanFlag, setBooleanFlag } from '@core/utils/storage-flag.util';
 import { NotificationPermissionService } from '../notifications/notification-permission.service';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
+import { LocalStorageService } from '../shared/local-storage.service';
 
 /**
  * Decides whether the post-update consent sheet must be shown to existing users
@@ -21,6 +20,7 @@ import { SettingsPreferencesService } from '../settings/settings-preferences.ser
 export class ReconsentPromptService {
   private readonly permission = inject(NotificationPermissionService);
   private readonly prefs = inject(SettingsPreferencesService);
+  private readonly localStorage = inject(LocalStorageService);
 
   /** True while the sheet is open. Used by the dashboard to avoid double-mounting. */
   readonly isSheetOpen = signal(false);
@@ -32,11 +32,8 @@ export class ReconsentPromptService {
    * see both questions inside the onboarding itself and must never see this.
    */
   async shouldShow(): Promise<boolean> {
-    const hasSeenOnboarding = getBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG);
-    if (!hasSeenOnboarding) return false;
-
-    const alreadyShown = getBooleanFlag(STORAGE_KEYS.RECONSENT_SHOWN);
-    if (alreadyShown) return false;
+    if (!this.localStorage.onboarding.isSeen()) return false;
+    if (this.localStorage.reconsent.isShown()) return false;
 
     const pending = await this.resolvePendingQuestions();
     return pending.notifications || pending.analytics;
@@ -53,15 +50,27 @@ export class ReconsentPromptService {
     const prefs = await this.prefs.getPreferences();
     await this.permission.init();
 
-    // Notifications: ask only if the OS permission has never been granted and
-    // is not permanently denied (asking on denied is pointless — Android won't
-    // surface the system dialog).
+    // Notifications gate:
+    //   1. If we recorded a decision in preferences, never ask again here —
+    //      the user can revisit in Settings → Notificaciones.
+    //   2. If the OS reports the permission is granted or permanently denied,
+    //      asking adds nothing (granted = already on; denied = OS dialog won't
+    //      reappear on Android).
+    //   3. The default `permissionState === 'unknown'` happens in web dev and
+    //      occasionally in fresh Capacitor sessions; treat it as "do not ask"
+    //      to avoid prompting users whose OS permission may already be on but
+    //      we just haven't queried yet.
+    const permissionState = this.permission.permissionState();
+    const notificationsAlreadyDecided = prefs.notificationsDecidedAt != null;
     const notifications =
-      !this.permission.isGranted() && !this.permission.isPermanentlyDenied();
+      !notificationsAlreadyDecided &&
+      permissionState !== 'granted' &&
+      permissionState !== 'denied' &&
+      permissionState !== 'unknown';
 
-    // Analytics: ask only if we have never recorded a decision. Both true and
-    // false `analyticsEnabled` after `analyticsDecidedAt` is set mean the user
-    // already chose.
+    // Analytics gate: ask only if we have never recorded a decision. Both
+    // true and false `analyticsEnabled` after `analyticsDecidedAt` is set
+    // mean the user already chose.
     const analytics = prefs.analyticsDecidedAt == null;
 
     return { notifications, analytics };
@@ -72,6 +81,6 @@ export class ReconsentPromptService {
    * crash mid-flow doesn't make the prompt reappear forever.
    */
   markShown(): void {
-    setBooleanFlag(STORAGE_KEYS.RECONSENT_SHOWN, true);
+    this.localStorage.reconsent.markShown();
   }
 }

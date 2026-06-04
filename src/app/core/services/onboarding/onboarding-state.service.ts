@@ -1,12 +1,13 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { ANALYTICS_EVENTS, ONBOARDING_QUICK_SEED_ITEMS, ONBOARDING_SLIDES, STORAGE_KEYS } from '@core/constants';
+import { ANALYTICS_EVENTS, ONBOARDING_QUICK_SEED_ITEMS, ONBOARDING_SLIDES } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
+import { LocalStorageService } from '../shared/local-storage.service';
 import type { OnboardingQuickSeedItem } from '@core/constants';
 import { buildAddItemPayload, FRESH_QTY } from '@core/domain/pantry';
 import type { OnboardingSlide } from '@core/models/onboarding';
 import type { PantryItem } from '@core/models/pantry';
 import { createDocumentId } from '@core/utils';
-import { setBooleanFlag } from '@core/utils/storage-flag.util';
+// Direct localStorage usage replaced by `LocalStorageService` (DI below).
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { PantryStoreService } from '../pantry/pantry-store.service';
@@ -45,6 +46,7 @@ export class OnboardingStateService {
   private readonly recoveryNotif = inject(RecoveryNotificationsService);
   private readonly translate = inject(TranslateService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly localStorage = inject(LocalStorageService);
 
   readonly slideOptions: SwiperOptions = {
     speed: 550,
@@ -132,15 +134,16 @@ export class OnboardingStateService {
   async acceptNotifications(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
     const granted = await this.notificationPermission.request();
     this.notificationsDecision.set(granted ? 'granted' : 'denied');
+    const current = await this.preferences.getPreferences();
+    await this.preferences.savePreferences({
+      ...current,
+      notificationsEnabled: granted ? true : current.notificationsEnabled,
+      notifyOnExpired: granted ? true : current.notifyOnExpired,
+      notifyOnNearExpiry: granted ? true : current.notifyOnNearExpiry,
+      notifyOnLowStock: granted ? true : current.notifyOnLowStock,
+      notificationsDecidedAt: new Date().toISOString(),
+    });
     if (granted) {
-      const current = await this.preferences.getPreferences();
-      await this.preferences.savePreferences({
-        ...current,
-        notificationsEnabled: true,
-        notifyOnExpired: true,
-        notifyOnNearExpiry: true,
-        notifyOnLowStock: true,
-      });
       await this.welcomeNotif.scheduleWelcomeNotification();
     }
     await this.goToNextSlide(swiperEl);
@@ -149,6 +152,13 @@ export class OnboardingStateService {
   /** User postponed notifications on slide 1. */
   async dismissNotifications(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
     this.notificationsDecision.set('later');
+    // Record the implicit decline so the re-consent sheet does not re-ask
+    // immediately on the dashboard.
+    const current = await this.preferences.getPreferences();
+    await this.preferences.savePreferences({
+      ...current,
+      notificationsDecidedAt: new Date().toISOString(),
+    });
     await this.goToNextSlide(swiperEl);
   }
 
@@ -189,7 +199,14 @@ export class OnboardingStateService {
   }
 
   async completeOnboarding(options?: { skipped?: boolean }): Promise<void> {
-    setBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG, true);
+    this.localStorage.onboarding.setSeen(true);
+
+    // Record a decision for any consent the user has not explicitly handled
+    // (typically via "Skip"). Without this, the post-update re-consent sheet
+    // would later surface the same question on the dashboard — confusing for
+    // a user who already chose to bypass the onboarding deliberately.
+    await this.recordImplicitConsentDecisions();
+
     this.analytics.track(ANALYTICS_EVENTS.ONBOARDING_COMPLETED, {
       seed_count: this.selectedCount(),
       notif_granted: this.notificationsDecision() === 'granted',
@@ -208,6 +225,37 @@ export class OnboardingStateService {
     // First post-onboarding view = pantry so user sees their seeded products.
     // Subsequent app launches default-route back to /dashboard.
     await this.navCtrl.navigateRoot('/pantry');
+  }
+
+  /**
+   * Persist an explicit "no" decision for every consent flow the user did not
+   * confirm during onboarding. Prevents the re-consent sheet from re-asking the
+   * same question on the dashboard immediately after a skip — that would feel
+   * nagging.
+   *
+   * Only stamps `analyticsDecidedAt` and `notificationsDecidedAt`. The actual
+   * `analyticsEnabled` / `notificationsEnabled` flags stay at whatever
+   * `acceptAnalytics` / `acceptNotifications` already wrote, or the safe
+   * default of false.
+   */
+  private async recordImplicitConsentDecisions(): Promise<void> {
+    const current = await this.preferences.getPreferences();
+    const now = new Date().toISOString();
+    const patch: Partial<typeof current> = {};
+
+    if (current.analyticsDecidedAt == null) {
+      patch.analyticsDecidedAt = now;
+      if (typeof current.analyticsEnabled !== 'boolean') {
+        patch.analyticsEnabled = false;
+      }
+    }
+    if (current.notificationsDecidedAt == null) {
+      patch.notificationsDecidedAt = now;
+    }
+
+    if (Object.keys(patch).length) {
+      await this.preferences.savePreferences({ ...current, ...patch });
+    }
   }
 
   /**

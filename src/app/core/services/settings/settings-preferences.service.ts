@@ -98,6 +98,7 @@ export class SettingsPreferencesService {
       notificationHour: this.ensureNotificationHour(input?.notificationHour),
       analyticsEnabled: typeof input?.analyticsEnabled === 'boolean' ? input.analyticsEnabled : undefined,
       analyticsDecidedAt: input?.analyticsDecidedAt ?? null,
+      notificationsDecidedAt: input?.notificationsDecidedAt ?? null,
       lastSyncAt: input?.lastSyncAt ?? null,
       locationOptions: this.ensureLocationOptions(input?.locationOptions),
       categoryOptions: this.ensureCategoryOptions(input?.categoryOptions),

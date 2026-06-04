@@ -16,8 +16,14 @@ export interface AppPreferences {
    * `undefined` = user has not been asked yet (consent flow pending).
    */
   analyticsEnabled?: boolean;
-  /** Timestamp (ISO) when consent decision was recorded. Null until asked. */
+  /** Timestamp (ISO) when analytics consent decision was recorded. Null until asked. */
   analyticsDecidedAt?: string | null;
+  /**
+   * Timestamp (ISO) when the notifications opt-in question was last decided
+   * (accept / decline / skip). Null until asked. Used by the re-consent sheet
+   * to know whether a user has already been prompted.
+   */
+  notificationsDecidedAt?: string | null;
   lastSyncAt?: string | null;
   locationOptions: string[];
   categoryOptions: string[];

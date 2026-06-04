@@ -2,8 +2,8 @@ import { Component, inject } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { App as CapacitorApp } from '@capacitor/app';
-import { STORAGE_KEYS } from '@core/constants';
 import { PantryQueryService } from '@core/services/pantry';
+import { LocalStorageService } from '@core/services/shared';
 import { MigrationPantryService } from '@core/services/migration/migration-pantry.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
@@ -11,6 +11,7 @@ import { RecoveryNotificationsService } from '@core/services/notifications/recov
 import { SyncService } from '@core/services/sync/sync.service';
 import { AnalyticsService } from '@core/services/analytics';
 import { ANALYTICS_EVENTS } from '@core/constants';
+// STORAGE_KEYS removed: callers go through LocalStorageService.
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
@@ -33,6 +34,7 @@ export class AppComponent {
   private readonly recoveryNotif = inject(RecoveryNotificationsService);
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly localStorage = inject(LocalStorageService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -130,23 +132,18 @@ export class AppComponent {
   }
 
   private getOrCreateUserId(): string {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.REVENUECAT_USER_ID);
-      if (stored) return stored;
-      const generated = (crypto?.randomUUID?.() ?? `user-${Date.now()}`);
-      localStorage.setItem(STORAGE_KEYS.REVENUECAT_USER_ID, generated);
-      return generated;
-    } catch {
-      return 'local-user';
-    }
+    const stored = this.localStorage.revenuecat.getUserId();
+    if (stored) return stored;
+    const generated = (crypto?.randomUUID?.() ?? `user-${Date.now()}`);
+    this.localStorage.revenuecat.setUserId(generated);
+    return generated;
   }
 
   private redirectToFirstRunFlows(): void {
     try {
-      const hasSeenOnboarding = localStorage.getItem(STORAGE_KEYS.ONBOARDING_FLAG);
       const currentUrl = this.router.url ?? '';
       const alreadyOnboarding = currentUrl.startsWith('/onboarding');
-      if (!hasSeenOnboarding && !alreadyOnboarding) {
+      if (!this.localStorage.onboarding.isSeen() && !alreadyOnboarding) {
         void this.navCtrl.navigateRoot('/onboarding');
       }
     } catch (err) {

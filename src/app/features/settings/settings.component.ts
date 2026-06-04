@@ -7,8 +7,9 @@ import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
-import { ANALYTICS_EVENTS, NOTIFICATION_IDS, STORAGE_KEYS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
+import { ANALYTICS_EVENTS, NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
 import { AnalyticsService } from '@core/services/analytics';
+import { LocalStorageService } from '@core/services/shared';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import {
   IonBackButton,
@@ -82,6 +83,7 @@ export class SettingsComponent {
   private readonly alertCtrl = inject(AlertController);
   private readonly toastCtrl = inject(ToastController);
   private readonly analytics = inject(AnalyticsService);
+  private readonly localStorage = inject(LocalStorageService);
 
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
@@ -256,10 +258,9 @@ export class SettingsComponent {
     if (this.isResettingOnboarding()) return;
     this.isResettingOnboarding.set(true);
     try {
-      // Wipe every per-device flag so the Dev "Reset onboarding" button gives a
-      // truly fresh-install experience (onboarding + re-consent + review prompts).
-      localStorage.removeItem(STORAGE_KEYS.ONBOARDING_FLAG);
-      localStorage.removeItem(STORAGE_KEYS.RECONSENT_SHOWN);
+      // Wipe every per-device flag so the Dev "Reset onboarding" button gives
+      // a truly fresh-install experience (onboarding + re-consent + review).
+      this.localStorage.onboarding.reset();
     } finally {
       this.isResettingOnboarding.set(false);
     }

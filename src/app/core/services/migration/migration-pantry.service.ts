@@ -5,16 +5,17 @@ import type { LegacyLocationStock, LegacyPantryItem } from '@core/models/migrati
 import type { ItemBatch } from '@core/models/pantry';
 import { PantryService } from '@core/services/pantry/pantry.service';
 import { normalizeLocationId } from '@core/utils/normalization.util';
-import { getBooleanFlag, setBooleanFlag } from '@core/utils/storage-flag.util';
+import { LocalStorageService } from '@core/services/shared/local-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class MigrationPantryService {
   private readonly pantryService = inject(PantryService);
+  private readonly storage = inject(LocalStorageService);
   private readonly PAGE_SIZE = 200;
-  private readonly MIGRATION_CHECK_KEY = 'pantry:migration:2.6';
+  private readonly MIGRATION_VERSION = '2.6';
 
   async migrateIfNeeded(): Promise<void> {
-    if (!getBooleanFlag(this.MIGRATION_CHECK_KEY, true)) {
+    if (!this.storage.migration.isPending(this.MIGRATION_VERSION)) {
       return;
     }
     const db = this.pantryService.getMigrationDatabase();
@@ -45,7 +46,7 @@ export class MigrationPantryService {
     }
 
     if (!legacyItems.length) {
-      setBooleanFlag(this.MIGRATION_CHECK_KEY, false);
+      this.storage.migration.markDone(this.MIGRATION_VERSION);
       return;
     }
 
@@ -63,14 +64,14 @@ export class MigrationPantryService {
           });
         })
       );
-      setBooleanFlag(this.MIGRATION_CHECK_KEY, false);
+      this.storage.migration.markDone(this.MIGRATION_VERSION);
     } catch (err) {
       console.error('[MigrationPantryService] migrateIfNeeded error', err);
     }
   }
 
   markMigrationCheckNeeded(): void {
-    setBooleanFlag(this.MIGRATION_CHECK_KEY, true);
+    this.storage.migration.markPending(this.MIGRATION_VERSION);
   }
 
   private shouldMigrate(item: LegacyPantryItem): boolean {
