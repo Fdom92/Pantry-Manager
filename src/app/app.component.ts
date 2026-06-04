@@ -4,7 +4,6 @@ import { filter } from 'rxjs/operators';
 import { App as CapacitorApp } from '@capacitor/app';
 import { PantryQueryService } from '@core/services/pantry';
 import { LocalStorageService } from '@core/services/shared';
-import { MigrationPantryService } from '@core/services/migration/migration-pantry.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
 import { RecoveryNotificationsService } from '@core/services/notifications/recovery-notifications.service';
@@ -26,7 +25,6 @@ export class AppComponent {
 
   // DI
   private readonly pantryQuery = inject(PantryQueryService);
-  private readonly pantryMigration = inject(MigrationPantryService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
@@ -62,7 +60,6 @@ export class AppComponent {
     await this.analytics.bootstrap();
     this.analytics.track(ANALYTICS_EVENTS.APP_OPEN);
     await this.pantryQuery.initialize();
-    await this.pantryMigration.migrateIfNeeded();
     await this.pantryQuery.ensureFirstPageLoaded();
     this.pantryQuery.startBackgroundLoad();
     await this.notificationScheduler.scheduleAll();

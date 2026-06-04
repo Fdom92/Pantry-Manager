@@ -184,10 +184,6 @@ export class PantryService extends StorageService<PantryItem> {
     });
   }
 
-  getMigrationDatabase(): PouchDB.Database<PantryItem> {
-    return this.database;
-  }
-
   /** Compute aggregate fields without mutating the original payload. */
   private applyDerivedFields(item: PantryItem): PantryItem {
     const rawBatches = Array.isArray(item.batches) ? item.batches : [];

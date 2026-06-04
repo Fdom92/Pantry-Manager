@@ -62,25 +62,6 @@ export class LocalStorageService {
     setEnabled: (v: boolean) => this.setBool(STORAGE_KEYS.ERROR_REPORTING_ENABLED, v),
   };
 
-  // ─── Migration markers ─────────────────────────────────────────────────
-  // The PouchDB migration system stamps a versioned boolean to remember if a
-  // legacy-to-current data shift has already run for this install. The version
-  // is encoded in the key (`pantry:migration:X.Y`) so a new release that
-  // introduces a new migration is always treated as "not yet applied" until it
-  // explicitly stamps its own key.
-  readonly migration = {
-    /**
-     * @param version migration version identifier, e.g. `'2.6'`.
-     * @param defaultValue value returned when the flag has never been written.
-     */
-    isPending: (version: string, defaultValue = true): boolean =>
-      this.getBool(`pantry:migration:${version}`, defaultValue),
-    markDone: (version: string) =>
-      this.setBool(`pantry:migration:${version}`, false),
-    markPending: (version: string) =>
-      this.setBool(`pantry:migration:${version}`, true),
-  };
-
   // ─── In-app review prompt cadence ──────────────────────────────────────
   readonly review = {
     isPending: () => this.getBool(STORAGE_KEYS.REVIEW_PENDING),

@@ -1,5 +1,4 @@
 export * from './dashboard';
-export * from './migration';
 export * from './onboarding';
 export * from './pantry';
 export * from './settings';
