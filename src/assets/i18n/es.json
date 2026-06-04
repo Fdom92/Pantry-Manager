@@ -17,7 +17,9 @@
       "continue": "Continuar",
       "enter": "Entrar a mi despensa",
       "notifyMe": "Sí, avísame",
-      "notifyLater": "Más tarde"
+      "notifyLater": "Más tarde",
+      "analyticsAccept": "Sí, ayudar",
+      "analyticsLater": "Ahora no"
     },
     "slides": {
       "notifications": {
@@ -41,6 +43,12 @@
         "noExpiryLabel": "Sin caducidad",
         "needsDateLabel": "Pendiente fecha",
         "adjustHint": "Ajusta fechas y cantidades en tu despensa cuando quieras."
+      },
+      "analytics": {
+        "title": "Ayúdanos a mejorar",
+        "description": "Comparte datos anónimos de uso. Sin nombres, sin productos, sin ubicación.",
+        "previewTitle": "Análisis anónimo",
+        "previewBody": "Solo medimos cómo usas la app: pantallas, toques y abandonos. Nada personal."
       }
     },
     "quickSeed": {
@@ -846,7 +854,9 @@
       "statusDescription": "Gracias por apoyar el proyecto. PRO está activo en este dispositivo.",
       "upgradePrompt": "Hazte PRO para desbloquear el historial completo y funciones premium.",
       "upgradeCta": "Hazte PRO",
-      "badgePro": "PRO activo"
+      "badgePro": "PRO activo",
+      "activeTitle": "PRO activo",
+      "upgradeTitle": "Hazte PRO"
     },
     "appearance": {
       "title": "Apariencia",
@@ -856,7 +866,9 @@
       "light": "Claro",
       "dark": "Oscuro",
       "system": "Sistema",
-      "error": "No se pudo actualizar el tema."
+      "error": "No se pudo actualizar el tema.",
+      "language": "Idioma",
+      "languageDescription": "Cambia el idioma de la app."
     },
     "advanced": {
       "title": "Datos",
@@ -1023,7 +1035,10 @@
       "languageSelectorSubtitle": "Fuerza el idioma de la UI para capturas sin cambiar los ajustes del móvil",
       "seedMarketingTitle": "Cargar base de datos de marketing",
       "seedMarketingSubtitle": "Borra todos los datos y carga contenido demo realista para capturas",
-      "seedMarketingConfirm": "¿Borrar todos los datos actuales y reemplazarlos con el dataset de marketing? Esta acción no se puede deshacer."
+      "seedMarketingConfirm": "¿Borrar todos los datos actuales y reemplazarlos con el dataset de marketing? Esta acción no se puede deshacer.",
+      "groupTelemetry": "Telemetría",
+      "testCrashTitle": "Disparar crash de prueba",
+      "testCrashSubtitle": "Lanza un error sintético para verificar Sentry."
     },
     "info": {
       "title": "Información",
@@ -1052,6 +1067,22 @@
       "permissionDeniedTitle": "Notificaciones bloqueadas",
       "permissionDeniedMessage": "¡Vaya! Parece que anteriormente desactivaste el permiso de notificaciones. Para volver a activarlas, ve a los Ajustes de tu dispositivo, busca la app y activa las notificaciones desde ahí.",
       "permissionDeniedButton": "Entendido"
+    },
+    "privacy": {
+      "title": "Privacidad",
+      "subtitle": "Controla qué datos comparte la app.",
+      "analyticsLabel": "Compartir datos de uso",
+      "analyticsDescription": "Datos anónimos para entender qué funciona. Puedes cambiarlo en cualquier momento.",
+      "policyLinkTitle": "Política de privacidad",
+      "policyLinkSubtitle": "Cómo tratamos tus datos.",
+      "toastEnabled": "Datos de uso activados",
+      "toastDisabled": "Datos de uso desactivados"
+    },
+    "help": {
+      "title": "Ayuda y legal",
+      "subtitle": "Soporte, valoración y documentos legales.",
+      "termsTitle": "Términos de uso",
+      "termsSubtitle": "Condiciones de servicio."
     }
   },
   "reviews": {
@@ -1155,6 +1186,23 @@
     "toast": {
       "updated_one": "1 producto actualizado",
       "updated_other": "{{ count }} productos actualizados"
+    }
+  },
+  "reconsent": {
+    "title": "Algunas opciones nuevas",
+    "intro": "Hemos añadido funciones que requieren tu permiso. Puedes cambiarlo cuando quieras en Ajustes.",
+    "footnote": "Tu privacidad importa. Nada sale de tu dispositivo sin tu permiso.",
+    "notifications": {
+      "label": "Recibir avisos",
+      "description": "Te avisamos cuando algo caduca o se acaba."
+    },
+    "analytics": {
+      "label": "Compartir datos anónimos",
+      "description": "Solo medimos cómo usas la app. Sin nombres, sin productos."
+    },
+    "actions": {
+      "confirm": "Hecho",
+      "later": "Ahora no"
     }
   }
 }

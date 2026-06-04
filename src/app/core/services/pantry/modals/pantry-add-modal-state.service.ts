@@ -9,6 +9,8 @@ import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { withSignalFlag } from '@core/utils';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { LanguageService } from '../../shared/language.service';
 import { PantryStoreService } from '../pantry-store.service';
@@ -23,6 +25,7 @@ export class PantryAddModalStateService {
   private readonly toastCtrl = inject(ToastController);
   private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly addModalOpen = signal(false);
   readonly isAdding = signal(false);
@@ -66,6 +69,7 @@ export class PantryAddModalStateService {
     this.addQuery.set('');
     this.addModalOpen.set(true);
     this.isAdding.set(false);
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_ADD_MODAL_OPENED);
   }
 
   /**
@@ -116,6 +120,13 @@ export class PantryAddModalStateService {
           const item: PantryItem = { ...base, productType: 'pantry' };
           await this.pantryStore.addItem(item);
           await this.eventManager.logAddNewItem(item, entry.quantity, sessionId, timestamp);
+          this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
+            kind: 'despensa',
+            source: 'add_modal',
+            is_new: true,
+            quantity: entry.quantity,
+            has_expiry: Boolean(entry.expirationDate),
+          });
           continue;
         }
 
@@ -127,6 +138,13 @@ export class PantryAddModalStateService {
         if (updated) {
           await this.pantryStore.updateItem(updated);
           await this.eventManager.logAddExistingItem(entry.item, updated, entry.quantity, entry.expirationDate, sessionId, timestamp);
+          this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
+            kind: 'despensa',
+            source: 'add_modal',
+            is_new: false,
+            quantity: entry.quantity,
+            has_expiry: Boolean(entry.expirationDate),
+          });
         }
       }
       this.dismissAddModal();

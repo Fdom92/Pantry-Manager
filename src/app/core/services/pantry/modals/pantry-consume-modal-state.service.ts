@@ -5,6 +5,8 @@ import { dedupeByNormalizedKey } from '@core/utils/normalization.util';
 import { withSignalFlag } from '@core/utils';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../../analytics/analytics.service';
 import { LanguageService } from '../../shared/language.service';
 import { ReviewPromptService } from '../../shared/review-prompt.service';
 import { PantryBatchOperationsService } from '../pantry-batch-operations.service';
@@ -19,6 +21,7 @@ export class PantryConsumeModalStateService {
   private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly languageService = inject(LanguageService);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly analytics = inject(AnalyticsService);
 
   // Reference to pantry items state for optimistic updates
   pantryItemsState?: WritableSignal<PantryItem[]>;
@@ -51,6 +54,7 @@ export class PantryConsumeModalStateService {
     this.consumeQuery.set('');
     this.consumeModalOpen.set(true);
     this.isConsuming.set(false);
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_CONSUME_MODAL_OPENED);
   }
 
   /**
@@ -100,6 +104,11 @@ export class PantryConsumeModalStateService {
           undefined,
           sessionId
         );
+        this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_CONSUMED, {
+          kind: latestItem.productType === 'fresh' ? 'fresh' : 'despensa',
+          source: 'consume_modal',
+          quantity: entry.quantity,
+        });
       }
       this.dismissConsumeModal();
       this.reviewPrompt.handleConsumeCompleted();

@@ -17,7 +17,9 @@
       "continue": "Continuer",
       "enter": "Ouvrir mon garde-manger",
       "notifyMe": "Oui, préviens-moi",
-      "notifyLater": "Plus tard"
+      "notifyLater": "Plus tard",
+      "analyticsAccept": "Oui, j’aide",
+      "analyticsLater": "Pas maintenant"
     },
     "slides": {
       "notifications": {
@@ -41,6 +43,12 @@
         "noExpiryLabel": "Sans expiration",
         "needsDateLabel": "Date à définir",
         "adjustHint": "Tu pourras ajuster dates et quantités plus tard dans ton garde-manger."
+      },
+      "analytics": {
+        "title": "Aide-nous à améliorer l’app",
+        "description": "Partage des données anonymes d’utilisation. Pas de noms, pas de produits, pas de localisation.",
+        "previewTitle": "Analyses anonymes",
+        "previewBody": "On mesure seulement comment tu utilises l’app : écrans, clics et abandons. Rien de personnel."
       }
     },
     "quickSeed": {
@@ -846,7 +854,9 @@
       "statusDescription": "Merci de soutenir le projet. PRO est actif sur cet appareil.",
       "upgradePrompt": "Passez en PRO pour débloquer l’historique complet et les fonctionnalités premium.",
       "upgradeCta": "Passer en PRO",
-      "badgePro": "PRO actif"
+      "badgePro": "PRO actif",
+      "activeTitle": "PRO actif",
+      "upgradeTitle": "Passer en PRO"
     },
     "appearance": {
       "title": "Apparence",
@@ -856,7 +866,9 @@
       "light": "Clair",
       "dark": "Sombre",
       "system": "Système",
-      "error": "Impossible de mettre à jour le thème."
+      "error": "Impossible de mettre à jour le thème.",
+      "language": "Langue",
+      "languageDescription": "Change la langue de l'app."
     },
     "advanced": {
       "title": "Données",
@@ -1023,7 +1035,10 @@
       "languageSelectorSubtitle": "Force UI language for screenshots without changing device settings",
       "seedMarketingTitle": "Load marketing database",
       "seedMarketingSubtitle": "Clear all data and seed realistic demo content for screenshots",
-      "seedMarketingConfirm": "This will delete all current data and replace it with the marketing dataset. Continue?"
+      "seedMarketingConfirm": "This will delete all current data and replace it with the marketing dataset. Continue?",
+      "groupTelemetry": "Télémétrie",
+      "testCrashTitle": "Déclencher un crash test",
+      "testCrashSubtitle": "Lance une erreur synthétique pour vérifier Sentry."
     },
     "info": {
       "title": "Informations",
@@ -1052,6 +1067,22 @@
       "permissionDeniedTitle": "Notifications bloquées",
       "permissionDeniedMessage": "Il semble que tu aies précédemment refusé l'autorisation des notifications. Pour les réactiver, va dans les Paramètres de ton appareil, trouve l'app et active les notifications.",
       "permissionDeniedButton": "Compris"
+    },
+    "privacy": {
+      "title": "Confidentialité",
+      "subtitle": "Contrôle les données partagées par l’app.",
+      "analyticsLabel": "Partager les données d’usage",
+      "analyticsDescription": "Données anonymes pour comprendre ce qui marche. Modifiable à tout moment.",
+      "policyLinkTitle": "Politique de confidentialité",
+      "policyLinkSubtitle": "Comment nous traitons tes données.",
+      "toastEnabled": "Données d'usage activées",
+      "toastDisabled": "Données d'usage désactivées"
+    },
+    "help": {
+      "title": "Aide et mentions légales",
+      "subtitle": "Support, évaluations et documents légaux.",
+      "termsTitle": "Conditions d'utilisation",
+      "termsSubtitle": "Conditions de service."
     }
   },
   "reviews": {
@@ -1155,6 +1186,23 @@
     "toast": {
       "updated_one": "1 produit mis à jour",
       "updated_other": "{{ count }} produits mis à jour"
+    }
+  },
+  "reconsent": {
+    "title": "Quelques nouvelles options",
+    "intro": "On a ajouté des fonctions qui nécessitent ta permission. Modifiable à tout moment dans les Paramètres.",
+    "footnote": "Ta vie privée compte. Rien ne quitte ton appareil sans permission.",
+    "notifications": {
+      "label": "Recevoir des alertes",
+      "description": "On te prévient quand quelque chose va expirer ou s'épuiser."
+    },
+    "analytics": {
+      "label": "Partager des données anonymes",
+      "description": "On mesure seulement comment tu utilises l'app. Pas de noms, pas de produits."
+    },
+    "actions": {
+      "confirm": "Terminé",
+      "later": "Pas maintenant"
     }
   }
 }

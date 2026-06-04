@@ -7,10 +7,12 @@ import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
-import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
+import { ANALYTICS_EVENTS, NOTIFICATION_IDS, STORAGE_KEYS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
+import { AnalyticsService } from '@core/services/analytics';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import {
   IonBackButton,
+  IonBadge,
   IonButton,
   IonButtons,
   IonCard,
@@ -27,13 +29,14 @@ import {
   IonListHeader,
   IonSpinner,
   IonTitle,
+  IonToggle,
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import packageJson from '../../../../package.json';
 import { environment } from 'src/environments/environment';
 import { SettingsNotificationsDevStateService } from '@core/services/settings/settings-notifications-dev-state.service';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-settings',
@@ -43,6 +46,7 @@ import { AlertController } from '@ionic/angular';
     IonToolbar,
     IonButtons,
     IonBackButton,
+    IonBadge,
     IonTitle,
     IonContent,
     IonCard,
@@ -57,6 +61,7 @@ import { AlertController } from '@ionic/angular';
     IonButton,
     IonIcon,
     IonSpinner,
+    IonToggle,
     CommonModule,
     RouterLink,
     TranslateModule,
@@ -75,6 +80,8 @@ export class SettingsComponent {
   private readonly language = inject(LanguageService);
   private readonly marketingSeeder = inject(DevMarketingSeederService);
   private readonly alertCtrl = inject(AlertController);
+  private readonly toastCtrl = inject(ToastController);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
@@ -82,6 +89,40 @@ export class SettingsComponent {
   readonly SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
   readonly currentLanguage = this.language.currentLanguage;
   protected readonly NOTIFICATION_IDS = NOTIFICATION_IDS;
+
+  /**
+   * Upgrade hero card CTA — emits an analytics event tagged with the entry
+   * point so the PRO funnel can attribute conversions to Settings vs Insights.
+   */
+  onUpgradeTap(): void {
+    this.analytics.track(ANALYTICS_EVENTS.UPGRADE_TAPPED, { source: 'settings_hero' });
+    this.facade.navigateToUpgrade();
+  }
+
+  /** Toggle anonymous analytics opt-in/out via the Privacidad card. */
+  async onAnalyticsToggle(event: CustomEvent<{ checked: boolean }>): Promise<void> {
+    const next = Boolean(event.detail?.checked);
+    await this.facade.toggleAnalytics(next);
+    const messageKey = next
+      ? 'settings.privacy.toastEnabled'
+      : 'settings.privacy.toastDisabled';
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant(messageKey),
+      duration: 1500,
+      position: 'bottom',
+    });
+    void toast.present();
+  }
+
+  /**
+   * Dev panel: throw a synthetic error so Sentry's Angular `ErrorHandler`
+   * captures it and we can verify the wiring end-to-end without DevTools.
+   * Requires analytics consent ON — otherwise `beforeSend` will drop the event.
+   */
+  triggerTestCrash(): void {
+    const ts = new Date().toISOString();
+    throw new Error(`[Dev] Sentry wiring test — fired at ${ts}`);
+  }
 
   /** Pretty-print a pending notification scheduleAt ISO for the dev panel. */
   formatPendingTime(iso?: string): string {
@@ -215,7 +256,10 @@ export class SettingsComponent {
     if (this.isResettingOnboarding()) return;
     this.isResettingOnboarding.set(true);
     try {
-      localStorage.removeItem('hasSeenOnboarding');
+      // Wipe every per-device flag so the Dev "Reset onboarding" button gives a
+      // truly fresh-install experience (onboarding + re-consent + review prompts).
+      localStorage.removeItem(STORAGE_KEYS.ONBOARDING_FLAG);
+      localStorage.removeItem(STORAGE_KEYS.RECONSENT_SHOWN);
     } finally {
       this.isResettingOnboarding.set(false);
     }

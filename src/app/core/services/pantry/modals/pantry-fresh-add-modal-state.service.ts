@@ -7,6 +7,8 @@ import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { LanguageService } from '../../shared/language.service';
 import { PantryStoreService } from '../pantry-store.service';
@@ -23,6 +25,7 @@ export class PantryFreshAddModalStateService {
   private readonly toastCtrl = inject(ToastController);
   private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly isOpen = signal(false);
   readonly isSubmitting = signal(false);
@@ -59,6 +62,7 @@ export class PantryFreshAddModalStateService {
     this.query.set('');
     this.isOpen.set(true);
     this.isSubmitting.set(false);
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_FRESH_ADD_MODAL_OPENED);
   }
 
   close(): void {
@@ -180,6 +184,13 @@ export class PantryFreshAddModalStateService {
           };
           await this.pantryStore.addItem(freshItem);
           await this.eventManager.logAddNewItem(freshItem, 3, sessionId, timestamp);
+          this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
+            kind: 'fresh',
+            source: 'fresh_add_modal',
+            is_new: true,
+            quantity: 3,
+            has_expiry: Boolean(entry.expirationDate),
+          });
           continue;
         }
 
@@ -202,6 +213,13 @@ export class PantryFreshAddModalStateService {
         };
         await this.pantryStore.updateItem(updated);
         await this.eventManager.logAddExistingItem(existing, updated, 3, entry.expirationDate, sessionId, timestamp);
+        this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
+          kind: 'fresh',
+          source: 'fresh_add_modal',
+          is_new: false,
+          quantity: 3,
+          has_expiry: Boolean(entry.expirationDate),
+        });
       }
       this.dismiss();
       const msg = entries.length === 1

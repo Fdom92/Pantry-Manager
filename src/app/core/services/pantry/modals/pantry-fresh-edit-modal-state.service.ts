@@ -7,6 +7,8 @@ import { normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { AlertController, ToastController } from '@ionic/angular';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
@@ -21,6 +23,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
   private readonly alertCtrl = inject(AlertController);
   private readonly toastCtrl = inject(ToastController);
   private readonly eventManager = inject(HistoryEventManagerService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly currentState = signal<FreshState>('none');
   readonly states: readonly FreshState[] = ['sufficient', 'low', 'none'];
@@ -87,6 +90,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
     });
     this.isSaving.set(false);
     this.isOpen.set(true);
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_EDIT_MODAL_OPENED, { kind: 'fresh' });
   }
 
   close(): void {
@@ -128,6 +132,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
       };
       await this.pantryStore.updateItem(updated);
       await this.eventManager.logAdvancedEdit(existing, updated);
+      this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_EDITED, { kind: 'fresh' });
       this.dismiss();
       const toast = await this.toastCtrl.create({
         message: this.translate.instant('pantry.toasts.saved'),

@@ -26,6 +26,8 @@ import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/
 import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import jsPDF from 'jspdf';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 
@@ -40,6 +42,7 @@ export class ListStateService {
   private readonly share = inject(ShareService);
   private readonly toastController = inject(ToastController);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly isSharingListInProgress = signal(false);
 
@@ -109,6 +112,11 @@ export class ListStateService {
       const msg = this.translate.instant('shopping.toasts.bought', { name });
       void this.showToast(msg);
       void this.reviewPrompt.handlePositiveAction();
+      this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BUY_COMPLETED, {
+        kind: isFresh ? 'fresh' : 'despensa',
+        reason: suggestion.reason,
+        quantity_override: Boolean(opts?.quantityOverride && opts.quantityOverride > 0),
+      });
     } catch (err) {
       console.error('[ListStateService] markAsBought failed', err);
       this.boughtItemIds.update(set => {
@@ -135,6 +143,7 @@ export class ListStateService {
       const msg = this.translate.instant('shopping.toasts.ignored', { name });
       void this.showToast(msg);
     }
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'auto' });
   }
 
   removeManualItem(id: string): void {
@@ -144,6 +153,7 @@ export class ListStateService {
       const msg = this.translate.instant('shopping.toasts.removedManual', { name: item.name });
       void this.showToast(msg);
     }
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'manual' });
   }
 
   restoreFromBought(id: string): void {
@@ -158,6 +168,7 @@ export class ListStateService {
   addManualItem(name: string): void {
     const id = crypto.randomUUID();
     this.manualItems.update(list => [...list, { id, name }]);
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_MANUAL_ADDED);
   }
 
   private async showToast(message: string, duration = 2500): Promise<void> {
@@ -183,6 +194,9 @@ export class ListStateService {
       if (!state.summary.total) {
         return;
       }
+      this.analytics.track(ANALYTICS_EVENTS.SHOPPING_LIST_SHARED, {
+        item_count: state.summary.total,
+      });
 
       await withSignalFlag(this.isSharingListInProgress, async () => {
         const pdfBlob = this.buildShoppingPdf(state.groupedSuggestions);

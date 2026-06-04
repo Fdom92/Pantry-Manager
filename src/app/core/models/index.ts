@@ -7,3 +7,4 @@ export * from './shared';
 export * from './list';
 export * from './upgrade';
 export * from './events';
+export * from './analytics';

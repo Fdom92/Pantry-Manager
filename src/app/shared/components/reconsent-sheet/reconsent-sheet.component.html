@@ -1,0 +1,89 @@
+<ion-modal
+  class="app-sheet-modal reconsent-sheet"
+  [isOpen]="isOpen()"
+  [initialBreakpoint]="0.6"
+  [breakpoints]="[0, 0.6, 0.9]"
+  [backdropDismiss]="true"
+  (ionModalDidDismiss)="close()"
+>
+  <ng-template>
+    <div class="sheet-shell">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ 'reconsent.title' | translate }}</ion-title>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <p class="reconsent-intro">{{ 'reconsent.intro' | translate }}</p>
+
+        <ion-list lines="none" class="reconsent-list">
+          @if (showNotifications()) {
+            <ion-item lines="none" class="reconsent-item">
+              <ion-icon
+                slot="start"
+                class="tonal-icon tonal-icon--primary"
+                name="notifications-outline"
+              ></ion-icon>
+              <ion-label>
+                <h3>{{ 'reconsent.notifications.label' | translate }}</h3>
+                <p>{{ 'reconsent.notifications.description' | translate }}</p>
+              </ion-label>
+              <ion-toggle
+                slot="end"
+                [checked]="notificationsOn()"
+                (ionChange)="onNotificationsToggle($event)"
+              ></ion-toggle>
+            </ion-item>
+          }
+
+          @if (showAnalytics()) {
+            <ion-item lines="none" class="reconsent-item">
+              <ion-icon
+                slot="start"
+                class="tonal-icon tonal-icon--primary"
+                name="analytics-outline"
+              ></ion-icon>
+              <ion-label>
+                <h3>{{ 'reconsent.analytics.label' | translate }}</h3>
+                <p>{{ 'reconsent.analytics.description' | translate }}</p>
+              </ion-label>
+              <ion-toggle
+                slot="end"
+                [checked]="analyticsOn()"
+                (ionChange)="onAnalyticsToggle($event)"
+              ></ion-toggle>
+            </ion-item>
+          }
+        </ion-list>
+
+        <p class="reconsent-footnote">
+          {{ 'reconsent.footnote' | translate }}
+        </p>
+      </ion-content>
+
+      <ion-footer>
+        <ion-toolbar>
+          <div class="reconsent-actions">
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="dismissLater()"
+              [disabled]="isSubmitting()"
+            >
+              {{ 'reconsent.actions.later' | translate }}
+            </ion-button>
+            <ion-button
+              color="primary"
+              shape="round"
+              (click)="confirm()"
+              [disabled]="isSubmitting()"
+            >
+              {{ 'reconsent.actions.confirm' | translate }}
+            </ion-button>
+          </div>
+        </ion-toolbar>
+      </ion-footer>
+    </div>
+  </ng-template>
+</ion-modal>
