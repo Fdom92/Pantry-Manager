@@ -233,7 +233,7 @@
             <div class="pro-error">
               <ion-icon name="alert-circle-outline"></ion-icon>
               <span>{{ 'insights.pro.error' | translate }}</span>
-              <ion-button size="small" shape="round" color="primary" (click)="facade.triggerProAnalysis()">
+              <ion-button size="small" color="primary" (click)="facade.triggerProAnalysis()">
                 {{ 'insights.pro.retry' | translate }}
               </ion-button>
             </div>
@@ -248,7 +248,7 @@
             <ion-icon name="sparkles-outline" class="pro-teaser__icon"></ion-icon>
             <h3 class="pro-teaser__title">{{ 'insights.pro.title' | translate }}</h3>
             <p class="pro-teaser__description">{{ 'insights.pro.description' | translate }}</p>
-            <ion-button [routerLink]="['/upgrade']" size="small" shape="round" color="tertiary">
+            <ion-button [routerLink]="['/upgrade']" size="small" color="tertiary">
               {{ 'insights.pro.cta' | translate }}
             </ion-button>
           </div>

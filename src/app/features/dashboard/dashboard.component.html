@@ -106,7 +106,6 @@
                 @if (facade.todaySuggestion()!.reasonKey === 'dashboard.today.reason.freshExpiring') {
                   <ion-button
                     size="small"
-                    shape="round"
                     [disabled]="facade.isConsumingToday()"
                     (click)="facade.markFreshItemOut(facade.todaySuggestion()!.protagonist.id)">
                     {{ 'dashboard.today.cta.markFreshOut' | translate }}
@@ -114,7 +113,6 @@
                 } @else {
                   <ion-button
                     size="small"
-                    shape="round"
                     [disabled]="facade.isConsumingToday()"
                     (click)="facade.actOnToday()">
                     {{ 'dashboard.today.cta.primary' | translate }}
@@ -146,7 +144,6 @@
                   <ion-button
                     class="action-card__cta"
                     size="small"
-                    shape="round"
                     (click)="action.cta.action()">
                     {{ action.cta.label }}
                   </ion-button>
