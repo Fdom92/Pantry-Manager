@@ -90,7 +90,8 @@
       "apply": "Aplicar",
       "clear": "Limpiar",
       "next": "Siguiente",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "dismiss": "Descartar"
     },
     "loading": "Cargando…",
     "dates": {

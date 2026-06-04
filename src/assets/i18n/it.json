@@ -90,7 +90,8 @@
       "apply": "Applica",
       "clear": "Pulisci",
       "next": "Avanti",
-      "delete": "Elimina"
+      "delete": "Elimina",
+      "dismiss": "Ignora"
     },
     "loading": "Caricamento…",
     "dates": {

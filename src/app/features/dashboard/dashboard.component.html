@@ -148,7 +148,7 @@
                     {{ action.cta.label }}
                   </ion-button>
                   @if (action.dismissible) {
-                    <button class="action-card__dismiss" (click)="facade.dismissAction(action)" aria-label="Dismiss">
+                    <button class="action-card__dismiss" (click)="facade.dismissAction(action)" [attr.aria-label]="'common.actions.dismiss' | translate">
                       <ion-icon name="close-outline"></ion-icon>
                     </button>
                   }

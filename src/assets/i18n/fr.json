@@ -90,7 +90,8 @@
       "apply": "Appliquer",
       "clear": "Effacer",
       "next": "Suivant",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "dismiss": "Ignorer"
     },
     "loading": "Chargement…",
     "dates": {
