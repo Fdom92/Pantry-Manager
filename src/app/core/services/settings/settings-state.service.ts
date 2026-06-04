@@ -1,4 +1,5 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { buildExportFileName, parseBackup } from '@core/domain/settings';
 import type { AppThemePreference } from '@core/models';
 import type { BaseDoc } from '@core/models/shared';
@@ -30,7 +31,9 @@ export class SettingsStateService {
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
 
-  readonly isPro = this.revenuecat.isPro();
+  readonly isPro = toSignal(this.revenuecat.isPro$, {
+    initialValue: this.revenuecat.isPro(),
+  });
   readonly themePreference = computed(() => this.appPreferences.preferences().theme);
   readonly analyticsEnabled = computed(
     () => this.appPreferences.preferences().analyticsEnabled === true

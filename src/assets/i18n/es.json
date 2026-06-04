@@ -854,7 +854,9 @@
       "statusDescription": "Gracias por apoyar el proyecto. PRO está activo en este dispositivo.",
       "upgradePrompt": "Hazte PRO para desbloquear el historial completo y funciones premium.",
       "upgradeCta": "Hazte PRO",
-      "badgePro": "PRO activo"
+      "badgePro": "PRO activo",
+      "activeTitle": "PRO activo",
+      "upgradeTitle": "Hazte PRO"
     },
     "appearance": {
       "title": "Apariencia",
@@ -864,7 +866,9 @@
       "light": "Claro",
       "dark": "Oscuro",
       "system": "Sistema",
-      "error": "No se pudo actualizar el tema."
+      "error": "No se pudo actualizar el tema.",
+      "language": "Idioma",
+      "languageDescription": "Cambia el idioma de la app."
     },
     "advanced": {
       "title": "Datos",
@@ -1073,6 +1077,12 @@
       "policyLinkSubtitle": "Cómo tratamos tus datos.",
       "toastEnabled": "Datos de uso activados",
       "toastDisabled": "Datos de uso desactivados"
+    },
+    "help": {
+      "title": "Ayuda y legal",
+      "subtitle": "Soporte, valoración y documentos legales.",
+      "termsTitle": "Términos de uso",
+      "termsSubtitle": "Condiciones de servicio."
     }
   },
   "reviews": {

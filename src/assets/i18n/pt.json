@@ -854,7 +854,9 @@
       "statusDescription": "Obrigado por apoiares o projeto. PRO está ativo neste dispositivo.",
       "upgradePrompt": "Atualiza para PRO para desbloquear o histórico completo e funcionalidades premium.",
       "upgradeCta": "Atualizar para PRO",
-      "badgePro": "PRO ativo"
+      "badgePro": "PRO ativo",
+      "activeTitle": "PRO ativo",
+      "upgradeTitle": "Torna-te PRO"
     },
     "appearance": {
       "title": "Aparência",
@@ -864,7 +866,9 @@
       "light": "Claro",
       "dark": "Escuro",
       "system": "Sistema",
-      "error": "Não foi possível atualizar o tema."
+      "error": "Não foi possível atualizar o tema.",
+      "language": "Idioma",
+      "languageDescription": "Muda o idioma da app."
     },
     "advanced": {
       "title": "Dados",
@@ -1073,6 +1077,12 @@
       "policyLinkSubtitle": "Como tratamos os teus dados.",
       "toastEnabled": "Dados de uso ativados",
       "toastDisabled": "Dados de uso desativados"
+    },
+    "help": {
+      "title": "Ajuda e legal",
+      "subtitle": "Suporte, avaliações e documentos legais.",
+      "termsTitle": "Termos de uso",
+      "termsSubtitle": "Condições de serviço."
     }
   },
   "reviews": {

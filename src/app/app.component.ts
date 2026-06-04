@@ -108,11 +108,23 @@ export class AppComponent {
   private async initializeRevenueCat(): Promise<void> {
     const userId = this.getOrCreateUserId();
     await this.revenuecat.init(userId);
+
+    // Foreground/background bookkeeping: tracks "session" boundaries from the
+    // analytics point of view. On Capacitor, "closing" the app from the user
+    // perspective normally means swiping it away from the recents list, which
+    // surfaces as `isActive = false` first.
+    let lastForegroundAt = Date.now();
     CapacitorApp.addListener('appStateChange', async state => {
       if (state.isActive) {
+        this.analytics.track(ANALYTICS_EVENTS.APP_FOREGROUNDED);
+        lastForegroundAt = Date.now();
         void this.recoveryNotif.cancelRecoveryWindow();
         await this.revenuecat.restore();
         await this.notificationScheduler.scheduleAll();
+      } else {
+        this.analytics.track(ANALYTICS_EVENTS.APP_BACKGROUNDED, {
+          session_duration_s: Math.round((Date.now() - lastForegroundAt) / 1000),
+        });
       }
     });
   }

@@ -854,7 +854,9 @@
       "statusDescription": "Thank you for supporting the project. PRO is active on this device.",
       "upgradePrompt": "Upgrade to PRO to unlock your full history and premium features.",
       "upgradeCta": "Upgrade to PRO",
-      "badgePro": "PRO active"
+      "badgePro": "PRO active",
+      "activeTitle": "PRO active",
+      "upgradeTitle": "Go PRO"
     },
     "appearance": {
       "title": "Appearance",
@@ -864,7 +866,9 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System",
-      "error": "Could not update the theme."
+      "error": "Could not update the theme.",
+      "language": "Language",
+      "languageDescription": "Change the app language."
     },
     "advanced": {
       "title": "Data",
@@ -1073,6 +1077,12 @@
       "policyLinkSubtitle": "How we handle your data.",
       "toastEnabled": "Usage data enabled",
       "toastDisabled": "Usage data disabled"
+    },
+    "help": {
+      "title": "Help and legal",
+      "subtitle": "Support, ratings and legal documents.",
+      "termsTitle": "Terms of use",
+      "termsSubtitle": "Service conditions."
     }
   },
   "reviews": {

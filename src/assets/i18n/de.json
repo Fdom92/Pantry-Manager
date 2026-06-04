@@ -854,7 +854,9 @@
       "statusDescription": "Danke für deine Unterstützung. PRO ist auf diesem Gerät aktiv.",
       "upgradePrompt": "Werde PRO, um deinen vollständigen Verlauf und Premium-Funktionen freizuschalten.",
       "upgradeCta": "PRO werden",
-      "badgePro": "PRO aktiv"
+      "badgePro": "PRO aktiv",
+      "activeTitle": "PRO aktiv",
+      "upgradeTitle": "PRO werden"
     },
     "appearance": {
       "title": "Erscheinungsbild",
@@ -864,7 +866,9 @@
       "light": "Hell",
       "dark": "Dunkel",
       "system": "System",
-      "error": "Das Design konnte nicht aktualisiert werden."
+      "error": "Das Design konnte nicht aktualisiert werden.",
+      "language": "Sprache",
+      "languageDescription": "App-Sprache ändern."
     },
     "advanced": {
       "title": "Daten",
@@ -1073,6 +1077,12 @@
       "policyLinkSubtitle": "So gehen wir mit deinen Daten um.",
       "toastEnabled": "Nutzungsdaten aktiviert",
       "toastDisabled": "Nutzungsdaten deaktiviert"
+    },
+    "help": {
+      "title": "Hilfe und Rechtliches",
+      "subtitle": "Support, Bewertungen und rechtliche Dokumente.",
+      "termsTitle": "Nutzungsbedingungen",
+      "termsSubtitle": "Servicebedingungen."
     }
   },
   "reviews": {

@@ -7,6 +7,10 @@
 export const ANALYTICS_EVENTS = {
   // Lifecycle
   APP_OPEN: 'app_open',
+  /** Fires when the app goes to background (Capacitor `appStateChange.isActive = false`). */
+  APP_BACKGROUNDED: 'app_backgrounded',
+  /** Fires when the app comes back to foreground. */
+  APP_FOREGROUNDED: 'app_foregrounded',
 
   // Onboarding
   ONBOARDING_STEP_VIEWED: 'onboarding_step_viewed',

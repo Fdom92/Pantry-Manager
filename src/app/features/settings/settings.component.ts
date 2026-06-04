@@ -7,10 +7,12 @@ import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
-import { NOTIFICATION_IDS, STORAGE_KEYS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
+import { ANALYTICS_EVENTS, NOTIFICATION_IDS, STORAGE_KEYS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
+import { AnalyticsService } from '@core/services/analytics';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import {
   IonBackButton,
+  IonBadge,
   IonButton,
   IonButtons,
   IonCard,
@@ -44,6 +46,7 @@ import { AlertController, ToastController } from '@ionic/angular';
     IonToolbar,
     IonButtons,
     IonBackButton,
+    IonBadge,
     IonTitle,
     IonContent,
     IonCard,
@@ -78,6 +81,7 @@ export class SettingsComponent {
   private readonly marketingSeeder = inject(DevMarketingSeederService);
   private readonly alertCtrl = inject(AlertController);
   private readonly toastCtrl = inject(ToastController);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
@@ -85,6 +89,15 @@ export class SettingsComponent {
   readonly SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
   readonly currentLanguage = this.language.currentLanguage;
   protected readonly NOTIFICATION_IDS = NOTIFICATION_IDS;
+
+  /**
+   * Upgrade hero card CTA — emits an analytics event tagged with the entry
+   * point so the PRO funnel can attribute conversions to Settings vs Insights.
+   */
+  onUpgradeTap(): void {
+    this.analytics.track(ANALYTICS_EVENTS.UPGRADE_TAPPED, { source: 'settings_hero' });
+    this.facade.navigateToUpgrade();
+  }
 
   /** Toggle anonymous analytics opt-in/out via the Privacidad card. */
   async onAnalyticsToggle(event: CustomEvent<{ checked: boolean }>): Promise<void> {
