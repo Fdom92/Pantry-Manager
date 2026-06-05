@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Input, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
@@ -26,6 +27,7 @@ export class ProTrialCtaComponent {
   private readonly router = inject(Router);
   private readonly ctaUi = inject(ProCtaUiStateService);
   private readonly storage = inject(LocalStorageService);
+  private readonly destroyRef = inject(DestroyRef);
 
   @Input({ required: true }) surface!: ProCtaSurface;
   /** When true, render a smaller variant suitable for inline placement. */
@@ -39,7 +41,9 @@ export class ProTrialCtaComponent {
   readonly hidden = computed(() => this.ctaUi.isDismissed(this.surface));
 
   constructor() {
-    this.revenueCat.hasUnusedTrial$.subscribe(v => this.hasUnusedTrial.set(v));
+    this.revenueCat.hasUnusedTrial$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(v => this.hasUnusedTrial.set(v));
   }
 
   async onPrimary(): Promise<void> {
