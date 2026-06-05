@@ -34,9 +34,10 @@ import {
   computePatternSignals,
   computeProductSignals,
 } from '@core/domain/insights/insights-pro-payload.domain';
+import { computeWasteSummary, type WasteSummary } from '@core/domain/insights/waste.domain';
 import type { PantryEvent } from '@core/models/events';
 
-export type { ActivityMetrics, DistributionMetrics, InventorySnapshot };
+export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary };
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -97,6 +98,10 @@ export class InsightsStateService {
     );
     return computeFoodCoverage(activeItems);
   });
+
+  readonly wasteSummary = computed<WasteSummary>(() =>
+    computeWasteSummary(this.events(), new Date(), 30)
+  );
 
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
