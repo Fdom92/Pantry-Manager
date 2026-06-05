@@ -12,6 +12,13 @@ export const ANALYTICS_EVENTS = {
   /** Fires when the app comes back to foreground. */
   APP_FOREGROUNDED: 'app_foregrounded',
 
+  // In-app update flow (Google Play API).
+  APP_UPDATE_CHECK: 'app_update_check',
+  APP_UPDATE_AVAILABLE: 'app_update_available',
+  APP_UPDATE_STARTED: 'app_update_started',
+  APP_UPDATE_COMPLETED: 'app_update_completed',
+  APP_UPDATE_FAILED: 'app_update_failed',
+
   // Onboarding
   ONBOARDING_STEP_VIEWED: 'onboarding_step_viewed',
   ONBOARDING_COMPLETED: 'onboarding_completed',

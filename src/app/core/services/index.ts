@@ -8,3 +8,4 @@ export * from './tabs';
 export * from './upgrade';
 export * from './analytics';
 export * from './reconsent';
+export * from './app-update';

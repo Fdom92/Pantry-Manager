@@ -9,6 +9,7 @@ import { NotificationSchedulerService } from '@core/services/notifications';
 import { RecoveryNotificationsService } from '@core/services/notifications/recovery-notifications.service';
 import { SyncService } from '@core/services/sync/sync.service';
 import { AnalyticsService } from '@core/services/analytics';
+import { AppUpdateService } from '@core/services/app-update';
 import { ANALYTICS_EVENTS } from '@core/constants';
 // STORAGE_KEYS removed: callers go through LocalStorageService.
 import { NavController } from '@ionic/angular';
@@ -33,6 +34,7 @@ export class AppComponent {
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
+  private readonly appUpdate = inject(AppUpdateService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -73,6 +75,10 @@ export class AppComponent {
     await this.initializeRevenueCat();
     await this.analytics.bootstrap();
     this.analytics.track(ANALYTICS_EVENTS.APP_OPEN);
+    // Ask Google Play whether a newer build is available. Fire-and-forget
+    // so the rest of the boot sequence is never blocked by a slow store
+    // check. The service no-ops on web / non-native platforms.
+    void this.appUpdate.checkAndPrompt();
     await this.pantryQuery.initialize();
     await this.pantryQuery.ensureFirstPageLoaded();
     this.pantryQuery.startBackgroundLoad();
