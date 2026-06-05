@@ -857,7 +857,10 @@
       "upgradeCta": "Hazte PRO",
       "badgePro": "PRO activo",
       "activeTitle": "PRO activo",
-      "upgradeTitle": "Hazte PRO"
+      "upgradeTitle": "Hazte PRO",
+      "priceMonthly": "{{price}} / mes",
+      "priceAnnual": "{{price}} / año",
+      "savings": "ahorra {{percent}}%"
     },
     "appearance": {
       "title": "Apariencia",

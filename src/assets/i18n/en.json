@@ -857,7 +857,10 @@
       "upgradeCta": "Upgrade to PRO",
       "badgePro": "PRO active",
       "activeTitle": "PRO active",
-      "upgradeTitle": "Go PRO"
+      "upgradeTitle": "Go PRO",
+      "priceMonthly": "{{price}} / month",
+      "priceAnnual": "{{price}} / year",
+      "savings": "save {{percent}}%"
     },
     "appearance": {
       "title": "Appearance",
