@@ -34,7 +34,14 @@ export class ProTrialCtaComponent {
   readonly hasUnusedTrial = toSignal(this.revenueCat.hasUnusedTrial$, { initialValue: false });
   readonly busy = signal<boolean>(false);
 
-  readonly hidden = computed(() => this.ctaUi.isDismissed(this.surface));
+  readonly hidden = computed(() => {
+    if (this.ctaUi.isDismissed(this.surface)) return true;
+    // On /upgrade, the fallback "Hazte PRO" path navigates to /upgrade — a no-op.
+    // Hide the CTA there when the user is not trial-eligible so we don't render
+    // a dead button. Per-plan cards remain the active purchase path.
+    if (this.surface === 'upgrade_page' && !this.hasUnusedTrial()) return true;
+    return false;
+  });
 
   async onPrimary(): Promise<void> {
     if (this.busy()) return;
