@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Agora não",
     "actions": {
       "close": "Fechar",
       "cancel": "Cancelar",
@@ -818,6 +819,10 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Começa o teu teste gratuito de 7 dias"
+    },
+    "cta": "Torna-te PRO",
     "title": "Atualizar para PRO",
     "headline": "Desbloqueia os superpoderes completos da despensa",
     "subtitle": "Automatização inteligente e funcionalidades prioritárias.",

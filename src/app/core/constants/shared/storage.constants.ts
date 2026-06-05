@@ -44,6 +44,10 @@ export const STORAGE_KEYS = {
    * and PouchDB is ready — can decide whether to forward events.
    */
   ERROR_REPORTING_ENABLED: 'errorReporting:enabled',
+  /** ISO timestamp when the user successfully started a PRO trial. */
+  PRO_TRIAL_STARTED_AT: 'pro:trial:startedAt',
+  /** Set once `pro_trial_expired` has been emitted for this trial (one-shot). */
+  PRO_TRIAL_EXPIRED_FIRED: 'pro:trial:expiredFired',
 } as const;
 
 export const DEFAULT_HOUSEHOLD_ID = 'household:default';

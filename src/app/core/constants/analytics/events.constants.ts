@@ -63,6 +63,9 @@ export const ANALYTICS_EVENTS = {
   UPGRADE_TAPPED: 'upgrade_tapped',
   UPGRADE_PURCHASE_STARTED: 'upgrade_purchase_started',
   UPGRADE_PURCHASE_COMPLETED: 'upgrade_purchase_completed',
+  PRO_TRIAL_CTA_CLICKED: 'pro_trial_cta_clicked',
+  PRO_TRIAL_STARTED: 'pro_trial_started',
+  PRO_TRIAL_EXPIRED: 'pro_trial_expired',
 
   // Notifications
   NOTIFICATION_SCHEDULED: 'notification_scheduled',

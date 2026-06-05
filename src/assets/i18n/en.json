@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Not now",
     "actions": {
       "close": "Close",
       "cancel": "Cancel",
@@ -818,6 +819,10 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Start your 7-day free trial"
+    },
+    "cta": "Go PRO",
     "title": "Upgrade to PRO",
     "headline": "Unlock the full pantry superpowers",
     "subtitle": "Smarter automation and priority features.",

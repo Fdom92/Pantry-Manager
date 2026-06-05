@@ -15,6 +15,8 @@ export class UpgradeRevenuecatService {
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());
   readonly isPro$: Observable<boolean> = this.proSubject.asObservable();
   readonly canUseAgent$: Observable<boolean> = this.isPro$.pipe(map(isPro => isPro || !environment.production));
+  private readonly trialEligibleSubject = new BehaviorSubject<boolean>(false);
+  readonly hasUnusedTrial$: Observable<boolean> = this.trialEligibleSubject.asObservable();
   private readonly preferredPackageTypes: PACKAGE_TYPE[] = [
     PACKAGE_TYPE.MONTHLY,
     PACKAGE_TYPE.ANNUAL,
@@ -53,6 +55,7 @@ export class UpgradeRevenuecatService {
           return;
         }
         this.updateProState(isPro);
+        void this.refreshTrialEligibility();
       });
       const info = await Purchases.getCustomerInfo();
       const isPro = this.extractIsPro(info);
@@ -61,6 +64,7 @@ export class UpgradeRevenuecatService {
       } else {
         console.warn('[UpgradeRevenuecatService] init: no entitlement data, keeping stored state');
       }
+      await this.refreshTrialEligibility();
     } catch (err) {
       console.error('[UpgradeRevenuecatService] init error', err);
     }
@@ -192,5 +196,31 @@ export class UpgradeRevenuecatService {
 
   private loadStoredState(): boolean {
     return this.storage.pro.getStatus() ?? false;
+  }
+
+  /** Recomputes trial eligibility from the current offering's intro price. */
+  async refreshTrialEligibility(): Promise<void> {
+    try {
+      const offering = await this.getOfferings();
+      if (!offering) {
+        this.trialEligibleSubject.next(false);
+        return;
+      }
+      if (this.isPro()) {
+        // Already PRO — never offer a trial CTA.
+        this.trialEligibleSubject.next(false);
+        return;
+      }
+      // Only inspect monthly/annual product slots — matches the rest of the
+      // service (getAvailablePackages prefers these). Custom non-standard
+      // packages with introPrice are intentionally ignored to keep the CTA
+      // path predictable.
+      const monthlyTrial = offering.monthly?.product?.introPrice?.price === 0;
+      const annualTrial = offering.annual?.product?.introPrice?.price === 0;
+      this.trialEligibleSubject.next(monthlyTrial || annualTrial);
+    } catch (err) {
+      console.error('[UpgradeRevenuecatService] refreshTrialEligibility error', err);
+      this.trialEligibleSubject.next(false);
+    }
   }
 }

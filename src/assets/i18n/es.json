@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Ahora no",
     "actions": {
       "close": "Cerrar",
       "cancel": "Cancelar",
@@ -818,6 +819,10 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Empieza tu prueba gratis de 7 días"
+    },
+    "cta": "Hazte PRO",
     "title": "Hazte PRO",
     "headline": "Desbloquea todo el poder de tu despensa",
     "subtitle": "Automatización inteligente y funciones prioritarias.",
