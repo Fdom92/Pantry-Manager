@@ -14,6 +14,14 @@
   color: var(--ion-color-medium);
   text-decoration: underline;
   font-size: var(--app-theme-font-size-small);
-  padding: 0;
+  padding: var(--app-theme-spacing-xs) var(--app-theme-spacing-sm);
+  min-height: 44px;
   align-self: center;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }

@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, Input, computed, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { ChangeDetectionStrategy, Component, Input, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { IonButton } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
@@ -16,7 +15,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 @Component({
   selector: 'app-pro-trial-cta',
   standalone: true,
-  imports: [CommonModule, IonicModule, TranslateModule],
+  imports: [IonButton, TranslateModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './pro-trial-cta.component.html',
   styleUrl: './pro-trial-cta.component.scss',
@@ -27,24 +26,15 @@ export class ProTrialCtaComponent {
   private readonly router = inject(Router);
   private readonly ctaUi = inject(ProCtaUiStateService);
   private readonly storage = inject(LocalStorageService);
-  private readonly destroyRef = inject(DestroyRef);
 
   @Input({ required: true }) surface!: ProCtaSurface;
-  /** When true, render a smaller variant suitable for inline placement. */
   @Input() compact = false;
-  /** When true, allow the user to dismiss the CTA for this session. */
   @Input() dismissible = false;
 
-  readonly hasUnusedTrial = signal<boolean>(false);
+  readonly hasUnusedTrial = toSignal(this.revenueCat.hasUnusedTrial$, { initialValue: false });
   readonly busy = signal<boolean>(false);
 
   readonly hidden = computed(() => this.ctaUi.isDismissed(this.surface));
-
-  constructor() {
-    this.revenueCat.hasUnusedTrial$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(v => this.hasUnusedTrial.set(v));
-  }
 
   async onPrimary(): Promise<void> {
     if (this.busy()) return;
