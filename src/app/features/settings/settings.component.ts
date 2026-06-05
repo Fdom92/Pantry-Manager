@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SettingsStateService } from '@core/services/settings/settings-state.service';
 import { NotificationSchedulerService } from '@core/services/notifications/notification-scheduler.service';
 import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
+import { computeAnnualSavingsPercent } from '@core/domain/upgrade';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
 import { ANALYTICS_EVENTS, NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
@@ -169,6 +170,30 @@ export class SettingsComponent {
     return formatDateTimeValue(iso, this.language.getCurrentLocale(), { fallback: '—' });
   }
 
+  // PRO pricing
+  readonly monthlyPriceString = signal<string | null>(null);
+  readonly annualPriceString = signal<string | null>(null);
+  private readonly monthlyPriceNumeric = signal<number | null>(null);
+  private readonly annualPriceNumeric = signal<number | null>(null);
+
+  readonly annualSavingsPercent = computed<number | null>(() =>
+    computeAnnualSavingsPercent({
+      monthlyPrice: this.monthlyPriceNumeric(),
+      annualPrice: this.annualPriceNumeric(),
+    })
+  );
+
+  private async loadPricing(): Promise<void> {
+    const offering = await this.revenuecat.getOfferings();
+    if (!offering) return;
+    const monthly = offering.monthly;
+    const annual = offering.annual;
+    this.monthlyPriceString.set(monthly?.product?.priceString ?? null);
+    this.annualPriceString.set(annual?.product?.priceString ?? null);
+    this.monthlyPriceNumeric.set(monthly?.product?.price ?? null);
+    this.annualPriceNumeric.set(annual?.product?.price ?? null);
+  }
+
   // Notifications
   readonly isTestingNotification = signal(false);
   readonly scheduleAtTimeInput = signal('09:00');
@@ -186,6 +211,7 @@ export class SettingsComponent {
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
+    await this.loadPricing();
   }
 
   // ─── Notifications ────────────────────────────────────────────────────────
