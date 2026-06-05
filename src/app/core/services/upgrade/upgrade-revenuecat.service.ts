@@ -211,8 +211,12 @@ export class UpgradeRevenuecatService {
         this.trialEligibleSubject.next(false);
         return;
       }
-      const monthlyTrial = Boolean(offering.monthly?.product?.introPrice?.price === 0);
-      const annualTrial = Boolean(offering.annual?.product?.introPrice?.price === 0);
+      // Only inspect monthly/annual product slots — matches the rest of the
+      // service (getAvailablePackages prefers these). Custom non-standard
+      // packages with introPrice are intentionally ignored to keep the CTA
+      // path predictable.
+      const monthlyTrial = offering.monthly?.product?.introPrice?.price === 0;
+      const annualTrial = offering.annual?.product?.introPrice?.price === 0;
       this.trialEligibleSubject.next(monthlyTrial || annualTrial);
     } catch (err) {
       console.error('[UpgradeRevenuecatService] refreshTrialEligibility error', err);

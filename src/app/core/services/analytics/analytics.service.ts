@@ -7,7 +7,6 @@ import posthog, { type PostHog } from 'posthog-js';
 import { environment } from 'src/environments/environment';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { LocalStorageService } from '../shared/local-storage.service';
-import type { ProCtaSurface } from '@core/services/upgrade/pro-cta-ui-state.service';
 import type {
   AnalyticsEventProps,
   AnalyticsSuperProps,
@@ -139,18 +138,6 @@ export class AnalyticsService {
     } catch (err) {
       this.logger.warn('[Analytics] track failed', { event, err });
     }
-  }
-
-  trackProTrialCtaClicked(surface: ProCtaSurface): void {
-    this.track(ANALYTICS_EVENTS.PRO_TRIAL_CTA_CLICKED, { surface });
-  }
-
-  trackProTrialStarted(): void {
-    this.track(ANALYTICS_EVENTS.PRO_TRIAL_STARTED);
-  }
-
-  trackProTrialExpired(): void {
-    this.track(ANALYTICS_EVENTS.PRO_TRIAL_EXPIRED);
   }
 
   /**

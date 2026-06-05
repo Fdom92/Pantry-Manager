@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 export type ProCtaSurface =
   | 'upgrade_page'
@@ -9,17 +9,16 @@ export type ProCtaSurface =
 
 @Injectable({ providedIn: 'root' })
 export class ProCtaUiStateService {
-  private readonly dismissed = signal<ReadonlySet<ProCtaSurface>>(new Set());
+  private readonly dismissedSignal = signal<ReadonlySet<ProCtaSurface>>(new Set());
+  readonly dismissed = this.dismissedSignal.asReadonly();
 
   isDismissed(surface: ProCtaSurface): boolean {
-    return this.dismissed().has(surface);
+    return this.dismissedSignal().has(surface);
   }
 
   dismiss(surface: ProCtaSurface): void {
-    const next = new Set(this.dismissed());
+    const next = new Set(this.dismissedSignal());
     next.add(surface);
-    this.dismissed.set(next);
+    this.dismissedSignal.set(next);
   }
-
-  readonly dismissedSurfaces = computed(() => this.dismissed());
 }
