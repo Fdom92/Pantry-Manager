@@ -211,7 +211,9 @@ export class SettingsComponent {
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
-    await this.loadPricing();
+    if (!this.isPro()) {
+      await this.loadPricing();
+    }
   }
 
   // ─── Notifications ────────────────────────────────────────────────────────
