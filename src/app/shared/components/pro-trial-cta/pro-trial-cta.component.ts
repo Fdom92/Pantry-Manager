@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, booleanAttribute, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IonButton } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
@@ -28,8 +28,8 @@ export class ProTrialCtaComponent {
   private readonly storage = inject(LocalStorageService);
 
   @Input({ required: true }) surface!: ProCtaSurface;
-  @Input() compact = false;
-  @Input() dismissible = false;
+  @Input({ transform: booleanAttribute }) compact = false;
+  @Input({ transform: booleanAttribute }) dismissible = false;
 
   readonly hasUnusedTrial = toSignal(this.revenueCat.hasUnusedTrial$, { initialValue: false });
   readonly busy = signal<boolean>(false);

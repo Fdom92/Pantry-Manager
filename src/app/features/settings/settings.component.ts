@@ -8,8 +8,7 @@ import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenue
 import { computeAnnualSavingsPercent } from '@core/domain/upgrade';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
-import { ANALYTICS_EVENTS, NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
-import { AnalyticsService } from '@core/services/analytics';
+import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
 import { LocalStorageService } from '@core/services/shared';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
@@ -39,6 +38,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import packageJson from '../../../../package.json';
 import { environment } from 'src/environments/environment';
 import { SettingsNotificationsDevStateService } from '@core/services/settings/settings-notifications-dev-state.service';
+import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial-cta.component';
 import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
@@ -68,6 +68,7 @@ import { AlertController, ToastController } from '@ionic/angular';
     CommonModule,
     RouterLink,
     TranslateModule,
+    ProTrialCtaComponent,
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
@@ -84,7 +85,6 @@ export class SettingsComponent {
   private readonly marketingSeeder = inject(DevMarketingSeederService);
   private readonly alertCtrl = inject(AlertController);
   private readonly toastCtrl = inject(ToastController);
-  private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly appPreferences = inject(SettingsPreferencesService);
 
@@ -94,15 +94,6 @@ export class SettingsComponent {
   readonly SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
   readonly currentLanguage = this.language.currentLanguage;
   protected readonly NOTIFICATION_IDS = NOTIFICATION_IDS;
-
-  /**
-   * Upgrade hero card CTA — emits an analytics event tagged with the entry
-   * point so the PRO funnel can attribute conversions to Settings vs Insights.
-   */
-  onUpgradeTap(): void {
-    this.analytics.track(ANALYTICS_EVENTS.UPGRADE_TAPPED, { source: 'settings_hero' });
-    this.facade.navigateToUpgrade();
-  }
 
   /** Toggle anonymous analytics opt-in/out via the Privacidad card. */
   async onAnalyticsToggle(event: CustomEvent<{ checked: boolean }>): Promise<void> {

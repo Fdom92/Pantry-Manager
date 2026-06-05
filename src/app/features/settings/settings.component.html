@@ -51,15 +51,7 @@
               }
             </div>
           }
-          <ion-button
-            expand="block"
-            shape="round"
-            color="tertiary"
-            (click)="onUpgradeTap()"
-          >
-            <ion-icon slot="start" name="sparkles-outline"></ion-icon>
-            {{ "settings.pro.upgradeCta" | translate }}
-          </ion-button>
+          <app-pro-trial-cta surface="settings_hero" compact dismissible />
         }
       </ion-card-content>
     </ion-card>
