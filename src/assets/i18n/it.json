@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Non ora",
     "actions": {
       "close": "Chiudi",
       "cancel": "Annulla",
@@ -818,6 +819,10 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Inizia la tua prova gratuita di 7 giorni"
+    },
+    "cta": "Diventa PRO",
     "title": "Passa a PRO",
     "headline": "Sblocca tutte le superpotenzialità della dispensa",
     "subtitle": "Automazioni intelligenti e funzionalità prioritarie.",

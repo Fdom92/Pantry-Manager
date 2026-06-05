@@ -1,0 +1,19 @@
+.pro-trial-cta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-2xs);
+}
+.pro-trial-cta--compact ion-button {
+  --padding-start: var(--app-theme-spacing-sm);
+  --padding-end: var(--app-theme-spacing-sm);
+  font-size: var(--app-theme-font-size-small);
+}
+.pro-trial-cta__dismiss {
+  background: none;
+  border: none;
+  color: var(--ion-color-medium);
+  text-decoration: underline;
+  font-size: var(--app-theme-font-size-small);
+  padding: 0;
+  align-self: center;
+}

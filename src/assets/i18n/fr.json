@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Pas maintenant",
     "actions": {
       "close": "Fermer",
       "cancel": "Annuler",
@@ -818,6 +819,10 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Commencez votre essai gratuit de 7 jours"
+    },
+    "cta": "Passer en PRO",
     "title": "Passer en PRO",
     "headline": "Débloquez toute la puissance de votre garde-manger",
     "subtitle": "Automatisation intelligente et fonctionnalités prioritaires.",

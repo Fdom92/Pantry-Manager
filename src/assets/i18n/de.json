@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Jetzt nicht",
     "actions": {
       "close": "Schließen",
       "cancel": "Abbrechen",
@@ -818,6 +819,10 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Starte deine 7-tägige kostenlose Probezeit"
+    },
+    "cta": "PRO werden",
     "title": "PRO werden",
     "headline": "Entfalte das volle Potenzial deiner Vorratskammer",
     "subtitle": "Intelligente Automatisierung und priorisierte Funktionen.",
