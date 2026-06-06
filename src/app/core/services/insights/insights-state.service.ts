@@ -113,12 +113,23 @@ export class InsightsStateService {
     });
   }
 
-  async ionViewWillEnter(): Promise<void> {
+  /**
+   * Loads pantry + events into local signals. Idempotent (PantryStore.loadAll
+   * is cached) and side-effect-free w.r.t. analytics so callers outside the
+   * insights tab — e.g. the dashboard waste tracker card — can populate the
+   * data they need without firing the `insights_viewed` paywall event.
+   */
+  async loadEvents(): Promise<void> {
     await this.pantryStore.loadAll();
     this.isLoadingEvents.set(true);
     const loaded = await this.eventLog.listEvents();
     this.events.set(loaded);
     this.isLoadingEvents.set(false);
+  }
+
+  async ionViewWillEnter(): Promise<void> {
+    await this.loadEvents();
+    const loaded = this.events();
 
     this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_VIEWED, {
       is_pro: this.isPro(),

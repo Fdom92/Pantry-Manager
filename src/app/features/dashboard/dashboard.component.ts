@@ -62,6 +62,7 @@ export class DashboardComponent implements OnDestroy {
   async ionViewWillEnter(): Promise<void> {
     this.isViewActive = true;
     await this.facade.ionViewWillEnter();
+    await this.insights.loadEvents();
     this.insights.trackWasteCardViewed();
     this.maybePresentReconsentSheet();
   }
