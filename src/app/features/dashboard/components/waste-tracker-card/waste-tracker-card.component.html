@@ -4,7 +4,7 @@
   </ion-card-header>
 
   <ion-card-content>
-    @if (isPro()) {
+    @if (isPro) {
       @if (isEmptyZeroWaste()) {
         <p class="waste-card__zero">
           {{ 'dashboard.waste.zero' | translate }}

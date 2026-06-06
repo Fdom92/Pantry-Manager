@@ -49,6 +49,7 @@ export class DashboardComponent implements OnDestroy {
   readonly facade = inject(DashboardStateService);
   private readonly insights = inject(InsightsStateService);
   readonly wasteSummary = computed<WasteSummary>(() => this.insights.wasteSummary());
+  readonly isInsightsPro = this.insights.isPro;
   @ViewChild(ReconsentSheetComponent) private reconsentSheet?: ReconsentSheetComponent;
 
   /** Guard so the re-consent sheet is evaluated only once per visit session. */
@@ -61,6 +62,7 @@ export class DashboardComponent implements OnDestroy {
   async ionViewWillEnter(): Promise<void> {
     this.isViewActive = true;
     await this.facade.ionViewWillEnter();
+    this.insights.trackWasteCardViewed();
     this.maybePresentReconsentSheet();
   }
 

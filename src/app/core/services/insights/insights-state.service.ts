@@ -105,6 +105,14 @@ export class InsightsStateService {
 
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
+  trackWasteCardViewed(): void {
+    this.analytics.track(ANALYTICS_EVENTS.WASTE_TRACKER_VIEWED, {
+      surface: 'dashboard',
+      is_pro: this.isPro(),
+      count: this.wasteSummary().totalCount,
+    });
+  }
+
   async ionViewWillEnter(): Promise<void> {
     await this.pantryStore.loadAll();
     this.isLoadingEvents.set(true);

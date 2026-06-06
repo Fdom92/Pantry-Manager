@@ -29,7 +29,7 @@
       }
 
       <!-- Waste tracker (PRO) -->
-      <app-waste-tracker-card [summary]="wasteSummary()" />
+      <app-waste-tracker-card [summary]="wasteSummary()" [isPro]="isInsightsPro()" />
 
       <!-- Today's suggestion -->
       @if (facade.totalItems() > 0) {
