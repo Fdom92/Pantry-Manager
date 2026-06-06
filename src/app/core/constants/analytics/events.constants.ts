@@ -66,6 +66,7 @@ export const ANALYTICS_EVENTS = {
   PRO_TRIAL_CTA_CLICKED: 'pro_trial_cta_clicked',
   PRO_TRIAL_STARTED: 'pro_trial_started',
   PRO_TRIAL_EXPIRED: 'pro_trial_expired',
+  WASTE_TRACKER_VIEWED: 'waste_tracker_viewed',
 
   // Notifications
   NOTIFICATION_SCHEDULED: 'notification_scheduled',

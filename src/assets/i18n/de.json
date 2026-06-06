@@ -349,6 +349,18 @@
       "updated": "Aktualisiert {{ date }}",
       "badge": "Neu",
       "empty": "Keine aktuellen Änderungen."
+    },
+    "waste": {
+      "title": "Abfall diesen Monat",
+      "count": "Du hast {{count}} Produkte weggeworfen",
+      "topCategory": "Hauptsächlich in: {{category}}",
+      "zero": "Kein Abfall diesen Monat! 🎯",
+      "trend": {
+        "up": "↑ Mehr als letzten Monat",
+        "down": "↓ Weniger als letzten Monat",
+        "flat": "≈ Gleich wie letzten Monat"
+      },
+      "teaser": "Erfahre, wie viel du diesen Monat weggeworfen hast"
     }
   },
   "shopping": {

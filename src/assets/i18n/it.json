@@ -349,6 +349,18 @@
       "updated": "Aggiornato {{ date }}",
       "badge": "Nuovo",
       "empty": "Nessun aggiornamento recente."
+    },
+    "waste": {
+      "title": "Sprechi questo mese",
+      "count": "Hai buttato {{count}} prodotti",
+      "topCategory": "Soprattutto in: {{category}}",
+      "zero": "Nessuno spreco questo mese! 🎯",
+      "trend": {
+        "up": "↑ Più del mese scorso",
+        "down": "↓ Meno del mese scorso",
+        "flat": "≈ Uguale al mese scorso"
+      },
+      "teaser": "Scopri quanto hai sprecato questo mese"
     }
   },
   "shopping": {

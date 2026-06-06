@@ -1,0 +1,25 @@
+.waste-card {
+  &__count {
+    font-size: var(--app-theme-font-size-xl);
+    font-weight: 600;
+    margin: 0;
+  }
+  &__top {
+    color: var(--ion-color-medium);
+    margin: var(--app-theme-spacing-2xs) 0 0;
+  }
+  &__zero {
+    color: var(--ion-color-success);
+    font-weight: 600;
+  }
+  &__trend {
+    margin-top: var(--app-theme-spacing-sm);
+    font-size: var(--app-theme-font-size-small);
+  }
+  &__trend[data-trend="up"]   { color: var(--ion-color-danger);  }
+  &__trend[data-trend="down"] { color: var(--ion-color-success); }
+  &__teaser {
+    color: var(--ion-color-medium);
+    margin-bottom: var(--app-theme-spacing-sm);
+  }
+}

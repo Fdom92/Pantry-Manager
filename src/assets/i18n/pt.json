@@ -349,6 +349,18 @@
       "updated": "Atualizado em {{ date }}",
       "badge": "Novo",
       "empty": "Sem atualizações recentes."
+    },
+    "waste": {
+      "title": "Desperdício este mês",
+      "count": "Deitou fora {{count}} produtos",
+      "topCategory": "Principalmente em: {{category}}",
+      "zero": "Sem desperdício este mês! 🎯",
+      "trend": {
+        "up": "↑ Mais do que o mês passado",
+        "down": "↓ Menos do que o mês passado",
+        "flat": "≈ Igual ao mês passado"
+      },
+      "teaser": "Descubra quanto desperdiçou este mês"
     }
   },
   "shopping": {
