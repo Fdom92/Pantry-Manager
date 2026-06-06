@@ -112,12 +112,16 @@ export class ExpiryPickerComponent {
 
   get formattedDate(): string {
     if (!this.date) return '';
-    const [year, month, day] = this.date.split('-').map(Number);
+    const parts = this.date.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(n => !Number.isFinite(n))) return '';
+    const [year, month, day] = parts;
+    const d = new Date(year, month - 1, day);
+    if (Number.isNaN(d.getTime())) return '';
     return new Intl.DateTimeFormat(this.languageService.getCurrentLocale(), {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
-    }).format(new Date(year, month - 1, day));
+    }).format(d);
   }
 
   onDateChange(event: Event): void {

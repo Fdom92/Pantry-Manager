@@ -290,6 +290,7 @@ export class PantryViewModelService {
   }
 
   private getCalendarDaysDifference(date1: Date, date2: Date): number {
+    if (Number.isNaN(date1.getTime()) || Number.isNaN(date2.getTime())) return 0;
     // Normalize to midnight to compare only dates
     const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
     const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
@@ -306,6 +307,9 @@ export class PantryViewModelService {
     }
 
     const expiryDate = new Date(value);
+    if (Number.isNaN(expiryDate.getTime())) {
+      return this.translate.instant('pantry.batches.noExpiryDate');
+    }
     const now = new Date();
     const daysDiff = this.getCalendarDaysDifference(now, expiryDate);
 
