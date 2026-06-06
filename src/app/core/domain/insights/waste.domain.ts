@@ -43,7 +43,7 @@ export function computeWasteSummary(
   let totalCount = 0;
 
   for (const e of inWindow) {
-    const q = e.quantity;
+    const q = Number.isFinite(e.quantity) ? e.quantity : 0;
     totalCount += q;
     if (e.categoryId) byCategoryMap.set(e.categoryId, (byCategoryMap.get(e.categoryId) ?? 0) + q);
     if (e.foodType)   byFoodTypeMap.set(e.foodType, (byFoodTypeMap.get(e.foodType) ?? 0) + q);
