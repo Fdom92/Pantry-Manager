@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, booleanAttribute, computed, input } from '@angular/core';
 import { IonCard, IonCardContent, IonCardHeader, IonCardTitle } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import type { WasteSummary } from '@core/domain/insights/waste.domain';
@@ -25,6 +25,9 @@ export class WasteTrackerCardComponent {
   readonly summary = input.required<WasteSummary>();
   readonly isPro = input.required<boolean>();
   readonly ctaSurface = input<ProCtaSurface>('waste_card');
+  /** Suppress the inline trial CTA in the free state — used on surfaces that already
+   * host a primary paywall (e.g. the Insights tab's bottom PRO teaser). */
+  readonly hideCta = input(false, { transform: booleanAttribute });
 
   readonly isEmptyZeroWaste = computed(() => this.isPro() && this.summary().totalCount === 0);
 

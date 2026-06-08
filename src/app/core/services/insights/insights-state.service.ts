@@ -41,6 +41,13 @@ export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSumm
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
+/**
+ * Module-level guard so `waste_tracker_viewed` fires at most once per app
+ * session, even when dashboard + insights both render the card and each has
+ * its own page-scoped InsightsStateService instance. Resets on cold start.
+ */
+let wasteViewFiredThisSession = false;
+
 @Injectable()
 export class InsightsStateService {
   private readonly pantryStore = inject(PantryStoreService);
@@ -106,6 +113,8 @@ export class InsightsStateService {
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
   trackWasteCardViewed(surface: 'dashboard' | 'insights' = 'dashboard'): void {
+    if (wasteViewFiredThisSession) return;
+    wasteViewFiredThisSession = true;
     this.analytics.track(ANALYTICS_EVENTS.WASTE_TRACKER_VIEWED, {
       surface,
       is_pro: this.isPro(),
