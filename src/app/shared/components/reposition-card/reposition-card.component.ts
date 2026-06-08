@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, booleanAttribute, computed, input, output } from '@angular/core';
-import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonItem, IonLabel, IonList, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonItem, IonLabel, IonList, IonButton } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import type { RepositionPrediction } from '@core/domain/insights/reposition.domain';
 import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial-cta.component';
@@ -10,7 +10,7 @@ import type { ProCtaSurface } from '@core/services/upgrade/pro-cta-ui-state.serv
   standalone: true,
   imports: [
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-    IonList, IonItem, IonLabel, IonButton, IonIcon,
+    IonList, IonItem, IonLabel, IonButton,
     TranslateModule, ProTrialCtaComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

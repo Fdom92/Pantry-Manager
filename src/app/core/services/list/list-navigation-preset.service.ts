@@ -1,28 +1,31 @@
 import { Injectable, signal } from '@angular/core';
 
 /**
- * Holds a one-shot manual item name to be added when the list page next enters.
+ * Holds pending manual item names to be added when the list page next enters.
  *
  * Mirrors `PantryNavigationPresetService` — a lightweight root-scoped bridge so
- * external surfaces (e.g. the dashboard reposition card) can queue an "add to list"
- * action without needing to inject the page-scoped `ListStateService`.
+ * external surfaces (e.g. the dashboard reposition card) can queue "add to list"
+ * actions without needing to inject the page-scoped `ListStateService`.
+ *
+ * Queue (not single slot) so rapid taps on multiple predictions before navigation
+ * settles do not silently drop items.
  */
 @Injectable({ providedIn: 'root' })
 export class ListNavigationPresetService {
-  private readonly _pendingItem = signal<string | null>(null);
+  private readonly _queue = signal<string[]>([]);
 
-  /** Queue a manual item name to be added on next list-page entry. Replaces any prior queued item. */
+  /** Queue a manual item name to be added on next list-page entry. */
   setPendingItem(name: string): void {
-    this._pendingItem.set(name);
+    this._queue.update(q => [...q, name]);
   }
 
   /**
-   * Read and clear the pending item atomically.
-   * Returns null if nothing was queued.
+   * Read and clear the pending queue atomically.
+   * Returns an empty array if nothing was queued.
    */
-  consume(): string | null {
-    const item = this._pendingItem();
-    if (item !== null) this._pendingItem.set(null);
-    return item;
+  consume(): string[] {
+    const q = this._queue();
+    if (q.length) this._queue.set([]);
+    return q;
   }
 }

@@ -74,9 +74,9 @@ export class ListStateService {
     this.skeletonManager.startLoading();
     await this.pantryStore.loadAll();
     this.skeletonManager.stopLoading();
-    const pendingItem = this.listNavPreset.consume();
-    if (pendingItem) {
-      this.addManualItem(pendingItem);
+    const pending = this.listNavPreset.consume();
+    for (const name of pending) {
+      this.addManualItem(name, 'preset');
     }
   }
 
@@ -171,10 +171,15 @@ export class ListStateService {
     this.boughtManuals.update(list => list.filter(b => b.id !== id));
   }
 
-  addManualItem(name: string): void {
+  addManualItem(name: string, source: 'user' | 'preset' = 'user'): void {
     const id = crypto.randomUUID();
     this.manualItems.update(list => [...list, { id, name }]);
-    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_MANUAL_ADDED);
+    // 'preset' adds are already analytics-attributed by the originating
+    // surface (e.g. repo_prediction_added_to_list), so avoid the duplicate
+    // shopping_manual_added event that would muddy the manual-add funnel.
+    if (source === 'user') {
+      this.analytics.track(ANALYTICS_EVENTS.SHOPPING_MANUAL_ADDED);
+    }
   }
 
   private async showToast(message: string, duration = 2500): Promise<void> {
