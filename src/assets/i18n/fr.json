@@ -361,6 +361,14 @@
         "flat": "≈ Pareil que le mois dernier"
       },
       "teaser": "Découvrez combien vous avez gaspillé ce mois"
+    },
+    "reposition": {
+      "title": "Bientôt en rupture",
+      "daysLeft": "Il reste {{days}} jours",
+      "add": "Ajouter",
+      "added": "Ajouté à la liste",
+      "empty": "Nous avons besoin de plus d'historique pour prédire",
+      "teaser": "Anticipez ce que vous devez acheter avant d'en manquer"
     }
   },
   "shopping": {

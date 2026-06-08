@@ -67,6 +67,8 @@ export const ANALYTICS_EVENTS = {
   PRO_TRIAL_STARTED: 'pro_trial_started',
   PRO_TRIAL_EXPIRED: 'pro_trial_expired',
   WASTE_TRACKER_VIEWED: 'waste_tracker_viewed',
+  REPO_PREDICTION_VIEWED: 'repo_prediction_viewed',
+  REPO_PREDICTION_ADDED_TO_LIST: 'repo_prediction_added_to_list',
 
   // Notifications
   NOTIFICATION_SCHEDULED: 'notification_scheduled',

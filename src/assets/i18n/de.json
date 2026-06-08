@@ -361,6 +361,14 @@
         "flat": "≈ Gleich wie letzten Monat"
       },
       "teaser": "Erfahre, wie viel du diesen Monat weggeworfen hast"
+    },
+    "reposition": {
+      "title": "Bald ausverkauft",
+      "daysLeft": "Noch {{days}} Tage",
+      "add": "Hinzufügen",
+      "added": "Zur Liste hinzugefügt",
+      "empty": "Wir brauchen mehr Verlauf für Vorhersagen",
+      "teaser": "Sag voraus, was du kaufen musst, bevor es aufgebraucht ist"
     }
   },
   "shopping": {

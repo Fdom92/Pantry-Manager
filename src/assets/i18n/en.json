@@ -361,6 +361,14 @@
         "flat": "≈ Same as last month"
       },
       "teaser": "Find out how much you wasted this month"
+    },
+    "reposition": {
+      "title": "Running out soon",
+      "daysLeft": "{{days}} days left",
+      "add": "Add",
+      "added": "Added to list",
+      "empty": "We need more history to predict",
+      "teaser": "Predict what you need to buy before you run out"
     }
   },
   "shopping": {

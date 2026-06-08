@@ -361,6 +361,14 @@
         "flat": "≈ Uguale al mese scorso"
       },
       "teaser": "Scopri quanto hai sprecato questo mese"
+    },
+    "reposition": {
+      "title": "In esaurimento presto",
+      "daysLeft": "Mancano {{days}} giorni",
+      "add": "Aggiungi",
+      "added": "Aggiunto alla lista",
+      "empty": "Abbiamo bisogno di più cronologia per prevedere",
+      "teaser": "Prevedi cosa comprare prima che finisca"
     }
   },
   "shopping": {

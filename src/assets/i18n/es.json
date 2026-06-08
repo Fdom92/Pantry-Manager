@@ -361,6 +361,14 @@
         "flat": "≈ Igual que el mes pasado"
       },
       "teaser": "Descubre cuánto has tirado este mes"
+    },
+    "reposition": {
+      "title": "Próximamente sin stock",
+      "daysLeft": "Quedan {{days}} días",
+      "add": "Añadir",
+      "added": "Añadido a la lista",
+      "empty": "Necesitamos más historial para predecir",
+      "teaser": "Predice qué necesitas comprar antes de que se acabe"
     }
   },
   "shopping": {

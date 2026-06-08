@@ -361,6 +361,14 @@
         "flat": "≈ Igual ao mês passado"
       },
       "teaser": "Descubra quanto desperdiçou este mês"
+    },
+    "reposition": {
+      "title": "A ficar sem stock em breve",
+      "daysLeft": "Faltam {{days}} dias",
+      "add": "Adicionar",
+      "added": "Adicionado à lista",
+      "empty": "Precisamos de mais histórico para prever",
+      "teaser": "Preveja o que precisa de comprar antes de ficar sem stock"
     }
   },
   "shopping": {
