@@ -35,9 +35,10 @@ import {
   computeProductSignals,
 } from '@core/domain/insights/insights-pro-payload.domain';
 import { computeWasteSummary, type WasteSummary } from '@core/domain/insights/waste.domain';
+import { computeRepositionPredictions, type RepositionPrediction } from '@core/domain/insights/reposition.domain';
 import type { PantryEvent } from '@core/models/events';
 
-export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary };
+export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary, RepositionPrediction };
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -108,6 +109,11 @@ export class InsightsStateService {
 
   readonly wasteSummary = computed<WasteSummary>(() =>
     computeWasteSummary(this.events(), new Date(), 30)
+  );
+
+  readonly repositionPredictions = computed<RepositionPrediction[]>(() =>
+    computeRepositionPredictions(this.pantryStore.items(), this.events(), new Date())
+      .filter(p => p.daysToOut <= 30)
   );
 
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
