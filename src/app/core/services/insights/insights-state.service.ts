@@ -105,19 +105,20 @@ export class InsightsStateService {
 
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
-  trackWasteCardViewed(): void {
+  trackWasteCardViewed(surface: 'dashboard' | 'insights' = 'dashboard'): void {
     this.analytics.track(ANALYTICS_EVENTS.WASTE_TRACKER_VIEWED, {
-      surface: 'dashboard',
+      surface,
       is_pro: this.isPro(),
       count: this.wasteSummary().totalCount,
     });
   }
 
   /**
-   * Loads pantry + events into local signals. Idempotent (PantryStore.loadAll
-   * is cached) and side-effect-free w.r.t. analytics so callers outside the
-   * insights tab — e.g. the dashboard waste tracker card — can populate the
-   * data they need without firing the `insights_viewed` paywall event.
+   * Loads pantry + events into local signals. Safe to call multiple times —
+   * `PantryStore.loadAll` is cached at the store layer, the event log fetch
+   * re-runs each call, and no analytics events fire here. Use this from
+   * surfaces outside the insights tab (e.g. the dashboard waste tracker card)
+   * that need data without triggering the `insights_viewed` paywall event.
    */
   async loadEvents(): Promise<void> {
     await this.pantryStore.loadAll();

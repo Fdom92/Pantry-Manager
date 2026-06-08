@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, Input, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { IonCard, IonCardContent, IonCardHeader, IonCardTitle } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import type { WasteSummary } from '@core/domain/insights/waste.domain';
+import { formatFriendlyName } from '@core/utils/normalization.util';
 import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial-cta.component';
 
 @Component({
@@ -20,8 +21,14 @@ import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial
   styleUrl: './waste-tracker-card.component.scss',
 })
 export class WasteTrackerCardComponent {
-  @Input({ required: true }) summary!: WasteSummary;
-  @Input({ required: true }) isPro!: boolean;
+  readonly summary = input.required<WasteSummary>();
+  readonly isPro = input.required<boolean>();
 
-  readonly isEmptyZeroWaste = computed(() => this.isPro && this.summary.totalCount === 0);
+  readonly isEmptyZeroWaste = computed(() => this.isPro() && this.summary().totalCount === 0);
+
+  readonly topCategoryLabel = computed<string | null>(() => {
+    const top = this.summary().byCategory[0];
+    if (!top) return null;
+    return formatFriendlyName(top.categoryId, top.categoryId);
+  });
 }

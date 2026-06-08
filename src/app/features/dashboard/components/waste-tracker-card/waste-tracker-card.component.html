@@ -4,22 +4,22 @@
   </ion-card-header>
 
   <ion-card-content>
-    @if (isPro) {
+    @if (isPro()) {
       @if (isEmptyZeroWaste()) {
         <p class="waste-card__zero">
           {{ 'dashboard.waste.zero' | translate }}
         </p>
       } @else {
         <p class="waste-card__count">
-          {{ 'dashboard.waste.count' | translate: { count: summary.totalCount } }}
+          {{ 'dashboard.waste.count' | translate: { count: summary().totalCount } }}
         </p>
-        @if (summary.byCategory[0]) {
+        @if (topCategoryLabel(); as topCategory) {
           <p class="waste-card__top">
-            {{ 'dashboard.waste.topCategory' | translate: { category: summary.byCategory[0].categoryId } }}
+            {{ 'dashboard.waste.topCategory' | translate: { category: topCategory } }}
           </p>
         }
-        <p class="waste-card__trend" [attr.data-trend]="summary.trend">
-          {{ ('dashboard.waste.trend.' + summary.trend) | translate }}
+        <p class="waste-card__trend" [attr.data-trend]="summary().trend">
+          {{ ('dashboard.waste.trend.' + summary().trend) | translate }}
         </p>
       }
     } @else {
