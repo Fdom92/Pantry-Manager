@@ -31,6 +31,13 @@
       <!-- Waste tracker (PRO) -->
       <app-waste-tracker-card [summary]="wasteSummary()" [isPro]="isInsightsPro()" />
 
+      <!-- Reposition predictions (PRO) -->
+      <app-reposition-card
+        [predictions]="repositionPredictions()"
+        [isPro]="isInsightsPro()"
+        (addToList)="onAddRepoPredictionToList($event)"
+      />
+
       <!-- Today's suggestion -->
       @if (facade.totalItems() > 0) {
         <section class="dashboard-section">

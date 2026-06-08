@@ -37,6 +37,8 @@ import {
 import { computeWasteSummary, type WasteSummary } from '@core/domain/insights/waste.domain';
 import { computeRepositionPredictions, type RepositionPrediction } from '@core/domain/insights/reposition.domain';
 import type { PantryEvent } from '@core/models/events';
+import { ListNavigationPresetService } from '../list/list-navigation-preset.service';
+import { NavController } from '@ionic/angular';
 
 export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary, RepositionPrediction };
 
@@ -49,6 +51,12 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
  */
 let wasteViewFiredThisSession = false;
 
+/**
+ * Module-level guard so `repo_prediction_viewed` fires at most once per app
+ * session. Same rationale as `wasteViewFiredThisSession`.
+ */
+let repoViewFiredThisSession = false;
+
 @Injectable()
 export class InsightsStateService {
   private readonly pantryStore = inject(PantryStoreService);
@@ -58,6 +66,8 @@ export class InsightsStateService {
   private readonly llmClient = inject(InsightsLlmClientService);
   private readonly languageService = inject(LanguageService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly listNavPreset = inject(ListNavigationPresetService);
+  private readonly navCtrl = inject(NavController);
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
@@ -126,6 +136,31 @@ export class InsightsStateService {
       is_pro: this.isPro(),
       count: this.wasteSummary().totalCount,
     });
+  }
+
+  trackRepoPredictionViewed(surface: 'dashboard' | 'insights' = 'dashboard'): void {
+    if (repoViewFiredThisSession) return;
+    repoViewFiredThisSession = true;
+    this.analytics.track(ANALYTICS_EVENTS.REPO_PREDICTION_VIEWED, {
+      surface,
+      is_pro: this.isPro(),
+      count: this.repositionPredictions().length,
+    });
+  }
+
+  /**
+   * Queues the predicted product as a manual list item (consumed when the
+   * list page next enters), fires the analytics event, and navigates to the
+   * list tab so the user sees the item immediately.
+   */
+  async addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): Promise<void> {
+    this.listNavPreset.setPendingItem(p.productName);
+    this.analytics.track(ANALYTICS_EVENTS.REPO_PREDICTION_ADDED_TO_LIST, {
+      daysToOut: p.daysToOut,
+      confidence: p.confidence,
+      surface,
+    });
+    await this.navCtrl.navigateRoot('/list');
   }
 
   /**
