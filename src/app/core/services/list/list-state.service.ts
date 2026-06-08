@@ -30,7 +30,6 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
-import { ListNavigationPresetService } from './list-navigation-preset.service';
 import { ListManualItemsStore } from './list-manual-items.store';
 
 @Injectable()
@@ -45,7 +44,6 @@ export class ListStateService {
   private readonly toastController = inject(ToastController);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly analytics = inject(AnalyticsService);
-  private readonly listNavPreset = inject(ListNavigationPresetService);
   private readonly manualItemsStore = inject(ListManualItemsStore);
 
   readonly isSharingListInProgress = signal(false);
@@ -78,10 +76,6 @@ export class ListStateService {
     this.skeletonManager.startLoading();
     await this.pantryStore.loadAll();
     this.skeletonManager.stopLoading();
-    const pending = this.listNavPreset.consume();
-    for (const name of pending) {
-      this.addManualItem(name, 'preset');
-    }
   }
 
   async ionViewWillLeave(): Promise<void> {

@@ -108,7 +108,7 @@ export class DashboardComponent implements OnDestroy {
   }
 
   async onAddRepoPredictionToList(p: RepositionPrediction): Promise<void> {
-    await this.insights.addRepoPredictionToList(p, 'dashboard');
+    this.insights.addRepoPredictionToList(p, 'dashboard');
     const message = this.translate.instant('dashboard.reposition.added');
     const t = await this.toast.create({ message, duration: 1800, position: 'bottom' });
     void t.present();

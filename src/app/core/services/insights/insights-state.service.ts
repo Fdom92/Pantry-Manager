@@ -37,8 +37,7 @@ import {
 import { computeWasteSummary, type WasteSummary } from '@core/domain/insights/waste.domain';
 import { computeRepositionPredictions, type RepositionPrediction } from '@core/domain/insights/reposition.domain';
 import type { PantryEvent } from '@core/models/events';
-import { ListNavigationPresetService } from '../list/list-navigation-preset.service';
-import { NavController } from '@ionic/angular';
+import { ListManualItemsStore } from '../list/list-manual-items.store';
 
 export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary, RepositionPrediction };
 
@@ -66,8 +65,7 @@ export class InsightsStateService {
   private readonly llmClient = inject(InsightsLlmClientService);
   private readonly languageService = inject(LanguageService);
   private readonly analytics = inject(AnalyticsService);
-  private readonly listNavPreset = inject(ListNavigationPresetService);
-  private readonly navCtrl = inject(NavController);
+  private readonly manualItemsStore = inject(ListManualItemsStore);
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
@@ -148,19 +146,13 @@ export class InsightsStateService {
     });
   }
 
-  /**
-   * Queues the predicted product as a manual list item (consumed when the
-   * list page next enters), fires the analytics event, and navigates to the
-   * list tab so the user sees the item immediately.
-   */
-  async addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): Promise<void> {
-    this.listNavPreset.setPendingItem(p.productName);
+  addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): void {
+    this.manualItemsStore.addManualItem(p.productName, 'preset');
     this.analytics.track(ANALYTICS_EVENTS.REPO_PREDICTION_ADDED_TO_LIST, {
       daysToOut: p.daysToOut,
       confidence: p.confidence,
       surface,
     });
-    await this.navCtrl.navigateRoot('/list');
   }
 
   /**
