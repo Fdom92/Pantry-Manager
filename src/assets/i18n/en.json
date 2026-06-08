@@ -349,6 +349,18 @@
       "updated": "Updated {{ date }}",
       "badge": "New",
       "empty": "No recent updates."
+    },
+    "waste": {
+      "title": "Waste this month",
+      "count": "You threw away {{count}} products",
+      "topCategory": "Mostly in: {{category}}",
+      "zero": "No waste this month! 🎯",
+      "trend": {
+        "up": "↑ More than last month",
+        "down": "↓ Less than last month",
+        "flat": "≈ Same as last month"
+      },
+      "teaser": "Find out how much you wasted this month"
     }
   },
   "shopping": {

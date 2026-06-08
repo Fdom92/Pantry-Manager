@@ -34,11 +34,19 @@ import {
   computePatternSignals,
   computeProductSignals,
 } from '@core/domain/insights/insights-pro-payload.domain';
+import { computeWasteSummary, type WasteSummary } from '@core/domain/insights/waste.domain';
 import type { PantryEvent } from '@core/models/events';
 
-export type { ActivityMetrics, DistributionMetrics, InventorySnapshot };
+export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary };
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Module-level guard so `waste_tracker_viewed` fires at most once per app
+ * session, even when dashboard + insights both render the card and each has
+ * its own page-scoped InsightsStateService instance. Resets on cold start.
+ */
+let wasteViewFiredThisSession = false;
 
 @Injectable()
 export class InsightsStateService {
@@ -98,14 +106,40 @@ export class InsightsStateService {
     return computeFoodCoverage(activeItems);
   });
 
+  readonly wasteSummary = computed<WasteSummary>(() =>
+    computeWasteSummary(this.events(), new Date(), 30)
+  );
+
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
-  async ionViewWillEnter(): Promise<void> {
+  trackWasteCardViewed(surface: 'dashboard' | 'insights' = 'dashboard'): void {
+    if (wasteViewFiredThisSession) return;
+    wasteViewFiredThisSession = true;
+    this.analytics.track(ANALYTICS_EVENTS.WASTE_TRACKER_VIEWED, {
+      surface,
+      is_pro: this.isPro(),
+      count: this.wasteSummary().totalCount,
+    });
+  }
+
+  /**
+   * Loads pantry + events into local signals. Safe to call multiple times —
+   * `PantryStore.loadAll` is cached at the store layer, the event log fetch
+   * re-runs each call, and no analytics events fire here. Use this from
+   * surfaces outside the insights tab (e.g. the dashboard waste tracker card)
+   * that need data without triggering the `insights_viewed` paywall event.
+   */
+  async loadEvents(): Promise<void> {
     await this.pantryStore.loadAll();
     this.isLoadingEvents.set(true);
     const loaded = await this.eventLog.listEvents();
     this.events.set(loaded);
     this.isLoadingEvents.set(false);
+  }
+
+  async ionViewWillEnter(): Promise<void> {
+    await this.loadEvents();
+    const loaded = this.events();
 
     this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_VIEWED, {
       is_pro: this.isPro(),

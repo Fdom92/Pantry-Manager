@@ -1,0 +1,34 @@
+<ion-card class="waste-card">
+  <ion-card-header>
+    <ion-card-title>{{ 'dashboard.waste.title' | translate }}</ion-card-title>
+  </ion-card-header>
+
+  <ion-card-content>
+    @if (isPro()) {
+      @if (isEmptyZeroWaste()) {
+        <p class="waste-card__zero">
+          {{ 'dashboard.waste.zero' | translate }}
+        </p>
+      } @else {
+        <p class="waste-card__count">
+          {{ 'dashboard.waste.count' | translate: { count: summary().totalCount } }}
+        </p>
+        @if (topCategoryLabel(); as topCategory) {
+          <p class="waste-card__top">
+            {{ 'dashboard.waste.topCategory' | translate: { category: topCategory } }}
+          </p>
+        }
+        <p class="waste-card__trend" [attr.data-trend]="summary().trend">
+          {{ ('dashboard.waste.trend.' + summary().trend) | translate }}
+        </p>
+      }
+    } @else {
+      <p class="waste-card__teaser">
+        {{ 'dashboard.waste.teaser' | translate }}
+      </p>
+      @if (!hideCta()) {
+        <app-pro-trial-cta [surface]="ctaSurface()" compact dismissible />
+      }
+    }
+  </ion-card-content>
+</ion-card>

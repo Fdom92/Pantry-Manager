@@ -349,6 +349,18 @@
       "updated": "Mis à jour le {{ date }}",
       "badge": "Nouveau",
       "empty": "Aucune mise à jour récente."
+    },
+    "waste": {
+      "title": "Gaspillage ce mois",
+      "count": "Vous avez jeté {{count}} produits",
+      "topCategory": "Surtout dans : {{category}}",
+      "zero": "Aucun gaspillage ce mois ! 🎯",
+      "trend": {
+        "up": "↑ Plus que le mois dernier",
+        "down": "↓ Moins que le mois dernier",
+        "flat": "≈ Pareil que le mois dernier"
+      },
+      "teaser": "Découvrez combien vous avez gaspillé ce mois"
     }
   },
   "shopping": {
