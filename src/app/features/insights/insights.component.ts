@@ -14,6 +14,7 @@ import {
 } from '@ionic/angular/standalone';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
 import { FoodType } from '@core/models/shared/enums.model';
+import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
 
 @Component({
   selector: 'app-insights',
@@ -30,6 +31,7 @@ import { FoodType } from '@core/models/shared/enums.model';
     IonButton,
     IonSkeletonText,
     IonButtons,
+    WasteTrackerCardComponent,
   ],
   templateUrl: './insights.component.html',
   styleUrls: ['./insights.component.scss'],
@@ -41,6 +43,7 @@ export class InsightsComponent {
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
+    this.facade.trackWasteCardViewed('insights');
   }
 
   formatPercent(ratio: number): string {

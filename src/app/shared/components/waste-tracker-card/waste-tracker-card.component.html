@@ -26,7 +26,7 @@
       <p class="waste-card__teaser">
         {{ 'dashboard.waste.teaser' | translate }}
       </p>
-      <app-pro-trial-cta surface="waste_card" compact dismissible />
+      <app-pro-trial-cta [surface]="ctaSurface()" compact dismissible />
     }
   </ion-card-content>
 </ion-card>

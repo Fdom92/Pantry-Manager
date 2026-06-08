@@ -4,6 +4,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import type { WasteSummary } from '@core/domain/insights/waste.domain';
 import { formatFriendlyName } from '@core/utils/normalization.util';
 import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial-cta.component';
+import type { ProCtaSurface } from '@core/services/upgrade/pro-cta-ui-state.service';
 
 @Component({
   selector: 'app-waste-tracker-card',
@@ -23,6 +24,7 @@ import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial
 export class WasteTrackerCardComponent {
   readonly summary = input.required<WasteSummary>();
   readonly isPro = input.required<boolean>();
+  readonly ctaSurface = input<ProCtaSurface>('waste_card');
 
   readonly isEmptyZeroWaste = computed(() => this.isPro() && this.summary().totalCount === 0);
 

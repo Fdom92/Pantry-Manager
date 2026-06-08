@@ -19,6 +19,15 @@
       </section>
     } @else {
 
+      <!-- SECTION 1: Waste tracker -->
+      <section class="insights-section">
+        <app-waste-tracker-card
+          [summary]="facade.wasteSummary()"
+          [isPro]="facade.isPro()"
+          [ctaSurface]="'insights_tab'"
+        />
+      </section>
+
       <!-- SECTION 2: Tu despensa ahora -->
       <section class="insights-section">
         <h3 class="insights-section__title">{{ 'insights.snapshot.title' | translate }}</h3>

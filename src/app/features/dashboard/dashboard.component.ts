@@ -7,7 +7,7 @@ import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-tod
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { ReconsentSheetComponent } from '@shared/components/reconsent-sheet/reconsent-sheet.component';
 import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edit-modal.component';
-import { WasteTrackerCardComponent } from './components/waste-tracker-card/waste-tracker-card.component';
+import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
 import {
   IonButton,
   IonButtons,
