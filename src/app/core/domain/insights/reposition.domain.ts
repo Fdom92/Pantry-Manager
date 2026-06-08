@@ -38,7 +38,7 @@ export function computeRepositionPredictions(
 
   const out: RepositionPrediction[] = [];
   for (const itm of items) {
-    if (itm.productType === 'fresh' || (itm as any).isFresh === true) continue;
+    if (itm.productType === 'fresh') continue;
     const agg = consumeAgg.get(itm._id);
     if (!agg) continue;
     if (agg.count < 3) continue;

@@ -11,7 +11,7 @@ const item = (over: Partial<PantryItem>): PantryItem => ({
   categoryId: over.categoryId ?? 'beverage',
   batches: over.batches ?? [{ batchId: 'b1', quantity: 4, expirationDate: undefined as any, opened: false } as any],
   isBasic: over.isBasic ?? true,
-  isFresh: (over as any).isFresh ?? false,
+  productType: (over as any).productType ?? 'pantry',
   noExpiry: (over as any).noExpiry ?? true,
   createdAt: (over as any).createdAt ?? '2026-04-01T00:00:00Z',
   updatedAt: (over as any).updatedAt ?? '2026-06-01T00:00:00Z',
@@ -37,7 +37,7 @@ describe('computeRepositionPredictions', () => {
   });
 
   it('skips fresh items', () => {
-    const items = [item({ _id: 'fp', isFresh: true } as any)];
+    const items = [item({ _id: 'fp', productType: 'fresh' } as any)];
     const events = Array.from({ length: 10 }, (_, i) =>
       ev({ productId: 'fp', quantity: 1, timestamp: new Date(now.getTime() - (i + 1) * 86_400_000).toISOString() })
     );
