@@ -31,10 +31,7 @@
       <!-- Streak chip -->
       <app-streak-chip />
 
-      <!-- Waste tracker (PRO) -->
-      <app-waste-tracker-card [summary]="wasteSummary()" [isPro]="isInsightsPro()" />
-
-      <!-- Reposition predictions (PRO) -->
+      <!-- Reposition predictions (PRO) — actionable: tap "Añadir" sends to list -->
       <app-reposition-card
         [predictions]="repositionPredictions()"
         [isPro]="isInsightsPro()"
