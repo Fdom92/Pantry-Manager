@@ -886,7 +886,7 @@
     "title": "Impostazioni",
     "pro": {
       "statusDescription": "Grazie per supportare il progetto. PRO è attivo su questo dispositivo.",
-      "upgradePrompt": "Passa a PRO per sbloccare lo storico completo e le funzionalità premium.",
+      "upgradePrompt": "Passa a PRO per sbloccare previsioni di scorta, analisi degli sprechi e altro.",
       "upgradeCta": "Passa a PRO",
       "badgePro": "PRO attivo",
       "activeTitle": "PRO attivo",
@@ -1126,6 +1126,7 @@
     "streak": {
       "title": "La tua serie",
       "daysLabel": "giorni",
+      "empty": "Aggiungi o consuma un prodotto oggi per iniziare la tua serie",
       "longest": "Serie migliore: {{longest}}",
       "milestones": "Traguardi",
       "nextGoal": "Mancano {{days}} giorni a {{milestone}}",

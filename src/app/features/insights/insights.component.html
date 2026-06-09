@@ -21,15 +21,17 @@
       <app-insights-empty-state />
     } @else {
 
-      <!-- SECTION 1: Waste tracker -->
-      <section class="insights-section">
-        <app-waste-tracker-card
-          [summary]="facade.wasteSummary()"
-          [isPro]="facade.isPro()"
-          [ctaSurface]="'insights_tab'"
-          hideCta
-        />
-      </section>
+      <!-- SECTION 1: Waste tracker (PRO only — free users get the bottom paywall instead) -->
+      @if (facade.isPro()) {
+        <section class="insights-section">
+          <app-waste-tracker-card
+            [summary]="facade.wasteSummary()"
+            [isPro]="facade.isPro()"
+            [ctaSurface]="'insights_tab'"
+            hideCta
+          />
+        </section>
+      }
 
       <!-- SECTION 2: Tu despensa ahora -->
       <section class="insights-section">

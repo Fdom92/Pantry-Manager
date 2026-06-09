@@ -3,6 +3,7 @@
   &__number  { font-size: 2.5rem; font-weight: 700; color: var(--ion-color-warning-shade); }
   &__label   { font-size: var(--app-theme-font-size-small); color: var(--ion-color-medium); }
   &__longest { color: var(--ion-color-medium); margin: var(--app-theme-spacing-sm) 0; }
+  &__empty   { color: var(--ion-color-medium); margin: var(--app-theme-spacing-sm) 0; font-size: var(--app-theme-font-size-small); }
   &__milestones ul { list-style: none; padding-left: 0; }
   &__milestone--reached { color: var(--ion-color-success); font-weight: 600; }
   &__next, &__grace { color: var(--ion-color-medium); font-size: var(--app-theme-font-size-small); }

@@ -886,7 +886,7 @@
     "title": "Einstellungen",
     "pro": {
       "statusDescription": "Danke für deine Unterstützung. PRO ist auf diesem Gerät aktiv.",
-      "upgradePrompt": "Werde PRO, um deinen vollständigen Verlauf und Premium-Funktionen freizuschalten.",
+      "upgradePrompt": "Werde PRO, um Bestandsprognosen, Verschwendungsanalysen und mehr freizuschalten.",
       "upgradeCta": "PRO werden",
       "badgePro": "PRO aktiv",
       "activeTitle": "PRO aktiv",
@@ -1126,6 +1126,7 @@
     "streak": {
       "title": "Deine Serie",
       "daysLabel": "Tage",
+      "empty": "Füge heute ein Produkt hinzu oder verbrauche eins, um deine Serie zu starten",
       "longest": "Längste Serie: {{longest}}",
       "milestones": "Meilensteine",
       "nextGoal": "Noch {{days}} Tage bis zu {{milestone}}",

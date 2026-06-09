@@ -10,7 +10,7 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
 import { ReconsentSheetComponent } from '@shared/components/reconsent-sheet/reconsent-sheet.component';
 import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edit-modal.component';
 import { RepositionCardComponent } from '@shared/components/reposition-card/reposition-card.component';
-import { StreakChipComponent } from './components/streak-chip/streak-chip.component';
+import { StreakCardComponent } from './components/streak-card/streak-card.component';
 import {
   IonButton,
   IonButtons,
@@ -43,7 +43,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     EmptyStateComponent,
     ReconsentSheetComponent,
     RepositionCardComponent,
-    StreakChipComponent,
+    StreakCardComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
