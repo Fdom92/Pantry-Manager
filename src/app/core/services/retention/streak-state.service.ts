@@ -8,7 +8,7 @@ import { StorageService } from '../shared/storage.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 
 @Injectable({ providedIn: 'root' })
-export class StreakService {
+export class StreakStateService {
   private readonly storage = inject(StorageService) as StorageService<StreakState>;
   private readonly destroyRef = inject(DestroyRef);
 

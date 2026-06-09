@@ -1,1 +1,1 @@
-export * from './streak.service';
+export * from './streak-state.service';
