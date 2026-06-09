@@ -11,6 +11,7 @@ import { RecoveryNotificationsService } from '@core/services/notifications/recov
 import { SyncService } from '@core/services/sync/sync.service';
 import { AnalyticsService } from '@core/services/analytics';
 import { AppUpdateService } from '@core/services/app-update';
+import { StreakService } from '@core/services/retention';
 import { ANALYTICS_EVENTS } from '@core/constants';
 // STORAGE_KEYS removed: callers go through LocalStorageService.
 import { NavController } from '@ionic/angular';
@@ -38,6 +39,7 @@ export class AppComponent {
   private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly appUpdate = inject(AppUpdateService);
+  private readonly streak = inject(StreakService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -76,6 +78,7 @@ export class AppComponent {
 
   private async initializeApp(): Promise<void> {
     await this.initializeRevenueCat();
+    await this.streak.bootstrap();
     await this.analytics.bootstrap();
     this.analytics.track(ANALYTICS_EVENTS.APP_OPEN);
     // Ask Google Play whether a newer build is available. Fire-and-forget
@@ -145,6 +148,7 @@ export class AppComponent {
         await this.revenuecat.restore();
         this.detectTrialExpiry();
         await this.notificationScheduler.scheduleAll();
+        void this.streak.bootstrap();
       } else {
         this.analytics.track(ANALYTICS_EVENTS.APP_BACKGROUNDED, {
           session_duration_s: Math.round((Date.now() - lastForegroundAt) / 1000),
