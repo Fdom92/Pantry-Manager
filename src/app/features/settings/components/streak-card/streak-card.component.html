@@ -1,0 +1,42 @@
+<ion-card class="streak-card" id="streak">
+  <ion-card-header>
+    <ion-card-title>
+      🔥 {{ 'settings.streak.title' | translate }}
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <div class="streak-card__current">
+      <span class="streak-card__number">{{ currentStreak() }}</span>
+      <span class="streak-card__label">{{ 'settings.streak.daysLabel' | translate }}</span>
+    </div>
+
+    <p class="streak-card__longest">
+      {{ 'settings.streak.longest' | translate: { longest: longestStreak() } }}
+    </p>
+
+    <div class="streak-card__milestones">
+      <h4>{{ 'settings.streak.milestones' | translate }}</h4>
+      <ul>
+        @for (m of milestones; track m) {
+          <li [class.streak-card__milestone--reached]="milestonesReached().includes(m)">
+            {{ milestonesReached().includes(m) ? '✓' : '○' }} {{ m }} {{ 'settings.streak.daysLabel' | translate }}
+          </li>
+        }
+      </ul>
+    </div>
+
+    @if (nextMilestone() !== null) {
+      <p class="streak-card__next">
+        {{ 'settings.streak.nextGoal' | translate: { days: daysToNextMilestone(), milestone: nextMilestone() } }}
+      </p>
+    }
+
+    <p class="streak-card__grace">
+      @if (graceUsedRecently()) {
+        {{ 'settings.streak.graceUsed' | translate }}
+      } @else {
+        {{ 'settings.streak.graceAvailable' | translate }}
+      }
+    </p>
+  </ion-card-content>
+</ion-card>

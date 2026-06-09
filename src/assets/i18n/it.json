@@ -369,6 +369,9 @@
       "added": "Aggiunto alla lista",
       "empty": "Abbiamo bisogno di più cronologia per prevedere",
       "teaser": "Prevedi cosa comprare prima che finisca"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} giorni"
     }
   },
   "shopping": {
@@ -1114,6 +1117,15 @@
       "subtitle": "Supporto, valutazioni e documenti legali.",
       "termsTitle": "Termini d'uso",
       "termsSubtitle": "Condizioni di servizio."
+    },
+    "streak": {
+      "title": "La tua serie",
+      "daysLabel": "giorni",
+      "longest": "Serie migliore: {{longest}}",
+      "milestones": "Traguardi",
+      "nextGoal": "Mancano {{days}} giorni a {{milestone}}",
+      "graceAvailable": "Giorno jolly disponibile",
+      "graceUsed": "Jolly usato — torna domani senza fallo"
     }
   },
   "reviews": {
@@ -1176,6 +1188,10 @@
         "title": "La tua dispensa ha bisogno di te",
         "body": "Torna ed evita di buttare cibo. Bastano 30 secondi."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Ottimo ritmo",
+      "body": "Gestisci la tua dispensa da {{streak}} giorni consecutivi. Vai avanti!"
     }
   },
   "sync": {
@@ -1235,5 +1251,8 @@
       "confirm": "Fatto",
       "later": "Non ora"
     }
+  },
+  "streak": {
+    "milestoneToast": "{{streak}} giorni di fila! 🔥 Continua così."
   }
 }

@@ -39,6 +39,7 @@ import packageJson from '../../../../package.json';
 import { environment } from 'src/environments/environment';
 import { SettingsNotificationsDevStateService } from '@core/services/settings/settings-notifications-dev-state.service';
 import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial-cta.component';
+import { StreakCardComponent } from './components/streak-card/streak-card.component';
 import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
@@ -69,6 +70,7 @@ import { AlertController, ToastController } from '@ionic/angular';
     RouterLink,
     TranslateModule,
     ProTrialCtaComponent,
+    StreakCardComponent,
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
