@@ -43,19 +43,6 @@ export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSumm
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-/**
- * Module-level guard so `waste_tracker_viewed` fires at most once per app
- * session, even when dashboard + insights both render the card and each has
- * its own page-scoped InsightsStateService instance. Resets on cold start.
- */
-let wasteViewFiredThisSession = false;
-
-/**
- * Module-level guard so `repo_prediction_viewed` fires at most once per app
- * session. Same rationale as `wasteViewFiredThisSession`.
- */
-let repoViewFiredThisSession = false;
-
 @Injectable()
 export class InsightsStateService {
   private readonly pantryStore = inject(PantryStoreService);
@@ -125,26 +112,6 @@ export class InsightsStateService {
   );
 
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
-
-  trackWasteCardViewed(surface: 'dashboard' | 'insights' = 'dashboard'): void {
-    if (wasteViewFiredThisSession) return;
-    wasteViewFiredThisSession = true;
-    this.analytics.track(ANALYTICS_EVENTS.WASTE_TRACKER_VIEWED, {
-      surface,
-      is_pro: this.isPro(),
-      count: this.wasteSummary().totalCount,
-    });
-  }
-
-  trackRepoPredictionViewed(surface: 'dashboard' | 'insights' = 'dashboard'): void {
-    if (repoViewFiredThisSession) return;
-    repoViewFiredThisSession = true;
-    this.analytics.track(ANALYTICS_EVENTS.REPO_PREDICTION_VIEWED, {
-      surface,
-      is_pro: this.isPro(),
-      count: this.repositionPredictions().length,
-    });
-  }
 
   addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): void {
     this.manualItemsStore.addManualItem(p.productName, 'preset');

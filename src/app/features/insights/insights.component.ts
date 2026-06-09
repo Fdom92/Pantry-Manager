@@ -13,6 +13,7 @@ import {
   IonButtons,
 } from '@ionic/angular/standalone';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
+import { InsightsTrackingStateService } from '@core/services/insights/insights-tracking-state.service';
 import { FoodType } from '@core/models/shared/enums.model';
 import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
 
@@ -39,11 +40,15 @@ import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card
 })
 export class InsightsComponent {
   readonly facade = inject(InsightsStateService);
+  private readonly insightsTracking = inject(InsightsTrackingStateService);
   readonly FoodType = FoodType;
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
-    this.facade.trackWasteCardViewed('insights');
+    this.insightsTracking.trackWasteCardViewed('insights', {
+      isPro: this.facade.isPro(),
+      count: this.facade.wasteSummary().totalCount,
+    });
   }
 
   formatPercent(ratio: number): string {
