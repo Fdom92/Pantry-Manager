@@ -3,11 +3,14 @@ import { Component, OnDestroy, ViewChild, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
+import { InsightsTrackingStateService } from '@core/services/insights/insights-tracking-state.service';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
+import type { RepositionPrediction } from '@core/domain/insights/reposition.domain';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { ReconsentSheetComponent } from '@shared/components/reconsent-sheet/reconsent-sheet.component';
 import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edit-modal.component';
 import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
+import { RepositionCardComponent } from '@shared/components/reposition-card/reposition-card.component';
 import {
   IonButton,
   IonButtons,
@@ -18,7 +21,8 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { TranslateModule } from '@ngx-translate/core';
+import { ToastController } from '@ionic/angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -39,6 +43,7 @@ import { TranslateModule } from '@ngx-translate/core';
     EmptyStateComponent,
     ReconsentSheetComponent,
     WasteTrackerCardComponent,
+    RepositionCardComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
@@ -47,8 +52,12 @@ import { TranslateModule } from '@ngx-translate/core';
 export class DashboardComponent implements OnDestroy {
   readonly facade = inject(DashboardStateService);
   private readonly insights = inject(InsightsStateService);
+  private readonly insightsTracking = inject(InsightsTrackingStateService);
+  private readonly toast = inject(ToastController);
+  private readonly translate = inject(TranslateService);
   readonly wasteSummary = this.insights.wasteSummary;
   readonly isInsightsPro = this.insights.isPro;
+  readonly repositionPredictions = this.insights.repositionPredictions;
   @ViewChild(ReconsentSheetComponent) private reconsentSheet?: ReconsentSheetComponent;
 
   /** Guard so the re-consent sheet is evaluated only once per visit session. */
@@ -62,7 +71,14 @@ export class DashboardComponent implements OnDestroy {
     this.isViewActive = true;
     await this.facade.ionViewWillEnter();
     await this.insights.loadEvents();
-    this.insights.trackWasteCardViewed('dashboard');
+    this.insightsTracking.trackWasteCardViewed('dashboard', {
+      isPro: this.isInsightsPro(),
+      count: this.wasteSummary().totalCount,
+    });
+    this.insightsTracking.trackRepoPredictionViewed('dashboard', {
+      isPro: this.isInsightsPro(),
+      count: this.repositionPredictions().length,
+    });
     this.maybePresentReconsentSheet();
   }
 
@@ -97,6 +113,13 @@ export class DashboardComponent implements OnDestroy {
       clearTimeout(this.reconsentTimer);
       this.reconsentTimer = null;
     }
+  }
+
+  async onAddRepoPredictionToList(p: RepositionPrediction): Promise<void> {
+    this.insights.addRepoPredictionToList(p, 'dashboard');
+    const message = this.translate.instant('dashboard.reposition.added');
+    const t = await this.toast.create({ message, duration: 1800, position: 'bottom' });
+    void t.present();
   }
 
   onSummaryCardClick(card: DashboardOverviewCardId): void {

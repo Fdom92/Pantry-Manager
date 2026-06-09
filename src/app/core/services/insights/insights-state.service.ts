@@ -35,18 +35,13 @@ import {
   computeProductSignals,
 } from '@core/domain/insights/insights-pro-payload.domain';
 import { computeWasteSummary, type WasteSummary } from '@core/domain/insights/waste.domain';
+import { computeRepositionPredictions, type RepositionPrediction } from '@core/domain/insights/reposition.domain';
 import type { PantryEvent } from '@core/models/events';
+import { ListManualItemsStore } from '../list/list-manual-items.store';
 
-export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary };
+export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary, RepositionPrediction };
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
-
-/**
- * Module-level guard so `waste_tracker_viewed` fires at most once per app
- * session, even when dashboard + insights both render the card and each has
- * its own page-scoped InsightsStateService instance. Resets on cold start.
- */
-let wasteViewFiredThisSession = false;
 
 @Injectable()
 export class InsightsStateService {
@@ -57,6 +52,7 @@ export class InsightsStateService {
   private readonly llmClient = inject(InsightsLlmClientService);
   private readonly languageService = inject(LanguageService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly manualItemsStore = inject(ListManualItemsStore);
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
@@ -110,15 +106,19 @@ export class InsightsStateService {
     computeWasteSummary(this.events(), new Date(), 30)
   );
 
+  readonly repositionPredictions = computed<RepositionPrediction[]>(() =>
+    computeRepositionPredictions(this.pantryStore.items(), this.events(), new Date())
+      .filter(p => p.daysToOut <= 30)
+  );
+
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
-  trackWasteCardViewed(surface: 'dashboard' | 'insights' = 'dashboard'): void {
-    if (wasteViewFiredThisSession) return;
-    wasteViewFiredThisSession = true;
-    this.analytics.track(ANALYTICS_EVENTS.WASTE_TRACKER_VIEWED, {
+  addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): void {
+    this.manualItemsStore.addManualItem(p.productName, 'preset');
+    this.analytics.track(ANALYTICS_EVENTS.REPO_PREDICTION_ADDED_TO_LIST, {
+      daysToOut: p.daysToOut,
+      confidence: p.confidence,
       surface,
-      is_pro: this.isPro(),
-      count: this.wasteSummary().totalCount,
     });
   }
 

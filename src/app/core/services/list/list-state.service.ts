@@ -30,6 +30,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
+import { ListManualItemsStore } from './list-manual-items.store';
 
 @Injectable()
 export class ListStateService {
@@ -43,14 +44,17 @@ export class ListStateService {
   private readonly toastController = inject(ToastController);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly manualItemsStore = inject(ListManualItemsStore);
 
   readonly isSharingListInProgress = signal(false);
 
-  // Ephemeral state — cleared on ionViewWillLeave
+  // Ephemeral per-visit state — cleared on ionViewWillLeave
   readonly boughtItemIds  = signal<Set<string>>(new Set());
   readonly removedAutoIds = signal<Set<string>>(new Set());
-  readonly manualItems    = signal<ManualItem[]>([]);
-  readonly boughtManuals  = signal<BoughtItem[]>([]);
+
+  // Persistent across tab switches — owned by ListManualItemsStore
+  readonly manualItems    = this.manualItemsStore.manualItems;
+  readonly boughtManuals  = this.manualItemsStore.boughtManuals;
 
   readonly shoppingAnalysis = computed<ShoppingStateWithItem>(() => {
     return this.buildShoppingAnalysis(
@@ -77,8 +81,6 @@ export class ListStateService {
   async ionViewWillLeave(): Promise<void> {
     this.boughtItemIds.set(new Set());
     this.removedAutoIds.set(new Set());
-    this.manualItems.set([]);
-    this.boughtManuals.set([]);
   }
 
   async markAsBought(
@@ -128,10 +130,8 @@ export class ListStateService {
   }
 
   markManualAsBought(id: string): void {
-    const item = this.manualItems().find(m => m.id === id);
+    const item = this.manualItemsStore.markManualAsBought(id);
     if (!item) return;
-    this.manualItems.update(list => list.filter(m => m.id !== id));
-    this.boughtManuals.update(list => [...list, { id, name: item.name }]);
     const msg = this.translate.instant('shopping.toasts.boughtManual', { name: item.name });
     void this.showToast(msg);
   }
@@ -147,8 +147,7 @@ export class ListStateService {
   }
 
   removeManualItem(id: string): void {
-    const item = this.manualItems().find(m => m.id === id);
-    this.manualItems.update(list => list.filter(m => m.id !== id));
+    const item = this.manualItemsStore.removeManual(id);
     if (item) {
       const msg = this.translate.instant('shopping.toasts.removedManual', { name: item.name });
       void this.showToast(msg);
@@ -162,13 +161,11 @@ export class ListStateService {
       next.delete(id);
       return next;
     });
-    this.boughtManuals.update(list => list.filter(b => b.id !== id));
+    this.manualItemsStore.restoreBoughtManual(id);
   }
 
-  addManualItem(name: string): void {
-    const id = crypto.randomUUID();
-    this.manualItems.update(list => [...list, { id, name }]);
-    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_MANUAL_ADDED);
+  addManualItem(name: string, source: 'user' | 'preset' = 'user'): void {
+    this.manualItemsStore.addManualItem(name, source);
   }
 
   private async showToast(message: string, duration = 2500): Promise<void> {
