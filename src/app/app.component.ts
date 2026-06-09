@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { App as CapacitorApp } from '@capacitor/app';
@@ -23,8 +24,10 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 })
 export class AppComponent {
   private readonly handledUrls = new Set<string>();
+  private wasProLastCheck: boolean | null = null;
 
   // DI
+  private readonly destroyRef = inject(DestroyRef);
   private readonly pantryQuery = inject(PantryQueryService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly router = inject(Router);
@@ -127,6 +130,7 @@ export class AppComponent {
   private async initializeRevenueCat(): Promise<void> {
     const userId = this.getOrCreateUserId();
     await this.revenuecat.init(userId);
+    this.detectTrialExpiry();
 
     // Foreground/background bookkeeping: tracks "session" boundaries from the
     // analytics point of view. On Capacitor, "closing" the app from the user
@@ -139,6 +143,7 @@ export class AppComponent {
         lastForegroundAt = Date.now();
         void this.recoveryNotif.cancelRecoveryWindow();
         await this.revenuecat.restore();
+        this.detectTrialExpiry();
         await this.notificationScheduler.scheduleAll();
       } else {
         this.analytics.track(ANALYTICS_EVENTS.APP_BACKGROUNDED, {
@@ -146,6 +151,10 @@ export class AppComponent {
         });
       }
     });
+
+    this.revenuecat.isPro$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.detectTrialExpiry());
   }
 
   private getOrCreateUserId(): string {
@@ -166,5 +175,26 @@ export class AppComponent {
     } catch (err) {
       console.warn('[AppComponent] first-run check failed', err);
     }
+  }
+
+  /**
+   * Fires `pro_trial_expired` exactly once after a trial-started user's PRO
+   * status flips from true to false. Idempotent across app launches via the
+   * `PRO_TRIAL_EXPIRED_FIRED` localStorage flag.
+   */
+  private detectTrialExpiry(): void {
+    const isPro = this.revenuecat.isPro();
+    const trialStartedAt = this.localStorage.pro.getTrialStartedAt();
+    const fired = this.localStorage.pro.isTrialExpiredFired();
+
+    if (!trialStartedAt || fired) {
+      this.wasProLastCheck = isPro;
+      return;
+    }
+    if (this.wasProLastCheck === true && isPro === false) {
+      this.analytics.track(ANALYTICS_EVENTS.PRO_TRIAL_EXPIRED);
+      this.localStorage.pro.markTrialExpiredFired();
+    }
+    this.wasProLastCheck = isPro;
   }
 }
