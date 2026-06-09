@@ -31,19 +31,7 @@
         />
       </section>
 
-      <!-- SECTION 2: Reposition prediction -->
-      <section class="insights-section">
-        <app-reposition-card
-          [predictions]="facade.repositionPredictions()"
-          [isPro]="facade.isPro()"
-          [ctaSurface]="'insights_tab'"
-          hideCta
-          [limit]="0"
-          (addToList)="onAddRepoPredictionToList($event)"
-        />
-      </section>
-
-      <!-- SECTION 3: Tu despensa ahora -->
+      <!-- SECTION 2: Tu despensa ahora -->
       <section class="insights-section">
         <h3 class="insights-section__title">{{ 'insights.snapshot.title' | translate }}</h3>
         <div class="snapshot-grid">
@@ -66,7 +54,7 @@
         </div>
       </section>
 
-      <!-- SECTION 4: Cobertura estimada -->
+      <!-- SECTION 3: Cobertura estimada -->
       @if (facade.foodCoverage()) {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.coverage.title' | translate }}</h3>
@@ -85,7 +73,7 @@
         </section>
       }
 
-      <!-- SECTION 5: Últimos 30 días -->
+      <!-- SECTION 4: Últimos 30 días -->
       <section class="insights-section">
         <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
         <div class="activity-row">
@@ -112,7 +100,7 @@
         </div>
       </section>
 
-      <!-- SECTION 6: Por tipo de alimento -->
+      <!-- SECTION 5: Por tipo de alimento -->
       @if (facade.distribution().foodTypes.length > 0) {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.distribution.title' | translate }}</h3>
@@ -149,7 +137,7 @@
         </section>
       }
 
-      <!-- SECTION 7: Calidad del inventario -->
+      <!-- SECTION 6: Calidad del inventario -->
       @if (facade.inventorySnapshot().total >= 3) {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.quality.title' | translate }}</h3>
@@ -203,7 +191,7 @@
         </section>
       }
 
-      <!-- SECTION 8: PRO analysis / teaser -->
+      <!-- SECTION 7: PRO analysis / teaser -->
       @if (facade.isPro()) {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.pro.title' | translate }}</h3>

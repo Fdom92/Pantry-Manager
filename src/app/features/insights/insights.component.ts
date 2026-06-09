@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import {
   IonButton,
   IonContent,
@@ -11,15 +11,12 @@ import {
   IonTitle,
   IonToolbar,
   IonButtons,
-  ToastController,
 } from '@ionic/angular/standalone';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
 import { InsightsTrackingStateService } from '@core/services/insights/insights-tracking-state.service';
 import { FoodType } from '@core/models/shared/enums.model';
 import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
-import { RepositionCardComponent } from '@shared/components/reposition-card/reposition-card.component';
 import { InsightsEmptyStateComponent } from './components/insights-empty-state/insights-empty-state.component';
-import type { RepositionPrediction } from '@core/domain/insights/reposition.domain';
 
 @Component({
   selector: 'app-insights',
@@ -37,7 +34,6 @@ import type { RepositionPrediction } from '@core/domain/insights/reposition.doma
     IonSkeletonText,
     IonButtons,
     WasteTrackerCardComponent,
-    RepositionCardComponent,
     InsightsEmptyStateComponent,
   ],
   templateUrl: './insights.component.html',
@@ -47,8 +43,6 @@ import type { RepositionPrediction } from '@core/domain/insights/reposition.doma
 export class InsightsComponent {
   readonly facade = inject(InsightsStateService);
   private readonly insightsTracking = inject(InsightsTrackingStateService);
-  private readonly toast = inject(ToastController);
-  private readonly translate = inject(TranslateService);
   readonly FoodType = FoodType;
 
   async ionViewWillEnter(): Promise<void> {
@@ -57,17 +51,6 @@ export class InsightsComponent {
       isPro: this.facade.isPro(),
       count: this.facade.wasteSummary().totalCount,
     });
-    this.insightsTracking.trackRepoPredictionViewed('insights', {
-      isPro: this.facade.isPro(),
-      count: this.facade.repositionPredictions().length,
-    });
-  }
-
-  async onAddRepoPredictionToList(p: RepositionPrediction): Promise<void> {
-    this.facade.addRepoPredictionToList(p, 'insights');
-    const message = this.translate.instant('dashboard.reposition.added');
-    const t = await this.toast.create({ message, duration: 1800, position: 'bottom' });
-    void t.present();
   }
 
   formatPercent(ratio: number): string {

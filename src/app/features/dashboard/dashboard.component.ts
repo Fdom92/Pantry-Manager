@@ -9,7 +9,6 @@ import type { RepositionPrediction } from '@core/domain/insights/reposition.doma
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { ReconsentSheetComponent } from '@shared/components/reconsent-sheet/reconsent-sheet.component';
 import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edit-modal.component';
-import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
 import { RepositionCardComponent } from '@shared/components/reposition-card/reposition-card.component';
 import { StreakChipComponent } from './components/streak-chip/streak-chip.component';
 import {
@@ -43,7 +42,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     BatchEditModalComponent,
     EmptyStateComponent,
     ReconsentSheetComponent,
-    WasteTrackerCardComponent,
     RepositionCardComponent,
     StreakChipComponent,
   ],
@@ -57,7 +55,6 @@ export class DashboardComponent implements OnDestroy {
   private readonly insightsTracking = inject(InsightsTrackingStateService);
   private readonly toast = inject(ToastController);
   private readonly translate = inject(TranslateService);
-  readonly wasteSummary = this.insights.wasteSummary;
   readonly isInsightsPro = this.insights.isPro;
   readonly repositionPredictions = this.insights.repositionPredictions;
   @ViewChild(ReconsentSheetComponent) private reconsentSheet?: ReconsentSheetComponent;
@@ -73,10 +70,6 @@ export class DashboardComponent implements OnDestroy {
     this.isViewActive = true;
     await this.facade.ionViewWillEnter();
     await this.insights.loadEvents();
-    this.insightsTracking.trackWasteCardViewed('dashboard', {
-      isPro: this.isInsightsPro(),
-      count: this.wasteSummary().totalCount,
-    });
     this.insightsTracking.trackRepoPredictionViewed('dashboard', {
       isPro: this.isInsightsPro(),
       count: this.repositionPredictions().length,
