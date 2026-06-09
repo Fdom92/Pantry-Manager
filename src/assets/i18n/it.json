@@ -1131,7 +1131,8 @@
       "milestones": "Traguardi",
       "nextGoal": "Mancano {{days}} giorni a {{milestone}}",
       "graceAvailable": "Giorno jolly disponibile",
-      "graceUsed": "Jolly usato — torna domani senza fallo"
+      "graceUsed": "Jolly usato — torna domani senza fallo",
+      "allMilestonesReached": "🎉 Hai raggiunto tutti i traguardi!"
     }
   },
   "reviews": {

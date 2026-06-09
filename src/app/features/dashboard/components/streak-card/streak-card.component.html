@@ -1,50 +1,29 @@
 <ion-card class="streak-card" id="streak">
-  <ion-card-header>
-    <ion-card-title>
-      🔥 {{ 'settings.streak.title' | translate }}
-    </ion-card-title>
-  </ion-card-header>
-  <ion-card-content>
-    <div class="streak-card__current">
-      <span class="streak-card__number">{{ currentStreak() }}</span>
-      <span class="streak-card__label">{{ 'settings.streak.daysLabel' | translate }}</span>
+  <ion-card-content class="streak-card__content">
+    <div class="streak-card__header">
+      <span class="streak-card__title">🔥 {{ 'settings.streak.title' | translate }}</span>
     </div>
 
-    @if (currentStreak() === 0) {
-      <p class="streak-card__empty">
+    <div class="streak-card__row">
+      <div class="streak-card__current">
+        <span class="streak-card__number">{{ currentStreak() }}</span>
+        <span class="streak-card__label">{{ 'settings.streak.daysLabel' | translate }}</span>
+      </div>
+      @if (currentStreak() > 0) {
+        <span class="streak-card__best">
+          {{ 'settings.streak.longest' | translate: { longest: longestStreak() } }}
+        </span>
+      }
+    </div>
+
+    <p class="streak-card__hint">
+      @if (currentStreak() === 0) {
         {{ 'settings.streak.empty' | translate }}
-      </p>
-    } @else {
-      <p class="streak-card__longest">
-        {{ 'settings.streak.longest' | translate: { longest: longestStreak() } }}
-      </p>
-    }
-
-    <div class="streak-card__milestones">
-      <h4>{{ 'settings.streak.milestones' | translate }}</h4>
-      <ul>
-        @for (m of milestones; track m) {
-          <li [class.streak-card__milestone--reached]="milestonesReached().includes(m)">
-            {{ milestonesReached().includes(m) ? '✓' : '○' }} {{ m }} {{ 'settings.streak.daysLabel' | translate }}
-          </li>
-        }
-      </ul>
-    </div>
-
-    @if (nextMilestone() !== null) {
-      <p class="streak-card__next">
-        {{ 'settings.streak.nextGoal' | translate: { days: daysToNextMilestone(), milestone: nextMilestone() } }}
-      </p>
-    }
-
-    @if (currentStreak() > 0) {
-      <p class="streak-card__grace">
-        @if (graceUsedRecently()) {
-          {{ 'settings.streak.graceUsed' | translate }}
-        } @else {
-          {{ 'settings.streak.graceAvailable' | translate }}
-        }
-      </p>
-    }
+      } @else if (nextMilestone() !== null) {
+        🏆 {{ 'settings.streak.nextGoal' | translate: { days: daysToNextMilestone(), milestone: nextMilestone() } }}
+      } @else {
+        {{ 'settings.streak.allMilestonesReached' | translate }}
+      }
+    </p>
   </ion-card-content>
 </ion-card>

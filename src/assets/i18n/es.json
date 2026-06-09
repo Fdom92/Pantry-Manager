@@ -1131,7 +1131,8 @@
       "milestones": "Hitos",
       "nextGoal": "Faltan {{days}} días para los {{milestone}}",
       "graceAvailable": "Día comodín disponible",
-      "graceUsed": "Comodín usado — vuelve mañana sin falta"
+      "graceUsed": "Comodín usado — vuelve mañana sin falta",
+      "allMilestonesReached": "🎉 ¡Has alcanzado todos los hitos!"
     }
   },
   "reviews": {

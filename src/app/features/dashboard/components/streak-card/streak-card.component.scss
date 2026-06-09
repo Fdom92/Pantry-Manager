@@ -1,10 +1,45 @@
 .streak-card {
-  &__current { display: flex; align-items: baseline; gap: var(--app-theme-spacing-2xs); }
-  &__number  { font-size: 2.5rem; font-weight: 700; color: var(--ion-color-warning-shade); }
-  &__label   { font-size: var(--app-theme-font-size-small); color: var(--ion-color-medium); }
-  &__longest { color: var(--ion-color-medium); margin: var(--app-theme-spacing-sm) 0; }
-  &__empty   { color: var(--ion-color-medium); margin: var(--app-theme-spacing-sm) 0; font-size: var(--app-theme-font-size-small); }
-  &__milestones ul { list-style: none; padding-left: 0; }
-  &__milestone--reached { color: var(--ion-color-success); font-weight: 600; }
-  &__next, &__grace { color: var(--ion-color-medium); font-size: var(--app-theme-font-size-small); }
+  &__content {
+    padding: var(--app-theme-spacing-md, 12px) var(--app-theme-spacing-md, 12px);
+  }
+  &__header {
+    margin-bottom: var(--app-theme-spacing-2xs, 2px);
+  }
+  &__title {
+    font-size: var(--app-theme-font-size-small, 0.875rem);
+    font-weight: 600;
+    color: var(--ion-color-medium-shade);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  &__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--app-theme-spacing-sm, 8px);
+  }
+  &__current {
+    display: flex;
+    align-items: baseline;
+    gap: var(--app-theme-spacing-2xs, 2px);
+  }
+  &__number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--ion-color-warning-shade);
+    line-height: 1;
+  }
+  &__label {
+    font-size: var(--app-theme-font-size-small, 0.875rem);
+    color: var(--ion-color-medium);
+  }
+  &__best {
+    font-size: var(--app-theme-font-size-small, 0.875rem);
+    color: var(--ion-color-medium);
+  }
+  &__hint {
+    margin: var(--app-theme-spacing-2xs, 2px) 0 0;
+    font-size: var(--app-theme-font-size-small, 0.875rem);
+    color: var(--ion-color-medium);
+  }
 }

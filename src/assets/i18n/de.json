@@ -1131,7 +1131,8 @@
       "milestones": "Meilensteine",
       "nextGoal": "Noch {{days}} Tage bis zu {{milestone}}",
       "graceAvailable": "Joker-Tag verfügbar",
-      "graceUsed": "Joker benutzt — komm morgen auf jeden Fall zurück"
+      "graceUsed": "Joker benutzt — komm morgen auf jeden Fall zurück",
+      "allMilestonesReached": "🎉 Du hast alle Meilensteine erreicht!"
     }
   },
   "reviews": {

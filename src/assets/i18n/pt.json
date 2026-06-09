@@ -1131,7 +1131,8 @@
       "milestones": "Marcos",
       "nextGoal": "Faltam {{days}} dias para {{milestone}}",
       "graceAvailable": "Dia curinga disponível",
-      "graceUsed": "Curinga usado — volta amanhã sem falta"
+      "graceUsed": "Curinga usado — volta amanhã sem falta",
+      "allMilestonesReached": "🎉 Atingiste todos os marcos!"
     }
   },
   "reviews": {
