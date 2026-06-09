@@ -7,6 +7,8 @@ export const NOTIFICATION_IDS = {
   RECOVERY_D2: 140,
   RECOVERY_D5: 141,
   RECOVERY_D10: 142,
+  /** Outside the priority registry — scheduled ad-hoc on milestone. */
+  STREAK_MILESTONE: 150,
 } as const;
 
 export const NOTIFICATION_CHANNEL_ID = 'pantry-alerts';
