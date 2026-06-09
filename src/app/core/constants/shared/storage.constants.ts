@@ -20,6 +20,8 @@ export const STORAGE_KEYS = {
   // ── PouchDB document ids ──────────────────────────────────────────────
   /** PouchDB `_id` for the singleton `AppPreferences` doc. */
   PREFERENCES: 'app:preferences',
+  /** PouchDB `_id` for the singleton streak state doc. */
+  STREAK_DOC_ID: 'streak:current',
 
   // ── localStorage keys (per-device state) ──────────────────────────────
   /** Cached PRO entitlement. Authoritative source is RevenueCat cloud. */
