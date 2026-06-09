@@ -893,6 +893,10 @@
     "pro": {
       "statusDescription": "Grazie per supportare il progetto. PRO è attivo su questo dispositivo.",
       "upgradePrompt": "Passa a PRO per sbloccare previsioni di scorta, analisi degli sprechi e altro.",
+      "tagline": "Ottieni il massimo dalla tua dispensa",
+      "feature1": "Prevedi cosa comprare prima che finisca",
+      "feature2": "Analisi degli sprechi e schemi di consumo",
+      "feature3": "Nuove funzionalità premium in arrivo",
       "upgradeCta": "Passa a PRO",
       "badgePro": "PRO attivo",
       "activeTitle": "PRO attivo",

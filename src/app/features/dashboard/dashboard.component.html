@@ -36,20 +36,6 @@
         <app-streak-card />
       </section>
 
-      <!-- Próximas compras (reposition) — PRO only AND only with real predictions -->
-      @if (isInsightsPro() && repositionPredictions().length > 0) {
-        <section class="dashboard-section">
-          <header class="dashboard-section-header">
-            <h3 class="dashboard-section-title">{{ 'dashboard.sections.reposition.title' | translate }}</h3>
-          </header>
-          <app-reposition-card
-            [predictions]="repositionPredictions()"
-            [isPro]="isInsightsPro()"
-            (addToList)="onAddRepoPredictionToList($event)"
-          />
-        </section>
-      }
-
       <!-- Today's suggestion -->
       @if (facade.totalItems() > 0) {
         <section class="dashboard-section">
@@ -178,6 +164,20 @@
               </div>
             }
           </div>
+        </section>
+      }
+
+      <!-- Próximas compras (reposition) — PRO only AND only with real predictions -->
+      @if (isInsightsPro() && repositionPredictions().length > 0) {
+        <section class="dashboard-section">
+          <header class="dashboard-section-header">
+            <h3 class="dashboard-section-title">{{ 'dashboard.sections.reposition.title' | translate }}</h3>
+          </header>
+          <app-reposition-card
+            [predictions]="repositionPredictions()"
+            [isPro]="isInsightsPro()"
+            (addToList)="onAddRepoPredictionToList($event)"
+          />
         </section>
       }
     }

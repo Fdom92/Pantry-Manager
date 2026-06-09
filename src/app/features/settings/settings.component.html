@@ -15,35 +15,51 @@
 
     <!-- ── PRO hero card ──────────────────────────────────────── -->
     <ion-card class="settings-card settings-pro-card" [class.is-pro]="isPro()">
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="sparkles-outline" class="settings-pro-card__icon"></ion-icon>
-          @if (isPro()) {
+      @if (isPro()) {
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="sparkles-outline" class="settings-pro-card__icon"></ion-icon>
             {{ "settings.pro.activeTitle" | translate }}
-          } @else {
-            {{ "settings.pro.upgradeTitle" | translate }}
-          }
-        </ion-card-title>
-        <ion-card-subtitle>
-          @if (isPro()) {
+          </ion-card-title>
+          <ion-card-subtitle>
             {{ "settings.pro.statusDescription" | translate }}
-          } @else {
-            {{ "settings.pro.upgradePrompt" | translate }}
-          }
-        </ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        @if (isPro()) {
-          <ion-badge color="tertiary">
-            {{ "settings.pro.badgePro" | translate }}
-          </ion-badge>
-        } @else {
+          </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-badge color="tertiary">{{ "settings.pro.badgePro" | translate }}</ion-badge>
+        </ion-card-content>
+      } @else {
+        <div class="pro-hero">
+          <div class="pro-hero__header">
+            <ion-icon name="sparkles-outline" class="pro-hero__icon"></ion-icon>
+            <div>
+              <h2 class="pro-hero__title">{{ "settings.pro.upgradeTitle" | translate }}</h2>
+              <p class="pro-hero__tagline">{{ "settings.pro.tagline" | translate }}</p>
+            </div>
+          </div>
+
+          <ul class="pro-hero__features">
+            <li>
+              <ion-icon name="trending-up-outline"></ion-icon>
+              <span>{{ "settings.pro.feature1" | translate }}</span>
+            </li>
+            <li>
+              <ion-icon name="analytics-outline"></ion-icon>
+              <span>{{ "settings.pro.feature2" | translate }}</span>
+            </li>
+            <li>
+              <ion-icon name="rocket-outline"></ion-icon>
+              <span>{{ "settings.pro.feature3" | translate }}</span>
+            </li>
+          </ul>
+
           @if (monthlyPriceString()) {
             <div class="pro-hero__pricing">
               <span class="pro-hero__price-line">
                 {{ 'settings.pro.priceMonthly' | translate: { price: monthlyPriceString() } }}
               </span>
               @if (annualPriceString()) {
+                <span class="pro-hero__price-divider">·</span>
                 <span class="pro-hero__price-line">
                   {{ 'settings.pro.priceAnnual' | translate: { price: annualPriceString() } }}
                   @if (annualSavingsPercent() !== null) {
@@ -55,9 +71,10 @@
               }
             </div>
           }
-          <app-pro-trial-cta surface="settings_hero" compact dismissible />
-        }
-      </ion-card-content>
+
+          <app-pro-trial-cta surface="settings_hero" dismissible />
+        </div>
+      }
     </ion-card>
 
     <!-- ── Apariencia ─────────────────────────────────────────── -->

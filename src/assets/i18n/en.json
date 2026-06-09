@@ -893,6 +893,10 @@
     "pro": {
       "statusDescription": "Thank you for supporting the project. PRO is active on this device.",
       "upgradePrompt": "Go PRO to unlock stock predictions, waste analytics, and more.",
+      "tagline": "Make the most of your pantry",
+      "feature1": "Predict what you'll need to buy before you run out",
+      "feature2": "Waste analytics and consumption patterns",
+      "feature3": "New premium features coming soon",
       "upgradeCta": "Upgrade to PRO",
       "badgePro": "PRO active",
       "activeTitle": "PRO active",

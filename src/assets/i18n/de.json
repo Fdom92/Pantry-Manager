@@ -893,6 +893,10 @@
     "pro": {
       "statusDescription": "Danke für deine Unterstützung. PRO ist auf diesem Gerät aktiv.",
       "upgradePrompt": "Werde PRO, um Bestandsprognosen, Verschwendungsanalysen und mehr freizuschalten.",
+      "tagline": "Hol das Maximum aus deiner Vorratskammer",
+      "feature1": "Vorhersage, was du kaufen musst, bevor es ausgeht",
+      "feature2": "Verschwendungsanalysen und Verbrauchsmuster",
+      "feature3": "Neue Premium-Funktionen in Kürze",
       "upgradeCta": "PRO werden",
       "badgePro": "PRO aktiv",
       "activeTitle": "PRO aktiv",

@@ -893,6 +893,10 @@
     "pro": {
       "statusDescription": "Gracias por apoyar el proyecto. PRO está activo en este dispositivo.",
       "upgradePrompt": "Hazte PRO para desbloquear predicciones de stock, análisis de desperdicio y más.",
+      "tagline": "Saca todo el partido a tu despensa",
+      "feature1": "Predice qué necesitas comprar antes de que se acabe",
+      "feature2": "Análisis de desperdicio y patrones de consumo",
+      "feature3": "Nuevas funciones premium próximamente",
       "upgradeCta": "Hazte PRO",
       "badgePro": "PRO activo",
       "activeTitle": "PRO activo",

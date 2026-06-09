@@ -893,6 +893,10 @@
     "pro": {
       "statusDescription": "Merci de soutenir le projet. PRO est actif sur cet appareil.",
       "upgradePrompt": "Passe en PRO pour débloquer les prédictions de stock, l’analyse du gaspillage et plus encore.",
+      "tagline": "Tire le meilleur parti de ton garde-manger",
+      "feature1": "Prédis ce que tu dois acheter avant d'en manquer",
+      "feature2": "Analyse du gaspillage et schémas de consommation",
+      "feature3": "Nouvelles fonctionnalités premium à venir",
       "upgradeCta": "Passer en PRO",
       "badgePro": "PRO actif",
       "activeTitle": "PRO actif",

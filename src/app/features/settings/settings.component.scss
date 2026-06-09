@@ -8,24 +8,86 @@
   margin: 0;
 }
 
-// ── PRO hero pricing block ────────────────────────────────────────────────────
+// ── PRO hero (free state) ─────────────────────────────────────────────────────
 
-.pro-hero__pricing {
+.pro-hero {
+  padding: var(--app-theme-spacing-md);
   display: flex;
   flex-direction: column;
-  gap: var(--app-theme-spacing-2xs);
-  margin: var(--app-theme-spacing-sm) 0 var(--app-theme-spacing-md);
-  font-size: var(--app-theme-font-size-small);
-}
+  gap: var(--app-theme-spacing-md);
 
-.pro-hero__price-line {
-  color: var(--ion-color-medium);
-}
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--app-theme-spacing-sm);
+  }
 
-.pro-hero__savings {
-  margin-left: var(--app-theme-spacing-2xs);
-  color: var(--ion-color-success);
-  font-weight: var(--app-theme-font-weight-bold);
+  &__icon {
+    font-size: 1.75rem;
+    color: var(--ion-color-tertiary);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ion-text-color);
+  }
+
+  &__tagline {
+    margin: 4px 0 0;
+    color: var(--ion-color-medium);
+    font-size: var(--app-theme-font-size-small);
+  }
+
+  &__features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-theme-spacing-sm);
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: var(--app-theme-spacing-sm);
+      color: var(--ion-text-color);
+      font-size: var(--app-theme-font-size-small);
+
+      ion-icon {
+        color: var(--ion-color-tertiary);
+        font-size: 1.15rem;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  &__pricing {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--app-theme-spacing-2xs);
+    font-size: var(--app-theme-font-size-small);
+    color: var(--ion-color-medium);
+  }
+
+  &__price-line {
+    color: var(--ion-color-medium);
+  }
+
+  &__price-divider {
+    color: var(--ion-color-medium);
+    opacity: 0.5;
+  }
+
+  &__savings {
+    margin-left: var(--app-theme-spacing-2xs);
+    color: var(--ion-color-success);
+    font-weight: var(--app-theme-font-weight-bold);
+  }
 }
 
 .settings-card ion-list-header {
