@@ -10,9 +10,15 @@
       <span class="streak-card__label">{{ 'settings.streak.daysLabel' | translate }}</span>
     </div>
 
-    <p class="streak-card__longest">
-      {{ 'settings.streak.longest' | translate: { longest: longestStreak() } }}
-    </p>
+    @if (currentStreak() === 0) {
+      <p class="streak-card__empty">
+        {{ 'settings.streak.empty' | translate }}
+      </p>
+    } @else {
+      <p class="streak-card__longest">
+        {{ 'settings.streak.longest' | translate: { longest: longestStreak() } }}
+      </p>
+    }
 
     <div class="streak-card__milestones">
       <h4>{{ 'settings.streak.milestones' | translate }}</h4>
@@ -31,12 +37,14 @@
       </p>
     }
 
-    <p class="streak-card__grace">
-      @if (graceUsedRecently()) {
-        {{ 'settings.streak.graceUsed' | translate }}
-      } @else {
-        {{ 'settings.streak.graceAvailable' | translate }}
-      }
-    </p>
+    @if (currentStreak() > 0) {
+      <p class="streak-card__grace">
+        @if (graceUsedRecently()) {
+          {{ 'settings.streak.graceUsed' | translate }}
+        } @else {
+          {{ 'settings.streak.graceAvailable' | translate }}
+        }
+      </p>
+    }
   </ion-card-content>
 </ion-card>

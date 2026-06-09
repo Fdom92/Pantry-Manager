@@ -886,7 +886,7 @@
     "title": "Paramètres",
     "pro": {
       "statusDescription": "Merci de soutenir le projet. PRO est actif sur cet appareil.",
-      "upgradePrompt": "Passez en PRO pour débloquer l’historique complet et les fonctionnalités premium.",
+      "upgradePrompt": "Passe en PRO pour débloquer les prédictions de stock, l’analyse du gaspillage et plus encore.",
       "upgradeCta": "Passer en PRO",
       "badgePro": "PRO actif",
       "activeTitle": "PRO actif",
@@ -1126,6 +1126,7 @@
     "streak": {
       "title": "Ta série",
       "daysLabel": "jours",
+      "empty": "Ajoute ou consomme un produit aujourd'hui pour démarrer ta série",
       "longest": "Meilleure série : {{longest}}",
       "milestones": "Jalons",
       "nextGoal": "Il reste {{days}} jours avant {{milestone}}",

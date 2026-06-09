@@ -886,7 +886,7 @@
     "title": "Settings",
     "pro": {
       "statusDescription": "Thank you for supporting the project. PRO is active on this device.",
-      "upgradePrompt": "Upgrade to PRO to unlock your full history and premium features.",
+      "upgradePrompt": "Go PRO to unlock stock predictions, waste analytics, and more.",
       "upgradeCta": "Upgrade to PRO",
       "badgePro": "PRO active",
       "activeTitle": "PRO active",
@@ -1126,6 +1126,7 @@
     "streak": {
       "title": "Your streak",
       "daysLabel": "days",
+      "empty": "Add or use a product today to start your streak",
       "longest": "Best streak: {{longest}}",
       "milestones": "Milestones",
       "nextGoal": "{{days}} days to go until {{milestone}}",

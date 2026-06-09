@@ -886,7 +886,7 @@
     "title": "Ajustes",
     "pro": {
       "statusDescription": "Gracias por apoyar el proyecto. PRO está activo en este dispositivo.",
-      "upgradePrompt": "Hazte PRO para desbloquear el historial completo y funciones premium.",
+      "upgradePrompt": "Hazte PRO para desbloquear predicciones de stock, análisis de desperdicio y más.",
       "upgradeCta": "Hazte PRO",
       "badgePro": "PRO activo",
       "activeTitle": "PRO activo",
@@ -1126,6 +1126,7 @@
     "streak": {
       "title": "Tu racha",
       "daysLabel": "días",
+      "empty": "Añade o consume un producto hoy para empezar tu racha",
       "longest": "Mejor racha: {{longest}}",
       "milestones": "Hitos",
       "nextGoal": "Faltan {{days}} días para los {{milestone}}",

@@ -886,7 +886,7 @@
     "title": "Definições",
     "pro": {
       "statusDescription": "Obrigado por apoiares o projeto. PRO está ativo neste dispositivo.",
-      "upgradePrompt": "Atualiza para PRO para desbloquear o histórico completo e funcionalidades premium.",
+      "upgradePrompt": "Torna-te PRO para desbloquear previsões de stock, análise de desperdício e mais.",
       "upgradeCta": "Atualizar para PRO",
       "badgePro": "PRO ativo",
       "activeTitle": "PRO ativo",
@@ -1126,6 +1126,7 @@
     "streak": {
       "title": "A tua sequência",
       "daysLabel": "dias",
+      "empty": "Adiciona ou consome um produto hoje para começar a tua sequência",
       "longest": "Melhor sequência: {{longest}}",
       "milestones": "Marcos",
       "nextGoal": "Faltam {{days}} dias para {{milestone}}",
