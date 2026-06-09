@@ -76,6 +76,14 @@ export const ANALYTICS_EVENTS = {
 
   // Preferences (signals of churn / personalization).
   PREFERENCE_CHANGED: 'preference_changed',
+
+  // Retention — streak
+  STREAK_REACHED: 'streak_reached',
+  STREAK_MILESTONE_3: 'streak_milestone_3',
+  STREAK_MILESTONE_7: 'streak_milestone_7',
+  STREAK_MILESTONE_30: 'streak_milestone_30',
+  STREAK_MILESTONE_100: 'streak_milestone_100',
+  STREAK_BROKEN: 'streak_broken',
 } as const;
 
 export type AnalyticsEventName =
