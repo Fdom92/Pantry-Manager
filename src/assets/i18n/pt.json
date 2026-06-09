@@ -151,6 +151,12 @@
       }
     },
     "sections": {
+      "progress": {
+        "title": "O teu progresso"
+      },
+      "reposition": {
+        "title": "Próximas compras"
+      },
       "today": {
         "title": "Recomendado para hoje"
       },

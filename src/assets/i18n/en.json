@@ -151,6 +151,12 @@
       }
     },
     "sections": {
+      "progress": {
+        "title": "Your progress"
+      },
+      "reposition": {
+        "title": "Upcoming shopping"
+      },
       "today": {
         "title": "Recommended for today"
       },

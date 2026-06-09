@@ -151,6 +151,12 @@
       }
     },
     "sections": {
+      "progress": {
+        "title": "Ton progrès"
+      },
+      "reposition": {
+        "title": "Prochaines courses"
+      },
       "today": {
         "title": "Recommandé pour aujourd'hui"
       },
