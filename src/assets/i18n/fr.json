@@ -369,6 +369,9 @@
       "added": "Ajouté à la liste",
       "empty": "Nous avons besoin de plus d'historique pour prédire",
       "teaser": "Anticipez ce que vous devez acheter avant d'en manquer"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} jours"
     }
   },
   "shopping": {
@@ -1114,6 +1117,15 @@
       "subtitle": "Support, évaluations et documents légaux.",
       "termsTitle": "Conditions d'utilisation",
       "termsSubtitle": "Conditions de service."
+    },
+    "streak": {
+      "title": "Ta série",
+      "daysLabel": "jours",
+      "longest": "Meilleure série : {{longest}}",
+      "milestones": "Jalons",
+      "nextGoal": "Il reste {{days}} jours avant {{milestone}}",
+      "graceAvailable": "Joker disponible",
+      "graceUsed": "Joker utilisé — reviens demain sans faute"
     }
   },
   "reviews": {
@@ -1176,6 +1188,10 @@
         "title": "Ton garde-manger a besoin de toi",
         "body": "Reviens et évite de jeter de la nourriture. 30 secondes suffisent."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Bel élan",
+      "body": "Tu gères ton garde-manger depuis {{streak}} jours d'affilée. Continue !"
     }
   },
   "sync": {
@@ -1235,5 +1251,8 @@
       "confirm": "Terminé",
       "later": "Pas maintenant"
     }
+  },
+  "streak": {
+    "milestoneToast": "{{streak}} jours d'affilée ! 🔥 Continue comme ça."
   }
 }

@@ -369,6 +369,9 @@
       "added": "Adicionado à lista",
       "empty": "Precisamos de mais histórico para prever",
       "teaser": "Preveja o que precisa de comprar antes de ficar sem stock"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} dias"
     }
   },
   "shopping": {
@@ -1114,6 +1117,15 @@
       "subtitle": "Suporte, avaliações e documentos legais.",
       "termsTitle": "Termos de uso",
       "termsSubtitle": "Condições de serviço."
+    },
+    "streak": {
+      "title": "A tua sequência",
+      "daysLabel": "dias",
+      "longest": "Melhor sequência: {{longest}}",
+      "milestones": "Marcos",
+      "nextGoal": "Faltam {{days}} dias para {{milestone}}",
+      "graceAvailable": "Dia curinga disponível",
+      "graceUsed": "Curinga usado — volta amanhã sem falta"
     }
   },
   "reviews": {
@@ -1176,6 +1188,10 @@
         "title": "A tua despensa precisa de ti",
         "body": "Volta e evita deitar comida fora. Bastam 30 segundos."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Bom ritmo",
+      "body": "Tens gerido a tua despensa durante {{streak}} dias seguidos. Continua!"
     }
   },
   "sync": {
@@ -1235,5 +1251,8 @@
       "confirm": "Pronto",
       "later": "Agora não"
     }
+  },
+  "streak": {
+    "milestoneToast": "{{streak}} dias seguidos! 🔥 Continue assim."
   }
 }

@@ -369,6 +369,9 @@
       "added": "Zur Liste hinzugefügt",
       "empty": "Wir brauchen mehr Verlauf für Vorhersagen",
       "teaser": "Sag voraus, was du kaufen musst, bevor es aufgebraucht ist"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} Tage"
     }
   },
   "shopping": {
@@ -1114,6 +1117,15 @@
       "subtitle": "Support, Bewertungen und rechtliche Dokumente.",
       "termsTitle": "Nutzungsbedingungen",
       "termsSubtitle": "Servicebedingungen."
+    },
+    "streak": {
+      "title": "Deine Serie",
+      "daysLabel": "Tage",
+      "longest": "Längste Serie: {{longest}}",
+      "milestones": "Meilensteine",
+      "nextGoal": "Noch {{days}} Tage bis zu {{milestone}}",
+      "graceAvailable": "Joker-Tag verfügbar",
+      "graceUsed": "Joker benutzt — komm morgen auf jeden Fall zurück"
     }
   },
   "reviews": {
@@ -1176,6 +1188,10 @@
         "title": "Deine Vorratskammer braucht dich",
         "body": "Komm zurück und vermeide Lebensmittelverschwendung. 30 Sekunden reichen."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Gutes Tempo",
+      "body": "Du kümmerst dich seit {{streak}} Tagen am Stück um deine Vorratskammer. Weiter so!"
     }
   },
   "sync": {
@@ -1235,5 +1251,8 @@
       "confirm": "Fertig",
       "later": "Jetzt nicht"
     }
+  },
+  "streak": {
+    "milestoneToast": "{{streak}} Tage am Stück! 🔥 Weiter so."
   }
 }

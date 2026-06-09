@@ -1,0 +1,8 @@
+@if (visible()) {
+  <a class="streak-chip" routerLink="/settings" fragment="streak">
+    <span class="streak-chip__icon">🔥</span>
+    <span class="streak-chip__text">
+      {{ 'dashboard.streak.chip' | translate: { streak: currentStreak() } }}
+    </span>
+  </a>
+}

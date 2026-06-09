@@ -369,6 +369,9 @@
       "added": "Añadido a la lista",
       "empty": "Necesitamos más historial para predecir",
       "teaser": "Predice qué necesitas comprar antes de que se acabe"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} días"
     }
   },
   "shopping": {
@@ -1114,6 +1117,15 @@
       "subtitle": "Soporte, valoración y documentos legales.",
       "termsTitle": "Términos de uso",
       "termsSubtitle": "Condiciones de servicio."
+    },
+    "streak": {
+      "title": "Tu racha",
+      "daysLabel": "días",
+      "longest": "Mejor racha: {{longest}}",
+      "milestones": "Hitos",
+      "nextGoal": "Faltan {{days}} días para los {{milestone}}",
+      "graceAvailable": "Día comodín disponible",
+      "graceUsed": "Comodín usado — vuelve mañana sin falta"
     }
   },
   "reviews": {
@@ -1176,6 +1188,10 @@
         "title": "Tu despensa te necesita",
         "body": "Vuelve y evita tirar comida. Tardas 30 segundos en revisarla."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Buen ritmo",
+      "body": "Llevas {{streak}} días seguidos cuidando tu despensa. ¡Sigue así!"
     }
   },
   "sync": {
@@ -1235,5 +1251,8 @@
       "confirm": "Hecho",
       "later": "Ahora no"
     }
+  },
+  "streak": {
+    "milestoneToast": "¡{{streak}} días seguidos! 🔥 Sigue así."
   }
 }

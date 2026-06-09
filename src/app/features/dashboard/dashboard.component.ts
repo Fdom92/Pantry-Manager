@@ -11,6 +11,7 @@ import { ReconsentSheetComponent } from '@shared/components/reconsent-sheet/reco
 import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edit-modal.component';
 import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
 import { RepositionCardComponent } from '@shared/components/reposition-card/reposition-card.component';
+import { StreakChipComponent } from './components/streak-chip/streak-chip.component';
 import {
   IonButton,
   IonButtons,
@@ -44,6 +45,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     ReconsentSheetComponent,
     WasteTrackerCardComponent,
     RepositionCardComponent,
+    StreakChipComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
