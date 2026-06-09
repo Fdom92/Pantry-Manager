@@ -533,6 +533,11 @@
         "recommendations": "Recommendations",
         "suggestions": "This week"
       }
+    },
+    "empty": {
+      "title": "No insights yet",
+      "body": "Add products to your pantry to see consumption patterns, predictions and waste.",
+      "cta": "Go to pantry"
     }
   },
   "pantry": {

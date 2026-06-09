@@ -533,6 +533,11 @@
         "recommendations": "Recommandations",
         "suggestions": "Cette semaine"
       }
+    },
+    "empty": {
+      "title": "Pas encore d'insights",
+      "body": "Ajoutez des produits à votre garde-manger pour voir les tendances de consommation, les prédictions et le gaspillage.",
+      "cta": "Aller au garde-manger"
     }
   },
   "pantry": {

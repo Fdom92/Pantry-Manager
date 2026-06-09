@@ -113,6 +113,14 @@ export class InsightsStateService {
 
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
+  readonly isEmpty = computed<boolean>(() => {
+    const items = this.pantryStore.items();
+    if (items.length === 0) return true;
+    const sevenDaysAgo = Date.now() - 7 * 86_400_000;
+    const recentEvents = this.events().filter(e => new Date(e.timestamp).getTime() >= sevenDaysAgo);
+    return recentEvents.length < 5;
+  });
+
   addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): void {
     this.manualItemsStore.addManualItem(p.productName, 'preset');
     this.analytics.track(ANALYTICS_EVENTS.REPO_PREDICTION_ADDED_TO_LIST, {
