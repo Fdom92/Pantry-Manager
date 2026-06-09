@@ -18,6 +18,7 @@ import { InsightsTrackingStateService } from '@core/services/insights/insights-t
 import { FoodType } from '@core/models/shared/enums.model';
 import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
 import { RepositionCardComponent } from '@shared/components/reposition-card/reposition-card.component';
+import { InsightsEmptyStateComponent } from './components/insights-empty-state/insights-empty-state.component';
 import type { RepositionPrediction } from '@core/domain/insights/reposition.domain';
 
 @Component({
@@ -37,6 +38,7 @@ import type { RepositionPrediction } from '@core/domain/insights/reposition.doma
     IonButtons,
     WasteTrackerCardComponent,
     RepositionCardComponent,
+    InsightsEmptyStateComponent,
   ],
   templateUrl: './insights.component.html',
   styleUrls: ['./insights.component.scss'],

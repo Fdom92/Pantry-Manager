@@ -40,6 +40,7 @@ import { environment } from 'src/environments/environment';
 import { SettingsNotificationsDevStateService } from '@core/services/settings/settings-notifications-dev-state.service';
 import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial-cta.component';
 import { StreakCardComponent } from './components/streak-card/streak-card.component';
+import { SettingsSkeletonComponent } from './components/settings-skeleton/settings-skeleton.component';
 import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
@@ -71,6 +72,7 @@ import { AlertController, ToastController } from '@ionic/angular';
     TranslateModule,
     ProTrialCtaComponent,
     StreakCardComponent,
+    SettingsSkeletonComponent,
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
@@ -202,8 +204,17 @@ export class SettingsComponent {
   readonly isResettingOnboarding = signal(false);
   readonly devIsPro = signal(this.revenuecat.isPro());
 
+  readonly showSkeleton = signal(false);
+
   async ionViewWillEnter(): Promise<void> {
+    const timer = setTimeout(() => {
+      if (!this.facade.isReady()) this.showSkeleton.set(true);
+    }, 100);
+
     await this.facade.ionViewWillEnter();
+    clearTimeout(timer);
+    this.showSkeleton.set(false);
+
     if (!this.isPro()) {
       await this.loadPricing();
     }

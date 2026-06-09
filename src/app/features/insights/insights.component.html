@@ -17,6 +17,8 @@
         <ion-skeleton-text animated style="width: 60%; height: 20px; margin-bottom: 16px;"></ion-skeleton-text>
         <ion-skeleton-text animated style="width: 100%; height: 80px;"></ion-skeleton-text>
       </section>
+    } @else if (facade.isEmpty()) {
+      <app-insights-empty-state />
     } @else {
 
       <!-- SECTION 1: Waste tracker -->

@@ -25,7 +25,7 @@ import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import jsPDF from 'jspdf';
+import type jsPDF from 'jspdf';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
@@ -196,7 +196,7 @@ export class ListStateService {
       });
 
       await withSignalFlag(this.isSharingListInProgress, async () => {
-        const pdfBlob = this.buildShoppingPdf(state.groupedSuggestions);
+        const pdfBlob = await this.buildShoppingPdf(state.groupedSuggestions);
         const filename = `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename(new Date())}.pdf`;
         const { outcome } = await this.share.tryShareBlob({
           blob: pdfBlob,
@@ -316,7 +316,8 @@ export class ListStateService {
     };
   }
 
-  private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {
+  private async buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Promise<Blob> {
+    const { default: jsPDF } = await import('jspdf');
     const doc = new jsPDF();
     const now = new Date();
     const marginX = 14;

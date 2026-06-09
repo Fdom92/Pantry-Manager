@@ -1,0 +1,12 @@
+.insights-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--app-theme-spacing-lg, 24px);
+  text-align: center;
+  gap: var(--app-theme-spacing-sm, 8px);
+
+  &__icon { font-size: 4rem; color: var(--ion-color-medium); }
+  &__title { font-size: 1.25rem; font-weight: 600; margin: 0; }
+  &__body  { color: var(--ion-color-medium); margin: 0 0 var(--app-theme-spacing-md, 16px); }
+}

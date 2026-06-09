@@ -9,6 +9,10 @@
 
 <ion-content class="ion-padding">
   <div class="settings-content">
+    @if (showSkeleton()) {
+      <app-settings-skeleton />
+    } @else {
+
     <!-- ── PRO hero card ──────────────────────────────────────── -->
     <ion-card class="settings-card settings-pro-card" [class.is-pro]="isPro()">
       <ion-card-header>
@@ -634,5 +638,7 @@
         </ion-list>
       </ion-card-content>
     </ion-card>
+
+    } <!-- end @else skeleton guard -->
   </div>
 </ion-content>

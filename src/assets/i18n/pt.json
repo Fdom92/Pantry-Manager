@@ -533,6 +533,11 @@
         "recommendations": "Recomendações",
         "suggestions": "Esta semana"
       }
+    },
+    "empty": {
+      "title": "Ainda sem insights",
+      "body": "Adiciona produtos à tua despensa para ver padrões de consumo, previsões e desperdício.",
+      "cta": "Ir para a despensa"
     }
   },
   "pantry": {

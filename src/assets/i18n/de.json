@@ -533,6 +533,11 @@
         "recommendations": "Empfehlungen",
         "suggestions": "Diese Woche"
       }
+    },
+    "empty": {
+      "title": "Noch keine Erkenntnisse",
+      "body": "Füge Produkte zu deiner Vorratskammer hinzu, um Verbrauchsmuster, Prognosen und Abfall zu sehen.",
+      "cta": "Zur Vorratskammer"
     }
   },
   "pantry": {
