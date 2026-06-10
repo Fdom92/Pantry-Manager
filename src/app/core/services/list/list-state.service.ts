@@ -97,22 +97,29 @@ export class ListStateService {
     this.boughtItemIds.update(set => new Set([...set, id]));
 
     try {
+      const timestamp = new Date().toISOString();
       if (isFresh) {
         const item = suggestion.item;
         const existingBatches = item.batches ?? [];
         const updatedBatches = existingBatches.length > 0
           ? [{ ...existingBatches[0], quantity: FRESH_QTY.sufficient }, ...existingBatches.slice(1)]
           : [{ batchId: `batch-${Date.now()}`, quantity: FRESH_QTY.sufficient }];
-        await this.pantryStore.updateItem({
+        const updatedFresh: PantryItem = {
           ...item,
           batches: updatedBatches,
-          updatedAt: new Date().toISOString(),
-        });
+          updatedAt: timestamp,
+        };
+        await this.pantryStore.updateItem(updatedFresh);
+        await this.eventManager.logAdvancedEdit(item, updatedFresh, 'pantry_card');
       } else {
         const quantity = opts?.quantityOverride && opts.quantityOverride > 0
           ? opts.quantityOverride
           : suggestion.suggestedQuantity;
-        await this.pantryStore.addNewLot(id, { quantity });
+        const previous = suggestion.item;
+        const updated = await this.pantryStore.addNewLot(id, { quantity });
+        if (updated) {
+          await this.eventManager.logAddExistingItem(previous, updated, quantity, undefined, undefined, timestamp);
+        }
       }
       const msg = this.translate.instant('shopping.toasts.bought', { name });
       void this.showToast(msg);
