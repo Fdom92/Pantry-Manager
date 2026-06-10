@@ -806,7 +806,10 @@
         "fiveDays": "5 days",
         "oneWeek": "1 week",
         "twoWeeks": "2 weeks",
-        "noDate": "No date"
+        "noDate": "No date",
+        "remaining": "{{days}} days left",
+        "expiresToday": "Expires today",
+        "expiredAgo": "Expired {{days}} days ago"
       },
       "card": {
         "expired": "Expired",

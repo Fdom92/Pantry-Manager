@@ -806,7 +806,10 @@
         "fiveDays": "5 dias",
         "oneWeek": "1 semana",
         "twoWeeks": "2 semanas",
-        "noDate": "Sem data"
+        "noDate": "Sem data",
+        "remaining": "Faltam {{days}} dias",
+        "expiresToday": "Caduca hoje",
+        "expiredAgo": "Caducou há {{days}} dias"
       },
       "card": {
         "expired": "Expirado",
