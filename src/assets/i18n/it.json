@@ -1142,7 +1142,13 @@
       "nextGoal": "Mancano {{days}} giorni a {{milestone}}",
       "graceAvailable": "Giorno jolly disponibile",
       "graceUsed": "Jolly usato — torna domani senza fallo",
-      "allMilestonesReached": "🎉 Hai raggiunto tutti i traguardi!"
+      "allMilestonesReached": "🎉 Hai raggiunto tutti i traguardi!",
+      "daysLabel_one": "giorno",
+      "daysLabel_other": "giorni",
+      "longest_one": "Serie migliore: {{longest}} giorno",
+      "longest_other": "Serie migliore: {{longest}} giorni",
+      "nextGoal_one": "Manca {{days}} giorno a {{milestone}}",
+      "nextGoal_other": "Mancano {{days}} giorni a {{milestone}}"
     }
   },
   "reviews": {

@@ -1136,10 +1136,16 @@
     "streak": {
       "title": "Tu racha",
       "daysLabel": "días",
+      "daysLabel_one": "día",
+      "daysLabel_other": "días",
       "empty": "Añade o consume un producto hoy para empezar tu racha",
       "longest": "Mejor racha: {{longest}}",
+      "longest_one": "Mejor racha: {{longest}} día",
+      "longest_other": "Mejor racha: {{longest}} días",
       "milestones": "Hitos",
       "nextGoal": "Faltan {{days}} días para los {{milestone}}",
+      "nextGoal_one": "Falta {{days}} día para los {{milestone}}",
+      "nextGoal_other": "Faltan {{days}} días para los {{milestone}}",
       "graceAvailable": "Día comodín disponible",
       "graceUsed": "Comodín usado — vuelve mañana sin falta",
       "allMilestonesReached": "🎉 ¡Has alcanzado todos los hitos!"

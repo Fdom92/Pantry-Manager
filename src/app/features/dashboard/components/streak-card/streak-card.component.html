@@ -7,11 +7,11 @@
     <div class="streak-card__row">
       <div class="streak-card__current">
         <span class="streak-card__number">{{ currentStreak() }}</span>
-        <span class="streak-card__label">{{ 'settings.streak.daysLabel' | translate }}</span>
+        <span class="streak-card__label">{{ daysLabelKey() | translate }}</span>
       </div>
       @if (currentStreak() > 0) {
         <span class="streak-card__best">
-          {{ 'settings.streak.longest' | translate: { longest: longestStreak() } }}
+          {{ longestLabelKey() | translate: { longest: longestStreak() } }}
         </span>
       }
     </div>
@@ -20,7 +20,7 @@
       @if (currentStreak() === 0) {
         {{ 'settings.streak.empty' | translate }}
       } @else if (nextMilestone() !== null) {
-        🏆 {{ 'settings.streak.nextGoal' | translate: { days: daysToNextMilestone(), milestone: nextMilestone() } }}
+        🏆 {{ nextGoalKey() | translate: { days: daysToNextMilestone(), milestone: nextMilestone() } }}
       } @else {
         {{ 'settings.streak.allMilestonesReached' | translate }}
       }

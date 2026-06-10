@@ -1136,10 +1136,16 @@
     "streak": {
       "title": "Your streak",
       "daysLabel": "days",
+      "daysLabel_one": "day",
+      "daysLabel_other": "days",
       "empty": "Add or use a product today to start your streak",
       "longest": "Best streak: {{longest}}",
+      "longest_one": "Best streak: {{longest}} day",
+      "longest_other": "Best streak: {{longest}} days",
       "milestones": "Milestones",
       "nextGoal": "{{days}} days to go until {{milestone}}",
+      "nextGoal_one": "{{days}} day to go until {{milestone}}",
+      "nextGoal_other": "{{days}} days to go until {{milestone}}",
       "graceAvailable": "Wildcard day available",
       "graceUsed": "Wildcard used — come back tomorrow without fail",
       "allMilestonesReached": "🎉 You've reached every milestone!"

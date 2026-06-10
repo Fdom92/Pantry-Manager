@@ -1142,7 +1142,13 @@
       "nextGoal": "Faltam {{days}} dias para {{milestone}}",
       "graceAvailable": "Dia curinga disponível",
       "graceUsed": "Curinga usado — volta amanhã sem falta",
-      "allMilestonesReached": "🎉 Atingiste todos os marcos!"
+      "allMilestonesReached": "🎉 Atingiste todos os marcos!",
+      "daysLabel_one": "dia",
+      "daysLabel_other": "dias",
+      "longest_one": "Melhor sequência: {{longest}} dia",
+      "longest_other": "Melhor sequência: {{longest}} dias",
+      "nextGoal_one": "Falta {{days}} dia para {{milestone}}",
+      "nextGoal_other": "Faltam {{days}} dias para {{milestone}}"
     }
   },
   "reviews": {

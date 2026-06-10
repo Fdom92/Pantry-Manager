@@ -1142,7 +1142,13 @@
       "nextGoal": "Noch {{days}} Tage bis zu {{milestone}}",
       "graceAvailable": "Joker-Tag verfügbar",
       "graceUsed": "Joker benutzt — komm morgen auf jeden Fall zurück",
-      "allMilestonesReached": "🎉 Du hast alle Meilensteine erreicht!"
+      "allMilestonesReached": "🎉 Du hast alle Meilensteine erreicht!",
+      "daysLabel_one": "Tag",
+      "daysLabel_other": "Tage",
+      "longest_one": "Längste Serie: {{longest}} Tag",
+      "longest_other": "Längste Serie: {{longest}} Tage",
+      "nextGoal_one": "Noch {{days}} Tag bis zu {{milestone}}",
+      "nextGoal_other": "Noch {{days}} Tage bis zu {{milestone}}"
     }
   },
   "reviews": {

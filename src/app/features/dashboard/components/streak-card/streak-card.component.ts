@@ -28,6 +28,23 @@ export class StreakCardComponent {
     return next === null ? null : Math.max(0, next - this.currentStreak());
   });
 
+  /** Translation key suffix — _one for singular, _other for plural. */
+  readonly daysLabelKey = computed(() =>
+    this.currentStreak() === 1
+      ? 'settings.streak.daysLabel_one'
+      : 'settings.streak.daysLabel_other'
+  );
+  readonly longestLabelKey = computed(() =>
+    this.longestStreak() === 1
+      ? 'settings.streak.longest_one'
+      : 'settings.streak.longest_other'
+  );
+  readonly nextGoalKey = computed(() =>
+    this.daysToNextMilestone() === 1
+      ? 'settings.streak.nextGoal_one'
+      : 'settings.streak.nextGoal_other'
+  );
+
   readonly graceUsedRecently = computed<boolean>(() => {
     const graceUsed = this.state()?.graceUsedDate;
     if (!graceUsed) return false;
