@@ -112,10 +112,17 @@ export class ExpiryPickerComponent {
 
   get formattedDate(): string {
     if (!this.date) return '';
-    const parts = this.date.split('-').map(Number);
-    if (parts.length !== 3 || parts.some(n => !Number.isFinite(n))) return '';
-    const [year, month, day] = parts;
-    const d = new Date(year, month - 1, day);
+    // Accept both YYYY-MM-DD (local interpretation) and full ISO strings
+    // ("2026-07-11T00:00:00Z" or "2026/07/11"). The plain YYYY-MM-DD path
+    // builds the Date in local time to avoid the UTC midnight-rollover that
+    // would push the displayed day back by one in negative-UTC timezones.
+    const plain = /^(\d{4})-(\d{2})-(\d{2})$/.exec(this.date);
+    let d: Date;
+    if (plain) {
+      d = new Date(Number(plain[1]), Number(plain[2]) - 1, Number(plain[3]));
+    } else {
+      d = new Date(this.date);
+    }
     if (Number.isNaN(d.getTime())) return '';
     return new Intl.DateTimeFormat(this.languageService.getCurrentLocale(), {
       day: 'numeric',
