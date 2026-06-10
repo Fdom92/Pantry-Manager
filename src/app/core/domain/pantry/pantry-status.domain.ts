@@ -2,6 +2,7 @@ import { ExpirationStatus } from '@core/models';
 import type { ExpiryClassification, ItemBatch, PantryItem, ProductStatusState } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
 import { toNumberOrZero } from '@core/utils/formatting.util';
+import { parseExpiryDate } from '@core/utils/date.util';
 import { collectBatches, sumQuantities } from './pantry-batch.domain';
 import { FRESH_NEAR_EXPIRY_WINDOW_DAYS, FRESH_QTY } from './fresh.domain';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
@@ -34,8 +35,8 @@ function getDaysPastExpiry(
 
   for (const batch of collectBatches(batches)) {
     if (!batch.expirationDate) continue;
-    const exp = new Date(batch.expirationDate);
-    if (!Number.isFinite(exp.getTime())) continue;
+    const exp = parseExpiryDate(batch.expirationDate);
+    if (exp === null) continue;
     exp.setHours(0, 0, 0, 0);
     if (exp < reference) {
       if (latestExpiredTime === null || exp.getTime() > latestExpiredTime) {
@@ -77,8 +78,8 @@ export function classifyExpiry(
     return 'unknown';
   }
 
-  const exp = new Date(expirationDate);
-  if (!Number.isFinite(exp.getTime())) {
+  const exp = parseExpiryDate(expirationDate);
+  if (exp === null) {
     return 'unknown';
   }
 
