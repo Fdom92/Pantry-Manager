@@ -49,4 +49,9 @@ export class ListManualItemsStore {
     this.manualItems.set([]);
     this.boughtManuals.set([]);
   }
+
+  /** Clear only the "Comprado" history for manual items. Pending items stay. */
+  clearBoughtManuals(): void {
+    this.boughtManuals.set([]);
+  }
 }

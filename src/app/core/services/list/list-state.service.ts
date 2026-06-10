@@ -84,6 +84,12 @@ export class ListStateService {
   async ionViewWillLeave(): Promise<void> {
     this.boughtItemIds.set(new Set());
     this.removedAutoIds.set(new Set());
+    // Clear the "Comprado" history for manual items too — they have already
+    // been added to the pantry by markManualAsBought, so keeping them in the
+    // bought-manuals signal would make that section grow forever across
+    // shopping trips. The pending (unbought) manualItems signal stays — it
+    // survives tab switches by design (S4 refactor).
+    this.manualItemsStore.clearBoughtManuals();
   }
 
   async markAsBought(
