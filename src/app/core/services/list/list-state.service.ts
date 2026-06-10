@@ -20,7 +20,9 @@ import {
 } from '@core/models/list';
 import { FRESH_QTY } from '@core/domain/pantry/fresh.domain';
 import { LanguageService } from '../shared/language.service';
-import { createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
+import { createDocumentId, createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
+import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
+import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
@@ -45,6 +47,7 @@ export class ListStateService {
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly analytics = inject(AnalyticsService);
   private readonly manualItemsStore = inject(ListManualItemsStore);
+  private readonly eventManager = inject(HistoryEventManagerService);
 
   readonly isSharingListInProgress = signal(false);
 
@@ -129,9 +132,45 @@ export class ListStateService {
     }
   }
 
-  markManualAsBought(id: string): void {
+  async markManualAsBought(id: string): Promise<void> {
     const item = this.manualItemsStore.markManualAsBought(id);
     if (!item) return;
+
+    // Match the manual entry to an existing pantry product by normalized name.
+    // If found → add a new lot. Otherwise create a brand-new pantry item.
+    const target = normalizeLowercase(item.name);
+    const match = this.items().find(p => normalizeLowercase(p.name) === target);
+    const timestamp = new Date().toISOString();
+
+    try {
+      if (match) {
+        const updated = await this.pantryStore.addNewLot(match._id, { quantity: 1 });
+        if (updated) {
+          await this.pantryStore.updateItem(updated);
+          await this.eventManager.logAddExistingItem(match, updated, 1, undefined, undefined, timestamp);
+        }
+      } else {
+        const base = buildAddItemPayload({
+          id: createDocumentId('item'),
+          nowIso: timestamp,
+          name: item.name,
+          quantity: 1,
+        });
+        const newItem: PantryItem = { ...base, productType: 'pantry' };
+        await this.pantryStore.addItem(newItem);
+        await this.eventManager.logAddNewItem(newItem, 1, undefined, timestamp);
+      }
+      this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
+        kind: 'despensa',
+        source: 'shopping_manual',
+        is_new: !match,
+        quantity: 1,
+      });
+      void this.reviewPrompt.handlePositiveAction();
+    } catch (err) {
+      console.error('[ListStateService] markManualAsBought add-to-pantry failed', err);
+    }
+
     const msg = this.translate.instant('shopping.toasts.boughtManual', { name: item.name });
     void this.showToast(msg);
   }
