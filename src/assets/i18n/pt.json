@@ -862,9 +862,11 @@
     "cta": "Torna-te PRO",
     "title": "Atualizar para PRO",
     "headline": "Desbloqueia os superpoderes completos da despensa",
-    "subtitle": "Automatização inteligente e funcionalidades prioritárias.",
+    "subtitle": "Previsões de compras, controlo de desperdício e análise IA com os teus próprios dados.",
     "benefits": {
-      "agent": "Descobre o que expira mais, o que se acumula e como melhorar a tua rotação. Recomendações concretas baseadas no teu próprio histórico de consumo."
+      "reposition": "Reposição inteligente: prevê quando vais ficar sem os teus básicos antes que faltem.",
+      "waste": "Controlo de desperdício: o que expira sem ser consumido, em que categorias e a tua tendência mensal.",
+      "analysis": "Análise IA da tua despensa: recomendações concretas baseadas no teu histórico real de consumo."
     },
     "actions": {
       "maybeLater": "Talvez mais tarde",
@@ -1138,6 +1140,7 @@
     },
     "streak": {
       "title": "A tua sequência",
+      "tokensLabel": "Coringas para proteger a tua sequência",
       "daysLabel": "dias",
       "empty": "Adiciona ou consome um produto hoje para começar a tua sequência",
       "longest": "Melhor sequência: {{longest}}",
@@ -1279,6 +1282,6 @@
     }
   },
   "streak": {
-    "milestoneToast": "{{streak}} dias seguidos! 🔥 Continue assim."
+    "milestoneToast": "{{streak}} dias seguidos! 🔥 Ganhaste 1 coringa 🛡️"
   }
 }

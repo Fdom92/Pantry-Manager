@@ -1,22 +1,17 @@
 <ion-card class="streak-card" id="streak">
   <ion-card-content class="streak-card__content">
-    <div class="streak-card__header">
-      <span class="streak-card__title">🔥 {{ 'settings.streak.title' | translate }}</span>
-    </div>
-
-    <div class="streak-card__row">
-      <div class="streak-card__current">
-        <span class="streak-card__number">{{ currentStreak() }}</span>
-        <span class="streak-card__label">{{ daysLabelKey() | translate }}</span>
-      </div>
-      @if (currentStreak() > 0) {
-        <span class="streak-card__best">
-          {{ longestLabelKey() | translate: { longest: longestStreak() } }}
+    <span class="streak-card__current">
+      🔥
+      <span class="streak-card__number">{{ currentStreak() }}</span>
+      <span class="streak-card__label">{{ daysLabelKey() | translate }}</span>
+      @if (graceTokens() > 0) {
+        <span class="streak-card__tokens" [attr.aria-label]="'settings.streak.tokensLabel' | translate">
+          🛡️ {{ graceTokens() }}
         </span>
       }
-    </div>
+    </span>
 
-    <p class="streak-card__hint">
+    <span class="streak-card__hint">
       @if (currentStreak() === 0) {
         {{ 'settings.streak.empty' | translate }}
       } @else if (nextMilestone() !== null) {
@@ -24,6 +19,6 @@
       } @else {
         {{ 'settings.streak.allMilestonesReached' | translate }}
       }
-    </p>
+    </span>
   </ion-card-content>
 </ion-card>

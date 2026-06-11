@@ -45,20 +45,41 @@ describe('computeRepositionPredictions', () => {
   });
 
   it('skips when velocity below threshold', () => {
-    // 1 consume in 30 days = 0.033/day, below 0.05 threshold
+    // 2 consumes of 0.5 in 30 days = 0.033/day, below 0.05 threshold
     const items = [item({ _id: 'p1' })];
-    const events = [ev({ productId: 'p1', quantity: 1, timestamp: '2026-05-20T00:00:00Z' })];
+    const events = [
+      ev({ productId: 'p1', quantity: 0.5, timestamp: '2026-05-20T00:00:00Z' }),
+      ev({ productId: 'p1', quantity: 0.5, timestamp: '2026-05-25T00:00:00Z' }),
+    ];
     expect(computeRepositionPredictions(items, events, now)).toEqual([]);
   });
 
-  it('hides low confidence (<3 events)', () => {
-    // Above velocity threshold via large quantity, but only 2 events
+  it('surfaces 2-event products with low confidence (cold start)', () => {
+    // Above velocity threshold via large quantity, only 2 events
     const items = [item({ _id: 'p1' })];
     const events = [
       ev({ productId: 'p1', quantity: 3, timestamp: '2026-05-20T00:00:00Z' }),
       ev({ productId: 'p1', quantity: 3, timestamp: '2026-05-25T00:00:00Z' }),
     ];
+    const result = computeRepositionPredictions(items, events, now);
+    expect(result.length).toBe(1);
+    expect(result[0].confidence).toBe('low');
+  });
+
+  it('hides products with a single consume event', () => {
+    const items = [item({ _id: 'p1' })];
+    const events = [ev({ productId: 'p1', quantity: 6, timestamp: '2026-05-20T00:00:00Z' })];
     expect(computeRepositionPredictions(items, events, now)).toEqual([]);
+  });
+
+  it('assigns medium confidence between 3 and 9 events', () => {
+    const items = [item({ _id: 'p1' })];
+    const events = Array.from({ length: 4 }, (_, i) =>
+      ev({ productId: 'p1', quantity: 1, timestamp: new Date(now.getTime() - (i + 1) * 86_400_000).toISOString() })
+    );
+    const result = computeRepositionPredictions(items, events, now);
+    expect(result.length).toBe(1);
+    expect(result[0].confidence).toBe('medium');
   });
 
   it('computes days-to-out, velocity, and high confidence', () => {

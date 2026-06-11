@@ -862,9 +862,11 @@
     "cta": "Go PRO",
     "title": "Upgrade to PRO",
     "headline": "Unlock the full pantry superpowers",
-    "subtitle": "Smarter automation and priority features.",
+    "subtitle": "Purchase predictions, waste tracking and AI analysis built on your own data.",
     "benefits": {
-      "agent": "Discover what expires most, what piles up, and how to improve your rotation. Concrete recommendations based on your own consumption history."
+      "reposition": "Smart restocking: predicts when you'll run out of your staples before they're gone.",
+      "waste": "Waste tracking: what expires unused, in which categories, and your monthly trend.",
+      "analysis": "AI pantry analysis: concrete recommendations based on your real consumption history."
     },
     "actions": {
       "maybeLater": "Maybe later",
@@ -1138,6 +1140,7 @@
     },
     "streak": {
       "title": "Your streak",
+      "tokensLabel": "Wildcards to protect your streak",
       "daysLabel": "days",
       "daysLabel_one": "day",
       "daysLabel_other": "days",
@@ -1279,6 +1282,6 @@
     }
   },
   "streak": {
-    "milestoneToast": "{{streak}} days in a row! 🔥 Keep it up."
+    "milestoneToast": "{{streak}} days in a row! 🔥 You earned 1 wildcard 🛡️"
   }
 }

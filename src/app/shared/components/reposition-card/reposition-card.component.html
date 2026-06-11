@@ -4,33 +4,24 @@
   </ion-card-header>
 
   <ion-card-content>
-    @if (isPro()) {
-      @if (isEmpty()) {
-        <p class="reposition-card__empty">
-          {{ 'dashboard.reposition.empty' | translate }}
-        </p>
-      } @else {
-        <ion-list lines="none" class="reposition-card__list">
-          @for (p of visiblePredictions(); track p.productId) {
-            <ion-item>
-              <ion-label>
-                <h3>{{ p.productName }}</h3>
-                <p>{{ 'dashboard.reposition.daysLeft' | translate: { days: p.daysToOut } }}</p>
-              </ion-label>
-              <ion-button slot="end" fill="clear" size="small" (click)="onAddToList(p)">
-                {{ 'dashboard.reposition.add' | translate }}
-              </ion-button>
-            </ion-item>
-          }
-        </ion-list>
-      }
-    } @else {
-      <p class="reposition-card__teaser">
-        {{ 'dashboard.reposition.teaser' | translate }}
+    @if (isEmpty()) {
+      <p class="reposition-card__empty">
+        {{ 'dashboard.reposition.empty' | translate }}
       </p>
-      @if (!hideCta()) {
-        <app-pro-trial-cta [surface]="ctaSurface()" compact dismissible />
-      }
+    } @else {
+      <ion-list lines="none" class="reposition-card__list">
+        @for (p of visiblePredictions(); track p.productId) {
+          <ion-item>
+            <ion-label>
+              <h3>{{ p.productName }}</h3>
+              <p>{{ 'dashboard.reposition.daysLeft' | translate: { days: p.daysToOut } }}</p>
+            </ion-label>
+            <ion-button slot="end" fill="clear" size="small" (click)="onAddToList(p)">
+              {{ 'dashboard.reposition.add' | translate }}
+            </ion-button>
+          </ion-item>
+        }
+      </ion-list>
     }
   </ion-card-content>
 </ion-card>

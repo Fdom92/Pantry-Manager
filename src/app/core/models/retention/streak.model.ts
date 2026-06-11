@@ -7,7 +7,8 @@ export interface StreakState extends BaseDoc {
   longestStreak: number;
   lastActiveDate: string;      // ISO yyyy-mm-dd, local timezone
   graceUsedDate?: string;      // ISO yyyy-mm-dd of last grace day burn
-  milestonesReached: number[]; // subset of [3, 7, 30, 100]
+  graceTokens?: number;        // grace-day wallet; absent on legacy docs (defaults to 1)
+  milestonesReached: number[]; // subset of STREAK_MILESTONES (legacy docs may hold 100)
   startedAt: string;           // ISO timestamp of first ever streak entry
   updatedAt: string;
 }

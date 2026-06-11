@@ -64,6 +64,8 @@ export const ANALYTICS_EVENTS = {
   UPGRADE_PURCHASE_STARTED: 'upgrade_purchase_started',
   UPGRADE_PURCHASE_COMPLETED: 'upgrade_purchase_completed',
   PRO_TRIAL_CTA_CLICKED: 'pro_trial_cta_clicked',
+  /** Tap anywhere on a locked PRO teaser card (navigates to /upgrade). */
+  PAYWALL_CARD_CLICKED: 'paywall_card_clicked',
   PRO_TRIAL_STARTED: 'pro_trial_started',
   PRO_TRIAL_EXPIRED: 'pro_trial_expired',
   WASTE_TRACKER_VIEWED: 'waste_tracker_viewed',
@@ -81,8 +83,8 @@ export const ANALYTICS_EVENTS = {
   STREAK_REACHED: 'streak_reached',
   STREAK_MILESTONE_3: 'streak_milestone_3',
   STREAK_MILESTONE_7: 'streak_milestone_7',
+  STREAK_MILESTONE_14: 'streak_milestone_14',
   STREAK_MILESTONE_30: 'streak_milestone_30',
-  STREAK_MILESTONE_100: 'streak_milestone_100',
   STREAK_BROKEN: 'streak_broken',
 } as const;
 

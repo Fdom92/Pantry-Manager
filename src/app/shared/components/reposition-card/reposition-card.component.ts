@@ -1,17 +1,16 @@
-import { ChangeDetectionStrategy, Component, booleanAttribute, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonItem, IonLabel, IonList, IonButton } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import type { RepositionPrediction } from '@core/domain/insights/reposition.domain';
-import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial-cta.component';
-import type { ProCtaSurface } from '@core/services/upgrade/pro-cta-ui-state.service';
 
+/** PRO-only prediction list. Free surfaces render `app-pro-paywall-card` instead. */
 @Component({
   selector: 'app-reposition-card',
   standalone: true,
   imports: [
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
     IonList, IonItem, IonLabel, IonButton,
-    TranslateModule, ProTrialCtaComponent,
+    TranslateModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './reposition-card.component.html',
@@ -19,9 +18,6 @@ import type { ProCtaSurface } from '@core/services/upgrade/pro-cta-ui-state.serv
 })
 export class RepositionCardComponent {
   readonly predictions = input.required<RepositionPrediction[]>();
-  readonly isPro = input.required<boolean>();
-  readonly ctaSurface = input<ProCtaSurface>('reposition_card');
-  readonly hideCta = input(false, { transform: booleanAttribute });
   /** Cap the rendered list (top-N by daysToOut). Pass 0 for "no limit". */
   readonly limit = input<number>(3);
 

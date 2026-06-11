@@ -38,7 +38,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import packageJson from '../../../../package.json';
 import { environment } from 'src/environments/environment';
 import { SettingsNotificationsDevStateService } from '@core/services/settings/settings-notifications-dev-state.service';
-import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial-cta.component';
+import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
 import { SettingsSkeletonComponent } from './components/settings-skeleton/settings-skeleton.component';
 import { AlertController, ToastController } from '@ionic/angular';
 
@@ -69,7 +69,7 @@ import { AlertController, ToastController } from '@ionic/angular';
     CommonModule,
     RouterLink,
     TranslateModule,
-    ProTrialCtaComponent,
+    ProPaywallCardComponent,
     SettingsSkeletonComponent,
   ],
   templateUrl: './settings.component.html',

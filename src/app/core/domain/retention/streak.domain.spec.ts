@@ -30,6 +30,7 @@ describe('evaluateStreak — null state', () => {
     expect(next!.currentStreak).toBe(1);
     expect(next!.longestStreak).toBe(1);
     expect(next!.lastActiveDate).toBe(TODAY);
+    expect(next!.graceTokens).toBe(1);
     expect(transitions).toEqual(jasmine.arrayContaining([
       jasmine.objectContaining({ kind: 'incremented', from: 0, to: 1 }),
     ]));
@@ -69,45 +70,65 @@ describe('evaluateStreak — gap=1', () => {
   });
 });
 
-// ── 5. gap=2 with no prior grace → burn grace + increment ────────────────────
-describe('evaluateStreak — gap=2, grace available', () => {
-  it('uses grace day and increments streak when no prior grace', () => {
-    const state = makeState({ currentStreak: 3, longestStreak: 3, lastActiveDate: TWO_DAYS_AGO });
+// ── 5. gap=2 with a token in the wallet → burn token + increment ─────────────
+describe('evaluateStreak — gap=2, token available', () => {
+  it('burns a grace token and increments the streak', () => {
+    const state = makeState({ currentStreak: 4, longestStreak: 4, lastActiveDate: TWO_DAYS_AGO, graceTokens: 1 });
     const { next, transitions } = evaluateStreak(state, TODAY, true);
-    expect(next!.currentStreak).toBe(4);
+    expect(next!.currentStreak).toBe(5);
+    expect(next!.graceTokens).toBe(0);
     expect(next!.graceUsedDate).toBeDefined();
     expect(transitions.some(t => t.kind === 'grace_used')).toBeTrue();
     expect(transitions.some(t => t.kind === 'incremented')).toBeTrue();
   });
-});
 
-// ── 6. gap=2 with grace burned within last 7 days → reset ────────────────────
-describe('evaluateStreak — gap=2, grace exhausted', () => {
-  it('resets when grace was burned less than 7 days ago', () => {
-    const state = makeState({
-      currentStreak: 3,
-      longestStreak: 3,
-      lastActiveDate: TWO_DAYS_AGO,
-      graceUsedDate: YESTERDAY, // within 7 days
-    });
+  it('treats legacy docs without graceTokens as having the initial token', () => {
+    const state = makeState({ currentStreak: 3, longestStreak: 3, lastActiveDate: TWO_DAYS_AGO });
+    delete (state as { graceTokens?: number }).graceTokens;
     const { next, transitions } = evaluateStreak(state, TODAY, true);
-    expect(transitions.some(t => t.kind === 'reset')).toBeTrue();
+    expect(next!.currentStreak).toBe(4);
+    expect(next!.graceTokens).toBe(0);
+    expect(transitions.some(t => t.kind === 'grace_used')).toBeTrue();
   });
-});
 
-// ── 7. gap=2 with grace burned 8+ days ago → grace available again ────────────
-describe('evaluateStreak — gap=2, grace replenished', () => {
-  it('uses grace again when last grace burn was 8+ days ago', () => {
+  it('ignores graceUsedDate recency — only the wallet matters', () => {
     const state = makeState({
       currentStreak: 5,
       longestStreak: 5,
       lastActiveDate: TWO_DAYS_AGO,
       graceUsedDate: EIGHT_DAYS_AGO,
+      graceTokens: 1,
     });
     const { next, transitions } = evaluateStreak(state, TODAY, true);
     expect(next!.currentStreak).toBe(6);
     expect(transitions.some(t => t.kind === 'grace_used')).toBeTrue();
-    expect(transitions.some(t => t.kind === 'incremented')).toBeTrue();
+  });
+});
+
+// ── 6. gap=2 with an empty wallet → reset (no time-based regeneration) ───────
+describe('evaluateStreak — gap=2, no tokens', () => {
+  it('resets when the wallet is empty', () => {
+    const state = makeState({
+      currentStreak: 3,
+      longestStreak: 3,
+      lastActiveDate: TWO_DAYS_AGO,
+      graceTokens: 0,
+    });
+    const { transitions } = evaluateStreak(state, TODAY, true);
+    expect(transitions.some(t => t.kind === 'reset')).toBeTrue();
+    expect(transitions.some(t => t.kind === 'grace_used')).toBeFalse();
+  });
+
+  it('does not regenerate by time: empty wallet resets even if last burn was 8+ days ago', () => {
+    const state = makeState({
+      currentStreak: 5,
+      longestStreak: 5,
+      lastActiveDate: TWO_DAYS_AGO,
+      graceUsedDate: EIGHT_DAYS_AGO,
+      graceTokens: 0,
+    });
+    const { transitions } = evaluateStreak(state, TODAY, true);
+    expect(transitions.some(t => t.kind === 'reset')).toBeTrue();
   });
 });
 
@@ -140,6 +161,54 @@ describe('evaluateStreak — milestones', () => {
     const state = makeState({ currentStreak: 2, longestStreak: 3, lastActiveDate: YESTERDAY, milestonesReached: [3] });
     const { transitions } = evaluateStreak(state, TODAY, true);
     expect(transitions.some(t => t.kind === 'milestone_reached')).toBeFalse();
+  });
+
+  it('emits milestone_reached at the new 14-day milestone', () => {
+    const state = makeState({ currentStreak: 13, longestStreak: 13, lastActiveDate: YESTERDAY, milestonesReached: [3, 7] });
+    const { next, transitions } = evaluateStreak(state, TODAY, true);
+    expect(next!.milestonesReached).toContain(14);
+    const milestone = transitions.find(t => t.kind === 'milestone_reached') as any;
+    expect(milestone.milestone).toBe(14);
+  });
+
+  it('no longer treats 100 as a milestone', () => {
+    const state = makeState({ currentStreak: 99, longestStreak: 99, lastActiveDate: YESTERDAY, milestonesReached: [3, 7, 14, 30] });
+    const { transitions } = evaluateStreak(state, TODAY, true);
+    expect(transitions.some(t => t.kind === 'milestone_reached')).toBeFalse();
+  });
+});
+
+// ── Reward: milestones grant grace tokens ─────────────────────────────────────
+describe('evaluateStreak — grace token rewards', () => {
+  it('grants +1 token when a milestone is reached', () => {
+    const state = makeState({ currentStreak: 2, longestStreak: 2, lastActiveDate: YESTERDAY, milestonesReached: [], graceTokens: 1 });
+    const { next } = evaluateStreak(state, TODAY, true);
+    expect(next!.currentStreak).toBe(3);
+    expect(next!.graceTokens).toBe(2);
+  });
+
+  it('caps the wallet at the maximum', () => {
+    const state = makeState({ currentStreak: 6, longestStreak: 6, lastActiveDate: YESTERDAY, milestonesReached: [3], graceTokens: 3 });
+    const { next } = evaluateStreak(state, TODAY, true);
+    expect(next!.currentStreak).toBe(7);
+    expect(next!.graceTokens).toBe(3);
+  });
+
+  it('re-grants the token in the same evaluation that burns it when a milestone lands', () => {
+    // gap=2 burns the only token; the increment lands on milestone 3 → wallet back to 1
+    const state = makeState({ currentStreak: 2, longestStreak: 2, lastActiveDate: TWO_DAYS_AGO, milestonesReached: [], graceTokens: 1 });
+    const { next, transitions } = evaluateStreak(state, TODAY, true);
+    expect(next!.currentStreak).toBe(3);
+    expect(next!.graceTokens).toBe(1);
+    expect(transitions.some(t => t.kind === 'grace_used')).toBeTrue();
+    expect(transitions.some(t => t.kind === 'milestone_reached')).toBeTrue();
+  });
+
+  it('preserves the wallet across resets', () => {
+    const state = makeState({ currentStreak: 5, longestStreak: 5, lastActiveDate: THREE_DAYS_AGO, graceTokens: 2 });
+    const { next } = evaluateStreak(state, TODAY, true);
+    expect(next!.currentStreak).toBe(1);
+    expect(next!.graceTokens).toBe(2);
   });
 });
 

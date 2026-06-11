@@ -1,5 +1,4 @@
 .reposition-card {
   &__empty   { color: var(--ion-color-medium); margin: 0; }
-  &__teaser  { color: var(--ion-color-medium); margin-bottom: var(--app-theme-spacing-sm); }
   &__list ion-item { --inner-padding-end: 0; }
 }

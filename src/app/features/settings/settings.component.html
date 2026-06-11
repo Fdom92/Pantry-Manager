@@ -14,8 +14,8 @@
     } @else {
 
     <!-- ── PRO hero card ──────────────────────────────────────── -->
-    <ion-card class="settings-card settings-pro-card" [class.is-pro]="isPro()">
-      @if (isPro()) {
+    @if (isPro()) {
+      <ion-card class="settings-card settings-pro-card is-pro">
         <ion-card-header>
           <ion-card-title>
             <ion-icon name="sparkles-outline" class="settings-pro-card__icon"></ion-icon>
@@ -28,54 +28,49 @@
         <ion-card-content>
           <ion-badge color="tertiary">{{ "settings.pro.badgePro" | translate }}</ion-badge>
         </ion-card-content>
-      } @else {
-        <div class="pro-hero">
-          <div class="pro-hero__header">
-            <ion-icon name="sparkles-outline" class="pro-hero__icon"></ion-icon>
-            <div>
-              <h2 class="pro-hero__title">{{ "settings.pro.upgradeTitle" | translate }}</h2>
-              <p class="pro-hero__tagline">{{ "settings.pro.tagline" | translate }}</p>
-            </div>
-          </div>
+      </ion-card>
+    } @else {
+      <app-pro-paywall-card
+        surface="settings_hero"
+        titleKey="settings.pro.upgradeTitle"
+        descriptionKey="settings.pro.tagline"
+        dismissible
+      >
+        <ul class="pro-hero__features">
+          <li>
+            <ion-icon name="trending-up-outline"></ion-icon>
+            <span>{{ "settings.pro.feature1" | translate }}</span>
+          </li>
+          <li>
+            <ion-icon name="analytics-outline"></ion-icon>
+            <span>{{ "settings.pro.feature2" | translate }}</span>
+          </li>
+          <li>
+            <ion-icon name="rocket-outline"></ion-icon>
+            <span>{{ "settings.pro.feature3" | translate }}</span>
+          </li>
+        </ul>
 
-          <ul class="pro-hero__features">
-            <li>
-              <ion-icon name="trending-up-outline"></ion-icon>
-              <span>{{ "settings.pro.feature1" | translate }}</span>
-            </li>
-            <li>
-              <ion-icon name="analytics-outline"></ion-icon>
-              <span>{{ "settings.pro.feature2" | translate }}</span>
-            </li>
-            <li>
-              <ion-icon name="rocket-outline"></ion-icon>
-              <span>{{ "settings.pro.feature3" | translate }}</span>
-            </li>
-          </ul>
-
-          @if (monthlyPriceString()) {
-            <div class="pro-hero__pricing">
+        @if (monthlyPriceString()) {
+          <div class="pro-hero__pricing">
+            <span class="pro-hero__price-line">
+              {{ 'settings.pro.priceMonthly' | translate: { price: monthlyPriceString() } }}
+            </span>
+            @if (annualPriceString()) {
+              <span class="pro-hero__price-divider">·</span>
               <span class="pro-hero__price-line">
-                {{ 'settings.pro.priceMonthly' | translate: { price: monthlyPriceString() } }}
+                {{ 'settings.pro.priceAnnual' | translate: { price: annualPriceString() } }}
+                @if (annualSavingsPercent() !== null) {
+                  <span class="pro-hero__savings">
+                    {{ 'settings.pro.savings' | translate: { percent: annualSavingsPercent() } }}
+                  </span>
+                }
               </span>
-              @if (annualPriceString()) {
-                <span class="pro-hero__price-divider">·</span>
-                <span class="pro-hero__price-line">
-                  {{ 'settings.pro.priceAnnual' | translate: { price: annualPriceString() } }}
-                  @if (annualSavingsPercent() !== null) {
-                    <span class="pro-hero__savings">
-                      {{ 'settings.pro.savings' | translate: { percent: annualSavingsPercent() } }}
-                    </span>
-                  }
-                </span>
-              }
-            </div>
-          }
-
-          <app-pro-trial-cta surface="settings_hero" dismissible />
-        </div>
-      }
-    </ion-card>
+            }
+          </div>
+        }
+      </app-pro-paywall-card>
+    }
 
     <!-- ── Apariencia ─────────────────────────────────────────── -->
     <ion-card class="settings-card">

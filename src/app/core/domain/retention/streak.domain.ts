@@ -1,20 +1,35 @@
 import type { StreakState } from '@core/models/retention/streak.model';
 
+export const STREAK_MILESTONES = [3, 7, 14, 30] as const;
+export type StreakMilestone = (typeof STREAK_MILESTONES)[number];
+
+/**
+ * Grace-day wallet ("comodines"): every streak starts with one token; each
+ * milestone earns one more (capped). Burning a token forgives a single
+ * missed day (gap of exactly 2). There is no time-based regeneration —
+ * tokens are only earned back through milestones.
+ */
+export const GRACE_TOKENS_INITIAL = 1;
+export const GRACE_TOKENS_MAX = 3;
+
 export type StreakTransition =
   | { kind: 'incremented'; from: number; to: number }
   | { kind: 'grace_used'; streak: number; on: string }
   | { kind: 'reset'; previousStreak: number }
-  | { kind: 'milestone_reached'; milestone: 3 | 7 | 30 | 100; streak: number };
+  | { kind: 'milestone_reached'; milestone: StreakMilestone; streak: number };
 
 export interface StreakEvaluation {
   next: StreakState;
   transitions: StreakTransition[];
 }
 
-export const STREAK_MILESTONES = [3, 7, 30, 100] as const;
+export function isMilestone(streak: number): streak is StreakMilestone {
+  return STREAK_MILESTONES.includes(streak as StreakMilestone);
+}
 
-export function isMilestone(streak: number): streak is 3 | 7 | 30 | 100 {
-  return STREAK_MILESTONES.includes(streak as 3 | 7 | 30 | 100);
+/** Legacy docs predate the wallet — they default to the initial token. */
+function tokensOf(state: StreakState): number {
+  return state.graceTokens ?? GRACE_TOKENS_INITIAL;
 }
 
 /**
@@ -44,29 +59,45 @@ function shiftDate(dateStr: string, days: number): string {
 function checkMilestone(
   streak: number,
   milestonesReached: number[],
+  graceTokens: number,
   transitions: StreakTransition[],
-): number[] {
+): { milestonesReached: number[]; graceTokens: number } {
   if (isMilestone(streak) && !milestonesReached.includes(streak)) {
     transitions.push({ kind: 'milestone_reached', milestone: streak, streak });
-    return [...milestonesReached, streak];
+    return {
+      milestonesReached: [...milestonesReached, streak],
+      graceTokens: Math.min(GRACE_TOKENS_MAX, graceTokens + 1),
+    };
   }
-  return milestonesReached;
+  return { milestonesReached, graceTokens };
 }
 
 function doIncrement(
   current: number,
   longest: number,
-  lastActiveDate: string,
   today: string,
   milestonesReached: number[],
+  graceTokens: number,
   transitions: StreakTransition[],
-): { currentStreak: number; longestStreak: number; lastActiveDate: string; milestonesReached: number[] } {
+): {
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate: string;
+  milestonesReached: number[];
+  graceTokens: number;
+} {
   const from = current;
   const to = current + 1;
   transitions.push({ kind: 'incremented', from, to });
   const newLongest = Math.max(to, longest);
-  const newMilestones = checkMilestone(to, milestonesReached, transitions);
-  return { currentStreak: to, longestStreak: newLongest, lastActiveDate: today, milestonesReached: newMilestones };
+  const milestone = checkMilestone(to, milestonesReached, graceTokens, transitions);
+  return {
+    currentStreak: to,
+    longestStreak: newLongest,
+    lastActiveDate: today,
+    milestonesReached: milestone.milestonesReached,
+    graceTokens: milestone.graceTokens,
+  };
 }
 
 /**
@@ -75,13 +106,14 @@ function doIncrement(
  *
  * Rules:
  * - state === null && !triggeredByMutation → { next: null, transitions: [] }
- * - state === null && triggeredByMutation  → bootstrap streak=1
+ * - state === null && triggeredByMutation  → bootstrap streak=1, 1 grace token
  * - lastActiveDate === today && mutation   → no-op
- * - gap=1                                 → increment
- * - gap=2, grace available, mutation      → burn grace + increment
- * - gap=2, grace unavailable OR !mutation → reset (+ increment if mutation)
- * - gap>=3                                → reset (+ increment if mutation)
- * - non-mutation with gap>=2              → reset to 0, no auto-increment
+ * - gap=1                                  → increment
+ * - gap=2, token available, mutation       → burn token + increment
+ * - gap=2, no tokens OR !mutation          → reset (+ increment if mutation)
+ * - gap>=3                                 → reset (+ increment if mutation)
+ * - non-mutation with gap>=2               → reset to 0, no auto-increment
+ * - each milestone reached earns +1 grace token (cap GRACE_TOKENS_MAX)
  */
 export function evaluateStreak(
   state: StreakState | null,
@@ -104,10 +136,13 @@ export function evaluateStreak(
       longestStreak: 1,
       lastActiveDate: today,
       milestonesReached: [],
+      graceTokens: GRACE_TOKENS_INITIAL,
       startedAt: `${today}T00:00:00.000Z`,
     };
     transitions.push({ kind: 'incremented', from: 0, to: 1 });
-    newState.milestonesReached = checkMilestone(1, newState.milestonesReached, transitions);
+    const milestone = checkMilestone(1, newState.milestonesReached, GRACE_TOKENS_INITIAL, transitions);
+    newState.milestonesReached = milestone.milestonesReached;
+    newState.graceTokens = milestone.graceTokens;
     return { next: newState, transitions };
   }
 
@@ -116,51 +151,43 @@ export function evaluateStreak(
   }
 
   const gap = daysBetween(state.lastActiveDate, today);
+  const tokens = tokensOf(state);
 
   if (gap === 1) {
-    const { currentStreak, longestStreak, lastActiveDate, milestonesReached } = doIncrement(
-      state.currentStreak, state.longestStreak, state.lastActiveDate, today, state.milestonesReached, transitions,
+    const inc = doIncrement(
+      state.currentStreak, state.longestStreak, today, state.milestonesReached, tokens, transitions,
     );
-    return {
-      next: { ...state, currentStreak, longestStreak, lastActiveDate, milestonesReached, updatedAt: now },
-      transitions,
-    };
+    return { next: { ...state, ...inc, updatedAt: now }, transitions };
   }
 
-  if (gap === 2) {
-    const graceAvailable =
-      !state.graceUsedDate || daysBetween(state.graceUsedDate, today) >= 7;
-
-    if (graceAvailable && triggeredByMutation) {
-      const graceUsedDate = shiftDate(state.lastActiveDate, 1);
-      transitions.push({ kind: 'grace_used', streak: state.currentStreak, on: graceUsedDate });
-      const { currentStreak, longestStreak, lastActiveDate, milestonesReached } = doIncrement(
-        state.currentStreak, state.longestStreak, state.lastActiveDate, today, state.milestonesReached, transitions,
-      );
-      return {
-        next: { ...state, currentStreak, longestStreak, lastActiveDate, graceUsedDate, milestonesReached, updatedAt: now },
-        transitions,
-      };
-    }
+  if (gap === 2 && tokens > 0 && triggeredByMutation) {
+    const graceUsedDate = shiftDate(state.lastActiveDate, 1);
+    transitions.push({ kind: 'grace_used', streak: state.currentStreak, on: graceUsedDate });
+    const inc = doIncrement(
+      state.currentStreak, state.longestStreak, today, state.milestonesReached, tokens - 1, transitions,
+    );
+    return { next: { ...state, ...inc, graceUsedDate, updatedAt: now }, transitions };
   }
 
-  // gap >= 2 with no grace, or gap >= 3: reset
+  // gap >= 2 with no tokens, or gap >= 3: reset (tokens persist across resets)
   const previousStreak = state.currentStreak;
   const longestStreak = Math.max(state.longestStreak, previousStreak);
   transitions.push({ kind: 'reset', previousStreak });
   let currentStreak = 0;
   let lastActiveDate = state.lastActiveDate;
   let milestonesReached = state.milestonesReached;
+  let graceTokens = tokens;
 
   if (triggeredByMutation) {
-    const result = doIncrement(0, longestStreak, lastActiveDate, today, milestonesReached, transitions);
-    currentStreak = result.currentStreak;
-    lastActiveDate = result.lastActiveDate;
-    milestonesReached = result.milestonesReached;
+    const inc = doIncrement(0, longestStreak, today, milestonesReached, tokens, transitions);
+    currentStreak = inc.currentStreak;
+    lastActiveDate = inc.lastActiveDate;
+    milestonesReached = inc.milestonesReached;
+    graceTokens = inc.graceTokens;
   }
 
   return {
-    next: { ...state, currentStreak, longestStreak, lastActiveDate, milestonesReached, updatedAt: now },
+    next: { ...state, currentStreak, longestStreak, lastActiveDate, milestonesReached, graceTokens, updatedAt: now },
     transitions,
   };
 }

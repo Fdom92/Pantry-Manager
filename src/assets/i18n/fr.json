@@ -862,9 +862,11 @@
     "cta": "Passer en PRO",
     "title": "Passer en PRO",
     "headline": "Débloquez toute la puissance de votre garde-manger",
-    "subtitle": "Automatisation intelligente et fonctionnalités prioritaires.",
+    "subtitle": "Prédictions d'achats, suivi du gaspillage et analyse IA basés sur vos propres données.",
     "benefits": {
-      "agent": "Découvrez ce qui périme le plus, ce qui s'accumule et comment améliorer votre rotation. Des recommandations concrètes basées sur votre propre historique de consommation."
+      "reposition": "Réapprovisionnement intelligent : prédit quand vos produits de base vont manquer, avant qu'ils ne manquent.",
+      "waste": "Suivi du gaspillage : ce qui périme sans être consommé, dans quelles catégories, et votre tendance mensuelle.",
+      "analysis": "Analyse IA de votre garde-manger : des recommandations concrètes basées sur votre historique réel de consommation."
     },
     "actions": {
       "maybeLater": "Plus tard",
@@ -1138,6 +1140,7 @@
     },
     "streak": {
       "title": "Ta série",
+      "tokensLabel": "Jokers pour protéger votre série",
       "daysLabel": "jours",
       "empty": "Ajoute ou consomme un produit aujourd'hui pour démarrer ta série",
       "longest": "Meilleure série : {{longest}}",
@@ -1279,6 +1282,6 @@
     }
   },
   "streak": {
-    "milestoneToast": "{{streak}} jours d'affilée ! 🔥 Continue comme ça."
+    "milestoneToast": "{{streak}} jours d'affilée ! 🔥 Vous avez gagné 1 joker 🛡️"
   }
 }

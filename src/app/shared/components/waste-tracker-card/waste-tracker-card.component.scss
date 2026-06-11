@@ -18,8 +18,4 @@
   }
   &__trend[data-trend="up"]   { color: var(--ion-color-danger);  }
   &__trend[data-trend="down"] { color: var(--ion-color-success); }
-  &__teaser {
-    color: var(--ion-color-medium);
-    margin-bottom: var(--app-theme-spacing-sm);
-  }
 }

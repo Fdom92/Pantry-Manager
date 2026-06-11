@@ -862,9 +862,11 @@
     "cta": "PRO werden",
     "title": "PRO werden",
     "headline": "Entfalte das volle Potenzial deiner Vorratskammer",
-    "subtitle": "Intelligente Automatisierung und priorisierte Funktionen.",
+    "subtitle": "Einkaufsprognosen, Abfall-Tracking und KI-Analyse auf Basis deiner eigenen Daten.",
     "benefits": {
-      "agent": "Erkenne, was am meisten abläuft, was sich ansammelt und wie du die Rotation verbessern kannst. Konkrete Empfehlungen aus deinem eigenen Verbrauchsverlauf."
+      "reposition": "Intelligentes Nachfüllen: sagt voraus, wann deine Basics zur Neige gehen, bevor sie fehlen.",
+      "waste": "Abfall-Tracking: was ungenutzt abläuft, in welchen Kategorien und dein Monatstrend.",
+      "analysis": "KI-Analyse deines Vorrats: konkrete Empfehlungen aus deinem echten Verbrauchsverlauf."
     },
     "actions": {
       "maybeLater": "Vielleicht später",
@@ -1138,6 +1140,7 @@
     },
     "streak": {
       "title": "Deine Serie",
+      "tokensLabel": "Joker zum Schutz deiner Serie",
       "daysLabel": "Tage",
       "empty": "Füge heute ein Produkt hinzu oder verbrauche eins, um deine Serie zu starten",
       "longest": "Längste Serie: {{longest}}",
@@ -1279,6 +1282,6 @@
     }
   },
   "streak": {
-    "milestoneToast": "{{streak}} Tage am Stück! 🔥 Weiter so."
+    "milestoneToast": "{{streak}} Tage in Folge! 🔥 Du hast 1 Joker verdient 🛡️"
   }
 }

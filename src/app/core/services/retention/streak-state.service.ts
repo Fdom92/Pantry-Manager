@@ -1,6 +1,6 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { evaluateStreak, type StreakTransition } from '@core/domain/retention/streak.domain';
+import { evaluateStreak, GRACE_TOKENS_INITIAL, type StreakTransition } from '@core/domain/retention/streak.domain';
 import type { StreakState } from '@core/models/retention/streak.model';
 import { STORAGE_KEYS } from '@core/constants';
 import { Subject } from 'rxjs';
@@ -17,6 +17,10 @@ export class StreakStateService {
   readonly currentStreak = computed(() => this._state()?.currentStreak ?? 0);
   readonly longestStreak = computed(() => this._state()?.longestStreak ?? 0);
   readonly milestonesReached = computed(() => this._state()?.milestonesReached ?? []);
+  readonly graceTokens = computed(() => {
+    const state = this._state();
+    return state ? (state.graceTokens ?? GRACE_TOKENS_INITIAL) : GRACE_TOKENS_INITIAL;
+  });
 
   readonly transition$ = new Subject<StreakTransition>();
 

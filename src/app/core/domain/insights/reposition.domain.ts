@@ -9,13 +9,16 @@ export interface RepositionPrediction {
   currentStock: number;
   velocityPerDay: number;
   daysToOut: number;
-  confidence: 'medium' | 'high';
+  confidence: 'low' | 'medium' | 'high';
 }
 
 const WINDOW_DAYS = 30;
 const MS_PER_DAY = 86_400_000;
 const VELOCITY_THRESHOLD = 0.05;
 const DAYS_TO_OUT_CAP = 90;
+// 2 events is enough signal to surface a prediction (cold-start friendly);
+// confidence communicates how much history backs it.
+const MIN_CONSUME_EVENTS = 2;
 
 export function computeRepositionPredictions(
   items: ReadonlyArray<PantryItem>,
@@ -41,13 +44,14 @@ export function computeRepositionPredictions(
     if (itm.productType === 'fresh') continue;
     const agg = consumeAgg.get(itm._id);
     if (!agg) continue;
-    if (agg.count < 3) continue;
+    if (agg.count < MIN_CONSUME_EVENTS) continue;
     const velocityPerDay = agg.qty / WINDOW_DAYS;
     if (velocityPerDay < VELOCITY_THRESHOLD) continue;
     const currentStock = sumQuantities(itm.batches);
     if (currentStock <= 0) continue;
     const daysToOut = Math.min(DAYS_TO_OUT_CAP, Math.round(currentStock / velocityPerDay));
-    const confidence: RepositionPrediction['confidence'] = agg.count >= 10 ? 'high' : 'medium';
+    const confidence: RepositionPrediction['confidence'] =
+      agg.count >= 10 ? 'high' : agg.count >= 3 ? 'medium' : 'low';
     out.push({
       productId: itm._id,
       productName: itm.name,

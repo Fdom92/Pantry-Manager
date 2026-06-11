@@ -16,6 +16,7 @@ import { InsightsStateService } from '@core/services/insights/insights-state.ser
 import { InsightsTrackingStateService } from '@core/services/insights/insights-tracking-state.service';
 import { FoodType } from '@core/models/shared/enums.model';
 import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
+import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
 import { InsightsEmptyStateComponent } from './components/insights-empty-state/insights-empty-state.component';
 
 @Component({
@@ -34,6 +35,7 @@ import { InsightsEmptyStateComponent } from './components/insights-empty-state/i
     IonSkeletonText,
     IonButtons,
     WasteTrackerCardComponent,
+    ProPaywallCardComponent,
     InsightsEmptyStateComponent,
   ],
   templateUrl: './insights.component.html',

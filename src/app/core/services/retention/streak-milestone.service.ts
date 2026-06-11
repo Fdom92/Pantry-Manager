@@ -42,8 +42,8 @@ export class StreakMilestoneService {
     switch (m) {
       case 3: return ANALYTICS_EVENTS.STREAK_MILESTONE_3;
       case 7: return ANALYTICS_EVENTS.STREAK_MILESTONE_7;
+      case 14: return ANALYTICS_EVENTS.STREAK_MILESTONE_14;
       case 30: return ANALYTICS_EVENTS.STREAK_MILESTONE_30;
-      case 100: return ANALYTICS_EVENTS.STREAK_MILESTONE_100;
       default: return null;
     }
   }

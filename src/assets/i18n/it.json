@@ -862,9 +862,11 @@
     "cta": "Diventa PRO",
     "title": "Passa a PRO",
     "headline": "Sblocca tutte le superpotenzialità della dispensa",
-    "subtitle": "Automazioni intelligenti e funzionalità prioritarie.",
+    "subtitle": "Previsioni di acquisto, controllo degli sprechi e analisi IA basati sui tuoi dati.",
     "benefits": {
-      "agent": "Scopri cosa scade di più, cosa si accumula e come migliorare la rotazione. Raccomandazioni concrete basate sul tuo storico di consumo reale."
+      "reposition": "Rifornimento intelligente: prevede quando finirai i tuoi prodotti di base prima che manchino.",
+      "waste": "Controllo degli sprechi: cosa scade senza essere consumato, in quali categorie e il tuo trend mensile.",
+      "analysis": "Analisi IA della tua dispensa: raccomandazioni concrete basate sul tuo storico di consumo reale."
     },
     "actions": {
       "maybeLater": "Forse più tardi",
@@ -1138,6 +1140,7 @@
     },
     "streak": {
       "title": "La tua serie",
+      "tokensLabel": "Jolly per proteggere la tua serie",
       "daysLabel": "giorni",
       "empty": "Aggiungi o consuma un prodotto oggi per iniziare la tua serie",
       "longest": "Serie migliore: {{longest}}",
@@ -1279,6 +1282,6 @@
     }
   },
   "streak": {
-    "milestoneToast": "{{streak}} giorni di fila! 🔥 Continua così."
+    "milestoneToast": "{{streak}} giorni di fila! 🔥 Hai guadagnato 1 jolly 🛡️"
   }
 }

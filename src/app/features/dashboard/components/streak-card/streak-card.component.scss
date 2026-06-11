@@ -1,30 +1,20 @@
 .streak-card {
   &__content {
-    padding: var(--app-theme-spacing-md, 12px) var(--app-theme-spacing-md, 12px);
-  }
-  &__header {
-    margin-bottom: var(--app-theme-spacing-2xs, 2px);
-  }
-  &__title {
-    font-size: var(--app-theme-font-size-small, 0.875rem);
-    font-weight: 600;
-    color: var(--ion-color-medium-shade);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  &__row {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    gap: var(--app-theme-spacing-sm, 8px);
+    flex-wrap: wrap;
+    gap: var(--app-theme-spacing-2xs, 2px) var(--app-theme-spacing-sm, 8px);
+    padding: var(--app-theme-spacing-sm, 8px) var(--app-theme-spacing-md, 12px);
   }
   &__current {
     display: flex;
     align-items: baseline;
     gap: var(--app-theme-spacing-2xs, 2px);
+    white-space: nowrap;
   }
   &__number {
-    font-size: 2rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--ion-color-warning-shade);
     line-height: 1;
@@ -33,13 +23,14 @@
     font-size: var(--app-theme-font-size-small, 0.875rem);
     color: var(--ion-color-medium);
   }
-  &__best {
+  &__tokens {
+    margin-left: var(--app-theme-spacing-xs, 4px);
     font-size: var(--app-theme-font-size-small, 0.875rem);
     color: var(--ion-color-medium);
   }
   &__hint {
-    margin: var(--app-theme-spacing-2xs, 2px) 0 0;
     font-size: var(--app-theme-font-size-small, 0.875rem);
     color: var(--ion-color-medium);
+    text-align: right;
   }
 }

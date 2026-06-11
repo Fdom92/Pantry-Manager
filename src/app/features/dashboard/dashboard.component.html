@@ -28,13 +28,8 @@
         </app-empty-state>
       }
 
-      <!-- Tu progreso (streak) -->
-      <section class="dashboard-section">
-        <header class="dashboard-section-header">
-          <h3 class="dashboard-section-title">{{ 'dashboard.sections.progress.title' | translate }}</h3>
-        </header>
-        <app-streak-card />
-      </section>
+      <!-- Racha — compact ambient reminder, no section chrome -->
+      <app-streak-card />
 
       <!-- Today's suggestion -->
       @if (facade.totalItems() > 0) {
@@ -167,16 +162,28 @@
         </section>
       }
 
-      <!-- Próximas compras (reposition) — PRO only AND only with real predictions -->
-      @if (isInsightsPro() && repositionPredictions().length > 0) {
+      <!-- Próximas compras (reposition) — PRO with real predictions; free users get the locked teaser -->
+      @if (isInsightsPro()) {
+        @if (repositionPredictions().length > 0) {
+          <section class="dashboard-section">
+            <header class="dashboard-section-header">
+              <h3 class="dashboard-section-title">{{ 'dashboard.sections.reposition.title' | translate }}</h3>
+            </header>
+            <app-reposition-card
+              [predictions]="repositionPredictions()"
+              (addToList)="onAddRepoPredictionToList($event)"
+            />
+          </section>
+        }
+      } @else {
         <section class="dashboard-section">
           <header class="dashboard-section-header">
             <h3 class="dashboard-section-title">{{ 'dashboard.sections.reposition.title' | translate }}</h3>
           </header>
-          <app-reposition-card
-            [predictions]="repositionPredictions()"
-            [isPro]="isInsightsPro()"
-            (addToList)="onAddRepoPredictionToList($event)"
+          <app-pro-paywall-card
+            surface="reposition_card"
+            titleKey="dashboard.reposition.title"
+            descriptionKey="dashboard.reposition.teaser"
           />
         </section>
       }

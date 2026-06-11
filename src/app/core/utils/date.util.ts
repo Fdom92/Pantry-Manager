@@ -116,12 +116,15 @@ export function toDateInputValue(dateIso: string | null | undefined): string {
 }
 
 /**
- * Convert a user-typed date string into a canonical ISO timestamp.
+ * Normalise a user-typed date string into the canonical `YYYY-MM-DD` storage
+ * shape (ISO 8601 date). Local-date semantics: never `.toISOString()`, which
+ * is UTC-based and rolls the calendar day at midnight edges (e.g. a typed
+ * "2026-05-28" became "2026-05-27T22:00:00Z" in UTC+2).
  * Returns null on invalid input.
  */
 export function toIsoDate(dateInput: string | null | undefined): string | null {
   const trimmed = dateInput?.trim?.() ?? '';
   if (!trimmed) return null;
   const d = parseExpiryDate(trimmed);
-  return d === null ? null : d.toISOString();
+  return d === null ? null : toLocalYmd(d);
 }
