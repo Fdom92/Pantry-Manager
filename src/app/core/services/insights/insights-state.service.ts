@@ -38,6 +38,7 @@ import { computeWasteSummary, type WasteSummary } from '@core/domain/insights/wa
 import { computeRepositionPredictions, type RepositionPrediction } from '@core/domain/insights/reposition.domain';
 import type { PantryEvent } from '@core/models/events';
 import { ListManualItemsStore } from '../list/list-manual-items.store';
+import { normalizeLowercase } from '@core/utils/normalization.util';
 
 export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary, RepositionPrediction };
 
@@ -106,10 +107,13 @@ export class InsightsStateService {
     computeWasteSummary(this.events(), new Date(), 30)
   );
 
-  readonly repositionPredictions = computed<RepositionPrediction[]>(() =>
-    computeRepositionPredictions(this.pantryStore.items(), this.events(), new Date())
-      .filter(p => p.daysToOut <= 30)
-  );
+  readonly repositionPredictions = computed<RepositionPrediction[]>(() => {
+    const inList = new Set(
+      this.manualItemsStore.manualItems().map(m => normalizeLowercase(m.name))
+    );
+    return computeRepositionPredictions(this.pantryStore.items(), this.events(), new Date())
+      .filter(p => p.daysToOut <= 30 && !inList.has(normalizeLowercase(p.productName)));
+  });
 
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 

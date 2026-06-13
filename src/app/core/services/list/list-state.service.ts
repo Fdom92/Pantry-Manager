@@ -145,7 +145,7 @@ export class ListStateService {
     }
   }
 
-  async markManualAsBought(id: string): Promise<void> {
+  async markManualAsBought(id: string, quantity = 1): Promise<void> {
     const item = this.manualItemsStore.markManualAsBought(id);
     if (!item) return;
 
@@ -157,27 +157,27 @@ export class ListStateService {
 
     try {
       if (match) {
-        const updated = await this.pantryStore.addNewLot(match._id, { quantity: 1 });
+        const updated = await this.pantryStore.addNewLot(match._id, { quantity });
         if (updated) {
           await this.pantryStore.updateItem(updated);
-          await this.eventManager.logAddExistingItem(match, updated, 1, undefined, undefined, timestamp);
+          await this.eventManager.logAddExistingItem(match, updated, quantity, undefined, undefined, timestamp);
         }
       } else {
         const base = buildAddItemPayload({
           id: createDocumentId('item'),
           nowIso: timestamp,
           name: item.name,
-          quantity: 1,
+          quantity,
         });
         const newItem: PantryItem = { ...base, productType: 'pantry' };
         await this.pantryStore.addItem(newItem);
-        await this.eventManager.logAddNewItem(newItem, 1, undefined, timestamp);
+        await this.eventManager.logAddNewItem(newItem, quantity, undefined, timestamp);
       }
       this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
         kind: 'despensa',
         source: 'shopping_manual',
         is_new: !match,
-        quantity: 1,
+        quantity,
       });
       void this.reviewPrompt.handlePositiveAction();
     } catch (err) {

@@ -57,6 +57,13 @@ export class LocalStorageService {
     markTrialExpiredFired: () => this.setBool(STORAGE_KEYS.PRO_TRIAL_EXPIRED_FIRED, true),
   };
 
+  // ─── Shopping manual items ─────────────────────────────────────────────
+  readonly manualList = {
+    getItems: <T>() => this.getJson<T[]>(STORAGE_KEYS.SHOPPING_MANUAL_ITEMS) ?? [],
+    setItems: <T>(items: T[]) => this.setJson(STORAGE_KEYS.SHOPPING_MANUAL_ITEMS, items),
+    clear: () => this.remove(STORAGE_KEYS.SHOPPING_MANUAL_ITEMS),
+  };
+
   // ─── RevenueCat anon identifier ────────────────────────────────────────
   readonly revenuecat = {
     getUserId: () => this.getString(STORAGE_KEYS.REVENUECAT_USER_ID),

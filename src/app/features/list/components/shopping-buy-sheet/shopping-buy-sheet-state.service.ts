@@ -4,8 +4,8 @@ import type { ShoppingSuggestionWithItem } from '@core/models/list/list.model';
 
 /**
  * Page-scoped state for the shopping list "buy with quantity" bottom sheet.
- * Despensa items only — fresh items snap to FRESH_QTY.sufficient via the
- * existing markAsBought path.
+ * Handles both despensa suggestions and manual items.
+ * Fresh items snap to FRESH_QTY.sufficient and bypass this sheet entirely.
  */
 @Injectable()
 export class ShoppingBuySheetStateService {
@@ -13,19 +13,36 @@ export class ShoppingBuySheetStateService {
 
   readonly isOpen = signal(false);
   readonly targetSuggestion = signal<ShoppingSuggestionWithItem | null>(null);
+  private readonly targetManualId = signal<string | null>(null);
+  private readonly targetManualName = signal<string | null>(null);
   readonly pendingQuantity = signal(0);
 
   readonly canDecrement = computed(() => this.pendingQuantity() > 1);
+  readonly targetName = computed(
+    () => this.targetSuggestion()?.item.name ?? this.targetManualName()
+  );
 
   openSheet(suggestion: ShoppingSuggestionWithItem): void {
     this.targetSuggestion.set(suggestion);
+    this.targetManualId.set(null);
+    this.targetManualName.set(null);
     this.pendingQuantity.set(Math.max(1, Math.floor(suggestion.suggestedQuantity || 1)));
+    this.isOpen.set(true);
+  }
+
+  openSheetForManual(id: string, name: string): void {
+    this.targetManualId.set(id);
+    this.targetManualName.set(name);
+    this.targetSuggestion.set(null);
+    this.pendingQuantity.set(1);
     this.isOpen.set(true);
   }
 
   closeSheet(): void {
     this.isOpen.set(false);
     this.targetSuggestion.set(null);
+    this.targetManualId.set(null);
+    this.targetManualName.set(null);
     this.pendingQuantity.set(0);
   }
 
@@ -40,15 +57,21 @@ export class ShoppingBuySheetStateService {
   }
 
   async confirm(): Promise<void> {
-    const suggestion = this.targetSuggestion();
     const qty = this.pendingQuantity();
-    if (!suggestion || qty <= 0) {
+    if (qty <= 0) {
       this.closeSheet();
       return;
     }
     this.isOpen.set(false);
-    await this.listState.markAsBought(suggestion, { quantityOverride: qty });
+    const suggestion = this.targetSuggestion();
+    const manualId = this.targetManualId();
     this.targetSuggestion.set(null);
+    this.targetManualId.set(null);
     this.pendingQuantity.set(0);
+    if (suggestion) {
+      await this.listState.markAsBought(suggestion, { quantityOverride: qty });
+    } else if (manualId) {
+      await this.listState.markManualAsBought(manualId, qty);
+    }
   }
 }

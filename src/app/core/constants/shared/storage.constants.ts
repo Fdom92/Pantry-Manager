@@ -50,6 +50,8 @@ export const STORAGE_KEYS = {
   PRO_TRIAL_STARTED_AT: 'pro:trial:startedAt',
   /** Set once `pro_trial_expired` has been emitted for this trial (one-shot). */
   PRO_TRIAL_EXPIRED_FIRED: 'pro:trial:expiredFired',
+  /** Pending manual shopping list items — survives app close, cleared on buy/remove. */
+  SHOPPING_MANUAL_ITEMS: 'shopping:manualItems',
 } as const;
 
 export const DEFAULT_HOUSEHOLD_ID = 'household:default';
