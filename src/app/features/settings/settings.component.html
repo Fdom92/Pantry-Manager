@@ -15,20 +15,15 @@
 
     <!-- ── PRO hero card ──────────────────────────────────────── -->
     @if (isPro()) {
-      <ion-card class="settings-card settings-pro-card is-pro">
-        <ion-card-header>
-          <ion-card-title>
-            <ion-icon name="sparkles-outline" class="settings-pro-card__icon"></ion-icon>
-            {{ "settings.pro.activeTitle" | translate }}
-          </ion-card-title>
-          <ion-card-subtitle>
-            {{ "settings.pro.statusDescription" | translate }}
-          </ion-card-subtitle>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-badge color="tertiary">{{ "settings.pro.badgePro" | translate }}</ion-badge>
-        </ion-card-content>
-      </ion-card>
+      <div class="settings-pro-active">
+        <div class="settings-pro-active__icon-wrap">
+          <ion-icon name="checkmark-circle"></ion-icon>
+        </div>
+        <div class="settings-pro-active__text">
+          <h3 class="settings-pro-active__title">{{ "settings.pro.activeTitle" | translate }}</h3>
+          <p class="settings-pro-active__subtitle">{{ "settings.pro.statusDescription" | translate }}</p>
+        </div>
+      </div>
     } @else {
       <app-pro-paywall-card
         surface="settings_hero"

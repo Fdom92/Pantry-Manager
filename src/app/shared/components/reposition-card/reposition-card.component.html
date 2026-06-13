@@ -1,27 +1,21 @@
 <ion-card class="reposition-card">
-  <ion-card-header>
-    <ion-card-title>{{ 'dashboard.reposition.title' | translate }}</ion-card-title>
-  </ion-card-header>
-
   <ion-card-content>
     @if (isEmpty()) {
-      <p class="reposition-card__empty">
-        {{ 'dashboard.reposition.empty' | translate }}
-      </p>
+      <p class="reposition-card__empty">{{ 'dashboard.reposition.empty' | translate }}</p>
     } @else {
-      <ion-list lines="none" class="reposition-card__list">
+      <div class="reposition-card__list">
         @for (p of visiblePredictions(); track p.productId) {
-          <ion-item>
-            <ion-label>
-              <h3>{{ p.productName }}</h3>
-              <p>{{ 'dashboard.reposition.daysLeft' | translate: { days: p.daysToOut } }}</p>
-            </ion-label>
-            <ion-button slot="end" fill="clear" size="small" (click)="onAddToList(p)">
+          <div class="reposition-card__row">
+            <div class="reposition-card__info">
+              <span class="reposition-card__name">{{ p.productName }}</span>
+              <span class="reposition-card__days">{{ 'dashboard.reposition.daysLeft' | translate: { days: p.daysToOut } }}</span>
+            </div>
+            <ion-button fill="clear" size="small" class="reposition-card__add" (click)="onAddToList(p)">
               {{ 'dashboard.reposition.add' | translate }}
             </ion-button>
-          </ion-item>
+          </div>
         }
-      </ion-list>
+      </div>
     }
   </ion-card-content>
 </ion-card>

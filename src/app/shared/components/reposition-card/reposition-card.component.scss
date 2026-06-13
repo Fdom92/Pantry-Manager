@@ -1,4 +1,52 @@
 .reposition-card {
-  &__empty   { color: var(--ion-color-medium); margin: 0; }
-  &__list ion-item { --inner-padding-end: 0; }
+  &__empty {
+    color: var(--app-theme-text-muted);
+    margin: 0;
+    font-size: var(--app-theme-font-size-small);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-theme-spacing-sm-plus);
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--app-theme-spacing-sm);
+    padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
+    border-radius: var(--app-theme-radius-md);
+    background: var(--app-theme-surface-tint-soft);
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--app-theme-spacing-2xs);
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__name {
+    font-size: var(--app-theme-font-size-body);
+    font-weight: var(--app-theme-font-weight-semibold);
+    color: var(--app-theme-text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__days {
+    font-size: var(--app-theme-font-size-small);
+    color: var(--app-theme-text-muted);
+  }
+
+  &__add {
+    margin: 0;
+    flex-shrink: 0;
+    --color: var(--ion-color-primary);
+    font-weight: var(--app-theme-font-weight-bold);
+  }
 }

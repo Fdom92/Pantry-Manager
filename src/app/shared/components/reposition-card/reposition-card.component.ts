@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonItem, IonLabel, IonList, IonButton } from '@ionic/angular/standalone';
+import { IonCard, IonCardContent, IonButton } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import type { RepositionPrediction } from '@core/domain/insights/reposition.domain';
 
@@ -8,8 +8,8 @@ import type { RepositionPrediction } from '@core/domain/insights/reposition.doma
   selector: 'app-reposition-card',
   standalone: true,
   imports: [
-    IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-    IonList, IonItem, IonLabel, IonButton,
+    IonCard, IonCardContent,
+    IonButton,
     TranslateModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

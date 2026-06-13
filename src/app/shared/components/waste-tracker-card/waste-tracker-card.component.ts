@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { IonCard, IonCardContent, IonCardHeader, IonCardTitle } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import type { WasteSummary } from '@core/domain/insights/waste.domain';
 import { formatFriendlyName } from '@core/utils/normalization.util';
@@ -9,10 +8,6 @@ import { formatFriendlyName } from '@core/utils/normalization.util';
   selector: 'app-waste-tracker-card',
   standalone: true,
   imports: [
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     TranslateModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
