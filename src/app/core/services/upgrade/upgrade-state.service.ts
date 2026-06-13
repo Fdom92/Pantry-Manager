@@ -61,7 +61,14 @@ export class UpgradeStateService {
   }
 
   async purchasePlan(pkg: PurchasesPackage | null): Promise<void> {
-    if (!pkg || this.activePurchaseId()) {
+    if (!pkg) {
+      if (!environment.production) {
+        this.revenuecat.setDevProState(true);
+        await this.goDashboard();
+      }
+      return;
+    }
+    if (this.activePurchaseId()) {
       return;
     }
     this.activePurchaseId.set(pkg.identifier);
@@ -90,10 +97,6 @@ export class UpgradeStateService {
   }
 
   private async loadAvailablePackages(): Promise<void> {
-    if (!environment.production) {
-      this.planOptions.set(this.buildMockPlanOptions());
-      return;
-    }
     await withSignalFlag(this.isLoadingPlans, async () => {
       const packages = await this.revenuecat.getAvailablePackages();
       if (this.lifecycle.isDestroyed()) {
@@ -101,39 +104,6 @@ export class UpgradeStateService {
       }
       this.buildPlanOptions(packages);
     });
-  }
-
-  private buildMockPlanOptions(): PlanViewModel[] {
-    return [
-      {
-        id: 'mock_annual',
-        type: PACKAGE_TYPE.ANNUAL,
-        title: this.translate.instant('upgrade.plans.annual'),
-        subtitle: '',
-        price: '€29.99',
-        periodLabel: this.translate.instant('upgrade.plans.perYear'),
-        badgeLabel: this.translate.instant('upgrade.plans.badgeBestValue'),
-        savingsLabel: this.translate.instant('upgrade.plans.savings', { value: '37' }),
-        trialLabel: null,
-        ctaLabel: this.translate.instant('upgrade.actions.select'),
-        benefits: this.benefitKeys.map(k => this.translate.instant(k)),
-        highlight: true,
-      },
-      {
-        id: 'mock_monthly',
-        type: PACKAGE_TYPE.MONTHLY,
-        title: this.translate.instant('upgrade.plans.monthly'),
-        subtitle: '',
-        price: '€3.99',
-        periodLabel: this.translate.instant('upgrade.plans.perMonth'),
-        badgeLabel: null,
-        savingsLabel: null,
-        trialLabel: this.translate.instant('upgrade.plans.trialFree'),
-        ctaLabel: this.translate.instant('upgrade.actions.startTrial'),
-        benefits: this.benefitKeys.map(k => this.translate.instant(k)),
-        highlight: false,
-      },
-    ];
   }
 
   private findPackageById(identifier: string): PurchasesPackage | null {
