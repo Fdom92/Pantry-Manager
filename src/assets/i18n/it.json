@@ -864,9 +864,9 @@
     "headline": "Sblocca tutte le superpotenzialità della dispensa",
     "subtitle": "Previsioni di acquisto, controllo degli sprechi e analisi IA basati sui tuoi dati.",
     "benefits": {
-      "reposition": "Rifornimento intelligente: prevede quando finirai i tuoi prodotti di base prima che manchino.",
-      "waste": "Controllo degli sprechi: cosa scade senza essere consumato, in quali categorie e il tuo trend mensile.",
-      "analysis": "Analisi IA della tua dispensa: raccomandazioni concrete basate sul tuo storico di consumo reale."
+      "reposition": "Rifornimento intelligente: prevede quando finirai i tuoi prodotti di base.",
+      "waste": "Controllo sprechi: cosa scade, in quali categorie e il tuo trend.",
+      "analysis": "Analisi IA: raccomandazioni basate sul tuo storico di consumo."
     },
     "actions": {
       "maybeLater": "Forse più tardi",

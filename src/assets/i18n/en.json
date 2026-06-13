@@ -864,9 +864,9 @@
     "headline": "Unlock the full pantry superpowers",
     "subtitle": "Purchase predictions, waste tracking and AI analysis built on your own data.",
     "benefits": {
-      "reposition": "Smart restocking: predicts when you'll run out of your staples before they're gone.",
-      "waste": "Waste tracking: what expires unused, in which categories, and your monthly trend.",
-      "analysis": "AI pantry analysis: concrete recommendations based on your real consumption history."
+      "reposition": "Smart restocking: predicts when you'll run out of your staples.",
+      "waste": "Waste tracking: what expires, in which categories, and your trend.",
+      "analysis": "AI analysis: recommendations based on your consumption history."
     },
     "actions": {
       "maybeLater": "Maybe later",

@@ -864,9 +864,9 @@
     "headline": "Débloquez toute la puissance de votre garde-manger",
     "subtitle": "Prédictions d'achats, suivi du gaspillage et analyse IA basés sur vos propres données.",
     "benefits": {
-      "reposition": "Réapprovisionnement intelligent : prédit quand vos produits de base vont manquer, avant qu'ils ne manquent.",
-      "waste": "Suivi du gaspillage : ce qui périme sans être consommé, dans quelles catégories, et votre tendance mensuelle.",
-      "analysis": "Analyse IA de votre garde-manger : des recommandations concrètes basées sur votre historique réel de consommation."
+      "reposition": "Réapprovisionnement intelligent : prédit quand vos produits de base vont manquer.",
+      "waste": "Suivi du gaspillage : ce qui périme, dans quelles catégories et votre tendance.",
+      "analysis": "Analyse IA : recommandations basées sur votre historique de consommation."
     },
     "actions": {
       "maybeLater": "Plus tard",

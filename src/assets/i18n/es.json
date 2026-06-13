@@ -864,9 +864,9 @@
     "headline": "Desbloquea todo el poder de tu despensa",
     "subtitle": "Predicción de compras, control de desperdicio y análisis IA con tus propios datos.",
     "benefits": {
-      "reposition": "Reposición inteligente: predice cuándo te quedarás sin tus básicos antes de que falten.",
-      "waste": "Control de desperdicio: qué caduca sin consumirse, en qué categorías y tu tendencia mensual.",
-      "analysis": "Análisis IA de tu despensa: recomendaciones concretas basadas en tu historial real de consumo."
+      "reposition": "Reposición inteligente: predice cuándo te quedarás sin básicos.",
+      "waste": "Control de desperdicio: qué caduca, en qué categorías y tendencia.",
+      "analysis": "Análisis IA: recomendaciones basadas en tu historial de consumo."
     },
     "actions": {
       "maybeLater": "Ahora no",

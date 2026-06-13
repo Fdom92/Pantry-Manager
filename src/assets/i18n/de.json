@@ -864,9 +864,9 @@
     "headline": "Entfalte das volle Potenzial deiner Vorratskammer",
     "subtitle": "Einkaufsprognosen, Abfall-Tracking und KI-Analyse auf Basis deiner eigenen Daten.",
     "benefits": {
-      "reposition": "Intelligentes Nachfüllen: sagt voraus, wann deine Basics zur Neige gehen, bevor sie fehlen.",
-      "waste": "Abfall-Tracking: was ungenutzt abläuft, in welchen Kategorien und dein Monatstrend.",
-      "analysis": "KI-Analyse deines Vorrats: konkrete Empfehlungen aus deinem echten Verbrauchsverlauf."
+      "reposition": "Intelligentes Nachfüllen: sagt voraus, wann deine Basics zur Neige gehen.",
+      "waste": "Abfall-Tracking: was abläuft, in welchen Kategorien und dein Trend.",
+      "analysis": "KI-Analyse: Empfehlungen basierend auf deinem Verbrauchsverlauf."
     },
     "actions": {
       "maybeLater": "Vielleicht später",
