@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Not now",
     "actions": {
       "close": "Close",
       "cancel": "Cancel",
@@ -150,6 +151,12 @@
       }
     },
     "sections": {
+      "progress": {
+        "title": "Your progress"
+      },
+      "reposition": {
+        "title": "Upcoming shopping"
+      },
       "today": {
         "title": "Recommended for today"
       },
@@ -348,6 +355,29 @@
       "updated": "Updated {{ date }}",
       "badge": "New",
       "empty": "No recent updates."
+    },
+    "waste": {
+      "title": "Waste this month",
+      "count": "You threw away {{count}} products",
+      "topCategory": "Mostly in: {{category}}",
+      "zero": "No waste this month! 🎯",
+      "trend": {
+        "up": "↑ More than last month",
+        "down": "↓ Less than last month",
+        "flat": "≈ Same as last month"
+      },
+      "teaser": "Find out how much you wasted this month"
+    },
+    "reposition": {
+      "title": "Running out soon",
+      "daysLeft": "{{days}} days left",
+      "add": "Add",
+      "added": "Added to list",
+      "empty": "We need more history to predict",
+      "teaser": "Predict what you need to buy before you run out"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} days"
     }
   },
   "shopping": {
@@ -509,6 +539,11 @@
         "recommendations": "Recommendations",
         "suggestions": "This week"
       }
+    },
+    "empty": {
+      "title": "No insights yet",
+      "body": "Add products to your pantry to see consumption patterns, predictions and waste.",
+      "cta": "Go to pantry"
     }
   },
   "pantry": {
@@ -771,7 +806,10 @@
         "fiveDays": "5 days",
         "oneWeek": "1 week",
         "twoWeeks": "2 weeks",
-        "noDate": "No date"
+        "noDate": "No date",
+        "remaining": "{{days}} days left",
+        "expiresToday": "Expires today",
+        "expiredAgo": "Expired {{days}} days ago"
       },
       "card": {
         "expired": "Expired",
@@ -818,11 +856,17 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Start your 7-day free trial"
+    },
+    "cta": "Go PRO",
     "title": "Upgrade to PRO",
     "headline": "Unlock the full pantry superpowers",
-    "subtitle": "Smarter automation and priority features.",
+    "subtitle": "Purchase predictions, waste tracking and AI analysis built on your own data.",
     "benefits": {
-      "agent": "Discover what expires most, what piles up, and how to improve your rotation. Concrete recommendations based on your own consumption history."
+      "reposition": "Smart restocking: predicts when you'll run out of your staples.",
+      "waste": "Waste tracking: what expires, in which categories, and your trend.",
+      "analysis": "AI analysis: recommendations based on your consumption history."
     },
     "actions": {
       "maybeLater": "Maybe later",
@@ -853,11 +897,18 @@
     "title": "Settings",
     "pro": {
       "statusDescription": "Thank you for supporting the project. PRO is active on this device.",
-      "upgradePrompt": "Upgrade to PRO to unlock your full history and premium features.",
+      "upgradePrompt": "Go PRO to unlock stock predictions, waste analytics, and more.",
+      "tagline": "Make the most of your pantry",
+      "feature1": "Predict what you'll need to buy before you run out",
+      "feature2": "Waste analytics and consumption patterns",
+      "feature3": "New premium features coming soon",
       "upgradeCta": "Upgrade to PRO",
       "badgePro": "PRO active",
       "activeTitle": "PRO active",
-      "upgradeTitle": "Go PRO"
+      "upgradeTitle": "Go PRO",
+      "priceMonthly": "{{price}} / month",
+      "priceAnnual": "{{price}} / year",
+      "savings": "save {{percent}}%"
     },
     "appearance": {
       "title": "Appearance",
@@ -1086,6 +1137,24 @@
       "subtitle": "Support, ratings and legal documents.",
       "termsTitle": "Terms of use",
       "termsSubtitle": "Service conditions."
+    },
+    "streak": {
+      "title": "Your streak",
+      "tokensLabel": "Wildcards to protect your streak",
+      "daysLabel": "days",
+      "daysLabel_one": "day",
+      "daysLabel_other": "days",
+      "empty": "Add or use a product today to start your streak",
+      "longest": "Best streak: {{longest}}",
+      "longest_one": "Best streak: {{longest}} day",
+      "longest_other": "Best streak: {{longest}} days",
+      "milestones": "Milestones",
+      "nextGoal": "{{days}} days to go until {{milestone}}",
+      "nextGoal_one": "{{days}} day to go until {{milestone}}",
+      "nextGoal_other": "{{days}} days to go until {{milestone}}",
+      "graceAvailable": "Wildcard day available",
+      "graceUsed": "Wildcard used — come back tomorrow without fail",
+      "allMilestonesReached": "🎉 You've reached every milestone!"
     }
   },
   "reviews": {
@@ -1148,6 +1217,10 @@
         "title": "Your pantry needs you",
         "body": "Come back and avoid wasting food. 30 seconds is all it takes."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Great momentum",
+      "body": "You've been managing your pantry for {{streak}} days in a row. Keep it up!"
     }
   },
   "sync": {
@@ -1207,5 +1280,8 @@
       "confirm": "Done",
       "later": "Not now"
     }
+  },
+  "streak": {
+    "milestoneToast": "{{streak}} days in a row! 🔥 You earned 1 wildcard 🛡️"
   }
 }

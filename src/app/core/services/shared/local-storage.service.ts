@@ -42,12 +42,26 @@ export class LocalStorageService {
     markShown: () => this.setBool(STORAGE_KEYS.RECONSENT_SHOWN, true),
   };
 
-  // ─── PRO entitlement cache ─────────────────────────────────────────────
+  // ─── PRO entitlement cache + trial flags ───────────────────────────────
   // Authoritative source is RevenueCat cloud; this is a sync cache read at
-  // boot before the SDK has rehydrated.
+  // boot before the SDK has rehydrated. Trial flags are local one-shots used
+  // by AppComponent to detect trial expiry and emit the analytics event once.
   readonly pro = {
     getStatus: (): boolean | null => this.getJson<boolean>(STORAGE_KEYS.PRO_STATUS),
     setStatus: (v: boolean) => this.setJson(STORAGE_KEYS.PRO_STATUS, v),
+
+    getTrialStartedAt: () => this.getDate(STORAGE_KEYS.PRO_TRIAL_STARTED_AT),
+    setTrialStartedAt: (v: Date | string) => this.setDate(STORAGE_KEYS.PRO_TRIAL_STARTED_AT, v),
+
+    isTrialExpiredFired: () => this.getBool(STORAGE_KEYS.PRO_TRIAL_EXPIRED_FIRED),
+    markTrialExpiredFired: () => this.setBool(STORAGE_KEYS.PRO_TRIAL_EXPIRED_FIRED, true),
+  };
+
+  // ─── Shopping manual items ─────────────────────────────────────────────
+  readonly manualList = {
+    getItems: <T>() => this.getJson<T[]>(STORAGE_KEYS.SHOPPING_MANUAL_ITEMS) ?? [],
+    setItems: <T>(items: T[]) => this.setJson(STORAGE_KEYS.SHOPPING_MANUAL_ITEMS, items),
+    clear: () => this.remove(STORAGE_KEYS.SHOPPING_MANUAL_ITEMS),
   };
 
   // ─── RevenueCat anon identifier ────────────────────────────────────────

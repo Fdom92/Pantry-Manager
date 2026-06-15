@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Jetzt nicht",
     "actions": {
       "close": "Schließen",
       "cancel": "Abbrechen",
@@ -150,6 +151,12 @@
       }
     },
     "sections": {
+      "progress": {
+        "title": "Dein Fortschritt"
+      },
+      "reposition": {
+        "title": "Nächster Einkauf"
+      },
       "today": {
         "title": "Empfohlen für heute"
       },
@@ -348,6 +355,29 @@
       "updated": "Aktualisiert {{ date }}",
       "badge": "Neu",
       "empty": "Keine aktuellen Änderungen."
+    },
+    "waste": {
+      "title": "Abfall diesen Monat",
+      "count": "Du hast {{count}} Produkte weggeworfen",
+      "topCategory": "Hauptsächlich in: {{category}}",
+      "zero": "Kein Abfall diesen Monat! 🎯",
+      "trend": {
+        "up": "↑ Mehr als letzten Monat",
+        "down": "↓ Weniger als letzten Monat",
+        "flat": "≈ Gleich wie letzten Monat"
+      },
+      "teaser": "Erfahre, wie viel du diesen Monat weggeworfen hast"
+    },
+    "reposition": {
+      "title": "Bald ausverkauft",
+      "daysLeft": "Noch {{days}} Tage",
+      "add": "Hinzufügen",
+      "added": "Zur Liste hinzugefügt",
+      "empty": "Wir brauchen mehr Verlauf für Vorhersagen",
+      "teaser": "Sag voraus, was du kaufen musst, bevor es aufgebraucht ist"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} Tage"
     }
   },
   "shopping": {
@@ -509,6 +539,11 @@
         "recommendations": "Empfehlungen",
         "suggestions": "Diese Woche"
       }
+    },
+    "empty": {
+      "title": "Noch keine Erkenntnisse",
+      "body": "Füge Produkte zu deiner Vorratskammer hinzu, um Verbrauchsmuster, Prognosen und Abfall zu sehen.",
+      "cta": "Zur Vorratskammer"
     }
   },
   "pantry": {
@@ -771,7 +806,10 @@
         "fiveDays": "5 Tage",
         "oneWeek": "1 Woche",
         "twoWeeks": "2 Wochen",
-        "noDate": "Kein Datum"
+        "noDate": "Kein Datum",
+        "remaining": "Noch {{days}} Tage",
+        "expiresToday": "Läuft heute ab",
+        "expiredAgo": "Vor {{days}} Tagen abgelaufen"
       },
       "card": {
         "expired": "Abgelaufen",
@@ -818,11 +856,17 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Starte deine 7-tägige kostenlose Probezeit"
+    },
+    "cta": "PRO werden",
     "title": "PRO werden",
     "headline": "Entfalte das volle Potenzial deiner Vorratskammer",
-    "subtitle": "Intelligente Automatisierung und priorisierte Funktionen.",
+    "subtitle": "Einkaufsprognosen, Abfall-Tracking und KI-Analyse auf Basis deiner eigenen Daten.",
     "benefits": {
-      "agent": "Erkenne, was am meisten abläuft, was sich ansammelt und wie du die Rotation verbessern kannst. Konkrete Empfehlungen aus deinem eigenen Verbrauchsverlauf."
+      "reposition": "Intelligentes Nachfüllen: sagt voraus, wann deine Basics zur Neige gehen.",
+      "waste": "Abfall-Tracking: was abläuft, in welchen Kategorien und dein Trend.",
+      "analysis": "KI-Analyse: Empfehlungen basierend auf deinem Verbrauchsverlauf."
     },
     "actions": {
       "maybeLater": "Vielleicht später",
@@ -853,11 +897,18 @@
     "title": "Einstellungen",
     "pro": {
       "statusDescription": "Danke für deine Unterstützung. PRO ist auf diesem Gerät aktiv.",
-      "upgradePrompt": "Werde PRO, um deinen vollständigen Verlauf und Premium-Funktionen freizuschalten.",
+      "upgradePrompt": "Werde PRO, um Bestandsprognosen, Verschwendungsanalysen und mehr freizuschalten.",
+      "tagline": "Hol das Maximum aus deiner Vorratskammer",
+      "feature1": "Vorhersage, was du kaufen musst, bevor es ausgeht",
+      "feature2": "Verschwendungsanalysen und Verbrauchsmuster",
+      "feature3": "Neue Premium-Funktionen in Kürze",
       "upgradeCta": "PRO werden",
       "badgePro": "PRO aktiv",
       "activeTitle": "PRO aktiv",
-      "upgradeTitle": "PRO werden"
+      "upgradeTitle": "PRO werden",
+      "priceMonthly": "{{price}} / Monat",
+      "priceAnnual": "{{price}} / Jahr",
+      "savings": "spare {{percent}}%"
     },
     "appearance": {
       "title": "Erscheinungsbild",
@@ -1086,6 +1137,24 @@
       "subtitle": "Support, Bewertungen und rechtliche Dokumente.",
       "termsTitle": "Nutzungsbedingungen",
       "termsSubtitle": "Servicebedingungen."
+    },
+    "streak": {
+      "title": "Deine Serie",
+      "tokensLabel": "Joker zum Schutz deiner Serie",
+      "daysLabel": "Tage",
+      "empty": "Füge heute ein Produkt hinzu oder verbrauche eins, um deine Serie zu starten",
+      "longest": "Längste Serie: {{longest}}",
+      "milestones": "Meilensteine",
+      "nextGoal": "Noch {{days}} Tage bis zu {{milestone}}",
+      "graceAvailable": "Joker-Tag verfügbar",
+      "graceUsed": "Joker benutzt — komm morgen auf jeden Fall zurück",
+      "allMilestonesReached": "🎉 Du hast alle Meilensteine erreicht!",
+      "daysLabel_one": "Tag",
+      "daysLabel_other": "Tage",
+      "longest_one": "Längste Serie: {{longest}} Tag",
+      "longest_other": "Längste Serie: {{longest}} Tage",
+      "nextGoal_one": "Noch {{days}} Tag bis zu {{milestone}}",
+      "nextGoal_other": "Noch {{days}} Tage bis zu {{milestone}}"
     }
   },
   "reviews": {
@@ -1148,6 +1217,10 @@
         "title": "Deine Vorratskammer braucht dich",
         "body": "Komm zurück und vermeide Lebensmittelverschwendung. 30 Sekunden reichen."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Gutes Tempo",
+      "body": "Du kümmerst dich seit {{streak}} Tagen am Stück um deine Vorratskammer. Weiter so!"
     }
   },
   "sync": {
@@ -1207,5 +1280,8 @@
       "confirm": "Fertig",
       "later": "Jetzt nicht"
     }
+  },
+  "streak": {
+    "milestoneToast": "{{streak}} Tage in Folge! 🔥 Du hast 1 Joker verdient 🛡️"
   }
 }

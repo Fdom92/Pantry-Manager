@@ -20,16 +20,19 @@ import {
 } from '@core/models/list';
 import { FRESH_QTY } from '@core/domain/pantry/fresh.domain';
 import { LanguageService } from '../shared/language.service';
-import { createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
+import { createDocumentId, createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
+import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
+import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import jsPDF from 'jspdf';
+import type jsPDF from 'jspdf';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
+import { ListManualItemsStore } from './list-manual-items.store';
 
 @Injectable()
 export class ListStateService {
@@ -43,14 +46,18 @@ export class ListStateService {
   private readonly toastController = inject(ToastController);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly manualItemsStore = inject(ListManualItemsStore);
+  private readonly eventManager = inject(HistoryEventManagerService);
 
   readonly isSharingListInProgress = signal(false);
 
-  // Ephemeral state — cleared on ionViewWillLeave
+  // Ephemeral per-visit state — cleared on ionViewWillLeave
   readonly boughtItemIds  = signal<Set<string>>(new Set());
   readonly removedAutoIds = signal<Set<string>>(new Set());
-  readonly manualItems    = signal<ManualItem[]>([]);
-  readonly boughtManuals  = signal<BoughtItem[]>([]);
+
+  // Persistent across tab switches — owned by ListManualItemsStore
+  readonly manualItems    = this.manualItemsStore.manualItems;
+  readonly boughtManuals  = this.manualItemsStore.boughtManuals;
 
   readonly shoppingAnalysis = computed<ShoppingStateWithItem>(() => {
     return this.buildShoppingAnalysis(
@@ -77,8 +84,12 @@ export class ListStateService {
   async ionViewWillLeave(): Promise<void> {
     this.boughtItemIds.set(new Set());
     this.removedAutoIds.set(new Set());
-    this.manualItems.set([]);
-    this.boughtManuals.set([]);
+    // Clear the "Comprado" history for manual items too — they have already
+    // been added to the pantry by markManualAsBought, so keeping them in the
+    // bought-manuals signal would make that section grow forever across
+    // shopping trips. The pending (unbought) manualItems signal stays — it
+    // survives tab switches by design (S4 refactor).
+    this.manualItemsStore.clearBoughtManuals();
   }
 
   async markAsBought(
@@ -92,22 +103,29 @@ export class ListStateService {
     this.boughtItemIds.update(set => new Set([...set, id]));
 
     try {
+      const timestamp = new Date().toISOString();
       if (isFresh) {
         const item = suggestion.item;
         const existingBatches = item.batches ?? [];
         const updatedBatches = existingBatches.length > 0
           ? [{ ...existingBatches[0], quantity: FRESH_QTY.sufficient }, ...existingBatches.slice(1)]
           : [{ batchId: `batch-${Date.now()}`, quantity: FRESH_QTY.sufficient }];
-        await this.pantryStore.updateItem({
+        const updatedFresh: PantryItem = {
           ...item,
           batches: updatedBatches,
-          updatedAt: new Date().toISOString(),
-        });
+          updatedAt: timestamp,
+        };
+        await this.pantryStore.updateItem(updatedFresh);
+        await this.eventManager.logAdvancedEdit(item, updatedFresh, 'pantry_card');
       } else {
         const quantity = opts?.quantityOverride && opts.quantityOverride > 0
           ? opts.quantityOverride
           : suggestion.suggestedQuantity;
-        await this.pantryStore.addNewLot(id, { quantity });
+        const previous = suggestion.item;
+        const updated = await this.pantryStore.addNewLot(id, { quantity });
+        if (updated) {
+          await this.eventManager.logAddExistingItem(previous, updated, quantity, undefined, undefined, timestamp);
+        }
       }
       const msg = this.translate.instant('shopping.toasts.bought', { name });
       void this.showToast(msg);
@@ -127,11 +145,45 @@ export class ListStateService {
     }
   }
 
-  markManualAsBought(id: string): void {
-    const item = this.manualItems().find(m => m.id === id);
+  async markManualAsBought(id: string, quantity = 1): Promise<void> {
+    const item = this.manualItemsStore.markManualAsBought(id);
     if (!item) return;
-    this.manualItems.update(list => list.filter(m => m.id !== id));
-    this.boughtManuals.update(list => [...list, { id, name: item.name }]);
+
+    // Match the manual entry to an existing pantry product by normalized name.
+    // If found → add a new lot. Otherwise create a brand-new pantry item.
+    const target = normalizeLowercase(item.name);
+    const match = this.items().find(p => normalizeLowercase(p.name) === target);
+    const timestamp = new Date().toISOString();
+
+    try {
+      if (match) {
+        const updated = await this.pantryStore.addNewLot(match._id, { quantity });
+        if (updated) {
+          await this.pantryStore.updateItem(updated);
+          await this.eventManager.logAddExistingItem(match, updated, quantity, undefined, undefined, timestamp);
+        }
+      } else {
+        const base = buildAddItemPayload({
+          id: createDocumentId('item'),
+          nowIso: timestamp,
+          name: item.name,
+          quantity,
+        });
+        const newItem: PantryItem = { ...base, productType: 'pantry' };
+        await this.pantryStore.addItem(newItem);
+        await this.eventManager.logAddNewItem(newItem, quantity, undefined, timestamp);
+      }
+      this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
+        kind: 'despensa',
+        source: 'shopping_manual',
+        is_new: !match,
+        quantity,
+      });
+      void this.reviewPrompt.handlePositiveAction();
+    } catch (err) {
+      console.error('[ListStateService] markManualAsBought add-to-pantry failed', err);
+    }
+
     const msg = this.translate.instant('shopping.toasts.boughtManual', { name: item.name });
     void this.showToast(msg);
   }
@@ -147,8 +199,7 @@ export class ListStateService {
   }
 
   removeManualItem(id: string): void {
-    const item = this.manualItems().find(m => m.id === id);
-    this.manualItems.update(list => list.filter(m => m.id !== id));
+    const item = this.manualItemsStore.removeManual(id);
     if (item) {
       const msg = this.translate.instant('shopping.toasts.removedManual', { name: item.name });
       void this.showToast(msg);
@@ -162,13 +213,11 @@ export class ListStateService {
       next.delete(id);
       return next;
     });
-    this.boughtManuals.update(list => list.filter(b => b.id !== id));
+    this.manualItemsStore.restoreBoughtManual(id);
   }
 
-  addManualItem(name: string): void {
-    const id = crypto.randomUUID();
-    this.manualItems.update(list => [...list, { id, name }]);
-    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_MANUAL_ADDED);
+  addManualItem(name: string, source: 'user' | 'preset' = 'user'): void {
+    this.manualItemsStore.addManualItem(name, source);
   }
 
   private async showToast(message: string, duration = 2500): Promise<void> {
@@ -199,7 +248,7 @@ export class ListStateService {
       });
 
       await withSignalFlag(this.isSharingListInProgress, async () => {
-        const pdfBlob = this.buildShoppingPdf(state.groupedSuggestions);
+        const pdfBlob = await this.buildShoppingPdf(state.groupedSuggestions);
         const filename = `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename(new Date())}.pdf`;
         const { outcome } = await this.share.tryShareBlob({
           blob: pdfBlob,
@@ -319,7 +368,8 @@ export class ListStateService {
     };
   }
 
-  private buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Blob {
+  private async buildShoppingPdf(groups: ShoppingSuggestionGroupWithItem[]): Promise<Blob> {
+    const { default: jsPDF } = await import('jspdf');
     const doc = new jsPDF();
     const now = new Date();
     const marginX = 14;

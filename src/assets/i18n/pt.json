@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Agora não",
     "actions": {
       "close": "Fechar",
       "cancel": "Cancelar",
@@ -150,6 +151,12 @@
       }
     },
     "sections": {
+      "progress": {
+        "title": "O teu progresso"
+      },
+      "reposition": {
+        "title": "Próximas compras"
+      },
       "today": {
         "title": "Recomendado para hoje"
       },
@@ -348,6 +355,29 @@
       "updated": "Atualizado em {{ date }}",
       "badge": "Novo",
       "empty": "Sem atualizações recentes."
+    },
+    "waste": {
+      "title": "Desperdício este mês",
+      "count": "Deitou fora {{count}} produtos",
+      "topCategory": "Principalmente em: {{category}}",
+      "zero": "Sem desperdício este mês! 🎯",
+      "trend": {
+        "up": "↑ Mais do que o mês passado",
+        "down": "↓ Menos do que o mês passado",
+        "flat": "≈ Igual ao mês passado"
+      },
+      "teaser": "Descubra quanto desperdiçou este mês"
+    },
+    "reposition": {
+      "title": "A ficar sem stock em breve",
+      "daysLeft": "Faltam {{days}} dias",
+      "add": "Adicionar",
+      "added": "Adicionado à lista",
+      "empty": "Precisamos de mais histórico para prever",
+      "teaser": "Preveja o que precisa de comprar antes de ficar sem stock"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} dias"
     }
   },
   "shopping": {
@@ -509,6 +539,11 @@
         "recommendations": "Recomendações",
         "suggestions": "Esta semana"
       }
+    },
+    "empty": {
+      "title": "Ainda sem insights",
+      "body": "Adiciona produtos à tua despensa para ver padrões de consumo, previsões e desperdício.",
+      "cta": "Ir para a despensa"
     }
   },
   "pantry": {
@@ -771,7 +806,10 @@
         "fiveDays": "5 dias",
         "oneWeek": "1 semana",
         "twoWeeks": "2 semanas",
-        "noDate": "Sem data"
+        "noDate": "Sem data",
+        "remaining": "Faltam {{days}} dias",
+        "expiresToday": "Caduca hoje",
+        "expiredAgo": "Caducou há {{days}} dias"
       },
       "card": {
         "expired": "Expirado",
@@ -818,11 +856,17 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Começa o teu teste gratuito de 7 dias"
+    },
+    "cta": "Torna-te PRO",
     "title": "Atualizar para PRO",
     "headline": "Desbloqueia os superpoderes completos da despensa",
-    "subtitle": "Automatização inteligente e funcionalidades prioritárias.",
+    "subtitle": "Previsões de compras, controlo de desperdício e análise IA com os teus próprios dados.",
     "benefits": {
-      "agent": "Descobre o que expira mais, o que se acumula e como melhorar a tua rotação. Recomendações concretas baseadas no teu próprio histórico de consumo."
+      "reposition": "Reposição inteligente: prevê quando vais ficar sem os teus básicos.",
+      "waste": "Controlo de desperdício: o que expira, em que categorias e a tua tendência.",
+      "analysis": "Análise IA: recomendações baseadas no teu histórico de consumo."
     },
     "actions": {
       "maybeLater": "Talvez mais tarde",
@@ -853,11 +897,18 @@
     "title": "Definições",
     "pro": {
       "statusDescription": "Obrigado por apoiares o projeto. PRO está ativo neste dispositivo.",
-      "upgradePrompt": "Atualiza para PRO para desbloquear o histórico completo e funcionalidades premium.",
+      "upgradePrompt": "Torna-te PRO para desbloquear previsões de stock, análise de desperdício e mais.",
+      "tagline": "Tira o máximo partido da tua despensa",
+      "feature1": "Prevê o que precisas de comprar antes de acabar",
+      "feature2": "Análise de desperdício e padrões de consumo",
+      "feature3": "Novas funcionalidades premium em breve",
       "upgradeCta": "Atualizar para PRO",
       "badgePro": "PRO ativo",
       "activeTitle": "PRO ativo",
-      "upgradeTitle": "Torna-te PRO"
+      "upgradeTitle": "Torna-te PRO",
+      "priceMonthly": "{{price}} / mês",
+      "priceAnnual": "{{price}} / ano",
+      "savings": "poupa {{percent}}%"
     },
     "appearance": {
       "title": "Aparência",
@@ -1086,6 +1137,24 @@
       "subtitle": "Suporte, avaliações e documentos legais.",
       "termsTitle": "Termos de uso",
       "termsSubtitle": "Condições de serviço."
+    },
+    "streak": {
+      "title": "A tua sequência",
+      "tokensLabel": "Coringas para proteger a tua sequência",
+      "daysLabel": "dias",
+      "empty": "Adiciona ou consome um produto hoje para começar a tua sequência",
+      "longest": "Melhor sequência: {{longest}}",
+      "milestones": "Marcos",
+      "nextGoal": "Faltam {{days}} dias para {{milestone}}",
+      "graceAvailable": "Dia curinga disponível",
+      "graceUsed": "Curinga usado — volta amanhã sem falta",
+      "allMilestonesReached": "🎉 Atingiste todos os marcos!",
+      "daysLabel_one": "dia",
+      "daysLabel_other": "dias",
+      "longest_one": "Melhor sequência: {{longest}} dia",
+      "longest_other": "Melhor sequência: {{longest}} dias",
+      "nextGoal_one": "Falta {{days}} dia para {{milestone}}",
+      "nextGoal_other": "Faltam {{days}} dias para {{milestone}}"
     }
   },
   "reviews": {
@@ -1148,6 +1217,10 @@
         "title": "A tua despensa precisa de ti",
         "body": "Volta e evita deitar comida fora. Bastam 30 segundos."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Bom ritmo",
+      "body": "Tens gerido a tua despensa durante {{streak}} dias seguidos. Continua!"
     }
   },
   "sync": {
@@ -1207,5 +1280,8 @@
       "confirm": "Pronto",
       "later": "Agora não"
     }
+  },
+  "streak": {
+    "milestoneToast": "{{streak}} dias seguidos! 🔥 Ganhaste 1 coringa 🛡️"
   }
 }

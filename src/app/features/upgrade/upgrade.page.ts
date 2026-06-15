@@ -13,6 +13,7 @@ import {
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { PlanCardComponent } from './components/plan-card/plan-card.component';
+import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial-cta.component';
 import { UpgradeStateService } from '@core/services/upgrade/upgrade-state.service';
 
 @Component({
@@ -31,6 +32,7 @@ import { UpgradeStateService } from '@core/services/upgrade/upgrade-state.servic
     CommonModule,
     TranslateModule,
     PlanCardComponent,
+    ProTrialCtaComponent,
   ],
   templateUrl: './upgrade.page.html',
   styleUrls: ['./upgrade.page.scss'],

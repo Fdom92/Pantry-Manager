@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Non ora",
     "actions": {
       "close": "Chiudi",
       "cancel": "Annulla",
@@ -150,6 +151,12 @@
       }
     },
     "sections": {
+      "progress": {
+        "title": "I tuoi progressi"
+      },
+      "reposition": {
+        "title": "Prossimi acquisti"
+      },
       "today": {
         "title": "Consigliato per oggi"
       },
@@ -348,6 +355,29 @@
       "updated": "Aggiornato {{ date }}",
       "badge": "Nuovo",
       "empty": "Nessun aggiornamento recente."
+    },
+    "waste": {
+      "title": "Sprechi questo mese",
+      "count": "Hai buttato {{count}} prodotti",
+      "topCategory": "Soprattutto in: {{category}}",
+      "zero": "Nessuno spreco questo mese! 🎯",
+      "trend": {
+        "up": "↑ Più del mese scorso",
+        "down": "↓ Meno del mese scorso",
+        "flat": "≈ Uguale al mese scorso"
+      },
+      "teaser": "Scopri quanto hai sprecato questo mese"
+    },
+    "reposition": {
+      "title": "In esaurimento presto",
+      "daysLeft": "Mancano {{days}} giorni",
+      "add": "Aggiungi",
+      "added": "Aggiunto alla lista",
+      "empty": "Abbiamo bisogno di più cronologia per prevedere",
+      "teaser": "Prevedi cosa comprare prima che finisca"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} giorni"
     }
   },
   "shopping": {
@@ -509,6 +539,11 @@
         "recommendations": "Raccomandazioni",
         "suggestions": "Questa settimana"
       }
+    },
+    "empty": {
+      "title": "Ancora nessun insight",
+      "body": "Aggiungi prodotti alla tua dispensa per vedere i modelli di consumo, le previsioni e gli sprechi.",
+      "cta": "Vai alla dispensa"
     }
   },
   "pantry": {
@@ -771,7 +806,10 @@
         "fiveDays": "5 giorni",
         "oneWeek": "1 settimana",
         "twoWeeks": "2 settimane",
-        "noDate": "Senza data"
+        "noDate": "Senza data",
+        "remaining": "Mancano {{days}} giorni",
+        "expiresToday": "Scade oggi",
+        "expiredAgo": "Scaduto {{days}} giorni fa"
       },
       "card": {
         "expired": "Scaduto",
@@ -818,11 +856,17 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Inizia la tua prova gratuita di 7 giorni"
+    },
+    "cta": "Diventa PRO",
     "title": "Passa a PRO",
     "headline": "Sblocca tutte le superpotenzialità della dispensa",
-    "subtitle": "Automazioni intelligenti e funzionalità prioritarie.",
+    "subtitle": "Previsioni di acquisto, controllo degli sprechi e analisi IA basati sui tuoi dati.",
     "benefits": {
-      "agent": "Scopri cosa scade di più, cosa si accumula e come migliorare la rotazione. Raccomandazioni concrete basate sul tuo storico di consumo reale."
+      "reposition": "Rifornimento intelligente: prevede quando finirai i tuoi prodotti di base.",
+      "waste": "Controllo sprechi: cosa scade, in quali categorie e il tuo trend.",
+      "analysis": "Analisi IA: raccomandazioni basate sul tuo storico di consumo."
     },
     "actions": {
       "maybeLater": "Forse più tardi",
@@ -853,11 +897,18 @@
     "title": "Impostazioni",
     "pro": {
       "statusDescription": "Grazie per supportare il progetto. PRO è attivo su questo dispositivo.",
-      "upgradePrompt": "Passa a PRO per sbloccare lo storico completo e le funzionalità premium.",
+      "upgradePrompt": "Passa a PRO per sbloccare previsioni di scorta, analisi degli sprechi e altro.",
+      "tagline": "Ottieni il massimo dalla tua dispensa",
+      "feature1": "Prevedi cosa comprare prima che finisca",
+      "feature2": "Analisi degli sprechi e schemi di consumo",
+      "feature3": "Nuove funzionalità premium in arrivo",
       "upgradeCta": "Passa a PRO",
       "badgePro": "PRO attivo",
       "activeTitle": "PRO attivo",
-      "upgradeTitle": "Diventa PRO"
+      "upgradeTitle": "Diventa PRO",
+      "priceMonthly": "{{price}} / mese",
+      "priceAnnual": "{{price}} / anno",
+      "savings": "risparmia {{percent}}%"
     },
     "appearance": {
       "title": "Aspetto",
@@ -1086,6 +1137,24 @@
       "subtitle": "Supporto, valutazioni e documenti legali.",
       "termsTitle": "Termini d'uso",
       "termsSubtitle": "Condizioni di servizio."
+    },
+    "streak": {
+      "title": "La tua serie",
+      "tokensLabel": "Jolly per proteggere la tua serie",
+      "daysLabel": "giorni",
+      "empty": "Aggiungi o consuma un prodotto oggi per iniziare la tua serie",
+      "longest": "Serie migliore: {{longest}}",
+      "milestones": "Traguardi",
+      "nextGoal": "Mancano {{days}} giorni a {{milestone}}",
+      "graceAvailable": "Giorno jolly disponibile",
+      "graceUsed": "Jolly usato — torna domani senza fallo",
+      "allMilestonesReached": "🎉 Hai raggiunto tutti i traguardi!",
+      "daysLabel_one": "giorno",
+      "daysLabel_other": "giorni",
+      "longest_one": "Serie migliore: {{longest}} giorno",
+      "longest_other": "Serie migliore: {{longest}} giorni",
+      "nextGoal_one": "Manca {{days}} giorno a {{milestone}}",
+      "nextGoal_other": "Mancano {{days}} giorni a {{milestone}}"
     }
   },
   "reviews": {
@@ -1148,6 +1217,10 @@
         "title": "La tua dispensa ha bisogno di te",
         "body": "Torna ed evita di buttare cibo. Bastano 30 secondi."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Ottimo ritmo",
+      "body": "Gestisci la tua dispensa da {{streak}} giorni consecutivi. Vai avanti!"
     }
   },
   "sync": {
@@ -1207,5 +1280,8 @@
       "confirm": "Fatto",
       "later": "Non ora"
     }
+  },
+  "streak": {
+    "milestoneToast": "{{streak}} giorni di fila! 🔥 Hai guadagnato 1 jolly 🛡️"
   }
 }

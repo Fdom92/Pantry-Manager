@@ -9,43 +9,63 @@
 
 <ion-content class="ion-padding">
   <div class="settings-content">
+    @if (showSkeleton()) {
+      <app-settings-skeleton />
+    } @else {
+
     <!-- ── PRO hero card ──────────────────────────────────────── -->
-    <ion-card class="settings-card settings-pro-card" [class.is-pro]="isPro()">
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="sparkles-outline" class="settings-pro-card__icon"></ion-icon>
-          @if (isPro()) {
-            {{ "settings.pro.activeTitle" | translate }}
-          } @else {
-            {{ "settings.pro.upgradeTitle" | translate }}
-          }
-        </ion-card-title>
-        <ion-card-subtitle>
-          @if (isPro()) {
-            {{ "settings.pro.statusDescription" | translate }}
-          } @else {
-            {{ "settings.pro.upgradePrompt" | translate }}
-          }
-        </ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        @if (isPro()) {
-          <ion-badge color="tertiary">
-            {{ "settings.pro.badgePro" | translate }}
-          </ion-badge>
-        } @else {
-          <ion-button
-            expand="block"
-            shape="round"
-            color="tertiary"
-            (click)="onUpgradeTap()"
-          >
-            <ion-icon slot="start" name="sparkles-outline"></ion-icon>
-            {{ "settings.pro.upgradeCta" | translate }}
-          </ion-button>
+    @if (isPro()) {
+      <div class="settings-pro-active">
+        <div class="settings-pro-active__icon-wrap">
+          <ion-icon name="checkmark-circle"></ion-icon>
+        </div>
+        <div class="settings-pro-active__text">
+          <h3 class="settings-pro-active__title">{{ "settings.pro.activeTitle" | translate }}</h3>
+          <p class="settings-pro-active__subtitle">{{ "settings.pro.statusDescription" | translate }}</p>
+        </div>
+      </div>
+    } @else {
+      <app-pro-paywall-card
+        surface="settings_hero"
+        titleKey="settings.pro.upgradeTitle"
+        descriptionKey="settings.pro.tagline"
+        dismissible
+      >
+        <ul class="pro-hero__features">
+          <li>
+            <ion-icon name="trending-up-outline"></ion-icon>
+            <span>{{ "settings.pro.feature1" | translate }}</span>
+          </li>
+          <li>
+            <ion-icon name="analytics-outline"></ion-icon>
+            <span>{{ "settings.pro.feature2" | translate }}</span>
+          </li>
+          <li>
+            <ion-icon name="rocket-outline"></ion-icon>
+            <span>{{ "settings.pro.feature3" | translate }}</span>
+          </li>
+        </ul>
+
+        @if (monthlyPriceString()) {
+          <div class="pro-hero__pricing">
+            <span class="pro-hero__price-line">
+              {{ 'settings.pro.priceMonthly' | translate: { price: monthlyPriceString() } }}
+            </span>
+            @if (annualPriceString()) {
+              <span class="pro-hero__price-divider">·</span>
+              <span class="pro-hero__price-line">
+                {{ 'settings.pro.priceAnnual' | translate: { price: annualPriceString() } }}
+                @if (annualSavingsPercent() !== null) {
+                  <span class="pro-hero__savings">
+                    {{ 'settings.pro.savings' | translate: { percent: annualSavingsPercent() } }}
+                  </span>
+                }
+              </span>
+            }
+          </div>
         }
-      </ion-card-content>
-    </ion-card>
+      </app-pro-paywall-card>
+    }
 
     <!-- ── Apariencia ─────────────────────────────────────────── -->
     <ion-card class="settings-card">
@@ -622,5 +642,7 @@
         </ion-list>
       </ion-card-content>
     </ion-card>
+
+    } <!-- end @else skeleton guard -->
   </div>
 </ion-content>

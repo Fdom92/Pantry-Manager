@@ -1,20 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SettingsStateService } from '@core/services/settings/settings-state.service';
 import { NotificationSchedulerService } from '@core/services/notifications/notification-scheduler.service';
 import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
+import { computeAnnualSavingsPercent } from '@core/domain/upgrade';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
-import { ANALYTICS_EVENTS, NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
-import { AnalyticsService } from '@core/services/analytics';
+import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
 import { LocalStorageService } from '@core/services/shared';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import {
   IonBackButton,
-  IonBadge,
   IonButton,
   IonButtons,
   IonCard,
@@ -38,6 +37,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import packageJson from '../../../../package.json';
 import { environment } from 'src/environments/environment';
 import { SettingsNotificationsDevStateService } from '@core/services/settings/settings-notifications-dev-state.service';
+import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
+import { SettingsSkeletonComponent } from './components/settings-skeleton/settings-skeleton.component';
 import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
@@ -48,7 +49,6 @@ import { AlertController, ToastController } from '@ionic/angular';
     IonToolbar,
     IonButtons,
     IonBackButton,
-    IonBadge,
     IonTitle,
     IonContent,
     IonCard,
@@ -67,6 +67,8 @@ import { AlertController, ToastController } from '@ionic/angular';
     CommonModule,
     RouterLink,
     TranslateModule,
+    ProPaywallCardComponent,
+    SettingsSkeletonComponent,
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
@@ -83,7 +85,6 @@ export class SettingsComponent {
   private readonly marketingSeeder = inject(DevMarketingSeederService);
   private readonly alertCtrl = inject(AlertController);
   private readonly toastCtrl = inject(ToastController);
-  private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly appPreferences = inject(SettingsPreferencesService);
 
@@ -93,15 +94,6 @@ export class SettingsComponent {
   readonly SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
   readonly currentLanguage = this.language.currentLanguage;
   protected readonly NOTIFICATION_IDS = NOTIFICATION_IDS;
-
-  /**
-   * Upgrade hero card CTA — emits an analytics event tagged with the entry
-   * point so the PRO funnel can attribute conversions to Settings vs Insights.
-   */
-  onUpgradeTap(): void {
-    this.analytics.track(ANALYTICS_EVENTS.UPGRADE_TAPPED, { source: 'settings_hero' });
-    this.facade.navigateToUpgrade();
-  }
 
   /** Toggle anonymous analytics opt-in/out via the Privacidad card. */
   async onAnalyticsToggle(event: CustomEvent<{ checked: boolean }>): Promise<void> {
@@ -169,6 +161,30 @@ export class SettingsComponent {
     return formatDateTimeValue(iso, this.language.getCurrentLocale(), { fallback: '—' });
   }
 
+  // PRO pricing
+  readonly monthlyPriceString = signal<string | null>(null);
+  readonly annualPriceString = signal<string | null>(null);
+  private readonly monthlyPriceNumeric = signal<number | null>(null);
+  private readonly annualPriceNumeric = signal<number | null>(null);
+
+  readonly annualSavingsPercent = computed<number | null>(() =>
+    computeAnnualSavingsPercent({
+      monthlyPrice: this.monthlyPriceNumeric(),
+      annualPrice: this.annualPriceNumeric(),
+    })
+  );
+
+  private async loadPricing(): Promise<void> {
+    const offering = await this.revenuecat.getOfferings();
+    if (!offering) return;
+    const monthly = offering.monthly;
+    const annual = offering.annual;
+    this.monthlyPriceString.set(monthly?.product?.priceString ?? null);
+    this.annualPriceString.set(annual?.product?.priceString ?? null);
+    this.monthlyPriceNumeric.set(monthly?.product?.price ?? null);
+    this.annualPriceNumeric.set(annual?.product?.price ?? null);
+  }
+
   // Notifications
   readonly isTestingNotification = signal(false);
   readonly scheduleAtTimeInput = signal('09:00');
@@ -184,8 +200,20 @@ export class SettingsComponent {
   readonly isResettingOnboarding = signal(false);
   readonly devIsPro = signal(this.revenuecat.isPro());
 
+  readonly showSkeleton = signal(false);
+
   async ionViewWillEnter(): Promise<void> {
+    const timer = setTimeout(() => {
+      if (!this.facade.isReady()) this.showSkeleton.set(true);
+    }, 100);
+
     await this.facade.ionViewWillEnter();
+    clearTimeout(timer);
+    this.showSkeleton.set(false);
+
+    if (!this.isPro()) {
+      await this.loadPricing();
+    }
   }
 
   // ─── Notifications ────────────────────────────────────────────────────────

@@ -44,6 +44,7 @@ export class SettingsStateService {
   readonly isImportingData = signal(false);
   readonly isResettingData = signal(false);
   readonly isUpdatingTheme = signal(false);
+  readonly isReady = signal(false);
 
   async ionViewWillEnter(): Promise<void> {
     try {
@@ -51,6 +52,7 @@ export class SettingsStateService {
     } catch (err) {
       console.error('[SettingsStateService] ensurePreferencesLoaded error', err);
     }
+    this.isReady.set(true);
   }
 
   async resetApplicationData(): Promise<void> {

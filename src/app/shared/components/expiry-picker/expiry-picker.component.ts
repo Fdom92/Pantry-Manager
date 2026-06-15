@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { LanguageService } from '@core/services/shared/language.service';
+import { formatExpiryLabel } from '@core/utils/date.util';
 import { IonChip, IonContent, IonIcon, IonLabel, IonModal } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { QuickDateChipsComponent } from '../quick-date-chips/quick-date-chips.component';
@@ -111,17 +112,7 @@ export class ExpiryPickerComponent {
   protected sheetOpen = signal(false);
 
   get formattedDate(): string {
-    if (!this.date) return '';
-    const parts = this.date.split('-').map(Number);
-    if (parts.length !== 3 || parts.some(n => !Number.isFinite(n))) return '';
-    const [year, month, day] = parts;
-    const d = new Date(year, month - 1, day);
-    if (Number.isNaN(d.getTime())) return '';
-    return new Intl.DateTimeFormat(this.languageService.getCurrentLocale(), {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    }).format(d);
+    return formatExpiryLabel(this.date, this.languageService.getCurrentLocale());
   }
 
   onDateChange(event: Event): void {

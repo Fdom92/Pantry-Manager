@@ -1,0 +1,21 @@
+@if (!hidden()) {
+  <div class="pro-trial-cta" [class.pro-trial-cta--compact]="compact">
+    <ion-button
+      expand="block"
+      color="tertiary"
+      [disabled]="busy()"
+      (click)="onPrimary()"
+    >
+      @if (hasUnusedTrial()) {
+        {{ 'upgrade.trial.cta' | translate }}
+      } @else {
+        {{ 'upgrade.cta' | translate }}
+      }
+    </ion-button>
+    @if (dismissible) {
+      <button class="pro-trial-cta__dismiss" type="button" (click)="onDismiss()">
+        {{ 'common.dismiss' | translate }}
+      </button>
+    }
+  </div>
+}

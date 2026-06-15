@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Pas maintenant",
     "actions": {
       "close": "Fermer",
       "cancel": "Annuler",
@@ -150,6 +151,12 @@
       }
     },
     "sections": {
+      "progress": {
+        "title": "Ton progrès"
+      },
+      "reposition": {
+        "title": "Prochaines courses"
+      },
       "today": {
         "title": "Recommandé pour aujourd'hui"
       },
@@ -348,6 +355,29 @@
       "updated": "Mis à jour le {{ date }}",
       "badge": "Nouveau",
       "empty": "Aucune mise à jour récente."
+    },
+    "waste": {
+      "title": "Gaspillage ce mois",
+      "count": "Vous avez jeté {{count}} produits",
+      "topCategory": "Surtout dans : {{category}}",
+      "zero": "Aucun gaspillage ce mois ! 🎯",
+      "trend": {
+        "up": "↑ Plus que le mois dernier",
+        "down": "↓ Moins que le mois dernier",
+        "flat": "≈ Pareil que le mois dernier"
+      },
+      "teaser": "Découvrez combien vous avez gaspillé ce mois"
+    },
+    "reposition": {
+      "title": "Bientôt en rupture",
+      "daysLeft": "Il reste {{days}} jours",
+      "add": "Ajouter",
+      "added": "Ajouté à la liste",
+      "empty": "Nous avons besoin de plus d'historique pour prédire",
+      "teaser": "Anticipez ce que vous devez acheter avant d'en manquer"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} jours"
     }
   },
   "shopping": {
@@ -509,6 +539,11 @@
         "recommendations": "Recommandations",
         "suggestions": "Cette semaine"
       }
+    },
+    "empty": {
+      "title": "Pas encore d'insights",
+      "body": "Ajoutez des produits à votre garde-manger pour voir les tendances de consommation, les prédictions et le gaspillage.",
+      "cta": "Aller au garde-manger"
     }
   },
   "pantry": {
@@ -771,7 +806,10 @@
         "fiveDays": "5 jours",
         "oneWeek": "1 semaine",
         "twoWeeks": "2 semaines",
-        "noDate": "Sans date"
+        "noDate": "Sans date",
+        "remaining": "Reste {{days}} jours",
+        "expiresToday": "Expire aujourd'hui",
+        "expiredAgo": "Expiré il y a {{days}} jours"
       },
       "card": {
         "expired": "Expiré",
@@ -818,11 +856,17 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Commencez votre essai gratuit de 7 jours"
+    },
+    "cta": "Passer en PRO",
     "title": "Passer en PRO",
     "headline": "Débloquez toute la puissance de votre garde-manger",
-    "subtitle": "Automatisation intelligente et fonctionnalités prioritaires.",
+    "subtitle": "Prédictions d'achats, suivi du gaspillage et analyse IA basés sur vos propres données.",
     "benefits": {
-      "agent": "Découvrez ce qui périme le plus, ce qui s'accumule et comment améliorer votre rotation. Des recommandations concrètes basées sur votre propre historique de consommation."
+      "reposition": "Réapprovisionnement intelligent : prédit quand vos produits de base vont manquer.",
+      "waste": "Suivi du gaspillage : ce qui périme, dans quelles catégories et votre tendance.",
+      "analysis": "Analyse IA : recommandations basées sur votre historique de consommation."
     },
     "actions": {
       "maybeLater": "Plus tard",
@@ -853,11 +897,18 @@
     "title": "Paramètres",
     "pro": {
       "statusDescription": "Merci de soutenir le projet. PRO est actif sur cet appareil.",
-      "upgradePrompt": "Passez en PRO pour débloquer l’historique complet et les fonctionnalités premium.",
+      "upgradePrompt": "Passe en PRO pour débloquer les prédictions de stock, l’analyse du gaspillage et plus encore.",
+      "tagline": "Tire le meilleur parti de ton garde-manger",
+      "feature1": "Prédis ce que tu dois acheter avant d'en manquer",
+      "feature2": "Analyse du gaspillage et schémas de consommation",
+      "feature3": "Nouvelles fonctionnalités premium à venir",
       "upgradeCta": "Passer en PRO",
       "badgePro": "PRO actif",
       "activeTitle": "PRO actif",
-      "upgradeTitle": "Passer en PRO"
+      "upgradeTitle": "Passer en PRO",
+      "priceMonthly": "{{price}} / mois",
+      "priceAnnual": "{{price}} / an",
+      "savings": "économisez {{percent}}%"
     },
     "appearance": {
       "title": "Apparence",
@@ -1086,6 +1137,24 @@
       "subtitle": "Support, évaluations et documents légaux.",
       "termsTitle": "Conditions d'utilisation",
       "termsSubtitle": "Conditions de service."
+    },
+    "streak": {
+      "title": "Ta série",
+      "tokensLabel": "Jokers pour protéger votre série",
+      "daysLabel": "jours",
+      "empty": "Ajoute ou consomme un produit aujourd'hui pour démarrer ta série",
+      "longest": "Meilleure série : {{longest}}",
+      "milestones": "Jalons",
+      "nextGoal": "Il reste {{days}} jours avant {{milestone}}",
+      "graceAvailable": "Joker disponible",
+      "graceUsed": "Joker utilisé — reviens demain sans faute",
+      "allMilestonesReached": "🎉 Tu as atteint tous les jalons !",
+      "daysLabel_one": "jour",
+      "daysLabel_other": "jours",
+      "longest_one": "Meilleure série : {{longest}} jour",
+      "longest_other": "Meilleure série : {{longest}} jours",
+      "nextGoal_one": "Il reste {{days}} jour avant {{milestone}}",
+      "nextGoal_other": "Il reste {{days}} jours avant {{milestone}}"
     }
   },
   "reviews": {
@@ -1148,6 +1217,10 @@
         "title": "Ton garde-manger a besoin de toi",
         "body": "Reviens et évite de jeter de la nourriture. 30 secondes suffisent."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Bel élan",
+      "body": "Tu gères ton garde-manger depuis {{streak}} jours d'affilée. Continue !"
     }
   },
   "sync": {
@@ -1207,5 +1280,8 @@
       "confirm": "Terminé",
       "later": "Pas maintenant"
     }
+  },
+  "streak": {
+    "milestoneToast": "{{streak}} jours d'affilée ! 🔥 Vous avez gagné 1 joker 🛡️"
   }
 }

@@ -81,6 +81,7 @@
     }
   },
   "common": {
+    "dismiss": "Ahora no",
     "actions": {
       "close": "Cerrar",
       "cancel": "Cancelar",
@@ -150,6 +151,12 @@
       }
     },
     "sections": {
+      "progress": {
+        "title": "Tu progreso"
+      },
+      "reposition": {
+        "title": "Próximas compras"
+      },
       "today": {
         "title": "Recomendado para hoy"
       },
@@ -348,6 +355,29 @@
       "updated": "Actualizado {{ date }}",
       "badge": "Nuevo",
       "empty": "Sin actualizaciones recientes."
+    },
+    "waste": {
+      "title": "Desperdicio este mes",
+      "count": "Has tirado {{count}} productos",
+      "topCategory": "Sobre todo en: {{category}}",
+      "zero": "¡Sin desperdicios este mes! 🎯",
+      "trend": {
+        "up": "↑ Más que el mes pasado",
+        "down": "↓ Menos que el mes pasado",
+        "flat": "≈ Igual que el mes pasado"
+      },
+      "teaser": "Descubre cuánto has tirado este mes"
+    },
+    "reposition": {
+      "title": "Próximamente sin stock",
+      "daysLeft": "Quedan {{days}} días",
+      "add": "Añadir",
+      "added": "Añadido a la lista",
+      "empty": "Necesitamos más historial para predecir",
+      "teaser": "Predice qué necesitas comprar antes de que se acabe"
+    },
+    "streak": {
+      "chip": "🔥 {{streak}} días"
     }
   },
   "shopping": {
@@ -509,6 +539,11 @@
         "recommendations": "Recomendaciones",
         "suggestions": "Esta semana"
       }
+    },
+    "empty": {
+      "title": "Aún no hay insights",
+      "body": "Añade productos a tu despensa para ver patrones de consumo, predicciones y desperdicio.",
+      "cta": "Ir a despensa"
     }
   },
   "pantry": {
@@ -771,7 +806,10 @@
         "fiveDays": "5 días",
         "oneWeek": "1 semana",
         "twoWeeks": "2 semanas",
-        "noDate": "Sin fecha"
+        "noDate": "Sin fecha",
+        "remaining": "Quedan {{days}} días",
+        "expiresToday": "Caduca hoy",
+        "expiredAgo": "Caducó hace {{days}} días"
       },
       "card": {
         "expired": "Caducado",
@@ -818,11 +856,17 @@
     }
   },
   "upgrade": {
+    "trial": {
+      "cta": "Empieza tu prueba gratis de 7 días"
+    },
+    "cta": "Hazte PRO",
     "title": "Hazte PRO",
     "headline": "Desbloquea todo el poder de tu despensa",
-    "subtitle": "Automatización inteligente y funciones prioritarias.",
+    "subtitle": "Predicción de compras, control de desperdicio y análisis IA con tus propios datos.",
     "benefits": {
-      "agent": "Descubre qué caducas más, qué acumulas y cómo mejorar tu rotación. Recomendaciones concretas basadas en tu propio historial de consumo."
+      "reposition": "Reposición inteligente: predice cuándo te quedarás sin básicos.",
+      "waste": "Control de desperdicio: qué caduca, en qué categorías y tendencia.",
+      "analysis": "Análisis IA: recomendaciones basadas en tu historial de consumo."
     },
     "actions": {
       "maybeLater": "Ahora no",
@@ -853,11 +897,18 @@
     "title": "Ajustes",
     "pro": {
       "statusDescription": "Gracias por apoyar el proyecto. PRO está activo en este dispositivo.",
-      "upgradePrompt": "Hazte PRO para desbloquear el historial completo y funciones premium.",
+      "upgradePrompt": "Hazte PRO para desbloquear predicciones de stock, análisis de desperdicio y más.",
+      "tagline": "Saca todo el partido a tu despensa",
+      "feature1": "Predice qué necesitas comprar antes de que se acabe",
+      "feature2": "Análisis de desperdicio y patrones de consumo",
+      "feature3": "Nuevas funciones premium próximamente",
       "upgradeCta": "Hazte PRO",
       "badgePro": "PRO activo",
       "activeTitle": "PRO activo",
-      "upgradeTitle": "Hazte PRO"
+      "upgradeTitle": "Hazte PRO",
+      "priceMonthly": "{{price}} / mes",
+      "priceAnnual": "{{price}} / año",
+      "savings": "ahorra {{percent}}%"
     },
     "appearance": {
       "title": "Apariencia",
@@ -1086,6 +1137,24 @@
       "subtitle": "Soporte, valoración y documentos legales.",
       "termsTitle": "Términos de uso",
       "termsSubtitle": "Condiciones de servicio."
+    },
+    "streak": {
+      "title": "Tu racha",
+      "tokensLabel": "Comodines para proteger tu racha",
+      "daysLabel": "días",
+      "daysLabel_one": "día",
+      "daysLabel_other": "días",
+      "empty": "Añade o consume un producto hoy para empezar tu racha",
+      "longest": "Mejor racha: {{longest}}",
+      "longest_one": "Mejor racha: {{longest}} día",
+      "longest_other": "Mejor racha: {{longest}} días",
+      "milestones": "Hitos",
+      "nextGoal": "Faltan {{days}} días para los {{milestone}}",
+      "nextGoal_one": "Falta {{days}} día para los {{milestone}}",
+      "nextGoal_other": "Faltan {{days}} días para los {{milestone}}",
+      "graceAvailable": "Día comodín disponible",
+      "graceUsed": "Comodín usado — vuelve mañana sin falta",
+      "allMilestonesReached": "🎉 ¡Has alcanzado todos los hitos!"
     }
   },
   "reviews": {
@@ -1148,6 +1217,10 @@
         "title": "Tu despensa te necesita",
         "body": "Vuelve y evita tirar comida. Tardas 30 segundos en revisarla."
       }
+    },
+    "streakMilestone": {
+      "title": "🔥 Buen ritmo",
+      "body": "Llevas {{streak}} días seguidos cuidando tu despensa. ¡Sigue así!"
     }
   },
   "sync": {
@@ -1207,5 +1280,8 @@
       "confirm": "Hecho",
       "later": "Ahora no"
     }
+  },
+  "streak": {
+    "milestoneToast": "¡{{streak}} días seguidos! 🔥 Has ganado 1 comodín 🛡️"
   }
 }

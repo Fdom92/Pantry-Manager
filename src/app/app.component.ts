@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { App as CapacitorApp } from '@capacitor/app';
@@ -10,6 +11,7 @@ import { RecoveryNotificationsService } from '@core/services/notifications/recov
 import { SyncService } from '@core/services/sync/sync.service';
 import { AnalyticsService } from '@core/services/analytics';
 import { AppUpdateService } from '@core/services/app-update';
+import { StreakStateService, StreakMilestoneService } from '@core/services/retention';
 import { ANALYTICS_EVENTS } from '@core/constants';
 // STORAGE_KEYS removed: callers go through LocalStorageService.
 import { NavController } from '@ionic/angular';
@@ -23,8 +25,10 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 })
 export class AppComponent {
   private readonly handledUrls = new Set<string>();
+  private wasProLastCheck: boolean | null = null;
 
   // DI
+  private readonly destroyRef = inject(DestroyRef);
   private readonly pantryQuery = inject(PantryQueryService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly router = inject(Router);
@@ -35,6 +39,8 @@ export class AppComponent {
   private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly appUpdate = inject(AppUpdateService);
+  private readonly streak = inject(StreakStateService);
+  private readonly streakMilestone = inject(StreakMilestoneService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -73,6 +79,8 @@ export class AppComponent {
 
   private async initializeApp(): Promise<void> {
     await this.initializeRevenueCat();
+    await this.streak.bootstrap();
+    this.streakMilestone.bootstrap();
     await this.analytics.bootstrap();
     this.analytics.track(ANALYTICS_EVENTS.APP_OPEN);
     // Ask Google Play whether a newer build is available. Fire-and-forget
@@ -127,6 +135,7 @@ export class AppComponent {
   private async initializeRevenueCat(): Promise<void> {
     const userId = this.getOrCreateUserId();
     await this.revenuecat.init(userId);
+    this.detectTrialExpiry();
 
     // Foreground/background bookkeeping: tracks "session" boundaries from the
     // analytics point of view. On Capacitor, "closing" the app from the user
@@ -139,13 +148,19 @@ export class AppComponent {
         lastForegroundAt = Date.now();
         void this.recoveryNotif.cancelRecoveryWindow();
         await this.revenuecat.restore();
+        this.detectTrialExpiry();
         await this.notificationScheduler.scheduleAll();
+        void this.streak.bootstrap();
       } else {
         this.analytics.track(ANALYTICS_EVENTS.APP_BACKGROUNDED, {
           session_duration_s: Math.round((Date.now() - lastForegroundAt) / 1000),
         });
       }
     });
+
+    this.revenuecat.isPro$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.detectTrialExpiry());
   }
 
   private getOrCreateUserId(): string {
@@ -166,5 +181,26 @@ export class AppComponent {
     } catch (err) {
       console.warn('[AppComponent] first-run check failed', err);
     }
+  }
+
+  /**
+   * Fires `pro_trial_expired` exactly once after a trial-started user's PRO
+   * status flips from true to false. Idempotent across app launches via the
+   * `PRO_TRIAL_EXPIRED_FIRED` localStorage flag.
+   */
+  private detectTrialExpiry(): void {
+    const isPro = this.revenuecat.isPro();
+    const trialStartedAt = this.localStorage.pro.getTrialStartedAt();
+    const fired = this.localStorage.pro.isTrialExpiredFired();
+
+    if (!trialStartedAt || fired) {
+      this.wasProLastCheck = isPro;
+      return;
+    }
+    if (this.wasProLastCheck === true && isPro === false) {
+      this.analytics.track(ANALYTICS_EVENTS.PRO_TRIAL_EXPIRED);
+      this.localStorage.pro.markTrialExpiredFired();
+    }
+    this.wasProLastCheck = isPro;
   }
 }

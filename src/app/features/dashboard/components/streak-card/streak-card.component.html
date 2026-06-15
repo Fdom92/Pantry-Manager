@@ -1,0 +1,24 @@
+<ion-card class="streak-card" id="streak">
+  <ion-card-content class="streak-card__content">
+    <span class="streak-card__current">
+      🔥
+      <span class="streak-card__number">{{ currentStreak() }}</span>
+      <span class="streak-card__label">{{ daysLabelKey() | translate }}</span>
+      @if (graceTokens() > 0) {
+        <span class="streak-card__tokens" [attr.aria-label]="'settings.streak.tokensLabel' | translate">
+          🛡️ {{ graceTokens() }}
+        </span>
+      }
+    </span>
+
+    <span class="streak-card__hint">
+      @if (currentStreak() === 0) {
+        {{ 'settings.streak.empty' | translate }}
+      } @else if (nextMilestone() !== null) {
+        🏆 {{ nextGoalKey() | translate: { days: daysToNextMilestone(), milestone: nextMilestone() } }}
+      } @else {
+        {{ 'settings.streak.allMilestonesReached' | translate }}
+      }
+    </span>
+  </ion-card-content>
+</ion-card>

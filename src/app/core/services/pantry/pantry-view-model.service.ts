@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { classifyExpiry, getItemStatusState, isIncomplete, normalizeBatches, sumQuantities } from '@core/domain/pantry';
 import { daysUntilExpiry, generateBatchId } from '@core/utils';
+import { parseExpiryDate, parseExpiryMs } from '@core/utils/date.util';
 import type {
   BatchCountsMeta,
   BatchEntryMeta,
@@ -306,8 +307,8 @@ export class PantryViewModelService {
       );
     }
 
-    const expiryDate = new Date(value);
-    if (Number.isNaN(expiryDate.getTime())) {
+    const expiryDate = parseExpiryDate(value);
+    if (expiryDate === null) {
       return this.translate.instant('pantry.batches.noExpiryDate');
     }
     const now = new Date();
@@ -411,8 +412,7 @@ export class PantryViewModelService {
     if (!batch.expirationDate) {
       return null;
     }
-    const time = new Date(batch.expirationDate).getTime();
-    return Number.isFinite(time) ? time : null;
+    return parseExpiryMs(batch.expirationDate);
   }
 
   private buildSubinfo(state: ProductStatusState, earliestDate: string | null, formattedDate: string, quantityLabel: string): string {

@@ -21,6 +21,7 @@ import { PantryStoreService } from './pantry-store.service';
 import { PantryViewModelService } from './pantry-view-model.service';
 import { SkeletonLoadingManager } from '@core/utils';
 import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
+import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { type FreshState, freshStateToQty } from '@core/domain/pantry';
@@ -41,6 +42,7 @@ export class PantryStateService {
   private readonly batchesModal = inject(PantryBatchesModalStateService);
   private readonly quantitySheet = inject(PantryQuantitySheetStateService);
   private readonly freshAddModal = inject(PantryFreshAddModalStateService);
+  private readonly historyManager = inject(HistoryEventManagerService);
   private readonly toastCtrl = inject(ToastController);
   private readonly translate = inject(TranslateService);
 
@@ -435,7 +437,13 @@ export class PantryStateService {
       ? [{ ...currentBatches[0], quantity: newQty }, ...currentBatches.slice(1)]
       : [{ batchId: `batch-${Date.now()}`, quantity: newQty }];
 
-    await this.pantryStore.updateItem({ ...item, batches: updatedBatches });
+    const updated: PantryItem = { ...item, batches: updatedBatches };
+    await this.pantryStore.updateItem(updated);
+    // Log the state change so streak, waste tracker, reposition predictions
+    // and the history event log all pick it up. Fresh chip taps are one of
+    // the most frequent daily mutations and must feed the mutation pipeline
+    // like every other CRUD action.
+    await this.historyManager.logAdvancedEdit(item, updated, 'pantry_card');
 
     let msgKey: string;
     let duration = 1500;

@@ -1,0 +1,16 @@
+<ion-card class="pro-paywall-card" button (click)="onCardClick()">
+  <ion-card-content class="pro-paywall-card__content">
+    <span class="pro-paywall-card__lock" aria-hidden="true">
+      <ion-icon name="lock-closed-outline"></ion-icon>
+    </span>
+    <ion-icon name="sparkles-outline" class="pro-paywall-card__icon" aria-hidden="true"></ion-icon>
+    <h3 class="pro-paywall-card__title">{{ titleKey() | translate }}</h3>
+    <p class="pro-paywall-card__description">{{ descriptionKey() | translate }}</p>
+    <ng-content />
+    @if (!hideCta()) {
+      <div class="pro-paywall-card__cta" (click)="$event.stopPropagation()">
+        <app-pro-trial-cta [surface]="surface()" [dismissible]="dismissible()" compact />
+      </div>
+    }
+  </ion-card-content>
+</ion-card>
