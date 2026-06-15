@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pantrymind – Smart Pantry Manager</title>
+  <meta name="description" content="Track expiration dates, build smart shopping lists, and reduce food waste. Free on Android. No account required.">
+  <meta property="og:title" content="Pantrymind – Smart Pantry Manager">
+  <meta property="og:description" content="Track expiration dates, reduce food waste, and shop smarter. Free on Android.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #3A9882;
+      --teal-deep: #2A7E70;
+      --teal-light: #e8f5f2;
+      --violet: #7C5CFF;
+      --violet-light: #f0edff;
+      --cream: #EFE7D8;
+      --bg: #F7F5F1;
+      --card-bg: #ffffff;
+      --text: #1A2E2A;
+      --text-muted: #5a7570;
+      --border: #e2ded8;
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 28px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.04);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.10), 0 16px 48px rgba(0,0,0,0.06);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(247,245,241,0.88);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: 64px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+    .logo-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--teal);
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .logo-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      position: absolute;
+      inset: 0;
+    }
+    .logo-mark img:not([src]) ~ .logo-fallback,
+    .logo-mark img[src=""] ~ .logo-fallback {
+      display: grid;
+    }
+    .logo-fallback {
+      display: none;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .btn-nav {
+      background: var(--teal-deep);
+      color: white;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-nav:hover {
+      background: var(--teal);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(42,126,112,0.3);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 24px 64px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 3.5vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.12;
+      margin-bottom: 20px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--teal-deep);
+    }
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 440px;
+      line-height: 1.75;
+      margin-bottom: 36px;
+    }
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--teal-deep);
+      color: white;
+      border: none;
+      padding: 14px 26px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover {
+      background: var(--teal);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(42,126,112,0.35);
+    }
+    .hero-note {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* ── PHONE MOCKUP ── */
+    .phone-wrap {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      padding: 20px;
+    }
+    .phone {
+      width: 248px;
+      height: 500px;
+      background: #111c1b;
+      border-radius: 40px;
+      border: 6px solid #0a1412;
+      position: relative;
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,0.04) inset;
+      overflow: hidden;
+    }
+    .phone::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 68px;
+      height: 5px;
+      background: #0a1412;
+      border-radius: 999px;
+      z-index: 2;
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: linear-gradient(160deg, #e8f5f2 0%, #f7f5f1 55%, #ede7d8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .phone-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .screen-placeholder {
+      opacity: 0.45;
+      text-align: center;
+      padding: 20px;
+      color: var(--teal-deep);
+    }
+    .screen-placeholder svg { margin-bottom: 8px; }
+    .screen-placeholder p { font-size: 0.72rem; font-weight: 500; line-height: 1.5; }
+
+    .badge-float {
+      position: absolute;
+      background: white;
+      border-radius: 14px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow-md);
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .badge-float.top-right { top: 50px; right: -8px; }
+    .badge-float.bot-left  { bottom: 70px; left: -8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-red    { background: #d64545; }
+    .dot-green  { background: #3d9b5f; }
+    .dot-amber  { background: #e5a93a; }
+
+    /* ── SHARED SECTION ── */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 56px 24px;
+    }
+    .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .section-sub {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 500px;
+      line-height: 1.75;
+    }
+
+    /* ── FEATURES GRID ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin-top: 48px;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 28px 22px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    @media (hover: hover) {
+      .feature-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--teal-light);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 0.975rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 52px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+    }
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--teal-deep);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-lbl {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .langs-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+    .lang-chip {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 13px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    /* ── PRO SECTION ── */
+    .pro-wrap {
+      padding: 0 24px 56px;
+    }
+    .pro-card {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #130d38 0%, #2b1f80 50%, #130d38 100%);
+      border-radius: var(--radius-lg);
+      padding: 56px 52px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .pro-card::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, rgba(124,92,255,0.28) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .pro-card::after {
+      content: '';
+      position: absolute;
+      bottom: -60px;
+      left: -60px;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(58,152,130,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .pro-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(124,92,255,0.2);
+      border: 1px solid rgba(124,92,255,0.35);
+      color: #c4b5fd;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 22px;
+    }
+    .pro-card h2 {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .pro-card > p {
+      color: rgba(255,255,255,0.68);
+      font-size: 1rem;
+      max-width: 480px;
+      margin-bottom: 36px;
+      line-height: 1.75;
+      position: relative;
+    }
+    .pro-perks {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 40px;
+      position: relative;
+    }
+    .perk {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .perk-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(124,92,255,0.25);
+      border: 1px solid rgba(124,92,255,0.4);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .perk-icon::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #c4b5fd;
+    }
+    .perk span {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.55;
+    }
+    .btn-pro {
+      background: var(--violet);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+    .btn-pro:hover {
+      background: #6b4dff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(124,92,255,0.55);
+    }
+
+    /* ── FOOTER ── */
+    .footer-wrap {
+      border-top: 1px solid var(--border);
+      margin: 0 24px;
+    }
+    footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer p { font-size: 0.82rem; color: var(--text-muted); }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover { color: var(--teal); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 48px 20px 40px;
+        gap: 48px;
+        text-align: center;
+      }
+      .hero-sub { max-width: 100%; }
+      .hero-ctas { justify-content: center; }
+      .phone-wrap { order: -1; }
+      .badge-float.top-right { right: 4px; }
+      .badge-float.bot-left  { left: 4px; }
+      .pro-card { padding: 40px 28px; }
+      .stats-row { gap: 24px; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <span class="logo-mark">
+        <img src="icon.png" alt="Pantrymind" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:9px;z-index:1">
+        <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" width="30" height="30" style="display:block;border-radius:9px">
+          <rect width="96" height="96" rx="20" fill="#3A9882"/>
+          <rect x="18" y="28" width="60" height="6" rx="3" fill="white" opacity="0.95"/>
+          <rect x="18" y="28" width="60" height="2" rx="1" fill="white"/>
+          <rect x="24" y="34" width="8" height="22" rx="2" fill="white" opacity="0.85"/>
+          <rect x="36" y="36" width="10" height="20" rx="2" fill="white" opacity="0.75"/>
+          <rect x="50" y="37" width="7" height="19" rx="2" fill="white" opacity="0.8"/>
+          <rect x="61" y="35" width="9" height="21" rx="2" fill="white" opacity="0.7"/>
+          <rect x="18" y="56" width="60" height="5" rx="2.5" fill="white" opacity="0.9"/>
+          <rect x="18" y="65" width="60" height="5" rx="2.5" fill="white" opacity="0.6"/>
+          <circle cx="68" cy="36" r="5" fill="#EFE7D8" opacity="0.9"/>
+          <circle cx="68" cy="36" r="2" fill="#3A9882"/>
+        </svg>
+      </span>
+      Pantrymind
+    </a>
+    <a href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind" class="btn-nav" target="_blank" rel="noopener">
+      Get it free ↓
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <p class="hero-eyebrow">Free · Android · No account needed</p>
+    <h1>Stop throwing away food you <em>forgot you had</em></h1>
+    <p class="hero-sub">
+      Pantrymind tracks your pantry, alerts you before things expire, and builds your shopping list automatically — so you waste less and spend smarter.
+    </p>
+    <div class="hero-ctas">
+      <a href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind" class="btn-primary" target="_blank" rel="noopener">
+        ↓ Get it on Google Play
+      </a>
+      <span class="hero-note">Free · Works offline</span>
+    </div>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-screen">
+        <!--
+          Replace the block below with your screenshot:
+          <img src="screenshot-pantry.png" alt="Pantrymind pantry screen">
+        -->
+        <div class="screen-placeholder">
+          <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="52" height="52" rx="14" fill="#3A9882" fill-opacity="0.12"/>
+            <rect x="10" y="14" width="32" height="4" rx="2" fill="#3A9882" fill-opacity="0.5"/>
+            <rect x="10" y="22" width="22" height="4" rx="2" fill="#3A9882" fill-opacity="0.35"/>
+            <rect x="10" y="30" width="28" height="4" rx="2" fill="#3A9882" fill-opacity="0.25"/>
+            <rect x="10" y="38" width="18" height="4" rx="2" fill="#3A9882" fill-opacity="0.2"/>
+          </svg>
+          <p>Add your app<br>screenshot here</p>
+        </div>
+      </div>
+    </div>
+    <div class="badge-float top-right">
+      <span class="dot dot-red"></span>
+      Yogur expires tomorrow
+    </div>
+    <div class="badge-float bot-left">
+      <span class="dot dot-green"></span>
+      14 items tracked
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section">
+  <p class="eyebrow">What it does</p>
+  <h2 class="section-title">Everything your pantry needs</h2>
+  <p class="section-sub">Built for people who want less waste and less mental load — not another spreadsheet to maintain.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📅</div>
+      <h3>Expiration tracking</h3>
+      <p>Add items with expiry dates. Get a 9am notification before things go bad. Manage batches and lots for products you buy in bulk.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛒</div>
+      <h3>Smart shopping list</h3>
+      <p>Restock suggestions based on what you actually run out of. Add items with one tap. Manual additions sync across app restarts.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Waste analytics</h3>
+      <p>See which categories you waste most in and what your trend looks like over time. Small nudges, real savings on your grocery bill.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔥</div>
+      <h3>Daily streaks</h3>
+      <p>Build a pantry habit. Log activity every day to grow your streak — grace tokens save you if you miss a day.</p>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div>
+      <div class="stat-num">6</div>
+      <div class="stat-lbl">languages supported</div>
+    </div>
+    <div>
+      <div class="stat-num">100%</div>
+      <div class="stat-lbl">offline — your data stays on your phone</div>
+    </div>
+    <div>
+      <div class="stat-num">0€</div>
+      <div class="stat-lbl">to get started</div>
+    </div>
+  </div>
+
+  <div class="langs-row">
+    <span class="lang-chip">🇪🇸 Español</span>
+    <span class="lang-chip">🇬🇧 English</span>
+    <span class="lang-chip">🇩🇪 Deutsch</span>
+    <span class="lang-chip">🇫🇷 Français</span>
+    <span class="lang-chip">🇮🇹 Italiano</span>
+    <span class="lang-chip">🇵🇹 Português</span>
+  </div>
+</section>
+
+<!-- PRO -->
+<div class="pro-wrap">
+  <div class="pro-card">
+    <div class="pro-badge">✦ Pantrymind Pro</div>
+    <h2>Unlock AI-powered insights</h2>
+    <p>Pro analyses your consumption history and tells you exactly what to buy, when — so you never over-stock or run out of your staples again.</p>
+    <div class="pro-perks">
+      <div class="perk">
+        <div class="perk-icon"></div>
+        <span>AI recommendations based on your real habits</span>
+      </div>
+      <div class="perk">
+        <div class="perk-icon"></div>
+        <span>Smart restock predictions for your staples</span>
+      </div>
+      <div class="perk">
+        <div class="perk-icon"></div>
+        <span>Detailed waste breakdown by category</span>
+      </div>
+      <div class="perk">
+        <div class="perk-icon"></div>
+        <span>Full consumption history analysis</span>
+      </div>
+    </div>
+    <a href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind" class="btn-pro" target="_blank" rel="noopener">
+      Try Pro free →
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-wrap">
+  <footer>
+    <p>© 2026 Pantrymind</p>
+    <div class="footer-links">
+      <a href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind" target="_blank" rel="noopener">Google Play</a>
+      <a href="privacy-policy.md">Privacy Policy</a>
+      <a href="terms-of-use.md">Terms of Use</a>
+      <a href="mailto:fer.olmo92@gmail.com">Contact</a>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>
