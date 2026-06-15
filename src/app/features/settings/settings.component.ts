@@ -14,7 +14,6 @@ import { SettingsPreferencesService } from '@core/services/settings/settings-pre
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import {
   IonBackButton,
-  IonBadge,
   IonButton,
   IonButtons,
   IonCard,
@@ -50,7 +49,6 @@ import { AlertController, ToastController } from '@ionic/angular';
     IonToolbar,
     IonButtons,
     IonBackButton,
-    IonBadge,
     IonTitle,
     IonContent,
     IonCard,

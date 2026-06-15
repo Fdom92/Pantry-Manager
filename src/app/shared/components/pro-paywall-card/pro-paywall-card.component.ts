@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, booleanAttribute, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, booleanAttribute, computed, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonCard, IonCardContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { AnalyticsService } from '@core/services/analytics/analytics.service';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { ProTrialCtaComponent } from '@shared/components/pro-trial-cta/pro-trial-cta.component';
-import type { ProCtaSurface } from '@core/services/upgrade/pro-cta-ui-state.service';
+import { ProCtaUiStateService, type ProCtaSurface } from '@core/services/upgrade/pro-cta-ui-state.service';
 
 /**
  * Canonical locked-feature teaser card. Violet PRO accent, dashed border,
@@ -20,12 +20,15 @@ import type { ProCtaSurface } from '@core/services/upgrade/pro-cta-ui-state.serv
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './pro-paywall-card.component.html',
   styleUrl: './pro-paywall-card.component.scss',
+  host: { '[style.display]': 'isDismissed() ? "none" : null' },
 })
 export class ProPaywallCardComponent {
   private readonly router = inject(Router);
   private readonly analytics = inject(AnalyticsService);
+  private readonly ctaUi = inject(ProCtaUiStateService);
 
   readonly surface = input.required<ProCtaSurface>();
+  readonly isDismissed = computed(() => this.ctaUi.isDismissed(this.surface()));
   readonly titleKey = input.required<string>();
   readonly descriptionKey = input.required<string>();
   /** Hide the embedded trial button when the surface hosts another primary CTA. */
