@@ -1,22 +1,36 @@
+<!--
+  No sheet breakpoints here — the reconsent modal is short (1-2 toggles +
+  footer), so we use auto-height + bottom-aligned positioning instead. This
+  keeps the footer with the CTA buttons reliably above the viewport bottom
+  edge, regardless of how much content the visible questions take.
+-->
 <ion-modal
   class="app-sheet-modal reconsent-sheet"
   [isOpen]="isOpen()"
-  [initialBreakpoint]="0.6"
-  [breakpoints]="[0, 0.6, 0.9]"
   [backdropDismiss]="true"
-  (ionModalDidDismiss)="close()"
+  (didDismiss)="close()"
 >
   <ng-template>
-    <div class="sheet-shell">
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>{{ 'reconsent.title' | translate }}</ion-title>
-        </ion-toolbar>
-      </ion-header>
+    <div class="sheet-shell reconsent-shell">
+      <div class="sheet-handle" aria-hidden="true"></div>
 
-      <ion-content class="ion-padding">
-        <p class="reconsent-intro">{{ 'reconsent.intro' | translate }}</p>
+      <header class="sheet-header">
+        <div class="sheet-header__titles">
+          <h2 class="sheet-header__title">{{ 'reconsent.title' | translate }}</h2>
+          <p class="sheet-header__subtitle">{{ 'reconsent.intro' | translate }}</p>
+        </div>
+        <ion-button
+          class="sheet-header__dismiss"
+          fill="clear"
+          color="medium"
+          (click)="onDismissLater()"
+          [attr.aria-label]="'common.actions.close' | translate"
+        >
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </header>
 
+      <div class="sheet-body">
         <ion-list lines="none" class="reconsent-list">
           @if (showNotifications()) {
             <ion-item lines="none" class="reconsent-item">
@@ -60,30 +74,27 @@
         <p class="reconsent-footnote">
           {{ 'reconsent.footnote' | translate }}
         </p>
-      </ion-content>
+      </div>
 
-      <ion-footer>
-        <ion-toolbar>
-          <div class="reconsent-actions">
-            <ion-button
-              fill="clear"
-              size="small"
-              (click)="dismissLater()"
-              [disabled]="isSubmitting()"
-            >
-              {{ 'reconsent.actions.later' | translate }}
-            </ion-button>
-            <ion-button
-              color="primary"
-              shape="round"
-              (click)="confirm()"
-              [disabled]="isSubmitting()"
-            >
-              {{ 'reconsent.actions.confirm' | translate }}
-            </ion-button>
-          </div>
-        </ion-toolbar>
-      </ion-footer>
+      <footer class="sheet-footer">
+        <ion-button
+          fill="clear"
+          color="medium"
+          (click)="onDismissLater()"
+          [disabled]="isSubmitting()"
+        >
+          {{ 'reconsent.actions.later' | translate }}
+        </ion-button>
+        <ion-button
+          expand="block" shape="round"
+          color="primary"
+          class="reconsent-confirm"
+          (click)="confirm()"
+          [disabled]="isSubmitting()"
+        >
+          {{ 'reconsent.actions.confirm' | translate }}
+        </ion-button>
+      </footer>
     </div>
   </ng-template>
 </ion-modal>

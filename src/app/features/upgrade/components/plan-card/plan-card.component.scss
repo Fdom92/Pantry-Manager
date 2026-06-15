@@ -111,8 +111,13 @@
 
 .plan-card__list li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--app-theme-spacing-sm);
+
+  ion-icon {
+    flex-shrink: 0;
+    margin-top: 2px; // optical alignment with the first text line
+  }
 }
 
 .plan-card ion-button {

@@ -1,4 +1,5 @@
 import type { ItemBatch, PantryItem, ProductStatusState } from '@core/models/pantry';
+import { parseExpiryMs } from '@core/utils/date.util';
 import { sumQuantities } from './pantry-batch.domain';
 import { calculateUrgencyScore } from './urgency.domain';
 
@@ -36,9 +37,13 @@ function pickClosestExpiration(batches: ItemBatch[]): string | undefined {
   if (!dated.length) return undefined;
 
   // Prefer the soonest future date; if all are past, prefer the most recent past date.
-  const future = dated.filter(d => Date.parse(d) >= now);
-  const pool = future.length ? future : dated;
-  return pool.slice().sort((a, b) => Date.parse(a) - Date.parse(b))[0];
+  // Invalid date strings are dropped — they would compare as NaN and could end
+  // up as the "soonest" via sort instability.
+  const parsed = dated.map(d => ({ d, ms: parseExpiryMs(d) })).filter(x => x.ms !== null) as Array<{ d: string; ms: number }>;
+  if (!parsed.length) return undefined;
+  const future = parsed.filter(x => x.ms >= now);
+  const pool = future.length ? future : parsed;
+  return pool.slice().sort((a, b) => a.ms - b.ms)[0]?.d;
 }
 
 /**

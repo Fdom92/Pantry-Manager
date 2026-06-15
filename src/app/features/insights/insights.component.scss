@@ -35,11 +35,6 @@
     margin: 0 0 var(--app-theme-spacing-md);
   }
 
-  &--pro-teaser {
-    border: 1px dashed color-mix(in srgb, var(--ion-color-tertiary) 45%, transparent);
-    background: color-mix(in srgb, var(--ion-color-tertiary) 5%, transparent);
-    box-shadow: none;
-  }
 }
 
 // ── Section A — snapshot grid ────────────────────────────────────────────────
@@ -143,45 +138,6 @@
     font-size: var(--app-theme-font-size-small);
     font-weight: var(--app-theme-font-weight-bold);
     text-align: right;
-  }
-}
-
-// ── Section D — PRO teaser ───────────────────────────────────────────────────
-
-.pro-teaser {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: var(--app-theme-spacing-sm);
-  padding: var(--app-theme-spacing-sm) 0;
-
-  &__lock {
-    position: absolute;
-    top: 0;
-    right: 0;
-    color: color-mix(in srgb, var(--ion-color-tertiary) 55%, transparent);
-    ion-icon { font-size: var(--app-theme-icon-size-sm); }
-  }
-
-  &__icon {
-    font-size: var(--app-theme-icon-size-xl);
-    color: var(--ion-color-tertiary);
-    margin-bottom: var(--app-theme-spacing-xs);
-  }
-
-  &__title {
-    font-size: var(--app-theme-font-size-title);
-    font-weight: var(--app-theme-font-weight-extra-bold);
-    margin: 0;
-  }
-
-  &__description {
-    font-size: var(--app-theme-font-size-small);
-    color: var(--app-theme-text-soft);
-    margin: 0;
-    line-height: var(--app-theme-line-height-normal);
   }
 }
 

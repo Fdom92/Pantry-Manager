@@ -12,6 +12,13 @@ export const ANALYTICS_EVENTS = {
   /** Fires when the app comes back to foreground. */
   APP_FOREGROUNDED: 'app_foregrounded',
 
+  // In-app update flow (Google Play API).
+  APP_UPDATE_CHECK: 'app_update_check',
+  APP_UPDATE_AVAILABLE: 'app_update_available',
+  APP_UPDATE_STARTED: 'app_update_started',
+  APP_UPDATE_COMPLETED: 'app_update_completed',
+  APP_UPDATE_FAILED: 'app_update_failed',
+
   // Onboarding
   ONBOARDING_STEP_VIEWED: 'onboarding_step_viewed',
   ONBOARDING_COMPLETED: 'onboarding_completed',
@@ -56,6 +63,14 @@ export const ANALYTICS_EVENTS = {
   UPGRADE_TAPPED: 'upgrade_tapped',
   UPGRADE_PURCHASE_STARTED: 'upgrade_purchase_started',
   UPGRADE_PURCHASE_COMPLETED: 'upgrade_purchase_completed',
+  PRO_TRIAL_CTA_CLICKED: 'pro_trial_cta_clicked',
+  /** Tap anywhere on a locked PRO teaser card (navigates to /upgrade). */
+  PAYWALL_CARD_CLICKED: 'paywall_card_clicked',
+  PRO_TRIAL_STARTED: 'pro_trial_started',
+  PRO_TRIAL_EXPIRED: 'pro_trial_expired',
+  WASTE_TRACKER_VIEWED: 'waste_tracker_viewed',
+  REPO_PREDICTION_VIEWED: 'repo_prediction_viewed',
+  REPO_PREDICTION_ADDED_TO_LIST: 'repo_prediction_added_to_list',
 
   // Notifications
   NOTIFICATION_SCHEDULED: 'notification_scheduled',
@@ -63,6 +78,14 @@ export const ANALYTICS_EVENTS = {
 
   // Preferences (signals of churn / personalization).
   PREFERENCE_CHANGED: 'preference_changed',
+
+  // Retention — streak
+  STREAK_REACHED: 'streak_reached',
+  STREAK_MILESTONE_3: 'streak_milestone_3',
+  STREAK_MILESTONE_7: 'streak_milestone_7',
+  STREAK_MILESTONE_14: 'streak_milestone_14',
+  STREAK_MILESTONE_30: 'streak_milestone_30',
+  STREAK_BROKEN: 'streak_broken',
 } as const;
 
 export type AnalyticsEventName =

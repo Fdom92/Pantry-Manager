@@ -1,5 +1,4 @@
 export * from './dashboard';
-export * from './migration';
 export * from './onboarding';
 export * from './pantry';
 export * from './settings';
@@ -9,3 +8,4 @@ export * from './tabs';
 export * from './upgrade';
 export * from './analytics';
 export * from './reconsent';
+export * from './app-update';

@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { STORAGE_KEYS } from '@core/constants';
-import { getBooleanFlag, setBooleanFlag, sleep } from '@core/utils';
+import { sleep } from '@core/utils';
 import { AlertController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { LocalStorageService } from './local-storage.service';
 
 interface InAppReviewPlugin {
   requestReview: () => Promise<void>;
@@ -13,6 +13,7 @@ interface InAppReviewPlugin {
 export class ReviewPromptService {
   private readonly alertCtrl = inject(AlertController);
   private readonly translate = inject(TranslateService);
+  private readonly storage = inject(LocalStorageService);
 
   private readonly minDaysSinceFirstUse = 3;
   private readonly minLaunches = 3;
@@ -35,12 +36,12 @@ export class ReviewPromptService {
     this.lastTriggerAt = now;
 
     this.noteLaunch();
-    if (!getBooleanFlag(STORAGE_KEYS.REVIEW_PENDING)) {
+    if (!this.storage.review.isPending()) {
       return;
     }
     const didPrompt = await this.promptIfEligible();
     if (didPrompt) {
-      this.clearPendingPrompt();
+      this.storage.review.clearPending();
     }
   }
 
@@ -49,7 +50,7 @@ export class ReviewPromptService {
       return;
     }
     this.noteFirstUse();
-    setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
+    this.storage.review.setPending(true);
   }
 
   handleProductAdded(): void {
@@ -57,11 +58,10 @@ export class ReviewPromptService {
       return;
     }
     this.noteFirstUse();
-    const current = this.getStoredNumber(STORAGE_KEYS.REVIEW_PRODUCT_ADD_COUNT) ?? 0;
-    const next = current + 1;
-    this.setItem(STORAGE_KEYS.REVIEW_PRODUCT_ADD_COUNT, String(next));
+    const next = this.storage.review.getProductAddCount() + 1;
+    this.storage.review.setProductAddCount(next);
     if (next >= this.minProductAddsForPrompt) {
-      setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
+      this.storage.review.setPending(true);
     }
   }
 
@@ -70,11 +70,10 @@ export class ReviewPromptService {
       return;
     }
     this.noteFirstUse();
-    const current = this.getStoredNumber(STORAGE_KEYS.REVIEW_CONSUME_COUNT) ?? 0;
-    const next = current + 1;
-    this.setItem(STORAGE_KEYS.REVIEW_CONSUME_COUNT, String(next));
+    const next = this.storage.review.getConsumeCount() + 1;
+    this.storage.review.setConsumeCount(next);
     if (next >= this.minConsumesForPrompt) {
-      setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
+      this.storage.review.setPending(true);
     }
   }
 
@@ -86,9 +85,9 @@ export class ReviewPromptService {
   async handleIngredientUsed(): Promise<void> {
     if (!this.storageAvailable) return;
     this.noteFirstUse();
-    setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
+    this.storage.review.setPending(true);
     const didPrompt = await this.promptIfEligibleNoLaunchGate('reviews.promptHoy');
-    if (didPrompt) this.clearPendingPrompt();
+    if (didPrompt) this.storage.review.clearPending();
   }
 
   /**
@@ -102,22 +101,19 @@ export class ReviewPromptService {
   async handlePositiveAction(): Promise<void> {
     if (!this.storageAvailable) return;
     this.noteFirstUse();
-    setBooleanFlag(STORAGE_KEYS.REVIEW_PENDING, true);
+    this.storage.review.setPending(true);
     const didPrompt = await this.promptIfEligibleNoLaunchGate('reviews.prompt');
-    if (didPrompt) this.clearPendingPrompt();
+    if (didPrompt) this.storage.review.clearPending();
   }
 
   private noteLaunch(): void {
     this.noteFirstUse();
-    const launchCount = this.getStoredNumber(STORAGE_KEYS.REVIEW_LAUNCH_COUNT) ?? 0;
-    this.setItem(STORAGE_KEYS.REVIEW_LAUNCH_COUNT, String(launchCount + 1));
+    this.storage.review.setLaunchCount(this.storage.review.getLaunchCount() + 1);
   }
 
   private noteFirstUse(): void {
-    const now = new Date().toISOString();
-    const firstUse = this.getStoredDate(STORAGE_KEYS.REVIEW_FIRST_USE_AT);
-    if (!firstUse) {
-      this.setItem(STORAGE_KEYS.REVIEW_FIRST_USE_AT, now);
+    if (!this.storage.review.getFirstUseAt()) {
+      this.storage.review.setFirstUseAt(new Date());
     }
   }
 
@@ -138,11 +134,11 @@ export class ReviewPromptService {
 
   private async doPrompt(messageKey: string): Promise<boolean> {
     const accepted = await this.showReviewAlert(messageKey);
-    const promptTimestamp = new Date().toISOString();
-    this.setItem(STORAGE_KEYS.REVIEW_LAST_PROMPT_AT, promptTimestamp);
+    const now = new Date();
+    this.storage.review.setLastPromptAt(now);
     if (!accepted) return true;
     const didRequest = await this.requestNativeReview();
-    if (didRequest) this.setItem(STORAGE_KEYS.REVIEW_COMPLETED_AT, promptTimestamp);
+    if (didRequest) this.storage.review.setCompletedAt(now);
     return true;
   }
 
@@ -168,18 +164,9 @@ export class ReviewPromptService {
     });
   }
 
-  private clearPendingPrompt(): void {
-    try {
-      localStorage.removeItem(STORAGE_KEYS.REVIEW_PENDING);
-    } catch {
-      // Ignore storage failures.
-    }
-  }
-
   private shouldPrompt(): boolean {
     if (!this.meetsBasicGates()) return false;
-    const launchCount = this.getStoredNumber(STORAGE_KEYS.REVIEW_LAUNCH_COUNT) ?? 0;
-    if (launchCount < this.minLaunches) return false;
+    if (this.storage.review.getLaunchCount() < this.minLaunches) return false;
     return true;
   }
 
@@ -190,15 +177,15 @@ export class ReviewPromptService {
 
   private meetsBasicGates(): boolean {
     if (!Capacitor.isNativePlatform()) return false;
-    if (!getBooleanFlag(STORAGE_KEYS.ONBOARDING_FLAG)) return false;
+    if (!this.storage.onboarding.isSeen()) return false;
 
-    const completedAt = this.getStoredDate(STORAGE_KEYS.REVIEW_COMPLETED_AT);
+    const completedAt = this.storage.review.getCompletedAt();
     if (completedAt && this.getDaysSince(completedAt) < this.completedCooldownDays) return false;
 
-    const firstUse = this.getStoredDate(STORAGE_KEYS.REVIEW_FIRST_USE_AT);
+    const firstUse = this.storage.review.getFirstUseAt();
     if (!firstUse || this.getDaysSince(firstUse) < this.minDaysSinceFirstUse) return false;
 
-    const lastPrompt = this.getStoredDate(STORAGE_KEYS.REVIEW_LAST_PROMPT_AT);
+    const lastPrompt = this.storage.review.getLastPromptAt();
     if (lastPrompt && this.getDaysSince(lastPrompt) < this.cooldownDays) return false;
 
     return true;
@@ -216,43 +203,8 @@ export class ReviewPromptService {
     }
   }
 
-  private getStoredDate(key: string): Date | null {
-    try {
-      const value = localStorage.getItem(key);
-      if (!value) {
-        return null;
-      }
-      const parsed = new Date(value);
-      return Number.isNaN(parsed.getTime()) ? null : parsed;
-    } catch {
-      return null;
-    }
-  }
-
-  private getStoredNumber(key: string): number | null {
-    try {
-      const raw = localStorage.getItem(key);
-      if (!raw) {
-        return null;
-      }
-      const parsed = Number(raw);
-      return Number.isNaN(parsed) ? null : parsed;
-    } catch {
-      return null;
-    }
-  }
-
-  private setItem(key: string, value: string): void {
-    try {
-      localStorage.setItem(key, value);
-    } catch {
-      // Ignore storage failures.
-    }
-  }
-
   private getDaysSince(date: Date): number {
     const diffMs = Date.now() - date.getTime();
     return Math.floor(diffMs / (24 * 60 * 60 * 1000));
   }
-
 }

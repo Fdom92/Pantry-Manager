@@ -8,13 +8,11 @@ import type { BaseDoc } from '@core/models/shared';
 import { StorageService } from '../shared/storage.service';
 import { ShareService } from '../shared/share.service';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
-import { MigrationPantryService } from '../migration/migration-pantry.service';
 
 @Injectable({ providedIn: 'root' })
 export class SyncService {
   private readonly storage = inject<StorageService<BaseDoc>>(StorageService);
   private readonly appPreferences = inject(SettingsPreferencesService);
-  private readonly migrationService = inject(MigrationPantryService);
   private readonly share = inject(ShareService);
   private readonly translate = inject(TranslateService);
   private readonly alertCtrl = inject(AlertController);
@@ -82,7 +80,6 @@ export class SyncService {
     await this.storage.clearAll();
     await this.storage.bulkSave(docs);
     await this.appPreferences.reload();
-    this.migrationService.markMigrationCheckNeeded();
   }
 
   private async doApplyImport(docs: BaseDoc[]): Promise<void> {

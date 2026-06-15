@@ -1,55 +1,116 @@
-// Re-uses the canonical .app-sheet-modal global pattern. Local tweaks only.
+@use '../../../shared/styles/modal-sheet' as sheet;
+@use '../../../shared/styles/form-section-flat' as ff;
 
-.reconsent-sheet {
-  --height: auto;
+:host {
+  display: block;
 }
 
-.sheet-shell {
+// Auto-height, bottom-anchored modal — same visual language as the other
+// sheet modals (rounded top corners, glass surfaces) but the modal itself
+// shrinks to fit its content. The breakpoint-based sheet mode pushed the
+// footer past the viewport when the body was short; this avoids that.
+ion-modal.reconsent-sheet {
+  @include sheet.sheet-base;
+  @include sheet.field-flat;
+  --height: auto;
+  --max-height: 90vh;
+  --width: 100%;
+  --max-width: 100%;
+  align-items: flex-end;
+}
+
+.sheet-shell.reconsent-shell {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  background: var(--ion-card-background);
+  // No `height: 100%` here — let the shell grow to its content height so
+  // the footer sits right under the body, not at the bottom of an empty 85%
+  // viewport.
 }
 
-.reconsent-intro {
-  margin: 0 0 var(--spacing-md, 16px);
-  color: var(--ion-color-step-600);
-  font-size: 0.95rem;
-  line-height: 1.45;
+.sheet-handle {
+  @include sheet.handle;
 }
+
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
+}
+
+.sheet-header__titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.sheet-header__title {
+  @include sheet.header-title;
+}
+
+.sheet-header__subtitle {
+  @include sheet.header-subtitle;
+}
+
+.sheet-header__dismiss {
+  margin: 0;
+}
+
+// Override `sheet.body` here: the auto-height modal doesn't need the
+// `flex: 1` grow behaviour from the mixin (no empty space to fill). The
+// scrolling fallback for very tall content is preserved via max-height +
+// overflow-y on the modal itself.
+.sheet-body {
+  flex: 0 0 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 var(--app-theme-spacing-lg, 20px) var(--app-theme-spacing-lg, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-md, 16px);
+}
+
+.sheet-footer {
+  @include sheet.footer;
+}
+
+// --- Content-specific ------------------------------------------------------
 
 .reconsent-list {
   background: transparent;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-sm, 8px);
 }
 
 .reconsent-item {
-  --background: var(--ion-color-step-50);
-  --border-radius: var(--radius-md, 12px);
-  margin-bottom: var(--spacing-sm, 8px);
-  border-radius: var(--radius-md, 12px);
+  --background: var(--ion-color-step-50, rgba(0, 0, 0, 0.04));
+  --border-radius: var(--app-theme-radius-md, 12px);
+  border-radius: var(--app-theme-radius-md, 12px);
   overflow: hidden;
 
-  ion-label h3 {
-    font-weight: 600;
-    font-size: 0.95rem;
-  }
-  ion-label p {
-    font-size: 0.85rem;
-    color: var(--ion-color-step-550);
+  ion-label {
+    h3 {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    p {
+      font-size: 0.85rem;
+      color: var(--ion-color-step-550, var(--ion-color-medium));
+      margin: 4px 0 0;
+      white-space: normal;
+    }
   }
 }
 
 .reconsent-footnote {
-  margin-top: var(--spacing-md, 16px);
-  color: var(--ion-color-step-500);
+  margin: 0;
+  color: var(--ion-color-step-500, var(--ion-color-medium));
   font-size: 0.8rem;
   line-height: 1.4;
+  text-align: center;
 }
 
-.reconsent-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-sm, 8px);
-  padding: 0 var(--spacing-md, 16px);
+.reconsent-confirm {
+  flex: 1;
 }

@@ -53,9 +53,12 @@ export class PantryQueryService {
   readonly totalCount = signal(0);
 
   constructor() {
+    // `allowSignalWrites` was deprecated in Angular 19 — writes inside effects
+    // are now allowed by default. The effect still recomputes the filtered
+    // product list whenever an input signal (items, filter, sort) changes.
     effect(() => {
       this.recomputeFilteredProducts();
-    }, { allowSignalWrites: true });
+    });
   }
 
   // ─── Initialization / Pagination ──────────────────────────────────────────

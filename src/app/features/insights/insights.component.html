@@ -17,7 +17,23 @@
         <ion-skeleton-text animated style="width: 60%; height: 20px; margin-bottom: 16px;"></ion-skeleton-text>
         <ion-skeleton-text animated style="width: 100%; height: 80px;"></ion-skeleton-text>
       </section>
+    } @else if (facade.isEmpty()) {
+      <app-insights-empty-state />
     } @else {
+
+      <!-- SECTION 1: Waste tracker — full data for PRO, locked teaser for free (bottom paywall hosts the trial CTA) -->
+      @if (facade.isPro()) {
+        <section class="insights-section">
+          <app-waste-tracker-card [summary]="facade.wasteSummary()" />
+        </section>
+      } @else {
+        <app-pro-paywall-card
+          surface="waste_card"
+          titleKey="dashboard.waste.title"
+          descriptionKey="dashboard.waste.teaser"
+          hideCta
+        />
+      }
 
       <!-- SECTION 2: Tu despensa ahora -->
       <section class="insights-section">
@@ -187,7 +203,7 @@
           @if (!facade.proAnalysis() && !facade.proAnalysisLoading() && !facade.proAnalysisError()) {
             <div class="pro-generate">
               <ion-icon name="sparkles-outline" class="pro-generate__icon"></ion-icon>
-              <ion-button (click)="facade.triggerProAnalysis()">
+              <ion-button shape="round" color="primary" (click)="facade.triggerProAnalysis()">
                 {{ 'insights.pro.generate' | translate }}
               </ion-button>
             </div>
@@ -233,26 +249,19 @@
             <div class="pro-error">
               <ion-icon name="alert-circle-outline"></ion-icon>
               <span>{{ 'insights.pro.error' | translate }}</span>
-              <ion-button size="small" (click)="facade.triggerProAnalysis()">
+              <ion-button size="small" color="primary" (click)="facade.triggerProAnalysis()">
                 {{ 'insights.pro.retry' | translate }}
               </ion-button>
             </div>
           }
         </section>
       } @else {
-        <section class="insights-section insights-section--pro-teaser">
-          <div class="pro-teaser">
-            <div class="pro-teaser__lock">
-              <ion-icon name="lock-closed-outline"></ion-icon>
-            </div>
-            <ion-icon name="sparkles-outline" class="pro-teaser__icon"></ion-icon>
-            <h3 class="pro-teaser__title">{{ 'insights.pro.title' | translate }}</h3>
-            <p class="pro-teaser__description">{{ 'insights.pro.description' | translate }}</p>
-            <ion-button [routerLink]="['/upgrade']" size="small" color="tertiary">
-              {{ 'insights.pro.cta' | translate }}
-            </ion-button>
-          </div>
-        </section>
+        <app-pro-paywall-card
+          surface="insights_tab"
+          titleKey="insights.pro.title"
+          descriptionKey="insights.pro.description"
+          hideCta
+        />
       }
 
     }

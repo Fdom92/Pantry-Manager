@@ -12,6 +12,7 @@ import { LanguageService } from '../shared/language.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { PantryNavigationPresetService } from '../pantry/pantry-navigation-preset.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
+import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -45,6 +46,7 @@ export class DashboardStateService {
   private readonly languageService = inject(LanguageService);
   private readonly navCtrl = inject(NavController);
   private readonly reviewPrompt = inject(ReviewPromptService);
+  private readonly historyManager = inject(HistoryEventManagerService);
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly hasCompletedInitialLoad = signal(false);
@@ -331,7 +333,12 @@ export class DashboardStateService {
       const item = this.pantryItems().find(i => i._id === suggestion.protagonist.id);
       if (item?.batches?.length) {
         const updatedBatches = applyFifoConsumption(item.batches, 1);
-        await this.pantryStore.updateItem({ ...item, batches: updatedBatches });
+        const updated: PantryItem = { ...item, batches: updatedBatches };
+        await this.pantryStore.updateItem(updated);
+        await this.historyManager.logStockAdjust(item, updated, {
+          deltaQuantity: -1,
+          source: 'dashboard',
+        });
       }
       this.lastProtagonistId.set(suggestion.protagonist.id);
       this.isCookingConfirmed.set(true);
@@ -350,7 +357,9 @@ export class DashboardStateService {
     this.isConsumingToday.set(true);
     try {
       const updatedBatch = { ...(item.batches?.[0] ?? { quantity: 0 }), quantity: 0 };
-      await this.pantryStore.updateItem({ ...item, batches: [updatedBatch] });
+      const updated: PantryItem = { ...item, batches: [updatedBatch] };
+      await this.pantryStore.updateItem(updated);
+      await this.historyManager.logAdvancedEdit(item, updated, 'dashboard');
       this.lastProtagonistId.set(id);
       this.isCookingConfirmed.set(true);
       void this.reviewPrompt.handlePositiveAction();

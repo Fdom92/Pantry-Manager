@@ -4,7 +4,7 @@ import { getItemStatusState } from '@core/domain/pantry/pantry-status.domain';
 import { calculateUrgencyScore } from '@core/domain/pantry/urgency.domain';
 import { sumQuantities } from '@core/domain/pantry/pantry-batch.domain';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-import { daysUntilExpiry } from '@core/utils/date.util';
+import { daysUntilExpiry, parseExpiryMs } from '@core/utils/date.util';
 
 // ─── HOY Block — v2 final architecture ───────────────────────────────────────
 //
@@ -60,11 +60,13 @@ export function computeTodaySuggestion(
 
   const getStock = (item: PantryItem): number => sumQuantities(item.batches);
 
-  const getEarliestExpiryDate = (item: PantryItem): string | undefined =>
-    (item.batches ?? [])
-      .filter(b => b.expirationDate)
-      .sort((a, b) => Date.parse(a.expirationDate!) - Date.parse(b.expirationDate!))[0]
-      ?.expirationDate;
+  const getEarliestExpiryDate = (item: PantryItem): string | undefined => {
+    const parsed = (item.batches ?? [])
+      .map(b => ({ b, ms: parseExpiryMs(b.expirationDate) }))
+      .filter(x => x.ms !== null) as Array<{ b: { expirationDate?: string }; ms: number }>;
+    parsed.sort((a, b) => a.ms - b.ms);
+    return parsed[0]?.b.expirationDate;
+  };
 
   const getDaysToExpiry = (item: PantryItem): number | null => {
     const date = getEarliestExpiryDate(item);

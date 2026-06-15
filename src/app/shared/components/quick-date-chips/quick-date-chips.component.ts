@@ -22,6 +22,9 @@ const CHIPS: DateChip[] = [
   standalone: true,
   imports: [IonChip, TranslateModule],
   template: `
+    @if (currentLabel(); as label) {
+      <p class="quick-date-chips__current">{{ label | translate: currentLabelParams() }}</p>
+    }
     <div class="quick-date-chips">
       @for (chip of chips; track chip.key) {
         <ion-chip
@@ -43,14 +46,57 @@ export class QuickDateChipsComponent implements OnChanges {
 
   readonly chips = CHIPS;
   readonly selectedKey = signal<string | null>(null);
+  readonly currentLabel = signal<string | null>(null);
+  readonly currentLabelParams = signal<Record<string, unknown>>({});
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!changes['initialDate']) return;
     const value = this.initialDate;
-    if (!value) { this.selectedKey.set(null); return; }
-    const dayOffset = Math.round((Date.parse(value) - Date.now()) / 86_400_000);
-    const match = CHIPS.find(c => c.offsetDays !== null && c.offsetDays === dayOffset);
-    this.selectedKey.set(match?.key ?? null);
+    if (!value) {
+      this.selectedKey.set(null);
+      this.currentLabel.set(null);
+      this.currentLabelParams.set({});
+      return;
+    }
+
+    const parsed = Date.parse(value);
+    if (Number.isNaN(parsed)) {
+      this.selectedKey.set(null);
+      this.currentLabel.set(null);
+      this.currentLabelParams.set({});
+      return;
+    }
+
+    const dayOffset = Math.round((parsed - Date.now()) / 86_400_000);
+
+    // Smart-match the closest preset by absolute day distance so the chip
+    // the user originally tapped (or its nearest neighbour) stays highlighted
+    // after time passes. Only consider preset chips, never noDate.
+    let best: DateChip | undefined;
+    let bestDiff = Number.POSITIVE_INFINITY;
+    for (const chip of CHIPS) {
+      if (chip.offsetDays === null) continue;
+      const diff = Math.abs(chip.offsetDays - dayOffset);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        best = chip;
+      }
+    }
+    this.selectedKey.set(best?.key ?? null);
+
+    // Header label so the user can see the actual remaining days in the
+    // sheet — without this they only ever saw the chip selection and
+    // chips-only mode hides the date input.
+    if (dayOffset > 0) {
+      this.currentLabel.set('pantry.fresh.quickDate.remaining');
+      this.currentLabelParams.set({ days: dayOffset });
+    } else if (dayOffset === 0) {
+      this.currentLabel.set('pantry.fresh.quickDate.expiresToday');
+      this.currentLabelParams.set({});
+    } else {
+      this.currentLabel.set('pantry.fresh.quickDate.expiredAgo');
+      this.currentLabelParams.set({ days: Math.abs(dayOffset) });
+    }
   }
 
   select(chip: DateChip): void {
@@ -68,5 +114,7 @@ export class QuickDateChipsComponent implements OnChanges {
 
   reset(): void {
     this.selectedKey.set(null);
+    this.currentLabel.set(null);
+    this.currentLabelParams.set({});
   }
 }

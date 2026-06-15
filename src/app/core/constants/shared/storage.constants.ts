@@ -20,6 +20,8 @@ export const STORAGE_KEYS = {
   // ── PouchDB document ids ──────────────────────────────────────────────
   /** PouchDB `_id` for the singleton `AppPreferences` doc. */
   PREFERENCES: 'app:preferences',
+  /** PouchDB `_id` for the singleton streak state doc. */
+  STREAK_DOC_ID: 'streak:current',
 
   // ── localStorage keys (per-device state) ──────────────────────────────
   /** Cached PRO entitlement. Authoritative source is RevenueCat cloud. */
@@ -44,6 +46,12 @@ export const STORAGE_KEYS = {
    * and PouchDB is ready — can decide whether to forward events.
    */
   ERROR_REPORTING_ENABLED: 'errorReporting:enabled',
+  /** ISO timestamp when the user successfully started a PRO trial. */
+  PRO_TRIAL_STARTED_AT: 'pro:trial:startedAt',
+  /** Set once `pro_trial_expired` has been emitted for this trial (one-shot). */
+  PRO_TRIAL_EXPIRED_FIRED: 'pro:trial:expiredFired',
+  /** Pending manual shopping list items — survives app close, cleared on buy/remove. */
+  SHOPPING_MANUAL_ITEMS: 'shopping:manualItems',
 } as const;
 
 export const DEFAULT_HOUSEHOLD_ID = 'household:default';

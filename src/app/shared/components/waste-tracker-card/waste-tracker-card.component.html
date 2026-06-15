@@ -1,0 +1,17 @@
+<h3 class="waste-card__title">{{ 'dashboard.waste.title' | translate }}</h3>
+
+@if (isEmptyZeroWaste()) {
+  <p class="waste-card__zero">{{ 'dashboard.waste.zero' | translate }}</p>
+} @else {
+  <p class="waste-card__count">
+    {{ 'dashboard.waste.count' | translate: { count: summary().totalCount } }}
+  </p>
+  @if (topCategoryLabel(); as topCategory) {
+    <p class="waste-card__top">
+      {{ 'dashboard.waste.topCategory' | translate: { category: topCategory } }}
+    </p>
+  }
+  <p class="waste-card__trend" [attr.data-trend]="summary().trend">
+    {{ ('dashboard.waste.trend.' + summary().trend) | translate }}
+  </p>
+}

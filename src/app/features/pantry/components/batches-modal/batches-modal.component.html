@@ -116,7 +116,7 @@
                 </article>
               }
 
-              <ion-button expand="block" fill="clear" (click)="state.addBatchesEntry()">
+              <ion-button expand="block" shape="round" fill="clear" (click)="state.addBatchesEntry()">
                 <ion-icon slot="start" name="add-outline"></ion-icon>
                 {{ 'pantry.batches.addBatch' | translate }}
               </ion-button>
@@ -127,7 +127,7 @@
                 {{ 'common.actions.cancel' | translate }}
               </ion-button>
               <ion-button
-                expand="block"
+                expand="block" shape="round"
                 color="primary"
                 [disabled]="state.batchesIsSaving()"
                 (click)="state.saveBatches()">

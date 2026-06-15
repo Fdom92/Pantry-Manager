@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { TranslateModule } from '@ngx-translate/core';
 
 export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
   id?: string;
@@ -13,7 +14,7 @@ export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
 @Component({
   selector: 'app-entity-autocomplete',
   standalone: true,
-  imports: [CommonModule, IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList],
+  imports: [CommonModule, TranslateModule, IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList],
   templateUrl: './entity-autocomplete.component.html',
   styleUrls: ['./entity-autocomplete.component.scss'],
 })

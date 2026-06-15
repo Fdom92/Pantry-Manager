@@ -8,6 +8,6 @@ export * from './pantry-selectors.util';
 export * from './list-grouping.util';
 export * from './signal.util';
 export * from './skeleton.util';
-export * from './storage-flag.util';
+// `storage-flag.util` removed in v4.6 — use `LocalStorageService` instead.
 export * from './task.util';
 export * from './uuid.util';

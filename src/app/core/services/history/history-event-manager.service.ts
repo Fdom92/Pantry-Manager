@@ -5,6 +5,7 @@ import type { PantryItem } from '@core/models/pantry';
 import type { EventSource } from '@core/models/events';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { computeEditedFields } from '@core/utils/pantry-diff.util';
+import { Subject } from 'rxjs';
 import { HistoryEventLogService } from './history-event-log.service';
 
 export type StockAdjustOptions = {
@@ -19,9 +20,13 @@ export type StockAdjustOptions = {
 export class HistoryEventManagerService {
   private readonly eventLog = inject(HistoryEventLogService);
 
+  private readonly _mutation$ = new Subject<void>();
+  /** Emits once after every event that is persisted to the event log. */
+  readonly mutation$ = this._mutation$.asObservable();
+
   async logAddNewItem(item: PantryItem, addedQuantity: number, sessionId?: string, timestamp?: string) {
     const nextQuantity = sumQuantities(item.batches ?? []);
-    return this.eventLog.logAddEvent({
+    const result = await this.eventLog.logAddEvent({
       productId: item._id,
       productName: item.name,
       quantity: addedQuantity,
@@ -35,6 +40,8 @@ export class HistoryEventManagerService {
       sessionId,
       timestamp,
     });
+    this._mutation$.next();
+    return result;
   }
 
   async logAddExistingItem(
@@ -47,7 +54,7 @@ export class HistoryEventManagerService {
   ) {
     const previousQuantity = sumQuantities(previousItem.batches ?? []);
     const nextQuantity = sumQuantities(updatedItem.batches ?? []);
-    return this.eventLog.logAddEvent({
+    const result = await this.eventLog.logAddEvent({
       productId: updatedItem._id,
       productName: updatedItem.name,
       quantity: addedQuantity,
@@ -61,13 +68,15 @@ export class HistoryEventManagerService {
       sessionId,
       timestamp,
     });
+    this._mutation$.next();
+    return result;
   }
 
   async logAdvancedEdit(previousItem: PantryItem, updatedItem: PantryItem, source: EventSource = 'edit_modal') {
     const previousQuantity = sumQuantities(previousItem.batches ?? []);
     const nextQuantity = sumQuantities(updatedItem.batches ?? []);
     const editedFields = computeEditedFields(previousItem, updatedItem);
-    return this.eventLog.logEditEvent({
+    const result = await this.eventLog.logEditEvent({
       productId: updatedItem._id,
       productName: updatedItem.name,
       quantity: nextQuantity,
@@ -79,6 +88,8 @@ export class HistoryEventManagerService {
       expirationDate: updatedItem.expirationDate,
       editedFields: editedFields.length > 0 ? editedFields : undefined,
     });
+    this._mutation$.next();
+    return result;
   }
 
   async logStockAdjust(
@@ -109,9 +120,11 @@ export class HistoryEventManagerService {
       expirationDate,
       sessionId,
     };
-    return deltaQuantity > 0
+    const result = await (deltaQuantity > 0
       ? this.eventLog.logAddEvent(params)
-      : this.eventLog.logConsumeEvent(params);
+      : this.eventLog.logConsumeEvent(params));
+    this._mutation$.next();
+    return result;
   }
 
   async logExpiredBatches(items: PantryItem[]): Promise<void> {
@@ -165,12 +178,13 @@ export class HistoryEventManagerService {
 
     if (tasks.length) {
       await Promise.all(tasks);
+      this._mutation$.next();
     }
   }
 
   async logDeleteFromCard(item: PantryItem) {
     const totalQuantity = sumQuantities(item.batches ?? []);
-    return this.eventLog.logDeleteEvent({
+    const result = await this.eventLog.logDeleteEvent({
       productId: item._id,
       productName: item.name,
       quantity: totalQuantity,
@@ -181,5 +195,7 @@ export class HistoryEventManagerService {
       categoryId: item.categoryId,
       foodType: item.foodType,
     });
+    this._mutation$.next();
+    return result;
   }
 }

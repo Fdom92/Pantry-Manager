@@ -2,6 +2,7 @@ import type { PantryItem } from '@core/models/pantry';
 import { classifyExpiry } from '@core/domain/pantry/pantry-status.domain';
 import { sumQuantities } from '@core/domain/pantry/pantry-batch.domain';
 import { toNumberOrZero } from '@core/utils/formatting.util';
+import { parseExpiryMs } from '@core/utils/date.util';
 
 /**
  * Returns a Date for the next occurrence of hour:00 after now.
@@ -54,7 +55,9 @@ export function nearestExpiryDays(items: PantryItem[], now: Date): number {
   for (const item of items) {
     for (const batch of item.batches ?? []) {
       if (!batch.expirationDate) continue;
-      const ms = new Date(batch.expirationDate).getTime() - now.getTime();
+      const expiryMs = parseExpiryMs(batch.expirationDate);
+      if (expiryMs === null) continue;
+      const ms = expiryMs - now.getTime();
       if (ms >= 0 && ms < minMs) minMs = ms;
     }
   }

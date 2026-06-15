@@ -9,17 +9,12 @@ import {
 import { CommonModule } from '@angular/common';
 import {
   IonButton,
-  IonContent,
-  IonFooter,
-  IonHeader,
   IonIcon,
   IonItem,
   IonLabel,
   IonList,
   IonModal,
-  IonTitle,
   IonToggle,
-  IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
@@ -43,11 +38,6 @@ import { SettingsPreferencesService } from '@core/services/settings/settings-pre
     CommonModule,
     TranslateModule,
     IonModal,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonFooter,
     IonList,
     IonItem,
     IonLabel,
@@ -73,9 +63,14 @@ export class ReconsentSheetComponent {
   readonly showNotifications = signal(false);
   readonly showAnalytics = signal(false);
 
-  /** Working state for the toggles. */
+  /**
+   * Working state for the toggles. **Both default to false**: GDPR-aligned
+   * opt-in by default. Tapping "Hecho" without flipping a toggle records
+   * the user's lack of choice as an explicit decline (`opt_out`), not an
+   * implicit acceptance.
+   */
   readonly notificationsOn = signal(false);
-  readonly analyticsOn = signal(true);
+  readonly analyticsOn = signal(false);
 
   readonly isSubmitting = signal(false);
 
@@ -101,8 +96,9 @@ export class ReconsentSheetComponent {
     const { notifications, analytics } = await this.reconsent.resolvePendingQuestions();
     this.showNotifications.set(notifications);
     this.showAnalytics.set(analytics);
+    // Both toggles default OFF — see comment on the signals above.
     this.notificationsOn.set(false);
-    this.analyticsOn.set(true);
+    this.analyticsOn.set(false);
     this.reconsent.isSheetOpen.set(true);
     this.isOpen.set(true);
   }
@@ -122,18 +118,23 @@ export class ReconsentSheetComponent {
 
     let notifGranted = false;
     try {
-      if (this.showNotifications() && this.notificationsOn()) {
-        notifGranted = await this.permission.request();
-        if (notifGranted) {
-          const current = await this.prefs.getPreferences();
-          await this.prefs.savePreferences({
-            ...current,
-            notificationsEnabled: true,
-            notifyOnExpired: true,
-            notifyOnNearExpiry: true,
-            notifyOnLowStock: true,
-          });
+      // Notifications branch — only request OS permission if the user actually
+      // flipped the toggle on. Always stamp `notificationsDecidedAt` if the
+      // question was asked, so the re-consent sheet does not re-prompt.
+      if (this.showNotifications()) {
+        const current = await this.prefs.getPreferences();
+        const now = new Date().toISOString();
+        if (this.notificationsOn()) {
+          notifGranted = await this.permission.request();
         }
+        await this.prefs.savePreferences({
+          ...current,
+          notificationsEnabled: notifGranted ? true : current.notificationsEnabled,
+          notifyOnExpired: notifGranted ? true : current.notifyOnExpired,
+          notifyOnNearExpiry: notifGranted ? true : current.notifyOnNearExpiry,
+          notifyOnLowStock: notifGranted ? true : current.notifyOnLowStock,
+          notificationsDecidedAt: now,
+        });
       }
 
       if (this.showAnalytics()) {
@@ -156,8 +157,31 @@ export class ReconsentSheetComponent {
     }
   }
 
-  /** Soft dismiss — no decisions applied, but the sheet is still marked as shown. */
-  dismissLater(): void {
+  /** Template-friendly fire-and-forget wrapper for `dismissLater`. */
+  onDismissLater(): void {
+    void this.dismissLater();
+  }
+
+  /**
+   * Soft dismiss — the user did not flip any toggle. Persist an explicit
+   * "no decision yet, asked though" timestamp so the question is not
+   * surfaced again automatically. The user can still revisit in Settings.
+   */
+  async dismissLater(): Promise<void> {
+    const current = await this.prefs.getPreferences();
+    const now = new Date().toISOString();
+    const patch: Partial<typeof current> = {};
+    if (this.showNotifications() && current.notificationsDecidedAt == null) {
+      patch.notificationsDecidedAt = now;
+    }
+    if (this.showAnalytics() && current.analyticsDecidedAt == null) {
+      patch.analyticsDecidedAt = now;
+      patch.analyticsEnabled = current.analyticsEnabled ?? false;
+    }
+    if (Object.keys(patch).length) {
+      await this.prefs.savePreferences({ ...current, ...patch });
+    }
+
     this.analytics.track(ANALYTICS_EVENTS.RECONSENT_SHEET_DECIDED, {
       notif_asked: this.showNotifications(),
       notif_granted: false,

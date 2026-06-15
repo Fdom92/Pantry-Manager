@@ -1,5 +1,12 @@
 @use '../../../shared/styles/chip' as chip;
 
+.quick-date-chips__current {
+  margin: 0 0 var(--app-theme-spacing-sm);
+  color: var(--ion-color-medium);
+  font-size: var(--app-theme-font-size-caption);
+  font-weight: var(--app-theme-font-weight-bold);
+}
+
 .quick-date-chips {
   display: flex;
   flex-wrap: wrap;

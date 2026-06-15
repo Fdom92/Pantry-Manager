@@ -20,6 +20,7 @@ export const DEFAULT_PREFERENCES: AppPreferences = {
   notificationHour: 9,
   analyticsEnabled: false,
   analyticsDecidedAt: null,
+  notificationsDecidedAt: null,
   lastSyncAt: null,
   locationOptions: [],
   categoryOptions: [],

@@ -106,6 +106,7 @@ import {
   lockClosedOutline,
   moonOutline,
   navigateOutline,
+  notificationsOffOutline,
   notificationsOutline,
   paperPlaneOutline,
   pricetagOutline,
@@ -129,8 +130,11 @@ import {
   storefrontOutline,
   sunnyOutline,
   timeOutline,
+  toggleOutline,
   trashOutline,
   trendingDownOutline,
+  trendingUpOutline,
+  rocketOutline,
   warning,
   warningOutline
 } from 'ionicons/icons';
@@ -232,13 +236,17 @@ addIcons({
   'school-outline': schoolOutline,
   'shield-checkmark-outline': shieldCheckmarkOutline,
   'trending-down-outline': trendingDownOutline,
+  'trending-up-outline': trendingUpOutline,
+  'rocket-outline': rocketOutline,
   'reload-outline': reloadOutline,
   'images-outline': imagesOutline,
   'bar-chart-outline': barChartOutline,
   'checkmark-outline': checkmarkOutline,
   'send-outline': sendOutline,
   'alarm-outline': alarmOutline,
-  'search-outline': searchOutline
+  'search-outline': searchOutline,
+  'notifications-off-outline': notificationsOffOutline,
+  'toggle-outline': toggleOutline
 });
 
 bootstrapApplication(AppComponent, {

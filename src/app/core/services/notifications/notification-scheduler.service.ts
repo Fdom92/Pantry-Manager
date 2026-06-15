@@ -14,6 +14,7 @@ import { NotificationPermissionService } from './notification-permission.service
 import { CapacitorNotificationPlugin } from './capacitor-notification.plugin';
 import { WelcomeNotificationService } from './welcome-notification.service';
 import { RecoveryNotificationsService } from './recovery-notifications.service';
+import { buildStreakMilestoneNotification } from './definitions/streak-milestone.notification';
 import { AppPreferences, PantryItem } from '@core/models';
 
 @Injectable({ providedIn: 'root' })
@@ -86,6 +87,9 @@ export class NotificationSchedulerService {
       case NOTIFICATION_IDS.RECOVERY_D2:
       case NOTIFICATION_IDS.RECOVERY_D5:
       case NOTIFICATION_IDS.RECOVERY_D10:
+        await this.navCtrl.navigateRoot('/dashboard');
+        return;
+      case NOTIFICATION_IDS.STREAK_MILESTONE:
         await this.navCtrl.navigateRoot('/dashboard');
         return;
     }
@@ -179,6 +183,17 @@ export class NotificationSchedulerService {
     if (allIds.length) {
       await this.plugin.cancel(allIds);
     }
+  }
+
+  /** Schedule a +24h celebration push when a streak milestone is reached. */
+  async scheduleStreakMilestone(streak: number): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
+    const preferences = this.preferencesService.preferences();
+    if (!preferences.notificationsEnabled) return;
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this.translate.instant(key, params);
+    const notif = buildStreakMilestoneNotification(streak, t);
+    await this.plugin.schedule([notif]);
   }
 
   /**

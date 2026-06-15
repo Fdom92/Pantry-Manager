@@ -1,5 +1,5 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
-import { buildPlanMeta } from '@core/domain/upgrade';
+import { buildPlanMeta, sortPackagesByPreference } from '@core/domain/upgrade';
 import type { PlanViewModel } from '@core/models/upgrade';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -28,7 +28,11 @@ export class UpgradeStateService {
 
   private monthlyPriceValue: number | null = null;
   private annualPriceValue: number | null = null;
-  private readonly benefitKeys = ['upgrade.benefits.agent'];
+  private readonly benefitKeys = [
+    'upgrade.benefits.reposition',
+    'upgrade.benefits.waste',
+    'upgrade.benefits.analysis',
+  ];
   private readonly availablePackages: PurchasesPackage[] = [];
 
   async ionViewWillEnter(): Promise<void> {
@@ -57,7 +61,14 @@ export class UpgradeStateService {
   }
 
   async purchasePlan(pkg: PurchasesPackage | null): Promise<void> {
-    if (!pkg || this.activePurchaseId()) {
+    if (!pkg) {
+      if (!environment.production) {
+        this.revenuecat.setDevProState(true);
+        await this.goDashboard();
+      }
+      return;
+    }
+    if (this.activePurchaseId()) {
       return;
     }
     this.activePurchaseId.set(pkg.identifier);
@@ -86,10 +97,6 @@ export class UpgradeStateService {
   }
 
   private async loadAvailablePackages(): Promise<void> {
-    if (!environment.production) {
-      this.planOptions.set(this.buildMockPlanOptions());
-      return;
-    }
     await withSignalFlag(this.isLoadingPlans, async () => {
       const packages = await this.revenuecat.getAvailablePackages();
       if (this.lifecycle.isDestroyed()) {
@@ -99,60 +106,30 @@ export class UpgradeStateService {
     });
   }
 
-  private buildMockPlanOptions(): PlanViewModel[] {
-    return [
-      {
-        id: 'mock_monthly',
-        type: PACKAGE_TYPE.MONTHLY,
-        title: this.translate.instant('upgrade.plans.monthly'),
-        subtitle: '',
-        price: '€3.99',
-        periodLabel: this.translate.instant('upgrade.plans.perMonth'),
-        badgeLabel: null,
-        savingsLabel: null,
-        trialLabel: this.translate.instant('upgrade.plans.trialFree'),
-        ctaLabel: this.translate.instant('upgrade.actions.startTrial'),
-        benefits: this.benefitKeys.map(k => this.translate.instant(k)),
-        highlight: false,
-      },
-      {
-        id: 'mock_annual',
-        type: PACKAGE_TYPE.ANNUAL,
-        title: this.translate.instant('upgrade.plans.annual'),
-        subtitle: '',
-        price: '€29.99',
-        periodLabel: this.translate.instant('upgrade.plans.perYear'),
-        badgeLabel: this.translate.instant('upgrade.plans.badgeBestValue'),
-        savingsLabel: this.translate.instant('upgrade.plans.savings', { value: '37' }),
-        trialLabel: null,
-        ctaLabel: this.translate.instant('upgrade.actions.select'),
-        benefits: this.benefitKeys.map(k => this.translate.instant(k)),
-        highlight: true,
-      },
-    ];
-  }
-
   private findPackageById(identifier: string): PurchasesPackage | null {
     const match = this.availablePackages.find(p => p.identifier === identifier);
     return match ?? null;
   }
 
   private buildPlanOptions(packages: PurchasesPackage[]): void {
-    this.availablePackages.splice(0, this.availablePackages.length, ...packages);
+    // Highlighted annual plan renders first (above the fold).
+    const ordered = sortPackagesByPreference(packages, [PACKAGE_TYPE.ANNUAL, PACKAGE_TYPE.MONTHLY]);
+    this.availablePackages.splice(0, this.availablePackages.length, ...ordered);
     this.monthlyPriceValue = null;
     this.annualPriceValue = null;
 
-    const plans = packages.map(pkg => {
+    // Collect prices before mapping: annual savings % needs the monthly price
+    // regardless of package order.
+    for (const pkg of ordered) {
       if (pkg.packageType === PACKAGE_TYPE.MONTHLY && pkg.product?.price) {
         this.monthlyPriceValue = pkg.product.price;
       }
       if (pkg.packageType === PACKAGE_TYPE.ANNUAL && pkg.product?.price) {
         this.annualPriceValue = pkg.product.price;
       }
-      return this.toPlanViewModel(pkg);
-    });
+    }
 
-    this.planOptions.set(plans);
+    this.planOptions.set(ordered.map(pkg => this.toPlanViewModel(pkg)));
   }
 
   private toPlanViewModel(pkg: PurchasesPackage): PlanViewModel {

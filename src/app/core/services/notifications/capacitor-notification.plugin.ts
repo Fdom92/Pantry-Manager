@@ -36,7 +36,7 @@ export class CapacitorNotificationPlugin implements INotificationPlugin {
         id: n.id,
         title: n.title,
         body: n.body,
-        schedule: { at: n.scheduleAt },
+        schedule: { at: n.scheduleAt, allowWhileIdle: true },
         channelId: NOTIFICATION_CHANNEL_ID,
         extra: n.extra ?? undefined,
       })),

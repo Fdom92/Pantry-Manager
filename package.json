@@ -1,6 +1,6 @@
 {
   "name": "pantrymind",
-  "version": "4.6",
+  "version": "4.7",
   "author": "Fernando del olmo",
   "homepage": "https://ferolmo.com/",
   "scripts": {
@@ -38,6 +38,7 @@
     "@capacitor/preferences": "^7.0.2",
     "@capacitor/share": "^7.0.2",
     "@capacitor/status-bar": "7.0.3",
+    "@capawesome/capacitor-app-update": "^7.2.0",
     "@ionic/angular": "^8.0.0",
     "@ngx-translate/core": "^16.0.4",
     "@ngx-translate/http-loader": "^16.0.1",

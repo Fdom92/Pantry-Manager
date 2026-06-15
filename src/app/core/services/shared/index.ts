@@ -4,3 +4,4 @@ export * from './language.service';
 export * from './logger.service';
 export * from './share.service';
 export * from './storage.service';
+export * from './local-storage.service';

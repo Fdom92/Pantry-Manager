@@ -34,9 +34,13 @@ import {
   computePatternSignals,
   computeProductSignals,
 } from '@core/domain/insights/insights-pro-payload.domain';
+import { computeWasteSummary, type WasteSummary } from '@core/domain/insights/waste.domain';
+import { computeRepositionPredictions, type RepositionPrediction } from '@core/domain/insights/reposition.domain';
 import type { PantryEvent } from '@core/models/events';
+import { ListManualItemsStore } from '../list/list-manual-items.store';
+import { normalizeLowercase } from '@core/utils/normalization.util';
 
-export type { ActivityMetrics, DistributionMetrics, InventorySnapshot };
+export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary, RepositionPrediction };
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -49,6 +53,7 @@ export class InsightsStateService {
   private readonly llmClient = inject(InsightsLlmClientService);
   private readonly languageService = inject(LanguageService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly manualItemsStore = inject(ListManualItemsStore);
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
@@ -98,14 +103,55 @@ export class InsightsStateService {
     return computeFoodCoverage(activeItems);
   });
 
+  readonly wasteSummary = computed<WasteSummary>(() =>
+    computeWasteSummary(this.events(), new Date(), 30)
+  );
+
+  readonly repositionPredictions = computed<RepositionPrediction[]>(() => {
+    const inList = new Set(
+      this.manualItemsStore.manualItems().map(m => normalizeLowercase(m.name))
+    );
+    return computeRepositionPredictions(this.pantryStore.items(), this.events(), new Date())
+      .filter(p => p.daysToOut <= 30 && !inList.has(normalizeLowercase(p.productName)));
+  });
+
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
-  async ionViewWillEnter(): Promise<void> {
+  readonly isEmpty = computed<boolean>(() => {
+    const items = this.pantryStore.items();
+    if (items.length === 0) return true;
+    const sevenDaysAgo = Date.now() - 7 * 86_400_000;
+    const recentEvents = this.events().filter(e => new Date(e.timestamp).getTime() >= sevenDaysAgo);
+    return recentEvents.length < 5;
+  });
+
+  addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): void {
+    this.manualItemsStore.addManualItem(p.productName, 'preset');
+    this.analytics.track(ANALYTICS_EVENTS.REPO_PREDICTION_ADDED_TO_LIST, {
+      daysToOut: p.daysToOut,
+      confidence: p.confidence,
+      surface,
+    });
+  }
+
+  /**
+   * Loads pantry + events into local signals. Safe to call multiple times —
+   * `PantryStore.loadAll` is cached at the store layer, the event log fetch
+   * re-runs each call, and no analytics events fire here. Use this from
+   * surfaces outside the insights tab (e.g. the dashboard waste tracker card)
+   * that need data without triggering the `insights_viewed` paywall event.
+   */
+  async loadEvents(): Promise<void> {
     await this.pantryStore.loadAll();
     this.isLoadingEvents.set(true);
     const loaded = await this.eventLog.listEvents();
     this.events.set(loaded);
     this.isLoadingEvents.set(false);
+  }
+
+  async ionViewWillEnter(): Promise<void> {
+    await this.loadEvents();
+    const loaded = this.events();
 
     this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_VIEWED, {
       is_pro: this.isPro(),

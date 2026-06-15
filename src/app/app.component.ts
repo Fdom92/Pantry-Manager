@@ -1,16 +1,19 @@
-import { Component, inject } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { App as CapacitorApp } from '@capacitor/app';
-import { STORAGE_KEYS } from '@core/constants';
 import { PantryQueryService } from '@core/services/pantry';
-import { MigrationPantryService } from '@core/services/migration/migration-pantry.service';
+import { LocalStorageService } from '@core/services/shared';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
 import { RecoveryNotificationsService } from '@core/services/notifications/recovery-notifications.service';
 import { SyncService } from '@core/services/sync/sync.service';
 import { AnalyticsService } from '@core/services/analytics';
+import { AppUpdateService } from '@core/services/app-update';
+import { StreakStateService, StreakMilestoneService } from '@core/services/retention';
 import { ANALYTICS_EVENTS } from '@core/constants';
+// STORAGE_KEYS removed: callers go through LocalStorageService.
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
@@ -22,10 +25,11 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 })
 export class AppComponent {
   private readonly handledUrls = new Set<string>();
+  private wasProLastCheck: boolean | null = null;
 
   // DI
+  private readonly destroyRef = inject(DestroyRef);
   private readonly pantryQuery = inject(PantryQueryService);
-  private readonly pantryMigration = inject(MigrationPantryService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
@@ -33,6 +37,10 @@ export class AppComponent {
   private readonly recoveryNotif = inject(RecoveryNotificationsService);
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly localStorage = inject(LocalStorageService);
+  private readonly appUpdate = inject(AppUpdateService);
+  private readonly streak = inject(StreakStateService);
+  private readonly streakMilestone = inject(StreakMilestoneService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -46,6 +54,20 @@ export class AppComponent {
    * cardinality low and stable in PostHog.
    */
   private subscribeToNavigation(): void {
+    // Blur the active element before the transition begins. Ionic flags the
+    // outgoing page with `aria-hidden="true"` (the `ion-page-hidden` class),
+    // and the browser logs a violation if a descendant of that page still
+    // owns focus — typically the tab-bar button the user just tapped.
+    this.router.events
+      .pipe(filter((evt): evt is NavigationStart => evt instanceof NavigationStart))
+      .subscribe(() => {
+        const el = (typeof document !== 'undefined' ? document.activeElement : null) as
+          | (HTMLElement | null);
+        if (el && typeof el.blur === 'function') {
+          el.blur();
+        }
+      });
+
     this.router.events
       .pipe(filter((evt): evt is NavigationEnd => evt instanceof NavigationEnd))
       .subscribe((evt) => {
@@ -57,10 +79,15 @@ export class AppComponent {
 
   private async initializeApp(): Promise<void> {
     await this.initializeRevenueCat();
+    await this.streak.bootstrap();
+    this.streakMilestone.bootstrap();
     await this.analytics.bootstrap();
     this.analytics.track(ANALYTICS_EVENTS.APP_OPEN);
+    // Ask Google Play whether a newer build is available. Fire-and-forget
+    // so the rest of the boot sequence is never blocked by a slow store
+    // check. The service no-ops on web / non-native platforms.
+    void this.appUpdate.checkAndPrompt();
     await this.pantryQuery.initialize();
-    await this.pantryMigration.migrateIfNeeded();
     await this.pantryQuery.ensureFirstPageLoaded();
     this.pantryQuery.startBackgroundLoad();
     await this.notificationScheduler.scheduleAll();
@@ -108,6 +135,7 @@ export class AppComponent {
   private async initializeRevenueCat(): Promise<void> {
     const userId = this.getOrCreateUserId();
     await this.revenuecat.init(userId);
+    this.detectTrialExpiry();
 
     // Foreground/background bookkeeping: tracks "session" boundaries from the
     // analytics point of view. On Capacitor, "closing" the app from the user
@@ -120,37 +148,59 @@ export class AppComponent {
         lastForegroundAt = Date.now();
         void this.recoveryNotif.cancelRecoveryWindow();
         await this.revenuecat.restore();
+        this.detectTrialExpiry();
         await this.notificationScheduler.scheduleAll();
+        void this.streak.bootstrap();
       } else {
         this.analytics.track(ANALYTICS_EVENTS.APP_BACKGROUNDED, {
           session_duration_s: Math.round((Date.now() - lastForegroundAt) / 1000),
         });
       }
     });
+
+    this.revenuecat.isPro$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.detectTrialExpiry());
   }
 
   private getOrCreateUserId(): string {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.REVENUECAT_USER_ID);
-      if (stored) return stored;
-      const generated = (crypto?.randomUUID?.() ?? `user-${Date.now()}`);
-      localStorage.setItem(STORAGE_KEYS.REVENUECAT_USER_ID, generated);
-      return generated;
-    } catch {
-      return 'local-user';
-    }
+    const stored = this.localStorage.revenuecat.getUserId();
+    if (stored) return stored;
+    const generated = (crypto?.randomUUID?.() ?? `user-${Date.now()}`);
+    this.localStorage.revenuecat.setUserId(generated);
+    return generated;
   }
 
   private redirectToFirstRunFlows(): void {
     try {
-      const hasSeenOnboarding = localStorage.getItem(STORAGE_KEYS.ONBOARDING_FLAG);
       const currentUrl = this.router.url ?? '';
       const alreadyOnboarding = currentUrl.startsWith('/onboarding');
-      if (!hasSeenOnboarding && !alreadyOnboarding) {
+      if (!this.localStorage.onboarding.isSeen() && !alreadyOnboarding) {
         void this.navCtrl.navigateRoot('/onboarding');
       }
     } catch (err) {
       console.warn('[AppComponent] first-run check failed', err);
     }
+  }
+
+  /**
+   * Fires `pro_trial_expired` exactly once after a trial-started user's PRO
+   * status flips from true to false. Idempotent across app launches via the
+   * `PRO_TRIAL_EXPIRED_FIRED` localStorage flag.
+   */
+  private detectTrialExpiry(): void {
+    const isPro = this.revenuecat.isPro();
+    const trialStartedAt = this.localStorage.pro.getTrialStartedAt();
+    const fired = this.localStorage.pro.isTrialExpiredFired();
+
+    if (!trialStartedAt || fired) {
+      this.wasProLastCheck = isPro;
+      return;
+    }
+    if (this.wasProLastCheck === true && isPro === false) {
+      this.analytics.track(ANALYTICS_EVENTS.PRO_TRIAL_EXPIRED);
+      this.localStorage.pro.markTrialExpiredFired();
+    }
+    this.wasProLastCheck = isPro;
   }
 }

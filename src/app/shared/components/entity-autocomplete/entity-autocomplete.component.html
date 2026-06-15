@@ -23,7 +23,7 @@
         size="small"
         slot="end"
         (click)="handleClearClick()"
-        aria-label="Clear">
+        [attr.aria-label]="'common.actions.clear' | translate">
         <ion-icon slot="icon-only" name="close"></ion-icon>
       </ion-button>
     }

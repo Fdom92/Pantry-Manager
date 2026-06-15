@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { classifyExpiry, getItemStatusState, isIncomplete, normalizeBatches, sumQuantities } from '@core/domain/pantry';
 import { daysUntilExpiry, generateBatchId } from '@core/utils';
+import { parseExpiryDate, parseExpiryMs } from '@core/utils/date.util';
 import type {
   BatchCountsMeta,
   BatchEntryMeta,
@@ -290,6 +291,7 @@ export class PantryViewModelService {
   }
 
   private getCalendarDaysDifference(date1: Date, date2: Date): number {
+    if (Number.isNaN(date1.getTime()) || Number.isNaN(date2.getTime())) return 0;
     // Normalize to midnight to compare only dates
     const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
     const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
@@ -305,7 +307,10 @@ export class PantryViewModelService {
       );
     }
 
-    const expiryDate = new Date(value);
+    const expiryDate = parseExpiryDate(value);
+    if (expiryDate === null) {
+      return this.translate.instant('pantry.batches.noExpiryDate');
+    }
     const now = new Date();
     const daysDiff = this.getCalendarDaysDifference(now, expiryDate);
 
@@ -407,8 +412,7 @@ export class PantryViewModelService {
     if (!batch.expirationDate) {
       return null;
     }
-    const time = new Date(batch.expirationDate).getTime();
-    return Number.isFinite(time) ? time : null;
+    return parseExpiryMs(batch.expirationDate);
   }
 
   private buildSubinfo(state: ProductStatusState, earliestDate: string | null, formattedDate: string, quantityLabel: string): string {
