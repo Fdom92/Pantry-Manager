@@ -79,8 +79,8 @@ export class AppComponent {
 
   private async initializeApp(): Promise<void> {
     await this.initializeRevenueCat();
-    await this.streak.bootstrap();
     this.streakMilestone.bootstrap();
+    await this.streak.bootstrap();
     await this.analytics.bootstrap();
     this.analytics.track(ANALYTICS_EVENTS.APP_OPEN);
     // Ask Google Play whether a newer build is available. Fire-and-forget
