@@ -568,6 +568,23 @@
             </ion-button>
           </ion-item>
 
+          <ion-item lines="none">
+            <ion-icon slot="start" class="tonal-icon tonal-icon--warning" name="person-remove-outline"></ion-icon>
+            <ion-label>
+              <h3>Mark device as internal</h3>
+              <p>Tags this PostHog person as is_internal=true — filter it out of dashboards.</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              color="warning"
+              (click)="markDeviceAsInternal()"
+              aria-label="Mark device as internal"
+            >
+              <ion-icon slot="icon-only" name="flag-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+
         </ion-list>
       </ion-card-content>
     </ion-card>
@@ -632,7 +649,7 @@
             </ion-label>
           </ion-item>
 
-          <ion-item lines="none">
+          <ion-item lines="none" (click)="onVersionTap()">
             <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="information-circle-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.info.version" | translate }}</h3>

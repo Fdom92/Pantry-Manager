@@ -37,6 +37,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import packageJson from '../../../../package.json';
 import { environment } from 'src/environments/environment';
 import { SettingsNotificationsDevStateService } from '@core/services/settings/settings-notifications-dev-state.service';
+import { AnalyticsService } from '@core/services/analytics/analytics.service';
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
 import { SettingsSkeletonComponent } from './components/settings-skeleton/settings-skeleton.component';
 import { AlertController, ToastController } from '@ionic/angular';
@@ -87,6 +88,7 @@ export class SettingsComponent {
   private readonly toastCtrl = inject(ToastController);
   private readonly localStorage = inject(LocalStorageService);
   private readonly appPreferences = inject(SettingsPreferencesService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
@@ -154,6 +156,37 @@ export class SettingsComponent {
 
     sessionStorage.setItem('sync:postReload', '1');
     window.location.href = '/dashboard';
+  }
+
+  markDeviceAsInternal(): void {
+    this.analytics.markAsInternal();
+    const id = this.analytics.getDistinctId() ?? '—';
+    void this.toastCtrl.create({
+      message: `Marked as internal. ID: ${id}`,
+      duration: 3000,
+      position: 'bottom',
+    }).then(t => t.present());
+  }
+
+  private versionTapCount = 0;
+  private versionTapTimer: ReturnType<typeof setTimeout> | null = null;
+
+  onVersionTap(): void {
+    this.versionTapCount++;
+    if (this.versionTapTimer) clearTimeout(this.versionTapTimer);
+    this.versionTapTimer = setTimeout(() => { this.versionTapCount = 0; }, 2000);
+
+    if (this.versionTapCount >= 7) {
+      this.versionTapCount = 0;
+      void this.alertCtrl.create({
+        header: 'Marcar como interno',
+        message: '¿Marcar este dispositivo como tester interno? Quedará excluido de las métricas de PostHog.',
+        buttons: [
+          { text: 'Cancelar', role: 'cancel' },
+          { text: 'Marcar', handler: () => this.markDeviceAsInternal() },
+        ],
+      }).then(a => a.present());
+    }
   }
 
   /** Pretty-print a pending notification scheduleAt ISO for the dev panel. */
