@@ -255,7 +255,7 @@
 
 @if (showCoachMark()) {
   <app-pantry-add-coach-mark
-    [targetEl]="despensaAddBtn.nativeElement"
+    [targetEl]="addBtnEl()!"
     (addRequested)="onCoachMarkAddRequested()"
     (dismissed)="onCoachMarkDismissed()">
   </app-pantry-add-coach-mark>

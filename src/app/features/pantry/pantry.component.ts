@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, OnDestroy, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, inject, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
@@ -91,7 +91,7 @@ import { LocalStorageService } from '@core/services/shared';
     PantryFreshAddModalStateService,
   ],
 })
-export class PantryComponent implements OnDestroy {
+export class PantryComponent implements AfterViewInit, OnDestroy {
   readonly facade = inject(PantryStateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -99,14 +99,25 @@ export class PantryComponent implements OnDestroy {
   private readonly coachMark = inject(CoachMarkService);
   private readonly localStorage = inject(LocalStorageService);
   @ViewChild(IonContent) private content!: IonContent;
-  @ViewChild('despensaAddBtn') readonly despensaAddBtn!: ElementRef<HTMLElement>;
+  @ViewChild('despensaAddBtn') private despensaAddBtnRef?: ElementRef<HTMLElement>;
 
   private readonly coachMarkDismissed = signal(false);
+  // Holds the button element once ViewChild is resolved (ngAfterViewInit).
+  // Signal makes showCoachMark reactive to the ref becoming available.
+  readonly addBtnEl = signal<HTMLElement | null>(null);
+
   readonly showCoachMark = computed(() =>
     !this.coachMarkDismissed() &&
+    this.addBtnEl() !== null &&
     this.localStorage.onboarding.isSeen() &&
     !this.coachMark.isShown('add_first_item')
   );
+
+  ngAfterViewInit(): void {
+    if (this.despensaAddBtnRef) {
+      this.addBtnEl.set(this.despensaAddBtnRef.nativeElement);
+    }
+  }
 
   onCoachMarkAddRequested(): void {
     this.coachMarkDismissed.set(true);
