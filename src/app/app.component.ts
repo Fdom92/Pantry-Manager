@@ -7,7 +7,6 @@ import { PantryQueryService } from '@core/services/pantry';
 import { LocalStorageService } from '@core/services/shared';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
-import { RecoveryNotificationsService } from '@core/services/notifications/recovery-notifications.service';
 import { SyncService } from '@core/services/sync/sync.service';
 import { AnalyticsService } from '@core/services/analytics';
 import { AppUpdateService } from '@core/services/app-update';
@@ -34,7 +33,6 @@ export class AppComponent {
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
   private readonly notificationScheduler = inject(NotificationSchedulerService);
-  private readonly recoveryNotif = inject(RecoveryNotificationsService);
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
@@ -91,8 +89,6 @@ export class AppComponent {
     await this.pantryQuery.ensureFirstPageLoaded();
     this.pantryQuery.startBackgroundLoad();
     await this.notificationScheduler.scheduleAll();
-    // User opened the app — recovery nudges are no longer relevant.
-    void this.recoveryNotif.cancelRecoveryWindow();
     await this.handleSyncLaunchUrl();
     this.listenForSyncIntents();
   }
@@ -146,7 +142,6 @@ export class AppComponent {
       if (state.isActive) {
         this.analytics.track(ANALYTICS_EVENTS.APP_FOREGROUNDED);
         lastForegroundAt = Date.now();
-        void this.recoveryNotif.cancelRecoveryWindow();
         await this.revenuecat.restore();
         this.detectTrialExpiry();
         await this.notificationScheduler.scheduleAll();

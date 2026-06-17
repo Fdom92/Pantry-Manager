@@ -13,7 +13,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { NotificationPermissionService } from '../notifications/notification-permission.service';
-import { RecoveryNotificationsService } from '../notifications/recovery-notifications.service';
 import { WelcomeNotificationService } from '../notifications/welcome-notification.service';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { register } from 'swiper/element/bundle';
@@ -43,7 +42,6 @@ export class OnboardingStateService {
   private readonly notificationPermission = inject(NotificationPermissionService);
   private readonly preferences = inject(SettingsPreferencesService);
   private readonly welcomeNotif = inject(WelcomeNotificationService);
-  private readonly recoveryNotif = inject(RecoveryNotificationsService);
   private readonly translate = inject(TranslateService);
   private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
@@ -214,14 +212,6 @@ export class OnboardingStateService {
       skipped: options?.skipped ?? false,
     });
     await this.bulkCreateSeedItems();
-    // Recovery window only makes sense if we can actually push to the user.
-    if (this.notificationsDecision() === 'granted') {
-      try {
-        await this.recoveryNotif.scheduleRecoveryWindow();
-      } catch {
-        // never block onboarding completion on a scheduling failure
-      }
-    }
     // First post-onboarding view = pantry so user sees their seeded products.
     // Subsequent app launches default-route back to /dashboard.
     await this.navCtrl.navigateRoot('/pantry');

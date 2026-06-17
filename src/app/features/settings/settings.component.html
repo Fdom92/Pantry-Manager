@@ -392,17 +392,9 @@
               <ion-icon name="checkmark-circle-outline" class="dev-fire-tile__icon dev-fire-tile__icon--success"></ion-icon>
               <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireWelcome' | translate }}</span>
             </button>
-            <button type="button" class="dev-fire-tile" (click)="dev.fireRecovery('d2')">
-              <ion-icon name="reload-outline" class="dev-fire-tile__icon dev-fire-tile__icon--tertiary"></ion-icon>
-              <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireRecoveryD2' | translate }}</span>
-            </button>
-            <button type="button" class="dev-fire-tile" (click)="dev.fireRecovery('d5')">
-              <ion-icon name="reload-outline" class="dev-fire-tile__icon dev-fire-tile__icon--tertiary"></ion-icon>
-              <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireRecoveryD5' | translate }}</span>
-            </button>
-            <button type="button" class="dev-fire-tile" (click)="dev.fireRecovery('d10')">
-              <ion-icon name="reload-outline" class="dev-fire-tile__icon dev-fire-tile__icon--tertiary"></ion-icon>
-              <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireRecoveryD10' | translate }}</span>
+            <button type="button" class="dev-fire-tile" (click)="dev.fireProjected()">
+              <ion-icon name="calendar-outline" class="dev-fire-tile__icon dev-fire-tile__icon--tertiary"></ion-icon>
+              <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireProjected' | translate }}</span>
             </button>
           </div>
 

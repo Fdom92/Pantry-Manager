@@ -570,6 +570,11 @@
       },
       "search": "Buscar productos"
     },
+    "coachMark": {
+      "addFirstItem": "Añade tu primer producto real",
+      "addFirstItemHint": "Toca para empezar tu despensa",
+      "ctaLabel": "Añadir producto"
+    },
     "fastAdd": {
       "groupLabel": "Añadir productos",
       "title": "Añadir productos",
@@ -1027,11 +1032,9 @@
         "fireLowStock": "Disparar 'bajo stock' en 5s",
         "fireReEngagement": "Disparar semanal en 5s",
         "fireWelcome": "Disparar bienvenida en 5s",
-        "fireRecoveryD2": "Disparar D2 en 5s",
-        "fireRecoveryD5": "Disparar D5 en 5s",
-        "fireRecoveryD10": "Disparar D10 en 5s",
+        "fireProjected": "Disparar proyectada en 5s",
         "fireSectionRegistered": "Definiciones registradas",
-        "fireSectionRetention": "Retención (bienvenida + recovery)",
+        "fireSectionRetention": "Retención (bienvenida + proyectadas)",
         "pendingTitle": "Programadas",
         "pendingEmpty": "Sin notificaciones programadas",
         "refreshPending": "Actualizar lista",

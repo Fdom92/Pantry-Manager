@@ -1,0 +1,15 @@
+<div class="coach-mark-backdrop" (click)="onBackdropTap()" role="dialog" [attr.aria-label]="'pantry.coachMark.addFirstItem' | translate">
+  <div class="coach-mark-card" (click)="$event.stopPropagation()">
+    <svg class="coach-mark-arrow" viewBox="0 0 40 32" fill="none" aria-hidden="true">
+      <path d="M20 2 L38 28 L20 22 L2 28 Z" fill="currentColor"/>
+    </svg>
+
+    <p class="coach-mark-card__title">{{ 'pantry.coachMark.addFirstItem' | translate }}</p>
+    <p class="coach-mark-card__hint">{{ 'pantry.coachMark.addFirstItemHint' | translate }}</p>
+
+    <button class="coach-mark-card__cta" (click)="onCtaTap($event)">
+      <ion-icon name="add-outline" aria-hidden="true"></ion-icon>
+      {{ 'pantry.coachMark.ctaLabel' | translate }}
+    </button>
+  </div>
+</div>

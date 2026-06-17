@@ -76,6 +76,13 @@ export class LocalStorageService {
     setEnabled: (v: boolean) => this.setBool(STORAGE_KEYS.ERROR_REPORTING_ENABLED, v),
   };
 
+  // ─── Coach marks (one-shot per-device flags) ───────────────────────────
+  readonly coachMark = {
+    isShown: (key: string) => this.getBool(`${STORAGE_KEYS.COACH_MARK_PREFIX}${key}`),
+    markShown: (key: string) => this.setBool(`${STORAGE_KEYS.COACH_MARK_PREFIX}${key}`, true),
+    reset: (key: string) => this.remove(`${STORAGE_KEYS.COACH_MARK_PREFIX}${key}`),
+  };
+
   // ─── In-app review prompt cadence ──────────────────────────────────────
   readonly review = {
     isPending: () => this.getBool(STORAGE_KEYS.REVIEW_PENDING),

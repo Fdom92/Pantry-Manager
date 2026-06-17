@@ -251,3 +251,10 @@
   </ion-modal>
 
 </ion-content>
+
+@if (showCoachMark()) {
+  <app-pantry-add-coach-mark
+    (addRequested)="onCoachMarkAddRequested()"
+    (dismissed)="onCoachMarkDismissed()">
+  </app-pantry-add-coach-mark>
+}

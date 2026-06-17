@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
@@ -38,6 +38,9 @@ import { FreshItemCardComponent } from './components/fresh-item-card/fresh-item-
 import { FreshAddModalComponent } from './components/fresh-add-modal/fresh-add-modal.component';
 import { FreshEditItemModalComponent } from './components/fresh-edit-item-modal/fresh-edit-item-modal.component';
 import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
+import { PantryAddCoachMarkComponent } from './components/add-coach-mark/add-coach-mark.component';
+import { CoachMarkService } from '@core/services/retention';
+import { LocalStorageService } from '@core/services/shared';
 
 @Component({
   selector: 'app-pantry',
@@ -71,6 +74,7 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
     FreshItemCardComponent,
     FreshAddModalComponent,
     FreshEditItemModalComponent,
+    PantryAddCoachMarkComponent,
   ],
   templateUrl: './pantry.component.html',
   styleUrls: ['./pantry.component.scss'],
@@ -92,7 +96,25 @@ export class PantryComponent implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly addModalState = inject(PantryAddModalStateService);
+  private readonly coachMark = inject(CoachMarkService);
+  private readonly localStorage = inject(LocalStorageService);
   @ViewChild(IonContent) private content!: IonContent;
+
+  private readonly coachMarkDismissed = signal(false);
+  readonly showCoachMark = computed(() =>
+    !this.coachMarkDismissed() &&
+    this.localStorage.onboarding.isSeen() &&
+    !this.coachMark.isShown('add_first_item')
+  );
+
+  onCoachMarkAddRequested(): void {
+    this.coachMarkDismissed.set(true);
+    this.addModalState.openAddModal();
+  }
+
+  onCoachMarkDismissed(): void {
+    this.coachMarkDismissed.set(true);
+  }
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
