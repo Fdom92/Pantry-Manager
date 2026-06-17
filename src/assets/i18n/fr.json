@@ -495,7 +495,8 @@
       "noExpiry": "Sans date: {{count}} sur {{total}} produits"
     },
     "coverage": {
-      "title": "Couverture estimée"
+      "title": "Couverture estimée",
+      "household": "Personnes à la maison"
     },
     "activity": {
       "title": "30 derniers jours",
@@ -569,6 +570,11 @@
         "pendientes": "En attente"
       },
       "search": "Rechercher des produits"
+    },
+    "coachMark": {
+      "addFirstItem": "Ajoute ton premier vrai produit",
+      "addFirstItemHint": "Appuie pour démarrer ton garde-manger",
+      "ctaLabel": "Ajouter un produit"
     },
     "fastAdd": {
       "groupLabel": "Ajouter des produits",
@@ -1027,11 +1033,9 @@
         "fireLowStock": "Déclencher 'stock bas' dans 5s",
         "fireReEngagement": "Déclencher hebdomadaire dans 5s",
         "fireWelcome": "Déclencher bienvenue dans 5s",
-        "fireRecoveryD2": "Déclencher D2 dans 5s",
-        "fireRecoveryD5": "Déclencher D5 dans 5s",
-        "fireRecoveryD10": "Déclencher D10 dans 5s",
+        "fireProjected": "Déclencher projetée dans 5s",
         "fireSectionRegistered": "Définitions enregistrées",
-        "fireSectionRetention": "Rétention (bienvenue + récupération)",
+        "fireSectionRetention": "Rétention (bienvenue + projections)",
         "pendingTitle": "Programmées",
         "pendingEmpty": "Aucune notification programmée",
         "refreshPending": "Rafraîchir la liste",

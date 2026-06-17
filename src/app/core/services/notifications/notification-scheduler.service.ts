@@ -4,7 +4,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { NotificationContext, ScheduledNotification } from '@core/models/notifications';
-import { ANALYTICS_EVENTS, NOTIFICATION_IDS } from '@core/constants';
+import { ANALYTICS_EVENTS, NOTIFICATION_IDS, PROJECTED_NOTIFICATION_IDS } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { PantryNavigationPresetService } from '@core/services/pantry/pantry-navigation-preset.service';
@@ -13,7 +13,6 @@ import { NotificationRegistryService } from './notification-registry.service';
 import { NotificationPermissionService } from './notification-permission.service';
 import { CapacitorNotificationPlugin } from './capacitor-notification.plugin';
 import { WelcomeNotificationService } from './welcome-notification.service';
-import { RecoveryNotificationsService } from './recovery-notifications.service';
 import { buildStreakMilestoneNotification } from './definitions/streak-milestone.notification';
 import { AppPreferences, PantryItem } from '@core/models';
 
@@ -28,7 +27,6 @@ export class NotificationSchedulerService {
   private readonly navCtrl = inject(NavController);
   private readonly translate = inject(TranslateService);
   private readonly welcomeNotif = inject(WelcomeNotificationService);
-  private readonly recoveryNotif = inject(RecoveryNotificationsService);
   private readonly analytics = inject(AnalyticsService);
 
   private isScheduling = false;
@@ -84,11 +82,6 @@ export class NotificationSchedulerService {
         await this.navCtrl.navigateRoot('/pantry', { queryParams });
         return;
       }
-      case NOTIFICATION_IDS.RECOVERY_D2:
-      case NOTIFICATION_IDS.RECOVERY_D5:
-      case NOTIFICATION_IDS.RECOVERY_D10:
-        await this.navCtrl.navigateRoot('/dashboard');
-        return;
       case NOTIFICATION_IDS.STREAK_MILESTONE:
         await this.navCtrl.navigateRoot('/dashboard');
         return;
@@ -113,12 +106,8 @@ export class NotificationSchedulerService {
       const preferences = this.preferencesService.preferences();
 
       if (!preferences.notificationsEnabled) {
-        // Master off — kill registered notifs AND retention nudges (welcome +
-        // recovery window). Trust the user's preference; don't honour scheduled
-        // retention pushes that contradict the silent state.
         await this.cancelAll();
         await this.welcomeNotif.cancelWelcomeNotification();
-        await this.recoveryNotif.cancelRecoveryWindow();
         return;
       }
 
@@ -153,24 +142,8 @@ export class NotificationSchedulerService {
       const t = (key: string, params?: Record<string, unknown>): string =>
         this.translate.instant(key, params);
 
-      // Cancel all known IDs before rescheduling
       await this.cancelAll();
-
-      const winner = this.evaluateWinningNotification(preferences, items, now, t);
-      if (!winner) return;
-
-      await this.plugin.schedule([{
-        id: winner.id,
-        title: winner.title,
-        body: winner.body,
-        scheduleAt: new Date(winner.scheduleAt),
-      }]);
-      this.analytics.track(ANALYTICS_EVENTS.NOTIFICATION_SCHEDULED, {
-        notification_id: winner.id,
-        offset_min: Math.round(
-          (new Date(winner.scheduleAt).getTime() - Date.now()) / 60000
-        ),
-      });
+      await this.scheduleProjectedNotifications(items, preferences, now, t);
     } catch (err) {
       console.error('[NotificationSchedulerService] scheduleAll error', err);
     } finally {
@@ -179,10 +152,51 @@ export class NotificationSchedulerService {
   }
 
   async cancelAll(): Promise<void> {
-    const allIds = this.registry.getAll().map(d => d.id);
+    const registryIds = this.registry.getAll().map(d => d.id);
+    const allIds = [...registryIds, ...PROJECTED_NOTIFICATION_IDS];
     if (allIds.length) {
       await this.plugin.cancel(allIds);
     }
+  }
+
+  private async scheduleProjectedNotifications(
+    items: PantryItem[],
+    preferences: AppPreferences,
+    now: Date,
+    t: (key: string, params?: Record<string, unknown>) => string,
+    daysAhead = 7
+  ): Promise<void> {
+    const toSchedule: Array<{
+      id: number;
+      title: string;
+      body: string;
+      scheduleAt: Date;
+      extra?: Record<string, unknown>;
+    }> = [];
+
+    for (let day = 1; day <= daysAhead; day++) {
+      const targetDate = new Date(now);
+      targetDate.setDate(targetDate.getDate() + day);
+      targetDate.setHours(9, 0, 0, 0);
+
+      const winner = this.evaluateWinningNotification(preferences, items, targetDate, t);
+      if (!winner) continue;
+
+      toSchedule.push({
+        id: PROJECTED_NOTIFICATION_IDS[day - 1],
+        title: winner.title,
+        body: winner.body,
+        scheduleAt: targetDate,
+        extra: winner.extra,
+      });
+    }
+
+    if (!toSchedule.length) return;
+
+    await this.plugin.schedule(toSchedule);
+    this.analytics.track(ANALYTICS_EVENTS.NOTIFICATION_SCHEDULED, {
+      count: toSchedule.length,
+    });
   }
 
   /** Schedule a +24h celebration push when a streak milestone is reached. */

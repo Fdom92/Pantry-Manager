@@ -76,6 +76,19 @@ export class LocalStorageService {
     setEnabled: (v: boolean) => this.setBool(STORAGE_KEYS.ERROR_REPORTING_ENABLED, v),
   };
 
+  // ─── Household size (scales food-coverage estimate) ───────────────────
+  readonly householdSize = {
+    get: () => this.getNumber(STORAGE_KEYS.HOUSEHOLD_SIZE) ?? 1,
+    set: (n: number) => this.setNumber(STORAGE_KEYS.HOUSEHOLD_SIZE, n),
+  };
+
+  // ─── Coach marks (one-shot per-device flags) ───────────────────────────
+  readonly coachMark = {
+    isShown: (key: string) => this.getBool(`${STORAGE_KEYS.COACH_MARK_PREFIX}${key}`),
+    markShown: (key: string) => this.setBool(`${STORAGE_KEYS.COACH_MARK_PREFIX}${key}`, true),
+    reset: (key: string) => this.remove(`${STORAGE_KEYS.COACH_MARK_PREFIX}${key}`),
+  };
+
   // ─── In-app review prompt cadence ──────────────────────────────────────
   readonly review = {
     isPending: () => this.getBool(STORAGE_KEYS.REVIEW_PENDING),

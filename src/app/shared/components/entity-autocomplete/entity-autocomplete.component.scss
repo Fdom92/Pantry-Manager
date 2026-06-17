@@ -6,6 +6,10 @@
   position: relative;
 }
 
+.autocomplete-input {
+  --background: transparent;
+}
+
 .autocomplete-clear {
   --padding-start: var(--app-theme-spacing-xs);
   --padding-end: var(--app-theme-spacing-xs);

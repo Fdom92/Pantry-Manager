@@ -20,6 +20,15 @@ function isPouchDbError(err: unknown): err is PouchDbError {
   return typeof (err as any)?.status === 'number';
 }
 
+function isIdbConnectionClosingError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  return (
+    err.name === 'InvalidStateError' ||
+    err.message.includes('connection is closing') ||
+    err.message.includes('Failed to execute \'transaction\'')
+  );
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -37,6 +46,23 @@ export class StorageService<T extends BaseDoc> {
     this.db = new PouchDB<T>(APP_DB_NAME, { auto_compaction: true });
   }
 
+  private reopenDatabase(): void {
+    this.db = new PouchDB<T>(APP_DB_NAME, { auto_compaction: true });
+    this.logger.warn('[Storage] IDB connection closed — reopened PouchDB instance');
+  }
+
+  private async withRetry<R>(op: () => Promise<R>): Promise<R> {
+    try {
+      return await op();
+    } catch (err: unknown) {
+      if (isIdbConnectionClosingError(err)) {
+        this.reopenDatabase();
+        return await op();
+      }
+      throw err;
+    }
+  }
+
   /**
    * save - public alias for upsert (create/update).
    * Updates when it exists; otherwise creates it.
@@ -50,6 +76,10 @@ export class StorageService<T extends BaseDoc> {
    * upsert - internal create or update with timestamps
    */
   async upsert(doc: T): Promise<T> {
+    return this.withRetry(() => this._upsert(doc));
+  }
+
+  private async _upsert(doc: T): Promise<T> {
     const withId = this.ensureDocumentId(doc);
     const docId = withId._id;
     const now = new Date().toISOString();
@@ -93,26 +123,30 @@ export class StorageService<T extends BaseDoc> {
    * get - fetch by id (null when it does not exist).
    */
   async get(id: string): Promise<T | null> {
-    try {
-      return await this.db.get(id);
-    } catch (err: unknown) {
-      if (isPouchDbError(err) && err.status === 404) return null;
-      throw err;
-    }
+    return this.withRetry(async () => {
+      try {
+        return await this.db.get(id);
+      } catch (err: unknown) {
+        if (isPouchDbError(err) && err.status === 404) return null;
+        throw err;
+      }
+    });
   }
 
   /**
    * remove - delete by id (app-level soft deletes can wrap this).
    */
   async remove(id: string): Promise<boolean> {
-    try {
-      const doc = await this.db.get(id);
-      await this.db.remove(doc);
-      return true;
-    } catch (err) {
-      this.logger.error('remove error', err);
-      return false;
-    }
+    return this.withRetry(async () => {
+      try {
+        const doc = await this.db.get(id);
+        await this.db.remove(doc);
+        return true;
+      } catch (err) {
+        this.logger.error('remove error', err);
+        return false;
+      }
+    });
   }
 
   /**
@@ -120,30 +154,29 @@ export class StorageService<T extends BaseDoc> {
    * If type is omitted, returns all docs (include_docs).
    */
   async all(type?: string): Promise<T[]> {
-    if (!type) {
-      const result = await this.db.allDocs<T>({ include_docs: true });
-      return result.rows.map(r => r.doc!).filter(Boolean);
-    }
-
-    await this.ensureIndex(['type']);
-    const docs: T[] = [];
-    let skip = 0;
-
-    // Stream the entire result set in deterministic batches so callers never hit an artificial cap.
-    while (true) {
-      const res = await this.db.find({
-        selector: { type },
-        skip,
-        limit: this.LIST_CHUNK_SIZE,
-      });
-      docs.push(...res.docs);
-      if (res.docs.length < this.LIST_CHUNK_SIZE) {
-        break;
+    return this.withRetry(async () => {
+      if (!type) {
+        const result = await this.db.allDocs<T>({ include_docs: true });
+        return result.rows.map(r => r.doc!).filter(Boolean);
       }
-      skip += res.docs.length;
-    }
 
-    return docs;
+      await this.ensureIndex(['type']);
+      const docs: T[] = [];
+      let skip = 0;
+
+      while (true) {
+        const res = await this.db.find({
+          selector: { type },
+          skip,
+          limit: this.LIST_CHUNK_SIZE,
+        });
+        docs.push(...res.docs);
+        if (res.docs.length < this.LIST_CHUNK_SIZE) break;
+        skip += res.docs.length;
+      }
+
+      return docs;
+    });
   }
 
   /**
@@ -176,16 +209,18 @@ export class StorageService<T extends BaseDoc> {
    * findByField - query by any indexed field.
    */
   async findByField<K extends keyof T>(field: K, value: T[K]): Promise<T[]> {
-    try {
-      await this.ensureIndex([ field as string ]);
-      const result = await this.db.find({
-        selector: { [field as string]: value },
-      });
-      return result.docs;
-    } catch (err) {
-      this.logger.error('findByField error', err);
-      return [];
-    }
+    return this.withRetry(async () => {
+      try {
+        await this.ensureIndex([field as string]);
+        const result = await this.db.find({
+          selector: { [field as string]: value },
+        });
+        return result.docs;
+      } catch (err) {
+        this.logger.error('findByField error', err);
+        return [];
+      }
+    });
   }
 
   /**
@@ -228,6 +263,10 @@ export class StorageService<T extends BaseDoc> {
   }
 
   async bulkSave(docs: T[]): Promise<T[]> {
+    return this.withRetry(() => this._bulkSave(docs));
+  }
+
+  private async _bulkSave(docs: T[]): Promise<T[]> {
     const now = new Date().toISOString();
     const prepared = docs.map(doc => {
       const withId = this.ensureDocumentId(doc);

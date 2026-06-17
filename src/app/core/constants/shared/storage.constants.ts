@@ -52,6 +52,10 @@ export const STORAGE_KEYS = {
   PRO_TRIAL_EXPIRED_FIRED: 'pro:trial:expiredFired',
   /** Pending manual shopping list items — survives app close, cleared on buy/remove. */
   SHOPPING_MANUAL_ITEMS: 'shopping:manualItems',
+  /** One-shot flags for coach marks — keyed by CoachMarkKey. */
+  COACH_MARK_PREFIX: 'coachMark:',
+  /** Number of people in household, used to scale food-coverage estimate. */
+  HOUSEHOLD_SIZE: 'insights:householdSize',
 } as const;
 
 export const DEFAULT_HOUSEHOLD_ID = 'household:default';

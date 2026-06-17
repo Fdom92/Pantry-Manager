@@ -7,6 +7,9 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonLabel,
+  IonSegment,
+  IonSegmentButton,
   IonSkeletonText,
   IonTitle,
   IonToolbar,
@@ -32,6 +35,9 @@ import { InsightsEmptyStateComponent } from './components/insights-empty-state/i
     IonContent,
     IonIcon,
     IonButton,
+    IonLabel,
+    IonSegment,
+    IonSegmentButton,
     IonSkeletonText,
     IonButtons,
     WasteTrackerCardComponent,
@@ -82,6 +88,12 @@ export class InsightsComponent {
 
   getFoodTypeLabel(foodType: FoodType): string {
     return `pantry.form.foodType.${foodType}`;
+  }
+
+  readonly householdSizes = [1, 2, 3, 4] as const;
+
+  setHouseholdSize(n: number): void {
+    this.facade.setHouseholdSize(n);
   }
 
   readonly proSections = [

@@ -8,6 +8,7 @@ import { InsightsCacheStorageService } from './insights-cache-storage.service';
 import { InsightsLlmClientService } from './insights-llm-client.service';
 import type { InsightsClientError } from './insights-llm-client.service';
 import { LanguageService } from '../shared/language.service';
+import { LocalStorageService } from '../shared/local-storage.service';
 import {
   computeActivityMetrics,
   computeDistribution,
@@ -54,9 +55,11 @@ export class InsightsStateService {
   private readonly languageService = inject(LanguageService);
   private readonly analytics = inject(AnalyticsService);
   private readonly manualItemsStore = inject(ListManualItemsStore);
+  private readonly localStorage = inject(LocalStorageService);
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
+  readonly householdSize = signal(this.localStorage.householdSize.get());
 
   readonly staleCount = computed((): number => {
     const now = Date.now();
@@ -83,7 +86,7 @@ export class InsightsStateService {
   );
 
   readonly activityMetrics = computed((): ActivityMetrics =>
-    computeActivityMetrics(this.events(), 30, new Date(), this.inventorySnapshot().active)
+    computeActivityMetrics(this.events(), 30, new Date())
   );
 
   readonly distribution = computed((): DistributionMetrics =>
@@ -100,8 +103,13 @@ export class InsightsStateService {
     const activeItems = this.pantryStore.items().filter(
       i => getItemStatusState(i, now, NEAR_EXPIRY_WINDOW_DAYS) !== 'expired'
     );
-    return computeFoodCoverage(activeItems);
+    return computeFoodCoverage(activeItems, this.householdSize(), now);
   });
+
+  setHouseholdSize(n: number): void {
+    this.householdSize.set(n);
+    this.localStorage.householdSize.set(n);
+  }
 
   readonly wasteSummary = computed<WasteSummary>(() =>
     computeWasteSummary(this.events(), new Date(), 30)

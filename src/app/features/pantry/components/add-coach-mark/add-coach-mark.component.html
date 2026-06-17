@@ -1,0 +1,15 @@
+<div class="coach-overlay" (click)="onBackdropTap()" role="dialog" [attr.aria-label]="'pantry.coachMark.addFirstItem' | translate">
+
+  @if (hasRect()) {
+    <!-- Spotlight ring — box-shadow creates the dark overlay "hole" -->
+    <div class="coach-spotlight" [style]="spotlightStyle()"></div>
+
+    <!-- Tooltip bubble above the button -->
+    <div class="coach-tooltip" [style]="tooltipStyle()" (click)="onTooltipTap($event)">
+      <p class="coach-tooltip__title">{{ 'pantry.coachMark.addFirstItem' | translate }}</p>
+      <p class="coach-tooltip__hint">{{ 'pantry.coachMark.addFirstItemHint' | translate }}</p>
+      <div class="coach-tooltip__arrow"></div>
+    </div>
+  }
+
+</div>

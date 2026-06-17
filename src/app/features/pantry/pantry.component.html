@@ -115,6 +115,7 @@
             <ion-icon [name]="facade.groupByCategory() ? 'list-outline' : 'apps-outline'"></ion-icon>
           </button>
           <button
+            #despensaAddBtn
             class="pantry-section__add-btn"
             [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
             (click)="facade.openAddModal()">
@@ -251,3 +252,11 @@
   </ion-modal>
 
 </ion-content>
+
+@if (showCoachMark()) {
+  <app-pantry-add-coach-mark
+    [targetEl]="addBtnEl()!"
+    (addRequested)="onCoachMarkAddRequested()"
+    (dismissed)="onCoachMarkDismissed()">
+  </app-pantry-add-coach-mark>
+}
