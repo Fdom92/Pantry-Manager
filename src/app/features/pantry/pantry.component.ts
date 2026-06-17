@@ -110,7 +110,8 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
     !this.coachMarkDismissed() &&
     this.addBtnEl() !== null &&
     this.localStorage.onboarding.isSeen() &&
-    !this.coachMark.isShown('add_first_item')
+    !this.coachMark.isShown('add_first_item') &&
+    this.facade.summary().total === 0
   );
 
   ngAfterViewInit(): void {

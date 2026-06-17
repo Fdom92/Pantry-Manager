@@ -54,6 +54,8 @@ export const STORAGE_KEYS = {
   SHOPPING_MANUAL_ITEMS: 'shopping:manualItems',
   /** One-shot flags for coach marks — keyed by CoachMarkKey. */
   COACH_MARK_PREFIX: 'coachMark:',
+  /** Number of people in household, used to scale food-coverage estimate. */
+  HOUSEHOLD_SIZE: 'insights:householdSize',
 } as const;
 
 export const DEFAULT_HOUSEHOLD_ID = 'household:default';

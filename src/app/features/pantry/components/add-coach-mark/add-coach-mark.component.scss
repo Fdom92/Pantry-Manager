@@ -12,8 +12,9 @@
 
 .coach-spotlight {
   position: fixed;
+  z-index: 1;
   border-radius: 10px;
-  // Huge inset shadow creates the dark overlay with a "hole" around the button
+  // Huge spread shadow creates the dark overlay with a "hole" around the button
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.72);
   border: 2px solid var(--ion-color-primary);
   pointer-events: none;
@@ -22,11 +23,12 @@
 
 .coach-tooltip {
   position: fixed;
+  z-index: 2;
   max-width: 220px;
   background: var(--ion-card-background);
   border-radius: 14px;
   padding: 12px 14px 14px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.07);
   cursor: pointer;
 
   &__title {
@@ -54,6 +56,21 @@
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
     border-top: 8px solid var(--ion-card-background);
+  }
+}
+
+// Dark mode: card-background is #1e1e1e (barely visible against the dark overlay).
+// Lift the tooltip surface and add a visible border so it reads as elevated.
+:host-context(.ion-palette-dark),
+:host-context(.dark),
+:host-context([data-theme='dark']) {
+  .coach-tooltip {
+    background: #2e2e2e;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    &__arrow {
+      border-top-color: #2e2e2e;
+    }
   }
 }
 

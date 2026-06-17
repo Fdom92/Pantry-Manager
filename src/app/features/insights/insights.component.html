@@ -74,6 +74,19 @@
               <span class="coverage-card__hint">{{ 'dashboard.foodCoverage.hint' | translate }}</span>
             </div>
           </div>
+          <div class="household-selector">
+            <span class="household-selector__label">{{ 'insights.coverage.household' | translate }}</span>
+            <ion-segment
+              class="household-segment"
+              [value]="facade.householdSize().toString()"
+              (ionChange)="setHouseholdSize(+$event.detail.value!)">
+              @for (n of householdSizes; track n) {
+                <ion-segment-button [value]="n.toString()">
+                  <ion-label>{{ n === 4 ? '4+' : n }}</ion-label>
+                </ion-segment-button>
+              }
+            </ion-segment>
+          </div>
         </section>
       }
 

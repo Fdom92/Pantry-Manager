@@ -495,7 +495,8 @@
       "noExpiry": "Senza data: {{count}} su {{total}} prodotti"
     },
     "coverage": {
-      "title": "Copertura stimata"
+      "title": "Copertura stimata",
+      "household": "Persone in casa"
     },
     "activity": {
       "title": "Ultimi 30 giorni",

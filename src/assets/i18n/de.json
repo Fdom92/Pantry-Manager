@@ -495,7 +495,8 @@
       "noExpiry": "Kein Datum: {{count}} von {{total}} Produkten"
     },
     "coverage": {
-      "title": "Geschätzte Reichweite"
+      "title": "Geschätzte Reichweite",
+      "household": "Personen im Haushalt"
     },
     "activity": {
       "title": "Letzte 30 Tage",
