@@ -1,15 +1,15 @@
-<div class="coach-mark-backdrop" (click)="onBackdropTap()" role="dialog" [attr.aria-label]="'pantry.coachMark.addFirstItem' | translate">
-  <div class="coach-mark-card" (click)="$event.stopPropagation()">
-    <svg class="coach-mark-arrow" viewBox="0 0 40 32" fill="none" aria-hidden="true">
-      <path d="M20 2 L38 28 L20 22 L2 28 Z" fill="currentColor"/>
-    </svg>
+<div class="coach-overlay" (click)="onBackdropTap()" role="dialog" [attr.aria-label]="'pantry.coachMark.addFirstItem' | translate">
 
-    <p class="coach-mark-card__title">{{ 'pantry.coachMark.addFirstItem' | translate }}</p>
-    <p class="coach-mark-card__hint">{{ 'pantry.coachMark.addFirstItemHint' | translate }}</p>
+  @if (hasRect()) {
+    <!-- Spotlight ring — box-shadow creates the dark overlay "hole" -->
+    <div class="coach-spotlight" [style]="spotlightStyle()"></div>
 
-    <button class="coach-mark-card__cta" (click)="onCtaTap($event)">
-      <ion-icon name="add-outline" aria-hidden="true"></ion-icon>
-      {{ 'pantry.coachMark.ctaLabel' | translate }}
-    </button>
-  </div>
+    <!-- Tooltip bubble above the button -->
+    <div class="coach-tooltip" [style]="tooltipStyle()" (click)="onTooltipTap($event)">
+      <p class="coach-tooltip__title">{{ 'pantry.coachMark.addFirstItem' | translate }}</p>
+      <p class="coach-tooltip__hint">{{ 'pantry.coachMark.addFirstItemHint' | translate }}</p>
+      <div class="coach-tooltip__arrow"></div>
+    </div>
+  }
+
 </div>

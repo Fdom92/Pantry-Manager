@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, OnDestroy, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
@@ -99,6 +99,7 @@ export class PantryComponent implements OnDestroy {
   private readonly coachMark = inject(CoachMarkService);
   private readonly localStorage = inject(LocalStorageService);
   @ViewChild(IonContent) private content!: IonContent;
+  @ViewChild('despensaAddBtn') readonly despensaAddBtn!: ElementRef<HTMLElement>;
 
   private readonly coachMarkDismissed = signal(false);
   readonly showCoachMark = computed(() =>
