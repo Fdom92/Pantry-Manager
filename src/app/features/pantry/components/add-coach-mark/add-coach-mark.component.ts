@@ -71,7 +71,6 @@ export class PantryAddCoachMarkComponent implements OnInit, AfterViewInit {
     this.analytics.track(ANALYTICS_EVENTS.COACH_MARK_DISMISSED, { key: 'add_first_item' });
     this.coachMark.markShown('add_first_item');
     this.dismissed.emit();
-    this.addRequested.emit();
   }
 
   onTooltipTap(event: Event): void {
