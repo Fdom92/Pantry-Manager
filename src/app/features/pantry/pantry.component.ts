@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, inject, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
@@ -38,6 +38,9 @@ import { FreshItemCardComponent } from './components/fresh-item-card/fresh-item-
 import { FreshAddModalComponent } from './components/fresh-add-modal/fresh-add-modal.component';
 import { FreshEditItemModalComponent } from './components/fresh-edit-item-modal/fresh-edit-item-modal.component';
 import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
+import { PantryAddCoachMarkComponent } from './components/add-coach-mark/add-coach-mark.component';
+import { CoachMarkService } from '@core/services/retention';
+import { LocalStorageService } from '@core/services/shared';
 
 @Component({
   selector: 'app-pantry',
@@ -71,6 +74,7 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
     FreshItemCardComponent,
     FreshAddModalComponent,
     FreshEditItemModalComponent,
+    PantryAddCoachMarkComponent,
   ],
   templateUrl: './pantry.component.html',
   styleUrls: ['./pantry.component.scss'],
@@ -87,12 +91,43 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
     PantryFreshAddModalStateService,
   ],
 })
-export class PantryComponent implements OnDestroy {
+export class PantryComponent implements AfterViewInit, OnDestroy {
   readonly facade = inject(PantryStateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly addModalState = inject(PantryAddModalStateService);
+  private readonly coachMark = inject(CoachMarkService);
+  private readonly localStorage = inject(LocalStorageService);
   @ViewChild(IonContent) private content!: IonContent;
+  @ViewChild('despensaAddBtn') private despensaAddBtnRef?: ElementRef<HTMLElement>;
+
+  private readonly coachMarkDismissed = signal(false);
+  // Holds the button element once ViewChild is resolved (ngAfterViewInit).
+  // Signal makes showCoachMark reactive to the ref becoming available.
+  readonly addBtnEl = signal<HTMLElement | null>(null);
+
+  readonly showCoachMark = computed(() =>
+    !this.coachMarkDismissed() &&
+    this.addBtnEl() !== null &&
+    this.localStorage.onboarding.isSeen() &&
+    !this.coachMark.isShown('add_first_item') &&
+    this.facade.summary().total === 0
+  );
+
+  ngAfterViewInit(): void {
+    if (this.despensaAddBtnRef) {
+      this.addBtnEl.set(this.despensaAddBtnRef.nativeElement);
+    }
+  }
+
+  onCoachMarkAddRequested(): void {
+    this.coachMarkDismissed.set(true);
+    this.addModalState.openAddModal();
+  }
+
+  onCoachMarkDismissed(): void {
+    this.coachMarkDismissed.set(true);
+  }
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();

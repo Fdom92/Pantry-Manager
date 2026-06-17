@@ -100,7 +100,6 @@ export function computeActivityMetrics(
   events: PantryEvent[],
   windowDays: number,
   now: Date,
-  activeInventory: number,
 ): ActivityMetrics {
   const cutoff = now.getTime() - windowDays * 24 * 60 * 60 * 1000;
   const recent = events.filter(e => new Date(e.timestamp).getTime() >= cutoff);
@@ -118,12 +117,19 @@ export function computeActivityMetrics(
   const wasteRatio =
     expired + consumed === 0 ? null : expired / (expired + consumed);
 
+  // Rotation = consumed / added: what fraction of what you add do you actually use.
+  // Old metric (consumed / currentInventory) was wrong — it mixed event-window
+  // counts against a point-in-time snapshot, producing inflated ratios.
   let rotationRatio: 'high' | 'medium' | 'low' | null = null;
-  if (activeInventory > 0) {
-    const ratio = consumed / activeInventory;
-    if (ratio >= 0.3) rotationRatio = 'high';
-    else if (ratio >= 0.1) rotationRatio = 'medium';
-    else rotationRatio = 'low';
+  if (consumed > 0 || added > 0) {
+    if (added === 0) {
+      rotationRatio = 'high'; // consuming from pre-existing stock, nothing new added
+    } else {
+      const ratio = consumed / added;
+      if (ratio >= 0.6) rotationRatio = 'high';
+      else if (ratio >= 0.25) rotationRatio = 'medium';
+      else rotationRatio = 'low';
+    }
   }
 
   return { added, consumed, expired, wasteRatio, rotationRatio, windowDays };
@@ -227,7 +233,6 @@ export type FoodCoverageUnit = 'days' | 'months' | 'years';
 export interface FoodCoverageResult {
   value: number;
   unit: FoodCoverageUnit;
-  enhanced: boolean;
 }
 
 const FOOD_TYPE_WEIGHTS: Record<FoodType, number> = {
@@ -240,31 +245,61 @@ const FOOD_TYPE_WEIGHTS: Record<FoodType, number> = {
   [FoodType.HOUSEHOLD]: 0,
 };
 
-const FOOD_TYPE_COVERAGE_THRESHOLD = 0.5;
+const MS_PER_DAY_COVERAGE = 86_400_000;
 
 /**
- * Estimates food coverage in days/months/years based on active item quantities.
- * Assumes 3 meal portions per day. Returns null when fewer than 3 items.
+ * Estimates food coverage in days/months/years.
+ *
+ * Fixes vs original:
+ * - householdSize: divides portions by 3×n instead of always 3 (1 person)
+ * - Per-item type weight applied individually (not binary all-or-nothing threshold)
+ * - Shelf-life proxy: items expiring soon contribute less to future coverage
  */
-export function computeFoodCoverage(activeItems: PantryItem[]): FoodCoverageResult | null {
+export function computeFoodCoverage(
+  activeItems: PantryItem[],
+  householdSize = 1,
+  now: Date = new Date(),
+): FoodCoverageResult | null {
   if (activeItems.length < 3) return null;
 
-  const classifiedCount = activeItems.filter(i => i.foodType).length;
-  const enhanced = classifiedCount / activeItems.length >= FOOD_TYPE_COVERAGE_THRESHOLD;
+  const nowMs = now.getTime();
 
   const totalPortions = activeItems.reduce((sum, item) => {
     const quantity = sumQuantities(item.batches);
-    const weight = enhanced && item.foodType ? FOOD_TYPE_WEIGHTS[item.foodType] : 1.0;
-    return sum + quantity * weight;
+    if (quantity <= 0) return sum;
+
+    const typeWeight = item.foodType ? FOOD_TYPE_WEIGHTS[item.foodType] : 1.0;
+    if (typeWeight === 0) return sum; // HOUSEHOLD items → no food value
+
+    // Shelf-life proxy: items expiring soon won't sustain future meals
+    let shelfFactor = 1.0;
+    const hasNoExpiry = (item.batches ?? []).every(b => !!b.noExpiry);
+    if (!hasNoExpiry) {
+      const earliestMs = (item.batches ?? [])
+        .map(b => b.expirationDate ? new Date(b.expirationDate).getTime() : null)
+        .filter((ms): ms is number => ms !== null)
+        .sort((a, b) => a - b)[0];
+
+      if (earliestMs !== undefined) {
+        const daysLeft = (earliestMs - nowMs) / MS_PER_DAY_COVERAGE;
+        if (daysLeft <= 0) shelfFactor = 0;
+        else if (daysLeft <= 3) shelfFactor = 0.2;
+        else if (daysLeft <= 7) shelfFactor = 0.5;
+        else if (daysLeft <= 14) shelfFactor = 0.8;
+      }
+    }
+
+    return sum + quantity * typeWeight * shelfFactor;
   }, 0);
 
   if (totalPortions === 0) return null;
 
-  const days = Math.max(1, Math.floor(totalPortions / 3));
+  const portionsPerDay = 3 * Math.max(1, Math.round(householdSize));
+  const days = Math.max(1, Math.floor(totalPortions / portionsPerDay));
 
-  if (days >= 365) return { value: Math.max(1, Math.round(days / 365)), unit: 'years', enhanced };
-  if (days >= 30)  return { value: Math.max(1, Math.round(days / 30)),  unit: 'months', enhanced };
-  return { value: days, unit: 'days', enhanced };
+  if (days >= 365) return { value: Math.max(1, Math.round(days / 365)), unit: 'years' };
+  if (days >= 30)  return { value: Math.max(1, Math.round(days / 30)),  unit: 'months' };
+  return { value: days, unit: 'days' };
 }
 
 // ─── Pantry Health State ──────────────────────────────────────────────────────

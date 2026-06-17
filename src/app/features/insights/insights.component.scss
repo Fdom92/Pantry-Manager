@@ -233,6 +233,35 @@
   span { flex: 1; }
 }
 
+// ── Household size selector ──────────────────────────────────────────────────
+
+.household-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-theme-spacing-md);
+  margin-top: var(--app-theme-spacing-sm);
+
+  &__label {
+    font-size: var(--app-theme-font-size-small);
+    color: var(--app-theme-text-subtle);
+    white-space: nowrap;
+  }
+}
+
+.household-segment {
+  --background: transparent;
+  min-width: 0;
+  flex: 1;
+
+  ion-segment-button {
+    --padding-start: 0;
+    --padding-end: 0;
+    min-width: 40px;
+    font-size: var(--app-theme-font-size-small);
+  }
+}
+
 // ── Coverage card ────────────────────────────────────────────────────────────
 
 .coverage-card {

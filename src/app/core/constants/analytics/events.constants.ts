@@ -86,6 +86,13 @@ export const ANALYTICS_EVENTS = {
   STREAK_MILESTONE_14: 'streak_milestone_14',
   STREAK_MILESTONE_30: 'streak_milestone_30',
   STREAK_BROKEN: 'streak_broken',
+
+  // Retention — coach marks
+  COACH_MARK_SHOWN: 'coach_mark_shown',
+  /** User tapped the backdrop to dismiss without using the CTA. */
+  COACH_MARK_DISMISSED: 'coach_mark_dismissed',
+  /** User tapped the CTA inside the coach mark — opens add modal. */
+  COACH_MARK_TAPPED: 'coach_mark_tapped',
 } as const;
 
 export type AnalyticsEventName =

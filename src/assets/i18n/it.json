@@ -495,7 +495,8 @@
       "noExpiry": "Senza data: {{count}} su {{total}} prodotti"
     },
     "coverage": {
-      "title": "Copertura stimata"
+      "title": "Copertura stimata",
+      "household": "Persone in casa"
     },
     "activity": {
       "title": "Ultimi 30 giorni",
@@ -569,6 +570,11 @@
         "pendientes": "In attesa"
       },
       "search": "Cerca prodotti"
+    },
+    "coachMark": {
+      "addFirstItem": "Aggiungi il tuo primo prodotto reale",
+      "addFirstItemHint": "Tocca per iniziare la tua dispensa",
+      "ctaLabel": "Aggiungi prodotto"
     },
     "fastAdd": {
       "groupLabel": "Aggiungi prodotti",
@@ -1027,11 +1033,9 @@
         "fireLowStock": "Attiva 'poco stock' in 5s",
         "fireReEngagement": "Attiva settimanale in 5s",
         "fireWelcome": "Attiva benvenuto in 5s",
-        "fireRecoveryD2": "Attiva D2 in 5s",
-        "fireRecoveryD5": "Attiva D5 in 5s",
-        "fireRecoveryD10": "Attiva D10 in 5s",
+        "fireProjected": "Attiva proiettata in 5s",
         "fireSectionRegistered": "Definizioni registrate",
-        "fireSectionRetention": "Retention (benvenuto + recupero)",
+        "fireSectionRetention": "Retention (benvenuto + proiezioni)",
         "pendingTitle": "Programmate",
         "pendingEmpty": "Nessuna notifica programmata",
         "refreshPending": "Aggiorna lista",

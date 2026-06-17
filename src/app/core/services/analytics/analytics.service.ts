@@ -127,6 +127,22 @@ export class AnalyticsService {
   }
 
   /**
+   * Mark the current device as an internal/developer device so it can be
+   * filtered out of PostHog dashboards with `is_internal ≠ true`.
+   * Call once per device from the dev panel; the property persists on the
+   * PostHog Person profile across sessions.
+   */
+  markAsInternal(): void {
+    if (!this.posthog) return;
+    this.posthog.people.set({ is_internal: true });
+    this.logger.info('[Analytics] device marked as internal');
+  }
+
+  getDistinctId(): string | undefined {
+    return this.posthog?.get_distinct_id();
+  }
+
+  /**
    * Track a product event. No-op if not opted in or not initialised.
    */
   track(event: string, props?: AnalyticsEventProps): void {
