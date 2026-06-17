@@ -14,6 +14,7 @@ import { PantryStoreService } from '../pantry/pantry-store.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { NotificationPermissionService } from '../notifications/notification-permission.service';
 import { WelcomeNotificationService } from '../notifications/welcome-notification.service';
+import { NotificationSchedulerService } from '../notifications/notification-scheduler.service';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { register } from 'swiper/element/bundle';
 import type { SwiperOptions } from 'swiper/types';
@@ -42,6 +43,7 @@ export class OnboardingStateService {
   private readonly notificationPermission = inject(NotificationPermissionService);
   private readonly preferences = inject(SettingsPreferencesService);
   private readonly welcomeNotif = inject(WelcomeNotificationService);
+  private readonly notificationScheduler = inject(NotificationSchedulerService);
   private readonly translate = inject(TranslateService);
   private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
@@ -212,6 +214,8 @@ export class OnboardingStateService {
       skipped: options?.skipped ?? false,
     });
     await this.bulkCreateSeedItems();
+    // Re-run after seeding so projected notifications reflect the new items.
+    void this.notificationScheduler.scheduleAll();
     // First post-onboarding view = pantry so user sees their seeded products.
     // Subsequent app launches default-route back to /dashboard.
     await this.navCtrl.navigateRoot('/pantry');
