@@ -23,7 +23,7 @@
 .coach-tooltip {
   position: fixed;
   max-width: 220px;
-  background: var(--ion-background-color);
+  background: var(--ion-card-background);
   border-radius: 14px;
   padding: 12px 14px 14px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
@@ -53,7 +53,7 @@
     height: 0;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
-    border-top: 8px solid var(--ion-background-color);
+    border-top: 8px solid var(--ion-card-background);
   }
 }
 
