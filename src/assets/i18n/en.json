@@ -404,7 +404,9 @@
       "pdfTitle": "Shopping list",
       "generatedOn": "Generated on {{ date }}",
       "dialogTitle": "Shopping list",
-      "dialogText": "Share your grocery list as a PDF."
+      "dialogText": "Share your grocery list as a PDF.",
+      "generatedWith": "Generated with PantryMind",
+      "manualSection": "Other items"
     },
     "chips": {
       "freshEmpty": "Fresh — out of stock",

@@ -404,7 +404,9 @@
       "pdfTitle": "Lista della spesa",
       "generatedOn": "Generata il {{ date }}",
       "dialogTitle": "Lista della spesa",
-      "dialogText": "Condividi la tua lista in PDF."
+      "dialogText": "Condividi la tua lista in PDF.",
+      "generatedWith": "Generato con PantryMind",
+      "manualSection": "Altri articoli"
     },
     "chips": {
       "freshEmpty": "Fresco esaurito",

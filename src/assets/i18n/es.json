@@ -404,7 +404,9 @@
       "pdfTitle": "Lista de la compra",
       "generatedOn": "Generada el {{ date }}",
       "dialogTitle": "Lista de la compra",
-      "dialogText": "Comparte tu lista en PDF."
+      "dialogText": "Comparte tu lista en PDF.",
+      "generatedWith": "Generado con PantryMind",
+      "manualSection": "Otros artículos"
     },
     "chips": {
       "freshEmpty": "Fresco agotado",
