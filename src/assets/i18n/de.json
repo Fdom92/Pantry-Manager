@@ -523,7 +523,8 @@
       "noDate": "Ohne Datum",
       "reviewable": "Zu prüfen",
       "expired": "Abgelaufen",
-      "noFoodType": "Ohne Lebensmitteltyp"
+      "noFoodType": "Ohne Lebensmitteltyp",
+      "improveTip": "Daten unter Ausstehende ergänzen"
     },
     "pro": {
       "title": "Intelligente KI-Analyse",

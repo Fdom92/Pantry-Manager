@@ -136,7 +136,8 @@ import {
   trendingUpOutline,
   rocketOutline,
   warning,
-  warningOutline
+  warningOutline,
+  pencilOutline
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -246,7 +247,9 @@ addIcons({
   'alarm-outline': alarmOutline,
   'search-outline': searchOutline,
   'notifications-off-outline': notificationsOffOutline,
-  'toggle-outline': toggleOutline
+  'toggle-outline': toggleOutline,
+  'pencil-outline': pencilOutline,
+  'chevron-forward-outline': chevronForwardOutline
 });
 
 bootstrapApplication(AppComponent, {

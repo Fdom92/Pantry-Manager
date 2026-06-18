@@ -523,7 +523,8 @@
       "noDate": "Sin fecha",
       "reviewable": "Revisables",
       "expired": "Caducados",
-      "noFoodType": "Sin tipo de alimento"
+      "noFoodType": "Sin tipo de alimento",
+      "improveTip": "Completa los datos en Pendientes"
     },
     "pro": {
       "title": "Análisis inteligente con IA",

@@ -523,7 +523,8 @@
       "noDate": "No date",
       "reviewable": "Reviewable",
       "expired": "Expired",
-      "noFoodType": "Without food type"
+      "noFoodType": "Without food type",
+      "improveTip": "Complete data in Pending items"
     },
     "pro": {
       "title": "Smart AI analysis",

@@ -320,6 +320,13 @@
   font-size: var(--app-theme-font-size-small);
   margin-bottom: var(--app-theme-spacing-xs);
   color: var(--app-theme-text-subtle);
+
+  &--action {
+    cursor: pointer;
+    color: var(--ion-color-primary);
+    &:active { opacity: 0.7; }
+    align-items: end;
+  }
 }
 
 // ── Quality score ────────────────────────────────────────────────────────────

@@ -523,7 +523,8 @@
       "noDate": "Sans date",
       "reviewable": "À vérifier",
       "expired": "Périmés",
-      "noFoodType": "Sans type d'aliment"
+      "noFoodType": "Sans type d'aliment",
+      "improveTip": "Complétez les données dans En attente"
     },
     "pro": {
       "title": "Analyse IA intelligente",
