@@ -389,7 +389,7 @@ export class ListStateService {
     const PAGE_H      = doc.internal.pageSize.getHeight();
     const MARGIN_X    = 14;
     const HEADER_H    = 26;
-    const LINE_H      = 7;
+    const LINE_H      = 5.5;
     const CHECKBOX_SZ = 3.5;
     const TEXT_X      = MARGIN_X + 6;
     const QTY_X       = PAGE_W - MARGIN_X;
@@ -448,11 +448,7 @@ export class ListStateService {
 
     // ── Page 1 header ─────────────────────────────────────────────────────────
     const title    = this.translate.instant('shopping.share.pdfTitle');
-    const dateStr  = formatDateTimeValue(now, locale, {
-      dateOptions: { year: 'numeric', month: 'long', day: 'numeric' },
-      timeOptions: {},
-      fallback: '',
-    });
+    const dateStr  = now.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
     const iconUrl  = await this.loadIconDataUrl();
     this.drawPdfHeader(doc, PAGE_W, HEADER_H, TEAL, WHITE, iconUrl, title, dateStr);
 
