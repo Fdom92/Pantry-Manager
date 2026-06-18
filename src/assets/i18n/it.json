@@ -406,7 +406,9 @@
       "dialogTitle": "Lista della spesa",
       "dialogText": "Condividi la tua lista in PDF.",
       "generatedWith": "Generato con PantryMind",
-      "manualSection": "Altri articoli"
+      "manualSection": "Altri articoli",
+      "actionPdf": "Condividi come PDF",
+      "actionText": "Condividi come testo"
     },
     "chips": {
       "freshEmpty": "Fresco esaurito",

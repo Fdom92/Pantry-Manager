@@ -3,7 +3,7 @@
     <ion-title>{{ 'shopping.title' | translate }}</ion-title>
     <ion-buttons slot="end">
       <ion-button
-        (click)="facade.shareShoppingListReport()"
+        (click)="facade.openShareMenu()"
         [disabled]="facade.loading() || facade.isSharingListInProgress() || !facade.shoppingAnalysis().summary.total"
         [attr.aria-label]="'shopping.share.button' | translate">
         @if (facade.isSharingListInProgress()) {

@@ -406,7 +406,9 @@
       "dialogTitle": "Shopping list",
       "dialogText": "Share your grocery list as a PDF.",
       "generatedWith": "Generated with PantryMind",
-      "manualSection": "Other items"
+      "manualSection": "Other items",
+      "actionPdf": "Share as PDF",
+      "actionText": "Share as text"
     },
     "chips": {
       "freshEmpty": "Fresh — out of stock",

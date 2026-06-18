@@ -1,5 +1,5 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { ActionSheetController, ToastController } from '@ionic/angular';
 import { SHOPPING_LIST_NAME, UNASSIGNED_SUPERMARKET_KEY } from '@core/constants';
 import {
   determineSuggestionNeed,
@@ -44,6 +44,7 @@ export class ListStateService {
   private readonly download = inject(DownloadService);
   private readonly share = inject(ShareService);
   private readonly toastController = inject(ToastController);
+  private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly analytics = inject(AnalyticsService);
   private readonly manualItemsStore = inject(ListManualItemsStore);
@@ -231,6 +232,76 @@ export class ListStateService {
 
   getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
     return suggestion.item?._id ?? suggestion.item?.name ?? 'item';
+  }
+
+  async openShareMenu(): Promise<void> {
+    const sheet = await this.actionSheetCtrl.create({
+      buttons: [
+        {
+          text: this.translate.instant('shopping.share.actionPdf'),
+          icon: 'document-outline',
+          handler: () => { void this.shareShoppingListReport(); },
+        },
+        {
+          text: this.translate.instant('shopping.share.actionText'),
+          icon: 'chatbubble-outline',
+          handler: () => { void this.shareShoppingListAsText(); },
+        },
+        { role: 'cancel' },
+      ],
+    });
+    await sheet.present();
+  }
+
+  async shareShoppingListAsText(): Promise<void> {
+    const state = this.shoppingAnalysis();
+    const manuals = this.manualItemsStore.manualItems();
+    if (!state.summary.total && !manuals.length) return;
+
+    const text = this.buildShoppingListText(state.groupedSuggestions, manuals);
+    try {
+      const { Share } = await import('@capacitor/share');
+      await Share.share({ text });
+      this.analytics.track(ANALYTICS_EVENTS.SHOPPING_LIST_SHARED, {
+        item_count: state.summary.total + manuals.length,
+        format: 'text',
+      });
+    } catch {
+      // user cancelled or share unavailable — silent
+    }
+  }
+
+  private buildShoppingListText(
+    groups: ShoppingSuggestionGroupWithItem[],
+    manualItems: ManualItem[],
+  ): string {
+    const locale = this.languageService.getCurrentLocale();
+    const title = this.translate.instant('shopping.share.pdfTitle');
+    const date = new Date().toLocaleDateString(locale, { day: 'numeric', month: 'long' });
+    const footer = this.translate.instant('shopping.share.generatedWith');
+    const manualSection = this.translate.instant('shopping.share.manualSection');
+
+    const lines: string[] = [`🛒 ${title} · ${date}`, ''];
+
+    for (const group of groups) {
+      if (!group.suggestions.length) continue;
+      lines.push(group.label);
+      for (const s of group.suggestions) {
+        const isFresh = s.reason === ShoppingReason.FRESH_EMPTY || s.reason === ShoppingReason.FRESH_LOW;
+        const name = s.item?.name ?? '';
+        lines.push(isFresh ? `• ${name}` : `• ${name} x${s.suggestedQuantity}`);
+      }
+      lines.push('');
+    }
+
+    if (manualItems.length) {
+      lines.push(manualSection);
+      for (const item of manualItems) lines.push(`• ${item.name}`);
+      lines.push('');
+    }
+
+    lines.push(`— ${footer}`);
+    return lines.join('\n');
   }
 
   async shareShoppingListReport(): Promise<void> {
