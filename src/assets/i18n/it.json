@@ -1205,7 +1205,11 @@
     },
     "weeklyReminder": {
       "title": "Cosa hai comprato questa settimana?",
-      "body": "Aggiungi i nuovi articoli per un monitoraggio accurato"
+      "body": "Aggiungi i nuovi articoli per un monitoraggio accurato",
+      "body_expired": "Hai {{ count }} prodotto/i scaduto/i. Controlla la dispensa prima di fare la spesa.",
+      "body_expiring": "{{ count }} prodotto/i in scadenza. È il momento di rivedere la lista.",
+      "body_lowStock": "{{ count }} prodotto/i quasi esaurito/i. Stai andando al supermercato?",
+      "body_clean": "La tua dispensa è aggiornata. Hai comprato qualcosa di nuovo questa settimana?"
     },
     "welcome": {
       "title": "PantryMind è pronto ✓",

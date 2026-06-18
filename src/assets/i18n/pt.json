@@ -1205,7 +1205,11 @@
     },
     "weeklyReminder": {
       "title": "O que você comprou esta semana?",
-      "body": "Adicione os novos itens para manter o rastreamento atualizado"
+      "body": "Adicione os novos itens para manter o rastreamento atualizado",
+      "body_expired": "Tens {{ count }} produto(s) expirado(s). Verifica a despensa antes de fazer compras.",
+      "body_expiring": "{{ count }} produto(s) a expirar em breve. Bom momento para rever a lista.",
+      "body_lowStock": "{{ count }} produto(s) com stock baixo. Vais ao supermercado hoje?",
+      "body_clean": "A tua despensa está atualizada. Compraste algo novo esta semana?"
     },
     "welcome": {
       "title": "PantryMind está pronto ✓",

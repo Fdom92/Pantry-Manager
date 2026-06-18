@@ -1205,7 +1205,11 @@
     },
     "weeklyReminder": {
       "title": "What did you buy this week?",
-      "body": "Add the new items to your pantry for accurate tracking"
+      "body": "Add the new items to your pantry for accurate tracking",
+      "body_expired": "You have {{ count }} expired item(s). Check your pantry before you shop.",
+      "body_expiring": "{{ count }} item(s) expiring soon. Good time to review your list.",
+      "body_lowStock": "{{ count }} item(s) running low. Time for a supermarket run?",
+      "body_clean": "Your pantry is up to date. Did you buy anything new this week?"
     },
     "welcome": {
       "title": "PantryMind is ready ✓",

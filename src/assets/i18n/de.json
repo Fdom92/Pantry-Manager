@@ -1205,7 +1205,11 @@
     },
     "weeklyReminder": {
       "title": "Was hast du diese Woche gekauft?",
-      "body": "Füge die Neueinkäufe hinzu, damit der Überblick aktuell bleibt"
+      "body": "Füge die Neueinkäufe hinzu, damit der Überblick aktuell bleibt",
+      "body_expired": "{{ count }} Produkt(e) abgelaufen. Überprüfe deinen Vorrat vor dem Einkaufen.",
+      "body_expiring": "{{ count }} Produkt(e) läuft bald ab. Zeit, die Liste zu prüfen.",
+      "body_lowStock": "{{ count }} Produkt(e) fast leer. Zeit für einen Einkauf?",
+      "body_clean": "Dein Vorrat ist aktuell. Hast du diese Woche etwas Neues gekauft?"
     },
     "welcome": {
       "title": "PantryMind ist bereit ✓",

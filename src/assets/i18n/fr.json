@@ -1205,7 +1205,11 @@
     },
     "weeklyReminder": {
       "title": "Qu'as-tu acheté cette semaine ?",
-      "body": "Ajoute tes nouveaux articles pour un suivi à jour"
+      "body": "Ajoute tes nouveaux articles pour un suivi à jour",
+      "body_expired": "{{ count }} produit(s) périmé(s). Vérifie ton garde-manger avant de faire les courses.",
+      "body_expiring": "{{ count }} produit(s) expirent bientôt. Bon moment pour revoir ta liste.",
+      "body_lowStock": "{{ count }} produit(s) presque épuisé(s). Tu passes au supermarché ?",
+      "body_clean": "Ton garde-manger est à jour. As-tu acheté quelque chose de nouveau cette semaine ?"
     },
     "welcome": {
       "title": "PantryMind est prêt ✓",
