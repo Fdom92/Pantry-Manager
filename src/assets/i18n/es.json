@@ -1211,6 +1211,7 @@
       "body_expired": "Tienes {{ count }} producto(s) caducado(s). Revisa tu despensa antes de hacer la compra.",
       "body_expiring": "{{ count }} producto(s) caducan pronto. Buen momento para repasar la lista.",
       "body_lowStock": "{{ count }} producto(s) con stock bajo. ¿Pasas por el supermercado hoy?",
+      "body_pendientes": "{{ count }} producto(s) sin datos completos. Complétalo en un minuto.",
       "body_clean": "Tu despensa está al día. ¿Has comprado algo nuevo esta semana?"
     },
     "welcome": {

@@ -1211,6 +1211,7 @@
       "body_expired": "Hai {{ count }} prodotto/i scaduto/i. Controlla la dispensa prima di fare la spesa.",
       "body_expiring": "{{ count }} prodotto/i in scadenza. È il momento di rivedere la lista.",
       "body_lowStock": "{{ count }} prodotto/i quasi esaurito/i. Stai andando al supermercato?",
+      "body_pendientes": "{{ count }} prodotto/i con dati incompleti. Sistemalo in un minuto.",
       "body_clean": "La tua dispensa è aggiornata. Hai comprato qualcosa di nuovo questa settimana?"
     },
     "welcome": {

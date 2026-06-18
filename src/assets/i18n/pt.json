@@ -1211,6 +1211,7 @@
       "body_expired": "Tens {{ count }} produto(s) expirado(s). Verifica a despensa antes de fazer compras.",
       "body_expiring": "{{ count }} produto(s) a expirar em breve. Bom momento para rever a lista.",
       "body_lowStock": "{{ count }} produto(s) com stock baixo. Vais ao supermercado hoje?",
+      "body_pendientes": "{{ count }} produto(s) com dados incompletos. Resolve em um minuto.",
       "body_clean": "A tua despensa está atualizada. Compraste algo novo esta semana?"
     },
     "welcome": {

@@ -4,6 +4,7 @@ import {
   filterNearExpiryItems,
   filterLowStockItems,
 } from '@core/domain/notifications';
+import { isIncomplete } from '@core/domain/pantry/pantry-filtering.domain';
 import type { NotificationContext, NotificationDefinition, ScheduledNotification } from '@core/models/notifications';
 import type { AppPreferences } from '@core/models/settings';
 
@@ -23,11 +24,12 @@ export class ReEngagementNotification implements NotificationDefinition {
     const trigger = this.getNextSunday(now);
     trigger.setHours(hour, 0, 0, 0);
 
-    const expired  = filterExpiredItems(items, now).length;
-    const expiring = filterNearExpiryItems(items, now, NEAR_EXPIRY_WINDOW_DAYS).length;
-    const lowStock = filterLowStockItems(items).length;
+    const expired    = filterExpiredItems(items, now).length;
+    const expiring   = filterNearExpiryItems(items, now, NEAR_EXPIRY_WINDOW_DAYS).length;
+    const lowStock   = filterLowStockItems(items).length;
+    const pendientes = items.filter(isIncomplete).length;
 
-    const body = this.buildBody(t, expired, expiring, lowStock);
+    const body = this.buildBody(t, expired, expiring, lowStock, pendientes);
 
     return {
       id: this.id,
@@ -42,6 +44,7 @@ export class ReEngagementNotification implements NotificationDefinition {
     expired: number,
     expiring: number,
     lowStock: number,
+    pendientes: number,
   ): string {
     if (expired > 0) {
       return t('notifications.weeklyReminder.body_expired', { count: expired });
@@ -51,6 +54,9 @@ export class ReEngagementNotification implements NotificationDefinition {
     }
     if (lowStock > 0) {
       return t('notifications.weeklyReminder.body_lowStock', { count: lowStock });
+    }
+    if (pendientes > 0) {
+      return t('notifications.weeklyReminder.body_pendientes', { count: pendientes });
     }
     return t('notifications.weeklyReminder.body_clean');
   }

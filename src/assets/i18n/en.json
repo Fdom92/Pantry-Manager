@@ -1211,6 +1211,7 @@
       "body_expired": "You have {{ count }} expired item(s). Check your pantry before you shop.",
       "body_expiring": "{{ count }} item(s) expiring soon. Good time to review your list.",
       "body_lowStock": "{{ count }} item(s) running low. Time for a supermarket run?",
+      "body_pendientes": "{{ count }} item(s) with incomplete data. Fix it in a minute.",
       "body_clean": "Your pantry is up to date. Did you buy anything new this week?"
     },
     "welcome": {

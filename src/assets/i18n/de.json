@@ -1211,6 +1211,7 @@
       "body_expired": "{{ count }} Produkt(e) abgelaufen. Überprüfe deinen Vorrat vor dem Einkaufen.",
       "body_expiring": "{{ count }} Produkt(e) läuft bald ab. Zeit, die Liste zu prüfen.",
       "body_lowStock": "{{ count }} Produkt(e) fast leer. Zeit für einen Einkauf?",
+      "body_pendientes": "{{ count }} Produkt(e) mit unvollständigen Daten. In einer Minute erledigt.",
       "body_clean": "Dein Vorrat ist aktuell. Hast du diese Woche etwas Neues gekauft?"
     },
     "welcome": {
