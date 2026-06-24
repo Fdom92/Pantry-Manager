@@ -404,7 +404,11 @@
       "pdfTitle": "Lista della spesa",
       "generatedOn": "Generata il {{ date }}",
       "dialogTitle": "Lista della spesa",
-      "dialogText": "Condividi la tua lista in PDF."
+      "dialogText": "Condividi la tua lista in PDF.",
+      "generatedWith": "Generato con PantryMind",
+      "manualSection": "Altri articoli",
+      "actionPdf": "Condividi come PDF",
+      "actionText": "Condividi come testo"
     },
     "chips": {
       "freshEmpty": "Fresco esaurito",
@@ -523,7 +527,8 @@
       "noDate": "Senza data",
       "reviewable": "Da verificare",
       "expired": "Scaduti",
-      "noFoodType": "Senza tipo di alimento"
+      "noFoodType": "Senza tipo di alimento",
+      "improveTip": "Completa i dati in Articoli in sospeso"
     },
     "pro": {
       "title": "Analisi IA intelligente",
@@ -1202,7 +1207,12 @@
     },
     "weeklyReminder": {
       "title": "Cosa hai comprato questa settimana?",
-      "body": "Aggiungi i nuovi articoli per un monitoraggio accurato"
+      "body": "Aggiungi i nuovi articoli per un monitoraggio accurato",
+      "body_expired": "Hai {{ count }} prodotto/i scaduto/i. Controlla la dispensa prima di fare la spesa.",
+      "body_expiring": "{{ count }} prodotto/i in scadenza. È il momento di rivedere la lista.",
+      "body_lowStock": "{{ count }} prodotto/i quasi esaurito/i. Stai andando al supermercato?",
+      "body_pendientes": "{{ count }} prodotto/i con dati incompleti. Sistemalo in un minuto.",
+      "body_clean": "La tua dispensa è aggiornata. Hai comprato qualcosa di nuovo questa settimana?"
     },
     "welcome": {
       "title": "PantryMind è pronto ✓",

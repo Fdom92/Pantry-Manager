@@ -404,7 +404,11 @@
       "pdfTitle": "Shopping list",
       "generatedOn": "Generated on {{ date }}",
       "dialogTitle": "Shopping list",
-      "dialogText": "Share your grocery list as a PDF."
+      "dialogText": "Share your grocery list as a PDF.",
+      "generatedWith": "Generated with PantryMind",
+      "manualSection": "Other items",
+      "actionPdf": "Share as PDF",
+      "actionText": "Share as text"
     },
     "chips": {
       "freshEmpty": "Fresh — out of stock",
@@ -523,7 +527,8 @@
       "noDate": "No date",
       "reviewable": "Reviewable",
       "expired": "Expired",
-      "noFoodType": "Without food type"
+      "noFoodType": "Without food type",
+      "improveTip": "Complete data in Pending items"
     },
     "pro": {
       "title": "Smart AI analysis",
@@ -1202,7 +1207,12 @@
     },
     "weeklyReminder": {
       "title": "What did you buy this week?",
-      "body": "Add the new items to your pantry for accurate tracking"
+      "body": "Add the new items to your pantry for accurate tracking",
+      "body_expired": "You have {{ count }} expired item(s). Check your pantry before you shop.",
+      "body_expiring": "{{ count }} item(s) expiring soon. Good time to review your list.",
+      "body_lowStock": "{{ count }} item(s) running low. Time for a supermarket run?",
+      "body_pendientes": "{{ count }} item(s) with incomplete data. Fix it in a minute.",
+      "body_clean": "Your pantry is up to date. Did you buy anything new this week?"
     },
     "welcome": {
       "title": "PantryMind is ready ✓",

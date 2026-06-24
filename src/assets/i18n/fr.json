@@ -404,7 +404,11 @@
       "pdfTitle": "Liste d’achats",
       "generatedOn": "Générée le {{ date }}",
       "dialogTitle": "Liste d’achats",
-      "dialogText": "Partagez votre liste en PDF."
+      "dialogText": "Partagez votre liste en PDF.",
+      "generatedWith": "Généré avec PantryMind",
+      "manualSection": "Autres articles",
+      "actionPdf": "Partager en PDF",
+      "actionText": "Partager en texte"
     },
     "chips": {
       "freshEmpty": "Frais épuisé",
@@ -523,7 +527,8 @@
       "noDate": "Sans date",
       "reviewable": "À vérifier",
       "expired": "Périmés",
-      "noFoodType": "Sans type d'aliment"
+      "noFoodType": "Sans type d'aliment",
+      "improveTip": "Complétez les données dans En attente"
     },
     "pro": {
       "title": "Analyse IA intelligente",
@@ -1202,7 +1207,12 @@
     },
     "weeklyReminder": {
       "title": "Qu'as-tu acheté cette semaine ?",
-      "body": "Ajoute tes nouveaux articles pour un suivi à jour"
+      "body": "Ajoute tes nouveaux articles pour un suivi à jour",
+      "body_expired": "{{ count }} produit(s) périmé(s). Vérifie ton garde-manger avant de faire les courses.",
+      "body_expiring": "{{ count }} produit(s) expirent bientôt. Bon moment pour revoir ta liste.",
+      "body_lowStock": "{{ count }} produit(s) presque épuisé(s). Tu passes au supermarché ?",
+      "body_pendientes": "{{ count }} article(s) avec des données incomplètes. Règle ça en une minute.",
+      "body_clean": "Ton garde-manger est à jour. As-tu acheté quelque chose de nouveau cette semaine ?"
     },
     "welcome": {
       "title": "PantryMind est prêt ✓",
