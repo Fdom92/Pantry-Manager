@@ -247,7 +247,7 @@ export class ListStateService {
           icon: 'chatbubble-outline',
           handler: () => { void this.shareShoppingListAsText(); },
         },
-        { role: 'cancel' },
+        { role: 'cancel', text: this.translate.instant('common.actions.cancel') },
       ],
     });
     await sheet.present();
