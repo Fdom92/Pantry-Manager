@@ -15,8 +15,10 @@ import {
   IonToolbar,
   IonButtons,
 } from '@ionic/angular/standalone';
+import { NavController } from '@ionic/angular';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
 import { InsightsTrackingStateService } from '@core/services/insights/insights-tracking-state.service';
+import { PantryNavigationPresetService } from '@core/services/pantry/pantry-navigation-preset.service';
 import { FoodType } from '@core/models/shared/enums.model';
 import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
@@ -51,7 +53,14 @@ import { InsightsEmptyStateComponent } from './components/insights-empty-state/i
 export class InsightsComponent {
   readonly facade = inject(InsightsStateService);
   private readonly insightsTracking = inject(InsightsTrackingStateService);
+  private readonly navigationPreset = inject(PantryNavigationPresetService);
+  private readonly navCtrl = inject(NavController);
   readonly FoodType = FoodType;
+
+  goToPendientes(): void {
+    this.navigationPreset.setPending({ pendientes: true });
+    void this.navCtrl.navigateRoot('/pantry');
+  }
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();

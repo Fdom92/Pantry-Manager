@@ -205,6 +205,14 @@
               </span>
             </div>
           </div>
+
+          @if (facade.pantryScore()!.score < 100) {
+            <p class="distribution-badge distribution-badge--action" (click)="goToPendientes()">
+              <ion-icon name="pencil-outline"></ion-icon>
+              {{ 'insights.quality.improveTip' | translate }}
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </p>
+          }
         </section>
       }
 

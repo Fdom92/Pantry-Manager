@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { shouldAutoAddToShoppingList, sumQuantities } from '@core/domain/pantry';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { environment } from 'src/environments/environment';
+import { ListManualItemsStore } from '../list/list-manual-items.store';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 
@@ -10,6 +11,7 @@ import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service'
 export class TabsStateService {
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly pantryStore = inject(PantryStoreService);
+  private readonly manualItemsStore = inject(ListManualItemsStore);
 
   readonly isPro = toSignal(this.revenuecat.isPro$, { initialValue: this.revenuecat.isPro() });
   readonly canUseAgent = computed(() => !environment.production || this.isPro());
@@ -31,11 +33,12 @@ export class TabsStateService {
    * items at qty=0 are included — activeProducts excludes qty=0 pantry items,
    * but the list iterates loadedProducts and shows them.
    */
-  readonly shoppingListCount = computed(() =>
-    this.pantryStore.loadedProducts().reduce((total, item) => {
+  readonly shoppingListCount = computed(() => {
+    const autoSuggested = this.pantryStore.loadedProducts().reduce((total, item) => {
       const totalQuantity = sumQuantities(item.batches ?? []);
       const minThreshold = toNumberOrZero(item.minThreshold);
       return shouldAutoAddToShoppingList(item, { totalQuantity, minThreshold }) ? total + 1 : total;
-    }, 0)
-  );
+    }, 0);
+    return autoSuggested + this.manualItemsStore.manualItems().length;
+  });
 }
