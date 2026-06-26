@@ -59,6 +59,7 @@ export class InsightsStateService {
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
+  private hasLoadedOnce = false;
   readonly householdSize = signal(this.localStorage.householdSize.get());
 
   readonly staleCount = computed((): number => {
@@ -151,10 +152,13 @@ export class InsightsStateService {
    */
   async loadEvents(): Promise<void> {
     await this.pantryStore.loadAll();
-    this.isLoadingEvents.set(true);
+    if (!this.hasLoadedOnce) {
+      this.isLoadingEvents.set(true);
+    }
     const loaded = await this.eventLog.listEvents();
     this.events.set(loaded);
     this.isLoadingEvents.set(false);
+    this.hasLoadedOnce = true;
   }
 
   async ionViewWillEnter(): Promise<void> {

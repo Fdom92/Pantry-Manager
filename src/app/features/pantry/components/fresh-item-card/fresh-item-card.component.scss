@@ -38,9 +38,6 @@
     font-size: var(--app-theme-font-size-body);
     font-weight: var(--app-theme-font-weight-bold);
     color: var(--app-theme-text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   &__keep-icon {
