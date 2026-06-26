@@ -111,6 +111,7 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
     this.addBtnEl() !== null &&
     this.localStorage.onboarding.isSeen() &&
     !this.coachMark.isShown('add_first_item') &&
+    this.facade.hasCompletedInitialLoad() &&
     this.facade.summary().total === 0
   );
 

@@ -178,7 +178,9 @@ export class HistoryEventManagerService {
 
     if (tasks.length) {
       await Promise.all(tasks);
-      this._mutation$.next();
+      // Do not emit mutation$ — expired-batch logging is a system housekeeping
+      // task, not a user action. Emitting here incorrectly triggers streak
+      // evaluation on view navigation (e.g. Dashboard ionViewWillEnter).
     }
   }
 

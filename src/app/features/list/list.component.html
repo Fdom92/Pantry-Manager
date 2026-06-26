@@ -4,7 +4,7 @@
     <ion-buttons slot="end">
       <ion-button
         (click)="facade.openShareMenu()"
-        [disabled]="facade.loading() || facade.isSharingListInProgress() || !facade.shoppingAnalysis().summary.total"
+        [disabled]="facade.loading() || facade.isSharingListInProgress() || (!facade.shoppingAnalysis().summary.total && !facade.manualItems().length)"
         [attr.aria-label]="'shopping.share.button' | translate">
         @if (facade.isSharingListInProgress()) {
           <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
