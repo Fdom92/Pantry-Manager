@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { RouterLink } from '@angular/router';
 import { ListStateService } from '@core/services/list/list-state.service';
 import {
-  AlertController,
   IonBadge,
   IonButton,
   IonButtons,
@@ -20,10 +19,12 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { ShoppingBuySheetComponent } from './components/shopping-buy-sheet/shopping-buy-sheet.component';
 import { ShoppingBuySheetStateService } from './components/shopping-buy-sheet/shopping-buy-sheet-state.service';
+import { ShoppingManualAddSheetComponent } from './components/shopping-manual-add-sheet/shopping-manual-add-sheet.component';
+import { ShoppingManualAddSheetStateService } from './components/shopping-manual-add-sheet/shopping-manual-add-sheet-state.service';
 import { ShoppingReason } from '@core/models/list/list.model';
 import type { ShoppingSuggestionWithItem } from '@core/models/list/list.model';
 
@@ -36,20 +37,20 @@ import type { ShoppingSuggestionWithItem } from '@core/models/list/list.model';
     TranslateModule,
     EmptyStateComponent,
     ShoppingBuySheetComponent,
+    ShoppingManualAddSheetComponent,
     IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
     IonContent, IonIcon, IonSpinner, IonSkeletonText, IonBadge,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   ],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
-  providers: [ListStateService, ShoppingBuySheetStateService],
+  providers: [ListStateService, ShoppingBuySheetStateService, ShoppingManualAddSheetStateService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListComponent {
   readonly facade = inject(ListStateService);
   readonly buySheet = inject(ShoppingBuySheetStateService);
-  private readonly alertController = inject(AlertController);
-  private readonly translate = inject(TranslateService);
+  readonly manualAddSheet = inject(ShoppingManualAddSheetStateService);
 
   private readonly collapsedGroups = signal<Set<string>>(new Set());
   readonly globalBoughtExpanded = signal(false);
@@ -96,28 +97,7 @@ export class ListComponent {
     this.buySheet.openSheet(suggestion);
   }
 
-  async openManualAdd(): Promise<void> {
-    const alert = await this.alertController.create({
-      header: this.translate.instant('shopping.manualAdd.alertTitle'),
-      inputs: [
-        {
-          type: 'text',
-          placeholder: this.translate.instant('shopping.manualAdd.placeholder'),
-        },
-      ],
-      buttons: [
-        { text: this.translate.instant('common.actions.cancel'), role: 'cancel' },
-        {
-          text: this.translate.instant('shopping.manualAdd.alertButton'),
-          handler: (data: Record<number, string>) => {
-            const name = (data[0] ?? '').trim();
-            if (name) {
-              this.facade.addManualItem(name);
-            }
-          },
-        },
-      ],
-    });
-    await alert.present();
+  openManualAdd(): void {
+    this.manualAddSheet.open();
   }
 }
