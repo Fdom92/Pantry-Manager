@@ -1129,7 +1129,9 @@
       "lowStockDescription": "Alerta quando produtos essenciais estão abaixo do mínimo",
       "permissionDeniedTitle": "Notificações bloqueadas",
       "permissionDeniedMessage": "Parece que anteriormente negaste a permissão de notificações. Para as reativar, vai às Definições do dispositivo, encontra a app e ativa as notificações a partir daí.",
-      "permissionDeniedButton": "Percebi"
+      "permissionDeniedButton": "Percebi",
+      "hourTitle": "Hora da notificação",
+      "hourDescription": "Os alertas diários são enviados neste horário"
     },
     "privacy": {
       "title": "Privacidade",

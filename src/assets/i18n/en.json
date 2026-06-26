@@ -1129,7 +1129,9 @@
       "lowStockDescription": "Alert when essential products are running low",
       "permissionDeniedTitle": "Notifications blocked",
       "permissionDeniedMessage": "It looks like you previously denied notification permission. To enable them again, go to your device Settings, find the app and turn on notifications from there.",
-      "permissionDeniedButton": "Got it"
+      "permissionDeniedButton": "Got it",
+      "hourTitle": "Notification time",
+      "hourDescription": "Daily alerts are sent at this time"
     },
     "privacy": {
       "title": "Privacy",

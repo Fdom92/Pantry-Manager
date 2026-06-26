@@ -1129,7 +1129,9 @@
       "lowStockDescription": "Avviso quando i prodotti essenziali sono sotto il minimo",
       "permissionDeniedTitle": "Notifiche bloccate",
       "permissionDeniedMessage": "Sembra che tu abbia precedentemente negato il permesso per le notifiche. Per riattivarle, vai nelle Impostazioni del dispositivo, trova l'app e attiva le notifiche da lì.",
-      "permissionDeniedButton": "Capito"
+      "permissionDeniedButton": "Capito",
+      "hourTitle": "Orario notifiche",
+      "hourDescription": "Gli avvisi giornalieri vengono inviati a quest'ora"
     },
     "privacy": {
       "title": "Privacy",

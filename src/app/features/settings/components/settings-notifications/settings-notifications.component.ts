@@ -13,6 +13,8 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonSelect,
+  IonSelectOption,
   IonTitle,
   IonToggle,
   IonToolbar,
@@ -38,6 +40,8 @@ import { TranslateModule } from '@ngx-translate/core';
     IonItem,
     IonLabel,
     IonToggle,
+    IonSelect,
+    IonSelectOption,
     TranslateModule,
   ],
   templateUrl: './settings-notifications.component.html',
@@ -46,6 +50,12 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class SettingsNotificationsComponent {
   readonly facade = inject(SettingsNotificationsStateService);
+
+  readonly HOUR_OPTIONS = Array.from({ length: 16 }, (_, i) => i + 7);
+
+  formatHour(h: number): string {
+    return `${h.toString().padStart(2, '0')}:00`;
+  }
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();

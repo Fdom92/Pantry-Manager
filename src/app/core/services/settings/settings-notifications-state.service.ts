@@ -24,6 +24,9 @@ export class SettingsNotificationsStateService {
   readonly notifyOnLowStock = computed(() =>
     Boolean(this.appPreferences.preferences().notifyOnLowStock)
   );
+  readonly notificationHour = computed(() =>
+    this.appPreferences.preferences().notificationHour ?? 9
+  );
 
   async ionViewWillEnter(): Promise<void> {
     await this.appPreferences.getPreferences();
@@ -47,6 +50,10 @@ export class SettingsNotificationsStateService {
 
   async setNotifyOnLowStock(value: boolean): Promise<void> {
     await this.save({ notifyOnLowStock: value });
+  }
+
+  async setNotificationHour(hour: number): Promise<void> {
+    await this.save({ notificationHour: hour });
   }
 
   private async showPermanentlyDeniedAlert(): Promise<void> {

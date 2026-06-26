@@ -1129,7 +1129,9 @@
       "lowStockDescription": "Alerta cuando productos esenciales están por debajo del mínimo",
       "permissionDeniedTitle": "Notificaciones bloqueadas",
       "permissionDeniedMessage": "¡Vaya! Parece que anteriormente desactivaste el permiso de notificaciones. Para volver a activarlas, ve a los Ajustes de tu dispositivo, busca la app y activa las notificaciones desde ahí.",
-      "permissionDeniedButton": "Entendido"
+      "permissionDeniedButton": "Entendido",
+      "hourTitle": "Hora de aviso",
+      "hourDescription": "Las alertas diarias se envían a esta hora"
     },
     "privacy": {
       "title": "Privacidad",

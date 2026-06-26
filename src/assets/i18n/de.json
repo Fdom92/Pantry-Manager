@@ -1129,7 +1129,9 @@
       "lowStockDescription": "Benachrichtigung, wenn wesentliche Produkte niedrig sind",
       "permissionDeniedTitle": "Benachrichtigungen blockiert",
       "permissionDeniedMessage": "Du hast die Benachrichtigungsberechtigung zuvor abgelehnt. Um sie wieder zu aktivieren, gehe in die Geräteeinstellungen, suche die App und aktiviere dort die Benachrichtigungen.",
-      "permissionDeniedButton": "Verstanden"
+      "permissionDeniedButton": "Verstanden",
+      "hourTitle": "Benachrichtigungszeit",
+      "hourDescription": "Tägliche Benachrichtigungen werden zu dieser Uhrzeit gesendet"
     },
     "privacy": {
       "title": "Datenschutz",
