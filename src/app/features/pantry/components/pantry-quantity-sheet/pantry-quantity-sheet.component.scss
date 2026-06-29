@@ -91,3 +91,7 @@
 .details-button ion-icon {
   font-size: var(--app-theme-icon-size-md);
 }
+
+.details-button--delete {
+  --color: var(--ion-color-danger);
+}

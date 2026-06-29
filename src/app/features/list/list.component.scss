@@ -378,8 +378,8 @@ ion-fab-button[size="small"] {
   gap: var(--app-theme-spacing-sm);
   width: 100%;
   padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
-  background: transparent;
-  border: 1px dashed color-mix(in srgb, var(--ion-text-color) 18%, transparent);
+  background: color-mix(in srgb, var(--ion-color-primary) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ion-color-primary) 30%, transparent);
   border-radius: var(--app-theme-card-border-radius);
   color: var(--app-theme-text-muted);
   font-size: var(--app-theme-font-size-body);

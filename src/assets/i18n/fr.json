@@ -612,6 +612,7 @@
     "batches": {
       "title": "Lots et dates",
       "count": "{{ count }} lots enregistrés",
+      "countOne": "1 lot enregistré",
       "open": "Ouvert",
       "noExpiryDate": "Sans date de péremption",
       "addBatch": "Ajouter un lot",

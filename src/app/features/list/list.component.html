@@ -89,11 +89,7 @@
                               {{ 'shopping.chips.belowMin' | translate }}
                             </ion-badge>
                           }
-                          @if (suggestion.item.isBasic) {
-                            <ion-badge class="reason-chip reason-chip--basic">
-                              {{ 'shopping.chips.basic' | translate }}
-                            </ion-badge>
-                          }
+
                         </div>
                         <span class="item-qty">
                           @if (suggestion.reason === 'fresh-empty') {

@@ -17,7 +17,7 @@
           @if (selectedItem) {
             <h2 class="sheet-header__title">{{ selectedItem.name }}</h2>
             <p class="sheet-header__subtitle">
-              {{ 'pantry.batches.count' | translate:{ count: state.getTotalBatchCount(selectedItem) } }}
+              {{ (state.getTotalBatchCount(selectedItem) === 1 ? 'pantry.batches.countOne' : 'pantry.batches.count') | translate:{ count: state.getTotalBatchCount(selectedItem) } }}
             </p>
           } @else {
             <h2 class="sheet-header__title">{{ 'pantry.batches.title' | translate }}</h2>

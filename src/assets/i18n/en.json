@@ -612,6 +612,7 @@
     "batches": {
       "title": "Batches & dates",
       "count": "{{ count }} batches recorded",
+      "countOne": "1 batch recorded",
       "open": "Opened",
       "noExpiryDate": "No expiration date",
       "addBatch": "Add batch",
