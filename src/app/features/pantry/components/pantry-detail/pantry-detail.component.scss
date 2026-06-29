@@ -49,6 +49,15 @@
   min-width: 0;
 }
 
+@keyframes star-hint-pulse {
+  0%   { transform: scale(1);   color: color-mix(in srgb, var(--ion-text-color) 25%, transparent); }
+  20%  { transform: scale(1.6); color: var(--app-theme-warning-deep); }
+  40%  { transform: scale(1);   color: color-mix(in srgb, var(--ion-text-color) 25%, transparent); }
+  65%  { transform: scale(1.6); color: var(--app-theme-warning-deep); }
+  85%  { transform: scale(1);   color: color-mix(in srgb, var(--ion-text-color) 25%, transparent); }
+  100% { transform: scale(1); }
+}
+
 .basic-icon {
   font-size: var(--app-theme-icon-size-sm);
   color: color-mix(in srgb, var(--ion-text-color) 25%, transparent);
@@ -67,6 +76,10 @@
 
   &:active {
     transform: scale(0.85);
+  }
+
+  &--hint {
+    animation: star-hint-pulse 2s ease-in-out 0.4s both;
   }
 }
 

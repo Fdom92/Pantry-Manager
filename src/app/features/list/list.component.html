@@ -48,13 +48,14 @@
       </button>
 
       @for (group of state.groupedSuggestions; track group.key) {
-        @if (group.suggestions.length) {
+        @let groupManuals = (group.key === UNASSIGNED_KEY) ? facade.manualItems() : [];
+        @if (group.suggestions.length || groupManuals.length) {
           <div class="suggestion-group">
 
             <!-- Group header -->
             <button class="supermarket-heading pressable" (click)="toggleGroup(group.key)">
               <span>{{ group.label }}</span>
-              <ion-badge class="group-count group-count--medium">{{ group.suggestions.length }}</ion-badge>
+              <ion-badge class="group-count group-count--medium">{{ group.suggestions.length + groupManuals.length }}</ion-badge>
               <ion-icon
                 class="collapse-icon"
                 [class.collapse-icon--expanded]="!isGroupCollapsed(group.key)"
@@ -91,15 +92,11 @@
                           }
 
                         </div>
-                        <span class="item-qty">
-                          @if (suggestion.reason === 'fresh-empty') {
-                            {{ 'shopping.suggestions.restockFresh' | translate }}
-                          } @else if (suggestion.reason === 'fresh-low') {
-                            {{ 'shopping.suggestions.freshLow' | translate }}
-                          } @else {
+                        @if (suggestion.minThreshold != null) {
+                          <span class="item-qty">
                             {{ 'shopping.suggestions.restock' | translate:{ amount: suggestion.suggestedQuantity } }}
-                          }
-                        </span>
+                          </span>
+                        }
                       </div>
                       <ion-button
                         slot="end"
@@ -123,48 +120,74 @@
                     </ion-item-options>
                   </ion-item-sliding>
                 }
+                @for (manual of groupManuals; track manual.id) {
+                  <ion-item-sliding>
+                    <ion-item detail="false" class="suggestion-item">
+                      <div class="item-body" slot="start">
+                        <span class="item-name">{{ manual.name }}</span>
+                      </div>
+                      <ion-button
+                        slot="end"
+                        fill="solid"
+                        color="primary"
+                        shape="round"
+                        class="buy-btn"
+                        (click)="buySheet.openSheetForManual(manual.id, manual.name)">
+                        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+                      </ion-button>
+                    </ion-item>
+                    <ion-item-options side="end">
+                      <ion-item-option color="danger" (click)="facade.removeManualItem(manual.id)">
+                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                      </ion-item-option>
+                    </ion-item-options>
+                  </ion-item-sliding>
+                }
               </ion-list>
             }
           </div>
         }
       }
 
-      <!-- Manual items (pending) -->
-      @if (facade.manualItems().length) {
+      <!-- Synthetic unassigned group: manual items only, no auto suggestions without supermarket -->
+      @if (facade.manualItems().length && !hasUnassignedAutoGroup(state.groupedSuggestions)) {
         <div class="suggestion-group">
-          <div class="supermarket-heading manual-heading">
-            <span>{{ 'shopping.manualAdd.sectionTitle' | translate }}</span>
-          </div>
-          <ion-list class="item-list" lines="none">
-            @for (manual of facade.manualItems(); track manual.id) {
-              <ion-item-sliding>
-                <ion-item detail="false" class="suggestion-item">
-                  <div class="item-body" slot="start">
-                    <span class="item-name">{{ manual.name }}</span>
-                    <div class="item-meta">
-                      <ion-badge class="reason-chip reason-chip--manual">
-                        {{ 'shopping.chips.manual' | translate }}
-                      </ion-badge>
+          <button class="supermarket-heading pressable" (click)="toggleGroup(UNASSIGNED_KEY)">
+            <span>{{ 'shopping.unassignedSupermarket' | translate }}</span>
+            <ion-badge class="group-count group-count--medium">{{ facade.manualItems().length }}</ion-badge>
+            <ion-icon
+              class="collapse-icon"
+              [class.collapse-icon--expanded]="!isGroupCollapsed(UNASSIGNED_KEY)"
+              name="chevron-down-outline">
+            </ion-icon>
+          </button>
+          @if (!isGroupCollapsed(UNASSIGNED_KEY)) {
+            <ion-list class="item-list" lines="none">
+              @for (manual of facade.manualItems(); track manual.id) {
+                <ion-item-sliding>
+                  <ion-item detail="false" class="suggestion-item">
+                    <div class="item-body" slot="start">
+                      <span class="item-name">{{ manual.name }}</span>
                     </div>
-                  </div>
-                  <ion-button
-                    slot="end"
-                    fill="solid"
-                    color="primary"
-                    shape="round"
-                    class="buy-btn"
-                    (click)="buySheet.openSheetForManual(manual.id, manual.name)">
-                    <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                  </ion-button>
-                </ion-item>
-                <ion-item-options side="end">
-                  <ion-item-option color="danger" (click)="facade.removeManualItem(manual.id)">
-                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                  </ion-item-option>
-                </ion-item-options>
-              </ion-item-sliding>
-            }
-          </ion-list>
+                    <ion-button
+                      slot="end"
+                      fill="solid"
+                      color="primary"
+                      shape="round"
+                      class="buy-btn"
+                      (click)="buySheet.openSheetForManual(manual.id, manual.name)">
+                      <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+                    </ion-button>
+                  </ion-item>
+                  <ion-item-options side="end">
+                    <ion-item-option color="danger" (click)="facade.removeManualItem(manual.id)">
+                      <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                    </ion-item-option>
+                  </ion-item-options>
+                </ion-item-sliding>
+              }
+            </ion-list>
+          }
         </div>
       }
 

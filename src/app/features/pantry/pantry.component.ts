@@ -102,6 +102,7 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
   @ViewChild('despensaAddBtn') private despensaAddBtnRef?: ElementRef<HTMLElement>;
 
   private readonly coachMarkDismissed = signal(false);
+  readonly showStarHint = signal(false);
   // Holds the button element once ViewChild is resolved (ngAfterViewInit).
   // Signal makes showCoachMark reactive to the ref becoming available.
   readonly addBtnEl = signal<HTMLElement | null>(null);
@@ -128,6 +129,20 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
 
   onCoachMarkDismissed(): void {
     this.coachMarkDismissed.set(true);
+  }
+
+  ionViewDidEnter(): void {
+    void this.maybeShowStarHint();
+  }
+
+  private async maybeShowStarHint(): Promise<void> {
+    if (this.localStorage.coachMark.isShown('pantry:star')) return;
+    if (!this.facade.despensaItems().length) return;
+    await new Promise<void>(r => setTimeout(r, 400));
+    this.showStarHint.set(true);
+    await new Promise<void>(r => setTimeout(r, 2800));
+    this.showStarHint.set(false);
+    this.localStorage.coachMark.markShown('pantry:star');
   }
 
   async ionViewWillEnter(): Promise<void> {

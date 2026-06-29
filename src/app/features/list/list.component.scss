@@ -224,11 +224,6 @@ ion-card-title {
 .reason-chip--primary { @include chip.accent-primary; }
 .reason-chip--basic   { @include chip.accent-medium; }
 
-.reason-chip--manual {
-  @include chip.accent-muted;
-  font-style: italic;
-}
-
 // ── Supermarket heading ──────────────────────────────────────────────────────
 
 .supermarket-heading {
@@ -244,10 +239,6 @@ ion-card-title {
   font-weight: var(--app-theme-font-weight-bold);
   color: var(--app-theme-text-color);
   padding: var(--app-theme-spacing-xs) 0;
-}
-
-.manual-heading {
-  cursor: default;
 }
 
 .group-count {

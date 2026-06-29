@@ -29,7 +29,7 @@ export const STORAGE_KEYS = {
   /** Stable anon user id used to init the RevenueCat SDK at boot. */
   REVENUECAT_USER_ID: 'revenuecat:userId',
   /** Onboarding completion flag. Read synchronously in `AppComponent` for routing. */
-  ONBOARDING_FLAG: 'hasSeenOnboarding',
+  ONBOARDING_FLAG: 'onboarding:seen',
   // Review prompt cadence (per-device — does not transfer in backup).
   REVIEW_FIRST_USE_AT: 'review:firstUseAt',
   REVIEW_LAUNCH_COUNT: 'review:launchCount',

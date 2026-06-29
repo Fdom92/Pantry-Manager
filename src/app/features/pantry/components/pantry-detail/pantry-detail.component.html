@@ -15,6 +15,7 @@
           class="basic-icon"
           [name]="viewModel.item.isBasic ? 'star' : 'star-outline'"
           [class.basic-icon--active]="viewModel.item.isBasic"
+          [class.basic-icon--hint]="showStarHint"
           role="button"
           tabindex="0"
           (click)="onBasicToggle($event)"

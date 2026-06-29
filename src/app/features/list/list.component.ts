@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, QueryList, ViewChildren, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ListStateService } from '@core/services/list/list-state.service';
 import {
@@ -26,7 +26,9 @@ import { ShoppingBuySheetStateService } from './components/shopping-buy-sheet/sh
 import { ShoppingManualAddSheetComponent } from './components/shopping-manual-add-sheet/shopping-manual-add-sheet.component';
 import { ShoppingManualAddSheetStateService } from './components/shopping-manual-add-sheet/shopping-manual-add-sheet-state.service';
 import { ShoppingReason } from '@core/models/list/list.model';
-import type { ShoppingSuggestionWithItem } from '@core/models/list/list.model';
+import type { ShoppingSuggestionGroupWithItem, ShoppingSuggestionWithItem } from '@core/models/list/list.model';
+import { UNASSIGNED_SUPERMARKET_KEY } from '@core/constants';
+import { LocalStorageService } from '@core/services/shared';
 
 @Component({
   selector: 'app-list',
@@ -51,6 +53,10 @@ export class ListComponent {
   readonly facade = inject(ListStateService);
   readonly buySheet = inject(ShoppingBuySheetStateService);
   readonly manualAddSheet = inject(ShoppingManualAddSheetStateService);
+  private readonly localStorage = inject(LocalStorageService);
+  readonly UNASSIGNED_KEY = UNASSIGNED_SUPERMARKET_KEY;
+
+  @ViewChildren(IonItemSliding) private slidingItems!: QueryList<IonItemSliding>;
 
   private readonly collapsedGroups = signal<Set<string>>(new Set());
   readonly globalBoughtExpanded = signal(false);
@@ -58,6 +64,10 @@ export class ListComponent {
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
+  }
+
+  ionViewDidEnter(): void {
+    void this.maybeShowSwipeHint();
   }
 
   async ionViewWillLeave(): Promise<void> {
@@ -95,6 +105,28 @@ export class ListComponent {
       return;
     }
     this.buySheet.openSheet(suggestion);
+  }
+
+  hasUnassignedAutoGroup(groups: ShoppingSuggestionGroupWithItem[]): boolean {
+    for (const g of groups) {
+      if (g.key === this.UNASSIGNED_KEY) return true;
+    }
+    return false;
+  }
+
+  private async maybeShowSwipeHint(): Promise<void> {
+    if (this.localStorage.coachMark.isShown('list:swipe')) return;
+    await new Promise<void>(r => setTimeout(r, 500));
+    const first = this.slidingItems?.first;
+    if (!first) return;
+    try {
+      await first.open('end');
+      await new Promise<void>(r => setTimeout(r, 900));
+      await first.close();
+      this.localStorage.coachMark.markShown('list:swipe');
+    } catch {
+      // hint is non-critical
+    }
   }
 
   openManualAdd(): void {
