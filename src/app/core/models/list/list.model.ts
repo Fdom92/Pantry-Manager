@@ -17,6 +17,7 @@ export interface BoughtItem {
 export interface ManualItem {
   id: string;
   name: string;
+  createdAt?: number;
 }
 
 export type ShoppingSuggestionWithItem = ShoppingSuggestion<PantryItem>;

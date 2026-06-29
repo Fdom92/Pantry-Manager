@@ -104,11 +104,14 @@
                       <ion-button
                         slot="end"
                         fill="solid"
-                        color="primary"
+                        [color]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'success' : 'primary'"
                         shape="round"
                         class="buy-btn"
                         (click)="onBuyTap(suggestion)">
-                        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+                        <ion-icon
+                          slot="icon-only"
+                          [name]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'leaf-outline' : 'cart-outline'">
+                        </ion-icon>
                       </ion-button>
                     </ion-item>
                     <ion-item-options side="end">

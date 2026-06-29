@@ -6,13 +6,21 @@ import { formatFriendlyName } from '@core/utils/normalization.util';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 
+const MANUAL_ITEM_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 @Injectable({ providedIn: 'root' })
 export class ListManualItemsStore {
   private readonly analytics = inject(AnalyticsService);
   private readonly storage = inject(LocalStorageService);
 
   readonly manualItems = signal<ManualItem[]>(
-    this.storage.manualList.getItems<ManualItem>()
+    (() => {
+      const all = this.storage.manualList.getItems<ManualItem>();
+      const now = Date.now();
+      const fresh = all.filter(item => !item.createdAt || now - item.createdAt < MANUAL_ITEM_TTL_MS);
+      if (fresh.length !== all.length) this.storage.manualList.setItems(fresh);
+      return fresh;
+    })()
   );
   readonly boughtManuals = signal<BoughtItem[]>([]);
 
@@ -22,7 +30,7 @@ export class ListManualItemsStore {
     // and pantry entries created on "buy" all share the same casing as
     // products added through the regular add flow.
     const friendly = formatFriendlyName(name, name);
-    const updated = [...this.manualItems(), { id, name: friendly }];
+    const updated = [...this.manualItems(), { id, name: friendly, createdAt: Date.now() }];
     this.manualItems.set(updated);
     this.storage.manualList.setItems(updated);
     // 'preset' adds are already analytics-attributed by the originating
