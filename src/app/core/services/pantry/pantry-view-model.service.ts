@@ -424,7 +424,7 @@ export class PantryViewModelService {
   }
 
   private buildExpiryPart(state: ProductStatusState, earliestDate: string | null, formattedDate: string): string {
-    if (!earliestDate) return this.translate.instant('pantry.detail.noExpiry');
+    if (!earliestDate) return '';
     if (state === 'expired') return this.translate.instant('pantry.detail.subinfo.expired');
     if (state === 'review') return this.translate.instant('pantry.detail.subinfo.review');
     const days = daysUntilExpiry(earliestDate);

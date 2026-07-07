@@ -24,7 +24,9 @@
         </ion-icon>
         <h3 class="item-name">{{ viewModel.item.name }}</h3>
       </div>
-      <p class="item-subinfo" [attr.data-status]="viewModel.globalStatus.state">{{ viewModel.expiryLabel }}</p>
+      @if (viewModel.expiryLabel) {
+        <p class="item-subinfo" [attr.data-status]="viewModel.globalStatus.state">{{ viewModel.expiryLabel }}</p>
+      }
     </div>
     <span class="item-qty" aria-hidden="true">{{ viewModel.quantityShortLabel }}</span>
   </div>

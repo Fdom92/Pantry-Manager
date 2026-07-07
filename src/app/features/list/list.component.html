@@ -72,26 +72,6 @@
                       class="suggestion-item">
                       <div class="item-body" slot="start">
                         <span class="item-name">{{ suggestion.item.name }}</span>
-                        <div class="item-meta">
-                          @if (suggestion.reason === 'fresh-empty') {
-                            <ion-badge class="reason-chip reason-chip--danger">
-                              {{ 'shopping.chips.freshEmpty' | translate }}
-                            </ion-badge>
-                          } @else if (suggestion.reason === 'fresh-low') {
-                            <ion-badge class="reason-chip reason-chip--warning">
-                              {{ 'shopping.chips.freshLow' | translate }}
-                            </ion-badge>
-                          } @else if (suggestion.reason === 'empty') {
-                            <ion-badge class="reason-chip reason-chip--danger">
-                              {{ 'shopping.chips.empty' | translate }}
-                            </ion-badge>
-                          } @else if (suggestion.reason === 'below-min') {
-                            <ion-badge class="reason-chip reason-chip--warning">
-                              {{ 'shopping.chips.belowMin' | translate }}
-                            </ion-badge>
-                          }
-
-                        </div>
                         @if (suggestion.minThreshold != null) {
                           <span class="item-qty">
                             {{ 'shopping.suggestions.restock' | translate:{ amount: suggestion.suggestedQuantity } }}
