@@ -1,5 +1,14 @@
 @use '../../shared/styles/chip' as chip;
 
+@keyframes item-exit {
+  to { transform: translateX(-56px); opacity: 0; }
+}
+
+ion-item-sliding.suggestion-item--exiting {
+  animation: item-exit 260ms ease forwards;
+  pointer-events: none;
+}
+
 ion-title {
   color: var(--app-theme-text-color);
 }

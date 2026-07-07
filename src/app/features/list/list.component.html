@@ -66,7 +66,7 @@
             @if (!isGroupCollapsed(group.key)) {
               <ion-list class="item-list" lines="none">
                 @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
-                  <ion-item-sliding>
+                  <ion-item-sliding [class.suggestion-item--exiting]="isExiting(suggestion.item._id)">
                     <ion-item
                       detail="false"
                       class="suggestion-item">

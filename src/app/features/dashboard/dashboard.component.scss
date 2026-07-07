@@ -375,6 +375,16 @@ ion-title {
   gap: var(--app-theme-spacing-md);
 }
 
+@keyframes card-dismiss {
+  from { opacity: 1; transform: scale(1) translateX(0); }
+  to   { opacity: 0; transform: scale(0.96) translateX(6px); }
+}
+
+.action-card--dismissing {
+  animation: card-dismiss 280ms ease forwards;
+  pointer-events: none;
+}
+
 .action-card {
   display: flex;
   flex-direction: column;

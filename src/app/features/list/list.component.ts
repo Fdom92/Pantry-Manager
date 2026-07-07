@@ -59,6 +59,7 @@ export class ListComponent {
   @ViewChildren(IonItemSliding) private slidingItems!: QueryList<IonItemSliding>;
 
   private readonly collapsedGroups = signal<Set<string>>(new Set());
+  private readonly exitingItems = signal<Set<string>>(new Set());
   readonly globalBoughtExpanded = signal(false);
   readonly globalIgnoredExpanded = signal(false);
 
@@ -97,14 +98,26 @@ export class ListComponent {
     this.globalIgnoredExpanded.update(v => !v);
   }
 
+  isExiting(id: string): boolean {
+    return this.exitingItems().has(id);
+  }
+
   onBuyTap(suggestion: ShoppingSuggestionWithItem): void {
     const isFresh = suggestion.reason === ShoppingReason.FRESH_EMPTY
       || suggestion.reason === ShoppingReason.FRESH_LOW;
     if (isFresh) {
-      void this.facade.markAsBought(suggestion);
+      void this.animateAndBuy(suggestion);
       return;
     }
     this.buySheet.openSheet(suggestion);
+  }
+
+  private async animateAndBuy(suggestion: ShoppingSuggestionWithItem): Promise<void> {
+    const id = suggestion.item._id;
+    this.exitingItems.update(s => new Set([...s, id]));
+    await new Promise<void>(r => setTimeout(r, 260));
+    void this.facade.markAsBought(suggestion);
+    this.exitingItems.update(s => { const n = new Set(s); n.delete(id); return n; });
   }
 
   hasUnassignedAutoGroup(groups: ShoppingSuggestionGroupWithItem[]): boolean {

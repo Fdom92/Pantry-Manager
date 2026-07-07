@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -57,12 +57,41 @@ export class InsightsComponent {
   private readonly navCtrl = inject(NavController);
   readonly FoodType = FoodType;
 
+  readonly barsVisible = signal(false);
+  @ViewChild('barsAnchor') private barsAnchorEl?: ElementRef<HTMLElement>;
+  private barObserver?: IntersectionObserver;
+
   goToPendientes(): void {
     this.navigationPreset.setPending({ pendientes: true });
     void this.navCtrl.navigateRoot('/pantry');
   }
 
+  ionViewDidEnter(): void {
+    this.setupBarObserver();
+  }
+
+  ionViewWillLeave(): void {
+    this.barObserver?.disconnect();
+  }
+
+  private setupBarObserver(): void {
+    this.barObserver?.disconnect();
+    const el = this.barsAnchorEl?.nativeElement;
+    if (!el) { this.barsVisible.set(true); return; }
+    this.barObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          this.barsVisible.set(true);
+          this.barObserver?.disconnect();
+        }
+      },
+      { threshold: 0.1 },
+    );
+    this.barObserver.observe(el);
+  }
+
   async ionViewWillEnter(): Promise<void> {
+    this.barsVisible.set(false);
     await this.facade.ionViewWillEnter();
     this.insightsTracking.trackWasteCardViewed('insights', {
       isPro: this.facade.isPro(),

@@ -138,6 +138,9 @@
         </div>
       </section>
 
+      <!-- Sentinel: IntersectionObserver triggers bar animations when this enters viewport -->
+      <div #barsAnchor></div>
+
       <!-- SECTION 5: Por tipo de alimento -->
       @if (facade.distribution().foodTypes.length > 0) {
         <section class="insights-section">
@@ -149,7 +152,7 @@
                 <div class="food-type-bar__track">
                   <div
                     class="food-type-bar__fill"
-                    [style.width]="getBarWidth(ft.count, getMaxFoodTypeCount())">
+                    [style.width]="barsVisible() ? getBarWidth(ft.count, getMaxFoodTypeCount()) : '0%'">
                   </div>
                 </div>
                 <span class="food-type-bar__count">{{ ft.count }}</span>
@@ -194,9 +197,9 @@
               <span class="quality-bar-row__label">{{ 'insights.quality.withDate' | translate }}</span>
               <div class="quality-bar-row__track">
                 <div class="quality-bar-row__fill quality-bar-row__fill--good"
-                  [style.width]="getQualityBarWidth(
+                  [style.width]="barsVisible() ? getQualityBarWidth(
                     facade.inventorySnapshot().total - facade.inventorySnapshot().noExpiryDate,
-                    facade.inventorySnapshot().total)">
+                    facade.inventorySnapshot().total) : '0%'">
                 </div>
               </div>
               <span class="quality-bar-row__pct">
@@ -207,7 +210,7 @@
               <span class="quality-bar-row__label">{{ 'insights.quality.noDate' | translate }}</span>
               <div class="quality-bar-row__track">
                 <div class="quality-bar-row__fill quality-bar-row__fill--warning"
-                  [style.width]="getQualityBarWidth(facade.inventorySnapshot().noExpiryDate, facade.inventorySnapshot().total)">
+                  [style.width]="barsVisible() ? getQualityBarWidth(facade.inventorySnapshot().noExpiryDate, facade.inventorySnapshot().total) : '0%'">
                 </div>
               </div>
               <span class="quality-bar-row__pct">
@@ -218,7 +221,7 @@
               <span class="quality-bar-row__label">{{ 'insights.quality.noFoodType' | translate }}</span>
               <div class="quality-bar-row__track">
                 <div class="quality-bar-row__fill quality-bar-row__fill--warning"
-                  [style.width]="getQualityBarWidth(facade.inventorySnapshot().noFoodType, facade.inventorySnapshot().total)">
+                  [style.width]="barsVisible() ? getQualityBarWidth(facade.inventorySnapshot().noFoodType, facade.inventorySnapshot().total) : '0%'">
                 </div>
               </div>
               <span class="quality-bar-row__pct">

@@ -329,7 +329,7 @@ export class SettingsComponent {
     if (!confirmed) return;
     this.isSeedingMarketing.set(true);
     try {
-      await this.marketingSeeder.seedMarketingDatabase();
+      await this.marketingSeeder.seedMarketingDatabase(this.translate.currentLang);
     } finally {
       this.isSeedingMarketing.set(false);
     }
