@@ -39,7 +39,13 @@
         }
       </section>
     } @else if (facade.isEmpty()) {
-      <app-insights-empty-state />
+      <app-empty-state
+        icon="pie-chart-outline"
+        titleKey="insights.empty.title"
+        subtitleKey="insights.empty.body"
+        [showAction]="true"
+        [actionLabel]="'insights.empty.cta' | translate"
+        (action)="goToPantry()" />
     } @else {
 
       <!-- SECTION 1: Waste tracker — full data for PRO, locked teaser for free (bottom paywall hosts the trial CTA) -->

@@ -22,7 +22,7 @@ import { PantryNavigationPresetService } from '@core/services/pantry/pantry-navi
 import { FoodType } from '@core/models/shared/enums.model';
 import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
-import { InsightsEmptyStateComponent } from './components/insights-empty-state/insights-empty-state.component';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-insights',
@@ -44,7 +44,7 @@ import { InsightsEmptyStateComponent } from './components/insights-empty-state/i
     IonButtons,
     WasteTrackerCardComponent,
     ProPaywallCardComponent,
-    InsightsEmptyStateComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './insights.component.html',
   styleUrls: ['./insights.component.scss'],
@@ -60,6 +60,10 @@ export class InsightsComponent {
   readonly barsVisible = signal(false);
   @ViewChild('barsAnchor') private barsAnchorEl?: ElementRef<HTMLElement>;
   private barObserver?: IntersectionObserver;
+
+  goToPantry(): void {
+    void this.navCtrl.navigateRoot('/pantry');
+  }
 
   goToPendientes(): void {
     this.navigationPreset.setPending({ pendientes: true });
