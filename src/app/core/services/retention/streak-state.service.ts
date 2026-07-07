@@ -14,6 +14,7 @@ export class StreakStateService {
 
   private readonly _state = signal<StreakState | null>(null);
   readonly state = this._state.asReadonly();
+  private lastBootstrappedDate: string | null = null;
   readonly currentStreak = computed(() => this._state()?.currentStreak ?? 0);
   readonly longestStreak = computed(() => this._state()?.longestStreak ?? 0);
   readonly milestonesReached = computed(() => this._state()?.milestonesReached ?? []);
@@ -32,9 +33,12 @@ export class StreakStateService {
   }
 
   async bootstrap(): Promise<void> {
+    const today = this.todayLocalISO();
+    if (this.lastBootstrappedDate === today) return;
+    this.lastBootstrappedDate = today;
+
     const loaded = await this.loadDoc();
     this._state.set(loaded);
-    const today = this.todayLocalISO();
     const evaluation = evaluateStreak(loaded, today, false);
     if (evaluation.next && evaluation.next !== loaded) {
       const persisted = await this.persistDoc(evaluation.next);

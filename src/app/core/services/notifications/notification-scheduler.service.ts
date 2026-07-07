@@ -34,7 +34,6 @@ export class NotificationSchedulerService {
   constructor() {
     effect(() => {
       this.preferencesService.preferences();
-      this.pantryStore.loadedProducts();
       void this.scheduleAll();
     });
 

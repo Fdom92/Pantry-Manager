@@ -127,7 +127,8 @@ export class InsightsStateService {
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
   readonly isEmpty = computed<boolean>(() => {
-    return this.pantryStore.items().length === 0;
+    if (this.events().length > 0) return false;
+    return this.pantryStore.loadedProducts().length === 0;
   });
 
   addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): void {
@@ -147,10 +148,10 @@ export class InsightsStateService {
    * that need data without triggering the `insights_viewed` paywall event.
    */
   async loadEvents(): Promise<void> {
-    await this.pantryStore.loadAll();
     if (!this.hasLoadedOnce) {
       this.isLoadingEvents.set(true);
     }
+    await this.pantryStore.loadAll();
     const loaded = await this.eventLog.listEvents();
     this.events.set(loaded);
     this.isLoadingEvents.set(false);
