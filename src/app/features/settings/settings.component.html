@@ -233,7 +233,6 @@
           </ion-list-header>
 
           <ion-item lines="none" button detail="true" routerLink="/onboarding">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="school-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.tutorial.title" | translate }}</h3>
               <p>{{ "settings.tutorial.subtitle" | translate }}</p>
@@ -241,7 +240,6 @@
           </ion-item>
 
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="refresh-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.resetOnboardingTitle" | translate }}</h3>
               <p>{{ "settings.dev.resetOnboardingSubtitle" | translate }}</p>
@@ -282,7 +280,6 @@
 
           <!-- Existing test + preview + schedule-at-time + cancel rows stay below in their original form -->
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="notifications-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.testNotificationTitle" | translate }}</h3>
               <p>{{ "settings.dev.testNotificationSubtitle" | translate }}</p>
@@ -303,7 +300,6 @@
           </ion-item>
 
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="time-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.scheduleAtTimeTitle" | translate }}</h3>
               <p>{{ "settings.dev.scheduleAtTimeSubtitle" | translate }}</p>
@@ -330,7 +326,6 @@
           </ion-item>
 
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="eye-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.previewNotificationTitle" | translate }}</h3>
               <p>{{ "settings.dev.previewNotificationSubtitle" | translate }}</p>
@@ -386,7 +381,6 @@
 
           <!-- Pending list -->
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--medium" name="list-outline"></ion-icon>
             <ion-label>
               <h3>{{ 'settings.dev.notifications.pendingTitle' | translate }}</h3>
             </ion-label>
@@ -413,7 +407,6 @@
 
           <!-- Cancel all (danger) -->
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--danger" name="close-circle-outline"></ion-icon>
             <ion-label>
               <h3>{{ 'settings.dev.notifications.cancelAll' | translate }}</h3>
             </ion-label>
@@ -428,7 +421,6 @@
           </ion-list-header>
 
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="images-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.seedMarketingTitle" | translate }}</h3>
               <p>{{ "settings.dev.seedMarketingSubtitle" | translate }}</p>
@@ -449,7 +441,6 @@
           </ion-item>
 
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--danger" name="trash-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.clearPantryTitle" | translate }}</h3>
               <p>{{ "settings.dev.clearPantrySubtitle" | translate }}</p>
@@ -476,7 +467,6 @@
           </ion-list-header>
 
           <ion-item lines="none">
-            <ion-icon slot="start" [name]="devIsPro() ? 'star' : 'star-outline'" [color]="devIsPro() ? 'tertiary' : 'medium'"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.toggleProTitle" | translate }}</h3>
               <p>{{ "settings.dev.toggleProSubtitle" | translate: { status: devIsPro() ? 'ON' : 'OFF' } }}</p>
@@ -493,7 +483,6 @@
           </ion-item>
 
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="information-circle-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.showAppStateTitle" | translate }}</h3>
               <p>{{ "settings.dev.showAppStateSubtitle" | translate }}</p>
@@ -514,7 +503,6 @@
           </ion-list-header>
 
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--danger" name="skull-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.testCrashTitle" | translate }}</h3>
               <p>{{ "settings.dev.testCrashSubtitle" | translate }}</p>
@@ -531,7 +519,6 @@
           </ion-item>
 
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--primary" name="shield-checkmark-outline"></ion-icon>
             <ion-label>
               <h3>{{ "settings.dev.triggerReconsentTitle" | translate }}</h3>
               <p>{{ "settings.dev.triggerReconsentSubtitle" | translate }}</p>
@@ -547,7 +534,6 @@
           </ion-item>
 
           <ion-item lines="none">
-            <ion-icon slot="start" class="tonal-icon tonal-icon--warning" name="person-remove-outline"></ion-icon>
             <ion-label>
               <h3>Mark device as internal</h3>
               <p>Tags this PostHog person as is_internal=true — filter it out of dashboards.</p>
