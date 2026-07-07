@@ -29,24 +29,34 @@
 
 .card-content {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--app-theme-spacing-md);
   padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-md) var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-xl);
 }
 
-.card-header {
+.card-main {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--app-theme-spacing-sm);
+  flex-direction: column;
+  gap: 2px;
 }
 
 .title-section {
   display: flex;
   align-items: center;
   gap: var(--app-theme-spacing-sm);
-  flex: 1;
   min-width: 0;
+}
+
+@keyframes star-hint-pulse {
+  0%   { transform: scale(1);   color: color-mix(in srgb, var(--ion-text-color) 25%, transparent); }
+  20%  { transform: scale(1.6); color: var(--app-theme-warning-deep); }
+  40%  { transform: scale(1);   color: color-mix(in srgb, var(--ion-text-color) 25%, transparent); }
+  65%  { transform: scale(1.6); color: var(--app-theme-warning-deep); }
+  85%  { transform: scale(1);   color: color-mix(in srgb, var(--ion-text-color) 25%, transparent); }
+  100% { transform: scale(1); }
 }
 
 .basic-icon {
@@ -67,6 +77,10 @@
 
   &:active {
     transform: scale(0.85);
+  }
+
+  &--hint {
+    animation: star-hint-pulse 2s ease-in-out 0.4s both;
   }
 }
 
@@ -98,4 +112,29 @@
   }
 
   &[data-status='review']    { color: var(--app-theme-warning-deep); }
+}
+
+.item-qty {
+  flex-shrink: 0;
+  min-width: 2rem;
+  padding: 3px var(--app-theme-spacing-sm-plus);
+  border-radius: var(--app-theme-radius-pill);
+  background: color-mix(in srgb, var(--ion-text-color) 7%, transparent);
+  color: var(--app-theme-text-muted);
+  font-size: var(--app-theme-font-size-body);
+  font-weight: var(--app-theme-font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  transition: background var(--app-theme-transition-fast);
+}
+
+.pantry-item-card[data-status='expired'] .item-qty {
+  background: color-mix(in srgb, var(--ion-color-danger) 12%, transparent);
+  color: var(--app-theme-card-accent-critical);
+}
+
+.pantry-item-card[data-status='near-expiry'] .item-qty,
+.pantry-item-card[data-status='low-stock'] .item-qty {
+  background: color-mix(in srgb, var(--ion-color-warning) 14%, transparent);
+  color: var(--app-theme-warning-deep);
 }

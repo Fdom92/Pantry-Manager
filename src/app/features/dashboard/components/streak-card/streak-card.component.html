@@ -15,7 +15,7 @@
       @if (currentStreak() === 0) {
         {{ 'settings.streak.empty' | translate }}
       } @else if (nextMilestone() !== null) {
-        🏆 {{ nextGoalKey() | translate: { days: daysToNextMilestone(), milestone: nextMilestone() } }}
+        {{ nextGoalKey() | translate: { days: daysToNextMilestone(), milestone: nextMilestone() } }}
       } @else {
         {{ 'settings.streak.allMilestonesReached' | translate }}
       }

@@ -273,6 +273,9 @@ export class PantryViewModelService {
       formattedEarliestExpirationLong,
       batchCountsLabel: aggregates.batchSummaryLabel,
       subinfo: this.buildSubinfo(aggregates.status.state, aggregates.earliestDate, formattedEarliestExpirationLong, aggregates.batchSummaryLabel),
+      totalQuantity: aggregates.totalQuantity,
+      quantityShortLabel: formatQuantity(aggregates.totalQuantity, this.languageService.getCurrentLocale()),
+      expiryLabel: this.buildExpiryPart(aggregates.status.state, aggregates.earliestDate, formattedEarliestExpirationLong),
       batches,
     };
   }
@@ -421,7 +424,7 @@ export class PantryViewModelService {
   }
 
   private buildExpiryPart(state: ProductStatusState, earliestDate: string | null, formattedDate: string): string {
-    if (!earliestDate) return this.translate.instant('pantry.detail.noExpiry');
+    if (!earliestDate) return '';
     if (state === 'expired') return this.translate.instant('pantry.detail.subinfo.expired');
     if (state === 'review') return this.translate.instant('pantry.detail.subinfo.review');
     const days = daysUntilExpiry(earliestDate);
@@ -447,6 +450,7 @@ export class PantryViewModelService {
     earliestDate: string | null;
     counts: BatchCountsMeta;
     batchSummaryLabel: string;
+    totalQuantity: number;
   } {
     const counts: BatchCountsMeta = {
       total: batches.length,
@@ -513,6 +517,7 @@ export class PantryViewModelService {
       earliestDate,
       counts,
       batchSummaryLabel,
+      totalQuantity,
     };
   }
 

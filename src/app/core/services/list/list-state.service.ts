@@ -311,7 +311,7 @@ export class ListStateService {
       }
 
       const state = this.shoppingAnalysis();
-      if (!state.summary.total) {
+      if (!state.summary.total && !this.manualItemsStore.manualItems().length) {
         return;
       }
       this.analytics.track(ANALYTICS_EVENTS.SHOPPING_LIST_SHARED, {
@@ -337,12 +337,14 @@ export class ListStateService {
           return;
         }
 
-        this.download.downloadBlob(pdfBlob, filename);
+        // Native share unavailable or failed — surface error to user.
+        await this.showToast(this.translate.instant('shopping.share.error'));
       }).catch(async err => {
         if (!isActive()) {
           return;
         }
         console.error('[ListStateService] shareShoppingList error', err);
+        await this.showToast(this.translate.instant('shopping.share.error'));
       });
     });
   }

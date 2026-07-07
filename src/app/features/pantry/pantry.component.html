@@ -109,7 +109,8 @@
         <h3 class="pantry-section__title">{{ 'pantry.sections.pantry' | translate }}</h3>
         <div class="pantry-section__actions">
           <button
-            class="pantry-section__add-btn"
+            class="pantry-section__add-btn pantry-section__group-toggle"
+            [class.pantry-section__group-toggle--active]="facade.groupByCategory()"
             [attr.aria-label]="(facade.groupByCategory() ? 'pantry.sections.groupToggle.grouped' : 'pantry.sections.groupToggle.flat') | translate"
             (click)="facade.toggleGroupByCategory()">
             <ion-icon [name]="facade.groupByCategory() ? 'list-outline' : 'apps-outline'"></ion-icon>
@@ -147,7 +148,7 @@
       } @else {
         @if (facade.groupByCategory()) {
           <div class="category-stack fade-in-list">
-            @for (group of facade.groups(); track group.key) {
+            @for (group of facade.groups(); track group.key; let firstGroup = $first) {
               <div class="virtual-category-card">
                 <ion-card>
                   <ion-card-header
@@ -178,7 +179,7 @@
                 </ion-card>
               </div>
               @if (!facade.isGroupCollapsed(group.key)) {
-                @for (item of group.items; track facade.trackByItemId($index, item)) {
+                @for (item of group.items; track facade.trackByItemId($index, item); let firstItem = $first) {
                   <div
                     class="virtual-item-card"
                     [class.virtual-item-card--deleting]="facade.isDeleting(item)">
@@ -186,6 +187,7 @@
                     <app-pantry-detail
                       class="virtual-item-card__detail"
                       [viewModel]="card"
+                      [showStarHint]="firstGroup && firstItem && showStarHint()"
                       (cardClicked)="facade.openQuantitySheet(item, $event)"
                       (basicToggle)="facade.toggleItemBasic($event)"
                     ></app-pantry-detail>
@@ -196,7 +198,7 @@
           </div>
         } @else {
           <div class="category-stack fade-in-list">
-            @for (item of facade.flatDespensaItems(); track facade.trackByItemId($index, item)) {
+            @for (item of facade.flatDespensaItems(); track facade.trackByItemId($index, item); let firstItem = $first) {
               <div
                 class="virtual-item-card"
                 [class.virtual-item-card--deleting]="facade.isDeleting(item)">
@@ -204,6 +206,7 @@
                 <app-pantry-detail
                   class="virtual-item-card__detail"
                   [viewModel]="card"
+                  [showStarHint]="firstItem && showStarHint()"
                   (cardClicked)="facade.openQuantitySheet(item, $event)"
                   (basicToggle)="facade.toggleItemBasic($event)"
                 ></app-pantry-detail>

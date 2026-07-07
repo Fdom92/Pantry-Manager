@@ -14,11 +14,38 @@
 
     @if (facade.isLoadingEvents()) {
       <section class="insights-section">
-        <ion-skeleton-text animated style="width: 60%; height: 20px; margin-bottom: 16px;"></ion-skeleton-text>
-        <ion-skeleton-text animated style="width: 100%; height: 80px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 50%; height: 18px; margin-bottom: 16px; border-radius: 4px;"></ion-skeleton-text>
+        <div class="snapshot-grid">
+          @for (i of [0,1,2,3]; track i) {
+            <ion-skeleton-text animated style="width: 100%; height: 72px; border-radius: 8px;"></ion-skeleton-text>
+          }
+        </div>
+      </section>
+      <section class="insights-section">
+        <ion-skeleton-text animated style="width: 45%; height: 18px; margin-bottom: 16px; border-radius: 4px;"></ion-skeleton-text>
+        <div style="display:flex; justify-content:space-around; gap:8px;">
+          @for (i of [0,1,2]; track i) {
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;">
+              <ion-skeleton-text animated style="width: 55%; height: 28px; border-radius: 4px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 75%; height: 13px; border-radius: 4px;"></ion-skeleton-text>
+            </div>
+          }
+        </div>
+      </section>
+      <section class="insights-section">
+        <ion-skeleton-text animated style="width: 55%; height: 18px; margin-bottom: 16px; border-radius: 4px;"></ion-skeleton-text>
+        @for (i of [0,1,2,3]; track i) {
+          <ion-skeleton-text animated style="width: 100%; height: 14px; margin-top: 10px; border-radius: 4px;"></ion-skeleton-text>
+        }
       </section>
     } @else if (facade.isEmpty()) {
-      <app-insights-empty-state />
+      <app-empty-state
+        icon="pie-chart-outline"
+        titleKey="insights.empty.title"
+        subtitleKey="insights.empty.body"
+        [showAction]="true"
+        [actionLabel]="'insights.empty.cta' | translate"
+        (action)="goToPantry()" />
     } @else {
 
       <!-- SECTION 1: Waste tracker — full data for PRO, locked teaser for free (bottom paywall hosts the trial CTA) -->
@@ -117,6 +144,9 @@
         </div>
       </section>
 
+      <!-- Sentinel: IntersectionObserver triggers bar animations when this enters viewport -->
+      <div #barsAnchor></div>
+
       <!-- SECTION 5: Por tipo de alimento -->
       @if (facade.distribution().foodTypes.length > 0) {
         <section class="insights-section">
@@ -128,7 +158,7 @@
                 <div class="food-type-bar__track">
                   <div
                     class="food-type-bar__fill"
-                    [style.width]="getBarWidth(ft.count, getMaxFoodTypeCount())">
+                    [style.width]="barsVisible() ? getBarWidth(ft.count, getMaxFoodTypeCount()) : '0%'">
                   </div>
                 </div>
                 <span class="food-type-bar__count">{{ ft.count }}</span>
@@ -155,7 +185,7 @@
       }
 
       <!-- SECTION 6: Calidad del inventario -->
-      @if (facade.inventorySnapshot().total >= 3) {
+      @if (facade.inventorySnapshot().total >= 1) {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.quality.title' | translate }}</h3>
 
@@ -173,9 +203,9 @@
               <span class="quality-bar-row__label">{{ 'insights.quality.withDate' | translate }}</span>
               <div class="quality-bar-row__track">
                 <div class="quality-bar-row__fill quality-bar-row__fill--good"
-                  [style.width]="getQualityBarWidth(
+                  [style.width]="barsVisible() ? getQualityBarWidth(
                     facade.inventorySnapshot().total - facade.inventorySnapshot().noExpiryDate,
-                    facade.inventorySnapshot().total)">
+                    facade.inventorySnapshot().total) : '0%'">
                 </div>
               </div>
               <span class="quality-bar-row__pct">
@@ -186,7 +216,7 @@
               <span class="quality-bar-row__label">{{ 'insights.quality.noDate' | translate }}</span>
               <div class="quality-bar-row__track">
                 <div class="quality-bar-row__fill quality-bar-row__fill--warning"
-                  [style.width]="getQualityBarWidth(facade.inventorySnapshot().noExpiryDate, facade.inventorySnapshot().total)">
+                  [style.width]="barsVisible() ? getQualityBarWidth(facade.inventorySnapshot().noExpiryDate, facade.inventorySnapshot().total) : '0%'">
                 </div>
               </div>
               <span class="quality-bar-row__pct">
@@ -197,7 +227,7 @@
               <span class="quality-bar-row__label">{{ 'insights.quality.noFoodType' | translate }}</span>
               <div class="quality-bar-row__track">
                 <div class="quality-bar-row__fill quality-bar-row__fill--warning"
-                  [style.width]="getQualityBarWidth(facade.inventorySnapshot().noFoodType, facade.inventorySnapshot().total)">
+                  [style.width]="barsVisible() ? getQualityBarWidth(facade.inventorySnapshot().noFoodType, facade.inventorySnapshot().total) : '0%'">
                 </div>
               </div>
               <span class="quality-bar-row__pct">

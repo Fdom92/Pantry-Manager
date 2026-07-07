@@ -139,7 +139,8 @@ import {
   rocketOutline,
   warning,
   warningOutline,
-  pencilOutline
+  pencilOutline,
+  pieChartOutline
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -253,7 +254,8 @@ addIcons({
   'notifications-off-outline': notificationsOffOutline,
   'toggle-outline': toggleOutline,
   'pencil-outline': pencilOutline,
-  'chevron-forward-outline': chevronForwardOutline
+  'chevron-forward-outline': chevronForwardOutline,
+  'pie-chart-outline': pieChartOutline
 });
 
 bootstrapApplication(AppComponent, {

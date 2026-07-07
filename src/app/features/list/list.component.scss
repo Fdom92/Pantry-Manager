@@ -1,5 +1,14 @@
 @use '../../shared/styles/chip' as chip;
 
+@keyframes item-exit {
+  to { transform: translateX(-56px); opacity: 0; }
+}
+
+ion-item-sliding.suggestion-item--exiting {
+  animation: item-exit 260ms ease forwards;
+  pointer-events: none;
+}
+
 ion-title {
   color: var(--app-theme-text-color);
 }
@@ -224,11 +233,6 @@ ion-card-title {
 .reason-chip--primary { @include chip.accent-primary; }
 .reason-chip--basic   { @include chip.accent-medium; }
 
-.reason-chip--manual {
-  @include chip.accent-muted;
-  font-style: italic;
-}
-
 // ── Supermarket heading ──────────────────────────────────────────────────────
 
 .supermarket-heading {
@@ -244,10 +248,6 @@ ion-card-title {
   font-weight: var(--app-theme-font-weight-bold);
   color: var(--app-theme-text-color);
   padding: var(--app-theme-spacing-xs) 0;
-}
-
-.manual-heading {
-  cursor: default;
 }
 
 .group-count {
@@ -378,8 +378,8 @@ ion-fab-button[size="small"] {
   gap: var(--app-theme-spacing-sm);
   width: 100%;
   padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
-  background: transparent;
-  border: 1px dashed color-mix(in srgb, var(--ion-text-color) 18%, transparent);
+  background: color-mix(in srgb, var(--ion-color-primary) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ion-color-primary) 30%, transparent);
   border-radius: var(--app-theme-card-border-radius);
   color: var(--app-theme-text-muted);
   font-size: var(--app-theme-font-size-body);

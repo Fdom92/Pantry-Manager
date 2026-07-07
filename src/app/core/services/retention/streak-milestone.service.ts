@@ -26,7 +26,7 @@ export class StreakMilestoneService {
   private async handleTransition(t: StreakTransition): Promise<void> {
     if (t.kind === 'incremented') {
       this.analytics.track(ANALYTICS_EVENTS.STREAK_REACHED, { streak: t.to });
-    } else if (t.kind === 'reset') {
+    } else if (t.kind === 'reset' && t.previousStreak > 0) {
       this.analytics.track(ANALYTICS_EVENTS.STREAK_BROKEN, { previousStreak: t.previousStreak });
     } else if (t.kind === 'milestone_reached') {
       const eventName = this.milestoneEventName(t.milestone);

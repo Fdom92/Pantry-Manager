@@ -9,8 +9,10 @@ ion-card-content {
 }
 
 ion-item {
-  --padding-start: 0;
+  --padding-start: var(--ion-card-padding, 16px);
   --inner-padding-end: 0;
+  --padding-top: var(--app-theme-spacing-sm-plus);
+  --padding-bottom: var(--app-theme-spacing-sm-plus);
 }
 
 .catalogs-content {

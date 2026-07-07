@@ -59,6 +59,7 @@ export class InsightsStateService {
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
+  private hasLoadedOnce = false;
   readonly householdSize = signal(this.localStorage.householdSize.get());
 
   readonly staleCount = computed((): number => {
@@ -126,11 +127,8 @@ export class InsightsStateService {
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 
   readonly isEmpty = computed<boolean>(() => {
-    const items = this.pantryStore.items();
-    if (items.length === 0) return true;
-    const sevenDaysAgo = Date.now() - 7 * 86_400_000;
-    const recentEvents = this.events().filter(e => new Date(e.timestamp).getTime() >= sevenDaysAgo);
-    return recentEvents.length < 5;
+    if (this.events().length > 0) return false;
+    return this.pantryStore.loadedProducts().length === 0;
   });
 
   addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): void {
@@ -150,11 +148,14 @@ export class InsightsStateService {
    * that need data without triggering the `insights_viewed` paywall event.
    */
   async loadEvents(): Promise<void> {
+    if (!this.hasLoadedOnce) {
+      this.isLoadingEvents.set(true);
+    }
     await this.pantryStore.loadAll();
-    this.isLoadingEvents.set(true);
     const loaded = await this.eventLog.listEvents();
     this.events.set(loaded);
     this.isLoadingEvents.set(false);
+    this.hasLoadedOnce = true;
   }
 
   async ionViewWillEnter(): Promise<void> {

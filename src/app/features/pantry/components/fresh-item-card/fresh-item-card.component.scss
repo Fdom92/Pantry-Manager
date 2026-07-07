@@ -38,9 +38,10 @@
     font-size: var(--app-theme-font-size-body);
     font-weight: var(--app-theme-font-weight-bold);
     color: var(--app-theme-text-color);
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   &__keep-icon {
@@ -83,7 +84,7 @@
 
   &__segment-btn {
     @include segment.button;
-    min-width: 52px;
+    min-width: 42px;
     text-transform: capitalize;
   }
 }

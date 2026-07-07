@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { LocalStorageService } from '@core/services/shared';
 
-export type CoachMarkKey = 'add_first_item';
+export type CoachMarkKey = 'add_first_item' | 'pantry:star' | 'list:swipe';
 
 @Injectable({ providedIn: 'root' })
 export class CoachMarkService {

@@ -218,8 +218,9 @@
       },
       "nearExpiry": {
         "title": "Products expiring soon",
-        "description": "{{ count }} products expire in {{ days }} days",
-        "cta": "View products"
+        "cta": "View products",
+        "description_one": "1 product expires in {{ days }} days",
+        "description_other": "{{ count }} products expire in {{ days }} days"
       },
       "lowStock": {
         "title": "Stock running low",
@@ -612,6 +613,7 @@
     "batches": {
       "title": "Batches & dates",
       "count": "{{ count }} batches recorded",
+      "countOne": "1 batch recorded",
       "open": "Opened",
       "noExpiryDate": "No expiration date",
       "addBatch": "Add batch",
@@ -994,8 +996,9 @@
         "addPromptTitle": "Add location",
         "addPromptPlaceholder": "Location name",
         "removeInUseTitle": "Location in use",
-        "removeInUseMessage": "This location is used by {{ count }} products. Those products will lose this information.",
-        "removeAction": "Remove"
+        "removeAction": "Remove",
+        "removeInUseMessage_one": "This location is used by 1 product. That product will lose this information.",
+        "removeInUseMessage_other": "This location is used by {{ count }} products. Those products will lose this information."
       },
       "categories": {
         "title": "Categories",
@@ -1006,8 +1009,9 @@
         "addPromptTitle": "Add category",
         "addPromptPlaceholder": "Category name",
         "removeInUseTitle": "Category in use",
-        "removeInUseMessage": "This category is used by {{ count }} products. Those products will lose this information.",
-        "removeAction": "Remove"
+        "removeAction": "Remove",
+        "removeInUseMessage_one": "This category is used by 1 product. That product will lose this information.",
+        "removeInUseMessage_other": "This category is used by {{ count }} products. Those products will lose this information."
       },
       "supermarkets": {
         "title": "Supermarkets",
@@ -1019,8 +1023,9 @@
         "addPromptPlaceholder": "Supermarket name",
         "other": "Other",
         "removeInUseTitle": "Supermarket in use",
-        "removeInUseMessage": "This supermarket is used by {{ count }} products. Those products will lose this information.",
-        "removeAction": "Remove"
+        "removeAction": "Remove",
+        "removeInUseMessage_one": "This supermarket is used by 1 product. That product will lose this information.",
+        "removeInUseMessage_other": "This supermarket is used by {{ count }} products. Those products will lose this information."
       }
     },
     "tutorial": {
@@ -1129,13 +1134,15 @@
       "lowStockDescription": "Alert when essential products are running low",
       "permissionDeniedTitle": "Notifications blocked",
       "permissionDeniedMessage": "It looks like you previously denied notification permission. To enable them again, go to your device Settings, find the app and turn on notifications from there.",
-      "permissionDeniedButton": "Got it"
+      "permissionDeniedButton": "Got it",
+      "hourTitle": "Notification time",
+      "hourDescription": "Daily alerts are sent at this time"
     },
     "privacy": {
       "title": "Privacy",
       "subtitle": "Control what data the app shares.",
       "analyticsLabel": "Share usage data",
-      "analyticsDescription": "Anonymous data to understand what works. You can change this anytime.",
+      "analyticsDescription": "Anonymous data to understand what works.",
       "policyLinkTitle": "Privacy policy",
       "policyLinkSubtitle": "How we handle your data.",
       "toastEnabled": "Usage data enabled",

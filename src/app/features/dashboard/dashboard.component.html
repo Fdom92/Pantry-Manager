@@ -29,7 +29,9 @@
       }
 
       <!-- Racha — compact ambient reminder, no section chrome -->
-      <app-streak-card />
+      @if (facade.totalItems() > 0) {
+        <app-streak-card />
+      }
 
       <!-- Today's suggestion -->
       @if (facade.totalItems() > 0) {
@@ -138,7 +140,10 @@
           </header>
           <div class="actions-stack">
             @for (action of facade.actions(); track action.id) {
-              <div class="action-card" [attr.data-priority]="action.priority" [attr.data-category]="action.category">
+              <div class="action-card"
+                [attr.data-priority]="action.priority"
+                [attr.data-category]="action.category"
+                [class.action-card--dismissing]="isDismissing(action.id)">
                 <div class="action-card__content">
                   <h4 class="action-card__title">{{ action.title }}</h4>
                   <p class="action-card__description">{{ action.description }}</p>
@@ -151,7 +156,7 @@
                     {{ action.cta.label }}
                   </ion-button>
                   @if (action.dismissible) {
-                    <button class="action-card__dismiss" (click)="facade.dismissAction(action)" [attr.aria-label]="'common.actions.dismiss' | translate">
+                    <button class="action-card__dismiss" (click)="onDismissAction(action)" [attr.aria-label]="'common.actions.dismiss' | translate">
                       <ion-icon name="close-outline"></ion-icon>
                     </button>
                   }
@@ -163,30 +168,32 @@
       }
 
       <!-- Próximas compras (reposition) — PRO with real predictions; free users get the locked teaser -->
-      @if (isInsightsPro()) {
-        @if (repositionPredictions().length > 0) {
+      @if (facade.totalItems() > 0) {
+        @if (isInsightsPro()) {
+          @if (repositionPredictions().length > 0) {
+            <section class="dashboard-section">
+              <header class="dashboard-section-header">
+                <h3 class="dashboard-section-title">{{ 'dashboard.sections.reposition.title' | translate }}</h3>
+              </header>
+              <app-reposition-card
+                [predictions]="repositionPredictions()"
+                (addToList)="onAddRepoPredictionToList($event)"
+              />
+            </section>
+          }
+        } @else {
           <section class="dashboard-section">
             <header class="dashboard-section-header">
               <h3 class="dashboard-section-title">{{ 'dashboard.sections.reposition.title' | translate }}</h3>
             </header>
-            <app-reposition-card
-              [predictions]="repositionPredictions()"
-              (addToList)="onAddRepoPredictionToList($event)"
+            <app-pro-paywall-card
+              surface="reposition_card"
+              titleKey="dashboard.reposition.title"
+              descriptionKey="dashboard.reposition.teaser"
+              hideCta
             />
           </section>
         }
-      } @else {
-        <section class="dashboard-section">
-          <header class="dashboard-section-header">
-            <h3 class="dashboard-section-title">{{ 'dashboard.sections.reposition.title' | translate }}</h3>
-          </header>
-          <app-pro-paywall-card
-            surface="reposition_card"
-            titleKey="dashboard.reposition.title"
-            descriptionKey="dashboard.reposition.teaser"
-            hideCta
-          />
-        </section>
       }
     }
   </div>

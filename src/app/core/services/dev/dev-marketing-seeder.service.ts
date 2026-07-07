@@ -18,14 +18,61 @@ interface ItemSeed {
   supermarket?: string;
 }
 
+const LOCALE_NAMES: Record<string, Record<string, string>> = {
+  es: {
+    'chicken-breast': 'Pechuga de Pollo',
+    'salmon-fillet': 'Filete de Salmón',
+    'eggs': 'Huevos',
+    'turkey-slices': 'Filetes de Pavo',
+    'broccoli': 'Brócoli',
+    'spinach': 'Espinacas',
+    'carrots': 'Zanahorias',
+    'tomatoes': 'Tomates',
+    'bananas': 'Plátanos',
+    'apples': 'Manzanas',
+    'strawberries': 'Fresas',
+    'avocados': 'Aguacates',
+    'greek-yogurt': 'Yogur Griego',
+    'milk': 'Leche',
+    'butter': 'Mantequilla',
+    'cheese-slices': 'Lonchas de Queso',
+    'petit-suisse': 'Petit Suisse',
+    'drinkable-yogurt': 'Yogur para Beber',
+    'mozzarella': 'Mozzarella',
+    'cream': 'Nata',
+    'kefir': 'Kéfir',
+    'protein-yogurt': 'Yogur Proteico',
+    'rice': 'Arroz',
+    'pasta': 'Pasta',
+    'oats': 'Avena',
+    'bread': 'Pan',
+    'tortillas': 'Tortillas',
+    'granola': 'Granola',
+    'crackers': 'Galletas Saladas',
+    'cereals': 'Cereales',
+    'flour': 'Harina',
+    'cookies': 'Galletas',
+    'dishwasher-tablets': 'Pastillas Lavavajillas',
+    'paper-towels': 'Papel de Cocina',
+    'laundry-detergent': 'Detergente Ropa',
+    'trash-bags': 'Bolsas de Basura',
+    'soap': 'Jabón',
+    'olive-oil': 'Aceite de Oliva',
+    'peanut-butter': 'Crema de Cacahuete',
+    'tuna-cans': 'Atún en Lata',
+    'tomato-sauce': 'Salsa de Tomate',
+    'nuts': 'Frutos Secos',
+  },
+};
+
 @Injectable({ providedIn: 'root' })
 export class DevMarketingSeederService {
   private readonly pantry = inject(PantryQueryService);
   private readonly eventLog = inject(HistoryEventLogService);
 
-  async seedMarketingDatabase(): Promise<void> {
+  async seedMarketingDatabase(locale = 'en'): Promise<void> {
     await this.clearAll();
-    const savedItems = await this.seedItems();
+    const savedItems = await this.seedItems(locale);
     await this.seedHistoryEvents(savedItems);
     await this.pantry.reloadFromStart();
   }
@@ -41,7 +88,8 @@ export class DevMarketingSeederService {
     ]);
   }
 
-  private async seedItems(): Promise<Map<string, PantryItem>> {
+  private async seedItems(locale = 'en'): Promise<Map<string, PantryItem>> {
+    const names = LOCALE_NAMES[locale] ?? {};
     const ts = Date.now();
     const mkId = (key: string) => `item:mkt-${ts}-${key}`;
     const now = new Date();
@@ -357,7 +405,7 @@ export class DevMarketingSeederService {
         _id: mkId(seed.key),
         type: 'item',
         householdId: DEFAULT_HOUSEHOLD_ID,
-        name: seed.name,
+        name: names[seed.key] ?? seed.name,
         categoryId: '',
         foodType: seed.foodType,
         productType: seed.productType,

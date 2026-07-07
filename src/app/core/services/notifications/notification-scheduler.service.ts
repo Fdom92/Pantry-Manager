@@ -4,7 +4,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { NotificationContext, ScheduledNotification } from '@core/models/notifications';
-import { ANALYTICS_EVENTS, NOTIFICATION_IDS, PROJECTED_NOTIFICATION_IDS } from '@core/constants';
+import { ANALYTICS_EVENTS, DEFAULT_NOTIFICATION_HOUR, NOTIFICATION_IDS, PROJECTED_NOTIFICATION_IDS } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { PantryNavigationPresetService } from '@core/services/pantry/pantry-navigation-preset.service';
@@ -34,7 +34,6 @@ export class NotificationSchedulerService {
   constructor() {
     effect(() => {
       this.preferencesService.preferences();
-      this.pantryStore.loadedProducts();
       void this.scheduleAll();
     });
 
@@ -166,6 +165,7 @@ export class NotificationSchedulerService {
     t: (key: string, params?: Record<string, unknown>) => string,
     daysAhead = 7
   ): Promise<void> {
+    const hour = preferences.notificationHour ?? DEFAULT_NOTIFICATION_HOUR;
     const toSchedule: Array<{
       id: number;
       title: string;
@@ -177,7 +177,7 @@ export class NotificationSchedulerService {
     for (let day = 1; day <= daysAhead; day++) {
       const targetDate = new Date(now);
       targetDate.setDate(targetDate.getDate() + day);
-      targetDate.setHours(9, 0, 0, 0);
+      targetDate.setHours(hour, 0, 0, 0);
 
       const winner = this.evaluateWinningNotification(preferences, items, targetDate, t);
       if (!winner) continue;

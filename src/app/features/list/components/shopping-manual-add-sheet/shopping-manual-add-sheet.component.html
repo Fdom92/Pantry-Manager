@@ -1,0 +1,43 @@
+<ion-modal
+  class="app-sheet-modal manual-add-sheet"
+  [isOpen]="state.isOpen()"
+  [initialBreakpoint]="0.45"
+  [breakpoints]="[0, 0.45]"
+  (didPresent)="onDidPresent()"
+  (didDismiss)="state.close()">
+  <ng-template>
+    <div class="sheet-shell manual-add-sheet__content">
+      <div class="sheet-header">
+        <h2 class="sheet-header__title">{{ 'shopping.manualAdd.alertTitle' | translate }}</h2>
+      </div>
+
+      <div class="manual-add-sheet__input-wrapper">
+        <ion-input
+          #nameInput
+          fill="outline"
+          [placeholder]="'shopping.manualAdd.placeholder' | translate"
+          [value]="state.inputValue()"
+          (ionInput)="state.setInputValue($event.detail.value ?? '')"
+          (keydown.enter)="confirm()">
+        </ion-input>
+      </div>
+
+      <div class="sheet-footer">
+        <ion-button
+          expand="block" shape="round"
+          fill="clear"
+          color="medium"
+          (click)="state.close()">
+          {{ 'common.actions.cancel' | translate }}
+        </ion-button>
+        <ion-button
+          expand="block" shape="round"
+          color="primary"
+          [disabled]="!state.inputValue().trim()"
+          (click)="confirm()">
+          {{ 'shopping.manualAdd.alertButton' | translate }}
+        </ion-button>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>

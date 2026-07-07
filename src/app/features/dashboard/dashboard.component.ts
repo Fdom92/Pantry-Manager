@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, ViewChild, inject } from '@angular/core';
+import { Component, OnDestroy, ViewChild, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
+import type { DashboardAction } from '@core/services/dashboard/dashboard-state.service';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
 import { InsightsTrackingStateService } from '@core/services/insights/insights-tracking-state.service';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
@@ -53,6 +54,18 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 })
 export class DashboardComponent implements OnDestroy {
   readonly facade = inject(DashboardStateService);
+  private readonly dismissingIds = signal(new Set<string>());
+
+  isDismissing(id: string): boolean {
+    return this.dismissingIds().has(id);
+  }
+
+  async onDismissAction(action: DashboardAction): Promise<void> {
+    this.dismissingIds.update(s => new Set([...s, action.id]));
+    await new Promise<void>(r => setTimeout(r, 280));
+    this.facade.dismissAction(action);
+    this.dismissingIds.update(s => { const n = new Set(s); n.delete(action.id); return n; });
+  }
   private readonly insights = inject(InsightsStateService);
   private readonly insightsTracking = inject(InsightsTrackingStateService);
   private readonly toast = inject(ToastController);
@@ -124,9 +137,9 @@ export class DashboardComponent implements OnDestroy {
   }
 
   shouldShowReason(): boolean {
-    // Spec invariant: reason is ALWAYS shown when a suggestion is active.
-    // The contextual text ("Caduca hoy", "Caduca pronto", "En revisión"…)
-    // helps the user understand why this item is being surfaced right now.
-    return !!this.facade.todaySuggestion();
+    const s = this.facade.todaySuggestion();
+    if (!s) return false;
+    // Hide reason when expiry date is visible — date already communicates urgency
+    return !s.protagonist.expirationDate;
   }
 }

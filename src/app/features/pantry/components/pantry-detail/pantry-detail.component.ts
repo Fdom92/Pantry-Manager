@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, input } from '@angular/core';
 import type { PantryItem, PantryItemCardViewModel } from '@core/models/pantry';
 import { IonIcon } from '@ionic/angular/standalone';
 
@@ -13,6 +13,7 @@ import { IonIcon } from '@ionic/angular/standalone';
 })
 export class PantryDetailComponent {
   @Input({ required: true }) viewModel!: PantryItemCardViewModel;
+  @Input() showStarHint = false;
   @Output() cardClicked = new EventEmitter<Event | undefined>();
   @Output() basicToggle = new EventEmitter<PantryItem>();
 

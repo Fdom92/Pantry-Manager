@@ -28,7 +28,15 @@ export class LocalStorageService {
 
   // ─── Onboarding & re-consent flags ─────────────────────────────────────
   readonly onboarding = {
-    isSeen: () => this.getBool(STORAGE_KEYS.ONBOARDING_FLAG),
+    isSeen: () => {
+      // One-time migration: 'hasSeenOnboarding' → 'onboarding:seen'
+      const legacy = localStorage.getItem('hasSeenOnboarding');
+      if (legacy !== null) {
+        this.setBool(STORAGE_KEYS.ONBOARDING_FLAG, legacy === 'true');
+        this.remove('hasSeenOnboarding');
+      }
+      return this.getBool(STORAGE_KEYS.ONBOARDING_FLAG);
+    },
     setSeen: (v: boolean) => this.setBool(STORAGE_KEYS.ONBOARDING_FLAG, v),
     /** Wipe both onboarding and re-consent flags — used by Dev "Reset onboarding". */
     reset: () => {

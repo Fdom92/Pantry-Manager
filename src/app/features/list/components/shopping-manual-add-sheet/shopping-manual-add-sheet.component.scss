@@ -1,0 +1,35 @@
+.manual-add-sheet__content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-lg) 0;
+  background: var(--ion-card-background);
+}
+
+.sheet-header__title {
+  margin: 0;
+  font-size: var(--app-theme-font-size-lg);
+  font-weight: var(--app-theme-font-weight-bold);
+  letter-spacing: var(--app-theme-letter-spacing-tight);
+}
+
+.manual-add-sheet__input-wrapper {
+  padding: var(--app-theme-spacing-lg) 0 var(--app-theme-spacing-md);
+
+  ion-input {
+    --border-radius: var(--app-theme-radius-md);
+  }
+}
+
+.sheet-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-xs);
+  margin-top: auto;
+  padding: var(--app-theme-spacing-md) 0
+           calc(var(--app-theme-spacing-md) + env(safe-area-inset-bottom, 0px));
+
+  ion-button {
+    margin: 0;
+  }
+}

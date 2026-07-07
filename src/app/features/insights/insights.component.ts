@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -22,7 +22,7 @@ import { PantryNavigationPresetService } from '@core/services/pantry/pantry-navi
 import { FoodType } from '@core/models/shared/enums.model';
 import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
-import { InsightsEmptyStateComponent } from './components/insights-empty-state/insights-empty-state.component';
+import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-insights',
@@ -44,7 +44,7 @@ import { InsightsEmptyStateComponent } from './components/insights-empty-state/i
     IonButtons,
     WasteTrackerCardComponent,
     ProPaywallCardComponent,
-    InsightsEmptyStateComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './insights.component.html',
   styleUrls: ['./insights.component.scss'],
@@ -57,12 +57,45 @@ export class InsightsComponent {
   private readonly navCtrl = inject(NavController);
   readonly FoodType = FoodType;
 
+  readonly barsVisible = signal(false);
+  @ViewChild('barsAnchor') private barsAnchorEl?: ElementRef<HTMLElement>;
+  private barObserver?: IntersectionObserver;
+
+  goToPantry(): void {
+    void this.navCtrl.navigateRoot('/pantry');
+  }
+
   goToPendientes(): void {
     this.navigationPreset.setPending({ pendientes: true });
     void this.navCtrl.navigateRoot('/pantry');
   }
 
+  ionViewDidEnter(): void {
+    this.setupBarObserver();
+  }
+
+  ionViewWillLeave(): void {
+    this.barObserver?.disconnect();
+  }
+
+  private setupBarObserver(): void {
+    this.barObserver?.disconnect();
+    const el = this.barsAnchorEl?.nativeElement;
+    if (!el) { this.barsVisible.set(true); return; }
+    this.barObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          this.barsVisible.set(true);
+          this.barObserver?.disconnect();
+        }
+      },
+      { threshold: 0.1 },
+    );
+    this.barObserver.observe(el);
+  }
+
   async ionViewWillEnter(): Promise<void> {
+    this.barsVisible.set(false);
     await this.facade.ionViewWillEnter();
     this.insightsTracking.trackWasteCardViewed('insights', {
       isPro: this.facade.isPro(),

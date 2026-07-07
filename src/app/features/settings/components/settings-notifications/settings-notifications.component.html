@@ -66,6 +66,22 @@
               ></ion-toggle>
             </ion-item>
 
+            <ion-item lines="none">
+              <ion-label>
+                <h3>{{ "settings.notifications.hourTitle" | translate }}</h3>
+                <p>{{ "settings.notifications.hourDescription" | translate }}</p>
+              </ion-label>
+              <ion-select
+                slot="end"
+                interface="action-sheet"
+                [value]="facade.notificationHour()"
+                (ionChange)="facade.setNotificationHour($any($event).detail.value)">
+                @for (h of HOUR_OPTIONS; track h) {
+                  <ion-select-option [value]="h">{{ formatHour(h) }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+
           }
 
         </ion-list>

@@ -197,7 +197,7 @@ export class DashboardStateService {
         priority: ActionPriority.HIGH,
         category: 'preventive',
         title: this.translate.instant('dashboard.actions.nearExpiry.title'),
-        description: this.translate.instant('dashboard.actions.nearExpiry.description', { count: nearExpiry, days: NEAR_EXPIRY_WINDOW_DAYS }),
+        description: this.translate.instant(nearExpiry === 1 ? 'dashboard.actions.nearExpiry.description_one' : 'dashboard.actions.nearExpiry.description_other', { count: nearExpiry, days: NEAR_EXPIRY_WINDOW_DAYS }),
         cta: {
           label: this.translate.instant('dashboard.actions.nearExpiry.cta'),
           action: () => this.onOverviewCardSelected('near-expiry'),

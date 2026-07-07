@@ -218,8 +218,9 @@
       },
       "nearExpiry": {
         "title": "Produits bientôt périmés",
-        "description": "{{ count }} produits expirent dans {{ days }} jours",
-        "cta": "Voir les produits"
+        "cta": "Voir les produits",
+        "description_one": "1 produit expire dans {{ days }} jours",
+        "description_other": "{{ count }} produits expirent dans {{ days }} jours"
       },
       "lowStock": {
         "title": "Stock faible",
@@ -612,6 +613,7 @@
     "batches": {
       "title": "Lots et dates",
       "count": "{{ count }} lots enregistrés",
+      "countOne": "1 lot enregistré",
       "open": "Ouvert",
       "noExpiryDate": "Sans date de péremption",
       "addBatch": "Ajouter un lot",
@@ -994,8 +996,9 @@
         "addPromptTitle": "Ajouter un emplacement",
         "addPromptPlaceholder": "Nom de l’emplacement",
         "removeInUseTitle": "Emplacement utilisé",
-        "removeInUseMessage": "Cet emplacement est utilisé par {{ count }} produits. Ces produits perdront cette information.",
-        "removeAction": "Supprimer"
+        "removeAction": "Supprimer",
+        "removeInUseMessage_one": "Cet emplacement est utilisé par 1 produit. Ce produit perdra cette information.",
+        "removeInUseMessage_other": "Cet emplacement est utilisé par {{ count }} produits. Ces produits perdront cette information."
       },
       "categories": {
         "title": "Catégories",
@@ -1006,8 +1009,9 @@
         "addPromptTitle": "Ajouter une catégorie",
         "addPromptPlaceholder": "Nom de la catégorie",
         "removeInUseTitle": "Catégorie utilisée",
-        "removeInUseMessage": "Cette catégorie est utilisée par {{ count }} produits. Ces produits perdront cette information.",
-        "removeAction": "Supprimer"
+        "removeAction": "Supprimer",
+        "removeInUseMessage_one": "Cette catégorie est utilisée par 1 produit. Ce produit perdra cette information.",
+        "removeInUseMessage_other": "Cette catégorie est utilisée par {{ count }} produits. Ces produits perdront cette information."
       },
       "supermarkets": {
         "title": "Supermarchés",
@@ -1019,8 +1023,9 @@
         "addPromptPlaceholder": "Nom du supermarché",
         "other": "Autre",
         "removeInUseTitle": "Supermarché utilisé",
-        "removeInUseMessage": "Ce supermarché est utilisé par {{ count }} produits. Ces produits perdront cette information.",
-        "removeAction": "Supprimer"
+        "removeAction": "Supprimer",
+        "removeInUseMessage_one": "Ce supermarché est utilisé par 1 produit. Ce produit perdra cette information.",
+        "removeInUseMessage_other": "Ce supermarché est utilisé par {{ count }} produits. Ces produits perdront cette information."
       }
     },
     "tutorial": {
@@ -1129,13 +1134,15 @@
       "lowStockDescription": "Alerte lorsque des produits essentiels sont en rupture de stock",
       "permissionDeniedTitle": "Notifications bloquées",
       "permissionDeniedMessage": "Il semble que tu aies précédemment refusé l'autorisation des notifications. Pour les réactiver, va dans les Paramètres de ton appareil, trouve l'app et active les notifications.",
-      "permissionDeniedButton": "Compris"
+      "permissionDeniedButton": "Compris",
+      "hourTitle": "Heure de notification",
+      "hourDescription": "Les alertes quotidiennes sont envoyées à cette heure"
     },
     "privacy": {
       "title": "Confidentialité",
       "subtitle": "Contrôle les données partagées par l’app.",
       "analyticsLabel": "Partager les données d’usage",
-      "analyticsDescription": "Données anonymes pour comprendre ce qui marche. Modifiable à tout moment.",
+      "analyticsDescription": "Données anonymes pour comprendre ce qui marche.",
       "policyLinkTitle": "Politique de confidentialité",
       "policyLinkSubtitle": "Comment nous traitons tes données.",
       "toastEnabled": "Données d'usage activées",
