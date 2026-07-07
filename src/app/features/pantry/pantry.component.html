@@ -109,7 +109,8 @@
         <h3 class="pantry-section__title">{{ 'pantry.sections.pantry' | translate }}</h3>
         <div class="pantry-section__actions">
           <button
-            class="pantry-section__add-btn"
+            class="pantry-section__add-btn pantry-section__group-toggle"
+            [class.pantry-section__group-toggle--active]="facade.groupByCategory()"
             [attr.aria-label]="(facade.groupByCategory() ? 'pantry.sections.groupToggle.grouped' : 'pantry.sections.groupToggle.flat') | translate"
             (click)="facade.toggleGroupByCategory()">
             <ion-icon [name]="facade.groupByCategory() ? 'list-outline' : 'apps-outline'"></ion-icon>

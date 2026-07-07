@@ -218,8 +218,9 @@
       },
       "nearExpiry": {
         "title": "Produits bientôt périmés",
-        "description": "{{ count }} produits expirent dans {{ days }} jours",
-        "cta": "Voir les produits"
+        "cta": "Voir les produits",
+        "description_one": "1 produit expire dans {{ days }} jours",
+        "description_other": "{{ count }} produits expirent dans {{ days }} jours"
       },
       "lowStock": {
         "title": "Stock faible",
@@ -995,8 +996,9 @@
         "addPromptTitle": "Ajouter un emplacement",
         "addPromptPlaceholder": "Nom de l’emplacement",
         "removeInUseTitle": "Emplacement utilisé",
-        "removeInUseMessage": "Cet emplacement est utilisé par {{ count }} produits. Ces produits perdront cette information.",
-        "removeAction": "Supprimer"
+        "removeAction": "Supprimer",
+        "removeInUseMessage_one": "Cet emplacement est utilisé par 1 produit. Ce produit perdra cette information.",
+        "removeInUseMessage_other": "Cet emplacement est utilisé par {{ count }} produits. Ces produits perdront cette information."
       },
       "categories": {
         "title": "Catégories",
@@ -1007,8 +1009,9 @@
         "addPromptTitle": "Ajouter une catégorie",
         "addPromptPlaceholder": "Nom de la catégorie",
         "removeInUseTitle": "Catégorie utilisée",
-        "removeInUseMessage": "Cette catégorie est utilisée par {{ count }} produits. Ces produits perdront cette information.",
-        "removeAction": "Supprimer"
+        "removeAction": "Supprimer",
+        "removeInUseMessage_one": "Cette catégorie est utilisée par 1 produit. Ce produit perdra cette information.",
+        "removeInUseMessage_other": "Cette catégorie est utilisée par {{ count }} produits. Ces produits perdront cette information."
       },
       "supermarkets": {
         "title": "Supermarchés",
@@ -1020,8 +1023,9 @@
         "addPromptPlaceholder": "Nom du supermarché",
         "other": "Autre",
         "removeInUseTitle": "Supermarché utilisé",
-        "removeInUseMessage": "Ce supermarché est utilisé par {{ count }} produits. Ces produits perdront cette information.",
-        "removeAction": "Supprimer"
+        "removeAction": "Supprimer",
+        "removeInUseMessage_one": "Ce supermarché est utilisé par 1 produit. Ce produit perdra cette information.",
+        "removeInUseMessage_other": "Ce supermarché est utilisé par {{ count }} produits. Ces produits perdront cette information."
       }
     },
     "tutorial": {

@@ -490,6 +490,22 @@ ion-modal.quantity-sheet ion-content {
       background: color-mix(in srgb, var(--ion-color-success) 22%, transparent);
     }
   }
+
+  // View-preference toggle — secondary to the add/consume action buttons.
+  // No fill by default; tonal fill only when grouping is active.
+  &__group-toggle {
+    background: transparent;
+    color: var(--app-theme-text-muted);
+
+    &:active {
+      background: color-mix(in srgb, var(--ion-text-color) 10%, transparent);
+    }
+
+    &--active {
+      background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+      color: var(--app-theme-primary-on-surface);
+    }
+  }
 }
 
 // Section divider — subtle gradient fade, strongest at center, transparent

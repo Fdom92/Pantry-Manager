@@ -240,7 +240,7 @@ export class SettingsCatalogsStateService {
     const configWithValue = this.getCatalogConfig(kind, value);
     const alert = await this.alertController.create({
       header: this.translate.instant(config.removalTitleKey),
-      message: this.translate.instant(config.removalMessageKey, { count: usage.count }),
+      message: this.translate.instant(usage.count === 1 ? config.removalMessageKey + '_one' : config.removalMessageKey + '_other', { count: usage.count }),
       buttons: [
         {
           text: this.translate.instant('common.actions.cancel'),
