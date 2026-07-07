@@ -80,7 +80,7 @@
 
   &__segment-btn {
     @include segment.button;
-    min-width: 52px;
+    min-width: 42px;
     text-transform: capitalize;
   }
 }

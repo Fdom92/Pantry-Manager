@@ -137,9 +137,9 @@ export class DashboardComponent implements OnDestroy {
   }
 
   shouldShowReason(): boolean {
-    // Spec invariant: reason is ALWAYS shown when a suggestion is active.
-    // The contextual text ("Caduca hoy", "Caduca pronto", "En revisión"…)
-    // helps the user understand why this item is being surfaced right now.
-    return !!this.facade.todaySuggestion();
+    const s = this.facade.todaySuggestion();
+    if (!s) return false;
+    // Hide reason when expiry date is visible — date already communicates urgency
+    return !s.protagonist.expirationDate;
   }
 }
