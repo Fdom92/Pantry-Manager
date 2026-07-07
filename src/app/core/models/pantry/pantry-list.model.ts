@@ -95,6 +95,9 @@ export interface PantryItemCardViewModel {
   formattedEarliestExpirationLong: string;
   batchCountsLabel: string;
   subinfo: string;
+  totalQuantity: number;
+  quantityShortLabel: string;
+  expiryLabel: string;
   batches: PantryItemBatchViewModel[];
 }
 

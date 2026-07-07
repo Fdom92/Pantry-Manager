@@ -273,6 +273,9 @@ export class PantryViewModelService {
       formattedEarliestExpirationLong,
       batchCountsLabel: aggregates.batchSummaryLabel,
       subinfo: this.buildSubinfo(aggregates.status.state, aggregates.earliestDate, formattedEarliestExpirationLong, aggregates.batchSummaryLabel),
+      totalQuantity: aggregates.totalQuantity,
+      quantityShortLabel: formatQuantity(aggregates.totalQuantity, this.languageService.getCurrentLocale()),
+      expiryLabel: this.buildExpiryPart(aggregates.status.state, aggregates.earliestDate, formattedEarliestExpirationLong),
       batches,
     };
   }
@@ -447,6 +450,7 @@ export class PantryViewModelService {
     earliestDate: string | null;
     counts: BatchCountsMeta;
     batchSummaryLabel: string;
+    totalQuantity: number;
   } {
     const counts: BatchCountsMeta = {
       total: batches.length,
@@ -513,6 +517,7 @@ export class PantryViewModelService {
       earliestDate,
       counts,
       batchSummaryLabel,
+      totalQuantity,
     };
   }
 

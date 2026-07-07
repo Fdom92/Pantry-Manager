@@ -9,7 +9,7 @@
     (click)="handleCardClick($event)"
     (keydown.enter)="handleCardClick($event)"
     (keydown.space)="$event.preventDefault(); handleCardClick($event)">
-    <div class="card-header">
+    <div class="card-main">
       <div class="title-section">
         <ion-icon
           class="basic-icon"
@@ -24,8 +24,8 @@
         </ion-icon>
         <h3 class="item-name">{{ viewModel.item.name }}</h3>
       </div>
+      <p class="item-subinfo" [attr.data-status]="viewModel.globalStatus.state">{{ viewModel.expiryLabel }}</p>
     </div>
-
-    <p class="item-subinfo" [attr.data-status]="viewModel.globalStatus.state">{{ viewModel.subinfo }}</p>
+    <span class="item-qty" aria-hidden="true">{{ viewModel.quantityShortLabel }}</span>
   </div>
 </div>
