@@ -1106,7 +1106,14 @@
       "testCrashTitle": "Attiva crash di test",
       "testCrashSubtitle": "Lancia un errore sintetico per verificare Sentry.",
       "triggerReconsentTitle": "Testa sheet di reconsent",
-      "triggerReconsentSubtitle": "Reimposta i flag e apre il sheet nella dashboard."
+      "triggerReconsentSubtitle": "Reimposta i flag e apre il sheet nella dashboard.",
+      "receiptScanTitle": "Scansiona scontrino (OCR)",
+      "receiptScanSubtitle": "Test OCR: foto di uno scontrino → righe rilevate",
+      "receiptScanResult": "{{ count }} righe rilevate",
+      "receiptScanShare": "Condividi risultato",
+      "receiptScanClear": "Pulisci",
+      "receiptScanNoImage": "Nessuna immagine selezionata.",
+      "receiptScanEmpty": "Nessun testo rilevato nell'immagine. Prova con più luce o più vicino."
     },
     "info": {
       "title": "Informazioni",

@@ -1106,7 +1106,14 @@
       "testCrashTitle": "Trigger test crash",
       "testCrashSubtitle": "Throw a synthetic error to verify Sentry wiring.",
       "triggerReconsentTitle": "Test reconsent sheet",
-      "triggerReconsentSubtitle": "Resets flags and pops the sheet on the dashboard."
+      "triggerReconsentSubtitle": "Resets flags and pops the sheet on the dashboard.",
+      "receiptScanTitle": "Scan receipt (OCR)",
+      "receiptScanSubtitle": "OCR spike: photo of a receipt → detected lines",
+      "receiptScanResult": "{{ count }} lines detected",
+      "receiptScanShare": "Share result",
+      "receiptScanClear": "Clear",
+      "receiptScanNoImage": "No image selected.",
+      "receiptScanEmpty": "No text detected in the image. Try better light or get closer."
     },
     "info": {
       "title": "Information",

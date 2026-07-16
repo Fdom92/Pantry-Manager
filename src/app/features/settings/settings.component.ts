@@ -12,6 +12,9 @@ import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@
 import { LocalStorageService } from '@core/services/shared';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Ocr } from '@capacitor-community/image-to-text';
+import { Share } from '@capacitor/share';
 import {
   IonBackButton,
   IonButton,
@@ -229,6 +232,10 @@ export class SettingsComponent {
   readonly isSeedingMarketing = signal(false);
   readonly isClearingPantry = signal(false);
 
+  // Receipt scan spike (dev-only, feat 5.1)
+  readonly isScanningReceipt = signal(false);
+  readonly receiptScanLines = signal<string[]>([]);
+
   // App state
   readonly isResettingOnboarding = signal(false);
   readonly devIsPro = signal(this.revenuecat.isPro());
@@ -333,6 +340,50 @@ export class SettingsComponent {
     } finally {
       this.isSeedingMarketing.set(false);
     }
+  }
+
+  async scanReceiptDev(): Promise<void> {
+    if (this.isScanningReceipt()) return;
+    this.isScanningReceipt.set(true);
+    try {
+      const photo = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Prompt,
+      });
+      if (!photo.path) {
+        window.alert(this.translate.instant('settings.dev.receiptScanNoImage'));
+        return;
+      }
+      const result = await Ocr.detectText({ filename: photo.path });
+      const lines = result.textDetections.map(d => d.text).filter(t => !!t.trim());
+      this.receiptScanLines.set(lines);
+      if (!lines.length) {
+        window.alert(this.translate.instant('settings.dev.receiptScanEmpty'));
+      }
+    } catch (err) {
+      // User cancelled the picker or OCR unavailable (web build)
+      const message = err instanceof Error ? err.message : String(err);
+      if (!/cancel/i.test(message)) {
+        window.alert(`OCR: ${message}`);
+      }
+    } finally {
+      this.isScanningReceipt.set(false);
+    }
+  }
+
+  async shareReceiptScanResult(): Promise<void> {
+    const lines = this.receiptScanLines();
+    if (!lines.length) return;
+    await Share.share({
+      title: 'PantryMind receipt OCR',
+      text: lines.join('\n'),
+    });
+  }
+
+  clearReceiptScanResult(): void {
+    this.receiptScanLines.set([]);
   }
 
   async clearPantry(): Promise<void> {

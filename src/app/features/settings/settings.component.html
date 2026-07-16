@@ -461,6 +461,46 @@
             </ion-button>
           </ion-item>
 
+          <ion-item lines="none">
+            <ion-label>
+              <h3>{{ "settings.dev.receiptScanTitle" | translate }}</h3>
+              <p>{{ "settings.dev.receiptScanSubtitle" | translate }}</p>
+            </ion-label>
+            <ion-button
+              fill="clear"
+              slot="end"
+              (click)="scanReceiptDev()"
+              [disabled]="isScanningReceipt()"
+              [attr.aria-label]="'settings.dev.receiptScanTitle' | translate"
+            >
+              @if (isScanningReceipt()) {
+                <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+              } @else {
+                <ion-icon slot="icon-only" name="receipt-outline"></ion-icon>
+              }
+            </ion-button>
+          </ion-item>
+
+          @if (receiptScanLines().length) {
+            <ion-item lines="none">
+              <ion-label>
+                <h3>{{ "settings.dev.receiptScanResult" | translate: { count: receiptScanLines().length } }}</h3>
+                @for (line of receiptScanLines(); track $index) {
+                  <p class="receipt-scan-line">{{ line }}</p>
+                }
+              </ion-label>
+            </ion-item>
+            <ion-item lines="none">
+              <ion-button fill="clear" size="small" (click)="shareReceiptScanResult()">
+                <ion-icon slot="start" name="share-outline"></ion-icon>
+                {{ "settings.dev.receiptScanShare" | translate }}
+              </ion-button>
+              <ion-button fill="clear" size="small" color="medium" (click)="clearReceiptScanResult()">
+                {{ "settings.dev.receiptScanClear" | translate }}
+              </ion-button>
+            </ion-item>
+          }
+
           <!-- ── App State ───────────────────────────────────── -->
           <ion-list-header>
             <ion-label>{{ "settings.dev.groupState" | translate }}</ion-label>

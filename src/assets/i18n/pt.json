@@ -1106,7 +1106,14 @@
       "testCrashTitle": "Disparar crash de teste",
       "testCrashSubtitle": "Lança um erro sintético para verificar o Sentry.",
       "triggerReconsentTitle": "Testar reconsent sheet",
-      "triggerReconsentSubtitle": "Reinicia as flags e abre o sheet no dashboard."
+      "triggerReconsentSubtitle": "Reinicia as flags e abre o sheet no dashboard.",
+      "receiptScanTitle": "Digitalizar talão (OCR)",
+      "receiptScanSubtitle": "Teste OCR: foto de um talão → linhas detetadas",
+      "receiptScanResult": "{{ count }} linhas detetadas",
+      "receiptScanShare": "Partilhar resultado",
+      "receiptScanClear": "Limpar",
+      "receiptScanNoImage": "Nenhuma imagem selecionada.",
+      "receiptScanEmpty": "Nenhum texto detetado na imagem. Tente com mais luz ou mais perto."
     },
     "info": {
       "title": "Informações",
