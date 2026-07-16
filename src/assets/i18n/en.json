@@ -866,6 +866,22 @@
         "addSuccess_one": "✅ {{name}} added",
         "addSuccess_other": "✅ {{count}} fresh items added"
       }
+    },
+    "receiptScan": {
+      "title": "Scanned receipt",
+      "subtitle": "{{ count }} products detected",
+      "entryButton": "Add from receipt",
+      "processing": "Reading the receipt…",
+      "error": "Couldn't read the receipt. Try better light or get closer.",
+      "retry": "Try again",
+      "matchExisting": "Will be added to the existing product",
+      "createNew": "Will be created as a new product",
+      "increase": "Increase quantity",
+      "decrease": "Decrease quantity",
+      "submit_one": "Add 1 product",
+      "submit_other": "Add {{ count }} products",
+      "toastAdded_one": "1 product added from the receipt",
+      "toastAdded_other": "{{ count }} products added from the receipt"
     }
   },
   "upgrade": {

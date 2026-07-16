@@ -866,6 +866,22 @@
         "addSuccess_one": "✅ {{name}} hinzugefügt",
         "addSuccess_other": "✅ {{count}} Frischeprodukte hinzugefügt"
       }
+    },
+    "receiptScan": {
+      "title": "Gescannter Kassenbon",
+      "subtitle": "{{ count }} Produkte erkannt",
+      "entryButton": "Vom Kassenbon hinzufügen",
+      "processing": "Bon wird gelesen…",
+      "error": "Bon konnte nicht gelesen werden. Versuche mehr Licht oder geh näher ran.",
+      "retry": "Erneut versuchen",
+      "matchExisting": "Wird zum vorhandenen Produkt hinzugefügt",
+      "createNew": "Wird als neues Produkt angelegt",
+      "increase": "Menge erhöhen",
+      "decrease": "Menge verringern",
+      "submit_one": "1 Produkt hinzufügen",
+      "submit_other": "{{ count }} Produkte hinzufügen",
+      "toastAdded_one": "1 Produkt vom Bon hinzugefügt",
+      "toastAdded_other": "{{ count }} Produkte vom Bon hinzugefügt"
     }
   },
   "upgrade": {

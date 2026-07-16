@@ -866,6 +866,22 @@
         "addSuccess_one": "✅ {{name}} aggiunto",
         "addSuccess_other": "✅ {{count}} freschi aggiunti"
       }
+    },
+    "receiptScan": {
+      "title": "Scontrino scansionato",
+      "subtitle": "{{ count }} prodotti rilevati",
+      "entryButton": "Aggiungi da scontrino",
+      "processing": "Lettura dello scontrino…",
+      "error": "Impossibile leggere lo scontrino. Prova con più luce o più vicino.",
+      "retry": "Riprova",
+      "matchExisting": "Verrà aggiunto al prodotto esistente",
+      "createNew": "Verrà creato come nuovo prodotto",
+      "increase": "Aumenta quantità",
+      "decrease": "Riduci quantità",
+      "submit_one": "Aggiungi 1 prodotto",
+      "submit_other": "Aggiungi {{ count }} prodotti",
+      "toastAdded_one": "1 prodotto aggiunto dallo scontrino",
+      "toastAdded_other": "{{ count }} prodotti aggiunti dallo scontrino"
     }
   },
   "upgrade": {

@@ -15,6 +15,7 @@ import { PantryBatchOperationsService } from './pantry-batch-operations.service'
 import { PantryBatchesModalStateService } from './modals/pantry-batches-modal-state.service';
 import { PantryAddModalStateService } from './modals/pantry-add-modal-state.service';
 import { PantryConsumeModalStateService } from './modals/pantry-consume-modal-state.service';
+import { PantryReceiptScanModalStateService } from './modals/pantry-receipt-scan-modal-state.service';
 import { PantryQuantitySheetStateService } from './modals/pantry-quantity-sheet-state.service';
 import { PantryListUiStateService } from './pantry-list-ui-state.service';
 import { PantryStoreService } from './pantry-store.service';
@@ -39,6 +40,7 @@ export class PantryStateService {
   private readonly listUi = inject(PantryListUiStateService);
   private readonly addModal = inject(PantryAddModalStateService);
   private readonly consumeModal = inject(PantryConsumeModalStateService);
+  private readonly receiptScanModal = inject(PantryReceiptScanModalStateService);
   private readonly batchesModal = inject(PantryBatchesModalStateService);
   private readonly quantitySheet = inject(PantryQuantitySheetStateService);
   private readonly freshAddModal = inject(PantryFreshAddModalStateService);
@@ -245,6 +247,9 @@ export class PantryStateService {
   adjustEntry = (entry: AddEntry, delta: number) => this.addModal.adjustEntry(entry, delta);
   adjustEntryById = (entryId: string, delta: number) => this.addModal.adjustEntryById(entryId, delta);
   setEntryDate = (entryId: string, date: string | undefined) => this.addModal.setEntryDate(entryId, date);
+
+  // -------- Receipt scan modal (delegates to PantryReceiptScanModalStateService) --------
+  startReceiptScan = () => this.receiptScanModal.startScan();
 
   // -------- Consume modal (delegates to PantryConsumeModalStateService) --------
   openConsumeModal = () => this.consumeModal.openConsumeModal();

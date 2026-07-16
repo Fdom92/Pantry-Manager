@@ -866,6 +866,22 @@
         "addSuccess_one": "✅ {{name}} adicionado",
         "addSuccess_other": "✅ {{count}} frescos adicionados"
       }
+    },
+    "receiptScan": {
+      "title": "Talão digitalizado",
+      "subtitle": "{{ count }} produtos detetados",
+      "entryButton": "Adicionar a partir do talão",
+      "processing": "A ler o talão…",
+      "error": "Não foi possível ler o talão. Tente com mais luz ou mais perto.",
+      "retry": "Tentar novamente",
+      "matchExisting": "Será adicionado ao produto existente",
+      "createNew": "Será criado como produto novo",
+      "increase": "Aumentar quantidade",
+      "decrease": "Reduzir quantidade",
+      "submit_one": "Adicionar 1 produto",
+      "submit_other": "Adicionar {{ count }} produtos",
+      "toastAdded_one": "1 produto adicionado do talão",
+      "toastAdded_other": "{{ count }} produtos adicionados do talão"
     }
   },
   "upgrade": {

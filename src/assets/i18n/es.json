@@ -866,6 +866,22 @@
         "addSuccess_one": "✅ {{name}} añadido",
         "addSuccess_other": "✅ {{count}} frescos añadidos"
       }
+    },
+    "receiptScan": {
+      "title": "Ticket escaneado",
+      "subtitle": "{{ count }} productos detectados",
+      "entryButton": "Añadir desde ticket",
+      "processing": "Leyendo el ticket…",
+      "error": "No se ha podido leer el ticket. Prueba con más luz o acércate más.",
+      "retry": "Volver a intentar",
+      "matchExisting": "Se añadirá al producto existente",
+      "createNew": "Se creará como producto nuevo",
+      "increase": "Aumentar cantidad",
+      "decrease": "Reducir cantidad",
+      "submit_one": "Añadir 1 producto",
+      "submit_other": "Añadir {{ count }} productos",
+      "toastAdded_one": "1 producto añadido desde el ticket",
+      "toastAdded_other": "{{ count }} productos añadidos desde el ticket"
     }
   },
   "upgrade": {
