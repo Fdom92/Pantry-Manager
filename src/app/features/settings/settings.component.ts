@@ -13,7 +13,7 @@ import { LocalStorageService } from '@core/services/shared';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { Ocr } from '@capacitor-community/image-to-text';
+import { CapacitorPluginMlKitTextRecognition } from '@pantrist/capacitor-plugin-ml-kit-text-recognition';
 import { Share } from '@capacitor/share';
 import {
   IonBackButton,
@@ -349,15 +349,19 @@ export class SettingsComponent {
       const photo = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
-        resultType: CameraResultType.Uri,
+        resultType: CameraResultType.Base64,
         source: CameraSource.Prompt,
       });
-      if (!photo.path) {
+      if (!photo.base64String) {
         window.alert(this.translate.instant('settings.dev.receiptScanNoImage'));
         return;
       }
-      const result = await Ocr.detectText({ filename: photo.path });
-      const lines = result.textDetections.map(d => d.text).filter(t => !!t.trim());
+      const result = await CapacitorPluginMlKitTextRecognition.detectText({
+        base64Image: photo.base64String,
+      });
+      const lines = result.blocks
+        .flatMap(block => block.lines.map(line => line.text))
+        .filter(t => !!t.trim());
       this.receiptScanLines.set(lines);
       if (!lines.length) {
         window.alert(this.translate.instant('settings.dev.receiptScanEmpty'));
