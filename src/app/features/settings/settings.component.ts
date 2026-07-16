@@ -235,6 +235,7 @@ export class SettingsComponent {
   // Receipt scan spike (dev-only, feat 5.1)
   readonly isScanningReceipt = signal(false);
   readonly receiptScanLines = signal<string[]>([]);
+  readonly receiptScanRaw = signal<string>('');
 
   // App state
   readonly isResettingOnboarding = signal(false);
@@ -363,6 +364,20 @@ export class SettingsComponent {
         .flatMap(block => block.lines.map(line => line.text))
         .filter(t => !!t.trim());
       this.receiptScanLines.set(lines);
+      // Full geometry payload for parser fixtures (shared as JSON by the share button).
+      this.receiptScanRaw.set(JSON.stringify(
+        {
+          capturedAt: new Date().toISOString(),
+          lines: result.blocks.flatMap(block =>
+            block.lines.map(line => ({
+              text: line.text,
+              box: line.boundingBox,
+            })),
+          ),
+        },
+        null,
+        1,
+      ));
       if (!lines.length) {
         window.alert(this.translate.instant('settings.dev.receiptScanEmpty'));
       }
@@ -378,16 +393,19 @@ export class SettingsComponent {
   }
 
   async shareReceiptScanResult(): Promise<void> {
+    // Prefer the JSON payload (text + bounding boxes) — it's the parser fixture format.
+    const raw = this.receiptScanRaw();
     const lines = this.receiptScanLines();
-    if (!lines.length) return;
+    if (!raw && !lines.length) return;
     await Share.share({
       title: 'PantryMind receipt OCR',
-      text: lines.join('\n'),
+      text: raw || lines.join('\n'),
     });
   }
 
   clearReceiptScanResult(): void {
     this.receiptScanLines.set([]);
+    this.receiptScanRaw.set('');
   }
 
   async clearPantry(): Promise<void> {
