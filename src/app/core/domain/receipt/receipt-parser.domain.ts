@@ -55,7 +55,16 @@ const NOISE_PATTERNS: RegExp[] = [
   /FACTURA|SIMPLIFICADA|FRA\.?\s?NUM|N\.?\s?CAJA|OP:\d|LE ATENDIO|VENDEDOR/i,
   /\bIVA\b|\bMWST\b|\bTVA\b|BASE IMP|CUOTA|%\s?IVA|IMP\.?\s?BRUTO|DESGLOSE/i,
   /TARJETA|BANCARIA|CONTACTLESS|VISA|MASTERCARD|DEBITO|CREDITO|EFECTIVO|CAMBIO|ENTREGADO|PAGO\b|AUT\s?\d|TPV|SANTANDER/i,
-  /PARKING|ENTRADA\s+\d{1,2}[:;]\d{2}|SALIDA\s+\d{1,2}[:;]\d{2}/i,
+  // PARK\w{0,3}G tolerates OCR garbling ("Parkiig"); two clock times in one
+  // row is the garage ENTRADA/SALIDA line however garbled the words are.
+  /PARK\w{0,3}G\b|ENTRADA\s+\d{1,2}[:;]\d{2}|SALIDA\s+\d{1,2}[:;]\d{2}/i,
+  /\d{1,2}[:;]\d{2}.*\d{1,2}[:;]\d{2}/,
+  // Receipt reprint marker + Carrefour loyalty branding block.
+  /DUPLICADO|A[ÑN]OS\s+CONTIGO|CLUBP/i,
+  // Section headers on Mercadona-style tickets ("PESCADO", "CARNICERIA"):
+  // a single word, garble-tolerant via prefix, never a product (products
+  // carry qty/price context).
+  /^(PESCA|CARNIC|FRUTER|CHARCUT|PANAD|DROGUER)[A-ZÁ-Üa-zá-ü]{0,6}$/i,
   /DEVOLUCION|JUSTIFICANTE|GRACIAS|VISITA|BIENVENID|RECIBO|CLIENTE|GARANT[IÍ]A/i,
   /CLUB\s?DIA|SOCIO|NEGOCIO\s+\d|MVM\b|^VAL$|ARTPESO|E4\s|FY\d{2}\b/i,
   /DESCRIPCI[OÓ]?N|\bCANT\b|\bPVP\b|\bQTE\b|\bMONTANT\b|P\.?\s?UNIT|DESCRIPTION/i,
@@ -64,8 +73,13 @@ const NOISE_PATTERNS: RegExp[] = [
   /^[\d\s*#:;.,-]+$/,
 ];
 
-/** Weight sub-row: belongs to the product row above it, not a product itself. */
-const WEIGHT_ROW = /\d+[.,]\d+\s*kg\s*[x×]/i;
+/**
+ * Weight sub-row: belongs to the product row above it, not a product itself.
+ * Second alternative catches OCR-garbled variants ("2,2t6 kg 241"): rows that
+ * START with a decimal number and mention kg are always weight lines —
+ * product rows never open with a decimal.
+ */
+const WEIGHT_ROW = /(\d+[.,]\d+\s*kg\s*[x×]|^\d+[.,]\d\S*\s.*\bkg\b)/i;
 
 /** Discount rows: explicit wording, or a lone negative amount (leading or trailing minus). */
 const DISCOUNT_ROW = /(DESCUENTO|DESCOMPTE|RABATT|REMISE|SCONTO|BEHERAPENAK|^\s*-\s?\d+[.,]\d{2}\s*€?\s*$|\d+[.,]\d{2}\s?-\s?[A-Z]?\s*$)/i;
@@ -188,6 +202,12 @@ export function parseReceipt(rows: ReceiptRow[]): ReceiptParseResult {
   const startIdx = rows.findIndex(r => START_ANCHOR.test(r.text));
   const zone = startIdx >= 0 ? rows.slice(startIdx + 1) : rows;
 
+  // Without a start anchor (Carrefour, Aldi, Lidl print no table header) the
+  // store-branding block can't be cut positionally — instead, only rows that
+  // carry a price qualify as products. Costco is exempt: its product names
+  // sit on their own price-less row above the data line.
+  const requirePrice = startIdx < 0 && supermarket !== 'costco';
+
   const items: ParsedReceiptItem[] = [];
   let ended = false;
 
@@ -196,6 +216,7 @@ export function parseReceipt(rows: ReceiptRow[]): ReceiptParseResult {
     const kind = classifyRow(row, items.length);
     if (kind === 'end') { ended = true; continue; }
     if (kind !== 'product') continue;
+    if (requirePrice && !rowHasPrice(row)) continue;
     const product = extractProduct(row);
     if (product) items.push(product);
   }
@@ -221,6 +242,11 @@ function consolidate(items: ParsedReceiptItem[]): ParsedReceiptItem[] {
     }
   }
   return [...byKey.values()];
+}
+
+/** True when any token in the row looks like a price ("1,75", "12.19"). */
+function rowHasPrice(row: ReceiptRow): boolean {
+  return /\d+[.,]\d{2}([^\d]|$)/.test(row.text);
 }
 
 function hasNameCell(row: ReceiptRow): boolean {

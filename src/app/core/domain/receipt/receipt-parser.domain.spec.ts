@@ -125,6 +125,44 @@ describe('receipt-parser.domain — full parse', () => {
     expect(p2!.rawName).toBe('COCA COLA 2 L');
   });
 
+  it('requires a price for products when no table header exists (real Carrefour case)', () => {
+    // Carrefour prints no "Descripcion" header — branding lines leaked as
+    // products on device (2026-07). Price requirement filters them out.
+    const rows = [
+      row('***CARREFOUR***'),
+      row('Torrejón de Ardoz'),
+      row('Alo8 Contiggo'),           // "21 años contigo" garbled
+      row('Clubpleenes'),             // "Clubpleanos feliz" garbled
+      row('llenes?'),                 // "¿Vienes?" garbled
+      row('* TICKET DUPLICADO *'),
+      row('VINO SIMPL BLANCO | 0,94'),
+      row('LECHE NATIVA 1 800 | 12,19'),
+      row('DESCUENTO EN 2ª UNIDAD | B551 | -0,84'),
+      row('16 ART. TOTAL A PAGAR : | 41,63'),
+    ];
+    const result = parseReceipt(rows);
+    const names = result.items.map(i => i.rawName);
+    expect(names).toEqual(['VINO SIMPL BLANCO', 'LECHE NATIVA 1 800']);
+  });
+
+  it('drops garbled tail junk after products (real Mercadona case)', () => {
+    const rows = [
+      row('MERCADONA, S.A.'),
+      row('Descr pcion | P. Unit | Imp.(€)'),
+      row('1 ZANAHORIA 500 G | 0,80'),
+      row('PESCALO'),                       // section header "PESCADO" garbled
+      row('Salmon Entero'),
+      row('2,2t6 kg 241'),                  // weight sub-row garbled
+      row('1 BANANA'),
+      row('1 PARKIIG'),                     // "PARKING" garbled
+      row('Ek Rada 19:11 Salioa 19:42'),    // "ENTRADA/SALIDA" garbled
+      row('TOTAL (€) | 86,01'),
+    ];
+    const result = parseReceipt(rows);
+    const names = result.items.map(i => i.rawName);
+    expect(names).toEqual(['ZANAHORIA 500 G', 'Salmon Entero', 'BANANA']);
+  });
+
   it('skips discount rows and consolidates duplicated products', () => {
     const rows = [
       row('ALDI'),
