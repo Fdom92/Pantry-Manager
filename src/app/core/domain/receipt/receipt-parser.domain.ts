@@ -69,6 +69,9 @@ const NOISE_PATTERNS: RegExp[] = [
   /CLUB\s?DIA|SOCIO|NEGOCIO\s+\d|MVM\b|^VAL$|ARTPESO|E4\s|FY\d{2}\b/i,
   /DESCRIPCI[OÓ]?N|\bCANT\b|\bPVP\b|\bQTE\b|\bMONTANT\b|P\.?\s?UNIT|DESCRIPTION/i,
   /VENTAS CONTADO|OPERACION|AHORRO|AHORRAD|OFERTAS?$/i,
+  // Payment/summary rows that carry prices and would pass the price gate
+  // (Lidl: "ENTREGA 4,02", "Suma 0,24 3,53"), plus loyalty-program upsell.
+  /^SUMA\b|^ENTREGA\b|REG[IÍ]STRATE|PR[OÓ]XIMAS COMPRAS|\bPLUS\b.*AHORRA/i,
   /^\d{1,2}[/\-.]\d{1,2}[/\-.]\d{2,4}/,
   /^[\d\s*#:;.,-]+$/,
 ];
@@ -87,7 +90,11 @@ const DISCOUNT_ROW = /(DESCUENTO|DESCOMPTE|RABATT|REMISE|SCONTO|BEHERAPENAK|^\s*
 const PRICE_TOKEN = /^-?\d{1,4}[.,]\d{2}[-€]?\s?[A-D]?$/;
 const CANT_CELL = /^\d{1,2}[.,]0$/;
 const QTY_X = /^(\d{1,2})\s?[xX]$/;
-const QTY_X_INLINE = /\b(\d{1,2})\s?[xX]\b/;
+// Negative lookbehind: don't fire inside a decimal price ("0,99x" is a
+// Lidl price-times marker, not a quantity).
+const QTY_X_INLINE = /(?<![\d.,])(\d{1,2})\s?[xX]\b/;
+/** Lidl multiplier: "<unit price>x" followed by the count in the next cell. */
+const PRICE_TIMES_CELL = /^\d{1,4}[.,]\d{2}\s?[xX]$/;
 const LEADING_QTY = /^(\d{1,2})\s+(.{3,})$/;
 const PRODUCT_CODE = /^\d{4,}[A-Z]?$/;
 
@@ -120,12 +127,22 @@ export function classifyRow(row: ReceiptRow, productsSoFar: number): ReceiptRowK
 /** Extract name + quantity from a product row. */
 export function extractProduct(row: ReceiptRow): ParsedReceiptItem | null {
   let quantity: number | null = null;
+  let expectQtyAfterPriceTimes = false;
   const nameParts: string[] = [];
 
   for (const rawCell of row.cells) {
     // Cells can themselves contain several tokens when OCR merged them.
     const cell = rawCell.trim();
     if (!cell) continue;
+
+    // Lidl: "0,99x" then the count in the next cell ("2").
+    if (PRICE_TIMES_CELL.test(cell)) { expectQtyAfterPriceTimes = true; continue; }
+    if (expectQtyAfterPriceTimes && /^\d{1,2}$/.test(cell)) {
+      quantity ??= parseInt(cell, 10);
+      expectQtyAfterPriceTimes = false;
+      continue;
+    }
+
     if (PRICE_TOKEN.test(cell) || PRODUCT_CODE.test(cell)) continue;
 
     const qtyX = cell.match(QTY_X);
@@ -141,6 +158,14 @@ export function extractProduct(row: ReceiptRow): ParsedReceiptItem | null {
 
   let name = nameParts.join(' ').replace(/\s+/g, ' ').trim();
 
+  // OCR reads a leading "1" as I/l/| ("I SOJA CON CHOCOLATE") — treat it as
+  // quantity 1 so it doesn't pollute the name.
+  const leadGarbled = name.match(/^[Il|]\s+(.{3,})$/);
+  if (leadGarbled && /[A-ZÁ-Ü0-9]/.test(leadGarbled[1].charAt(0))) {
+    quantity ??= 1;
+    name = leadGarbled[1].trim();
+  }
+
   // Leading quantity glued to the name ("2 COCA COLA ZERO").
   const lead = name.match(LEADING_QTY);
   if (lead && !startsWithWeight(name)) {
@@ -155,14 +180,30 @@ export function extractProduct(row: ReceiptRow): ParsedReceiptItem | null {
     name = name.replace(QTY_X_INLINE, ' ').replace(/\s+/g, ' ').trim();
   }
 
-  // Strip stray price/code tokens that survived cell-merging.
+  // Strip stray price/code tokens that survived cell-merging:
+  // prices, long numeric codes, promo codes ("B551"), percent markers ("30%").
   const tokens = name
     .split(' ')
-    .filter(tok => !PRICE_TOKEN.test(tok) && !PRODUCT_CODE.test(tok));
-  // Trailing currency symbols and 1-char VAT class markers ("€ 2", "B") are
-  // receipt metadata, never part of the product name.
-  while (tokens.length && /^(€|[A-D0-9])$/.test(tokens[tokens.length - 1])) {
-    tokens.pop();
+    .filter(tok =>
+      !PRICE_TOKEN.test(tok) &&
+      !PRODUCT_CODE.test(tok) &&
+      !/^[A-Z]\d{3,}$/.test(tok) &&
+      !/^\d{1,3}%$/.test(tok),
+    );
+  // Trailing receipt metadata, never part of the product name:
+  // "€ 2" (currency + VAT class), a bare "€", or a 1-char VAT letter ("B").
+  // A bare trailing digit is kept — it can be a legit size ("FRESAS 6").
+  while (tokens.length) {
+    const last = tokens[tokens.length - 1];
+    const prev = tokens[tokens.length - 2];
+    if (/^[0-9]$/.test(last) && prev === '€') {
+      tokens.pop();
+      tokens.pop();
+    } else if (last === '€' || /^[A-D]$/.test(last)) {
+      tokens.pop();
+    } else {
+      break;
+    }
   }
   name = tokens.join(' ').trim();
 
@@ -184,14 +225,24 @@ export function extractProduct(row: ReceiptRow): ParsedReceiptItem | null {
  * "P6", "3x350") are never touched.
  */
 export function cleanOcrDigitArtifacts(name: string): string {
-  return name.replace(
-    /(?<=[a-záéíóúüñç])[01](?=[a-záéíóúüñç])/gi,
-    (digit, offset: number, whole: string) => {
-      const upper = /[A-ZÁÉÍÓÚÜÑÇ]/.test(whole.charAt(offset - 1));
-      if (digit === '0') return upper ? 'O' : 'o';
-      return upper ? 'I' : 'i';
-    },
-  );
+  return name
+    .replace(
+      /(?<=[a-záéíóúüñç])[01](?=[a-záéíóúüñç])/gi,
+      (digit, offset: number, whole: string) => {
+        const upper = /[A-ZÁÉÍÓÚÜÑÇ]/.test(whole.charAt(offset - 1));
+        if (digit === '0') return upper ? 'O' : 'o';
+        return upper ? 'I' : 'i';
+      },
+    )
+    // Word-final 0 after 2+ letters ("DANONIN0" → DANONINO). Sizes like
+    // "P6" or standalone numbers ("1 800") are untouched.
+    .replace(
+      /(?<=[a-záéíóúüñç]{2})0\b/gi,
+      (_digit, offset: number, whole: string) => {
+        const upper = /[A-ZÁÉÍÓÚÜÑÇ]/.test(whole.charAt(offset - 1));
+        return upper ? 'O' : 'o';
+      },
+    );
 }
 
 export function parseReceipt(rows: ReceiptRow[]): ReceiptParseResult {
@@ -199,7 +250,14 @@ export function parseReceipt(rows: ReceiptRow[]): ReceiptParseResult {
 
   // Zone start: when the table header exists, discard the whole store-header
   // block above it in one move (immune to OCR-garbled address/phone lines).
-  const startIdx = rows.findIndex(r => START_ANCHOR.test(r.text));
+  // The anchor is only valid BEFORE the first priced row: anchor words like
+  // PVP also appear in the tax-summary table at the BOTTOM (Lidl), and
+  // matching there would discard every product above it. Store headers never
+  // carry prices; product rows do.
+  const firstPricedIdx = rows.findIndex(rowHasPrice);
+  const anchorIdx = rows.findIndex(r => START_ANCHOR.test(r.text));
+  const startIdx =
+    anchorIdx >= 0 && (firstPricedIdx < 0 || anchorIdx < firstPricedIdx) ? anchorIdx : -1;
   const zone = startIdx >= 0 ? rows.slice(startIdx + 1) : rows;
 
   // Without a start anchor (Carrefour, Aldi, Lidl print no table header) the

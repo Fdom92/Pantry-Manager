@@ -163,6 +163,44 @@ describe('receipt-parser.domain — full parse', () => {
     expect(names).toEqual(['ZANAHORIA 500 G', 'Salmon Entero', 'BANANA']);
   });
 
+  it('ignores anchor words in the bottom tax table (real Lidl case)', () => {
+    // Lidl prints "PVP" in the IVA summary at the BOTTOM — the start anchor
+    // must not match there, or every product above gets discarded.
+    const rows = [
+      row('LIDL SUPERMERCADOS S.A.U'),
+      row('Ctra. Loeches, 49'),
+      row('28850Torrejón de Ardoz'),
+      row('NIF A60195278'),
+      row('EUR'),
+      row('ZUMO NARANJA S/PULPA | 1,79 B'),
+      row('PAN BLANCO S/CORTEZA | 0,99x | 2 | 1,98 A'),
+      row('TOTAL | 3,77'),
+      row('ENTREGA | 4,02'),
+      row('Cambio | -0,25'),
+      row('IVA% | IVA | + | P N | = | PVP'),
+      row('A 4% | 0,08 | 1,90 | 1,98'),
+      row('Suma | 0,24 | 3,53 | 3,77'),
+      row('Regístrate en Lidl Plus y ahorra'),
+      row('en tus próximas compras'),
+    ];
+    const result = parseReceipt(rows);
+    const names = result.items.map(i => i.rawName);
+    expect(names).toEqual(['ZUMO NARANJA S/PULPA', 'PAN BLANCO S/CORTEZA']);
+    expect(result.items[1].quantity).toBe(2);
+  });
+
+  it('treats a leading OCR-garbled I as quantity 1 and strips promo codes (real cases)', () => {
+    // "1 SOJA..." read as "I Soja..." (Mercadona) — I is qty 1, not name.
+    const p = extractProduct(row('I SOJA CON CHOCOLATE | 1,55'));
+    expect(p).toEqual(jasmine.objectContaining({ rawName: 'SOJA CON CHOCOLATE', quantity: 1 }));
+
+    // Carrefour promo code "B551" + "30%" marker must not pollute names.
+    const p2 = extractProduct(row('DANONIN0 FRESAS 6 | B551 | 1,69'));
+    expect(p2!.rawName).toBe('DANONINO FRESAS 6');
+    const p3 = extractProduct(row('BANANA GRANEL | 30% | 1,29'));
+    expect(p3!.rawName).toBe('BANANA GRANEL');
+  });
+
   it('skips discount rows and consolidates duplicated products', () => {
     const rows = [
       row('ALDI'),
