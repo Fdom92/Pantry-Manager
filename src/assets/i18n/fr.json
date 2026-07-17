@@ -882,7 +882,8 @@
       "submit_other": "Ajouter {{ count }} produits",
       "toastAdded_one": "1 produit ajouté depuis le ticket",
       "toastAdded_other": "{{ count }} produits ajoutés depuis le ticket",
-      "editNameTitle": "Corriger le nom"
+      "editNameTitle": "Corriger le nom",
+      "smartBadge": "Analyse intelligente"
     }
   },
   "upgrade": {

@@ -882,7 +882,8 @@
       "submit_other": "{{ count }} Produkte hinzufügen",
       "toastAdded_one": "1 Produkt vom Bon hinzugefügt",
       "toastAdded_other": "{{ count }} Produkte vom Bon hinzugefügt",
-      "editNameTitle": "Namen korrigieren"
+      "editNameTitle": "Namen korrigieren",
+      "smartBadge": "Intelligente Analyse"
     }
   },
   "upgrade": {

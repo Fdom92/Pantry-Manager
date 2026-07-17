@@ -15,6 +15,11 @@
           @if (state.phase() === 'review') {
             <p class="sheet-header__subtitle">
               {{ 'pantry.receiptScan.subtitle' | translate: { count: state.reviewLines().length } }}
+              @if (state.usedSmartScan()) {
+                <span class="receipt-scan-modal__smart-badge">
+                  ✨ {{ 'pantry.receiptScan.smartBadge' | translate }}
+                </span>
+              }
             </p>
           }
         </div>

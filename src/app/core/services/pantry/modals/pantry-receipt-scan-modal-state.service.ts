@@ -7,11 +7,13 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { createDocumentId } from '@core/utils/uuid.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
-import type { OcrLine, ReceiptReviewLine } from '@core/models/receipt';
+import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
 import type { PantryItem } from '@core/models/pantry';
 import { PantryStoreService } from '../pantry-store.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
+import { ReceiptLlmClientService } from '../../receipt/receipt-llm-client.service';
+import { UpgradeRevenuecatService } from '../../upgrade/upgrade-revenuecat.service';
 
 export type ReceiptScanPhase = 'processing' | 'review' | 'error';
 
@@ -27,12 +29,16 @@ export class PantryReceiptScanModalStateService {
   private readonly translate = inject(TranslateService);
   private readonly toastCtrl = inject(ToastController);
   private readonly alertCtrl = inject(AlertController);
+  private readonly llmClient = inject(ReceiptLlmClientService);
+  private readonly revenuecat = inject(UpgradeRevenuecatService);
 
   readonly isOpen = signal(false);
   readonly phase = signal<ReceiptScanPhase>('processing');
   readonly reviewLines = signal<ReceiptReviewLine[]>([]);
   readonly detectedSupermarket = signal<string | null>(null);
   readonly isSubmitting = signal(false);
+  /** True when the PRO LLM path produced the current review lines. */
+  readonly usedSmartScan = signal(false);
 
   readonly includedLines = computed(() => this.reviewLines().filter(l => l.included));
   readonly includedCount = computed(() => this.includedLines().length);
@@ -65,13 +71,37 @@ export class PantryReceiptScanModalStateService {
         block.lines.map(line => ({ text: line.text, box: line.boundingBox ?? null })),
       );
       const rows = reconstructRows(ocrLines);
-      const parsed = parseReceipt(rows);
-      this.detectedSupermarket.set(parsed.supermarket);
+
+      // PRO smart scan: LLM parses the OCR rows server-side (better with
+      // garbled/unknown formats). Local rule-based parser is the free tier
+      // and the offline/error fallback.
+      let items: ParsedReceiptItem[];
+      let supermarket: string | null;
+      let smart = false;
+      if (this.revenuecat.isPro()) {
+        try {
+          const smartResult = await this.llmClient.parse(rows.map(r => r.text));
+          items = smartResult.items;
+          supermarket = smartResult.supermarket;
+          smart = true;
+        } catch (err) {
+          console.warn('[PantryReceiptScanModalStateService] smart scan failed, falling back to local parser', err);
+          const parsed = parseReceipt(rows);
+          items = parsed.items;
+          supermarket = parsed.supermarket;
+        }
+      } else {
+        const parsed = parseReceipt(rows);
+        items = parsed.items;
+        supermarket = parsed.supermarket;
+      }
+      this.usedSmartScan.set(smart);
+      this.detectedSupermarket.set(supermarket);
 
       const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name }));
       const itemsById = new Map(this.pantryStore.loadedProducts().map(item => [item._id, item]));
 
-      const lines: ReceiptReviewLine[] = parsed.items.map((item, index) => {
+      const lines: ReceiptReviewLine[] = items.map((item, index) => {
         const match = matchReceiptName(item.rawName, candidates);
         const matchedItem = match ? itemsById.get(match.id) ?? null : null;
         return {
@@ -219,6 +249,7 @@ export class PantryReceiptScanModalStateService {
         items_added: added,
         items_matched: matched,
         supermarket: this.detectedSupermarket() ?? 'unknown',
+        mode: this.usedSmartScan() ? 'smart' : 'local',
       });
 
       this.close();
@@ -242,6 +273,7 @@ export class PantryReceiptScanModalStateService {
     this.isOpen.set(false);
     this.reviewLines.set([]);
     this.detectedSupermarket.set(null);
+    this.usedSmartScan.set(false);
   }
 }
 

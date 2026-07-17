@@ -882,7 +882,8 @@
       "submit_other": "Add {{ count }} products",
       "toastAdded_one": "1 product added from the receipt",
       "toastAdded_other": "{{ count }} products added from the receipt",
-      "editNameTitle": "Edit name"
+      "editNameTitle": "Edit name",
+      "smartBadge": "Smart scan"
     }
   },
   "upgrade": {

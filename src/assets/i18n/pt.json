@@ -882,7 +882,8 @@
       "submit_other": "Adicionar {{ count }} produtos",
       "toastAdded_one": "1 produto adicionado do talão",
       "toastAdded_other": "{{ count }} produtos adicionados do talão",
-      "editNameTitle": "Corrigir nome"
+      "editNameTitle": "Corrigir nome",
+      "smartBadge": "Análise inteligente"
     }
   },
   "upgrade": {

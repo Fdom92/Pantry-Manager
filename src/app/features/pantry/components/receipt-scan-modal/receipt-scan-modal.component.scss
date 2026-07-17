@@ -63,6 +63,17 @@ ion-modal.app-sheet-modal {
     font-size: 44px;
     color: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
   }
+
+  &__smart-badge {
+    display: inline-block;
+    margin-left: var(--app-theme-spacing-xs);
+    padding: 1px 8px;
+    border-radius: var(--app-theme-radius-pill, 999px);
+    background: color-mix(in srgb, var(--ion-color-tertiary) 14%, transparent);
+    color: var(--ion-color-tertiary);
+    font-size: var(--app-theme-font-size-small);
+    font-weight: var(--app-theme-font-weight-bold);
+  }
 }
 
 .receipt-lines {
