@@ -881,7 +881,8 @@
       "submit_one": "Aggiungi 1 prodotto",
       "submit_other": "Aggiungi {{ count }} prodotti",
       "toastAdded_one": "1 prodotto aggiunto dallo scontrino",
-      "toastAdded_other": "{{ count }} prodotti aggiunti dallo scontrino"
+      "toastAdded_other": "{{ count }} prodotti aggiunti dallo scontrino",
+      "editNameTitle": "Correggi nome"
     }
   },
   "upgrade": {

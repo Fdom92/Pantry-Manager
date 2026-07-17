@@ -57,7 +57,13 @@
                     [attr.aria-label]="state.displayName(line)">
                   </ion-checkbox>
 
-                  <div class="receipt-line__body">
+                  <div
+                    class="receipt-line__body"
+                    role="button"
+                    tabindex="0"
+                    (click)="state.editLineName(line.id)"
+                    (keydown.enter)="state.editLineName(line.id)"
+                    [attr.aria-label]="'pantry.receiptScan.editNameTitle' | translate">
                     <p class="receipt-line__name">{{ state.displayName(line) }}</p>
                     @if (state.isAutoMatch(line)) {
                       <p class="receipt-line__meta receipt-line__meta--match">

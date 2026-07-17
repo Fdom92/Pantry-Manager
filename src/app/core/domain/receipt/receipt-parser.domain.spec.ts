@@ -99,6 +99,32 @@ describe('receipt-parser.domain — full parse', () => {
     expect(result.items.find(i => i.rawName === 'COCA COLA ZERO')!.quantity).toBe(2);
   });
 
+  it('discards the garbled store header above the table anchor (real device case)', () => {
+    // Real Mercadona scan 2026-07: OCR garbled the address block beyond
+    // any noise pattern — the start anchor must remove it wholesale.
+    const rows = [
+      row('MERCADONA, S.A.'),
+      row('Pozo 0e Las Nieves, 34'),
+      row('850 Torrejón de Ardoz'),
+      row('Llefono :'),
+      row('Descr pcion | P. Unit | Imp.(€)'),
+      row('5 LECHE ENTERA P6 | 5,82 | 29,10'),
+      row('1 S0JA NATURAL | 1,20'),
+      row('TOTAL (€) | 86,01'),
+    ];
+    const result = parseReceipt(rows);
+    const names = result.items.map(i => i.rawName);
+    expect(names).toEqual(['LECHE ENTERA P6', 'SOJA NATURAL']);
+    expect(result.items[0].quantity).toBe(5);
+  });
+
+  it('cleans OCR digit artifacts inside words but not sizes', () => {
+    const p = extractProduct(row('1 YOGUR L1QUIDO FRESA'));
+    expect(p!.rawName).toBe('YOGUR LIQUIDO FRESA');
+    const p2 = extractProduct(row('2 COCA COLA 2 L'));
+    expect(p2!.rawName).toBe('COCA COLA 2 L');
+  });
+
   it('skips discount rows and consolidates duplicated products', () => {
     const rows = [
       row('ALDI'),

@@ -30,13 +30,25 @@ const SUPERMARKET_PATTERNS: Array<{ key: string; pattern: RegExp }> = [
   { key: 'consum', pattern: /\bCONSUM\b/i },
 ];
 
+/**
+ * Rows matching this mark the table header ("Descripcion  P.Unit  Imp") —
+ * when present, everything ABOVE it (store name, address, phone...) is
+ * discarded wholesale. Far more robust than per-line noise patterns, because
+ * OCR garbles header lines beyond recognition ("Llefono :").
+ * Tolerant to garbling: DESCR minus vowels, P. Unit, PVP+TOTAL...
+ */
+const START_ANCHOR = /(DESCR\s?[IL1]?PC|P\.?\s?UN[IL1]T|DESCRIPTION\b|\bQTE\b|\bPVP\b|\bCANT\b)/i;
+
 /** Rows at/after one of these mark the end of the product zone. */
 const END_ANCHOR = /(TOTAL\s*\(|A PAGAR|RESUMEN POR BASES|TOTAL A PAGAR|GUZTIRA|IMPORTE:|SOUS-?TOTAL|SUMME\b|TOTALE\b|MONTANT\b|^TOTAL\b|\bTOTAL €|\bTOTAL\s*\(€\))/i;
 
 /** Rows matching any of these are never products. */
 const NOISE_PATTERNS: RegExp[] = [
   /\b(C\.?I\.?F|N\.?I\.?F|NIF|CIF)[.:\s]/i,
-  /\bTEL[EÉ]?F?O?N?O?\b|\bTLF\b|\bTEL\b[.:\s]/i,
+  // FONO catches OCR-garbled TELEFONO variants ("Llefono", "TILEFONO").
+  /\bTEL[EÉ]?F?O?N?O?\b|\bTLF\b|\bTEL\b[.:\s]|FONO\s*:?/i,
+  // Postal-code + city rows that lost their prefix ("850 Torrejón de Ardoz").
+  /^\d{3,5}\s+[A-ZÁ-Ü][a-zá-ü]+(\s|$)/,
   /\bwww\.|@|HTTP/i,
   /\bC\.?P\.?[.:\s]?\d{4,5}\b|\bPOL[IÍ]GONO\b|\bCTRA\b|\bAVDA\b|\bC\/\s/i,
   /HORARIO|Lu\.-|LUNES|APERTURA/i,
@@ -140,6 +152,8 @@ export function extractProduct(row: ReceiptRow): ParsedReceiptItem | null {
   }
   name = tokens.join(' ').trim();
 
+  name = cleanOcrDigitArtifacts(name);
+
   const letters = (name.match(/[a-záéíóúüñç]/gi) ?? []).length;
   if (letters < 3) return null;
 
@@ -150,12 +164,34 @@ export function extractProduct(row: ReceiptRow): ParsedReceiptItem | null {
   };
 }
 
+/**
+ * Receipt fonts make OCR read O as 0 and I/L as 1 ("S0JA", "YOGUR L1QUIDO").
+ * Only digits flanked by letters are substituted — quantities, sizes ("2 L",
+ * "P6", "3x350") are never touched.
+ */
+export function cleanOcrDigitArtifacts(name: string): string {
+  return name.replace(
+    /(?<=[a-záéíóúüñç])[01](?=[a-záéíóúüñç])/gi,
+    (digit, offset: number, whole: string) => {
+      const upper = /[A-ZÁÉÍÓÚÜÑÇ]/.test(whole.charAt(offset - 1));
+      if (digit === '0') return upper ? 'O' : 'o';
+      return upper ? 'I' : 'i';
+    },
+  );
+}
+
 export function parseReceipt(rows: ReceiptRow[]): ReceiptParseResult {
   const supermarket = detectSupermarket(rows);
+
+  // Zone start: when the table header exists, discard the whole store-header
+  // block above it in one move (immune to OCR-garbled address/phone lines).
+  const startIdx = rows.findIndex(r => START_ANCHOR.test(r.text));
+  const zone = startIdx >= 0 ? rows.slice(startIdx + 1) : rows;
+
   const items: ParsedReceiptItem[] = [];
   let ended = false;
 
-  for (const row of rows) {
+  for (const row of zone) {
     if (ended) break;
     const kind = classifyRow(row, items.length);
     if (kind === 'end') { ended = true; continue; }

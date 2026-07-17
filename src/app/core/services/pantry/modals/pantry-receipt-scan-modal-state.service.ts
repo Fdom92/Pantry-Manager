@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { CapacitorPluginMlKitTextRecognition } from '@pantrist/capacitor-plugin-ml-kit-text-recognition';
-import { ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { createDocumentId } from '@core/utils/uuid.util';
@@ -26,6 +26,7 @@ export class PantryReceiptScanModalStateService {
   private readonly analytics = inject(AnalyticsService);
   private readonly translate = inject(TranslateService);
   private readonly toastCtrl = inject(ToastController);
+  private readonly alertCtrl = inject(AlertController);
 
   readonly isOpen = signal(false);
   readonly phase = signal<ReceiptScanPhase>('processing');
@@ -109,6 +110,53 @@ export class PantryReceiptScanModalStateService {
       ),
     );
     this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'quantity' });
+  }
+
+  /** Tap on a line name → alert prompt to correct OCR-garbled text. */
+  async editLineName(id: number): Promise<void> {
+    const line = this.reviewLines().find(l => l.id === id);
+    if (!line) return;
+    const alert = await this.alertCtrl.create({
+      header: this.translate.instant('pantry.receiptScan.editNameTitle'),
+      inputs: [
+        {
+          name: 'name',
+          type: 'text',
+          value: this.displayName(line),
+        },
+      ],
+      buttons: [
+        { text: this.translate.instant('common.actions.cancel'), role: 'cancel' },
+        {
+          text: this.translate.instant('common.actions.save'),
+          handler: (data: { name?: string }) => {
+            const name = (data.name ?? '').trim();
+            if (!name) return;
+            // Re-match against the pantry: typing the right name should link
+            // the line to the existing product instead of creating a copy.
+            const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name }));
+            const rematch = matchReceiptName(name, candidates);
+            const matchedItem = rematch
+              ? this.pantryStore.loadedProducts().find(i => i._id === rematch.id) ?? null
+              : null;
+            this.reviewLines.update(lines =>
+              lines.map(l =>
+                l.id === id
+                  ? {
+                      ...l,
+                      parsed: { ...l.parsed, rawName: name },
+                      match: matchedItem,
+                      matchScore: rematch?.score ?? 0,
+                    }
+                  : l,
+              ),
+            );
+            this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'name' });
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
   /** True when the match is strong enough to add to the existing item. */

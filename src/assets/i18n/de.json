@@ -881,7 +881,8 @@
       "submit_one": "1 Produkt hinzufügen",
       "submit_other": "{{ count }} Produkte hinzufügen",
       "toastAdded_one": "1 Produkt vom Bon hinzugefügt",
-      "toastAdded_other": "{{ count }} Produkte vom Bon hinzugefügt"
+      "toastAdded_other": "{{ count }} Produkte vom Bon hinzugefügt",
+      "editNameTitle": "Namen korrigieren"
     }
   },
   "upgrade": {

@@ -70,12 +70,32 @@ function scoreTokens(receiptTokens: string[], candidateTokens: string[]): number
   return score;
 }
 
-/** Equal, or prefix of one another (min 3 chars, receipts truncate words). */
+/**
+ * Equal, prefix of one another (receipts truncate words), or 1 edit apart
+ * for longer tokens (OCR garbles characters: "hatural" ≈ "natural").
+ */
 function tokensMatch(a: string, b: string): boolean {
   if (a === b) return true;
   const min = Math.min(a.length, b.length);
   if (min < 3) return false;
-  return a.startsWith(b) || b.startsWith(a);
+  if (a.startsWith(b) || b.startsWith(a)) return true;
+  return min >= 5 && withinOneEdit(a, b);
+}
+
+/** Levenshtein distance ≤ 1, O(n) two-pointer check. */
+function withinOneEdit(a: string, b: string): boolean {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0;
+  let j = 0;
+  let edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++edits > 1) return false;
+    if (a.length > b.length) i++;
+    else if (b.length > a.length) j++;
+    else { i++; j++; }
+  }
+  return edits + (a.length - i) + (b.length - j) <= 1;
 }
 
 function tokenize(value: string): string[] {
