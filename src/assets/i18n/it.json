@@ -872,7 +872,7 @@
       "subtitle": "{{ count }} prodotti rilevati",
       "entryButton": "Aggiungi da scontrino",
       "processing": "Lettura dello scontrino…",
-      "error": "Impossibile leggere lo scontrino. Prova con più luce o più vicino.",
+      "error": "Impossibile leggere lo scontrino. Inquadra solo l'elenco dei prodotti, avvicinati e cerca una buona luce.",
       "retry": "Riprova",
       "matchExisting": "Verrà aggiunto al prodotto esistente",
       "createNew": "Verrà creato come nuovo prodotto",
@@ -883,7 +883,13 @@
       "toastAdded_one": "1 prodotto aggiunto dallo scontrino",
       "toastAdded_other": "{{ count }} prodotti aggiunti dallo scontrino",
       "editNameTitle": "Correggi nome",
-      "smartBadge": "Analisi intelligente"
+      "smartBadge": "Analisi intelligente",
+      "hintTitle": "Consiglio per la scansione",
+      "hintMessage": "Inquadra solo l'elenco dei prodotti — senza l'intestazione del negozio né i totali. Più vicino e ben illuminato, migliori i risultati.",
+      "hintOk": "Capito",
+      "promptHeader": "Scansiona scontrino",
+      "promptGallery": "Scegli dalla galleria",
+      "promptCamera": "Scatta foto"
     }
   },
   "upgrade": {

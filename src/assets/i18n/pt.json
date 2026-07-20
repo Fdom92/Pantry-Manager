@@ -872,7 +872,7 @@
       "subtitle": "{{ count }} produtos detetados",
       "entryButton": "Adicionar a partir do talão",
       "processing": "A ler o talão…",
-      "error": "Não foi possível ler o talão. Tente com mais luz ou mais perto.",
+      "error": "Não foi possível ler o talão. Enquadre apenas a lista de produtos, aproxime-se e procure boa luz.",
       "retry": "Tentar novamente",
       "matchExisting": "Será adicionado ao produto existente",
       "createNew": "Será criado como produto novo",
@@ -883,7 +883,13 @@
       "toastAdded_one": "1 produto adicionado do talão",
       "toastAdded_other": "{{ count }} produtos adicionados do talão",
       "editNameTitle": "Corrigir nome",
-      "smartBadge": "Análise inteligente"
+      "smartBadge": "Análise inteligente",
+      "hintTitle": "Dica para digitalizar",
+      "hintMessage": "Enquadre apenas a lista de produtos — sem o cabeçalho da loja nem os totais. Quanto mais perto e com melhor luz, melhores os resultados.",
+      "hintOk": "Entendido",
+      "promptHeader": "Digitalizar talão",
+      "promptGallery": "Escolher da galeria",
+      "promptCamera": "Tirar foto"
     }
   },
   "upgrade": {

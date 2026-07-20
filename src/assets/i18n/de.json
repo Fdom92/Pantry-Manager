@@ -872,7 +872,7 @@
       "subtitle": "{{ count }} Produkte erkannt",
       "entryButton": "Vom Kassenbon hinzufügen",
       "processing": "Bon wird gelesen…",
-      "error": "Bon konnte nicht gelesen werden. Versuche mehr Licht oder geh näher ran.",
+      "error": "Bon konnte nicht gelesen werden. Erfasse nur die Produktliste, geh näher ran und sorge für gutes Licht.",
       "retry": "Erneut versuchen",
       "matchExisting": "Wird zum vorhandenen Produkt hinzugefügt",
       "createNew": "Wird als neues Produkt angelegt",
@@ -883,7 +883,13 @@
       "toastAdded_one": "1 Produkt vom Bon hinzugefügt",
       "toastAdded_other": "{{ count }} Produkte vom Bon hinzugefügt",
       "editNameTitle": "Namen korrigieren",
-      "smartBadge": "Intelligente Analyse"
+      "smartBadge": "Intelligente Analyse",
+      "hintTitle": "Scan-Tipp",
+      "hintMessage": "Erfasse nur die Produktliste — ohne Kopfzeile des Ladens und ohne Summen. Je näher und besser beleuchtet, desto besser das Ergebnis.",
+      "hintOk": "Verstanden",
+      "promptHeader": "Kassenbon scannen",
+      "promptGallery": "Aus Galerie wählen",
+      "promptCamera": "Foto aufnehmen"
     }
   },
   "upgrade": {

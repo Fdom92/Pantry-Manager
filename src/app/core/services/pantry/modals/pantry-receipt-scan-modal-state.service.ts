@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { CapacitorPluginMlKitTextRecognition } from '@pantrist/capacitor-plugin-ml-kit-text-recognition';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { createDocumentId } from '@core/utils/uuid.util';
@@ -14,6 +14,9 @@ import { HistoryEventManagerService } from '../../history/history-event-manager.
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { ReceiptLlmClientService } from '../../receipt/receipt-llm-client.service';
 import { UpgradeRevenuecatService } from '../../upgrade/upgrade-revenuecat.service';
+import { LocalStorageService } from '../../shared/local-storage.service';
+
+const FRAMING_HINT_KEY = 'receiptScanFraming';
 
 export type ReceiptScanPhase = 'processing' | 'review' | 'error';
 
@@ -31,6 +34,7 @@ export class PantryReceiptScanModalStateService {
   private readonly alertCtrl = inject(AlertController);
   private readonly llmClient = inject(ReceiptLlmClientService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
+  private readonly localStorage = inject(LocalStorageService);
 
   readonly isOpen = signal(false);
   readonly phase = signal<ReceiptScanPhase>('processing');
@@ -45,6 +49,7 @@ export class PantryReceiptScanModalStateService {
 
   /** Entry point: opens the camera/gallery picker, then the review sheet. */
   async startScan(): Promise<void> {
+    await this.showFramingHintOnce();
     this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_STARTED, {});
     let base64: string | undefined;
     try {
@@ -53,6 +58,9 @@ export class PantryReceiptScanModalStateService {
         allowEditing: false,
         resultType: CameraResultType.Base64,
         source: CameraSource.Prompt,
+        promptLabelHeader: this.translate.instant('pantry.receiptScan.promptHeader'),
+        promptLabelPhoto: this.translate.instant('pantry.receiptScan.promptGallery'),
+        promptLabelPicture: this.translate.instant('pantry.receiptScan.promptCamera'),
       });
       base64 = photo.base64String;
     } catch {
@@ -125,6 +133,25 @@ export class PantryReceiptScanModalStateService {
       this.phase.set('error');
       this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_FAILED, { reason: 'ocr_error' });
     }
+  }
+
+  /**
+   * One-shot tip before the first scan: framing only the product list (no
+   * header, no totals) measurably improves OCR quality. The system camera
+   * can't render overlays, so the tip goes before it opens.
+   */
+  private async showFramingHintOnce(): Promise<void> {
+    if (this.localStorage.coachMark.isShown(FRAMING_HINT_KEY)) return;
+    const alert = await this.alertCtrl.create({
+      header: this.translate.instant('pantry.receiptScan.hintTitle'),
+      message: this.translate.instant('pantry.receiptScan.hintMessage'),
+      buttons: [{ text: this.translate.instant('pantry.receiptScan.hintOk'), role: 'confirm' }],
+    });
+    await alert.present();
+    // Mark as seen on present (not on dismiss): if the dialog ever fails to
+    // close cleanly, the hint must never block future scans.
+    this.localStorage.coachMark.markShown(FRAMING_HINT_KEY);
+    await alert.onDidDismiss();
   }
 
   toggleLine(id: number): void {

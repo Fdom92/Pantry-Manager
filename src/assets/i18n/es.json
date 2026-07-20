@@ -872,7 +872,7 @@
       "subtitle": "{{ count }} productos detectados",
       "entryButton": "Añadir desde ticket",
       "processing": "Leyendo el ticket…",
-      "error": "No se ha podido leer el ticket. Prueba con más luz o acércate más.",
+      "error": "No se ha podido leer el ticket. Encuadra solo la lista de productos, acércate más y busca buena luz.",
       "retry": "Volver a intentar",
       "matchExisting": "Se añadirá al producto existente",
       "createNew": "Se creará como producto nuevo",
@@ -883,7 +883,13 @@
       "toastAdded_one": "1 producto añadido desde el ticket",
       "toastAdded_other": "{{ count }} productos añadidos desde el ticket",
       "editNameTitle": "Corregir nombre",
-      "smartBadge": "Análisis inteligente"
+      "smartBadge": "Análisis inteligente",
+      "hintTitle": "Consejo para escanear",
+      "hintMessage": "Encuadra solo la lista de productos — sin la cabecera de la tienda ni los totales. Cuanto más cerca y con mejor luz, mejores resultados.",
+      "hintOk": "Entendido",
+      "promptHeader": "Escanear ticket",
+      "promptGallery": "Elegir de la galería",
+      "promptCamera": "Hacer foto"
     }
   },
   "upgrade": {

@@ -352,6 +352,9 @@ export class SettingsComponent {
         allowEditing: false,
         resultType: CameraResultType.Base64,
         source: CameraSource.Prompt,
+        promptLabelHeader: this.translate.instant('pantry.receiptScan.promptHeader'),
+        promptLabelPhoto: this.translate.instant('pantry.receiptScan.promptGallery'),
+        promptLabelPicture: this.translate.instant('pantry.receiptScan.promptCamera'),
       });
       if (!photo.base64String) {
         window.alert(this.translate.instant('settings.dev.receiptScanNoImage'));
