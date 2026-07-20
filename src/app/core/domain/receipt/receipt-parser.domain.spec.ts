@@ -189,6 +189,19 @@ describe('receipt-parser.domain — full parse', () => {
     expect(result.items[1].quantity).toBe(2);
   });
 
+  it('parses Lidl price-times-qty even when OCR merges it into one cell (real device case)', () => {
+    // Device scan: "0,99x" and "2" arrived glued into a single cell/token
+    // ("0,99x2"), not split — cell-level matching missed this, token-level
+    // matching (splitting cells on whitespace) catches it.
+    const glued = extractProduct(row('PAN BLANCO S/CORTEZA 0,99x2 1,98 A'));
+    expect(glued).toEqual(jasmine.objectContaining({ rawName: 'PAN BLANCO S/CORTEZA', quantity: 2 }));
+
+    // Also handle "0,99x 2" merged into one cell with a space (still one
+    // ReceiptRow cell, since OCR line reconstruction didn't split it).
+    const spaced = extractProduct(row('PAN BLANCO S/CORTEZA 0,99x 2 1,98 A'));
+    expect(spaced).toEqual(jasmine.objectContaining({ rawName: 'PAN BLANCO S/CORTEZA', quantity: 2 }));
+  });
+
   it('treats a leading OCR-garbled I as quantity 1 and strips promo codes (real cases)', () => {
     // "1 SOJA..." read as "I Soja..." (Mercadona) — I is qty 1, not name.
     const p = extractProduct(row('I SOJA CON CHOCOLATE | 1,55'));

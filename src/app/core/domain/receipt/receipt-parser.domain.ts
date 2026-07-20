@@ -127,33 +127,45 @@ export function classifyRow(row: ReceiptRow, productsSoFar: number): ReceiptRowK
 /** Extract name + quantity from a product row. */
 export function extractProduct(row: ReceiptRow): ParsedReceiptItem | null {
   let quantity: number | null = null;
-  let expectQtyAfterPriceTimes = false;
   const nameParts: string[] = [];
 
-  for (const rawCell of row.cells) {
-    // Cells can themselves contain several tokens when OCR merged them.
-    const cell = rawCell.trim();
-    if (!cell) continue;
+  // Flatten every cell into whitespace-separated tokens. OCR doesn't
+  // reliably split "0,99x" and "2" into distinct cells — depending on
+  // spacing/kerning they can arrive merged into one line ("0,99x2" or
+  // "0,99x 2" as a single cell) — so pattern-match at token granularity,
+  // not cell granularity.
+  const tokens = row.cells.flatMap(c => c.trim().split(/\s+/)).filter(Boolean);
 
-    // Lidl: "0,99x" then the count in the next cell ("2").
-    if (PRICE_TIMES_CELL.test(cell)) { expectQtyAfterPriceTimes = true; continue; }
-    if (expectQtyAfterPriceTimes && /^\d{1,2}$/.test(cell)) {
-      quantity ??= parseInt(cell, 10);
-      expectQtyAfterPriceTimes = false;
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+
+    // Lidl: "0,99x" then the count in the next token ("2"). Also handles
+    // the fully-glued form "0,99x2" via the split below.
+    if (PRICE_TIMES_CELL.test(token)) {
+      const next = tokens[i + 1];
+      if (next && /^\d{1,2}$/.test(next)) {
+        quantity ??= parseInt(next, 10);
+        i++;
+      }
+      continue;
+    }
+    const gluedPriceTimes = token.match(/^(\d{1,4}[.,]\d{2})[xX](\d{1,2})$/);
+    if (gluedPriceTimes) {
+      quantity ??= parseInt(gluedPriceTimes[2], 10);
       continue;
     }
 
-    if (PRICE_TOKEN.test(cell) || PRODUCT_CODE.test(cell)) continue;
+    if (PRICE_TOKEN.test(token) || PRODUCT_CODE.test(token)) continue;
 
-    const qtyX = cell.match(QTY_X);
+    const qtyX = token.match(QTY_X);
     if (qtyX) { quantity ??= parseInt(qtyX[1], 10); continue; }
 
-    if (CANT_CELL.test(cell)) {
-      const n = Math.round(parseFloat(cell.replace(',', '.')));
+    if (CANT_CELL.test(token)) {
+      const n = Math.round(parseFloat(token.replace(',', '.')));
       if (n >= 1 && n <= 99) { quantity ??= n; continue; }
     }
 
-    nameParts.push(cell);
+    nameParts.push(token);
   }
 
   let name = nameParts.join(' ').replace(/\s+/g, ' ').trim();
@@ -182,7 +194,7 @@ export function extractProduct(row: ReceiptRow): ParsedReceiptItem | null {
 
   // Strip stray price/code tokens that survived cell-merging:
   // prices, long numeric codes, promo codes ("B551"), percent markers ("30%").
-  const tokens = name
+  const nameTokens = name
     .split(' ')
     .filter(tok =>
       !PRICE_TOKEN.test(tok) &&
@@ -193,19 +205,19 @@ export function extractProduct(row: ReceiptRow): ParsedReceiptItem | null {
   // Trailing receipt metadata, never part of the product name:
   // "€ 2" (currency + VAT class), a bare "€", or a 1-char VAT letter ("B").
   // A bare trailing digit is kept — it can be a legit size ("FRESAS 6").
-  while (tokens.length) {
-    const last = tokens[tokens.length - 1];
-    const prev = tokens[tokens.length - 2];
+  while (nameTokens.length) {
+    const last = nameTokens[nameTokens.length - 1];
+    const prev = nameTokens[nameTokens.length - 2];
     if (/^[0-9]$/.test(last) && prev === '€') {
-      tokens.pop();
-      tokens.pop();
+      nameTokens.pop();
+      nameTokens.pop();
     } else if (last === '€' || /^[A-D]$/.test(last)) {
-      tokens.pop();
+      nameTokens.pop();
     } else {
       break;
     }
   }
-  name = tokens.join(' ').trim();
+  name = nameTokens.join(' ').trim();
 
   name = cleanOcrDigitArtifacts(name);
 
