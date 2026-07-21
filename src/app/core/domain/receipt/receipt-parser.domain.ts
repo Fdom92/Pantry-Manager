@@ -187,6 +187,8 @@ const PRICE_TOKEN = /^-?\d{1,4}[.,]\d{2}[-€]?\s?[A-D]?$/;
 const PRODUCT_CODE = /^\d{4,}[A-Z]?$/;
 const PROMO_CODE = /^[A-Z]\d{3,}$/;
 const PERCENT_MARKER = /^\d{1,3}%$/;
+/** Price fragment that lost its leading digit to OCR noise (",70", ".40") — never a real product-name token. */
+const ORPHAN_PRICE_FRAGMENT = /^[.,]\d{2}$/;
 
 const CANT_CELL = /^\d{1,2}[.,]0$/;
 const QTY_X = /^(\d{1,2})\s?[xX]$/;
@@ -343,7 +345,8 @@ function stripNameNoise(name: string): string {
       !PRICE_TOKEN.test(tok) &&
       !PRODUCT_CODE.test(tok) &&
       !PROMO_CODE.test(tok) &&
-      !PERCENT_MARKER.test(tok),
+      !PERCENT_MARKER.test(tok) &&
+      !ORPHAN_PRICE_FRAGMENT.test(tok),
     );
 
   while (tokens.length) {

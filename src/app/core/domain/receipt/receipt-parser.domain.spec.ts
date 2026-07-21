@@ -189,6 +189,14 @@ describe('receipt-parser.domain — full parse', () => {
     expect(result.items[1].quantity).toBe(2);
   });
 
+  it('drops an orphan price fragment that lost its leading digit (real device case)', () => {
+    // "2 CREMA VERDURAS  1,70  3,40" — OCR dropped the leading "1" of the
+    // unit price, leaving a bare ",70" token that doesn't match PRICE_TOKEN
+    // (which requires a leading digit) and used to leak into the name.
+    const p = extractProduct(row('2 CREMA VERDURAS ,70 3,40'));
+    expect(p).toEqual(jasmine.objectContaining({ rawName: 'CREMA VERDURAS', quantity: 2 }));
+  });
+
   it('parses Lidl price-times-qty even when OCR merges it into one cell (real device case)', () => {
     // Device scan: "0,99x" and "2" arrived glued into a single cell/token
     // ("0,99x2"), not split — cell-level matching missed this, token-level
