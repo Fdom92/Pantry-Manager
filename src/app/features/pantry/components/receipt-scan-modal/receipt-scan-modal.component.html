@@ -70,7 +70,12 @@
                     (keydown.enter)="state.editLineName(line.id)"
                     [attr.aria-label]="'pantry.receiptScan.editNameTitle' | translate">
                     <p class="receipt-line__name">{{ state.displayName(line) }}</p>
-                    @if (state.isAutoMatch(line)) {
+                    @if (state.isFreshMatch(line)) {
+                      <p class="receipt-line__meta receipt-line__meta--match">
+                        <ion-icon name="leaf-outline"></ion-icon>
+                        {{ 'pantry.receiptScan.matchFresh' | translate }}
+                      </p>
+                    } @else if (state.isAutoMatch(line)) {
                       <p class="receipt-line__meta receipt-line__meta--match">
                         <ion-icon name="link-outline"></ion-icon>
                         {{ 'pantry.receiptScan.matchExisting' | translate }}
@@ -83,20 +88,22 @@
                     }
                   </div>
 
-                  <div class="receipt-line__qty">
-                    <button
-                      type="button"
-                      class="receipt-line__qty-btn"
-                      [disabled]="line.quantity <= 1"
-                      (click)="state.adjustLineQuantity(line.id, -1)"
-                      [attr.aria-label]="'pantry.receiptScan.decrease' | translate">−</button>
-                    <span class="receipt-line__qty-value">{{ line.quantity }}</span>
-                    <button
-                      type="button"
-                      class="receipt-line__qty-btn"
-                      (click)="state.adjustLineQuantity(line.id, 1)"
-                      [attr.aria-label]="'pantry.receiptScan.increase' | translate">+</button>
-                  </div>
+                  @if (!state.isFreshMatch(line)) {
+                    <div class="receipt-line__qty">
+                      <button
+                        type="button"
+                        class="receipt-line__qty-btn"
+                        [disabled]="line.quantity <= 1"
+                        (click)="state.adjustLineQuantity(line.id, -1)"
+                        [attr.aria-label]="'pantry.receiptScan.decrease' | translate">−</button>
+                      <span class="receipt-line__qty-value">{{ line.quantity }}</span>
+                      <button
+                        type="button"
+                        class="receipt-line__qty-btn"
+                        (click)="state.adjustLineQuantity(line.id, 1)"
+                        [attr.aria-label]="'pantry.receiptScan.increase' | translate">+</button>
+                    </div>
+                  }
                 </li>
               }
             </ul>

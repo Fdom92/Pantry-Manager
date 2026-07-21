@@ -889,7 +889,8 @@
       "hintOk": "Entendido",
       "promptHeader": "Digitalizar talão",
       "promptGallery": "Escolher da galeria",
-      "promptCamera": "Tirar foto"
+      "promptCamera": "Tirar foto",
+      "matchFresh": "Será marcado como disponível"
     }
   },
   "upgrade": {

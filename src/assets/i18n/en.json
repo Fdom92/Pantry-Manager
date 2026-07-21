@@ -889,7 +889,8 @@
       "hintOk": "Got it",
       "promptHeader": "Scan receipt",
       "promptGallery": "Choose from gallery",
-      "promptCamera": "Take photo"
+      "promptCamera": "Take photo",
+      "matchFresh": "Will be marked as in stock"
     }
   },
   "upgrade": {

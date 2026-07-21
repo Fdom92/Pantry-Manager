@@ -889,7 +889,8 @@
       "hintOk": "Verstanden",
       "promptHeader": "Kassenbon scannen",
       "promptGallery": "Aus Galerie wählen",
-      "promptCamera": "Foto aufnehmen"
+      "promptCamera": "Foto aufnehmen",
+      "matchFresh": "Wird als vorhanden markiert"
     }
   },
   "upgrade": {

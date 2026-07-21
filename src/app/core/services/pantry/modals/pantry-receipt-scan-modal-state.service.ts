@@ -5,7 +5,9 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { createDocumentId } from '@core/utils/uuid.util';
+import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
+import { FRESH_QTY } from '@core/domain/pantry/fresh.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
 import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
 import type { PantryItem } from '@core/models/pantry';
@@ -221,6 +223,11 @@ export class PantryReceiptScanModalStateService {
     return !!line.match && line.matchScore >= MATCH_AUTO_THRESHOLD;
   }
 
+  /** True when the auto-matched item is a fresh product (restocked, not lotted). */
+  isFreshMatch(line: ReceiptReviewLine): boolean {
+    return this.isAutoMatch(line) && line.match!.productType === 'fresh';
+  }
+
   displayName(line: ReceiptReviewLine): string {
     return this.isAutoMatch(line) ? line.match!.name : formatReceiptName(line.parsed.rawName);
   }
@@ -239,12 +246,18 @@ export class PantryReceiptScanModalStateService {
     try {
       for (const line of lines) {
         if (this.isAutoMatch(line)) {
-          const updated = await this.pantryStore.addNewLot(line.match!._id, {
-            quantity: line.quantity,
-          });
+          const matchedItem = line.match!;
+          // Fresh items are single-batch and state-based (sufficient/low/none),
+          // not FIFO lots — mirror the normal fresh-add flow (overwrite the one
+          // batch to "sufficient") instead of appending a lot with the ticket's
+          // literal quantity, which would pile up batches the fresh model
+          // doesn't expect.
+          const updated = matchedItem.productType === 'fresh'
+            ? restockFreshItem(matchedItem, timestamp)
+            : await this.pantryStore.addNewLot(matchedItem._id, { quantity: line.quantity });
           if (updated) {
             await this.pantryStore.updateItem(updated);
-            await this.eventManager.logAddExistingItem(line.match!, updated, line.quantity, undefined, sessionId, timestamp);
+            await this.eventManager.logAddExistingItem(matchedItem, updated, line.quantity, undefined, sessionId, timestamp);
             matched++;
           }
         } else {
@@ -302,6 +315,28 @@ export class PantryReceiptScanModalStateService {
     this.detectedSupermarket.set(null);
     this.usedSmartScan.set(false);
   }
+}
+
+/**
+ * Fresh items are single-batch: restocking overwrites that one batch to
+ * "sufficient" rather than appending a lot, mirroring
+ * PantryFreshAddModalStateService's existing-item path. The ticket's scanned
+ * quantity is ignored here — fresh state isn't a literal count.
+ */
+function restockFreshItem(item: PantryItem, timestamp: string): PantryItem {
+  const previousBatch = item.batches?.[0];
+  return {
+    ...item,
+    batches: [{
+      batchId: previousBatch?.batchId ?? generateBatchId(),
+      quantity: FRESH_QTY.sufficient,
+      expirationDate: previousBatch?.expirationDate,
+      noExpiry: previousBatch?.noExpiry,
+      opened: previousBatch?.opened,
+      locationId: previousBatch?.locationId,
+    }],
+    updatedAt: timestamp,
+  };
 }
 
 /** Receipt names come in SHOUTING CASE — store them as Title Case. */

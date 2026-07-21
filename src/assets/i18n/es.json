@@ -889,7 +889,8 @@
       "hintOk": "Entendido",
       "promptHeader": "Escanear ticket",
       "promptGallery": "Elegir de la galería",
-      "promptCamera": "Hacer foto"
+      "promptCamera": "Hacer foto",
+      "matchFresh": "Se marcará como disponible"
     }
   },
   "upgrade": {

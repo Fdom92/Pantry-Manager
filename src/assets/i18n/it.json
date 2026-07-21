@@ -889,7 +889,8 @@
       "hintOk": "Capito",
       "promptHeader": "Scansiona scontrino",
       "promptGallery": "Scegli dalla galleria",
-      "promptCamera": "Scatta foto"
+      "promptCamera": "Scatta foto",
+      "matchFresh": "Verrà segnato come disponibile"
     }
   },
   "upgrade": {
