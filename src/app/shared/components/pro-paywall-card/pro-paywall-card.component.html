@@ -1,15 +1,12 @@
 <ion-card class="pro-paywall-card" [class.pro-paywall-card--pill]="variant() === 'pill'" button (click)="onCardClick()">
   <ion-card-content class="pro-paywall-card__content">
+    <span class="pro-paywall-card__lock" aria-hidden="true">
+      <ion-icon name="lock-closed-outline"></ion-icon>
+    </span>
     @if (variant() === 'pill') {
-      <span class="pro-paywall-card__lock" aria-hidden="true">
-        <ion-icon name="lock-closed-outline"></ion-icon>
-      </span>
-      <h3 class="pro-paywall-card__pill-title">{{ titleKey() | translate }}</h3>
+      <h3 class="pro-paywall-card__title--pill">{{ titleKey() | translate }}</h3>
       <ion-icon name="chevron-forward-outline" class="pro-paywall-card__chevron" aria-hidden="true"></ion-icon>
     } @else {
-      <span class="pro-paywall-card__lock" aria-hidden="true">
-        <ion-icon name="lock-closed-outline"></ion-icon>
-      </span>
       <ion-icon name="sparkles-outline" class="pro-paywall-card__icon" aria-hidden="true"></ion-icon>
       <h3 class="pro-paywall-card__title">{{ titleKey() | translate }}</h3>
       <p class="pro-paywall-card__description">{{ descriptionKey() | translate }}</p>
