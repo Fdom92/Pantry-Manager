@@ -5,6 +5,7 @@ export const environment: Environment = {
   production: true,
   revenueCatPublicKey: environmentSecrets.revenuecat.prodKey,
   insightsApiUrl: 'https://pantry-manager.onrender.com/insights/analyze',
+  receiptApiUrl: 'https://pantry-manager.onrender.com/receipt/parse',
   analytics: {
     posthogKey: environmentSecrets.analytics.posthogKey,
     posthogHost: 'https://eu.i.posthog.com',

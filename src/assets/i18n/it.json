@@ -866,6 +866,31 @@
         "addSuccess_one": "✅ {{name}} aggiunto",
         "addSuccess_other": "✅ {{count}} freschi aggiunti"
       }
+    },
+    "receiptScan": {
+      "title": "Scontrino scansionato",
+      "subtitle": "{{ count }} prodotti rilevati",
+      "entryButton": "Aggiungi da scontrino",
+      "processing": "Lettura dello scontrino…",
+      "error": "Impossibile leggere lo scontrino. Inquadra solo l'elenco dei prodotti, avvicinati e cerca una buona luce.",
+      "retry": "Riprova",
+      "matchExisting": "Verrà aggiunto al prodotto esistente",
+      "createNew": "Verrà creato come nuovo prodotto",
+      "increase": "Aumenta quantità",
+      "decrease": "Riduci quantità",
+      "submit_one": "Aggiungi 1 prodotto",
+      "submit_other": "Aggiungi {{ count }} prodotti",
+      "toastAdded_one": "1 prodotto aggiunto dallo scontrino",
+      "toastAdded_other": "{{ count }} prodotti aggiunti dallo scontrino",
+      "editNameTitle": "Correggi nome",
+      "smartBadge": "Analisi intelligente",
+      "hintTitle": "Consiglio per la scansione",
+      "hintMessage": "Inquadra solo l'elenco dei prodotti — senza l'intestazione del negozio né i totali. Più vicino e ben illuminato, migliori i risultati.",
+      "hintOk": "Capito",
+      "promptHeader": "Scansiona scontrino",
+      "promptGallery": "Scegli dalla galleria",
+      "promptCamera": "Scatta foto",
+      "matchFresh": "Verrà segnato come disponibile"
     }
   },
   "upgrade": {
@@ -1106,7 +1131,14 @@
       "testCrashTitle": "Attiva crash di test",
       "testCrashSubtitle": "Lancia un errore sintetico per verificare Sentry.",
       "triggerReconsentTitle": "Testa sheet di reconsent",
-      "triggerReconsentSubtitle": "Reimposta i flag e apre il sheet nella dashboard."
+      "triggerReconsentSubtitle": "Reimposta i flag e apre il sheet nella dashboard.",
+      "receiptScanTitle": "Scansiona scontrino (OCR)",
+      "receiptScanSubtitle": "Test OCR: foto di uno scontrino → righe rilevate",
+      "receiptScanResult": "{{ count }} righe rilevate",
+      "receiptScanShare": "Condividi risultato",
+      "receiptScanClear": "Pulisci",
+      "receiptScanNoImage": "Nessuna immagine selezionata.",
+      "receiptScanEmpty": "Nessun testo rilevato nell'immagine. Prova con più luce o più vicino."
     },
     "info": {
       "title": "Informazioni",

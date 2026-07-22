@@ -866,6 +866,31 @@
         "addSuccess_one": "✅ {{name}} adicionado",
         "addSuccess_other": "✅ {{count}} frescos adicionados"
       }
+    },
+    "receiptScan": {
+      "title": "Talão digitalizado",
+      "subtitle": "{{ count }} produtos detetados",
+      "entryButton": "Adicionar a partir do talão",
+      "processing": "A ler o talão…",
+      "error": "Não foi possível ler o talão. Enquadre apenas a lista de produtos, aproxime-se e procure boa luz.",
+      "retry": "Tentar novamente",
+      "matchExisting": "Será adicionado ao produto existente",
+      "createNew": "Será criado como produto novo",
+      "increase": "Aumentar quantidade",
+      "decrease": "Reduzir quantidade",
+      "submit_one": "Adicionar 1 produto",
+      "submit_other": "Adicionar {{ count }} produtos",
+      "toastAdded_one": "1 produto adicionado do talão",
+      "toastAdded_other": "{{ count }} produtos adicionados do talão",
+      "editNameTitle": "Corrigir nome",
+      "smartBadge": "Análise inteligente",
+      "hintTitle": "Dica para digitalizar",
+      "hintMessage": "Enquadre apenas a lista de produtos — sem o cabeçalho da loja nem os totais. Quanto mais perto e com melhor luz, melhores os resultados.",
+      "hintOk": "Entendido",
+      "promptHeader": "Digitalizar talão",
+      "promptGallery": "Escolher da galeria",
+      "promptCamera": "Tirar foto",
+      "matchFresh": "Será marcado como disponível"
     }
   },
   "upgrade": {
@@ -1106,7 +1131,14 @@
       "testCrashTitle": "Disparar crash de teste",
       "testCrashSubtitle": "Lança um erro sintético para verificar o Sentry.",
       "triggerReconsentTitle": "Testar reconsent sheet",
-      "triggerReconsentSubtitle": "Reinicia as flags e abre o sheet no dashboard."
+      "triggerReconsentSubtitle": "Reinicia as flags e abre o sheet no dashboard.",
+      "receiptScanTitle": "Digitalizar talão (OCR)",
+      "receiptScanSubtitle": "Teste OCR: foto de um talão → linhas detetadas",
+      "receiptScanResult": "{{ count }} linhas detetadas",
+      "receiptScanShare": "Partilhar resultado",
+      "receiptScanClear": "Limpar",
+      "receiptScanNoImage": "Nenhuma imagem selecionada.",
+      "receiptScanEmpty": "Nenhum texto detetado na imagem. Tente com mais luz ou mais perto."
     },
     "info": {
       "title": "Informações",

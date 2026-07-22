@@ -116,6 +116,12 @@
             <ion-icon [name]="facade.groupByCategory() ? 'list-outline' : 'apps-outline'"></ion-icon>
           </button>
           <button
+            class="pantry-section__add-btn pantry-section__receipt-btn"
+            [attr.aria-label]="'pantry.receiptScan.entryButton' | translate"
+            (click)="facade.startReceiptScan()">
+            <ion-icon name="receipt-outline"></ion-icon>
+          </button>
+          <button
             #despensaAddBtn
             class="pantry-section__add-btn"
             [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
@@ -219,6 +225,7 @@
   }
 
   <app-pantry-add-modal></app-pantry-add-modal>
+  <app-pantry-receipt-scan-modal></app-pantry-receipt-scan-modal>
   <app-pantry-consume-modal></app-pantry-consume-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>

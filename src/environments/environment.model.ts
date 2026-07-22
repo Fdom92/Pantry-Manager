@@ -2,6 +2,7 @@ export interface Environment {
   production: boolean;
   revenueCatPublicKey: string;
   insightsApiUrl: string;
+  receiptApiUrl: string;
   analytics: AnalyticsEnvironment;
   sentry: SentryEnvironment;
 }
