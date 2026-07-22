@@ -1,0 +1,31 @@
+.waste-teaser-card {
+  margin: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.waste-teaser-card__content {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
+  min-height: 44px;
+}
+
+.waste-teaser-card__icon {
+  font-size: var(--app-theme-icon-size-sm);
+  color: var(--ion-color-medium);
+  flex-shrink: 0;
+}
+
+.waste-teaser-card__text {
+  flex: 1;
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-color);
+}
+
+.waste-teaser-card__chevron {
+  font-size: var(--app-theme-icon-size-sm);
+  color: var(--ion-color-medium);
+  flex-shrink: 0;
+}

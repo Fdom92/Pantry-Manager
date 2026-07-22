@@ -1,0 +1,13 @@
+<ion-card class="waste-teaser-card" button routerLink="/insights">
+  <ion-card-content class="waste-teaser-card__content">
+    <ion-icon name="trash-outline" class="waste-teaser-card__icon" aria-hidden="true"></ion-icon>
+    <span class="waste-teaser-card__text">
+      @if (isEmptyZeroWaste()) {
+        {{ 'dashboard.waste.zero' | translate }}
+      } @else {
+        {{ 'dashboard.waste.count' | translate: { count: summary().totalCount } }}
+      }
+    </span>
+    <ion-icon name="chevron-forward-outline" class="waste-teaser-card__chevron" aria-hidden="true"></ion-icon>
+  </ion-card-content>
+</ion-card>
