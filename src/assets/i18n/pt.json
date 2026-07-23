@@ -367,7 +367,7 @@
         "down": "↓ Menos do que o mês passado",
         "flat": "≈ Igual ao mês passado"
       },
-      "teaser": "Descubra quanto desperdiçou este mês"
+      "unlockBreakdown": "Desbloqueia o detalhe por categoria e tendência"
     },
     "reposition": {
       "title": "A ficar sem stock em breve",
@@ -505,16 +505,12 @@
     },
     "activity": {
       "title": "Últimos 30 dias",
-      "added": "Adicionados",
-      "consumed": "Consumidos",
-      "expired": "Expirados",
-      "wasteRatio": "Desperdício",
+      "detail": "Consumiste {{consumed}} dos {{added}} produtos adicionados este mês",
+      "detailNoAdds": "Consumiste {{consumed}} produtos sem adicionar nada de novo este mês",
       "noActivity": "Sem atividade registada",
-      "noWaste": "Sem desperdício",
       "rotationHigh": "Rotação alta",
       "rotationMedium": "Rotação média",
-      "rotationLow": "Rotação baixa",
-      "rotationNone": "Sem atividade"
+      "rotationLow": "Rotação baixa"
     },
     "distribution": {
       "title": "Por tipo de alimento",

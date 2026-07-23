@@ -51,3 +51,31 @@
 .pro-paywall-card__cta {
   align-self: stretch;
 }
+
+.pro-paywall-card--pill .pro-paywall-card__content {
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
+  min-height: 44px;
+}
+
+.pro-paywall-card--pill .pro-paywall-card__lock {
+  position: static;
+  flex-shrink: 0;
+}
+
+.pro-paywall-card__title--pill {
+  flex: 1;
+  margin: 0;
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-bold);
+  color: var(--app-theme-text-strong);
+}
+
+.pro-paywall-card__chevron {
+  font-size: var(--app-theme-icon-size-sm);
+  color: var(--ion-color-medium);
+  flex-shrink: 0;
+}

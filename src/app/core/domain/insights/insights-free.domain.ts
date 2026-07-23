@@ -21,9 +21,8 @@ export interface InventorySnapshot {
 export interface ActivityMetrics {
   added: number;
   consumed: number;
-  expired: number;
-  wasteRatio: number | null;
   rotationRatio: 'high' | 'medium' | 'low' | null;
+  rotationPercent: number | null;
   windowDays: number;
 }
 
@@ -106,33 +105,29 @@ export function computeActivityMetrics(
 
   let added = 0;
   let consumed = 0;
-  let expired = 0;
 
   for (const e of recent) {
     if (e.eventType === 'ADD') added += 1;
     else if (e.eventType === 'CONSUME') consumed += 1;
-    else if (e.eventType === 'EXPIRE') expired += 1;
   }
-
-  const wasteRatio =
-    expired + consumed === 0 ? null : expired / (expired + consumed);
 
   // Rotation = consumed / added: what fraction of what you add do you actually use.
   // Old metric (consumed / currentInventory) was wrong — it mixed event-window
   // counts against a point-in-time snapshot, producing inflated ratios.
   let rotationRatio: 'high' | 'medium' | 'low' | null = null;
+  let rotationPercent: number | null = null;
   if (consumed > 0 || added > 0) {
     if (added === 0) {
       rotationRatio = 'high'; // consuming from pre-existing stock, nothing new added
     } else {
-      const ratio = consumed / added;
-      if (ratio >= 0.6) rotationRatio = 'high';
-      else if (ratio >= 0.25) rotationRatio = 'medium';
+      rotationPercent = consumed / added;
+      if (rotationPercent >= 0.6) rotationRatio = 'high';
+      else if (rotationPercent >= 0.25) rotationRatio = 'medium';
       else rotationRatio = 'low';
     }
   }
 
-  return { added, consumed, expired, wasteRatio, rotationRatio, windowDays };
+  return { added, consumed, rotationRatio, rotationPercent, windowDays };
 }
 
 export function computeDistribution(

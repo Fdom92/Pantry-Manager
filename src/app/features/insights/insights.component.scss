@@ -74,27 +74,23 @@
 
 // ── Section B — activity ─────────────────────────────────────────────────────
 
-.activity-row {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: var(--app-theme-spacing-md-plus);
+.activity-headline {
+  font-size: var(--app-theme-font-size-3xl);
+  font-weight: var(--app-theme-font-weight-extra-bold);
+  line-height: var(--app-theme-line-height-display);
+  margin: 0;
 }
 
-.activity-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--app-theme-spacing-xs);
+.activity-detail {
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-subtle);
+  margin: var(--app-theme-spacing-2xs) 0 0;
+}
 
-  &__value {
-    font-size: var(--app-theme-font-size-2xl);
-    font-weight: var(--app-theme-font-weight-extra-bold);
-  }
-
-  &__label {
-    font-size: var(--app-theme-font-size-micro);
-    color: var(--app-theme-text-subtle);
-  }
+.activity-empty {
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-subtle);
+  margin: 0;
 }
 
 // ── Section C — distribution bars ────────────────────────────────────────────

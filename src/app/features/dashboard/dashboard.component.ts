@@ -13,6 +13,7 @@ import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edi
 import { RepositionCardComponent } from '@shared/components/reposition-card/reposition-card.component';
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
 import { StreakCardComponent } from './components/streak-card/streak-card.component';
+import { WasteTeaserCardComponent } from './components/waste-teaser-card/waste-teaser-card.component';
 import {
   IonButton,
   IonButtons,
@@ -47,6 +48,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     RepositionCardComponent,
     ProPaywallCardComponent,
     StreakCardComponent,
+    WasteTeaserCardComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
@@ -72,6 +74,7 @@ export class DashboardComponent implements OnDestroy {
   private readonly translate = inject(TranslateService);
   readonly isInsightsPro = this.insights.isPro;
   readonly repositionPredictions = this.insights.repositionPredictions;
+  readonly wasteSummary = this.insights.wasteSummary;
   @ViewChild(ReconsentSheetComponent) private reconsentSheet?: ReconsentSheetComponent;
 
   /** Guard so the re-consent sheet is evaluated only once per visit session. */
@@ -88,6 +91,10 @@ export class DashboardComponent implements OnDestroy {
     this.insightsTracking.trackRepoPredictionViewed('dashboard', {
       isPro: this.isInsightsPro(),
       count: this.repositionPredictions().length,
+    });
+    this.insightsTracking.trackWasteCardViewed('dashboard', {
+      isPro: this.isInsightsPro(),
+      count: this.wasteSummary().totalCount,
     });
     this.maybePresentReconsentSheet();
   }

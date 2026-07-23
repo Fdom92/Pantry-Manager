@@ -367,7 +367,7 @@
         "down": "↓ Less than last month",
         "flat": "≈ Same as last month"
       },
-      "teaser": "Find out how much you wasted this month"
+      "unlockBreakdown": "Unlock the category and trend breakdown"
     },
     "reposition": {
       "title": "Running out soon",
@@ -505,16 +505,12 @@
     },
     "activity": {
       "title": "Last 30 days",
-      "added": "Added",
-      "consumed": "Consumed",
-      "expired": "Expired",
-      "wasteRatio": "Waste rate",
+      "detail": "You used {{consumed}} of the {{added}} products you added this month",
+      "detailNoAdds": "You used {{consumed}} products without adding anything new this month",
       "noActivity": "No activity recorded",
-      "noWaste": "No waste",
       "rotationHigh": "High rotation",
       "rotationMedium": "Medium rotation",
-      "rotationLow": "Low rotation",
-      "rotationNone": "No activity"
+      "rotationLow": "Low rotation"
     },
     "distribution": {
       "title": "By food type",

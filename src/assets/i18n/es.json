@@ -367,7 +367,7 @@
         "down": "↓ Menos que el mes pasado",
         "flat": "≈ Igual que el mes pasado"
       },
-      "teaser": "Descubre cuánto has tirado este mes"
+      "unlockBreakdown": "Desbloquea el desglose por categoría y tendencia"
     },
     "reposition": {
       "title": "Próximamente sin stock",
@@ -505,16 +505,12 @@
     },
     "activity": {
       "title": "Últimos 30 días",
-      "added": "Añadidos",
-      "consumed": "Consumidos",
-      "expired": "Caducados",
-      "wasteRatio": "Desperdicio",
+      "detail": "Consumiste {{consumed}} de {{added}} productos añadidos este mes",
+      "detailNoAdds": "Consumiste {{consumed}} productos sin añadir nada nuevo este mes",
       "noActivity": "Sin actividad registrada",
-      "noWaste": "Sin desperdicio",
       "rotationHigh": "Rotación alta",
       "rotationMedium": "Rotación media",
-      "rotationLow": "Rotación baja",
-      "rotationNone": "Sin actividad"
+      "rotationLow": "Rotación baja"
     },
     "distribution": {
       "title": "Por tipo de alimento",

@@ -367,7 +367,7 @@
         "down": "↓ Moins que le mois dernier",
         "flat": "≈ Pareil que le mois dernier"
       },
-      "teaser": "Découvrez combien vous avez gaspillé ce mois"
+      "unlockBreakdown": "Débloque la répartition par catégorie et tendance"
     },
     "reposition": {
       "title": "Bientôt en rupture",
@@ -505,16 +505,12 @@
     },
     "activity": {
       "title": "30 derniers jours",
-      "added": "Ajoutés",
-      "consumed": "Consommés",
-      "expired": "Périmés",
-      "wasteRatio": "Gaspillage",
+      "detail": "Tu as consommé {{consumed}} des {{added}} produits ajoutés ce mois-ci",
+      "detailNoAdds": "Tu as consommé {{consumed}} produits sans rien ajouter de nouveau ce mois-ci",
       "noActivity": "Aucune activité enregistrée",
-      "noWaste": "Aucun gaspillage",
       "rotationHigh": "Rotation élevée",
       "rotationMedium": "Rotation moyenne",
-      "rotationLow": "Rotation faible",
-      "rotationNone": "Aucune activité"
+      "rotationLow": "Rotation faible"
     },
     "distribution": {
       "title": "Par type d'aliment",

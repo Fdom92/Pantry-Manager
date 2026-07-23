@@ -367,7 +367,7 @@
         "down": "↓ Meno del mese scorso",
         "flat": "≈ Uguale al mese scorso"
       },
-      "teaser": "Scopri quanto hai sprecato questo mese"
+      "unlockBreakdown": "Sblocca la suddivisione per categoria e tendenza"
     },
     "reposition": {
       "title": "In esaurimento presto",
@@ -505,16 +505,12 @@
     },
     "activity": {
       "title": "Ultimi 30 giorni",
-      "added": "Aggiunti",
-      "consumed": "Consumati",
-      "expired": "Scaduti",
-      "wasteRatio": "Spreco",
+      "detail": "Hai consumato {{consumed}} dei {{added}} prodotti aggiunti questo mese",
+      "detailNoAdds": "Hai consumato {{consumed}} prodotti senza aggiungere nulla di nuovo questo mese",
       "noActivity": "Nessuna attività registrata",
-      "noWaste": "Nessuno spreco",
       "rotationHigh": "Rotazione alta",
       "rotationMedium": "Rotazione media",
-      "rotationLow": "Rotazione bassa",
-      "rotationNone": "Nessuna attività"
+      "rotationLow": "Rotazione bassa"
     },
     "distribution": {
       "title": "Per tipo di cibo",
