@@ -505,8 +505,8 @@
     },
     "activity": {
       "title": "Last 30 days",
-      "detail": "You used {{consumed}} of the {{added}} products you added this month",
-      "detailNoAdds": "You used {{consumed}} products without adding anything new this month",
+      "detail": "You added {{added}} times and used {{consumed}} times this month",
+      "detailNoAdds": "You used {{consumed}} times without adding anything this month",
       "noActivity": "No activity recorded",
       "rotationHigh": "High rotation",
       "rotationMedium": "Medium rotation",
