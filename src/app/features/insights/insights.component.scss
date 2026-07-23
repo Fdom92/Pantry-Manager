@@ -75,8 +75,9 @@
 // ── Section B — activity ─────────────────────────────────────────────────────
 
 .activity-headline {
-  font-size: var(--app-theme-font-size-title);
-  font-weight: var(--app-theme-font-weight-bold);
+  font-size: var(--app-theme-font-size-3xl);
+  font-weight: var(--app-theme-font-weight-extra-bold);
+  line-height: var(--app-theme-line-height-display);
   margin: 0;
 }
 

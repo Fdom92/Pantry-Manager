@@ -510,8 +510,7 @@
       "noActivity": "Keine Aktivität aufgezeichnet",
       "rotationHigh": "Hohe Rotation",
       "rotationMedium": "Mittlere Rotation",
-      "rotationLow": "Niedrige Rotation",
-      "rotationNone": "Keine Aktivität"
+      "rotationLow": "Niedrige Rotation"
     },
     "distribution": {
       "title": "Nach Lebensmitteltyp",

@@ -111,7 +111,8 @@
       <!-- SECTION 4: Últimos 30 días — rotation: how much of what you add you actually consume -->
       <section class="insights-section">
         <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
-        @if (facade.activityMetrics().added === 0 && facade.activityMetrics().consumed === 0) {
+        @let rotationRatio = facade.activityMetrics().rotationRatio;
+        @if (rotationRatio === null) {
           <p class="activity-empty">{{ 'insights.activity.noActivity' | translate }}</p>
         } @else {
           @if (facade.activityMetrics().rotationPercent !== null) {
@@ -126,7 +127,7 @@
           </p>
           <div class="rotation-badge">
             <ion-icon name="refresh-outline"></ion-icon>
-            <span>{{ getRotationLabel(facade.activityMetrics().rotationRatio) | translate }}</span>
+            <span>{{ getRotationLabel(rotationRatio) | translate }}</span>
           </div>
         }
       </section>
