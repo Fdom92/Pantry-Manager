@@ -108,23 +108,27 @@
         </section>
       }
 
-      <!-- SECTION 4: Últimos 30 días — consumption behavior only; waste has its own card above (Section 1), no need to repeat it here -->
+      <!-- SECTION 4: Últimos 30 días — rotation: how much of what you add you actually consume -->
       <section class="insights-section">
         <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
-        <div class="activity-row">
-          <div class="activity-stat">
-            <span class="activity-stat__value">{{ facade.activityMetrics().added }}</span>
-            <span class="activity-stat__label">{{ 'insights.activity.added' | translate }}</span>
+        @if (facade.activityMetrics().added === 0 && facade.activityMetrics().consumed === 0) {
+          <p class="activity-empty">{{ 'insights.activity.noActivity' | translate }}</p>
+        } @else {
+          @if (facade.activityMetrics().rotationPercent !== null) {
+            <p class="activity-headline">{{ formatPercent(facade.activityMetrics().rotationPercent!) }}</p>
+          }
+          <p class="activity-detail">
+            @if (facade.activityMetrics().added > 0) {
+              {{ 'insights.activity.detail' | translate: { consumed: facade.activityMetrics().consumed, added: facade.activityMetrics().added } }}
+            } @else {
+              {{ 'insights.activity.detailNoAdds' | translate: { consumed: facade.activityMetrics().consumed } }}
+            }
+          </p>
+          <div class="rotation-badge">
+            <ion-icon name="refresh-outline"></ion-icon>
+            <span>{{ getRotationLabel(facade.activityMetrics().rotationRatio) | translate }}</span>
           </div>
-          <div class="activity-stat">
-            <span class="activity-stat__value">{{ facade.activityMetrics().consumed }}</span>
-            <span class="activity-stat__label">{{ 'insights.activity.consumed' | translate }}</span>
-          </div>
-        </div>
-        <div class="rotation-badge">
-          <ion-icon name="refresh-outline"></ion-icon>
-          <span>{{ getRotationLabel(facade.activityMetrics().rotationRatio) | translate }}</span>
-        </div>
+        }
       </section>
 
       <!-- Sentinel: IntersectionObserver triggers bar animations when this enters viewport -->
