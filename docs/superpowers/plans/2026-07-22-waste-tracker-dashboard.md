@@ -707,3 +707,317 @@ Expected: succeeds.
 git add src/app/features/insights/insights.component.html
 git commit -m "refactor(insights): de-dupe waste stats from the activity card, surface 'added' instead"
 ```
+
+---
+
+## Task 7 (follow-up): rotation % as the headline, not raw added/consumed counts
+
+**User feedback after Task 6:** two raw counts side by side ("Añadidos 8, Consumidos 3") don't say anything on their own — every sibling card on this page (Cobertura estimada, Calidad del inventario, the waste card) leads with one synthesized number + an explanatory sentence, not scattered counts. Fix: make the headline the rotation percentage (`consumed / added`), with a sentence underneath giving the raw counts as context, and a genuine empty state for zero activity (there's an unused `insights.activity.noActivity` i18n key sitting in all 6 locales for exactly this — never wired up).
+
+This requires exposing a raw ratio from the domain (`computeActivityMetrics` currently only buckets into `'high'|'medium'|'low'`, no percentage). While touching that function, also remove `expired`/`wasteRatio` from `ActivityMetrics` — after Task 6, nothing in the app reads either field anymore (verified via `grep -rn "activityMetrics()\." src/app` — only `added`, `consumed`, `rotationRatio` are read anywhere); leaving them would be computing dead output every call.
+
+**Files:**
+- Modify: `src/app/core/domain/insights/insights-free.domain.ts`
+- Modify: `src/app/core/domain/insights/insights-free.domain.spec.ts`
+- Modify: `src/app/features/insights/insights.component.html`
+- Modify: `src/app/features/insights/insights.component.scss`
+- Modify: `src/assets/i18n/{es,en,de,fr,it,pt}.json`
+
+- [ ] **Step 1: Domain — replace `expired`/`wasteRatio` with `rotationPercent`**
+
+In `insights-free.domain.ts`, the `ActivityMetrics` interface currently reads:
+
+```ts
+export interface ActivityMetrics {
+  added: number;
+  consumed: number;
+  expired: number;
+  wasteRatio: number | null;
+  rotationRatio: 'high' | 'medium' | 'low' | null;
+  windowDays: number;
+}
+```
+
+Replace with:
+
+```ts
+export interface ActivityMetrics {
+  added: number;
+  consumed: number;
+  rotationRatio: 'high' | 'medium' | 'low' | null;
+  rotationPercent: number | null;
+  windowDays: number;
+}
+```
+
+`computeActivityMetrics` currently reads:
+
+```ts
+export function computeActivityMetrics(
+  events: PantryEvent[],
+  windowDays: number,
+  now: Date,
+): ActivityMetrics {
+  const cutoff = now.getTime() - windowDays * 24 * 60 * 60 * 1000;
+  const recent = events.filter(e => new Date(e.timestamp).getTime() >= cutoff);
+
+  let added = 0;
+  let consumed = 0;
+  let expired = 0;
+
+  for (const e of recent) {
+    if (e.eventType === 'ADD') added += 1;
+    else if (e.eventType === 'CONSUME') consumed += 1;
+    else if (e.eventType === 'EXPIRE') expired += 1;
+  }
+
+  const wasteRatio =
+    expired + consumed === 0 ? null : expired / (expired + consumed);
+
+  // Rotation = consumed / added: what fraction of what you add do you actually use.
+  // Old metric (consumed / currentInventory) was wrong — it mixed event-window
+  // counts against a point-in-time snapshot, producing inflated ratios.
+  let rotationRatio: 'high' | 'medium' | 'low' | null = null;
+  if (consumed > 0 || added > 0) {
+    if (added === 0) {
+      rotationRatio = 'high'; // consuming from pre-existing stock, nothing new added
+    } else {
+      const ratio = consumed / added;
+      if (ratio >= 0.6) rotationRatio = 'high';
+      else if (ratio >= 0.25) rotationRatio = 'medium';
+      else rotationRatio = 'low';
+    }
+  }
+
+  return { added, consumed, expired, wasteRatio, rotationRatio, windowDays };
+}
+```
+
+Replace with:
+
+```ts
+export function computeActivityMetrics(
+  events: PantryEvent[],
+  windowDays: number,
+  now: Date,
+): ActivityMetrics {
+  const cutoff = now.getTime() - windowDays * 24 * 60 * 60 * 1000;
+  const recent = events.filter(e => new Date(e.timestamp).getTime() >= cutoff);
+
+  let added = 0;
+  let consumed = 0;
+
+  for (const e of recent) {
+    if (e.eventType === 'ADD') added += 1;
+    else if (e.eventType === 'CONSUME') consumed += 1;
+  }
+
+  // Rotation = consumed / added: what fraction of what you add do you actually use.
+  // Old metric (consumed / currentInventory) was wrong — it mixed event-window
+  // counts against a point-in-time snapshot, producing inflated ratios.
+  let rotationRatio: 'high' | 'medium' | 'low' | null = null;
+  let rotationPercent: number | null = null;
+  if (consumed > 0 || added > 0) {
+    if (added === 0) {
+      rotationRatio = 'high'; // consuming from pre-existing stock, nothing new added
+    } else {
+      rotationPercent = consumed / added;
+      if (rotationPercent >= 0.6) rotationRatio = 'high';
+      else if (rotationPercent >= 0.25) rotationRatio = 'medium';
+      else rotationRatio = 'low';
+    }
+  }
+
+  return { added, consumed, rotationRatio, rotationPercent, windowDays };
+}
+```
+
+- [ ] **Step 2: Update the domain spec**
+
+In `insights-free.domain.spec.ts`, the `describe('computeActivityMetrics', ...)` block currently has (in this order): a `'counts ADD events...'` test, a `'counts CONSUME events...'` test, a `'counts EXPIRE events...'` test, three `wasteRatio` tests, then a nested `describe('rotationRatio', ...)` with 4 tests. Remove the `'counts EXPIRE events within window'` test and all three `wasteRatio` tests (`is null when no consumed or expired`, `is 0 when consumed > 0 and expired = 0`, `is 1 when expired > 0 and consumed = 0`). Replace the nested `describe('rotationRatio', ...)` block with:
+
+```ts
+  describe('rotationRatio and rotationPercent', () => {
+    const recentTs = new Date('2026-04-20').toISOString();
+    const now = new Date('2026-05-14');
+
+    it('are both null when there is no recent activity', () => {
+      const result = computeActivityMetrics([], 30, now);
+      expect(result.rotationRatio).toBeNull();
+      expect(result.rotationPercent).toBeNull();
+    });
+
+    it('rotationRatio is high and rotationPercent is null when consuming with nothing newly added', () => {
+      const events = Array.from({ length: 6 }, () =>
+        makeEvent({ eventType: 'CONSUME', timestamp: recentTs })
+      );
+      // 6 consumed / 0 added → consuming pre-existing stock → high, but no ratio to show
+      const result = computeActivityMetrics(events, 30, now);
+      expect(result.rotationRatio).toBe('high');
+      expect(result.rotationPercent).toBeNull();
+    });
+
+    it('is medium when consumed / added is between 0.25 and 0.6', () => {
+      const events = [
+        makeEvent({ eventType: 'CONSUME', timestamp: recentTs }),
+        ...Array.from({ length: 3 }, () =>
+          makeEvent({ eventType: 'ADD', timestamp: recentTs })
+        ),
+      ];
+      // 1 consumed / 3 added ≈ 0.33 → medium
+      const result = computeActivityMetrics(events, 30, now);
+      expect(result.rotationRatio).toBe('medium');
+      expect(result.rotationPercent).toBeCloseTo(1 / 3);
+    });
+
+    it('is low when consumed / added < 0.25', () => {
+      const events = [
+        makeEvent({ eventType: 'CONSUME', timestamp: recentTs }),
+        ...Array.from({ length: 5 }, () =>
+          makeEvent({ eventType: 'ADD', timestamp: recentTs })
+        ),
+      ];
+      // 1 consumed / 5 added = 0.2 → low
+      const result = computeActivityMetrics(events, 30, now);
+      expect(result.rotationRatio).toBe('low');
+      expect(result.rotationPercent).toBe(0.2);
+    });
+  });
+```
+
+The two remaining top-level tests (`'counts ADD events within window'`, `'counts CONSUME events within window'`) stay as-is.
+
+- [ ] **Step 3: Redesign Section 4's template**
+
+In `insights.component.html`, Section 4 currently (post-Task-6) reads:
+
+```html
+      <!-- SECTION 4: Últimos 30 días — consumption behavior only; waste has its own card above (Section 1), no need to repeat it here -->
+      <section class="insights-section">
+        <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
+        <div class="activity-row">
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().added }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.added' | translate }}</span>
+          </div>
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().consumed }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.consumed' | translate }}</span>
+          </div>
+        </div>
+        <div class="rotation-badge">
+          <ion-icon name="refresh-outline"></ion-icon>
+          <span>{{ getRotationLabel(facade.activityMetrics().rotationRatio) | translate }}</span>
+        </div>
+      </section>
+```
+
+Replace with:
+
+```html
+      <!-- SECTION 4: Últimos 30 días — rotation: how much of what you add you actually consume -->
+      <section class="insights-section">
+        <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
+        @if (facade.activityMetrics().added === 0 && facade.activityMetrics().consumed === 0) {
+          <p class="activity-empty">{{ 'insights.activity.noActivity' | translate }}</p>
+        } @else {
+          @if (facade.activityMetrics().rotationPercent !== null) {
+            <p class="activity-headline">{{ formatPercent(facade.activityMetrics().rotationPercent!) }}</p>
+          }
+          <p class="activity-detail">
+            @if (facade.activityMetrics().added > 0) {
+              {{ 'insights.activity.detail' | translate: { consumed: facade.activityMetrics().consumed, added: facade.activityMetrics().added } }}
+            } @else {
+              {{ 'insights.activity.detailNoAdds' | translate: { consumed: facade.activityMetrics().consumed } }}
+            }
+          </p>
+          <div class="rotation-badge">
+            <ion-icon name="refresh-outline"></ion-icon>
+            <span>{{ getRotationLabel(facade.activityMetrics().rotationRatio) | translate }}</span>
+          </div>
+        }
+      </section>
+```
+
+`formatPercent()` and `getRotationLabel()` are pre-existing methods on `insights.component.ts`, untouched by this task — same ones already used elsewhere in this file.
+
+- [ ] **Step 4: Update styles — new classes, drop dead ones**
+
+In `insights.component.scss`, remove the (now unused after Step 3) `.activity-row` and `.activity-stat` rules:
+
+```scss
+.activity-row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--app-theme-spacing-md-plus);
+}
+
+.activity-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--app-theme-spacing-xs);
+
+  &__value {
+    font-size: var(--app-theme-font-size-2xl);
+    font-weight: var(--app-theme-font-weight-extra-bold);
+  }
+
+  &__label {
+    font-size: var(--app-theme-font-size-micro);
+    color: var(--app-theme-text-subtle);
+  }
+}
+```
+
+Replace that whole block with:
+
+```scss
+.activity-headline {
+  font-size: var(--app-theme-font-size-title);
+  font-weight: var(--app-theme-font-weight-bold);
+  margin: 0;
+}
+
+.activity-detail {
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-subtle);
+  margin: var(--app-theme-spacing-2xs) 0 0;
+}
+
+.activity-empty {
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-subtle);
+  margin: 0;
+}
+```
+
+(Mirrors the existing `.coverage-card__value`/`.coverage-card__hint` sizing tokens elsewhere in this same file, for visual consistency with Section 3 right above it.)
+
+- [ ] **Step 5: i18n — add 2 keys, remove 5 dead ones**
+
+In each of `src/assets/i18n/{es,en,de,fr,it,pt}.json`, inside the existing `"activity": { ... }` object:
+
+Remove: `"added"`, `"consumed"`, `"expired"`, `"wasteRatio"`, `"noWaste"` (all five are now unreferenced anywhere in `src/app` — verify with `grep -rn "insights.activity.added\|insights.activity.consumed\|insights.activity.expired\|insights.activity.wasteRatio\|insights.activity.noWaste" src/app` before removing, it should return nothing after Step 3 is applied).
+
+Add:
+- es: `"detail": "Consumiste {{consumed}} de {{added}} productos añadidos este mes"`, `"detailNoAdds": "Consumiste {{consumed}} productos sin añadir nada nuevo este mes"`
+- en: `"detail": "You used {{consumed}} of the {{added}} products you added this month"`, `"detailNoAdds": "You used {{consumed}} products without adding anything new this month"`
+- de: `"detail": "Du hast {{consumed}} von {{added}} hinzugefügten Produkten diesen Monat verbraucht"`, `"detailNoAdds": "Du hast {{consumed}} Produkte verbraucht, ohne diesen Monat etwas Neues hinzuzufügen"`
+- fr: `"detail": "Tu as consommé {{consumed}} des {{added}} produits ajoutés ce mois-ci"`, `"detailNoAdds": "Tu as consommé {{consumed}} produits sans rien ajouter de nouveau ce mois-ci"`
+- it: `"detail": "Hai consumato {{consumed}} dei {{added}} prodotti aggiunti questo mese"`, `"detailNoAdds": "Hai consumato {{consumed}} prodotti senza aggiungere nulla di nuovo questo mese"`
+- pt: `"detail": "Consumiste {{consumed}} dos {{added}} produtos adicionados este mês"`, `"detailNoAdds": "Consumiste {{consumed}} produtos sem adicionar nada de novo este mês"`
+
+Keep `"title"`, `"noActivity"`, `"rotationHigh"`, `"rotationMedium"`, `"rotationLow"`, `"rotationNone"` untouched — all still used.
+
+- [ ] **Step 6: Compile check + run the domain spec**
+
+Run: `npx ng build` — expected to succeed.
+Run: `npx ng test --watch=false --browsers=ChromeHeadless --include='**/insights-free.domain.spec.ts'` (or the project's standard single-file test invocation — check `.claude/DEV.md` if this exact flag differs) — all `computeActivityMetrics` tests should pass, none should reference removed fields.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add src/app/core/domain/insights/insights-free.domain.ts src/app/core/domain/insights/insights-free.domain.spec.ts src/app/features/insights/insights.component.html src/app/features/insights/insights.component.scss src/assets/i18n/
+git commit -m "refactor(insights): headline rotation % instead of raw added/consumed counts"
+```
