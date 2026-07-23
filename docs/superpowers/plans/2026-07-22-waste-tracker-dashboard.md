@@ -628,3 +628,82 @@ git commit -m "fix(insights): make waste count free everywhere, gate only the br
 ```
 
 **Self-review addendum:** This directly closes the gap the original Task 3 self-review missed — the plan's "Sin cambios ... gate PRO en Insights — intactos" line (top of this doc, §"Sin cambios") was wrong; the gate needed to move from card-level to field-level for the free/PRO story to be consistent across Dashboard and Insights. `'waste_card'` stays as an unused-but-harmless entry in `ProCtaSurface` (`src/app/core/services/upgrade/pro-cta-ui-state.service.ts:7`) — not removed, since it's a type-only union member with no behavioral cost and removing it risks unrelated churn.
+
+---
+
+## Task 6 (follow-up): de-duplicate "Últimos 30 días" against the waste card
+
+**Found by the user while reviewing the Task 5 fix.** Insights Section 4 ("Últimos 30 días", always free, pre-dates this branch) shows `Consumidos` / `Caducados` / `Desperdicio %`. `Caducados` and `Desperdicio %` are derived from the exact same EXPIRE events as the waste card above it (`computeActivityMetrics`'s `expired` field counts the same events `computeWasteSummary`'s `totalCount` does, both over a 30-day window — see `src/app/core/domain/insights/insights-free.domain.ts:109-118`). Before this branch this redundancy already existed for PRO users; Task 5 made it visible to free users too, since the waste card's count is no longer locked. Not a bug introduced by this branch, but worth trimming while this exact file is already open.
+
+**Files:**
+- Modify: `src/app/features/insights/insights.component.html`
+
+- [ ] **Step 1: Replace Section 4 with a de-duplicated version**
+
+Current section (post-Task-5, unchanged since it wasn't touched by Task 5):
+
+```html
+      <!-- SECTION 4: Últimos 30 días -->
+      <section class="insights-section">
+        <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
+        <div class="activity-row">
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().consumed }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.consumed' | translate }}</span>
+          </div>
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().expired }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.expired' | translate }}</span>
+          </div>
+          <div class="activity-stat">
+            @if (facade.activityMetrics().wasteRatio !== null && facade.activityMetrics().wasteRatio! > 0) {
+              <span class="activity-stat__value">{{ formatPercent(facade.activityMetrics().wasteRatio!) }}</span>
+            } @else {
+              <span class="activity-stat__value">—</span>
+            }
+            <span class="activity-stat__label">{{ 'insights.activity.wasteRatio' | translate }}</span>
+          </div>
+        </div>
+        <div class="rotation-badge">
+          <ion-icon name="refresh-outline"></ion-icon>
+          <span>{{ getRotationLabel(facade.activityMetrics().rotationRatio) | translate }}</span>
+        </div>
+      </section>
+```
+
+Replace with:
+
+```html
+      <!-- SECTION 4: Últimos 30 días — consumption behavior only; waste has its own card above (Section 1), no need to repeat it here -->
+      <section class="insights-section">
+        <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
+        <div class="activity-row">
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().added }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.added' | translate }}</span>
+          </div>
+          <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().consumed }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.consumed' | translate }}</span>
+          </div>
+        </div>
+        <div class="rotation-badge">
+          <ion-icon name="refresh-outline"></ion-icon>
+          <span>{{ getRotationLabel(facade.activityMetrics().rotationRatio) | translate }}</span>
+        </div>
+      </section>
+```
+
+`added` is already a field on `ActivityMetrics` (`src/app/core/domain/insights/insights-free.domain.ts:22`, computed at line 107/112) and was already exposed on `facade.activityMetrics()` — it was simply never rendered until now. `insights.activity.added` ("Añadidos") already exists in all 6 i18n locale files (verify: `grep -n '"added"' src/assets/i18n/es.json` under the `activity` block) — **no i18n changes needed for this task.** No domain, no `.ts` changes — this is a template-only edit. `formatPercent()` stays used elsewhere in this same file (Section 6, "Calidad del inventario") so it does not become a dead method.
+
+- [ ] **Step 2: Compile check**
+
+Run: `npx ng build`
+Expected: succeeds.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add src/app/features/insights/insights.component.html
+git commit -m "refactor(insights): de-dupe waste stats from the activity card, surface 'added' instead"
+```
