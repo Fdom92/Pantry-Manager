@@ -108,25 +108,17 @@
         </section>
       }
 
-      <!-- SECTION 4: Últimos 30 días -->
+      <!-- SECTION 4: Últimos 30 días — consumption behavior only; waste has its own card above (Section 1), no need to repeat it here -->
       <section class="insights-section">
         <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
         <div class="activity-row">
           <div class="activity-stat">
+            <span class="activity-stat__value">{{ facade.activityMetrics().added }}</span>
+            <span class="activity-stat__label">{{ 'insights.activity.added' | translate }}</span>
+          </div>
+          <div class="activity-stat">
             <span class="activity-stat__value">{{ facade.activityMetrics().consumed }}</span>
             <span class="activity-stat__label">{{ 'insights.activity.consumed' | translate }}</span>
-          </div>
-          <div class="activity-stat">
-            <span class="activity-stat__value">{{ facade.activityMetrics().expired }}</span>
-            <span class="activity-stat__label">{{ 'insights.activity.expired' | translate }}</span>
-          </div>
-          <div class="activity-stat">
-            @if (facade.activityMetrics().wasteRatio !== null && facade.activityMetrics().wasteRatio! > 0) {
-              <span class="activity-stat__value">{{ formatPercent(facade.activityMetrics().wasteRatio!) }}</span>
-            } @else {
-              <span class="activity-stat__value">—</span>
-            }
-            <span class="activity-stat__label">{{ 'insights.activity.wasteRatio' | translate }}</span>
           </div>
         </div>
         <div class="rotation-badge">
