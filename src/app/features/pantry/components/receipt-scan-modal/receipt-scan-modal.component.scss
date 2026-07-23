@@ -1,0 +1,166 @@
+@use '../../../../shared/styles/modal-sheet' as sheet;
+
+ion-modal.app-sheet-modal {
+  @include sheet.sheet-base;
+}
+
+.sheet-shell {
+  @include sheet.layout;
+}
+
+.sheet-handle {
+  @include sheet.handle;
+}
+
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
+}
+
+.sheet-header__titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.sheet-header__title {
+  @include sheet.header-title;
+}
+
+.sheet-header__subtitle {
+  @include sheet.header-subtitle;
+}
+
+.sheet-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-xs);
+  flex-shrink: 0;
+}
+
+.sheet-body {
+  @include sheet.body;
+}
+
+.sheet-footer {
+  @include sheet.footer;
+  @include sheet.glass-fallback;
+}
+
+.receipt-scan-modal {
+
+  &__state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--app-theme-spacing-md);
+    padding: var(--app-theme-spacing-3xl) var(--app-theme-spacing-lg);
+    text-align: center;
+    color: var(--app-theme-text-muted);
+  }
+
+  &__error-icon {
+    font-size: 44px;
+    color: color-mix(in srgb, var(--ion-text-color) 30%, transparent);
+  }
+
+  &__smart-badge {
+    display: inline-block;
+    margin-left: var(--app-theme-spacing-xs);
+    padding: 1px 8px;
+    border-radius: var(--app-theme-radius-pill, 999px);
+    background: color-mix(in srgb, var(--ion-color-tertiary) 14%, transparent);
+    color: var(--ion-color-tertiary);
+    font-size: var(--app-theme-font-size-small);
+    font-weight: var(--app-theme-font-weight-bold);
+  }
+}
+
+.receipt-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--app-theme-spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-sm);
+}
+
+.receipt-line {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-md);
+  padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-card-border-radius);
+  background: var(--app-theme-card-bg);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+  transition: opacity var(--app-theme-transition-fast);
+
+  &--excluded {
+    opacity: 0.45;
+  }
+
+  &__check {
+    flex-shrink: 0;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    margin: 0;
+    font-size: var(--app-theme-font-size-body);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__meta {
+    margin: 2px 0 0;
+    font-size: var(--app-theme-font-size-small);
+    color: var(--app-theme-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    ion-icon { font-size: var(--app-theme-icon-size-xs); }
+
+    &--match {
+      color: var(--app-theme-primary-on-surface);
+    }
+  }
+
+  &__qty {
+    display: flex;
+    align-items: center;
+    gap: var(--app-theme-spacing-xs);
+    flex-shrink: 0;
+  }
+
+  &__qty-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--app-theme-radius-circle);
+    border: none;
+    background: color-mix(in srgb, var(--ion-text-color) 7%, transparent);
+    color: var(--app-theme-text-color);
+    font-size: 17px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+
+    &:disabled { opacity: 0.35; }
+    &:active { background: color-mix(in srgb, var(--ion-text-color) 14%, transparent); }
+  }
+
+  &__qty-value {
+    min-width: 22px;
+    text-align: center;
+    font-weight: var(--app-theme-font-weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+}

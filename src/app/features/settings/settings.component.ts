@@ -12,6 +12,9 @@ import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@
 import { LocalStorageService } from '@core/services/shared';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { CapacitorPluginMlKitTextRecognition } from '@pantrist/capacitor-plugin-ml-kit-text-recognition';
+import { Share } from '@capacitor/share';
 import {
   IonBackButton,
   IonButton,
@@ -229,6 +232,11 @@ export class SettingsComponent {
   readonly isSeedingMarketing = signal(false);
   readonly isClearingPantry = signal(false);
 
+  // Receipt scan spike (dev-only, feat 5.1)
+  readonly isScanningReceipt = signal(false);
+  readonly receiptScanLines = signal<string[]>([]);
+  readonly receiptScanRaw = signal<string>('');
+
   // App state
   readonly isResettingOnboarding = signal(false);
   readonly devIsPro = signal(this.revenuecat.isPro());
@@ -333,6 +341,74 @@ export class SettingsComponent {
     } finally {
       this.isSeedingMarketing.set(false);
     }
+  }
+
+  async scanReceiptDev(): Promise<void> {
+    if (this.isScanningReceipt()) return;
+    this.isScanningReceipt.set(true);
+    try {
+      const photo = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Prompt,
+        promptLabelHeader: this.translate.instant('pantry.receiptScan.promptHeader'),
+        promptLabelPhoto: this.translate.instant('pantry.receiptScan.promptGallery'),
+        promptLabelPicture: this.translate.instant('pantry.receiptScan.promptCamera'),
+      });
+      if (!photo.base64String) {
+        window.alert(this.translate.instant('settings.dev.receiptScanNoImage'));
+        return;
+      }
+      const result = await CapacitorPluginMlKitTextRecognition.detectText({
+        base64Image: photo.base64String,
+      });
+      const lines = result.blocks
+        .flatMap(block => block.lines.map(line => line.text))
+        .filter(t => !!t.trim());
+      this.receiptScanLines.set(lines);
+      // Full geometry payload for parser fixtures (shared as JSON by the share button).
+      this.receiptScanRaw.set(JSON.stringify(
+        {
+          capturedAt: new Date().toISOString(),
+          lines: result.blocks.flatMap(block =>
+            block.lines.map(line => ({
+              text: line.text,
+              box: line.boundingBox,
+            })),
+          ),
+        },
+        null,
+        1,
+      ));
+      if (!lines.length) {
+        window.alert(this.translate.instant('settings.dev.receiptScanEmpty'));
+      }
+    } catch (err) {
+      // User cancelled the picker or OCR unavailable (web build)
+      const message = err instanceof Error ? err.message : String(err);
+      if (!/cancel/i.test(message)) {
+        window.alert(`OCR: ${message}`);
+      }
+    } finally {
+      this.isScanningReceipt.set(false);
+    }
+  }
+
+  async shareReceiptScanResult(): Promise<void> {
+    // Prefer the JSON payload (text + bounding boxes) — it's the parser fixture format.
+    const raw = this.receiptScanRaw();
+    const lines = this.receiptScanLines();
+    if (!raw && !lines.length) return;
+    await Share.share({
+      title: 'PantryMind receipt OCR',
+      text: raw || lines.join('\n'),
+    });
+  }
+
+  clearReceiptScanResult(): void {
+    this.receiptScanLines.set([]);
+    this.receiptScanRaw.set('');
   }
 
   async clearPantry(): Promise<void> {

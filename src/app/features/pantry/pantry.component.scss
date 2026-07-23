@@ -506,6 +506,17 @@ ion-modal.quantity-sheet ion-content {
       color: var(--app-theme-primary-on-surface);
     }
   }
+
+  // Receipt scan entry: secondary style like the group toggle — add (+) and
+  // consume (−) keep the visual priority in the actions row.
+  &__receipt-btn {
+    background: transparent;
+    color: var(--app-theme-text-muted);
+
+    &:active {
+      background: color-mix(in srgb, var(--ion-text-color) 10%, transparent);
+    }
+  }
 }
 
 // Section divider — subtle gradient fade, strongest at center, transparent

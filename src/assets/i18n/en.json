@@ -367,7 +367,7 @@
         "down": "↓ Less than last month",
         "flat": "≈ Same as last month"
       },
-      "teaser": "Find out how much you wasted this month"
+      "unlockBreakdown": "Unlock the category and trend breakdown"
     },
     "reposition": {
       "title": "Running out soon",
@@ -505,16 +505,12 @@
     },
     "activity": {
       "title": "Last 30 days",
-      "added": "Added",
-      "consumed": "Consumed",
-      "expired": "Expired",
-      "wasteRatio": "Waste rate",
+      "detail": "You added {{added}} times and used {{consumed}} times this month",
+      "detailNoAdds": "You used {{consumed}} times without adding anything this month",
       "noActivity": "No activity recorded",
-      "noWaste": "No waste",
       "rotationHigh": "High rotation",
       "rotationMedium": "Medium rotation",
-      "rotationLow": "Low rotation",
-      "rotationNone": "No activity"
+      "rotationLow": "Low rotation"
     },
     "distribution": {
       "title": "By food type",
@@ -866,6 +862,31 @@
         "addSuccess_one": "✅ {{name}} added",
         "addSuccess_other": "✅ {{count}} fresh items added"
       }
+    },
+    "receiptScan": {
+      "title": "Scanned receipt",
+      "subtitle": "{{ count }} products detected",
+      "entryButton": "Add from receipt",
+      "processing": "Reading the receipt…",
+      "error": "Couldn't read the receipt. Frame only the product list, get closer and find good light.",
+      "retry": "Try again",
+      "matchExisting": "Will be added to the existing product",
+      "createNew": "Will be created as a new product",
+      "increase": "Increase quantity",
+      "decrease": "Decrease quantity",
+      "submit_one": "Add 1 product",
+      "submit_other": "Add {{ count }} products",
+      "toastAdded_one": "1 product added from the receipt",
+      "toastAdded_other": "{{ count }} products added from the receipt",
+      "editNameTitle": "Edit name",
+      "smartBadge": "Smart scan",
+      "hintTitle": "Scanning tip",
+      "hintMessage": "Frame only the product list — leave out the store header and the totals. The closer and better lit, the better the results.",
+      "hintOk": "Got it",
+      "promptHeader": "Scan receipt",
+      "promptGallery": "Choose from gallery",
+      "promptCamera": "Take photo",
+      "matchFresh": "Will be marked as in stock"
     }
   },
   "upgrade": {
@@ -1106,7 +1127,14 @@
       "testCrashTitle": "Trigger test crash",
       "testCrashSubtitle": "Throw a synthetic error to verify Sentry wiring.",
       "triggerReconsentTitle": "Test reconsent sheet",
-      "triggerReconsentSubtitle": "Resets flags and pops the sheet on the dashboard."
+      "triggerReconsentSubtitle": "Resets flags and pops the sheet on the dashboard.",
+      "receiptScanTitle": "Scan receipt (OCR)",
+      "receiptScanSubtitle": "OCR spike: photo of a receipt → detected lines",
+      "receiptScanResult": "{{ count }} lines detected",
+      "receiptScanShare": "Share result",
+      "receiptScanClear": "Clear",
+      "receiptScanNoImage": "No image selected.",
+      "receiptScanEmpty": "No text detected in the image. Try better light or get closer."
     },
     "info": {
       "title": "Information",

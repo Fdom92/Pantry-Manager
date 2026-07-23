@@ -1,0 +1,131 @@
+<ion-modal
+  class="app-sheet-modal receipt-scan-modal"
+  [isOpen]="state.isOpen()"
+  [breakpoints]="[0, 0.85, 1]"
+  [initialBreakpoint]="0.85"
+  [handle]="false"
+  (didDismiss)="state.close()">
+  <ng-template>
+    <div class="sheet-shell receipt-scan-modal__content">
+      <div class="sheet-handle" aria-hidden="true"></div>
+
+      <header class="sheet-header">
+        <div class="sheet-header__titles">
+          <h2 class="sheet-header__title">{{ 'pantry.receiptScan.title' | translate }}</h2>
+          @if (state.phase() === 'review') {
+            <p class="sheet-header__subtitle">
+              {{ 'pantry.receiptScan.subtitle' | translate: { count: state.reviewLines().length } }}
+              @if (state.usedSmartScan()) {
+                <span class="receipt-scan-modal__smart-badge">
+                  ✨ {{ 'pantry.receiptScan.smartBadge' | translate }}
+                </span>
+              }
+            </p>
+          }
+        </div>
+        <div class="sheet-header__actions">
+          <ion-button
+            fill="clear"
+            color="medium"
+            (click)="state.close()"
+            [attr.aria-label]="'common.actions.close' | translate">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </div>
+      </header>
+
+      <div class="sheet-body">
+        @switch (state.phase()) {
+          @case ('processing') {
+            <div class="receipt-scan-modal__state">
+              <ion-spinner name="crescent"></ion-spinner>
+              <p>{{ 'pantry.receiptScan.processing' | translate }}</p>
+            </div>
+          }
+          @case ('error') {
+            <div class="receipt-scan-modal__state">
+              <ion-icon name="receipt-outline" class="receipt-scan-modal__error-icon"></ion-icon>
+              <p>{{ 'pantry.receiptScan.error' | translate }}</p>
+              <ion-button fill="outline" shape="round" (click)="state.startScan()">
+                {{ 'pantry.receiptScan.retry' | translate }}
+              </ion-button>
+            </div>
+          }
+          @case ('review') {
+            <ul class="receipt-lines">
+              @for (line of state.reviewLines(); track line.id) {
+                <li class="receipt-line" [class.receipt-line--excluded]="!line.included">
+                  <ion-checkbox
+                    class="receipt-line__check"
+                    [checked]="line.included"
+                    (ionChange)="state.toggleLine(line.id)"
+                    [attr.aria-label]="state.displayName(line)">
+                  </ion-checkbox>
+
+                  <div
+                    class="receipt-line__body"
+                    role="button"
+                    tabindex="0"
+                    (click)="state.editLineName(line.id)"
+                    (keydown.enter)="state.editLineName(line.id)"
+                    [attr.aria-label]="'pantry.receiptScan.editNameTitle' | translate">
+                    <p class="receipt-line__name">{{ state.displayName(line) }}</p>
+                    @if (state.isFreshMatch(line)) {
+                      <p class="receipt-line__meta receipt-line__meta--match">
+                        <ion-icon name="leaf-outline"></ion-icon>
+                        {{ 'pantry.receiptScan.matchFresh' | translate }}
+                      </p>
+                    } @else if (state.isAutoMatch(line)) {
+                      <p class="receipt-line__meta receipt-line__meta--match">
+                        <ion-icon name="link-outline"></ion-icon>
+                        {{ 'pantry.receiptScan.matchExisting' | translate }}
+                      </p>
+                    } @else {
+                      <p class="receipt-line__meta">
+                        <ion-icon name="add-circle-outline"></ion-icon>
+                        {{ 'pantry.receiptScan.createNew' | translate }}
+                      </p>
+                    }
+                  </div>
+
+                  @if (!state.isFreshMatch(line)) {
+                    <div class="receipt-line__qty">
+                      <button
+                        type="button"
+                        class="receipt-line__qty-btn"
+                        [disabled]="line.quantity <= 1"
+                        (click)="state.adjustLineQuantity(line.id, -1)"
+                        [attr.aria-label]="'pantry.receiptScan.decrease' | translate">−</button>
+                      <span class="receipt-line__qty-value">{{ line.quantity }}</span>
+                      <button
+                        type="button"
+                        class="receipt-line__qty-btn"
+                        (click)="state.adjustLineQuantity(line.id, 1)"
+                        [attr.aria-label]="'pantry.receiptScan.increase' | translate">+</button>
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        }
+      </div>
+
+      @if (state.phase() === 'review') {
+        <ion-footer class="sheet-footer">
+          <ion-button
+            expand="block"
+            shape="round"
+            [disabled]="!state.includedCount() || state.isSubmitting()"
+            (click)="state.submit()">
+            @if (state.isSubmitting()) {
+              <ion-spinner name="dots"></ion-spinner>
+            } @else {
+              {{ (state.includedCount() === 1 ? 'pantry.receiptScan.submit_one' : 'pantry.receiptScan.submit_other') | translate: { count: state.includedCount() } }}
+            }
+          </ion-button>
+        </ion-footer>
+      }
+    </div>
+  </ng-template>
+</ion-modal>
