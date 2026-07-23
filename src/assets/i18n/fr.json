@@ -367,7 +367,7 @@
         "down": "↓ Moins que le mois dernier",
         "flat": "≈ Pareil que le mois dernier"
       },
-      "teaser": "Découvrez combien vous avez gaspillé ce mois"
+      "unlockBreakdown": "Débloque la répartition par catégorie et tendance"
     },
     "reposition": {
       "title": "Bientôt en rupture",

@@ -27,4 +27,18 @@
   }
   &__trend[data-trend="up"]   { color: var(--ion-color-danger);  }
   &__trend[data-trend="down"] { color: var(--ion-color-success); }
+
+  &__locked-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--app-theme-spacing-2xs);
+    margin-top: var(--app-theme-spacing-sm);
+    font-size: var(--app-theme-font-size-small);
+    color: var(--ion-color-tertiary);
+    text-decoration: none;
+
+    ion-icon {
+      font-size: var(--app-theme-icon-size-sm);
+    }
+  }
 }

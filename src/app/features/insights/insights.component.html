@@ -48,19 +48,10 @@
         (action)="goToPantry()" />
     } @else {
 
-      <!-- SECTION 1: Waste tracker — full data for PRO, locked teaser for free (bottom paywall hosts the trial CTA) -->
-      @if (facade.isPro()) {
-        <section class="insights-section">
-          <app-waste-tracker-card [summary]="facade.wasteSummary()" />
-        </section>
-      } @else {
-        <app-pro-paywall-card
-          surface="waste_card"
-          titleKey="dashboard.waste.title"
-          descriptionKey="dashboard.waste.teaser"
-          hideCta
-        />
-      }
+      <!-- SECTION 1: Waste tracker — count is free for everyone, breakdown is PRO-gated inside the card -->
+      <section class="insights-section">
+        <app-waste-tracker-card [summary]="facade.wasteSummary()" [isPro]="facade.isPro()" />
+      </section>
 
       <!-- SECTION 2: Tu despensa ahora -->
       <section class="insights-section">
