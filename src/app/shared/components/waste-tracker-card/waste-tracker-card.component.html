@@ -16,7 +16,7 @@
       {{ ('dashboard.waste.trend.' + summary().trend) | translate }}
     </p>
   } @else {
-    <a class="waste-card__locked-hint" routerLink="/upgrade">
+    <a class="waste-card__locked-hint" routerLink="/upgrade" (click)="onUnlockClick()">
       <ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon>
       {{ 'dashboard.waste.unlockBreakdown' | translate }}
     </a>

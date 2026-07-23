@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
+import { AnalyticsService } from '@core/services/analytics/analytics.service';
+import { ANALYTICS_EVENTS } from '@core/constants';
 import type { WasteSummary } from '@core/domain/insights/waste.domain';
 import { formatFriendlyName } from '@core/utils/normalization.util';
 
@@ -23,6 +25,8 @@ import { formatFriendlyName } from '@core/utils/normalization.util';
   styleUrl: './waste-tracker-card.component.scss',
 })
 export class WasteTrackerCardComponent {
+  private readonly analytics = inject(AnalyticsService);
+
   readonly summary = input.required<WasteSummary>();
   readonly isPro = input.required<boolean>();
 
@@ -33,4 +37,8 @@ export class WasteTrackerCardComponent {
     if (!top) return null;
     return formatFriendlyName(top.categoryId, top.categoryId);
   });
+
+  onUnlockClick(): void {
+    this.analytics.track(ANALYTICS_EVENTS.PAYWALL_CARD_CLICKED, { surface: 'waste_card' });
+  }
 }
