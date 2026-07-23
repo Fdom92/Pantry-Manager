@@ -1,11 +1,9 @@
 .waste-card {
   &__title {
     margin: 0 0 var(--app-theme-spacing-md);
-    font-size: var(--app-theme-font-size-body);
+    font-size: var(--app-theme-font-size-md);
     font-weight: var(--app-theme-font-weight-bold);
-    text-transform: uppercase;
-    letter-spacing: var(--app-theme-letter-spacing-eyebrow);
-    color: var(--app-theme-text-muted);
+    color: var(--app-theme-text-color);
   }
 
   &__count {
