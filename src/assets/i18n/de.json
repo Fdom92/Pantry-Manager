@@ -880,6 +880,8 @@
       "toastAdded_other": "{{ count }} Produkte vom Bon hinzugefügt",
       "editNameTitle": "Namen korrigieren",
       "smartBadge": "Intelligente Analyse",
+      "upsellPill": "Genauer mit PRO",
+      "smartScanFallback": "Intelligente Analyse nicht verfügbar, einfacher Modus wird verwendet",
       "hintTitle": "Scan-Tipp",
       "hintMessage": "Erfasse nur die Produktliste — ohne Kopfzeile des Ladens und ohne Summen. Je näher und besser beleuchtet, desto besser das Ergebnis.",
       "hintOk": "Verstanden",
@@ -900,7 +902,8 @@
     "benefits": {
       "reposition": "Intelligentes Nachfüllen: sagt voraus, wann deine Basics zur Neige gehen.",
       "waste": "Abfall-Tracking: was abläuft, in welchen Kategorien und dein Trend.",
-      "analysis": "KI-Analyse: Empfehlungen basierend auf deinem Verbrauchsverlauf."
+      "analysis": "KI-Analyse: Empfehlungen basierend auf deinem Verbrauchsverlauf.",
+      "receiptScan": "KI-Kassenbon-Scan: Fotografiere deinen Einkaufszettel und füge alles zur Speisekammer hinzu."
     },
     "actions": {
       "maybeLater": "Vielleicht später",
@@ -935,7 +938,7 @@
       "tagline": "Hol das Maximum aus deiner Vorratskammer",
       "feature1": "Vorhersage, was du kaufen musst, bevor es ausgeht",
       "feature2": "Verschwendungsanalysen und Verbrauchsmuster",
-      "feature3": "Neue Premium-Funktionen in Kürze",
+      "feature3": "Scanne Kassenbons und füge alles per KI hinzu",
       "upgradeCta": "PRO werden",
       "badgePro": "PRO aktiv",
       "activeTitle": "PRO aktiv",

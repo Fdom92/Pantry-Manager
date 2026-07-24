@@ -21,6 +21,16 @@
                 </span>
               }
             </p>
+            @if (!state.isPro()) {
+              <app-pro-paywall-card
+                class="receipt-scan-modal__upsell"
+                surface="receipt_scan"
+                titleKey="pantry.receiptScan.upsellPill"
+                descriptionKey="pantry.receiptScan.upsellPill"
+                variant="pill"
+                hideCta
+              />
+            }
           }
         </div>
         <div class="sheet-header__actions">

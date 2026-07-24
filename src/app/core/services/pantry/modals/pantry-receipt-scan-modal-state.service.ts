@@ -45,6 +45,8 @@ export class PantryReceiptScanModalStateService {
   readonly isSubmitting = signal(false);
   /** True when the PRO LLM path produced the current review lines. */
   readonly usedSmartScan = signal(false);
+  /** Captured once per scan — drives the free-tier upsell pill in the header. */
+  readonly isPro = signal(false);
 
   readonly includedLines = computed(() => this.reviewLines().filter(l => l.included));
   readonly includedCount = computed(() => this.includedLines().length);
@@ -88,7 +90,9 @@ export class PantryReceiptScanModalStateService {
       let items: ParsedReceiptItem[];
       let supermarket: string | null;
       let smart = false;
-      if (this.revenuecat.isPro()) {
+      const isPro = this.revenuecat.isPro();
+      this.isPro.set(isPro);
+      if (isPro) {
         try {
           const smartResult = await this.llmClient.parse(rows.map(r => r.text));
           items = smartResult.items;
@@ -99,6 +103,7 @@ export class PantryReceiptScanModalStateService {
           const parsed = parseReceipt(rows);
           items = parsed.items;
           supermarket = parsed.supermarket;
+          void this.showSmartScanFallbackToast();
         }
       } else {
         const parsed = parseReceipt(rows);
@@ -135,6 +140,22 @@ export class PantryReceiptScanModalStateService {
       this.phase.set('error');
       this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_FAILED, { reason: 'ocr_error' });
     }
+  }
+
+  /**
+   * PRO tried the LLM path and it failed (network/backend error) — the scan
+   * still succeeds via the local parser, but a paying user should know this
+   * particular scan didn't get the smart-scan treatment, not just silently
+   * see the smart badge missing.
+   */
+  private async showSmartScanFallbackToast(): Promise<void> {
+    const toast = await this.toastCtrl.create({
+      message: this.translate.instant('pantry.receiptScan.smartScanFallback'),
+      duration: 3000,
+      position: 'bottom',
+      color: 'warning',
+    });
+    void toast.present();
   }
 
   /**
@@ -314,6 +335,7 @@ export class PantryReceiptScanModalStateService {
     this.reviewLines.set([]);
     this.detectedSupermarket.set(null);
     this.usedSmartScan.set(false);
+    this.isPro.set(false);
   }
 }
 

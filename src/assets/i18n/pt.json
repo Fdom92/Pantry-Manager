@@ -880,6 +880,8 @@
       "toastAdded_other": "{{ count }} produtos adicionados do talão",
       "editNameTitle": "Corrigir nome",
       "smartBadge": "Análise inteligente",
+      "upsellPill": "Mais preciso com PRO",
+      "smartScanFallback": "Não foi possível usar a análise inteligente, a usar o modo básico",
       "hintTitle": "Dica para digitalizar",
       "hintMessage": "Enquadre apenas a lista de produtos — sem o cabeçalho da loja nem os totais. Quanto mais perto e com melhor luz, melhores os resultados.",
       "hintOk": "Entendido",
@@ -900,7 +902,8 @@
     "benefits": {
       "reposition": "Reposição inteligente: prevê quando vais ficar sem os teus básicos.",
       "waste": "Controlo de desperdício: o que expira, em que categorias e a tua tendência.",
-      "analysis": "Análise IA: recomendações baseadas no teu histórico de consumo."
+      "analysis": "Análise IA: recomendações baseadas no teu histórico de consumo.",
+      "receiptScan": "Leitura de talão com IA: fotografa o teu talão de compras e adiciona tudo à despensa."
     },
     "actions": {
       "maybeLater": "Talvez mais tarde",
@@ -935,7 +938,7 @@
       "tagline": "Tira o máximo partido da tua despensa",
       "feature1": "Prevê o que precisas de comprar antes de acabar",
       "feature2": "Análise de desperdício e padrões de consumo",
-      "feature3": "Novas funcionalidades premium em breve",
+      "feature3": "Lê talões de compra e adiciona tudo com IA",
       "upgradeCta": "Atualizar para PRO",
       "badgePro": "PRO ativo",
       "activeTitle": "PRO ativo",
