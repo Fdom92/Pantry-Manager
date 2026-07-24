@@ -880,6 +880,8 @@
       "toastAdded_other": "{{ count }} productos añadidos desde el ticket",
       "editNameTitle": "Corregir nombre",
       "smartBadge": "Análisis inteligente",
+      "upsellPill": "Más preciso con PRO",
+      "smartScanFallback": "No se pudo usar el análisis inteligente, usando el modo básico",
       "hintTitle": "Consejo para escanear",
       "hintMessage": "Encuadra solo la lista de productos — sin la cabecera de la tienda ni los totales. Cuanto más cerca y con mejor luz, mejores resultados.",
       "hintOk": "Entendido",
@@ -900,7 +902,8 @@
     "benefits": {
       "reposition": "Reposición inteligente: predice cuándo te quedarás sin básicos.",
       "waste": "Control de desperdicio: qué caduca, en qué categorías y tendencia.",
-      "analysis": "Análisis IA: recomendaciones basadas en tu historial de consumo."
+      "analysis": "Análisis IA: recomendaciones basadas en tu historial de consumo.",
+      "receiptScan": "Escaneo de tickets con IA: fotografía tu compra y añádela toda a la despensa."
     },
     "actions": {
       "maybeLater": "Ahora no",
@@ -935,7 +938,7 @@
       "tagline": "Saca todo el partido a tu despensa",
       "feature1": "Predice qué necesitas comprar antes de que se acabe",
       "feature2": "Análisis de desperdicio y patrones de consumo",
-      "feature3": "Nuevas funciones premium próximamente",
+      "feature3": "Escanea tickets de compra y añade todo con IA",
       "upgradeCta": "Hazte PRO",
       "badgePro": "PRO activo",
       "activeTitle": "PRO activo",

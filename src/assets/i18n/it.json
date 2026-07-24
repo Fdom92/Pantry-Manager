@@ -880,6 +880,8 @@
       "toastAdded_other": "{{ count }} prodotti aggiunti dallo scontrino",
       "editNameTitle": "Correggi nome",
       "smartBadge": "Analisi intelligente",
+      "upsellPill": "Più preciso con PRO",
+      "smartScanFallback": "Analisi intelligente non disponibile, uso modalità base",
       "hintTitle": "Consiglio per la scansione",
       "hintMessage": "Inquadra solo l'elenco dei prodotti — senza l'intestazione del negozio né i totali. Più vicino e ben illuminato, migliori i risultati.",
       "hintOk": "Capito",
@@ -900,7 +902,8 @@
     "benefits": {
       "reposition": "Rifornimento intelligente: prevede quando finirai i tuoi prodotti di base.",
       "waste": "Controllo sprechi: cosa scade, in quali categorie e il tuo trend.",
-      "analysis": "Analisi IA: raccomandazioni basate sul tuo storico di consumo."
+      "analysis": "Analisi IA: raccomandazioni basate sul tuo storico di consumo.",
+      "receiptScan": "Scansione scontrino con IA: fotografa lo scontrino e aggiungi tutto alla dispensa."
     },
     "actions": {
       "maybeLater": "Forse più tardi",
@@ -935,7 +938,7 @@
       "tagline": "Ottieni il massimo dalla tua dispensa",
       "feature1": "Prevedi cosa comprare prima che finisca",
       "feature2": "Analisi degli sprechi e schemi di consumo",
-      "feature3": "Nuove funzionalità premium in arrivo",
+      "feature3": "Scansiona gli scontrini e aggiungi tutto con l'IA",
       "upgradeCta": "Passa a PRO",
       "badgePro": "PRO attivo",
       "activeTitle": "PRO attivo",

@@ -5,7 +5,8 @@ export type ProCtaSurface =
   | 'settings_hero'
   | 'insights_tab'
   | 'waste_card'
-  | 'reposition_card';
+  | 'reposition_card'
+  | 'receipt_scan';
 
 @Injectable({ providedIn: 'root' })
 export class ProCtaUiStateService {

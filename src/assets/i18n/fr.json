@@ -880,6 +880,8 @@
       "toastAdded_other": "{{ count }} produits ajoutés depuis le ticket",
       "editNameTitle": "Corriger le nom",
       "smartBadge": "Analyse intelligente",
+      "upsellPill": "Plus précis avec PRO",
+      "smartScanFallback": "Analyse intelligente indisponible, mode basique utilisé",
       "hintTitle": "Astuce de scan",
       "hintMessage": "Cadrez uniquement la liste des produits — sans l'en-tête du magasin ni les totaux. Plus c'est proche et bien éclairé, meilleurs sont les résultats.",
       "hintOk": "Compris",
@@ -900,7 +902,8 @@
     "benefits": {
       "reposition": "Réapprovisionnement intelligent : prédit quand vos produits de base vont manquer.",
       "waste": "Suivi du gaspillage : ce qui périme, dans quelles catégories et votre tendance.",
-      "analysis": "Analyse IA : recommandations basées sur votre historique de consommation."
+      "analysis": "Analyse IA : recommandations basées sur votre historique de consommation.",
+      "receiptScan": "Scan de ticket par IA : photographiez votre ticket de caisse et ajoutez tout au garde-manger."
     },
     "actions": {
       "maybeLater": "Plus tard",
@@ -935,7 +938,7 @@
       "tagline": "Tire le meilleur parti de ton garde-manger",
       "feature1": "Prédis ce que tu dois acheter avant d'en manquer",
       "feature2": "Analyse du gaspillage et schémas de consommation",
-      "feature3": "Nouvelles fonctionnalités premium à venir",
+      "feature3": "Scannez vos tickets de caisse et ajoutez tout avec l'IA",
       "upgradeCta": "Passer en PRO",
       "badgePro": "PRO actif",
       "activeTitle": "PRO actif",
