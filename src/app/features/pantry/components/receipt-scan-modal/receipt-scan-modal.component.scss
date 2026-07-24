@@ -30,6 +30,11 @@ ion-modal.app-sheet-modal {
   @include sheet.header-subtitle;
 }
 
+.receipt-scan-modal__upsell {
+  display: block;
+  margin-top: var(--app-theme-spacing-xs);
+}
+
 .sheet-header__actions {
   display: flex;
   align-items: center;

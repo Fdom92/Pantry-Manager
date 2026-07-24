@@ -32,6 +32,7 @@ export class UpgradeStateService {
     'upgrade.benefits.reposition',
     'upgrade.benefits.waste',
     'upgrade.benefits.analysis',
+    'upgrade.benefits.receiptScan',
   ];
   private readonly availablePackages: PurchasesPackage[] = [];
 

@@ -880,6 +880,8 @@
       "toastAdded_other": "{{ count }} products added from the receipt",
       "editNameTitle": "Edit name",
       "smartBadge": "Smart scan",
+      "upsellPill": "More accurate with PRO",
+      "smartScanFallback": "Couldn't use smart scan, using basic mode instead",
       "hintTitle": "Scanning tip",
       "hintMessage": "Frame only the product list — leave out the store header and the totals. The closer and better lit, the better the results.",
       "hintOk": "Got it",
@@ -900,7 +902,8 @@
     "benefits": {
       "reposition": "Smart restocking: predicts when you'll run out of your staples.",
       "waste": "Waste tracking: what expires, in which categories, and your trend.",
-      "analysis": "AI analysis: recommendations based on your consumption history."
+      "analysis": "AI analysis: recommendations based on your consumption history.",
+      "receiptScan": "AI receipt scanning: photograph your shopping ticket and add everything to your pantry."
     },
     "actions": {
       "maybeLater": "Maybe later",
@@ -935,7 +938,7 @@
       "tagline": "Make the most of your pantry",
       "feature1": "Predict what you'll need to buy before you run out",
       "feature2": "Waste analytics and consumption patterns",
-      "feature3": "New premium features coming soon",
+      "feature3": "Scan shopping receipts and add everything with AI",
       "upgradeCta": "Upgrade to PRO",
       "badgePro": "PRO active",
       "activeTitle": "PRO active",
