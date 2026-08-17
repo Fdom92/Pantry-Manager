@@ -72,6 +72,12 @@ export const ANALYTICS_EVENTS = {
   REPO_PREDICTION_VIEWED: 'repo_prediction_viewed',
   REPO_PREDICTION_ADDED_TO_LIST: 'repo_prediction_added_to_list',
 
+  // Receipt scan (feat 5.1)
+  RECEIPT_SCAN_STARTED: 'receipt_scan_started',
+  RECEIPT_SCAN_COMPLETED: 'receipt_scan_completed',
+  RECEIPT_SCAN_FAILED: 'receipt_scan_failed',
+  RECEIPT_LINE_EDITED: 'receipt_line_edited',
+
   // Notifications
   NOTIFICATION_SCHEDULED: 'notification_scheduled',
   NOTIFICATION_TAPPED: 'notification_tapped',

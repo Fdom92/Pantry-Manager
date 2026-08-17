@@ -167,7 +167,7 @@
         </section>
       }
 
-      <!-- Próximas compras (reposition) — PRO with real predictions; free users get the locked teaser -->
+      <!-- Próximas compras (reposition) — PRO with real predictions; free users get a compact locked pill -->
       @if (facade.totalItems() > 0) {
         @if (isInsightsPro()) {
           @if (repositionPredictions().length > 0) {
@@ -182,18 +182,19 @@
             </section>
           }
         } @else {
-          <section class="dashboard-section">
-            <header class="dashboard-section-header">
-              <h3 class="dashboard-section-title">{{ 'dashboard.sections.reposition.title' | translate }}</h3>
-            </header>
-            <app-pro-paywall-card
-              surface="reposition_card"
-              titleKey="dashboard.reposition.title"
-              descriptionKey="dashboard.reposition.teaser"
-              hideCta
-            />
-          </section>
+          <app-pro-paywall-card
+            surface="reposition_card"
+            titleKey="dashboard.reposition.title"
+            descriptionKey="dashboard.reposition.teaser"
+            variant="pill"
+            hideCta
+          />
         }
+      }
+
+      <!-- Desperdicio este mes — free, ambient, links to the full PRO breakdown in Insights -->
+      @if (facade.totalItems() > 0) {
+        <app-waste-teaser-card [summary]="wasteSummary()" />
       }
     }
   </div>

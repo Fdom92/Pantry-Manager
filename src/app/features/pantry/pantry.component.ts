@@ -38,6 +38,8 @@ import { FreshItemCardComponent } from './components/fresh-item-card/fresh-item-
 import { FreshAddModalComponent } from './components/fresh-add-modal/fresh-add-modal.component';
 import { FreshEditItemModalComponent } from './components/fresh-edit-item-modal/fresh-edit-item-modal.component';
 import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
+import { PantryReceiptScanModalStateService } from '@core/services/pantry/modals/pantry-receipt-scan-modal-state.service';
+import { PantryReceiptScanModalComponent } from './components/receipt-scan-modal/receipt-scan-modal.component';
 import { PantryAddCoachMarkComponent } from './components/add-coach-mark/add-coach-mark.component';
 import { CoachMarkService } from '@core/services/retention';
 import { LocalStorageService } from '@core/services/shared';
@@ -74,6 +76,7 @@ import { LocalStorageService } from '@core/services/shared';
     FreshItemCardComponent,
     FreshAddModalComponent,
     FreshEditItemModalComponent,
+    PantryReceiptScanModalComponent,
     PantryAddCoachMarkComponent,
   ],
   templateUrl: './pantry.component.html',
@@ -89,6 +92,7 @@ import { LocalStorageService } from '@core/services/shared';
     PantryEditItemModalStateService,
     PantryQuantitySheetStateService,
     PantryFreshAddModalStateService,
+    PantryReceiptScanModalStateService,
   ],
 })
 export class PantryComponent implements AfterViewInit, OnDestroy {

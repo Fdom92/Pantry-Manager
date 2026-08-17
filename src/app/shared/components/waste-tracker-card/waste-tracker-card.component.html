@@ -6,12 +6,19 @@
   <p class="waste-card__count">
     {{ 'dashboard.waste.count' | translate: { count: summary().totalCount } }}
   </p>
-  @if (topCategoryLabel(); as topCategory) {
-    <p class="waste-card__top">
-      {{ 'dashboard.waste.topCategory' | translate: { category: topCategory } }}
+  @if (isPro()) {
+    @if (topCategoryLabel(); as topCategory) {
+      <p class="waste-card__top">
+        {{ 'dashboard.waste.topCategory' | translate: { category: topCategory } }}
+      </p>
+    }
+    <p class="waste-card__trend" [attr.data-trend]="summary().trend">
+      {{ ('dashboard.waste.trend.' + summary().trend) | translate }}
     </p>
+  } @else {
+    <a class="waste-card__locked-hint" routerLink="/upgrade" (click)="onUnlockClick()">
+      <ion-icon name="lock-closed-outline" aria-hidden="true"></ion-icon>
+      {{ 'dashboard.waste.unlockBreakdown' | translate }}
+    </a>
   }
-  <p class="waste-card__trend" [attr.data-trend]="summary().trend">
-    {{ ('dashboard.waste.trend.' + summary().trend) | translate }}
-  </p>
 }

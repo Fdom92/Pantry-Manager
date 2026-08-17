@@ -367,7 +367,7 @@
         "down": "↓ Weniger als letzten Monat",
         "flat": "≈ Gleich wie letzten Monat"
       },
-      "teaser": "Erfahre, wie viel du diesen Monat weggeworfen hast"
+      "unlockBreakdown": "Schalte die Aufschlüsselung nach Kategorie und Trend frei"
     },
     "reposition": {
       "title": "Bald ausverkauft",
@@ -505,16 +505,12 @@
     },
     "activity": {
       "title": "Letzte 30 Tage",
-      "added": "Hinzugefügt",
-      "consumed": "Verbraucht",
-      "expired": "Abgelaufen",
-      "wasteRatio": "Verschwendung",
+      "detail": "Du hast {{added}} Mal hinzugefügt und {{consumed}} Mal verbraucht in diesem Monat",
+      "detailNoAdds": "Du hast {{consumed}} Mal verbraucht, ohne diesen Monat etwas hinzuzufügen",
       "noActivity": "Keine Aktivität aufgezeichnet",
-      "noWaste": "Kein Verlust",
       "rotationHigh": "Hohe Rotation",
       "rotationMedium": "Mittlere Rotation",
-      "rotationLow": "Niedrige Rotation",
-      "rotationNone": "Keine Aktivität"
+      "rotationLow": "Niedrige Rotation"
     },
     "distribution": {
       "title": "Nach Lebensmitteltyp",
@@ -866,6 +862,33 @@
         "addSuccess_one": "✅ {{name}} hinzugefügt",
         "addSuccess_other": "✅ {{count}} Frischeprodukte hinzugefügt"
       }
+    },
+    "receiptScan": {
+      "title": "Gescannter Kassenbon",
+      "subtitle": "{{ count }} Produkte erkannt",
+      "entryButton": "Vom Kassenbon hinzufügen",
+      "processing": "Bon wird gelesen…",
+      "error": "Bon konnte nicht gelesen werden. Erfasse nur die Produktliste, geh näher ran und sorge für gutes Licht.",
+      "retry": "Erneut versuchen",
+      "matchExisting": "Wird zum vorhandenen Produkt hinzugefügt",
+      "createNew": "Wird als neues Produkt angelegt",
+      "increase": "Menge erhöhen",
+      "decrease": "Menge verringern",
+      "submit_one": "1 Produkt hinzufügen",
+      "submit_other": "{{ count }} Produkte hinzufügen",
+      "toastAdded_one": "1 Produkt vom Bon hinzugefügt",
+      "toastAdded_other": "{{ count }} Produkte vom Bon hinzugefügt",
+      "editNameTitle": "Namen korrigieren",
+      "smartBadge": "Intelligente Analyse",
+      "upsellPill": "Genauer mit PRO",
+      "smartScanFallback": "Intelligente Analyse nicht verfügbar, einfacher Modus wird verwendet",
+      "hintTitle": "Scan-Tipp",
+      "hintMessage": "Erfasse nur die Produktliste — ohne Kopfzeile des Ladens und ohne Summen. Je näher und besser beleuchtet, desto besser das Ergebnis.",
+      "hintOk": "Verstanden",
+      "promptHeader": "Kassenbon scannen",
+      "promptGallery": "Aus Galerie wählen",
+      "promptCamera": "Foto aufnehmen",
+      "matchFresh": "Wird als vorhanden markiert"
     }
   },
   "upgrade": {
@@ -879,7 +902,8 @@
     "benefits": {
       "reposition": "Intelligentes Nachfüllen: sagt voraus, wann deine Basics zur Neige gehen.",
       "waste": "Abfall-Tracking: was abläuft, in welchen Kategorien und dein Trend.",
-      "analysis": "KI-Analyse: Empfehlungen basierend auf deinem Verbrauchsverlauf."
+      "analysis": "KI-Analyse: Empfehlungen basierend auf deinem Verbrauchsverlauf.",
+      "receiptScan": "KI-Kassenbon-Scan: Fotografiere deinen Einkaufszettel und füge alles zur Speisekammer hinzu."
     },
     "actions": {
       "maybeLater": "Vielleicht später",
@@ -914,7 +938,7 @@
       "tagline": "Hol das Maximum aus deiner Vorratskammer",
       "feature1": "Vorhersage, was du kaufen musst, bevor es ausgeht",
       "feature2": "Verschwendungsanalysen und Verbrauchsmuster",
-      "feature3": "Neue Premium-Funktionen in Kürze",
+      "feature3": "Scanne Kassenbons und füge alles per KI hinzu",
       "upgradeCta": "PRO werden",
       "badgePro": "PRO aktiv",
       "activeTitle": "PRO aktiv",
@@ -1106,7 +1130,14 @@
       "testCrashTitle": "Test-Crash auslösen",
       "testCrashSubtitle": "Synthetischen Fehler werfen, um Sentry zu prüfen.",
       "triggerReconsentTitle": "Reconsent-Sheet testen",
-      "triggerReconsentSubtitle": "Setzt die Flags zurück und öffnet das Sheet im Dashboard."
+      "triggerReconsentSubtitle": "Setzt die Flags zurück und öffnet das Sheet im Dashboard.",
+      "receiptScanTitle": "Kassenbon scannen (OCR)",
+      "receiptScanSubtitle": "OCR-Test: Foto eines Bons → erkannte Zeilen",
+      "receiptScanResult": "{{ count }} Zeilen erkannt",
+      "receiptScanShare": "Ergebnis teilen",
+      "receiptScanClear": "Leeren",
+      "receiptScanNoImage": "Kein Bild ausgewählt.",
+      "receiptScanEmpty": "Kein Text im Bild erkannt. Versuche mehr Licht oder geh näher ran."
     },
     "info": {
       "title": "Informationen",

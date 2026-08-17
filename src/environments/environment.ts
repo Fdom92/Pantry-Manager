@@ -9,6 +9,7 @@ export const environment: Environment = {
   production: false,
   revenueCatPublicKey: environmentSecrets.revenuecat.devKey,
   insightsApiUrl: 'https://pantry-manager-develop.onrender.com/insights/analyze',
+  receiptApiUrl: 'https://pantry-manager-develop.onrender.com/receipt/parse',
   analytics: {
     // Free-tier limits us to 1 PostHog project so dev shares the prod key,
     // distinguished only by the `environment: 'dev'` super-prop. Real key is

@@ -123,8 +123,7 @@ export class InsightsComponent {
     return Math.max(...foodTypes.map(f => f.count));
   }
 
-  getRotationLabel(ratio: 'high' | 'medium' | 'low' | null): string {
-    if (ratio === null) return 'insights.activity.rotationNone';
+  getRotationLabel(ratio: 'high' | 'medium' | 'low'): string {
     return `insights.activity.rotation${ratio.charAt(0).toUpperCase()}${ratio.slice(1)}`;
   }
 

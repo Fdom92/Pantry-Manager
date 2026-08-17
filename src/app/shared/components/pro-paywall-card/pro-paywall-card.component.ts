@@ -35,6 +35,8 @@ export class ProPaywallCardComponent {
   readonly hideCta = input(false, { transform: booleanAttribute });
   /** Show the "Ahora no" dismiss link under the trial button. */
   readonly dismissible = input(false, { transform: booleanAttribute });
+  /** 'pill' renders a single-row compact form (icon + title + chevron) for dense surfaces like Dashboard. Description, projected content, and the CTA/dismiss button are not shown in 'pill'. */
+  readonly variant = input<'card' | 'pill'>('card');
 
   onCardClick(): void {
     this.analytics.track(ANALYTICS_EVENTS.PAYWALL_CARD_CLICKED, { surface: this.surface() });

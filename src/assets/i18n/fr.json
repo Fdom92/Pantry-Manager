@@ -367,7 +367,7 @@
         "down": "↓ Moins que le mois dernier",
         "flat": "≈ Pareil que le mois dernier"
       },
-      "teaser": "Découvrez combien vous avez gaspillé ce mois"
+      "unlockBreakdown": "Débloque la répartition par catégorie et tendance"
     },
     "reposition": {
       "title": "Bientôt en rupture",
@@ -505,16 +505,12 @@
     },
     "activity": {
       "title": "30 derniers jours",
-      "added": "Ajoutés",
-      "consumed": "Consommés",
-      "expired": "Périmés",
-      "wasteRatio": "Gaspillage",
+      "detail": "Tu as ajouté {{added}} fois et utilisé {{consumed}} fois ce mois-ci",
+      "detailNoAdds": "Tu as utilisé {{consumed}} fois sans rien ajouter ce mois-ci",
       "noActivity": "Aucune activité enregistrée",
-      "noWaste": "Aucun gaspillage",
       "rotationHigh": "Rotation élevée",
       "rotationMedium": "Rotation moyenne",
-      "rotationLow": "Rotation faible",
-      "rotationNone": "Aucune activité"
+      "rotationLow": "Rotation faible"
     },
     "distribution": {
       "title": "Par type d'aliment",
@@ -866,6 +862,33 @@
         "addSuccess_one": "✅ {{name}} ajouté",
         "addSuccess_other": "✅ {{count}} produits frais ajoutés"
       }
+    },
+    "receiptScan": {
+      "title": "Ticket scanné",
+      "subtitle": "{{ count }} produits détectés",
+      "entryButton": "Ajouter depuis un ticket",
+      "processing": "Lecture du ticket…",
+      "error": "Impossible de lire le ticket. Cadrez uniquement la liste des produits, rapprochez-vous et cherchez une bonne lumière.",
+      "retry": "Réessayer",
+      "matchExisting": "Sera ajouté au produit existant",
+      "createNew": "Sera créé comme nouveau produit",
+      "increase": "Augmenter la quantité",
+      "decrease": "Réduire la quantité",
+      "submit_one": "Ajouter 1 produit",
+      "submit_other": "Ajouter {{ count }} produits",
+      "toastAdded_one": "1 produit ajouté depuis le ticket",
+      "toastAdded_other": "{{ count }} produits ajoutés depuis le ticket",
+      "editNameTitle": "Corriger le nom",
+      "smartBadge": "Analyse intelligente",
+      "upsellPill": "Plus précis avec PRO",
+      "smartScanFallback": "Analyse intelligente indisponible, mode basique utilisé",
+      "hintTitle": "Astuce de scan",
+      "hintMessage": "Cadrez uniquement la liste des produits — sans l'en-tête du magasin ni les totaux. Plus c'est proche et bien éclairé, meilleurs sont les résultats.",
+      "hintOk": "Compris",
+      "promptHeader": "Scanner le ticket",
+      "promptGallery": "Choisir dans la galerie",
+      "promptCamera": "Prendre une photo",
+      "matchFresh": "Sera marqué comme disponible"
     }
   },
   "upgrade": {
@@ -879,7 +902,8 @@
     "benefits": {
       "reposition": "Réapprovisionnement intelligent : prédit quand vos produits de base vont manquer.",
       "waste": "Suivi du gaspillage : ce qui périme, dans quelles catégories et votre tendance.",
-      "analysis": "Analyse IA : recommandations basées sur votre historique de consommation."
+      "analysis": "Analyse IA : recommandations basées sur votre historique de consommation.",
+      "receiptScan": "Scan de ticket par IA : photographiez votre ticket de caisse et ajoutez tout au garde-manger."
     },
     "actions": {
       "maybeLater": "Plus tard",
@@ -914,7 +938,7 @@
       "tagline": "Tire le meilleur parti de ton garde-manger",
       "feature1": "Prédis ce que tu dois acheter avant d'en manquer",
       "feature2": "Analyse du gaspillage et schémas de consommation",
-      "feature3": "Nouvelles fonctionnalités premium à venir",
+      "feature3": "Scannez vos tickets de caisse et ajoutez tout avec l'IA",
       "upgradeCta": "Passer en PRO",
       "badgePro": "PRO actif",
       "activeTitle": "PRO actif",
@@ -1106,7 +1130,14 @@
       "testCrashTitle": "Déclencher un crash test",
       "testCrashSubtitle": "Lance une erreur synthétique pour vérifier Sentry.",
       "triggerReconsentTitle": "Tester le sheet de reconsent",
-      "triggerReconsentSubtitle": "Réinitialise les flags et ouvre le sheet sur le dashboard."
+      "triggerReconsentSubtitle": "Réinitialise les flags et ouvre le sheet sur le dashboard.",
+      "receiptScanTitle": "Scanner un ticket (OCR)",
+      "receiptScanSubtitle": "Test OCR : photo d'un ticket → lignes détectées",
+      "receiptScanResult": "{{ count }} lignes détectées",
+      "receiptScanShare": "Partager le résultat",
+      "receiptScanClear": "Effacer",
+      "receiptScanNoImage": "Aucune image sélectionnée.",
+      "receiptScanEmpty": "Aucun texte détecté dans l'image. Essayez avec plus de lumière ou de plus près."
     },
     "info": {
       "title": "Informations",

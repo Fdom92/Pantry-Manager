@@ -48,19 +48,10 @@
         (action)="goToPantry()" />
     } @else {
 
-      <!-- SECTION 1: Waste tracker — full data for PRO, locked teaser for free (bottom paywall hosts the trial CTA) -->
-      @if (facade.isPro()) {
-        <section class="insights-section">
-          <app-waste-tracker-card [summary]="facade.wasteSummary()" />
-        </section>
-      } @else {
-        <app-pro-paywall-card
-          surface="waste_card"
-          titleKey="dashboard.waste.title"
-          descriptionKey="dashboard.waste.teaser"
-          hideCta
-        />
-      }
+      <!-- SECTION 1: Waste tracker — count is free for everyone, breakdown is PRO-gated inside the card -->
+      <section class="insights-section">
+        <app-waste-tracker-card [summary]="facade.wasteSummary()" [isPro]="facade.isPro()" />
+      </section>
 
       <!-- SECTION 2: Tu despensa ahora -->
       <section class="insights-section">
@@ -117,31 +108,28 @@
         </section>
       }
 
-      <!-- SECTION 4: Últimos 30 días -->
+      <!-- SECTION 4: Últimos 30 días — rotation: how much of what you add you actually consume -->
       <section class="insights-section">
         <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
-        <div class="activity-row">
-          <div class="activity-stat">
-            <span class="activity-stat__value">{{ facade.activityMetrics().consumed }}</span>
-            <span class="activity-stat__label">{{ 'insights.activity.consumed' | translate }}</span>
-          </div>
-          <div class="activity-stat">
-            <span class="activity-stat__value">{{ facade.activityMetrics().expired }}</span>
-            <span class="activity-stat__label">{{ 'insights.activity.expired' | translate }}</span>
-          </div>
-          <div class="activity-stat">
-            @if (facade.activityMetrics().wasteRatio !== null && facade.activityMetrics().wasteRatio! > 0) {
-              <span class="activity-stat__value">{{ formatPercent(facade.activityMetrics().wasteRatio!) }}</span>
+        @let rotationRatio = facade.activityMetrics().rotationRatio;
+        @if (rotationRatio === null) {
+          <p class="activity-empty">{{ 'insights.activity.noActivity' | translate }}</p>
+        } @else {
+          @if (facade.activityMetrics().rotationPercent !== null) {
+            <p class="activity-headline">{{ formatPercent(facade.activityMetrics().rotationPercent!) }}</p>
+          }
+          <p class="activity-detail">
+            @if (facade.activityMetrics().added > 0) {
+              {{ 'insights.activity.detail' | translate: { consumed: facade.activityMetrics().consumed, added: facade.activityMetrics().added } }}
             } @else {
-              <span class="activity-stat__value">—</span>
+              {{ 'insights.activity.detailNoAdds' | translate: { consumed: facade.activityMetrics().consumed } }}
             }
-            <span class="activity-stat__label">{{ 'insights.activity.wasteRatio' | translate }}</span>
+          </p>
+          <div class="rotation-badge">
+            <ion-icon name="refresh-outline"></ion-icon>
+            <span>{{ getRotationLabel(rotationRatio) | translate }}</span>
           </div>
-        </div>
-        <div class="rotation-badge">
-          <ion-icon name="refresh-outline"></ion-icon>
-          <span>{{ getRotationLabel(facade.activityMetrics().rotationRatio) | translate }}</span>
-        </div>
+        }
       </section>
 
       <!-- Sentinel: IntersectionObserver triggers bar animations when this enters viewport -->
@@ -189,11 +177,11 @@
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.quality.title' | translate }}</h3>
 
-          @if (facade.pantryScore()) {
-            <div class="quality-score" [attr.data-label]="facade.pantryScore()!.label">
-              <span class="quality-score__value">{{ facade.pantryScore()!.score }}</span>
+          @if (facade.pantryScore(); as score) {
+            <div class="quality-score" [attr.data-label]="score.label">
+              <span class="quality-score__value">{{ score.score }}</span>
               <span class="quality-score__label">
-                {{ 'dashboard.pantryScore.' + facade.pantryScore()!.label | translate }}
+                {{ 'dashboard.pantryScore.' + score.label | translate }}
               </span>
             </div>
           }
@@ -236,12 +224,14 @@
             </div>
           </div>
 
-          @if (facade.pantryScore()!.score < 100) {
-            <p class="distribution-badge distribution-badge--action" (click)="goToPendientes()">
-              <ion-icon name="pencil-outline"></ion-icon>
-              {{ 'insights.quality.improveTip' | translate }}
-              <ion-icon name="chevron-forward-outline"></ion-icon>
-            </p>
+          @if (facade.pantryScore(); as score) {
+            @if (score.score < 100) {
+              <p class="distribution-badge distribution-badge--action" (click)="goToPendientes()">
+                <ion-icon name="pencil-outline"></ion-icon>
+                {{ 'insights.quality.improveTip' | translate }}
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+              </p>
+            }
           }
         </section>
       }

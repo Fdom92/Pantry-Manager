@@ -367,7 +367,7 @@
         "down": "↓ Menos que el mes pasado",
         "flat": "≈ Igual que el mes pasado"
       },
-      "teaser": "Descubre cuánto has tirado este mes"
+      "unlockBreakdown": "Desbloquea el desglose por categoría y tendencia"
     },
     "reposition": {
       "title": "Próximamente sin stock",
@@ -505,16 +505,12 @@
     },
     "activity": {
       "title": "Últimos 30 días",
-      "added": "Añadidos",
-      "consumed": "Consumidos",
-      "expired": "Caducados",
-      "wasteRatio": "Desperdicio",
+      "detail": "Añadiste {{added}} veces y usaste {{consumed}} veces este mes",
+      "detailNoAdds": "Usaste {{consumed}} veces sin añadir nada este mes",
       "noActivity": "Sin actividad registrada",
-      "noWaste": "Sin desperdicio",
       "rotationHigh": "Rotación alta",
       "rotationMedium": "Rotación media",
-      "rotationLow": "Rotación baja",
-      "rotationNone": "Sin actividad"
+      "rotationLow": "Rotación baja"
     },
     "distribution": {
       "title": "Por tipo de alimento",
@@ -866,6 +862,33 @@
         "addSuccess_one": "✅ {{name}} añadido",
         "addSuccess_other": "✅ {{count}} frescos añadidos"
       }
+    },
+    "receiptScan": {
+      "title": "Ticket escaneado",
+      "subtitle": "{{ count }} productos detectados",
+      "entryButton": "Añadir desde ticket",
+      "processing": "Leyendo el ticket…",
+      "error": "No se ha podido leer el ticket. Encuadra solo la lista de productos, acércate más y busca buena luz.",
+      "retry": "Volver a intentar",
+      "matchExisting": "Se añadirá al producto existente",
+      "createNew": "Se creará como producto nuevo",
+      "increase": "Aumentar cantidad",
+      "decrease": "Reducir cantidad",
+      "submit_one": "Añadir 1 producto",
+      "submit_other": "Añadir {{ count }} productos",
+      "toastAdded_one": "1 producto añadido desde el ticket",
+      "toastAdded_other": "{{ count }} productos añadidos desde el ticket",
+      "editNameTitle": "Corregir nombre",
+      "smartBadge": "Análisis inteligente",
+      "upsellPill": "Más preciso con PRO",
+      "smartScanFallback": "No se pudo usar el análisis inteligente, usando el modo básico",
+      "hintTitle": "Consejo para escanear",
+      "hintMessage": "Encuadra solo la lista de productos — sin la cabecera de la tienda ni los totales. Cuanto más cerca y con mejor luz, mejores resultados.",
+      "hintOk": "Entendido",
+      "promptHeader": "Escanear ticket",
+      "promptGallery": "Elegir de la galería",
+      "promptCamera": "Hacer foto",
+      "matchFresh": "Se marcará como disponible"
     }
   },
   "upgrade": {
@@ -879,7 +902,8 @@
     "benefits": {
       "reposition": "Reposición inteligente: predice cuándo te quedarás sin básicos.",
       "waste": "Control de desperdicio: qué caduca, en qué categorías y tendencia.",
-      "analysis": "Análisis IA: recomendaciones basadas en tu historial de consumo."
+      "analysis": "Análisis IA: recomendaciones basadas en tu historial de consumo.",
+      "receiptScan": "Escaneo de tickets con IA: fotografía tu compra y añádela toda a la despensa."
     },
     "actions": {
       "maybeLater": "Ahora no",
@@ -914,7 +938,7 @@
       "tagline": "Saca todo el partido a tu despensa",
       "feature1": "Predice qué necesitas comprar antes de que se acabe",
       "feature2": "Análisis de desperdicio y patrones de consumo",
-      "feature3": "Nuevas funciones premium próximamente",
+      "feature3": "Escanea tickets de compra y añade todo con IA",
       "upgradeCta": "Hazte PRO",
       "badgePro": "PRO activo",
       "activeTitle": "PRO activo",
@@ -1106,7 +1130,14 @@
       "testCrashTitle": "Disparar crash de prueba",
       "testCrashSubtitle": "Lanza un error sintético para verificar Sentry.",
       "triggerReconsentTitle": "Probar reconsent sheet",
-      "triggerReconsentSubtitle": "Resetea flags y abre el sheet en el dashboard."
+      "triggerReconsentSubtitle": "Resetea flags y abre el sheet en el dashboard.",
+      "receiptScanTitle": "Escanear ticket (OCR)",
+      "receiptScanSubtitle": "Prueba de OCR: foto de un ticket → líneas detectadas",
+      "receiptScanResult": "{{ count }} líneas detectadas",
+      "receiptScanShare": "Compartir resultado",
+      "receiptScanClear": "Limpiar",
+      "receiptScanNoImage": "No se ha seleccionado ninguna imagen.",
+      "receiptScanEmpty": "No se ha detectado texto en la imagen. Prueba con más luz o más cerca."
     },
     "info": {
       "title": "Información",
