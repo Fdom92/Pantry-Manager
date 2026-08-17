@@ -392,6 +392,7 @@ export class PantryStateService {
   dismissQuantitySheet = () => this.quantitySheet.dismissQuantitySheet();
   incrementQuantity = (item: PantryItem) => this.quantitySheet.incrementQuantity(item);
   decrementQuantity = (item: PantryItem) => this.quantitySheet.decrementQuantity(item);
+  emptyOutQuantity = (item: PantryItem) => this.quantitySheet.emptyOut(item);
   getQuantitySheetTotalQuantity = (item: PantryItem) => this.quantitySheet.getTotalQuantity(item);
   setQuantitySheetExpiryDate = (date: string | undefined) => this.quantitySheet.setExpiryDate(date);
   toggleQuantitySheetNoExpiry = () => this.quantitySheet.toggleNoExpiry();

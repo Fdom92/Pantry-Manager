@@ -740,7 +740,8 @@
       "expiryDate": "Fecha de caducidad (opcional)",
       "noDate": "Añadir fecha",
       "zeroHint": "Desaparecerá de tu despensa hasta que añadas más",
-      "zeroHintBasic": "Desaparecerá de tu despensa y pasará a tu lista de la compra"
+      "zeroHintBasic": "Desaparecerá de tu despensa y pasará a tu lista de la compra",
+      "emptyOut": "Agotar"
     },
     "toasts": {
       "locationRequired": "Selecciona una ubicación antes de guardar.",

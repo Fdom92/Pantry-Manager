@@ -145,6 +145,21 @@ export class PantryQuantitySheetStateService {
   }
 
   /**
+   * Set pending change so the item's total lands at exactly 0 in one tap,
+   * instead of one "-" tap per remaining unit.
+   */
+  emptyOut(item: PantryItem): void {
+    if (!item?._id) {
+      return;
+    }
+    const remaining = this.getTotalQuantity(item) + this.pendingQuantityChange();
+    if (remaining <= 0) {
+      return;
+    }
+    this.pendingQuantityChange.update(current => current - remaining);
+  }
+
+  /**
    * Apply accumulated quantity changes when closing the sheet.
    */
   private async applyPendingChanges(item: PantryItem, change: number, expiryDate?: string, noExpiry?: boolean): Promise<void> {

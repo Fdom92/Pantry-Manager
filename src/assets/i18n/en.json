@@ -740,7 +740,8 @@
       "expiryDate": "Expiry date (optional)",
       "noDate": "Add date",
       "zeroHint": "It'll disappear from your pantry until you restock it",
-      "zeroHintBasic": "It'll disappear from your pantry and show up in your shopping list"
+      "zeroHintBasic": "It'll disappear from your pantry and show up in your shopping list",
+      "emptyOut": "Mark as empty"
     },
     "toasts": {
       "locationRequired": "Select a location before saving.",

@@ -740,6 +740,7 @@
       "noDate": "Ajouter date",
       "zeroHint": "Il disparaîtra de votre garde-manger jusqu'à ce que vous en rajoutiez",
       "zeroHintBasic": "Il disparaîtra de votre garde-manger et apparaîtra dans votre liste de courses",
+      "emptyOut": "Marquer comme épuisé",
       "hint": "Ajustez la quantité. Elle sera sauvegardée à la fermeture."
     },
     "toasts": {
