@@ -740,6 +740,7 @@
       "noDate": "Datum wählen",
       "zeroHint": "Verschwindet aus deiner Speisekammer, bis du wieder Vorrat hinzufügst",
       "zeroHintBasic": "Verschwindet aus deiner Speisekammer und taucht in deiner Einkaufsliste auf",
+      "emptyOut": "Als leer markieren",
       "hint": "Menge anpassen. Wird beim Schließen gespeichert."
     },
     "toasts": {

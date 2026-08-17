@@ -42,6 +42,15 @@
         <ion-icon slot="icon-only" name="add"></ion-icon>
       </ion-button>
     </div>
+    @if (displayQuantity > 0) {
+      <ion-button
+        fill="clear"
+        size="small"
+        class="empty-out-button"
+        (click)="handleEmptyOut()">
+        {{ 'pantry.quantitySheet.emptyOut' | translate }}
+      </ion-button>
+    }
     @if (zeroHintKey) {
       <p class="quantity-zero-hint">{{ zeroHintKey | translate }}</p>
     }

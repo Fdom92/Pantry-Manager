@@ -740,6 +740,7 @@
       "noDate": "Aggiungi data",
       "zeroHint": "Sparirà dalla dispensa finché non aggiungi scorte",
       "zeroHintBasic": "Sparirà dalla dispensa e comparirà nella tua lista della spesa",
+      "emptyOut": "Segna come esaurito",
       "hint": "Regola la quantità. Verrà salvata alla chiusura."
     },
     "toasts": {

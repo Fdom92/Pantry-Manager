@@ -250,6 +250,7 @@
           [quantityUnit]="''"
           (increment)="facade.incrementQuantity(item)"
           (decrement)="facade.decrementQuantity(item)"
+          (emptyOut)="facade.emptyOutQuantity(item)"
           (expiryDateChange)="facade.setQuantitySheetExpiryDate($event)"
           (noExpiryToggle)="facade.toggleQuantitySheetNoExpiry()"
           (viewDetails)="facade.openBatchesModalFromSheet(item)"
