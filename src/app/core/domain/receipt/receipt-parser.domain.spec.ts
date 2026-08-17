@@ -189,6 +189,36 @@ describe('receipt-parser.domain — full parse', () => {
     expect(result.items[1].quantity).toBe(2);
   });
 
+  it('ends the table on a truncated tax-summary header (real Merkocash case)', () => {
+    // The photo crop cut the tax table header mid-word ("Resumen po" instead
+    // of "RESUMEN POR BASES DE IVA") — END_ANCHOR must not require the full
+    // phrase or the fragment leaks through as a fake product.
+    const rows = [
+      row('MERKOCASH'),
+      row('Descripcion | Cant | Pvp | Total'),
+      row('PAN ROSQUILLA | 1.0 | 0.99 | 0.99'),
+      row('Resumen po'),
+    ];
+    const result = parseReceipt(rows);
+    const names = result.items.map(i => i.rawName);
+    expect(names).toEqual(['PAN ROSQUILLA']);
+  });
+
+  it('discards an OCR-garbled "Polígono" address line (real Costco case)', () => {
+    // OCR read "POLÍGONO" as "Pollgono" (double L, no accent) — the noise
+    // pattern only covered the I/Í spellings, so this leaked in as a
+    // priceless "product" (Costco never requires a price per row).
+    const rows = [
+      row('COSTCO WHOLESALE'),
+      row('Pollgono Industrial «Los Gavilanes»'),
+      row('Muffins doble choc'),
+      row('10450 V | 1x | 5,99 | 5,99 B'),
+    ];
+    const result = parseReceipt(rows);
+    const names = result.items.map(i => i.rawName);
+    expect(names).toEqual(['Muffins doble choc']);
+  });
+
   it('drops an orphan price fragment that lost its leading digit (real device case)', () => {
     // "2 CREMA VERDURAS  1,70  3,40" — OCR dropped the leading "1" of the
     // unit price, leaving a bare ",70" token that doesn't match PRICE_TOKEN
