@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, booleanAttribute, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, booleanAttribute, computed, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonCard, IonCardContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
@@ -37,9 +37,12 @@ export class ProPaywallCardComponent {
   readonly dismissible = input(false, { transform: booleanAttribute });
   /** 'pill' renders a single-row compact form (icon + title + chevron) for dense surfaces like Dashboard. Description, projected content, and the CTA/dismiss button are not shown in 'pill'. */
   readonly variant = input<'card' | 'pill'>('card');
+  /** Fires synchronously, before navigation, so a host that renders this inside a modal/sheet can close it first. */
+  @Output() readonly cardClicked = new EventEmitter<void>();
 
   onCardClick(): void {
     this.analytics.track(ANALYTICS_EVENTS.PAYWALL_CARD_CLICKED, { surface: this.surface() });
+    this.cardClicked.emit();
     void this.router.navigate(['/upgrade']);
   }
 }
