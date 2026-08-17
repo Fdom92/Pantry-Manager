@@ -177,11 +177,11 @@
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.quality.title' | translate }}</h3>
 
-          @if (facade.pantryScore()) {
-            <div class="quality-score" [attr.data-label]="facade.pantryScore()!.label">
-              <span class="quality-score__value">{{ facade.pantryScore()!.score }}</span>
+          @if (facade.pantryScore(); as score) {
+            <div class="quality-score" [attr.data-label]="score.label">
+              <span class="quality-score__value">{{ score.score }}</span>
               <span class="quality-score__label">
-                {{ 'dashboard.pantryScore.' + facade.pantryScore()!.label | translate }}
+                {{ 'dashboard.pantryScore.' + score.label | translate }}
               </span>
             </div>
           }
@@ -224,12 +224,14 @@
             </div>
           </div>
 
-          @if (facade.pantryScore()!.score < 100) {
-            <p class="distribution-badge distribution-badge--action" (click)="goToPendientes()">
-              <ion-icon name="pencil-outline"></ion-icon>
-              {{ 'insights.quality.improveTip' | translate }}
-              <ion-icon name="chevron-forward-outline"></ion-icon>
-            </p>
+          @if (facade.pantryScore(); as score) {
+            @if (score.score < 100) {
+              <p class="distribution-badge distribution-badge--action" (click)="goToPendientes()">
+                <ion-icon name="pencil-outline"></ion-icon>
+                {{ 'insights.quality.improveTip' | translate }}
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+              </p>
+            }
           }
         </section>
       }
