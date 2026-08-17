@@ -61,7 +61,7 @@ export function detectSupermarket(rows: ReceiptRow[]): string | null {
 const START_ANCHOR = /(DESCR\s?[IL1]?PC|P\.?\s?UN[IL1]T|DESCRIPTION\b|\bQTE\b|\bPVP\b|\bCANT\b)/i;
 
 /** Rows at/after one of these mark the end of the product zone. */
-const END_ANCHOR = /(TOTAL\s*\(|A PAGAR|RESUMEN POR BASES|TOTAL A PAGAR|GUZTIRA|IMPORTE:|SOUS-?TOTAL|SUMME\b|TOTALE\b|MONTANT\b|^TOTAL\b|\bTOTAL €|\bTOTAL\s*\(€\))/i;
+const END_ANCHOR = /(TOTAL\s*\(|A PAGAR|\bRESUMEN\b|TOTAL A PAGAR|GUZTIRA|IMPORTE:|SOUS-?TOTAL|SUMME\b|TOTALE\b|MONTANT\b|^TOTAL\b|\bTOTAL €|\bTOTAL\s*\(€\))/i;
 
 // ─────────────────────────────────────────────────────────────────────────
 // Row classification (noise filtering)
@@ -79,7 +79,7 @@ const STORE_CONTACT_NOISE = [
   // Postal-code + city rows that lost their prefix ("850 Torrejón de Ardoz").
   /^\d{3,5}\s+[A-ZÁ-Ü][a-zá-ü]+(\s|$)/,
   /\bwww\.|@|HTTP/i,
-  /\bC\.?P\.?[.:\s]?\d{4,5}\b|\bPOL[IÍ]GONO\b|\bCTRA\b|\bAVDA\b|\bC\/\s/i,
+  /\bC\.?P\.?[.:\s]?\d{4,5}\b|\bPOL[IÍL]{1,2}GONO\b|\bCTRA\b|\bAVDA\b|\bC\/\s/i,
   /HORARIO|Lu\.-|LUNES|APERTURA/i,
 ];
 
