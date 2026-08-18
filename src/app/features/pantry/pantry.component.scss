@@ -46,6 +46,13 @@ ion-title {
   display: none;
 }
 
+.pendientes-complete-cta {
+  margin: 0 var(--app-theme-spacing-2xs) var(--app-theme-spacing-2xs);
+  --padding-start: var(--app-theme-spacing-xs);
+  --padding-end: var(--app-theme-spacing-xs);
+  font-size: var(--app-theme-font-size-small);
+}
+
 .summary-chips .status-chip {
   flex: 0 0 auto;
   --padding-start: var(--app-theme-spacing-md);

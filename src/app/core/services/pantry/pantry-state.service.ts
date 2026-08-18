@@ -197,6 +197,16 @@ export class PantryStateService {
 
     // Sync collapsed groups with current page
     effect(() => this.listUi.syncCollapsedGroups(this.groups()));
+
+    // If the pendientes filter is active but the last pendiente item just got
+    // fixed, its chip disappears (count-gated in buildFilterChips) — falling
+    // back to 'all' avoids leaving the user on a filter with no visible chip
+    // and an empty list.
+    effect(() => {
+      if (this.activeFilters().pendientes && this.summary().statusCounts.pendientes === 0) {
+        this.applyStatusFilterPreset('all');
+      }
+    });
   }
 
   /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
@@ -230,9 +240,6 @@ export class PantryStateService {
 
   onFilterChipSelected(chip: FilterChipViewModel): void {
     if (chip.value) {
-      if (chip.value === 'pendientes' && !this.pendientesSheet.isOpen()) {
-        this.openPendientesSheet();
-      }
       this.applyStatusFilterPreset(chip.value);
       return;
     }

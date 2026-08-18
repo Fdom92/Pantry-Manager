@@ -39,6 +39,16 @@
         </ion-chip>
       }
     </div>
+    @if (facade.activeFilters().pendientes) {
+      <ion-button
+        class="pendientes-complete-cta"
+        fill="clear"
+        size="small"
+        (click)="facade.openPendientesSheet()">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        {{ 'pantry.pendientesSheet.title' | translate }}
+      </ion-button>
+    }
   </div>
 
   @if (facade.showSkeleton()) {
