@@ -31,6 +31,11 @@
             @for (row of state.rows(); track row.itemId) {
               <li class="pendiente-row">
                 <p class="pendiente-row__name">{{ row.name }}</p>
+                @if (row.datelessBatchCount > 1) {
+                  <p class="pendiente-row__batch-note">
+                    {{ 'pantry.pendientesSheet.batchDateNote' | translate: { count: row.datelessBatchCount } }}
+                  </p>
+                }
 
                 @if (row.needsFoodType) {
                   <div class="pendiente-row__food-types">

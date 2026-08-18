@@ -748,6 +748,7 @@
       "subtitle": "Renseignez le type d'aliment et la date de péremption de ces produits",
       "empty": "Aucun produit en attente",
       "dateLabel": "Ajouter une date",
+      "batchDateNote": "S'appliquera aux {{ count }} lots sans date",
       "saveAll": "Tout enregistrer",
       "savedToast": "{{ count }} produit(s) mis à jour"
     },

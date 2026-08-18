@@ -748,6 +748,7 @@
       "subtitle": "Rellena tipo de alimento y fecha de caducidad para estos productos",
       "empty": "No tienes productos pendientes",
       "dateLabel": "Añadir fecha",
+      "batchDateNote": "Se aplicará a los {{ count }} lotes sin fecha",
       "saveAll": "Guardar todo",
       "savedToast": "{{ count }} producto(s) actualizado(s)"
     },

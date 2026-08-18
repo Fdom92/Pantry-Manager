@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
-import { hasMissingExpiry, isIncomplete } from '@core/domain/pantry/pantry-filtering.domain';
+import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete } from '@core/domain/pantry/pantry-filtering.domain';
 import { applyPendienteFix, isPendienteRowResolved } from '@core/domain/pantry/pendiente-fix.domain';
 import { suggestExpiryDate } from '@core/domain/pantry/expiry-suggestion.domain';
 import type { PantryItem } from '@core/models/pantry';
@@ -17,6 +17,8 @@ export interface PendienteRow {
   name: string;
   needsFoodType: boolean;
   needsDate: boolean;
+  /** How many of this item's batches are missing a date — a save applies one date to all of them. */
+  datelessBatchCount: number;
   foodType: FoodType | null;
   expirationDate: string | undefined;
   noExpiry: boolean;
@@ -174,6 +176,7 @@ export class PantryPendientesSheetStateService {
       name: item.name,
       needsFoodType,
       needsDate,
+      datelessBatchCount: countMissingExpiryBatches(item),
       foodType: item.foodType ?? null,
       expirationDate: !needsFoodType && needsDate ? suggestExpiryDate(item.foodType!) : undefined,
       noExpiry: false,

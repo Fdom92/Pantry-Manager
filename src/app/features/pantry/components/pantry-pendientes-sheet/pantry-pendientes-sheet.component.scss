@@ -83,6 +83,12 @@ ion-modal.app-sheet-modal {
     color: var(--app-theme-text-color);
   }
 
+  &__batch-note {
+    margin: calc(-1 * var(--app-theme-spacing-2xs)) 0 0;
+    font-size: var(--app-theme-font-size-tiny);
+    color: var(--app-theme-text-muted);
+  }
+
   &__food-types {
     display: flex;
     flex-wrap: wrap;

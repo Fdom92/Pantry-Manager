@@ -748,6 +748,7 @@
       "subtitle": "Inserisci tipo di alimento e data di scadenza per questi prodotti",
       "empty": "Nessun prodotto in sospeso",
       "dateLabel": "Aggiungi data",
+      "batchDateNote": "Verrà applicata a tutti i {{ count }} lotti senza data",
       "saveAll": "Salva tutto",
       "savedToast": "{{ count }} prodotto/i aggiornato/i"
     },

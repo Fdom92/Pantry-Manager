@@ -748,6 +748,7 @@
       "subtitle": "Lebensmitteltyp und Ablaufdatum für diese Produkte ausfüllen",
       "empty": "Keine offenen Produkte",
       "dateLabel": "Datum hinzufügen",
+      "batchDateNote": "Wird auf alle {{ count }} Chargen ohne Datum angewendet",
       "saveAll": "Alles speichern",
       "savedToast": "{{ count }} Produkt(e) aktualisiert"
     },

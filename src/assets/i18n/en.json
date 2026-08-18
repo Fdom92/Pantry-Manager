@@ -748,6 +748,7 @@
       "subtitle": "Fill in food type and expiry date for these products",
       "empty": "No pending products",
       "dateLabel": "Add date",
+      "batchDateNote": "Will apply to all {{ count }} dateless batches",
       "saveAll": "Save all",
       "savedToast": "{{ count }} product(s) updated"
     },

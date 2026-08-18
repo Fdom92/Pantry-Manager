@@ -748,6 +748,7 @@
       "subtitle": "Preencha o tipo de alimento e a data de validade destes produtos",
       "empty": "Nenhum produto pendente",
       "dateLabel": "Adicionar data",
+      "batchDateNote": "Será aplicada aos {{ count }} lotes sem data",
       "saveAll": "Guardar tudo",
       "savedToast": "{{ count }} produto(s) atualizado(s)"
     },
