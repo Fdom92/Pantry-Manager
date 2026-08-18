@@ -231,7 +231,7 @@ export class PantryStateService {
   onFilterChipSelected(chip: FilterChipViewModel): void {
     if (chip.value) {
       this.applyStatusFilterPreset(chip.value);
-      if (chip.value === 'pendientes') {
+      if (chip.value === 'pendientes' && !this.pendientesSheet.isOpen()) {
         this.openPendientesSheet();
       }
       return;
