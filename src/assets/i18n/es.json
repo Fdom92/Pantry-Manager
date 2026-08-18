@@ -743,6 +743,14 @@
       "zeroHintBasic": "Desaparecerá de tu despensa y pasará a tu lista de la compra",
       "emptyOut": "Agotar"
     },
+    "pendientesSheet": {
+      "title": "Completar pendientes",
+      "subtitle": "Rellena tipo de alimento y fecha de caducidad para estos productos",
+      "empty": "No tienes productos pendientes",
+      "dateLabel": "Añadir fecha",
+      "saveAll": "Guardar todo",
+      "savedToast": "{{ count }} producto(s) actualizado(s)"
+    },
     "toasts": {
       "locationRequired": "Selecciona una ubicación antes de guardar.",
       "saveError": "No se pudo guardar el producto.",

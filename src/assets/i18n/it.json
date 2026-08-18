@@ -743,6 +743,14 @@
       "emptyOut": "Segna come esaurito",
       "hint": "Regola la quantità. Verrà salvata alla chiusura."
     },
+    "pendientesSheet": {
+      "title": "Completa i prodotti in sospeso",
+      "subtitle": "Inserisci tipo di alimento e data di scadenza per questi prodotti",
+      "empty": "Nessun prodotto in sospeso",
+      "dateLabel": "Aggiungi data",
+      "saveAll": "Salva tutto",
+      "savedToast": "{{ count }} prodotto/i aggiornato/i"
+    },
     "toasts": {
       "locationRequired": "Seleziona una posizione prima di salvare.",
       "saveError": "Impossibile salvare l'articolo.",

@@ -743,6 +743,14 @@
       "emptyOut": "Marquer comme épuisé",
       "hint": "Ajustez la quantité. Elle sera sauvegardée à la fermeture."
     },
+    "pendientesSheet": {
+      "title": "Compléter les produits en attente",
+      "subtitle": "Renseignez le type d'aliment et la date de péremption de ces produits",
+      "empty": "Aucun produit en attente",
+      "dateLabel": "Ajouter une date",
+      "saveAll": "Tout enregistrer",
+      "savedToast": "{{ count }} produit(s) mis à jour"
+    },
     "toasts": {
       "locationRequired": "Sélectionnez un emplacement avant d’enregistrer.",
       "saveError": "Impossible d’enregistrer le produit.",

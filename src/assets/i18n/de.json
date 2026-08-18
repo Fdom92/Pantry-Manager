@@ -743,6 +743,14 @@
       "emptyOut": "Als leer markieren",
       "hint": "Menge anpassen. Wird beim Schließen gespeichert."
     },
+    "pendientesSheet": {
+      "title": "Offene Einträge vervollständigen",
+      "subtitle": "Lebensmitteltyp und Ablaufdatum für diese Produkte ausfüllen",
+      "empty": "Keine offenen Produkte",
+      "dateLabel": "Datum hinzufügen",
+      "saveAll": "Alles speichern",
+      "savedToast": "{{ count }} Produkt(e) aktualisiert"
+    },
     "toasts": {
       "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
       "saveError": "Das Produkt konnte nicht gespeichert werden.",

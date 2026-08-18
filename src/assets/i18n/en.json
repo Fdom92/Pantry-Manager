@@ -743,6 +743,14 @@
       "zeroHintBasic": "It'll disappear from your pantry and show up in your shopping list",
       "emptyOut": "Mark as empty"
     },
+    "pendientesSheet": {
+      "title": "Complete pending items",
+      "subtitle": "Fill in food type and expiry date for these products",
+      "empty": "No pending products",
+      "dateLabel": "Add date",
+      "saveAll": "Save all",
+      "savedToast": "{{ count }} product(s) updated"
+    },
     "toasts": {
       "locationRequired": "Select a location before saving.",
       "saveError": "Could not save the item.",
