@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FoodType } from '@core/models/shared/enums.model';
 import { PantryPendientesSheetStateService } from '@core/services/pantry/modals/pantry-pendientes-sheet-state.service';
-import { IonButton, IonChip, IonContent, IonFooter, IonIcon, IonModal, IonSpinner } from '@ionic/angular/standalone';
+import { IonButton, IonChip, IonFooter, IonIcon, IonModal, IonSpinner } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 
@@ -10,7 +10,6 @@ import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-p
   standalone: true,
   imports: [
     IonModal,
-    IonContent,
     IonFooter,
     IonButton,
     IonIcon,

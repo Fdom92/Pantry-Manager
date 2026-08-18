@@ -39,7 +39,9 @@
                         class="food-type-chip"
                         [class.food-type-chip--active]="row.foodType === type"
                         button="true"
-                        (click)="state.selectFoodType(row.itemId, type)">
+                        (click)="state.selectFoodType(row.itemId, type)"
+                        [attr.aria-pressed]="row.foodType === type"
+                        [attr.aria-label]="('pantry.form.foodType.' + type) | translate">
                         {{ ('pantry.form.foodType.' + type) | translate }}
                       </ion-chip>
                     }
