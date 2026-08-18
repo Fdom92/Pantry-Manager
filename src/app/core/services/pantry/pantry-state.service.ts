@@ -17,6 +17,8 @@ import { PantryAddModalStateService } from './modals/pantry-add-modal-state.serv
 import { PantryConsumeModalStateService } from './modals/pantry-consume-modal-state.service';
 import { PantryReceiptScanModalStateService } from './modals/pantry-receipt-scan-modal-state.service';
 import { PantryQuantitySheetStateService } from './modals/pantry-quantity-sheet-state.service';
+import { PantryPendientesSheetStateService } from './modals/pantry-pendientes-sheet-state.service';
+import { PantryNavigationPresetService } from './pantry-navigation-preset.service';
 import { PantryListUiStateService } from './pantry-list-ui-state.service';
 import { PantryStoreService } from './pantry-store.service';
 import { PantryViewModelService } from './pantry-view-model.service';
@@ -43,6 +45,8 @@ export class PantryStateService {
   private readonly receiptScanModal = inject(PantryReceiptScanModalStateService);
   private readonly batchesModal = inject(PantryBatchesModalStateService);
   private readonly quantitySheet = inject(PantryQuantitySheetStateService);
+  private readonly pendientesSheet = inject(PantryPendientesSheetStateService);
+  private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly freshAddModal = inject(PantryFreshAddModalStateService);
   private readonly historyManager = inject(HistoryEventManagerService);
   private readonly toastCtrl = inject(ToastController);
@@ -150,7 +154,8 @@ export class PantryStateService {
     this.editItemModalRequest() !== null ||
     this.editFreshItemModalRequest() !== null ||
     this.quantitySheet.showQuantitySheet() ||
-    this.consumeModal.consumeModalOpen()
+    this.consumeModal.consumeModalOpen() ||
+    this.pendientesSheet.isOpen()
   );
 
   constructor() {
@@ -198,8 +203,12 @@ export class PantryStateService {
   async ionViewWillEnter(): Promise<void> {
     this.skeletonManager.startLoading();
     this.pantryStore.clearEntryFilters();
+    const shouldOpenPendientes = this.navigationPreset.peek()?.pendientes === true;
     this.pantryStore.applyPendingNavigationPreset();
     await this.loadItems();
+    if (shouldOpenPendientes) {
+      this.openPendientesSheet();
+    }
     this.pantryStore.watchRealtime();
     this.skeletonManager.stopLoading();
   }
@@ -222,6 +231,9 @@ export class PantryStateService {
   onFilterChipSelected(chip: FilterChipViewModel): void {
     if (chip.value) {
       this.applyStatusFilterPreset(chip.value);
+      if (chip.value === 'pendientes') {
+        this.openPendientesSheet();
+      }
       return;
     }
     this.applyStatusFilterPreset('all');
@@ -389,6 +401,7 @@ export class PantryStateService {
 
   // -------- Quantity sheet (delegates to PantryQuantitySheetStateService) --------
   openQuantitySheet = (item: PantryItem, event?: Event) => this.quantitySheet.openQuantitySheet(item, event);
+  openPendientesSheet = () => this.pendientesSheet.open();
   dismissQuantitySheet = () => this.quantitySheet.dismissQuantitySheet();
   incrementQuantity = (item: PantryItem) => this.quantitySheet.incrementQuantity(item);
   decrementQuantity = (item: PantryItem) => this.quantitySheet.decrementQuantity(item);
