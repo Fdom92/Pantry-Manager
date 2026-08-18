@@ -1,0 +1,94 @@
+@use '../../../../shared/styles/modal-sheet' as sheet;
+
+ion-modal.app-sheet-modal {
+  @include sheet.sheet-base;
+}
+
+.sheet-shell {
+  @include sheet.layout;
+}
+
+.sheet-handle {
+  @include sheet.handle;
+}
+
+.sheet-header {
+  @include sheet.header;
+  @include sheet.glass-fallback;
+}
+
+.sheet-header__titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.sheet-header__title {
+  @include sheet.header-title;
+}
+
+.sheet-header__subtitle {
+  @include sheet.header-subtitle;
+}
+
+.sheet-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-xs);
+  flex-shrink: 0;
+}
+
+.sheet-body {
+  @include sheet.body;
+}
+
+.sheet-footer {
+  @include sheet.footer;
+  @include sheet.glass-fallback;
+}
+
+.pendientes-sheet__empty {
+  padding: var(--app-theme-spacing-3xl) var(--app-theme-spacing-lg);
+  text-align: center;
+  color: var(--app-theme-text-muted);
+}
+
+.pendiente-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--app-theme-spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-sm);
+}
+
+.pendiente-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-sm);
+  padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-md);
+  border-radius: var(--app-theme-card-border-radius);
+  background: var(--app-theme-card-bg);
+  border: var(--app-theme-card-border-width) solid var(--app-theme-card-border-color);
+
+  &__name {
+    margin: 0;
+    font-size: var(--app-theme-font-size-body);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+  }
+
+  &__food-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--app-theme-spacing-xs);
+  }
+}
+
+.food-type-chip {
+  --background: color-mix(in srgb, var(--ion-text-color) 7%, transparent);
+
+  &--active {
+    --background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+  }
+}

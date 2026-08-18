@@ -1,0 +1,81 @@
+<ion-modal
+  class="app-sheet-modal pendientes-sheet"
+  [isOpen]="state.isOpen()"
+  [breakpoints]="[0, 0.85, 1]"
+  [initialBreakpoint]="0.85"
+  [handle]="false"
+  (didDismiss)="state.dismiss()">
+  <ng-template>
+    <div class="sheet-shell pendientes-sheet__content">
+      <div class="sheet-handle" aria-hidden="true"></div>
+
+      <header class="sheet-header">
+        <div class="sheet-header__titles">
+          <h2 class="sheet-header__title">{{ 'pantry.pendientesSheet.title' | translate }}</h2>
+          <p class="sheet-header__subtitle">{{ 'pantry.pendientesSheet.subtitle' | translate }}</p>
+        </div>
+        <div class="sheet-header__actions">
+          <ion-button
+            fill="clear"
+            color="medium"
+            (click)="state.close()"
+            [attr.aria-label]="'common.actions.close' | translate">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </div>
+      </header>
+
+      <div class="sheet-body">
+        @if (state.rows().length) {
+          <ul class="pendiente-rows">
+            @for (row of state.rows(); track row.itemId) {
+              <li class="pendiente-row">
+                <p class="pendiente-row__name">{{ row.name }}</p>
+
+                @if (row.needsFoodType) {
+                  <div class="pendiente-row__food-types">
+                    @for (type of foodTypes; track type) {
+                      <ion-chip
+                        class="food-type-chip"
+                        [class.food-type-chip--active]="row.foodType === type"
+                        button="true"
+                        (click)="state.selectFoodType(row.itemId, type)">
+                        {{ ('pantry.form.foodType.' + type) | translate }}
+                      </ion-chip>
+                    }
+                  </div>
+                }
+
+                @if (row.needsDate) {
+                  <app-expiry-picker
+                    [date]="row.expirationDate"
+                    [noExpiry]="row.noExpiry"
+                    noDateKey="pantry.pendientesSheet.dateLabel"
+                    (dateChange)="state.setExpirationDate(row.itemId, $event)"
+                    (noExpiryToggle)="state.toggleNoExpiry(row.itemId)">
+                  </app-expiry-picker>
+                }
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="pendientes-sheet__empty">{{ 'pantry.pendientesSheet.empty' | translate }}</p>
+        }
+      </div>
+
+      <ion-footer class="sheet-footer">
+        <ion-button
+          expand="block"
+          shape="round"
+          [disabled]="!state.hasTouchedRows() || state.isSaving()"
+          (click)="state.saveAll()">
+          @if (state.isSaving()) {
+            <ion-spinner name="dots"></ion-spinner>
+          } @else {
+            {{ 'pantry.pendientesSheet.saveAll' | translate }}
+          }
+        </ion-button>
+      </ion-footer>
+    </div>
+  </ng-template>
+</ion-modal>
