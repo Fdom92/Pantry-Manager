@@ -166,13 +166,15 @@ export class PantryPendientesSheetStateService {
   }
 
   private buildRow(item: PantryItem): PendienteRow {
+    const needsFoodType = !item.foodType;
+    const needsDate = hasMissingExpiry(item);
     return {
       itemId: item._id,
       name: item.name,
-      needsFoodType: !item.foodType,
-      needsDate: hasMissingExpiry(item),
+      needsFoodType,
+      needsDate,
       foodType: item.foodType ?? null,
-      expirationDate: undefined,
+      expirationDate: !needsFoodType && needsDate ? suggestExpiryDate(item.foodType!) : undefined,
       noExpiry: false,
       touched: false,
     };
