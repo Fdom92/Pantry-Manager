@@ -1,5 +1,5 @@
 import { FoodType } from '@core/models/shared/enums.model';
-import { matchesFilters } from './pantry-filtering.domain';
+import { hasMissingExpiry, isIncomplete, matchesFilters } from './pantry-filtering.domain';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 
 function daysFromNow(days: number): string {
@@ -64,5 +64,68 @@ describe('matchesFilters — review filter', () => {
       batches: [{ batchId: 'b1', quantity: 1, expirationDate: daysFromNow(-10) }],
     });
     expect(matchesFilters(tooOld, { ...noFilters, review: true })).toBeFalse();
+  });
+});
+
+describe('isIncomplete', () => {
+  it('is incomplete when foodType is missing, even with a full expirationDate', () => {
+    const item = makeItem({
+      foodType: undefined,
+      batches: [{ batchId: 'b1', quantity: 1, expirationDate: daysFromNow(30) }],
+    });
+    expect(isIncomplete(item)).toBeTrue();
+  });
+
+  it('is complete when foodType is set and every batch has a date', () => {
+    const item = makeItem({
+      foodType: FoodType.CARB,
+      batches: [{ batchId: 'b1', quantity: 1, expirationDate: daysFromNow(30) }],
+    });
+    expect(isIncomplete(item)).toBeFalse();
+  });
+
+  it('is incomplete when foodType is set but a batch is missing a date and not noExpiry', () => {
+    const item = makeItem({
+      foodType: FoodType.CARB,
+      batches: [
+        { batchId: 'b1', quantity: 1, expirationDate: daysFromNow(30) },
+        { batchId: 'b2', quantity: 1 },
+      ],
+    });
+    expect(isIncomplete(item)).toBeTrue();
+  });
+
+  it('is complete when the only dateless batch is explicitly marked noExpiry', () => {
+    const item = makeItem({
+      foodType: FoodType.HOUSEHOLD,
+      batches: [{ batchId: 'b1', quantity: 1, noExpiry: true }],
+    });
+    expect(isIncomplete(item)).toBeFalse();
+  });
+
+  it('fresh items with foodType set are always complete, regardless of batches', () => {
+    const item = makeItem({
+      foodType: FoodType.VEGETABLE,
+      productType: 'fresh',
+      batches: [{ batchId: 'b1', quantity: 1 }],
+    });
+    expect(isIncomplete(item)).toBeFalse();
+  });
+});
+
+describe('hasMissingExpiry', () => {
+  it('is false for fresh items regardless of batch dates', () => {
+    const item = makeItem({ productType: 'fresh', batches: [{ batchId: 'b1', quantity: 1 }] });
+    expect(hasMissingExpiry(item)).toBeFalse();
+  });
+
+  it('is true when any pantry batch lacks a date and is not noExpiry', () => {
+    const item = makeItem({ batches: [{ batchId: 'b1', quantity: 1 }] });
+    expect(hasMissingExpiry(item)).toBeTrue();
+  });
+
+  it('is false when every dateless batch is marked noExpiry', () => {
+    const item = makeItem({ batches: [{ batchId: 'b1', quantity: 1, noExpiry: true }] });
+    expect(hasMissingExpiry(item)).toBeFalse();
   });
 });
