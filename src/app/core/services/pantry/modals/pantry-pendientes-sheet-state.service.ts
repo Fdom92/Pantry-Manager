@@ -76,7 +76,7 @@ export class PantryPendientesSheetStateService {
    */
   selectFoodType(itemId: string, foodType: FoodType): void {
     this.rows.update(current => current.map(row => {
-      if (row.itemId !== itemId) {
+      if (row.itemId !== itemId || !row.needsFoodType) {
         return row;
       }
       const shouldSuggestDate = row.needsDate && !row.expirationDate && !row.noExpiry;
@@ -94,7 +94,7 @@ export class PantryPendientesSheetStateService {
    */
   setExpirationDate(itemId: string, date: string | undefined): void {
     this.rows.update(current => current.map(row =>
-      row.itemId === itemId
+      row.itemId === itemId && row.needsDate
         ? { ...row, expirationDate: date || undefined, noExpiry: date ? false : row.noExpiry, touched: true }
         : row
     ));
@@ -105,7 +105,7 @@ export class PantryPendientesSheetStateService {
    */
   toggleNoExpiry(itemId: string): void {
     this.rows.update(current => current.map(row => {
-      if (row.itemId !== itemId) {
+      if (row.itemId !== itemId || !row.needsDate) {
         return row;
       }
       const toggled = !row.noExpiry;
