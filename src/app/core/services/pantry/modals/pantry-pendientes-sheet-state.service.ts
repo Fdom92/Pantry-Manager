@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { hasMissingExpiry, isIncomplete } from '@core/domain/pantry/pantry-filtering.domain';
-import { applyPendienteFix } from '@core/domain/pantry/pendiente-fix.domain';
+import { applyPendienteFix, isPendienteRowResolved } from '@core/domain/pantry/pendiente-fix.domain';
 import { suggestExpiryDate } from '@core/domain/pantry/expiry-suggestion.domain';
 import type { PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
@@ -20,7 +20,6 @@ export interface PendienteRow {
   foodType: FoodType | null;
   expirationDate: string | undefined;
   noExpiry: boolean;
-  touched: boolean;
 }
 
 /**
@@ -40,7 +39,7 @@ export class PantryPendientesSheetStateService {
   readonly isSaving = signal(false);
   readonly rows = signal<PendienteRow[]>([]);
 
-  readonly hasTouchedRows = computed(() => this.rows().some(row => row.touched));
+  readonly hasSaveableRows = computed(() => this.rows().some(isPendienteRowResolved));
 
   /**
    * Open the sheet and snapshot every currently-incomplete item into a row.
@@ -84,7 +83,6 @@ export class PantryPendientesSheetStateService {
         ...row,
         foodType,
         expirationDate: shouldSuggestDate ? suggestExpiryDate(foodType) : row.expirationDate,
-        touched: true,
       };
     }));
   }
@@ -95,7 +93,7 @@ export class PantryPendientesSheetStateService {
   setExpirationDate(itemId: string, date: string | undefined): void {
     this.rows.update(current => current.map(row =>
       row.itemId === itemId && row.needsDate
-        ? { ...row, expirationDate: date || undefined, noExpiry: date ? false : row.noExpiry, touched: true }
+        ? { ...row, expirationDate: date || undefined, noExpiry: date ? false : row.noExpiry }
         : row
     ));
   }
@@ -109,27 +107,29 @@ export class PantryPendientesSheetStateService {
         return row;
       }
       const toggled = !row.noExpiry;
-      return { ...row, noExpiry: toggled, expirationDate: toggled ? undefined : row.expirationDate, touched: true };
+      return { ...row, noExpiry: toggled, expirationDate: toggled ? undefined : row.expirationDate };
     }));
   }
 
   /**
-   * Persist every touched row in one pass. Untouched rows are left as-is —
+   * Persist every resolved row (has a value for everything it needed — picked
+   * or pre-filled) in one pass. Rows still missing something are left as-is —
    * they remain "pendientes" and will reappear next time the sheet opens.
    */
   async saveAll(): Promise<void> {
     if (this.isSaving()) {
       return;
     }
-    const touchedRows = this.rows().filter(row => row.touched);
-    if (!touchedRows.length) {
+    const saveableRows = this.rows().filter(isPendienteRowResolved);
+    if (!saveableRows.length) {
       this.close();
       return;
     }
 
     await withSignalFlag(this.isSaving, async () => {
       const items = this.pantryStore.loadedProducts();
-      for (const row of touchedRows) {
+      let savedCount = 0;
+      for (const row of saveableRows) {
         const item = items.find(candidate => candidate._id === row.itemId);
         if (!item) {
           continue;
@@ -150,11 +150,12 @@ export class PantryPendientesSheetStateService {
         });
         await this.pantryStore.updateItem(updated);
         await this.eventManager.logAdvancedEdit(item, updated, 'pendientes_bulk_fix');
+        savedCount++;
       }
 
-      this.analytics.track(ANALYTICS_EVENTS.PANTRY_PENDIENTES_SAVED, { count: touchedRows.length });
+      this.analytics.track(ANALYTICS_EVENTS.PANTRY_PENDIENTES_SAVED, { count: savedCount });
       const toast = await this.toastCtrl.create({
-        message: this.translate.instant('pantry.pendientesSheet.savedToast', { count: touchedRows.length }),
+        message: this.translate.instant('pantry.pendientesSheet.savedToast', { count: savedCount }),
         duration: 1500,
         position: 'bottom',
       });
@@ -176,7 +177,6 @@ export class PantryPendientesSheetStateService {
       foodType: item.foodType ?? null,
       expirationDate: !needsFoodType && needsDate ? suggestExpiryDate(item.foodType!) : undefined,
       noExpiry: false,
-      touched: false,
     };
   }
 }

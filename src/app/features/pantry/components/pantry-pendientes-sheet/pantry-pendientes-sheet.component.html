@@ -69,7 +69,7 @@
         <ion-button
           expand="block"
           shape="round"
-          [disabled]="!state.hasTouchedRows() || state.isSaving()"
+          [disabled]="!state.hasSaveableRows() || state.isSaving()"
           (click)="state.saveAll()">
           @if (state.isSaving()) {
             <ion-spinner name="dots"></ion-spinner>
