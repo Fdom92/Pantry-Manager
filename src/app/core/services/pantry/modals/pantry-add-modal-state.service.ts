@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { buildAddItemPayload } from '@core/domain/pantry';
+import { buildAddItemPayload, inferExpiryForName, suggestExpiryDate } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete, createDocumentId } from '@core/utils';
 import { formatFriendlyName, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
@@ -190,6 +190,11 @@ export class PantryAddModalStateService {
           quantity: 1,
           item,
           isNew: false,
+          // Show the suggested expiry up front so the user can accept or edit
+          // it before saving, instead of discovering it afterwards.
+          expirationDate: item.foodType
+            ? suggestExpiryDate(item.foodType)
+            : inferExpiryForName(option.title).expirationDate,
         },
       ];
     });
@@ -236,6 +241,7 @@ export class PantryAddModalStateService {
           name: formattedName,
           quantity: 1,
           isNew: true,
+          expirationDate: inferExpiryForName(formattedName).expirationDate,
         },
       ];
     });
