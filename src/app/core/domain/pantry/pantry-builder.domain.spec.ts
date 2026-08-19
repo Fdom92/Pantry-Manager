@@ -1,3 +1,4 @@
+import { FoodType } from '@core/models/shared/enums.model';
 import { buildAddItemPayload } from './pantry-builder.domain';
 
 const BASE = {
@@ -70,8 +71,11 @@ describe('buildAddItemPayload', () => {
       expect(result.batches[0].expirationDate).toBe('2026-12-31');
     });
 
-    it('no expirationDate when not provided', () => {
-      const result = buildAddItemPayload(BASE);
+    it('no expirationDate when not provided and the name is unrecognised', () => {
+      // BASE.name ("Chicken") is in the food dictionary, so it would now get an
+      // inferred date. Use a name the dictionary does not know to assert the
+      // original contract: no date in, no date out.
+      const result = buildAddItemPayload({ ...BASE, name: 'xyzzy' });
       expect(result.batches[0].expirationDate).toBeUndefined();
     });
 
@@ -112,5 +116,34 @@ describe('buildAddItemPayload', () => {
       const result = buildAddItemPayload({ ...BASE, expirationDate: '2026-12-31' });
       expect(result.expirationDate).toBe('2026-12-31');
     });
+  });
+});
+
+describe('buildAddItemPayload — foodType inference', () => {
+  const base = { id: 'item:1', nowIso: '2026-01-01T12:00:00.000Z', quantity: 1 };
+
+  it('infers foodType and fills the batch expiry for a known name', () => {
+    const item = buildAddItemPayload({ ...base, name: 'leche' });
+    expect(item.foodType).toBe(FoodType.DAIRY);
+    expect(item.batches[0].expirationDate).toBeDefined();
+    expect(item.expirationDate).toBe(item.batches[0].expirationDate);
+  });
+
+  it('leaves foodType and expiry unset for an unknown name', () => {
+    const item = buildAddItemPayload({ ...base, name: 'xyzzy' });
+    expect(item.foodType).toBeUndefined();
+    expect(item.batches[0].expirationDate).toBeUndefined();
+  });
+
+  it('never overrides an explicit expirationDate from the caller', () => {
+    const item = buildAddItemPayload({ ...base, name: 'leche', expirationDate: '2026-03-15' });
+    expect(item.batches[0].expirationDate).toBe('2026-03-15');
+    expect(item.foodType).toBe(FoodType.DAIRY);
+  });
+
+  it('never sets an expiry when the caller marked the batch noExpiry', () => {
+    const item = buildAddItemPayload({ ...base, name: 'leche', noExpiry: true });
+    expect(item.batches[0].expirationDate).toBeUndefined();
+    expect(item.batches[0].noExpiry).toBe(true);
   });
 });
