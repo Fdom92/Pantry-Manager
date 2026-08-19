@@ -435,7 +435,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
     foodType: FoodType.FRUIT,
     terms: {
       es: ['manzana', 'manzanas'], en: ['apple', 'apples'],
-      de: ['apfel', 'apfel'], fr: ['pomme', 'pommes'],
+      de: ['apfel'], fr: ['pomme', 'pommes'],
       it: ['mela', 'mele'], pt: ['maca', 'macas'],
     },
   },

@@ -116,6 +116,9 @@ export class PantryAddModalStateService {
             quantity: entry.quantity,
             expirationDate: entry.expirationDate,
             noExpiry: entry.noExpiry,
+            // The row already showed the suggested date in an editable chip, so
+            // an empty value here means the user cleared it on purpose.
+            inferExpiry: false,
           });
           const item: PantryItem = { ...base, productType: 'pantry' };
           await this.pantryStore.addItem(item);

@@ -147,3 +147,26 @@ describe('buildAddItemPayload — foodType inference', () => {
     expect(item.batches[0].noExpiry).toBe(true);
   });
 });
+
+describe('buildAddItemPayload — opting out of date inference', () => {
+  const base = { id: 'item:1', nowIso: '2026-01-01T12:00:00.000Z', quantity: 1 };
+
+  it('does not infer a date when the caller opted out', () => {
+    // The add modal resolves the date itself, so a blank there is a deliberate
+    // choice by the user — not an absence the builder should fill in.
+    const item = buildAddItemPayload({ ...base, name: 'leche', inferExpiry: false });
+    expect(item.batches[0].expirationDate).toBeUndefined();
+  });
+
+  it('still classifies the foodType when date inference is opted out', () => {
+    // Clearing a date is not the same as rejecting the classification, which
+    // still feeds insights, waste tracking and the pendientes filter.
+    const item = buildAddItemPayload({ ...base, name: 'leche', inferExpiry: false });
+    expect(item.foodType).toBe(FoodType.DAIRY);
+  });
+
+  it('infers by default when the flag is omitted', () => {
+    const item = buildAddItemPayload({ ...base, name: 'leche' });
+    expect(item.batches[0].expirationDate).toBeDefined();
+  });
+});

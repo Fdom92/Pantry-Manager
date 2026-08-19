@@ -14,6 +14,16 @@ export function buildAddItemPayload(params: {
   householdId?: string;
   expirationDate?: string;
   noExpiry?: boolean;
+  /**
+   * Whether to derive an expiry date from the product name when the caller
+   * passes none. Defaults to true.
+   *
+   * Callers that already resolved the date with the user — the add modal shows
+   * the suggestion in an editable chip — must pass false, so that a blank there
+   * reads as "the user removed it" rather than "nobody set one". Without this,
+   * clearing the chip would be silently undone here.
+   */
+  inferExpiry?: boolean;
 }): PantryItem {
   const normalizedName = normalizeTrim(params.name) || UNASSIGNED_PRODUCT_NAME;
 
@@ -28,7 +38,8 @@ export function buildAddItemPayload(params: {
   // the caller always wins; an unrecognised name falls back to no date, which
   // is the behaviour this function had before inference existed.
   const inferred = inferExpiryForName(normalizedName, new Date(params.nowIso));
-  const shouldInferDate = !params.expirationDate && !params.noExpiry;
+  const shouldInferDate =
+    params.inferExpiry !== false && !params.expirationDate && !params.noExpiry;
 
   const batches: ItemBatch[] = [
     {
