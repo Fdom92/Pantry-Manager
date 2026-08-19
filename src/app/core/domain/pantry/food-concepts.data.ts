@@ -214,4 +214,123 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
       fr: ['tofu'], it: ['tofu'], pt: ['tofu'],
     },
   },
+
+  // ── Carbs and dry pantry ─────────────────────────────────────────────────
+  {
+    key: 'pasta',
+    foodType: FoodType.CARB,
+    terms: {
+      es: ['pasta', 'macarrones', 'espaguetis'], en: ['pasta', 'spaghetti', 'macaroni'],
+      de: ['nudeln', 'spaghetti'], fr: ['pates', 'spaghetti'],
+      it: ['pasta', 'spaghetti'], pt: ['massa', 'esparguete'],
+    },
+  },
+  {
+    key: 'rice',
+    foodType: FoodType.CARB,
+    terms: {
+      es: ['arroz'], en: ['rice'], de: ['reis'],
+      fr: ['riz'], it: ['riso'], pt: ['arroz'],
+    },
+  },
+  {
+    key: 'flour',
+    foodType: FoodType.CARB,
+    terms: {
+      es: ['harina'], en: ['flour'], de: ['mehl'],
+      fr: ['farine'], it: ['farina'], pt: ['farinha'],
+    },
+  },
+  {
+    key: 'chickpeas',
+    foodType: FoodType.CARB,
+    terms: {
+      es: ['garbanzos'], en: ['chickpeas'], de: ['kichererbsen'],
+      fr: ['pois chiches'], it: ['ceci'], pt: ['grao de bico'],
+    },
+  },
+  {
+    key: 'lentils',
+    foodType: FoodType.CARB,
+    terms: {
+      es: ['lentejas'], en: ['lentils'], de: ['linsen'],
+      fr: ['lentilles'], it: ['lenticchie'], pt: ['lentilhas'],
+    },
+  },
+  {
+    key: 'beans',
+    foodType: FoodType.CARB,
+    terms: {
+      es: ['alubias', 'judias', 'frijoles'], en: ['beans'],
+      de: ['bohnen'], fr: ['haricots'], it: ['fagioli'], pt: ['feijao'],
+    },
+  },
+  {
+    key: 'cereal',
+    foodType: FoodType.CARB,
+    terms: {
+      es: ['cereales', 'avena'], en: ['cereal', 'oats'],
+      de: ['muesli', 'haferflocken'], fr: ['cereales', 'avoine'],
+      it: ['cereali', 'avena'], pt: ['cereais', 'aveia'],
+    },
+  },
+  {
+    key: 'sugar',
+    foodType: FoodType.CARB,
+    terms: {
+      es: ['azucar'], en: ['sugar'], de: ['zucker'],
+      fr: ['sucre'], it: ['zucchero'], pt: ['acucar'],
+    },
+  },
+  {
+    key: 'cookies',
+    foodType: FoodType.CARB,
+    terms: {
+      es: ['galletas'], en: ['cookies', 'biscuits'], de: ['kekse'],
+      fr: ['biscuits'], it: ['biscotti'], pt: ['bolachas'],
+    },
+  },
+
+  // ── Condiments and drinks (OTHER) ────────────────────────────────────────
+  {
+    key: 'olive-oil',
+    foodType: FoodType.OTHER,
+    terms: {
+      es: ['aceite', 'aceite de oliva'], en: ['oil', 'olive oil'],
+      de: ['ol', 'olivenol'], fr: ['huile', 'huile olive'],
+      it: ['olio', 'olio oliva'], pt: ['azeite', 'oleo'],
+    },
+  },
+  {
+    key: 'salt',
+    foodType: FoodType.OTHER,
+    terms: {
+      es: ['sal'], en: ['salt'], de: ['salz'],
+      fr: ['sel'], it: ['sale'], pt: ['sal'],
+    },
+  },
+  {
+    key: 'vinegar',
+    foodType: FoodType.OTHER,
+    terms: {
+      es: ['vinagre'], en: ['vinegar'], de: ['essig'],
+      fr: ['vinaigre'], it: ['aceto'], pt: ['vinagre'],
+    },
+  },
+  {
+    key: 'coffee',
+    foodType: FoodType.OTHER,
+    terms: {
+      es: ['cafe'], en: ['coffee'], de: ['kaffee'],
+      fr: ['cafe'], it: ['caffe'], pt: ['cafe'],
+    },
+  },
+  {
+    key: 'tea',
+    foodType: FoodType.OTHER,
+    terms: {
+      es: ['te', 'infusion'], en: ['tea'], de: ['tee'],
+      fr: ['the', 'infusion'], it: ['te', 'tisana'], pt: ['cha'],
+    },
+  },
 ];
