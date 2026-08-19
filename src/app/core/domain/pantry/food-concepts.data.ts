@@ -95,4 +95,123 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
       pt: ['pao'],
     },
   },
+
+  // ── Dairy ────────────────────────────────────────────────────────────────
+  {
+    key: 'cheese',
+    foodType: FoodType.DAIRY,
+    terms: {
+      es: ['queso'], en: ['cheese'], de: ['kase'],
+      fr: ['fromage'], it: ['formaggio'], pt: ['queijo'],
+    },
+  },
+  {
+    key: 'butter',
+    foodType: FoodType.DAIRY,
+    terms: {
+      es: ['mantequilla'], en: ['butter'], de: ['butter'],
+      fr: ['beurre'], it: ['burro'], pt: ['manteiga'],
+    },
+  },
+  {
+    key: 'cream',
+    foodType: FoodType.DAIRY,
+    terms: {
+      es: ['nata', 'crema'], en: ['cream'], de: ['sahne'],
+      fr: ['creme'], it: ['panna'], pt: ['natas'],
+    },
+  },
+  {
+    key: 'fresh-cheese',
+    foodType: FoodType.DAIRY,
+    terms: {
+      es: ['requeson', 'queso fresco'], en: ['cottage cheese', 'cream cheese'],
+      de: ['quark', 'frischkase'], fr: ['fromage blanc'],
+      it: ['ricotta'], pt: ['requeijao'],
+    },
+  },
+
+  // ── Protein ──────────────────────────────────────────────────────────────
+  {
+    key: 'eggs',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['huevo', 'huevos'], en: ['egg', 'eggs'], de: ['ei', 'eier'],
+      fr: ['oeuf', 'oeufs'], it: ['uovo', 'uova'], pt: ['ovo', 'ovos'],
+    },
+  },
+  {
+    key: 'chicken',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['pollo'], en: ['chicken'], de: ['hahnchen', 'huhn'],
+      fr: ['poulet'], it: ['pollo'], pt: ['frango'],
+    },
+  },
+  {
+    key: 'beef',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['ternera', 'vacuno'], en: ['beef'], de: ['rindfleisch'],
+      fr: ['boeuf'], it: ['manzo'], pt: ['carne de vaca'],
+    },
+  },
+  {
+    key: 'pork',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['cerdo', 'panceta'], en: ['pork', 'bacon'], de: ['schweinefleisch', 'speck'],
+      fr: ['porc', 'lardons'], it: ['maiale', 'pancetta'], pt: ['porco', 'bacon'],
+    },
+  },
+  {
+    key: 'fish',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['pescado', 'merluza', 'salmon'], en: ['fish', 'salmon', 'cod'],
+      de: ['fisch', 'lachs'], fr: ['poisson', 'saumon'],
+      it: ['pesce', 'salmone'], pt: ['peixe', 'salmao'],
+    },
+  },
+  {
+    key: 'tuna',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['atun'], en: ['tuna'], de: ['thunfisch'],
+      fr: ['thon'], it: ['tonno'], pt: ['atum'],
+    },
+  },
+  {
+    key: 'ham',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['jamon'], en: ['ham'], de: ['schinken'],
+      fr: ['jambon'], it: ['prosciutto'], pt: ['presunto'],
+    },
+  },
+  {
+    key: 'sausage',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['chorizo', 'salchicha', 'salchichon'], en: ['sausage'],
+      de: ['wurst', 'wurstchen'], fr: ['saucisse', 'saucisson'],
+      it: ['salsiccia', 'salame'], pt: ['linguica', 'salsicha'],
+    },
+  },
+  {
+    key: 'turkey',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['pavo'], en: ['turkey'], de: ['pute', 'truthahn'],
+      fr: ['dinde'], it: ['tacchino'], pt: ['peru'],
+    },
+  },
+  {
+    key: 'tofu',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['tofu'], en: ['tofu'], de: ['tofu'],
+      fr: ['tofu'], it: ['tofu'], pt: ['tofu'],
+    },
+  },
 ];

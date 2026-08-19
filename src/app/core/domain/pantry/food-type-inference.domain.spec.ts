@@ -23,8 +23,10 @@ describe('inferFoodType', () => {
   });
 
   it('matches whole tokens only, never substrings', () => {
-    // "panceta" contains "pan" (bread) but is pork
-    expect(inferFoodType('panceta')).toBeNull();
+    // "pancarta" contains "pan" (bread) as a substring but is not a grocery
+    expect(inferFoodType('pancarta')).toBeNull();
+    // "limonada" contains "limon" but is a different product
+    expect(inferFoodType('limonada')).toBeNull();
   });
 
   it('handles code-switching: english term with spanish app', () => {
