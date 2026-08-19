@@ -1,8 +1,9 @@
 import { SUPPORTED_LANGUAGES } from '@core/constants';
 import { FoodType } from '@core/models/shared/enums.model';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
+import { EXPIRY_SUGGESTION_DAYS } from './expiry-suggestion.domain';
 import { FOOD_CONCEPTS } from './food-concepts.data';
-import { inferFoodType } from './food-type-inference.domain';
+import { inferExpiryForName, inferFoodType } from './food-type-inference.domain';
 
 describe('inferFoodType', () => {
   it('matches a simple single-word term', () => {
@@ -89,5 +90,28 @@ describe('FOOD_CONCEPTS data integrity', () => {
         }
       }
     }
+  });
+});
+
+describe('inferExpiryForName', () => {
+  const from = new Date('2026-01-01T12:00:00');
+
+  it('returns the foodType and a suggested date for a known term', () => {
+    const result = inferExpiryForName('leche', from);
+    expect(result.foodType).toBe(FoodType.DAIRY);
+    // DAIRY shelf life comes from the shared table, not a literal here
+    const days = EXPIRY_SUGGESTION_DAYS[FoodType.DAIRY];
+    const expected = new Date(from);
+    expected.setDate(expected.getDate() + days);
+    const y = expected.getFullYear();
+    const m = String(expected.getMonth() + 1).padStart(2, '0');
+    const d = String(expected.getDate()).padStart(2, '0');
+    expect(result.expirationDate).toBe(`${y}-${m}-${d}`);
+  });
+
+  it('returns nulls for an unknown term so callers keep current behaviour', () => {
+    const result = inferExpiryForName('xyzzy', from);
+    expect(result.foodType).toBeNull();
+    expect(result.expirationDate).toBeUndefined();
   });
 });

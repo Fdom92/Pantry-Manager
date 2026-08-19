@@ -1,5 +1,6 @@
 import type { FoodType } from '@core/models/shared/enums.model';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
+import { suggestExpiryDate } from './expiry-suggestion.domain';
 import { FOOD_CONCEPTS } from './food-concepts.data';
 
 /**
@@ -57,4 +58,23 @@ export function inferFoodType(name: string): FoodType | null {
     }
   }
   return null;
+}
+
+export interface InferredExpiry {
+  foodType: FoodType | null;
+  /** `YYYY-MM-DD`, or undefined when the name could not be recognised. */
+  expirationDate: string | undefined;
+}
+
+/**
+ * Convenience wrapper: infer the food type from a product name and derive the
+ * suggested expiry date from it. Returns undefined dates for unknown names so
+ * every caller can keep its existing "no date" behaviour unchanged.
+ */
+export function inferExpiryForName(name: string, fromDate: Date = new Date()): InferredExpiry {
+  const foodType = inferFoodType(name);
+  return {
+    foodType,
+    expirationDate: foodType ? suggestExpiryDate(foodType, fromDate) : undefined,
+  };
 }
