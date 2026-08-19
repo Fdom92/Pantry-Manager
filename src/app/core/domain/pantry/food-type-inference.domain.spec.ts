@@ -1,4 +1,7 @@
+import { SUPPORTED_LANGUAGES } from '@core/constants';
 import { FoodType } from '@core/models/shared/enums.model';
+import { normalizeSearchQuery } from '@core/utils/normalization.util';
+import { FOOD_CONCEPTS } from './food-concepts.data';
 import { inferFoodType } from './food-type-inference.domain';
 
 describe('inferFoodType', () => {
@@ -42,5 +45,49 @@ describe('inferFoodType', () => {
   it('returns null for null/undefined input', () => {
     expect(inferFoodType(null as unknown as string)).toBeNull();
     expect(inferFoodType(undefined as unknown as string)).toBeNull();
+  });
+});
+
+describe('FOOD_CONCEPTS data integrity', () => {
+  it('has a unique key per concept', () => {
+    const keys = FOOD_CONCEPTS.map(c => c.key);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it('declares at least one term for every supported language', () => {
+    for (const concept of FOOD_CONCEPTS) {
+      for (const lang of SUPPORTED_LANGUAGES) {
+        const terms = concept.terms[lang];
+        expect(terms?.length)
+          .withContext(`concept "${concept.key}" is missing terms for "${lang}"`)
+          .toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('stores every term already normalised (lowercase, unaccented)', () => {
+    for (const concept of FOOD_CONCEPTS) {
+      for (const terms of Object.values(concept.terms)) {
+        for (const term of terms) {
+          expect(term)
+            .withContext(`concept "${concept.key}" has a non-normalised term`)
+            .toBe(normalizeSearchQuery(term));
+        }
+      }
+    }
+  });
+
+  it('resolves every declared term back to its own foodType', () => {
+    // Guards against a term being silently shadowed by an earlier concept.
+    // A shadowed term is allowed only if both concepts share the same foodType.
+    for (const concept of FOOD_CONCEPTS) {
+      for (const terms of Object.values(concept.terms)) {
+        for (const term of terms) {
+          expect(inferFoodType(term))
+            .withContext(`term "${term}" (concept "${concept.key}") resolves elsewhere`)
+            .toBe(concept.foodType);
+        }
+      }
+    }
   });
 });

@@ -509,4 +509,91 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
       fr: ['avocat'], it: ['avocado'], pt: ['abacate'],
     },
   },
+
+  // ── Household ────────────────────────────────────────────────────────────
+  {
+    key: 'toilet-paper',
+    foodType: FoodType.HOUSEHOLD,
+    terms: {
+      es: ['papel higienico'], en: ['toilet paper'], de: ['toilettenpapier'],
+      fr: ['papier toilette'], it: ['carta igienica'], pt: ['papel higienico'],
+    },
+  },
+  {
+    key: 'detergent',
+    foodType: FoodType.HOUSEHOLD,
+    terms: {
+      es: ['detergente', 'jabon'], en: ['detergent', 'soap'],
+      de: ['waschmittel', 'seife'], fr: ['lessive', 'savon'],
+      it: ['detersivo', 'sapone'], pt: ['detergente', 'sabao'],
+    },
+  },
+  {
+    key: 'dish-soap',
+    foodType: FoodType.HOUSEHOLD,
+    terms: {
+      es: ['lavavajillas'], en: ['dish soap', 'dishwasher tablets'],
+      de: ['spulmittel'], fr: ['liquide vaisselle'],
+      it: ['detersivo piatti'], pt: ['detergente loica'],
+    },
+  },
+  {
+    key: 'bleach',
+    foodType: FoodType.HOUSEHOLD,
+    terms: {
+      es: ['lejia'], en: ['bleach'], de: ['bleichmittel'],
+      fr: ['javel'], it: ['candeggina'], pt: ['lixivia'],
+    },
+  },
+  {
+    key: 'shampoo',
+    foodType: FoodType.HOUSEHOLD,
+    terms: {
+      es: ['champu'], en: ['shampoo'], de: ['shampoo'],
+      fr: ['shampooing'], it: ['shampoo'], pt: ['champo'],
+    },
+  },
+  {
+    key: 'toothpaste',
+    foodType: FoodType.HOUSEHOLD,
+    terms: {
+      es: ['pasta de dientes', 'dentifrico'], en: ['toothpaste'],
+      de: ['zahnpasta'], fr: ['dentifrice'],
+      it: ['dentifricio'], pt: ['pasta de dentes'],
+    },
+  },
+
+  // ── Drinks ───────────────────────────────────────────────────────────────
+  {
+    key: 'water',
+    foodType: FoodType.OTHER,
+    terms: {
+      es: ['agua'], en: ['water'], de: ['wasser'],
+      fr: ['eau'], it: ['acqua'], pt: ['agua'],
+    },
+  },
+  {
+    key: 'juice',
+    foodType: FoodType.OTHER,
+    terms: {
+      es: ['zumo'], en: ['juice'], de: ['saft'],
+      fr: ['jus'], it: ['succo'], pt: ['sumo'],
+    },
+  },
+  {
+    key: 'beer',
+    foodType: FoodType.OTHER,
+    terms: {
+      es: ['cerveza'], en: ['beer'], de: ['bier'],
+      fr: ['biere'], it: ['birra'], pt: ['cerveja'],
+    },
+  },
+  {
+    key: 'wine',
+    foodType: FoodType.OTHER,
+    terms: {
+      es: ['vino'], en: ['wine'], de: ['wein'],
+      fr: ['vin'], it: ['vino'], pt: ['vinho'],
+    },
+  },
 ];
