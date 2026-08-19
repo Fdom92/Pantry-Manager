@@ -8,6 +8,8 @@ import { createDocumentId } from '@core/utils/uuid.util';
 import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { FRESH_QTY } from '@core/domain/pantry/fresh.domain';
+import { suggestExpiryDate } from '@core/domain/pantry/expiry-suggestion.domain';
+import { inferExpiryForName } from '@core/domain/pantry/food-type-inference.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
 import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
 import type { PantryItem } from '@core/models/pantry';
@@ -275,7 +277,12 @@ export class PantryReceiptScanModalStateService {
           // doesn't expect.
           const updated = matchedItem.productType === 'fresh'
             ? restockFreshItem(matchedItem, timestamp)
-            : await this.pantryStore.addNewLot(matchedItem._id, { quantity: line.quantity });
+            : await this.pantryStore.addNewLot(matchedItem._id, {
+                quantity: line.quantity,
+                expiryDate: matchedItem.foodType
+                  ? suggestExpiryDate(matchedItem.foodType)
+                  : inferExpiryForName(matchedItem.name).expirationDate,
+              });
           if (updated) {
             await this.pantryStore.updateItem(updated);
             await this.eventManager.logAddExistingItem(matchedItem, updated, line.quantity, undefined, sessionId, timestamp);
