@@ -18,7 +18,8 @@ import {
   type ShoppingSummary,
   ShoppingReason,
 } from '@core/models/list';
-import { FRESH_QTY } from '@core/domain/pantry/fresh.domain';
+import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
+import { generateBatchId } from '@core/utils/batch-id.util';
 import { LanguageService } from '../shared/language.service';
 import { createDocumentId, createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
@@ -109,15 +110,7 @@ export class ListStateService {
       const timestamp = new Date().toISOString();
       if (isFresh) {
         const item = suggestion.item;
-        const existingBatches = item.batches ?? [];
-        const updatedBatches = existingBatches.length > 0
-          ? [{ ...existingBatches[0], quantity: FRESH_QTY.sufficient }, ...existingBatches.slice(1)]
-          : [{ batchId: `batch-${Date.now()}`, quantity: FRESH_QTY.sufficient }];
-        const updatedFresh: PantryItem = {
-          ...item,
-          batches: updatedBatches,
-          updatedAt: timestamp,
-        };
+        const updatedFresh = restockFreshItem(item, timestamp, generateBatchId());
         await this.pantryStore.updateItem(updatedFresh);
         await this.eventManager.logAdvancedEdit(item, updatedFresh, 'pantry_card');
       } else {
@@ -166,14 +159,22 @@ export class ListStateService {
 
     try {
       if (match) {
-        // Same reasoning as markAsBought: an added lot with no date would be
-        // invisible to the expiry alerts.
-        const expiryDate = match.foodType
-          ? suggestExpiryDate(match.foodType)
-          : inferExpiryForName(match.name).expirationDate;
-        const updated = await this.pantryStore.addNewLot(match._id, { quantity, expiryDate });
-        if (updated) {
+        let updated: PantryItem | null;
+        if (match.productType === 'fresh') {
+          // Fresh products track stock as a state on a single batch, so they are
+          // refilled rather than given a new lot.
+          updated = restockFreshItem(match, timestamp, generateBatchId());
           await this.pantryStore.updateItem(updated);
+        } else {
+          // Same reasoning as markAsBought: an added lot with no date would be
+          // invisible to the expiry alerts.
+          const expiryDate = match.foodType
+            ? suggestExpiryDate(match.foodType)
+            : inferExpiryForName(match.name).expirationDate;
+          updated = await this.pantryStore.addNewLot(match._id, { quantity, expiryDate });
+          if (updated) await this.pantryStore.updateItem(updated);
+        }
+        if (updated) {
           await this.eventManager.logAddExistingItem(match, updated, quantity, undefined, undefined, timestamp);
         }
       } else {

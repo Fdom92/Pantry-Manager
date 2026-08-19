@@ -7,7 +7,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { createDocumentId } from '@core/utils/uuid.util';
 import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
-import { FRESH_QTY } from '@core/domain/pantry/fresh.domain';
+import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
 import { suggestExpiryDate } from '@core/domain/pantry/expiry-suggestion.domain';
 import { inferExpiryForName } from '@core/domain/pantry/food-type-inference.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
@@ -276,7 +276,7 @@ export class PantryReceiptScanModalStateService {
           // literal quantity, which would pile up batches the fresh model
           // doesn't expect.
           const updated = matchedItem.productType === 'fresh'
-            ? restockFreshItem(matchedItem, timestamp)
+            ? restockFreshItem(matchedItem, timestamp, generateBatchId())
             : await this.pantryStore.addNewLot(matchedItem._id, {
                 quantity: line.quantity,
                 expiryDate: matchedItem.foodType
@@ -352,22 +352,6 @@ export class PantryReceiptScanModalStateService {
  * PantryFreshAddModalStateService's existing-item path. The ticket's scanned
  * quantity is ignored here — fresh state isn't a literal count.
  */
-function restockFreshItem(item: PantryItem, timestamp: string): PantryItem {
-  const previousBatch = item.batches?.[0];
-  return {
-    ...item,
-    batches: [{
-      batchId: previousBatch?.batchId ?? generateBatchId(),
-      quantity: FRESH_QTY.sufficient,
-      expirationDate: previousBatch?.expirationDate,
-      noExpiry: previousBatch?.noExpiry,
-      opened: previousBatch?.opened,
-      locationId: previousBatch?.locationId,
-    }],
-    updatedAt: timestamp,
-  };
-}
-
 /** Receipt names come in SHOUTING CASE — store them as Title Case. */
 function formatReceiptName(raw: string): string {
   return raw

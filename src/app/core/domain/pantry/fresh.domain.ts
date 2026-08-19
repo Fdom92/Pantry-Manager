@@ -65,6 +65,34 @@ export function consolidateBatchesForFresh(
   };
 }
 
+/**
+ * Refills a fresh product back to the "sufficient" state after the user buys it.
+ *
+ * Fresh items model stock as a state (`sufficient | low | none`) held in a single
+ * batch, so restocking replaces that batch rather than appending a new lot the
+ * way despensa items do — appending would pile up batches the fresh model does
+ * not expect. Batch identity and date metadata are preserved.
+ *
+ * `fallbackBatchId` is only used when the item has no batch yet; it is passed in
+ * rather than generated here so this stays a pure function, matching
+ * `consolidateBatchesForFresh`.
+ */
+export function restockFreshItem(item: PantryItem, timestamp: string, fallbackBatchId: string): PantryItem {
+  const previous = item.batches?.[0];
+  return {
+    ...item,
+    batches: [{
+      batchId: previous?.batchId ?? fallbackBatchId,
+      quantity: FRESH_QTY.sufficient,
+      expirationDate: previous?.expirationDate,
+      noExpiry: previous?.noExpiry,
+      opened: previous?.opened,
+      locationId: previous?.locationId,
+    }],
+    updatedAt: timestamp,
+  };
+}
+
 export interface ConvertToFreshPreview {
   totalQty: number;
   resultingState: FreshState;
