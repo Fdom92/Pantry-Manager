@@ -333,4 +333,180 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
       fr: ['the', 'infusion'], it: ['te', 'tisana'], pt: ['cha'],
     },
   },
+
+  // ── Vegetables ───────────────────────────────────────────────────────────
+  {
+    key: 'onion',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['cebolla', 'cebollas'], en: ['onion', 'onions'],
+      de: ['zwiebel', 'zwiebeln'], fr: ['oignon', 'oignons'],
+      it: ['cipolla', 'cipolle'], pt: ['cebola', 'cebolas'],
+    },
+  },
+  {
+    key: 'potato',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['patata', 'patatas'], en: ['potato', 'potatoes'],
+      de: ['kartoffel', 'kartoffeln'], fr: ['pomme de terre'],
+      it: ['patata', 'patate'], pt: ['batata', 'batatas'],
+    },
+  },
+  {
+    key: 'garlic',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['ajo', 'ajos'], en: ['garlic'], de: ['knoblauch'],
+      fr: ['ail'], it: ['aglio'], pt: ['alho'],
+    },
+  },
+  {
+    key: 'lettuce',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['lechuga'], en: ['lettuce'], de: ['salat'],
+      fr: ['laitue'], it: ['lattuga'], pt: ['alface'],
+    },
+  },
+  {
+    key: 'carrot',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['zanahoria', 'zanahorias'], en: ['carrot', 'carrots'],
+      de: ['karotte', 'mohren'], fr: ['carotte', 'carottes'],
+      it: ['carota', 'carote'], pt: ['cenoura', 'cenouras'],
+    },
+  },
+  {
+    key: 'pepper-veg',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['pimiento', 'pimientos'], en: ['bell pepper', 'peppers'],
+      de: ['paprika'], fr: ['poivron', 'poivrons'],
+      it: ['peperone', 'peperoni'], pt: ['pimento', 'pimentos'],
+    },
+  },
+  {
+    key: 'zucchini',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['calabacin'], en: ['zucchini', 'courgette'], de: ['zucchini'],
+      fr: ['courgette'], it: ['zucchina', 'zucchine'], pt: ['courgette'],
+    },
+  },
+  {
+    key: 'spinach',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['espinacas'], en: ['spinach'], de: ['spinat'],
+      fr: ['epinards'], it: ['spinaci'], pt: ['espinafres'],
+    },
+  },
+  {
+    key: 'broccoli',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['brocoli'], en: ['broccoli'], de: ['brokkoli'],
+      fr: ['brocoli'], it: ['broccoli'], pt: ['brocolos'],
+    },
+  },
+  {
+    key: 'mushroom',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['champinones', 'setas'], en: ['mushrooms'],
+      de: ['champignons', 'pilze'], fr: ['champignons'],
+      it: ['funghi'], pt: ['cogumelos'],
+    },
+  },
+  {
+    key: 'cucumber',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['pepino'], en: ['cucumber'], de: ['gurke'],
+      fr: ['concombre'], it: ['cetriolo'], pt: ['pepino'],
+    },
+  },
+
+  // ── Fruit ────────────────────────────────────────────────────────────────
+  {
+    key: 'apple',
+    foodType: FoodType.FRUIT,
+    terms: {
+      es: ['manzana', 'manzanas'], en: ['apple', 'apples'],
+      de: ['apfel', 'apfel'], fr: ['pomme', 'pommes'],
+      it: ['mela', 'mele'], pt: ['maca', 'macas'],
+    },
+  },
+  {
+    key: 'banana',
+    foodType: FoodType.FRUIT,
+    terms: {
+      es: ['platano', 'platanos', 'banana'], en: ['banana', 'bananas'],
+      de: ['banane', 'bananen'], fr: ['banane', 'bananes'],
+      it: ['banana', 'banane'], pt: ['banana', 'bananas'],
+    },
+  },
+  {
+    key: 'orange',
+    foodType: FoodType.FRUIT,
+    terms: {
+      es: ['naranja', 'naranjas'], en: ['orange', 'oranges'],
+      de: ['orange', 'orangen'], fr: ['orange', 'oranges'],
+      it: ['arancia', 'arance'], pt: ['laranja', 'laranjas'],
+    },
+  },
+  {
+    key: 'strawberry',
+    foodType: FoodType.FRUIT,
+    terms: {
+      es: ['fresa', 'fresas'], en: ['strawberry', 'strawberries'],
+      de: ['erdbeere', 'erdbeeren'], fr: ['fraise', 'fraises'],
+      it: ['fragola', 'fragole'], pt: ['morango', 'morangos'],
+    },
+  },
+  {
+    key: 'pear',
+    foodType: FoodType.FRUIT,
+    terms: {
+      es: ['pera', 'peras'], en: ['pear', 'pears'],
+      de: ['birne', 'birnen'], fr: ['poire', 'poires'],
+      it: ['pera', 'pere'], pt: ['pera', 'peras'],
+    },
+  },
+  {
+    key: 'grape',
+    foodType: FoodType.FRUIT,
+    terms: {
+      es: ['uva', 'uvas'], en: ['grapes'], de: ['trauben'],
+      fr: ['raisin', 'raisins'], it: ['uva'], pt: ['uvas'],
+    },
+  },
+  {
+    key: 'melon',
+    foodType: FoodType.FRUIT,
+    terms: {
+      es: ['melon', 'sandia'], en: ['melon', 'watermelon'],
+      de: ['melone'], fr: ['melon', 'pasteque'],
+      it: ['melone', 'anguria'], pt: ['melao', 'melancia'],
+    },
+  },
+  {
+    key: 'peach',
+    foodType: FoodType.FRUIT,
+    terms: {
+      es: ['melocoton', 'nectarina'], en: ['peach', 'nectarine'],
+      de: ['pfirsich'], fr: ['peche', 'nectarine'],
+      it: ['pesca', 'pesche'], pt: ['pessego'],
+    },
+  },
+  {
+    key: 'avocado',
+    foodType: FoodType.FRUIT,
+    terms: {
+      es: ['aguacate'], en: ['avocado'], de: ['avocado'],
+      fr: ['avocat'], it: ['avocado'], pt: ['abacate'],
+    },
+  },
 ];
