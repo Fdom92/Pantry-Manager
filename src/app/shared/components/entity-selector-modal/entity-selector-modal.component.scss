@@ -1,5 +1,4 @@
 @use '../../../shared/styles/modal-sheet' as sheet;
-@use '../../../shared/styles/form-section-flat' as ff;
 
 :host {
   display: block;
@@ -45,7 +44,10 @@ ion-modal.app-sheet-modal {
   @include sheet.body;
 }
 
-.form-section--cta { @include ff.section-cta; }
+.sheet-footer {
+  @include sheet.footer;
+  @include sheet.glass-fallback;
+}
 
 // ── Search row ──────────────────────────────────────────────────────────────
 

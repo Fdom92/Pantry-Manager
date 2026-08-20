@@ -110,20 +110,23 @@
         <div class="entity-selector-modal__extras">
           <ng-content select="[extras]"></ng-content>
         </div>
-
-        <section class="form-section form-section--cta">
-          <ion-button
-            expand="block" shape="round"
-            color="primary"
-            [disabled]="disableSave || saving"
-            (click)="save.emit()">
-            @if (saving) {
-              <ion-spinner slot="start" name="lines-small"></ion-spinner>
-            }
-            {{ saveLabel }}
-          </ion-button>
-        </section>
       </div>
+
+      <!-- The CTA is pinned outside .sheet-body on purpose: inside it, the
+           button scrolled away with the entry list and ended up off-screen
+           once the user added enough products to overflow the sheet. -->
+      <ion-footer class="sheet-footer">
+        <ion-button
+          expand="block" shape="round"
+          color="primary"
+          [disabled]="disableSave || saving"
+          (click)="save.emit()">
+          @if (saving) {
+            <ion-spinner slot="start" name="lines-small"></ion-spinner>
+          }
+          {{ saveLabel }}
+        </ion-button>
+      </ion-footer>
     </div>
   </ng-template>
 </ion-modal>
