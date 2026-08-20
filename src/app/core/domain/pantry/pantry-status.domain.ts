@@ -3,6 +3,7 @@ import type { ExpiryClassification, ItemBatch, PantryItem, ProductStatusState } 
 import { FoodType } from '@core/models/shared/enums.model';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { parseExpiryDate } from '@core/utils/date.util';
+import { assertNever } from '@core/utils/assert-never.util';
 import { collectBatches, sumQuantities } from './pantry-batch.domain';
 import { FRESH_NEAR_EXPIRY_WINDOW_DAYS, FRESH_QTY } from './fresh.domain';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
@@ -12,6 +13,7 @@ export const REVIEW_GRACE_DAYS = 7;
 export function getExpiryModeFromFoodType(
   foodType: FoodType | undefined
 ): 'strict' | 'flexible' | 'ignore' {
+  if (!foodType) return 'strict';
   switch (foodType) {
     case FoodType.DAIRY:
     case FoodType.CARB:
@@ -22,9 +24,15 @@ export function getExpiryModeFromFoodType(
     case FoodType.HOUSEHOLD:
     case FoodType.NON_PERISHABLE:
       return 'ignore';
-    default:
+    case FoodType.PROTEIN:
+    case FoodType.VEGETABLE:
+    case FoodType.FRUIT:
+    case FoodType.OTHER:
       return 'strict';
   }
+  // No `default`: every FoodType is listed above, so adding one to the enum
+  // fails to compile here instead of silently inheriting 'strict'.
+  return assertNever(foodType);
 }
 
 function getDaysPastExpiry(

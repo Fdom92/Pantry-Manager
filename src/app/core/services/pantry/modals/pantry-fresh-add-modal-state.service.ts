@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { buildAddItemPayload, inferExpiryForName, suggestExpiryDate } from '@core/domain/pantry';
+import { buildAddItemPayload, resolveSuggestedExpiry } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete, createDocumentId, withSignalFlag } from '@core/utils';
 import { dedupeByNormalizedKey, formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
@@ -98,9 +98,7 @@ export class PantryFreshAddModalStateService {
           isNew: false,
           // Restocking a fresh product means a new lettuce, not the old one, so
           // it gets a fresh suggested date rather than inheriting the batch's.
-          expirationDate: item.foodType
-            ? suggestExpiryDate(item.foodType)
-            : inferExpiryForName(option.title).expirationDate,
+          expirationDate: resolveSuggestedExpiry(option.title, item.foodType),
         },
       ];
     });
@@ -132,7 +130,7 @@ export class PantryFreshAddModalStateService {
           name: formatted,
           quantity: 1,
           isNew: true,
-          expirationDate: inferExpiryForName(formatted).expirationDate,
+          expirationDate: resolveSuggestedExpiry(formatted, null),
         },
       ];
     });
@@ -144,7 +142,12 @@ export class PantryFreshAddModalStateService {
       const idx = current.findIndex(e => e.id === entryId);
       if (idx < 0) return current;
       const next = [...current];
-      next[idx] = { ...next[idx], expirationDate: date || undefined, noExpiry: date ? undefined : next[idx].noExpiry };
+      next[idx] = {
+        ...next[idx],
+        expirationDate: date || undefined,
+        noExpiry: date ? undefined : next[idx].noExpiry,
+        dateFromUser: true,
+      };
       return next;
     });
   }

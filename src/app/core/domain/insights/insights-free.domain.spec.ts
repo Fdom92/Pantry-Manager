@@ -86,13 +86,33 @@ describe('computeInventorySnapshot', () => {
 
   it('counts items without expiry date (excluding fresh and noExpiry)', () => {
     const items = [
-      makeItem({ batches: [] }),
+      makeItem({ batches: [{ batchId: 'b1', quantity: 1 }] }),
       makeItem({ productType: 'fresh', batches: [] }),
       makeItem({ batches: [{ batchId: 'b1', quantity: 1, noExpiry: true }] }),
       makeItem({ batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
     ];
     const result = computeInventorySnapshot(items, now);
     expect(result.noExpiryDate).toBe(1);
+  });
+
+  it('counts an item with one dated and one dateless batch', () => {
+    // The count runs on hasMissingExpiry, the same rule as the Pendientes chip
+    // and its bulk-fix sheet. The rule this replaced asked whether ANY batch had
+    // a date, so a part-dated product was pending in one screen and not another.
+    const items = [
+      makeItem({ batches: [
+        { batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' },
+        { batchId: 'b2', quantity: 1 },
+      ] }),
+    ];
+    expect(computeInventorySnapshot(items, now).noExpiryDate).toBe(1);
+  });
+
+  it('does not count an item with no batches at all', () => {
+    // Nothing to put a date on: the bulk-fix sheet maps over the batches, so
+    // counting this would show a pending item the user has no way to resolve.
+    const items = [makeItem({ batches: [] })];
+    expect(computeInventorySnapshot(items, now).noExpiryDate).toBe(0);
   });
 
   it('expiredRatio is 0 when total is 0', () => {

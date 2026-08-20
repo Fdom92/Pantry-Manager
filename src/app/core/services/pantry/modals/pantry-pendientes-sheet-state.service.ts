@@ -3,6 +3,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete } from '@core/domain/pantry/pantry-filtering.domain';
 import { inferFoodType } from '@core/domain/pantry/food-type-inference.domain';
 import { applyPendienteFix, isPendienteRowResolved } from '@core/domain/pantry/pendiente-fix.domain';
+import { expiryAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
 import { suggestExpiryDate } from '@core/domain/pantry/expiry-suggestion.domain';
 import type { PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
@@ -23,6 +24,8 @@ export interface PendienteRow {
   foodType: FoodType | null;
   expirationDate: string | undefined;
   noExpiry: boolean;
+  /** Set once the user picks a date here, so re-picking the type leaves it alone. */
+  dateFromUser?: boolean;
 }
 
 /**
@@ -81,11 +84,12 @@ export class PantryPendientesSheetStateService {
       if (row.itemId !== itemId || !row.needsFoodType) {
         return row;
       }
-      const shouldSuggestDate = row.needsDate && !row.expirationDate && !row.noExpiry;
       return {
         ...row,
         foodType,
-        expirationDate: shouldSuggestDate ? suggestExpiryDate(foodType) : row.expirationDate,
+        expirationDate: row.needsDate
+          ? expiryAfterFoodTypeChange(row, foodType)
+          : row.expirationDate,
       };
     }));
   }
@@ -96,7 +100,7 @@ export class PantryPendientesSheetStateService {
   setExpirationDate(itemId: string, date: string | undefined): void {
     this.rows.update(current => current.map(row =>
       row.itemId === itemId && row.needsDate
-        ? { ...row, expirationDate: date || undefined, noExpiry: date ? false : row.noExpiry }
+        ? { ...row, expirationDate: date || undefined, noExpiry: date ? false : row.noExpiry, dateFromUser: true }
         : row
     ));
   }

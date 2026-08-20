@@ -159,7 +159,10 @@ export function dedupeByNormalizedKey<T>(
   const seen = new Set<string>();
   const result: T[] = [];
   for (const item of items) {
-    const key = normalizeLowercase(keyFn(item));
+    // normalizeProductKey, not normalizeLowercase: every caller keys on a
+    // product name, and the search that found those names ignores accents. A
+    // stricter key here would let "Atún" and "Atun" through as two entries.
+    const key = normalizeProductKey(keyFn(item));
     if (!key || seen.has(key)) {
       continue;
     }

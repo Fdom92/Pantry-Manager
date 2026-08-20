@@ -191,6 +191,15 @@ describe('dedupeByNormalizedKey', () => {
   });
 });
 
+describe('dedupeByNormalizedKey — accents', () => {
+  it('folds accented and unaccented spellings of one product together', () => {
+    const items = [{ name: 'Atún' }, { name: 'Atun' }, { name: 'Arroz' }];
+    const result = dedupeByNormalizedKey(items, i => i.name);
+    expect(result.length).toBe(2);
+    expect(result[0].name).toBe('Atún');
+  });
+});
+
 describe('normalizeProductKey', () => {
   it('treats accented and unaccented spellings as the same product', () => {
     expect(normalizeProductKey('Atún')).toBe(normalizeProductKey('Atun'));

@@ -1,7 +1,7 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
-import { getItemStatusState, isIncomplete, sumQuantities } from '@core/domain/pantry';
+import { getItemStatusState, hasMissingExpiry, isIncomplete, sumQuantities } from '@core/domain/pantry';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 export interface InventorySnapshot {
@@ -72,14 +72,12 @@ export function computeInventorySnapshot(items: PantryItem[], now: Date): Invent
       result.basicsOutOfStock += 1;
     }
 
-    if (item.productType !== 'fresh') {
-      const hasBatchDate = (item.batches ?? []).some(b => !!b.expirationDate);
-      const allMarkedNoExpiry =
-        (item.batches ?? []).length > 0 &&
-        (item.batches ?? []).every(b => !!b.noExpiry);
-      if (!hasBatchDate && !allMarkedNoExpiry) {
-        result.noExpiryDate += 1;
-      }
+    // hasMissingExpiry, not a local rule: it counts an item with ANY dateless
+    // batch, which is what the Pendientes chip and its sheet act on. The old
+    // inline check only counted items where NO batch had a date, so a two-lot
+    // product with one date was pending in one screen and fine in another.
+    if (hasMissingExpiry(item)) {
+      result.noExpiryDate += 1;
     }
 
     if (!item.foodType) {

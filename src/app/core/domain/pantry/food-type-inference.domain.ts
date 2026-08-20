@@ -78,3 +78,51 @@ export function inferExpiryForName(name: string, fromDate: Date = new Date()): I
     expirationDate: foodType ? suggestExpiryDate(foodType, fromDate) : undefined,
   };
 }
+
+/**
+ * The expiry date a product should be given, from whatever is known about it.
+ *
+ * A stored foodType is authoritative — the user may have corrected it, and the
+ * name inference must not override that. Only when there is no type do we fall
+ * back to reading the name. Every add and restock flow resolves dates through
+ * here so they cannot drift apart.
+ */
+export function resolveSuggestedExpiry(
+  name: string,
+  foodType: FoodType | null | undefined,
+  fromDate: Date = new Date(),
+): string | undefined {
+  if (foodType) return suggestExpiryDate(foodType, fromDate);
+  return inferExpiryForName(name, fromDate).expirationDate;
+}
+
+/**
+ * A row in an add sheet or the pendientes sheet, as far as expiry is concerned.
+ */
+export interface ExpiryEditableRow {
+  expirationDate?: string;
+  noExpiry?: boolean;
+  /**
+   * True once the user has set the date themselves. A suggested date carries no
+   * such claim, so re-picking the food type is free to replace it.
+   */
+  dateFromUser?: boolean;
+}
+
+/**
+ * The date a row should show after the user picks a food type.
+ *
+ * A date the user chose, or an explicit "no expiry", is theirs and survives.
+ * Anything else was a suggestion derived from the previous type, so correcting
+ * the type re-derives it — otherwise fixing a wrong type leaves the date it
+ * produced behind, which is exactly what the sheet's own hint promises it won't.
+ */
+export function expiryAfterFoodTypeChange(
+  row: ExpiryEditableRow,
+  foodType: FoodType,
+  fromDate: Date = new Date(),
+): string | undefined {
+  if (row.noExpiry) return row.expirationDate;
+  if (row.dateFromUser && row.expirationDate) return row.expirationDate;
+  return suggestExpiryDate(foodType, fromDate);
+}

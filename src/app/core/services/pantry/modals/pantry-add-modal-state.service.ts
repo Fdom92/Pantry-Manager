@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { buildAddItemPayload, inferExpiryForName, inferFoodType, suggestExpiryDate } from '@core/domain/pantry';
+import { buildAddItemPayload, expiryAfterFoodTypeChange, inferFoodType, resolveSuggestedExpiry } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import type { FoodType } from '@core/models/shared/enums.model';
 import { buildPantryItemAutocomplete, createDocumentId } from '@core/utils';
@@ -200,9 +200,7 @@ export class PantryAddModalStateService {
           // Show the suggested type and expiry up front so the user can accept
           // or edit them before saving, instead of discovering them afterwards.
           foodType: item.foodType ?? inferFoodType(option.title),
-          expirationDate: item.foodType
-            ? suggestExpiryDate(item.foodType)
-            : inferExpiryForName(option.title).expirationDate,
+          expirationDate: resolveSuggestedExpiry(option.title, item.foodType),
         },
       ];
     });
@@ -250,7 +248,7 @@ export class PantryAddModalStateService {
           quantity: 1,
           isNew: true,
           foodType: inferFoodType(formattedName),
-          expirationDate: inferExpiryForName(formattedName).expirationDate,
+          expirationDate: resolveSuggestedExpiry(formattedName, null),
         },
       ];
     });
@@ -302,7 +300,14 @@ export class PantryAddModalStateService {
       const index = current.findIndex(row => row.id === entryId);
       if (index < 0) return current;
       const next = [...current];
-      next[index] = { ...next[index], expirationDate: date || undefined, noExpiry: date ? undefined : next[index].noExpiry };
+      next[index] = {
+        ...next[index],
+        expirationDate: date || undefined,
+        noExpiry: date ? undefined : next[index].noExpiry,
+        // Whatever the user puts here — a date or a deliberate blank — is theirs
+        // now, so correcting the food type later must not overwrite it.
+        dateFromUser: true,
+      };
       return next;
     });
   }
@@ -317,11 +322,10 @@ export class PantryAddModalStateService {
       if (index < 0) return current;
       const next = [...current];
       const row = next[index];
-      const keepsOwnDate = Boolean(row.expirationDate) || Boolean(row.noExpiry);
       next[index] = {
         ...row,
         foodType,
-        expirationDate: keepsOwnDate ? row.expirationDate : suggestExpiryDate(foodType),
+        expirationDate: expiryAfterFoodTypeChange(row, foodType),
       };
       return next;
     });

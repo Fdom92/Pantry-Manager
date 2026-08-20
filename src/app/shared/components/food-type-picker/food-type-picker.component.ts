@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { FoodType } from '@core/models/shared/enums.model';
+import { assertNever } from '@core/utils/assert-never.util';
 import { IonChip, IonContent, IonIcon, IonLabel, IonModal } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -98,7 +99,10 @@ export class FoodTypePickerComponent {
       case FoodType.BEVERAGE:  return 'water-outline';
       case FoodType.NON_PERISHABLE: return 'flask-outline';
       case FoodType.HOUSEHOLD: return 'home-outline';
-      default:                 return 'ellipsis-horizontal-outline';
+      case FoodType.OTHER:     return 'ellipsis-horizontal-outline';
     }
+    // No `default`: a new FoodType must choose an icon here rather than quietly
+    // rendering the "other" dots.
+    return assertNever(type);
   }
 }
