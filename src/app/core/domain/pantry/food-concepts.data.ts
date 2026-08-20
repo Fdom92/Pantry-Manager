@@ -25,7 +25,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   // by length at runtime regardless of declaration order.
   {
     key: 'fried-tomato',
-    foodType: FoodType.CARB,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['tomate frito', 'tomate triturado'],
       en: ['tomato sauce', 'canned tomato'],
@@ -175,7 +175,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'tuna',
-    foodType: FoodType.PROTEIN,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['atun'], en: ['tuna'], de: ['thunfisch'],
       fr: ['thon'], it: ['tonno'], pt: ['atum'],
@@ -243,7 +243,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'chickpeas',
-    foodType: FoodType.CARB,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['garbanzos'], en: ['chickpeas'], de: ['kichererbsen'],
       fr: ['pois chiches'], it: ['ceci'], pt: ['grao de bico'],
@@ -251,7 +251,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'lentils',
-    foodType: FoodType.CARB,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['lentejas'], en: ['lentils'], de: ['linsen'],
       fr: ['lentilles'], it: ['lenticchie'], pt: ['lentilhas'],
@@ -259,7 +259,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'beans',
-    foodType: FoodType.CARB,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['alubias', 'judias', 'frijoles'], en: ['beans'],
       de: ['bohnen'], fr: ['haricots'], it: ['fagioli'], pt: ['feijao'],
@@ -276,7 +276,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'sugar',
-    foodType: FoodType.CARB,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['azucar'], en: ['sugar'], de: ['zucker'],
       fr: ['sucre'], it: ['zucchero'], pt: ['acucar'],
@@ -294,7 +294,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   // ── Condiments and drinks (OTHER) ────────────────────────────────────────
   {
     key: 'olive-oil',
-    foodType: FoodType.OTHER,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['aceite', 'aceite de oliva'], en: ['oil', 'olive oil'],
       de: ['ol', 'olivenol'], fr: ['huile', 'huile olive'],
@@ -303,7 +303,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'salt',
-    foodType: FoodType.OTHER,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['sal'], en: ['salt'], de: ['salz'],
       fr: ['sel'], it: ['sale'], pt: ['sal'],
@@ -311,7 +311,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'vinegar',
-    foodType: FoodType.OTHER,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['vinagre'], en: ['vinegar'], de: ['essig'],
       fr: ['vinaigre'], it: ['aceto'], pt: ['vinagre'],
@@ -319,7 +319,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'coffee',
-    foodType: FoodType.OTHER,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['cafe'], en: ['coffee'], de: ['kaffee'],
       fr: ['cafe'], it: ['caffe'], pt: ['cafe'],
@@ -327,7 +327,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'tea',
-    foodType: FoodType.OTHER,
+    foodType: FoodType.NON_PERISHABLE,
     terms: {
       es: ['te', 'infusion'], en: ['tea'], de: ['tee'],
       fr: ['the', 'infusion'], it: ['te', 'tisana'], pt: ['cha'],
@@ -566,7 +566,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   // ── Drinks ───────────────────────────────────────────────────────────────
   {
     key: 'water',
-    foodType: FoodType.OTHER,
+    foodType: FoodType.BEVERAGE,
     terms: {
       es: ['agua'], en: ['water'], de: ['wasser'],
       fr: ['eau'], it: ['acqua'], pt: ['agua'],
@@ -574,7 +574,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'juice',
-    foodType: FoodType.OTHER,
+    foodType: FoodType.BEVERAGE,
     terms: {
       es: ['zumo'], en: ['juice'], de: ['saft'],
       fr: ['jus'], it: ['succo'], pt: ['sumo'],
@@ -582,7 +582,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'beer',
-    foodType: FoodType.OTHER,
+    foodType: FoodType.BEVERAGE,
     terms: {
       es: ['cerveza'], en: ['beer'], de: ['bier'],
       fr: ['biere'], it: ['birra'], pt: ['cerveja'],
@@ -590,10 +590,22 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
   },
   {
     key: 'wine',
-    foodType: FoodType.OTHER,
+    foodType: FoodType.BEVERAGE,
     terms: {
       es: ['vino'], en: ['wine'], de: ['wein'],
       fr: ['vin'], it: ['vino'], pt: ['vinho'],
+    },
+  },
+  {
+    key: 'soda',
+    foodType: FoodType.BEVERAGE,
+    terms: {
+      es: ['refresco', 'gaseosa', 'cola', 'coca cola', 'fanta'],
+      en: ['soda', 'soft drink', 'cola', 'coca cola', 'fanta'],
+      de: ['limonade', 'softdrink', 'cola', 'coca cola', 'fanta'],
+      fr: ['soda', 'boisson gazeuse', 'cola', 'coca cola', 'fanta'],
+      it: ['bibita', 'bevanda gassata', 'cola', 'coca cola', 'fanta'],
+      pt: ['refrigerante', 'gasosa', 'cola', 'coca cola', 'fanta'],
     },
   },
 ];

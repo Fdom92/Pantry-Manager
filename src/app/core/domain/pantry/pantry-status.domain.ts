@@ -15,8 +15,12 @@ export function getExpiryModeFromFoodType(
   switch (foodType) {
     case FoodType.DAIRY:
     case FoodType.CARB:
+    // An opened juice does go off; a sealed bottle of water does not. Flexible
+    // warns without ever declaring a drink expired outright.
+    case FoodType.BEVERAGE:
       return 'flexible';
     case FoodType.HOUSEHOLD:
+    case FoodType.NON_PERISHABLE:
       return 'ignore';
     default:
       return 'strict';

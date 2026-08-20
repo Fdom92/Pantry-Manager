@@ -668,6 +668,8 @@
         "vegetable": "Légume",
         "fruit": "Fruit",
         "dairy": "Produit laitier",
+        "beverage": "Boisson",
+        "non-perishable": "Non périssable",
         "other": "Autre",
         "household": "Ménage"
       }

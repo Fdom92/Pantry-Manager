@@ -12,6 +12,8 @@ export const EXPIRY_SUGGESTION_DAYS: Record<FoodType, number> = {
   [FoodType.VEGETABLE]: 7,
   [FoodType.FRUIT]: 7,
   [FoodType.DAIRY]: 14,
+  [FoodType.BEVERAGE]: 180,
+  [FoodType.NON_PERISHABLE]: 540,
   [FoodType.HOUSEHOLD]: 365,
   [FoodType.OTHER]: 120,
 };

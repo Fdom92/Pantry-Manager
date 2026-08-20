@@ -668,6 +668,8 @@
         "vegetable": "Vegetable",
         "fruit": "Fruit",
         "dairy": "Dairy",
+        "beverage": "Drink",
+        "non-perishable": "Non-perishable",
         "other": "Other",
         "household": "Household"
       }

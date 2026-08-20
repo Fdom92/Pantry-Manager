@@ -33,6 +33,14 @@ describe('getExpiryModeFromFoodType', () => {
     expect(getExpiryModeFromFoodType(FoodType.HOUSEHOLD)).toBe('ignore');
   });
 
+  it('returns flexible for beverage', () => {
+    expect(getExpiryModeFromFoodType(FoodType.BEVERAGE)).toBe('flexible');
+  });
+
+  it('returns ignore for non-perishable', () => {
+    expect(getExpiryModeFromFoodType(FoodType.NON_PERISHABLE)).toBe('ignore');
+  });
+
   it('returns strict for protein', () => {
     expect(getExpiryModeFromFoodType(FoodType.PROTEIN)).toBe('strict');
   });

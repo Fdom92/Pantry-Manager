@@ -147,6 +147,8 @@ import {
   nutritionOutline,
   pizzaOutline,
   iceCreamOutline,
+  waterOutline,
+  flaskOutline,
   ellipsisHorizontalOutline,
   helpCircleOutline,
 } from 'ionicons/icons';
@@ -182,6 +184,8 @@ addIcons({
   'nutrition-outline': nutritionOutline,
   'pizza-outline': pizzaOutline,
   'ice-cream-outline': iceCreamOutline,
+  'water-outline': waterOutline,
+  'flask-outline': flaskOutline,
   'ellipsis-horizontal-outline': ellipsisHorizontalOutline,
   'help-circle-outline': helpCircleOutline,
   add: add,

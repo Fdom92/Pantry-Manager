@@ -22,8 +22,22 @@ describe('inferFoodType', () => {
 
   it('prefers the longest n-gram: "tomate frito" beats "tomate"', () => {
     expect(inferFoodType('tomate')).toBe(FoodType.VEGETABLE);
-    expect(inferFoodType('tomate frito')).toBe(FoodType.CARB);
-    expect(inferFoodType('bote de tomate frito')).toBe(FoodType.CARB);
+    expect(inferFoodType('tomate frito')).toBe(FoodType.NON_PERISHABLE);
+    expect(inferFoodType('bote de tomate frito')).toBe(FoodType.NON_PERISHABLE);
+  });
+
+  it('reads drinks as beverages rather than falling through to OTHER', () => {
+    expect(inferFoodType('agua')).toBe(FoodType.BEVERAGE);
+    expect(inferFoodType('vino tinto')).toBe(FoodType.BEVERAGE);
+    expect(inferFoodType('coca cola')).toBe(FoodType.BEVERAGE);
+    expect(inferFoodType('fanta naranja')).toBe(FoodType.BEVERAGE);
+  });
+
+  it('reads store-cupboard staples and tins as non-perishable', () => {
+    expect(inferFoodType('sal')).toBe(FoodType.NON_PERISHABLE);
+    expect(inferFoodType('aceite de oliva')).toBe(FoodType.NON_PERISHABLE);
+    expect(inferFoodType('atun')).toBe(FoodType.NON_PERISHABLE);
+    expect(inferFoodType('lentejas')).toBe(FoodType.NON_PERISHABLE);
   });
 
   it('matches whole tokens only, never substrings', () => {

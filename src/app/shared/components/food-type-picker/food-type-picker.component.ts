@@ -95,6 +95,8 @@ export class FoodTypePickerComponent {
       case FoodType.VEGETABLE: return 'leaf-outline';
       case FoodType.FRUIT:     return 'nutrition-outline';
       case FoodType.DAIRY:     return 'ice-cream-outline';
+      case FoodType.BEVERAGE:  return 'water-outline';
+      case FoodType.NON_PERISHABLE: return 'flask-outline';
       case FoodType.HOUSEHOLD: return 'home-outline';
       default:                 return 'ellipsis-horizontal-outline';
     }

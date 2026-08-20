@@ -668,6 +668,8 @@
         "vegetable": "Gemüse",
         "fruit": "Obst",
         "dairy": "Milchprodukt",
+        "beverage": "Getränk",
+        "non-perishable": "Haltbar",
         "other": "Sonstiges",
         "household": "Haushalt"
       }

@@ -1,9 +1,13 @@
 .food-type-chip {
   margin: 0;
   height: 30px;
-  // Fixed width so the date chips line up down the list instead of starting at
-  // a different offset on every row. "Carbohidrato" is the longest label.
-  min-width: 112px;
+  // Floor width so the date chips line up down the list instead of starting at
+  // a different offset on every row. Sized for the longest label most languages
+  // produce ("No perecedero", "Milchprodukt"). A few — "Produit laitier",
+  // "Non-perishable" — run past it and push their own date chip right; a fixed
+  // width would align those rows only by truncating a label the user just
+  // picked, which is the worse trade.
+  min-width: 128px;
   justify-content: center;
   --background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
   color: var(--app-theme-primary-on-surface);
