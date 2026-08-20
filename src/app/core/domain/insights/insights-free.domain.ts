@@ -26,14 +26,31 @@ export interface ActivityMetrics {
   windowDays: number;
 }
 
-const FOOD_TYPE_DISPLAY_ORDER: FoodType[] = [
-  FoodType.PROTEIN,
-  FoodType.VEGETABLE,
-  FoodType.FRUIT,
-  FoodType.DAIRY,
-  FoodType.CARB,
-  // OTHER excluded: too generic to surface meaningful insights
-];
+/**
+ * Where each food type sits in the distribution chart, or null to leave it out.
+ *
+ * A Record rather than a list so a new FoodType cannot quietly fail to appear:
+ * TypeScript makes it declare a rank or an explicit null. The list this replaced
+ * dropped beverages and non-perishables the moment those types existed, which
+ * also took tinned tuna, pulses and sugar out of a chart that used to count them
+ * as protein and carbohydrate.
+ */
+const FOOD_TYPE_DISPLAY_RANK: Record<FoodType, number | null> = {
+  [FoodType.PROTEIN]:        0,
+  [FoodType.VEGETABLE]:      1,
+  [FoodType.FRUIT]:          2,
+  [FoodType.DAIRY]:          3,
+  [FoodType.CARB]:           4,
+  [FoodType.NON_PERISHABLE]: 5,
+  [FoodType.BEVERAGE]:       6,
+  [FoodType.HOUSEHOLD]:      null, // not food
+  [FoodType.OTHER]:          null, // too generic to say anything useful about
+};
+
+const FOOD_TYPE_DISPLAY_ORDER: FoodType[] = (Object.entries(FOOD_TYPE_DISPLAY_RANK) as [FoodType, number | null][])
+  .filter((entry): entry is [FoodType, number] => entry[1] !== null)
+  .sort((a, b) => a[1] - b[1])
+  .map(([foodType]) => foodType);
 
 export interface DistributionMetrics {
   foodTypes: { foodType: FoodType; count: number }[];

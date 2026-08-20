@@ -40,6 +40,41 @@ function makeEvent(overrides: Partial<PantryEvent> = {}): PantryEvent {
   } as PantryEvent;
 }
 
+describe('computeDistribution — display order', () => {
+  const now = new Date('2026-05-14');
+
+  it('shows beverages and non-perishables, not just the original five', () => {
+    // The reassignment moved tinned tuna, pulses and sugar into non-perishable.
+    // A display list that predates those types drops them from the chart, so the
+    // products a user actually owns stop being counted at all.
+    const items = [
+      makeItem({ foodType: FoodType.PROTEIN, batches: [{ batchId: 'b1', quantity: 1 }] }),
+      makeItem({ foodType: FoodType.NON_PERISHABLE, batches: [{ batchId: 'b2', quantity: 1 }] }),
+      makeItem({ foodType: FoodType.BEVERAGE, batches: [{ batchId: 'b3', quantity: 1 }] }),
+    ];
+    const shown = computeDistribution(items, [], now, 30).foodTypes.map(f => f.foodType);
+    expect(shown).toContain(FoodType.NON_PERISHABLE);
+    expect(shown).toContain(FoodType.BEVERAGE);
+  });
+
+  it('still leaves household and other out of the chart', () => {
+    const items = [
+      makeItem({ foodType: FoodType.HOUSEHOLD, batches: [{ batchId: 'b1', quantity: 1 }] }),
+      makeItem({ foodType: FoodType.OTHER, batches: [{ batchId: 'b2', quantity: 1 }] }),
+    ];
+    expect(computeDistribution(items, [], now, 30).foodTypes).toEqual([]);
+  });
+
+  it('keeps protein first and never leads with a pantry staple', () => {
+    const items = [
+      makeItem({ foodType: FoodType.BEVERAGE, batches: [{ batchId: 'b1', quantity: 1 }] }),
+      makeItem({ foodType: FoodType.PROTEIN, batches: [{ batchId: 'b2', quantity: 1 }] }),
+    ];
+    const shown = computeDistribution(items, [], now, 30).foodTypes.map(f => f.foodType);
+    expect(shown[0]).toBe(FoodType.PROTEIN);
+  });
+});
+
 describe('computeInventorySnapshot', () => {
   const now = new Date('2026-05-14');
 
