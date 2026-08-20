@@ -800,7 +800,7 @@
       "showLess": "Vedi meno",
       "emptyState": {
         "title": "Prodotti freschi",
-        "subtitle": "Aggiungi quello che usi ogni settimana\n(senza date esatte)",
+        "subtitle": "Aggiungi quello che usi ogni settimana\n(la data viene suggerita)",
         "cta": "+ Aggiungi freschi"
       },
       "keepInStock": "Rifornisci automaticamente",

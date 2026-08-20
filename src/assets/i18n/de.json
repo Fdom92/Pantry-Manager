@@ -800,7 +800,7 @@
       "showLess": "Weniger anzeigen",
       "emptyState": {
         "title": "Frische Produkte",
-        "subtitle": "Füge hinzu, was du jede Woche verwendest\n(ohne genaue Daten)",
+        "subtitle": "Füge hinzu, was du jede Woche verwendest\n(das Datum wird vorgeschlagen)",
         "cta": "+ Frische Produkte hinzufügen"
       },
       "keepInStock": "Automatisch nachkaufen",

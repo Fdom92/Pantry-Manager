@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { buildAddItemPayload } from '@core/domain/pantry';
+import { buildAddItemPayload, inferExpiryForName, suggestExpiryDate } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete, createDocumentId, withSignalFlag } from '@core/utils';
 import { dedupeByNormalizedKey, formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
@@ -90,7 +90,18 @@ export class PantryFreshAddModalStateService {
       if (alreadyPresent) return current;
       return [
         ...current,
-        { id: `fresh:${item._id}`, name: option.title, quantity: 1, item, isNew: false },
+        {
+          id: `fresh:${item._id}`,
+          name: option.title,
+          quantity: 1,
+          item,
+          isNew: false,
+          // Restocking a fresh product means a new lettuce, not the old one, so
+          // it gets a fresh suggested date rather than inheriting the batch's.
+          expirationDate: item.foodType
+            ? suggestExpiryDate(item.foodType)
+            : inferExpiryForName(option.title).expirationDate,
+        },
       ];
     });
     this.query.set('');
@@ -116,7 +127,13 @@ export class PantryFreshAddModalStateService {
       if (alreadyPresent) return current;
       return [
         ...current,
-        { id: `fresh:new:${normalized}`, name: formatted, quantity: 1, isNew: true },
+        {
+          id: `fresh:new:${normalized}`,
+          name: formatted,
+          quantity: 1,
+          isNew: true,
+          expirationDate: inferExpiryForName(formatted).expirationDate,
+        },
       ];
     });
     this.query.set('');
@@ -175,6 +192,10 @@ export class PantryFreshAddModalStateService {
             quantity: 3, // Suficiente
             expirationDate: entry.expirationDate,
             noExpiry: entry.noExpiry,
+            // The row already shows a suggested date, so the builder must save
+            // what is on screen. Without this, clearing the date in the sheet
+            // silently brought an inferred one back on save.
+            inferExpiry: false,
           });
           const freshItem: PantryItem = {
             ...base,

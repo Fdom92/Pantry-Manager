@@ -800,7 +800,7 @@
       "showLess": "Ver menos",
       "emptyState": {
         "title": "Frescos",
-        "subtitle": "Adiciona o que usas cada semana\n(sem datas exatas)",
+        "subtitle": "Adiciona o que usas cada semana\n(a data é sugerida)",
         "cta": "+ Adicionar frescos"
       },
       "keepInStock": "Reabastecer automaticamente",

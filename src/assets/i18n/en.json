@@ -800,7 +800,7 @@
       "showLess": "See less",
       "emptyState": {
         "title": "Fresh items",
-        "subtitle": "Add what you use every week\n(no exact dates needed)",
+        "subtitle": "Add what you use every week\n(the date is suggested for you)",
         "cta": "+ Add fresh items"
       },
       "keepInStock": "Restock automatically",

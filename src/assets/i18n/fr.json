@@ -800,7 +800,7 @@
       "showLess": "Voir moins",
       "emptyState": {
         "title": "Produits frais",
-        "subtitle": "Ajoute ce que tu utilises chaque semaine\n(sans dates exactes)",
+        "subtitle": "Ajoute ce que tu utilises chaque semaine\n(la date est suggérée)",
         "cta": "+ Ajouter des frais"
       },
       "keepInStock": "Réapprovisionner automatiquement",
