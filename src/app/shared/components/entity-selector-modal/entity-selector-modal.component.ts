@@ -53,6 +53,12 @@ export class EntitySelectorModalComponent<TRaw = unknown, TMeta = unknown> {
   @Input() showEmptyAction = false;
   @Input() showEmptyActionWhenNoExactMatch = false;
   @Input() entriesEmptyLabel = '';
+  /**
+   * Optional note shown under the picked entries. Sits here rather than in the
+   * header so it appears next to the values it explains, and only once there is
+   * something on screen to explain.
+   */
+  @Input() entriesHint = '';
   @Input() saveLabel = '';
   @Input() saving = false;
   @Input() disableSave = false;

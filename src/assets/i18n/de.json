@@ -115,7 +115,7 @@
     },
     "pantry": {
       "title": "Die Vorratskammer ist leer",
-      "subtitle": "Füge Produkte hinzu, die du verfolgen möchtest\n(mit Menge und Ablaufdatum)"
+      "subtitle": "Füge Produkte hinzu, die du verfolgen möchtest\n(mit genauer Menge und Chargen)"
     },
     "shopping": {
       "title": "Alles in Ordnung"
@@ -673,6 +673,9 @@
         "non-perishable": "Haltbar",
         "other": "Sonstiges",
         "household": "Haushalt"
+      },
+      "expiry": {
+        "suggestedHint": "Das Datum wird aus dem Lebensmitteltyp vorgeschlagen. Passe es bei Bedarf an."
       }
     },
     "detail": {
@@ -800,7 +803,7 @@
       "showLess": "Weniger anzeigen",
       "emptyState": {
         "title": "Frische Produkte",
-        "subtitle": "Füge hinzu, was du jede Woche verwendest\n(das Datum wird vorgeschlagen)",
+        "subtitle": "Füge hinzu, was du jede Woche verwendest\n(genug, wenig oder leer)",
         "cta": "+ Frische Produkte hinzufügen"
       },
       "keepInStock": "Automatisch nachkaufen",

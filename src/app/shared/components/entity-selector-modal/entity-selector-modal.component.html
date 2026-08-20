@@ -114,6 +114,9 @@
               </div>
             }
           </section>
+          @if (entriesHint) {
+            <p class="entity-selector-modal__hint">{{ entriesHint }}</p>
+          }
         } @else if (entriesEmptyLabel) {
           <p class="entity-selector-modal__empty">{{ entriesEmptyLabel }}</p>
         }

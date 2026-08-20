@@ -115,7 +115,7 @@
     },
     "pantry": {
       "title": "La despensa está vacía",
-      "subtitle": "Añade productos que quieras controlar\n(con cantidad y caducidad)"
+      "subtitle": "Añade productos que quieras controlar\n(con cantidad exacta y lotes)"
     },
     "shopping": {
       "title": "Todo en orden"
@@ -673,6 +673,9 @@
         "non-perishable": "No perecedero",
         "other": "Otro",
         "household": "Hogar"
+      },
+      "expiry": {
+        "suggestedHint": "La fecha se sugiere a partir del tipo de alimento. Edítala si no cuadra."
       }
     },
     "detail": {
@@ -800,7 +803,7 @@
       "showLess": "Ver menos",
       "emptyState": {
         "title": "Frescos",
-        "subtitle": "Añade lo que usas cada semana\n(la fecha se sugiere sola)",
+        "subtitle": "Añade lo que usas cada semana\n(suficiente, poco o nada)",
         "cta": "+ Añadir frescos"
       },
       "keepInStock": "Volver a comprar automáticamente",

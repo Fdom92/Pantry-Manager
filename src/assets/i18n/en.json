@@ -115,7 +115,7 @@
     },
     "pantry": {
       "title": "Pantry is empty",
-      "subtitle": "Add products you want to track\n(with quantity and expiry)"
+      "subtitle": "Add products you want to track\n(with exact quantity and batches)"
     },
     "shopping": {
       "title": "All set"
@@ -673,6 +673,9 @@
         "non-perishable": "Non-perishable",
         "other": "Other",
         "household": "Household"
+      },
+      "expiry": {
+        "suggestedHint": "The date is suggested from the food type. Edit it if it doesn't fit."
       }
     },
     "detail": {
@@ -800,7 +803,7 @@
       "showLess": "See less",
       "emptyState": {
         "title": "Fresh items",
-        "subtitle": "Add what you use every week\n(the date is suggested for you)",
+        "subtitle": "Add what you use every week\n(plenty, low or out)",
         "cta": "+ Add fresh items"
       },
       "keepInStock": "Restock automatically",

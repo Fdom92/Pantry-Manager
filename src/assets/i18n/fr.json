@@ -115,7 +115,7 @@
     },
     "pantry": {
       "title": "Le garde-manger est vide",
-      "subtitle": "Ajoute les produits que tu veux surveiller\n(avec quantité et date de péremption)"
+      "subtitle": "Ajoute les produits que tu veux surveiller\n(avec quantité exacte et lots)"
     },
     "shopping": {
       "title": "Tout est en ordre"
@@ -673,6 +673,9 @@
         "non-perishable": "Non périssable",
         "other": "Autre",
         "household": "Ménage"
+      },
+      "expiry": {
+        "suggestedHint": "La date est suggérée d'après le type d'aliment. Modifiez-la si besoin."
       }
     },
     "detail": {
@@ -800,7 +803,7 @@
       "showLess": "Voir moins",
       "emptyState": {
         "title": "Produits frais",
-        "subtitle": "Ajoute ce que tu utilises chaque semaine\n(la date est suggérée)",
+        "subtitle": "Ajoute ce que tu utilises chaque semaine\n(assez, peu ou vide)",
         "cta": "+ Ajouter des frais"
       },
       "keepInStock": "Réapprovisionner automatiquement",

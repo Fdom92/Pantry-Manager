@@ -132,6 +132,13 @@ ion-modal.app-sheet-modal {
 
 // ── Empty + extras ──────────────────────────────────────────────────────────
 
+.entity-selector-modal__hint {
+  margin: var(--app-theme-spacing-sm) 0 0;
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-muted);
+  line-height: var(--app-theme-line-height-body);
+}
+
 .entity-selector-modal__empty {
   margin: var(--app-theme-spacing-md) 0;
   text-align: center;

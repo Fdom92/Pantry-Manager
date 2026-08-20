@@ -115,7 +115,7 @@
     },
     "pantry": {
       "title": "La dispensa è vuota",
-      "subtitle": "Aggiungi i prodotti che vuoi controllare\n(con quantità e scadenza)"
+      "subtitle": "Aggiungi i prodotti che vuoi controllare\n(con quantità esatta e lotti)"
     },
     "shopping": {
       "title": "Tutto in ordine"
@@ -673,6 +673,9 @@
         "non-perishable": "Non deperibile",
         "other": "Altro",
         "household": "Casa"
+      },
+      "expiry": {
+        "suggestedHint": "La data è suggerita in base al tipo di alimento. Modificala se non torna."
       }
     },
     "detail": {
@@ -800,7 +803,7 @@
       "showLess": "Vedi meno",
       "emptyState": {
         "title": "Prodotti freschi",
-        "subtitle": "Aggiungi quello che usi ogni settimana\n(la data viene suggerita)",
+        "subtitle": "Aggiungi quello che usi ogni settimana\n(sufficiente, poco o niente)",
         "cta": "+ Aggiungi freschi"
       },
       "keepInStock": "Rifornisci automaticamente",
