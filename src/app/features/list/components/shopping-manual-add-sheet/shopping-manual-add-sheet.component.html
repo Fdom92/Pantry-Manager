@@ -14,7 +14,6 @@
       <div class="manual-add-sheet__input-wrapper">
         <ion-input
           #nameInput
-          fill="outline"
           [placeholder]="'shopping.manualAdd.placeholder' | translate"
           [value]="state.inputValue()"
           (ionInput)="state.setInputValue($event.detail.value ?? '')"
