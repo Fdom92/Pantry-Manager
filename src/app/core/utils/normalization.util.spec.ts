@@ -4,6 +4,7 @@ import {
   normalizeCategoryId,
   normalizeLocationId,
   normalizeLowercase,
+  normalizeProductKey,
   normalizeSearchField,
   normalizeSearchQuery,
   normalizeSupermarketName,
@@ -187,5 +188,30 @@ describe('dedupeByNormalizedKey', () => {
     const result = dedupeByNormalizedKey(items, s => s);
     expect(result.length).toBe(1);
     expect(result[0]).toBe('valid');
+  });
+});
+
+describe('normalizeProductKey', () => {
+  it('treats accented and unaccented spellings as the same product', () => {
+    expect(normalizeProductKey('Atún')).toBe(normalizeProductKey('Atun'));
+    expect(normalizeProductKey('Plátano')).toBe(normalizeProductKey('platano'));
+    expect(normalizeProductKey('LIMÓN')).toBe(normalizeProductKey('limon'));
+  });
+
+  it('ignores case and surrounding whitespace', () => {
+    expect(normalizeProductKey('  Arroz  ')).toBe(normalizeProductKey('arroz'));
+  });
+
+  it('still tells genuinely different products apart', () => {
+    expect(normalizeProductKey('atun')).not.toBe(normalizeProductKey('atunes'));
+  });
+
+  // The bug this guards: the autocomplete searched with one normalizer while
+  // the add flow deduped with another, so it would offer an existing "Atún"
+  // and then file a typed "Atun" as a separate product.
+  it('agrees with the normalizer the autocomplete searches with', () => {
+    for (const name of ['Atún', 'Atun', 'Café con leche', 'JAMÓN serrano']) {
+      expect(normalizeProductKey(name)).toBe(normalizeSearchField(name));
+    }
   });
 });

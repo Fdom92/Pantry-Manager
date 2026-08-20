@@ -44,6 +44,19 @@ export function normalizeSearchField(value: unknown): string {
   return stripDiacritics(normalizeWhitespaceLowercase(String(value ?? '')));
 }
 
+/**
+ * Normalize a product name for **identity** — deciding whether two names refer
+ * to the same product.
+ *
+ * Must strip diacritics, and must stay in step with `normalizeSearchField`,
+ * which is what the autocomplete searches with. When the two disagree the
+ * autocomplete offers you an existing "Atún" while the add flow concludes your
+ * typed "Atun" is a different product, and you end up with both in the pantry.
+ */
+export function normalizeProductKey(value: string | null | undefined): string {
+  return normalizeSearchQuery(value);
+}
+
 export function normalizeLocaleCode(locale?: string | null): string | null {
   if (!locale) {
     return null;

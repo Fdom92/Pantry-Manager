@@ -28,7 +28,7 @@ import { inferExpiryForName } from '@core/domain/pantry/food-type-inference.doma
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
-import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
+import { normalizeLowercase, normalizeProductKey, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import type jsPDF from 'jspdf';
 import { ANALYTICS_EVENTS } from '@core/constants';
@@ -153,8 +153,8 @@ export class ListStateService {
 
     // Match the manual entry to an existing pantry product by normalized name.
     // If found → add a new lot. Otherwise create a brand-new pantry item.
-    const target = normalizeLowercase(item.name);
-    const match = this.items().find(p => normalizeLowercase(p.name) === target);
+    const target = normalizeProductKey(item.name);
+    const match = this.items().find(p => normalizeProductKey(p.name) === target);
     const timestamp = new Date().toISOString();
 
     try {

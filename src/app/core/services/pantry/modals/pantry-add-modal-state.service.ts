@@ -3,7 +3,7 @@ import { buildAddItemPayload, inferExpiryForName, inferFoodType, suggestExpiryDa
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import type { FoodType } from '@core/models/shared/enums.model';
 import { buildPantryItemAutocomplete, createDocumentId } from '@core/utils';
-import { formatFriendlyName, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
+import { formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
 import { dedupeByNormalizedKey } from '@core/utils/normalization.util';
 import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -217,10 +217,10 @@ export class PantryAddModalStateService {
     if (!nextName) {
       return;
     }
-    const normalized = normalizeLowercase(nextName);
+    const normalized = normalizeProductKey(nextName);
     const matchingItem = this.pantryStore
       .loadedProducts()
-      .find(item => item.productType !== 'fresh' && normalizeLowercase(item.name) === normalized);
+      .find(item => item.productType !== 'fresh' && normalizeProductKey(item.name) === normalized);
 
     if (matchingItem) {
       const option: AutocompleteItem<PantryItem> = {
@@ -234,7 +234,7 @@ export class PantryAddModalStateService {
 
     const formattedName = formatFriendlyName(nextName, nextName);
     this.addEntries.update(current => {
-      const existingIndex = current.findIndex(entry => normalizeLowercase(entry.name) === normalized);
+      const existingIndex = current.findIndex(entry => normalizeProductKey(entry.name) === normalized);
       if (existingIndex >= 0) {
         const next = [...current];
         const updated = { ...next[existingIndex] };
