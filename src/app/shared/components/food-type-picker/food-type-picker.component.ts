@@ -81,14 +81,20 @@ export class FoodTypePickerComponent {
     this.sheetOpen.set(false);
   }
 
-  /** Ionicons name per type — keeps the chip readable when space is tight. */
+  /**
+   * Ionicons name per type — keeps the chip readable when space is tight.
+   *
+   * No two of these should be confusable at chip size, which is why the fruit
+   * icon is the apple and not the flower: `nutrition-outline` IS an apple, so
+   * having it stand for carbs while fruit got a flower had them backwards.
+   */
   iconFor(type: FoodType): string {
     switch (type) {
       case FoodType.PROTEIN:   return 'fish-outline';
-      case FoodType.CARB:      return 'nutrition-outline';
+      case FoodType.CARB:      return 'pizza-outline';
       case FoodType.VEGETABLE: return 'leaf-outline';
-      case FoodType.FRUIT:     return 'flower-outline';
-      case FoodType.DAIRY:     return 'water-outline';
+      case FoodType.FRUIT:     return 'nutrition-outline';
+      case FoodType.DAIRY:     return 'ice-cream-outline';
       case FoodType.HOUSEHOLD: return 'home-outline';
       default:                 return 'ellipsis-horizontal-outline';
     }

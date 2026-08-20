@@ -145,8 +145,8 @@ import {
   pieChartOutline,
   fishOutline,
   nutritionOutline,
-  flowerOutline,
-  waterOutline,
+  pizzaOutline,
+  iceCreamOutline,
   ellipsisHorizontalOutline,
   helpCircleOutline,
 } from 'ionicons/icons';
@@ -180,8 +180,8 @@ addIcons({
   // Food-type chips in the add row (FoodTypePickerComponent).
   'fish-outline': fishOutline,
   'nutrition-outline': nutritionOutline,
-  'flower-outline': flowerOutline,
-  'water-outline': waterOutline,
+  'pizza-outline': pizzaOutline,
+  'ice-cream-outline': iceCreamOutline,
   'ellipsis-horizontal-outline': ellipsisHorizontalOutline,
   'help-circle-outline': helpCircleOutline,
   add: add,
