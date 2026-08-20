@@ -5,6 +5,7 @@ import {
   IonIcon,
   IonModal,
   IonSpinner,
+  IonFooter,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { EntityAutocompleteComponent, type AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
@@ -29,6 +30,7 @@ export interface EntitySelectorEntry {
     IonButton,
     IonIcon,
     IonSpinner,
+    IonFooter,
     ExpiryPickerComponent,
     EntityAutocompleteComponent,
   ],
