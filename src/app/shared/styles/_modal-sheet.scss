@@ -33,10 +33,22 @@
 // (no <ion-content> — its shadow-DOM scroll part doesn't reliably accept
 // display: flex from outside, leaving the footer off-screen at small sheet
 // breakpoints). A bare flex column is unambiguous and Just Works.
-@mixin layout {
+/// Applies to the `.sheet-shell` wrapper.
+///
+/// `$max-height` MUST match the modal's own `[initialBreakpoint]` expressed in
+/// vh — a sheet opened at 0.45 passes 45vh. Ionic does not clamp its sheet
+/// wrapper to that breakpoint when the content is short: the wrapper grows to
+/// the intrinsic height and the footer, pinned to the bottom of the shell, ends
+/// up below the visible area where its buttons cannot be tapped. Capping the
+/// shell here keeps the footer reachable and lets `body` scroll instead.
+///
+/// This bug shipped three separate times before the cap lived in the mixin —
+/// keep it here rather than in the individual components.
+@mixin layout($max-height: 85vh) {
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-height: $max-height;
   background: var(--ion-card-background);
   overflow: hidden;
 }

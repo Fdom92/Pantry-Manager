@@ -5,13 +5,7 @@ ion-modal.app-sheet-modal {
 }
 
 .sheet-shell {
-  @include sheet.layout;
-  // Ionic's sheet-breakpoint wrapper doesn't clamp height to initialBreakpoint (0.85)
-  // when content is short (e.g. a single pendiente row) — it sizes to an inflated
-  // intrinsic height and translates the overflow off-screen, pushing the footer
-  // below the viewport. Capping height here (matching the modal's own breakpoint)
-  // forces .sheet-body's existing overflow-y:auto to compress/scroll correctly instead.
-  max-height: 85vh;
+  @include sheet.layout(85vh);
 }
 
 .sheet-handle {
