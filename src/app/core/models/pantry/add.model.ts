@@ -1,3 +1,4 @@
+import type { FoodType } from '../shared/enums.model';
 import type { PantryItem } from './item.model';
 
 export interface AddEntry {
@@ -8,4 +9,6 @@ export interface AddEntry {
   isNew: boolean;
   expirationDate?: string;
   noExpiry?: boolean;
+  /** Inferred from the name, or picked by the user in the add row. */
+  foodType?: FoodType | null;
 }

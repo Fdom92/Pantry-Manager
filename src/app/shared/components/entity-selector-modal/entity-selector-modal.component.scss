@@ -79,9 +79,10 @@ ion-modal.app-sheet-modal {
   color: var(--app-theme-text-color);
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  // Wrap rather than ellipsize: the name is the one thing the user needs to
+  // read, and a date chip beside it leaves little room on a phone. Long names
+  // take a second line instead of turning into "L...".
+  overflow-wrap: anywhere;
 }
 
 .entity-selector-controls {
@@ -89,6 +90,32 @@ ion-modal.app-sheet-modal {
   align-items: center;
   gap: var(--app-theme-spacing-xs);
   flex-shrink: 0;
+}
+
+// Four controls next to the name never fit on a phone, so the add-to-pantry
+// row gives the name its own line and lets the chips sit underneath. Rows with
+// fewer controls (fresh add, consume) stay on one line and wrap if they must.
+.entity-selector-item--stacked {
+  flex-wrap: wrap;
+
+  .entity-selector-item-name {
+    flex: 1 0 100%;
+    margin-bottom: var(--app-theme-spacing-2xs);
+  }
+
+  .entity-selector-controls {
+    flex: 1;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+// Muted and last in the row — an escape hatch, not a primary control.
+.entity-selector-remove {
+  margin: 0;
+  --padding-start: var(--app-theme-spacing-2xs);
+  --padding-end: var(--app-theme-spacing-2xs);
+  opacity: 0.55;
 }
 
 .entity-selector-quantity {

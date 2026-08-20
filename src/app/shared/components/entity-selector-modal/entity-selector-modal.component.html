@@ -52,7 +52,7 @@
         @if (entries.length) {
           <section class="form-section entity-selector-modal__list">
             @for (entry of entries; track entry.id) {
-              <div class="entity-selector-item">
+              <div class="entity-selector-item" [class.entity-selector-item--stacked]="showEntryFoodType">
                 <h3 class="entity-selector-item-name">{{ entry.title }}</h3>
                 <div class="entity-selector-controls">
                   @if (showEntryQuantity) {
@@ -73,14 +73,12 @@
                         <ion-icon slot="icon-only" name="add-outline"></ion-icon>
                       </ion-button>
                     </div>
-                  } @else {
-                    <ion-button
-                      fill="clear"
-                      size="small"
-                      color="medium"
-                      (click)="adjustEntry.emit({ entry, delta: -1 })">
-                      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-                    </ion-button>
+                  }
+                  @if (showEntryFoodType) {
+                    <app-food-type-picker
+                      [foodType]="entry.foodType ?? null"
+                      (foodTypeChange)="entryFoodTypeChange.emit({ entry, foodType: $event })">
+                    </app-food-type-picker>
                   }
                   @if (showEntryDate) {
                     @if (entryDateQuickOnly) {
@@ -98,6 +96,19 @@
                         (noExpiryToggle)="entryNoExpiryToggle.emit({ entry })">
                       </app-expiry-picker>
                     }
+                  }
+                  @if (!showEntryQuantity) {
+                    <!-- Last in the row on purpose: it is the escape hatch for a
+                         mistaken pick, not part of what the user reads. -->
+                    <ion-button
+                      class="entity-selector-remove"
+                      fill="clear"
+                      size="small"
+                      color="medium"
+                      [attr.aria-label]="'common.actions.delete' | translate"
+                      (click)="adjustEntry.emit({ entry, delta: -1 })">
+                      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+                    </ion-button>
                   }
                 </div>
               </div>

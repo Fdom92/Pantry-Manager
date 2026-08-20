@@ -25,7 +25,9 @@
   (emptyAction)="state.addEntryFromQuery($event)"
   (adjustEntry)="state.adjustEntryById($event.entry.id, $event.delta)"
   [showEntryNoExpiry]="true"
+  [showEntryFoodType]="true"
   (entryDateChange)="state.setEntryDate($event.entry.id, $event.date)"
   (entryNoExpiryToggle)="state.setEntryNoExpiry($event.entry.id)"
+  (entryFoodTypeChange)="state.setEntryFoodType($event.entry.id, $event.foodType)"
   (save)="state.submitAdd()">
 </app-entity-selector-modal>

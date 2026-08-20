@@ -668,6 +668,8 @@
         "vegetable": "Verdura",
         "fruit": "Frutta",
         "dairy": "Latticino",
+        "beverage": "Bevanda",
+        "non-perishable": "Non deperibile",
         "other": "Altro",
         "household": "Casa"
       }

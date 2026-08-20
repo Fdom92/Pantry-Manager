@@ -1,8 +1,9 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { buildAddItemPayload } from '@core/domain/pantry';
+import { buildAddItemPayload, inferExpiryForName, inferFoodType, suggestExpiryDate } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
+import type { FoodType } from '@core/models/shared/enums.model';
 import { buildPantryItemAutocomplete, createDocumentId } from '@core/utils';
-import { formatFriendlyName, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
+import { formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
 import { dedupeByNormalizedKey } from '@core/utils/normalization.util';
 import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -40,6 +41,7 @@ export class PantryAddModalStateService {
       isNew: entry.isNew,
       expirationDate: entry.expirationDate,
       noExpiry: entry.noExpiry,
+      foodType: entry.foodType,
     }))
   );
 
@@ -116,6 +118,11 @@ export class PantryAddModalStateService {
             quantity: entry.quantity,
             expirationDate: entry.expirationDate,
             noExpiry: entry.noExpiry,
+            // The row already showed the suggested type and date in editable
+            // chips, so whatever it holds now is the user's decision — an empty
+            // date means they cleared it on purpose.
+            foodType: entry.foodType ?? undefined,
+            inferExpiry: false,
           });
           const item: PantryItem = { ...base, productType: 'pantry' };
           await this.pantryStore.addItem(item);
@@ -190,6 +197,12 @@ export class PantryAddModalStateService {
           quantity: 1,
           item,
           isNew: false,
+          // Show the suggested type and expiry up front so the user can accept
+          // or edit them before saving, instead of discovering them afterwards.
+          foodType: item.foodType ?? inferFoodType(option.title),
+          expirationDate: item.foodType
+            ? suggestExpiryDate(item.foodType)
+            : inferExpiryForName(option.title).expirationDate,
         },
       ];
     });
@@ -204,10 +217,10 @@ export class PantryAddModalStateService {
     if (!nextName) {
       return;
     }
-    const normalized = normalizeLowercase(nextName);
+    const normalized = normalizeProductKey(nextName);
     const matchingItem = this.pantryStore
       .loadedProducts()
-      .find(item => item.productType !== 'fresh' && normalizeLowercase(item.name) === normalized);
+      .find(item => item.productType !== 'fresh' && normalizeProductKey(item.name) === normalized);
 
     if (matchingItem) {
       const option: AutocompleteItem<PantryItem> = {
@@ -221,7 +234,7 @@ export class PantryAddModalStateService {
 
     const formattedName = formatFriendlyName(nextName, nextName);
     this.addEntries.update(current => {
-      const existingIndex = current.findIndex(entry => normalizeLowercase(entry.name) === normalized);
+      const existingIndex = current.findIndex(entry => normalizeProductKey(entry.name) === normalized);
       if (existingIndex >= 0) {
         const next = [...current];
         const updated = { ...next[existingIndex] };
@@ -236,6 +249,8 @@ export class PantryAddModalStateService {
           name: formattedName,
           quantity: 1,
           isNew: true,
+          foodType: inferFoodType(formattedName),
+          expirationDate: inferExpiryForName(formattedName).expirationDate,
         },
       ];
     });
@@ -288,6 +303,26 @@ export class PantryAddModalStateService {
       if (index < 0) return current;
       const next = [...current];
       next[index] = { ...next[index], expirationDate: date || undefined, noExpiry: date ? undefined : next[index].noExpiry };
+      return next;
+    });
+  }
+
+  /**
+   * Set the food type for an entry. Re-suggests the expiry date from the new
+   * type unless the user already put a date there themselves.
+   */
+  setEntryFoodType(entryId: string, foodType: FoodType): void {
+    this.addEntries.update(current => {
+      const index = current.findIndex(row => row.id === entryId);
+      if (index < 0) return current;
+      const next = [...current];
+      const row = next[index];
+      const keepsOwnDate = Boolean(row.expirationDate) || Boolean(row.noExpiry);
+      next[index] = {
+        ...row,
+        foodType,
+        expirationDate: keepsOwnDate ? row.expirationDate : suggestExpiryDate(foodType),
+      };
       return next;
     });
   }

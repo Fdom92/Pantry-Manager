@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete } from '@core/domain/pantry/pantry-filtering.domain';
+import { inferFoodType } from '@core/domain/pantry/food-type-inference.domain';
 import { applyPendienteFix, isPendienteRowResolved } from '@core/domain/pantry/pendiente-fix.domain';
 import { suggestExpiryDate } from '@core/domain/pantry/expiry-suggestion.domain';
 import type { PantryItem } from '@core/models/pantry';
@@ -169,6 +170,9 @@ export class PantryPendientesSheetStateService {
   }
 
   private buildRow(item: PantryItem): PendienteRow {
+    // For items missing a foodType, offer the inferred one as a pre-selection
+    // so the user confirms rather than picks from scratch.
+    const foodType = item.foodType ?? inferFoodType(item.name) ?? null;
     const needsFoodType = !item.foodType;
     const needsDate = hasMissingExpiry(item);
     return {
@@ -177,8 +181,8 @@ export class PantryPendientesSheetStateService {
       needsFoodType,
       needsDate,
       datelessBatchCount: countMissingExpiryBatches(item),
-      foodType: item.foodType ?? null,
-      expirationDate: !needsFoodType && needsDate ? suggestExpiryDate(item.foodType!) : undefined,
+      foodType,
+      expirationDate: foodType && needsDate ? suggestExpiryDate(foodType) : undefined,
       noExpiry: false,
     };
   }

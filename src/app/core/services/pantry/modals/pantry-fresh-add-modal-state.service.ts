@@ -2,7 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { buildAddItemPayload } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete, createDocumentId, withSignalFlag } from '@core/utils';
-import { dedupeByNormalizedKey, formatFriendlyName, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
+import { dedupeByNormalizedKey, formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
 import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
@@ -99,11 +99,11 @@ export class PantryFreshAddModalStateService {
   addEntryFromQuery(name?: string): void {
     const next = normalizeTrim(name ?? this.query());
     if (!next) return;
-    const normalized = normalizeLowercase(next);
+    const normalized = normalizeProductKey(next);
     // Solo busca contra el catálogo de frescos (no merges con un item de despensa con el mismo nombre).
     const match = this.pantryStore
       .loadedProducts()
-      .find(i => i.productType === 'fresh' && normalizeLowercase(i.name) === normalized);
+      .find(i => i.productType === 'fresh' && normalizeProductKey(i.name) === normalized);
 
     if (match) {
       this.addEntry({ id: match._id, title: match.name, raw: match });
@@ -112,7 +112,7 @@ export class PantryFreshAddModalStateService {
 
     const formatted = formatFriendlyName(next, next);
     this.entries.update(current => {
-      const alreadyPresent = current.some(e => normalizeLowercase(e.name) === normalized);
+      const alreadyPresent = current.some(e => normalizeProductKey(e.name) === normalized);
       if (alreadyPresent) return current;
       return [
         ...current,

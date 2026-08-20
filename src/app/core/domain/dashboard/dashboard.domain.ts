@@ -75,7 +75,16 @@ export function computeTodaySuggestion(
 
   const getState = (item: PantryItem) => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
 
-  const isFood   = (item: PantryItem): boolean => item.foodType !== FoodType.HOUSEHOLD;
+  // The suggestion rescues food about to spoil, so it only draws from things
+  // you would actually cook or eat. Without this a bottle of water or a bag of
+  // salt could surface as "use it today", which reads as a broken app.
+  const SUGGESTIBLE_EXCLUDED: ReadonlySet<FoodType> = new Set([
+    FoodType.HOUSEHOLD,
+    FoodType.BEVERAGE,
+    FoodType.NON_PERISHABLE,
+  ]);
+  const isFood   = (item: PantryItem): boolean =>
+    !item.foodType || !SUGGESTIBLE_EXCLUDED.has(item.foodType);
   const hasStock = (item: PantryItem): boolean => getStock(item) > 0;
 
   const toItem = (item: PantryItem): TodaySuggestionItem => ({

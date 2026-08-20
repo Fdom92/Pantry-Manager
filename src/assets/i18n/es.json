@@ -668,6 +668,8 @@
         "vegetable": "Verdura",
         "fruit": "Fruta",
         "dairy": "Lácteo",
+        "beverage": "Bebida",
+        "non-perishable": "No perecedero",
         "other": "Otro",
         "household": "Hogar"
       }

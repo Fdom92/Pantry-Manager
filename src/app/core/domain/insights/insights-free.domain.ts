@@ -237,6 +237,10 @@ const FOOD_TYPE_WEIGHTS: Record<FoodType, number> = {
   [FoodType.FRUIT]:     0.6,
   [FoodType.DAIRY]:     0.6,
   [FoodType.OTHER]:     0.4,
+  // Drinks are not meals, so they add no days of food coverage. Oil and salt
+  // stretch meals without being one, hence the small but non-zero weight.
+  [FoodType.BEVERAGE]:  0,
+  [FoodType.NON_PERISHABLE]: 0.2,
   [FoodType.HOUSEHOLD]: 0,
 };
 
