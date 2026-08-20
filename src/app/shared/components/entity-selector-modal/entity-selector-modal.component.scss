@@ -91,6 +91,26 @@ ion-modal.app-sheet-modal {
   flex-shrink: 0;
 }
 
+// With the food-type chip on, four controls do not fit next to the name on a
+// phone — the name is what gets truncated, and it is the one thing the user
+// needs to read. Give it its own line and let the chips sit underneath.
+.entity-selector-item--stacked {
+  flex-wrap: wrap;
+
+  .entity-selector-item-name {
+    flex: 1 0 100%;
+    white-space: normal;
+    overflow: visible;
+    margin-bottom: var(--app-theme-spacing-2xs);
+  }
+
+  .entity-selector-controls {
+    flex: 1;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
 .entity-selector-quantity {
   display: flex;
   align-items: center;

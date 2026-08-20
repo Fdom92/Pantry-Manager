@@ -1,5 +1,6 @@
 import { DEFAULT_HOUSEHOLD_ID, UNASSIGNED_PRODUCT_NAME } from '@core/constants';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
+import type { FoodType } from '@core/models/shared/enums.model';
 import { roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { inferExpiryForName } from './food-type-inference.domain';
@@ -24,6 +25,11 @@ export function buildAddItemPayload(params: {
    * clearing the chip would be silently undone here.
    */
   inferExpiry?: boolean;
+  /**
+   * Explicit classification, wins over the name-based guess. Callers that let
+   * the user pick a type (the add modal shows it in a chip) must pass it here.
+   */
+  foodType?: FoodType;
 }): PantryItem {
   const normalizedName = normalizeTrim(params.name) || UNASSIGNED_PRODUCT_NAME;
 
@@ -56,7 +62,7 @@ export function buildAddItemPayload(params: {
     householdId: params.householdId ?? DEFAULT_HOUSEHOLD_ID,
     name: normalizedName,
     categoryId: '',
-    foodType: inferred.foodType ?? undefined,
+    foodType: params.foodType ?? inferred.foodType ?? undefined,
     batches,
     supermarket: '',
     isBasic: undefined,
