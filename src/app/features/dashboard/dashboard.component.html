@@ -64,8 +64,18 @@
                   <p class="today-card__all-good-title">{{ 'dashboard.today.allGood.title' | translate }}</p>
                   @if (facade.hasLowDataQuality()) {
                     <p class="today-card__all-good-hint">
-                      {{ 'dashboard.today.allGood.missingDates' | translate:{ count: facade.noExpiryDateCount() } }}
+                      {{ 'dashboard.today.allGood.incompleteData' | translate:{ count: facade.incompleteItemCount() } }}
                     </p>
+                    <!-- Without this the card states the problem on the home
+                         screen and offers nowhere to act on it. -->
+                    <button
+                      type="button"
+                      class="today-card__fix-cta"
+                      (click)="goToPendientes()">
+                      <ion-icon name="pencil-outline"></ion-icon>
+                      {{ 'dashboard.today.allGood.fixCta' | translate }}
+                      <ion-icon name="chevron-forward-outline"></ion-icon>
+                    </button>
                   } @else if (facade.nextExpiringItem()) {
                     <p class="today-card__all-good-hint">
                       {{ 'dashboard.today.allGood.nextExpiry' | translate:{

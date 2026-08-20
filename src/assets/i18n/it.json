@@ -203,7 +203,8 @@
         "title": "Tutto sotto controllo",
         "hint": "Niente di urgente oggi — la tua dispensa è in ottima forma",
         "nextExpiry": "Prossima scadenza: {{name}} tra {{days}} giorni",
-        "missingDates": "{{count}} prodotti senza data di scadenza · aggiungile per vedere i suggerimenti"
+        "incompleteData": "{{count}} prodotti con dati incompleti · completali per vedere i suggerimenti",
+        "fixCta": "Completa i sospesi"
       },
       "secondary": {
         "days": "{{count}} giorni"

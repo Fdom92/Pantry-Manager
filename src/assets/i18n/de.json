@@ -203,7 +203,8 @@
         "title": "Alles unter Kontrolle",
         "hint": "Heute nichts Dringendes — dein Vorrat ist in guter Verfassung",
         "nextExpiry": "Nächstes Ablaufdatum: {{name}} in {{days}} Tagen",
-        "missingDates": "{{count}} Produkte ohne Ablaufdatum · füge sie hinzu, um Vorschläge zu sehen"
+        "incompleteData": "{{count}} Produkte mit unvollständigen Daten · ergänze sie für Vorschläge",
+        "fixCta": "Ausstehende ergänzen"
       },
       "secondary": {
         "days": "{{count}} Tage"

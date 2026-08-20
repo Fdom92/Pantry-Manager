@@ -203,7 +203,8 @@
         "title": "Todo bajo control",
         "hint": "Nada urgente hoy — tu despensa está en orden",
         "nextExpiry": "Próxima caducidad: {{name}} en {{days}} días",
-        "missingDates": "{{count}} productos sin fecha de caducidad · añádelas para ver sugerencias"
+        "incompleteData": "{{count}} productos con datos incompletos · complétalos para ver sugerencias",
+        "fixCta": "Completar pendientes"
       },
       "secondary": {
         "days": "{{count}} días"
