@@ -142,7 +142,13 @@ import {
   warning,
   warningOutline,
   pencilOutline,
-  pieChartOutline
+  pieChartOutline,
+  fishOutline,
+  nutritionOutline,
+  flowerOutline,
+  waterOutline,
+  ellipsisHorizontalOutline,
+  helpCircleOutline,
 } from 'ionicons/icons';
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
@@ -171,6 +177,13 @@ function localeFactory(language: LanguageService): string {
 }
 
 addIcons({
+  // Food-type chips in the add row (FoodTypePickerComponent).
+  'fish-outline': fishOutline,
+  'nutrition-outline': nutritionOutline,
+  'flower-outline': flowerOutline,
+  'water-outline': waterOutline,
+  'ellipsis-horizontal-outline': ellipsisHorizontalOutline,
+  'help-circle-outline': helpCircleOutline,
   add: add,
   remove: remove,
   close: close,

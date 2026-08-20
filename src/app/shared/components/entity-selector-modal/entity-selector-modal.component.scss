@@ -91,9 +91,10 @@ ion-modal.app-sheet-modal {
   flex-shrink: 0;
 }
 
-// With the food-type chip on, four controls do not fit next to the name on a
-// phone — the name is what gets truncated, and it is the one thing the user
-// needs to read. Give it its own line and let the chips sit underneath.
+// A date chip — with or without the food-type chip beside it — leaves no room
+// for the name on a phone, and the name is the one thing the user needs to
+// read. Give it its own line and let the controls sit underneath. Rows without
+// chips (the consume modal) stay on a single compact line.
 .entity-selector-item--stacked {
   flex-wrap: wrap;
 

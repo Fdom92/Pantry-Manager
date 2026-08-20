@@ -1,6 +1,10 @@
 .food-type-chip {
   margin: 0;
   height: 30px;
+  // Fixed width so the date chips line up down the list instead of starting at
+  // a different offset on every row. "Carbohidrato" is the longest label.
+  min-width: 112px;
+  justify-content: center;
   --background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
   color: var(--app-theme-primary-on-surface);
   font-size: var(--app-theme-font-size-small);
