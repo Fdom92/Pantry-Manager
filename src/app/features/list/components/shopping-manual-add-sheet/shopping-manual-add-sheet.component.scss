@@ -2,6 +2,11 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  // Ionic's sheet wrapper doesn't clamp its height to initialBreakpoint (0.45)
+  // when the content is short, so it sizes to the intrinsic height and pushes
+  // the footer — and its buttons — below the visible area. Capping here to the
+  // modal's own breakpoint keeps them reachable without scrolling.
+  max-height: 45vh;
   padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-lg) 0;
   background: var(--ion-card-background);
 }
@@ -15,10 +20,6 @@
 
 .manual-add-sheet__input-wrapper {
   padding: var(--app-theme-spacing-lg) 0 var(--app-theme-spacing-md);
-
-  ion-input {
-    --border-radius: var(--app-theme-radius-md);
-  }
 }
 
 .sheet-footer {
