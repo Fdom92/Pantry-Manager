@@ -48,7 +48,7 @@ export class StorageService<T extends BaseDoc> {
 
   private reopenDatabase(): void {
     this.db = new PouchDB<T>(APP_DB_NAME, { auto_compaction: true });
-    this.logger.warn('[Storage] IDB connection closed — reopened PouchDB instance');
+    this.logger.warn('StorageService', 'IDB connection closed — reopened PouchDB instance');
   }
 
   private async withRetry<R>(op: () => Promise<R>): Promise<R> {
@@ -91,11 +91,12 @@ export class StorageService<T extends BaseDoc> {
       });
 
       if (!existing && withId._rev) {
-        this.logger.warn(`Dropping unexpected _rev for new doc: ${docId}`, { _rev: withId._rev });
+        this.logger.warn('StorageService', `Dropping unexpected _rev for new doc: ${docId}`, { _rev: withId._rev });
       }
 
       if (existing && withId._rev && withId._rev !== existing._rev) {
         this.logger.warn(
+          'StorageService',
           `_rev mismatch detected before upsert: ${docId}`,
           { incomingRev: withId._rev, storedRev: existing._rev }
         );
@@ -112,9 +113,9 @@ export class StorageService<T extends BaseDoc> {
       return { ...newDoc, _rev: res.rev } as T;
     } catch (err: unknown) {
       if (isPouchDbError(err) && err.status === 409) {
-        this.logger.warn(`Conflict while saving document: ${docId}`, err);
+        this.logger.warn('StorageService', `Conflict while saving document: ${docId}`, { err });
       }
-      this.logger.error('upsert error', err);
+      this.logger.error('StorageService', 'upsert error', err);
       throw err;
     }
   }
@@ -143,7 +144,7 @@ export class StorageService<T extends BaseDoc> {
         await this.db.remove(doc);
         return true;
       } catch (err) {
-        this.logger.error('remove error', err);
+        this.logger.error('StorageService', 'remove error', err);
         return false;
       }
     });
@@ -217,7 +218,7 @@ export class StorageService<T extends BaseDoc> {
         });
         return result.docs;
       } catch (err) {
-        this.logger.error('findByField error', err);
+        this.logger.error('StorageService', 'findByField error', err);
         return [];
       }
     });
@@ -231,7 +232,7 @@ export class StorageService<T extends BaseDoc> {
       await this.db.createIndex({ index: { fields } });
     } catch (err) {
       // Some errors appear when the index already exists; log and ignore them
-      this.logger.warn('ensureIndex warning', err);
+      this.logger.warn('StorageService', 'ensureIndex warning', { err });
     }
   }
 
@@ -256,7 +257,7 @@ export class StorageService<T extends BaseDoc> {
       if (change.doc) onChange(change.doc);
     })
     .on('error', err => {
-      this.logger.error('changes feed error', err);
+      this.logger.error('StorageService', 'changes feed error', err);
     });
 
     return feed;
@@ -280,14 +281,14 @@ export class StorageService<T extends BaseDoc> {
 
     const duplicateIds = this.findDuplicateIds(prepared);
     if (duplicateIds.length) {
-      this.logger.warn('bulkSave detected duplicate IDs', duplicateIds);
+      this.logger.warn('StorageService', 'bulkSave detected duplicate IDs', { duplicateIds });
     }
 
     const res = await this.db.bulkDocs(prepared as any);
     return prepared.map((doc, index) => {
       const outcome = res[index] as PouchDB.Core.Response & { error?: string };
       if (outcome?.error) {
-        this.logger.error(`bulkSave error for document: ${doc._id}`, outcome);
+        this.logger.error('StorageService', `bulkSave error for document: ${doc._id}`, outcome);
         return doc;
       }
       return { ...doc, _rev: outcome.rev } as T;
@@ -306,7 +307,7 @@ export class StorageService<T extends BaseDoc> {
 
     const typePrefix = ((doc as any)?.type ?? 'doc').toString().split(':')[0] || 'doc';
     const generatedId = createDocumentId(typePrefix);
-    this.logger.warn(`Generated missing _id for document`, { generatedId, type: (doc as any)?.type });
+    this.logger.warn('StorageService', `Generated missing _id for document`, { generatedId, type: (doc as any)?.type });
     return { ...doc, _id: generatedId } as T;
   }
 

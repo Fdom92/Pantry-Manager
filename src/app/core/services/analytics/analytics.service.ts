@@ -152,7 +152,7 @@ export class AnalyticsService {
     try {
       this.posthog.capture(event, this.sanitizeProps(props));
     } catch (err) {
-      this.logger.warn('[Analytics] track failed', { event, err });
+      this.logger.warn('AnalyticsService', 'track failed', { event, err });
     }
   }
 
@@ -226,7 +226,7 @@ export class AnalyticsService {
         },
       }) as PostHog;
     } catch (err) {
-      this.logger.error('[Analytics] posthog init failed', err);
+      this.logger.error('AnalyticsService', 'posthog init failed', err);
       this.posthog = null;
       this.readySignal.set(false);
     }
