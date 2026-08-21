@@ -1,7 +1,7 @@
 import { Injectable, computed, effect, inject, signal, DestroyRef } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { computeTodaySuggestion } from '@core/domain/dashboard';
-import { applyFifoConsumption, sumQuantities } from '@core/domain/pantry';
+import { applyFifoConsumption, isIncomplete, sumQuantities } from '@core/domain/pantry';
 import { daysUntilExpiry } from '@core/utils/date.util';
 import type { TodaySuggestion } from '@core/domain/dashboard';
 import type {
@@ -37,6 +37,9 @@ export interface DashboardAction {
   cta: ActionCta;
   dismissible: boolean;
 }
+
+/** Fewest incomplete products worth interrupting the home screen for. */
+const MIN_INCOMPLETE_TO_SURFACE = 1;
 
 @Injectable()
 export class DashboardStateService {
@@ -88,19 +91,18 @@ export class DashboardStateService {
     }, 0);
   });
 
-  readonly noExpiryDateCount = computed(() => {
-    return this.pantryItems().filter(item => {
-      if (item.isBasic) return false;
-      // Fresh items naturally lack precise dates — exclude from quality warnings
-      if (item.productType === 'fresh') return false;
-      const hasBatchDate = item.batches?.some(b => !!b.expirationDate);
-      const hasItemDate = !!item.expirationDate;
-      if (hasBatchDate || hasItemDate) return false;
-      // Exclude items where all batches are explicitly marked as no-expiry
-      const allMarkedNoExpiry = item.batches?.length > 0 && item.batches.every(b => !!b.noExpiry);
-      return !allMarkedNoExpiry;
-    }).length;
-  });
+  /**
+   * Counts exactly what the Pendientes chip and its bulk-fix sheet will show.
+   *
+   * This used to run its own predicate, which skipped `isBasic` items and all
+   * fresh products and only looked at dates. The dashboard could therefore say
+   * "3 products" and hand the user to a sheet listing 5, or offer nothing to fix
+   * for a product missing only its food type. `isIncomplete` is the one
+   * definition of pending, so the number here and the list there agree.
+   */
+  readonly incompleteItemCount = computed(
+    () => this.pantryItems().filter(isIncomplete).length
+  );
 
   readonly stalePantryItems = computed(() => {
     const now = this.getReferenceNow();
@@ -142,8 +144,19 @@ export class DashboardStateService {
     return item?.name ?? null;
   });
 
+  /**
+   * Surface the incomplete-data card only when there is nothing more urgent to
+   * say, and at least one product to fix.
+   *
+   * The threshold used to be three. That was calibrated when incomplete data was
+   * the normal state of a pantry and surfacing one or two products would have
+   * nagged constantly. Since the add flows infer a food type and a date, the
+   * incomplete ones are the exception — so one or two are real, and worth the
+   * one line. Leaving it at three meant the home screen said "all under control"
+   * while the Pendientes chip showed two and the Insights card listed them.
+   */
   readonly hasLowDataQuality = computed((): boolean =>
-    !this.todaySuggestion() && this.noExpiryDateCount() >= 3
+    !this.todaySuggestion() && this.incompleteItemCount() >= MIN_INCOMPLETE_TO_SURFACE
   );
 
   readonly nextExpiringItem = computed((): { name: string; daysToExpiry: number } | null => {

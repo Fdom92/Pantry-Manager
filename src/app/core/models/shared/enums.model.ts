@@ -24,6 +24,9 @@ export enum FoodType {
   VEGETABLE = 'vegetable',
   FRUIT = 'fruit',
   DAIRY = 'dairy',
+  BEVERAGE = 'beverage',
+  /** Oil, salt, vinegar, tinned goods — food that effectively does not spoil. */
+  NON_PERISHABLE = 'non-perishable',
   HOUSEHOLD = 'household',
   OTHER = 'other'
 }

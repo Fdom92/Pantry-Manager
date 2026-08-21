@@ -115,7 +115,7 @@
     },
     "pantry": {
       "title": "La dispensa è vuota",
-      "subtitle": "Aggiungi i prodotti che vuoi controllare\n(con quantità e scadenza)"
+      "subtitle": "Aggiungi i prodotti che vuoi controllare\n(con quantità esatta e lotti)"
     },
     "shopping": {
       "title": "Tutto in ordine"
@@ -203,7 +203,10 @@
         "title": "Tutto sotto controllo",
         "hint": "Niente di urgente oggi — la tua dispensa è in ottima forma",
         "nextExpiry": "Prossima scadenza: {{name}} tra {{days}} giorni",
-        "missingDates": "{{count}} prodotti senza data di scadenza · aggiungile per vedere i suggerimenti"
+        "incompleteTitle": "Dati mancanti",
+        "incompleteData_one": "1 prodotto con dati incompleti · completalo per vedere i suggerimenti",
+        "incompleteData_other": "{{count}} prodotti con dati incompleti · completali per vedere i suggerimenti",
+        "fixCta": "Completa i sospesi"
       },
       "secondary": {
         "days": "{{count}} giorni"
@@ -668,8 +671,13 @@
         "vegetable": "Verdura",
         "fruit": "Frutta",
         "dairy": "Latticino",
+        "beverage": "Bevanda",
+        "non-perishable": "Non deperibile",
         "other": "Altro",
         "household": "Casa"
+      },
+      "expiry": {
+        "suggestedHint": "La data è suggerita in base al tipo di alimento. Modificala se non torna."
       }
     },
     "detail": {
@@ -740,7 +748,17 @@
       "noDate": "Aggiungi data",
       "zeroHint": "Sparirà dalla dispensa finché non aggiungi scorte",
       "zeroHintBasic": "Sparirà dalla dispensa e comparirà nella tua lista della spesa",
+      "emptyOut": "Segna come esaurito",
       "hint": "Regola la quantità. Verrà salvata alla chiusura."
+    },
+    "pendientesSheet": {
+      "title": "Completa i prodotti in sospeso",
+      "subtitle": "Inserisci tipo di alimento e data di scadenza per questi prodotti",
+      "empty": "Nessun prodotto in sospeso",
+      "dateLabel": "Aggiungi data",
+      "batchDateNote": "Verrà applicata a tutti i {{ count }} lotti senza data",
+      "saveAll": "Salva tutto",
+      "savedToast": "{{ count }} prodotto/i aggiornato/i"
     },
     "toasts": {
       "locationRequired": "Seleziona una posizione prima di salvare.",
@@ -787,7 +805,7 @@
       "showLess": "Vedi meno",
       "emptyState": {
         "title": "Prodotti freschi",
-        "subtitle": "Aggiungi quello che usi ogni settimana\n(senza date esatte)",
+        "subtitle": "Aggiungi quello che usi ogni settimana\n(sufficiente, poco o niente)",
         "cta": "+ Aggiungi freschi"
       },
       "keepInStock": "Rifornisci automaticamente",

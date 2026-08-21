@@ -115,7 +115,7 @@
     },
     "pantry": {
       "title": "A despensa está vazia",
-      "subtitle": "Adiciona produtos que queiras controlar\n(com quantidade e validade)"
+      "subtitle": "Adiciona produtos que queiras controlar\n(com quantidade exata e lotes)"
     },
     "shopping": {
       "title": "Tudo em ordem"
@@ -203,7 +203,10 @@
         "title": "Tudo sob controlo",
         "hint": "Nada urgente hoje — a sua despensa está em ótima forma",
         "nextExpiry": "Próxima validade: {{name}} em {{days}} dias",
-        "missingDates": "{{count}} produtos sem data de validade · adicione-as para ver sugestões"
+        "incompleteTitle": "Faltam dados",
+        "incompleteData_one": "1 produto com dados incompletos · completa-o para ver sugestões",
+        "incompleteData_other": "{{count}} produtos com dados incompletos · completa-os para ver sugestões",
+        "fixCta": "Completar pendentes"
       },
       "secondary": {
         "days": "{{count}} dias"
@@ -668,8 +671,13 @@
         "vegetable": "Vegetal",
         "fruit": "Fruta",
         "dairy": "Laticínio",
+        "beverage": "Bebida",
+        "non-perishable": "Não perecível",
         "other": "Outro",
         "household": "Casa"
+      },
+      "expiry": {
+        "suggestedHint": "A data é sugerida a partir do tipo de alimento. Edita-a se não bater certo."
       }
     },
     "detail": {
@@ -740,7 +748,17 @@
       "noDate": "Adicionar data",
       "zeroHint": "Vai desaparecer da despensa até você adicionar mais",
       "zeroHintBasic": "Vai desaparecer da despensa e aparecer na sua lista de compras",
+      "emptyOut": "Marcar como esgotado",
       "hint": "Ajuste a quantidade. Será guardada ao fechar."
+    },
+    "pendientesSheet": {
+      "title": "Completar produtos pendentes",
+      "subtitle": "Preencha o tipo de alimento e a data de validade destes produtos",
+      "empty": "Nenhum produto pendente",
+      "dateLabel": "Adicionar data",
+      "batchDateNote": "Será aplicada aos {{ count }} lotes sem data",
+      "saveAll": "Guardar tudo",
+      "savedToast": "{{ count }} produto(s) atualizado(s)"
     },
     "toasts": {
       "locationRequired": "Seleciona uma localização antes de guardar.",
@@ -787,7 +805,7 @@
       "showLess": "Ver menos",
       "emptyState": {
         "title": "Frescos",
-        "subtitle": "Adiciona o que usas cada semana\n(sem datas exatas)",
+        "subtitle": "Adiciona o que usas cada semana\n(suficiente, pouco ou nada)",
         "cta": "+ Adicionar frescos"
       },
       "keepInStock": "Reabastecer automaticamente",

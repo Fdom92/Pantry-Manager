@@ -5,6 +5,7 @@ import {
   getFreshExpiryUrgency,
   isFreshKeepInStock,
   qtyToFreshState,
+  restockFreshItem,
 } from './fresh.domain';
 import type { PantryItem } from '@core/models/pantry';
 
@@ -168,5 +169,54 @@ describe('consolidateBatchesForFresh', () => {
   it('returns none-state quantity for empty batches', () => {
     const result = consolidateBatchesForFresh([], NEW_BATCH_ID);
     expect(result.quantity).toBe(0); // qtyToFreshState(0)=none → freshStateToQty(none)=0
+  });
+});
+
+describe('restockFreshItem', () => {
+  const TS = '2026-08-19T10:00:00.000Z';
+
+  it('refills to the sufficient state', () => {
+    const item = makeItem({ batches: [{ batchId: 'b1', quantity: FRESH_QTY.none }] });
+    const result = restockFreshItem(item, TS, 'fallback');
+    expect(result.batches[0].quantity).toBe(FRESH_QTY.sufficient);
+  });
+
+  it('keeps a fresh item on a single batch instead of appending lots', () => {
+    const item = makeItem({
+      batches: [
+        { batchId: 'b1', quantity: FRESH_QTY.low },
+        { batchId: 'b2', quantity: FRESH_QTY.low },
+      ],
+    });
+    const result = restockFreshItem(item, TS, 'fallback');
+    expect(result.batches.length).toBe(1);
+    expect(result.batches[0].batchId).toBe('b1');
+  });
+
+  it('preserves the existing batch metadata', () => {
+    const item = makeItem({
+      batches: [{
+        batchId: 'b1', quantity: FRESH_QTY.none,
+        expirationDate: '2026-09-01', opened: true, locationId: 'fridge',
+      }],
+    });
+    const result = restockFreshItem(item, TS, 'fallback');
+    expect(result.batches[0].expirationDate).toBe('2026-09-01');
+    expect(result.batches[0].opened).toBeTrue();
+    expect(result.batches[0].locationId).toBe('fridge');
+  });
+
+  it('uses the fallback batch id when the item has no batches yet', () => {
+    const result = restockFreshItem(makeItem({ batches: [] }), TS, 'fallback');
+    expect(result.batches[0].batchId).toBe('fallback');
+    expect(result.batches[0].quantity).toBe(FRESH_QTY.sufficient);
+  });
+
+  it('stamps updatedAt and does not mutate the input', () => {
+    const item = makeItem({ batches: [{ batchId: 'b1', quantity: FRESH_QTY.none }] });
+    const result = restockFreshItem(item, TS, 'fallback');
+    expect(result.updatedAt).toBe(TS);
+    expect(result).not.toBe(item);
+    expect(item.batches[0].quantity).toBe(FRESH_QTY.none);
   });
 });

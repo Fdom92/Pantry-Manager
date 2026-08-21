@@ -44,6 +44,19 @@ export function normalizeSearchField(value: unknown): string {
   return stripDiacritics(normalizeWhitespaceLowercase(String(value ?? '')));
 }
 
+/**
+ * Normalize a product name for **identity** — deciding whether two names refer
+ * to the same product.
+ *
+ * Must strip diacritics, and must stay in step with `normalizeSearchField`,
+ * which is what the autocomplete searches with. When the two disagree the
+ * autocomplete offers you an existing "Atún" while the add flow concludes your
+ * typed "Atun" is a different product, and you end up with both in the pantry.
+ */
+export function normalizeProductKey(value: string | null | undefined): string {
+  return normalizeSearchQuery(value);
+}
+
 export function normalizeLocaleCode(locale?: string | null): string | null {
   if (!locale) {
     return null;
@@ -146,7 +159,10 @@ export function dedupeByNormalizedKey<T>(
   const seen = new Set<string>();
   const result: T[] = [];
   for (const item of items) {
-    const key = normalizeLowercase(keyFn(item));
+    // normalizeProductKey, not normalizeLowercase: every caller keys on a
+    // product name, and the search that found those names ignores accents. A
+    // stricter key here would let "Atún" and "Atun" through as two entries.
+    const key = normalizeProductKey(keyFn(item));
     if (!key || seen.has(key)) {
       continue;
     }

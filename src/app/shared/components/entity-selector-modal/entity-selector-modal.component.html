@@ -52,7 +52,7 @@
         @if (entries.length) {
           <section class="form-section entity-selector-modal__list">
             @for (entry of entries; track entry.id) {
-              <div class="entity-selector-item">
+              <div class="entity-selector-item" [class.entity-selector-item--stacked]="showEntryFoodType">
                 <h3 class="entity-selector-item-name">{{ entry.title }}</h3>
                 <div class="entity-selector-controls">
                   @if (showEntryQuantity) {
@@ -73,14 +73,12 @@
                         <ion-icon slot="icon-only" name="add-outline"></ion-icon>
                       </ion-button>
                     </div>
-                  } @else {
-                    <ion-button
-                      fill="clear"
-                      size="small"
-                      color="medium"
-                      (click)="adjustEntry.emit({ entry, delta: -1 })">
-                      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-                    </ion-button>
+                  }
+                  @if (showEntryFoodType) {
+                    <app-food-type-picker
+                      [foodType]="entry.foodType ?? null"
+                      (foodTypeChange)="entryFoodTypeChange.emit({ entry, foodType: $event })">
+                    </app-food-type-picker>
                   }
                   @if (showEntryDate) {
                     @if (entryDateQuickOnly) {
@@ -99,10 +97,26 @@
                       </app-expiry-picker>
                     }
                   }
+                  @if (!showEntryQuantity) {
+                    <!-- Last in the row on purpose: it is the escape hatch for a
+                         mistaken pick, not part of what the user reads. -->
+                    <ion-button
+                      class="entity-selector-remove"
+                      fill="clear"
+                      size="small"
+                      color="medium"
+                      [attr.aria-label]="'common.actions.delete' | translate"
+                      (click)="adjustEntry.emit({ entry, delta: -1 })">
+                      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+                    </ion-button>
+                  }
                 </div>
               </div>
             }
           </section>
+          @if (entriesHint) {
+            <p class="entity-selector-modal__hint">{{ entriesHint }}</p>
+          }
         } @else if (entriesEmptyLabel) {
           <p class="entity-selector-modal__empty">{{ entriesEmptyLabel }}</p>
         }
@@ -110,20 +124,23 @@
         <div class="entity-selector-modal__extras">
           <ng-content select="[extras]"></ng-content>
         </div>
-
-        <section class="form-section form-section--cta">
-          <ion-button
-            expand="block" shape="round"
-            color="primary"
-            [disabled]="disableSave || saving"
-            (click)="save.emit()">
-            @if (saving) {
-              <ion-spinner slot="start" name="lines-small"></ion-spinner>
-            }
-            {{ saveLabel }}
-          </ion-button>
-        </section>
       </div>
+
+      <!-- The CTA is pinned outside .sheet-body on purpose: inside it, the
+           button scrolled away with the entry list and ended up off-screen
+           once the user added enough products to overflow the sheet. -->
+      <ion-footer class="sheet-footer">
+        <ion-button
+          expand="block" shape="round"
+          color="primary"
+          [disabled]="disableSave || saving"
+          (click)="save.emit()">
+          @if (saving) {
+            <ion-spinner slot="start" name="lines-small"></ion-spinner>
+          }
+          {{ saveLabel }}
+        </ion-button>
+      </ion-footer>
     </div>
   </ng-template>
 </ion-modal>

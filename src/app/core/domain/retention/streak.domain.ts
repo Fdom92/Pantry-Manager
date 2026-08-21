@@ -33,14 +33,28 @@ function tokensOf(state: StreakState): number {
 }
 
 /**
- * Returns floor(days) between two ISO yyyy-mm-dd strings.
- * Positive when b is after a.
+ * Whole calendar days between two ISO yyyy-mm-dd strings. Positive when b is
+ * after a.
+ *
+ * Counted through Date.UTC on purpose. Local midnights are not 24 hours apart
+ * across a daylight-saving change: the two consecutive days either side of a
+ * spring-forward are 23 hours apart, so dividing by a fixed day gave 0 for
+ * consecutive dates. The caller matches `gap === 1` to continue a streak and
+ * falls through to reset otherwise, so on the last Sunday of March every user
+ * with a streak silently lost it — the one mechanic in the app whose whole job
+ * is bringing people back. UTC has no such transitions, and these are calendar
+ * dates with no time of day to preserve.
  */
 function daysBetween(a: string, b: string): number {
-  const msA = new Date(`${a}T00:00:00`).getTime();
-  const msB = new Date(`${b}T00:00:00`).getTime();
+  const toUtcMs = (iso: string): number => {
+    const [y, m, d] = iso.split('-').map(Number);
+    if (!y || !m || !d) return Number.NaN;
+    return Date.UTC(y, m - 1, d);
+  };
+  const msA = toUtcMs(a);
+  const msB = toUtcMs(b);
   if (Number.isNaN(msA) || Number.isNaN(msB)) return 0;
-  return Math.floor((msB - msA) / 86_400_000);
+  return Math.round((msB - msA) / 86_400_000);
 }
 
 /**

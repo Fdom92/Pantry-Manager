@@ -34,8 +34,16 @@ export function sumQuantities(
 }
 
 /**
- * Merge batches that share the same expiration date and location.
- * Returns a new array without mutating the input batches.
+ * Merge batches that share the same expiration date and location, plus batches
+ * explicitly marked as never expiring.
+ *
+ * The two dateless cases are not the same thing. A batch with no date is one
+ * whose expiry is *unknown* — two of them could spoil weeks apart, so they stay
+ * separate. `noExpiry: true` is a statement that there is no date to know, which
+ * makes two such batches interchangeable and safe to add together. Without that
+ * distinction every restock of salt or bin bags appended another row, and since
+ * household products are now marked no-expiry automatically, that went from rare
+ * to routine.
  */
 export function mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
   if (!Array.isArray(batches) || batches.length <= 1) {
@@ -48,7 +56,11 @@ export function mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
   for (const batch of batches) {
     const expiryKey = normalizeTrim(batch.expirationDate);
     const locationKey = normalizeTrim(batch.locationId);
-    const key = expiryKey ? `${locationKey}::${expiryKey}` : '';
+    const key = expiryKey
+      ? `${locationKey}::${expiryKey}`
+      : batch.noExpiry
+        ? `${locationKey}::never`
+        : '';
 
     if (!key) {
       merged.push({ ...batch });
@@ -65,6 +77,7 @@ export function mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
 
     existing.quantity = toNumberOrZero(existing.quantity) + toNumberOrZero(batch.quantity);
     existing.opened = Boolean(existing.opened || batch.opened);
+    existing.noExpiry = existing.noExpiry || batch.noExpiry || undefined;
   }
 
   return merged;

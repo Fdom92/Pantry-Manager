@@ -48,6 +48,8 @@ export const ANALYTICS_EVENTS = {
   PANTRY_CONSUME_MODAL_OPENED: 'pantry_consume_modal_opened',
   PANTRY_EDIT_MODAL_OPENED: 'pantry_edit_modal_opened',
   PANTRY_BATCHES_MODAL_OPENED: 'pantry_batches_modal_opened',
+  PANTRY_PENDIENTES_SHEET_OPENED: 'pantry_pendientes_sheet_opened',
+  PANTRY_PENDIENTES_SAVED: 'pantry_pendientes_saved',
 
   // Shopping list
   SHOPPING_BUY_COMPLETED: 'shopping_buy_completed',

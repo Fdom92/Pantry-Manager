@@ -1,7 +1,9 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
-import { getItemStatusState, isIncomplete, sumQuantities } from '@core/domain/pantry';
+import { getItemStatusState, hasMissingExpiry, isIncomplete, sumQuantities } from '@core/domain/pantry';
+import { FOOD_TYPE_PROFILE } from '@core/domain/pantry/food-type-profile.domain';
+import { parseExpiryMs } from '@core/utils/date.util';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 export interface InventorySnapshot {
@@ -26,14 +28,13 @@ export interface ActivityMetrics {
   windowDays: number;
 }
 
-const FOOD_TYPE_DISPLAY_ORDER: FoodType[] = [
-  FoodType.PROTEIN,
-  FoodType.VEGETABLE,
-  FoodType.FRUIT,
-  FoodType.DAIRY,
-  FoodType.CARB,
-  // OTHER excluded: too generic to surface meaningful insights
-];
+/** Chart order, derived from the one food-type table. */
+const FOOD_TYPE_DISPLAY_ORDER: FoodType[] = (
+  Object.entries(FOOD_TYPE_PROFILE) as [FoodType, { chartRank: number | null }][]
+)
+  .filter((entry): entry is [FoodType, { chartRank: number }] => entry[1].chartRank !== null)
+  .sort((x, y) => x[1].chartRank - y[1].chartRank)
+  .map(([foodType]) => foodType);
 
 export interface DistributionMetrics {
   foodTypes: { foodType: FoodType; count: number }[];
@@ -72,14 +73,12 @@ export function computeInventorySnapshot(items: PantryItem[], now: Date): Invent
       result.basicsOutOfStock += 1;
     }
 
-    if (item.productType !== 'fresh') {
-      const hasBatchDate = (item.batches ?? []).some(b => !!b.expirationDate);
-      const allMarkedNoExpiry =
-        (item.batches ?? []).length > 0 &&
-        (item.batches ?? []).every(b => !!b.noExpiry);
-      if (!hasBatchDate && !allMarkedNoExpiry) {
-        result.noExpiryDate += 1;
-      }
+    // hasMissingExpiry, not a local rule: it counts an item with ANY dateless
+    // batch, which is what the Pendientes chip and its sheet act on. The old
+    // inline check only counted items where NO batch had a date, so a two-lot
+    // product with one date was pending in one screen and fine in another.
+    if (hasMissingExpiry(item)) {
+      result.noExpiryDate += 1;
     }
 
     if (!item.foodType) {
@@ -230,15 +229,11 @@ export interface FoodCoverageResult {
   unit: FoodCoverageUnit;
 }
 
-const FOOD_TYPE_WEIGHTS: Record<FoodType, number> = {
-  [FoodType.PROTEIN]:   1.2,
-  [FoodType.CARB]:      1.1,
-  [FoodType.VEGETABLE]: 0.9,
-  [FoodType.FRUIT]:     0.6,
-  [FoodType.DAIRY]:     0.6,
-  [FoodType.OTHER]:     0.4,
-  [FoodType.HOUSEHOLD]: 0,
-};
+/** Coverage weights, derived from the one food-type table. */
+const FOOD_TYPE_WEIGHTS: Record<FoodType, number> = Object.fromEntries(
+  (Object.entries(FOOD_TYPE_PROFILE) as [FoodType, { coverageWeight: number }][])
+    .map(([type, profile]) => [type, profile.coverageWeight]),
+) as Record<FoodType, number>;
 
 const MS_PER_DAY_COVERAGE = 86_400_000;
 
@@ -271,7 +266,9 @@ export function computeFoodCoverage(
     const hasNoExpiry = (item.batches ?? []).every(b => !!b.noExpiry);
     if (!hasNoExpiry) {
       const earliestMs = (item.batches ?? [])
-        .map(b => b.expirationDate ? new Date(b.expirationDate).getTime() : null)
+        // parseExpiryMs, not new Date(): a plain YYYY-MM-DD parses as UTC midnight,
+        // which lands on the previous day for anyone west of Greenwich.
+        .map(b => parseExpiryMs(b.expirationDate))
         .filter((ms): ms is number => ms !== null)
         .sort((a, b) => a - b)[0];
 

@@ -115,7 +115,7 @@
     },
     "pantry": {
       "title": "Le garde-manger est vide",
-      "subtitle": "Ajoute les produits que tu veux surveiller\n(avec quantité et date de péremption)"
+      "subtitle": "Ajoute les produits que tu veux surveiller\n(avec quantité exacte et lots)"
     },
     "shopping": {
       "title": "Tout est en ordre"
@@ -203,7 +203,10 @@
         "title": "Tout est sous contrôle",
         "hint": "Rien d'urgent aujourd'hui — votre garde-manger est en parfait état",
         "nextExpiry": "Prochaine expiration : {{name}} dans {{days}} jours",
-        "missingDates": "{{count}} produits sans date d'expiration · ajoutez-les pour voir des suggestions"
+        "incompleteTitle": "Données manquantes",
+        "incompleteData_one": "1 produit aux données incomplètes · complétez-le pour voir des suggestions",
+        "incompleteData_other": "{{count}} produits aux données incomplètes · complétez-les pour voir des suggestions",
+        "fixCta": "Compléter En attente"
       },
       "secondary": {
         "days": "{{count}} jours"
@@ -668,8 +671,13 @@
         "vegetable": "Légume",
         "fruit": "Fruit",
         "dairy": "Produit laitier",
+        "beverage": "Boisson",
+        "non-perishable": "Non périssable",
         "other": "Autre",
         "household": "Ménage"
+      },
+      "expiry": {
+        "suggestedHint": "La date est suggérée d'après le type d'aliment. Modifiez-la si besoin."
       }
     },
     "detail": {
@@ -740,7 +748,17 @@
       "noDate": "Ajouter date",
       "zeroHint": "Il disparaîtra de votre garde-manger jusqu'à ce que vous en rajoutiez",
       "zeroHintBasic": "Il disparaîtra de votre garde-manger et apparaîtra dans votre liste de courses",
+      "emptyOut": "Marquer comme épuisé",
       "hint": "Ajustez la quantité. Elle sera sauvegardée à la fermeture."
+    },
+    "pendientesSheet": {
+      "title": "Compléter les produits en attente",
+      "subtitle": "Renseignez le type d'aliment et la date de péremption de ces produits",
+      "empty": "Aucun produit en attente",
+      "dateLabel": "Ajouter une date",
+      "batchDateNote": "S'appliquera aux {{ count }} lots sans date",
+      "saveAll": "Tout enregistrer",
+      "savedToast": "{{ count }} produit(s) mis à jour"
     },
     "toasts": {
       "locationRequired": "Sélectionnez un emplacement avant d’enregistrer.",
@@ -787,7 +805,7 @@
       "showLess": "Voir moins",
       "emptyState": {
         "title": "Produits frais",
-        "subtitle": "Ajoute ce que tu utilises chaque semaine\n(sans dates exactes)",
+        "subtitle": "Ajoute ce que tu utilises chaque semaine\n(assez, peu ou vide)",
         "cta": "+ Ajouter des frais"
       },
       "keepInStock": "Réapprovisionner automatiquement",

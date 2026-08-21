@@ -1,3 +1,4 @@
+import { normalizeProductKey } from '@core/utils/normalization.util';
 import type {
   ParsedReceiptItem,
   ReceiptParseResult,
@@ -449,7 +450,11 @@ function findZoneStart(rows: ReceiptRow[]): number {
 function consolidate(items: ParsedReceiptItem[]): ParsedReceiptItem[] {
   const byKey = new Map<string, ParsedReceiptItem>();
   for (const item of items) {
-    const key = item.rawName.toLowerCase();
+    // normalizeProductKey, not toLowerCase: OCR is not consistent about accents
+    // or trailing spaces within one receipt, and these chains print a row per
+    // unit, so "ATÚN" and "ATUN " have to land on the same key or the product
+    // shows up twice in the review sheet instead of as a quantity of two.
+    const key = normalizeProductKey(item.rawName);
     const existing = byKey.get(key);
     if (existing) {
       existing.quantity = clampQuantity(existing.quantity + item.quantity);

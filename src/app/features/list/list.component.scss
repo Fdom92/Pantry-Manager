@@ -194,17 +194,26 @@ ion-card-title {
   cursor: pointer;
 }
 
+// Ionic sizes a `slot="start"` element to its content, so a long product name
+// grew the row and pushed the buy button past the edge — visibly out of line
+// with every other row, and clipped. Taking the free space instead lets the
+// name wrap and leaves the button where the eye expects it.
 .item-body {
   display: flex;
   flex-direction: column;
   gap: var(--app-theme-spacing-2xs);
   padding: var(--app-theme-spacing-sm) 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .item-name {
   font-size: var(--app-theme-font-size-title);
   font-weight: var(--app-theme-font-weight-bold);
   color: var(--app-theme-text-color);
+  // Wrap rather than run on: these are real supermarket names, some of them
+  // long ("Smileat zanahoria pera y plátano").
+  overflow-wrap: anywhere;
 }
 
 .item-meta {

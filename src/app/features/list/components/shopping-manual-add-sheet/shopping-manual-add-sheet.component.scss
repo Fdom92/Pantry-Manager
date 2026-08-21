@@ -1,9 +1,8 @@
+@use '../../../../shared/styles/modal-sheet' as sheet;
+
 .manual-add-sheet__content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  @include sheet.layout(45vh);
   padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-lg) 0;
-  background: var(--ion-card-background);
 }
 
 .sheet-header__title {
@@ -15,10 +14,6 @@
 
 .manual-add-sheet__input-wrapper {
   padding: var(--app-theme-spacing-lg) 0 var(--app-theme-spacing-md);
-
-  ion-input {
-    --border-radius: var(--app-theme-radius-md);
-  }
 }
 
 .sheet-footer {

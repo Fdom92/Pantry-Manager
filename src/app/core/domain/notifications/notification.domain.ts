@@ -1,5 +1,5 @@
 import type { PantryItem } from '@core/models/pantry';
-import { classifyExpiry } from '@core/domain/pantry/pantry-status.domain';
+import { classifyExpiry, getExpiryModeFromFoodType } from '@core/domain/pantry/pantry-status.domain';
 import { sumQuantities } from '@core/domain/pantry/pantry-batch.domain';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { parseExpiryMs } from '@core/utils/date.util';
@@ -17,8 +17,22 @@ export function buildNextTriggerDate(now: Date, hour: number): Date {
   return trigger;
 }
 
+/**
+ * Products whose expiry the app actually acts on, so a notification cannot
+ * contradict the screen the user opens next.
+ *
+ * classifyExpiry only reads a date; it knows nothing about the food type. A bin
+ * bag or a bottle of bleach carrying an old date is 'normal' everywhere in the
+ * app — getExpiryModeFromFoodType ignores it — but the notification counted it
+ * as expired and told the user to go and look.
+ */
+function respectsExpiry(item: PantryItem): boolean {
+  return getExpiryModeFromFoodType(item.foodType) !== 'ignore';
+}
+
 export function filterExpiredItems(items: PantryItem[], now: Date): PantryItem[] {
   return items.filter(item =>
+    respectsExpiry(item) &&
     (item.batches ?? []).some(
       batch => batch.expirationDate && classifyExpiry(batch.expirationDate, now, 0) === 'expired'
     )
@@ -35,6 +49,7 @@ export function filterNearExpiryItems(
   windowDays: number
 ): PantryItem[] {
   return items.filter(item => {
+    if (!respectsExpiry(item)) return false;
     const batches = item.batches ?? [];
     const hasExpired = batches.some(
       b => b.expirationDate && classifyExpiry(b.expirationDate, now, 0) === 'expired'

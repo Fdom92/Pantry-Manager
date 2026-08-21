@@ -173,7 +173,12 @@
       }
 
       <!-- SECTION 6: Calidad del inventario -->
-      @if (facade.inventorySnapshot().total >= 1) {
+      <!-- Only worth showing while something is actually missing. Since the add
+           flows infer food type and expiry, a complete inventory would otherwise
+           render a permanent 100% bar and two empty ones with no action behind
+           them. `pendientes` is the same isIncomplete() predicate that powers the
+           Pendientes chip, so the card and its CTA appear and vanish together. -->
+      @if (facade.inventorySnapshot().total >= 1 && facade.inventorySnapshot().pendientes > 0) {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.quality.title' | translate }}</h3>
 

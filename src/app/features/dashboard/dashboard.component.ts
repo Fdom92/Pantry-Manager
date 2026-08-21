@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, ViewChild, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { NavController } from '@ionic/angular/standalone';
+import { PantryNavigationPresetService } from '@core/services/pantry/pantry-navigation-preset.service';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import type { DashboardAction } from '@core/services/dashboard/dashboard-state.service';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
@@ -71,6 +73,8 @@ export class DashboardComponent implements OnDestroy {
   private readonly insights = inject(InsightsStateService);
   private readonly insightsTracking = inject(InsightsTrackingStateService);
   private readonly toast = inject(ToastController);
+  private readonly navCtrl = inject(NavController);
+  private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly translate = inject(TranslateService);
   readonly isInsightsPro = this.insights.isPro;
   readonly repositionPredictions = this.insights.repositionPredictions;
@@ -149,4 +153,15 @@ export class DashboardComponent implements OnDestroy {
     // Hide reason when expiry date is visible — date already communicates urgency
     return !s.protagonist.expirationDate;
   }
+
+  /**
+   * Same destination as the Insights quality card: the preset both filters the
+   * pantry to pending items and opens the bulk-fix sheet once the list has
+   * loaded (see PantryStateService.ionViewWillEnter).
+   */
+  goToPendientes(): void {
+    this.navigationPreset.setPending({ pendientes: true });
+    void this.navCtrl.navigateRoot('/pantry');
+  }
+
 }

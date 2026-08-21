@@ -115,7 +115,7 @@
     },
     "pantry": {
       "title": "Pantry is empty",
-      "subtitle": "Add products you want to track\n(with quantity and expiry)"
+      "subtitle": "Add products you want to track\n(with exact quantity and batches)"
     },
     "shopping": {
       "title": "All set"
@@ -203,7 +203,10 @@
         "title": "All under control",
         "hint": "Nothing urgent today — your pantry is in great shape",
         "nextExpiry": "Next expiry: {{name}} in {{days}} days",
-        "missingDates": "{{count}} products without expiry date · add them to see suggestions"
+        "incompleteTitle": "Missing details",
+        "incompleteData_one": "1 product with incomplete data · complete it to see suggestions",
+        "incompleteData_other": "{{count}} products with incomplete data · complete them to see suggestions",
+        "fixCta": "Complete pending items"
       },
       "secondary": {
         "days": "{{count}} days"
@@ -668,8 +671,13 @@
         "vegetable": "Vegetable",
         "fruit": "Fruit",
         "dairy": "Dairy",
+        "beverage": "Drink",
+        "non-perishable": "Non-perishable",
         "other": "Other",
         "household": "Household"
+      },
+      "expiry": {
+        "suggestedHint": "The date is suggested from the food type. Edit it if it doesn't fit."
       }
     },
     "detail": {
@@ -740,7 +748,17 @@
       "expiryDate": "Expiry date (optional)",
       "noDate": "Add date",
       "zeroHint": "It'll disappear from your pantry until you restock it",
-      "zeroHintBasic": "It'll disappear from your pantry and show up in your shopping list"
+      "zeroHintBasic": "It'll disappear from your pantry and show up in your shopping list",
+      "emptyOut": "Mark as empty"
+    },
+    "pendientesSheet": {
+      "title": "Complete pending items",
+      "subtitle": "Fill in food type and expiry date for these products",
+      "empty": "No pending products",
+      "dateLabel": "Add date",
+      "batchDateNote": "Will apply to all {{ count }} dateless batches",
+      "saveAll": "Save all",
+      "savedToast": "{{ count }} product(s) updated"
     },
     "toasts": {
       "locationRequired": "Select a location before saving.",
@@ -787,7 +805,7 @@
       "showLess": "See less",
       "emptyState": {
         "title": "Fresh items",
-        "subtitle": "Add what you use every week\n(no exact dates needed)",
+        "subtitle": "Add what you use every week\n(plenty, low or out)",
         "cta": "+ Add fresh items"
       },
       "keepInStock": "Restock automatically",

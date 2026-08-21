@@ -4,6 +4,7 @@ import { FoodType } from '@core/models/shared/enums.model';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { parseExpiryDate } from '@core/utils/date.util';
 import { collectBatches, sumQuantities } from './pantry-batch.domain';
+import { FOOD_TYPE_PROFILE, type ExpiryMode } from './food-type-profile.domain';
 import { FRESH_NEAR_EXPIRY_WINDOW_DAYS, FRESH_QTY } from './fresh.domain';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
@@ -11,16 +12,12 @@ export const REVIEW_GRACE_DAYS = 7;
 
 export function getExpiryModeFromFoodType(
   foodType: FoodType | undefined
-): 'strict' | 'flexible' | 'ignore' {
-  switch (foodType) {
-    case FoodType.DAIRY:
-    case FoodType.CARB:
-      return 'flexible';
-    case FoodType.HOUSEHOLD:
-      return 'ignore';
-    default:
-      return 'strict';
-  }
+): ExpiryMode {
+  // No switch to keep in step any more: the mode lives beside the shelf life in
+  // FOOD_TYPE_PROFILE, where the type system refuses to pair 'ignore' with a
+  // real shelf life, or a real shelf life with 'ignore'.
+  if (!foodType) return 'strict';
+  return FOOD_TYPE_PROFILE[foodType].expiryMode;
 }
 
 function getDaysPastExpiry(

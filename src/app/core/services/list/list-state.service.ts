@@ -18,14 +18,16 @@ import {
   type ShoppingSummary,
   ShoppingReason,
 } from '@core/models/list';
-import { FRESH_QTY } from '@core/domain/pantry/fresh.domain';
+import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
+import { generateBatchId } from '@core/utils/batch-id.util';
 import { LanguageService } from '../shared/language.service';
 import { createDocumentId, createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
+import { resolveSuggestedExpiry, toLotExpiry } from '@core/domain/pantry/food-type-inference.domain';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
-import { normalizeLowercase, normalizeSupermarketValue } from '@core/utils/normalization.util';
+import { normalizeLowercase, normalizeProductKey, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import type jsPDF from 'jspdf';
 import { ANALYTICS_EVENTS } from '@core/constants';
@@ -107,15 +109,7 @@ export class ListStateService {
       const timestamp = new Date().toISOString();
       if (isFresh) {
         const item = suggestion.item;
-        const existingBatches = item.batches ?? [];
-        const updatedBatches = existingBatches.length > 0
-          ? [{ ...existingBatches[0], quantity: FRESH_QTY.sufficient }, ...existingBatches.slice(1)]
-          : [{ batchId: `batch-${Date.now()}`, quantity: FRESH_QTY.sufficient }];
-        const updatedFresh: PantryItem = {
-          ...item,
-          batches: updatedBatches,
-          updatedAt: timestamp,
-        };
+        const updatedFresh = restockFreshItem(item, timestamp, generateBatchId());
         await this.pantryStore.updateItem(updatedFresh);
         await this.eventManager.logAdvancedEdit(item, updatedFresh, 'pantry_card');
       } else {
@@ -123,7 +117,11 @@ export class ListStateService {
           ? opts.quantityOverride
           : suggestion.suggestedQuantity;
         const previous = suggestion.item;
-        const updated = await this.pantryStore.addNewLot(id, { quantity });
+        // Restocking an existing product: derive the expiry from the product's
+        // own foodType when it has one, otherwise infer it from its name. Without
+        // this the new lot is dateless and invisible to every expiry alert.
+        const suggested = resolveSuggestedExpiry(previous.name, previous.foodType);
+        const updated = await this.pantryStore.addNewLot(id, { quantity, ...toLotExpiry(suggested) });
         if (updated) {
           await this.eventManager.logAddExistingItem(previous, updated, quantity, undefined, undefined, timestamp);
         }
@@ -152,15 +150,26 @@ export class ListStateService {
 
     // Match the manual entry to an existing pantry product by normalized name.
     // If found → add a new lot. Otherwise create a brand-new pantry item.
-    const target = normalizeLowercase(item.name);
-    const match = this.items().find(p => normalizeLowercase(p.name) === target);
+    const target = normalizeProductKey(item.name);
+    const match = this.items().find(p => normalizeProductKey(p.name) === target);
     const timestamp = new Date().toISOString();
 
     try {
       if (match) {
-        const updated = await this.pantryStore.addNewLot(match._id, { quantity });
-        if (updated) {
+        let updated: PantryItem | null;
+        if (match.productType === 'fresh') {
+          // Fresh products track stock as a state on a single batch, so they are
+          // refilled rather than given a new lot.
+          updated = restockFreshItem(match, timestamp, generateBatchId());
           await this.pantryStore.updateItem(updated);
+        } else {
+          // Same reasoning as markAsBought: an added lot with no date would be
+          // invisible to the expiry alerts.
+          const suggested = resolveSuggestedExpiry(match.name, match.foodType);
+          updated = await this.pantryStore.addNewLot(match._id, { quantity, ...toLotExpiry(suggested) });
+          if (updated) await this.pantryStore.updateItem(updated);
+        }
+        if (updated) {
           await this.eventManager.logAddExistingItem(match, updated, quantity, undefined, undefined, timestamp);
         }
       } else {
