@@ -295,3 +295,31 @@ describe('receipt-matching.domain', () => {
     expect(matchReceiptName('JEANS MUJER', candidates)).toBeNull();
   });
 });
+
+describe('parseReceipt — consolidating a product printed once per unit', () => {
+  it('folds rows that differ only by an accent or a stray space', () => {
+    // Costco and Aldi print one row per unit, and OCR is not consistent about
+    // accents or trailing spaces within a single receipt. Keying on the raw
+    // lowercase text left the same product in the sheet twice.
+    const rows = [
+      row('ATUN CLARO | 2,45'),
+      row('ATÚN CLARO | 2,45'),
+      row('ATUN CLARO  | 2,45'),
+      row('TOTAL (€) | 7,35'),
+    ];
+    const result = parseReceipt(rows);
+    const tuna = result.items.filter(i => /atun|atún/i.test(i.rawName));
+    expect(tuna.length).toBe(1);
+    expect(tuna[0].quantity).toBe(3);
+  });
+
+  it('keeps genuinely different products apart', () => {
+    const rows = [
+      row('ATUN CLARO | 2,45'),
+      row('ATUN ROJO | 4,95'),
+      row('TOTAL (€) | 7,40'),
+    ];
+    const result = parseReceipt(rows);
+    expect(result.items.filter(i => /atun/i.test(i.rawName)).length).toBe(2);
+  });
+});
