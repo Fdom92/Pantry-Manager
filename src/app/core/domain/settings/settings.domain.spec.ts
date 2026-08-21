@@ -12,13 +12,33 @@ describe('buildExportFileName', () => {
   });
 
   it('keeps the timestamp sortable so backups list in order', () => {
-    const earlier = buildExportFileName(new Date('2026-08-25T09:00:00Z'));
-    const later = buildExportFileName(new Date('2026-08-25T18:00:00Z'));
+    const earlier = buildExportFileName(new Date('2026-08-25T09:00:00'));
+    const later = buildExportFileName(new Date('2026-08-25T18:00:00'));
     expect([later, earlier].sort()).toEqual([earlier, later]);
   });
 
-  it('formats the timestamp without punctuation', () => {
-    expect(formatIsoTimestampForFilename(NOW)).toBe('2026-08-25T14-30-05-123Z');
+  it('names the file with the day the user actually exported on', () => {
+    // Local, not UTC: at 01:00 on the 26th in Madrid, a UTC stamp reads the
+    // 25th, so the backup you just made looks like yesterday's.
+    const lateNight = new Date('2026-08-26T01:00:00+02:00');
+    expect(buildExportFileName(lateNight)).toContain('2026-08-26');
+  });
+
+  it('leaves out the seconds, the milliseconds and the ISO punctuation', () => {
+    const name = buildExportFileName(NOW);
+    expect(name).not.toContain('T');
+    expect(name).not.toContain('Z');
+    expect(/\d{3}\.json$/.test(name)).toBe(false);
+  });
+
+  it('keeps a minute of precision so two exports in a day do not collide', () => {
+    const first = buildExportFileName(new Date('2026-08-25T09:15:00'));
+    const second = buildExportFileName(new Date('2026-08-25T09:16:00'));
+    expect(first).not.toBe(second);
+  });
+
+  it('formats as year-month-day then time', () => {
+    expect(formatIsoTimestampForFilename(new Date('2026-08-25T14:30:05'))).toBe('2026-08-25-14-30');
   });
 });
 
