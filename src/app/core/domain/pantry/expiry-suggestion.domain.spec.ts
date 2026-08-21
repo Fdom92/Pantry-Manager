@@ -1,5 +1,5 @@
 import { FoodType } from '@core/models/shared/enums.model';
-import { EXPIRY_SUGGESTION_DAYS, NEVER_EXPIRES, foodTypeExpires, suggestExpiryDate } from './expiry-suggestion.domain';
+import { EXPIRY_SUGGESTION_DAYS, foodTypeExpires, suggestExpiryDate } from './expiry-suggestion.domain';
 import { getExpiryModeFromFoodType } from './pantry-status.domain';
 
 describe('suggestExpiryDate', () => {
@@ -12,7 +12,7 @@ describe('suggestExpiryDate', () => {
   it('matches EXPIRY_SUGGESTION_DAYS for every FoodType value', () => {
     for (const type of Object.values(FoodType)) {
       const days = EXPIRY_SUGGESTION_DAYS[type];
-      if (days === NEVER_EXPIRES) {
+      if (days === null) {
         expect(suggestExpiryDate(type, from)).toBeUndefined();
         continue;
       }

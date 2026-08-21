@@ -2,6 +2,8 @@ import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
 import { getItemStatusState, hasMissingExpiry, isIncomplete, sumQuantities } from '@core/domain/pantry';
+import { FOOD_TYPE_PROFILE } from '@core/domain/pantry/food-type-profile.domain';
+import { parseExpiryMs } from '@core/utils/date.util';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 export interface InventorySnapshot {
@@ -26,30 +28,12 @@ export interface ActivityMetrics {
   windowDays: number;
 }
 
-/**
- * Where each food type sits in the distribution chart, or null to leave it out.
- *
- * A Record rather than a list so a new FoodType cannot quietly fail to appear:
- * TypeScript makes it declare a rank or an explicit null. The list this replaced
- * dropped beverages and non-perishables the moment those types existed, which
- * also took tinned tuna, pulses and sugar out of a chart that used to count them
- * as protein and carbohydrate.
- */
-const FOOD_TYPE_DISPLAY_RANK: Record<FoodType, number | null> = {
-  [FoodType.PROTEIN]:        0,
-  [FoodType.VEGETABLE]:      1,
-  [FoodType.FRUIT]:          2,
-  [FoodType.DAIRY]:          3,
-  [FoodType.CARB]:           4,
-  [FoodType.NON_PERISHABLE]: 5,
-  [FoodType.BEVERAGE]:       6,
-  [FoodType.HOUSEHOLD]:      null, // not food
-  [FoodType.OTHER]:          null, // too generic to say anything useful about
-};
-
-const FOOD_TYPE_DISPLAY_ORDER: FoodType[] = (Object.entries(FOOD_TYPE_DISPLAY_RANK) as [FoodType, number | null][])
-  .filter((entry): entry is [FoodType, number] => entry[1] !== null)
-  .sort((a, b) => a[1] - b[1])
+/** Chart order, derived from the one food-type table. */
+const FOOD_TYPE_DISPLAY_ORDER: FoodType[] = (
+  Object.entries(FOOD_TYPE_PROFILE) as [FoodType, { chartRank: number | null }][]
+)
+  .filter((entry): entry is [FoodType, { chartRank: number }] => entry[1].chartRank !== null)
+  .sort((x, y) => x[1].chartRank - y[1].chartRank)
   .map(([foodType]) => foodType);
 
 export interface DistributionMetrics {
@@ -245,19 +229,11 @@ export interface FoodCoverageResult {
   unit: FoodCoverageUnit;
 }
 
-const FOOD_TYPE_WEIGHTS: Record<FoodType, number> = {
-  [FoodType.PROTEIN]:   1.2,
-  [FoodType.CARB]:      1.1,
-  [FoodType.VEGETABLE]: 0.9,
-  [FoodType.FRUIT]:     0.6,
-  [FoodType.DAIRY]:     0.6,
-  [FoodType.OTHER]:     0.4,
-  // Drinks are not meals, so they add no days of food coverage. Oil and salt
-  // stretch meals without being one, hence the small but non-zero weight.
-  [FoodType.BEVERAGE]:  0,
-  [FoodType.NON_PERISHABLE]: 0.2,
-  [FoodType.HOUSEHOLD]: 0,
-};
+/** Coverage weights, derived from the one food-type table. */
+const FOOD_TYPE_WEIGHTS: Record<FoodType, number> = Object.fromEntries(
+  (Object.entries(FOOD_TYPE_PROFILE) as [FoodType, { coverageWeight: number }][])
+    .map(([type, profile]) => [type, profile.coverageWeight]),
+) as Record<FoodType, number>;
 
 const MS_PER_DAY_COVERAGE = 86_400_000;
 
@@ -290,7 +266,9 @@ export function computeFoodCoverage(
     const hasNoExpiry = (item.batches ?? []).every(b => !!b.noExpiry);
     if (!hasNoExpiry) {
       const earliestMs = (item.batches ?? [])
-        .map(b => b.expirationDate ? new Date(b.expirationDate).getTime() : null)
+        // parseExpiryMs, not new Date(): a plain YYYY-MM-DD parses as UTC midnight,
+        // which lands on the previous day for anyone west of Greenwich.
+        .map(b => parseExpiryMs(b.expirationDate))
         .filter((ms): ms is number => ms !== null)
         .sort((a, b) => a - b)[0];
 
