@@ -203,7 +203,9 @@
         "title": "Tout est sous contrôle",
         "hint": "Rien d'urgent aujourd'hui — votre garde-manger est en parfait état",
         "nextExpiry": "Prochaine expiration : {{name}} dans {{days}} jours",
-        "incompleteData": "{{count}} produits aux données incomplètes · complétez-les pour voir des suggestions",
+        "incompleteTitle": "Données manquantes",
+        "incompleteData_one": "1 produit aux données incomplètes · complétez-le pour voir des suggestions",
+        "incompleteData_other": "{{count}} produits aux données incomplètes · complétez-les pour voir des suggestions",
         "fixCta": "Compléter En attente"
       },
       "secondary": {

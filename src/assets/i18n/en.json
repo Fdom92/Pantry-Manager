@@ -203,7 +203,9 @@
         "title": "All under control",
         "hint": "Nothing urgent today — your pantry is in great shape",
         "nextExpiry": "Next expiry: {{name}} in {{days}} days",
-        "incompleteData": "{{count}} products with incomplete data · complete them to see suggestions",
+        "incompleteTitle": "Missing details",
+        "incompleteData_one": "1 product with incomplete data · complete it to see suggestions",
+        "incompleteData_other": "{{count}} products with incomplete data · complete them to see suggestions",
         "fixCta": "Complete pending items"
       },
       "secondary": {

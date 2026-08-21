@@ -203,7 +203,9 @@
         "title": "Tutto sotto controllo",
         "hint": "Niente di urgente oggi — la tua dispensa è in ottima forma",
         "nextExpiry": "Prossima scadenza: {{name}} tra {{days}} giorni",
-        "incompleteData": "{{count}} prodotti con dati incompleti · completali per vedere i suggerimenti",
+        "incompleteTitle": "Dati mancanti",
+        "incompleteData_one": "1 prodotto con dati incompleti · completalo per vedere i suggerimenti",
+        "incompleteData_other": "{{count}} prodotti con dati incompleti · completali per vedere i suggerimenti",
         "fixCta": "Completa i sospesi"
       },
       "secondary": {

@@ -203,7 +203,9 @@
         "title": "Alles unter Kontrolle",
         "hint": "Heute nichts Dringendes — dein Vorrat ist in guter Verfassung",
         "nextExpiry": "Nächstes Ablaufdatum: {{name}} in {{days}} Tagen",
-        "incompleteData": "{{count}} Produkte mit unvollständigen Daten · ergänze sie für Vorschläge",
+        "incompleteTitle": "Angaben fehlen",
+        "incompleteData_one": "1 Produkt mit unvollständigen Daten · ergänze es für Vorschläge",
+        "incompleteData_other": "{{count}} Produkte mit unvollständigen Daten · ergänze sie für Vorschläge",
         "fixCta": "Ausstehende ergänzen"
       },
       "secondary": {

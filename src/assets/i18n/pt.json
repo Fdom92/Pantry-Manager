@@ -203,7 +203,9 @@
         "title": "Tudo sob controlo",
         "hint": "Nada urgente hoje — a sua despensa está em ótima forma",
         "nextExpiry": "Próxima validade: {{name}} em {{days}} dias",
-        "incompleteData": "{{count}} produtos com dados incompletos · complete-os para ver sugestões",
+        "incompleteTitle": "Faltam dados",
+        "incompleteData_one": "1 produto com dados incompletos · completa-o para ver sugestões",
+        "incompleteData_other": "{{count}} produtos com dados incompletos · completa-os para ver sugestões",
         "fixCta": "Completar pendentes"
       },
       "secondary": {

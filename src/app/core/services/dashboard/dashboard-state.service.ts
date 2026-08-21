@@ -38,6 +38,9 @@ export interface DashboardAction {
   dismissible: boolean;
 }
 
+/** Fewest incomplete products worth interrupting the home screen for. */
+const MIN_INCOMPLETE_TO_SURFACE = 1;
+
 @Injectable()
 export class DashboardStateService {
   private readonly pantryStore = inject(PantryStoreService);
@@ -141,8 +144,19 @@ export class DashboardStateService {
     return item?.name ?? null;
   });
 
+  /**
+   * Surface the incomplete-data card only when there is nothing more urgent to
+   * say, and at least one product to fix.
+   *
+   * The threshold used to be three. That was calibrated when incomplete data was
+   * the normal state of a pantry and surfacing one or two products would have
+   * nagged constantly. Since the add flows infer a food type and a date, the
+   * incomplete ones are the exception — so one or two are real, and worth the
+   * one line. Leaving it at three meant the home screen said "all under control"
+   * while the Pendientes chip showed two and the Insights card listed them.
+   */
   readonly hasLowDataQuality = computed((): boolean =>
-    !this.todaySuggestion() && this.incompleteItemCount() >= 3
+    !this.todaySuggestion() && this.incompleteItemCount() >= MIN_INCOMPLETE_TO_SURFACE
   );
 
   readonly nextExpiringItem = computed((): { name: string; daysToExpiry: number } | null => {
