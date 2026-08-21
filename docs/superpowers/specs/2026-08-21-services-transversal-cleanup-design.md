@@ -1,0 +1,263 @@
+# Limpieza transversal de la capa `services` (v5.3)
+
+Branch: `feat/services-cleanup-5.3` (desde `develop`)
+
+## Contexto
+
+Auditoría completa de `src/app/core/services` — 82 ficheros, 12.459 líneas — hecha al
+arrancar la 5.3. Aparecen dos clases de deuda:
+
+- **Transversal**: el mismo defecto repetido en toda la capa (logging, toasts, código
+  dev en producción, fósiles). ~900 líneas, riesgo bajo, borrado o centralización.
+- **Estructural**: la pila de cuatro capas de pantry, la fachada de 65 señales y los
+  9 servicios de modal sin base común. ~5.000 líneas, riesgo alto, toca la pantalla
+  más usada de la app.
+
+**Este spec cubre solo lo transversal.** Lo estructural queda documentado al final
+como deuda conocida, sin fecha.
+
+El hallazgo que motiva la prioridad es T1: la app paga Sentry desde la 4.6 y no ve
+ninguno de los fallos que captura en sus `catch`.
+
+## Objetivo
+
+Que un fallo capturado sea visible, que un aviso al usuario se escriba en un solo
+sitio, que el código de desarrollo no viaje al usuario, y que lo muerto no ocupe.
+
+---
+
+## T1 — `LoggerService` como único canal, con salida a Sentry
+
+### Problema
+
+`LoggerService` (95 loc, dev-gated, prefijado) tiene **3 consumidores**:
+`storage.service.ts`, `app-update.service.ts`, `analytics.service.ts`. Frente a eso hay
+**73 llamadas a `console.log/warn/error`** repartidas por `src/app` —
+`upgrade-revenuecat.service.ts` 15, `settings-state.service.ts` 6, `pantry-store.service.ts` 5,
+`share.service.ts` 4, `pantry-fresh-edit-modal-state.service.ts` 4.
+
+Sentry se inicializa en `main.ts:33` con `integrations: [browserTracingIntegration()]`
+— sin `captureConsoleIntegration`. Consecuencia: cada `catch { console.error(...) }`
+es un fallo que el usuario sufre y que **no existe en el crash reporting**.
+
+### Diseño
+
+Firma nueva, con ámbito explícito para que Sentry agrupe y filtre:
+
+```ts
+error(scope: string, message: string, err?: unknown, extra?: Record<string, unknown>): void
+warn(scope: string, message: string, extra?: Record<string, unknown>): void
+```
+
+- `error()` escribe en consola **y** llama a
+  `Sentry.captureException(err instanceof Error ? err : new Error(message), { tags: { scope }, extra })`.
+- `warn()` **no** genera evento: deja un `Sentry.addBreadcrumb({ level: 'warning', category: scope, message })`.
+  Viaja adjunto al siguiente error y da contexto sin gastar cuota.
+- `log/debug/info/time/timeEnd/group/groupEnd` se quedan igual, solo dev.
+- Muere el `if/else` de `error()`, cuyas dos ramas son hoy idénticas
+  (`logger.service.ts:52-57`).
+
+**Consentimiento: no hay nada que añadir.** El `beforeSend` de `main.ts:24` filtra
+*todos* los eventos leyendo `STORAGE_KEYS.ERROR_REPORTING_ENABLED`, así que
+`captureException` hereda el gate que ya existe. Los breadcrumbs no son eventos y solo
+se envían adjuntos a uno que haya pasado el filtro.
+
+### Alcance de la migración
+
+Los 73 puntos de `src/app`, de forma mecánica:
+
+```ts
+// antes
+console.error('[ListStateService] markAsBought failed', err);
+// después
+this.logger.error('ListStateService', 'markAsBought failed', err);
+```
+
+`main.ts` conserva `console` — se ejecuta antes del bootstrap de Angular y ahí no hay
+inyector.
+
+**Regla de la migración: se cambia la llamada y nada más.** El riesgo real de editar 73
+`catch` no es el log, es alterar el flujo de recuperación por accidente.
+
+---
+
+## T2 — `ToastService`
+
+### Problema
+
+52 apariciones de `ToastController` en 13 ficheros, sin servicio que las centralice.
+Cada punto repite `create({ message, duration, position }) + present()`, casi siempre
+precedido de un `translate.instant`. Las duraciones ya divergieron sin criterio: 1200,
+1500, 1800, 2000, 2500 y 3000 ms. Todos los toasts son `position: 'bottom'`; hay un
+único `color: 'warning'`.
+
+### Diseño
+
+Nuevo `core/services/shared/toast.service.ts`, `providedIn: 'root'`:
+
+```ts
+success(key: string, params?: Record<string, unknown>): void   // 1500 ms
+info(key: string, params?: Record<string, unknown>): void      // 2000 ms
+error(key: string, params?: Record<string, unknown>): void     // 3000 ms, color 'danger'
+raw(message: string, opts?: { duration?: number }): void        // mensaje ya construido
+```
+
+- Traduce dentro con `TranslateService`; el llamante pasa clave i18n, no texto.
+- `position: 'bottom'` fijo.
+- No devuelve promesa que el llamante deba esperar (hoy la mitad de los sitios hace
+  `void toast.present()` y la otra mitad `await`).
+- `raw()` existe para los pocos mensajes que se construyen concatenando.
+
+Migran los 20 puntos de presentación; 13 ficheros pierden la dependencia de
+`ToastController`. El único `color: 'warning'` vivo se revisa en su sitio y cae en
+`info` o en `error` según lo que comunique.
+
+---
+
+## T3 — Código de desarrollo fuera del bundle de producción
+
+### Problema
+
+`DevMarketingSeederService` son **712 líneas** — el fichero más grande de toda la capa —
+con nombres de producto en 6 idiomas para generar capturas de tienda. Se inyecta
+incondicionalmente en `settings.component.ts:89`; el flag `isDev` (línea 97) solo
+esconde el botón en la plantilla, pero el árbol de dependencias ya lo arrastró al bundle.
+
+`NotificationSchedulerService` (361 loc) lleva ~110 líneas en 4 métodos marcados
+"Dev-only": `scheduleNotificationAtTime`, `previewNextNotification`,
+`scheduleTestNotification` y `fireDefinitionInFiveSeconds`. Los dos primeros de acción
+son **idénticos salvo la hora de disparo**.
+
+### Diseño
+
+- El seeder deja de inyectarse. El handler de `SettingsComponent`, dentro de la rama
+  `isDev` que ya existe, hace `await import(...)` y obtiene la instancia del `Injector`
+  (`providedIn: 'root'` la crea perezosamente).
+- Los 4 métodos dev del scheduler salen a un `DevNotificationsService` nuevo en
+  `core/services/dev/`, cargado con el mismo mecanismo desde
+  `SettingsNotificationsDevStateService`.
+- Al moverlos, `scheduleTestNotification` y `scheduleNotificationAtTime` se funden en
+  `fireWinning(at: Date)` — misma lógica, la hora como parámetro.
+- `NotificationSchedulerService` baja a ~250 líneas y se queda solo con producción.
+
+Efecto: ambos salen del bundle inicial y quedan como chunk perezoso que en producción
+nadie descarga. Se mide con `ng build --configuration production --stats-json`,
+comparando antes y después.
+
+Si el chunk resultara molesto en el AAB, la exclusión real vía `fileReplacements` en
+`angular.json` (donde ya hay uno para `environment`) queda como paso siguiente. No se
+hace por adelantado: obliga a mantener un stub sincronizado con la interfaz.
+
+---
+
+## T4 — Borrados
+
+| Qué | Dónde | Nota |
+|---|---|---|
+| `NetworkService` (44 loc) | `shared/network.service.ts` + export en `shared/index.ts` | **Cero consumidores** en todo el repo |
+| `canUseAgent()` y `canUseAgent$` | `upgrade-revenuecat.service.ts:17,29` | Fósil de la feature agent, borrada en la 4.4 |
+| `canUseAgent` | `tabs-state.service.ts:17` | Verificar antes que ninguna plantilla lo consuma |
+| 3 × `const normalized` sin usar | `catalog-options.service.ts:22,43,64` | Variables muertas |
+| `ConfirmService` sobre `window.confirm` | `shared/confirm.service.ts` | Ver abajo |
+
+### `window.confirm` → `ion-alert`
+
+`ConfirmService` envuelve `window.confirm`: un diálogo de navegador dentro de una app
+Ionic, que además bloquea el hilo del WebView. Tres llamantes, los tres en flujos
+destructivos:
+
+| Llamante | Flujo | Clave del mensaje |
+|---|---|---|
+| `pantry-list-ui-state.service.ts:93` | Borrar producto | `pantry.confirmDelete` |
+| `settings-state.service.ts:59` | Resetear datos de la aplicación | `settings.reset.confirm` |
+| `settings-state.service.ts:127` | Importar backup (sobrescribe todo) | `settings.import.confirm` |
+
+Pasa a `AlertController` y a ser `async`. Los tres llamantes están ya dentro de métodos
+async — `submitImportFileSelection` incluso hace `await` sobre el booleano síncrono
+actual — así que el cambio no propaga.
+
+Los mensajes ya están traducidos. Para los botones: `common.actions.cancel` y
+`common.actions.delete` **ya existen** en los 6 idiomas; falta añadir
+`common.actions.confirm` para los dos diálogos de ajustes, donde "Eliminar" no es la
+palabra correcta.
+
+Es el único cambio de T4 visible para el usuario: esos tres diálogos cambian de aspecto.
+
+### Duraciones de toast
+
+Las 6 duraciones arbitrarias colapsan a las 3 del servicio nuevo al migrar T2.
+
+---
+
+## Verificación
+
+La lección de la 5.2, confirmada cinco veces, es que estos fallos no los caza el test
+suite: salen ejecutando la app.
+
+**Red de regresión existente.** La capa de dominio no se toca en ningún punto de este
+spec, así que sus 641 tests siguen siendo válidos y deben pasar sin modificación.
+
+**Specs nuevos:**
+
+- `logger.service.spec.ts` — que `error()` llama a `captureException` con el tag `scope`;
+  que `warn()` deja breadcrumb y **no** genera evento; que `log/debug/info` callan en prod.
+- `toast.service.spec.ts` — duración y color por tipo; que traduce con interpolación de
+  parámetros; que `raw()` no pasa por el traductor.
+
+**QA manual en dispositivo** (obligatoria, no opcional):
+
+1. Borrar un producto → nuevo diálogo Ionic, confirmar y cancelar.
+2. Resetear datos de la aplicación → nuevo diálogo, confirmar y cancelar.
+3. Importar un backup → nuevo diálogo, confirmar y cancelar; verificar que los datos
+   se restauran.
+4. Provocar un toast de cada tipo (guardar, error de compartir, alta múltiple).
+5. Panel dev de notificaciones: disparar la ganadora, una definición concreta, la de
+   bienvenida, cancelar todas.
+6. Seeder de marketing en build de desarrollo.
+7. Comprobar en el proyecto Sentry de dev que llega un evento de un `catch` real.
+
+**Medición de bundle:** tamaño del bundle inicial antes y después de T3.
+
+---
+
+## Riesgos
+
+1. **73 ediciones mecánicas.** El peligro no es el log sino tocar sin querer el flujo de
+   un `catch`. Mitigación: cambiar la llamada y nada más; revisar el diff fichero a
+   fichero buscando cualquier cambio que no sea la línea de log.
+2. **Volumen en Sentry.** Van a empezar a llegar fallos hoy invisibles — es el objetivo,
+   pero puede comerse la cuota gratuita. Revisar a las 48 h de publicar y silenciar lo
+   ruidoso antes de que tire eventos útiles.
+3. **Cambio visible de diálogos.** Borrar producto, resetear datos e importar backup
+   cambian de aspecto. Es una mejora, pero los tres son flujos destructivos: probar
+   confirmar *y* cancelar en cada uno.
+4. **Carga dinámica del seeder.** Si el import falla solo se rompe en desarrollo, pero
+   se rompe la herramienta de capturas. Probar antes de cerrar la rama.
+
+---
+
+## Fuera de alcance
+
+Los cuatro bloques son independientes entre sí y cada uno puede mergearse por separado.
+
+**Deuda estructural documentada, sin fecha** (medida en la misma auditoría):
+
+- **E1 — Pantry: cuatro capas sin frontera** (5.098 loc). `PantryService` (219) →
+  `PantryQueryService` (380) → `PantryStoreService` (272) → `PantryStateService` (542).
+  El Store delega 7 métodos línea a línea al Query y expone 6 helpers de dominio de los
+  que `getItemEarliestExpiry` y `getItemBatches` tienen **0 usos**. Los consumidores
+  entran por niveles distintos: 17 por Store, 8 por Query.
+- **E2 — `ListStateService` (623 loc) son tres servicios.** ~250 líneas de generación de
+  PDF sin estado (`buildShoppingPdf`, `drawPdfHeader`, `loadIconDataUrl`) y ~90 de
+  `buildShoppingAnalysis`, lógica pura que pertenece a `core/domain/list` con tests.
+  `markAsBought` y `markManualAsBought` duplican la bifurcación fresco-vs-lote.
+- **E3 — Catálogos escritos tres veces.** `SettingsCatalogsStateService` (416 loc)
+  triplica señales y métodos públicos para location/category/supermarket, mientras sus
+  privados **ya están parametrizados por `CatalogKind`**. `CatalogOptionsService` repite
+  el mismo copy-paste, y `SettingsPreferencesService` añade tres `ensureXOptions`.
+- **E4 — 9 servicios de modal sin base común.** `PantryEditModalBase` son 12 líneas. Add
+  y fresh-add reimplementan el mismo motor de entradas por separado. Cada modal usa su
+  propio verbo: `openAddModal` / `open` / `openEdit` / `openQuantitySheet`.
+
+Bien factorizado, no tocar: `notifications/definitions` (registry + definiciones),
+`shared/local-storage.service.ts`, `shared/storage.service.ts`, `retention/`, `analytics/`.
