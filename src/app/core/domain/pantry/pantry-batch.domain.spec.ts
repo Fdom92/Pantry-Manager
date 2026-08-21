@@ -201,3 +201,50 @@ describe('computeEarliestExpiry', () => {
     expect(computeEarliestExpiry(batches)).toBe('2025-06-01');
   });
 });
+
+describe('mergeBatchesByExpiry — batches with no date', () => {
+  it('adds together two batches explicitly marked as never expiring', () => {
+    // Buying bin bags twice should leave one row of two, not two rows of one.
+    const merged = mergeBatchesByExpiry([
+      { batchId: 'a', quantity: 1, noExpiry: true },
+      { batchId: 'b', quantity: 1, noExpiry: true },
+    ]);
+    expect(merged.length).toBe(1);
+    expect(merged[0].quantity).toBe(2);
+    expect(merged[0].noExpiry).toBe(true);
+  });
+
+  it('keeps never-expiring batches apart when they sit in different places', () => {
+    const merged = mergeBatchesByExpiry([
+      { batchId: 'a', quantity: 1, noExpiry: true, locationId: 'kitchen' },
+      { batchId: 'b', quantity: 1, noExpiry: true, locationId: 'garage' },
+    ]);
+    expect(merged.length).toBe(2);
+  });
+
+  it('leaves batches of unknown expiry alone', () => {
+    // No date is not the same claim as no expiry: these two could spoil weeks
+    // apart, so adding them together would invent a fact.
+    const merged = mergeBatchesByExpiry([
+      { batchId: 'a', quantity: 1 },
+      { batchId: 'b', quantity: 1 },
+    ]);
+    expect(merged.length).toBe(2);
+  });
+
+  it('does not fold an undated batch into a never-expiring one', () => {
+    const merged = mergeBatchesByExpiry([
+      { batchId: 'a', quantity: 1, noExpiry: true },
+      { batchId: 'b', quantity: 1 },
+    ]);
+    expect(merged.length).toBe(2);
+  });
+
+  it('still keeps a dated batch separate from a never-expiring one', () => {
+    const merged = mergeBatchesByExpiry([
+      { batchId: 'a', quantity: 1, noExpiry: true },
+      { batchId: 'b', quantity: 1, expirationDate: '2026-09-01' },
+    ]);
+    expect(merged.length).toBe(2);
+  });
+});
