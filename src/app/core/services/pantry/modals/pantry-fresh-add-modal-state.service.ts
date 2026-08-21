@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { buildAddItemPayload, resolveSuggestedExpiry } from '@core/domain/pantry';
+import { buildAddItemPayload, FRESH_QTY, resolveSuggestedExpiry } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete, createDocumentId, withSignalFlag } from '@core/utils';
 import { dedupeByNormalizedKey, formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
@@ -192,7 +192,7 @@ export class PantryFreshAddModalStateService {
             id: createDocumentId('item'),
             nowIso: timestamp,
             name: entry.name,
-            quantity: 3, // Suficiente
+            quantity: FRESH_QTY.sufficient,
             expirationDate: entry.expirationDate,
             noExpiry: entry.noExpiry,
             // The row already shows a suggested date, so the builder must save
@@ -212,7 +212,7 @@ export class PantryFreshAddModalStateService {
             kind: 'fresh',
             source: 'fresh_add_modal',
             is_new: true,
-            quantity: 3,
+            quantity: FRESH_QTY.sufficient,
             has_expiry: Boolean(entry.expirationDate),
           });
           continue;
@@ -223,7 +223,7 @@ export class PantryFreshAddModalStateService {
         const previousBatch = existing.batches?.[0];
         const updatedBatch = {
           batchId: previousBatch?.batchId ?? `batch-${Date.now()}`,
-          quantity: 3,
+          quantity: FRESH_QTY.sufficient,
           expirationDate: entry.expirationDate ?? previousBatch?.expirationDate,
           noExpiry: entry.noExpiry ?? previousBatch?.noExpiry,
           opened: previousBatch?.opened,
@@ -241,7 +241,7 @@ export class PantryFreshAddModalStateService {
           kind: 'fresh',
           source: 'fresh_add_modal',
           is_new: false,
-          quantity: 3,
+          quantity: FRESH_QTY.sufficient,
           has_expiry: Boolean(entry.expirationDate),
         });
       }

@@ -239,3 +239,40 @@ describe('evaluateStreak — non-mutation bootstrap with gap>=2', () => {
     expect(transitions.some(t => t.kind === 'incremented')).toBeFalse();
   });
 });
+
+describe('evaluateStreak — daylight saving', () => {
+  // Local midnights are 23 hours apart across a spring-forward, so counting the
+  // gap in fixed 24-hour blocks returned 0 for two consecutive dates. evaluate
+  // continues a streak on gap === 1 and resets on anything else, so a user
+  // active on both days lost their streak — once a year, silently, in the one
+  // mechanic meant to bring them back.
+  const SPRING_FORWARD_EVE = '2026-03-29';
+  const DAY_AFTER = '2026-03-30';
+
+  it('continues the streak across a spring-forward, not resets it', () => {
+    const state = makeState({
+      lastActiveDate: SPRING_FORWARD_EVE,
+      currentStreak: 40,
+      longestStreak: 40,
+    });
+    const { next } = evaluateStreak(state, DAY_AFTER, true);
+    expect(next.currentStreak).toBe(41);
+  });
+
+  it('continues the streak across an autumn fall-back too', () => {
+    const state = makeState({ lastActiveDate: '2026-10-25', currentStreak: 5, longestStreak: 5 });
+    const { next } = evaluateStreak(state, '2026-10-26', true);
+    expect(next.currentStreak).toBe(6);
+  });
+
+  it('still resets after a genuine two-day absence with no tokens', () => {
+    const state = makeState({
+      lastActiveDate: SPRING_FORWARD_EVE,
+      currentStreak: 40,
+      longestStreak: 40,
+      graceTokens: 0,
+    });
+    const { next } = evaluateStreak(state, '2026-04-01', true);
+    expect(next.currentStreak).toBe(1);
+  });
+});
