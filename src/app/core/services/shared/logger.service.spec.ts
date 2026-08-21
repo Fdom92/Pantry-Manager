@@ -41,6 +41,18 @@ describe('LoggerService', () => {
       const [, context] = reporter.captureException.calls.mostRecent().args;
       expect(context?.extra?.['itemId']).toBe('item:1');
     });
+
+    it('also prints extra data to the console, not just to Sentry', () => {
+      const consoleSpy = spyOn(console, 'error');
+      const err = new Error('x');
+
+      service.error('PantryService', 'save failed', err, { itemId: 'item:1' });
+
+      expect(consoleSpy).toHaveBeenCalledTimes(1);
+      const consoleArgs = consoleSpy.calls.mostRecent().args;
+      expect(consoleArgs).toContain(err);
+      expect(consoleArgs).toContain(jasmine.objectContaining({ itemId: 'item:1' }));
+    });
   });
 
   describe('warn()', () => {

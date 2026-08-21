@@ -55,7 +55,7 @@ export class LoggerService {
    * Consent is enforced upstream by the `beforeSend` hook in `main.ts`.
    */
   error(scope: string, message: string, err?: unknown, extra?: Record<string, unknown>): void {
-    console.error(`${this.prefix} [${scope}] ${message}`, err ?? '');
+    console.error(`${this.prefix} [${scope}] ${message}`, err ?? '', extra ?? '');
     const error = err instanceof Error
       ? err
       : new Error(err === undefined ? message : `${message}: ${String(err)}`);

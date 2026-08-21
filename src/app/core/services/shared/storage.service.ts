@@ -288,7 +288,7 @@ export class StorageService<T extends BaseDoc> {
     return prepared.map((doc, index) => {
       const outcome = res[index] as PouchDB.Core.Response & { error?: string };
       if (outcome?.error) {
-        this.logger.error('StorageService', `bulkSave error for document: ${doc._id}`, outcome);
+        this.logger.error('StorageService', `bulkSave error for document: ${doc._id}`, undefined, { outcome });
         return doc;
       }
       return { ...doc, _rev: outcome.rev } as T;
