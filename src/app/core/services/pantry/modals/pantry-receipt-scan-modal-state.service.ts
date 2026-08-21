@@ -8,7 +8,7 @@ import { createDocumentId } from '@core/utils/uuid.util';
 import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
-import { resolveSuggestedExpiry } from '@core/domain/pantry/food-type-inference.domain';
+import { resolveSuggestedExpiry, toLotExpiry } from '@core/domain/pantry/food-type-inference.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
 import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
 import type { PantryItem } from '@core/models/pantry';
@@ -278,7 +278,7 @@ export class PantryReceiptScanModalStateService {
             ? restockFreshItem(matchedItem, timestamp, generateBatchId())
             : await this.pantryStore.addNewLot(matchedItem._id, {
                 quantity: line.quantity,
-                expiryDate: resolveSuggestedExpiry(matchedItem.name, matchedItem.foodType),
+                ...toLotExpiry(resolveSuggestedExpiry(matchedItem.name, matchedItem.foodType)),
               });
           if (updated) {
             await this.pantryStore.updateItem(updated);

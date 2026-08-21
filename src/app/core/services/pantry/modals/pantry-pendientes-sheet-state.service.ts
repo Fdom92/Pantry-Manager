@@ -3,8 +3,8 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete } from '@core/domain/pantry/pantry-filtering.domain';
 import { inferFoodType } from '@core/domain/pantry/food-type-inference.domain';
 import { applyPendienteFix, isPendienteRowResolved } from '@core/domain/pantry/pendiente-fix.domain';
-import { expiryAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
-import { suggestExpiryDate } from '@core/domain/pantry/expiry-suggestion.domain';
+import { expiryAfterFoodTypeChange, resolveSuggestedExpiry } from '@core/domain/pantry/food-type-inference.domain';
+import { foodTypeExpires } from '@core/domain/pantry/expiry-suggestion.domain';
 import type { PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
 import { withSignalFlag } from '@core/utils';
@@ -84,12 +84,15 @@ export class PantryPendientesSheetStateService {
       if (row.itemId !== itemId || !row.needsFoodType) {
         return row;
       }
+      if (!row.needsDate) return { ...row, foodType };
+      const suggested = expiryAfterFoodTypeChange(row, foodType);
       return {
         ...row,
         foodType,
-        expirationDate: row.needsDate
-          ? expiryAfterFoodTypeChange(row, foodType)
-          : row.expirationDate,
+        expirationDate: suggested.expirationDate,
+        // A type that never expires resolves the row without a date at all,
+        // rather than leaving it stuck asking for one it should not have.
+        noExpiry: suggested.noExpiry ?? false,
       };
     }));
   }
@@ -186,8 +189,12 @@ export class PantryPendientesSheetStateService {
       needsDate,
       datelessBatchCount: countMissingExpiryBatches(item),
       foodType,
-      expirationDate: foodType && needsDate ? suggestExpiryDate(foodType) : undefined,
-      noExpiry: false,
+      ...(foodType && needsDate
+        ? {
+            expirationDate: resolveSuggestedExpiry(item.name, foodType).expirationDate,
+            noExpiry: !foodTypeExpires(foodType),
+          }
+        : { expirationDate: undefined, noExpiry: false }),
     };
   }
 }

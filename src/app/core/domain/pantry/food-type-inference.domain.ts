@@ -1,6 +1,6 @@
 import type { FoodType } from '@core/models/shared/enums.model';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
-import { suggestExpiryDate } from './expiry-suggestion.domain';
+import { foodTypeExpires, suggestExpiryDate } from './expiry-suggestion.domain';
 import { FOOD_CONCEPTS } from './food-concepts.data';
 
 /**
@@ -64,6 +64,8 @@ export interface InferredExpiry {
   foodType: FoodType | null;
   /** `YYYY-MM-DD`, or undefined when the name could not be recognised. */
   expirationDate: string | undefined;
+  /** True when the recognised type never expires, so no date should be invented. */
+  noExpiry?: boolean;
 }
 
 /**
@@ -76,6 +78,7 @@ export function inferExpiryForName(name: string, fromDate: Date = new Date()): I
   return {
     foodType,
     expirationDate: foodType ? suggestExpiryDate(foodType, fromDate) : undefined,
+    noExpiry: foodType ? !foodTypeExpires(foodType) : undefined,
   };
 }
 
@@ -87,13 +90,29 @@ export function inferExpiryForName(name: string, fromDate: Date = new Date()): I
  * back to reading the name. Every add and restock flow resolves dates through
  * here so they cannot drift apart.
  */
+export interface SuggestedExpiry {
+  expirationDate?: string;
+  /** True for a type where a date would be a fiction — bin bags, salt. */
+  noExpiry?: boolean;
+}
+
+/**
+ * Same suggestion, spelled the way addNewLot names its parameters. Exists so the
+ * mapping lives in one place rather than being re-typed at every restock site.
+ */
+export function toLotExpiry(suggested: SuggestedExpiry): { expiryDate?: string; noExpiry?: boolean } {
+  return { expiryDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
+}
+
 export function resolveSuggestedExpiry(
   name: string,
   foodType: FoodType | null | undefined,
   fromDate: Date = new Date(),
-): string | undefined {
-  if (foodType) return suggestExpiryDate(foodType, fromDate);
-  return inferExpiryForName(name, fromDate).expirationDate;
+): SuggestedExpiry {
+  const type = foodType ?? inferFoodType(name);
+  if (!type) return {};
+  if (!foodTypeExpires(type)) return { noExpiry: true };
+  return { expirationDate: suggestExpiryDate(type, fromDate) };
 }
 
 /**
@@ -121,8 +140,10 @@ export function expiryAfterFoodTypeChange(
   row: ExpiryEditableRow,
   foodType: FoodType,
   fromDate: Date = new Date(),
-): string | undefined {
-  if (row.noExpiry) return row.expirationDate;
-  if (row.dateFromUser && row.expirationDate) return row.expirationDate;
-  return suggestExpiryDate(foodType, fromDate);
+): SuggestedExpiry {
+  if (row.dateFromUser && (row.expirationDate || row.noExpiry)) {
+    return { expirationDate: row.expirationDate, noExpiry: row.noExpiry };
+  }
+  if (!foodTypeExpires(foodType)) return { noExpiry: true };
+  return { expirationDate: suggestExpiryDate(foodType, fromDate) };
 }

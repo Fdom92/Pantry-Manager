@@ -114,13 +114,19 @@ describe('inferExpiryForName', () => {
     const result = inferExpiryForName('leche', from);
     expect(result.foodType).toBe(FoodType.DAIRY);
     // DAIRY shelf life comes from the shared table, not a literal here
-    const days = EXPIRY_SUGGESTION_DAYS[FoodType.DAIRY];
+    const days = EXPIRY_SUGGESTION_DAYS[FoodType.DAIRY] as number;
     const expected = new Date(from);
     expected.setDate(expected.getDate() + days);
     const y = expected.getFullYear();
     const m = String(expected.getMonth() + 1).padStart(2, '0');
     const d = String(expected.getDate()).padStart(2, '0');
     expect(result.expirationDate).toBe(`${y}-${m}-${d}`);
+  });
+
+  it('marks a never-expiring type as noExpiry instead of dating it', () => {
+    const result = inferExpiryForName('bolsas de basura', from);
+    expect(result.expirationDate).toBeUndefined();
+    expect(result.noExpiry).toBe(true);
   });
 
   it('returns nulls for an unknown term so callers keep current behaviour', () => {

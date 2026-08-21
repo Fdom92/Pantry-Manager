@@ -200,7 +200,7 @@ export class PantryAddModalStateService {
           // Show the suggested type and expiry up front so the user can accept
           // or edit them before saving, instead of discovering them afterwards.
           foodType: item.foodType ?? inferFoodType(option.title),
-          expirationDate: resolveSuggestedExpiry(option.title, item.foodType),
+          ...resolveSuggestedExpiry(option.title, item.foodType),
         },
       ];
     });
@@ -248,7 +248,7 @@ export class PantryAddModalStateService {
           quantity: 1,
           isNew: true,
           foodType: inferFoodType(formattedName),
-          expirationDate: resolveSuggestedExpiry(formattedName, null),
+          ...resolveSuggestedExpiry(formattedName, null),
         },
       ];
     });
@@ -325,7 +325,7 @@ export class PantryAddModalStateService {
       next[index] = {
         ...row,
         foodType,
-        expirationDate: expiryAfterFoodTypeChange(row, foodType),
+        ...expiryAfterFoodTypeChange(row, foodType),
       };
       return next;
     });

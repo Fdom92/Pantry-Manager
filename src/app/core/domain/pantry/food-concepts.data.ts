@@ -512,6 +512,50 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
 
   // ── Household ────────────────────────────────────────────────────────────
   {
+    key: 'bin-bags',
+    foodType: FoodType.HOUSEHOLD,
+    terms: {
+      es: ['bolsas de basura', 'bolsa de basura', 'basura'],
+      en: ['bin bags', 'bin bag', 'trash bags', 'garbage bags'],
+      de: ['muellbeutel', 'muellsaecke'],
+      fr: ['sacs poubelle', 'sac poubelle'],
+      it: ['sacchi spazzatura', 'sacchetti spazzatura'],
+      pt: ['sacos do lixo', 'saco do lixo'],
+    },
+  },
+  {
+    key: 'kitchen-roll',
+    foodType: FoodType.HOUSEHOLD,
+    terms: {
+      es: ['papel de cocina', 'rollo de cocina'],
+      en: ['kitchen roll', 'paper towels'],
+      de: ['kuechenrolle'],
+      fr: ['essuie tout'],
+      it: ['carta cucina'],
+      pt: ['papel de cozinha'],
+    },
+  },
+  {
+    key: 'aluminium-foil',
+    foodType: FoodType.HOUSEHOLD,
+    terms: {
+      es: ['papel de aluminio', 'papel film', 'film transparente'],
+      en: ['aluminium foil', 'tin foil', 'cling film'],
+      de: ['alufolie', 'frischhaltefolie'],
+      fr: ['papier aluminium', 'film alimentaire'],
+      it: ['carta alluminio', 'pellicola'],
+      pt: ['papel aluminio', 'pelicula aderente'],
+    },
+  },
+  {
+    key: 'softener',
+    foodType: FoodType.HOUSEHOLD,
+    terms: {
+      es: ['suavizante'], en: ['fabric softener'], de: ['weichspueler'],
+      fr: ['adoucissant'], it: ['ammorbidente'], pt: ['amaciador'],
+    },
+  },
+  {
     key: 'toilet-paper',
     foodType: FoodType.HOUSEHOLD,
     terms: {

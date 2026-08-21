@@ -98,7 +98,7 @@ export class PantryFreshAddModalStateService {
           isNew: false,
           // Restocking a fresh product means a new lettuce, not the old one, so
           // it gets a fresh suggested date rather than inheriting the batch's.
-          expirationDate: resolveSuggestedExpiry(option.title, item.foodType),
+          ...resolveSuggestedExpiry(option.title, item.foodType),
         },
       ];
     });
@@ -130,7 +130,7 @@ export class PantryFreshAddModalStateService {
           name: formatted,
           quantity: 1,
           isNew: true,
-          expirationDate: resolveSuggestedExpiry(formatted, null),
+          ...resolveSuggestedExpiry(formatted, null),
         },
       ];
     });

@@ -52,7 +52,9 @@ export function buildAddItemPayload(params: {
       quantity: roundQuantity(Math.max(1, sanitizedQuantity)),
       locationId: normalizeTrim(params.defaultLocationId ?? '') || undefined,
       expirationDate: params.expirationDate ?? (shouldInferDate ? inferred.expirationDate : undefined),
-      noExpiry: params.noExpiry || undefined,
+      // A recognised type that never expires marks the lot instead of leaving it
+      // dateless, which would otherwise read as data still pending.
+      noExpiry: params.noExpiry || (shouldInferDate && inferred.noExpiry) || undefined,
     },
   ];
 
