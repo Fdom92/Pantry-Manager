@@ -1,3 +1,4 @@
+import { normalizeProductKey } from '@core/utils/normalization.util';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
@@ -180,10 +181,13 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
     if (!items.length) {
       return [];
     }
-    const query = this.inputValue.trim().toLowerCase();
+    // Searched through the same key the options are compared with. If these two
+    // disagree, typing "Atun" with "Atún" stored finds nothing AND is refused
+    // the option to create, leaving no way forward at all.
+    const query = normalizeProductKey(this.inputValue);
     const matches = (!query && this.showAllOnFocus)
       ? items
-      : items.filter(item => this.getOptionName(item).toLowerCase().includes(query));
+      : items.filter(item => normalizeProductKey(this.getOptionName(item)).includes(query));
     if (this.maxOptions > 0) {
       return matches.slice(0, this.maxOptions);
     }
@@ -254,8 +258,23 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
     });
   }
 
+  /**
+   * How a typed value is compared with the existing options to decide whether
+   * it already exists.
+   *
+   * normalizeProductKey, because every consumer of this component is picking a
+   * product: it is only rendered inside EntitySelectorModal, which the add,
+   * fresh-add and consume sheets use. Catalog labels take a different route
+   * through EntitySelectorField and keep their own comparison, where accents
+   * still separate values because those strings are stored keys.
+   *
+   * Comparing here without folding accents meant typing "Atun" while "Atún"
+   * existed offered "create Atun" — and then adding it resolved to the existing
+   * product anyway, since the add flow keys on this same function's stricter
+   * cousin. The offer contradicted what the tap did.
+   */
   private normalizeMatchValue(value: string): string {
-    return (value ?? '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
+    return normalizeProductKey((value ?? '').toString());
   }
 
   private getEventStringValue(event: CustomEvent): string {
