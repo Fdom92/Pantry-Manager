@@ -61,11 +61,30 @@
               <div class="today-card__all-good-row">
                 <ion-icon [name]="facade.hasLowDataQuality() ? 'alert-circle-outline' : 'checkmark-circle-outline'"></ion-icon>
                 <div>
-                  <p class="today-card__all-good-title">{{ 'dashboard.today.allGood.title' | translate }}</p>
+                  <!-- "All under control" would contradict the very next line
+                       once the card is reporting missing data. -->
+                  <p class="today-card__all-good-title">
+                    {{ (facade.hasLowDataQuality()
+                          ? 'dashboard.today.allGood.incompleteTitle'
+                          : 'dashboard.today.allGood.title') | translate }}
+                  </p>
                   @if (facade.hasLowDataQuality()) {
                     <p class="today-card__all-good-hint">
-                      {{ 'dashboard.today.allGood.missingDates' | translate:{ count: facade.noExpiryDateCount() } }}
+                      {{ (facade.incompleteItemCount() === 1
+                            ? 'dashboard.today.allGood.incompleteData_one'
+                            : 'dashboard.today.allGood.incompleteData_other')
+                          | translate:{ count: facade.incompleteItemCount() } }}
                     </p>
+                    <!-- Without this the card states the problem on the home
+                         screen and offers nowhere to act on it. -->
+                    <button
+                      type="button"
+                      class="today-card__fix-cta"
+                      (click)="goToPendientes()">
+                      <ion-icon name="pencil-outline"></ion-icon>
+                      {{ 'dashboard.today.allGood.fixCta' | translate }}
+                      <ion-icon name="chevron-forward-outline"></ion-icon>
+                    </button>
                   } @else if (facade.nextExpiringItem()) {
                     <p class="today-card__all-good-hint">
                       {{ 'dashboard.today.allGood.nextExpiry' | translate:{

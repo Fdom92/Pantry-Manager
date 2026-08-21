@@ -333,6 +333,24 @@ ion-title {
     color: var(--app-theme-text-muted);
   }
 
+  // The way out of the incomplete-data state. Styled as a link rather than a
+  // button so it does not compete with the card's own primary action.
+  &__fix-cta {
+    display: flex;
+    align-items: center;
+    gap: var(--app-theme-spacing-xs);
+    margin-top: var(--app-theme-spacing-xs);
+    padding: 0;
+    background: none;
+    border: none;
+    font-size: var(--app-theme-font-size-small);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--ion-color-primary);
+    cursor: pointer;
+
+    &:active { opacity: 0.7; }
+  }
+
   // Success / confirmed state — accent swaps to success.
   &--confirmed {
     --today-accent: var(--app-theme-card-accent-success);

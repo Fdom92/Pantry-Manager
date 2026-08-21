@@ -1,17 +1,24 @@
 import type { EventQuantities, QuantityInput } from '@core/models/events';
 import { normalizeWhitespace } from '@core/utils/normalization.util';
+import { daysUntilExpiry } from '@core/utils/date.util';
 
 /**
- * Computes the number of full days between the event timestamp and the batch expiry date.
- * Returns undefined when either date is missing.
- * A negative value means the batch was already expired at the time of the event.
+ * Days between the event and the batch's expiry date. Zero means the event
+ * happened on the expiry day; a negative value means it was already past.
+ * Undefined when either date is missing.
+ *
+ * Delegates to daysUntilExpiry rather than subtracting timestamps here. Doing
+ * the arithmetic locally meant `Date.parse('2026-08-25')` — UTC midnight —
+ * against a real instant, so every event came out a day early: consuming
+ * something on its expiry date recorded -1, "already expired", and using it a
+ * day ahead recorded 0. Waste tracking and the PRO signals were built on that.
  */
 export function computeDaysToExpiry(expirationDate: string | undefined, timestamp: string): number | undefined {
   if (!expirationDate) return undefined;
-  const expiryMs = Date.parse(expirationDate);
   const eventMs = Date.parse(timestamp);
-  if (!Number.isFinite(expiryMs) || !Number.isFinite(eventMs)) return undefined;
-  return Math.floor((expiryMs - eventMs) / 86_400_000);
+  if (!Number.isFinite(eventMs)) return undefined;
+  const days = daysUntilExpiry(expirationDate, eventMs);
+  return Number.isNaN(days) ? undefined : days;
 }
 
 export function buildEventQuantities(input: QuantityInput): EventQuantities {

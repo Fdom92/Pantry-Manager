@@ -29,6 +29,7 @@ export class PantryQuantitySheetComponent {
   @Input() pendingNoExpiry = false;
   @Output() increment = new EventEmitter<void>();
   @Output() decrement = new EventEmitter<void>();
+  @Output() emptyOut = new EventEmitter<void>();
   @Output() expiryDateChange = new EventEmitter<string | undefined>();
   @Output() noExpiryToggle = new EventEmitter<void>();
   @Output() viewDetails = new EventEmitter<void>();
@@ -61,6 +62,10 @@ export class PantryQuantitySheetComponent {
 
   handleDecrement(): void {
     this.decrement.emit();
+  }
+
+  handleEmptyOut(): void {
+    this.emptyOut.emit();
   }
 
   handleViewDetails(): void {

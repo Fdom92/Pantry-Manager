@@ -1,9 +1,21 @@
 import { BACKUP_FILENAME, IMPORT_EMPTY_ERROR, IMPORT_INVALID_ERROR } from '@core/constants';
 import type { BaseDoc } from '@core/models/shared';
 import { normalizeTrim } from '@core/utils/normalization.util';
+import { toLocalYmd } from '@core/utils/date.util';
 
+/**
+ * The date and time part of a backup filename, in the user's own timezone.
+ *
+ * This used to be the raw ISO string with its punctuation swapped, which put a
+ * "T", the seconds, the milliseconds and a "Z" into a name a person reads in
+ * their downloads folder. Worse, it was UTC: exporting at 01:00 on the 26th in
+ * Spain produced a file named the 25th, so the backup you just made looked like
+ * yesterday's. Kept as year-month-day so the files still sort by age.
+ */
 export function formatIsoTimestampForFilename(now: Date): string {
-  return now.toISOString().replace(/[:.]/g, '-');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  return `${toLocalYmd(now)}-${hh}-${mm}`;
 }
 
 export function buildExportFileName(now: Date): string {

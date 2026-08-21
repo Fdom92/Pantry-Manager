@@ -1,8 +1,8 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { buildAddItemPayload } from '@core/domain/pantry';
+import { buildAddItemPayload, FRESH_QTY, resolveSuggestedExpiry } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete, createDocumentId, withSignalFlag } from '@core/utils';
-import { dedupeByNormalizedKey, formatFriendlyName, normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
+import { dedupeByNormalizedKey, formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
 import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
@@ -90,7 +90,16 @@ export class PantryFreshAddModalStateService {
       if (alreadyPresent) return current;
       return [
         ...current,
-        { id: `fresh:${item._id}`, name: option.title, quantity: 1, item, isNew: false },
+        {
+          id: `fresh:${item._id}`,
+          name: option.title,
+          quantity: 1,
+          item,
+          isNew: false,
+          // Restocking a fresh product means a new lettuce, not the old one, so
+          // it gets a fresh suggested date rather than inheriting the batch's.
+          ...resolveSuggestedExpiry(option.title, item.foodType),
+        },
       ];
     });
     this.query.set('');
@@ -99,11 +108,11 @@ export class PantryFreshAddModalStateService {
   addEntryFromQuery(name?: string): void {
     const next = normalizeTrim(name ?? this.query());
     if (!next) return;
-    const normalized = normalizeLowercase(next);
+    const normalized = normalizeProductKey(next);
     // Solo busca contra el catálogo de frescos (no merges con un item de despensa con el mismo nombre).
     const match = this.pantryStore
       .loadedProducts()
-      .find(i => i.productType === 'fresh' && normalizeLowercase(i.name) === normalized);
+      .find(i => i.productType === 'fresh' && normalizeProductKey(i.name) === normalized);
 
     if (match) {
       this.addEntry({ id: match._id, title: match.name, raw: match });
@@ -112,11 +121,17 @@ export class PantryFreshAddModalStateService {
 
     const formatted = formatFriendlyName(next, next);
     this.entries.update(current => {
-      const alreadyPresent = current.some(e => normalizeLowercase(e.name) === normalized);
+      const alreadyPresent = current.some(e => normalizeProductKey(e.name) === normalized);
       if (alreadyPresent) return current;
       return [
         ...current,
-        { id: `fresh:new:${normalized}`, name: formatted, quantity: 1, isNew: true },
+        {
+          id: `fresh:new:${normalized}`,
+          name: formatted,
+          quantity: 1,
+          isNew: true,
+          ...resolveSuggestedExpiry(formatted, null),
+        },
       ];
     });
     this.query.set('');
@@ -127,7 +142,12 @@ export class PantryFreshAddModalStateService {
       const idx = current.findIndex(e => e.id === entryId);
       if (idx < 0) return current;
       const next = [...current];
-      next[idx] = { ...next[idx], expirationDate: date || undefined, noExpiry: date ? undefined : next[idx].noExpiry };
+      next[idx] = {
+        ...next[idx],
+        expirationDate: date || undefined,
+        noExpiry: date ? undefined : next[idx].noExpiry,
+        dateFromUser: true,
+      };
       return next;
     });
   }
@@ -172,9 +192,13 @@ export class PantryFreshAddModalStateService {
             id: createDocumentId('item'),
             nowIso: timestamp,
             name: entry.name,
-            quantity: 3, // Suficiente
+            quantity: FRESH_QTY.sufficient,
             expirationDate: entry.expirationDate,
             noExpiry: entry.noExpiry,
+            // The row already shows a suggested date, so the builder must save
+            // what is on screen. Without this, clearing the date in the sheet
+            // silently brought an inferred one back on save.
+            inferExpiry: false,
           });
           const freshItem: PantryItem = {
             ...base,
@@ -188,7 +212,7 @@ export class PantryFreshAddModalStateService {
             kind: 'fresh',
             source: 'fresh_add_modal',
             is_new: true,
-            quantity: 3,
+            quantity: FRESH_QTY.sufficient,
             has_expiry: Boolean(entry.expirationDate),
           });
           continue;
@@ -199,7 +223,7 @@ export class PantryFreshAddModalStateService {
         const previousBatch = existing.batches?.[0];
         const updatedBatch = {
           batchId: previousBatch?.batchId ?? `batch-${Date.now()}`,
-          quantity: 3,
+          quantity: FRESH_QTY.sufficient,
           expirationDate: entry.expirationDate ?? previousBatch?.expirationDate,
           noExpiry: entry.noExpiry ?? previousBatch?.noExpiry,
           opened: previousBatch?.opened,
@@ -217,7 +241,7 @@ export class PantryFreshAddModalStateService {
           kind: 'fresh',
           source: 'fresh_add_modal',
           is_new: false,
-          quantity: 3,
+          quantity: FRESH_QTY.sufficient,
           has_expiry: Boolean(entry.expirationDate),
         });
       }

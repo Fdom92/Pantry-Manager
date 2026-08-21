@@ -57,6 +57,14 @@
   color: var(--app-theme-text-subtle);
 }
 
+.empty-out-button {
+  display: block;
+  margin: 0 auto;
+  --color: var(--ion-color-medium);
+  font-size: var(--app-theme-font-size-small);
+  text-transform: none;
+}
+
 .quantity-zero-hint {
   font-size: var(--app-theme-font-size-small);
   color: var(--app-theme-warning-deep);

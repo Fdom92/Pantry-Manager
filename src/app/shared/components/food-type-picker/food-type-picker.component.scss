@@ -1,0 +1,56 @@
+.food-type-chip {
+  margin: 0;
+  height: 30px;
+  // Floor width so the date chips line up down the list instead of starting at
+  // a different offset on every row. Sized for the longest label most languages
+  // produce ("No perecedero", "Milchprodukt"). A few — "Produit laitier",
+  // "Non-perishable" — run past it and push their own date chip right; a fixed
+  // width would align those rows only by truncating a label the user just
+  // picked, which is the worse trade.
+  min-width: 128px;
+  justify-content: center;
+  --background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+  color: var(--app-theme-primary-on-surface);
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-bold);
+  white-space: nowrap;
+
+  ion-icon {
+    font-size: var(--app-theme-icon-size-xs);
+    margin-inline-end: 4px;
+  }
+
+  // Nothing was inferred — read as a prompt to fill it in, not as a value.
+  &--unset {
+    --background: color-mix(in srgb, var(--ion-text-color) 7%, transparent);
+    color: var(--app-theme-text-muted);
+    font-weight: var(--app-theme-font-weight-normal);
+  }
+}
+
+.food-type-sheet {
+  padding: var(--app-theme-spacing-lg);
+
+  &__title {
+    margin: 0 0 var(--app-theme-spacing-md);
+    font-size: var(--app-theme-font-size-lg);
+    font-weight: var(--app-theme-font-weight-bold);
+    color: var(--app-theme-text-color);
+  }
+
+  &__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--app-theme-spacing-xs);
+  }
+}
+
+.food-type-option {
+  --background: color-mix(in srgb, var(--ion-text-color) 7%, transparent);
+  color: var(--app-theme-text-color);
+
+  &--active {
+    --background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+  }
+}

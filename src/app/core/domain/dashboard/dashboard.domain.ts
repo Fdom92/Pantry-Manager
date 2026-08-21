@@ -1,4 +1,4 @@
-import { FoodType } from '@core/models/shared/enums.model';
+import { FOOD_TYPE_PROFILE } from '@core/domain/pantry/food-type-profile.domain';
 import type { PantryItem } from '@core/models/pantry';
 import { getItemStatusState } from '@core/domain/pantry/pantry-status.domain';
 import { calculateUrgencyScore } from '@core/domain/pantry/urgency.domain';
@@ -75,7 +75,13 @@ export function computeTodaySuggestion(
 
   const getState = (item: PantryItem) => getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
 
-  const isFood   = (item: PantryItem): boolean => item.foodType !== FoodType.HOUSEHOLD;
+  // The suggestion rescues food about to spoil, so it only draws from things you
+  // would actually cook or eat — a bottle of water or a bag of salt surfacing as
+  // "use it today" reads as a broken app. Which types qualify is declared once,
+  // in FOOD_TYPE_PROFILE, rather than kept as a list here that has to be
+  // remembered whenever the enum grows.
+  const isFood = (item: PantryItem): boolean =>
+    !item.foodType || FOOD_TYPE_PROFILE[item.foodType].suggestible;
   const hasStock = (item: PantryItem): boolean => getStock(item) > 0;
 
   const toItem = (item: PantryItem): TodaySuggestionItem => ({

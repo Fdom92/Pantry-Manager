@@ -115,7 +115,7 @@
     },
     "pantry": {
       "title": "Die Vorratskammer ist leer",
-      "subtitle": "Füge Produkte hinzu, die du verfolgen möchtest\n(mit Menge und Ablaufdatum)"
+      "subtitle": "Füge Produkte hinzu, die du verfolgen möchtest\n(mit genauer Menge und Chargen)"
     },
     "shopping": {
       "title": "Alles in Ordnung"
@@ -203,7 +203,10 @@
         "title": "Alles unter Kontrolle",
         "hint": "Heute nichts Dringendes — dein Vorrat ist in guter Verfassung",
         "nextExpiry": "Nächstes Ablaufdatum: {{name}} in {{days}} Tagen",
-        "missingDates": "{{count}} Produkte ohne Ablaufdatum · füge sie hinzu, um Vorschläge zu sehen"
+        "incompleteTitle": "Angaben fehlen",
+        "incompleteData_one": "1 Produkt mit unvollständigen Daten · ergänze es für Vorschläge",
+        "incompleteData_other": "{{count}} Produkte mit unvollständigen Daten · ergänze sie für Vorschläge",
+        "fixCta": "Ausstehende ergänzen"
       },
       "secondary": {
         "days": "{{count}} Tage"
@@ -668,8 +671,13 @@
         "vegetable": "Gemüse",
         "fruit": "Obst",
         "dairy": "Milchprodukt",
+        "beverage": "Getränk",
+        "non-perishable": "Haltbar",
         "other": "Sonstiges",
         "household": "Haushalt"
+      },
+      "expiry": {
+        "suggestedHint": "Das Datum wird aus dem Lebensmitteltyp vorgeschlagen. Passe es bei Bedarf an."
       }
     },
     "detail": {
@@ -740,7 +748,17 @@
       "noDate": "Datum wählen",
       "zeroHint": "Verschwindet aus deiner Speisekammer, bis du wieder Vorrat hinzufügst",
       "zeroHintBasic": "Verschwindet aus deiner Speisekammer und taucht in deiner Einkaufsliste auf",
+      "emptyOut": "Als leer markieren",
       "hint": "Menge anpassen. Wird beim Schließen gespeichert."
+    },
+    "pendientesSheet": {
+      "title": "Offene Einträge vervollständigen",
+      "subtitle": "Lebensmitteltyp und Ablaufdatum für diese Produkte ausfüllen",
+      "empty": "Keine offenen Produkte",
+      "dateLabel": "Datum hinzufügen",
+      "batchDateNote": "Wird auf alle {{ count }} Chargen ohne Datum angewendet",
+      "saveAll": "Alles speichern",
+      "savedToast": "{{ count }} Produkt(e) aktualisiert"
     },
     "toasts": {
       "locationRequired": "Bitte wähle vor dem Speichern einen Standort aus.",
@@ -787,7 +805,7 @@
       "showLess": "Weniger anzeigen",
       "emptyState": {
         "title": "Frische Produkte",
-        "subtitle": "Füge hinzu, was du jede Woche verwendest\n(ohne genaue Daten)",
+        "subtitle": "Füge hinzu, was du jede Woche verwendest\n(genug, wenig oder leer)",
         "cta": "+ Frische Produkte hinzufügen"
       },
       "keepInStock": "Automatisch nachkaufen",

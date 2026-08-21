@@ -33,6 +33,17 @@ describe('getExpiryModeFromFoodType', () => {
     expect(getExpiryModeFromFoodType(FoodType.HOUSEHOLD)).toBe('ignore');
   });
 
+  it('returns flexible for beverage', () => {
+    expect(getExpiryModeFromFoodType(FoodType.BEVERAGE)).toBe('flexible');
+  });
+
+  it('returns flexible for non-perishable', () => {
+    // Not 'ignore': oil, coffee and tins carry a real best-before, just a
+    // distant one. Flexible warns once it passes without declaring a sealed tin
+    // expired outright. Household is the only type with nothing to warn about.
+    expect(getExpiryModeFromFoodType(FoodType.NON_PERISHABLE)).toBe('flexible');
+  });
+
   it('returns strict for protein', () => {
     expect(getExpiryModeFromFoodType(FoodType.PROTEIN)).toBe('strict');
   });

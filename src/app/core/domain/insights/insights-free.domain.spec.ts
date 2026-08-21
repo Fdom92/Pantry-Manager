@@ -40,6 +40,41 @@ function makeEvent(overrides: Partial<PantryEvent> = {}): PantryEvent {
   } as PantryEvent;
 }
 
+describe('computeDistribution — display order', () => {
+  const now = new Date('2026-05-14');
+
+  it('shows beverages and non-perishables, not just the original five', () => {
+    // The reassignment moved tinned tuna, pulses and sugar into non-perishable.
+    // A display list that predates those types drops them from the chart, so the
+    // products a user actually owns stop being counted at all.
+    const items = [
+      makeItem({ foodType: FoodType.PROTEIN, batches: [{ batchId: 'b1', quantity: 1 }] }),
+      makeItem({ foodType: FoodType.NON_PERISHABLE, batches: [{ batchId: 'b2', quantity: 1 }] }),
+      makeItem({ foodType: FoodType.BEVERAGE, batches: [{ batchId: 'b3', quantity: 1 }] }),
+    ];
+    const shown = computeDistribution(items, [], now, 30).foodTypes.map(f => f.foodType);
+    expect(shown).toContain(FoodType.NON_PERISHABLE);
+    expect(shown).toContain(FoodType.BEVERAGE);
+  });
+
+  it('still leaves household and other out of the chart', () => {
+    const items = [
+      makeItem({ foodType: FoodType.HOUSEHOLD, batches: [{ batchId: 'b1', quantity: 1 }] }),
+      makeItem({ foodType: FoodType.OTHER, batches: [{ batchId: 'b2', quantity: 1 }] }),
+    ];
+    expect(computeDistribution(items, [], now, 30).foodTypes).toEqual([]);
+  });
+
+  it('keeps protein first and never leads with a pantry staple', () => {
+    const items = [
+      makeItem({ foodType: FoodType.BEVERAGE, batches: [{ batchId: 'b1', quantity: 1 }] }),
+      makeItem({ foodType: FoodType.PROTEIN, batches: [{ batchId: 'b2', quantity: 1 }] }),
+    ];
+    const shown = computeDistribution(items, [], now, 30).foodTypes.map(f => f.foodType);
+    expect(shown[0]).toBe(FoodType.PROTEIN);
+  });
+});
+
 describe('computeInventorySnapshot', () => {
   const now = new Date('2026-05-14');
 
@@ -86,13 +121,33 @@ describe('computeInventorySnapshot', () => {
 
   it('counts items without expiry date (excluding fresh and noExpiry)', () => {
     const items = [
-      makeItem({ batches: [] }),
+      makeItem({ batches: [{ batchId: 'b1', quantity: 1 }] }),
       makeItem({ productType: 'fresh', batches: [] }),
       makeItem({ batches: [{ batchId: 'b1', quantity: 1, noExpiry: true }] }),
       makeItem({ batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
     ];
     const result = computeInventorySnapshot(items, now);
     expect(result.noExpiryDate).toBe(1);
+  });
+
+  it('counts an item with one dated and one dateless batch', () => {
+    // The count runs on hasMissingExpiry, the same rule as the Pendientes chip
+    // and its bulk-fix sheet. The rule this replaced asked whether ANY batch had
+    // a date, so a part-dated product was pending in one screen and not another.
+    const items = [
+      makeItem({ batches: [
+        { batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' },
+        { batchId: 'b2', quantity: 1 },
+      ] }),
+    ];
+    expect(computeInventorySnapshot(items, now).noExpiryDate).toBe(1);
+  });
+
+  it('does not count an item with no batches at all', () => {
+    // Nothing to put a date on: the bulk-fix sheet maps over the batches, so
+    // counting this would show a pending item the user has no way to resolve.
+    const items = [makeItem({ batches: [] })];
+    expect(computeInventorySnapshot(items, now).noExpiryDate).toBe(0);
   });
 
   it('expiredRatio is 0 when total is 0', () => {

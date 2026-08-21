@@ -72,5 +72,8 @@ Thumbs.db
 # Claude
 .claude
 
+# Git worktrees (superpowers subagent-driven-development)
+.worktrees
+
 # Local secrets — must NEVER be committed (public repo).
 src/environments/environment.secrets.ts

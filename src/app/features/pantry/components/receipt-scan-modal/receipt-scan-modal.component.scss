@@ -5,7 +5,7 @@ ion-modal.app-sheet-modal {
 }
 
 .sheet-shell {
-  @include sheet.layout;
+  @include sheet.layout(85vh);
 }
 
 .sheet-handle {

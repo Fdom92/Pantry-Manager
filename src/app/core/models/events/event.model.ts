@@ -11,6 +11,7 @@ export type EventSource =
   | 'edit_modal'
   | 'pantry_card'
   | 'dashboard'
+  | 'pendientes_bulk_fix'
   | 'system';
 
 export interface PantryEvent extends BaseDoc {

@@ -6,6 +6,7 @@
   [placeholder]="'pantry.fastAdd.placeholder' | translate"
   [emptyLabel]="'pantry.fastAdd.noResults' | translate"
   [entriesEmptyLabel]="'pantry.fastAdd.empty' | translate"
+  [entriesHint]="'pantry.form.expiry.suggestedHint' | translate"
   [saveLabel]="'pantry.fastAdd.submit' | translate"
   [saving]="state.isAdding()"
   [disableSave]="!state.hasAddEntries()"
@@ -25,7 +26,9 @@
   (emptyAction)="state.addEntryFromQuery($event)"
   (adjustEntry)="state.adjustEntryById($event.entry.id, $event.delta)"
   [showEntryNoExpiry]="true"
+  [showEntryFoodType]="true"
   (entryDateChange)="state.setEntryDate($event.entry.id, $event.date)"
   (entryNoExpiryToggle)="state.setEntryNoExpiry($event.entry.id)"
+  (entryFoodTypeChange)="state.setEntryFoodType($event.entry.id, $event.foodType)"
   (save)="state.submitAdd()">
 </app-entity-selector-modal>

@@ -3,3 +3,8 @@ export * from './pantry-builder.domain';
 export * from './pantry-filtering.domain';
 export * from './pantry-status.domain';
 export * from './fresh.domain';
+export * from './food-type-profile.domain';
+export * from './expiry-suggestion.domain';
+export * from './food-type-inference.domain';
+export * from './food-concepts.data';
+export * from './pendiente-fix.domain';

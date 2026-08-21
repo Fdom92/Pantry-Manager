@@ -39,6 +39,16 @@
         </ion-chip>
       }
     </div>
+    @if (facade.activeFilters().pendientes) {
+      <ion-button
+        class="pendientes-complete-cta"
+        fill="clear"
+        size="small"
+        (click)="facade.openPendientesSheet()">
+        <ion-icon slot="start" name="create-outline"></ion-icon>
+        {{ 'pantry.pendientesSheet.title' | translate }}
+      </ion-button>
+    }
   </div>
 
   @if (facade.showSkeleton()) {
@@ -226,6 +236,7 @@
 
   <app-pantry-add-modal></app-pantry-add-modal>
   <app-pantry-receipt-scan-modal></app-pantry-receipt-scan-modal>
+  <app-pantry-pendientes-sheet></app-pantry-pendientes-sheet>
   <app-pantry-consume-modal></app-pantry-consume-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>
@@ -250,6 +261,7 @@
           [quantityUnit]="''"
           (increment)="facade.incrementQuantity(item)"
           (decrement)="facade.decrementQuantity(item)"
+          (emptyOut)="facade.emptyOutQuantity(item)"
           (expiryDateChange)="facade.setQuantitySheetExpiryDate($event)"
           (noExpiryToggle)="facade.toggleQuantitySheetNoExpiry()"
           (viewDetails)="facade.openBatchesModalFromSheet(item)"

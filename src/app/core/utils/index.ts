@@ -11,3 +11,4 @@ export * from './skeleton.util';
 // `storage-flag.util` removed in v4.6 — use `LocalStorageService` instead.
 export * from './task.util';
 export * from './uuid.util';
+export * from './assert-never.util';

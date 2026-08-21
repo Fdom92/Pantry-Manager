@@ -1,7 +1,7 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
-import { getItemStatusState, sumQuantities } from '@core/domain/pantry';
+import { getItemStatusState, hasMissingExpiry, sumQuantities } from '@core/domain/pantry';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 export interface InsightsInventorySignals {
@@ -80,12 +80,9 @@ export function computeInventorySignals(items: PantryItem[], now: Date): Insight
       else if (state === 'low-stock') lowStockCount += 1;
     }
 
-    if (item.productType !== 'fresh') {
-      const hasBatchDate = (item.batches ?? []).some(b => !!b.expirationDate);
-      const allMarkedNoExpiry =
-        (item.batches ?? []).length > 0 && (item.batches ?? []).every(b => !!b.noExpiry);
-      if (!hasBatchDate && !allMarkedNoExpiry) noExpiryDateCount += 1;
-    }
+    // Same definition the rest of the app uses, so the ratio the model reasons
+    // over matches what the user is shown.
+    if (hasMissingExpiry(item)) noExpiryDateCount += 1;
   }
 
   const total = items.length;

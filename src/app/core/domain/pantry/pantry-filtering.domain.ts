@@ -33,15 +33,29 @@ export function matchesFilters(item: PantryItem, filters: PantryFilterState, now
 }
 
 /**
+ * Count how many of the item's batches are missing an expiration date and
+ * aren't explicitly marked noExpiry. Fresh items never count (no batch-level dates).
+ */
+export function countMissingExpiryBatches(item: PantryItem): number {
+  if (item.productType === 'fresh') return 0;
+  const batches = item.batches ?? [];
+  return batches.filter(b => !b.expirationDate && !b.noExpiry).length;
+}
+
+/**
+ * Check if any of the item's batches is missing an expiration date and isn't
+ * explicitly marked noExpiry. Fresh items never count (no batch-level dates).
+ */
+export function hasMissingExpiry(item: PantryItem): boolean {
+  return countMissingExpiryBatches(item) > 0;
+}
+
+/**
  * Check if item is missing relevant tracking data (no foodType or any batch without expiry).
- * An item with multiple batches is incomplete if any batch lacks a date and isn't
- * explicitly marked noExpiry — not just when all batches are missing.
  */
 export function isIncomplete(item: PantryItem): boolean {
   if (!item.foodType) return true;
-  if (item.productType === 'fresh') return false;
-  const batches = item.batches ?? [];
-  return batches.some(b => !b.expirationDate && !b.noExpiry);
+  return hasMissingExpiry(item);
 }
 
 /**
