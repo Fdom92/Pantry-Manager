@@ -25,7 +25,7 @@ import { createDocumentId, createLatestOnlyRunner, SkeletonLoadingManager, withS
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { resolveSuggestedExpiry, toLotExpiry } from '@core/domain/pantry/food-type-inference.domain';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
-import { DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
+import { DownloadService, LoggerService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLowercase, normalizeProductKey, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
@@ -51,6 +51,7 @@ export class ListStateService {
   private readonly analytics = inject(AnalyticsService);
   private readonly manualItemsStore = inject(ListManualItemsStore);
   private readonly eventManager = inject(HistoryEventManagerService);
+  private readonly logger = inject(LoggerService);
 
   readonly isSharingListInProgress = signal(false);
 
@@ -135,7 +136,7 @@ export class ListStateService {
         quantity_override: Boolean(opts?.quantityOverride && opts.quantityOverride > 0),
       });
     } catch (err) {
-      console.error('[ListStateService] markAsBought failed', err);
+      this.logger.error('ListStateService', 'markAsBought failed', err);
       this.boughtItemIds.update(set => {
         const next = new Set(set);
         next.delete(id);
@@ -191,7 +192,7 @@ export class ListStateService {
       });
       void this.reviewPrompt.handlePositiveAction();
     } catch (err) {
-      console.error('[ListStateService] markManualAsBought add-to-pantry failed', err);
+      this.logger.error('ListStateService', 'markManualAsBought add-to-pantry failed', err);
     }
 
     const msg = this.translate.instant('shopping.toasts.boughtManual', { name: item.name });
@@ -352,7 +353,7 @@ export class ListStateService {
         if (!isActive()) {
           return;
         }
-        console.error('[ListStateService] shareShoppingList error', err);
+        this.logger.error('ListStateService', 'shareShoppingList error', err);
         await this.showToast(this.translate.instant('shopping.share.error'));
       });
     });

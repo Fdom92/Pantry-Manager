@@ -12,12 +12,14 @@ import {
 } from '@core/models';
 import { normalizeStringList } from '@core/utils/normalization.util';
 import { StorageService } from '../shared/storage.service';
+import { LoggerService } from '../shared/logger.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SettingsPreferencesService {
   private readonly storage = inject<StorageService<AppPreferencesDoc>>(StorageService);
+  private readonly logger = inject(LoggerService);
 
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
@@ -81,7 +83,7 @@ export class SettingsPreferencesService {
         this.applyDefaults();
       }
     } catch (err) {
-      console.error('[SettingsPreferencesService] loadFromStorage error', err);
+      this.logger.error('SettingsPreferencesService', 'loadFromStorage error', err);
       this.applyDefaults();
     }
   }

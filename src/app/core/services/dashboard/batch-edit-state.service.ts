@@ -12,6 +12,7 @@ import { HistoryEventManagerService } from '../history/history-event-manager.ser
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { LanguageService } from '../shared/language.service';
+import { LoggerService } from '../shared/logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class BatchEditStateService {
@@ -21,6 +22,7 @@ export class BatchEditStateService {
   private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly toastCtrl = inject(ToastController);
+  private readonly logger = inject(LoggerService);
 
   readonly isOpen = signal(false);
   readonly config = signal<BatchEditFlowConfig | null>(null);
@@ -139,7 +141,7 @@ export class BatchEditStateService {
       this.dismiss();
       await this.showSuccessToast(items.length);
     } catch (err) {
-      console.error('[BatchEditStateService] apply error', err);
+      this.logger.error('BatchEditStateService', 'apply error', err);
     } finally {
       this.isSaving.set(false);
     }

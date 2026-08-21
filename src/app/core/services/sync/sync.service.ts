@@ -8,6 +8,7 @@ import type { BaseDoc } from '@core/models/shared';
 import { StorageService } from '../shared/storage.service';
 import { ShareService } from '../shared/share.service';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
+import { LoggerService } from '../shared/logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class SyncService {
@@ -16,6 +17,7 @@ export class SyncService {
   private readonly share = inject(ShareService);
   private readonly translate = inject(TranslateService);
   private readonly alertCtrl = inject(AlertController);
+  private readonly logger = inject(LoggerService);
 
   readonly isSendingSync = signal(false);
   readonly isApplyingSync = signal(false);
@@ -29,7 +31,7 @@ export class SyncService {
       const text = result.data as string;
       docs = parseBackup(text, new Date().toISOString());
     } catch (err) {
-      console.error('[SyncService] handleIncomingIntent: invalid file', err);
+      this.logger.error('SyncService', 'handleIncomingIntent: invalid file', err);
       await this.showSyncError(err);
       return;
     }
@@ -69,7 +71,7 @@ export class SyncService {
         text: this.translate.instant('sync.send.shareText'),
       });
     } catch (err) {
-      console.error('[SyncService] sendSync error', err);
+      this.logger.error('SyncService', 'sendSync error', err);
     } finally {
       this.isSendingSync.set(false);
     }
@@ -90,7 +92,7 @@ export class SyncService {
       sessionStorage.setItem('sync:postReload', '1');
       setTimeout(() => window.location.reload(), 600);
     } catch (err) {
-      console.error('[SyncService] doApplyImport error', err);
+      this.logger.error('SyncService', 'doApplyImport error', err);
       await this.showSyncError(err);
     } finally {
       this.isApplyingSync.set(false);

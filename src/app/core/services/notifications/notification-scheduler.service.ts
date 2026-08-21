@@ -15,6 +15,7 @@ import { CapacitorNotificationPlugin } from './capacitor-notification.plugin';
 import { WelcomeNotificationService } from './welcome-notification.service';
 import { buildStreakMilestoneNotification } from './definitions/streak-milestone.notification';
 import { AppPreferences, PantryItem } from '@core/models';
+import { LoggerService } from '../shared/logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationSchedulerService {
@@ -28,6 +29,7 @@ export class NotificationSchedulerService {
   private readonly translate = inject(TranslateService);
   private readonly welcomeNotif = inject(WelcomeNotificationService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   private isScheduling = false;
 
@@ -144,7 +146,7 @@ export class NotificationSchedulerService {
       await this.cancelAll();
       await this.scheduleProjectedNotifications(items, preferences, now, t);
     } catch (err) {
-      console.error('[NotificationSchedulerService] scheduleAll error', err);
+      this.logger.error('NotificationSchedulerService', 'scheduleAll error', err);
     } finally {
       this.isScheduling = false;
     }

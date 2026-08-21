@@ -7,6 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { withSignalFlag } from '@core/utils';
 import { SettingsPreferencesService } from './settings-preferences.service';
 import { AlertController } from '@ionic/angular/standalone';
+import { LoggerService } from '../shared/logger.service';
 
 type CatalogKind = 'category' | 'supermarket' | 'location';
 
@@ -16,6 +17,7 @@ export class SettingsCatalogsStateService {
   private readonly translate = inject(TranslateService);
   private readonly pantryService = inject(PantryQueryService);
   private readonly alertController = inject(AlertController);
+  private readonly logger = inject(LoggerService);
 
   readonly isLoading = signal(false);
   readonly isSaving = signal(false);
@@ -108,7 +110,7 @@ export class SettingsCatalogsStateService {
       this.categoryOptionsDraft.set([...categoryPayload]);
       this.supermarketOptionsDraft.set([...supermarketPayload]);
     }).catch(async (err: unknown) => {
-      console.error('[SettingsCatalogsStateService] submitCatalogs error', err);
+      this.logger.error('SettingsCatalogsStateService', 'submitCatalogs error', err);
     });
   }
 
@@ -155,7 +157,7 @@ export class SettingsCatalogsStateService {
       this.syncCategoryOptionsFromPreferences();
       this.syncSupermarketOptionsFromPreferences();
     }).catch(async (err: unknown) => {
-      console.error('[SettingsCatalogsStateService] loadPreferences error', err);
+      this.logger.error('SettingsCatalogsStateService', 'loadPreferences error', err);
     });
   }
 

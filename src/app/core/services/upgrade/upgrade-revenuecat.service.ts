@@ -4,12 +4,14 @@ import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@r
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LocalStorageService } from '../shared/local-storage.service';
+import { LoggerService } from '../shared/logger.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UpgradeRevenuecatService {
   private readonly storage = inject(LocalStorageService);
+  private readonly logger = inject(LoggerService);
   private userId: string | null = null;
   private readonly publicApiKey = environment.revenueCatPublicKey;
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());
@@ -43,7 +45,7 @@ export class UpgradeRevenuecatService {
   async init(userId: string): Promise<void> {
     this.userId = userId;
     if (!this.publicApiKey) {
-      console.error('[UpgradeRevenuecatService] missing public API key in environment');
+      this.logger.error('UpgradeRevenuecatService', 'missing public API key in environment');
       return;
     }
     try {
@@ -51,7 +53,7 @@ export class UpgradeRevenuecatService {
       Purchases.addCustomerInfoUpdateListener((info: any) => {
         const isPro = this.extractIsPro(info);
         if (isPro === null) {
-          console.warn('[UpgradeRevenuecatService] customerInfo update without entitlement data; keeping previous state');
+          this.logger.warn('UpgradeRevenuecatService', 'customerInfo update without entitlement data; keeping previous state');
           return;
         }
         this.updateProState(isPro);
@@ -62,11 +64,11 @@ export class UpgradeRevenuecatService {
       if (isPro !== null) {
         this.updateProState(isPro);
       } else {
-        console.warn('[UpgradeRevenuecatService] init: no entitlement data, keeping stored state');
+        this.logger.warn('UpgradeRevenuecatService', 'init: no entitlement data, keeping stored state');
       }
       await this.refreshTrialEligibility();
     } catch (err) {
-      console.error('[UpgradeRevenuecatService] init error', err);
+      this.logger.error('UpgradeRevenuecatService', 'init error', err);
     }
   }
 
@@ -75,7 +77,7 @@ export class UpgradeRevenuecatService {
       const offerings = await Purchases.getOfferings();
       return offerings?.current ?? null;
     } catch (err) {
-      console.error('[UpgradeRevenuecatService] getOfferings error', err);
+      this.logger.error('UpgradeRevenuecatService', 'getOfferings error', err);
       return null;
     }
   }
@@ -83,7 +85,7 @@ export class UpgradeRevenuecatService {
   async getAvailablePackages(): Promise<PurchasesPackage[]> {
     const offering = await this.getOfferings();
     if (!offering) {
-      console.warn('[UpgradeRevenuecatService] no active offering available');
+      this.logger.warn('UpgradeRevenuecatService', 'no active offering available');
       return [];
     }
 
@@ -95,13 +97,13 @@ export class UpgradeRevenuecatService {
 
     const sorted = normalizePackages(candidates, this.preferredPackageTypes);
 
-    console.info(
+    this.logger.info(
       '[UpgradeRevenuecatService] available packages',
       sorted.map(pkg => `${pkg.packageType}:${pkg.identifier}`).join(', ')
     );
 
     if (!sorted.length) {
-      console.warn('[UpgradeRevenuecatService] offering has no purchasable packages', {
+      this.logger.warn('UpgradeRevenuecatService', 'offering has no purchasable packages', {
         available: offering.availablePackages?.map(pkg => ({
           identifier: pkg.identifier,
           type: pkg.packageType,
@@ -125,7 +127,7 @@ export class UpgradeRevenuecatService {
       }
       return Boolean(isPro ?? this.isPro());
     } catch (err) {
-      console.error('[UpgradeRevenuecatService] purchasePackage error', err);
+      this.logger.error('UpgradeRevenuecatService', 'purchasePackage error', err);
       return false;
     }
   }
@@ -134,12 +136,12 @@ export class UpgradeRevenuecatService {
     try {
       const selectedPackage = await this.getPreferredPackage();
       if (!selectedPackage) {
-        console.warn('[UpgradeRevenuecatService] purchasePro aborted: no package available');
+        this.logger.warn('UpgradeRevenuecatService', 'purchasePro aborted: no package available');
         return false;
       }
       return this.purchasePackage(selectedPackage);
     } catch (err) {
-      console.error('[UpgradeRevenuecatService] purchasePro error', err);
+      this.logger.error('UpgradeRevenuecatService', 'purchasePro error', err);
       return false;
     }
   }
@@ -153,7 +155,7 @@ export class UpgradeRevenuecatService {
       }
       return Boolean(isPro ?? this.isPro());
     } catch (err) {
-      console.error('[UpgradeRevenuecatService] restore error', err);
+      this.logger.error('UpgradeRevenuecatService', 'restore error', err);
       return false;
     }
   }
@@ -161,7 +163,7 @@ export class UpgradeRevenuecatService {
   private extractIsPro(info: any): boolean | null {
     const entitlements = info?.entitlements?.active ?? info?.subscriber?.entitlements?.active;
     if (!entitlements) {
-      console.warn('[UpgradeRevenuecatService] entitlements missing in customer info', { info });
+      this.logger.warn('UpgradeRevenuecatService', 'entitlements missing in customer info', { info });
       return null;
     }
     const keys = Object.keys(entitlements);
@@ -182,10 +184,10 @@ export class UpgradeRevenuecatService {
       info?.subscriber?.allPurchasedProductIdentifiers ??
       [];
     if (activeSubs.length) {
-      console.warn('[UpgradeRevenuecatService] entitlements empty but active subscriptions present', { activeSubs });
+      this.logger.warn('UpgradeRevenuecatService', 'entitlements empty but active subscriptions present', { activeSubs });
       return true;
     }
-    console.warn('[UpgradeRevenuecatService] no active entitlements found', { entitlements: keys, activeSubs });
+    this.logger.warn('UpgradeRevenuecatService', 'no active entitlements found', { entitlements: keys, activeSubs });
     return false;
   }
 
@@ -219,7 +221,7 @@ export class UpgradeRevenuecatService {
       const annualTrial = offering.annual?.product?.introPrice?.price === 0;
       this.trialEligibleSubject.next(monthlyTrial || annualTrial);
     } catch (err) {
-      console.error('[UpgradeRevenuecatService] refreshTrialEligibility error', err);
+      this.logger.error('UpgradeRevenuecatService', 'refreshTrialEligibility error', err);
       this.trialEligibleSubject.next(false);
     }
   }

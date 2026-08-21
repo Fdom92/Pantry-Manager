@@ -1,12 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type { NotificationDefinition } from '@core/models/notifications';
 import { ExpiredItemsNotification } from './definitions/expired-items.notification';
 import { NearExpiryNotification } from './definitions/near-expiry.notification';
 import { LowStockNotification } from './definitions/low-stock.notification';
 import { ReEngagementNotification } from './definitions/re-engagement.notification';
+import { LoggerService } from '../shared/logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationRegistryService {
+  private readonly logger = inject(LoggerService);
   private readonly definitions: NotificationDefinition[] = [
     new ExpiredItemsNotification(),
     new NearExpiryNotification(),
@@ -26,7 +28,7 @@ export class NotificationRegistryService {
   register(definition: NotificationDefinition): void {
     const exists = this.definitions.some(d => d.id === definition.id);
     if (exists) {
-      console.warn(`[NotificationRegistry] Definition with id ${definition.id} already registered`);
+      this.logger.warn('NotificationRegistryService', `Definition with id ${definition.id} already registered`);
       return;
     }
     this.definitions.push(definition);

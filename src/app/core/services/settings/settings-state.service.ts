@@ -7,7 +7,7 @@ import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { createLatestOnlyRunner, runIfIdle, withSignalFlag } from '@core/utils';
 import { ANALYTICS_EVENTS } from '@core/constants';
-import { ConfirmService, DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
+import { ConfirmService, DownloadService, LoggerService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { StorageService } from '../shared/storage.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
@@ -30,6 +30,7 @@ export class SettingsStateService {
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   readonly isPro = toSignal(this.revenuecat.isPro$, {
     initialValue: this.revenuecat.isPro(),
@@ -50,7 +51,7 @@ export class SettingsStateService {
     try {
       await this.appPreferences.getPreferences();
     } catch (err) {
-      console.error('[SettingsStateService] ensurePreferencesLoaded error', err);
+      this.logger.error('SettingsStateService', 'ensurePreferencesLoaded error', err);
     }
     this.isReady.set(true);
   }
@@ -70,7 +71,7 @@ export class SettingsStateService {
       }
       this.reloadApp();
     }).catch(async err => {
-      console.error('[SettingsStateService] resetApplicationData error', err);
+      this.logger.error('SettingsStateService', 'resetApplicationData error', err);
     });
   }
 
@@ -110,7 +111,7 @@ export class SettingsStateService {
 
       this.download.downloadBlob(blob, filename);
     }).catch(async err => {
-      console.error('[SettingsStateService] exportDataBackup error', err);
+      this.logger.error('SettingsStateService', 'exportDataBackup error', err);
     });
   }
 
@@ -140,7 +141,7 @@ export class SettingsStateService {
         shouldReload = true;
       }
     }).catch(async (err: unknown) => {
-      console.error('[SettingsStateService] submitImportFileSelection error', err);
+      this.logger.error('SettingsStateService', 'submitImportFileSelection error', err);
       if (this.lifecycle.isDestroyed()) {
         return;
       }
@@ -170,7 +171,7 @@ export class SettingsStateService {
         value: nextTheme,
       });
     }).catch(async err => {
-      console.error('[SettingsStateService] updateThemePreference error', err);
+      this.logger.error('SettingsStateService', 'updateThemePreference error', err);
     });
   }
 
@@ -193,7 +194,7 @@ export class SettingsStateService {
         await this.analytics.optOut();
       }
     }).catch(err => {
-      console.error('[SettingsStateService] toggleAnalytics error', err);
+      this.logger.error('SettingsStateService', 'toggleAnalytics error', err);
     });
   }
 
