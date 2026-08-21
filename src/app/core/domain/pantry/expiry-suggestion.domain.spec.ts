@@ -1,5 +1,6 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import { EXPIRY_SUGGESTION_DAYS, NEVER_EXPIRES, foodTypeExpires, suggestExpiryDate } from './expiry-suggestion.domain';
+import { getExpiryModeFromFoodType } from './pantry-status.domain';
 
 describe('suggestExpiryDate', () => {
   const from = new Date('2026-01-01T12:00:00');
@@ -24,20 +25,30 @@ describe('suggestExpiryDate', () => {
     }
   });
 
-  it('invents no date for a type that never expires', () => {
-    // Bin bags and salt do not go off. A number here would be printed on screen
-    // and then ignored by getExpiryModeFromFoodType, which reads as a bug.
+  it('invents no date for household, which genuinely never expires', () => {
     expect(suggestExpiryDate(FoodType.HOUSEHOLD, from)).toBeUndefined();
-    expect(suggestExpiryDate(FoodType.NON_PERISHABLE, from)).toBeUndefined();
     expect(foodTypeExpires(FoodType.HOUSEHOLD)).toBe(false);
-    expect(foodTypeExpires(FoodType.NON_PERISHABLE)).toBe(false);
   });
 
-  it('still dates every type that genuinely spoils', () => {
-    for (const type of [FoodType.PROTEIN, FoodType.VEGETABLE, FoodType.FRUIT,
-                        FoodType.DAIRY, FoodType.CARB, FoodType.BEVERAGE, FoodType.OTHER]) {
-      expect(foodTypeExpires(type)).toBe(true);
-      expect(suggestExpiryDate(type, from)).toBeDefined();
+  it('dates every other type, including store-cupboard staples', () => {
+    // Oil, coffee and tins carry a real best-before, just a distant one, so
+    // they are dated rather than treated like bin bags.
+    for (const type of Object.values(FoodType)) {
+      if (type === FoodType.HOUSEHOLD) continue;
+      expect(foodTypeExpires(type)).withContext(type).toBe(true);
+      expect(suggestExpiryDate(type, from)).withContext(type).toBeDefined();
+    }
+  });
+
+  it('never shows a date the expiry rules will ignore, nor ignores a dated type', () => {
+    // The invariant that keeps the two tables honest. Breaking it in either
+    // direction is a user-visible bug: a date printed and never acted on, or a
+    // product that needs a date and is given none.
+    for (const type of Object.values(FoodType)) {
+      const ignored = getExpiryModeFromFoodType(type) === 'ignore';
+      expect(foodTypeExpires(type))
+        .withContext(`${type}: expires=${foodTypeExpires(type)} mode=${getExpiryModeFromFoodType(type)}`)
+        .toBe(!ignored);
     }
   });
 

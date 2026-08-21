@@ -20,9 +20,11 @@ export function getExpiryModeFromFoodType(
     // An opened juice does go off; a sealed bottle of water does not. Flexible
     // warns without ever declaring a drink expired outright.
     case FoodType.BEVERAGE:
+    // Oil, coffee and tins do have a best-before, years out. Flexible warns
+    // once it passes without ever calling a sealed tin rubbish.
+    case FoodType.NON_PERISHABLE:
       return 'flexible';
     case FoodType.HOUSEHOLD:
-    case FoodType.NON_PERISHABLE:
       return 'ignore';
     case FoodType.PROTEIN:
     case FoodType.VEGETABLE:
