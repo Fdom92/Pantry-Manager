@@ -107,7 +107,7 @@ export class PantryReceiptScanModalStateService {
           const parsed = parseReceipt(rows);
           items = parsed.items;
           supermarket = parsed.supermarket;
-          void this.showSmartScanFallbackToast();
+          this.showSmartScanFallbackToast();
         }
       } else {
         const parsed = parseReceipt(rows);
@@ -152,7 +152,7 @@ export class PantryReceiptScanModalStateService {
    * particular scan didn't get the smart-scan treatment, not just silently
    * see the smart badge missing.
    */
-  private async showSmartScanFallbackToast(): Promise<void> {
+  private showSmartScanFallbackToast(): void {
     this.toast.info('pantry.receiptScan.smartScanFallback');
   }
 
