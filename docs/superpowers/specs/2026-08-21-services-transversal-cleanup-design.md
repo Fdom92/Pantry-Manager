@@ -277,3 +277,31 @@ pierde su `color: 'warning'`, que avisaba a un usuario PRO de que su escaneo se
 degradó). Se ofreció un cuarto método `hint()` a 2500 ms y se declinó: tres
 cubos es lo que dice el spec y 1500 ms es lo que ya tenían la mayoría de las
 confirmaciones. Reabrirlo necesita evidencia de uso, no otro argumento.
+
+**Corrección medida sobre T3** (2026-08-24). El spec afirmaba que
+`DevMarketingSeederService` "entra en el bundle de producción" porque se inyectaba
+incondicionalmente. Es falso en el sentido que importa: la ruta `/settings` ya era
+lazy, así que el seeder vivía en el chunk de ajustes, no en el inicial. Sacarlo con
+`await import()` lo mueve de un chunk perezoso a otro propio.
+
+Medición real, `ng build --configuration production`, `develop` contra la rama:
+
+| | develop | rama | delta |
+|---|---|---|---|
+| Bundle inicial (crudo) | 2,38 MB | 2,36 MB | −20 kB |
+| Bundle inicial (transferido) | 541,48 kB | 543,80 kB | **+2,3 kB** |
+| Suma de todo el JS emitido | 4.560.850 B | 4.546.186 B | −14,3 kB |
+
+El inicial comprimido sube ligeramente por cómo reparte esbuild los chunks. La
+reducción neta de JS (−14 kB) viene de los borrados de T4 y de las 110 líneas dev
+que salen del scheduler, no del seeder. Si algún día se quiere que el seeder no
+viaje **en absoluto**, hace falta la exclusión por `fileReplacements` que el spec
+dejó como paso siguiente — el import dinámico no la sustituye.
+
+**Sin cabecera en los diálogos de confirmación** (2026-08-24). La revisión propuso
+añadir `header` a las alertas de resetear datos e importar copia, porque
+`window.confirm` traía el marco del navegador gratis. Se declinó: el cuerpo de los
+tres mensajes ya enuncia la consecuencia y hace la pregunta ("Esta acción no se
+puede deshacer. ¿Quieres continuar?"), y una cabecera repetiría lo mismo con menos
+palabras. No hay claves de título para reutilizar, así que añadirla costaría copy
+nuevo en 6 idiomas para no decir nada nuevo.
