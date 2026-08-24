@@ -261,3 +261,19 @@ Los cuatro bloques son independientes entre sí y cada uno puede mergearse por s
 
 Bien factorizado, no tocar: `notifications/definitions` (registry + definiciones),
 `shared/local-storage.service.ts`, `shared/storage.service.ts`, `retention/`, `analytics/`.
+
+---
+
+## Decisiones tomadas durante la ejecución
+
+**Las duraciones se quedan en tres cubos, sin excepciones** (2026-08-24). La
+revisión de las tareas 5 y 6 señaló cuatro mensajes que pierden tiempo de
+lectura al colapsar: `shopping.toasts.bought` (2500 → 1500, dos frases con el
+nombre interpolado, y es la acción más frecuente de la app),
+`pantry.fresh.toast.markedOutHint` (2500 → 1500, es una instrucción y era la
+única rama con duración larga en el código viejo), `batchEdit.toast.updated_other`
+(2500 → 1500) y `pantry.receiptScan.smartScanFallback` (3000 → 2000, y además
+pierde su `color: 'warning'`, que avisaba a un usuario PRO de que su escaneo se
+degradó). Se ofreció un cuarto método `hint()` a 2500 ms y se declinó: tres
+cubos es lo que dice el spec y 1500 ms es lo que ya tenían la mayoría de las
+confirmaciones. Reabrirlo necesita evidencia de uso, no otro argumento.
