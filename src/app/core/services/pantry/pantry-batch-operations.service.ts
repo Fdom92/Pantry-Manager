@@ -7,6 +7,7 @@ import { roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeLocationId, normalizeLowercase } from '@core/utils/normalization.util';
 import { generateBatchId } from '@core/utils';
 import type { EventSource } from '@core/models/events';
+import { LoggerService } from '../shared/logger.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { PantryStoreService } from './pantry-store.service';
 import { PantryViewModelService } from './pantry-view-model.service';
@@ -19,6 +20,7 @@ export class PantryBatchOperationsService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly viewModel = inject(PantryViewModelService);
   private readonly eventManager = inject(HistoryEventManagerService);
+  private readonly logger = inject(LoggerService);
 
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -305,7 +307,7 @@ export class PantryBatchOperationsService {
               });
           }
         } catch (err) {
-          console.error('[PantryBatchOperationsService] updateItem error', err);
+          this.logger.error('PantryBatchOperationsService', 'updateItem error', err);
         } finally {
           this.pendingItems.delete(itemId);
           this.pendingEventMeta.delete(itemId);

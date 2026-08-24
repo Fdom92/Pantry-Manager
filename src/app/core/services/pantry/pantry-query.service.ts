@@ -9,6 +9,7 @@ import {
 import { DEFAULT_PANTRY_FILTERS } from '@core/models/pantry';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
+import { LoggerService } from '../shared/logger.service';
 import { PantryNavigationPresetService } from './pantry-navigation-preset.service';
 import { PantryService } from './pantry.service';
 
@@ -25,6 +26,7 @@ import { PantryService } from './pantry.service';
 export class PantryQueryService {
   private readonly pantryService = inject(PantryService);
   private readonly navigationPreset = inject(PantryNavigationPresetService);
+  private readonly logger = inject(LoggerService);
 
   private dbInitialized = false;
   private currentLoadPromise: Promise<void> | null = null;
@@ -75,7 +77,7 @@ export class PantryQueryService {
       const total = await this.pantryService.getTotalCount();
       this.totalCount.set(total);
     } catch (err) {
-      console.warn('[PantryQueryService] init failed', err);
+      this.logger.warn('PantryQueryService', 'init failed', { err: String(err) });
       this.dbInitialized = false;
     }
   }
@@ -116,7 +118,7 @@ export class PantryQueryService {
           await this.loadNextPage();
         }
       } catch (err) {
-        console.warn('[PantryQueryService] background load failed', err);
+        this.logger.warn('PantryQueryService', 'background load failed', { err: String(err) });
       } finally {
         this.backgroundLoadPromise = null;
       }

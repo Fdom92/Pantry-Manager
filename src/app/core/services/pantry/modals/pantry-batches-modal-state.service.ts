@@ -21,6 +21,7 @@ import type { AutocompleteItem } from '@shared/components/entity-autocomplete/en
 import { CatalogOptionsService } from '../../settings';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
+import { LoggerService } from '../../shared/logger.service';
 
 /**
  * Manages batches modal state and batch view models.
@@ -34,6 +35,7 @@ export class PantryBatchesModalStateService {
   private readonly catalogOptions = inject(CatalogOptionsService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
@@ -309,7 +311,7 @@ export class PantryBatchesModalStateService {
       });
       void toast.present();
     } catch (err) {
-      console.error('[PantryBatchesModalStateService] saveBatches error', err);
+      this.logger.error('PantryBatchesModalStateService', 'saveBatches error', err);
     } finally {
       this.isSaving.set(false);
     }

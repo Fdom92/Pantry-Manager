@@ -14,6 +14,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { LanguageService } from '../../shared/language.service';
+import { LoggerService } from '../../shared/logger.service';
 import { PantryStoreService } from '../pantry-store.service';
 
 /**
@@ -27,6 +28,7 @@ export class PantryAddModalStateService {
   private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   readonly addModalOpen = signal(false);
   readonly isAdding = signal(false);
@@ -161,7 +163,7 @@ export class PantryAddModalStateService {
       const toast = await this.toastCtrl.create({ message: msg, duration: 1500, position: 'bottom' });
       void toast.present();
     }).catch(async err => {
-      console.error('[PantryAddModalStateService] submitAdd error', err);
+      this.logger.error('PantryAddModalStateService', 'submitAdd error', err);
     });
   }
 

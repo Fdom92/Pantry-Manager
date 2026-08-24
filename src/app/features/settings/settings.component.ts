@@ -9,7 +9,7 @@ import { computeAnnualSavingsPercent } from '@core/domain/upgrade';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
 import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
-import { LocalStorageService } from '@core/services/shared';
+import { LocalStorageService, LoggerService } from '@core/services/shared';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
@@ -92,6 +92,7 @@ export class SettingsComponent {
   private readonly localStorage = inject(LocalStorageService);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
@@ -154,7 +155,7 @@ export class SettingsComponent {
         analyticsEnabled: undefined,
       });
     } catch (err) {
-      console.warn('[Dev] reconsent reset prefs error', err);
+      this.logger.warn('SettingsComponent', '[Dev] reconsent reset prefs error', { err: String(err) });
     }
 
     sessionStorage.setItem('sync:postReload', '1');

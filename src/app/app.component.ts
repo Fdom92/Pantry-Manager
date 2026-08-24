@@ -4,7 +4,7 @@ import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { App as CapacitorApp } from '@capacitor/app';
 import { PantryQueryService } from '@core/services/pantry';
-import { LocalStorageService } from '@core/services/shared';
+import { LocalStorageService, LoggerService } from '@core/services/shared';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
 import { SyncService } from '@core/services/sync/sync.service';
@@ -37,6 +37,7 @@ export class AppComponent {
   private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly appUpdate = inject(AppUpdateService);
+  private readonly logger = inject(LoggerService);
   private readonly streak = inject(StreakStateService);
   private readonly streakMilestone = inject(StreakMilestoneService);
 
@@ -174,7 +175,7 @@ export class AppComponent {
         void this.navCtrl.navigateRoot('/onboarding');
       }
     } catch (err) {
-      console.warn('[AppComponent] first-run check failed', err);
+      this.logger.warn('AppComponent', 'first-run check failed', { err: String(err) });
     }
   }
 

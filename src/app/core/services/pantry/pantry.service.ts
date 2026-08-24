@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { DEFAULT_HOUSEHOLD_ID, NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import {
   computeEarliestExpiry as computeEarliestExpiryStock,
@@ -13,6 +13,7 @@ import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { normalizeLocationId, normalizeSupermarketName, normalizeTrim } from '@core/utils/normalization.util';
 import { generateBatchId } from '@core/utils';
 import { StorageService } from '../shared/storage.service';
+import { LoggerService } from '../shared/logger.service';
 
 /**
  * PouchDB persistence layer for pantry items.
@@ -31,6 +32,7 @@ import { StorageService } from '../shared/storage.service';
  */
 @Injectable({ providedIn: 'root' })
 export class PantryService extends StorageService<PantryItem> {
+  private readonly pantryLogger = inject(LoggerService);
   private readonly TYPE = 'item';
   private readonly PRODUCT_INDEX_FIELDS: string[] = ['type'];
   private dbPreloaded = false;
@@ -47,7 +49,7 @@ export class PantryService extends StorageService<PantryItem> {
       await this.database.info();
       await this.ensureProductIndex();
     } catch (err) {
-      console.warn('[PantryService] Database warmup failed', err);
+      this.pantryLogger.warn('PantryService', 'Database warmup failed', { err });
       this.dbPreloaded = false;
     }
   }
@@ -57,7 +59,7 @@ export class PantryService extends StorageService<PantryItem> {
     try {
       return await this.countByType(this.TYPE);
     } catch (err) {
-      console.warn('[PantryService] Failed to count items', err);
+      this.pantryLogger.warn('PantryService', 'Failed to count items', { err });
       return 0;
     }
   }

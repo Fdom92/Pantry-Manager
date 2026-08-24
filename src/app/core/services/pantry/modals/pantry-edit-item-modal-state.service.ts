@@ -17,6 +17,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { CatalogOptionsService, SettingsPreferencesService } from '../../settings';
+import { LoggerService } from '../../shared/logger.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { buildConvertToFreshPreview, consolidateBatchesForFresh } from '@core/domain/pantry';
@@ -34,6 +35,7 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly alertCtrl = inject(AlertController);
   private readonly toastCtrl = inject(ToastController);
+  private readonly logger = inject(LoggerService);
 
   readonly foodTypes = Object.values(FoodType);
 
@@ -252,7 +254,7 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
       void toast.present();
     } catch (err) {
       this.isSaving.set(false);
-      console.error('[PantryEditItemModalStateService] submitItem error', err);
+      this.logger.error('PantryEditItemModalStateService', 'submitItem error', err);
     }
   }
 
@@ -317,7 +319,7 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
       await toast.present();
       this.dismiss();
     } catch (err) {
-      console.error('[PantryEditItemModalStateService] convertToFresh error', err);
+      this.logger.error('PantryEditItemModalStateService', 'convertToFresh error', err);
     } finally {
       this.isSaving.set(false);
     }

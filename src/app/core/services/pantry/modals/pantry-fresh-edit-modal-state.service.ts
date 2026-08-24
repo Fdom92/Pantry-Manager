@@ -10,6 +10,7 @@ import type { AutocompleteItem } from '@shared/components/entity-autocomplete/en
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { LoggerService } from '../../shared/logger.service';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { PantryEditModalBase } from './pantry-edit-modal-base';
@@ -24,6 +25,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
   private readonly toastCtrl = inject(ToastController);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   readonly currentState = signal<FreshState>('none');
   readonly states: readonly FreshState[] = ['sufficient', 'low', 'none'];
@@ -77,7 +79,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
 
   openEdit(item: PantryItem): void {
     if (item.productType !== 'fresh') {
-      console.warn('[PantryFreshEditModal] non-fresh item passed; ignoring');
+      this.logger.warn('PantryFreshEditModalStateService', 'non-fresh item passed; ignoring');
       return;
     }
     this.editingItem.set(item);
@@ -141,7 +143,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
       });
       void toast.present();
     } catch (err) {
-      console.error('[PantryFreshEditModalStateService] save error', err);
+      this.logger.error('PantryFreshEditModalStateService', 'save error', err);
     } finally {
       this.isSaving.set(false);
     }
@@ -166,7 +168,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
       });
       void toast.present();
     } catch (err) {
-      console.error('[PantryFreshEditModalStateService] convertToPantry error', err);
+      this.logger.error('PantryFreshEditModalStateService', 'convertToPantry error', err);
     } finally {
       this.isSaving.set(false);
     }
@@ -199,7 +201,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
       });
       void toast.present();
     } catch (err) {
-      console.error('[PantryFreshEditModalStateService] deleteItem error', err);
+      this.logger.error('PantryFreshEditModalStateService', 'deleteItem error', err);
     } finally {
       this.isSaving.set(false);
     }

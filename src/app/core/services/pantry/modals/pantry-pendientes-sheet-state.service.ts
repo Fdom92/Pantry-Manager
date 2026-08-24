@@ -12,6 +12,7 @@ import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { LoggerService } from '../../shared/logger.service';
 import { PantryStoreService } from '../pantry-store.service';
 
 export interface PendienteRow {
@@ -40,6 +41,7 @@ export class PantryPendientesSheetStateService {
   private readonly analytics = inject(AnalyticsService);
   private readonly toastCtrl = inject(ToastController);
   private readonly translate = inject(TranslateService);
+  private readonly logger = inject(LoggerService);
 
   readonly isOpen = signal(false);
   readonly isSaving = signal(false);
@@ -172,7 +174,7 @@ export class PantryPendientesSheetStateService {
       void toast.present();
       this.close();
     }).catch(err => {
-      console.error('[PantryPendientesSheetStateService] saveAll error', err);
+      this.logger.error('PantryPendientesSheetStateService', 'saveAll error', err);
     });
   }
 

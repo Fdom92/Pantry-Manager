@@ -16,10 +16,12 @@ import { StockStatus } from '@core/models/shared';
 import { normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
+import { LoggerService } from '../shared/logger.service';
 import { PantryQueryService } from './pantry-query.service';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
+  private readonly logger = inject(LoggerService);
   private readonly pantryQuery = inject(PantryQueryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly eventManager = inject(HistoryEventManagerService);
@@ -87,7 +89,7 @@ export class PantryStoreService {
       this.error.set(null);
       void this.logExpiredBatchEvents(this.items());
     } catch (err: unknown) {
-      console.error('[PantryStoreService] loadAll error', err);
+      this.logger.error('PantryStoreService', 'loadAll error', err);
       const msg = err instanceof Error ? err.message : 'Error loading pantry items';
       this.error.set(msg);
     }
@@ -105,7 +107,7 @@ export class PantryStoreService {
       await this.pantryQuery.saveItem(item);
       this.reviewPrompt.handleProductAdded();
     } catch (err: unknown) {
-      console.error('[PantryStoreService] addItem error', err);
+      this.logger.error('PantryStoreService', 'addItem error', err);
       this.error.set('Failed to add item');
     }
   }
@@ -115,7 +117,7 @@ export class PantryStoreService {
     try {
       await this.pantryQuery.saveItem(item);
     } catch (err: unknown) {
-      console.error('[PantryStoreService] updateItem error', err);
+      this.logger.error('PantryStoreService', 'updateItem error', err);
       this.error.set('Failed to update item');
     }
   }
@@ -129,7 +131,7 @@ export class PantryStoreService {
       await this.pantryQuery.deleteItem(id);
       this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_DELETED, { kind });
     } catch (err: unknown) {
-      console.error('[PantryStoreService] deleteItem error', err);
+      this.logger.error('PantryStoreService', 'deleteItem error', err);
       this.error.set('Failed to delete item');
     }
   }
@@ -247,7 +249,7 @@ export class PantryStoreService {
     try {
       await this.eventManager.logExpiredBatches(items);
     } catch (err) {
-      console.error('[PantryStoreService] logExpiredBatchEvents error', err);
+      this.logger.error('PantryStoreService', 'logExpiredBatchEvents error', err);
     } finally {
       this.expiredScanInProgress = false;
     }

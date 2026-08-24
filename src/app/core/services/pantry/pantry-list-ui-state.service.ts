@@ -5,6 +5,7 @@ import { sleep } from '@core/utils';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastController } from '@ionic/angular';
 import { ConfirmService } from '../shared';
+import { LoggerService } from '../shared/logger.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { PantryStoreService } from './pantry-store.service';
 
@@ -18,6 +19,7 @@ export class PantryListUiStateService {
   private readonly toastCtrl = inject(ToastController);
   private readonly confirm = inject(ConfirmService);
   private readonly eventManager = inject(HistoryEventManagerService);
+  private readonly logger = inject(LoggerService);
 
   readonly collapsedGroups: WritableSignal<Set<string>> = signal(new Set());
   readonly deletingItems: WritableSignal<Set<string>> = signal(new Set());
@@ -113,7 +115,7 @@ export class PantryListUiStateService {
       });
       void toast.present();
     } catch (err) {
-      console.error('[PantryListUiStateService] deleteItem error', err);
+      this.logger.error('PantryListUiStateService', 'deleteItem error', err);
     } finally {
       this.unmarkItemDeleting(item._id);
     }

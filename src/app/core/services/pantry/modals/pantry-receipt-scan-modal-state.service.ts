@@ -18,6 +18,7 @@ import { AnalyticsService } from '../../analytics/analytics.service';
 import { ReceiptLlmClientService } from '../../receipt/receipt-llm-client.service';
 import { UpgradeRevenuecatService } from '../../upgrade/upgrade-revenuecat.service';
 import { LocalStorageService } from '../../shared/local-storage.service';
+import { LoggerService } from '../../shared/logger.service';
 
 const FRAMING_HINT_KEY = 'receiptScanFraming';
 
@@ -38,6 +39,7 @@ export class PantryReceiptScanModalStateService {
   private readonly llmClient = inject(ReceiptLlmClientService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly localStorage = inject(LocalStorageService);
+  private readonly logger = inject(LoggerService);
 
   readonly isOpen = signal(false);
   readonly phase = signal<ReceiptScanPhase>('processing');
@@ -100,7 +102,7 @@ export class PantryReceiptScanModalStateService {
           supermarket = smartResult.supermarket;
           smart = true;
         } catch (err) {
-          console.warn('[PantryReceiptScanModalStateService] smart scan failed, falling back to local parser', err);
+          this.logger.warn('PantryReceiptScanModalStateService', 'smart scan failed, falling back to local parser', { err: String(err) });
           const parsed = parseReceipt(rows);
           items = parsed.items;
           supermarket = parsed.supermarket;
@@ -137,7 +139,7 @@ export class PantryReceiptScanModalStateService {
         this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_FAILED, { reason: 'no_products' });
       }
     } catch (err) {
-      console.error('[PantryReceiptScanModalStateService] OCR/parse error', err);
+      this.logger.error('PantryReceiptScanModalStateService', 'OCR/parse error', err);
       this.phase.set('error');
       this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_FAILED, { reason: 'ocr_error' });
     }
@@ -328,7 +330,7 @@ export class PantryReceiptScanModalStateService {
       });
       void toast.present();
     } catch (err) {
-      console.error('[PantryReceiptScanModalStateService] submit error', err);
+      this.logger.error('PantryReceiptScanModalStateService', 'submit error', err);
     } finally {
       this.isSubmitting.set(false);
     }

@@ -11,6 +11,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { LanguageService } from '../../shared/language.service';
+import { LoggerService } from '../../shared/logger.service';
 import { PantryStoreService } from '../pantry-store.service';
 
 /**
@@ -26,6 +27,7 @@ export class PantryFreshAddModalStateService {
   private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   readonly isOpen = signal(false);
   readonly isSubmitting = signal(false);
@@ -251,7 +253,7 @@ export class PantryFreshAddModalStateService {
         : this.translate.instant('pantry.fresh.toast.addSuccess_other', { count: entries.length });
       const toast = await this.toastCtrl.create({ message: msg, duration: 1500, position: 'bottom' });
       void toast.present();
-    }).catch(err => console.error('[PantryFreshAddModalStateService] submit error', err));
+    }).catch(err => this.logger.error('PantryFreshAddModalStateService', 'submit error', err));
   }
 
   private buildOptions(items: PantryItem[], entries: AddEntry[]): AutocompleteItem<PantryItem>[] {

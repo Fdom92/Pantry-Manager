@@ -8,6 +8,7 @@ import type { EntitySelectorEntry } from '@shared/components/entity-selector-mod
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { LanguageService } from '../../shared/language.service';
+import { LoggerService } from '../../shared/logger.service';
 import { ReviewPromptService } from '../../shared/review-prompt.service';
 import { PantryBatchOperationsService } from '../pantry-batch-operations.service';
 import { PantryStoreService } from '../pantry-store.service';
@@ -22,6 +23,7 @@ export class PantryConsumeModalStateService {
   private readonly languageService = inject(LanguageService);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   // Reference to pantry items state for optimistic updates
   pantryItemsState?: WritableSignal<PantryItem[]>;
@@ -113,7 +115,7 @@ export class PantryConsumeModalStateService {
       this.dismissConsumeModal();
       this.reviewPrompt.handleConsumeCompleted();
     }).catch(err => {
-      console.error('[PantryConsumeModalStateService] submitConsume error', err);
+      this.logger.error('PantryConsumeModalStateService', 'submitConsume error', err);
     });
   }
 
