@@ -1,5 +1,5 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
-import { ActionSheetController, ToastController } from '@ionic/angular';
+import { ActionSheetController } from '@ionic/angular';
 import { SHOPPING_LIST_NAME, UNASSIGNED_SUPERMARKET_KEY } from '@core/constants';
 import {
   determineSuggestionNeed,
@@ -25,7 +25,7 @@ import { createDocumentId, createLatestOnlyRunner, SkeletonLoadingManager, withS
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { resolveSuggestedExpiry, toLotExpiry } from '@core/domain/pantry/food-type-inference.domain';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
-import { DownloadService, LoggerService, ShareService, shouldSkipShareOutcome } from '../shared';
+import { DownloadService, LoggerService, ShareService, ToastService, shouldSkipShareOutcome } from '../shared';
 import { formatDateTimeValue, formatQuantity, roundQuantity } from '@core/utils/formatting.util';
 import { normalizeLowercase, normalizeProductKey, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
@@ -45,7 +45,7 @@ export class ListStateService {
   private readonly languageService = inject(LanguageService);
   private readonly download = inject(DownloadService);
   private readonly share = inject(ShareService);
-  private readonly toastController = inject(ToastController);
+  private readonly toast = inject(ToastService);
   private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly analytics = inject(AnalyticsService);
@@ -127,8 +127,7 @@ export class ListStateService {
           await this.eventManager.logAddExistingItem(previous, updated, quantity, undefined, undefined, timestamp);
         }
       }
-      const msg = this.translate.instant('shopping.toasts.bought', { name });
-      void this.showToast(msg);
+      this.toast.success('shopping.toasts.bought', { name });
       void this.reviewPrompt.handlePositiveAction();
       this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BUY_COMPLETED, {
         kind: isFresh ? 'fresh' : 'despensa',
@@ -195,16 +194,14 @@ export class ListStateService {
       this.logger.error('ListStateService', 'markManualAsBought add-to-pantry failed', err);
     }
 
-    const msg = this.translate.instant('shopping.toasts.boughtManual', { name: item.name });
-    void this.showToast(msg);
+    this.toast.success('shopping.toasts.boughtManual', { name: item.name });
   }
 
   removeAutoItem(id: string): void {
     const name = this.items().find(i => i._id === id)?.name;
     this.removedAutoIds.update(set => new Set([...set, id]));
     if (name) {
-      const msg = this.translate.instant('shopping.toasts.ignored', { name });
-      void this.showToast(msg);
+      this.toast.info('shopping.toasts.ignored', { name });
     }
     this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'auto' });
   }
@@ -212,8 +209,7 @@ export class ListStateService {
   removeManualItem(id: string): void {
     const item = this.manualItemsStore.removeManual(id);
     if (item) {
-      const msg = this.translate.instant('shopping.toasts.removedManual', { name: item.name });
-      void this.showToast(msg);
+      this.toast.success('shopping.toasts.removedManual', { name: item.name });
     }
     this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'manual' });
   }
@@ -229,15 +225,6 @@ export class ListStateService {
 
   addManualItem(name: string, source: 'user' | 'preset' = 'user'): void {
     this.manualItemsStore.addManualItem(name, source);
-  }
-
-  private async showToast(message: string, duration = 2500): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration,
-      position: 'bottom',
-    });
-    await toast.present();
   }
 
   getSuggestionTrackId(suggestion: ShoppingSuggestionWithItem): string {
@@ -348,13 +335,13 @@ export class ListStateService {
         }
 
         // Native share unavailable or failed — surface error to user.
-        await this.showToast(this.translate.instant('shopping.share.error'));
-      }).catch(async err => {
+        this.toast.error('shopping.share.error');
+      }).catch(err => {
         if (!isActive()) {
           return;
         }
         this.logger.error('ListStateService', 'shareShoppingList error', err);
-        await this.showToast(this.translate.instant('shopping.share.error'));
+        this.toast.error('shopping.share.error');
       });
     });
   }

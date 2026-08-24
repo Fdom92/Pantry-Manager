@@ -16,6 +16,7 @@ import { RepositionCardComponent } from '@shared/components/reposition-card/repo
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
 import { StreakCardComponent } from './components/streak-card/streak-card.component';
 import { WasteTeaserCardComponent } from './components/waste-teaser-card/waste-teaser-card.component';
+import { ToastService } from '@core/services/shared';
 import {
   IonButton,
   IonButtons,
@@ -26,8 +27,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { ToastController } from '@ionic/angular';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -72,10 +72,9 @@ export class DashboardComponent implements OnDestroy {
   }
   private readonly insights = inject(InsightsStateService);
   private readonly insightsTracking = inject(InsightsTrackingStateService);
-  private readonly toast = inject(ToastController);
+  private readonly toast = inject(ToastService);
   private readonly navCtrl = inject(NavController);
   private readonly navigationPreset = inject(PantryNavigationPresetService);
-  private readonly translate = inject(TranslateService);
   readonly isInsightsPro = this.insights.isPro;
   readonly repositionPredictions = this.insights.repositionPredictions;
   readonly wasteSummary = this.insights.wasteSummary;
@@ -136,11 +135,9 @@ export class DashboardComponent implements OnDestroy {
     }
   }
 
-  async onAddRepoPredictionToList(p: RepositionPrediction): Promise<void> {
+  onAddRepoPredictionToList(p: RepositionPrediction): void {
     this.insights.addRepoPredictionToList(p, 'dashboard');
-    const message = this.translate.instant('dashboard.reposition.added');
-    const t = await this.toast.create({ message, duration: 1800, position: 'bottom' });
-    void t.present();
+    this.toast.success('dashboard.reposition.added');
   }
 
   onSummaryCardClick(card: DashboardOverviewCardId): void {

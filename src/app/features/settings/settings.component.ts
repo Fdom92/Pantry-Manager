@@ -9,7 +9,7 @@ import { computeAnnualSavingsPercent } from '@core/domain/upgrade';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
 import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
-import { LocalStorageService, LoggerService } from '@core/services/shared';
+import { LocalStorageService, LoggerService, ToastService } from '@core/services/shared';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
@@ -43,7 +43,7 @@ import { SettingsNotificationsDevStateService } from '@core/services/settings/se
 import { AnalyticsService } from '@core/services/analytics/analytics.service';
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
 import { SettingsSkeletonComponent } from './components/settings-skeleton/settings-skeleton.component';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-settings',
@@ -88,7 +88,7 @@ export class SettingsComponent {
   private readonly language = inject(LanguageService);
   private readonly marketingSeeder = inject(DevMarketingSeederService);
   private readonly alertCtrl = inject(AlertController);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toast = inject(ToastService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly analytics = inject(AnalyticsService);
@@ -108,12 +108,7 @@ export class SettingsComponent {
     const messageKey = next
       ? 'settings.privacy.toastEnabled'
       : 'settings.privacy.toastDisabled';
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant(messageKey),
-      duration: 1500,
-      position: 'bottom',
-    });
-    void toast.present();
+    this.toast.success(messageKey);
   }
 
   /**
@@ -165,11 +160,7 @@ export class SettingsComponent {
   markDeviceAsInternal(): void {
     this.analytics.markAsInternal();
     const id = this.analytics.getDistinctId() ?? '—';
-    void this.toastCtrl.create({
-      message: `Marked as internal. ID: ${id}`,
-      duration: 3000,
-      position: 'bottom',
-    }).then(t => t.present());
+    this.toast.raw(`Marked as internal. ID: ${id}`, { duration: 3000 });
   }
 
   private versionTapCount = 0;

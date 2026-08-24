@@ -1,17 +1,17 @@
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { StreakStateService } from './streak-state.service';
 import { NotificationSchedulerService } from '../notifications/notification-scheduler.service';
+import { ToastService } from '../shared/toast.service';
 import type { StreakTransition } from '@core/domain/retention/streak.domain';
 
 @Injectable({ providedIn: 'root' })
 export class StreakMilestoneService {
   private readonly streak = inject(StreakStateService);
-  private readonly toast = inject(ToastController);
+  private readonly toast = inject(ToastService);
   private readonly translate = inject(TranslateService);
   private readonly analytics = inject(AnalyticsService);
   private readonly scheduler = inject(NotificationSchedulerService);
@@ -32,8 +32,7 @@ export class StreakMilestoneService {
       const eventName = this.milestoneEventName(t.milestone);
       if (eventName) this.analytics.track(eventName);
       const message = this.translate.instant('streak.milestoneToast', { streak: t.streak });
-      const toastEl = await this.toast.create({ message, duration: 4000, position: 'top' });
-      void toastEl.present();
+      this.toast.raw(message, { duration: 4000, position: 'top' });
       await this.scheduler.scheduleStreakMilestone(t.streak);
     }
   }

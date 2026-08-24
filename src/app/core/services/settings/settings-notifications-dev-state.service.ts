@@ -8,8 +8,7 @@ import { NotificationRegistryService } from '@core/services/notifications/notifi
 import { NotificationSchedulerService } from '@core/services/notifications/notification-scheduler.service';
 import { WelcomeNotificationService } from '@core/services/notifications/welcome-notification.service';
 import { SettingsPreferencesService } from './settings-preferences.service';
-import { ToastController } from '@ionic/angular';
-import { TranslateService } from '@ngx-translate/core';
+import { ToastService } from '@core/services/shared';
 
 @Injectable()
 export class SettingsNotificationsDevStateService {
@@ -19,8 +18,7 @@ export class SettingsNotificationsDevStateService {
   private readonly plugin = inject(CapacitorNotificationPlugin);
   private readonly preferencesService = inject(SettingsPreferencesService);
   private readonly welcomeNotif = inject(WelcomeNotificationService);
-  private readonly toastCtrl = inject(ToastController);
-  private readonly translate = inject(TranslateService);
+  private readonly toast = inject(ToastService);
 
   readonly isNativePlatform = Capacitor.isNativePlatform();
   readonly pending = signal<PendingNotification[]>([]);
@@ -48,23 +46,23 @@ export class SettingsNotificationsDevStateService {
 
   async fireWinning(): Promise<void> {
     const ok = await this.scheduler.scheduleTestNotification();
-    await this.notifyOutcome(ok);
+    this.notifyOutcome(ok);
     await this.refreshPending();
   }
 
   async fireDefinition(definitionId: number): Promise<void> {
     const ok = await this.scheduler.fireDefinitionInFiveSeconds(definitionId);
-    await this.notifyOutcome(ok);
+    this.notifyOutcome(ok);
     await this.refreshPending();
   }
 
   async fireWelcome(): Promise<void> {
     if (!this.isNativePlatform) {
-      await this.notifyOutcome(false);
+      this.notifyOutcome(false);
       return;
     }
     await this.welcomeNotif.scheduleWelcomeNotification({ delayMs: 5_000 });
-    await this.notifyOutcome(true);
+    this.notifyOutcome(true);
     await this.refreshPending();
   }
 
@@ -72,7 +70,7 @@ export class SettingsNotificationsDevStateService {
     const ok = await this.scheduler.fireDefinitionInFiveSeconds(NOTIFICATION_IDS.EXPIRED_ITEMS)
       || await this.scheduler.fireDefinitionInFiveSeconds(NOTIFICATION_IDS.NEAR_EXPIRY)
       || await this.scheduler.fireDefinitionInFiveSeconds(NOTIFICATION_IDS.LOW_STOCK);
-    await this.notifyOutcome(ok);
+    this.notifyOutcome(ok);
     await this.refreshPending();
   }
 
@@ -86,15 +84,11 @@ export class SettingsNotificationsDevStateService {
     await this.refreshPending();
   }
 
-  private async notifyOutcome(ok: boolean): Promise<void> {
-    const messageKey = ok
-      ? 'settings.dev.notifications.toast.scheduled'
-      : 'settings.dev.notifications.toast.noop';
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant(messageKey),
-      duration: 1800,
-      position: 'bottom',
-    });
-    await toast.present();
+  private notifyOutcome(ok: boolean): void {
+    if (ok) {
+      this.toast.success('settings.dev.notifications.toast.scheduled');
+    } else {
+      this.toast.info('settings.dev.notifications.toast.noop');
+    }
   }
 }
