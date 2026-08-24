@@ -225,6 +225,23 @@ export class NotificationSchedulerService {
     return this.evaluateWinningNotification(preferences, items, now, t);
   }
 
+  /**
+   * Build one specific definition against the current pantry, ignoring priority.
+   * Public for the same reason as evaluateWinnerNow: the dev panel needs the real
+   * context assembly, not a copy of it.
+   */
+  evaluateDefinitionNow(definitionId: number, now: Date): ScheduledNotification | null {
+    const definition = this.registry.getById(definitionId);
+    if (!definition) return null;
+
+    const preferences = this.preferencesService.preferences();
+    const items = this.pantryStore.loadedProducts();
+    const t = (key: string, params?: Record<string, unknown>): string =>
+      this.translate.instant(key, params);
+
+    return definition.build({ items, preferences, t, now });
+  }
+
   /** Evaluate all notification definitions and return the highest-priority payload. */
   private evaluateWinningNotification(
     preferences: AppPreferences,
