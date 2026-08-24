@@ -49,7 +49,7 @@ export class PantryService extends StorageService<PantryItem> {
       await this.database.info();
       await this.ensureProductIndex();
     } catch (err) {
-      this.pantryLogger.warn('PantryService', 'Database warmup failed', { err });
+      this.pantryLogger.warn('PantryService', 'Database warmup failed', { err: String(err) });
       this.dbPreloaded = false;
     }
   }
@@ -59,7 +59,7 @@ export class PantryService extends StorageService<PantryItem> {
     try {
       return await this.countByType(this.TYPE);
     } catch (err) {
-      this.pantryLogger.warn('PantryService', 'Failed to count items', { err });
+      this.pantryLogger.warn('PantryService', 'Failed to count items', { err: String(err) });
       return 0;
     }
   }
