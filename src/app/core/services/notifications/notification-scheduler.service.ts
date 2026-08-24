@@ -213,127 +213,16 @@ export class NotificationSchedulerService {
   }
 
   /**
-   * Dev-only: runs the real evaluation logic but fires the winning notification
-   * at the given hour:minute today.
-   * Returns true if a notification was scheduled, false otherwise.
+   * Evaluate every registered definition against the current pantry and return
+   * the winning payload for `now`. Public because the dev panel needs the real
+   * evaluation logic without duplicating the context assembly.
    */
-  async scheduleNotificationAtTime(hour: number, minute: number): Promise<boolean> {
-    if (!Capacitor.isNativePlatform()) return false;
-
-    await this.permission.init();
-
-    if (!this.permission.isGranted()) {
-      const granted = await this.permission.request();
-      if (!granted) return false;
-    }
-
+  evaluateWinnerNow(now: Date): ScheduledNotification | null {
     const preferences = this.preferencesService.preferences();
     const items = this.pantryStore.loadedProducts();
-    const now = new Date();
     const t = (key: string, params?: Record<string, unknown>): string =>
       this.translate.instant(key, params);
-
-    const winner = this.evaluateWinningNotification(preferences, items, now, t);
-    if (!winner) return false;
-
-    const scheduleAt = new Date();
-    scheduleAt.setHours(hour, minute, 0, 0);
-
-    await this.plugin.schedule([{
-      id: winner.id,
-      title: winner.title,
-      body: winner.body,
-      scheduleAt,
-    }]);
-
-    return true;
-  }
-
-  /**
-   * Dev-only: evaluates all registered definitions and returns the winning
-   * notification payload without scheduling anything.
-   * Returns null if no notification would be scheduled.
-   */
-  async previewNextNotification(): Promise<{ title: string; body: string } | null> {
-    const preferences = this.preferencesService.preferences();
-    const items = this.pantryStore.loadedProducts();
-    const now = new Date();
-    const t = (key: string, params?: Record<string, unknown>): string =>
-      this.translate.instant(key, params);
-
-    const winner = this.evaluateWinningNotification(preferences, items, now, t);
-    if (!winner) return null;
-
-    return { title: winner.title, body: winner.body };
-  }
-
-  /**
-   * Dev-only: runs the real evaluation logic but fires the winning notification
-   * in 5 seconds regardless of the configured notification hour.
-   * Returns true if a notification was scheduled, false otherwise.
-   */
-  async scheduleTestNotification(): Promise<boolean> {
-    if (!Capacitor.isNativePlatform()) return false;
-
-    await this.permission.init();
-
-    if (!this.permission.isGranted()) {
-      const granted = await this.permission.request();
-      if (!granted) return false;
-    }
-
-    const preferences = this.preferencesService.preferences();
-    const items = this.pantryStore.loadedProducts();
-    const now = new Date();
-    const t = (key: string, params?: Record<string, unknown>): string =>
-      this.translate.instant(key, params);
-
-    const winner = this.evaluateWinningNotification(preferences, items, now, t);
-    if (!winner) return false;
-
-    await this.plugin.schedule([{
-      id: winner.id,
-      title: winner.title,
-      body: winner.body,
-      scheduleAt: new Date(Date.now() + 5_000),
-    }]);
-
-    return true;
-  }
-
-  /**
-   * Dev-only: build a single specific definition (regardless of priority) and
-   * fire it in ~5 seconds. Returns false if the definition is not registered,
-   * or if its build() returns null (no items to notify about).
-   */
-  async fireDefinitionInFiveSeconds(definitionId: number): Promise<boolean> {
-    const def = this.registry.getById(definitionId);
-    if (!def) return false;
-
-    await this.permission.init();
-    if (!this.permission.isGranted()) {
-      const granted = await this.permission.request();
-      if (!granted) return false;
-    }
-
-    const preferences = this.preferencesService.preferences();
-    const items = this.pantryStore.loadedProducts();
-    const now = new Date();
-    const t = (key: string, params?: Record<string, unknown>): string =>
-      this.translate.instant(key, params);
-
-    const payload = def.build({ items, preferences, t, now });
-    if (!payload) return false;
-
-    await this.plugin.schedule([{
-      id: payload.id,
-      title: payload.title,
-      body: payload.body,
-      scheduleAt: new Date(Date.now() + 5_000),
-      extra: payload.extra,
-    }]);
-
-    return true;
+    return this.evaluateWinningNotification(preferences, items, now, t);
   }
 
   /** Evaluate all notification definitions and return the highest-priority payload. */

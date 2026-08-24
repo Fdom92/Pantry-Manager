@@ -1,18 +1,18 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { NOTIFICATION_IDS, PROJECTED_NOTIFICATION_IDS } from '@core/constants';
 import type { PendingNotification } from '@core/services/notifications/notification.plugin';
 import { CapacitorNotificationPlugin } from '@core/services/notifications/capacitor-notification.plugin';
 import { NotificationPermissionService } from '@core/services/notifications/notification-permission.service';
 import { NotificationRegistryService } from '@core/services/notifications/notification-registry.service';
-import { NotificationSchedulerService } from '@core/services/notifications/notification-scheduler.service';
 import { WelcomeNotificationService } from '@core/services/notifications/welcome-notification.service';
 import { SettingsPreferencesService } from './settings-preferences.service';
 import { ToastService } from '@core/services/shared';
+import type { DevNotificationsService } from '@core/services/dev/dev-notifications.service';
 
 @Injectable()
 export class SettingsNotificationsDevStateService {
-  private readonly scheduler = inject(NotificationSchedulerService);
+  private readonly injector = inject(Injector);
   private readonly registry = inject(NotificationRegistryService);
   private readonly permission = inject(NotificationPermissionService);
   private readonly plugin = inject(CapacitorNotificationPlugin);
@@ -40,18 +40,23 @@ export class SettingsNotificationsDevStateService {
     this.pending.set(list);
   }
 
+  private async dev(): Promise<DevNotificationsService> {
+    const { DevNotificationsService } = await import('@core/services/dev/dev-notifications.service');
+    return this.injector.get(DevNotificationsService);
+  }
+
   async previewNext(): Promise<{ title: string; body: string } | null> {
-    return await this.scheduler.previewNextNotification();
+    return (await this.dev()).previewNext();
   }
 
   async fireWinning(): Promise<void> {
-    const ok = await this.scheduler.scheduleTestNotification();
+    const ok = await (await this.dev()).fireWinning(new Date(Date.now() + 5_000));
     this.notifyOutcome(ok);
     await this.refreshPending();
   }
 
   async fireDefinition(definitionId: number): Promise<void> {
-    const ok = await this.scheduler.fireDefinitionInFiveSeconds(definitionId);
+    const ok = await (await this.dev()).fireDefinition(definitionId);
     this.notifyOutcome(ok);
     await this.refreshPending();
   }
@@ -67,9 +72,10 @@ export class SettingsNotificationsDevStateService {
   }
 
   async fireProjected(): Promise<void> {
-    const ok = await this.scheduler.fireDefinitionInFiveSeconds(NOTIFICATION_IDS.EXPIRED_ITEMS)
-      || await this.scheduler.fireDefinitionInFiveSeconds(NOTIFICATION_IDS.NEAR_EXPIRY)
-      || await this.scheduler.fireDefinitionInFiveSeconds(NOTIFICATION_IDS.LOW_STOCK);
+    const dev = await this.dev();
+    const ok = await dev.fireDefinition(NOTIFICATION_IDS.EXPIRED_ITEMS)
+      || await dev.fireDefinition(NOTIFICATION_IDS.NEAR_EXPIRY)
+      || await dev.fireDefinition(NOTIFICATION_IDS.LOW_STOCK);
     this.notifyOutcome(ok);
     await this.refreshPending();
   }

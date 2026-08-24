@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, Injector, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SettingsStateService } from '@core/services/settings/settings-state.service';
 import { NotificationSchedulerService } from '@core/services/notifications/notification-scheduler.service';
@@ -8,6 +8,7 @@ import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenue
 import { computeAnnualSavingsPercent } from '@core/domain/upgrade';
 import { LanguageService } from '@core/services/shared/language.service';
 import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
+import type { DevNotificationsService } from '@core/services/dev/dev-notifications.service';
 import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
 import { LocalStorageService, LoggerService, ToastService } from '@core/services/shared';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
@@ -82,6 +83,7 @@ export class SettingsComponent {
   readonly facade = inject(SettingsStateService);
   readonly dev = inject(SettingsNotificationsDevStateService);
   private readonly scheduler = inject(NotificationSchedulerService);
+  private readonly injector = inject(Injector);
   private readonly pantry = inject(PantryQueryService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly translate = inject(TranslateService);
@@ -251,11 +253,16 @@ export class SettingsComponent {
 
   // ─── Notifications ────────────────────────────────────────────────────────
 
+  private async devNotifications(): Promise<DevNotificationsService> {
+    const { DevNotificationsService } = await import('@core/services/dev/dev-notifications.service');
+    return this.injector.get(DevNotificationsService);
+  }
+
   async testNotification(): Promise<void> {
     if (this.isTestingNotification()) return;
     this.isTestingNotification.set(true);
     try {
-      await this.scheduler.scheduleTestNotification();
+      await (await this.devNotifications()).fireWinning(new Date(Date.now() + 5_000));
     } finally {
       this.isTestingNotification.set(false);
     }
@@ -284,7 +291,9 @@ export class SettingsComponent {
     this.isSchedulingAtTime.set(true);
     try {
       const [hour, minute] = this.scheduleAtTimeInput().split(':').map(Number);
-      await this.scheduler.scheduleNotificationAtTime(hour, minute);
+      const at = new Date();
+      at.setHours(hour, minute, 0, 0);
+      await (await this.devNotifications()).fireWinning(at);
     } finally {
       this.isSchedulingAtTime.set(false);
     }
@@ -294,7 +303,7 @@ export class SettingsComponent {
     if (this.isPreviewingNotification()) return;
     this.isPreviewingNotification.set(true);
     try {
-      const result = await this.scheduler.previewNextNotification();
+      const result = (await this.devNotifications()).previewNext();
       if (result) {
         window.alert(`${result.title}\n\n${result.body}`);
       } else {
