@@ -19,7 +19,6 @@ export class CatalogOptionsService {
    */
   async addCategoryOption(value: string): Promise<string> {
     const formatted = formatFriendlyName(value, value);
-    const normalized = normalizeCategoryId(formatted);
     const current = await this.appPreferences.getPreferences();
 
     // Find existing match
@@ -40,7 +39,6 @@ export class CatalogOptionsService {
    */
   async addLocationOption(value: string): Promise<string> {
     const formatted = formatFriendlyName(value, value);
-    const normalized = normalizeLocationId(formatted);
     const current = await this.appPreferences.getPreferences();
 
     // Find existing match
@@ -61,7 +59,6 @@ export class CatalogOptionsService {
    */
   async addSupermarketOption(value: string): Promise<string> {
     const formatted = formatFriendlyName(value, value);
-    const normalized = normalizeSupermarketValue(formatted);
     const current = await this.appPreferences.getPreferences();
 
     // Find existing match

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { normalizePackages, pickPreferredPackage } from '@core/domain/upgrade';
 import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-capacitor';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { LoggerService } from '../shared/logger.service';
@@ -16,7 +16,6 @@ export class UpgradeRevenuecatService {
   private readonly publicApiKey = environment.revenueCatPublicKey;
   private readonly proSubject = new BehaviorSubject<boolean>(this.loadStoredState());
   readonly isPro$: Observable<boolean> = this.proSubject.asObservable();
-  readonly canUseAgent$: Observable<boolean> = this.isPro$.pipe(map(isPro => isPro || !environment.production));
   private readonly trialEligibleSubject = new BehaviorSubject<boolean>(false);
   readonly hasUnusedTrial$: Observable<boolean> = this.trialEligibleSubject.asObservable();
   private readonly preferredPackageTypes: PACKAGE_TYPE[] = [
@@ -26,10 +25,6 @@ export class UpgradeRevenuecatService {
 
   isPro(): boolean {
     return this.proSubject.value;
-  }
-
-  canUseAgent(): boolean {
-    return !environment.production || this.isPro();
   }
 
   /** Dev-only: force a specific PRO state for testing purposes. No-op in production. */
