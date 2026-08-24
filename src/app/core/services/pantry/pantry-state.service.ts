@@ -25,8 +25,7 @@ import { PantryViewModelService } from './pantry-view-model.service';
 import { SkeletonLoadingManager } from '@core/utils';
 import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
-import { ToastController } from '@ionic/angular';
-import { TranslateService } from '@ngx-translate/core';
+import { ToastService } from '../shared';
 import { type FreshState, freshStateToQty } from '@core/domain/pantry';
 
 /**
@@ -49,8 +48,7 @@ export class PantryStateService {
   private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly freshAddModal = inject(PantryFreshAddModalStateService);
   private readonly historyManager = inject(HistoryEventManagerService);
-  private readonly toastCtrl = inject(ToastController);
-  private readonly translate = inject(TranslateService);
+  private readonly toast = inject(ToastService);
 
   // Core state signals
   readonly skeletonPlaceholders = this.listUi.skeletonPlaceholders;
@@ -472,23 +470,16 @@ export class PantryStateService {
     await this.historyManager.logAdvancedEdit(item, updated, 'pantry_card');
 
     let msgKey: string;
-    let duration = 1500;
     if (state === 'none' && item.isBasic) {
       msgKey = 'pantry.toasts.addedToList';
     } else if (state === 'none') {
       msgKey = 'pantry.fresh.toast.markedOutHint';
-      duration = 2500;
     } else if (state === 'low') {
       msgKey = 'pantry.fresh.toast.updatedLow';
     } else {
       msgKey = 'pantry.fresh.toast.updated';
     }
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant(msgKey),
-      duration,
-      position: 'bottom',
-    });
-    await toast.present();
+    this.toast.success(msgKey);
   }
 
   async toggleItemBasic(item: PantryItem): Promise<void> {
@@ -509,12 +500,7 @@ export class PantryStateService {
     } else {
       msgKey = isDepleted ? 'pantry.toasts.isBasicOffDepleted' : 'pantry.toasts.isBasicOff';
     }
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant(msgKey),
-      duration: 1200,
-      position: 'bottom',
-    });
-    await toast.present();
+    this.toast.success(msgKey);
   }
 
   openFreshAddModal(): void {

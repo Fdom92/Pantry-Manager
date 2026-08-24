@@ -16,12 +16,12 @@ import { hasBatchMetadataChanged } from '@core/utils/pantry-diff.util';
 import { formatFriendlyName, normalizeTrim } from '@core/utils/normalization.util';
 import { ANALYTICS_EVENTS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { TranslateService } from '@ngx-translate/core';
-import { ToastController } from '@ionic/angular';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { CatalogOptionsService } from '../../settings';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { LoggerService } from '../../shared/logger.service';
+import { ToastService } from '../../shared';
 
 /**
  * Manages batches modal state and batch view models.
@@ -31,7 +31,7 @@ export class PantryBatchesModalStateService {
   private readonly viewModel = inject(PantryViewModelService);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly translate = inject(TranslateService);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toast = inject(ToastService);
   private readonly catalogOptions = inject(CatalogOptionsService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
@@ -304,12 +304,7 @@ export class PantryBatchesModalStateService {
       this.selectedBatchesItem.set(updatedItem);
       this.editMode.set(false);
       this.editedBatches.set([]);
-      const toast = await this.toastCtrl.create({
-        message: this.translate.instant('pantry.toasts.saved'),
-        duration: 1500,
-        position: 'bottom',
-      });
-      void toast.present();
+      this.toast.success('pantry.toasts.saved');
     } catch (err) {
       this.logger.error('PantryBatchesModalStateService', 'saveBatches error', err);
     } finally {

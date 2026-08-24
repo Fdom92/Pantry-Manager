@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { CapacitorPluginMlKitTextRecognition } from '@pantrist/capacitor-plugin-ml-kit-text-recognition';
-import { AlertController, ToastController } from '@ionic/angular/standalone';
+import { AlertController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { createDocumentId } from '@core/utils/uuid.util';
@@ -19,6 +19,7 @@ import { ReceiptLlmClientService } from '../../receipt/receipt-llm-client.servic
 import { UpgradeRevenuecatService } from '../../upgrade/upgrade-revenuecat.service';
 import { LocalStorageService } from '../../shared/local-storage.service';
 import { LoggerService } from '../../shared/logger.service';
+import { ToastService } from '../../shared';
 
 const FRAMING_HINT_KEY = 'receiptScanFraming';
 
@@ -34,7 +35,7 @@ export class PantryReceiptScanModalStateService {
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
   private readonly translate = inject(TranslateService);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toast = inject(ToastService);
   private readonly alertCtrl = inject(AlertController);
   private readonly llmClient = inject(ReceiptLlmClientService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
@@ -152,13 +153,7 @@ export class PantryReceiptScanModalStateService {
    * see the smart badge missing.
    */
   private async showSmartScanFallbackToast(): Promise<void> {
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant('pantry.receiptScan.smartScanFallback'),
-      duration: 3000,
-      position: 'bottom',
-      color: 'warning',
-    });
-    void toast.present();
+    this.toast.info('pantry.receiptScan.smartScanFallback');
   }
 
   /**
@@ -320,15 +315,10 @@ export class PantryReceiptScanModalStateService {
       });
 
       this.close();
-      const toast = await this.toastCtrl.create({
-        message: this.translate.instant(
-          added === 1 ? 'pantry.receiptScan.toastAdded_one' : 'pantry.receiptScan.toastAdded_other',
-          { count: added },
-        ),
-        duration: 2000,
-        position: 'bottom',
-      });
-      void toast.present();
+      this.toast.success(
+        added === 1 ? 'pantry.receiptScan.toastAdded_one' : 'pantry.receiptScan.toastAdded_other',
+        { count: added },
+      );
     } catch (err) {
       this.logger.error('PantryReceiptScanModalStateService', 'submit error', err);
     } finally {

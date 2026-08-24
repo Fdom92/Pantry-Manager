@@ -5,7 +5,6 @@ import type { FoodType } from '@core/models/shared/enums.model';
 import { buildPantryItemAutocomplete, createDocumentId } from '@core/utils';
 import { formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
 import { dedupeByNormalizedKey } from '@core/utils/normalization.util';
-import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
@@ -15,6 +14,7 @@ import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { LanguageService } from '../../shared/language.service';
 import { LoggerService } from '../../shared/logger.service';
+import { ToastService } from '../../shared';
 import { PantryStoreService } from '../pantry-store.service';
 
 /**
@@ -24,7 +24,7 @@ import { PantryStoreService } from '../pantry-store.service';
 export class PantryAddModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly translate = inject(TranslateService);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toast = inject(ToastService);
   private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
@@ -157,11 +157,11 @@ export class PantryAddModalStateService {
         }
       }
       this.dismissAddModal();
-      const msg = entries.length === 1
-        ? this.translate.instant('pantry.toasts.createSuccess', { name: entries[0].name, quantity: '', breakdown: '' })
-        : this.translate.instant('pantry.toasts.multipleAdded', { count: entries.length });
-      const toast = await this.toastCtrl.create({ message: msg, duration: 1500, position: 'bottom' });
-      void toast.present();
+      if (entries.length === 1) {
+        this.toast.success('pantry.toasts.createSuccess', { name: entries[0].name, quantity: '', breakdown: '' });
+      } else {
+        this.toast.success('pantry.toasts.multipleAdded', { count: entries.length });
+      }
     }).catch(async err => {
       this.logger.error('PantryAddModalStateService', 'submitAdd error', err);
     });
