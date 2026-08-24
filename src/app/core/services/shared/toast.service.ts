@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { LoggerService } from './logger.service';
 
 export interface ToastOptions {
   duration?: number;
@@ -24,6 +25,7 @@ const DURATION = {
 export class ToastService {
   private readonly toastCtrl = inject(ToastController);
   private readonly translate = inject(TranslateService);
+  private readonly logger = inject(LoggerService);
 
   success(key: string, params?: Record<string, unknown>): void {
     void this.present(this.translate.instant(key, params), { duration: DURATION.success });
@@ -46,12 +48,16 @@ export class ToastService {
   }
 
   private async present(message: string, opts?: ToastOptions): Promise<void> {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: opts?.duration ?? DURATION.info,
-      position: opts?.position ?? 'bottom',
-      ...(opts?.color ? { color: opts.color } : {}),
-    });
-    await toast.present();
+    try {
+      const toast = await this.toastCtrl.create({
+        message,
+        duration: opts?.duration ?? DURATION.info,
+        position: opts?.position ?? 'bottom',
+        ...(opts?.color ? { color: opts.color } : {}),
+      });
+      await toast.present();
+    } catch (err) {
+      this.logger.warn('ToastService', 'Failed to present toast', { err: String(err) });
+    }
   }
 }
