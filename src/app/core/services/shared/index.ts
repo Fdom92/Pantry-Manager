@@ -6,3 +6,4 @@ export * from './sentry-reporter';
 export * from './share.service';
 export * from './storage.service';
 export * from './local-storage.service';
+export * from './toast.service';
