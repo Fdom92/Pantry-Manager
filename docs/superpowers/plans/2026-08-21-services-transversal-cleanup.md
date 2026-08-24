@@ -1088,6 +1088,16 @@ git commit -m "docs(patterns): document the toast and logging recipes"
 
 ---
 
+## Deuda de test conocida (anotada durante la ejecución)
+
+`NotificationSchedulerService` se queda **sin cobertura unitaria** tras la Task 7.
+Su único spec cubría `fireDefinitionInFiveSeconds`, que se movió con su servicio a
+`dev-notifications.service.spec.ts`; el fichero que quedaba solo declaraba que no
+tenía tests, y se borró. Sin cubrir: `scheduleAll`, `cancelAll`,
+`scheduleProjectedNotifications`, `scheduleStreakMilestone`, `handleNotificationTap`
+y `evaluateWinnerNow`. No entra en esta rama —, es trabajo de test nuevo sobre código
+que este plan no modifica— pero queda escrito para que no se descubra por sorpresa.
+
 ## Fuera de alcance
 
 Este plan no toca `core/domain/` en ningún punto, ni la deuda estructural medida en la misma auditoría (pila de cuatro capas de pantry, fachada de 65 señales, `ListStateService` con 250 líneas de PDF, catálogos triplicados, 9 servicios de modal sin base común). Está toda documentada con cifras en la sección "Fuera de alcance" del spec.
