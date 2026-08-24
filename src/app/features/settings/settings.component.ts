@@ -7,7 +7,7 @@ import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
 import { computeAnnualSavingsPercent } from '@core/domain/upgrade';
 import { LanguageService } from '@core/services/shared/language.service';
-import { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
+import type { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
 import type { DevNotificationsService } from '@core/services/dev/dev-notifications.service';
 import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
 import { LocalStorageService, LoggerService, ToastService } from '@core/services/shared';
@@ -88,7 +88,6 @@ export class SettingsComponent {
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly translate = inject(TranslateService);
   private readonly language = inject(LanguageService);
-  private readonly marketingSeeder = inject(DevMarketingSeederService);
   private readonly alertCtrl = inject(AlertController);
   private readonly toast = inject(ToastService);
   private readonly localStorage = inject(LocalStorageService);
@@ -258,6 +257,11 @@ export class SettingsComponent {
     return this.injector.get(DevNotificationsService);
   }
 
+  private async marketingSeeder(): Promise<DevMarketingSeederService> {
+    const { DevMarketingSeederService } = await import('@core/services/dev/dev-marketing-seeder.service');
+    return this.injector.get(DevMarketingSeederService);
+  }
+
   async testNotification(): Promise<void> {
     if (this.isTestingNotification()) return;
     this.isTestingNotification.set(true);
@@ -338,7 +342,7 @@ export class SettingsComponent {
     if (!confirmed) return;
     this.isSeedingMarketing.set(true);
     try {
-      await this.marketingSeeder.seedMarketingDatabase(this.translate.currentLang);
+      await (await this.marketingSeeder()).seedMarketingDatabase(this.translate.currentLang);
     } finally {
       this.isSeedingMarketing.set(false);
     }
