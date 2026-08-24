@@ -57,7 +57,7 @@ export class SettingsStateService {
   }
 
   async resetApplicationData(): Promise<void> {
-    const confirmed = this.confirm.confirm(this.translate.instant('settings.reset.confirm'));
+    const confirmed = await this.confirm.confirm(this.translate.instant('settings.reset.confirm'));
 
     if (!confirmed) {
       return;

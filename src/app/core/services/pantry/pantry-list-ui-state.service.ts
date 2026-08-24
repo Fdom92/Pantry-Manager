@@ -91,7 +91,7 @@ export class PantryListUiStateService {
     const shouldConfirm = !skipConfirm && typeof window !== 'undefined';
     if (shouldConfirm) {
       const msg = this.translate.instant('pantry.confirmDelete', { name: item.name ?? '' });
-      const confirmed = this.confirm.confirm(msg);
+      const confirmed = await this.confirm.confirm(msg, { confirmKey: 'common.actions.delete' });
       if (!confirmed) {
         return;
       }

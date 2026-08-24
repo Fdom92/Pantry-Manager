@@ -92,6 +92,7 @@
       "clear": "Limpiar",
       "next": "Siguiente",
       "delete": "Eliminar",
+      "confirm": "Confirmar",
       "dismiss": "Descartar"
     },
     "loading": "Cargando…",

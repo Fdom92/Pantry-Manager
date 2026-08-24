@@ -92,6 +92,7 @@
       "clear": "Leeren",
       "next": "Weiter",
       "delete": "Löschen",
+      "confirm": "Bestätigen",
       "dismiss": "Verwerfen"
     },
     "loading": "Lädt…",
