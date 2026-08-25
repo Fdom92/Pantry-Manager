@@ -2,15 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, Injector, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SettingsStateService } from '@core/services/settings/settings-state.service';
-import { NotificationSchedulerService } from '@core/services/notifications/notification-scheduler.service';
-import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
-import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
 import { computeAnnualSavingsPercent } from '@core/domain/upgrade';
-import { LanguageService } from '@core/services/shared/language.service';
-import type { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
 import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
-import { LocalStorageService, LoggerService, ToastService } from '@core/services/shared';
-import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { formatDateTimeValue } from '@core/utils/formatting.util';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { CapacitorPluginMlKitTextRecognition } from '@pantrist/capacitor-plugin-ml-kit-text-recognition';
@@ -39,8 +32,7 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import packageJson from '../../../../package.json';
 import { environment } from 'src/environments/environment';
-import { SettingsNotificationsDevStateService } from '@core/services/settings/settings-notifications-dev-state.service';
-import { AnalyticsService } from '@core/services/analytics/analytics.service';
+import { SettingsDevStateService } from '@core/services/settings/settings-dev-state.service';
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
 import { SettingsSkeletonComponent } from './components/settings-skeleton/settings-skeleton.component';
 import { AlertController } from '@ionic/angular';
@@ -76,39 +68,26 @@ import { AlertController } from '@ionic/angular';
   ],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
-  providers: [SettingsStateService, SettingsNotificationsDevStateService],
+  providers: [SettingsStateService, SettingsDevStateService],
 })
 export class SettingsComponent {
   readonly facade = inject(SettingsStateService);
-  readonly dev = inject(SettingsNotificationsDevStateService);
-  private readonly scheduler = inject(NotificationSchedulerService);
+  readonly dev = inject(SettingsDevStateService);
   private readonly injector = inject(Injector);
-  private readonly pantry = inject(PantryQueryService);
-  private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly translate = inject(TranslateService);
-  private readonly language = inject(LanguageService);
   private readonly alertCtrl = inject(AlertController);
-  private readonly toast = inject(ToastService);
-  private readonly localStorage = inject(LocalStorageService);
-  private readonly appPreferences = inject(SettingsPreferencesService);
-  private readonly analytics = inject(AnalyticsService);
-  private readonly logger = inject(LoggerService);
 
   readonly appVersion = packageJson.version ?? '0.0.0';
   readonly isDev = !environment.production;
   readonly isPro = this.facade.isPro;
   readonly SUPPORTED_LANGUAGES = SUPPORTED_LANGUAGES;
-  readonly currentLanguage = this.language.currentLanguage;
+  readonly currentLanguage = this.facade.currentLanguage;
   protected readonly NOTIFICATION_IDS = NOTIFICATION_IDS;
 
   /** Toggle anonymous analytics opt-in/out via the Privacidad card. */
   async onAnalyticsToggle(event: CustomEvent<{ checked: boolean }>): Promise<void> {
     const next = Boolean(event.detail?.checked);
     await this.facade.toggleAnalytics(next);
-    const messageKey = next
-      ? 'settings.privacy.toastEnabled'
-      : 'settings.privacy.toastDisabled';
-    this.toast.success(messageKey);
   }
 
   /**
@@ -136,31 +115,13 @@ export class SettingsComponent {
    *    cleanly (no router race against the freshly-saved prefs doc).
    */
   async triggerReconsentSheet(): Promise<void> {
-    this.localStorage.onboarding.setSeen(true);
-    // Direct primitive — we want the flag *cleared*, the service only exposes
-    // markShown(). Calling the underlying remove is acceptable in a dev tool.
-    localStorage.removeItem('reconsent:shown');
-
-    try {
-      const prefs = await this.appPreferences.getPreferences();
-      await this.appPreferences.savePreferences({
-        ...prefs,
-        analyticsDecidedAt: null,
-        notificationsDecidedAt: null,
-        analyticsEnabled: undefined,
-      });
-    } catch (err) {
-      this.logger.warn('SettingsComponent', '[Dev] reconsent reset prefs error', { err: String(err) });
-    }
-
+    await this.dev.prepareReconsentSheet();
     sessionStorage.setItem('sync:postReload', '1');
     window.location.href = '/dashboard';
   }
 
   markDeviceAsInternal(): void {
-    this.analytics.markAsInternal();
-    const id = this.analytics.getDistinctId() ?? '—';
-    this.toast.raw(`Marked as internal. ID: ${id}`, { duration: 3000 });
+    this.dev.markDeviceAsInternal();
   }
 
   private versionTapCount = 0;
@@ -186,7 +147,7 @@ export class SettingsComponent {
 
   /** Pretty-print a pending notification scheduleAt ISO for the dev panel. */
   formatPendingTime(iso?: string): string {
-    return formatDateTimeValue(iso, this.language.getCurrentLocale(), { fallback: '—' });
+    return formatDateTimeValue(iso, this.facade.getCurrentLocale(), { fallback: '—' });
   }
 
   // PRO pricing
@@ -203,7 +164,7 @@ export class SettingsComponent {
   );
 
   private async loadPricing(): Promise<void> {
-    const offering = await this.revenuecat.getOfferings();
+    const offering = await this.facade.getOfferings();
     if (!offering) return;
     const monthly = offering.monthly;
     const annual = offering.annual;
@@ -231,7 +192,7 @@ export class SettingsComponent {
 
   // App state
   readonly isResettingOnboarding = signal(false);
-  readonly devIsPro = signal(this.revenuecat.isPro());
+  readonly devIsPro = signal(this.dev.isPro());
 
   readonly showSkeleton = signal(false);
 
@@ -250,11 +211,6 @@ export class SettingsComponent {
   }
 
   // ─── Notifications ────────────────────────────────────────────────────────
-
-  private async marketingSeeder(): Promise<DevMarketingSeederService> {
-    const { DevMarketingSeederService } = await import('@core/services/dev/dev-marketing-seeder.service');
-    return this.injector.get(DevMarketingSeederService);
-  }
 
   async testNotification(): Promise<void> {
     if (this.isTestingNotification()) return;
@@ -316,7 +272,7 @@ export class SettingsComponent {
     if (this.isCancellingNotifications()) return;
     this.isCancellingNotifications.set(true);
     try {
-      await this.scheduler.cancelAll();
+      await this.dev.cancelAll();
     } finally {
       this.isCancellingNotifications.set(false);
     }
@@ -325,7 +281,7 @@ export class SettingsComponent {
   // ─── Language ─────────────────────────────────────────────────────────────
 
   async setLanguage(lang: SupportedLanguage): Promise<void> {
-    await this.language.setLanguage(lang);
+    await this.facade.setLanguage(lang);
   }
 
   // ─── Data ─────────────────────────────────────────────────────────────────
@@ -336,7 +292,7 @@ export class SettingsComponent {
     if (!confirmed) return;
     this.isSeedingMarketing.set(true);
     try {
-      await (await this.marketingSeeder()).seedMarketingDatabase(this.translate.currentLang);
+      await this.dev.seedMarketingDatabase(this.translate.currentLang);
     } finally {
       this.isSeedingMarketing.set(false);
     }
@@ -416,11 +372,7 @@ export class SettingsComponent {
     if (!confirmed) return;
     this.isClearingPantry.set(true);
     try {
-      const items = await this.pantry.getAll();
-      for (const item of items) {
-        await this.pantry.deleteItem(item._id);
-      }
-      await this.pantry.reloadFromStart();
+      await this.dev.clearPantry();
     } finally {
       this.isClearingPantry.set(false);
     }
@@ -434,7 +386,7 @@ export class SettingsComponent {
     try {
       // Wipe every per-device flag so the Dev "Reset onboarding" button gives
       // a truly fresh-install experience (onboarding + re-consent + review).
-      this.localStorage.onboarding.reset();
+      this.dev.resetOnboarding();
     } finally {
       this.isResettingOnboarding.set(false);
     }
@@ -442,12 +394,12 @@ export class SettingsComponent {
 
   togglePro(): void {
     const next = !this.devIsPro();
-    this.revenuecat.setDevProState(next);
+    this.dev.setProState(next);
     this.devIsPro.set(next);
   }
 
   async showAppState(): Promise<void> {
-    const summary = await this.pantry.getSummary();
+    const summary = await this.dev.getPantrySummary();
     const isPro = this.devIsPro();
 
     window.alert([

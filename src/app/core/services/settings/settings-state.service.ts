@@ -6,11 +6,14 @@ import type { BaseDoc } from '@core/models/shared';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { createLatestOnlyRunner, runIfIdle, withSignalFlag } from '@core/utils';
-import { ANALYTICS_EVENTS } from '@core/constants';
+import { ANALYTICS_EVENTS, type SupportedLanguage } from '@core/constants';
 import { ConfirmService, DownloadService, LoggerService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { StorageService } from '../shared/storage.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
+import { LanguageService } from '../shared/language.service';
+import { ToastService } from '../shared/toast.service';
+import type { PurchasesOffering } from '@revenuecat/purchases-capacitor';
 import { SettingsPreferencesService } from './settings-preferences.service';
 import { SyncService } from '../sync/sync.service';
 import { AnalyticsService } from '../analytics/analytics.service';
@@ -23,6 +26,8 @@ export class SettingsStateService {
   private readonly storage = inject<StorageService<BaseDoc>>(StorageService);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
+  private readonly language = inject(LanguageService);
+  private readonly toast = inject(ToastService);
   private readonly navCtrl = inject(NavController);
   private readonly download = inject(DownloadService);
   private readonly confirm = inject(ConfirmService);
@@ -175,6 +180,23 @@ export class SettingsStateService {
     });
   }
 
+  // ─── Idioma ───────────────────────────────────────────────────────────────
+
+  readonly currentLanguage = this.language.currentLanguage;
+
+  getCurrentLocale(): string {
+    return this.language.getCurrentLocale();
+  }
+
+  async setLanguage(lang: SupportedLanguage): Promise<void> {
+    await this.language.setLanguage(lang);
+  }
+
+  /** Offering behind the PRO pricing shown in the Settings hero. */
+  async getOfferings(): Promise<PurchasesOffering | null> {
+    return await this.revenuecat.getOfferings();
+  }
+
   navigateToUpgrade(): void {
     void this.navCtrl.navigateForward('/upgrade');
   }
@@ -193,6 +215,7 @@ export class SettingsStateService {
       } else {
         await this.analytics.optOut();
       }
+      this.toast.success(next ? 'settings.privacy.toastEnabled' : 'settings.privacy.toastDisabled');
     }).catch(err => {
       this.logger.error('SettingsStateService', 'toggleAnalytics error', err);
     });

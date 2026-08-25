@@ -7,11 +7,21 @@ import { NotificationPermissionService } from '@core/services/notifications/noti
 import { NotificationRegistryService } from '@core/services/notifications/notification-registry.service';
 import { WelcomeNotificationService } from '@core/services/notifications/welcome-notification.service';
 import { SettingsPreferencesService } from './settings-preferences.service';
+import { AnalyticsService } from '@core/services/analytics/analytics.service';
+import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
+import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
+import { LocalStorageService } from '@core/services/shared/local-storage.service';
+import { LoggerService } from '@core/services/shared/logger.service';
 import { ToastService } from '@core/services/shared';
 import type { DevNotificationsService } from '@core/services/dev/dev-notifications.service';
 
+/**
+ * Everything the dev panel in Settings can do. Page-scoped and only ever
+ * reached from a build where the panel is visible — keeping these
+ * dependencies here is what lets the Settings page itself stay a page.
+ */
 @Injectable()
-export class SettingsNotificationsDevStateService {
+export class SettingsDevStateService {
   private readonly injector = inject(Injector);
   private readonly registry = inject(NotificationRegistryService);
   private readonly permission = inject(NotificationPermissionService);
@@ -19,6 +29,11 @@ export class SettingsNotificationsDevStateService {
   private readonly preferencesService = inject(SettingsPreferencesService);
   private readonly welcomeNotif = inject(WelcomeNotificationService);
   private readonly toast = inject(ToastService);
+  private readonly analytics = inject(AnalyticsService);
+  private readonly pantry = inject(PantryQueryService);
+  private readonly revenuecat = inject(UpgradeRevenuecatService);
+  private readonly localStorage = inject(LocalStorageService);
+  private readonly logger = inject(LoggerService);
 
   readonly isNativePlatform = Capacitor.isNativePlatform();
   readonly pending = signal<PendingNotification[]>([]);
@@ -93,6 +108,77 @@ export class SettingsNotificationsDevStateService {
     ];
     await this.plugin.cancel(allIds);
     await this.refreshPending();
+  }
+
+  // ─── Datos ────────────────────────────────────────────────────────────────
+
+  /** Wipe every pantry item, one by one, and reload the list from scratch. */
+  async clearPantry(): Promise<void> {
+    const items = await this.pantry.getAll();
+    for (const item of items) {
+      await this.pantry.deleteItem(item._id);
+    }
+    await this.pantry.reloadFromStart();
+  }
+
+  /** Counts behind the dev "app state" dump. */
+  async getPantrySummary(): Promise<{ total: number; expired: number; nearExpiry: number; lowStock: number }> {
+    return await this.pantry.getSummary();
+  }
+
+  /** Populate a realistic pantry for store screenshots. Loaded on demand. */
+  async seedMarketingDatabase(lang: string): Promise<void> {
+    const { DevMarketingSeederService } = await import('@core/services/dev/dev-marketing-seeder.service');
+    await this.injector.get(DevMarketingSeederService).seedMarketingDatabase(lang);
+  }
+
+  // ─── Estado de la app ─────────────────────────────────────────────────────
+
+  /** Wipe every per-device flag, for a truly fresh-install experience. */
+  resetOnboarding(): void {
+    this.localStorage.onboarding.reset();
+  }
+
+  isPro(): boolean {
+    return this.revenuecat.isPro();
+  }
+
+  setProState(isPro: boolean): void {
+    this.revenuecat.setDevProState(isPro);
+  }
+
+  markDeviceAsInternal(): void {
+    this.analytics.markAsInternal();
+    const id = this.analytics.getDistinctId() ?? '—';
+    this.toast.raw(`Marked as internal. ID: ${id}`, { duration: 3000 });
+  }
+
+  /**
+   * Put the app back in the state where the re-consent sheet is due:
+   *  - Keep `hasSeenOnboarding = true` (the user must look like an existing one).
+   *  - Clear the one-shot `reconsent:shown` flag.
+   *  - Wipe the consent decision timestamps from PouchDB preferences so
+   *    `ReconsentPromptService.resolvePendingQuestions()` reports both as pending.
+   *
+   * Returns once the state is written; the caller reloads the app.
+   */
+  async prepareReconsentSheet(): Promise<void> {
+    this.localStorage.onboarding.setSeen(true);
+    // Direct primitive — we want the flag *cleared*, and the service only
+    // exposes markShown(). Acceptable in a dev tool.
+    localStorage.removeItem('reconsent:shown');
+
+    try {
+      const prefs = await this.preferencesService.getPreferences();
+      await this.preferencesService.savePreferences({
+        ...prefs,
+        analyticsDecidedAt: null,
+        notificationsDecidedAt: null,
+        analyticsEnabled: undefined,
+      });
+    } catch (err) {
+      this.logger.warn('SettingsDevStateService', 'reconsent reset prefs error', { err: String(err) });
+    }
   }
 
   private notifyOutcome(ok: boolean): void {

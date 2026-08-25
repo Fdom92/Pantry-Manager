@@ -337,6 +337,16 @@ export class DashboardStateService {
     await this.navCtrl.navigateRoot('/list');
   }
 
+  /**
+   * Same destination as the Insights quality card: the preset both filters the
+   * pantry to pending items and opens the bulk-fix sheet once the list has
+   * loaded (see PantryStateService.ionViewWillEnter).
+   */
+  async goToPendientes(): Promise<void> {
+    this.navigationPreset.setPending({ pendientes: true });
+    await this.navCtrl.navigateRoot('/pantry');
+  }
+
   async actOnToday(): Promise<void> {
     const suggestion = this.todaySuggestion();
     if (!suggestion || this.isConsumingToday()) return;
