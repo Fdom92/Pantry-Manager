@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { normalizePackages, pickPreferredPackage } from '@core/domain/upgrade';
+import { normalizePackages, pickPreferredPackage, resolveProStatus, type ProStatusInput } from '@core/domain/upgrade';
 import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -63,7 +63,7 @@ export class UpgradeRevenuecatService {
     }
     try {
       await Purchases.configure({ apiKey: this.publicApiKey, appUserID: userId });
-      Purchases.addCustomerInfoUpdateListener((info: any) => {
+      Purchases.addCustomerInfoUpdateListener(info => {
         const isPro = this.extractIsPro(info);
         if (isPro === null) {
           this.logger.warn('UpgradeRevenuecatService', 'customerInfo update without entitlement data; keeping previous state');
@@ -72,8 +72,8 @@ export class UpgradeRevenuecatService {
         this.updateProState(isPro);
         void this.refreshTrialEligibility();
       });
-      const info = await Purchases.getCustomerInfo();
-      const isPro = this.extractIsPro(info);
+      const { customerInfo } = await Purchases.getCustomerInfo();
+      const isPro = this.extractIsPro(customerInfo);
       if (isPro !== null) {
         this.updateProState(isPro);
       } else {
@@ -165,8 +165,8 @@ export class UpgradeRevenuecatService {
 
   async restore(): Promise<boolean> {
     try {
-      const info = await Purchases.restorePurchases();
-      const isPro = this.extractIsPro(info);
+      const { customerInfo } = await Purchases.restorePurchases();
+      const isPro = this.extractIsPro(customerInfo);
       if (isPro !== null) {
         this.updateProState(isPro);
       }
@@ -181,35 +181,29 @@ export class UpgradeRevenuecatService {
     }
   }
 
-  private extractIsPro(info: any): boolean | null {
-    const entitlements = info?.entitlements?.active ?? info?.subscriber?.entitlements?.active;
-    if (!entitlements) {
-      this.logger.warn('UpgradeRevenuecatService', 'entitlements missing in customer info', { info });
-      return null;
+  /**
+   * Reads PRO status out of whatever RevenueCat handed back. The decision — and
+   * the reasons it can fail to decide — live in resolveProStatus; this only
+   * logs what happened, because a customer who cannot be classified is worth a
+   * breadcrumb when the next real failure arrives.
+   */
+  private extractIsPro(info: ProStatusInput | null | undefined): boolean | null {
+    const status = resolveProStatus(info);
+
+    if (status.reason === 'entitlements-missing') {
+      this.logger.warn('UpgradeRevenuecatService', 'entitlements missing in customer info', { info: String(info) });
+    } else if (status.reason === 'active-subscriptions') {
+      this.logger.warn('UpgradeRevenuecatService', 'entitlements empty but active subscriptions present', {
+        activeSubs: status.activeSubscriptions,
+      });
+    } else if (status.reason === 'no-active-entitlements') {
+      this.logger.warn('UpgradeRevenuecatService', 'no active entitlements found', {
+        entitlements: status.entitlementKeys,
+        activeSubs: status.activeSubscriptions,
+      });
     }
-    const keys = Object.keys(entitlements);
-    // accept common names or any active entitlement as PRO
-    if (entitlements['pro'] || entitlements['premium']) {
-      return true;
-    }
-    const anyActive = keys.some(key => {
-      const value = entitlements[key];
-      return Boolean(value?.isActive ?? value);
-    });
-    if (anyActive) {
-      return true;
-    }
-    const activeSubs: string[] =
-      info?.activeSubscriptions ??
-      info?.subscriber?.activeSubscriptions ??
-      info?.subscriber?.allPurchasedProductIdentifiers ??
-      [];
-    if (activeSubs.length) {
-      this.logger.warn('UpgradeRevenuecatService', 'entitlements empty but active subscriptions present', { activeSubs });
-      return true;
-    }
-    this.logger.warn('UpgradeRevenuecatService', 'no active entitlements found', { entitlements: keys, activeSubs });
-    return false;
+
+    return status.isPro;
   }
 
   private updateProState(isPro: boolean): void {
