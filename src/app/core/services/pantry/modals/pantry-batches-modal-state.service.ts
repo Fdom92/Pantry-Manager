@@ -245,7 +245,7 @@ export class PantryBatchesModalStateService {
   }
 
   private async addAndAssignLocation(index: number, value: string): Promise<void> {
-    const selected = await this.catalogOptions.addLocationOption(value);
+    const selected = await this.catalogOptions.addOption('location', value);
     this.updateBatchLocation(index, selected);
   }
 

@@ -170,12 +170,12 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
   }
 
   private async addSupermarketOption(value: string): Promise<void> {
-    const selected = await this.catalogOptions.addSupermarketOption(value);
+    const selected = await this.catalogOptions.addOption('supermarket', value);
     this.form.get('supermarket')?.setValue(selected);
   }
 
   private async addCategoryOption(value: string): Promise<void> {
-    const selected = await this.catalogOptions.addCategoryOption(value);
+    const selected = await this.catalogOptions.addOption('category', value);
     this.form.get('categoryId')?.setValue(selected);
   }
 
