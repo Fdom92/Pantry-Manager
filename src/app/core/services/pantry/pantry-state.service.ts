@@ -25,6 +25,7 @@ import { PantryViewModelService } from './pantry-view-model.service';
 import { SkeletonLoadingManager } from '@core/utils';
 import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
+import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared';
 import { type FreshState, freshStateToQty } from '@core/domain/pantry';
 
@@ -48,6 +49,7 @@ export class PantryStateService {
   private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly freshAddModal = inject(PantryFreshAddModalStateService);
   private readonly historyManager = inject(HistoryEventManagerService);
+  private readonly localStorage = inject(LocalStorageService);
   private readonly toast = inject(ToastService);
 
   // Core state signals
@@ -513,6 +515,14 @@ export class PantryStateService {
 
   onDestroy(): void {
     this.batchOps.clearAll();
+  }
+
+  /**
+   * Whether the user has finished onboarding. The add coach mark waits for it —
+   * showing a hint on top of a pantry the user has not met yet is noise.
+   */
+  hasSeenOnboarding(): boolean {
+    return this.localStorage.onboarding.isSeen();
   }
 
   // -------- Private helpers --------

@@ -1,11 +1,17 @@
 {
   "root": true,
-  "ignorePatterns": ["projects/**/*"],
+  "ignorePatterns": [
+    "projects/**/*"
+  ],
   "overrides": [
     {
-      "files": ["*.ts"],
+      "files": [
+        "*.ts"
+      ],
       "parserOptions": {
-        "project": ["tsconfig.json"],
+        "project": [
+          "tsconfig.json"
+        ],
         "createDefaultProgram": true
       },
       "extends": [
@@ -16,7 +22,10 @@
         "@angular-eslint/component-class-suffix": [
           "error",
           {
-            "suffixes": ["Page", "Component"]
+            "suffixes": [
+              "Page",
+              "Component"
+            ]
           }
         ],
         "@angular-eslint/component-selector": [
@@ -38,7 +47,9 @@
       }
     },
     {
-      "files": ["src/app/features/**/*.ts"],
+      "files": [
+        "src/app/features/**/*.ts"
+      ],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -49,8 +60,8 @@
                 "message": "No importes desde @core/services (barrel). Importa el *StateService concreto."
               },
               {
-                "regex": "^@core/services/(?!.*-state\\.service$).*",
-                "message": "Features solo pueden importar StateServices (rutas que terminen en -state.service)."
+                "regex": "^@core/services/(?!.*(?:-state\\.service|\\.providers)$).*",
+                "message": "Features solo pueden importar StateServices (rutas que terminen en -state.service) o arrays de providers (*.providers)."
               }
             ]
           }
@@ -58,7 +69,9 @@
       }
     },
     {
-      "files": ["src/app/core/domain/**/*.ts"],
+      "files": [
+        "src/app/core/domain/**/*.ts"
+      ],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -78,7 +91,9 @@
       }
     },
     {
-      "files": ["src/app/core/services/**/*.ts"],
+      "files": [
+        "src/app/core/services/**/*.ts"
+      ],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -98,8 +113,12 @@
       }
     },
     {
-      "files": ["*.html"],
-      "extends": ["plugin:@angular-eslint/template/recommended"],
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended"
+      ],
       "rules": {}
     }
   ]
