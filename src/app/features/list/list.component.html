@@ -72,7 +72,7 @@
                       class="suggestion-item">
                       <div class="item-body" slot="start">
                         <span class="item-name">{{ suggestion.item.name }}</span>
-                        @if (suggestion.minThreshold != null) {
+                        @if (suggestion.minThreshold !== undefined) {
                           <span class="item-qty">
                             {{ 'shopping.suggestions.restock' | translate:{ amount: suggestion.suggestedQuantity } }}
                           </span>

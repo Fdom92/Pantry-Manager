@@ -55,7 +55,6 @@ export class CapacitorNotificationPlugin implements INotificationPlugin {
       await LocalNotifications.createChannel({
         id: options.id,
         name: options.name,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         importance: options.importance as any,
         visibility: 1,
         sound: 'default',

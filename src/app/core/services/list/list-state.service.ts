@@ -544,7 +544,6 @@ export class ListStateService {
     }
 
     // ── Footers (all pages) ───────────────────────────────────────────────────
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const total        = (doc.internal as any).getNumberOfPages() as number;
     const footerLineY  = PAGE_H - 12;
     const footerTextY  = PAGE_H - 7;
