@@ -54,8 +54,4 @@ import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.
 })
 export class SettingsCatalogsComponent {
   readonly state = inject(SettingsCatalogsStateService);
-
-  async ionViewWillEnter(): Promise<void> {
-    await this.state.ionViewWillEnter();
-  }
 }

@@ -70,8 +70,13 @@ export class SettingsCatalogsStateService {
     return `settings.catalogs.${CATALOG_VIEWS.find(v => v.kind === kind)!.ns}.${name}`;
   }
 
-  async ionViewWillEnter(): Promise<void> {
-    await this.loadPreferences();
+  constructor() {
+    // Not ionViewWillEnter: that hook does not fire reliably for this page, and
+    // when it does not, the screen shows empty catalogs over stored values —
+    // the user's own locations, categories and supermarkets, saved and
+    // invisible. Loading on construction cannot miss, and the service is
+    // page-scoped so it is constructed on every entry anyway.
+    void this.loadPreferences();
   }
 
   addOption(kind: CatalogKind): void {
