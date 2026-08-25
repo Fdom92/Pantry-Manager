@@ -6,8 +6,11 @@ export { foodTypeExpires };
 
 /**
  * Shelf life per FoodType, derived from FOOD_TYPE_PROFILE — null where a date
- * would be a fiction. Kept as a named export because it reads better at the
- * call sites that only care about the number.
+ * would be a fiction.
+ *
+ * No production code reads this: every caller goes through suggestExpiryDate.
+ * It stays because the spec walks it against every FoodType value, which is
+ * what fails the build when a food type is added without a shelf life.
  */
 export const EXPIRY_SUGGESTION_DAYS: Record<FoodType, number | null> =
   Object.fromEntries(
