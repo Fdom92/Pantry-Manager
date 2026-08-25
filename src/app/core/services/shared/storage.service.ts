@@ -112,10 +112,14 @@ export class StorageService<T extends BaseDoc> {
       const res: PouchResponse = await this.db.put(newDoc as any);
       return { ...newDoc, _rev: res.rev } as T;
     } catch (err: unknown) {
+      // Breadcrumb, not an event: this layer rethrows, so it has not handled
+      // anything. Whoever catches upstream — PantryStoreService and friends —
+      // is the one that reports the failure, and this context travels with it.
       if (isPouchDbError(err) && err.status === 409) {
         this.logger.warn('StorageService', `Conflict while saving document: ${docId}`, { err });
+      } else {
+        this.logger.warn('StorageService', 'upsert error', { err: String(err) });
       }
-      this.logger.error('StorageService', 'upsert error', err);
       throw err;
     }
   }
