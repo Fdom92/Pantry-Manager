@@ -305,3 +305,53 @@ tres mensajes ya enuncia la consecuencia y hace la pregunta ("Esta acción no se
 puede deshacer. ¿Quieres continuar?"), y una cabecera repetiría lo mismo con menos
 palabras. No hay claves de título para reutilizar, así que añadirla costaría copy
 nuevo en 6 idiomas para no decir nada nuevo.
+
+---
+
+## Cierre de la auditoría (2026-08-25)
+
+Las siete fases del informe se ejecutaron en la 5.3, salvo cuatro decisiones
+tomadas contra el propio informe. Cada una se midió antes de descartarla.
+
+**Hecho:** CI con lint y tests, las 16 violaciones de frontera, borrado del
+código muerto con el detector re-ejecutado hasta converger en cero, catálogos y
+motor de alta parametrizados, `logExpiredBatches` y el análisis de la compra a
+dominio con tests, `extractIsPro` tipada, panel dev fuera de Ajustes, registro de
+iconos fuera de `main.ts`, los wrappers y delegaciones del Store, los reexportes
+de señal sin lector, y una sola convención de verbos en los nueve modales.
+
+**No hecho, con motivo:**
+
+1. **Fundir Store y Query.** Al contar los llamantes resultó que no son dos capas
+   sobre lo mismo: el Store da estado derivado y mutaciones, Query da datos y
+   pipeline, y cada uno tiene su público. Lo que sobraba eran los wrappers y las
+   seis delegaciones, y eso sí se quitó. Fundirlos daba un servicio de 600 líneas
+   sin resolver nada.
+
+2. **Los 12 tokens SCSS "sin uso".** Cada uno es un escalón de una escala cerrada
+   y documentada — `spacing` se declara a sí misma "14-step scale (2px → 48px)".
+   Borrar los escalones libres deja huecos en un vocabulario e invita a escribir
+   `40px` a mano.
+
+3. **`@capacitor/keyboard` y `@capacitor/browser`.** Se probó de verdad: se
+   desinstalaron, `cap sync`, y el proyecto nativo **compila sin ellos**. Pero el
+   APK de debug no mide nada (sin ellos 23,8 MB, con ellos 21,4 MB: ruido de
+   dexado incremental sin R8), y `keyboard` no es inerte aunque no se importe en
+   JS — es lo que redimensiona el WebView al abrir el teclado, y eso cambia el
+   comportamiento de los formularios solo en dispositivo. Beneficio no medible
+   contra riesgo que únicamente se ve en el móvil.
+
+4. **`pantry-view-model.service.ts` (573 líneas).** El informe lo marcó P2
+   "quizá dividir". Es presentación cohesionada de una sola pantalla y depende de
+   locale, así que no baja a dominio tal cual; partirlo por tamaño añadiría
+   ficheros sin quitar complejidad.
+
+**Deuda que la auditoría destapó y sigue viva:** el plugin de TypeScript no está
+cargado en ESLint, así que ninguna regla de TS actúa y los 17 `any` no los mira
+nadie; `NotificationSchedulerService` se quedó sin cobertura al mover sus métodos
+dev; `features/` y `shared/` siguen sin un solo spec; y `restore()` se llama en
+cada primer plano, que ahora que funciona hace una ida y vuelta real a la tienda.
+
+**Nota de entorno descubierta de paso:** el build nativo falla con `./gradlew` a
+secas porque no hay JDK 21 en el PATH. Funciona con
+`JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"`.
