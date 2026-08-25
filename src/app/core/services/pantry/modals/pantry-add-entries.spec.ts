@@ -36,10 +36,9 @@ function makeItem(over: Partial<PantryItem> = {}): PantryItem {
 
 function configure(loadedProducts: PantryItem[]) {
   const store = jasmine.createSpyObj<PantryStoreService>('PantryStoreService', [
-    'getItemTotalQuantity', 'addItem', 'updateItem', 'addNewLot',
+    'addItem', 'updateItem', 'addNewLot',
   ]);
   (store as unknown as { loadedProducts: () => PantryItem[] }).loadedProducts = () => loadedProducts;
-  store.getItemTotalQuantity.and.returnValue(1);
 
   const translate = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
   translate.instant.and.callFake((key: string) => key);

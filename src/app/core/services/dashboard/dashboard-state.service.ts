@@ -1,8 +1,9 @@
 import { Injectable, computed, effect, inject, signal, DestroyRef } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { computeTodaySuggestion } from '@core/domain/dashboard';
-import { applyFifoConsumption, isIncomplete, sumQuantities } from '@core/domain/pantry';
+import { applyFifoConsumption, isIncomplete, shouldAutoAddToShoppingList, sumQuantities } from '@core/domain/pantry';
 import { daysUntilExpiry } from '@core/utils/date.util';
+import { toNumberOrZero } from '@core/utils/formatting.util';
 import type { TodaySuggestion } from '@core/domain/dashboard';
 import type {
   PantryItem,
@@ -85,9 +86,9 @@ export class DashboardStateService {
       return 0;
     }
     return items.reduce((total, item) => {
-      const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
-      const minThreshold = this.pantryStore.getItemTotalMinThreshold(item);
-      return this.pantryStore.shouldAutoAddToShoppingList(item, { totalQuantity, minThreshold }) ? total + 1 : total;
+      const totalQuantity = sumQuantities(item.batches ?? []);
+      const minThreshold = toNumberOrZero(item.minThreshold);
+      return shouldAutoAddToShoppingList(item, { totalQuantity, minThreshold }) ? total + 1 : total;
     }, 0);
   });
 
@@ -110,7 +111,7 @@ export class DashboardStateService {
     const staleThresholdMs = staleThresholdDays * 24 * 60 * 60 * 1000;
 
     return this.pantryItems().filter(item => {
-      const totalQuantity = this.pantryStore.getItemTotalQuantity(item);
+      const totalQuantity = sumQuantities(item.batches ?? []);
       if (totalQuantity <= 0) {
         return false;
       }

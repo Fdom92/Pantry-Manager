@@ -136,17 +136,7 @@ export class PantryStoreService {
     }
   }
 
-  /** Remove every expired item currently cached in the store. */
-  async deleteExpiredItems(): Promise<void> {
-    const expiredIds = this.expiredItems().map(item => item._id);
-    if (!expiredIds.length) return;
-    await Promise.all(expiredIds.map(id => this.deleteItem(id)));
-  }
 
-  /** Simple alias used by views to trigger a full reload. */
-  async refresh(): Promise<void> {
-    await this.loadAll();
-  }
 
   // ─── Pagination / filter delegation ──────────────────────────────────────
 
@@ -192,40 +182,11 @@ export class PantryStoreService {
     });
   }
 
-  // ─── Domain helpers (direct calls — no delegation chain) ──────────────────
 
-  /** Sum every batch quantity into a single figure. */
-  getItemTotalQuantity(item: PantryItem): number {
-    return sumQuantities(item.batches ?? []);
-  }
 
-  /** Return the minimum threshold configured for the product. */
-  getItemTotalMinThreshold(item: PantryItem): number {
-    return toNumberOrZero(item.minThreshold);
-  }
 
-  /** Earliest expiry date considering all batches. */
-  getItemEarliestExpiry(item: PantryItem): string | undefined {
-    return computeEarliestExpiry(item.batches ?? []);
-  }
 
-  /** Flatten and normalize all batches associated with an item. */
-  getItemBatches(item: PantryItem) {
-    return collectBatches(item.batches ?? [], { generateBatchId });
-  }
 
-  /** Determine whether any batch for the item is currently marked as opened. */
-  hasItemOpenBatch(item: PantryItem): boolean {
-    return hasOpenBatch(item);
-  }
-
-  /** Single source of truth for deciding whether an item should be auto-added to shopping list. */
-  shouldAutoAddToShoppingList(
-    item: PantryItem,
-    context?: { totalQuantity?: number; minThreshold?: number | null }
-  ): boolean {
-    return shouldAutoAddToShoppingListDomain(item, context);
-  }
 
   // ─── Private ─────────────────────────────────────────────────────────────
 

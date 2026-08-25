@@ -1,5 +1,5 @@
 import { computed, inject, signal } from '@angular/core';
-import { resolveSuggestedExpiry } from '@core/domain/pantry';
+import { resolveSuggestedExpiry, sumQuantities } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { buildPantryItemAutocomplete } from '@core/utils';
 import { dedupeByNormalizedKey, formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
@@ -226,7 +226,7 @@ export abstract class PantryAddEntriesBase {
     return buildPantryItemAutocomplete(items.filter(item => this.belongsToCatalogue(item)), {
       locale,
       excludeIds: excluded,
-      getQuantity: item => this.pantryStore.getItemTotalQuantity(item),
+      getQuantity: item => sumQuantities(item.batches ?? []),
     });
   }
 }
