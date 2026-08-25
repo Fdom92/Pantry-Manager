@@ -6,6 +6,24 @@ import { environment } from 'src/environments/environment';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { LoggerService } from '../shared/logger.service';
 
+/**
+ * RevenueCat rejects with `userCancelled` when the user backs out of the native
+ * purchase or restore sheet — the most common non-success outcome on this path,
+ * and not a failure worth a crash report. The plugin exposes the flag either on
+ * the error or inside `userInfo`; `PURCHASE_CANCELLED_ERROR` is code "1".
+ */
+function isUserCancellation(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) return false;
+  const candidate = err as {
+    userCancelled?: unknown;
+    code?: unknown;
+    userInfo?: { userCancelled?: unknown } | null;
+  };
+  return candidate.userCancelled === true
+    || candidate.userInfo?.userCancelled === true
+    || candidate.code === '1';
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -122,7 +140,11 @@ export class UpgradeRevenuecatService {
       }
       return Boolean(isPro ?? this.isPro());
     } catch (err) {
-      this.logger.error('UpgradeRevenuecatService', 'purchasePackage error', err);
+      if (isUserCancellation(err)) {
+        this.logger.warn('UpgradeRevenuecatService', 'purchase cancelled by the user', { err: String(err) });
+      } else {
+        this.logger.error('UpgradeRevenuecatService', 'purchasePackage error', err);
+      }
       return false;
     }
   }
@@ -150,7 +172,11 @@ export class UpgradeRevenuecatService {
       }
       return Boolean(isPro ?? this.isPro());
     } catch (err) {
-      this.logger.error('UpgradeRevenuecatService', 'restore error', err);
+      if (isUserCancellation(err)) {
+        this.logger.warn('UpgradeRevenuecatService', 'restore cancelled by the user', { err: String(err) });
+      } else {
+        this.logger.error('UpgradeRevenuecatService', 'restore error', err);
+      }
       return false;
     }
   }
