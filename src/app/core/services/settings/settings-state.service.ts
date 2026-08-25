@@ -5,7 +5,7 @@ import type { AppThemePreference } from '@core/models';
 import type { BaseDoc } from '@core/models/shared';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { createLatestOnlyRunner, runIfIdle, withSignalFlag } from '@core/utils';
+import { createLatestOnlyRunner, runIfIdle } from '@core/utils';
 import { ANALYTICS_EVENTS, type SupportedLanguage } from '@core/constants';
 import { ConfirmService, DownloadService, LoggerService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';

@@ -1,4 +1,4 @@
-import { Injectable, inject, Signal, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { ANALYTICS_EVENTS, DEFAULT_LANGUAGE, LOCALES, SUPPORTED_LANGUAGES, SupportedLanguage } from '@core/constants';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';

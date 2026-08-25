@@ -6,7 +6,6 @@ import { HistoryEventManagerService } from '../history/history-event-manager.ser
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import type { PantryItem } from '@core/models/pantry';
-import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 describe('PantryStoreService', () => {
   let service: PantryStoreService;

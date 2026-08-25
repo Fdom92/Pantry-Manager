@@ -1,18 +1,8 @@
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
 import { ANALYTICS_EVENTS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
-import {
-  collectBatches,
-  computeEarliestExpiry,
-  getItemStatusState,
-  hasOpenBatch,
-  shouldAutoAddToShoppingList as shouldAutoAddToShoppingListDomain,
-  sumQuantities,
-} from '@core/domain/pantry';
-import { toNumberOrZero } from '@core/utils/formatting.util';
-import { generateBatchId } from '@core/utils';
+import { getItemStatusState } from '@core/domain/pantry';
 import type { PantryFilterState, PantryItem, PantrySummary } from '@core/models/pantry';
-import { StockStatus } from '@core/models/shared';
 import { normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';

@@ -1,4 +1,4 @@
-import type { ItemBatch, PantryItem } from '@core/models/pantry';
+import type { PantryItem } from '@core/models/pantry';
 import { normalizeLowercase } from '@core/utils/normalization.util';
 
 /**

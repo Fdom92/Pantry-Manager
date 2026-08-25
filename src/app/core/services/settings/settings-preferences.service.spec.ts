@@ -23,25 +23,6 @@ describe('SettingsPreferencesService', () => {
     storageSpy = jasmine.createSpyObj('StorageService', ['save', 'get']);
     storageSpy.get.and.returnValue(Promise.resolve(null));
 
-    // Default save returns a properly structured document
-    const defaultDoc: AppPreferencesDoc = {
-      _id: 'preferences',
-      type: 'preferences',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      theme: 'system',
-      nearExpiryDays: NEAR_EXPIRY_WINDOW_DAYS,
-      compactView: false,
-      notificationsEnabled: false,
-      notifyOnExpired: false,
-      notifyOnLowStock: false,
-      notifyOnNearExpiry: false,
-      notificationHour: 9,
-      lastSyncAt: null,
-      locationOptions: [],
-      categoryOptions: [],
-      supermarketOptions: [],
-    } as any;
     storageSpy.save.and.callFake((doc: AppPreferencesDoc) => Promise.resolve(doc));
 
     TestBed.configureTestingModule({

@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { APP_DB_NAME, STORAGE_BULK_CHUNK_SIZE } from '@core/constants';
 import { BaseDoc } from '@core/models/shared';
 import { createDocumentId } from '@core/utils';
-import { normalizeSearchField, normalizeSearchQuery, normalizeTrim } from '@core/utils/normalization.util';
+import { normalizeTrim } from '@core/utils/normalization.util';
 import PouchDB from 'pouchdb-browser';
 import PouchFind from 'pouchdb-find';
 import { LoggerService } from './logger.service';

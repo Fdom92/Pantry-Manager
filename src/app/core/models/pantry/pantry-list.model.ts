@@ -1,4 +1,3 @@
-import type { StatusColor } from '../shared/color.model';
 import { ItemBatch } from './item-batch.model';
 import { PantryItem } from './item.model';
 

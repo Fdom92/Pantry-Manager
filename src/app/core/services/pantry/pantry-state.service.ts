@@ -1,6 +1,5 @@
 import { Injectable, Signal, WritableSignal, computed, effect, inject, signal } from '@angular/core';
 import {
-  AddEntry,
   FilterChipViewModel,
   ItemBatch,
   PantryFilterState,

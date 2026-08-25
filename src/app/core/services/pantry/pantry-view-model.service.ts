@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
-import { classifyExpiry, getItemStatusState, isIncomplete, normalizeBatches, sumQuantities } from '@core/domain/pantry';
+import { classifyExpiry, getItemStatusState, isIncomplete, normalizeBatches } from '@core/domain/pantry';
 import { daysUntilExpiry, generateBatchId } from '@core/utils';
 import { parseExpiryDate, parseExpiryMs } from '@core/utils/date.util';
 import type {
