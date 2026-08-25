@@ -73,12 +73,12 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
     effect(() => {
       const request = this.listState.editFreshItemModalRequest();
       if (!request) return;
-      this.openEdit(request.item);
+      this.open(request.item);
       this.listState.clearEditFreshItemModalRequest();
     });
   }
 
-  openEdit(item: PantryItem): void {
+  open(item: PantryItem): void {
     if (item.productType !== 'fresh') {
       this.logger.warn('PantryFreshEditModalStateService', 'non-fresh item passed; ignoring');
       return;

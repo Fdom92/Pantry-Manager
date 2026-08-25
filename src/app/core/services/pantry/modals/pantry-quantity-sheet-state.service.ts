@@ -28,7 +28,7 @@ export class PantryQuantitySheetStateService {
   /**
    * Open quantity sheet for an item.
    */
-  openQuantitySheet(item: PantryItem, event?: Event): void {
+  open(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     this.selectedItem.set(item);
     this.pendingQuantityChange.set(0);
@@ -40,7 +40,7 @@ export class PantryQuantitySheetStateService {
   /**
    * Close the sheet. Pending changes are applied via didDismiss → dismissQuantitySheet().
    */
-  closeQuantitySheet(): void {
+  close(): void {
     this.showQuantitySheet.set(false);
   }
 
@@ -49,7 +49,7 @@ export class PantryQuantitySheetStateService {
    * Single save point for all dismiss paths: close button, swipe, backdrop, navigation.
    * State is reset before the async save so double-calls are safe no-ops.
    */
-  async dismissQuantitySheet(): Promise<void> {
+  async dismiss(): Promise<void> {
     const item = this.selectedItem();
     const change = this.pendingQuantityChange();
     const expiryDate = this.pendingExpiryDate();

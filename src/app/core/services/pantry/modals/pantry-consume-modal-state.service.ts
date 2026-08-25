@@ -51,7 +51,7 @@ export class PantryConsumeModalStateService {
   /**
    * Open consume modal and reset state.
    */
-  openConsumeModal(): void {
+  open(): void {
     this.consumeEntries.set([]);
     this.consumeQuery.set('');
     this.consumeModalOpen.set(true);
@@ -62,7 +62,7 @@ export class PantryConsumeModalStateService {
   /**
    * Close consume modal and cleanup state.
    */
-  closeConsumeModal(): void {
+  close(): void {
     if (!this.consumeModalOpen()) {
       return;
     }
@@ -75,7 +75,7 @@ export class PantryConsumeModalStateService {
   /**
    * Dismiss modal without cleanup (for backdrop click).
    */
-  dismissConsumeModal(): void {
+  dismiss(): void {
     this.consumeModalOpen.set(false);
   }
 
@@ -112,7 +112,7 @@ export class PantryConsumeModalStateService {
           quantity: entry.quantity,
         });
       }
-      this.dismissConsumeModal();
+      this.dismiss();
       this.reviewPrompt.handleConsumeCompleted();
     }).catch(err => {
       this.logger.error('PantryConsumeModalStateService', 'submitConsume error', err);

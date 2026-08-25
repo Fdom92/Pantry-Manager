@@ -61,7 +61,7 @@ export class PantryBatchesModalStateService {
   /**
    * Open batches modal for an item.
    */
-  openBatchesModal(item: PantryItem, event?: Event): void {
+  open(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     this.selectedBatchesItem.set(item);
     this.showBatchesModal.set(true);
@@ -73,7 +73,7 @@ export class PantryBatchesModalStateService {
   /**
    * Close batches modal and cleanup state.
    */
-  closeBatchesModal(): void {
+  close(): void {
     if (!this.showBatchesModal()) {
       return;
     }
@@ -86,7 +86,7 @@ export class PantryBatchesModalStateService {
   /**
    * Dismiss modal without cleanup (for backdrop click).
    */
-  dismissBatchesModal(): void {
+  dismiss(): void {
     this.showBatchesModal.set(false);
     this.editMode.set(false);
     this.editedBatches.set([]);

@@ -82,12 +82,12 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
       if (!request) {
         return;
       }
-      this.openEdit(request.item);
+      this.open(request.item);
       this.listState.clearEditItemModalRequest();
     });
   }
 
-  openEdit(item: PantryItem, event?: Event): void {
+  open(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     this.applyItemToForm(item);
     this.isSaving.set(false);

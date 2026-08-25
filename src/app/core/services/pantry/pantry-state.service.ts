@@ -259,9 +259,9 @@ export class PantryStateService {
   startReceiptScan = () => this.receiptScanModal.startScan();
 
   // -------- Consume modal (delegates to PantryConsumeModalStateService) --------
-  openConsumeModal = () => this.consumeModal.openConsumeModal();
-  closeConsumeModal = () => this.consumeModal.closeConsumeModal();
-  dismissConsumeModal = () => this.consumeModal.dismissConsumeModal();
+  openConsumeModal = () => this.consumeModal.open();
+  closeConsumeModal = () => this.consumeModal.close();
+  dismissConsumeModal = () => this.consumeModal.dismiss();
   submitConsume = () => this.consumeModal.submitConsume();
   onConsumeQueryChange = (value: string) => this.consumeModal.onConsumeQueryChange(value);
   addConsumeEntry = (option: AutocompleteItem<PantryItem>) => this.consumeModal.addConsumeEntry(option);
@@ -275,7 +275,7 @@ export class PantryStateService {
   isDeleting = (item: PantryItem) => this.listUi.isDeleting(item);
 
   deleteItem(item: PantryItem, event?: Event, skipConfirm = false): Promise<void> {
-     this.quantitySheet.dismissQuantitySheet();
+     this.quantitySheet.dismiss();
      return this.listUi.deleteItem(item, event, skipConfirm, itemId => this.batchOps.cancelPendingStockSave(itemId));
   }
 
@@ -370,9 +370,9 @@ export class PantryStateService {
   cancelPendingStockSave = (itemId: string) => this.batchOps.cancelPendingStockSave(itemId);
 
   // -------- Batches modal (delegates to PantryBatchesModalStateService) --------
-  openBatchesModal = (item: PantryItem, event?: Event) => this.batchesModal.openBatchesModal(item, event);
-  closeBatchesModal = () => this.batchesModal.closeBatchesModal();
-  dismissBatchesModal = () => this.batchesModal.dismissBatchesModal();
+  openBatchesModal = (item: PantryItem, event?: Event) => this.batchesModal.open(item, event);
+  closeBatchesModal = () => this.batchesModal.close();
+  dismissBatchesModal = () => this.batchesModal.dismiss();
   getTotalBatchCount = (item: PantryItem) => this.batchesModal.getTotalBatchCount(item);
   getSortedBatches = (item: PantryItem) => this.batchesModal.getSortedBatches(item);
   buildItemCardViewModel = (item: PantryItem) => this.batchesModal.buildItemCardViewModel(item);
@@ -395,9 +395,9 @@ export class PantryStateService {
   clearBatchLocation = (index: number) => this.batchesModal.clearBatchLocation(index);
 
   // -------- Quantity sheet (delegates to PantryQuantitySheetStateService) --------
-  openQuantitySheet = (item: PantryItem, event?: Event) => this.quantitySheet.openQuantitySheet(item, event);
+  openQuantitySheet = (item: PantryItem, event?: Event) => this.quantitySheet.open(item, event);
   openPendientesSheet = () => this.pendientesSheet.open();
-  dismissQuantitySheet = () => this.quantitySheet.dismissQuantitySheet();
+  dismissQuantitySheet = () => this.quantitySheet.dismiss();
   incrementQuantity = (item: PantryItem) => this.quantitySheet.incrementQuantity(item);
   decrementQuantity = (item: PantryItem) => this.quantitySheet.decrementQuantity(item);
   emptyOutQuantity = (item: PantryItem) => this.quantitySheet.emptyOut(item);
@@ -406,17 +406,17 @@ export class PantryStateService {
   toggleQuantitySheetNoExpiry = () => this.quantitySheet.toggleNoExpiry();
 
   closeQuantitySheetWithSave(): void {
-    this.quantitySheet.closeQuantitySheet();
+    this.quantitySheet.close();
   }
 
   async openBatchesModalFromSheet(item: PantryItem): Promise<void> {
-    await this.quantitySheet.dismissQuantitySheet();
+    await this.quantitySheet.dismiss();
     const updatedItem = this.pantryItemsState().find(i => i._id === item._id) ?? item;
-    this.batchesModal.openBatchesModal(updatedItem);
+    this.batchesModal.open(updatedItem);
   }
 
   async openEditModalFromSheet(item: PantryItem): Promise<void> {
-    await this.quantitySheet.dismissQuantitySheet();
+    await this.quantitySheet.dismiss();
     const updatedItem = this.pantryItemsState().find(i => i._id === item._id) ?? item;
     if (updatedItem.productType === 'fresh') {
       this.editFreshItemModalRequest.set({ mode: 'edit', item: updatedItem });
