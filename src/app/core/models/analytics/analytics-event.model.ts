@@ -8,21 +8,6 @@ export type AnalyticsEventProps = Record<
 >;
 
 /**
- * Persisted event entry used by the offline-first queue.
- * Stored in PouchDB while the user is offline or analytics is opted out.
- */
-export interface QueuedAnalyticsEvent {
-  /** Unique queue id (uuid). */
-  id: string;
-  /** Event name (see `ANALYTICS_EVENTS`). */
-  event: string;
-  /** Event-specific props. */
-  props: AnalyticsEventProps;
-  /** Timestamp (ms epoch) when the event was queued — used as `$timestamp`. */
-  ts: number;
-}
-
-/**
  * Super-properties attached to every event. Resolved once at init and on locale / PRO changes.
  */
 export interface AnalyticsSuperProps {

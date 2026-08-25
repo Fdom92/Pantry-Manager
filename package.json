@@ -48,7 +48,6 @@
     "@sentry/angular": "^10.43.0",
     "@sentry/capacitor": "^4.0.0",
     "date-fns": "^3.6.0",
-    "dompurify": "^3.3.1",
     "ionicons": "^7.0.0",
     "jspdf": "^3.0.4",
     "posthog-js": "^1.379.0",

@@ -90,22 +90,6 @@ export function toLocalYmd(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-// ── Existing helpers, kept as-is ─────────────────────────────────────────────
-
-export function isWithinHours(date: Date, startHour: number, endHour: number): boolean {
-  const hour = date.getHours();
-  return hour >= startHour && hour < endHour;
-}
-
-export function isSundayAfternoon(date: Date): boolean {
-  return date.getDay() === 0 && date.getHours() >= 15;
-}
-
-export function isWeekend(date: Date): boolean {
-  const day = date.getDay();
-  return day === 0 || day === 5 || day === 6; // Friday, Saturday, Sunday
-}
-
 /**
  * Convert any stored date string into the `YYYY-MM-DD` shape consumable by an
  * `<input type="date">`. Returns '' on invalid input.
