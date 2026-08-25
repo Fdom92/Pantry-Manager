@@ -1,186 +1,64 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { buildAddItemPayload, FRESH_QTY, resolveSuggestedExpiry } from '@core/domain/pantry';
+import { Injectable, inject } from '@angular/core';
+import { buildAddItemPayload, FRESH_QTY } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
-import { buildPantryItemAutocomplete, createDocumentId, withSignalFlag } from '@core/utils';
-import { dedupeByNormalizedKey, formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
-import { TranslateService } from '@ngx-translate/core';
-import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
-import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
+import { createDocumentId, withSignalFlag } from '@core/utils';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
-import { LanguageService } from '../../shared/language.service';
 import { LoggerService } from '../../shared/logger.service';
 import { ToastService } from '../../shared';
-import { PantryStoreService } from '../pantry-store.service';
+import { PantryAddEntriesBase } from './pantry-add-entries-base';
 
 /**
- * Estado del modal de añadir fresco. Idéntico patrón que PantryAddModalStateService,
- * pero el catálogo se filtra a productType === 'fresh' y la submission convierte
- * cantidades en estado "Suficiente" (qty=3) por defecto.
+ * The fresco add sheet. Same entry engine as the despensa one, drawing from the
+ * fresh half of the catalogue, and saving as a state rather than a count: a
+ * fresh product is had ("Suficiente") or not had.
  */
 @Injectable()
-export class PantryFreshAddModalStateService {
-  private readonly pantryStore = inject(PantryStoreService);
-  private readonly translate = inject(TranslateService);
+export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
   private readonly toast = inject(ToastService);
-  private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
 
-  readonly isOpen = signal(false);
-  readonly isSubmitting = signal(false);
-  readonly query = signal('');
-  readonly entries = signal<AddEntry[]>([]);
+  protected readonly idPrefix = 'fresh';
 
-  readonly entryViewModels = computed<EntitySelectorEntry[]>(() =>
-    this.entries().map(entry => ({
-      id: entry.id,
-      title: entry.name,
-      quantity: entry.quantity,
-      isNew: entry.isNew,
-      expirationDate: entry.expirationDate,
-      noExpiry: entry.noExpiry,
-    }))
-  );
+  protected belongsToCatalogue(item: PantryItem): boolean {
+    return item.productType === 'fresh';
+  }
 
-  readonly hasEntries = computed(() => this.entries().length > 0);
+  /** You either have lettuce or you do not, so a second pick changes nothing. */
+  protected onRepeatedPick(entries: AddEntry[]): AddEntry[] {
+    return entries;
+  }
 
-  readonly options = computed(() => this.buildOptions(this.pantryStore.loadedProducts(), this.entries()));
-
-  readonly showEmptyAction = computed(() => normalizeTrim(this.query()).length >= 1);
-
-  readonly emptyActionLabel = computed(() => {
-    void this.languageService.currentLanguage();
-    const name = normalizeTrim(this.query());
-    if (!name) return '';
-    const formatted = formatFriendlyName(name, name);
-    return this.translate.instant('pantry.fastAdd.addNew', { name: formatted });
-  });
+  /**
+   * Restocking a fresh product means a new lettuce, not the old one, so it gets
+   * a fresh suggested date rather than inheriting the batch's.
+   */
+  protected decorateEntry(name: string, item?: PantryItem): Partial<AddEntry> {
+    return this.suggestedExpiryFor(name, item);
+  }
 
   open(): void {
-    this.entries.set([]);
-    this.query.set('');
-    this.isOpen.set(true);
-    this.isSubmitting.set(false);
+    this.openSheet();
     this.analytics.track(ANALYTICS_EVENTS.PANTRY_FRESH_ADD_MODAL_OPENED);
   }
 
   close(): void {
-    if (!this.isOpen()) return;
-    this.isOpen.set(false);
-    this.isSubmitting.set(false);
-    this.entries.set([]);
-    this.query.set('');
-  }
-
-  dismiss(): void {
-    this.isOpen.set(false);
-  }
-
-  onQueryChange(value: string): void {
-    this.query.set(value ?? '');
-  }
-
-  /** Selección de un item existente desde el autocomplete. */
-  addEntry(option: AutocompleteItem<PantryItem>): void {
-    const item = option?.raw;
-    if (!item) return;
-    this.entries.update(current => {
-      const alreadyPresent = current.some(e => e.item?._id === item._id);
-      if (alreadyPresent) return current;
-      return [
-        ...current,
-        {
-          id: `fresh:${item._id}`,
-          name: option.title,
-          quantity: 1,
-          item,
-          isNew: false,
-          // Restocking a fresh product means a new lettuce, not the old one, so
-          // it gets a fresh suggested date rather than inheriting the batch's.
-          ...resolveSuggestedExpiry(option.title, item.foodType),
-        },
-      ];
-    });
-    this.query.set('');
-  }
-
-  addEntryFromQuery(name?: string): void {
-    const next = normalizeTrim(name ?? this.query());
-    if (!next) return;
-    const normalized = normalizeProductKey(next);
-    // Solo busca contra el catálogo de frescos (no merges con un item de despensa con el mismo nombre).
-    const match = this.pantryStore
-      .loadedProducts()
-      .find(i => i.productType === 'fresh' && normalizeProductKey(i.name) === normalized);
-
-    if (match) {
-      this.addEntry({ id: match._id, title: match.name, raw: match });
-      return;
-    }
-
-    const formatted = formatFriendlyName(next, next);
-    this.entries.update(current => {
-      const alreadyPresent = current.some(e => normalizeProductKey(e.name) === normalized);
-      if (alreadyPresent) return current;
-      return [
-        ...current,
-        {
-          id: `fresh:new:${normalized}`,
-          name: formatted,
-          quantity: 1,
-          isNew: true,
-          ...resolveSuggestedExpiry(formatted, null),
-        },
-      ];
-    });
-    this.query.set('');
-  }
-
-  setEntryDate(entryId: string, date: string | undefined): void {
-    this.entries.update(current => {
-      const idx = current.findIndex(e => e.id === entryId);
-      if (idx < 0) return current;
-      const next = [...current];
-      next[idx] = {
-        ...next[idx],
-        expirationDate: date || undefined,
-        noExpiry: date ? undefined : next[idx].noExpiry,
-        dateFromUser: true,
-      };
-      return next;
-    });
-  }
-
-  adjustEntryById(entryId: string, delta: number): void {
-    const d = Number.isFinite(delta) ? delta : 0;
-    if (!d) return;
-    this.entries.update(current => {
-      const idx = current.findIndex(e => e.id === entryId);
-      if (idx < 0) return current;
-      const next = [...current];
-      const updated = { ...next[idx], quantity: Math.max(0, next[idx].quantity + d) };
-      if (updated.quantity <= 0) {
-        next.splice(idx, 1);
-        return next;
-      }
-      next[idx] = updated;
-      return next;
-    });
+    this.closeSheet();
   }
 
   /**
-   * Submission. Cada entry se materializa así:
-   * - isNew → crea PantryItem con productType='fresh', batch único qty=3 (Suficiente),
-   *           expirationDate del entry, minThreshold=undefined.
-   * - existing → sobrescribe el batch único del fresco (qty=3, fecha si proporcionada).
-   *              Esto preserva la convención "fresco = 1 lote" en lugar de añadir nuevos lotes.
+   * Each entry is materialised as:
+   * - new → a PantryItem with productType='fresh' and a single batch at
+   *   "Suficiente", carrying whatever date the row shows.
+   * - existing → its single batch is overwritten, keeping the convention that a
+   *   fresh product has exactly one lot rather than a stack of them.
    */
   async submit(): Promise<void> {
     if (this.isSubmitting()) return;
-    const entries = this.entries().filter(e => e.quantity > 0);
+    const entries = this.submittableEntries();
     if (!entries.length) return;
 
     await withSignalFlag(this.isSubmitting, async () => {
@@ -220,7 +98,6 @@ export class PantryFreshAddModalStateService {
           continue;
         }
 
-        // Existente: sobrescribe el batch único.
         const existing = entry.item;
         const previousBatch = existing.batches?.[0];
         const updatedBatch = {
@@ -254,18 +131,5 @@ export class PantryFreshAddModalStateService {
         this.toast.success('pantry.fresh.toast.addSuccess_other', { count: entries.length });
       }
     }).catch(err => this.logger.error('PantryFreshAddModalStateService', 'submit error', err));
-  }
-
-  private buildOptions(items: PantryItem[], entries: AddEntry[]): AutocompleteItem<PantryItem>[] {
-    const locale = this.languageService.getCurrentLocale();
-    const uniqueEntries = dedupeByNormalizedKey(entries, e => e.name);
-    const excluded = new Set(uniqueEntries.map(e => e.item?._id).filter(Boolean) as string[]);
-    // Filtramos a SOLO frescos antes de pasar al autocomplete.
-    const onlyFresh = items.filter(i => i.productType === 'fresh');
-    return buildPantryItemAutocomplete(onlyFresh, {
-      locale,
-      excludeIds: excluded,
-      getQuantity: item => this.pantryStore.getItemTotalQuantity(item),
-    });
   }
 }

@@ -75,41 +75,41 @@ describe('add sheet entry engine — despensa', () => {
   });
 
   it('starts empty and opens clean', () => {
-    service.addEntries.set([{ id: 'stale', name: 'Sobra', quantity: 1, isNew: true }]);
-    service.addQuery.set('sobra');
+    service.entries.set([{ id: 'stale', name: 'Sobra', quantity: 1, isNew: true }]);
+    service.query.set('sobra');
 
-    service.openAddModal();
+    service.open();
 
-    expect(service.addEntries()).toEqual([]);
-    expect(service.addQuery()).toBe('');
-    expect(service.addModalOpen()).toBeTrue();
+    expect(service.entries()).toEqual([]);
+    expect(service.query()).toBe('');
+    expect(service.isOpen()).toBeTrue();
   });
 
   it('adds a catalogue pick as one entry and clears the query', () => {
-    service.addQuery.set('lec');
+    service.query.set('lec');
     service.addEntry({ id: leche._id, title: leche.name, raw: leche });
 
-    const entries = service.addEntries();
+    const entries = service.entries();
     expect(entries.length).toBe(1);
     expect(entries[0].name).toBe('Leche');
     expect(entries[0].quantity).toBe(1);
     expect(entries[0].isNew).toBeFalse();
     expect(entries[0].item).toBe(leche);
-    expect(service.addQuery()).toBe('');
+    expect(service.query()).toBe('');
   });
 
   it('picking the same product twice bumps the quantity instead of duplicating the row', () => {
     service.addEntry({ id: leche._id, title: leche.name, raw: leche });
     service.addEntry({ id: leche._id, title: leche.name, raw: leche });
 
-    expect(service.addEntries().length).toBe(1);
-    expect(service.addEntries()[0].quantity).toBe(2);
+    expect(service.entries().length).toBe(1);
+    expect(service.entries()[0].quantity).toBe(2);
   });
 
   it('typing the name of a product already in the pantry reuses it rather than creating a new one', () => {
     service.addEntryFromQuery('leche');
 
-    const entry = service.addEntries()[0];
+    const entry = service.entries()[0];
     expect(entry.isNew).toBeFalse();
     expect(entry.item?._id).toBe('item:leche');
   });
@@ -117,68 +117,68 @@ describe('add sheet entry engine — despensa', () => {
   it('typing an unknown name creates a new entry with an inferred food type', () => {
     service.addEntryFromQuery('yogur natural');
 
-    const entry = service.addEntries()[0];
+    const entry = service.entries()[0];
     expect(entry.isNew).toBeTrue();
     expect(entry.foodType).toBeTruthy();
   });
 
   it('ignores an empty query', () => {
     service.addEntryFromQuery('   ');
-    expect(service.addEntries()).toEqual([]);
+    expect(service.entries()).toEqual([]);
   });
 
   it('drops the row when the quantity reaches zero', () => {
     service.addEntry({ id: leche._id, title: leche.name, raw: leche });
-    const id = service.addEntries()[0].id;
+    const id = service.entries()[0].id;
 
     service.adjustEntryById(id, -1);
 
-    expect(service.addEntries()).toEqual([]);
+    expect(service.entries()).toEqual([]);
   });
 
   it('ignores a non-finite delta', () => {
     service.addEntry({ id: leche._id, title: leche.name, raw: leche });
-    service.adjustEntryById(service.addEntries()[0].id, Number.NaN);
+    service.adjustEntryById(service.entries()[0].id, Number.NaN);
 
-    expect(service.addEntries()[0].quantity).toBe(1);
+    expect(service.entries()[0].quantity).toBe(1);
   });
 
   it('marks a date the user typed as theirs, so a later food type change cannot replace it', () => {
     service.addEntryFromQuery('algo nuevo');
-    const id = service.addEntries()[0].id;
+    const id = service.entries()[0].id;
 
     service.setEntryDate(id, '2026-03-01');
 
-    const entry = service.addEntries()[0];
+    const entry = service.entries()[0];
     expect(entry.expirationDate).toBe('2026-03-01');
     expect(entry.dateFromUser).toBeTrue();
   });
 
   it('clearing the date keeps it cleared and still counts as the user deciding', () => {
     service.addEntryFromQuery('algo nuevo');
-    const id = service.addEntries()[0].id;
+    const id = service.entries()[0].id;
 
     service.setEntryDate(id, undefined);
 
-    expect(service.addEntries()[0].expirationDate).toBeUndefined();
-    expect(service.addEntries()[0].dateFromUser).toBeTrue();
+    expect(service.entries()[0].expirationDate).toBeUndefined();
+    expect(service.entries()[0].dateFromUser).toBeTrue();
   });
 
   it('marking no-expiry clears the date, and unmarking leaves it clear', () => {
     service.addEntryFromQuery('algo nuevo');
-    const id = service.addEntries()[0].id;
+    const id = service.entries()[0].id;
     service.setEntryDate(id, '2026-03-01');
 
     service.setEntryNoExpiry(id);
-    expect(service.addEntries()[0].noExpiry).toBeTrue();
-    expect(service.addEntries()[0].expirationDate).toBeUndefined();
+    expect(service.entries()[0].noExpiry).toBeTrue();
+    expect(service.entries()[0].expirationDate).toBeUndefined();
 
     service.setEntryNoExpiry(id);
-    expect(service.addEntries()[0].noExpiry).toBeUndefined();
+    expect(service.entries()[0].noExpiry).toBeUndefined();
   });
 
   it('offers only non-fresh products in the autocomplete', () => {
-    const titles = service.addOptions().map(o => o.title);
+    const titles = service.options().map(o => o.title);
     expect(titles).toContain('Leche');
     expect(titles).not.toContain('Lechuga');
   });
@@ -186,17 +186,17 @@ describe('add sheet entry engine — despensa', () => {
   it('stops offering a product already sitting in the entry list', () => {
     service.addEntry({ id: leche._id, title: leche.name, raw: leche });
 
-    expect(service.addOptions().map(o => o.id)).not.toContain(leche._id);
+    expect(service.options().map(o => o.id)).not.toContain(leche._id);
   });
 
   it('closing wipes the draft', () => {
-    service.openAddModal();
+    service.open();
     service.addEntryFromQuery('algo');
 
-    service.closeAddModal();
+    service.close();
 
-    expect(service.addModalOpen()).toBeFalse();
-    expect(service.addEntries()).toEqual([]);
+    expect(service.isOpen()).toBeFalse();
+    expect(service.entries()).toEqual([]);
   });
 });
 

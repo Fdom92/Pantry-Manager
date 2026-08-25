@@ -110,7 +110,7 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
 
   onCoachMarkAddRequested(): void {
     this.coachMarkDismissed.set(true);
-    this.addModalState.openAddModal();
+    this.addModalState.open();
   }
 
   onCoachMarkDismissed(): void {
@@ -138,7 +138,7 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
     // Consume the query param right away so it does not re-trigger on tab switches.
     const shouldOpenModal = this.route.snapshot.queryParams['openAddModal'] === 'true';
     if (shouldOpenModal) {
-      this.addModalState.openAddModal();
+      this.addModalState.open();
       void this.router.navigate([], {
         relativeTo: this.route,
         queryParams: { openAddModal: null },

@@ -74,15 +74,15 @@ export class PantryStateService {
   // Delegated signals from specialized services
   readonly collapsedGroups = this.listUi.collapsedGroups;
   readonly deletingItems = this.listUi.deletingItems;
-  readonly addModalOpen = this.addModal.addModalOpen;
-  readonly isAdding = this.addModal.isAdding;
-  readonly addQuery = this.addModal.addQuery;
-  readonly addEntries = this.addModal.addEntries;
-  readonly addEntryViewModels = this.addModal.addEntryViewModels;
-  readonly hasAddEntries = this.addModal.hasAddEntries;
-  readonly addOptions = this.addModal.addOptions;
-  readonly showAddEmptyAction = this.addModal.showAddEmptyAction;
-  readonly addEmptyActionLabel = this.addModal.addEmptyActionLabel;
+  readonly addModalOpen = this.addModal.isOpen;
+  readonly isAdding = this.addModal.isSubmitting;
+  readonly addQuery = this.addModal.query;
+  readonly addEntries = this.addModal.entries;
+  readonly addEntryViewModels = this.addModal.entryViewModels;
+  readonly hasAddEntries = this.addModal.hasEntries;
+  readonly addOptions = this.addModal.options;
+  readonly showAddEmptyAction = this.addModal.showEmptyAction;
+  readonly addEmptyActionLabel = this.addModal.emptyActionLabel;
   readonly consumeModalOpen = this.consumeModal.consumeModalOpen;
   readonly isConsuming = this.consumeModal.isConsuming;
   readonly consumeQuery = this.consumeModal.consumeQuery;
@@ -256,14 +256,13 @@ export class PantryStateService {
   }
 
   // -------- Add modal (delegates to PantryAddModalStateService) --------
-  openAddModal = () => this.addModal.openAddModal();
-  closeAddModal = () => this.addModal.closeAddModal();
-  dismissAddModal = () => this.addModal.dismissAddModal();
-  submitAdd = () => this.addModal.submitAdd();
-  onAddQueryChange = (value: string) => this.addModal.onAddQueryChange(value);
+  openAddModal = () => this.addModal.open();
+  closeAddModal = () => this.addModal.close();
+  dismissAddModal = () => this.addModal.dismiss();
+  submitAdd = () => this.addModal.submit();
+  onAddQueryChange = (value: string) => this.addModal.onQueryChange(value);
   addEntry = (option: AutocompleteItem<PantryItem>) => this.addModal.addEntry(option);
   addEntryFromQuery = (name?: string) => this.addModal.addEntryFromQuery(name);
-  adjustEntry = (entry: AddEntry, delta: number) => this.addModal.adjustEntry(entry, delta);
   adjustEntryById = (entryId: string, delta: number) => this.addModal.adjustEntryById(entryId, delta);
   setEntryDate = (entryId: string, date: string | undefined) => this.addModal.setEntryDate(entryId, date);
 
