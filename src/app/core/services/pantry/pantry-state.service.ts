@@ -77,24 +77,8 @@ export class PantryStateService {
   readonly showSkeleton = this.skeletonManager.showSkeleton;
 
   // Delegated signals from specialized services
-  readonly collapsedGroups = this.listUi.collapsedGroups;
-  readonly deletingItems = this.listUi.deletingItems;
-  readonly addModalOpen = this.addModal.isOpen;
-  readonly isAdding = this.addModal.isSubmitting;
-  readonly addQuery = this.addModal.query;
-  readonly addEntries = this.addModal.entries;
-  readonly addEntryViewModels = this.addModal.entryViewModels;
-  readonly hasAddEntries = this.addModal.hasEntries;
-  readonly addOptions = this.addModal.options;
-  readonly showAddEmptyAction = this.addModal.showEmptyAction;
-  readonly addEmptyActionLabel = this.addModal.emptyActionLabel;
-  readonly consumeModalOpen = this.consumeModal.consumeModalOpen;
-  readonly isConsuming = this.consumeModal.isConsuming;
-  readonly consumeQuery = this.consumeModal.consumeQuery;
-  readonly consumeEntries = this.consumeModal.consumeEntries;
-  readonly consumeEntryViewModels = this.consumeModal.consumeEntryViewModels;
-  readonly hasConsumeEntries = this.consumeModal.hasConsumeEntries;
-  readonly consumeOptions = this.consumeModal.consumeOptions;
+  // Read by BatchesModalComponent, which injects this facade rather than the
+  // modal's own state service.
   readonly showBatchesModal = this.batchesModal.showBatchesModal;
   readonly selectedBatchesItem = this.batchesModal.selectedBatchesItem;
   readonly batchesEditMode = this.batchesModal.editMode;
