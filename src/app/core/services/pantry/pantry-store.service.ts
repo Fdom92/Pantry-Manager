@@ -83,8 +83,8 @@ export class PantryStoreService {
   /** Load items from storage, updating loading/error signals accordingly. */
   async loadAll(): Promise<void> {
     try {
-      await this.ensureFirstPageLoaded();
-      this.startBackgroundLoad();
+      await this.pantryQuery.ensureFirstPageLoaded();
+      this.pantryQuery.startBackgroundLoad();
       this.watchRealtime();
       this.error.set(null);
       void this.logExpiredBatchEvents(this.items());
@@ -138,31 +138,11 @@ export class PantryStoreService {
 
 
 
-  // ─── Pagination / filter delegation ──────────────────────────────────────
 
-  clearEntryFilters(): void {
-    this.pantryQuery.clearEntryFilters();
-  }
 
-  applyPendingNavigationPreset(): void {
-    this.pantryQuery.applyPendingNavigationPreset();
-  }
 
-  async ensureFirstPageLoaded(): Promise<void> {
-    await this.pantryQuery.ensureFirstPageLoaded();
-  }
 
-  startBackgroundLoad(): void {
-    this.pantryQuery.startBackgroundLoad();
-  }
 
-  setSearchQuery(value: string): void {
-    this.pantryQuery.setSearchQuery(value);
-  }
-
-  setFilters(filters: Partial<PantryFilterState>): void {
-    this.pantryQuery.setFilters(filters);
-  }
 
   async addNewLot(
     itemId: string,

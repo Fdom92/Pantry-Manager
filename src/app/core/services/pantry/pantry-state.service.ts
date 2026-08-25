@@ -20,6 +20,7 @@ import { PantryQuantitySheetStateService } from './modals/pantry-quantity-sheet-
 import { PantryPendientesSheetStateService } from './modals/pantry-pendientes-sheet-state.service';
 import { PantryNavigationPresetService } from './pantry-navigation-preset.service';
 import { PantryListUiStateService } from './pantry-list-ui-state.service';
+import { PantryQueryService } from './pantry-query.service';
 import { PantryStoreService } from './pantry-store.service';
 import { PantryViewModelService } from './pantry-view-model.service';
 import { SkeletonLoadingManager } from '@core/utils';
@@ -36,6 +37,10 @@ import { type FreshState, freshStateToQty } from '@core/domain/pantry';
 @Injectable()
 export class PantryStateService {
   private readonly pantryStore = inject(PantryStoreService);
+  // The list pipeline — search, filters, paging — belongs to the query service.
+  // The store owns derived state and mutations; it used to forward these calls
+  // and that only hid where they lived.
+  private readonly pantryQuery = inject(PantryQueryService);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly viewModel = inject(PantryViewModelService);
   private readonly batchOps = inject(PantryBatchOperationsService);
@@ -212,9 +217,9 @@ export class PantryStateService {
   /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
   async ionViewWillEnter(): Promise<void> {
     this.skeletonManager.startLoading();
-    this.pantryStore.clearEntryFilters();
+    this.pantryQuery.clearEntryFilters();
     const shouldOpenPendientes = this.navigationPreset.peek()?.pendientes === true;
-    this.pantryStore.applyPendingNavigationPreset();
+    this.pantryQuery.applyPendingNavigationPreset();
     await this.loadItems();
     if (shouldOpenPendientes) {
       this.openPendientesSheet();
@@ -225,17 +230,17 @@ export class PantryStateService {
 
   async loadItems(): Promise<void> {
     if (this.pantryStore.loadedProducts().length === 0) {
-      await this.pantryStore.ensureFirstPageLoaded();
+      await this.pantryQuery.ensureFirstPageLoaded();
     }
     if (!this.pantryStore.pipelineResetting()) {
-      this.pantryStore.startBackgroundLoad();
+      this.pantryQuery.startBackgroundLoad();
     }
     this.hasCompletedInitialLoad.set(true);
   }
 
   // -------- Filters --------
   onSearchTermChange(ev: CustomEvent): void {
-    this.pantryStore.setSearchQuery(ev.detail?.value ?? '');
+    this.pantryQuery.setSearchQuery(ev.detail?.value ?? '');
   }
 
   onFilterChipSelected(chip: FilterChipViewModel): void {
@@ -293,7 +298,7 @@ export class PantryStateService {
   private applyStatusFilterPreset(preset: PantryStatusFilterValue): void {
     switch (preset) {
       case 'expired':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: true,
           expiring: false,
           lowStock: false,
@@ -304,7 +309,7 @@ export class PantryStateService {
         });
         break;
       case 'near-expiry':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: true,
           lowStock: false,
@@ -315,7 +320,7 @@ export class PantryStateService {
         });
         break;
       case 'low-stock':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: false,
           lowStock: true,
@@ -326,7 +331,7 @@ export class PantryStateService {
         });
         break;
       case 'normal':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: false,
           lowStock: false,
@@ -337,7 +342,7 @@ export class PantryStateService {
         });
         break;
       case 'review':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: false,
           lowStock: false,
@@ -348,7 +353,7 @@ export class PantryStateService {
         });
         break;
       case 'pendientes':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: false,
           lowStock: false,
@@ -359,7 +364,7 @@ export class PantryStateService {
         });
         break;
       default:
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: false,
           lowStock: false,
