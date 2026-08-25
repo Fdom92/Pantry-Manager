@@ -1,0 +1,373 @@
+<ion-card class="settings-card">
+  <ion-card-header>
+    <ion-card-title>{{ "settings.dev.title" | translate }}</ion-card-title>
+    <ion-card-subtitle>{{ "settings.dev.subtitle" | translate }}</ion-card-subtitle>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-list lines="none">
+
+      <!-- ── Onboarding ─────────────────────────────────── -->
+      <ion-list-header>
+        <ion-label>{{ "settings.dev.groupOnboarding" | translate }}</ion-label>
+      </ion-list-header>
+
+      <ion-item lines="none" button detail="true" routerLink="/onboarding">
+        <ion-label>
+          <h3>{{ "settings.tutorial.title" | translate }}</h3>
+          <p>{{ "settings.tutorial.subtitle" | translate }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.resetOnboardingTitle" | translate }}</h3>
+          <p>{{ "settings.dev.resetOnboardingSubtitle" | translate }}</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          (click)="resetOnboarding()"
+          [disabled]="isResettingOnboarding()"
+          [attr.aria-label]="'settings.dev.resetOnboardingTitle' | translate"
+        >
+          @if (isResettingOnboarding()) {
+            <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+          } @else {
+            <ion-icon slot="icon-only" name="checkmark-outline"></ion-icon>
+          }
+        </ion-button>
+      </ion-item>
+
+      <!-- Language picker promoted to the Apariencia card in v4.6. -->
+
+      <!-- ── Notifications ──────────────────────────────── -->
+      <ion-list-header>
+        <ion-label>{{ "settings.dev.groupNotifications" | translate }}</ion-label>
+      </ion-list-header>
+
+      <!-- State chips row -->
+      <div class="dev-notif-state">
+        <span class="dev-notif-state__chip" [attr.data-state]="dev.permissionState()">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          {{ 'settings.dev.notifications.permissionLabel' | translate }}: {{ dev.permissionState() }}
+        </span>
+        <span class="dev-notif-state__chip" [attr.data-state]="dev.notificationsEnabled() ? 'granted' : 'denied'">
+          <ion-icon [name]="dev.notificationsEnabled() ? 'notifications-outline' : 'notifications-off-outline'"></ion-icon>
+          {{ 'settings.dev.notifications.preferenceLabel' | translate }}: {{ dev.notificationsEnabled() ? '✓' : '✗' }}
+        </span>
+      </div>
+
+      <!-- Existing test + preview + schedule-at-time + cancel rows stay below in their original form -->
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.testNotificationTitle" | translate }}</h3>
+          <p>{{ "settings.dev.testNotificationSubtitle" | translate }}</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          (click)="testNotification()"
+          [disabled]="isTestingNotification()"
+          [attr.aria-label]="'settings.dev.testNotificationAction' | translate"
+        >
+          @if (isTestingNotification()) {
+            <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+          } @else {
+            <ion-icon slot="icon-only" name="send-outline"></ion-icon>
+          }
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.scheduleAtTimeTitle" | translate }}</h3>
+          <p>{{ "settings.dev.scheduleAtTimeSubtitle" | translate }}</p>
+        </ion-label>
+        <input
+          type="time"
+          [value]="scheduleAtTimeInput()"
+          (change)="onScheduleAtTimeChange($event)"
+          class="dev-time-input"
+        />
+        <ion-button
+          fill="clear"
+          slot="end"
+          (click)="scheduleAtTime()"
+          [disabled]="isSchedulingAtTime()"
+          [attr.aria-label]="'settings.dev.scheduleAtTimeAction' | translate"
+        >
+          @if (isSchedulingAtTime()) {
+            <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+          } @else {
+            <ion-icon slot="icon-only" name="alarm-outline"></ion-icon>
+          }
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.previewNotificationTitle" | translate }}</h3>
+          <p>{{ "settings.dev.previewNotificationSubtitle" | translate }}</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          (click)="previewNotification()"
+          [disabled]="isPreviewingNotification()"
+          [attr.aria-label]="'settings.dev.previewNotificationTitle' | translate"
+        >
+          @if (isPreviewingNotification()) {
+            <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+          } @else {
+            <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+          }
+        </ion-button>
+      </ion-item>
+
+      <!-- Fire-by-definition grid (registered) -->
+      <div class="dev-fire-grid-label">{{ 'settings.dev.notifications.fireSectionRegistered' | translate }}</div>
+      <div class="dev-fire-grid">
+        <button type="button" class="dev-fire-tile" (click)="dev.fireDefinition(NOTIFICATION_IDS.EXPIRED_ITEMS)">
+          <ion-icon name="alert-circle-outline" class="dev-fire-tile__icon dev-fire-tile__icon--danger"></ion-icon>
+          <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireExpired' | translate }}</span>
+        </button>
+        <button type="button" class="dev-fire-tile" (click)="dev.fireDefinition(NOTIFICATION_IDS.NEAR_EXPIRY)">
+          <ion-icon name="hourglass-outline" class="dev-fire-tile__icon dev-fire-tile__icon--warning"></ion-icon>
+          <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireNearExpiry' | translate }}</span>
+        </button>
+        <button type="button" class="dev-fire-tile" (click)="dev.fireDefinition(NOTIFICATION_IDS.LOW_STOCK)">
+          <ion-icon name="trending-down-outline" class="dev-fire-tile__icon dev-fire-tile__icon--primary"></ion-icon>
+          <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireLowStock' | translate }}</span>
+        </button>
+        <button type="button" class="dev-fire-tile" (click)="dev.fireDefinition(NOTIFICATION_IDS.RE_ENGAGEMENT)">
+          <ion-icon name="calendar-outline" class="dev-fire-tile__icon dev-fire-tile__icon--medium"></ion-icon>
+          <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireReEngagement' | translate }}</span>
+        </button>
+      </div>
+
+      <!-- Fire welcome + recovery (retention) -->
+      <div class="dev-fire-grid-label">{{ 'settings.dev.notifications.fireSectionRetention' | translate }}</div>
+      <div class="dev-fire-grid">
+        <button type="button" class="dev-fire-tile" (click)="dev.fireWelcome()">
+          <ion-icon name="checkmark-circle-outline" class="dev-fire-tile__icon dev-fire-tile__icon--success"></ion-icon>
+          <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireWelcome' | translate }}</span>
+        </button>
+        <button type="button" class="dev-fire-tile" (click)="dev.fireProjected()">
+          <ion-icon name="calendar-outline" class="dev-fire-tile__icon dev-fire-tile__icon--tertiary"></ion-icon>
+          <span class="dev-fire-tile__label">{{ 'settings.dev.notifications.fireProjected' | translate }}</span>
+        </button>
+      </div>
+
+      <!-- Pending list -->
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ 'settings.dev.notifications.pendingTitle' | translate }}</h3>
+        </ion-label>
+        <ion-button slot="end" fill="clear" (click)="dev.refreshPending()" [attr.aria-label]="'settings.dev.notifications.refreshPending' | translate">
+          <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      @if (dev.pending().length === 0) {
+        <div class="dev-pending-empty">{{ 'settings.dev.notifications.pendingEmpty' | translate }}</div>
+      } @else {
+        <ul class="dev-pending-list">
+          @for (n of dev.pending(); track n.id) {
+            <li class="dev-pending-item">
+              <span class="dev-pending-item__badge">#{{ n.id }}</span>
+              <div class="dev-pending-item__body">
+                <span class="dev-pending-item__title">{{ n.title || '—' }}</span>
+                <span class="dev-pending-item__time">{{ formatPendingTime(n.scheduleAt) }}</span>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+
+      <!-- Cancel all (danger) -->
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ 'settings.dev.notifications.cancelAll' | translate }}</h3>
+        </ion-label>
+        <ion-button slot="end" fill="clear" color="danger" (click)="dev.cancelAll()" [attr.aria-label]="'settings.dev.notifications.cancelAll' | translate">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <!-- ── Data ───────────────────────────────────────── -->
+      <ion-list-header>
+        <ion-label>{{ "settings.dev.groupData" | translate }}</ion-label>
+      </ion-list-header>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.seedMarketingTitle" | translate }}</h3>
+          <p>{{ "settings.dev.seedMarketingSubtitle" | translate }}</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          (click)="seedMarketingDatabase()"
+          [disabled]="isSeedingMarketing()"
+          [attr.aria-label]="'settings.dev.seedMarketingTitle' | translate"
+        >
+          @if (isSeedingMarketing()) {
+            <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+          } @else {
+            <ion-icon slot="icon-only" name="sparkles-outline"></ion-icon>
+          }
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.clearPantryTitle" | translate }}</h3>
+          <p>{{ "settings.dev.clearPantrySubtitle" | translate }}</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          color="danger"
+          (click)="clearPantry()"
+          [disabled]="isClearingPantry()"
+          [attr.aria-label]="'settings.dev.clearPantryTitle' | translate"
+        >
+          @if (isClearingPantry()) {
+            <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+          } @else {
+            <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+          }
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.receiptScanTitle" | translate }}</h3>
+          <p>{{ "settings.dev.receiptScanSubtitle" | translate }}</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          (click)="scanReceiptDev()"
+          [disabled]="isScanningReceipt()"
+          [attr.aria-label]="'settings.dev.receiptScanTitle' | translate"
+        >
+          @if (isScanningReceipt()) {
+            <ion-spinner slot="icon-only" name="dots"></ion-spinner>
+          } @else {
+            <ion-icon slot="icon-only" name="receipt-outline"></ion-icon>
+          }
+        </ion-button>
+      </ion-item>
+
+      @if (receiptScanLines().length) {
+        <ion-item lines="none">
+          <ion-label>
+            <h3>{{ "settings.dev.receiptScanResult" | translate: { count: receiptScanLines().length } }}</h3>
+            @for (line of receiptScanLines(); track $index) {
+              <p class="receipt-scan-line">{{ line }}</p>
+            }
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-button fill="clear" size="small" (click)="shareReceiptScanResult()">
+            <ion-icon slot="start" name="share-outline"></ion-icon>
+            {{ "settings.dev.receiptScanShare" | translate }}
+          </ion-button>
+          <ion-button fill="clear" size="small" color="medium" (click)="clearReceiptScanResult()">
+            {{ "settings.dev.receiptScanClear" | translate }}
+          </ion-button>
+        </ion-item>
+      }
+
+      <!-- ── App State ───────────────────────────────────── -->
+      <ion-list-header>
+        <ion-label>{{ "settings.dev.groupState" | translate }}</ion-label>
+      </ion-list-header>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.toggleProTitle" | translate }}</h3>
+          <p>{{ "settings.dev.toggleProSubtitle" | translate: { status: devIsPro() ? 'ON' : 'OFF' } }}</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          [color]="devIsPro() ? 'tertiary' : 'medium'"
+          (click)="togglePro()"
+          [attr.aria-label]="'settings.dev.toggleProTitle' | translate"
+        >
+          <ion-icon slot="icon-only" [name]="devIsPro() ? 'toggle' : 'toggle-outline'"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.showAppStateTitle" | translate }}</h3>
+          <p>{{ "settings.dev.showAppStateSubtitle" | translate }}</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          (click)="showAppState()"
+          [attr.aria-label]="'settings.dev.showAppStateTitle' | translate"
+        >
+          <ion-icon slot="icon-only" name="bar-chart-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <!-- ── Telemetry diagnostics ──────────────────────────── -->
+      <ion-list-header>
+        <ion-label>{{ "settings.dev.groupTelemetry" | translate }}</ion-label>
+      </ion-list-header>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.testCrashTitle" | translate }}</h3>
+          <p>{{ "settings.dev.testCrashSubtitle" | translate }}</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          color="danger"
+          (click)="triggerTestCrash()"
+          [attr.aria-label]="'settings.dev.testCrashTitle' | translate"
+        >
+          <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>{{ "settings.dev.triggerReconsentTitle" | translate }}</h3>
+          <p>{{ "settings.dev.triggerReconsentSubtitle" | translate }}</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          (click)="triggerReconsentSheet()"
+          [attr.aria-label]="'settings.dev.triggerReconsentTitle' | translate"
+        >
+          <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h3>Mark device as internal</h3>
+          <p>Tags this PostHog person as is_internal=true — filter it out of dashboards.</p>
+        </ion-label>
+        <ion-button
+          fill="clear"
+          slot="end"
+          color="warning"
+          (click)="dev.markDeviceAsInternal()"
+          aria-label="Mark device as internal"
+        >
+          <ion-icon slot="icon-only" name="flag-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+    </ion-list>
+  </ion-card-content>
+</ion-card>
