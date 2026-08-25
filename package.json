@@ -1,6 +1,6 @@
 {
   "name": "pantrymind",
-  "version": "5.2",
+  "version": "5.3",
   "author": "Fernando del olmo",
   "homepage": "https://ferolmo.com/",
   "scripts": {
@@ -16,8 +16,6 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^20.0.0",
-    "@angular/cdk": "^20.2.13",
     "@angular/common": "^20.0.0",
     "@angular/compiler": "^20.0.0",
     "@angular/core": "^20.0.0",
