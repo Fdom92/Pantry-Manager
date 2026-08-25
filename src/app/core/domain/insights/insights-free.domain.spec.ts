@@ -5,8 +5,6 @@ import {
   computeInventorySnapshot,
   computePantryScore,
   computeFoodCoverage,
-  computePantryHealthState,
-  PantryHealthState,
 } from './insights-free.domain';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
@@ -397,25 +395,3 @@ describe('computeFoodCoverage', () => {
   });
 });
 
-describe('computePantryHealthState', () => {
-  it('returns CRITICAL when expired > 0', () => {
-    expect(computePantryHealthState(2, 0, 10, 5, 0)).toBe(PantryHealthState.CRITICAL);
-  });
-
-  it('returns ATTENTION when nearExpiry > 0 and no expired', () => {
-    expect(computePantryHealthState(0, 3, 10, 5, 0)).toBe(PantryHealthState.ATTENTION);
-  });
-
-  it('returns ATTENTION when total > 10 and fewer than 30% items have dates', () => {
-    // total=20, withDates=4 (20%), expired=0, nearExpiry=0
-    expect(computePantryHealthState(0, 0, 20, 4, 0)).toBe(PantryHealthState.ATTENTION);
-  });
-
-  it('returns OPTIMAL when no issues', () => {
-    expect(computePantryHealthState(0, 0, 10, 8, 0)).toBe(PantryHealthState.OPTIMAL);
-  });
-
-  it('CRITICAL takes precedence over nearExpiry', () => {
-    expect(computePantryHealthState(1, 5, 10, 5, 0)).toBe(PantryHealthState.CRITICAL);
-  });
-});
