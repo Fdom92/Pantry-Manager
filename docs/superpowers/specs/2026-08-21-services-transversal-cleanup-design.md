@@ -346,9 +346,31 @@ de señal sin lector, y una sola convención de verbos en los nueve modales.
    locale, así que no baja a dominio tal cual; partirlo por tamaño añadiría
    ficheros sin quitar complejidad.
 
-**Deuda que la auditoría destapó y sigue viva:** el plugin de TypeScript no está
-cargado en ESLint, así que ninguna regla de TS actúa y los 17 `any` no los mira
-nadie; `NotificationSchedulerService` se quedó sin cobertura al mover sus métodos
+## El plugin de TypeScript, ya cargado (4329b8d)
+
+Era la primera deuda de la lista de abajo y se cerró antes de publicar. `ng lint`
+extendía solo `@angular-eslint`, de modo que ninguna regla veía el TypeScript
+dentro del fichero. Al cargar `plugin:@typescript-eslint/recommended` salieron 24
+errores: 22 símbolos importados que ya no usaba nadie, un `prefer-const` y un
+`no-unused-expressions`.
+
+Lo revelador es de dónde venían ocho de esos huérfanos: de `81d7d22`, un commit
+de esta misma rama. Quitar los wrappers de dominio de `pantry-store.service.ts`
+dejó sus imports en pie y el lint de entonces no podía verlo. Una rama que se
+dedica a limpiar generaba basura que su propia red no atrapaba.
+
+`no-explicit-any` queda en **warning, no en error**. Los 18 restantes son bordes
+de librerías sin tipos (PouchDB, plugins de Capacitor, la respuesta del LLM);
+ponerlos en rojo o bloquea el CI o empuja a taparlos con un tipo peor. Como
+warning siguen a la vista. Los specs lo desactivan del todo: un doble de test
+puede mentir sobre su tipo, es su trabajo.
+
+Los dos hallazgos que no eran imports eran código de verdad: un ternario usado
+como sentencia en `list.component.ts` (la intención era alternar, ahora lo dice)
+y un `let { quantity, nameTokens }` en el parser de tickets donde solo `quantity`
+se reasigna.
+
+**Deuda que la auditoría destapó y sigue viva:** `NotificationSchedulerService` se quedó sin cobertura al mover sus métodos
 dev; `features/` y `shared/` siguen sin un solo spec; y `restore()` se llama en
 cada primer plano, que ahora que funciona hace una ida y vuelta real a la tienda.
 
