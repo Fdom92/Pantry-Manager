@@ -1088,6 +1088,22 @@ git commit -m "docs(patterns): document the toast and logging recipes"
 
 ---
 
+## Corrección: el fallo de Catálogos no era de producción
+
+El commit `5a469d6` se tituló "show the catalogs the user actually saved", dando a
+entender que arreglaba algo que sufrían los usuarios. **No era así.** El síntoma
+—añadir una ubicación, volver a entrar y ver la lista vacía sobre datos guardados— es
+real, pero solo ocurre sirviendo con `ng serve` en un Chrome de escritorio, porque en
+ese entorno `ionViewWillEnter` no dispara en ninguna página.
+
+Comprobado en dispositivo sobre la 5.2 publicada, sin ningún arreglo: la ubicación
+persiste al salir y volver, y al cerrar y reabrir la app. Y Ajustes muestra el precio
+PRO real, que solo puede venir de `loadPricing()`, que vive dentro de ese mismo hook.
+
+El cambio se mantiene porque cargar en el constructor de un servicio page-scoped es
+equivalente en dispositivo y elimina la divergencia entre dev y producción. Pero es
+robustez, no un fallo corregido para el usuario.
+
 ## Deuda de test conocida (anotada durante la ejecución)
 
 `NotificationSchedulerService` se queda **sin cobertura unitaria** tras la Task 7.
