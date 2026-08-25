@@ -50,7 +50,12 @@ export class SettingsNotificationsDevStateService {
   }
 
   async fireWinning(): Promise<void> {
-    const ok = await (await this.dev()).fireWinning(new Date(Date.now() + 5_000));
+    await this.fireWinningAt(new Date(Date.now() + 5_000));
+  }
+
+  /** Backs the panel's "schedule at hh:mm" button. */
+  async fireWinningAt(at: Date): Promise<void> {
+    const ok = await (await this.dev()).fireWinning(at);
     this.notifyOutcome(ok);
     await this.refreshPending();
   }

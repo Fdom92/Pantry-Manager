@@ -9,6 +9,7 @@ import { InsightsLlmClientService } from './insights-llm-client.service';
 import type { InsightsClientError } from './insights-llm-client.service';
 import { LanguageService } from '../shared/language.service';
 import { LocalStorageService } from '../shared/local-storage.service';
+import { ToastService } from '../shared/toast.service';
 import {
   computeActivityMetrics,
   computeDistribution,
@@ -56,6 +57,7 @@ export class InsightsStateService {
   private readonly analytics = inject(AnalyticsService);
   private readonly manualItemsStore = inject(ListManualItemsStore);
   private readonly localStorage = inject(LocalStorageService);
+  private readonly toast = inject(ToastService);
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
@@ -138,6 +140,7 @@ export class InsightsStateService {
       confidence: p.confidence,
       surface,
     });
+    this.toast.success('dashboard.reposition.added');
   }
 
   /**

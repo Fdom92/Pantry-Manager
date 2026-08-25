@@ -16,7 +16,6 @@ import { RepositionCardComponent } from '@shared/components/reposition-card/repo
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
 import { StreakCardComponent } from './components/streak-card/streak-card.component';
 import { WasteTeaserCardComponent } from './components/waste-teaser-card/waste-teaser-card.component';
-import { ToastService } from '@core/services/shared';
 import {
   IonButton,
   IonButtons,
@@ -72,7 +71,6 @@ export class DashboardComponent implements OnDestroy {
   }
   private readonly insights = inject(InsightsStateService);
   private readonly insightsTracking = inject(InsightsTrackingStateService);
-  private readonly toast = inject(ToastService);
   private readonly navCtrl = inject(NavController);
   private readonly navigationPreset = inject(PantryNavigationPresetService);
   readonly isInsightsPro = this.insights.isPro;
@@ -137,7 +135,6 @@ export class DashboardComponent implements OnDestroy {
 
   onAddRepoPredictionToList(p: RepositionPrediction): void {
     this.insights.addRepoPredictionToList(p, 'dashboard');
-    this.toast.success('dashboard.reposition.added');
   }
 
   onSummaryCardClick(card: DashboardOverviewCardId): void {

@@ -8,7 +8,6 @@ import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenue
 import { computeAnnualSavingsPercent } from '@core/domain/upgrade';
 import { LanguageService } from '@core/services/shared/language.service';
 import type { DevMarketingSeederService } from '@core/services/dev/dev-marketing-seeder.service';
-import type { DevNotificationsService } from '@core/services/dev/dev-notifications.service';
 import { NOTIFICATION_IDS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@core/constants';
 import { LocalStorageService, LoggerService, ToastService } from '@core/services/shared';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
@@ -252,11 +251,6 @@ export class SettingsComponent {
 
   // ─── Notifications ────────────────────────────────────────────────────────
 
-  private async devNotifications(): Promise<DevNotificationsService> {
-    const { DevNotificationsService } = await import('@core/services/dev/dev-notifications.service');
-    return this.injector.get(DevNotificationsService);
-  }
-
   private async marketingSeeder(): Promise<DevMarketingSeederService> {
     const { DevMarketingSeederService } = await import('@core/services/dev/dev-marketing-seeder.service');
     return this.injector.get(DevMarketingSeederService);
@@ -266,7 +260,7 @@ export class SettingsComponent {
     if (this.isTestingNotification()) return;
     this.isTestingNotification.set(true);
     try {
-      await (await this.devNotifications()).fireWinning(new Date(Date.now() + 5_000));
+      await this.dev.fireWinning();
     } finally {
       this.isTestingNotification.set(false);
     }
@@ -297,7 +291,7 @@ export class SettingsComponent {
       const [hour, minute] = this.scheduleAtTimeInput().split(':').map(Number);
       const at = new Date();
       at.setHours(hour, minute, 0, 0);
-      await (await this.devNotifications()).fireWinning(at);
+      await this.dev.fireWinningAt(at);
     } finally {
       this.isSchedulingAtTime.set(false);
     }
@@ -307,7 +301,7 @@ export class SettingsComponent {
     if (this.isPreviewingNotification()) return;
     this.isPreviewingNotification.set(true);
     try {
-      const result = (await this.devNotifications()).previewNext();
+      const result = await this.dev.previewNext();
       if (result) {
         window.alert(`${result.title}\n\n${result.body}`);
       } else {
