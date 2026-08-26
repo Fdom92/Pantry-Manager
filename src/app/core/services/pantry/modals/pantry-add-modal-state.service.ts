@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { buildAddItemPayload, expiryAfterFoodTypeChange, inferFoodType } from '@core/domain/pantry';
+import { buildAddItemPayload } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
-import type { FoodType } from '@core/models/shared/enums.model';
 import { createDocumentId, withSignalFlag } from '@core/utils';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
@@ -36,17 +35,6 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
     return next;
   }
 
-  /**
-   * Show the suggested type and expiry up front so the user can accept or edit
-   * them before saving, instead of discovering them afterwards.
-   */
-  protected decorateEntry(name: string, item?: PantryItem): Partial<AddEntry> {
-    return {
-      foodType: item?.foodType ?? inferFoodType(name),
-      ...this.suggestedExpiryFor(name, item),
-    };
-  }
-
   open(): void {
     this.openSheet();
     this.analytics.track(ANALYTICS_EVENTS.PANTRY_ADD_MODAL_OPENED);
@@ -54,18 +42,6 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
 
   close(): void {
     this.closeSheet();
-  }
-
-  /**
-   * Set the food type for an entry. Re-suggests the expiry date from the new
-   * type unless the user already put a date there themselves.
-   */
-  setEntryFoodType(entryId: string, foodType: FoodType): void {
-    this.updateEntry(entryId, entry => ({
-      ...entry,
-      foodType,
-      ...expiryAfterFoodTypeChange(entry, foodType),
-    }));
   }
 
   /** Toggle "intentionally no expiry" for an entry. Clears the date. */

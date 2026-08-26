@@ -36,10 +36,6 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
    * Restocking a fresh product means a new lettuce, not the old one, so it gets
    * a fresh suggested date rather than inheriting the batch's.
    */
-  protected decorateEntry(name: string, item?: PantryItem): Partial<AddEntry> {
-    return this.suggestedExpiryFor(name, item);
-  }
-
   open(): void {
     this.openSheet();
     this.analytics.track(ANALYTICS_EVENTS.PANTRY_FRESH_ADD_MODAL_OPENED);

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
 import type { PantryItem } from '@core/models/pantry';
+import { FoodType } from '@core/models/shared/enums.model';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { LanguageService } from '../../shared/language.service';
@@ -229,6 +230,47 @@ describe('add sheet entry engine — frescos', () => {
     const entry = service.entries()[0];
     expect(entry.isNew).toBeTrue();
     expect(entry.item).toBeUndefined();
+  });
+
+  /**
+   * The sheet's own hint says the date comes from the food type, so the type
+   * has to be visible and correctable — otherwise a wrong guess produces a
+   * wrong date the user cannot explain or fix. Despensa always worked this
+   * way; frescos showed the hint without the chip until 5.3.
+   */
+  describe('food type', () => {
+    it('gives a typed-in fresh product an inferred food type', () => {
+      service.addEntryFromQuery('lechuga');
+
+      expect(service.entries()[0].foodType).toBeTruthy();
+    });
+
+    it('takes the food type from the catalogue product when there is one', () => {
+      service.addEntry({ id: lechuga._id, title: lechuga.name, raw: lechuga });
+
+      expect(service.entries()[0].foodType).toBeTruthy();
+    });
+
+    it('re-suggests the date when the user corrects the type', () => {
+      service.addEntryFromQuery('lechuga');
+      const id = service.entries()[0].id;
+      const before = service.entries()[0].expirationDate;
+
+      service.setEntryFoodType(id, FoodType.NON_PERISHABLE);
+
+      expect(service.entries()[0].foodType).toBe(FoodType.NON_PERISHABLE);
+      expect(service.entries()[0].expirationDate).not.toBe(before);
+    });
+
+    it('keeps a date the user chose themselves when the type changes', () => {
+      service.addEntryFromQuery('lechuga');
+      const id = service.entries()[0].id;
+      service.setEntryDate(id, '2027-01-01');
+
+      service.setEntryFoodType(id, FoodType.NON_PERISHABLE);
+
+      expect(service.entries()[0].expirationDate).toBe('2027-01-01');
+    });
   });
 
   it('offers only fresh products in the autocomplete', () => {

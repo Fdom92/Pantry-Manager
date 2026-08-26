@@ -1,6 +1,7 @@
 import { computed, inject, signal } from '@angular/core';
-import { resolveSuggestedExpiry, sumQuantities } from '@core/domain/pantry';
+import { expiryAfterFoodTypeChange, inferFoodType, resolveSuggestedExpiry, sumQuantities } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
+import type { FoodType } from '@core/models/shared/enums.model';
 import { buildPantryItemAutocomplete } from '@core/utils';
 import { dedupeByNormalizedKey, formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
@@ -12,7 +13,7 @@ import { PantryStoreService } from '../pantry-store.service';
 /**
  * The list a user builds before saving in either add sheet: pick from the
  * catalogue, type a name, nudge quantities, set dates. Despensa and fresco run
- * the same engine and disagree in three places, which are the abstract members
+ * the same engine and disagree in two places, which are the abstract members
  * below — everything else is written once here.
  *
  * Submission is deliberately not part of this: a despensa entry becomes a new
@@ -36,8 +37,19 @@ export abstract class PantryAddEntriesBase {
    */
   protected abstract onRepeatedPick(entries: AddEntry[], index: number): AddEntry[];
 
-  /** Per-sheet fields on a new entry — despensa carries a food type, fresco does not. */
-  protected abstract decorateEntry(name: string, item?: PantryItem): Partial<AddEntry>;
+  /**
+   * Fields a new entry starts with. Both sheets show the suggested type and
+   * expiry up front so the user can accept or correct them before saving,
+   * rather than discovering them afterwards — and the type has to be visible
+   * for the expiry hint below the list to mean anything, since that is what
+   * the date is derived from.
+   */
+  protected decorateEntry(name: string, item?: PantryItem): Partial<AddEntry> {
+    return {
+      foodType: item?.foodType ?? inferFoodType(name),
+      ...this.suggestedExpiryFor(name, item),
+    };
+  }
 
   readonly isOpen = signal(false);
   readonly isSubmitting = signal(false);
@@ -160,6 +172,18 @@ export abstract class PantryAddEntriesBase {
       ];
     });
     this.query.set('');
+  }
+
+  /**
+   * Set the food type for an entry. Re-suggests the expiry date from the new
+   * type unless the user already put a date there themselves.
+   */
+  setEntryFoodType(entryId: string, foodType: FoodType): void {
+    this.updateEntry(entryId, entry => ({
+      ...entry,
+      foodType,
+      ...expiryAfterFoodTypeChange(entry, foodType),
+    }));
   }
 
   /**
