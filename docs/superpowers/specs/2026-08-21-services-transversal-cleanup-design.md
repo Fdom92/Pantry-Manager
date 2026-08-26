@@ -377,3 +377,36 @@ cada primer plano, que ahora que funciona hace una ida y vuelta real a la tienda
 **Nota de entorno descubierta de paso:** el build nativo falla con `./gradlew` a
 secas porque no hay JDK 21 en el PATH. Funciona con
 `JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"`.
+
+## QA manual sobre la rama ya "verde" (2026-08-26)
+
+Con `ng lint` en cero, 709 tests en verde y el build de producción hecho,
+veinte minutos de usar la app en el dev server destaparon tres cosas. Ninguna
+la podía ver el pipeline:
+
+1. **`flag-outline` sin registrar.** Lo dejó caer esta misma rama al extraer el
+   panel de dev a su propio componente. Ionicons resuelve los nombres en
+   runtime: el icono no se pinta, avisa solo por consola, y pasa lint, tests y
+   build sin despeinarse. Ahora hay un script en el CI que lo caza, validado
+   quitando la registración y comprobando que falla.
+2. **Tres errores falsos en Sentry por carga.** RevenueCat es native-only y en
+   web rechaza con "Web not supported in this plugin". Iba por `logger.error`,
+   que hace `captureException`. Una condición esperada generando eventos —
+   exactamente el ruido que entrena a ignorar los errores de ese servicio.
+   Los otros seis servicios native-only ya se guardaban con
+   `Capacitor.isNativePlatform()`; RevenueCat era el único que no.
+3. **El chip de tipo, ausente en la hoja de alta de frescos.** El hint decía
+   que la fecha sale del tipo de alimento —y es literalmente cierto,
+   `resolveSuggestedExpiry` cae a `inferFoodType(name)`— pero el tipo era
+   invisible e incorregible. No era diseño: el modal de *editar* fresco sí
+   tenía el picker.
+
+**El mismo patrón que en la 5.2, otra vez.** Los tres salieron de ejecutar la
+app, ninguno de un test. Y el tercero lo encontró el usuario, no yo: yo había
+escrito en el docblock de `PantryAddEntriesBase` que "despensa lleva tipo de
+alimento y fresco no", codificando el hueco como si fuera una decisión. Merece
+la pena desconfiar de los docblocks que explican por qué algo está incompleto.
+
+Efecto colateral que sí funcionó: al mover `decorateEntry` y `setEntryFoodType`
+a la clase base, el plugin de TypeScript recién cargado cazó al instante los
+tres imports que quedaban huérfanos en la subclase.
