@@ -40,6 +40,9 @@ jobs:
       - name: Lint
         run: npx ng lint
 
+      - name: Check icon registry
+        run: node scripts/check-icons.mjs
+
       - name: Test
         run: npx ng test --watch=false --browsers=ChromeHeadless
 
