@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { Injectable, inject } from '@angular/core';
 import { normalizePackages, pickPreferredPackage, resolveProStatus, type ProStatusInput } from '@core/domain/upgrade';
 import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-capacitor';
@@ -55,8 +56,24 @@ export class UpgradeRevenuecatService {
     return this.userId;
   }
 
+  /**
+   * RevenueCat is a native-only plugin: under `ng serve` every call rejects
+   * with "Web not supported in this plugin". That is an expected condition,
+   * not a failure — and since `logger.error` captures a Sentry event, letting
+   * it through files three fake issues on every dev page load, which is
+   * exactly the noise that trains you to ignore this service's real errors.
+   *
+   * Every other native-only service in the app guards the same way.
+   */
+  private get isUnavailable(): boolean {
+    return !Capacitor.isNativePlatform();
+  }
+
   async init(userId: string): Promise<void> {
     this.userId = userId;
+    if (this.isUnavailable) {
+      return;
+    }
     if (!this.publicApiKey) {
       this.logger.error('UpgradeRevenuecatService', 'missing public API key in environment');
       return;
@@ -86,6 +103,9 @@ export class UpgradeRevenuecatService {
   }
 
   async getOfferings(): Promise<PurchasesOffering | null> {
+    if (this.isUnavailable) {
+      return null;
+    }
     try {
       const offerings = await Purchases.getOfferings();
       return offerings?.current ?? null;
@@ -132,6 +152,9 @@ export class UpgradeRevenuecatService {
   }
 
   async purchasePackage(aPackage: PurchasesPackage): Promise<boolean> {
+    if (this.isUnavailable) {
+      return false;
+    }
     try {
       const result = await Purchases.purchasePackage({ aPackage });
       const isPro = this.extractIsPro(result?.customerInfo);
@@ -164,6 +187,9 @@ export class UpgradeRevenuecatService {
   }
 
   async restore(): Promise<boolean> {
+    if (this.isUnavailable) {
+      return this.isPro();
+    }
     try {
       const { customerInfo } = await Purchases.restorePurchases();
       const isPro = this.extractIsPro(customerInfo);
