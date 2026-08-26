@@ -10,6 +10,12 @@
  *
  * This is a static check over files, which is why it is a script rather than a
  * spec: nothing here needs a browser or a rendered component.
+ *
+ * It reads both `name="x"` and the string literals inside `[name]="…"`. The
+ * dynamic form was skipped at first as "out of reach", and `toggle` — half of
+ * a ternary in the dev panel — slipped through that gap and had to be found by
+ * hand as well. A literal sitting after a comparison operator is what the
+ * expression tests, not an icon, so those are dropped.
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
@@ -38,15 +44,28 @@ if (registered.size === 0) {
   process.exit(2);
 }
 
-// Only literal names. `[name]="expr"` is resolved at runtime and cannot be
-// checked from here.
 const used = new Map();
 let templatesSeen = 0;
+
+function note(name, file) {
+  used.set(name, [...(used.get(name) ?? []), file]);
+}
+
 for (const file of files.filter(f => f.endsWith('.html'))) {
   templatesSeen++;
   const html = readFileSync(file, 'utf8');
+
   for (const match of html.matchAll(/<ion-icon[^>]*\sname="([a-z0-9-]+)"/g)) {
-    used.set(match[1], [...(used.get(match[1]) ?? []), file]);
+    note(match[1], file);
+  }
+
+  // `[name]="cond ? 'a' : 'b'"` — every literal the expression can produce is
+  // an icon that must exist. Literals being compared against are not.
+  for (const match of html.matchAll(/<ion-icon[^>]*\[name\]="([^"]*)"/g)) {
+    const results = match[1].replace(/(?:===|!==|==|!=)\s*'[^']*'/g, '');
+    for (const literal of results.matchAll(/'([a-z0-9-]+)'/g)) {
+      note(literal[1], file);
+    }
   }
 }
 
