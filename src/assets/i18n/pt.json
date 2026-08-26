@@ -615,7 +615,7 @@
       "count": "{{ count }} lotes registados",
       "countOne": "1 lote registado",
       "open": "Aberto",
-      "noExpiryDate": "Sem data de validade",
+      "noExpiryDate": "Data em falta",
       "addBatch": "Adicionar lote",
       "currentQuantity": "Quantidade",
       "expires": {

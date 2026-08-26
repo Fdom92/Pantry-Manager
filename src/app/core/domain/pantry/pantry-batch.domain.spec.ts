@@ -1,4 +1,10 @@
 import type { ItemBatch } from '@core/models/pantry';
+import deBundle from '../../../../assets/i18n/de.json';
+import enBundle from '../../../../assets/i18n/en.json';
+import esBundle from '../../../../assets/i18n/es.json';
+import frBundle from '../../../../assets/i18n/fr.json';
+import itBundle from '../../../../assets/i18n/it.json';
+import ptBundle from '../../../../assets/i18n/pt.json';
 import { applyFifoConsumption, collectBatches, computeEarliestExpiry, mergeBatchesByExpiry, normalizeBatches, sumQuantities } from './pantry-batch.domain';
 
 function batch(overrides: Partial<ItemBatch> = {}): ItemBatch {
@@ -246,5 +252,47 @@ describe('mergeBatchesByExpiry — batches with no date', () => {
       { batchId: 'b', quantity: 1, expirationDate: '2026-09-01' },
     ]);
     expect(merged.length).toBe(2);
+  });
+});
+
+/**
+ * The two dateless states behave in opposite ways — `noExpiry` batches merge,
+ * unknown-date ones stay apart — so a user who cannot tell the labels apart is
+ * left watching identical-looking rows sometimes combine and sometimes not.
+ *
+ * German shipped both labels as the exact same string ("Kein Ablaufdatum")
+ * from the commit that introduced noExpiry until 5.3, which is precisely the
+ * kind of collision no reviewer reads six bundles to catch.
+ */
+describe('the two dateless labels', () => {
+  const locales: [string, unknown][] = [
+    ['es', esBundle], ['en', enBundle], ['de', deBundle],
+    ['fr', frBundle], ['it', itBundle], ['pt', ptBundle],
+  ];
+
+  function labels(bundle: unknown) {
+    return (bundle as { pantry: { batches: Record<string, string> } }).pantry.batches;
+  }
+
+  it('never spells "no expiry" and "date missing" the same way', () => {
+    const collisions: string[] = [];
+    for (const [code, bundle] of locales) {
+      const { noExpiryIntentional, noExpiryDate } = labels(bundle);
+      if (noExpiryIntentional === noExpiryDate) {
+        collisions.push(`${code}: both are "${noExpiryDate}"`);
+      }
+    }
+    expect(collisions).toEqual([]);
+  });
+
+  it('defines both labels in every language', () => {
+    const missing: string[] = [];
+    for (const [code, bundle] of locales) {
+      const batches = labels(bundle);
+      for (const key of ['noExpiryIntentional', 'noExpiryDate']) {
+        if (!batches[key]) missing.push(`${code}.${key}`);
+      }
+    }
+    expect(missing).toEqual([]);
   });
 });

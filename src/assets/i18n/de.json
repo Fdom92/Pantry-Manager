@@ -615,7 +615,7 @@
       "count": "{{ count }} registrierte Chargen",
       "countOne": "1 registrierte Charge",
       "open": "Geöffnet",
-      "noExpiryDate": "Kein Ablaufdatum",
+      "noExpiryDate": "Datum fehlt",
       "addBatch": "Charge hinzufügen",
       "currentQuantity": "Menge",
       "expires": {

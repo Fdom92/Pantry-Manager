@@ -615,7 +615,7 @@
       "count": "{{ count }} lotti registrati",
       "countOne": "1 lotto registrato",
       "open": "Aperto",
-      "noExpiryDate": "Nessuna data di scadenza",
+      "noExpiryDate": "Data mancante",
       "addBatch": "Aggiungi lotto",
       "currentQuantity": "Quantità",
       "expires": {

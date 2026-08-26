@@ -615,7 +615,7 @@
       "count": "{{ count }} batches recorded",
       "countOne": "1 batch recorded",
       "open": "Opened",
-      "noExpiryDate": "No expiration date",
+      "noExpiryDate": "Date missing",
       "addBatch": "Add batch",
       "currentQuantity": "Quantity",
       "expires": {

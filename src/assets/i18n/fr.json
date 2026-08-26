@@ -615,7 +615,7 @@
       "count": "{{ count }} lots enregistrés",
       "countOne": "1 lot enregistré",
       "open": "Ouvert",
-      "noExpiryDate": "Sans date de péremption",
+      "noExpiryDate": "Date manquante",
       "addBatch": "Ajouter un lot",
       "currentQuantity": "Quantité",
       "expires": {
