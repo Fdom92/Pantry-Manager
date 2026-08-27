@@ -2,10 +2,10 @@
 
   @if (hasRect()) {
     <!-- Spotlight ring — box-shadow creates the dark overlay "hole" -->
-    <div class="coach-spotlight" [style]="spotlightStyle()"></div>
+    <div class="coach-spotlight" [style]="spotlightStyle()" (click)="onAcceptTap($event)"></div>
 
     <!-- Tooltip bubble above the button -->
-    <div class="coach-tooltip" [style]="tooltipStyle()" (click)="onTooltipTap($event)">
+    <div class="coach-tooltip" [style]="tooltipStyle()" (click)="onAcceptTap($event)">
       <p class="coach-tooltip__title">{{ 'pantry.coachMark.addFirstItem' | translate }}</p>
       <p class="coach-tooltip__hint">{{ 'pantry.coachMark.addFirstItemHint' | translate }}</p>
       <div class="coach-tooltip__arrow"></div>

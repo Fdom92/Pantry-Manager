@@ -69,7 +69,13 @@ export class PantryAddCoachMarkComponent implements OnInit, AfterViewInit {
     this.dismissed.emit();
   }
 
-  onTooltipTap(event: Event): void {
+  /**
+   * Taking the coach mark up on its offer. Bound to both the tooltip and the
+   * spotlight, because the spotlight sits on top of the very button it is
+   * pointing at: without its own handler the tap reaches the backdrop, which
+   * dismisses the mark and leaves the user to press the button a second time.
+   */
+  onAcceptTap(event: Event): void {
     event.stopPropagation();
     this.coachMark.accept('add_first_item');
     this.addRequested.emit();
