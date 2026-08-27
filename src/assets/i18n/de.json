@@ -42,6 +42,7 @@
         "emptyBody": "Füge sie einzeln aus der Vorratskammer hinzu.",
         "noExpiryLabel": "Kein Ablaufdatum",
         "needsDateLabel": "Datum ausstehend",
+        "expiresLabel": "Läuft ab am {{date}}",
         "adjustHint": "Daten und Mengen kannst du später in deiner Vorratskammer anpassen."
       },
       "analytics": {

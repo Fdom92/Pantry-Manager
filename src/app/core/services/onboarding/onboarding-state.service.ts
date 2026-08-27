@@ -3,7 +3,7 @@ import { ANALYTICS_EVENTS, ONBOARDING_QUICK_SEED_ITEMS, ONBOARDING_SLIDES } from
 import { AnalyticsService } from '../analytics/analytics.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import type { OnboardingQuickSeedItem } from '@core/constants';
-import { buildAddItemPayload, FRESH_QTY } from '@core/domain/pantry';
+import { buildAddItemPayload, FRESH_QTY, resolveSuggestedExpiry } from '@core/domain/pantry';
 import type { OnboardingSlide } from '@core/models/onboarding';
 import type { PantryItem } from '@core/models/pantry';
 import { createDocumentId } from '@core/utils';
@@ -82,6 +82,23 @@ export class OnboardingStateService {
   });
 
   readonly selectedCount = computed(() => this.selectedSeedKeys().size);
+
+  /**
+   * What the confirm slide promises each selected seed will get. It resolves
+   * the date through the same function the creation does, from the same
+   * declared food type, so the preview cannot drift from what is saved a tap
+   * later. Before this the slide said "date pending" for every row, which
+   * stopped being true once the app started inferring dates.
+   */
+  readonly selectedSeedPreviews = computed(() =>
+    this.selectedSeedItems().map(seed => {
+      const name = this.translate.instant(`onboarding.quickSeed.items.${seed.key}`);
+      const suggested = seed.alwaysNoExpiry
+        ? { noExpiry: true }
+        : resolveSuggestedExpiry(name, seed.foodType);
+      return { seed, name, ...suggested };
+    })
+  );
 
   constructor() {
     if (!swiperRegistered) {
@@ -274,11 +291,14 @@ export class OnboardingStateService {
         name,
         quantity,
         noExpiry: seed.alwaysNoExpiry,
+        // The curated list already knows what each seed is, so the builder must
+        // not fall back to guessing it from a translated name — that is what
+        // left "Œufs" and "Grão-de-bico" without a date.
+        foodType: seed.foodType,
       });
       const item: PantryItem = {
         ...base,
         productType: seed.productType,
-        foodType: seed.foodType,
       };
       await this.pantryStore.addItem(item);
       await this.historyManager.logAddNewItem(item, quantity, sessionId, timestamp);

@@ -42,6 +42,7 @@
         "emptyBody": "Adiciona-os um a um a partir da despensa.",
         "noExpiryLabel": "Sem validade",
         "needsDateLabel": "Data por definir",
+        "expiresLabel": "Válido até {{date}}",
         "adjustHint": "Ajusta datas e quantidades depois na tua despensa."
       },
       "analytics": {

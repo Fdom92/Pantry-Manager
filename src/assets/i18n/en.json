@@ -42,6 +42,7 @@
         "emptyBody": "Add them one by one from your pantry.",
         "noExpiryLabel": "No expiry",
         "needsDateLabel": "Date pending",
+        "expiresLabel": "Expires {{date}}",
         "adjustHint": "Adjust dates and quantities later in your pantry."
       },
       "analytics": {

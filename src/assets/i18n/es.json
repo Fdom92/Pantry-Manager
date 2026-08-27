@@ -42,6 +42,7 @@
         "emptyBody": "Puedes añadirlos uno a uno desde la despensa.",
         "noExpiryLabel": "Sin caducidad",
         "needsDateLabel": "Pendiente fecha",
+        "expiresLabel": "Caduca el {{date}}",
         "adjustHint": "Ajusta fechas y cantidades en tu despensa cuando quieras."
       },
       "analytics": {

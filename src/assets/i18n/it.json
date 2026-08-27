@@ -42,6 +42,7 @@
         "emptyBody": "Aggiungili uno per uno dalla dispensa.",
         "noExpiryLabel": "Senza scadenza",
         "needsDateLabel": "Data da impostare",
+        "expiresLabel": "Scade il {{date}}",
         "adjustHint": "Regola date e quantità più tardi nella tua dispensa."
       },
       "analytics": {
