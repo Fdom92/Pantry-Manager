@@ -5,12 +5,15 @@ import type { AppThemePreference } from '@core/models';
 import type { BaseDoc } from '@core/models/shared';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { createLatestOnlyRunner, runIfIdle, withSignalFlag } from '@core/utils';
-import { ANALYTICS_EVENTS } from '@core/constants';
-import { ConfirmService, DownloadService, ShareService, shouldSkipShareOutcome } from '../shared';
+import { createLatestOnlyRunner, runIfIdle } from '@core/utils';
+import { ANALYTICS_EVENTS, type SupportedLanguage } from '@core/constants';
+import { ConfirmService, DownloadService, LoggerService, ShareService, shouldSkipShareOutcome } from '../shared';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { StorageService } from '../shared/storage.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
+import { LanguageService } from '../shared/language.service';
+import { ToastService } from '../shared/toast.service';
+import type { PurchasesOffering } from '@revenuecat/purchases-capacitor';
 import { SettingsPreferencesService } from './settings-preferences.service';
 import { SyncService } from '../sync/sync.service';
 import { AnalyticsService } from '../analytics/analytics.service';
@@ -23,6 +26,8 @@ export class SettingsStateService {
   private readonly storage = inject<StorageService<BaseDoc>>(StorageService);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
+  private readonly language = inject(LanguageService);
+  private readonly toast = inject(ToastService);
   private readonly navCtrl = inject(NavController);
   private readonly download = inject(DownloadService);
   private readonly confirm = inject(ConfirmService);
@@ -30,6 +35,7 @@ export class SettingsStateService {
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   readonly isPro = toSignal(this.revenuecat.isPro$, {
     initialValue: this.revenuecat.isPro(),
@@ -50,13 +56,13 @@ export class SettingsStateService {
     try {
       await this.appPreferences.getPreferences();
     } catch (err) {
-      console.error('[SettingsStateService] ensurePreferencesLoaded error', err);
+      this.logger.error('SettingsStateService', 'ensurePreferencesLoaded error', err);
     }
     this.isReady.set(true);
   }
 
   async resetApplicationData(): Promise<void> {
-    const confirmed = this.confirm.confirm(this.translate.instant('settings.reset.confirm'));
+    const confirmed = await this.confirm.confirm(this.translate.instant('settings.reset.confirm'));
 
     if (!confirmed) {
       return;
@@ -70,7 +76,7 @@ export class SettingsStateService {
       }
       this.reloadApp();
     }).catch(async err => {
-      console.error('[SettingsStateService] resetApplicationData error', err);
+      this.logger.error('SettingsStateService', 'resetApplicationData error', err);
     });
   }
 
@@ -110,7 +116,7 @@ export class SettingsStateService {
 
       this.download.downloadBlob(blob, filename);
     }).catch(async err => {
-      console.error('[SettingsStateService] exportDataBackup error', err);
+      this.logger.error('SettingsStateService', 'exportDataBackup error', err);
     });
   }
 
@@ -140,7 +146,7 @@ export class SettingsStateService {
         shouldReload = true;
       }
     }).catch(async (err: unknown) => {
-      console.error('[SettingsStateService] submitImportFileSelection error', err);
+      this.logger.error('SettingsStateService', 'submitImportFileSelection error', err);
       if (this.lifecycle.isDestroyed()) {
         return;
       }
@@ -170,8 +176,25 @@ export class SettingsStateService {
         value: nextTheme,
       });
     }).catch(async err => {
-      console.error('[SettingsStateService] updateThemePreference error', err);
+      this.logger.error('SettingsStateService', 'updateThemePreference error', err);
     });
+  }
+
+  // ─── Idioma ───────────────────────────────────────────────────────────────
+
+  readonly currentLanguage = this.language.currentLanguage;
+
+  getCurrentLocale(): string {
+    return this.language.getCurrentLocale();
+  }
+
+  async setLanguage(lang: SupportedLanguage): Promise<void> {
+    await this.language.setLanguage(lang);
+  }
+
+  /** Offering behind the PRO pricing shown in the Settings hero. */
+  async getOfferings(): Promise<PurchasesOffering | null> {
+    return await this.revenuecat.getOfferings();
   }
 
   navigateToUpgrade(): void {
@@ -192,8 +215,9 @@ export class SettingsStateService {
       } else {
         await this.analytics.optOut();
       }
+      this.toast.success(next ? 'settings.privacy.toastEnabled' : 'settings.privacy.toastDisabled');
     }).catch(err => {
-      console.error('[SettingsStateService] toggleAnalytics error', err);
+      this.logger.error('SettingsStateService', 'toggleAnalytics error', err);
     });
   }
 

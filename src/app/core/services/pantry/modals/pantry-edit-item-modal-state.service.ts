@@ -1,6 +1,6 @@
-import { Injectable, effect, inject, signal } from '@angular/core';
+import { Injectable, effect, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import { buildUniqueSelectOptions, createDocumentId, formatSupermarketLabel, hasMeaningfulItemChanges } from '@core/utils';
@@ -17,6 +17,8 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { CatalogOptionsService, SettingsPreferencesService } from '../../settings';
+import { LoggerService } from '../../shared/logger.service';
+import { ToastService } from '../../shared';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { buildConvertToFreshPreview, consolidateBatchesForFresh } from '@core/domain/pantry';
@@ -33,7 +35,8 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
   private readonly analytics = inject(AnalyticsService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly alertCtrl = inject(AlertController);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toast = inject(ToastService);
+  private readonly logger = inject(LoggerService);
 
   readonly foodTypes = Object.values(FoodType);
 
@@ -79,12 +82,12 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
       if (!request) {
         return;
       }
-      this.openEdit(request.item);
+      this.open(request.item);
       this.listState.clearEditItemModalRequest();
     });
   }
 
-  openEdit(item: PantryItem, event?: Event): void {
+  open(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     this.applyItemToForm(item);
     this.isSaving.set(false);
@@ -167,12 +170,12 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
   }
 
   private async addSupermarketOption(value: string): Promise<void> {
-    const selected = await this.catalogOptions.addSupermarketOption(value);
+    const selected = await this.catalogOptions.addOption('supermarket', value);
     this.form.get('supermarket')?.setValue(selected);
   }
 
   private async addCategoryOption(value: string): Promise<void> {
-    const selected = await this.catalogOptions.addCategoryOption(value);
+    const selected = await this.catalogOptions.addOption('category', value);
     this.form.get('categoryId')?.setValue(selected);
   }
 
@@ -244,15 +247,10 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
         });
       }
       this.dismiss();
-      const toast = await this.toastCtrl.create({
-        message: this.translate.instant('pantry.toasts.saved'),
-        duration: 1200,
-        position: 'bottom',
-      });
-      void toast.present();
+      this.toast.success('pantry.toasts.saved');
     } catch (err) {
       this.isSaving.set(false);
-      console.error('[PantryEditItemModalStateService] submitItem error', err);
+      this.logger.error('PantryEditItemModalStateService', 'submitItem error', err);
     }
   }
 
@@ -309,15 +307,10 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
         updatedAt: new Date().toISOString(),
       };
       await this.pantryStore.updateItem(updated);
-      const toast = await this.toastCtrl.create({
-        message: this.translate.instant('pantry.fresh.convertToFresh.toast'),
-        duration: 1500,
-        position: 'bottom',
-      });
-      await toast.present();
+      this.toast.success('pantry.fresh.convertToFresh.toast');
       this.dismiss();
     } catch (err) {
-      console.error('[PantryEditItemModalStateService] convertToFresh error', err);
+      this.logger.error('PantryEditItemModalStateService', 'convertToFresh error', err);
     } finally {
       this.isSaving.set(false);
     }

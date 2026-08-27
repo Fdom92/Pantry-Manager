@@ -27,24 +27,15 @@ import { PantryAddModalComponent } from './components/add-modal/add-modal.compon
 import { PantryConsumeModalComponent } from './components/consume-modal/consume-modal.component';
 import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.component';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
-import { PantryBatchOperationsService } from '@core/services/pantry/pantry-batch-operations.service';
-import { PantryListUiStateService } from '@core/services/pantry/pantry-list-ui-state.service';
+import { PANTRY_PAGE_PROVIDERS } from '@core/services/pantry/pantry-page.providers';
 import { PantryAddModalStateService } from '@core/services/pantry/modals/pantry-add-modal-state.service';
-import { PantryConsumeModalStateService } from '@core/services/pantry/modals/pantry-consume-modal-state.service';
-import { PantryBatchesModalStateService } from '@core/services/pantry/modals/pantry-batches-modal-state.service';
-import { PantryEditItemModalStateService } from '@core/services/pantry/modals/pantry-edit-item-modal-state.service';
-import { PantryQuantitySheetStateService } from '@core/services/pantry/modals/pantry-quantity-sheet-state.service';
 import { FreshItemCardComponent } from './components/fresh-item-card/fresh-item-card.component';
 import { FreshAddModalComponent } from './components/fresh-add-modal/fresh-add-modal.component';
 import { FreshEditItemModalComponent } from './components/fresh-edit-item-modal/fresh-edit-item-modal.component';
-import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
-import { PantryReceiptScanModalStateService } from '@core/services/pantry/modals/pantry-receipt-scan-modal-state.service';
 import { PantryReceiptScanModalComponent } from './components/receipt-scan-modal/receipt-scan-modal.component';
-import { PantryPendientesSheetStateService } from '@core/services/pantry/modals/pantry-pendientes-sheet-state.service';
 import { PantryPendientesSheetComponent } from './components/pantry-pendientes-sheet/pantry-pendientes-sheet.component';
 import { PantryAddCoachMarkComponent } from './components/add-coach-mark/add-coach-mark.component';
-import { CoachMarkService } from '@core/services/retention';
-import { LocalStorageService } from '@core/services/shared';
+import { CoachMarkStateService } from '@core/services/retention/coach-mark-state.service';
 
 @Component({
   selector: 'app-pantry',
@@ -85,27 +76,14 @@ import { LocalStorageService } from '@core/services/shared';
   templateUrl: './pantry.component.html',
   styleUrls: ['./pantry.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    PantryStateService,
-    PantryBatchOperationsService,
-    PantryListUiStateService,
-    PantryAddModalStateService,
-    PantryConsumeModalStateService,
-    PantryBatchesModalStateService,
-    PantryEditItemModalStateService,
-    PantryQuantitySheetStateService,
-    PantryFreshAddModalStateService,
-    PantryReceiptScanModalStateService,
-    PantryPendientesSheetStateService,
-  ],
+  providers: [PANTRY_PAGE_PROVIDERS],
 })
 export class PantryComponent implements AfterViewInit, OnDestroy {
   readonly facade = inject(PantryStateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly addModalState = inject(PantryAddModalStateService);
-  private readonly coachMark = inject(CoachMarkService);
-  private readonly localStorage = inject(LocalStorageService);
+  private readonly coachMark = inject(CoachMarkStateService);
   @ViewChild(IonContent) private content!: IonContent;
   @ViewChild('despensaAddBtn') private despensaAddBtnRef?: ElementRef<HTMLElement>;
 
@@ -118,7 +96,7 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
   readonly showCoachMark = computed(() =>
     !this.coachMarkDismissed() &&
     this.addBtnEl() !== null &&
-    this.localStorage.onboarding.isSeen() &&
+    this.facade.hasSeenOnboarding() &&
     !this.coachMark.isShown('add_first_item') &&
     this.facade.hasCompletedInitialLoad() &&
     this.facade.summary().total === 0
@@ -132,7 +110,7 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
 
   onCoachMarkAddRequested(): void {
     this.coachMarkDismissed.set(true);
-    this.addModalState.openAddModal();
+    this.addModalState.open();
   }
 
   onCoachMarkDismissed(): void {
@@ -144,13 +122,13 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
   }
 
   private async maybeShowStarHint(): Promise<void> {
-    if (this.localStorage.coachMark.isShown('pantry:star')) return;
+    if (this.coachMark.isShown('pantry:star')) return;
     if (!this.facade.despensaItems().length) return;
     await new Promise<void>(r => setTimeout(r, 400));
     this.showStarHint.set(true);
     await new Promise<void>(r => setTimeout(r, 2800));
     this.showStarHint.set(false);
-    this.localStorage.coachMark.markShown('pantry:star');
+    this.coachMark.markShown('pantry:star');
   }
 
   async ionViewWillEnter(): Promise<void> {
@@ -160,7 +138,7 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
     // Consume the query param right away so it does not re-trigger on tab switches.
     const shouldOpenModal = this.route.snapshot.queryParams['openAddModal'] === 'true';
     if (shouldOpenModal) {
-      this.addModalState.openAddModal();
+      this.addModalState.open();
       void this.router.navigate([], {
         relativeTo: this.route,
         queryParams: { openAddModal: null },

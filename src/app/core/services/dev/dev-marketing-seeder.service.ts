@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
-import type { EventParams } from '@core/models/events';
 import { generateBatchId } from '@core/utils';
 import { PantryQueryService } from '../pantry/pantry-query.service';
 import { HistoryEventLogService } from '../history/history-event-log.service';

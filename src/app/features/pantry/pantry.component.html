@@ -267,7 +267,7 @@
           (viewDetails)="facade.openBatchesModalFromSheet(item)"
           (editRequested)="facade.openEditModalFromSheet(item)"
           (deleteRequested)="facade.deleteItem(item, $event)"
-          (close)="facade.closeQuantitySheetWithSave()">
+          (closeRequested)="facade.closeQuantitySheetWithSave()">
         </app-pantry-quantity-sheet>
       }
     </ng-template>

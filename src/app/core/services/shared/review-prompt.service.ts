@@ -4,6 +4,7 @@ import { sleep } from '@core/utils';
 import { AlertController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { LocalStorageService } from './local-storage.service';
+import { LoggerService } from './logger.service';
 
 interface InAppReviewPlugin {
   requestReview: () => Promise<void>;
@@ -14,6 +15,7 @@ export class ReviewPromptService {
   private readonly alertCtrl = inject(AlertController);
   private readonly translate = inject(TranslateService);
   private readonly storage = inject(LocalStorageService);
+  private readonly logger = inject(LoggerService);
 
   private readonly minDaysSinceFirstUse = 3;
   private readonly minLaunches = 3;
@@ -158,7 +160,7 @@ export class ReviewPromptService {
           },
         ],
       }).then(alert => alert.present()).catch(err => {
-        console.error('Failed to present review alert:', err);
+        this.logger.error('ReviewPromptService', 'Failed to present review alert', err);
         resolve(false);
       });
     });
@@ -198,7 +200,7 @@ export class ReviewPromptService {
       await plugin.requestReview();
       return true;
     } catch (err) {
-      console.warn('[ReviewPromptService] In-app review unavailable', err);
+      this.logger.warn('ReviewPromptService', 'In-app review unavailable', { err: String(err) });
       return false;
     }
   }

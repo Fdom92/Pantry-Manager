@@ -1,5 +1,5 @@
 import { FoodType } from '@core/models/shared/enums.model';
-import { computeWasteSummary, type WasteSummary } from './waste.domain';
+import { computeWasteSummary } from './waste.domain';
 import type { PantryEvent } from '@core/models/events';
 
 const ev = (overrides: Partial<PantryEvent>): PantryEvent => ({

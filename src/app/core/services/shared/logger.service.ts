@@ -1,4 +1,5 @@
-import { Injectable, isDevMode } from '@angular/core';
+import { Injectable, inject, isDevMode } from '@angular/core';
+import { SENTRY_REPORTER } from './sentry-reporter';
 
 /**
  * Centralized logging service that respects development/production modes.
@@ -11,6 +12,7 @@ import { Injectable, isDevMode } from '@angular/core';
 export class LoggerService {
   private readonly isDev = isDevMode();
   private readonly prefix = '[PantryManager]';
+  private readonly sentry = inject(SENTRY_REPORTER);
 
   /**
    * Log informational messages (development only)
@@ -40,21 +42,27 @@ export class LoggerService {
   }
 
   /**
-   * Log warning messages (always enabled)
+   * Non-fatal condition. Always printed; leaves a Sentry breadcrumb so it gives
+   * context to the next captured error, without creating an event of its own.
    */
-  warn(message: string, ...args: unknown[]): void {
-    console.warn(`${this.prefix} [WARN] ${message}`, ...args);
+  warn(scope: string, message: string, extra?: Record<string, unknown>): void {
+    console.warn(`${this.prefix} [${scope}] ${message}`, extra ?? '');
+    this.sentry.addBreadcrumb({ level: 'warning', category: scope, message, data: extra });
   }
 
   /**
-   * Log error messages (always enabled)
+   * Failure the user suffers. Always printed and always reported to Sentry.
+   * Consent is enforced upstream by the `beforeSend` hook in `main.ts`.
    */
-  error(message: string, error?: Error | unknown, ...args: unknown[]): void {
-    if (error instanceof Error) {
-      console.error(`${this.prefix} [ERROR] ${message}`, error, ...args);
-    } else {
-      console.error(`${this.prefix} [ERROR] ${message}`, error, ...args);
-    }
+  error(scope: string, message: string, err?: unknown, extra?: Record<string, unknown>): void {
+    console.error(`${this.prefix} [${scope}] ${message}`, err ?? '', extra ?? '');
+    const error = err instanceof Error
+      ? err
+      : new Error(err === undefined ? message : `${message}: ${String(err)}`);
+    this.sentry.captureException(error, {
+      tags: { scope },
+      extra: { message, ...extra },
+    });
   }
 
   /**

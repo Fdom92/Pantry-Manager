@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [develop, main]
+
+# A new push to the same branch makes the previous run irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # environment.secrets.ts holds real API keys and is gitignored, but the
+      # build imports it. The committed template has the right shape with empty
+      # values, which is all a lint/test/build run needs.
+      - name: Provide placeholder secrets
+        run: cp src/environments/environment.secrets.example.ts src/environments/environment.secrets.ts
+
+      - name: Resolve a headless Chrome for Karma
+        run: echo "CHROME_BIN=$(which google-chrome || which chromium-browser || which chromium)" >> "$GITHUB_ENV"
+
+      - name: Lint
+        run: npx ng lint
+
+      - name: Check icon registry
+        run: node scripts/check-icons.mjs
+
+      - name: Test
+        run: npx ng test --watch=false --browsers=ChromeHeadless
+
+      - name: Build (production)
+        run: npx ng build --configuration production

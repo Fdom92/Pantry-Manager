@@ -2,7 +2,6 @@ import { computed, inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { shouldAutoAddToShoppingList, sumQuantities } from '@core/domain/pantry';
 import { toNumberOrZero } from '@core/utils/formatting.util';
-import { environment } from 'src/environments/environment';
 import { ListManualItemsStore } from '../list/list-manual-items.store';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
@@ -14,7 +13,6 @@ export class TabsStateService {
   private readonly manualItemsStore = inject(ListManualItemsStore);
 
   readonly isPro = toSignal(this.revenuecat.isPro$, { initialValue: this.revenuecat.isPro() });
-  readonly canUseAgent = computed(() => !environment.production || this.isPro());
 
   /** Items that have expired — drives the red badge on the Pantry tab. */
   readonly expiredCount = computed(() => this.pantryStore.expiredItems().length);

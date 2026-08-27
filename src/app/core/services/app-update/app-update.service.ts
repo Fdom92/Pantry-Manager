@@ -72,7 +72,7 @@ export class AppUpdateService {
         await AppUpdate.openAppStore();
       }
     } catch (err) {
-      this.logger.warn('[AppUpdate] check failed', err);
+      this.logger.warn('AppUpdateService', 'check failed', { err });
       this.analytics.track(ANALYTICS_EVENTS.APP_UPDATE_FAILED, {
         reason: 'check_failed',
       });
@@ -88,7 +88,7 @@ export class AppUpdateService {
         code: result.code,
       });
     } catch (err) {
-      this.logger.warn('[AppUpdate] immediate update failed', err);
+      this.logger.warn('AppUpdateService', 'immediate update failed', { err });
       this.analytics.track(ANALYTICS_EVENTS.APP_UPDATE_FAILED, {
         mode: 'immediate',
         reason: 'rejected_or_error',
@@ -108,7 +108,7 @@ export class AppUpdateService {
             mode: 'flexible',
           });
         } catch (err) {
-          this.logger.warn('[AppUpdate] completeFlexibleUpdate failed', err);
+          this.logger.warn('AppUpdateService', 'completeFlexibleUpdate failed', { err });
         }
       } else if (state.installStatus === FlexibleUpdateInstallStatus.FAILED) {
         this.analytics.track(ANALYTICS_EVENTS.APP_UPDATE_FAILED, {
@@ -122,7 +122,7 @@ export class AppUpdateService {
       const result = await AppUpdate.startFlexibleUpdate();
       this.logger.info('[AppUpdate] flexible update started', { code: result.code });
     } catch (err) {
-      this.logger.warn('[AppUpdate] flexible update failed', err);
+      this.logger.warn('AppUpdateService', 'flexible update failed', { err });
       this.analytics.track(ANALYTICS_EVENTS.APP_UPDATE_FAILED, {
         mode: 'flexible',
         reason: 'start_failed',

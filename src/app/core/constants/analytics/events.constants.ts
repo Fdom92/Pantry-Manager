@@ -103,5 +103,3 @@ export const ANALYTICS_EVENTS = {
   COACH_MARK_TAPPED: 'coach_mark_tapped',
 } as const;
 
-export type AnalyticsEventName =
-  (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];

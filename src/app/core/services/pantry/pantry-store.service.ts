@@ -1,25 +1,17 @@
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
 import { ANALYTICS_EVENTS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
-import {
-  collectBatches,
-  computeEarliestExpiry,
-  getItemStatusState,
-  hasOpenBatch,
-  shouldAutoAddToShoppingList as shouldAutoAddToShoppingListDomain,
-  sumQuantities,
-} from '@core/domain/pantry';
-import { toNumberOrZero } from '@core/utils/formatting.util';
-import { generateBatchId } from '@core/utils';
+import { getItemStatusState } from '@core/domain/pantry';
 import type { PantryFilterState, PantryItem, PantrySummary } from '@core/models/pantry';
-import { StockStatus } from '@core/models/shared';
 import { normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
+import { LoggerService } from '../shared/logger.service';
 import { PantryQueryService } from './pantry-query.service';
 
 @Injectable({ providedIn: 'root' })
 export class PantryStoreService {
+  private readonly logger = inject(LoggerService);
   private readonly pantryQuery = inject(PantryQueryService);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly eventManager = inject(HistoryEventManagerService);
@@ -81,13 +73,13 @@ export class PantryStoreService {
   /** Load items from storage, updating loading/error signals accordingly. */
   async loadAll(): Promise<void> {
     try {
-      await this.ensureFirstPageLoaded();
-      this.startBackgroundLoad();
+      await this.pantryQuery.ensureFirstPageLoaded();
+      this.pantryQuery.startBackgroundLoad();
       this.watchRealtime();
       this.error.set(null);
       void this.logExpiredBatchEvents(this.items());
     } catch (err: unknown) {
-      console.error('[PantryStoreService] loadAll error', err);
+      this.logger.error('PantryStoreService', 'loadAll error', err);
       const msg = err instanceof Error ? err.message : 'Error loading pantry items';
       this.error.set(msg);
     }
@@ -105,7 +97,7 @@ export class PantryStoreService {
       await this.pantryQuery.saveItem(item);
       this.reviewPrompt.handleProductAdded();
     } catch (err: unknown) {
-      console.error('[PantryStoreService] addItem error', err);
+      this.logger.error('PantryStoreService', 'addItem error', err);
       this.error.set('Failed to add item');
     }
   }
@@ -115,7 +107,7 @@ export class PantryStoreService {
     try {
       await this.pantryQuery.saveItem(item);
     } catch (err: unknown) {
-      console.error('[PantryStoreService] updateItem error', err);
+      this.logger.error('PantryStoreService', 'updateItem error', err);
       this.error.set('Failed to update item');
     }
   }
@@ -129,48 +121,18 @@ export class PantryStoreService {
       await this.pantryQuery.deleteItem(id);
       this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_DELETED, { kind });
     } catch (err: unknown) {
-      console.error('[PantryStoreService] deleteItem error', err);
+      this.logger.error('PantryStoreService', 'deleteItem error', err);
       this.error.set('Failed to delete item');
     }
   }
 
-  /** Remove every expired item currently cached in the store. */
-  async deleteExpiredItems(): Promise<void> {
-    const expiredIds = this.expiredItems().map(item => item._id);
-    if (!expiredIds.length) return;
-    await Promise.all(expiredIds.map(id => this.deleteItem(id)));
-  }
 
-  /** Simple alias used by views to trigger a full reload. */
-  async refresh(): Promise<void> {
-    await this.loadAll();
-  }
 
-  // ─── Pagination / filter delegation ──────────────────────────────────────
 
-  clearEntryFilters(): void {
-    this.pantryQuery.clearEntryFilters();
-  }
 
-  applyPendingNavigationPreset(): void {
-    this.pantryQuery.applyPendingNavigationPreset();
-  }
 
-  async ensureFirstPageLoaded(): Promise<void> {
-    await this.pantryQuery.ensureFirstPageLoaded();
-  }
 
-  startBackgroundLoad(): void {
-    this.pantryQuery.startBackgroundLoad();
-  }
 
-  setSearchQuery(value: string): void {
-    this.pantryQuery.setSearchQuery(value);
-  }
-
-  setFilters(filters: Partial<PantryFilterState>): void {
-    this.pantryQuery.setFilters(filters);
-  }
 
   async addNewLot(
     itemId: string,
@@ -190,40 +152,11 @@ export class PantryStoreService {
     });
   }
 
-  // ─── Domain helpers (direct calls — no delegation chain) ──────────────────
 
-  /** Sum every batch quantity into a single figure. */
-  getItemTotalQuantity(item: PantryItem): number {
-    return sumQuantities(item.batches ?? []);
-  }
 
-  /** Return the minimum threshold configured for the product. */
-  getItemTotalMinThreshold(item: PantryItem): number {
-    return toNumberOrZero(item.minThreshold);
-  }
 
-  /** Earliest expiry date considering all batches. */
-  getItemEarliestExpiry(item: PantryItem): string | undefined {
-    return computeEarliestExpiry(item.batches ?? []);
-  }
 
-  /** Flatten and normalize all batches associated with an item. */
-  getItemBatches(item: PantryItem) {
-    return collectBatches(item.batches ?? [], { generateBatchId });
-  }
 
-  /** Determine whether any batch for the item is currently marked as opened. */
-  hasItemOpenBatch(item: PantryItem): boolean {
-    return hasOpenBatch(item);
-  }
-
-  /** Single source of truth for deciding whether an item should be auto-added to shopping list. */
-  shouldAutoAddToShoppingList(
-    item: PantryItem,
-    context?: { totalQuantity?: number; minThreshold?: number | null }
-  ): boolean {
-    return shouldAutoAddToShoppingListDomain(item, context);
-  }
 
   // ─── Private ─────────────────────────────────────────────────────────────
 
@@ -247,7 +180,7 @@ export class PantryStoreService {
     try {
       await this.eventManager.logExpiredBatches(items);
     } catch (err) {
-      console.error('[PantryStoreService] logExpiredBatchEvents error', err);
+      this.logger.error('PantryStoreService', 'logExpiredBatchEvents error', err);
     } finally {
       this.expiredScanInProgress = false;
     }

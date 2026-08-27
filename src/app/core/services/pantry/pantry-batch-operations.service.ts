@@ -1,12 +1,13 @@
 import { Injectable, WritableSignal, inject } from '@angular/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { BATCH_STOCK_SAVE_DELAY_MS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
-import { applyFifoConsumption, computeEarliestExpiry, normalizeBatches, sumQuantities } from '@core/domain/pantry';
+import { applyFifoConsumption, computeEarliestExpiry, hasOpenBatch as hasOpenBatchDomain, normalizeBatches, sumQuantities } from '@core/domain/pantry';
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeLocationId, normalizeLowercase } from '@core/utils/normalization.util';
 import { generateBatchId } from '@core/utils';
 import type { EventSource } from '@core/models/events';
+import { LoggerService } from '../shared/logger.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { PantryStoreService } from './pantry-store.service';
 import { PantryViewModelService } from './pantry-view-model.service';
@@ -19,6 +20,7 @@ export class PantryBatchOperationsService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly viewModel = inject(PantryViewModelService);
   private readonly eventManager = inject(HistoryEventManagerService);
+  private readonly logger = inject(LoggerService);
 
   private readonly pendingItems = new Map<string, PantryItem>();
   private readonly stockSaveTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -198,14 +200,14 @@ export class PantryBatchOperationsService {
    * Get total quantity for an item (delegates to store).
    */
   getTotalQuantity(item: PantryItem): number {
-    return this.pantryStore.getItemTotalQuantity(item);
+    return sumQuantities(item.batches ?? []);
   }
 
   /**
    * Check if item has any opened batch (delegates to store).
    */
   hasOpenBatch(item: PantryItem): boolean {
-    return this.pantryStore.hasItemOpenBatch(item);
+    return hasOpenBatchDomain(item);
   }
 
   /**
@@ -305,7 +307,7 @@ export class PantryBatchOperationsService {
               });
           }
         } catch (err) {
-          console.error('[PantryBatchOperationsService] updateItem error', err);
+          this.logger.error('PantryBatchOperationsService', 'updateItem error', err);
         } finally {
           this.pendingItems.delete(itemId);
           this.pendingEventMeta.delete(itemId);

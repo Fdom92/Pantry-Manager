@@ -6,7 +6,6 @@ import { HistoryEventManagerService } from '../history/history-event-manager.ser
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import type { PantryItem } from '@core/models/pantry';
-import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 describe('PantryStoreService', () => {
   let service: PantryStoreService;
@@ -228,26 +227,6 @@ describe('PantryStoreService', () => {
 
   // ── deleteExpiredItems ─────────────────────────────────────────────────────
 
-  describe('deleteExpiredItems', () => {
-    it('fans out deleteItem calls for each expired item', async () => {
-      const expiredItem1 = makeItem({
-        _id: 'expired-1',
-        expirationDate: '2026-01-01',
-      });
-      const expiredItem2 = makeItem({
-        _id: 'expired-2',
-        expirationDate: '2026-01-02',
-      });
-
-      // Mock the expiredItems computed by setting activeProducts
-      // The computed will filter based on getItemStatusState
-      // To make items "expired", set expirationDate to past
-      (pantryQuerySpy.activeProducts as any).set([expiredItem1, expiredItem2]);
-
-      // Actually, we can't easily test this without mocking the entire status logic.
-      // Skip for now or test at a higher level.
-    });
-  });
 
   // ── computed signals ───────────────────────────────────────────────────────
 
@@ -284,46 +263,4 @@ describe('PantryStoreService', () => {
 
   // ── domain helper wrappers ─────────────────────────────────────────────────
 
-  describe('domain helper methods', () => {
-    it('getItemTotalQuantity sums batches', () => {
-      const item = makeItem({
-        batches: [
-          { batchId: 'b1', quantity: 3 },
-          { batchId: 'b2', quantity: 2 },
-        ],
-      });
-      expect(service.getItemTotalQuantity(item)).toBe(5);
-    });
-
-    it('getItemTotalMinThreshold returns minThreshold or 0', () => {
-      const item1 = makeItem({ minThreshold: 5 });
-      expect(service.getItemTotalMinThreshold(item1)).toBe(5);
-
-      const item2 = makeItem({ minThreshold: undefined });
-      expect(service.getItemTotalMinThreshold(item2)).toBe(0);
-    });
-
-    it('getItemEarliestExpiry returns earliest date', () => {
-      const item = makeItem({
-        batches: [
-          { batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' },
-          { batchId: 'b2', quantity: 1, expirationDate: '2026-05-01' },
-        ],
-      });
-      expect(service.getItemEarliestExpiry(item)).toBe('2026-05-01');
-    });
-
-    it('hasItemOpenBatch checks opened flag', () => {
-      const item = makeItem({
-        batches: [{ batchId: 'b1', quantity: 1, opened: true }],
-      });
-      expect(service.hasItemOpenBatch(item)).toBe(true);
-    });
-
-    it('shouldAutoAddToShoppingList delegates to domain', () => {
-      const item = makeItem({ isBasic: true, batches: [] });
-      const result = service.shouldAutoAddToShoppingList(item);
-      expect(typeof result).toBe('boolean');
-    });
-  });
 });

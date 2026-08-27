@@ -17,6 +17,7 @@
   [showEntryDate]="true"
   [entryDateQuickOnly]="true"
   [showEntryQuantity]="false"
+  [showEntryFoodType]="true"
   [showAllOnFocus]="true"
   [autofocus]="true"
   [showEmptyAction]="state.showEmptyAction()"
@@ -29,5 +30,6 @@
   (emptyAction)="state.addEntryFromQuery($event)"
   (adjustEntry)="state.adjustEntryById($event.entry.id, $event.delta)"
   (entryDateChange)="state.setEntryDate($event.entry.id, $event.date)"
+  (entryFoodTypeChange)="state.setEntryFoodType($event.entry.id, $event.foodType)"
   (save)="state.submit()">
 </app-entity-selector-modal>

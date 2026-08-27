@@ -37,18 +37,6 @@ function fallbackDateString(value: string | Date | null | undefined, fallback: s
   return fallback || (typeof value === 'string' ? value : '');
 }
 
-export function formatDateValue(
-  value: string | Date | null | undefined,
-  locale: string,
-  options: Intl.DateTimeFormatOptions = ES_DATE_FORMAT_OPTIONS.short,
-  { fallback = '' }: DateFormatOptions = {}
-): string {
-  if (!value) {
-    return fallback;
-  }
-  const date = toDateOrNull(value);
-  return date ? date.toLocaleDateString(locale, options) : fallbackDateString(value, fallback);
-}
 
 export function formatDateTimeValue(
   value: string | Date | null | undefined,
@@ -74,19 +62,3 @@ export function formatDateTimeValue(
   return `${datePart} ${timePart}`.trim();
 }
 
-export function formatTimeValue(
-  value: string | Date | null | undefined,
-  locale: string,
-  {
-    fallback = '',
-    timeOptions = { hour: '2-digit', minute: '2-digit' } as Intl.DateTimeFormatOptions,
-  }: DateFormatOptions & {
-    timeOptions?: Intl.DateTimeFormatOptions;
-  } = {}
-): string {
-  if (!value) {
-    return fallback;
-  }
-  const date = toDateOrNull(value);
-  return date ? date.toLocaleTimeString(locale, timeOptions) : fallbackDateString(value, fallback);
-}

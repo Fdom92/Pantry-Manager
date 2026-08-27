@@ -1,6 +1,8 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { NavController } from '@ionic/angular';
 import { toSignal } from '@angular/core/rxjs-interop';
 import type { InsightsAnalysis, InsightsSignalsPayload } from '@core/models/insights/insights-analysis.model';
+import { PantryNavigationPresetService } from '../pantry/pantry-navigation-preset.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { HistoryEventLogService } from '../history/history-event-log.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
@@ -9,6 +11,7 @@ import { InsightsLlmClientService } from './insights-llm-client.service';
 import type { InsightsClientError } from './insights-llm-client.service';
 import { LanguageService } from '../shared/language.service';
 import { LocalStorageService } from '../shared/local-storage.service';
+import { ToastService } from '../shared/toast.service';
 import {
   computeActivityMetrics,
   computeDistribution,
@@ -48,6 +51,8 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 @Injectable()
 export class InsightsStateService {
   private readonly pantryStore = inject(PantryStoreService);
+  private readonly navigationPreset = inject(PantryNavigationPresetService);
+  private readonly navCtrl = inject(NavController);
   private readonly eventLog = inject(HistoryEventLogService);
   private readonly revenueCat = inject(UpgradeRevenuecatService);
   private readonly cacheStorage = inject(InsightsCacheStorageService);
@@ -56,6 +61,7 @@ export class InsightsStateService {
   private readonly analytics = inject(AnalyticsService);
   private readonly manualItemsStore = inject(ListManualItemsStore);
   private readonly localStorage = inject(LocalStorageService);
+  private readonly toast = inject(ToastService);
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
@@ -131,6 +137,15 @@ export class InsightsStateService {
     return this.pantryStore.loadedProducts().length === 0;
   });
 
+  /**
+   * Filters the pantry to pending items and opens the bulk-fix sheet once the
+   * list has loaded (see PantryStateService.ionViewWillEnter).
+   */
+  async goToPendientes(): Promise<void> {
+    this.navigationPreset.setPending({ pendientes: true });
+    await this.navCtrl.navigateRoot('/pantry');
+  }
+
   addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): void {
     this.manualItemsStore.addManualItem(p.productName, 'preset');
     this.analytics.track(ANALYTICS_EVENTS.REPO_PREDICTION_ADDED_TO_LIST, {
@@ -138,6 +153,7 @@ export class InsightsStateService {
       confidence: p.confidence,
       surface,
     });
+    this.toast.success('dashboard.reposition.added');
   }
 
   /**

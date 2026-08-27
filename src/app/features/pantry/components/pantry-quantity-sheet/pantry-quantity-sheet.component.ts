@@ -35,7 +35,7 @@ export class PantryQuantitySheetComponent {
   @Output() viewDetails = new EventEmitter<void>();
   @Output() editRequested = new EventEmitter<Event | undefined>();
   @Output() deleteRequested = new EventEmitter<Event | undefined>();
-  @Output() close = new EventEmitter<void>();
+  @Output() closeRequested = new EventEmitter<void>();
 
   get displayQuantity(): number {
     return this.totalQuantity + this.pendingChange;
@@ -81,6 +81,6 @@ export class PantryQuantitySheetComponent {
   }
 
   handleClose(): void {
-    this.close.emit();
+    this.closeRequested.emit();
   }
 }

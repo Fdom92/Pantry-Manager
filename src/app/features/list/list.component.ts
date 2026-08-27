@@ -28,7 +28,7 @@ import { ShoppingManualAddSheetStateService } from './components/shopping-manual
 import { ShoppingReason } from '@core/models/list/list.model';
 import type { ShoppingSuggestionGroupWithItem, ShoppingSuggestionWithItem } from '@core/models/list/list.model';
 import { UNASSIGNED_SUPERMARKET_KEY } from '@core/constants';
-import { LocalStorageService } from '@core/services/shared';
+import { CoachMarkStateService } from '@core/services/retention/coach-mark-state.service';
 
 @Component({
   selector: 'app-list',
@@ -53,7 +53,7 @@ export class ListComponent {
   readonly facade = inject(ListStateService);
   readonly buySheet = inject(ShoppingBuySheetStateService);
   readonly manualAddSheet = inject(ShoppingManualAddSheetStateService);
-  private readonly localStorage = inject(LocalStorageService);
+  private readonly coachMark = inject(CoachMarkStateService);
   readonly UNASSIGNED_KEY = UNASSIGNED_SUPERMARKET_KEY;
 
   @ViewChildren(IonItemSliding) private slidingItems!: QueryList<IonItemSliding>;
@@ -81,7 +81,11 @@ export class ListComponent {
   toggleGroup(key: string): void {
     this.collapsedGroups.update(set => {
       const next = new Set(set);
-      next.has(key) ? next.delete(key) : next.add(key);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
       return next;
     });
   }
@@ -128,7 +132,7 @@ export class ListComponent {
   }
 
   private async maybeShowSwipeHint(): Promise<void> {
-    if (this.localStorage.coachMark.isShown('list:swipe')) return;
+    if (this.coachMark.isShown('list:swipe')) return;
     await new Promise<void>(r => setTimeout(r, 500));
     const first = this.slidingItems?.first;
     if (!first) return;
@@ -136,7 +140,7 @@ export class ListComponent {
       await first.open('end');
       await new Promise<void>(r => setTimeout(r, 900));
       await first.close();
-      this.localStorage.coachMark.markShown('list:swipe');
+      this.coachMark.markShown('list:swipe');
     } catch {
       // hint is non-critical
     }

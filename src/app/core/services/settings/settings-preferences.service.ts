@@ -12,12 +12,14 @@ import {
 } from '@core/models';
 import { normalizeStringList } from '@core/utils/normalization.util';
 import { StorageService } from '../shared/storage.service';
+import { LoggerService } from '../shared/logger.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SettingsPreferencesService {
   private readonly storage = inject<StorageService<AppPreferencesDoc>>(StorageService);
+  private readonly logger = inject(LoggerService);
 
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
@@ -81,7 +83,7 @@ export class SettingsPreferencesService {
         this.applyDefaults();
       }
     } catch (err) {
-      console.error('[SettingsPreferencesService] loadFromStorage error', err);
+      this.logger.error('SettingsPreferencesService', 'loadFromStorage error', err);
       this.applyDefaults();
     }
   }
@@ -100,9 +102,9 @@ export class SettingsPreferencesService {
       analyticsDecidedAt: input?.analyticsDecidedAt ?? null,
       notificationsDecidedAt: input?.notificationsDecidedAt ?? null,
       lastSyncAt: input?.lastSyncAt ?? null,
-      locationOptions: this.ensureLocationOptions(input?.locationOptions),
-      categoryOptions: this.ensureCategoryOptions(input?.categoryOptions),
-      supermarketOptions: this.ensureSupermarketOptions(input?.supermarketOptions),
+      locationOptions: this.ensureOptions(input?.locationOptions),
+      categoryOptions: this.ensureOptions(input?.categoryOptions),
+      supermarketOptions: this.ensureOptions(input?.supermarketOptions),
     };
   }
 
@@ -148,19 +150,8 @@ export class SettingsPreferencesService {
     }
   }
 
-  private ensureLocationOptions(options?: unknown): string[] {
-    return normalizeStringList(options, {
-      fallback: [],
-    });
-  }
-
-  private ensureCategoryOptions(options?: unknown): string[] {
-    return normalizeStringList(options, {
-      fallback: [],
-    });
-  }
-
-  private ensureSupermarketOptions(options?: unknown): string[] {
+  /** Every catalog stores a plain string list and validates the same way. */
+  private ensureOptions(options?: unknown): string[] {
     return normalizeStringList(options, {
       fallback: [],
     });

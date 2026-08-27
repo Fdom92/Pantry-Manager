@@ -42,6 +42,7 @@
         "emptyBody": "Puedes añadirlos uno a uno desde la despensa.",
         "noExpiryLabel": "Sin caducidad",
         "needsDateLabel": "Pendiente fecha",
+        "expiresLabel": "Caduca el {{date}}",
         "adjustHint": "Ajusta fechas y cantidades en tu despensa cuando quieras."
       },
       "analytics": {
@@ -92,6 +93,7 @@
       "clear": "Limpiar",
       "next": "Siguiente",
       "delete": "Eliminar",
+      "confirm": "Confirmar",
       "dismiss": "Descartar"
     },
     "loading": "Cargando…",
@@ -614,7 +616,7 @@
       "count": "{{ count }} lotes registrados",
       "countOne": "1 lote registrado",
       "open": "Abierto",
-      "noExpiryDate": "Sin fecha de caducidad",
+      "noExpiryDate": "Falta la fecha",
       "addBatch": "Añadir lote",
       "currentQuantity": "Cantidad",
       "expires": {

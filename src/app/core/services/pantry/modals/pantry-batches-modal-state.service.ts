@@ -16,11 +16,12 @@ import { hasBatchMetadataChanged } from '@core/utils/pantry-diff.util';
 import { formatFriendlyName, normalizeTrim } from '@core/utils/normalization.util';
 import { ANALYTICS_EVENTS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { TranslateService } from '@ngx-translate/core';
-import { ToastController } from '@ionic/angular';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { CatalogOptionsService } from '../../settings';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
+import { LoggerService } from '../../shared/logger.service';
+import { ToastService } from '../../shared';
 
 /**
  * Manages batches modal state and batch view models.
@@ -30,10 +31,11 @@ export class PantryBatchesModalStateService {
   private readonly viewModel = inject(PantryViewModelService);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly translate = inject(TranslateService);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toast = inject(ToastService);
   private readonly catalogOptions = inject(CatalogOptionsService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   readonly showBatchesModal = signal(false);
   readonly selectedBatchesItem = signal<PantryItem | null>(null);
@@ -59,7 +61,7 @@ export class PantryBatchesModalStateService {
   /**
    * Open batches modal for an item.
    */
-  openBatchesModal(item: PantryItem, event?: Event): void {
+  open(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
     this.selectedBatchesItem.set(item);
     this.showBatchesModal.set(true);
@@ -71,7 +73,7 @@ export class PantryBatchesModalStateService {
   /**
    * Close batches modal and cleanup state.
    */
-  closeBatchesModal(): void {
+  close(): void {
     if (!this.showBatchesModal()) {
       return;
     }
@@ -84,7 +86,7 @@ export class PantryBatchesModalStateService {
   /**
    * Dismiss modal without cleanup (for backdrop click).
    */
-  dismissBatchesModal(): void {
+  dismiss(): void {
     this.showBatchesModal.set(false);
     this.editMode.set(false);
     this.editedBatches.set([]);
@@ -243,7 +245,7 @@ export class PantryBatchesModalStateService {
   }
 
   private async addAndAssignLocation(index: number, value: string): Promise<void> {
-    const selected = await this.catalogOptions.addLocationOption(value);
+    const selected = await this.catalogOptions.addOption('location', value);
     this.updateBatchLocation(index, selected);
   }
 
@@ -302,14 +304,9 @@ export class PantryBatchesModalStateService {
       this.selectedBatchesItem.set(updatedItem);
       this.editMode.set(false);
       this.editedBatches.set([]);
-      const toast = await this.toastCtrl.create({
-        message: this.translate.instant('pantry.toasts.saved'),
-        duration: 1500,
-        position: 'bottom',
-      });
-      void toast.present();
+      this.toast.success('pantry.toasts.saved');
     } catch (err) {
-      console.error('[PantryBatchesModalStateService] saveBatches error', err);
+      this.logger.error('PantryBatchesModalStateService', 'saveBatches error', err);
     } finally {
       this.isSaving.set(false);
     }

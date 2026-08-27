@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, ViewChild, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NavController } from '@ionic/angular/standalone';
-import { PantryNavigationPresetService } from '@core/services/pantry/pantry-navigation-preset.service';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
 import type { DashboardAction } from '@core/services/dashboard/dashboard-state.service';
 import { InsightsStateService } from '@core/services/insights/insights-state.service';
@@ -26,8 +25,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { ToastController } from '@ionic/angular';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -72,10 +70,7 @@ export class DashboardComponent implements OnDestroy {
   }
   private readonly insights = inject(InsightsStateService);
   private readonly insightsTracking = inject(InsightsTrackingStateService);
-  private readonly toast = inject(ToastController);
   private readonly navCtrl = inject(NavController);
-  private readonly navigationPreset = inject(PantryNavigationPresetService);
-  private readonly translate = inject(TranslateService);
   readonly isInsightsPro = this.insights.isPro;
   readonly repositionPredictions = this.insights.repositionPredictions;
   readonly wasteSummary = this.insights.wasteSummary;
@@ -136,11 +131,8 @@ export class DashboardComponent implements OnDestroy {
     }
   }
 
-  async onAddRepoPredictionToList(p: RepositionPrediction): Promise<void> {
+  onAddRepoPredictionToList(p: RepositionPrediction): void {
     this.insights.addRepoPredictionToList(p, 'dashboard');
-    const message = this.translate.instant('dashboard.reposition.added');
-    const t = await this.toast.create({ message, duration: 1800, position: 'bottom' });
-    void t.present();
   }
 
   onSummaryCardClick(card: DashboardOverviewCardId): void {
@@ -154,14 +146,8 @@ export class DashboardComponent implements OnDestroy {
     return !s.protagonist.expirationDate;
   }
 
-  /**
-   * Same destination as the Insights quality card: the preset both filters the
-   * pantry to pending items and opens the bulk-fix sheet once the list has
-   * loaded (see PantryStateService.ionViewWillEnter).
-   */
   goToPendientes(): void {
-    this.navigationPreset.setPending({ pendientes: true });
-    void this.navCtrl.navigateRoot('/pantry');
+    void this.facade.goToPendientes();
   }
 
 }

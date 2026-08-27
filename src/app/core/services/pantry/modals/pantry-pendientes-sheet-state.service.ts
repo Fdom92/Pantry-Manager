@@ -8,10 +8,10 @@ import { foodTypeExpires } from '@core/domain/pantry/expiry-suggestion.domain';
 import type { PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
 import { withSignalFlag } from '@core/utils';
-import { ToastController } from '@ionic/angular';
-import { TranslateService } from '@ngx-translate/core';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { LoggerService } from '../../shared/logger.service';
+import { ToastService } from '../../shared';
 import { PantryStoreService } from '../pantry-store.service';
 
 export interface PendienteRow {
@@ -38,8 +38,8 @@ export class PantryPendientesSheetStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
-  private readonly toastCtrl = inject(ToastController);
-  private readonly translate = inject(TranslateService);
+  private readonly toast = inject(ToastService);
+  private readonly logger = inject(LoggerService);
 
   readonly isOpen = signal(false);
   readonly isSaving = signal(false);
@@ -164,15 +164,10 @@ export class PantryPendientesSheetStateService {
       }
 
       this.analytics.track(ANALYTICS_EVENTS.PANTRY_PENDIENTES_SAVED, { count: savedCount });
-      const toast = await this.toastCtrl.create({
-        message: this.translate.instant('pantry.pendientesSheet.savedToast', { count: savedCount }),
-        duration: 1500,
-        position: 'bottom',
-      });
-      void toast.present();
+      this.toast.success('pantry.pendientesSheet.savedToast', { count: savedCount });
       this.close();
     }).catch(err => {
-      console.error('[PantryPendientesSheetStateService] saveAll error', err);
+      this.logger.error('PantryPendientesSheetStateService', 'saveAll error', err);
     });
   }
 

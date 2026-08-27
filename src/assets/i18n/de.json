@@ -42,6 +42,7 @@
         "emptyBody": "Füge sie einzeln aus der Vorratskammer hinzu.",
         "noExpiryLabel": "Kein Ablaufdatum",
         "needsDateLabel": "Datum ausstehend",
+        "expiresLabel": "Läuft ab am {{date}}",
         "adjustHint": "Daten und Mengen kannst du später in deiner Vorratskammer anpassen."
       },
       "analytics": {
@@ -92,6 +93,7 @@
       "clear": "Leeren",
       "next": "Weiter",
       "delete": "Löschen",
+      "confirm": "Bestätigen",
       "dismiss": "Verwerfen"
     },
     "loading": "Lädt…",
@@ -614,7 +616,7 @@
       "count": "{{ count }} registrierte Chargen",
       "countOne": "1 registrierte Charge",
       "open": "Geöffnet",
-      "noExpiryDate": "Kein Ablaufdatum",
+      "noExpiryDate": "Datum fehlt",
       "addBatch": "Charge hinzufügen",
       "currentQuantity": "Menge",
       "expires": {

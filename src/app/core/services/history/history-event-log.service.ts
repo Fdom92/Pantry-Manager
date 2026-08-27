@@ -1,11 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import type { BaseEventParams, EventParams, PantryEvent } from '@core/models/events';
 import { buildEventQuantities, computeDaysToExpiry } from '@core/domain/events';
 import { createDocumentId } from '@core/utils';
 import { StorageService } from '../shared/storage.service';
+import { LoggerService } from '../shared/logger.service';
 
 @Injectable({ providedIn: 'root' })
 export class HistoryEventLogService extends StorageService<PantryEvent> {
+  private readonly eventLogger = inject(LoggerService);
   private readonly TYPE = 'event';
 
   async listEvents(): Promise<PantryEvent[]> {
@@ -87,7 +89,7 @@ export class HistoryEventLogService extends StorageService<PantryEvent> {
     try {
       return await this.save(payload);
     } catch (err) {
-      console.error('[HistoryEventLogService] logEvent error', err);
+      this.eventLogger.error('HistoryEventLogService', 'logEvent error', err);
       return null;
     }
   }

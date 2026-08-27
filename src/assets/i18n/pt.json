@@ -42,6 +42,7 @@
         "emptyBody": "Adiciona-os um a um a partir da despensa.",
         "noExpiryLabel": "Sem validade",
         "needsDateLabel": "Data por definir",
+        "expiresLabel": "Válido até {{date}}",
         "adjustHint": "Ajusta datas e quantidades depois na tua despensa."
       },
       "analytics": {
@@ -92,6 +93,7 @@
       "clear": "Limpar",
       "next": "Seguinte",
       "delete": "Excluir",
+      "confirm": "Confirmar",
       "dismiss": "Dispensar"
     },
     "loading": "A carregar…",
@@ -614,7 +616,7 @@
       "count": "{{ count }} lotes registados",
       "countOne": "1 lote registado",
       "open": "Aberto",
-      "noExpiryDate": "Sem data de validade",
+      "noExpiryDate": "Data em falta",
       "addBatch": "Adicionar lote",
       "currentQuantity": "Quantidade",
       "expires": {

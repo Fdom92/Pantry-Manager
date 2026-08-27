@@ -42,6 +42,7 @@
         "emptyBody": "Add them one by one from your pantry.",
         "noExpiryLabel": "No expiry",
         "needsDateLabel": "Date pending",
+        "expiresLabel": "Expires {{date}}",
         "adjustHint": "Adjust dates and quantities later in your pantry."
       },
       "analytics": {
@@ -92,6 +93,7 @@
       "clear": "Clear",
       "next": "Next",
       "delete": "Delete",
+      "confirm": "Confirm",
       "dismiss": "Dismiss"
     },
     "loading": "Loading…",
@@ -614,7 +616,7 @@
       "count": "{{ count }} batches recorded",
       "countOne": "1 batch recorded",
       "open": "Opened",
-      "noExpiryDate": "No expiration date",
+      "noExpiryDate": "Date missing",
       "addBatch": "Add batch",
       "currentQuantity": "Quantity",
       "expires": {

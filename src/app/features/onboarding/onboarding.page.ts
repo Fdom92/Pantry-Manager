@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -15,7 +16,7 @@ import { OnboardingSeedGridComponent } from './components/seed-grid/seed-grid.co
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [IonContent, IonButton, IonIcon, TranslateModule, OnboardingSeedGridComponent],
+  imports: [DatePipe, IonContent, IonButton, IonIcon, TranslateModule, OnboardingSeedGridComponent],
   templateUrl: './onboarding.page.html',
   styleUrls: ['./onboarding.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

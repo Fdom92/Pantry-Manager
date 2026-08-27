@@ -1,5 +1,4 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { ToastController } from '@ionic/angular/standalone';
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import { NO_EXPIRY_SENTINEL, applyBatchEditFilter } from '@core/models/pantry/batch-edit.model';
@@ -12,6 +11,8 @@ import { HistoryEventManagerService } from '../history/history-event-manager.ser
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { LanguageService } from '../shared/language.service';
+import { LoggerService } from '../shared/logger.service';
+import { ToastService } from '../shared/toast.service';
 
 @Injectable({ providedIn: 'root' })
 export class BatchEditStateService {
@@ -20,7 +21,8 @@ export class BatchEditStateService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly eventManager = inject(HistoryEventManagerService);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toast = inject(ToastService);
+  private readonly logger = inject(LoggerService);
 
   readonly isOpen = signal(false);
   readonly config = signal<BatchEditFlowConfig | null>(null);
@@ -137,9 +139,9 @@ export class BatchEditStateService {
         await this.eventManager.logAdvancedEdit(item, updated, 'dashboard');
       }));
       this.dismiss();
-      await this.showSuccessToast(items.length);
+      this.showSuccessToast(items.length);
     } catch (err) {
-      console.error('[BatchEditStateService] apply error', err);
+      this.logger.error('BatchEditStateService', 'apply error', err);
     } finally {
       this.isSaving.set(false);
     }
@@ -162,14 +164,9 @@ export class BatchEditStateService {
     return applyBatchEditFilter(items, filter);
   }
 
-  private async showSuccessToast(count: number): Promise<void> {
+  private showSuccessToast(count: number): void {
     const messageKey = count === 1 ? 'batchEdit.toast.updated_one' : 'batchEdit.toast.updated_other';
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant(messageKey, { count }),
-      duration: 2500,
-      position: 'bottom',
-    });
-    await toast.present();
+    this.toast.success(messageKey, { count });
   }
 
   private reset(): void {

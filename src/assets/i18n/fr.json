@@ -42,6 +42,7 @@
         "emptyBody": "Ajoute-les un par un depuis ton garde-manger.",
         "noExpiryLabel": "Sans expiration",
         "needsDateLabel": "Date à définir",
+        "expiresLabel": "Périme le {{date}}",
         "adjustHint": "Tu pourras ajuster dates et quantités plus tard dans ton garde-manger."
       },
       "analytics": {
@@ -92,6 +93,7 @@
       "clear": "Effacer",
       "next": "Suivant",
       "delete": "Supprimer",
+      "confirm": "Confirmer",
       "dismiss": "Ignorer"
     },
     "loading": "Chargement…",
@@ -614,7 +616,7 @@
       "count": "{{ count }} lots enregistrés",
       "countOne": "1 lot enregistré",
       "open": "Ouvert",
-      "noExpiryDate": "Sans date de péremption",
+      "noExpiryDate": "Date manquante",
       "addBatch": "Ajouter un lot",
       "currentQuantity": "Quantité",
       "expires": {

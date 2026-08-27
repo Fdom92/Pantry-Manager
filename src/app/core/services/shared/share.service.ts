@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { EXPORT_DIRECTORY } from '@core/constants';
 import { normalizeLowercase } from '@core/utils/normalization.util';
+import { LoggerService } from './logger.service';
 
 export type ShareOutcome = 'shared' | 'cancelled' | 'unavailable' | 'failed';
 
@@ -19,6 +20,7 @@ export function shouldSkipShareOutcome(outcome: ShareOutcome): boolean {
 
 @Injectable({ providedIn: 'root' })
 export class ShareService {
+  private readonly logger = inject(LoggerService);
   private readonly shareTimeoutMs = 120_000;
 
   async tryShareBlob(params: ShareBlobParams): Promise<{ outcome: ShareOutcome }> {
@@ -64,7 +66,7 @@ export class ShareService {
       if (this.isUserCancellation(err)) {
         return { outcome: 'cancelled' };
       }
-      console.warn('[ShareService] Web share failed', err);
+      this.logger.warn('ShareService', 'Web share failed', { err: String(err) });
       return { outcome: 'failed' };
     }
   }
@@ -106,19 +108,19 @@ export class ShareService {
           didTimeout = true;
           return { outcome: 'failed' };
         }
-        console.warn('[ShareService] Native share failed', err);
+        this.logger.warn('ShareService', 'Native share failed', { err: String(err) });
         return { outcome: 'failed' };
       } finally {
         if (!didTimeout) {
           try {
             await Filesystem.deleteFile({ path, directory: Directory.Cache });
           } catch (deleteErr) {
-            console.warn('[ShareService] Failed to delete temp shared file', deleteErr);
+            this.logger.warn('ShareService', 'Failed to delete temp shared file', { err: String(deleteErr) });
           }
         }
       }
     } catch (err) {
-      console.warn('[ShareService] Native share unavailable', err);
+      this.logger.warn('ShareService', 'Native share unavailable', { err: String(err) });
       return { outcome: 'unavailable' };
     }
   }

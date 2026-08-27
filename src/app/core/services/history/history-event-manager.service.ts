@@ -1,9 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { classifyExpiry, sumQuantities } from '@core/domain/pantry';
-import { buildExpireBatchKey } from '@core/domain/events';
+import { sumQuantities } from '@core/domain/pantry';
+import { selectUnloggedExpiredBatches } from '@core/domain/events';
 import type { PantryItem } from '@core/models/pantry';
 import type { EventSource } from '@core/models/events';
-import { normalizeTrim } from '@core/utils/normalization.util';
 import { computeEditedFields } from '@core/utils/pantry-diff.util';
 import { Subject } from 'rxjs';
 import { HistoryEventLogService } from './history-event-log.service';
@@ -128,60 +127,29 @@ export class HistoryEventManagerService {
   }
 
   async logExpiredBatches(items: PantryItem[]): Promise<void> {
-    const expireEvents = await this.eventLog.listEventsByType('EXPIRE');
-    const seen = new Set<string>();
-    for (const event of expireEvents) {
-      const batchKey = normalizeTrim(String(event.sourceMetadata?.['batchKey'] ?? ''));
-      if (batchKey) seen.add(batchKey);
-      // Also index by productId::date so old batchId-based keys cover fresh items
-      // whose batchId may have been regenerated since the event was recorded.
-      const dateKey = event.productId && event.expirationDate
-        ? `${event.productId}::${normalizeTrim(event.expirationDate)}`
-        : null;
-      if (dateKey) seen.add(dateKey);
+    const previousEvents = await this.eventLog.listEventsByType('EXPIRE');
+    const pending = selectUnloggedExpiredBatches(items, previousEvents, new Date());
+    if (!pending.length) {
+      return;
     }
 
-    const now = new Date();
-    const tasks: Promise<unknown>[] = [];
-
-    for (const item of items) {
-      for (const batch of item.batches ?? []) {
-        if (!batch?.expirationDate) continue;
-        if (classifyExpiry(batch.expirationDate, now, 0) !== 'expired') continue;
-
-        // Fresh items use a date-based key because their batchId is regenerated on every
-        // consolidation — using batchId would cause duplicate EXPIRE events after any edit.
-        const batchKey = item.productType === 'fresh'
-          ? `${item._id}::${normalizeTrim(batch.expirationDate)}`
-          : buildExpireBatchKey(item._id, batch);
-
-        if (!batchKey || seen.has(batchKey)) continue;
-        const quantity = Number.isFinite(batch.quantity) ? batch.quantity : 0;
-        if (!Number.isFinite(quantity) || quantity <= 0) continue;
-        seen.add(batchKey);
-        tasks.push(
-          this.eventLog.logExpireEvent({
-            productId: item._id,
-            productName: item.name,
-            quantity,
-            batchId: batch.batchId,
-            source: 'system',
-            categoryId: item.categoryId,
-            foodType: item.foodType,
-            expirationDate: batch.expirationDate,
-            timestamp: new Date(batch.expirationDate).toISOString(),
-            sourceMetadata: { batchKey },
-          })
-        );
-      }
-    }
-
-    if (tasks.length) {
-      await Promise.all(tasks);
-      // Do not emit mutation$ — expired-batch logging is a system housekeeping
-      // task, not a user action. Emitting here incorrectly triggers streak
-      // evaluation on view navigation (e.g. Dashboard ionViewWillEnter).
-    }
+    await Promise.all(pending.map(({ item, batch, batchKey, quantity }) =>
+      this.eventLog.logExpireEvent({
+        productId: item._id,
+        productName: item.name,
+        quantity,
+        batchId: batch.batchId,
+        source: 'system',
+        categoryId: item.categoryId,
+        foodType: item.foodType,
+        expirationDate: batch.expirationDate,
+        timestamp: new Date(batch.expirationDate as string).toISOString(),
+        sourceMetadata: { batchKey },
+      })
+    ));
+    // Do not emit mutation$ — expired-batch logging is a system housekeeping
+    // task, not a user action. Emitting here incorrectly triggers streak
+    // evaluation on view navigation (e.g. Dashboard ionViewWillEnter).
   }
 
   async logDeleteFromCard(item: PantryItem) {

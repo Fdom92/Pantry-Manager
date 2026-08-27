@@ -148,15 +148,15 @@
           @case ('confirm') {
             @if (facade.selectedCount() > 0) {
               <ul class="confirm-list">
-                @for (seed of facade.selectedSeedItems(); track seed.key) {
+                @for (row of facade.selectedSeedPreviews(); track row.seed.key) {
                   <li class="confirm-row">
-                    <span class="confirm-emoji" aria-hidden="true">{{ seed.emoji }}</span>
-                    <span class="confirm-name">
-                      {{ 'onboarding.quickSeed.items.' + seed.key | translate }}
-                    </span>
+                    <span class="confirm-emoji" aria-hidden="true">{{ row.seed.emoji }}</span>
+                    <span class="confirm-name">{{ row.name }}</span>
                     <span class="confirm-meta">
-                      @if (seed.alwaysNoExpiry) {
+                      @if (row.noExpiry) {
                         {{ 'onboarding.slides.confirm.noExpiryLabel' | translate }}
+                      } @else if (row.expirationDate) {
+                        {{ 'onboarding.slides.confirm.expiresLabel' | translate:{ date: (row.expirationDate | date:'d MMM') } }}
                       } @else {
                         {{ 'onboarding.slides.confirm.needsDateLabel' | translate }}
                       }

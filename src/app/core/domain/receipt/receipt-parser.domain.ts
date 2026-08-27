@@ -207,7 +207,8 @@ const LEADING_GARBLED_ONE = /^[Il|]\s+(.{3,})$/;
 /** Extract name + quantity from a product row. */
 export function extractProduct(row: ReceiptRow): ParsedReceiptItem | null {
   const tokens = tokenizeRow(row);
-  let { quantity, nameTokens } = splitTokens(tokens);
+  const { quantity: splitQuantity, nameTokens } = splitTokens(tokens);
+  let quantity = splitQuantity;
   let name = nameTokens.join(' ').replace(/\s+/g, ' ').trim();
 
   // Three name-level passes for quantity markers that survive tokenization

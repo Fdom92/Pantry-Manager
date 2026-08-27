@@ -1,11 +1,19 @@
 import { Injectable, inject } from '@angular/core';
-import { isDuplicateCatalogValue, normalizeCatalogOptions } from '@core/domain/settings';
+import { normalizeCatalogOptions } from '@core/domain/settings';
 import { formatFriendlyName, normalizeCategoryId, normalizeLocationId, normalizeSupermarketValue } from '@core/utils/normalization.util';
 import { SettingsPreferencesService } from './settings-preferences.service';
+import type { CatalogKind } from './settings-catalogs-state.service';
+
+/** How each catalog decides that two values are the same thing. */
+const CATALOG_NORMALIZERS: Record<CatalogKind, (value: string) => string | undefined> = {
+  category: normalizeCategoryId,
+  location: normalizeLocationId,
+  supermarket: normalizeSupermarketValue,
+};
 
 /**
- * Centralized service for managing catalog options (categories, locations, supermarkets).
- * Prevents duplication of catalog management logic across multiple services.
+ * Adds values to the user's catalogs (categories, locations, supermarkets)
+ * from wherever a product form lets someone type a new one.
  */
 @Injectable({
   providedIn: 'root'
@@ -14,65 +22,22 @@ export class CatalogOptionsService {
   private readonly appPreferences = inject(SettingsPreferencesService);
 
   /**
-   * Add a new category option if it doesn't already exist.
-   * Returns the final value (either newly added or existing match).
+   * Add a value to a catalog unless an equivalent one is already there.
+   * Returns what the caller should select: the existing match if there was
+   * one, otherwise the newly added value.
    */
-  async addCategoryOption(value: string): Promise<string> {
+  async addOption(kind: CatalogKind, value: string): Promise<string> {
     const formatted = formatFriendlyName(value, value);
-    const normalized = normalizeCategoryId(formatted);
     const current = await this.appPreferences.getPreferences();
+    const field = `${kind}Options` as const;
 
-    // Find existing match
-    const existingMatch = this.findExistingOption(formatted, current.categoryOptions, normalizeCategoryId);
+    const existingMatch = this.findExistingOption(formatted, current[field], CATALOG_NORMALIZERS[kind]);
     if (existingMatch) {
       return existingMatch;
     }
 
-    // Add new option
-    const updated = normalizeCatalogOptions([...current.categoryOptions, formatted]);
-    await this.appPreferences.savePreferences({ ...current, categoryOptions: updated });
-    return formatted;
-  }
-
-  /**
-   * Add a new location option if it doesn't already exist.
-   * Returns the final value (either newly added or existing match).
-   */
-  async addLocationOption(value: string): Promise<string> {
-    const formatted = formatFriendlyName(value, value);
-    const normalized = normalizeLocationId(formatted);
-    const current = await this.appPreferences.getPreferences();
-
-    // Find existing match
-    const existingMatch = this.findExistingOption(formatted, current.locationOptions, normalizeLocationId);
-    if (existingMatch) {
-      return existingMatch;
-    }
-
-    // Add new option
-    const updated = normalizeCatalogOptions([...current.locationOptions, formatted]);
-    await this.appPreferences.savePreferences({ ...current, locationOptions: updated });
-    return formatted;
-  }
-
-  /**
-   * Add a new supermarket option if it doesn't already exist.
-   * Returns the final value (either newly added or existing match).
-   */
-  async addSupermarketOption(value: string): Promise<string> {
-    const formatted = formatFriendlyName(value, value);
-    const normalized = normalizeSupermarketValue(formatted);
-    const current = await this.appPreferences.getPreferences();
-
-    // Find existing match
-    const existingMatch = this.findExistingOption(formatted, current.supermarketOptions, normalizeSupermarketValue);
-    if (existingMatch) {
-      return existingMatch;
-    }
-
-    // Add new option
-    const updated = normalizeCatalogOptions([...current.supermarketOptions, formatted]);
-    await this.appPreferences.savePreferences({ ...current, supermarketOptions: updated });
+    const updated = normalizeCatalogOptions([...current[field], formatted]);
+    await this.appPreferences.savePreferences({ ...current, [field]: updated });
     return formatted;
   }
 
@@ -87,7 +52,7 @@ export class CatalogOptionsService {
     const normalizedValue = normalize(value);
     if (!normalizedValue) return undefined;
 
-    const normalizedKey = (normalizedValue ?? '').toLowerCase();
+    const normalizedKey = normalizedValue.toLowerCase();
     return (existing ?? []).find(option => {
       const normalizedOption = normalize(option);
       return (normalizedOption ?? '').toLowerCase() === normalizedKey;

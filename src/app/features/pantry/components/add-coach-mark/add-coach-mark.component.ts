@@ -11,9 +11,7 @@ import {
   signal,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { AnalyticsService } from '@core/services/analytics';
-import { CoachMarkService } from '@core/services/retention';
-import { ANALYTICS_EVENTS } from '@core/constants';
+import { CoachMarkStateService } from '@core/services/retention/coach-mark-state.service';
 
 @Component({
   selector: 'app-pantry-add-coach-mark',
@@ -28,8 +26,7 @@ export class PantryAddCoachMarkComponent implements OnInit, AfterViewInit {
   @Output() addRequested = new EventEmitter<void>();
   @Output() dismissed = new EventEmitter<void>();
 
-  private readonly analytics = inject(AnalyticsService);
-  private readonly coachMark = inject(CoachMarkService);
+  private readonly coachMark = inject(CoachMarkStateService);
 
   private readonly rect = signal<DOMRect | null>(null);
 
@@ -58,7 +55,7 @@ export class PantryAddCoachMarkComponent implements OnInit, AfterViewInit {
   readonly hasRect = computed(() => this.rect() !== null);
 
   ngOnInit(): void {
-    this.analytics.track(ANALYTICS_EVENTS.COACH_MARK_SHOWN, { key: 'add_first_item' });
+    this.coachMark.trackShown('add_first_item');
   }
 
   ngAfterViewInit(): void {
@@ -68,15 +65,19 @@ export class PantryAddCoachMarkComponent implements OnInit, AfterViewInit {
   }
 
   onBackdropTap(): void {
-    this.analytics.track(ANALYTICS_EVENTS.COACH_MARK_DISMISSED, { key: 'add_first_item' });
-    this.coachMark.markShown('add_first_item');
+    this.coachMark.dismiss('add_first_item');
     this.dismissed.emit();
   }
 
-  onTooltipTap(event: Event): void {
+  /**
+   * Taking the coach mark up on its offer. Bound to both the tooltip and the
+   * spotlight, because the spotlight sits on top of the very button it is
+   * pointing at: without its own handler the tap reaches the backdrop, which
+   * dismisses the mark and leaves the user to press the button a second time.
+   */
+  onAcceptTap(event: Event): void {
     event.stopPropagation();
-    this.analytics.track(ANALYTICS_EVENTS.COACH_MARK_TAPPED, { key: 'add_first_item' });
-    this.coachMark.markShown('add_first_item');
+    this.coachMark.accept('add_first_item');
     this.addRequested.emit();
   }
 }

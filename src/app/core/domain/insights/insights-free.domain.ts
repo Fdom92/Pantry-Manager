@@ -294,27 +294,3 @@ export function computeFoodCoverage(
   return { value: days, unit: 'days' };
 }
 
-// ─── Pantry Health State ──────────────────────────────────────────────────────
-
-export enum PantryHealthState {
-  CRITICAL  = 'critical',
-  ATTENTION = 'attention',
-  OPTIMAL   = 'optimal',
-}
-
-/**
- * Derives pantry health state from expiry/tracking signals.
- * withDates = count of non-basic items that have at least one dated batch.
- */
-export function computePantryHealthState(
-  expired: number,
-  nearExpiry: number,
-  total: number,
-  withDates: number,
-  stale: number,
-): PantryHealthState {
-  if (expired > 0) return PantryHealthState.CRITICAL;
-  if (nearExpiry > 0) return PantryHealthState.ATTENTION;
-  if (total > 10 && withDates < total * 0.3) return PantryHealthState.ATTENTION;
-  return PantryHealthState.OPTIMAL;
-}

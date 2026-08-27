@@ -1,9 +1,10 @@
-import { Injectable, inject, Signal, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { ANALYTICS_EVENTS, DEFAULT_LANGUAGE, LOCALES, SUPPORTED_LANGUAGES, SupportedLanguage } from '@core/constants';
 import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { normalizeLocaleCode } from '@core/utils/normalization.util';
 import { AnalyticsService } from '../analytics/analytics.service';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,7 @@ import { AnalyticsService } from '../analytics/analytics.service';
 export class LanguageService {
   private readonly translate = inject(TranslateService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   readonly currentLanguage = signal<SupportedLanguage>(DEFAULT_LANGUAGE);
 
@@ -60,7 +62,7 @@ export class LanguageService {
     }
 
     if (base) {
-      console.warn(`[LanguageService] Locale ${base} no soportado, usando fallback en.`);
+      this.logger.warn('LanguageService', `Locale ${base} no soportado, usando fallback en.`);
     }
     return DEFAULT_LANGUAGE;
   }

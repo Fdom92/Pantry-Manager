@@ -5,11 +5,13 @@ import type { PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
 import { normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { LoggerService } from '../../shared/logger.service';
+import { ToastService } from '../../shared';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { PantryEditModalBase } from './pantry-edit-modal-base';
@@ -21,9 +23,10 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
   private readonly listState = inject(PantryStateService);
   private readonly translate = inject(TranslateService);
   private readonly alertCtrl = inject(AlertController);
-  private readonly toastCtrl = inject(ToastController);
+  private readonly toast = inject(ToastService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly logger = inject(LoggerService);
 
   readonly currentState = signal<FreshState>('none');
   readonly states: readonly FreshState[] = ['sufficient', 'low', 'none'];
@@ -70,14 +73,14 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
     effect(() => {
       const request = this.listState.editFreshItemModalRequest();
       if (!request) return;
-      this.openEdit(request.item);
+      this.open(request.item);
       this.listState.clearEditFreshItemModalRequest();
     });
   }
 
-  openEdit(item: PantryItem): void {
+  open(item: PantryItem): void {
     if (item.productType !== 'fresh') {
-      console.warn('[PantryFreshEditModal] non-fresh item passed; ignoring');
+      this.logger.warn('PantryFreshEditModalStateService', 'non-fresh item passed; ignoring');
       return;
     }
     this.editingItem.set(item);
@@ -134,14 +137,9 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
       await this.eventManager.logAdvancedEdit(existing, updated);
       this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_EDITED, { kind: 'fresh' });
       this.dismiss();
-      const toast = await this.toastCtrl.create({
-        message: this.translate.instant('pantry.toasts.saved'),
-        duration: 1200,
-        position: 'bottom',
-      });
-      void toast.present();
+      this.toast.success('pantry.toasts.saved');
     } catch (err) {
-      console.error('[PantryFreshEditModalStateService] save error', err);
+      this.logger.error('PantryFreshEditModalStateService', 'save error', err);
     } finally {
       this.isSaving.set(false);
     }
@@ -159,14 +157,9 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
       };
       await this.pantryStore.updateItem(updated);
       this.dismiss();
-      const toast = await this.toastCtrl.create({
-        message: this.translate.instant('pantry.fresh.convertToPantry.toast'),
-        duration: 1200,
-        position: 'bottom',
-      });
-      void toast.present();
+      this.toast.success('pantry.fresh.convertToPantry.toast');
     } catch (err) {
-      console.error('[PantryFreshEditModalStateService] convertToPantry error', err);
+      this.logger.error('PantryFreshEditModalStateService', 'convertToPantry error', err);
     } finally {
       this.isSaving.set(false);
     }
@@ -192,14 +185,9 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
     try {
       await this.pantryStore.deleteItem(existing._id);
       this.dismiss();
-      const toast = await this.toastCtrl.create({
-        message: this.translate.instant('pantry.toasts.deleted'),
-        duration: 1200,
-        position: 'bottom',
-      });
-      void toast.present();
+      this.toast.success('pantry.toasts.deleted');
     } catch (err) {
-      console.error('[PantryFreshEditModalStateService] deleteItem error', err);
+      this.logger.error('PantryFreshEditModalStateService', 'deleteItem error', err);
     } finally {
       this.isSaving.set(false);
     }

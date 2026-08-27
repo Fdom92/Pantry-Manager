@@ -1,6 +1,5 @@
 import { Injectable, Signal, WritableSignal, computed, effect, inject, signal } from '@angular/core';
 import {
-  AddEntry,
   FilterChipViewModel,
   ItemBatch,
   PantryFilterState,
@@ -20,13 +19,14 @@ import { PantryQuantitySheetStateService } from './modals/pantry-quantity-sheet-
 import { PantryPendientesSheetStateService } from './modals/pantry-pendientes-sheet-state.service';
 import { PantryNavigationPresetService } from './pantry-navigation-preset.service';
 import { PantryListUiStateService } from './pantry-list-ui-state.service';
+import { PantryQueryService } from './pantry-query.service';
 import { PantryStoreService } from './pantry-store.service';
 import { PantryViewModelService } from './pantry-view-model.service';
 import { SkeletonLoadingManager } from '@core/utils';
 import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pantry-fresh-add-modal-state.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
-import { ToastController } from '@ionic/angular';
-import { TranslateService } from '@ngx-translate/core';
+import { LocalStorageService } from '../shared/local-storage.service';
+import { ToastService } from '../shared';
 import { type FreshState, freshStateToQty } from '@core/domain/pantry';
 
 /**
@@ -36,6 +36,10 @@ import { type FreshState, freshStateToQty } from '@core/domain/pantry';
 @Injectable()
 export class PantryStateService {
   private readonly pantryStore = inject(PantryStoreService);
+  // The list pipeline — search, filters, paging — belongs to the query service.
+  // The store owns derived state and mutations; it used to forward these calls
+  // and that only hid where they lived.
+  private readonly pantryQuery = inject(PantryQueryService);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly viewModel = inject(PantryViewModelService);
   private readonly batchOps = inject(PantryBatchOperationsService);
@@ -49,8 +53,8 @@ export class PantryStateService {
   private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly freshAddModal = inject(PantryFreshAddModalStateService);
   private readonly historyManager = inject(HistoryEventManagerService);
-  private readonly toastCtrl = inject(ToastController);
-  private readonly translate = inject(TranslateService);
+  private readonly localStorage = inject(LocalStorageService);
+  private readonly toast = inject(ToastService);
 
   // Core state signals
   readonly skeletonPlaceholders = this.listUi.skeletonPlaceholders;
@@ -72,24 +76,8 @@ export class PantryStateService {
   readonly showSkeleton = this.skeletonManager.showSkeleton;
 
   // Delegated signals from specialized services
-  readonly collapsedGroups = this.listUi.collapsedGroups;
-  readonly deletingItems = this.listUi.deletingItems;
-  readonly addModalOpen = this.addModal.addModalOpen;
-  readonly isAdding = this.addModal.isAdding;
-  readonly addQuery = this.addModal.addQuery;
-  readonly addEntries = this.addModal.addEntries;
-  readonly addEntryViewModels = this.addModal.addEntryViewModels;
-  readonly hasAddEntries = this.addModal.hasAddEntries;
-  readonly addOptions = this.addModal.addOptions;
-  readonly showAddEmptyAction = this.addModal.showAddEmptyAction;
-  readonly addEmptyActionLabel = this.addModal.addEmptyActionLabel;
-  readonly consumeModalOpen = this.consumeModal.consumeModalOpen;
-  readonly isConsuming = this.consumeModal.isConsuming;
-  readonly consumeQuery = this.consumeModal.consumeQuery;
-  readonly consumeEntries = this.consumeModal.consumeEntries;
-  readonly consumeEntryViewModels = this.consumeModal.consumeEntryViewModels;
-  readonly hasConsumeEntries = this.consumeModal.hasConsumeEntries;
-  readonly consumeOptions = this.consumeModal.consumeOptions;
+  // Read by BatchesModalComponent, which injects this facade rather than the
+  // modal's own state service.
   readonly showBatchesModal = this.batchesModal.showBatchesModal;
   readonly selectedBatchesItem = this.batchesModal.selectedBatchesItem;
   readonly batchesEditMode = this.batchesModal.editMode;
@@ -212,9 +200,9 @@ export class PantryStateService {
   /** Lifecycle hook: ensure the store is primed and real-time updates are wired. */
   async ionViewWillEnter(): Promise<void> {
     this.skeletonManager.startLoading();
-    this.pantryStore.clearEntryFilters();
+    this.pantryQuery.clearEntryFilters();
     const shouldOpenPendientes = this.navigationPreset.peek()?.pendientes === true;
-    this.pantryStore.applyPendingNavigationPreset();
+    this.pantryQuery.applyPendingNavigationPreset();
     await this.loadItems();
     if (shouldOpenPendientes) {
       this.openPendientesSheet();
@@ -225,17 +213,17 @@ export class PantryStateService {
 
   async loadItems(): Promise<void> {
     if (this.pantryStore.loadedProducts().length === 0) {
-      await this.pantryStore.ensureFirstPageLoaded();
+      await this.pantryQuery.ensureFirstPageLoaded();
     }
     if (!this.pantryStore.pipelineResetting()) {
-      this.pantryStore.startBackgroundLoad();
+      this.pantryQuery.startBackgroundLoad();
     }
     this.hasCompletedInitialLoad.set(true);
   }
 
   // -------- Filters --------
   onSearchTermChange(ev: CustomEvent): void {
-    this.pantryStore.setSearchQuery(ev.detail?.value ?? '');
+    this.pantryQuery.setSearchQuery(ev.detail?.value ?? '');
   }
 
   onFilterChipSelected(chip: FilterChipViewModel): void {
@@ -256,14 +244,13 @@ export class PantryStateService {
   }
 
   // -------- Add modal (delegates to PantryAddModalStateService) --------
-  openAddModal = () => this.addModal.openAddModal();
-  closeAddModal = () => this.addModal.closeAddModal();
-  dismissAddModal = () => this.addModal.dismissAddModal();
-  submitAdd = () => this.addModal.submitAdd();
-  onAddQueryChange = (value: string) => this.addModal.onAddQueryChange(value);
+  openAddModal = () => this.addModal.open();
+  closeAddModal = () => this.addModal.close();
+  dismissAddModal = () => this.addModal.dismiss();
+  submitAdd = () => this.addModal.submit();
+  onAddQueryChange = (value: string) => this.addModal.onQueryChange(value);
   addEntry = (option: AutocompleteItem<PantryItem>) => this.addModal.addEntry(option);
   addEntryFromQuery = (name?: string) => this.addModal.addEntryFromQuery(name);
-  adjustEntry = (entry: AddEntry, delta: number) => this.addModal.adjustEntry(entry, delta);
   adjustEntryById = (entryId: string, delta: number) => this.addModal.adjustEntryById(entryId, delta);
   setEntryDate = (entryId: string, date: string | undefined) => this.addModal.setEntryDate(entryId, date);
 
@@ -271,9 +258,9 @@ export class PantryStateService {
   startReceiptScan = () => this.receiptScanModal.startScan();
 
   // -------- Consume modal (delegates to PantryConsumeModalStateService) --------
-  openConsumeModal = () => this.consumeModal.openConsumeModal();
-  closeConsumeModal = () => this.consumeModal.closeConsumeModal();
-  dismissConsumeModal = () => this.consumeModal.dismissConsumeModal();
+  openConsumeModal = () => this.consumeModal.open();
+  closeConsumeModal = () => this.consumeModal.close();
+  dismissConsumeModal = () => this.consumeModal.dismiss();
   submitConsume = () => this.consumeModal.submitConsume();
   onConsumeQueryChange = (value: string) => this.consumeModal.onConsumeQueryChange(value);
   addConsumeEntry = (option: AutocompleteItem<PantryItem>) => this.consumeModal.addConsumeEntry(option);
@@ -287,14 +274,14 @@ export class PantryStateService {
   isDeleting = (item: PantryItem) => this.listUi.isDeleting(item);
 
   deleteItem(item: PantryItem, event?: Event, skipConfirm = false): Promise<void> {
-     this.quantitySheet.dismissQuantitySheet();
+     this.quantitySheet.dismiss();
      return this.listUi.deleteItem(item, event, skipConfirm, itemId => this.batchOps.cancelPendingStockSave(itemId));
   }
 
   private applyStatusFilterPreset(preset: PantryStatusFilterValue): void {
     switch (preset) {
       case 'expired':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: true,
           expiring: false,
           lowStock: false,
@@ -305,7 +292,7 @@ export class PantryStateService {
         });
         break;
       case 'near-expiry':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: true,
           lowStock: false,
@@ -316,7 +303,7 @@ export class PantryStateService {
         });
         break;
       case 'low-stock':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: false,
           lowStock: true,
@@ -327,7 +314,7 @@ export class PantryStateService {
         });
         break;
       case 'normal':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: false,
           lowStock: false,
@@ -338,7 +325,7 @@ export class PantryStateService {
         });
         break;
       case 'review':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: false,
           lowStock: false,
@@ -349,7 +336,7 @@ export class PantryStateService {
         });
         break;
       case 'pendientes':
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: false,
           lowStock: false,
@@ -360,7 +347,7 @@ export class PantryStateService {
         });
         break;
       default:
-        this.pantryStore.setFilters({
+        this.pantryQuery.setFilters({
           expired: false,
           expiring: false,
           lowStock: false,
@@ -382,9 +369,9 @@ export class PantryStateService {
   cancelPendingStockSave = (itemId: string) => this.batchOps.cancelPendingStockSave(itemId);
 
   // -------- Batches modal (delegates to PantryBatchesModalStateService) --------
-  openBatchesModal = (item: PantryItem, event?: Event) => this.batchesModal.openBatchesModal(item, event);
-  closeBatchesModal = () => this.batchesModal.closeBatchesModal();
-  dismissBatchesModal = () => this.batchesModal.dismissBatchesModal();
+  openBatchesModal = (item: PantryItem, event?: Event) => this.batchesModal.open(item, event);
+  closeBatchesModal = () => this.batchesModal.close();
+  dismissBatchesModal = () => this.batchesModal.dismiss();
   getTotalBatchCount = (item: PantryItem) => this.batchesModal.getTotalBatchCount(item);
   getSortedBatches = (item: PantryItem) => this.batchesModal.getSortedBatches(item);
   buildItemCardViewModel = (item: PantryItem) => this.batchesModal.buildItemCardViewModel(item);
@@ -407,9 +394,9 @@ export class PantryStateService {
   clearBatchLocation = (index: number) => this.batchesModal.clearBatchLocation(index);
 
   // -------- Quantity sheet (delegates to PantryQuantitySheetStateService) --------
-  openQuantitySheet = (item: PantryItem, event?: Event) => this.quantitySheet.openQuantitySheet(item, event);
+  openQuantitySheet = (item: PantryItem, event?: Event) => this.quantitySheet.open(item, event);
   openPendientesSheet = () => this.pendientesSheet.open();
-  dismissQuantitySheet = () => this.quantitySheet.dismissQuantitySheet();
+  dismissQuantitySheet = () => this.quantitySheet.dismiss();
   incrementQuantity = (item: PantryItem) => this.quantitySheet.incrementQuantity(item);
   decrementQuantity = (item: PantryItem) => this.quantitySheet.decrementQuantity(item);
   emptyOutQuantity = (item: PantryItem) => this.quantitySheet.emptyOut(item);
@@ -418,17 +405,17 @@ export class PantryStateService {
   toggleQuantitySheetNoExpiry = () => this.quantitySheet.toggleNoExpiry();
 
   closeQuantitySheetWithSave(): void {
-    this.quantitySheet.closeQuantitySheet();
+    this.quantitySheet.close();
   }
 
   async openBatchesModalFromSheet(item: PantryItem): Promise<void> {
-    await this.quantitySheet.dismissQuantitySheet();
+    await this.quantitySheet.dismiss();
     const updatedItem = this.pantryItemsState().find(i => i._id === item._id) ?? item;
-    this.batchesModal.openBatchesModal(updatedItem);
+    this.batchesModal.open(updatedItem);
   }
 
   async openEditModalFromSheet(item: PantryItem): Promise<void> {
-    await this.quantitySheet.dismissQuantitySheet();
+    await this.quantitySheet.dismiss();
     const updatedItem = this.pantryItemsState().find(i => i._id === item._id) ?? item;
     if (updatedItem.productType === 'fresh') {
       this.editFreshItemModalRequest.set({ mode: 'edit', item: updatedItem });
@@ -472,23 +459,16 @@ export class PantryStateService {
     await this.historyManager.logAdvancedEdit(item, updated, 'pantry_card');
 
     let msgKey: string;
-    let duration = 1500;
     if (state === 'none' && item.isBasic) {
       msgKey = 'pantry.toasts.addedToList';
     } else if (state === 'none') {
       msgKey = 'pantry.fresh.toast.markedOutHint';
-      duration = 2500;
     } else if (state === 'low') {
       msgKey = 'pantry.fresh.toast.updatedLow';
     } else {
       msgKey = 'pantry.fresh.toast.updated';
     }
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant(msgKey),
-      duration,
-      position: 'bottom',
-    });
-    await toast.present();
+    this.toast.success(msgKey);
   }
 
   async toggleItemBasic(item: PantryItem): Promise<void> {
@@ -509,12 +489,7 @@ export class PantryStateService {
     } else {
       msgKey = isDepleted ? 'pantry.toasts.isBasicOffDepleted' : 'pantry.toasts.isBasicOff';
     }
-    const toast = await this.toastCtrl.create({
-      message: this.translate.instant(msgKey),
-      duration: 1200,
-      position: 'bottom',
-    });
-    await toast.present();
+    this.toast.success(msgKey);
   }
 
   openFreshAddModal(): void {
@@ -527,6 +502,14 @@ export class PantryStateService {
 
   onDestroy(): void {
     this.batchOps.clearAll();
+  }
+
+  /**
+   * Whether the user has finished onboarding. The add coach mark waits for it —
+   * showing a hint on top of a pantry the user has not met yet is noise.
+   */
+  hasSeenOnboarding(): boolean {
+    return this.localStorage.onboarding.isSeen();
   }
 
   // -------- Private helpers --------
