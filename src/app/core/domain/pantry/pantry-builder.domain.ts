@@ -3,7 +3,7 @@ import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import type { FoodType } from '@core/models/shared/enums.model';
 import { roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeTrim } from '@core/utils/normalization.util';
-import { inferExpiryForName } from './food-type-inference.domain';
+import { inferFoodType, resolveSuggestedExpiry } from './food-type-inference.domain';
 import { computeEarliestExpiry } from './pantry-batch.domain';
 
 export function buildAddItemPayload(params: {
@@ -39,11 +39,18 @@ export function buildAddItemPayload(params: {
     : params.quantity;
   const sanitizedQuantity = Math.max(1, toNumberOrZero(rawQty));
 
-  // Infer the food type from the name so the item is visible to the expiry
-  // alert system from day one. An explicit date or an explicit noExpiry from
-  // the caller always wins; an unrecognised name falls back to no date, which
-  // is the behaviour this function had before inference existed.
-  const inferred = inferExpiryForName(normalizedName, new Date(params.nowIso));
+  // Classify the item so it is visible to the expiry alert system from day
+  // one. A type the caller states is authoritative — it came from a picker or
+  // a curated list, and the name is only a guess — and it drives the suggested
+  // date as well as the stored field. Reading the date off the name instead
+  // left onboarding's French "Œufs" and Portuguese "Grão-de-bico" dateless
+  // even though their type was known all along.
+  const resolvedFoodType = params.foodType ?? inferFoodType(normalizedName) ?? undefined;
+
+  // An explicit date or an explicit noExpiry from the caller always wins; an
+  // unclassifiable item falls back to no date, which is the behaviour this
+  // function had before inference existed.
+  const inferred = resolveSuggestedExpiry(normalizedName, resolvedFoodType ?? null, new Date(params.nowIso));
   const shouldInferDate =
     params.inferExpiry !== false && !params.expirationDate && !params.noExpiry;
 
@@ -64,7 +71,7 @@ export function buildAddItemPayload(params: {
     householdId: params.householdId ?? DEFAULT_HOUSEHOLD_ID,
     name: normalizedName,
     categoryId: '',
-    foodType: params.foodType ?? inferred.foodType ?? undefined,
+    foodType: resolvedFoodType,
     batches,
     supermarket: '',
     isBasic: undefined,

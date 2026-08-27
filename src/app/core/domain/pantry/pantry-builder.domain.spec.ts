@@ -170,3 +170,48 @@ describe('buildAddItemPayload — opting out of date inference', () => {
     expect(item.batches[0].expirationDate).toBeDefined();
   });
 });
+
+/**
+ * The name is a guess; a type the caller states came from a picker or a curated
+ * list. When the two are available the stated one has to win for the *date* as
+ * well as the stored field — reading the date off the name regardless is what
+ * left onboarding's French "Œufs" and Portuguese "Grão-de-bico" with no expiry
+ * even though their food type was declared in the seed table all along.
+ */
+describe('an explicit food type beats the name', () => {
+  it('dates a product whose name means nothing to the inference', () => {
+    const item = buildAddItemPayload({ ...BASE, name: 'Œufs', foodType: FoodType.PROTEIN });
+
+    expect(item.foodType).toBe(FoodType.PROTEIN);
+    expect(item.batches[0].expirationDate).toBeDefined();
+  });
+
+  it('leaves such a product dateless when no type is stated', () => {
+    const item = buildAddItemPayload({ ...BASE, name: 'Œufs' });
+
+    expect(item.batches[0].expirationDate).toBeUndefined();
+  });
+
+  it('derives the date from the stated type, not the one the name suggests', () => {
+    const asGuessed = buildAddItemPayload({ ...BASE, name: 'Leche' });
+    const asStated = buildAddItemPayload({ ...BASE, name: 'Leche', foodType: FoodType.NON_PERISHABLE });
+
+    expect(asStated.foodType).toBe(FoodType.NON_PERISHABLE);
+    expect(asStated.batches[0].expirationDate).not.toBe(asGuessed.batches[0].expirationDate);
+  });
+
+  it('marks a stated type that never expires instead of dating it', () => {
+    const item = buildAddItemPayload({ ...BASE, name: 'Zzzz', foodType: FoodType.HOUSEHOLD });
+
+    expect(item.batches[0].noExpiry).toBeTrue();
+    expect(item.batches[0].expirationDate).toBeUndefined();
+  });
+
+  it('still lets an explicit date from the caller win over both', () => {
+    const item = buildAddItemPayload({
+      ...BASE, name: 'Leche', foodType: FoodType.PROTEIN, expirationDate: '2027-03-01',
+    });
+
+    expect(item.batches[0].expirationDate).toBe('2027-03-01');
+  });
+});

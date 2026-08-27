@@ -71,9 +71,11 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
             quantity: FRESH_QTY.sufficient,
             expirationDate: entry.expirationDate,
             noExpiry: entry.noExpiry,
-            // The row already shows a suggested date, so the builder must save
-            // what is on screen. Without this, clearing the date in the sheet
-            // silently brought an inferred one back on save.
+            // The row already shows the suggested type and date in editable
+            // chips, so whatever it holds now is the user's decision — an empty
+            // date means they cleared it on purpose, and a corrected type must
+            // not be overwritten by the guess the name produces.
+            foodType: entry.foodType ?? undefined,
             inferExpiry: false,
           });
           const freshItem: PantryItem = {
