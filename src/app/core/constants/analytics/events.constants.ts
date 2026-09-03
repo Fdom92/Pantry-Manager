@@ -88,6 +88,12 @@ export const ANALYTICS_EVENTS = {
   RECEIPT_PARSE_FINISHED: 'receipt_parse_finished',
   RECEIPT_REVIEW_OPENED: 'receipt_review_opened',
   RECEIPT_SUBMIT_PRESSED: 'receipt_submit_pressed',
+  /**
+   * The review sheet closed with nothing saved. This is the event that tells
+   * a broken scanner apart from a working one people give up on: both leave
+   * a lone receipt_scan_started behind, which is all 5.1-5.3 ever recorded.
+   */
+  RECEIPT_REVIEW_ABANDONED: 'receipt_review_abandoned',
 
   // Notifications
   NOTIFICATION_SCHEDULED: 'notification_scheduled',

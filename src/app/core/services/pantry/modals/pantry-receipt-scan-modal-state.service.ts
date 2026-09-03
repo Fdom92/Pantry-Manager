@@ -52,6 +52,8 @@ export class PantryReceiptScanModalStateService {
   readonly usedSmartScan = signal(false);
   /** Captured once per scan — drives the free-tier upsell pill in the header. */
   readonly isPro = signal(false);
+  /** Separates "closed after saving" from "closed and gave up" in close(). */
+  private readonly hasSubmitted = signal(false);
 
   readonly includedLines = computed(() => this.reviewLines().filter(l => l.included));
   readonly includedCount = computed(() => this.includedLines().length);
@@ -96,6 +98,7 @@ export class PantryReceiptScanModalStateService {
     this.isOpen.set(true);
     this.phase.set('processing');
     this.reviewLines.set([]);
+    this.hasSubmitted.set(false);
 
     try {
       const ocrStartedAt = Date.now();
@@ -362,6 +365,7 @@ export class PantryReceiptScanModalStateService {
         mode: this.usedSmartScan() ? 'smart' : 'local',
       });
 
+      this.hasSubmitted.set(true);
       this.close();
       this.toast.success(
         added === 1 ? 'pantry.receiptScan.toastAdded_one' : 'pantry.receiptScan.toastAdded_other',
@@ -380,11 +384,26 @@ export class PantryReceiptScanModalStateService {
   }
 
   close(): void {
+    // A review sheet closed with nothing saved is the reading the 5.1-5.3 data
+    // could not rule out: a scan that reaches this far and is given up on
+    // leaves exactly the same trace as one that never got past the camera —
+    // a lone receipt_scan_started. Clearing reviewLines below makes this
+    // idempotent, which matters because submit() calls close() and the
+    // modal's didDismiss then calls it again.
+    if (this.phase() === 'review' && !this.hasSubmitted() && this.reviewLines().length) {
+      this.analytics.track(ANALYTICS_EVENTS.RECEIPT_REVIEW_ABANDONED, {
+        lines: this.reviewLines().length,
+        included: this.includedCount(),
+        mode: this.usedSmartScan() ? 'smart' : 'local',
+        supermarket: this.detectedSupermarket() ?? 'unknown',
+      });
+    }
     this.isOpen.set(false);
     this.reviewLines.set([]);
     this.detectedSupermarket.set(null);
     this.usedSmartScan.set(false);
     this.isPro.set(false);
+    this.hasSubmitted.set(false);
   }
 }
 
