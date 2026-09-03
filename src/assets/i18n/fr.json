@@ -446,7 +446,8 @@
       "bought": "✓ {{name}} acheté. Garde-manger mis à jour.",
       "boughtManual": "✓ {{name}} acheté.",
       "ignored": "{{name}} masqué pour l'instant — réapparaîtra la prochaine fois.",
-      "removedManual": "{{name}} retiré de la liste."
+      "removedManual": "{{name}} retiré de la liste.",
+      "shareFailed": "Impossible de partager la liste. Réessaie."
     },
     "buySheet": {
       "title": "Combien en as-tu acheté ?",
@@ -908,7 +909,8 @@
       "promptHeader": "Scanner le ticket",
       "promptGallery": "Choisir dans la galerie",
       "promptCamera": "Prendre une photo",
-      "matchFresh": "Sera marqué comme disponible"
+      "matchFresh": "Sera marqué comme disponible",
+      "pickerError": "Impossible d'ouvrir l'appareil photo ou la galerie. Réessaie."
     }
   },
   "upgrade": {

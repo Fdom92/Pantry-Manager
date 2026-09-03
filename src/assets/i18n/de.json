@@ -446,7 +446,8 @@
       "bought": "✓ {{name}} gekauft. Vorrat aktualisiert.",
       "boughtManual": "✓ {{name}} gekauft.",
       "ignored": "{{name}} jetzt ausgeblendet — erscheint beim nächsten Mal wieder.",
-      "removedManual": "{{name}} aus der Liste entfernt."
+      "removedManual": "{{name}} aus der Liste entfernt.",
+      "shareFailed": "Die Liste konnte nicht geteilt werden. Bitte versuche es erneut."
     },
     "buySheet": {
       "title": "Wie viele hast du gekauft?",
@@ -908,7 +909,8 @@
       "promptHeader": "Kassenbon scannen",
       "promptGallery": "Aus Galerie wählen",
       "promptCamera": "Foto aufnehmen",
-      "matchFresh": "Wird als vorhanden markiert"
+      "matchFresh": "Wird als vorhanden markiert",
+      "pickerError": "Kamera oder Galerie konnten nicht geöffnet werden. Bitte versuche es erneut."
     }
   },
   "upgrade": {

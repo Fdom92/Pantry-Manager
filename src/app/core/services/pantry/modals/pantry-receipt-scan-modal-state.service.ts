@@ -10,6 +10,7 @@ import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
 import { resolveSuggestedExpiry, toLotExpiry } from '@core/domain/pantry/food-type-inference.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
+import { classifyNativeDismissal } from '@core/domain/shared';
 import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
 import type { PantryItem } from '@core/models/pantry';
 import { PantryStoreService } from '../pantry-store.service';
@@ -60,6 +61,7 @@ export class PantryReceiptScanModalStateService {
     await this.showFramingHintOnce();
     this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_STARTED, {});
     let base64: string | undefined;
+    let format: string | undefined;
     try {
       const photo = await Camera.getPhoto({
         quality: 90,
@@ -71,22 +73,43 @@ export class PantryReceiptScanModalStateService {
         promptLabelPicture: this.translate.instant('pantry.receiptScan.promptCamera'),
       });
       base64 = photo.base64String;
-    } catch {
-      // Picker cancelled — nothing to do.
+      format = photo.format;
+    } catch (err) {
+      // Until 5.4 every rejection here was swallowed as "user cancelled", and
+      // production showed what that hid: 11 scans started, 0 finished, 0
+      // reported as failed. Only a recognised cancellation stays silent now.
+      if (classifyNativeDismissal(err) === 'cancelled') {
+        return;
+      }
+      this.reportScanFailure('picker_error', 'photo picker error', err);
       return;
     }
-    if (!base64) return;
+    if (!base64) {
+      this.reportScanFailure('no_image', 'photo picker returned no image data');
+      return;
+    }
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_PHOTO_CAPTURED, {
+      bytes: base64.length,
+      format: format ?? 'unknown',
+    });
 
     this.isOpen.set(true);
     this.phase.set('processing');
     this.reviewLines.set([]);
 
     try {
+      const ocrStartedAt = Date.now();
       const result = await CapacitorPluginMlKitTextRecognition.detectText({ base64Image: base64 });
       const ocrLines: OcrLine[] = result.blocks.flatMap(block =>
         block.lines.map(line => ({ text: line.text, box: line.boundingBox ?? null })),
       );
       const rows = reconstructRows(ocrLines);
+      this.analytics.track(ANALYTICS_EVENTS.RECEIPT_OCR_FINISHED, {
+        blocks: result.blocks.length,
+        lines: ocrLines.length,
+        rows: rows.length,
+        ms: Date.now() - ocrStartedAt,
+      });
 
       // PRO smart scan: LLM parses the OCR rows server-side (better with
       // garbled/unknown formats). Local rule-based parser is the free tier
@@ -116,6 +139,12 @@ export class PantryReceiptScanModalStateService {
       }
       this.usedSmartScan.set(smart);
       this.detectedSupermarket.set(supermarket);
+      this.analytics.track(ANALYTICS_EVENTS.RECEIPT_PARSE_FINISHED, {
+        rows: rows.length,
+        items: items.length,
+        supermarket: supermarket ?? 'unknown',
+        mode: smart ? 'smart' : 'local',
+      });
 
       const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name }));
       const itemsById = new Map(this.pantryStore.loadedProducts().map(item => [item._id, item]));
@@ -138,12 +167,30 @@ export class PantryReceiptScanModalStateService {
       if (!lines.length) {
         this.phase.set('error');
         this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_FAILED, { reason: 'no_products' });
+        return;
       }
+      this.analytics.track(ANALYTICS_EVENTS.RECEIPT_REVIEW_OPENED, {
+        lines: lines.length,
+        auto_matched: lines.filter(line => this.isAutoMatch(line)).length,
+        included: lines.filter(line => line.included).length,
+      });
     } catch (err) {
       this.logger.error('PantryReceiptScanModalStateService', 'OCR/parse error', err);
       this.phase.set('error');
       this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_FAILED, { reason: 'ocr_error' });
     }
+  }
+
+  /**
+   * A scan that died before the review sheet ever opened. The modal is not up
+   * yet at this point, so there is no error phase to fall back on: without a
+   * toast the user sees the button do nothing at all, which is precisely how
+   * this failure stayed invisible through three releases.
+   */
+  private reportScanFailure(reason: string, message: string, err?: unknown): void {
+    this.logger.error('PantryReceiptScanModalStateService', message, err);
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_FAILED, { reason });
+    this.toast.error('pantry.receiptScan.pickerError');
   }
 
   /**
@@ -255,6 +302,7 @@ export class PantryReceiptScanModalStateService {
     if (this.isSubmitting()) return;
     const lines = this.includedLines();
     if (!lines.length) return;
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SUBMIT_PRESSED, { included: lines.length });
     this.isSubmitting.set(true);
 
     const sessionId = createDocumentId('session');
@@ -320,7 +368,12 @@ export class PantryReceiptScanModalStateService {
         { count: added },
       );
     } catch (err) {
+      // Reached Sentry but never the user: the sheet just sat there with the
+      // save button springing back. Partial adds are possible here, so say how
+      // many made it rather than implying nothing happened.
       this.logger.error('PantryReceiptScanModalStateService', 'submit error', err);
+      this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_FAILED, { reason: 'submit_error', items_added: added });
+      this.toast.error('pantry.receiptScan.error');
     } finally {
       this.isSubmitting.set(false);
     }

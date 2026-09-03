@@ -446,7 +446,8 @@
       "bought": "✓ {{name}} comprado. Despensa atualizada.",
       "boughtManual": "✓ {{name}} comprado.",
       "ignored": "{{name}} oculto agora — voltará na próxima vez.",
-      "removedManual": "{{name}} removido da lista."
+      "removedManual": "{{name}} removido da lista.",
+      "shareFailed": "Não foi possível partilhar a lista. Tenta de novo."
     },
     "buySheet": {
       "title": "Quantos compraste?",
@@ -908,7 +909,8 @@
       "promptHeader": "Digitalizar talão",
       "promptGallery": "Escolher da galeria",
       "promptCamera": "Tirar foto",
-      "matchFresh": "Será marcado como disponível"
+      "matchFresh": "Será marcado como disponível",
+      "pickerError": "Não foi possível abrir a câmara ou a galeria. Tenta de novo."
     }
   },
   "upgrade": {

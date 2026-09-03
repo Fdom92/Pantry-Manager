@@ -446,7 +446,8 @@
       "bought": "✓ {{name}} comprado. Despensa actualizada.",
       "boughtManual": "✓ {{name}} comprado.",
       "ignored": "{{name}} oculto por ahora — volverá la próxima vez.",
-      "removedManual": "{{name}} eliminado de la lista."
+      "removedManual": "{{name}} eliminado de la lista.",
+      "shareFailed": "No se ha podido compartir la lista. Inténtalo de nuevo."
     },
     "buySheet": {
       "title": "¿Cuántas unidades compraste?",
@@ -908,7 +909,8 @@
       "promptHeader": "Escanear ticket",
       "promptGallery": "Elegir de la galería",
       "promptCamera": "Hacer foto",
-      "matchFresh": "Se marcará como disponible"
+      "matchFresh": "Se marcará como disponible",
+      "pickerError": "No se ha podido abrir la cámara ni la galería. Inténtalo de nuevo."
     }
   },
   "upgrade": {

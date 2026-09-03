@@ -446,7 +446,8 @@
       "bought": "✓ {{name}} bought. Pantry updated.",
       "boughtManual": "✓ {{name}} bought.",
       "ignored": "{{name}} hidden for now — it will come back next time.",
-      "removedManual": "{{name}} removed from list."
+      "removedManual": "{{name}} removed from list.",
+      "shareFailed": "Couldn't share the list. Please try again."
     },
     "buySheet": {
       "title": "How many did you buy?",
@@ -908,7 +909,8 @@
       "promptHeader": "Scan receipt",
       "promptGallery": "Choose from gallery",
       "promptCamera": "Take photo",
-      "matchFresh": "Will be marked as in stock"
+      "matchFresh": "Will be marked as in stock",
+      "pickerError": "Couldn't open the camera or gallery. Please try again."
     }
   },
   "upgrade": {

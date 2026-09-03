@@ -2,6 +2,7 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { ActionSheetController } from '@ionic/angular';
 import { SHOPPING_LIST_NAME } from '@core/constants';
 import { buildShoppingAnalysis } from '@core/domain/list';
+import { classifyNativeDismissal } from '@core/domain/shared';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
 import { type ShoppingStateWithItem, type ShoppingSuggestionWithItem, ShoppingReason } from '@core/models/list';
@@ -251,8 +252,15 @@ export class ListStateService {
         item_count: state.summary.total + manuals.length,
         format: 'text',
       });
-    } catch {
-      // user cancelled or share unavailable — silent
+    } catch (err) {
+      // QA found this one by picking "Text" from the share sheet and watching
+      // nothing happen at all: cancelling and a broken Share plugin took the
+      // same silent path. Only a recognised cancellation stays quiet now.
+      if (classifyNativeDismissal(err) === 'cancelled') {
+        return;
+      }
+      this.logger.error('ListStateService', 'shareShoppingListAsText failed', err);
+      this.toast.error('shopping.toasts.shareFailed');
     }
   }
 

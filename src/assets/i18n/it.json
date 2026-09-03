@@ -446,7 +446,8 @@
       "bought": "✓ {{name}} acquistato. Dispensa aggiornata.",
       "boughtManual": "✓ {{name}} acquistato.",
       "ignored": "{{name}} nascosto ora — riapparirà la prossima volta.",
-      "removedManual": "{{name}} rimosso dalla lista."
+      "removedManual": "{{name}} rimosso dalla lista.",
+      "shareFailed": "Impossibile condividere la lista. Riprova."
     },
     "buySheet": {
       "title": "Quanti ne hai comprati?",
@@ -908,7 +909,8 @@
       "promptHeader": "Scansiona scontrino",
       "promptGallery": "Scegli dalla galleria",
       "promptCamera": "Scatta foto",
-      "matchFresh": "Verrà segnato come disponibile"
+      "matchFresh": "Verrà segnato come disponibile",
+      "pickerError": "Impossibile aprire la fotocamera o la galleria. Riprova."
     }
   },
   "upgrade": {

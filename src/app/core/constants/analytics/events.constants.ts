@@ -79,6 +79,15 @@ export const ANALYTICS_EVENTS = {
   RECEIPT_SCAN_COMPLETED: 'receipt_scan_completed',
   RECEIPT_SCAN_FAILED: 'receipt_scan_failed',
   RECEIPT_LINE_EDITED: 'receipt_line_edited',
+  // Funnel between started and completed (5.4). Without these, a scan that
+  // dies mid-flow is indistinguishable from one that never began: the 5.1-5.3
+  // data showed 11 starts, 0 completions and 0 failures, with no way to tell
+  // whether the camera, the OCR, the parser or the submit was at fault.
+  RECEIPT_PHOTO_CAPTURED: 'receipt_photo_captured',
+  RECEIPT_OCR_FINISHED: 'receipt_ocr_finished',
+  RECEIPT_PARSE_FINISHED: 'receipt_parse_finished',
+  RECEIPT_REVIEW_OPENED: 'receipt_review_opened',
+  RECEIPT_SUBMIT_PRESSED: 'receipt_submit_pressed',
 
   // Notifications
   NOTIFICATION_SCHEDULED: 'notification_scheduled',
