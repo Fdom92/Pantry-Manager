@@ -50,6 +50,19 @@ export const ANALYTICS_EVENTS = {
   PANTRY_BATCHES_MODAL_OPENED: 'pantry_batches_modal_opened',
   PANTRY_PENDIENTES_SHEET_OPENED: 'pantry_pendientes_sheet_opened',
   PANTRY_PENDIENTES_SAVED: 'pantry_pendientes_saved',
+  /**
+   * The quantity sheet is the path people actually consume through, and until
+   * 5.4 it only reported successful adjustments — no denominator, so a sheet
+   * opened and closed untouched was invisible.
+   */
+  PANTRY_QUANTITY_SHEET_OPENED: 'pantry_quantity_sheet_opened',
+  /**
+   * Consume-flow drop-off. The 30-day export had 5 consume modals opened by 5
+   * different people and 0 items consumed; these two say whether they leave
+   * before picking anything or after picking and thinking better of it.
+   */
+  PANTRY_CONSUME_ENTRY_ADDED: 'pantry_consume_entry_added',
+  PANTRY_CONSUME_MODAL_ABANDONED: 'pantry_consume_modal_abandoned',
 
   // Shopping list
   SHOPPING_BUY_COMPLETED: 'shopping_buy_completed',

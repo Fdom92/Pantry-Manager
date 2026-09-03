@@ -32,6 +32,8 @@ export class PantryConsumeModalStateService {
   readonly isConsuming = signal(false);
   readonly consumeQuery = signal('');
   readonly consumeEntries = signal<ConsumeEntry[]>([]);
+  /** Separates "dismissed after consuming" from "dismissed and gave up". */
+  private readonly hasSubmitted = signal(false);
 
   readonly consumeEntryViewModels = computed<EntitySelectorEntry[]>(() =>
     this.consumeEntries().map(entry => ({
@@ -56,6 +58,7 @@ export class PantryConsumeModalStateService {
     this.consumeQuery.set('');
     this.consumeModalOpen.set(true);
     this.isConsuming.set(false);
+    this.hasSubmitted.set(false);
     this.analytics.track(ANALYTICS_EVENTS.PANTRY_CONSUME_MODAL_OPENED);
   }
 
@@ -74,8 +77,23 @@ export class PantryConsumeModalStateService {
 
   /**
    * Dismiss modal without cleanup (for backdrop click).
+   *
+   * The abandonment event lives here rather than in close() because the modal
+   * emits willDismiss before didDismiss: dismiss() clears consumeModalOpen and
+   * close()'s guard then returns early, so close() never actually runs in
+   * practice. An entries count of 0 means the modal was opened and left
+   * without picking anything; a count above 0 means the user picked and then
+   * thought better of saving. Both read as a bare
+   * pantry_consume_modal_opened today.
    */
   dismiss(): void {
+    if (this.consumeModalOpen() && !this.hasSubmitted()) {
+      const entries = this.consumeEntries();
+      this.analytics.track(ANALYTICS_EVENTS.PANTRY_CONSUME_MODAL_ABANDONED, {
+        entries: entries.length,
+        units: entries.reduce((sum, entry) => sum + entry.quantity, 0),
+      });
+    }
     this.consumeModalOpen.set(false);
   }
 
@@ -112,6 +130,7 @@ export class PantryConsumeModalStateService {
           quantity: entry.quantity,
         });
       }
+      this.hasSubmitted.set(true);
       this.dismiss();
       this.reviewPrompt.handleConsumeCompleted();
     }).catch(err => {
@@ -159,6 +178,10 @@ export class PantryConsumeModalStateService {
       ];
     });
     this.consumeQuery.set('');
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_CONSUME_ENTRY_ADDED, {
+      kind: item.productType === 'fresh' ? 'fresh' : 'despensa',
+      entries: this.consumeEntries().length,
+    });
   }
 
   /**
