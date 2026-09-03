@@ -54,8 +54,31 @@ Solo hay dos salidas antes de ese punto, en
 if (!base64) return;   // ← ídem
 ```
 
-Ambas son mudas. El fallo está en la captura de foto o antes, y no deja rastro
-en ningún sitio: ni PostHog, ni Sentry, ni consola.
+Ambas son mudas: no dejan rastro ni en PostHog, ni en Sentry, ni en consola.
+
+**Corrección (misma sesión).** La primera lectura de esto fue "el fallo está en
+la captura de foto o antes". Es más de lo que los datos sostienen. Cero
+`receipt_scan_failed` solo descarta dos cosas: que el OCR reviente y que el
+parser saque cero productos. **No descarta que el review sheet se abriera y el
+usuario lo cerrara sin guardar** — ese camino tampoco emitía ningún evento.
+
+Las dos historias dejan exactamente la misma huella, un `receipt_scan_started`
+suelto:
+
+```
+A) started → el picker falla en silencio                    → nada más
+B) started → OCR bien → parser bien → review → se va        → nada más
+```
+
+Y la segunda gana peso: en el dispositivo de desarrollo funcionan **cámara y
+galería**, así que el fallo universal es poco probable. El sospechoso pasa a ser
+la calidad del parseo, con límites ya documentados (OCR que parte palabras;
+Aldi, Dia, Eroski, Alcampo y Consum nunca probados).
+
+Esto **no cambia el trabajo**, lo justifica: distinguir A de B es exactamente lo
+que la 5.4 construye. Sí retira una propuesta — sustituir `CameraSource.Prompt`
+por un action sheet propio para saber cámara vs galería — porque con ambas rutas
+funcionando ese bit deja de ser el más informativo.
 
 ### Lo que se descartó por inspección
 
@@ -104,8 +127,36 @@ Entre `started` y `completed` no hay nada. Eventos nuevos:
 - `receipt_photo_captured` — `{ source: 'camera' | 'gallery' | 'unknown', bytes }`
 - `receipt_ocr_finished` — `{ blocks, lines, ms }`
 - `receipt_parse_finished` — `{ rows, items, supermarket, mode }`
-- `receipt_review_opened` — `{ lines, auto_matched }`
+- `receipt_review_opened` — `{ lines, auto_matched, included }`
 - `receipt_submit_pressed` — `{ included }`
+- `receipt_review_abandoned` — `{ lines, included, mode, supermarket }`
+
+El último es el que separa las historias A y B de arriba, y por eso es el más
+importante de los seis.
+
+### 2b. El mismo agujero en el camino de consumo
+
+`pantry_consume_modal_opened` daba 5 aperturas por 5 usuarios distintos y
+`pantry_item_consumed` cero, sin nada en medio. Misma ambigüedad, mismo remedio:
+
+- `pantry_consume_entry_added` — separa "abrió y se fue sin elegir nada" de
+  "eligió y luego no guardó"
+- `pantry_consume_modal_abandoned` — `{ entries, units }`
+- `pantry_quantity_sheet_opened` — el denominador que le faltaba a
+  `pantry_quantity_adjusted`, en el camino por el que la gente consume de verdad
+- `pantry_item_deleted` gana `had_stock` y `quantity` — para contrastar la
+  hipótesis de que borran en vez de consumir (23 borrados contra 19 ajustes)
+
+**Fuera a propósito:** añadir, onboarding y paywall ya tienen pares
+apertura/finalización y no necesitan eventos nuevos.
+
+### 2c. Hallazgo lateral: `close()` del modal de consumir es código muerto
+
+El modal emite `willDismiss` antes que `didDismiss`. `dismiss()` pone
+`consumeModalOpen` a `false`, y la guarda de `close()` (`if
+(!this.consumeModalOpen()) return;`) sale antes de limpiar nada. La limpieza de
+`close()` no se ejecuta nunca. No se ha tocado el comportamiento — solo se ha
+puesto el evento de abandono en `dismiss()`, que sí corre. Queda anotado.
 
 Con esto, el siguiente export dice si falla la cámara, el OCR, el parser o el
 submit. Hoy es indistinguible.
