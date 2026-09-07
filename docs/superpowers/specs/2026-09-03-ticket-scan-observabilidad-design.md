@@ -164,6 +164,28 @@ submit. Hoy es indistinguible.
 `receipt_scan_failed` gana razones: `picker_error`, `no_image`, además de las
 dos existentes.
 
+### 2d. Perfiles de persona — el agujero mayor, y no eran eventos
+
+`posthog.init()` no pasaba `person_profiles`, y posthog-js usa
+`'identified_only'` por defecto. Como la app **nunca llama a `identify()`**,
+jamás se creó un perfil: todos los eventos llegaban `propertyless` y PostHog no
+podía construir **ni una sola cohorte**. 67 tipos de evento y ninguna forma de
+preguntar *quién* los hacía.
+
+`buildPersonProfile()` (`core/domain/analytics/`) decide qué se envía: cuentas,
+buckets y booleanos, nunca nombres ni texto libre. El tamaño de despensa va
+**bucketizado** por la misma razón por la que un valor raro es una huella
+dactilar — "6-20 productos" hace la cohorte, "exactamente 137" empieza a
+describir un hogar. Reutiliza el predicado `isIncomplete` que ya filtran el chip
+de Despensa y los insights gratuitos, en vez de mantener una segunda definición
+que derivaría.
+
+Se envía tras cargar la primera página de despensa y en cada vuelta a primer
+plano; enviarlo antes reportaría a todo usuario recurrente como vacío.
+
+Con esto la pregunta que importa pasa a ser contestable: **de los 18 usuarios
+que no volvieron tras una sesión, ¿cuántos tenían la despensa vacía?**
+
 ### 3. Añadir el bloque `<service>` del Photo Picker
 
 Según el README del plugin.
@@ -183,6 +205,23 @@ toca documenta los bugs en vez de encontrarlos.
 Es la parte que ningún test cubre y la que encontró los 8 bugs de la 5.3.
 Escaneo real por cámara y por galería, en un dispositivo que **no** sea el de
 desarrollo.
+
+## La feature: preguntar qué significa "borrar"
+
+Borrar un producto que aún tiene stock casi nunca es corregir un error — es
+alguien diciendo "me lo he acabado" con el único botón que la app le daba. 23
+borrados contra 19 ajustes de cantidad en 30 días, y cada uno tiró el histórico
+de consumo del que viven el waste tracker y los insights.
+
+Ahora se pregunta. **"Se ha acabado"** vacía el stock por el camino FIFO normal,
+así que queda como `CONSUME` en el histórico y **el producto sigue en la
+despensa**, donde la lista de la compra puede verlo caer bajo su umbral.
+**"Borrar producto"** se comporta igual que siempre. Con stock a cero se
+mantiene el confirm de siempre: la pregunta extra solo aparece donde cambia el
+resultado.
+
+`pantry_delete_intent_resolved` registra qué verbo se eligió, para poder juzgar
+la pantalla en el siguiente export en vez de por fe.
 
 ## Fuera de alcance
 
@@ -216,6 +255,11 @@ En el export siguiente a publicar la 5.4:
    siguen fallando, **el export dice en qué fase** — eso ya es un éxito parcial.
 2. `pantry_item_added` con `source: 'receipt_scan'` deja de ser cero.
 3. Aparecen eventos en Sentry cuando la cámara falla, en vez de silencio.
+4. PostHog tiene perfiles de persona y se pueden construir cohortes — en
+   particular "una sola sesión" × `pantry_size: 'empty'`.
+5. `pantry_delete_intent_resolved` dice qué fracción de los borrados eran en
+   realidad consumo. Si domina `consumed`, la hipótesis era correcta y el
+   histórico deja de sangrar.
 
 ## En paralelo, fuera de código
 
