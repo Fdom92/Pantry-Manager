@@ -63,6 +63,19 @@ export const ANALYTICS_EVENTS = {
    */
   PANTRY_CONSUME_ENTRY_ADDED: 'pantry_consume_entry_added',
   PANTRY_CONSUME_MODAL_ABANDONED: 'pantry_consume_modal_abandoned',
+  /**
+   * What people do inside the pantry tab. It draws more views than any other
+   * (74 of 194 in the 30-day export) and was, until 5.4, a black box: we knew
+   * they went there and nothing about what they did once inside.
+   */
+  PANTRY_SEARCH_USED: 'pantry_search_used',
+  PANTRY_FILTER_APPLIED: 'pantry_filter_applied',
+  PANTRY_GROUPING_TOGGLED: 'pantry_grouping_toggled',
+  /**
+   * Shown when a screen has nothing to render. 18 of 24 users never came back
+   * after one session; this says how many of them were staring at an empty app.
+   */
+  EMPTY_STATE_SHOWN: 'empty_state_shown',
 
   // Shopping list
   SHOPPING_BUY_COMPLETED: 'shopping_buy_completed',
@@ -110,6 +123,12 @@ export const ANALYTICS_EVENTS = {
 
   // Notifications
   NOTIFICATION_SCHEDULED: 'notification_scheduled',
+  /**
+   * Delivery, as opposed to engagement. 124 scheduled and 0 tapped over 30
+   * days could mean the OS never fired them or that nobody cared, and those
+   * two call for opposite fixes.
+   */
+  NOTIFICATION_RECEIVED: 'notification_received',
   NOTIFICATION_TAPPED: 'notification_tapped',
 
   // Preferences (signals of churn / personalization).

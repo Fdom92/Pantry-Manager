@@ -9,6 +9,9 @@ import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
 import { SyncService } from '@core/services/sync/sync.service';
 import { AnalyticsService } from '@core/services/analytics';
+import { buildPersonProfile } from '@core/domain/analytics';
+import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
+import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 import { AppUpdateService } from '@core/services/app-update';
 import { StreakStateService, StreakMilestoneService } from '@core/services/retention';
 import { ANALYTICS_EVENTS } from '@core/constants';
@@ -40,6 +43,8 @@ export class AppComponent {
   private readonly logger = inject(LoggerService);
   private readonly streak = inject(StreakStateService);
   private readonly streakMilestone = inject(StreakMilestoneService);
+  private readonly pantryStore = inject(PantryStoreService);
+  private readonly prefs = inject(SettingsPreferencesService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -89,9 +94,36 @@ export class AppComponent {
     await this.pantryQuery.initialize();
     await this.pantryQuery.ensureFirstPageLoaded();
     this.pantryQuery.startBackgroundLoad();
+    // After the first page is in: a profile sent before the pantry loads would
+    // report every returning user as empty-handed.
+    void this.syncPersonProfile();
     await this.notificationScheduler.scheduleAll();
     await this.handleSyncLaunchUrl();
     this.listenForSyncIntents();
+  }
+
+  /**
+   * Refresh the traits PostHog keeps against this person. Sent on boot and on
+   * every foreground so the snapshot tracks reality rather than whatever was
+   * true on install day — pantry size in particular is the trait that makes
+   * "who churns" answerable, and it is the one that moves most.
+   */
+  private async syncPersonProfile(): Promise<void> {
+    try {
+      const preferences = await this.prefs.getPreferences();
+      this.analytics.setPersonProfile(
+        buildPersonProfile({
+          items: this.pantryStore.loadedProducts(),
+          firstOpenAt: this.localStorage.review.getFirstUseAt(),
+          now: new Date(),
+          onboardingDone: this.localStorage.onboarding.isSeen(),
+          notificationsEnabled: preferences.notificationsEnabled === true,
+        }),
+      );
+    } catch (err) {
+      // Analytics must never break a boot.
+      this.logger.warn('AppComponent', 'syncPersonProfile failed', { err });
+    }
   }
 
   private async handleSyncLaunchUrl(): Promise<void> {
@@ -147,6 +179,7 @@ export class AppComponent {
         this.detectTrialExpiry();
         await this.notificationScheduler.scheduleAll();
         void this.streak.bootstrap();
+        void this.syncPersonProfile();
       } else {
         this.analytics.track(ANALYTICS_EVENTS.APP_BACKGROUNDED, {
           session_duration_s: Math.round((Date.now() - lastForegroundAt) / 1000),
