@@ -41,6 +41,12 @@ export const ANALYTICS_EVENTS = {
   PANTRY_ITEM_EDITED: 'pantry_item_edited',
   PANTRY_ITEM_DELETED: 'pantry_item_deleted',
   PANTRY_QUANTITY_ADJUSTED: 'pantry_quantity_adjusted',
+  /**
+   * Which verb the user actually meant when deleting a product that still had
+   * stock. Measures whether the 5.4 prompt converts thrown-away history into
+   * recorded consumption, or whether people genuinely wanted it gone.
+   */
+  PANTRY_DELETE_INTENT_RESOLVED: 'pantry_delete_intent_resolved',
 
   // Pantry modal opens — enable abandonment funnels (opened vs submitted).
   PANTRY_ADD_MODAL_OPENED: 'pantry_add_modal_opened',

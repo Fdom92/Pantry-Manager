@@ -301,7 +301,30 @@ export class PantryStateService {
 
   deleteItem(item: PantryItem, event?: Event, skipConfirm = false): Promise<void> {
      this.quantitySheet.dismiss();
-     return this.listUi.deleteItem(item, event, skipConfirm, itemId => this.batchOps.cancelPendingStockSave(itemId));
+     return this.listUi.deleteItem(
+       item,
+       event,
+       skipConfirm,
+       itemId => this.batchOps.cancelPendingStockSave(itemId),
+       // "I finished it" instead of "erase it": drain the stock through the
+       // normal FIFO path so it lands in the history as a CONSUME, and leave
+       // the product in the pantry where the shopping list can still see it.
+       target => this.consumeRemainingStock(target),
+     );
+  }
+
+  private async consumeRemainingStock(item: PantryItem): Promise<void> {
+    const remaining = this.batchOps.getTotalQuantity(item);
+    if (remaining <= 0) {
+      return;
+    }
+    await this.batchOps.adjustTotalQuantityWithFIFO(
+      item,
+      -remaining,
+      this.pantryItemsState,
+      item.expirationDate ?? undefined,
+      'pantry_card',
+    );
   }
 
   private applyStatusFilterPreset(preset: PantryStatusFilterValue): void {

@@ -778,7 +778,8 @@
       "isBasicOffDepleted": "Eliminado de tu lista de compra",
       "addedToList": "🛒 Añadido a tu lista de compra",
       "hiddenUntilStock": "Se ocultará hasta que vuelvas a añadir stock.",
-      "multipleAdded": "✅ {{count}} productos añadidos"
+      "multipleAdded": "✅ {{count}} productos añadidos",
+      "markedConsumed": "✓ Consumo registrado. El producto sigue en tu despensa."
     },
     "confirmDelete": "¿Eliminar \"{{ name }}\"?",
     "fab": {
@@ -911,6 +912,12 @@
       "promptCamera": "Hacer foto",
       "matchFresh": "Se marcará como disponible",
       "pickerError": "No se ha podido abrir la cámara ni la galería. Inténtalo de nuevo."
+    },
+    "deleteWithStock": {
+      "header": "¿Se ha acabado?",
+      "message": "Todavía te quedan {{count}} de {{name}}. Si te lo has acabado lo descontamos y guardamos el consumo; si lo borras se pierde su historial.",
+      "consumed": "Se ha acabado",
+      "delete": "Borrar producto"
     }
   },
   "upgrade": {
