@@ -779,7 +779,7 @@
       "addedToList": "🛒 Zur Einkaufsliste hinzugefügt",
       "hiddenUntilStock": "Es wird ausgeblendet, bis du wieder Bestand hinzufügst.",
       "multipleAdded": "✅ {{count}} Produkte hinzugefügt",
-      "markedConsumed": "✓ Verbrauch erfasst. Das Produkt bleibt in deiner Vorratskammer."
+      "markedConsumed": "✓ Verbrauch erfasst. Wird ausgeblendet, bis du wieder Vorrat hinzufügst."
     },
     "confirmDelete": "„{{ name }}\" löschen?",
     "fab": {

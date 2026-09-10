@@ -75,6 +75,20 @@ describe('PantryListUiStateService — deleting a product that still has stock',
     expect(store.deleteItem).not.toHaveBeenCalled();
   });
 
+  it('says the product is hidden until restocked, since it leaves the list at zero', async () => {
+    confirm.choose.and.resolveTo('consumed');
+    await service.deleteItem(item(), undefined, false, undefined, consumeAll);
+    const toast = TestBed.inject(ToastService) as jasmine.SpyObj<ToastService>;
+    expect(toast.success).toHaveBeenCalledWith('pantry.toasts.markedConsumed');
+  });
+
+  it('says a basic went onto the shopping list, as the quantity sheet does', async () => {
+    confirm.choose.and.resolveTo('consumed');
+    await service.deleteItem(item({ isBasic: true }), undefined, false, undefined, consumeAll);
+    const toast = TestBed.inject(ToastService) as jasmine.SpyObj<ToastService>;
+    expect(toast.success).toHaveBeenCalledWith('pantry.toasts.addedToList');
+  });
+
   it('still deletes when the user really means delete', async () => {
     confirm.choose.and.resolveTo('delete');
     await service.deleteItem(item(), undefined, false, undefined, consumeAll);
