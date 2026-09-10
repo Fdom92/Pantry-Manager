@@ -5,7 +5,7 @@ import esBundle from '../../../../assets/i18n/es.json';
 import frBundle from '../../../../assets/i18n/fr.json';
 import itBundle from '../../../../assets/i18n/it.json';
 import ptBundle from '../../../../assets/i18n/pt.json';
-import { applyFifoConsumption, collectBatches, computeEarliestExpiry, mergeBatchesByExpiry, normalizeBatches, sumQuantities } from './pantry-batch.domain';
+import { applyFifoConsumption, collectBatches, hasConsumableStock, computeEarliestExpiry, mergeBatchesByExpiry, normalizeBatches, sumQuantities } from './pantry-batch.domain';
 
 function batch(overrides: Partial<ItemBatch> = {}): ItemBatch {
   return { batchId: 'b1', quantity: 1, opened: false, ...overrides } as ItemBatch;
@@ -294,5 +294,37 @@ describe('the two dateless labels', () => {
       }
     }
     expect(missing).toEqual([]);
+  });
+});
+
+describe('hasConsumableStock', () => {
+  const product = (quantities: number[], productType: 'pantry' | 'fresh' = 'pantry') =>
+    ({
+      _id: `item:${quantities.join('-')}`,
+      type: 'product',
+      name: 'X',
+      categoryId: 'c',
+      productType,
+      batches: quantities.map((quantity, i) => ({ batchId: `b${i}`, quantity })),
+    }) as never;
+
+  it('is false for an empty pantry', () => {
+    expect(hasConsumableStock([])).toBeFalse();
+  });
+
+  it('is false when every product is at zero', () => {
+    expect(hasConsumableStock([product([0]), product([0, 0])])).toBeFalse();
+  });
+
+  it('is true as soon as one lot of one product has stock', () => {
+    expect(hasConsumableStock([product([0]), product([0, 2])])).toBeTrue();
+  });
+
+  it('counts fresh products, which the consume modal also lists', () => {
+    expect(hasConsumableStock([product([1], 'fresh')])).toBeTrue();
+  });
+
+  it('is false for a product with no lots at all', () => {
+    expect(hasConsumableStock([product([])])).toBeFalse();
   });
 });

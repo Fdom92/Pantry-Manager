@@ -1,4 +1,4 @@
-import type { BatchIdGenerator, ItemBatch } from '@core/models/pantry';
+import type { PantryItem, BatchIdGenerator, ItemBatch } from '@core/models/pantry';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeOptionalTrim, normalizeTrim } from '@core/utils/normalization.util';
 
@@ -31,6 +31,15 @@ export function sumQuantities(
   }
   const total = batches.reduce((sum, batch) => sum + toNumberOrZero(batch.quantity), 0);
   return options?.round ? options.round(total) : total;
+}
+
+/**
+ * True when at least one product has stock left to consume — fresh ones
+ * included, because the consume modal lists those too. Mirrors the modal's
+ * own filter so the "−" button never promises a list the modal then can't show.
+ */
+export function hasConsumableStock(items: readonly PantryItem[]): boolean {
+  return items.some(item => sumQuantities(item.batches) > 0);
 }
 
 /**
