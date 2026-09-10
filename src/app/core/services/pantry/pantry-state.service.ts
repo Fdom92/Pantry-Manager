@@ -29,7 +29,7 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared';
-import { type FreshState, freshStateToQty, qtyToFreshState } from '@core/domain/pantry';
+import { type FreshState, freshStateToQty, hasConsumableStock, qtyToFreshState } from '@core/domain/pantry';
 
 /**
  * Main orchestrator for pantry page state.
@@ -118,6 +118,13 @@ export class PantryStateService {
     return this.showAllFresh() ? items : items.slice(0, 4);
   });
 
+  /**
+   * Whether the "−" button in the despensa header has anything to offer. With
+   * no stock anywhere the consume modal opened onto "Aún no has añadido nada"
+   * and nothing else — a dead end, most likely to meet brand-new users. Same
+   * source as the modal's own list, so the two can't disagree.
+   */
+  readonly canConsume = computed(() => hasConsumableStock(this.pantryStore.loadedProducts()));
   readonly despensaItems = computed(() =>
     this.pantryItemsState().filter(i => i.productType !== 'fresh')
   );

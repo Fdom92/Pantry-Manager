@@ -2,6 +2,11 @@
   <ion-toolbar>
     <ion-title>{{ 'pantry.title' | translate }}</ion-title>
     <ion-buttons slot="end">
+      <!-- Page-level, not in the despensa header: a receipt restocks fresh
+           products too, and sitting under "Despensa" said otherwise. -->
+      <ion-button [attr.aria-label]="'pantry.receiptScan.entryButton' | translate" (click)="facade.startReceiptScan()">
+        <ion-icon slot="icon-only" name="receipt-outline"></ion-icon>
+      </ion-button>
       <ion-button [routerLink]="['/settings']" [attr.aria-label]="'settings.title' | translate">
         <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
       </ion-button>
@@ -126,24 +131,20 @@
             <ion-icon [name]="facade.groupByCategory() ? 'list-outline' : 'apps-outline'"></ion-icon>
           </button>
           <button
-            class="pantry-section__add-btn pantry-section__receipt-btn"
-            [attr.aria-label]="'pantry.receiptScan.entryButton' | translate"
-            (click)="facade.startReceiptScan()">
-            <ion-icon name="receipt-outline"></ion-icon>
-          </button>
-          <button
             #despensaAddBtn
             class="pantry-section__add-btn"
             [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
             (click)="facade.openAddModal()">
             <ion-icon name="add-outline"></ion-icon>
           </button>
-          <button
-            class="pantry-section__add-btn pantry-section__consume-btn"
-            [attr.aria-label]="'pantry.consume.groupLabel' | translate"
-            (click)="facade.openConsumeModal()">
-            <ion-icon name="remove-outline"></ion-icon>
-          </button>
+          @if (facade.canConsume()) {
+            <button
+              class="pantry-section__add-btn pantry-section__consume-btn"
+              [attr.aria-label]="'pantry.consume.groupLabel' | translate"
+              (click)="facade.openConsumeModal()">
+              <ion-icon name="remove-outline"></ion-icon>
+            </button>
+          }
         </div>
       </header>
 
