@@ -779,7 +779,7 @@
       "addedToList": "🛒 Added to your shopping list",
       "hiddenUntilStock": "It will be hidden until you add stock again.",
       "multipleAdded": "✅ {{count}} items added",
-      "markedConsumed": "✓ Consumption recorded. The product stays in your pantry."
+      "markedConsumed": "✓ Consumption recorded. It will be hidden until you add stock again."
     },
     "confirmDelete": "Delete \"{{ name }}\"?",
     "fab": {

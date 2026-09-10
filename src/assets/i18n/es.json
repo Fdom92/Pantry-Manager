@@ -779,7 +779,7 @@
       "addedToList": "🛒 Añadido a tu lista de compra",
       "hiddenUntilStock": "Se ocultará hasta que vuelvas a añadir stock.",
       "multipleAdded": "✅ {{count}} productos añadidos",
-      "markedConsumed": "✓ Consumo registrado. El producto sigue en tu despensa."
+      "markedConsumed": "✓ Consumo registrado. Se ocultará hasta que vuelvas a añadir stock."
     },
     "confirmDelete": "¿Eliminar \"{{ name }}\"?",
     "fab": {

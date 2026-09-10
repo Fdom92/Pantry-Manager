@@ -126,7 +126,15 @@ export class PantryListUiStateService {
         if (choice === 'consumed') {
           cancelPendingStockSave?.(item._id);
           await consumeAll(item);
-          this.toast.success('pantry.toasts.markedConsumed');
+          // At zero stock the product drops out of the pantry list, exactly as
+          // after "Agotar" in the quantity sheet — so the toast says where it
+          // went, mirroring that sheet: onto the shopping list if it is a basic,
+          // hidden until restocked otherwise.
+          if (item.isBasic) {
+            this.toast.success('pantry.toasts.addedToList');
+          } else {
+            this.toast.success('pantry.toasts.markedConsumed');
+          }
           return;
         }
         // 'delete' falls through to the normal removal path below.

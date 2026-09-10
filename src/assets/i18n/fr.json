@@ -779,7 +779,7 @@
       "addedToList": "🛒 Ajouté à ta liste de courses",
       "hiddenUntilStock": "Il sera masqué jusqu'à ce que tu rajouttes du stock.",
       "multipleAdded": "✅ {{count}} produits ajoutés",
-      "markedConsumed": "✓ Consommation enregistrée. Le produit reste dans ton garde-manger."
+      "markedConsumed": "✓ Consommation enregistrée. Le produit sera masqué jusqu'à ce que tu en rajoutes."
     },
     "confirmDelete": "Supprimer \"{{ name }}\" ?",
     "fab": {
