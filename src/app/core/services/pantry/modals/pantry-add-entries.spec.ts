@@ -307,3 +307,87 @@ describe('add sheet entry engine — frescos', () => {
     expect(service.entries()).toEqual([]);
   });
 });
+
+/**
+ * The submit / abandon pair added in 5.4. pantry_item_added fires once per
+ * product, so "opened vs added" was never a funnel; these events are. The
+ * subtle part is dismiss(): the modal calls it on willDismiss, including right
+ * after a successful save, and it must not report that as abandonment.
+ */
+describe('add sheet — submit / abandon funnel', () => {
+  let analytics: jasmine.SpyObj<AnalyticsService>;
+
+  function eventsNamed(name: string): unknown[][] {
+    return analytics.track.calls.allArgs().filter(([event]) => event === name);
+  }
+
+  describe('despensa', () => {
+    let service: PantryAddModalStateService;
+
+    beforeEach(() => {
+      configure([makeItem({ _id: 'item:leche', name: 'Leche' })]);
+      service = TestBed.inject(PantryAddModalStateService);
+      analytics = TestBed.inject(AnalyticsService) as jasmine.SpyObj<AnalyticsService>;
+    });
+
+    it('reports an untouched sheet closed as abandoned with 0 entries', () => {
+      service.open();
+      service.dismiss();
+      const abandoned = eventsNamed('pantry_add_modal_abandoned');
+      expect(abandoned.length).toBe(1);
+      expect(abandoned[0][1]).toEqual(jasmine.objectContaining({ kind: 'despensa', entries: 0 }));
+    });
+
+    it('reports how many entries were left behind', () => {
+      service.open();
+      service.addEntryFromQuery('yogur natural');
+      service.dismiss();
+      expect(eventsNamed('pantry_add_modal_abandoned')[0][1])
+        .toEqual(jasmine.objectContaining({ entries: 1 }));
+    });
+
+    it('reports a save once, and the dismiss that follows it as nothing', async () => {
+      service.open();
+      service.addEntryFromQuery('yogur natural');
+      await service.submit();
+      service.dismiss(); // the modal's own willDismiss after the save
+      expect(eventsNamed('pantry_add_submitted').length).toBe(1);
+      expect(eventsNamed('pantry_add_submitted')[0][1])
+        .toEqual(jasmine.objectContaining({ kind: 'despensa', entries: 1, new_items: 1 }));
+      expect(eventsNamed('pantry_add_modal_abandoned').length).toBe(0);
+    });
+
+    it('does not double-count when dismiss runs twice', () => {
+      service.open();
+      service.dismiss();
+      service.dismiss();
+      expect(eventsNamed('pantry_add_modal_abandoned').length).toBe(1);
+    });
+
+    it('re-arms on the next open after a save', async () => {
+      service.open();
+      service.addEntryFromQuery('yogur natural');
+      await service.submit();
+      service.open();
+      service.dismiss();
+      expect(eventsNamed('pantry_add_modal_abandoned').length).toBe(1);
+    });
+  });
+
+  describe('frescos', () => {
+    let service: PantryFreshAddModalStateService;
+
+    beforeEach(() => {
+      configure([makeItem({ _id: 'item:lechuga', name: 'Lechuga', productType: 'fresh' })]);
+      service = TestBed.inject(PantryFreshAddModalStateService);
+      analytics = TestBed.inject(AnalyticsService) as jasmine.SpyObj<AnalyticsService>;
+    });
+
+    it('labels its events as fresh', () => {
+      service.open();
+      service.dismiss();
+      expect(eventsNamed('pantry_add_modal_abandoned')[0][1])
+        .toEqual(jasmine.objectContaining({ kind: 'fresh' }));
+    });
+  });
+});

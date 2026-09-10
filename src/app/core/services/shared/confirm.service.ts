@@ -31,4 +31,46 @@ export class ConfirmService {
     const { role } = await alert.onDidDismiss();
     return role === 'confirm';
   }
+
+  /**
+   * Confirmation with more than one way to say yes.
+   *
+   * Some destructive actions are destructive only because the app offered no
+   * better verb. Deleting a product that still has stock is the case that
+   * prompted this: the user means "I finished it", the app hears "erase it",
+   * and the consumption history goes with it.
+   *
+   * Returns the chosen role, or `'cancel'` for the cancel button, a backdrop
+   * tap or a hardware back press.
+   */
+  async choose<T extends string>(
+    message: string,
+    opts: { header?: string; choices: readonly ChoiceOption<T>[] },
+  ): Promise<T | 'cancel'> {
+    const alert = await this.alertCtrl.create({
+      header: opts.header,
+      message,
+      buttons: [
+        ...opts.choices.map(choice => ({
+          text: this.translate.instant(choice.labelKey),
+          role: choice.role,
+          cssClass: choice.danger ? 'alert-button-danger' : undefined,
+        })),
+        { text: this.translate.instant('common.actions.cancel'), role: 'cancel' },
+      ],
+    });
+    await alert.present();
+    const { role } = await alert.onDidDismiss();
+    // Ionic reports 'backdrop' for a backdrop tap; anything that is not one of
+    // our own roles means the user backed out.
+    const chosen = opts.choices.find(choice => choice.role === role);
+    return chosen ? chosen.role : 'cancel';
+  }
+}
+
+export interface ChoiceOption<T extends string> {
+  /** Value returned when this button is picked. Must not be `'cancel'`. */
+  role: T;
+  labelKey: string;
+  danger?: boolean;
 }

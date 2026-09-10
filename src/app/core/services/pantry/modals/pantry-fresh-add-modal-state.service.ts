@@ -36,6 +36,8 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
    * Restocking a fresh product means a new lettuce, not the old one, so it gets
    * a fresh suggested date rather than inheriting the batch's.
    */
+  protected readonly analyticsKind = 'fresh' as const;
+
   open(): void {
     this.openSheet();
     this.analytics.track(ANALYTICS_EVENTS.PANTRY_FRESH_ADD_MODAL_OPENED);
@@ -122,6 +124,7 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
           has_expiry: Boolean(entry.expirationDate),
         });
       }
+      this.recordSubmitted(entries);
       this.dismiss();
       if (entries.length === 1) {
         this.toast.success('pantry.fresh.toast.addSuccess_one', { name: entries[0].name });

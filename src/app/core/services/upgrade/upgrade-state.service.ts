@@ -50,6 +50,9 @@ export class UpgradeStateService {
 
   async restorePurchases(): Promise<void> {
     const restored = await this.revenuecat.restore();
+    this.analytics.track(ANALYTICS_EVENTS.UPGRADE_RESTORE_TAPPED, {
+      restored: Boolean(restored || this.revenuecat.isPro()),
+    });
     if (restored || this.revenuecat.isPro()) {
       await this.goDashboard();
       return;
@@ -82,8 +85,15 @@ export class UpgradeStateService {
       package_type: pkg.packageType,
     });
     try {
-      const success = await this.revenuecat.purchasePackage(pkg);
-      const finalised = success || (await this.revenuecat.restore());
+      const outcome = await this.revenuecat.purchasePackageWithOutcome(pkg);
+      const finalised = outcome === 'completed' || (await this.revenuecat.restore());
+      if (!finalised) {
+        this.analytics.track(ANALYTICS_EVENTS.UPGRADE_PURCHASE_FAILED, {
+          plan_id: pkg.identifier,
+          package_type: pkg.packageType,
+          reason: outcome,
+        });
+      }
       if (finalised) {
         this.reviewPrompt.markEngagement();
         this.analytics.track(ANALYTICS_EVENTS.UPGRADE_PURCHASE_COMPLETED, {

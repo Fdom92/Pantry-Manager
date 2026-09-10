@@ -117,9 +117,19 @@ export class PantryStoreService {
     // Capture kind BEFORE deletion so analytics keeps full context.
     const target = this.items().find(i => i._id === id);
     const kind = target?.productType === 'fresh' ? 'fresh' : 'despensa';
+    // Deleting a product that still has stock is how someone says "I finished
+    // this" without the app ever recording a CONSUME. The 30-day export showed
+    // 23 deletions against 19 quantity adjustments, so this is worth knowing:
+    // every such deletion is consumption history thrown away, which is the
+    // likeliest reason the waste tracker and insights run short of data.
+    const quantity = target ? target.batches.reduce((sum, batch) => sum + batch.quantity, 0) : 0;
     try {
       await this.pantryQuery.deleteItem(id);
-      this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_DELETED, { kind });
+      this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_DELETED, {
+        kind,
+        had_stock: quantity > 0,
+        quantity,
+      });
     } catch (err: unknown) {
       this.logger.error('PantryStoreService', 'deleteItem error', err);
       this.error.set('Failed to delete item');
