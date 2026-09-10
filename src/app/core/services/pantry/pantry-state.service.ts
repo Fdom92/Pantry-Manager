@@ -9,6 +9,8 @@ import {
 } from '@core/models/pantry';
 import { computeSupermarketSuggestions } from '@core/utils/pantry-selectors.util';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { SettingsPreferencesService } from '../settings/settings-preferences.service';
 import { PantryBatchOperationsService } from './pantry-batch-operations.service';
 import { PantryBatchesModalStateService } from './modals/pantry-batches-modal-state.service';
@@ -27,7 +29,7 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared';
-import { type FreshState, freshStateToQty } from '@core/domain/pantry';
+import { type FreshState, freshStateToQty, qtyToFreshState } from '@core/domain/pantry';
 
 /**
  * Main orchestrator for pantry page state.
@@ -54,6 +56,7 @@ export class PantryStateService {
   private readonly freshAddModal = inject(PantryFreshAddModalStateService);
   private readonly historyManager = inject(HistoryEventManagerService);
   private readonly localStorage = inject(LocalStorageService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly toast = inject(ToastService);
 
   // Core state signals
@@ -120,7 +123,14 @@ export class PantryStateService {
   );
   readonly groups = computed(() => this.viewModel.buildGroups(this.despensaItems()));
   readonly groupByCategory = signal(false);
-  toggleGroupByCategory(): void { this.groupByCategory.update(v => !v); }
+  /** Debounce state for PANTRY_SEARCH_USED — see onSearchTermChange. */
+  private wasSearching = false;
+  toggleGroupByCategory(): void {
+    this.groupByCategory.update(v => !v);
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_GROUPING_TOGGLED, {
+      grouped: this.groupByCategory(),
+    });
+  }
   readonly flatDespensaItems = computed(() =>
     [...this.despensaItems()].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
   );
@@ -223,10 +233,26 @@ export class PantryStateService {
 
   // -------- Filters --------
   onSearchTermChange(ev: CustomEvent): void {
-    this.pantryQuery.setSearchQuery(ev.detail?.value ?? '');
+    const query = String(ev.detail?.value ?? '');
+    // One event per search, not per keystroke: only the empty → non-empty
+    // transition counts, so a 12-letter product name is one event and not
+    // twelve. Deleting back to empty re-arms it for the next search.
+    const isSearching = query.trim().length > 0;
+    if (isSearching !== this.wasSearching) {
+      this.wasSearching = isSearching;
+      if (isSearching) {
+        this.analytics.track(ANALYTICS_EVENTS.PANTRY_SEARCH_USED, {
+          items: this.pantryItemsState().length,
+        });
+      }
+    }
+    this.pantryQuery.setSearchQuery(query);
   }
 
   onFilterChipSelected(chip: FilterChipViewModel): void {
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_FILTER_APPLIED, {
+      filter: chip.value ?? 'all',
+    });
     if (chip.value) {
       this.applyStatusFilterPreset(chip.value);
       return;
@@ -275,7 +301,30 @@ export class PantryStateService {
 
   deleteItem(item: PantryItem, event?: Event, skipConfirm = false): Promise<void> {
      this.quantitySheet.dismiss();
-     return this.listUi.deleteItem(item, event, skipConfirm, itemId => this.batchOps.cancelPendingStockSave(itemId));
+     return this.listUi.deleteItem(
+       item,
+       event,
+       skipConfirm,
+       itemId => this.batchOps.cancelPendingStockSave(itemId),
+       // "I finished it" instead of "erase it": drain the stock through the
+       // normal FIFO path so it lands in the history as a CONSUME, and leave
+       // the product in the pantry where the shopping list can still see it.
+       target => this.consumeRemainingStock(target),
+     );
+  }
+
+  private async consumeRemainingStock(item: PantryItem): Promise<void> {
+    const remaining = this.batchOps.getTotalQuantity(item);
+    if (remaining <= 0) {
+      return;
+    }
+    await this.batchOps.adjustTotalQuantityWithFIFO(
+      item,
+      -remaining,
+      this.pantryItemsState,
+      item.expirationDate ?? undefined,
+      'pantry_card',
+    );
   }
 
   private applyStatusFilterPreset(preset: PantryStatusFilterValue): void {
@@ -457,6 +506,13 @@ export class PantryStateService {
     // the most frequent daily mutations and must feed the mutation pipeline
     // like every other CRUD action.
     await this.historyManager.logAdvancedEdit(item, updated, 'pantry_card');
+    // Same gesture, now visible to analytics too: the fridge's equivalent of
+    // the quantity sheet, and until 5.4 absent from every consume number.
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_FRESH_STATE_CHANGED, {
+      from: qtyToFreshState(this.batchOps.getTotalQuantity(item)),
+      to: state,
+      is_basic: Boolean(item.isBasic),
+    });
 
     let msgKey: string;
     if (state === 'none' && item.isBasic) {

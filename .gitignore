@@ -77,3 +77,6 @@ Thumbs.db
 
 # Local secrets — must NEVER be committed (public repo).
 src/environments/environment.secrets.ts
+
+# superpowers brainstorm scratch
+.superpowers/

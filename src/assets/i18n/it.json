@@ -446,7 +446,8 @@
       "bought": "✓ {{name}} acquistato. Dispensa aggiornata.",
       "boughtManual": "✓ {{name}} acquistato.",
       "ignored": "{{name}} nascosto ora — riapparirà la prossima volta.",
-      "removedManual": "{{name}} rimosso dalla lista."
+      "removedManual": "{{name}} rimosso dalla lista.",
+      "shareFailed": "Impossibile condividere la lista. Riprova."
     },
     "buySheet": {
       "title": "Quanti ne hai comprati?",
@@ -777,7 +778,8 @@
       "isBasicOffDepleted": "Rimosso dalla tua lista della spesa",
       "addedToList": "🛒 Aggiunto alla lista della spesa",
       "hiddenUntilStock": "Sarà nascosto finché non aggiungerai nuovamente dello stock.",
-      "multipleAdded": "✅ {{count}} prodotti aggiunti"
+      "multipleAdded": "✅ {{count}} prodotti aggiunti",
+      "markedConsumed": "✓ Consumo registrato. Il prodotto resta nella tua dispensa."
     },
     "confirmDelete": "Eliminare \"{{ name }}\"?",
     "fab": {
@@ -908,7 +910,14 @@
       "promptHeader": "Scansiona scontrino",
       "promptGallery": "Scegli dalla galleria",
       "promptCamera": "Scatta foto",
-      "matchFresh": "Verrà segnato come disponibile"
+      "matchFresh": "Verrà segnato come disponibile",
+      "pickerError": "Impossibile aprire la fotocamera o la galleria. Riprova."
+    },
+    "deleteWithStock": {
+      "header": "Finito?",
+      "message": "Ti restano ancora {{count}} di {{name}}. Se l'hai finito lo scaliamo e registriamo il consumo; eliminandolo perdi la sua cronologia.",
+      "consumed": "L'ho finito",
+      "delete": "Elimina prodotto"
     }
   },
   "upgrade": {

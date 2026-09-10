@@ -4,6 +4,8 @@ import type { PantryGroup, PantryItem } from '@core/models/pantry';
 import { sleep } from '@core/utils';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmService, ToastService } from '../shared';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { LoggerService } from '../shared/logger.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { PantryStoreService } from './pantry-store.service';
@@ -16,6 +18,7 @@ export class PantryListUiStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly translate = inject(TranslateService);
   private readonly toast = inject(ToastService);
+  private readonly analytics = inject(AnalyticsService);
   private readonly confirm = inject(ConfirmService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly logger = inject(LoggerService);
@@ -81,19 +84,58 @@ export class PantryListUiStateService {
     item: PantryItem,
     event?: Event,
     skipConfirm = false,
-    cancelPendingStockSave?: (itemId: string) => void
+    cancelPendingStockSave?: (itemId: string) => void,
+    consumeAll?: (item: PantryItem) => Promise<void>
   ): Promise<void> {
     event?.stopPropagation();
     if (!item?._id) {
       return;
     }
 
+    const remaining = (item.batches ?? []).reduce((sum, batch) => sum + (batch.quantity ?? 0), 0);
     const shouldConfirm = !skipConfirm && typeof window !== 'undefined';
+
     if (shouldConfirm) {
-      const msg = this.translate.instant('pantry.confirmDelete', { name: item.name ?? '' });
-      const confirmed = await this.confirm.confirm(msg, { confirmKey: 'common.actions.delete' });
-      if (!confirmed) {
-        return;
+      // A product with stock left is almost never a mistake to erase — it is
+      // someone saying "I finished this" with the only button the app gave
+      // them. 23 deletions against 19 quantity adjustments over 30 days, and
+      // every one of those deletions threw away the consumption history the
+      // waste tracker and the insights are starved of. So ask which they mean.
+      if (remaining > 0 && consumeAll) {
+        const choice = await this.confirm.choose(
+          this.translate.instant('pantry.deleteWithStock.message', {
+            name: item.name ?? '',
+            count: remaining,
+          }),
+          {
+            header: this.translate.instant('pantry.deleteWithStock.header'),
+            choices: [
+              { role: 'consumed', labelKey: 'pantry.deleteWithStock.consumed' },
+              { role: 'delete', labelKey: 'pantry.deleteWithStock.delete', danger: true },
+            ] as const,
+          },
+        );
+        this.analytics.track(ANALYTICS_EVENTS.PANTRY_DELETE_INTENT_RESOLVED, {
+          choice,
+          quantity: remaining,
+          kind: item.productType === 'fresh' ? 'fresh' : 'despensa',
+        });
+        if (choice === 'cancel') {
+          return;
+        }
+        if (choice === 'consumed') {
+          cancelPendingStockSave?.(item._id);
+          await consumeAll(item);
+          this.toast.success('pantry.toasts.markedConsumed');
+          return;
+        }
+        // 'delete' falls through to the normal removal path below.
+      } else {
+        const msg = this.translate.instant('pantry.confirmDelete', { name: item.name ?? '' });
+        const confirmed = await this.confirm.confirm(msg, { confirmKey: 'common.actions.delete' });
+        if (!confirmed) {
+          return;
+        }
       }
     }
 

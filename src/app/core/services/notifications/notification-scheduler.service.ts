@@ -44,6 +44,17 @@ export class NotificationSchedulerService {
         const extra = (action.notification.extra as Record<string, unknown> | undefined) ?? undefined;
         void this.handleNotificationTap(action.notification.id, extra);
       });
+
+      // Delivery, as distinct from engagement. The 30-day export had 124
+      // notification_scheduled and not one notification_tapped, and a schedule
+      // is only a promise: the OS may drop it, batch it, or never fire it at
+      // all. Without this, "they never arrive" and "they arrive and nobody
+      // cares" are the same number, and the fixes are opposites.
+      void LocalNotifications.addListener('localNotificationReceived', notification => {
+        this.analytics.track(ANALYTICS_EVENTS.NOTIFICATION_RECEIVED, {
+          notification_id: notification.id,
+        });
+      });
     }
   }
 

@@ -13,6 +13,8 @@ import { LoggerService } from '../shared/logger.service';
  * and not a failure worth a crash report. The plugin exposes the flag either on
  * the error or inside `userInfo`; `PURCHASE_CANCELLED_ERROR` is code "1".
  */
+export type PurchaseOutcome = 'completed' | 'cancelled' | 'failed' | 'unavailable';
+
 function isUserCancellation(err: unknown): boolean {
   if (typeof err !== 'object' || err === null) return false;
   const candidate = err as {
@@ -152,8 +154,19 @@ export class UpgradeRevenuecatService {
   }
 
   async purchasePackage(aPackage: PurchasesPackage): Promise<boolean> {
+    return (await this.purchasePackageWithOutcome(aPackage)) === 'completed';
+  }
+
+  /**
+   * Same purchase, but saying how it ended. A plain boolean folds "the user
+   * backed out of the store sheet" and "the store failed" into one `false`,
+   * and those mean different things for the paywall. Kept separate from
+   * purchasePackage() so existing callers are untouched; analytics lives in
+   * the caller because AnalyticsService already injects this service.
+   */
+  async purchasePackageWithOutcome(aPackage: PurchasesPackage): Promise<PurchaseOutcome> {
     if (this.isUnavailable) {
-      return false;
+      return 'unavailable';
     }
     try {
       const result = await Purchases.purchasePackage({ aPackage });
@@ -161,14 +174,14 @@ export class UpgradeRevenuecatService {
       if (isPro !== null) {
         this.updateProState(isPro);
       }
-      return Boolean(isPro ?? this.isPro());
+      return (isPro ?? this.isPro()) ? 'completed' : 'failed';
     } catch (err) {
       if (isUserCancellation(err)) {
         this.logger.warn('UpgradeRevenuecatService', 'purchase cancelled by the user', { err: String(err) });
-      } else {
-        this.logger.error('UpgradeRevenuecatService', 'purchasePackage error', err);
+        return 'cancelled';
       }
-      return false;
+      this.logger.error('UpgradeRevenuecatService', 'purchasePackage error', err);
+      return 'failed';
     }
   }
 

@@ -30,6 +30,13 @@ export class PantryQuantitySheetStateService {
    */
   open(item: PantryItem, event?: Event): void {
     event?.stopPropagation();
+    // The denominator for pantry_quantity_adjusted, which until 5.4 only fired
+    // when something actually changed — a sheet opened and closed untouched
+    // left no trace at all, on the one path people really consume through.
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_QUANTITY_SHEET_OPENED, {
+      kind: item.productType === 'fresh' ? 'fresh' : 'despensa',
+      quantity: this.getTotalQuantity(item),
+    });
     this.selectedItem.set(item);
     this.pendingQuantityChange.set(0);
     this.pendingExpiryDate.set(undefined);

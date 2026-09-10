@@ -9,6 +9,8 @@ import type {
   PantryItem,
 } from '@core/models';
 import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-today.model';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../analytics/analytics.service';
 import { LanguageService } from '../shared/language.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { PantryNavigationPresetService } from '../pantry/pantry-navigation-preset.service';
@@ -52,6 +54,7 @@ export class DashboardStateService {
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly historyManager = inject(HistoryEventManagerService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly analytics = inject(AnalyticsService);
 
   private readonly hasCompletedInitialLoad = signal(false);
   private readonly dismissedActionIds = signal(new Set<string>());
@@ -326,12 +329,20 @@ export class DashboardStateService {
 
   dismissAction(action: DashboardAction): void {
     this.dismissedActionIds.update(ids => new Set([...ids, action.id]));
+    // Action ids are fixed card identifiers ('expired-action', …), not data.
+    this.analytics.track(ANALYTICS_EVENTS.DASHBOARD_SUGGESTION_DISMISSED, {
+      surface: 'action',
+      action: action.id,
+    });
   }
 
   dismissToday(): void {
     const suggestion = this.todaySuggestion();
     if (!suggestion) return;
     this.dismissedTodayIds.update(ids => new Set([...ids, suggestion.protagonist.id]));
+    this.analytics.track(ANALYTICS_EVENTS.DASHBOARD_SUGGESTION_DISMISSED, {
+      surface: 'today',
+    });
   }
 
   async goToShoppingList(): Promise<void> {
@@ -362,6 +373,14 @@ export class DashboardStateService {
         await this.historyManager.logStockAdjust(item, updated, {
           deltaQuantity: -1,
           source: 'dashboard',
+        });
+        // Consumption from the tab everyone lands on. It reached the history
+        // log but never PostHog, so the consume numbers were missing what is
+        // probably the single most frequent consume gesture in the app.
+        this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_CONSUMED, {
+          kind: item.productType === 'fresh' ? 'fresh' : 'despensa',
+          source: 'dashboard',
+          quantity: 1,
         });
       }
       this.lastProtagonistId.set(suggestion.protagonist.id);

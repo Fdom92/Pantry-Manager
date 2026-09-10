@@ -6,6 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import posthog, { type PostHog } from 'posthog-js';
 import { environment } from 'src/environments/environment';
 import { ANALYTICS_EVENTS } from '@core/constants';
+import type { PersonProfile } from '@core/domain/analytics';
 import { LocalStorageService } from '../shared/local-storage.service';
 import type {
   AnalyticsEventProps,
@@ -143,6 +144,25 @@ export class AnalyticsService {
   }
 
   /**
+   * Attach durable, non-identifying traits to the PostHog person so cohorts
+   * become possible: "one-session users whose pantry was empty" is a question
+   * events alone can never answer.
+   *
+   * Safe to call repeatedly — PostHog overwrites by key, and callers re-send
+   * the whole snapshot rather than diffing.
+   */
+  setPersonProfile(profile: PersonProfile): void {
+    if (!this.posthog || !this.readySignal()) {
+      return;
+    }
+    try {
+      this.posthog.setPersonProperties({ ...profile });
+    } catch (err) {
+      this.logger.warn('AnalyticsService', 'setPersonProfile failed', { err });
+    }
+  }
+
+  /**
    * Track a product event. No-op if not opted in or not initialised.
    */
   track(event: string, props?: AnalyticsEventProps): void {
@@ -197,6 +217,15 @@ export class AnalyticsService {
     try {
       this.posthog = posthog.init(cfg.posthogKey, {
         api_host: cfg.posthogHost,
+        // Person profiles are opt-in in posthog-js: the default
+        // 'identified_only' plus the fact that this app never calls identify()
+        // meant no profile was ever created, so every event arrived
+        // propertyless and PostHog could not build a single cohort. 67 event
+        // types and no way to ask *who* did them. The distinct id already
+        // rides on every event; this only lets PostHog aggregate by it.
+        // What we attach is governed by buildPersonProfile() — counts,
+        // buckets and booleans, never names or free text.
+        person_profiles: 'always',
         // Privacy + lean-by-default:
         autocapture: false,
         capture_pageview: false,
