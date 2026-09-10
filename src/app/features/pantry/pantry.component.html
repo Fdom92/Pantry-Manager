@@ -15,46 +15,48 @@
 </ion-header>
 
 <ion-content #content class="ion-padding">
-  <div class="pantry-search">
-    <ion-searchbar
-      [placeholder]="'pantry.filters.search' | translate"
-      [value]="facade.searchTerm()"
-      debounce="300"
-      (ionInput)="facade.onSearchTermChange($event)">
-    </ion-searchbar>
-  </div>
+  @if (!facade.pantryIsEmpty()) {
+    <div class="pantry-search">
+      <ion-searchbar
+        [placeholder]="'pantry.filters.search' | translate"
+        [value]="facade.searchTerm()"
+        debounce="300"
+        (ionInput)="facade.onSearchTermChange($event)">
+      </ion-searchbar>
+    </div>
 
-  <div class="summary-bar" [attr.aria-label]="'pantry.filters.quick' | translate">
-    <div class="summary-chips" role="tablist">
-      @for (chip of facade.filterChips(); track chip.key) {
-        <ion-chip
-          class="status-chip"
-          [class.active]="chip.active"
-          [ngClass]="chip.colorClass"
-          button="true"
-          (click)="facade.onFilterChipSelected(chip)"
-          [attr.aria-pressed]="chip.active"
-          [attr.aria-label]="(chip.description | translate) + ' (' + chip.count + ')'"
-          size="small">
-          <ion-icon [name]="chip.icon"></ion-icon>
-          <div class="chip-body">
-            <span class="chip-label">{{ chip.label | translate }}</span>
-            <span class="chip-count">{{ chip.count }}</span>
-          </div>
-        </ion-chip>
+    <div class="summary-bar" [attr.aria-label]="'pantry.filters.quick' | translate">
+      <div class="summary-chips" role="tablist">
+        @for (chip of facade.filterChips(); track chip.key) {
+          <ion-chip
+            class="status-chip"
+            [class.active]="chip.active"
+            [ngClass]="chip.colorClass"
+            button="true"
+            (click)="facade.onFilterChipSelected(chip)"
+            [attr.aria-pressed]="chip.active"
+            [attr.aria-label]="(chip.description | translate) + ' (' + chip.count + ')'"
+            size="small">
+            <ion-icon [name]="chip.icon"></ion-icon>
+            <div class="chip-body">
+              <span class="chip-label">{{ chip.label | translate }}</span>
+              <span class="chip-count">{{ chip.count }}</span>
+            </div>
+          </ion-chip>
+        }
+      </div>
+      @if (facade.activeFilters().pendientes) {
+        <ion-button
+          class="pendientes-complete-cta"
+          fill="clear"
+          size="small"
+          (click)="facade.openPendientesSheet()">
+          <ion-icon slot="start" name="create-outline"></ion-icon>
+          {{ 'pantry.pendientesSheet.title' | translate }}
+        </ion-button>
       }
     </div>
-    @if (facade.activeFilters().pendientes) {
-      <ion-button
-        class="pendientes-complete-cta"
-        fill="clear"
-        size="small"
-        (click)="facade.openPendientesSheet()">
-        <ion-icon slot="start" name="create-outline"></ion-icon>
-        {{ 'pantry.pendientesSheet.title' | translate }}
-      </ion-button>
-    }
-  </div>
+  }
 
   @if (facade.showSkeleton()) {
     <div class="skeleton-list">
@@ -123,13 +125,15 @@
       <header class="pantry-section__header pantry-section__header--despensa">
         <h3 class="pantry-section__title">{{ 'pantry.sections.pantry' | translate }}</h3>
         <div class="pantry-section__actions">
-          <button
-            class="pantry-section__add-btn pantry-section__group-toggle"
-            [class.pantry-section__group-toggle--active]="facade.groupByCategory()"
-            [attr.aria-label]="(facade.groupByCategory() ? 'pantry.sections.groupToggle.grouped' : 'pantry.sections.groupToggle.flat') | translate"
-            (click)="facade.toggleGroupByCategory()">
-            <ion-icon [name]="facade.groupByCategory() ? 'list-outline' : 'apps-outline'"></ion-icon>
-          </button>
+          @if (!facade.pantryIsEmpty()) {
+            <button
+              class="pantry-section__add-btn pantry-section__group-toggle"
+              [class.pantry-section__group-toggle--active]="facade.groupByCategory()"
+              [attr.aria-label]="(facade.groupByCategory() ? 'pantry.sections.groupToggle.grouped' : 'pantry.sections.groupToggle.flat') | translate"
+              (click)="facade.toggleGroupByCategory()">
+              <ion-icon [name]="facade.groupByCategory() ? 'list-outline' : 'apps-outline'"></ion-icon>
+            </button>
+          }
           <button
             #despensaAddBtn
             class="pantry-section__add-btn"
