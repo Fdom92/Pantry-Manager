@@ -1,4 +1,5 @@
 import { NEAR_EXPIRY_WINDOW_DAYS, RECENTLY_ADDED_WINDOW_DAYS } from '@core/constants';
+import type { PantryStatusFilterValue, PantrySummaryMeta } from '@core/models/pantry';
 import { normalizeSearchField } from '@core/utils/normalization.util';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 import { getItemStatusState } from './pantry-status.domain';
@@ -81,4 +82,35 @@ export function sortPantryItems(items: PantryItem[]): PantryItem[] {
     return labelA.localeCompare(labelB);
   });
   return sorted;
+}
+
+/**
+ * How many products a status filter would show. The single mapping between a
+ * filter value and its summary count, so the chip row and the "fall back to
+ * All" rule can never read different numbers.
+ */
+export function statusFilterCount(
+  summary: Pick<PantrySummaryMeta, 'total' | 'statusCounts'>,
+  value: PantryStatusFilterValue,
+): number {
+  const counts = summary.statusCounts;
+  switch (value) {
+    case 'all': return summary.total;
+    case 'normal': return counts.normal;
+    case 'low-stock': return counts.lowStock;
+    case 'near-expiry': return counts.expiring;
+    case 'review': return counts.review;
+    case 'expired': return counts.expired;
+    case 'pendientes': return counts.pendientes;
+  }
+}
+
+/**
+ * A chip earns its place only when tapping it would show something. "All" is
+ * the exception — it is the way back. A row of "Caducados 0 · Revisar 0" is
+ * noise, and a chip that appears only when there is something expired doubles
+ * as the alert. Pendientes already worked this way; now every chip does.
+ */
+export function isStatusChipVisible(value: PantryStatusFilterValue, count: number): boolean {
+  return value === 'all' || count > 0;
 }

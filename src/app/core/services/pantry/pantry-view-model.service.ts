@@ -1,3 +1,4 @@
+import { isStatusChipVisible } from '@core/domain/pantry';
 import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { classifyExpiry, getItemStatusState, isIncomplete, normalizeBatches } from '@core/domain/pantry';
@@ -144,10 +145,7 @@ export class PantryViewModelService {
         colorClass: 'chip--expired',
         active: activeStatus === 'expired',
       },
-    ];
-
-    if (counts.pendientes > 0) {
-      statusChips.push({
+      {
         key: 'status-pendientes',
         kind: 'status',
         value: 'pendientes',
@@ -157,10 +155,12 @@ export class PantryViewModelService {
         description: 'pantry.filters.desc.pendientes',
         colorClass: 'chip--pendientes',
         active: activeStatus === 'pendientes',
-      });
-    }
+      },
+    ];
 
-    return statusChips;
+
+    // An unset value means "all", as in onFilterChipSelected.
+    return statusChips.filter(chip => isStatusChipVisible(chip.value ?? 'all', chip.count));
   }
 
   buildGroups(items: PantryItem[]): PantryGroup[] {
