@@ -6,22 +6,17 @@ import { formatFriendlyName } from '@core/utils/normalization.util';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 
-const MANUAL_ITEM_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-
 @Injectable({ providedIn: 'root' })
 export class ListManualItemsStore {
   private readonly analytics = inject(AnalyticsService);
   private readonly storage = inject(LocalStorageService);
 
-  readonly manualItems = signal<ManualItem[]>(
-    (() => {
-      const all = this.storage.manualList.getItems<ManualItem>();
-      const now = Date.now();
-      const fresh = all.filter(item => !item.createdAt || now - item.createdAt < MANUAL_ITEM_TTL_MS);
-      if (fresh.length !== all.length) this.storage.manualList.setItems(fresh);
-      return fresh;
-    })()
-  );
+  // No expiry. Until 5.4 anything older than 7 days was pruned here on every
+  // launch, without a word: write "bombillas", shop eight days later, and it
+  // was simply gone. A shopping list is the user's own note — it stays until
+  // they buy it or remove it themselves. createdAt is still written; it just
+  // no longer decides anything.
+  readonly manualItems = signal<ManualItem[]>(this.storage.manualList.getItems<ManualItem>());
   readonly boughtManuals = signal<BoughtItem[]>([]);
 
   addManualItem(name: string, source: 'user' | 'preset' = 'user'): void {
