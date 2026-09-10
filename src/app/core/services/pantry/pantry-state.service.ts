@@ -29,7 +29,7 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared';
-import { type FreshState, freshStateToQty, hasConsumableStock, qtyToFreshState } from '@core/domain/pantry';
+import { type FreshState, freshStateToQty, hasConsumableStock, qtyToFreshState, statusFilterCount } from '@core/domain/pantry';
 
 /**
  * Main orchestrator for pantry page state.
@@ -213,12 +213,17 @@ export class PantryStateService {
     // Sync collapsed groups with current page
     effect(() => this.listUi.syncCollapsedGroups(this.groups()));
 
-    // If the pendientes filter is active but the last pendiente item just got
-    // fixed, its chip disappears (count-gated in buildFilterChips) — falling
-    // back to 'all' avoids leaving the user on a filter with no visible chip
-    // and an empty list.
+    // A chip disappears once its count reaches zero (isStatusChipVisible), so a
+    // filter left with nothing to show would strand the user on an empty list
+    // with no visible chip to undo it — fall back to 'all'. Pendientes used to
+    // be the only chip that could vanish; now any can. Only after the store has
+    // read everything: on a cold start from an "expired" notification the
+    // preset lands before the first page, every count is still 0, and firing
+    // then would undo the deep link before it had a chance to show anything.
     effect(() => {
-      if (this.activeFilters().pendientes && this.summary().statusCounts.pendientes === 0) {
+      if (!this.pantryStore.endReached()) return;
+      const active = this.statusFilter();
+      if (active !== 'all' && statusFilterCount(this.summary(), active) === 0) {
         this.applyStatusFilterPreset('all');
       }
     });

@@ -1,5 +1,5 @@
 import { FoodType } from '@core/models/shared/enums.model';
-import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete, matchesFilters } from './pantry-filtering.domain';
+import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete, isStatusChipVisible, matchesFilters, statusFilterCount } from './pantry-filtering.domain';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 
 function daysFromNow(days: number): string {
@@ -151,5 +151,38 @@ describe('countMissingExpiryBatches', () => {
   it('is 0 when every dateless batch is marked noExpiry', () => {
     const item = makeItem({ batches: [{ batchId: 'b1', quantity: 1, noExpiry: true }] });
     expect(countMissingExpiryBatches(item)).toBe(0);
+  });
+});
+
+describe('statusFilterCount', () => {
+  const summary = {
+    total: 10,
+    statusCounts: { expired: 1, expiring: 2, review: 3, lowStock: 4, normal: 5, pendientes: 6 },
+  };
+
+  it('maps every filter value to its own count', () => {
+    expect(statusFilterCount(summary, 'all')).toBe(10);
+    expect(statusFilterCount(summary, 'expired')).toBe(1);
+    expect(statusFilterCount(summary, 'near-expiry')).toBe(2);
+    expect(statusFilterCount(summary, 'review')).toBe(3);
+    expect(statusFilterCount(summary, 'low-stock')).toBe(4);
+    expect(statusFilterCount(summary, 'normal')).toBe(5);
+    expect(statusFilterCount(summary, 'pendientes')).toBe(6);
+  });
+});
+
+describe('isStatusChipVisible', () => {
+  it('always shows "All" — it is the way back, even at zero', () => {
+    expect(isStatusChipVisible('all', 0)).toBeTrue();
+  });
+
+  it('hides any other chip that would show nothing', () => {
+    for (const value of ['expired', 'near-expiry', 'review', 'low-stock', 'normal', 'pendientes'] as const) {
+      expect(isStatusChipVisible(value, 0)).withContext(value).toBeFalse();
+    }
+  });
+
+  it('shows a chip as soon as it has something to show', () => {
+    expect(isStatusChipVisible('expired', 1)).toBeTrue();
   });
 });
