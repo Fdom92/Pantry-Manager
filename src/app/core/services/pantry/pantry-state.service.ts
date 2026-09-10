@@ -125,6 +125,16 @@ export class PantryStateService {
    * source as the modal's own list, so the two can't disagree.
    */
   readonly canConsume = computed(() => hasConsumableStock(this.pantryStore.loadedProducts()));
+  /**
+   * True only once the store has read everything and found no products. A
+   * first-time user used to meet a search bar, six filter chips all at 0 and a
+   * grouping toggle, none of which do anything yet, crowding the one thing that
+   * does — the "+". endReached guards the returning user: before the first page
+   * lands the summary is still 0, and hiding on that alone would make the
+   * controls pop in on every visit. A filter reset can only clear endReached,
+   * so it can show them early, never hide them wrongly.
+   */
+  readonly pantryIsEmpty = computed(() => this.pantryStore.endReached() && this.summary().total === 0);
   readonly despensaItems = computed(() =>
     this.pantryItemsState().filter(i => i.productType !== 'fresh')
   );
