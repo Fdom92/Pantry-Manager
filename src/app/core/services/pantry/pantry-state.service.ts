@@ -29,7 +29,7 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared';
-import { type FreshState, freshStateToQty } from '@core/domain/pantry';
+import { type FreshState, freshStateToQty, qtyToFreshState } from '@core/domain/pantry';
 
 /**
  * Main orchestrator for pantry page state.
@@ -506,6 +506,13 @@ export class PantryStateService {
     // the most frequent daily mutations and must feed the mutation pipeline
     // like every other CRUD action.
     await this.historyManager.logAdvancedEdit(item, updated, 'pantry_card');
+    // Same gesture, now visible to analytics too: the fridge's equivalent of
+    // the quantity sheet, and until 5.4 absent from every consume number.
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_FRESH_STATE_CHANGED, {
+      from: qtyToFreshState(this.batchOps.getTotalQuantity(item)),
+      to: state,
+      is_basic: Boolean(item.isBasic),
+    });
 
     let msgKey: string;
     if (state === 'none' && item.isBasic) {

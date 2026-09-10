@@ -35,6 +35,8 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
     return next;
   }
 
+  protected readonly analyticsKind = 'despensa' as const;
+
   open(): void {
     this.openSheet();
     this.analytics.track(ANALYTICS_EVENTS.PANTRY_ADD_MODAL_OPENED);
@@ -114,6 +116,7 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
           });
         }
       }
+      this.recordSubmitted(entries);
       this.dismiss();
       if (entries.length === 1) {
         this.toast.success('pantry.toasts.createSuccess', { name: entries[0].name, quantity: '', breakdown: '' });

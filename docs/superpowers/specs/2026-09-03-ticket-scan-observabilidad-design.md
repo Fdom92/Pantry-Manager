@@ -186,6 +186,33 @@ plano; enviarlo antes reportaría a todo usuario recurrente como vacío.
 Con esto la pregunta que importa pasa a ser contestable: **de los 18 usuarios
 que no volvieron tras una sesión, ¿cuántos tenían la despensa vacía?**
 
+### 2e. Barrido final: los caminos que seguían sin evento
+
+Una auditoría de todos los servicios de estado encontró diez sin ningún
+`track`. Cinco huecos pesaban lo bastante para entrar antes de publicar:
+
+- **"Consumir" en el bloque HOY del Inicio** → `pantry_item_consumed` con
+  `source: 'dashboard'`. Solo llegaba al historial interno; era consumo desde la
+  pestaña a la que llega todo el mundo, invisible en PostHog.
+- **"Ahora no"** en HOY y en las tarjetas de acción →
+  `dashboard_suggestion_dismissed` (`surface`, y el id fijo de la tarjeta).
+- **Cambio de estado de un fresco** → `pantry_fresh_state_changed` (`from`,
+  `to`). El consumo de la nevera.
+- **Añadir: guardar o abandonar** → `pantry_add_submitted` /
+  `pantry_add_modal_abandoned`, en la base común de los dos modales de alta.
+  **Corrección:** se había dado por medible este embudo con
+  `add_modal_opened` → `item_added`, pero `item_added` se emite por producto,
+  no por guardado; un guardado de 5 productos contaba 5.
+- **PRO: compra no completada y "Restaurar compras"** →
+  `upgrade_purchase_failed` (`reason: cancelled | failed | unavailable`) y
+  `upgrade_restore_tapped`. `purchasePackageWithOutcome()` devuelve cómo acabó
+  la compra; `purchasePackage()` delega en ella y sus llamadores no cambian.
+
+Quedan sin evento, a propósito: acciones dentro del modal de lotes, marcar como
+básico, catálogos y copia de seguridad en Ajustes, hojas de la lista de la
+compra, la petición de valoración y los errores genéricos (van a Sentry, no a
+PostHog).
+
 ### 3. Añadir el bloque `<service>` del Photo Picker
 
 Según el README del plugin.

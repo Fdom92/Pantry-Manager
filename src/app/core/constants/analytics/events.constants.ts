@@ -51,6 +51,19 @@ export const ANALYTICS_EVENTS = {
   // Pantry modal opens — enable abandonment funnels (opened vs submitted).
   PANTRY_ADD_MODAL_OPENED: 'pantry_add_modal_opened',
   PANTRY_FRESH_ADD_MODAL_OPENED: 'pantry_fresh_add_modal_opened',
+  /**
+   * One per save of either add modal, despensa or fresh. pantry_item_added
+   * fires once per product, so "opened vs added" was never a funnel — one save
+   * of five products counted as five. These two are the real pair.
+   */
+  PANTRY_ADD_SUBMITTED: 'pantry_add_submitted',
+  PANTRY_ADD_MODAL_ABANDONED: 'pantry_add_modal_abandoned',
+  /**
+   * A fresh product moved between sufficient / low / none from its card. The
+   * fridge's consumption gesture, logged to history but invisible to
+   * analytics until 5.4.
+   */
+  PANTRY_FRESH_STATE_CHANGED: 'pantry_fresh_state_changed',
   PANTRY_CONSUME_MODAL_OPENED: 'pantry_consume_modal_opened',
   PANTRY_EDIT_MODAL_OPENED: 'pantry_edit_modal_opened',
   PANTRY_BATCHES_MODAL_OPENED: 'pantry_batches_modal_opened',
@@ -83,6 +96,10 @@ export const ANALYTICS_EVENTS = {
    */
   EMPTY_STATE_SHOWN: 'empty_state_shown',
 
+  // Dashboard
+  /** "Not now" on the HOY suggestion or on one of the action cards. */
+  DASHBOARD_SUGGESTION_DISMISSED: 'dashboard_suggestion_dismissed',
+
   // Shopping list
   SHOPPING_BUY_COMPLETED: 'shopping_buy_completed',
   SHOPPING_MANUAL_ADDED: 'shopping_manual_added',
@@ -97,6 +114,13 @@ export const ANALYTICS_EVENTS = {
   UPGRADE_TAPPED: 'upgrade_tapped',
   UPGRADE_PURCHASE_STARTED: 'upgrade_purchase_started',
   UPGRADE_PURCHASE_COMPLETED: 'upgrade_purchase_completed',
+  /**
+   * The purchase sheet closed without a purchase. Only completions were
+   * recorded before, so someone reaching the store sheet and backing out left
+   * no trace. reason: cancelled | failed | unavailable.
+   */
+  UPGRADE_PURCHASE_FAILED: 'upgrade_purchase_failed',
+  UPGRADE_RESTORE_TAPPED: 'upgrade_restore_tapped',
   PRO_TRIAL_CTA_CLICKED: 'pro_trial_cta_clicked',
   /** Tap anywhere on a locked PRO teaser card (navigates to /upgrade). */
   PAYWALL_CARD_CLICKED: 'paywall_card_clicked',

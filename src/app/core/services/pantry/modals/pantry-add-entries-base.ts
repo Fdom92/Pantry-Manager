@@ -7,6 +7,8 @@ import { dedupeByNormalizedKey, formatFriendlyName, normalizeProductKey, normali
 import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { AnalyticsService } from '../../analytics/analytics.service';
 import { LanguageService } from '../../shared/language.service';
 import { PantryStoreService } from '../pantry-store.service';
 
@@ -24,6 +26,13 @@ export abstract class PantryAddEntriesBase {
   protected readonly pantryStore = inject(PantryStoreService);
   protected readonly translate = inject(TranslateService);
   protected readonly languageService = inject(LanguageService);
+  // Named apart from the subclasses' own `analytics` field so the two private
+  // members never collide.
+  private readonly addFunnelAnalytics = inject(AnalyticsService);
+  /** Separates "closed after saving" from "closed and gave up" in dismiss(). */
+  private hasSubmitted = false;
+  /** Which add modal this is, for the submit / abandon pair. */
+  protected abstract readonly analyticsKind: 'despensa' | 'fresh';
 
   /** Prefix for generated entry ids, so the two sheets never collide. */
   protected abstract readonly idPrefix: string;
@@ -86,6 +95,7 @@ export abstract class PantryAddEntriesBase {
 
   /** Open with a clean draft. */
   protected openSheet(): void {
+    this.hasSubmitted = false;
     this.entries.set([]);
     this.query.set('');
     this.isOpen.set(true);
@@ -103,9 +113,32 @@ export abstract class PantryAddEntriesBase {
     this.query.set('');
   }
 
-  /** Hide without wiping — the sheet is being dismissed, not abandoned. */
+  /**
+   * Hide without wiping — the sheet is being dismissed, not abandoned.
+   *
+   * Also where abandonment is recorded. The modal fires willDismiss before
+   * didDismiss, so this runs first and flips isOpen; the isOpen guard below
+   * then keeps the second pass, and the one after a successful save, silent.
+   * An entries count of 0 means opened and left untouched.
+   */
   dismiss(): void {
+    if (this.isOpen() && !this.hasSubmitted) {
+      this.addFunnelAnalytics.track(ANALYTICS_EVENTS.PANTRY_ADD_MODAL_ABANDONED, {
+        kind: this.analyticsKind,
+        entries: this.entries().length,
+      });
+    }
     this.isOpen.set(false);
+  }
+
+  /** Call once a save has gone through, before dismissing the sheet. */
+  protected recordSubmitted(entries: readonly AddEntry[]): void {
+    this.hasSubmitted = true;
+    this.addFunnelAnalytics.track(ANALYTICS_EVENTS.PANTRY_ADD_SUBMITTED, {
+      kind: this.analyticsKind,
+      entries: entries.length,
+      new_items: entries.filter(entry => entry.isNew || !entry.item).length,
+    });
   }
 
   onQueryChange(value: string): void {
