@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { Injectable, inject } from '@angular/core';
-import { normalizePackages, pickPreferredPackage, resolveProStatus, type ProStatusInput } from '@core/domain/upgrade';
+import { normalizePackages, isEnvironmentalStoreError, pickPreferredPackage, resolveProStatus, type ProStatusInput } from '@core/domain/upgrade';
 import { PACKAGE_TYPE, Purchases, PurchasesOffering, PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -112,6 +112,16 @@ export class UpgradeRevenuecatService {
       const offerings = await Purchases.getOfferings();
       return offerings?.current ?? null;
     } catch (err) {
+      // No billing on this device, or no network: a condition, not a fault.
+      // The paywall already shows "plans unavailable", so a warning (kept as
+      // a breadcrumb) is enough — logged as an error, every getOfferings()
+      // call on such a device became a fresh Sentry event.
+      if (isEnvironmentalStoreError(err)) {
+        this.logger.warn('UpgradeRevenuecatService', 'getOfferings unavailable on this device', {
+          code: String((err as { code?: unknown }).code ?? ''),
+        });
+        return null;
+      }
       this.logger.error('UpgradeRevenuecatService', 'getOfferings error', err);
       return null;
     }
