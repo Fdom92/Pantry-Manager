@@ -116,3 +116,31 @@ export function pickPreferredPackage(
   }
   return packages[0] ?? null;
 }
+
+/**
+ * RevenueCat error codes that describe the device or the connection, not a
+ * fault in the app: "3" PURCHASE_NOT_ALLOWED (no Play account, no billing —
+ * emulators, Huawei, managed phones) and "10" NETWORK_ERROR. Play's pre-launch
+ * robots hit the first on every run, and each getOfferings() call turned it
+ * into a fresh Sentry error.
+ *
+ * "23" CONFIGURATION_ERROR is deliberately absent: in production it would mean
+ * the paywall has no plans for anyone, which is exactly what Sentry is for.
+ */
+const ENVIRONMENTAL_STORE_ERROR_CODES = new Set(['3', '10']);
+const ENVIRONMENTAL_READABLE_CODES = new Set(['PURCHASE_NOT_ALLOWED_ERROR', 'NETWORK_ERROR']);
+
+export function isEnvironmentalStoreError(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) {
+    return false;
+  }
+  const candidate = error as { code?: unknown; data?: { readableErrorCode?: unknown } | null };
+  // The code arrives as a string ("3") on some paths and a number (23) on
+  // others, so compare on its string form.
+  if (candidate.code !== undefined && candidate.code !== null
+    && ENVIRONMENTAL_STORE_ERROR_CODES.has(String(candidate.code))) {
+    return true;
+  }
+  const readable = candidate.data?.readableErrorCode;
+  return typeof readable === 'string' && ENVIRONMENTAL_READABLE_CODES.has(readable);
+}

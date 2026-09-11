@@ -1,5 +1,6 @@
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import {
+  isEnvironmentalStoreError,
   buildPlanMeta,
   buildTrialMeta,
   computeAnnualSavingsPercent,
@@ -182,5 +183,40 @@ describe('pickPreferredPackage', () => {
 
   it('returns null rather than undefined when there is nothing to sell', () => {
     expect(pickPreferredPackage([], preferred)).toBeNull();
+  });
+});
+
+describe('isEnvironmentalStoreError', () => {
+  it('recognises PURCHASE_NOT_ALLOWED as the code string RevenueCat sends', () => {
+    expect(isEnvironmentalStoreError({ code: '3', message: 'The device or user is not allowed to make the purchase.' })).toBeTrue();
+  });
+
+  it('recognises the same code sent as a number', () => {
+    expect(isEnvironmentalStoreError({ code: 3 })).toBeTrue();
+  });
+
+  it('recognises a network error', () => {
+    expect(isEnvironmentalStoreError({ code: '10', message: 'Error performing request.' })).toBeTrue();
+  });
+
+  it('recognises the readable code when the numeric one is missing', () => {
+    expect(isEnvironmentalStoreError({ data: { readableErrorCode: 'PURCHASE_NOT_ALLOWED_ERROR' } })).toBeTrue();
+  });
+
+  it('keeps a configuration error as a real error — in production it would mean no plans for anyone', () => {
+    expect(isEnvironmentalStoreError({ code: 23 })).toBeFalse();
+    expect(isEnvironmentalStoreError({ code: '23' })).toBeFalse();
+  });
+
+  it('does not swallow a user cancellation or anything unknown', () => {
+    expect(isEnvironmentalStoreError({ code: '1' })).toBeFalse();
+    expect(isEnvironmentalStoreError({ code: '0' })).toBeFalse();
+    expect(isEnvironmentalStoreError(new Error('boom'))).toBeFalse();
+  });
+
+  it('never throws on odd input', () => {
+    for (const value of [undefined, null, 'x', 3, {}, { data: null }]) {
+      expect(isEnvironmentalStoreError(value)).toBeFalse();
+    }
   });
 });
