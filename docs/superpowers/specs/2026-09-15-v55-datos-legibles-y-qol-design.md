@@ -92,10 +92,13 @@ y el scheduler apaga el interruptor del usuario sin avisar
 (`notification-scheduler.service.ts:127-134`).
 
 - `NotificationPermissionDisplay` gana `'unavailable'`.
-- Los `catch` de `checkPermission()` y `requestPermission()` llaman a
-  `logger.error`, que llega a Sentry, y devuelven `'unavailable'`. En
-  `requestPermission()`, `NotificationPermissionService.request()` deja el estado en
-  `'unavailable'` en vez de `'denied'`.
+- `checkPermission()` y `requestPermission()` pasan a devolver
+  `'granted' | 'denied' | 'unavailable'` (`requestPermission()` hoy devuelve
+  `boolean`). Sus `catch` llaman a `logger.error`, que llega a Sentry, y devuelven
+  `'unavailable'`.
+- `NotificationPermissionService.request()` sigue devolviendo `boolean` a sus
+  llamadores (scheduler, hoja de reconsentimiento, panel de desarrollo), pero guarda
+  el estado de tres valores: `'unavailable'` ya no se convierte en `'denied'`.
 - El scheduler solo apaga el interruptor con `'denied'`. Con `'unavailable'` sale
   sin programar y sin tocar preferencias.
 - `reconsent-prompt.service.ts:63-69` excluye `'unavailable'`, para no pedirle
