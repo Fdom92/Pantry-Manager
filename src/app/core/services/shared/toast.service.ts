@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from './logger.service';
 
@@ -25,8 +25,17 @@ const DURATION = {
 @Injectable({ providedIn: 'root' })
 export class ToastService {
   private readonly toastCtrl = inject(ToastController);
+  private readonly modalCtrl = inject(ModalController);
   private readonly translate = inject(TranslateService);
   private readonly logger = inject(LoggerService);
+
+  /**
+   * The toast currently on screen, if any. Only one is ever shown at a time:
+   * without this, a second toast (e.g. "Añadido a la lista" right after
+   * "Comprado") stacked on top of the first and could cover the footer of an
+   * open sheet.
+   */
+  private current: HTMLIonToastElement | null = null;
 
   success(key: string, params?: Record<string, unknown>): void {
     void this.present(this.translate.instant(key, params), { duration: DURATION.success });
@@ -67,12 +76,15 @@ export class ToastService {
 
   private async presentWithAction(message: string, actionText: string, onAction: () => void): Promise<void> {
     try {
+      const position = await this.resolvePosition();
+      await this.dismissCurrent();
       const toast = await this.toastCtrl.create({
         message,
         duration: DURATION.action,
-        position: 'bottom',
+        position,
         buttons: [{ text: actionText, handler: () => { onAction(); } }],
       });
+      this.trackCurrent(toast);
       await toast.present();
     } catch (err) {
       this.logger.warn('ToastService', 'Failed to present action toast', { err: String(err) });
@@ -81,15 +93,39 @@ export class ToastService {
 
   private async present(message: string, opts?: ToastOptions): Promise<void> {
     try {
+      const position = opts?.position ?? await this.resolvePosition();
+      await this.dismissCurrent();
       const toast = await this.toastCtrl.create({
         message,
         duration: opts?.duration ?? DURATION.info,
-        position: opts?.position ?? 'bottom',
+        position,
         ...(opts?.color ? { color: opts.color } : {}),
       });
+      this.trackCurrent(toast);
       await toast.present();
     } catch (err) {
       this.logger.warn('ToastService', 'Failed to present toast', { err: String(err) });
     }
+  }
+
+  /** Toasts default to the bottom, but that is where an open sheet's footer
+   *  (e.g. the buy sheet's "Añadir" button) lives, so they surface at the top
+   *  instead whenever a modal is in front. */
+  private async resolvePosition(): Promise<'top' | 'bottom'> {
+    const topModal = await this.modalCtrl.getTop();
+    return topModal ? 'top' : 'bottom';
+  }
+
+  private async dismissCurrent(): Promise<void> {
+    await this.current?.dismiss().catch(() => undefined);
+  }
+
+  private trackCurrent(toast: HTMLIonToastElement): void {
+    this.current = toast;
+    void toast.onDidDismiss().then(() => {
+      if (this.current === toast) {
+        this.current = null;
+      }
+    });
   }
 }
