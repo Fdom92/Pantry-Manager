@@ -177,8 +177,16 @@ manuales, solo se ve el estado vacío y **no hay forma de añadir nada**.
 
 - La fila pasa a estar fuera de esa cadena de `@if`: se ve siempre que no esté
   cargando, y el estado vacío va debajo.
-- Se revisa el texto `shopping.emptyState.autoHint`: si dice que la lista solo se
-  llena sola, se ajusta en los 6 idiomas para mencionar también el añadido a mano.
+- **Texto del estado vacío que explica cómo se llena la lista.** Todo producto nuevo
+  nace sin básico (`isBasic: undefined`, `pantry-builder.domain.ts:77`), incluidos
+  los del onboarding, y la lista solo sugiere básicos. Para un usuario nuevo la lista
+  está vacía siempre, y el texto actual no le dice por qué. `shopping.emptyState.autoHint`
+  pasa a explicar las dos vías: marcar productos como básicos con la estrella (vuelven
+  solos a la lista cuando se acaban o bajan del mínimo) y añadir a mano con la fila de
+  arriba. En los 6 idiomas; la clave se mantiene.
+- **Por qué importa:** en el export del 2026-09-14, 5 de los 11 usuarios nuevos reales
+  abrieron la pestaña Lista en su primera sesión; lo más probable es que vieran una
+  pantalla vacía sin forma de añadir nada.
 
 ## 8 — Quitar de básicos desde la lista
 
