@@ -18,7 +18,6 @@
   [autofocus]="true"
   [showEmptyAction]="false"
   (willDismiss)="state.dismiss()"
-  (didDismiss)="state.close()"
   (selectItem)="state.addConsumeEntry($event)"
   (queryChange)="state.onConsumeQueryChange($event)"
   (adjustEntry)="state.adjustConsumeEntryById($event.entry.id, $event.delta)"
