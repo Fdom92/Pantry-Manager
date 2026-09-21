@@ -402,6 +402,9 @@ ion-fab-button[size="small"] {
 
 .manual-add-row {
   display: flex;
+  // Sits above the groups (and above the empty state) since it moved out of
+  // .suggestion-groups; match that container's gap.
+  margin-bottom: var(--app-theme-spacing-2xl);
   align-items: center;
   gap: var(--app-theme-spacing-sm);
   width: 100%;
