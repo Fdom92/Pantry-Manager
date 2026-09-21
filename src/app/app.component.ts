@@ -112,6 +112,7 @@ export class AppComponent {
   private async syncPersonProfile(): Promise<void> {
     try {
       const preferences = await this.prefs.getPreferences();
+      const installSource = await this.installSource.resolve();
       this.analytics.setPersonProfile(
         buildPersonProfile({
           items: this.pantryStore.loadedProducts(),
@@ -119,7 +120,7 @@ export class AppComponent {
           now: new Date(),
           onboardingDone: this.localStorage.onboarding.isSeen(),
           notificationsEnabled: preferences.notificationsEnabled === true,
-          installSource: await this.installSource.resolve(),
+          installSource,
         }),
       );
     } catch (err) {

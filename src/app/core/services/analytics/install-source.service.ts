@@ -4,7 +4,7 @@ import { classifyInstallSource, type InstallSourceKind } from '@core/domain/anal
 import { LoggerService } from '../shared/logger.service';
 
 interface InstallSourceNative {
-  getInstaller(): Promise<{ installer?: string | null }>;
+  getInstaller(): Promise<{ installer?: string | null; error?: boolean }>;
 }
 
 const InstallSource = registerPlugin<InstallSourceNative>('InstallSource');
@@ -26,7 +26,11 @@ export class InstallSourceService {
   private async read(): Promise<InstallSourceKind> {
     if (!Capacitor.isNativePlatform()) return 'unknown';
     try {
-      const { installer } = await InstallSource.getInstaller();
+      const { installer, error } = await InstallSource.getInstaller();
+      if (error) {
+        this.logger.warn('InstallSourceService', 'native installer lookup failed');
+        return 'unknown';
+      }
       return classifyInstallSource(installer ?? null);
     } catch (err) {
       this.logger.warn('InstallSourceService', 'getInstaller failed', { err: String(err) });

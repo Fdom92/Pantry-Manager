@@ -10,8 +10,8 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 
 /**
  * Reports which package installed this APK ("com.android.vending" = Play).
- * Never rejects: any failure resolves with no installer, and the JS side
- * decides what that means.
+ * Never rejects: a failure resolves with error: true, which JS reports as
+ * 'unknown'.
  */
 @CapacitorPlugin(name = "InstallSource")
 public class InstallSourcePlugin extends Plugin {
@@ -23,6 +23,7 @@ public class InstallSourcePlugin extends Plugin {
             ret.put("installer", readInstaller());
         } catch (Exception e) {
             ret.put("installer", JSObject.NULL);
+            ret.put("error", true);
         }
         call.resolve(ret);
     }
