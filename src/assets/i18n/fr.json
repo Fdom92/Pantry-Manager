@@ -804,7 +804,7 @@
       },
       "sort": {
         "label": "Trier",
-        "expiry": "Expire en premier",
+        "expiry": "Par date de péremption",
         "alpha": "Alphabétique"
       }
     },

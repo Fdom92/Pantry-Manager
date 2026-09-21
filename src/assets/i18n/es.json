@@ -804,7 +804,7 @@
       },
       "sort": {
         "label": "Ordenar",
-        "expiry": "Caduca antes",
+        "expiry": "Por caducidad",
         "alpha": "Alfabético"
       }
     },

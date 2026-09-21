@@ -804,7 +804,7 @@
       },
       "sort": {
         "label": "Ordina",
-        "expiry": "In scadenza prima",
+        "expiry": "Per scadenza",
         "alpha": "Alfabetico"
       }
     },

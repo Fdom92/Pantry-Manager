@@ -100,7 +100,8 @@ const passesFilters = matchesFilters(item, {
 
 // Sort items
 const sorted = sortPantryItems(items, 'expiry');
-// Order: expired > near-expiry > low-stock > normal, then alphabetical
+// 'expiry': earliest expirationDate first, dateless last, ties by name;
+// 'alpha': by name (accents/case ignored)
 ```
 
 ### Dashboard Domain

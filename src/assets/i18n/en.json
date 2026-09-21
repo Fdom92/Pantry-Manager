@@ -804,7 +804,7 @@
       },
       "sort": {
         "label": "Sort",
-        "expiry": "Expiring first",
+        "expiry": "By expiry date",
         "alpha": "Alphabetical"
       }
     },

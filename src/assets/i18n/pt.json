@@ -804,7 +804,7 @@
       },
       "sort": {
         "label": "Ordenar",
-        "expiry": "Expira primeiro",
+        "expiry": "Por validade",
         "alpha": "Alfabético"
       }
     },

@@ -268,7 +268,7 @@ export function matchesFilters(
  * Sorts items by priority: expired > near-expiry > low-stock > normal,
  * then alphabetically.
  */
-export function sortPantryItems(items: PantryItem[]): PantryItem[]
+export function sortPantryItems(items: PantryItem[], mode: PantrySortMode): PantryItem[]
 
 /**
  * Checks if an item was recently added.
@@ -377,7 +377,7 @@ describe('sortPantryItems', () => {
       { ...normalItem, name: 'Zanahoria' },
       { ...normalItem, name: 'Arroz' }
     ];
-    const sorted = sortPantryItems(items, 'expiry');
+    const sorted = sortPantryItems(items, 'alpha');
     expect(sorted[0].name).toBe('Arroz');
   });
 });
@@ -495,12 +495,12 @@ export function classifyExpiry(
 
 ```typescript
 // ✅ GOOD: Does not modify input
-export function sortPantryItems(items: PantryItem[]): PantryItem[] {
+export function sortPantryItems(items: PantryItem[], mode: PantrySortMode): PantryItem[] {
   return [...items].sort((a, b) => /* ... */);
 }
 
 // ❌ BAD: Modifies input
-export function sortPantryItems(items: PantryItem[]): PantryItem[] {
+export function sortPantryItems(items: PantryItem[], mode: PantrySortMode): PantryItem[] {
   items.sort((a, b) => /* ... */);  // ❌ Mutation
   return items;
 }

@@ -97,6 +97,7 @@ export class PantryStateService {
   readonly pendingQuantitySheetNoExpiry = this.quantitySheet.pendingNoExpiry;
 
   // Computed signals coordinating across services
+  // Fresh stays alphabetical: it is ordered by state, and the sort control belongs to the despensa header.
   readonly freshItems = computed(() =>
     this.pantryItemsState()
       .filter(i => i.productType === 'fresh')
