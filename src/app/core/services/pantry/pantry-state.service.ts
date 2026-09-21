@@ -29,7 +29,7 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared';
-import { type FreshState, freshStateToQty, hasConsumableStock, qtyToFreshState, statusFilterCount } from '@core/domain/pantry';
+import { type FreshState, freshStateToQty, hasConsumableStock, qtyToFreshState, setBasic, statusFilterCount } from '@core/domain/pantry';
 
 /**
  * Main orchestrator for pantry page state.
@@ -551,14 +551,7 @@ export class PantryStateService {
 
   async toggleItemBasic(item: PantryItem): Promise<void> {
     const isBasic = !item.isBasic;
-    const updated: PantryItem = {
-      ...item,
-      isBasic,
-      updatedAt: new Date().toISOString(),
-    };
-    if (!isBasic) {
-      updated.minThreshold = undefined;
-    }
+    const updated = setBasic(item, isBasic, new Date().toISOString());
     await this.pantryStore.updateItem(updated);
     const isDepleted = this.batchOps.getTotalQuantity(item) <= 0;
     let msgKey: string;
