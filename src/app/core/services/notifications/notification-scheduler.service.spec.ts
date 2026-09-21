@@ -89,5 +89,6 @@ describe('NotificationSchedulerService — permission branch', () => {
     await scheduler.scheduleAll();
 
     expect(prefs.savePreferences).toHaveBeenCalledWith(jasmine.objectContaining({ notificationsEnabled: false }));
+    expect(permission.request).not.toHaveBeenCalled();
   });
 });

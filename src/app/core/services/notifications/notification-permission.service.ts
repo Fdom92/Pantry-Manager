@@ -28,8 +28,11 @@ export class NotificationPermissionService {
       await this.createChannel();
       this.channelCreated = true;
     }
-    // Only query the system if we don't have a definitive answer yet
-    if (this.permissionState() === 'unknown') {
+    // Only query the system if we don't have a definitive answer yet. Also
+    // retry after 'unavailable': that was a plugin failure, not a user
+    // decision, and a transient one must not disable scheduling all session.
+    const state = this.permissionState();
+    if (state === 'unknown' || state === 'unavailable') {
       const display = await this.plugin.checkPermission();
       this.permissionState.set(display);
     }
