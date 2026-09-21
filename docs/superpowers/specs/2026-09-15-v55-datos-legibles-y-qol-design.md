@@ -30,7 +30,7 @@ propósito.
 5. Sección Frescos vacía en una línea.
 6. Borrar código muerto del modal de consumir.
 7. Lista de la compra: añadir a mano con la lista vacía.
-8. Lista de la compra: quitar de básicos desde la lista.
+8. Lista de la compra: acciones unificadas en un menú al tocar la fila, con "Ya no es básico".
 
 Los puntos 7 y 8 salen del uso real de Fernando (añadidos el 2026-09-21).
 
@@ -188,42 +188,84 @@ manuales, solo se ve el estado vacío y **no hay forma de añadir nada**.
   abrieron la pestaña Lista en su primera sesión; lo más probable es que vieran una
   pantalla vacía sin forma de añadir nada.
 
-## 8 — Quitar de básicos desde la lista
+## 8 — Acciones de la lista unificadas, con "Ya no es básico"
 
-**El caso (Fernando, uso real):** el maíz era básico con mínimo 1. Se acaba y sale
-en la lista. Pero ya no se quiere tener siempre: se comprará de vez en cuando. No
-hay forma de decirlo:
+**El caso que lo destapó (Fernando, uso real):** el maíz era básico con mínimo 1. Se
+acaba y sale en la lista, pero ya no se quiere tener siempre. No hay forma de
+decirlo:
 
 - La lista **solo sugiere productos básicos** (`shouldAutoAddToShoppingList`,
   `pantry-status.domain.ts:180`). Quitar el básico es exactamente "no me lo vuelvas
-  a sugerir", da igual lo que se compre o se gaste después.
+  a sugerir".
 - En la despensa ya existe (la estrella, `toggleItemBasic`,
-  `pantry-state.service.ts:552`), y al quitarlo también borra el mínimo. **Pero un
-  producto de despensa a 0 no se ve en la despensa** (`activeProducts` filtra por
-  stock mayor que 0). El producto agotado solo existe en la lista, justo donde no se
-  puede desmarcar.
-- Lo que hoy hay en la lista al deslizar (ojo tachado, `removeAutoItem`) es otra
-  cosa: "oculto por ahora — volverá la próxima vez". Es el "este viaje no". **Se
-  queda como está.**
+  `pantry-state.service.ts:552`), pero **un producto de despensa a 0 no se ve en la
+  despensa** (`activeProducts` filtra por stock mayor que 0). El agotado solo existe
+  en la lista, justo donde no se puede desmarcar.
 
-**Cambio:**
+**Al mirarlo, la lista tenía un problema más amplio:** tres gestos distintos, en dos
+direcciones, y una sección sin salida.
 
+| Fila | Hoy |
+|---|---|
+| Sugerencia automática | deslizar a la izquierda → ocultar por ahora |
+| Manual | deslizar a la izquierda → borrar (rojo) |
+| Comprado | deslizar **a la derecha** → devolver a la lista |
+| Oculto | **nada**: solo se recupera saliendo de la pestaña |
+
+Y el gesto no se descubre: Fernando, que conoce la app, no encontró el de ocultar.
+
+### Regla nueva, para toda la lista
+
+**El botón de la fila es la acción principal (comprar); tocar la fila abre un menú
+con el resto.** Se quita `ion-item-sliding` de las cuatro clases de fila. La
+despensa ya no usa deslizar, así que la app queda sin gestos ocultos.
+
+| Fila | Botón | Tocar la fila → menú |
+|---|---|---|
+| Automática (despensa o fresco) | comprar (como hoy) | Ocultar por ahora · Ya no es básico · Cancelar |
+| Manual | comprar (como hoy) | Quitar de la lista (destructiva) · Cancelar |
+| Comprado | — | Devolver a la lista · Cancelar |
+| Oculto | — | Volver a mostrar · Ya no es básico · Cancelar |
+
+El botón de comprar no cambia: en despensa abre la hoja de cantidad y en frescos
+compra directo (`list.component.ts:109-116`). Tocar el botón no abre el menú.
+
+### Piezas
+
+- **Dominio:** `listRowActions(kind)` en `core/domain/list/`, con
+  `kind = 'auto' | 'manual' | 'bought' | 'hidden'`. Devuelve la lista ordenada de
+  acciones (`'hide' | 'unbasic' | 'remove' | 'restore' | 'unhide'`) y cuál es
+  destructiva. La tabla de arriba vive solo ahí. Con spec.
 - **Dominio:** `setBasic(item, isBasic, nowIso)` en `core/domain/pantry/`, con la
   regla que hoy vive dentro de `toggleItemBasic` (quitar el básico borra
-  `minThreshold`). La usan la estrella de la despensa y la lista, para que no haya dos
-  definiciones de qué significa dejar de ser básico. Con spec.
-- **Lista:** botón **"Ya no es básico"** en la hoja que abre `onBuyTap`, y una
-  segunda opción al deslizar, junto al ojo tachado. Guarda con
-  `pantryStore.updateItem` y el producto sale de la lista al momento.
-- **Aviso con deshacer:** `ToastService.withAction(key, actionKey, handler)`, con
-  `buttons` de Ionic y 5 s. "Deshacer" vuelve a marcar el básico **con el mínimo que
-  tenía**. Es necesario porque, si el producto está a 0, después de quitarle el
-  básico no aparece en ningún sitio hasta que se vuelva a añadir.
-- **Textos:** clave nueva en `shopping.*` en los 6 idiomas ("{{name}} ya no es
-  básico: no volverá a la lista sola"), más el botón y "Deshacer".
+  `minThreshold`). La usan la estrella de la despensa y la lista. Con spec.
+- **Estado (`ListStateService`):** `openRowActions(row)` pinta el menú con el
+  `ActionSheetController` que el servicio ya inyecta para compartir, y despacha a:
+  `removeAutoItem` (ya existe), `unbasicItem` (nuevo), `removeManualItem` (ya
+  existe), `restoreFromBought` (ya existe) y `unhideAutoItem` (nuevo: quita el id de
+  `removedAutoIds`).
+- **"Ocultar por ahora"** mantiene su semántica: se olvida al salir de la pestaña.
+  El texto del aviso ya lo dice ("volverá la próxima vez").
+- **Aviso con deshacer para "Ya no es básico":** `ToastService.withAction(key,
+  actionKey, handler)`, con `buttons` de Ionic y 5 s. "Deshacer" vuelve a marcar el
+  básico **con el mínimo que tenía**. Es necesario porque un producto a 0 sin básico
+  no aparece en ningún sitio hasta que se vuelve a añadir.
+- **Plantilla:** las filas tienen feedback de pulsación (`pressable`, ya usado en la
+  lista) para que se note que se pueden tocar.
+- **Textos:** menú y avisos en `shopping.*`, en los 6 idiomas.
 - **Frescos:** la misma acción vale; también se sugieren solo si son básicos.
-- **Analítica:** `shopping_basic_removed { kind, surface: 'sheet' | 'swipe',
-  depleted }` y `shopping_basic_restored` si se deshace.
+
+### Analítica
+
+- `shopping_row_menu_opened { kind }`: si nadie lo abre, el problema pasa a ser que
+  no se descubre, y se verá en los datos.
+- `shopping_item_removed` (ya existe) gana `surface: 'menu'`.
+- `shopping_basic_removed { kind, depleted }` y `shopping_basic_restored` al
+  deshacer.
+
+### Qué se pierde
+
+El deslizar, para quien lo conociera. Con los datos actuales, prácticamente nadie.
 
 ## Riesgos
 
@@ -245,7 +287,9 @@ hay forma de decirlo:
   PostHog; `notification_delivered_seen` tras dejar una notificación en la bandeja
   (el panel de desarrollo puede lanzarlas); onboarding, borrado y ticket siguen
   funcionando.
-- Lista de la compra: con la lista vacía se puede añadir a mano;
-  quitar de básicos saca el producto de la lista y no vuelve aunque se compre y se
-  gaste; "Deshacer" lo devuelve con su mínimo; "oculto por ahora" sigue igual.
+- Lista de la compra: con la lista vacía se puede añadir a mano y el texto explica
+  cómo se llena; tocar cada una de las cuatro clases de fila abre su menú y ninguna
+  se desliza; "Ya no es básico" saca el producto y no vuelve aunque se compre y se
+  gaste; "Deshacer" lo devuelve con su mínimo; los ocultos se pueden volver a
+  mostrar.
 - Pista de pruebas internas de Play: `install_source: 'play'`.
