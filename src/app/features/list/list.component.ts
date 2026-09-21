@@ -25,6 +25,7 @@ import { ShoppingManualAddSheetStateService } from './components/shopping-manual
 import { ShoppingReason } from '@core/models/list/list.model';
 import type { ShoppingSuggestionGroupWithItem, ShoppingSuggestionWithItem } from '@core/models/list/list.model';
 import { UNASSIGNED_SUPERMARKET_KEY } from '@core/constants';
+import { suggestionDetail } from '@core/domain/list';
 
 @Component({
   selector: 'app-list',
@@ -50,6 +51,7 @@ export class ListComponent {
   readonly buySheet = inject(ShoppingBuySheetStateService);
   readonly manualAddSheet = inject(ShoppingManualAddSheetStateService);
   readonly UNASSIGNED_KEY = UNASSIGNED_SUPERMARKET_KEY;
+  readonly suggestionDetail = suggestionDetail;
 
   private readonly collapsedGroups = signal<Set<string>>(new Set());
   private readonly exitingItems = signal<Set<string>>(new Set());

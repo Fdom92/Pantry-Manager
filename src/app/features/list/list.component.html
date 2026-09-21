@@ -76,10 +76,9 @@
                       (click)="facade.openRowActions({ kind: 'auto', id: suggestion.item._id, name: suggestion.item.name })">
                       <div class="item-body" slot="start">
                         <span class="item-name">{{ suggestion.item.name }}</span>
-                        @if (suggestion.minThreshold !== undefined) {
-                          <span class="item-qty">
-                            {{ 'shopping.suggestions.restock' | translate:{ amount: suggestion.suggestedQuantity } }}
-                          </span>
+                        @let detail = suggestionDetail(suggestion);
+                        @if (detail) {
+                          <span class="item-qty">{{ detail.key | translate:detail.params }}</span>
                         }
                       </div>
                       <ion-button
