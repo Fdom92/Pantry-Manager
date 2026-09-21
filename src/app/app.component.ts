@@ -99,6 +99,7 @@ export class AppComponent {
     // report every returning user as empty-handed.
     void this.syncPersonProfile();
     await this.notificationScheduler.scheduleAll();
+    void this.notificationScheduler.reportDelivered();
     await this.handleSyncLaunchUrl();
     this.listenForSyncIntents();
   }
@@ -181,6 +182,7 @@ export class AppComponent {
         await this.revenuecat.restore();
         this.detectTrialExpiry();
         await this.notificationScheduler.scheduleAll();
+        void this.notificationScheduler.reportDelivered();
         void this.streak.bootstrap();
         void this.syncPersonProfile();
       } else {

@@ -159,6 +159,16 @@ export const ANALYTICS_EVENTS = {
    * two call for opposite fixes.
    */
   NOTIFICATION_RECEIVED: 'notification_received',
+  /**
+   * Notifications still in the system tray when the app opens. A lower bound on
+   * delivery: tapped or swiped-away ones are gone, and one left in the tray is
+   * counted again on every open — dedupe by person and id when analysing.
+   * Exists because notification_received can almost never fire: the plugin
+   * only emits it while the WebView is alive, and a morning notification
+   * usually arrives with the app process dead.
+   * ids is a sorted comma-joined string (event props are flat).
+   */
+  NOTIFICATION_DELIVERED_SEEN: 'notification_delivered_seen',
   NOTIFICATION_TAPPED: 'notification_tapped',
 
   // Preferences (signals of churn / personalization).

@@ -15,7 +15,7 @@ import { NotificationRegistryService } from './notification-registry.service';
 import { NotificationSchedulerService } from './notification-scheduler.service';
 import { WelcomeNotificationService } from './welcome-notification.service';
 
-describe('NotificationSchedulerService — permission branch', () => {
+describe('NotificationSchedulerService', () => {
   let scheduler: NotificationSchedulerService;
   let prefs: { preferences: ReturnType<typeof signal>; savePreferences: jasmine.Spy };
   let permission: jasmine.SpyObj<NotificationPermissionService>;
@@ -90,5 +90,23 @@ describe('NotificationSchedulerService — permission branch', () => {
 
     expect(prefs.savePreferences).toHaveBeenCalledWith(jasmine.objectContaining({ notificationsEnabled: false }));
     expect(permission.request).not.toHaveBeenCalled();
+  });
+
+  it('reports the notifications left in the tray', async () => {
+    plugin.getDelivered.and.resolveTo([9001, 9003]);
+    await scheduler.reportDelivered();
+    expect(analytics.track).toHaveBeenCalledWith('notification_delivered_seen', { count: 2, ids: '9001,9003' });
+  });
+
+  it('sorts the ids before joining them', async () => {
+    plugin.getDelivered.and.resolveTo([9003, 9001]);
+    await scheduler.reportDelivered();
+    expect(analytics.track).toHaveBeenCalledWith('notification_delivered_seen', { count: 2, ids: '9001,9003' });
+  });
+
+  it('stays quiet when the tray is empty', async () => {
+    plugin.getDelivered.and.resolveTo([]);
+    await scheduler.reportDelivered();
+    expect(analytics.track).not.toHaveBeenCalled();
   });
 });

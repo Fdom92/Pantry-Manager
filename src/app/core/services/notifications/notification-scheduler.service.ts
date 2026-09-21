@@ -50,6 +50,7 @@ export class NotificationSchedulerService {
       // is only a promise: the OS may drop it, batch it, or never fire it at
       // all. Without this, "they never arrive" and "they arrive and nobody
       // cares" are the same number, and the fixes are opposites.
+      // In practice this almost never fires (the WebView must be alive); see NOTIFICATION_DELIVERED_SEEN.
       void LocalNotifications.addListener('localNotificationReceived', notification => {
         this.analytics.track(ANALYTICS_EVENTS.NOTIFICATION_RECEIVED, {
           notification_id: notification.id,
@@ -173,6 +174,17 @@ export class NotificationSchedulerService {
     if (allIds.length) {
       await this.plugin.cancel(allIds);
     }
+  }
+
+  /** See ANALYTICS_EVENTS.NOTIFICATION_DELIVERED_SEEN for what this can and cannot say. */
+  async reportDelivered(): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
+    const ids = await this.plugin.getDelivered();
+    if (!ids.length) return;
+    this.analytics.track(ANALYTICS_EVENTS.NOTIFICATION_DELIVERED_SEEN, {
+      count: ids.length,
+      ids: [...ids].sort((a, b) => a - b).join(','),
+    });
   }
 
   private async scheduleProjectedNotifications(
