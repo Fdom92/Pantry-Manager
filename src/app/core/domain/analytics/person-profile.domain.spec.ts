@@ -63,6 +63,7 @@ describe('buildPersonProfile', () => {
     now: NOW,
     onboardingDone: true,
     notificationsEnabled: false,
+    installSource: 'play' as const,
   };
 
   it('splits despensa from fresh', () => {
@@ -132,10 +133,15 @@ describe('buildPersonProfile', () => {
     expect(profile.notifications_enabled).toBe(true);
   });
 
+  it('reports where the app was installed from', () => {
+    expect(buildPersonProfile({ ...base, items: [] }).install_source).toBe('play');
+    expect(buildPersonProfile({ ...base, items: [], installSource: 'sideload' }).install_source).toBe('sideload');
+  });
+
   it('emits no free text — every value is a count, a bucket or a boolean', () => {
     const profile = buildPersonProfile({ ...base, items: [item({ name: 'Leche Hacendado' })] });
     const values = Object.values(profile) as unknown[];
-    const buckets = ['empty', '1-5', '6-20', '21-50', '50+'];
+    const buckets = ['empty', '1-5', '6-20', '21-50', '50+', 'play', 'sideload', 'other', 'unknown'];
     for (const value of values) {
       const ok =
         typeof value === 'number' ||

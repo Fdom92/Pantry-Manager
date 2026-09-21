@@ -118,6 +118,7 @@ export class AppComponent {
           now: new Date(),
           onboardingDone: this.localStorage.onboarding.isSeen(),
           notificationsEnabled: preferences.notificationsEnabled === true,
+          installSource: 'unknown',
         }),
       );
     } catch (err) {
