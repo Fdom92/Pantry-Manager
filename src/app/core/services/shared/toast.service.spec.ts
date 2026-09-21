@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { ModalController, ToastController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastService } from './toast.service';
 import { LoggerService } from './logger.service';
