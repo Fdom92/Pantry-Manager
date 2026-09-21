@@ -127,6 +127,12 @@
         <div class="pantry-section__actions">
           @if (!facade.pantryIsEmpty()) {
             <button
+              class="pantry-section__add-btn pantry-section__sort-toggle"
+              [attr.aria-label]="'pantry.sections.sort.label' | translate"
+              (click)="facade.openSortMenu()">
+              <ion-icon name="swap-vertical-outline"></ion-icon>
+            </button>
+            <button
               class="pantry-section__add-btn pantry-section__group-toggle"
               [class.pantry-section__group-toggle--active]="facade.groupByCategory()"
               [attr.aria-label]="(facade.groupByCategory() ? 'pantry.sections.groupToggle.grouped' : 'pantry.sections.groupToggle.flat') | translate"

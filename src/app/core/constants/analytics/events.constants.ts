@@ -90,6 +90,7 @@ export const ANALYTICS_EVENTS = {
   PANTRY_SEARCH_USED: 'pantry_search_used',
   PANTRY_FILTER_APPLIED: 'pantry_filter_applied',
   PANTRY_GROUPING_TOGGLED: 'pantry_grouping_toggled',
+  PANTRY_SORT_CHANGED: 'pantry_sort_changed',
   /**
    * Shown when a screen has nothing to render. 18 of 24 users never came back
    * after one session; this says how many of them were staring at an empty app.

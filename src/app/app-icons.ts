@@ -80,6 +80,7 @@ import {
   statsChartOutline,
   storefrontOutline,
   sunnyOutline,
+  swapVerticalOutline,
   timeOutline,
   toggle,
   toggleOutline,
@@ -213,6 +214,7 @@ export const APP_ICONS: Record<string, string> = {
   'pencil-outline': pencilOutline,
   'chevron-forward-outline': chevronForwardOutline,
   'pie-chart-outline': pieChartOutline,
+  'swap-vertical-outline': swapVerticalOutline,
 };
 
 /** Called once at bootstrap. */

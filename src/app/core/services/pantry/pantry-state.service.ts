@@ -1,4 +1,6 @@
 import { Injectable, Signal, WritableSignal, computed, effect, inject, signal } from '@angular/core';
+import { ActionSheetController } from '@ionic/angular';
+import { TranslateService } from '@ngx-translate/core';
 import {
   FilterChipViewModel,
   ItemBatch,
@@ -29,7 +31,7 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared';
-import { type FreshState, freshStateToQty, hasConsumableStock, qtyToFreshState, setBasic, statusFilterCount } from '@core/domain/pantry';
+import { type FreshState, type PantrySortMode, freshStateToQty, hasConsumableStock, qtyToFreshState, setBasic, statusFilterCount } from '@core/domain/pantry';
 
 /**
  * Main orchestrator for pantry page state.
@@ -58,6 +60,8 @@ export class PantryStateService {
   private readonly localStorage = inject(LocalStorageService);
   private readonly analytics = inject(AnalyticsService);
   private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
+  private readonly actionSheetCtrl = inject(ActionSheetController);
 
   // Core state signals
   readonly skeletonPlaceholders = this.listUi.skeletonPlaceholders;
@@ -140,6 +144,7 @@ export class PantryStateService {
   );
   readonly groups = computed(() => this.viewModel.buildGroups(this.despensaItems()));
   readonly groupByCategory = signal(false);
+  readonly sortMode = this.pantryStore.sortMode;
   /** Debounce state for PANTRY_SEARCH_USED — see onSearchTermChange. */
   private wasSearching = false;
   toggleGroupByCategory(): void {
@@ -147,6 +152,31 @@ export class PantryStateService {
     this.analytics.track(ANALYTICS_EVENTS.PANTRY_GROUPING_TOGGLED, {
       grouped: this.groupByCategory(),
     });
+  }
+
+  async openSortMenu(): Promise<void> {
+    const current = this.sortMode();
+    const option = (mode: PantrySortMode, key: string) => ({
+      text: this.translate.instant(key),
+      icon: current === mode ? 'checkmark-outline' : undefined,
+      role: current === mode ? 'selected' : undefined,
+      handler: () => this.changeSortMode(mode),
+    });
+    const sheet = await this.actionSheetCtrl.create({
+      header: this.translate.instant('pantry.sections.sort.label'),
+      buttons: [
+        option('expiry', 'pantry.sections.sort.expiry'),
+        option('alpha', 'pantry.sections.sort.alpha'),
+        { role: 'cancel', text: this.translate.instant('common.actions.cancel') },
+      ],
+    });
+    await sheet.present();
+  }
+
+  private changeSortMode(mode: PantrySortMode): void {
+    if (this.sortMode() === mode) return;
+    this.pantryStore.setSortMode(mode);
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_SORT_CHANGED, { mode });
   }
   /** Already ordered by the query's sort mode; do not re-sort here. */
   readonly flatDespensaItems = this.despensaItems;

@@ -801,6 +801,11 @@
       "groupToggle": {
         "flat": "Nach Kategorie gruppieren",
         "grouped": "Listenansicht"
+      },
+      "sort": {
+        "label": "Sortieren",
+        "expiry": "Läuft zuerst ab",
+        "alpha": "Alphabetisch"
       }
     },
     "fresh": {
