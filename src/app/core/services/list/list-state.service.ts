@@ -261,10 +261,17 @@ export class ListStateService {
     const item = this.items().find(i => i._id === id);
     if (!item) return;
     const previousMin = item.minThreshold;
-    await this.pantryStore.updateItem(setBasic(item, false, new Date().toISOString()));
+    try {
+      await this.pantryStore.updateItem(setBasic(item, false, new Date().toISOString()));
+    } catch (err) {
+      // pantryStore.updateItem swallows its own persistence errors — this
+      // catches anything else (e.g. setBasic itself throwing).
+      this.logger.error('ListStateService', 'unbasicItem failed', err);
+      return;
+    }
     this.unhideAutoItem(id);
     this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BASIC_REMOVED, {
-      kind: item.productType === 'fresh' ? 'fresh' : 'despensa',
+      product_type: item.productType === 'fresh' ? 'fresh' : 'despensa',
       from,
       depleted: sumQuantities(item.batches ?? []) <= 0,
     });
@@ -279,7 +286,12 @@ export class ListStateService {
   private async restoreBasic(id: string, previousMin: number | undefined): Promise<void> {
     const current = this.items().find(i => i._id === id);
     if (!current) return;
-    await this.pantryStore.updateItem(setBasic(current, true, new Date().toISOString(), previousMin));
+    try {
+      await this.pantryStore.updateItem(setBasic(current, true, new Date().toISOString(), previousMin));
+    } catch (err) {
+      this.logger.error('ListStateService', 'restoreBasic failed', err);
+      return;
+    }
     this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BASIC_RESTORED);
   }
 

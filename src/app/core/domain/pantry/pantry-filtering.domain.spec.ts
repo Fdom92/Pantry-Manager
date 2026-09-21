@@ -214,6 +214,14 @@ describe('sortPantryItems', () => {
     expect(sorted.map(i => i.name)).toEqual(['huevos', 'pan']);
   });
 
+  it('expiry compares parsed instants, so a legacy full ISO timestamp still orders correctly against a plain date', () => {
+    const sorted = sortPantryItems(
+      [a('leche', '2026-09-15T00:00:00Z'), a('yogur', '2026-09-01')],
+      'expiry',
+    );
+    expect(sorted.map(i => i.name)).toEqual(['yogur', 'leche']);
+  });
+
   it('does not mutate its input', () => {
     const input = [a('b'), a('a')];
     sortPantryItems(input, 'alpha');

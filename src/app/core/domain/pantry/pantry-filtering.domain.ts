@@ -86,16 +86,22 @@ function compareByName(a: PantryItem, b: PantryItem): number {
 }
 
 /**
- * `expirationDate` is already the earliest date among lots with stock
- * (computeEarliestExpiryStock), stored as an ISO date, so plain string
- * comparison orders it. Dateless items go last; ties fall back to the name.
+ * `expirationDate` is the earliest date among ALL of the item's batches —
+ * including depleted (zero-quantity) ones, it is not filtered to batches
+ * with stock (PantryService.applyDerivedFields → computeEarliestExpiry).
+ * Most stored dates are `YYYY-MM-DD`, but legacy/migrated docs may carry
+ * full ISO timestamps (see date.util.ts), so instants are compared via
+ * Date.parse rather than as raw strings. Dateless/unparsable items go
+ * last; ties fall back to the name.
  */
 function compareByExpiry(a: PantryItem, b: PantryItem): number {
-  const ea = a.expirationDate;
-  const eb = b.expirationDate;
-  if (ea && eb && ea !== eb) return ea < eb ? -1 : 1;
-  if (ea && !eb) return -1;
-  if (!ea && eb) return 1;
+  const ea = Date.parse(a.expirationDate ?? '');
+  const eb = Date.parse(b.expirationDate ?? '');
+  const aValid = !Number.isNaN(ea);
+  const bValid = !Number.isNaN(eb);
+  if (aValid && bValid && ea !== eb) return ea < eb ? -1 : 1;
+  if (aValid && !bValid) return -1;
+  if (!aValid && bValid) return 1;
   return compareByName(a, b);
 }
 

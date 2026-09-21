@@ -29,11 +29,15 @@ export class InstallSourceService {
       const { installer, error } = await InstallSource.getInstaller();
       if (error) {
         this.logger.warn('InstallSourceService', 'native installer lookup failed');
+        // Transient failure, not a definitive answer — don't let it stick for
+        // the whole process. Let the next resolve() try again.
+        this.cached = null;
         return 'unknown';
       }
       return classifyInstallSource(installer ?? null);
     } catch (err) {
       this.logger.warn('InstallSourceService', 'getInstaller failed', { err: String(err) });
+      this.cached = null;
       return 'unknown';
     }
   }
