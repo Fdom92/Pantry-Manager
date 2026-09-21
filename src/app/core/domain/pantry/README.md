@@ -328,7 +328,7 @@ const passes = matchesFilters(item, filters, {
 
 // Sort items
 const items = [normalItem, expiredItem, nearExpiryItem];
-const sorted = sortPantryItems(items);
+const sorted = sortPantryItems(items, 'expiry');
 // Result: [expiredItem, nearExpiryItem, normalItem]
 ```
 
@@ -368,7 +368,7 @@ describe('matchesSearchQuery', () => {
 describe('sortPantryItems', () => {
   it('should sort expired first', () => {
     const items = [normalItem, expiredItem];
-    const sorted = sortPantryItems(items);
+    const sorted = sortPantryItems(items, 'expiry');
     expect(sorted[0]).toBe(expiredItem);
   });
 
@@ -377,7 +377,7 @@ describe('sortPantryItems', () => {
       { ...normalItem, name: 'Zanahoria' },
       { ...normalItem, name: 'Arroz' }
     ];
-    const sorted = sortPantryItems(items);
+    const sorted = sortPantryItems(items, 'expiry');
     expect(sorted[0].name).toBe('Arroz');
   });
 });

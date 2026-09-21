@@ -148,9 +148,8 @@ export class PantryStateService {
       grouped: this.groupByCategory(),
     });
   }
-  readonly flatDespensaItems = computed(() =>
-    [...this.despensaItems()].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
-  );
+  /** Already ordered by the query's sort mode; do not re-sort here. */
+  readonly flatDespensaItems = this.despensaItems;
   readonly statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
   readonly summary = computed<PantrySummaryMeta>(() => this.summarySnapshot());
   readonly filterChips = computed(() =>

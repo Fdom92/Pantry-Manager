@@ -163,6 +163,7 @@ export class PantryViewModelService {
     return statusChips.filter(chip => isStatusChipVisible(chip.value ?? 'all', chip.count));
   }
 
+  /** Items keep the order they arrive in — the query decides the sort mode. */
   buildGroups(items: PantryItem[]): PantryGroup[] {
     const map = new Map<string, PantryGroup>();
     const now = new Date();
@@ -196,9 +197,6 @@ export class PantryViewModelService {
     }
 
     const groups = Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
-    for (const group of groups) {
-      group.items = group.items.sort((a, b) => this.compareItems(a, b));
-    }
     return groups;
   }
 
@@ -389,11 +387,6 @@ export class PantryViewModelService {
   normalizeLocationOptions(options: string[] | null | undefined): string[] {
     return normalizeStringList(options, { fallback: [] });
   }
-
-  private compareItems(a: PantryItem, b: PantryItem): number {
-    return (a.name ?? '').localeCompare(b.name ?? '');
-  }
-
 
   private collectBatches(item: PantryItem): BatchEntryMeta[] {
     const batches: BatchEntryMeta[] = [];

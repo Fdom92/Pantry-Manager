@@ -99,7 +99,7 @@ const passesFilters = matchesFilters(item, {
 });
 
 // Sort items
-const sorted = sortPantryItems(items);
+const sorted = sortPantryItems(items, 'expiry');
 // Order: expired > near-expiry > low-stock > normal, then alphabetical
 ```
 
@@ -169,7 +169,7 @@ const options = normalizeCatalogOptions([
 | `classifyExpiry` | Classifies expiry date | `ExpiryClassification` |
 | `matchesSearchQuery` | Checks if matches search | `boolean` |
 | `matchesFilters` | Applies filters to item | `boolean` |
-| `sortPantryItems` | Sorts items by priority | `PantryItem[]` |
+| `sortPantryItems` | Sorts by expiry (default) or name | `PantryItem[]`, `PantrySortMode` |
 
 ### Dashboard (2 main functions)
 
