@@ -337,7 +337,6 @@ export class PantryStateService {
 
   // -------- Consume modal (delegates to PantryConsumeModalStateService) --------
   openConsumeModal = () => this.consumeModal.open();
-  closeConsumeModal = () => this.consumeModal.close();
   dismissConsumeModal = () => this.consumeModal.dismiss();
   submitConsume = () => this.consumeModal.submitConsume();
   onConsumeQueryChange = (value: string) => this.consumeModal.onConsumeQueryChange(value);
