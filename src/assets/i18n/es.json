@@ -120,7 +120,7 @@
       "subtitle": "Añade productos que quieras controlar\n(con cantidad exacta y lotes)"
     },
     "shopping": {
-      "title": "Todo en orden"
+      "title": "Tu lista está vacía"
     }
   },
   "locations": {
@@ -437,7 +437,7 @@
       "inlineHint": "Añadir producto a la lista..."
     },
     "emptyState": {
-      "autoHint": "Los productos agotados aparecerán aquí automáticamente."
+      "autoHint": "Marca con ★ «Mantener siempre en casa» lo que no quieres que falte: volverá aquí solo cuando se acabe o baje del mínimo. O añade cualquier cosa a mano arriba."
     },
     "ignored": {
       "sectionTitle": "Ocultos ahora"

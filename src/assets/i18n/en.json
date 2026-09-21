@@ -120,7 +120,7 @@
       "subtitle": "Add products you want to track\n(with exact quantity and batches)"
     },
     "shopping": {
-      "title": "All set"
+      "title": "Your list is empty"
     }
   },
   "locations": {
@@ -437,7 +437,7 @@
       "inlineHint": "Add a product to the list..."
     },
     "emptyState": {
-      "autoHint": "Out-of-stock items will appear here automatically."
+      "autoHint": "Star ★ “Always keep at home” on what you never want to run out of: it will come back here on its own when it runs out or drops below its minimum. Or add anything by hand above."
     },
     "ignored": {
       "sectionTitle": "Hidden for now"

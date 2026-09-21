@@ -120,7 +120,7 @@
       "subtitle": "Füge Produkte hinzu, die du verfolgen möchtest\n(mit genauer Menge und Chargen)"
     },
     "shopping": {
-      "title": "Alles in Ordnung"
+      "title": "Deine Liste ist leer"
     }
   },
   "locations": {
@@ -437,7 +437,7 @@
       "inlineHint": "Produkt zur Liste hinzufügen..."
     },
     "emptyState": {
-      "autoHint": "Aufgebrauchte Produkte erscheinen hier automatisch."
+      "autoHint": "Markiere mit ★ „Immer zuhause vorrätig halten“, was nie fehlen soll: Es kommt von selbst hierher zurück, wenn es aufgebraucht ist oder unter das Minimum fällt. Oder füge oben etwas von Hand hinzu."
     },
     "ignored": {
       "sectionTitle": "Jetzt ausgeblendet"

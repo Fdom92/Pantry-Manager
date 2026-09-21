@@ -120,7 +120,7 @@
       "subtitle": "Aggiungi i prodotti che vuoi controllare\n(con quantità esatta e lotti)"
     },
     "shopping": {
-      "title": "Tutto in ordine"
+      "title": "La tua lista è vuota"
     }
   },
   "locations": {
@@ -437,7 +437,7 @@
       "inlineHint": "Aggiungi un prodotto alla lista..."
     },
     "emptyState": {
-      "autoHint": "I prodotti esauriti appariranno qui automaticamente."
+      "autoHint": "Segna con ★ «Tenere sempre in casa» ciò che non deve mai mancare: tornerà qui da solo quando finisce o scende sotto il minimo. Oppure aggiungi qualsiasi cosa a mano qui sopra."
     },
     "ignored": {
       "sectionTitle": "Nascosti ora"
