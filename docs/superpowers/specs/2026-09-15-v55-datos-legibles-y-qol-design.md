@@ -29,8 +29,14 @@ propósito.
 4. Orden de la despensa por caducidad.
 5. Sección Frescos vacía en una línea.
 6. Borrar código muerto del modal de consumir.
+7. Lista de la compra: añadir a mano con la lista vacía.
+8. Lista de la compra: "No lo necesito" que se guarda.
 
-**Fuera, para cuando haya datos:** deshacer; el spec del scheduler y las carreras
+Los puntos 7 y 8 salen del uso real de Fernando (añadidos el 2026-09-21).
+
+**Fuera, para cuando haya datos:** ticket en varias fotos (a la 5.6, cuando la
+revisión del 2 de octubre diga en qué paso se rompe el ticket para usuarios
+reales; si es en otro paso, las varias fotos no lo arreglan); deshacer; el spec del scheduler y las carreras
 H2/H3; source maps de Sentry; corregir DEV.md (ProGuard); tests en `features/`.
 El diseño de todo eso sigue en la historia de git de este fichero (commit
 `36d5edc5`).
@@ -163,6 +169,47 @@ y se aplica en un único punto: `pantry-query.service.ts:304`.
 (`pantry-state.service.ts:310`): ninguno tiene llamadores. Se borran los dos, y el
 comentario de `dismiss()` que menciona `close()` se ajusta.
 
+## 7 — Añadir a mano con la lista vacía
+
+Es un bug. La fila "añadir a mano" (`list.component.html:45-48`) está dentro del
+`@else` del estado vacío (`:34-41`). Si no hay sugerencias, comprados, ignorados ni
+manuales, solo se ve el estado vacío y **no hay forma de añadir nada**.
+
+- La fila pasa a estar fuera de esa cadena de `@if`: se ve siempre que no esté
+  cargando, y el estado vacío va debajo.
+- Se revisa el texto `shopping.emptyState.autoHint`: si dice que la lista solo se
+  llena sola, se ajusta en los 6 idiomas para mencionar también el añadido a mano.
+
+## 8 — "No lo necesito" que se guarda
+
+Quitar un automático ya existe (`removeAutoItem`, `list-state.service.ts:189`), pero:
+
+- solo se llega **deslizando la fila**, con un icono de ojo tachado
+  (`list.component.html:94-99`), y Fernando, que conoce la app, no lo encontró;
+- **es temporal**: `removedAutoIds` es un signal en memoria que se vacía en
+  `ionViewWillLeave` (`:79`), así que al cambiar de pestaña el producto vuelve.
+
+**Regla:** un automático descartado no vuelve a salir **mientras su stock no
+cambie**. Se guarda el id y la cantidad total de ese momento; en cuanto la cantidad
+es otra (se consume, se repone o se ajusta), el descarte se olvida y el producto
+vuelve a evaluarse con las reglas de siempre. Así "ya no lo necesito" no se
+convierte en "no me lo sugieras nunca más".
+
+- **Dominio:** en `core/domain/list/`, `isDismissalActive(dismissal, currentQuantity)`
+  y `pruneDismissals(dismissals, items)`, que quita los de productos borrados o con
+  stock distinto. Con spec. Vale igual para frescos, porque su "cantidad" es el
+  estado (3/1/0).
+- **Persistencia:** `LocalStorageService.shoppingDismissals`, como `manualList`, con
+  una clave nueva en `storage.constants.ts`. Se poda al cargar la lista.
+- **Estado:** `removedAutoIds` deja de ser un signal que se vacía al salir;
+  `ionViewWillLeave` ya no lo toca. `boughtItemIds` sigue como está.
+- **Sección "Ignorados":** ya existe (`state.allIgnoredItems`) y su acción de
+  recuperar borra el descarte guardado.
+- **Visible:** botón "No lo necesito" en la hoja que abre `onBuyTap`, además del
+  gesto de deslizar.
+- **Analítica:** `shopping_item_removed` ya existe con `source: 'auto'`; se añade
+  `surface: 'sheet' | 'swipe'`. Así se sabe si el botón visible cambia algo.
+
 ## Riesgos
 
 - **Primer código nativo propio.** Si `registerPlugin` falla, lo único que se
@@ -183,4 +230,7 @@ comentario de `dismiss()` que menciona `close()` se ajusta.
   PostHog; `notification_delivered_seen` tras dejar una notificación en la bandeja
   (el panel de desarrollo puede lanzarlas); onboarding, borrado y ticket siguen
   funcionando.
+- Lista de la compra: con la lista vacía se puede añadir a mano; descartar un
+  automático sobrevive a cambiar de pestaña y a reiniciar la app, y vuelve a salir
+  al cambiar su stock.
 - Pista de pruebas internas de Play: `install_source: 'play'`.
