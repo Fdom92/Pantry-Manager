@@ -51,14 +51,16 @@ falta un **plugin nativo local**, el primero del repo:
   con `registerPlugin` en `MainActivity`. Un único método, `getInstaller()`, que usa
   `PackageManager.getInstallSourceInfo(packageName).getInstallingPackageName()` en
   API 30+ y `getInstallerPackageName()` por debajo. Cualquier excepción devuelve
-  `null`; nunca lanza.
+  `{ error: true }`, que JS reporta como `'unknown'`; nunca lanza. (Diseño
+  inicial: devolver `null`, que se habría clasificado como `'sideload'` y habría
+  filtrado como interno a un usuario real de Play.)
 - **Dominio:** `classifyInstallSource(installer: string | null)` en
   `core/domain/analytics/`, con spec:
   - `com.android.vending` → `'play'`
   - `null` o `com.google.android.packageinstaller` / `com.android.packageinstaller`
     / `com.android.shell` → `'sideload'`
   - cualquier otro valor → `'other'`
-  - fuera de nativo o si el plugin falla → `'unknown'`
+  - fuera de nativo, si el plugin falla o si el Java devuelve `error` → `'unknown'`
 - **Envío:** `PersonProfile` gana `install_source`. Se calcula una vez por arranque
   y va con `syncPersonProfile()`, que ya corre al arrancar y en cada vuelta a primer
   plano.
@@ -83,6 +85,10 @@ del plugin (`definitions.d.ts:88`).
 - Evento nuevo **`notification_delivered_seen`**, con `count` y `ids`, emitido al
   arrancar y en cada vuelta a primer plano, **solo si `count > 0`**. Sin títulos ni
   cuerpos: los ids son números de programación, no contenido.
+- **La bandeja se lee antes de que `scheduleAll()` cancele nada**: en Android,
+  cancelar una notificación programada también la quita de la bandeja si ya se
+  mostró (`dismissVisibleNotification`). Encontrado en la revisión final: leerla
+  después la dejaba siempre vacía.
 - **Es un mínimo, no un conteo exacto.** Las notificaciones tocadas o descartadas
   ya no están en la bandeja, y las que siguen se cuentan otra vez en cada apertura.
   El análisis tiene que deduplicar por usuario e id. Se documenta en el comentario
@@ -228,7 +234,7 @@ despensa ya no usa deslizar, así que la app queda sin gestos ocultos.
 |---|---|---|
 | Automática (despensa o fresco) | comprar (como hoy) | Ocultar por ahora · Ya no es básico · Cancelar |
 | Manual | comprar (como hoy) | Quitar de la lista (destructiva) · Cancelar |
-| Comprado | — | Devolver a la lista · Cancelar |
+| Comprado | — | ninguno: fila solo informativa (ver nota) |
 | Oculto | — | Volver a mostrar · Ya no es básico · Cancelar |
 
 El botón de comprar no cambia: en despensa abre la hoja de cantidad y en frescos
@@ -237,9 +243,14 @@ compra directo (`list.component.ts:109-116`). Tocar el botón no abre el menú.
 ### Piezas
 
 - **Dominio:** `listRowActions(kind)` en `core/domain/list/`, con
-  `kind = 'auto' | 'manual' | 'bought' | 'hidden'`. Devuelve la lista ordenada de
-  acciones (`'hide' | 'unbasic' | 'remove' | 'restore' | 'unhide'`) y cuál es
-  destructiva. La tabla de arriba vive solo ahí. Con spec.
+  `kind = 'auto' | 'manual' | 'hidden'`. Devuelve la lista ordenada de acciones
+  (`'hide' | 'unbasic' | 'remove' | 'unhide'`) y cuál es destructiva. La tabla de
+  arriba vive solo ahí. Con spec.
+- **Nota (decidido en la implementación, 2026-09-21):** las filas de Comprado
+  quedan **solo informativas**. "Devolver a la lista" nunca funcionó: en un manual
+  solo lo quitaba de Comprado (desaparecía de todas partes y el lote se quedaba), y
+  en un automático no revertía la reposición. Deshacer una compra de verdad va a la
+  5.6. Se borran `restoreFromBought` y `restoreBoughtManual`.
 - **Dominio:** `setBasic(item, isBasic, nowIso)` en `core/domain/pantry/`, con la
   regla que hoy vive dentro de `toggleItemBasic` (quitar el básico borra
   `minThreshold`). La usan la estrella de la despensa y la lista. Con spec.
@@ -295,8 +306,8 @@ El deslizar, para quien lo conociera. Con los datos actuales, prácticamente nad
   (el panel de desarrollo puede lanzarlas); onboarding, borrado y ticket siguen
   funcionando.
 - Lista de la compra: con la lista vacía se puede añadir a mano y el texto explica
-  cómo se llena; tocar cada una de las cuatro clases de fila abre su menú y ninguna
-  se desliza; "Ya no es básico" saca el producto y no vuelve aunque se compre y se
+  cómo se llena; tocar una fila automática, manual u oculta abre su menú, las de
+  Comprado no tienen menú, y ninguna se desliza; "Ya no es básico" saca el producto y no vuelve aunque se compre y se
   gaste; "Deshacer" lo devuelve con su mínimo; los ocultos se pueden volver a
   mostrar.
 - Pista de pruebas internas de Play: `install_source: 'play'`.
