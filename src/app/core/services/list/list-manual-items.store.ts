@@ -54,10 +54,6 @@ export class ListManualItemsStore {
     return item;
   }
 
-  restoreBoughtManual(id: string): void {
-    this.boughtManuals.update(list => list.filter(b => b.id !== id));
-  }
-
   clear(): void {
     this.manualItems.set([]);
     this.boughtManuals.set([]);

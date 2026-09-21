@@ -69,6 +69,8 @@
                   @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
                     <ion-item
                       detail="false"
+                      role="button"
+                      tabindex="0"
                       class="suggestion-item pressable"
                       [class.suggestion-item--exiting]="isExiting(suggestion.item._id)"
                       (click)="facade.openRowActions({ kind: 'auto', id: suggestion.item._id, name: suggestion.item.name })">
@@ -97,6 +99,8 @@
                   @for (manual of groupManuals; track manual.id) {
                     <ion-item
                       detail="false"
+                      role="button"
+                      tabindex="0"
                       class="suggestion-item pressable"
                       (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
                       <div class="item-body" slot="start">
@@ -136,6 +140,8 @@
                 @for (manual of facade.manualItems(); track manual.id) {
                   <ion-item
                     detail="false"
+                    role="button"
+                    tabindex="0"
                     class="suggestion-item pressable"
                     (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
                     <div class="item-body" slot="start">
@@ -172,10 +178,7 @@
             @if (globalBoughtExpanded()) {
               <ion-list class="item-list bought-list" lines="none">
                 @for (bought of state.allBoughtItems; track bought.id) {
-                  <ion-item
-                    class="bought-item pressable"
-                    detail="false"
-                    (click)="facade.openRowActions({ kind: 'bought', id: bought.id, name: bought.name })">
+                  <ion-item class="bought-item" detail="false">
                     <ion-icon slot="start" name="checkmark-circle" color="success"></ion-icon>
                     <span class="item-name bought-name">{{ bought.name }}</span>
                   </ion-item>
@@ -202,6 +205,8 @@
                 @for (ignored of state.allIgnoredItems; track ignored.id) {
                   <ion-item
                     detail="false"
+                    role="button"
+                    tabindex="0"
                     class="ignored-item pressable"
                     (click)="facade.openRowActions({ kind: 'hidden', id: ignored.id, name: ignored.name })">
                     <ion-icon slot="start" name="eye-off-outline" color="medium"></ion-icon>

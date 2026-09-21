@@ -208,7 +208,6 @@ export class ListStateService {
     hide: 'shopping.rowMenu.hide',
     unbasic: 'shopping.rowMenu.unbasic',
     remove: 'shopping.rowMenu.remove',
-    restore: 'shopping.rowMenu.restore',
     unhide: 'shopping.rowMenu.unhide',
   };
 
@@ -216,7 +215,6 @@ export class ListStateService {
     hide: 'eye-off-outline',
     unbasic: 'star-outline',
     remove: 'trash-outline',
-    restore: 'arrow-undo-outline',
     unhide: 'eye-outline',
   };
 
@@ -242,7 +240,6 @@ export class ListStateService {
       case 'hide': this.removeAutoItem(row.id); return;
       case 'unbasic': await this.unbasicItem(row.id, row.kind); return;
       case 'remove': this.removeManualItem(row.id); return;
-      case 'restore': this.restoreFromBought(row.id); return;
       case 'unhide': this.unhideAutoItem(row.id); return;
     }
   }
@@ -284,15 +281,6 @@ export class ListStateService {
     if (!current) return;
     await this.pantryStore.updateItem(setBasic(current, true, new Date().toISOString(), previousMin));
     this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BASIC_RESTORED);
-  }
-
-  restoreFromBought(id: string): void {
-    this.boughtItemIds.update(set => {
-      const next = new Set(set);
-      next.delete(id);
-      return next;
-    });
-    this.manualItemsStore.restoreBoughtManual(id);
   }
 
   addManualItem(name: string, source: 'user' | 'preset' = 'user'): void {

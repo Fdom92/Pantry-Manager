@@ -122,6 +122,25 @@ ion-card-title {
   transform: scale(0.94);
 }
 
+// A tappable row (buy button + tap-for-menu) shares its :active state with
+// its button ancestor — the button being pressed also makes the row match
+// `.pressable:active`, so the whole row shrank whenever the buy button was
+// tapped. These rows get their own feedback instead — a background tint,
+// no scale — and skip it entirely while the buy button itself is pressed,
+// so the button's own activated state isn't fought by the row.
+ion-item.suggestion-item.pressable:active:not(:has(.buy-btn:active)),
+ion-item.ignored-item.pressable:active:not(:has(.buy-btn:active)) {
+  --background: var(--app-theme-input-focus-bg);
+  transform: none;
+}
+
+// The buy button being :active also matches the generic `.pressable:active`
+// rule above on the row — cancel the row's scale so only the button's own
+// activated state shows.
+ion-item.suggestion-item.pressable:active:has(.buy-btn:active) {
+  transform: none;
+}
+
 // ── Empty + skeleton ─────────────────────────────────────────────────────────
 
 .fade-in-list {
