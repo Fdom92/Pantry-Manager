@@ -119,8 +119,12 @@ fuera.
 
 ## 4 — Orden por caducidad
 
-Hoy la despensa se ordena solo alfabéticamente (`pantry-filtering.domain.ts:75`),
-y se aplica en un único punto: `pantry-query.service.ts:304`.
+Hoy la despensa se ordena solo alfabéticamente, y **en tres sitios**, no en uno:
+`sortPantryItems` en `pantry-query.service.ts:304`, otra vez en
+`PantryStateService.flatDespensaItems` (`localeCompare`), y otra dentro de cada
+grupo en `PantryViewModelService.buildGroups` (`compareItems`). El orden se decide
+en la consulta y **los otros dos dejan de reordenar**: conservan el orden de
+entrada. Si no, el orden por caducidad no se vería nunca.
 
 - **Dominio:** `sortPantryItems(items, mode: PantrySortMode)`, con
   `PantrySortMode = 'expiry' | 'alpha'`. Reglas de `'expiry'`:
@@ -252,7 +256,10 @@ compra directo (`list.component.ts:109-116`). Tocar el botón no abre el menú.
   no aparece en ningún sitio hasta que se vuelve a añadir.
 - **Plantilla:** las filas tienen feedback de pulsación (`pressable`, ya usado en la
   lista) para que se note que se pueden tocar.
-- **Textos:** menú y avisos en `shopping.*`, en los 6 idiomas.
+- **Textos:** menú y avisos en `shopping.*`, en los 6 idiomas. La app nunca dice
+  "básico" al usuario: la estrella se llama "Mantener siempre en casa"
+  (`pantry.form.basic`). La acción del menú sigue ese vocabulario: "Ya no mantener
+  siempre en casa".
 - **Frescos:** la misma acción vale; también se sugieren solo si son básicos.
 
 ### Analítica
