@@ -70,18 +70,39 @@ export function isRecentlyAdded(item: PantryItem): boolean {
 }
 
 /**
- * Sort pantry items alphabetically by name.
+ * How the despensa list is ordered. 'expiry' is the default: in an app about
+ * expiry dates, what runs out tomorrow should not sit at the bottom because
+ * its name starts with Y.
  */
-export function sortPantryItems(items: PantryItem[]): PantryItem[] {
-  if (items.length <= 1) return items;
+export type PantrySortMode = 'expiry' | 'alpha';
+export const DEFAULT_PANTRY_SORT_MODE: PantrySortMode = 'expiry';
 
-  const sorted = [...items];
-  sorted.sort((a, b) => {
-    const labelA = normalizeSearchField(a.name);
-    const labelB = normalizeSearchField(b.name);
-    return labelA.localeCompare(labelB);
-  });
-  return sorted;
+export function isPantrySortMode(value: unknown): value is PantrySortMode {
+  return value === 'expiry' || value === 'alpha';
+}
+
+function compareByName(a: PantryItem, b: PantryItem): number {
+  return normalizeSearchField(a.name).localeCompare(normalizeSearchField(b.name));
+}
+
+/**
+ * `expirationDate` is already the earliest date among lots with stock
+ * (computeEarliestExpiryStock), stored as an ISO date, so plain string
+ * comparison orders it. Dateless items go last; ties fall back to the name.
+ */
+function compareByExpiry(a: PantryItem, b: PantryItem): number {
+  const ea = a.expirationDate;
+  const eb = b.expirationDate;
+  if (ea && eb && ea !== eb) return ea < eb ? -1 : 1;
+  if (ea && !eb) return -1;
+  if (!ea && eb) return 1;
+  return compareByName(a, b);
+}
+
+export function sortPantryItems(items: PantryItem[], mode: PantrySortMode): PantryItem[] {
+  if (items.length <= 1) return items;
+  const compare = mode === 'expiry' ? compareByExpiry : compareByName;
+  return [...items].sort(compare);
 }
 
 /**

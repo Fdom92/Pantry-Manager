@@ -1,5 +1,5 @@
 import { FoodType } from '@core/models/shared/enums.model';
-import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete, isStatusChipVisible, matchesFilters, statusFilterCount } from './pantry-filtering.domain';
+import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete, isPantrySortMode, isStatusChipVisible, matchesFilters, sortPantryItems, statusFilterCount } from './pantry-filtering.domain';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 
 function daysFromNow(days: number): string {
@@ -184,5 +184,48 @@ describe('isStatusChipVisible', () => {
 
   it('shows a chip as soon as it has something to show', () => {
     expect(isStatusChipVisible('expired', 1)).toBeTrue();
+  });
+});
+
+describe('sortPantryItems', () => {
+  const a = (name: string, expirationDate?: string) =>
+    makeItem({ _id: name, name, expirationDate });
+
+  it('alpha keeps the current alphabetical behaviour, ignoring accents and case', () => {
+    const sorted = sortPantryItems([a('zanahoria'), a('Árbol'), a('berenjena')], 'alpha');
+    expect(sorted.map(i => i.name)).toEqual(['Árbol', 'berenjena', 'zanahoria']);
+  });
+
+  it('expiry puts the earliest date first, so expired items lead', () => {
+    const sorted = sortPantryItems(
+      [a('leche', '2026-09-30'), a('yogur', '2026-09-01'), a('queso', '2026-09-15')],
+      'expiry',
+    );
+    expect(sorted.map(i => i.name)).toEqual(['yogur', 'queso', 'leche']);
+  });
+
+  it('expiry sends dateless items to the end, alphabetically', () => {
+    const sorted = sortPantryItems([a('sal'), a('arroz'), a('leche', '2026-09-30')], 'expiry');
+    expect(sorted.map(i => i.name)).toEqual(['leche', 'arroz', 'sal']);
+  });
+
+  it('expiry breaks ties by name so the order never jumps between reloads', () => {
+    const sorted = sortPantryItems([a('pan', '2026-09-20'), a('huevos', '2026-09-20')], 'expiry');
+    expect(sorted.map(i => i.name)).toEqual(['huevos', 'pan']);
+  });
+
+  it('does not mutate its input', () => {
+    const input = [a('b'), a('a')];
+    sortPantryItems(input, 'alpha');
+    expect(input.map(i => i.name)).toEqual(['b', 'a']);
+  });
+});
+
+describe('isPantrySortMode', () => {
+  it('accepts only the known modes', () => {
+    expect(isPantrySortMode('expiry')).toBeTrue();
+    expect(isPantrySortMode('alpha')).toBeTrue();
+    expect(isPantrySortMode('recent')).toBeFalse();
+    expect(isPantrySortMode(null)).toBeFalse();
   });
 });

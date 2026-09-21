@@ -301,7 +301,7 @@ export class PantryQueryService {
     const filtered = loaded.filter(item =>
       matchesSearchQuery(item, query) && matchesFilters(item, filters)
     );
-    this.filteredProducts.set(sortPantryItems(filtered));
+    this.filteredProducts.set(sortPantryItems(filtered, 'alpha'));
   }
 
   private requestPipelineReset(): void {
