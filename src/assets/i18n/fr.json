@@ -94,7 +94,8 @@
       "next": "Suivant",
       "delete": "Supprimer",
       "confirm": "Confirmer",
-      "dismiss": "Ignorer"
+      "dismiss": "Ignorer",
+      "undo": "Annuler"
     },
     "loading": "Chargement…",
     "dates": {
@@ -447,7 +448,8 @@
       "boughtManual": "✓ {{name}} acheté.",
       "ignored": "{{name}} masqué pour l'instant — réapparaîtra la prochaine fois.",
       "removedManual": "{{name}} retiré de la liste.",
-      "shareFailed": "Impossible de partager la liste. Réessaie."
+      "shareFailed": "Impossible de partager la liste. Réessaie.",
+      "unbasic": "{{name}} ne sera plus ajouté automatiquement à ta liste."
     },
     "buySheet": {
       "title": "Combien en as-tu acheté ?",
@@ -457,7 +459,14 @@
       "increment": "Augmenter la quantité",
       "decrement": "Diminuer la quantité"
     },
-    "tabTitle": "Courses"
+    "tabTitle": "Courses",
+    "rowMenu": {
+      "hide": "Masquer pour l’instant",
+      "unbasic": "Ne plus toujours garder à la maison",
+      "remove": "Retirer de la liste",
+      "restore": "Remettre dans la liste",
+      "unhide": "Afficher à nouveau"
+    }
   },
   "insights": {
     "ctaDefault": "Compris",

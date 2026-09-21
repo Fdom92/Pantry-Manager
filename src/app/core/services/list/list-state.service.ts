@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { ActionSheetController } from '@ionic/angular';
 import { SHOPPING_LIST_NAME } from '@core/constants';
-import { buildShoppingAnalysis } from '@core/domain/list';
+import { buildShoppingAnalysis, listRowActions, type ListRowAction, type ListRowKind } from '@core/domain/list';
 import { classifyNativeDismissal } from '@core/domain/shared';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
@@ -11,6 +11,7 @@ import { generateBatchId } from '@core/utils/batch-id.util';
 import { createDocumentId, createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { resolveSuggestedExpiry, toLotExpiry } from '@core/domain/pantry/food-type-inference.domain';
+import { setBasic, sumQuantities } from '@core/domain/pantry';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { DownloadService, LoggerService, ShareService, ToastService, shouldSkipShareOutcome } from '../shared';
 import { normalizeProductKey } from '@core/utils/normalization.util';
@@ -41,7 +42,7 @@ export class ListStateService {
 
   readonly isSharingListInProgress = signal(false);
 
-  // Ephemeral per-visit state — cleared on ionViewWillLeave
+  // Ephemeral per-visit state — cleared on ionViewWillLeave ("hide for now" means this visit).
   readonly boughtItemIds  = signal<Set<string>>(new Set());
   readonly removedAutoIds = signal<Set<string>>(new Set());
 
@@ -192,7 +193,7 @@ export class ListStateService {
     if (name) {
       this.toast.info('shopping.toasts.ignored', { name });
     }
-    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'auto' });
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'auto', surface: 'menu' });
   }
 
   removeManualItem(id: string): void {
@@ -200,7 +201,89 @@ export class ListStateService {
     if (item) {
       this.toast.success('shopping.toasts.removedManual', { name: item.name });
     }
-    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'manual' });
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'manual', surface: 'menu' });
+  }
+
+  private static readonly ROW_ACTION_LABELS: Record<ListRowAction, string> = {
+    hide: 'shopping.rowMenu.hide',
+    unbasic: 'shopping.rowMenu.unbasic',
+    remove: 'shopping.rowMenu.remove',
+    restore: 'shopping.rowMenu.restore',
+    unhide: 'shopping.rowMenu.unhide',
+  };
+
+  private static readonly ROW_ACTION_ICONS: Record<ListRowAction, string> = {
+    hide: 'eye-off-outline',
+    unbasic: 'star-outline',
+    remove: 'trash-outline',
+    restore: 'arrow-undo-outline',
+    unhide: 'eye-outline',
+  };
+
+  async openRowActions(row: { kind: ListRowKind; id: string; name: string }): Promise<void> {
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ROW_MENU_OPENED, { kind: row.kind });
+    const sheet = await this.actionSheetCtrl.create({
+      header: row.name,
+      buttons: [
+        ...listRowActions(row.kind).map(spec => ({
+          text: this.translate.instant(ListStateService.ROW_ACTION_LABELS[spec.action]),
+          icon: ListStateService.ROW_ACTION_ICONS[spec.action],
+          role: spec.destructive ? 'destructive' : undefined,
+          handler: () => { void this.runRowAction(spec.action, row); },
+        })),
+        { role: 'cancel', text: this.translate.instant('common.actions.cancel') },
+      ],
+    });
+    await sheet.present();
+  }
+
+  private async runRowAction(action: ListRowAction, row: { kind: ListRowKind; id: string }): Promise<void> {
+    switch (action) {
+      case 'hide': this.removeAutoItem(row.id); return;
+      case 'unbasic': await this.unbasicItem(row.id, row.kind); return;
+      case 'remove': this.removeManualItem(row.id); return;
+      case 'restore': this.restoreFromBought(row.id); return;
+      case 'unhide': this.unhideAutoItem(row.id); return;
+    }
+  }
+
+  unhideAutoItem(id: string): void {
+    this.removedAutoIds.update(set => {
+      const next = new Set(set);
+      next.delete(id);
+      return next;
+    });
+  }
+
+  /**
+   * "Always keep at home" off, from the list. A depleted despensa product is
+   * hidden from the pantry screen, so the list is the only place it can be
+   * un-starred. After this it appears nowhere until added again — hence undo.
+   */
+  async unbasicItem(id: string, from: ListRowKind): Promise<void> {
+    const item = this.items().find(i => i._id === id);
+    if (!item) return;
+    const previousMin = item.minThreshold;
+    await this.pantryStore.updateItem(setBasic(item, false, new Date().toISOString()));
+    this.unhideAutoItem(id);
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BASIC_REMOVED, {
+      kind: item.productType === 'fresh' ? 'fresh' : 'despensa',
+      from,
+      depleted: sumQuantities(item.batches ?? []) <= 0,
+    });
+    this.toast.withAction(
+      'shopping.toasts.unbasic',
+      'common.actions.undo',
+      () => { void this.restoreBasic(id, previousMin); },
+      { name: item.name },
+    );
+  }
+
+  private async restoreBasic(id: string, previousMin: number | undefined): Promise<void> {
+    const current = this.items().find(i => i._id === id);
+    if (!current) return;
+    await this.pantryStore.updateItem(setBasic(current, true, new Date().toISOString(), previousMin));
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BASIC_RESTORED);
   }
 
   restoreFromBought(id: string): void {

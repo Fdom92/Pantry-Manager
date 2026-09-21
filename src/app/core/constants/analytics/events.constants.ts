@@ -106,6 +106,10 @@ export const ANALYTICS_EVENTS = {
   SHOPPING_MANUAL_ADDED: 'shopping_manual_added',
   SHOPPING_ITEM_REMOVED: 'shopping_item_removed',
   SHOPPING_LIST_SHARED: 'shopping_list_shared',
+  /** Row tapped → action menu shown. If nobody opens it, discoverability is the problem. */
+  SHOPPING_ROW_MENU_OPENED: 'shopping_row_menu_opened',
+  SHOPPING_BASIC_REMOVED: 'shopping_basic_removed',
+  SHOPPING_BASIC_RESTORED: 'shopping_basic_restored',
 
   // Insights / PRO
   INSIGHTS_VIEWED: 'insights_viewed',

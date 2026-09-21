@@ -94,7 +94,8 @@
       "next": "Weiter",
       "delete": "Löschen",
       "confirm": "Bestätigen",
-      "dismiss": "Verwerfen"
+      "dismiss": "Verwerfen",
+      "undo": "Rückgängig"
     },
     "loading": "Lädt…",
     "dates": {
@@ -447,7 +448,8 @@
       "boughtManual": "✓ {{name}} gekauft.",
       "ignored": "{{name}} jetzt ausgeblendet — erscheint beim nächsten Mal wieder.",
       "removedManual": "{{name}} aus der Liste entfernt.",
-      "shareFailed": "Die Liste konnte nicht geteilt werden. Bitte versuche es erneut."
+      "shareFailed": "Die Liste konnte nicht geteilt werden. Bitte versuche es erneut.",
+      "unbasic": "{{name}} wird nicht mehr automatisch zur Liste hinzugefügt."
     },
     "buySheet": {
       "title": "Wie viele hast du gekauft?",
@@ -457,7 +459,14 @@
       "increment": "Menge erhöhen",
       "decrement": "Menge verringern"
     },
-    "tabTitle": "Einkauf"
+    "tabTitle": "Einkauf",
+    "rowMenu": {
+      "hide": "Vorerst ausblenden",
+      "unbasic": "Nicht mehr immer vorrätig halten",
+      "remove": "Von der Liste entfernen",
+      "restore": "Zurück auf die Liste",
+      "unhide": "Wieder anzeigen"
+    }
   },
   "insights": {
     "ctaDefault": "Verstanden",

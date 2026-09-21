@@ -94,7 +94,8 @@
       "next": "Avanti",
       "delete": "Elimina",
       "confirm": "Conferma",
-      "dismiss": "Ignora"
+      "dismiss": "Ignora",
+      "undo": "Annulla"
     },
     "loading": "Caricamento…",
     "dates": {
@@ -447,7 +448,8 @@
       "boughtManual": "✓ {{name}} acquistato.",
       "ignored": "{{name}} nascosto ora — riapparirà la prossima volta.",
       "removedManual": "{{name}} rimosso dalla lista.",
-      "shareFailed": "Impossibile condividere la lista. Riprova."
+      "shareFailed": "Impossibile condividere la lista. Riprova.",
+      "unbasic": "{{name}} non verrà più aggiunto automaticamente alla lista."
     },
     "buySheet": {
       "title": "Quanti ne hai comprati?",
@@ -457,7 +459,14 @@
       "increment": "Aumenta quantità",
       "decrement": "Riduci quantità"
     },
-    "tabTitle": "Spesa"
+    "tabTitle": "Spesa",
+    "rowMenu": {
+      "hide": "Nascondi per ora",
+      "unbasic": "Non tenere più sempre in casa",
+      "remove": "Rimuovi dalla lista",
+      "restore": "Rimetti nella lista",
+      "unhide": "Mostra di nuovo"
+    }
   },
   "insights": {
     "ctaDefault": "Capito",

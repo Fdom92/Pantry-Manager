@@ -94,7 +94,8 @@
       "next": "Next",
       "delete": "Delete",
       "confirm": "Confirm",
-      "dismiss": "Dismiss"
+      "dismiss": "Dismiss",
+      "undo": "Undo"
     },
     "loading": "Loading…",
     "dates": {
@@ -447,7 +448,8 @@
       "boughtManual": "✓ {{name}} bought.",
       "ignored": "{{name}} hidden for now — it will come back next time.",
       "removedManual": "{{name}} removed from list.",
-      "shareFailed": "Couldn't share the list. Please try again."
+      "shareFailed": "Couldn't share the list. Please try again.",
+      "unbasic": "{{name}} won’t be added to your list automatically anymore."
     },
     "buySheet": {
       "title": "How many did you buy?",
@@ -457,7 +459,14 @@
       "increment": "Increase quantity",
       "decrement": "Decrease quantity"
     },
-    "tabTitle": "Shop"
+    "tabTitle": "Shop",
+    "rowMenu": {
+      "hide": "Hide for now",
+      "unbasic": "Stop always keeping at home",
+      "remove": "Remove from list",
+      "restore": "Put back on the list",
+      "unhide": "Show again"
+    }
   },
   "insights": {
     "ctaDefault": "Got it",
