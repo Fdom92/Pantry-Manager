@@ -32,6 +32,7 @@ export class NotificationSchedulerService {
   private readonly logger = inject(LoggerService);
 
   private isScheduling = false;
+  private deliveredSnapshot: Promise<number[]> | null = null;
 
   constructor() {
     effect(() => {
@@ -110,6 +111,9 @@ export class NotificationSchedulerService {
    */
   async scheduleAll(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
+    // Read the tray before anything below cancels (cancel() also dismisses shown
+    // notifications on Android). Consumed by reportDelivered().
+    this.deliveredSnapshot ??= this.plugin.getDelivered();
     if (this.isScheduling) return;
 
     this.isScheduling = true;
@@ -179,7 +183,9 @@ export class NotificationSchedulerService {
   /** See ANALYTICS_EVENTS.NOTIFICATION_DELIVERED_SEEN for what this can and cannot say. */
   async reportDelivered(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
-    const ids = await this.plugin.getDelivered();
+    const snapshot = this.deliveredSnapshot ?? this.plugin.getDelivered();
+    this.deliveredSnapshot = null;
+    const ids = await snapshot;
     if (!ids.length) return;
     this.analytics.track(ANALYTICS_EVENTS.NOTIFICATION_DELIVERED_SEEN, {
       count: ids.length,

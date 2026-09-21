@@ -172,6 +172,8 @@ export const ANALYTICS_EVENTS = {
    * only emits it while the WebView is alive, and a morning notification
    * usually arrives with the app process dead.
    * ids is a sorted comma-joined string (event props are flat).
+   * The tray is read before scheduleAll() cancels anything — cancelling also
+   * dismisses shown notifications.
    */
   NOTIFICATION_DELIVERED_SEEN: 'notification_delivered_seen',
   NOTIFICATION_TAPPED: 'notification_tapped',

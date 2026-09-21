@@ -109,4 +109,49 @@ describe('NotificationSchedulerService', () => {
     await scheduler.reportDelivered();
     expect(analytics.track).not.toHaveBeenCalled();
   });
+
+  it('reads the tray before cancelling anything', async () => {
+    permission.isGranted.and.returnValue(true);
+    plugin.getDelivered.and.resolveTo([201]);
+    const order: string[] = [];
+    plugin.getDelivered.and.callFake(() => {
+      order.push('getDelivered');
+      return Promise.resolve([201]);
+    });
+    plugin.cancel.and.callFake(() => {
+      order.push('cancel');
+      return Promise.resolve();
+    });
+
+    await scheduler.scheduleAll();
+
+    expect(order[0]).toBe('getDelivered');
+    expect(order.indexOf('cancel')).toBeGreaterThan(order.indexOf('getDelivered'));
+  });
+
+  it('reports the snapshot taken before the cancel', async () => {
+    permission.isGranted.and.returnValue(true);
+    plugin.getDelivered.and.resolveTo([201]);
+
+    await scheduler.scheduleAll();
+    await scheduler.reportDelivered();
+
+    expect(analytics.track).toHaveBeenCalledWith('notification_delivered_seen', { count: 1, ids: '201' });
+    expect(plugin.getDelivered).toHaveBeenCalledTimes(1);
+  });
+
+  it('takes a fresh snapshot on the next scheduling pass after reporting', async () => {
+    permission.isGranted.and.returnValue(true);
+    plugin.getDelivered.and.resolveTo([201]);
+
+    await scheduler.scheduleAll();
+    await scheduler.reportDelivered();
+
+    plugin.getDelivered.and.resolveTo([]);
+    await scheduler.scheduleAll();
+    await scheduler.reportDelivered();
+
+    expect(plugin.getDelivered).toHaveBeenCalledTimes(2);
+    expect(analytics.track).toHaveBeenCalledTimes(1);
+  });
 });
