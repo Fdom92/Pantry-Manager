@@ -13,6 +13,7 @@ const DURATION = {
   success: 1500,
   info: 2000,
   error: 3000,
+  action: 5000,
 } as const;
 
 /**
@@ -45,6 +46,37 @@ export class ToastService {
   /** For messages already built by the caller (concatenations, dev panels). */
   raw(message: string, opts?: ToastOptions): void {
     void this.present(message, opts);
+  }
+
+  /**
+   * A toast with one action button (e.g. "Undo"). Longer than the others:
+   * the user has to read it and decide.
+   */
+  withAction(
+    key: string,
+    actionKey: string,
+    onAction: () => void,
+    params?: Record<string, unknown>,
+  ): void {
+    void this.presentWithAction(
+      this.translate.instant(key, params),
+      this.translate.instant(actionKey),
+      onAction,
+    );
+  }
+
+  private async presentWithAction(message: string, actionText: string, onAction: () => void): Promise<void> {
+    try {
+      const toast = await this.toastCtrl.create({
+        message,
+        duration: DURATION.action,
+        position: 'bottom',
+        buttons: [{ text: actionText, handler: () => { onAction(); } }],
+      });
+      await toast.present();
+    } catch (err) {
+      this.logger.warn('ToastService', 'Failed to present action toast', { err: String(err) });
+    }
   }
 
   private async present(message: string, opts?: ToastOptions): Promise<void> {
