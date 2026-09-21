@@ -124,6 +124,9 @@ export class NotificationSchedulerService {
       }
 
       if (!this.permission.isGranted()) {
+        // A broken plugin is not a user decision: the plugin already logged it
+        // to Sentry. Leave the user's toggle exactly as it is.
+        if (this.permission.isUnavailable()) return;
         if (this.permission.isPermanentlyDenied()) {
           // User chose "Don't ask again" — cannot request. Auto-disable the toggle.
           // The settings UI will show a friendly alert explaining how to re-enable.
@@ -138,6 +141,7 @@ export class NotificationSchedulerService {
         if (this.permission.wasRequested) return;
         const granted = await this.permission.request();
         if (!granted) {
+          if (this.permission.isUnavailable()) return;
           // Mirror the system decision back into preferences so the toggle goes OFF
           // automatically — avoids the confusing state where toggle is ON but no
           // notifications arrive.
