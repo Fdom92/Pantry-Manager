@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { STORAGE_KEYS } from '@core/constants';
+import { DEFAULT_PANTRY_SORT_MODE, isPantrySortMode, type PantrySortMode } from '@core/domain/pantry';
 
 /**
  * Typed, grouped facade over `window.localStorage`.
@@ -88,6 +89,15 @@ export class LocalStorageService {
   readonly householdSize = {
     get: () => this.getNumber(STORAGE_KEYS.HOUSEHOLD_SIZE) ?? 1,
     set: (n: number) => this.setNumber(STORAGE_KEYS.HOUSEHOLD_SIZE, n),
+  };
+
+  // ─── Despensa sort order (screen state) ────────────────────────────────
+  readonly pantrySort = {
+    get: (): PantrySortMode => {
+      const raw = this.getString(STORAGE_KEYS.PANTRY_SORT);
+      return isPantrySortMode(raw) ? raw : DEFAULT_PANTRY_SORT_MODE;
+    },
+    set: (mode: PantrySortMode) => this.setString(STORAGE_KEYS.PANTRY_SORT, mode),
   };
 
   // ─── Coach marks (one-shot per-device flags) ───────────────────────────

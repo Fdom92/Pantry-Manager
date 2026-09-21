@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
 import { ANALYTICS_EVENTS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
-import { getItemStatusState } from '@core/domain/pantry';
+import { getItemStatusState, type PantrySortMode } from '@core/domain/pantry';
 import type { PantryFilterState, PantryItem, PantrySummary } from '@core/models/pantry';
 import { normalizeLowercase, normalizeTrim } from '@core/utils/normalization.util';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
@@ -31,6 +31,7 @@ export class PantryStoreService {
   readonly endReached: Signal<boolean> = this.pantryQuery.endReached;
   readonly searchQuery: Signal<string> = this.pantryQuery.searchQuery;
   readonly activeFilters: Signal<PantryFilterState> = this.pantryQuery.activeFilters;
+  readonly sortMode: Signal<PantrySortMode> = this.pantryQuery.sortMode;
   readonly pipelineResetting: Signal<boolean> = this.pantryQuery.pipelineResetting;
   readonly totalCount: Signal<number> = this.pantryQuery.totalCount;
   readonly loadedProducts: Signal<PantryItem[]> = this.pantryQuery.loadedProducts;
@@ -149,6 +150,10 @@ export class PantryStoreService {
     params: { quantity: number; expiryDate?: string; location?: string; noExpiry?: boolean }
   ): Promise<PantryItem | null> {
     return this.pantryQuery.addNewLot(itemId, params);
+  }
+
+  setSortMode(mode: PantrySortMode): void {
+    this.pantryQuery.setSortMode(mode);
   }
 
   // ─── Realtime sync ────────────────────────────────────────────────────────

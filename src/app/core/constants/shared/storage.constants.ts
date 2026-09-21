@@ -56,6 +56,11 @@ export const STORAGE_KEYS = {
   COACH_MARK_PREFIX: 'coachMark:',
   /** Number of people in household, used to scale food-coverage estimate. */
   HOUSEHOLD_SIZE: 'insights:householdSize',
+  /**
+   * Despensa sort order ('expiry' | 'alpha'). Screen state, not an app
+   * preference: AppPreferences changes re-run the notification scheduler.
+   */
+  PANTRY_SORT: 'pantry:sortMode',
 } as const;
 
 export const DEFAULT_HOUSEHOLD_ID = 'household:default';

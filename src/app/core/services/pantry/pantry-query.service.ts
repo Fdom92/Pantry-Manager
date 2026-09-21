@@ -5,11 +5,13 @@ import {
   matchesSearchQuery,
   sortPantryItems,
   sumQuantities,
+  type PantrySortMode,
 } from '@core/domain/pantry';
 import { DEFAULT_PANTRY_FILTERS } from '@core/models/pantry';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
 import { LoggerService } from '../shared/logger.service';
+import { LocalStorageService } from '../shared/local-storage.service';
 import { PantryNavigationPresetService } from './pantry-navigation-preset.service';
 import { PantryService } from './pantry.service';
 
@@ -27,6 +29,7 @@ export class PantryQueryService {
   private readonly pantryService = inject(PantryService);
   private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly logger = inject(LoggerService);
+  private readonly localStorage = inject(LocalStorageService);
 
   private dbInitialized = false;
   private currentLoadPromise: Promise<void> | null = null;
@@ -47,6 +50,7 @@ export class PantryQueryService {
   readonly filteredProducts = signal<PantryItem[]>([]);
   readonly searchQuery = signal('');
   readonly activeFilters = signal<PantryFilterState>({ ...DEFAULT_PANTRY_FILTERS });
+  readonly sortMode = signal<PantrySortMode>(this.localStorage.pantrySort.get());
   readonly pageOffset = signal(0);
   readonly pageSize = signal(DEFAULT_PANTRY_PAGE_SIZE);
   readonly loading = signal(false);
@@ -249,6 +253,13 @@ export class PantryQueryService {
     this.requestPipelineReset();
   }
 
+  /** Re-sorts in memory; does not reset pagination. */
+  setSortMode(mode: PantrySortMode): void {
+    if (this.sortMode() === mode) return;
+    this.sortMode.set(mode);
+    this.localStorage.pantrySort.set(mode);
+  }
+
   /** Resets filters and search text, forcing a fresh load from the start. */
   resetSearchAndFilters(): void {
     const hasSearch = Boolean(this.searchQuery());
@@ -301,7 +312,7 @@ export class PantryQueryService {
     const filtered = loaded.filter(item =>
       matchesSearchQuery(item, query) && matchesFilters(item, filters)
     );
-    this.filteredProducts.set(sortPantryItems(filtered, 'alpha'));
+    this.filteredProducts.set(sortPantryItems(filtered, this.sortMode()));
   }
 
   private requestPipelineReset(): void {
