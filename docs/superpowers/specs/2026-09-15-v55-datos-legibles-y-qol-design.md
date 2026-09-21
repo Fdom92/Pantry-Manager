@@ -30,7 +30,7 @@ propósito.
 5. Sección Frescos vacía en una línea.
 6. Borrar código muerto del modal de consumir.
 7. Lista de la compra: añadir a mano con la lista vacía.
-8. Lista de la compra: "No lo necesito" que se guarda.
+8. Lista de la compra: quitar de básicos desde la lista.
 
 Los puntos 7 y 8 salen del uso real de Fernando (añadidos el 2026-09-21).
 
@@ -180,35 +180,42 @@ manuales, solo se ve el estado vacío y **no hay forma de añadir nada**.
 - Se revisa el texto `shopping.emptyState.autoHint`: si dice que la lista solo se
   llena sola, se ajusta en los 6 idiomas para mencionar también el añadido a mano.
 
-## 8 — "No lo necesito" que se guarda
+## 8 — Quitar de básicos desde la lista
 
-Quitar un automático ya existe (`removeAutoItem`, `list-state.service.ts:189`), pero:
+**El caso (Fernando, uso real):** el maíz era básico con mínimo 1. Se acaba y sale
+en la lista. Pero ya no se quiere tener siempre: se comprará de vez en cuando. No
+hay forma de decirlo:
 
-- solo se llega **deslizando la fila**, con un icono de ojo tachado
-  (`list.component.html:94-99`), y Fernando, que conoce la app, no lo encontró;
-- **es temporal**: `removedAutoIds` es un signal en memoria que se vacía en
-  `ionViewWillLeave` (`:79`), así que al cambiar de pestaña el producto vuelve.
+- La lista **solo sugiere productos básicos** (`shouldAutoAddToShoppingList`,
+  `pantry-status.domain.ts:180`). Quitar el básico es exactamente "no me lo vuelvas
+  a sugerir", da igual lo que se compre o se gaste después.
+- En la despensa ya existe (la estrella, `toggleItemBasic`,
+  `pantry-state.service.ts:552`), y al quitarlo también borra el mínimo. **Pero un
+  producto de despensa a 0 no se ve en la despensa** (`activeProducts` filtra por
+  stock mayor que 0). El producto agotado solo existe en la lista, justo donde no se
+  puede desmarcar.
+- Lo que hoy hay en la lista al deslizar (ojo tachado, `removeAutoItem`) es otra
+  cosa: "oculto por ahora — volverá la próxima vez". Es el "este viaje no". **Se
+  queda como está.**
 
-**Regla:** un automático descartado no vuelve a salir **mientras su stock no
-cambie**. Se guarda el id y la cantidad total de ese momento; en cuanto la cantidad
-es otra (se consume, se repone o se ajusta), el descarte se olvida y el producto
-vuelve a evaluarse con las reglas de siempre. Así "ya no lo necesito" no se
-convierte en "no me lo sugieras nunca más".
+**Cambio:**
 
-- **Dominio:** en `core/domain/list/`, `isDismissalActive(dismissal, currentQuantity)`
-  y `pruneDismissals(dismissals, items)`, que quita los de productos borrados o con
-  stock distinto. Con spec. Vale igual para frescos, porque su "cantidad" es el
-  estado (3/1/0).
-- **Persistencia:** `LocalStorageService.shoppingDismissals`, como `manualList`, con
-  una clave nueva en `storage.constants.ts`. Se poda al cargar la lista.
-- **Estado:** `removedAutoIds` deja de ser un signal que se vacía al salir;
-  `ionViewWillLeave` ya no lo toca. `boughtItemIds` sigue como está.
-- **Sección "Ignorados":** ya existe (`state.allIgnoredItems`) y su acción de
-  recuperar borra el descarte guardado.
-- **Visible:** botón "No lo necesito" en la hoja que abre `onBuyTap`, además del
-  gesto de deslizar.
-- **Analítica:** `shopping_item_removed` ya existe con `source: 'auto'`; se añade
-  `surface: 'sheet' | 'swipe'`. Así se sabe si el botón visible cambia algo.
+- **Dominio:** `setBasic(item, isBasic, nowIso)` en `core/domain/pantry/`, con la
+  regla que hoy vive dentro de `toggleItemBasic` (quitar el básico borra
+  `minThreshold`). La usan la estrella de la despensa y la lista, para que no haya dos
+  definiciones de qué significa dejar de ser básico. Con spec.
+- **Lista:** botón **"Ya no es básico"** en la hoja que abre `onBuyTap`, y una
+  segunda opción al deslizar, junto al ojo tachado. Guarda con
+  `pantryStore.updateItem` y el producto sale de la lista al momento.
+- **Aviso con deshacer:** `ToastService.withAction(key, actionKey, handler)`, con
+  `buttons` de Ionic y 5 s. "Deshacer" vuelve a marcar el básico **con el mínimo que
+  tenía**. Es necesario porque, si el producto está a 0, después de quitarle el
+  básico no aparece en ningún sitio hasta que se vuelva a añadir.
+- **Textos:** clave nueva en `shopping.*` en los 6 idiomas ("{{name}} ya no es
+  básico: no volverá a la lista sola"), más el botón y "Deshacer".
+- **Frescos:** la misma acción vale; también se sugieren solo si son básicos.
+- **Analítica:** `shopping_basic_removed { kind, surface: 'sheet' | 'swipe',
+  depleted }` y `shopping_basic_restored` si se deshace.
 
 ## Riesgos
 
@@ -230,7 +237,7 @@ convierte en "no me lo sugieras nunca más".
   PostHog; `notification_delivered_seen` tras dejar una notificación en la bandeja
   (el panel de desarrollo puede lanzarlas); onboarding, borrado y ticket siguen
   funcionando.
-- Lista de la compra: con la lista vacía se puede añadir a mano; descartar un
-  automático sobrevive a cambiar de pestaña y a reiniciar la app, y vuelve a salir
-  al cambiar su stock.
+- Lista de la compra: con la lista vacía se puede añadir a mano;
+  quitar de básicos saca el producto de la lista y no vuelve aunque se compre y se
+  gaste; "Deshacer" lo devuelve con su mínimo; "oculto por ahora" sigue igual.
 - Pista de pruebas internas de Play: `install_source: 'play'`.
