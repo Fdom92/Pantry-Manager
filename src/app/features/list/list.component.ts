@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, QueryList, ViewChildren, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ListStateService } from '@core/services/list/list-state.service';
 import {
@@ -10,9 +10,6 @@ import {
   IonHeader,
   IonIcon,
   IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
   IonList,
   IonSkeletonText,
   IonSpinner,
@@ -28,7 +25,6 @@ import { ShoppingManualAddSheetStateService } from './components/shopping-manual
 import { ShoppingReason } from '@core/models/list/list.model';
 import type { ShoppingSuggestionGroupWithItem, ShoppingSuggestionWithItem } from '@core/models/list/list.model';
 import { UNASSIGNED_SUPERMARKET_KEY } from '@core/constants';
-import { CoachMarkStateService } from '@core/services/retention/coach-mark-state.service';
 
 @Component({
   selector: 'app-list',
@@ -42,7 +38,7 @@ import { CoachMarkStateService } from '@core/services/retention/coach-mark-state
     ShoppingManualAddSheetComponent,
     IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
     IonContent, IonIcon, IonSpinner, IonSkeletonText, IonBadge,
-    IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
+    IonList, IonItem,
   ],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
@@ -53,10 +49,7 @@ export class ListComponent {
   readonly facade = inject(ListStateService);
   readonly buySheet = inject(ShoppingBuySheetStateService);
   readonly manualAddSheet = inject(ShoppingManualAddSheetStateService);
-  private readonly coachMark = inject(CoachMarkStateService);
   readonly UNASSIGNED_KEY = UNASSIGNED_SUPERMARKET_KEY;
-
-  @ViewChildren(IonItemSliding) private slidingItems!: QueryList<IonItemSliding>;
 
   private readonly collapsedGroups = signal<Set<string>>(new Set());
   private readonly exitingItems = signal<Set<string>>(new Set());
@@ -65,10 +58,6 @@ export class ListComponent {
 
   async ionViewWillEnter(): Promise<void> {
     await this.facade.ionViewWillEnter();
-  }
-
-  ionViewDidEnter(): void {
-    void this.maybeShowSwipeHint();
   }
 
   async ionViewWillLeave(): Promise<void> {
@@ -129,21 +118,6 @@ export class ListComponent {
       if (g.key === this.UNASSIGNED_KEY) return true;
     }
     return false;
-  }
-
-  private async maybeShowSwipeHint(): Promise<void> {
-    if (this.coachMark.isShown('list:swipe')) return;
-    await new Promise<void>(r => setTimeout(r, 500));
-    const first = this.slidingItems?.first;
-    if (!first) return;
-    try {
-      await first.open('end');
-      await new Promise<void>(r => setTimeout(r, 900));
-      await first.close();
-      this.coachMark.markShown('list:swipe');
-    } catch {
-      // hint is non-critical
-    }
   }
 
   openManualAdd(): void {

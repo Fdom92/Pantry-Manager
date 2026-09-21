@@ -4,7 +4,7 @@
   to { transform: translateX(-56px); opacity: 0; }
 }
 
-ion-item-sliding.suggestion-item--exiting {
+ion-item.suggestion-item--exiting {
   animation: item-exit 260ms ease forwards;
   pointer-events: none;
 }

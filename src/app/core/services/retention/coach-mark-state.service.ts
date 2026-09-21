@@ -3,7 +3,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '@core/services/analytics/analytics.service';
 import { LocalStorageService } from '@core/services/shared';
 
-export type CoachMarkKey = 'add_first_item' | 'pantry:star' | 'list:swipe';
+export type CoachMarkKey = 'add_first_item' | 'pantry:star';
 
 /**
  * One-shot UI hints. Owns both halves of a coach mark — whether it has already

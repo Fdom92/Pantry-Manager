@@ -67,62 +67,51 @@
               @if (!isGroupCollapsed(group.key)) {
                 <ion-list class="item-list" lines="none">
                   @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
-                    <ion-item-sliding [class.suggestion-item--exiting]="isExiting(suggestion.item._id)">
-                      <ion-item
-                        detail="false"
-                        class="suggestion-item">
-                        <div class="item-body" slot="start">
-                          <span class="item-name">{{ suggestion.item.name }}</span>
-                          @if (suggestion.minThreshold !== undefined) {
-                            <span class="item-qty">
-                              {{ 'shopping.suggestions.restock' | translate:{ amount: suggestion.suggestedQuantity } }}
-                            </span>
-                          }
-                        </div>
-                        <ion-button
-                          slot="end"
-                          fill="solid"
-                          [color]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'success' : 'primary'"
-                          shape="round"
-                          class="buy-btn"
-                          (click)="onBuyTap(suggestion)">
-                          <ion-icon
-                            slot="icon-only"
-                            [name]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'leaf-outline' : 'cart-outline'">
-                          </ion-icon>
-                        </ion-button>
-                      </ion-item>
-                      <ion-item-options side="end">
-                        <ion-item-option
-                          color="medium"
-                          (click)="facade.removeAutoItem(suggestion.item._id)">
-                          <ion-icon slot="icon-only" name="eye-off-outline"></ion-icon>
-                        </ion-item-option>
-                      </ion-item-options>
-                    </ion-item-sliding>
+                    <ion-item
+                      detail="false"
+                      class="suggestion-item pressable"
+                      [class.suggestion-item--exiting]="isExiting(suggestion.item._id)"
+                      (click)="facade.openRowActions({ kind: 'auto', id: suggestion.item._id, name: suggestion.item.name })">
+                      <div class="item-body" slot="start">
+                        <span class="item-name">{{ suggestion.item.name }}</span>
+                        @if (suggestion.minThreshold !== undefined) {
+                          <span class="item-qty">
+                            {{ 'shopping.suggestions.restock' | translate:{ amount: suggestion.suggestedQuantity } }}
+                          </span>
+                        }
+                      </div>
+                      <ion-button
+                        slot="end"
+                        fill="solid"
+                        [color]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'success' : 'primary'"
+                        shape="round"
+                        class="buy-btn"
+                        (click)="$event.stopPropagation(); onBuyTap(suggestion)">
+                        <ion-icon
+                          slot="icon-only"
+                          [name]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'leaf-outline' : 'cart-outline'">
+                        </ion-icon>
+                      </ion-button>
+                    </ion-item>
                   }
                   @for (manual of groupManuals; track manual.id) {
-                    <ion-item-sliding>
-                      <ion-item detail="false" class="suggestion-item">
-                        <div class="item-body" slot="start">
-                          <span class="item-name">{{ manual.name }}</span>
-                        </div>
-                        <ion-button
-                          slot="end"
-                          fill="solid"
-                          color="primary"
-                          shape="round"
-                          class="buy-btn"
-                          (click)="buySheet.openSheetForManual(manual.id, manual.name)">
-                          <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                        </ion-button>
-                      </ion-item>
-                      <ion-item-options side="end">
-                        <ion-item-option color="danger" (click)="facade.removeManualItem(manual.id)">
-                          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                        </ion-item-option>
-                      </ion-item-options>
-                    </ion-item-sliding>
+                    <ion-item
+                      detail="false"
+                      class="suggestion-item pressable"
+                      (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
+                      <div class="item-body" slot="start">
+                        <span class="item-name">{{ manual.name }}</span>
+                      </div>
+                      <ion-button
+                        slot="end"
+                        fill="solid"
+                        color="primary"
+                        shape="round"
+                        class="buy-btn"
+                        (click)="$event.stopPropagation(); buySheet.openSheetForManual(manual.id, manual.name)">
+                        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+                      </ion-button>
+                    </ion-item>
                   }
                 </ion-list>
               }
@@ -145,27 +134,23 @@
             @if (!isGroupCollapsed(UNASSIGNED_KEY)) {
               <ion-list class="item-list" lines="none">
                 @for (manual of facade.manualItems(); track manual.id) {
-                  <ion-item-sliding>
-                    <ion-item detail="false" class="suggestion-item">
-                      <div class="item-body" slot="start">
-                        <span class="item-name">{{ manual.name }}</span>
-                      </div>
-                      <ion-button
-                        slot="end"
-                        fill="solid"
-                        color="primary"
-                        shape="round"
-                        class="buy-btn"
-                        (click)="buySheet.openSheetForManual(manual.id, manual.name)">
-                        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                      </ion-button>
-                    </ion-item>
-                    <ion-item-options side="end">
-                      <ion-item-option color="danger" (click)="facade.removeManualItem(manual.id)">
-                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                      </ion-item-option>
-                    </ion-item-options>
-                  </ion-item-sliding>
+                  <ion-item
+                    detail="false"
+                    class="suggestion-item pressable"
+                    (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
+                    <div class="item-body" slot="start">
+                      <span class="item-name">{{ manual.name }}</span>
+                    </div>
+                    <ion-button
+                      slot="end"
+                      fill="solid"
+                      color="primary"
+                      shape="round"
+                      class="buy-btn"
+                      (click)="$event.stopPropagation(); buySheet.openSheetForManual(manual.id, manual.name)">
+                      <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+                    </ion-button>
+                  </ion-item>
                 }
               </ion-list>
             }
@@ -187,17 +172,13 @@
             @if (globalBoughtExpanded()) {
               <ion-list class="item-list bought-list" lines="none">
                 @for (bought of state.allBoughtItems; track bought.id) {
-                  <ion-item-sliding>
-                    <ion-item class="bought-item" detail="false">
-                      <ion-icon slot="start" name="checkmark-circle" color="success"></ion-icon>
-                      <span class="item-name bought-name">{{ bought.name }}</span>
-                    </ion-item>
-                    <ion-item-options side="start">
-                      <ion-item-option (click)="facade.restoreFromBought(bought.id)">
-                        <ion-icon slot="icon-only" name="arrow-undo-outline"></ion-icon>
-                      </ion-item-option>
-                    </ion-item-options>
-                  </ion-item-sliding>
+                  <ion-item
+                    class="bought-item pressable"
+                    detail="false"
+                    (click)="facade.openRowActions({ kind: 'bought', id: bought.id, name: bought.name })">
+                    <ion-icon slot="start" name="checkmark-circle" color="success"></ion-icon>
+                    <span class="item-name bought-name">{{ bought.name }}</span>
+                  </ion-item>
                 }
               </ion-list>
             }
@@ -219,7 +200,10 @@
             @if (globalIgnoredExpanded()) {
               <ion-list class="item-list ignored-list" lines="none">
                 @for (ignored of state.allIgnoredItems; track ignored.id) {
-                  <ion-item detail="false" class="ignored-item">
+                  <ion-item
+                    detail="false"
+                    class="ignored-item pressable"
+                    (click)="facade.openRowActions({ kind: 'hidden', id: ignored.id, name: ignored.name })">
                     <ion-icon slot="start" name="eye-off-outline" color="medium"></ion-icon>
                     <span class="item-name ignored-name">{{ ignored.name }}</span>
                   </ion-item>
