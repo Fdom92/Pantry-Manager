@@ -83,3 +83,12 @@
 }
 
 // Animation app-empty-fade now lives in global.scss alongside app-fade-in-list.
+
+.empty-state-inline {
+  margin: 0;
+  padding: var(--app-theme-spacing-xs) 0 var(--app-theme-spacing-sm);
+  color: var(--ion-color-medium);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  white-space: normal; // the subtitle's "\n" reads as a space on one line
+}

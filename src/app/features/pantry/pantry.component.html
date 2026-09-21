@@ -86,6 +86,7 @@
           class="list-empty-state"
           icon="leaf-outline"
           [hideTitle]="true"
+          [inline]="true"
           [subtitleKey]="'pantry.fresh.emptyState.subtitle'">
         </app-empty-state>
       } @else if (facade.hasFreshButFilteredEmpty()) {
@@ -93,6 +94,7 @@
           class="list-empty-state"
           icon="leaf-outline"
           [hideTitle]="true"
+          [inline]="true"
           [subtitleKey]="'pantry.fresh.empty.filters'">
         </app-empty-state>
       } @else {

@@ -25,6 +25,11 @@ export class EmptyStateComponent implements OnInit {
   @Input() showAction = false;
   @Input() actionLabel?: string;
   @Input() compact = false;
+  /**
+   * One line of secondary text, no icon, no card. The analytics event still
+   * fires from ngOnInit — the reason this is a variant and not plain text.
+   */
+  @Input() inline = false;
   @Input() iconColor?: EmptyStateColor;
   @Output() action = new EventEmitter<void>();
 
