@@ -8,7 +8,7 @@ import { LocalStorageService, LoggerService } from '@core/services/shared';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
 import { SyncService } from '@core/services/sync/sync.service';
-import { AnalyticsService } from '@core/services/analytics';
+import { AnalyticsService, InstallSourceService } from '@core/services/analytics';
 import { buildPersonProfile } from '@core/domain/analytics';
 import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
@@ -38,6 +38,7 @@ export class AppComponent {
   private readonly notificationScheduler = inject(NotificationSchedulerService);
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly installSource = inject(InstallSourceService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly appUpdate = inject(AppUpdateService);
   private readonly logger = inject(LoggerService);
@@ -118,7 +119,7 @@ export class AppComponent {
           now: new Date(),
           onboardingDone: this.localStorage.onboarding.isSeen(),
           notificationsEnabled: preferences.notificationsEnabled === true,
-          installSource: 'unknown',
+          installSource: await this.installSource.resolve(),
         }),
       );
     } catch (err) {
