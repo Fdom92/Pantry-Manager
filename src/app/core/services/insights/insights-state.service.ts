@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { toSignal } from '@angular/core/rxjs-interop';
 import type { InsightsAnalysis, InsightsSignalsPayload } from '@core/models/insights/insights-analysis.model';
@@ -66,6 +66,15 @@ export class InsightsStateService {
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
   private hasLoadedOnce = false;
+
+  // Load on creation and whenever the history changes, not only from
+  // `ionViewWillEnter`: the dashboard showed "sin desperdicios" until a tab
+  // switch, because the hook hadn't run yet or the expired-batch scan logged
+  // its events after the page had read them.
+  private readonly reloadOnHistoryChange = effect(() => {
+    this.eventLog.revision();
+    untracked(() => void this.loadEvents());
+  });
   readonly householdSize = signal(this.localStorage.householdSize.get());
 
   readonly staleCount = computed((): number => {
