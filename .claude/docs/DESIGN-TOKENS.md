@@ -36,6 +36,8 @@ rule because Material mode doesn't colour them.
   `@supports not (backdrop-filter)` fallback.
 - **Tonal chips/buttons**: soft accent fill + deep accent text instead of solid colour.
 - **Hover lift** (`--app-theme-card-hover-*`) only inside `@media (hover: hover)`.
+- **Empty states**: a whole empty screen gets the big icon + title (`app-empty-state`); an empty
+  section inside a page gets `[inline]="true"` (small icon + one line, no card).
 - **Press feedback** on tappable rows: background tint, not scale, when the row contains its own
   button (the scale would leak to the whole row).
 
