@@ -354,8 +354,8 @@
     },
     "waste": {
       "title": "Waste this month",
-      "count_one": "You threw away 1 product",
-      "count": "You threw away {{count}} products",
+      "count_one": "1 product expired on you",
+      "count": "{{count}} products expired on you",
       "topCategory": "Mostly in: {{category}}",
       "zero": "No waste this month! 🎯",
       "trend": {

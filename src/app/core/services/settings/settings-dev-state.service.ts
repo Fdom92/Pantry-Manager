@@ -116,7 +116,7 @@ export class SettingsDevStateService {
 
   /**
    * Wipe every pantry item and the history behind it, so the app looks new:
-   * leaving the events kept the waste card at "Has tirado N" after a wipe.
+   * leaving the events kept the waste card at its old count after a wipe.
    */
   async clearPantry(): Promise<void> {
     const [items, events] = await Promise.all([this.pantry.getAll(), this.eventLog.listEvents()]);

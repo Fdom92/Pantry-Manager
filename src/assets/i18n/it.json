@@ -354,8 +354,8 @@
     },
     "waste": {
       "title": "Sprechi questo mese",
-      "count_one": "Hai buttato 1 prodotto",
-      "count": "Hai buttato {{count}} prodotti",
+      "count_one": "Ti è scaduto 1 prodotto",
+      "count": "Ti sono scaduti {{count}} prodotti",
       "topCategory": "Soprattutto in: {{category}}",
       "zero": "Nessuno spreco questo mese! 🎯",
       "trend": {

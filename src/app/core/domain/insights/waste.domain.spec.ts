@@ -38,7 +38,7 @@ describe('computeWasteSummary', () => {
     expect(computeWasteSummary(events, now, 30).totalCount).toBe(1);
   });
 
-  // The card says "Has tirado N productos": 6 yogures + 4 huevos are 2 products,
+  // The card says "Se te han caducado N productos": 6 yogures + 4 huevos are 2 products,
   // not 10 (it summed units until 5.5).
   it('counts products, not units', () => {
     const events = [

@@ -354,8 +354,8 @@
     },
     "waste": {
       "title": "Desperdicio este mes",
-      "count_one": "Has tirado 1 producto",
-      "count": "Has tirado {{count}} productos",
+      "count_one": "Se te ha caducado 1 producto",
+      "count": "Se te han caducado {{count}} productos",
       "topCategory": "Sobre todo en: {{category}}",
       "zero": "¡Sin desperdicios este mes! 🎯",
       "trend": {

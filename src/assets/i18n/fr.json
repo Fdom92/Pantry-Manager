@@ -354,8 +354,8 @@
     },
     "waste": {
       "title": "Gaspillage ce mois",
-      "count_one": "Vous avez jeté 1 produit",
-      "count": "Vous avez jeté {{count}} produits",
+      "count_one": "1 produit a expiré",
+      "count": "{{count}} produits ont expiré",
       "topCategory": "Surtout dans : {{category}}",
       "zero": "Aucun gaspillage ce mois ! 🎯",
       "trend": {

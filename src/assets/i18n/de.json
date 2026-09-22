@@ -354,8 +354,8 @@
     },
     "waste": {
       "title": "Abfall diesen Monat",
-      "count_one": "Du hast 1 Produkt weggeworfen",
-      "count": "Du hast {{count}} Produkte weggeworfen",
+      "count_one": "1 Produkt ist dir abgelaufen",
+      "count": "{{count}} Produkte sind dir abgelaufen",
       "topCategory": "Hauptsächlich in: {{category}}",
       "zero": "Kein Abfall diesen Monat! 🎯",
       "trend": {

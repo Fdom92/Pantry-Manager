@@ -2,7 +2,7 @@ import type { PantryEvent } from '@core/models/events';
 import type { FoodType } from '@core/models/shared/enums.model';
 
 /**
- * "Has tirado N productos" for the last `windowDays`: distinct products with a
+ * "Se te han caducado N productos" for the last `windowDays`: distinct products with a
  * batch that expired while it still had stock. Counts products, not units —
  * 6 yogures + 4 huevos are 2 products (it summed units until 5.5).
  */
