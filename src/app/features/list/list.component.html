@@ -4,7 +4,7 @@
     <ion-buttons slot="end">
       <ion-button
         (click)="facade.openShareMenu()"
-        [disabled]="facade.loading() || facade.isSharingListInProgress() || (!facade.shoppingAnalysis().summary.total && !facade.manualItems().length)"
+        [disabled]="facade.loading() || facade.isSharingListInProgress() || (!facade.shoppingAnalysis().summary.total && !facade.visibleManualItems().length)"
         [attr.aria-label]="'shopping.share.button' | translate">
         @if (facade.isSharingListInProgress()) {
           <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
@@ -38,7 +38,7 @@
       <span>{{ 'shopping.manualAdd.inlineHint' | translate }}</span>
     </button>
 
-    @if (!state.summary.total && !state.allBoughtItems.length && !state.allIgnoredItems.length && !facade.manualItems().length) {
+    @if (!state.summary.total && !state.allBoughtItems.length && !state.allIgnoredItems.length && !facade.visibleManualItems().length) {
       <app-empty-state
         class="list-empty-state"
         icon="cart-outline"
@@ -49,7 +49,7 @@
       <div class="suggestion-groups fade-in-list">
 
         @for (group of state.groupedSuggestions; track group.key) {
-          @let groupManuals = (group.key === UNASSIGNED_KEY) ? facade.manualItems() : [];
+          @let groupManuals = (group.key === UNASSIGNED_KEY) ? facade.visibleManualItems() : [];
           @if (group.suggestions.length || groupManuals.length) {
             <div class="suggestion-group">
 
@@ -123,11 +123,11 @@
         }
 
         <!-- Synthetic unassigned group: manual items only, no auto suggestions without supermarket -->
-        @if (facade.manualItems().length && !hasUnassignedAutoGroup(state.groupedSuggestions)) {
+        @if (facade.visibleManualItems().length && !hasUnassignedAutoGroup(state.groupedSuggestions)) {
           <div class="suggestion-group">
             <button class="supermarket-heading pressable" (click)="toggleGroup(UNASSIGNED_KEY)">
               <span>{{ 'shopping.unassignedSupermarket' | translate }}</span>
-              <ion-badge class="group-count group-count--medium">{{ facade.manualItems().length }}</ion-badge>
+              <ion-badge class="group-count group-count--medium">{{ facade.visibleManualItems().length }}</ion-badge>
               <ion-icon
                 class="collapse-icon"
                 [class.collapse-icon--expanded]="!isGroupCollapsed(UNASSIGNED_KEY)"
@@ -136,7 +136,7 @@
             </button>
             @if (!isGroupCollapsed(UNASSIGNED_KEY)) {
               <ion-list class="item-list" lines="none">
-                @for (manual of facade.manualItems(); track manual.id) {
+                @for (manual of facade.visibleManualItems(); track manual.id) {
                   <ion-item
                     detail="false"
                     role="button"

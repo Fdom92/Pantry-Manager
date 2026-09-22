@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { ActionSheetController } from '@ionic/angular';
 import { SHOPPING_LIST_NAME } from '@core/constants';
-import { buildShoppingAnalysis, listRowActions, type ListRowAction, type ListRowKind } from '@core/domain/list';
+import { buildShoppingAnalysis, listRowActions, manualItemsNotSuggested, type ListRowAction, type ListRowKind } from '@core/domain/list';
 import { classifyNativeDismissal } from '@core/domain/shared';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
@@ -63,6 +63,19 @@ export class ListStateService {
     });
   });
 
+  /**
+   * Manual items to actually render/count/export: a hand-written entry that
+   * names a product the automatic list already suggests (e.g. "Pollo" typed
+   * in by hand while the pantry's own "Pollo" is out of stock and marked
+   * basic) is the same purchase written twice, so the suggestion wins. Only
+   * *pending* suggestions hide a manual — one the user hid "for now" or has
+   * already bought must not, or their own note would vanish along with it.
+   */
+  readonly visibleManualItems = computed(() => {
+    const suggestedNames = this.shoppingAnalysis().suggestions.map(s => s.item.name);
+    return manualItemsNotSuggested(this.manualItems(), suggestedNames);
+  });
+
   readonly loading = this.pantryStore.loading;
   readonly items = this.pantryStore.loadedProducts;
 
@@ -115,6 +128,15 @@ export class ListStateService {
         const updated = await this.pantryStore.addNewLot(id, { quantity, ...toLotExpiry(suggested) });
         if (updated) {
           await this.eventManager.logAddExistingItem(previous, updated, quantity, undefined, undefined, timestamp);
+        }
+      }
+      // Buying the automatic suggestion settles any hand-written note for the
+      // same product too — otherwise a manual "Pollo" reappears right after
+      // the auto "Pollo" is bought, once it drops out of pendingSuggestions.
+      const boughtKey = normalizeProductKey(name);
+      for (const manual of this.manualItems()) {
+        if (normalizeProductKey(manual.name) === boughtKey) {
+          this.manualItemsStore.removeManual(manual.id);
         }
       }
       this.toast.success('shopping.toasts.bought', { name });
@@ -324,7 +346,7 @@ export class ListStateService {
 
   async shareShoppingListAsText(): Promise<void> {
     const state = this.shoppingAnalysis();
-    const manuals = this.manualItemsStore.manualItems();
+    const manuals = this.visibleManualItems();
     if (!state.summary.total && !manuals.length) return;
 
     const text = this.exportService.buildText(state.groupedSuggestions, manuals);
@@ -355,7 +377,7 @@ export class ListStateService {
       }
 
       const state = this.shoppingAnalysis();
-      if (!state.summary.total && !this.manualItemsStore.manualItems().length) {
+      if (!state.summary.total && !this.visibleManualItems().length) {
         return;
       }
       this.analytics.track(ANALYTICS_EVENTS.SHOPPING_LIST_SHARED, {
@@ -363,7 +385,7 @@ export class ListStateService {
       });
 
       await withSignalFlag(this.isSharingListInProgress, async () => {
-        const pdfBlob = await this.exportService.buildPdf(state.groupedSuggestions, this.manualItemsStore.manualItems());
+        const pdfBlob = await this.exportService.buildPdf(state.groupedSuggestions, this.visibleManualItems());
         const filename = `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename(new Date())}.pdf`;
         const { outcome } = await this.share.tryShareBlob({
           blob: pdfBlob,
