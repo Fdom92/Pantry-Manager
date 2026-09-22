@@ -181,6 +181,27 @@ describe('parseReceipt — quantity-first table (real Family Cash ticket)', () =
     });
   });
 
+  describe('noise words inside a structured row', () => {
+    // Noise patterns include ordinary product words (AHORRO, CLIENTE, SOCIO,
+    // CAMBIO...). In this layout a leading CANT + a price is stronger
+    // evidence than one word, so such a row stays a product.
+    const header = row('Cant | Precio | Descripción Artículo | Importe');
+
+    it('keeps a CANT + price row whose name matches a noise pattern', () => {
+      const items = parseReceipt([header, row('1 | 2,50 | PACK AHORRO GALLETAS | 2,50')]).items;
+      expect(items.map(i => [i.rawName, i.quantity])).toEqual([['PACK AHORRO GALLETAS', 1]]);
+    });
+
+    it('still drops a payment row that has no leading CANT', () => {
+      const items = parseReceipt([
+        header,
+        row('2 | 0,75 | MACARRON FAMILY 500 GR | 1,50'),
+        row('TARJETA | 83,07'),
+      ]).items;
+      expect(items.map(i => i.rawName)).toEqual(['MACARRON FAMILY 500 GR']);
+    });
+  });
+
   it('only flags headers that print CANT before the description', () => {
     expect(isQuantityFirstHeader(row('Cant | Precio | Descripción Artículo | Importe'))).toBeTrue();
     expect(isQuantityFirstHeader(row('Descripcion | Cant | Pvp | Total'))).toBeFalse();

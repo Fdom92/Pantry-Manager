@@ -55,8 +55,15 @@ export function parseQuantityFirstZone(zone: ReceiptRow[]): ParsedReceiptItem[] 
   for (const row of zone) {
     if (products.length > 0 && END_ANCHOR.test(row.text)) break;
     if (DISCOUNT_ROW.test(row.text)) { current = null; continue; }
-    if (isNoiseText(row.text)) { current = null; continue; }
-    const priced = tokenizeRow(row).some(tok => PRICE_TOKEN.test(tok));
+    const tokens = tokenizeRow(row);
+    const priced = tokens.some(tok => PRICE_TOKEN.test(tok));
+    // CANT + price is the row's structure, so noise words don't veto it:
+    // the noise patterns include ordinary product words ("PACK AHORRO
+    // GALLETAS" trips AHORRO; CLIENTE, SOCIO, CAMBIO can appear in names),
+    // and in this layout a leading CANT + a price is far stronger evidence
+    // than one word. Rows without that shape (payment, tax) stay noise.
+    const structural = priced && LEADING_CANT_TOKEN.test(tokens[0] ?? '');
+    if (!structural && isNoiseText(row.text)) { current = null; continue; }
     if (priced) {
       current = { ...row, cells: [...row.cells] };
       products.push(current);
