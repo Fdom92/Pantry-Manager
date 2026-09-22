@@ -52,6 +52,9 @@ CI (`.github/workflows/ci.yml`) runs lint, check-icons, tests and the production
   Don't rename existing keys: analytics uses some of them as identifiers (`empty_state_shown`).
 - Analytics: event names in `ANALYTICS_EVENTS` (`core/constants/analytics/events.constants.ts`),
   snake_case, **flat** props only (string/number/boolean). No names or free text.
+- Dates and spans of days shown to the user go through `DateDisplayService` or its pipes
+  (`appExpiry`, `appRelativeDays`, `appDuration`, `appDate`). Never `toLocaleDateString`,
+  `DatePipe` or `{{days}} días` in a bundle: i18n strings carry the frame (`Caduca {{when}}`).
 - User feedback through `ToastService` (i18n keys), errors through `LoggerService`
   (`error` → Sentry, `warn` → breadcrumb). No `console.*` in `src/app`.
 

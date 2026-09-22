@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from '@angular/core';
 import { IonChip } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
+import { daysUntilExpiry, toLocalYmd } from '@core/utils/date.util';
+import { ExpiryPipe } from '@shared/pipes/date-display.pipes';
 
 interface DateChip {
   key: string;
@@ -20,10 +22,10 @@ const CHIPS: DateChip[] = [
 @Component({
   selector: 'app-quick-date-chips',
   standalone: true,
-  imports: [IonChip, TranslateModule],
+  imports: [IonChip, TranslateModule, ExpiryPipe],
   template: `
-    @if (currentLabel(); as label) {
-      <p class="quick-date-chips__current">{{ label | translate: currentLabelParams() }}</p>
+    @if (currentDate(); as date) {
+      <p class="quick-date-chips__current">{{ date | appExpiry }}</p>
     }
     <div class="quick-date-chips">
       @for (chip of chips; track chip.key) {
@@ -46,28 +48,24 @@ export class QuickDateChipsComponent implements OnChanges {
 
   readonly chips = CHIPS;
   readonly selectedKey = signal<string | null>(null);
-  readonly currentLabel = signal<string | null>(null);
-  readonly currentLabelParams = signal<Record<string, unknown>>({});
+  /** The stored date, shown above the chips as "Caduca dentro de 5 días". */
+  readonly currentDate = signal<string | null>(null);
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!changes['initialDate']) return;
     const value = this.initialDate;
     if (!value) {
       this.selectedKey.set(null);
-      this.currentLabel.set(null);
-      this.currentLabelParams.set({});
+      this.currentDate.set(null);
       return;
     }
 
-    const parsed = Date.parse(value);
-    if (Number.isNaN(parsed)) {
+    const dayOffset = daysUntilExpiry(value);
+    if (Number.isNaN(dayOffset)) {
       this.selectedKey.set(null);
-      this.currentLabel.set(null);
-      this.currentLabelParams.set({});
+      this.currentDate.set(null);
       return;
     }
-
-    const dayOffset = Math.round((parsed - Date.now()) / 86_400_000);
 
     // Smart-match the closest preset by absolute day distance so the chip
     // the user originally tapped (or its nearest neighbour) stays highlighted
@@ -87,16 +85,7 @@ export class QuickDateChipsComponent implements OnChanges {
     // Header label so the user can see the actual remaining days in the
     // sheet — without this they only ever saw the chip selection and
     // chips-only mode hides the date input.
-    if (dayOffset > 0) {
-      this.currentLabel.set('pantry.fresh.quickDate.remaining');
-      this.currentLabelParams.set({ days: dayOffset });
-    } else if (dayOffset === 0) {
-      this.currentLabel.set('pantry.fresh.quickDate.expiresToday');
-      this.currentLabelParams.set({});
-    } else {
-      this.currentLabel.set('pantry.fresh.quickDate.expiredAgo');
-      this.currentLabelParams.set({ days: Math.abs(dayOffset) });
-    }
+    this.currentDate.set(value);
   }
 
   select(chip: DateChip): void {
@@ -107,14 +96,13 @@ export class QuickDateChipsComponent implements OnChanges {
     }
     this.selectedKey.set(chip.key);
     const date = chip.offsetDays !== null
-      ? new Date(Date.now() + chip.offsetDays * 86_400_000).toISOString().split('T')[0]
+      ? toLocalYmd(new Date(Date.now() + chip.offsetDays * 86_400_000))
       : null;
     this.dateSelected.emit(date);
   }
 
   reset(): void {
     this.selectedKey.set(null);
-    this.currentLabel.set(null);
-    this.currentLabelParams.set({});
+    this.currentDate.set(null);
   }
 }

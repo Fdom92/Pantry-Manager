@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { classifyExpiry, getItemStatusState, isIncomplete, normalizeBatches } from '@core/domain/pantry';
 import { daysUntilExpiry, generateBatchId } from '@core/utils';
-import { parseExpiryDate, parseExpiryMs } from '@core/utils/date.util';
+import { parseExpiryMs } from '@core/utils/date.util';
 import type {
   BatchCountsMeta,
   BatchEntryMeta,
@@ -23,14 +23,14 @@ import type {
 import { formatQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { formatFriendlyName, normalizeCategoryId, normalizeLowercase, normalizeLocationId, normalizeStringList } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
-import { formatDistance } from 'date-fns';
-import { es, enUS, pt, fr, it, de, type Locale } from 'date-fns/locale';
+import { DateDisplayService } from '../shared/date-display.service';
 import { LanguageService } from '../shared/language.service';
 
 @Injectable({ providedIn: 'root' })
 export class PantryViewModelService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
+  private readonly dates = inject(DateDisplayService);
 
   buildSummary(items: PantryItem[], totalCount: number): PantrySummaryMeta {
     const now = new Date();
@@ -278,28 +278,6 @@ export class PantryViewModelService {
     };
   }
 
-  private getDateFnsLocale(): Locale {
-    const currentLang = this.languageService.getCurrentLanguage();
-    const localeMap: Record<string, Locale> = {
-      es,
-      en: enUS,
-      pt,
-      fr,
-      it,
-      de,
-    };
-    return localeMap[currentLang] || enUS;
-  }
-
-  private getCalendarDaysDifference(date1: Date, date2: Date): number {
-    if (Number.isNaN(date1.getTime()) || Number.isNaN(date2.getTime())) return 0;
-    // Normalize to midnight to compare only dates
-    const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
-    const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
-    const diffTime = d2.getTime() - d1.getTime();
-    return Math.round(diffTime / (1000 * 60 * 60 * 24));
-  }
-
   formatBatchDate(batch: ItemBatch): string {
     const value = batch.expirationDate;
     if (!value) {
@@ -307,38 +285,7 @@ export class PantryViewModelService {
         batch.noExpiry ? 'pantry.batches.noExpiryIntentional' : 'pantry.batches.noExpiryDate'
       );
     }
-
-    const expiryDate = parseExpiryDate(value);
-    if (expiryDate === null) {
-      return this.translate.instant('pantry.batches.noExpiryDate');
-    }
-    const now = new Date();
-    const daysDiff = this.getCalendarDaysDifference(now, expiryDate);
-
-    // Handle special cases: today, tomorrow, yesterday
-    if (daysDiff === 0) {
-      return this.translate.instant('pantry.batches.expires.today');
-    }
-    if (daysDiff === 1) {
-      return this.translate.instant('pantry.batches.expires.tomorrow');
-    }
-    if (daysDiff === -1) {
-      return this.translate.instant('pantry.batches.expired.yesterday');
-    }
-
-    // For other dates, use date-fns with normalized dates (midnight)
-    // to calculate calendar days instead of exact time
-    const normalizedNow = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const normalizedExpiry = new Date(expiryDate.getFullYear(), expiryDate.getMonth(), expiryDate.getDate());
-
-    const locale = this.getDateFnsLocale();
-    const relative = formatDistance(normalizedExpiry, normalizedNow, {
-      addSuffix: true,
-      locale,
-    });
-
-    const key = daysDiff > 0 ? 'dashboard.nearExpiry.expires' : 'dashboard.expired.expires';
-    return this.translate.instant(key, { date: relative });
+    return this.dates.expiry(value) || this.translate.instant('pantry.batches.noExpiryDate');
   }
 
   formatBatchQuantity(batch: ItemBatch): string {
@@ -420,11 +367,7 @@ export class PantryViewModelService {
     if (!earliestDate) return '';
     if (state === 'expired') return this.translate.instant('pantry.detail.subinfo.expired');
     if (state === 'review') return this.translate.instant('pantry.detail.subinfo.review');
-    const days = daysUntilExpiry(earliestDate);
-    if (days <= 0) return this.translate.instant('pantry.detail.subinfo.expired');
-    if (days === 1) return this.translate.instant('pantry.detail.subinfo.tomorrow');
-    // Within 7 days: show relative urgency. Beyond: show the date-fns formatted date.
-    if (days <= 7) return this.translate.instant('pantry.detail.subinfo.inDays', { count: days });
+    if (daysUntilExpiry(earliestDate) <= 0) return this.translate.instant('pantry.detail.subinfo.expired');
     return formattedDate;
   }
 

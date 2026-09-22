@@ -8,7 +8,7 @@
           <div class="reposition-card__row">
             <div class="reposition-card__info">
               <span class="reposition-card__name">{{ p.productName }}</span>
-              <span class="reposition-card__days">{{ 'dashboard.reposition.daysLeft' | translate: { days: p.daysToOut } }}</span>
+              <span class="reposition-card__days">{{ 'dashboard.reposition.daysLeft' | translate: { when: (p.daysToOut | appRelativeDays) } }}</span>
             </div>
             <ion-button fill="clear" size="small" class="reposition-card__add" (click)="onAddToList(p)">
               {{ 'dashboard.reposition.add' | translate }}

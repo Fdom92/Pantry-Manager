@@ -106,6 +106,10 @@
     },
     "selects": {
       "noOptions": "Aucune option configurée. Saisissez pour en créer une ou ajoutez-la dans les réglages."
+    },
+    "expiry": {
+      "future": "Expire {{when}}",
+      "past": "Expiré {{when}}"
     }
   },
   "emptyStates": {
@@ -187,11 +191,6 @@
         "dismiss": "Pas maintenant",
         "markFreshOut": "Je ne l'ai plus"
       },
-      "expiry": {
-        "today": "Expire aujourd'hui",
-        "tomorrow": "Expire demain",
-        "inDays": "Expire dans {{ count }} jours"
-      },
       "confirm": {
         "question": "Avez-vous utilisé ces ingrédients ?",
         "yes": "Oui, marquer comme utilisés",
@@ -205,14 +204,11 @@
       "allGood": {
         "title": "Tout est sous contrôle",
         "hint": "Rien d'urgent aujourd'hui — votre garde-manger est en parfait état",
-        "nextExpiry": "Prochaine expiration : {{name}} dans {{days}} jours",
+        "nextExpiry": "Prochaine expiration : {{name}}, {{when}}",
         "incompleteTitle": "Données manquantes",
         "incompleteData_one": "1 produit aux données incomplètes · complétez-le pour voir des suggestions",
         "incompleteData_other": "{{count}} produits aux données incomplètes · complétez-les pour voir des suggestions",
         "fixCta": "Compléter En attente"
-      },
-      "secondary": {
-        "days": "{{count}} jours"
       }
     },
     "actions": {
@@ -254,12 +250,7 @@
     "foodCoverage": {
       "title": "Couverture estimée",
       "hint": "Estimation basée sur les produits de votre garde-manger",
-      "days_one": "≈ 1 jour de nourriture",
-      "days_other": "≈ {{ count }} jours de nourriture",
-      "months_one": "≈ 1 mois de nourriture",
-      "months_other": "≈ {{ count }} mois de nourriture",
-      "years_one": "≈ 1 an de nourriture",
-      "years_other": "≈ {{ count }} ans de nourriture"
+      "value": "≈ {{duration}} de nourriture"
     },
     "summary": {
       "title": "Résumé du garde-manger",
@@ -341,7 +332,6 @@
     "nearExpiry": {
       "title": "Bientôt périmés",
       "subtitle": "Dans les {{ days }} prochains jours",
-      "expires": "Expire le {{ date }}",
       "empty": "Aucun produit n’expire prochainement."
     },
     "lowStock": {
@@ -353,7 +343,6 @@
     "expired": {
       "title": "Articles périmés",
       "deleteAria": "Supprimer les périmés",
-      "expires": "Périmé le {{ date }}",
       "badge": "Périmé",
       "empty": "Aucun article périmé pour le moment."
     },
@@ -377,7 +366,7 @@
     },
     "reposition": {
       "title": "Bientôt en rupture",
-      "daysLeft": "Il reste {{days}} jours",
+      "daysLeft": "Épuisé {{when}}",
       "add": "Ajouter",
       "added": "Ajouté à la liste",
       "empty": "Nous avons besoin de plus d'historique pour prédire",
@@ -628,13 +617,6 @@
       "noExpiryDate": "Date manquante",
       "addBatch": "Ajouter un lot",
       "currentQuantity": "Quantité",
-      "expires": {
-        "today": "Expire aujourd'hui",
-        "tomorrow": "Expire demain"
-      },
-      "expired": {
-        "yesterday": "Expiré hier"
-      },
       "noExpiryIntentional": "Sans date"
     },
     "form": {
@@ -697,8 +679,6 @@
       "noExpiry": "Sans date de péremption",
       "subinfo": {
         "expired": "Expiré",
-        "tomorrow": "Expire demain",
-        "inDays": "Expire dans {{count}} jours",
         "review": "À consommer vite"
       },
       "quantity": {
@@ -845,10 +825,7 @@
         "fiveDays": "5 jours",
         "oneWeek": "1 semaine",
         "twoWeeks": "2 semaines",
-        "noDate": "Sans date",
-        "remaining": "Reste {{days}} jours",
-        "expiresToday": "Expire aujourd'hui",
-        "expiredAgo": "Expiré il y a {{days}} jours"
+        "noDate": "Sans date"
       },
       "card": {
         "expired": "Expiré",
@@ -1259,11 +1236,7 @@
     "nearExpiry": {
       "title": "{{ count }} produits expirent bientôt",
       "title_one": "1 produit expire bientôt",
-      "body": "Le plus proche dans {{ nearestDays }} jours",
-      "body_tomorrow": "Le plus proche expire demain",
-      "body_one": "Expire dans {{ nearestDays }} jours",
-      "body_one_tomorrow": "Expire demain",
-      "body_one_named": "Ton {{name}} expire dans {{days}} jours.",
+      "body_one_named": "Ton {{name}} expire {{when}}.",
       "body_one_named_tomorrow": "Ton {{name}} expire demain. Consomme-le aujourd'hui.",
       "body_many_named": "Ton {{name}} et {{others}} autres expirent bientôt.",
       "body_many_named_tomorrow": "Ton {{name}} expire demain et {{others}} autres sont proches."

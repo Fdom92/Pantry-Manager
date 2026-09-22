@@ -54,6 +54,21 @@ const choice = await this.confirm.choose(message, { choices: [...] });
 
 One toast at a time; it moves to the top while a sheet is open. Never inject `ToastController`.
 
+## Dates
+
+Rules in `core/domain/shared/date-display.domain.ts` (≤13 days → days, <60 → weeks, then
+months, then years; Intl does grammar and plurals). `DateDisplayService` adds the app locale.
+
+```html
+{{ item.expirationDate | appExpiry }}                 <!-- Caduca mañana / Caducó hace 3 días -->
+{{ 'ns.key' | translate: { when: (days | appRelativeDays) } }}   <!-- dentro de 9 meses -->
+{{ days | appDuration }}                              <!-- 9 meses -->
+{{ value | appDate: 'dayMonth' }}                     <!-- 5 jul -->
+```
+
+Services inject `DateDisplayService`; notification definitions get `context.locale` and call
+the domain formatters. Compact status badges ("Hoy", "2 días") are fixed labels, not dates.
+
 ## Errors
 
 ```ts

@@ -106,6 +106,10 @@
     },
     "selects": {
       "noOptions": "Keine Optionen konfiguriert. Tippe, um eine zu erstellen, oder füge sie in den Einstellungen hinzu."
+    },
+    "expiry": {
+      "future": "Läuft {{when}} ab",
+      "past": "Abgelaufen {{when}}"
     }
   },
   "emptyStates": {
@@ -187,11 +191,6 @@
         "dismiss": "Nicht jetzt",
         "markFreshOut": "Ich habe es nicht mehr"
       },
-      "expiry": {
-        "today": "Läuft heute ab",
-        "tomorrow": "Läuft morgen ab",
-        "inDays": "Läuft in {{ count }} Tagen ab"
-      },
       "confirm": {
         "question": "Hast du diese Zutaten verwendet?",
         "yes": "Ja, als verwendet markieren",
@@ -205,14 +204,11 @@
       "allGood": {
         "title": "Alles unter Kontrolle",
         "hint": "Heute nichts Dringendes — dein Vorrat ist in guter Verfassung",
-        "nextExpiry": "Nächstes Ablaufdatum: {{name}} in {{days}} Tagen",
+        "nextExpiry": "Nächstes Ablaufdatum: {{name}}, {{when}}",
         "incompleteTitle": "Angaben fehlen",
         "incompleteData_one": "1 Produkt mit unvollständigen Daten · ergänze es für Vorschläge",
         "incompleteData_other": "{{count}} Produkte mit unvollständigen Daten · ergänze sie für Vorschläge",
         "fixCta": "Ausstehende ergänzen"
-      },
-      "secondary": {
-        "days": "{{count}} Tage"
       }
     },
     "actions": {
@@ -254,12 +250,7 @@
     "foodCoverage": {
       "title": "Geschätzte Reichweite",
       "hint": "Schätzung basierend auf den Produkten in deiner Speisekammer",
-      "days_one": "≈ 1 Tag Lebensmittel",
-      "days_other": "≈ {{ count }} Tage Lebensmittel",
-      "months_one": "≈ 1 Monat Lebensmittel",
-      "months_other": "≈ {{ count }} Monate Lebensmittel",
-      "years_one": "≈ 1 Jahr Lebensmittel",
-      "years_other": "≈ {{ count }} Jahre Lebensmittel"
+      "value": "≈ {{duration}} Lebensmittel"
     },
     "summary": {
       "title": "Vorratsübersicht",
@@ -341,7 +332,6 @@
     "nearExpiry": {
       "title": "Kurz vor Ablauf",
       "subtitle": "In den nächsten {{ days }} Tagen",
-      "expires": "Läuft ab am {{ date }}",
       "empty": "Keine Produkte laufen bald ab."
     },
     "lowStock": {
@@ -353,7 +343,6 @@
     "expired": {
       "title": "Abgelaufene Artikel",
       "deleteAria": "Abgelaufene löschen",
-      "expires": "Abgelaufen am {{ date }}",
       "badge": "Abgelaufen",
       "empty": "Zurzeit gibt es keine abgelaufenen Artikel."
     },
@@ -377,7 +366,7 @@
     },
     "reposition": {
       "title": "Bald ausverkauft",
-      "daysLeft": "Noch {{days}} Tage",
+      "daysLeft": "Leer {{when}}",
       "add": "Hinzufügen",
       "added": "Zur Liste hinzugefügt",
       "empty": "Wir brauchen mehr Verlauf für Vorhersagen",
@@ -628,13 +617,6 @@
       "noExpiryDate": "Datum fehlt",
       "addBatch": "Charge hinzufügen",
       "currentQuantity": "Menge",
-      "expires": {
-        "today": "Läuft heute ab",
-        "tomorrow": "Läuft morgen ab"
-      },
-      "expired": {
-        "yesterday": "Gestern abgelaufen"
-      },
       "noExpiryIntentional": "Kein Ablaufdatum"
     },
     "form": {
@@ -697,8 +679,6 @@
       "noExpiry": "Kein Ablaufdatum",
       "subinfo": {
         "expired": "Abgelaufen",
-        "tomorrow": "Läuft morgen ab",
-        "inDays": "Läuft in {{count}} Tagen ab",
         "review": "Bald verbrauchen"
       },
       "quantity": {
@@ -845,10 +825,7 @@
         "fiveDays": "5 Tage",
         "oneWeek": "1 Woche",
         "twoWeeks": "2 Wochen",
-        "noDate": "Kein Datum",
-        "remaining": "Noch {{days}} Tage",
-        "expiresToday": "Läuft heute ab",
-        "expiredAgo": "Vor {{days}} Tagen abgelaufen"
+        "noDate": "Kein Datum"
       },
       "card": {
         "expired": "Abgelaufen",
@@ -1259,11 +1236,7 @@
     "nearExpiry": {
       "title": "{{ count }} Produkte laufen bald ab",
       "title_one": "1 Produkt läuft bald ab",
-      "body": "Das nächste in {{ nearestDays }} Tagen",
-      "body_tomorrow": "Das nächste läuft morgen ab",
-      "body_one": "Läuft ab in {{ nearestDays }} Tagen",
-      "body_one_tomorrow": "Läuft morgen ab",
-      "body_one_named": "Dein {{name}} läuft in {{days}} Tagen ab.",
+      "body_one_named": "Dein {{name}} läuft {{when}} ab.",
       "body_one_named_tomorrow": "Dein {{name}} läuft morgen ab. Heute aufbrauchen.",
       "body_many_named": "Dein {{name}} und {{others}} weitere laufen bald ab.",
       "body_many_named_tomorrow": "Dein {{name}} läuft morgen ab und {{others}} weitere sind kurz davor."

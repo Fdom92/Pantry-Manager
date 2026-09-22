@@ -106,6 +106,10 @@
     },
     "selects": {
       "noOptions": "Sem opções configuradas. Escreve para criar uma ou adiciona-a nas definições."
+    },
+    "expiry": {
+      "future": "Expira {{when}}",
+      "past": "Expirou {{when}}"
     }
   },
   "emptyStates": {
@@ -187,11 +191,6 @@
         "dismiss": "Agora não",
         "markFreshOut": "Já não tenho"
       },
-      "expiry": {
-        "today": "Expira hoje",
-        "tomorrow": "Expira amanhã",
-        "inDays": "Expira em {{ count }} dias"
-      },
       "confirm": {
         "question": "Usou estes ingredientes?",
         "yes": "Sim, marcar como usados",
@@ -205,14 +204,11 @@
       "allGood": {
         "title": "Tudo sob controlo",
         "hint": "Nada urgente hoje — a sua despensa está em ótima forma",
-        "nextExpiry": "Próxima validade: {{name}} em {{days}} dias",
+        "nextExpiry": "Próxima validade: {{name}}, {{when}}",
         "incompleteTitle": "Faltam dados",
         "incompleteData_one": "1 produto com dados incompletos · completa-o para ver sugestões",
         "incompleteData_other": "{{count}} produtos com dados incompletos · completa-os para ver sugestões",
         "fixCta": "Completar pendentes"
-      },
-      "secondary": {
-        "days": "{{count}} dias"
       }
     },
     "actions": {
@@ -254,12 +250,7 @@
     "foodCoverage": {
       "title": "Cobertura estimada",
       "hint": "Estimativa baseada nos produtos da sua despensa",
-      "days_one": "≈ 1 dia de comida",
-      "days_other": "≈ {{ count }} dias de comida",
-      "months_one": "≈ 1 mês de comida",
-      "months_other": "≈ {{ count }} meses de comida",
-      "years_one": "≈ 1 ano de comida",
-      "years_other": "≈ {{ count }} anos de comida"
+      "value": "≈ {{duration}} de comida"
     },
     "summary": {
       "title": "Visão geral da despensa",
@@ -341,7 +332,6 @@
     "nearExpiry": {
       "title": "Perto da validade",
       "subtitle": "Nos próximos {{ days }} dias",
-      "expires": "Expira em {{ date }}",
       "empty": "Nenhum produto a expirar em breve."
     },
     "lowStock": {
@@ -353,7 +343,6 @@
     "expired": {
       "title": "Itens expirados",
       "deleteAria": "Eliminar itens expirados",
-      "expires": "Expirou em {{ date }}",
       "badge": "Expirado",
       "empty": "Nenhum item expirado neste momento."
     },
@@ -377,7 +366,7 @@
     },
     "reposition": {
       "title": "A ficar sem stock em breve",
-      "daysLeft": "Faltam {{days}} dias",
+      "daysLeft": "Acaba {{when}}",
       "add": "Adicionar",
       "added": "Adicionado à lista",
       "empty": "Precisamos de mais histórico para prever",
@@ -628,13 +617,6 @@
       "noExpiryDate": "Data em falta",
       "addBatch": "Adicionar lote",
       "currentQuantity": "Quantidade",
-      "expires": {
-        "today": "Expira hoje",
-        "tomorrow": "Expira amanhã"
-      },
-      "expired": {
-        "yesterday": "Expirou ontem"
-      },
       "noExpiryIntentional": "Sem validade"
     },
     "form": {
@@ -697,8 +679,6 @@
       "noExpiry": "Sem validade",
       "subinfo": {
         "expired": "Expirado",
-        "tomorrow": "Expira amanhã",
-        "inDays": "Expira em {{count}} dias",
         "review": "Consumir em breve"
       },
       "quantity": {
@@ -845,10 +825,7 @@
         "fiveDays": "5 dias",
         "oneWeek": "1 semana",
         "twoWeeks": "2 semanas",
-        "noDate": "Sem data",
-        "remaining": "Faltam {{days}} dias",
-        "expiresToday": "Caduca hoje",
-        "expiredAgo": "Caducou há {{days}} dias"
+        "noDate": "Sem data"
       },
       "card": {
         "expired": "Expirado",
@@ -1259,11 +1236,7 @@
     "nearExpiry": {
       "title": "{{ count }} produtos vencem em breve",
       "title_one": "1 produto vence em breve",
-      "body": "O mais próximo em {{ nearestDays }} dias",
-      "body_tomorrow": "O mais próximo vence amanhã",
-      "body_one": "Vence em {{ nearestDays }} dias",
-      "body_one_tomorrow": "Vence amanhã",
-      "body_one_named": "O teu {{name}} caduca em {{days}} dias.",
+      "body_one_named": "O teu {{name}} caduca {{when}}.",
       "body_one_named_tomorrow": "O teu {{name}} caduca amanhã. Usa-o hoje.",
       "body_many_named": "O teu {{name}} e mais {{others}} caducam em breve.",
       "body_many_named_tomorrow": "O teu {{name}} caduca amanhã e mais {{others}} estão perto."

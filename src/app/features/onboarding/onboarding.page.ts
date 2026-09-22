@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -12,11 +11,12 @@ import { OnboardingStateService } from '@core/services/onboarding/onboarding-sta
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { OnboardingSeedGridComponent } from './components/seed-grid/seed-grid.component';
+import { AppDatePipe } from '@shared/pipes/date-display.pipes';
 
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [DatePipe, IonContent, IonButton, IonIcon, TranslateModule, OnboardingSeedGridComponent],
+  imports: [AppDatePipe, IonContent, IonButton, IonIcon, TranslateModule, OnboardingSeedGridComponent],
   templateUrl: './onboarding.page.html',
   styleUrls: ['./onboarding.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

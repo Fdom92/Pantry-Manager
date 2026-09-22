@@ -413,14 +413,6 @@ export class DashboardStateService {
     }
   }
 
-  formatExpiryRelative(value: string | undefined): string | null {
-    if (!value) return null;
-    const diffDays = daysUntilExpiry(value);
-    if (diffDays <= 0) return this.translate.instant('dashboard.today.expiry.today');
-    if (diffDays === 1) return this.translate.instant('dashboard.today.expiry.tomorrow');
-    return this.translate.instant('dashboard.today.expiry.inDays', { count: diffDays });
-  }
-
   private getReferenceNow(): Date {
     const timestamp = this.lastRefreshTimestamp();
     if (timestamp) {

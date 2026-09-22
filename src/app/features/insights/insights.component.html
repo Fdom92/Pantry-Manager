@@ -84,10 +84,7 @@
             <ion-icon name="calendar-outline"></ion-icon>
             <div class="coverage-card__info">
               <span class="coverage-card__value">
-                {{ (facade.foodCoverage()!.value === 1
-                      ? 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_one'
-                      : 'dashboard.foodCoverage.' + facade.foodCoverage()!.unit + '_other')
-                    | translate:{ count: facade.foodCoverage()!.value } }}
+                {{ 'dashboard.foodCoverage.value' | translate:{ duration: (facade.foodCoverage()!.days | appDuration) } }}
               </span>
               <span class="coverage-card__hint">{{ 'dashboard.foodCoverage.hint' | translate }}</span>
             </div>

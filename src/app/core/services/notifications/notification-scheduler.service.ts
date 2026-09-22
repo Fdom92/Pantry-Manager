@@ -16,6 +16,7 @@ import { WelcomeNotificationService } from './welcome-notification.service';
 import { buildStreakMilestoneNotification } from './definitions/streak-milestone.notification';
 import { AppPreferences, PantryItem } from '@core/models';
 import { LoggerService } from '../shared/logger.service';
+import { LanguageService } from '../shared/language.service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationSchedulerService {
@@ -30,6 +31,7 @@ export class NotificationSchedulerService {
   private readonly welcomeNotif = inject(WelcomeNotificationService);
   private readonly analytics = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
+  private readonly language = inject(LanguageService);
 
   private isScheduling = false;
   private deliveredSnapshot: Promise<number[]> | null = null;
@@ -272,7 +274,7 @@ export class NotificationSchedulerService {
     const t = (key: string, params?: Record<string, unknown>): string =>
       this.translate.instant(key, params);
 
-    return definition.build({ items, preferences, t, now });
+    return definition.build({ items, preferences, t, locale: this.language.getCurrentLocale(), now });
   }
 
   /** Evaluate all notification definitions and return the highest-priority payload. */
@@ -282,7 +284,13 @@ export class NotificationSchedulerService {
     now: Date,
     translate: (key: string, params?: Record<string, unknown>) => string
   ): ScheduledNotification | null {
-    const context: NotificationContext = { items, preferences, t: translate, now };
+    const context: NotificationContext = {
+      items,
+      preferences,
+      t: translate,
+      locale: this.language.getCurrentLocale(),
+      now,
+    };
     const definitions = this.registry.getAll();
     const candidates: Array<{ priority: number; payload: ScheduledNotification }> = [];
 
