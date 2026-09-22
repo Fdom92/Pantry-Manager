@@ -190,6 +190,7 @@ function isNoiseText(text: string): boolean {
 //  - Aldi:                none (always 1) + weight sub-rows  "0,526 kg x 2,39 €/kg"
 //  - Family Cash:         leading CANT column, decimal = weight in kg
 //                                                            "2 | 0,75 | MACARRON", "0,39 | 4,99 | MAGRO"
+//                         count taken from importe ÷ precio when whole
 //                         (own path: parseQuantityFirstZone, see below)
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -528,18 +529,46 @@ function parseQuantityFirstZone(zone: ReceiptRow[]): ParsedReceiptItem[] {
 }
 
 /**
- * The CANT column is authoritative: an integer is the count, a decimal is
- * a weight (one item). None of the in-name quantity heuristics run — they
- * would eat "4 X" out of "COCA-COLA 4 X 2 L PET".
+ * Quantity comes from the row's own arithmetic first. Real device OCR of the
+ * Family Cash ticket (2026-09): the CANT column is thin and its digit is
+ * often lost ("0,75 | MACARRON | 1,50") or misread (a "1" where the ticket
+ * printed 2), or merged with Precio into one leading "149". Importe ÷ Precio
+ * is the count the till actually charged, so it wins over the CANT digit.
+ *
+ * Order: a leading weight (decimal CANT) → one item; else a whole
+ * importe ÷ precio → that; else a leading 1–2 digit CANT → that; else 1.
+ * None of the in-name quantity heuristics run — they would eat "4 X" out of
+ * "COCA-COLA 4 X 2 L PET".
  */
 function extractQuantityFirstProduct(row: ReceiptRow): ParsedReceiptItem | null {
   const tokens = tokenizeRow(row);
-  let quantity: number | null = null;
-  if (tokens.length && LEADING_CANT_TOKEN.test(tokens[0])) {
-    const cant = tokens.shift()!;
-    quantity = /[.,]/.test(cant) ? null : parseInt(cant, 10);
-    if (tokens.length && PRECIO_CELL_TOKEN.test(tokens[0])) tokens.shift();
+  let cantCount: number | null = null;
+  let weighed = false;
+  const lead = tokens[0];
+
+  if (lead !== undefined && LEADING_CANT_TOKEN.test(lead)) {
+    if (/[.,]/.test(lead)) {
+      // A 2-decimal lead with only one other price is the Precio of a row
+      // whose CANT was lost; a weight row always carries three numbers
+      // (cant 0,39 + precio 4,99 + importe 1,95).
+      const priceCount = tokens.filter(tok => PRICE_TOKEN.test(tok)).length;
+      const leadIsPrecio = PRICE_TOKEN.test(lead) && priceCount === 2;
+      if (!leadIsPrecio) {
+        weighed = true;
+        tokens.shift();
+      }
+    } else {
+      tokens.shift();
+      // 3+ digits is CANT and Precio merged ("1" + "1,49" → "149"), never a count.
+      if (lead.length <= 2) cantCount = parseInt(lead, 10);
+    }
   }
+
+  const priceQty = weighed ? null : quantityFromPrices(tokens);
+
+  // The token after a CANT digit is the Precio column, even when OCR lost
+  // its comma ("149"); drop it so it can't reach the name.
+  if (cantCount !== null && tokens.length && PRECIO_CELL_TOKEN.test(tokens[0])) tokens.shift();
 
   const nameTokens = tokens.filter(tok => !PRICE_TOKEN.test(tok) && !PRODUCT_CODE.test(tok));
   let name = stripNameNoise(nameTokens.join(' '));
@@ -548,11 +577,23 @@ function extractQuantityFirstProduct(row: ReceiptRow): ParsedReceiptItem | null 
 
   if (countLetters(name) < 3) return null;
 
+  const quantity = weighed ? null : priceQty ?? cantCount;
   return {
     rawName: name,
     quantity: clampQuantity(quantity ?? 1),
     confidence: quantity !== null ? 'high' : 'medium',
   };
+}
+
+/** Importe ÷ Precio (last ÷ first 2-decimal price) when it is a whole count. */
+function quantityFromPrices(tokens: string[]): number | null {
+  const prices = tokens
+    .filter(tok => PRICE_TOKEN.test(tok))
+    .map(tok => parseFloat(tok.replace(',', '.')));
+  if (prices.length < 2 || prices[0] <= 0) return null;
+  const ratio = prices[prices.length - 1] / prices[0];
+  const rounded = Math.round(ratio);
+  return ratio >= 1 && Math.abs(ratio - rounded) < 0.02 ? rounded : null;
 }
 
 /**

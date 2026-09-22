@@ -398,6 +398,50 @@ describe('parseReceipt — quantity-first table (real Family Cash ticket)', () =
     expect(merged.items.map(i => [i.rawName, i.quantity])).toEqual([['MAIZ DULCE COCIDO EN MAZORCA 450', 1]]);
   });
 
+  describe('quantity from importe ÷ precio (real device OCR)', () => {
+    // The thin CANT digit is often lost or misread; the row's own
+    // arithmetic (Importe ÷ Precio) is the reliable count.
+    const parseQtyFirst = (...productRows: ReceiptRow[]) =>
+      parseReceipt([row('Cant | Precio | Descripción Artículo | Importe'), ...productRows])
+        .items.map(i => [i.rawName, i.quantity]);
+
+    it('recovers a lost CANT digit', () => {
+      expect(parseQtyFirst(row('0,75 | MACARRON FAMILY 500 GR | 1,50')))
+        .toEqual([['MACARRON FAMILY 500 GR', 2]]);
+    });
+
+    it('lets the arithmetic win over a misread CANT digit', () => {
+      expect(parseQtyFirst(row('1 | 0,75 | MACARRON FAMILY 500 GR | 1,50')))
+        .toEqual([['MACARRON FAMILY 500 GR', 2]]);
+    });
+
+    it('agrees with a correct CANT digit, wrapped names included', () => {
+      expect(parseQtyFirst(row('3 | 3,99 | LOMOS ATUN CLARO NATURAL | 11,97'), row('FAMILY')))
+        .toEqual([['LOMOS ATUN CLARO NATURAL FAMILY', 3]]);
+      expect(parseQtyFirst(row('2 | 0,08 | BOLSA ASA G-200 FAMILY | 0,16')))
+        .toEqual([['BOLSA ASA G-200 FAMILY', 2]]);
+    });
+
+    it('never takes a 3-digit leading number (merged CANT + Precio) as the quantity', () => {
+      expect(parseQtyFirst(row('149 MAIZ DULCE COCIDO EN | 1,49'), row('MAZORCA 450')))
+        .toEqual([['MAIZ DULCE COCIDO EN MAZORCA 450', 1]]);
+    });
+
+    it('keeps weighed rows at one item', () => {
+      expect(parseQtyFirst(
+        row('0,7 | 6,99 | LONGANIZA DE POLLO/CERDO | 4,89'),
+        row('KG'),
+        row('0,39 | 4,99 | MAGRO DE CERDO DUROC A | 1,95'),
+        row('TACOS KG'),
+        row('1,161 | 2,49 | CLEMENTINA KG | 2,89'),
+      )).toEqual([
+        ['LONGANIZA DE POLLO/CERDO', 1],
+        ['MAGRO DE CERDO DUROC A TACOS', 1],
+        ['CLEMENTINA', 1],
+      ]);
+    });
+  });
+
   it('only flags headers that print CANT before the description', () => {
     expect(isQuantityFirstHeader(row('Cant | Precio | Descripción Artículo | Importe'))).toBeTrue();
     expect(isQuantityFirstHeader(row('Descripcion | Cant | Pvp | Total'))).toBeFalse();
