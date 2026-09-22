@@ -481,6 +481,12 @@ function findZoneStart(rows: ReceiptRow[]): number {
 const QTY_FIRST_HEADER = /\bCANT\b.*DESCR/i;
 /** Leading CANT cell: unit count or kg weight ("2", "0,7", "1,161"). */
 const LEADING_CANT_TOKEN = /^\d{1,3}([.,]\d{1,3})?$/;
+/**
+ * Precio cell right after CANT. Looser than PRICE_TOKEN because OCR drops
+ * the comma ("1,49" → "149"); only ever applied at that one position, so
+ * sizes like "450" or "160" later in the name survive.
+ */
+const PRECIO_CELL_TOKEN = /^\d{1,4}([.,]\d{1,2})?$/;
 
 export function isQuantityFirstHeader(headerRow: ReceiptRow): boolean {
   return QTY_FIRST_HEADER.test(headerRow.text);
@@ -532,6 +538,7 @@ function extractQuantityFirstProduct(row: ReceiptRow): ParsedReceiptItem | null 
   if (tokens.length && LEADING_CANT_TOKEN.test(tokens[0])) {
     const cant = tokens.shift()!;
     quantity = /[.,]/.test(cant) ? null : parseInt(cant, 10);
+    if (tokens.length && PRECIO_CELL_TOKEN.test(tokens[0])) tokens.shift();
   }
 
   const nameTokens = tokens.filter(tok => !PRICE_TOKEN.test(tok) && !PRODUCT_CODE.test(tok));

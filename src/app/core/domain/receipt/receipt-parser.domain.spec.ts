@@ -378,6 +378,26 @@ describe('parseReceipt — quantity-first table (real Family Cash ticket)', () =
     expect(items.find(i => i.rawName === 'CLEMENTINA')!.confidence).toBe('medium');
   });
 
+  it('drops the unit-price column even when OCR loses its comma (real device case)', () => {
+    // Device scan of the same ticket: "1,49" in the Precio column came back
+    // as "149" — not a PRICE_TOKEN, so it leaked into the name.
+    const header = row('Cant | Precio | Descripción Artículo | Importe');
+    const split = parseReceipt([
+      header,
+      row('1 | 149 | MAIZ DULCE COCIDO EN | 1,49'),
+      row('MAZORCA 450'),
+    ]);
+    expect(split.items.map(i => [i.rawName, i.quantity])).toEqual([['MAIZ DULCE COCIDO EN MAZORCA 450', 1]]);
+
+    // Same row with the CANT and Precio cells merged into the name cell.
+    const merged = parseReceipt([
+      header,
+      row('1 149 MAIZ DULCE COCIDO EN | 1,49'),
+      row('MAZORCA 450'),
+    ]);
+    expect(merged.items.map(i => [i.rawName, i.quantity])).toEqual([['MAIZ DULCE COCIDO EN MAZORCA 450', 1]]);
+  });
+
   it('only flags headers that print CANT before the description', () => {
     expect(isQuantityFirstHeader(row('Cant | Precio | Descripción Artículo | Importe'))).toBeTrue();
     expect(isQuantityFirstHeader(row('Descripcion | Cant | Pvp | Total'))).toBeFalse();
