@@ -26,11 +26,15 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
+import { DurationPipe, ExpiryPipe, RelativeDaysPipe } from '@shared/pipes/date-display.pipes';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
+    DurationPipe,
+    ExpiryPipe,
+    RelativeDaysPipe,
     IonHeader,
     IonToolbar,
     IonTitle,

@@ -69,8 +69,13 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# Claude
-.claude
+# Claude — shared config is versioned; personal settings stay local
+.claude/*
+!.claude/settings.json
+!.claude/launch.json
+!.claude/agents/
+!.claude/commands/
+!.claude/docs/
 
 # Git worktrees (superpowers subagent-driven-development)
 .worktrees

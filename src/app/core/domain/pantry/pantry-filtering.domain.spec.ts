@@ -1,5 +1,5 @@
 import { FoodType } from '@core/models/shared/enums.model';
-import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete, isStatusChipVisible, matchesFilters, statusFilterCount } from './pantry-filtering.domain';
+import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete, isStatusChipVisible, matchesFilters, sortPantryItems, statusFilterCount } from './pantry-filtering.domain';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 
 function daysFromNow(days: number): string {
@@ -184,5 +184,21 @@ describe('isStatusChipVisible', () => {
 
   it('shows a chip as soon as it has something to show', () => {
     expect(isStatusChipVisible('expired', 1)).toBeTrue();
+  });
+});
+
+describe('sortPantryItems', () => {
+  const a = (name: string, expirationDate?: string) =>
+    makeItem({ _id: name, name, expirationDate });
+
+  it('keeps the alphabetical behaviour, ignoring accents and case', () => {
+    const sorted = sortPantryItems([a('zanahoria'), a('Árbol'), a('berenjena')]);
+    expect(sorted.map(i => i.name)).toEqual(['Árbol', 'berenjena', 'zanahoria']);
+  });
+
+  it('does not mutate its input', () => {
+    const input = [a('b'), a('a')];
+    sortPantryItems(input);
+    expect(input.map(i => i.name)).toEqual(['b', 'a']);
   });
 });

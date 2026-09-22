@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm start)",
+      "Bash(npm run *)",
+      "Bash(npx ng lint *)",
+      "Bash(npx ng test *)",
+      "Bash(npx ng build *)",
+      "Bash(node scripts/check-icons.mjs)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)"
+    ],
+    "ask": [
+      "Edit(/android/**)",
+      "Bash(git merge *)",
+      "Bash(git tag *)"
+    ],
+    "deny": [
+      "Read(/src/environments/environment.secrets.ts)",
+      "Edit(/src/environments/environment.secrets.ts)",
+      "Read(/backend/.env)",
+      "Edit(/backend/.env)",
+      "Bash(git push *)",
+      "Bash(npm publish *)"
+    ]
+  }
+}

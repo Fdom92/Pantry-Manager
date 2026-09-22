@@ -1,5 +1,6 @@
 import type { PantryItem } from '@core/models/pantry';
 import { isIncomplete } from '@core/domain/pantry/pantry-filtering.domain';
+import type { InstallSourceKind } from './install-source.domain';
 
 /**
  * Shape of what PantryMind is willing to say about a person.
@@ -26,6 +27,8 @@ export interface PersonProfile {
   days_since_first_open: number;
   onboarding_done: boolean;
   notifications_enabled: boolean;
+  /** See `classifyInstallSource`: filter PostHog on 'play' to drop QA installs. */
+  install_source: InstallSourceKind;
 }
 
 export type PantrySizeBucket = 'empty' | '1-5' | '6-20' | '21-50' | '50+';
@@ -59,8 +62,9 @@ export function buildPersonProfile(params: {
   now: Date;
   onboardingDone: boolean;
   notificationsEnabled: boolean;
+  installSource: InstallSourceKind;
 }): PersonProfile {
-  const { items, firstOpenAt, now, onboardingDone, notificationsEnabled } = params;
+  const { items, firstOpenAt, now, onboardingDone, notificationsEnabled, installSource } = params;
   const fresh = items.filter(item => item.productType === 'fresh').length;
 
   return {
@@ -72,5 +76,6 @@ export function buildPersonProfile(params: {
     days_since_first_open: daysSince(firstOpenAt, now),
     onboarding_done: onboardingDone,
     notifications_enabled: notificationsEnabled,
+    install_source: installSource,
   };
 }

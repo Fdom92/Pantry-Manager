@@ -54,8 +54,8 @@ export function computeTodaySuggestion(
   _nearExpiryItems: PantryItem[],
   allItems: PantryItem[],
   skipId?: string,
+  nowMs: number = Date.now(),
 ): TodaySuggestion | null {
-  const nowMs = Date.now();
   const now = new Date(nowMs);
 
   const getStock = (item: PantryItem): number => sumQuantities(item.batches);

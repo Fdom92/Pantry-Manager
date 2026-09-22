@@ -204,6 +204,18 @@ ion-icon[color='medium'] {
   color: var(--app-theme-text-soft);
 }
 
+// Material mode leaves destructive action-sheet buttons uncoloured; the app
+// relies on red to mark "remove" actions (e.g. the shopping list row menu).
+ion-action-sheet .action-sheet-destructive {
+  --button-color: var(--ion-color-danger);
+  color: var(--ion-color-danger);
+
+  ion-icon,
+  .action-sheet-icon {
+    color: var(--ion-color-danger);
+  }
+}
+
 // ── Shared animations ───────────────────────────────────────────────────────
 // Defined once globally so every list/card across the app uses the same fade
 // motion. Previously duplicated in pantry.scss and list.scss.

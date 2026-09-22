@@ -156,7 +156,7 @@
                       @if (row.noExpiry) {
                         {{ 'onboarding.slides.confirm.noExpiryLabel' | translate }}
                       } @else if (row.expirationDate) {
-                        {{ 'onboarding.slides.confirm.expiresLabel' | translate:{ date: (row.expirationDate | date:'d MMM') } }}
+                        {{ 'onboarding.slides.confirm.expiresLabel' | translate:{ date: (row.expirationDate | appDate: 'dayMonth') } }}
                       } @else {
                         {{ 'onboarding.slides.confirm.needsDateLabel' | translate }}
                       }

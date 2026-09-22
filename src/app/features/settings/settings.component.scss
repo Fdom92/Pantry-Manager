@@ -259,6 +259,9 @@
 .dev-notif-state__chip[data-state='prompt-with-rationale'] {
   --chip-accent: var(--ion-color-warning-shade);
 }
+.dev-notif-state__chip[data-state='unavailable'] {
+  --chip-accent: var(--ion-color-warning-shade);
+}
 
 // ── Dev fire grid ─────────────────────────────────────────────────────────────
 

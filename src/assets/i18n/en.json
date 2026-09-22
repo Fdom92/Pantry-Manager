@@ -94,7 +94,8 @@
       "next": "Next",
       "delete": "Delete",
       "confirm": "Confirm",
-      "dismiss": "Dismiss"
+      "dismiss": "Dismiss",
+      "undo": "Undo"
     },
     "loading": "Loading…",
     "dates": {
@@ -105,6 +106,10 @@
     },
     "selects": {
       "noOptions": "No options configured. Type to create one or add it in Settings."
+    },
+    "expiry": {
+      "future": "Expires {{when}}",
+      "past": "Expired {{when}}"
     }
   },
   "emptyStates": {
@@ -120,7 +125,7 @@
       "subtitle": "Add products you want to track\n(with exact quantity and batches)"
     },
     "shopping": {
-      "title": "All set"
+      "title": "Your list is empty"
     }
   },
   "locations": {
@@ -186,11 +191,6 @@
         "dismiss": "Not now",
         "markFreshOut": "I don't have it anymore"
       },
-      "expiry": {
-        "today": "Expires today",
-        "tomorrow": "Expires tomorrow",
-        "inDays": "Expires in {{ count }} days"
-      },
       "confirm": {
         "question": "Did you use these ingredients?",
         "yes": "Yes, mark as used",
@@ -204,14 +204,11 @@
       "allGood": {
         "title": "All under control",
         "hint": "Nothing urgent today — your pantry is in great shape",
-        "nextExpiry": "Next expiry: {{name}} in {{days}} days",
+        "nextExpiry": "Next expiry: {{name}}, {{when}}",
         "incompleteTitle": "Missing details",
         "incompleteData_one": "1 product with incomplete data · complete it to see suggestions",
         "incompleteData_other": "{{count}} products with incomplete data · complete them to see suggestions",
         "fixCta": "Complete pending items"
-      },
-      "secondary": {
-        "days": "{{count}} days"
       }
     },
     "actions": {
@@ -253,12 +250,7 @@
     "foodCoverage": {
       "title": "Estimated coverage",
       "hint": "Estimate based on the products in your pantry",
-      "days_one": "≈ 1 day of food",
-      "days_other": "≈ {{ count }} days of food",
-      "months_one": "≈ 1 month of food",
-      "months_other": "≈ {{ count }} months of food",
-      "years_one": "≈ 1 year of food",
-      "years_other": "≈ {{ count }} years of food"
+      "value": "≈ {{duration}} of food"
     },
     "summary": {
       "title": "Pantry overview",
@@ -340,7 +332,6 @@
     "nearExpiry": {
       "title": "Near expiry",
       "subtitle": "In the next {{ days }} days",
-      "expires": "Expires {{ date }}",
       "empty": "No products expiring soon."
     },
     "lowStock": {
@@ -352,7 +343,6 @@
     "expired": {
       "title": "Expired items",
       "deleteAria": "Delete expired items",
-      "expires": "Expired {{ date }}",
       "badge": "Expired",
       "empty": "No expired items right now."
     },
@@ -364,7 +354,8 @@
     },
     "waste": {
       "title": "Waste this month",
-      "count": "You threw away {{count}} products",
+      "count_one": "1 product expired on you",
+      "count": "{{count}} products expired on you",
       "topCategory": "Mostly in: {{category}}",
       "zero": "No waste this month! 🎯",
       "trend": {
@@ -376,7 +367,7 @@
     },
     "reposition": {
       "title": "Running out soon",
-      "daysLeft": "{{days}} days left",
+      "daysLeft": "Runs out {{when}}",
       "add": "Add",
       "added": "Added to list",
       "empty": "We need more history to predict",
@@ -437,7 +428,7 @@
       "inlineHint": "Add a product to the list..."
     },
     "emptyState": {
-      "autoHint": "Out-of-stock items will appear here automatically."
+      "autoHint": "Star ★ what you never want to run out of and it will come back here when it runs out. Or add it by hand above."
     },
     "ignored": {
       "sectionTitle": "Hidden for now"
@@ -447,7 +438,8 @@
       "boughtManual": "✓ {{name}} bought.",
       "ignored": "{{name}} hidden for now — it will come back next time.",
       "removedManual": "{{name}} removed from list.",
-      "shareFailed": "Couldn't share the list. Please try again."
+      "shareFailed": "Couldn't share the list. Please try again.",
+      "unbasic": "{{name}} won’t be added to your list automatically anymore."
     },
     "buySheet": {
       "title": "How many did you buy?",
@@ -457,7 +449,13 @@
       "increment": "Increase quantity",
       "decrement": "Decrease quantity"
     },
-    "tabTitle": "Shop"
+    "tabTitle": "Shop",
+    "rowMenu": {
+      "hide": "Hide for now",
+      "unbasic": "Stop always keeping at home",
+      "remove": "Remove from list",
+      "unhide": "Show again"
+    }
   },
   "insights": {
     "ctaDefault": "Got it",
@@ -620,13 +618,6 @@
       "noExpiryDate": "Date missing",
       "addBatch": "Add batch",
       "currentQuantity": "Quantity",
-      "expires": {
-        "today": "Expires today",
-        "tomorrow": "Expires tomorrow"
-      },
-      "expired": {
-        "yesterday": "Expired yesterday"
-      },
       "noExpiryIntentional": "No expiry"
     },
     "form": {
@@ -689,8 +680,6 @@
       "noExpiry": "No expiration",
       "subinfo": {
         "expired": "Expired",
-        "tomorrow": "Expires tomorrow",
-        "inDays": "Expires in {{count}} days",
         "review": "Use soon"
       },
       "quantity": {
@@ -837,10 +826,7 @@
         "fiveDays": "5 days",
         "oneWeek": "1 week",
         "twoWeeks": "2 weeks",
-        "noDate": "No date",
-        "remaining": "{{days}} days left",
-        "expiresToday": "Expires today",
-        "expiredAgo": "Expired {{days}} days ago"
+        "noDate": "No date"
       },
       "card": {
         "expired": "Expired",
@@ -1135,8 +1121,8 @@
       "seedLowStockTitle": "Seed low stock items",
       "seedLowStockSubtitle": "Add 3 basic items below minimum threshold",
       "clearPantryTitle": "Clear all pantry items",
-      "clearPantrySubtitle": "Permanently delete every item in the pantry",
-      "clearPantryConfirm": "Delete all pantry items? This cannot be undone.",
+      "clearPantrySubtitle": "Deletes every product and its history",
+      "clearPantryConfirm": "Delete every product and its history? This cannot be undone.",
       "toggleProTitle": "Toggle PRO",
       "toggleProSubtitle": "Simulate PRO status ({{ status }})",
       "showAppStateTitle": "Show app state",
@@ -1251,11 +1237,7 @@
     "nearExpiry": {
       "title": "{{ count }} items expiring soon",
       "title_one": "1 item expiring soon",
-      "body": "The nearest in {{ nearestDays }} days",
-      "body_tomorrow": "The nearest expires tomorrow",
-      "body_one": "Expires in {{ nearestDays }} days",
-      "body_one_tomorrow": "Expires tomorrow",
-      "body_one_named": "Your {{name}} expires in {{days}} days.",
+      "body_one_named": "Your {{name}} expires {{when}}.",
       "body_one_named_tomorrow": "Your {{name}} expires tomorrow. Use it today.",
       "body_many_named": "Your {{name}} and {{others}} more expire soon.",
       "body_many_named_tomorrow": "Your {{name}} expires tomorrow and {{others}} more are close."

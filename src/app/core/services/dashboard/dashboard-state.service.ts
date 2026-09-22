@@ -1,8 +1,9 @@
-import { Injectable, computed, effect, inject, signal, DestroyRef } from '@angular/core';
+import { Injectable, computed, inject, signal, DestroyRef } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { computeTodaySuggestion } from '@core/domain/dashboard';
 import { applyFifoConsumption, isIncomplete, shouldAutoAddToShoppingList, sumQuantities } from '@core/domain/pantry';
 import { daysUntilExpiry } from '@core/utils/date.util';
+import { ClockService } from '@core/services/shared/clock.service';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import type { TodaySuggestion } from '@core/domain/dashboard';
 import type {
@@ -47,6 +48,7 @@ const MIN_INCOMPLETE_TO_SURFACE = 1;
 @Injectable()
 export class DashboardStateService {
   private readonly pantryStore = inject(PantryStoreService);
+  private readonly clock = inject(ClockService);
   private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
@@ -74,7 +76,6 @@ export class DashboardStateService {
     !this.hasCompletedInitialLoad() && (this.pantryStore.loading() || !this.pantryStore.endReached())
   );
 
-  readonly lastRefreshTimestamp = signal<string | null>(null);
 
   // Today's suggestion block
   readonly isCookingConfirmed = signal(false);
@@ -109,7 +110,7 @@ export class DashboardStateService {
   );
 
   readonly stalePantryItems = computed(() => {
-    const now = this.getReferenceNow();
+    const now = new Date(this.clock.now());
     const staleThresholdDays = 30;
     const staleThresholdMs = staleThresholdDays * 24 * 60 * 60 * 1000;
 
@@ -135,6 +136,7 @@ export class DashboardStateService {
       this.nearExpiryItems(),
       this.pantryItems(),
       this.lastProtagonistId(),
+      this.clock.now(),
     );
     if (!raw) return null;
     if (this.dismissedTodayIds().has(raw.protagonist.id)) return null;
@@ -165,7 +167,7 @@ export class DashboardStateService {
 
   readonly nextExpiringItem = computed((): { name: string; daysToExpiry: number } | null => {
     if (this.todaySuggestion()) return null;
-    const nowMs = Date.now();
+    const nowMs = this.clock.now();
     let earliest: { name: string; daysToExpiry: number } | null = null;
     for (const item of this.pantryItems()) {
       const stock = sumQuantities(item.batches);
@@ -271,20 +273,6 @@ export class DashboardStateService {
   }
 
   constructor() {
-    effect(() => {
-      const items = this.pantryItems();
-      if (this.pantryStore.loading()) {
-        return;
-      }
-      if (!this.hasCompletedInitialLoad()) {
-        return;
-      }
-      if (!items) {
-        return;
-      }
-      this.lastRefreshTimestamp.set(new Date().toISOString());
-    });
-
     this.destroyRef.onDestroy(() => {
       for (const timeout of this.pendingTimeouts) {
         clearTimeout(timeout);
@@ -296,7 +284,6 @@ export class DashboardStateService {
   async ionViewWillEnter(): Promise<void> {
     await this.pantryStore.loadAll();
     this.hasCompletedInitialLoad.set(true);
-    this.lastRefreshTimestamp.set(new Date().toISOString());
     void this.reviewPrompt.handleDashboardEnter();
   }
 
@@ -411,25 +398,6 @@ export class DashboardStateService {
     } finally {
       this.isConsumingToday.set(false);
     }
-  }
-
-  formatExpiryRelative(value: string | undefined): string | null {
-    if (!value) return null;
-    const diffDays = daysUntilExpiry(value);
-    if (diffDays <= 0) return this.translate.instant('dashboard.today.expiry.today');
-    if (diffDays === 1) return this.translate.instant('dashboard.today.expiry.tomorrow');
-    return this.translate.instant('dashboard.today.expiry.inDays', { count: diffDays });
-  }
-
-  private getReferenceNow(): Date {
-    const timestamp = this.lastRefreshTimestamp();
-    if (timestamp) {
-      const parsed = new Date(timestamp);
-      if (!Number.isNaN(parsed.getTime())) {
-        return parsed;
-      }
-    }
-    return new Date();
   }
 
   private getOverviewCardCount(card: DashboardOverviewCardId): number {

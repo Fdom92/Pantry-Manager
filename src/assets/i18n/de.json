@@ -94,7 +94,8 @@
       "next": "Weiter",
       "delete": "Löschen",
       "confirm": "Bestätigen",
-      "dismiss": "Verwerfen"
+      "dismiss": "Verwerfen",
+      "undo": "Rückgängig"
     },
     "loading": "Lädt…",
     "dates": {
@@ -105,6 +106,10 @@
     },
     "selects": {
       "noOptions": "Keine Optionen konfiguriert. Tippe, um eine zu erstellen, oder füge sie in den Einstellungen hinzu."
+    },
+    "expiry": {
+      "future": "Läuft {{when}} ab",
+      "past": "Abgelaufen {{when}}"
     }
   },
   "emptyStates": {
@@ -120,7 +125,7 @@
       "subtitle": "Füge Produkte hinzu, die du verfolgen möchtest\n(mit genauer Menge und Chargen)"
     },
     "shopping": {
-      "title": "Alles in Ordnung"
+      "title": "Deine Liste ist leer"
     }
   },
   "locations": {
@@ -186,11 +191,6 @@
         "dismiss": "Nicht jetzt",
         "markFreshOut": "Ich habe es nicht mehr"
       },
-      "expiry": {
-        "today": "Läuft heute ab",
-        "tomorrow": "Läuft morgen ab",
-        "inDays": "Läuft in {{ count }} Tagen ab"
-      },
       "confirm": {
         "question": "Hast du diese Zutaten verwendet?",
         "yes": "Ja, als verwendet markieren",
@@ -204,14 +204,11 @@
       "allGood": {
         "title": "Alles unter Kontrolle",
         "hint": "Heute nichts Dringendes — dein Vorrat ist in guter Verfassung",
-        "nextExpiry": "Nächstes Ablaufdatum: {{name}} in {{days}} Tagen",
+        "nextExpiry": "Nächstes Ablaufdatum: {{name}}, {{when}}",
         "incompleteTitle": "Angaben fehlen",
         "incompleteData_one": "1 Produkt mit unvollständigen Daten · ergänze es für Vorschläge",
         "incompleteData_other": "{{count}} Produkte mit unvollständigen Daten · ergänze sie für Vorschläge",
         "fixCta": "Ausstehende ergänzen"
-      },
-      "secondary": {
-        "days": "{{count}} Tage"
       }
     },
     "actions": {
@@ -253,12 +250,7 @@
     "foodCoverage": {
       "title": "Geschätzte Reichweite",
       "hint": "Schätzung basierend auf den Produkten in deiner Speisekammer",
-      "days_one": "≈ 1 Tag Lebensmittel",
-      "days_other": "≈ {{ count }} Tage Lebensmittel",
-      "months_one": "≈ 1 Monat Lebensmittel",
-      "months_other": "≈ {{ count }} Monate Lebensmittel",
-      "years_one": "≈ 1 Jahr Lebensmittel",
-      "years_other": "≈ {{ count }} Jahre Lebensmittel"
+      "value": "≈ {{duration}} Lebensmittel"
     },
     "summary": {
       "title": "Vorratsübersicht",
@@ -340,7 +332,6 @@
     "nearExpiry": {
       "title": "Kurz vor Ablauf",
       "subtitle": "In den nächsten {{ days }} Tagen",
-      "expires": "Läuft ab am {{ date }}",
       "empty": "Keine Produkte laufen bald ab."
     },
     "lowStock": {
@@ -352,7 +343,6 @@
     "expired": {
       "title": "Abgelaufene Artikel",
       "deleteAria": "Abgelaufene löschen",
-      "expires": "Abgelaufen am {{ date }}",
       "badge": "Abgelaufen",
       "empty": "Zurzeit gibt es keine abgelaufenen Artikel."
     },
@@ -364,7 +354,8 @@
     },
     "waste": {
       "title": "Abfall diesen Monat",
-      "count": "Du hast {{count}} Produkte weggeworfen",
+      "count_one": "1 Produkt ist dir abgelaufen",
+      "count": "{{count}} Produkte sind dir abgelaufen",
       "topCategory": "Hauptsächlich in: {{category}}",
       "zero": "Kein Abfall diesen Monat! 🎯",
       "trend": {
@@ -376,7 +367,7 @@
     },
     "reposition": {
       "title": "Bald ausverkauft",
-      "daysLeft": "Noch {{days}} Tage",
+      "daysLeft": "Leer {{when}}",
       "add": "Hinzufügen",
       "added": "Zur Liste hinzugefügt",
       "empty": "Wir brauchen mehr Verlauf für Vorhersagen",
@@ -437,7 +428,7 @@
       "inlineHint": "Produkt zur Liste hinzufügen..."
     },
     "emptyState": {
-      "autoHint": "Aufgebrauchte Produkte erscheinen hier automatisch."
+      "autoHint": "Markiere mit ★, was nie fehlen soll, dann kommt es hierher zurück, wenn es aufgebraucht ist. Oder füge es oben von Hand hinzu."
     },
     "ignored": {
       "sectionTitle": "Jetzt ausgeblendet"
@@ -447,7 +438,8 @@
       "boughtManual": "✓ {{name}} gekauft.",
       "ignored": "{{name}} jetzt ausgeblendet — erscheint beim nächsten Mal wieder.",
       "removedManual": "{{name}} aus der Liste entfernt.",
-      "shareFailed": "Die Liste konnte nicht geteilt werden. Bitte versuche es erneut."
+      "shareFailed": "Die Liste konnte nicht geteilt werden. Bitte versuche es erneut.",
+      "unbasic": "{{name}} wird nicht mehr automatisch zur Liste hinzugefügt."
     },
     "buySheet": {
       "title": "Wie viele hast du gekauft?",
@@ -457,7 +449,13 @@
       "increment": "Menge erhöhen",
       "decrement": "Menge verringern"
     },
-    "tabTitle": "Einkauf"
+    "tabTitle": "Einkauf",
+    "rowMenu": {
+      "hide": "Vorerst ausblenden",
+      "unbasic": "Nicht mehr immer vorrätig halten",
+      "remove": "Von der Liste entfernen",
+      "unhide": "Wieder anzeigen"
+    }
   },
   "insights": {
     "ctaDefault": "Verstanden",
@@ -620,13 +618,6 @@
       "noExpiryDate": "Datum fehlt",
       "addBatch": "Charge hinzufügen",
       "currentQuantity": "Menge",
-      "expires": {
-        "today": "Läuft heute ab",
-        "tomorrow": "Läuft morgen ab"
-      },
-      "expired": {
-        "yesterday": "Gestern abgelaufen"
-      },
       "noExpiryIntentional": "Kein Ablaufdatum"
     },
     "form": {
@@ -689,8 +680,6 @@
       "noExpiry": "Kein Ablaufdatum",
       "subinfo": {
         "expired": "Abgelaufen",
-        "tomorrow": "Läuft morgen ab",
-        "inDays": "Läuft in {{count}} Tagen ab",
         "review": "Bald verbrauchen"
       },
       "quantity": {
@@ -837,10 +826,7 @@
         "fiveDays": "5 Tage",
         "oneWeek": "1 Woche",
         "twoWeeks": "2 Wochen",
-        "noDate": "Kein Datum",
-        "remaining": "Noch {{days}} Tage",
-        "expiresToday": "Läuft heute ab",
-        "expiredAgo": "Vor {{days}} Tagen abgelaufen"
+        "noDate": "Kein Datum"
       },
       "card": {
         "expired": "Abgelaufen",
@@ -1135,8 +1121,8 @@
       "seedLowStockTitle": "Items mit niedrigem Bestand erstellen",
       "seedLowStockSubtitle": "3 Basis-Items unter Mindestschwelle hinzufügen",
       "clearPantryTitle": "Alle Vorratskammer-Items löschen",
-      "clearPantrySubtitle": "Alle Items dauerhaft löschen",
-      "clearPantryConfirm": "Alle Items löschen? Dies kann nicht rückgängig gemacht werden.",
+      "clearPantrySubtitle": "Löscht alle Produkte und ihren Verlauf",
+      "clearPantryConfirm": "Alle Produkte und ihren Verlauf löschen? Das kann nicht rückgängig gemacht werden.",
       "toggleProTitle": "PRO umschalten",
       "toggleProSubtitle": "PRO-Status simulieren ({{ status }})",
       "showAppStateTitle": "App-Status anzeigen",
@@ -1251,11 +1237,7 @@
     "nearExpiry": {
       "title": "{{ count }} Produkte laufen bald ab",
       "title_one": "1 Produkt läuft bald ab",
-      "body": "Das nächste in {{ nearestDays }} Tagen",
-      "body_tomorrow": "Das nächste läuft morgen ab",
-      "body_one": "Läuft ab in {{ nearestDays }} Tagen",
-      "body_one_tomorrow": "Läuft morgen ab",
-      "body_one_named": "Dein {{name}} läuft in {{days}} Tagen ab.",
+      "body_one_named": "Dein {{name}} läuft {{when}} ab.",
       "body_one_named_tomorrow": "Dein {{name}} läuft morgen ab. Heute aufbrauchen.",
       "body_many_named": "Dein {{name}} und {{others}} weitere laufen bald ab.",
       "body_many_named_tomorrow": "Dein {{name}} läuft morgen ab und {{others}} weitere sind kurz davor."

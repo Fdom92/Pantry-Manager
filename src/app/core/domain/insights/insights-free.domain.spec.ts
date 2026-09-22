@@ -365,23 +365,23 @@ describe('computeFoodCoverage', () => {
     expect(computeFoodCoverage(items)).toBeNull();
   });
 
-  it('returns days unit for small quantities', () => {
+  it('returns a small number of days for small quantities', () => {
     const items = [
       makeItem({ batches: [{ batchId: 'b1', quantity: 3 }] }),
       makeItem({ batches: [{ batchId: 'b1', quantity: 3 }] }),
       makeItem({ batches: [{ batchId: 'b1', quantity: 3 }] }),
     ];
     const result = computeFoodCoverage(items)!;
-    expect(result.unit).toBe('days');
-    expect(result.value).toBeGreaterThan(0);
+    expect(result.days).toBeGreaterThan(0);
+    expect(result.days).toBeLessThan(30);
   });
 
-  it('returns months unit when >= 30 days', () => {
+  it('returns 30+ days for a well-stocked pantry', () => {
     const items = Array.from({ length: 5 }, () =>
       makeItem({ batches: [{ batchId: 'b1', quantity: 20 }] })
     );
     const result = computeFoodCoverage(items)!;
-    expect(['months', 'years']).toContain(result.unit);
+    expect(result.days).toBeGreaterThanOrEqual(30);
   });
 
   it('returns a coverage value for items with foodType', () => {
@@ -391,7 +391,7 @@ describe('computeFoodCoverage', () => {
       makeItem({ foodType: FoodType.DAIRY, batches: [{ batchId: 'b1', quantity: 5 }] }),
     ];
     const result = computeFoodCoverage(items)!;
-    expect(result.value).toBeGreaterThan(0);
+    expect(result.days).toBeGreaterThan(0);
   });
 });
 

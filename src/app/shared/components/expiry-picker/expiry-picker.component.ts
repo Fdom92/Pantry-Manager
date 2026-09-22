@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { LanguageService } from '@core/services/shared/language.service';
-import { formatExpiryLabel } from '@core/utils/date.util';
+import { DateDisplayService } from '@core/services/shared/date-display.service';
 import { IonChip, IonContent, IonIcon, IonLabel, IonModal } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { QuickDateChipsComponent } from '../quick-date-chips/quick-date-chips.component';
@@ -94,7 +93,7 @@ import { QuickDateChipsComponent } from '../quick-date-chips/quick-date-chips.co
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpiryPickerComponent {
-  private readonly languageService = inject(LanguageService);
+  private readonly dates = inject(DateDisplayService);
 
   @Input() mode: 'full' | 'chips-only' | 'picker-only' = 'full';
   @Input() date?: string;
@@ -112,7 +111,7 @@ export class ExpiryPickerComponent {
   protected sheetOpen = signal(false);
 
   get formattedDate(): string {
-    return formatExpiryLabel(this.date, this.languageService.getCurrentLocale());
+    return this.dates.date(this.date);
   }
 
   onDateChange(event: Event): void {

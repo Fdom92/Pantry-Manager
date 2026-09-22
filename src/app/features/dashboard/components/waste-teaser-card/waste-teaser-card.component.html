@@ -5,7 +5,7 @@
       @if (isEmptyZeroWaste()) {
         {{ 'dashboard.waste.zero' | translate }}
       } @else {
-        {{ 'dashboard.waste.count' | translate: { count: summary().totalCount } }}
+        {{ (summary().totalCount === 1 ? 'dashboard.waste.count_one' : 'dashboard.waste.count') | translate: { count: summary().totalCount } }}
       }
     </span>
     <ion-icon name="chevron-forward-outline" class="waste-teaser-card__chevron" aria-hidden="true"></ion-icon>

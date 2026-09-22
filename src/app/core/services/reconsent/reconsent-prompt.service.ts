@@ -60,12 +60,14 @@ export class ReconsentPromptService {
     //      occasionally in fresh Capacitor sessions; treat it as "do not ask"
     //      to avoid prompting users whose OS permission may already be on but
     //      we just haven't queried yet.
+    //   4. 'unavailable' means the plugin is broken — asking would fail too.
     const permissionState = this.permission.permissionState();
     const notificationsAlreadyDecided = prefs.notificationsDecidedAt != null;
     const notifications =
       !notificationsAlreadyDecided &&
       permissionState !== 'granted' &&
       permissionState !== 'denied' &&
+      permissionState !== 'unavailable' &&
       permissionState !== 'unknown';
 
     // Analytics gate: ask only if we have never recorded a decision. Both

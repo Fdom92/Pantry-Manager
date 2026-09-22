@@ -83,16 +83,18 @@
 
       @if (facade.hasNoFreshAtAll()) {
         <app-empty-state
-          class="list-empty-state"
+          class="list-empty-state list-empty-state--inline"
           icon="leaf-outline"
           [hideTitle]="true"
+          [inline]="true"
           [subtitleKey]="'pantry.fresh.emptyState.subtitle'">
         </app-empty-state>
       } @else if (facade.hasFreshButFilteredEmpty()) {
         <app-empty-state
-          class="list-empty-state"
+          class="list-empty-state list-empty-state--inline"
           icon="leaf-outline"
           [hideTitle]="true"
+          [inline]="true"
           [subtitleKey]="'pantry.fresh.empty.filters'">
         </app-empty-state>
       } @else {
@@ -100,6 +102,7 @@
           @for (item of facade.visibleFreshItems(); track item._id) {
             <app-fresh-item-card
               [item]="item"
+              [now]="facade.now()"
               (stateChange)="facade.setFreshState($event.item, $event.state)"
               (editRequested)="facade.openEditModalFromSheet($event)"
               (basicToggle)="facade.toggleItemBasic($event)">
@@ -154,16 +157,18 @@
 
       @if (facade.summary().total === 0) {
         <app-empty-state
-          class="list-empty-state"
+          class="list-empty-state list-empty-state--inline"
           icon="fast-food-outline"
           [hideTitle]="true"
+          [inline]="true"
           [subtitleKey]="'emptyStates.pantry.subtitle'">
         </app-empty-state>
       } @else if (facade.despensaItems().length === 0) {
         <app-empty-state
-          class="list-empty-state"
+          class="list-empty-state list-empty-state--inline"
           icon="fast-food-outline"
           [hideTitle]="true"
+          [inline]="true"
           [subtitleKey]="'pantry.empty.filters'">
         </app-empty-state>
       } @else {

@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { ActionSheetController } from '@ionic/angular';
 import { SHOPPING_LIST_NAME } from '@core/constants';
-import { buildShoppingAnalysis } from '@core/domain/list';
+import { buildShoppingAnalysis, listRowActions, manualItemsNotSuggested, type ListRowAction, type ListRowKind } from '@core/domain/list';
 import { classifyNativeDismissal } from '@core/domain/shared';
 import { formatIsoTimestampForFilename } from '@core/domain/settings';
 import type { PantryItem } from '@core/models/pantry';
@@ -11,6 +11,7 @@ import { generateBatchId } from '@core/utils/batch-id.util';
 import { createDocumentId, createLatestOnlyRunner, SkeletonLoadingManager, withSignalFlag } from '@core/utils';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { resolveSuggestedExpiry, toLotExpiry } from '@core/domain/pantry/food-type-inference.domain';
+import { setBasic, sumQuantities } from '@core/domain/pantry';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { DownloadService, LoggerService, ShareService, ToastService, shouldSkipShareOutcome } from '../shared';
 import { normalizeProductKey } from '@core/utils/normalization.util';
@@ -41,7 +42,7 @@ export class ListStateService {
 
   readonly isSharingListInProgress = signal(false);
 
-  // Ephemeral per-visit state — cleared on ionViewWillLeave
+  // Ephemeral per-visit state — cleared on ionViewWillLeave ("hide for now" means this visit).
   readonly boughtItemIds  = signal<Set<string>>(new Set());
   readonly removedAutoIds = signal<Set<string>>(new Set());
 
@@ -60,6 +61,19 @@ export class ListStateService {
       boughtManuals: this.boughtManuals(),
       unassignedLabel: this.translate.instant('shopping.unassignedSupermarket'),
     });
+  });
+
+  /**
+   * Manual items to actually render/count/export: a hand-written entry that
+   * names a product the automatic list already suggests (e.g. "Pollo" typed
+   * in by hand while the pantry's own "Pollo" is out of stock and marked
+   * basic) is the same purchase written twice, so the suggestion wins. Only
+   * *pending* suggestions hide a manual — one the user hid "for now" or has
+   * already bought must not, or their own note would vanish along with it.
+   */
+  readonly visibleManualItems = computed(() => {
+    const suggestedNames = this.shoppingAnalysis().suggestions.map(s => s.item.name);
+    return manualItemsNotSuggested(this.manualItems(), suggestedNames);
   });
 
   readonly loading = this.pantryStore.loading;
@@ -114,6 +128,15 @@ export class ListStateService {
         const updated = await this.pantryStore.addNewLot(id, { quantity, ...toLotExpiry(suggested) });
         if (updated) {
           await this.eventManager.logAddExistingItem(previous, updated, quantity, undefined, undefined, timestamp);
+        }
+      }
+      // Buying the automatic suggestion settles any hand-written note for the
+      // same product too — otherwise a manual "Pollo" reappears right after
+      // the auto "Pollo" is bought, once it drops out of pendingSuggestions.
+      const boughtKey = normalizeProductKey(name);
+      for (const manual of this.manualItems()) {
+        if (normalizeProductKey(manual.name) === boughtKey) {
+          this.manualItemsStore.removeManual(manual.id);
         }
       }
       this.toast.success('shopping.toasts.bought', { name });
@@ -192,7 +215,7 @@ export class ListStateService {
     if (name) {
       this.toast.info('shopping.toasts.ignored', { name });
     }
-    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'auto' });
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'auto', surface: 'menu' });
   }
 
   removeManualItem(id: string): void {
@@ -200,16 +223,98 @@ export class ListStateService {
     if (item) {
       this.toast.success('shopping.toasts.removedManual', { name: item.name });
     }
-    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'manual' });
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_REMOVED, { source: 'manual', surface: 'menu' });
   }
 
-  restoreFromBought(id: string): void {
-    this.boughtItemIds.update(set => {
+  private static readonly ROW_ACTION_LABELS: Record<ListRowAction, string> = {
+    hide: 'shopping.rowMenu.hide',
+    unbasic: 'shopping.rowMenu.unbasic',
+    remove: 'shopping.rowMenu.remove',
+    unhide: 'shopping.rowMenu.unhide',
+  };
+
+  private static readonly ROW_ACTION_ICONS: Record<ListRowAction, string> = {
+    hide: 'eye-off-outline',
+    unbasic: 'star-outline',
+    remove: 'trash-outline',
+    unhide: 'eye-outline',
+  };
+
+  async openRowActions(row: { kind: ListRowKind; id: string; name: string }): Promise<void> {
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ROW_MENU_OPENED, { kind: row.kind });
+    const sheet = await this.actionSheetCtrl.create({
+      header: row.name,
+      buttons: [
+        ...listRowActions(row.kind).map(spec => ({
+          text: this.translate.instant(ListStateService.ROW_ACTION_LABELS[spec.action]),
+          icon: ListStateService.ROW_ACTION_ICONS[spec.action],
+          role: spec.destructive ? 'destructive' : undefined,
+          handler: () => { void this.runRowAction(spec.action, row); },
+        })),
+        { role: 'cancel', text: this.translate.instant('common.actions.cancel') },
+      ],
+    });
+    await sheet.present();
+  }
+
+  private async runRowAction(action: ListRowAction, row: { kind: ListRowKind; id: string }): Promise<void> {
+    switch (action) {
+      case 'hide': this.removeAutoItem(row.id); return;
+      case 'unbasic': await this.unbasicItem(row.id, row.kind); return;
+      case 'remove': this.removeManualItem(row.id); return;
+      case 'unhide': this.unhideAutoItem(row.id); return;
+    }
+  }
+
+  unhideAutoItem(id: string): void {
+    this.removedAutoIds.update(set => {
       const next = new Set(set);
       next.delete(id);
       return next;
     });
-    this.manualItemsStore.restoreBoughtManual(id);
+  }
+
+  /**
+   * "Always keep at home" off, from the list. A depleted despensa product is
+   * hidden from the pantry screen, so the list is the only place it can be
+   * un-starred. After this it appears nowhere until added again — hence undo.
+   */
+  async unbasicItem(id: string, from: ListRowKind): Promise<void> {
+    const item = this.items().find(i => i._id === id);
+    if (!item) return;
+    const previousMin = item.minThreshold;
+    try {
+      await this.pantryStore.updateItem(setBasic(item, false, new Date().toISOString()));
+    } catch (err) {
+      // pantryStore.updateItem swallows its own persistence errors — this
+      // catches anything else (e.g. setBasic itself throwing).
+      this.logger.error('ListStateService', 'unbasicItem failed', err);
+      return;
+    }
+    this.unhideAutoItem(id);
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BASIC_REMOVED, {
+      product_type: item.productType === 'fresh' ? 'fresh' : 'despensa',
+      from,
+      depleted: sumQuantities(item.batches ?? []) <= 0,
+    });
+    this.toast.withAction(
+      'shopping.toasts.unbasic',
+      'common.actions.undo',
+      () => { void this.restoreBasic(id, previousMin); },
+      { name: item.name },
+    );
+  }
+
+  private async restoreBasic(id: string, previousMin: number | undefined): Promise<void> {
+    const current = this.items().find(i => i._id === id);
+    if (!current) return;
+    try {
+      await this.pantryStore.updateItem(setBasic(current, true, new Date().toISOString(), previousMin));
+    } catch (err) {
+      this.logger.error('ListStateService', 'restoreBasic failed', err);
+      return;
+    }
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BASIC_RESTORED);
   }
 
   addManualItem(name: string, source: 'user' | 'preset' = 'user'): void {
@@ -241,7 +346,7 @@ export class ListStateService {
 
   async shareShoppingListAsText(): Promise<void> {
     const state = this.shoppingAnalysis();
-    const manuals = this.manualItemsStore.manualItems();
+    const manuals = this.visibleManualItems();
     if (!state.summary.total && !manuals.length) return;
 
     const text = this.exportService.buildText(state.groupedSuggestions, manuals);
@@ -272,7 +377,7 @@ export class ListStateService {
       }
 
       const state = this.shoppingAnalysis();
-      if (!state.summary.total && !this.manualItemsStore.manualItems().length) {
+      if (!state.summary.total && !this.visibleManualItems().length) {
         return;
       }
       this.analytics.track(ANALYTICS_EVENTS.SHOPPING_LIST_SHARED, {
@@ -280,7 +385,7 @@ export class ListStateService {
       });
 
       await withSignalFlag(this.isSharingListInProgress, async () => {
-        const pdfBlob = await this.exportService.buildPdf(state.groupedSuggestions, this.manualItemsStore.manualItems());
+        const pdfBlob = await this.exportService.buildPdf(state.groupedSuggestions, this.visibleManualItems());
         const filename = `${SHOPPING_LIST_NAME}-${formatIsoTimestampForFilename(new Date())}.pdf`;
         const { outcome } = await this.share.tryShareBlob({
           blob: pdfBlob,

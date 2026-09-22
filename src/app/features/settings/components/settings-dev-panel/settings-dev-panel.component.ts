@@ -3,7 +3,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Share } from '@capacitor/share';
 import { CapacitorPluginMlKitTextRecognition } from '@pantrist/capacitor-plugin-ml-kit-text-recognition';
 import { NOTIFICATION_IDS } from '@core/constants';
-import { formatDateTimeValue } from '@core/utils/formatting.util';
+import { AppDatePipe } from '@shared/pipes/date-display.pipes';
 import { SettingsDevStateService } from '@core/services/settings/settings-dev-state.service';
 import { SettingsStateService } from '@core/services/settings/settings-state.service';
 import { AlertController } from '@ionic/angular';
@@ -40,6 +40,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   selector: 'app-settings-dev-panel',
   standalone: true,
   imports: [
+    AppDatePipe,
     IonCard,
     IonCardHeader,
     IonCardTitle,
@@ -111,11 +112,6 @@ export class SettingsDevPanelComponent {
     await this.dev.prepareReconsentSheet();
     sessionStorage.setItem('sync:postReload', '1');
     window.location.href = '/dashboard';
-  }
-
-  /** Pretty-print a pending notification scheduleAt ISO for the dev panel. */
-  formatPendingTime(iso?: string): string {
-    return formatDateTimeValue(iso, this.facade.getCurrentLocale(), { fallback: '—' });
   }
 
   async testNotification(): Promise<void> {

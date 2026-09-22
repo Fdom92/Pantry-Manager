@@ -1,6 +1,6 @@
 {
   "name": "pantrymind",
-  "version": "5.4",
+  "version": "5.5",
   "author": "Fernando del olmo",
   "homepage": "https://ferolmo.com/",
   "scripts": {
@@ -45,7 +45,6 @@
     "@revenuecat/purchases-capacitor": "^11.2.15",
     "@sentry/angular": "^10.43.0",
     "@sentry/capacitor": "^4.0.0",
-    "date-fns": "^3.6.0",
     "ionicons": "^7.0.0",
     "jspdf": "^3.0.4",
     "posthog-js": "^1.379.0",

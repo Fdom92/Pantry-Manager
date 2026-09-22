@@ -1,12 +1,16 @@
 import type { PantryEvent } from '@core/models/events';
 import type { FoodType } from '@core/models/shared/enums.model';
 
+/**
+ * "Se te han caducado N productos" for the last `windowDays`: distinct products with a
+ * batch that expired while it still had stock. Counts products, not units —
+ * 6 yogures + 4 huevos are 2 products (it summed units until 5.5).
+ */
 export interface WasteSummary {
   windowDays: number;
   totalCount: number;
   byCategory: Array<{ categoryId: string; count: number }>;
   byFoodType: Array<{ foodType: FoodType; count: number }>;
-  topProduct?: { productId: string; productName: string; count: number };
   previousWindowCount: number;
   trend: 'up' | 'down' | 'flat';
 }
@@ -22,38 +26,27 @@ export function computeWasteSummary(
   const windowStart = nowMs - windowDays * MS_PER_DAY;
   const prevStart = windowStart - windowDays * MS_PER_DAY;
 
-  const inWindow: PantryEvent[] = [];
-  let previousWindowCount = 0;
+  // productId → its latest expired event in the window (for category/foodType)
+  const inWindow = new Map<string, PantryEvent>();
+  const inPrevious = new Set<string>();
 
   for (const e of events) {
     if (e.eventType !== 'EXPIRE') continue;
+    if (!(Number.isFinite(e.quantity) && e.quantity > 0)) continue;
     const t = new Date(e.timestamp).getTime();
     if (Number.isNaN(t)) continue;
-    const q = Number.isFinite(e.quantity) ? e.quantity : 0;
     if (t >= windowStart && t <= nowMs) {
-      inWindow.push(e);
+      inWindow.set(e.productId, e);
     } else if (t >= prevStart && t < windowStart) {
-      previousWindowCount += q;
+      inPrevious.add(e.productId);
     }
   }
 
   const byCategoryMap = new Map<string, number>();
   const byFoodTypeMap = new Map<FoodType, number>();
-  const byProductMap = new Map<string, { productName: string; count: number }>();
-  let totalCount = 0;
-
-  for (const e of inWindow) {
-    const q = Number.isFinite(e.quantity) ? e.quantity : 0;
-    totalCount += q;
-    if (e.categoryId) byCategoryMap.set(e.categoryId, (byCategoryMap.get(e.categoryId) ?? 0) + q);
-    if (e.foodType)   byFoodTypeMap.set(e.foodType, (byFoodTypeMap.get(e.foodType) ?? 0) + q);
-    const productName = e.productName ?? '';
-    const existing = byProductMap.get(e.productId);
-    if (existing) {
-      existing.count += q;
-    } else {
-      byProductMap.set(e.productId, { productName, count: q });
-    }
+  for (const e of inWindow.values()) {
+    if (e.categoryId) byCategoryMap.set(e.categoryId, (byCategoryMap.get(e.categoryId) ?? 0) + 1);
+    if (e.foodType) byFoodTypeMap.set(e.foodType, (byFoodTypeMap.get(e.foodType) ?? 0) + 1);
   }
 
   const byCategory = [...byCategoryMap.entries()]
@@ -63,26 +56,11 @@ export function computeWasteSummary(
     .map(([foodType, count]) => ({ foodType, count }))
     .sort((a, b) => b.count - a.count);
 
-  let topProduct: WasteSummary['topProduct'];
-  let top = 0;
-  for (const [productId, v] of byProductMap) {
-    if (v.count > top) {
-      top = v.count;
-      topProduct = { productId, productName: v.productName, count: v.count };
-    }
-  }
-
+  const totalCount = inWindow.size;
+  const previousWindowCount = inPrevious.size;
   let trend: WasteSummary['trend'] = 'flat';
   if (totalCount > previousWindowCount) trend = 'up';
   else if (totalCount < previousWindowCount) trend = 'down';
 
-  return {
-    windowDays,
-    totalCount,
-    byCategory,
-    byFoodType,
-    topProduct,
-    previousWindowCount,
-    trend,
-  };
+  return { windowDays, totalCount, byCategory, byFoodType, previousWindowCount, trend };
 }

@@ -32,6 +32,7 @@ function makeCtx(items: PantryItem[]): NotificationContext {
       supermarketOptions: [],
     },
     t: (key, params) => `[${key}|${JSON.stringify(params ?? {})}]`,
+    locale: 'es-ES',
     now: new Date('2026-06-02T08:00:00.000Z'),
   };
 }

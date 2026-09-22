@@ -4,7 +4,7 @@
   <p class="waste-card__zero">{{ 'dashboard.waste.zero' | translate }}</p>
 } @else {
   <p class="waste-card__count">
-    {{ 'dashboard.waste.count' | translate: { count: summary().totalCount } }}
+    {{ (summary().totalCount === 1 ? 'dashboard.waste.count_one' : 'dashboard.waste.count') | translate: { count: summary().totalCount } }}
   </p>
   @if (isPro()) {
     @if (topCategoryLabel(); as topCategory) {
