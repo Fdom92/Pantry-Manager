@@ -34,6 +34,9 @@ const SUPERMARKET_PATTERNS: Array<{ key: string; pattern: RegExp }> = [
   { key: 'eroski', pattern: /EROSKI/i },
   { key: 'alcampo', pattern: /ALCAMPO/i },
   { key: 'consum', pattern: /\bCONSUM\b/i },
+  // Not /FAMILY/ alone: "FAMILY" is their house brand on product rows, and
+  // rows matching a chain pattern are classified as noise.
+  { key: 'familycash', pattern: /FAMILY\s?CASH/i },
 ];
 
 export function detectSupermarket(rows: ReceiptRow[]): string | null {
@@ -163,25 +166,31 @@ export function classifyRow(row: ReceiptRow, productsSoFar: number): ReceiptRowK
   if (productsSoFar > 0 && END_ANCHOR.test(text)) return 'end';
   if (WEIGHT_ROW.test(text)) return 'weight';
   if (DISCOUNT_ROW.test(text)) return 'discount';
-  // Chain names and company suffixes are header noise, not products.
-  if (SUPERMARKET_PATTERNS.some(s => s.pattern.test(text))) return 'noise';
-  if (/\bS\.?\s?(A|L)\.?\s?(U|COOP)?\.?\s*$/i.test(text)) return 'noise';
-  for (const p of NOISE_PATTERNS) {
-    if (p.test(text)) return 'noise';
-  }
+  if (isNoiseText(text)) return 'noise';
   return hasNameCell(row) ? 'product' : 'noise';
+}
+
+/** Chain names, company suffixes and every NOISE_PATTERNS entry. */
+function isNoiseText(text: string): boolean {
+  // Chain names and company suffixes are header noise, not products.
+  if (SUPERMARKET_PATTERNS.some(s => s.pattern.test(text))) return true;
+  if (/\bS\.?\s?(A|L)\.?\s?(U|COOP)?\.?\s*$/i.test(text)) return true;
+  return NOISE_PATTERNS.some(p => p.test(text));
 }
 
 // ─────────────────────────────────────────────────────────────────────────
 // Quantity encodings
 //
-// Real fixtures (2026-07) use six different ways to encode quantity:
+// Real fixtures (2026-07/09) use seven different ways to encode quantity:
 //  - Mercadona / Eroski: leading digit in the name row      "2 COCA COLA ZERO"
 //  - Mercadona (OCR):    leading "1" misread as "I"         "I SOJA NATURAL"
 //  - Costco / Dia:       "Nx" token                         "1x", "6X"
 //  - Lidl:                "<unit price>x" + count            "0,99x 2" / "0,99x2"
 //  - Merkocash:           decimal CANT column cell           "24.0"
 //  - Aldi:                none (always 1) + weight sub-rows  "0,526 kg x 2,39 €/kg"
+//  - Family Cash:         leading CANT column, decimal = weight in kg
+//                                                            "2 | 0,75 | MACARRON", "0,39 | 4,99 | MAGRO"
+//                         (own path: parseQuantityFirstZone, see below)
 // ─────────────────────────────────────────────────────────────────────────
 
 const PRICE_TOKEN = /^-?\d{1,4}[.,]\d{2}[-€]?\s?[A-D]?$/;
@@ -412,6 +421,14 @@ export function parseReceipt(rows: ReceiptRow[]): ReceiptParseResult {
   // sit on their own price-less row above the data line.
   const requirePrice = startIdx < 0 && supermarket !== 'costco';
 
+  if (startIdx >= 0 && isQuantityFirstHeader(rows[startIdx])) {
+    return {
+      supermarket,
+      items: consolidate(parseQuantityFirstZone(zone)),
+      totalRows: rows.length,
+    };
+  }
+
   const items: ParsedReceiptItem[] = [];
   let ended = false;
 
@@ -445,6 +462,103 @@ function findZoneStart(rows: ReceiptRow[]): number {
   if (anchorIdx < 0) return -1;
   if (firstPricedIdx >= 0 && anchorIdx >= firstPricedIdx) return -1;
   return anchorIdx;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Quantity-first tables (Family Cash)
+//
+// Real ticket 2026-09: header "Cant | Precio | Descripción Artículo |
+// Importe". The CANT column comes FIRST and holds either a unit count ("2")
+// or a weight in kg ("0,39", "1,161"); long names wrap onto a second row
+// with no numbers ("LOMOS ATUN CLARO NATURAL" / "FAMILY"). The usual path
+// loses weighed rows (WEIGHT_ROW), turns every wrap into a fake product and
+// leaves decimal quantities glued into the name — so these tables take
+// their own path, decided by the header, not the chain (the chain name is
+// often cropped out of the photo).
+// ─────────────────────────────────────────────────────────────────────────
+
+/** CANT printed before DESCRIPCION (Merkocash prints it after: "Descripcion | Cant"). */
+const QTY_FIRST_HEADER = /\bCANT\b.*DESCR/i;
+/** Leading CANT cell: unit count or kg weight ("2", "0,7", "1,161"). */
+const LEADING_CANT_TOKEN = /^\d{1,3}([.,]\d{1,3})?$/;
+
+export function isQuantityFirstHeader(headerRow: ReceiptRow): boolean {
+  return QTY_FIRST_HEADER.test(headerRow.text);
+}
+
+/**
+ * Merge wrapped rows into their product, then extract each one. A row with
+ * a price starts a product; a following price-less row is the rest of its
+ * name ("500 GR", "KG", "FAMILY") — no letter-count minimum, sizes wrap
+ * too. Merging happens before any name cleanup so a trailing-VAT-letter
+ * rule can't eat "DUROC A" before "TACOS" joins it.
+ */
+function parseQuantityFirstZone(zone: ReceiptRow[]): ParsedReceiptItem[] {
+  const products: ReceiptRow[] = [];
+  let current: ReceiptRow | null = null;
+
+  for (const row of zone) {
+    if (products.length > 0 && END_ANCHOR.test(row.text)) break;
+    if (DISCOUNT_ROW.test(row.text)) { current = null; continue; }
+    const tokens = tokenizeRow(row);
+    const priced = tokens.some(tok => PRICE_TOKEN.test(tok));
+    // CANT + price is the row's structure, so noise words don't veto it:
+    // "AGUA MINERAL TELENO" trips the garbled-TELEFONO pattern.
+    const structural = priced && LEADING_CANT_TOKEN.test(tokens[0] ?? '');
+    if (!structural && isNoiseText(row.text)) { current = null; continue; }
+    if (priced) {
+      current = { ...row, cells: [...row.cells] };
+      products.push(current);
+    } else if (current) {
+      current.cells.push(...row.cells);
+      current.text = `${current.text} ${row.text}`;
+    }
+    // A wrap row with no product before it is ignored.
+  }
+
+  return products
+    .map(extractQuantityFirstProduct)
+    .filter((p): p is ParsedReceiptItem => p !== null);
+}
+
+/**
+ * The CANT column is authoritative: an integer is the count, a decimal is
+ * a weight (one item). None of the in-name quantity heuristics run — they
+ * would eat "4 X" out of "COCA-COLA 4 X 2 L PET".
+ */
+function extractQuantityFirstProduct(row: ReceiptRow): ParsedReceiptItem | null {
+  const tokens = tokenizeRow(row);
+  let quantity: number | null = null;
+  if (tokens.length && LEADING_CANT_TOKEN.test(tokens[0])) {
+    const cant = tokens.shift()!;
+    quantity = /[.,]/.test(cant) ? null : parseInt(cant, 10);
+  }
+
+  const nameTokens = tokens.filter(tok => !PRICE_TOKEN.test(tok) && !PRODUCT_CODE.test(tok));
+  let name = stripNameNoise(nameTokens.join(' '));
+  name = stripTrailingKgUnit(name);
+  name = cleanOcrDigitArtifacts(name);
+
+  if (countLetters(name) < 3) return null;
+
+  return {
+    rawName: name,
+    quantity: clampQuantity(quantity ?? 1),
+    confidence: quantity !== null ? 'high' : 'medium',
+  };
+}
+
+/**
+ * "CLEMENTINA KG": KG marks a sold-by-weight item, not the name; "FIDEUA
+ * FAMILY 1 KG" is a pack size and keeps it.
+ */
+function stripTrailingKgUnit(name: string): string {
+  const tokens = name.split(' ');
+  const prev = tokens[tokens.length - 2];
+  if (/^KG$/i.test(tokens[tokens.length - 1]) && prev && !/^\d+([.,]\d+)?$/.test(prev)) {
+    tokens.pop();
+  }
+  return tokens.join(' ');
 }
 
 /** Merge repeated lines of the same product (Costco/Aldi print one row per unit). */
