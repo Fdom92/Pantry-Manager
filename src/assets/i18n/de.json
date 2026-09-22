@@ -354,6 +354,7 @@
     },
     "waste": {
       "title": "Abfall diesen Monat",
+      "count_one": "Du hast 1 Produkt weggeworfen",
       "count": "Du hast {{count}} Produkte weggeworfen",
       "topCategory": "Hauptsächlich in: {{category}}",
       "zero": "Kein Abfall diesen Monat! 🎯",
@@ -1120,8 +1121,8 @@
       "seedLowStockTitle": "Items mit niedrigem Bestand erstellen",
       "seedLowStockSubtitle": "3 Basis-Items unter Mindestschwelle hinzufügen",
       "clearPantryTitle": "Alle Vorratskammer-Items löschen",
-      "clearPantrySubtitle": "Alle Items dauerhaft löschen",
-      "clearPantryConfirm": "Alle Items löschen? Dies kann nicht rückgängig gemacht werden.",
+      "clearPantrySubtitle": "Löscht alle Produkte und ihren Verlauf",
+      "clearPantryConfirm": "Alle Produkte und ihren Verlauf löschen? Das kann nicht rückgängig gemacht werden.",
       "toggleProTitle": "PRO umschalten",
       "toggleProSubtitle": "PRO-Status simulieren ({{ status }})",
       "showAppStateTitle": "App-Status anzeigen",

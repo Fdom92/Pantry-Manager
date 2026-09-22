@@ -354,6 +354,7 @@
     },
     "waste": {
       "title": "Desperdicio este mes",
+      "count_one": "Has tirado 1 producto",
       "count": "Has tirado {{count}} productos",
       "topCategory": "Sobre todo en: {{category}}",
       "zero": "¡Sin desperdicios este mes! 🎯",
@@ -1120,8 +1121,8 @@
       "seedLowStockTitle": "Crear items con stock bajo",
       "seedLowStockSubtitle": "Añade 3 items básicos por debajo del mínimo",
       "clearPantryTitle": "Vaciar toda la despensa",
-      "clearPantrySubtitle": "Elimina permanentemente todos los items",
-      "clearPantryConfirm": "¿Eliminar todos los items de la despensa? No se puede deshacer.",
+      "clearPantrySubtitle": "Borra todos los productos y su historial",
+      "clearPantryConfirm": "¿Borrar todos los productos y su historial? No se puede deshacer.",
       "toggleProTitle": "Activar/desactivar PRO",
       "toggleProSubtitle": "Simular estado PRO ({{ status }})",
       "showAppStateTitle": "Ver estado de la app",

@@ -354,6 +354,7 @@
     },
     "waste": {
       "title": "Waste this month",
+      "count_one": "You threw away 1 product",
       "count": "You threw away {{count}} products",
       "topCategory": "Mostly in: {{category}}",
       "zero": "No waste this month! 🎯",
@@ -1120,8 +1121,8 @@
       "seedLowStockTitle": "Seed low stock items",
       "seedLowStockSubtitle": "Add 3 basic items below minimum threshold",
       "clearPantryTitle": "Clear all pantry items",
-      "clearPantrySubtitle": "Permanently delete every item in the pantry",
-      "clearPantryConfirm": "Delete all pantry items? This cannot be undone.",
+      "clearPantrySubtitle": "Deletes every product and its history",
+      "clearPantryConfirm": "Delete every product and its history? This cannot be undone.",
       "toggleProTitle": "Toggle PRO",
       "toggleProSubtitle": "Simulate PRO status ({{ status }})",
       "showAppStateTitle": "Show app state",

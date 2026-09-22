@@ -354,6 +354,7 @@
     },
     "waste": {
       "title": "Gaspillage ce mois",
+      "count_one": "Vous avez jeté 1 produit",
       "count": "Vous avez jeté {{count}} produits",
       "topCategory": "Surtout dans : {{category}}",
       "zero": "Aucun gaspillage ce mois ! 🎯",
@@ -1120,8 +1121,8 @@
       "seedLowStockTitle": "Créer des articles en stock faible",
       "seedLowStockSubtitle": "Ajouter 3 articles de base en dessous du seuil minimum",
       "clearPantryTitle": "Vider tous les articles du garde-manger",
-      "clearPantrySubtitle": "Supprimer définitivement tous les articles",
-      "clearPantryConfirm": "Supprimer tous les articles ? Cette action est irréversible.",
+      "clearPantrySubtitle": "Supprime tous les produits et leur historique",
+      "clearPantryConfirm": "Supprimer tous les produits et leur historique ? Action irréversible.",
       "toggleProTitle": "Basculer PRO",
       "toggleProSubtitle": "Simuler le statut PRO ({{ status }})",
       "showAppStateTitle": "Afficher l’état de l’app",

@@ -354,6 +354,7 @@
     },
     "waste": {
       "title": "Sprechi questo mese",
+      "count_one": "Hai buttato 1 prodotto",
       "count": "Hai buttato {{count}} prodotti",
       "topCategory": "Soprattutto in: {{category}}",
       "zero": "Nessuno spreco questo mese! 🎯",
@@ -1120,8 +1121,8 @@
       "seedLowStockTitle": "Crea articoli con scorte basse",
       "seedLowStockSubtitle": "Aggiungi 3 articoli di base sotto la soglia minima",
       "clearPantryTitle": "Svuota tutta la dispensa",
-      "clearPantrySubtitle": "Elimina definitivamente tutti gli articoli",
-      "clearPantryConfirm": "Eliminare tutti gli articoli? Questa azione non può essere annullata.",
+      "clearPantrySubtitle": "Elimina tutti i prodotti e la loro cronologia",
+      "clearPantryConfirm": "Eliminare tutti i prodotti e la loro cronologia? Non si può annullare.",
       "toggleProTitle": "Attiva/disattiva PRO",
       "toggleProSubtitle": "Simula lo stato PRO ({{ status }})",
       "showAppStateTitle": "Mostra stato app",

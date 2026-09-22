@@ -9,6 +9,7 @@ import { WelcomeNotificationService } from '@core/services/notifications/welcome
 import { SettingsPreferencesService } from './settings-preferences.service';
 import { AnalyticsService } from '@core/services/analytics/analytics.service';
 import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
+import { HistoryEventLogService } from '@core/services/history/history-event-log.service';
 import { UpgradeRevenuecatService } from '@core/services/upgrade/upgrade-revenuecat.service';
 import { LocalStorageService } from '@core/services/shared/local-storage.service';
 import { LoggerService } from '@core/services/shared/logger.service';
@@ -31,6 +32,7 @@ export class SettingsDevStateService {
   private readonly toast = inject(ToastService);
   private readonly analytics = inject(AnalyticsService);
   private readonly pantry = inject(PantryQueryService);
+  private readonly eventLog = inject(HistoryEventLogService);
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly logger = inject(LoggerService);
@@ -112,11 +114,17 @@ export class SettingsDevStateService {
 
   // ─── Datos ────────────────────────────────────────────────────────────────
 
-  /** Wipe every pantry item, one by one, and reload the list from scratch. */
+  /**
+   * Wipe every pantry item and the history behind it, so the app looks new:
+   * leaving the events kept the waste card at "Has tirado N" after a wipe.
+   */
   async clearPantry(): Promise<void> {
-    const items = await this.pantry.getAll();
+    const [items, events] = await Promise.all([this.pantry.getAll(), this.eventLog.listEvents()]);
     for (const item of items) {
       await this.pantry.deleteItem(item._id);
+    }
+    for (const event of events) {
+      await this.eventLog.remove(event._id);
     }
     await this.pantry.reloadFromStart();
   }
