@@ -265,10 +265,9 @@ export function matchesFilters(
 ): boolean
 
 /**
- * Sorts items by priority: expired > near-expiry > low-stock > normal,
- * then alphabetically.
+ * Sorts items alphabetically (accents/case ignored).
  */
-export function sortPantryItems(items: PantryItem[], mode: PantrySortMode): PantryItem[]
+export function sortPantryItems(items: PantryItem[]): PantryItem[]
 
 /**
  * Checks if an item was recently added.
@@ -327,21 +326,15 @@ const passes = matchesFilters(item, filters, {
 // Result: true (item is near-expiry)
 
 // Sort items
-const items = [normalItem, expiredItem, nearExpiryItem];
-const sorted = sortPantryItems(items, 'expiry');
-// Result: [expiredItem, nearExpiryItem, normalItem]
+const items = [zanahoria, arbol, berenjena];
+const sorted = sortPantryItems(items);
+// Result: [arbol, berenjena, zanahoria] — alphabetical, accents/case ignored
 ```
 
 **Sorting logic**:
 
 ```typescript
-1. By status (priority weight):
-   - expired: 0 (highest priority)
-   - near-expiry: 1
-   - low-stock: 2
-   - normal: 3
-
-2. If tied on status, alphabetically by name (normalized)
+Alphabetically by name (normalized: accents/case ignored)
 ```
 
 **Tests**:
@@ -366,18 +359,12 @@ describe('matchesSearchQuery', () => {
 });
 
 describe('sortPantryItems', () => {
-  it('should sort expired first', () => {
-    const items = [normalItem, expiredItem];
-    const sorted = sortPantryItems(items, 'expiry');
-    expect(sorted[0]).toBe(expiredItem);
-  });
-
-  it('should sort alphabetically within same status', () => {
+  it('should sort alphabetically, ignoring accents and case', () => {
     const items = [
       { ...normalItem, name: 'Zanahoria' },
       { ...normalItem, name: 'Arroz' }
     ];
-    const sorted = sortPantryItems(items, 'alpha');
+    const sorted = sortPantryItems(items);
     expect(sorted[0].name).toBe('Arroz');
   });
 });
@@ -495,12 +482,12 @@ export function classifyExpiry(
 
 ```typescript
 // ✅ GOOD: Does not modify input
-export function sortPantryItems(items: PantryItem[], mode: PantrySortMode): PantryItem[] {
+export function sortPantryItems(items: PantryItem[]): PantryItem[] {
   return [...items].sort((a, b) => /* ... */);
 }
 
 // ❌ BAD: Modifies input
-export function sortPantryItems(items: PantryItem[], mode: PantrySortMode): PantryItem[] {
+export function sortPantryItems(items: PantryItem[]): PantryItem[] {
   items.sort((a, b) => /* ... */);  // ❌ Mutation
   return items;
 }

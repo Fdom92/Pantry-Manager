@@ -809,11 +809,6 @@
       "groupToggle": {
         "flat": "Nach Kategorie gruppieren",
         "grouped": "Listenansicht"
-      },
-      "sort": {
-        "label": "Sortieren",
-        "expiry": "Nach Ablaufdatum",
-        "alpha": "Alphabetisch"
       }
     },
     "fresh": {

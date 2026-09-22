@@ -26,7 +26,7 @@ propósito.
 1. Origen de la instalación, enviado a PostHog.
 2. Notificaciones entregadas, contadas en la bandeja.
 3. Avería del plugin de notificaciones distinta de rechazo.
-4. Orden de la despensa por caducidad.
+4. ~~Orden de la despensa por caducidad.~~ Retirado el 2026-09-22 (ver sección 4).
 5. Sección Frescos vacía en una línea.
 6. Borrar código muerto del modal de consumir.
 7. Lista de la compra: añadir a mano con la lista vacía.
@@ -160,6 +160,11 @@ entrada. Si no, el orden por caducidad no se vería nunca.
   `pantry_grouping_toggled`.
 - **De paso:** `core/domain/README.md` dice que `sortPantryItems` "ordena por
   prioridad", lo cual es falso hoy. Se corrige.
+
+**Retirado el 2026-09-22 tras probarlo en el móvil:** el botón solo afectaba a
+Despensa, desentonaba en la cabecera, y en la vista por categorías las
+categorías seguían alfabéticas, así que el orden parecía no aplicarse. Se
+vuelve al alfabético; se mantiene que el orden lo decide solo la consulta.
 
 ## 5 — Frescos vacía en una línea
 

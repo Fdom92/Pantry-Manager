@@ -69,46 +69,16 @@ export function isRecentlyAdded(item: PantryItem): boolean {
   return Date.now() - createdAt.getTime() <= windowMs;
 }
 
-/**
- * How the despensa list is ordered. 'expiry' is the default: in an app about
- * expiry dates, what runs out tomorrow should not sit at the bottom because
- * its name starts with Y.
- */
-export type PantrySortMode = 'expiry' | 'alpha';
-export const DEFAULT_PANTRY_SORT_MODE: PantrySortMode = 'expiry';
-
-export function isPantrySortMode(value: unknown): value is PantrySortMode {
-  return value === 'expiry' || value === 'alpha';
-}
-
 function compareByName(a: PantryItem, b: PantryItem): number {
   return normalizeSearchField(a.name).localeCompare(normalizeSearchField(b.name));
 }
 
 /**
- * `expirationDate` is the earliest date among ALL of the item's batches —
- * including depleted (zero-quantity) ones, it is not filtered to batches
- * with stock (PantryService.applyDerivedFields → computeEarliestExpiry).
- * Most stored dates are `YYYY-MM-DD`, but legacy/migrated docs may carry
- * full ISO timestamps (see date.util.ts), so instants are compared via
- * Date.parse rather than as raw strings. Dateless/unparsable items go
- * last; ties fall back to the name.
+ * Sort despensa items alphabetically (accents/case ignored).
  */
-function compareByExpiry(a: PantryItem, b: PantryItem): number {
-  const ea = Date.parse(a.expirationDate ?? '');
-  const eb = Date.parse(b.expirationDate ?? '');
-  const aValid = !Number.isNaN(ea);
-  const bValid = !Number.isNaN(eb);
-  if (aValid && bValid && ea !== eb) return ea < eb ? -1 : 1;
-  if (aValid && !bValid) return -1;
-  if (!aValid && bValid) return 1;
-  return compareByName(a, b);
-}
-
-export function sortPantryItems(items: PantryItem[], mode: PantrySortMode): PantryItem[] {
+export function sortPantryItems(items: PantryItem[]): PantryItem[] {
   if (items.length <= 1) return items;
-  const compare = mode === 'expiry' ? compareByExpiry : compareByName;
-  return [...items].sort(compare);
+  return [...items].sort(compareByName);
 }
 
 /**

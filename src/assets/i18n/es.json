@@ -809,11 +809,6 @@
       "groupToggle": {
         "flat": "Agrupar por categoría",
         "grouped": "Vista plana"
-      },
-      "sort": {
-        "label": "Ordenar",
-        "expiry": "Por caducidad",
-        "alpha": "Alfabético"
       }
     },
     "fresh": {

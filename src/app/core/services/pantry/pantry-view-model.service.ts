@@ -163,7 +163,7 @@ export class PantryViewModelService {
     return statusChips.filter(chip => isStatusChipVisible(chip.value ?? 'all', chip.count));
   }
 
-  /** Items keep the order they arrive in — the query decides the sort mode. */
+  /** Items keep the order they arrive in — ordered by the query. */
   buildGroups(items: PantryItem[]): PantryGroup[] {
     const map = new Map<string, PantryGroup>();
     const now = new Date();

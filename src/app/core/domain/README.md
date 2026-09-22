@@ -99,9 +99,8 @@ const passesFilters = matchesFilters(item, {
 });
 
 // Sort items
-const sorted = sortPantryItems(items, 'expiry');
-// 'expiry': earliest expirationDate first, dateless last, ties by name;
-// 'alpha': by name (accents/case ignored)
+const sorted = sortPantryItems(items);
+// alphabetical (accents/case ignored)
 ```
 
 ### Dashboard Domain
@@ -170,7 +169,7 @@ const options = normalizeCatalogOptions([
 | `classifyExpiry` | Classifies expiry date | `ExpiryClassification` |
 | `matchesSearchQuery` | Checks if matches search | `boolean` |
 | `matchesFilters` | Applies filters to item | `boolean` |
-| `sortPantryItems` | Sorts by expiry (default) or name | `PantryItem[]`, `PantrySortMode` |
+| `sortPantryItems` | Sorts alphabetically (accents/case ignored) | `PantryItem[]` |
 
 ### Dashboard (2 main functions)
 
