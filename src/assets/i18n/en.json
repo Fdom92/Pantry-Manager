@@ -438,7 +438,7 @@
       "inlineHint": "Add a product to the list..."
     },
     "emptyState": {
-      "autoHint": "Star ★ “Always keep at home” on what you never want to run out of: it will come back here on its own when it runs out or drops below its minimum. Or add anything by hand above."
+      "autoHint": "Star ★ what you never want to run out of and it will come back here when it runs out. Or add it by hand above."
     },
     "ignored": {
       "sectionTitle": "Hidden for now"

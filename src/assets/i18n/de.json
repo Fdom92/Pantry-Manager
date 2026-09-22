@@ -438,7 +438,7 @@
       "inlineHint": "Produkt zur Liste hinzufügen..."
     },
     "emptyState": {
-      "autoHint": "Markiere mit ★ „Immer zuhause vorrätig halten“, was nie fehlen soll: Es kommt von selbst hierher zurück, wenn es aufgebraucht ist oder unter das Minimum fällt. Oder füge oben etwas von Hand hinzu."
+      "autoHint": "Markiere mit ★, was nie fehlen soll, dann kommt es hierher zurück, wenn es aufgebraucht ist. Oder füge es oben von Hand hinzu."
     },
     "ignored": {
       "sectionTitle": "Jetzt ausgeblendet"

@@ -148,6 +148,11 @@ ion-title {
   margin: var(--app-theme-spacing-md-plus) 0 var(--app-theme-spacing-xs-plus);
 }
 
+// A one-line hint under the Frescos header: no card around it, so no card-sized gap.
+.list-empty-state--inline {
+  margin: 0;
+}
+
 .skeleton-list {
   display: flex;
   flex-direction: column;

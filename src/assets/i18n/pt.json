@@ -438,7 +438,7 @@
       "inlineHint": "Adicionar produto à lista..."
     },
     "emptyState": {
-      "autoHint": "Marque com ★ «Manter sempre em casa» o que não pode faltar: voltará aqui sozinho quando acabar ou ficar abaixo do mínimo. Ou adicione o que quiser à mão acima."
+      "autoHint": "Marque com ★ o que não pode faltar e voltará aqui quando acabar. Ou adicione-o à mão acima."
     },
     "ignored": {
       "sectionTitle": "Ocultos agora"

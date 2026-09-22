@@ -438,7 +438,7 @@
       "inlineHint": "Aggiungi un prodotto alla lista..."
     },
     "emptyState": {
-      "autoHint": "Segna con ★ «Tenere sempre in casa» ciò che non deve mai mancare: tornerà qui da solo quando finisce o scende sotto il minimo. Oppure aggiungi qualsiasi cosa a mano qui sopra."
+      "autoHint": "Segna con ★ ciò che non deve mai mancare e tornerà qui quando finisce. Oppure aggiungilo a mano qui sopra."
     },
     "ignored": {
       "sectionTitle": "Nascosti ora"

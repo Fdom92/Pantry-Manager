@@ -83,7 +83,7 @@
 
       @if (facade.hasNoFreshAtAll()) {
         <app-empty-state
-          class="list-empty-state"
+          class="list-empty-state list-empty-state--inline"
           icon="leaf-outline"
           [hideTitle]="true"
           [inline]="true"
@@ -91,7 +91,7 @@
         </app-empty-state>
       } @else if (facade.hasFreshButFilteredEmpty()) {
         <app-empty-state
-          class="list-empty-state"
+          class="list-empty-state list-empty-state--inline"
           icon="leaf-outline"
           [hideTitle]="true"
           [inline]="true"

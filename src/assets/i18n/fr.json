@@ -438,7 +438,7 @@
       "inlineHint": "Ajouter un produit à la liste..."
     },
     "emptyState": {
-      "autoHint": "Marque d’une ★ « Toujours garder à la maison » ce qui ne doit jamais manquer : il reviendra ici tout seul quand il sera épuisé ou sous son minimum. Ou ajoute ce que tu veux à la main ci-dessus."
+      "autoHint": "Marque d’une ★ ce qui ne doit jamais manquer : il reviendra ici quand il sera épuisé. Ou ajoute-le à la main ci-dessus."
     },
     "ignored": {
       "sectionTitle": "Masqués pour l'instant"
