@@ -12,6 +12,7 @@ import {
   normalizeTrim
 } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
+import { DateDisplayService } from '@core/services/shared/date-display.service';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
@@ -31,6 +32,7 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly catalogOptions = inject(CatalogOptionsService);
   private readonly translate = inject(TranslateService);
+  private readonly dates = inject(DateDisplayService);
   private readonly listState = inject(PantryStateService);
   private readonly analytics = inject(AnalyticsService);
   private readonly eventManager = inject(HistoryEventManagerService);
@@ -262,7 +264,7 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
 
     const stateLabel = this.translate.instant(`pantry.fresh.state.${preview.resultingState}`);
     const dateLabel = preview.resultingExpiration
-      ? new Date(preview.resultingExpiration).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })
+      ? this.dates.date(preview.resultingExpiration, 'long')
       : this.translate.instant('common.dates.none');
 
     const titleKey = 'pantry.fresh.convertToFresh.dialog.title';

@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { toSignal } from '@angular/core/rxjs-interop';
 import type { InsightsAnalysis, InsightsSignalsPayload } from '@core/models/insights/insights-analysis.model';
@@ -9,6 +9,7 @@ import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service'
 import { InsightsCacheStorageService } from './insights-cache-storage.service';
 import { InsightsLlmClientService } from './insights-llm-client.service';
 import type { InsightsClientError } from './insights-llm-client.service';
+import { ClockService } from '@core/services/shared/clock.service';
 import { LanguageService } from '../shared/language.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared/toast.service';
@@ -62,14 +63,24 @@ export class InsightsStateService {
   private readonly manualItemsStore = inject(ListManualItemsStore);
   private readonly localStorage = inject(LocalStorageService);
   private readonly toast = inject(ToastService);
+  private readonly clock = inject(ClockService);
 
   private readonly events = signal<PantryEvent[]>([]);
   readonly isLoadingEvents = signal(true);
   private hasLoadedOnce = false;
+
+  // Load on creation and whenever the history changes, not only from
+  // `ionViewWillEnter`: the dashboard showed "sin desperdicios" until a tab
+  // switch, because the hook hadn't run yet or the expired-batch scan logged
+  // its events after the page had read them.
+  private readonly reloadOnHistoryChange = effect(() => {
+    this.eventLog.revision();
+    untracked(() => void this.loadEvents());
+  });
   readonly householdSize = signal(this.localStorage.householdSize.get());
 
   readonly staleCount = computed((): number => {
-    const now = Date.now();
+    const now = this.clock.now();
     const STALE_MS = 30 * 24 * 60 * 60 * 1000;
     return this.pantryStore.items().filter(item => {
       const qty = sumQuantities(item.batches);
@@ -85,19 +96,19 @@ export class InsightsStateService {
   readonly proAnalysisStale = computed(() => {
     const a = this.proAnalysis();
     if (!a) return true;
-    return Date.now() - new Date(a.generatedAt).getTime() > CACHE_TTL_MS;
+    return this.clock.now() - new Date(a.generatedAt).getTime() > CACHE_TTL_MS;
   });
 
   readonly inventorySnapshot = computed((): InventorySnapshot =>
-    computeInventorySnapshot(this.pantryStore.items(), new Date())
+    computeInventorySnapshot(this.pantryStore.items(), new Date(this.clock.now()))
   );
 
   readonly activityMetrics = computed((): ActivityMetrics =>
-    computeActivityMetrics(this.events(), 30, new Date())
+    computeActivityMetrics(this.events(), 30, new Date(this.clock.now()))
   );
 
   readonly distribution = computed((): DistributionMetrics =>
-    computeDistribution(this.pantryStore.items(), this.events(), new Date(), 30)
+    computeDistribution(this.pantryStore.items(), this.events(), new Date(this.clock.now()), 30)
   );
 
   readonly pantryScore = computed((): PantryScoreResult | null => {
@@ -106,7 +117,7 @@ export class InsightsStateService {
   });
 
   readonly foodCoverage = computed((): FoodCoverageResult | null => {
-    const now = new Date();
+    const now = new Date(this.clock.now());
     const activeItems = this.pantryStore.items().filter(
       i => getItemStatusState(i, now, NEAR_EXPIRY_WINDOW_DAYS) !== 'expired'
     );
@@ -119,14 +130,14 @@ export class InsightsStateService {
   }
 
   readonly wasteSummary = computed<WasteSummary>(() =>
-    computeWasteSummary(this.events(), new Date(), 30)
+    computeWasteSummary(this.events(), new Date(this.clock.now()), 30)
   );
 
   readonly repositionPredictions = computed<RepositionPrediction[]>(() => {
     const inList = new Set(
       this.manualItemsStore.manualItems().map(m => normalizeLowercase(m.name))
     );
-    return computeRepositionPredictions(this.pantryStore.items(), this.events(), new Date())
+    return computeRepositionPredictions(this.pantryStore.items(), this.events(), new Date(this.clock.now()))
       .filter(p => p.daysToOut <= 30 && !inList.has(normalizeLowercase(p.productName)));
   });
 

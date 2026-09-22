@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { IonCard, IonCardContent, IonButton } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
+import { RelativeDaysPipe } from '@shared/pipes/date-display.pipes';
 import type { RepositionPrediction } from '@core/domain/insights/reposition.domain';
 
 /** PRO-only prediction list. Free surfaces render `app-pro-paywall-card` instead. */
@@ -11,6 +12,7 @@ import type { RepositionPrediction } from '@core/domain/insights/reposition.doma
     IonCard, IonCardContent,
     IonButton,
     TranslateModule,
+    RelativeDaysPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './reposition-card.component.html',

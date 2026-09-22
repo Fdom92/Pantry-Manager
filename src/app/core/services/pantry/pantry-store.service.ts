@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, Signal, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, Signal, signal, untracked } from '@angular/core';
 import { ANALYTICS_EVENTS, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { getItemStatusState } from '@core/domain/pantry';
@@ -7,6 +7,7 @@ import { normalizeLowercase, normalizeTrim } from '@core/utils/normalization.uti
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
 import { LoggerService } from '../shared/logger.service';
+import { ClockService } from '../shared/clock.service';
 import { PantryQueryService } from './pantry-query.service';
 
 @Injectable({ providedIn: 'root' })
@@ -16,13 +17,24 @@ export class PantryStoreService {
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly clock = inject(ClockService);
   private realtimeSubscribed = false;
   private expiredScanInProgress = false;
 
   // ─── Clock signal for consistent timestamps across all computed properties ──
-  // Ensures expiredItems, nearExpiryItems, etc. all use the same point-in-time.
-  // Without this, items could disagree on status during midnight transitions.
-  private readonly nowMs = signal(Date.now());
+  // One point-in-time for expiredItems, nearExpiryItems, etc., and it advances
+  // (resume, midnight): a constant here froze the statuses at app start.
+  private readonly nowMs = this.clock.now;
+
+  // A new day can expire batches with no data change: log them then too, or
+  // the waste card misses them until something is edited.
+  private lastScannedDay = this.clock.today();
+  private readonly scanOnNewDay = effect(() => {
+    const today = this.clock.today();
+    if (today === this.lastScannedDay) return;
+    this.lastScannedDay = today;
+    untracked(() => void this.logExpiredBatchEvents(this.items()));
+  });
 
   // ─── Exposed signals (delegated from PantryQueryService) ──────────────────
 

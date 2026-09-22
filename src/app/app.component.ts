@@ -8,7 +8,7 @@ import { LocalStorageService, LoggerService } from '@core/services/shared';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
 import { SyncService } from '@core/services/sync/sync.service';
-import { AnalyticsService } from '@core/services/analytics';
+import { AnalyticsService, InstallSourceService } from '@core/services/analytics';
 import { buildPersonProfile } from '@core/domain/analytics';
 import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
@@ -18,6 +18,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 // STORAGE_KEYS removed: callers go through LocalStorageService.
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { ClockService } from '@core/services/shared/clock.service';
 
 @Component({
   selector: 'app-root',
@@ -38,6 +39,7 @@ export class AppComponent {
   private readonly notificationScheduler = inject(NotificationSchedulerService);
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly installSource = inject(InstallSourceService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly appUpdate = inject(AppUpdateService);
   private readonly logger = inject(LoggerService);
@@ -45,6 +47,7 @@ export class AppComponent {
   private readonly streakMilestone = inject(StreakMilestoneService);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly prefs = inject(SettingsPreferencesService);
+  private readonly clock = inject(ClockService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -98,6 +101,7 @@ export class AppComponent {
     // report every returning user as empty-handed.
     void this.syncPersonProfile();
     await this.notificationScheduler.scheduleAll();
+    void this.notificationScheduler.reportDelivered();
     await this.handleSyncLaunchUrl();
     this.listenForSyncIntents();
   }
@@ -111,6 +115,7 @@ export class AppComponent {
   private async syncPersonProfile(): Promise<void> {
     try {
       const preferences = await this.prefs.getPreferences();
+      const installSource = await this.installSource.resolve();
       this.analytics.setPersonProfile(
         buildPersonProfile({
           items: this.pantryStore.loadedProducts(),
@@ -118,6 +123,7 @@ export class AppComponent {
           now: new Date(),
           onboardingDone: this.localStorage.onboarding.isSeen(),
           notificationsEnabled: preferences.notificationsEnabled === true,
+          installSource,
         }),
       );
     } catch (err) {
@@ -173,11 +179,14 @@ export class AppComponent {
     let lastForegroundAt = Date.now();
     CapacitorApp.addListener('appStateChange', async state => {
       if (state.isActive) {
+        // Before anything else reads the time: resuming the next day must reclassify.
+        this.clock.tick();
         this.analytics.track(ANALYTICS_EVENTS.APP_FOREGROUNDED);
         lastForegroundAt = Date.now();
         await this.revenuecat.restore();
         this.detectTrialExpiry();
         await this.notificationScheduler.scheduleAll();
+        void this.notificationScheduler.reportDelivered();
         void this.streak.bootstrap();
         void this.syncPersonProfile();
       } else {

@@ -5,6 +5,7 @@ import { formatQuantity } from '@core/utils/formatting.util';
 import { TranslateService } from '@ngx-translate/core';
 import type jsPDF from 'jspdf';
 import { LanguageService } from '../shared/language.service';
+import { DateDisplayService } from '../shared/date-display.service';
 
 /**
  * Renders the shopping list for sharing — as a laid-out PDF, or as plain text
@@ -19,6 +20,7 @@ import { LanguageService } from '../shared/language.service';
 export class ShoppingExportService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
+  private readonly dates = inject(DateDisplayService);
 
   async buildPdf(
     groups: ShoppingSuggestionGroupWithItem[],
@@ -100,7 +102,7 @@ export class ShoppingExportService {
 
     // ── Page 1 header ─────────────────────────────────────────────────────────
     const title    = this.translate.instant('shopping.share.pdfTitle');
-    const dateStr  = now.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
+    const dateStr  = this.dates.date(now, 'long');
     const iconUrl  = await this.loadIconDataUrl();
     this.drawPdfHeader(doc, PAGE_W, HEADER_H, TEAL, WHITE, iconUrl, title, dateStr);
 
@@ -193,9 +195,8 @@ export class ShoppingExportService {
     groups: ShoppingSuggestionGroupWithItem[],
     manualItems: ManualItem[],
   ): string {
-    const locale = this.languageService.getCurrentLocale();
     const title = this.translate.instant('shopping.share.pdfTitle');
-    const date = new Date().toLocaleDateString(locale, { day: 'numeric', month: 'long' });
+    const date = this.dates.date(new Date(), 'dayMonthLong');
     const footer = this.translate.instant('shopping.share.generatedWith');
     const manualSection = this.translate.instant('shopping.share.manualSection');
 

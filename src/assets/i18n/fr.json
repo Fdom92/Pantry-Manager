@@ -94,7 +94,8 @@
       "next": "Suivant",
       "delete": "Supprimer",
       "confirm": "Confirmer",
-      "dismiss": "Ignorer"
+      "dismiss": "Ignorer",
+      "undo": "Annuler"
     },
     "loading": "Chargement…",
     "dates": {
@@ -105,6 +106,10 @@
     },
     "selects": {
       "noOptions": "Aucune option configurée. Saisissez pour en créer une ou ajoutez-la dans les réglages."
+    },
+    "expiry": {
+      "future": "Expire {{when}}",
+      "past": "Expiré {{when}}"
     }
   },
   "emptyStates": {
@@ -120,7 +125,7 @@
       "subtitle": "Ajoute les produits que tu veux surveiller\n(avec quantité exacte et lots)"
     },
     "shopping": {
-      "title": "Tout est en ordre"
+      "title": "Ta liste est vide"
     }
   },
   "locations": {
@@ -186,11 +191,6 @@
         "dismiss": "Pas maintenant",
         "markFreshOut": "Je ne l'ai plus"
       },
-      "expiry": {
-        "today": "Expire aujourd'hui",
-        "tomorrow": "Expire demain",
-        "inDays": "Expire dans {{ count }} jours"
-      },
       "confirm": {
         "question": "Avez-vous utilisé ces ingrédients ?",
         "yes": "Oui, marquer comme utilisés",
@@ -204,14 +204,11 @@
       "allGood": {
         "title": "Tout est sous contrôle",
         "hint": "Rien d'urgent aujourd'hui — votre garde-manger est en parfait état",
-        "nextExpiry": "Prochaine expiration : {{name}} dans {{days}} jours",
+        "nextExpiry": "Prochaine expiration : {{name}}, {{when}}",
         "incompleteTitle": "Données manquantes",
         "incompleteData_one": "1 produit aux données incomplètes · complétez-le pour voir des suggestions",
         "incompleteData_other": "{{count}} produits aux données incomplètes · complétez-les pour voir des suggestions",
         "fixCta": "Compléter En attente"
-      },
-      "secondary": {
-        "days": "{{count}} jours"
       }
     },
     "actions": {
@@ -253,12 +250,7 @@
     "foodCoverage": {
       "title": "Couverture estimée",
       "hint": "Estimation basée sur les produits de votre garde-manger",
-      "days_one": "≈ 1 jour de nourriture",
-      "days_other": "≈ {{ count }} jours de nourriture",
-      "months_one": "≈ 1 mois de nourriture",
-      "months_other": "≈ {{ count }} mois de nourriture",
-      "years_one": "≈ 1 an de nourriture",
-      "years_other": "≈ {{ count }} ans de nourriture"
+      "value": "≈ {{duration}} de nourriture"
     },
     "summary": {
       "title": "Résumé du garde-manger",
@@ -340,7 +332,6 @@
     "nearExpiry": {
       "title": "Bientôt périmés",
       "subtitle": "Dans les {{ days }} prochains jours",
-      "expires": "Expire le {{ date }}",
       "empty": "Aucun produit n’expire prochainement."
     },
     "lowStock": {
@@ -352,7 +343,6 @@
     "expired": {
       "title": "Articles périmés",
       "deleteAria": "Supprimer les périmés",
-      "expires": "Périmé le {{ date }}",
       "badge": "Périmé",
       "empty": "Aucun article périmé pour le moment."
     },
@@ -364,7 +354,8 @@
     },
     "waste": {
       "title": "Gaspillage ce mois",
-      "count": "Vous avez jeté {{count}} produits",
+      "count_one": "1 produit a expiré",
+      "count": "{{count}} produits ont expiré",
       "topCategory": "Surtout dans : {{category}}",
       "zero": "Aucun gaspillage ce mois ! 🎯",
       "trend": {
@@ -376,7 +367,7 @@
     },
     "reposition": {
       "title": "Bientôt en rupture",
-      "daysLeft": "Il reste {{days}} jours",
+      "daysLeft": "Épuisé {{when}}",
       "add": "Ajouter",
       "added": "Ajouté à la liste",
       "empty": "Nous avons besoin de plus d'historique pour prédire",
@@ -437,7 +428,7 @@
       "inlineHint": "Ajouter un produit à la liste..."
     },
     "emptyState": {
-      "autoHint": "Les produits épuisés apparaîtront ici automatiquement."
+      "autoHint": "Marque d’une ★ ce qui ne doit jamais manquer : il reviendra ici quand il sera épuisé. Ou ajoute-le à la main ci-dessus."
     },
     "ignored": {
       "sectionTitle": "Masqués pour l'instant"
@@ -447,7 +438,8 @@
       "boughtManual": "✓ {{name}} acheté.",
       "ignored": "{{name}} masqué pour l'instant — réapparaîtra la prochaine fois.",
       "removedManual": "{{name}} retiré de la liste.",
-      "shareFailed": "Impossible de partager la liste. Réessaie."
+      "shareFailed": "Impossible de partager la liste. Réessaie.",
+      "unbasic": "{{name}} ne sera plus ajouté automatiquement à ta liste."
     },
     "buySheet": {
       "title": "Combien en as-tu acheté ?",
@@ -457,7 +449,13 @@
       "increment": "Augmenter la quantité",
       "decrement": "Diminuer la quantité"
     },
-    "tabTitle": "Courses"
+    "tabTitle": "Courses",
+    "rowMenu": {
+      "hide": "Masquer pour l’instant",
+      "unbasic": "Ne plus toujours garder à la maison",
+      "remove": "Retirer de la liste",
+      "unhide": "Afficher à nouveau"
+    }
   },
   "insights": {
     "ctaDefault": "Compris",
@@ -620,13 +618,6 @@
       "noExpiryDate": "Date manquante",
       "addBatch": "Ajouter un lot",
       "currentQuantity": "Quantité",
-      "expires": {
-        "today": "Expire aujourd'hui",
-        "tomorrow": "Expire demain"
-      },
-      "expired": {
-        "yesterday": "Expiré hier"
-      },
       "noExpiryIntentional": "Sans date"
     },
     "form": {
@@ -689,8 +680,6 @@
       "noExpiry": "Sans date de péremption",
       "subinfo": {
         "expired": "Expiré",
-        "tomorrow": "Expire demain",
-        "inDays": "Expire dans {{count}} jours",
         "review": "À consommer vite"
       },
       "quantity": {
@@ -837,10 +826,7 @@
         "fiveDays": "5 jours",
         "oneWeek": "1 semaine",
         "twoWeeks": "2 semaines",
-        "noDate": "Sans date",
-        "remaining": "Reste {{days}} jours",
-        "expiresToday": "Expire aujourd'hui",
-        "expiredAgo": "Expiré il y a {{days}} jours"
+        "noDate": "Sans date"
       },
       "card": {
         "expired": "Expiré",
@@ -1135,8 +1121,8 @@
       "seedLowStockTitle": "Créer des articles en stock faible",
       "seedLowStockSubtitle": "Ajouter 3 articles de base en dessous du seuil minimum",
       "clearPantryTitle": "Vider tous les articles du garde-manger",
-      "clearPantrySubtitle": "Supprimer définitivement tous les articles",
-      "clearPantryConfirm": "Supprimer tous les articles ? Cette action est irréversible.",
+      "clearPantrySubtitle": "Supprime tous les produits et leur historique",
+      "clearPantryConfirm": "Supprimer tous les produits et leur historique ? Action irréversible.",
       "toggleProTitle": "Basculer PRO",
       "toggleProSubtitle": "Simuler le statut PRO ({{ status }})",
       "showAppStateTitle": "Afficher l’état de l’app",
@@ -1251,11 +1237,7 @@
     "nearExpiry": {
       "title": "{{ count }} produits expirent bientôt",
       "title_one": "1 produit expire bientôt",
-      "body": "Le plus proche dans {{ nearestDays }} jours",
-      "body_tomorrow": "Le plus proche expire demain",
-      "body_one": "Expire dans {{ nearestDays }} jours",
-      "body_one_tomorrow": "Expire demain",
-      "body_one_named": "Ton {{name}} expire dans {{days}} jours.",
+      "body_one_named": "Ton {{name}} expire {{when}}.",
       "body_one_named_tomorrow": "Ton {{name}} expire demain. Consomme-le aujourd'hui.",
       "body_many_named": "Ton {{name}} et {{others}} autres expirent bientôt.",
       "body_many_named_tomorrow": "Ton {{name}} expire demain et {{others}} autres sont proches."

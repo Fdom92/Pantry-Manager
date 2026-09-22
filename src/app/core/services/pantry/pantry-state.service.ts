@@ -29,7 +29,8 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared';
-import { type FreshState, freshStateToQty, hasConsumableStock, qtyToFreshState, statusFilterCount } from '@core/domain/pantry';
+import { type FreshState, freshStateToQty, hasConsumableStock, qtyToFreshState, setBasic, statusFilterCount } from '@core/domain/pantry';
+import { ClockService } from '../shared/clock.service';
 
 /**
  * Main orchestrator for pantry page state.
@@ -44,6 +45,9 @@ export class PantryStateService {
   private readonly pantryQuery = inject(PantryQueryService);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly viewModel = inject(PantryViewModelService);
+  private readonly clock = inject(ClockService);
+  /** For time-based labels in child cards that only rerender on input change. */
+  readonly now = this.clock.now;
   private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly listUi = inject(PantryListUiStateService);
   private readonly addModal = inject(PantryAddModalStateService);
@@ -148,9 +152,9 @@ export class PantryStateService {
       grouped: this.groupByCategory(),
     });
   }
-  readonly flatDespensaItems = computed(() =>
-    [...this.despensaItems()].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
-  );
+
+  /** Already ordered by the query — alphabetical; do not re-sort here. */
+  readonly flatDespensaItems = this.despensaItems;
   readonly statusFilter = computed(() => this.getStatusFilterValue(this.activeFilters()));
   readonly summary = computed<PantrySummaryMeta>(() => this.summarySnapshot());
   readonly filterChips = computed(() =>
@@ -203,10 +207,11 @@ export class PantryStateService {
       const totalCount = this.pantryStore.totalCount();
       const loadedItems = this.pantryStore.activeProducts();
       const isLoading = this.pantryStore.loading();
+      const now = new Date(this.clock.now()); // chip counts move to a new day too
       const shouldUseFreshSummary = !isLoading || loadedItems.length > 0 || totalCount === 0;
       if (shouldUseFreshSummary) {
         // Include both fresh and pantry items so chip counts reflect both sections.
-        this.summarySnapshot.set(this.viewModel.buildSummary(loadedItems, loadedItems.length));
+        this.summarySnapshot.set(this.viewModel.buildSummary(loadedItems, loadedItems.length, now));
       }
     });
 
@@ -307,7 +312,6 @@ export class PantryStateService {
 
   // -------- Consume modal (delegates to PantryConsumeModalStateService) --------
   openConsumeModal = () => this.consumeModal.open();
-  closeConsumeModal = () => this.consumeModal.close();
   dismissConsumeModal = () => this.consumeModal.dismiss();
   submitConsume = () => this.consumeModal.submitConsume();
   onConsumeQueryChange = (value: string) => this.consumeModal.onConsumeQueryChange(value);
@@ -551,14 +555,7 @@ export class PantryStateService {
 
   async toggleItemBasic(item: PantryItem): Promise<void> {
     const isBasic = !item.isBasic;
-    const updated: PantryItem = {
-      ...item,
-      isBasic,
-      updatedAt: new Date().toISOString(),
-    };
-    if (!isBasic) {
-      updated.minThreshold = undefined;
-    }
+    const updated = setBasic(item, isBasic, new Date().toISOString());
     await this.pantryStore.updateItem(updated);
     const isDepleted = this.batchOps.getTotalQuantity(item) <= 0;
     let msgKey: string;

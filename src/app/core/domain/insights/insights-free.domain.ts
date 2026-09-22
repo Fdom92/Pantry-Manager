@@ -222,11 +222,9 @@ export function computePantryScore(
 
 // ─── Food Coverage ────────────────────────────────────────────────────────────
 
-export type FoodCoverageUnit = 'days' | 'months' | 'years';
-
 export interface FoodCoverageResult {
-  value: number;
-  unit: FoodCoverageUnit;
+  /** Whole days; shown through `appDuration` like every other span. */
+  days: number;
 }
 
 /** Coverage weights, derived from the one food-type table. */
@@ -238,7 +236,7 @@ const FOOD_TYPE_WEIGHTS: Record<FoodType, number> = Object.fromEntries(
 const MS_PER_DAY_COVERAGE = 86_400_000;
 
 /**
- * Estimates food coverage in days/months/years.
+ * Estimates how many days of meals the pantry covers.
  *
  * Fixes vs original:
  * - householdSize: divides portions by 3×n instead of always 3 (1 person)
@@ -287,10 +285,6 @@ export function computeFoodCoverage(
   if (totalPortions === 0) return null;
 
   const portionsPerDay = 3 * Math.max(1, Math.round(householdSize));
-  const days = Math.max(1, Math.floor(totalPortions / portionsPerDay));
-
-  if (days >= 365) return { value: Math.max(1, Math.round(days / 365)), unit: 'years' };
-  if (days >= 30)  return { value: Math.max(1, Math.round(days / 30)),  unit: 'months' };
-  return { value: days, unit: 'days' };
+  return { days: Math.max(1, Math.floor(totalPortions / portionsPerDay)) };
 }
 

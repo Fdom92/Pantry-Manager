@@ -94,7 +94,8 @@
       "next": "Siguiente",
       "delete": "Eliminar",
       "confirm": "Confirmar",
-      "dismiss": "Descartar"
+      "dismiss": "Descartar",
+      "undo": "Deshacer"
     },
     "loading": "Cargando…",
     "dates": {
@@ -105,6 +106,10 @@
     },
     "selects": {
       "noOptions": "No hay opciones configuradas. Escríbela para crearla o añádela en ajustes."
+    },
+    "expiry": {
+      "future": "Caduca {{when}}",
+      "past": "Caducó {{when}}"
     }
   },
   "emptyStates": {
@@ -120,7 +125,7 @@
       "subtitle": "Añade productos que quieras controlar\n(con cantidad exacta y lotes)"
     },
     "shopping": {
-      "title": "Todo en orden"
+      "title": "Tu lista está vacía"
     }
   },
   "locations": {
@@ -186,11 +191,6 @@
         "dismiss": "Ahora no",
         "markFreshOut": "Ya no lo tengo"
       },
-      "expiry": {
-        "today": "Caduca hoy",
-        "tomorrow": "Caduca mañana",
-        "inDays": "Caduca en {{ count }} días"
-      },
       "confirm": {
         "question": "¿Has usado estos ingredientes?",
         "yes": "Sí, ya los he usado",
@@ -204,14 +204,11 @@
       "allGood": {
         "title": "Todo bajo control",
         "hint": "Nada urgente hoy — tu despensa está en orden",
-        "nextExpiry": "Próxima caducidad: {{name}} en {{days}} días",
+        "nextExpiry": "Próxima caducidad: {{name}}, {{when}}",
         "incompleteTitle": "Faltan datos",
         "incompleteData_one": "1 producto con datos incompletos · complétalo para ver sugerencias",
         "incompleteData_other": "{{count}} productos con datos incompletos · complétalos para ver sugerencias",
         "fixCta": "Completar pendientes"
-      },
-      "secondary": {
-        "days": "{{count}} días"
       }
     },
     "actions": {
@@ -253,12 +250,7 @@
     "foodCoverage": {
       "title": "Cobertura estimada",
       "hint": "Estimación basada en los productos de tu despensa",
-      "days_one": "≈ 1 día de comida",
-      "days_other": "≈ {{ count }} días de comida",
-      "months_one": "≈ 1 mes de comida",
-      "months_other": "≈ {{ count }} meses de comida",
-      "years_one": "≈ 1 año de comida",
-      "years_other": "≈ {{ count }} años de comida"
+      "value": "≈ {{duration}} de comida"
     },
     "summary": {
       "title": "Resumen de la despensa",
@@ -340,7 +332,6 @@
     "nearExpiry": {
       "title": "Por caducar",
       "subtitle": "En los próximos {{ days }} días",
-      "expires": "Caduca {{ date }}",
       "empty": "No hay productos que expiren pronto."
     },
     "lowStock": {
@@ -352,7 +343,6 @@
     "expired": {
       "title": "Artículos caducados",
       "deleteAria": "Eliminar caducados",
-      "expires": "Caducó {{ date }}",
       "badge": "Caducado",
       "empty": "No hay artículos caducados en este momento."
     },
@@ -364,7 +354,8 @@
     },
     "waste": {
       "title": "Desperdicio este mes",
-      "count": "Has tirado {{count}} productos",
+      "count_one": "Se te ha caducado 1 producto",
+      "count": "Se te han caducado {{count}} productos",
       "topCategory": "Sobre todo en: {{category}}",
       "zero": "¡Sin desperdicios este mes! 🎯",
       "trend": {
@@ -376,7 +367,7 @@
     },
     "reposition": {
       "title": "Próximamente sin stock",
-      "daysLeft": "Quedan {{days}} días",
+      "daysLeft": "Se acaba {{when}}",
       "add": "Añadir",
       "added": "Añadido a la lista",
       "empty": "Necesitamos más historial para predecir",
@@ -437,7 +428,7 @@
       "inlineHint": "Añadir producto a la lista..."
     },
     "emptyState": {
-      "autoHint": "Los productos agotados aparecerán aquí automáticamente."
+      "autoHint": "Marca con ★ lo que no quieres que falte y volverá aquí cuando se acabe. O añádelo a mano arriba."
     },
     "ignored": {
       "sectionTitle": "Ocultos ahora"
@@ -447,7 +438,8 @@
       "boughtManual": "✓ {{name}} comprado.",
       "ignored": "{{name}} oculto por ahora — volverá la próxima vez.",
       "removedManual": "{{name}} eliminado de la lista.",
-      "shareFailed": "No se ha podido compartir la lista. Inténtalo de nuevo."
+      "shareFailed": "No se ha podido compartir la lista. Inténtalo de nuevo.",
+      "unbasic": "{{name}} ya no se añadirá a la lista automáticamente."
     },
     "buySheet": {
       "title": "¿Cuántas unidades compraste?",
@@ -457,7 +449,13 @@
       "increment": "Aumentar cantidad",
       "decrement": "Reducir cantidad"
     },
-    "tabTitle": "Compra"
+    "tabTitle": "Compra",
+    "rowMenu": {
+      "hide": "Ocultar por ahora",
+      "unbasic": "Ya no mantener siempre en casa",
+      "remove": "Quitar de la lista",
+      "unhide": "Volver a mostrar"
+    }
   },
   "insights": {
     "ctaDefault": "Entendido",
@@ -620,13 +618,6 @@
       "noExpiryDate": "Falta la fecha",
       "addBatch": "Añadir lote",
       "currentQuantity": "Cantidad",
-      "expires": {
-        "today": "Caduca hoy",
-        "tomorrow": "Caduca mañana"
-      },
-      "expired": {
-        "yesterday": "Caducó ayer"
-      },
       "noExpiryIntentional": "Sin caducidad"
     },
     "form": {
@@ -689,8 +680,6 @@
       "noExpiry": "Sin caducidad",
       "subinfo": {
         "expired": "Caducado",
-        "tomorrow": "Caduca mañana",
-        "inDays": "Caduca en {{count}} días",
         "review": "Consumir pronto"
       },
       "quantity": {
@@ -837,10 +826,7 @@
         "fiveDays": "5 días",
         "oneWeek": "1 semana",
         "twoWeeks": "2 semanas",
-        "noDate": "Sin fecha",
-        "remaining": "Quedan {{days}} días",
-        "expiresToday": "Caduca hoy",
-        "expiredAgo": "Caducó hace {{days}} días"
+        "noDate": "Sin fecha"
       },
       "card": {
         "expired": "Caducado",
@@ -1135,8 +1121,8 @@
       "seedLowStockTitle": "Crear items con stock bajo",
       "seedLowStockSubtitle": "Añade 3 items básicos por debajo del mínimo",
       "clearPantryTitle": "Vaciar toda la despensa",
-      "clearPantrySubtitle": "Elimina permanentemente todos los items",
-      "clearPantryConfirm": "¿Eliminar todos los items de la despensa? No se puede deshacer.",
+      "clearPantrySubtitle": "Borra todos los productos y su historial",
+      "clearPantryConfirm": "¿Borrar todos los productos y su historial? No se puede deshacer.",
       "toggleProTitle": "Activar/desactivar PRO",
       "toggleProSubtitle": "Simular estado PRO ({{ status }})",
       "showAppStateTitle": "Ver estado de la app",
@@ -1251,11 +1237,7 @@
     "nearExpiry": {
       "title": "{{ count }} productos caducan pronto",
       "title_one": "1 producto caduca pronto",
-      "body": "El primero en {{ nearestDays }} días",
-      "body_tomorrow": "El primero caduca mañana",
-      "body_one": "Caduca en {{ nearestDays }} días",
-      "body_one_tomorrow": "Caduca mañana",
-      "body_one_named": "Tu {{name}} caduca en {{days}} días.",
+      "body_one_named": "Tu {{name}} caduca {{when}}.",
       "body_one_named_tomorrow": "Tu {{name}} caduca mañana. Consúmelo hoy.",
       "body_many_named": "Tu {{name}} y {{others}} más caducan pronto.",
       "body_many_named_tomorrow": "Tu {{name}} caduca mañana y {{others}} más están cerca."

@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import type { BaseEventParams, EventParams, PantryEvent } from '@core/models/events';
 import { buildEventQuantities, computeDaysToExpiry } from '@core/domain/events';
 import { createDocumentId } from '@core/utils';
@@ -9,6 +9,29 @@ import { LoggerService } from '../shared/logger.service';
 export class HistoryEventLogService extends StorageService<PantryEvent> {
   private readonly eventLogger = inject(LoggerService);
   private readonly TYPE = 'event';
+  private revisionTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /**
+   * Bumps whenever an event document is written or deleted, by any path
+   * (expired-batch logging, the dev seeder, a wipe). Readers of the history
+   * react to it instead of reloading only on `ionViewWillEnter`, which doesn't
+   * fire on a tab page when coming back from /settings. Coalesced, because a
+   * seed or a wipe writes hundreds of events in a row.
+   */
+  readonly revision = signal(0);
+
+  constructor() {
+    super();
+    // Deleted docs arrive as { _id, _deleted } with no `type`: match the id.
+    this.watchChanges(doc => {
+      if (!doc._id?.startsWith(`${this.TYPE}:`)) return;
+      if (this.revisionTimer) clearTimeout(this.revisionTimer);
+      this.revisionTimer = setTimeout(() => {
+        this.revisionTimer = null;
+        this.revision.update(v => v + 1);
+      }, 150);
+    });
+  }
 
   async listEvents(): Promise<PantryEvent[]> {
     const events = await this.all(this.TYPE);

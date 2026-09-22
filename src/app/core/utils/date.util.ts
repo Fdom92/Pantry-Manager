@@ -65,20 +65,6 @@ export function daysUntilExpiry(dateStr: string | null | undefined, nowMs = Date
 }
 
 /**
- * Pretty-print a stored date for display ("11 jul" / "5 jul 2026" etc.).
- * Returns '' on invalid input so the caller can safely interpolate.
- */
-export function formatExpiryLabel(
-  value: string | null | undefined,
-  locale: string,
-  opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' }
-): string {
-  const d = parseExpiryDate(value);
-  if (d === null) return '';
-  return new Intl.DateTimeFormat(locale, opts).format(d);
-}
-
-/**
  * Build a `YYYY-MM-DD` string from a Date in **local** time.
  * Avoids `.toISOString()` which is UTC and can roll the day backwards at
  * midnight edges in negative-UTC zones.

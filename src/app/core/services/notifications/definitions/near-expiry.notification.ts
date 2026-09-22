@@ -5,6 +5,7 @@ import {
   nearestExpiryDays,
   pickPriorityItem,
 } from '@core/domain/notifications';
+import { formatRelativeDays } from '@core/domain/shared';
 import type { NotificationContext, NotificationDefinition, ScheduledNotification } from '@core/models/notifications';
 import type { AppPreferences } from '@core/models/settings';
 
@@ -17,7 +18,7 @@ export class NearExpiryNotification implements NotificationDefinition {
   }
 
   build(context: NotificationContext): ScheduledNotification | null {
-    const { items, preferences, t, now } = context;
+    const { items, preferences, t, locale, now } = context;
     const nearExpiry = filterNearExpiryItems(items, now, NEAR_EXPIRY_WINDOW_DAYS);
     if (!nearExpiry.length) return null;
 
@@ -43,7 +44,7 @@ export class NearExpiryNotification implements NotificationDefinition {
     return {
       id: this.id,
       title: t(titleKey, { count }),
-      body: t(bodyKey, { name: winner.name, days: nearestDays, others }),
+      body: t(bodyKey, { name: winner.name, when: formatRelativeDays(nearestDays, locale), others }),
       scheduleAt: buildNextTriggerDate(now, hour).toISOString(),
       extra: { itemId: winner._id },
     };

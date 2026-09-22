@@ -69,19 +69,16 @@ export function isRecentlyAdded(item: PantryItem): boolean {
   return Date.now() - createdAt.getTime() <= windowMs;
 }
 
+function compareByName(a: PantryItem, b: PantryItem): number {
+  return normalizeSearchField(a.name).localeCompare(normalizeSearchField(b.name));
+}
+
 /**
- * Sort pantry items alphabetically by name.
+ * Sort despensa items alphabetically (accents/case ignored).
  */
 export function sortPantryItems(items: PantryItem[]): PantryItem[] {
   if (items.length <= 1) return items;
-
-  const sorted = [...items];
-  sorted.sort((a, b) => {
-    const labelA = normalizeSearchField(a.name);
-    const labelB = normalizeSearchField(b.name);
-    return labelA.localeCompare(labelB);
-  });
-  return sorted;
+  return [...items].sort(compareByName);
 }
 
 /**

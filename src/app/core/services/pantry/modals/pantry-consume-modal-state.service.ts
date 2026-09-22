@@ -63,27 +63,12 @@ export class PantryConsumeModalStateService {
   }
 
   /**
-   * Close consume modal and cleanup state.
-   */
-  close(): void {
-    if (!this.consumeModalOpen()) {
-      return;
-    }
-    this.consumeModalOpen.set(false);
-    this.isConsuming.set(false);
-    this.consumeEntries.set([]);
-    this.consumeQuery.set('');
-  }
-
-  /**
    * Dismiss modal without cleanup (for backdrop click).
    *
-   * The abandonment event lives here rather than in close() because the modal
-   * emits willDismiss before didDismiss: dismiss() clears consumeModalOpen and
-   * close()'s guard then returns early, so close() never actually runs in
-   * practice. An entries count of 0 means the modal was opened and left
-   * without picking anything; a count above 0 means the user picked and then
-   * thought better of saving. Both read as a bare
+   * The abandonment event lives here because this is the only close path the
+   * modal ever takes. An entries count of 0 means the modal was opened and
+   * left without picking anything; a count above 0 means the user picked and
+   * then thought better of saving. Both read as a bare
    * pantry_consume_modal_opened today.
    */
   dismiss(): void {

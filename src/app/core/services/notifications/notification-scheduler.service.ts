@@ -16,6 +16,7 @@ import { WelcomeNotificationService } from './welcome-notification.service';
 import { buildStreakMilestoneNotification } from './definitions/streak-milestone.notification';
 import { AppPreferences, PantryItem } from '@core/models';
 import { LoggerService } from '../shared/logger.service';
+import { LanguageService } from '../shared/language.service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationSchedulerService {
@@ -30,8 +31,10 @@ export class NotificationSchedulerService {
   private readonly welcomeNotif = inject(WelcomeNotificationService);
   private readonly analytics = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
+  private readonly language = inject(LanguageService);
 
   private isScheduling = false;
+  private deliveredSnapshot: Promise<number[]> | null = null;
 
   constructor() {
     effect(() => {
@@ -50,6 +53,7 @@ export class NotificationSchedulerService {
       // is only a promise: the OS may drop it, batch it, or never fire it at
       // all. Without this, "they never arrive" and "they arrive and nobody
       // cares" are the same number, and the fixes are opposites.
+      // In practice this almost never fires (the WebView must be alive); see NOTIFICATION_DELIVERED_SEEN.
       void LocalNotifications.addListener('localNotificationReceived', notification => {
         this.analytics.track(ANALYTICS_EVENTS.NOTIFICATION_RECEIVED, {
           notification_id: notification.id,
@@ -109,6 +113,9 @@ export class NotificationSchedulerService {
    */
   async scheduleAll(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
+    // Read the tray before anything below cancels (cancel() also dismisses shown
+    // notifications on Android). Consumed by reportDelivered().
+    this.deliveredSnapshot ??= this.plugin.getDelivered();
     if (this.isScheduling) return;
 
     this.isScheduling = true;
@@ -124,6 +131,9 @@ export class NotificationSchedulerService {
       }
 
       if (!this.permission.isGranted()) {
+        // A broken plugin is not a user decision: the plugin already logged it
+        // to Sentry. Leave the user's toggle exactly as it is.
+        if (this.permission.isUnavailable()) return;
         if (this.permission.isPermanentlyDenied()) {
           // User chose "Don't ask again" — cannot request. Auto-disable the toggle.
           // The settings UI will show a friendly alert explaining how to re-enable.
@@ -138,6 +148,7 @@ export class NotificationSchedulerService {
         if (this.permission.wasRequested) return;
         const granted = await this.permission.request();
         if (!granted) {
+          if (this.permission.isUnavailable()) return;
           // Mirror the system decision back into preferences so the toggle goes OFF
           // automatically — avoids the confusing state where toggle is ON but no
           // notifications arrive.
@@ -169,6 +180,19 @@ export class NotificationSchedulerService {
     if (allIds.length) {
       await this.plugin.cancel(allIds);
     }
+  }
+
+  /** See ANALYTICS_EVENTS.NOTIFICATION_DELIVERED_SEEN for what this can and cannot say. */
+  async reportDelivered(): Promise<void> {
+    if (!Capacitor.isNativePlatform()) return;
+    const snapshot = this.deliveredSnapshot ?? this.plugin.getDelivered();
+    this.deliveredSnapshot = null;
+    const ids = await snapshot;
+    if (!ids.length) return;
+    this.analytics.track(ANALYTICS_EVENTS.NOTIFICATION_DELIVERED_SEEN, {
+      count: ids.length,
+      ids: [...ids].sort((a, b) => a - b).join(','),
+    });
   }
 
   private async scheduleProjectedNotifications(
@@ -250,7 +274,7 @@ export class NotificationSchedulerService {
     const t = (key: string, params?: Record<string, unknown>): string =>
       this.translate.instant(key, params);
 
-    return definition.build({ items, preferences, t, now });
+    return definition.build({ items, preferences, t, locale: this.language.getCurrentLocale(), now });
   }
 
   /** Evaluate all notification definitions and return the highest-priority payload. */
@@ -260,7 +284,13 @@ export class NotificationSchedulerService {
     now: Date,
     translate: (key: string, params?: Record<string, unknown>) => string
   ): ScheduledNotification | null {
-    const context: NotificationContext = { items, preferences, t: translate, now };
+    const context: NotificationContext = {
+      items,
+      preferences,
+      t: translate,
+      locale: this.language.getCurrentLocale(),
+      now,
+    };
     const definitions = this.registry.getAll();
     const candidates: Array<{ priority: number; payload: ScheduledNotification }> = [];
 

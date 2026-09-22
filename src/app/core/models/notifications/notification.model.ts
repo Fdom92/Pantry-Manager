@@ -5,6 +5,8 @@ export interface NotificationContext {
   items: PantryItem[];
   preferences: AppPreferences;
   t: (key: string, params?: Record<string, unknown>) => string;
+  /** App locale ('es-ES'…) for `core/domain/shared/date-display` formatters. */
+  locale: string;
   now: Date;
 }
 

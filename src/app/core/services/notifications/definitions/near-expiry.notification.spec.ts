@@ -30,6 +30,7 @@ function makeCtx(items: PantryItem[], now: Date): NotificationContext {
       supermarketOptions: [],
     },
     t: (key, params) => `[${key}|${JSON.stringify(params ?? {})}]`,
+    locale: 'es-ES',
     now,
   };
 }
@@ -51,7 +52,14 @@ describe('NearExpiryNotification — smart copy', () => {
     const inFive = '2026-06-07T08:00:00.000Z';
     const out = def.build(makeCtx([makeItem('item:b', 'bread', inFive)], now))!;
     expect(out.body).toContain('notifications.nearExpiry.body_one_named');
-    expect(out.body).toContain('"days":5');
+    expect(out.body).toContain('"when":"dentro de 5 días"');
+  });
+
+  it('shows two weeks, not "15 días", at the edge of the window', () => {
+    const now = new Date('2026-06-02T08:00:00.000Z');
+    const inFifteen = '2026-06-17T08:00:00.000Z';
+    const out = def.build(makeCtx([makeItem('item:r', 'rice', inFifteen)], now))!;
+    expect(out.body).toContain('"when":"dentro de 2 semanas"');
   });
 
   it('uses _many_named copy with others=N-1 when count>1', () => {

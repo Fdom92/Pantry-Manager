@@ -105,6 +105,10 @@ export const ANALYTICS_EVENTS = {
   SHOPPING_MANUAL_ADDED: 'shopping_manual_added',
   SHOPPING_ITEM_REMOVED: 'shopping_item_removed',
   SHOPPING_LIST_SHARED: 'shopping_list_shared',
+  /** Row tapped → action menu shown. If nobody opens it, discoverability is the problem. */
+  SHOPPING_ROW_MENU_OPENED: 'shopping_row_menu_opened',
+  SHOPPING_BASIC_REMOVED: 'shopping_basic_removed',
+  SHOPPING_BASIC_RESTORED: 'shopping_basic_restored',
 
   // Insights / PRO
   INSIGHTS_VIEWED: 'insights_viewed',
@@ -159,6 +163,18 @@ export const ANALYTICS_EVENTS = {
    * two call for opposite fixes.
    */
   NOTIFICATION_RECEIVED: 'notification_received',
+  /**
+   * Notifications still in the system tray when the app opens. A lower bound on
+   * delivery: tapped or swiped-away ones are gone, and one left in the tray is
+   * counted again on every open — dedupe by person and id when analysing.
+   * Exists because notification_received can almost never fire: the plugin
+   * only emits it while the WebView is alive, and a morning notification
+   * usually arrives with the app process dead.
+   * ids is a sorted comma-joined string (event props are flat).
+   * The tray is read before scheduleAll() cancels anything — cancelling also
+   * dismisses shown notifications.
+   */
+  NOTIFICATION_DELIVERED_SEEN: 'notification_delivered_seen',
   NOTIFICATION_TAPPED: 'notification_tapped',
 
   // Preferences (signals of churn / personalization).

@@ -1,6 +1,5 @@
 export * from './base-doc.model';
 export * from './color.model';
-export * from './date-format-options.model';
 export * from './empty-state.model';
 export * from './enums.model';
 export * from './household.model';
