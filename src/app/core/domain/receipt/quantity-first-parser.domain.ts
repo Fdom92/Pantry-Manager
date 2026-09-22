@@ -1,4 +1,5 @@
 import type { ParsedReceiptItem, ReceiptRow } from '@core/models/receipt';
+import { assertNever } from '@core/utils/assert-never.util';
 import {
   DISCOUNT_ROW,
   END_ANCHOR,
@@ -85,33 +86,35 @@ export function parseQuantityFirstZone(zone: ReceiptRow[]): ParsedReceiptItem[] 
  */
 function extractQuantityFirstProduct(row: ReceiptRow): ParsedReceiptItem | null {
   const tokens = tokenizeRow(row);
-  let cantCount: number | null = null;
-  let weighed = false;
-  const lead = tokens[0];
+  const cant = readLeadingCant(tokens);
+  let quantity: number | null;
 
-  if (lead !== undefined && LEADING_CANT_TOKEN.test(lead)) {
-    if (/[.,]/.test(lead)) {
-      // A 2-decimal lead with only one other price is the Precio of a row
-      // whose CANT was lost; a weight row always carries three numbers
-      // (cant 0,39 + precio 4,99 + importe 1,95).
-      const priceCount = tokens.filter(tok => PRICE_TOKEN.test(tok)).length;
-      const leadIsPrecio = PRICE_TOKEN.test(lead) && priceCount === 2;
-      if (!leadIsPrecio) {
-        weighed = true;
-        tokens.shift();
-      }
-    } else {
+  switch (cant.kind) {
+    case 'weight':
+      // One weighed item, whatever the arithmetic says.
       tokens.shift();
-      // 3+ digits is CANT and Precio merged ("1" + "1,49" → "149"), never a count.
-      if (lead.length <= 2) cantCount = parseInt(lead, 10);
-    }
+      quantity = null;
+      break;
+    case 'count':
+      tokens.shift();
+      quantity = quantityFromPrices(tokens) ?? cant.value;
+      // The token after a CANT digit is the Precio column, even when OCR lost
+      // its comma ("149"); drop it so it can't reach the name.
+      if (tokens.length && PRECIO_CELL_TOKEN.test(tokens[0])) tokens.shift();
+      break;
+    case 'merged':
+      tokens.shift();
+      quantity = quantityFromPrices(tokens);
+      break;
+    case 'lostCant':
+    case 'none':
+      // Nothing to drop: a lost-CANT lead is the Precio, which is both the
+      // divisor for quantityFromPrices and a PRICE_TOKEN the name filter drops.
+      quantity = quantityFromPrices(tokens);
+      break;
+    default:
+      return assertNever(cant);
   }
-
-  const priceQty = weighed ? null : quantityFromPrices(tokens);
-
-  // The token after a CANT digit is the Precio column, even when OCR lost
-  // its comma ("149"); drop it so it can't reach the name.
-  if (cantCount !== null && tokens.length && PRECIO_CELL_TOKEN.test(tokens[0])) tokens.shift();
 
   const nameTokens = tokens.filter(tok => !PRICE_TOKEN.test(tok) && !PRODUCT_CODE.test(tok));
   let name = stripNameNoise(nameTokens.join(' '));
@@ -120,12 +123,40 @@ function extractQuantityFirstProduct(row: ReceiptRow): ParsedReceiptItem | null 
 
   if (countLetters(name) < 3) return null;
 
-  const quantity = weighed ? null : priceQty ?? cantCount;
   return {
     rawName: name,
     quantity: clampQuantity(quantity ?? 1),
     confidence: quantity !== null ? 'high' : 'medium',
   };
+}
+
+/** What the row's first token says about the CANT column. */
+type LeadingCant =
+  | { kind: 'weight' }                // "0,39", "1,161": kg, with precio + importe after
+  | { kind: 'count'; value: number }  // "2"
+  | { kind: 'merged' }                // "149": CANT and Precio glued, not a count
+  | { kind: 'lostCant' }              // row opens with Precio ("0,75 | … | 1,50")
+  | { kind: 'none' };
+
+/**
+ * Decide what the leading token is. Pure: the caller drops the token.
+ *
+ * A 2-decimal lead with only one other price is the Precio of a row whose
+ * CANT was lost; a weight row always carries three numbers (cant 0,39 +
+ * precio 4,99 + importe 1,95). An integer of 3+ digits is CANT and Precio
+ * merged ("1" + "1,49" → "149"), never a count.
+ */
+export function readLeadingCant(tokens: readonly string[]): LeadingCant {
+  const lead = tokens[0];
+  if (lead === undefined || !LEADING_CANT_TOKEN.test(lead)) return { kind: 'none' };
+
+  if (/[.,]/.test(lead)) {
+    const priceCount = tokens.filter(tok => PRICE_TOKEN.test(tok)).length;
+    const leadIsPrecio = PRICE_TOKEN.test(lead) && priceCount === 2;
+    return leadIsPrecio ? { kind: 'lostCant' } : { kind: 'weight' };
+  }
+
+  return lead.length <= 2 ? { kind: 'count', value: parseInt(lead, 10) } : { kind: 'merged' };
 }
 
 /** Importe ÷ Precio (last ÷ first 2-decimal price) when it is a whole count. */

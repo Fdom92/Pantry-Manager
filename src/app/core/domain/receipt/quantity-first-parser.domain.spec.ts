@@ -1,4 +1,4 @@
-import { isQuantityFirstHeader } from './quantity-first-parser.domain';
+import { isQuantityFirstHeader, readLeadingCant } from './quantity-first-parser.domain';
 import { parseReceipt } from './receipt-parser.domain';
 import type { ReceiptRow } from '@core/models/receipt';
 
@@ -199,5 +199,33 @@ describe('parseReceipt — quantity-first table (real Family Cash ticket)', () =
       ['CERVEZA ESTRE', 24],
       ['PAN ROSQUILLA', 1],
     ]);
+  });
+});
+
+describe('readLeadingCant', () => {
+  const tokens = (text: string) => text.split(/\s+/).filter(Boolean);
+
+  it('reads a decimal lead with precio and importe after it as a weight', () => {
+    expect(readLeadingCant(tokens('0,39 4,99 MAGRO DE CERDO 1,95'))).toEqual({ kind: 'weight' });
+    expect(readLeadingCant(tokens('1,161 2,49 CLEMENTINA KG 2,89'))).toEqual({ kind: 'weight' });
+    expect(readLeadingCant(tokens('0,7 6,99 LONGANIZA 4,89'))).toEqual({ kind: 'weight' });
+  });
+
+  it('reads a 1-2 digit lead as a count', () => {
+    expect(readLeadingCant(tokens('2 0,75 MACARRON 1,50'))).toEqual({ kind: 'count', value: 2 });
+    expect(readLeadingCant(tokens('12 0,08 BOLSA 0,96'))).toEqual({ kind: 'count', value: 12 });
+  });
+
+  it('reads a 3-digit lead as CANT and Precio merged', () => {
+    expect(readLeadingCant(tokens('149 MAIZ DULCE 1,49'))).toEqual({ kind: 'merged' });
+  });
+
+  it('reads a 2-decimal lead with one other price as a Precio whose CANT was lost', () => {
+    expect(readLeadingCant(tokens('0,75 MACARRON FAMILY 1,50'))).toEqual({ kind: 'lostCant' });
+  });
+
+  it('reports none when the row does not open with a number', () => {
+    expect(readLeadingCant(tokens('MACARRON FAMILY 1,50'))).toEqual({ kind: 'none' });
+    expect(readLeadingCant([])).toEqual({ kind: 'none' });
   });
 });
