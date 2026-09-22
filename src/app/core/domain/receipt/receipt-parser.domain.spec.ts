@@ -1,5 +1,5 @@
 import { reconstructRows } from './receipt-geometry.domain';
-import { detectSupermarket, extractProduct, isQuantityFirstHeader, parseReceipt } from './receipt-parser.domain';
+import { classifyRow, detectSupermarket, extractProduct, isQuantityFirstHeader, parseReceipt } from './receipt-parser.domain';
 import { matchReceiptName, MATCH_AUTO_THRESHOLD } from './receipt-matching.domain';
 import type { OcrLine, ReceiptRow } from '@core/models/receipt';
 
@@ -253,6 +253,46 @@ describe('receipt-parser.domain — full parse', () => {
     expect(p2!.rawName).toBe('DANONINO FRESAS 6');
     const p3 = extractProduct(row('BANANA GRANEL | 30% | 1,29'));
     expect(p3!.rawName).toBe('BANANA GRANEL');
+  });
+
+  describe('phone lines vs. the TELENO brand (real Family Cash ticket 2026-09)', () => {
+    // "AGUA MINERAL TELENO" tripped the phone-label pattern: TEL + optional
+    // E/F/O/N/O letters matched the brand word, so on the regular path the
+    // row was dropped as a store phone line.
+    it('keeps a product row that contains TELENO', () => {
+      const rows = [
+        row('MERCADONA S.A.'),
+        row('Descripcion | P. Unit | Imp'),
+        row('1 AGUA MINERAL TELENO 0,5L | 0,35'),
+        row('2 COCA COLA ZERO | 4,00 | 8,00'),
+        row('TOTAL (€) | 8,35'),
+      ];
+      const names = parseReceipt(rows).items.map(i => i.rawName);
+      expect(names).toEqual(['AGUA MINERAL TELENO 0,5L', 'COCA COLA ZERO']);
+    });
+
+    it('keeps a TELENO row on a ticket with no table header', () => {
+      const names = parseReceipt([
+        row('AGUA MINERAL TELENO 1,5L | 0,55'),
+        row('TOTAL | 0,55'),
+      ]).items.map(i => i.rawName);
+      expect(names).toEqual(['AGUA MINERAL TELENO 1,5L']);
+    });
+
+    it('still classifies phone lines as noise, garbled ones included', () => {
+      for (const text of [
+        'TELEFONO: | 916761102',
+        'TELÉFONO 916761102',
+        'Telf.: 916761102',
+        'TEL: 91 123 45 67',
+        'TEL 91 123 45 67',
+        'TLF 91 123 45 67',
+        'Llefono : 91 676 11 02',
+        'TILEFONO 91 676 11 02',
+      ]) {
+        expect(classifyRow(row(text), 1)).withContext(text).toBe('noise');
+      }
+    });
   });
 
   it('skips discount rows and consolidates duplicated products', () => {

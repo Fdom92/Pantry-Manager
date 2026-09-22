@@ -78,8 +78,13 @@ const FISCAL_ID_NOISE = [
 
 /** Store contact block: phone, address, opening hours. */
 const STORE_CONTACT_NOISE = [
-  // FONO catches OCR-garbled TELEFONO variants ("Llefono", "TILEFONO").
-  /\bTEL[EÉ]?F?O?N?O?\b|\bTLF\b|\bTEL\b[.:\s]|FONO\s*:?/i,
+  // Phone labels only: TELEFONO / TELÉFONO / TELF / TELEF. (the F is
+  // required), TLF, or a bare TEL followed by "." ":" or a space. FONO
+  // catches OCR-garbled variants ("Llefono", "TILEFONO"). The F is required
+  // because Family Cash 2026-09 printed "AGUA MINERAL TELENO" (a water
+  // brand sold in many chains): the old TEL + optional E/F/O/N/O letters
+  // matched TELENO and dropped the product as a phone line.
+  /\bTEL[EÉ]?F|\bTLF\b|\bTEL\b[.:\s]|FONO\s*:?/i,
   // Postal-code + city rows that lost their prefix ("850 Torrejón de Ardoz").
   /^\d{3,5}\s+[A-ZÁ-Ü][a-zá-ü]+(\s|$)/,
   /\bwww\.|@|HTTP/i,
@@ -507,12 +512,8 @@ function parseQuantityFirstZone(zone: ReceiptRow[]): ParsedReceiptItem[] {
   for (const row of zone) {
     if (products.length > 0 && END_ANCHOR.test(row.text)) break;
     if (DISCOUNT_ROW.test(row.text)) { current = null; continue; }
-    const tokens = tokenizeRow(row);
-    const priced = tokens.some(tok => PRICE_TOKEN.test(tok));
-    // CANT + price is the row's structure, so noise words don't veto it:
-    // "AGUA MINERAL TELENO" trips the garbled-TELEFONO pattern.
-    const structural = priced && LEADING_CANT_TOKEN.test(tokens[0] ?? '');
-    if (!structural && isNoiseText(row.text)) { current = null; continue; }
+    if (isNoiseText(row.text)) { current = null; continue; }
+    const priced = tokenizeRow(row).some(tok => PRICE_TOKEN.test(tok));
     if (priced) {
       current = { ...row, cells: [...row.cells] };
       products.push(current);
