@@ -156,16 +156,18 @@
 
       @if (facade.summary().total === 0) {
         <app-empty-state
-          class="list-empty-state"
+          class="list-empty-state list-empty-state--inline"
           icon="fast-food-outline"
           [hideTitle]="true"
+          [inline]="true"
           [subtitleKey]="'emptyStates.pantry.subtitle'">
         </app-empty-state>
       } @else if (facade.despensaItems().length === 0) {
         <app-empty-state
-          class="list-empty-state"
+          class="list-empty-state list-empty-state--inline"
           icon="fast-food-outline"
           [hideTitle]="true"
+          [inline]="true"
           [subtitleKey]="'pantry.empty.filters'">
         </app-empty-state>
       } @else {

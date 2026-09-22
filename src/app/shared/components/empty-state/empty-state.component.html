@@ -1,5 +1,8 @@
 @if (inline) {
-  <p class="empty-state-inline">{{ subtitle || (subtitleKey | translate) }}</p>
+  <p class="empty-state-inline">
+    <ion-icon class="empty-state-inline__icon" [name]="icon" aria-hidden="true"></ion-icon>
+    <span>{{ subtitle || (subtitleKey | translate) }}</span>
+  </p>
 } @else {
   <div class="empty-state">
     <div class="empty-icon" [class]="'empty-icon color-' + (iconColor || 'primary')">
