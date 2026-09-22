@@ -10,6 +10,7 @@ import { DEFAULT_PANTRY_FILTERS } from '@core/models/pantry';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
 import { LoggerService } from '../shared/logger.service';
+import { ClockService } from '../shared/clock.service';
 import { PantryNavigationPresetService } from './pantry-navigation-preset.service';
 import { PantryService } from './pantry.service';
 
@@ -27,6 +28,7 @@ export class PantryQueryService {
   private readonly pantryService = inject(PantryService);
   private readonly navigationPreset = inject(PantryNavigationPresetService);
   private readonly logger = inject(LoggerService);
+  private readonly clock = inject(ClockService);
 
   private dbInitialized = false;
   private currentLoadPromise: Promise<void> | null = null;
@@ -298,8 +300,10 @@ export class PantryQueryService {
     const loaded = this.activeProducts();
     const query = normalizeSearchQuery(this.searchQuery());
     const filters = this.activeFilters();
+    // Read inside the effect so "Caducados" / "Por caducar" refilter on a new day.
+    const now = new Date(this.clock.now());
     const filtered = loaded.filter(item =>
-      matchesSearchQuery(item, query) && matchesFilters(item, filters)
+      matchesSearchQuery(item, query) && matchesFilters(item, filters, now)
     );
     this.filteredProducts.set(sortPantryItems(filtered));
   }

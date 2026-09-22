@@ -102,6 +102,7 @@
           @for (item of facade.visibleFreshItems(); track item._id) {
             <app-fresh-item-card
               [item]="item"
+              [now]="facade.now()"
               (stateChange)="facade.setFreshState($event.item, $event.state)"
               (editRequested)="facade.openEditModalFromSheet($event)"
               (basicToggle)="facade.toggleItemBasic($event)">

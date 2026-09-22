@@ -18,6 +18,8 @@ import { daysUntilExpiry } from '@core/utils';
 })
 export class FreshItemCardComponent implements OnChanges {
   @Input({ required: true }) item!: PantryItem;
+  /** The app clock (`ClockService.now`), so "Mañana" becomes "Hoy" on a new day. */
+  @Input() now = Date.now();
   @Output() readonly stateChange = new EventEmitter<{ item: PantryItem; state: FreshState }>();
   @Output() readonly editRequested = new EventEmitter<PantryItem>();
   @Output() readonly basicToggle = new EventEmitter<PantryItem>();
@@ -60,7 +62,7 @@ export class FreshItemCardComponent implements OnChanges {
     this.currentState.set(qtyToFreshState(qty));
     const dateStr = batch?.expirationDate;
     if (dateStr && qty > 0) {
-      const days = daysUntilExpiry(dateStr);
+      const days = daysUntilExpiry(dateStr, this.now);
       this.daysToExpiry.set(days);
     } else {
       this.daysToExpiry.set(null);

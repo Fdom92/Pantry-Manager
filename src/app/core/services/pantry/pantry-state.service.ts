@@ -30,6 +30,7 @@ import { HistoryEventManagerService } from '../history/history-event-manager.ser
 import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared';
 import { type FreshState, freshStateToQty, hasConsumableStock, qtyToFreshState, setBasic, statusFilterCount } from '@core/domain/pantry';
+import { ClockService } from '../shared/clock.service';
 
 /**
  * Main orchestrator for pantry page state.
@@ -44,6 +45,9 @@ export class PantryStateService {
   private readonly pantryQuery = inject(PantryQueryService);
   private readonly appPreferences = inject(SettingsPreferencesService);
   private readonly viewModel = inject(PantryViewModelService);
+  private readonly clock = inject(ClockService);
+  /** For time-based labels in child cards that only rerender on input change. */
+  readonly now = this.clock.now;
   private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly listUi = inject(PantryListUiStateService);
   private readonly addModal = inject(PantryAddModalStateService);
@@ -203,10 +207,11 @@ export class PantryStateService {
       const totalCount = this.pantryStore.totalCount();
       const loadedItems = this.pantryStore.activeProducts();
       const isLoading = this.pantryStore.loading();
+      const now = new Date(this.clock.now()); // chip counts move to a new day too
       const shouldUseFreshSummary = !isLoading || loadedItems.length > 0 || totalCount === 0;
       if (shouldUseFreshSummary) {
         // Include both fresh and pantry items so chip counts reflect both sections.
-        this.summarySnapshot.set(this.viewModel.buildSummary(loadedItems, loadedItems.length));
+        this.summarySnapshot.set(this.viewModel.buildSummary(loadedItems, loadedItems.length, now));
       }
     });
 

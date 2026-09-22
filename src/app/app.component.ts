@@ -18,6 +18,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 // STORAGE_KEYS removed: callers go through LocalStorageService.
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { ClockService } from '@core/services/shared/clock.service';
 
 @Component({
   selector: 'app-root',
@@ -46,6 +47,7 @@ export class AppComponent {
   private readonly streakMilestone = inject(StreakMilestoneService);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly prefs = inject(SettingsPreferencesService);
+  private readonly clock = inject(ClockService);
 
   constructor() {
     this.redirectToFirstRunFlows();
@@ -177,6 +179,8 @@ export class AppComponent {
     let lastForegroundAt = Date.now();
     CapacitorApp.addListener('appStateChange', async state => {
       if (state.isActive) {
+        // Before anything else reads the time: resuming the next day must reclassify.
+        this.clock.tick();
         this.analytics.track(ANALYTICS_EVENTS.APP_FOREGROUNDED);
         lastForegroundAt = Date.now();
         await this.revenuecat.restore();

@@ -8,3 +8,4 @@ export * from './storage.service';
 export * from './local-storage.service';
 export * from './toast.service';
 export * from './date-display.service';
+export * from './clock.service';

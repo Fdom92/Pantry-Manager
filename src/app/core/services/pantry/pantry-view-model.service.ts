@@ -32,8 +32,7 @@ export class PantryViewModelService {
   private readonly languageService = inject(LanguageService);
   private readonly dates = inject(DateDisplayService);
 
-  buildSummary(items: PantryItem[], totalCount: number): PantrySummaryMeta {
-    const now = new Date();
+  buildSummary(items: PantryItem[], totalCount: number, now: Date = new Date()): PantrySummaryMeta {
     const statusCounts = {
       expired: 0,
       expiring: 0,

@@ -7,6 +7,7 @@ import {
   formatRelativeDays,
 } from '@core/domain/shared';
 import { daysUntilExpiry } from '@core/utils/date.util';
+import { ClockService } from './clock.service';
 import { LanguageService } from './language.service';
 
 /**
@@ -19,6 +20,7 @@ import { LanguageService } from './language.service';
 export class DateDisplayService {
   private readonly language = inject(LanguageService);
   private readonly translate = inject(TranslateService);
+  private readonly clock = inject(ClockService);
 
   /** "9 meses", "1 día". */
   duration(days: number): string {
@@ -30,8 +32,11 @@ export class DateDisplayService {
     return formatRelativeDays(days, this.locale());
   }
 
-  /** "Caduca hoy", "Caduca dentro de 9 meses", "Caducó hace 3 días"; '' without a valid date. */
-  expiry(value: string | null | undefined, nowMs = Date.now()): string {
+  /**
+   * "Caduca hoy", "Caduca dentro de 9 meses", "Caducó hace 3 días"; '' without a valid date.
+   * Reads the clock signal, so templates using `appExpiry` rerender on a new day.
+   */
+  expiry(value: string | null | undefined, nowMs = this.clock.now()): string {
     const days = daysUntilExpiry(value, nowMs);
     if (!Number.isFinite(days)) return '';
     const key = days < 0 ? 'common.expiry.past' : 'common.expiry.future';

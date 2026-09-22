@@ -70,6 +70,11 @@ CI (`.github/workflows/ci.yml`) runs lint, check-icons, tests and the production
 
 - Ionic controllers (`ModalController`, …) must come from `@ionic/angular/standalone` when
   injected in root services; the `@ionic/angular` one isn't provided and blanks the app at boot.
+- Anything classified by time (expired, near expiry, waste window) reads `ClockService.now()`
+  inside its `computed`/effect. A bare `new Date()` there freezes: Android resumes the app the
+  next day with no data change, so nothing recomputes.
+- Data read only in `ionViewWillEnter` goes stale: the hook doesn't fire on a tab page when
+  coming back from `/settings`, nor in the browser dev server. Derive from signals instead.
 - Before deleting a method, grep its bare name in `.html` templates, not only in `.ts`.
 - New icons: register them in `src/app/app-icons.ts`. `check-icons` only sees templates, not
   icons passed from TypeScript (action sheets).
