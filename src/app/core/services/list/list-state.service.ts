@@ -262,7 +262,13 @@ export class ListStateService {
       case 'hide': this.removeAutoItem(row.id); return;
       case 'unbasic': await this.unbasicItem(row.id, row.kind); return;
       case 'remove': this.removeManualItem(row.id); return;
-      case 'unhide': this.unhideAutoItem(row.id); return;
+      case 'unhide':
+        this.unhideAutoItem(row.id);
+        // Tracked here, not inside unhideAutoItem(): unbasicItem() also calls
+        // it, to reset the hidden flag on un-star, and that is not a
+        // user-initiated unhide.
+        this.analytics.track(ANALYTICS_EVENTS.SHOPPING_ITEM_UNHIDDEN, { surface: 'menu' });
+        return;
     }
   }
 

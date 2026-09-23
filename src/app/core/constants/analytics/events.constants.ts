@@ -64,6 +64,9 @@ export const ANALYTICS_EVENTS = {
    * analytics until 5.4.
    */
   PANTRY_FRESH_STATE_CHANGED: 'pantry_fresh_state_changed',
+  /** Star toggle ("always keep at home"). Was invisible to analytics — the
+   * shopping list's auto-suggest source could not be measured at all. */
+  PANTRY_BASIC_TOGGLED: 'pantry_basic_toggled',
   PANTRY_CONSUME_MODAL_OPENED: 'pantry_consume_modal_opened',
   PANTRY_EDIT_MODAL_OPENED: 'pantry_edit_modal_opened',
   PANTRY_BATCHES_MODAL_OPENED: 'pantry_batches_modal_opened',
@@ -104,6 +107,8 @@ export const ANALYTICS_EVENTS = {
   SHOPPING_BUY_COMPLETED: 'shopping_buy_completed',
   SHOPPING_MANUAL_ADDED: 'shopping_manual_added',
   SHOPPING_ITEM_REMOVED: 'shopping_item_removed',
+  /** Its siblings (hide/remove/unbasic) all track; this one didn't. */
+  SHOPPING_ITEM_UNHIDDEN: 'shopping_item_unhidden',
   SHOPPING_LIST_SHARED: 'shopping_list_shared',
   /** Row tapped → action menu shown. If nobody opens it, discoverability is the problem. */
   SHOPPING_ROW_MENU_OPENED: 'shopping_row_menu_opened',

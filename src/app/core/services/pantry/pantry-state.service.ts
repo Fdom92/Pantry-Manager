@@ -558,6 +558,14 @@ export class PantryStateService {
     const updated = setBasic(item, isBasic, new Date().toISOString());
     await this.pantryStore.updateItem(updated);
     const isDepleted = this.batchOps.getTotalQuantity(item) <= 0;
+    // This star toggle drives the shopping list's whole auto-suggest source
+    // and had no event at all — adoption of "always keep at home" was
+    // unmeasurable.
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_BASIC_TOGGLED, {
+      is_basic: isBasic,
+      product_type: item.productType === 'fresh' ? 'fresh' : 'despensa',
+      depleted: isDepleted,
+    });
     let msgKey: string;
     if (isBasic) {
       msgKey = isDepleted ? 'pantry.toasts.addedToList' : 'pantry.toasts.isBasicOn';
