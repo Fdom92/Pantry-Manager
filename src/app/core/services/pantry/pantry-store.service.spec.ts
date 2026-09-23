@@ -225,8 +225,75 @@ describe('PantryStoreService', () => {
     });
   });
 
-  // ── deleteExpiredItems ─────────────────────────────────────────────────────
+  // ── loadAll ────────────────────────────────────────────────────────────────
 
+  describe('loadAll', () => {
+    it('waits for the expired-batch sweep to finish before resolving', async () => {
+      let resolveSweep!: () => void;
+      eventManagerSpy.logExpiredBatches.and.returnValue(
+        new Promise<void>(resolve => {
+          resolveSweep = resolve;
+        })
+      );
+
+      let loadAllResolved = false;
+      const loadAllPromise = service.loadAll().then(() => {
+        loadAllResolved = true;
+      });
+
+      // Flush pending microtasks without resolving the sweep.
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(eventManagerSpy.logExpiredBatches)
+        .withContext('the sweep never started')
+        .toHaveBeenCalled();
+      expect(loadAllResolved)
+        .withContext('loadAll resolved before the expired-batch sweep finished writing events')
+        .toBe(false);
+
+      resolveSweep();
+      await loadAllPromise;
+      expect(loadAllResolved).toBe(true);
+    });
+
+    it('a concurrent loadAll() joins the in-flight sweep instead of skipping it', async () => {
+      // Dashboard's own ionViewWillEnter and InsightsStateService's reactive
+      // effect both call loadAll() in the same tick — the second call must
+      // not resolve before the sweep the first call started actually writes.
+      let resolveSweep!: () => void;
+      eventManagerSpy.logExpiredBatches.and.returnValue(
+        new Promise<void>(resolve => {
+          resolveSweep = resolve;
+        })
+      );
+
+      let firstResolved = false;
+      let secondResolved = false;
+      const first = service.loadAll().then(() => {
+        firstResolved = true;
+      });
+      const second = service.loadAll().then(() => {
+        secondResolved = true;
+      });
+
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(eventManagerSpy.logExpiredBatches.calls.count())
+        .withContext('the sweep should only run once for two concurrent loadAll() calls')
+        .toBe(1);
+      expect(firstResolved).toBe(false);
+      expect(secondResolved)
+        .withContext('the second loadAll() resolved without waiting for the shared sweep')
+        .toBe(false);
+
+      resolveSweep();
+      await Promise.all([first, second]);
+      expect(firstResolved).toBe(true);
+      expect(secondResolved).toBe(true);
+    });
+  });
 
   // ── computed signals ───────────────────────────────────────────────────────
 

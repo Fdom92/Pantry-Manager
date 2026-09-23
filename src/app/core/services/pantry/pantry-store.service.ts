@@ -19,7 +19,7 @@ export class PantryStoreService {
   private readonly analytics = inject(AnalyticsService);
   private readonly clock = inject(ClockService);
   private realtimeSubscribed = false;
-  private expiredScanInProgress = false;
+  private expiredScanPromise: Promise<void> | null = null;
 
   // ─── Clock signal for consistent timestamps across all computed properties ──
   // One point-in-time for expiredItems, nearExpiryItems, etc., and it advances
@@ -89,7 +89,10 @@ export class PantryStoreService {
       this.pantryQuery.startBackgroundLoad();
       this.watchRealtime();
       this.error.set(null);
-      void this.logExpiredBatchEvents(this.items());
+      // Awaited: callers reading events right after loadAll() (waste tracker,
+      // insights) would otherwise race the sweep and miss batches that just
+      // expired — e.g. a fresh backup import landing several at once.
+      await this.logExpiredBatchEvents(this.items());
     } catch (err: unknown) {
       this.logger.error('PantryStoreService', 'loadAll error', err);
       const msg = err instanceof Error ? err.message : 'Error loading pantry items';
@@ -196,16 +199,22 @@ export class PantryStoreService {
     return undefined;
   }
 
-  private async logExpiredBatchEvents(items: PantryItem[]): Promise<void> {
-    if (this.expiredScanInProgress) return;
-    this.expiredScanInProgress = true;
-    try {
-      await this.eventManager.logExpiredBatches(items);
-    } catch (err) {
-      this.logger.error('PantryStoreService', 'logExpiredBatchEvents error', err);
-    } finally {
-      this.expiredScanInProgress = false;
-    }
+  // A concurrent caller joins the in-flight sweep instead of skipping it —
+  // loadAll() from the dashboard and from InsightsStateService's own reactive
+  // effect can start in the same tick, and a caller awaiting this must see
+  // the write actually finish, not just that someone else started one.
+  private logExpiredBatchEvents(items: PantryItem[]): Promise<void> {
+    if (this.expiredScanPromise) return this.expiredScanPromise;
+    this.expiredScanPromise = (async () => {
+      try {
+        await this.eventManager.logExpiredBatches(items);
+      } catch (err) {
+        this.logger.error('PantryStoreService', 'logExpiredBatchEvents error', err);
+      } finally {
+        this.expiredScanPromise = null;
+      }
+    })();
+    return this.expiredScanPromise;
   }
 
   private buildMergeKey(item: PantryItem): string | null {
