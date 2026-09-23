@@ -4,6 +4,7 @@ import { AnalyticsService } from '../analytics/analytics.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import type { OnboardingQuickSeedItem } from '@core/constants';
 import { buildAddItemPayload, FRESH_QTY, resolveSuggestedExpiry } from '@core/domain/pantry';
+import { resolveNotificationsConsent } from '@core/domain/notifications/notification.domain';
 import type { OnboardingSlide } from '@core/models/onboarding';
 import type { PantryItem } from '@core/models/pantry';
 import { createDocumentId } from '@core/utils';
@@ -30,7 +31,7 @@ interface SwiperElementLike extends HTMLElement {
   };
 }
 
-type NotificationsDecision = 'granted' | 'denied' | 'later' | null;
+type NotificationsDecision = 'granted' | 'denied' | 'unavailable' | 'later' | null;
 type AnalyticsDecision = 'granted' | 'denied' | null;
 
 let swiperRegistered = false;
@@ -150,7 +151,11 @@ export class OnboardingStateService {
   /** User accepted notifications on slide 1. Requests OS permission and persists prefs. */
   async acceptNotifications(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
     const granted = await this.notificationPermission.request();
-    this.notificationsDecision.set(granted ? 'granted' : 'denied');
+    const { decision, shouldPersistDecision } = resolveNotificationsConsent(
+      granted,
+      this.notificationPermission.isUnavailable()
+    );
+    this.notificationsDecision.set(decision);
     const current = await this.preferences.getPreferences();
     await this.preferences.savePreferences({
       ...current,
@@ -158,7 +163,11 @@ export class OnboardingStateService {
       notifyOnExpired: granted ? true : current.notifyOnExpired,
       notifyOnNearExpiry: granted ? true : current.notifyOnNearExpiry,
       notifyOnLowStock: granted ? true : current.notifyOnLowStock,
-      notificationsDecidedAt: new Date().toISOString(),
+      // A plugin failure isn't a decision — leave this unset so the
+      // re-consent sheet's live permissionState() check gets a real chance
+      // to ask again once the plugin recovers, instead of being permanently
+      // blocked by a decidedAt stamp that never reflected a real choice.
+      ...(shouldPersistDecision ? { notificationsDecidedAt: new Date().toISOString() } : {}),
     });
     if (granted) {
       await this.welcomeNotif.scheduleWelcomeNotification();

@@ -20,6 +20,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '@core/services/analytics';
 import { NotificationPermissionService } from '@core/services/notifications/notification-permission.service';
+import { resolveNotificationsConsent } from '@core/domain/notifications/notification.domain';
 import { ReconsentPromptService } from '@core/services/reconsent';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
 
@@ -124,8 +125,17 @@ export class ReconsentSheetComponent {
       if (this.showNotifications()) {
         const current = await this.prefs.getPreferences();
         const now = new Date().toISOString();
+        let shouldPersistDecision = true;
         if (this.notificationsOn()) {
           notifGranted = await this.permission.request();
+          // A plugin failure isn't the user's decision — don't stamp
+          // notificationsDecidedAt, or the sheet would never ask again even
+          // after the plugin recovers (see OnboardingStateService for the
+          // same fix and why it matters).
+          shouldPersistDecision = resolveNotificationsConsent(
+            notifGranted,
+            this.permission.isUnavailable()
+          ).shouldPersistDecision;
         }
         await this.prefs.savePreferences({
           ...current,
@@ -133,7 +143,7 @@ export class ReconsentSheetComponent {
           notifyOnExpired: notifGranted ? true : current.notifyOnExpired,
           notifyOnNearExpiry: notifGranted ? true : current.notifyOnNearExpiry,
           notifyOnLowStock: notifGranted ? true : current.notifyOnLowStock,
-          notificationsDecidedAt: now,
+          ...(shouldPersistDecision ? { notificationsDecidedAt: now } : {}),
         });
       }
 

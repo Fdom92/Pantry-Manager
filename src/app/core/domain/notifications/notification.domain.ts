@@ -120,6 +120,29 @@ export function pickPriorityItem(
   return byEarliestExpiry[0] ?? items[0];
 }
 
+export interface NotificationsConsentResolution {
+  decision: 'granted' | 'denied' | 'unavailable';
+  /** False for a plugin failure: it is not the user's decision, so nothing
+   * should be stamped that would stop the re-consent sheet from asking again
+   * once the plugin recovers. */
+  shouldPersistDecision: boolean;
+}
+
+/**
+ * What to record after the OS permission request settles. A native-plugin
+ * failure ('unavailable') is not the same as the user tapping "don't allow"
+ * ('denied') — conflating the two, as onboarding used to, wrote 'denied' for
+ * a transient failure and permanently blocked the re-consent sheet.
+ */
+export function resolveNotificationsConsent(
+  granted: boolean,
+  pluginUnavailable: boolean
+): NotificationsConsentResolution {
+  if (granted) return { decision: 'granted', shouldPersistDecision: true };
+  if (pluginUnavailable) return { decision: 'unavailable', shouldPersistDecision: false };
+  return { decision: 'denied', shouldPersistDecision: true };
+}
+
 function earliestBatchExpiry(item: PantryItem): string | undefined {
   if (!item.batches?.length) return undefined;
   const dated = item.batches.map(b => b.expirationDate).filter((d): d is string => !!d);
