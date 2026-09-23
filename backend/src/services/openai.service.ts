@@ -25,31 +25,6 @@ function getClient(): OpenAI {
 }
 
 export const openaiService = {
-  /**
-   * Creates an OpenAI streaming response and returns an async iterable of text chunks.
-   * The HTTP call to OpenAI happens eagerly so callers can catch auth/rate errors
-   * before committing to SSE headers.
-   */
-  async createStream(payload: any): Promise<AsyncIterable<string>> {
-    const client = getClient();
-    const system = { role: 'system', content: String(payload.system) };
-    const messages = Array.isArray(payload.messages) ? payload.messages : [];
-
-    // This await makes the HTTP request to OpenAI — may throw 429, auth errors, etc.
-    const openaiStream = await client.chat.completions.create({
-      model: payload.model ?? model,
-      messages: [system, ...messages],
-      stream: true,
-    });
-
-    return (async function* () {
-      for await (const chunk of openaiStream) {
-        const text = chunk.choices[0]?.delta?.content ?? '';
-        if (text) yield text;
-      }
-    })();
-  },
-
   async createCompletion(payload: { system: string; userMessage: string }): Promise<string> {
     const client = getClient();
     const response = await client.chat.completions.create({

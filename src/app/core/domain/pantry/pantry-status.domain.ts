@@ -6,7 +6,6 @@ import { parseExpiryDate } from '@core/utils/date.util';
 import { collectBatches, sumQuantities } from './pantry-batch.domain';
 import { FOOD_TYPE_PROFILE, type ExpiryMode } from './food-type-profile.domain';
 import { FRESH_NEAR_EXPIRY_WINDOW_DAYS, FRESH_QTY } from './fresh.domain';
-import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
 
 export const REVIEW_GRACE_DAYS = 7;
 
@@ -205,12 +204,4 @@ export function getStatusSortWeight(state: ProductStatusState): number {
     case 'low-stock':  return 2;
     default:           return 3;
   }
-}
-
-/**
- * Compute expiration-based sort weight for a pantry item.
- * Convenience wrapper around getItemStatusState + getStatusSortWeight.
- */
-export function getExpirationSortWeight(item: PantryItem, now: Date = new Date()): number {
-  return getStatusSortWeight(getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS));
 }
