@@ -85,7 +85,7 @@ export class PantryPendientesSheetStateService {
         return row;
       }
       if (!row.needsDate) return { ...row, foodType };
-      const suggested = expiryAfterFoodTypeChange(row, foodType);
+      const suggested = expiryAfterFoodTypeChange(row, foodType, new Date());
       return {
         ...row,
         foodType,
@@ -186,7 +186,7 @@ export class PantryPendientesSheetStateService {
       foodType,
       ...(foodType && needsDate
         ? {
-            expirationDate: resolveSuggestedExpiry(item.name, foodType).expirationDate,
+            expirationDate: resolveSuggestedExpiry(item.name, foodType, new Date()).expirationDate,
             noExpiry: !foodTypeExpires(foodType),
           }
         : { expirationDate: undefined, noExpiry: false }),

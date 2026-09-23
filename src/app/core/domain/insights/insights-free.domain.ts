@@ -245,8 +245,8 @@ const MS_PER_DAY_COVERAGE = 86_400_000;
  */
 export function computeFoodCoverage(
   activeItems: PantryItem[],
-  householdSize = 1,
-  now: Date = new Date(),
+  householdSize: number,
+  now: Date,
 ): FoodCoverageResult | null {
   if (activeItems.length < 3) return null;
 

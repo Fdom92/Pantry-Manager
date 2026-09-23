@@ -15,18 +15,18 @@ export function matchesSearchQuery(item: PantryItem, query: string): boolean {
 
 /**
  * Check if item matches active filters.
- * @param now - Reference timestamp. Defaults to Date.now() but should be passed
- *   explicitly in hot render paths to guarantee all items are evaluated against
- *   the same instant (multiple new Date() calls in a loop can differ by ms).
+ * @param now - Reference timestamp, passed explicitly (not read internally)
+ *   so all items in a filter pass are evaluated against the same instant and
+ *   the caller's tracked clock, not a fresh `new Date()` per call.
  */
-export function matchesFilters(item: PantryItem, filters: PantryFilterState, now = new Date()): boolean {
+export function matchesFilters(item: PantryItem, filters: PantryFilterState, now: Date): boolean {
   const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
 
   if (filters.expired && state !== 'expired') return false;
   if (filters.expiring && state !== 'near-expiry') return false;
   if (filters.review && state !== 'review') return false;
   if (filters.lowStock && state !== 'low-stock') return false;
-  if (filters.recentlyAdded && !isRecentlyAdded(item)) return false;
+  if (filters.recentlyAdded && !isRecentlyAdded(item, now)) return false;
   if (filters.normalOnly && state !== 'normal') return false;
   if (filters.pendientes && !isIncomplete(item)) return false;
 
@@ -62,11 +62,11 @@ export function isIncomplete(item: PantryItem): boolean {
 /**
  * Check if item was recently added based on configured window.
  */
-export function isRecentlyAdded(item: PantryItem): boolean {
+export function isRecentlyAdded(item: PantryItem, now: Date): boolean {
   const createdAt = new Date(item?.createdAt ?? '');
   if (Number.isNaN(createdAt.getTime())) return false;
   const windowMs = RECENTLY_ADDED_WINDOW_DAYS * 24 * 60 * 60 * 1000;
-  return Date.now() - createdAt.getTime() <= windowMs;
+  return now.getTime() - createdAt.getTime() <= windowMs;
 }
 
 function compareByName(a: PantryItem, b: PantryItem): number {

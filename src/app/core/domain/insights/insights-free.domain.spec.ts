@@ -353,7 +353,7 @@ describe('computePantryScore', () => {
 describe('computeFoodCoverage', () => {
   it('returns null when fewer than 3 items', () => {
     const items = [makeItem(), makeItem()];
-    expect(computeFoodCoverage(items)).toBeNull();
+    expect(computeFoodCoverage(items, 1, new Date())).toBeNull();
   });
 
   it('returns null when total portions are 0', () => {
@@ -362,7 +362,7 @@ describe('computeFoodCoverage', () => {
       makeItem({ batches: [{ batchId: 'b1', quantity: 0 }] }),
       makeItem({ batches: [{ batchId: 'b1', quantity: 0 }] }),
     ];
-    expect(computeFoodCoverage(items)).toBeNull();
+    expect(computeFoodCoverage(items, 1, new Date())).toBeNull();
   });
 
   it('returns a small number of days for small quantities', () => {
@@ -371,7 +371,7 @@ describe('computeFoodCoverage', () => {
       makeItem({ batches: [{ batchId: 'b1', quantity: 3 }] }),
       makeItem({ batches: [{ batchId: 'b1', quantity: 3 }] }),
     ];
-    const result = computeFoodCoverage(items)!;
+    const result = computeFoodCoverage(items, 1, new Date())!;
     expect(result.days).toBeGreaterThan(0);
     expect(result.days).toBeLessThan(30);
   });
@@ -380,7 +380,7 @@ describe('computeFoodCoverage', () => {
     const items = Array.from({ length: 5 }, () =>
       makeItem({ batches: [{ batchId: 'b1', quantity: 20 }] })
     );
-    const result = computeFoodCoverage(items)!;
+    const result = computeFoodCoverage(items, 1, new Date())!;
     expect(result.days).toBeGreaterThanOrEqual(30);
   });
 
@@ -390,7 +390,7 @@ describe('computeFoodCoverage', () => {
       makeItem({ foodType: FoodType.CARB, batches: [{ batchId: 'b1', quantity: 5 }] }),
       makeItem({ foodType: FoodType.DAIRY, batches: [{ batchId: 'b1', quantity: 5 }] }),
     ];
-    const result = computeFoodCoverage(items)!;
+    const result = computeFoodCoverage(items, 1, new Date())!;
     expect(result.days).toBeGreaterThan(0);
   });
 });

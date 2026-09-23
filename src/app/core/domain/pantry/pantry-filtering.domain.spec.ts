@@ -38,7 +38,7 @@ describe('matchesFilters — review filter', () => {
       foodType: FoodType.DAIRY,
       batches: [{ batchId: 'b1', quantity: 1, expirationDate: daysFromNow(-3) }],
     });
-    expect(matchesFilters(item, { ...noFilters, review: false })).toBeTrue();
+    expect(matchesFilters(item, { ...noFilters, review: false }, new Date())).toBeTrue();
   });
 
   it('passes review-state items (DAIRY 3 days past date, within 7d grace)', () => {
@@ -47,7 +47,7 @@ describe('matchesFilters — review filter', () => {
       foodType: FoodType.DAIRY,
       batches: [{ batchId: 'b1', quantity: 1, expirationDate: daysFromNow(-3) }],
     });
-    expect(matchesFilters(reviewItem, { ...noFilters, review: true })).toBeTrue();
+    expect(matchesFilters(reviewItem, { ...noFilters, review: true }, new Date())).toBeTrue();
   });
 
   it('blocks non-review items (PROTEIN — strict mode, same date is expired not review)', () => {
@@ -55,7 +55,7 @@ describe('matchesFilters — review filter', () => {
       foodType: FoodType.PROTEIN,
       batches: [{ batchId: 'b1', quantity: 1, expirationDate: daysFromNow(-3) }],
     });
-    expect(matchesFilters(expiredItem, { ...noFilters, review: true })).toBeFalse();
+    expect(matchesFilters(expiredItem, { ...noFilters, review: true }, new Date())).toBeFalse();
   });
 
   it('blocks DAIRY item past grace period (>7 days expired)', () => {
@@ -63,7 +63,7 @@ describe('matchesFilters — review filter', () => {
       foodType: FoodType.DAIRY,
       batches: [{ batchId: 'b1', quantity: 1, expirationDate: daysFromNow(-10) }],
     });
-    expect(matchesFilters(tooOld, { ...noFilters, review: true })).toBeFalse();
+    expect(matchesFilters(tooOld, { ...noFilters, review: true }, new Date())).toBeFalse();
   });
 });
 

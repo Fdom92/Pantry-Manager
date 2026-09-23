@@ -326,7 +326,7 @@ export class PantryReceiptScanModalStateService {
             ? restockFreshItem(matchedItem, timestamp, generateBatchId())
             : await this.pantryStore.addNewLot(matchedItem._id, {
                 quantity: line.quantity,
-                ...toLotExpiry(resolveSuggestedExpiry(matchedItem.name, matchedItem.foodType)),
+                ...toLotExpiry(resolveSuggestedExpiry(matchedItem.name, matchedItem.foodType, new Date(timestamp))),
               });
           if (updated) {
             await this.pantryStore.updateItem(updated);

@@ -98,7 +98,7 @@ export class OnboardingStateService {
       const name = this.translate.instant(`onboarding.quickSeed.items.${seed.key}`);
       const suggested = seed.alwaysNoExpiry
         ? { noExpiry: true }
-        : resolveSuggestedExpiry(name, seed.foodType);
+        : resolveSuggestedExpiry(name, seed.foodType, new Date());
       return { seed, name, ...suggested };
     })
   );
