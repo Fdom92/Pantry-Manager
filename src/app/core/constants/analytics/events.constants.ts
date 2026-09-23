@@ -185,6 +185,12 @@ export const ANALYTICS_EVENTS = {
   // Preferences (signals of churn / personalization).
   PREFERENCE_CHANGED: 'preference_changed',
 
+  /** Data backup — a destructive/bulk operation with no analytics until 5.6:
+   * a reset or a failed import was invisible outside Sentry logs. */
+  DATA_EXPORTED: 'data_exported',
+  DATA_IMPORTED: 'data_imported',
+  DATA_RESET: 'data_reset',
+
   // Retention — streak
   STREAK_REACHED: 'streak_reached',
   STREAK_MILESTONE_3: 'streak_milestone_3',

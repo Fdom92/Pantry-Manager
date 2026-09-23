@@ -74,6 +74,7 @@ export class SettingsStateService {
       if (this.lifecycle.isDestroyed()) {
         return;
       }
+      this.analytics.track(ANALYTICS_EVENTS.DATA_RESET);
       this.reloadApp();
     }).catch(async err => {
       this.logger.error('SettingsStateService', 'resetApplicationData error', err);
@@ -110,6 +111,11 @@ export class SettingsStateService {
         return;
       }
 
+      if (outcome === 'cancelled') {
+        return;
+      }
+      this.analytics.track(ANALYTICS_EVENTS.DATA_EXPORTED, { doc_count: docs.length });
+
       if (shouldSkipShareOutcome(outcome)) {
         return;
       }
@@ -142,6 +148,7 @@ export class SettingsStateService {
       const docs = parseBackup(fileContents, new Date().toISOString());
       await this.applyImport(docs);
       this.reviewPrompt.markEngagement();
+      this.analytics.track(ANALYTICS_EVENTS.DATA_IMPORTED, { doc_count: docs.length });
       if (!this.lifecycle.isDestroyed()) {
         shouldReload = true;
       }
