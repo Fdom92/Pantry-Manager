@@ -1315,18 +1315,6 @@
       "errorTitle": "Não foi possível aplicar a sincronização"
     }
   },
-  "batchEdit": {
-    "expiryDateHint": "Apenas produtos com um único lote são exibidos.",
-    "actions": {
-      "setFoodType": "Definir tipo de alimento",
-      "setCategory": "Definir categoria",
-      "setExpiryDate": "Definir data de validade"
-    },
-    "toast": {
-      "updated_one": "1 produto atualizado",
-      "updated_other": "{{ count }} produtos atualizados"
-    }
-  },
   "reconsent": {
     "title": "Algumas novas opções",
     "intro": "Adicionámos funções que precisam da tua permissão. Podes mudar a qualquer momento nas Definições.",

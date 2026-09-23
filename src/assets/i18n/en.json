@@ -1315,18 +1315,6 @@
       "errorTitle": "Could not apply the sync"
     }
   },
-  "batchEdit": {
-    "expiryDateHint": "Only products with a single batch are shown.",
-    "actions": {
-      "setFoodType": "Set food type",
-      "setCategory": "Set category",
-      "setExpiryDate": "Set expiry date"
-    },
-    "toast": {
-      "updated_one": "1 item updated",
-      "updated_other": "{{ count }} items updated"
-    }
-  },
   "reconsent": {
     "title": "A couple of new options",
     "intro": "We've added features that need your permission. You can change this anytime in Settings.",

@@ -1315,18 +1315,6 @@
       "errorTitle": "Synchronisierung konnte nicht angewendet werden"
     }
   },
-  "batchEdit": {
-    "expiryDateHint": "Es werden nur Produkte mit einer einzigen Charge angezeigt.",
-    "actions": {
-      "setFoodType": "Lebensmitteltyp festlegen",
-      "setCategory": "Kategorie festlegen",
-      "setExpiryDate": "Ablaufdatum festlegen"
-    },
-    "toast": {
-      "updated_one": "1 Produkt aktualisiert",
-      "updated_other": "{{ count }} Produkte aktualisiert"
-    }
-  },
   "reconsent": {
     "title": "Ein paar neue Optionen",
     "intro": "Wir haben Funktionen ergänzt, die deine Erlaubnis brauchen. Änderbar jederzeit in den Einstellungen.",
