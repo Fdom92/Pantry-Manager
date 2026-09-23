@@ -6,6 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import type jsPDF from 'jspdf';
 import { LanguageService } from '../shared/language.service';
 import { DateDisplayService } from '../shared/date-display.service';
+import { LoggerService } from '../shared/logger.service';
 
 /**
  * Renders the shopping list for sharing — as a laid-out PDF, or as plain text
@@ -21,6 +22,7 @@ export class ShoppingExportService {
   private readonly translate = inject(TranslateService);
   private readonly languageService = inject(LanguageService);
   private readonly dates = inject(DateDisplayService);
+  private readonly logger = inject(LoggerService);
 
   async buildPdf(
     groups: ShoppingSuggestionGroupWithItem[],
@@ -186,7 +188,8 @@ export class ShoppingExportService {
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
-    } catch {
+    } catch (err) {
+      this.logger.warn('ShoppingExportService', 'Failed to load app icon for PDF header', { err });
       return null;
     }
   }

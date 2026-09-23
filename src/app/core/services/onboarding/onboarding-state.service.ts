@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { ANALYTICS_EVENTS, ONBOARDING_QUICK_SEED_ITEMS, ONBOARDING_SLIDES } from '@core/constants';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { LocalStorageService } from '../shared/local-storage.service';
+import { LoggerService } from '../shared/logger.service';
 import type { OnboardingQuickSeedItem } from '@core/constants';
 import { buildAddItemPayload, FRESH_QTY, resolveSuggestedExpiry } from '@core/domain/pantry';
 import { resolveNotificationsConsent } from '@core/domain/notifications/notification.domain';
@@ -48,6 +49,7 @@ export class OnboardingStateService {
   private readonly translate = inject(TranslateService);
   private readonly analytics = inject(AnalyticsService);
   private readonly localStorage = inject(LocalStorageService);
+  private readonly logger = inject(LoggerService);
 
   readonly slideOptions: SwiperOptions = {
     speed: 550,
@@ -173,6 +175,11 @@ export class OnboardingStateService {
       await this.welcomeNotif.scheduleWelcomeNotification();
     }
     await this.goToNextSlide(swiperEl);
+  }
+
+  /** Haptics are best-effort on the seed grid; never block the toggle on it. */
+  logSeedGridHapticsFailure(err: unknown): void {
+    this.logger.warn('OnboardingStateService', 'Seed grid Haptics.impact failed', { err });
   }
 
   /** User postponed notifications on slide 1. */
