@@ -65,6 +65,9 @@ CI (`.github/workflows/ci.yml`) runs lint, check-icons, tests and the production
 2. Run it in the browser (`npm start`) when the change is visible there.
 3. List what only a device can prove — camera, OCR, notifications, native plugins, in-app
    purchases — for manual QA with a debug APK. A green CI has shipped real bugs before.
+4. Before merging `release/X.Y` → `main` (publishing to Play also publishes `docs/` on GitHub
+   Pages): run the `landing-reviewer` agent if the release changed what's free vs PRO or shipped
+   a user-facing feature. The landing page is hand-maintained, not generated — it drifts silently.
 
 ## Known traps
 
