@@ -83,6 +83,7 @@
   },
   "common": {
     "dismiss": "Jetzt nicht",
+    "pressBackAgainToExit": "Zurück nochmal drücken, um die App zu schließen",
     "actions": {
       "close": "Schließen",
       "cancel": "Abbrechen",

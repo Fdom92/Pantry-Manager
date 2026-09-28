@@ -3,8 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { PantryQueryService } from '@core/services/pantry';
-import { LocalStorageService, LoggerService } from '@core/services/shared';
+import { LocalStorageService, LoggerService, ToastService } from '@core/services/shared';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
 import { SyncService } from '@core/services/sync/sync.service';
@@ -48,11 +49,14 @@ export class AppComponent {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly prefs = inject(SettingsPreferencesService);
   private readonly clock = inject(ClockService);
+  private readonly toast = inject(ToastService);
+  private lastExitPromptAt = 0;
 
   constructor() {
     this.redirectToFirstRunFlows();
     void this.initializeApp();
     this.subscribeToNavigation();
+    this.setupExitOnDoubleBack();
   }
 
   /**
@@ -155,6 +159,28 @@ export class AppComponent {
         this.markHandled(url);
         void this.syncService.handleIncomingIntent(url);
       }
+    });
+  }
+
+  /**
+   * "Press back again to exit." Registered at priority -1: Ionic's overlays
+   * (~100) and the router outlet's own back navigation (~0) both get first
+   * crack at the ionBackButton event, so this only fires once there is
+   * nothing left to close or navigate back to — the app root with an empty
+   * stack, where Capacitor's default handler would otherwise exit instantly.
+   */
+  private setupExitOnDoubleBack(): void {
+    if (!Capacitor.isNativePlatform()) return;
+    document.addEventListener('ionBackButton', (ev: Event) => {
+      (ev as CustomEvent).detail.register(-1, () => {
+        const now = Date.now();
+        if (now - this.lastExitPromptAt < 2000) {
+          void CapacitorApp.exitApp();
+          return;
+        }
+        this.lastExitPromptAt = now;
+        this.toast.info('common.pressBackAgainToExit');
+      });
     });
   }
 

@@ -83,6 +83,7 @@
   },
   "common": {
     "dismiss": "Not now",
+    "pressBackAgainToExit": "Press back again to exit",
     "actions": {
       "close": "Close",
       "cancel": "Cancel",

@@ -83,6 +83,7 @@
   },
   "common": {
     "dismiss": "Non ora",
+    "pressBackAgainToExit": "Premi di nuovo indietro per uscire",
     "actions": {
       "close": "Chiudi",
       "cancel": "Annulla",
