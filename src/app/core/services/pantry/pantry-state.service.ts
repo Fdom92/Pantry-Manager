@@ -122,6 +122,15 @@ export class PantryStateService {
     return this.showAllFresh() ? items : items.slice(0, 4);
   });
 
+  /** Collapsed every time the page is entered — despensa is the main list,
+   * and scrolling past an expanded fresh section to reach it was the
+   * complaint. Not persisted: it always starts collapsed. */
+  readonly freshSectionExpanded = signal(false);
+
+  toggleFreshSection(): void {
+    this.freshSectionExpanded.update(v => !v);
+  }
+
   /**
    * Whether the "−" button in the despensa header has anything to offer. With
    * no stock anywhere the consume modal opened onto "Aún no has añadido nada"

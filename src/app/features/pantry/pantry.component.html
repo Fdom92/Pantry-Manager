@@ -74,9 +74,19 @@
   } @else {
     <!-- FRESCOS SECTION -->
     <section class="pantry-section pantry-section--fresh">
-      <header class="pantry-section__header">
+      <header
+        class="pantry-section__header"
+        [class.pantry-section__header--collapsible]="!facade.hasNoFreshAtAll()"
+        (click)="facade.hasNoFreshAtAll() ? null : facade.toggleFreshSection()">
         <h3 class="pantry-section__title">{{ 'pantry.sections.fresh' | translate }}</h3>
-        <button class="pantry-section__add-btn" [attr.aria-label]="'pantry.fresh.addButton' | translate" (click)="facade.openFreshAddModal()">
+        @if (!facade.hasNoFreshAtAll()) {
+          <ion-icon
+            class="pantry-section__chevron"
+            [name]="facade.freshSectionExpanded() ? 'chevron-up-outline' : 'chevron-down-outline'"
+            [attr.aria-label]="(facade.freshSectionExpanded() ? 'common.actions.close' : 'pantry.sections.fresh') | translate">
+          </ion-icon>
+        }
+        <button class="pantry-section__add-btn" [attr.aria-label]="'pantry.fresh.addButton' | translate" (click)="$event.stopPropagation(); facade.openFreshAddModal()">
           <ion-icon name="add-outline"></ion-icon>
         </button>
       </header>
@@ -89,34 +99,36 @@
           [inline]="true"
           [subtitleKey]="'pantry.fresh.emptyState.subtitle'">
         </app-empty-state>
-      } @else if (facade.hasFreshButFilteredEmpty()) {
-        <app-empty-state
-          class="list-empty-state list-empty-state--inline"
-          icon="leaf-outline"
-          [hideTitle]="true"
-          [inline]="true"
-          [subtitleKey]="'pantry.fresh.empty.filters'">
-        </app-empty-state>
-      } @else {
-        <div class="fresh-list">
-          @for (item of facade.visibleFreshItems(); track item._id) {
-            <app-fresh-item-card
-              [item]="item"
-              [now]="facade.now()"
-              (stateChange)="facade.setFreshState($event.item, $event.state)"
-              (editRequested)="facade.openEditModalFromSheet($event)"
-              (basicToggle)="facade.toggleItemBasic($event)">
-            </app-fresh-item-card>
-          }
-        </div>
-        @if (facade.freshItems().length > 4) {
-          <button type="button" class="fresh-show-more" (click)="onToggleShowAllFresh()">
-            @if (!facade.showAllFresh()) {
-              {{ 'pantry.fresh.showMore' | translate:{ count: facade.freshItems().length } }}
-            } @else {
-              {{ 'pantry.fresh.showLess' | translate }}
+      } @else if (facade.freshSectionExpanded()) {
+        @if (facade.hasFreshButFilteredEmpty()) {
+          <app-empty-state
+            class="list-empty-state list-empty-state--inline"
+            icon="leaf-outline"
+            [hideTitle]="true"
+            [inline]="true"
+            [subtitleKey]="'pantry.fresh.empty.filters'">
+          </app-empty-state>
+        } @else {
+          <div class="fresh-list">
+            @for (item of facade.visibleFreshItems(); track item._id) {
+              <app-fresh-item-card
+                [item]="item"
+                [now]="facade.now()"
+                (stateChange)="facade.setFreshState($event.item, $event.state)"
+                (editRequested)="facade.openEditModalFromSheet($event)"
+                (basicToggle)="facade.toggleItemBasic($event)">
+              </app-fresh-item-card>
             }
-          </button>
+          </div>
+          @if (facade.freshItems().length > 4) {
+            <button type="button" class="fresh-show-more" (click)="onToggleShowAllFresh()">
+              @if (!facade.showAllFresh()) {
+                {{ 'pantry.fresh.showMore' | translate:{ count: facade.freshItems().length } }}
+              } @else {
+                {{ 'pantry.fresh.showLess' | translate }}
+              }
+            </button>
+          }
         }
       }
     </section>

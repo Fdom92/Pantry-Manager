@@ -457,6 +457,17 @@ ion-modal.quantity-sheet ion-content {
     margin-top: var(--app-theme-spacing-sm);
   }
 
+  &__header--collapsible {
+    cursor: pointer;
+  }
+
+  &__chevron {
+    color: var(--app-theme-text-muted);
+    font-size: var(--app-theme-icon-size-md);
+    margin-inline-end: auto;
+    padding-inline-start: var(--app-theme-spacing-xs);
+  }
+
   &__title {
     margin: 0;
     font-size: var(--app-theme-font-size-caption);
