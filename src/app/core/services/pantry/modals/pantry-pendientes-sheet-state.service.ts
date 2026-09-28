@@ -51,7 +51,11 @@ export class PantryPendientesSheetStateService {
    * Open the sheet and snapshot every currently-incomplete item into a row.
    */
   open(): void {
-    const items = this.pantryStore.loadedProducts().filter(isIncomplete);
+    // activeProducts, not loadedProducts: a depleted despensa item is invisible
+    // everywhere else (the "pendientes" filter chip in the pantry list uses the
+    // same signal), so it must not show up here either — fixing the expiry date
+    // of something you have zero of isn't a "pendiente" worth asking about.
+    const items = this.pantryStore.activeProducts().filter(isIncomplete);
     this.rows.set(items.map(item => this.buildRow(item)));
     this.isOpen.set(true);
     this.analytics.track(ANALYTICS_EVENTS.PANTRY_PENDIENTES_SHEET_OPENED, { count: items.length });
