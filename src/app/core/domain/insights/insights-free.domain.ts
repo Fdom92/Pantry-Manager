@@ -1,24 +1,10 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
-import { getItemStatusState, hasMissingExpiry, isIncomplete, sumQuantities } from '@core/domain/pantry';
+import { getItemStatusState, sumQuantities } from '@core/domain/pantry';
 import { FOOD_TYPE_PROFILE } from '@core/domain/pantry/food-type-profile.domain';
 import { parseExpiryMs } from '@core/utils/date.util';
 import { NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
-
-export interface InventorySnapshot {
-  total: number;
-  active: number;
-  expired: number;
-  review: number;
-  nearExpiry: number;
-  lowStock: number;
-  basicsOutOfStock: number;
-  noExpiryDate: number;
-  noFoodType: number;
-  pendientes: number;
-  expiredRatio: number;
-}
 
 export interface ActivityMetrics {
   added: number;
@@ -40,58 +26,6 @@ export interface DistributionMetrics {
   foodTypes: { foodType: FoodType; count: number }[];
   mostWastedFoodType: FoodType | null;
   leastRotatingFoodType: FoodType | null;
-}
-
-export function computeInventorySnapshot(items: PantryItem[], now: Date): InventorySnapshot {
-  const result: InventorySnapshot = {
-    total: items.length,
-    active: 0,
-    expired: 0,
-    review: 0,
-    nearExpiry: 0,
-    lowStock: 0,
-    basicsOutOfStock: 0,
-    noExpiryDate: 0,
-    noFoodType: 0,
-    pendientes: 0,
-    expiredRatio: 0,
-  };
-
-  for (const item of items) {
-    const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
-
-    if (state === 'expired') {
-      result.expired += 1;
-    } else {
-      result.active += 1;
-      if (state === 'review') result.review += 1;
-      else if (state === 'near-expiry') result.nearExpiry += 1;
-      else if (state === 'low-stock') result.lowStock += 1;
-    }
-
-    if (item.isBasic === true && sumQuantities(item.batches ?? []) === 0) {
-      result.basicsOutOfStock += 1;
-    }
-
-    // hasMissingExpiry, not a local rule: it counts an item with ANY dateless
-    // batch, which is what the Pendientes chip and its sheet act on. The old
-    // inline check only counted items where NO batch had a date, so a two-lot
-    // product with one date was pending in one screen and fine in another.
-    if (hasMissingExpiry(item)) {
-      result.noExpiryDate += 1;
-    }
-
-    if (!item.foodType) {
-      result.noFoodType += 1;
-    }
-
-    if (isIncomplete(item)) {
-      result.pendientes += 1;
-    }
-  }
-
-  result.expiredRatio = result.total > 0 ? result.expired / result.total : 0;
-  return result;
 }
 
 export function computeActivityMetrics(
@@ -188,36 +122,6 @@ export function computeDistribution(
   }
 
   return { foodTypes, mostWastedFoodType, leastRotatingFoodType };
-}
-
-// ─── Pantry Score ─────────────────────────────────────────────────────────────
-
-export type PantryScoreLabel = 'excellent' | 'good' | 'fair' | 'poor';
-
-export interface PantryScoreResult {
-  score: number;
-  label: PantryScoreLabel;
-}
-
-/**
- * Computes a 0–100 data quality score: % of items with complete data (foodType + expiry).
- * Returns null when fewer than 3 items (not enough signal).
- */
-export function computePantryScore(
-  total: number,
-  pendientes: number,
-): PantryScoreResult | null {
-  if (total < 3) return null;
-
-  const score = Math.round((1 - pendientes / total) * 100);
-
-  let label: PantryScoreLabel;
-  if (score >= 90) label = 'excellent';
-  else if (score >= 70) label = 'good';
-  else if (score >= 50) label = 'fair';
-  else label = 'poor';
-
-  return { score, label };
 }
 
 // ─── Food Coverage ────────────────────────────────────────────────────────────

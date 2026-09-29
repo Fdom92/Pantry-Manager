@@ -65,10 +65,6 @@ export class InsightsComponent {
     void this.navCtrl.navigateRoot('/pantry');
   }
 
-  goToPendientes(): void {
-    void this.facade.goToPendientes();
-  }
-
   ionViewDidEnter(): void {
     this.setupBarObserver();
   }
@@ -109,11 +105,6 @@ export class InsightsComponent {
   getBarWidth(count: number, maxCount: number): string {
     if (maxCount === 0) return '0%';
     return `${Math.round((count / maxCount) * 100)}%`;
-  }
-
-  getQualityBarWidth(count: number, total: number): string {
-    if (total === 0) return '0%';
-    return `${Math.round((count / total) * 100)}%`;
   }
 
   getMaxFoodTypeCount(): number {

@@ -16,16 +16,14 @@ import { ToastService } from '../shared/toast.service';
 import {
   computeActivityMetrics,
   computeDistribution,
-  computeInventorySnapshot,
-  computePantryScore,
   computeFoodCoverage,
+  classifyCoverageLevel,
 } from '@core/domain/insights/insights-free.domain';
 import type {
   ActivityMetrics,
   DistributionMetrics,
-  InventorySnapshot,
-  PantryScoreResult,
   FoodCoverageResult,
+  CoverageLevel,
 } from '@core/domain/insights/insights-free.domain';
 import { getItemStatusState } from '@core/domain/pantry/pantry-status.domain';
 import { sumQuantities } from '@core/domain/pantry/pantry-batch.domain';
@@ -39,13 +37,13 @@ import {
   computePatternSignals,
   computeProductSignals,
 } from '@core/domain/insights/insights-pro-payload.domain';
-import { computeWasteSummary, type WasteSummary } from '@core/domain/insights/waste.domain';
+import { computeWasteSummary, classifyWasteLevel, type WasteSummary, type WasteLevel } from '@core/domain/insights/waste.domain';
 import { computeRepositionPredictions, type RepositionPrediction } from '@core/domain/insights/reposition.domain';
 import type { PantryEvent } from '@core/models/events';
 import { ListManualItemsStore } from '../list/list-manual-items.store';
 import { normalizeLowercase } from '@core/utils/normalization.util';
 
-export type { ActivityMetrics, DistributionMetrics, InventorySnapshot, WasteSummary, RepositionPrediction };
+export type { ActivityMetrics, DistributionMetrics, WasteSummary, RepositionPrediction, CoverageLevel, WasteLevel };
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -99,10 +97,6 @@ export class InsightsStateService {
     return this.clock.now() - new Date(a.generatedAt).getTime() > CACHE_TTL_MS;
   });
 
-  readonly inventorySnapshot = computed((): InventorySnapshot =>
-    computeInventorySnapshot(this.pantryStore.items(), new Date(this.clock.now()))
-  );
-
   readonly activityMetrics = computed((): ActivityMetrics =>
     computeActivityMetrics(this.events(), 30, new Date(this.clock.now()))
   );
@@ -111,17 +105,17 @@ export class InsightsStateService {
     computeDistribution(this.pantryStore.items(), this.events(), new Date(this.clock.now()), 30)
   );
 
-  readonly pantryScore = computed((): PantryScoreResult | null => {
-    const snapshot = this.inventorySnapshot();
-    return computePantryScore(snapshot.total, snapshot.pendientes);
-  });
-
   readonly foodCoverage = computed((): FoodCoverageResult | null => {
     const now = new Date(this.clock.now());
     const activeItems = this.pantryStore.items().filter(
       i => getItemStatusState(i, now, NEAR_EXPIRY_WINDOW_DAYS) !== 'expired'
     );
     return computeFoodCoverage(activeItems, this.householdSize(), now);
+  });
+
+  readonly coverageLevel = computed((): CoverageLevel | null => {
+    const coverage = this.foodCoverage();
+    return coverage ? classifyCoverageLevel(coverage.days) : null;
   });
 
   setHouseholdSize(n: number): void {
@@ -132,6 +126,8 @@ export class InsightsStateService {
   readonly wasteSummary = computed<WasteSummary>(() =>
     computeWasteSummary(this.events(), new Date(this.clock.now()), 30)
   );
+
+  readonly wasteLevel = computed((): WasteLevel => classifyWasteLevel(this.wasteSummary().totalCount));
 
   readonly repositionPredictions = computed<RepositionPrediction[]>(() => {
     const inList = new Set(

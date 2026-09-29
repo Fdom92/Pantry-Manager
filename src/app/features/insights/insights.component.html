@@ -53,29 +53,6 @@
         <app-waste-tracker-card [summary]="facade.wasteSummary()" [isPro]="facade.isPro()" />
       </section>
 
-      <!-- SECTION 2: Tu despensa ahora -->
-      <section class="insights-section">
-        <h3 class="insights-section__title">{{ 'insights.snapshot.title' | translate }}</h3>
-        <div class="snapshot-grid">
-          <div class="metric-card">
-            <span class="metric-card__value">{{ facade.inventorySnapshot().active }}</span>
-            <span class="metric-card__label">{{ 'insights.snapshot.active' | translate }}</span>
-          </div>
-          <div class="metric-card">
-            <span class="metric-card__value">{{ facade.inventorySnapshot().expired }}</span>
-            <span class="metric-card__label">{{ 'insights.snapshot.expired' | translate }}</span>
-          </div>
-          <div class="metric-card">
-            <span class="metric-card__value">{{ facade.inventorySnapshot().review }}</span>
-            <span class="metric-card__label">{{ 'insights.snapshot.review' | translate }}</span>
-          </div>
-          <div class="metric-card">
-            <span class="metric-card__value">{{ facade.inventorySnapshot().noExpiryDate }}</span>
-            <span class="metric-card__label">{{ 'insights.snapshot.noDate' | translate }}</span>
-          </div>
-        </div>
-      </section>
-
       <!-- SECTION 3: Cobertura estimada -->
       @if (facade.foodCoverage()) {
         <section class="insights-section">
@@ -166,75 +143,6 @@
               </p>
             }
           </div>
-        </section>
-      }
-
-      <!-- SECTION 6: Calidad del inventario -->
-      <!-- Only worth showing while something is actually missing. Since the add
-           flows infer food type and expiry, a complete inventory would otherwise
-           render a permanent 100% bar and two empty ones with no action behind
-           them. `pendientes` is the same isIncomplete() predicate that powers the
-           Pendientes chip, so the card and its CTA appear and vanish together. -->
-      @if (facade.inventorySnapshot().total >= 1 && facade.inventorySnapshot().pendientes > 0) {
-        <section class="insights-section">
-          <h3 class="insights-section__title">{{ 'insights.quality.title' | translate }}</h3>
-
-          @if (facade.pantryScore(); as score) {
-            <div class="quality-score" [attr.data-label]="score.label">
-              <span class="quality-score__value">{{ score.score }}</span>
-              <span class="quality-score__label">
-                {{ 'dashboard.pantryScore.' + score.label | translate }}
-              </span>
-            </div>
-          }
-
-          <div class="quality-bars">
-            <div class="quality-bar-row">
-              <span class="quality-bar-row__label">{{ 'insights.quality.withDate' | translate }}</span>
-              <div class="quality-bar-row__track">
-                <div class="quality-bar-row__fill quality-bar-row__fill--good"
-                  [style.width]="barsVisible() ? getQualityBarWidth(
-                    facade.inventorySnapshot().total - facade.inventorySnapshot().noExpiryDate,
-                    facade.inventorySnapshot().total) : '0%'">
-                </div>
-              </div>
-              <span class="quality-bar-row__pct">
-                {{ formatPercent((facade.inventorySnapshot().total - facade.inventorySnapshot().noExpiryDate) / facade.inventorySnapshot().total) }}
-              </span>
-            </div>
-            <div class="quality-bar-row">
-              <span class="quality-bar-row__label">{{ 'insights.quality.noDate' | translate }}</span>
-              <div class="quality-bar-row__track">
-                <div class="quality-bar-row__fill quality-bar-row__fill--warning"
-                  [style.width]="barsVisible() ? getQualityBarWidth(facade.inventorySnapshot().noExpiryDate, facade.inventorySnapshot().total) : '0%'">
-                </div>
-              </div>
-              <span class="quality-bar-row__pct">
-                {{ formatPercent(facade.inventorySnapshot().noExpiryDate / facade.inventorySnapshot().total) }}
-              </span>
-            </div>
-            <div class="quality-bar-row">
-              <span class="quality-bar-row__label">{{ 'insights.quality.noFoodType' | translate }}</span>
-              <div class="quality-bar-row__track">
-                <div class="quality-bar-row__fill quality-bar-row__fill--warning"
-                  [style.width]="barsVisible() ? getQualityBarWidth(facade.inventorySnapshot().noFoodType, facade.inventorySnapshot().total) : '0%'">
-                </div>
-              </div>
-              <span class="quality-bar-row__pct">
-                {{ formatPercent(facade.inventorySnapshot().noFoodType / facade.inventorySnapshot().total) }}
-              </span>
-            </div>
-          </div>
-
-          @if (facade.pantryScore(); as score) {
-            @if (score.score < 100) {
-              <p class="distribution-badge distribution-badge--action" (click)="goToPendientes()">
-                <ion-icon name="pencil-outline"></ion-icon>
-                {{ 'insights.quality.improveTip' | translate }}
-                <ion-icon name="chevron-forward-outline"></ion-icon>
-              </p>
-            }
-          }
         </section>
       }
 
