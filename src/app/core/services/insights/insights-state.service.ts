@@ -1,8 +1,6 @@
 import { Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
-import { NavController } from '@ionic/angular';
 import { toSignal } from '@angular/core/rxjs-interop';
 import type { InsightsAnalysis, InsightsSignalsPayload } from '@core/models/insights/insights-analysis.model';
-import { PantryNavigationPresetService } from '../pantry/pantry-navigation-preset.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { HistoryEventLogService } from '../history/history-event-log.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
@@ -50,8 +48,6 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 @Injectable()
 export class InsightsStateService {
   private readonly pantryStore = inject(PantryStoreService);
-  private readonly navigationPreset = inject(PantryNavigationPresetService);
-  private readonly navCtrl = inject(NavController);
   private readonly eventLog = inject(HistoryEventLogService);
   private readonly revenueCat = inject(UpgradeRevenuecatService);
   private readonly cacheStorage = inject(InsightsCacheStorageService);
@@ -143,15 +139,6 @@ export class InsightsStateService {
     if (this.events().length > 0) return false;
     return this.pantryStore.loadedProducts().length === 0;
   });
-
-  /**
-   * Filters the pantry to pending items and opens the bulk-fix sheet once the
-   * list has loaded (see PantryStateService.ionViewWillEnter).
-   */
-  async goToPendientes(): Promise<void> {
-    this.navigationPreset.setPending({ pendientes: true });
-    await this.navCtrl.navigateRoot('/pantry');
-  }
 
   addRepoPredictionToList(p: RepositionPrediction, surface: 'dashboard' | 'insights' = 'dashboard'): void {
     this.manualItemsStore.addManualItem(p.productName, 'preset');
