@@ -1,0 +1,23 @@
+.insight-pill {
+  display: inline-block;
+  font-size: var(--app-theme-font-size-tiny);
+  font-weight: var(--app-theme-font-weight-bold);
+  padding: 3px 10px;
+  border-radius: var(--app-theme-radius-circle);
+  white-space: nowrap;
+
+  &[data-level='good'] {
+    background: color-mix(in srgb, var(--ion-color-success) 18%, transparent);
+    color: var(--app-theme-success-deep);
+  }
+
+  &[data-level='normal'] {
+    background: color-mix(in srgb, var(--ion-color-warning) 18%, transparent);
+    color: var(--app-theme-warning-deep);
+  }
+
+  &[data-level='bad'] {
+    background: color-mix(in srgb, var(--ion-color-danger) 18%, transparent);
+    color: var(--ion-color-danger);
+  }
+}
