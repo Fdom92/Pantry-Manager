@@ -495,42 +495,30 @@
       "attention": "Prodotti da verificare",
       "optimal": "Inventario aggiornato"
     },
-    "snapshot": {
-      "title": "La tua dispensa ora",
-      "active": "Attivi",
-      "expired": "Scaduti",
-      "review": "Verificare",
-      "noDate": "Senza data",
-      "basicsOut": "Essenziali esauriti",
-      "noExpiry": "Senza data: {{count}} su {{total}} prodotti"
-    },
     "coverage": {
-      "title": "Copertura stimata",
-      "household": "Persone in casa"
+      "title": "Copertura",
+      "household": "Persone in casa",
+      "sentence": "Con quello che hai, duri {{duration}} senza fare la spesa",
+      "level": {
+        "good": "Buona",
+        "normal": "Limitata",
+        "bad": "Bassa"
+      }
     },
     "activity": {
-      "title": "Ultimi 30 giorni",
+      "title": "Rotazione",
       "detail": "Hai aggiunto {{added}} volte e usato {{consumed}} volte questo mese",
       "detailNoAdds": "Hai usato {{consumed}} volte senza aggiungere nulla questo mese",
       "noActivity": "Nessuna attività registrata",
       "rotationHigh": "Rotazione alta",
       "rotationMedium": "Rotazione media",
-      "rotationLow": "Rotazione bassa"
+      "rotationLow": "Rotazione bassa",
+      "windowLabel": "Ultimi 30 giorni"
     },
     "distribution": {
-      "title": "Per tipo di cibo",
+      "title": "Classificazione",
       "mostWasted": "Incidenza maggiore",
       "leastRotating": "Bassa rotazione"
-    },
-    "quality": {
-      "title": "Qualità dell'inventario",
-      "score": "Punteggio",
-      "withDate": "Tracciati",
-      "noDate": "Senza data",
-      "reviewable": "Da verificare",
-      "expired": "Scaduti",
-      "noFoodType": "Senza tipo di alimento",
-      "improveTip": "Completa i dati in Articoli in sospeso"
     },
     "pro": {
       "title": "Analisi IA intelligente",

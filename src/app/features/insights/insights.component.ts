@@ -22,6 +22,7 @@ import { FoodType } from '@core/models/shared/enums.model';
 import { WasteTrackerCardComponent } from '@shared/components/waste-tracker-card/waste-tracker-card.component';
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
+import { InsightStatusPillComponent } from '@shared/components/insight-status-pill/insight-status-pill.component';
 import { DurationPipe } from '@shared/pipes/date-display.pipes';
 
 @Component({
@@ -46,6 +47,7 @@ import { DurationPipe } from '@shared/pipes/date-display.pipes';
     WasteTrackerCardComponent,
     ProPaywallCardComponent,
     EmptyStateComponent,
+    InsightStatusPillComponent,
   ],
   templateUrl: './insights.component.html',
   styleUrls: ['./insights.component.scss'],
@@ -115,6 +117,12 @@ export class InsightsComponent {
 
   getRotationLabel(ratio: 'high' | 'medium' | 'low'): string {
     return `insights.activity.rotation${ratio.charAt(0).toUpperCase()}${ratio.slice(1)}`;
+  }
+
+  getRotationPillLevel(ratio: 'high' | 'medium' | 'low'): 'good' | 'normal' | 'bad' {
+    if (ratio === 'high') return 'good';
+    if (ratio === 'medium') return 'normal';
+    return 'bad';
   }
 
   getFoodTypeLabel(foodType: FoodType): string {

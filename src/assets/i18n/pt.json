@@ -495,42 +495,30 @@
       "attention": "Produtos a verificar",
       "optimal": "Inventário atualizado"
     },
-    "snapshot": {
-      "title": "A tua despensa agora",
-      "active": "Ativos",
-      "expired": "Expirados",
-      "review": "Verificar",
-      "noDate": "Sem data",
-      "basicsOut": "Básicos sem stock",
-      "noExpiry": "Sem data: {{count}} de {{total}} produtos"
-    },
     "coverage": {
-      "title": "Cobertura estimada",
-      "household": "Pessoas em casa"
+      "title": "Cobertura",
+      "household": "Pessoas em casa",
+      "sentence": "Com o que tens, aguentas {{duration}} sem comprar",
+      "level": {
+        "good": "Boa",
+        "normal": "Apertada",
+        "bad": "Baixa"
+      }
     },
     "activity": {
-      "title": "Últimos 30 dias",
+      "title": "Rotação",
       "detail": "Adicionaste {{added}} vezes e usaste {{consumed}} vezes este mês",
       "detailNoAdds": "Usaste {{consumed}} vezes sem adicionar nada este mês",
       "noActivity": "Sem atividade registada",
       "rotationHigh": "Rotação alta",
       "rotationMedium": "Rotação média",
-      "rotationLow": "Rotação baixa"
+      "rotationLow": "Rotação baixa",
+      "windowLabel": "Últimos 30 dias"
     },
     "distribution": {
-      "title": "Por tipo de alimento",
+      "title": "Classificação",
       "mostWasted": "Maior incidência",
       "leastRotating": "Baixa rotação"
-    },
-    "quality": {
-      "title": "Qualidade do inventário",
-      "score": "Pontuação",
-      "withDate": "Rastreados",
-      "noDate": "Sem data",
-      "reviewable": "Revisáveis",
-      "expired": "Expirados",
-      "noFoodType": "Sem tipo de alimento",
-      "improveTip": "Complete os dados em Pendentes"
     },
     "pro": {
       "title": "Análise inteligente com IA",

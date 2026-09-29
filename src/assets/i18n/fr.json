@@ -495,42 +495,30 @@
       "attention": "Produits à vérifier",
       "optimal": "Inventaire à jour"
     },
-    "snapshot": {
-      "title": "Ton garde-manger",
-      "active": "Actifs",
-      "expired": "Périmés",
-      "review": "Vérifier",
-      "noDate": "Sans date",
-      "basicsOut": "Essentiels vides",
-      "noExpiry": "Sans date: {{count}} sur {{total}} produits"
-    },
     "coverage": {
-      "title": "Couverture estimée",
-      "household": "Personnes à la maison"
+      "title": "Couverture",
+      "household": "Personnes à la maison",
+      "sentence": "Avec ce que tu as, tu tiens {{duration}} sans faire de courses",
+      "level": {
+        "good": "Bonne",
+        "normal": "Juste",
+        "bad": "Faible"
+      }
     },
     "activity": {
-      "title": "30 derniers jours",
+      "title": "Rotation",
       "detail": "Tu as ajouté {{added}} fois et utilisé {{consumed}} fois ce mois-ci",
       "detailNoAdds": "Tu as utilisé {{consumed}} fois sans rien ajouter ce mois-ci",
       "noActivity": "Aucune activité enregistrée",
       "rotationHigh": "Rotation élevée",
       "rotationMedium": "Rotation moyenne",
-      "rotationLow": "Rotation faible"
+      "rotationLow": "Rotation faible",
+      "windowLabel": "30 derniers jours"
     },
     "distribution": {
-      "title": "Par type d'aliment",
+      "title": "Classification",
       "mostWasted": "Incidence élevée",
       "leastRotating": "Faible rotation"
-    },
-    "quality": {
-      "title": "Qualité de l'inventaire",
-      "score": "Score",
-      "withDate": "Suivi",
-      "noDate": "Sans date",
-      "reviewable": "À vérifier",
-      "expired": "Périmés",
-      "noFoodType": "Sans type d'aliment",
-      "improveTip": "Complétez les données dans En attente"
     },
     "pro": {
       "title": "Analyse IA intelligente",

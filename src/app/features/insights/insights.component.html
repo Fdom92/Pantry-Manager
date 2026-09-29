@@ -13,31 +13,13 @@
   <div class="insights">
 
     @if (facade.isLoadingEvents()) {
-      <section class="insights-section">
-        <ion-skeleton-text animated style="width: 50%; height: 18px; margin-bottom: 16px; border-radius: 4px;"></ion-skeleton-text>
-        <div class="snapshot-grid">
-          @for (i of [0,1,2,3]; track i) {
-            <ion-skeleton-text animated style="width: 100%; height: 72px; border-radius: 8px;"></ion-skeleton-text>
-          }
-        </div>
-      </section>
-      <section class="insights-section">
-        <ion-skeleton-text animated style="width: 45%; height: 18px; margin-bottom: 16px; border-radius: 4px;"></ion-skeleton-text>
-        <div style="display:flex; justify-content:space-around; gap:8px;">
-          @for (i of [0,1,2]; track i) {
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;">
-              <ion-skeleton-text animated style="width: 55%; height: 28px; border-radius: 4px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 75%; height: 13px; border-radius: 4px;"></ion-skeleton-text>
-            </div>
-          }
-        </div>
-      </section>
-      <section class="insights-section">
-        <ion-skeleton-text animated style="width: 55%; height: 18px; margin-bottom: 16px; border-radius: 4px;"></ion-skeleton-text>
-        @for (i of [0,1,2,3]; track i) {
-          <ion-skeleton-text animated style="width: 100%; height: 14px; margin-top: 10px; border-radius: 4px;"></ion-skeleton-text>
-        }
-      </section>
+      @for (i of [0,1,2,3]; track i) {
+        <section class="insights-section">
+          <ion-skeleton-text animated style="width: 45%; height: 14px; margin-bottom: 12px; border-radius: 4px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 60%; height: 28px; margin-bottom: 8px; border-radius: 4px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 80%; height: 13px; border-radius: 4px;"></ion-skeleton-text>
+        </section>
+      }
     } @else if (facade.isEmpty()) {
       <app-empty-state
         icon="pie-chart-outline"
@@ -53,17 +35,24 @@
         <app-waste-tracker-card [summary]="facade.wasteSummary()" [isPro]="facade.isPro()" />
       </section>
 
-      <!-- SECTION 3: Cobertura estimada -->
-      @if (facade.foodCoverage()) {
+      <!-- SECTION 2: Cobertura -->
+      @if (facade.foodCoverage(); as coverage) {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.coverage.title' | translate }}</h3>
           <div class="coverage-card">
             <ion-icon name="calendar-outline"></ion-icon>
             <div class="coverage-card__info">
-              <span class="coverage-card__value">
-                {{ 'dashboard.foodCoverage.value' | translate:{ duration: (facade.foodCoverage()!.days | appDuration) } }}
+              <div class="coverage-card__headline">
+                <span class="coverage-card__value">
+                  {{ 'dashboard.foodCoverage.value' | translate:{ duration: (coverage.days | appDuration) } }}
+                </span>
+                @if (facade.coverageLevel(); as level) {
+                  <app-insight-status-pill [level]="level" [labelKey]="'insights.coverage.level.' + level" />
+                }
+              </div>
+              <span class="coverage-card__hint">
+                {{ 'insights.coverage.sentence' | translate:{ duration: (coverage.days | appDuration) } }}
               </span>
-              <span class="coverage-card__hint">{{ 'dashboard.foodCoverage.hint' | translate }}</span>
             </div>
           </div>
           <div class="household-selector">
@@ -82,34 +71,34 @@
         </section>
       }
 
-      <!-- SECTION 4: Últimos 30 días — rotation: how much of what you add you actually consume -->
+      <!-- SECTION 3: Rotación — how much of what you add you actually consume -->
       <section class="insights-section">
         <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
         @let rotationRatio = facade.activityMetrics().rotationRatio;
         @if (rotationRatio === null) {
           <p class="activity-empty">{{ 'insights.activity.noActivity' | translate }}</p>
         } @else {
-          @if (facade.activityMetrics().rotationPercent !== null) {
-            <p class="activity-headline">{{ formatPercent(facade.activityMetrics().rotationPercent!) }}</p>
-          }
+          <div class="activity-headline-row">
+            @if (facade.activityMetrics().rotationPercent !== null) {
+              <p class="activity-headline">{{ formatPercent(facade.activityMetrics().rotationPercent!) }}</p>
+            }
+            <app-insight-status-pill [level]="getRotationPillLevel(rotationRatio)" [labelKey]="getRotationLabel(rotationRatio)" />
+          </div>
           <p class="activity-detail">
+            {{ 'insights.activity.windowLabel' | translate }} —
             @if (facade.activityMetrics().added > 0) {
               {{ 'insights.activity.detail' | translate: { consumed: facade.activityMetrics().consumed, added: facade.activityMetrics().added } }}
             } @else {
               {{ 'insights.activity.detailNoAdds' | translate: { consumed: facade.activityMetrics().consumed } }}
             }
           </p>
-          <div class="rotation-badge">
-            <ion-icon name="refresh-outline"></ion-icon>
-            <span>{{ getRotationLabel(rotationRatio) | translate }}</span>
-          </div>
         }
       </section>
 
       <!-- Sentinel: IntersectionObserver triggers bar animations when this enters viewport -->
       <div #barsAnchor></div>
 
-      <!-- SECTION 5: Por tipo de alimento -->
+      <!-- SECTION 4: Clasificación -->
       @if (facade.distribution().foodTypes.length > 0) {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.distribution.title' | translate }}</h3>
@@ -146,7 +135,7 @@
         </section>
       }
 
-      <!-- SECTION 7: PRO analysis / teaser -->
+      <!-- SECTION 5: PRO analysis / teaser -->
       @if (facade.isPro()) {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.pro.title' | translate }}</h3>

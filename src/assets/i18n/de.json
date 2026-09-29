@@ -495,42 +495,30 @@
       "attention": "Produkte zu prüfen",
       "optimal": "Vorrat aktuell"
     },
-    "snapshot": {
-      "title": "Dein Vorrat jetzt",
-      "active": "Aktiv",
-      "expired": "Abgelaufen",
-      "review": "Prüfen",
-      "noDate": "Kein Datum",
-      "basicsOut": "Basis leer",
-      "noExpiry": "Kein Datum: {{count}} von {{total}} Produkten"
-    },
     "coverage": {
-      "title": "Geschätzte Reichweite",
-      "household": "Personen im Haushalt"
+      "title": "Reichweite",
+      "household": "Personen im Haushalt",
+      "sentence": "Mit dem, was du hast, kommst du {{duration}} ohne Einkauf aus",
+      "level": {
+        "good": "Gut",
+        "normal": "Knapp",
+        "bad": "Niedrig"
+      }
     },
     "activity": {
-      "title": "Letzte 30 Tage",
+      "title": "Rotation",
       "detail": "Du hast {{added}} Mal hinzugefügt und {{consumed}} Mal verbraucht in diesem Monat",
       "detailNoAdds": "Du hast {{consumed}} Mal verbraucht, ohne diesen Monat etwas hinzuzufügen",
       "noActivity": "Keine Aktivität aufgezeichnet",
       "rotationHigh": "Hohe Rotation",
       "rotationMedium": "Mittlere Rotation",
-      "rotationLow": "Niedrige Rotation"
+      "rotationLow": "Niedrige Rotation",
+      "windowLabel": "Letzte 30 Tage"
     },
     "distribution": {
-      "title": "Nach Lebensmitteltyp",
+      "title": "Einordnung",
       "mostWasted": "Häufiger abgelaufen",
       "leastRotating": "Niedrige Rotation"
-    },
-    "quality": {
-      "title": "Inventarqualität",
-      "score": "Bewertung",
-      "withDate": "Mit Datum",
-      "noDate": "Ohne Datum",
-      "reviewable": "Zu prüfen",
-      "expired": "Abgelaufen",
-      "noFoodType": "Ohne Lebensmitteltyp",
-      "improveTip": "Daten unter Ausstehende ergänzen"
     },
     "pro": {
       "title": "Intelligente KI-Analyse",

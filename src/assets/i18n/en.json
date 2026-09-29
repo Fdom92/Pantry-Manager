@@ -495,42 +495,30 @@
       "attention": "Items to review",
       "optimal": "Inventory up to date"
     },
-    "snapshot": {
-      "title": "Your pantry now",
-      "active": "Active",
-      "expired": "Expired",
-      "review": "Check",
-      "noDate": "No date",
-      "basicsOut": "Basics out",
-      "noExpiry": "No date: {{count}} of {{total}} items"
-    },
     "coverage": {
-      "title": "Estimated coverage",
-      "household": "People at home"
+      "title": "Coverage",
+      "household": "People at home",
+      "sentence": "With what you have, you'll last {{duration}} without shopping",
+      "level": {
+        "good": "Good",
+        "normal": "Tight",
+        "bad": "Low"
+      }
     },
     "activity": {
-      "title": "Last 30 days",
+      "title": "Rotation",
       "detail": "You added {{added}} times and used {{consumed}} times this month",
       "detailNoAdds": "You used {{consumed}} times without adding anything this month",
       "noActivity": "No activity recorded",
       "rotationHigh": "High rotation",
       "rotationMedium": "Medium rotation",
-      "rotationLow": "Low rotation"
+      "rotationLow": "Low rotation",
+      "windowLabel": "Last 30 days"
     },
     "distribution": {
-      "title": "By food type",
+      "title": "Breakdown",
       "mostWasted": "Higher incidence",
       "leastRotating": "Low rotation"
-    },
-    "quality": {
-      "title": "Inventory quality",
-      "score": "Score",
-      "withDate": "Tracked",
-      "noDate": "No date",
-      "reviewable": "Reviewable",
-      "expired": "Expired",
-      "noFoodType": "Without food type",
-      "improveTip": "Complete data in Pending items"
     },
     "pro": {
       "title": "Smart AI analysis",
