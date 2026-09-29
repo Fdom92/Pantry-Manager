@@ -288,3 +288,15 @@ export function computeFoodCoverage(
   return { days: Math.max(1, Math.floor(totalPortions / portionsPerDay)) };
 }
 
+export type CoverageLevel = 'good' | 'normal' | 'bad';
+
+/**
+ * Same caveat as classifyWasteLevel: reasonable starting thresholds, not
+ * derived from real data yet.
+ */
+export function classifyCoverageLevel(days: number): CoverageLevel {
+  if (days < 3) return 'bad';
+  if (days <= 7) return 'normal';
+  return 'good';
+}
+

@@ -5,6 +5,7 @@ import {
   computeInventorySnapshot,
   computePantryScore,
   computeFoodCoverage,
+  classifyCoverageLevel,
 } from './insights-free.domain';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
@@ -392,6 +393,23 @@ describe('computeFoodCoverage', () => {
     ];
     const result = computeFoodCoverage(items, 1, new Date())!;
     expect(result.days).toBeGreaterThan(0);
+  });
+});
+
+describe('classifyCoverageLevel', () => {
+  it('is bad below 3 days', () => {
+    expect(classifyCoverageLevel(0)).toBe('bad');
+    expect(classifyCoverageLevel(2)).toBe('bad');
+  });
+
+  it('is normal between 3 and 7 days', () => {
+    expect(classifyCoverageLevel(3)).toBe('normal');
+    expect(classifyCoverageLevel(7)).toBe('normal');
+  });
+
+  it('is good above 7 days', () => {
+    expect(classifyCoverageLevel(8)).toBe('good');
+    expect(classifyCoverageLevel(30)).toBe('good');
   });
 });
 
