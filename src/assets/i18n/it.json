@@ -552,6 +552,13 @@
       "title": "Ancora nessun insight",
       "body": "Aggiungi prodotti alla tua dispensa per vedere i modelli di consumo, le previsioni e gli sprechi.",
       "cta": "Vai alla dispensa"
+    },
+    "waste": {
+      "level": {
+        "good": "Nessuno spreco",
+        "normal": "Normale",
+        "bad": "Alto"
+      }
     }
   },
   "pantry": {

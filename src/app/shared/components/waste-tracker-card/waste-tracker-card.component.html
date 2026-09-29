@@ -3,9 +3,12 @@
 @if (isEmptyZeroWaste()) {
   <p class="waste-card__zero">{{ 'dashboard.waste.zero' | translate }}</p>
 } @else {
-  <p class="waste-card__count">
-    {{ (summary().totalCount === 1 ? 'dashboard.waste.count_one' : 'dashboard.waste.count') | translate: { count: summary().totalCount } }}
-  </p>
+  <div class="waste-card__count-row">
+    <p class="waste-card__count">
+      {{ (summary().totalCount === 1 ? 'dashboard.waste.count_one' : 'dashboard.waste.count') | translate: { count: summary().totalCount } }}
+    </p>
+    <app-insight-status-pill [level]="level()" [labelKey]="levelLabelKey()" />
+  </div>
   @if (isPro()) {
     @if (topCategoryLabel(); as topCategory) {
       <p class="waste-card__top">

@@ -4,8 +4,9 @@ import { IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { AnalyticsService } from '@core/services/analytics/analytics.service';
 import { ANALYTICS_EVENTS } from '@core/constants';
-import type { WasteSummary } from '@core/domain/insights/waste.domain';
+import { classifyWasteLevel, type WasteSummary } from '@core/domain/insights/waste.domain';
 import { formatFriendlyName } from '@core/utils/normalization.util';
+import { InsightStatusPillComponent } from '@shared/components/insight-status-pill/insight-status-pill.component';
 
 /**
  * Waste summary card. The total count (or zero-waste state) is shown to
@@ -19,6 +20,7 @@ import { formatFriendlyName } from '@core/utils/normalization.util';
     TranslateModule,
     RouterLink,
     IonIcon,
+    InsightStatusPillComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './waste-tracker-card.component.html',
@@ -31,6 +33,8 @@ export class WasteTrackerCardComponent {
   readonly isPro = input.required<boolean>();
 
   readonly isEmptyZeroWaste = computed(() => this.summary().totalCount === 0);
+  readonly level = computed(() => classifyWasteLevel(this.summary().totalCount));
+  readonly levelLabelKey = computed(() => `insights.waste.level.${this.level()}`);
 
   readonly topCategoryLabel = computed<string | null>(() => {
     const top = this.summary().byCategory[0];

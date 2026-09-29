@@ -552,6 +552,13 @@
       "title": "Aún no hay insights",
       "body": "Añade productos a tu despensa para ver patrones de consumo, predicciones y desperdicio.",
       "cta": "Ir a despensa"
+    },
+    "waste": {
+      "level": {
+        "good": "Sin desperdicio",
+        "normal": "Normal",
+        "bad": "Alto"
+      }
     }
   },
   "pantry": {

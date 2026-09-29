@@ -10,8 +10,13 @@
     margin: 0 0 var(--app-theme-spacing-md);
   }
 
-  // Matches .metric-card__value / .activity-headline — the other "big
-  // number" headlines on this page.
+  &__count-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--app-theme-spacing-sm);
+  }
+
+  // Matches .activity-headline — the other "big number" headline on this page.
   &__count,
   &__zero {
     font-size: var(--app-theme-font-size-3xl);
