@@ -370,7 +370,7 @@ export class PantryReceiptScanModalStateService {
         return { ...l, noExpiry: toggled || undefined, expirationDate: toggled ? undefined : l.expirationDate, dateFromUser: true };
       }),
     );
-    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'expiration_date' });
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'no_expiry' });
   }
 
   displayName(line: ReceiptReviewLine): string {
