@@ -172,9 +172,7 @@ export class PantryReceiptScanModalStateService {
         // Reuse the same match/fresh predicates the rest of the service uses,
         // so "what can this line infer" never drifts from "what can this line
         // edit" (canEditFoodType/canEditExpiry below read the same predicates).
-        const foodType = this.isAutoMatch(base) ? (matchedItem!.foodType ?? null) : inferFoodType(item.rawName);
-        const suggested = this.isFreshMatch(base) ? {} : resolveSuggestedExpiry(item.rawName, foodType, new Date());
-        return { ...base, foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
+        return { ...base, ...this.deriveLineFields(base) };
       });
 
       this.reviewLines.set(lines);
@@ -280,16 +278,16 @@ export class PantryReceiptScanModalStateService {
               ? this.pantryStore.loadedProducts().find(i => i._id === rematch.id) ?? null
               : null;
             this.reviewLines.update(lines =>
-              lines.map(l =>
-                l.id === id
-                  ? {
-                      ...l,
-                      parsed: { ...l.parsed, rawName: name },
-                      match: matchedItem,
-                      matchScore: rematch?.score ?? 0,
-                    }
-                  : l,
-              ),
+              lines.map(l => {
+                if (l.id !== id) return l;
+                const updated: ReceiptReviewLine = {
+                  ...l,
+                  parsed: { ...l.parsed, rawName: name },
+                  match: matchedItem,
+                  matchScore: rematch?.score ?? 0,
+                };
+                return { ...updated, ...this.deriveLineFields(updated) };
+              }),
             );
             this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'name' });
           },
@@ -307,6 +305,23 @@ export class PantryReceiptScanModalStateService {
   /** True when the auto-matched item is a fresh product (restocked, not lotted). */
   isFreshMatch(line: ReceiptReviewLine): boolean {
     return this.isAutoMatch(line) && line.match!.productType === 'fresh';
+  }
+
+  /**
+   * What classifyInference for a line should be: type from the match (or
+   * inferred from the name), expiry from the type (or kept if the user
+   * already chose one). Shared by startScan (first pass) and editLineName
+   * (a rematch can flip a line between new/matched, which changes what both
+   * fields should be) so the two can't drift into different answers for the
+   * same question.
+   */
+  private deriveLineFields(line: ReceiptReviewLine): Pick<ReceiptReviewLine, 'foodType' | 'expirationDate' | 'noExpiry'> {
+    const foodType = this.isAutoMatch(line) ? (line.match!.foodType ?? null) : inferFoodType(line.parsed.rawName);
+    if (line.dateFromUser && (line.expirationDate || line.noExpiry)) {
+      return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry };
+    }
+    const suggested = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date());
+    return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
   }
 
   /**
