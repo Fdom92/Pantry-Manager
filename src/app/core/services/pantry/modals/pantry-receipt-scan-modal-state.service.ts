@@ -8,7 +8,7 @@ import { createDocumentId } from '@core/utils/uuid.util';
 import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
-import { resolveSuggestedExpiry, toLotExpiry, inferFoodType, expiryAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
+import { resolveSuggestedExpiry, inferFoodType, expiryAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
 import { classifyNativeDismissal } from '@core/domain/shared';
 import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
@@ -402,7 +402,8 @@ export class PantryReceiptScanModalStateService {
             ? restockFreshItem(matchedItem, timestamp, generateBatchId())
             : await this.pantryStore.addNewLot(matchedItem._id, {
                 quantity: line.quantity,
-                ...toLotExpiry(resolveSuggestedExpiry(matchedItem.name, matchedItem.foodType, new Date(timestamp))),
+                expiryDate: line.expirationDate,
+                noExpiry: line.noExpiry,
               });
           if (updated) {
             await this.pantryStore.updateItem(updated);
@@ -415,6 +416,10 @@ export class PantryReceiptScanModalStateService {
             nowIso: timestamp,
             name: formatReceiptName(line.parsed.rawName),
             quantity: line.quantity,
+            foodType: line.foodType ?? undefined,
+            expirationDate: line.expirationDate,
+            noExpiry: line.noExpiry,
+            inferExpiry: false,
           });
           const item: PantryItem = {
             ...base,
@@ -429,7 +434,7 @@ export class PantryReceiptScanModalStateService {
           source: 'receipt_scan',
           is_new: !this.isAutoMatch(line),
           quantity: line.quantity,
-          has_expiry: false,
+          has_expiry: Boolean(line.expirationDate),
         });
         added++;
       }
