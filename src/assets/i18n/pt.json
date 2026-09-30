@@ -883,7 +883,8 @@
       "promptGallery": "Escolher da galeria",
       "promptCamera": "Tirar foto",
       "matchFresh": "Será marcado como disponível",
-      "pickerError": "Não foi possível abrir a câmara ou a galeria. Tenta de novo."
+      "pickerError": "Não foi possível abrir a câmara ou a galeria. Tenta de novo.",
+      "toggleDetails": "Ver tipo e validade"
     },
     "deleteWithStock": {
       "header": "Já acabou?",
