@@ -883,7 +883,8 @@
       "promptGallery": "Aus Galerie wählen",
       "promptCamera": "Foto aufnehmen",
       "matchFresh": "Wird als vorhanden markiert",
-      "pickerError": "Kamera oder Galerie konnten nicht geöffnet werden. Bitte versuche es erneut."
+      "pickerError": "Kamera oder Galerie konnten nicht geöffnet werden. Bitte versuche es erneut.",
+      "toggleDetails": "Typ und Ablaufdatum anzeigen"
     },
     "deleteWithStock": {
       "header": "Alles aufgebraucht?",

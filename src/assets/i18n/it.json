@@ -883,7 +883,8 @@
       "promptGallery": "Scegli dalla galleria",
       "promptCamera": "Scatta foto",
       "matchFresh": "Verrà segnato come disponibile",
-      "pickerError": "Impossibile aprire la fotocamera o la galleria. Riprova."
+      "pickerError": "Impossibile aprire la fotocamera o la galleria. Riprova.",
+      "toggleDetails": "Mostra tipo e scadenza"
     },
     "deleteWithStock": {
       "header": "Finito?",

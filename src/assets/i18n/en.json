@@ -883,7 +883,8 @@
       "promptGallery": "Choose from gallery",
       "promptCamera": "Take photo",
       "matchFresh": "Will be marked as in stock",
-      "pickerError": "Couldn't open the camera or gallery. Please try again."
+      "pickerError": "Couldn't open the camera or gallery. Please try again.",
+      "toggleDetails": "Show type and expiry"
     },
     "deleteWithStock": {
       "header": "All finished?",

@@ -883,7 +883,8 @@
       "promptGallery": "Choisir dans la galerie",
       "promptCamera": "Prendre une photo",
       "matchFresh": "Sera marqué comme disponible",
-      "pickerError": "Impossible d'ouvrir l'appareil photo ou la galerie. Réessaie."
+      "pickerError": "Impossible d'ouvrir l'appareil photo ou la galerie. Réessaie.",
+      "toggleDetails": "Voir le type et la date de péremption"
     },
     "deleteWithStock": {
       "header": "Terminé ?",

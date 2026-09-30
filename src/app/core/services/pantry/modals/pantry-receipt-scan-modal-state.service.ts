@@ -8,11 +8,12 @@ import { createDocumentId } from '@core/utils/uuid.util';
 import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
-import { resolveSuggestedExpiry, toLotExpiry } from '@core/domain/pantry/food-type-inference.domain';
+import { resolveSuggestedExpiry, inferFoodType, expiryAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
 import { classifyNativeDismissal } from '@core/domain/shared';
 import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
 import type { PantryItem } from '@core/models/pantry';
+import type { FoodType } from '@core/models/shared/enums.model';
 import { PantryStoreService } from '../pantry-store.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
@@ -155,14 +156,23 @@ export class PantryReceiptScanModalStateService {
       const lines: ReceiptReviewLine[] = items.map((item, index) => {
         const match = matchReceiptName(item.rawName, candidates);
         const matchedItem = match ? itemsById.get(match.id) ?? null : null;
-        return {
+        const base: ReceiptReviewLine = {
           id: index,
           parsed: item,
           match: matchedItem,
           matchScore: match?.score ?? 0,
           included: item.confidence !== 'low',
           quantity: item.quantity,
+          foodType: null,
+          expirationDate: undefined,
+          noExpiry: undefined,
+          dateFromUser: false,
+          expanded: false,
         };
+        // Reuse the same match/fresh predicates the rest of the service uses,
+        // so "what can this line infer" never drifts from "what can this line
+        // edit" (canEditFoodType/canEditExpiry below read the same predicates).
+        return { ...base, ...this.deriveLineFields(base) };
       });
 
       this.reviewLines.set(lines);
@@ -268,16 +278,16 @@ export class PantryReceiptScanModalStateService {
               ? this.pantryStore.loadedProducts().find(i => i._id === rematch.id) ?? null
               : null;
             this.reviewLines.update(lines =>
-              lines.map(l =>
-                l.id === id
-                  ? {
-                      ...l,
-                      parsed: { ...l.parsed, rawName: name },
-                      match: matchedItem,
-                      matchScore: rematch?.score ?? 0,
-                    }
-                  : l,
-              ),
+              lines.map(l => {
+                if (l.id !== id) return l;
+                const updated: ReceiptReviewLine = {
+                  ...l,
+                  parsed: { ...l.parsed, rawName: name },
+                  match: matchedItem,
+                  matchScore: rematch?.score ?? 0,
+                };
+                return { ...updated, ...this.deriveLineFields(updated) };
+              }),
             );
             this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'name' });
           },
@@ -295,6 +305,87 @@ export class PantryReceiptScanModalStateService {
   /** True when the auto-matched item is a fresh product (restocked, not lotted). */
   isFreshMatch(line: ReceiptReviewLine): boolean {
     return this.isAutoMatch(line) && line.match!.productType === 'fresh';
+  }
+
+  /**
+   * What classifyInference for a line should be: type from the match (or
+   * inferred from the name), expiry from the type (or kept if the user
+   * already chose one). Shared by startScan (first pass) and editLineName
+   * (a rematch can flip a line between new/matched, which changes what both
+   * fields should be) so the two can't drift into different answers for the
+   * same question.
+   */
+  private deriveLineFields(line: ReceiptReviewLine): Pick<ReceiptReviewLine, 'foodType' | 'expirationDate' | 'noExpiry'> {
+    const foodType = this.isAutoMatch(line) ? (line.match!.foodType ?? null) : inferFoodType(line.parsed.rawName);
+    if (line.dateFromUser && (line.expirationDate || line.noExpiry)) {
+      return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry };
+    }
+    const suggested = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date());
+    return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
+  }
+
+  /**
+   * Type belongs to the product, not this lot — a matched line reuses the
+   * existing product's own type and can't repoint it from the ticket.
+   */
+  canEditFoodType(line: ReceiptReviewLine): boolean {
+    return !this.isAutoMatch(line);
+  }
+
+  /** Fresh matches restock via state (sufficient/low/none), no lot/date at all. */
+  canEditExpiry(line: ReceiptReviewLine): boolean {
+    return !this.isFreshMatch(line);
+  }
+
+  /** Whether this line has anything worth expanding the accordion for. */
+  canExpand(line: ReceiptReviewLine): boolean {
+    return this.canEditFoodType(line) || this.canEditExpiry(line);
+  }
+
+  toggleExpanded(id: number): void {
+    this.reviewLines.update(lines =>
+      lines.map(l => (l.id === id ? { ...l, expanded: !l.expanded } : l)),
+    );
+  }
+
+  /**
+   * Set the food type for a line. Re-suggests the expiry from the new type
+   * unless the user already set a date themselves — same rule as the manual
+   * add flow's setEntryFoodType.
+   */
+  setLineFoodType(id: number, foodType: FoodType): void {
+    this.reviewLines.update(lines =>
+      lines.map(l =>
+        l.id === id
+          ? { ...l, foodType, ...expiryAfterFoodTypeChange(l, foodType, new Date()) }
+          : l,
+      ),
+    );
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'food_type' });
+  }
+
+  /** Set or clear the expiry date for a line. A cleared date is a decision too. */
+  setLineExpirationDate(id: number, date: string | undefined): void {
+    this.reviewLines.update(lines =>
+      lines.map(l =>
+        l.id === id
+          ? { ...l, expirationDate: date || undefined, noExpiry: date ? undefined : l.noExpiry, dateFromUser: true }
+          : l,
+      ),
+    );
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'expiration_date' });
+  }
+
+  /** Toggle "intentionally no expiry" for a line. Clears the date either way it lands. */
+  setLineNoExpiry(id: number): void {
+    this.reviewLines.update(lines =>
+      lines.map(l => {
+        if (l.id !== id) return l;
+        const toggled = !l.noExpiry;
+        return { ...l, noExpiry: toggled || undefined, expirationDate: toggled ? undefined : l.expirationDate, dateFromUser: true };
+      }),
+    );
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'no_expiry' });
   }
 
   displayName(line: ReceiptReviewLine): string {
@@ -326,7 +417,8 @@ export class PantryReceiptScanModalStateService {
             ? restockFreshItem(matchedItem, timestamp, generateBatchId())
             : await this.pantryStore.addNewLot(matchedItem._id, {
                 quantity: line.quantity,
-                ...toLotExpiry(resolveSuggestedExpiry(matchedItem.name, matchedItem.foodType, new Date(timestamp))),
+                expiryDate: line.expirationDate,
+                noExpiry: line.noExpiry,
               });
           if (updated) {
             await this.pantryStore.updateItem(updated);
@@ -339,6 +431,10 @@ export class PantryReceiptScanModalStateService {
             nowIso: timestamp,
             name: formatReceiptName(line.parsed.rawName),
             quantity: line.quantity,
+            foodType: line.foodType ?? undefined,
+            expirationDate: line.expirationDate,
+            noExpiry: line.noExpiry,
+            inferExpiry: false,
           });
           const item: PantryItem = {
             ...base,
@@ -353,7 +449,7 @@ export class PantryReceiptScanModalStateService {
           source: 'receipt_scan',
           is_new: !this.isAutoMatch(line),
           quantity: line.quantity,
-          has_expiry: false,
+          has_expiry: Boolean(line.expirationDate),
         });
         added++;
       }
