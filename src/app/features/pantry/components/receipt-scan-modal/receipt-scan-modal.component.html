@@ -139,6 +139,7 @@
                         class="receipt-line__expand-btn"
                         (click)="state.toggleExpanded(line.id)"
                         [attr.aria-expanded]="line.expanded"
+                        [attr.aria-controls]="'receipt-line-details-' + line.id"
                         [attr.aria-label]="'pantry.receiptScan.toggleDetails' | translate">
                         <ion-icon [name]="line.expanded ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
                       </button>
@@ -146,7 +147,7 @@
                   </div>
 
                   @if (line.expanded && state.canExpand(line)) {
-                    <div class="receipt-line__details">
+                    <div class="receipt-line__details" [id]="'receipt-line-details-' + line.id">
                       @if (state.canEditFoodType(line)) {
                         <app-food-type-picker
                           [foodType]="line.foodType"
