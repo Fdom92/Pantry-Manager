@@ -55,6 +55,58 @@
     } @else {
       <div class="suggestion-groups fade-in-list">
 
+        <ng-template #suggestionRow let-suggestion="suggestion">
+          <ion-item
+            detail="false"
+            role="button"
+            tabindex="0"
+            class="suggestion-item pressable"
+            [class.suggestion-item--exiting]="isExiting(suggestion.item._id)"
+            (click)="facade.openRowActions({ kind: 'auto', id: suggestion.item._id, name: suggestion.item.name })">
+            <div class="item-body" slot="start">
+              <span class="item-name">{{ suggestion.item.name }}</span>
+              @let detail = suggestionDetail(suggestion);
+              @if (detail) {
+                <span class="item-qty">{{ detail.key | translate:detail.params }}</span>
+              }
+            </div>
+            <ion-button
+              slot="end"
+              fill="solid"
+              [color]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'success' : 'primary'"
+              shape="round"
+              class="buy-btn"
+              (click)="$event.stopPropagation(); onBuyTap(suggestion)">
+              <ion-icon
+                slot="icon-only"
+                [name]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'leaf-outline' : 'cart-outline'">
+              </ion-icon>
+            </ion-button>
+          </ion-item>
+        </ng-template>
+
+        <ng-template #manualRow let-manual="manual">
+          <ion-item
+            detail="false"
+            role="button"
+            tabindex="0"
+            class="suggestion-item pressable"
+            (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
+            <div class="item-body" slot="start">
+              <span class="item-name">{{ manual.name }}</span>
+            </div>
+            <ion-button
+              slot="end"
+              fill="solid"
+              color="primary"
+              shape="round"
+              class="buy-btn"
+              (click)="$event.stopPropagation(); buySheet.openSheetForManual(manual.id, manual.name)">
+              <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ng-template>
+
         @if (facade.groupBySupermarket()) {
           @for (group of state.groupedSuggestions; track group.key) {
             @let groupManuals = (group.key === UNASSIGNED_KEY) ? facade.visibleManualItems() : [];
@@ -75,54 +127,10 @@
                 @if (!isGroupCollapsed(group.key)) {
                   <ion-list class="item-list" lines="none">
                     @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
-                      <ion-item
-                        detail="false"
-                        role="button"
-                        tabindex="0"
-                        class="suggestion-item pressable"
-                        [class.suggestion-item--exiting]="isExiting(suggestion.item._id)"
-                        (click)="facade.openRowActions({ kind: 'auto', id: suggestion.item._id, name: suggestion.item.name })">
-                        <div class="item-body" slot="start">
-                          <span class="item-name">{{ suggestion.item.name }}</span>
-                          @let detail = suggestionDetail(suggestion);
-                          @if (detail) {
-                            <span class="item-qty">{{ detail.key | translate:detail.params }}</span>
-                          }
-                        </div>
-                        <ion-button
-                          slot="end"
-                          fill="solid"
-                          [color]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'success' : 'primary'"
-                          shape="round"
-                          class="buy-btn"
-                          (click)="$event.stopPropagation(); onBuyTap(suggestion)">
-                          <ion-icon
-                            slot="icon-only"
-                            [name]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'leaf-outline' : 'cart-outline'">
-                          </ion-icon>
-                        </ion-button>
-                      </ion-item>
+                      <ng-container [ngTemplateOutlet]="suggestionRow" [ngTemplateOutletContext]="{ suggestion }"></ng-container>
                     }
                     @for (manual of groupManuals; track manual.id) {
-                      <ion-item
-                        detail="false"
-                        role="button"
-                        tabindex="0"
-                        class="suggestion-item pressable"
-                        (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
-                        <div class="item-body" slot="start">
-                          <span class="item-name">{{ manual.name }}</span>
-                        </div>
-                        <ion-button
-                          slot="end"
-                          fill="solid"
-                          color="primary"
-                          shape="round"
-                          class="buy-btn"
-                          (click)="$event.stopPropagation(); buySheet.openSheetForManual(manual.id, manual.name)">
-                          <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                        </ion-button>
-                      </ion-item>
+                      <ng-container [ngTemplateOutlet]="manualRow" [ngTemplateOutletContext]="{ manual }"></ng-container>
                     }
                   </ion-list>
                 }
@@ -145,25 +153,7 @@
               @if (!isGroupCollapsed(UNASSIGNED_KEY)) {
                 <ion-list class="item-list" lines="none">
                   @for (manual of facade.visibleManualItems(); track manual.id) {
-                    <ion-item
-                      detail="false"
-                      role="button"
-                      tabindex="0"
-                      class="suggestion-item pressable"
-                      (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
-                      <div class="item-body" slot="start">
-                        <span class="item-name">{{ manual.name }}</span>
-                      </div>
-                      <ion-button
-                        slot="end"
-                        fill="solid"
-                        color="primary"
-                        shape="round"
-                        class="buy-btn"
-                        (click)="$event.stopPropagation(); buySheet.openSheetForManual(manual.id, manual.name)">
-                        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                      </ion-button>
-                    </ion-item>
+                    <ng-container [ngTemplateOutlet]="manualRow" [ngTemplateOutletContext]="{ manual }"></ng-container>
                   }
                 </ion-list>
               }
@@ -172,54 +162,10 @@
         } @else {
           <ion-list class="item-list" lines="none">
             @for (suggestion of state.suggestions; track facade.getSuggestionTrackId(suggestion)) {
-              <ion-item
-                detail="false"
-                role="button"
-                tabindex="0"
-                class="suggestion-item pressable"
-                [class.suggestion-item--exiting]="isExiting(suggestion.item._id)"
-                (click)="facade.openRowActions({ kind: 'auto', id: suggestion.item._id, name: suggestion.item.name })">
-                <div class="item-body" slot="start">
-                  <span class="item-name">{{ suggestion.item.name }}</span>
-                  @let detail = suggestionDetail(suggestion);
-                  @if (detail) {
-                    <span class="item-qty">{{ detail.key | translate:detail.params }}</span>
-                  }
-                </div>
-                <ion-button
-                  slot="end"
-                  fill="solid"
-                  [color]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'success' : 'primary'"
-                  shape="round"
-                  class="buy-btn"
-                  (click)="$event.stopPropagation(); onBuyTap(suggestion)">
-                  <ion-icon
-                    slot="icon-only"
-                    [name]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'leaf-outline' : 'cart-outline'">
-                  </ion-icon>
-                </ion-button>
-              </ion-item>
+              <ng-container [ngTemplateOutlet]="suggestionRow" [ngTemplateOutletContext]="{ suggestion }"></ng-container>
             }
             @for (manual of facade.visibleManualItems(); track manual.id) {
-              <ion-item
-                detail="false"
-                role="button"
-                tabindex="0"
-                class="suggestion-item pressable"
-                (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
-                <div class="item-body" slot="start">
-                  <span class="item-name">{{ manual.name }}</span>
-                </div>
-                <ion-button
-                  slot="end"
-                  fill="solid"
-                  color="primary"
-                  shape="round"
-                  class="buy-btn"
-                  (click)="$event.stopPropagation(); buySheet.openSheetForManual(manual.id, manual.name)">
-                  <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                </ion-button>
-              </ion-item>
+              <ng-container [ngTemplateOutlet]="manualRow" [ngTemplateOutletContext]="{ manual }"></ng-container>
             }
           </ion-list>
         }
