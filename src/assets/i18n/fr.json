@@ -371,6 +371,10 @@
   "shopping": {
     "title": "Liste de courses",
     "unassignedSupermarket": "N’importe quel supermarché",
+    "groupToggle": {
+      "flat": "Grouper par supermarché",
+      "grouped": "Vue liste"
+    },
     "reasons": {
       "below-min": "Stock faible",
       "empty": "Rupture de stock"

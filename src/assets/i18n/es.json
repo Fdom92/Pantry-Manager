@@ -371,6 +371,10 @@
   "shopping": {
     "title": "Lista de la compra",
     "unassignedSupermarket": "Cualquier supermercado",
+    "groupToggle": {
+      "flat": "Agrupar por supermercado",
+      "grouped": "Vista plana"
+    },
     "reasons": {
       "below-min": "Bajo stock",
       "empty": "Sin stock"
