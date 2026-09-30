@@ -240,17 +240,7 @@
     "context": {
       "recentlyAdded": "{{ count }} productos añadidos recientemente"
     },
-    "pantryScore": {
-      "title": "Salud de la despensa",
-      "hint": "Puntuación basada en caducidades, stock y organización de tu despensa",
-      "excellent": "Excelente",
-      "good": "Bastante bien",
-      "fair": "Mejorable",
-      "poor": "Necesita atención"
-    },
     "foodCoverage": {
-      "title": "Cobertura estimada",
-      "hint": "Estimación basada en los productos de tu despensa",
       "value": "≈ {{duration}} de comida"
     },
     "summary": {

@@ -240,17 +240,7 @@
     "context": {
       "recentlyAdded": "{{ count }} produits récemment ajoutés"
     },
-    "pantryScore": {
-      "title": "Santé du garde-manger",
-      "hint": "Score basé sur les dates d'expiration, le stock et l'organisation de votre garde-manger",
-      "excellent": "Excellent",
-      "good": "Plutôt bien",
-      "fair": "Améliorable",
-      "poor": "Nécessite attention"
-    },
     "foodCoverage": {
-      "title": "Couverture estimée",
-      "hint": "Estimation basée sur les produits de votre garde-manger",
       "value": "≈ {{duration}} de nourriture"
     },
     "summary": {

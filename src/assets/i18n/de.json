@@ -240,17 +240,7 @@
     "context": {
       "recentlyAdded": "{{ count }} kürzlich hinzugefügte Produkte"
     },
-    "pantryScore": {
-      "title": "Vorratsgesundheit",
-      "hint": "Bewertung basierend auf Ablaufdaten, Vorrat und Organisation deiner Speisekammer",
-      "excellent": "Ausgezeichnet",
-      "good": "Ziemlich gut",
-      "fair": "Verbesserungswürdig",
-      "poor": "Braucht Aufmerksamkeit"
-    },
     "foodCoverage": {
-      "title": "Geschätzte Reichweite",
-      "hint": "Schätzung basierend auf den Produkten in deiner Speisekammer",
       "value": "≈ {{duration}} Lebensmittel"
     },
     "summary": {

@@ -240,17 +240,7 @@
     "context": {
       "recentlyAdded": "{{ count }} prodotti aggiunti di recente"
     },
-    "pantryScore": {
-      "title": "Salute della dispensa",
-      "hint": "Punteggio basato su scadenze, scorte e organizzazione della tua dispensa",
-      "excellent": "Eccellente",
-      "good": "Abbastanza bene",
-      "fair": "Migliorabile",
-      "poor": "Richiede attenzione"
-    },
     "foodCoverage": {
-      "title": "Copertura stimata",
-      "hint": "Stima basata sui prodotti della tua dispensa",
       "value": "≈ {{duration}} di cibo"
     },
     "summary": {
