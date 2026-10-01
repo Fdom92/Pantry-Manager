@@ -193,6 +193,15 @@
                   <ion-item class="bought-item" detail="false">
                     <ion-icon slot="start" name="checkmark-circle" color="success"></ion-icon>
                     <span class="item-name bought-name">{{ bought.name }}</span>
+                    <ion-button
+                      slot="end"
+                      fill="clear"
+                      color="medium"
+                      class="undo-btn"
+                      (click)="facade.undoPurchase(bought.id)"
+                      [attr.aria-label]="'common.actions.undo' | translate">
+                      <ion-icon slot="icon-only" name="arrow-undo-outline"></ion-icon>
+                    </ion-button>
                   </ion-item>
                 }
               </ion-list>

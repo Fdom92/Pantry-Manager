@@ -4,8 +4,9 @@
  * only place that decides what that menu holds. It replaced three swipe
  * gestures in two directions and a hidden section with no way back.
  *
- * Bought rows are read-only: undoing a purchase (reverting the restock) is
- * not implemented.
+ * Bought rows aren't part of this menu system — undoing a purchase is a
+ * dedicated button on the row itself (ListStateService.undoPurchase), not a
+ * tap-to-open-menu action, so there's no 'bought' ListRowKind here.
  */
 export type ListRowKind = 'auto' | 'manual' | 'hidden';
 export type ListRowAction = 'hide' | 'unbasic' | 'remove' | 'unhide';

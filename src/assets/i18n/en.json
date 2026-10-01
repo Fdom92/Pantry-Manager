@@ -434,7 +434,10 @@
       "ignored": "{{name}} hidden for now — it will come back next time.",
       "removedManual": "{{name}} removed from list.",
       "shareFailed": "Couldn't share the list. Please try again.",
-      "unbasic": "{{name}} won’t be added to your list automatically anymore."
+      "unbasic": "{{name}} won’t be added to your list automatically anymore.",
+      "purchaseUndone": "Purchase undone.",
+      "undoStale": "Can't undo anymore — the product changed after you bought it.",
+      "undoFailed": "Couldn't undo the purchase. Try again."
     },
     "buySheet": {
       "title": "How many did you buy?",

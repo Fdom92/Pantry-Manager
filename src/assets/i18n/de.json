@@ -434,7 +434,10 @@
       "ignored": "{{name}} jetzt ausgeblendet — erscheint beim nächsten Mal wieder.",
       "removedManual": "{{name}} aus der Liste entfernt.",
       "shareFailed": "Die Liste konnte nicht geteilt werden. Bitte versuche es erneut.",
-      "unbasic": "{{name}} wird nicht mehr automatisch zur Liste hinzugefügt."
+      "unbasic": "{{name}} wird nicht mehr automatisch zur Liste hinzugefügt.",
+      "purchaseUndone": "Kauf rückgängig gemacht.",
+      "undoStale": "Kann nicht mehr rückgängig gemacht werden — das Produkt wurde nach dem Kauf geändert.",
+      "undoFailed": "Der Kauf konnte nicht rückgängig gemacht werden. Versuche es erneut."
     },
     "buySheet": {
       "title": "Wie viele hast du gekauft?",
