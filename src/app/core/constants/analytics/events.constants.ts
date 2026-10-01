@@ -105,6 +105,7 @@ export const ANALYTICS_EVENTS = {
 
   // Shopping list
   SHOPPING_BUY_COMPLETED: 'shopping_buy_completed',
+  SHOPPING_BUY_UNDONE: 'shopping_buy_undone',
   SHOPPING_MANUAL_ADDED: 'shopping_manual_added',
   SHOPPING_ITEM_REMOVED: 'shopping_item_removed',
   /** Its siblings (hide/remove/unbasic) all track; this one didn't. */
