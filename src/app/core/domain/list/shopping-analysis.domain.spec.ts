@@ -126,6 +126,15 @@ describe('buildShoppingAnalysis', () => {
     expect(lidl?.suggestions[0].reason).toBe(ShoppingReason.EMPTY);
   });
 
+  it('orders the flat suggestion list by urgency too, not just each group', () => {
+    const state = analyse([
+      item({ _id: 'a', name: 'Arroz', minThreshold: 5, batches: [{ batchId: 'b1', quantity: 4 }] }),
+      item({ _id: 'b', name: 'Leche', minThreshold: 2, batches: [{ batchId: 'b2', quantity: 0 }] }),
+    ]);
+
+    expect(state.suggestions[0].reason).toBe(ShoppingReason.EMPTY);
+  });
+
   it('returns an empty analysis for an empty pantry', () => {
     const state = analyse([]);
 
