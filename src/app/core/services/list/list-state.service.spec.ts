@@ -312,6 +312,26 @@ describe('ListStateService — undoPurchase', () => {
     expect(manualItemsSignal()).toEqual([{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
   });
 
+  it('ignores a second undoPurchase for the same row fired before the first one finishes', async () => {
+    setup([], [{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
+
+    await service.markManualAsBought('m1');
+    expect(pantryStoreSpy.addItem).toHaveBeenCalled();
+    const createdItem = itemsSignal().find(i => i.name === 'Bombillas');
+    expect(createdItem).toBeDefined();
+
+    // Two rapid taps on the same row, neither awaited before the other starts —
+    // the in-flight guard must make the second call a no-op so restoreManual
+    // (which appends with no dedupe) only runs once.
+    const p1 = service.undoPurchase('m1');
+    const p2 = service.undoPurchase('m1');
+    await Promise.all([p1, p2]);
+
+    expect(manualItemsStoreSpy.restoreManual).toHaveBeenCalledTimes(1);
+    expect(manualItemsSignal()).toEqual([{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
+    expect(pantryStoreSpy.deleteItem).toHaveBeenCalledTimes(1);
+  });
+
   it('retries only the manual-restore step after it fails once, without repeating the pantry delete', async () => {
     setup([], [{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
     await service.markManualAsBought('m1');

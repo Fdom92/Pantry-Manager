@@ -79,6 +79,11 @@ export class ListStateService {
    */
   private readonly purchaseUndoRecords = signal<Map<string, PurchaseUndoRecord>>(new Map());
 
+  /** Rows currently mid-undo — guards against a double-tap starting the same
+   * revert twice (e.g. duplicating a restored manual entry, since
+   * restoreManual appends with no dedupe). */
+  readonly undoInProgressIds = signal<Set<string>>(new Set());
+
   // Persistent across tab switches — owned by ListManualItemsStore
   readonly manualItems    = this.manualItemsStore.manualItems;
   readonly boughtManuals  = this.manualItemsStore.boughtManuals;
@@ -288,55 +293,65 @@ export class ListStateService {
   async undoPurchase(boughtRowId: string): Promise<void> {
     const record = this.purchaseUndoRecords().get(boughtRowId);
     if (!record) return;
+    if (this.undoInProgressIds().has(boughtRowId)) return;
 
-    if (!record.pantryRestored) {
-      const current = this.items().find(i => i._id === record.pantryItemId);
-      if (current && current.updatedAt !== record.updatedAtAfterBuy) {
-        this.toast.error('shopping.toasts.undoStale');
-        return;
-      }
-      try {
-        if (record.pantryItemSnapshot) {
-          await this.pantryStore.updateItem(record.pantryItemSnapshot);
-        } else if (current) {
-          await this.pantryStore.deleteItem(record.pantryItemId);
-        }
-      } catch (err) {
-        this.logger.error('ListStateService', 'undoPurchase failed (pantry step)', err);
-        this.toast.error('shopping.toasts.undoFailed');
-        return;
-      }
-      // Mark this step done before attempting the next one, so a retry after
-      // the manual-restore step fails doesn't repeat (or get wrongly blocked
-      // re-attempting) a pantry write that already succeeded.
-      this.purchaseUndoRecords.update(map => {
-        const next = new Map(map);
-        next.set(boughtRowId, { ...record, pantryRestored: true });
-        return next;
-      });
-    }
-
+    this.undoInProgressIds.update(set => new Set([...set, boughtRowId]));
     try {
-      if (record.manualItem) {
-        this.manualItemsStore.restoreManual(record.manualItem);
+      if (!record.pantryRestored) {
+        const current = this.items().find(i => i._id === record.pantryItemId);
+        if (current && current.updatedAt !== record.updatedAtAfterBuy) {
+          this.toast.error('shopping.toasts.undoStale');
+          return;
+        }
+        try {
+          if (record.pantryItemSnapshot) {
+            await this.pantryStore.updateItem(record.pantryItemSnapshot);
+          } else if (current) {
+            await this.pantryStore.deleteItem(record.pantryItemId);
+          }
+        } catch (err) {
+          this.logger.error('ListStateService', 'undoPurchase failed (pantry step)', err);
+          this.toast.error('shopping.toasts.undoFailed');
+          return;
+        }
+        // Mark this step done before attempting the next one, so a retry after
+        // the manual-restore step fails doesn't repeat (or get wrongly blocked
+        // re-attempting) a pantry write that already succeeded.
+        this.purchaseUndoRecords.update(map => {
+          const next = new Map(map);
+          next.set(boughtRowId, { ...record, pantryRestored: true });
+          return next;
+        });
       }
-      this.purchaseUndoRecords.update(map => {
-        const next = new Map(map);
+
+      try {
+        if (record.manualItem) {
+          this.manualItemsStore.restoreManual(record.manualItem);
+        }
+        this.purchaseUndoRecords.update(map => {
+          const next = new Map(map);
+          next.delete(boughtRowId);
+          return next;
+        });
+        this.boughtItemIds.update(set => {
+          const next = new Set(set);
+          next.delete(record.pantryItemId);
+          return next;
+        });
+        this.toast.success('shopping.toasts.purchaseUndone');
+        this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BUY_UNDONE, {
+          kind: record.pantryItemSnapshot ? 'restock' : 'created',
+        });
+      } catch (err) {
+        this.logger.error('ListStateService', 'undoPurchase failed (manual-restore step)', err);
+        this.toast.error('shopping.toasts.undoFailed');
+      }
+    } finally {
+      this.undoInProgressIds.update(set => {
+        const next = new Set(set);
         next.delete(boughtRowId);
         return next;
       });
-      this.boughtItemIds.update(set => {
-        const next = new Set(set);
-        next.delete(record.pantryItemId);
-        return next;
-      });
-      this.toast.success('shopping.toasts.purchaseUndone');
-      this.analytics.track(ANALYTICS_EVENTS.SHOPPING_BUY_UNDONE, {
-        kind: record.pantryItemSnapshot ? 'restock' : 'created',
-      });
-    } catch (err) {
-      this.logger.error('ListStateService', 'undoPurchase failed (manual-restore step)', err);
-      this.toast.error('shopping.toasts.undoFailed');
     }
   }
 
