@@ -311,4 +311,86 @@ describe('ListStateService — undoPurchase', () => {
     );
     expect(manualItemsSignal()).toEqual([{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
   });
+
+  it('retries only the manual-restore step after it fails once, without repeating the pantry delete', async () => {
+    setup([], [{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
+    await service.markManualAsBought('m1');
+    const createdItem = itemsSignal().find(i => i.name === 'Bombillas');
+    expect(createdItem).toBeDefined();
+
+    let restoreAttempts = 0;
+    manualItemsStoreSpy.restoreManual.and.callFake((item: ManualItem) => {
+      restoreAttempts++;
+      if (restoreAttempts === 1) {
+        throw new Error('localStorage quota exceeded');
+      }
+      manualItemsSignal.update(list => [...list, item]);
+      boughtManualsSignal.update(list => list.filter(b => b.id !== item.id));
+    });
+
+    await service.undoPurchase('m1');
+    expect(pantryStoreSpy.deleteItem).toHaveBeenCalledTimes(1);
+    expect(toastSpy.error).toHaveBeenCalledWith('shopping.toasts.undoFailed');
+
+    // Retry: pantryRestored is already true, so this must not attempt a second
+    // delete of a product that's already gone — it should go straight to
+    // retrying restoreManual.
+    await service.undoPurchase('m1');
+    expect(pantryStoreSpy.deleteItem).toHaveBeenCalledTimes(1);
+    expect(manualItemsStoreSpy.restoreManual).toHaveBeenCalledTimes(2);
+    expect(manualItemsSignal()).toEqual([{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
+  });
+
+  it('does not repeat the pantry write on retry once pantryRestored is set', async () => {
+    setup([pollo()], [{ id: 'm1', name: 'Pollo', createdAt: 1 }]);
+    await service.markManualAsBought('m1');
+    // Matching an existing product already calls updateItem once during the
+    // buy itself (to persist the merged lot) — reset so the assertions below
+    // measure only what the undo attempts do.
+    pantryStoreSpy.updateItem.calls.reset();
+
+    let restoreAttempts = 0;
+    manualItemsStoreSpy.restoreManual.and.callFake((item: ManualItem) => {
+      restoreAttempts++;
+      if (restoreAttempts === 1) {
+        throw new Error('localStorage quota exceeded');
+      }
+      manualItemsSignal.update(list => [...list, item]);
+      boughtManualsSignal.update(list => list.filter(b => b.id !== item.id));
+    });
+
+    await service.undoPurchase('m1');
+    expect(pantryStoreSpy.updateItem).toHaveBeenCalledTimes(1);
+
+    await service.undoPurchase('m1');
+    // Still exactly one pantry write across both attempts: the second call
+    // skipped the pantry step entirely because pantryRestored was already true.
+    expect(pantryStoreSpy.updateItem).toHaveBeenCalledTimes(1);
+    expect(manualItemsStoreSpy.restoreManual).toHaveBeenCalledTimes(2);
+    expect(manualItemsSignal()).toEqual([{ id: 'm1', name: 'Pollo', createdAt: 1 }]);
+  });
+
+  it('leaves the record retryable when the pantry write itself fails', async () => {
+    setup([pollo()]);
+    const suggestion = service.shoppingAnalysis().suggestions[0];
+    await service.markAsBought(suggestion);
+    expect(pantryStoreSpy.updateItem).not.toHaveBeenCalled();
+
+    let attempt = 0;
+    pantryStoreSpy.updateItem.and.callFake(() => {
+      attempt++;
+      return attempt === 1 ? Promise.reject(new Error('write failed')) : Promise.resolve();
+    });
+
+    await service.undoPurchase('item:pollo');
+    expect(pantryStoreSpy.updateItem).toHaveBeenCalledTimes(1);
+    expect(toastSpy.error).toHaveBeenCalledWith('shopping.toasts.undoFailed');
+
+    // Retry: the record was left untouched (pantryRestored never got set), so
+    // the pantry write itself — not just the manual-restore step — is
+    // attempted again, not skipped as if it had already succeeded.
+    await service.undoPurchase('item:pollo');
+    expect(pantryStoreSpy.updateItem).toHaveBeenCalledTimes(2);
+    expect(toastSpy.success).toHaveBeenCalledWith('shopping.toasts.purchaseUndone');
+  });
 });

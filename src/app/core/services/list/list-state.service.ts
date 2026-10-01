@@ -31,6 +31,8 @@ interface PurchaseUndoRecord {
   updatedAtAfterBuy: string;
   /** Present only for a manual-sourced row: what to hand back to ListManualItemsStore.restoreManual. */
   manualItem?: ManualItem;
+  /** Set once the pantry-side revert (updateItem/deleteItem) has succeeded, so a retry after the manual-restore step fails doesn't re-attempt — or get wrongly staleness-blocked re-attempting — a pantry write that already landed. */
+  pantryRestored?: boolean;
 }
 
 @Injectable()
@@ -69,6 +71,11 @@ export class ListStateService {
    * section (the pantry item id for auto/manual-matched buys, the manual
    * entry's own id for a brand-new manual buy). Ephemeral per-visit, same
    * lifecycle as boughtItemIds/boughtManuals above — cleared below.
+   * Keying both id spaces into one map is safe: a pantry item's `_id` always
+   * comes from `createDocumentId('item')` (prefixed `item:...`), while a
+   * manual item's id is a bare `crypto.randomUUID()` (no prefix) — the two
+   * are structurally disjoint, so an auto-row key can never collide with a
+   * manual-row key.
    */
   private readonly purchaseUndoRecords = signal<Map<string, PurchaseUndoRecord>>(new Map());
 
@@ -268,23 +275,48 @@ export class ListStateService {
    * if the purchase came from one. Refuses — with a toast, no state change —
    * if the product was touched by something else since the buy, so undo
    * never silently clobbers an unrelated edit.
+   *
+   * Two independently-failable writes (the pantry revert, then
+   * restoreManual) means a naive single try block could succeed at the
+   * first and fail at the second, leaving the pantry item's updatedAt no
+   * longer matching updatedAtAfterBuy — not because of an outside edit, but
+   * because of the undo itself — which would then wrongly trip the
+   * staleness guard on retry and strand the row forever. record.pantryRestored
+   * makes this resumable: a retry skips straight past the already-succeeded
+   * pantry step instead of repeating it or being falsely blocked re-doing it.
    */
   async undoPurchase(boughtRowId: string): Promise<void> {
     const record = this.purchaseUndoRecords().get(boughtRowId);
     if (!record) return;
 
-    const current = this.items().find(i => i._id === record.pantryItemId);
-    if (current && current.updatedAt !== record.updatedAtAfterBuy) {
-      this.toast.error('shopping.toasts.undoStale');
-      return;
+    if (!record.pantryRestored) {
+      const current = this.items().find(i => i._id === record.pantryItemId);
+      if (current && current.updatedAt !== record.updatedAtAfterBuy) {
+        this.toast.error('shopping.toasts.undoStale');
+        return;
+      }
+      try {
+        if (record.pantryItemSnapshot) {
+          await this.pantryStore.updateItem(record.pantryItemSnapshot);
+        } else if (current) {
+          await this.pantryStore.deleteItem(record.pantryItemId);
+        }
+      } catch (err) {
+        this.logger.error('ListStateService', 'undoPurchase failed (pantry step)', err);
+        this.toast.error('shopping.toasts.undoFailed');
+        return;
+      }
+      // Mark this step done before attempting the next one, so a retry after
+      // the manual-restore step fails doesn't repeat (or get wrongly blocked
+      // re-attempting) a pantry write that already succeeded.
+      this.purchaseUndoRecords.update(map => {
+        const next = new Map(map);
+        next.set(boughtRowId, { ...record, pantryRestored: true });
+        return next;
+      });
     }
 
     try {
-      if (record.pantryItemSnapshot) {
-        await this.pantryStore.updateItem(record.pantryItemSnapshot);
-      } else if (current) {
-        await this.pantryStore.deleteItem(record.pantryItemId);
-      }
       if (record.manualItem) {
         this.manualItemsStore.restoreManual(record.manualItem);
       }
@@ -303,7 +335,7 @@ export class ListStateService {
         kind: record.pantryItemSnapshot ? 'restock' : 'created',
       });
     } catch (err) {
-      this.logger.error('ListStateService', 'undoPurchase failed', err);
+      this.logger.error('ListStateService', 'undoPurchase failed (manual-restore step)', err);
       this.toast.error('shopping.toasts.undoFailed');
     }
   }
