@@ -371,6 +371,10 @@
   "shopping": {
     "title": "Lista della spesa",
     "unassignedSupermarket": "Qualsiasi supermercato",
+    "groupToggle": {
+      "flat": "Raggruppa per supermercato",
+      "grouped": "Vista lista"
+    },
     "reasons": {
       "below-min": "Stock basso",
       "empty": "Esaurito"

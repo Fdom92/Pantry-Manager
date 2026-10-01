@@ -371,6 +371,10 @@
   "shopping": {
     "title": "Einkaufsliste",
     "unassignedSupermarket": "Beliebiger Supermarkt",
+    "groupToggle": {
+      "flat": "Nach Supermarkt gruppieren",
+      "grouped": "Listenansicht"
+    },
     "reasons": {
       "below-min": "Niedriger Bestand",
       "empty": "Kein Bestand"

@@ -41,6 +41,14 @@ export class ListStateService {
   private readonly logger = inject(LoggerService);
 
   readonly isSharingListInProgress = signal(false);
+  /** Flat by default; no persistence (same as Despensa's groupByCategory) — revisit once
+   * shopping_grouping_toggled shows whether people actually use grouped view. */
+  readonly groupBySupermarket = signal(false);
+
+  toggleGroupBySupermarket(): void {
+    this.groupBySupermarket.update(v => !v);
+    this.analytics.track(ANALYTICS_EVENTS.SHOPPING_GROUPING_TOGGLED, { grouped: this.groupBySupermarket() });
+  }
 
   // Ephemeral per-visit state — cleared on ionViewWillLeave ("hide for now" means this visit).
   readonly boughtItemIds  = signal<Set<string>>(new Set());

@@ -371,6 +371,10 @@
   "shopping": {
     "title": "Shopping list",
     "unassignedSupermarket": "Any supermarket",
+    "groupToggle": {
+      "flat": "Group by supermarket",
+      "grouped": "Flat list"
+    },
     "reasons": {
       "below-min": "Low stock",
       "empty": "Out of stock"
