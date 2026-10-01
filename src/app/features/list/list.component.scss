@@ -427,3 +427,41 @@ ion-fab-button[size="small"] {
 .manual-add-row:active {
   opacity: 0.5;
 }
+
+// ── List actions row (group toggle + share) ──────────────────────────────────
+// Content-adjacent actions, not global toolbar icons — mirrors Despensa's
+// small circular action-button pattern instead of living in the header.
+
+.list-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--app-theme-spacing-xs);
+  margin-bottom: var(--app-theme-spacing-lg);
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--app-theme-control-size-md);
+    height: var(--app-theme-control-size-md);
+    border: none;
+    border-radius: var(--app-theme-radius-circle);
+    background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+    color: var(--app-theme-primary-on-surface);
+    cursor: pointer;
+    transition: background var(--app-theme-transition-fast);
+
+    ion-icon, ion-spinner {
+      font-size: var(--app-theme-icon-size-md);
+    }
+
+    &:active {
+      background: color-mix(in srgb, var(--ion-color-primary) 22%, transparent);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+  }
+}

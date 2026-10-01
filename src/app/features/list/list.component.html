@@ -2,23 +2,6 @@
   <ion-toolbar>
     <ion-title>{{ 'shopping.title' | translate }}</ion-title>
     <ion-buttons slot="end">
-      @if (facade.shoppingAnalysis().summary.total) {
-        <ion-button
-          (click)="facade.toggleGroupBySupermarket()"
-          [attr.aria-label]="(facade.groupBySupermarket() ? 'shopping.groupToggle.grouped' : 'shopping.groupToggle.flat') | translate">
-          <ion-icon slot="icon-only" [name]="facade.groupBySupermarket() ? 'list-outline' : 'apps-outline'"></ion-icon>
-        </ion-button>
-      }
-      <ion-button
-        (click)="facade.openShareMenu()"
-        [disabled]="facade.loading() || facade.isSharingListInProgress() || (!facade.shoppingAnalysis().summary.total && !facade.visibleManualItems().length)"
-        [attr.aria-label]="'shopping.share.button' | translate">
-        @if (facade.isSharingListInProgress()) {
-          <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
-        } @else {
-          <ion-icon slot="icon-only" name="share-outline"></ion-icon>
-        }
-      </ion-button>
       <ion-button [routerLink]="['/settings']" [attr.aria-label]="'settings.title' | translate">
         <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
       </ion-button>
@@ -44,6 +27,28 @@
       <ion-icon name="add-circle-outline" color="medium"></ion-icon>
       <span>{{ 'shopping.manualAdd.inlineHint' | translate }}</span>
     </button>
+
+    @if (state.summary.total || facade.visibleManualItems().length) {
+      <div class="list-actions-row">
+        <button
+          class="list-actions-row__btn pressable"
+          (click)="facade.toggleGroupBySupermarket()"
+          [attr.aria-label]="(facade.groupBySupermarket() ? 'shopping.groupToggle.grouped' : 'shopping.groupToggle.flat') | translate">
+          <ion-icon [name]="facade.groupBySupermarket() ? 'list-outline' : 'apps-outline'"></ion-icon>
+        </button>
+        <button
+          class="list-actions-row__btn pressable"
+          [disabled]="facade.loading() || facade.isSharingListInProgress()"
+          (click)="facade.openShareMenu()"
+          [attr.aria-label]="'shopping.share.button' | translate">
+          @if (facade.isSharingListInProgress()) {
+            <ion-spinner name="lines-small"></ion-spinner>
+          } @else {
+            <ion-icon name="share-outline"></ion-icon>
+          }
+        </button>
+      </div>
+    }
 
     @if (!state.summary.total && !state.allBoughtItems.length && !state.allIgnoredItems.length && !facade.visibleManualItems().length) {
       <app-empty-state
