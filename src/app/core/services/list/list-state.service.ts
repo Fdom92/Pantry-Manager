@@ -350,7 +350,7 @@ export class ListStateService {
               throw new Error('pantry restore did not land');
             }
           } else if (current) {
-            await this.pantryStore.deleteItem(record.pantryItemId);
+            await this.pantryStore.deleteItem(record.pantryItemId, { track: false });
             if (this.items().some(i => i._id === record.pantryItemId)) {
               throw new Error('pantry delete did not land');
             }

@@ -341,7 +341,7 @@ describe('ListStateService — undoPurchase', () => {
 
     await service.undoPurchase('m1');
 
-    expect(pantryStoreSpy.deleteItem).toHaveBeenCalledWith(createdItem!._id);
+    expect(pantryStoreSpy.deleteItem).toHaveBeenCalledWith(createdItem!._id, { track: false });
     expect(manualItemsStoreSpy.restoreManual).toHaveBeenCalledWith(
       jasmine.objectContaining({ id: 'm1', name: 'Bombillas' }),
     );
