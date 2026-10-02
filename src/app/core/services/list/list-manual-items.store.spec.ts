@@ -49,3 +49,41 @@ describe('ListManualItemsStore — hand-written items persist', () => {
     expect(store.manualItems()).toEqual([]);
   });
 });
+
+describe('ListManualItemsStore — restoreManual', () => {
+  function setup() {
+    const setItems = jasmine.createSpy('setItems');
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: LocalStorageService,
+          useValue: { manualList: { getItems: () => [], setItems, clear: jasmine.createSpy('clear') } },
+        },
+        { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
+      ],
+    });
+    return { store: TestBed.inject(ListManualItemsStore), setItems };
+  }
+
+  it('puts a bought entry back as pending and drops it from boughtManuals', () => {
+    const { store } = setup();
+    store.addManualItem('Sal');
+    const [item] = store.manualItems();
+    store.markManualAsBought(item.id);
+
+    store.restoreManual(item);
+
+    expect(store.manualItems()).toEqual([item]);
+    expect(store.boughtManuals()).toEqual([]);
+  });
+
+  it('is idempotent: restoring the same entry twice leaves exactly one', () => {
+    const { store } = setup();
+    const item: ManualItem = { id: 'm1', name: 'Sal', createdAt: 1 };
+
+    store.restoreManual(item);
+    store.restoreManual(item);
+
+    expect(store.manualItems()).toEqual([item]);
+  });
+});

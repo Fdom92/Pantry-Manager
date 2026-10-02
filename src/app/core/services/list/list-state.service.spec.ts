@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { ActionSheetController } from '@ionic/angular';
 import type { PantryItem } from '@core/models/pantry';
-import type { BoughtItem, ManualItem } from '@core/models/list';
+import { ShoppingReason, type BoughtItem, type ManualItem, type ShoppingSuggestionWithItem } from '@core/models/list';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { DownloadService, LoggerService, ShareService, ToastService } from '../shared';
@@ -156,6 +156,10 @@ describe('ListStateService — undoPurchase', () => {
     restoreManual: jasmine.Spy;
   };
   let toastSpy: jasmine.SpyObj<ToastService>;
+  // The faithful write the real store performs; tests override updateItem with
+  // failing variants and fall back to this one.
+  let realUpdateItem: (item: PantryItem) => Promise<void>;
+  let stampCounter: number;
 
   function pollo(overrides: Partial<PantryItem> = {}): PantryItem {
     return {
@@ -173,10 +177,39 @@ describe('ListStateService — undoPurchase', () => {
     } as PantryItem;
   }
 
+  function freshPollo(): PantryItem {
+    return pollo({ productType: 'fresh', batches: [{ batchId: 'b1', quantity: 0 }] });
+  }
+
+  /**
+   * StorageService._upsert overwrites updatedAt with its own clock on every
+   * save, and the pantry cache holds that saved copy. The fakes below do the
+   * same with a strictly increasing stamp: the original unit tests used fixed
+   * values, so they never noticed the undo record was built from the
+   * pre-save timestamp.
+   */
+  function stamp(): string {
+    return new Date(Date.UTC(2026, 1, 1, 0, 0, ++stampCounter)).toISOString();
+  }
+
+  function persist(item: PantryItem): PantryItem {
+    const saved = { ...item, updatedAt: stamp() };
+    const exists = itemsSignal().some(i => i._id === saved._id);
+    itemsSignal.set(exists
+      ? itemsSignal().map(i => (i._id === saved._id ? saved : i))
+      : [saved, ...itemsSignal()]);
+    return saved;
+  }
+
   function setup(items: PantryItem[] = [pollo()], manuals: ManualItem[] = []) {
+    stampCounter = 0;
     itemsSignal = signal<PantryItem[]>(items);
     manualItemsSignal = signal<ManualItem[]>(manuals);
     boughtManualsSignal = signal<BoughtItem[]>([]);
+    realUpdateItem = item => {
+      persist(item);
+      return Promise.resolve();
+    };
 
     pantryStoreSpy = {
       loadedProducts: itemsSignal,
@@ -188,17 +221,14 @@ describe('ListStateService — undoPurchase', () => {
       addNewLot: jasmine.createSpy('addNewLot').and.callFake((itemId: string, params: { quantity: number }) => {
         const current = itemsSignal().find(i => i._id === itemId);
         if (!current) return Promise.resolve(null);
-        const updated: PantryItem = {
+        return Promise.resolve(persist({
           ...current,
           batches: [...current.batches, { batchId: 'b2', quantity: params.quantity }],
-          updatedAt: '2026-01-02T00:00:00.000Z',
-        };
-        itemsSignal.set(itemsSignal().map(i => (i._id === itemId ? updated : i)));
-        return Promise.resolve(updated);
+        }));
       }),
-      updateItem: jasmine.createSpy('updateItem').and.resolveTo(),
+      updateItem: jasmine.createSpy('updateItem').and.callFake((item: PantryItem) => realUpdateItem(item)),
       addItem: jasmine.createSpy('addItem').and.callFake((item: PantryItem) => {
-        itemsSignal.set([...itemsSignal(), item]);
+        persist(item);
         return Promise.resolve();
       }),
       deleteItem: jasmine.createSpy('deleteItem').and.callFake((id: string) => {
@@ -210,7 +240,11 @@ describe('ListStateService — undoPurchase', () => {
     manualItemsStoreSpy = {
       manualItems: manualItemsSignal,
       boughtManuals: boughtManualsSignal,
-      removeManual: jasmine.createSpy('removeManual'),
+      removeManual: jasmine.createSpy('removeManual').and.callFake((id: string) => {
+        const found = manualItemsSignal().find(m => m.id === id);
+        manualItemsSignal.set(manualItemsSignal().filter(m => m.id !== id));
+        return found;
+      }),
       markManualAsBought: jasmine.createSpy('markManualAsBought').and.callFake((id: string) => {
         const found = manualItemsSignal().find(m => m.id === id);
         if (!found) return undefined;
@@ -221,7 +255,9 @@ describe('ListStateService — undoPurchase', () => {
       addManualItem: jasmine.createSpy('addManualItem'),
       clearBoughtManuals: jasmine.createSpy('clearBoughtManuals'),
       restoreManual: jasmine.createSpy('restoreManual').and.callFake((item: ManualItem) => {
-        manualItemsSignal.update(list => [...list, item]);
+        if (!manualItemsSignal().some(m => m.id === item.id)) {
+          manualItemsSignal.update(list => [...list, item]);
+        }
         boughtManualsSignal.update(list => list.filter(b => b.id !== item.id));
       }),
     };
@@ -399,7 +435,7 @@ describe('ListStateService — undoPurchase', () => {
     let attempt = 0;
     pantryStoreSpy.updateItem.and.callFake(() => {
       attempt++;
-      return attempt === 1 ? Promise.reject(new Error('write failed')) : Promise.resolve();
+      return attempt === 1 ? Promise.reject(new Error('write failed')) : realUpdateItem(pantryStoreSpy.updateItem.calls.mostRecent().args[0]);
     });
 
     await service.undoPurchase('item:pollo');
@@ -412,5 +448,151 @@ describe('ListStateService — undoPurchase', () => {
     await service.undoPurchase('item:pollo');
     expect(pantryStoreSpy.updateItem).toHaveBeenCalledTimes(2);
     expect(toastSpy.success).toHaveBeenCalledWith('shopping.toasts.purchaseUndone');
+  });
+
+  // ─── Realistic stamping: every buy path must be undoable ───────────────
+
+  it('undoes an auto fresh restock when the store stamps its own updatedAt', async () => {
+    setup([freshPollo()]);
+    const suggestion: ShoppingSuggestionWithItem = {
+      item: itemsSignal()[0], reason: ShoppingReason.FRESH_EMPTY, suggestedQuantity: 0, currentQuantity: 0,
+    };
+
+    await service.markAsBought(suggestion);
+    expect(service.canUndoPurchase('item:pollo')).toBeTrue();
+
+    await service.undoPurchase('item:pollo');
+
+    expect(toastSpy.error).not.toHaveBeenCalled();
+    expect(toastSpy.success).toHaveBeenCalledWith('shopping.toasts.purchaseUndone');
+    expect(itemsSignal().find(i => i._id === 'item:pollo')?.batches).toEqual([{ batchId: 'b1', quantity: 0 }]);
+    expect(service.canUndoPurchase('item:pollo')).toBeFalse();
+  });
+
+  it('undoes an auto non-fresh restock (addNewLot) under realistic stamping', async () => {
+    setup([pollo()]);
+    await service.markAsBought(service.shoppingAnalysis().suggestions[0]);
+
+    await service.undoPurchase('item:pollo');
+
+    expect(toastSpy.error).not.toHaveBeenCalled();
+    expect(toastSpy.success).toHaveBeenCalledWith('shopping.toasts.purchaseUndone');
+    expect(itemsSignal().find(i => i._id === 'item:pollo')?.batches).toEqual([{ batchId: 'b1', quantity: 0 }]);
+  });
+
+  it('undoes a manual buy matched to an existing non-fresh product (addNewLot + updateItem double write)', async () => {
+    setup([pollo()], [{ id: 'm1', name: 'Pollo', createdAt: 1 }]);
+    await service.markManualAsBought('m1');
+    expect(service.canUndoPurchase('m1')).toBeTrue();
+
+    await service.undoPurchase('m1');
+
+    expect(toastSpy.error).not.toHaveBeenCalled();
+    expect(itemsSignal().find(i => i._id === 'item:pollo')?.batches).toEqual([{ batchId: 'b1', quantity: 0 }]);
+    expect(manualItemsSignal()).toEqual([{ id: 'm1', name: 'Pollo', createdAt: 1 }]);
+  });
+
+  it('undoes a manual buy matched to an existing fresh product', async () => {
+    setup([freshPollo()], [{ id: 'm1', name: 'Pollo', createdAt: 1 }]);
+    await service.markManualAsBought('m1');
+
+    await service.undoPurchase('m1');
+
+    expect(toastSpy.error).not.toHaveBeenCalled();
+    expect(itemsSignal().find(i => i._id === 'item:pollo')?.batches).toEqual([{ batchId: 'b1', quantity: 0 }]);
+    expect(manualItemsSignal()).toEqual([{ id: 'm1', name: 'Pollo', createdAt: 1 }]);
+  });
+
+  it('undoes a manual buy that created a new product under realistic stamping', async () => {
+    setup([], [{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
+    await service.markManualAsBought('m1');
+
+    await service.undoPurchase('m1');
+
+    expect(toastSpy.error).not.toHaveBeenCalled();
+    expect(itemsSignal().find(i => i.name === 'Bombillas')).toBeUndefined();
+    expect(manualItemsSignal()).toEqual([{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
+  });
+
+  // ─── A write that "succeeds" without landing ───────────────────────────
+
+  it('reports a failure, not success, when the store swallows a failed restore', async () => {
+    setup([pollo()]);
+    await service.markAsBought(service.shoppingAnalysis().suggestions[0]);
+    // The real store catches its own errors: the promise resolves, the cache is unchanged.
+    pantryStoreSpy.updateItem.and.resolveTo();
+
+    await service.undoPurchase('item:pollo');
+
+    expect(toastSpy.error).toHaveBeenCalledWith('shopping.toasts.undoFailed');
+    expect(toastSpy.success).not.toHaveBeenCalledWith('shopping.toasts.purchaseUndone');
+    expect(service.canUndoPurchase('item:pollo')).toBeTrue();
+    expect(service.boughtItemIds().has('item:pollo')).toBeTrue();
+  });
+
+  it('reports a failure when the store swallows a failed delete of a created product', async () => {
+    setup([], [{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
+    await service.markManualAsBought('m1');
+    pantryStoreSpy.deleteItem.and.resolveTo();
+
+    await service.undoPurchase('m1');
+
+    expect(toastSpy.error).toHaveBeenCalledWith('shopping.toasts.undoFailed');
+    expect(service.canUndoPurchase('m1')).toBeTrue();
+    expect(manualItemsStoreSpy.restoreManual).not.toHaveBeenCalled();
+    expect(boughtManualsSignal().map(b => b.id)).toEqual(['m1']);
+  });
+
+  // ─── Product deleted after the buy ─────────────────────────────────────
+
+  it('refuses to resurrect a product that was deleted after the buy', async () => {
+    setup([pollo()]);
+    await service.markAsBought(service.shoppingAnalysis().suggestions[0]);
+    itemsSignal.set([]);
+
+    await service.undoPurchase('item:pollo');
+
+    expect(toastSpy.error).toHaveBeenCalledWith('shopping.toasts.undoStale');
+    expect(pantryStoreSpy.updateItem).not.toHaveBeenCalled();
+    expect(itemsSignal()).toEqual([]);
+  });
+
+  // ─── Same-name manual notes removed by an auto buy ─────────────────────
+
+  it('hands back a same-name manual note that buying the automatic suggestion removed', async () => {
+    setup([pollo()], [{ id: 'm1', name: 'Pollo', createdAt: 1 }]);
+    await service.markAsBought(service.shoppingAnalysis().suggestions[0]);
+    expect(manualItemsSignal()).toEqual([]);
+
+    await service.undoPurchase('item:pollo');
+
+    expect(toastSpy.error).not.toHaveBeenCalled();
+    expect(manualItemsSignal()).toEqual([{ id: 'm1', name: 'Pollo', createdAt: 1 }]);
+  });
+
+  // ─── Merge: the new product never reaches the cache ────────────────────
+
+  it('offers no undo when adding the manual item merged into an existing product', async () => {
+    setup([], [{ id: 'm1', name: 'Bombillas', createdAt: 1 }]);
+    // PantryStoreService.addItem merges into an existing item (different _id),
+    // so the item we built is never what lands in the cache.
+    pantryStoreSpy.addItem.and.callFake(() => {
+      persist(pollo({ _id: 'item:other', name: 'Bombillas LED' }));
+      return Promise.resolve();
+    });
+
+    await service.markManualAsBought('m1');
+
+    expect(service.canUndoPurchase('m1')).toBeFalse();
+  });
+
+  it('keeps the undo record when the history log throws after the pantry write', async () => {
+    setup([pollo()], [{ id: 'm1', name: 'Pollo', createdAt: 1 }]);
+    const events = TestBed.inject(HistoryEventManagerService) as jasmine.SpyObj<HistoryEventManagerService>;
+    events.logAddExistingItem.and.rejectWith(new Error('history down'));
+
+    await service.markManualAsBought('m1');
+
+    expect(service.canUndoPurchase('m1')).toBeTrue();
   });
 });

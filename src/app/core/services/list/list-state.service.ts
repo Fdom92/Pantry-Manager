@@ -33,6 +33,16 @@ interface PurchaseUndoRecord {
   manualItem?: ManualItem;
   /** Set once the pantry-side revert (updateItem/deleteItem) has succeeded, so a retry after the manual-restore step fails doesn't re-attempt — or get wrongly staleness-blocked re-attempting — a pantry write that already landed. */
   pantryRestored?: boolean;
+  /** Pending manual notes with the same product name that buying an automatic suggestion removed — handed back on undo so undo is a true inverse. */
+  removedManuals?: ManualItem[];
+}
+
+interface RecordPurchaseUndoOptions {
+  /** Pantry item the buy touched; defaults to the row id (auto rows). */
+  pantryItemId?: string;
+  pantryItemSnapshot?: PantryItem;
+  manualItem?: ManualItem;
+  removedManuals?: ManualItem[];
 }
 
 @Injectable()
@@ -150,13 +160,19 @@ export class ListStateService {
 
     try {
       const timestamp = new Date().toISOString();
+      // Read before the pantry write: buying the suggestion also removes these
+      // notes (below), and undo has to be able to hand them back.
+      const boughtKey = normalizeProductKey(name);
+      const sameNameManuals = this.manualItems().filter(m => normalizeProductKey(m.name) === boughtKey);
       if (isFresh) {
         const item = suggestion.item;
         const preSnapshot = structuredClone(item);
         const updatedFresh = restockFreshItem(item, timestamp, generateBatchId());
         await this.pantryStore.updateItem(updatedFresh);
+        // Right after the write, before the history log: if the log throws the
+        // row stays in Comprado and must still be undoable.
+        this.recordPurchaseUndo(id, { pantryItemSnapshot: preSnapshot, removedManuals: sameNameManuals });
         await this.eventManager.logAdvancedEdit(item, updatedFresh, 'pantry_card');
-        this.recordPurchaseUndo(id, preSnapshot, updatedFresh.updatedAt);
       } else {
         const quantity = opts?.quantityOverride && opts.quantityOverride > 0
           ? opts.quantityOverride
@@ -169,14 +185,13 @@ export class ListStateService {
         const suggested = resolveSuggestedExpiry(previous.name, previous.foodType, new Date(timestamp));
         const updated = await this.pantryStore.addNewLot(id, { quantity, ...toLotExpiry(suggested) });
         if (updated) {
+          this.recordPurchaseUndo(id, { pantryItemSnapshot: preSnapshot, removedManuals: sameNameManuals });
           await this.eventManager.logAddExistingItem(previous, updated, quantity, undefined, undefined, timestamp);
-          this.recordPurchaseUndo(id, preSnapshot, updated.updatedAt);
         }
       }
       // Buying the automatic suggestion settles any hand-written note for the
       // same product too — otherwise a manual "Pollo" reappears right after
       // the auto "Pollo" is bought, once it drops out of pendingSuggestions.
-      const boughtKey = normalizeProductKey(name);
       for (const manual of this.manualItems()) {
         if (normalizeProductKey(manual.name) === boughtKey) {
           this.manualItemsStore.removeManual(manual.id);
@@ -226,8 +241,8 @@ export class ListStateService {
           if (updated) await this.pantryStore.updateItem(updated);
         }
         if (updated) {
+          this.recordPurchaseUndo(id, { pantryItemSnapshot: preSnapshot, manualItem: item, pantryItemId: match._id });
           await this.eventManager.logAddExistingItem(match, updated, quantity, undefined, undefined, timestamp);
-          this.recordPurchaseUndo(id, preSnapshot, updated.updatedAt, item, match._id);
         }
       } else {
         const base = buildAddItemPayload({
@@ -238,8 +253,11 @@ export class ListStateService {
         });
         const newItem: PantryItem = { ...base, productType: 'pantry' };
         await this.pantryStore.addItem(newItem);
+        // addItem merges into an existing product when one matches (a different
+        // _id), so newItem._id may never reach the cache. recordPurchaseUndo
+        // skips the record in that case: there is nothing of ours to delete.
+        this.recordPurchaseUndo(id, { manualItem: item, pantryItemId: newItem._id });
         await this.eventManager.logAddNewItem(newItem, quantity, undefined, timestamp);
-        this.recordPurchaseUndo(id, undefined, newItem.updatedAt, item, newItem._id);
       }
       this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
         kind: 'despensa',
@@ -255,20 +273,33 @@ export class ListStateService {
     this.toast.success('shopping.toasts.boughtManual', { name: item.name });
   }
 
-  private recordPurchaseUndo(
-    boughtRowId: string,
-    pantryItemSnapshot: PantryItem | undefined,
-    updatedAtAfterBuy: string,
-    manualItem?: ManualItem,
-    pantryItemId?: string,
-  ): void {
+  /**
+   * The cache holds what StorageService._upsert actually stored, and _upsert
+   * stamps its own updatedAt on every save. The timestamp on the object a
+   * caller built before saving is never that value, so the staleness guard
+   * must be fed from here, after the awaited writes.
+   */
+  private persistedUpdatedAt(id: string): string | undefined {
+    return this.items().find(i => i._id === id)?.updatedAt;
+  }
+
+  canUndoPurchase(boughtRowId: string): boolean {
+    return this.purchaseUndoRecords().has(boughtRowId);
+  }
+
+  /** No-op when the product isn't in the cache (e.g. an add that merged into another product): no record, no undo button. */
+  private recordPurchaseUndo(boughtRowId: string, opts: RecordPurchaseUndoOptions): void {
+    const pantryItemId = opts.pantryItemId ?? boughtRowId;
+    const updatedAtAfterBuy = this.persistedUpdatedAt(pantryItemId);
+    if (updatedAtAfterBuy === undefined) return;
     this.purchaseUndoRecords.update(map => {
       const next = new Map(map);
       next.set(boughtRowId, {
-        pantryItemId: pantryItemId ?? boughtRowId,
-        pantryItemSnapshot,
+        pantryItemId,
+        pantryItemSnapshot: opts.pantryItemSnapshot,
         updatedAtAfterBuy,
-        manualItem,
+        manualItem: opts.manualItem,
+        removedManuals: opts.removedManuals?.length ? opts.removedManuals : undefined,
       });
       return next;
     });
@@ -299,15 +330,30 @@ export class ListStateService {
     try {
       if (!record.pantryRestored) {
         const current = this.items().find(i => i._id === record.pantryItemId);
+        // A deleted product counts as "changed": updateItem would upsert it back.
+        if (record.pantryItemSnapshot && !current) {
+          this.toast.error('shopping.toasts.undoStale');
+          return;
+        }
         if (current && current.updatedAt !== record.updatedAtAfterBuy) {
           this.toast.error('shopping.toasts.undoStale');
           return;
         }
         try {
+          // PantryStoreService.updateItem/deleteItem swallow their own errors,
+          // so a failed write resolves normally; check the cache to know it landed.
           if (record.pantryItemSnapshot) {
             await this.pantryStore.updateItem(record.pantryItemSnapshot);
+            const after = this.items().find(i => i._id === record.pantryItemId);
+            // A successful save always stamps a new updatedAt.
+            if (!after || after.updatedAt === record.updatedAtAfterBuy) {
+              throw new Error('pantry restore did not land');
+            }
           } else if (current) {
             await this.pantryStore.deleteItem(record.pantryItemId);
+            if (this.items().some(i => i._id === record.pantryItemId)) {
+              throw new Error('pantry delete did not land');
+            }
           }
         } catch (err) {
           this.logger.error('ListStateService', 'undoPurchase failed (pantry step)', err);
@@ -327,6 +373,9 @@ export class ListStateService {
       try {
         if (record.manualItem) {
           this.manualItemsStore.restoreManual(record.manualItem);
+        }
+        for (const manual of record.removedManuals ?? []) {
+          this.manualItemsStore.restoreManual(manual);
         }
         this.purchaseUndoRecords.update(map => {
           const next = new Map(map);
