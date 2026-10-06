@@ -434,7 +434,10 @@
       "ignored": "{{name}} oculto por ahora — volverá la próxima vez.",
       "removedManual": "{{name}} eliminado de la lista.",
       "shareFailed": "No se ha podido compartir la lista. Inténtalo de nuevo.",
-      "unbasic": "{{name}} ya no se añadirá a la lista automáticamente."
+      "unbasic": "{{name}} ya no se añadirá a la lista automáticamente.",
+      "purchaseUndone": "Compra deshecha.",
+      "undoStale": "Ya no se puede deshacer — el producto cambió después de comprarlo.",
+      "undoFailed": "No se ha podido deshacer la compra. Inténtalo de nuevo."
     },
     "buySheet": {
       "title": "¿Cuántas unidades compraste?",

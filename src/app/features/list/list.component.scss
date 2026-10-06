@@ -366,6 +366,15 @@ ion-fab-button[size="small"] {
   flex-shrink: 0;
 }
 
+.undo-btn {
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
 // ── Ignored section ──────────────────────────────────────────────────────────
 
 .ignored-section {

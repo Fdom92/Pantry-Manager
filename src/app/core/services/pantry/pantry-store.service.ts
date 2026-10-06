@@ -127,8 +127,15 @@ export class PantryStoreService {
     }
   }
 
-  /** Remove an item from the local cache once deletion succeeds. */
-  async deleteItem(id: string): Promise<void> {
+  /**
+   * Remove an item from the local cache once deletion succeeds.
+   *
+   * `track: false` is for deletions that are not the user saying "I'm done
+   * with this" — e.g. undoing a purchase that had just created the product.
+   * Counting those as deletions-with-stock would inflate exactly the metric
+   * the comment below exists to watch.
+   */
+  async deleteItem(id: string, opts?: { track?: boolean }): Promise<void> {
     // Capture kind BEFORE deletion so analytics keeps full context.
     const target = this.items().find(i => i._id === id);
     const kind = target?.productType === 'fresh' ? 'fresh' : 'despensa';
@@ -140,11 +147,13 @@ export class PantryStoreService {
     const quantity = target ? target.batches.reduce((sum, batch) => sum + batch.quantity, 0) : 0;
     try {
       await this.pantryQuery.deleteItem(id);
-      this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_DELETED, {
-        kind,
-        had_stock: quantity > 0,
-        quantity,
-      });
+      if (opts?.track !== false) {
+        this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_DELETED, {
+          kind,
+          had_stock: quantity > 0,
+          quantity,
+        });
+      }
     } catch (err: unknown) {
       this.logger.error('PantryStoreService', 'deleteItem error', err);
       this.error.set('Failed to delete item');

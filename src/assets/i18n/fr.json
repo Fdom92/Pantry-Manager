@@ -434,7 +434,10 @@
       "ignored": "{{name}} masqué pour l'instant — réapparaîtra la prochaine fois.",
       "removedManual": "{{name}} retiré de la liste.",
       "shareFailed": "Impossible de partager la liste. Réessaie.",
-      "unbasic": "{{name}} ne sera plus ajouté automatiquement à ta liste."
+      "unbasic": "{{name}} ne sera plus ajouté automatiquement à ta liste.",
+      "purchaseUndone": "Achat annulé.",
+      "undoStale": "Impossible d'annuler — le produit a changé après l'achat.",
+      "undoFailed": "Impossible d'annuler l'achat. Réessaie."
     },
     "buySheet": {
       "title": "Combien en as-tu acheté ?",

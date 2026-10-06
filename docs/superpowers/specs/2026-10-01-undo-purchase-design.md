@@ -101,3 +101,14 @@ a las que se confirman.
   edición — y confirmar que el botón de deshacer avisa en vez de machacar).
 - QA en dispositivo: confirmar que cambiar de pestaña (Despensa ↔ Compra) de verdad vacía
   "Comprado" como se espera, no solo en el navegador.
+
+## Limitaciones conocidas
+
+- Los eventos de historial escritos al comprar no se revierten al deshacer.
+- Si el producto nuevo de una nota manual acaba fusionándose en un producto existente
+  (`findMergeCandidate`), esa fila no tiene deshacer (no se muestra el botón).
+- Dos compras del mismo producto en una visita solo se deshacen limpiamente de la más nueva a
+  la más antigua: deshacer la nueva cambia el `updatedAt` del producto y la antigua avisa de
+  que "cambió".
+- El botón de deshacer mide 36px, igual que el de comprar, por debajo de los 48dp de Material;
+  es coherente con el patrón existente, revisar ambos a la vez.
