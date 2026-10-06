@@ -39,6 +39,7 @@ export class AnalyticsService {
 
   private posthog: PostHog | null = null;
   private superProps: AnalyticsSuperProps | null = null;
+  private readonly reportedOnce = new Set<string>();
 
   // Signals so UI (Settings page) can react.
   private readonly readySignal = signal(false);
@@ -174,6 +175,27 @@ export class AnalyticsService {
     } catch (err) {
       this.logger.warn('AnalyticsService', 'track failed', { event, err });
     }
+  }
+
+  /**
+   * `track`, but at most once per `dedupeKey` for the life of the app process.
+   *
+   * For events emitted from something that gets recreated over and over — an
+   * empty-state block rebuilt on every filter keystroke or list reload fired
+   * 897 times in 30 days for ~106 real occurrences, and one session sent the
+   * same key 164 times. The key is not consumed while analytics isn't ready,
+   * so a user who opts in later in the same launch is still counted.
+   */
+  trackOnce(event: string, props: AnalyticsEventProps | undefined, dedupeKey: string): void {
+    if (!this.readySignal()) {
+      return;
+    }
+    const id = `${event}|${dedupeKey}`;
+    if (this.reportedOnce.has(id)) {
+      return;
+    }
+    this.reportedOnce.add(id);
+    this.track(event, props);
   }
 
   /**
