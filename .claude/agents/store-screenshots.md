@@ -57,7 +57,9 @@ were requested.
 1. Tools: `adb` is on PATH; the emulator is `~/Library/Android/sdk/emulator/emulator`, AVD
    `Medium_Phone_API_35` (`emulator -list-avds`). Boot it if `adb devices` shows nothing
    (`-no-snapshot-save`), wait for `sys.boot_completed`.
-2. Build and install the **debug** app: `npm run prepare:build`, then `cd android && ./gradlew
+2. Build and install the **debug** app (gradle needs JDK 21; the shell default may be newer and
+   fail — use `JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"` for that
+   command): `npm run prepare:build`, then `cd android && ./gradlew
    assembleDebug`, then `adb install -r` the APK from `android/app/build/outputs/apk/debug/`. If
    the build or install fails, report the error verbatim and stop — don't work around it.
 3. **Play rules for phone screenshots:** 2–8 images, PNG (24-bit, no alpha) or JPEG, each side
@@ -78,6 +80,9 @@ were requested.
   calls `DevMarketingSeederService.seedMarketingDatabase(lang)` and localises product names to the
   current app language). Run it **once per language, after switching the app language** — product
   names and history are language-specific.
+  The seeder also writes a streak doc, which the app only reads at start: after seeding,
+  force-stop and relaunch the app (`adb shell am force-stop com.fdom.pantrymind.dev`, then start
+  it) before capturing, and confirm the dashboard streak card shows days, not 0.
 - PRO screens (AI insights, restock predictions) need the dev panel's PRO toggle on; the free-tier
   shots need it off. Never use a real purchase or RevenueCat.
 - The seeder does not necessarily cover every screen (e.g. shopping-list manual notes, ignored
