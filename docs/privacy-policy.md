@@ -1,6 +1,6 @@
 # Privacy Policy — PantryMind
 
-Last updated: 03/06/2026
+Last updated: 07/10/2026
 
 PantryMind ("the App") is developed by Fernando del Olmo ("the Developer").
 This Privacy Policy explains what data the App handles, when, and why.
@@ -13,8 +13,8 @@ This Privacy Policy explains what data the App handles, when, and why.
 - **No advertising, no tracking for marketing, no data sale.**
 - A few **optional, consent-gated** services are used to keep the App
   working and improving (analytics, crash reporting, in-app purchases,
-  AI insights). You can opt out at any time and the App remains fully
-  functional.
+  AI insights, smart receipt scanning). You can opt out at any time and the
+  App remains fully functional.
 
 ## 2. What stays on your device
 
@@ -81,6 +81,37 @@ any time from **Settings → Privacidad** or by uninstalling the App.
   [OpenAI Privacy Policy](https://openai.com/policies/privacy-policy).
 - **Consent:** Only triggered when a PRO user explicitly requests an
   analysis. Free users never reach this code path.
+- **PRO check:** The request carries the same anonymous identifier
+  described in 3.3 so the backend can confirm your subscription. It is
+  not linked to your name or any other personal data.
+
+### 3.6 Smart receipt scanning (OpenAI, via our backend) — PRO
+
+- **What:** When a **PRO** user scans a shopping receipt, the photo is
+  read **on your device** (text recognition runs locally; the photo is
+  never uploaded and is not kept by the App). The **text lines** read from
+  the receipt are then sent to our backend, which forwards them to OpenAI
+  to pick out the purchased products and quantities. Because this is the
+  full text of the receipt, it can include anything printed on it besides
+  the products — for example the store name and address, the date and
+  time, and payment or loyalty-card lines. We instruct the model to ignore
+  those lines, but they are part of what is transmitted. Only the
+  products and quantities come back, and you review and correct them
+  before anything is added to your pantry.
+- **Why:** Reads garbled or unusual receipt layouts better than the
+  on-device parser used by the free tier.
+- **Provider:** OpenAI L.L.C., via a backend hosted on Render (EU region).
+  [OpenAI Privacy Policy](https://openai.com/policies/privacy-policy).
+  The request also carries the anonymous identifier described in 3.3 to
+  confirm your PRO subscription.
+- **What we keep:** The backend does not store receipt text or photos.
+  Server logs keep technical metadata only (the anonymous identifier,
+  the number of lines and error messages); if processing fails, a short
+  excerpt of the technical response may appear in those logs.
+- **Consent:** Used automatically whenever a PRO user scans a receipt
+  while online. Free users never reach this code path, and a PRO user
+  who is offline or whose request fails falls back to the on-device
+  parser, in which case nothing leaves the device.
 
 ### 3.5 Local notifications
 
@@ -93,7 +124,10 @@ in your device settings at any time.
 
 - Real names, email addresses, phone numbers, postal addresses
 - Precise location (GPS) or coarse location
-- Contacts, calendar, photos, microphone, camera
+- Contacts, calendar, microphone
+- Photos and camera images: receipt photos are read on your device and
+  never uploaded (only the text read from a receipt is sent, and only for
+  PRO smart scanning — see 3.6)
 - Advertising identifiers
 - Behavioural profiles or marketing segments
 
@@ -124,7 +158,8 @@ generally cannot link any record back to you. You can still:
 - **Sentry:** subject to Sentry's retention defaults
   (currently 30 days on the Developer plan).
 - **RevenueCat / OpenAI / Render:** subject to their own policies linked
-  in section 3.
+  in section 3. Our backend does not store the text of AI insight requests
+  or receipts (see 3.4 and 3.6).
 
 ## 8. Changes to this policy
 
