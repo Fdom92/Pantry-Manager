@@ -109,7 +109,8 @@ by app structure. Pick the screens that show, in this order of priority:
 7. Reassurance — local-first/offline, notifications, onboarding starter set. Only if a slot is
    left.
 
-Rules: never duplicate a screen; never show an empty state, an error toast, a loading skeleton or
+Rules: never spend a slot on a minor quality-of-life feature (undo, toggles, sort order) — a slot
+is for something that makes a stranger install; never duplicate a screen; never show an empty state, an error toast, a loading skeleton or
 a half-open keyboard; avoid screens that look the same at thumbnail size; keep the same seeded
 persona and "today" across the set so the story is coherent (a product "expires tomorrow" on one
 shot can't be "expired" on the next). Fewer than 8 is fine when the rest would be filler.

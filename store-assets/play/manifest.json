@@ -1,0 +1,92 @@
+{
+  "capturedAt": "2026-10-07",
+  "appVersion": "5.6",
+  "commit": "1ed0093c6af233d65390197b3c6649cfddceb3d5",
+  "uploadedToPlay": false,
+  "languages": [
+    "es",
+    "en",
+    "de",
+    "fr",
+    "it",
+    "pt"
+  ],
+  "device": "Medium_Phone_API_35 emulator, wm size 1080x2160 density 420, debug APK com.fdom.pantrymind.dev, marketing seed",
+  "notes": "Captured on an emulator whose WebView (124) does not report safe-area insets under edge-to-edge, so --ion-safe-area-top/bottom were set to 24px at runtime through DevTools (not in the app source) to emulate a current device. Slot 03 (receipt review) is missing: ML Kit OCR cannot run on the emulator, needs a capture from a real device. Recaptured after the seeder improvements in 1ed0093c (12-day streak, no waste this month, rotation 88%, no expired products). Gotcha: the app language follows the device/app locale (not persisted), so use `adb shell cmd locale set-app-locales <pkg> --locales <lang>` before seeding; the dev-panel seed needs the native confirm dialog accepted. Insights shots for de/it/pt are scrolled a few px (waste card title clipped under the header) while es/en/fr are at scroll 0. Decision 2026-10-07: undo-purchase is deliberately NOT a store shot (minor feature, wastes a slot); the listing sells the core promise, pantry at a glance, ticket review, shopping list, insights and PRO.",
+  "shots": [
+    {
+      "id": "dashboard",
+      "order": 1,
+      "file": "01-dashboard.png",
+      "captured": true,
+      "sources": [
+        "src/app/features/dashboard",
+        "src/app/shared"
+      ],
+      "pro": false
+    },
+    {
+      "id": "pantry",
+      "order": 2,
+      "file": "02-pantry.png",
+      "captured": true,
+      "state": "fresh section expanded",
+      "sources": [
+        "src/app/features/pantry/pantry.component.html",
+        "src/app/features/pantry/pantry.component.scss",
+        "src/app/features/pantry/components/fresh-item-card",
+        "src/app/shared"
+      ],
+      "pro": false
+    },
+    {
+      "id": "receipt-review",
+      "order": 3,
+      "file": "03-receipt-review.png",
+      "captured": false,
+      "reason": "needs a real device (ML Kit OCR unavailable on the emulator)",
+      "sources": [
+        "src/app/features/pantry/components/receipt-scan-modal"
+      ],
+      "pro": false
+    },
+    {
+      "id": "shopping",
+      "order": 4,
+      "file": "04-shopping.png",
+      "captured": true,
+      "state": "grouped by supermarket",
+      "sources": [
+        "src/app/features/list"
+      ],
+      "pro": false
+    },
+    {
+      "id": "insights",
+      "order": 5,
+      "file": "05-insights.png",
+      "captured": true,
+      "sources": [
+        "src/app/features/insights",
+        "src/app/shared/components/insight-status-pill"
+      ],
+      "pro": false
+    },
+    {
+      "id": "pro-restock",
+      "order": 6,
+      "file": "06-pro-restock.png",
+      "captured": true,
+      "state": "dashboard scrolled, PRO simulated from the dev panel",
+      "sources": [
+        "src/app/features/dashboard"
+      ],
+      "pro": true
+    }
+  ],
+  "alsoWatch": [
+    "src/app/core/services/dev/dev-marketing-seeder.service.ts",
+    "src/theme",
+    "src/assets/i18n"
+  ]
+}
