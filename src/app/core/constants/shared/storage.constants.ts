@@ -38,6 +38,11 @@ export const STORAGE_KEYS = {
   REVIEW_PRODUCT_ADD_COUNT: 'review:productAddCount',
   REVIEW_CONSUME_COUNT: 'review:consumeCount',
   REVIEW_PENDING: 'review:pending',
+  /**
+   * Language the user picked in Settings. Per-device on purpose: without it the app
+   * re-read the phone's locale on every launch and silently undid the choice.
+   */
+  LANGUAGE: 'app:language',
   /** Set once the post-update re-consent sheet has been shown (one-shot). */
   RECONSENT_SHOWN: 'reconsent:shown',
   /**

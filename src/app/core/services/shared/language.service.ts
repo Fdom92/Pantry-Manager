@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { normalizeLocaleCode } from '@core/utils/normalization.util';
 import { AnalyticsService } from '../analytics/analytics.service';
+import { LocalStorageService } from './local-storage.service';
 import { LoggerService } from './logger.service';
 
 @Injectable({
@@ -13,6 +14,7 @@ export class LanguageService {
   private readonly translate = inject(TranslateService);
   private readonly analytics = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
+  private readonly localStorage = inject(LocalStorageService);
 
   readonly currentLanguage = signal<SupportedLanguage>(DEFAULT_LANGUAGE);
 
@@ -20,8 +22,12 @@ export class LanguageService {
     this.translate.addLangs([...SUPPORTED_LANGUAGES]);
     this.translate.setDefaultLang(DEFAULT_LANGUAGE);
 
-    const deviceLocale = this.getNavigatorLocale();
-    const language = this.resolveSupportedLanguage(deviceLocale);
+    // The user's own choice wins over the phone's locale; a stale or hand-edited
+    // value that is no longer supported falls through to the device locale.
+    const stored = this.localStorage.language.get();
+    const language = this.isSupportedLanguage(stored)
+      ? stored
+      : this.resolveSupportedLanguage(this.getNavigatorLocale());
 
     await firstValueFrom(this.translate.use(language));
     this.currentLanguage.set(language);
@@ -40,6 +46,7 @@ export class LanguageService {
     const previous = this.currentLanguage();
     await firstValueFrom(this.translate.use(lang));
     this.currentLanguage.set(lang);
+    this.localStorage.language.set(lang);
     if (previous !== lang) {
       this.analytics.track(ANALYTICS_EVENTS.PREFERENCE_CHANGED, {
         key: 'language',
