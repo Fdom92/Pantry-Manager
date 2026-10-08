@@ -12,3 +12,4 @@ export * from './skeleton.util';
 export * from './task.util';
 export * from './uuid.util';
 export * from './assert-never.util';
+export * from './navigation.util';
