@@ -17,6 +17,7 @@ import { AppUpdateService } from '@core/services/app-update';
 import { StreakStateService, StreakMilestoneService } from '@core/services/retention';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { isExitScreenUrl } from '@core/utils/navigation.util';
+import { SystemBarsService } from '@core/services/shared/system-bars.service';
 // STORAGE_KEYS removed: callers go through LocalStorageService.
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
@@ -38,6 +39,7 @@ export class AppComponent {
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
+  private readonly systemBars = inject(SystemBarsService);
   private readonly notificationScheduler = inject(NotificationSchedulerService);
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
@@ -58,6 +60,7 @@ export class AppComponent {
     void this.initializeApp();
     this.subscribeToNavigation();
     this.setupExitOnDoubleBack();
+    this.systemBars.init();
   }
 
   /**
