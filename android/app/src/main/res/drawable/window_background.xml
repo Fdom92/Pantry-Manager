@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The WebView covers everything but the system-bar insets, so only those strips are
+     visible: toolbar colour at the top, page colour below. 120dp is taller than any
+     status bar and is hidden behind the WebView past it. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/window_strip_bottom" />
+        </shape>
+    </item>
+    <item android:gravity="top" android:height="120dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/window_strip_top" />
+        </shape>
+    </item>
+</layer-list>

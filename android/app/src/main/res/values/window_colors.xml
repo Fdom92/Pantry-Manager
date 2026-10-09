@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- What shows through under the transparent system bars once Capacitor adds the
+         edge-to-edge margins: the top strip must match the toolbar and the bottom one
+         the page/tab bar (src/theme/variables.scss: ion-toolbar-background and
+         ion-color-light). Keep both in sync with that file. -->
+    <color name="window_strip_top">#FFFFFF</color>
+    <color name="window_strip_bottom">#F6FAF8</color>
+    <bool name="light_system_bars">true</bool>
+</resources>
