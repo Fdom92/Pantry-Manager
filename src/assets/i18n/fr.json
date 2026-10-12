@@ -1201,7 +1201,7 @@
       "empty": "Ajoute ou consomme un produit aujourd'hui pour démarrer ta série",
       "longest": "Meilleure série : {{longest}}",
       "milestones": "Jalons",
-      "nextGoal": "Il reste {{days}} jours avant {{milestone}}",
+      "nextGoal": "Plus que {{days}} jours avant les {{milestone}} jours",
       "graceAvailable": "Joker disponible",
       "graceUsed": "Joker utilisé — reviens demain sans faute",
       "allMilestonesReached": "🎉 Tu as atteint tous les jalons !",
@@ -1209,8 +1209,8 @@
       "daysLabel_other": "jours",
       "longest_one": "Meilleure série : {{longest}} jour",
       "longest_other": "Meilleure série : {{longest}} jours",
-      "nextGoal_one": "Il reste {{days}} jour avant {{milestone}}",
-      "nextGoal_other": "Il reste {{days}} jours avant {{milestone}}"
+      "nextGoal_one": "Plus que {{days}} jour avant les {{milestone}} jours",
+      "nextGoal_other": "Plus que {{days}} jours avant les {{milestone}} jours"
     }
   },
   "reviews": {
