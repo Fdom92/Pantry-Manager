@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
 import 'dotenv/config';
-import agentRoutes from './routes/agent.routes.js';
 import insightsRoutes from './routes/insights.routes.js';
 import receiptRoutes from './routes/receipt.routes.js';
 import paymentsRoutes from './routes/payments.js';
@@ -52,7 +51,6 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/payments', paymentsRoutes);
-app.use('/agent', agentRoutes);
 app.use('/insights', insightsRoutes);
 app.use('/receipt', receiptRoutes);
 

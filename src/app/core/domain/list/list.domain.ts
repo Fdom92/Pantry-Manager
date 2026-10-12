@@ -6,7 +6,6 @@ export const URGENCY_WEIGHT: Record<ShoppingReason, number> = {
   [ShoppingReason.FRESH_LOW]:   1.5,
   [ShoppingReason.EMPTY]:       2,
   [ShoppingReason.BELOW_MIN]:   3,
-  [ShoppingReason.MANUAL]:      4,
 };
 
 /**

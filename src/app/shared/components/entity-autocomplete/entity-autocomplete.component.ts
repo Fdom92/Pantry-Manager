@@ -1,6 +1,7 @@
+import { SHEET_AUTOFOCUS_DELAY_MS } from '@core/constants';
 import { normalizeProductKey } from '@core/utils/normalization.util';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild, inject } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -19,10 +20,11 @@ export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
   templateUrl: './entity-autocomplete.component.html',
   styleUrls: ['./entity-autocomplete.component.scss'],
 })
-export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implements OnChanges {
+export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implements OnChanges, AfterViewInit {
   // DI
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly destroyRef = inject(DestroyRef);
+  @ViewChild(IonInput) private inputRef?: IonInput;
   // INPUTS
   @Input() items: readonly AutocompleteItem<TRaw, TMeta>[] = [];
   @Input() placeholder?: string;
@@ -55,6 +57,36 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
   inputValue = '';
   isFocused = false;
   private blurTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  ngAfterViewInit(): void {
+    if (this.autofocus) {
+      this.focusWhenPresented();
+    }
+  }
+
+  /**
+   * The `autofocus` attribute alone does not raise the keyboard on Android, least of
+   * all inside an Ionic overlay that is still animating in: the add, fresh and consume
+   * sheets opened with the search field unfocused. Focus has to be asked for with
+   * setFocus(), and starting it as the sheet starts to open (not when it has finished)
+   * makes the keyboard and the sheet move together instead of one after the other.
+   * A fallback covers a modal whose start event had already fired.
+   */
+  private focusWhenPresented(): void {
+    let done = false;
+    const focus = () => {
+      if (done) return;
+      done = true;
+      void this.inputRef?.setFocus();
+    };
+    const modal: HTMLElement | null = this.host.nativeElement.closest('ion-modal');
+    if (!modal) {
+      setTimeout(focus);
+      return;
+    }
+    modal.addEventListener('ionModalWillPresent', () => setTimeout(focus, SHEET_AUTOFOCUS_DELAY_MS), { once: true });
+    setTimeout(focus, 700);
+  }
 
   constructor() {
     this.destroyRef.onDestroy(() => {

@@ -2,16 +2,6 @@
   <ion-toolbar>
     <ion-title>{{ 'shopping.title' | translate }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button
-        (click)="facade.openShareMenu()"
-        [disabled]="facade.loading() || facade.isSharingListInProgress() || (!facade.shoppingAnalysis().summary.total && !facade.visibleManualItems().length)"
-        [attr.aria-label]="'shopping.share.button' | translate">
-        @if (facade.isSharingListInProgress()) {
-          <ion-spinner slot="icon-only" name="lines-small"></ion-spinner>
-        } @else {
-          <ion-icon slot="icon-only" name="share-outline"></ion-icon>
-        }
-      </ion-button>
       <ion-button [routerLink]="['/settings']" [attr.aria-label]="'settings.title' | translate">
         <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
       </ion-button>
@@ -38,6 +28,28 @@
       <span>{{ 'shopping.manualAdd.inlineHint' | translate }}</span>
     </button>
 
+    @if (state.summary.total || facade.visibleManualItems().length) {
+      <div class="list-actions-row">
+        <button
+          class="list-actions-row__btn pressable"
+          (click)="facade.toggleGroupBySupermarket()"
+          [attr.aria-label]="(facade.groupBySupermarket() ? 'shopping.groupToggle.grouped' : 'shopping.groupToggle.flat') | translate">
+          <ion-icon [name]="facade.groupBySupermarket() ? 'list-outline' : 'apps-outline'"></ion-icon>
+        </button>
+        <button
+          class="list-actions-row__btn pressable"
+          [disabled]="facade.loading() || facade.isSharingListInProgress()"
+          (click)="facade.openShareMenu()"
+          [attr.aria-label]="'shopping.share.button' | translate">
+          @if (facade.isSharingListInProgress()) {
+            <ion-spinner name="lines-small"></ion-spinner>
+          } @else {
+            <ion-icon name="share-outline"></ion-icon>
+          }
+        </button>
+      </div>
+    }
+
     @if (!state.summary.total && !state.allBoughtItems.length && !state.allIgnoredItems.length && !facade.visibleManualItems().length) {
       <app-empty-state
         class="list-empty-state"
@@ -48,118 +60,119 @@
     } @else {
       <div class="suggestion-groups fade-in-list">
 
-        @for (group of state.groupedSuggestions; track group.key) {
-          @let groupManuals = (group.key === UNASSIGNED_KEY) ? facade.visibleManualItems() : [];
-          @if (group.suggestions.length || groupManuals.length) {
-            <div class="suggestion-group">
+        <ng-template #suggestionRow let-suggestion="suggestion">
+          <ion-item
+            detail="false"
+            role="button"
+            tabindex="0"
+            class="suggestion-item pressable"
+            [class.suggestion-item--exiting]="isExiting(suggestion.item._id)"
+            (click)="facade.openRowActions({ kind: 'auto', id: suggestion.item._id, name: suggestion.item.name })">
+            <div class="item-body" slot="start">
+              <span class="item-name">{{ suggestion.item.name }}</span>
+              @let detail = suggestionDetail(suggestion);
+              @if (detail) {
+                <span class="item-qty">{{ detail.key | translate:detail.params }}</span>
+              }
+            </div>
+            <ion-button
+              slot="end"
+              fill="solid"
+              [color]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'success' : 'primary'"
+              shape="round"
+              class="buy-btn"
+              (click)="$event.stopPropagation(); onBuyTap(suggestion)">
+              <ion-icon
+                slot="icon-only"
+                [name]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'leaf-outline' : 'cart-outline'">
+              </ion-icon>
+            </ion-button>
+          </ion-item>
+        </ng-template>
 
-              <!-- Group header -->
-              <button class="supermarket-heading pressable" (click)="toggleGroup(group.key)">
-                <span>{{ group.label }}</span>
-                <ion-badge class="group-count group-count--medium">{{ group.suggestions.length + groupManuals.length }}</ion-badge>
+        <ng-template #manualRow let-manual="manual">
+          <ion-item
+            detail="false"
+            role="button"
+            tabindex="0"
+            class="suggestion-item pressable"
+            (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
+            <div class="item-body" slot="start">
+              <span class="item-name">{{ manual.name }}</span>
+            </div>
+            <ion-button
+              slot="end"
+              fill="solid"
+              color="primary"
+              shape="round"
+              class="buy-btn"
+              (click)="$event.stopPropagation(); buySheet.openSheetForManual(manual.id, manual.name)">
+              <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ng-template>
+
+        @if (facade.groupBySupermarket()) {
+          @for (group of state.groupedSuggestions; track group.key) {
+            @let groupManuals = (group.key === UNASSIGNED_KEY) ? facade.visibleManualItems() : [];
+            @if (group.suggestions.length || groupManuals.length) {
+              <div class="suggestion-group">
+
+                <!-- Group header -->
+                <button class="supermarket-heading pressable" (click)="toggleGroup(group.key)">
+                  <span>{{ group.label }}</span>
+                  <ion-badge class="group-count group-count--medium">{{ group.suggestions.length + groupManuals.length }}</ion-badge>
+                  <ion-icon
+                    class="collapse-icon"
+                    [class.collapse-icon--expanded]="!isGroupCollapsed(group.key)"
+                    name="chevron-down-outline">
+                  </ion-icon>
+                </button>
+
+                @if (!isGroupCollapsed(group.key)) {
+                  <ion-list class="item-list" lines="none">
+                    @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
+                      <ng-container [ngTemplateOutlet]="suggestionRow" [ngTemplateOutletContext]="{ suggestion }"></ng-container>
+                    }
+                    @for (manual of groupManuals; track manual.id) {
+                      <ng-container [ngTemplateOutlet]="manualRow" [ngTemplateOutletContext]="{ manual }"></ng-container>
+                    }
+                  </ion-list>
+                }
+              </div>
+            }
+          }
+
+          <!-- Synthetic unassigned group: manual items only, no auto suggestions without supermarket -->
+          @if (facade.visibleManualItems().length && !hasUnassignedAutoGroup(state.groupedSuggestions)) {
+            <div class="suggestion-group">
+              <button class="supermarket-heading pressable" (click)="toggleGroup(UNASSIGNED_KEY)">
+                <span>{{ 'shopping.unassignedSupermarket' | translate }}</span>
+                <ion-badge class="group-count group-count--medium">{{ facade.visibleManualItems().length }}</ion-badge>
                 <ion-icon
                   class="collapse-icon"
-                  [class.collapse-icon--expanded]="!isGroupCollapsed(group.key)"
+                  [class.collapse-icon--expanded]="!isGroupCollapsed(UNASSIGNED_KEY)"
                   name="chevron-down-outline">
                 </ion-icon>
               </button>
-
-              @if (!isGroupCollapsed(group.key)) {
+              @if (!isGroupCollapsed(UNASSIGNED_KEY)) {
                 <ion-list class="item-list" lines="none">
-                  @for (suggestion of group.suggestions; track facade.getSuggestionTrackId(suggestion)) {
-                    <ion-item
-                      detail="false"
-                      role="button"
-                      tabindex="0"
-                      class="suggestion-item pressable"
-                      [class.suggestion-item--exiting]="isExiting(suggestion.item._id)"
-                      (click)="facade.openRowActions({ kind: 'auto', id: suggestion.item._id, name: suggestion.item.name })">
-                      <div class="item-body" slot="start">
-                        <span class="item-name">{{ suggestion.item.name }}</span>
-                        @let detail = suggestionDetail(suggestion);
-                        @if (detail) {
-                          <span class="item-qty">{{ detail.key | translate:detail.params }}</span>
-                        }
-                      </div>
-                      <ion-button
-                        slot="end"
-                        fill="solid"
-                        [color]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'success' : 'primary'"
-                        shape="round"
-                        class="buy-btn"
-                        (click)="$event.stopPropagation(); onBuyTap(suggestion)">
-                        <ion-icon
-                          slot="icon-only"
-                          [name]="(suggestion.reason === 'fresh-empty' || suggestion.reason === 'fresh-low') ? 'leaf-outline' : 'cart-outline'">
-                        </ion-icon>
-                      </ion-button>
-                    </ion-item>
-                  }
-                  @for (manual of groupManuals; track manual.id) {
-                    <ion-item
-                      detail="false"
-                      role="button"
-                      tabindex="0"
-                      class="suggestion-item pressable"
-                      (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
-                      <div class="item-body" slot="start">
-                        <span class="item-name">{{ manual.name }}</span>
-                      </div>
-                      <ion-button
-                        slot="end"
-                        fill="solid"
-                        color="primary"
-                        shape="round"
-                        class="buy-btn"
-                        (click)="$event.stopPropagation(); buySheet.openSheetForManual(manual.id, manual.name)">
-                        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                      </ion-button>
-                    </ion-item>
+                  @for (manual of facade.visibleManualItems(); track manual.id) {
+                    <ng-container [ngTemplateOutlet]="manualRow" [ngTemplateOutletContext]="{ manual }"></ng-container>
                   }
                 </ion-list>
               }
             </div>
           }
-        }
-
-        <!-- Synthetic unassigned group: manual items only, no auto suggestions without supermarket -->
-        @if (facade.visibleManualItems().length && !hasUnassignedAutoGroup(state.groupedSuggestions)) {
-          <div class="suggestion-group">
-            <button class="supermarket-heading pressable" (click)="toggleGroup(UNASSIGNED_KEY)">
-              <span>{{ 'shopping.unassignedSupermarket' | translate }}</span>
-              <ion-badge class="group-count group-count--medium">{{ facade.visibleManualItems().length }}</ion-badge>
-              <ion-icon
-                class="collapse-icon"
-                [class.collapse-icon--expanded]="!isGroupCollapsed(UNASSIGNED_KEY)"
-                name="chevron-down-outline">
-              </ion-icon>
-            </button>
-            @if (!isGroupCollapsed(UNASSIGNED_KEY)) {
-              <ion-list class="item-list" lines="none">
-                @for (manual of facade.visibleManualItems(); track manual.id) {
-                  <ion-item
-                    detail="false"
-                    role="button"
-                    tabindex="0"
-                    class="suggestion-item pressable"
-                    (click)="facade.openRowActions({ kind: 'manual', id: manual.id, name: manual.name })">
-                    <div class="item-body" slot="start">
-                      <span class="item-name">{{ manual.name }}</span>
-                    </div>
-                    <ion-button
-                      slot="end"
-                      fill="solid"
-                      color="primary"
-                      shape="round"
-                      class="buy-btn"
-                      (click)="$event.stopPropagation(); buySheet.openSheetForManual(manual.id, manual.name)">
-                      <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-                    </ion-button>
-                  </ion-item>
-                }
-              </ion-list>
+        } @else {
+          <ion-list class="item-list" lines="none">
+            @for (suggestion of state.suggestions; track facade.getSuggestionTrackId(suggestion)) {
+              <ng-container [ngTemplateOutlet]="suggestionRow" [ngTemplateOutletContext]="{ suggestion }"></ng-container>
             }
-          </div>
+            @for (manual of facade.visibleManualItems(); track manual.id) {
+              <ng-container [ngTemplateOutlet]="manualRow" [ngTemplateOutletContext]="{ manual }"></ng-container>
+            }
+          </ion-list>
         }
 
         <!-- Global "Comprado" section -->
@@ -180,6 +193,18 @@
                   <ion-item class="bought-item" detail="false">
                     <ion-icon slot="start" name="checkmark-circle" color="success"></ion-icon>
                     <span class="item-name bought-name">{{ bought.name }}</span>
+                    @if (facade.canUndoPurchase(bought.id)) {
+                      <ion-button
+                        slot="end"
+                        fill="clear"
+                        color="medium"
+                        class="undo-btn"
+                        [disabled]="facade.undoInProgressIds().has(bought.id)"
+                        (click)="facade.undoPurchase(bought.id)"
+                        [attr.aria-label]="'common.actions.undo' | translate">
+                        <ion-icon slot="icon-only" name="arrow-undo-outline"></ion-icon>
+                      </ion-button>
+                    }
                   </ion-item>
                 }
               </ion-list>

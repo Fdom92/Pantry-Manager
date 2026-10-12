@@ -3,8 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { PantryQueryService } from '@core/services/pantry';
-import { LocalStorageService, LoggerService } from '@core/services/shared';
+import { LocalStorageService, LoggerService, ToastService } from '@core/services/shared';
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
 import { SyncService } from '@core/services/sync/sync.service';
@@ -15,6 +16,8 @@ import { SettingsPreferencesService } from '@core/services/settings/settings-pre
 import { AppUpdateService } from '@core/services/app-update';
 import { StreakStateService, StreakMilestoneService } from '@core/services/retention';
 import { ANALYTICS_EVENTS } from '@core/constants';
+import { isExitScreenUrl } from '@core/utils/navigation.util';
+import { SystemBarsService } from '@core/services/shared/system-bars.service';
 // STORAGE_KEYS removed: callers go through LocalStorageService.
 import { NavController } from '@ionic/angular';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
@@ -36,6 +39,7 @@ export class AppComponent {
   private readonly revenuecat = inject(UpgradeRevenuecatService);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
+  private readonly systemBars = inject(SystemBarsService);
   private readonly notificationScheduler = inject(NotificationSchedulerService);
   private readonly syncService = inject(SyncService);
   private readonly analytics = inject(AnalyticsService);
@@ -48,11 +52,15 @@ export class AppComponent {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly prefs = inject(SettingsPreferencesService);
   private readonly clock = inject(ClockService);
+  private readonly toast = inject(ToastService);
+  private lastExitPromptAt = 0;
 
   constructor() {
     this.redirectToFirstRunFlows();
     void this.initializeApp();
     this.subscribeToNavigation();
+    this.setupExitOnDoubleBack();
+    this.systemBars.init();
   }
 
   /**
@@ -155,6 +163,36 @@ export class AppComponent {
         this.markHandled(url);
         void this.syncService.handleIncomingIntent(url);
       }
+    });
+  }
+
+  /**
+   * "Press back again to exit." on the screens where back has nowhere to go (tab roots,
+   * onboarding). Registered at priority 1: above Ionic's NavController handler (0), which
+   * pops and then ALWAYS hands over to lower-priority handlers, so a handler below it
+   * would fire after every navigation back and exit from the middle of a stack. Open
+   * overlays (priority ~100) still get first crack and swallow the event.
+   */
+  private setupExitOnDoubleBack(): void {
+    if (!Capacitor.isNativePlatform()) return;
+    // @capacitor/app only dispatches the DOM 'backbutton' event (which Ionic turns into
+    // ionBackButton) while a 'backButton' listener exists; without one the native
+    // callback just calls webView.goBack() and none of the handlers below ever run.
+    void CapacitorApp.addListener('backButton', () => undefined);
+    document.addEventListener('ionBackButton', (ev: Event) => {
+      (ev as CustomEvent).detail.register(1, (processNextHandler: () => void) => {
+        if (!isExitScreenUrl(this.router.url)) {
+          processNextHandler();
+          return;
+        }
+        const now = Date.now();
+        if (now - this.lastExitPromptAt < 2000) {
+          void CapacitorApp.exitApp();
+          return;
+        }
+        this.lastExitPromptAt = now;
+        this.toast.info('common.pressBackAgainToExit');
+      });
     });
   }
 

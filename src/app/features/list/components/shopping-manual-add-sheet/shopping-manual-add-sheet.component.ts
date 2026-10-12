@@ -3,6 +3,7 @@ import { IonButton, IonInput, IonModal } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { ShoppingManualAddSheetStateService } from './shopping-manual-add-sheet-state.service';
 import { ListStateService } from '@core/services/list/list-state.service';
+import { SHEET_AUTOFOCUS_DELAY_MS } from '@core/constants';
 
 @Component({
   selector: 'app-shopping-manual-add-sheet',
@@ -18,8 +19,9 @@ export class ShoppingManualAddSheetComponent {
 
   @ViewChild('nameInput') private nameInputRef?: IonInput;
 
-  async onDidPresent(): Promise<void> {
-    await this.nameInputRef?.setFocus();
+  /** Focus as the sheet starts to open, so the keyboard rises with it (see the constant). */
+  onWillPresent(): void {
+    setTimeout(() => void this.nameInputRef?.setFocus(), SHEET_AUTOFOCUS_DELAY_MS);
   }
 
   confirm(): void {

@@ -83,6 +83,7 @@
   },
   "common": {
     "dismiss": "Pas maintenant",
+    "pressBackAgainToExit": "Appuyez à nouveau sur retour pour quitter",
     "actions": {
       "close": "Fermer",
       "cancel": "Annuler",
@@ -239,17 +240,7 @@
     "context": {
       "recentlyAdded": "{{ count }} produits récemment ajoutés"
     },
-    "pantryScore": {
-      "title": "Santé du garde-manger",
-      "hint": "Score basé sur les dates d'expiration, le stock et l'organisation de votre garde-manger",
-      "excellent": "Excellent",
-      "good": "Plutôt bien",
-      "fair": "Améliorable",
-      "poor": "Nécessite attention"
-    },
     "foodCoverage": {
-      "title": "Couverture estimée",
-      "hint": "Estimation basée sur les produits de votre garde-manger",
       "value": "≈ {{duration}} de nourriture"
     },
     "summary": {
@@ -380,6 +371,10 @@
   "shopping": {
     "title": "Liste de courses",
     "unassignedSupermarket": "N’importe quel supermarché",
+    "groupToggle": {
+      "flat": "Grouper par supermarché",
+      "grouped": "Vue liste"
+    },
     "reasons": {
       "below-min": "Stock faible",
       "empty": "Rupture de stock"
@@ -439,7 +434,10 @@
       "ignored": "{{name}} masqué pour l'instant — réapparaîtra la prochaine fois.",
       "removedManual": "{{name}} retiré de la liste.",
       "shareFailed": "Impossible de partager la liste. Réessaie.",
-      "unbasic": "{{name}} ne sera plus ajouté automatiquement à ta liste."
+      "unbasic": "{{name}} ne sera plus ajouté automatiquement à ta liste.",
+      "purchaseUndone": "Achat annulé.",
+      "undoStale": "Impossible d'annuler — le produit a changé après l'achat.",
+      "undoFailed": "Impossible d'annuler l'achat. Réessaie."
     },
     "buySheet": {
       "title": "Combien en as-tu acheté ?",
@@ -494,42 +492,30 @@
       "attention": "Produits à vérifier",
       "optimal": "Inventaire à jour"
     },
-    "snapshot": {
-      "title": "Ton garde-manger",
-      "active": "Actifs",
-      "expired": "Périmés",
-      "review": "Vérifier",
-      "noDate": "Sans date",
-      "basicsOut": "Essentiels vides",
-      "noExpiry": "Sans date: {{count}} sur {{total}} produits"
-    },
     "coverage": {
-      "title": "Couverture estimée",
-      "household": "Personnes à la maison"
+      "title": "Couverture",
+      "household": "Personnes à la maison",
+      "sentence": "Avec ce que tu as, tu tiens {{duration}} sans faire de courses",
+      "level": {
+        "good": "Bonne",
+        "normal": "Juste",
+        "bad": "Faible"
+      }
     },
     "activity": {
-      "title": "30 derniers jours",
+      "title": "Rotation",
       "detail": "Tu as ajouté {{added}} fois et utilisé {{consumed}} fois ce mois-ci",
       "detailNoAdds": "Tu as utilisé {{consumed}} fois sans rien ajouter ce mois-ci",
       "noActivity": "Aucune activité enregistrée",
       "rotationHigh": "Rotation élevée",
       "rotationMedium": "Rotation moyenne",
-      "rotationLow": "Rotation faible"
+      "rotationLow": "Rotation faible",
+      "windowLabel": "30 derniers jours"
     },
     "distribution": {
-      "title": "Par type d'aliment",
+      "title": "Classification",
       "mostWasted": "Incidence élevée",
       "leastRotating": "Faible rotation"
-    },
-    "quality": {
-      "title": "Qualité de l'inventaire",
-      "score": "Score",
-      "withDate": "Suivi",
-      "noDate": "Sans date",
-      "reviewable": "À vérifier",
-      "expired": "Périmés",
-      "noFoodType": "Sans type d'aliment",
-      "improveTip": "Complétez les données dans En attente"
     },
     "pro": {
       "title": "Analyse IA intelligente",
@@ -551,6 +537,13 @@
       "title": "Pas encore d'insights",
       "body": "Ajoutez des produits à votre garde-manger pour voir les tendances de consommation, les prédictions et le gaspillage.",
       "cta": "Aller au garde-manger"
+    },
+    "waste": {
+      "level": {
+        "good": "Pas de gaspillage",
+        "normal": "Normal",
+        "bad": "Élevé"
+      }
     }
   },
   "pantry": {
@@ -897,7 +890,8 @@
       "promptGallery": "Choisir dans la galerie",
       "promptCamera": "Prendre une photo",
       "matchFresh": "Sera marqué comme disponible",
-      "pickerError": "Impossible d'ouvrir l'appareil photo ou la galerie. Réessaie."
+      "pickerError": "Impossible d'ouvrir l'appareil photo ou la galerie. Réessaie.",
+      "toggleDetails": "Voir le type et la date de péremption"
     },
     "deleteWithStock": {
       "header": "Terminé ?",
@@ -1313,18 +1307,6 @@
       "confirm": "Oui, mettre à jour",
       "dismiss": "Non, annuler",
       "errorTitle": "Impossible d'appliquer la synchronisation"
-    }
-  },
-  "batchEdit": {
-    "expiryDateHint": "Seuls les produits avec un seul lot sont affichés.",
-    "actions": {
-      "setFoodType": "Définir le type d'aliment",
-      "setCategory": "Définir la catégorie",
-      "setExpiryDate": "Définir la date d'expiration"
-    },
-    "toast": {
-      "updated_one": "1 produit mis à jour",
-      "updated_other": "{{ count }} produits mis à jour"
     }
   },
   "reconsent": {

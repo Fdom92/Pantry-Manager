@@ -29,8 +29,9 @@ export class OnboardingSeedGridComponent {
     }
     try {
       await Haptics.impact({ style: ImpactStyle.Light });
-    } catch {
+    } catch (err) {
       // Haptics are best-effort: never block the toggle on a missing haptic engine.
+      this.facade.logSeedGridHapticsFailure(err);
     }
   }
 }

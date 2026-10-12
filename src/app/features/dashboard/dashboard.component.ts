@@ -10,7 +10,6 @@ import type { DashboardOverviewCardId } from '@core/models/dashboard/consume-tod
 import type { RepositionPrediction } from '@core/domain/insights/reposition.domain';
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { ReconsentSheetComponent } from '@shared/components/reconsent-sheet/reconsent-sheet.component';
-import { BatchEditModalComponent } from './components/batch-edit-modal/batch-edit-modal.component';
 import { RepositionCardComponent } from '@shared/components/reposition-card/reposition-card.component';
 import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro-paywall-card.component';
 import { StreakCardComponent } from './components/streak-card/streak-card.component';
@@ -46,7 +45,6 @@ import { DurationPipe, ExpiryPipe, RelativeDaysPipe } from '@shared/pipes/date-d
     CommonModule,
     RouterLink,
     TranslateModule,
-    BatchEditModalComponent,
     EmptyStateComponent,
     ReconsentSheetComponent,
     RepositionCardComponent,

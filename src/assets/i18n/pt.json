@@ -83,6 +83,7 @@
   },
   "common": {
     "dismiss": "Agora não",
+    "pressBackAgainToExit": "Toque novamente em voltar para sair",
     "actions": {
       "close": "Fechar",
       "cancel": "Cancelar",
@@ -239,17 +240,7 @@
     "context": {
       "recentlyAdded": "{{ count }} produtos adicionados recentemente"
     },
-    "pantryScore": {
-      "title": "Saúde da despensa",
-      "hint": "Pontuação baseada em validades, stock e organização da sua despensa",
-      "excellent": "Excelente",
-      "good": "Bem",
-      "fair": "Melhorável",
-      "poor": "Precisa de atenção"
-    },
     "foodCoverage": {
-      "title": "Cobertura estimada",
-      "hint": "Estimativa baseada nos produtos da sua despensa",
       "value": "≈ {{duration}} de comida"
     },
     "summary": {
@@ -380,6 +371,10 @@
   "shopping": {
     "title": "Lista de compras",
     "unassignedSupermarket": "Qualquer supermercado",
+    "groupToggle": {
+      "flat": "Agrupar por supermercado",
+      "grouped": "Vista plana"
+    },
     "reasons": {
       "below-min": "Stock baixo",
       "empty": "Sem stock"
@@ -439,7 +434,10 @@
       "ignored": "{{name}} oculto agora — voltará na próxima vez.",
       "removedManual": "{{name}} removido da lista.",
       "shareFailed": "Não foi possível partilhar a lista. Tenta de novo.",
-      "unbasic": "{{name}} não será mais adicionado automaticamente à sua lista."
+      "unbasic": "{{name}} não será mais adicionado automaticamente à sua lista.",
+      "purchaseUndone": "Compra desfeita.",
+      "undoStale": "Já não é possível desfazer — o produto mudou depois da compra.",
+      "undoFailed": "Não foi possível desfazer a compra. Tenta novamente."
     },
     "buySheet": {
       "title": "Quantos compraste?",
@@ -494,42 +492,30 @@
       "attention": "Produtos a verificar",
       "optimal": "Inventário atualizado"
     },
-    "snapshot": {
-      "title": "A tua despensa agora",
-      "active": "Ativos",
-      "expired": "Expirados",
-      "review": "Verificar",
-      "noDate": "Sem data",
-      "basicsOut": "Básicos sem stock",
-      "noExpiry": "Sem data: {{count}} de {{total}} produtos"
-    },
     "coverage": {
-      "title": "Cobertura estimada",
-      "household": "Pessoas em casa"
+      "title": "Cobertura",
+      "household": "Pessoas em casa",
+      "sentence": "Com o que tens, aguentas {{duration}} sem comprar",
+      "level": {
+        "good": "Boa",
+        "normal": "Apertada",
+        "bad": "Baixa"
+      }
     },
     "activity": {
-      "title": "Últimos 30 dias",
+      "title": "Rotação",
       "detail": "Adicionaste {{added}} vezes e usaste {{consumed}} vezes este mês",
       "detailNoAdds": "Usaste {{consumed}} vezes sem adicionar nada este mês",
       "noActivity": "Sem atividade registada",
       "rotationHigh": "Rotação alta",
       "rotationMedium": "Rotação média",
-      "rotationLow": "Rotação baixa"
+      "rotationLow": "Rotação baixa",
+      "windowLabel": "Últimos 30 dias"
     },
     "distribution": {
-      "title": "Por tipo de alimento",
+      "title": "Classificação",
       "mostWasted": "Maior incidência",
       "leastRotating": "Baixa rotação"
-    },
-    "quality": {
-      "title": "Qualidade do inventário",
-      "score": "Pontuação",
-      "withDate": "Rastreados",
-      "noDate": "Sem data",
-      "reviewable": "Revisáveis",
-      "expired": "Expirados",
-      "noFoodType": "Sem tipo de alimento",
-      "improveTip": "Complete os dados em Pendentes"
     },
     "pro": {
       "title": "Análise inteligente com IA",
@@ -551,6 +537,13 @@
       "title": "Ainda sem insights",
       "body": "Adiciona produtos à tua despensa para ver padrões de consumo, previsões e desperdício.",
       "cta": "Ir para a despensa"
+    },
+    "waste": {
+      "level": {
+        "good": "Sem desperdício",
+        "normal": "Normal",
+        "bad": "Alto"
+      }
     }
   },
   "pantry": {
@@ -897,7 +890,8 @@
       "promptGallery": "Escolher da galeria",
       "promptCamera": "Tirar foto",
       "matchFresh": "Será marcado como disponível",
-      "pickerError": "Não foi possível abrir a câmara ou a galeria. Tenta de novo."
+      "pickerError": "Não foi possível abrir a câmara ou a galeria. Tenta de novo.",
+      "toggleDetails": "Ver tipo e validade"
     },
     "deleteWithStock": {
       "header": "Já acabou?",
@@ -1313,18 +1307,6 @@
       "confirm": "Sim, atualizar",
       "dismiss": "Não, cancelar",
       "errorTitle": "Não foi possível aplicar a sincronização"
-    }
-  },
-  "batchEdit": {
-    "expiryDateHint": "Apenas produtos com um único lote são exibidos.",
-    "actions": {
-      "setFoodType": "Definir tipo de alimento",
-      "setCategory": "Definir categoria",
-      "setExpiryDate": "Definir data de validade"
-    },
-    "toast": {
-      "updated_one": "1 produto atualizado",
-      "updated_other": "{{ count }} produtos atualizados"
     }
   },
   "reconsent": {

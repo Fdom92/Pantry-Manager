@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
+import { LoggerService } from '../shared/logger.service';
 import type { InsightsAnalysis, InsightsSignalsPayload } from '@core/models/insights/insights-analysis.model';
 import { environment } from 'src/environments/environment';
 
@@ -8,6 +9,7 @@ export type InsightsClientError = 'RATE_LIMIT' | 'TIMEOUT' | 'PRO_REQUIRED' | 'A
 @Injectable({ providedIn: 'root' })
 export class InsightsLlmClientService {
   private readonly revenuecat = inject(UpgradeRevenuecatService);
+  private readonly logger = inject(LoggerService);
   private readonly endpoint = environment.insightsApiUrl;
   private readonly timeoutMs = 45000;
   private warmupInFlight = false;
@@ -67,7 +69,8 @@ export class InsightsLlmClientService {
     let healthUrl: string;
     try {
       healthUrl = new URL(this.endpoint).origin + '/health';
-    } catch {
+    } catch (err) {
+      this.logger.warn('InsightsLlmClientService', 'Could not build warmup health URL', { err });
       return;
     }
     this.warmupInFlight = true;
@@ -75,8 +78,10 @@ export class InsightsLlmClientService {
     const timeoutId = setTimeout(() => controller.abort(), 10000);
     try {
       await fetch(healthUrl, { method: 'GET', signal: controller.signal });
-    } catch {
-      // best-effort
+    } catch (err) {
+      // Best-effort: a failed warmup just means the first real request pays
+      // the backend's cold-start cost — still worth a breadcrumb.
+      this.logger.warn('InsightsLlmClientService', 'Warmup ping failed', { err });
     } finally {
       clearTimeout(timeoutId);
       this.warmupInFlight = false;

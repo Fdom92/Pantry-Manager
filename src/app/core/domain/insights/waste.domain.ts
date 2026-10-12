@@ -64,3 +64,16 @@ export function computeWasteSummary(
 
   return { windowDays, totalCount, byCategory, byFoodType, previousWindowCount, trend };
 }
+
+export type WasteLevel = 'good' | 'normal' | 'bad';
+
+/**
+ * Free-tier status pill for the waste card. No trend needed (that's PRO) —
+ * just today's absolute count. Thresholds are a starting estimate, not
+ * derived from real usage data yet; revisit once PostHog exports exist.
+ */
+export function classifyWasteLevel(totalCount: number): WasteLevel {
+  if (totalCount === 0) return 'good';
+  if (totalCount <= 2) return 'normal';
+  return 'bad';
+}

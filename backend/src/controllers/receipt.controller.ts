@@ -88,8 +88,8 @@ export const receiptController = {
     let parsed: any;
     try {
       parsed = JSON.parse(content);
-    } catch {
-      logger.error('Failed to parse OpenAI JSON response (receipt)', { userId, content: content.slice(0, 200) });
+    } catch (err) {
+      logger.error('Failed to parse OpenAI JSON response (receipt)', { userId, content: content.slice(0, 200), err });
       res.status(500).json({ error: 'INVALID_RESPONSE' });
       return;
     }
