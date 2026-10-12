@@ -15,6 +15,8 @@ const DIMMING_OVERLAYS = ['Modal', 'Alert', 'ActionSheet', 'Loading'] as const;
 /** Ionic's md backdrop opacity, for when the overlay's own value can't be read. */
 const DEFAULT_BACKDROP_OPACITY = 0.32;
 const DIM_TRANSITION_MS = 250;
+/** Length of the theme cross-fade (View Transitions' default), shared with the bar strips. */
+export const THEME_FADE_MS = 250;
 
 /**
  * Keeps the strips under the transparent system bars in step with the app.
@@ -36,6 +38,7 @@ export class SystemBarsService {
   private readonly overlays = new Map<EventTarget, { opacity: number; bottom: Rgb | null }>();
   private probe: HTMLElement | null = null;
   private started = false;
+  private nextFadeMs = 0;
 
   init(): void {
     if (this.started || !Capacitor.isNativePlatform()) return;
@@ -48,15 +51,27 @@ export class SystemBarsService {
     }
     // A sheet that settles at another breakpoint (or is dragged to one) dims by another amount.
     document.addEventListener('ionBreakpointDidChange', e => this.breakpointChanged(e as CustomEvent<{ breakpoint?: number }>));
-    // The theme switches by class/attribute on <html>, or by the system's own scheme. Sync at
-    // once and without a fade: the page repaints in this very frame, and any delay here shows
-    // up as the bars changing a beat after the app (two flashes).
-    new MutationObserver(() => void this.sync(0)).observe(document.documentElement, {
+    // Every theme switch, in-app or by the system, ends up as a class/attribute change on
+    // <html>. Sync at once: a delay here shows as the bars changing a beat after the app.
+    new MutationObserver(() => this.syncAfterThemeChange()).observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class', 'data-theme'],
     });
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => void this.sync(0));
     void this.sync(0);
+  }
+
+  /**
+   * Called just before a theme switch that cross-fades, so the strips fade over the same
+   * time instead of snapping while the page is still blending.
+   */
+  expectFade(durationMs: number): void {
+    this.nextFadeMs = durationMs;
+  }
+
+  private syncAfterThemeChange(): void {
+    const durationMs = this.nextFadeMs;
+    this.nextFadeMs = 0;
+    void this.sync(durationMs);
   }
 
   private overlayOpened(event: Event): void {
