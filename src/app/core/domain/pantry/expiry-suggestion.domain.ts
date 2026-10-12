@@ -25,7 +25,7 @@ export const EXPIRY_SUGGESTION_DAYS: Record<FoodType, number | null> =
  */
 export function suggestExpiryDate(
   foodType: FoodType,
-  fromDate: Date = new Date(),
+  fromDate: Date,
 ): string | undefined {
   const days = FOOD_TYPE_PROFILE[foodType].shelfLifeDays;
   if (days === null) return undefined;

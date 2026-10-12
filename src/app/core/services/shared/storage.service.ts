@@ -143,14 +143,12 @@ export class StorageService<T extends BaseDoc> {
    */
   async remove(id: string): Promise<boolean> {
     return this.withRetry(async () => {
-      try {
-        const doc = await this.db.get(id);
-        await this.db.remove(doc);
-        return true;
-      } catch (err) {
-        this.logger.error('StorageService', 'remove error', err);
-        return false;
-      }
+      const doc = await this.db.get(id);
+      await this.db.remove(doc);
+      return true;
+    }).catch(err => {
+      this.logger.error('StorageService', 'remove error', err);
+      return false;
     });
   }
 
@@ -188,26 +186,28 @@ export class StorageService<T extends BaseDoc> {
    * countByType - returns the number of documents for the requested type without fetching full docs.
    */
   protected async countByType(type: string): Promise<number> {
-    await this.ensureIndex(['type']);
-    let total = 0;
-    let skip = 0;
+    return this.withRetry(async () => {
+      await this.ensureIndex(['type']);
+      let total = 0;
+      let skip = 0;
 
-    while (true) {
-      const res = await this.db.find({
-        selector: { type },
-        fields: ['_id'],
-        skip,
-        limit: this.LIST_CHUNK_SIZE,
-      });
-      const batch = res.docs.length;
-      total += batch;
-      if (batch < this.LIST_CHUNK_SIZE) {
-        break;
+      while (true) {
+        const res = await this.db.find({
+          selector: { type },
+          fields: ['_id'],
+          skip,
+          limit: this.LIST_CHUNK_SIZE,
+        });
+        const batch = res.docs.length;
+        total += batch;
+        if (batch < this.LIST_CHUNK_SIZE) {
+          break;
+        }
+        skip += batch;
       }
-      skip += batch;
-    }
 
-    return total;
+      return total;
+    });
   }
 
   /**
@@ -215,16 +215,14 @@ export class StorageService<T extends BaseDoc> {
    */
   async findByField<K extends keyof T>(field: K, value: T[K]): Promise<T[]> {
     return this.withRetry(async () => {
-      try {
-        await this.ensureIndex([field as string]);
-        const result = await this.db.find({
-          selector: { [field as string]: value },
-        });
-        return result.docs;
-      } catch (err) {
-        this.logger.error('StorageService', 'findByField error', err);
-        return [];
-      }
+      await this.ensureIndex([field as string]);
+      const result = await this.db.find({
+        selector: { [field as string]: value },
+      });
+      return result.docs;
+    }).catch(err => {
+      this.logger.error('StorageService', 'findByField error', err);
+      return [];
     });
   }
 
@@ -235,6 +233,12 @@ export class StorageService<T extends BaseDoc> {
     try {
       await this.db.createIndex({ index: { fields } });
     } catch (err) {
+      // A stale connection isn't "index already exists" — rethrow so the
+      // caller's withRetry() reopens and retries the whole operation instead
+      // of silently continuing against a connection that is still closing.
+      if (isIdbConnectionClosingError(err)) {
+        throw err;
+      }
       // Some errors appear when the index already exists; log and ignore them
       this.logger.warn('StorageService', 'ensureIndex warning', { err });
     }

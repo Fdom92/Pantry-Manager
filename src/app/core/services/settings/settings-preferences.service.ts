@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import {
   DEFAULT_PREFERENCES,
   DOC_TYPE_PREFERENCES,
@@ -13,6 +14,7 @@ import {
 import { normalizeStringList } from '@core/utils/normalization.util';
 import { StorageService } from '../shared/storage.service';
 import { LoggerService } from '../shared/logger.service';
+import { SystemBarsService, THEME_FADE_MS } from '../shared/system-bars.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +22,7 @@ import { LoggerService } from '../shared/logger.service';
 export class SettingsPreferencesService {
   private readonly storage = inject<StorageService<AppPreferencesDoc>>(StorageService);
   private readonly logger = inject(LoggerService);
+  private readonly systemBars = inject(SystemBarsService);
 
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
@@ -68,7 +71,7 @@ export class SettingsPreferencesService {
     this.cachedDoc = saved;
     const normalizedPrefs = this.normalizePreferences(saved);
     this.preferencesSignal.set(normalizedPrefs);
-    this.applyTheme(normalizedPrefs.theme);
+    this.applyTheme(normalizedPrefs.theme, undefined, true);
   }
 
   private async loadFromStorage(): Promise<void> {
@@ -120,17 +123,39 @@ export class SettingsPreferencesService {
     return DEFAULT_PREFERENCES.theme;
   }
 
-  private applyTheme(theme: AppThemePreference, systemPrefersDark?: boolean): void {
+  /**
+   * `animate` is for a change the user is looking at (Settings, the system flipping while the
+   * app is open), not for the first paint: the switch cross-fades instead of snapping, and the
+   * system-bar strips fade over the same time so the app and its bars move as one.
+   */
+  private applyTheme(theme: AppThemePreference, systemPrefersDark?: boolean, animate = false): void {
     if (typeof document === 'undefined') {
       return;
     }
     const prefersDark = systemPrefersDark ?? this.prefersDarkQuery?.matches ?? false;
     const useDark = theme === 'dark' || (theme === 'system' && prefersDark);
     const root = document.documentElement;
-    root.classList.toggle('ion-palette-dark', useDark);
-    root.classList.toggle('dark', useDark);
-    root.setAttribute('data-theme', useDark ? 'dark' : 'light');
-    root.style.setProperty('color-scheme', useDark ? 'dark' : 'light');
+    const apply = () => {
+      root.classList.toggle('ion-palette-dark', useDark);
+      root.classList.toggle('dark', useDark);
+      root.setAttribute('data-theme', useDark ? 'dark' : 'light');
+      root.style.setProperty('color-scheme', useDark ? 'dark' : 'light');
+    };
+
+    const changes = root.classList.contains('ion-palette-dark') !== useDark;
+    const startTransition = (document as Document & { startViewTransition?: (cb: () => void) => unknown })
+      .startViewTransition;
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    if (!animate || !changes || !Capacitor.isNativePlatform() || typeof startTransition !== 'function' || reducedMotion) {
+      apply();
+      return;
+    }
+    this.systemBars.expectFade(THEME_FADE_MS);
+    try {
+      startTransition.call(document, apply);
+    } catch {
+      apply();
+    }
   }
 
   private setupSystemThemeListener(): void {
@@ -139,7 +164,7 @@ export class SettingsPreferencesService {
     }
     const listener = (event: MediaQueryListEvent) => {
       if (this.preferencesSignal().theme === 'system') {
-        this.applyTheme('system', event.matches);
+        this.applyTheme('system', event.matches, true);
       }
     };
 

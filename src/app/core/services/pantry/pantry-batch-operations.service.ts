@@ -357,7 +357,8 @@ export class PantryBatchOperationsService {
   private async hapticImpact(style: ImpactStyle): Promise<void> {
     try {
       await Haptics.impact({ style });
-    } catch {
+    } catch (err) {
+      this.logger.warn('PantryBatchOperationsService', 'Haptics.impact failed, falling back to vibrate', { err });
       if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
         navigator.vibrate(20);
       }

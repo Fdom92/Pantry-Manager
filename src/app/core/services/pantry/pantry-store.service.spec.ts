@@ -227,6 +227,25 @@ describe('PantryStoreService', () => {
 
   // ── loadAll ────────────────────────────────────────────────────────────────
 
+  describe('deleteItem', () => {
+    it('tracks the deletion by default', async () => {
+      const analytics = TestBed.inject(AnalyticsService) as jasmine.SpyObj<AnalyticsService>;
+
+      await service.deleteItem('item-1');
+
+      expect(analytics.track).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not track when asked not to (e.g. undoing a purchase that created the product)', async () => {
+      const analytics = TestBed.inject(AnalyticsService) as jasmine.SpyObj<AnalyticsService>;
+
+      await service.deleteItem('item-1', { track: false });
+
+      expect(pantryQuerySpy.deleteItem).toHaveBeenCalledWith('item-1');
+      expect(analytics.track).not.toHaveBeenCalled();
+    });
+  });
+
   describe('loadAll', () => {
     it('waits for the expired-batch sweep to finish before resolving', async () => {
       let resolveSweep!: () => void;

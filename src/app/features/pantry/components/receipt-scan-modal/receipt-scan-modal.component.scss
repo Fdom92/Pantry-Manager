@@ -92,8 +92,7 @@ ion-modal.app-sheet-modal {
 
 .receipt-line {
   display: flex;
-  align-items: center;
-  gap: var(--app-theme-spacing-md);
+  flex-direction: column;
   padding: var(--app-theme-spacing-sm-plus) var(--app-theme-spacing-md);
   border-radius: var(--app-theme-card-border-radius);
   background: var(--app-theme-card-bg);
@@ -102,6 +101,12 @@ ion-modal.app-sheet-modal {
 
   &--excluded {
     opacity: 0.45;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: var(--app-theme-spacing-md);
   }
 
   &__check {
@@ -167,5 +172,28 @@ ion-modal.app-sheet-modal {
     text-align: center;
     font-weight: var(--app-theme-font-weight-bold);
     font-variant-numeric: tabular-nums;
+  }
+
+  &__expand-btn {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--app-theme-radius-circle);
+    border: none;
+    background: transparent;
+    color: var(--app-theme-text-muted);
+    display: grid;
+    place-items: center;
+
+    &:active { background: color-mix(in srgb, var(--ion-text-color) 7%, transparent); }
+  }
+
+  &__details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--app-theme-spacing-xs);
+    margin-top: var(--app-theme-spacing-sm);
+    padding-top: var(--app-theme-spacing-sm);
+    border-top: 1px dashed var(--app-theme-card-border-color);
   }
 }

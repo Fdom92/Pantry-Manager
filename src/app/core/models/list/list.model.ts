@@ -5,7 +5,6 @@ export enum ShoppingReason {
   BELOW_MIN   = 'below-min',
   FRESH_EMPTY = 'fresh-empty',
   FRESH_LOW   = 'fresh-low',
-  MANUAL      = 'manual',
 }
 
 export interface BoughtItem {

@@ -30,6 +30,6 @@ describe('suggestionDetail', () => {
   });
 
   it('shows nothing when there is no threshold to speak of', () => {
-    expect(suggestionDetail({ reason: ShoppingReason.MANUAL, suggestedQuantity: 1 })).toBeNull();
+    expect(suggestionDetail({ reason: ShoppingReason.EMPTY, suggestedQuantity: 1 })).toBeNull();
   });
 });

@@ -54,6 +54,22 @@ export class ListManualItemsStore {
     return item;
   }
 
+  /**
+   * Undo of markManualAsBought: puts the exact same entry (id, name, createdAt)
+   * back into the pending list and drops it from boughtManuals, as if it had
+   * never been bought. Idempotent: an entry with the same id is not appended
+   * twice (a retry after a partial failure, or a note restored by two paths).
+   * No analytics here — the caller (undoPurchase) tracks
+   * SHOPPING_BUY_UNDONE once for the whole operation.
+   */
+  restoreManual(item: ManualItem): void {
+    if (!this.manualItems().some(m => m.id === item.id)) {
+      this.manualItems.update(list => [...list, item]);
+      this.storage.manualList.setItems(this.manualItems());
+    }
+    this.boughtManuals.update(list => list.filter(b => b.id !== item.id));
+  }
+
   clear(): void {
     this.manualItems.set([]);
     this.boughtManuals.set([]);

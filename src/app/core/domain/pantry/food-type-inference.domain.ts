@@ -73,7 +73,7 @@ export interface InferredExpiry {
  * suggested expiry date from it. Returns undefined dates for unknown names so
  * every caller can keep its existing "no date" behaviour unchanged.
  */
-export function inferExpiryForName(name: string, fromDate: Date = new Date()): InferredExpiry {
+export function inferExpiryForName(name: string, fromDate: Date): InferredExpiry {
   const foodType = inferFoodType(name);
   return {
     foodType,
@@ -107,7 +107,7 @@ export function toLotExpiry(suggested: SuggestedExpiry): { expiryDate?: string; 
 export function resolveSuggestedExpiry(
   name: string,
   foodType: FoodType | null | undefined,
-  fromDate: Date = new Date(),
+  fromDate: Date,
 ): SuggestedExpiry {
   const type = foodType ?? inferFoodType(name);
   if (!type) return {};
@@ -139,7 +139,7 @@ export interface ExpiryEditableRow {
 export function expiryAfterFoodTypeChange(
   row: ExpiryEditableRow,
   foodType: FoodType,
-  fromDate: Date = new Date(),
+  fromDate: Date,
 ): SuggestedExpiry {
   if (row.dateFromUser && (row.expirationDate || row.noExpiry)) {
     return { expirationDate: row.expirationDate, noExpiry: row.noExpiry };

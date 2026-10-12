@@ -1,4 +1,5 @@
 import type { PantryItem } from '../pantry/item.model';
+import type { FoodType } from '../shared/enums.model';
 
 /** Bounding box as returned by the ML Kit text-recognition plugin. */
 export interface OcrBox {
@@ -55,4 +56,22 @@ export interface ReceiptReviewLine {
   included: boolean;
   /** Editable quantity (starts at parsed.quantity). */
   quantity: number;
+  /**
+   * Inferred (or user-picked) food type. Only meaningful — and only
+   * editable — for lines that will create a brand-new product; a matched
+   * line keeps the existing product's own type. null when nothing could be
+   * inferred.
+   */
+  foodType: FoodType | null;
+  /**
+   * Inferred (or user-picked) expiry for the lot this line will add.
+   * Undefined when unclassifiable and not marked no-expiry. Not applicable
+   * to matched fresh items, which have no lot/expiry concept at all.
+   */
+  expirationDate?: string;
+  noExpiry?: boolean;
+  /** True once the user has touched the date/no-expiry picker for this line — mirrors AddEntry.dateFromUser, so a later food-type change doesn't clobber a date the user already set. */
+  dateFromUser: boolean;
+  /** Accordion state for the review row. Never persisted, UI-only. */
+  expanded: boolean;
 }

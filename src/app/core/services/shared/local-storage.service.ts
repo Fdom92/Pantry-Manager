@@ -84,6 +84,12 @@ export class LocalStorageService {
     setEnabled: (v: boolean) => this.setBool(STORAGE_KEYS.ERROR_REPORTING_ENABLED, v),
   };
 
+  // ─── Language chosen in Settings (absent = follow the device locale) ───
+  readonly language = {
+    get: () => this.getString(STORAGE_KEYS.LANGUAGE),
+    set: (v: string) => this.setString(STORAGE_KEYS.LANGUAGE, v),
+  };
+
   // ─── Household size (scales food-coverage estimate) ───────────────────
   readonly householdSize = {
     get: () => this.getNumber(STORAGE_KEYS.HOUSEHOLD_SIZE) ?? 1,

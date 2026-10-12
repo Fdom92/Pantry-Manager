@@ -1,10 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { DEFAULT_HOUSEHOLD_ID } from '@core/constants';
+import { DEFAULT_HOUSEHOLD_ID, STORAGE_KEYS } from '@core/constants';
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
+import type { StreakState } from '@core/models/retention/streak.model';
 import { generateBatchId } from '@core/utils';
 import { PantryQueryService } from '../pantry/pantry-query.service';
 import { HistoryEventLogService } from '../history/history-event-log.service';
+import { StorageService } from '../shared/storage.service';
 
 interface ItemSeed {
   key: string;
@@ -244,11 +246,13 @@ const LOCALE_NAMES: Record<string, Record<string, string>> = {
 export class DevMarketingSeederService {
   private readonly pantry = inject(PantryQueryService);
   private readonly eventLog = inject(HistoryEventLogService);
+  private readonly storage = inject(StorageService) as StorageService<StreakState>;
 
   async seedMarketingDatabase(locale = 'en'): Promise<void> {
     await this.clearAll();
     const savedItems = await this.seedItems(locale);
     await this.seedHistoryEvents(savedItems);
+    await this.seedStreak();
     await this.pantry.reloadFromStart();
   }
 
@@ -260,7 +264,34 @@ export class DevMarketingSeederService {
     await Promise.all([
       ...items.map(i => this.pantry.deleteItem(i._id)),
       ...events.map(e => this.eventLog.remove(e._id)),
+      this.storage.remove(STORAGE_KEYS.STREAK_DOC_ID),
     ]);
+  }
+
+  /**
+   * An empty streak card ("0 days, add a product to start") is the first thing a
+   * store visitor sees on the dashboard. The in-memory streak state is read at app
+   * start, so the app has to be restarted after seeding for this to show.
+   */
+  private async seedStreak(): Promise<void> {
+    const today = new Date();
+    const iso = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const startedAt = new Date(today);
+    startedAt.setDate(startedAt.getDate() - 11);
+    const stamp = today.toISOString();
+    await this.storage.save({
+      _id: STORAGE_KEYS.STREAK_DOC_ID,
+      type: 'streak',
+      createdAt: stamp,
+      updatedAt: stamp,
+      currentStreak: 12,
+      longestStreak: 12,
+      lastActiveDate: iso(today),
+      graceTokens: 2,
+      milestonesReached: [3, 7],
+      startedAt: startedAt.toISOString(),
+    } as StreakState);
   }
 
   private async seedItems(locale = 'en'): Promise<Map<string, PantryItem>> {
@@ -291,7 +322,7 @@ export class DevMarketingSeederService {
         name: 'Salmon Fillet',
         foodType: FoodType.PROTEIN,
         productType: 'fresh',
-        batches: [{ quantity: 1, daysFromNow: -3 }],
+        batches: [{ quantity: 1, daysFromNow: 2 }],
       },
       {
         key: 'eggs',
@@ -376,7 +407,7 @@ export class DevMarketingSeederService {
         key: 'greek-yogurt',
         name: 'Greek Yogurt',
         foodType: FoodType.DAIRY,
-        batches: [{ quantity: 1, daysFromNow: -2 }],
+        batches: [{ quantity: 1, daysFromNow: 4 }],
         isBasic: true,
         minThreshold: 3,
         supermarket: 'Lidl',
@@ -406,7 +437,7 @@ export class DevMarketingSeederService {
         key: 'petit-suisse',
         name: 'Petit Suisse',
         foodType: FoodType.DAIRY,
-        batches: [{ quantity: 2, daysFromNow: -4 }],
+        batches: [{ quantity: 2, daysFromNow: 5 }],
       },
       {
         key: 'drinkable-yogurt',
@@ -424,13 +455,13 @@ export class DevMarketingSeederService {
         key: 'cream',
         name: 'Cream',
         foodType: FoodType.DAIRY,
-        batches: [{ quantity: 1, daysFromNow: -10 }],
+        batches: [{ quantity: 1, daysFromNow: 6 }],
       },
       {
         key: 'kefir',
         name: 'Kefir',
         foodType: FoodType.DAIRY,
-        batches: [{ quantity: 2, daysFromNow: -5 }],
+        batches: [{ quantity: 2, daysFromNow: 7 }],
       },
       {
         key: 'protein-yogurt',
@@ -623,16 +654,28 @@ export class DevMarketingSeederService {
       { key: 'milk', qty: 2, daysAgo: 7 },
       { key: 'salmon-fillet', qty: 1, daysAgo: 5 },
       { key: 'strawberries', qty: 1, daysAgo: 2 },
+      // Weekly shops: the rotation card compares uses against additions, and a
+      // shop-heavy month keeps it in a believable high-but-not-absurd range.
+      { key: 'bananas', qty: 3, daysAgo: 27 },
+      { key: 'bread', qty: 2, daysAgo: 26 },
+      { key: 'tomatoes', qty: 4, daysAgo: 25 },
+      { key: 'cheese-slices', qty: 1, daysAgo: 22 },
+      { key: 'carrots', qty: 2, daysAgo: 20 },
+      { key: 'butter', qty: 1, daysAgo: 19 },
+      { key: 'apples', qty: 4, daysAgo: 17 },
+      { key: 'tuna-cans', qty: 3, daysAgo: 14 },
+      { key: 'broccoli', qty: 1, daysAgo: 13 },
+      { key: 'avocados', qty: 2, daysAgo: 11 },
+      { key: 'cereals', qty: 1, daysAgo: 8 },
+      { key: 'tomato-sauce', qty: 2, daysAgo: 6 },
+      { key: 'spinach', qty: 1, daysAgo: 4 },
+      { key: 'tortillas', qty: 1, daysAgo: 3 },
     ];
 
     const consumeEvents: Array<{ key: string; qty: number; daysAgo: number }> = [
       { key: 'eggs', qty: 3, daysAgo: 27 },
-      { key: 'milk', qty: 1, daysAgo: 26 },
-      { key: 'greek-yogurt', qty: 1, daysAgo: 25 },
       { key: 'eggs', qty: 3, daysAgo: 23 },
       { key: 'chicken-breast', qty: 1, daysAgo: 22 },
-      { key: 'pasta', qty: 1, daysAgo: 20 },
-      { key: 'rice', qty: 1, daysAgo: 19 },
       { key: 'milk', qty: 1, daysAgo: 18 },
       { key: 'bananas', qty: 3, daysAgo: 16 },
       { key: 'greek-yogurt', qty: 2, daysAgo: 15 },
@@ -653,12 +696,13 @@ export class DevMarketingSeederService {
       { key: 'bananas', qty: 2, daysAgo: 1 },
     ];
 
+    // Nothing expired in the last 30 days (green waste pill); a few the month before so the
+    // PRO trend reads as an improvement rather than an empty chart.
     const expireEvents: Array<{ key: string; qty: number; daysAgo: number }> = [
-      { key: 'cream', qty: 1, daysAgo: 10 },
-      { key: 'salmon-fillet', qty: 1, daysAgo: 3 },
-      { key: 'milk', qty: 1, daysAgo: 20 },
-      { key: 'greek-yogurt', qty: 1, daysAgo: 30 },
+      { key: 'cream', qty: 1, daysAgo: 34 },
+      { key: 'milk', qty: 1, daysAgo: 40 },
       { key: 'cheese-slices', qty: 1, daysAgo: 45 },
+      { key: 'greek-yogurt', qty: 1, daysAgo: 52 },
     ];
 
     const tasks: Promise<unknown>[] = [];

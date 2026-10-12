@@ -185,8 +185,8 @@ export const insightsController = {
     let parsed: any;
     try {
       parsed = JSON.parse(content);
-    } catch {
-      logger.error('Failed to parse OpenAI JSON response', { userId, content });
+    } catch (err) {
+      logger.error('Failed to parse OpenAI JSON response', { userId, content, err });
       res.status(500).json({ error: 'INVALID_RESPONSE' });
       return;
     }

@@ -66,53 +66,103 @@
             <ul class="receipt-lines">
               @for (line of state.reviewLines(); track line.id) {
                 <li class="receipt-line" [class.receipt-line--excluded]="!line.included">
-                  <ion-checkbox
-                    class="receipt-line__check"
-                    [checked]="line.included"
-                    (ionChange)="state.toggleLine(line.id)"
-                    [attr.aria-label]="state.displayName(line)">
-                  </ion-checkbox>
+                  <div class="receipt-line__row">
+                    <ion-checkbox
+                      class="receipt-line__check"
+                      [checked]="line.included"
+                      (ionChange)="state.toggleLine(line.id)"
+                      [attr.aria-label]="state.displayName(line)">
+                    </ion-checkbox>
 
-                  <div
-                    class="receipt-line__body"
-                    role="button"
-                    tabindex="0"
-                    (click)="state.editLineName(line.id)"
-                    (keydown.enter)="state.editLineName(line.id)"
-                    [attr.aria-label]="'pantry.receiptScan.editNameTitle' | translate">
-                    <p class="receipt-line__name">{{ state.displayName(line) }}</p>
-                    @if (state.isFreshMatch(line)) {
-                      <p class="receipt-line__meta receipt-line__meta--match">
-                        <ion-icon name="leaf-outline"></ion-icon>
-                        {{ 'pantry.receiptScan.matchFresh' | translate }}
-                      </p>
-                    } @else if (state.isAutoMatch(line)) {
-                      <p class="receipt-line__meta receipt-line__meta--match">
-                        <ion-icon name="link-outline"></ion-icon>
-                        {{ 'pantry.receiptScan.matchExisting' | translate }}
-                      </p>
-                    } @else {
-                      <p class="receipt-line__meta">
-                        <ion-icon name="add-circle-outline"></ion-icon>
-                        {{ 'pantry.receiptScan.createNew' | translate }}
-                      </p>
+                    <div
+                      class="receipt-line__body"
+                      role="button"
+                      tabindex="0"
+                      (click)="state.editLineName(line.id)"
+                      (keydown.enter)="state.editLineName(line.id)"
+                      [attr.aria-label]="'pantry.receiptScan.editNameTitle' | translate">
+                      <p class="receipt-line__name">{{ state.displayName(line) }}</p>
+                      @if (state.isFreshMatch(line)) {
+                        <p class="receipt-line__meta receipt-line__meta--match">
+                          <ion-icon name="leaf-outline"></ion-icon>
+                          {{ 'pantry.receiptScan.matchFresh' | translate }}
+                        </p>
+                      } @else if (state.isAutoMatch(line)) {
+                        <p class="receipt-line__meta receipt-line__meta--match">
+                          <ion-icon name="link-outline"></ion-icon>
+                          {{ 'pantry.receiptScan.matchExisting' | translate }}
+                          @if (line.foodType) {
+                            · {{ 'pantry.form.foodType.' + line.foodType | translate }}
+                          }
+                          @if (line.noExpiry) {
+                            · {{ 'pantry.batches.noExpiryIntentional' | translate }}
+                          } @else if (line.expirationDate) {
+                            · {{ line.expirationDate | appExpiry }}
+                          }
+                        </p>
+                      } @else {
+                        <p class="receipt-line__meta">
+                          <ion-icon name="add-circle-outline"></ion-icon>
+                          {{ 'pantry.receiptScan.createNew' | translate }}
+                          @if (line.foodType) {
+                            · {{ 'pantry.form.foodType.' + line.foodType | translate }}
+                          }
+                          @if (line.noExpiry) {
+                            · {{ 'pantry.batches.noExpiryIntentional' | translate }}
+                          } @else if (line.expirationDate) {
+                            · {{ line.expirationDate | appExpiry }}
+                          }
+                        </p>
+                      }
+                    </div>
+
+                    @if (!state.isFreshMatch(line)) {
+                      <div class="receipt-line__qty">
+                        <button
+                          type="button"
+                          class="receipt-line__qty-btn"
+                          [disabled]="line.quantity <= 1"
+                          (click)="state.adjustLineQuantity(line.id, -1)"
+                          [attr.aria-label]="'pantry.receiptScan.decrease' | translate">−</button>
+                        <span class="receipt-line__qty-value">{{ line.quantity }}</span>
+                        <button
+                          type="button"
+                          class="receipt-line__qty-btn"
+                          (click)="state.adjustLineQuantity(line.id, 1)"
+                          [attr.aria-label]="'pantry.receiptScan.increase' | translate">+</button>
+                      </div>
+                    }
+
+                    @if (state.canExpand(line)) {
+                      <button
+                        type="button"
+                        class="receipt-line__expand-btn"
+                        (click)="state.toggleExpanded(line.id)"
+                        [attr.aria-expanded]="line.expanded"
+                        [attr.aria-controls]="'receipt-line-details-' + line.id"
+                        [attr.aria-label]="'pantry.receiptScan.toggleDetails' | translate">
+                        <ion-icon [name]="line.expanded ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+                      </button>
                     }
                   </div>
 
-                  @if (!state.isFreshMatch(line)) {
-                    <div class="receipt-line__qty">
-                      <button
-                        type="button"
-                        class="receipt-line__qty-btn"
-                        [disabled]="line.quantity <= 1"
-                        (click)="state.adjustLineQuantity(line.id, -1)"
-                        [attr.aria-label]="'pantry.receiptScan.decrease' | translate">−</button>
-                      <span class="receipt-line__qty-value">{{ line.quantity }}</span>
-                      <button
-                        type="button"
-                        class="receipt-line__qty-btn"
-                        (click)="state.adjustLineQuantity(line.id, 1)"
-                        [attr.aria-label]="'pantry.receiptScan.increase' | translate">+</button>
+                  @if (line.expanded && state.canExpand(line)) {
+                    <div class="receipt-line__details" [id]="'receipt-line-details-' + line.id">
+                      @if (state.canEditFoodType(line)) {
+                        <app-food-type-picker
+                          [foodType]="line.foodType"
+                          (foodTypeChange)="state.setLineFoodType(line.id, $event)">
+                        </app-food-type-picker>
+                      }
+                      @if (state.canEditExpiry(line)) {
+                        <app-expiry-picker
+                          [mode]="'picker-only'"
+                          [date]="line.expirationDate"
+                          [noExpiry]="line.noExpiry ?? false"
+                          (dateChange)="state.setLineExpirationDate(line.id, $event)"
+                          (noExpiryToggle)="state.setLineNoExpiry(line.id)">
+                        </app-expiry-picker>
+                      }
                     </div>
                   }
                 </li>

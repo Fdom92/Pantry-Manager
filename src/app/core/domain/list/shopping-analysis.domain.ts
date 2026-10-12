@@ -102,7 +102,7 @@ export function buildShoppingAnalysis(input: ShoppingAnalysisInput): ShoppingSta
   }));
 
   return {
-    suggestions: pendingSuggestions,
+    suggestions: sortSuggestionsByUrgency(pendingSuggestions),
     groupedSuggestions,
     summary,
     allBoughtItems: [...boughtAutoItems, ...boughtManuals],

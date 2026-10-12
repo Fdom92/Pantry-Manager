@@ -42,11 +42,18 @@ export class EmptyStateComponent implements OnInit {
    * it carries no user text. What we get back is how many people meet an empty
    * app and where, which is the readily testable explanation for 18 of 24
    * users never opening it a second time.
+   *
+   * Once per key per launch: ngOnInit runs every time the surrounding block is
+   * rebuilt (filtering, reloading the list), which sent the same key 164 times
+   * in one session and made this the top event by volume while measuring
+   * nothing. The question is who meets an empty state, not how often it paints.
    */
   ngOnInit(): void {
-    this.analytics.track(ANALYTICS_EVENTS.EMPTY_STATE_SHOWN, {
-      key: this.subtitleKey,
-    });
+    this.analytics.trackOnce(
+      ANALYTICS_EVENTS.EMPTY_STATE_SHOWN,
+      { key: this.subtitleKey },
+      this.subtitleKey,
+    );
   }
 
   triggerAction(): void {

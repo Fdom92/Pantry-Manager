@@ -1,5 +1,5 @@
 import { FoodType } from '@core/models/shared/enums.model';
-import { computeWasteSummary } from './waste.domain';
+import { computeWasteSummary, classifyWasteLevel } from './waste.domain';
 import type { PantryEvent } from '@core/models/events';
 
 const ev = (overrides: Partial<PantryEvent>): PantryEvent => ({
@@ -86,5 +86,21 @@ describe('computeWasteSummary', () => {
     expect(result.totalCount).toBe(2);
     expect(result.previousWindowCount).toBe(1);
     expect(result.trend).toBe('up');
+  });
+});
+
+describe('classifyWasteLevel', () => {
+  it('is good when nothing expired', () => {
+    expect(classifyWasteLevel(0)).toBe('good');
+  });
+
+  it('is normal for 1-2 expired products', () => {
+    expect(classifyWasteLevel(1)).toBe('normal');
+    expect(classifyWasteLevel(2)).toBe('normal');
+  });
+
+  it('is bad for 3 or more expired products', () => {
+    expect(classifyWasteLevel(3)).toBe('bad');
+    expect(classifyWasteLevel(10)).toBe('bad');
   });
 });

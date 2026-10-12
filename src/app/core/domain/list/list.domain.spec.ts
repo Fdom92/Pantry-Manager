@@ -102,14 +102,8 @@ describe('sortSuggestionsByUrgency', () => {
     expect(sorted[0].reason).toBe(ShoppingReason.EMPTY);
   });
 
-  it('BELOW_MIN (3) sorts before MANUAL (4)', () => {
-    const items = [makeSuggestion(ShoppingReason.MANUAL), makeSuggestion(ShoppingReason.BELOW_MIN)];
-    const sorted = sortSuggestionsByUrgency(items);
-    expect(sorted[0].reason).toBe(ShoppingReason.BELOW_MIN);
-  });
-
   it('does not mutate input array', () => {
-    const items = [makeSuggestion(ShoppingReason.MANUAL), makeSuggestion(ShoppingReason.EMPTY)];
+    const items = [makeSuggestion(ShoppingReason.BELOW_MIN), makeSuggestion(ShoppingReason.EMPTY)];
     const original = [...items];
     sortSuggestionsByUrgency(items);
     expect(items[0].reason).toBe(original[0].reason);

@@ -1,4 +1,9 @@
-import { filterExpiredItems, filterNearExpiryItems, pickPriorityItem } from './notification.domain';
+import {
+  filterExpiredItems,
+  filterNearExpiryItems,
+  pickPriorityItem,
+  resolveNotificationsConsent,
+} from './notification.domain';
 import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 
@@ -84,5 +89,31 @@ describe('notification filters — types the app does not police', () => {
     const bags = { ...makeItem('Bolsas', soon), foodType: FoodType.HOUSEHOLD } as PantryItem;
     expect(filterNearExpiryItems([bags], now, 15)).toEqual([]);
     expect(filterNearExpiryItems([makeItem('Yogur', soon)], now, 15).length).toBe(1);
+  });
+});
+
+describe('resolveNotificationsConsent', () => {
+  it('records granted and persists the decision', () => {
+    expect(resolveNotificationsConsent(true, false)).toEqual({
+      decision: 'granted',
+      shouldPersistDecision: true,
+    });
+  });
+
+  it('records an explicit refusal and persists it — the OS will not ask again', () => {
+    expect(resolveNotificationsConsent(false, false)).toEqual({
+      decision: 'denied',
+      shouldPersistDecision: true,
+    });
+  });
+
+  it('does not conflate a plugin failure with a real refusal, and leaves the door open to re-ask', () => {
+    // A broken plugin is not the user's decision: writing 'denied' here used
+    // to permanently block the re-consent sheet from ever asking again, even
+    // after the plugin recovered.
+    expect(resolveNotificationsConsent(false, true)).toEqual({
+      decision: 'unavailable',
+      shouldPersistDecision: false,
+    });
   });
 });

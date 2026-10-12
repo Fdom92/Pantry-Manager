@@ -2,9 +2,8 @@ import { FoodType } from '@core/models/shared/enums.model';
 import {
   computeActivityMetrics,
   computeDistribution,
-  computeInventorySnapshot,
-  computePantryScore,
   computeFoodCoverage,
+  classifyCoverageLevel,
 } from './insights-free.domain';
 import type { PantryItem } from '@core/models/pantry';
 import type { PantryEvent } from '@core/models/events';
@@ -70,96 +69,6 @@ describe('computeDistribution — display order', () => {
     ];
     const shown = computeDistribution(items, [], now, 30).foodTypes.map(f => f.foodType);
     expect(shown[0]).toBe(FoodType.PROTEIN);
-  });
-});
-
-describe('computeInventorySnapshot', () => {
-  const now = new Date('2026-05-14');
-
-  it('counts active items (non-expired)', () => {
-    const items = [
-      makeItem({ batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
-    ];
-    const result = computeInventorySnapshot(items, now);
-    expect(result.total).toBe(1);
-    expect(result.active).toBe(1);
-    expect(result.expired).toBe(0);
-  });
-
-  it('counts expired items and excludes from active', () => {
-    const items = [
-      makeItem({ batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-05-01' }] }),
-    ];
-    const result = computeInventorySnapshot(items, now);
-    expect(result.expired).toBe(1);
-    expect(result.active).toBe(0);
-  });
-
-  it('counts review items (dairy expired <7d ago)', () => {
-    const items = [
-      makeItem({
-        foodType: FoodType.DAIRY,
-        batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-05-11' }],
-      }),
-    ];
-    const result = computeInventorySnapshot(items, now);
-    expect(result.review).toBe(1);
-    expect(result.active).toBe(1);
-    expect(result.expired).toBe(0);
-  });
-
-  it('counts basics out of stock', () => {
-    const items = [
-      makeItem({ isBasic: true, batches: [] }),
-      makeItem({ isBasic: true, batches: [{ batchId: 'b1', quantity: 1 }] }),
-    ];
-    const result = computeInventorySnapshot(items, now);
-    expect(result.basicsOutOfStock).toBe(1);
-  });
-
-  it('counts items without expiry date (excluding fresh and noExpiry)', () => {
-    const items = [
-      makeItem({ batches: [{ batchId: 'b1', quantity: 1 }] }),
-      makeItem({ productType: 'fresh', batches: [] }),
-      makeItem({ batches: [{ batchId: 'b1', quantity: 1, noExpiry: true }] }),
-      makeItem({ batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
-    ];
-    const result = computeInventorySnapshot(items, now);
-    expect(result.noExpiryDate).toBe(1);
-  });
-
-  it('counts an item with one dated and one dateless batch', () => {
-    // The count runs on hasMissingExpiry, the same rule as the Pendientes chip
-    // and its bulk-fix sheet. The rule this replaced asked whether ANY batch had
-    // a date, so a part-dated product was pending in one screen and not another.
-    const items = [
-      makeItem({ batches: [
-        { batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' },
-        { batchId: 'b2', quantity: 1 },
-      ] }),
-    ];
-    expect(computeInventorySnapshot(items, now).noExpiryDate).toBe(1);
-  });
-
-  it('does not count an item with no batches at all', () => {
-    // Nothing to put a date on: the bulk-fix sheet maps over the batches, so
-    // counting this would show a pending item the user has no way to resolve.
-    const items = [makeItem({ batches: [] })];
-    expect(computeInventorySnapshot(items, now).noExpiryDate).toBe(0);
-  });
-
-  it('expiredRatio is 0 when total is 0', () => {
-    const result = computeInventorySnapshot([], now);
-    expect(result.expiredRatio).toBe(0);
-  });
-
-  it('expiredRatio is correct', () => {
-    const items = [
-      makeItem({ batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-05-01' }] }),
-      makeItem({ batches: [{ batchId: 'b1', quantity: 1, expirationDate: '2026-06-01' }] }),
-    ];
-    const result = computeInventorySnapshot(items, now);
-    expect(result.expiredRatio).toBe(0.5);
   });
 });
 
@@ -309,51 +218,10 @@ describe('computeDistribution', () => {
   });
 });
 
-describe('computePantryScore', () => {
-  it('returns null when fewer than 3 items', () => {
-    expect(computePantryScore(2, 0)).toBeNull();
-  });
-
-  it('returns score 100 and excellent when no pendientes', () => {
-    const result = computePantryScore(10, 0);
-    expect(result).not.toBeNull();
-    expect(result!.score).toBe(100);
-    expect(result!.label).toBe('excellent');
-  });
-
-  it('returns good label at 70% completeness', () => {
-    // 3 of 10 pendientes → score 70
-    const result = computePantryScore(10, 3);
-    expect(result!.score).toBe(70);
-    expect(result!.label).toBe('good');
-  });
-
-  it('returns fair label at 50% completeness', () => {
-    // 5 of 10 pendientes → score 50
-    const result = computePantryScore(10, 5);
-    expect(result!.score).toBe(50);
-    expect(result!.label).toBe('fair');
-  });
-
-  it('returns poor label below 50% completeness', () => {
-    // 8 of 10 pendientes → score 20
-    const result = computePantryScore(10, 8);
-    expect(result!.score).toBeLessThan(50);
-    expect(result!.label).toBe('poor');
-  });
-
-  it('score scales linearly with pendientes ratio', () => {
-    const full = computePantryScore(100, 0)!;
-    const half = computePantryScore(100, 50)!;
-    expect(full.score).toBe(100);
-    expect(half.score).toBe(50);
-  });
-});
-
 describe('computeFoodCoverage', () => {
   it('returns null when fewer than 3 items', () => {
     const items = [makeItem(), makeItem()];
-    expect(computeFoodCoverage(items)).toBeNull();
+    expect(computeFoodCoverage(items, 1, new Date())).toBeNull();
   });
 
   it('returns null when total portions are 0', () => {
@@ -362,7 +230,7 @@ describe('computeFoodCoverage', () => {
       makeItem({ batches: [{ batchId: 'b1', quantity: 0 }] }),
       makeItem({ batches: [{ batchId: 'b1', quantity: 0 }] }),
     ];
-    expect(computeFoodCoverage(items)).toBeNull();
+    expect(computeFoodCoverage(items, 1, new Date())).toBeNull();
   });
 
   it('returns a small number of days for small quantities', () => {
@@ -371,7 +239,7 @@ describe('computeFoodCoverage', () => {
       makeItem({ batches: [{ batchId: 'b1', quantity: 3 }] }),
       makeItem({ batches: [{ batchId: 'b1', quantity: 3 }] }),
     ];
-    const result = computeFoodCoverage(items)!;
+    const result = computeFoodCoverage(items, 1, new Date())!;
     expect(result.days).toBeGreaterThan(0);
     expect(result.days).toBeLessThan(30);
   });
@@ -380,7 +248,7 @@ describe('computeFoodCoverage', () => {
     const items = Array.from({ length: 5 }, () =>
       makeItem({ batches: [{ batchId: 'b1', quantity: 20 }] })
     );
-    const result = computeFoodCoverage(items)!;
+    const result = computeFoodCoverage(items, 1, new Date())!;
     expect(result.days).toBeGreaterThanOrEqual(30);
   });
 
@@ -390,8 +258,25 @@ describe('computeFoodCoverage', () => {
       makeItem({ foodType: FoodType.CARB, batches: [{ batchId: 'b1', quantity: 5 }] }),
       makeItem({ foodType: FoodType.DAIRY, batches: [{ batchId: 'b1', quantity: 5 }] }),
     ];
-    const result = computeFoodCoverage(items)!;
+    const result = computeFoodCoverage(items, 1, new Date())!;
     expect(result.days).toBeGreaterThan(0);
+  });
+});
+
+describe('classifyCoverageLevel', () => {
+  it('is bad below 3 days', () => {
+    expect(classifyCoverageLevel(0)).toBe('bad');
+    expect(classifyCoverageLevel(2)).toBe('bad');
+  });
+
+  it('is normal between 3 and 7 days', () => {
+    expect(classifyCoverageLevel(3)).toBe('normal');
+    expect(classifyCoverageLevel(7)).toBe('normal');
+  });
+
+  it('is good above 7 days', () => {
+    expect(classifyCoverageLevel(8)).toBe('good');
+    expect(classifyCoverageLevel(30)).toBe('good');
   });
 });
 
