@@ -3,7 +3,7 @@
   [isOpen]="state.isOpen()"
   [initialBreakpoint]="0.45"
   [breakpoints]="[0, 0.45]"
-  (didPresent)="onDidPresent()"
+  (willPresent)="onWillPresent()"
   (didDismiss)="state.close()">
   <ng-template>
     <div class="sheet-shell manual-add-sheet__content">

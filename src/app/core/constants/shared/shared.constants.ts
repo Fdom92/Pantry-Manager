@@ -25,3 +25,11 @@ export const DEFAULT_PREFERENCES: AppPreferences = {
   categoryOptions: [],
   supermarketOptions: [],
 };
+
+/**
+ * How long after a sheet starts to open its search/name field is focused. Focusing once
+ * the slide-in finishes made the keyboard and the WebView resize land as a second, abrupt
+ * motion; starting it with the sheet (after a beat, so the field exists and is laid out)
+ * lets the two blend into one. Raise it if the keyboard ever fights the slide-in.
+ */
+export const SHEET_AUTOFOCUS_DELAY_MS = 80;

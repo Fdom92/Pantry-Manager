@@ -1,3 +1,4 @@
+import { SHEET_AUTOFOCUS_DELAY_MS } from '@core/constants';
 import { normalizeProductKey } from '@core/utils/normalization.util';
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild, inject } from '@angular/core';
@@ -67,16 +68,24 @@ export class EntityAutocompleteComponent<TRaw = unknown, TMeta = unknown> implem
    * The `autofocus` attribute alone does not raise the keyboard on Android, least of
    * all inside an Ionic overlay that is still animating in: the add, fresh and consume
    * sheets opened with the search field unfocused. Focus has to be asked for with
-   * setFocus() once the modal is on screen.
+   * setFocus(), and starting it as the sheet starts to open (not when it has finished)
+   * makes the keyboard and the sheet move together instead of one after the other.
+   * A fallback covers a modal whose start event had already fired.
    */
   private focusWhenPresented(): void {
-    const focus = () => void this.inputRef?.setFocus();
+    let done = false;
+    const focus = () => {
+      if (done) return;
+      done = true;
+      void this.inputRef?.setFocus();
+    };
     const modal: HTMLElement | null = this.host.nativeElement.closest('ion-modal');
     if (!modal) {
       setTimeout(focus);
       return;
     }
-    modal.addEventListener('ionModalDidPresent', focus, { once: true });
+    modal.addEventListener('ionModalWillPresent', () => setTimeout(focus, SHEET_AUTOFOCUS_DELAY_MS), { once: true });
+    setTimeout(focus, 700);
   }
 
   constructor() {
