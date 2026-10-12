@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Capacitor, registerPlugin } from '@capacitor/core';
+import { sheetBackdropFactor } from '@core/utils/backdrop.util';
 import { dimColor, isLightColor, parseCssColor, toHex } from '@core/utils/color.util';
 import { LoggerService } from './logger.service';
 
@@ -43,6 +44,8 @@ export class SystemBarsService {
       document.addEventListener(`ion${name}WillDismiss`, e => this.overlayClosed(e));
       document.addEventListener(`ion${name}DidDismiss`, e => this.overlayClosed(e));
     }
+    // A sheet that settles at another breakpoint (or is dragged to one) dims by another amount.
+    document.addEventListener('ionBreakpointDidChange', e => this.breakpointChanged(e as CustomEvent<{ breakpoint?: number }>));
     // The theme switches by class/attribute on <html>, or by the system's own scheme.
     new MutationObserver(() => this.scheduleSync()).observe(document.documentElement, {
       attributes: true,
@@ -54,6 +57,14 @@ export class SystemBarsService {
 
   private overlayOpened(event: Event): void {
     this.overlays.set(event.target as EventTarget, this.backdropOpacityOf(event.target as HTMLElement));
+    void this.sync(DIM_TRANSITION_MS);
+  }
+
+  private breakpointChanged(event: CustomEvent<{ breakpoint?: number }>): void {
+    const overlay = event.target as HTMLElement;
+    const breakpoint = event.detail?.breakpoint;
+    if (!this.overlays.has(overlay) || typeof breakpoint !== 'number') return;
+    this.overlays.set(overlay, this.backdropOpacityOf(overlay, breakpoint));
     void this.sync(DIM_TRANSITION_MS);
   }
 
@@ -102,9 +113,25 @@ export class SystemBarsService {
     return parseCssColor(getComputedStyle(this.probe).backgroundColor);
   }
 
-  private backdropOpacityOf(overlay: HTMLElement): number {
-    if ((overlay as HTMLElement & { showBackdrop?: boolean }).showBackdrop === false) return 0;
+  /**
+   * What the overlay's backdrop actually shows: its --backdrop-opacity, scaled down for a
+   * sheet modal that is not fully open (Ionic fades the backdrop with the breakpoint).
+   */
+  private backdropOpacityOf(overlay: HTMLElement, breakpoint?: number): number {
+    const sheet = overlay as HTMLElement & {
+      showBackdrop?: boolean;
+      breakpoints?: number[];
+      initialBreakpoint?: number;
+      currentBreakpoint?: number;
+      backdropBreakpoint?: number;
+    };
+    if (sheet.showBackdrop === false) return 0;
+
     const value = parseFloat(getComputedStyle(overlay).getPropertyValue('--backdrop-opacity'));
-    return Number.isFinite(value) ? value : DEFAULT_BACKDROP_OPACITY;
+    const full = Number.isFinite(value) ? value : DEFAULT_BACKDROP_OPACITY;
+
+    const open = breakpoint ?? sheet.currentBreakpoint ?? sheet.initialBreakpoint;
+    if (!sheet.breakpoints?.length || typeof open !== 'number') return full;
+    return full * sheetBackdropFactor(open, sheet.backdropBreakpoint ?? 0);
   }
 }

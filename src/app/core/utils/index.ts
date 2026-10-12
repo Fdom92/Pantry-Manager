@@ -14,3 +14,4 @@ export * from './uuid.util';
 export * from './assert-never.util';
 export * from './navigation.util';
 export * from './color.util';
+export * from './backdrop.util';
