@@ -1,6 +1,6 @@
 # Privacy Policy — PantryMind
 
-Last updated: 07/10/2026
+Last updated: 12/10/2026
 
 PantryMind ("the App") is developed by Fernando del Olmo ("the Developer").
 This Privacy Policy explains what data the App handles, when, and why.
@@ -8,7 +8,9 @@ This Privacy Policy explains what data the App handles, when, and why.
 ## 1. Summary
 
 - **All pantry data stays on your device.** Items, batches, shopping list,
-  preferences and history are stored locally and are never sent to any server.
+  preferences and history are stored locally and are never sent to any
+  server, apart from the limited data the optional PRO AI features send
+  when you use them (see 3.4 and 3.6).
 - **No account, no login, no profile.** We do not know who you are.
 - **No advertising, no tracking for marketing, no data sale.**
 - A few **optional, consent-gated** services are used to keep the App
@@ -19,7 +21,8 @@ This Privacy Policy explains what data the App handles, when, and why.
 ## 2. What stays on your device
 
 The following data **never leaves your device** unless you explicitly export
-or share it yourself (e.g. via the Backup export feature):
+or share it yourself (e.g. via the Backup export feature), except for the
+limited data the optional PRO AI features send when you use them (3.4, 3.6):
 
 - Pantry items, batches and expiration dates
 - Shopping list entries
@@ -71,19 +74,33 @@ any time from **Settings → Privacidad** or by uninstalling the App.
 
 ### 3.4 AI insights (OpenAI, via our backend)
 
-- **What:** PRO users who tap "Generate insights" send aggregated,
-  anonymised consumption statistics (counts, categories, expiry trends)
-  to our backend, which forwards them to OpenAI for analysis.
-  **No item names, no personal data, no device identifiers** are included
-  in the payload.
+- **What:** PRO users who tap "Generate insights" send aggregated
+  consumption statistics (counts, categories, expiry trends) to our
+  backend, which forwards them to OpenAI for analysis. For context, the
+  request also includes **a few product names, as you typed them**: up to
+  5 products that are close to expiry, up to 5 that expired in the last 7
+  days, and up to 5 with no movement in the last 30 days. It does not
+  include quantities, dates, notes, your shopping list or any other
+  personal data.
 - **Why:** Powers the AI-generated insights shown in the Insights tab.
 - **Provider:** OpenAI L.L.C., via a backend hosted on Render (EU region).
   [OpenAI Privacy Policy](https://openai.com/policies/privacy-policy).
+- **What we keep:** The backend does not store the request. Server logs
+  keep technical metadata only (the anonymous identifier, the language and
+  a risk level); if processing fails, the technical response may appear in
+  those logs.
 - **Consent:** Only triggered when a PRO user explicitly requests an
   analysis. Free users never reach this code path.
 - **PRO check:** The request carries the same anonymous identifier
   described in 3.3 so the backend can confirm your subscription. It is
   not linked to your name or any other personal data.
+
+### 3.5 Local notifications
+
+Notifications are scheduled and shown by your device's operating system.
+Nothing is sent to a server to deliver them. The notification permission is
+requested with your explicit consent during onboarding and can be revoked
+in your device settings at any time.
 
 ### 3.6 Smart receipt scanning (OpenAI, via our backend) — PRO
 
@@ -112,13 +129,6 @@ any time from **Settings → Privacidad** or by uninstalling the App.
   while online. Free users never reach this code path, and a PRO user
   who is offline or whose request fails falls back to the on-device
   parser, in which case nothing leaves the device.
-
-### 3.5 Local notifications
-
-Notifications are scheduled and shown by your device's operating system.
-Nothing is sent to a server to deliver them. The notification permission is
-requested with your explicit consent during onboarding and can be revoked
-in your device settings at any time.
 
 ## 4. Data we never collect
 
