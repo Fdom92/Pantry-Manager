@@ -32,4 +32,4 @@ export const DEFAULT_PREFERENCES: AppPreferences = {
  * motion; starting it with the sheet (after a beat, so the field exists and is laid out)
  * lets the two blend into one. Raise it if the keyboard ever fights the slide-in.
  */
-export const SHEET_AUTOFOCUS_DELAY_MS = 80;
+export const SHEET_AUTOFOCUS_DELAY_MS = 120;
