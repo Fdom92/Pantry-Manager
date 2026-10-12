@@ -243,6 +243,19 @@ const LOCALE_NAMES: Record<string, Record<string, string>> = {
 };
 
 /**
+ * A real pantry's products carry the category the user picked, and the PRO waste card's
+ * "top category" line is built from it; seeded products had none, so that line never showed.
+ */
+const CATEGORY_NAMES: Record<string, Record<FoodType, string>> = {
+  es: { protein: 'Proteínas', carb: 'Cereales y pasta', vegetable: 'Verduras', fruit: 'Frutas', dairy: 'Lácteos', beverage: 'Bebidas', 'non-perishable': 'Despensa', household: 'Hogar', other: 'Otros' },
+  en: { protein: 'Protein', carb: 'Grains and pasta', vegetable: 'Vegetables', fruit: 'Fruit', dairy: 'Dairy', beverage: 'Drinks', 'non-perishable': 'Pantry staples', household: 'Household', other: 'Other' },
+  de: { protein: 'Eiweiß', carb: 'Getreide und Nudeln', vegetable: 'Gemüse', fruit: 'Obst', dairy: 'Milchprodukte', beverage: 'Getränke', 'non-perishable': 'Vorrat', household: 'Haushalt', other: 'Sonstiges' },
+  fr: { protein: 'Protéines', carb: 'Céréales et pâtes', vegetable: 'Légumes', fruit: 'Fruits', dairy: 'Produits laitiers', beverage: 'Boissons', 'non-perishable': 'Épicerie', household: 'Maison', other: 'Autres' },
+  it: { protein: 'Proteine', carb: 'Cereali e pasta', vegetable: 'Verdure', fruit: 'Frutta', dairy: 'Latticini', beverage: 'Bevande', 'non-perishable': 'Dispensa', household: 'Casa', other: 'Altro' },
+  pt: { protein: 'Proteínas', carb: 'Cereais e massa', vegetable: 'Legumes', fruit: 'Fruta', dairy: 'Laticínios', beverage: 'Bebidas', 'non-perishable': 'Despensa', household: 'Casa', other: 'Outros' },
+};
+
+/**
  * Seeds name their main supermarket "Mercadona" because the author is Spanish; a store listing in
  * another language showing it gives away a Spanish test device. Swap in a chain that exists there.
  */
@@ -626,7 +639,7 @@ export class DevMarketingSeederService {
         type: 'item',
         householdId: DEFAULT_HOUSEHOLD_ID,
         name: names[seed.key] ?? seed.name,
-        categoryId: '',
+        categoryId: CATEGORY_NAMES[locale]?.[seed.foodType] ?? '',
         foodType: seed.foodType,
         productType: seed.productType,
         isBasic: seed.isBasic,
@@ -714,7 +727,7 @@ export class DevMarketingSeederService {
     const expireEvents: Array<{ key: string; qty: number; daysAgo: number }> = [
       // This month: two, so the card shows a real (and improving) figure instead of its empty state.
       { key: 'bananas', qty: 2, daysAgo: 6 },
-      { key: 'tomatoes', qty: 1, daysAgo: 17 },
+      { key: 'strawberries', qty: 1, daysAgo: 17 },
       { key: 'cream', qty: 1, daysAgo: 34 },
       { key: 'milk', qty: 1, daysAgo: 40 },
       { key: 'cheese-slices', qty: 1, daysAgo: 45 },
