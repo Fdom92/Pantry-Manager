@@ -36,7 +36,6 @@ export class SystemBarsService {
   private readonly overlays = new Map<EventTarget, { opacity: number; bottom: Rgb | null }>();
   private probe: HTMLElement | null = null;
   private started = false;
-  private pendingSync: ReturnType<typeof setTimeout> | null = null;
 
   init(): void {
     if (this.started || !Capacitor.isNativePlatform()) return;
@@ -49,12 +48,14 @@ export class SystemBarsService {
     }
     // A sheet that settles at another breakpoint (or is dragged to one) dims by another amount.
     document.addEventListener('ionBreakpointDidChange', e => this.breakpointChanged(e as CustomEvent<{ breakpoint?: number }>));
-    // The theme switches by class/attribute on <html>, or by the system's own scheme.
-    new MutationObserver(() => this.scheduleSync()).observe(document.documentElement, {
+    // The theme switches by class/attribute on <html>, or by the system's own scheme. Sync at
+    // once and without a fade: the page repaints in this very frame, and any delay here shows
+    // up as the bars changing a beat after the app (two flashes).
+    new MutationObserver(() => void this.sync(0)).observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class', 'data-theme'],
     });
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => this.scheduleSync());
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => void this.sync(0));
     void this.sync(0);
   }
 
@@ -76,15 +77,6 @@ export class SystemBarsService {
     if (this.overlays.delete(event.target as EventTarget)) {
       void this.sync(DIM_TRANSITION_MS);
     }
-  }
-
-  /** Theme classes land a frame after the event that triggers them; debounce and re-read. */
-  private scheduleSync(): void {
-    if (this.pendingSync) clearTimeout(this.pendingSync);
-    this.pendingSync = setTimeout(() => {
-      this.pendingSync = null;
-      void this.sync(0);
-    }, 60);
   }
 
   private async sync(durationMs: number): Promise<void> {
