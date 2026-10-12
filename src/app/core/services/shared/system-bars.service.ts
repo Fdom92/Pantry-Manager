@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { sheetBackdropFactor } from '@core/utils/backdrop.util';
-import { dimColor, isLightColor, parseCssColor, toHex } from '@core/utils/color.util';
+import { dimColor, isLightColor, parseCssColor, toHex, type Rgb } from '@core/utils/color.util';
 import { LoggerService } from './logger.service';
 
 interface SystemBarsNative {
@@ -29,8 +29,11 @@ const DIM_TRANSITION_MS = 250;
 @Injectable({ providedIn: 'root' })
 export class SystemBarsService {
   private readonly logger = inject(LoggerService);
-  /** Open overlays and the backdrop opacity each one brings. */
-  private readonly overlays = new Map<EventTarget, number>();
+  /**
+   * Open overlays: the backdrop opacity each brings and, for one anchored to the bottom
+   * (a sheet), its own background, which the bottom strip should continue.
+   */
+  private readonly overlays = new Map<EventTarget, { opacity: number; bottom: Rgb | null }>();
   private probe: HTMLElement | null = null;
   private started = false;
   private pendingSync: ReturnType<typeof setTimeout> | null = null;
@@ -56,7 +59,8 @@ export class SystemBarsService {
   }
 
   private overlayOpened(event: Event): void {
-    this.overlays.set(event.target as EventTarget, this.backdropOpacityOf(event.target as HTMLElement));
+    const overlay = event.target as HTMLElement;
+    this.overlays.set(overlay, { opacity: this.backdropOpacityOf(overlay), bottom: this.sheetBackgroundOf(overlay) });
     void this.sync(DIM_TRANSITION_MS);
   }
 
@@ -64,7 +68,7 @@ export class SystemBarsService {
     const overlay = event.target as HTMLElement;
     const breakpoint = event.detail?.breakpoint;
     if (!this.overlays.has(overlay) || typeof breakpoint !== 'number') return;
-    this.overlays.set(overlay, this.backdropOpacityOf(overlay, breakpoint));
+    this.overlays.set(overlay, { opacity: this.backdropOpacityOf(overlay, breakpoint), bottom: this.sheetBackgroundOf(overlay) });
     void this.sync(DIM_TRANSITION_MS);
   }
 
@@ -88,11 +92,15 @@ export class SystemBarsService {
     const bottom = this.resolveColor('--ion-background-color');
     if (!top || !bottom) return;
 
-    const dim = Math.max(0, ...this.overlays.values());
+    const open = [...this.overlays.values()];
+    const dim = Math.max(0, ...open.map(o => o.opacity));
+    // A sheet reaches the bottom edge and is not dimmed itself: the strip under it should
+    // look like its continuation, not like the dimmed page behind it.
+    const sheetBottom = [...open].reverse().find(o => o.bottom)?.bottom ?? null;
     try {
       await SystemBars.setStrips({
         top: toHex(dimColor(top, dim)),
-        bottom: toHex(dimColor(bottom, dim)),
+        bottom: toHex(sheetBottom ?? dimColor(bottom, dim)),
         lightBars: isLightColor(top),
         durationMs,
       });
@@ -111,6 +119,12 @@ export class SystemBarsService {
     }
     this.probe.style.backgroundColor = `var(${variable})`;
     return parseCssColor(getComputedStyle(this.probe).backgroundColor);
+  }
+
+  /** The background of a bottom-anchored overlay's panel, if it has an opaque one. */
+  private sheetBackgroundOf(overlay: HTMLElement) {
+    const panel = overlay.shadowRoot?.querySelector('.modal-wrapper, .action-sheet-wrapper');
+    return panel ? parseCssColor(getComputedStyle(panel).backgroundColor) : null;
   }
 
   /**
