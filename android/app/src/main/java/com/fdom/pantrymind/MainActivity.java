@@ -47,10 +47,12 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // The manifest handles uiMode itself, so a light/dark switch while the app is open
+        if (SystemBarsPlugin.isWebControlled()) {
+            return;
+        }
+        // Before the web side has sent its colours: the manifest handles uiMode itself, so a light/dark switch while the app is open
         // does not recreate the activity: the window background (the strips under the
         // transparent system bars) and the bar icon colours have to be resolved again.
-        // The web side then overrides them with the app theme's own colours.
         getWindow().setBackgroundDrawableResource(R.drawable.window_background);
         boolean light = getResources().getBoolean(R.bool.light_system_bars);
         WindowInsetsControllerCompat controller =

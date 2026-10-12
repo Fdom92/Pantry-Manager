@@ -28,6 +28,15 @@ public class SystemBarsPlugin extends Plugin {
     // Taller than any status bar; whatever the WebView covers past it is invisible anyway.
     private static final int TOP_STRIP_DP = 120;
 
+    // Once the web side has sent its colours it owns the strips; the native fallback in
+    // MainActivity (system light/dark switch) must stop repainting them with resource colours,
+    // or the bars follow the phone's mode while the app, fixed to the other theme, does not.
+    private static volatile boolean webControlled = false;
+
+    public static boolean isWebControlled() {
+        return webControlled;
+    }
+
     private int currentTop = Color.TRANSPARENT;
     private int currentBottom = Color.TRANSPARENT;
     private boolean hasColors = false;
@@ -54,6 +63,7 @@ public class SystemBarsPlugin extends Plugin {
         final Boolean lightIcons = call.getBoolean("lightBars");
         final int duration = call.getInt("durationMs", 0);
 
+        webControlled = true;
         activity.runOnUiThread(() -> {
             if (lightIcons != null) {
                 applyIconAppearance(activity, lightIcons);
