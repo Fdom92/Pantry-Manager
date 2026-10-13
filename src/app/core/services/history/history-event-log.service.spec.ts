@@ -18,7 +18,7 @@ describe('HistoryEventLogService snapshot', () => {
   });
 
   it('remembers the last full read, newest first, so a rebuilt page can paint at once', async () => {
-    spyOn(service as unknown as { all: () => Promise<PantryEvent[]> }, 'all').and.resolveTo([
+    const allSpy = spyOn(service as unknown as { allByIdPrefix: (prefix: string) => Promise<PantryEvent[]> }, 'allByIdPrefix').and.resolveTo([
       event('event:a', '2026-10-01T10:00:00Z'),
       event('event:b', '2026-10-02T10:00:00Z'),
     ]);
@@ -26,6 +26,7 @@ describe('HistoryEventLogService snapshot', () => {
     const listed = await service.listEvents();
 
     expect(service.peekEvents()).toBe(listed);
+    expect(allSpy).toHaveBeenCalledOnceWith('event:');
     expect(listed.map(e => e._id)).toEqual(['event:b', 'event:a']);
   });
 });

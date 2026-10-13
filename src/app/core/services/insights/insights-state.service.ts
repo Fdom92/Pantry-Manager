@@ -65,7 +65,18 @@ export class InsightsStateService {
   private readonly initialEvents = this.eventLog.peekEvents();
   private readonly events = signal<PantryEvent[]>(this.initialEvents ?? []);
   readonly isLoadingEvents = signal(this.initialEvents === null);
+  /** Pantry in memory: enough for the cards that don't read the history (coverage). */
+  private readonly pantryReady = signal(this.initialEvents !== null);
   private hasLoadedOnce = this.initialEvents !== null;
+
+  /**
+   * Nothing worth drawing yet: the history is loading and either the pantry has
+   * not arrived or it is empty (so the empty state may be what follows). Once the
+   * pantry is in, cards fill in one by one instead of waiting for the slowest.
+   */
+  readonly showFullSkeleton = computed(
+    () => this.isLoadingEvents() && (!this.pantryReady() || this.pantryStore.loadedProducts().length === 0)
+  );
 
   // Load on creation and whenever the history changes, not only from
   // `ionViewWillEnter`: the dashboard showed "sin desperdicios" until a tab
@@ -166,6 +177,7 @@ export class InsightsStateService {
       this.isLoadingEvents.set(true);
     }
     await this.pantryStore.loadAll();
+    this.pantryReady.set(true);
     const loaded = await this.eventLog.listEvents();
     this.events.set(loaded);
     this.isLoadingEvents.set(false);

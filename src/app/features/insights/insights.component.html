@@ -12,13 +12,19 @@
 <ion-content class="ion-padding">
   <div class="insights">
 
-    @if (facade.isLoadingEvents()) {
+    <!-- One placeholder per card that still waits for the history; the cards that
+         only need the pantry (coverage) draw as soon as it is in memory. -->
+    <ng-template #cardSkeleton>
+      <section class="insights-section">
+        <ion-skeleton-text animated style="width: 45%; height: 14px; margin-bottom: 12px; border-radius: 4px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 60%; height: 28px; margin-bottom: 8px; border-radius: 4px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 80%; height: 13px; border-radius: 4px;"></ion-skeleton-text>
+      </section>
+    </ng-template>
+
+    @if (facade.showFullSkeleton()) {
       @for (i of [0,1,2,3]; track i) {
-        <section class="insights-section">
-          <ion-skeleton-text animated style="width: 45%; height: 14px; margin-bottom: 12px; border-radius: 4px;"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 60%; height: 28px; margin-bottom: 8px; border-radius: 4px;"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width: 80%; height: 13px; border-radius: 4px;"></ion-skeleton-text>
-        </section>
+        <ng-container [ngTemplateOutlet]="cardSkeleton"></ng-container>
       }
     } @else if (facade.isEmpty()) {
       <app-empty-state
@@ -31,9 +37,13 @@
     } @else {
 
       <!-- SECTION 1: Waste tracker — count is free for everyone, breakdown is PRO-gated inside the card -->
-      <section class="insights-section">
-        <app-waste-tracker-card [summary]="facade.wasteSummary()" [isPro]="facade.isPro()" />
-      </section>
+      @if (facade.isLoadingEvents()) {
+        <ng-container [ngTemplateOutlet]="cardSkeleton"></ng-container>
+      } @else {
+        <section class="insights-section">
+          <app-waste-tracker-card [summary]="facade.wasteSummary()" [isPro]="facade.isPro()" />
+        </section>
+      }
 
       <!-- SECTION 2: Cobertura -->
       @if (facade.foodCoverage(); as coverage) {
@@ -72,34 +82,40 @@
       }
 
       <!-- SECTION 3: Rotación — how much of what you add you actually consume -->
-      <section class="insights-section">
-        <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
-        @let rotationRatio = facade.activityMetrics().rotationRatio;
-        @if (rotationRatio === null) {
-          <p class="activity-empty">{{ 'insights.activity.noActivity' | translate }}</p>
-        } @else {
-          <div class="activity-headline-row">
-            @if (facade.activityMetrics().rotationPercent !== null) {
-              <p class="activity-headline">{{ formatPercent(facade.activityMetrics().rotationPercent!) }}</p>
-            }
-            <app-insight-status-pill [level]="getRotationPillLevel(rotationRatio)" [labelKey]="getRotationLabel(rotationRatio)" />
-          </div>
-          <p class="activity-detail">
-            {{ 'insights.activity.windowLabel' | translate }} —
-            @if (facade.activityMetrics().added > 0) {
-              {{ 'insights.activity.detail' | translate: { consumed: facade.activityMetrics().consumed, added: facade.activityMetrics().added } }}
-            } @else {
-              {{ 'insights.activity.detailNoAdds' | translate: { consumed: facade.activityMetrics().consumed } }}
-            }
-          </p>
-        }
-      </section>
+      @if (facade.isLoadingEvents()) {
+        <ng-container [ngTemplateOutlet]="cardSkeleton"></ng-container>
+      } @else {
+        <section class="insights-section">
+          <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
+          @let rotationRatio = facade.activityMetrics().rotationRatio;
+          @if (rotationRatio === null) {
+            <p class="activity-empty">{{ 'insights.activity.noActivity' | translate }}</p>
+          } @else {
+            <div class="activity-headline-row">
+              @if (facade.activityMetrics().rotationPercent !== null) {
+                <p class="activity-headline">{{ formatPercent(facade.activityMetrics().rotationPercent!) }}</p>
+              }
+              <app-insight-status-pill [level]="getRotationPillLevel(rotationRatio)" [labelKey]="getRotationLabel(rotationRatio)" />
+            </div>
+            <p class="activity-detail">
+              {{ 'insights.activity.windowLabel' | translate }} —
+              @if (facade.activityMetrics().added > 0) {
+                {{ 'insights.activity.detail' | translate: { consumed: facade.activityMetrics().consumed, added: facade.activityMetrics().added } }}
+              } @else {
+                {{ 'insights.activity.detailNoAdds' | translate: { consumed: facade.activityMetrics().consumed } }}
+              }
+            </p>
+          }
+        </section>
+      }
 
       <!-- Sentinel: IntersectionObserver triggers bar animations when this enters viewport -->
       <div #barsAnchor></div>
 
       <!-- SECTION 4: Clasificación -->
-      @if (facade.distribution().foodTypes.length > 0) {
+      @if (facade.isLoadingEvents()) {
+        <ng-container [ngTemplateOutlet]="cardSkeleton"></ng-container>
+      } @else if (facade.distribution().foodTypes.length > 0) {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.distribution.title' | translate }}</h3>
           <div class="food-type-bars">

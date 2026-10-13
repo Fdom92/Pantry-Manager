@@ -42,7 +42,7 @@ export class HistoryEventLogService extends StorageService<PantryEvent> {
   }
 
   async listEvents(): Promise<PantryEvent[]> {
-    const events = this.sortByTimestamp(await this.all(this.TYPE));
+    const events = this.sortByTimestamp(await this.allByIdPrefix(`${this.TYPE}:`));
     this.snapshot = events;
     return events;
   }
