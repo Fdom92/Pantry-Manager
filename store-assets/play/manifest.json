@@ -94,5 +94,34 @@
     "src/app/core/services/dev/dev-marketing-seeder.service.ts",
     "src/theme",
     "src/assets/i18n"
-  ]
+  ],
+  "final": {
+    "generatedAt": "2026-10-13",
+    "canvaDesignId": "DAHX3620p6k",
+    "slots": [
+      "dashboard",
+      "receipt-review",
+      "pantry",
+      "shopping",
+      "insights"
+    ],
+    "skipped": [
+      "receipt-review (de, pt: crops on hold, OCR flaws until recaptured)"
+    ],
+    "note": "Files are <lang>/final/<order>-<id>.png (01-dashboard, 02-receipt-review, 03-pantry, 04-shopping, 05-insights). 02-receipt-review exists only for es, en, fr, it; de and pt are on hold until recaptured.",
+    "receiptReview": {
+      "generatedAt": "2026-10-13",
+      "languages": [
+        "es",
+        "en",
+        "fr",
+        "it"
+      ],
+      "file": "02-receipt-review.png",
+      "pendingLanguages": [
+        "de",
+        "pt"
+      ]
+    }
+  }
 }

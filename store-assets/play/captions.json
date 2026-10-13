@@ -1,0 +1,118 @@
+{
+  "_comment": "Final Play set: order, source capture and on-image captions. Source of the wording: listing-brief.md section 4 (headline = slot's headline with a hand-picked line break, sub = its sub-line). A '\\n' in a headline is a deliberate line break: every headline is exactly two lines at 72 px, so the layout is identical on all slots and languages. Switch a slot's capture by editing 'file'; change wording here, not in the agent.",
+  "languages": ["es", "en", "de", "fr", "it", "pt"],
+  "slots": [
+    {
+      "order": 1,
+      "id": "dashboard",
+      "file": "01-dashboard.png",
+      "altText": "PantryMind dashboard: what to use first before it expires",
+      "headline": {
+        "es": "Úsalo antes\nde que caduque",
+        "en": "Use it before\nit expires",
+        "de": "Aufbrauchen statt\nwegwerfen",
+        "fr": "À consommer\nen priorité",
+        "it": "Usalo prima\nche scada",
+        "pt": "Consome antes\ndo prazo"
+      },
+      "sub": {
+        "es": "Cada día, qué consumir primero",
+        "en": "See what to eat first, every day",
+        "de": "Jeden Tag sehen, was zuerst dran ist",
+        "fr": "Chaque jour, quoi utiliser d'abord",
+        "it": "Ogni giorno, cosa consumare prima",
+        "pt": "Todos os dias, o que usar primeiro"
+      }
+    },
+    {
+      "order": 2,
+      "id": "receipt-review",
+      "file": "03-receipt-review.png",
+      "altText": "PantryMind receipt review: type and expiry on every line",
+      "pending": "Captured on the developer's phone with a fictional ticket; skip this slot until <lang>/crop/03-receipt-review.png exists.",
+      "headline": {
+        "es": "Del ticket\na tu despensa",
+        "en": "From receipt\nto pantry",
+        "de": "Vom Kassenbon\nin den Vorrat",
+        "fr": "Du ticket au\ngarde-manger",
+        "it": "Dallo scontrino\nalla dispensa",
+        "pt": "Do talão para\na despensa"
+      },
+      "sub": {
+        "es": "Revisa tipo y caducidad de cada línea",
+        "en": "Check type and expiry on every line",
+        "de": "Typ und Ablaufdatum pro Zeile prüfen",
+        "fr": "Vérifie type et date ligne par ligne",
+        "it": "Controlla tipo e scadenza riga per riga",
+        "pt": "Confirma tipo e validade linha a linha"
+      }
+    },
+    {
+      "order": 3,
+      "id": "pantry",
+      "file": "02-pantry.png",
+      "altText": "PantryMind pantry with expiry status on every product",
+      "headline": {
+        "es": "Tu despensa\nde un vistazo",
+        "en": "Your pantry\nat a glance",
+        "de": "Dein Vorrat auf\neinen Blick",
+        "fr": "Tes réserves\nd'un coup d'œil",
+        "it": "La dispensa a\ncolpo d'occhio",
+        "pt": "A despensa\nnum relance"
+      },
+      "sub": {
+        "es": "Sin cuenta. Funciona sin conexión.",
+        "en": "No account. Works offline.",
+        "de": "Ohne Konto. Funktioniert offline.",
+        "fr": "Sans compte. Fonctionne hors ligne.",
+        "it": "Senza account. Funziona offline.",
+        "pt": "Sem conta. Funciona sem internet."
+      }
+    },
+    {
+      "order": 4,
+      "id": "shopping",
+      "file": "04-shopping.png",
+      "altText": "PantryMind shopping list grouped by supermarket",
+      "headline": {
+        "es": "Lo que falta,\na la lista",
+        "en": "Running low?\nIt's on the list",
+        "de": "Was ausgeht,\nkommt auf die Liste",
+        "fr": "Ce qui manque,\nsur la liste",
+        "it": "Quel che finisce\nva in lista",
+        "pt": "O que falta\nvai à lista"
+      },
+      "sub": {
+        "es": "Compártela en PDF o texto",
+        "en": "Share it as PDF or text",
+        "de": "Als PDF oder Text teilen",
+        "fr": "Partage-la en PDF ou en texte",
+        "it": "Condividila in PDF o testo",
+        "pt": "Partilha-a em PDF ou texto"
+      }
+    },
+    {
+      "order": 5,
+      "id": "insights",
+      "file": "06-pro-waste.png",
+      "altText": "PantryMind insights: food waste, coverage and rotation",
+      "note": "Uses 06 (waste card with the PRO category line) instead of 05: they are the same screen and 06 shows more. No PRO pill: the headline sells the free waste count; add one only if the headline starts to sell the breakdown.",
+      "headline": {
+        "es": "Mira cuánto\ndesperdicias",
+        "en": "See how much\nyou waste",
+        "de": "Sieh, wie viel\ndu wegwirfst",
+        "fr": "Vois ce que\ntu gaspilles",
+        "it": "Scopri quanto\nsprechi",
+        "pt": "Vê quanto\ndesperdiças"
+      },
+      "sub": {
+        "es": "Y cuántos días aguantas sin comprar",
+        "en": "And how long your food will last",
+        "de": "Und wie lange dein Vorrat reicht",
+        "fr": "Et combien de jours tu tiens",
+        "it": "E per quanti giorni hai da mangiare",
+        "pt": "E para quantos dias tens comida"
+      }
+    }
+  ]
+}
