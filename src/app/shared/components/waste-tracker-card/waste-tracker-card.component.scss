@@ -16,23 +16,20 @@
     gap: var(--app-theme-spacing-sm);
   }
 
-  // Matches .activity-headline — the other "big number" headline on this page.
-  &__count {
-    font-size: var(--app-theme-font-size-3xl);
-    font-weight: var(--app-theme-font-weight-extra-bold);
-    line-height: var(--app-theme-line-height-display);
-    margin: 0;
-  }
   &__top {
     color: var(--ion-color-medium);
     margin: var(--app-theme-spacing-2xs) 0 0;
   }
-  // A sentence, not a figure: at the hero-number size it outweighed every other card.
+  // Both are sentences ("Se te han caducado 2 productos"), not figures: at the
+  // hero-number size they wrapped to two lines and outweighed every other card.
+  &__count,
   &__zero {
     font-size: var(--app-theme-font-size-xl);
     font-weight: var(--app-theme-font-weight-bold);
     line-height: var(--app-theme-line-height-tight);
     margin: 0;
+  }
+  &__zero {
     color: var(--ion-color-success);
   }
   &__trend {
