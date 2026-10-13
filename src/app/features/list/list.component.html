@@ -22,16 +22,18 @@
       }
     </div>
   } @else {
-    <!-- Inline manual add row — always available, also on an empty list -->
-    <button class="manual-add-row pressable" (click)="openManualAdd()">
-      <ion-icon name="add-circle-outline" color="medium"></ion-icon>
-      <span>{{ 'shopping.manualAdd.inlineHint' | translate }}</span>
-    </button>
+    <!-- One row: the manual-add field is always there (also on an empty list);
+         the view/share buttons join it, shrinking the field, once there is a list. -->
+    <div class="list-toolbar">
+      <button class="manual-add-row pressable" (click)="openManualAdd()">
+        <ion-icon name="add-circle-outline" color="medium"></ion-icon>
+        <span>{{ 'shopping.manualAdd.inlineHint' | translate }}</span>
+      </button>
 
-    @if (state.summary.total || facade.visibleManualItems().length) {
-      <div class="list-actions-row">
+      @if (state.summary.total || facade.visibleManualItems().length) {
         <button
           class="list-actions-row__btn pressable"
+          [class.list-actions-row__btn--active]="facade.groupBySupermarket()"
           (click)="facade.toggleGroupBySupermarket()"
           [attr.aria-label]="(facade.groupBySupermarket() ? 'shopping.groupToggle.grouped' : 'shopping.groupToggle.flat') | translate">
           <ion-icon [name]="facade.groupBySupermarket() ? 'list-outline' : 'apps-outline'"></ion-icon>
@@ -47,8 +49,8 @@
             <ion-icon name="share-outline"></ion-icon>
           }
         </button>
-      </div>
-    }
+      }
+    </div>
 
     @if (!state.summary.total && !state.allBoughtItems.length && !state.allIgnoredItems.length && !facade.visibleManualItems().length) {
       <app-empty-state
