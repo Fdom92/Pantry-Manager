@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-12",
+  "capturedAt": "2026-10-13",
   "appVersion": "5.6",
-  "commit": "492d985b10c52b7a7d22b2ca603946fb32869ab3",
+  "commit": "fc9a4508e3d8192758e5670b9e01e43dc304afe6",
   "uploadedToPlay": false,
   "languages": [
     "es",
@@ -12,7 +12,7 @@
     "pt"
   ],
   "device": "Medium_Phone_API_35 emulator, wm size 1080x2160 density 420, 3-button navigation, light theme, demo-mode status bar (09:41), debug APK com.fdom.pantrymind.dev, marketing seed (PRO off for slots 01-05, dev-panel PRO switch on for slot 06)",
-  "notes": "Recaptured 2026-10-12 after seeder commit 59529022 (sentence-case names, per-country main supermarket, 9-day streak, 2 wasted products this month) and i18n commit 8df333d1. No runtime --ion-safe-area workaround: the app applies Capacitor edge-to-edge margins itself. Slots 03 (receipt review) and 06 (PRO AI analysis) are not captured: 03 needs the developer's phone (ML Kit OCR does not run on the emulator), 06 needs a real PRO tester with the backend and must not be edited. Shopping list is the grouped-by-supermarket view (toggled; default is flat). Pantry has the Fresh section expanded. Insights is at scroll 0 in all six languages. Capture recipe that worked: `pm clear` the debug app, skip onboarding, tap the language button in Settings, run the dev-panel seed (native confirm, takes about 90 s on the emulator), force-stop and relaunch. Seeding over an existing seeded DB left the streak at 0 (the dashboard showed 0 days), so start from a cleared app for every language. Screenshots only repaint on interaction on the emulator, so a stale frame can hide a finished seed. Update 2026-10-12: the emulator's status bar showed '3G' and wifi-with-exclamation icons (no validated internet), so every capture also has a cropped copy in <lang>/crop/ (63 px off the top, 1984 px high, no status bar and no navigation strip; 1080x1984, ratio 1.84). Use the crop/ copies as the base for Canva. Update 2026-10-12 (slot 06): the AI-analysis shot was dropped because the model output is generic; slot 06 is now pro-waste, the Insights tab with the dev-panel PRO switch ON (local simulation, 'Generate analysis' not tapped), scroll 0, same recipe per language (pm clear, skip onboarding, language button, marketing seed, force-stop and relaunch, PRO switch, Insights tab). Slot 06 recaptured after commit dd5919b5 (seeder assigns a localized category to every product): the waste card now shows the top-category line (Frutas / Fruit / Obst / Fruits / Frutta / Fruta) plus the green improving trend and no violet unlock line; theme forced to Light in Settings before seeding (the System theme flipped to dark in earlier runs). Only slot 06 (full and crop/) was recaptured; slots 01, 02, 04, 05 still come from the top-level commit. Emulator note: it was booted with 3-button navigation forced and restored to gestural afterwards.",
+  "notes": "Recaptured 2026-10-12 after seeder commit 59529022 (sentence-case names, per-country main supermarket, 9-day streak, 2 wasted products this month) and i18n commit 8df333d1. No runtime --ion-safe-area workaround: the app applies Capacitor edge-to-edge margins itself. Slots 03 (receipt review) and 06 (PRO AI analysis) are not captured: 03 needs the developer's phone (ML Kit OCR does not run on the emulator), 06 needs a real PRO tester with the backend and must not be edited. Shopping list is the grouped-by-supermarket view (toggled; default is flat). Pantry has the Fresh section expanded. Insights is at scroll 0 in all six languages. Capture recipe that worked: `pm clear` the debug app, skip onboarding, tap the language button in Settings, run the dev-panel seed (native confirm, takes about 90 s on the emulator), force-stop and relaunch. Seeding over an existing seeded DB left the streak at 0 (the dashboard showed 0 days), so start from a cleared app for every language. Screenshots only repaint on interaction on the emulator, so a stale frame can hide a finished seed. Update 2026-10-12: the emulator's status bar showed '3G' and wifi-with-exclamation icons (no validated internet), so every capture also has a cropped copy in <lang>/crop/ (63 px off the top, 1984 px high, no status bar and no navigation strip; 1080x1984, ratio 1.84). Use the crop/ copies as the base for Canva. Update 2026-10-12 (slot 06): the AI-analysis shot was dropped because the model output is generic; slot 06 is now pro-waste, the Insights tab with the dev-panel PRO switch ON (local simulation, 'Generate analysis' not tapped), scroll 0, same recipe per language (pm clear, skip onboarding, language button, marketing seed, force-stop and relaunch, PRO switch, Insights tab). Slot 06 recaptured after commit dd5919b5 (seeder assigns a localized category to every product): the waste card now shows the top-category line (Frutas / Fruit / Obst / Fruits / Frutta / Fruta) plus the green improving trend and no violet unlock line; theme forced to Light in Settings before seeding (the System theme flipped to dark in earlier runs). Only slot 06 (full and crop/) was recaptured; slots 01, 02, 04, 05 still come from the top-level commit. Emulator note: it was booted with 3-button navigation forced and restored to gestural afterwards. Update 2026-10-13: slots 04-shopping and 06-pro-waste (full and crop/, all six languages) were recaptured from commit fc9a4508 after the UI commits dc7e0bb2 (waste headline smaller), f6af4e09 (shopping toolbar in one row, grid toggle filled when grouped) and c6a8ee49/fc9a4508 (Insights loading); slots 01, 02, 05 still come from the 2026-10-12 capture.",
   "shots": [
     {
       "id": "dashboard",
@@ -97,7 +97,7 @@
   ],
   "final": {
     "generatedAt": "2026-10-13",
-    "canvaDesignId": "DAHX3620p6k",
+    "tool": "scripts/store-shots/render.mjs",
     "slots": [
       "dashboard",
       "receipt-review",
@@ -105,19 +105,6 @@
       "shopping",
       "insights"
     ],
-    "note": "Files are <lang>/final/<order>-<id>.png (01-dashboard, 02-receipt-review, 03-pantry, 04-shopping, 05-insights). 02-receipt-review exists for all six languages (de and pt added 2026-10-13 from the recaptured crops).",
-    "receiptReview": {
-      "generatedAt": "2026-10-13",
-      "languages": [
-        "es",
-        "en",
-        "de",
-        "fr",
-        "it",
-        "pt"
-      ],
-      "file": "02-receipt-review.png",
-      "pendingLanguages": []
-    }
+    "note": "Files are <lang>/final/<order>-<id>.png (01-dashboard, 02-receipt-review, 03-pantry, 04-shopping, 05-insights); 05 uses the 06-pro-waste crop. Gradient + phone bezel + caption composed locally; the earlier Canva-based set was replaced."
   }
 }
