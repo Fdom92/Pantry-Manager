@@ -2,7 +2,7 @@
   "capturedAt": "2026-10-13",
   "appVersion": "5.6",
   "commit": "fc9a4508e3d8192758e5670b9e01e43dc304afe6",
-  "uploadedToPlay": false,
+  "uploadedToPlay": true,
   "languages": [
     "es",
     "en",
@@ -106,5 +106,6 @@
       "insights"
     ],
     "note": "Files are <lang>/final/<order>-<id>.png (01-dashboard, 02-receipt-review, 03-pantry, 04-shopping, 05-insights); 05 uses the 06-pro-waste crop. Gradient + phone bezel + caption composed locally; the earlier Canva-based set was replaced."
-  }
+  },
+  "uploadedAt": "2026-10-13"
 }
