@@ -486,7 +486,7 @@
       }
     },
     "tabTitle": "Insights",
-    "title": "Analysis",
+    "title": "Insights",
     "status": {
       "critical": "Expired items in inventory",
       "attention": "Items to review",

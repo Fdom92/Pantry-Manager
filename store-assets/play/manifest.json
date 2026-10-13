@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-10-07",
+  "capturedAt": "2026-10-12",
   "appVersion": "5.6",
-  "commit": "1ed0093c6af233d65390197b3c6649cfddceb3d5",
+  "commit": "492d985b10c52b7a7d22b2ca603946fb32869ab3",
   "uploadedToPlay": false,
   "languages": [
     "es",
@@ -11,14 +11,15 @@
     "it",
     "pt"
   ],
-  "device": "Medium_Phone_API_35 emulator, wm size 1080x2160 density 420, debug APK com.fdom.pantrymind.dev, marketing seed",
-  "notes": "Captured on an emulator whose WebView (124) does not report safe-area insets under edge-to-edge, so --ion-safe-area-top/bottom were set to 24px at runtime through DevTools (not in the app source) to emulate a current device. Slot 03 (receipt review) is missing: ML Kit OCR cannot run on the emulator, needs a capture from a real device. Recaptured after the seeder improvements in 1ed0093c (12-day streak, no waste this month, rotation 88%, no expired products). Gotcha: the app language follows the device/app locale (not persisted), so use `adb shell cmd locale set-app-locales <pkg> --locales <lang>` before seeding; the dev-panel seed needs the native confirm dialog accepted. Insights shots for de/it/pt are scrolled a few px (waste card title clipped under the header) while es/en/fr are at scroll 0. Decision 2026-10-07: undo-purchase is deliberately NOT a store shot (minor feature, wastes a slot); the listing sells the core promise, pantry at a glance, ticket review, shopping list, insights and PRO. Update 2026-10-09: the app now applies Capacitor's edge-to-edge margins (adjustMarginsForEdgeToEdge 'auto') and colours the strips under the system bars natively, so the runtime --ion-safe-area workaround must NOT be applied when recapturing (it would double the padding).",
+  "device": "Medium_Phone_API_35 emulator, wm size 1080x2160 density 420, 3-button navigation, light theme, demo-mode status bar (09:41), debug APK com.fdom.pantrymind.dev, marketing seed (PRO off for slots 01-05, dev-panel PRO switch on for slot 06)",
+  "notes": "Recaptured 2026-10-12 after seeder commit 59529022 (sentence-case names, per-country main supermarket, 9-day streak, 2 wasted products this month) and i18n commit 8df333d1. No runtime --ion-safe-area workaround: the app applies Capacitor edge-to-edge margins itself. Slots 03 (receipt review) and 06 (PRO AI analysis) are not captured: 03 needs the developer's phone (ML Kit OCR does not run on the emulator), 06 needs a real PRO tester with the backend and must not be edited. Shopping list is the grouped-by-supermarket view (toggled; default is flat). Pantry has the Fresh section expanded. Insights is at scroll 0 in all six languages. Capture recipe that worked: `pm clear` the debug app, skip onboarding, tap the language button in Settings, run the dev-panel seed (native confirm, takes about 90 s on the emulator), force-stop and relaunch. Seeding over an existing seeded DB left the streak at 0 (the dashboard showed 0 days), so start from a cleared app for every language. Screenshots only repaint on interaction on the emulator, so a stale frame can hide a finished seed. Update 2026-10-12: the emulator's status bar showed '3G' and wifi-with-exclamation icons (no validated internet), so every capture also has a cropped copy in <lang>/crop/ (63 px off the top, 1984 px high, no status bar and no navigation strip; 1080x1984, ratio 1.84). Use the crop/ copies as the base for Canva. Update 2026-10-12 (slot 06): the AI-analysis shot was dropped because the model output is generic; slot 06 is now pro-waste, the Insights tab with the dev-panel PRO switch ON (local simulation, 'Generate analysis' not tapped), scroll 0, same recipe per language (pm clear, skip onboarding, language button, marketing seed, force-stop and relaunch, PRO switch, Insights tab). Slot 06 recaptured after commit dd5919b5 (seeder assigns a localized category to every product): the waste card now shows the top-category line (Frutas / Fruit / Obst / Fruits / Frutta / Fruta) plus the green improving trend and no violet unlock line; theme forced to Light in Settings before seeding (the System theme flipped to dark in earlier runs). Only slot 06 (full and crop/) was recaptured; slots 01, 02, 04, 05 still come from the top-level commit. Emulator note: it was booted with 3-button navigation forced and restored to gestural afterwards.",
   "shots": [
     {
       "id": "dashboard",
       "order": 1,
       "file": "01-dashboard.png",
       "captured": true,
+      "state": "top of the dashboard, violet PRO pill visible at the bottom",
       "sources": [
         "src/app/features/dashboard",
         "src/app/shared"
@@ -44,7 +45,7 @@
       "order": 3,
       "file": "03-receipt-review.png",
       "captured": false,
-      "reason": "needs a real device (ML Kit OCR unavailable on the emulator)",
+      "reason": "needs a real device (ML Kit OCR unavailable on the emulator); one fictional ticket per language",
       "sources": [
         "src/app/features/pantry/components/receipt-scan-modal"
       ],
@@ -66,6 +67,7 @@
       "order": 5,
       "file": "05-insights.png",
       "captured": true,
+      "state": "scroll 0, waste card shows 2 expired products with the amber Normal pill",
       "sources": [
         "src/app/features/insights",
         "src/app/shared/components/insight-status-pill"
@@ -73,20 +75,49 @@
       "pro": false
     },
     {
-      "id": "pro-restock",
+      "id": "pro-waste",
       "order": 6,
-      "file": "06-pro-restock.png",
+      "file": "06-pro-waste.png",
       "captured": true,
-      "state": "dashboard scrolled, PRO simulated from the dev panel",
+      "state": "Insights tab, PRO switch ON (local simulation), scroll 0, light theme: waste card (2 expired, Normal pill, 'mostly in: Fruit' top-category line, green improving trend vs last month, no unlock line) plus coverage and rotation cards. Recaptured 2026-10-12 after the seeder started assigning categories.",
+      "replaces": "pro-ai-analysis (dropped: AI analysis output is generic)",
       "sources": [
-        "src/app/features/dashboard"
+        "src/app/features/insights",
+        "src/app/shared/components/waste-tracker-card",
+        "src/app/shared/components/insight-status-pill"
       ],
-      "pro": true
+      "pro": true,
+      "commit": "dd5919b58f59080cbe931448e8753e1e1be1a5ab"
     }
   ],
   "alsoWatch": [
     "src/app/core/services/dev/dev-marketing-seeder.service.ts",
     "src/theme",
     "src/assets/i18n"
-  ]
+  ],
+  "final": {
+    "generatedAt": "2026-10-13",
+    "canvaDesignId": "DAHX3620p6k",
+    "slots": [
+      "dashboard",
+      "receipt-review",
+      "pantry",
+      "shopping",
+      "insights"
+    ],
+    "note": "Files are <lang>/final/<order>-<id>.png (01-dashboard, 02-receipt-review, 03-pantry, 04-shopping, 05-insights). 02-receipt-review exists for all six languages (de and pt added 2026-10-13 from the recaptured crops).",
+    "receiptReview": {
+      "generatedAt": "2026-10-13",
+      "languages": [
+        "es",
+        "en",
+        "de",
+        "fr",
+        "it",
+        "pt"
+      ],
+      "file": "02-receipt-review.png",
+      "pendingLanguages": []
+    }
+  }
 }
