@@ -105,23 +105,19 @@
       "shopping",
       "insights"
     ],
-    "skipped": [
-      "receipt-review (de, pt: crops on hold, OCR flaws until recaptured)"
-    ],
-    "note": "Files are <lang>/final/<order>-<id>.png (01-dashboard, 02-receipt-review, 03-pantry, 04-shopping, 05-insights). 02-receipt-review exists only for es, en, fr, it; de and pt are on hold until recaptured.",
+    "note": "Files are <lang>/final/<order>-<id>.png (01-dashboard, 02-receipt-review, 03-pantry, 04-shopping, 05-insights). 02-receipt-review exists for all six languages (de and pt added 2026-10-13 from the recaptured crops).",
     "receiptReview": {
       "generatedAt": "2026-10-13",
       "languages": [
         "es",
         "en",
+        "de",
         "fr",
-        "it"
+        "it",
+        "pt"
       ],
       "file": "02-receipt-review.png",
-      "pendingLanguages": [
-        "de",
-        "pt"
-      ]
+      "pendingLanguages": []
     }
   }
 }
