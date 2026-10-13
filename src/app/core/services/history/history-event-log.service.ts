@@ -20,11 +20,19 @@ export class HistoryEventLogService extends StorageService<PantryEvent> {
    */
   readonly revision = signal(0);
 
+  /**
+   * Last full read of the log, dropped on the first change to it. A page that is
+   * destroyed and rebuilt (Insights, after a trip to /settings) paints from this
+   * and revalidates, instead of showing skeletons until PouchDB answers again.
+   */
+  private snapshot: PantryEvent[] | null = null;
+
   constructor() {
     super();
     // Deleted docs arrive as { _id, _deleted } with no `type`: match the id.
     this.watchChanges(doc => {
       if (!doc._id?.startsWith(`${this.TYPE}:`)) return;
+      this.snapshot = null;
       if (this.revisionTimer) clearTimeout(this.revisionTimer);
       this.revisionTimer = setTimeout(() => {
         this.revisionTimer = null;
@@ -34,8 +42,14 @@ export class HistoryEventLogService extends StorageService<PantryEvent> {
   }
 
   async listEvents(): Promise<PantryEvent[]> {
-    const events = await this.all(this.TYPE);
-    return this.sortByTimestamp(events);
+    const events = this.sortByTimestamp(await this.all(this.TYPE));
+    this.snapshot = events;
+    return events;
+  }
+
+  /** The last `listEvents()` result if nothing was written since, else null. */
+  peekEvents(): PantryEvent[] | null {
+    return this.snapshot;
   }
 
   async listEventsByType(eventType: PantryEvent['eventType']): Promise<PantryEvent[]> {

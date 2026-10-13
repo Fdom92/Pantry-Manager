@@ -59,9 +59,13 @@ export class InsightsStateService {
   private readonly toast = inject(ToastService);
   private readonly clock = inject(ClockService);
 
-  private readonly events = signal<PantryEvent[]>([]);
-  readonly isLoadingEvents = signal(true);
-  private hasLoadedOnce = false;
+  // Start from the log's last read when it is still valid: this service is
+  // rebuilt with the page (e.g. after /settings), and skeletons for data we
+  // already have look like a slow tab.
+  private readonly initialEvents = this.eventLog.peekEvents();
+  private readonly events = signal<PantryEvent[]>(this.initialEvents ?? []);
+  readonly isLoadingEvents = signal(this.initialEvents === null);
+  private hasLoadedOnce = this.initialEvents !== null;
 
   // Load on creation and whenever the history changes, not only from
   // `ionViewWillEnter`: the dashboard showed "sin desperdicios" until a tab
