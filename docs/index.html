@@ -3,27 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pantrymind – Smart Pantry Manager</title>
+  <title>PantryMind – Smart Pantry Manager</title>
   <meta name="description" content="Track expiration dates, build smart shopping lists, and reduce food waste. Free on Android. No account required.">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Pantrymind">
+  <meta property="og:site_name" content="PantryMind">
   <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://fdom92.github.io/Pantry-Manager/">
-  <meta property="og:title" content="Pantrymind – Smart Pantry Manager">
+  <meta property="og:title" content="PantryMind – Smart Pantry Manager">
   <meta property="og:description" content="Track expiration dates, reduce food waste, and shop smarter. Free on Android.">
-  <meta property="og:image" content="https://fdom92.github.io/Pantry-Manager/social-card.png">
+  <meta property="og:image" content="https://fdom92.github.io/Pantry-Manager/social-card-v2.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Pantrymind: expiry tracking, shopping list, waste analytics, fresh items, receipt scan, streaks. Free, no account, works offline.">
+  <meta property="og:image:alt" content="PantryMind: expiry tracking, shopping list, waste analytics, fresh items, receipt scan, streaks. Free, no account, works offline.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Pantrymind – Smart Pantry Manager">
+  <meta name="twitter:title" content="PantryMind – Smart Pantry Manager">
   <meta name="twitter:description" content="Track expiration dates, reduce food waste, and shop smarter. Free on Android.">
-  <meta name="twitter:image" content="https://fdom92.github.io/Pantry-Manager/social-card.png">
-  <meta name="twitter:image:alt" content="Pantrymind: expiry tracking, shopping list, waste analytics, fresh items, receipt scan, streaks. Free, no account, works offline.">
+  <meta name="twitter:image" content="https://fdom92.github.io/Pantry-Manager/social-card-v2.png">
+  <meta name="twitter:image:alt" content="PantryMind: expiry tracking, shopping list, waste analytics, fresh items, receipt scan, streaks. Free, no account, works offline.">
   <link rel="canonical" href="https://fdom92.github.io/Pantry-Manager/">
   <link rel="alternate" hreflang="en" href="https://fdom92.github.io/Pantry-Manager/">
   <link rel="alternate" hreflang="es" href="https://fdom92.github.io/Pantry-Manager/es/">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -37,7 +39,8 @@
       --violet: #7C5CFF;
       --violet-light: #f0edff;
       --cream: #EFE7D8;
-      --bg: #F7F5F1;
+      --bg: #F6FAF8;
+      --teal-text: #277A6C;
       --card-bg: #ffffff;
       --text: #1A2E2A;
       --text-muted: #5a7570;
@@ -63,7 +66,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(247,245,241,0.88);
+      background: rgba(246,250,248,0.88);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-bottom: 1px solid var(--border);
@@ -132,7 +135,7 @@
       transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
     }
     .btn-nav:hover {
-      background: var(--teal);
+      background: #256f62;
       transform: translateY(-1px);
       box-shadow: 0 4px 16px rgba(42,126,112,0.3);
     }
@@ -152,7 +155,7 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--teal);
+      color: var(--teal-text);
       margin-bottom: 18px;
     }
     .hero h1 {
@@ -195,7 +198,7 @@
       gap: 8px;
     }
     .btn-primary:hover {
-      background: var(--teal);
+      background: #256f62;
       transform: translateY(-1px);
       box-shadow: 0 6px 24px rgba(42,126,112,0.35);
     }
@@ -212,7 +215,7 @@
       padding: 20px;
     }
     .phone {
-      width: 248px;
+      width: 278px;
       height: 500px;
       background: #111c1b;
       border-radius: 40px;
@@ -237,7 +240,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: linear-gradient(160deg, #e8f5f2 0%, #f7f5f1 55%, #ede7d8 100%);
+      background: linear-gradient(160deg, #e8f5f2 0%, #f6faf8 55%, #ede7d8 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -248,6 +251,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: top;
     }
     .screen-placeholder {
       opacity: 0.45;
@@ -291,7 +295,7 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--teal);
+      color: var(--teal-text);
       margin-bottom: 12px;
     }
     .section-title {
@@ -486,7 +490,7 @@
       line-height: 1.55;
     }
     .btn-pro {
-      background: var(--violet);
+      background: #6D51E0;
       color: white;
       border: none;
       padding: 14px 28px;
@@ -502,10 +506,27 @@
       position: relative;
     }
     .btn-pro:hover {
-      background: #6b4dff;
+      background: #5e43cc;
       transform: translateY(-1px);
       box-shadow: 0 6px 28px rgba(124,92,255,0.55);
     }
+
+
+    /* ── GALLERY ── */
+    .gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; margin-top: 40px; }
+    .gallery figure { text-align: center; }
+    .gallery .shot {
+      border-radius: 30px;
+      border: 6px solid #0a1412;
+      overflow: hidden;
+      background: #111c1b;
+      box-shadow: var(--shadow-md);
+      aspect-ratio: 540 / 992;
+    }
+    .gallery img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+    .gallery figcaption { margin-top: 14px; font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .gallery-note { margin-top: 28px; text-align: center; font-size: 0.9rem; color: var(--text-muted); }
+    @media (max-width: 900px) { .gallery { grid-template-columns: repeat(2, 1fr); } }
 
     /* ── FOOTER ── */
     .footer-wrap {
@@ -530,7 +551,7 @@
       font-size: 0.82rem;
       transition: color 0.15s;
     }
-    .footer-links a:hover { color: var(--teal); }
+    .footer-links a:hover { color: var(--teal-text); }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
@@ -587,7 +608,7 @@
   <div class="nav-inner">
     <a href="/" class="nav-logo">
       <span class="logo-mark">
-        <img src="icon.png" alt="Pantrymind" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:9px;z-index:1">
+        <img src="icon.png" alt="PantryMind" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:9px;z-index:1">
         <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" width="30" height="30" style="display:block;border-radius:9px">
           <rect width="96" height="96" rx="20" fill="#3A9882"/>
           <rect x="18" y="28" width="60" height="6" rx="3" fill="white" opacity="0.95"/>
@@ -602,7 +623,7 @@
           <circle cx="68" cy="36" r="2" fill="#3A9882"/>
         </svg>
       </span>
-      Pantrymind
+      PantryMind
     </a>
     <a href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind" class="btn-nav" target="_blank" rel="noopener">
       Get it free ↓
@@ -616,7 +637,7 @@
     <p class="hero-eyebrow">Free · Android · No account needed</p>
     <h1>Stop throwing away food you <em>forgot you had</em></h1>
     <p class="hero-sub">
-      Pantrymind tracks your pantry, alerts you before things expire, and builds your shopping list automatically — so you waste less and spend smarter.
+      PantryMind tracks your pantry, alerts you before things expire, and builds your shopping list automatically — so you waste less and spend smarter.
     </p>
     <div class="hero-ctas">
       <a href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind" class="btn-primary" target="_blank" rel="noopener">
@@ -629,16 +650,16 @@
   <div class="phone-wrap">
     <div class="phone">
       <div class="phone-screen">
-        <img src="screenshot-dashboard.png" alt="Pantrymind home screen showing today's expiring products and recommended actions">
+        <img src="screenshot-dashboard.png" alt="PantryMind home screen showing today's expiring products and recommended actions">
       </div>
     </div>
     <div class="badge-float top-right">
       <span class="dot dot-red"></span>
-      Yogurt expires tomorrow
+      Chicken breast expires tomorrow
     </div>
     <div class="badge-float bot-left">
       <span class="dot dot-green"></span>
-      14 items tracked
+      42 items tracked
     </div>
   </div>
 </div>
@@ -668,12 +689,12 @@
     <div class="feature-card">
       <div class="feature-icon">🧾</div>
       <h3>Receipt scanning</h3>
-      <p>Snap a photo of your grocery receipt and Pantrymind reads it on your phone. Review each line and adjust the name, food type and expiry before anything is added — no manual typing.</p>
+      <p>Snap a photo of your grocery receipt and PantryMind reads it on your phone. Review each line and adjust the name, food type and expiry before anything is added — no manual typing.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">📊</div>
       <h3>Pantry insights</h3>
-      <p>See how much food you waste each month, how many days your pantry would last without shopping, and how much of what you buy you actually use — each with a clear green, amber or red status. Upgrade to Pro for the breakdown by category and trend.</p>
+      <p>See how much food you waste each month, how many days your pantry would last without shopping, and how much of what you buy you actually use — each with a clear green, amber or red status. A breakdown of your pantry by food type, and with Pro the trend versus last month and your most-wasted category.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">🔥</div>
@@ -689,7 +710,7 @@
     </div>
     <div>
       <div class="stat-num">100%</div>
-      <div class="stat-lbl">of free features work offline — your data stays on your phone</div>
+      <div class="stat-lbl">of free features work offline (receipt scanning downloads its reader the first time) — your data stays on your phone</div>
     </div>
     <div>
       <div class="stat-num">0€</div>
@@ -707,10 +728,35 @@
   </div>
 </section>
 
+<!-- GALLERY -->
+<section class="section">
+  <p class="eyebrow">In action</p>
+  <h2 class="section-title">See it in action</h2>
+  <div class="gallery">
+      <figure>
+        <div class="shot"><img src="shot-en-receipt.jpg" alt="Review of a scanned receipt with type and expiry per line" loading="lazy" width="540" height="992"></div>
+        <figcaption>Review every receipt line</figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="shot-en-pantry.jpg" alt="Pantry with fresh and pantry items" loading="lazy" width="540" height="992"></div>
+        <figcaption>Your pantry at a glance</figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="shot-en-shopping.jpg" alt="Shopping list grouped by supermarket" loading="lazy" width="540" height="992"></div>
+        <figcaption>Shopping list, by supermarket</figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="shot-en-insights.jpg" alt="Insights with waste, coverage and rotation" loading="lazy" width="540" height="992"></div>
+        <figcaption>Waste, coverage and rotation (Pro adds the trend)</figcaption>
+      </figure>
+  </div>
+  <p class="gallery-note">Light and dark theme, 6 languages, no account.</p>
+</section>
+
 <!-- PRO -->
 <div class="pro-wrap">
   <div class="pro-card">
-    <div class="pro-badge">✦ Pantrymind Pro</div>
+    <div class="pro-badge">✦ PantryMind Pro</div>
     <h2>Unlock AI-powered insights</h2>
     <p>Pro analyses your consumption history and tells you exactly what to buy, when — so you never over-stock or run out of your staples again.</p>
     <div class="pro-perks">
@@ -724,7 +770,7 @@
       </div>
       <div class="perk">
         <div class="perk-icon"></div>
-        <span>Detailed waste breakdown by category and trend</span>
+        <span>Waste trend vs last month and your top category</span>
       </div>
       <div class="perk">
         <div class="perk-icon"></div>
@@ -744,7 +790,7 @@
 <!-- FOOTER -->
 <div class="footer-wrap">
   <footer>
-    <p>© 2026 Pantrymind</p>
+    <p>© 2026 PantryMind</p>
     <div class="footer-links">
       <a href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind" target="_blank" rel="noopener">Google Play</a>
       <a href="privacy-policy">Privacy Policy</a>

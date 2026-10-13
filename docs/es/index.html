@@ -3,27 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pantrymind – Controla tu despensa</title>
+  <title>PantryMind – Controla tu despensa</title>
   <meta name="description" content="Controla caducidades, crea listas de la compra inteligentes y desperdicia menos comida. Gratis en Android. Sin cuentas.">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Pantrymind">
+  <meta property="og:site_name" content="PantryMind">
   <meta property="og:locale" content="es_ES">
   <meta property="og:url" content="https://fdom92.github.io/Pantry-Manager/es/">
-  <meta property="og:title" content="Pantrymind – Controla tu despensa">
+  <meta property="og:title" content="PantryMind – Controla tu despensa">
   <meta property="og:description" content="Controla caducidades, desperdicia menos y compra mejor. Gratis en Android.">
-  <meta property="og:image" content="https://fdom92.github.io/Pantry-Manager/social-card-es.png">
+  <meta property="og:image" content="https://fdom92.github.io/Pantry-Manager/social-card-es-v2.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Pantrymind: caducidades, lista de la compra, desperdicio, frescos, escaneo de ticket, rachas. Gratis, sin cuenta, sin conexión.">
+  <meta property="og:image:alt" content="PantryMind: caducidades, lista de la compra, desperdicio, frescos, escaneo de ticket, rachas. Gratis, sin cuenta, sin conexión.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Pantrymind – Controla tu despensa">
+  <meta name="twitter:title" content="PantryMind – Controla tu despensa">
   <meta name="twitter:description" content="Controla caducidades, desperdicia menos y compra mejor. Gratis en Android.">
-  <meta name="twitter:image" content="https://fdom92.github.io/Pantry-Manager/social-card-es.png">
-  <meta name="twitter:image:alt" content="Pantrymind: caducidades, lista de la compra, desperdicio, frescos, escaneo de ticket, rachas. Gratis, sin cuenta, sin conexión.">
+  <meta name="twitter:image" content="https://fdom92.github.io/Pantry-Manager/social-card-es-v2.png">
+  <meta name="twitter:image:alt" content="PantryMind: caducidades, lista de la compra, desperdicio, frescos, escaneo de ticket, rachas. Gratis, sin cuenta, sin conexión.">
   <link rel="canonical" href="https://fdom92.github.io/Pantry-Manager/es/">
   <link rel="alternate" hreflang="en" href="https://fdom92.github.io/Pantry-Manager/">
   <link rel="alternate" hreflang="es" href="https://fdom92.github.io/Pantry-Manager/es/">
+  <link rel="icon" type="image/png" href="../icon.png">
+  <link rel="apple-touch-icon" href="../icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -37,7 +39,8 @@
       --violet: #7C5CFF;
       --violet-light: #f0edff;
       --cream: #EFE7D8;
-      --bg: #F7F5F1;
+      --bg: #F6FAF8;
+      --teal-text: #277A6C;
       --card-bg: #ffffff;
       --text: #1A2E2A;
       --text-muted: #5a7570;
@@ -63,7 +66,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(247,245,241,0.88);
+      background: rgba(246,250,248,0.88);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-bottom: 1px solid var(--border);
@@ -132,7 +135,7 @@
       transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
     }
     .btn-nav:hover {
-      background: var(--teal);
+      background: #256f62;
       transform: translateY(-1px);
       box-shadow: 0 4px 16px rgba(42,126,112,0.3);
     }
@@ -152,7 +155,7 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--teal);
+      color: var(--teal-text);
       margin-bottom: 18px;
     }
     .hero h1 {
@@ -195,7 +198,7 @@
       gap: 8px;
     }
     .btn-primary:hover {
-      background: var(--teal);
+      background: #256f62;
       transform: translateY(-1px);
       box-shadow: 0 6px 24px rgba(42,126,112,0.35);
     }
@@ -212,7 +215,7 @@
       padding: 20px;
     }
     .phone {
-      width: 248px;
+      width: 278px;
       height: 500px;
       background: #111c1b;
       border-radius: 40px;
@@ -237,7 +240,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: linear-gradient(160deg, #e8f5f2 0%, #f7f5f1 55%, #ede7d8 100%);
+      background: linear-gradient(160deg, #e8f5f2 0%, #f6faf8 55%, #ede7d8 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -248,6 +251,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: top;
     }
     .screen-placeholder {
       opacity: 0.45;
@@ -291,7 +295,7 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--teal);
+      color: var(--teal-text);
       margin-bottom: 12px;
     }
     .section-title {
@@ -486,7 +490,7 @@
       line-height: 1.55;
     }
     .btn-pro {
-      background: var(--violet);
+      background: #6D51E0;
       color: white;
       border: none;
       padding: 14px 28px;
@@ -502,10 +506,27 @@
       position: relative;
     }
     .btn-pro:hover {
-      background: #6b4dff;
+      background: #5e43cc;
       transform: translateY(-1px);
       box-shadow: 0 6px 28px rgba(124,92,255,0.55);
     }
+
+
+    /* ── GALLERY ── */
+    .gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; margin-top: 40px; }
+    .gallery figure { text-align: center; }
+    .gallery .shot {
+      border-radius: 30px;
+      border: 6px solid #0a1412;
+      overflow: hidden;
+      background: #111c1b;
+      box-shadow: var(--shadow-md);
+      aspect-ratio: 540 / 992;
+    }
+    .gallery img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+    .gallery figcaption { margin-top: 14px; font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .gallery-note { margin-top: 28px; text-align: center; font-size: 0.9rem; color: var(--text-muted); }
+    @media (max-width: 900px) { .gallery { grid-template-columns: repeat(2, 1fr); } }
 
     /* ── FOOTER ── */
     .footer-wrap {
@@ -530,7 +551,7 @@
       font-size: 0.82rem;
       transition: color 0.15s;
     }
-    .footer-links a:hover { color: var(--teal); }
+    .footer-links a:hover { color: var(--teal-text); }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
@@ -558,7 +579,7 @@
   <div class="nav-inner">
     <a href="../" class="nav-logo">
       <span class="logo-mark">
-        <img src="../icon.png" alt="Pantrymind" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:9px;z-index:1">
+        <img src="../icon.png" alt="PantryMind" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:9px;z-index:1">
         <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" width="30" height="30" style="display:block;border-radius:9px">
           <rect width="96" height="96" rx="20" fill="#3A9882"/>
           <rect x="18" y="28" width="60" height="6" rx="3" fill="white" opacity="0.95"/>
@@ -573,7 +594,7 @@
           <circle cx="68" cy="36" r="2" fill="#3A9882"/>
         </svg>
       </span>
-      Pantrymind
+      PantryMind
     </a>
     <a href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind" class="btn-nav" target="_blank" rel="noopener">
       Descárgala gratis ↓
@@ -587,7 +608,7 @@
     <p class="hero-eyebrow">Gratis · Android · Sin cuentas</p>
     <h1>Deja de tirar comida que <em>olvidaste que tenías</em></h1>
     <p class="hero-sub">
-      Pantrymind controla tu despensa, te avisa antes de que algo caduque y crea tu lista de la compra automáticamente — desperdicias menos y compras mejor.
+      PantryMind controla tu despensa, te avisa antes de que algo caduque y crea tu lista de la compra automáticamente — desperdicias menos y compras mejor.
     </p>
     <div class="hero-ctas">
       <a href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind" class="btn-primary" target="_blank" rel="noopener">
@@ -600,16 +621,16 @@
   <div class="phone-wrap">
     <div class="phone">
       <div class="phone-screen">
-        <img src="../screenshot-dashboard-es.png" alt="Pantalla de inicio de Pantrymind con los productos que caducan hoy y acciones recomendadas">
+        <img src="../screenshot-dashboard-es.png" alt="Pantalla de inicio de PantryMind con los productos que caducan hoy y acciones recomendadas">
       </div>
     </div>
     <div class="badge-float top-right">
       <span class="dot dot-red"></span>
-      El yogur caduca mañana
+      La pechuga de pollo caduca mañana
     </div>
     <div class="badge-float bot-left">
       <span class="dot dot-green"></span>
-      14 productos controlados
+      42 productos controlados
     </div>
   </div>
 </div>
@@ -634,17 +655,17 @@
     <div class="feature-card">
       <div class="feature-icon">🛒</div>
       <h3>Lista de la compra inteligente</h3>
-      <p>Marca lo que quieres tener siempre en casa y aparece en tu lista en cuanto se acaba — ordenado por urgencia o agrupado por supermercado. Añade tus propias notas, marca como comprado (y deshaz si te equivocas) y comparte la lista en PDF o texto.</p>
+      <p>Marca lo que quieres tener siempre en casa y aparece en tu lista en cuanto se acaba — ordenado por urgencia o agrupado por supermercado. Añade tus propios artículos, marca como comprado (y deshaz si te equivocas) y comparte la lista en PDF o texto.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">🧾</div>
       <h3>Escaneo de ticket</h3>
-      <p>Haz una foto al ticket de la compra y Pantrymind lo lee en tu móvil. Revisa cada línea y ajusta nombre, tipo de alimento y caducidad antes de añadir nada — sin escribir a mano.</p>
+      <p>Haz una foto al ticket de la compra y PantryMind lo lee en tu móvil. Revisa cada línea y ajusta nombre, tipo de alimento y caducidad antes de añadir nada — sin escribir a mano.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">📊</div>
       <h3>Análisis de tu despensa</h3>
-      <p>Mira cuánto desperdicias cada mes, para cuántos días tienes comida sin volver a comprar y cuánto de lo que compras acabas consumiendo — todo con un estado claro en verde, ámbar o rojo. Con Pro, desglose por categoría y tendencia.</p>
+      <p>Mira cuánto desperdicias cada mes, para cuántos días tienes comida sin volver a comprar y cuánto de lo que compras acabas consumiendo — todo con un estado claro en verde, ámbar o rojo. Un desglose de tu despensa por tipo de alimento, y con Pro la tendencia frente al mes pasado y tu categoría con más desperdicio.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">🔥</div>
@@ -660,7 +681,7 @@
     </div>
     <div>
       <div class="stat-num">100%</div>
-      <div class="stat-lbl">de las funciones gratis funcionan sin conexión — tus datos se quedan en tu móvil</div>
+      <div class="stat-lbl">de las funciones gratis funcionan sin conexión (el escaneo de ticket descarga su lector la primera vez) — tus datos se quedan en tu móvil</div>
     </div>
     <div>
       <div class="stat-num">0€</div>
@@ -678,10 +699,35 @@
   </div>
 </section>
 
+<!-- GALLERY -->
+<section class="section">
+  <p class="eyebrow">En acción</p>
+  <h2 class="section-title">Míralo en acción</h2>
+  <div class="gallery">
+      <figure>
+        <div class="shot"><img src="../shot-es-receipt.jpg" alt="Revisión de un ticket escaneado con tipo y caducidad por línea" loading="lazy" width="540" height="992"></div>
+        <figcaption>Revisa cada línea del ticket</figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="../shot-es-pantry.jpg" alt="Despensa con productos frescos y de despensa" loading="lazy" width="540" height="992"></div>
+        <figcaption>Tu despensa de un vistazo</figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="../shot-es-shopping.jpg" alt="Lista de la compra agrupada por supermercado" loading="lazy" width="540" height="992"></div>
+        <figcaption>Lista de la compra, por supermercado</figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img src="../shot-es-insights.jpg" alt="Análisis con desperdicio, cobertura y rotación" loading="lazy" width="540" height="992"></div>
+        <figcaption>Desperdicio, cobertura y rotación (Pro añade la tendencia)</figcaption>
+      </figure>
+  </div>
+  <p class="gallery-note">Tema claro y oscuro, 6 idiomas, sin cuenta.</p>
+</section>
+
 <!-- PRO -->
 <div class="pro-wrap">
   <div class="pro-card">
-    <div class="pro-badge">✦ Pantrymind Pro</div>
+    <div class="pro-badge">✦ PantryMind Pro</div>
     <h2>Desbloquea análisis con IA</h2>
     <p>Pro analiza tu historial de consumo y te dice qué comprar y cuándo — sin quedarte sin tus básicos ni acumular de más.</p>
     <div class="pro-perks">
@@ -695,7 +741,7 @@
       </div>
       <div class="perk">
         <div class="perk-icon"></div>
-        <span>Desglose de desperdicio por categoría y tendencia</span>
+        <span>Tendencia del desperdicio frente al mes pasado y tu categoría principal</span>
       </div>
       <div class="perk">
         <div class="perk-icon"></div>
@@ -715,7 +761,7 @@
 <!-- FOOTER -->
 <div class="footer-wrap">
   <footer>
-    <p>© 2026 Pantrymind</p>
+    <p>© 2026 PantryMind</p>
     <div class="footer-links">
       <a href="https://play.google.com/store/apps/details?id=com.fdom.pantrymind" target="_blank" rel="noopener">Google Play</a>
       <a href="../privacy-policy">Política de privacidad</a>
