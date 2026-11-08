@@ -63,6 +63,29 @@ describe('inferFoodType', () => {
   });
 });
 
+describe('inferFoodType on a real household catalogue', () => {
+  // Names from a real pantry (2026-11) that fell into "otros" or got no date.
+  const cases: Array<[string, FoodType]> = [
+    ['Pechuga de pollo congelada', FoodType.PROTEIN],
+    ['Tilapia congelada', FoodType.PROTEIN],
+    ['Contramuslos congelados', FoodType.PROTEIN],
+    ['Alitas congeladas', FoodType.PROTEIN],
+    ['Croquetas congeladas', FoodType.PROTEIN],
+    ['Cachopo congelado', FoodType.PROTEIN],
+    ['Lomos de pescado', FoodType.PROTEIN],
+    ['Guisantes congelados', FoodType.VEGETABLE],
+    ['Brócoli congelado', FoodType.VEGETABLE],
+    // Portuguese has two everyday words for courgette; the catalogue only had the French one.
+    ['Curgete', FoodType.VEGETABLE],
+    ['Abobrinha', FoodType.VEGETABLE],
+  ];
+  for (const [name, type] of cases) {
+    it(`reads "${name}" as ${type}`, () => {
+      expect(inferFoodType(name)).toBe(type);
+    });
+  }
+});
+
 describe('FOOD_CONCEPTS data integrity', () => {
   it('has a unique key per concept', () => {
     const keys = FOOD_CONCEPTS.map(c => c.key);
