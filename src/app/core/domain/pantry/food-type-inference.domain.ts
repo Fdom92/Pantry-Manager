@@ -1,20 +1,21 @@
 import type { FoodType } from '@core/models/shared/enums.model';
+import { toLocalYmd } from '@core/utils/date.util';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
 import { foodTypeExpires, suggestExpiryDate } from './expiry-suggestion.domain';
-import { FOOD_CONCEPTS } from './food-concepts.data';
+import { FOOD_CONCEPTS, type FoodConcept } from './food-concepts.data';
 
 /**
- * Flattened lookup: normalised term -> FoodType, pooled across all languages so
+ * Flattened lookup: normalised term -> concept, pooled across all languages so
  * a user typing an English word in a Spanish app still matches. Built once at
  * module load. First declaration wins on collision (see FOOD_CONCEPTS docs).
  */
-const TERM_INDEX: ReadonlyMap<string, FoodType> = (() => {
-  const index = new Map<string, FoodType>();
+const TERM_INDEX: ReadonlyMap<string, FoodConcept> = (() => {
+  const index = new Map<string, FoodConcept>();
   for (const concept of FOOD_CONCEPTS) {
     for (const terms of Object.values(concept.terms)) {
       for (const term of terms) {
         const key = normalizeSearchQuery(term);
-        if (key && !index.has(key)) index.set(key, concept.foodType);
+        if (key && !index.has(key)) index.set(key, concept);
       }
     }
   }
@@ -43,6 +44,10 @@ const MAX_TERM_WORDS: number = (() => {
  * and fall back to their existing no-date behaviour.
  */
 export function inferFoodType(name: string): FoodType | null {
+  return inferConcept(name)?.foodType ?? null;
+}
+
+function inferConcept(name: string): FoodConcept | null {
   const normalized = normalizeSearchQuery(name);
   if (!normalized) return null;
 
@@ -69,6 +74,21 @@ export interface InferredExpiry {
 }
 
 /**
+ * The suggested date for a product of this type, honouring a concept's own shelf
+ * life only when the type is the concept's: bread typed as CARB gets days, but a
+ * user who re-typed it as something else gets that type's shelf life.
+ */
+function suggestExpiryForName(name: string, foodType: FoodType, fromDate: Date): string | undefined {
+  const concept = inferConcept(name);
+  if (concept?.shelfLifeDays && concept.foodType === foodType) {
+    const result = new Date(fromDate);
+    result.setDate(result.getDate() + concept.shelfLifeDays);
+    return toLocalYmd(result);
+  }
+  return suggestExpiryDate(foodType, fromDate);
+}
+
+/**
  * Convenience wrapper: infer the food type from a product name and derive the
  * suggested expiry date from it. Returns undefined dates for unknown names so
  * every caller can keep its existing "no date" behaviour unchanged.
@@ -77,7 +97,7 @@ export function inferExpiryForName(name: string, fromDate: Date): InferredExpiry
   const foodType = inferFoodType(name);
   return {
     foodType,
-    expirationDate: foodType ? suggestExpiryDate(foodType, fromDate) : undefined,
+    expirationDate: foodType ? suggestExpiryForName(name, foodType, fromDate) : undefined,
     noExpiry: foodType ? !foodTypeExpires(foodType) : undefined,
   };
 }
@@ -112,7 +132,7 @@ export function resolveSuggestedExpiry(
   const type = foodType ?? inferFoodType(name);
   if (!type) return {};
   if (!foodTypeExpires(type)) return { noExpiry: true };
-  return { expirationDate: suggestExpiryDate(type, fromDate) };
+  return { expirationDate: suggestExpiryForName(name, type, fromDate) };
 }
 
 /**

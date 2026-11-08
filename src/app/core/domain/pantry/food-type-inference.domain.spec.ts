@@ -3,7 +3,7 @@ import { FoodType } from '@core/models/shared/enums.model';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
 import { EXPIRY_SUGGESTION_DAYS } from './expiry-suggestion.domain';
 import { FOOD_CONCEPTS } from './food-concepts.data';
-import { inferExpiryForName, inferFoodType } from './food-type-inference.domain';
+import { inferExpiryForName, inferFoodType, resolveSuggestedExpiry } from './food-type-inference.domain';
 
 describe('inferFoodType', () => {
   it('matches a simple single-word term', () => {
@@ -127,6 +127,27 @@ describe('inferExpiryForName', () => {
     const result = inferExpiryForName('bolsas de basura', from);
     expect(result.expirationDate).toBeUndefined();
     expect(result.noExpiry).toBe(true);
+  });
+
+  it('dates bread in days, not the 270 days of rice and pasta', () => {
+    expect(inferExpiryForName('Pan de molde', from).expirationDate).toBe('2026-01-08');
+  });
+
+  it('keeps dry bread (toasted, crumbs) on the long carb shelf life', () => {
+    const toasted = inferExpiryForName('Pan tostado', from).expirationDate as string;
+    const crumbs = inferExpiryForName('Pan rallado', from).expirationDate as string;
+    expect(toasted > '2026-06-01').toBeTrue();
+    expect(crumbs > '2026-06-01').toBeTrue();
+  });
+
+  it('uses the bread shelf life when the stored type is already CARB', () => {
+    // Every bread saved before 5.7 carries foodType CARB: restocks must still get days.
+    expect(resolveSuggestedExpiry('Pan de molde', FoodType.CARB, from).expirationDate).toBe('2026-01-08');
+  });
+
+  it('does not apply the bread shelf life when the user picked another type', () => {
+    expect(resolveSuggestedExpiry('Pan de molde', FoodType.NON_PERISHABLE, from).expirationDate)
+      .not.toBe('2026-01-08');
   });
 
   it('returns nulls for an unknown term so callers keep current behaviour', () => {

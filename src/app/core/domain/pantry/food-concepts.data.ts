@@ -18,6 +18,11 @@ export interface FoodConcept {
   readonly key: string;
   readonly foodType: FoodType;
   readonly terms: Record<SupportedLanguage, readonly string[]>;
+  /**
+   * Overrides the food type's shelf life when one concept inside a type keeps
+   * far less than the rest: bread is a CARB like rice, but lasts days, not months.
+   */
+  readonly shelfLifeDays?: number;
 }
 
 export const FOOD_CONCEPTS: readonly FoodConcept[] = [
@@ -84,8 +89,22 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
     },
   },
   {
+    // Before 'bread' so it reads as a whole: these keep for months like pasta.
+    key: 'dry-bread',
+    foodType: FoodType.CARB,
+    terms: {
+      es: ['pan tostado', 'pan rallado', 'panko', 'biscotes'],
+      en: ['breadcrumbs', 'rusks', 'melba toast'],
+      de: ['paniermehl', 'zwieback'],
+      fr: ['chapelure', 'pain grille', 'biscottes'],
+      it: ['pangrattato', 'pan grattato', 'fette biscottate'],
+      pt: ['pao ralado', 'tostas'],
+    },
+  },
+  {
     key: 'bread',
     foodType: FoodType.CARB,
+    shelfLifeDays: 7,
     terms: {
       es: ['pan'],
       en: ['bread'],
