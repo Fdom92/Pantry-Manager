@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { sumQuantities } from '@core/domain/pantry';
-import { selectUnloggedExpiredBatches } from '@core/domain/events';
+import { selectDuplicateExpireEvents, selectUnloggedExpiredBatches } from '@core/domain/events';
 import type { PantryItem } from '@core/models/pantry';
 import type { EventSource } from '@core/models/events';
 import { computeEditedFields } from '@core/utils/pantry-diff.util';
@@ -128,6 +128,10 @@ export class HistoryEventManagerService {
 
   async logExpiredBatches(items: PantryItem[]): Promise<void> {
     const previousEvents = await this.eventLog.listEventsByType('EXPIRE');
+    const duplicates = selectDuplicateExpireEvents(previousEvents);
+    if (duplicates.length) {
+      await this.eventLog.deleteEvents(duplicates);
+    }
     const pending = selectUnloggedExpiredBatches(items, previousEvents, new Date());
     if (!pending.length) {
       return;

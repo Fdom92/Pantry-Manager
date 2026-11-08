@@ -57,6 +57,10 @@ export class HistoryEventLogService extends StorageService<PantryEvent> {
     return this.sortByTimestamp(events);
   }
 
+  async deleteEvents(events: PantryEvent[]): Promise<void> {
+    await this.bulkSave(events.map(event => ({ ...event, _deleted: true }) as PantryEvent));
+  }
+
   async logAddEvent(params: BaseEventParams): Promise<PantryEvent | null> {
     return this.logEvent({
       eventType: 'ADD',

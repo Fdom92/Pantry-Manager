@@ -34,6 +34,7 @@ describe('HistoryEventManagerService', () => {
       'logExpireEvent',
       'logDeleteEvent',
       'listEventsByType',
+      'deleteEvents',
     ]);
     const mockEvent: PantryEvent = {
       type: 'event',
@@ -48,6 +49,7 @@ describe('HistoryEventManagerService', () => {
     eventLogSpy.logExpireEvent.and.returnValue(Promise.resolve(mockEvent));
     eventLogSpy.logDeleteEvent.and.returnValue(Promise.resolve(mockEvent));
     eventLogSpy.listEventsByType.and.returnValue(Promise.resolve([]));
+    eventLogSpy.deleteEvents.and.returnValue(Promise.resolve());
 
     TestBed.configureTestingModule({
       providers: [
@@ -142,6 +144,26 @@ describe('HistoryEventManagerService', () => {
   // ── logExpiredBatches ──────────────────────────────────────────────────────
 
   describe('logExpiredBatches', () => {
+    it('deletes EXPIRE events that repeat a batch already recorded', async () => {
+      const expire = (id: string, createdAt: string) => ({
+        _id: id, type: 'event', eventType: 'EXPIRE', productId: 'item-1', quantity: 1,
+        timestamp: createdAt, createdAt, sourceMetadata: { batchKey: 'item-1::b1' },
+      } as any as PantryEvent);
+      const original = expire('event:a', '2026-10-04T00:00:00.000Z');
+      const repeat = expire('event:b', '2026-10-13T00:00:00.000Z');
+      eventLogSpy.listEventsByType.and.returnValue(Promise.resolve([repeat, original]));
+
+      await service.logExpiredBatches([]);
+
+      expect(eventLogSpy.deleteEvents).toHaveBeenCalledOnceWith([repeat]);
+    });
+
+    it('deletes nothing when the history has no repeats', async () => {
+      await service.logExpiredBatches([]);
+
+      expect(eventLogSpy.deleteEvents).not.toHaveBeenCalled();
+    });
+
     it('logs EXPIRE event for expired batch', async () => {
       const item = makeItem({
         batches: [makeBatch(5, '2026-05-01')],
