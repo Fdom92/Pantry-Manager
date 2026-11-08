@@ -11,6 +11,7 @@ const item = (over: Partial<PantryItem>): PantryItem => ({
   categoryId: over.categoryId ?? 'beverage',
   batches: over.batches ?? [{ batchId: 'b1', quantity: 4, expirationDate: undefined as any, opened: false } as any],
   isBasic: over.isBasic ?? true,
+  minThreshold: over.minThreshold,
   productType: (over as any).productType ?? 'pantry',
   noExpiry: (over as any).noExpiry ?? true,
   createdAt: (over as any).createdAt ?? '2026-04-01T00:00:00Z',
@@ -40,6 +41,15 @@ describe('computeRepositionPredictions', () => {
     const items = [item({ _id: 'fp', productType: 'fresh' } as any)];
     const events = Array.from({ length: 10 }, (_, i) =>
       ev({ productId: 'fp', quantity: 1, timestamp: new Date(now.getTime() - (i + 1) * 86_400_000).toISOString() })
+    );
+    expect(computeRepositionPredictions(items, events, now)).toEqual([]);
+  });
+
+  it('skips a basic the shopping list already suggests on its own (below its minimum)', () => {
+    // Offering "Añadir" for something the list already shows is noise: yogur, leche.
+    const items = [item({ _id: 'p1', isBasic: true, minThreshold: 6, batches: [{ batchId: 'b1', quantity: 4 } as any] })];
+    const events = Array.from({ length: 6 }, (_, i) =>
+      ev({ productId: 'p1', quantity: 1, timestamp: new Date(now.getTime() - (i + 1) * 86_400_000).toISOString() })
     );
     expect(computeRepositionPredictions(items, events, now)).toEqual([]);
   });
