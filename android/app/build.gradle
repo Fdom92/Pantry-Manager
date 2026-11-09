@@ -18,9 +18,12 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            shrinkResources false
+            // Play flags under 25 % obfuscation (deadline Feb 2027); measured 37 % with these rules.
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Native libs (ML Kit, Sentry, RevenueCat) ship their symbol table so Play can read native crashes.
+            ndk { debugSymbolLevel 'SYMBOL_TABLE' }
         }
         debug {
             applicationIdSuffix ".dev"
