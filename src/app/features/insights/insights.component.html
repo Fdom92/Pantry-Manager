@@ -194,6 +194,12 @@
             }
           </div>
           <div class="distribution-badges">
+            @if (facade.unclassifiedCount() > 0) {
+              <p class="distribution-badge">
+                <ion-icon name="help-circle-outline"></ion-icon>
+                {{ 'insights.distribution.unclassified' | translate: { count: facade.unclassifiedCount() } }}
+              </p>
+            }
             @if (facade.distribution().mostWastedFoodType) {
               <p class="distribution-badge">
                 <ion-icon name="analytics-outline"></ion-icon>

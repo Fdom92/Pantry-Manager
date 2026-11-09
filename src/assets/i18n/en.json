@@ -515,7 +515,8 @@
     "distribution": {
       "title": "Breakdown",
       "mostWasted": "Higher incidence",
-      "leastRotating": "Low rotation"
+      "leastRotating": "Low rotation",
+      "unclassified": "No food type: {{count}} (not counted here)"
     },
     "pro": {
       "title": "Smart AI analysis",

@@ -515,7 +515,8 @@
     "distribution": {
       "title": "Einordnung",
       "mostWasted": "Häufiger abgelaufen",
-      "leastRotating": "Niedrige Rotation"
+      "leastRotating": "Niedrige Rotation",
+      "unclassified": "Ohne Lebensmittelart: {{count}} (hier nicht gezählt)"
     },
     "pro": {
       "title": "Intelligente KI-Analyse",

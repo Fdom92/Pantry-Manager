@@ -151,6 +151,10 @@ export class InsightsStateService {
       .filter(p => p.daysToOut <= 30 && !inList.has(normalizeLowercase(p.productName)));
   });
 
+  /** Products in stock with no food type: the classification card cannot place them. */
+  readonly unclassifiedCount = computed(() =>
+    this.pantryStore.items().filter(i => !i.foodType && sumQuantities(i.batches) > 0).length);
+
   readonly staleProducts = computed(() =>
     computeStaleProducts(this.pantryStore.items(), this.events(), new Date(this.clock.now())));
 

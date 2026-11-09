@@ -515,7 +515,8 @@
     "distribution": {
       "title": "Clasificación",
       "mostWasted": "Mayor incidencia",
-      "leastRotating": "Baja rotación"
+      "leastRotating": "Baja rotación",
+      "unclassified": "Sin tipo de alimento: {{count}} (no cuentan aquí)"
     },
     "pro": {
       "title": "Análisis inteligente con IA",
