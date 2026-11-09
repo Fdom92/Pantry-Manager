@@ -1,5 +1,6 @@
 import { FoodType } from '@core/models/shared/enums.model';
-import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete, isStatusChipVisible, matchesFilters, sortPantryItems, statusFilterCount } from './pantry-filtering.domain';
+import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete, isStatusChipVisible, matchesFilters, matchesSearchQuery, sortPantryItems, statusFilterCount } from './pantry-filtering.domain';
+import { normalizeSearchQuery } from '@core/utils/normalization.util';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 
 function daysFromNow(days: number): string {
@@ -200,5 +201,37 @@ describe('sortPantryItems', () => {
     const input = [a('b'), a('a')];
     sortPantryItems(input);
     expect(input.map(i => i.name)).toEqual(['b', 'a']);
+  });
+});
+
+describe('matchesSearchQuery', () => {
+  const finds = (query: string, name: string, categoryId = '') =>
+    matchesSearchQuery(makeItem({ name, categoryId }), normalizeSearchQuery(query));
+
+  it('matches the start of any word of the name', () => {
+    expect(finds('macarrones', 'Macarrones concha')).toBeTrue();
+    expect(finds('concha', 'Macarrones concha')).toBeTrue();
+  });
+
+  it('does not match inside a word: "agua" is not "paraguaya"', () => {
+    expect(finds('agua', 'Agua mineral')).toBeTrue();
+    expect(finds('agua', 'Paraguaya')).toBeFalse();
+    // "aguacate" does start with "agua": a word-start search cannot tell them apart while typing.
+    expect(finds('agua', 'Aguacate')).toBeTrue();
+  });
+
+  it('finds a product by its category', () => {
+    expect(finds('lacteos', 'Yogur natural', 'Lácteos')).toBeTrue();
+    expect(finds('salsa', 'Ketchup', 'Condimentos')).toBeFalse();
+  });
+
+  it('needs every typed word to start some word', () => {
+    expect(finds('lentejas pard', 'Lentejas pardinas')).toBeTrue();
+    expect(finds('lentejas rioj', 'Lentejas pardinas')).toBeFalse();
+  });
+
+  it('ignores accents and case, and matches everything for an empty query', () => {
+    expect(finds('BROCOLI', 'Brócoli congelado')).toBeTrue();
+    expect(finds('', 'Lo que sea')).toBeTrue();
   });
 });

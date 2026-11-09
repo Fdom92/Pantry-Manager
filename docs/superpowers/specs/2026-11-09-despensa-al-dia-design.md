@@ -64,7 +64,8 @@ frescos. Agrupar Frescos por categoría queda fuera.
 `matchesSearchQuery` deja de buscar el texto en cualquier parte del nombre y pasa a buscarlo
 **al inicio de cada palabra**, en el nombre y en la categoría:
 
-- "agua" encuentra "Agua mineral", no "Aguacate" ni "Paraguaya".
+- "agua" encuentra "Agua mineral" y ya no "Paraguaya". "Aguacate" sigue saliendo: empieza
+  por "agua", y mientras se escribe no hay forma de distinguirlo.
 - "salsa" encuentra "Salsa ketchup"; "lácteos" encuentra todo lo de esa categoría.
 - Varias palabras: todas deben empezar alguna palabra ("lentejas pard" → "Lentejas
   pardinas").

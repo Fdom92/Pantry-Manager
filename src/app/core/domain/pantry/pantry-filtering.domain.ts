@@ -9,8 +9,9 @@ import { getItemStatusState } from './pantry-status.domain';
  */
 export function matchesSearchQuery(item: PantryItem, query: string): boolean {
   if (!query) return true;
-  const name = normalizeSearchField(item.name);
-  return name.includes(query);
+  // Word starts only, over name and category: "agua" must not find "aguacate".
+  const words = normalizeSearchField(`${item.name} ${item.categoryId ?? ''}`).split(/[^a-z0-9]+/);
+  return query.split(' ').every(term => words.some(word => word.startsWith(term)));
 }
 
 /**
