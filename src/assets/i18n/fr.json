@@ -789,16 +789,6 @@
     "fab": {
       "groupLabel": "Actions"
     },
-    "consume": {
-      "groupLabel": "Consommer des produits",
-      "title": "Consommer des produits",
-      "cardTitle": "Marquer consommé",
-      "subtitle": "Cherche des produits à déduire de ton garde-manger.",
-      "placeholder": "Chercher un produit",
-      "noResults": "Aucun résultat",
-      "empty": "Tu n'as encore rien ajouté.",
-      "submit": "Enregistrer"
-    },
     "sections": {
       "fresh": "Frais",
       "pantry": "Garde-manger",

@@ -503,19 +503,7 @@ ion-modal.quantity-sheet ion-content {
     gap: var(--app-theme-spacing-xs);
   }
 
-  // Consume action — uses success (leaf green). Eating/consuming is a positive
-  // depletion, semantically aligned with success. Previously used secondary
-  // (mint), which is now cream and would no longer read as actionable.
-  &__consume-btn {
-    background: color-mix(in srgb, var(--ion-color-success) 12%, transparent);
-    color: var(--app-theme-success-deep);
-
-    &:active {
-      background: color-mix(in srgb, var(--ion-color-success) 22%, transparent);
-    }
-  }
-
-  // View-preference toggle — secondary to the add/consume action buttons.
+  // View-preference toggle — secondary to the add button.
   // No fill by default; tonal fill only when grouping is active.
   &__group-toggle {
     background: transparent;
@@ -617,4 +605,11 @@ ion-modal.quantity-sheet ion-content {
   &:active {
     opacity: var(--app-theme-opacity-muted);
   }
+}
+
+.fresh-group-title {
+  margin: var(--app-theme-spacing-md) 0 var(--app-theme-spacing-xs);
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-semibold);
+  color: var(--app-theme-text-muted);
 }

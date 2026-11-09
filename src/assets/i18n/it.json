@@ -789,16 +789,6 @@
     "fab": {
       "groupLabel": "Azioni"
     },
-    "consume": {
-      "groupLabel": "Consuma prodotti",
-      "title": "Consuma prodotti",
-      "cardTitle": "Segna consumato",
-      "subtitle": "Cerca i prodotti da scalare dalla tua dispensa.",
-      "placeholder": "Cerca prodotto",
-      "noResults": "Nessun risultato",
-      "empty": "Non hai ancora aggiunto nulla.",
-      "submit": "Registra"
-    },
     "sections": {
       "fresh": "Freschi",
       "pantry": "Dispensa",

@@ -789,16 +789,6 @@
     "fab": {
       "groupLabel": "Aktionen"
     },
-    "consume": {
-      "groupLabel": "Produkte verbrauchen",
-      "title": "Produkte verbrauchen",
-      "cardTitle": "Als verbraucht markieren",
-      "subtitle": "Suche Produkte, um sie aus deiner Vorratskammer abzuziehen.",
-      "placeholder": "Produkt suchen",
-      "noResults": "Keine Ergebnisse",
-      "empty": "Du hast noch nichts hinzugefügt.",
-      "submit": "Eintragen"
-    },
     "sections": {
       "fresh": "Frisches",
       "pantry": "Vorratskammer",

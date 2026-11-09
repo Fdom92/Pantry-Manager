@@ -86,9 +86,20 @@
             [attr.aria-label]="(facade.freshSectionExpanded() ? 'common.actions.close' : 'pantry.sections.fresh') | translate">
           </ion-icon>
         }
-        <button class="pantry-section__add-btn" [attr.aria-label]="'pantry.fresh.addButton' | translate" (click)="$event.stopPropagation(); facade.openFreshAddModal()">
-          <ion-icon name="add-outline"></ion-icon>
-        </button>
+        <div class="pantry-section__actions">
+          @if (!facade.hasNoFreshAtAll()) {
+            <button
+              class="pantry-section__add-btn pantry-section__group-toggle"
+              [class.pantry-section__group-toggle--active]="facade.freshGrouped()"
+              [attr.aria-label]="(facade.freshGrouped() ? 'pantry.sections.groupToggle.grouped' : 'pantry.sections.groupToggle.flat') | translate"
+              (click)="$event.stopPropagation(); facade.toggleFreshGrouping()">
+              <ion-icon [name]="facade.freshGrouped() ? 'list-outline' : 'apps-outline'"></ion-icon>
+            </button>
+          }
+          <button class="pantry-section__add-btn" [attr.aria-label]="'pantry.fresh.addButton' | translate" (click)="$event.stopPropagation(); facade.openFreshAddModal()">
+            <ion-icon name="add-outline"></ion-icon>
+          </button>
+        </div>
       </header>
 
       @if (facade.hasNoFreshAtAll()) {
@@ -109,6 +120,22 @@
             [subtitleKey]="'pantry.fresh.empty.filters'">
           </app-empty-state>
         } @else {
+          @if (facade.freshGrouped()) {
+            @for (group of facade.freshGroups(); track group.key) {
+              <h4 class="fresh-group-title">{{ group.name }}</h4>
+              <div class="fresh-list">
+                @for (item of group.items; track item._id) {
+                  <app-fresh-item-card
+                    [item]="item"
+                    [now]="facade.now()"
+                    (stateChange)="facade.setFreshState($event.item, $event.state)"
+                    (editRequested)="facade.openEditModalFromSheet($event)"
+                    (basicToggle)="facade.toggleItemBasic($event)">
+                  </app-fresh-item-card>
+                }
+              </div>
+            }
+          } @else {
           <div class="fresh-list">
             @for (item of facade.visibleFreshItems(); track item._id) {
               <app-fresh-item-card
@@ -120,7 +147,8 @@
               </app-fresh-item-card>
             }
           </div>
-          @if (facade.freshItems().length > 4) {
+          }
+          @if (!facade.freshGrouped() && facade.freshItems().length > 4) {
             <button type="button" class="fresh-show-more" (click)="onToggleShowAllFresh()">
               @if (!facade.showAllFresh()) {
                 {{ 'pantry.fresh.showMore' | translate:{ count: facade.freshItems().length } }}
@@ -156,14 +184,6 @@
             (click)="facade.openAddModal()">
             <ion-icon name="add-outline"></ion-icon>
           </button>
-          @if (facade.canConsume()) {
-            <button
-              class="pantry-section__add-btn pantry-section__consume-btn"
-              [attr.aria-label]="'pantry.consume.groupLabel' | translate"
-              (click)="facade.openConsumeModal()">
-              <ion-icon name="remove-outline"></ion-icon>
-            </button>
-          }
         </div>
       </header>
 
@@ -259,7 +279,6 @@
   <app-pantry-add-modal></app-pantry-add-modal>
   <app-pantry-receipt-scan-modal></app-pantry-receipt-scan-modal>
   <app-pantry-pendientes-sheet></app-pantry-pendientes-sheet>
-  <app-pantry-consume-modal></app-pantry-consume-modal>
   <app-pantry-batches-modal></app-pantry-batches-modal>
   <app-pantry-edit-item-modal></app-pantry-edit-item-modal>
   <app-fresh-add-modal></app-fresh-add-modal>

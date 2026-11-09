@@ -789,16 +789,6 @@
     "fab": {
       "groupLabel": "Actions"
     },
-    "consume": {
-      "groupLabel": "Consume products",
-      "title": "Consume products",
-      "cardTitle": "Mark consumed",
-      "subtitle": "Search for products to deduct from your pantry.",
-      "placeholder": "Search product",
-      "noResults": "No results",
-      "empty": "You haven't added anything yet.",
-      "submit": "Register"
-    },
     "sections": {
       "fresh": "Fresh",
       "pantry": "Pantry",

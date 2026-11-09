@@ -16,7 +16,6 @@ import { SettingsPreferencesService } from '../settings/settings-preferences.ser
 import { PantryBatchOperationsService } from './pantry-batch-operations.service';
 import { PantryBatchesModalStateService } from './modals/pantry-batches-modal-state.service';
 import { PantryAddModalStateService } from './modals/pantry-add-modal-state.service';
-import { PantryConsumeModalStateService } from './modals/pantry-consume-modal-state.service';
 import { PantryReceiptScanModalStateService } from './modals/pantry-receipt-scan-modal-state.service';
 import { PantryQuantitySheetStateService } from './modals/pantry-quantity-sheet-state.service';
 import { PantryPendientesSheetStateService } from './modals/pantry-pendientes-sheet-state.service';
@@ -30,7 +29,7 @@ import { PantryFreshAddModalStateService } from '@core/services/pantry/modals/pa
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { ToastService } from '../shared';
-import { type FreshState, freshStateToQty, hasConsumableStock, qtyToFreshState, setBasic, statusFilterCount } from '@core/domain/pantry';
+import { type FreshState, freshStateToQty, qtyToFreshState, setBasic, statusFilterCount } from '@core/domain/pantry';
 import { ClockService } from '../shared/clock.service';
 
 /**
@@ -52,7 +51,6 @@ export class PantryStateService {
   private readonly batchOps = inject(PantryBatchOperationsService);
   private readonly listUi = inject(PantryListUiStateService);
   private readonly addModal = inject(PantryAddModalStateService);
-  private readonly consumeModal = inject(PantryConsumeModalStateService);
   private readonly receiptScanModal = inject(PantryReceiptScanModalStateService);
   private readonly batchesModal = inject(PantryBatchesModalStateService);
   private readonly quantitySheet = inject(PantryQuantitySheetStateService);
@@ -118,6 +116,13 @@ export class PantryStateService {
   readonly hasNoFreshAtAll = computed(() => this.totalFreshCount() === 0);
 
   readonly showAllFresh = signal(false);
+  /** Fresh only groups by category: a fresh product keeps one lot, rarely with a place. */
+  readonly freshGrouped = signal(false);
+  readonly freshGroups = computed(() => this.viewModel.buildGroups(this.freshItems()));
+  toggleFreshGrouping(): void {
+    this.freshGrouped.update(v => !v);
+    this.analytics.track(ANALYTICS_EVENTS.PANTRY_GROUPING_TOGGLED, { grouped: this.freshGrouped(), mode: this.freshGrouped() ? 'category' : 'flat', section: 'fresh' });
+  }
   readonly visibleFreshItems = computed(() => {
     const items = this.freshItems();
     return this.showAllFresh() ? items : items.slice(0, 4);
@@ -132,13 +137,6 @@ export class PantryStateService {
     this.freshSectionExpanded.update(v => !v);
   }
 
-  /**
-   * Whether the "−" button in the despensa header has anything to offer. With
-   * no stock anywhere the consume modal opened onto "Aún no has añadido nada"
-   * and nothing else — a dead end, most likely to meet brand-new users. Same
-   * source as the modal's own list, so the two can't disagree.
-   */
-  readonly canConsume = computed(() => hasConsumableStock(this.pantryStore.loadedProducts()));
   /**
    * True only once the store has read everything and found no products. A
    * first-time user used to meet a search bar, six filter chips all at 0 and a
@@ -194,7 +192,6 @@ export class PantryStateService {
     this.editItemModalRequest() !== null ||
     this.editFreshItemModalRequest() !== null ||
     this.quantitySheet.showQuantitySheet() ||
-    this.consumeModal.consumeModalOpen() ||
     this.pendientesSheet.isOpen()
   );
 
@@ -212,7 +209,6 @@ export class PantryStateService {
     this.quantitySheet.pantryItemsState = this.pantryItemsState;
 
     // Provide pantry items state to consume modal for optimistic updates
-    this.consumeModal.pantryItemsState = this.pantryItemsState;
 
     // Keep UI in sync with filtered pipeline, merging optimistic batch edits.
     // Frozen while any edit modal is open so items don't vanish mid-edit when
@@ -338,14 +334,6 @@ export class PantryStateService {
   freezeOneUnit = (item: PantryItem) => this.quantitySheet.freezeOne(item);
   thawOneUnit = (item: PantryItem) => this.quantitySheet.thawOne(item);
   discardOneUnit = (item: PantryItem) => this.quantitySheet.discardOne(item);
-
-  // -------- Consume modal (delegates to PantryConsumeModalStateService) --------
-  openConsumeModal = () => this.consumeModal.open();
-  dismissConsumeModal = () => this.consumeModal.dismiss();
-  submitConsume = () => this.consumeModal.submitConsume();
-  onConsumeQueryChange = (value: string) => this.consumeModal.onConsumeQueryChange(value);
-  addConsumeEntry = (option: AutocompleteItem<PantryItem>) => this.consumeModal.addConsumeEntry(option);
-  adjustConsumeEntryById = (entryId: string, delta: number) => this.consumeModal.adjustConsumeEntryById(entryId, delta);
 
   // -------- List UI state (delegates to PantryListUiStateService) --------
   trackByItemId = (index: number, item: PantryItem) => this.listUi.trackByItemId(index, item);

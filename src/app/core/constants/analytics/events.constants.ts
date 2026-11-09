@@ -69,7 +69,6 @@ export const ANALYTICS_EVENTS = {
   /** Star toggle ("always keep at home"). Was invisible to analytics — the
    * shopping list's auto-suggest source could not be measured at all. */
   PANTRY_BASIC_TOGGLED: 'pantry_basic_toggled',
-  PANTRY_CONSUME_MODAL_OPENED: 'pantry_consume_modal_opened',
   PANTRY_EDIT_MODAL_OPENED: 'pantry_edit_modal_opened',
   PANTRY_BATCHES_MODAL_OPENED: 'pantry_batches_modal_opened',
   PANTRY_PENDIENTES_SHEET_OPENED: 'pantry_pendientes_sheet_opened',
@@ -86,7 +85,6 @@ export const ANALYTICS_EVENTS = {
    * before picking anything or after picking and thinking better of it.
    */
   PANTRY_CONSUME_ENTRY_ADDED: 'pantry_consume_entry_added',
-  PANTRY_CONSUME_MODAL_ABANDONED: 'pantry_consume_modal_abandoned',
   /**
    * What people do inside the pantry tab. It draws more views than any other
    * (74 of 194 in the 30-day export) and was, until 5.4, a black box: we knew

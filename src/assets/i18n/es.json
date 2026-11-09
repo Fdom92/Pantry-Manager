@@ -789,16 +789,6 @@
     "fab": {
       "groupLabel": "Acciones"
     },
-    "consume": {
-      "groupLabel": "Consumir productos",
-      "title": "Consumir productos",
-      "cardTitle": "Marcar consumido",
-      "subtitle": "Busca productos para descontar de tu despensa.",
-      "placeholder": "Buscar producto",
-      "noResults": "Sin resultados",
-      "empty": "Aún no has añadido nada.",
-      "submit": "Registrar"
-    },
     "sections": {
       "fresh": "Frescos",
       "pantry": "Despensa",
