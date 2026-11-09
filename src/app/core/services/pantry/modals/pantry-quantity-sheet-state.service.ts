@@ -184,9 +184,9 @@ export class PantryQuantitySheetStateService {
   }
 
   async openOne(item: PantryItem): Promise<void> {
-    const fridge = needsFridgeWhenOpen(item.foodType, item.name) ? findFridgeLocation(this.locations()) : undefined;
+    const fridge = needsFridgeWhenOpen(item.foodType) ? findFridgeLocation(this.locations()) : undefined;
     await this.applyBatchAction(item, 'open', current =>
-      openOne(current.batches ?? [], current.foodType, new Date(), generateBatchId, fridge, current.name),
+      openOne(current.batches ?? [], current.foodType, new Date(), generateBatchId, fridge),
       batch => batch.expirationDate
         ? { key: 'pantry.quickActions.toast.openedUntil', params: { when: this.dates.expiry(batch.expirationDate) } }
         : { key: 'pantry.quickActions.toast.opened' });

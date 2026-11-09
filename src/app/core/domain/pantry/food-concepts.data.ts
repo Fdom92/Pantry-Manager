@@ -23,8 +23,6 @@ export interface FoodConcept {
    * far less than the rest: bread is a CARB like rice, but lasts days, not months.
    */
   readonly shelfLifeDays?: number;
-  /** Days it keeps once opened, overriding the type's (sauces: a month, not five days). */
-  readonly openedShelfDays?: number;
 }
 
 export const FOOD_CONCEPTS: readonly FoodConcept[] = [
@@ -40,30 +38,6 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
       fr: ['sauce tomate', 'tomate concassee'],
       it: ['passata', 'pomodoro pelati'],
       pt: ['tomate frito', 'polpa de tomate'],
-    },
-  },
-  {
-    // Fresh basil sauce: its label says five days once opened, unlike jar sauces.
-    key: 'pesto',
-    foodType: FoodType.OTHER,
-    openedShelfDays: 5,
-    terms: {
-      es: ['salsa pesto', 'pesto'], en: ['pesto'], de: ['pesto'],
-      fr: ['pesto', 'sauce pesto'], it: ['pesto'], pt: ['pesto', 'molho pesto'],
-    },
-  },
-  {
-    // Jar sauces: labels say "once opened, use within a month".
-    key: 'sauce',
-    foodType: FoodType.OTHER,
-    openedShelfDays: 30,
-    terms: {
-      es: ['salsa', 'mayonesa', 'ketchup', 'mostaza', 'alioli'],
-      en: ['sauce', 'mayonnaise', 'mayo', 'ketchup', 'mustard', 'bbq sauce'],
-      de: ['sosse', 'sauce', 'mayonnaise', 'ketchup', 'senf'],
-      fr: ['sauce', 'mayonnaise', 'ketchup', 'moutarde'],
-      it: ['salsa', 'maionese', 'ketchup', 'senape'],
-      pt: ['molho', 'maionese', 'ketchup', 'mostarda'],
     },
   },
   {
