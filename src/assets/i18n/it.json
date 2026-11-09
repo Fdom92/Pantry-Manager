@@ -499,8 +499,10 @@
       "level": {
         "good": "Buona",
         "normal": "Limitata",
-        "bad": "Bassa"
-      }
+        "bad": "Bassa",
+        "plenty": "Abbondante"
+      },
+      "legend": "Bassa: meno di {{low}} · Limitata: fino a {{tight}} · Buona: fino a {{good}} · Abbondante: di più"
     },
     "activity": {
       "title": "Rotazione",
@@ -510,7 +512,8 @@
       "rotationHigh": "Rotazione alta",
       "rotationMedium": "Rotazione media",
       "rotationLow": "Rotazione bassa",
-      "windowLabel": "Ultimi 30 giorni"
+      "windowLabel": "Ultimi 30 giorni",
+      "overHundred": "Questo mese hai usato più di quanto hai comprato: stai attingendo a ciò che avevi già."
     },
     "distribution": {
       "title": "Classificazione",

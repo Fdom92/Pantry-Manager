@@ -499,8 +499,10 @@
       "level": {
         "good": "Gut",
         "normal": "Knapp",
-        "bad": "Niedrig"
-      }
+        "bad": "Niedrig",
+        "plenty": "Reichlich"
+      },
+      "legend": "Niedrig: unter {{low}} · Knapp: bis {{tight}} · Gut: bis {{good}} · Reichlich: mehr"
     },
     "activity": {
       "title": "Rotation",
@@ -510,7 +512,8 @@
       "rotationHigh": "Hohe Rotation",
       "rotationMedium": "Mittlere Rotation",
       "rotationLow": "Niedrige Rotation",
-      "windowLabel": "Letzte 30 Tage"
+      "windowLabel": "Letzte 30 Tage",
+      "overHundred": "Du hast diesen Monat mehr verbraucht als gekauft: du lebst von deinem Vorrat."
     },
     "distribution": {
       "title": "Einordnung",

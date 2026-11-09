@@ -499,8 +499,10 @@
       "level": {
         "good": "Good",
         "normal": "Tight",
-        "bad": "Low"
-      }
+        "bad": "Low",
+        "plenty": "Plenty"
+      },
+      "legend": "Low: under {{low}} · Tight: up to {{tight}} · Good: up to {{good}} · Plenty: more"
     },
     "activity": {
       "title": "Rotation",
@@ -510,7 +512,8 @@
       "rotationHigh": "High rotation",
       "rotationMedium": "Medium rotation",
       "rotationLow": "Low rotation",
-      "windowLabel": "Last 30 days"
+      "windowLabel": "Last 30 days",
+      "overHundred": "You used more than you bought this month: you are drawing on what you already had."
     },
     "distribution": {
       "title": "Breakdown",

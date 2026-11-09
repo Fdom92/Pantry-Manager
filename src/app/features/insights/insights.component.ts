@@ -24,6 +24,10 @@ import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { InsightStatusPillComponent } from '@shared/components/insight-status-pill/insight-status-pill.component';
 import { DurationPipe } from '@shared/pipes/date-display.pipes';
+import { PantryQueryService } from '@core/services/pantry/pantry-query.service';
+import { AnalyticsService } from '@core/services/analytics/analytics.service';
+import { ANALYTICS_EVENTS } from '@core/constants';
+import { COVERAGE_LEVEL_DAYS } from '@core/domain/insights/insights-free.domain';
 
 @Component({
   selector: 'app-insights',
@@ -57,6 +61,8 @@ export class InsightsComponent {
   readonly facade = inject(InsightsStateService);
   private readonly insightsTracking = inject(InsightsTrackingStateService);
   private readonly navCtrl = inject(NavController);
+  private readonly pantryQuery = inject(PantryQueryService);
+  private readonly analytics = inject(AnalyticsService);
   readonly FoodType = FoodType;
 
   readonly barsVisible = signal(false);
@@ -69,6 +75,13 @@ export class InsightsComponent {
   private barObserver?: IntersectionObserver;
 
   goToPantry(): void {
+    void this.navCtrl.navigateRoot('/pantry');
+  }
+
+  /** From the "untouched" card: open the pantry already searched for that product. */
+  openInPantry(name: string): void {
+    this.pantryQuery.setSearchQuery(name);
+    this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_STALE_OPENED);
     void this.navCtrl.navigateRoot('/pantry');
   }
 
@@ -135,6 +148,7 @@ export class InsightsComponent {
   }
 
   readonly householdSizes = [1, 2, 3, 4] as const;
+  readonly coverageDays = COVERAGE_LEVEL_DAYS;
 
   setHouseholdSize(n: number): void {
     this.facade.setHouseholdSize(n);
