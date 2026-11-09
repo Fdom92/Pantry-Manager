@@ -232,6 +232,13 @@ describe('matchesSearchQuery', () => {
     expect(finds('lentejas rioj', 'Lentejas pardinas')).toBeFalse();
   });
 
+  it('splits the query like the name, so punctuation and ß still match', () => {
+    expect(finds('coca-cola', 'Coca-Cola Zero')).toBeTrue();
+    expect(finds('agua 1,5', 'Agua mineral 1,5 L')).toBeTrue();
+    expect(finds('weissbrot', 'Weißbrot')).toBeTrue();
+    expect(finds('weiß', 'Weißbrot')).toBeTrue();
+  });
+
   it('ignores accents and case, and matches everything for an empty query', () => {
     expect(finds('BROCOLI', 'Brócoli congelado')).toBeTrue();
     expect(finds('', 'Lo que sea')).toBeTrue();

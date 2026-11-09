@@ -30,7 +30,7 @@ export interface PersonProfile {
   /** See `classifyInstallSource`: filter PostHog on 'play' to drop QA installs. */
   install_source: InstallSourceKind;
   /**
-   * Set only when true: sideloaded and other-store installs are QA builds. Never
+   * Set only when true: sideloaded installs are QA builds. Never
    * sent as false, so a Play install marked internal by hand stays marked.
    */
   is_internal?: true;
@@ -82,6 +82,7 @@ export function buildPersonProfile(params: {
     onboarding_done: onboardingDone,
     notifications_enabled: notificationsEnabled,
     install_source: installSource,
-    ...(installSource === 'sideload' || installSource === 'other' ? { is_internal: true as const } : {}),
+    // 'other' is left out: OEM migration tools (e.g. Samsung Smart Switch) install for real users.
+    ...(installSource === 'sideload' ? { is_internal: true as const } : {}),
   };
 }

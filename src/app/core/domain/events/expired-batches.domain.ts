@@ -55,8 +55,9 @@ export function selectDuplicateExpireEvents(events: PantryEvent[]): PantryEvent[
   const seen = new Set<string>();
   const duplicates: PantryEvent[] = [];
   for (const event of oldestFirst) {
-    const key = normalizeTrim(String(event.sourceMetadata?.['batchKey'] ?? ''))
-      || `${event.productId}::${normalizeTrim(event.expirationDate)}`;
+    const date = normalizeTrim(event.expirationDate);
+    const key = normalizeTrim(String(event.sourceMetadata?.['batchKey'] ?? '')) || (date ? `${event.productId}::${date}` : '');
+    if (!key) continue; // nothing to tell it apart by: never delete it
     if (seen.has(key)) duplicates.push(event);
     else seen.add(key);
   }

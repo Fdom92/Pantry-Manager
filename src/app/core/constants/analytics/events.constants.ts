@@ -84,7 +84,6 @@ export const ANALYTICS_EVENTS = {
    * different people and 0 items consumed; these two say whether they leave
    * before picking anything or after picking and thinking better of it.
    */
-  PANTRY_CONSUME_ENTRY_ADDED: 'pantry_consume_entry_added',
   /**
    * What people do inside the pantry tab. It draws more views than any other
    * (74 of 194 in the 30-day export) and was, until 5.4, a black box: we knew

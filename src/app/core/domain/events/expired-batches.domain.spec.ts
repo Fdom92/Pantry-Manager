@@ -174,6 +174,13 @@ describe('selectDuplicateExpireEvents', () => {
     expect(selectDuplicateExpireEvents([old, again]).map(e => e._id)).toEqual(['event:b']);
   });
 
+  it('never treats events with no batch key and no date as copies of each other', () => {
+    const a = expireEvent({ _id: 'event:a', createdAt: '2026-05-01T00:00:00.000Z', expirationDate: undefined });
+    const b = expireEvent({ _id: 'event:b', createdAt: '2026-05-02T00:00:00.000Z', expirationDate: undefined });
+
+    expect(selectDuplicateExpireEvents([a, b])).toEqual([]);
+  });
+
   it('returns nothing when every batch was logged once', () => {
     const a = expireEvent({ _id: 'event:a', sourceMetadata: key('k1') });
     const b = expireEvent({ _id: 'event:b', sourceMetadata: key('k2') });

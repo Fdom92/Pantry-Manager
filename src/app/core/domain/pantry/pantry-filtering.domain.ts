@@ -12,7 +12,8 @@ export function matchesSearchQuery(item: PantryItem, query: string): boolean {
   if (!query) return true;
   // Word starts only, over name and category: "agua" must not find "aguacate".
   const words = normalizeSearchField(`${item.name} ${item.categoryId ?? ''}`).split(/[^a-z0-9]+/);
-  return query.split(' ').every(term => words.some(word => word.startsWith(term)));
+  const terms = query.split(/[^a-z0-9]+/).filter(Boolean);
+  return terms.every(term => words.some(word => word.startsWith(term)));
 }
 
 /**
