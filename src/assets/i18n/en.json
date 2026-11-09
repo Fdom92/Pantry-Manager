@@ -603,7 +603,8 @@
       "expiring": "{{ count }} expiring",
       "expired": "{{ count }} expired",
       "collapse": "Collapse {{ name }}",
-      "expand": "Expand {{ name }}"
+      "expand": "Expand {{ name }}",
+      "noLocation": "No location"
     },
     "batches": {
       "title": "Batches & dates",
@@ -784,7 +785,8 @@
       "pantry": "Pantry",
       "groupToggle": {
         "flat": "Group by category",
-        "grouped": "Flat list"
+        "grouped": "Flat list",
+        "category": "Group by location"
       }
     },
     "fresh": {

@@ -152,15 +152,26 @@ export class PantryStateService {
   readonly despensaItems = computed(() =>
     this.pantryItemsState().filter(i => i.productType !== 'fresh')
   );
-  readonly groups = computed(() => this.viewModel.buildGroups(this.despensaItems()));
-  readonly groupByCategory = signal(false);
+  readonly groupMode = signal<'flat' | 'category' | 'location'>('flat');
+  /** True in either grouped mode; the template draws both the same way. */
+  readonly groupByCategory = computed(() => this.groupMode() !== 'flat');
+  readonly groups = computed(() => this.groupMode() === 'location'
+    ? this.viewModel.buildLocationGroups(this.despensaItems(), this.quantitySheet.locations())
+    : this.viewModel.buildGroups(this.despensaItems()));
   /** Debounce state for PANTRY_SEARCH_USED — see onSearchTermChange. */
   private wasSearching = false;
   toggleGroupByCategory(): void {
-    this.groupByCategory.update(v => !v);
+    const next = { flat: 'category', category: 'location', location: 'flat' } as const;
+    this.groupMode.update(mode => next[mode]);
     this.analytics.track(ANALYTICS_EVENTS.PANTRY_GROUPING_TOGGLED, {
       grouped: this.groupByCategory(),
+      mode: this.groupMode(),
     });
+  }
+
+  /** The stored product: a location group's row holds only one place's lots. */
+  resolveItem(item: PantryItem): PantryItem {
+    return this.pantryItemsState().find(i => i._id === item._id) ?? item;
   }
 
   /** Already ordered by the query — alphabetical; do not re-sort here. */

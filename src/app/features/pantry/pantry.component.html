@@ -144,9 +144,9 @@
             <button
               class="pantry-section__add-btn pantry-section__group-toggle"
               [class.pantry-section__group-toggle--active]="facade.groupByCategory()"
-              [attr.aria-label]="(facade.groupByCategory() ? 'pantry.sections.groupToggle.grouped' : 'pantry.sections.groupToggle.flat') | translate"
+              [attr.aria-label]="('pantry.sections.groupToggle.' + (facade.groupMode() === 'location' ? 'grouped' : facade.groupMode())) | translate"
               (click)="facade.toggleGroupByCategory()">
-              <ion-icon [name]="facade.groupByCategory() ? 'list-outline' : 'apps-outline'"></ion-icon>
+              <ion-icon [name]="facade.groupMode() === 'flat' ? 'apps-outline' : facade.groupMode() === 'category' ? 'location-outline' : 'list-outline'"></ion-icon>
             </button>
           }
           <button
@@ -226,8 +226,8 @@
                       class="virtual-item-card__detail"
                       [viewModel]="card"
                       [showStarHint]="firstGroup && firstItem && showStarHint()"
-                      (cardClicked)="facade.openQuantitySheet(item, $event)"
-                      (basicToggle)="facade.toggleItemBasic($event)"
+                      (cardClicked)="facade.openQuantitySheet(facade.resolveItem(item), $event)"
+                      (basicToggle)="facade.toggleItemBasic(facade.resolveItem($event))"
                     ></app-pantry-detail>
                   </div>
                 }

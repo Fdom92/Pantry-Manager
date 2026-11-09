@@ -603,7 +603,8 @@
       "expiring": "{{ count }} kurz vor Ablauf",
       "expired": "{{ count }} abgelaufen",
       "collapse": "{{ name }} einklappen",
-      "expand": "{{ name }} ausklappen"
+      "expand": "{{ name }} ausklappen",
+      "noLocation": "Ohne Ort"
     },
     "batches": {
       "title": "Chargen & Daten",
@@ -784,7 +785,8 @@
       "pantry": "Vorratskammer",
       "groupToggle": {
         "flat": "Nach Kategorie gruppieren",
-        "grouped": "Listenansicht"
+        "grouped": "Listenansicht",
+        "category": "Nach Ort gruppieren"
       }
     },
     "fresh": {

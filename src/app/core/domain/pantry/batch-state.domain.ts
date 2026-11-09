@@ -204,3 +204,38 @@ export function findFridgeLocation(locations: readonly string[]): string | undef
 export function findFreezerLocation(locations: readonly string[]): string | undefined {
   return findLocation(locations, FREEZER_WORDS);
 }
+
+export interface LocationGroup {
+  /** Location name, or '' for lots with none. */
+  location: string;
+  /** Each product reduced to its lots in this place: for display only, never to save. */
+  items: PantryItem[];
+}
+
+/**
+ * Products grouped by where their lots are. A product with lots in two places
+ * shows in both, each with only that place's lots. Groups follow the user's
+ * order of locations; unknown places come next, lots without a place last.
+ */
+export function groupByLocation(items: readonly PantryItem[], locationOrder: readonly string[]): LocationGroup[] {
+  const groups = new Map<string, PantryItem[]>();
+  for (const item of items) {
+    const byPlace = new Map<string, ItemBatch[]>();
+    for (const batch of item.batches ?? []) {
+      if (toNumberOrZero(batch.quantity) <= 0) continue;
+      const place = batch.locationId && batch.locationId !== 'unassigned' ? batch.locationId : '';
+      byPlace.set(place, [...(byPlace.get(place) ?? []), batch]);
+    }
+    for (const [place, batches] of byPlace) {
+      groups.set(place, [...(groups.get(place) ?? []), { ...item, batches }]);
+    }
+  }
+  const rank = (place: string) => {
+    if (!place) return Number.MAX_SAFE_INTEGER;
+    const index = locationOrder.indexOf(place);
+    return index === -1 ? locationOrder.length : index;
+  };
+  return [...groups.entries()]
+    .sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b))
+    .map(([location, groupItems]) => ({ location, items: groupItems }));
+}

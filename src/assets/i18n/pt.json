@@ -603,7 +603,8 @@
       "expiring": "{{ count }} a expirar",
       "expired": "{{ count }} expirados",
       "collapse": "Recolher {{ name }}",
-      "expand": "Expandir {{ name }}"
+      "expand": "Expandir {{ name }}",
+      "noLocation": "Sem localização"
     },
     "batches": {
       "title": "Lotes e datas",
@@ -784,7 +785,8 @@
       "pantry": "Despensa",
       "groupToggle": {
         "flat": "Agrupar por categoria",
-        "grouped": "Vista plana"
+        "grouped": "Vista plana",
+        "category": "Agrupar por localização"
       }
     },
     "fresh": {

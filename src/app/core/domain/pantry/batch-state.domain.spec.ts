@@ -3,7 +3,7 @@ import { FoodType } from '@core/models/shared/enums.model';
 import { computeTodaySuggestion } from '@core/domain/dashboard';
 import { selectUnloggedExpiredBatches } from '@core/domain/events';
 import { filterExpiredItems, filterNearExpiryItems } from '@core/domain/notifications';
-import { dueBatchIndex, findFreezerLocation, findFridgeLocation, freezeOne, frozenQuantity, moveOne, openedShelfDays, openOne, THAW_MAX_DAYS, thawOne } from './batch-state.domain';
+import { dueBatchIndex, findFreezerLocation, groupByLocation, findFridgeLocation, freezeOne, frozenQuantity, moveOne, openedShelfDays, openOne, THAW_MAX_DAYS, thawOne } from './batch-state.domain';
 import { hasMissingExpiry } from './pantry-filtering.domain';
 import { getItemStatusState } from './pantry-status.domain';
 
@@ -160,5 +160,33 @@ describe('findFridgeLocation / findFreezerLocation', () => {
 
   it('returns undefined when there is none', () => {
     expect(findFridgeLocation(['Sótano', 'Cocina'])).toBeUndefined();
+  });
+});
+
+describe('groupByLocation', () => {
+  const item = (name: string, batches: ItemBatch[]) =>
+    ({ _id: `item:${name}`, type: 'item', householdId: 'h', name, categoryId: '', batches } as PantryItem);
+
+  it('puts a product under every place it has lots, with only that place\'s lots', () => {
+    const leche = item('Leche', [lot({ quantity: 18, locationId: 'Sótano' }), lot({ quantity: 1, locationId: 'Nevera', opened: true })]);
+    const groups = groupByLocation([leche], ['Sótano', 'Cocina', 'Nevera']);
+    expect(groups.map(g => g.location)).toEqual(['Sótano', 'Nevera']);
+    expect(groups[0].items[0].batches.map(b => b.quantity)).toEqual([18]);
+    expect(groups[1].items[0].batches.map(b => b.quantity)).toEqual([1]);
+  });
+
+  it('follows the user\'s order and leaves lots without a place last', () => {
+    const groups = groupByLocation([
+      item('Sal', [lot({ locationId: 'unassigned' })]),
+      item('Pan', [lot({ locationId: 'Cocina' })]),
+      item('Maíz', [lot({ locationId: 'Sótano' })]),
+    ], ['Sótano', 'Cocina']);
+    expect(groups.map(g => g.location)).toEqual(['Sótano', 'Cocina', '']);
+  });
+
+  it('never touches the products it is given', () => {
+    const leche = item('Leche', [lot({ quantity: 2, locationId: 'Sótano' }), lot({ quantity: 1, locationId: 'Nevera' })]);
+    groupByLocation([leche], []);
+    expect(leche.batches.length).toBe(2);
   });
 });

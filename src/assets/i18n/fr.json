@@ -603,7 +603,8 @@
       "expiring": "{{ count }} bientôt périmés",
       "expired": "{{ count }} périmés",
       "collapse": "Réduire {{ name }}",
-      "expand": "Développer {{ name }}"
+      "expand": "Développer {{ name }}",
+      "noLocation": "Sans emplacement"
     },
     "batches": {
       "title": "Lots et dates",
@@ -784,7 +785,8 @@
       "pantry": "Garde-manger",
       "groupToggle": {
         "flat": "Grouper par catégorie",
-        "grouped": "Vue liste"
+        "grouped": "Vue liste",
+        "category": "Grouper par emplacement"
       }
     },
     "fresh": {

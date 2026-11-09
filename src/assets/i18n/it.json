@@ -603,7 +603,8 @@
       "expiring": "{{ count }} in scadenza",
       "expired": "{{ count }} scaduti",
       "collapse": "Comprimi {{ name }}",
-      "expand": "Espandi {{ name }}"
+      "expand": "Espandi {{ name }}",
+      "noLocation": "Senza posizione"
     },
     "batches": {
       "title": "Lotti e date",
@@ -784,7 +785,8 @@
       "pantry": "Dispensa",
       "groupToggle": {
         "flat": "Raggruppa per categoria",
-        "grouped": "Vista lista"
+        "grouped": "Vista lista",
+        "category": "Raggruppa per posizione"
       }
     },
     "fresh": {
