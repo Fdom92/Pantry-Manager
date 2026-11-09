@@ -114,9 +114,8 @@
         @if (facade.savedInTime().saved > 0) {
           <section class="insights-section">
             <h3 class="insights-section__title">{{ 'insights.saved.title' | translate }}</h3>
-            <p class="activity-detail">
-              {{ 'insights.saved.detail' | translate: { saved: facade.savedInTime().saved, wasted: facade.savedInTime().wasted } }}
-            </p>
+            <p class="activity-detail">{{ 'insights.saved.used' | translate: { count: facade.savedInTime().saved } }}</p>
+            <p class="activity-detail">{{ 'insights.saved.wasted' | translate: { count: facade.savedInTime().wasted } }}</p>
           </section>
         }
 
@@ -170,14 +169,14 @@
         }
       }
 
-      <!-- Sentinel: IntersectionObserver triggers bar animations when this enters viewport -->
-      <div #barsAnchor></div>
 
       <!-- SECTION 4: Clasificación -->
       @if (facade.isLoadingEvents()) {
         <ng-container [ngTemplateOutlet]="cardSkeleton"></ng-container>
       } @else if (facade.distribution().foodTypes.length > 0) {
         <section class="insights-section">
+          <!-- Sentinel inside the card: a bare div between cards took its own gap in the stack -->
+          <div #barsAnchor></div>
           <h3 class="insights-section__title">{{ 'insights.distribution.title' | translate }}</h3>
           <div class="food-type-bars">
             @for (ft of facade.distribution().foodTypes; track ft.foodType) {

@@ -548,7 +548,8 @@
     },
     "saved": {
       "title": "Salvati in tempo",
-      "detail": "Usati nell'ultima settimana: {{saved}} · Sprecati: {{wasted}} (questo mese)"
+      "used": "Usati nell'ultima settimana: {{count}}",
+      "wasted": "Sprecati questo mese: {{count}}"
     },
     "topUsed": {
       "title": "Cosa usi di più",

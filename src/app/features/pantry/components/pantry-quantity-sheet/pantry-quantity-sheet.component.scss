@@ -4,15 +4,15 @@
 
 :host {
   display: block;
-  height: 100%;
 }
 
+// A plain block, not ion-content: the modal sizes itself to this content (auto height).
 .quantity-sheet-content {
-  --padding-top: var(--app-theme-spacing-lg);
-  --padding-bottom: calc(var(--app-theme-spacing-xl) + env(safe-area-inset-bottom, 0px));
-  --padding-start: var(--app-theme-spacing-xl);
-  --padding-end: var(--app-theme-spacing-xl);
-  height: 100%;
+  padding: var(--app-theme-spacing-lg) var(--app-theme-spacing-xl)
+    calc(var(--app-theme-spacing-xl) + env(safe-area-inset-bottom, 0px));
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--ion-card-background);
 }
 
 .sheet-header {

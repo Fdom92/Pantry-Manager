@@ -288,8 +288,8 @@
     #quantityModal
     class="app-sheet-modal quantity-sheet"
     [isOpen]="facade.showQuantitySheet()"
-    [initialBreakpoint]="0.5"
-    [breakpoints]="[0, 0.5, 0.75]"
+    [initialBreakpoint]="1"
+    [breakpoints]="[0, 1]"
     (didDismiss)="facade.dismissQuantitySheet()">
     <ng-template>
       @if (facade.selectedQuantitySheetItem(); as item) {

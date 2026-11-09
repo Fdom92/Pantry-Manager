@@ -60,7 +60,12 @@ export class InsightsComponent {
   readonly FoodType = FoodType;
 
   readonly barsVisible = signal(false);
-  @ViewChild('barsAnchor') private barsAnchorEl?: ElementRef<HTMLElement>;
+  private barsAnchorEl?: ElementRef<HTMLElement>;
+  // The anchor lives inside the classification card, which renders after the events load.
+  @ViewChild('barsAnchor') set barsAnchor(el: ElementRef<HTMLElement> | undefined) {
+    this.barsAnchorEl = el;
+    if (el && !this.barsVisible()) this.setupBarObserver();
+  }
   private barObserver?: IntersectionObserver;
 
   goToPantry(): void {

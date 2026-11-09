@@ -437,8 +437,10 @@ ion-card-header {
 // modal-sheet mixin used by every other sheet modal. No per-modal radius
 // or background override needed here — the only thing left is matching the
 // inner ion-content bg.
-ion-modal.quantity-sheet ion-content {
-  --background: var(--ion-card-background);
+// Auto height: with breakpoint 1 the sheet is exactly as tall as its content,
+// so the quick actions never push "edit / delete" below the fold.
+ion-modal.quantity-sheet {
+  --height: auto;
 }
 
 // ── Two-section layout (Fresh + Despensa) ──────────────────────────────────

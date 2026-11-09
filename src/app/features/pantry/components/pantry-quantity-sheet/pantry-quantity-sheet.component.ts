@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
 import { frozenQuantity } from '@core/domain/pantry';
-import { IonButton, IonChip, IonContent, IonIcon, IonLabel } from '@ionic/angular/standalone';
+import { IonButton, IonChip, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 
@@ -11,7 +11,6 @@ import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-p
   standalone: true,
   imports: [
     CommonModule,
-    IonContent,
     IonButton,
     IonIcon,
     IonChip,

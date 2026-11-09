@@ -548,7 +548,8 @@
     },
     "saved": {
       "title": "Rechtzeitig gerettet",
-      "detail": "In ihrer letzten Woche verbraucht: {{saved}} · Verschwendet: {{wasted}} (diesen Monat)"
+      "used": "In ihrer letzten Woche verbraucht: {{count}}",
+      "wasted": "Diesen Monat verschwendet: {{count}}"
     },
     "topUsed": {
       "title": "Was du am meisten nutzt",
