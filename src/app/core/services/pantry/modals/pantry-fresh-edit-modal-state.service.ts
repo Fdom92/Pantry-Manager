@@ -3,13 +3,15 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { type FreshState, freshStateToQty, qtyToFreshState } from '@core/domain/pantry';
 import type { PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
-import { normalizeTrim } from '@core/utils/normalization.util';
+import { buildUniqueSelectOptions } from '@core/utils';
+import { formatFriendlyName, normalizeCategoryId, normalizeStringList, normalizeTrim } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { AlertController } from '@ionic/angular';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { CatalogOptionsService, SettingsPreferencesService } from '../../settings';
 import { LoggerService } from '../../shared/logger.service';
 import { ToastService } from '../../shared';
 import { PantryStateService } from '../pantry-state.service';
@@ -27,6 +29,8 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
+  private readonly appPreferences = inject(SettingsPreferencesService);
+  private readonly catalogOptions = inject(CatalogOptionsService);
 
   readonly currentState = signal<FreshState>('none');
   readonly states: readonly FreshState[] = ['sufficient', 'low', 'none'];
@@ -57,10 +61,42 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
     this.form.get('foodType')?.setValue(null);
   }
 
+  // Same category catalogue and picker as the pantry edit modal.
+  getCategoryOptions(): AutocompleteItem<string>[] {
+    const presets = normalizeStringList(this.appPreferences.preferences().categoryOptions, { fallback: [] });
+    const current = normalizeCategoryId(this.form.get('categoryId')?.value ?? '');
+    const uncategorized = this.translate.instant('pantry.form.uncategorized');
+    return buildUniqueSelectOptions([...presets, current], { labelFor: value => formatFriendlyName(value, uncategorized) })
+      .map(option => ({ id: option.value, title: option.label, raw: option.value }));
+  }
+
+  getCategoryDisplayValue(): string {
+    const raw = normalizeTrim(this.form.get('categoryId')?.value ?? '');
+    if (!raw) return this.translate.instant('pantry.form.uncategorized');
+    return this.getCategoryOptions().find(o => o.raw === raw)?.title ?? raw;
+  }
+
+  onCategorySelect(option: AutocompleteItem<string>): void {
+    const value = normalizeTrim((option?.raw ?? '').toString());
+    if (value) this.form.get('categoryId')?.setValue(value);
+  }
+
+  clearCategorySelection(): void {
+    this.form.get('categoryId')?.setValue(null);
+  }
+
+  async addCategoryFromText(value: string): Promise<void> {
+    const next = normalizeTrim(value);
+    if (!next) return;
+    const selected = await this.catalogOptions.addOption('category', formatFriendlyName(next, next));
+    this.form.get('categoryId')?.setValue(selected);
+  }
+
   readonly form = this.fb.group({
     name: this.fb.control('', { validators: [Validators.required, Validators.maxLength(120)], nonNullable: true }),
     expirationDate: this.fb.control<string | null>(null),
     foodType: this.fb.control<FoodType | null>(null),
+    categoryId: this.fb.control<string | null>(null),
   });
 
   readonly canSave = computed(() => {
@@ -90,6 +126,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
       name: item.name ?? '',
       expirationDate: batch?.expirationDate || null,
       foodType: item.foodType ?? null,
+      categoryId: item.categoryId || null,
     });
     this.isSaving.set(false);
     this.isOpen.set(true);
@@ -116,7 +153,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
 
     this.isSaving.set(true);
     try {
-      const { name, expirationDate, foodType } = this.form.value;
+      const { name, expirationDate, foodType, categoryId } = this.form.value;
       const previousBatch = existing.batches?.[0];
       const updatedBatch = {
         batchId: previousBatch?.batchId ?? `batch-${Date.now()}`,
@@ -131,6 +168,7 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
         name: normalizeTrim(name ?? existing.name),
         batches: [updatedBatch],
         foodType: foodType ?? undefined,
+        categoryId: normalizeCategoryId(categoryId ?? ''),
         updatedAt: new Date().toISOString(),
       };
       await this.pantryStore.updateItem(updated);

@@ -47,6 +47,23 @@
                 (cleared)="state.clearFoodTypeSelection()">
               </app-entity-selector-field>
             </div>
+            <div class="form-autocomplete">
+              <app-entity-selector-field
+                [items]="state.getCategoryOptions()"
+                [label]="'pantry.form.category' | translate"
+                [placeholder]="'pantry.form.categoryPlaceholder' | translate"
+                [searchPlaceholder]="'pantry.form.categorySearchPlaceholder' | translate"
+                [clearLabel]="'pantry.form.uncategorized' | translate"
+                [showEmptyAction]="true"
+                [showEmptyActionWhenNoExactMatch]="true"
+                [emptyActionLabel]="'pantry.form.categoryAdd.option' | translate"
+                [emptyLabel]="'common.selects.noOptions' | translate"
+                [value]="state.getCategoryDisplayValue()"
+                (optionSelected)="state.onCategorySelect($event)"
+                (emptyAction)="state.addCategoryFromText($event)"
+                (cleared)="state.clearCategorySelection()">
+              </app-entity-selector-field>
+            </div>
           </section>
 
           <section class="form-section">
