@@ -42,6 +42,7 @@ export const ANALYTICS_EVENTS = {
   PANTRY_ITEM_DELETED: 'pantry_item_deleted',
   PANTRY_QUANTITY_ADJUSTED: 'pantry_quantity_adjusted',
   PANTRY_QUICK_ACTION: 'pantry_quick_action',
+  INSIGHTS_TOP_USED_MARKED_BASIC: 'insights_top_used_marked_basic',
   /**
    * Which verb the user actually meant when deleting a product that still had
    * stock. Measures whether the 5.4 prompt converts thrown-away history into

@@ -37,6 +37,9 @@ import {
 } from '@core/domain/insights/insights-pro-payload.domain';
 import { computeWasteSummary, classifyWasteLevel, type WasteSummary, type WasteLevel } from '@core/domain/insights/waste.domain';
 import { computeRepositionPredictions, type RepositionPrediction } from '@core/domain/insights/reposition.domain';
+import { computeSavedInTime, computeStaleProducts, computeTopUsed } from '@core/domain/insights/pantry-habits.domain';
+import { frozenQuantity } from '@core/domain/pantry/batch-state.domain';
+import { setBasic } from '@core/domain/pantry/basic.domain';
 import type { PantryEvent } from '@core/models/events';
 import { ListManualItemsStore } from '../list/list-manual-items.store';
 import { normalizeLowercase } from '@core/utils/normalization.util';
@@ -147,6 +150,37 @@ export class InsightsStateService {
     return computeRepositionPredictions(this.pantryStore.items(), this.events(), new Date(this.clock.now()))
       .filter(p => p.daysToOut <= 30 && !inList.has(normalizeLowercase(p.productName)));
   });
+
+  readonly staleProducts = computed(() =>
+    computeStaleProducts(this.pantryStore.items(), this.events(), new Date(this.clock.now())));
+
+  readonly topUsed = computed(() =>
+    computeTopUsed(this.pantryStore.items(), this.events(), new Date(this.clock.now())));
+
+  readonly savedInTime = computed(() => computeSavedInTime(this.events(), new Date(this.clock.now()), 30));
+
+  /** Products with something frozen and how long the oldest unit has been in. */
+  readonly freezer = computed(() => {
+    let products = 0;
+    let oldest: string | null = null;
+    for (const item of this.pantryStore.items()) {
+      if (frozenQuantity(item) <= 0) continue;
+      products += 1;
+      for (const b of item.batches ?? []) {
+        if (b.frozenAt && (!oldest || b.frozenAt < oldest)) oldest = b.frozenAt;
+      }
+    }
+    const days = oldest ? Math.floor((this.clock.now() - Date.parse(oldest)) / 86_400_000) : 0;
+    return { products, oldestDays: days };
+  });
+
+  async markAsBasic(productId: string): Promise<void> {
+    const item = this.pantryStore.items().find(i => i._id === productId);
+    if (!item || item.isBasic) return;
+    await this.pantryStore.updateItem(setBasic(item, true, new Date().toISOString()));
+    this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_TOP_USED_MARKED_BASIC);
+    this.toast.success('insights.topUsed.markedBasic', { name: item.name });
+  }
 
   readonly isPro = toSignal(this.revenueCat.isPro$, { initialValue: this.revenueCat.isPro() });
 

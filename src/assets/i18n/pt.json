@@ -544,6 +544,25 @@
         "normal": "Normal",
         "bad": "Alto"
       }
+    },
+    "saved": {
+      "title": "Salvos a tempo",
+      "detail": "Usados na última semana: {{saved}} · Desperdiçados: {{wasted}} (este mês)"
+    },
+    "topUsed": {
+      "title": "O que mais usa",
+      "units": "×{{count}}",
+      "markBasic": "Marcar como básico",
+      "markedBasic": "{{name}} é agora um básico"
+    },
+    "stale": {
+      "title": "Parados",
+      "detail": "Em stock e parados há dois meses: {{count}}. Ainda lá estão?"
+    },
+    "freezer": {
+      "title": "Congelador",
+      "detail": "Congelados: {{count}}",
+      "oldest": "O mais antigo está lá há {{oldest}}."
     }
   },
   "pantry": {

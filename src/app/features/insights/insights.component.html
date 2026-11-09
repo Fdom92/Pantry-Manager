@@ -109,6 +109,67 @@
         </section>
       }
 
+      @if (!facade.isLoadingEvents()) {
+        <!-- Saved in time: the positive half of waste -->
+        @if (facade.savedInTime().saved > 0) {
+          <section class="insights-section">
+            <h3 class="insights-section__title">{{ 'insights.saved.title' | translate }}</h3>
+            <p class="activity-detail">
+              {{ 'insights.saved.detail' | translate: { saved: facade.savedInTime().saved, wasted: facade.savedInTime().wasted } }}
+            </p>
+          </section>
+        }
+
+        <!-- Most used: offer to make them basics -->
+        @if (facade.topUsed().length > 0) {
+          <section class="insights-section">
+            <h3 class="insights-section__title">{{ 'insights.topUsed.title' | translate }}</h3>
+            <ul class="habit-list">
+              @for (p of facade.topUsed(); track p.productId) {
+                <li class="habit-list__row">
+                  <span class="habit-list__name">{{ p.name }}</span>
+                  <span class="habit-list__meta">{{ 'insights.topUsed.units' | translate: { count: p.units } }}</span>
+                  @if (p.suggestBasic) {
+                    <ion-button fill="clear" size="small" (click)="facade.markAsBasic(p.productId)">
+                      {{ 'insights.topUsed.markBasic' | translate }}
+                    </ion-button>
+                  }
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        <!-- Stale: stock nobody touched in two months -->
+        @if (facade.staleProducts().length > 0) {
+          <section class="insights-section">
+            <h3 class="insights-section__title">{{ 'insights.stale.title' | translate }}</h3>
+            <p class="activity-detail">{{ 'insights.stale.detail' | translate: { count: facade.staleProducts().length } }}</p>
+            <ul class="habit-list">
+              @for (s of facade.staleProducts().slice(0, 5); track s.item._id) {
+                <li class="habit-list__row">
+                  <span class="habit-list__name">{{ s.item.name }}</span>
+                  <span class="habit-list__meta">{{ s.idleDays | appDuration }}</span>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        <!-- Freezer -->
+        @if (facade.freezer().products > 0) {
+          <section class="insights-section">
+            <h3 class="insights-section__title">{{ 'insights.freezer.title' | translate }}</h3>
+            <p class="activity-detail">
+              {{ 'insights.freezer.detail' | translate: { count: facade.freezer().products } }}
+              @if (facade.freezer().oldestDays > 0) {
+                {{ 'insights.freezer.oldest' | translate: { oldest: (facade.freezer().oldestDays | appDuration) } }}
+              }
+            </p>
+          </section>
+        }
+      }
+
       <!-- Sentinel: IntersectionObserver triggers bar animations when this enters viewport -->
       <div #barsAnchor></div>
 

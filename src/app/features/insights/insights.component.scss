@@ -274,3 +274,29 @@
   margin-bottom: var(--app-theme-spacing-xs);
   color: var(--app-theme-text-subtle);
 }
+
+.habit-list {
+  list-style: none;
+  margin: var(--app-theme-spacing-sm) 0 0;
+  padding: 0;
+}
+
+.habit-list__row {
+  display: flex;
+  align-items: center;
+  gap: var(--app-theme-spacing-sm);
+  min-height: 40px;
+}
+
+.habit-list__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.habit-list__meta {
+  color: var(--app-theme-text-muted);
+  font-size: var(--app-theme-font-size-small);
+}

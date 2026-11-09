@@ -544,6 +544,25 @@
         "normal": "Normal",
         "bad": "High"
       }
+    },
+    "saved": {
+      "title": "Saved in time",
+      "detail": "Used in their last week: {{saved}} · Wasted: {{wasted}} (this month)"
+    },
+    "topUsed": {
+      "title": "What you use most",
+      "units": "×{{count}}",
+      "markBasic": "Mark as basic",
+      "markedBasic": "{{name}} is now a basic"
+    },
+    "stale": {
+      "title": "Untouched",
+      "detail": "In stock and untouched for two months: {{count}}. Still there?"
+    },
+    "freezer": {
+      "title": "Freezer",
+      "detail": "Frozen: {{count}}",
+      "oldest": "The oldest has been in for {{oldest}}."
     }
   },
   "pantry": {

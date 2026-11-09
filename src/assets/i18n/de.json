@@ -544,6 +544,25 @@
         "normal": "Normal",
         "bad": "Hoch"
       }
+    },
+    "saved": {
+      "title": "Rechtzeitig gerettet",
+      "detail": "In ihrer letzten Woche verbraucht: {{saved}} · Verschwendet: {{wasted}} (diesen Monat)"
+    },
+    "topUsed": {
+      "title": "Was du am meisten nutzt",
+      "units": "×{{count}}",
+      "markBasic": "Als Basis markieren",
+      "markedBasic": "{{name}} ist jetzt ein Basisprodukt"
+    },
+    "stale": {
+      "title": "Unberührt",
+      "detail": "Auf Vorrat und seit zwei Monaten unberührt: {{count}}. Noch da?"
+    },
+    "freezer": {
+      "title": "Gefrierschrank",
+      "detail": "Eingefroren: {{count}}",
+      "oldest": "Das älteste liegt seit {{oldest}} drin."
     }
   },
   "pantry": {
