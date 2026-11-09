@@ -1,6 +1,11 @@
-import type { ItemBatch } from '@core/models/pantry';
+import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
-import { dueBatchIndex, freezeOne, moveOne, openedShelfDays, openOne, THAW_MAX_DAYS, thawOne } from './batch-state.domain';
+import { computeTodaySuggestion } from '@core/domain/dashboard';
+import { selectUnloggedExpiredBatches } from '@core/domain/events';
+import { filterExpiredItems, filterNearExpiryItems } from '@core/domain/notifications';
+import { dueBatchIndex, freezeOne, frozenQuantity, moveOne, openedShelfDays, openOne, THAW_MAX_DAYS, thawOne } from './batch-state.domain';
+import { hasMissingExpiry } from './pantry-filtering.domain';
+import { getItemStatusState } from './pantry-status.domain';
 
 const NOW = new Date('2026-11-09T10:00:00');
 let n = 0;
@@ -104,5 +109,41 @@ describe('freezeOne and thawOne', () => {
     const result = thawOne(lots, NOW, newId)!;
     expect(result.batches[result.index].batchId).toBe('old');
     expect(result.batches[result.index].expirationDate).toBeUndefined();
+  });
+});
+
+describe('a frozen lot across the app', () => {
+  // Frozen yesterday's chicken: its fresh date has passed, but it is in the freezer.
+  const chicken = (): PantryItem => {
+    const frozen = freezeOne([lot({ batchId: 'c', quantity: 1, expirationDate: '2026-11-08' })], NOW, newId)!;
+    return {
+      _id: 'item:pollo', type: 'item', householdId: 'h', name: 'Pechuga de pollo', categoryId: '',
+      productType: 'pantry', foodType: FoodType.PROTEIN, batches: frozen.batches,
+    } as PantryItem;
+  };
+
+  it('is neither expired nor near expiry', () => {
+    expect(getItemStatusState(chicken(), NOW, 15)).toBe('normal');
+  });
+
+  it('never goes to waste', () => {
+    expect(selectUnloggedExpiredBatches([chicken()], [], NOW)).toEqual([]);
+  });
+
+  it('never triggers an expiry notification', () => {
+    expect(filterExpiredItems([chicken()], NOW)).toEqual([]);
+    expect(filterNearExpiryItems([chicken()], NOW, 15)).toEqual([]);
+  });
+
+  it('is not suggested for today', () => {
+    expect(computeTodaySuggestion([], [chicken()], undefined, NOW.getTime())).toBeNull();
+  });
+
+  it('is not "pending": its date is paused, not missing', () => {
+    expect(hasMissingExpiry(chicken())).toBeFalse();
+  });
+
+  it('counts its frozen units', () => {
+    expect(frozenQuantity(chicken())).toBe(1);
   });
 });

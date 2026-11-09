@@ -1,4 +1,4 @@
-import type { BatchIdGenerator, ItemBatch } from '@core/models/pantry';
+import type { BatchIdGenerator, ItemBatch, PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
 import { toLocalYmd } from '@core/utils/date.util';
 import { toNumberOrZero } from '@core/utils/formatting.util';
@@ -175,4 +175,9 @@ export function thawOne(
     }
     return thawed;
   }, newId);
+}
+
+/** Units of the product sitting in the freezer. */
+export function frozenQuantity(item: PantryItem): number {
+  return (item.batches ?? []).reduce((sum, b) => sum + (b.frozenAt ? toNumberOrZero(b.quantity) : 0), 0);
 }

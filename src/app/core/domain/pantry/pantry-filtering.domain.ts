@@ -41,7 +41,8 @@ export function matchesFilters(item: PantryItem, filters: PantryFilterState, now
 export function countMissingExpiryBatches(item: PantryItem): number {
   if (item.productType === 'fresh') return 0;
   const batches = item.batches ?? [];
-  return batches.filter(b => !b.expirationDate && !b.noExpiry).length;
+  // A frozen lot's date is paused, not missing.
+  return batches.filter(b => !b.expirationDate && !b.noExpiry && !b.frozenAt).length;
 }
 
 /**
