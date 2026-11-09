@@ -1,5 +1,6 @@
 import { Injectable, Signal, WritableSignal, computed, effect, inject, signal } from '@angular/core';
 import {
+  DEFAULT_PANTRY_FILTERS,
   FilterChipViewModel,
   ItemBatch,
   PantryFilterState,
@@ -76,7 +77,7 @@ export class PantryStateService {
   readonly summarySnapshot: WritableSignal<PantrySummaryMeta> = signal({
     total: 0,
     visible: 0,
-    statusCounts: { expired: 0, expiring: 0, review: 0, lowStock: 0, normal: 0, pendientes: 0 },
+    statusCounts: { expired: 0, expiring: 0, review: 0, lowStock: 0, normal: 0, pendientes: 0, frozen: 0 },
   });
 
   private readonly skeletonManager = new SkeletonLoadingManager();
@@ -371,85 +372,12 @@ export class PantryStateService {
   }
 
   private applyStatusFilterPreset(preset: PantryStatusFilterValue): void {
-    switch (preset) {
-      case 'expired':
-        this.pantryQuery.setFilters({
-          expired: true,
-          expiring: false,
-          lowStock: false,
-          recentlyAdded: false,
-          normalOnly: false,
-          review: false,
-          pendientes: false,
-        });
-        break;
-      case 'near-expiry':
-        this.pantryQuery.setFilters({
-          expired: false,
-          expiring: true,
-          lowStock: false,
-          recentlyAdded: false,
-          normalOnly: false,
-          review: false,
-          pendientes: false,
-        });
-        break;
-      case 'low-stock':
-        this.pantryQuery.setFilters({
-          expired: false,
-          expiring: false,
-          lowStock: true,
-          recentlyAdded: false,
-          normalOnly: false,
-          review: false,
-          pendientes: false,
-        });
-        break;
-      case 'normal':
-        this.pantryQuery.setFilters({
-          expired: false,
-          expiring: false,
-          lowStock: false,
-          recentlyAdded: false,
-          normalOnly: true,
-          review: false,
-          pendientes: false,
-        });
-        break;
-      case 'review':
-        this.pantryQuery.setFilters({
-          expired: false,
-          expiring: false,
-          lowStock: false,
-          recentlyAdded: false,
-          normalOnly: false,
-          review: true,
-          pendientes: false,
-        });
-        break;
-      case 'pendientes':
-        this.pantryQuery.setFilters({
-          expired: false,
-          expiring: false,
-          lowStock: false,
-          recentlyAdded: false,
-          normalOnly: false,
-          review: false,
-          pendientes: true,
-        });
-        break;
-      default:
-        this.pantryQuery.setFilters({
-          expired: false,
-          expiring: false,
-          lowStock: false,
-          recentlyAdded: false,
-          normalOnly: false,
-          review: false,
-          pendientes: false,
-        });
-        break;
-    }
+    const flag: Record<PantryStatusFilterValue, keyof PantryFilterState | null> = {
+      all: null, expired: 'expired', 'near-expiry': 'expiring', 'low-stock': 'lowStock',
+      normal: 'normalOnly', review: 'review', pendientes: 'pendientes', frozen: 'frozen',
+    };
+    const key = flag[preset] ?? null;
+    this.pantryQuery.setFilters({ ...DEFAULT_PANTRY_FILTERS, ...(key ? { [key]: true } : {}) });
   }
 
   // -------- Batch operations (delegates to PantryBatchOperationsService) --------
@@ -620,6 +548,7 @@ export class PantryStateService {
     if (filters.lowStock) return 'low-stock';
     if (filters.normalOnly) return 'normal';
     if (filters.pendientes) return 'pendientes';
+    if (filters.frozen) return 'frozen';
     return 'all';
   }
 }

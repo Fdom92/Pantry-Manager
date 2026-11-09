@@ -3,6 +3,7 @@ import type { PantryStatusFilterValue, PantrySummaryMeta } from '@core/models/pa
 import { normalizeSearchField } from '@core/utils/normalization.util';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 import { getItemStatusState } from './pantry-status.domain';
+import { frozenQuantity } from './batch-state.domain';
 
 /**
  * Check if item matches search query.
@@ -30,6 +31,7 @@ export function matchesFilters(item: PantryItem, filters: PantryFilterState, now
   if (filters.recentlyAdded && !isRecentlyAdded(item, now)) return false;
   if (filters.normalOnly && state !== 'normal') return false;
   if (filters.pendientes && !isIncomplete(item)) return false;
+  if (filters.frozen && frozenQuantity(item) <= 0) return false;
 
   return true;
 }
@@ -101,6 +103,7 @@ export function statusFilterCount(
     case 'review': return counts.review;
     case 'expired': return counts.expired;
     case 'pendientes': return counts.pendientes;
+    case 'frozen': return counts.frozen;
   }
 }
 

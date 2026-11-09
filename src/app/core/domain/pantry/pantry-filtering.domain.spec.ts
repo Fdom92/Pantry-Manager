@@ -31,6 +31,7 @@ const noFilters: PantryFilterState = {
   normalOnly: false,
   review: false,
   pendientes: false,
+  frozen: false,
 };
 
 describe('matchesFilters — review filter', () => {
@@ -158,7 +159,7 @@ describe('countMissingExpiryBatches', () => {
 describe('statusFilterCount', () => {
   const summary = {
     total: 10,
-    statusCounts: { expired: 1, expiring: 2, review: 3, lowStock: 4, normal: 5, pendientes: 6 },
+    statusCounts: { expired: 1, expiring: 2, review: 3, lowStock: 4, normal: 5, pendientes: 6, frozen: 7 },
   };
 
   it('maps every filter value to its own count', () => {
@@ -169,6 +170,7 @@ describe('statusFilterCount', () => {
     expect(statusFilterCount(summary, 'low-stock')).toBe(4);
     expect(statusFilterCount(summary, 'normal')).toBe(5);
     expect(statusFilterCount(summary, 'pendientes')).toBe(6);
+    expect(statusFilterCount(summary, 'frozen')).toBe(7);
   });
 });
 
@@ -233,5 +235,15 @@ describe('matchesSearchQuery', () => {
   it('ignores accents and case, and matches everything for an empty query', () => {
     expect(finds('BROCOLI', 'Brócoli congelado')).toBeTrue();
     expect(finds('', 'Lo que sea')).toBeTrue();
+  });
+});
+
+describe('matchesFilters — frozen', () => {
+  it('keeps only products with something in the freezer', () => {
+    const frozen = makeItem({ batches: [{ batchId: 'a', quantity: 1, frozenAt: '2026-11-01' }] });
+    const shelf = makeItem({ batches: [{ batchId: 'b', quantity: 1, noExpiry: true }] });
+    const only = { ...noFilters, frozen: true };
+    expect(matchesFilters(frozen, only, new Date())).toBeTrue();
+    expect(matchesFilters(shelf, only, new Date())).toBeFalse();
   });
 });

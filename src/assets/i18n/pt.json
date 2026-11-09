@@ -558,7 +558,8 @@
         "expiring": "A expirar em poucos dias",
         "expired": "Rever e descartar",
         "review": "Passou a data, pode ainda estar bom",
-        "pendientes": "Produtos com informações incompletas"
+        "pendientes": "Produtos com informações incompletas",
+        "frozen": "Produtos com algo no congelador"
       },
       "status": {
         "normal": "Sem alertas",
@@ -566,7 +567,8 @@
         "expiring": "Perto da validade",
         "expired": "Expirado",
         "review": "Verificar",
-        "pendientes": "Pendentes"
+        "pendientes": "Pendentes",
+        "frozen": "Congelados"
       },
       "search": "Pesquisar produtos"
     },
@@ -914,6 +916,10 @@
         "thawed": "1 descongelado",
         "thawedUntil": "1 descongelado · {{when}}",
         "discarded": "Deitei 1 fora: conta como desperdício"
+      },
+      "badge": {
+        "frozen": "{{count}} congelado(s)",
+        "opened": "Há um aberto"
       }
     }
   },

@@ -132,6 +132,7 @@ ion-title {
 .summary-chips .status-chip.chip--review    { --chip-accent: var(--ion-color-warning-shade); }
 .summary-chips .status-chip.chip--expired   { --chip-accent: var(--ion-color-danger); }
 .summary-chips .status-chip.chip--pendientes{ --chip-accent: var(--ion-color-medium-shade); }
+.summary-chips .status-chip.chip--frozen    { --chip-accent: var(--ion-color-secondary); }
 
 // chip--basic kept on medium tone (NOT tertiary — tertiary is now reserved
 // for PRO/premium; basic items are operational, not premium).

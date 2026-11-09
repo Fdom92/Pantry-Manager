@@ -558,7 +558,8 @@
         "expiring": "Laufen in wenigen Tagen ab",
         "expired": "Überprüfen und entsorgen",
         "review": "Datum überschritten, evtl. noch gut",
-        "pendientes": "Produkte mit unvollständigen Angaben"
+        "pendientes": "Produkte mit unvollständigen Angaben",
+        "frozen": "Produkte mit etwas im Gefrierschrank"
       },
       "status": {
         "normal": "Keine Probleme",
@@ -566,7 +567,8 @@
         "expiring": "Bald ablaufend",
         "expired": "Abgelaufen",
         "review": "Prüfen",
-        "pendientes": "Ausstehend"
+        "pendientes": "Ausstehend",
+        "frozen": "Eingefroren"
       },
       "search": "Produkte suchen"
     },
@@ -914,6 +916,10 @@
         "thawed": "1 aufgetaut",
         "thawedUntil": "1 aufgetaut · {{when}}",
         "discarded": "1 weggeworfen: zählt als Verschwendung"
+      },
+      "badge": {
+        "frozen": "{{count}} eingefroren",
+        "opened": "Einer ist geöffnet"
       }
     }
   },

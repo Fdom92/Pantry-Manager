@@ -1,4 +1,4 @@
-import { isStatusChipVisible } from '@core/domain/pantry';
+import { isStatusChipVisible, frozenQuantity } from '@core/domain/pantry';
 import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { classifyExpiry, getItemStatusState, isIncomplete, normalizeBatches } from '@core/domain/pantry';
@@ -40,6 +40,7 @@ export class PantryViewModelService {
       lowStock: 0,
       normal: 0,
       pendientes: 0,
+      frozen: 0,
     };
     for (const item of items) {
       const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
@@ -62,6 +63,9 @@ export class PantryViewModelService {
       }
       if (isIncomplete(item)) {
         statusCounts.pendientes += 1;
+      }
+      if (frozenQuantity(item) > 0) {
+        statusCounts.frozen += 1;
       }
     }
 
@@ -154,6 +158,17 @@ export class PantryViewModelService {
         description: 'pantry.filters.desc.pendientes',
         colorClass: 'chip--pendientes',
         active: activeStatus === 'pendientes',
+      },
+      {
+        key: 'status-frozen',
+        kind: 'status',
+        value: 'frozen',
+        label: 'pantry.filters.status.frozen',
+        count: counts.frozen,
+        icon: 'snow-outline',
+        description: 'pantry.filters.desc.frozen',
+        colorClass: 'chip--frozen',
+        active: activeStatus === 'frozen',
       },
     ];
 

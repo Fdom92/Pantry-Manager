@@ -325,16 +325,9 @@ export class PantryQueryService {
     }
   }
 
+  // Every key, so a new filter cannot be silently ignored (the frozen chip once was).
   private areFiltersEqual(a: PantryFilterState, b: PantryFilterState): boolean {
-    return (
-      a.lowStock === b.lowStock &&
-      a.expired === b.expired &&
-      a.expiring === b.expiring &&
-      a.recentlyAdded === b.recentlyAdded &&
-      a.normalOnly === b.normalOnly &&
-      a.review === b.review &&
-      a.pendientes === b.pendientes
-    );
+    return (Object.keys(DEFAULT_PANTRY_FILTERS) as (keyof PantryFilterState)[]).every(key => a[key] === b[key]);
   }
 
   private appendBatchToLoadedProducts(batch: PantryItem[]): void {

@@ -558,7 +558,8 @@
         "expiring": "Caducan en pocos días",
         "expired": "Revisar y descartar",
         "review": "Pasó la fecha, pero puede estar bien",
-        "pendientes": "Productos con información incompleta"
+        "pendientes": "Productos con información incompleta",
+        "frozen": "Productos con algo en el congelador"
       },
       "status": {
         "normal": "Sin alertas",
@@ -566,7 +567,8 @@
         "expiring": "Próx. caducar",
         "expired": "Caducados",
         "review": "Revisar",
-        "pendientes": "Pendientes"
+        "pendientes": "Pendientes",
+        "frozen": "Congelados"
       },
       "search": "Buscar productos"
     },
@@ -914,6 +916,10 @@
         "thawed": "Descongelado 1",
         "thawedUntil": "Descongelado 1 · {{when}}",
         "discarded": "Tirado 1: cuenta como desperdicio"
+      },
+      "badge": {
+        "frozen": "{{count}} congelado(s)",
+        "opened": "Hay uno abierto"
       }
     }
   },

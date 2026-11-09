@@ -558,7 +558,8 @@
         "expiring": "Expiring in a few days",
         "expired": "Review and discard",
         "review": "Past date, may still be fine",
-        "pendientes": "Products with incomplete information"
+        "pendientes": "Products with incomplete information",
+        "frozen": "Products with something in the freezer"
       },
       "status": {
         "normal": "No alerts",
@@ -566,7 +567,8 @@
         "expiring": "Near expiry",
         "expired": "Expired",
         "review": "Check",
-        "pendientes": "Pending"
+        "pendientes": "Pending",
+        "frozen": "Frozen"
       },
       "search": "Search products"
     },
@@ -914,6 +916,10 @@
         "thawed": "Thawed 1",
         "thawedUntil": "Thawed 1 · {{when}}",
         "discarded": "Threw 1 away: counted as waste"
+      },
+      "badge": {
+        "frozen": "{{count}} frozen",
+        "opened": "One is open"
       }
     }
   },

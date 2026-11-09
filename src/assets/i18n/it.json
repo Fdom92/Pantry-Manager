@@ -558,7 +558,8 @@
         "expiring": "In scadenza tra pochi giorni",
         "expired": "Controlla ed elimina",
         "review": "Data superata, potrebbe essere ok",
-        "pendientes": "Prodotti con informazioni incomplete"
+        "pendientes": "Prodotti con informazioni incomplete",
+        "frozen": "Prodotti con qualcosa nel congelatore"
       },
       "status": {
         "normal": "Nessun problema",
@@ -566,7 +567,8 @@
         "expiring": "Vicino alla scadenza",
         "expired": "Scaduto",
         "review": "Verificare",
-        "pendientes": "In attesa"
+        "pendientes": "In attesa",
+        "frozen": "Congelati"
       },
       "search": "Cerca prodotti"
     },
@@ -914,6 +916,10 @@
         "thawed": "1 scongelato",
         "thawedUntil": "1 scongelato · {{when}}",
         "discarded": "1 buttato: conta come spreco"
+      },
+      "badge": {
+        "frozen": "{{count}} congelato/i",
+        "opened": "Uno è aperto"
       }
     }
   },
