@@ -13,6 +13,7 @@ import { HistoryEventManagerService } from '../../history/history-event-manager.
 import { LoggerService } from '../../shared/logger.service';
 import { ToastService } from '../../shared';
 import { PantryStoreService } from '../pantry-store.service';
+import { ShelfLifeLearningService } from '../shelf-life-learning.service';
 
 export interface PendienteRow {
   itemId: string;
@@ -35,6 +36,7 @@ export interface PendienteRow {
  */
 @Injectable()
 export class PantryPendientesSheetStateService {
+  private readonly shelfLife = inject(ShelfLifeLearningService);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
@@ -190,7 +192,7 @@ export class PantryPendientesSheetStateService {
       foodType,
       ...(foodType && needsDate
         ? {
-            expirationDate: resolveSuggestedExpiry(item.name, foodType, new Date()).expirationDate,
+            expirationDate: resolveSuggestedExpiry(item.name, foodType, new Date(), this.shelfLife.daysFor(item.name, item._id)).expirationDate,
             noExpiry: !foodTypeExpires(foodType),
           }
         : { expirationDate: undefined, noExpiry: false }),
