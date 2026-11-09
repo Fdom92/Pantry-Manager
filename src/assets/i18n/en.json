@@ -927,7 +927,9 @@
         "frozen": "Froze 1",
         "thawed": "Thawed 1",
         "thawedUntil": "Thawed 1 · {{when}}",
-        "discarded": "Threw 1 away: counted as waste"
+        "discarded": "Threw 1 away: counted as waste",
+        "failed": "Couldn't save. Try again.",
+        "undoStale": "It has changed since: cannot undo."
       },
       "badge": {
         "frozen": "{{count}} frozen",

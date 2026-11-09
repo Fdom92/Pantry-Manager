@@ -927,7 +927,9 @@
         "frozen": "1 congelé",
         "thawed": "1 décongelé",
         "thawedUntil": "1 décongelé · {{when}}",
-        "discarded": "1 jeté : compté comme gaspillage"
+        "discarded": "1 jeté : compté comme gaspillage",
+        "failed": "Impossible d'enregistrer. Réessayez.",
+        "undoStale": "Modifié entre-temps : impossible d'annuler."
       },
       "badge": {
         "frozen": "{{count}} congelé(s)",

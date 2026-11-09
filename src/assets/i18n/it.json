@@ -927,7 +927,9 @@
         "frozen": "1 congelato",
         "thawed": "1 scongelato",
         "thawedUntil": "1 scongelato · {{when}}",
-        "discarded": "1 buttato: conta come spreco"
+        "discarded": "1 buttato: conta come spreco",
+        "failed": "Impossibile salvare. Riprova.",
+        "undoStale": "Nel frattempo è cambiato: impossibile annullare."
       },
       "badge": {
         "frozen": "{{count}} congelato/i",

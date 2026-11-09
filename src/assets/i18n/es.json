@@ -927,7 +927,9 @@
         "frozen": "Congelado 1",
         "thawed": "Descongelado 1",
         "thawedUntil": "Descongelado 1 · {{when}}",
-        "discarded": "Tirado 1: cuenta como desperdicio"
+        "discarded": "Tirado 1: cuenta como desperdicio",
+        "failed": "No se pudo guardar. Inténtalo otra vez.",
+        "undoStale": "Ya ha cambiado: no se puede deshacer."
       },
       "badge": {
         "frozen": "{{count}} congelado(s)",

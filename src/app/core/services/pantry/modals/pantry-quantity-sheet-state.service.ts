@@ -218,19 +218,37 @@ export class PantryQuantitySheetStateService {
     if (index === -1) return;
     const next = batches.map(b => ({ ...b }));
     next[index].quantity = toNumberOrZero(next[index].quantity) - 1;
-    await this.pantryStore.updateItem({ ...current, batches: next.filter(b => toNumberOrZero(b.quantity) > 0) });
+    const saved = next.filter(b => toNumberOrZero(b.quantity) > 0);
+    // Waste is only recorded once the stock really dropped.
+    if (!(await this.pantryStore.updateItem({ ...current, batches: saved }))) {
+      this.toast.error('pantry.quickActions.toast.failed');
+      return;
+    }
     const event = await this.history.logDiscard(current, 1);
     this.trackQuickAction(current, 'discard');
     this.toast.withAction('pantry.quickActions.toast.discarded', 'common.actions.undo', () => {
-      void this.pantryStore.updateItem({ ...current, updatedAt: new Date().toISOString() });
-      if (event) void this.history.undoDiscard(event);
+      void this.undo(current, saved).then(done => { if (done && event) void this.history.undoDiscard(event); });
     });
   }
 
   /** Saves pending −/+ first, so an action always starts from the stored item. */
   private async closeAndReload(item: PantryItem): Promise<PantryItem> {
     await this.dismiss();
+    await this.batchOps.flushPendingStockSave(item._id);
     return this.pantryStore.items().find(i => i._id === item._id) ?? item;
+  }
+
+  /**
+   * Puts the item back as it was before an action, unless it changed since: an
+   * Undo tapped after another edit must not wipe that edit.
+   */
+  private async undo(before: PantryItem, after: ItemBatch[]): Promise<boolean> {
+    const stored = this.pantryStore.items().find(i => i._id === before._id);
+    if (!stored || JSON.stringify(stored.batches ?? []) !== JSON.stringify(after)) {
+      this.toast.error('pantry.quickActions.toast.undoStale');
+      return false;
+    }
+    return this.pantryStore.updateItem({ ...before, updatedAt: new Date().toISOString() });
   }
 
   private async applyBatchAction(
@@ -242,12 +260,13 @@ export class PantryQuantitySheetStateService {
     const current = await this.closeAndReload(item);
     const result = change(current);
     if (!result) return;
-    await this.pantryStore.updateItem({ ...current, batches: result.batches });
+    if (!(await this.pantryStore.updateItem({ ...current, batches: result.batches }))) {
+      this.toast.error('pantry.quickActions.toast.failed');
+      return;
+    }
     this.trackQuickAction(current, action, action === 'move' ? result.batches[result.index].locationId : undefined);
     const { key, params } = message(result.batches[result.index]);
-    this.toast.withAction(key, 'common.actions.undo', () => {
-      void this.pantryStore.updateItem({ ...current, updatedAt: new Date().toISOString() });
-    }, params);
+    this.toast.withAction(key, 'common.actions.undo', () => void this.undo(current, result.batches), params);
   }
 
   private trackQuickAction(item: PantryItem, action: string, to?: string): void {
