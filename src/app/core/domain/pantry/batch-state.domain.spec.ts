@@ -3,7 +3,7 @@ import { FoodType } from '@core/models/shared/enums.model';
 import { computeTodaySuggestion } from '@core/domain/dashboard';
 import { selectUnloggedExpiredBatches } from '@core/domain/events';
 import { filterExpiredItems, filterNearExpiryItems } from '@core/domain/notifications';
-import { dueBatchIndex, freezeOne, frozenQuantity, moveOne, openedShelfDays, openOne, THAW_MAX_DAYS, thawOne } from './batch-state.domain';
+import { dueBatchIndex, findFreezerLocation, findFridgeLocation, freezeOne, frozenQuantity, moveOne, openedShelfDays, openOne, THAW_MAX_DAYS, thawOne } from './batch-state.domain';
 import { hasMissingExpiry } from './pantry-filtering.domain';
 import { getItemStatusState } from './pantry-status.domain';
 
@@ -98,7 +98,8 @@ describe('freezeOne and thawOne', () => {
   });
 
   it('thawing dates it today plus the days left, at most THAW_MAX_DAYS and at least one', () => {
-    const many = thawOne([lot({ frozenAt: '2026-10-01', frozenDaysLeft: 20 })], NOW, newId)!.batches[0];
+    const many = thawOne([lot({ frozenAt: '2026-10-01', frozenDaysLeft: 20, locationId: 'Congelador' })], NOW, newId, 'Nevera')!.batches[0];
+    expect(many.locationId).toBe('Nevera');
     expect(many.expirationDate).toBe(plusDays(THAW_MAX_DAYS));
     expect(many.frozenAt).toBeUndefined();
     expect(thawOne([lot({ frozenAt: '2026-10-01', frozenDaysLeft: 0 })], NOW, newId)!.batches[0].expirationDate).toBe(plusDays(1));
@@ -145,5 +146,19 @@ describe('a frozen lot across the app', () => {
 
   it('counts its frozen units', () => {
     expect(frozenQuantity(chicken())).toBe(1);
+  });
+});
+
+describe('findFridgeLocation / findFreezerLocation', () => {
+  it('recognises the user\'s own names for them', () => {
+    const mine = ['Sótano', 'Cocina', 'Nevera', 'Congelador'];
+    expect(findFridgeLocation(mine)).toBe('Nevera');
+    expect(findFreezerLocation(mine)).toBe('Congelador');
+    expect(findFridgeLocation(['Pantry', 'Fridge'])).toBe('Fridge');
+    expect(findFreezerLocation(['Küche', 'Gefrierschrank'])).toBe('Gefrierschrank');
+  });
+
+  it('returns undefined when there is none', () => {
+    expect(findFridgeLocation(['Sótano', 'Cocina'])).toBeUndefined();
   });
 });

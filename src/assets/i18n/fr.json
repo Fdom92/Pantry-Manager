@@ -898,6 +898,23 @@
       "message": "Il te reste encore {{count}} de {{name}}. Si tu l'as fini, on le déduit et on enregistre la consommation ; en supprimant, tu perds son historique.",
       "consumed": "Je l'ai fini",
       "delete": "Supprimer le produit"
+    },
+    "quickActions": {
+      "open": "Ouvrir 1",
+      "move": "Déplacer 1",
+      "moveTo": "Déplacer vers",
+      "freeze": "Congeler 1",
+      "thaw": "Décongeler 1",
+      "discard": "1 jeté",
+      "toast": {
+        "opened": "1 ouvert",
+        "openedUntil": "1 ouvert · {{when}}",
+        "moved": "1 déplacé vers {{place}}",
+        "frozen": "1 congelé",
+        "thawed": "1 décongelé",
+        "thawedUntil": "1 décongelé · {{when}}",
+        "discarded": "1 jeté : compté comme gaspillage"
+      }
     }
   },
   "upgrade": {

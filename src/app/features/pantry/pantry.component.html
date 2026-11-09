@@ -289,7 +289,13 @@
           (viewDetails)="facade.openBatchesModalFromSheet(item)"
           (editRequested)="facade.openEditModalFromSheet(item)"
           (deleteRequested)="facade.deleteItem(item, $event)"
-          (closeRequested)="facade.closeQuantitySheetWithSave()">
+          (closeRequested)="facade.closeQuantitySheetWithSave()"
+          [locations]="facade.quickActionLocations()"
+          (openOne)="facade.openOneUnit(item)"
+          (moveOne)="facade.moveOneUnit(item, $event)"
+          (freezeOne)="facade.freezeOneUnit(item)"
+          (thawOne)="facade.thawOneUnit(item)"
+          (discardOne)="facade.discardOneUnit(item)">
         </app-pantry-quantity-sheet>
       }
     </ng-template>

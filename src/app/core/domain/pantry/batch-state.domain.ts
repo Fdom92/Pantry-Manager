@@ -2,6 +2,7 @@ import type { BatchIdGenerator, ItemBatch, PantryItem } from '@core/models/pantr
 import { FoodType } from '@core/models/shared/enums.model';
 import { toLocalYmd } from '@core/utils/date.util';
 import { toNumberOrZero } from '@core/utils/formatting.util';
+import { normalizeSearchQuery } from '@core/utils/normalization.util';
 
 /**
  * One-tap actions on "the lot that is due": opening, moving, freezing and
@@ -158,6 +159,7 @@ export function thawOne(
   batches: readonly ItemBatch[],
   now: Date,
   newId: BatchIdGenerator,
+  fridgeLocationId?: string,
 ): { batches: ItemBatch[]; index: number } | null {
   let index = -1;
   batches.forEach((b, i) => {
@@ -167,7 +169,7 @@ export function thawOne(
   if (index === -1) return null;
   return changeOneUnit(batches, index, unit => {
     const { frozenAt: _at, frozenDaysLeft, ...rest } = unit;
-    const thawed: ItemBatch = { ...rest };
+    const thawed: ItemBatch = { ...rest, ...(fridgeLocationId ? { locationId: fridgeLocationId } : {}) };
     if (frozenDaysLeft !== undefined) {
       const date = new Date(now);
       date.setDate(date.getDate() + Math.min(THAW_MAX_DAYS, Math.max(1, frozenDaysLeft)));
@@ -180,4 +182,25 @@ export function thawOne(
 /** Units of the product sitting in the freezer. */
 export function frozenQuantity(item: PantryItem): number {
   return (item.batches ?? []).reduce((sum, b) => sum + (b.frozenAt ? toNumberOrZero(b.quantity) : 0), 0);
+}
+
+// Locations are free-text names the user typed, in any of the six languages.
+const FRIDGE_WORDS = ['nevera', 'frigo', 'frigorifico', 'fridge', 'refrigerator', 'kuhlschrank', 'refrigerateur', 'frigorifero', 'geladeira', 'frigorifico'];
+const FREEZER_WORDS = ['congelador', 'congelado', 'freezer', 'gefrier', 'congelateur', 'congelatore', 'arca'];
+
+function findLocation(locations: readonly string[], words: readonly string[]): string | undefined {
+  return locations.find(name => {
+    const normalized = normalizeSearchQuery(name);
+    return words.some(word => normalized.includes(word));
+  });
+}
+
+/** The user's fridge among their locations, recognised by name. */
+export function findFridgeLocation(locations: readonly string[]): string | undefined {
+  return findLocation(locations, FRIDGE_WORDS);
+}
+
+/** The user's freezer among their locations, recognised by name. */
+export function findFreezerLocation(locations: readonly string[]): string | undefined {
+  return findLocation(locations, FREEZER_WORDS);
 }

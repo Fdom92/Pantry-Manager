@@ -319,6 +319,14 @@ export class PantryStateService {
   // -------- Receipt scan modal (delegates to PantryReceiptScanModalStateService) --------
   startReceiptScan = () => this.receiptScanModal.startScan();
 
+  // -------- Quick actions (delegates to PantryQuantitySheetStateService) --------
+  quickActionLocations = () => this.quantitySheet.locations();
+  openOneUnit = (item: PantryItem) => this.quantitySheet.openOne(item);
+  moveOneUnit = (item: PantryItem, locationId: string) => this.quantitySheet.moveOne(item, locationId);
+  freezeOneUnit = (item: PantryItem) => this.quantitySheet.freezeOne(item);
+  thawOneUnit = (item: PantryItem) => this.quantitySheet.thawOne(item);
+  discardOneUnit = (item: PantryItem) => this.quantitySheet.discardOne(item);
+
   // -------- Consume modal (delegates to PantryConsumeModalStateService) --------
   openConsumeModal = () => this.consumeModal.open();
   dismissConsumeModal = () => this.consumeModal.dismiss();

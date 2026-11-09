@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { sumQuantities } from '@core/domain/pantry';
 import { selectDuplicateExpireEvents, selectUnloggedExpiredBatches } from '@core/domain/events';
 import type { PantryItem } from '@core/models/pantry';
-import type { EventSource } from '@core/models/events';
+import type { EventSource, PantryEvent } from '@core/models/events';
 import { computeEditedFields } from '@core/utils/pantry-diff.util';
 import { Subject } from 'rxjs';
 import { HistoryEventLogService } from './history-event-log.service';
@@ -154,6 +154,32 @@ export class HistoryEventManagerService {
     // Do not emit mutation$ — expired-batch logging is a system housekeeping
     // task, not a user action. Emitting here incorrectly triggers streak
     // evaluation on view navigation (e.g. Dashboard ionViewWillEnter).
+  }
+
+  /**
+   * A unit thrown away by hand ("Se tiró"): logged as EXPIRE so the waste
+   * card counts it, with a key of its own and no date, so the expired-batch
+   * sweep never mistakes it for, or lets it hide, a lot's real expiry.
+   */
+  async logDiscard(item: PantryItem, quantity: number) {
+    const now = new Date().toISOString();
+    const result = await this.eventLog.logExpireEvent({
+      productId: item._id,
+      productName: item.name,
+      quantity,
+      source: 'discard',
+      categoryId: item.categoryId,
+      foodType: item.foodType,
+      timestamp: now,
+      sourceMetadata: { batchKey: `${item._id}::discard::${now}` },
+    });
+    this._mutation$.next();
+    return result;
+  }
+
+  /** Undoes a "Se tiró": the waste it recorded disappears with it. */
+  async undoDiscard(event: PantryEvent): Promise<void> {
+    await this.eventLog.deleteEvents([event]);
   }
 
   async logDeleteFromCard(item: PantryItem) {

@@ -898,6 +898,23 @@
       "message": "Du hast noch {{count}} von {{name}}. Wenn du es aufgebraucht hast, ziehen wir es ab und erfassen den Verbrauch; beim Löschen geht der Verlauf verloren.",
       "consumed": "Aufgebraucht",
       "delete": "Produkt löschen"
+    },
+    "quickActions": {
+      "open": "1 öffnen",
+      "move": "1 verschieben",
+      "moveTo": "Verschieben nach",
+      "freeze": "1 einfrieren",
+      "thaw": "1 auftauen",
+      "discard": "1 weggeworfen",
+      "toast": {
+        "opened": "1 geöffnet",
+        "openedUntil": "1 geöffnet · {{when}}",
+        "moved": "1 nach {{place}} verschoben",
+        "frozen": "1 eingefroren",
+        "thawed": "1 aufgetaut",
+        "thawedUntil": "1 aufgetaut · {{when}}",
+        "discarded": "1 weggeworfen: zählt als Verschwendung"
+      }
     }
   },
   "upgrade": {

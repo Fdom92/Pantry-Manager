@@ -898,6 +898,23 @@
       "message": "Todavía te quedan {{count}} de {{name}}. Si te lo has acabado lo descontamos y guardamos el consumo; si lo borras se pierde su historial.",
       "consumed": "Se ha acabado",
       "delete": "Borrar producto"
+    },
+    "quickActions": {
+      "open": "Abrir 1",
+      "move": "Mover 1",
+      "moveTo": "Mover a",
+      "freeze": "Congelar 1",
+      "thaw": "Descongelar 1",
+      "discard": "Se tiró 1",
+      "toast": {
+        "opened": "Abierto 1",
+        "openedUntil": "Abierto 1 · {{when}}",
+        "moved": "Movido 1 a {{place}}",
+        "frozen": "Congelado 1",
+        "thawed": "Descongelado 1",
+        "thawedUntil": "Descongelado 1 · {{when}}",
+        "discarded": "Tirado 1: cuenta como desperdicio"
+      }
     }
   },
   "upgrade": {

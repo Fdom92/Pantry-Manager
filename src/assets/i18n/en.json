@@ -898,6 +898,23 @@
       "message": "You still have {{count}} of {{name}}. If you finished it we'll subtract it and record the consumption; deleting loses its history.",
       "consumed": "I finished it",
       "delete": "Delete product"
+    },
+    "quickActions": {
+      "open": "Open 1",
+      "move": "Move 1",
+      "moveTo": "Move to",
+      "freeze": "Freeze 1",
+      "thaw": "Thaw 1",
+      "discard": "Threw 1 away",
+      "toast": {
+        "opened": "Opened 1",
+        "openedUntil": "Opened 1 · {{when}}",
+        "moved": "Moved 1 to {{place}}",
+        "frozen": "Froze 1",
+        "thawed": "Thawed 1",
+        "thawedUntil": "Thawed 1 · {{when}}",
+        "discarded": "Threw 1 away: counted as waste"
+      }
     }
   },
   "upgrade": {
