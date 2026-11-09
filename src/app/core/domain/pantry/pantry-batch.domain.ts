@@ -64,7 +64,8 @@ export function mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
 
   for (const batch of batches) {
     const expiryKey = normalizeTrim(batch.expirationDate);
-    const locationKey = normalizeTrim(batch.locationId);
+    // Opened and frozen lots only merge with lots in the same state.
+    const locationKey = `${normalizeTrim(batch.locationId)}::${batch.opened ? 'open' : ''}::${batch.frozenAt ? `frozen-${batch.frozenDaysLeft ?? ''}` : ''}`;
     const key = expiryKey
       ? `${locationKey}::${expiryKey}`
       : batch.noExpiry

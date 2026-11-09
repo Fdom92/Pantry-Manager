@@ -73,6 +73,21 @@ describe('mergeBatchesByExpiry', () => {
     expect(result[0].quantity).toBe(b.quantity);
   });
 
+  it('keeps an opened unit apart from the sealed lot with the same date', () => {
+    // "Abrir 1" splits one unit off; merging it back would mark the whole lot opened.
+    const sealed = batch({ batchId: 'a', expirationDate: '2025-06-01', quantity: 3 });
+    const open = batch({ batchId: 'b', expirationDate: '2025-06-01', quantity: 1, opened: true });
+    const result = mergeBatchesByExpiry([sealed, open]);
+    expect(result.length).toBe(2);
+    expect(result.find(b => b.opened)!.quantity).toBe(1);
+  });
+
+  it('keeps a frozen lot apart from a sealed one', () => {
+    const shelf = batch({ batchId: 'a', noExpiry: true, quantity: 2 });
+    const frozen = batch({ batchId: 'b', noExpiry: true, quantity: 1, frozenAt: '2025-05-01' });
+    expect(mergeBatchesByExpiry([shelf, frozen]).length).toBe(2);
+  });
+
   it('merges batches with same expiry + location', () => {
     const b1 = batch({ batchId: 'a', expirationDate: '2025-06-01', locationId: 'fridge', quantity: 2 });
     const b2 = batch({ batchId: 'b', expirationDate: '2025-06-01', locationId: 'fridge', quantity: 3 });
@@ -94,10 +109,11 @@ describe('mergeBatchesByExpiry', () => {
     expect(result.length).toBe(2);
   });
 
-  it('marks merged batch as opened if either source is opened', () => {
-    const b1 = batch({ expirationDate: '2025-06-01', opened: true });
-    const b2 = batch({ expirationDate: '2025-06-01', opened: false });
+  it('merges two opened batches with the same date', () => {
+    const b1 = batch({ batchId: 'a', expirationDate: '2025-06-01', opened: true });
+    const b2 = batch({ batchId: 'b', expirationDate: '2025-06-01', opened: true });
     const result = mergeBatchesByExpiry([b1, b2]);
+    expect(result.length).toBe(1);
     expect(result[0].opened).toBe(true);
   });
 });
