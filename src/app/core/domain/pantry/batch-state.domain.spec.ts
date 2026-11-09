@@ -190,3 +190,24 @@ describe('groupByLocation', () => {
     expect(leche.batches.length).toBe(2);
   });
 });
+
+describe('openedShelfDays per product', () => {
+  it('gives opened sauces a month, as their labels say', () => {
+    expect(openedShelfDays(FoodType.OTHER, 'Salsa mayonesa')).toBe(30);
+    expect(openedShelfDays(FoodType.OTHER, 'Ketchup')).toBe(30);
+    expect(openedShelfDays(FoodType.OTHER, 'Salsa barbacoa')).toBe(30);
+  });
+
+  it('keeps pesto at five days: its label says so once opened', () => {
+    expect(openedShelfDays(FoodType.OTHER, 'Salsa pesto')).toBe(5);
+  });
+
+  it('falls back to the type when the user re-typed the product', () => {
+    expect(openedShelfDays(FoodType.DAIRY, 'Salsa mayonesa')).toBe(openedShelfDays(FoodType.DAIRY));
+  });
+
+  it('openOne uses the product\'s own opened life', () => {
+    const result = openOne([lot({ expirationDate: '2027-10-16' })], FoodType.OTHER, NOW, newId, undefined, 'Salsa mayonesa')!;
+    expect(result.batches[result.index].expirationDate).toBe(plusDays(30));
+  });
+});

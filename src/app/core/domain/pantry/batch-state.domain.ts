@@ -3,6 +3,7 @@ import { FoodType } from '@core/models/shared/enums.model';
 import { toLocalYmd } from '@core/utils/date.util';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
+import { inferConcept } from './food-type-inference.domain';
 
 /**
  * One-tap actions on "the lot that is due": opening, moving, freezing and
@@ -20,7 +21,10 @@ const DAY_MS = 86_400_000;
  * shorten its date (rice, salt, bin bags).
  */
 // shortcut: one value per type (labels mostly say 3-5 days), review with the shelf-life table before 5.7 ships.
-export function openedShelfDays(foodType: FoodType | undefined): number | null {
+export function openedShelfDays(foodType: FoodType | undefined, name?: string): number | null {
+  // A product's own opened life wins while it keeps the concept's type (as shelf life does).
+  const concept = name ? inferConcept(name) : null;
+  if (concept?.openedShelfDays && concept.foodType === (foodType ?? concept.foodType)) return concept.openedShelfDays;
   switch (foodType) {
     case FoodType.PROTEIN:
     case FoodType.FRUIT:
@@ -38,8 +42,8 @@ export function openedShelfDays(foodType: FoodType | undefined): number | null {
 }
 
 /** Food types that should go to the fridge once opened. */
-export function needsFridgeWhenOpen(foodType: FoodType | undefined): boolean {
-  return openedShelfDays(foodType) !== null;
+export function needsFridgeWhenOpen(foodType: FoodType | undefined, name?: string): boolean {
+  return openedShelfDays(foodType, name) !== null;
 }
 
 function expiryTime(batch: ItemBatch): number {
@@ -101,10 +105,11 @@ export function openOne(
   now: Date,
   newId: BatchIdGenerator,
   fridgeLocationId?: string,
+  name?: string,
 ): { batches: ItemBatch[]; index: number } | null {
   const index = dueBatchIndex(batches, isSealed);
   if (index === -1) return null;
-  const days = openedShelfDays(foodType);
+  const days = openedShelfDays(foodType, name);
   return changeOneUnit(batches, index, unit => {
     const opened: ItemBatch = { ...unit, opened: true, openedAt: now.toISOString() };
     if (days !== null) {

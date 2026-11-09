@@ -47,7 +47,8 @@ export function inferFoodType(name: string): FoodType | null {
   return inferConcept(name)?.foodType ?? null;
 }
 
-function inferConcept(name: string): FoodConcept | null {
+/** The catalogue concept a product name refers to, or null. */
+export function inferConcept(name: string): FoodConcept | null {
   const normalized = normalizeSearchQuery(name);
   if (!normalized) return null;
 
