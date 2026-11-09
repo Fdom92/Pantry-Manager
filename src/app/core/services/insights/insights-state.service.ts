@@ -2,6 +2,7 @@ import { Injectable, computed, effect, inject, signal, untracked } from '@angula
 import { toSignal } from '@angular/core/rxjs-interop';
 import type { InsightsAnalysis, InsightsSignalsPayload } from '@core/models/insights/insights-analysis.model';
 import { PantryStoreService } from '../pantry/pantry-store.service';
+import { PantryQueryService } from '../pantry/pantry-query.service';
 import { HistoryEventLogService } from '../history/history-event-log.service';
 import { UpgradeRevenuecatService } from '../upgrade/upgrade-revenuecat.service';
 import { InsightsCacheStorageService } from './insights-cache-storage.service';
@@ -60,6 +61,7 @@ export class InsightsStateService {
   private readonly manualItemsStore = inject(ListManualItemsStore);
   private readonly localStorage = inject(LocalStorageService);
   private readonly toast = inject(ToastService);
+  private readonly pantryQuery = inject(PantryQueryService);
   private readonly clock = inject(ClockService);
 
   // Start from the log's last read when it is still valid: this service is
@@ -177,6 +179,12 @@ export class InsightsStateService {
     const days = oldest ? Math.floor((this.clock.now() - Date.parse(oldest)) / 86_400_000) : 0;
     return { products, oldestDays: days };
   });
+
+  /** Leaves the pantry search set to this product, for the page about to open. */
+  searchPantryFor(name: string): void {
+    this.pantryQuery.setSearchQuery(name);
+    this.analytics.track(ANALYTICS_EVENTS.INSIGHTS_STALE_OPENED);
+  }
 
   async markAsBasic(productId: string): Promise<void> {
     const item = this.pantryStore.items().find(i => i._id === productId);
