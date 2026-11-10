@@ -35,6 +35,19 @@ describe('StorageService', () => {
   });
 
   describe('findByField', () => {
+    it('returns every match, not only the first page PouchDB answers with', async () => {
+      // db.find() without a limit stops at 25 docs. The expired-batch sweep read its
+      // EXPIRE history this way and re-logged whatever fell past the first 25.
+      const value = `page-test-${Date.now()}`;
+      await service.bulkSave(
+        Array.from({ length: 30 }, (_, i) => ({ _id: `${value}:${i}`, type: value } as BaseDoc)),
+      );
+
+      const result = await service.findByField('type', value as any);
+
+      expect(result.length).toBe(30);
+    });
+
     it('retries once on a closing connection instead of degrading to an empty result', async () => {
       // First call on the stale db throws; withRetry() must reopen and retry
       // — not swallow it internally and hand back [] as if there were

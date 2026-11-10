@@ -3,7 +3,7 @@ import { FoodType } from '@core/models/shared/enums.model';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
 import { EXPIRY_SUGGESTION_DAYS } from './expiry-suggestion.domain';
 import { FOOD_CONCEPTS } from './food-concepts.data';
-import { inferExpiryForName, inferFoodType } from './food-type-inference.domain';
+import { inferExpiryForName, inferFoodType, resolveSuggestedExpiry } from './food-type-inference.domain';
 
 describe('inferFoodType', () => {
   it('matches a simple single-word term', () => {
@@ -61,6 +61,29 @@ describe('inferFoodType', () => {
     expect(inferFoodType(null as unknown as string)).toBeNull();
     expect(inferFoodType(undefined as unknown as string)).toBeNull();
   });
+});
+
+describe('inferFoodType on a real household catalogue', () => {
+  // Names from a real pantry (2026-11) that fell into "otros" or got no date.
+  const cases: Array<[string, FoodType]> = [
+    ['Pechuga de pollo congelada', FoodType.PROTEIN],
+    ['Tilapia congelada', FoodType.PROTEIN],
+    ['Contramuslos congelados', FoodType.PROTEIN],
+    ['Alitas congeladas', FoodType.PROTEIN],
+    ['Croquetas congeladas', FoodType.PROTEIN],
+    ['Cachopo congelado', FoodType.PROTEIN],
+    ['Lomos de pescado', FoodType.PROTEIN],
+    ['Guisantes congelados', FoodType.VEGETABLE],
+    ['Brócoli congelado', FoodType.VEGETABLE],
+    // Portuguese has two everyday words for courgette; the catalogue only had the French one.
+    ['Curgete', FoodType.VEGETABLE],
+    ['Abobrinha', FoodType.VEGETABLE],
+  ];
+  for (const [name, type] of cases) {
+    it(`reads "${name}" as ${type}`, () => {
+      expect(inferFoodType(name)).toBe(type);
+    });
+  }
 });
 
 describe('FOOD_CONCEPTS data integrity', () => {
@@ -133,5 +156,25 @@ describe('inferExpiryForName', () => {
     const result = inferExpiryForName('xyzzy', from);
     expect(result.foodType).toBeNull();
     expect(result.expirationDate).toBeUndefined();
+  });
+});
+
+describe('resolveSuggestedExpiry with a learned shelf life', () => {
+  const from = new Date('2026-01-01T12:00:00');
+
+  it('prefers what this household learned over the type default', () => {
+    expect(resolveSuggestedExpiry('Huevos', FoodType.PROTEIN, from, 21).expirationDate).toBe('2026-01-22');
+  });
+
+  it('dates a product the catalogue does not know, once learned', () => {
+    expect(resolveSuggestedExpiry('Smileat cocidito', null, from, 300).expirationDate).toBe('2026-10-28');
+  });
+
+  it('never dates a type that does not expire', () => {
+    expect(resolveSuggestedExpiry('Bolsas de basura', FoodType.HOUSEHOLD, from, 30)).toEqual({ noExpiry: true });
+  });
+
+  it('falls back to the type when nothing was learned', () => {
+    expect(resolveSuggestedExpiry('Huevos', FoodType.PROTEIN, from, undefined).expirationDate).toBe('2026-01-06');
   });
 });

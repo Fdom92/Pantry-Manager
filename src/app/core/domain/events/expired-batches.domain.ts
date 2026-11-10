@@ -46,6 +46,25 @@ function seenKeys(previousEvents: PantryEvent[]): Set<string> {
 }
 
 /**
+ * EXPIRE events that repeat a batch already recorded, keeping the oldest one per
+ * batch. Up to 5.6 the sweep could only see 25 past events, so it re-logged the
+ * same batches on every pantry load; this is what lets the app heal that history.
+ */
+export function selectDuplicateExpireEvents(events: PantryEvent[]): PantryEvent[] {
+  const oldestFirst = [...events].sort((a, b) => (a.createdAt ?? '').localeCompare(b.createdAt ?? ''));
+  const seen = new Set<string>();
+  const duplicates: PantryEvent[] = [];
+  for (const event of oldestFirst) {
+    const date = normalizeTrim(event.expirationDate);
+    const key = normalizeTrim(String(event.sourceMetadata?.['batchKey'] ?? '')) || (date ? `${event.productId}::${date}` : '');
+    if (!key) continue; // nothing to tell it apart by: never delete it
+    if (seen.has(key)) duplicates.push(event);
+    else seen.add(key);
+  }
+  return duplicates;
+}
+
+/**
  * Decides which expired batches still need an EXPIRE event, given what has
  * already been recorded.
  *

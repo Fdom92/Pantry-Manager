@@ -1,6 +1,6 @@
 import type { PantryEvent } from '@core/models/events';
 import type { PantryItem } from '@core/models/pantry';
-import { selectUnloggedExpiredBatches } from './expired-batches.domain';
+import { selectDuplicateExpireEvents, selectUnloggedExpiredBatches } from './expired-batches.domain';
 
 const NOW = new Date('2026-08-25T12:00:00');
 
@@ -150,5 +150,41 @@ describe('selectUnloggedExpiredBatches', () => {
 
   it('survives a product with no batches array at all', () => {
     expect(selectUnloggedExpiredBatches([item({ batches: undefined })], [], NOW)).toEqual([]);
+  });
+});
+
+describe('selectDuplicateExpireEvents', () => {
+  const key = (k: string) => ({ batchKey: k });
+
+  it('keeps the oldest EXPIRE per batch and returns the rest as duplicates', () => {
+    const first = expireEvent({ _id: 'event:a', createdAt: '2026-10-04T06:36:55.000Z', sourceMetadata: key('item:halls::b1') });
+    const dupe1 = expireEvent({ _id: 'event:b', createdAt: '2026-10-13T10:12:25.000Z', sourceMetadata: key('item:halls::b1') });
+    const dupe2 = expireEvent({ _id: 'event:c', createdAt: '2026-10-13T10:12:29.000Z', sourceMetadata: key('item:halls::b1') });
+    const other = expireEvent({ _id: 'event:d', createdAt: '2026-10-13T10:12:30.000Z', sourceMetadata: key('item:leche::b9') });
+
+    const dupes = selectDuplicateExpireEvents([dupe2, other, first, dupe1]);
+
+    expect(dupes.map(e => e._id).sort()).toEqual(['event:b', 'event:c']);
+  });
+
+  it('falls back to product and date for events written before the key was stored', () => {
+    const old = expireEvent({ _id: 'event:a', createdAt: '2026-05-01T00:00:00.000Z', expirationDate: '2026-04-30' });
+    const again = expireEvent({ _id: 'event:b', createdAt: '2026-05-02T00:00:00.000Z', expirationDate: '2026-04-30' });
+
+    expect(selectDuplicateExpireEvents([old, again]).map(e => e._id)).toEqual(['event:b']);
+  });
+
+  it('never treats events with no batch key and no date as copies of each other', () => {
+    const a = expireEvent({ _id: 'event:a', createdAt: '2026-05-01T00:00:00.000Z', expirationDate: undefined });
+    const b = expireEvent({ _id: 'event:b', createdAt: '2026-05-02T00:00:00.000Z', expirationDate: undefined });
+
+    expect(selectDuplicateExpireEvents([a, b])).toEqual([]);
+  });
+
+  it('returns nothing when every batch was logged once', () => {
+    const a = expireEvent({ _id: 'event:a', sourceMetadata: key('k1') });
+    const b = expireEvent({ _id: 'event:b', sourceMetadata: key('k2') });
+
+    expect(selectDuplicateExpireEvents([a, b])).toEqual([]);
   });
 });

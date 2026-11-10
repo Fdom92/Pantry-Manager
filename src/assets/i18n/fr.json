@@ -499,8 +499,10 @@
       "level": {
         "good": "Bonne",
         "normal": "Juste",
-        "bad": "Faible"
-      }
+        "bad": "Faible",
+        "plenty": "Largement"
+      },
+      "legend": "Faible : moins de {{low}} · Juste : jusqu'à {{tight}} · Bonne : jusqu'à {{good}} · Largement : plus"
     },
     "activity": {
       "title": "Rotation",
@@ -510,12 +512,14 @@
       "rotationHigh": "Rotation élevée",
       "rotationMedium": "Rotation moyenne",
       "rotationLow": "Rotation faible",
-      "windowLabel": "30 derniers jours"
+      "windowLabel": "30 derniers jours",
+      "overHundred": "Vous avez utilisé plus que vous n'avez acheté ce mois-ci : vous puisez dans vos réserves."
     },
     "distribution": {
       "title": "Classification",
       "mostWasted": "Incidence élevée",
-      "leastRotating": "Faible rotation"
+      "leastRotating": "Faible rotation",
+      "unclassified": "Sans type d'aliment : {{count}} (non comptés ici)"
     },
     "pro": {
       "title": "Analyse IA intelligente",
@@ -544,6 +548,26 @@
         "normal": "Normal",
         "bad": "Élevé"
       }
+    },
+    "saved": {
+      "title": "Sauvés à temps",
+      "used": "Utilisés dans leur dernière semaine : {{count}}",
+      "wasted": "Gaspillés ce mois-ci : {{count}}"
+    },
+    "topUsed": {
+      "title": "Ce que vous utilisez le plus",
+      "units": "×{{count}}",
+      "markBasic": "Marquer essentiel",
+      "markedBasic": "{{name}} est maintenant un essentiel"
+    },
+    "stale": {
+      "title": "Oubliés",
+      "detail": "En stock et intacts depuis deux mois : {{count}}. Toujours là ?"
+    },
+    "freezer": {
+      "title": "Congélateur",
+      "detail": "Congelés : {{count}}",
+      "oldest": "Le plus ancien y est depuis {{oldest}}."
     }
   },
   "pantry": {
@@ -558,7 +582,8 @@
         "expiring": "Expirent dans quelques jours",
         "expired": "À vérifier et jeter",
         "review": "Date dépassée, peut encore être bon",
-        "pendientes": "Produits avec informations incomplètes"
+        "pendientes": "Produits avec informations incomplètes",
+        "frozen": "Produits avec quelque chose au congélateur"
       },
       "status": {
         "normal": "Sans alertes",
@@ -566,7 +591,8 @@
         "expiring": "Bientôt périmé",
         "expired": "Périmé",
         "review": "Vérifier",
-        "pendientes": "En attente"
+        "pendientes": "En attente",
+        "frozen": "Congelés"
       },
       "search": "Rechercher des produits"
     },
@@ -601,7 +627,8 @@
       "expiring": "{{ count }} bientôt périmés",
       "expired": "{{ count }} périmés",
       "collapse": "Réduire {{ name }}",
-      "expand": "Développer {{ name }}"
+      "expand": "Développer {{ name }}",
+      "noLocation": "Sans emplacement"
     },
     "batches": {
       "title": "Lots et dates",
@@ -767,22 +794,13 @@
     "fab": {
       "groupLabel": "Actions"
     },
-    "consume": {
-      "groupLabel": "Consommer des produits",
-      "title": "Consommer des produits",
-      "cardTitle": "Marquer consommé",
-      "subtitle": "Cherche des produits à déduire de ton garde-manger.",
-      "placeholder": "Chercher un produit",
-      "noResults": "Aucun résultat",
-      "empty": "Tu n'as encore rien ajouté.",
-      "submit": "Enregistrer"
-    },
     "sections": {
       "fresh": "Frais",
       "pantry": "Garde-manger",
       "groupToggle": {
         "flat": "Grouper par catégorie",
-        "grouped": "Vue liste"
+        "grouped": "Vue liste",
+        "category": "Grouper par emplacement"
       }
     },
     "fresh": {
@@ -898,6 +916,29 @@
       "message": "Il te reste encore {{count}} de {{name}}. Si tu l'as fini, on le déduit et on enregistre la consommation ; en supprimant, tu perds son historique.",
       "consumed": "Je l'ai fini",
       "delete": "Supprimer le produit"
+    },
+    "quickActions": {
+      "open": "Ouvrir 1",
+      "move": "Déplacer 1",
+      "moveTo": "Déplacer vers",
+      "freeze": "Congeler 1",
+      "thaw": "Décongeler 1",
+      "discard": "1 jeté",
+      "toast": {
+        "opened": "1 ouvert",
+        "openedUntil": "1 ouvert · {{when}}",
+        "moved": "1 déplacé vers {{place}}",
+        "frozen": "1 congelé",
+        "thawed": "1 décongelé",
+        "thawedUntil": "1 décongelé · {{when}}",
+        "discarded": "1 jeté : compté comme gaspillage",
+        "failed": "Impossible d'enregistrer. Réessayez.",
+        "undoStale": "Modifié entre-temps : impossible d'annuler."
+      },
+      "badge": {
+        "frozen": "{{count}} congelé(s)",
+        "opened": "Un est ouvert"
+      }
     }
   },
   "upgrade": {

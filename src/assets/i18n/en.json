@@ -499,8 +499,10 @@
       "level": {
         "good": "Good",
         "normal": "Tight",
-        "bad": "Low"
-      }
+        "bad": "Low",
+        "plenty": "Plenty"
+      },
+      "legend": "Low: under {{low}} · Tight: up to {{tight}} · Good: up to {{good}} · Plenty: more"
     },
     "activity": {
       "title": "Rotation",
@@ -510,12 +512,14 @@
       "rotationHigh": "High rotation",
       "rotationMedium": "Medium rotation",
       "rotationLow": "Low rotation",
-      "windowLabel": "Last 30 days"
+      "windowLabel": "Last 30 days",
+      "overHundred": "You used more than you bought this month: you are drawing on what you already had."
     },
     "distribution": {
       "title": "Breakdown",
       "mostWasted": "Higher incidence",
-      "leastRotating": "Low rotation"
+      "leastRotating": "Low rotation",
+      "unclassified": "No food type: {{count}} (not counted here)"
     },
     "pro": {
       "title": "Smart AI analysis",
@@ -544,6 +548,26 @@
         "normal": "Normal",
         "bad": "High"
       }
+    },
+    "saved": {
+      "title": "Saved in time",
+      "used": "Used in their last week: {{count}}",
+      "wasted": "Wasted this month: {{count}}"
+    },
+    "topUsed": {
+      "title": "What you use most",
+      "units": "×{{count}}",
+      "markBasic": "Mark as basic",
+      "markedBasic": "{{name}} is now a basic"
+    },
+    "stale": {
+      "title": "Untouched",
+      "detail": "In stock and untouched for two months: {{count}}. Still there?"
+    },
+    "freezer": {
+      "title": "Freezer",
+      "detail": "Frozen: {{count}}",
+      "oldest": "The oldest has been in for {{oldest}}."
     }
   },
   "pantry": {
@@ -558,7 +582,8 @@
         "expiring": "Expiring in a few days",
         "expired": "Review and discard",
         "review": "Past date, may still be fine",
-        "pendientes": "Products with incomplete information"
+        "pendientes": "Products with incomplete information",
+        "frozen": "Products with something in the freezer"
       },
       "status": {
         "normal": "No alerts",
@@ -566,7 +591,8 @@
         "expiring": "Near expiry",
         "expired": "Expired",
         "review": "Check",
-        "pendientes": "Pending"
+        "pendientes": "Pending",
+        "frozen": "Frozen"
       },
       "search": "Search products"
     },
@@ -601,7 +627,8 @@
       "expiring": "{{ count }} expiring",
       "expired": "{{ count }} expired",
       "collapse": "Collapse {{ name }}",
-      "expand": "Expand {{ name }}"
+      "expand": "Expand {{ name }}",
+      "noLocation": "No location"
     },
     "batches": {
       "title": "Batches & dates",
@@ -767,22 +794,13 @@
     "fab": {
       "groupLabel": "Actions"
     },
-    "consume": {
-      "groupLabel": "Consume products",
-      "title": "Consume products",
-      "cardTitle": "Mark consumed",
-      "subtitle": "Search for products to deduct from your pantry.",
-      "placeholder": "Search product",
-      "noResults": "No results",
-      "empty": "You haven't added anything yet.",
-      "submit": "Register"
-    },
     "sections": {
       "fresh": "Fresh",
       "pantry": "Pantry",
       "groupToggle": {
         "flat": "Group by category",
-        "grouped": "Flat list"
+        "grouped": "Flat list",
+        "category": "Group by location"
       }
     },
     "fresh": {
@@ -898,6 +916,29 @@
       "message": "You still have {{count}} of {{name}}. If you finished it we'll subtract it and record the consumption; deleting loses its history.",
       "consumed": "I finished it",
       "delete": "Delete product"
+    },
+    "quickActions": {
+      "open": "Open 1",
+      "move": "Move 1",
+      "moveTo": "Move to",
+      "freeze": "Freeze 1",
+      "thaw": "Thaw 1",
+      "discard": "Threw 1 away",
+      "toast": {
+        "opened": "Opened 1",
+        "openedUntil": "Opened 1 · {{when}}",
+        "moved": "Moved 1 to {{place}}",
+        "frozen": "Froze 1",
+        "thawed": "Thawed 1",
+        "thawedUntil": "Thawed 1 · {{when}}",
+        "discarded": "Threw 1 away: counted as waste",
+        "failed": "Couldn't save. Try again.",
+        "undoStale": "It has changed since: cannot undo."
+      },
+      "badge": {
+        "frozen": "{{count}} frozen",
+        "opened": "One is open"
+      }
     }
   },
   "upgrade": {

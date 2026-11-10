@@ -274,9 +274,14 @@ describe('classifyCoverageLevel', () => {
     expect(classifyCoverageLevel(7)).toBe('normal');
   });
 
-  it('is good above 7 days', () => {
+  it('is good from 8 to 30 days', () => {
     expect(classifyCoverageLevel(8)).toBe('good');
     expect(classifyCoverageLevel(30)).toBe('good');
+  });
+
+  it('is plenty beyond a month: well stocked is not the same as overstocked', () => {
+    expect(classifyCoverageLevel(31)).toBe('plenty');
+    expect(classifyCoverageLevel(90)).toBe('plenty');
   });
 });
 

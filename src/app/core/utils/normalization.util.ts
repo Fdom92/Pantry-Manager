@@ -33,7 +33,8 @@ export function normalizeWhitespaceLowercase(value: string | null | undefined): 
 }
 
 export function stripDiacritics(value: string): string {
-  return value.normalize('NFD').replace(/[̀-ͯ]/g, '');
+  // ß has no decomposition: map it so "Weißbrot" and "weissbrot" are the same word.
+  return value.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ß/g, 'ss');
 }
 
 export function normalizeSearchQuery(value: string | null | undefined): string {

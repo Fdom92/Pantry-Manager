@@ -280,43 +280,57 @@ export class PantryBatchOperationsService {
       clearTimeout(existingTimer);
     }
 
-    const timer = setTimeout(async () => {
-      const pending = this.pendingItems.get(itemId);
-      if (pending) {
-        try {
-          const latest = this.pantryStore.items().find(item => item._id === itemId);
-          const nextPayload = latest
-            ? {
-                ...latest,
-                batches: pending.batches,
-                expirationDate: pending.expirationDate ?? latest.expirationDate,
-                updatedAt: pending.updatedAt ?? new Date().toISOString(),
-              }
-            : pending;
-
-          await this.pantryStore.updateItem(nextPayload);
-          const eventMeta = this.pendingEventMeta.get(itemId);
-          const deltaQuantity = eventMeta?.deltaQuantity;
-          if (eventMeta?.adjustmentType === 'add' || eventMeta?.adjustmentType === 'consume') {
-            await this.eventManager.logStockAdjust(latest, nextPayload, {
-                deltaQuantity: deltaQuantity ?? 0,
-                batchId: eventMeta?.batchId,
-                source: eventMeta?.source,
-                expirationDate: eventMeta?.expirationDate,
-                sessionId: eventMeta?.sessionId,
-              });
-          }
-        } catch (err) {
-          this.logger.error('PantryBatchOperationsService', 'updateItem error', err);
-        } finally {
-          this.pendingItems.delete(itemId);
-          this.pendingEventMeta.delete(itemId);
-        }
-      }
-      this.stockSaveTimers.delete(itemId);
-    }, this.stockSaveDelay);
+    const timer = setTimeout(() => void this.runStockSave(itemId), this.stockSaveDelay);
 
     this.stockSaveTimers.set(itemId, timer);
+  }
+
+  /**
+   * Saves this item's pending −/+ now instead of when its timer fires. A quick
+   * action must start from the saved item: otherwise the timer later overwrites
+   * the action's lots with the ones from before it.
+   */
+  async flushPendingStockSave(itemId: string): Promise<void> {
+    const timer = this.stockSaveTimers.get(itemId);
+    if (!timer) return;
+    clearTimeout(timer);
+    await this.runStockSave(itemId);
+  }
+
+  private async runStockSave(itemId: string): Promise<void> {
+    const pending = this.pendingItems.get(itemId);
+    if (pending) {
+      try {
+        const latest = this.pantryStore.items().find(item => item._id === itemId);
+        const nextPayload = latest
+          ? {
+              ...latest,
+              batches: pending.batches,
+              expirationDate: pending.expirationDate ?? latest.expirationDate,
+              updatedAt: pending.updatedAt ?? new Date().toISOString(),
+            }
+          : pending;
+
+        await this.pantryStore.updateItem(nextPayload);
+        const eventMeta = this.pendingEventMeta.get(itemId);
+        const deltaQuantity = eventMeta?.deltaQuantity;
+        if (eventMeta?.adjustmentType === 'add' || eventMeta?.adjustmentType === 'consume') {
+          await this.eventManager.logStockAdjust(latest, nextPayload, {
+              deltaQuantity: deltaQuantity ?? 0,
+              batchId: eventMeta?.batchId,
+              source: eventMeta?.source,
+              expirationDate: eventMeta?.expirationDate,
+              sessionId: eventMeta?.sessionId,
+            });
+        }
+      } catch (err) {
+        this.logger.error('PantryBatchOperationsService', 'updateItem error', err);
+      } finally {
+        this.pendingItems.delete(itemId);
+        this.pendingEventMeta.delete(itemId);
+      }
+    }
+    this.stockSaveTimers.delete(itemId);
   }
 
   private resolveAdjustmentType(

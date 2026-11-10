@@ -24,6 +24,7 @@ import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { InsightStatusPillComponent } from '@shared/components/insight-status-pill/insight-status-pill.component';
 import { DurationPipe } from '@shared/pipes/date-display.pipes';
+import { COVERAGE_LEVEL_DAYS } from '@core/domain/insights/insights-free.domain';
 
 @Component({
   selector: 'app-insights',
@@ -60,10 +61,21 @@ export class InsightsComponent {
   readonly FoodType = FoodType;
 
   readonly barsVisible = signal(false);
-  @ViewChild('barsAnchor') private barsAnchorEl?: ElementRef<HTMLElement>;
+  private barsAnchorEl?: ElementRef<HTMLElement>;
+  // The anchor lives inside the classification card, which renders after the events load.
+  @ViewChild('barsAnchor') set barsAnchor(el: ElementRef<HTMLElement> | undefined) {
+    this.barsAnchorEl = el;
+    if (el && !this.barsVisible()) this.setupBarObserver();
+  }
   private barObserver?: IntersectionObserver;
 
   goToPantry(): void {
+    void this.navCtrl.navigateRoot('/pantry');
+  }
+
+  /** From the "untouched" card: open the pantry already searched for that product. */
+  openInPantry(name: string): void {
+    this.facade.searchPantryFor(name);
     void this.navCtrl.navigateRoot('/pantry');
   }
 
@@ -130,6 +142,7 @@ export class InsightsComponent {
   }
 
   readonly householdSizes = [1, 2, 3, 4] as const;
+  readonly coverageDays = COVERAGE_LEVEL_DAYS;
 
   setHouseholdSize(n: number): void {
     this.facade.setHouseholdSize(n);

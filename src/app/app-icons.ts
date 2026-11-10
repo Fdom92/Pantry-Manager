@@ -99,6 +99,10 @@ import {
   flaskOutline,
   ellipsisHorizontalOutline,
   helpCircleOutline,
+  locationOutline,
+  lockOpenOutline,
+  snowOutline,
+  swapHorizontalOutline,
 } from 'ionicons/icons';
 
 /**
@@ -137,6 +141,10 @@ export const APP_ICONS: Record<string, string> = {
   'add-circle-outline': addCircleOutline,
   'remove-outline': removeOutline,
   'trash-outline': trashOutline,
+  'location-outline': locationOutline,
+  'lock-open-outline': lockOpenOutline,
+  'snow-outline': snowOutline,
+  'swap-horizontal-outline': swapHorizontalOutline,
   'create-outline': createOutline,
   'receipt-outline': receiptOutline,
   'refresh-outline': refreshOutline,

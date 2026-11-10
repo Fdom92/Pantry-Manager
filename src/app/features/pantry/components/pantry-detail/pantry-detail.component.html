@@ -23,6 +23,14 @@
           (keydown.space)="$event.preventDefault(); onBasicToggle($event)">
         </ion-icon>
         <h3 class="item-name">{{ viewModel.item.name }}</h3>
+        @if (frozenUnits > 0) {
+          <ion-icon class="state-icon" name="snow-outline" role="img"
+            [attr.aria-label]="'pantry.quickActions.badge.frozen' | translate: { count: frozenUnits }"></ion-icon>
+        }
+        @if (hasOpened) {
+          <ion-icon class="state-icon" name="lock-open-outline" role="img"
+            [attr.aria-label]="'pantry.quickActions.badge.opened' | translate"></ion-icon>
+        }
       </div>
       @if (viewModel.expiryLabel) {
         <p class="item-subinfo" [attr.data-status]="viewModel.globalStatus.state">{{ viewModel.expiryLabel }}</p>

@@ -1,7 +1,7 @@
 import { ItemBatch } from './item-batch.model';
 import { PantryItem } from './item.model';
 
-export type PantryStatusFilterValue = 'all' | 'expired' | 'review' | 'near-expiry' | 'low-stock' | 'normal' | 'pendientes';
+export type PantryStatusFilterValue = 'all' | 'expired' | 'review' | 'near-expiry' | 'low-stock' | 'normal' | 'pendientes' | 'frozen';
 export type ExpiryClassification = 'expired' | 'near-expiry' | 'normal' | 'unknown';
 export type FilterChipKind = 'status';
 
@@ -27,6 +27,7 @@ export interface PantrySummaryMeta {
     lowStock: number;
     normal: number;
     pendientes: number;
+    frozen: number;
   };
 }
 

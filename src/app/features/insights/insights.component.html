@@ -36,55 +36,27 @@
         (action)="goToPantry()" />
     } @else {
 
-      <!-- SECTION 1: Waste tracker — count is free for everyone, breakdown is PRO-gated inside the card -->
+      <!-- Cards wait for the history together, so none jumps in ahead of the rest.
+           Order: how am I doing (waste, saved) · do I use what I buy (rotation, most used)
+           · what I have now (coverage, untouched, freezer, classification). -->
       @if (facade.isLoadingEvents()) {
-        <ng-container [ngTemplateOutlet]="cardSkeleton"></ng-container>
+        @for (i of [0,1,2,3]; track i) {
+          <ng-container [ngTemplateOutlet]="cardSkeleton"></ng-container>
+        }
       } @else {
         <section class="insights-section">
           <app-waste-tracker-card [summary]="facade.wasteSummary()" [isPro]="facade.isPro()" />
         </section>
-      }
 
-      <!-- SECTION 2: Cobertura -->
-      @if (facade.foodCoverage(); as coverage) {
-        <section class="insights-section">
-          <h3 class="insights-section__title">{{ 'insights.coverage.title' | translate }}</h3>
-          <div class="coverage-card">
-            <ion-icon name="calendar-outline"></ion-icon>
-            <div class="coverage-card__info">
-              <div class="coverage-card__headline">
-                <span class="coverage-card__value">
-                  {{ 'dashboard.foodCoverage.value' | translate:{ duration: (coverage.days | appDuration) } }}
-                </span>
-                @if (facade.coverageLevel(); as level) {
-                  <app-insight-status-pill [level]="level" [labelKey]="'insights.coverage.level.' + level" />
-                }
-              </div>
-              <span class="coverage-card__hint">
-                {{ 'insights.coverage.sentence' | translate:{ duration: (coverage.days | appDuration) } }}
-              </span>
-            </div>
-          </div>
-          <div class="household-selector">
-            <span class="household-selector__label">{{ 'insights.coverage.household' | translate }}</span>
-            <ion-segment
-              class="household-segment"
-              [value]="facade.householdSize().toString()"
-              (ionChange)="setHouseholdSize(+$event.detail.value!)">
-              @for (n of householdSizes; track n) {
-                <ion-segment-button [value]="n.toString()">
-                  <ion-label>{{ n === 4 ? '4+' : n }}</ion-label>
-                </ion-segment-button>
-              }
-            </ion-segment>
-          </div>
-        </section>
-      }
+          <!-- Saved in time: the positive half of waste -->
+          @if (facade.savedInTime().saved > 0) {
+            <section class="insights-section">
+              <h3 class="insights-section__title">{{ 'insights.saved.title' | translate }}</h3>
+              <p class="activity-detail">{{ 'insights.saved.used' | translate: { count: facade.savedInTime().saved } }}</p>
+              <p class="activity-detail">{{ 'insights.saved.wasted' | translate: { count: facade.savedInTime().wasted } }}</p>
+            </section>
+          }
 
-      <!-- SECTION 3: Rotación — how much of what you add you actually consume -->
-      @if (facade.isLoadingEvents()) {
-        <ng-container [ngTemplateOutlet]="cardSkeleton"></ng-container>
-      } @else {
         <section class="insights-section">
           <h3 class="insights-section__title">{{ 'insights.activity.title' | translate }}</h3>
           @let rotationRatio = facade.activityMetrics().rotationRatio;
@@ -105,50 +77,146 @@
                 {{ 'insights.activity.detailNoAdds' | translate: { consumed: facade.activityMetrics().consumed } }}
               }
             </p>
+            @if ((facade.activityMetrics().rotationPercent ?? 0) > 1) {
+              <p class="activity-detail">{{ 'insights.activity.overHundred' | translate }}</p>
+            }
           }
         </section>
-      }
 
-      <!-- Sentinel: IntersectionObserver triggers bar animations when this enters viewport -->
-      <div #barsAnchor></div>
+          <!-- Most used: offer to make them basics -->
+          @if (facade.topUsed().length > 0) {
+            <section class="insights-section">
+              <h3 class="insights-section__title">{{ 'insights.topUsed.title' | translate }}</h3>
+              <ul class="habit-list">
+                @for (p of facade.topUsed(); track p.productId) {
+                  <li class="habit-list__row">
+                    <span class="habit-list__name">{{ p.name }}</span>
+                    <span class="habit-list__meta">{{ 'insights.topUsed.units' | translate: { count: p.units } }}</span>
+                    @if (p.suggestBasic) {
+                      <ion-button fill="clear" size="small" (click)="facade.markAsBasic(p.productId)">
+                        {{ 'insights.topUsed.markBasic' | translate }}
+                      </ion-button>
+                    }
+                  </li>
+                }
+              </ul>
+            </section>
+          }
 
-      <!-- SECTION 4: Clasificación -->
-      @if (facade.isLoadingEvents()) {
-        <ng-container [ngTemplateOutlet]="cardSkeleton"></ng-container>
-      } @else if (facade.distribution().foodTypes.length > 0) {
-        <section class="insights-section">
-          <h3 class="insights-section__title">{{ 'insights.distribution.title' | translate }}</h3>
-          <div class="food-type-bars">
-            @for (ft of facade.distribution().foodTypes; track ft.foodType) {
-              <div class="food-type-bar">
-                <span class="food-type-bar__label">{{ getFoodTypeLabel(ft.foodType) | translate }}</span>
-                <div class="food-type-bar__track">
-                  <div
-                    class="food-type-bar__fill"
-                    [style.width]="barsVisible() ? getBarWidth(ft.count, getMaxFoodTypeCount()) : '0%'">
-                  </div>
+        @if (facade.foodCoverage(); as coverage) {
+          <section class="insights-section">
+            <h3 class="insights-section__title">{{ 'insights.coverage.title' | translate }}</h3>
+            <div class="coverage-card">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <div class="coverage-card__info">
+                <div class="coverage-card__headline">
+                  <span class="coverage-card__value">
+                    {{ 'dashboard.foodCoverage.value' | translate:{ duration: (coverage.days | appDuration) } }}
+                  </span>
+                  @if (facade.coverageLevel(); as level) {
+                    <!-- "Plenty" is a heads-up, not a problem: amber, never red -->
+                    <app-insight-status-pill [level]="level === 'plenty' ? 'normal' : level" [labelKey]="'insights.coverage.level.' + level" />
+                  }
                 </div>
-                <span class="food-type-bar__count">{{ ft.count }}</span>
+                <span class="coverage-card__hint">
+                  {{ 'insights.coverage.sentence' | translate:{ duration: (coverage.days | appDuration) } }}
+                </span>
+                <span class="coverage-card__hint">
+                  {{ 'insights.coverage.legend' | translate:{ low: (coverageDays.bad | appDuration), tight: (coverageDays.normal | appDuration), good: (coverageDays.good | appDuration) } }}
+                </span>
               </div>
-            }
-          </div>
-          <div class="distribution-badges">
-            @if (facade.distribution().mostWastedFoodType) {
-              <p class="distribution-badge">
-                <ion-icon name="analytics-outline"></ion-icon>
-                {{ 'insights.distribution.mostWasted' | translate }}:
-                {{ getFoodTypeLabel(facade.distribution().mostWastedFoodType!) | translate }}
+            </div>
+            <div class="household-selector">
+              <span class="household-selector__label">{{ 'insights.coverage.household' | translate }}</span>
+              <ion-segment
+                class="household-segment"
+                [value]="facade.householdSize().toString()"
+                (ionChange)="setHouseholdSize(+$event.detail.value!)">
+                @for (n of householdSizes; track n) {
+                  <ion-segment-button [value]="n.toString()">
+                    <ion-label>{{ n === 4 ? '4+' : n }}</ion-label>
+                  </ion-segment-button>
+                }
+              </ion-segment>
+            </div>
+          </section>
+        }
+
+          <!-- Stale: stock nobody touched in two months -->
+          @if (facade.staleProducts().length > 0) {
+            <section class="insights-section">
+              <h3 class="insights-section__title">{{ 'insights.stale.title' | translate }}</h3>
+              <p class="activity-detail">{{ 'insights.stale.detail' | translate: { count: facade.staleProducts().length } }}</p>
+              <ul class="habit-list">
+                @for (s of facade.staleProducts().slice(0, 5); track s.item._id) {
+                  <li>
+                    <button type="button" class="habit-list__row habit-list__row--button" (click)="openInPantry(s.item.name)">
+                      <span class="habit-list__name">{{ s.item.name }}</span>
+                      <span class="habit-list__meta">{{ s.idleDays | appDuration }}</span>
+                      <ion-icon name="chevron-forward-outline" aria-hidden="true"></ion-icon>
+                    </button>
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+
+          <!-- Freezer -->
+          @if (facade.freezer().products > 0) {
+            <section class="insights-section">
+              <h3 class="insights-section__title">{{ 'insights.freezer.title' | translate }}</h3>
+              <p class="activity-detail">
+                {{ 'insights.freezer.detail' | translate: { count: facade.freezer().products } }}
+                @if (facade.freezer().oldestDays > 0) {
+                  {{ 'insights.freezer.oldest' | translate: { oldest: (facade.freezer().oldestDays | appDuration) } }}
+                }
               </p>
-            }
-            @if (facade.distribution().leastRotatingFoodType) {
-              <p class="distribution-badge">
-                <ion-icon name="time-outline"></ion-icon>
-                {{ 'insights.distribution.leastRotating' | translate }}:
-                {{ getFoodTypeLabel(facade.distribution().leastRotatingFoodType!) | translate }}
-              </p>
-            }
-          </div>
-        </section>
+            </section>
+          }
+
+        @if (facade.distribution().foodTypes.length > 0) {
+          <section class="insights-section">
+            <!-- Sentinel inside the card: a bare div between cards took its own gap in the stack -->
+            <div #barsAnchor></div>
+            <h3 class="insights-section__title">{{ 'insights.distribution.title' | translate }}</h3>
+            <div class="food-type-bars">
+              @for (ft of facade.distribution().foodTypes; track ft.foodType) {
+                <div class="food-type-bar">
+                  <span class="food-type-bar__label">{{ getFoodTypeLabel(ft.foodType) | translate }}</span>
+                  <div class="food-type-bar__track">
+                    <div
+                      class="food-type-bar__fill"
+                      [style.width]="barsVisible() ? getBarWidth(ft.count, getMaxFoodTypeCount()) : '0%'">
+                    </div>
+                  </div>
+                  <span class="food-type-bar__count">{{ ft.count }}</span>
+                </div>
+              }
+            </div>
+            <div class="distribution-badges">
+              @if (facade.unclassifiedCount() > 0) {
+                <p class="distribution-badge">
+                  <ion-icon name="help-circle-outline"></ion-icon>
+                  {{ 'insights.distribution.unclassified' | translate: { count: facade.unclassifiedCount() } }}
+                </p>
+              }
+              @if (facade.distribution().mostWastedFoodType) {
+                <p class="distribution-badge">
+                  <ion-icon name="analytics-outline"></ion-icon>
+                  {{ 'insights.distribution.mostWasted' | translate }}:
+                  {{ getFoodTypeLabel(facade.distribution().mostWastedFoodType!) | translate }}
+                </p>
+              }
+              @if (facade.distribution().leastRotatingFoodType) {
+                <p class="distribution-badge">
+                  <ion-icon name="time-outline"></ion-icon>
+                  {{ 'insights.distribution.leastRotating' | translate }}:
+                  {{ getFoodTypeLabel(facade.distribution().leastRotatingFoodType!) | translate }}
+                </p>
+              }
+            </div>
+          </section>
+        }
       }
 
       <!-- SECTION 5: PRO analysis / teaser -->

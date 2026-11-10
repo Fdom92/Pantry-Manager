@@ -79,6 +79,10 @@ CI (`.github/workflows/ci.yml`) runs lint, check-icons, tests and the production
 - Data read only in `ionViewWillEnter` goes stale: the hook doesn't fire on a tab page when
   coming back from `/settings`, nor in the browser dev server. Derive from signals instead.
 - Before deleting a method, grep its bare name in `.html` templates, not only in `.ts`.
+- PouchDB `find()` without `limit` silently returns 25 docs. Page with `skip`/`limit` (as
+  `StorageService.all` and `findByField` do), or use `allByIdPrefix`.
+- Pantry rows grouped by location carry only that place's lots: resolve the stored item
+  (`resolveItem`) before any action that saves it, or the other places' lots are lost.
 - New icons: register them in `src/app/app-icons.ts`. `check-icons` only sees templates, not
   icons passed from TypeScript (action sheets).
 - The browser can't open the camera/gallery sheet or run OCR: receipt scanning is APK-only.

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Resources looked up by name at runtime, which resource shrinking cannot see:
+     the notification small icon is named in capacitor.config.ts. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_icon_notification" />

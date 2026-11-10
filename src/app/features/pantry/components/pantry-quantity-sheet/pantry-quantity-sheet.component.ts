@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { frozenQuantity } from '@core/domain/pantry';
+import { IonButton, IonChip, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
 import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 
@@ -10,9 +11,10 @@ import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-p
   standalone: true,
   imports: [
     CommonModule,
-    IonContent,
     IonButton,
     IonIcon,
+    IonChip,
+    IonLabel,
     ExpiryPickerComponent,
     TranslateModule,
   ],
@@ -36,6 +38,31 @@ export class PantryQuantitySheetComponent {
   @Output() editRequested = new EventEmitter<Event | undefined>();
   @Output() deleteRequested = new EventEmitter<Event | undefined>();
   @Output() closeRequested = new EventEmitter<void>();
+  @Input() locations: string[] = [];
+  @Output() openOne = new EventEmitter<void>();
+  @Output() moveOne = new EventEmitter<string>();
+  @Output() freezeOne = new EventEmitter<void>();
+  @Output() thawOne = new EventEmitter<void>();
+  @Output() discardOne = new EventEmitter<void>();
+
+  showMoveTargets = false;
+
+  /** One-tap actions work on pantry lots; a fresh product keeps a single level-based lot. */
+  get showQuickActions(): boolean {
+    return this.item.productType !== 'fresh' && this.totalQuantity > 0;
+  }
+
+  get canOpen(): boolean {
+    return (this.item.batches ?? []).some(b => (b.quantity ?? 0) > 0 && !b.opened && !b.frozenAt);
+  }
+
+  get canFreeze(): boolean {
+    return frozenQuantity(this.item) < this.totalQuantity;
+  }
+
+  get hasFrozen(): boolean {
+    return frozenQuantity(this.item) > 0;
+  }
 
   get displayQuantity(): number {
     return this.totalQuantity + this.pendingChange;

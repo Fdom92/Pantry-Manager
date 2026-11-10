@@ -1,4 +1,4 @@
-<ion-content class="quantity-sheet-content">
+<div class="quantity-sheet-content">
   <div class="sheet-header">
     <h2 class="sheet-title">{{ item.name }}</h2>
     <ion-button
@@ -68,6 +68,46 @@
     }
   </div>
 
+  @if (showQuickActions) {
+    <div class="quick-actions">
+      @if (canOpen) {
+        <ion-button fill="outline" size="small" (click)="openOne.emit()">
+          <ion-icon slot="start" name="lock-open-outline"></ion-icon>
+          {{ 'pantry.quickActions.open' | translate }}
+        </ion-button>
+      }
+      @if (locations.length) {
+        <ion-button fill="outline" size="small" (click)="showMoveTargets = !showMoveTargets">
+          <ion-icon slot="start" name="swap-horizontal-outline"></ion-icon>
+          {{ 'pantry.quickActions.move' | translate }}
+        </ion-button>
+      }
+      @if (canFreeze) {
+        <ion-button fill="outline" size="small" (click)="freezeOne.emit()">
+          <ion-icon slot="start" name="snow-outline"></ion-icon>
+          {{ 'pantry.quickActions.freeze' | translate }}
+        </ion-button>
+      }
+      @if (hasFrozen) {
+        <ion-button fill="outline" size="small" (click)="thawOne.emit()">
+          <ion-icon slot="start" name="sunny-outline"></ion-icon>
+          {{ 'pantry.quickActions.thaw' | translate }}
+        </ion-button>
+      }
+      <ion-button fill="outline" size="small" color="danger" (click)="discardOne.emit()">
+        <ion-icon slot="start" name="trash-outline"></ion-icon>
+        {{ 'pantry.quickActions.discard' | translate }}
+      </ion-button>
+    </div>
+    @if (showMoveTargets) {
+      <div class="move-targets" role="group" [attr.aria-label]="'pantry.quickActions.moveTo' | translate">
+        @for (place of locations; track place) {
+          <ion-chip (click)="moveOne.emit(place)"><ion-label>{{ place }}</ion-label></ion-chip>
+        }
+      </div>
+    }
+  }
+
   <div class="actions-section">
     <ion-button
       expand="block"
@@ -94,4 +134,4 @@
       {{ 'pantry.detail.actions.deleteItem' | translate }}
     </ion-button>
   </div>
-</ion-content>
+</div>

@@ -12,6 +12,7 @@ export type EventSource =
   | 'pantry_card'
   | 'dashboard'
   | 'pendientes_bulk_fix'
+  | 'discard'
   | 'system';
 
 export interface PantryEvent extends BaseDoc {

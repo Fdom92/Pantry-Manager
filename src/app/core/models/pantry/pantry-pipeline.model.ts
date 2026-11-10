@@ -6,6 +6,7 @@ export interface PantryFilterState {
   normalOnly: boolean;
   review: boolean;
   pendientes: boolean;
+  frozen: boolean;
 }
 
 export const DEFAULT_PANTRY_FILTERS: PantryFilterState = {
@@ -16,4 +17,5 @@ export const DEFAULT_PANTRY_FILTERS: PantryFilterState = {
   normalOnly: false,
   review: false,
   pendientes: false,
+  frozen: false,
 };

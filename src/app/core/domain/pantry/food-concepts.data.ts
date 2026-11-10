@@ -144,8 +144,17 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
     key: 'chicken',
     foodType: FoodType.PROTEIN,
     terms: {
-      es: ['pollo'], en: ['chicken'], de: ['hahnchen', 'huhn'],
+      es: ['pollo', 'alitas', 'contramuslos'], en: ['chicken', 'chicken wings'], de: ['hahnchen', 'huhn'],
       fr: ['poulet'], it: ['pollo'], pt: ['frango'],
+    },
+  },
+  {
+    // Breaded ready-meals: what they are made of matters less than how they keep.
+    key: 'croquettes',
+    foodType: FoodType.PROTEIN,
+    terms: {
+      es: ['croquetas', 'cachopo', 'nuggets'], en: ['croquettes', 'nuggets'], de: ['kroketten'],
+      fr: ['croquettes'], it: ['crocchette'], pt: ['croquetes'],
     },
   },
   {
@@ -168,7 +177,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
     key: 'fish',
     foodType: FoodType.PROTEIN,
     terms: {
-      es: ['pescado', 'merluza', 'salmon'], en: ['fish', 'salmon', 'cod'],
+      es: ['pescado', 'merluza', 'salmon', 'tilapia', 'bacalao', 'lubina', 'dorada'], en: ['fish', 'salmon', 'cod', 'hake', 'tilapia'],
       de: ['fisch', 'lachs'], fr: ['poisson', 'saumon'],
       it: ['pesce', 'salmone'], pt: ['peixe', 'salmao'],
     },
@@ -392,7 +401,7 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
     foodType: FoodType.VEGETABLE,
     terms: {
       es: ['calabacin'], en: ['zucchini', 'courgette'], de: ['zucchini'],
-      fr: ['courgette'], it: ['zucchina', 'zucchine'], pt: ['courgette'],
+      fr: ['courgette'], it: ['zucchina', 'zucchine'], pt: ['curgete', 'abobrinha', 'courgette'],
     },
   },
   {
@@ -401,6 +410,14 @@ export const FOOD_CONCEPTS: readonly FoodConcept[] = [
     terms: {
       es: ['espinacas'], en: ['spinach'], de: ['spinat'],
       fr: ['epinards'], it: ['spinaci'], pt: ['espinafres'],
+    },
+  },
+  {
+    key: 'peas',
+    foodType: FoodType.VEGETABLE,
+    terms: {
+      es: ['guisantes'], en: ['peas'], de: ['erbsen'],
+      fr: ['petits pois'], it: ['piselli'], pt: ['ervilhas'],
     },
   },
   {
