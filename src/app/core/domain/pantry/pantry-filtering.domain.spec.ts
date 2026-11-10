@@ -1,5 +1,6 @@
 import { FoodType } from '@core/models/shared/enums.model';
-import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete, isStatusChipVisible, matchesFilters, sortPantryItems, statusFilterCount } from './pantry-filtering.domain';
+import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete, isStatusChipVisible, matchesFilters, matchesSearchQuery, sortPantryItems, statusFilterCount } from './pantry-filtering.domain';
+import { normalizeSearchQuery } from '@core/utils/normalization.util';
 import type { PantryFilterState, PantryItem } from '@core/models/pantry';
 
 function daysFromNow(days: number): string {
@@ -30,6 +31,7 @@ const noFilters: PantryFilterState = {
   normalOnly: false,
   review: false,
   pendientes: false,
+  frozen: false,
 };
 
 describe('matchesFilters — review filter', () => {
@@ -157,7 +159,7 @@ describe('countMissingExpiryBatches', () => {
 describe('statusFilterCount', () => {
   const summary = {
     total: 10,
-    statusCounts: { expired: 1, expiring: 2, review: 3, lowStock: 4, normal: 5, pendientes: 6 },
+    statusCounts: { expired: 1, expiring: 2, review: 3, lowStock: 4, normal: 5, pendientes: 6, frozen: 7 },
   };
 
   it('maps every filter value to its own count', () => {
@@ -168,6 +170,7 @@ describe('statusFilterCount', () => {
     expect(statusFilterCount(summary, 'low-stock')).toBe(4);
     expect(statusFilterCount(summary, 'normal')).toBe(5);
     expect(statusFilterCount(summary, 'pendientes')).toBe(6);
+    expect(statusFilterCount(summary, 'frozen')).toBe(7);
   });
 });
 
@@ -200,5 +203,54 @@ describe('sortPantryItems', () => {
     const input = [a('b'), a('a')];
     sortPantryItems(input);
     expect(input.map(i => i.name)).toEqual(['b', 'a']);
+  });
+});
+
+describe('matchesSearchQuery', () => {
+  const finds = (query: string, name: string, categoryId = '') =>
+    matchesSearchQuery(makeItem({ name, categoryId }), normalizeSearchQuery(query));
+
+  it('matches the start of any word of the name', () => {
+    expect(finds('macarrones', 'Macarrones concha')).toBeTrue();
+    expect(finds('concha', 'Macarrones concha')).toBeTrue();
+  });
+
+  it('does not match inside a word: "agua" is not "paraguaya"', () => {
+    expect(finds('agua', 'Agua mineral')).toBeTrue();
+    expect(finds('agua', 'Paraguaya')).toBeFalse();
+    // "aguacate" does start with "agua": a word-start search cannot tell them apart while typing.
+    expect(finds('agua', 'Aguacate')).toBeTrue();
+  });
+
+  it('finds a product by its category', () => {
+    expect(finds('lacteos', 'Yogur natural', 'Lácteos')).toBeTrue();
+    expect(finds('salsa', 'Ketchup', 'Condimentos')).toBeFalse();
+  });
+
+  it('needs every typed word to start some word', () => {
+    expect(finds('lentejas pard', 'Lentejas pardinas')).toBeTrue();
+    expect(finds('lentejas rioj', 'Lentejas pardinas')).toBeFalse();
+  });
+
+  it('splits the query like the name, so punctuation and ß still match', () => {
+    expect(finds('coca-cola', 'Coca-Cola Zero')).toBeTrue();
+    expect(finds('agua 1,5', 'Agua mineral 1,5 L')).toBeTrue();
+    expect(finds('weissbrot', 'Weißbrot')).toBeTrue();
+    expect(finds('weiß', 'Weißbrot')).toBeTrue();
+  });
+
+  it('ignores accents and case, and matches everything for an empty query', () => {
+    expect(finds('BROCOLI', 'Brócoli congelado')).toBeTrue();
+    expect(finds('', 'Lo que sea')).toBeTrue();
+  });
+});
+
+describe('matchesFilters — frozen', () => {
+  it('keeps only products with something in the freezer', () => {
+    const frozen = makeItem({ batches: [{ batchId: 'a', quantity: 1, frozenAt: '2026-11-01' }] });
+    const shelf = makeItem({ batches: [{ batchId: 'b', quantity: 1, noExpiry: true }] });
+    const only = { ...noFilters, frozen: true };
+    expect(matchesFilters(frozen, only, new Date())).toBeTrue();
+    expect(matchesFilters(shelf, only, new Date())).toBeFalse();
   });
 });

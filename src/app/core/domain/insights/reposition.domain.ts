@@ -1,6 +1,7 @@
 import type { PantryItem } from '@core/models/pantry/item.model';
 import type { PantryEvent } from '@core/models/events';
 import { sumQuantities } from '@core/domain/pantry/pantry-batch.domain';
+import { shouldAutoAddToShoppingList } from '@core/domain/pantry/pantry-status.domain';
 
 export interface RepositionPrediction {
   productId: string;
@@ -42,6 +43,8 @@ export function computeRepositionPredictions(
   const out: RepositionPrediction[] = [];
   for (const itm of items) {
     if (itm.productType === 'fresh') continue;
+    // The shopping list already suggests it: "Añadir" here would add nothing.
+    if (shouldAutoAddToShoppingList(itm)) continue;
     const agg = consumeAgg.get(itm._id);
     if (!agg) continue;
     if (agg.count < MIN_CONSUME_EVENTS) continue;

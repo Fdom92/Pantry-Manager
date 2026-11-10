@@ -1,4 +1,4 @@
-import type { PantryItem, BatchIdGenerator, ItemBatch } from '@core/models/pantry';
+import type { BatchIdGenerator, ItemBatch } from '@core/models/pantry';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeOptionalTrim, normalizeTrim } from '@core/utils/normalization.util';
 
@@ -34,15 +34,6 @@ export function sumQuantities(
 }
 
 /**
- * True when at least one product has stock left to consume — fresh ones
- * included, because the consume modal lists those too. Mirrors the modal's
- * own filter so the "−" button never promises a list the modal then can't show.
- */
-export function hasConsumableStock(items: readonly PantryItem[]): boolean {
-  return items.some(item => sumQuantities(item.batches) > 0);
-}
-
-/**
  * Merge batches that share the same expiration date and location, plus batches
  * explicitly marked as never expiring.
  *
@@ -64,7 +55,8 @@ export function mergeBatchesByExpiry(batches: ItemBatch[]): ItemBatch[] {
 
   for (const batch of batches) {
     const expiryKey = normalizeTrim(batch.expirationDate);
-    const locationKey = normalizeTrim(batch.locationId);
+    // Opened and frozen lots only merge with lots in the same state.
+    const locationKey = `${normalizeTrim(batch.locationId)}::${batch.opened ? 'open' : ''}::${batch.frozenAt ? `frozen-${batch.frozenDaysLeft ?? ''}` : ''}`;
     const key = expiryKey
       ? `${locationKey}::${expiryKey}`
       : batch.noExpiry

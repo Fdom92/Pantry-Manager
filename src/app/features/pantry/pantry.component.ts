@@ -24,7 +24,6 @@ import { PantryBatchesModalComponent } from './components/batches-modal/batches-
 import { PantryEditItemModalComponent } from './components/edit-item-modal/edit-item-modal.component';
 import { PantryQuantitySheetComponent } from './components/pantry-quantity-sheet/pantry-quantity-sheet.component';
 import { PantryAddModalComponent } from './components/add-modal/add-modal.component';
-import { PantryConsumeModalComponent } from './components/consume-modal/consume-modal.component';
 import { PantryDetailComponent } from './components/pantry-detail/pantry-detail.component';
 import { PantryStateService } from '@core/services/pantry/pantry-state.service';
 import { PANTRY_PAGE_PROVIDERS } from '@core/services/pantry/pantry-page.providers';
@@ -62,7 +61,6 @@ import { CoachMarkStateService } from '@core/services/retention/coach-mark-state
     TranslateModule,
     EmptyStateComponent,
     PantryAddModalComponent,
-    PantryConsumeModalComponent,
     PantryBatchesModalComponent,
     PantryEditItemModalComponent,
     PantryQuantitySheetComponent,

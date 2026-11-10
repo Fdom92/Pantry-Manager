@@ -1,4 +1,4 @@
-import { isStatusChipVisible } from '@core/domain/pantry';
+import { isStatusChipVisible, frozenQuantity, groupByLocation } from '@core/domain/pantry';
 import { Injectable, inject } from '@angular/core';
 import { NEAR_EXPIRY_WINDOW_DAYS, UNASSIGNED_LOCATION_KEY } from '@core/constants';
 import { classifyExpiry, getItemStatusState, isIncomplete, normalizeBatches } from '@core/domain/pantry';
@@ -40,6 +40,7 @@ export class PantryViewModelService {
       lowStock: 0,
       normal: 0,
       pendientes: 0,
+      frozen: 0,
     };
     for (const item of items) {
       const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
@@ -62,6 +63,9 @@ export class PantryViewModelService {
       }
       if (isIncomplete(item)) {
         statusCounts.pendientes += 1;
+      }
+      if (frozenQuantity(item) > 0) {
+        statusCounts.frozen += 1;
       }
     }
 
@@ -155,6 +159,17 @@ export class PantryViewModelService {
         colorClass: 'chip--pendientes',
         active: activeStatus === 'pendientes',
       },
+      {
+        key: 'status-frozen',
+        kind: 'status',
+        value: 'frozen',
+        label: 'pantry.filters.status.frozen',
+        count: counts.frozen,
+        icon: 'snow-outline',
+        description: 'pantry.filters.desc.frozen',
+        colorClass: 'chip--frozen',
+        active: activeStatus === 'frozen',
+      },
     ];
 
 
@@ -197,6 +212,28 @@ export class PantryViewModelService {
 
     const groups = Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
     return groups;
+  }
+
+  /** Groups by place; each row carries only that place's lots, so resolve the full item before acting on it. */
+  buildLocationGroups(items: PantryItem[], locationOrder: string[]): PantryGroup[] {
+    const now = new Date();
+    return groupByLocation(items, locationOrder).map(({ location, items: groupItems }) => {
+      const group: PantryGroup = {
+        key: `loc:${location}`,
+        name: location || this.translate.instant('pantry.group.noLocation'),
+        items: groupItems,
+        lowStockCount: 0,
+        expiringCount: 0,
+        expiredCount: 0,
+      };
+      for (const item of groupItems) {
+        const state = getItemStatusState(item, now, NEAR_EXPIRY_WINDOW_DAYS);
+        if (state === 'low-stock') group.lowStockCount += 1;
+        else if (state === 'expired') group.expiredCount += 1;
+        else if (state === 'near-expiry') group.expiringCount += 1;
+      }
+      return group;
+    });
   }
 
   computeBatchSummaries(items: PantryItem[]): Map<string, BatchSummaryMeta> {

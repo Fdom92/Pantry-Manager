@@ -138,6 +138,15 @@ describe('buildPersonProfile', () => {
     expect(buildPersonProfile({ ...base, items: [], installSource: 'sideload' }).install_source).toBe('sideload');
   });
 
+  it('marks sideloaded installs as internal, and never unmarks', () => {
+    expect(buildPersonProfile({ ...base, items: [], installSource: 'sideload' }).is_internal).toBeTrue();
+    // Other installers include phone-migration tools used by real users.
+    expect('is_internal' in buildPersonProfile({ ...base, items: [], installSource: 'other' })).toBeFalse();
+    // Absent rather than false: a Play install marked by hand must stay internal.
+    expect('is_internal' in buildPersonProfile({ ...base, items: [] })).toBeFalse();
+    expect('is_internal' in buildPersonProfile({ ...base, items: [], installSource: 'unknown' })).toBeFalse();
+  });
+
   it('emits no free text — every value is a count, a bucket or a boolean', () => {
     const profile = buildPersonProfile({ ...base, items: [item({ name: 'Leche Hacendado' })] });
     const values = Object.values(profile) as unknown[];

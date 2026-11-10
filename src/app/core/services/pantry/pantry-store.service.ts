@@ -117,13 +117,15 @@ export class PantryStoreService {
     }
   }
 
-  /** Replace an existing item in the signal cache with its latest version. */
-  async updateItem(item: PantryItem): Promise<void> {
+  /** Replace an existing item in the signal cache with its latest version. False when the save failed. */
+  async updateItem(item: PantryItem): Promise<boolean> {
     try {
       await this.pantryQuery.saveItem(item);
+      return true;
     } catch (err: unknown) {
       this.logger.error('PantryStoreService', 'updateItem error', err);
       this.error.set('Failed to update item');
+      return false;
     }
   }
 

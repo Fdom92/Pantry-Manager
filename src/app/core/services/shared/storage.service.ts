@@ -233,10 +233,20 @@ export class StorageService<T extends BaseDoc> {
   async findByField<K extends keyof T>(field: K, value: T[K]): Promise<T[]> {
     return this.withRetry(async () => {
       await this.ensureIndex([field as string]);
-      const result = await this.db.find({
-        selector: { [field as string]: value },
-      });
-      return result.docs;
+      // find() without a limit silently stops at 25 docs: page like all() does.
+      const docs: T[] = [];
+      let skip = 0;
+      while (true) {
+        const res = await this.db.find({
+          selector: { [field as string]: value },
+          skip,
+          limit: this.LIST_CHUNK_SIZE,
+        });
+        docs.push(...(res.docs as T[]));
+        if (res.docs.length < this.LIST_CHUNK_SIZE) break;
+        skip += res.docs.length;
+      }
+      return docs;
     }).catch(err => {
       this.logger.error('StorageService', 'findByField error', err);
       return [];

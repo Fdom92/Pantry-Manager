@@ -5,7 +5,7 @@ import esBundle from '../../../../assets/i18n/es.json';
 import frBundle from '../../../../assets/i18n/fr.json';
 import itBundle from '../../../../assets/i18n/it.json';
 import ptBundle from '../../../../assets/i18n/pt.json';
-import { applyFifoConsumption, collectBatches, hasConsumableStock, computeEarliestExpiry, mergeBatchesByExpiry, normalizeBatches, sumQuantities } from './pantry-batch.domain';
+import { applyFifoConsumption, collectBatches, computeEarliestExpiry, mergeBatchesByExpiry, normalizeBatches, sumQuantities } from './pantry-batch.domain';
 
 function batch(overrides: Partial<ItemBatch> = {}): ItemBatch {
   return { batchId: 'b1', quantity: 1, opened: false, ...overrides } as ItemBatch;
@@ -73,6 +73,21 @@ describe('mergeBatchesByExpiry', () => {
     expect(result[0].quantity).toBe(b.quantity);
   });
 
+  it('keeps an opened unit apart from the sealed lot with the same date', () => {
+    // "Abrir 1" splits one unit off; merging it back would mark the whole lot opened.
+    const sealed = batch({ batchId: 'a', expirationDate: '2025-06-01', quantity: 3 });
+    const open = batch({ batchId: 'b', expirationDate: '2025-06-01', quantity: 1, opened: true });
+    const result = mergeBatchesByExpiry([sealed, open]);
+    expect(result.length).toBe(2);
+    expect(result.find(b => b.opened)!.quantity).toBe(1);
+  });
+
+  it('keeps a frozen lot apart from a sealed one', () => {
+    const shelf = batch({ batchId: 'a', noExpiry: true, quantity: 2 });
+    const frozen = batch({ batchId: 'b', noExpiry: true, quantity: 1, frozenAt: '2025-05-01' });
+    expect(mergeBatchesByExpiry([shelf, frozen]).length).toBe(2);
+  });
+
   it('merges batches with same expiry + location', () => {
     const b1 = batch({ batchId: 'a', expirationDate: '2025-06-01', locationId: 'fridge', quantity: 2 });
     const b2 = batch({ batchId: 'b', expirationDate: '2025-06-01', locationId: 'fridge', quantity: 3 });
@@ -94,10 +109,11 @@ describe('mergeBatchesByExpiry', () => {
     expect(result.length).toBe(2);
   });
 
-  it('marks merged batch as opened if either source is opened', () => {
-    const b1 = batch({ expirationDate: '2025-06-01', opened: true });
-    const b2 = batch({ expirationDate: '2025-06-01', opened: false });
+  it('merges two opened batches with the same date', () => {
+    const b1 = batch({ batchId: 'a', expirationDate: '2025-06-01', opened: true });
+    const b2 = batch({ batchId: 'b', expirationDate: '2025-06-01', opened: true });
     const result = mergeBatchesByExpiry([b1, b2]);
+    expect(result.length).toBe(1);
     expect(result[0].opened).toBe(true);
   });
 });
@@ -297,34 +313,3 @@ describe('the two dateless labels', () => {
   });
 });
 
-describe('hasConsumableStock', () => {
-  const product = (quantities: number[], productType: 'pantry' | 'fresh' = 'pantry') =>
-    ({
-      _id: `item:${quantities.join('-')}`,
-      type: 'product',
-      name: 'X',
-      categoryId: 'c',
-      productType,
-      batches: quantities.map((quantity, i) => ({ batchId: `b${i}`, quantity })),
-    }) as never;
-
-  it('is false for an empty pantry', () => {
-    expect(hasConsumableStock([])).toBeFalse();
-  });
-
-  it('is false when every product is at zero', () => {
-    expect(hasConsumableStock([product([0]), product([0, 0])])).toBeFalse();
-  });
-
-  it('is true as soon as one lot of one product has stock', () => {
-    expect(hasConsumableStock([product([0]), product([0, 2])])).toBeTrue();
-  });
-
-  it('counts fresh products, which the consume modal also lists', () => {
-    expect(hasConsumableStock([product([1], 'fresh')])).toBeTrue();
-  });
-
-  it('is false for a product with no lots at all', () => {
-    expect(hasConsumableStock([product([])])).toBeFalse();
-  });
-});

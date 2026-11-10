@@ -41,7 +41,7 @@ export function applyPendienteFix(item: PantryItem, fix: PendienteFix): PantryIt
 
   const batches: ItemBatch[] = shouldUpdateBatches
     ? item.batches.map(batch =>
-        !batch.expirationDate && !batch.noExpiry
+        !batch.expirationDate && !batch.noExpiry && !batch.frozenAt
           ? { ...batch, expirationDate: fix.expirationDate, noExpiry: fix.noExpiry || undefined }
           : batch
       )

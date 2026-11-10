@@ -18,8 +18,19 @@ kept in code on purpose because they are what the user sees.
 
 ## Lots and quantities
 
-- **Lote / batch** — `ItemBatch`: `quantity`, optional `expirationDate`, `opened`, `locationId`, `noExpiry`.
+- **Lote / batch** — `ItemBatch`: `quantity`, optional `expirationDate`, `opened`, `locationId`, `noExpiry`,
+  plus the batch states below.
 - **FIFO** — consumption takes from the earliest-expiring lot first (`pantry-batch.domain.ts`).
+- **Batch states** (`batch-state.domain.ts`, 5.7) — **abierto** (`opened`, `openedAt`,
+  `printedExpirationDate`): opening shortens the date by `openedShelfDays(foodType)` and moves the
+  lot to the fridge. **congelado** (`frozenAt`, `frozenDaysLeft`): the lot has *no* date while
+  frozen, so nothing expires, notifies or counts as waste; thawing gives at most `THAW_MAX_DAYS`.
+  Lots only merge with lots in the same state.
+- **Lote que toca** — `dueBatchIndex`: opened first, then earliest date, dateless last. The
+  quantity sheet's one-tap actions (Abrir 1, Mover 1, Congelar 1, Descongelar 1, Se tiró 1) act on
+  one unit of it. Moving and opening are not consuming.
+- **Nevera / Congelador** — locations are free text; `findFridgeLocation` / `findFreezerLocation`
+  recognise them by name in the six languages.
 - **Total quantity** — `sumQuantities(batches)`. A despensa product at 0 disappears from the
   pantry screen (it still exists, and the list may suggest it).
 - **noExpiry** — the user confirmed the lot doesn't expire, so it isn't "missing a date".
@@ -32,6 +43,10 @@ kept in code on purpose because they are what the user sees.
   Shelf life and expiry mode per type live in `FOOD_TYPE_PROFILE`
   (`core/domain/pantry/food-type-profile.domain.ts`). Food type and a suggested date are inferred
   from the product name when it is added (`food-type-inference.domain.ts`).
+- **Learned shelf life** (`learned-shelf-life.domain.ts`, `ShelfLifeLearningService`, 5.7) — a lot
+  added without a date gets the median days-to-expiry of the product's last five dated `ADD`
+  events (by product id, then by name). The food-type table is only the fallback: do not add
+  per-product exceptions to it. Every add flow passes it to `resolveSuggestedExpiry`.
 - **Catalogs** — categories, locations and supermarkets are string lists in `AppPreferences`
   (`categoryOptions`, `locationOptions`, `supermarketOptions`), not separate documents.
 
@@ -57,6 +72,8 @@ kept in code on purpose because they are what the user sees.
 
 - **PantryEvent** — append-only audit record; `PantryEventType` `ADD | CONSUME | EDIT | EXPIRE | DELETE`.
   Written through `HistoryEventManagerService`; not shown in the UI. The waste tracker counts `EXPIRE`.
+  "Se tiró" is an `EXPIRE` with `source: 'discard'`, no `expirationDate` and its own `batchKey`.
+  The expired-batch sweep deletes `EXPIRE` events that repeat a batch (keeps the oldest).
 - **EventSource** — where the action came from (`add_modal`, `consume_modal`, `quantity_sheet`…).
 
 ## Notifications

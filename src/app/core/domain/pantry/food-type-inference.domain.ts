@@ -1,4 +1,5 @@
 import type { FoodType } from '@core/models/shared/enums.model';
+import { toLocalYmd } from '@core/utils/date.util';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
 import { foodTypeExpires, suggestExpiryDate } from './expiry-suggestion.domain';
 import { FOOD_CONCEPTS } from './food-concepts.data';
@@ -108,10 +109,17 @@ export function resolveSuggestedExpiry(
   name: string,
   foodType: FoodType | null | undefined,
   fromDate: Date,
+  learnedDays?: number,
 ): SuggestedExpiry {
   const type = foodType ?? inferFoodType(name);
+  if (type && !foodTypeExpires(type)) return { noExpiry: true };
+  // This household's own history for the product beats any table.
+  if (learnedDays && learnedDays > 0) {
+    const date = new Date(fromDate);
+    date.setDate(date.getDate() + learnedDays);
+    return { expirationDate: toLocalYmd(date) };
+  }
   if (!type) return {};
-  if (!foodTypeExpires(type)) return { noExpiry: true };
   return { expirationDate: suggestExpiryDate(type, fromDate) };
 }
 

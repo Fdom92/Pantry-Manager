@@ -499,8 +499,10 @@
       "level": {
         "good": "Gut",
         "normal": "Knapp",
-        "bad": "Niedrig"
-      }
+        "bad": "Niedrig",
+        "plenty": "Reichlich"
+      },
+      "legend": "Niedrig: unter {{low}} · Knapp: bis {{tight}} · Gut: bis {{good}} · Reichlich: mehr"
     },
     "activity": {
       "title": "Rotation",
@@ -510,12 +512,14 @@
       "rotationHigh": "Hohe Rotation",
       "rotationMedium": "Mittlere Rotation",
       "rotationLow": "Niedrige Rotation",
-      "windowLabel": "Letzte 30 Tage"
+      "windowLabel": "Letzte 30 Tage",
+      "overHundred": "Du hast diesen Monat mehr verbraucht als gekauft: du lebst von deinem Vorrat."
     },
     "distribution": {
       "title": "Einordnung",
       "mostWasted": "Häufiger abgelaufen",
-      "leastRotating": "Niedrige Rotation"
+      "leastRotating": "Niedrige Rotation",
+      "unclassified": "Ohne Lebensmittelart: {{count}} (hier nicht gezählt)"
     },
     "pro": {
       "title": "Intelligente KI-Analyse",
@@ -544,6 +548,26 @@
         "normal": "Normal",
         "bad": "Hoch"
       }
+    },
+    "saved": {
+      "title": "Rechtzeitig gerettet",
+      "used": "In ihrer letzten Woche verbraucht: {{count}}",
+      "wasted": "Diesen Monat verschwendet: {{count}}"
+    },
+    "topUsed": {
+      "title": "Was du am meisten nutzt",
+      "units": "×{{count}}",
+      "markBasic": "Als Basis markieren",
+      "markedBasic": "{{name}} ist jetzt ein Basisprodukt"
+    },
+    "stale": {
+      "title": "Unberührt",
+      "detail": "Auf Vorrat und seit zwei Monaten unberührt: {{count}}. Noch da?"
+    },
+    "freezer": {
+      "title": "Gefrierschrank",
+      "detail": "Eingefroren: {{count}}",
+      "oldest": "Das älteste liegt seit {{oldest}} drin."
     }
   },
   "pantry": {
@@ -558,7 +582,8 @@
         "expiring": "Laufen in wenigen Tagen ab",
         "expired": "Überprüfen und entsorgen",
         "review": "Datum überschritten, evtl. noch gut",
-        "pendientes": "Produkte mit unvollständigen Angaben"
+        "pendientes": "Produkte mit unvollständigen Angaben",
+        "frozen": "Produkte mit etwas im Gefrierschrank"
       },
       "status": {
         "normal": "Keine Probleme",
@@ -566,7 +591,8 @@
         "expiring": "Bald ablaufend",
         "expired": "Abgelaufen",
         "review": "Prüfen",
-        "pendientes": "Ausstehend"
+        "pendientes": "Ausstehend",
+        "frozen": "Eingefroren"
       },
       "search": "Produkte suchen"
     },
@@ -601,7 +627,8 @@
       "expiring": "{{ count }} kurz vor Ablauf",
       "expired": "{{ count }} abgelaufen",
       "collapse": "{{ name }} einklappen",
-      "expand": "{{ name }} ausklappen"
+      "expand": "{{ name }} ausklappen",
+      "noLocation": "Ohne Ort"
     },
     "batches": {
       "title": "Chargen & Daten",
@@ -767,22 +794,13 @@
     "fab": {
       "groupLabel": "Aktionen"
     },
-    "consume": {
-      "groupLabel": "Produkte verbrauchen",
-      "title": "Produkte verbrauchen",
-      "cardTitle": "Als verbraucht markieren",
-      "subtitle": "Suche Produkte, um sie aus deiner Vorratskammer abzuziehen.",
-      "placeholder": "Produkt suchen",
-      "noResults": "Keine Ergebnisse",
-      "empty": "Du hast noch nichts hinzugefügt.",
-      "submit": "Eintragen"
-    },
     "sections": {
       "fresh": "Frisches",
       "pantry": "Vorratskammer",
       "groupToggle": {
         "flat": "Nach Kategorie gruppieren",
-        "grouped": "Listenansicht"
+        "grouped": "Listenansicht",
+        "category": "Nach Ort gruppieren"
       }
     },
     "fresh": {
@@ -898,6 +916,29 @@
       "message": "Du hast noch {{count}} von {{name}}. Wenn du es aufgebraucht hast, ziehen wir es ab und erfassen den Verbrauch; beim Löschen geht der Verlauf verloren.",
       "consumed": "Aufgebraucht",
       "delete": "Produkt löschen"
+    },
+    "quickActions": {
+      "open": "1 öffnen",
+      "move": "1 verschieben",
+      "moveTo": "Verschieben nach",
+      "freeze": "1 einfrieren",
+      "thaw": "1 auftauen",
+      "discard": "1 weggeworfen",
+      "toast": {
+        "opened": "1 geöffnet",
+        "openedUntil": "1 geöffnet · {{when}}",
+        "moved": "1 nach {{place}} verschoben",
+        "frozen": "1 eingefroren",
+        "thawed": "1 aufgetaut",
+        "thawedUntil": "1 aufgetaut · {{when}}",
+        "discarded": "1 weggeworfen: zählt als Verschwendung",
+        "failed": "Konnte nicht speichern. Bitte erneut versuchen.",
+        "undoStale": "Inzwischen geändert: Rückgängig nicht möglich."
+      },
+      "badge": {
+        "frozen": "{{count}} eingefroren",
+        "opened": "Einer ist geöffnet"
+      }
     }
   },
   "upgrade": {

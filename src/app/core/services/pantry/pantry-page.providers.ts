@@ -4,7 +4,6 @@ import { PantryListUiStateService } from './pantry-list-ui-state.service';
 import { PantryStateService } from './pantry-state.service';
 import { PantryAddModalStateService } from './modals/pantry-add-modal-state.service';
 import { PantryBatchesModalStateService } from './modals/pantry-batches-modal-state.service';
-import { PantryConsumeModalStateService } from './modals/pantry-consume-modal-state.service';
 import { PantryEditItemModalStateService } from './modals/pantry-edit-item-modal-state.service';
 import { PantryFreshAddModalStateService } from './modals/pantry-fresh-add-modal-state.service';
 import { PantryPendientesSheetStateService } from './modals/pantry-pendientes-sheet-state.service';
@@ -24,7 +23,6 @@ export const PANTRY_PAGE_PROVIDERS: Provider[] = [
   PantryBatchOperationsService,
   PantryListUiStateService,
   PantryAddModalStateService,
-  PantryConsumeModalStateService,
   PantryBatchesModalStateService,
   PantryEditItemModalStateService,
   PantryQuantitySheetStateService,

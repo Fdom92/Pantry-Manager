@@ -22,6 +22,7 @@ import { UpgradeRevenuecatService } from '../../upgrade/upgrade-revenuecat.servi
 import { LocalStorageService } from '../../shared/local-storage.service';
 import { LoggerService } from '../../shared/logger.service';
 import { ToastService } from '../../shared';
+import { ShelfLifeLearningService } from '../shelf-life-learning.service';
 
 const FRAMING_HINT_KEY = 'receiptScanFraming';
 
@@ -33,6 +34,7 @@ export type ReceiptScanPhase = 'processing' | 'review' | 'error';
  */
 @Injectable()
 export class PantryReceiptScanModalStateService {
+  private readonly shelfLife = inject(ShelfLifeLearningService);
   private readonly pantryStore = inject(PantryStoreService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
@@ -320,7 +322,10 @@ export class PantryReceiptScanModalStateService {
     if (line.dateFromUser && (line.expirationDate || line.noExpiry)) {
       return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry };
     }
-    const suggested = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date());
+    const learned = this.isAutoMatch(line)
+      ? this.shelfLife.daysFor(line.match?.name, line.match?._id)
+      : this.shelfLife.daysFor(line.parsed.rawName);
+    const suggested = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned);
     return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
   }
 

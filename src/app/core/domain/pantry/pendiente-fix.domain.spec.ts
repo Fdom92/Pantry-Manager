@@ -26,6 +26,18 @@ describe('applyPendienteFix', () => {
     expect(result.batches).toEqual(item.batches);
   });
 
+  it('never dates a frozen lot: its date is paused while frozen', () => {
+    const item = makeItem({
+      batches: [
+        { batchId: 'shelf', quantity: 1 },
+        { batchId: 'frozen', quantity: 1, frozenAt: '2026-11-01', frozenDaysLeft: 2 },
+      ],
+    });
+    const result = applyPendienteFix(item, { expirationDate: '2026-12-01' });
+    expect(result.batches.find(b => b.batchId === 'shelf')!.expirationDate).toBe('2026-12-01');
+    expect(result.batches.find(b => b.batchId === 'frozen')!.expirationDate).toBeUndefined();
+  });
+
   it('applies the date only to batches missing a date and not noExpiry', () => {
     const item = makeItem({
       foodType: FoodType.DAIRY,

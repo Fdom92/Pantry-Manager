@@ -9,3 +9,5 @@ export * from './food-type-inference.domain';
 export * from './food-concepts.data';
 export * from './pendiente-fix.domain';
 export * from './basic.domain';
+export * from './batch-state.domain';
+export * from './learned-shelf-life.domain';

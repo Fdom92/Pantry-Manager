@@ -94,6 +94,12 @@
   white-space: nowrap;
 }
 
+.state-icon {
+  flex-shrink: 0;
+  font-size: var(--app-theme-icon-size-sm, 16px);
+  color: var(--app-theme-text-muted);
+}
+
 .item-subinfo {
   font-size: var(--app-theme-font-size-small);
   color: var(--app-theme-text-muted);

@@ -11,6 +11,7 @@ import { ANALYTICS_EVENTS } from '@core/constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { LanguageService } from '../../shared/language.service';
 import { PantryStoreService } from '../pantry-store.service';
+import { ShelfLifeLearningService } from '../shelf-life-learning.service';
 
 /**
  * The list a user builds before saving in either add sheet: pick from the
@@ -24,6 +25,7 @@ import { PantryStoreService } from '../pantry-store.service';
  */
 export abstract class PantryAddEntriesBase {
   protected readonly pantryStore = inject(PantryStoreService);
+  private readonly shelfLife = inject(ShelfLifeLearningService);
   protected readonly translate = inject(TranslateService);
   protected readonly languageService = inject(LanguageService);
   // Named apart from the subclasses' own `analytics` field so the two private
@@ -273,7 +275,7 @@ export abstract class PantryAddEntriesBase {
 
   /** A restock is a new carton, so it gets a fresh suggestion, not the old batch's date. */
   protected suggestedExpiryFor(name: string, item?: PantryItem): Partial<AddEntry> {
-    return resolveSuggestedExpiry(name, item?.foodType ?? null, new Date());
+    return resolveSuggestedExpiry(name, item?.foodType ?? null, new Date(), this.shelfLife.daysFor(item?.name ?? name, item?._id));
   }
 
   private buildOptions(items: PantryItem[], entries: AddEntry[]): AutocompleteItem<PantryItem>[] {

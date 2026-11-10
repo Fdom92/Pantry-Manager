@@ -132,6 +132,7 @@ ion-title {
 .summary-chips .status-chip.chip--review    { --chip-accent: var(--ion-color-warning-shade); }
 .summary-chips .status-chip.chip--expired   { --chip-accent: var(--ion-color-danger); }
 .summary-chips .status-chip.chip--pendientes{ --chip-accent: var(--ion-color-medium-shade); }
+.summary-chips .status-chip.chip--frozen    { --chip-accent: var(--ion-color-secondary); }
 
 // chip--basic kept on medium tone (NOT tertiary — tertiary is now reserved
 // for PRO/premium; basic items are operational, not premium).
@@ -436,8 +437,10 @@ ion-card-header {
 // modal-sheet mixin used by every other sheet modal. No per-modal radius
 // or background override needed here — the only thing left is matching the
 // inner ion-content bg.
-ion-modal.quantity-sheet ion-content {
-  --background: var(--ion-card-background);
+// Auto height: with breakpoint 1 the sheet is exactly as tall as its content,
+// so the quick actions never push "edit / delete" below the fold.
+ion-modal.quantity-sheet {
+  --height: auto;
 }
 
 // ── Two-section layout (Fresh + Despensa) ──────────────────────────────────
@@ -502,19 +505,7 @@ ion-modal.quantity-sheet ion-content {
     gap: var(--app-theme-spacing-xs);
   }
 
-  // Consume action — uses success (leaf green). Eating/consuming is a positive
-  // depletion, semantically aligned with success. Previously used secondary
-  // (mint), which is now cream and would no longer read as actionable.
-  &__consume-btn {
-    background: color-mix(in srgb, var(--ion-color-success) 12%, transparent);
-    color: var(--app-theme-success-deep);
-
-    &:active {
-      background: color-mix(in srgb, var(--ion-color-success) 22%, transparent);
-    }
-  }
-
-  // View-preference toggle — secondary to the add/consume action buttons.
+  // View-preference toggle — secondary to the add button.
   // No fill by default; tonal fill only when grouping is active.
   &__group-toggle {
     background: transparent;
@@ -616,4 +607,11 @@ ion-modal.quantity-sheet ion-content {
   &:active {
     opacity: var(--app-theme-opacity-muted);
   }
+}
+
+.fresh-group-title {
+  margin: var(--app-theme-spacing-md) 0 var(--app-theme-spacing-xs);
+  font-size: var(--app-theme-font-size-small);
+  font-weight: var(--app-theme-font-weight-semibold);
+  color: var(--app-theme-text-muted);
 }

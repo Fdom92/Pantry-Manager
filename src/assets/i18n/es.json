@@ -499,8 +499,10 @@
       "level": {
         "good": "Buena",
         "normal": "Ajustado",
-        "bad": "Bajo"
-      }
+        "bad": "Bajo",
+        "plenty": "De sobra"
+      },
+      "legend": "Bajo: menos de {{low}} · Ajustado: hasta {{tight}} · Buena: hasta {{good}} · De sobra: más"
     },
     "activity": {
       "title": "Rotación",
@@ -510,12 +512,14 @@
       "rotationHigh": "Rotación alta",
       "rotationMedium": "Rotación media",
       "rotationLow": "Rotación baja",
-      "windowLabel": "Últimos 30 días"
+      "windowLabel": "Últimos 30 días",
+      "overHundred": "Has gastado más de lo que has comprado este mes: estás tirando de lo que ya tenías."
     },
     "distribution": {
       "title": "Clasificación",
       "mostWasted": "Mayor incidencia",
-      "leastRotating": "Baja rotación"
+      "leastRotating": "Baja rotación",
+      "unclassified": "Sin tipo de alimento: {{count}} (no cuentan aquí)"
     },
     "pro": {
       "title": "Análisis inteligente con IA",
@@ -544,6 +548,26 @@
         "normal": "Normal",
         "bad": "Alto"
       }
+    },
+    "saved": {
+      "title": "Salvados a tiempo",
+      "used": "Usados en su última semana: {{count}}",
+      "wasted": "Desperdiciados este mes: {{count}}"
+    },
+    "topUsed": {
+      "title": "Lo que más usas",
+      "units": "×{{count}}",
+      "markBasic": "Marcar básico",
+      "markedBasic": "{{name}} es ahora un básico"
+    },
+    "stale": {
+      "title": "Parados",
+      "detail": "Sin tocar en dos meses y con stock: {{count}}. ¿Siguen ahí?"
+    },
+    "freezer": {
+      "title": "Congelador",
+      "detail": "Congelados: {{count}}",
+      "oldest": "El más antiguo lleva {{oldest}}."
     }
   },
   "pantry": {
@@ -558,7 +582,8 @@
         "expiring": "Caducan en pocos días",
         "expired": "Revisar y descartar",
         "review": "Pasó la fecha, pero puede estar bien",
-        "pendientes": "Productos con información incompleta"
+        "pendientes": "Productos con información incompleta",
+        "frozen": "Productos con algo en el congelador"
       },
       "status": {
         "normal": "Sin alertas",
@@ -566,7 +591,8 @@
         "expiring": "Próx. caducar",
         "expired": "Caducados",
         "review": "Revisar",
-        "pendientes": "Pendientes"
+        "pendientes": "Pendientes",
+        "frozen": "Congelados"
       },
       "search": "Buscar productos"
     },
@@ -601,7 +627,8 @@
       "expiring": "{{ count }} por caducar",
       "expired": "{{ count }} caducados",
       "collapse": "Contraer {{ name }}",
-      "expand": "Expandir {{ name }}"
+      "expand": "Expandir {{ name }}",
+      "noLocation": "Sin ubicación"
     },
     "batches": {
       "title": "Lotes y fechas",
@@ -767,22 +794,13 @@
     "fab": {
       "groupLabel": "Acciones"
     },
-    "consume": {
-      "groupLabel": "Consumir productos",
-      "title": "Consumir productos",
-      "cardTitle": "Marcar consumido",
-      "subtitle": "Busca productos para descontar de tu despensa.",
-      "placeholder": "Buscar producto",
-      "noResults": "Sin resultados",
-      "empty": "Aún no has añadido nada.",
-      "submit": "Registrar"
-    },
     "sections": {
       "fresh": "Frescos",
       "pantry": "Despensa",
       "groupToggle": {
         "flat": "Agrupar por categoría",
-        "grouped": "Vista plana"
+        "grouped": "Vista plana",
+        "category": "Agrupar por ubicación"
       }
     },
     "fresh": {
@@ -898,6 +916,29 @@
       "message": "Todavía te quedan {{count}} de {{name}}. Si te lo has acabado lo descontamos y guardamos el consumo; si lo borras se pierde su historial.",
       "consumed": "Se ha acabado",
       "delete": "Borrar producto"
+    },
+    "quickActions": {
+      "open": "Abrir 1",
+      "move": "Mover 1",
+      "moveTo": "Mover a",
+      "freeze": "Congelar 1",
+      "thaw": "Descongelar 1",
+      "discard": "Se tiró 1",
+      "toast": {
+        "opened": "Abierto 1",
+        "openedUntil": "Abierto 1 · {{when}}",
+        "moved": "Movido 1 a {{place}}",
+        "frozen": "Congelado 1",
+        "thawed": "Descongelado 1",
+        "thawedUntil": "Descongelado 1 · {{when}}",
+        "discarded": "Tirado 1: cuenta como desperdicio",
+        "failed": "No se pudo guardar. Inténtalo otra vez.",
+        "undoStale": "Ya ha cambiado: no se puede deshacer."
+      },
+      "badge": {
+        "frozen": "{{count}} congelado(s)",
+        "opened": "Hay uno abierto"
+      }
     }
   },
   "upgrade": {
