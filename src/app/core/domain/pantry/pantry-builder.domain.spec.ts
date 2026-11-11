@@ -186,8 +186,14 @@ describe('an explicit food type beats the name', () => {
     expect(item.batches[0].expirationDate).toBeDefined();
   });
 
-  it('leaves such a product dateless when no type is stated', () => {
+  it('suggests a date for a ligature name the table now recognises when no type is stated', () => {
     const item = buildAddItemPayload({ ...BASE, name: 'Œufs' });
+
+    expect(item.batches[0].expirationDate).toBeDefined();
+  });
+
+  it('leaves an unknown name dateless when no type is stated', () => {
+    const item = buildAddItemPayload({ ...BASE, name: 'Kombucha' });
 
     expect(item.batches[0].expirationDate).toBeUndefined();
   });
