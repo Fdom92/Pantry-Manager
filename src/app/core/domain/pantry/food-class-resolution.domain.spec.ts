@@ -68,7 +68,7 @@ describe('resolveFoodClass', () => {
   });
 
   it('a stored foodKind wins', () => {
-    expect(resolveFoodClass('x', undefined, 'bread')?.key).toBe('bread');
+    expect(resolveFoodClass('x', undefined, 'fresh-bread')?.key).toBe('fresh-bread');
   });
 
   it('an unknown foodKind falls back to the name', () => {
