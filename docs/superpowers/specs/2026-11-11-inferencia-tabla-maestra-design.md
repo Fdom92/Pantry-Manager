@@ -34,6 +34,15 @@ Otros fallos encontrados:
 - Lo aprendido puede aprender de sus propias sugerencias: los eventos no registran si la
   fecha la puso el usuario (`shortcut` en `learned-shelf-life.domain.ts`).
 
+**Cobertura medida** sobre el inventario real de una casa (145 productos distintos, con el
+tipo que puso quien la conoce): la lista actual (71 conceptos, unos 100–125 términos por
+idioma) reconoce el **60 %** y acierta el tipo en el **47 %**. Causas: faltan familias enteras
+(salsas, dulces, caldos y sopas, aperitivos, encurtidos, postres lácteos), faltan frescos
+comunes (mandarina, calabaza, puerro, boniato), no hay plurales ("salchichas" no casa con
+"salchicha"), marcas pegadas ("cocacola"), y lo preparado pierde contra su ingrediente
+("batido de fresa" → fruta, "crema de calabaza" → lácteo, "flan de huevo" → proteína).
+"Judías verdes" cae en legumbre seca.
+
 Hasta la 5.7 la decisión fue no meter excepciones por producto y confiar en lo aprendido.
 Lo aprendido no ayuda en la primera sesión, y la 5.8 la convierte en el centro.
 
@@ -63,6 +72,7 @@ interface FoodClass {
   openedDays: number | null;      // null = abrir no acorta
   thawDays: number | null;        // null = no aplica → THAW_MAX_DAYS
   source: string;                 // de dónde sale el número
+  preparation?: true;             // salsa, sopa, batido…: gana a sus ingredientes
   terms: Record<SupportedLanguage, readonly string[]>;
 }
 ```
@@ -100,11 +110,35 @@ Función pura `resolveFoodClass(name, foodType?, foodKind?) → FoodClass | null
 
 1. Si hay `foodKind` guardado, la clase existe y su padre coincide con `foodType` (o no hay
    `foodType`), se usa esa.
-2. Si no, se infiere del nombre: n-gramas de mayor a menor longitud, solo palabras enteras
-   (el mismo algoritmo de `inferFoodType`).
+2. Si no, se infiere del nombre con las reglas de emparejamiento de abajo.
 3. Si hay `foodType` y la clase inferida tiene otro padre, se usa la genérica de ese
    `foodType`. El tipo elegido o corregido por el usuario manda.
 4. Sin clase y sin tipo: `null`. Sin fecha, como hoy.
+
+**Reglas de emparejamiento** (nombre → clase), en este orden:
+
+1. **Solo palabras enteras**, tras la normalización para clasificar ("panceta" no es "pan").
+2. **Plurales:** una palabra que no casa se prueba también sin `-s` y sin `-es` finales
+   ("salchichas" → "salchicha"). Los términos se escriben en singular salvo que el plural
+   sea irregular.
+3. **El grupo de palabras más largo gana** ("leche de avena" a "leche", "pasta de dientes" a
+   "pasta").
+4. **Lo preparado gana a lo que lleva dentro:** a igual longitud, una clase con
+   `preparation: true` (salsas, sopas y caldos, cremas, batidos, flanes y natillas,
+   mermeladas, helados, zumos) gana a una de ingrediente. Va en la clase y no en la posición
+   porque el castellano pone el plato delante ("batido de fresa") y el inglés detrás
+   ("strawberry milkshake").
+5. **Desempate:** la coincidencia más a la izquierda.
+
+**Genéricos ambiguos → la clase que dura menos** entre las razonables: "queso" a secas es
+queso fresco, "jamón" es fiambre cocido, "leche" es leche UHT, "atún" es conserva salvo
+"atún fresco" o "lomos de atún". Es el mismo criterio del extremo bajo; lo aprendido lo
+corrige en cuanto el usuario pone su fecha. Cada genérico ambiguo lleva un comentario con
+este motivo.
+
+**Volumen:** de unos 125 términos a unos 400–500 por idioma, agrupados por clase y tomados de
+la lista de productos de FoodKeeper y del corpus de abajo. Incluye formas pegadas de marcas
+muy comunes que funcionan como nombre genérico ("cocacola" junto a "coca cola").
 
 `inferFoodType(name)` pasa a ser `resolveFoodClass(name)?.foodType ?? null` y conserva su
 firma para sus llamadores.
@@ -174,8 +208,18 @@ Test-first en `core/domain`:
 - **Integridad de la tabla:** cada clase tiene padre, `source` y términos en los 6 idiomas;
   ningún término está en dos clases; `openedDays ≤ sealedDays`; hay una genérica por
   `FoodType`; los días son positivos o `null`.
-- **Fixture de nombres reales** → clase esperada, empezando por los 90 de la revisión, más
-  "œufs", "grão-de-bico", "pimienta", "patatas fritas", "sal".
+- **Corpus de cobertura** → clase esperada, como fixture versionado. **Meta: ≥90 % de
+  nombres reconocidos con la clase correcta**, comprobada por un test que falla por debajo
+  del umbral e imprime los fallos. El corpus junta:
+  - los 145 productos del inventario real, **solo como lista de nombres genéricos**, sin
+    cantidades, ubicaciones, fechas ni nada que identifique la casa (el repo es público);
+    Fernando revisa la lista antes del commit;
+  - los 90 nombres de la revisión del 2026-11-11, más "œufs", "grão-de-bico", "pimienta",
+    "patatas fritas", "sal", "judías verdes", "batido de fresa", "crema de calabaza";
+  - las líneas de producto de los tickets reales que ya están en los specs del lector;
+  - una lista equivalente en inglés (la mitad de los usuarios).
+- Reglas de emparejamiento: plural, longitud, `preparation`, desempate por la izquierda,
+  cada una con un caso que falla sin ella.
 - `resolveFoodClass`: las cuatro reglas, con tipo que manda sobre nombre.
 - `resolveSuggestedExpiry`: los cinco niveles y el umbral de 3 en la clase.
 - `learnShelfLifeDays`: `dateFromUser`, compatibilidad con eventos viejos, congelados fuera,
