@@ -1,5 +1,7 @@
 # Onboarding orientado a activación
 
+> **Sustituida** por `2026-11-11-primera-sesion-5.8-design.md` (no llegó a implementarse).
+
 **Fecha:** 2026-10-07. **Versión objetivo:** 5.7 (la 5.6 está cerrada). Origen: el export de
 PostHog de 30 días (`project_posthog_export_2026_10_06`) mostró que la mayoría de usuarios
 entra, prueba y se va; 17 de 20 hacen una sola sesión y vuelven 3.
