@@ -1,7 +1,9 @@
 # Primera sesión: el primer producto propio (5.8)
 
 **Fecha:** 2026-11-11. **Versión:** 5.8 (rama `release/5.8`). **Sustituye** a
-`2026-10-07-onboarding-activation-design.md`, que no llegó a implementarse.
+`2026-10-07-onboarding-activation-design.md`, que no llegó a implementarse. Depende del
+bloque A, `2026-11-11-inferencia-tabla-maestra-design.md`: las clases dan tipo, fecha y
+Despensa/Frescos.
 
 ## Por qué
 
@@ -53,11 +55,12 @@ erratas. "Cociné esto". Hoja de cantidad acción→cantidad (pendiente de los d
   si nada coincide, ofrece "Añadir «X»".
 - Al elegir o escribir aparece una fila con nombre, tipo y fecha propuesta, editable con
   `app-food-type-picker` / `app-expiry-picker` / `quick-date-chips`.
-  - **Básico elegido:** usa el `foodType`, el `productType` y el `alwaysNoExpiry` del básico.
-    No se infiere del nombre traducido (eso dejaba "Œufs" y "Grão-de-bico" sin fecha).
-  - **Nombre escrito:** `foodType` con `inferFoodType` y fecha con `resolveSuggestedExpiry`,
-    igual que el alta normal. `productType: 'pantry'`, como el alta por defecto desde
-    Despensa. Si es incorrecto, el usuario lo cambia al editar.
+  - **Básico elegido:** cada básico de `ONBOARDING_QUICK_SEED_ITEMS` apunta a una clase
+    (`classKey`), que sustituye a sus `foodType`, `productType` y `alwaysNoExpiry`. Tipo,
+    fecha y Despensa/Frescos salen de la clase, no del nombre traducido (eso dejaba "Œufs" y
+    "Grão-de-bico" sin fecha).
+  - **Nombre escrito:** clase con `resolveFoodClass`, fecha con `resolveSuggestedExpiry`,
+    igual que el alta normal; `storage` de la clase, o `'pantry'` si es desconocido.
 - Se pueden añadir varios productos, pero el texto anima a añadir uno. "Continuar" se activa
   con uno o más.
 - "Empezar vacío" pasa al paso `notifications` sin guardar nada.
@@ -83,8 +86,8 @@ fecha o `noExpiry`). Construye con `buildAddItemPayload`, guarda con
 Afecta a los modales de añadir de Despensa y de Frescos (`PantryAddEntriesBase`).
 
 - **Con el campo vacío al enfocar:** tus productos de esa mitad del catálogo, como hoy. Si no
-  tienes ninguno, los básicos de esa mitad: `productType: 'pantry'` en Despensa y `'fresh'`
-  en Frescos.
+  tienes ninguno, los básicos de esa mitad según el `storage` de su clase: `'pantry'` en
+  Despensa y `'fresh'` en Frescos.
 - **Al escribir:** primero tus productos que coinciden; después los básicos que coinciden y
   que no tienes ya. "Que no tienes ya" se compara por `normalizeProductKey` del nombre
   traducido, porque los productos sembrados en versiones anteriores no guardan de qué
@@ -98,7 +101,7 @@ Afecta a los modales de añadir de Despensa y de Frescos (`PantryAddEntriesBase`
 - **Servicio:** las opciones pasan a ser una unión (producto propio | básico). `addEntry` hoy
   sale sin hacer nada si la opción no trae un `PantryItem` (`pantry-add-entries-base.ts`,
   `if (!item) return`). Con un básico, crea una entrada nueva como `addEntryFromQuery`, pero
-  con el `foodType` del básico en lugar de inferirlo.
+  con el `classKey` del básico en lugar de inferirlo.
 - El filtro de `app-entity-autocomplete` (subcadena sobre la clave normalizada) no cambia.
 
 ## 3. Estado vacío con acciones y retirada del coach mark
@@ -174,7 +177,7 @@ de los básicos). No se renombra ninguna clave.
 - **Dominio (test-first):** construcción de opciones (vacío/con productos, mitad
   despensa/fresco, exclusión por nombre normalizado, orden); condición de activación como
   función pura (producto, permiso, consentimiento, marca).
-- **Servicios:** `addEntry` con un básico crea una entrada con el `foodType` del básico; el
+- **Servicios:** `addEntry` con un básico crea una entrada con la clase del básico; el
   servicio de guardado compartido (sello de `ClockService`, historial); propiedades de
   `onboarding_completed`; `activation_reached` una sola vez y solo con la marca.
 - **Navegador (`npm start`):** onboarding entero en sus tres caminos (un básico, nombre
