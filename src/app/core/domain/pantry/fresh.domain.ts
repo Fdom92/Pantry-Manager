@@ -84,9 +84,9 @@ export function restockFreshItem(
   expiry?: { expirationDate?: string; noExpiry?: boolean },
 ): PantryItem {
   const previous = item.batches?.[0];
-  // A restock is a new unit: when the caller knows its date, the old (possibly
-  // expired) one and its "opened" flag no longer describe what is on the shelf.
-  const fresh = !!(expiry?.expirationDate || expiry?.noExpiry);
+  // A restock is a new unit: when the caller passes an expiry (even an empty one),
+  // the old (possibly expired) date and "opened" flag describe the previous purchase.
+  const fresh = !!expiry;
   return {
     ...item,
     batches: [{

@@ -457,7 +457,7 @@ export class PantryReceiptScanModalStateService {
               });
           if (updated) {
             await this.pantryStore.updateItem(updated);
-            await this.eventManager.logAddExistingItem(matchedItem, updated, line.quantity, undefined, sessionId, timestamp, { dateFromUser: line.dateFromUser });
+            await this.eventManager.logAddExistingItem(matchedItem, updated, matchedItem.productType === 'fresh' ? FRESH_QTY.sufficient : line.quantity, undefined, sessionId, timestamp, { dateFromUser: line.dateFromUser });
             matched++;
           }
         } else {
@@ -485,7 +485,7 @@ export class PantryReceiptScanModalStateService {
           kind: this.isFreshLine(line) ? 'fresh' : 'despensa',
           source: 'receipt_scan',
           is_new: !this.isAutoMatch(line),
-          quantity: line.quantity,
+          quantity: this.isFreshLine(line) ? FRESH_QTY.sufficient : line.quantity,
           has_expiry: Boolean(line.expirationDate),
         });
         added++;

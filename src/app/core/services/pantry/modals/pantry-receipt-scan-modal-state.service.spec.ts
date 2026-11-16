@@ -319,6 +319,43 @@ describe('PantryReceiptScanModalStateService', () => {
       expect(saved.batches[0].quantity).toBe(FRESH_QTY.sufficient);
     });
 
+    it('a matched fresh item with an unclassifiable name gets no date, and logs the stored quantity', async () => {
+      const matched = makeMatchedItem({
+        productType: 'fresh', name: 'Zzqx', foodType: undefined,
+        batches: [{ batchId: 'b1', quantity: 0, expirationDate: '2020-01-01' }],
+      });
+      service.reviewLines.set([makeLine({
+        parsed: { rawName: 'ZZQX', quantity: 6, confidence: 'high' }, quantity: 6,
+        match: matched, matchScore: 0.95, expirationDate: undefined,
+      })]);
+      await service.submit();
+      const saved = pantryStore.updateItem.calls.mostRecent().args[0] as PantryItem;
+      expect(saved.batches[0].expirationDate).toBeUndefined();
+      expect(events.logAddExistingItem.calls.mostRecent().args[2]).toBe(FRESH_QTY.sufficient);
+    });
+
+    it('PANTRY_ITEM_ADDED sends the stored quantity for a new fresh line', async () => {
+      service.reviewLines.set([makeLine({ quantity: 6, storage: 'fresh', suggestedStorage: 'fresh' })]);
+      await service.submit();
+      const args = analytics.track.calls.allArgs().find(a => a[0] === ANALYTICS_EVENTS.PANTRY_ITEM_ADDED)![1] as Record<string, unknown>;
+      expect(args['quantity']).toBe(FRESH_QTY.sufficient);
+    });
+
+    it('a storage override survives a food-type change and a rename', async () => {
+      alertCtrl.create.and.callFake((config: any) => {
+        const save = config.buttons.find((b: any) => typeof b.handler === 'function');
+        queueMicrotask(() => save.handler({ name: 'PERAS CONFERENCE' }));
+        return Promise.resolve({ present: () => Promise.resolve() } as any);
+      });
+      service.reviewLines.set([makeLine()]);
+      service.setLineStorage(1, 'fresh');
+      service.setLineFoodType(1, FoodType.OTHER);
+      expect(service.reviewLines()[0].storage).toBe('fresh');
+      await service.editLineName(1);
+      await Promise.resolve();
+      expect(service.reviewLines()[0].storage).toBe('fresh');
+    });
+
     it('setLineStorage changes the destination and counts as storage_changed', async () => {
       service.reviewLines.set([makeLine({ id: 1 }), makeLine({ id: 2, storage: 'fresh', suggestedStorage: 'fresh' })]);
       service.setLineStorage(1, 'fresh');
