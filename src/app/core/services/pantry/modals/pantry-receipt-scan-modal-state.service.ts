@@ -323,9 +323,9 @@ export class PantryReceiptScanModalStateService {
       return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry };
     }
     const learned = this.isAutoMatch(line)
-      ? this.shelfLife.daysFor(line.match?.name, line.match?._id)
-      : this.shelfLife.daysFor(line.parsed.rawName);
-    const suggested: SuggestedExpiry = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), { product: learned });
+      ? this.shelfLife.daysFor(line.match?.name, line.match?._id, null, foodType)
+      : this.shelfLife.daysFor(line.parsed.rawName, undefined, null, foodType);
+    const suggested: SuggestedExpiry = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned);
     return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
   }
 

@@ -29,6 +29,10 @@ export interface PantryEvent extends BaseDoc {
   categoryId?: string;
   /** Semantic food classification — enables coverage and nutritional trend analysis */
   foodType?: FoodType;
+  /** Food class key at ADD time; absent on events from before 5.8 */
+  foodKind?: string;
+  /** Whether the user chose the expiry (vs the app's suggestion); absent on events from before 5.8 */
+  dateFromUser?: boolean;
   /** Expiry date of the batch involved: ADD → new batch expiry, CONSUME → consumed batch expiry, EXPIRE → expired batch date */
   expirationDate?: string;
   /** Days from event timestamp until batch expiry — pre-computed at ADD time for waste prediction (negative = already expired) */

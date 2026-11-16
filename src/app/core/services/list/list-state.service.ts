@@ -184,7 +184,7 @@ export class ListStateService {
         // Restocking an existing product: derive the expiry from the product's
         // own foodType when it has one, otherwise infer it from its name. Without
         // this the new lot is dateless and invisible to every expiry alert.
-        const suggested = resolveSuggestedExpiry(previous.name, previous.foodType, new Date(timestamp), { product: this.shelfLife.daysFor(previous.name, previous._id) });
+        const suggested = resolveSuggestedExpiry(previous.name, previous.foodType, new Date(timestamp), this.shelfLife.daysFor(previous.name, previous._id, null, previous.foodType));
         const updated = await this.pantryStore.addNewLot(id, { quantity, ...toLotExpiry(suggested) });
         if (updated) {
           this.recordPurchaseUndo(id, { pantryItemSnapshot: preSnapshot, removedManuals: sameNameManuals });
@@ -238,7 +238,7 @@ export class ListStateService {
         } else {
           // Same reasoning as markAsBought: an added lot with no date would be
           // invisible to the expiry alerts.
-          const suggested = resolveSuggestedExpiry(match.name, match.foodType, new Date(timestamp), { product: this.shelfLife.daysFor(match.name, match._id) });
+          const suggested = resolveSuggestedExpiry(match.name, match.foodType, new Date(timestamp), this.shelfLife.daysFor(match.name, match._id, null, match.foodType));
           updated = await this.pantryStore.addNewLot(match._id, { quantity, ...toLotExpiry(suggested) });
           if (updated) await this.pantryStore.updateItem(updated);
         }

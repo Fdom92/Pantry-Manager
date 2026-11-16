@@ -275,7 +275,7 @@ export abstract class PantryAddEntriesBase {
 
   /** A restock is a new carton, so it gets a fresh suggestion, not the old batch's date. */
   protected suggestedExpiryFor(name: string, item?: PantryItem): Partial<AddEntry> {
-    return resolveSuggestedExpiry(name, item?.foodType ?? null, new Date(), { product: this.shelfLife.daysFor(item?.name ?? name, item?._id) });
+    return resolveSuggestedExpiry(name, item?.foodType ?? null, new Date(), this.shelfLife.daysFor(item?.name ?? name, item?._id, null, item?.foodType));
   }
 
   private buildOptions(items: PantryItem[], entries: AddEntry[]): AutocompleteItem<PantryItem>[] {
