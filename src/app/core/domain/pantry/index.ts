@@ -13,3 +13,4 @@ export * from './pendiente-fix.domain';
 export * from './basic.domain';
 export * from './batch-state.domain';
 export * from './learned-shelf-life.domain';
+export * from './food-kind-after-edit.domain';
