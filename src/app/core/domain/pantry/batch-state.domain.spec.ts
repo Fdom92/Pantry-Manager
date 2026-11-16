@@ -1,15 +1,21 @@
 import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
+import type { FoodClass } from './food-classes.model';
 import { computeTodaySuggestion } from '@core/domain/dashboard';
 import { selectUnloggedExpiredBatches } from '@core/domain/events';
 import { filterExpiredItems, filterNearExpiryItems } from '@core/domain/notifications';
-import { dueBatchIndex, findFreezerLocation, groupByLocation, findFridgeLocation, freezeOne, frozenQuantity, moveOne, openedShelfDays, openOne, THAW_MAX_DAYS, thawOne } from './batch-state.domain';
+import { dueBatchIndex, findFreezerLocation, groupByLocation, findFridgeLocation, freezeOne, frozenQuantity, moveOne, needsFridgeWhenOpen, openOne, THAW_MAX_DAYS, thawOne } from './batch-state.domain';
 import { hasMissingExpiry } from './pantry-filtering.domain';
 import { getItemStatusState } from './pantry-status.domain';
 
 const NOW = new Date('2026-11-09T10:00:00');
 let n = 0;
 const newId = () => `new-${++n}`;
+const klass = (over: Partial<FoodClass>): FoodClass => ({
+  key: 'test', foodType: FoodType.DAIRY, storage: 'fresh', sealedDays: 5, openedDays: null, thawDays: null, source: 'test',
+  terms: { es: [], en: [], de: [], fr: [], it: [], pt: [] }, ...over,
+});
+const OPEN3 = klass({ openedDays: 3 });
 const lot = (over: Partial<ItemBatch>): ItemBatch => ({ batchId: 'b', quantity: 1, ...over });
 const plusDays = (days: number) => {
   const d = new Date(NOW);
@@ -36,7 +42,7 @@ describe('dueBatchIndex', () => {
 
 describe('openOne', () => {
   it('splits one unit off the due lot and leaves the rest sealed', () => {
-    const result = openOne([lot({ batchId: 'maiz', quantity: 5, expirationDate: '2029-07-01' })], FoodType.VEGETABLE, NOW, newId)!;
+    const result = openOne([lot({ batchId: 'maiz', quantity: 5, expirationDate: '2029-07-01' })], OPEN3, NOW, newId)!;
     expect(result.batches.length).toBe(2);
     expect(result.batches[0]).toEqual(jasmine.objectContaining({ batchId: 'maiz', quantity: 4 }));
     expect(result.batches[0].opened).toBeFalsy();
@@ -44,29 +50,43 @@ describe('openOne', () => {
   });
 
   it('opens a single-unit lot in place, keeping its id', () => {
-    const result = openOne([lot({ batchId: 'solo', quantity: 1 })], FoodType.OTHER, NOW, newId)!;
+    const result = openOne([lot({ batchId: 'solo', quantity: 1 })], OPEN3, NOW, newId)!;
     expect(result.batches.length).toBe(1);
     expect(result.batches[0].batchId).toBe('solo');
     expect(result.batches[0].opened).toBeTrue();
   });
 
   it('shortens the date by the opened shelf life, keeps the printed one and moves it to the fridge', () => {
-    const days = openedShelfDays(FoodType.DAIRY);
-    expect(days).withContext('dairy must shorten once opened').not.toBeNull();
-    const result = openOne([lot({ expirationDate: '2027-02-04' })], FoodType.DAIRY, NOW, newId, 'Nevera')!;
+    const result = openOne([lot({ expirationDate: '2027-02-04' })], OPEN3, NOW, newId, 'Nevera')!;
     const opened = result.batches[result.index];
-    expect(opened.expirationDate).toBe(plusDays(days as number));
+    expect(opened.expirationDate).toBe(plusDays(3));
     expect(opened.printedExpirationDate).toBe('2027-02-04');
     expect(opened.locationId).toBe('Nevera');
   });
 
   it('never pushes the date later than the pack', () => {
-    const result = openOne([lot({ expirationDate: plusDays(1) })], FoodType.DAIRY, NOW, newId)!;
+    const result = openOne([lot({ expirationDate: plusDays(1) })], OPEN3, NOW, newId)!;
     expect(result.batches[result.index].expirationDate).toBe(plusDays(1));
   });
 
+  it('does not shorten the date when the class has no opened days or there is no class', () => {
+    for (const k of [klass({ openedDays: null }), null]) {
+      const result = openOne([lot({ expirationDate: '2027-02-04' })], k, NOW, newId, 'Nevera')!;
+      const opened = result.batches[result.index];
+      expect(opened.expirationDate).toBe('2027-02-04');
+      expect(opened.opened).toBeTrue();
+      expect(opened.locationId).toBeUndefined();
+    }
+  });
+
+  it('needs the fridge only when the class shortens once opened', () => {
+    expect(needsFridgeWhenOpen(OPEN3)).toBeTrue();
+    expect(needsFridgeWhenOpen(klass({ openedDays: null }))).toBeFalse();
+    expect(needsFridgeWhenOpen(null)).toBeFalse();
+  });
+
   it('returns null when everything is already open or frozen', () => {
-    expect(openOne([lot({ opened: true }), lot({ frozenAt: '2026-10-01' })], FoodType.DAIRY, NOW, newId)).toBeNull();
+    expect(openOne([lot({ opened: true }), lot({ frozenAt: '2026-10-01' })], OPEN3, NOW, newId)).toBeNull();
   });
 });
 
@@ -98,16 +118,23 @@ describe('freezeOne and thawOne', () => {
   });
 
   it('thawing dates it today plus the days left, at most THAW_MAX_DAYS and at least one', () => {
-    const many = thawOne([lot({ frozenAt: '2026-10-01', frozenDaysLeft: 20, locationId: 'Congelador' })], NOW, newId, 'Nevera')!.batches[0];
+    const many = thawOne([lot({ frozenAt: '2026-10-01', frozenDaysLeft: 20, locationId: 'Congelador' })], null, NOW, newId, 'Nevera')!.batches[0];
     expect(many.locationId).toBe('Nevera');
     expect(many.expirationDate).toBe(plusDays(THAW_MAX_DAYS));
     expect(many.frozenAt).toBeUndefined();
-    expect(thawOne([lot({ frozenAt: '2026-10-01', frozenDaysLeft: 0 })], NOW, newId)!.batches[0].expirationDate).toBe(plusDays(1));
+    expect(thawOne([lot({ frozenAt: '2026-10-01', frozenDaysLeft: 0 })], null, NOW, newId)!.batches[0].expirationDate).toBe(plusDays(1));
+  });
+
+  it('thaws by the class thaw days, capped by the days it had left', () => {
+    const frozen = (left: number) => [lot({ frozenAt: '2026-10-01', frozenDaysLeft: left })];
+    expect(thawOne(frozen(10), klass({ thawDays: 1 }), NOW, newId)!.batches[0].expirationDate).toBe(plusDays(1));
+    expect(thawOne(frozen(10), klass({ thawDays: null }), NOW, newId)!.batches[0].expirationDate).toBe(plusDays(3));
+    expect(thawOne(frozen(2), klass({ thawDays: 5 }), NOW, newId)!.batches[0].expirationDate).toBe(plusDays(2));
   });
 
   it('thaws the lot frozen longest ago; a lot frozen without a date stays dateless', () => {
     const lots = [lot({ batchId: 'new', frozenAt: '2026-11-01' }), lot({ batchId: 'old', frozenAt: '2026-09-01' })];
-    const result = thawOne(lots, NOW, newId)!;
+    const result = thawOne(lots, null, NOW, newId)!;
     expect(result.batches[result.index].batchId).toBe('old');
     expect(result.batches[result.index].expirationDate).toBeUndefined();
   });
