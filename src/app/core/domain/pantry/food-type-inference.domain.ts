@@ -1,6 +1,7 @@
 import type { FoodType } from '@core/models/shared/enums.model';
 import { toLocalYmd } from '@core/utils/date.util';
-import { foodTypeExpires, suggestExpiryDate } from './expiry-suggestion.domain';
+import { suggestExpiryDate } from './expiry-suggestion.domain';
+import { genericClassFor } from './food-classes.data';
 import { resolveFoodClass } from './food-class-resolution.domain';
 
 /**
@@ -28,11 +29,12 @@ export interface InferredExpiry {
  * every caller can keep its existing "no date" behaviour unchanged.
  */
 export function inferExpiryForName(name: string, fromDate: Date): InferredExpiry {
-  const foodType = inferFoodType(name);
+  const klass = resolveFoodClass(name);
+  const foodType = klass?.foodType ?? null;
   return {
     foodType,
-    expirationDate: foodType ? suggestExpiryDate(foodType, fromDate) : undefined,
-    noExpiry: foodType ? !foodTypeExpires(foodType) : undefined,
+    expirationDate: klass ? suggestExpiryDate(klass, fromDate) : undefined,
+    noExpiry: klass ? klass.sealedDays === null : undefined,
   };
 }
 
@@ -58,22 +60,36 @@ export function toLotExpiry(suggested: SuggestedExpiry): { expiryDate?: string; 
   return { expiryDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
 }
 
+export type ExpirySource = 'learned_product' | 'learned_class' | 'table' | 'none';
+
+/** Learned shelf life in days; `klass` is only set once the class has enough samples. */
+export interface LearnedDays {
+  product?: number;
+  klass?: number;
+}
+
 export function resolveSuggestedExpiry(
   name: string,
   foodType: FoodType | null | undefined,
   fromDate: Date,
-  learnedDays?: number,
-): SuggestedExpiry {
-  const type = foodType ?? inferFoodType(name);
-  if (type && !foodTypeExpires(type)) return { noExpiry: true };
-  // This household's own history for the product beats any table.
-  if (learnedDays && learnedDays > 0) {
-    const date = new Date(fromDate);
-    date.setDate(date.getDate() + learnedDays);
-    return { expirationDate: toLocalYmd(date) };
+  learned?: LearnedDays,
+  foodKind?: string | null,
+): SuggestedExpiry & { source: ExpirySource } {
+  const klass = resolveFoodClass(name, foodType, foodKind);
+  if (klass?.sealedDays === null) return { noExpiry: true, source: 'none' };
+  // This household's own history beats any table: the product first, then its class.
+  const fromHistory = [
+    [learned?.product, 'learned_product'],
+    [learned?.klass, 'learned_class'],
+  ] as const;
+  for (const [days, source] of fromHistory) {
+    if (days && days > 0) {
+      const date = new Date(fromDate);
+      date.setDate(date.getDate() + days);
+      return { expirationDate: toLocalYmd(date), source };
+    }
   }
-  if (!type) return {};
-  return { expirationDate: suggestExpiryDate(type, fromDate) };
+  return klass ? { expirationDate: suggestExpiryDate(klass, fromDate), source: 'table' } : { source: 'none' };
 }
 
 /**
@@ -105,6 +121,7 @@ export function expiryAfterFoodTypeChange(
   if (row.dateFromUser && (row.expirationDate || row.noExpiry)) {
     return { expirationDate: row.expirationDate, noExpiry: row.noExpiry };
   }
-  if (!foodTypeExpires(foodType)) return { noExpiry: true };
-  return { expirationDate: suggestExpiryDate(foodType, fromDate) };
+  const klass = genericClassFor(foodType);
+  if (klass.sealedDays === null) return { noExpiry: true };
+  return { expirationDate: suggestExpiryDate(klass, fromDate) };
 }

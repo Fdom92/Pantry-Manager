@@ -1,6 +1,6 @@
 import type { PantryEvent } from '@core/models/events';
 import { normalizeProductKey } from '@core/utils/normalization.util';
-import { FOOD_TYPE_PROFILE } from './food-type-profile.domain';
+import { LEGACY_SHELF_LIFE_DAYS } from './expiry-suggestion.domain';
 
 /** How many recent dated additions of a product the learned shelf life looks at. */
 export const LEARNED_SAMPLE_SIZE = 5;
@@ -20,7 +20,7 @@ export function learnShelfLifeDays(events: readonly PantryEvent[]): Map<string, 
   const samples = new Map<string, { at: number; days: number }[]>();
   for (const e of events) {
     if (e.eventType !== 'ADD' || !e.productName || e.daysToExpiry == null || e.daysToExpiry <= 0) continue;
-    if (e.foodType && FOOD_TYPE_PROFILE[e.foodType]?.shelfLifeDays === e.daysToExpiry) continue;
+    if (e.foodType && LEGACY_SHELF_LIFE_DAYS[e.foodType] === e.daysToExpiry) continue;
     const at = Date.parse(e.timestamp);
     if (Number.isNaN(at)) continue;
     for (const key of [`id:${e.productId}`, normalizeProductKey(e.productName)]) {

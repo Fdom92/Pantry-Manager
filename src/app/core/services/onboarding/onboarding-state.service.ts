@@ -4,7 +4,7 @@ import { AnalyticsService } from '../analytics/analytics.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { LoggerService } from '../shared/logger.service';
 import type { OnboardingQuickSeedItem } from '@core/constants';
-import { buildAddItemPayload, FRESH_QTY, resolveSuggestedExpiry } from '@core/domain/pantry';
+import { buildAddItemPayload, FRESH_QTY, resolveSuggestedExpiry, type SuggestedExpiry } from '@core/domain/pantry';
 import { resolveNotificationsConsent } from '@core/domain/notifications/notification.domain';
 import type { OnboardingSlide } from '@core/models/onboarding';
 import type { PantryItem } from '@core/models/pantry';
@@ -96,7 +96,7 @@ export class OnboardingStateService {
   readonly selectedSeedPreviews = computed(() =>
     this.selectedSeedItems().map(seed => {
       const name = this.translate.instant(`onboarding.quickSeed.items.${seed.key}`);
-      const suggested = seed.alwaysNoExpiry
+      const suggested: SuggestedExpiry = seed.alwaysNoExpiry
         ? { noExpiry: true }
         : resolveSuggestedExpiry(name, seed.foodType, new Date());
       return { seed, name, ...suggested };

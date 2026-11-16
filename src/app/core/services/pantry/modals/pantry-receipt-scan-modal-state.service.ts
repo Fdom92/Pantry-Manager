@@ -8,7 +8,7 @@ import { createDocumentId } from '@core/utils/uuid.util';
 import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
-import { resolveSuggestedExpiry, inferFoodType, expiryAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
+import { resolveSuggestedExpiry, type SuggestedExpiry, inferFoodType, expiryAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
 import { classifyNativeDismissal } from '@core/domain/shared';
 import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
@@ -325,7 +325,7 @@ export class PantryReceiptScanModalStateService {
     const learned = this.isAutoMatch(line)
       ? this.shelfLife.daysFor(line.match?.name, line.match?._id)
       : this.shelfLife.daysFor(line.parsed.rawName);
-    const suggested = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned);
+    const suggested: SuggestedExpiry = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), { product: learned });
     return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
   }
 

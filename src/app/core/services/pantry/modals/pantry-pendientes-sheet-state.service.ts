@@ -192,7 +192,7 @@ export class PantryPendientesSheetStateService {
       foodType,
       ...(foodType && needsDate
         ? {
-            expirationDate: resolveSuggestedExpiry(item.name, foodType, new Date(), this.shelfLife.daysFor(item.name, item._id)).expirationDate,
+            expirationDate: resolveSuggestedExpiry(item.name, foodType, new Date(), { product: this.shelfLife.daysFor(item.name, item._id) }).expirationDate,
             noExpiry: !foodTypeExpires(foodType),
           }
         : { expirationDate: undefined, noExpiry: false }),
