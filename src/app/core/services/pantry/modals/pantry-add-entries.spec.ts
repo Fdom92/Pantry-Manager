@@ -8,6 +8,7 @@ import { LanguageService } from '../../shared/language.service';
 import { LoggerService } from '../../shared/logger.service';
 import { ToastService } from '../../shared/toast.service';
 import { PantryStoreService } from '../pantry-store.service';
+import { ShelfLifeLearningService } from '../shelf-life-learning.service';
 import { PantryAddModalStateService } from './pantry-add-modal-state.service';
 import { PantryFreshAddModalStateService } from './pantry-fresh-add-modal-state.service';
 
@@ -35,7 +36,7 @@ function makeItem(over: Partial<PantryItem> = {}): PantryItem {
   } as PantryItem;
 }
 
-function configure(loadedProducts: PantryItem[]) {
+function configure(loadedProducts: PantryItem[], learned?: { product?: number }) {
   const store = jasmine.createSpyObj<PantryStoreService>('PantryStoreService', [
     'addItem', 'updateItem', 'addNewLot',
   ]);
@@ -55,6 +56,7 @@ function configure(loadedProducts: PantryItem[]) {
       { provide: PantryStoreService, useValue: store },
       { provide: TranslateService, useValue: translate },
       { provide: LanguageService, useValue: language },
+      ...(learned ? [{ provide: ShelfLifeLearningService, useValue: { daysFor: () => learned } }] : []),
       { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'error', 'info', 'raw']) },
       { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
       { provide: HistoryEventManagerService, useValue: jasmine.createSpyObj('HistoryEventManagerService', ['logAddNewItem', 'logAddExistingItem']) },
@@ -403,5 +405,81 @@ describe('add sheet — submit / abandon funnel', () => {
       expect(eventsNamed('pantry_add_modal_abandoned')[0][1])
         .toEqual(jasmine.objectContaining({ kind: 'fresh' }));
     });
+  });
+});
+
+describe('expiry source of a suggested date', () => {
+  function addedProps(analytics: AnalyticsService) {
+    const calls = (analytics.track as jasmine.Spy).calls.allArgs().filter(([e]) => e === 'pantry_item_added');
+    return calls[calls.length - 1][1] as Record<string, unknown>;
+  }
+
+  it('comes from the table for a typed name, and from history when there is some', () => {
+    configure([]);
+    const table = TestBed.inject(PantryAddModalStateService);
+    table.addEntryFromQuery('pan');
+    expect(table.entries()[0].expirySource).toBe('table');
+    expect((table.entries()[0] as unknown as Record<string, unknown>)['source']).toBeUndefined();
+
+    TestBed.resetTestingModule();
+    configure([], { product: 9 });
+    const learned = TestBed.inject(PantryAddModalStateService);
+    learned.addEntryFromQuery('pan');
+    expect(learned.entries()[0].expirySource).toBe('learned_product');
+  });
+
+  it('turns into user once the user sets or clears the date, or marks no expiry', () => {
+    configure([], { product: 9 });
+    const service = TestBed.inject(PantryAddModalStateService);
+    service.addEntryFromQuery('pan');
+    const id = service.entries()[0].id;
+    service.setEntryDate(id, '2026-03-01');
+    expect(service.entries()[0].expirySource).toBe('user');
+    service.setEntryDate(id, undefined);
+    expect(service.entries()[0].expirySource).toBe('user');
+
+    service.addEntryFromQuery('arroz');
+    service.setEntryNoExpiry(service.entries()[1].id);
+    expect(service.entries()[1].expirySource).toBe('user');
+  });
+
+  it('a food type change re-derives from the table, but keeps the user date as user', () => {
+    configure([], { product: 9 });
+    const service = TestBed.inject(PantryFreshAddModalStateService);
+    service.addEntryFromQuery('algo nuevo');
+    const id = service.entries()[0].id;
+    service.setEntryFoodType(id, FoodType.DAIRY);
+    expect(service.entries()[0].expirySource).toBe('table');
+    service.setEntryDate(id, '2026-03-01');
+    service.setEntryFoodType(id, FoodType.VEGETABLE);
+    expect(service.entries()[0].expirySource).toBe('user');
+  });
+
+  it('exposes the hint source to the view, nothing for user or none', () => {
+    configure([], { product: 9 });
+    const service = TestBed.inject(PantryAddModalStateService);
+    service.addEntryFromQuery('pan');
+    expect(service.entryViewModels()[0].expirySource).toBe('learned_product');
+  });
+
+  it('pantry_item_added carries expiry_source in both sheets', async () => {
+    configure([], { product: 9 });
+    const despensa = TestBed.inject(PantryAddModalStateService);
+    const analytics = TestBed.inject(AnalyticsService);
+    despensa.addEntryFromQuery('pan');
+    await despensa.submit();
+    expect(addedProps(analytics)['expiry_source']).toBe('learned_product');
+
+    despensa.open();
+    despensa.addEntryFromQuery('queso');
+    despensa.setEntryDate(despensa.entries()[0].id, '2026-03-01');
+    await despensa.submit();
+    expect(addedProps(analytics)['expiry_source']).toBe('user');
+
+    const fresh = TestBed.inject(PantryFreshAddModalStateService);
+    fresh.open();
+    fresh.addEntryFromQuery('lechuga');
+    await fresh.submit();
+    expect(addedProps(analytics)['expiry_source']).toBe('learned_product');
   });
 });

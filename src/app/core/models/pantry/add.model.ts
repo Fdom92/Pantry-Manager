@@ -1,3 +1,4 @@
+import type { ExpirySource } from '@core/domain/pantry';
 import type { FoodType } from '../shared/enums.model';
 import type { PantryItem } from './item.model';
 
@@ -16,4 +17,6 @@ export interface AddEntry {
    * of food type from replacing it. A suggested date makes no such claim.
    */
   dateFromUser?: boolean;
+  /** Who decided the date, for the hint under it and for analytics. */
+  expirySource?: ExpirySource | 'user';
 }

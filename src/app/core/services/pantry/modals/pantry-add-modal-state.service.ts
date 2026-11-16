@@ -53,6 +53,7 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
       return {
         ...entry,
         noExpiry: toggled || undefined,
+        expirySource: 'user',
         expirationDate: toggled ? undefined : entry.expirationDate,
       };
     });
@@ -95,6 +96,7 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
             is_new: true,
             quantity: entry.quantity,
             has_expiry: Boolean(entry.expirationDate),
+            expiry_source: entry.expirySource ?? 'none',
           });
           continue;
         }
@@ -113,6 +115,7 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
             is_new: false,
             quantity: entry.quantity,
             has_expiry: Boolean(entry.expirationDate),
+            expiry_source: entry.expirySource ?? 'none',
           });
         }
       }

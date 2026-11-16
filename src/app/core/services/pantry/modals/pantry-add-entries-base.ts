@@ -1,5 +1,5 @@
 import { computed, inject, signal } from '@angular/core';
-import { expiryAfterFoodTypeChange, inferFoodType, resolveSuggestedExpiry, sumQuantities } from '@core/domain/pantry';
+import { expiryAfterFoodTypeChange, expirySourceAfterFoodTypeChange, inferFoodType, resolveSuggestedExpiry, sumQuantities } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import type { FoodType } from '@core/models/shared/enums.model';
 import { buildPantryItemAutocomplete } from '@core/utils';
@@ -78,6 +78,7 @@ export abstract class PantryAddEntriesBase {
       expirationDate: entry.expirationDate,
       noExpiry: entry.noExpiry,
       foodType: entry.foodType,
+      expirySource: entry.expirySource,
     }))
   );
 
@@ -218,6 +219,7 @@ export abstract class PantryAddEntriesBase {
       ...entry,
       foodType,
       ...expiryAfterFoodTypeChange(entry, foodType, new Date()),
+      expirySource: expirySourceAfterFoodTypeChange(entry, foodType),
     }));
   }
 
@@ -231,6 +233,7 @@ export abstract class PantryAddEntriesBase {
       expirationDate: date || undefined,
       noExpiry: date ? undefined : entry.noExpiry,
       dateFromUser: true,
+      expirySource: 'user',
     }));
   }
 
@@ -275,7 +278,8 @@ export abstract class PantryAddEntriesBase {
 
   /** A restock is a new carton, so it gets a fresh suggestion, not the old batch's date. */
   protected suggestedExpiryFor(name: string, item?: PantryItem): Partial<AddEntry> {
-    return resolveSuggestedExpiry(name, item?.foodType ?? null, new Date(), this.shelfLife.daysFor(item?.name ?? name, item?._id, item?.foodKind, item?.foodType), item?.foodKind);
+    const { source, ...suggested } = resolveSuggestedExpiry(name, item?.foodType ?? null, new Date(), this.shelfLife.daysFor(item?.name ?? name, item?._id, item?.foodKind, item?.foodType), item?.foodKind);
+    return { ...suggested, expirySource: source };
   }
 
   private buildOptions(items: PantryItem[], entries: AddEntry[]): AutocompleteItem<PantryItem>[] {

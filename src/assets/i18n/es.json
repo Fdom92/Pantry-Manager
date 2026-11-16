@@ -691,7 +691,9 @@
         "household": "Hogar"
       },
       "expiry": {
-        "suggestedHint": "La fecha se sugiere a partir del tipo de alimento. Edítala si no cuadra."
+        "suggestedHint": "La fecha se sugiere a partir del tipo de alimento. Edítala si no cuadra.",
+        "sourceLearned": "Según tus compras anteriores",
+        "sourceTable": "Estimada para este tipo de producto"
       }
     },
     "detail": {

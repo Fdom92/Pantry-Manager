@@ -691,7 +691,9 @@
         "household": "Household"
       },
       "expiry": {
-        "suggestedHint": "The date is suggested from the food type. Edit it if it doesn't fit."
+        "suggestedHint": "The date is suggested from the food type. Edit it if it doesn't fit.",
+        "sourceLearned": "Based on your past purchases",
+        "sourceTable": "Estimated for this type of product"
       }
     },
     "detail": {

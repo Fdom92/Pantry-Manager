@@ -125,3 +125,9 @@ export function expiryAfterFoodTypeChange(
   if (klass.sealedDays === null) return { noExpiry: true };
   return { expirationDate: suggestExpiryDate(klass, fromDate) };
 }
+
+/** Where the date a row holds after a type change comes from: its own, none, or the new class's table. */
+export function expirySourceAfterFoodTypeChange(row: ExpiryEditableRow, foodType: FoodType): ExpirySource | 'user' {
+  if (row.dateFromUser && (row.expirationDate || row.noExpiry)) return 'user';
+  return genericClassFor(foodType).sealedDays === null ? 'none' : 'table';
+}

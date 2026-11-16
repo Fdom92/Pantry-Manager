@@ -1,3 +1,4 @@
+import type { ExpirySource } from '@core/domain/pantry';
 import type { PantryItem } from '../pantry/item.model';
 import type { FoodType } from '../shared/enums.model';
 
@@ -72,6 +73,8 @@ export interface ReceiptReviewLine {
   noExpiry?: boolean;
   /** True once the user has touched the date/no-expiry picker for this line — mirrors AddEntry.dateFromUser, so a later food-type change doesn't clobber a date the user already set. */
   dateFromUser: boolean;
+  /** Who decided the date, for analytics. */
+  expirySource?: ExpirySource | 'user';
   /** Where a new product goes. Matched lines follow the existing product. */
   storage: 'pantry' | 'fresh';
   /** What the food class suggested; `storage` differing from it is a user override. */

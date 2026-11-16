@@ -691,7 +691,9 @@
         "household": "Casa"
       },
       "expiry": {
-        "suggestedHint": "A data é sugerida a partir do tipo de alimento. Edita-a se não bater certo."
+        "suggestedHint": "A data é sugerida a partir do tipo de alimento. Edita-a se não bater certo.",
+        "sourceLearned": "Com base nas tuas compras anteriores",
+        "sourceTable": "Estimada para este tipo de produto"
       }
     },
     "detail": {

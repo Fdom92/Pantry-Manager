@@ -111,6 +111,11 @@
                     </ion-button>
                   }
                 </div>
+                @if (showEntryDate && (entry.expirySource === 'learned_product' || entry.expirySource === 'learned_class')) {
+                  <p class="entity-selector-item-source">{{ 'pantry.form.expiry.sourceLearned' | translate }}</p>
+                } @else if (showEntryDate && entry.expirySource === 'table') {
+                  <p class="entity-selector-item-source">{{ 'pantry.form.expiry.sourceTable' | translate }}</p>
+                }
               </div>
             }
           </section>

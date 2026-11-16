@@ -1,7 +1,7 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import { suggestExpiryDate } from './expiry-suggestion.domain';
 import { FOOD_CLASS_BY_KEY, genericClassFor } from './food-classes.data';
-import { expiryAfterFoodTypeChange, inferExpiryForName, inferFoodType, resolveSuggestedExpiry } from './food-type-inference.domain';
+import { expiryAfterFoodTypeChange, expirySourceAfterFoodTypeChange, inferExpiryForName, inferFoodType, resolveSuggestedExpiry } from './food-type-inference.domain';
 
 describe('inferFoodType', () => {
   it('matches a simple single-word term', () => {
@@ -170,5 +170,13 @@ describe('expiryAfterFoodTypeChange', () => {
   it('keeps a date the user set', () => {
     expect(expiryAfterFoodTypeChange({ expirationDate: '2026-02-02', dateFromUser: true }, FoodType.DAIRY, from))
       .toEqual({ expirationDate: '2026-02-02', noExpiry: undefined });
+  });
+});
+
+describe('expirySourceAfterFoodTypeChange', () => {
+  it('is user when the user date survives, none for a class without expiry, table otherwise', () => {
+    expect(expirySourceAfterFoodTypeChange({ expirationDate: '2026-02-02', dateFromUser: true }, FoodType.DAIRY)).toBe('user');
+    expect(expirySourceAfterFoodTypeChange({}, FoodType.HOUSEHOLD)).toBe('none');
+    expect(expirySourceAfterFoodTypeChange({ expirationDate: '2026-02-02' }, FoodType.DAIRY)).toBe('table');
   });
 });

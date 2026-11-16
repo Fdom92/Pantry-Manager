@@ -66,6 +66,7 @@ ion-modal.app-sheet-modal {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   padding-block: var(--app-theme-spacing-sm);
   border-bottom: var(--app-theme-form-section-divider);
 
@@ -83,6 +84,14 @@ ion-modal.app-sheet-modal {
   // read, and a date chip beside it leaves little room on a phone. Long names
   // take a second line instead of turning into "L...".
   overflow-wrap: anywhere;
+}
+
+// Own line under the date, so it never competes with the chips for width.
+.entity-selector-item-source {
+  flex: 1 0 100%;
+  margin: var(--app-theme-spacing-2xs) 0 0;
+  font-size: var(--app-theme-font-size-small);
+  color: var(--app-theme-text-muted);
 }
 
 .entity-selector-controls {

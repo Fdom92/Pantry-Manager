@@ -691,7 +691,9 @@
         "household": "Ménage"
       },
       "expiry": {
-        "suggestedHint": "La date est suggérée d'après le type d'aliment. Modifiez-la si besoin."
+        "suggestedHint": "La date est suggérée d'après le type d'aliment. Modifiez-la si besoin.",
+        "sourceLearned": "D'après vos achats précédents",
+        "sourceTable": "Estimée pour ce type de produit"
       }
     },
     "detail": {

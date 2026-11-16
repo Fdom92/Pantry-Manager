@@ -9,7 +9,7 @@ import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
 import { FRESH_QTY, resolveFoodClass } from '@core/domain/pantry';
-import { resolveSuggestedExpiry, type SuggestedExpiry, inferFoodType, expiryAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
+import { resolveSuggestedExpiry, inferFoodType, expiryAfterFoodTypeChange, expirySourceAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
 import { classifyNativeDismissal } from '@core/domain/shared';
 import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
@@ -325,18 +325,18 @@ export class PantryReceiptScanModalStateService {
    * fields should be) so the two can't drift into different answers for the
    * same question.
    */
-  private deriveLineFields(line: ReceiptReviewLine): Pick<ReceiptReviewLine, 'foodType' | 'expirationDate' | 'noExpiry' | 'storage' | 'suggestedStorage'> {
+  private deriveLineFields(line: ReceiptReviewLine): Pick<ReceiptReviewLine, 'foodType' | 'expirationDate' | 'noExpiry' | 'expirySource' | 'storage' | 'suggestedStorage'> {
     const foodType = this.isAutoMatch(line) ? (line.match!.foodType ?? null) : inferFoodType(line.parsed.rawName);
     const storage = this.storageFor(line, foodType);
     if (line.dateFromUser && (line.expirationDate || line.noExpiry)) {
-      return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry, ...storage };
+      return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry, expirySource: 'user', ...storage };
     }
     const learned = this.isAutoMatch(line)
       ? this.shelfLife.daysFor(line.match?.name, line.match?._id, line.match?.foodKind, foodType)
       : this.shelfLife.daysFor(line.parsed.rawName, undefined, null, foodType);
     // A restocked fresh item needs a date too: its old batch date is the one it is replacing.
-    const suggested: SuggestedExpiry = resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned, line.match?.foodKind);
-    return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry, ...storage };
+    const { source, ...suggested } = resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned, line.match?.foodKind);
+    return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry, expirySource: source, ...storage };
   }
 
   /** Class storage for a new line (unknown → pantry); a manual override survives re-derivation. */
@@ -392,7 +392,7 @@ export class PantryReceiptScanModalStateService {
     this.reviewLines.update(lines =>
       lines.map(l =>
         l.id === id
-          ? { ...l, foodType, ...expiryAfterFoodTypeChange(l, foodType, new Date()), ...this.storageFor(l, foodType) }
+          ? { ...l, foodType, ...expiryAfterFoodTypeChange(l, foodType, new Date()), expirySource: expirySourceAfterFoodTypeChange(l, foodType), ...this.storageFor(l, foodType) }
           : l,
       ),
     );
@@ -404,7 +404,7 @@ export class PantryReceiptScanModalStateService {
     this.reviewLines.update(lines =>
       lines.map(l =>
         l.id === id
-          ? { ...l, expirationDate: date || undefined, noExpiry: date ? undefined : l.noExpiry, dateFromUser: true }
+          ? { ...l, expirationDate: date || undefined, noExpiry: date ? undefined : l.noExpiry, dateFromUser: true, expirySource: 'user' }
           : l,
       ),
     );
@@ -417,7 +417,7 @@ export class PantryReceiptScanModalStateService {
       lines.map(l => {
         if (l.id !== id) return l;
         const toggled = !l.noExpiry;
-        return { ...l, noExpiry: toggled || undefined, expirationDate: toggled ? undefined : l.expirationDate, dateFromUser: true };
+        return { ...l, noExpiry: toggled || undefined, expirationDate: toggled ? undefined : l.expirationDate, dateFromUser: true, expirySource: 'user' };
       }),
     );
     this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'no_expiry' });
@@ -487,6 +487,7 @@ export class PantryReceiptScanModalStateService {
           is_new: !this.isAutoMatch(line),
           quantity: this.isFreshLine(line) ? FRESH_QTY.sufficient : line.quantity,
           has_expiry: Boolean(line.expirationDate),
+          expiry_source: line.expirySource ?? 'none',
         });
         added++;
       }

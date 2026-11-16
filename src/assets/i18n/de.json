@@ -691,7 +691,9 @@
         "household": "Haushalt"
       },
       "expiry": {
-        "suggestedHint": "Das Datum wird aus dem Lebensmitteltyp vorgeschlagen. Passe es bei Bedarf an."
+        "suggestedHint": "Das Datum wird aus dem Lebensmitteltyp vorgeschlagen. Passe es bei Bedarf an.",
+        "sourceLearned": "Nach deinen bisherigen Einkäufen",
+        "sourceTable": "Geschätzt für diese Produktart"
       }
     },
     "detail": {

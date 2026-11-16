@@ -94,6 +94,7 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
             is_new: true,
             quantity: FRESH_QTY.sufficient,
             has_expiry: Boolean(entry.expirationDate),
+          expiry_source: entry.expirySource ?? 'none',
           });
           continue;
         }
@@ -122,6 +123,7 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
           is_new: false,
           quantity: FRESH_QTY.sufficient,
           has_expiry: Boolean(entry.expirationDate),
+            expiry_source: entry.expirySource ?? 'none',
         });
       }
       this.recordSubmitted(entries);
