@@ -184,11 +184,11 @@ export class ListStateService {
         // Restocking an existing product: derive the expiry from the product's
         // own foodType when it has one, otherwise infer it from its name. Without
         // this the new lot is dateless and invisible to every expiry alert.
-        const suggested = resolveSuggestedExpiry(previous.name, previous.foodType, new Date(timestamp), this.shelfLife.daysFor(previous.name, previous._id, null, previous.foodType));
+        const suggested = resolveSuggestedExpiry(previous.name, previous.foodType, new Date(timestamp), this.shelfLife.daysFor(previous.name, previous._id, previous.foodKind, previous.foodType), previous.foodKind);
         const updated = await this.pantryStore.addNewLot(id, { quantity, ...toLotExpiry(suggested) });
         if (updated) {
           this.recordPurchaseUndo(id, { pantryItemSnapshot: preSnapshot, removedManuals: sameNameManuals });
-          await this.eventManager.logAddExistingItem(previous, updated, quantity, undefined, undefined, timestamp);
+          await this.eventManager.logAddExistingItem(previous, updated, quantity, undefined, undefined, timestamp, { dateFromUser: false });
         }
       }
       // Buying the automatic suggestion settles any hand-written note for the
@@ -238,13 +238,13 @@ export class ListStateService {
         } else {
           // Same reasoning as markAsBought: an added lot with no date would be
           // invisible to the expiry alerts.
-          const suggested = resolveSuggestedExpiry(match.name, match.foodType, new Date(timestamp), this.shelfLife.daysFor(match.name, match._id, null, match.foodType));
+          const suggested = resolveSuggestedExpiry(match.name, match.foodType, new Date(timestamp), this.shelfLife.daysFor(match.name, match._id, match.foodKind, match.foodType), match.foodKind);
           updated = await this.pantryStore.addNewLot(match._id, { quantity, ...toLotExpiry(suggested) });
           if (updated) await this.pantryStore.updateItem(updated);
         }
         if (updated) {
           this.recordPurchaseUndo(id, { pantryItemSnapshot: preSnapshot, manualItem: item, pantryItemId: match._id });
-          await this.eventManager.logAddExistingItem(match, updated, quantity, undefined, undefined, timestamp);
+          await this.eventManager.logAddExistingItem(match, updated, quantity, undefined, undefined, timestamp, { dateFromUser: false });
         }
       } else {
         const base = buildAddItemPayload({
@@ -259,7 +259,7 @@ export class ListStateService {
         // _id), so newItem._id may never reach the cache. recordPurchaseUndo
         // skips the record in that case: there is nothing of ours to delete.
         this.recordPurchaseUndo(id, { manualItem: item, pantryItemId: newItem._id });
-        await this.eventManager.logAddNewItem(newItem, quantity, undefined, timestamp);
+        await this.eventManager.logAddNewItem(newItem, quantity, undefined, timestamp, { dateFromUser: false });
       }
       this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
         kind: 'despensa',

@@ -178,7 +178,7 @@ export class PantryPendientesSheetStateService {
 
   /** Date and no-expiry flag come from one suggestion so they cannot disagree. */
   private suggestion(item: PantryItem, foodType: FoodType) {
-    const { expirationDate, noExpiry } = resolveSuggestedExpiry(item.name, foodType, new Date(), this.shelfLife.daysFor(item.name, item._id, null, foodType));
+    const { expirationDate, noExpiry } = resolveSuggestedExpiry(item.name, foodType, new Date(), this.shelfLife.daysFor(item.name, item._id, item.foodKind, foodType), item.foodKind);
     return { expirationDate, noExpiry: !!noExpiry };
   }
 

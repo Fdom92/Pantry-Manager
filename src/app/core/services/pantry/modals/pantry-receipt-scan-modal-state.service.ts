@@ -323,9 +323,9 @@ export class PantryReceiptScanModalStateService {
       return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry };
     }
     const learned = this.isAutoMatch(line)
-      ? this.shelfLife.daysFor(line.match?.name, line.match?._id, null, foodType)
+      ? this.shelfLife.daysFor(line.match?.name, line.match?._id, line.match?.foodKind, foodType)
       : this.shelfLife.daysFor(line.parsed.rawName, undefined, null, foodType);
-    const suggested: SuggestedExpiry = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned);
+    const suggested: SuggestedExpiry = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned, line.match?.foodKind);
     return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
   }
 
@@ -427,7 +427,7 @@ export class PantryReceiptScanModalStateService {
               });
           if (updated) {
             await this.pantryStore.updateItem(updated);
-            await this.eventManager.logAddExistingItem(matchedItem, updated, line.quantity, undefined, sessionId, timestamp);
+            await this.eventManager.logAddExistingItem(matchedItem, updated, line.quantity, undefined, sessionId, timestamp, { dateFromUser: line.dateFromUser });
             matched++;
           }
         } else {
@@ -447,7 +447,7 @@ export class PantryReceiptScanModalStateService {
             supermarket: this.detectedSupermarket() ?? undefined,
           };
           await this.pantryStore.addItem(item);
-          await this.eventManager.logAddNewItem(item, line.quantity, sessionId, timestamp);
+          await this.eventManager.logAddNewItem(item, line.quantity, sessionId, timestamp, { dateFromUser: line.dateFromUser });
         }
         this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
           kind: 'despensa',

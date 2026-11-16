@@ -586,6 +586,15 @@ describe('ListStateService — undoPurchase', () => {
     expect(service.canUndoPurchase('m1')).toBeFalse();
   });
 
+  it('logs a list restock as app-dated, so it never feeds learned shelf life', async () => {
+    setup([pollo()], []);
+    const events = TestBed.inject(HistoryEventManagerService) as jasmine.SpyObj<HistoryEventManagerService>;
+
+    await service.markAsBought(service.shoppingAnalysis().suggestions[0]);
+
+    expect(events.logAddExistingItem.calls.mostRecent().args[6]).toEqual({ dateFromUser: false });
+  });
+
   it('keeps the undo record when the history log throws after the pantry write', async () => {
     setup([pollo()], [{ id: 'm1', name: 'Pollo', createdAt: 1 }]);
     const events = TestBed.inject(HistoryEventManagerService) as jasmine.SpyObj<HistoryEventManagerService>;

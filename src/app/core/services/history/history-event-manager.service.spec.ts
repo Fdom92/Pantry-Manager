@@ -332,6 +332,29 @@ describe('HistoryEventManagerService', () => {
     });
   });
 
+  describe('food kind and date origin', () => {
+    it('logAddNewItem writes the item foodKind and the dateFromUser flag', async () => {
+      await service.logAddNewItem(makeItem({ batches: [makeBatch(1)], foodKind: 'fresh-bread' }), 1, undefined, undefined, { dateFromUser: true });
+      const params = eventLogSpy.logAddEvent.calls.mostRecent().args[0];
+      expect(params.foodKind).toBe('fresh-bread');
+      expect(params.dateFromUser).toBeTrue();
+    });
+
+    it('logAddExistingItem writes the updated item foodKind and the flag', async () => {
+      const prev = makeItem({ batches: [makeBatch(1)] });
+      const updated = makeItem({ batches: [makeBatch(2)], foodKind: 'milk' });
+      await service.logAddExistingItem(prev, updated, 1, undefined, undefined, undefined, { dateFromUser: false });
+      const params = eventLogSpy.logAddEvent.calls.mostRecent().args[0];
+      expect(params.foodKind).toBe('milk');
+      expect(params.dateFromUser).toBeFalse();
+    });
+
+    it('leaves dateFromUser unset when the caller gives no meta', async () => {
+      await service.logAddNewItem(makeItem({ batches: [makeBatch(1)] }), 1);
+      expect(eventLogSpy.logAddEvent.calls.mostRecent().args[0].dateFromUser).toBeUndefined();
+    });
+  });
+
   // ── logAddExistingItem ─────────────────────────────────────────────────────
 
   describe('logAddExistingItem', () => {

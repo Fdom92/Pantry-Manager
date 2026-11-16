@@ -87,7 +87,7 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
             isBasic: false,
           };
           await this.pantryStore.addItem(freshItem);
-          await this.eventManager.logAddNewItem(freshItem, 3, sessionId, timestamp);
+          await this.eventManager.logAddNewItem(freshItem, 3, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
           this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
             kind: 'fresh',
             source: 'fresh_add_modal',
@@ -115,7 +115,7 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
           updatedAt: timestamp,
         };
         await this.pantryStore.updateItem(updated);
-        await this.eventManager.logAddExistingItem(existing, updated, 3, entry.expirationDate, sessionId, timestamp);
+        await this.eventManager.logAddExistingItem(existing, updated, 3, entry.expirationDate, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
         this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
           kind: 'fresh',
           source: 'fresh_add_modal',

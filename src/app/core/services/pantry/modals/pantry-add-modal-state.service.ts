@@ -88,7 +88,7 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
           });
           const item: PantryItem = { ...base, productType: 'pantry' };
           await this.pantryStore.addItem(item);
-          await this.eventManager.logAddNewItem(item, entry.quantity, sessionId, timestamp);
+          await this.eventManager.logAddNewItem(item, entry.quantity, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
           this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
             kind: 'despensa',
             source: 'add_modal',
@@ -106,7 +106,7 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
         });
         if (updated) {
           await this.pantryStore.updateItem(updated);
-          await this.eventManager.logAddExistingItem(entry.item, updated, entry.quantity, entry.expirationDate, sessionId, timestamp);
+          await this.eventManager.logAddExistingItem(entry.item, updated, entry.quantity, entry.expirationDate, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
           this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
             kind: 'despensa',
             source: 'add_modal',

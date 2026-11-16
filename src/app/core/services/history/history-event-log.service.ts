@@ -117,6 +117,8 @@ export class HistoryEventLogService extends StorageService<PantryEvent> {
       source: params.source,
       categoryId: params.categoryId,
       foodType: params.foodType,
+      foodKind: params.foodKind,
+      dateFromUser: params.dateFromUser,
       expirationDate: params.expirationDate,
       daysToExpiry: params.daysToExpiry ?? computeDaysToExpiry(params.expirationDate, now),
       editedFields: params.editedFields,

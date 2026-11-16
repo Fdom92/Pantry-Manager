@@ -357,6 +357,20 @@ describe('add sheet — submit / abandon funnel', () => {
       expect(eventsNamed('pantry_add_modal_abandoned').length).toBe(0);
     });
 
+    it('tells the event log whether the user set the date', async () => {
+      const events = TestBed.inject(HistoryEventManagerService) as jasmine.SpyObj<HistoryEventManagerService>;
+      service.open();
+      service.addEntryFromQuery('yogur natural');
+      service.setEntryDate(service.entries()[0].id, '2026-03-01');
+      await service.submit();
+      expect(events.logAddNewItem.calls.mostRecent().args[4]).toEqual({ dateFromUser: true });
+
+      service.open();
+      service.addEntryFromQuery('queso fresco');
+      await service.submit();
+      expect(events.logAddNewItem.calls.mostRecent().args[4]).toEqual({ dateFromUser: false });
+    });
+
     it('does not double-count when dismiss runs twice', () => {
       service.open();
       service.dismiss();

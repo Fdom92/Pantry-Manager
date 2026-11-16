@@ -317,7 +317,7 @@ export class OnboardingStateService {
         productType: seed.productType,
       };
       await this.pantryStore.addItem(item);
-      await this.historyManager.logAddNewItem(item, quantity, sessionId, timestamp);
+      await this.historyManager.logAddNewItem(item, quantity, sessionId, timestamp, { dateFromUser: false });
     }
   }
 }

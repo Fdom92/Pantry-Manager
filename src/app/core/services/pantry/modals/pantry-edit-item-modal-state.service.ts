@@ -22,7 +22,7 @@ import { LoggerService } from '../../shared/logger.service';
 import { ToastService } from '../../shared';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
-import { buildConvertToFreshPreview, consolidateBatchesForFresh } from '@core/domain/pantry';
+import { buildConvertToFreshPreview, consolidateBatchesForFresh, resolveFoodClass } from '@core/domain/pantry';
 import { PantryEditModalBase } from './pantry-edit-modal-base';
 
 @Injectable()
@@ -363,6 +363,8 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
       isBasic: isBasic ? true : undefined,
       minThreshold: isBasic ? normalizedMinThreshold : undefined,
       foodType: foodType ?? undefined,
+      // A changed type invalidates the stored class; recompute so it never contradicts the type.
+      foodKind: (foodType ?? undefined) === existing.foodType ? existing.foodKind : resolveFoodClass(name ?? '', foodType)?.key,
       updatedAt: now,
     };
   }
