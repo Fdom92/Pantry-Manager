@@ -4,7 +4,6 @@ import { countMissingExpiryBatches, hasMissingExpiry, isIncomplete } from '@core
 import { inferFoodType } from '@core/domain/pantry/food-type-inference.domain';
 import { applyPendienteFix, isPendienteRowResolved } from '@core/domain/pantry/pendiente-fix.domain';
 import { expiryAfterFoodTypeChange, resolveSuggestedExpiry } from '@core/domain/pantry/food-type-inference.domain';
-import { foodTypeExpires } from '@core/domain/pantry/expiry-suggestion.domain';
 import type { PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
 import { withSignalFlag } from '@core/utils';
@@ -177,6 +176,12 @@ export class PantryPendientesSheetStateService {
     });
   }
 
+  /** Date and no-expiry flag come from one suggestion so they cannot disagree. */
+  private suggestion(item: PantryItem, foodType: FoodType) {
+    const { expirationDate, noExpiry } = resolveSuggestedExpiry(item.name, foodType, new Date(), { product: this.shelfLife.daysFor(item.name, item._id) });
+    return { expirationDate, noExpiry: !!noExpiry };
+  }
+
   private buildRow(item: PantryItem): PendienteRow {
     // For items missing a foodType, offer the inferred one as a pre-selection
     // so the user confirms rather than picks from scratch.
@@ -190,12 +195,7 @@ export class PantryPendientesSheetStateService {
       needsDate,
       datelessBatchCount: countMissingExpiryBatches(item),
       foodType,
-      ...(foodType && needsDate
-        ? {
-            expirationDate: resolveSuggestedExpiry(item.name, foodType, new Date(), { product: this.shelfLife.daysFor(item.name, item._id) }).expirationDate,
-            noExpiry: !foodTypeExpires(foodType),
-          }
-        : { expirationDate: undefined, noExpiry: false }),
+      ...(foodType && needsDate ? this.suggestion(item, foodType) : { expirationDate: undefined, noExpiry: false }),
     };
   }
 }
