@@ -9,3 +9,4 @@ export * from './pantry-list-ui-state.service';
 export * from './modals/pantry-edit-item-modal-state.service';
 export * from './modals/pantry-add-modal-state.service';
 export * from './modals/pantry-batches-modal-state.service';
+export * from './first-products.service';

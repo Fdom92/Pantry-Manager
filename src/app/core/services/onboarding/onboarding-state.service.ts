@@ -4,16 +4,14 @@ import { AnalyticsService } from '../analytics/analytics.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { LoggerService } from '../shared/logger.service';
 import type { OnboardingQuickSeedItem } from '@core/constants';
-import { buildAddItemPayload, FRESH_QTY, resolveSuggestedExpiry, type SuggestedExpiry } from '@core/domain/pantry';
+import { FOOD_CLASS_BY_KEY, resolveSuggestedExpiry, type SuggestedExpiry } from '@core/domain/pantry';
 import { resolveNotificationsConsent } from '@core/domain/notifications/notification.domain';
 import type { OnboardingSlide } from '@core/models/onboarding';
-import type { PantryItem } from '@core/models/pantry';
-import { createDocumentId } from '@core/utils';
 // Direct localStorage usage replaced by `LocalStorageService` (DI below).
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { PantryStoreService } from '../pantry/pantry-store.service';
-import { HistoryEventManagerService } from '../history/history-event-manager.service';
+import { FirstProductsService } from '../pantry/first-products.service';
+import { ClockService } from '../shared/clock.service';
 import { NotificationPermissionService } from '../notifications/notification-permission.service';
 import { WelcomeNotificationService } from '../notifications/welcome-notification.service';
 import { NotificationSchedulerService } from '../notifications/notification-scheduler.service';
@@ -40,8 +38,8 @@ let swiperRegistered = false;
 @Injectable()
 export class OnboardingStateService {
   private readonly navCtrl = inject(NavController);
-  private readonly pantryStore = inject(PantryStoreService);
-  private readonly historyManager = inject(HistoryEventManagerService);
+  private readonly firstProducts = inject(FirstProductsService);
+  private readonly clock = inject(ClockService);
   private readonly notificationPermission = inject(NotificationPermissionService);
   private readonly preferences = inject(SettingsPreferencesService);
   private readonly welcomeNotif = inject(WelcomeNotificationService);
@@ -96,9 +94,8 @@ export class OnboardingStateService {
   readonly selectedSeedPreviews = computed(() =>
     this.selectedSeedItems().map(seed => {
       const name = this.translate.instant(`onboarding.quickSeed.items.${seed.key}`);
-      const suggested: SuggestedExpiry = seed.alwaysNoExpiry
-        ? { noExpiry: true }
-        : resolveSuggestedExpiry(name, seed.foodType, new Date());
+      const cls = FOOD_CLASS_BY_KEY.get(seed.classKey)!;
+      const suggested: SuggestedExpiry = resolveSuggestedExpiry(name, cls.foodType, new Date(this.clock.now()), undefined, seed.classKey);
       return { seed, name, ...suggested };
     })
   );
@@ -246,7 +243,18 @@ export class OnboardingStateService {
       analytics_granted: this.analyticsDecision() === 'granted',
       skipped: options?.skipped ?? false,
     });
-    await this.bulkCreateSeedItems();
+    await this.firstProducts.save(
+      this.selectedSeedItems().map(seed => {
+        const cls = FOOD_CLASS_BY_KEY.get(seed.classKey)!;
+        return {
+          name: this.translate.instant(`onboarding.quickSeed.items.${seed.key}`),
+          classKey: seed.classKey,
+          storage: cls.storage,
+          dateFromUser: false,
+          source: 'suggestion' as const,
+        };
+      })
+    );
     // Re-run after seeding so projected notifications reflect the new items.
     void this.notificationScheduler.scheduleAll();
     // First post-onboarding view = pantry so user sees their seeded products.
@@ -282,42 +290,6 @@ export class OnboardingStateService {
 
     if (Object.keys(patch).length) {
       await this.preferences.savePreferences({ ...current, ...patch });
-    }
-  }
-
-  /**
-   * Create PantryItems for every selected quick-seed entry.
-   * Items with `alwaysNoExpiry` get a noExpiry batch; all others stay with no
-   * expirationDate set so the user fills it as they actually need it (Option A
-   * — never invent dates).
-   */
-  private async bulkCreateSeedItems(): Promise<void> {
-    const selected = this.selectedSeedItems();
-    if (!selected.length) {
-      return;
-    }
-    const timestamp = new Date().toISOString();
-    const sessionId = selected.length > 1 ? createDocumentId('session') : undefined;
-    for (const seed of selected) {
-      const name = this.translate.instant(`onboarding.quickSeed.items.${seed.key}`);
-      const quantity = seed.productType === 'fresh' ? FRESH_QTY.sufficient : 1;
-      const base = buildAddItemPayload({
-        id: createDocumentId('item'),
-        nowIso: timestamp,
-        name,
-        quantity,
-        noExpiry: seed.alwaysNoExpiry,
-        // The curated list already knows what each seed is, so the builder must
-        // not fall back to guessing it from a translated name — that is what
-        // left "Œufs" and "Grão-de-bico" without a date.
-        foodType: seed.foodType,
-      });
-      const item: PantryItem = {
-        ...base,
-        productType: seed.productType,
-      };
-      await this.pantryStore.addItem(item);
-      await this.historyManager.logAddNewItem(item, quantity, sessionId, timestamp, { dateFromUser: false });
     }
   }
 }

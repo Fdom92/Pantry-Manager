@@ -1,39 +1,40 @@
-import { FoodType } from '@core/models/shared';
-
+/**
+ * What the grid offers. The class gives each one its type, its date and whether
+ * it lives in the pantry or the fridge, so nothing here repeats those facts.
+ * Keys are food-class keys (core/domain/pantry/food-classes.data.ts).
+ */
 export interface OnboardingQuickSeedItem {
   key: string;
   emoji: string;
-  foodType: FoodType;
-  productType: 'fresh' | 'pantry';
-  alwaysNoExpiry?: boolean;
+  classKey: string;
 }
 
 export const ONBOARDING_QUICK_SEED_ITEMS: readonly OnboardingQuickSeedItem[] = [
-  { key: 'milk', emoji: '🥛', foodType: FoodType.DAIRY, productType: 'pantry' },
-  { key: 'eggs', emoji: '🥚', foodType: FoodType.PROTEIN, productType: 'fresh' },
-  { key: 'cheese', emoji: '🧀', foodType: FoodType.DAIRY, productType: 'fresh' },
-  { key: 'butter', emoji: '🧈', foodType: FoodType.DAIRY, productType: 'fresh' },
-  { key: 'yogurt', emoji: '🥣', foodType: FoodType.DAIRY, productType: 'fresh' },
-  { key: 'cannedTuna', emoji: '🐟', foodType: FoodType.NON_PERISHABLE, productType: 'pantry' },
+  { key: 'milk', emoji: '🥛', classKey: 'uht-milk' },
+  { key: 'eggs', emoji: '🥚', classKey: 'eggs' },
+  { key: 'cheese', emoji: '🧀', classKey: 'fresh-cheese' },
+  { key: 'butter', emoji: '🧈', classKey: 'butter' },
+  { key: 'yogurt', emoji: '🥣', classKey: 'yogurt' },
+  { key: 'cannedTuna', emoji: '🐟', classKey: 'canned' },
 
-  { key: 'bread', emoji: '🍞', foodType: FoodType.CARB, productType: 'fresh' },
-  { key: 'pasta', emoji: '🍝', foodType: FoodType.CARB, productType: 'pantry' },
-  { key: 'rice', emoji: '🍚', foodType: FoodType.CARB, productType: 'pantry' },
-  { key: 'flour', emoji: '🌾', foodType: FoodType.CARB, productType: 'pantry' },
-  { key: 'chickpeas', emoji: '🫘', foodType: FoodType.NON_PERISHABLE, productType: 'pantry' },
-  { key: 'lentils', emoji: '🫛', foodType: FoodType.NON_PERISHABLE, productType: 'pantry' },
+  { key: 'bread', emoji: '🍞', classKey: 'fresh-bread' },
+  { key: 'pasta', emoji: '🍝', classKey: 'dry-pasta' },
+  { key: 'rice', emoji: '🍚', classKey: 'rice-grains' },
+  { key: 'flour', emoji: '🌾', classKey: 'flour' },
+  { key: 'chickpeas', emoji: '🫘', classKey: 'dried-legumes' },
+  { key: 'lentils', emoji: '🫛', classKey: 'dried-legumes' },
 
-  { key: 'tomato', emoji: '🍅', foodType: FoodType.VEGETABLE, productType: 'fresh' },
-  { key: 'onion', emoji: '🧅', foodType: FoodType.VEGETABLE, productType: 'fresh' },
-  { key: 'potato', emoji: '🥔', foodType: FoodType.VEGETABLE, productType: 'fresh' },
-  { key: 'lemon', emoji: '🍋', foodType: FoodType.FRUIT, productType: 'fresh' },
-  { key: 'apple', emoji: '🍎', foodType: FoodType.FRUIT, productType: 'fresh' },
-  { key: 'banana', emoji: '🍌', foodType: FoodType.FRUIT, productType: 'fresh' },
+  { key: 'tomato', emoji: '🍅', classKey: 'fruiting-veg' },
+  { key: 'onion', emoji: '🧅', classKey: 'bulbs-tubers' },
+  { key: 'potato', emoji: '🥔', classKey: 'bulbs-tubers' },
+  { key: 'lemon', emoji: '🍋', classKey: 'citrus' },
+  { key: 'apple', emoji: '🍎', classKey: 'hardy-fruit' },
+  { key: 'banana', emoji: '🍌', classKey: 'common-fruit' },
 
-  { key: 'oliveOil', emoji: '🫒', foodType: FoodType.NON_PERISHABLE, productType: 'pantry' },
-  { key: 'salt', emoji: '🧂', foodType: FoodType.NON_PERISHABLE, productType: 'pantry', alwaysNoExpiry: true },
-  { key: 'pepper', emoji: '🌶️', foodType: FoodType.NON_PERISHABLE, productType: 'pantry', alwaysNoExpiry: true },
-  { key: 'sugar', emoji: '🍯', foodType: FoodType.NON_PERISHABLE, productType: 'pantry', alwaysNoExpiry: true },
-  { key: 'coffee', emoji: '☕', foodType: FoodType.NON_PERISHABLE, productType: 'pantry' },
-  { key: 'vinegar', emoji: '🍷', foodType: FoodType.NON_PERISHABLE, productType: 'pantry', alwaysNoExpiry: true },
+  { key: 'oliveOil', emoji: '🫒', classKey: 'oil' },
+  { key: 'salt', emoji: '🧂', classKey: 'salt-spices' },
+  { key: 'pepper', emoji: '🌶️', classKey: 'salt-spices' },
+  { key: 'sugar', emoji: '🍯', classKey: 'salt-spices' },
+  { key: 'coffee', emoji: '☕', classKey: 'coffee' },
+  { key: 'vinegar', emoji: '🍷', classKey: 'salt-spices' },
 ] as const;
