@@ -53,6 +53,7 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
       return {
         ...entry,
         noExpiry: toggled || undefined,
+        dateFromUser: toggled || entry.dateFromUser,
         expirySource: 'user',
         expirationDate: toggled ? undefined : entry.expirationDate,
       };

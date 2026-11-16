@@ -455,11 +455,30 @@ describe('expiry source of a suggested date', () => {
     expect(service.entries()[0].expirySource).toBe('user');
   });
 
-  it('exposes the hint source to the view, nothing for user or none', () => {
+  it('an explicit no-expiry survives a food type change', () => {
+    configure([]);
+    const service = TestBed.inject(PantryAddModalStateService);
+    service.addEntryFromQuery('pan');
+    const id = service.entries()[0].id;
+    service.setEntryNoExpiry(id);
+    service.setEntryFoodType(id, FoodType.DAIRY);
+    const entry = service.entries()[0];
+    expect(entry.noExpiry).toBeTrue();
+    expect(entry.expirySource).toBe('user');
+  });
+
+  it('exposes the source to the view for every case, including user and none', () => {
     configure([], { product: 9 });
     const service = TestBed.inject(PantryAddModalStateService);
     service.addEntryFromQuery('pan');
+    const id = service.entries()[0].id;
     expect(service.entryViewModels()[0].expirySource).toBe('learned_product');
+    service.setEntryDate(id, '2026-03-01');
+    expect(service.entryViewModels()[0].expirySource).toBe('user');
+
+    service.addEntryFromQuery('lavavajillas');
+    service.setEntryFoodType(service.entries()[1].id, FoodType.HOUSEHOLD);
+    expect(service.entryViewModels()[1].expirySource).toBe('none');
   });
 
   it('pantry_item_added carries expiry_source in both sheets', async () => {
