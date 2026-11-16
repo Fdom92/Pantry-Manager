@@ -10,6 +10,8 @@ import { LoggerService } from '../../shared/logger.service';
 import { ToastService } from '../../shared';
 import { AlertController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
+import { FRESH_QTY } from '@core/domain/pantry';
+import { ANALYTICS_EVENTS } from '@core/constants';
 import { FoodType } from '@core/models/shared/enums.model';
 import { inferFoodType, resolveSuggestedExpiry } from '@core/domain/pantry/food-type-inference.domain';
 import type { ReceiptReviewLine } from '@core/models/receipt';
@@ -42,6 +44,8 @@ describe('PantryReceiptScanModalStateService', () => {
       expirationDate: undefined,
       noExpiry: undefined,
       dateFromUser: false,
+      storage: 'pantry',
+      suggestedStorage: 'pantry',
       expanded: false,
       ...overrides,
     };
@@ -261,6 +265,79 @@ describe('PantryReceiptScanModalStateService', () => {
       const line = service.reviewLines()[0];
       expect(line.foodType).not.toBe(FoodType.DAIRY);
       expect(line.foodType).toBe(inferFoodType('PERAS CONFERENCE'));
+    });
+  });
+
+  describe('storage and submit', () => {
+    let events: jasmine.SpyObj<HistoryEventManagerService>;
+    let analytics: jasmine.SpyObj<AnalyticsService>;
+    beforeEach(() => {
+      events = TestBed.inject(HistoryEventManagerService) as jasmine.SpyObj<HistoryEventManagerService>;
+      analytics = TestBed.inject(AnalyticsService) as jasmine.SpyObj<AnalyticsService>;
+    });
+
+    it('a new fresh line with quantity 6 is one "sufficient" batch, never 6 (Review Focus 3)', async () => {
+      service.reviewLines.set([makeLine({
+        parsed: { rawName: 'MANZANAS GOLDEN', quantity: 6, confidence: 'high' },
+        quantity: 6, storage: 'fresh', suggestedStorage: 'fresh', foodType: FoodType.FRUIT,
+      })]);
+      await service.submit();
+      const item = pantryStore.addItem.calls.mostRecent().args[0] as PantryItem;
+      expect(item.productType).toBe('fresh');
+      expect(item.isBasic).toBeFalse();
+      expect(item.minThreshold).toBeUndefined();
+      expect(item.batches.length).toBe(1);
+      expect(item.batches[0].quantity).toBe(FRESH_QTY.sufficient);
+    });
+
+    it('a pantry line keeps the ticket quantity', async () => {
+      service.reviewLines.set([makeLine({ quantity: 6 })]);
+      await service.submit();
+      const item = pantryStore.addItem.calls.mostRecent().args[0] as PantryItem;
+      expect(item.productType).toBe('pantry');
+      expect(item.batches[0].quantity).toBe(6);
+    });
+
+    it('an unknown product defaults to pantry on scan-time derivation', () => {
+      const line = makeLine({ parsed: { rawName: 'ZZQX', quantity: 1, confidence: 'high' } });
+      service.reviewLines.set([line]);
+      service.setLineFoodType(1, FoodType.OTHER);
+      expect(service.reviewLines()[0].storage).toBe('pantry');
+    });
+
+    it('a restocked fresh item gets a new date, not the previous batch one', async () => {
+      const matched = makeMatchedItem({
+        productType: 'fresh', name: 'Manzanas',
+        batches: [{ batchId: 'b1', quantity: 0, expirationDate: '2020-01-01' }],
+      });
+      service.reviewLines.set([makeLine({
+        match: matched, matchScore: 0.95, expirationDate: '2026-12-01',
+      })]);
+      await service.submit();
+      const saved = pantryStore.updateItem.calls.mostRecent().args[0] as PantryItem;
+      expect(saved.batches[0].expirationDate).toBe('2026-12-01');
+      expect(saved.batches[0].quantity).toBe(FRESH_QTY.sufficient);
+    });
+
+    it('setLineStorage changes the destination and counts as storage_changed', async () => {
+      service.reviewLines.set([makeLine({ id: 1 }), makeLine({ id: 2, storage: 'fresh', suggestedStorage: 'fresh' })]);
+      service.setLineStorage(1, 'fresh');
+      expect(service.reviewLines()[0].storage).toBe('fresh');
+      await service.submit();
+      const args = analytics.track.calls.allArgs().find(a => a[0] === ANALYTICS_EVENTS.RECEIPT_SCAN_COMPLETED)![1] as Record<string, unknown>;
+      expect(args['fresh_lines']).toBe(2);
+      expect(args['storage_changed']).toBe(1);
+      expect(events.logAddNewItem).toHaveBeenCalledTimes(2);
+    });
+
+    it('toggling back to the suggestion is not a change', async () => {
+      service.reviewLines.set([makeLine()]);
+      service.setLineStorage(1, 'fresh');
+      service.setLineStorage(1, 'pantry');
+      await service.submit();
+      const args = analytics.track.calls.allArgs().find(a => a[0] === ANALYTICS_EVENTS.RECEIPT_SCAN_COMPLETED)![1] as Record<string, unknown>;
+      expect(args['storage_changed']).toBe(0);
+      expect(args['fresh_lines']).toBe(0);
     });
   });
 });

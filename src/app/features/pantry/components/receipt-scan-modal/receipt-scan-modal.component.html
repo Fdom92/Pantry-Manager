@@ -116,7 +116,7 @@
                       }
                     </div>
 
-                    @if (!state.isFreshMatch(line)) {
+                    @if (!state.isFreshLine(line)) {
                       <div class="receipt-line__qty">
                         <button
                           type="button"
@@ -148,6 +148,19 @@
 
                   @if (line.expanded && state.canExpand(line)) {
                     <div class="receipt-line__details" [id]="'receipt-line-details-' + line.id">
+                      @if (state.canEditStorage(line)) {
+                        <ion-segment
+                          class="receipt-line__storage"
+                          [value]="line.storage"
+                          (ionChange)="state.setLineStorage(line.id, $any($event.detail.value))">
+                          <ion-segment-button value="pantry">
+                            <ion-label>{{ 'pantry.sections.pantry' | translate }}</ion-label>
+                          </ion-segment-button>
+                          <ion-segment-button value="fresh">
+                            <ion-label>{{ 'pantry.sections.fresh' | translate }}</ion-label>
+                          </ion-segment-button>
+                        </ion-segment>
+                      }
                       @if (state.canEditFoodType(line)) {
                         <app-food-type-picker
                           [foodType]="line.foodType"

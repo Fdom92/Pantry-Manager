@@ -219,4 +219,25 @@ describe('restockFreshItem', () => {
     expect(result).not.toBe(item);
     expect(item.batches[0].quantity).toBe(FRESH_QTY.none);
   });
+
+  it('a new expiry replaces the previous batch date and clears opened', () => {
+    const item = makeItem({
+      batches: [{ batchId: 'b1', quantity: FRESH_QTY.none, expirationDate: '2026-01-01', opened: true }],
+    });
+    const result = restockFreshItem(item, TS, 'fallback', { expirationDate: '2026-12-01' });
+    expect(result.batches[0].expirationDate).toBe('2026-12-01');
+    expect(result.batches[0].opened).toBeFalsy();
+  });
+
+  it('a no-expiry decision replaces the previous date', () => {
+    const item = makeItem({ batches: [{ batchId: 'b1', quantity: 0, expirationDate: '2026-01-01' }] });
+    const result = restockFreshItem(item, TS, 'fallback', { noExpiry: true });
+    expect(result.batches[0].expirationDate).toBeUndefined();
+    expect(result.batches[0].noExpiry).toBeTrue();
+  });
+
+  it('an empty expiry keeps the previous date', () => {
+    const item = makeItem({ batches: [{ batchId: 'b1', quantity: 0, expirationDate: '2026-01-01' }] });
+    expect(restockFreshItem(item, TS, 'fallback', {}).batches[0].expirationDate).toBe('2026-01-01');
+  });
 });

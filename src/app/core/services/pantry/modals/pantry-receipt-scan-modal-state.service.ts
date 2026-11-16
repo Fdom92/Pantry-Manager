@@ -8,6 +8,7 @@ import { createDocumentId } from '@core/utils/uuid.util';
 import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
+import { FRESH_QTY, resolveFoodClass } from '@core/domain/pantry';
 import { resolveSuggestedExpiry, type SuggestedExpiry, inferFoodType, expiryAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
 import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
 import { classifyNativeDismissal } from '@core/domain/shared';
@@ -169,6 +170,8 @@ export class PantryReceiptScanModalStateService {
           expirationDate: undefined,
           noExpiry: undefined,
           dateFromUser: false,
+          storage: 'pantry',
+          suggestedStorage: 'pantry',
           expanded: false,
         };
         // Reuse the same match/fresh predicates the rest of the service uses,
@@ -304,6 +307,11 @@ export class PantryReceiptScanModalStateService {
     return !!line.match && line.matchScore >= MATCH_AUTO_THRESHOLD;
   }
 
+  /** A fresh line is a state (sufficient), not a count: matched fresh item or new line sent to Frescos. */
+  isFreshLine(line: ReceiptReviewLine): boolean {
+    return this.isAutoMatch(line) ? this.isFreshMatch(line) : line.storage === 'fresh';
+  }
+
   /** True when the auto-matched item is a fresh product (restocked, not lotted). */
   isFreshMatch(line: ReceiptReviewLine): boolean {
     return this.isAutoMatch(line) && line.match!.productType === 'fresh';
@@ -317,16 +325,38 @@ export class PantryReceiptScanModalStateService {
    * fields should be) so the two can't drift into different answers for the
    * same question.
    */
-  private deriveLineFields(line: ReceiptReviewLine): Pick<ReceiptReviewLine, 'foodType' | 'expirationDate' | 'noExpiry'> {
+  private deriveLineFields(line: ReceiptReviewLine): Pick<ReceiptReviewLine, 'foodType' | 'expirationDate' | 'noExpiry' | 'storage' | 'suggestedStorage'> {
     const foodType = this.isAutoMatch(line) ? (line.match!.foodType ?? null) : inferFoodType(line.parsed.rawName);
+    const storage = this.storageFor(line, foodType);
     if (line.dateFromUser && (line.expirationDate || line.noExpiry)) {
-      return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry };
+      return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry, ...storage };
     }
     const learned = this.isAutoMatch(line)
       ? this.shelfLife.daysFor(line.match?.name, line.match?._id, line.match?.foodKind, foodType)
       : this.shelfLife.daysFor(line.parsed.rawName, undefined, null, foodType);
-    const suggested: SuggestedExpiry = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned, line.match?.foodKind);
-    return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
+    // A restocked fresh item needs a date too: its old batch date is the one it is replacing.
+    const suggested: SuggestedExpiry = resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned, line.match?.foodKind);
+    return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry, ...storage };
+  }
+
+  /** Class storage for a new line (unknown → pantry); a manual override survives re-derivation. */
+  private storageFor(line: ReceiptReviewLine, foodType: FoodType | null): Pick<ReceiptReviewLine, 'storage' | 'suggestedStorage'> {
+    if (this.isAutoMatch(line)) {
+      const storage = line.match!.productType === 'fresh' ? 'fresh' : 'pantry';
+      return { storage, suggestedStorage: storage };
+    }
+    const suggestedStorage = resolveFoodClass(line.parsed.rawName, foodType)?.storage ?? 'pantry';
+    const overridden = line.storage !== line.suggestedStorage;
+    return { storage: overridden ? line.storage : suggestedStorage, suggestedStorage };
+  }
+
+  canEditStorage(line: ReceiptReviewLine): boolean {
+    return !this.isAutoMatch(line);
+  }
+
+  setLineStorage(id: number, storage: 'pantry' | 'fresh'): void {
+    this.reviewLines.update(lines => lines.map(l => (l.id === id ? { ...l, storage } : l)));
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'storage' });
   }
 
   /**
@@ -362,7 +392,7 @@ export class PantryReceiptScanModalStateService {
     this.reviewLines.update(lines =>
       lines.map(l =>
         l.id === id
-          ? { ...l, foodType, ...expiryAfterFoodTypeChange(l, foodType, new Date()) }
+          ? { ...l, foodType, ...expiryAfterFoodTypeChange(l, foodType, new Date()), ...this.storageFor(l, foodType) }
           : l,
       ),
     );
@@ -419,7 +449,7 @@ export class PantryReceiptScanModalStateService {
           // literal quantity, which would pile up batches the fresh model
           // doesn't expect.
           const updated = matchedItem.productType === 'fresh'
-            ? restockFreshItem(matchedItem, timestamp, generateBatchId())
+            ? restockFreshItem(matchedItem, timestamp, generateBatchId(), { expirationDate: line.expirationDate, noExpiry: line.noExpiry })
             : await this.pantryStore.addNewLot(matchedItem._id, {
                 quantity: line.quantity,
                 expiryDate: line.expirationDate,
@@ -435,7 +465,8 @@ export class PantryReceiptScanModalStateService {
             id: createDocumentId('item'),
             nowIso: timestamp,
             name: formatReceiptName(line.parsed.rawName),
-            quantity: line.quantity,
+            // Fresh is a state, not a count: 6 apples on the ticket is one "sufficient" batch.
+            quantity: line.storage === 'fresh' ? FRESH_QTY.sufficient : line.quantity,
             foodType: line.foodType ?? undefined,
             expirationDate: line.expirationDate,
             noExpiry: line.noExpiry,
@@ -443,14 +474,15 @@ export class PantryReceiptScanModalStateService {
           });
           const item: PantryItem = {
             ...base,
-            productType: 'pantry',
+            productType: line.storage,
+            ...(line.storage === 'fresh' ? { minThreshold: undefined, isBasic: false } : {}),
             supermarket: this.detectedSupermarket() ?? undefined,
           };
           await this.pantryStore.addItem(item);
-          await this.eventManager.logAddNewItem(item, line.quantity, sessionId, timestamp, { dateFromUser: line.dateFromUser });
+          await this.eventManager.logAddNewItem(item, item.batches[0].quantity, sessionId, timestamp, { dateFromUser: line.dateFromUser });
         }
         this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
-          kind: 'despensa',
+          kind: this.isFreshLine(line) ? 'fresh' : 'despensa',
           source: 'receipt_scan',
           is_new: !this.isAutoMatch(line),
           quantity: line.quantity,
@@ -462,6 +494,8 @@ export class PantryReceiptScanModalStateService {
       this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_COMPLETED, {
         items_added: added,
         items_matched: matched,
+        fresh_lines: lines.filter(l => this.isFreshLine(l)).length,
+        storage_changed: lines.filter(l => !this.isAutoMatch(l) && l.storage !== l.suggestedStorage).length,
         supermarket: this.detectedSupermarket() ?? 'unknown',
         mode: this.usedSmartScan() ? 'smart' : 'local',
       });

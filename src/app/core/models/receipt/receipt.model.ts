@@ -72,6 +72,10 @@ export interface ReceiptReviewLine {
   noExpiry?: boolean;
   /** True once the user has touched the date/no-expiry picker for this line — mirrors AddEntry.dateFromUser, so a later food-type change doesn't clobber a date the user already set. */
   dateFromUser: boolean;
+  /** Where a new product goes. Matched lines follow the existing product. */
+  storage: 'pantry' | 'fresh';
+  /** What the food class suggested; `storage` differing from it is a user override. */
+  suggestedStorage: 'pantry' | 'fresh';
   /** Accordion state for the review row. Never persisted, UI-only. */
   expanded: boolean;
 }
