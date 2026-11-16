@@ -67,8 +67,20 @@ describe('resolveFoodClass', () => {
     expect(resolveFoodClass('Pan', FoodType.DAIRY)?.key).toBe('generic-dairy');
   });
 
+  it('a stored type that agrees with the name keeps the specific class', () => {
+    expect(resolveFoodClass('Huevos', FoodType.PROTEIN)?.key).toBe('eggs');
+  });
+
+  it('a kind whose parent differs from the stored type is ignored', () => {
+    expect(resolveFoodClass('x', FoodType.DAIRY, 'eggs')?.key).toBe('generic-dairy');
+  });
+
   it('a stored foodKind wins', () => {
     expect(resolveFoodClass('x', undefined, 'fresh-bread')?.key).toBe('fresh-bread');
+  });
+
+  it('a kind alone resolves', () => {
+    expect(resolveFoodClass('Huevos', undefined, 'eggs')?.key).toBe('eggs');
   });
 
   it('an unknown foodKind falls back to the name', () => {

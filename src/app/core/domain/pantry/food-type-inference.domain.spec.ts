@@ -135,7 +135,7 @@ describe('resolveSuggestedExpiry', () => {
 
   it('falls back to the class table when nothing was learned', () => {
     const eggs = FOOD_CLASS_BY_KEY.get('eggs')!;
-    expect(resolveSuggestedExpiry('Huevos', null, from)).toEqual({
+    expect(resolveSuggestedExpiry('Huevos', FoodType.PROTEIN, from)).toEqual({
       expirationDate: suggestExpiryDate(eggs, from),
       source: 'table',
     });

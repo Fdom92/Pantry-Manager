@@ -73,9 +73,9 @@ export function matchFoodClass(name: string, classes: readonly FoodClass[] = FOO
 }
 
 /**
- * Class of a product. A stored foodKind is authoritative; a stored foodType
- * without a kind means the user (or an old record) fixed the type by hand, so
- * the name must not override it and the type's generic class applies.
+ * Class of a product: 1) a stored foodKind whose parent agrees with the stored
+ * type, 2) the name, 3) the type's generic class when the name matched nothing or
+ * a class of another type (the user fixed the type by hand), 4) null.
  */
 export function resolveFoodClass(
   name: string,
@@ -83,7 +83,8 @@ export function resolveFoodClass(
   foodKind?: string | null,
 ): FoodClass | null {
   const byKind = foodKind ? FOOD_CLASS_BY_KEY.get(foodKind) : undefined;
-  if (byKind) return byKind;
-  if (foodType) return genericClassFor(foodType);
-  return matchFoodClass(name);
+  if (byKind && (!foodType || byKind.foodType === foodType)) return byKind;
+  const byName = matchFoodClass(name);
+  if (!foodType) return byName;
+  return byName?.foodType === foodType ? byName : genericClassFor(foodType);
 }
