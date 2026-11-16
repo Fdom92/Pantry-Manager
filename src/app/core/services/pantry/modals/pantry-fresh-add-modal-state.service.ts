@@ -21,6 +21,7 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
   private readonly analytics = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
 
+  protected readonly basicsStorage = 'fresh' as const;
   protected readonly idPrefix = 'fresh';
 
   protected belongsToCatalogue(item: PantryItem): boolean {
@@ -78,6 +79,7 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
             // date means they cleared it on purpose, and a corrected type must
             // not be overwritten by the guess the name produces.
             foodType: entry.foodType ?? undefined,
+            foodKind: entry.foodKind,
             inferExpiry: false,
           });
           const freshItem: PantryItem = {

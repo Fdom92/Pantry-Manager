@@ -12,6 +12,8 @@ export interface AddEntry {
   noExpiry?: boolean;
   /** Inferred from the name, or picked by the user in the add row. */
   foodType?: FoodType | null;
+  /** Food class key, set when the entry comes from a basic so the name's translation is not re-classified. */
+  foodKind?: string;
   /**
    * True once the user has set the date themselves, which stops a later change
    * of food type from replacing it. A suggested date makes no such claim.

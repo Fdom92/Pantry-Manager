@@ -21,6 +21,7 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
   private readonly analytics = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
 
+  protected readonly basicsStorage = 'pantry' as const;
   protected readonly idPrefix = 'add';
 
   /** Legacy items without a productType count as despensa by convention. */
@@ -86,6 +87,7 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
             // chips, so whatever it holds now is the user's decision — an empty
             // date means they cleared it on purpose.
             foodType: entry.foodType ?? undefined,
+            foodKind: entry.foodKind,
             inferExpiry: false,
           });
           const item: PantryItem = { ...base, productType: 'pantry' };

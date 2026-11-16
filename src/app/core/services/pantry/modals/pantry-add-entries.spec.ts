@@ -502,3 +502,30 @@ describe('expiry source of a suggested date', () => {
     expect(addedProps(analytics)['expiry_source']).toBe('learned_product');
   });
 });
+
+describe('add sheet basics', () => {
+  it('despensa offers only pantry basics on an empty pantry, frescos only fresh ones', () => {
+    configure([]);
+    const names = (o: { title: string }[]) => o.map(x => x.title);
+    const pantry = names(TestBed.inject(PantryAddModalStateService).options());
+    const fresh = names(TestBed.inject(PantryFreshAddModalStateService).options());
+    expect(pantry).toContain('onboarding.quickSeed.items.pasta');
+    expect(pantry).not.toContain('onboarding.quickSeed.items.bread');
+    expect(fresh).toContain('onboarding.quickSeed.items.bread');
+    expect(fresh).not.toContain('onboarding.quickSeed.items.pasta');
+  });
+
+  it('picking a basic makes a new entry that keeps its class and a short date for fresh bread', () => {
+    configure([]);
+    const service = TestBed.inject(PantryFreshAddModalStateService);
+    const option = service.options().find(o => o.title === 'onboarding.quickSeed.items.bread')!;
+
+    service.addEntry(option);
+
+    const entry = service.entries()[0];
+    expect(entry.isNew).toBeTrue();
+    expect(entry.foodKind).toBe('fresh-bread');
+    expect(entry.foodType).toBeTruthy();
+    expect(entry.expirationDate).toBeTruthy();
+  });
+});
