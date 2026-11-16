@@ -2,6 +2,7 @@ import type { BatchIdGenerator, ItemBatch, PantryItem } from '@core/models/pantr
 import { toLocalYmd } from '@core/utils/date.util';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
+import { FoodType } from '@core/models/shared/enums.model';
 import type { FoodClass } from './food-classes.model';
 
 /**
@@ -15,9 +16,19 @@ export const THAW_MAX_DAYS = 3;
 
 const DAY_MS = 86_400_000;
 
-/** Classes whose date opening shortens should go to the fridge once opened. */
-export function needsFridgeWhenOpen(klass: FoodClass | null): boolean {
-  return klass?.openedDays != null;
+/** Food types that should go to the fridge once opened (independent of the class's opened days). */
+export function needsFridgeWhenOpen(foodType: FoodType | undefined): boolean {
+  switch (foodType) {
+    case FoodType.PROTEIN:
+    case FoodType.FRUIT:
+    case FoodType.DAIRY:
+    case FoodType.VEGETABLE:
+    case FoodType.BEVERAGE:
+    case FoodType.OTHER:
+      return true;
+    default:
+      return false;
+  }
 }
 
 function expiryTime(batch: ItemBatch): number {
@@ -95,8 +106,9 @@ export function openOne(
         opened.expirationDate = shortened;
         opened.noExpiry = undefined;
       }
-      if (fridgeLocationId) opened.locationId = fridgeLocationId;
     }
+    // The caller decides by food type whether it goes to the fridge; days only shorten the date.
+    if (fridgeLocationId) opened.locationId = fridgeLocationId;
     return opened;
   }, newId);
 }

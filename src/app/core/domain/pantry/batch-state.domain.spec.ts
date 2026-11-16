@@ -75,14 +75,23 @@ describe('openOne', () => {
       const opened = result.batches[result.index];
       expect(opened.expirationDate).toBe('2027-02-04');
       expect(opened.opened).toBeTrue();
-      expect(opened.locationId).toBeUndefined();
     }
   });
 
-  it('needs the fridge only when the class shortens once opened', () => {
-    expect(needsFridgeWhenOpen(OPEN3)).toBeTrue();
-    expect(needsFridgeWhenOpen(klass({ openedDays: null }))).toBeFalse();
-    expect(needsFridgeWhenOpen(null)).toBeFalse();
+  it('opening fresh milk moves it to the fridge but keeps its date; dry pasta type does not need the fridge', () => {
+    const milk = openOne([lot({ expirationDate: '2027-02-04' })], klass({ key: 'fresh-milk', openedDays: null }), NOW, newId, 'Nevera')!;
+    expect(milk.batches[milk.index].locationId).toBe('Nevera');
+    expect(milk.batches[milk.index].expirationDate).toBe('2027-02-04');
+    expect(needsFridgeWhenOpen(FoodType.CARB)).toBeFalse();
+    expect(needsFridgeWhenOpen(FoodType.NON_PERISHABLE)).toBeFalse();
+    expect(needsFridgeWhenOpen(undefined)).toBeFalse();
+  });
+
+  it('needs the fridge by food type', () => {
+    for (const t of [FoodType.PROTEIN, FoodType.FRUIT, FoodType.DAIRY, FoodType.VEGETABLE, FoodType.BEVERAGE, FoodType.OTHER]) {
+      expect(needsFridgeWhenOpen(t)).toBeTrue();
+    }
+    expect(needsFridgeWhenOpen(FoodType.HOUSEHOLD)).toBeFalse();
   });
 
   it('returns null when everything is already open or frozen', () => {

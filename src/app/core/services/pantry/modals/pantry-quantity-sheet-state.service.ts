@@ -187,7 +187,7 @@ export class PantryQuantitySheetStateService {
   private classOf = (item: PantryItem) => resolveFoodClass(item.name, item.foodType, item.foodKind);
 
   async openOne(item: PantryItem): Promise<void> {
-    const fridge = needsFridgeWhenOpen(this.classOf(item)) ? findFridgeLocation(this.locations()) : undefined;
+    const fridge = needsFridgeWhenOpen(item.foodType) ? findFridgeLocation(this.locations()) : undefined;
     await this.applyBatchAction(item, 'open', current =>
       openOne(current.batches ?? [], this.classOf(current), new Date(), generateBatchId, fridge),
       batch => batch.expirationDate
