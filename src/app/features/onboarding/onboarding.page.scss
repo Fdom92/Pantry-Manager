@@ -59,14 +59,6 @@
   gap: var(--app-theme-spacing-sm);
 }
 
-.skip-corner {
-  --color: var(--app-theme-text-muted);
-  font-size: var(--app-theme-font-size-small);
-  font-weight: var(--app-theme-font-weight-semibold);
-  text-transform: none;
-  letter-spacing: 0;
-}
-
 .eyebrow {
   display: inline-flex;
   gap: var(--app-theme-spacing-sm-plus);
@@ -257,71 +249,62 @@
   }
 }
 
-// ── Slide: seed (grid is its own component; this is the footer chip) ──────────
+// ── Slide: add (search + the rows the user is building) ─────────────────────
 
-.seed-count {
-  justify-self: center;
-  padding: var(--app-theme-spacing-xs-plus) var(--app-theme-spacing-md);
-  border-radius: var(--app-theme-radius-pill);
-  background: color-mix(in srgb, var(--ion-color-primary) 14%, transparent);
-  color: var(--app-theme-primary-on-surface);
-  font-size: var(--app-theme-font-size-small);
-  font-weight: var(--app-theme-font-weight-bold);
+// The suggestions drop down over the card (absolute, up to 240px); the card is
+// tall enough to hold them instead of clipping them under its own scroll.
+.slide-card[data-slide='add'] {
+  min-height: min(600px, calc(100% - var(--app-theme-spacing-3xl)));
 }
 
-// ── Slide: confirm (review list) ──────────────────────────────────────────────
+.add-search {
+  width: 100%;
+  margin-top: var(--app-theme-spacing-lg);
+  text-align: left;
+}
 
-.confirm-list {
-  margin: var(--app-theme-spacing-lg) 0 0;
+.draft-list {
+  width: 100%;
+  margin: var(--app-theme-spacing-md) 0 0;
   padding: 0;
   list-style: none;
   display: grid;
   gap: var(--app-theme-spacing-xs-plus);
-  max-height: 260px;
-  overflow-y: auto;
   text-align: left;
 }
 
-.confirm-row {
+.draft-row {
   display: grid;
-  grid-template-columns: var(--app-theme-spacing-2xl) 1fr auto;
-  align-items: center;
-  gap: var(--app-theme-spacing-sm-plus);
+  gap: var(--app-theme-spacing-xs);
   padding: var(--app-theme-spacing-sm) var(--app-theme-spacing-md);
   border-radius: var(--app-theme-spacing-md);
   background: color-mix(in srgb, var(--ion-text-color) 4%, transparent);
 }
 
-.confirm-emoji {
-  font-size: var(--app-theme-icon-size-md);
-  line-height: 1;
+.draft-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-theme-spacing-sm);
+  min-height: 32px;
 }
 
-.confirm-name {
+.draft-name {
   font-size: var(--app-theme-font-size-body);
   font-weight: var(--app-theme-font-weight-semibold);
   color: var(--app-theme-text-color);
 }
 
-.confirm-meta {
-  font-size: var(--app-theme-font-size-small);
-  color: var(--app-theme-text-muted);
-  white-space: nowrap;
+.draft-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--app-theme-spacing-xs);
 }
 
-.confirm-empty {
-  margin-top: var(--app-theme-spacing-lg);
-  font-size: var(--app-theme-font-size-caption);
-  color: var(--app-theme-text-muted);
-  font-style: italic;
-}
-
-.confirm-hint {
-  margin-top: var(--app-theme-spacing-md);
-  font-size: var(--app-theme-font-size-tiny);
-  color: var(--app-theme-text-muted);
-  text-align: center;
-  line-height: var(--app-theme-line-height-normal);
+.draft-saved {
+  font-size: var(--app-theme-icon-size-md);
+  color: var(--ion-color-success);
 }
 
 // ── Swiper pagination ─────────────────────────────────────────────────────────

@@ -10,40 +10,29 @@
     "tagline": "Configura tutto in un minuto",
     "taglineDone": "Tutto pronto",
     "actions": {
-      "skip": "Salta",
       "next": "Avanti",
       "start": "Inizia",
       "skipHint": "Puoi saltare questo tutorial in qualsiasi momento.",
       "continue": "Continua",
-      "enter": "Apri la mia dispensa",
       "notifyMe": "Sì, avvisami",
       "notifyLater": "Più tardi",
       "analyticsAccept": "Sì, aiuta",
-      "analyticsLater": "Non ora"
+      "analyticsLater": "Non ora",
+      "startEmpty": "Inizia vuoto"
     },
     "slides": {
+      "add": {
+        "title": "Cosa hai a portata di mano adesso?",
+        "description": "Aggiungi un prodotto che hai in casa e ti avviseremo prima che scada. Ne basta uno.",
+        "placeholder": "Scrivi o scegli: latte, uova…",
+        "saveError": "Impossibile salvare. Riprova."
+      },
       "notifications": {
         "title": "Avviso prima della scadenza",
         "description": "Ti avvisiamo quando qualcosa sta per scadere o finire.",
         "previewTitle": "Prodotti in scadenza",
-        "previewBody": "3 prodotti scadono questa settimana"
-      },
-      "seed": {
-        "title": "Cosa hai ora in dispensa?",
-        "description": "Tocca quello che hai già. Modifichi le quantità dopo. Puoi saltare questo passaggio.",
-        "selectedCount": "{{ count }} selezionati",
-        "skip": "Salta questo passaggio"
-      },
-      "confirm": {
-        "title": "La tua dispensa è pronta 👌",
-        "description": "Abbiamo aggiunto la tua selezione alla dispensa.",
-        "titleEmpty": "Nessun problema",
-        "descriptionEmpty": "Aggiungerai i tuoi prodotti quando vorrai.",
-        "emptyBody": "Aggiungili uno per uno dalla dispensa.",
-        "noExpiryLabel": "Senza scadenza",
-        "needsDateLabel": "Data da impostare",
-        "expiresLabel": "Scade il {{date}}",
-        "adjustHint": "Regola date e quantità più tardi nella tua dispensa."
+        "previewBody": "3 prodotti scadono questa settimana",
+        "previewBodyProduct": "{{name}} scade {{when}}"
       },
       "analytics": {
         "title": "Aiutaci a migliorare",

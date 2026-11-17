@@ -10,40 +10,29 @@
     "tagline": "Commencez en 1 minute",
     "taglineDone": "Tout est prêt",
     "actions": {
-      "skip": "Passer",
       "next": "Suivant",
       "start": "Commencer",
       "skipHint": "Vous pouvez passer ce tutoriel à tout moment.",
       "continue": "Continuer",
-      "enter": "Ouvrir mon garde-manger",
       "notifyMe": "Oui, préviens-moi",
       "notifyLater": "Plus tard",
       "analyticsAccept": "Oui, j’aide",
-      "analyticsLater": "Pas maintenant"
+      "analyticsLater": "Pas maintenant",
+      "startEmpty": "Commencer à vide"
     },
     "slides": {
+      "add": {
+        "title": "Qu'as-tu sous la main en ce moment ?",
+        "description": "Ajoute un produit que tu as chez toi et on te préviendra avant qu'il expire. Un seul suffit.",
+        "placeholder": "Tape ou choisis : lait, œufs…",
+        "saveError": "Impossible d'enregistrer. Réessaie."
+      },
       "notifications": {
         "title": "Alerte avant l'expiration",
         "description": "On te prévient quand quelque chose va expirer ou s'épuiser.",
         "previewTitle": "Produits bientôt expirés",
-        "previewBody": "3 produits expirent cette semaine"
-      },
-      "seed": {
-        "title": "Qu'as-tu maintenant dans ton garde-manger ?",
-        "description": "Touche ce que tu as déjà. Tu modifies les quantités plus tard. Tu peux passer cette étape.",
-        "selectedCount": "{{ count }} sélectionnés",
-        "skip": "Passer cette étape"
-      },
-      "confirm": {
-        "title": "Ton garde-manger est prêt 👌",
-        "description": "Ta sélection a été ajoutée à ton garde-manger.",
-        "titleEmpty": "Pas de souci",
-        "descriptionEmpty": "Tu ajouteras tes produits quand tu voudras.",
-        "emptyBody": "Ajoute-les un par un depuis ton garde-manger.",
-        "noExpiryLabel": "Sans expiration",
-        "needsDateLabel": "Date à définir",
-        "expiresLabel": "Périme le {{date}}",
-        "adjustHint": "Tu pourras ajuster dates et quantités plus tard dans ton garde-manger."
+        "previewBody": "3 produits expirent cette semaine",
+        "previewBodyProduct": "{{name}} expire {{when}}"
       },
       "analytics": {
         "title": "Aide-nous à améliorer l’app",

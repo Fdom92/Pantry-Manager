@@ -10,40 +10,29 @@
     "tagline": "Configura tudo em menos de um minuto",
     "taglineDone": "Tudo pronto",
     "actions": {
-      "skip": "Ignorar",
       "next": "Seguinte",
       "start": "Começar",
       "skipHint": "Podes saltar este tutorial a qualquer momento.",
       "continue": "Continuar",
-      "enter": "Abrir a minha despensa",
       "notifyMe": "Sim, avisa-me",
       "notifyLater": "Mais tarde",
       "analyticsAccept": "Sim, ajudar",
-      "analyticsLater": "Agora não"
+      "analyticsLater": "Agora não",
+      "startEmpty": "Começar vazio"
     },
     "slides": {
+      "add": {
+        "title": "O que tens à mão agora mesmo?",
+        "description": "Adiciona um produto que tenhas em casa e avisamos-te antes de expirar. Basta um.",
+        "placeholder": "Escreve ou escolhe: leite, ovos…",
+        "saveError": "Não foi possível guardar. Tenta novamente."
+      },
       "notifications": {
         "title": "Aviso antes de expirar",
         "description": "Avisamos-te quando algo está prestes a expirar ou a acabar.",
         "previewTitle": "Produtos a expirar em breve",
-        "previewBody": "3 produtos expiram esta semana"
-      },
-      "seed": {
-        "title": "O que tens agora na despensa?",
-        "description": "Toca no que já tens. As quantidades ajustas depois. Podes saltar este passo.",
-        "selectedCount": "{{ count }} selecionados",
-        "skip": "Saltar este passo"
-      },
-      "confirm": {
-        "title": "A tua despensa está pronta 👌",
-        "description": "Adicionámos a tua seleção à despensa.",
-        "titleEmpty": "Sem problema",
-        "descriptionEmpty": "Adicionarás os teus produtos quando quiseres.",
-        "emptyBody": "Adiciona-os um a um a partir da despensa.",
-        "noExpiryLabel": "Sem validade",
-        "needsDateLabel": "Data por definir",
-        "expiresLabel": "Válido até {{date}}",
-        "adjustHint": "Ajusta datas e quantidades depois na tua despensa."
+        "previewBody": "3 produtos expiram esta semana",
+        "previewBodyProduct": "{{name}} expira {{when}}"
       },
       "analytics": {
         "title": "Ajuda-nos a melhorar",

@@ -2,21 +2,35 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  computed,
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   inject,
+  signal,
   ViewChild,
 } from '@angular/core';
 import { OnboardingStateService } from '@core/services/onboarding/onboarding-state.service';
+import type { AddOption } from '@core/domain/pantry';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { OnboardingSeedGridComponent } from './components/seed-grid/seed-grid.component';
-import { AppDatePipe } from '@shared/pipes/date-display.pipes';
+import { EntityAutocompleteComponent, type AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
+import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
+import { FoodTypePickerComponent } from '@shared/components/food-type-picker/food-type-picker.component';
+import { RelativeDaysPipe } from '@shared/pipes/date-display.pipes';
 
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [AppDatePipe, IonContent, IonButton, IonIcon, TranslateModule, OnboardingSeedGridComponent],
+  imports: [
+    RelativeDaysPipe,
+    EntityAutocompleteComponent,
+    ExpiryPickerComponent,
+    FoodTypePickerComponent,
+    IonContent,
+    IonButton,
+    IonIcon,
+    TranslateModule,
+  ],
   templateUrl: './onboarding.page.html',
   styleUrls: ['./onboarding.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,6 +40,18 @@ import { AppDatePipe } from '@shared/pipes/date-display.pipes';
 export class OnboardingPage implements AfterViewInit {
   @ViewChild('swiperRef') swiperElement?: ElementRef<HTMLElement>;
   readonly facade = inject(OnboardingStateService);
+
+  /** What the user is typing on the add step, for the "Añadir «X»" option. */
+  readonly query = signal('');
+
+  readonly addItems = computed<AutocompleteItem<never, AddOption>[]>(() =>
+    this.facade.addOptions().map(option => ({
+      id: option.kind === 'basic' ? `basic:${option.seed.key}` : option.item._id,
+      title: option.kind === 'basic' ? option.name : option.item.name,
+      emoji: option.kind === 'basic' ? option.seed.emoji : undefined,
+      meta: option,
+    }))
+  );
 
   ngAfterViewInit(): void {
     this.facade.initializeSwiper(this.swiperElement?.nativeElement);
@@ -39,12 +65,18 @@ export class OnboardingPage implements AfterViewInit {
     await this.facade.goToNextSlide(this.swiperElement?.nativeElement);
   }
 
-  async skipOnboarding(): Promise<void> {
-    await this.facade.skipOnboarding();
+  onOptionSelected(item: AutocompleteItem<never, AddOption>): void {
+    if (item.meta) {
+      this.facade.addDraft(item.meta);
+    }
   }
 
-  async completeOnboarding(): Promise<void> {
-    await this.facade.completeOnboarding();
+  async onContinueFromAdd(): Promise<void> {
+    await this.facade.continueFromAdd(this.swiperElement?.nativeElement);
+  }
+
+  async onStartEmpty(): Promise<void> {
+    await this.facade.startEmpty(this.swiperElement?.nativeElement);
   }
 
   async onAcceptNotifications(): Promise<void> {

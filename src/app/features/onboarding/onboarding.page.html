@@ -13,41 +13,95 @@
         }}
       </span>
     </div>
-    <ion-button
-      fill="clear"
-      size="small"
-      class="skip-corner"
-      (click)="skipOnboarding()">
-      {{ 'onboarding.actions.skip' | translate }}
-    </ion-button>
   </div>
 
+  <!-- events-prefix: unprefixed, Swiper re-emits its "click" as a DOM click on the
+       container, which the add step's autocomplete takes for a click outside and closes. -->
   <swiper-container
     #swiperRef
+    events-prefix="swiper"
     class="onboarding-swiper"
-    (slidechange)="onSlideChanged()">
+    (swiperslidechange)="onSlideChanged()">
     @for (slide of facade.availableSlides; track slide.key) {
     <swiper-slide>
       <div class="slide-card" [attr.data-slide]="slide.key">
         <div class="icon-burst">
           <ion-icon [name]="slide.icon"></ion-icon>
         </div>
-        <h1>
-          @if (slide.key === 'confirm' && facade.selectedCount() === 0) {
-            {{ 'onboarding.slides.confirm.titleEmpty' | translate }}
-          } @else {
-            {{ slide.titleKey | translate }}
-          }
-        </h1>
-        <p>
-          @if (slide.key === 'confirm' && facade.selectedCount() === 0) {
-            {{ 'onboarding.slides.confirm.descriptionEmpty' | translate }}
-          } @else {
-            {{ slide.descriptionKey | translate }}
-          }
-        </p>
+        <h1>{{ slide.titleKey | translate }}</h1>
+        <p>{{ slide.descriptionKey | translate }}</p>
 
         @switch (slide.key) {
+          @case ('add') {
+            @if (!facade.draftsSaved()) {
+              <!-- No autofocus: raising the keyboard inside a swiper slide on entry is unreliable on Android. -->
+              <app-entity-autocomplete
+                class="add-search"
+                [items]="addItems()"
+                [placeholder]="'onboarding.slides.add.placeholder' | translate"
+                [showAllOnFocus]="true"
+                [showEmptyAction]="true"
+                [showEmptyActionWhenNoExactMatch]="true"
+                [emptyActionLabel]="query().trim() ? ('pantry.fastAdd.addNew' | translate: { name: query().trim() }) : ''"
+                [emptyLabel]="'common.selects.noOptions' | translate"
+                (valueChange)="query.set($event)"
+                (optionSelected)="onOptionSelected($event)"
+                (emptyAction)="facade.addDraft($event)">
+              </app-entity-autocomplete>
+            }
+            @if (facade.drafts().length) {
+              <ul class="draft-list">
+                @for (draft of facade.drafts(); track draft.name; let i = $index) {
+                  <li class="draft-row">
+                    <div class="draft-head">
+                      <span class="draft-name">{{ draft.name }}</span>
+                      @if (!facade.draftsSaved()) {
+                        <ion-button
+                          fill="clear"
+                          size="small"
+                          color="medium"
+                          [attr.aria-label]="'common.actions.delete' | translate"
+                          (click)="facade.removeDraft(i)">
+                          <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+                        </ion-button>
+                      } @else {
+                        <ion-icon class="draft-saved" name="checkmark-circle"></ion-icon>
+                      }
+                    </div>
+                    @if (!facade.draftsSaved()) {
+                      <div class="draft-controls">
+                        <app-food-type-picker
+                          [foodType]="draft.foodType ?? null"
+                          (foodTypeChange)="facade.setDraftFoodType(i, $event)">
+                        </app-food-type-picker>
+                        <app-expiry-picker
+                          [date]="draft.expirationDate"
+                          [noExpiry]="draft.noExpiry ?? false"
+                          (dateChange)="facade.setDraftDate(i, $event)"
+                          (noExpiryToggle)="facade.toggleDraftNoExpiry(i)">
+                        </app-expiry-picker>
+                      </div>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+            <div class="slide-sticky-footer">
+              <ion-button
+                color="primary"
+                shape="round"
+                expand="block"
+                [disabled]="!facade.drafts().length"
+                (click)="onContinueFromAdd()">
+                {{ 'onboarding.actions.continue' | translate }}
+              </ion-button>
+              @if (!facade.draftsSaved()) {
+                <ion-button fill="clear" size="small" (click)="onStartEmpty()">
+                  {{ 'onboarding.actions.startEmpty' | translate }}
+                </ion-button>
+              }
+            </div>
+          }
           @case ('notifications') {
             <div class="notif-preview">
               <div class="notif-app-row">
@@ -62,7 +116,12 @@
                 {{ 'onboarding.slides.notifications.previewTitle' | translate }}
               </div>
               <div class="notif-body">
-                {{ 'onboarding.slides.notifications.previewBody' | translate }}
+                @let first = facade.firstDraft();
+                @if (first?.expirationDate) {
+                  {{ 'onboarding.slides.notifications.previewBodyProduct' | translate: { name: first!.name, when: (facade.firstDraftDays() | appRelativeDays) } }}
+                } @else {
+                  {{ 'onboarding.slides.notifications.previewBody' | translate }}
+                }
               </div>
             </div>
             @if (facade.notificationsDecision() === null) {
@@ -126,61 +185,6 @@
                 </ion-icon>
               </div>
             }
-          }
-          @case ('seed') {
-            <app-onboarding-seed-grid [items]="facade.quickSeedItems" />
-            <div class="slide-sticky-footer">
-              <span class="seed-count">
-                {{
-                  'onboarding.slides.seed.selectedCount'
-                    | translate : { count: facade.selectedCount() }
-                }}
-              </span>
-              <ion-button
-                color="primary"
-                shape="round"
-                expand="block"
-                (click)="goToNextSlide()">
-                {{ 'onboarding.actions.continue' | translate }}
-              </ion-button>
-            </div>
-          }
-          @case ('confirm') {
-            @if (facade.selectedCount() > 0) {
-              <ul class="confirm-list">
-                @for (row of facade.selectedSeedPreviews(); track row.seed.key) {
-                  <li class="confirm-row">
-                    <span class="confirm-emoji" aria-hidden="true">{{ row.seed.emoji }}</span>
-                    <span class="confirm-name">{{ row.name }}</span>
-                    <span class="confirm-meta">
-                      @if (row.noExpiry) {
-                        {{ 'onboarding.slides.confirm.noExpiryLabel' | translate }}
-                      } @else if (row.expirationDate) {
-                        {{ 'onboarding.slides.confirm.expiresLabel' | translate:{ date: (row.expirationDate | appDate: 'dayMonth') } }}
-                      } @else {
-                        {{ 'onboarding.slides.confirm.needsDateLabel' | translate }}
-                      }
-                    </span>
-                  </li>
-                }
-              </ul>
-              <p class="confirm-hint">
-                {{ 'onboarding.slides.confirm.adjustHint' | translate }}
-              </p>
-            } @else {
-              <p class="confirm-empty">
-                {{ 'onboarding.slides.confirm.emptyBody' | translate }}
-              </p>
-            }
-            <div class="slide-sticky-footer">
-              <ion-button
-                color="primary"
-                shape="round"
-                expand="block"
-                (click)="completeOnboarding()">
-                {{ 'onboarding.actions.enter' | translate }}
-              </ion-button>
-            </div>
           }
         }
       </div>

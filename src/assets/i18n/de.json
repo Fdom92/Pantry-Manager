@@ -10,40 +10,29 @@
     "tagline": "In 1 Minute starten",
     "taglineDone": "Alles bereit",
     "actions": {
-      "skip": "Überspringen",
       "next": "Weiter",
       "start": "Starten",
       "skipHint": "Du kannst dieses Tutorial jederzeit überspringen.",
       "continue": "Weiter",
-      "enter": "Vorratskammer öffnen",
       "notifyMe": "Ja, benachrichtige mich",
       "notifyLater": "Später",
       "analyticsAccept": "Ja, helfen",
-      "analyticsLater": "Jetzt nicht"
+      "analyticsLater": "Jetzt nicht",
+      "startEmpty": "Leer starten"
     },
     "slides": {
+      "add": {
+        "title": "Was hast du gerade zur Hand?",
+        "description": "Füge ein Produkt hinzu, das du zu Hause hast, und wir erinnern dich, bevor es abläuft. Eines reicht.",
+        "placeholder": "Tippe oder wähle: Milch, Eier…",
+        "saveError": "Speichern fehlgeschlagen. Bitte versuche es erneut."
+      },
       "notifications": {
         "title": "Hinweis vor dem Ablaufen",
         "description": "Wir benachrichtigen dich, wenn etwas bald abläuft oder zur Neige geht.",
         "previewTitle": "Produkte laufen bald ab",
-        "previewBody": "3 Produkte laufen diese Woche ab"
-      },
-      "seed": {
-        "title": "Was hast du jetzt in der Vorratskammer?",
-        "description": "Tippe an, was du schon hast. Mengen bearbeitest du später. Kannst diesen Schritt überspringen.",
-        "selectedCount": "{{ count }} ausgewählt",
-        "skip": "Diesen Schritt überspringen"
-      },
-      "confirm": {
-        "title": "Deine Vorratskammer ist bereit 👌",
-        "description": "Wir haben deine Auswahl hinzugefügt.",
-        "titleEmpty": "Kein Problem",
-        "descriptionEmpty": "Du kannst deine Produkte hinzufügen, wann du willst.",
-        "emptyBody": "Füge sie einzeln aus der Vorratskammer hinzu.",
-        "noExpiryLabel": "Kein Ablaufdatum",
-        "needsDateLabel": "Datum ausstehend",
-        "expiresLabel": "Läuft ab am {{date}}",
-        "adjustHint": "Daten und Mengen kannst du später in deiner Vorratskammer anpassen."
+        "previewBody": "3 Produkte laufen diese Woche ab",
+        "previewBodyProduct": "{{name}} läuft {{when}} ab"
       },
       "analytics": {
         "title": "Hilf uns, besser zu werden",

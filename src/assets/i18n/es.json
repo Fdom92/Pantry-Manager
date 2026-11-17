@@ -10,40 +10,29 @@
     "tagline": "Empieza en 1 minuto",
     "taglineDone": "Todo listo",
     "actions": {
-      "skip": "Saltar",
       "next": "Siguiente",
       "start": "Empezar",
       "skipHint": "Puedes saltar este tutorial cuando quieras.",
       "continue": "Continuar",
-      "enter": "Entrar a mi despensa",
       "notifyMe": "Sí, avísame",
       "notifyLater": "Más tarde",
       "analyticsAccept": "Sí, ayudar",
-      "analyticsLater": "Ahora no"
+      "analyticsLater": "Ahora no",
+      "startEmpty": "Empezar vacío"
     },
     "slides": {
+      "add": {
+        "title": "¿Qué tienes a mano ahora mismo?",
+        "description": "Añade un producto que tengas en casa y te avisaremos antes de que caduque. Con uno basta.",
+        "placeholder": "Escribe o elige: leche, huevos…",
+        "saveError": "No se ha podido guardar. Inténtalo de nuevo."
+      },
       "notifications": {
         "title": "Avisos antes de que caduque",
         "description": "Te avisamos cuando algo esté a punto de caducar o se acabe.",
         "previewTitle": "Productos próximos a caducar",
-        "previewBody": "3 productos expiran esta semana"
-      },
-      "seed": {
-        "title": "¿Qué tienes ahora en la despensa?",
-        "description": "Toca lo que ya tengas. Después editas cantidades. Puedes saltar este paso.",
-        "selectedCount": "{{ count }} seleccionados",
-        "skip": "Saltar este paso"
-      },
-      "confirm": {
-        "title": "Tu despensa lista 👌",
-        "description": "Hemos añadido lo que has seleccionado a tu despensa.",
-        "titleEmpty": "Sin problema",
-        "descriptionEmpty": "Añadirás tus productos cuando quieras.",
-        "emptyBody": "Puedes añadirlos uno a uno desde la despensa.",
-        "noExpiryLabel": "Sin caducidad",
-        "needsDateLabel": "Pendiente fecha",
-        "expiresLabel": "Caduca el {{date}}",
-        "adjustHint": "Ajusta fechas y cantidades en tu despensa cuando quieras."
+        "previewBody": "3 productos expiran esta semana",
+        "previewBodyProduct": "{{name}} caduca {{when}}"
       },
       "analytics": {
         "title": "Ayúdanos a mejorar",
