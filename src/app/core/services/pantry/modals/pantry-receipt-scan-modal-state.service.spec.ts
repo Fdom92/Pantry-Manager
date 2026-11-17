@@ -324,6 +324,7 @@ describe('PantryReceiptScanModalStateService', () => {
       const saved = pantryStore.updateItem.calls.mostRecent().args[0] as PantryItem;
       expect(saved.batches[0].expirationDate).toBe('2026-12-01');
       expect(saved.batches[0].quantity).toBe(FRESH_QTY.sufficient);
+      expect(events.logAddExistingItem.calls.mostRecent().args[3]).toBe('2026-12-01');
     });
 
     it('a matched fresh item with an unclassifiable name gets no date, and logs the stored quantity', async () => {

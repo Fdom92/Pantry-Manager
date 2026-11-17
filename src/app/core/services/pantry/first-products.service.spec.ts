@@ -25,7 +25,7 @@ describe('FirstProductsService', () => {
       providers: [
         { provide: PantryStoreService, useValue: store },
         { provide: HistoryEventManagerService, useValue: history },
-        { provide: ClockService, useValue: { now: () => NOW } },
+        { provide: ClockService, useValue: { now: () => NOW, tick: () => undefined } },
       ],
     });
     service = TestBed.inject(FirstProductsService);

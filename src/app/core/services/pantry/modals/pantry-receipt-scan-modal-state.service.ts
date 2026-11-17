@@ -490,7 +490,7 @@ export class PantryReceiptScanModalStateService {
               });
           if (updated) {
             await this.pantryStore.updateItem(updated);
-            await this.eventManager.logAddExistingItem(matchedItem, updated, matchedItem.productType === 'fresh' ? FRESH_QTY.sufficient : line.quantity, undefined, sessionId, timestamp, { dateFromUser: line.dateFromUser });
+            await this.eventManager.logAddExistingItem(matchedItem, updated, matchedItem.productType === 'fresh' ? FRESH_QTY.sufficient : line.quantity, line.expirationDate, sessionId, timestamp, { dateFromUser: line.dateFromUser });
             matched++;
           }
         } else {

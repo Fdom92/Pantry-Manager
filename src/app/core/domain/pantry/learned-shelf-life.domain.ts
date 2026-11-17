@@ -35,7 +35,7 @@ export function learnShelfLifeDays(events: readonly PantryEvent[]): LearnedShelf
   const samples = new Map<string, { at: number; days: number }[]>();
   const classSamples = new Map<string, { at: number; days: number }[]>();
   const push = (m: Map<string, { at: number; days: number }[]>, key: string, s: { at: number; days: number }) =>
-    m.set(key, [...(m.get(key) ?? []), s]);
+    (m.get(key) ?? m.set(key, []).get(key)!).push(s);
   for (const e of events) {
     if (e.eventType !== 'ADD' || !e.productName || e.daysToExpiry == null || e.daysToExpiry <= 0) continue;
     if (e.dateFromUser === false) continue;

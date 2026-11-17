@@ -34,6 +34,7 @@ export class FirstProductsService {
     if (!drafts.length) {
       return [];
     }
+    this.clock.tick(); // the clock only moves on foreground/midnight; this is an event timestamp
     const timestamp = new Date(this.clock.now()).toISOString();
     const sessionId = drafts.length > 1 ? createDocumentId('session') : undefined;
     const saved: PantryItem[] = [];
