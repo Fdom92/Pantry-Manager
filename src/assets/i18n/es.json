@@ -104,7 +104,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Añadir producto"
+      "addProduct": "Añadir producto",
+      "scanReceipt": "Escanear ticket"
     },
     "generic": {
       "title": "Nada que mostrar",
@@ -584,11 +585,6 @@
         "frozen": "Congelados"
       },
       "search": "Buscar productos"
-    },
-    "coachMark": {
-      "addFirstItem": "Añade tu primer producto real",
-      "addFirstItemHint": "Toca para empezar tu despensa",
-      "ctaLabel": "Añadir producto"
     },
     "fastAdd": {
       "groupLabel": "Añadir productos",

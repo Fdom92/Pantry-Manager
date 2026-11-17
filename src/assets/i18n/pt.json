@@ -104,7 +104,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Adicionar produto"
+      "addProduct": "Adicionar produto",
+      "scanReceipt": "Digitalizar talão"
     },
     "generic": {
       "title": "Nada para mostrar",
@@ -584,11 +585,6 @@
         "frozen": "Congelados"
       },
       "search": "Pesquisar produtos"
-    },
-    "coachMark": {
-      "addFirstItem": "Adiciona o teu primeiro produto real",
-      "addFirstItemHint": "Toca para começar a tua despensa",
-      "ctaLabel": "Adicionar produto"
     },
     "fastAdd": {
       "groupLabel": "Adicionar produtos",

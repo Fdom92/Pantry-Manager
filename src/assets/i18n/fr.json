@@ -104,7 +104,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Ajouter un produit"
+      "addProduct": "Ajouter un produit",
+      "scanReceipt": "Scanner le ticket"
     },
     "generic": {
       "title": "Rien à afficher",
@@ -584,11 +585,6 @@
         "frozen": "Congelés"
       },
       "search": "Rechercher des produits"
-    },
-    "coachMark": {
-      "addFirstItem": "Ajoute ton premier vrai produit",
-      "addFirstItemHint": "Appuie pour démarrer ton garde-manger",
-      "ctaLabel": "Ajouter un produit"
     },
     "fastAdd": {
       "groupLabel": "Ajouter des produits",

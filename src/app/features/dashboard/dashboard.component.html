@@ -24,7 +24,11 @@
           class="dashboard-empty"
           icon="basket-outline"
           [titleKey]="'dashboard.empty.title'"
-          [subtitleKey]="'dashboard.empty.subtitle'">
+          [subtitleKey]="'dashboard.empty.subtitle'"
+          [showAction]="true"
+          [secondaryActionLabel]="'emptyStates.actions.scanReceipt' | translate"
+          (action)="onFirstStep('add')"
+          (secondaryAction)="onFirstStep('scan')">
         </app-empty-state>
       }
 

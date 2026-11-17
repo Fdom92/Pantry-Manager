@@ -104,7 +104,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Add product"
+      "addProduct": "Add product",
+      "scanReceipt": "Scan receipt"
     },
     "generic": {
       "title": "Nothing to show",
@@ -584,11 +585,6 @@
         "frozen": "Frozen"
       },
       "search": "Search products"
-    },
-    "coachMark": {
-      "addFirstItem": "Add your first real product",
-      "addFirstItemHint": "Tap to start filling your pantry",
-      "ctaLabel": "Add product"
     },
     "fastAdd": {
       "groupLabel": "Add products",

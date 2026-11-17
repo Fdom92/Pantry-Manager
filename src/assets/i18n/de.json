@@ -104,7 +104,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Produkt hinzufügen"
+      "addProduct": "Produkt hinzufügen",
+      "scanReceipt": "Kassenbon scannen"
     },
     "generic": {
       "title": "Nichts anzuzeigen",
@@ -584,11 +585,6 @@
         "frozen": "Eingefroren"
       },
       "search": "Produkte suchen"
-    },
-    "coachMark": {
-      "addFirstItem": "Füge dein erstes echtes Produkt hinzu",
-      "addFirstItemHint": "Tippe, um deine Vorratskammer zu starten",
-      "ctaLabel": "Produkt hinzufügen"
     },
     "fastAdd": {
       "groupLabel": "Produkte hinzufügen",

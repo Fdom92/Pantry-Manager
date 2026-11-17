@@ -98,6 +98,9 @@ export const ANALYTICS_EVENTS = {
    */
   EMPTY_STATE_SHOWN: 'empty_state_shown',
 
+  /** Empty pantry/dashboard: which of the two first actions was tapped (`action`, `screen`). */
+  FIRST_STEPS_ACTION: 'first_steps_action',
+
   // Dashboard
   /** "Not now" on the HOY suggestion or on one of the action cards. */
   DASHBOARD_SUGGESTION_DISMISSED: 'dashboard_suggestion_dismissed',
