@@ -51,11 +51,11 @@ describe('ActivationService', () => {
 
   const flush = () => TestBed.tick();
 
-  it('emits activation_reached once with source and minutes since onboarding', () => {
+  it('emits activation_reached once with source and minutes since onboarding', async () => {
     service.markOnboarded(false);
     flush();
     clockMs = T0 + 7 * 60_000; // no visibilitychange: only a refresh of the clock can see it
-    service.recordFirstProduct('typed');
+    await service.saveAsFirstProduct('typed', async () => undefined);
     items.set([{}]);
     flush();
     items.set([{}, {}]);
@@ -74,9 +74,9 @@ describe('ActivationService', () => {
     expect((emitted[0].props as { source: string }).source).toBe('onboarding');
   });
 
-  it('keeps the first source: a later product does not overwrite it', () => {
+  it('keeps the first source: a later product does not overwrite it', async () => {
     service.markOnboarded(true);
-    service.recordFirstProduct('receipt');
+    await service.saveAsFirstProduct('receipt', async () => undefined);
     items.set([{}]);
     flush();
 
@@ -90,8 +90,8 @@ describe('ActivationService', () => {
     expect(emitted).toEqual([]);
   });
 
-  it('does not record a source without the marker', () => {
-    service.recordFirstProduct('typed');
+  it('does not record a source without the marker', async () => {
+    await service.saveAsFirstProduct('typed', async () => undefined);
     service.markOnboarded(false);
     items.set([{}]);
     flush();
@@ -136,6 +136,29 @@ describe('ActivationService', () => {
     TestBed.tick();
 
     expect(emitted.length).toBe(1);
+  });
+
+  it('writes the source before the save runs, so the effect cannot see the product without it', async () => {
+    service.markOnboarded(false);
+    let seenDuringSave: string | null = null;
+    await service.saveAsFirstProduct('typed', async () => {
+      seenDuringSave = localStorage.getItem('activation:firstProductSource');
+      items.set([{}]);
+      flush();
+    });
+
+    expect(seenDuringSave as string | null).toBe('typed');
+    expect((emitted[0].props as { source: string }).source).toBe('typed');
+  });
+
+  it('undoes the source when the save throws, and keeps one that was already there', async () => {
+    service.markOnboarded(false);
+    await expectAsync(service.saveAsFirstProduct('typed', () => Promise.reject(new Error('disk')))).toBeRejected();
+    expect(localStorage.getItem('activation:firstProductSource')).toBeNull();
+
+    await service.saveAsFirstProduct('receipt', async () => undefined);
+    await expectAsync(service.saveAsFirstProduct('typed', () => Promise.reject(new Error('disk')))).toBeRejected();
+    expect(localStorage.getItem('activation:firstProductSource')).toBe('receipt');
   });
 
   it('needs notifications granted', () => {

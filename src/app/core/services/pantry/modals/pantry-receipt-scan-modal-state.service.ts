@@ -480,8 +480,7 @@ export class PantryReceiptScanModalStateService {
             ...(line.storage === 'fresh' ? { minThreshold: undefined, isBasic: false } : {}),
             supermarket: this.detectedSupermarket() ?? undefined,
           };
-          await this.pantryStore.addItem(item);
-          this.activation.recordFirstProduct('receipt');
+          await this.activation.saveAsFirstProduct('receipt', () => this.pantryStore.addItem(item));
           await this.eventManager.logAddNewItem(item, item.batches[0].quantity, sessionId, timestamp, { dateFromUser: line.dateFromUser });
         }
         this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {

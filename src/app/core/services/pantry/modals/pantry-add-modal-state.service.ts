@@ -93,8 +93,7 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
             inferExpiry: false,
           });
           const item: PantryItem = { ...base, productType: 'pantry' };
-          await this.pantryStore.addItem(item);
-          this.activation.recordFirstProduct(entry.foodKind ? 'suggestion' : 'typed');
+          await this.activation.saveAsFirstProduct(entry.foodKind ? 'suggestion' : 'typed', () => this.pantryStore.addItem(item));
           await this.eventManager.logAddNewItem(item, entry.quantity, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
           this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
             kind: 'despensa',

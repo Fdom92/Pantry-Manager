@@ -50,10 +50,21 @@ export class ActivationService {
     this.onboardedAt.set(at.getTime());
   }
 
-  /** Call just before a new product is saved; only the first one after onboarding counts. */
-  recordFirstProduct(source: Exclude<FirstProductSource, 'onboarding'>): void {
-    if (this.onboardedAt() !== null && !this.storage.getFirstSource()) {
+  /**
+   * Runs the save of a new product. Only the first one after onboarding counts: its source is
+   * written BEFORE the save, because the store signal changes inside it and the activation
+   * effect may flush before any code after the await. Undone if the save throws.
+   */
+  async saveAsFirstProduct(source: Exclude<FirstProductSource, 'onboarding'>, save: () => Promise<void>): Promise<void> {
+    const writes = this.onboardedAt() !== null && !this.storage.getFirstSource();
+    if (writes) {
       this.storage.setFirstSource(source);
+    }
+    try {
+      await save();
+    } catch (err) {
+      if (writes) this.storage.clearFirstSource();
+      throw err;
     }
   }
 

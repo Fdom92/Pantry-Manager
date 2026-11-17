@@ -256,8 +256,7 @@ export class ListStateService {
           quantity,
         });
         const newItem: PantryItem = { ...base, productType: 'pantry' };
-        await this.pantryStore.addItem(newItem);
-        this.activation.recordFirstProduct('list');
+        await this.activation.saveAsFirstProduct('list', () => this.pantryStore.addItem(newItem));
         // addItem merges into an existing product when one matches (a different
         // _id), so newItem._id may never reach the cache. recordPurchaseUndo
         // skips the record in that case: there is nothing of ours to delete.

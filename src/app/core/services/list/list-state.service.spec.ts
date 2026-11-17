@@ -84,7 +84,7 @@ describe('ListStateService — a manual item that duplicates a suggestion', () =
         { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'info', 'error', 'withAction']) },
         { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn', 'info']) },
         { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
-        { provide: ActivationService, useValue: jasmine.createSpyObj('ActivationService', ['recordFirstProduct']) },
+        { provide: ActivationService, useValue: { saveAsFirstProduct: jasmine.createSpy('saveAsFirstProduct').and.callFake((_s: string, save: () => Promise<void>) => save()) } },
         {
           provide: ReviewPromptService,
           useValue: jasmine.createSpyObj('ReviewPromptService', ['handlePositiveAction']),
@@ -278,7 +278,7 @@ describe('ListStateService — undoPurchase', () => {
         { provide: ToastService, useValue: toastSpy },
         { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn', 'info']) },
         { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
-        { provide: ActivationService, useValue: jasmine.createSpyObj('ActivationService', ['recordFirstProduct']) },
+        { provide: ActivationService, useValue: { saveAsFirstProduct: jasmine.createSpy('saveAsFirstProduct').and.callFake((_s: string, save: () => Promise<void>) => save()) } },
         {
           provide: ReviewPromptService,
           useValue: jasmine.createSpyObj('ReviewPromptService', ['handlePositiveAction']),
@@ -339,7 +339,7 @@ describe('ListStateService — undoPurchase', () => {
     await service.markManualAsBought('m1');
 
     expect(pantryStoreSpy.addItem).toHaveBeenCalled();
-    expect(TestBed.inject(ActivationService).recordFirstProduct).toHaveBeenCalledWith('list');
+    expect(TestBed.inject(ActivationService).saveAsFirstProduct).toHaveBeenCalledWith('list', jasmine.any(Function));
     const createdItem = itemsSignal().find(i => i.name === 'Bombillas');
     expect(createdItem).toBeDefined();
 

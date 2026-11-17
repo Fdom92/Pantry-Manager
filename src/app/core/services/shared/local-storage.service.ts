@@ -50,6 +50,7 @@ export class LocalStorageService {
     setOnboardedAt: (v: Date | string) => this.setDate(STORAGE_KEYS.ONBOARDING_V58_DONE, v),
     getFirstSource: () => this.getString(STORAGE_KEYS.FIRST_PRODUCT_SOURCE),
     setFirstSource: (v: string) => this.setString(STORAGE_KEYS.FIRST_PRODUCT_SOURCE, v),
+    clearFirstSource: () => this.remove(STORAGE_KEYS.FIRST_PRODUCT_SOURCE),
     isReported: () => this.getBool(STORAGE_KEYS.ACTIVATION_REPORTED),
     markReported: () => this.setBool(STORAGE_KEYS.ACTIVATION_REPORTED, true),
   };

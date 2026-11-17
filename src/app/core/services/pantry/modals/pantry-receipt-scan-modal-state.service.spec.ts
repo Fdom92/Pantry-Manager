@@ -78,7 +78,7 @@ describe('PantryReceiptScanModalStateService', () => {
         { provide: PantryStoreService, useValue: pantryStore },
         { provide: HistoryEventManagerService, useValue: jasmine.createSpyObj('HistoryEventManagerService', ['logAddExistingItem', 'logAddNewItem']) },
         { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
-        { provide: ActivationService, useValue: { recordFirstProduct: () => undefined } },
+        { provide: ActivationService, useValue: { saveAsFirstProduct: (_s: string, save: () => Promise<void>) => save() } },
         { provide: TranslateService, useValue: jasmine.createSpyObj('TranslateService', ['instant']) },
         { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'error', 'info']) },
         { provide: AlertController, useValue: alertCtrl },

@@ -61,7 +61,7 @@ function configure(loadedProducts: PantryItem[], learned?: { product?: number })
       ...(learned ? [{ provide: ShelfLifeLearningService, useValue: { daysFor: () => learned } }] : []),
       { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'error', 'info', 'raw']) },
       { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
-      { provide: ActivationService, useValue: jasmine.createSpyObj('ActivationService', ['recordFirstProduct']) },
+      { provide: ActivationService, useValue: { saveAsFirstProduct: jasmine.createSpy('saveAsFirstProduct').and.callFake((_s: string, save: () => Promise<void>) => save()) } },
       { provide: HistoryEventManagerService, useValue: jasmine.createSpyObj('HistoryEventManagerService', ['logAddNewItem', 'logAddExistingItem']) },
       { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn', 'debug', 'info', 'log']) },
     ],
@@ -509,24 +509,24 @@ describe('expiry source of a suggested date', () => {
 describe('first product source', () => {
   it('is suggestion for a basic and typed for free text, in both sheets, after the save', async () => {
     configure([]);
-    const activation = TestBed.inject(ActivationService) as jasmine.SpyObj<ActivationService>;
+    const activation = TestBed.inject(ActivationService) as unknown as { saveAsFirstProduct: jasmine.Spy };
     const despensa = TestBed.inject(PantryAddModalStateService);
     despensa.addEntry({ title: 'Leche', meta: ONBOARDING_QUICK_SEED_ITEMS[0] } as never);
     await despensa.submit();
-    expect(activation.recordFirstProduct).toHaveBeenCalledOnceWith('suggestion');
+    expect(activation.saveAsFirstProduct).toHaveBeenCalledOnceWith('suggestion', jasmine.any(Function));
 
-    activation.recordFirstProduct.calls.reset();
+    activation.saveAsFirstProduct.calls.reset();
     despensa.open();
     despensa.addEntryFromQuery('pan casero');
     await despensa.submit();
-    expect(activation.recordFirstProduct).toHaveBeenCalledOnceWith('typed');
+    expect(activation.saveAsFirstProduct).toHaveBeenCalledOnceWith('typed', jasmine.any(Function));
 
-    activation.recordFirstProduct.calls.reset();
+    activation.saveAsFirstProduct.calls.reset();
     const fresh = TestBed.inject(PantryFreshAddModalStateService);
     fresh.open();
     fresh.addEntryFromQuery('lechuga rara');
     await fresh.submit();
-    expect(activation.recordFirstProduct).toHaveBeenCalledOnceWith('typed');
+    expect(activation.saveAsFirstProduct).toHaveBeenCalledOnceWith('typed', jasmine.any(Function));
   });
 });
 
