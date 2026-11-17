@@ -82,6 +82,9 @@
                       (keydown.enter)="state.editLineName(line.id)"
                       [attr.aria-label]="'pantry.receiptScan.editNameTitle' | translate">
                       <p class="receipt-line__name">{{ state.displayName(line) }}</p>
+                      @if (line.match) {
+                        <p class="receipt-line__ticket">{{ 'pantry.receiptScan.ticketText' | translate: { name: line.parsed.rawName } }}</p>
+                      }
                       @if (state.isFreshMatch(line)) {
                         <p class="receipt-line__meta receipt-line__meta--match">
                           <ion-icon name="leaf-outline"></ion-icon>
@@ -146,8 +149,24 @@
                     }
                   </div>
 
+                  @if (state.isSuggestion(line)) {
+                    <div class="receipt-line__suggest">
+                      <ion-icon name="help-circle-outline"></ion-icon>
+                      <span>{{ 'pantry.receiptScan.suggestQuestion' | translate: { name: line.match!.name } }}</span>
+                      <button type="button" class="receipt-line__suggest-btn" (click)="state.acceptSuggestion(line.id)">
+                        {{ 'pantry.receiptScan.suggestAccept' | translate }}
+                      </button>
+                    </div>
+                  }
+
                   @if (line.expanded && state.canExpand(line)) {
                     <div class="receipt-line__details" [id]="'receipt-line-details-' + line.id">
+                      @if (state.isAutoMatch(line)) {
+                        <button type="button" class="receipt-line__unmatch" (click)="state.unmatchLine(line.id)">
+                          <ion-icon name="close"></ion-icon>
+                          {{ 'pantry.receiptScan.notThisProduct' | translate }}
+                        </button>
+                      }
                       @if (state.canEditStorage(line)) {
                         <ion-segment
                           class="receipt-line__storage"

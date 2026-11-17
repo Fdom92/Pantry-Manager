@@ -1,8 +1,13 @@
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
+import { matchFoodClass, resolveFoodClass } from '@core/domain/pantry';
+import type { FoodType } from '@core/models/shared/enums.model';
 
 export interface MatchCandidate {
   id: string;
   name: string;
+  /** Stored class of the product; lets a hand-corrected product keep its own class. */
+  foodType?: FoodType | null;
+  foodKind?: string | null;
 }
 
 export interface MatchResult {
@@ -10,6 +15,11 @@ export interface MatchResult {
   name: string;
   /** 0..1 — share of receipt tokens matched against the candidate name. */
   score: number;
+  /**
+   * Safe to join without asking: strong score, the receipt covers the whole
+   * candidate name, and the food classes agree. Otherwise it is a suggestion.
+   */
+  auto: boolean;
 }
 
 /** Score above which a match is trusted enough to pre-select in the review UI. */
@@ -29,20 +39,33 @@ export function matchReceiptName(rawName: string, candidates: MatchCandidate[]):
   if (!receiptTokens.length) return null;
 
   let best: MatchResult | null = null;
+  let bestCoverage = 0;
+  let bestCandidate: MatchCandidate | null = null;
   for (const candidate of candidates) {
     const candidateTokens = tokenize(candidate.name);
     if (!candidateTokens.length) continue;
 
-    const score = scoreTokens(receiptTokens, candidateTokens);
+    const { score, candidateCoverage } = scoreTokens(receiptTokens, candidateTokens);
     if (score > (best?.score ?? 0)) {
-      best = { id: candidate.id, name: candidate.name, score };
+      best = { id: candidate.id, name: candidate.name, score, auto: false };
+      bestCoverage = candidateCoverage;
+      bestCandidate = candidate;
     }
   }
 
-  return best && best.score >= MATCH_SUGGEST_THRESHOLD ? best : null;
+  if (!best || !bestCandidate || best.score < MATCH_SUGGEST_THRESHOLD) return null;
+  best.auto = best.score >= MATCH_AUTO_THRESHOLD && bestCoverage === 1 && classesCompatible(rawName, bestCandidate);
+  return best;
 }
 
-function scoreTokens(receiptTokens: string[], candidateTokens: string[]): number {
+/** Unknown on either side does not block; two known classes must be the same. */
+function classesCompatible(rawName: string, candidate: MatchCandidate): boolean {
+  const line = matchFoodClass(rawName);
+  const stored = resolveFoodClass(candidate.name, candidate.foodType, candidate.foodKind);
+  return !line || !stored || line.key === stored.key;
+}
+
+function scoreTokens(receiptTokens: string[], candidateTokens: string[]): { score: number; candidateCoverage: number } {
   let matched = 0;
   const used = new Set<number>();
 
@@ -67,7 +90,7 @@ function scoreTokens(receiptTokens: string[], candidateTokens: string[]): number
   if (tokensMatch(receiptTokens[0], candidateTokens[0])) {
     score = Math.min(1, score + 0.1);
   }
-  return score;
+  return { score, candidateCoverage };
 }
 
 /**

@@ -53,6 +53,10 @@ export interface ReceiptReviewLine {
   match: PantryItem | null;
   /** 0..1 similarity score of the match. */
   matchScore: number;
+  /** The matcher trusted the match enough to join without asking; otherwise it is only a suggestion. */
+  matchAuto: boolean;
+  /** The user tapped "yes" on a suggestion: it now behaves like an auto match. */
+  suggestionAccepted?: boolean;
   /** Whether this line will be added on submit. */
   included: boolean;
   /** Editable quantity (starts at parsed.quantity). */

@@ -129,6 +129,38 @@ ion-modal.app-sheet-modal {
     overflow: hidden;
   }
 
+  &__ticket {
+    margin: 2px 0 0;
+    font-size: var(--app-theme-font-size-small);
+    color: var(--app-theme-text-muted);
+    font-style: italic;
+  }
+
+  &__suggest {
+    display: flex;
+    align-items: center;
+    gap: var(--app-theme-spacing-xs);
+    margin-top: var(--app-theme-spacing-xs);
+    font-size: var(--app-theme-font-size-small);
+    color: var(--app-theme-text-color);
+
+    ion-icon { font-size: var(--app-theme-icon-size-xs); }
+  }
+
+  &__suggest-btn,
+  &__unmatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border: 1px solid var(--app-theme-card-border-color);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ion-color-primary);
+    font: inherit;
+    cursor: pointer;
+  }
+
   &__meta {
     margin: 2px 0 0;
     font-size: var(--app-theme-font-size-small);

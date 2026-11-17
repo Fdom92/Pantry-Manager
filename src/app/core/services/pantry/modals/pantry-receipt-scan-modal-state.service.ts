@@ -10,7 +10,7 @@ import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
 import { FRESH_QTY, resolveFoodClass } from '@core/domain/pantry';
 import { resolveSuggestedExpiry, inferFoodType, expiryAfterFoodTypeChange, expirySourceAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
-import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
+import { reconstructRows, parseReceipt, matchReceiptName } from '@core/domain/receipt';
 import { classifyNativeDismissal } from '@core/domain/shared';
 import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
 import type { PantryItem } from '@core/models/pantry';
@@ -155,7 +155,7 @@ export class PantryReceiptScanModalStateService {
         mode: smart ? 'smart' : 'local',
       });
 
-      const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name }));
+      const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name, foodType: item.foodType, foodKind: item.foodKind }));
       const itemsById = new Map(this.pantryStore.loadedProducts().map(item => [item._id, item]));
 
       const lines: ReceiptReviewLine[] = items.map((item, index) => {
@@ -166,6 +166,7 @@ export class PantryReceiptScanModalStateService {
           parsed: item,
           match: matchedItem,
           matchScore: match?.score ?? 0,
+          matchAuto: match?.auto ?? false,
           included: item.confidence !== 'low',
           quantity: item.quantity,
           foodType: null,
@@ -279,7 +280,7 @@ export class PantryReceiptScanModalStateService {
             if (!name) return;
             // Re-match against the pantry: typing the right name should link
             // the line to the existing product instead of creating a copy.
-            const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name }));
+            const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name, foodType: item.foodType, foodKind: item.foodKind }));
             const rematch = matchReceiptName(name, candidates);
             const matchedItem = rematch
               ? this.pantryStore.loadedProducts().find(i => i._id === rematch.id) ?? null
@@ -292,6 +293,8 @@ export class PantryReceiptScanModalStateService {
                   parsed: { ...l.parsed, rawName: name },
                   match: matchedItem,
                   matchScore: rematch?.score ?? 0,
+                  matchAuto: rematch?.auto ?? false,
+                  suggestionAccepted: false,
                 };
                 return { ...updated, ...this.deriveLineFields(updated) };
               }),
@@ -304,9 +307,35 @@ export class PantryReceiptScanModalStateService {
     await alert.present();
   }
 
-  /** True when the match is strong enough to add to the existing item. */
+  /** True when the line will be added to the existing item: trusted by the matcher, or accepted by the user. */
   isAutoMatch(line: ReceiptReviewLine): boolean {
-    return !!line.match && line.matchScore >= MATCH_AUTO_THRESHOLD;
+    return !!line.match && (line.matchAuto || !!line.suggestionAccepted);
+  }
+
+  /** A possible match the user has not confirmed: saved as a new product unless accepted. */
+  isSuggestion(line: ReceiptReviewLine): boolean {
+    return !!line.match && !this.isAutoMatch(line);
+  }
+
+  acceptSuggestion(id: number): void {
+    this.updateLine(id, l => ({ ...l, suggestionAccepted: true }));
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'accept_suggestion' });
+  }
+
+  /** "Not this product": drop the match, the line becomes a new product named after the ticket. */
+  unmatchLine(id: number): void {
+    this.updateLine(id, l => ({ ...l, match: null, matchScore: 0, matchAuto: false, suggestionAccepted: false }));
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'unmatch' });
+  }
+
+  private updateLine(id: number, change: (line: ReceiptReviewLine) => ReceiptReviewLine): void {
+    this.reviewLines.update(lines =>
+      lines.map(l => {
+        if (l.id !== id) return l;
+        const updated = change(l);
+        return { ...updated, ...this.deriveLineFields(updated) };
+      }),
+    );
   }
 
   /** A fresh line is a state (sufficient), not a count: matched fresh item or new line sent to Frescos. */
@@ -376,7 +405,7 @@ export class PantryReceiptScanModalStateService {
 
   /** Whether this line has anything worth expanding the accordion for. */
   canExpand(line: ReceiptReviewLine): boolean {
-    return this.canEditFoodType(line) || this.canEditExpiry(line);
+    return this.canEditFoodType(line) || this.canEditExpiry(line) || this.isAutoMatch(line);
   }
 
   toggleExpanded(id: number): void {
@@ -499,6 +528,10 @@ export class PantryReceiptScanModalStateService {
         items_matched: matched,
         fresh_lines: lines.filter(l => this.isFreshLine(l)).length,
         storage_changed: lines.filter(l => !this.isAutoMatch(l) && l.storage !== l.suggestedStorage).length,
+        // A match the matcher did not trust: shown as "¿Es tu …?", accepted or not.
+        suggested_lines: lines.filter(l => l.match && !l.matchAuto).length,
+        suggested_accepted: lines.filter(l => l.match && !l.matchAuto && l.suggestionAccepted).length,
+        unmatched: lines.filter(l => !l.match).length,
         supermarket: this.detectedSupermarket() ?? 'unknown',
         mode: this.usedSmartScan() ? 'smart' : 'local',
       });
