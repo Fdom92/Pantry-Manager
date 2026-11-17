@@ -3,6 +3,7 @@ import { buildAddItemPayload, FOOD_CLASS_BY_KEY, FRESH_QTY } from '@core/domain/
 import type { PantryItem } from '@core/models/pantry';
 import type { FoodType } from '@core/models/shared';
 import { createDocumentId } from '@core/utils';
+import { normalizeProductKey } from '@core/utils/normalization.util';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { ClockService } from '../shared/clock.service';
 import { PantryStoreService } from './pantry-store.service';
@@ -27,6 +28,9 @@ export class FirstProductsService {
   private readonly clock = inject(ClockService);
 
   async save(drafts: readonly ProductDraft[]): Promise<PantryItem[]> {
+    // A previous run may have been cut off before onboarding was marked seen.
+    const owned = new Set(this.pantryStore.loadedProducts().map(p => normalizeProductKey(p.name)));
+    drafts = drafts.filter(d => !owned.has(normalizeProductKey(d.name)));
     if (!drafts.length) {
       return [];
     }

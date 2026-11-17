@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
+import type { PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared';
 import { FRESH_QTY } from '@core/domain/pantry';
 import { ClockService } from '../shared/clock.service';
@@ -9,11 +11,13 @@ import { PantryStoreService } from './pantry-store.service';
 describe('FirstProductsService', () => {
   const NOW = new Date('2026-11-16T10:00:00.000Z').getTime();
   let service: FirstProductsService;
+  let loaded: ReturnType<typeof signal<PantryItem[]>>;
   let store: jasmine.SpyObj<PantryStoreService>;
   let history: jasmine.SpyObj<HistoryEventManagerService>;
 
   beforeEach(() => {
-    store = jasmine.createSpyObj('PantryStoreService', ['addItem']);
+    loaded = signal<PantryItem[]>([]);
+    store = jasmine.createSpyObj('PantryStoreService', ['addItem'], { loadedProducts: loaded });
     store.addItem.and.resolveTo();
     history = jasmine.createSpyObj('HistoryEventManagerService', ['logAddNewItem']);
     history.logAddNewItem.and.resolveTo(undefined as never);
@@ -83,5 +87,13 @@ describe('FirstProductsService', () => {
     const [item] = await service.save([draft({ name: 'Cosa', foodType: FoodType.CARB })]);
     expect(item.foodType).toBe(FoodType.CARB);
     expect(item.foodKind).toBeDefined();
+  });
+
+  it('skips a draft whose product already exists and returns only what it created', async () => {
+    loaded.set([{ _id: 'x', name: 'leche ', batches: [] } as unknown as PantryItem]);
+    const saved = await service.save([draft({ name: 'Leche' }), draft({ name: 'Huevos', classKey: 'eggs' })]);
+    expect(saved.map(i => i.name)).toEqual(['Huevos']);
+    expect(store.addItem).toHaveBeenCalledTimes(1);
+    expect(history.logAddNewItem).toHaveBeenCalledTimes(1);
   });
 });

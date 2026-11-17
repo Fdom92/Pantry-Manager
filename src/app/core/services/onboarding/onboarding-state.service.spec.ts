@@ -1,4 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
+import type { PantryItem } from '@core/models/pantry';
+import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ONBOARDING_QUICK_SEED_ITEMS } from '@core/constants';
 import { FoodType } from '@core/models/shared';
 import type { AddOption } from '@core/domain/pantry';
@@ -20,6 +23,7 @@ import { OnboardingStateService } from './onboarding-state.service';
 describe('OnboardingStateService — add step', () => {
   const NOW = new Date('2026-11-16T10:00:00.000Z').getTime();
   let service: OnboardingStateService;
+  let loaded: ReturnType<typeof signal<PantryItem[]>>;
   let firstProducts: jasmine.SpyObj<FirstProductsService>;
   let toast: jasmine.SpyObj<ToastService>;
   let activation: jasmine.SpyObj<ActivationService>;
@@ -33,12 +37,14 @@ describe('OnboardingStateService — add step', () => {
   });
 
   beforeEach(() => {
+    loaded = signal<PantryItem[]>([]);
     firstProducts = jasmine.createSpyObj('FirstProductsService', ['save']);
     firstProducts.save.and.resolveTo([]);
     TestBed.configureTestingModule({
       providers: [
         OnboardingStateService,
         { provide: FirstProductsService, useValue: firstProducts },
+        { provide: PantryStoreService, useValue: { loadedProducts: loaded } },
         { provide: ClockService, useValue: { now: () => NOW } },
         { provide: NavController, useValue: jasmine.createSpyObj('NavController', ['navigateRoot']) },
         { provide: NotificationPermissionService, useValue: {} },
@@ -59,6 +65,15 @@ describe('OnboardingStateService — add step', () => {
     service = TestBed.inject(OnboardingStateService);
     slideNext = jasmine.createSpy('slideNext');
     swiperEl = Object.assign(document.createElement('div'), { swiper: { isEnd: false, slideNext, realIndex: 0 } });
+  });
+
+  it('does not offer a basic the pantry already has (a second onboarding run)', () => {
+    const seed = ONBOARDING_QUICK_SEED_ITEMS[0];
+    const all = service.addOptions().length;
+    loaded.set([{ _id: 'x', name: `onboarding.quickSeed.items.${seed.key}`, batches: [] } as unknown as PantryItem]);
+    const options = service.addOptions();
+    expect(options.length).toBe(all - 1);
+    expect(options.every(o => o.kind === 'basic' && o.seed.key !== seed.key)).toBeTrue();
   });
 
   /** The swiper reporting it now shows slide `index`, as a swipe or slideNext would. */

@@ -21,6 +21,7 @@ import type { OnboardingSlide } from '@core/models/onboarding';
 // Direct localStorage usage replaced by `LocalStorageService` (DI below).
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { PantryStoreService } from '../pantry/pantry-store.service';
 import { FirstProductsService, type ProductDraft } from '../pantry/first-products.service';
 import { ClockService } from '../shared/clock.service';
 import { NotificationPermissionService } from '../notifications/notification-permission.service';
@@ -50,6 +51,7 @@ let swiperRegistered = false;
 export class OnboardingStateService {
   private readonly navCtrl = inject(NavController);
   private readonly firstProducts = inject(FirstProductsService);
+  private readonly pantryStore = inject(PantryStoreService);
   private readonly clock = inject(ClockService);
   private readonly notificationPermission = inject(NotificationPermissionService);
   private readonly preferences = inject(SettingsPreferencesService);
@@ -101,13 +103,18 @@ export class OnboardingStateService {
   readonly firstDraftDays = computed(() => daysUntilExpiry(this.firstDraft()?.expirationDate, this.clock.now()));
 
   /** Every basic, translated: a new user has no products of their own to suggest. */
-  readonly addOptions = computed<AddOption[]>(() =>
-    buildAddOptions(
+  readonly addOptions = computed<AddOption[]>(() => {
+    // Basics the pantry already has (an interrupted earlier run) are not offered again. They are
+    // filtered here rather than passed as `own`, which with an empty query would list only those.
+    const owned = new Set(this.pantryStore.loadedProducts().map(p => normalizeProductKey(p.name)));
+    return buildAddOptions(
       [],
-      ONBOARDING_QUICK_SEED_ITEMS.map(seed => ({ seed, name: this.translate.instant(`onboarding.quickSeed.items.${seed.key}`) as string })),
+      ONBOARDING_QUICK_SEED_ITEMS
+        .map(seed => ({ seed, name: this.translate.instant(`onboarding.quickSeed.items.${seed.key}`) as string }))
+        .filter(b => !owned.has(normalizeProductKey(b.name))),
       '',
-    )
-  );
+    );
+  });
 
   constructor() {
     if (!swiperRegistered) {
