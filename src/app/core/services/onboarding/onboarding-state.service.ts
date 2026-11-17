@@ -76,6 +76,8 @@ export class OnboardingStateService {
 
   readonly availableSlides = ONBOARDING_SLIDES as OnboardingSlide[];
 
+  private readonly addSlideIndex = this.availableSlides.findIndex(slide => slide.key === 'add');
+
   /** Notification permission decision flag. null = not yet asked. */
   readonly notificationsDecision = signal<NotificationsDecision>(null);
 
@@ -93,7 +95,7 @@ export class OnboardingStateService {
   /** Days until the first draft expires, for the notification preview; NaN without a date. */
   readonly firstDraftDays = computed(() => daysUntilExpiry(this.firstDraft()?.expirationDate, this.clock.now()));
 
-  /** The 25 basics, translated: a new user has no products of their own to suggest. */
+  /** Every basic, translated: a new user has no products of their own to suggest. */
   readonly addOptions = computed<AddOption[]>(() =>
     buildAddOptions(
       [],
@@ -124,6 +126,10 @@ export class OnboardingStateService {
     }
     const idx = swiper.realIndex ?? swiper.activeIndex ?? 0;
     this.currentSlideIndex.set(idx);
+    // Leaving the add step by swipe skips Continuar; save then, so a killed app keeps the product.
+    if (idx > this.addSlideIndex && !this.draftsSaved() && this.drafts().length) {
+      void this.saveDrafts();
+    }
     const slide = this.availableSlides[idx];
     if (slide) {
       // Only fires for users who already opted in on the analytics slide; the
@@ -315,9 +321,8 @@ export class OnboardingStateService {
   async completeOnboarding(): Promise<void> {
     this.localStorage.onboarding.setSeen(true);
 
-    // Record a decision for any consent the user has not explicitly handled. Without this, the post-update re-consent sheet
-    // would later surface the same question on the dashboard — confusing for
-    // a user who already chose to bypass the onboarding deliberately.
+    // Record a decision for any consent the user left undecided, so the
+    // re-consent sheet does not ask the same question again on the dashboard.
     await this.recordImplicitConsentDecisions();
 
     // Final prop set is redesigned with activation_reached (Task B5).
@@ -325,7 +330,7 @@ export class OnboardingStateService {
       notif_granted: this.notificationsDecision() === 'granted',
       analytics_granted: this.analyticsDecision() === 'granted',
     });
-    // Safety net: a swipe past the add step skips "Continuar"; its drafts still count.
+    // Last net for drafts the add step did not save (normally Continuar or the swipe already did).
     await this.saveDrafts();
     // Re-run so projected notifications reflect the new items.
     void this.notificationScheduler.scheduleAll();

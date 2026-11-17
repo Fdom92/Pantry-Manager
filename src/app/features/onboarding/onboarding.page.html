@@ -117,7 +117,8 @@
               </div>
               <div class="notif-body">
                 @let first = facade.firstDraft();
-                @if (first?.expirationDate) {
+                <!-- A date already past would read "caduca hace N días": generic text instead. -->
+                @if (first?.expirationDate && facade.firstDraftDays() >= 0) {
                   {{ 'onboarding.slides.notifications.previewBodyProduct' | translate: { name: first!.name, when: (facade.firstDraftDays() | appRelativeDays) } }}
                 } @else {
                   {{ 'onboarding.slides.notifications.previewBody' | translate }}
