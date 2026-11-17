@@ -16,6 +16,7 @@ describe('FOOD_CLASS_CORPUS coverage', () => {
     );
     const hit = 1 - misses.length / FOOD_CLASS_CORPUS.length;
     const summary = `${(hit * 100).toFixed(1)} % of ${FOOD_CLASS_CORPUS.length}; misses:\n${misses.join('\n')}`;
-    expect(hit).toBeGreaterThanOrEqual(GOAL, summary);
+    if (hit < GOAL) fail(summary); // a matcher message may truncate; fail() keeps the full list
+    expect(hit).toBeGreaterThanOrEqual(GOAL);
   });
 });
