@@ -17,6 +17,7 @@ import type { PantryItem } from '@core/models/pantry';
 import type { FoodType } from '@core/models/shared/enums.model';
 import { PantryStoreService } from '../pantry-store.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { ActivationService } from '../../analytics/activation.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { ReceiptLlmClientService } from '../../receipt/receipt-llm-client.service';
 import { UpgradeRevenuecatService } from '../../upgrade/upgrade-revenuecat.service';
@@ -39,6 +40,7 @@ export class PantryReceiptScanModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly activation = inject(ActivationService);
   private readonly translate = inject(TranslateService);
   private readonly toast = inject(ToastService);
   private readonly alertCtrl = inject(AlertController);
@@ -478,6 +480,7 @@ export class PantryReceiptScanModalStateService {
             ...(line.storage === 'fresh' ? { minThreshold: undefined, isBasic: false } : {}),
             supermarket: this.detectedSupermarket() ?? undefined,
           };
+          this.activation.recordFirstProduct('receipt');
           await this.pantryStore.addItem(item);
           await this.eventManager.logAddNewItem(item, item.batches[0].quantity, sessionId, timestamp, { dateFromUser: line.dateFromUser });
         }

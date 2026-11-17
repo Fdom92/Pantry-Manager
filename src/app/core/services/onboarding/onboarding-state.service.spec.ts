@@ -4,6 +4,7 @@ import { FoodType } from '@core/models/shared';
 import type { AddOption } from '@core/domain/pantry';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
+import { ActivationService } from '../analytics/activation.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { NotificationPermissionService } from '../notifications/notification-permission.service';
 import { NotificationSchedulerService } from '../notifications/notification-scheduler.service';
@@ -21,6 +22,7 @@ describe('OnboardingStateService — add step', () => {
   let service: OnboardingStateService;
   let firstProducts: jasmine.SpyObj<FirstProductsService>;
   let toast: jasmine.SpyObj<ToastService>;
+  let activation: jasmine.SpyObj<ActivationService>;
   let slideNext: jasmine.Spy;
   let swiperEl: HTMLElement;
 
@@ -48,6 +50,7 @@ describe('OnboardingStateService — add step', () => {
         { provide: NotificationSchedulerService, useValue: { scheduleAll: async () => undefined } },
         { provide: TranslateService, useValue: { instant: (key: string) => key } },
         { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
+        { provide: ActivationService, useValue: (activation = jasmine.createSpyObj('ActivationService', ['markOnboarded'])) },
         { provide: LocalStorageService, useValue: { onboarding: { setSeen: () => undefined } } },
         { provide: ToastService, useFactory: () => (toast = jasmine.createSpyObj('ToastService', ['error'])) },
         { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn']) },
@@ -146,6 +149,50 @@ describe('OnboardingStateService — add step', () => {
     firstProducts.save.calls.reset();
     await service.completeOnboarding();
     expect(firstProducts.save).not.toHaveBeenCalled();
+  });
+
+  describe('onboarding_completed', () => {
+    const completedProps = () => {
+      const analytics = TestBed.inject(AnalyticsService) as jasmine.SpyObj<AnalyticsService>;
+      return analytics.track.calls.allArgs().find(([event]) => event === 'onboarding_completed')![1];
+    };
+
+    it('reports what the user saved, with the step they finished on', async () => {
+      service.addDraft(basic('milk', 'Leche'));
+      service.addDraft('Mi plato');
+      service.currentSlideIndex.set(2);
+      await service.completeOnboarding();
+
+      expect(completedProps()).toEqual({
+        own_count: 2,
+        own_source: 'suggestion',
+        started_empty: false,
+        last_step_index: 2,
+        notif_granted: false,
+        analytics_granted: false,
+      });
+      expect(activation.markOnboarded).toHaveBeenCalledWith(true);
+    });
+
+    it('started empty: no own_source, own_count 0', async () => {
+      await service.startEmpty(swiperEl);
+      await service.completeOnboarding();
+
+      const props = completedProps();
+      expect(props).toEqual(jasmine.objectContaining({ own_count: 0, started_empty: true }));
+      expect('own_source' in props!).toBeFalse();
+      expect('seed_count' in props!).toBeFalse();
+      expect('skipped' in props!).toBeFalse();
+      expect(activation.markOnboarded).toHaveBeenCalledWith(false);
+    });
+
+    it('a failed save counts no products', async () => {
+      firstProducts.save.and.rejectWith(new Error('disk full'));
+      service.addDraft(basic('milk', 'Leche'));
+      await service.completeOnboarding();
+
+      expect(completedProps()).toEqual(jasmine.objectContaining({ own_count: 0, started_empty: false }));
+    });
   });
 
   it('a failed save shows a toast, stays on the step and can be retried', async () => {

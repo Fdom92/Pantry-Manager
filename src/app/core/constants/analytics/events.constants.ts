@@ -22,6 +22,7 @@ export const ANALYTICS_EVENTS = {
   // Onboarding
   ONBOARDING_STEP_VIEWED: 'onboarding_step_viewed',
   ONBOARDING_COMPLETED: 'onboarding_completed',
+  ACTIVATION_REACHED: 'activation_reached',
 
   // Consent
   ANALYTICS_OPT_IN: 'analytics_opt_in',

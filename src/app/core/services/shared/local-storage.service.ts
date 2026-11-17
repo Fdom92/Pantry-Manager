@@ -45,6 +45,15 @@ export class LocalStorageService {
     },
   };
 
+  readonly activation = {
+    getOnboardedAt: () => this.getDate(STORAGE_KEYS.ONBOARDING_V58_DONE),
+    setOnboardedAt: (v: Date | string) => this.setDate(STORAGE_KEYS.ONBOARDING_V58_DONE, v),
+    getFirstSource: () => this.getString(STORAGE_KEYS.FIRST_PRODUCT_SOURCE),
+    setFirstSource: (v: string) => this.setString(STORAGE_KEYS.FIRST_PRODUCT_SOURCE, v),
+    isReported: () => this.getBool(STORAGE_KEYS.ACTIVATION_REPORTED),
+    markReported: () => this.setBool(STORAGE_KEYS.ACTIVATION_REPORTED, true),
+  };
+
   readonly reconsent = {
     isShown: () => this.getBool(STORAGE_KEYS.RECONSENT_SHOWN),
     markShown: () => this.setBool(STORAGE_KEYS.RECONSENT_SHOWN, true),

@@ -3,6 +3,7 @@ import { buildAddItemPayload, FRESH_QTY } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { createDocumentId, withSignalFlag } from '@core/utils';
 import { ANALYTICS_EVENTS } from '@core/constants';
+import { ActivationService } from '../../analytics/activation.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { LoggerService } from '../../shared/logger.service';
@@ -20,6 +21,7 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
+  private readonly activation = inject(ActivationService);
 
   protected readonly basicsStorage = 'fresh' as const;
   protected readonly idPrefix = 'fresh';
@@ -88,6 +90,8 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
             minThreshold: undefined,
             isBasic: false,
           };
+          // Before the save, so the source is there when the new product reaches the activation effect.
+          this.activation.recordFirstProduct(entry.foodKind ? 'suggestion' : 'typed');
           await this.pantryStore.addItem(freshItem);
           await this.eventManager.logAddNewItem(freshItem, 3, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
           this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {

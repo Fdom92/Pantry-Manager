@@ -30,6 +30,12 @@ export const STORAGE_KEYS = {
   REVENUECAT_USER_ID: 'revenuecat:userId',
   /** Onboarding completion flag. Read synchronously in `AppComponent` for routing. */
   ONBOARDING_FLAG: 'onboarding:seen',
+  /** ISO time the 5.8 onboarding finished: the marker for activation and the start of its clock. */
+  ONBOARDING_V58_DONE: 'onboarding:v58Done',
+  /** How the first product after the 5.8 onboarding got in: onboarding | suggestion | typed | receipt. */
+  FIRST_PRODUCT_SOURCE: 'activation:firstProductSource',
+  /** Set once `activation_reached` has been reported, so a relaunch does not repeat it. */
+  ACTIVATION_REPORTED: 'activation:reported',
   // Review prompt cadence (per-device — does not transfer in backup).
   REVIEW_FIRST_USE_AT: 'review:firstUseAt',
   REVIEW_LAUNCH_COUNT: 'review:launchCount',

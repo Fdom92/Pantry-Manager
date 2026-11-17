@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { PantryReceiptScanModalStateService } from './pantry-receipt-scan-modal-state.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { ActivationService } from '../../analytics/activation.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { ReceiptLlmClientService } from '../../receipt/receipt-llm-client.service';
 import { UpgradeRevenuecatService } from '../../upgrade/upgrade-revenuecat.service';
@@ -77,6 +78,7 @@ describe('PantryReceiptScanModalStateService', () => {
         { provide: PantryStoreService, useValue: pantryStore },
         { provide: HistoryEventManagerService, useValue: jasmine.createSpyObj('HistoryEventManagerService', ['logAddExistingItem', 'logAddNewItem']) },
         { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
+        { provide: ActivationService, useValue: { recordFirstProduct: () => undefined } },
         { provide: TranslateService, useValue: jasmine.createSpyObj('TranslateService', ['instant']) },
         { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'error', 'info']) },
         { provide: AlertController, useValue: alertCtrl },

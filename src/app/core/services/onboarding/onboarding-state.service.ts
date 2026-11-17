@@ -3,6 +3,7 @@ import { ANALYTICS_EVENTS, ONBOARDING_QUICK_SEED_ITEMS, ONBOARDING_SLIDES } from
 import type { FoodType } from '@core/models/shared';
 import { daysUntilExpiry } from '@core/utils/date.util';
 import { formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
+import { ActivationService } from '../analytics/activation.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { LoggerService } from '../shared/logger.service';
@@ -56,6 +57,7 @@ export class OnboardingStateService {
   private readonly notificationScheduler = inject(NotificationSchedulerService);
   private readonly translate = inject(TranslateService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly activation = inject(ActivationService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly logger = inject(LoggerService);
   private readonly toast = inject(ToastService);
@@ -89,6 +91,9 @@ export class OnboardingStateService {
 
   /** Set once the drafts are in the store; the add step is then read-only. */
   readonly draftsSaved = signal(false);
+
+  /** True once the user chose "Empezar vacío" instead of adding products. */
+  private startedEmpty = false;
 
   readonly firstDraft = computed(() => this.drafts()[0] ?? null);
 
@@ -269,6 +274,7 @@ export class OnboardingStateService {
   async startEmpty(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
     if (!this.draftsSaved()) {
       this.drafts.set([]);
+      this.startedEmpty = true;
     }
     await this.goToNextSlide(swiperEl);
   }
@@ -325,13 +331,19 @@ export class OnboardingStateService {
     // re-consent sheet does not ask the same question again on the dashboard.
     await this.recordImplicitConsentDecisions();
 
-    // Final prop set is redesigned with activation_reached (Task B5).
+    // Last net for drafts the add step did not save (normally Continuar or the swipe already did).
+    await this.saveDrafts();
+    const ownCount = this.draftsSaved() ? this.drafts().length : 0;
+    this.activation.markOnboarded(ownCount > 0);
     this.analytics.track(ANALYTICS_EVENTS.ONBOARDING_COMPLETED, {
+      own_count: ownCount,
+      // Omitted when nothing was saved: props stay flat, no null.
+      ...(ownCount > 0 ? { own_source: this.drafts()[0].source } : {}),
+      started_empty: this.startedEmpty,
+      last_step_index: this.currentSlideIndex(),
       notif_granted: this.notificationsDecision() === 'granted',
       analytics_granted: this.analyticsDecision() === 'granted',
     });
-    // Last net for drafts the add step did not save (normally Continuar or the swipe already did).
-    await this.saveDrafts();
     // Re-run so projected notifications reflect the new items.
     void this.notificationScheduler.scheduleAll();
     // First post-onboarding view = pantry so the user sees their first products.
