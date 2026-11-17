@@ -90,9 +90,8 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
             minThreshold: undefined,
             isBasic: false,
           };
-          // Before the save, so the source is there when the new product reaches the activation effect.
-          this.activation.recordFirstProduct(entry.foodKind ? 'suggestion' : 'typed');
           await this.pantryStore.addItem(freshItem);
+          this.activation.recordFirstProduct(entry.foodKind ? 'suggestion' : 'typed');
           await this.eventManager.logAddNewItem(freshItem, 3, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
           this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
             kind: 'fresh',

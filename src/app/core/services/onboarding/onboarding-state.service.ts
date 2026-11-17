@@ -339,7 +339,7 @@ export class OnboardingStateService {
       own_count: ownCount,
       // Omitted when nothing was saved: props stay flat, no null.
       ...(ownCount > 0 ? { own_source: this.drafts()[0].source } : {}),
-      started_empty: this.startedEmpty,
+      started_empty: this.startedEmpty && ownCount === 0,
       last_step_index: this.currentSlideIndex(),
       notif_granted: this.notificationsDecision() === 'granted',
       analytics_granted: this.analyticsDecision() === 'granted',

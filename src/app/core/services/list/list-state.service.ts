@@ -17,6 +17,7 @@ import { DownloadService, LoggerService, ShareService, ToastService, shouldSkipS
 import { normalizeProductKey } from '@core/utils/normalization.util';
 import { TranslateService } from '@ngx-translate/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
+import { ActivationService } from '../analytics/activation.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ReviewPromptService } from '../shared/review-prompt.service';
@@ -59,6 +60,7 @@ export class ListStateService {
   private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly reviewPrompt = inject(ReviewPromptService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly activation = inject(ActivationService);
   private readonly manualItemsStore = inject(ListManualItemsStore);
   private readonly exportService = inject(ShoppingExportService);
   private readonly eventManager = inject(HistoryEventManagerService);
@@ -255,6 +257,7 @@ export class ListStateService {
         });
         const newItem: PantryItem = { ...base, productType: 'pantry' };
         await this.pantryStore.addItem(newItem);
+        this.activation.recordFirstProduct('list');
         // addItem merges into an existing product when one matches (a different
         // _id), so newItem._id may never reach the cache. recordPurchaseUndo
         // skips the record in that case: there is nothing of ours to delete.

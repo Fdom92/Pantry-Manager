@@ -7,7 +7,7 @@ import { ClockService } from '../shared/clock.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { AnalyticsService } from './analytics.service';
 
-export type FirstProductSource = 'onboarding' | 'suggestion' | 'typed' | 'receipt';
+export type FirstProductSource = 'onboarding' | 'suggestion' | 'typed' | 'receipt' | 'list';
 
 /** Reports `activation_reached` the first time the 5.8 activation conditions hold. */
 @Injectable({ providedIn: 'root' })
@@ -41,6 +41,7 @@ export class ActivationService {
 
   /** The 5.8 onboarding finished; `savedProducts` = it saved the user's first products. */
   markOnboarded(savedProducts: boolean): void {
+    this.clock.tick(); // the clock only moves on foreground/midnight; this is an event timestamp
     const at = new Date(this.clock.now());
     this.storage.setOnboardedAt(at);
     if (savedProducts && !this.storage.getFirstSource()) {
@@ -57,6 +58,7 @@ export class ActivationService {
   }
 
   private report(): void {
+    this.clock.tick();
     const minutes = Math.round((this.clock.now() - (this.onboardedAt() ?? 0)) / 60_000);
     this.analytics.trackOnce(
       ANALYTICS_EVENTS.ACTIVATION_REACHED,

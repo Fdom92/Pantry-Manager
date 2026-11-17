@@ -1,7 +1,9 @@
+import { ONBOARDING_QUICK_SEED_ITEMS } from '@core/constants';
 import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
 import type { PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
+import { ActivationService } from '../../analytics/activation.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { LanguageService } from '../../shared/language.service';
@@ -59,6 +61,7 @@ function configure(loadedProducts: PantryItem[], learned?: { product?: number })
       ...(learned ? [{ provide: ShelfLifeLearningService, useValue: { daysFor: () => learned } }] : []),
       { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'error', 'info', 'raw']) },
       { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
+      { provide: ActivationService, useValue: jasmine.createSpyObj('ActivationService', ['recordFirstProduct']) },
       { provide: HistoryEventManagerService, useValue: jasmine.createSpyObj('HistoryEventManagerService', ['logAddNewItem', 'logAddExistingItem']) },
       { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn', 'debug', 'info', 'log']) },
     ],
@@ -500,6 +503,30 @@ describe('expiry source of a suggested date', () => {
     fresh.addEntryFromQuery('lechuga');
     await fresh.submit();
     expect(addedProps(analytics)['expiry_source']).toBe('learned_product');
+  });
+});
+
+describe('first product source', () => {
+  it('is suggestion for a basic and typed for free text, in both sheets, after the save', async () => {
+    configure([]);
+    const activation = TestBed.inject(ActivationService) as jasmine.SpyObj<ActivationService>;
+    const despensa = TestBed.inject(PantryAddModalStateService);
+    despensa.addEntry({ title: 'Leche', meta: ONBOARDING_QUICK_SEED_ITEMS[0] } as never);
+    await despensa.submit();
+    expect(activation.recordFirstProduct).toHaveBeenCalledOnceWith('suggestion');
+
+    activation.recordFirstProduct.calls.reset();
+    despensa.open();
+    despensa.addEntryFromQuery('pan casero');
+    await despensa.submit();
+    expect(activation.recordFirstProduct).toHaveBeenCalledOnceWith('typed');
+
+    activation.recordFirstProduct.calls.reset();
+    const fresh = TestBed.inject(PantryFreshAddModalStateService);
+    fresh.open();
+    fresh.addEntryFromQuery('lechuga rara');
+    await fresh.submit();
+    expect(activation.recordFirstProduct).toHaveBeenCalledOnceWith('typed');
   });
 });
 

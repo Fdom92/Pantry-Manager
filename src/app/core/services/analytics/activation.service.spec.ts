@@ -15,6 +15,7 @@ describe('ActivationService', () => {
   let now: ReturnType<typeof signal<number>>;
   let emitted: Array<{ event: string; props: unknown }>;
   let service: ActivationService;
+  let clockMs: number;
 
   beforeEach(() => {
     localStorage.clear();
@@ -22,13 +23,15 @@ describe('ActivationService', () => {
     permission = signal('granted');
     ready = signal(true);
     now = signal(T0);
+    spyOn(Date, 'now').and.callFake(() => clockMs);
+    clockMs = T0;
     emitted = [];
     const seen = new Set<string>();
     TestBed.configureTestingModule({
       providers: [
         { provide: PantryStoreService, useValue: { items } },
         { provide: NotificationPermissionService, useValue: { permissionState: permission } },
-        { provide: ClockService, useValue: { now } },
+        { provide: ClockService, useValue: { now, tick: () => now.set(Date.now()) } },
         {
           provide: AnalyticsService,
           useValue: {
@@ -51,7 +54,7 @@ describe('ActivationService', () => {
   it('emits activation_reached once with source and minutes since onboarding', () => {
     service.markOnboarded(false);
     flush();
-    now.set(T0 + 7 * 60_000);
+    clockMs = T0 + 7 * 60_000; // no visibilitychange: only a refresh of the clock can see it
     service.recordFirstProduct('typed');
     items.set([{}]);
     flush();
@@ -125,7 +128,7 @@ describe('ActivationService', () => {
       providers: [
         { provide: PantryStoreService, useValue: { items } },
         { provide: NotificationPermissionService, useValue: { permissionState: permission } },
-        { provide: ClockService, useValue: { now } },
+        { provide: ClockService, useValue: { now, tick: () => now.set(Date.now()) } },
         { provide: AnalyticsService, useValue: { isReady: ready, trackOnce: () => emitted.push({ event: 'again', props: {} }) } },
       ],
     });

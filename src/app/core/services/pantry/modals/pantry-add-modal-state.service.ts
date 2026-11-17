@@ -93,9 +93,8 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
             inferExpiry: false,
           });
           const item: PantryItem = { ...base, productType: 'pantry' };
-          // Before the save, so the source is there when the new product reaches the activation effect.
-          this.activation.recordFirstProduct(entry.foodKind ? 'suggestion' : 'typed');
           await this.pantryStore.addItem(item);
+          this.activation.recordFirstProduct(entry.foodKind ? 'suggestion' : 'typed');
           await this.eventManager.logAddNewItem(item, entry.quantity, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
           this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
             kind: 'despensa',

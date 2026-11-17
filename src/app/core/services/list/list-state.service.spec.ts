@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ActionSheetController } from '@ionic/angular';
 import type { PantryItem } from '@core/models/pantry';
 import { ShoppingReason, type BoughtItem, type ManualItem, type ShoppingSuggestionWithItem } from '@core/models/list';
+import { ActivationService } from '../analytics/activation.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { DownloadService, LoggerService, ShareService, ToastService } from '../shared';
@@ -83,6 +84,7 @@ describe('ListStateService — a manual item that duplicates a suggestion', () =
         { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'info', 'error', 'withAction']) },
         { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn', 'info']) },
         { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
+        { provide: ActivationService, useValue: jasmine.createSpyObj('ActivationService', ['recordFirstProduct']) },
         {
           provide: ReviewPromptService,
           useValue: jasmine.createSpyObj('ReviewPromptService', ['handlePositiveAction']),
@@ -276,6 +278,7 @@ describe('ListStateService — undoPurchase', () => {
         { provide: ToastService, useValue: toastSpy },
         { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn', 'info']) },
         { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
+        { provide: ActivationService, useValue: jasmine.createSpyObj('ActivationService', ['recordFirstProduct']) },
         {
           provide: ReviewPromptService,
           useValue: jasmine.createSpyObj('ReviewPromptService', ['handlePositiveAction']),
@@ -336,6 +339,7 @@ describe('ListStateService — undoPurchase', () => {
     await service.markManualAsBought('m1');
 
     expect(pantryStoreSpy.addItem).toHaveBeenCalled();
+    expect(TestBed.inject(ActivationService).recordFirstProduct).toHaveBeenCalledWith('list');
     const createdItem = itemsSignal().find(i => i.name === 'Bombillas');
     expect(createdItem).toBeDefined();
 

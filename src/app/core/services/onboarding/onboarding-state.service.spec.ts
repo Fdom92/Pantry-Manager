@@ -186,6 +186,14 @@ describe('OnboardingStateService — add step', () => {
       expect(activation.markOnboarded).toHaveBeenCalledWith(false);
     });
 
+    it('empezar vacío and then adding products is not started_empty', async () => {
+      await service.startEmpty(swiperEl);
+      service.addDraft(basic('milk', 'Leche'));
+      await service.completeOnboarding();
+
+      expect(completedProps()).toEqual(jasmine.objectContaining({ own_count: 1, started_empty: false }));
+    });
+
     it('a failed save counts no products', async () => {
       firstProducts.save.and.rejectWith(new Error('disk full'));
       service.addDraft(basic('milk', 'Leche'));
