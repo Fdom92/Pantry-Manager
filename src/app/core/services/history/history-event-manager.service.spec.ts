@@ -98,6 +98,15 @@ describe('HistoryEventManagerService', () => {
       expect(eventLogSpy.logConsumeEvent).not.toHaveBeenCalled();
     });
 
+    it('marks the ADD event as not user-dated unless the caller says so', async () => {
+      const previousItem = makeItem({ batches: [makeBatch(3)] });
+      const updatedItem = makeItem({ batches: [makeBatch(3), makeBatch(2)] });
+      await service.logStockAdjust(previousItem, updatedItem, { deltaQuantity: 2, expirationDate: '2026-12-01' });
+      expect(eventLogSpy.logAddEvent.calls.mostRecent().args[0].dateFromUser).toBeFalse();
+      await service.logStockAdjust(previousItem, updatedItem, { deltaQuantity: 2, expirationDate: '2026-12-01', dateFromUser: true });
+      expect(eventLogSpy.logAddEvent.calls.mostRecent().args[0].dateFromUser).toBeTrue();
+    });
+
     it('calls logConsumeEvent when deltaQuantity < 0', async () => {
       const previousItem = makeItem({ batches: [makeBatch(5)] });
       const updatedItem = makeItem({ batches: [makeBatch(2)] });

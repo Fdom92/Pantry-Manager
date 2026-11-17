@@ -13,6 +13,8 @@ export type StockAdjustOptions = {
   source?: EventSource;
   expirationDate?: string;
   sessionId?: string;
+  /** Only a date the user picked may teach shelf life; a lot's existing date must not. */
+  dateFromUser?: boolean;
 };
 
 /** Whether the user set the lot date; only those dates feed learned shelf life. */
@@ -126,6 +128,7 @@ export class HistoryEventManagerService {
       foodType: updatedItem.foodType,
       expirationDate,
       sessionId,
+      dateFromUser: options.dateFromUser ?? false,
     };
     const result = await (deltaQuantity > 0
       ? this.eventLog.logAddEvent(params)

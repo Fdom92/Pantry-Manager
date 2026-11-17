@@ -31,6 +31,7 @@ export class PantryBatchOperationsService {
     source?: EventSource;
     expirationDate?: string;
     sessionId?: string;
+    dateFromUser?: boolean;
   }>();
   private readonly stockSaveDelay = BATCH_STOCK_SAVE_DELAY_MS;
 
@@ -45,7 +46,8 @@ export class PantryBatchOperationsService {
     event?: Event,
     pantryItemsState?: WritableSignal<PantryItem[]>,
     source?: EventSource,
-    sessionId?: string
+    sessionId?: string,
+    dateFromUser?: boolean
   ): Promise<void> {
     event?.stopPropagation();
     if (!item?._id || !Number.isFinite(delta) || delta === 0) {
@@ -101,6 +103,7 @@ export class PantryBatchOperationsService {
       source,
       expirationDate: batch.expirationDate,
       sessionId,
+      dateFromUser,
     });
   }
 
@@ -116,7 +119,8 @@ export class PantryBatchOperationsService {
     expirationDate?: string,
     source?: EventSource,
     noExpiry?: boolean,
-    sessionId?: string
+    sessionId?: string,
+    dateFromUser?: boolean
   ): Promise<void> {
     if (!item?._id || !Number.isFinite(change) || change === 0) {
       return;
@@ -147,7 +151,8 @@ export class PantryBatchOperationsService {
         undefined,
         pantryItemsState,
         source,
-        sessionId
+        sessionId,
+        dateFromUser
       );
     } else if (change < 0) {
       const originalTotal = sumQuantities(item.batches ?? [], { round: roundQuantity });
@@ -254,6 +259,7 @@ export class PantryBatchOperationsService {
       source?: EventSource;
       expirationDate?: string;
       sessionId?: string;
+      dateFromUser?: boolean;
     }
   ): void {
     this.pendingItems.set(itemId, updated);
@@ -271,6 +277,7 @@ export class PantryBatchOperationsService {
           source: meta.source ?? existing.source,
           expirationDate: existing.expirationDate ?? meta.expirationDate,
           sessionId: existing.sessionId ?? meta.sessionId,
+          dateFromUser: existing.dateFromUser || meta.dateFromUser,
         });
       }
     }
@@ -321,6 +328,7 @@ export class PantryBatchOperationsService {
               source: eventMeta?.source,
               expirationDate: eventMeta?.expirationDate,
               sessionId: eventMeta?.sessionId,
+              dateFromUser: eventMeta?.dateFromUser,
             });
         }
       } catch (err) {

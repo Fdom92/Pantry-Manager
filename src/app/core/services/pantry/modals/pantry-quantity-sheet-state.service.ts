@@ -173,7 +173,7 @@ export class PantryQuantitySheetStateService {
    * Apply accumulated quantity changes when closing the sheet.
    */
   private async applyPendingChanges(item: PantryItem, change: number, expiryDate?: string, noExpiry?: boolean): Promise<void> {
-    await this.batchOps.adjustTotalQuantityWithFIFO(item, change, this.pantryItemsState, expiryDate, 'quantity_sheet', noExpiry);
+    await this.batchOps.adjustTotalQuantityWithFIFO(item, change, this.pantryItemsState, expiryDate, 'quantity_sheet', noExpiry, undefined, !!expiryDate);
   }
 
 
