@@ -1,6 +1,6 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { type FreshState, freshStateToQty, qtyToFreshState } from '@core/domain/pantry';
+import { type FreshState, foodKindAfterEdit, freshStateToQty, qtyToFreshState } from '@core/domain/pantry';
 import type { PantryItem } from '@core/models/pantry';
 import { FoodType } from '@core/models/shared/enums.model';
 import { buildUniqueSelectOptions } from '@core/utils';
@@ -163,11 +163,13 @@ export class PantryFreshEditModalStateService extends PantryEditModalBase {
         opened: previousBatch?.opened,
         locationId: previousBatch?.locationId,
       };
+      const normalizedName = normalizeTrim(name ?? existing.name);
       const updated: PantryItem = {
         ...existing,
-        name: normalizeTrim(name ?? existing.name),
+        name: normalizedName,
         batches: [updatedBatch],
         foodType: foodType ?? undefined,
+        foodKind: foodKindAfterEdit(existing, { name: normalizedName, foodType: foodType ?? undefined }),
         categoryId: normalizeCategoryId(categoryId ?? ''),
         updatedAt: new Date().toISOString(),
       };
