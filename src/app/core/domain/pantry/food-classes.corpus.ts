@@ -18,6 +18,7 @@ export interface FoodClassCorpusEntry {
 
 const es = (name: string, classKey: string): FoodClassCorpusEntry => ({ name, lang: 'es', classKey });
 const en = (name: string, classKey: string): FoodClassCorpusEntry => ({ name, lang: 'en', classKey });
+const de = (name: string, classKey: string): FoodClassCorpusEntry => ({ name, lang: 'de', classKey });
 const fr = (name: string, classKey: string): FoodClassCorpusEntry => ({ name, lang: 'fr', classKey });
 const pt = (name: string, classKey: string): FoodClassCorpusEntry => ({ name, lang: 'pt', classKey });
 
@@ -477,6 +478,19 @@ const TERM_FIXES: readonly FoodClassCorpusEntry[] = [
   fr('petit pot pour bébé', 'baby-food'),
   pt('papa infantil', 'baby-food'),
   es('papilla de frutas', 'baby-food'),
+  es('galletas infantiles', 'cookies-cereals'),
+  es('cereales infantiles', 'cookies-cereals'),
+  es('cereal infantil', 'cookies-cereals'),
+  es('papilla de cereales', 'cookies-cereals'),
+  es('papilla', 'cookies-cereals'),
+  en('baby cereal', 'cookies-cereals'),
+  de('Babybrei', 'cookies-cereals'),
+  es('yogur infantil', 'yogurt'),
+  es('champú infantil', 'household'),
+  es('gel infantil', 'household'),
+  es('colonia infantil', 'household'),
+  en('baby shampoo', 'household'),
+  en('baby lotion', 'household'),
   es('potito de pollo', 'baby-food'),
 ];
 
