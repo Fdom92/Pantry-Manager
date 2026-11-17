@@ -283,7 +283,10 @@ describe('PantryReceiptScanModalStateService', () => {
     it('a new fresh line with quantity 6 is one "sufficient" batch, never 6 (Review Focus 3)', async () => {
       service.reviewLines.set([makeLine({
         parsed: { rawName: 'MANZANAS GOLDEN', quantity: 6, confidence: 'high' },
-        quantity: 6, storage: 'fresh', suggestedStorage: 'fresh', foodType: FoodType.FRUIT,
+        quantity: 6,
+        storage: 'fresh',
+        suggestedStorage: 'fresh',
+        foodType: FoodType.FRUIT,
       })]);
       await service.submit();
       const item = pantryStore.addItem.calls.mostRecent().args[0] as PantryItem;
@@ -427,7 +430,21 @@ describe('PantryReceiptScanModalStateService', () => {
       expect(pantryStore.addItem).not.toHaveBeenCalled();
       expect(completedArgs()['suggested_lines']).toBe(1);
       expect(completedArgs()['suggested_accepted']).toBe(1);
-      expect(completedArgs()['unmatched']).toBe(0);
+      expect(completedArgs()['no_match_lines']).toBe(0);
+    });
+
+    it('a suggestion keeps its own class for expiry until accepted', () => {
+      const raw = 'TOMATE TRITURADO';
+      const own = resolveSuggestedExpiry(raw, inferFoodType(raw), new Date()).expirationDate;
+      const line = suggested({
+        parsed: { rawName: raw, quantity: 1, confidence: 'high' },
+        match: makeMatchedItem({ name: 'Tomate frito casero', foodType: FoodType.NON_PERISHABLE, foodKind: 'jam-spreads' }),
+      });
+      const derive = (l: ReceiptReviewLine) => (service as any).deriveLineFields(l) as Partial<ReceiptReviewLine>;
+      expect(derive(line).expirationDate).toBe(own);
+      const kind = resolveSuggestedExpiry(raw, FoodType.NON_PERISHABLE, new Date(), undefined, 'jam-spreads').expirationDate;
+      expect(kind).not.toBe(own);
+      expect(derive({ ...line, suggestionAccepted: true }).expirationDate).toBe(kind);
     });
 
     it('unmatchLine releases a matched line and saves it under the ticket name', async () => {
@@ -443,7 +460,7 @@ describe('PantryReceiptScanModalStateService', () => {
       expect(service.displayName(line)).toBe('Tomate Triturado');
       await service.submit();
       expect((pantryStore.addItem.calls.mostRecent().args[0] as PantryItem).name).toBe('Tomate Triturado');
-      expect(completedArgs()['unmatched']).toBe(1);
+      expect(completedArgs()['no_match_lines']).toBe(1);
       expect(events.logAddNewItem).toHaveBeenCalled();
     });
   });

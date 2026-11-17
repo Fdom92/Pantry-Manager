@@ -366,7 +366,9 @@ export class PantryReceiptScanModalStateService {
       ? this.shelfLife.daysFor(line.match?.name, line.match?._id, line.match?.foodKind, foodType)
       : this.shelfLife.daysFor(line.parsed.rawName, undefined, null, foodType);
     // A restocked fresh item needs a date too: its old batch date is the one it is replacing.
-    const { source, ...suggested } = resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned, line.match?.foodKind);
+    // Only a joined match lends its class: a suggestion is saved as a new product.
+    const matchKind = this.isAutoMatch(line) ? line.match?.foodKind : null;
+    const { source, ...suggested } = resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned, matchKind);
     return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry, expirySource: source, ...storage };
   }
 
@@ -529,9 +531,9 @@ export class PantryReceiptScanModalStateService {
         fresh_lines: lines.filter(l => this.isFreshLine(l)).length,
         storage_changed: lines.filter(l => !this.isAutoMatch(l) && l.storage !== l.suggestedStorage).length,
         // A match the matcher did not trust: shown as "¿Es tu …?", accepted or not.
-        suggested_lines: lines.filter(l => l.match && !l.matchAuto).length,
-        suggested_accepted: lines.filter(l => l.match && !l.matchAuto && l.suggestionAccepted).length,
-        unmatched: lines.filter(l => !l.match).length,
+        suggested_lines: lines.filter(l => this.isSuggestion(l) || l.suggestionAccepted).length,
+        suggested_accepted: lines.filter(l => l.suggestionAccepted).length,
+        no_match_lines: lines.filter(l => !l.match).length,
         supermarket: this.detectedSupermarket() ?? 'unknown',
         mode: this.usedSmartScan() ? 'smart' : 'local',
       });
