@@ -475,12 +475,12 @@ const CARB_CLASSES: readonly FoodClass[] = [
     source: `${FK}: cookies, soft, 2-3 months (crispy 4-6); cereal, ready-to-eat, 6-12 months, opened 2-3 months; crackers 8 months, opened 1 month`,
     terms: {
       // Dry baby cereal (papilla, babybrei) is a powder, not a jar: it lasts like cereal.
-      es: ['galleta infantil', 'cereal infantil', 'papilla', 'galleta', 'galletas maria', 'cereal', 'cereales', 'muesli', 'granola', 'copos de avena', 'avena', 'copos de maiz', 'corn flakes', 'tostada', 'biscote', 'pan tostado de molde', 'crackers', 'regana', 'picos', 'colines', 'palitos de pan', 'barrita de cereales', 'barrita', 'tortitas de arroz', 'tortita de maiz', 'cookies', 'oreo', 'digestive', 'galleta salada', 'grisines', 'cereales de desayuno'],
+      es: ['galleta infantil', 'cereal infantil', 'papilla de cereales', 'papilla cereales', 'cereales para bebe', 'galleta', 'galletas maria', 'cereal', 'cereales', 'muesli', 'granola', 'copos de avena', 'avena', 'copos de maiz', 'corn flakes', 'tostada', 'biscote', 'pan tostado de molde', 'crackers', 'regana', 'picos', 'colines', 'palitos de pan', 'barrita de cereales', 'barrita', 'tortitas de arroz', 'tortita de maiz', 'cookies', 'oreo', 'digestive', 'galleta salada', 'grisines', 'cereales de desayuno'],
       en: ['baby cereal', 'chocolate chip cookie', 'cookie', 'biscuit', 'cracker', 'cereal', 'breakfast cereal', 'cornflakes', 'corn flakes', 'muesli', 'granola', 'oats', 'oatmeal', 'porridge oats', 'rice cakes', 'cereal bar', 'granola bar', 'breadsticks', 'crispbread', 'rusks', 'graham crackers', 'digestives'],
-      de: ['babybrei', 'kekse', 'keks', 'platzchen', 'cracker', 'cornflakes', 'musli', 'muesli', 'granola', 'haferflocken', 'zwieback', 'knackebrot', 'reiswaffeln', 'getreideriegel', 'muesliriegel', 'salzstangen', 'grissini', 'frühstuckscerealien', 'cerealien'],
-      fr: ['biscuit', 'biscuits', 'gateaux secs', 'cereales', 'corn flakes', 'muesli', 'granola', 'flocons d avoine', 'biscottes', 'crackers', 'galettes de riz', 'barre de cereales', 'gressins', 'pain grille', 'sables', 'petit beurre'],
-      it: ['biscotti', 'biscotto', 'cereali', 'corn flakes', 'muesli', 'granola', 'fiocchi d avena', 'avena', 'fette biscottate', 'cracker', 'crackers', 'gallette di riso', 'barretta ai cereali', 'grissini', 'taralli', 'frollini'],
-      pt: ['bolacha', 'bolachas', 'biscoito', 'cereais', 'corn flakes', 'muesli', 'granola', 'flocos de aveia', 'aveia', 'tostas', 'crackers', 'bolachas de arroz', 'barra de cereais', 'grissinis', 'bolacha maria'],
+      de: ['getreidebrei', 'kekse', 'keks', 'platzchen', 'cracker', 'cornflakes', 'musli', 'muesli', 'granola', 'haferflocken', 'zwieback', 'knackebrot', 'reiswaffeln', 'getreideriegel', 'muesliriegel', 'salzstangen', 'grissini', 'frühstuckscerealien', 'cerealien'],
+      fr: ['cereales pour bebe', 'biscuit', 'biscuits', 'gateaux secs', 'cereales', 'corn flakes', 'muesli', 'granola', 'flocons d avoine', 'biscottes', 'crackers', 'galettes de riz', 'barre de cereales', 'gressins', 'pain grille', 'sables', 'petit beurre'],
+      it: ['cereali per bambini', 'biscotti', 'biscotto', 'cereali', 'corn flakes', 'muesli', 'granola', 'fiocchi d avena', 'avena', 'fette biscottate', 'cracker', 'crackers', 'gallette di riso', 'barretta ai cereali', 'grissini', 'taralli', 'frollini'],
+      pt: ['cereais para bebe', 'bolacha', 'bolachas', 'biscoito', 'cereais', 'corn flakes', 'muesli', 'granola', 'flocos de aveia', 'aveia', 'tostas', 'crackers', 'bolachas de arroz', 'barra de cereais', 'grissinis', 'bolacha maria'],
     },
   },
 ];
@@ -867,9 +867,9 @@ const OTHER_CLASSES: readonly FoodClass[] = [
     // FoodKeeper gives no unopened figure for baby food jars: sealedDays is an analog of canned low-acid goods (jars are retorted), the printed date prevails.
     source: `${FK}: baby food jars, opened 2-3 days in the fridge (low end); unopened analog of canned low-acid goods, 12 months`,
     terms: {
-      es: ['infantil', 'potito', 'pure infantil', 'papilla de frutas', 'pure de fruta', 'pure de pera', 'pure de frambuesa'],
+      es: ['infantil', 'potito', 'pure infantil', 'papilla', 'pure de fruta', 'pure de pera', 'pure de frambuesa'],
       en: ['baby food', 'baby puree', 'infant'],
-      de: ['babynahrung', 'babykost', 'glaschen', 'glaeschen'],
+      de: ['babynahrung', 'babybrei', 'babykost', 'glaschen', 'glaeschen'],
       fr: ['petit pot', 'pour bebe', 'puree pour bebe'],
       it: ['omogeneizzato', 'per bambini', 'pappa per bambini'],
       pt: ['papa infantil', 'para bebe', 'pure infantil', 'infantil'],
