@@ -132,6 +132,17 @@ export class PantryComponent implements OnDestroy {
       });
     }
 
+    const search = this.route.snapshot.queryParams['search'];
+    if (search) {
+      this.facade.searchFor(search);
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { search: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
+
     const focusItemId = this.route.snapshot.queryParams['focusItem'];
     if (focusItemId) {
       this.facade.focusItemById(focusItemId);

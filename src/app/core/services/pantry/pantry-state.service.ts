@@ -276,6 +276,11 @@ export class PantryStateService {
   }
 
   // -------- Filters --------
+  /** Deep-link entry: shows only products matching `name`. */
+  searchFor(name: string): void {
+    this.pantryQuery.setSearchQuery(name);
+  }
+
   onSearchTermChange(ev: CustomEvent): void {
     const query = String(ev.detail?.value ?? '');
     // One event per search, not per keystroke: only the empty → non-empty
