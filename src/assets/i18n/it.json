@@ -485,25 +485,21 @@
     "coverage": {
       "title": "Copertura",
       "household": "Persone in casa",
-      "sentence": "Con quello che hai, duri {{duration}} senza fare la spesa",
       "level": {
         "good": "Buona",
         "normal": "Limitata",
         "bad": "Bassa",
         "plenty": "Abbondante"
-      },
-      "legend": "Bassa: meno di {{low}} · Limitata: fino a {{tight}} · Buona: fino a {{good}} · Abbondante: di più"
+      }
     },
     "activity": {
       "title": "Rotazione",
-      "detail": "Hai aggiunto {{added}} volte e usato {{consumed}} volte questo mese",
-      "detailNoAdds": "Hai usato {{consumed}} volte senza aggiungere nulla questo mese",
+      "detail": "{{added}} aggiunti · {{consumed}} usati in 30 giorni",
+      "detailNoAdds": "{{consumed}} usati in 30 giorni",
       "noActivity": "Nessuna attività registrata",
       "rotationHigh": "Rotazione alta",
       "rotationMedium": "Rotazione media",
-      "rotationLow": "Rotazione bassa",
-      "windowLabel": "Ultimi 30 giorni",
-      "overHundred": "Questo mese hai usato più di quanto hai comprato: stai attingendo a ciò che avevi già."
+      "rotationLow": "Rotazione bassa"
     },
     "distribution": {
       "title": "Classificazione",
@@ -541,8 +537,8 @@
     },
     "saved": {
       "title": "Salvati in tempo",
-      "used": "Usati nell'ultima settimana: {{count}}",
-      "wasted": "Sprecati questo mese: {{count}}"
+      "used": "{{count}} usati in tempo",
+      "wasted": "{{count}} buttati questo mese"
     },
     "topUsed": {
       "title": "Cosa usi di più",

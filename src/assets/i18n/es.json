@@ -485,25 +485,21 @@
     "coverage": {
       "title": "Cobertura",
       "household": "Personas en casa",
-      "sentence": "Con lo que tienes, aguantas {{duration}} sin comprar",
       "level": {
         "good": "Buena",
         "normal": "Ajustado",
         "bad": "Bajo",
         "plenty": "De sobra"
-      },
-      "legend": "Bajo: menos de {{low}} · Ajustado: hasta {{tight}} · Buena: hasta {{good}} · De sobra: más"
+      }
     },
     "activity": {
       "title": "Rotación",
-      "detail": "Añadiste {{added}} veces y usaste {{consumed}} veces este mes",
-      "detailNoAdds": "Usaste {{consumed}} veces sin añadir nada este mes",
+      "detail": "{{added}} añadidos · {{consumed}} usados en 30 días",
+      "detailNoAdds": "{{consumed}} usados en 30 días",
       "noActivity": "Sin actividad registrada",
       "rotationHigh": "Rotación alta",
       "rotationMedium": "Rotación media",
-      "rotationLow": "Rotación baja",
-      "windowLabel": "Últimos 30 días",
-      "overHundred": "Has gastado más de lo que has comprado este mes: estás tirando de lo que ya tenías."
+      "rotationLow": "Rotación baja"
     },
     "distribution": {
       "title": "Clasificación",
@@ -541,8 +537,8 @@
     },
     "saved": {
       "title": "Salvados a tiempo",
-      "used": "Usados en su última semana: {{count}}",
-      "wasted": "Desperdiciados este mes: {{count}}"
+      "used": "{{count}} usados a tiempo",
+      "wasted": "{{count}} tirados este mes"
     },
     "topUsed": {
       "title": "Lo que más usas",

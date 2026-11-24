@@ -52,8 +52,10 @@
           @if (facade.savedInTime().saved > 0) {
             <section class="insights-section">
               <h3 class="insights-section__title">{{ 'insights.saved.title' | translate }}</h3>
-              <p class="activity-detail">{{ 'insights.saved.used' | translate: { count: facade.savedInTime().saved } }}</p>
-              <p class="activity-detail">{{ 'insights.saved.wasted' | translate: { count: facade.savedInTime().wasted } }}</p>
+              <p class="activity-detail">
+                {{ 'insights.saved.used' | translate: { count: facade.savedInTime().saved } }} ·
+                {{ 'insights.saved.wasted' | translate: { count: facade.savedInTime().wasted } }}
+              </p>
             </section>
           }
 
@@ -70,16 +72,12 @@
               <app-insight-status-pill [level]="getRotationPillLevel(rotationRatio)" [labelKey]="getRotationLabel(rotationRatio)" />
             </div>
             <p class="activity-detail">
-              {{ 'insights.activity.windowLabel' | translate }} —
               @if (facade.activityMetrics().added > 0) {
                 {{ 'insights.activity.detail' | translate: { consumed: facade.activityMetrics().consumed, added: facade.activityMetrics().added } }}
               } @else {
                 {{ 'insights.activity.detailNoAdds' | translate: { consumed: facade.activityMetrics().consumed } }}
               }
             </p>
-            @if ((facade.activityMetrics().rotationPercent ?? 0) > 1) {
-              <p class="activity-detail">{{ 'insights.activity.overHundred' | translate }}</p>
-            }
           }
         </section>
 
@@ -107,7 +105,6 @@
           <section class="insights-section">
             <h3 class="insights-section__title">{{ 'insights.coverage.title' | translate }}</h3>
             <div class="coverage-card">
-              <ion-icon name="calendar-outline"></ion-icon>
               <div class="coverage-card__info">
                 <div class="coverage-card__headline">
                   <span class="coverage-card__value">
@@ -118,12 +115,6 @@
                     <app-insight-status-pill [level]="level === 'plenty' ? 'normal' : level" [labelKey]="'insights.coverage.level.' + level" />
                   }
                 </div>
-                <span class="coverage-card__hint">
-                  {{ 'insights.coverage.sentence' | translate:{ duration: (coverage.days | appDuration) } }}
-                </span>
-                <span class="coverage-card__hint">
-                  {{ 'insights.coverage.legend' | translate:{ low: (coverageDays.bad | appDuration), tight: (coverageDays.normal | appDuration), good: (coverageDays.good | appDuration) } }}
-                </span>
               </div>
             </div>
             <div class="household-selector">

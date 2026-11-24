@@ -485,25 +485,21 @@
     "coverage": {
       "title": "Reichweite",
       "household": "Personen im Haushalt",
-      "sentence": "Mit dem, was du hast, kommst du {{duration}} ohne Einkauf aus",
       "level": {
         "good": "Gut",
         "normal": "Knapp",
         "bad": "Niedrig",
         "plenty": "Reichlich"
-      },
-      "legend": "Niedrig: unter {{low}} · Knapp: bis {{tight}} · Gut: bis {{good}} · Reichlich: mehr"
+      }
     },
     "activity": {
       "title": "Rotation",
-      "detail": "Du hast {{added}} Mal hinzugefügt und {{consumed}} Mal verbraucht in diesem Monat",
-      "detailNoAdds": "Du hast {{consumed}} Mal verbraucht, ohne diesen Monat etwas hinzuzufügen",
+      "detail": "{{added}} hinzugefügt · {{consumed}} verbraucht in 30 Tagen",
+      "detailNoAdds": "{{consumed}} verbraucht in 30 Tagen",
       "noActivity": "Keine Aktivität aufgezeichnet",
       "rotationHigh": "Hohe Rotation",
       "rotationMedium": "Mittlere Rotation",
-      "rotationLow": "Niedrige Rotation",
-      "windowLabel": "Letzte 30 Tage",
-      "overHundred": "Du hast diesen Monat mehr verbraucht als gekauft: du lebst von deinem Vorrat."
+      "rotationLow": "Niedrige Rotation"
     },
     "distribution": {
       "title": "Einordnung",
@@ -541,8 +537,8 @@
     },
     "saved": {
       "title": "Rechtzeitig gerettet",
-      "used": "In ihrer letzten Woche verbraucht: {{count}}",
-      "wasted": "Diesen Monat verschwendet: {{count}}"
+      "used": "{{count}} rechtzeitig verbraucht",
+      "wasted": "{{count}} diesen Monat weggeworfen"
     },
     "topUsed": {
       "title": "Was du am meisten nutzt",

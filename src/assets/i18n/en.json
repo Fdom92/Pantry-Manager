@@ -485,25 +485,21 @@
     "coverage": {
       "title": "Coverage",
       "household": "People at home",
-      "sentence": "With what you have, you'll last {{duration}} without shopping",
       "level": {
         "good": "Good",
         "normal": "Tight",
         "bad": "Low",
         "plenty": "Plenty"
-      },
-      "legend": "Low: under {{low}} · Tight: up to {{tight}} · Good: up to {{good}} · Plenty: more"
+      }
     },
     "activity": {
       "title": "Rotation",
-      "detail": "You added {{added}} times and used {{consumed}} times this month",
-      "detailNoAdds": "You used {{consumed}} times without adding anything this month",
+      "detail": "{{added}} added · {{consumed}} used in 30 days",
+      "detailNoAdds": "{{consumed}} used in 30 days",
       "noActivity": "No activity recorded",
       "rotationHigh": "High rotation",
       "rotationMedium": "Medium rotation",
-      "rotationLow": "Low rotation",
-      "windowLabel": "Last 30 days",
-      "overHundred": "You used more than you bought this month: you are drawing on what you already had."
+      "rotationLow": "Low rotation"
     },
     "distribution": {
       "title": "Breakdown",
@@ -541,8 +537,8 @@
     },
     "saved": {
       "title": "Saved in time",
-      "used": "Used in their last week: {{count}}",
-      "wasted": "Wasted this month: {{count}}"
+      "used": "{{count}} used in time",
+      "wasted": "{{count}} thrown away this month"
     },
     "topUsed": {
       "title": "What you use most",

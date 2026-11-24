@@ -235,11 +235,6 @@
   background: var(--ion-item-background);
   border-radius: var(--app-theme-radius-sm-plus);
 
-  ion-icon {
-    font-size: var(--app-theme-icon-size-md);
-    color: var(--app-theme-text-subtle);
-  }
-
   &__headline {
     display: flex;
     align-items: baseline;
@@ -249,11 +244,6 @@
   &__value {
     font-size: var(--app-theme-font-size-title);
     font-weight: var(--app-theme-font-weight-bold);
-  }
-
-  &__hint {
-    font-size: var(--app-theme-font-size-small);
-    color: var(--app-theme-text-subtle);
   }
 
   &__info {
