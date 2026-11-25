@@ -22,7 +22,7 @@ export const ANALYTICS_EVENTS = {
   // Onboarding
   ONBOARDING_STEP_VIEWED: 'onboarding_step_viewed',
   ONBOARDING_COMPLETED: 'onboarding_completed',
-  ONBOARDING_SKIPPED: 'onboarding_skipped',
+  ACTIVATION_REACHED: 'activation_reached',
 
   // Consent
   ANALYTICS_OPT_IN: 'analytics_opt_in',
@@ -98,6 +98,9 @@ export const ANALYTICS_EVENTS = {
    * after one session; this says how many of them were staring at an empty app.
    */
   EMPTY_STATE_SHOWN: 'empty_state_shown',
+
+  /** Empty pantry/dashboard: which of the two first actions was tapped (`action`, `screen`). */
+  FIRST_STEPS_ACTION: 'first_steps_action',
 
   // Dashboard
   /** "Not now" on the HOY suggestion or on one of the action cards. */

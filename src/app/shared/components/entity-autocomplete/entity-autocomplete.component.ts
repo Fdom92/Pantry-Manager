@@ -8,6 +8,7 @@ import { TranslateModule } from '@ngx-translate/core';
 export interface AutocompleteItem<TRaw = unknown, TMeta = unknown> {
   id?: string;
   title: string;
+  emoji?: string;
   subtitle?: string;
   meta?: TMeta;
   raw?: TRaw;

@@ -58,6 +58,21 @@ export function normalizeProductKey(value: string | null | undefined): string {
   return normalizeSearchQuery(value);
 }
 
+/**
+ * Normalize a name for **classification** — matching it against a word table.
+ * Never use it for product identity: it is lossier than `normalizeProductKey`
+ * (ligatures folded, hyphens read as word breaks), so "Grão-de-bico" and
+ * "grao de bico" collapse together here but stay distinct as products.
+ */
+export function normalizeForClassification(value: string | null | undefined): string {
+  return normalizeSearchQuery(value)
+    .replace(/œ/g, 'oe')
+    .replace(/æ/g, 'ae')
+    .replace(/-/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function normalizeLocaleCode(locale?: string | null): string | null {
   if (!locale) {
     return null;

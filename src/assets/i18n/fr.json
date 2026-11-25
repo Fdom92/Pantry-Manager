@@ -10,40 +10,31 @@
     "tagline": "Commencez en 1 minute",
     "taglineDone": "Tout est prêt",
     "actions": {
-      "skip": "Passer",
       "next": "Suivant",
       "start": "Commencer",
       "skipHint": "Vous pouvez passer ce tutoriel à tout moment.",
       "continue": "Continuer",
-      "enter": "Ouvrir mon garde-manger",
       "notifyMe": "Oui, préviens-moi",
       "notifyLater": "Plus tard",
       "analyticsAccept": "Oui, j’aide",
-      "analyticsLater": "Pas maintenant"
+      "analyticsLater": "Pas maintenant",
+      "startEmpty": "Commencer à vide"
     },
     "slides": {
+      "add": {
+        "title": "Qu'as-tu sous la main en ce moment ?",
+        "description": "Ajoute un produit que tu as chez toi et on te préviendra avant qu'il expire. Un seul suffit.",
+        "saveError": "Impossible d'enregistrer. Réessaie.",
+        "otherProduct": "Autre produit…",
+        "otherPlaceholder": "Saisissez un produit"
+      },
       "notifications": {
         "title": "Alerte avant l'expiration",
         "description": "On te prévient quand quelque chose va expirer ou s'épuiser.",
         "previewTitle": "Produits bientôt expirés",
-        "previewBody": "3 produits expirent cette semaine"
-      },
-      "seed": {
-        "title": "Qu'as-tu maintenant dans ton garde-manger ?",
-        "description": "Touche ce que tu as déjà. Tu modifies les quantités plus tard. Tu peux passer cette étape.",
-        "selectedCount": "{{ count }} sélectionnés",
-        "skip": "Passer cette étape"
-      },
-      "confirm": {
-        "title": "Ton garde-manger est prêt 👌",
-        "description": "Ta sélection a été ajoutée à ton garde-manger.",
-        "titleEmpty": "Pas de souci",
-        "descriptionEmpty": "Tu ajouteras tes produits quand tu voudras.",
-        "emptyBody": "Ajoute-les un par un depuis ton garde-manger.",
-        "noExpiryLabel": "Sans expiration",
-        "needsDateLabel": "Date à définir",
-        "expiresLabel": "Périme le {{date}}",
-        "adjustHint": "Tu pourras ajuster dates et quantités plus tard dans ton garde-manger."
+        "previewBody": "3 produits expirent cette semaine",
+        "previewBodyProduct": "{{name}} expire {{when}}",
+        "previewTime": "maintenant"
       },
       "analytics": {
         "title": "Aide-nous à améliorer l’app",
@@ -115,7 +106,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Ajouter un produit"
+      "addProduct": "Ajouter un produit",
+      "scanReceipt": "Scanner le ticket"
     },
     "generic": {
       "title": "Rien à afficher",
@@ -495,29 +487,28 @@
     "coverage": {
       "title": "Couverture",
       "household": "Personnes à la maison",
-      "sentence": "Avec ce que tu as, tu tiens {{duration}} sans faire de courses",
       "level": {
         "good": "Bonne",
         "normal": "Juste",
         "bad": "Faible",
         "plenty": "Largement"
       },
-      "legend": "Faible : moins de {{low}} · Juste : jusqu'à {{tight}} · Bonne : jusqu'à {{good}} · Largement : plus"
+      "headline": "Tu as environ {{duration}} de nourriture"
     },
     "activity": {
       "title": "Rotation",
-      "detail": "Tu as ajouté {{added}} fois et utilisé {{consumed}} fois ce mois-ci",
-      "detailNoAdds": "Tu as utilisé {{consumed}} fois sans rien ajouter ce mois-ci",
+      "detail": "Ajoutés : {{added}} · Utilisés en 30 jours : {{consumed}}",
+      "detailNoAdds": "Utilisés en 30 jours : {{consumed}}",
       "noActivity": "Aucune activité enregistrée",
-      "rotationHigh": "Rotation élevée",
-      "rotationMedium": "Rotation moyenne",
-      "rotationLow": "Rotation faible",
-      "windowLabel": "30 derniers jours",
-      "overHundred": "Vous avez utilisé plus que vous n'avez acheté ce mois-ci : vous puisez dans vos réserves."
+      "rotationHigh": "Élevée",
+      "rotationMedium": "Moyenne",
+      "rotationLow": "Faible",
+      "headline": "Tu as utilisé {{percent}} % de ce que tu as ajouté",
+      "headlineNoAdds": "Tu utilises ce que tu avais déjà"
     },
     "distribution": {
       "title": "Classification",
-      "mostWasted": "Incidence élevée",
+      "mostWasted": "Le plus périmé",
       "leastRotating": "Faible rotation",
       "unclassified": "Sans type d'aliment : {{count}} (non comptés ici)"
     },
@@ -551,8 +542,8 @@
     },
     "saved": {
       "title": "Sauvés à temps",
-      "used": "Utilisés dans leur dernière semaine : {{count}}",
-      "wasted": "Gaspillés ce mois-ci : {{count}}"
+      "used": "Utilisés à temps : {{count}}",
+      "wasted": "Jetés ce mois-ci : {{count}}"
     },
     "topUsed": {
       "title": "Ce que vous utilisez le plus",
@@ -568,6 +559,10 @@
       "title": "Congélateur",
       "detail": "Congelés : {{count}}",
       "oldest": "Le plus ancien y est depuis {{oldest}}."
+    },
+    "sections": {
+      "month": "Ce mois-ci",
+      "pantry": "Ton garde-manger"
     }
   },
   "pantry": {
@@ -595,11 +590,6 @@
         "frozen": "Congelés"
       },
       "search": "Rechercher des produits"
-    },
-    "coachMark": {
-      "addFirstItem": "Ajoute ton premier vrai produit",
-      "addFirstItemHint": "Appuie pour démarrer ton garde-manger",
-      "ctaLabel": "Ajouter un produit"
     },
     "fastAdd": {
       "groupLabel": "Ajouter des produits",
@@ -691,7 +681,9 @@
         "household": "Ménage"
       },
       "expiry": {
-        "suggestedHint": "La date est suggérée d'après le type d'aliment. Modifiez-la si besoin."
+        "suggestedHint": "La date est suggérée d'après le type d'aliment. Modifiez-la si besoin.",
+        "sourceLearned": "D'après vos achats précédents",
+        "sourceTable": "Estimée pour ce type de produit"
       }
     },
     "detail": {
@@ -889,8 +881,11 @@
       "processing": "Lecture du ticket…",
       "error": "Impossible de lire le ticket. Cadrez uniquement la liste des produits, rapprochez-vous et cherchez une bonne lumière.",
       "retry": "Réessayer",
-      "matchExisting": "Sera ajouté au produit existant",
-      "createNew": "Sera créé comme nouveau produit",
+      "statusHave": "Déjà chez vous",
+      "statusNew": "Nouveau",
+      "suggestQuestion": "C'est votre {{name}} ?",
+      "suggestAccept": "Oui",
+      "notThisProduct": "Pas ce produit",
       "increase": "Augmenter la quantité",
       "decrease": "Réduire la quantité",
       "submit_one": "Ajouter 1 produit",
@@ -907,7 +902,6 @@
       "promptHeader": "Scanner le ticket",
       "promptGallery": "Choisir dans la galerie",
       "promptCamera": "Prendre une photo",
-      "matchFresh": "Sera marqué comme disponible",
       "pickerError": "Impossible d'ouvrir l'appareil photo ou la galerie. Réessaie.",
       "toggleDetails": "Voir le type et la date de péremption"
     },

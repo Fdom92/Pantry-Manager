@@ -1,19 +1,26 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { ANALYTICS_EVENTS, ONBOARDING_QUICK_SEED_ITEMS, ONBOARDING_SLIDES } from '@core/constants';
+import { formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
+import { ActivationService } from '../analytics/activation.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { LocalStorageService } from '../shared/local-storage.service';
 import { LoggerService } from '../shared/logger.service';
-import type { OnboardingQuickSeedItem } from '@core/constants';
-import { buildAddItemPayload, FRESH_QTY, resolveSuggestedExpiry } from '@core/domain/pantry';
+import { ToastService } from '../shared/toast.service';
+import {
+  buildAddOptions,
+  FOOD_CLASS_BY_KEY,
+  resolveFoodClass,
+  resolveSuggestedExpiry,
+  type AddOption,
+} from '@core/domain/pantry';
 import { resolveNotificationsConsent } from '@core/domain/notifications/notification.domain';
 import type { OnboardingSlide } from '@core/models/onboarding';
-import type { PantryItem } from '@core/models/pantry';
-import { createDocumentId } from '@core/utils';
 // Direct localStorage usage replaced by `LocalStorageService` (DI below).
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { PantryStoreService } from '../pantry/pantry-store.service';
-import { HistoryEventManagerService } from '../history/history-event-manager.service';
+import { FirstProductsService, type ProductDraft } from '../pantry/first-products.service';
+import { ClockService } from '../shared/clock.service';
 import { NotificationPermissionService } from '../notifications/notification-permission.service';
 import { WelcomeNotificationService } from '../notifications/welcome-notification.service';
 import { NotificationSchedulerService } from '../notifications/notification-scheduler.service';
@@ -40,16 +47,19 @@ let swiperRegistered = false;
 @Injectable()
 export class OnboardingStateService {
   private readonly navCtrl = inject(NavController);
+  private readonly firstProducts = inject(FirstProductsService);
   private readonly pantryStore = inject(PantryStoreService);
-  private readonly historyManager = inject(HistoryEventManagerService);
+  private readonly clock = inject(ClockService);
   private readonly notificationPermission = inject(NotificationPermissionService);
   private readonly preferences = inject(SettingsPreferencesService);
   private readonly welcomeNotif = inject(WelcomeNotificationService);
   private readonly notificationScheduler = inject(NotificationSchedulerService);
   private readonly translate = inject(TranslateService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly activation = inject(ActivationService);
   private readonly localStorage = inject(LocalStorageService);
   private readonly logger = inject(LoggerService);
+  private readonly toast = inject(ToastService);
 
   readonly slideOptions: SwiperOptions = {
     speed: 550,
@@ -67,7 +77,7 @@ export class OnboardingStateService {
 
   readonly availableSlides = ONBOARDING_SLIDES as OnboardingSlide[];
 
-  readonly quickSeedItems = ONBOARDING_QUICK_SEED_ITEMS as OnboardingQuickSeedItem[];
+  private readonly addSlideIndex = this.availableSlides.findIndex(slide => slide.key === 'add');
 
   /** Notification permission decision flag. null = not yet asked. */
   readonly notificationsDecision = signal<NotificationsDecision>(null);
@@ -75,33 +85,39 @@ export class OnboardingStateService {
   /** Analytics consent decision flag. null = not yet asked. */
   readonly analyticsDecision = signal<AnalyticsDecision>(null);
 
-  /** Set of selected quick-seed item keys (slide 2). */
-  readonly selectedSeedKeys = signal<ReadonlySet<string>>(new Set());
+  /** The products typed or picked on the add step, saved when the user continues. */
+  readonly drafts = signal<ProductDraft[]>([]);
 
-  /** Items selected, in stable order from constant. */
-  readonly selectedSeedItems = computed(() => {
-    const keys = this.selectedSeedKeys();
-    return this.quickSeedItems.filter(item => keys.has(item.key));
+  /** Set once the drafts are in the store; the add step is then read-only. */
+  readonly draftsSaved = signal(false);
+
+  /** True once the user chose "Empezar vacío" instead of adding products. */
+  private startedEmpty = false;
+
+  readonly firstDraft = computed(() => this.drafts()[0] ?? null);
+
+  /** The notification preview shows the 3-day alert for this product; null = generic text. */
+  readonly previewProductName = computed(() => this.firstDraft()?.name ?? null);
+
+  /** Every basic, translated: a new user has no products of their own to suggest. */
+  readonly addOptions = computed<AddOption[]>(() => {
+    // Basics the pantry already has (an interrupted earlier run) are not offered again. They are
+    // filtered here rather than passed as `own`, which with an empty query would list only those.
+    const owned = new Set(this.pantryStore.loadedProducts().map(p => normalizeProductKey(p.name)));
+    return buildAddOptions(
+      [],
+      ONBOARDING_QUICK_SEED_ITEMS
+        .map(seed => ({ seed, name: this.translate.instant(`onboarding.quickSeed.items.${seed.key}`) as string }))
+        .filter(b => !owned.has(normalizeProductKey(b.name))),
+      '',
+    );
   });
 
-  readonly selectedCount = computed(() => this.selectedSeedKeys().size);
-
-  /**
-   * What the confirm slide promises each selected seed will get. It resolves
-   * the date through the same function the creation does, from the same
-   * declared food type, so the preview cannot drift from what is saved a tap
-   * later. Before this the slide said "date pending" for every row, which
-   * stopped being true once the app started inferring dates.
-   */
-  readonly selectedSeedPreviews = computed(() =>
-    this.selectedSeedItems().map(seed => {
-      const name = this.translate.instant(`onboarding.quickSeed.items.${seed.key}`);
-      const suggested = seed.alwaysNoExpiry
-        ? { noExpiry: true }
-        : resolveSuggestedExpiry(name, seed.foodType, new Date());
-      return { seed, name, ...suggested };
-    })
-  );
+  /** The basics as chips, selected while a draft of that name exists (picked or typed). */
+  readonly basicChips = computed(() => {
+    const drafted = new Set(this.drafts().map(d => normalizeProductKey(d.name)));
+    return this.addOptions().map(option => ({ option, selected: drafted.has(normalizeProductKey(this.optionName(option))) }));
+  });
 
   constructor() {
     if (!swiperRegistered) {
@@ -125,6 +141,10 @@ export class OnboardingStateService {
     }
     const idx = swiper.realIndex ?? swiper.activeIndex ?? 0;
     this.currentSlideIndex.set(idx);
+    // Leaving the add step by swipe skips Continuar; save then, so a killed app keeps the product.
+    if (idx > this.addSlideIndex && !this.draftsSaved() && this.drafts().length) {
+      void this.saveDrafts();
+    }
     const slide = this.availableSlides[idx];
     if (slide) {
       // Only fires for users who already opted in on the analytics slide; the
@@ -177,11 +197,6 @@ export class OnboardingStateService {
     await this.goToNextSlide(swiperEl);
   }
 
-  /** Haptics are best-effort on the seed grid; never block the toggle on it. */
-  logSeedGridHapticsFailure(err: unknown): void {
-    this.logger.warn('OnboardingStateService', 'Seed grid Haptics.impact failed', { err });
-  }
-
   /** User postponed notifications on slide 1. */
   async dismissNotifications(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
     this.notificationsDecision.set('later');
@@ -209,47 +224,153 @@ export class OnboardingStateService {
     await this.goToNextSlide(swiperEl);
   }
 
-  /** Toggle quick-seed item selection (slide 2). */
-  toggleSeedItem(key: string): void {
-    const current = new Set(this.selectedSeedKeys());
-    if (current.has(key)) {
-      current.delete(key);
-    } else {
-      current.add(key);
+  /** A basic picked from the list, or a name the user typed. */
+  addDraft(option: AddOption | string): void {
+    const draft = typeof option === 'string' ? this.typedDraft(option) : option.kind === 'basic' ? this.basicDraft(option) : null;
+    if (!draft) {
+      return;
     }
-    this.selectedSeedKeys.set(current);
+    const key = normalizeProductKey(draft.name);
+    if (this.drafts().some(d => normalizeProductKey(d.name) === key)) {
+      return;
+    }
+    this.drafts.update(current => [...current, draft]);
   }
 
-  isSeedItemSelected(key: string): boolean {
-    return this.selectedSeedKeys().has(key);
+  /** Chip tap: adds the basic, or removes its draft when already there. */
+  toggleBasic(option: AddOption): void {
+    const key = normalizeProductKey(this.optionName(option));
+    const index = this.drafts().findIndex(d => normalizeProductKey(d.name) === key);
+    if (index >= 0) {
+      this.removeDraft(index);
+    } else {
+      this.addDraft(option);
+    }
   }
 
-  async skipOnboarding(): Promise<void> {
-    this.analytics.track(ANALYTICS_EVENTS.ONBOARDING_SKIPPED, {
-      from_slide_index: this.currentSlideIndex(),
-    });
-    await this.completeOnboarding({ skipped: true });
+  /** The basic's emoji for a draft row; '' for a product that is not a basic. */
+  emojiFor(name: string): string {
+    const key = normalizeProductKey(name);
+    const seed = ONBOARDING_QUICK_SEED_ITEMS.find(
+      s => normalizeProductKey(this.translate.instant(`onboarding.quickSeed.items.${s.key}`)) === key,
+    );
+    return seed?.emoji ?? '';
   }
 
-  async completeOnboarding(options?: { skipped?: boolean }): Promise<void> {
+  private optionName(option: AddOption): string {
+    return option.kind === 'basic' ? option.name : option.item.name;
+  }
+
+  removeDraft(index: number): void {
+    this.drafts.update(current => current.filter((_, i) => i !== index));
+  }
+
+  setDraftDate(index: number, date: string | undefined): void {
+    this.updateDraft(index, draft => ({
+      ...draft,
+      expirationDate: date || undefined,
+      noExpiry: date ? undefined : draft.noExpiry,
+      dateFromUser: true,
+    }));
+  }
+
+  toggleDraftNoExpiry(index: number): void {
+    this.updateDraft(index, draft => ({
+      ...draft,
+      noExpiry: !draft.noExpiry || undefined,
+      expirationDate: draft.noExpiry ? draft.expirationDate : undefined,
+      dateFromUser: true,
+    }));
+  }
+
+  /**
+   * "Continuar" on the add step. Saved now, not at the end, so the notification
+   * preview already has the product and closing the app mid-way does not lose it.
+   */
+  async continueFromAdd(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
+    if (!(await this.saveDrafts())) {
+      return;
+    }
+    await this.goToNextSlide(swiperEl);
+  }
+
+  /** "Empezar vacío": nothing is saved, and the preview falls back to its generic text. */
+  async startEmpty(swiperEl: SwiperElementLike | null | undefined): Promise<void> {
+    if (!this.draftsSaved()) {
+      this.drafts.set([]);
+      this.startedEmpty = true;
+    }
+    await this.goToNextSlide(swiperEl);
+  }
+
+  private async saveDrafts(): Promise<boolean> {
+    if (this.draftsSaved()) {
+      return true;
+    }
+    // Set before awaiting so a double tap or a swipe cannot save the same drafts twice.
+    this.draftsSaved.set(true);
+    try {
+      await this.firstProducts.save(this.drafts());
+      return true;
+    } catch (err) {
+      this.draftsSaved.set(false);
+      this.logger.error('OnboardingStateService', 'Saving the first products failed', { err });
+      this.toast.error('onboarding.slides.add.saveError');
+      return false;
+    }
+  }
+
+  private basicDraft(option: Extract<AddOption, { kind: 'basic' }>): ProductDraft {
+    const cls = FOOD_CLASS_BY_KEY.get(option.seed.classKey)!;
+    const { source: _source, ...expiry } = resolveSuggestedExpiry(option.name, cls.foodType, new Date(this.clock.now()), undefined, cls.key);
+    return { name: option.name, classKey: cls.key, foodType: cls.foodType, storage: cls.storage, ...expiry, dateFromUser: false, source: 'suggestion' };
+  }
+
+  private typedDraft(text: string): ProductDraft | null {
+    const trimmed = normalizeTrim(text);
+    if (!trimmed) {
+      return null;
+    }
+    const name = formatFriendlyName(trimmed, trimmed);
+    const cls = resolveFoodClass(name);
+    const { source: _source, ...expiry } = resolveSuggestedExpiry(name, cls?.foodType, new Date(this.clock.now()), undefined, cls?.key);
+    return {
+      name,
+      ...(cls ? { classKey: cls.key, foodType: cls.foodType } : {}),
+      storage: cls?.storage ?? 'pantry',
+      ...expiry,
+      dateFromUser: false,
+      source: 'typed',
+    };
+  }
+
+  private updateDraft(index: number, updater: (draft: ProductDraft) => ProductDraft): void {
+    this.drafts.update(current => current.map((draft, i) => (i === index ? updater(draft) : draft)));
+  }
+
+  async completeOnboarding(): Promise<void> {
     this.localStorage.onboarding.setSeen(true);
 
-    // Record a decision for any consent the user has not explicitly handled
-    // (typically via "Skip"). Without this, the post-update re-consent sheet
-    // would later surface the same question on the dashboard — confusing for
-    // a user who already chose to bypass the onboarding deliberately.
+    // Record a decision for any consent the user left undecided, so the
+    // re-consent sheet does not ask the same question again on the dashboard.
     await this.recordImplicitConsentDecisions();
 
+    // Last net for drafts the add step did not save (normally Continuar or the swipe already did).
+    await this.saveDrafts();
+    const ownCount = this.draftsSaved() ? this.drafts().length : 0;
+    this.activation.markOnboarded(ownCount > 0);
     this.analytics.track(ANALYTICS_EVENTS.ONBOARDING_COMPLETED, {
-      seed_count: this.selectedCount(),
+      own_count: ownCount,
+      // Omitted when nothing was saved: props stay flat, no null.
+      ...(ownCount > 0 ? { own_source: this.drafts()[0].source } : {}),
+      started_empty: this.startedEmpty && ownCount === 0,
+      last_step_index: this.currentSlideIndex(),
       notif_granted: this.notificationsDecision() === 'granted',
       analytics_granted: this.analyticsDecision() === 'granted',
-      skipped: options?.skipped ?? false,
     });
-    await this.bulkCreateSeedItems();
-    // Re-run after seeding so projected notifications reflect the new items.
+    // Re-run so projected notifications reflect the new items.
     void this.notificationScheduler.scheduleAll();
-    // First post-onboarding view = pantry so user sees their seeded products.
+    // First post-onboarding view = pantry so the user sees their first products.
     // Subsequent app launches default-route back to /dashboard.
     await this.navCtrl.navigateRoot('/pantry');
   }
@@ -257,7 +378,7 @@ export class OnboardingStateService {
   /**
    * Persist an explicit "no" decision for every consent flow the user did not
    * confirm during onboarding. Prevents the re-consent sheet from re-asking the
-   * same question on the dashboard immediately after a skip — that would feel
+   * same question on the dashboard right after onboarding — that would feel
    * nagging.
    *
    * Only stamps `analyticsDecidedAt` and `notificationsDecidedAt`. The actual
@@ -282,42 +403,6 @@ export class OnboardingStateService {
 
     if (Object.keys(patch).length) {
       await this.preferences.savePreferences({ ...current, ...patch });
-    }
-  }
-
-  /**
-   * Create PantryItems for every selected quick-seed entry.
-   * Items with `alwaysNoExpiry` get a noExpiry batch; all others stay with no
-   * expirationDate set so the user fills it as they actually need it (Option A
-   * — never invent dates).
-   */
-  private async bulkCreateSeedItems(): Promise<void> {
-    const selected = this.selectedSeedItems();
-    if (!selected.length) {
-      return;
-    }
-    const timestamp = new Date().toISOString();
-    const sessionId = selected.length > 1 ? createDocumentId('session') : undefined;
-    for (const seed of selected) {
-      const name = this.translate.instant(`onboarding.quickSeed.items.${seed.key}`);
-      const quantity = seed.productType === 'fresh' ? FRESH_QTY.sufficient : 1;
-      const base = buildAddItemPayload({
-        id: createDocumentId('item'),
-        nowIso: timestamp,
-        name,
-        quantity,
-        noExpiry: seed.alwaysNoExpiry,
-        // The curated list already knows what each seed is, so the builder must
-        // not fall back to guessing it from a translated name — that is what
-        // left "Œufs" and "Grão-de-bico" without a date.
-        foodType: seed.foodType,
-      });
-      const item: PantryItem = {
-        ...base,
-        productType: seed.productType,
-      };
-      await this.pantryStore.addItem(item);
-      await this.historyManager.logAddNewItem(item, quantity, sessionId, timestamp);
     }
   }
 }

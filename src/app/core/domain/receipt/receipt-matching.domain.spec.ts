@@ -125,3 +125,38 @@ describe('matchReceiptName', () => {
     });
   });
 });
+
+describe('matchReceiptName — auto flag (stricter auto-match)', () => {
+  const one = (name: string, extra: Partial<MatchCandidate> = {}): MatchCandidate[] => [{ id: 'x', name, ...extra }];
+
+  it('does not auto-join a bare line to a longer product ("LECHE" vs "Leche en polvo")', () => {
+    const m = matchReceiptName('LECHE', one('Leche en polvo'));
+    expect(m).not.toBeNull();
+    expect(m!.auto).toBeFalse();
+  });
+
+  it('does not auto-join products of different class ("TOMATE TRITURADO" vs "Tomate")', () => {
+    const m = matchReceiptName('TOMATE TRITURADO', one('Tomate'));
+    expect(m).not.toBeNull();
+    expect(m!.auto).toBeFalse();
+  });
+
+  it('auto-joins a brand-suffixed line to the same product', () => {
+    expect(matchReceiptName('YOGUR NATURAL HACENDADO', one('Yogur natural'))!.auto).toBeTrue();
+  });
+
+  it('auto-joins an abbreviated line', () => {
+    expect(matchReceiptName('PECH POLLO FIL', one('Pechuga de pollo'))!.auto).toBeTrue();
+  });
+
+  it('an unknown class on either side does not block', () => {
+    expect(matchReceiptName('ZZQXWV KLMNOP', one('Zzqxwv klmnop'))!.auto).toBeTrue();
+    expect(matchReceiptName('TOMATE', one('Tomate', { foodKind: 'no-such-kind' }))!.auto).toBeTrue();
+  });
+
+  it('uses the stored class of the candidate when given', () => {
+    // A hand-corrected product keeps its own class, not the one its name suggests.
+    const m = matchReceiptName('TOMATE', one('Tomate', { foodKind: 'canned' }));
+    expect(m!.auto).toBeFalse();
+  });
+});

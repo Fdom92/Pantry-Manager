@@ -24,5 +24,16 @@
         {{ actionLabel || ('emptyStates.actions.addProduct' | translate) }}
       </ion-button>
     }
+    @if (secondaryActionLabel) {
+      <ion-button
+        color="primary"
+        fill="outline"
+        class="empty-action"
+        shape="round"
+        (click)="secondaryAction.emit()">
+        <ion-icon slot="start" name="receipt-outline"></ion-icon>
+        {{ secondaryActionLabel }}
+      </ion-button>
+    }
   </div>
 }

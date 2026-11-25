@@ -15,6 +15,8 @@ export interface RepositionPrediction {
 
 const WINDOW_DAYS = 30;
 const MS_PER_DAY = 86_400_000;
+// A new product can't show 30 days of consumption: don't dilute it over days it didn't exist.
+export const OBSERVED_MIN_DAYS = 7;
 const VELOCITY_THRESHOLD = 0.05;
 const DAYS_TO_OUT_CAP = 90;
 // 2 events is enough signal to surface a prediction (cold-start friendly);
@@ -28,6 +30,13 @@ export function computeRepositionPredictions(
 ): RepositionPrediction[] {
   const nowMs = now.getTime();
   const windowStart = nowMs - WINDOW_DAYS * MS_PER_DAY;
+
+  const firstAddMs = new Map<string, number>();
+  for (const e of events) {
+    if (e.eventType !== 'ADD') continue;
+    const t = new Date(e.timestamp).getTime();
+    if (!Number.isNaN(t) && t < (firstAddMs.get(e.productId) ?? Infinity)) firstAddMs.set(e.productId, t);
+  }
 
   const consumeAgg = new Map<string, { qty: number; count: number }>();
   for (const e of events) {
@@ -48,7 +57,12 @@ export function computeRepositionPredictions(
     const agg = consumeAgg.get(itm._id);
     if (!agg) continue;
     if (agg.count < MIN_CONSUME_EVENTS) continue;
-    const velocityPerDay = agg.qty / WINDOW_DAYS;
+    const created = new Date(itm.createdAt).getTime();
+    const firstAdd = Math.min(firstAddMs.get(itm._id) ?? Infinity, Number.isNaN(created) ? Infinity : created);
+    const observedDays = Number.isFinite(firstAdd)
+      ? Math.min(WINDOW_DAYS, Math.max(OBSERVED_MIN_DAYS, Math.floor((nowMs - firstAdd) / MS_PER_DAY)))
+      : WINDOW_DAYS;
+    const velocityPerDay = agg.qty / observedDays;
     if (velocityPerDay < VELOCITY_THRESHOLD) continue;
     const currentStock = sumQuantities(itm.batches);
     if (currentStock <= 0) continue;

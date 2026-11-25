@@ -144,3 +144,19 @@ export function isEnvironmentalStoreError(error: unknown): boolean {
   const readable = candidate.data?.readableErrorCode;
   return typeof readable === 'string' && ENVIRONMENTAL_READABLE_CODES.has(readable);
 }
+
+/**
+ * getOfferings only: code 2 STORE_PROBLEM_ERROR is the store failing to list
+ * products (Play down, no account, restricted profile). Not environmental for a
+ * purchase, where it can be a real fault, so isEnvironmentalStoreError excludes it.
+ */
+export function isEnvironmentalOfferingsError(error: unknown): boolean {
+  if (isEnvironmentalStoreError(error)) {
+    return true;
+  }
+  if (typeof error !== 'object' || error === null) {
+    return false;
+  }
+  const candidate = error as { code?: unknown; data?: { readableErrorCode?: unknown } | null };
+  return String(candidate.code) === '2' || candidate.data?.readableErrorCode === 'STORE_PROBLEM_ERROR';
+}

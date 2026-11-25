@@ -1,3 +1,4 @@
+import type { ExpirySource } from '@core/domain/pantry';
 import type { PantryItem } from '../pantry/item.model';
 import type { FoodType } from '../shared/enums.model';
 
@@ -52,6 +53,10 @@ export interface ReceiptReviewLine {
   match: PantryItem | null;
   /** 0..1 similarity score of the match. */
   matchScore: number;
+  /** The matcher trusted the match enough to join without asking; otherwise it is only a suggestion. */
+  matchAuto: boolean;
+  /** The user tapped "yes" on a suggestion: it now behaves like an auto match. */
+  suggestionAccepted?: boolean;
   /** Whether this line will be added on submit. */
   included: boolean;
   /** Editable quantity (starts at parsed.quantity). */
@@ -72,6 +77,12 @@ export interface ReceiptReviewLine {
   noExpiry?: boolean;
   /** True once the user has touched the date/no-expiry picker for this line — mirrors AddEntry.dateFromUser, so a later food-type change doesn't clobber a date the user already set. */
   dateFromUser: boolean;
+  /** Who decided the date, for analytics. */
+  expirySource?: ExpirySource | 'user';
+  /** Where a new product goes. Matched lines follow the existing product. */
+  storage: 'pantry' | 'fresh';
+  /** What the food class suggested; `storage` differing from it is a user override. */
+  suggestedStorage: 'pantry' | 'fresh';
   /** Accordion state for the review row. Never persisted, UI-only. */
   expanded: boolean;
 }

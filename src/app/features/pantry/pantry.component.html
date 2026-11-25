@@ -178,7 +178,6 @@
             </button>
           }
           <button
-            #despensaAddBtn
             class="pantry-section__add-btn"
             [attr.aria-label]="'pantry.fastAdd.groupLabel' | translate"
             (click)="facade.openAddModal()">
@@ -189,11 +188,14 @@
 
       @if (facade.summary().total === 0) {
         <app-empty-state
-          class="list-empty-state list-empty-state--inline"
+          class="list-empty-state"
           icon="fast-food-outline"
           [hideTitle]="true"
-          [inline]="true"
-          [subtitleKey]="'emptyStates.pantry.subtitle'">
+          [subtitleKey]="'emptyStates.pantry.subtitle'"
+          [showAction]="true"
+          [secondaryActionLabel]="'emptyStates.actions.scanReceipt' | translate"
+          (action)="onFirstStep('add')"
+          (secondaryAction)="onFirstStep('scan')">
         </app-empty-state>
       } @else if (facade.despensaItems().length === 0) {
         <app-empty-state
@@ -322,10 +324,3 @@
 
 </ion-content>
 
-@if (showCoachMark()) {
-  <app-pantry-add-coach-mark
-    [targetEl]="addBtnEl()!"
-    (addRequested)="onCoachMarkAddRequested()"
-    (dismissed)="onCoachMarkDismissed()">
-  </app-pantry-add-coach-mark>
-}

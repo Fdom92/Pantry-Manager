@@ -3,6 +3,7 @@ import type { ItemBatch, PantryItem } from '@core/models/pantry';
 import type { FoodType } from '@core/models/shared/enums.model';
 import { roundQuantity, toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeTrim } from '@core/utils/normalization.util';
+import { resolveFoodClass } from './food-class-resolution.domain';
 import { inferFoodType, resolveSuggestedExpiry } from './food-type-inference.domain';
 import { computeEarliestExpiry } from './pantry-batch.domain';
 
@@ -30,6 +31,8 @@ export function buildAddItemPayload(params: {
    * the user pick a type (the add modal shows it in a chip) must pass it here.
    */
   foodType?: FoodType;
+  /** A kind the caller already knows; resolved from the name and type when absent. */
+  foodKind?: string;
 }): PantryItem {
   const normalizedName = normalizeTrim(params.name) || UNASSIGNED_PRODUCT_NAME;
 
@@ -50,7 +53,8 @@ export function buildAddItemPayload(params: {
   // An explicit date or an explicit noExpiry from the caller always wins; an
   // unclassifiable item falls back to no date, which is the behaviour this
   // function had before inference existed.
-  const inferred = resolveSuggestedExpiry(normalizedName, resolvedFoodType ?? null, new Date(params.nowIso));
+  const foodKind = resolveFoodClass(normalizedName, params.foodType, params.foodKind)?.key;
+  const inferred = resolveSuggestedExpiry(normalizedName, resolvedFoodType ?? null, new Date(params.nowIso), undefined, foodKind);
   const shouldInferDate =
     params.inferExpiry !== false && !params.expirationDate && !params.noExpiry;
 
@@ -72,6 +76,7 @@ export function buildAddItemPayload(params: {
     name: normalizedName,
     categoryId: '',
     foodType: resolvedFoodType,
+    foodKind,
     batches,
     supermarket: '',
     isBasic: undefined,

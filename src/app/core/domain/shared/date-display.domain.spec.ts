@@ -81,3 +81,38 @@ describe('formatDisplayDate', () => {
     expect(formatDisplayDate(null, 'es-ES')).toBe('');
   });
 });
+
+// A 150-row Despensa formats every row on each change detection; building a
+// new Intl object per call was the bulk of the grouping-switch cost.
+describe('Intl formatter reuse', () => {
+  const intl = Intl as unknown as Record<string, unknown>;
+  let originals: Record<string, unknown>;
+  let built: number;
+
+  beforeEach(() => {
+    built = 0;
+    originals = {};
+    for (const name of ['NumberFormat', 'RelativeTimeFormat', 'DateTimeFormat'] as const) {
+      const Orig = Intl[name] as unknown as new (...args: unknown[]) => object;
+      originals[name] = Orig;
+      intl[name] = class extends Orig {
+        constructor(...args: unknown[]) {
+          super(...args);
+          built++;
+        }
+      };
+    }
+  });
+
+  afterEach(() => Object.assign(intl, originals));
+
+  it('builds each formatter once per locale and options', () => {
+    for (let i = 0; i < 3; i++) {
+      formatRelativeDays(5, 'fr-FR');
+      formatDuration(5, 'fr-FR');
+      formatDisplayDate('2026-07-05', 'fr-FR', 'dayMonth');
+    }
+    expect(built).toBeLessThanOrEqual(3);
+    expect(formatRelativeDays(5, 'fr-FR')).toBe('dans 5 jours');
+  });
+});

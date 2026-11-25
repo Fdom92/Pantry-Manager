@@ -15,6 +15,7 @@ import { normalizeStringList } from '@core/utils/normalization.util';
 import { StorageService } from '../shared/storage.service';
 import { LoggerService } from '../shared/logger.service';
 import { SystemBarsService, THEME_FADE_MS } from '../shared/system-bars.service';
+import { LocalStorageService } from '../shared/local-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,7 @@ export class SettingsPreferencesService {
   private readonly storage = inject<StorageService<AppPreferencesDoc>>(StorageService);
   private readonly logger = inject(LoggerService);
   private readonly systemBars = inject(SystemBarsService);
+  private readonly localStore = inject(LocalStorageService);
 
   private readonly ready: Promise<void>;
   private cachedDoc: AppPreferencesDoc | null = null;
@@ -129,6 +131,8 @@ export class SettingsPreferencesService {
    * system-bar strips fade over the same time so the app and its bars move as one.
    */
   private applyTheme(theme: AppThemePreference, systemPrefersDark?: boolean, animate = false): void {
+    this.localStore.theme.set(theme);
+    this.systemBars.setNightMode(theme);
     if (typeof document === 'undefined') {
       return;
     }

@@ -10,40 +10,31 @@
     "tagline": "In 1 Minute starten",
     "taglineDone": "Alles bereit",
     "actions": {
-      "skip": "Überspringen",
       "next": "Weiter",
       "start": "Starten",
       "skipHint": "Du kannst dieses Tutorial jederzeit überspringen.",
       "continue": "Weiter",
-      "enter": "Vorratskammer öffnen",
       "notifyMe": "Ja, benachrichtige mich",
       "notifyLater": "Später",
       "analyticsAccept": "Ja, helfen",
-      "analyticsLater": "Jetzt nicht"
+      "analyticsLater": "Jetzt nicht",
+      "startEmpty": "Leer starten"
     },
     "slides": {
+      "add": {
+        "title": "Was hast du gerade zur Hand?",
+        "description": "Füge ein Produkt hinzu, das du zu Hause hast, und wir erinnern dich, bevor es abläuft. Eines reicht.",
+        "saveError": "Speichern fehlgeschlagen. Bitte versuche es erneut.",
+        "otherProduct": "Anderes Produkt…",
+        "otherPlaceholder": "Produkt eingeben"
+      },
       "notifications": {
         "title": "Hinweis vor dem Ablaufen",
         "description": "Wir benachrichtigen dich, wenn etwas bald abläuft oder zur Neige geht.",
         "previewTitle": "Produkte laufen bald ab",
-        "previewBody": "3 Produkte laufen diese Woche ab"
-      },
-      "seed": {
-        "title": "Was hast du jetzt in der Vorratskammer?",
-        "description": "Tippe an, was du schon hast. Mengen bearbeitest du später. Kannst diesen Schritt überspringen.",
-        "selectedCount": "{{ count }} ausgewählt",
-        "skip": "Diesen Schritt überspringen"
-      },
-      "confirm": {
-        "title": "Deine Vorratskammer ist bereit 👌",
-        "description": "Wir haben deine Auswahl hinzugefügt.",
-        "titleEmpty": "Kein Problem",
-        "descriptionEmpty": "Du kannst deine Produkte hinzufügen, wann du willst.",
-        "emptyBody": "Füge sie einzeln aus der Vorratskammer hinzu.",
-        "noExpiryLabel": "Kein Ablaufdatum",
-        "needsDateLabel": "Datum ausstehend",
-        "expiresLabel": "Läuft ab am {{date}}",
-        "adjustHint": "Daten und Mengen kannst du später in deiner Vorratskammer anpassen."
+        "previewBody": "3 Produkte laufen diese Woche ab",
+        "previewBodyProduct": "{{name}} läuft {{when}} ab",
+        "previewTime": "jetzt"
       },
       "analytics": {
         "title": "Hilf uns, besser zu werden",
@@ -115,7 +106,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Produkt hinzufügen"
+      "addProduct": "Produkt hinzufügen",
+      "scanReceipt": "Kassenbon scannen"
     },
     "generic": {
       "title": "Nichts anzuzeigen",
@@ -495,29 +487,28 @@
     "coverage": {
       "title": "Reichweite",
       "household": "Personen im Haushalt",
-      "sentence": "Mit dem, was du hast, kommst du {{duration}} ohne Einkauf aus",
       "level": {
         "good": "Gut",
         "normal": "Knapp",
         "bad": "Niedrig",
         "plenty": "Reichlich"
       },
-      "legend": "Niedrig: unter {{low}} · Knapp: bis {{tight}} · Gut: bis {{good}} · Reichlich: mehr"
+      "headline": "Du hast Essen für etwa {{duration}}"
     },
     "activity": {
       "title": "Rotation",
-      "detail": "Du hast {{added}} Mal hinzugefügt und {{consumed}} Mal verbraucht in diesem Monat",
-      "detailNoAdds": "Du hast {{consumed}} Mal verbraucht, ohne diesen Monat etwas hinzuzufügen",
+      "detail": "Hinzugefügt: {{added}} · Verbraucht in 30 Tagen: {{consumed}}",
+      "detailNoAdds": "Verbraucht in 30 Tagen: {{consumed}}",
       "noActivity": "Keine Aktivität aufgezeichnet",
-      "rotationHigh": "Hohe Rotation",
-      "rotationMedium": "Mittlere Rotation",
-      "rotationLow": "Niedrige Rotation",
-      "windowLabel": "Letzte 30 Tage",
-      "overHundred": "Du hast diesen Monat mehr verbraucht als gekauft: du lebst von deinem Vorrat."
+      "rotationHigh": "Hoch",
+      "rotationMedium": "Mittel",
+      "rotationLow": "Niedrig",
+      "headline": "Du hast {{percent}} % von dem verbraucht, was du hinzugefügt hast",
+      "headlineNoAdds": "Du verbrauchst, was du schon hattest"
     },
     "distribution": {
       "title": "Einordnung",
-      "mostWasted": "Häufiger abgelaufen",
+      "mostWasted": "Am häufigsten abgelaufen",
       "leastRotating": "Niedrige Rotation",
       "unclassified": "Ohne Lebensmittelart: {{count}} (hier nicht gezählt)"
     },
@@ -551,8 +542,8 @@
     },
     "saved": {
       "title": "Rechtzeitig gerettet",
-      "used": "In ihrer letzten Woche verbraucht: {{count}}",
-      "wasted": "Diesen Monat verschwendet: {{count}}"
+      "used": "Rechtzeitig verbraucht: {{count}}",
+      "wasted": "Diesen Monat weggeworfen: {{count}}"
     },
     "topUsed": {
       "title": "Was du am meisten nutzt",
@@ -568,6 +559,10 @@
       "title": "Gefrierschrank",
       "detail": "Eingefroren: {{count}}",
       "oldest": "Das älteste liegt seit {{oldest}} drin."
+    },
+    "sections": {
+      "month": "Diesen Monat",
+      "pantry": "Dein Vorrat"
     }
   },
   "pantry": {
@@ -595,11 +590,6 @@
         "frozen": "Eingefroren"
       },
       "search": "Produkte suchen"
-    },
-    "coachMark": {
-      "addFirstItem": "Füge dein erstes echtes Produkt hinzu",
-      "addFirstItemHint": "Tippe, um deine Vorratskammer zu starten",
-      "ctaLabel": "Produkt hinzufügen"
     },
     "fastAdd": {
       "groupLabel": "Produkte hinzufügen",
@@ -691,7 +681,9 @@
         "household": "Haushalt"
       },
       "expiry": {
-        "suggestedHint": "Das Datum wird aus dem Lebensmitteltyp vorgeschlagen. Passe es bei Bedarf an."
+        "suggestedHint": "Das Datum wird aus dem Lebensmitteltyp vorgeschlagen. Passe es bei Bedarf an.",
+        "sourceLearned": "Nach deinen bisherigen Einkäufen",
+        "sourceTable": "Geschätzt für diese Produktart"
       }
     },
     "detail": {
@@ -889,8 +881,11 @@
       "processing": "Bon wird gelesen…",
       "error": "Bon konnte nicht gelesen werden. Erfasse nur die Produktliste, geh näher ran und sorge für gutes Licht.",
       "retry": "Erneut versuchen",
-      "matchExisting": "Wird zum vorhandenen Produkt hinzugefügt",
-      "createNew": "Wird als neues Produkt angelegt",
+      "statusHave": "Schon vorhanden",
+      "statusNew": "Neu",
+      "suggestQuestion": "Ist es dein {{name}}?",
+      "suggestAccept": "Ja",
+      "notThisProduct": "Nicht dieses Produkt",
       "increase": "Menge erhöhen",
       "decrease": "Menge verringern",
       "submit_one": "1 Produkt hinzufügen",
@@ -907,7 +902,6 @@
       "promptHeader": "Kassenbon scannen",
       "promptGallery": "Aus Galerie wählen",
       "promptCamera": "Foto aufnehmen",
-      "matchFresh": "Wird als vorhanden markiert",
       "pickerError": "Kamera oder Galerie konnten nicht geöffnet werden. Bitte versuche es erneut.",
       "toggleDetails": "Typ und Ablaufdatum anzeigen"
     },

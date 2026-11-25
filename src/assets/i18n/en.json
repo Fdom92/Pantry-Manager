@@ -10,40 +10,31 @@
     "tagline": "Get set up in a minute",
     "taglineDone": "Ready to start",
     "actions": {
-      "skip": "Skip",
       "next": "Next",
       "start": "Start",
       "skipHint": "You can skip this tutorial anytime.",
       "continue": "Continue",
-      "enter": "Open my pantry",
       "notifyMe": "Yes, notify me",
       "notifyLater": "Later",
       "analyticsAccept": "Yes, help out",
-      "analyticsLater": "Not now"
+      "analyticsLater": "Not now",
+      "startEmpty": "Start empty"
     },
     "slides": {
+      "add": {
+        "title": "What do you have to hand right now?",
+        "description": "Add one product you have at home and we'll remind you before it expires. One is enough.",
+        "saveError": "Couldn't save. Please try again.",
+        "otherProduct": "Another product…",
+        "otherPlaceholder": "Type a product"
+      },
       "notifications": {
         "title": "Heads-up before it expires",
         "description": "We notify you when something is about to expire or runs out.",
         "previewTitle": "Products expiring soon",
-        "previewBody": "3 products expire this week"
-      },
-      "seed": {
-        "title": "What do you have in your pantry?",
-        "description": "Tap what you already have. You can edit quantities later. You can skip this step.",
-        "selectedCount": "{{ count }} selected",
-        "skip": "Skip this step"
-      },
-      "confirm": {
-        "title": "Your pantry is ready 👌",
-        "description": "We've added your selection to your pantry.",
-        "titleEmpty": "No problem",
-        "descriptionEmpty": "You can add your products whenever you want.",
-        "emptyBody": "Add them one by one from your pantry.",
-        "noExpiryLabel": "No expiry",
-        "needsDateLabel": "Date pending",
-        "expiresLabel": "Expires {{date}}",
-        "adjustHint": "Adjust dates and quantities later in your pantry."
+        "previewBody": "3 products expire this week",
+        "previewBodyProduct": "{{name}} expires {{when}}",
+        "previewTime": "now"
       },
       "analytics": {
         "title": "Help us improve",
@@ -115,7 +106,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Add product"
+      "addProduct": "Add product",
+      "scanReceipt": "Scan receipt"
     },
     "generic": {
       "title": "Nothing to show",
@@ -495,29 +487,28 @@
     "coverage": {
       "title": "Coverage",
       "household": "People at home",
-      "sentence": "With what you have, you'll last {{duration}} without shopping",
       "level": {
         "good": "Good",
         "normal": "Tight",
         "bad": "Low",
         "plenty": "Plenty"
       },
-      "legend": "Low: under {{low}} · Tight: up to {{tight}} · Good: up to {{good}} · Plenty: more"
+      "headline": "You have about {{duration}} of food"
     },
     "activity": {
       "title": "Rotation",
-      "detail": "You added {{added}} times and used {{consumed}} times this month",
-      "detailNoAdds": "You used {{consumed}} times without adding anything this month",
+      "detail": "Added: {{added}} · Used in 30 days: {{consumed}}",
+      "detailNoAdds": "Used in 30 days: {{consumed}}",
       "noActivity": "No activity recorded",
-      "rotationHigh": "High rotation",
-      "rotationMedium": "Medium rotation",
-      "rotationLow": "Low rotation",
-      "windowLabel": "Last 30 days",
-      "overHundred": "You used more than you bought this month: you are drawing on what you already had."
+      "rotationHigh": "High",
+      "rotationMedium": "Medium",
+      "rotationLow": "Low",
+      "headline": "You've used {{percent}}% of what you added",
+      "headlineNoAdds": "You're using up what you already had"
     },
     "distribution": {
       "title": "Breakdown",
-      "mostWasted": "Higher incidence",
+      "mostWasted": "Most expired",
       "leastRotating": "Low rotation",
       "unclassified": "No food type: {{count}} (not counted here)"
     },
@@ -551,8 +542,8 @@
     },
     "saved": {
       "title": "Saved in time",
-      "used": "Used in their last week: {{count}}",
-      "wasted": "Wasted this month: {{count}}"
+      "used": "Used in time: {{count}}",
+      "wasted": "Thrown away this month: {{count}}"
     },
     "topUsed": {
       "title": "What you use most",
@@ -568,6 +559,10 @@
       "title": "Freezer",
       "detail": "Frozen: {{count}}",
       "oldest": "The oldest has been in for {{oldest}}."
+    },
+    "sections": {
+      "month": "This month",
+      "pantry": "Your pantry"
     }
   },
   "pantry": {
@@ -595,11 +590,6 @@
         "frozen": "Frozen"
       },
       "search": "Search products"
-    },
-    "coachMark": {
-      "addFirstItem": "Add your first real product",
-      "addFirstItemHint": "Tap to start filling your pantry",
-      "ctaLabel": "Add product"
     },
     "fastAdd": {
       "groupLabel": "Add products",
@@ -691,7 +681,9 @@
         "household": "Household"
       },
       "expiry": {
-        "suggestedHint": "The date is suggested from the food type. Edit it if it doesn't fit."
+        "suggestedHint": "The date is suggested from the food type. Edit it if it doesn't fit.",
+        "sourceLearned": "Based on your past purchases",
+        "sourceTable": "Estimated for this type of product"
       }
     },
     "detail": {
@@ -889,8 +881,11 @@
       "processing": "Reading the receipt…",
       "error": "Couldn't read the receipt. Frame only the product list, get closer and find good light.",
       "retry": "Try again",
-      "matchExisting": "Will be added to the existing product",
-      "createNew": "Will be created as a new product",
+      "statusHave": "Already have it",
+      "statusNew": "New",
+      "suggestQuestion": "Is it your {{name}}?",
+      "suggestAccept": "Yes",
+      "notThisProduct": "Not this product",
       "increase": "Increase quantity",
       "decrease": "Decrease quantity",
       "submit_one": "Add 1 product",
@@ -907,7 +902,6 @@
       "promptHeader": "Scan receipt",
       "promptGallery": "Choose from gallery",
       "promptCamera": "Take photo",
-      "matchFresh": "Will be marked as in stock",
       "pickerError": "Couldn't open the camera or gallery. Please try again.",
       "toggleDetails": "Show type and expiry"
     },

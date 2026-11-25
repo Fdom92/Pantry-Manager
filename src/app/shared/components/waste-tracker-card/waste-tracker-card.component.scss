@@ -12,7 +12,8 @@
 
   &__count-row {
     display: flex;
-    align-items: baseline;
+    align-items: center;
+    justify-content: space-between;
     gap: var(--app-theme-spacing-sm);
   }
 
@@ -21,10 +22,10 @@
     margin: var(--app-theme-spacing-2xs) 0 0;
   }
   // Both are sentences ("Se te han caducado 2 productos"), not figures: at the
-  // hero-number size they wrapped to two lines and outweighed every other card.
+  // hero-number size they wrapped to two lines and outweighed every other card; same size as the rotation and coverage headlines.
   &__count,
   &__zero {
-    font-size: var(--app-theme-font-size-xl);
+    font-size: var(--app-theme-font-size-title);
     font-weight: var(--app-theme-font-weight-bold);
     line-height: var(--app-theme-line-height-tight);
     margin: 0;

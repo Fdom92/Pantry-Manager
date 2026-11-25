@@ -10,40 +10,31 @@
     "tagline": "Configura tutto in un minuto",
     "taglineDone": "Tutto pronto",
     "actions": {
-      "skip": "Salta",
       "next": "Avanti",
       "start": "Inizia",
       "skipHint": "Puoi saltare questo tutorial in qualsiasi momento.",
       "continue": "Continua",
-      "enter": "Apri la mia dispensa",
       "notifyMe": "Sì, avvisami",
       "notifyLater": "Più tardi",
       "analyticsAccept": "Sì, aiuta",
-      "analyticsLater": "Non ora"
+      "analyticsLater": "Non ora",
+      "startEmpty": "Inizia vuoto"
     },
     "slides": {
+      "add": {
+        "title": "Cosa hai a portata di mano adesso?",
+        "description": "Aggiungi un prodotto che hai in casa e ti avviseremo prima che scada. Ne basta uno.",
+        "saveError": "Impossibile salvare. Riprova.",
+        "otherProduct": "Altro prodotto…",
+        "otherPlaceholder": "Scrivi un prodotto"
+      },
       "notifications": {
         "title": "Avviso prima della scadenza",
         "description": "Ti avvisiamo quando qualcosa sta per scadere o finire.",
         "previewTitle": "Prodotti in scadenza",
-        "previewBody": "3 prodotti scadono questa settimana"
-      },
-      "seed": {
-        "title": "Cosa hai ora in dispensa?",
-        "description": "Tocca quello che hai già. Modifichi le quantità dopo. Puoi saltare questo passaggio.",
-        "selectedCount": "{{ count }} selezionati",
-        "skip": "Salta questo passaggio"
-      },
-      "confirm": {
-        "title": "La tua dispensa è pronta 👌",
-        "description": "Abbiamo aggiunto la tua selezione alla dispensa.",
-        "titleEmpty": "Nessun problema",
-        "descriptionEmpty": "Aggiungerai i tuoi prodotti quando vorrai.",
-        "emptyBody": "Aggiungili uno per uno dalla dispensa.",
-        "noExpiryLabel": "Senza scadenza",
-        "needsDateLabel": "Data da impostare",
-        "expiresLabel": "Scade il {{date}}",
-        "adjustHint": "Regola date e quantità più tardi nella tua dispensa."
+        "previewBody": "3 prodotti scadono questa settimana",
+        "previewBodyProduct": "{{name}} scade {{when}}",
+        "previewTime": "ora"
       },
       "analytics": {
         "title": "Aiutaci a migliorare",
@@ -115,7 +106,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Aggiungi prodotto"
+      "addProduct": "Aggiungi prodotto",
+      "scanReceipt": "Scansiona scontrino"
     },
     "generic": {
       "title": "Niente da mostrare",
@@ -495,29 +487,28 @@
     "coverage": {
       "title": "Copertura",
       "household": "Persone in casa",
-      "sentence": "Con quello che hai, duri {{duration}} senza fare la spesa",
       "level": {
         "good": "Buona",
         "normal": "Limitata",
         "bad": "Bassa",
         "plenty": "Abbondante"
       },
-      "legend": "Bassa: meno di {{low}} · Limitata: fino a {{tight}} · Buona: fino a {{good}} · Abbondante: di più"
+      "headline": "Hai circa {{duration}} di cibo"
     },
     "activity": {
       "title": "Rotazione",
-      "detail": "Hai aggiunto {{added}} volte e usato {{consumed}} volte questo mese",
-      "detailNoAdds": "Hai usato {{consumed}} volte senza aggiungere nulla questo mese",
+      "detail": "Aggiunti: {{added}} · Usati in 30 giorni: {{consumed}}",
+      "detailNoAdds": "Usati in 30 giorni: {{consumed}}",
       "noActivity": "Nessuna attività registrata",
-      "rotationHigh": "Rotazione alta",
-      "rotationMedium": "Rotazione media",
-      "rotationLow": "Rotazione bassa",
-      "windowLabel": "Ultimi 30 giorni",
-      "overHundred": "Questo mese hai usato più di quanto hai comprato: stai attingendo a ciò che avevi già."
+      "rotationHigh": "Alta",
+      "rotationMedium": "Media",
+      "rotationLow": "Bassa",
+      "headline": "Hai usato il {{percent}}% di ciò che hai aggiunto",
+      "headlineNoAdds": "Stai usando ciò che avevi già"
     },
     "distribution": {
       "title": "Classificazione",
-      "mostWasted": "Incidenza maggiore",
+      "mostWasted": "Più scaduto",
       "leastRotating": "Bassa rotazione",
       "unclassified": "Senza tipo di alimento: {{count}} (non contati qui)"
     },
@@ -551,8 +542,8 @@
     },
     "saved": {
       "title": "Salvati in tempo",
-      "used": "Usati nell'ultima settimana: {{count}}",
-      "wasted": "Sprecati questo mese: {{count}}"
+      "used": "Usati in tempo: {{count}}",
+      "wasted": "Buttati questo mese: {{count}}"
     },
     "topUsed": {
       "title": "Cosa usi di più",
@@ -568,6 +559,10 @@
       "title": "Congelatore",
       "detail": "Congelati: {{count}}",
       "oldest": "Il più vecchio è lì da {{oldest}}."
+    },
+    "sections": {
+      "month": "Questo mese",
+      "pantry": "La tua dispensa"
     }
   },
   "pantry": {
@@ -595,11 +590,6 @@
         "frozen": "Congelati"
       },
       "search": "Cerca prodotti"
-    },
-    "coachMark": {
-      "addFirstItem": "Aggiungi il tuo primo prodotto reale",
-      "addFirstItemHint": "Tocca per iniziare la tua dispensa",
-      "ctaLabel": "Aggiungi prodotto"
     },
     "fastAdd": {
       "groupLabel": "Aggiungi prodotti",
@@ -691,7 +681,9 @@
         "household": "Casa"
       },
       "expiry": {
-        "suggestedHint": "La data è suggerita in base al tipo di alimento. Modificala se non torna."
+        "suggestedHint": "La data è suggerita in base al tipo di alimento. Modificala se non torna.",
+        "sourceLearned": "In base ai tuoi acquisti precedenti",
+        "sourceTable": "Stimata per questo tipo di prodotto"
       }
     },
     "detail": {
@@ -889,8 +881,11 @@
       "processing": "Lettura dello scontrino…",
       "error": "Impossibile leggere lo scontrino. Inquadra solo l'elenco dei prodotti, avvicinati e cerca una buona luce.",
       "retry": "Riprova",
-      "matchExisting": "Verrà aggiunto al prodotto esistente",
-      "createNew": "Verrà creato come nuovo prodotto",
+      "statusHave": "Ce l'hai già",
+      "statusNew": "Nuovo",
+      "suggestQuestion": "È il tuo {{name}}?",
+      "suggestAccept": "Sì",
+      "notThisProduct": "Non è questo prodotto",
       "increase": "Aumenta quantità",
       "decrease": "Riduci quantità",
       "submit_one": "Aggiungi 1 prodotto",
@@ -907,7 +902,6 @@
       "promptHeader": "Scansiona scontrino",
       "promptGallery": "Scegli dalla galleria",
       "promptCamera": "Scatta foto",
-      "matchFresh": "Verrà segnato come disponibile",
       "pickerError": "Impossibile aprire la fotocamera o la galleria. Riprova.",
       "toggleDetails": "Mostra tipo e scadenza"
     },

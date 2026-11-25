@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ActionSheetController } from '@ionic/angular';
 import type { PantryItem } from '@core/models/pantry';
 import { ShoppingReason, type BoughtItem, type ManualItem, type ShoppingSuggestionWithItem } from '@core/models/list';
+import { ActivationService } from '../analytics/activation.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { HistoryEventManagerService } from '../history/history-event-manager.service';
 import { DownloadService, LoggerService, ShareService, ToastService } from '../shared';
@@ -83,6 +84,7 @@ describe('ListStateService — a manual item that duplicates a suggestion', () =
         { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'info', 'error', 'withAction']) },
         { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn', 'info']) },
         { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
+        { provide: ActivationService, useValue: { saveAsFirstProduct: jasmine.createSpy('saveAsFirstProduct').and.callFake((_s: string, save: () => Promise<void>) => save()) } },
         {
           provide: ReviewPromptService,
           useValue: jasmine.createSpyObj('ReviewPromptService', ['handlePositiveAction']),
@@ -276,6 +278,7 @@ describe('ListStateService — undoPurchase', () => {
         { provide: ToastService, useValue: toastSpy },
         { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn', 'info']) },
         { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
+        { provide: ActivationService, useValue: { saveAsFirstProduct: jasmine.createSpy('saveAsFirstProduct').and.callFake((_s: string, save: () => Promise<void>) => save()) } },
         {
           provide: ReviewPromptService,
           useValue: jasmine.createSpyObj('ReviewPromptService', ['handlePositiveAction']),
@@ -336,6 +339,7 @@ describe('ListStateService — undoPurchase', () => {
     await service.markManualAsBought('m1');
 
     expect(pantryStoreSpy.addItem).toHaveBeenCalled();
+    expect(TestBed.inject(ActivationService).saveAsFirstProduct).toHaveBeenCalledWith('list', jasmine.any(Function));
     const createdItem = itemsSignal().find(i => i.name === 'Bombillas');
     expect(createdItem).toBeDefined();
 
@@ -584,6 +588,15 @@ describe('ListStateService — undoPurchase', () => {
     await service.markManualAsBought('m1');
 
     expect(service.canUndoPurchase('m1')).toBeFalse();
+  });
+
+  it('logs a list restock as app-dated, so it never feeds learned shelf life', async () => {
+    setup([pollo()], []);
+    const events = TestBed.inject(HistoryEventManagerService) as jasmine.SpyObj<HistoryEventManagerService>;
+
+    await service.markAsBought(service.shoppingAnalysis().suggestions[0]);
+
+    expect(events.logAddExistingItem.calls.mostRecent().args[6]).toEqual({ dateFromUser: false });
   });
 
   it('keeps the undo record when the history log throws after the pantry write', async () => {

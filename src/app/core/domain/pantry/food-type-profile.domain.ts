@@ -43,7 +43,6 @@ interface FoodTypeProfileBase {
  * not have been shown.
  */
 interface PerishableProfile extends FoodTypeProfileBase {
-  shelfLifeDays: number;
   expiryMode: Exclude<ExpiryMode, 'ignore'>;
 }
 
@@ -52,7 +51,6 @@ interface PerishableProfile extends FoodTypeProfileBase {
  * be `ignore` — the two halves of that decision cannot be set separately.
  */
 interface NonPerishableProfile extends FoodTypeProfileBase {
-  shelfLifeDays: null;
   expiryMode: 'ignore';
 }
 
@@ -60,28 +58,24 @@ export type FoodTypeProfile = PerishableProfile | NonPerishableProfile;
 
 export const FOOD_TYPE_PROFILE: Record<FoodType, FoodTypeProfile> = {
   [FoodType.PROTEIN]: {
-    shelfLifeDays: 5,
     expiryMode: 'strict',
     coverageWeight: 1.2,
     chartRank: 0,
     suggestible: true,
   },
   [FoodType.VEGETABLE]: {
-    shelfLifeDays: 7,
     expiryMode: 'strict',
     coverageWeight: 0.9,
     chartRank: 1,
     suggestible: true,
   },
   [FoodType.FRUIT]: {
-    shelfLifeDays: 7,
     expiryMode: 'strict',
     coverageWeight: 0.6,
     chartRank: 2,
     suggestible: true,
   },
   [FoodType.DAIRY]: {
-    shelfLifeDays: 14,
     // Milk a day past its date is a judgement call, not rubbish.
     expiryMode: 'flexible',
     coverageWeight: 0.6,
@@ -89,7 +83,6 @@ export const FOOD_TYPE_PROFILE: Record<FoodType, FoodTypeProfile> = {
     suggestible: true,
   },
   [FoodType.CARB]: {
-    shelfLifeDays: 270,
     expiryMode: 'flexible',
     coverageWeight: 1.1,
     chartRank: 4,
@@ -97,7 +90,6 @@ export const FOOD_TYPE_PROFILE: Record<FoodType, FoodTypeProfile> = {
   },
   [FoodType.NON_PERISHABLE]: {
     // Oil, coffee and tins do carry a best-before, just years out.
-    shelfLifeDays: 540,
     expiryMode: 'flexible',
     // Staples stretch the meals you cook without being one themselves.
     coverageWeight: 0.2,
@@ -107,7 +99,6 @@ export const FOOD_TYPE_PROFILE: Record<FoodType, FoodTypeProfile> = {
   },
   [FoodType.BEVERAGE]: {
     // An opened juice goes off; a sealed bottle of water does not.
-    shelfLifeDays: 180,
     expiryMode: 'flexible',
     // Drinks are not meals, so they add no days of food coverage.
     coverageWeight: 0,
@@ -115,7 +106,6 @@ export const FOOD_TYPE_PROFILE: Record<FoodType, FoodTypeProfile> = {
     suggestible: false,
   },
   [FoodType.OTHER]: {
-    shelfLifeDays: 120,
     expiryMode: 'strict',
     coverageWeight: 0.4,
     // Too generic to draw a conclusion from, but still alerted on: the user
@@ -126,15 +116,9 @@ export const FOOD_TYPE_PROFILE: Record<FoodType, FoodTypeProfile> = {
   [FoodType.HOUSEHOLD]: {
     // Bin bags and detergent do not go off. The union makes 'ignore' the only
     // mode this can pair with.
-    shelfLifeDays: null,
     expiryMode: 'ignore',
     coverageWeight: 0,
     chartRank: null,
     suggestible: false,
   },
 };
-
-/** Whether a date means anything for this food type at all. */
-export function foodTypeExpires(foodType: FoodType): boolean {
-  return FOOD_TYPE_PROFILE[foodType].shelfLifeDays !== null;
-}

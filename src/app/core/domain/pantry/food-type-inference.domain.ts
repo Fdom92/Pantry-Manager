@@ -1,64 +1,18 @@
 import type { FoodType } from '@core/models/shared/enums.model';
 import { toLocalYmd } from '@core/utils/date.util';
-import { normalizeSearchQuery } from '@core/utils/normalization.util';
-import { foodTypeExpires, suggestExpiryDate } from './expiry-suggestion.domain';
-import { FOOD_CONCEPTS } from './food-concepts.data';
+import { suggestExpiryDate } from './expiry-suggestion.domain';
+import { genericClassFor } from './food-classes.data';
+import { resolveFoodClass } from './food-class-resolution.domain';
 
 /**
- * Flattened lookup: normalised term -> FoodType, pooled across all languages so
- * a user typing an English word in a Spanish app still matches. Built once at
- * module load. First declaration wins on collision (see FOOD_CONCEPTS docs).
- */
-const TERM_INDEX: ReadonlyMap<string, FoodType> = (() => {
-  const index = new Map<string, FoodType>();
-  for (const concept of FOOD_CONCEPTS) {
-    for (const terms of Object.values(concept.terms)) {
-      for (const term of terms) {
-        const key = normalizeSearchQuery(term);
-        if (key && !index.has(key)) index.set(key, concept.foodType);
-      }
-    }
-  }
-  return index;
-})();
-
-/** Longest term in the index, in words. Bounds the n-gram scan. */
-const MAX_TERM_WORDS: number = (() => {
-  let max = 1;
-  for (const term of TERM_INDEX.keys()) {
-    const words = term.split(' ').length;
-    if (words > max) max = words;
-  }
-  return max;
-})();
-
-/**
- * Guesses the FoodType of a product from the name the user typed.
+ * Guesses the FoodType of a product from the name the user typed, through the
+ * food class table (whole words, longest term wins).
  *
- * Scans contiguous word n-grams from longest to shortest so that a specific
- * multi-word product beats a generic single word ("tomate frito" is pantry
- * sauce, "tomate" is a fresh vegetable). Matching is whole-token only, so
- * "panceta" never matches "pan".
- *
- * Returns null when nothing matches — callers must treat that as "unknown"
+ * Returns null when nothing matches: callers must treat that as "unknown"
  * and fall back to their existing no-date behaviour.
  */
 export function inferFoodType(name: string): FoodType | null {
-  const normalized = normalizeSearchQuery(name);
-  if (!normalized) return null;
-
-  const words = normalized.split(' ').filter(Boolean);
-  if (!words.length) return null;
-
-  const maxSize = Math.min(MAX_TERM_WORDS, words.length);
-  for (let size = maxSize; size >= 1; size--) {
-    for (let start = 0; start + size <= words.length; start++) {
-      const candidate = words.slice(start, start + size).join(' ');
-      const match = TERM_INDEX.get(candidate);
-      if (match) return match;
-    }
-  }
-  return null;
+  return resolveFoodClass(name)?.foodType ?? null;
 }
 
 export interface InferredExpiry {
@@ -75,11 +29,12 @@ export interface InferredExpiry {
  * every caller can keep its existing "no date" behaviour unchanged.
  */
 export function inferExpiryForName(name: string, fromDate: Date): InferredExpiry {
-  const foodType = inferFoodType(name);
+  const klass = resolveFoodClass(name);
+  const foodType = klass?.foodType ?? null;
   return {
     foodType,
-    expirationDate: foodType ? suggestExpiryDate(foodType, fromDate) : undefined,
-    noExpiry: foodType ? !foodTypeExpires(foodType) : undefined,
+    expirationDate: klass ? suggestExpiryDate(klass, fromDate) : undefined,
+    noExpiry: klass ? klass.sealedDays === null : undefined,
   };
 }
 
@@ -105,22 +60,36 @@ export function toLotExpiry(suggested: SuggestedExpiry): { expiryDate?: string; 
   return { expiryDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
 }
 
+export type ExpirySource = 'learned_product' | 'learned_class' | 'table' | 'none';
+
+/** Learned shelf life in days; `klass` is only set once the class has enough samples. */
+export interface LearnedDays {
+  product?: number;
+  klass?: number;
+}
+
 export function resolveSuggestedExpiry(
   name: string,
   foodType: FoodType | null | undefined,
   fromDate: Date,
-  learnedDays?: number,
-): SuggestedExpiry {
-  const type = foodType ?? inferFoodType(name);
-  if (type && !foodTypeExpires(type)) return { noExpiry: true };
-  // This household's own history for the product beats any table.
-  if (learnedDays && learnedDays > 0) {
-    const date = new Date(fromDate);
-    date.setDate(date.getDate() + learnedDays);
-    return { expirationDate: toLocalYmd(date) };
+  learned?: LearnedDays,
+  foodKind?: string | null,
+): SuggestedExpiry & { source: ExpirySource } {
+  const klass = resolveFoodClass(name, foodType, foodKind);
+  if (klass?.sealedDays === null) return { noExpiry: true, source: 'none' };
+  // This household's own history beats any table: the product first, then its class.
+  const fromHistory = [
+    [learned?.product, 'learned_product'],
+    [learned?.klass, 'learned_class'],
+  ] as const;
+  for (const [days, source] of fromHistory) {
+    if (days && days > 0) {
+      const date = new Date(fromDate);
+      date.setDate(date.getDate() + days);
+      return { expirationDate: toLocalYmd(date), source };
+    }
   }
-  if (!type) return {};
-  return { expirationDate: suggestExpiryDate(type, fromDate) };
+  return klass ? { expirationDate: suggestExpiryDate(klass, fromDate), source: 'table' } : { source: 'none' };
 }
 
 /**
@@ -152,6 +121,13 @@ export function expiryAfterFoodTypeChange(
   if (row.dateFromUser && (row.expirationDate || row.noExpiry)) {
     return { expirationDate: row.expirationDate, noExpiry: row.noExpiry };
   }
-  if (!foodTypeExpires(foodType)) return { noExpiry: true };
-  return { expirationDate: suggestExpiryDate(foodType, fromDate) };
+  const klass = genericClassFor(foodType);
+  if (klass.sealedDays === null) return { noExpiry: true };
+  return { expirationDate: suggestExpiryDate(klass, fromDate) };
+}
+
+/** Where the date a row holds after a type change comes from: its own, none, or the new class's table. */
+export function expirySourceAfterFoodTypeChange(row: ExpiryEditableRow, foodType: FoodType): ExpirySource | 'user' {
+  if (row.dateFromUser && (row.expirationDate || row.noExpiry)) return 'user';
+  return genericClassFor(foodType).sealedDays === null ? 'none' : 'table';
 }

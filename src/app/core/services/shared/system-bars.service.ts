@@ -2,10 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { sheetBackdropFactor } from '@core/utils/backdrop.util';
 import { dimColor, isLightColor, parseCssColor, toHex, type Rgb } from '@core/utils/color.util';
+import type { AppThemePreference } from '@core/models';
 import { LoggerService } from './logger.service';
 
 interface SystemBarsNative {
   setStrips(options: { top: string; bottom: string; lightBars?: boolean; durationMs?: number }): Promise<void>;
+  setNightMode(options: { mode: AppThemePreference }): Promise<void>;
 }
 
 const SystemBars = registerPlugin<SystemBarsNative>('SystemBars');
@@ -58,6 +60,18 @@ export class SystemBarsService {
       attributeFilter: ['class', 'data-theme'],
     });
     void this.sync(0);
+  }
+
+  /**
+   * The native window background, all that shows before the page paints, resolves from
+   * Android's night mode, which only knows the system theme. Saving the app's own choice
+   * lets the next launch start in it instead of flashing the other colour.
+   */
+  setNightMode(mode: AppThemePreference): void {
+    if (!Capacitor.isNativePlatform()) return;
+    SystemBars.setNightMode({ mode }).catch(err =>
+      this.logger.warn('SystemBarsService', 'setNightMode failed', { err: String(err) }),
+    );
   }
 
   /**

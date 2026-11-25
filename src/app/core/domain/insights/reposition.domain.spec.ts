@@ -140,4 +140,30 @@ describe('computeRepositionPredictions', () => {
     );
     expect(computeRepositionPredictions(items, events, now)).toEqual([]);
   });
+
+  describe('observed days', () => {
+    const day = 86_400_000;
+    const consumes = (n: number) =>
+      Array.from({ length: n }, (_, i) =>
+        ev({ productId: 'p1', quantity: 1, timestamp: new Date(now.getTime() - (i + 1) * day).toISOString() }));
+
+    it('divides by 7 for a product first added 5 days ago', () => {
+      const items = [item({ _id: 'p1', createdAt: new Date(now.getTime() - 5 * day).toISOString() } as any)];
+      const [p] = computeRepositionPredictions(items, consumes(2), now);
+      expect(p.velocityPerDay).toBeCloseTo(2 / 7, 5);
+    });
+
+    it('divides by 30 for a product older than the window', () => {
+      const items = [item({ _id: 'p1', createdAt: new Date(now.getTime() - 60 * day).toISOString() } as any)];
+      const [p] = computeRepositionPredictions(items, consumes(3), now);
+      expect(p.velocityPerDay).toBeCloseTo(3 / 30, 5);
+    });
+
+    it('uses the earliest of the ADD event and createdAt', () => {
+      const items = [item({ _id: 'p1', createdAt: new Date(now.getTime() - 5 * day).toISOString() } as any)];
+      const add = ev({ eventType: 'ADD', productId: 'p1', timestamp: new Date(now.getTime() - 20 * day).toISOString() });
+      const [p] = computeRepositionPredictions(items, [add, ...consumes(2)], now);
+      expect(p.velocityPerDay).toBeCloseTo(2 / 20, 5);
+    });
+  });
 });

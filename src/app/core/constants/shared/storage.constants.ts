@@ -30,6 +30,12 @@ export const STORAGE_KEYS = {
   REVENUECAT_USER_ID: 'revenuecat:userId',
   /** Onboarding completion flag. Read synchronously in `AppComponent` for routing. */
   ONBOARDING_FLAG: 'onboarding:seen',
+  /** ISO time the 5.8 onboarding finished: the marker for activation and the start of its clock. */
+  ONBOARDING_V58_DONE: 'onboarding:v58Done',
+  /** How the first product after the 5.8 onboarding got in: onboarding | suggestion | typed | receipt. */
+  FIRST_PRODUCT_SOURCE: 'activation:firstProductSource',
+  /** Set once `activation_reached` has been reported, so a relaunch does not repeat it. */
+  ACTIVATION_REPORTED: 'activation:reported',
   // Review prompt cadence (per-device — does not transfer in backup).
   REVIEW_FIRST_USE_AT: 'review:firstUseAt',
   REVIEW_LAUNCH_COUNT: 'review:launchCount',
@@ -43,6 +49,11 @@ export const STORAGE_KEYS = {
    * re-read the phone's locale on every launch and silently undid the choice.
    */
   LANGUAGE: 'app:language',
+  /**
+   * Mirror of `AppPreferences.theme`, read by an inline script in index.html: the theme
+   * class has to be on <html> before the first paint, long before PouchDB answers.
+   */
+  THEME: 'app:theme',
   /** Set once the post-update re-consent sheet has been shown (one-shot). */
   RECONSENT_SHOWN: 'reconsent:shown',
   /**
@@ -59,6 +70,8 @@ export const STORAGE_KEYS = {
   SHOPPING_MANUAL_ITEMS: 'shopping:manualItems',
   /** One-shot flags for coach marks — keyed by CoachMarkKey. */
   COACH_MARK_PREFIX: 'coachMark:',
+  /** Despensa's Frescos section open or collapsed, as the user last left it (absent = open). */
+  PANTRY_FRESH_EXPANDED: 'pantry:freshExpanded',
   /** Number of people in household, used to scale food-coverage estimate. */
   HOUSEHOLD_SIZE: 'insights:householdSize',
 } as const;

@@ -3,6 +3,7 @@ import { buildAddItemPayload, FRESH_QTY } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { createDocumentId, withSignalFlag } from '@core/utils';
 import { ANALYTICS_EVENTS } from '@core/constants';
+import { ActivationService } from '../../analytics/activation.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { LoggerService } from '../../shared/logger.service';
@@ -20,7 +21,9 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
+  private readonly activation = inject(ActivationService);
 
+  protected readonly basicsStorage = 'fresh' as const;
   protected readonly idPrefix = 'fresh';
 
   protected belongsToCatalogue(item: PantryItem): boolean {
@@ -78,6 +81,7 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
             // date means they cleared it on purpose, and a corrected type must
             // not be overwritten by the guess the name produces.
             foodType: entry.foodType ?? undefined,
+            foodKind: entry.foodKind,
             inferExpiry: false,
           });
           const freshItem: PantryItem = {
@@ -86,14 +90,15 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
             minThreshold: undefined,
             isBasic: false,
           };
-          await this.pantryStore.addItem(freshItem);
-          await this.eventManager.logAddNewItem(freshItem, 3, sessionId, timestamp);
+          await this.activation.saveAsFirstProduct(entry.foodKind ? 'suggestion' : 'typed', () => this.pantryStore.addItem(freshItem));
+          await this.eventManager.logAddNewItem(freshItem, 3, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
           this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
             kind: 'fresh',
             source: 'fresh_add_modal',
             is_new: true,
             quantity: FRESH_QTY.sufficient,
             has_expiry: Boolean(entry.expirationDate),
+            expiry_source: entry.expirySource ?? 'none',
           });
           continue;
         }
@@ -115,13 +120,14 @@ export class PantryFreshAddModalStateService extends PantryAddEntriesBase {
           updatedAt: timestamp,
         };
         await this.pantryStore.updateItem(updated);
-        await this.eventManager.logAddExistingItem(existing, updated, 3, entry.expirationDate, sessionId, timestamp);
+        await this.eventManager.logAddExistingItem(existing, updated, 3, entry.expirationDate, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
         this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
           kind: 'fresh',
           source: 'fresh_add_modal',
           is_new: false,
           quantity: FRESH_QTY.sufficient,
           has_expiry: Boolean(entry.expirationDate),
+          expiry_source: entry.expirySource ?? 'none',
         });
       }
       this.recordSubmitted(entries);

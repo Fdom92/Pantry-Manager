@@ -1,6 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { learnedDaysFor, learnShelfLifeDays } from '@core/domain/pantry';
+import { type LearnedDays, learnedDaysFor, learnShelfLifeDays } from '@core/domain/pantry';
 import type { PantryEvent } from '@core/models/events';
+import type { FoodType } from '@core/models/shared/enums.model';
 import { HistoryEventLogService } from '../history/history-event-log.service';
 import { LoggerService } from '../shared/logger.service';
 
@@ -24,8 +25,8 @@ export class ShelfLifeLearningService {
     });
   }
 
-  /** Learned days for a product (by id when known, else by name), or undefined with no history. */
-  daysFor(name: string | null | undefined, productId?: string): number | undefined {
-    return learnedDaysFor(this.learned(), name, productId);
+  /** Learned days for a product (by id when known, else by name) and for its food class. */
+  daysFor(name: string | null | undefined, productId?: string, foodKind?: string | null, foodType?: FoodType | null): LearnedDays {
+    return learnedDaysFor(this.learned(), name, productId, foodKind, foodType);
   }
 }

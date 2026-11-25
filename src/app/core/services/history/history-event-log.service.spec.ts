@@ -30,3 +30,17 @@ describe('HistoryEventLogService snapshot', () => {
     expect(listed.map(e => e._id)).toEqual(['event:b', 'event:a']);
   });
 });
+
+describe('HistoryEventLogService foodKind / dateFromUser', () => {
+  it('stores both on the event so learning can read them back', async () => {
+    TestBed.configureTestingModule({});
+    const service = TestBed.inject(HistoryEventLogService);
+    const saveSpy = spyOn(service, 'save').and.callFake(async doc => doc as PantryEvent);
+
+    const saved = await service.logAddEvent({ productId: 'item:1', quantity: 1, foodKind: 'fresh-bread', dateFromUser: true });
+
+    expect(saveSpy).toHaveBeenCalled();
+    expect(saved?.foodKind).toBe('fresh-bread');
+    expect(saved?.dateFromUser).toBeTrue();
+  });
+});

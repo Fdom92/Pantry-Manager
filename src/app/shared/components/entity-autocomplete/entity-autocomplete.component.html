@@ -42,7 +42,7 @@
         @for (option of options; track trackOption($index, option)) {
           <ion-item button="true" class="autocomplete-option" (click)="selectOption(option)">
             <ion-label>
-              <h3>{{ option.title }}</h3>
+              <h3>@if (option.emoji) {<span aria-hidden="true">{{ option.emoji }} </span>}{{ option.title }}</h3>
               @if (showSecondaryInfo && getSecondaryInfo(option)) {
                 <p>{{ getSecondaryInfo(option) }}</p>
               }
