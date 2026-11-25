@@ -49,6 +49,11 @@ export const STORAGE_KEYS = {
    * re-read the phone's locale on every launch and silently undid the choice.
    */
   LANGUAGE: 'app:language',
+  /**
+   * Mirror of `AppPreferences.theme`, read by an inline script in index.html: the theme
+   * class has to be on <html> before the first paint, long before PouchDB answers.
+   */
+  THEME: 'app:theme',
   /** Set once the post-update re-consent sheet has been shown (one-shot). */
   RECONSENT_SHOWN: 'reconsent:shown',
   /**

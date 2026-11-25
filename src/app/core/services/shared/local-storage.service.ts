@@ -100,6 +100,11 @@ export class LocalStorageService {
     set: (v: string) => this.setString(STORAGE_KEYS.LANGUAGE, v),
   };
 
+  // ─── Theme mirror for the first paint (index.html reads it) ────────────
+  readonly theme = {
+    set: (v: string) => this.setString(STORAGE_KEYS.THEME, v),
+  };
+
   // ─── Household size (scales food-coverage estimate) ───────────────────
   readonly householdSize = {
     get: () => this.getNumber(STORAGE_KEYS.HOUSEHOLD_SIZE) ?? 1,

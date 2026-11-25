@@ -3,11 +3,13 @@ package com.fdom.pantrymind;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.view.Gravity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.Plugin;
@@ -35,6 +37,34 @@ public class SystemBarsPlugin extends Plugin {
 
     public static boolean isWebControlled() {
         return webControlled;
+    }
+
+    private static final String PREFS = "system_bars";
+    private static final String KEY_NIGHT_MODE = "night_mode";
+
+    /**
+     * The app's own theme choice as an AppCompat night mode, saved by the web side. Applied
+     * before the window exists, it makes the window background match the app instead of the
+     * phone, so launch shows no other colour.
+     */
+    public static int savedNightMode(Context context) {
+        String mode = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_NIGHT_MODE, "system");
+        return toNightMode(mode);
+    }
+
+    private static int toNightMode(String mode) {
+        if ("dark".equals(mode)) return AppCompatDelegate.MODE_NIGHT_YES;
+        if ("light".equals(mode)) return AppCompatDelegate.MODE_NIGHT_NO;
+        return AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+    }
+
+    @PluginMethod
+    public void setNightMode(PluginCall call) {
+        final String mode = call.getString("mode", "system");
+        // Only saved, for the next launch: applying it now would also flip the WebView's
+        // prefers-color-scheme, which the "system" theme relies on to read the phone's mode.
+        getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY_NIGHT_MODE, mode).apply();
+        call.resolve();
     }
 
     private int currentTop = Color.TRANSPARENT;
