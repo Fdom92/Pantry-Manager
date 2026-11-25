@@ -145,6 +145,22 @@ describe('PantryReceiptScanModalStateService', () => {
     });
   });
 
+  describe('suggestion lines', () => {
+    it('expand like new lines; the displayed name is already the ticket text', () => {
+      const line = makeLine({
+        parsed: { rawName: 'LECHE EN POLVO NESTLE', quantity: 1, confidence: 'high' },
+        match: makeMatchedItem({ name: 'Leche en polvo desnatada' }), matchScore: 0.7, matchAuto: false,
+      });
+      expect(service.isSuggestion(line)).toBe(true);
+      expect(service.canExpand(line)).toBe(true);
+      expect(service.canEditStorage(line)).toBe(true);
+      expect(service.canEditFoodType(line)).toBe(true);
+      expect(service.ticketText(line)).toBeNull();
+      // Once accepted it behaves like a matched line: the ticket text is now the extra info.
+      expect(service.ticketText({ ...line, suggestionAccepted: true })).toBe('LECHE EN POLVO NESTLE');
+    });
+  });
+
   describe('toggleExpanded', () => {
     it('flips only the targeted line', () => {
       service.reviewLines.set([makeLine({ id: 1 }), makeLine({ id: 2 })]);
