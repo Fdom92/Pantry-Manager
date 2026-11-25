@@ -128,13 +128,13 @@ export class PantryStateService {
     return this.showAllFresh() ? items : items.slice(0, 4);
   });
 
-  /** Collapsed every time the page is entered — despensa is the main list,
-   * and scrolling past an expanded fresh section to reach it was the
-   * complaint. Not persisted: it always starts collapsed. */
-  readonly freshSectionExpanded = signal(false);
+  /** Open by default (QA 5.8: a collapsed section hid the fresh products just added);
+   * a user who collapses it keeps it collapsed across launches. */
+  readonly freshSectionExpanded = signal(this.localStorage.pantryUi.isFreshExpanded());
 
   toggleFreshSection(): void {
     this.freshSectionExpanded.update(v => !v);
+    this.localStorage.pantryUi.setFreshExpanded(this.freshSectionExpanded());
   }
 
   /**

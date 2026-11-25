@@ -65,6 +65,8 @@ export const STORAGE_KEYS = {
   SHOPPING_MANUAL_ITEMS: 'shopping:manualItems',
   /** One-shot flags for coach marks — keyed by CoachMarkKey. */
   COACH_MARK_PREFIX: 'coachMark:',
+  /** Despensa's Frescos section open or collapsed, as the user last left it (absent = open). */
+  PANTRY_FRESH_EXPANDED: 'pantry:freshExpanded',
   /** Number of people in household, used to scale food-coverage estimate. */
   HOUSEHOLD_SIZE: 'insights:householdSize',
 } as const;

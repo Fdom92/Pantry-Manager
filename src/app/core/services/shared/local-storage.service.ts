@@ -106,6 +106,12 @@ export class LocalStorageService {
     set: (n: number) => this.setNumber(STORAGE_KEYS.HOUSEHOLD_SIZE, n),
   };
 
+  // ─── Despensa list layout ──────────────────────────────────────────────
+  readonly pantryUi = {
+    isFreshExpanded: () => this.getBool(STORAGE_KEYS.PANTRY_FRESH_EXPANDED, true),
+    setFreshExpanded: (v: boolean) => this.setBool(STORAGE_KEYS.PANTRY_FRESH_EXPANDED, v),
+  };
+
   // ─── Coach marks (one-shot per-device flags) ───────────────────────────
   readonly coachMark = {
     isShown: (key: string) => this.getBool(`${STORAGE_KEYS.COACH_MARK_PREFIX}${key}`),
