@@ -991,7 +991,7 @@
       "upgradeTitle": "Diventa PRO",
       "priceMonthly": "{{price}} / mese",
       "priceAnnual": "{{price}} / anno",
-      "savings": "risparmia {{percent}}%%"
+      "savings": "risparmia {{percent}}%"
     },
     "appearance": {
       "title": "Aspetto",

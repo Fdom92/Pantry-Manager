@@ -991,7 +991,7 @@
       "upgradeTitle": "Torna-te PRO",
       "priceMonthly": "{{price}} / mês",
       "priceAnnual": "{{price}} / ano",
-      "savings": "poupa {{percent}}%%"
+      "savings": "poupa {{percent}}%"
     },
     "appearance": {
       "title": "Aparência",

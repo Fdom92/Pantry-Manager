@@ -991,7 +991,7 @@
       "upgradeTitle": "Passer en PRO",
       "priceMonthly": "{{price}} / mois",
       "priceAnnual": "{{price}} / an",
-      "savings": "économisez {{percent}} %%"
+      "savings": "économisez {{percent}}%"
     },
     "appearance": {
       "title": "Apparence",

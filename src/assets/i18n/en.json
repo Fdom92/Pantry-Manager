@@ -991,7 +991,7 @@
       "upgradeTitle": "Go PRO",
       "priceMonthly": "{{price}} / month",
       "priceAnnual": "{{price}} / year",
-      "savings": "save {{percent}}%%"
+      "savings": "save {{percent}}%"
     },
     "appearance": {
       "title": "Appearance",

@@ -991,7 +991,7 @@
       "upgradeTitle": "Hazte PRO",
       "priceMonthly": "{{price}} / mes",
       "priceAnnual": "{{price}} / año",
-      "savings": "ahorra {{percent}} %%"
+      "savings": "ahorra {{percent}}%"
     },
     "appearance": {
       "title": "Apariencia",
