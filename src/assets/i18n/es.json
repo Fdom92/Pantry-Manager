@@ -490,20 +490,23 @@
         "normal": "Ajustado",
         "bad": "Bajo",
         "plenty": "De sobra"
-      }
+      },
+      "headline": "Tienes unas {{duration}} de comida"
     },
     "activity": {
       "title": "Rotación",
-      "detail": "{{added}} añadidos · {{consumed}} usados en 30 días",
-      "detailNoAdds": "{{consumed}} usados en 30 días",
+      "detail": "Añadidos: {{added}} · Usados en 30 días: {{consumed}}",
+      "detailNoAdds": "Usados en 30 días: {{consumed}}",
       "noActivity": "Sin actividad registrada",
-      "rotationHigh": "Rotación alta",
-      "rotationMedium": "Rotación media",
-      "rotationLow": "Rotación baja"
+      "rotationHigh": "Alta",
+      "rotationMedium": "Media",
+      "rotationLow": "Baja",
+      "headline": "Has usado el {{percent}} % de lo que añadiste",
+      "headlineNoAdds": "Estás gastando lo que ya tenías"
     },
     "distribution": {
       "title": "Clasificación",
-      "mostWasted": "Mayor incidencia",
+      "mostWasted": "Más caducado",
       "leastRotating": "Baja rotación",
       "unclassified": "Sin tipo de alimento: {{count}} (no cuentan aquí)"
     },
@@ -537,8 +540,8 @@
     },
     "saved": {
       "title": "Salvados a tiempo",
-      "used": "{{count}} usados a tiempo",
-      "wasted": "{{count}} tirados este mes"
+      "used": "Usados a tiempo: {{count}}",
+      "wasted": "Tirados este mes: {{count}}"
     },
     "topUsed": {
       "title": "Lo que más usas",
@@ -554,6 +557,10 @@
       "title": "Congelador",
       "detail": "Congelados: {{count}}",
       "oldest": "El más antiguo lleva {{oldest}}."
+    },
+    "sections": {
+      "month": "Este mes",
+      "pantry": "Tu despensa"
     }
   },
   "pantry": {
@@ -982,7 +989,7 @@
       "upgradeTitle": "Hazte PRO",
       "priceMonthly": "{{price}} / mes",
       "priceAnnual": "{{price}} / año",
-      "savings": "ahorra {{percent}}%"
+      "savings": "ahorra {{percent}} %%"
     },
     "appearance": {
       "title": "Apariencia",

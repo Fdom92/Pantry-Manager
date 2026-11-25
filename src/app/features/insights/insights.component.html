@@ -44,6 +44,8 @@
           <ng-container [ngTemplateOutlet]="cardSkeleton"></ng-container>
         }
       } @else {
+        <div class="insights-group">
+        <h3 class="insights-group__title">{{ 'insights.sections.month' | translate }}</h3>
         <section class="insights-section">
           <app-waste-tracker-card [summary]="facade.wasteSummary()" [isPro]="facade.isPro()" />
         </section>
@@ -66,9 +68,13 @@
             <p class="activity-empty">{{ 'insights.activity.noActivity' | translate }}</p>
           } @else {
             <div class="activity-headline-row">
-              @if (facade.activityMetrics().rotationPercent !== null) {
-                <p class="activity-headline">{{ formatPercent(facade.activityMetrics().rotationPercent!) }}</p>
-              }
+              <p class="activity-headline">
+                @if (facade.activityMetrics().rotationPercent !== null) {
+                  {{ 'insights.activity.headline' | translate: { percent: formatPercent(facade.activityMetrics().rotationPercent!) } }}
+                } @else {
+                  {{ 'insights.activity.headlineNoAdds' | translate }}
+                }
+              </p>
               <app-insight-status-pill [level]="getRotationPillLevel(rotationRatio)" [labelKey]="getRotationLabel(rotationRatio)" />
             </div>
             <p class="activity-detail">
@@ -80,6 +86,37 @@
             </p>
           }
         </section>
+
+        </div>
+
+        @if (facade.foodCoverage() || facade.topUsed().length > 0 || facade.staleProducts().length > 0 || facade.freezer().products > 0 || facade.distribution().foodTypes.length > 0) {
+        <div class="insights-group">
+        <h3 class="insights-group__title">{{ 'insights.sections.pantry' | translate }}</h3>
+        @if (facade.foodCoverage(); as coverage) {
+          <section class="insights-section">
+            <h3 class="insights-section__title">{{ 'insights.coverage.title' | translate }}</h3>
+            <div class="activity-headline-row">
+              <p class="activity-headline">{{ 'insights.coverage.headline' | translate: { duration: (coverage.days | appDuration) } }}</p>
+              @if (facade.coverageLevel(); as level) {
+                <!-- "Plenty" is a heads-up, not a problem: amber, never red -->
+                <app-insight-status-pill [level]="level === 'plenty' ? 'normal' : level" [labelKey]="'insights.coverage.level.' + level" />
+              }
+            </div>
+            <div class="household-selector">
+              <span class="household-selector__label">{{ 'insights.coverage.household' | translate }}</span>
+              <ion-segment
+                class="household-segment"
+                [value]="facade.householdSize().toString()"
+                (ionChange)="setHouseholdSize(+$event.detail.value!)">
+                @for (n of householdSizes; track n) {
+                  <ion-segment-button [value]="n.toString()">
+                    <ion-label>{{ n === 4 ? '4+' : n }}</ion-label>
+                  </ion-segment-button>
+                }
+              </ion-segment>
+            </div>
+          </section>
+        }
 
           <!-- Most used: offer to make them basics -->
           @if (facade.topUsed().length > 0) {
@@ -100,38 +137,6 @@
               </ul>
             </section>
           }
-
-        @if (facade.foodCoverage(); as coverage) {
-          <section class="insights-section">
-            <h3 class="insights-section__title">{{ 'insights.coverage.title' | translate }}</h3>
-            <div class="coverage-card">
-              <div class="coverage-card__info">
-                <div class="coverage-card__headline">
-                  <span class="coverage-card__value">
-                    {{ 'dashboard.foodCoverage.value' | translate:{ duration: (coverage.days | appDuration) } }}
-                  </span>
-                  @if (facade.coverageLevel(); as level) {
-                    <!-- "Plenty" is a heads-up, not a problem: amber, never red -->
-                    <app-insight-status-pill [level]="level === 'plenty' ? 'normal' : level" [labelKey]="'insights.coverage.level.' + level" />
-                  }
-                </div>
-              </div>
-            </div>
-            <div class="household-selector">
-              <span class="household-selector__label">{{ 'insights.coverage.household' | translate }}</span>
-              <ion-segment
-                class="household-segment"
-                [value]="facade.householdSize().toString()"
-                (ionChange)="setHouseholdSize(+$event.detail.value!)">
-                @for (n of householdSizes; track n) {
-                  <ion-segment-button [value]="n.toString()">
-                    <ion-label>{{ n === 4 ? '4+' : n }}</ion-label>
-                  </ion-segment-button>
-                }
-              </ion-segment>
-            </div>
-          </section>
-        }
 
           <!-- Stale: stock nobody touched in two months -->
           @if (facade.staleProducts().length > 0) {
@@ -207,6 +212,8 @@
               }
             </div>
           </section>
+        }
+        </div>
         }
       }
 

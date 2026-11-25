@@ -490,20 +490,23 @@
         "normal": "Knapp",
         "bad": "Niedrig",
         "plenty": "Reichlich"
-      }
+      },
+      "headline": "Du hast Essen für etwa {{duration}}"
     },
     "activity": {
       "title": "Rotation",
-      "detail": "{{added}} hinzugefügt · {{consumed}} verbraucht in 30 Tagen",
-      "detailNoAdds": "{{consumed}} verbraucht in 30 Tagen",
+      "detail": "Hinzugefügt: {{added}} · Verbraucht in 30 Tagen: {{consumed}}",
+      "detailNoAdds": "Verbraucht in 30 Tagen: {{consumed}}",
       "noActivity": "Keine Aktivität aufgezeichnet",
-      "rotationHigh": "Hohe Rotation",
-      "rotationMedium": "Mittlere Rotation",
-      "rotationLow": "Niedrige Rotation"
+      "rotationHigh": "Hoch",
+      "rotationMedium": "Mittel",
+      "rotationLow": "Niedrig",
+      "headline": "Du hast {{percent}} % von dem verbraucht, was du hinzugefügt hast",
+      "headlineNoAdds": "Du verbrauchst, was du schon hattest"
     },
     "distribution": {
       "title": "Einordnung",
-      "mostWasted": "Häufiger abgelaufen",
+      "mostWasted": "Am häufigsten abgelaufen",
       "leastRotating": "Niedrige Rotation",
       "unclassified": "Ohne Lebensmittelart: {{count}} (hier nicht gezählt)"
     },
@@ -537,8 +540,8 @@
     },
     "saved": {
       "title": "Rechtzeitig gerettet",
-      "used": "{{count}} rechtzeitig verbraucht",
-      "wasted": "{{count}} diesen Monat weggeworfen"
+      "used": "Rechtzeitig verbraucht: {{count}}",
+      "wasted": "Diesen Monat weggeworfen: {{count}}"
     },
     "topUsed": {
       "title": "Was du am meisten nutzt",
@@ -554,6 +557,10 @@
       "title": "Gefrierschrank",
       "detail": "Eingefroren: {{count}}",
       "oldest": "Das älteste liegt seit {{oldest}} drin."
+    },
+    "sections": {
+      "month": "Diesen Monat",
+      "pantry": "Dein Vorrat"
     }
   },
   "pantry": {
@@ -982,7 +989,7 @@
       "upgradeTitle": "PRO werden",
       "priceMonthly": "{{price}} / Monat",
       "priceAnnual": "{{price}} / Jahr",
-      "savings": "spare {{percent}}%"
+      "savings": "spare {{percent}} %%"
     },
     "appearance": {
       "title": "Erscheinungsbild",

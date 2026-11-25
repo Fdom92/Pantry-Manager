@@ -490,20 +490,23 @@
         "normal": "Juste",
         "bad": "Faible",
         "plenty": "Largement"
-      }
+      },
+      "headline": "Tu as environ {{duration}} de nourriture"
     },
     "activity": {
       "title": "Rotation",
-      "detail": "{{added}} ajoutés · {{consumed}} utilisés en 30 jours",
-      "detailNoAdds": "{{consumed}} utilisés en 30 jours",
+      "detail": "Ajoutés : {{added}} · Utilisés en 30 jours : {{consumed}}",
+      "detailNoAdds": "Utilisés en 30 jours : {{consumed}}",
       "noActivity": "Aucune activité enregistrée",
-      "rotationHigh": "Rotation élevée",
-      "rotationMedium": "Rotation moyenne",
-      "rotationLow": "Rotation faible"
+      "rotationHigh": "Élevée",
+      "rotationMedium": "Moyenne",
+      "rotationLow": "Faible",
+      "headline": "Tu as utilisé {{percent}} % de ce que tu as ajouté",
+      "headlineNoAdds": "Tu utilises ce que tu avais déjà"
     },
     "distribution": {
       "title": "Classification",
-      "mostWasted": "Incidence élevée",
+      "mostWasted": "Le plus périmé",
       "leastRotating": "Faible rotation",
       "unclassified": "Sans type d'aliment : {{count}} (non comptés ici)"
     },
@@ -537,8 +540,8 @@
     },
     "saved": {
       "title": "Sauvés à temps",
-      "used": "{{count}} utilisés à temps",
-      "wasted": "{{count}} jetés ce mois-ci"
+      "used": "Utilisés à temps : {{count}}",
+      "wasted": "Jetés ce mois-ci : {{count}}"
     },
     "topUsed": {
       "title": "Ce que vous utilisez le plus",
@@ -554,6 +557,10 @@
       "title": "Congélateur",
       "detail": "Congelés : {{count}}",
       "oldest": "Le plus ancien y est depuis {{oldest}}."
+    },
+    "sections": {
+      "month": "Ce mois-ci",
+      "pantry": "Ton garde-manger"
     }
   },
   "pantry": {
@@ -982,7 +989,7 @@
       "upgradeTitle": "Passer en PRO",
       "priceMonthly": "{{price}} / mois",
       "priceAnnual": "{{price}} / an",
-      "savings": "économisez {{percent}}%"
+      "savings": "économisez {{percent}} %%"
     },
     "appearance": {
       "title": "Apparence",

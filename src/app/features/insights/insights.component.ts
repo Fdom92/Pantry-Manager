@@ -113,7 +113,7 @@ export class InsightsComponent {
   }
 
   formatPercent(ratio: number): string {
-    return `${Math.round(ratio * 100)}%`;
+    return `${Math.round(ratio * 100)}`; // the bundle owns the % sign and its spacing
   }
 
   getBarWidth(count: number, maxCount: number): string {

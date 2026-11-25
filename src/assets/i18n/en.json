@@ -490,20 +490,23 @@
         "normal": "Tight",
         "bad": "Low",
         "plenty": "Plenty"
-      }
+      },
+      "headline": "You have about {{duration}} of food"
     },
     "activity": {
       "title": "Rotation",
-      "detail": "{{added}} added · {{consumed}} used in 30 days",
-      "detailNoAdds": "{{consumed}} used in 30 days",
+      "detail": "Added: {{added}} · Used in 30 days: {{consumed}}",
+      "detailNoAdds": "Used in 30 days: {{consumed}}",
       "noActivity": "No activity recorded",
-      "rotationHigh": "High rotation",
-      "rotationMedium": "Medium rotation",
-      "rotationLow": "Low rotation"
+      "rotationHigh": "High",
+      "rotationMedium": "Medium",
+      "rotationLow": "Low",
+      "headline": "You've used {{percent}}% of what you added",
+      "headlineNoAdds": "You're using up what you already had"
     },
     "distribution": {
       "title": "Breakdown",
-      "mostWasted": "Higher incidence",
+      "mostWasted": "Most expired",
       "leastRotating": "Low rotation",
       "unclassified": "No food type: {{count}} (not counted here)"
     },
@@ -537,8 +540,8 @@
     },
     "saved": {
       "title": "Saved in time",
-      "used": "{{count}} used in time",
-      "wasted": "{{count}} thrown away this month"
+      "used": "Used in time: {{count}}",
+      "wasted": "Thrown away this month: {{count}}"
     },
     "topUsed": {
       "title": "What you use most",
@@ -554,6 +557,10 @@
       "title": "Freezer",
       "detail": "Frozen: {{count}}",
       "oldest": "The oldest has been in for {{oldest}}."
+    },
+    "sections": {
+      "month": "This month",
+      "pantry": "Your pantry"
     }
   },
   "pantry": {
@@ -982,7 +989,7 @@
       "upgradeTitle": "Go PRO",
       "priceMonthly": "{{price}} / month",
       "priceAnnual": "{{price}} / year",
-      "savings": "save {{percent}}%"
+      "savings": "save {{percent}}%%"
     },
     "appearance": {
       "title": "Appearance",

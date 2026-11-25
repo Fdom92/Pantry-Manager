@@ -490,20 +490,23 @@
         "normal": "Limitata",
         "bad": "Bassa",
         "plenty": "Abbondante"
-      }
+      },
+      "headline": "Hai circa {{duration}} di cibo"
     },
     "activity": {
       "title": "Rotazione",
-      "detail": "{{added}} aggiunti · {{consumed}} usati in 30 giorni",
-      "detailNoAdds": "{{consumed}} usati in 30 giorni",
+      "detail": "Aggiunti: {{added}} · Usati in 30 giorni: {{consumed}}",
+      "detailNoAdds": "Usati in 30 giorni: {{consumed}}",
       "noActivity": "Nessuna attività registrata",
-      "rotationHigh": "Rotazione alta",
-      "rotationMedium": "Rotazione media",
-      "rotationLow": "Rotazione bassa"
+      "rotationHigh": "Alta",
+      "rotationMedium": "Media",
+      "rotationLow": "Bassa",
+      "headline": "Hai usato il {{percent}}% di ciò che hai aggiunto",
+      "headlineNoAdds": "Stai usando ciò che avevi già"
     },
     "distribution": {
       "title": "Classificazione",
-      "mostWasted": "Incidenza maggiore",
+      "mostWasted": "Più scaduto",
       "leastRotating": "Bassa rotazione",
       "unclassified": "Senza tipo di alimento: {{count}} (non contati qui)"
     },
@@ -537,8 +540,8 @@
     },
     "saved": {
       "title": "Salvati in tempo",
-      "used": "{{count}} usati in tempo",
-      "wasted": "{{count}} buttati questo mese"
+      "used": "Usati in tempo: {{count}}",
+      "wasted": "Buttati questo mese: {{count}}"
     },
     "topUsed": {
       "title": "Cosa usi di più",
@@ -554,6 +557,10 @@
       "title": "Congelatore",
       "detail": "Congelati: {{count}}",
       "oldest": "Il più vecchio è lì da {{oldest}}."
+    },
+    "sections": {
+      "month": "Questo mese",
+      "pantry": "La tua dispensa"
     }
   },
   "pantry": {
@@ -982,7 +989,7 @@
       "upgradeTitle": "Diventa PRO",
       "priceMonthly": "{{price}} / mese",
       "priceAnnual": "{{price}} / anno",
-      "savings": "risparmia {{percent}}%"
+      "savings": "risparmia {{percent}}%%"
     },
     "appearance": {
       "title": "Aspetto",
