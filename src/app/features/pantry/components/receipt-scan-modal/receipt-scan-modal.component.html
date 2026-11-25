@@ -83,10 +83,6 @@
                       [attr.aria-label]="'pantry.receiptScan.editNameTitle' | translate">
                       <p class="receipt-line__name">{{ state.displayName(line) }}</p>
                       <div class="receipt-line__sub">
-                        @let ticket = state.ticketText(line);
-                        @if (ticket) {
-                          <span class="receipt-line__ticket">{{ 'pantry.receiptScan.ticketText' | translate: { name: ticket } }}</span>
-                        }
                         @switch (state.lineStatus(line)) {
                           @case ('have') {
                             <span class="receipt-line__pill receipt-line__pill--have">{{ 'pantry.receiptScan.statusHave' | translate }}</span>
@@ -139,6 +135,10 @@
 
                   @if (line.expanded && state.canExpand(line)) {
                     <div class="receipt-line__details" [id]="'receipt-line-details-' + line.id">
+                      @let ticket = state.ticketText(line);
+                      @if (ticket) {
+                        <p class="receipt-line__ticket">{{ ticket }}</p>
+                      }
                       @if (state.canEditStorage(line)) {
                         <!-- Chips act on click, the last event of a tap. The old ion-segment committed on
                              touchend, the re-render moved the row and Chrome's click then hit the date chip. -->

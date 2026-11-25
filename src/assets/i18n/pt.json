@@ -881,7 +881,6 @@
       "processing": "A ler o talão…",
       "error": "Não foi possível ler o talão. Enquadre apenas a lista de produtos, aproxime-se e procure boa luz.",
       "retry": "Tentar novamente",
-      "ticketText": "talão: {{name}}",
       "statusHave": "Já tem",
       "statusNew": "Novo",
       "suggestQuestion": "É o seu {{name}}?",

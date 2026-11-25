@@ -881,7 +881,6 @@
       "processing": "Lecture du ticket…",
       "error": "Impossible de lire le ticket. Cadrez uniquement la liste des produits, rapprochez-vous et cherchez une bonne lumière.",
       "retry": "Réessayer",
-      "ticketText": "ticket : {{name}}",
       "statusHave": "Déjà chez vous",
       "statusNew": "Nouveau",
       "suggestQuestion": "C'est votre {{name}} ?",

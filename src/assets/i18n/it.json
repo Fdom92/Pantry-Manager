@@ -881,7 +881,6 @@
       "processing": "Lettura dello scontrino…",
       "error": "Impossibile leggere lo scontrino. Inquadra solo l'elenco dei prodotti, avvicinati e cerca una buona luce.",
       "retry": "Riprova",
-      "ticketText": "scontrino: {{name}}",
       "statusHave": "Ce l'hai già",
       "statusNew": "Nuovo",
       "suggestQuestion": "È il tuo {{name}}?",

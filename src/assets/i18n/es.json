@@ -881,7 +881,6 @@
       "processing": "Leyendo el ticket…",
       "error": "No se ha podido leer el ticket. Encuadra solo la lista de productos, acércate más y busca buena luz.",
       "retry": "Volver a intentar",
-      "ticketText": "ticket: {{name}}",
       "statusHave": "Ya la tienes",
       "statusNew": "Nuevo",
       "suggestQuestion": "¿Es tu {{name}}?",

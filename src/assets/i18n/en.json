@@ -881,7 +881,6 @@
       "processing": "Reading the receipt…",
       "error": "Couldn't read the receipt. Frame only the product list, get closer and find good light.",
       "retry": "Try again",
-      "ticketText": "receipt: {{name}}",
       "statusHave": "Already have it",
       "statusNew": "New",
       "suggestQuestion": "Is it your {{name}}?",

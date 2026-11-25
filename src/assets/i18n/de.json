@@ -881,7 +881,6 @@
       "processing": "Bon wird gelesen…",
       "error": "Bon konnte nicht gelesen werden. Erfasse nur die Produktliste, geh näher ran und sorge für gutes Licht.",
       "retry": "Erneut versuchen",
-      "ticketText": "Kassenbon: {{name}}",
       "statusHave": "Schon vorhanden",
       "statusNew": "Neu",
       "suggestQuestion": "Ist es dein {{name}}?",
