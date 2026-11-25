@@ -1,4 +1,5 @@
 import { parseExpiryDate } from '@core/utils/date.util';
+import { cachedIntl } from '@core/utils/formatting.util';
 
 /**
  * How a number of days is shown to the user. The single rule behind every
@@ -30,7 +31,7 @@ export function toDisplayDuration(days: number): DisplayDuration {
 /** "9 meses", "1 día", "3 weeks" — a length of time with no direction. */
 export function formatDuration(days: number, locale: string): string {
   const { value, unit } = toDisplayDuration(days);
-  return new Intl.NumberFormat(locale, { style: 'unit', unit, unitDisplay: 'long' }).format(value);
+  return cachedIntl(`duration:${locale}:${unit}`, () => new Intl.NumberFormat(locale, { style: 'unit', unit, unitDisplay: 'long' })).format(value);
 }
 
 /**
@@ -45,7 +46,7 @@ export function formatRelativeDays(days: number, locale: string): string {
   // Words only for today/tomorrow/yesterday: 'auto' would also say "pasado
   // mañana" or "el próximo año", which reads as a calendar date, not a span.
   const numeric = unit === 'day' && value <= 1 ? 'auto' : 'always';
-  return new Intl.RelativeTimeFormat(locale, { numeric }).format(signed, unit);
+  return cachedIntl(`relative:${locale}:${numeric}`, () => new Intl.RelativeTimeFormat(locale, { numeric })).format(signed, unit);
 }
 
 export type DisplayDateStyle = 'dayMonth' | 'dayMonthLong' | 'short' | 'long' | 'dateTime';
@@ -66,5 +67,5 @@ export function formatDisplayDate(
 ): string {
   const date = value instanceof Date ? value : parseExpiryDate(value);
   if (date === null || Number.isNaN(date.getTime())) return '';
-  return new Intl.DateTimeFormat(locale, DATE_STYLES[style]).format(date);
+  return cachedIntl(`date:${locale}:${style}`, () => new Intl.DateTimeFormat(locale, DATE_STYLES[style])).format(date);
 }
