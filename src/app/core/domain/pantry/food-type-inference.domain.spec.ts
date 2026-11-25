@@ -1,9 +1,7 @@
-import { SUPPORTED_LANGUAGES } from '@core/constants';
 import { FoodType } from '@core/models/shared/enums.model';
-import { normalizeSearchQuery } from '@core/utils/normalization.util';
-import { EXPIRY_SUGGESTION_DAYS } from './expiry-suggestion.domain';
-import { FOOD_CONCEPTS } from './food-concepts.data';
-import { inferExpiryForName, inferFoodType, resolveSuggestedExpiry } from './food-type-inference.domain';
+import { suggestExpiryDate } from './expiry-suggestion.domain';
+import { FOOD_CLASS_BY_KEY, genericClassFor } from './food-classes.data';
+import { expiryAfterFoodTypeChange, expirySourceAfterFoodTypeChange, inferExpiryForName, inferFoodType, resolveSuggestedExpiry } from './food-type-inference.domain';
 
 describe('inferFoodType', () => {
   it('matches a simple single-word term', () => {
@@ -86,64 +84,13 @@ describe('inferFoodType on a real household catalogue', () => {
   }
 });
 
-describe('FOOD_CONCEPTS data integrity', () => {
-  it('has a unique key per concept', () => {
-    const keys = FOOD_CONCEPTS.map(c => c.key);
-    expect(new Set(keys).size).toBe(keys.length);
-  });
-
-  it('declares at least one term for every supported language', () => {
-    for (const concept of FOOD_CONCEPTS) {
-      for (const lang of SUPPORTED_LANGUAGES) {
-        const terms = concept.terms[lang];
-        expect(terms?.length)
-          .withContext(`concept "${concept.key}" is missing terms for "${lang}"`)
-          .toBeGreaterThan(0);
-      }
-    }
-  });
-
-  it('stores every term already normalised (lowercase, unaccented)', () => {
-    for (const concept of FOOD_CONCEPTS) {
-      for (const terms of Object.values(concept.terms)) {
-        for (const term of terms) {
-          expect(term)
-            .withContext(`concept "${concept.key}" has a non-normalised term`)
-            .toBe(normalizeSearchQuery(term));
-        }
-      }
-    }
-  });
-
-  it('resolves every declared term back to its own foodType', () => {
-    // Guards against a term being silently shadowed by an earlier concept.
-    // A shadowed term is allowed only if both concepts share the same foodType.
-    for (const concept of FOOD_CONCEPTS) {
-      for (const terms of Object.values(concept.terms)) {
-        for (const term of terms) {
-          expect(inferFoodType(term))
-            .withContext(`term "${term}" (concept "${concept.key}") resolves elsewhere`)
-            .toBe(concept.foodType);
-        }
-      }
-    }
-  });
-});
-
 describe('inferExpiryForName', () => {
   const from = new Date('2026-01-01T12:00:00');
 
   it('returns the foodType and a suggested date for a known term', () => {
     const result = inferExpiryForName('leche', from);
     expect(result.foodType).toBe(FoodType.DAIRY);
-    // DAIRY shelf life comes from the shared table, not a literal here
-    const days = EXPIRY_SUGGESTION_DAYS[FoodType.DAIRY] as number;
-    const expected = new Date(from);
-    expected.setDate(expected.getDate() + days);
-    const y = expected.getFullYear();
-    const m = String(expected.getMonth() + 1).padStart(2, '0');
-    const d = String(expected.getDate()).padStart(2, '0');
-    expect(result.expirationDate).toBe(`${y}-${m}-${d}`);
+    expect(result.expirationDate).toBe(suggestExpiryDate(FOOD_CLASS_BY_KEY.get('uht-milk')!, from));
   });
 
   it('marks a never-expiring type as noExpiry instead of dating it', () => {
@@ -159,22 +106,77 @@ describe('inferExpiryForName', () => {
   });
 });
 
-describe('resolveSuggestedExpiry with a learned shelf life', () => {
+describe('resolveSuggestedExpiry', () => {
   const from = new Date('2026-01-01T12:00:00');
 
-  it('prefers what this household learned over the type default', () => {
-    expect(resolveSuggestedExpiry('Huevos', FoodType.PROTEIN, from, 21).expirationDate).toBe('2026-01-22');
+  it('prefers what this household learned for the product', () => {
+    expect(resolveSuggestedExpiry('Huevos', FoodType.PROTEIN, from, { product: 10 }))
+      .toEqual({ expirationDate: '2026-01-11', source: 'learned_product' });
   });
 
   it('dates a product the catalogue does not know, once learned', () => {
-    expect(resolveSuggestedExpiry('Smileat cocidito', null, from, 300).expirationDate).toBe('2026-10-28');
+    expect(resolveSuggestedExpiry('Smileat cocidito', null, from, { product: 300 }).expirationDate).toBe('2026-10-28');
   });
 
-  it('never dates a type that does not expire', () => {
-    expect(resolveSuggestedExpiry('Bolsas de basura', FoodType.HOUSEHOLD, from, 30)).toEqual({ noExpiry: true });
+  it('uses the class-level learning when the product has none', () => {
+    expect(resolveSuggestedExpiry('Huevos', FoodType.PROTEIN, from, { klass: 6 }))
+      .toEqual({ expirationDate: '2026-01-07', source: 'learned_class' });
   });
 
-  it('falls back to the type when nothing was learned', () => {
-    expect(resolveSuggestedExpiry('Huevos', FoodType.PROTEIN, from, undefined).expirationDate).toBe('2026-01-06');
+  it('prefers the product over the class', () => {
+    expect(resolveSuggestedExpiry('Huevos', FoodType.PROTEIN, from, { product: 10, klass: 6 }).source).toBe('learned_product');
+  });
+
+  it('never dates a class that does not expire, even with learned days', () => {
+    expect(resolveSuggestedExpiry('Bolsas de basura', FoodType.HOUSEHOLD, from, { product: 30 }))
+      .toEqual({ noExpiry: true, source: 'none' });
+    expect(resolveSuggestedExpiry('Sal', null, from, { product: 30 })).toEqual({ noExpiry: true, source: 'none' });
+  });
+
+  it('falls back to the class table when nothing was learned', () => {
+    const eggs = FOOD_CLASS_BY_KEY.get('eggs')!;
+    expect(resolveSuggestedExpiry('Huevos', FoodType.PROTEIN, from)).toEqual({
+      expirationDate: suggestExpiryDate(eggs, from),
+      source: 'table',
+    });
+  });
+
+  it('suggests no date without a class or a type', () => {
+    expect(resolveSuggestedExpiry('xyzzy', null, from)).toEqual({ source: 'none' });
+  });
+
+  it('dates fresh bread by its class, not by the 270 days of the carb type', () => {
+    const bread = FOOD_CLASS_BY_KEY.get('fresh-bread')!;
+    const result = resolveSuggestedExpiry('Pan', null, from);
+    expect(result.expirationDate).toBe(suggestExpiryDate(bread, from));
+    expect(result.expirationDate).toBe('2026-01-04');
+  });
+
+  it('a stored type wins over the name (corrected by hand)', () => {
+    expect(resolveSuggestedExpiry('Pan', FoodType.DAIRY, from).expirationDate)
+      .toBe(suggestExpiryDate(genericClassFor(FoodType.DAIRY), from));
+  });
+});
+
+describe('expiryAfterFoodTypeChange', () => {
+  const from = new Date('2026-01-01T12:00:00');
+
+  it('re-derives from the generic class of the new type', () => {
+    expect(expiryAfterFoodTypeChange({}, FoodType.DAIRY, from))
+      .toEqual({ expirationDate: suggestExpiryDate(genericClassFor(FoodType.DAIRY), from) });
+    expect(expiryAfterFoodTypeChange({}, FoodType.HOUSEHOLD, from)).toEqual({ noExpiry: true });
+  });
+
+  it('keeps a date the user set', () => {
+    expect(expiryAfterFoodTypeChange({ expirationDate: '2026-02-02', dateFromUser: true }, FoodType.DAIRY, from))
+      .toEqual({ expirationDate: '2026-02-02', noExpiry: undefined });
+  });
+});
+
+describe('expirySourceAfterFoodTypeChange', () => {
+  it('is user when the user date survives, none for a class without expiry, table otherwise', () => {
+    expect(expirySourceAfterFoodTypeChange({ expirationDate: '2026-02-02', dateFromUser: true }, FoodType.DAIRY)).toBe('user');
+    expect(expirySourceAfterFoodTypeChange({}, FoodType.HOUSEHOLD)).toBe('none');
+    expect(expirySourceAfterFoodTypeChange({ expirationDate: '2026-02-02' }, FoodType.DAIRY)).toBe('table');
   });
 });

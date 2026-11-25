@@ -1,8 +1,9 @@
 import type { BatchIdGenerator, ItemBatch, PantryItem } from '@core/models/pantry';
-import { FoodType } from '@core/models/shared/enums.model';
 import { toLocalYmd } from '@core/utils/date.util';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { normalizeSearchQuery } from '@core/utils/normalization.util';
+import { FoodType } from '@core/models/shared/enums.model';
+import type { FoodClass } from './food-classes.model';
 
 /**
  * One-tap actions on "the lot that is due": opening, moving, freezing and
@@ -15,31 +16,19 @@ export const THAW_MAX_DAYS = 3;
 
 const DAY_MS = 86_400_000;
 
-/**
- * Days a product keeps once opened, by food type. null = opening does not
- * shorten its date (rice, salt, bin bags).
- */
-// shortcut: one value per type (labels mostly say 3-5 days), review with the shelf-life table before 5.7 ships.
-export function openedShelfDays(foodType: FoodType | undefined): number | null {
+/** Food types that should go to the fridge once opened (independent of the class's opened days). */
+export function needsFridgeWhenOpen(foodType: FoodType | undefined): boolean {
   switch (foodType) {
     case FoodType.PROTEIN:
     case FoodType.FRUIT:
-      return 3;
     case FoodType.DAIRY:
     case FoodType.VEGETABLE:
-      return 4;
     case FoodType.BEVERAGE:
     case FoodType.OTHER:
-      return 5;
+      return true;
     default:
-      // CARB, NON_PERISHABLE, HOUSEHOLD, unknown: opening does not shorten them.
-      return null;
+      return false;
   }
-}
-
-/** Food types that should go to the fridge once opened. */
-export function needsFridgeWhenOpen(foodType: FoodType | undefined): boolean {
-  return openedShelfDays(foodType) !== null;
 }
 
 function expiryTime(batch: ItemBatch): number {
@@ -97,14 +86,14 @@ const isSealed = (b: ItemBatch) => !b.opened && !b.frozenAt;
 /** Opens one unit of the due sealed lot. null when nothing sealed is left. */
 export function openOne(
   batches: readonly ItemBatch[],
-  foodType: FoodType | undefined,
+  klass: FoodClass | null,
   now: Date,
   newId: BatchIdGenerator,
   fridgeLocationId?: string,
 ): { batches: ItemBatch[]; index: number } | null {
   const index = dueBatchIndex(batches, isSealed);
   if (index === -1) return null;
-  const days = openedShelfDays(foodType);
+  const days = klass?.openedDays ?? null;
   return changeOneUnit(batches, index, unit => {
     const opened: ItemBatch = { ...unit, opened: true, openedAt: now.toISOString() };
     if (days !== null) {
@@ -117,8 +106,9 @@ export function openOne(
         opened.expirationDate = shortened;
         opened.noExpiry = undefined;
       }
-      if (fridgeLocationId) opened.locationId = fridgeLocationId;
     }
+    // The caller decides by food type whether it goes to the fridge; days only shorten the date.
+    if (fridgeLocationId) opened.locationId = fridgeLocationId;
     return opened;
   }, newId);
 }
@@ -154,9 +144,10 @@ export function freezeOne(
   }, newId);
 }
 
-/** Thaws one unit of the frozen lot frozen longest ago: date = today + days left, max THAW_MAX_DAYS. */
+/** Thaws one unit of the frozen lot frozen longest ago: date = today + days left, max the class thaw days (THAW_MAX_DAYS by default). */
 export function thawOne(
   batches: readonly ItemBatch[],
+  klass: FoodClass | null,
   now: Date,
   newId: BatchIdGenerator,
   fridgeLocationId?: string,
@@ -172,7 +163,7 @@ export function thawOne(
     const thawed: ItemBatch = { ...rest, ...(fridgeLocationId ? { locationId: fridgeLocationId } : {}) };
     if (frozenDaysLeft !== undefined) {
       const date = new Date(now);
-      date.setDate(date.getDate() + Math.min(THAW_MAX_DAYS, Math.max(1, frozenDaysLeft)));
+      date.setDate(date.getDate() + Math.min(klass?.thawDays ?? THAW_MAX_DAYS, Math.max(1, frozenDaysLeft)));
       thawed.expirationDate = toLocalYmd(date);
     }
     return thawed;

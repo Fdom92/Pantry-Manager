@@ -45,6 +45,16 @@ export class LocalStorageService {
     },
   };
 
+  readonly activation = {
+    getOnboardedAt: () => this.getDate(STORAGE_KEYS.ONBOARDING_V58_DONE),
+    setOnboardedAt: (v: Date | string) => this.setDate(STORAGE_KEYS.ONBOARDING_V58_DONE, v),
+    getFirstSource: () => this.getString(STORAGE_KEYS.FIRST_PRODUCT_SOURCE),
+    setFirstSource: (v: string) => this.setString(STORAGE_KEYS.FIRST_PRODUCT_SOURCE, v),
+    clearFirstSource: () => this.remove(STORAGE_KEYS.FIRST_PRODUCT_SOURCE),
+    isReported: () => this.getBool(STORAGE_KEYS.ACTIVATION_REPORTED),
+    markReported: () => this.setBool(STORAGE_KEYS.ACTIVATION_REPORTED, true),
+  };
+
   readonly reconsent = {
     isShown: () => this.getBool(STORAGE_KEYS.RECONSENT_SHOWN),
     markShown: () => this.setBool(STORAGE_KEYS.RECONSENT_SHOWN, true),
@@ -90,10 +100,21 @@ export class LocalStorageService {
     set: (v: string) => this.setString(STORAGE_KEYS.LANGUAGE, v),
   };
 
+  // ─── Theme mirror for the first paint (index.html reads it) ────────────
+  readonly theme = {
+    set: (v: string) => this.setString(STORAGE_KEYS.THEME, v),
+  };
+
   // ─── Household size (scales food-coverage estimate) ───────────────────
   readonly householdSize = {
     get: () => this.getNumber(STORAGE_KEYS.HOUSEHOLD_SIZE) ?? 1,
     set: (n: number) => this.setNumber(STORAGE_KEYS.HOUSEHOLD_SIZE, n),
+  };
+
+  // ─── Despensa list layout ──────────────────────────────────────────────
+  readonly pantryUi = {
+    isFreshExpanded: () => this.getBool(STORAGE_KEYS.PANTRY_FRESH_EXPANDED, true),
+    setFreshExpanded: (v: boolean) => this.setBool(STORAGE_KEYS.PANTRY_FRESH_EXPANDED, v),
   };
 
   // ─── Coach marks (one-shot per-device flags) ───────────────────────────

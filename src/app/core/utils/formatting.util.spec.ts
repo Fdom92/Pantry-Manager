@@ -1,4 +1,4 @@
-import { roundQuantity, toNumberOrZero } from './formatting.util';
+import { formatQuantity, roundQuantity, toNumberOrZero } from './formatting.util';
 
 describe('toNumberOrZero', () => {
   it('converts valid number string to number', () => {
@@ -61,5 +61,29 @@ describe('roundQuantity', () => {
   it('handles negative values', () => {
     expect(roundQuantity(-1.4)).toBe(-1);
     expect(roundQuantity(-1.5)).toBe(-1);
+  });
+});
+
+describe('formatQuantity', () => {
+  it('formats a rounded quantity in the locale', () => {
+    expect(formatQuantity(1234.4, 'es-ES')).toBe('1234');
+    expect(formatQuantity(1234.4, 'en-US')).toBe('1,234');
+  });
+
+  it('reuses one Intl.NumberFormat per locale', () => {
+    const Orig = Intl.NumberFormat;
+    let built = 0;
+    (Intl as unknown as Record<string, unknown>)['NumberFormat'] = class extends Orig {
+      constructor(...args: ConstructorParameters<typeof Intl.NumberFormat>) {
+        super(...args);
+        built++;
+      }
+    };
+    try {
+      for (let i = 0; i < 3; i++) formatQuantity(i, 'it-IT');
+      expect(built).toBeLessThanOrEqual(1);
+    } finally {
+      (Intl as unknown as Record<string, unknown>)['NumberFormat'] = Orig;
+    }
   });
 });

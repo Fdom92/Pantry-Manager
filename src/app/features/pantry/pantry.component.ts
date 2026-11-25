@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, inject, OnDestroy, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
@@ -33,7 +33,7 @@ import { FreshAddModalComponent } from './components/fresh-add-modal/fresh-add-m
 import { FreshEditItemModalComponent } from './components/fresh-edit-item-modal/fresh-edit-item-modal.component';
 import { PantryReceiptScanModalComponent } from './components/receipt-scan-modal/receipt-scan-modal.component';
 import { PantryPendientesSheetComponent } from './components/pantry-pendientes-sheet/pantry-pendientes-sheet.component';
-import { PantryAddCoachMarkComponent } from './components/add-coach-mark/add-coach-mark.component';
+import { FirstStepsStateService } from '@core/services/retention/first-steps-state.service';
 import { CoachMarkStateService } from '@core/services/retention/coach-mark-state.service';
 
 @Component({
@@ -69,50 +69,27 @@ import { CoachMarkStateService } from '@core/services/retention/coach-mark-state
     FreshEditItemModalComponent,
     PantryReceiptScanModalComponent,
     PantryPendientesSheetComponent,
-    PantryAddCoachMarkComponent,
   ],
   templateUrl: './pantry.component.html',
   styleUrls: ['./pantry.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [PANTRY_PAGE_PROVIDERS],
 })
-export class PantryComponent implements AfterViewInit, OnDestroy {
+export class PantryComponent implements OnDestroy {
   readonly facade = inject(PantryStateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly addModalState = inject(PantryAddModalStateService);
   private readonly coachMark = inject(CoachMarkStateService);
+  private readonly firstSteps = inject(FirstStepsStateService);
   @ViewChild(IonContent) private content!: IonContent;
-  @ViewChild('despensaAddBtn') private despensaAddBtnRef?: ElementRef<HTMLElement>;
 
-  private readonly coachMarkDismissed = signal(false);
   readonly showStarHint = signal(false);
-  // Holds the button element once ViewChild is resolved (ngAfterViewInit).
-  // Signal makes showCoachMark reactive to the ref becoming available.
-  readonly addBtnEl = signal<HTMLElement | null>(null);
 
-  readonly showCoachMark = computed(() =>
-    !this.coachMarkDismissed() &&
-    this.addBtnEl() !== null &&
-    this.facade.hasSeenOnboarding() &&
-    !this.coachMark.isShown('add_first_item') &&
-    this.facade.hasCompletedInitialLoad() &&
-    this.facade.summary().total === 0
-  );
-
-  ngAfterViewInit(): void {
-    if (this.despensaAddBtnRef) {
-      this.addBtnEl.set(this.despensaAddBtnRef.nativeElement);
-    }
-  }
-
-  onCoachMarkAddRequested(): void {
-    this.coachMarkDismissed.set(true);
-    this.addModalState.open();
-  }
-
-  onCoachMarkDismissed(): void {
-    this.coachMarkDismissed.set(true);
+  onFirstStep(action: 'add' | 'scan'): void {
+    this.firstSteps.choose(action, 'pantry');
+    if (action === 'add') this.facade.openAddModal();
+    else this.facade.startReceiptScan();
   }
 
   ionViewDidEnter(): void {
@@ -140,6 +117,27 @@ export class PantryComponent implements AfterViewInit, OnDestroy {
       void this.router.navigate([], {
         relativeTo: this.route,
         queryParams: { openAddModal: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
+
+    if (this.route.snapshot.queryParams['startReceiptScan'] === 'true') {
+      this.facade.startReceiptScan();
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { startReceiptScan: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+    }
+
+    const search = this.route.snapshot.queryParams['search'];
+    if (search) {
+      this.facade.searchFor(search);
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { search: null },
         queryParamsHandling: 'merge',
         replaceUrl: true,
       });

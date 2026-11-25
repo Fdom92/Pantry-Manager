@@ -2,6 +2,7 @@ import {
   dedupeByNormalizedKey,
   formatFriendlyName,
   normalizeCategoryId,
+  normalizeForClassification,
   normalizeLocationId,
   normalizeLowercase,
   normalizeProductKey,
@@ -222,5 +223,32 @@ describe('normalizeProductKey', () => {
     for (const name of ['Atún', 'Atun', 'Café con leche', 'JAMÓN serrano']) {
       expect(normalizeProductKey(name)).toBe(normalizeSearchField(name));
     }
+  });
+});
+
+describe('normalizeForClassification', () => {
+  it('folds ligatures that the accent stripper leaves alone', () => {
+    expect(normalizeForClassification('Œufs')).toBe('oeufs');
+    expect(normalizeForClassification('ÆBLE')).toBe('aeble');
+  });
+
+  it('turns hyphens into spaces so compound names match word by word', () => {
+    expect(normalizeForClassification('Grão-de-bico')).toBe('grao de bico');
+  });
+
+  it('collapses spaces and trims', () => {
+    expect(normalizeForClassification('  Pan   de molde ')).toBe('pan de molde');
+  });
+
+  it('handles null and undefined', () => {
+    expect(normalizeForClassification(null)).toBe('');
+    expect(normalizeForClassification(undefined)).toBe('');
+  });
+
+  // Regression: identity must not move. Values captured before the
+  // classification normaliser existed.
+  it('leaves normalizeProductKey output unchanged for ligatures and hyphens', () => {
+    expect(normalizeProductKey('Œufs')).toBe('œufs');
+    expect(normalizeProductKey('Grão-de-bico')).toBe('grao-de-bico');
   });
 });

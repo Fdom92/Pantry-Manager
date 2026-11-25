@@ -22,7 +22,7 @@ import { LoggerService } from '../../shared/logger.service';
 import { ToastService } from '../../shared';
 import { PantryStateService } from '../pantry-state.service';
 import { PantryStoreService } from '../pantry-store.service';
-import { buildConvertToFreshPreview, consolidateBatchesForFresh } from '@core/domain/pantry';
+import { buildConvertToFreshPreview, consolidateBatchesForFresh, foodKindAfterEdit } from '@core/domain/pantry';
 import { PantryEditModalBase } from './pantry-edit-modal-base';
 
 @Injectable()
@@ -352,17 +352,19 @@ export class PantryEditItemModalStateService extends PantryEditModalBase {
       normalizedMinThreshold = Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : undefined;
     }
 
+    const normalizedName = normalizeTrim(name);
     const normalizedSupermarket = normalizeSupermarketValue(supermarket);
     const normalizedCategory = normalizeCategoryId(categoryId);
 
     return {
       ...existing,
-      name: normalizeTrim(name),
+      name: normalizedName,
       categoryId: normalizedCategory,
       supermarket: normalizedSupermarket,
       isBasic: isBasic ? true : undefined,
       minThreshold: isBasic ? normalizedMinThreshold : undefined,
       foodType: foodType ?? undefined,
+      foodKind: foodKindAfterEdit(existing, { name: normalizedName, foodType: foodType ?? undefined }),
       updatedAt: now,
     };
   }

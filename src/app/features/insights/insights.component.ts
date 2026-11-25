@@ -24,7 +24,6 @@ import { ProPaywallCardComponent } from '@shared/components/pro-paywall-card/pro
 import { EmptyStateComponent } from '@shared/components/empty-state/empty-state.component';
 import { InsightStatusPillComponent } from '@shared/components/insight-status-pill/insight-status-pill.component';
 import { DurationPipe } from '@shared/pipes/date-display.pipes';
-import { COVERAGE_LEVEL_DAYS } from '@core/domain/insights/insights-free.domain';
 
 @Component({
   selector: 'app-insights',
@@ -75,8 +74,9 @@ export class InsightsComponent {
 
   /** From the "untouched" card: open the pantry already searched for that product. */
   openInPantry(name: string): void {
-    this.facade.searchPantryFor(name);
-    void this.navCtrl.navigateRoot('/pantry');
+    this.facade.trackStaleOpened();
+    // Via query param: the pantry clears its search on entry, so a search set beforehand is lost.
+    void this.navCtrl.navigateRoot('/pantry', { queryParams: { search: name } });
   }
 
   ionViewDidEnter(): void {
@@ -113,7 +113,7 @@ export class InsightsComponent {
   }
 
   formatPercent(ratio: number): string {
-    return `${Math.round(ratio * 100)}%`;
+    return `${Math.round(ratio * 100)}`; // the bundle owns the % sign and its spacing
   }
 
   getBarWidth(count: number, maxCount: number): string {
@@ -142,7 +142,6 @@ export class InsightsComponent {
   }
 
   readonly householdSizes = [1, 2, 3, 4] as const;
-  readonly coverageDays = COVERAGE_LEVEL_DAYS;
 
   setHouseholdSize(n: number): void {
     this.facade.setHouseholdSize(n);

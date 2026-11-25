@@ -1,9 +1,11 @@
 package com.fdom.pantrymind;
 
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -17,7 +19,11 @@ public class MainActivity extends BridgeActivity {
         // Local plugins must be registered before super.onCreate builds the bridge.
         registerPlugin(InstallSourcePlugin.class);
         registerPlugin(SystemBarsPlugin.class);
+        // The in-app theme, not the phone's, decides the window background resources.
+        AppCompatDelegate.setDefaultNightMode(SystemBarsPlugin.savedNightMode(this));
         super.onCreate(savedInstanceState);
+        // WebView paints white until the page does; transparent lets the night-aware window background show.
+        getBridge().getWebView().setBackgroundColor(Color.TRANSPARENT);
         applyInsetsWithKeyboard();
     }
 

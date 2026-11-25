@@ -9,7 +9,7 @@ import { LocalStorageService, LoggerService, ToastService } from '@core/services
 import { UpgradeRevenuecatService } from '@core/services/upgrade';
 import { NotificationSchedulerService } from '@core/services/notifications';
 import { SyncService } from '@core/services/sync/sync.service';
-import { AnalyticsService, InstallSourceService } from '@core/services/analytics';
+import { ActivationService, AnalyticsService, InstallSourceService } from '@core/services/analytics';
 import { buildPersonProfile } from '@core/domain/analytics';
 import { PantryStoreService } from '@core/services/pantry/pantry-store.service';
 import { SettingsPreferencesService } from '@core/services/settings/settings-preferences.service';
@@ -53,6 +53,8 @@ export class AppComponent {
   private readonly prefs = inject(SettingsPreferencesService);
   private readonly clock = inject(ClockService);
   private readonly toast = inject(ToastService);
+  // Injected for its effect: reports activation_reached.
+  private readonly activation = inject(ActivationService);
   private lastExitPromptAt = 0;
 
   constructor() {

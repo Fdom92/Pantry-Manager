@@ -12,6 +12,9 @@ export type BaseEventParams = {
   source?: EventSource;
   categoryId?: string;
   foodType?: FoodType;
+  foodKind?: string;
+  /** True only when the user set the date; false for dates the app suggested. */
+  dateFromUser?: boolean;
   expirationDate?: string;
   daysToExpiry?: number;
   editedFields?: string[];

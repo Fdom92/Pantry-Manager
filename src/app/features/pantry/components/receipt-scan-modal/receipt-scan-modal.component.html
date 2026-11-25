@@ -82,41 +82,28 @@
                       (keydown.enter)="state.editLineName(line.id)"
                       [attr.aria-label]="'pantry.receiptScan.editNameTitle' | translate">
                       <p class="receipt-line__name">{{ state.displayName(line) }}</p>
-                      @if (state.isFreshMatch(line)) {
-                        <p class="receipt-line__meta receipt-line__meta--match">
-                          <ion-icon name="leaf-outline"></ion-icon>
-                          {{ 'pantry.receiptScan.matchFresh' | translate }}
-                        </p>
-                      } @else if (state.isAutoMatch(line)) {
-                        <p class="receipt-line__meta receipt-line__meta--match">
-                          <ion-icon name="link-outline"></ion-icon>
-                          {{ 'pantry.receiptScan.matchExisting' | translate }}
-                          @if (line.foodType) {
-                            · {{ 'pantry.form.foodType.' + line.foodType | translate }}
+                      <div class="receipt-line__sub">
+                        @switch (state.lineStatus(line)) {
+                          @case ('have') {
+                            <span class="receipt-line__pill receipt-line__pill--have">{{ 'pantry.receiptScan.statusHave' | translate }}</span>
                           }
-                          @if (line.noExpiry) {
-                            · {{ 'pantry.batches.noExpiryIntentional' | translate }}
-                          } @else if (line.expirationDate) {
-                            · {{ line.expirationDate | appExpiry }}
+                          @case ('new') {
+                            <span class="receipt-line__pill">{{ 'pantry.receiptScan.statusNew' | translate }}</span>
                           }
-                        </p>
-                      } @else {
-                        <p class="receipt-line__meta">
-                          <ion-icon name="add-circle-outline"></ion-icon>
-                          {{ 'pantry.receiptScan.createNew' | translate }}
-                          @if (line.foodType) {
-                            · {{ 'pantry.form.foodType.' + line.foodType | translate }}
+                          @case ('suggestion') {
+                            <span class="receipt-line__pill receipt-line__pill--suggest">
+                              <span class="receipt-line__pill-text">{{ 'pantry.receiptScan.suggestQuestion' | translate: { name: line.match!.name } }}</span>
+                              <!-- Inside the body, whose click renames the line: keep the accept tap from also opening that prompt. -->
+                              <button type="button" class="receipt-line__suggest-btn" (click)="$event.stopPropagation(); state.acceptSuggestion(line.id)">
+                                {{ 'pantry.receiptScan.suggestAccept' | translate }}
+                              </button>
+                            </span>
                           }
-                          @if (line.noExpiry) {
-                            · {{ 'pantry.batches.noExpiryIntentional' | translate }}
-                          } @else if (line.expirationDate) {
-                            · {{ line.expirationDate | appExpiry }}
-                          }
-                        </p>
-                      }
+                        }
+                      </div>
                     </div>
 
-                    @if (!state.isFreshMatch(line)) {
+                    @if (!state.isFreshLine(line)) {
                       <div class="receipt-line__qty">
                         <button
                           type="button"
@@ -148,6 +135,23 @@
 
                   @if (line.expanded && state.canExpand(line)) {
                     <div class="receipt-line__details" [id]="'receipt-line-details-' + line.id">
+                      @let ticket = state.ticketText(line);
+                      @if (ticket) {
+                        <p class="receipt-line__ticket">{{ ticket }}</p>
+                      }
+                      @if (state.canEditStorage(line)) {
+                        <!-- Chips act on click, the last event of a tap. The old ion-segment committed on
+                             touchend, the re-render moved the row and Chrome's click then hit the date chip. -->
+                        @for (place of storagePlaces; track place) {
+                          <ion-chip
+                            class="receipt-line__storage-chip"
+                            [class.receipt-line__storage-chip--active]="line.storage === place"
+                            [attr.aria-pressed]="line.storage === place"
+                            (click)="state.setLineStorage(line.id, place)">
+                            <ion-label>{{ 'pantry.sections.' + place | translate }}</ion-label>
+                          </ion-chip>
+                        }
+                      }
                       @if (state.canEditFoodType(line)) {
                         <app-food-type-picker
                           [foodType]="line.foodType"
@@ -162,6 +166,11 @@
                           (dateChange)="state.setLineExpirationDate(line.id, $event)"
                           (noExpiryToggle)="state.setLineNoExpiry(line.id)">
                         </app-expiry-picker>
+                      }
+                      @if (state.isAutoMatch(line)) {
+                        <button type="button" class="receipt-line__unmatch" (click)="state.unmatchLine(line.id)">
+                          {{ 'pantry.receiptScan.notThisProduct' | translate }}
+                        </button>
                       }
                     </div>
                   }

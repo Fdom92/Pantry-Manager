@@ -1,4 +1,5 @@
 import { FoodType } from '@core/models/shared/enums.model';
+import { resolveFoodClass } from './food-class-resolution.domain';
 import { buildAddItemPayload } from './pantry-builder.domain';
 
 const BASE = {
@@ -148,6 +149,25 @@ describe('buildAddItemPayload — foodType inference', () => {
   });
 });
 
+describe('buildAddItemPayload — foodKind', () => {
+  const base = { id: 'item:1', nowIso: '2026-01-01T12:00:00.000Z', quantity: 1 };
+
+  it('stores the class the name resolves to', () => {
+    const item = buildAddItemPayload({ ...base, name: 'leche' });
+    expect(item.foodKind).toBe(resolveFoodClass('leche')?.key);
+    expect(item.foodKind).toBeDefined();
+  });
+
+  it('stores the generic of the type when the stated type contradicts the name', () => {
+    const item = buildAddItemPayload({ ...base, name: 'Pan', foodType: FoodType.DAIRY });
+    expect(item.foodKind).toBe('generic-dairy');
+  });
+
+  it('leaves it unset when nothing matches', () => {
+    expect(buildAddItemPayload({ ...base, name: 'xyzzy' }).foodKind).toBeUndefined();
+  });
+});
+
 describe('buildAddItemPayload — opting out of date inference', () => {
   const base = { id: 'item:1', nowIso: '2026-01-01T12:00:00.000Z', quantity: 1 };
 
@@ -186,8 +206,14 @@ describe('an explicit food type beats the name', () => {
     expect(item.batches[0].expirationDate).toBeDefined();
   });
 
-  it('leaves such a product dateless when no type is stated', () => {
+  it('suggests a date for a ligature name the table now recognises when no type is stated', () => {
     const item = buildAddItemPayload({ ...BASE, name: 'Œufs' });
+
+    expect(item.batches[0].expirationDate).toBeDefined();
+  });
+
+  it('leaves an unknown name dateless when no type is stated', () => {
+    const item = buildAddItemPayload({ ...BASE, name: 'Kombucha' });
 
     expect(item.batches[0].expirationDate).toBeUndefined();
   });

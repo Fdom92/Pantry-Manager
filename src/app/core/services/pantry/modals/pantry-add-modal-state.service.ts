@@ -3,6 +3,7 @@ import { buildAddItemPayload } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import { createDocumentId, withSignalFlag } from '@core/utils';
 import { ANALYTICS_EVENTS } from '@core/constants';
+import { ActivationService } from '../../analytics/activation.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { LoggerService } from '../../shared/logger.service';
@@ -20,7 +21,9 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
   private readonly logger = inject(LoggerService);
+  private readonly activation = inject(ActivationService);
 
+  protected readonly basicsStorage = 'pantry' as const;
   protected readonly idPrefix = 'add';
 
   /** Legacy items without a productType count as despensa by convention. */
@@ -53,6 +56,8 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
       return {
         ...entry,
         noExpiry: toggled || undefined,
+        dateFromUser: toggled || entry.dateFromUser,
+        expirySource: 'user',
         expirationDate: toggled ? undefined : entry.expirationDate,
       };
     });
@@ -84,17 +89,19 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
             // chips, so whatever it holds now is the user's decision — an empty
             // date means they cleared it on purpose.
             foodType: entry.foodType ?? undefined,
+            foodKind: entry.foodKind,
             inferExpiry: false,
           });
           const item: PantryItem = { ...base, productType: 'pantry' };
-          await this.pantryStore.addItem(item);
-          await this.eventManager.logAddNewItem(item, entry.quantity, sessionId, timestamp);
+          await this.activation.saveAsFirstProduct(entry.foodKind ? 'suggestion' : 'typed', () => this.pantryStore.addItem(item));
+          await this.eventManager.logAddNewItem(item, entry.quantity, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
           this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
             kind: 'despensa',
             source: 'add_modal',
             is_new: true,
             quantity: entry.quantity,
             has_expiry: Boolean(entry.expirationDate),
+            expiry_source: entry.expirySource ?? 'none',
           });
           continue;
         }
@@ -106,13 +113,14 @@ export class PantryAddModalStateService extends PantryAddEntriesBase {
         });
         if (updated) {
           await this.pantryStore.updateItem(updated);
-          await this.eventManager.logAddExistingItem(entry.item, updated, entry.quantity, entry.expirationDate, sessionId, timestamp);
+          await this.eventManager.logAddExistingItem(entry.item, updated, entry.quantity, entry.expirationDate, sessionId, timestamp, { dateFromUser: !!entry.dateFromUser });
           this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
             kind: 'despensa',
             source: 'add_modal',
             is_new: false,
             quantity: entry.quantity,
             has_expiry: Boolean(entry.expirationDate),
+            expiry_source: entry.expirySource ?? 'none',
           });
         }
       }

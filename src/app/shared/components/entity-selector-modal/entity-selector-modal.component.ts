@@ -11,6 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { EntityAutocompleteComponent, type AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
 import { FoodTypePickerComponent } from '@shared/components/food-type-picker/food-type-picker.component';
+import type { ExpirySource } from '@core/domain/pantry';
 import type { FoodType } from '@core/models/shared/enums.model';
 
 export interface EntitySelectorEntry {
@@ -21,6 +22,7 @@ export interface EntitySelectorEntry {
   expirationDate?: string;
   noExpiry?: boolean;
   foodType?: FoodType | null;
+  expirySource?: ExpirySource | 'user';
 }
 
 @Component({

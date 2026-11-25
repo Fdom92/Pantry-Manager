@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { PantryReceiptScanModalStateService } from './pantry-receipt-scan-modal-state.service';
 import { PantryStoreService } from '../pantry-store.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { ActivationService } from '../../analytics/activation.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { ReceiptLlmClientService } from '../../receipt/receipt-llm-client.service';
 import { UpgradeRevenuecatService } from '../../upgrade/upgrade-revenuecat.service';
@@ -10,6 +11,8 @@ import { LoggerService } from '../../shared/logger.service';
 import { ToastService } from '../../shared';
 import { AlertController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
+import { FRESH_QTY } from '@core/domain/pantry';
+import { ANALYTICS_EVENTS } from '@core/constants';
 import { FoodType } from '@core/models/shared/enums.model';
 import { inferFoodType, resolveSuggestedExpiry } from '@core/domain/pantry/food-type-inference.domain';
 import type { ReceiptReviewLine } from '@core/models/receipt';
@@ -36,12 +39,15 @@ describe('PantryReceiptScanModalStateService', () => {
       parsed: { rawName: 'MANZANAS GOLDEN', quantity: 2, confidence: 'high' },
       match: null,
       matchScore: 0,
+      matchAuto: false,
       included: true,
       quantity: 2,
       foodType: null,
       expirationDate: undefined,
       noExpiry: undefined,
       dateFromUser: false,
+      storage: 'pantry',
+      suggestedStorage: 'pantry',
       expanded: false,
       ...overrides,
     };
@@ -73,6 +79,7 @@ describe('PantryReceiptScanModalStateService', () => {
         { provide: PantryStoreService, useValue: pantryStore },
         { provide: HistoryEventManagerService, useValue: jasmine.createSpyObj('HistoryEventManagerService', ['logAddExistingItem', 'logAddNewItem']) },
         { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
+        { provide: ActivationService, useValue: { saveAsFirstProduct: (_s: string, save: () => Promise<void>) => save() } },
         { provide: TranslateService, useValue: jasmine.createSpyObj('TranslateService', ['instant']) },
         { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'error', 'info']) },
         { provide: AlertController, useValue: alertCtrl },
@@ -85,6 +92,33 @@ describe('PantryReceiptScanModalStateService', () => {
     service = TestBed.inject(PantryReceiptScanModalStateService);
   });
 
+  describe('collapsed line: status pill and ticket text', () => {
+    it('an auto match, fresh restock included, reads "have"', () => {
+      expect(service.lineStatus(makeLine({ match: makeMatchedItem(), matchAuto: true }))).toBe('have');
+      expect(service.lineStatus(makeLine({ match: makeMatchedItem({ productType: 'fresh' }), matchAuto: true }))).toBe('have');
+      expect(service.lineStatus(makeLine({ match: makeMatchedItem(), suggestionAccepted: true }))).toBe('have');
+    });
+
+    it('an unconfirmed match is a suggestion, no match is new', () => {
+      expect(service.lineStatus(makeLine({ match: makeMatchedItem(), matchAuto: false }))).toBe('suggestion');
+      expect(service.lineStatus(makeLine())).toBe('new');
+    });
+
+    it('shows the ticket text only when it differs from the displayed name', () => {
+      // New line: displayed name is the ticket text in Title Case.
+      expect(service.ticketText(makeLine())).toBeNull();
+      // Accents and spacing are not a difference worth a second line.
+      expect(service.ticketText(makeLine({
+        parsed: { rawName: 'LECHE  ENTERA', quantity: 1, confidence: 'high' },
+        match: makeMatchedItem({ name: 'Leche entéra' }), matchAuto: true,
+      }))).toBeNull();
+      expect(service.ticketText(makeLine({
+        parsed: { rawName: 'LCHE ENT HCD', quantity: 1, confidence: 'high' },
+        match: makeMatchedItem({ name: 'Leche entera' }), matchAuto: true,
+      }))).toBe('LCHE ENT HCD');
+    });
+  });
+
   describe('canEditFoodType / canEditExpiry / canExpand', () => {
     it('allows editing both for a brand-new line', () => {
       const line = makeLine();
@@ -95,7 +129,7 @@ describe('PantryReceiptScanModalStateService', () => {
 
     it('allows only expiry for a matched non-fresh line', () => {
       const matched = makeMatchedItem({ productType: 'pantry' });
-      const line = makeLine({ match: matched, matchScore: 0.95 });
+      const line = makeLine({ match: matched, matchScore: 0.95, matchAuto: true });
       expect(service.canEditFoodType(line)).toBe(false);
       expect(service.canEditExpiry(line)).toBe(true);
       expect(service.canExpand(line)).toBe(true);
@@ -103,10 +137,27 @@ describe('PantryReceiptScanModalStateService', () => {
 
     it('allows neither for a matched fresh line', () => {
       const matched = makeMatchedItem({ productType: 'fresh' });
-      const line = makeLine({ match: matched, matchScore: 0.95 });
+      const line = makeLine({ match: matched, matchScore: 0.95, matchAuto: true });
       expect(service.canEditFoodType(line)).toBe(false);
       expect(service.canEditExpiry(line)).toBe(false);
-      expect(service.canExpand(line)).toBe(false);
+      // Still expandable: "not this product" lives in the accordion of a matched line.
+      expect(service.canExpand(line)).toBe(true);
+    });
+  });
+
+  describe('suggestion lines', () => {
+    it('expand like new lines; the displayed name is already the ticket text', () => {
+      const line = makeLine({
+        parsed: { rawName: 'LECHE EN POLVO NESTLE', quantity: 1, confidence: 'high' },
+        match: makeMatchedItem({ name: 'Leche en polvo desnatada' }), matchScore: 0.7, matchAuto: false,
+      });
+      expect(service.isSuggestion(line)).toBe(true);
+      expect(service.canExpand(line)).toBe(true);
+      expect(service.canEditStorage(line)).toBe(true);
+      expect(service.canEditFoodType(line)).toBe(true);
+      expect(service.ticketText(line)).toBeNull();
+      // Once accepted it behaves like a matched line: the ticket text is now the extra info.
+      expect(service.ticketText({ ...line, suggestionAccepted: true })).toBe('LECHE EN POLVO NESTLE');
     });
   });
 
@@ -198,7 +249,7 @@ describe('PantryReceiptScanModalStateService', () => {
           id: 1,
           parsed: { rawName: 'LECHE ENTERA', quantity: 1, confidence: 'high' },
           match: matched,
-          matchScore: 0.95,
+          matchScore: 0.95, matchAuto: true,
           foodType: FoodType.DAIRY,
           expirationDate: '2026-01-01',
           dateFromUser: false,
@@ -261,6 +312,206 @@ describe('PantryReceiptScanModalStateService', () => {
       const line = service.reviewLines()[0];
       expect(line.foodType).not.toBe(FoodType.DAIRY);
       expect(line.foodType).toBe(inferFoodType('PERAS CONFERENCE'));
+    });
+  });
+
+  describe('storage and submit', () => {
+    let events: jasmine.SpyObj<HistoryEventManagerService>;
+    let analytics: jasmine.SpyObj<AnalyticsService>;
+    beforeEach(() => {
+      events = TestBed.inject(HistoryEventManagerService) as jasmine.SpyObj<HistoryEventManagerService>;
+      analytics = TestBed.inject(AnalyticsService) as jasmine.SpyObj<AnalyticsService>;
+    });
+
+    it('a new fresh line with quantity 6 is one "sufficient" batch, never 6 (Review Focus 3)', async () => {
+      service.reviewLines.set([makeLine({
+        parsed: { rawName: 'MANZANAS GOLDEN', quantity: 6, confidence: 'high' },
+        quantity: 6,
+        storage: 'fresh',
+        suggestedStorage: 'fresh',
+        foodType: FoodType.FRUIT,
+      })]);
+      await service.submit();
+      const item = pantryStore.addItem.calls.mostRecent().args[0] as PantryItem;
+      expect(item.productType).toBe('fresh');
+      expect(item.isBasic).toBeFalse();
+      expect(item.minThreshold).toBeUndefined();
+      expect(item.batches.length).toBe(1);
+      expect(item.batches[0].quantity).toBe(FRESH_QTY.sufficient);
+    });
+
+    it('a pantry line keeps the ticket quantity', async () => {
+      service.reviewLines.set([makeLine({ quantity: 6 })]);
+      await service.submit();
+      const item = pantryStore.addItem.calls.mostRecent().args[0] as PantryItem;
+      expect(item.productType).toBe('pantry');
+      expect(item.batches[0].quantity).toBe(6);
+    });
+
+    it('an unknown product defaults to pantry on scan-time derivation', () => {
+      const line = makeLine({ parsed: { rawName: 'ZZQX', quantity: 1, confidence: 'high' } });
+      service.reviewLines.set([line]);
+      service.setLineFoodType(1, FoodType.OTHER);
+      expect(service.reviewLines()[0].storage).toBe('pantry');
+    });
+
+    it('a restocked fresh item gets a new date, not the previous batch one', async () => {
+      const matched = makeMatchedItem({
+        productType: 'fresh', name: 'Manzanas',
+        batches: [{ batchId: 'b1', quantity: 0, expirationDate: '2020-01-01' }],
+      });
+      service.reviewLines.set([makeLine({
+        match: matched, matchScore: 0.95, matchAuto: true, expirationDate: '2026-12-01',
+      })]);
+      await service.submit();
+      const saved = pantryStore.updateItem.calls.mostRecent().args[0] as PantryItem;
+      expect(saved.batches[0].expirationDate).toBe('2026-12-01');
+      expect(saved.batches[0].quantity).toBe(FRESH_QTY.sufficient);
+      expect(events.logAddExistingItem.calls.mostRecent().args[3]).toBe('2026-12-01');
+    });
+
+    it('a matched fresh item with an unclassifiable name gets no date, and logs the stored quantity', async () => {
+      const matched = makeMatchedItem({
+        productType: 'fresh', name: 'Zzqx', foodType: undefined,
+        batches: [{ batchId: 'b1', quantity: 0, expirationDate: '2020-01-01' }],
+      });
+      service.reviewLines.set([makeLine({
+        parsed: { rawName: 'ZZQX', quantity: 6, confidence: 'high' }, quantity: 6,
+        match: matched, matchScore: 0.95, matchAuto: true, expirationDate: undefined,
+      })]);
+      await service.submit();
+      const saved = pantryStore.updateItem.calls.mostRecent().args[0] as PantryItem;
+      expect(saved.batches[0].expirationDate).toBeUndefined();
+      expect(events.logAddExistingItem.calls.mostRecent().args[2]).toBe(FRESH_QTY.sufficient);
+    });
+
+    it('PANTRY_ITEM_ADDED sends the stored quantity for a new fresh line', async () => {
+      service.reviewLines.set([makeLine({ quantity: 6, storage: 'fresh', suggestedStorage: 'fresh' })]);
+      await service.submit();
+      const args = analytics.track.calls.allArgs().find(a => a[0] === ANALYTICS_EVENTS.PANTRY_ITEM_ADDED)![1] as Record<string, unknown>;
+      expect(args['quantity']).toBe(FRESH_QTY.sufficient);
+    });
+
+    it('a storage override survives a food-type change and a rename', async () => {
+      alertCtrl.create.and.callFake((config: any) => {
+        const save = config.buttons.find((b: any) => typeof b.handler === 'function');
+        queueMicrotask(() => save.handler({ name: 'PERAS CONFERENCE' }));
+        return Promise.resolve({ present: () => Promise.resolve() } as any);
+      });
+      service.reviewLines.set([makeLine()]);
+      service.setLineStorage(1, 'fresh');
+      service.setLineFoodType(1, FoodType.OTHER);
+      expect(service.reviewLines()[0].storage).toBe('fresh');
+      await service.editLineName(1);
+      await Promise.resolve();
+      expect(service.reviewLines()[0].storage).toBe('fresh');
+    });
+
+    it('setLineStorage changes the destination and counts as storage_changed', async () => {
+      service.reviewLines.set([makeLine({ id: 1 }), makeLine({ id: 2, storage: 'fresh', suggestedStorage: 'fresh' })]);
+      service.setLineStorage(1, 'fresh');
+      expect(service.reviewLines()[0].storage).toBe('fresh');
+      await service.submit();
+      const args = analytics.track.calls.allArgs().find(a => a[0] === ANALYTICS_EVENTS.RECEIPT_SCAN_COMPLETED)![1] as Record<string, unknown>;
+      expect(args['fresh_lines']).toBe(2);
+      expect(args['storage_changed']).toBe(1);
+      expect(events.logAddNewItem).toHaveBeenCalledTimes(2);
+    });
+
+    it('picking the storage a line already has does nothing, not even an edit event', () => {
+      service.reviewLines.set([makeLine()]);
+      service.setLineStorage(1, 'pantry');
+      expect(analytics.track).not.toHaveBeenCalledWith(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'storage' });
+    });
+
+    it('toggling back to the suggestion is not a change', async () => {
+      service.reviewLines.set([makeLine()]);
+      service.setLineStorage(1, 'fresh');
+      service.setLineStorage(1, 'pantry');
+      await service.submit();
+      const args = analytics.track.calls.allArgs().find(a => a[0] === ANALYTICS_EVENTS.RECEIPT_SCAN_COMPLETED)![1] as Record<string, unknown>;
+      expect(args['storage_changed']).toBe(0);
+      expect(args['fresh_lines']).toBe(0);
+    });
+  });
+  describe('suggestions and unmatch (stricter auto-match)', () => {
+    let events: jasmine.SpyObj<HistoryEventManagerService>;
+    let analytics: jasmine.SpyObj<AnalyticsService>;
+    const completedArgs = () =>
+      analytics.track.calls.allArgs().find(a => a[0] === ANALYTICS_EVENTS.RECEIPT_SCAN_COMPLETED)![1] as Record<string, unknown>;
+
+    beforeEach(() => {
+      events = TestBed.inject(HistoryEventManagerService) as jasmine.SpyObj<HistoryEventManagerService>;
+      analytics = TestBed.inject(AnalyticsService) as jasmine.SpyObj<AnalyticsService>;
+    });
+
+    const suggested = (overrides: Partial<ReceiptReviewLine> = {}) => makeLine({
+      parsed: { rawName: 'LECHE', quantity: 1, confidence: 'high' },
+      quantity: 1,
+      match: makeMatchedItem({ name: 'Leche en polvo' }),
+      matchScore: 0.8,
+      matchAuto: false,
+      ...overrides,
+    });
+
+    it('a non-auto match is a suggestion, not an auto match', () => {
+      const line = suggested();
+      expect(service.isAutoMatch(line)).toBeFalse();
+      expect(service.isSuggestion(line)).toBeTrue();
+    });
+
+    it('an unaccepted suggestion is saved as a NEW product and counted in suggested_lines (Review Focus 5)', async () => {
+      service.reviewLines.set([suggested()]);
+      await service.submit();
+      expect(pantryStore.addNewLot).not.toHaveBeenCalled();
+      expect(pantryStore.addItem).toHaveBeenCalledTimes(1);
+      expect((pantryStore.addItem.calls.mostRecent().args[0] as PantryItem).name).toBe('Leche');
+      expect(completedArgs()['suggested_lines']).toBe(1);
+      expect(completedArgs()['suggested_accepted']).toBe(0);
+    });
+
+    it('acceptSuggestion joins the line to the product and restocks it', async () => {
+      service.reviewLines.set([suggested()]);
+      service.acceptSuggestion(1);
+      expect(service.isAutoMatch(service.reviewLines()[0])).toBeTrue();
+      pantryStore.addNewLot.and.resolveTo(makeMatchedItem());
+      await service.submit();
+      expect(pantryStore.addNewLot).toHaveBeenCalledTimes(1);
+      expect(pantryStore.addItem).not.toHaveBeenCalled();
+      expect(completedArgs()['suggested_lines']).toBe(1);
+      expect(completedArgs()['suggested_accepted']).toBe(1);
+      expect(completedArgs()['no_match_lines']).toBe(0);
+    });
+
+    it('a suggestion keeps its own class for expiry until accepted', () => {
+      const raw = 'TOMATE TRITURADO';
+      const own = resolveSuggestedExpiry(raw, inferFoodType(raw), new Date()).expirationDate;
+      const line = suggested({
+        parsed: { rawName: raw, quantity: 1, confidence: 'high' },
+        match: makeMatchedItem({ name: 'Tomate frito casero', foodType: FoodType.NON_PERISHABLE, foodKind: 'jam-spreads' }),
+      });
+      const derive = (l: ReceiptReviewLine) => (service as any).deriveLineFields(l) as Partial<ReceiptReviewLine>;
+      expect(derive(line).expirationDate).toBe(own);
+      const kind = resolveSuggestedExpiry(raw, FoodType.NON_PERISHABLE, new Date(), undefined, 'jam-spreads').expirationDate;
+      expect(kind).not.toBe(own);
+      expect(derive({ ...line, suggestionAccepted: true }).expirationDate).toBe(kind);
+    });
+
+    it('unmatchLine releases a matched line and saves it under the ticket name', async () => {
+      service.reviewLines.set([makeLine({
+        parsed: { rawName: 'TOMATE TRITURADO', quantity: 1, confidence: 'high' },
+        quantity: 1,
+        match: makeMatchedItem({ name: 'Tomate' }), matchScore: 0.9, matchAuto: true,
+      })]);
+      service.unmatchLine(1);
+      const line = service.reviewLines()[0];
+      expect(line.match).toBeNull();
+      expect(service.isAutoMatch(line)).toBeFalse();
+      expect(service.displayName(line)).toBe('Tomate Triturado');
+      await service.submit();
+      expect((pantryStore.addItem.calls.mostRecent().args[0] as PantryItem).name).toBe('Tomate Triturado');
+      expect(completedArgs()['no_match_lines']).toBe(1);
+      expect(events.logAddNewItem).toHaveBeenCalled();
     });
   });
 });

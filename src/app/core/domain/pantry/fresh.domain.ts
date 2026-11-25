@@ -77,16 +77,24 @@ export function consolidateBatchesForFresh(
  * rather than generated here so this stays a pure function, matching
  * `consolidateBatchesForFresh`.
  */
-export function restockFreshItem(item: PantryItem, timestamp: string, fallbackBatchId: string): PantryItem {
+export function restockFreshItem(
+  item: PantryItem,
+  timestamp: string,
+  fallbackBatchId: string,
+  expiry?: { expirationDate?: string; noExpiry?: boolean },
+): PantryItem {
   const previous = item.batches?.[0];
+  // A restock is a new unit: when the caller passes an expiry (even an empty one),
+  // the old (possibly expired) date and "opened" flag describe the previous purchase.
+  const fresh = !!expiry;
   return {
     ...item,
     batches: [{
       batchId: previous?.batchId ?? fallbackBatchId,
       quantity: FRESH_QTY.sufficient,
-      expirationDate: previous?.expirationDate,
-      noExpiry: previous?.noExpiry,
-      opened: previous?.opened,
+      expirationDate: fresh ? expiry!.expirationDate : previous?.expirationDate,
+      noExpiry: fresh ? expiry!.noExpiry : previous?.noExpiry,
+      opened: fresh ? undefined : previous?.opened,
       locationId: previous?.locationId,
     }],
     updatedAt: timestamp,

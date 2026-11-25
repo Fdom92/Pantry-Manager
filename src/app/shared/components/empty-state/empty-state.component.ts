@@ -24,6 +24,8 @@ export class EmptyStateComponent implements OnInit {
   @Input() hideTitle = false;
   @Input() showAction = false;
   @Input() actionLabel?: string;
+  /** Second button, rendered only when set. */
+  @Input() secondaryActionLabel?: string;
   @Input() compact = false;
   /**
    * A section-level hint: small icon + secondary text, no card. The analytics event still
@@ -32,6 +34,7 @@ export class EmptyStateComponent implements OnInit {
   @Input() inline = false;
   @Input() iconColor?: EmptyStateColor;
   @Output() action = new EventEmitter<void>();
+  @Output() secondaryAction = new EventEmitter<void>();
 
   /**
    * Reporting from the component rather than from each of its fifteen call

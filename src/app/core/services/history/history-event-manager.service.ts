@@ -13,7 +13,12 @@ export type StockAdjustOptions = {
   source?: EventSource;
   expirationDate?: string;
   sessionId?: string;
+  /** Only a date the user picked may teach shelf life; a lot's existing date must not. */
+  dateFromUser?: boolean;
 };
+
+/** Whether the user set the lot date; only those dates feed learned shelf life. */
+export type AddEventMeta = { dateFromUser?: boolean };
 
 @Injectable({ providedIn: 'root' })
 export class HistoryEventManagerService {
@@ -23,7 +28,7 @@ export class HistoryEventManagerService {
   /** Emits once after every event that is persisted to the event log. */
   readonly mutation$ = this._mutation$.asObservable();
 
-  async logAddNewItem(item: PantryItem, addedQuantity: number, sessionId?: string, timestamp?: string) {
+  async logAddNewItem(item: PantryItem, addedQuantity: number, sessionId?: string, timestamp?: string, meta?: AddEventMeta) {
     const nextQuantity = sumQuantities(item.batches ?? []);
     const result = await this.eventLog.logAddEvent({
       productId: item._id,
@@ -35,6 +40,8 @@ export class HistoryEventManagerService {
       source: 'add_modal',
       categoryId: item.categoryId,
       foodType: item.foodType,
+      foodKind: item.foodKind,
+      dateFromUser: meta?.dateFromUser,
       expirationDate: item.batches?.[0]?.expirationDate,
       sessionId,
       timestamp,
@@ -49,7 +56,8 @@ export class HistoryEventManagerService {
     addedQuantity: number,
     expirationDate?: string,
     sessionId?: string,
-    timestamp?: string
+    timestamp?: string,
+    meta?: AddEventMeta
   ) {
     const previousQuantity = sumQuantities(previousItem.batches ?? []);
     const nextQuantity = sumQuantities(updatedItem.batches ?? []);
@@ -63,6 +71,8 @@ export class HistoryEventManagerService {
       source: 'add_modal',
       categoryId: updatedItem.categoryId,
       foodType: updatedItem.foodType,
+      foodKind: updatedItem.foodKind,
+      dateFromUser: meta?.dateFromUser,
       expirationDate,
       sessionId,
       timestamp,
@@ -118,6 +128,7 @@ export class HistoryEventManagerService {
       foodType: updatedItem.foodType,
       expirationDate,
       sessionId,
+      dateFromUser: options.dateFromUser ?? false,
     };
     const result = await (deltaQuantity > 0
       ? this.eventLog.logAddEvent(params)

@@ -5,6 +5,7 @@ import { PantryStoreService } from '../pantry-store.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { ToastService } from '../../shared';
+import { FoodType } from '@core/models/shared/enums.model';
 import type { PantryItem } from '@core/models/pantry';
 
 describe('PantryPendientesSheetStateService', () => {
@@ -41,6 +42,27 @@ describe('PantryPendientesSheetStateService', () => {
       ],
     });
     service = TestBed.inject(PantryPendientesSheetStateService);
+  });
+
+  describe('suggested rows', () => {
+    function openWith(item: PantryItem) {
+      (pantryStoreSpy.activeProducts as any).set([item]);
+      (pantryStoreSpy.loadedProducts as any).set([item]);
+      service.open();
+      return service.rows()[0];
+    }
+
+    it('marks a type-stored staple like Sal as no-expiry, without a date', () => {
+      const row = openWith(makeItem({ name: 'Sal', foodType: FoodType.NON_PERISHABLE }));
+      expect(row.noExpiry).toBeTrue();
+      expect(row.expirationDate).toBeUndefined();
+    });
+
+    it('dates Pan (carb) and leaves noExpiry off', () => {
+      const row = openWith(makeItem({ name: 'Pan', foodType: FoodType.CARB }));
+      expect(row.expirationDate).toBeDefined();
+      expect(row.noExpiry).toBeFalse();
+    });
   });
 
   describe('open', () => {

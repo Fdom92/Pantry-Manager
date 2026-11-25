@@ -10,40 +10,31 @@
     "tagline": "Configura tudo em menos de um minuto",
     "taglineDone": "Tudo pronto",
     "actions": {
-      "skip": "Ignorar",
       "next": "Seguinte",
       "start": "Começar",
       "skipHint": "Podes saltar este tutorial a qualquer momento.",
       "continue": "Continuar",
-      "enter": "Abrir a minha despensa",
       "notifyMe": "Sim, avisa-me",
       "notifyLater": "Mais tarde",
       "analyticsAccept": "Sim, ajudar",
-      "analyticsLater": "Agora não"
+      "analyticsLater": "Agora não",
+      "startEmpty": "Começar vazio"
     },
     "slides": {
+      "add": {
+        "title": "O que tens à mão agora mesmo?",
+        "description": "Adiciona um produto que tenhas em casa e avisamos-te antes de expirar. Basta um.",
+        "saveError": "Não foi possível guardar. Tenta novamente.",
+        "otherProduct": "Outro produto…",
+        "otherPlaceholder": "Escreve um produto"
+      },
       "notifications": {
         "title": "Aviso antes de expirar",
         "description": "Avisamos-te quando algo está prestes a expirar ou a acabar.",
         "previewTitle": "Produtos a expirar em breve",
-        "previewBody": "3 produtos expiram esta semana"
-      },
-      "seed": {
-        "title": "O que tens agora na despensa?",
-        "description": "Toca no que já tens. As quantidades ajustas depois. Podes saltar este passo.",
-        "selectedCount": "{{ count }} selecionados",
-        "skip": "Saltar este passo"
-      },
-      "confirm": {
-        "title": "A tua despensa está pronta 👌",
-        "description": "Adicionámos a tua seleção à despensa.",
-        "titleEmpty": "Sem problema",
-        "descriptionEmpty": "Adicionarás os teus produtos quando quiseres.",
-        "emptyBody": "Adiciona-os um a um a partir da despensa.",
-        "noExpiryLabel": "Sem validade",
-        "needsDateLabel": "Data por definir",
-        "expiresLabel": "Válido até {{date}}",
-        "adjustHint": "Ajusta datas e quantidades depois na tua despensa."
+        "previewBody": "3 produtos expiram esta semana",
+        "previewBodyProduct": "{{name}} expira {{when}}",
+        "previewTime": "agora"
       },
       "analytics": {
         "title": "Ajuda-nos a melhorar",
@@ -115,7 +106,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Adicionar produto"
+      "addProduct": "Adicionar produto",
+      "scanReceipt": "Digitalizar talão"
     },
     "generic": {
       "title": "Nada para mostrar",
@@ -495,29 +487,28 @@
     "coverage": {
       "title": "Cobertura",
       "household": "Pessoas em casa",
-      "sentence": "Com o que tens, aguentas {{duration}} sem comprar",
       "level": {
         "good": "Boa",
         "normal": "Apertada",
         "bad": "Baixa",
         "plenty": "Com folga"
       },
-      "legend": "Baixa: menos de {{low}} · Apertada: até {{tight}} · Boa: até {{good}} · Com folga: mais"
+      "headline": "Tens cerca de {{duration}} de comida"
     },
     "activity": {
       "title": "Rotação",
-      "detail": "Adicionaste {{added}} vezes e usaste {{consumed}} vezes este mês",
-      "detailNoAdds": "Usaste {{consumed}} vezes sem adicionar nada este mês",
+      "detail": "Adicionados: {{added}} · Usados em 30 dias: {{consumed}}",
+      "detailNoAdds": "Usados em 30 dias: {{consumed}}",
       "noActivity": "Sem atividade registada",
-      "rotationHigh": "Rotação alta",
-      "rotationMedium": "Rotação média",
-      "rotationLow": "Rotação baixa",
-      "windowLabel": "Últimos 30 dias",
-      "overHundred": "Este mês usou mais do que comprou: está a gastar o que já tinha."
+      "rotationHigh": "Alta",
+      "rotationMedium": "Média",
+      "rotationLow": "Baixa",
+      "headline": "Usaste {{percent}}% do que adicionaste",
+      "headlineNoAdds": "Estás a usar o que já tinhas"
     },
     "distribution": {
       "title": "Classificação",
-      "mostWasted": "Maior incidência",
+      "mostWasted": "Mais caducado",
       "leastRotating": "Baixa rotação",
       "unclassified": "Sem tipo de alimento: {{count}} (não contam aqui)"
     },
@@ -551,8 +542,8 @@
     },
     "saved": {
       "title": "Salvos a tempo",
-      "used": "Usados na última semana: {{count}}",
-      "wasted": "Desperdiçados este mês: {{count}}"
+      "used": "Usados a tempo: {{count}}",
+      "wasted": "Deitados fora este mês: {{count}}"
     },
     "topUsed": {
       "title": "O que mais usa",
@@ -568,6 +559,10 @@
       "title": "Congelador",
       "detail": "Congelados: {{count}}",
       "oldest": "O mais antigo está lá há {{oldest}}."
+    },
+    "sections": {
+      "month": "Este mês",
+      "pantry": "A tua despensa"
     }
   },
   "pantry": {
@@ -595,11 +590,6 @@
         "frozen": "Congelados"
       },
       "search": "Pesquisar produtos"
-    },
-    "coachMark": {
-      "addFirstItem": "Adiciona o teu primeiro produto real",
-      "addFirstItemHint": "Toca para começar a tua despensa",
-      "ctaLabel": "Adicionar produto"
     },
     "fastAdd": {
       "groupLabel": "Adicionar produtos",
@@ -691,7 +681,9 @@
         "household": "Casa"
       },
       "expiry": {
-        "suggestedHint": "A data é sugerida a partir do tipo de alimento. Edita-a se não bater certo."
+        "suggestedHint": "A data é sugerida a partir do tipo de alimento. Edita-a se não bater certo.",
+        "sourceLearned": "Com base nas tuas compras anteriores",
+        "sourceTable": "Estimada para este tipo de produto"
       }
     },
     "detail": {
@@ -889,8 +881,11 @@
       "processing": "A ler o talão…",
       "error": "Não foi possível ler o talão. Enquadre apenas a lista de produtos, aproxime-se e procure boa luz.",
       "retry": "Tentar novamente",
-      "matchExisting": "Será adicionado ao produto existente",
-      "createNew": "Será criado como produto novo",
+      "statusHave": "Já tem",
+      "statusNew": "Novo",
+      "suggestQuestion": "É o seu {{name}}?",
+      "suggestAccept": "Sim",
+      "notThisProduct": "Não é este produto",
       "increase": "Aumentar quantidade",
       "decrease": "Reduzir quantidade",
       "submit_one": "Adicionar 1 produto",
@@ -907,7 +902,6 @@
       "promptHeader": "Digitalizar talão",
       "promptGallery": "Escolher da galeria",
       "promptCamera": "Tirar foto",
-      "matchFresh": "Será marcado como disponível",
       "pickerError": "Não foi possível abrir a câmara ou a galeria. Tenta de novo.",
       "toggleDetails": "Ver tipo e validade"
     },

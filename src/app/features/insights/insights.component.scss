@@ -4,6 +4,21 @@
   gap: var(--app-theme-spacing-xl);
 }
 
+.insights-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-theme-spacing-md);
+
+  // Same look as .dashboard-section-title
+  &__title {
+    margin: 0;
+    font-size: var(--app-theme-font-size-md);
+    font-weight: var(--app-theme-font-weight-extra-bold);
+    color: var(--app-theme-text-color);
+    opacity: 0.7;
+  }
+}
+
 .insights-section {
   background: var(--ion-card-background);
   border-radius: var(--app-theme-card-border-radius);
@@ -37,16 +52,18 @@
 
 // ── Section B — activity ─────────────────────────────────────────────────────
 
+// Shared by waste, rotation and coverage: sentence on the left, level chip on the right
 .activity-headline-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--app-theme-spacing-sm);
 }
 
 .activity-headline {
-  font-size: var(--app-theme-font-size-3xl);
-  font-weight: var(--app-theme-font-weight-extra-bold);
-  line-height: var(--app-theme-line-height-display);
+  font-size: var(--app-theme-font-size-title);
+  font-weight: var(--app-theme-font-weight-bold);
+  line-height: var(--app-theme-line-height-tight);
   margin: 0;
 }
 
@@ -222,43 +239,6 @@
     --padding-end: 0;
     min-width: 40px;
     font-size: var(--app-theme-font-size-small);
-  }
-}
-
-// ── Coverage card ────────────────────────────────────────────────────────────
-
-.coverage-card {
-  display: flex;
-  align-items: center;
-  gap: var(--app-theme-spacing-md);
-  padding: var(--app-theme-spacing-md-plus);
-  background: var(--ion-item-background);
-  border-radius: var(--app-theme-radius-sm-plus);
-
-  ion-icon {
-    font-size: var(--app-theme-icon-size-md);
-    color: var(--app-theme-text-subtle);
-  }
-
-  &__headline {
-    display: flex;
-    align-items: baseline;
-    gap: var(--app-theme-spacing-sm);
-  }
-
-  &__value {
-    font-size: var(--app-theme-font-size-title);
-    font-weight: var(--app-theme-font-weight-bold);
-  }
-
-  &__hint {
-    font-size: var(--app-theme-font-size-small);
-    color: var(--app-theme-text-subtle);
-  }
-
-  &__info {
-    display: flex;
-    flex-direction: column;
   }
 }
 

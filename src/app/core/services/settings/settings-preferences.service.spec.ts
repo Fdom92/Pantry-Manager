@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { SettingsPreferencesService } from './settings-preferences.service';
 import { StorageService } from '../shared/storage.service';
-import { DEFAULT_PREFERENCES, NEAR_EXPIRY_WINDOW_DAYS } from '@core/constants';
+import { SystemBarsService } from '../shared/system-bars.service';
+import { DEFAULT_PREFERENCES, NEAR_EXPIRY_WINDOW_DAYS, STORAGE_KEYS } from '@core/constants';
 import type { AppPreferencesDoc } from '@core/models';
 
 describe('SettingsPreferencesService', () => {
@@ -308,6 +309,31 @@ describe('SettingsPreferencesService', () => {
 
       await service.savePreferences({ theme: 'light' } as any);
       expect(document.documentElement.style.colorScheme).toBe('light');
+    });
+  });
+
+  // ── native night mode ──────────────────────────────────────────────────────
+
+  describe('native night mode', () => {
+    it('sends the stored theme at startup and every change after it', async () => {
+      storageSpy.get.and.returnValue(Promise.resolve({ _id: 'preferences', type: 'preferences', theme: 'dark' } as any));
+      const systemBars = TestBed.inject(SystemBarsService);
+      const setNightMode = spyOn(systemBars, 'setNightMode');
+
+      await service.reload();
+      expect(setNightMode).toHaveBeenCalledWith('dark');
+
+      await service.savePreferences({ theme: 'system' } as any);
+      expect(setNightMode).toHaveBeenCalledWith('system');
+    });
+
+    it('mirrors the theme to localStorage, read by index.html before Angular boots', async () => {
+      storageSpy.get.and.returnValue(Promise.resolve({ _id: 'preferences', type: 'preferences', theme: 'dark' } as any));
+      await service.reload();
+      expect(localStorage.getItem(STORAGE_KEYS.THEME)).toBe('dark');
+
+      await service.savePreferences({ theme: 'light' } as any);
+      expect(localStorage.getItem(STORAGE_KEYS.THEME)).toBe('light');
     });
   });
 });

@@ -17,6 +17,20 @@
   <!-- add to homescreen for ios -->
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+  <!-- The theme class otherwise waits for the preferences in PouchDB, so the first paints were
+       light. app:theme mirrors the preference (STORAGE_KEYS.THEME). body too: the inlined critical
+       CSS paints it light until the full stylesheet, with the dark palette, loads. -->
+  <style>html.dark,html.dark body{background:#121212}</style>
+  <script>
+    (function () {
+      var theme = null;
+      try { theme = localStorage.getItem('app:theme'); } catch (e) {}
+      if (theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('ion-palette-dark', 'dark');
+      }
+    })();
+  </script>
 </head>
 
 <body>

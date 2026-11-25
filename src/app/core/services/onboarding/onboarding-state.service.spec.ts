@@ -1,0 +1,264 @@
+import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
+import type { PantryItem } from '@core/models/pantry';
+import { PantryStoreService } from '../pantry/pantry-store.service';
+import { ONBOARDING_QUICK_SEED_ITEMS } from '@core/constants';
+import type { AddOption } from '@core/domain/pantry';
+import { NavController } from '@ionic/angular';
+import { TranslateService } from '@ngx-translate/core';
+import { ActivationService } from '../analytics/activation.service';
+import { AnalyticsService } from '../analytics/analytics.service';
+import { NotificationPermissionService } from '../notifications/notification-permission.service';
+import { NotificationSchedulerService } from '../notifications/notification-scheduler.service';
+import { WelcomeNotificationService } from '../notifications/welcome-notification.service';
+import { FirstProductsService } from '../pantry/first-products.service';
+import { SettingsPreferencesService } from '../settings/settings-preferences.service';
+import { ClockService } from '../shared/clock.service';
+import { LocalStorageService } from '../shared/local-storage.service';
+import { LoggerService } from '../shared/logger.service';
+import { ToastService } from '../shared/toast.service';
+import { OnboardingStateService } from './onboarding-state.service';
+
+describe('OnboardingStateService — add step', () => {
+  const NOW = new Date('2026-11-16T10:00:00.000Z').getTime();
+  let service: OnboardingStateService;
+  let loaded: ReturnType<typeof signal<PantryItem[]>>;
+  let firstProducts: jasmine.SpyObj<FirstProductsService>;
+  let toast: jasmine.SpyObj<ToastService>;
+  let activation: jasmine.SpyObj<ActivationService>;
+  let slideNext: jasmine.Spy;
+  let swiperEl: HTMLElement;
+
+  const basic = (key: string, name: string): AddOption => ({
+    kind: 'basic',
+    seed: ONBOARDING_QUICK_SEED_ITEMS.find(s => s.key === key)!,
+    name,
+  });
+
+  beforeEach(() => {
+    loaded = signal<PantryItem[]>([]);
+    firstProducts = jasmine.createSpyObj('FirstProductsService', ['save']);
+    firstProducts.save.and.resolveTo([]);
+    TestBed.configureTestingModule({
+      providers: [
+        OnboardingStateService,
+        { provide: FirstProductsService, useValue: firstProducts },
+        { provide: PantryStoreService, useValue: { loadedProducts: loaded } },
+        { provide: ClockService, useValue: { now: () => NOW } },
+        { provide: NavController, useValue: jasmine.createSpyObj('NavController', ['navigateRoot']) },
+        { provide: NotificationPermissionService, useValue: {} },
+        {
+          provide: SettingsPreferencesService,
+          useValue: { getPreferences: async () => ({}), savePreferences: async () => undefined },
+        },
+        { provide: WelcomeNotificationService, useValue: {} },
+        { provide: NotificationSchedulerService, useValue: { scheduleAll: async () => undefined } },
+        { provide: TranslateService, useValue: { instant: (key: string) => key } },
+        { provide: AnalyticsService, useValue: jasmine.createSpyObj('AnalyticsService', ['track']) },
+        { provide: ActivationService, useValue: (activation = jasmine.createSpyObj('ActivationService', ['markOnboarded'])) },
+        { provide: LocalStorageService, useValue: { onboarding: { setSeen: () => undefined } } },
+        { provide: ToastService, useFactory: () => (toast = jasmine.createSpyObj('ToastService', ['error'])) },
+        { provide: LoggerService, useValue: jasmine.createSpyObj('LoggerService', ['error', 'warn']) },
+      ],
+    });
+    service = TestBed.inject(OnboardingStateService);
+    slideNext = jasmine.createSpy('slideNext');
+    swiperEl = Object.assign(document.createElement('div'), { swiper: { isEnd: false, slideNext, realIndex: 0 } });
+  });
+
+  it('does not offer a basic the pantry already has (a second onboarding run)', () => {
+    const seed = ONBOARDING_QUICK_SEED_ITEMS[0];
+    const all = service.addOptions().length;
+    loaded.set([{ _id: 'x', name: `onboarding.quickSeed.items.${seed.key}`, batches: [] } as unknown as PantryItem]);
+    const options = service.addOptions();
+    expect(options.length).toBe(all - 1);
+    expect(options.every(o => o.kind === 'basic' && o.seed.key !== seed.key)).toBeTrue();
+  });
+
+  /** The swiper reporting it now shows slide `index`, as a swipe or slideNext would. */
+  const landOn = (index: number) =>
+    service.onSlideChanged(Object.assign(document.createElement('div'), { swiper: { realIndex: index, slideNext } }));
+
+  it('a picked basic becomes a draft with its class, storage and a suggested date', () => {
+    service.addDraft(basic('eggs', 'Huevos'));
+    expect(service.drafts()).toEqual([
+      jasmine.objectContaining({ name: 'Huevos', classKey: 'eggs', storage: 'fresh', source: 'suggestion', dateFromUser: false }),
+    ]);
+    expect(service.drafts()[0].expirationDate).toBeTruthy();
+  });
+
+  it('a typed name gets its class from the name, and pantry when nothing matches', () => {
+    service.addDraft('huevos camperos');
+    service.addDraft('cosa rara');
+    const [eggs, unknown] = service.drafts();
+    expect(eggs).toEqual(jasmine.objectContaining({ classKey: 'eggs', storage: 'fresh', source: 'typed' }));
+    expect(unknown).toEqual(jasmine.objectContaining({ storage: 'pantry', source: 'typed' }));
+    expect(unknown.classKey).toBeUndefined();
+  });
+
+  it('the same product twice is one draft', () => {
+    service.addDraft(basic('eggs', 'Huevos'));
+    service.addDraft('huevos');
+    expect(service.drafts().length).toBe(1);
+  });
+
+  it('removeDraft drops that row', () => {
+    service.addDraft(basic('eggs', 'Huevos'));
+    service.addDraft(basic('milk', 'Leche'));
+    service.removeDraft(0);
+    expect(service.drafts().map(d => d.name)).toEqual(['Leche']);
+  });
+
+  it('firstDraft feeds the notification preview', () => {
+    expect(service.firstDraft()).toBeNull();
+    service.addDraft(basic('milk', 'Leche'));
+    service.addDraft(basic('eggs', 'Huevos'));
+    expect(service.firstDraft()?.name).toBe('Leche');
+  });
+
+  it('tapping a basic chip adds it, tapping it again removes it', () => {
+    const eggs = service.basicChips().find(c => c.option.kind === 'basic' && c.option.seed.key === 'eggs')!;
+    expect(service.basicChips().every(c => !c.selected)).toBeTrue();
+    service.toggleBasic(eggs.option);
+    expect(service.drafts()).toEqual([jasmine.objectContaining({ classKey: 'eggs', source: 'suggestion' })]);
+    expect(service.basicChips().find(c => c.option === eggs.option)!.selected).toBeTrue();
+    service.toggleBasic(eggs.option);
+    expect(service.drafts()).toEqual([]);
+    expect(service.basicChips().every(c => !c.selected)).toBeTrue();
+  });
+
+  it('a typed name matching a basic marks that chip selected, and the chip removes it', () => {
+    const milk = service.basicChips().find(c => c.option.kind === 'basic' && c.option.seed.key === 'milk')!;
+    service.addDraft(milk.option.kind === 'basic' ? milk.option.name : '');
+    expect(service.basicChips().find(c => c.option === milk.option)!.selected).toBeTrue();
+    service.toggleBasic(milk.option);
+    expect(service.drafts()).toEqual([]);
+  });
+
+  it('a draft row shows the basic\'s emoji, none for a product of its own', () => {
+    expect(service.emojiFor('onboarding.quickSeed.items.eggs')).toBe('🥚');
+    expect(service.emojiFor('Mi plato')).toBe('');
+  });
+
+  it('the notification preview names the first product, or none without drafts', () => {
+    expect(service.previewProductName()).toBeNull();
+    service.addDraft(basic('milk', 'Leche'));
+    service.addDraft(basic('eggs', 'Huevos'));
+    expect(service.previewProductName()).toBe('Leche');
+  });
+
+  it('continue from add saves the drafts before moving to notifications', async () => {
+    firstProducts.save.and.callFake(async () => {
+      expect(slideNext).not.toHaveBeenCalled();
+      return [];
+    });
+    service.addDraft(basic('milk', 'Leche'));
+    await service.continueFromAdd(swiperEl);
+    expect(firstProducts.save).toHaveBeenCalledOnceWith([jasmine.objectContaining({ name: 'Leche' })]);
+    expect(slideNext).toHaveBeenCalled();
+  });
+
+  it('continuing again after coming back does not save the products twice', async () => {
+    service.addDraft(basic('milk', 'Leche'));
+    await service.continueFromAdd(swiperEl);
+    await service.continueFromAdd(swiperEl);
+    expect(firstProducts.save).toHaveBeenCalledTimes(1);
+  });
+
+  it('startEmpty saves nothing, clears the drafts and moves on', async () => {
+    service.addDraft(basic('milk', 'Leche'));
+    await service.startEmpty(swiperEl);
+    expect(firstProducts.save).not.toHaveBeenCalled();
+    expect(service.firstDraft()).toBeNull();
+    expect(slideNext).toHaveBeenCalled();
+  });
+
+  it('leaving the add step by swipe saves the drafts, once', async () => {
+    service.addDraft(basic('milk', 'Leche'));
+    landOn(1);
+    await Promise.resolve();
+    landOn(2);
+    expect(firstProducts.save).toHaveBeenCalledOnceWith([jasmine.objectContaining({ name: 'Leche' })]);
+  });
+
+  it('a swipe with no drafts saves nothing', () => {
+    landOn(1);
+    expect(firstProducts.save).not.toHaveBeenCalled();
+  });
+
+  it('completing saves drafts left unsaved, and does not save again after Continuar', async () => {
+    service.addDraft(basic('milk', 'Leche'));
+    await service.completeOnboarding();
+    expect(firstProducts.save).toHaveBeenCalledTimes(1);
+
+    firstProducts.save.calls.reset();
+    await service.completeOnboarding();
+    expect(firstProducts.save).not.toHaveBeenCalled();
+  });
+
+  describe('onboarding_completed', () => {
+    const completedProps = () => {
+      const analytics = TestBed.inject(AnalyticsService) as jasmine.SpyObj<AnalyticsService>;
+      return analytics.track.calls.allArgs().find(([event]) => event === 'onboarding_completed')![1];
+    };
+
+    it('reports what the user saved, with the step they finished on', async () => {
+      service.addDraft(basic('milk', 'Leche'));
+      service.addDraft('Mi plato');
+      service.currentSlideIndex.set(2);
+      await service.completeOnboarding();
+
+      expect(completedProps()).toEqual({
+        own_count: 2,
+        own_source: 'suggestion',
+        started_empty: false,
+        last_step_index: 2,
+        notif_granted: false,
+        analytics_granted: false,
+      });
+      expect(activation.markOnboarded).toHaveBeenCalledWith(true);
+    });
+
+    it('started empty: no own_source, own_count 0', async () => {
+      await service.startEmpty(swiperEl);
+      await service.completeOnboarding();
+
+      const props = completedProps();
+      expect(props).toEqual(jasmine.objectContaining({ own_count: 0, started_empty: true }));
+      expect('own_source' in props!).toBeFalse();
+      expect('seed_count' in props!).toBeFalse();
+      expect('skipped' in props!).toBeFalse();
+      expect(activation.markOnboarded).toHaveBeenCalledWith(false);
+    });
+
+    it('empezar vacío and then adding products is not started_empty', async () => {
+      await service.startEmpty(swiperEl);
+      service.addDraft(basic('milk', 'Leche'));
+      await service.completeOnboarding();
+
+      expect(completedProps()).toEqual(jasmine.objectContaining({ own_count: 1, started_empty: false }));
+    });
+
+    it('a failed save counts no products', async () => {
+      firstProducts.save.and.rejectWith(new Error('disk full'));
+      service.addDraft(basic('milk', 'Leche'));
+      await service.completeOnboarding();
+
+      expect(completedProps()).toEqual(jasmine.objectContaining({ own_count: 0, started_empty: false }));
+    });
+  });
+
+  it('a failed save shows a toast, stays on the step and can be retried', async () => {
+    firstProducts.save.and.rejectWith(new Error('disk full'));
+    service.addDraft(basic('milk', 'Leche'));
+    await service.continueFromAdd(swiperEl);
+    expect(toast.error).toHaveBeenCalledWith('onboarding.slides.add.saveError');
+    expect(slideNext).not.toHaveBeenCalled();
+    expect(service.draftsSaved()).toBeFalse();
+
+    firstProducts.save.and.resolveTo([]);
+    await service.continueFromAdd(swiperEl);
+    expect(firstProducts.save).toHaveBeenCalledTimes(2);
+    expect(slideNext).toHaveBeenCalled();
+  });
+});

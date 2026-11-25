@@ -1,5 +1,5 @@
 import { computed, inject, signal } from '@angular/core';
-import { expiryAfterFoodTypeChange, inferFoodType, resolveSuggestedExpiry, sumQuantities } from '@core/domain/pantry';
+import { buildAddOptions, expiryAfterFoodTypeChange, FOOD_CLASS_BY_KEY, expirySourceAfterFoodTypeChange, inferFoodType, resolveSuggestedExpiry, sumQuantities } from '@core/domain/pantry';
 import type { AddEntry, PantryItem } from '@core/models/pantry';
 import type { FoodType } from '@core/models/shared/enums.model';
 import { buildPantryItemAutocomplete } from '@core/utils';
@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import type { AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import type { EntitySelectorEntry } from '@shared/components/entity-selector-modal/entity-selector-modal.component';
 import { ANALYTICS_EVENTS } from '@core/constants';
+import { ONBOARDING_QUICK_SEED_ITEMS, type OnboardingQuickSeedItem } from '@core/constants/onboarding/quick-seed.constants';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { LanguageService } from '../../shared/language.service';
 import { PantryStoreService } from '../pantry-store.service';
@@ -39,6 +40,9 @@ export abstract class PantryAddEntriesBase {
   /** Prefix for generated entry ids, so the two sheets never collide. */
   protected abstract readonly idPrefix: string;
 
+  /** Which basics this sheet suggests: the ones whose food class lives there. */
+  protected abstract readonly basicsStorage: 'pantry' | 'fresh';
+
   /** Which half of the catalogue this sheet draws from. */
   protected abstract belongsToCatalogue(item: PantryItem): boolean;
 
@@ -55,10 +59,12 @@ export abstract class PantryAddEntriesBase {
    * for the expiry hint below the list to mean anything, since that is what
    * the date is derived from.
    */
-  protected decorateEntry(name: string, item?: PantryItem): Partial<AddEntry> {
+  protected decorateEntry(name: string, item?: PantryItem, seed?: OnboardingQuickSeedItem): Partial<AddEntry> {
+    const foodClass = seed && FOOD_CLASS_BY_KEY.get(seed.classKey);
     return {
-      foodType: item?.foodType ?? inferFoodType(name),
-      ...this.suggestedExpiryFor(name, item),
+      foodType: item?.foodType ?? foodClass?.foodType ?? inferFoodType(name),
+      ...(foodClass ? { foodKind: foodClass.key } : {}),
+      ...this.suggestedExpiryFor(name, item, foodClass?.key),
     };
   }
 
@@ -78,10 +84,11 @@ export abstract class PantryAddEntriesBase {
       expirationDate: entry.expirationDate,
       noExpiry: entry.noExpiry,
       foodType: entry.foodType,
+      expirySource: entry.expirySource,
     }))
   );
 
-  readonly options = computed(() => this.buildOptions(this.pantryStore.loadedProducts(), this.entries()));
+  readonly options = computed(() => this.buildOptions(this.pantryStore.loadedProducts(), this.entries(), this.query()));
 
   readonly showEmptyAction = computed(() => normalizeTrim(this.query()).length >= 1);
 
@@ -151,6 +158,10 @@ export abstract class PantryAddEntriesBase {
   addEntry(option: AutocompleteItem<PantryItem>): void {
     const item = option?.raw;
     if (!item) {
+      const seed = option?.meta as OnboardingQuickSeedItem | undefined;
+      if (seed) {
+        this.addNewEntry(option.title, seed);
+      }
       return;
     }
     this.entries.update(current => {
@@ -189,7 +200,12 @@ export abstract class PantryAddEntriesBase {
       return;
     }
 
-    const formatted = formatFriendlyName(next, next);
+    this.addNewEntry(formatFriendlyName(next, next));
+  }
+
+  /** A product the pantry does not have yet; a basic brings its food class along. */
+  private addNewEntry(formatted: string, seed?: OnboardingQuickSeedItem): void {
+    const normalized = normalizeProductKey(formatted);
     this.entries.update(current => {
       const index = current.findIndex(entry => normalizeProductKey(entry.name) === normalized);
       if (index >= 0) {
@@ -202,7 +218,7 @@ export abstract class PantryAddEntriesBase {
           name: formatted,
           quantity: 1,
           isNew: true,
-          ...this.decorateEntry(formatted),
+          ...this.decorateEntry(formatted, undefined, seed),
         },
       ];
     });
@@ -218,6 +234,7 @@ export abstract class PantryAddEntriesBase {
       ...entry,
       foodType,
       ...expiryAfterFoodTypeChange(entry, foodType, new Date()),
+      expirySource: expirySourceAfterFoodTypeChange(entry, foodType),
     }));
   }
 
@@ -231,6 +248,7 @@ export abstract class PantryAddEntriesBase {
       expirationDate: date || undefined,
       noExpiry: date ? undefined : entry.noExpiry,
       dateFromUser: true,
+      expirySource: 'user',
     }));
   }
 
@@ -274,18 +292,32 @@ export abstract class PantryAddEntriesBase {
   }
 
   /** A restock is a new carton, so it gets a fresh suggestion, not the old batch's date. */
-  protected suggestedExpiryFor(name: string, item?: PantryItem): Partial<AddEntry> {
-    return resolveSuggestedExpiry(name, item?.foodType ?? null, new Date(), this.shelfLife.daysFor(item?.name ?? name, item?._id));
+  protected suggestedExpiryFor(name: string, item?: PantryItem, foodKind = item?.foodKind): Partial<AddEntry> {
+    const foodType = item?.foodType ?? (foodKind ? FOOD_CLASS_BY_KEY.get(foodKind)?.foodType : undefined);
+    const { source, ...suggested } = resolveSuggestedExpiry(name, foodType ?? null, new Date(), this.shelfLife.daysFor(item?.name ?? name, item?._id, foodKind, foodType), foodKind);
+    return { ...suggested, expirySource: source };
   }
 
-  private buildOptions(items: PantryItem[], entries: AddEntry[]): AutocompleteItem<PantryItem>[] {
+  private buildOptions(items: PantryItem[], entries: AddEntry[], query: string): AutocompleteItem<PantryItem>[] {
     const locale = this.languageService.getCurrentLocale();
     const uniqueEntries = dedupeByNormalizedKey(entries, entry => entry.name);
     const excluded = new Set(uniqueEntries.map(entry => entry.item?._id).filter(Boolean) as string[]);
-    return buildPantryItemAutocomplete(items.filter(item => this.belongsToCatalogue(item)), {
+    const picked = new Set(uniqueEntries.map(entry => normalizeProductKey(entry.name)));
+    const catalogue = items.filter(item => this.belongsToCatalogue(item));
+    const basics = ONBOARDING_QUICK_SEED_ITEMS
+      .filter(seed => FOOD_CLASS_BY_KEY.get(seed.classKey)?.storage === this.basicsStorage)
+      .map(seed => ({ seed, name: this.translate.instant(`onboarding.quickSeed.items.${seed.key}`) as string }))
+      .filter(basic => !picked.has(normalizeProductKey(basic.name)));
+    const own = buildPantryItemAutocomplete(catalogue, {
       locale,
       excludeIds: excluded,
       getQuantity: item => sumQuantities(item.batches ?? []),
     });
+    const ownById = new Map(own.map(o => [o.id, o]));
+    return buildAddOptions(catalogue.filter(item => ownById.has(item._id)), basics, query).map(option =>
+      option.kind === 'own'
+        ? ownById.get(option.item._id)!
+        : { id: `basic:${option.seed.key}`, title: option.name, emoji: option.seed.emoji, meta: option.seed }
+    );
   }
 }

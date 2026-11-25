@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, ViewChild, inject, signal } from '@angular/core';
+import { FirstStepsStateService } from '@core/services/retention/first-steps-state.service';
 import { RouterLink } from '@angular/router';
 import { NavController } from '@ionic/angular/standalone';
 import { DashboardStateService } from '@core/services/dashboard/dashboard-state.service';
@@ -73,6 +74,7 @@ export class DashboardComponent implements OnDestroy {
   private readonly insights = inject(InsightsStateService);
   private readonly insightsTracking = inject(InsightsTrackingStateService);
   private readonly navCtrl = inject(NavController);
+  private readonly firstSteps = inject(FirstStepsStateService);
   readonly isInsightsPro = this.insights.isPro;
   readonly repositionPredictions = this.insights.repositionPredictions;
   readonly wasteSummary = this.insights.wasteSummary;
@@ -146,6 +148,14 @@ export class DashboardComponent implements OnDestroy {
     if (!s) return false;
     // Hide reason when expiry date is visible — date already communicates urgency
     return !s.protagonist.expirationDate;
+  }
+
+  /** The pantry page consumes the query param in ionViewWillEnter and clears it. */
+  onFirstStep(action: 'add' | 'scan'): void {
+    this.firstSteps.choose(action, 'dashboard');
+    void this.navCtrl.navigateRoot('/pantry', {
+      queryParams: action === 'add' ? { openAddModal: true } : { startReceiptScan: true },
+    });
   }
 
   goToPendientes(): void {

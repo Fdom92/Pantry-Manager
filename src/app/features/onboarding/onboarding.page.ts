@@ -5,18 +5,27 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   inject,
+  signal,
   ViewChild,
 } from '@angular/core';
 import { OnboardingStateService } from '@core/services/onboarding/onboarding-state.service';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon, IonInput } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { OnboardingSeedGridComponent } from './components/seed-grid/seed-grid.component';
-import { AppDatePipe } from '@shared/pipes/date-display.pipes';
+import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
+import { RelativeDaysPipe } from '@shared/pipes/date-display.pipes';
 
 @Component({
   selector: 'app-onboarding',
   standalone: true,
-  imports: [AppDatePipe, IonContent, IonButton, IonIcon, TranslateModule, OnboardingSeedGridComponent],
+  imports: [
+    RelativeDaysPipe,
+    ExpiryPickerComponent,
+    IonContent,
+    IonButton,
+    IonIcon,
+    IonInput,
+    TranslateModule,
+  ],
   templateUrl: './onboarding.page.html',
   styleUrls: ['./onboarding.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,6 +35,10 @@ import { AppDatePipe } from '@shared/pipes/date-display.pipes';
 export class OnboardingPage implements AfterViewInit {
   @ViewChild('swiperRef') swiperElement?: ElementRef<HTMLElement>;
   readonly facade = inject(OnboardingStateService);
+
+  /** "Otro producto…" reveals the input for a product that is not a basic. */
+  readonly otherOpen = signal(false);
+  readonly typed = signal('');
 
   ngAfterViewInit(): void {
     this.facade.initializeSwiper(this.swiperElement?.nativeElement);
@@ -39,12 +52,29 @@ export class OnboardingPage implements AfterViewInit {
     await this.facade.goToNextSlide(this.swiperElement?.nativeElement);
   }
 
-  async skipOnboarding(): Promise<void> {
-    await this.facade.skipOnboarding();
+  /** The keyboard shrinks the card after focus, leaving the input below the fold; bring it back. */
+  revealInput(input: EventTarget | null): void {
+    // Only the card scrolls: scrollIntoView would also shift the page under the swiper.
+    setTimeout(() => {
+      const el = input as HTMLElement | null;
+      const card = el?.closest('.slide-card');
+      if (el && card) {
+        card.scrollTop = el.offsetTop + el.offsetHeight - card.clientHeight;
+      }
+    }, 350);
   }
 
-  async completeOnboarding(): Promise<void> {
-    await this.facade.completeOnboarding();
+  addTyped(): void {
+    this.facade.addDraft(this.typed());
+    this.typed.set('');
+  }
+
+  async onContinueFromAdd(): Promise<void> {
+    await this.facade.continueFromAdd(this.swiperElement?.nativeElement);
+  }
+
+  async onStartEmpty(): Promise<void> {
+    await this.facade.startEmpty(this.swiperElement?.nativeElement);
   }
 
   async onAcceptNotifications(): Promise<void> {

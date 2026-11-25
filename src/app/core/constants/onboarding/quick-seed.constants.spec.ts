@@ -1,16 +1,14 @@
-import { FoodType } from '@core/models/shared';
 import { inferFoodType } from '@core/domain/pantry/food-type-inference.domain';
+import { FOOD_CLASS_BY_KEY } from '@core/domain/pantry/food-classes.data';
 import es from '../../../../assets/i18n/es.json';
 import { ONBOARDING_QUICK_SEED_ITEMS } from './quick-seed.constants';
 
 /**
- * The onboarding seeds carry an explicit foodType, and the inference dictionary
- * carries one for the same products under their names. Two sources for the same
- * fact drift silently: sugar sat as a carbohydrate in the dictionary while the
- * seed called it non-perishable, and nothing caught it but a reading of the
- * table. These tests are the thing that catches it.
+ * Each basic carries a food class, which is the one source for its type, date
+ * and pantry/fresh. The dictionary also infers a type from the name; two
+ * sources for one fact drift silently, so these tests catch the disagreement.
  */
-describe('onboarding quick seed — agrees with the inference dictionary', () => {
+describe('onboarding quick seed — points at food classes', () => {
   const labels = (es as { onboarding: { quickSeed: { items: Record<string, string> } } })
     .onboarding.quickSeed.items;
 
@@ -20,23 +18,28 @@ describe('onboarding quick seed — agrees with the inference dictionary', () =>
     }
   });
 
+  it('points every seed at an existing food class', () => {
+    for (const seed of ONBOARDING_QUICK_SEED_ITEMS) {
+      expect(FOOD_CLASS_BY_KEY.has(seed.classKey)).withContext(`${seed.key} -> ${seed.classKey}`).toBeTrue();
+    }
+  });
+
   it('never contradicts the type the dictionary infers from the seed name', () => {
     const clashes: string[] = [];
     for (const seed of ONBOARDING_QUICK_SEED_ITEMS) {
       const inferred = inferFoodType(labels[seed.key] ?? '');
-      // A seed whose name is not in the dictionary is fine — the seed's own type
-      // stands. Only an actual disagreement is a problem.
-      if (inferred !== null && inferred !== seed.foodType) {
-        clashes.push(`${seed.key}: seed=${seed.foodType} dictionary=${inferred}`);
+      const classType = FOOD_CLASS_BY_KEY.get(seed.classKey)?.foodType;
+      if (inferred !== null && inferred !== classType) {
+        clashes.push(`${seed.key}: class=${classType} dictionary=${inferred}`);
       }
     }
     expect(clashes).toEqual([]);
   });
 
-  it('only seeds types that exist in the enum', () => {
-    const known = Object.values(FoodType);
-    for (const seed of ONBOARDING_QUICK_SEED_ITEMS) {
-      expect(known).toContain(seed.foodType);
+  it('keeps salt, pepper, sugar and vinegar on a class that never expires', () => {
+    for (const key of ['salt', 'pepper', 'sugar', 'vinegar']) {
+      const seed = ONBOARDING_QUICK_SEED_ITEMS.find(s => s.key === key)!;
+      expect(FOOD_CLASS_BY_KEY.get(seed.classKey)?.sealedDays).withContext(key).toBeNull();
     }
   });
 });

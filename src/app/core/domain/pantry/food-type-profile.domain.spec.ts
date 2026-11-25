@@ -1,7 +1,8 @@
 import { FoodType } from '@core/models/shared/enums.model';
-import { FOOD_TYPE_PROFILE, foodTypeExpires } from './food-type-profile.domain';
+import { FOOD_TYPE_PROFILE } from './food-type-profile.domain';
 import { getExpiryModeFromFoodType } from './pantry-status.domain';
-import { suggestExpiryDate } from './expiry-suggestion.domain';
+import { foodTypeExpires, suggestExpiryDate } from './expiry-suggestion.domain';
+import { genericClassFor } from './food-classes.data';
 import deBundle from '../../../../assets/i18n/de.json';
 import enBundle from '../../../../assets/i18n/en.json';
 import esBundle from '../../../../assets/i18n/es.json';
@@ -29,7 +30,7 @@ describe('FOOD_TYPE_PROFILE', () => {
     for (const type of allTypes) {
       const ignored = getExpiryModeFromFoodType(type) === 'ignore';
       expect(foodTypeExpires(type)).withContext(type).toBe(!ignored);
-      expect(suggestExpiryDate(type, new Date('2026-01-01T12:00:00')) === undefined)
+      expect(suggestExpiryDate(genericClassFor(type), new Date('2026-01-01T12:00:00')) === undefined)
         .withContext(type)
         .toBe(ignored);
     }

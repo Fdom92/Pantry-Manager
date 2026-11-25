@@ -14,5 +14,7 @@ export interface PantryItem extends BaseDoc {
   expirationDate?: string;
   expirationStatus?: ExpirationStatus;
   foodType?: FoodType;
+  /** Food class key (food-classes table), resolved when the type or name is set. */
+  foodKind?: string;
   productType?: 'fresh' | 'pantry';
 }

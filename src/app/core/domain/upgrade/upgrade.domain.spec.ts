@@ -1,6 +1,7 @@
 import { PACKAGE_TYPE, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
 import {
   isEnvironmentalStoreError,
+  isEnvironmentalOfferingsError,
   buildPlanMeta,
   buildTrialMeta,
   computeAnnualSavingsPercent,
@@ -218,5 +219,31 @@ describe('isEnvironmentalStoreError', () => {
     for (const value of [undefined, null, 'x', 3, {}, { data: null }]) {
       expect(isEnvironmentalStoreError(value)).toBeFalse();
     }
+  });
+});
+
+describe('isEnvironmentalOfferingsError', () => {
+  it('accepts store problem by code, string or number', () => {
+    expect(isEnvironmentalOfferingsError({ code: '2' })).toBeTrue();
+    expect(isEnvironmentalOfferingsError({ code: 2 })).toBeTrue();
+  });
+
+  it('accepts STORE_PROBLEM_ERROR by readable code', () => {
+    expect(isEnvironmentalOfferingsError({ data: { readableErrorCode: 'STORE_PROBLEM_ERROR' } })).toBeTrue();
+  });
+
+  it('still accepts the environmental store errors', () => {
+    expect(isEnvironmentalOfferingsError({ code: '3' })).toBeTrue();
+  });
+
+  it('rejects configuration errors and non-objects', () => {
+    expect(isEnvironmentalOfferingsError({ code: '23' })).toBeFalse();
+    expect(isEnvironmentalOfferingsError(null)).toBeFalse();
+    expect(isEnvironmentalOfferingsError('2')).toBeFalse();
+  });
+
+  it('leaves isEnvironmentalStoreError (purchase) false for code 2', () => {
+    expect(isEnvironmentalStoreError({ code: '2' })).toBeFalse();
+    expect(isEnvironmentalStoreError({ data: { readableErrorCode: 'STORE_PROBLEM_ERROR' } })).toBeFalse();
   });
 });

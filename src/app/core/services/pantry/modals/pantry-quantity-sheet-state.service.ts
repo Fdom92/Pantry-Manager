@@ -5,6 +5,7 @@ import {
   dueBatchIndex, findFreezerLocation, findFridgeLocation, freezeOne, moveOne, needsFridgeWhenOpen, openOne, thawOne,
 } from '@core/domain/pantry';
 import type { ItemBatch } from '@core/models/pantry';
+import { resolveFoodClass } from '@core/domain/pantry/food-class-resolution.domain';
 import { generateBatchId } from '@core/utils';
 import { toNumberOrZero } from '@core/utils/formatting.util';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
@@ -172,7 +173,7 @@ export class PantryQuantitySheetStateService {
    * Apply accumulated quantity changes when closing the sheet.
    */
   private async applyPendingChanges(item: PantryItem, change: number, expiryDate?: string, noExpiry?: boolean): Promise<void> {
-    await this.batchOps.adjustTotalQuantityWithFIFO(item, change, this.pantryItemsState, expiryDate, 'quantity_sheet', noExpiry);
+    await this.batchOps.adjustTotalQuantityWithFIFO(item, change, this.pantryItemsState, expiryDate, 'quantity_sheet', noExpiry, undefined, !!expiryDate);
   }
 
 
@@ -183,10 +184,12 @@ export class PantryQuantitySheetStateService {
     return this.preferences.preferences().locationOptions ?? [];
   }
 
+  private classOf = (item: PantryItem) => resolveFoodClass(item.name, item.foodType, item.foodKind);
+
   async openOne(item: PantryItem): Promise<void> {
     const fridge = needsFridgeWhenOpen(item.foodType) ? findFridgeLocation(this.locations()) : undefined;
     await this.applyBatchAction(item, 'open', current =>
-      openOne(current.batches ?? [], current.foodType, new Date(), generateBatchId, fridge),
+      openOne(current.batches ?? [], this.classOf(current), new Date(), generateBatchId, fridge),
       batch => batch.expirationDate
         ? { key: 'pantry.quickActions.toast.openedUntil', params: { when: this.dates.expiry(batch.expirationDate) } }
         : { key: 'pantry.quickActions.toast.opened' });
@@ -204,7 +207,7 @@ export class PantryQuantitySheetStateService {
   }
 
   async thawOne(item: PantryItem): Promise<void> {
-    await this.applyBatchAction(item, 'thaw', current => thawOne(current.batches ?? [], new Date(), generateBatchId, findFridgeLocation(this.locations())),
+    await this.applyBatchAction(item, 'thaw', current => thawOne(current.batches ?? [], this.classOf(current), new Date(), generateBatchId, findFridgeLocation(this.locations())),
       batch => batch.expirationDate
         ? { key: 'pantry.quickActions.toast.thawedUntil', params: { when: this.dates.expiry(batch.expirationDate) } }
         : { key: 'pantry.quickActions.toast.thawed' });

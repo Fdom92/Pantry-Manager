@@ -1,35 +1,37 @@
 import { FoodType } from '@core/models/shared/enums.model';
 import { toLocalYmd } from '@core/utils/date.util';
-import { FOOD_TYPE_PROFILE, foodTypeExpires } from './food-type-profile.domain';
-
-export { foodTypeExpires };
+import type { FoodClass } from './food-classes.model';
+import { genericClassFor } from './food-classes.data';
 
 /**
- * Shelf life per FoodType, derived from FOOD_TYPE_PROFILE — null where a date
- * would be a fiction.
- *
- * No production code reads this: every caller goes through suggestExpiryDate.
- * It stays because the spec walks it against every FoodType value, which is
- * what fails the build when a food type is added without a shelf life.
+ * The 5.7 per-type shelf lives. Only learned-shelf-life reads it, to skip old ADD
+ * events whose date was the app's own suggestion (they carry no dateFromUser).
  */
-export const EXPIRY_SUGGESTION_DAYS: Record<FoodType, number | null> =
-  Object.fromEntries(
-    (Object.entries(FOOD_TYPE_PROFILE) as [FoodType, { shelfLifeDays: number | null }][])
-      .map(([type, profile]) => [type, profile.shelfLifeDays]),
-  ) as Record<FoodType, number | null>;
+export const LEGACY_SHELF_LIFE_DAYS: Readonly<Record<FoodType, number | null>> = {
+  [FoodType.PROTEIN]: 5,
+  [FoodType.VEGETABLE]: 7,
+  [FoodType.FRUIT]: 7,
+  [FoodType.DAIRY]: 14,
+  [FoodType.CARB]: 270,
+  [FoodType.NON_PERISHABLE]: 540,
+  [FoodType.BEVERAGE]: 180,
+  [FoodType.OTHER]: 120,
+  [FoodType.HOUSEHOLD]: null,
+};
+
+/** Whether a date means anything for this food type at all. */
+export function foodTypeExpires(foodType: FoodType): boolean {
+  return genericClassFor(foodType).sealedDays !== null;
+}
 
 /**
- * Suggests a `YYYY-MM-DD` expiry date by adding the foodType's shelf life to
- * fromDate, or undefined for a type that never expires — callers mark those
+ * Suggests a `YYYY-MM-DD` expiry date by adding the class's sealed days to
+ * fromDate, or undefined for a class that never expires — callers mark those
  * `noExpiry` instead of inventing a date.
  */
-export function suggestExpiryDate(
-  foodType: FoodType,
-  fromDate: Date,
-): string | undefined {
-  const days = FOOD_TYPE_PROFILE[foodType].shelfLifeDays;
-  if (days === null) return undefined;
+export function suggestExpiryDate(klass: FoodClass, fromDate: Date): string | undefined {
+  if (klass.sealedDays === null) return undefined;
   const result = new Date(fromDate);
-  result.setDate(result.getDate() + days);
+  result.setDate(result.getDate() + klass.sealedDays);
   return toLocalYmd(result);
 }

@@ -5,17 +5,20 @@ import { AlertController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { createDocumentId } from '@core/utils/uuid.util';
+import { normalizeSearchQuery } from '@core/utils/normalization.util';
 import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
-import { resolveSuggestedExpiry, inferFoodType, expiryAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
-import { reconstructRows, parseReceipt, matchReceiptName, MATCH_AUTO_THRESHOLD } from '@core/domain/receipt';
+import { FRESH_QTY, resolveFoodClass } from '@core/domain/pantry';
+import { resolveSuggestedExpiry, inferFoodType, expiryAfterFoodTypeChange, expirySourceAfterFoodTypeChange } from '@core/domain/pantry/food-type-inference.domain';
+import { reconstructRows, parseReceipt, matchReceiptName } from '@core/domain/receipt';
 import { classifyNativeDismissal } from '@core/domain/shared';
 import type { OcrLine, ParsedReceiptItem, ReceiptReviewLine } from '@core/models/receipt';
 import type { PantryItem } from '@core/models/pantry';
 import type { FoodType } from '@core/models/shared/enums.model';
 import { PantryStoreService } from '../pantry-store.service';
 import { HistoryEventManagerService } from '../../history/history-event-manager.service';
+import { ActivationService } from '../../analytics/activation.service';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { ReceiptLlmClientService } from '../../receipt/receipt-llm-client.service';
 import { UpgradeRevenuecatService } from '../../upgrade/upgrade-revenuecat.service';
@@ -38,6 +41,7 @@ export class PantryReceiptScanModalStateService {
   private readonly pantryStore = inject(PantryStoreService);
   private readonly eventManager = inject(HistoryEventManagerService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly activation = inject(ActivationService);
   private readonly translate = inject(TranslateService);
   private readonly toast = inject(ToastService);
   private readonly alertCtrl = inject(AlertController);
@@ -152,7 +156,7 @@ export class PantryReceiptScanModalStateService {
         mode: smart ? 'smart' : 'local',
       });
 
-      const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name }));
+      const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name, foodType: item.foodType, foodKind: item.foodKind }));
       const itemsById = new Map(this.pantryStore.loadedProducts().map(item => [item._id, item]));
 
       const lines: ReceiptReviewLine[] = items.map((item, index) => {
@@ -163,12 +167,15 @@ export class PantryReceiptScanModalStateService {
           parsed: item,
           match: matchedItem,
           matchScore: match?.score ?? 0,
+          matchAuto: match?.auto ?? false,
           included: item.confidence !== 'low',
           quantity: item.quantity,
           foodType: null,
           expirationDate: undefined,
           noExpiry: undefined,
           dateFromUser: false,
+          storage: 'pantry',
+          suggestedStorage: 'pantry',
           expanded: false,
         };
         // Reuse the same match/fresh predicates the rest of the service uses,
@@ -274,7 +281,7 @@ export class PantryReceiptScanModalStateService {
             if (!name) return;
             // Re-match against the pantry: typing the right name should link
             // the line to the existing product instead of creating a copy.
-            const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name }));
+            const candidates = this.pantryStore.loadedProducts().map(item => ({ id: item._id, name: item.name, foodType: item.foodType, foodKind: item.foodKind }));
             const rematch = matchReceiptName(name, candidates);
             const matchedItem = rematch
               ? this.pantryStore.loadedProducts().find(i => i._id === rematch.id) ?? null
@@ -287,6 +294,8 @@ export class PantryReceiptScanModalStateService {
                   parsed: { ...l.parsed, rawName: name },
                   match: matchedItem,
                   matchScore: rematch?.score ?? 0,
+                  matchAuto: rematch?.auto ?? false,
+                  suggestionAccepted: false,
                 };
                 return { ...updated, ...this.deriveLineFields(updated) };
               }),
@@ -299,9 +308,40 @@ export class PantryReceiptScanModalStateService {
     await alert.present();
   }
 
-  /** True when the match is strong enough to add to the existing item. */
+  /** True when the line will be added to the existing item: trusted by the matcher, or accepted by the user. */
   isAutoMatch(line: ReceiptReviewLine): boolean {
-    return !!line.match && line.matchScore >= MATCH_AUTO_THRESHOLD;
+    return !!line.match && (line.matchAuto || !!line.suggestionAccepted);
+  }
+
+  /** A possible match the user has not confirmed: saved as a new product unless accepted. */
+  isSuggestion(line: ReceiptReviewLine): boolean {
+    return !!line.match && !this.isAutoMatch(line);
+  }
+
+  acceptSuggestion(id: number): void {
+    this.updateLine(id, l => ({ ...l, suggestionAccepted: true }));
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'accept_suggestion' });
+  }
+
+  /** "Not this product": drop the match, the line becomes a new product named after the ticket. */
+  unmatchLine(id: number): void {
+    this.updateLine(id, l => ({ ...l, match: null, matchScore: 0, matchAuto: false, suggestionAccepted: false }));
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'unmatch' });
+  }
+
+  private updateLine(id: number, change: (line: ReceiptReviewLine) => ReceiptReviewLine): void {
+    this.reviewLines.update(lines =>
+      lines.map(l => {
+        if (l.id !== id) return l;
+        const updated = change(l);
+        return { ...updated, ...this.deriveLineFields(updated) };
+      }),
+    );
+  }
+
+  /** A fresh line is a state (sufficient), not a count: matched fresh item or new line sent to Frescos. */
+  isFreshLine(line: ReceiptReviewLine): boolean {
+    return this.isAutoMatch(line) ? this.isFreshMatch(line) : line.storage === 'fresh';
   }
 
   /** True when the auto-matched item is a fresh product (restocked, not lotted). */
@@ -317,16 +357,42 @@ export class PantryReceiptScanModalStateService {
    * fields should be) so the two can't drift into different answers for the
    * same question.
    */
-  private deriveLineFields(line: ReceiptReviewLine): Pick<ReceiptReviewLine, 'foodType' | 'expirationDate' | 'noExpiry'> {
+  private deriveLineFields(line: ReceiptReviewLine): Pick<ReceiptReviewLine, 'foodType' | 'expirationDate' | 'noExpiry' | 'expirySource' | 'storage' | 'suggestedStorage'> {
     const foodType = this.isAutoMatch(line) ? (line.match!.foodType ?? null) : inferFoodType(line.parsed.rawName);
+    const storage = this.storageFor(line, foodType);
     if (line.dateFromUser && (line.expirationDate || line.noExpiry)) {
-      return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry };
+      return { foodType, expirationDate: line.expirationDate, noExpiry: line.noExpiry, expirySource: 'user', ...storage };
     }
     const learned = this.isAutoMatch(line)
-      ? this.shelfLife.daysFor(line.match?.name, line.match?._id)
-      : this.shelfLife.daysFor(line.parsed.rawName);
-    const suggested = this.isFreshMatch(line) ? {} : resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned);
-    return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry };
+      ? this.shelfLife.daysFor(line.match?.name, line.match?._id, line.match?.foodKind, foodType)
+      : this.shelfLife.daysFor(line.parsed.rawName, undefined, null, foodType);
+    // A restocked fresh item needs a date too: its old batch date is the one it is replacing.
+    // Only a joined match lends its class: a suggestion is saved as a new product.
+    const matchKind = this.isAutoMatch(line) ? line.match?.foodKind : null;
+    const { source, ...suggested } = resolveSuggestedExpiry(line.parsed.rawName, foodType, new Date(), learned, matchKind);
+    return { foodType, expirationDate: suggested.expirationDate, noExpiry: suggested.noExpiry, expirySource: source, ...storage };
+  }
+
+  /** Class storage for a new line (unknown → pantry); a manual override survives re-derivation. */
+  private storageFor(line: ReceiptReviewLine, foodType: FoodType | null): Pick<ReceiptReviewLine, 'storage' | 'suggestedStorage'> {
+    if (this.isAutoMatch(line)) {
+      const storage = line.match!.productType === 'fresh' ? 'fresh' : 'pantry';
+      return { storage, suggestedStorage: storage };
+    }
+    const suggestedStorage = resolveFoodClass(line.parsed.rawName, foodType)?.storage ?? 'pantry';
+    const overridden = line.storage !== line.suggestedStorage;
+    return { storage: overridden ? line.storage : suggestedStorage, suggestedStorage };
+  }
+
+  canEditStorage(line: ReceiptReviewLine): boolean {
+    return !this.isAutoMatch(line);
+  }
+
+  setLineStorage(id: number, storage: 'pantry' | 'fresh'): void {
+    // Chips re-fire on the selected one; only a real change is an edit.
+    if (this.reviewLines().find(l => l.id === id)?.storage === storage) return;
+    this.reviewLines.update(lines => lines.map(l => (l.id === id ? { ...l, storage } : l)));
+    this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'storage' });
   }
 
   /**
@@ -344,7 +410,7 @@ export class PantryReceiptScanModalStateService {
 
   /** Whether this line has anything worth expanding the accordion for. */
   canExpand(line: ReceiptReviewLine): boolean {
-    return this.canEditFoodType(line) || this.canEditExpiry(line);
+    return this.canEditFoodType(line) || this.canEditExpiry(line) || this.isAutoMatch(line);
   }
 
   toggleExpanded(id: number): void {
@@ -362,7 +428,7 @@ export class PantryReceiptScanModalStateService {
     this.reviewLines.update(lines =>
       lines.map(l =>
         l.id === id
-          ? { ...l, foodType, ...expiryAfterFoodTypeChange(l, foodType, new Date()) }
+          ? { ...l, foodType, ...expiryAfterFoodTypeChange(l, foodType, new Date()), expirySource: expirySourceAfterFoodTypeChange(l, foodType), ...this.storageFor(l, foodType) }
           : l,
       ),
     );
@@ -374,7 +440,7 @@ export class PantryReceiptScanModalStateService {
     this.reviewLines.update(lines =>
       lines.map(l =>
         l.id === id
-          ? { ...l, expirationDate: date || undefined, noExpiry: date ? undefined : l.noExpiry, dateFromUser: true }
+          ? { ...l, expirationDate: date || undefined, noExpiry: date ? undefined : l.noExpiry, dateFromUser: true, expirySource: 'user' }
           : l,
       ),
     );
@@ -387,10 +453,22 @@ export class PantryReceiptScanModalStateService {
       lines.map(l => {
         if (l.id !== id) return l;
         const toggled = !l.noExpiry;
-        return { ...l, noExpiry: toggled || undefined, expirationDate: toggled ? undefined : l.expirationDate, dateFromUser: true };
+        return { ...l, noExpiry: toggled || undefined, expirationDate: toggled ? undefined : l.expirationDate, dateFromUser: true, expirySource: 'user' };
       }),
     );
     this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'no_expiry' });
+  }
+
+  /** Status pill of the collapsed line. */
+  lineStatus(line: ReceiptReviewLine): 'have' | 'new' | 'suggestion' {
+    if (this.isAutoMatch(line)) return 'have';
+    return this.isSuggestion(line) ? 'suggestion' : 'new';
+  }
+
+  /** The raw ticket text, only when it says something the displayed name does not. */
+  ticketText(line: ReceiptReviewLine): string | null {
+    const raw = line.parsed.rawName;
+    return normalizeSearchQuery(raw) === normalizeSearchQuery(this.displayName(line)) ? null : raw;
   }
 
   displayName(line: ReceiptReviewLine): string {
@@ -419,7 +497,7 @@ export class PantryReceiptScanModalStateService {
           // literal quantity, which would pile up batches the fresh model
           // doesn't expect.
           const updated = matchedItem.productType === 'fresh'
-            ? restockFreshItem(matchedItem, timestamp, generateBatchId())
+            ? restockFreshItem(matchedItem, timestamp, generateBatchId(), { expirationDate: line.expirationDate, noExpiry: line.noExpiry })
             : await this.pantryStore.addNewLot(matchedItem._id, {
                 quantity: line.quantity,
                 expiryDate: line.expirationDate,
@@ -427,7 +505,7 @@ export class PantryReceiptScanModalStateService {
               });
           if (updated) {
             await this.pantryStore.updateItem(updated);
-            await this.eventManager.logAddExistingItem(matchedItem, updated, line.quantity, undefined, sessionId, timestamp);
+            await this.eventManager.logAddExistingItem(matchedItem, updated, matchedItem.productType === 'fresh' ? FRESH_QTY.sufficient : line.quantity, line.expirationDate, sessionId, timestamp, { dateFromUser: line.dateFromUser });
             matched++;
           }
         } else {
@@ -435,7 +513,8 @@ export class PantryReceiptScanModalStateService {
             id: createDocumentId('item'),
             nowIso: timestamp,
             name: formatReceiptName(line.parsed.rawName),
-            quantity: line.quantity,
+            // Fresh is a state, not a count: 6 apples on the ticket is one "sufficient" batch.
+            quantity: line.storage === 'fresh' ? FRESH_QTY.sufficient : line.quantity,
             foodType: line.foodType ?? undefined,
             expirationDate: line.expirationDate,
             noExpiry: line.noExpiry,
@@ -443,18 +522,20 @@ export class PantryReceiptScanModalStateService {
           });
           const item: PantryItem = {
             ...base,
-            productType: 'pantry',
+            productType: line.storage,
+            ...(line.storage === 'fresh' ? { minThreshold: undefined, isBasic: false } : {}),
             supermarket: this.detectedSupermarket() ?? undefined,
           };
-          await this.pantryStore.addItem(item);
-          await this.eventManager.logAddNewItem(item, line.quantity, sessionId, timestamp);
+          await this.activation.saveAsFirstProduct('receipt', () => this.pantryStore.addItem(item));
+          await this.eventManager.logAddNewItem(item, item.batches[0].quantity, sessionId, timestamp, { dateFromUser: line.dateFromUser });
         }
         this.analytics.track(ANALYTICS_EVENTS.PANTRY_ITEM_ADDED, {
-          kind: 'despensa',
+          kind: this.isFreshLine(line) ? 'fresh' : 'despensa',
           source: 'receipt_scan',
           is_new: !this.isAutoMatch(line),
-          quantity: line.quantity,
+          quantity: this.isFreshLine(line) ? FRESH_QTY.sufficient : line.quantity,
           has_expiry: Boolean(line.expirationDate),
+          expiry_source: line.expirySource ?? 'none',
         });
         added++;
       }
@@ -462,6 +543,12 @@ export class PantryReceiptScanModalStateService {
       this.analytics.track(ANALYTICS_EVENTS.RECEIPT_SCAN_COMPLETED, {
         items_added: added,
         items_matched: matched,
+        fresh_lines: lines.filter(l => this.isFreshLine(l)).length,
+        storage_changed: lines.filter(l => !this.isAutoMatch(l) && l.storage !== l.suggestedStorage).length,
+        // A match the matcher did not trust: shown as "¿Es tu …?", accepted or not.
+        suggested_lines: lines.filter(l => this.isSuggestion(l) || l.suggestionAccepted).length,
+        suggested_accepted: lines.filter(l => l.suggestionAccepted).length,
+        no_match_lines: lines.filter(l => !l.match).length,
         supermarket: this.detectedSupermarket() ?? 'unknown',
         mode: this.usedSmartScan() ? 'smart' : 'local',
       });

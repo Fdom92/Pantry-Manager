@@ -10,40 +10,31 @@
     "tagline": "Empieza en 1 minuto",
     "taglineDone": "Todo listo",
     "actions": {
-      "skip": "Saltar",
       "next": "Siguiente",
       "start": "Empezar",
       "skipHint": "Puedes saltar este tutorial cuando quieras.",
       "continue": "Continuar",
-      "enter": "Entrar a mi despensa",
       "notifyMe": "Sí, avísame",
       "notifyLater": "Más tarde",
       "analyticsAccept": "Sí, ayudar",
-      "analyticsLater": "Ahora no"
+      "analyticsLater": "Ahora no",
+      "startEmpty": "Empezar vacío"
     },
     "slides": {
+      "add": {
+        "title": "¿Qué tienes a mano ahora mismo?",
+        "description": "Añade un producto que tengas en casa y te avisaremos antes de que caduque. Con uno basta.",
+        "saveError": "No se ha podido guardar. Inténtalo de nuevo.",
+        "otherProduct": "Otro producto…",
+        "otherPlaceholder": "Escribe un producto"
+      },
       "notifications": {
         "title": "Avisos antes de que caduque",
         "description": "Te avisamos cuando algo esté a punto de caducar o se acabe.",
         "previewTitle": "Productos próximos a caducar",
-        "previewBody": "3 productos expiran esta semana"
-      },
-      "seed": {
-        "title": "¿Qué tienes ahora en la despensa?",
-        "description": "Toca lo que ya tengas. Después editas cantidades. Puedes saltar este paso.",
-        "selectedCount": "{{ count }} seleccionados",
-        "skip": "Saltar este paso"
-      },
-      "confirm": {
-        "title": "Tu despensa lista 👌",
-        "description": "Hemos añadido lo que has seleccionado a tu despensa.",
-        "titleEmpty": "Sin problema",
-        "descriptionEmpty": "Añadirás tus productos cuando quieras.",
-        "emptyBody": "Puedes añadirlos uno a uno desde la despensa.",
-        "noExpiryLabel": "Sin caducidad",
-        "needsDateLabel": "Pendiente fecha",
-        "expiresLabel": "Caduca el {{date}}",
-        "adjustHint": "Ajusta fechas y cantidades en tu despensa cuando quieras."
+        "previewBody": "3 productos expiran esta semana",
+        "previewBodyProduct": "{{name}} caduca {{when}}",
+        "previewTime": "ahora"
       },
       "analytics": {
         "title": "Ayúdanos a mejorar",
@@ -115,7 +106,8 @@
   },
   "emptyStates": {
     "actions": {
-      "addProduct": "Añadir producto"
+      "addProduct": "Añadir producto",
+      "scanReceipt": "Escanear ticket"
     },
     "generic": {
       "title": "Nada que mostrar",
@@ -495,29 +487,28 @@
     "coverage": {
       "title": "Cobertura",
       "household": "Personas en casa",
-      "sentence": "Con lo que tienes, aguantas {{duration}} sin comprar",
       "level": {
         "good": "Buena",
         "normal": "Ajustado",
         "bad": "Bajo",
         "plenty": "De sobra"
       },
-      "legend": "Bajo: menos de {{low}} · Ajustado: hasta {{tight}} · Buena: hasta {{good}} · De sobra: más"
+      "headline": "Tienes unas {{duration}} de comida"
     },
     "activity": {
       "title": "Rotación",
-      "detail": "Añadiste {{added}} veces y usaste {{consumed}} veces este mes",
-      "detailNoAdds": "Usaste {{consumed}} veces sin añadir nada este mes",
+      "detail": "Añadidos: {{added}} · Usados en 30 días: {{consumed}}",
+      "detailNoAdds": "Usados en 30 días: {{consumed}}",
       "noActivity": "Sin actividad registrada",
-      "rotationHigh": "Rotación alta",
-      "rotationMedium": "Rotación media",
-      "rotationLow": "Rotación baja",
-      "windowLabel": "Últimos 30 días",
-      "overHundred": "Has gastado más de lo que has comprado este mes: estás tirando de lo que ya tenías."
+      "rotationHigh": "Alta",
+      "rotationMedium": "Media",
+      "rotationLow": "Baja",
+      "headline": "Has usado el {{percent}} % de lo que añadiste",
+      "headlineNoAdds": "Estás gastando lo que ya tenías"
     },
     "distribution": {
       "title": "Clasificación",
-      "mostWasted": "Mayor incidencia",
+      "mostWasted": "Más caducado",
       "leastRotating": "Baja rotación",
       "unclassified": "Sin tipo de alimento: {{count}} (no cuentan aquí)"
     },
@@ -551,8 +542,8 @@
     },
     "saved": {
       "title": "Salvados a tiempo",
-      "used": "Usados en su última semana: {{count}}",
-      "wasted": "Desperdiciados este mes: {{count}}"
+      "used": "Usados a tiempo: {{count}}",
+      "wasted": "Tirados este mes: {{count}}"
     },
     "topUsed": {
       "title": "Lo que más usas",
@@ -568,6 +559,10 @@
       "title": "Congelador",
       "detail": "Congelados: {{count}}",
       "oldest": "El más antiguo lleva {{oldest}}."
+    },
+    "sections": {
+      "month": "Este mes",
+      "pantry": "Tu despensa"
     }
   },
   "pantry": {
@@ -595,11 +590,6 @@
         "frozen": "Congelados"
       },
       "search": "Buscar productos"
-    },
-    "coachMark": {
-      "addFirstItem": "Añade tu primer producto real",
-      "addFirstItemHint": "Toca para empezar tu despensa",
-      "ctaLabel": "Añadir producto"
     },
     "fastAdd": {
       "groupLabel": "Añadir productos",
@@ -691,7 +681,9 @@
         "household": "Hogar"
       },
       "expiry": {
-        "suggestedHint": "La fecha se sugiere a partir del tipo de alimento. Edítala si no cuadra."
+        "suggestedHint": "La fecha se sugiere a partir del tipo de alimento. Edítala si no cuadra.",
+        "sourceLearned": "Según tus compras anteriores",
+        "sourceTable": "Estimada para este tipo de producto"
       }
     },
     "detail": {
@@ -889,8 +881,11 @@
       "processing": "Leyendo el ticket…",
       "error": "No se ha podido leer el ticket. Encuadra solo la lista de productos, acércate más y busca buena luz.",
       "retry": "Volver a intentar",
-      "matchExisting": "Se añadirá al producto existente",
-      "createNew": "Se creará como producto nuevo",
+      "statusHave": "Ya la tienes",
+      "statusNew": "Nuevo",
+      "suggestQuestion": "¿Es tu {{name}}?",
+      "suggestAccept": "Sí",
+      "notThisProduct": "No es este producto",
       "increase": "Aumentar cantidad",
       "decrease": "Reducir cantidad",
       "submit_one": "Añadir 1 producto",
@@ -907,7 +902,6 @@
       "promptHeader": "Escanear ticket",
       "promptGallery": "Elegir de la galería",
       "promptCamera": "Hacer foto",
-      "matchFresh": "Se marcará como disponible",
       "pickerError": "No se ha podido abrir la cámara ni la galería. Inténtalo de nuevo.",
       "toggleDetails": "Ver tipo y caducidad"
     },
