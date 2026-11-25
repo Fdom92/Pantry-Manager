@@ -15,8 +15,7 @@
     </div>
   </div>
 
-  <!-- events-prefix: unprefixed, Swiper re-emits its "click" as a DOM click on the
-       container, which the add step's autocomplete takes for a click outside and closes. -->
+  <!-- events-prefix: unprefixed, Swiper re-emits its "click" as a DOM click on the container. -->
   <swiper-container
     #swiperRef
     events-prefix="swiper"
@@ -34,59 +33,74 @@
         @switch (slide.key) {
           @case ('add') {
             @if (!facade.draftsSaved()) {
-              <!-- No autofocus: raising the keyboard inside a swiper slide on entry is unreliable on Android. -->
-              <app-entity-autocomplete
-                class="add-search"
-                [items]="addItems()"
-                [placeholder]="'onboarding.slides.add.placeholder' | translate"
-                [showAllOnFocus]="true"
-                [showEmptyAction]="true"
-                [showEmptyActionWhenNoExactMatch]="true"
-                [emptyActionLabel]="query().trim() ? ('pantry.fastAdd.addNew' | translate: { name: query().trim() }) : ''"
-                [emptyLabel]="'common.selects.noOptions' | translate"
-                (valueChange)="query.set($event)"
-                (optionSelected)="onOptionSelected($event)"
-                (emptyAction)="facade.addDraft($event)">
-              </app-entity-autocomplete>
-            }
-            @if (facade.drafts().length) {
-              <ul class="draft-list">
-                @for (draft of facade.drafts(); track draft.name; let i = $index) {
-                  <li class="draft-row">
-                    <div class="draft-head">
-                      <span class="draft-name">{{ draft.name }}</span>
-                      @if (!facade.draftsSaved()) {
-                        <ion-button
-                          fill="clear"
-                          size="small"
-                          color="medium"
-                          [attr.aria-label]="'common.actions.delete' | translate"
-                          (click)="facade.removeDraft(i)">
-                          <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-                        </ion-button>
-                      } @else {
-                        <ion-icon class="draft-saved" name="checkmark-circle"></ion-icon>
-                      }
-                    </div>
-                    @if (!facade.draftsSaved()) {
-                      <div class="draft-controls">
-                        <app-food-type-picker
-                          [foodType]="draft.foodType ?? null"
-                          (foodTypeChange)="facade.setDraftFoodType(i, $event)">
-                        </app-food-type-picker>
-                        <app-expiry-picker
-                          [date]="draft.expirationDate"
-                          [noExpiry]="draft.noExpiry ?? false"
-                          (dateChange)="facade.setDraftDate(i, $event)"
-                          (noExpiryToggle)="facade.toggleDraftNoExpiry(i)">
-                        </app-expiry-picker>
-                      </div>
-                    }
-                  </li>
+              <div class="basic-grid">
+                @for (chip of facade.basicChips(); track chip.option.kind === 'basic' ? chip.option.seed.key : chip.option.item._id) {
+                  @if (chip.option.kind === 'basic') {
+                    <button
+                      type="button"
+                      class="basic-chip"
+                      [class.basic-chip--selected]="chip.selected"
+                      [attr.aria-pressed]="chip.selected"
+                      (click)="facade.toggleBasic(chip.option)">
+                      <span aria-hidden="true">{{ chip.option.seed.emoji }}</span>
+                      {{ chip.option.name }}
+                    </button>
+                  }
                 }
-              </ul>
+              </div>
+              @if (!otherOpen()) {
+                <button type="button" class="other-link" (click)="otherOpen.set(true)">
+                  {{ 'onboarding.slides.add.otherProduct' | translate }}
+                </button>
+              } @else {
+                <!-- No autofocus: raising the keyboard inside a swiper slide is unreliable on Android. -->
+                <div class="other-row">
+                  <ion-input
+                    class="other-input"
+                    [placeholder]="'onboarding.slides.add.otherPlaceholder' | translate"
+                    [value]="typed()"
+                    (ionInput)="typed.set($event.detail.value ?? '')"
+                    (ionFocus)="revealInput($event.target)"
+                    (keydown.enter)="addTyped()">
+                  </ion-input>
+                  <ion-button size="small" [disabled]="!typed().trim()" (click)="addTyped()">
+                    {{ 'common.actions.add' | translate }}
+                  </ion-button>
+                </div>
+              }
             }
-            <div class="slide-sticky-footer">
+            <ul class="draft-list">
+              @for (draft of facade.drafts(); track draft.name; let i = $index) {
+                <li class="draft-row">
+                  <span class="draft-name">
+                    @let emoji = facade.emojiFor(draft.name);
+                    @if (emoji) {
+                      <span class="draft-emoji" aria-hidden="true">{{ emoji }}</span>
+                    }
+                    {{ draft.name }}
+                  </span>
+                  @if (!facade.draftsSaved()) {
+                    <app-expiry-picker
+                      [date]="draft.expirationDate"
+                      [noExpiry]="draft.noExpiry ?? false"
+                      (dateChange)="facade.setDraftDate(i, $event)"
+                      (noExpiryToggle)="facade.toggleDraftNoExpiry(i)">
+                    </app-expiry-picker>
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      color="medium"
+                      [attr.aria-label]="'common.actions.delete' | translate"
+                      (click)="facade.removeDraft(i)">
+                      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+                    </ion-button>
+                  } @else {
+                    <ion-icon class="draft-saved" name="checkmark-circle"></ion-icon>
+                  }
+                </li>
+              }
+            </ul>
+            <div class="slide-footer">
               <ion-button
                 color="primary"
                 shape="round"
@@ -110,16 +124,15 @@
                   src="assets/icon/app-icon.png"
                   alt="PantryMind" />
                 <span class="notif-app-name">PantryMind</span>
-                <span class="notif-app-time">now</span>
+                <span class="notif-app-time">{{ 'onboarding.slides.notifications.previewTime' | translate }}</span>
               </div>
               <div class="notif-title">
                 {{ 'onboarding.slides.notifications.previewTitle' | translate }}
               </div>
               <div class="notif-body">
-                @let first = facade.firstDraft();
-                <!-- A date already past would read "caduca hace N días": generic text instead. -->
-                @if (first?.expirationDate && facade.firstDraftDays() >= 0) {
-                  {{ 'onboarding.slides.notifications.previewBodyProduct' | translate: { name: first!.name, when: (facade.firstDraftDays() | appRelativeDays) } }}
+                <!-- The alert they will actually get: three days before the date. -->
+                @if (facade.previewProductName(); as name) {
+                  {{ 'onboarding.slides.notifications.previewBodyProduct' | translate: { name: name, when: (3 | appRelativeDays) } }}
                 } @else {
                   {{ 'onboarding.slides.notifications.previewBody' | translate }}
                 }

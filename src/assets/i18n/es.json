@@ -24,15 +24,17 @@
       "add": {
         "title": "¿Qué tienes a mano ahora mismo?",
         "description": "Añade un producto que tengas en casa y te avisaremos antes de que caduque. Con uno basta.",
-        "placeholder": "Escribe o elige: leche, huevos…",
-        "saveError": "No se ha podido guardar. Inténtalo de nuevo."
+        "saveError": "No se ha podido guardar. Inténtalo de nuevo.",
+        "otherProduct": "Otro producto…",
+        "otherPlaceholder": "Escribe un producto"
       },
       "notifications": {
         "title": "Avisos antes de que caduque",
         "description": "Te avisamos cuando algo esté a punto de caducar o se acabe.",
         "previewTitle": "Productos próximos a caducar",
         "previewBody": "3 productos expiran esta semana",
-        "previewBodyProduct": "{{name}} caduca {{when}}"
+        "previewBodyProduct": "{{name}} caduca {{when}}",
+        "previewTime": "ahora"
       },
       "analytics": {
         "title": "Ayúdanos a mejorar",

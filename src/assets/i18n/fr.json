@@ -24,15 +24,17 @@
       "add": {
         "title": "Qu'as-tu sous la main en ce moment ?",
         "description": "Ajoute un produit que tu as chez toi et on te préviendra avant qu'il expire. Un seul suffit.",
-        "placeholder": "Tape ou choisis : lait, œufs…",
-        "saveError": "Impossible d'enregistrer. Réessaie."
+        "saveError": "Impossible d'enregistrer. Réessaie.",
+        "otherProduct": "Autre produit…",
+        "otherPlaceholder": "Saisissez un produit"
       },
       "notifications": {
         "title": "Alerte avant l'expiration",
         "description": "On te prévient quand quelque chose va expirer ou s'épuiser.",
         "previewTitle": "Produits bientôt expirés",
         "previewBody": "3 produits expirent cette semaine",
-        "previewBodyProduct": "{{name}} expire {{when}}"
+        "previewBodyProduct": "{{name}} expire {{when}}",
+        "previewTime": "maintenant"
       },
       "analytics": {
         "title": "Aide-nous à améliorer l’app",

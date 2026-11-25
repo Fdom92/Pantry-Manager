@@ -3,7 +3,6 @@ import { signal } from '@angular/core';
 import type { PantryItem } from '@core/models/pantry';
 import { PantryStoreService } from '../pantry/pantry-store.service';
 import { ONBOARDING_QUICK_SEED_ITEMS } from '@core/constants';
-import { FoodType } from '@core/models/shared';
 import type { AddOption } from '@core/domain/pantry';
 import { NavController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
@@ -115,6 +114,37 @@ describe('OnboardingStateService — add step', () => {
     service.addDraft(basic('milk', 'Leche'));
     service.addDraft(basic('eggs', 'Huevos'));
     expect(service.firstDraft()?.name).toBe('Leche');
+  });
+
+  it('tapping a basic chip adds it, tapping it again removes it', () => {
+    const eggs = service.basicChips().find(c => c.option.kind === 'basic' && c.option.seed.key === 'eggs')!;
+    expect(service.basicChips().every(c => !c.selected)).toBeTrue();
+    service.toggleBasic(eggs.option);
+    expect(service.drafts()).toEqual([jasmine.objectContaining({ classKey: 'eggs', source: 'suggestion' })]);
+    expect(service.basicChips().find(c => c.option === eggs.option)!.selected).toBeTrue();
+    service.toggleBasic(eggs.option);
+    expect(service.drafts()).toEqual([]);
+    expect(service.basicChips().every(c => !c.selected)).toBeTrue();
+  });
+
+  it('a typed name matching a basic marks that chip selected, and the chip removes it', () => {
+    const milk = service.basicChips().find(c => c.option.kind === 'basic' && c.option.seed.key === 'milk')!;
+    service.addDraft(milk.option.kind === 'basic' ? milk.option.name : '');
+    expect(service.basicChips().find(c => c.option === milk.option)!.selected).toBeTrue();
+    service.toggleBasic(milk.option);
+    expect(service.drafts()).toEqual([]);
+  });
+
+  it('a draft row shows the basic\'s emoji, none for a product of its own', () => {
+    expect(service.emojiFor('onboarding.quickSeed.items.eggs')).toBe('🥚');
+    expect(service.emojiFor('Mi plato')).toBe('');
+  });
+
+  it('the notification preview names the first product, or none without drafts', () => {
+    expect(service.previewProductName()).toBeNull();
+    service.addDraft(basic('milk', 'Leche'));
+    service.addDraft(basic('eggs', 'Huevos'));
+    expect(service.previewProductName()).toBe('Leche');
   });
 
   it('continue from add saves the drafts before moving to notifications', async () => {
@@ -230,16 +260,5 @@ describe('OnboardingStateService — add step', () => {
     await service.continueFromAdd(swiperEl);
     expect(firstProducts.save).toHaveBeenCalledTimes(2);
     expect(slideNext).toHaveBeenCalled();
-  });
-
-  it('a type change drops a class of another type, and keeps one that still fits', () => {
-    service.addDraft(basic('eggs', 'Huevos'));
-    service.addDraft(basic('milk', 'Leche'));
-    service.setDraftFoodType(0, FoodType.DAIRY);
-    service.setDraftFoodType(1, FoodType.DAIRY);
-    const [eggs, milk] = service.drafts();
-    expect(eggs.classKey).toBeUndefined();
-    expect(eggs.foodType).toBe(FoodType.DAIRY);
-    expect(milk.classKey).toBe('uht-milk');
   });
 });

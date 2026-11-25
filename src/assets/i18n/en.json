@@ -24,15 +24,17 @@
       "add": {
         "title": "What do you have to hand right now?",
         "description": "Add one product you have at home and we'll remind you before it expires. One is enough.",
-        "placeholder": "Type or pick: milk, eggs…",
-        "saveError": "Couldn't save. Please try again."
+        "saveError": "Couldn't save. Please try again.",
+        "otherProduct": "Another product…",
+        "otherPlaceholder": "Type a product"
       },
       "notifications": {
         "title": "Heads-up before it expires",
         "description": "We notify you when something is about to expire or runs out.",
         "previewTitle": "Products expiring soon",
         "previewBody": "3 products expire this week",
-        "previewBodyProduct": "{{name}} expires {{when}}"
+        "previewBodyProduct": "{{name}} expires {{when}}",
+        "previewTime": "now"
       },
       "analytics": {
         "title": "Help us improve",

@@ -2,7 +2,6 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  computed,
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   inject,
@@ -10,12 +9,9 @@ import {
   ViewChild,
 } from '@angular/core';
 import { OnboardingStateService } from '@core/services/onboarding/onboarding-state.service';
-import type { AddOption } from '@core/domain/pantry';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon, IonInput } from '@ionic/angular/standalone';
 import { TranslateModule } from '@ngx-translate/core';
-import { EntityAutocompleteComponent, type AutocompleteItem } from '@shared/components/entity-autocomplete/entity-autocomplete.component';
 import { ExpiryPickerComponent } from '@shared/components/expiry-picker/expiry-picker.component';
-import { FoodTypePickerComponent } from '@shared/components/food-type-picker/food-type-picker.component';
 import { RelativeDaysPipe } from '@shared/pipes/date-display.pipes';
 
 @Component({
@@ -23,12 +19,11 @@ import { RelativeDaysPipe } from '@shared/pipes/date-display.pipes';
   standalone: true,
   imports: [
     RelativeDaysPipe,
-    EntityAutocompleteComponent,
     ExpiryPickerComponent,
-    FoodTypePickerComponent,
     IonContent,
     IonButton,
     IonIcon,
+    IonInput,
     TranslateModule,
   ],
   templateUrl: './onboarding.page.html',
@@ -41,17 +36,9 @@ export class OnboardingPage implements AfterViewInit {
   @ViewChild('swiperRef') swiperElement?: ElementRef<HTMLElement>;
   readonly facade = inject(OnboardingStateService);
 
-  /** What the user is typing on the add step, for the "Añadir «X»" option. */
-  readonly query = signal('');
-
-  readonly addItems = computed<AutocompleteItem<never, AddOption>[]>(() =>
-    this.facade.addOptions().map(option => ({
-      id: option.kind === 'basic' ? `basic:${option.seed.key}` : option.item._id,
-      title: option.kind === 'basic' ? option.name : option.item.name,
-      emoji: option.kind === 'basic' ? option.seed.emoji : undefined,
-      meta: option,
-    }))
-  );
+  /** "Otro producto…" reveals the input for a product that is not a basic. */
+  readonly otherOpen = signal(false);
+  readonly typed = signal('');
 
   ngAfterViewInit(): void {
     this.facade.initializeSwiper(this.swiperElement?.nativeElement);
@@ -65,10 +52,21 @@ export class OnboardingPage implements AfterViewInit {
     await this.facade.goToNextSlide(this.swiperElement?.nativeElement);
   }
 
-  onOptionSelected(item: AutocompleteItem<never, AddOption>): void {
-    if (item.meta) {
-      this.facade.addDraft(item.meta);
-    }
+  /** The keyboard shrinks the card after focus, leaving the input below the fold; bring it back. */
+  revealInput(input: EventTarget | null): void {
+    // Only the card scrolls: scrollIntoView would also shift the page under the swiper.
+    setTimeout(() => {
+      const el = input as HTMLElement | null;
+      const card = el?.closest('.slide-card');
+      if (el && card) {
+        card.scrollTop = el.offsetTop + el.offsetHeight - card.clientHeight;
+      }
+    }, 350);
+  }
+
+  addTyped(): void {
+    this.facade.addDraft(this.typed());
+    this.typed.set('');
   }
 
   async onContinueFromAdd(): Promise<void> {

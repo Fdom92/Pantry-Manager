@@ -24,15 +24,17 @@
       "add": {
         "title": "O que tens à mão agora mesmo?",
         "description": "Adiciona um produto que tenhas em casa e avisamos-te antes de expirar. Basta um.",
-        "placeholder": "Escreve ou escolhe: leite, ovos…",
-        "saveError": "Não foi possível guardar. Tenta novamente."
+        "saveError": "Não foi possível guardar. Tenta novamente.",
+        "otherProduct": "Outro produto…",
+        "otherPlaceholder": "Escreve um produto"
       },
       "notifications": {
         "title": "Aviso antes de expirar",
         "description": "Avisamos-te quando algo está prestes a expirar ou a acabar.",
         "previewTitle": "Produtos a expirar em breve",
         "previewBody": "3 produtos expiram esta semana",
-        "previewBodyProduct": "{{name}} expira {{when}}"
+        "previewBodyProduct": "{{name}} expira {{when}}",
+        "previewTime": "agora"
       },
       "analytics": {
         "title": "Ajuda-nos a melhorar",

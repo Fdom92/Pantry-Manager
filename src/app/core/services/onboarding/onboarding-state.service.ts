@@ -1,7 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { ANALYTICS_EVENTS, ONBOARDING_QUICK_SEED_ITEMS, ONBOARDING_SLIDES } from '@core/constants';
-import type { FoodType } from '@core/models/shared';
-import { daysUntilExpiry } from '@core/utils/date.util';
 import { formatFriendlyName, normalizeProductKey, normalizeTrim } from '@core/utils/normalization.util';
 import { ActivationService } from '../analytics/activation.service';
 import { AnalyticsService } from '../analytics/analytics.service';
@@ -10,7 +8,6 @@ import { LoggerService } from '../shared/logger.service';
 import { ToastService } from '../shared/toast.service';
 import {
   buildAddOptions,
-  expiryAfterFoodTypeChange,
   FOOD_CLASS_BY_KEY,
   resolveFoodClass,
   resolveSuggestedExpiry,
@@ -99,8 +96,8 @@ export class OnboardingStateService {
 
   readonly firstDraft = computed(() => this.drafts()[0] ?? null);
 
-  /** Days until the first draft expires, for the notification preview; NaN without a date. */
-  readonly firstDraftDays = computed(() => daysUntilExpiry(this.firstDraft()?.expirationDate, this.clock.now()));
+  /** The notification preview shows the 3-day alert for this product; null = generic text. */
+  readonly previewProductName = computed(() => this.firstDraft()?.name ?? null);
 
   /** Every basic, translated: a new user has no products of their own to suggest. */
   readonly addOptions = computed<AddOption[]>(() => {
@@ -114,6 +111,12 @@ export class OnboardingStateService {
         .filter(b => !owned.has(normalizeProductKey(b.name))),
       '',
     );
+  });
+
+  /** The basics as chips, selected while a draft of that name exists (picked or typed). */
+  readonly basicChips = computed(() => {
+    const drafted = new Set(this.drafts().map(d => normalizeProductKey(d.name)));
+    return this.addOptions().map(option => ({ option, selected: drafted.has(normalizeProductKey(this.optionName(option))) }));
   });
 
   constructor() {
@@ -234,18 +237,32 @@ export class OnboardingStateService {
     this.drafts.update(current => [...current, draft]);
   }
 
-  removeDraft(index: number): void {
-    this.drafts.update(current => current.filter((_, i) => i !== index));
+  /** Chip tap: adds the basic, or removes its draft when already there. */
+  toggleBasic(option: AddOption): void {
+    const key = normalizeProductKey(this.optionName(option));
+    const index = this.drafts().findIndex(d => normalizeProductKey(d.name) === key);
+    if (index >= 0) {
+      this.removeDraft(index);
+    } else {
+      this.addDraft(option);
+    }
   }
 
-  /** A type change re-suggests the date unless the user set it; a class of another type no longer applies. */
-  setDraftFoodType(index: number, foodType: FoodType): void {
-    this.updateDraft(index, draft => ({
-      ...draft,
-      foodType,
-      classKey: draft.classKey && FOOD_CLASS_BY_KEY.get(draft.classKey)?.foodType === foodType ? draft.classKey : undefined,
-      ...expiryAfterFoodTypeChange(draft, foodType, new Date(this.clock.now())),
-    }));
+  /** The basic's emoji for a draft row; '' for a product that is not a basic. */
+  emojiFor(name: string): string {
+    const key = normalizeProductKey(name);
+    const seed = ONBOARDING_QUICK_SEED_ITEMS.find(
+      s => normalizeProductKey(this.translate.instant(`onboarding.quickSeed.items.${s.key}`)) === key,
+    );
+    return seed?.emoji ?? '';
+  }
+
+  private optionName(option: AddOption): string {
+    return option.kind === 'basic' ? option.name : option.item.name;
+  }
+
+  removeDraft(index: number): void {
+    this.drafts.update(current => current.filter((_, i) => i !== index));
   }
 
   setDraftDate(index: number, date: string | undefined): void {

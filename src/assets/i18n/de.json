@@ -24,15 +24,17 @@
       "add": {
         "title": "Was hast du gerade zur Hand?",
         "description": "Füge ein Produkt hinzu, das du zu Hause hast, und wir erinnern dich, bevor es abläuft. Eines reicht.",
-        "placeholder": "Tippe oder wähle: Milch, Eier…",
-        "saveError": "Speichern fehlgeschlagen. Bitte versuche es erneut."
+        "saveError": "Speichern fehlgeschlagen. Bitte versuche es erneut.",
+        "otherProduct": "Anderes Produkt…",
+        "otherPlaceholder": "Produkt eingeben"
       },
       "notifications": {
         "title": "Hinweis vor dem Ablaufen",
         "description": "Wir benachrichtigen dich, wenn etwas bald abläuft oder zur Neige geht.",
         "previewTitle": "Produkte laufen bald ab",
         "previewBody": "3 Produkte laufen diese Woche ab",
-        "previewBodyProduct": "{{name}} läuft {{when}} ab"
+        "previewBodyProduct": "{{name}} läuft {{when}} ab",
+        "previewTime": "jetzt"
       },
       "analytics": {
         "title": "Hilf uns, besser zu werden",

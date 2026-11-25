@@ -24,15 +24,17 @@
       "add": {
         "title": "Cosa hai a portata di mano adesso?",
         "description": "Aggiungi un prodotto che hai in casa e ti avviseremo prima che scada. Ne basta uno.",
-        "placeholder": "Scrivi o scegli: latte, uova…",
-        "saveError": "Impossibile salvare. Riprova."
+        "saveError": "Impossibile salvare. Riprova.",
+        "otherProduct": "Altro prodotto…",
+        "otherPlaceholder": "Scrivi un prodotto"
       },
       "notifications": {
         "title": "Avviso prima della scadenza",
         "description": "Ti avvisiamo quando qualcosa sta per scadere o finire.",
         "previewTitle": "Prodotti in scadenza",
         "previewBody": "3 prodotti scadono questa settimana",
-        "previewBodyProduct": "{{name}} scade {{when}}"
+        "previewBodyProduct": "{{name}} scade {{when}}",
+        "previewTime": "ora"
       },
       "analytics": {
         "title": "Aiutaci a migliorare",
