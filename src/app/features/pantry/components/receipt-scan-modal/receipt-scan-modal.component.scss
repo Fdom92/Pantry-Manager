@@ -1,3 +1,4 @@
+@use '../../../../shared/styles/chip' as chip;
 @use '../../../../shared/styles/modal-sheet' as sheet;
 
 ion-modal.app-sheet-modal {
@@ -129,51 +130,91 @@ ion-modal.app-sheet-modal {
     overflow: hidden;
   }
 
-  &__ticket {
-    margin: 2px 0 0;
-    font-size: var(--app-theme-font-size-small);
-    color: var(--app-theme-text-muted);
-    font-style: italic;
-  }
-
-  &__suggest {
+  // Line 2: one line, never wraps; the ticket text gives way before the pill.
+  &__sub {
     display: flex;
     align-items: center;
     gap: var(--app-theme-spacing-xs);
-    margin-top: var(--app-theme-spacing-xs);
+    margin-top: 2px;
+    min-width: 0;
     font-size: var(--app-theme-font-size-small);
-    color: var(--app-theme-text-color);
-
-    ion-icon { font-size: var(--app-theme-icon-size-xs); }
   }
 
-  &__suggest-btn,
-  &__unmatch {
+  &__ticket {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--app-theme-text-muted);
+  }
+
+  &__pill {
+    @include chip.tonal;
+    @include chip.accent-muted;
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 12px;
-    border: 1px solid var(--app-theme-card-border-color);
+    max-width: 100%;
+    min-width: 0;
+    white-space: nowrap;
+
+    &--have { @include chip.accent-primary; }
+
+    &--suggest {
+      @include chip.accent-tertiary;
+      flex-shrink: 1;
+      padding-inline-end: 2px;
+    }
+  }
+
+  &__pill-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__suggest-btn {
+    flex-shrink: 0;
+    padding: 0 8px;
+    border: none;
     border-radius: 999px;
-    background: transparent;
-    color: var(--ion-color-primary);
+    background: var(--ion-color-tertiary);
+    color: var(--ion-color-tertiary-contrast);
     font: inherit;
     cursor: pointer;
   }
 
-  &__meta {
-    margin: 2px 0 0;
+  &__storage-chip {
+    @include chip.tonal;
+    @include chip.accent-muted;
+    margin: 0;
+    height: 28px;
     font-size: var(--app-theme-font-size-small);
-    color: var(--app-theme-text-muted);
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    padding-inline: var(--app-theme-spacing-sm);
+    // Unselected reads as an option, not as a second value next to the type chip.
+    --background: transparent;
+    font-weight: var(--app-theme-font-weight-normal);
 
-    ion-icon { font-size: var(--app-theme-icon-size-xs); }
-
-    &--match {
-      color: var(--app-theme-primary-on-surface);
+    &--active {
+      @include chip.accent-primary;
+      --background: color-mix(in srgb, var(--chip-accent) 18%, transparent);
+      font-weight: var(--app-theme-font-weight-bold);
     }
+  }
+
+  &__unmatch {
+    flex-basis: 100%;
+    padding: 2px 0;
+    border: none;
+    background: none;
+    text-align: start;
+    color: var(--ion-color-primary);
+    font: inherit;
+    font-size: var(--app-theme-font-size-small);
+    text-decoration: underline;
+    cursor: pointer;
   }
 
   &__qty {
@@ -220,13 +261,10 @@ ion-modal.app-sheet-modal {
     &:active { background: color-mix(in srgb, var(--ion-text-color) 7%, transparent); }
   }
 
-  &__storage {
-    flex: 1 1 100%;
-  }
-
   &__details {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: var(--app-theme-spacing-xs);
     margin-top: var(--app-theme-spacing-sm);
     padding-top: var(--app-theme-spacing-sm);

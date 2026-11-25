@@ -92,6 +92,33 @@ describe('PantryReceiptScanModalStateService', () => {
     service = TestBed.inject(PantryReceiptScanModalStateService);
   });
 
+  describe('collapsed line: status pill and ticket text', () => {
+    it('an auto match, fresh restock included, reads "have"', () => {
+      expect(service.lineStatus(makeLine({ match: makeMatchedItem(), matchAuto: true }))).toBe('have');
+      expect(service.lineStatus(makeLine({ match: makeMatchedItem({ productType: 'fresh' }), matchAuto: true }))).toBe('have');
+      expect(service.lineStatus(makeLine({ match: makeMatchedItem(), suggestionAccepted: true }))).toBe('have');
+    });
+
+    it('an unconfirmed match is a suggestion, no match is new', () => {
+      expect(service.lineStatus(makeLine({ match: makeMatchedItem(), matchAuto: false }))).toBe('suggestion');
+      expect(service.lineStatus(makeLine())).toBe('new');
+    });
+
+    it('shows the ticket text only when it differs from the displayed name', () => {
+      // New line: displayed name is the ticket text in Title Case.
+      expect(service.ticketText(makeLine())).toBeNull();
+      // Accents and spacing are not a difference worth a second line.
+      expect(service.ticketText(makeLine({
+        parsed: { rawName: 'LECHE  ENTERA', quantity: 1, confidence: 'high' },
+        match: makeMatchedItem({ name: 'Leche entéra' }), matchAuto: true,
+      }))).toBeNull();
+      expect(service.ticketText(makeLine({
+        parsed: { rawName: 'LCHE ENT HCD', quantity: 1, confidence: 'high' },
+        match: makeMatchedItem({ name: 'Leche entera' }), matchAuto: true,
+      }))).toBe('LCHE ENT HCD');
+    });
+  });
+
   describe('canEditFoodType / canEditExpiry / canExpand', () => {
     it('allows editing both for a brand-new line', () => {
       const line = makeLine();
@@ -373,6 +400,12 @@ describe('PantryReceiptScanModalStateService', () => {
       expect(args['fresh_lines']).toBe(2);
       expect(args['storage_changed']).toBe(1);
       expect(events.logAddNewItem).toHaveBeenCalledTimes(2);
+    });
+
+    it('picking the storage a line already has does nothing, not even an edit event', () => {
+      service.reviewLines.set([makeLine()]);
+      service.setLineStorage(1, 'pantry');
+      expect(analytics.track).not.toHaveBeenCalledWith(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'storage' });
     });
 
     it('toggling back to the suggestion is not a change', async () => {

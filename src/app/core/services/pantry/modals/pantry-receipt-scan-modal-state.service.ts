@@ -5,6 +5,7 @@ import { AlertController } from '@ionic/angular/standalone';
 import { TranslateService } from '@ngx-translate/core';
 import { ANALYTICS_EVENTS } from '@core/constants';
 import { createDocumentId } from '@core/utils/uuid.util';
+import { normalizeSearchQuery } from '@core/utils/normalization.util';
 import { generateBatchId } from '@core/utils/batch-id.util';
 import { buildAddItemPayload } from '@core/domain/pantry/pantry-builder.domain';
 import { restockFreshItem } from '@core/domain/pantry/fresh.domain';
@@ -388,6 +389,8 @@ export class PantryReceiptScanModalStateService {
   }
 
   setLineStorage(id: number, storage: 'pantry' | 'fresh'): void {
+    // Chips re-fire on the selected one; only a real change is an edit.
+    if (this.reviewLines().find(l => l.id === id)?.storage === storage) return;
     this.reviewLines.update(lines => lines.map(l => (l.id === id ? { ...l, storage } : l)));
     this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'storage' });
   }
@@ -454,6 +457,18 @@ export class PantryReceiptScanModalStateService {
       }),
     );
     this.analytics.track(ANALYTICS_EVENTS.RECEIPT_LINE_EDITED, { field: 'no_expiry' });
+  }
+
+  /** Status pill of the collapsed line. */
+  lineStatus(line: ReceiptReviewLine): 'have' | 'new' | 'suggestion' {
+    if (this.isAutoMatch(line)) return 'have';
+    return this.isSuggestion(line) ? 'suggestion' : 'new';
+  }
+
+  /** The raw ticket text, only when it says something the displayed name does not. */
+  ticketText(line: ReceiptReviewLine): string | null {
+    const raw = line.parsed.rawName;
+    return normalizeSearchQuery(raw) === normalizeSearchQuery(this.displayName(line)) ? null : raw;
   }
 
   displayName(line: ReceiptReviewLine): string {
